@@ -389,6 +389,24 @@ def dyadrads_1d() -> Rule:
     )
 
 
+def dyadlags_0d() -> Rule:
+    """Build the 0D binary temporal 3-lag lookup rule family."""
+
+    channels = (
+        exhaustive(component=0, alphabet_size=2),
+        exhaustive(component=1, alphabet_size=2),
+        exhaustive(component=2, alphabet_size=2),
+    )
+    output = lookup(channels, alphabet_size=2)
+
+    return Rule(
+        family="dyadlags_0d",
+        params={},
+        channels=channels,
+        metadata=output.metadata,
+    )
+
+
 def dyadaxes_2d() -> Rule:
     """Build the 2D Dyadaxes composed binary rule family.
 

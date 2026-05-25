@@ -198,6 +198,7 @@ Use `ca.canonical_coords(domain, shape, steps)` for the flattened
 Rules:
 
 - `ar2_modular_0d`
+- `dyadlags_0d`
 - `dyadrads_1d`
 - `dyadaxes_2d`
 - `dyadaxes_3d`
@@ -207,7 +208,7 @@ Neighborhoods:
 - `self_at`, `literal_offsets`, `metric_radius`, `shell`, `axis_shell`
 - `l1_shell`, `change_count_shell`, `directional_line`, `directional_fov`
 - `eca`, `moore`, `von_neumann`, `history`
-- `ar2_0d`, `dyadrads_1d`, `dyadaxes_2d`, `dyadaxes_3d`
+- `ar2_0d`, `dyadlags_0d`, `dyadrads_1d`, `dyadaxes_2d`, `dyadaxes_3d`
 
 Seeds:
 

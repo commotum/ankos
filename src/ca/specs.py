@@ -130,6 +130,8 @@ def rule_from_spec(spec: Mapping[str, Any] | str | rules_lib.Rule) -> rules_lib.
             coefficient_grid=tuple(int(value) for value in coefficient_grid),
             constant=int(params.get("constant", 1)),
         )
+    if family == "dyadlags_0d":
+        return rules_lib.dyadlags_0d()
     if family == "dyadrads_1d":
         return rules_lib.dyadrads_1d()
     if family == "dyadaxes_2d":
@@ -163,6 +165,8 @@ def _neighborhood_from_one_spec(
 
     if family == "ar2_0d":
         return neighborhoods_lib.ar2_0d(**params)
+    if family == "dyadlags_0d":
+        return neighborhoods_lib.dyadlags_0d(**params)
     if family == "dyadrads_1d":
         return neighborhoods_lib.dyadrads_1d(**params)
     if family == "dyadaxes_2d":

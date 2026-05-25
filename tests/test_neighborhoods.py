@@ -48,6 +48,17 @@ def test_history_preserves_temporal_components() -> None:
     assert _coords(neighborhood, component=2) == [[-2, 0, 0, 0]]
 
 
+def test_dyadlags_0d_preserves_temporal_lag_components() -> None:
+    neighborhood = neighborhoods.dyadlags_0d()
+
+    assert neighborhood.name == "dyadlags_0d"
+    assert neighborhood.params == {"time_offsets": (0, -1, -2)}
+    assert len(neighborhood.components) == 3
+    assert _coords(neighborhood, component=0) == [[0, 0, 0, 0]]
+    assert _coords(neighborhood, component=1) == [[-1, 0, 0, 0]]
+    assert _coords(neighborhood, component=2) == [[-2, 0, 0, 0]]
+
+
 def test_metric_radius_builds_eca_stencil() -> None:
     neighborhood = neighborhoods.metric_radius(
         axes=("x",),

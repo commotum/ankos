@@ -44,6 +44,16 @@ def _assert_batch_matches_loop(
     return batch
 
 
+def _dyadlags_dynamics() -> ca.Dynamics:
+    return ca.Dynamics(
+        domain="t+0d",
+        shape=(),
+        rule=rules.dyadlags_0d(),
+        neighborhoods=(neighborhoods.dyadlags_0d(),),
+        frontier=frontiers.time_slice(()),
+    )
+
+
 def test_ar2_rollout_returns_raw_episode() -> None:
     dynamics = ca.Dynamics(
         domain="t+0d",
@@ -95,6 +105,77 @@ def test_ar2_rollout_batch_matches_loop() -> None:
     assert batch.states.shape == (3, 5)
     assert ca.RawBatch is RawBatch
     assert ca.rollout_batch is not None
+
+
+def test_dyadlags_rollout_rule_zero_outputs_zero_after_seed() -> None:
+    episode = ca.rollout(
+        dynamics=_dyadlags_dynamics(),
+        rule_id=0,
+        seed_state=np.array([1, 1, 1]),
+        steps=4,
+    )
+
+    assert episode.domain == "t+0d"
+    assert episode.shape == ()
+    assert episode.states.tolist() == [1, 0, 0, 0]
+    assert episode.coords is not None
+    assert episode.coords.tolist() == [
+        [0, 0, 0, 0],
+        [1, 0, 0, 0],
+        [2, 0, 0, 0],
+        [3, 0, 0, 0],
+    ]
+
+
+def test_dyadlags_rollout_rule_255_outputs_one_after_seed() -> None:
+    episode = ca.rollout(
+        dynamics=_dyadlags_dynamics(),
+        rule_id=255,
+        seed_state=np.array([0, 0, 0]),
+        steps=4,
+    )
+
+    assert episode.states.tolist() == [0, 1, 1, 1]
+
+
+def test_dyadlags_rollout_rule_150_uses_three_lag_lookup() -> None:
+    episode = ca.rollout(
+        dynamics=_dyadlags_dynamics(),
+        rule_id=150,
+        seed_state=np.array([1, 1, 0]),
+        steps=6,
+    )
+
+    assert episode.states.tolist() == [0, 0, 1, 1, 0, 0]
+
+
+def test_dyadlags_rollout_batch_matches_loop() -> None:
+    batch = _assert_batch_matches_loop(
+        dynamics=_dyadlags_dynamics(),
+        rule_ids=[0, 37, 150, 255],
+        seed_states=np.array(
+            [
+                [1, 1, 1],
+                [0, 1, 0],
+                [1, 1, 0],
+                [0, 0, 0],
+            ],
+            dtype=np.int64,
+        ),
+        steps=6,
+    )
+
+    assert batch.states.shape == (4, 6)
+
+
+def test_dyadlags_rollout_rejects_non_binary_seed_values() -> None:
+    with pytest.raises(ValueError, match="dyadlags_0d initial_state"):
+        ca.rollout(
+            dynamics=_dyadlags_dynamics(),
+            rule_id=0,
+            seed_state=np.array([0, 1, 2]),
+            steps=2,
+        )
 
 
 def test_spatial_lookup_rule_zero_outputs_zero_state() -> None:

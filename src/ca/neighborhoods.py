@@ -636,6 +636,25 @@ def ar2_0d(time_offsets: Sequence[int] = (0, -1)) -> Neighborhood:
     )
 
 
+def dyadlags_0d(time_offsets: Sequence[int] = (0, -1, -2)) -> Neighborhood:
+    """Build the 0D binary temporal lookup read interface.
+
+    Reads current scalar value and two previous scalar values by default:
+    `x[t]`, `x[t-1]`, and `x[t-2]`. Component boundaries are preserved so the
+    lookup rule can treat each lag as its own binary channel.
+    """
+
+    normalized_offsets = tuple(int(time_offset) for time_offset in time_offsets)
+    neighborhood = history(normalized_offsets)
+
+    return Neighborhood(
+        components=neighborhood.components,
+        combine=neighborhood.combine,
+        name="dyadlags_0d",
+        params={"time_offsets": normalized_offsets},
+    )
+
+
 def dyadrads_1d(time_offset: int = 0) -> Neighborhood:
     """Build the 1D Dyadrads three-component neighborhood.
 

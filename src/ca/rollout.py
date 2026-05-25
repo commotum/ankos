@@ -158,6 +158,9 @@ def _rollout_states(
     if rule.family == "ar2_modular_0d":
         return _rollout_ar2(seed_state, rule, steps)
 
+    if rule.family == "dyadlags_0d":
+        return _rollout_temporal_lookup(seed_state, rule, steps)
+
     if rule.family in {"dyadrads_1d", "dyadaxes_2d", "dyadaxes_3d"}:
         return _rollout_spatial_lookup(
             initial_state=seed_state,
@@ -186,6 +189,9 @@ def _rollout_batch_states(
 
     if rule.family == "ar2_modular_0d":
         return _rollout_ar2_batch(seed_states, rule, rule_ids, steps)
+
+    if rule.family == "dyadlags_0d":
+        return _rollout_temporal_lookup_batch(seed_states, rule_ids, steps)
 
     if rule.family in {"dyadrads_1d", "dyadaxes_2d", "dyadaxes_3d"}:
         return _rollout_spatial_lookup_batch(
@@ -276,6 +282,17 @@ def apply_rule(rule: Any, reads: Sequence[Any], rule_id: int) -> Any:
     if instantiated.family == "ar2_modular_0d":
         return instantiated.fn(reads[0], reads[1])
 
+    if instantiated.family == "dyadlags_0d":
+        current = int(np.asarray(reads[0]).reshape(-1)[0])
+        previous = int(np.asarray(reads[1]).reshape(-1)[0])
+        older = int(np.asarray(reads[2]).reshape(-1)[0])
+        _validate_binary_values(
+            np.asarray((older, previous, current), dtype=np.int64),
+            label="dyadlags_0d reads",
+        )
+        index = current | (previous << 1) | (older << 2)
+        return (int(instantiated.rule_id) >> int(index)) & 1
+
     if instantiated.family in {"dyadrads_1d", "dyadaxes_2d", "dyadaxes_3d"}:
         channel_bits = []
         for channel in instantiated.channels:
@@ -311,6 +328,69 @@ def _rollout_ar2(initial_state: Any, rule: rules.Rule, steps: int) -> np.ndarray
         previous, current = current, nxt
 
     return states
+
+
+def _rollout_temporal_lookup(initial_state: Any, rule: rules.Rule, steps: int) -> np.ndarray:
+    """Roll a scalar binary temporal lookup episode.
+
+    The seed triple is interpreted as hidden history plus first serialized
+    value: `(x[-2], x[-1], x[0])`. Returned states start at `x[0]`.
+    """
+
+    seed = np.asarray(initial_state, dtype=np.int64).reshape(-1)
+    if seed.size != 3:
+        raise ValueError(f"dyadlags_0d initial_state must contain 3 values, got {seed.size}")
+    _validate_binary_values(seed, label="dyadlags_0d initial_state")
+
+    older = int(seed[0])
+    previous = int(seed[1])
+    current = int(seed[2])
+
+    states = np.empty((int(steps),), dtype=np.int64)
+    states[0] = current
+
+    for index in range(1, int(steps)):
+        lookup_index = current | (previous << 1) | (older << 2)
+        nxt = (int(rule.rule_id) >> lookup_index) & 1
+        states[index] = nxt
+        older, previous, current = previous, current, nxt
+
+    return states
+
+
+def _rollout_temporal_lookup_batch(
+    initial_states: Any,
+    rule_ids: np.ndarray,
+    steps: int,
+) -> np.ndarray:
+    seeds = np.asarray(initial_states, dtype=np.int64)
+    if seeds.ndim != 2 or seeds.shape[1] != 3:
+        raise ValueError(f"dyadlags_0d seed_states must have shape (B, 3), got {tuple(seeds.shape)}")
+    if seeds.shape[0] != rule_ids.size:
+        raise ValueError(
+            f"rule_ids has batch size {rule_ids.size}, but seed_states has batch size {seeds.shape[0]}"
+        )
+    _validate_binary_values(seeds, label="dyadlags_0d seed_states")
+
+    older = seeds[:, 0].copy()
+    previous = seeds[:, 1].copy()
+    current = seeds[:, 2].copy()
+
+    states = np.empty((rule_ids.size, int(steps)), dtype=np.int64)
+    states[:, 0] = current
+
+    for index in range(1, int(steps)):
+        lookup_index = current | (previous << 1) | (older << 2)
+        nxt = np.bitwise_and(np.right_shift(rule_ids, lookup_index), 1)
+        states[:, index] = nxt
+        older, previous, current = previous, current, nxt
+
+    return states
+
+
+def _validate_binary_values(values: np.ndarray, label: str) -> None:
+    if np.any((values != 0) & (values != 1)):
+        raise ValueError(f"{label} values must be binary (0 or 1)")
 
 
 def _rollout_ar2_batch(

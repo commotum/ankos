@@ -52,6 +52,31 @@ def test_dynamics_from_spec_accepts_plural_neighborhood_specs() -> None:
     assert dynamics.boundary == {"policy": "periodic"}
 
 
+def test_dynamics_from_spec_accepts_dyadlags_0d() -> None:
+    spec = {
+        "domain": "t+0d",
+        "shape": [],
+        "rule": "dyadlags_0d",
+        "neighborhoods": [{"family": "dyadlags_0d"}],
+        "frontier": "time_slice",
+    }
+
+    dynamics = ca.dynamics_from_spec(spec)
+    episode = ca.rollout(
+        dynamics=dynamics,
+        rule_id=150,
+        seed_state=np.array([1, 1, 0], dtype=np.int64),
+        steps=4,
+    )
+
+    assert dynamics.domain == "t+0d"
+    assert dynamics.shape == ()
+    assert dynamics.rule.family == "dyadlags_0d"
+    assert dynamics.neighborhoods[0].name == "dyadlags_0d"
+    assert ca.rule_count(dynamics.rule) == 256
+    assert episode.states.tolist() == [0, 0, 1, 1]
+
+
 def test_dynamics_from_spec_rejects_old_full_next_slice_name() -> None:
     spec = {
         "domain": "t+1d",

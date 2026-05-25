@@ -2,14 +2,17 @@
 
 import pytest
 
+import ca
 from ca import rules
 
 
 def test_rule_count_uses_declared_rule_range() -> None:
     assert rules.rule_count(rules.ar2_modular_0d()) == 256
+    assert rules.rule_count(rules.dyadlags_0d()) == 256
     assert rules.rule_count(rules.dyadrads_1d()) == 256
     assert rules.rule_count(rules.dyadaxes_2d()) == 256
     assert rules.rule_count(rules.dyadaxes_3d()) == 256
+    assert ca.rule_count(ca.dyadlags_0d_rule()) == 256
 
 
 def test_valid_rule_ids_returns_finite_range() -> None:
