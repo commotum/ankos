@@ -3,6 +3,7 @@
 import numpy as np
 import pytest
 
+import ca
 from ca import loci, seeds
 
 
@@ -11,6 +12,54 @@ def test_pair_seed_renders_numpy_pair() -> None:
 
     assert isinstance(rendered, np.ndarray)
     assert rendered.tolist() == [3, 5]
+
+
+def test_uniform_bits_renders_binary_vector() -> None:
+    rendered = seeds.render(seeds.uniform_bits(length=3), ())
+
+    assert rendered.shape == (3,)
+    assert rendered.dtype == np.int64
+    assert set(rendered.tolist()).issubset({0, 1})
+
+
+def test_uniform_bits_seed_is_deterministic_with_rng() -> None:
+    seed = seeds.uniform_bits(length=3)
+    left = seeds.render(seed, (), rng=np.random.default_rng(123))
+    right = seeds.render(seed, (), rng=np.random.default_rng(123))
+
+    np.testing.assert_array_equal(left, right)
+
+
+def test_uniform_bits_can_reject_all_zero_samples() -> None:
+    seed = seeds.uniform_bits(length=3, reject_all_zero=True)
+
+    for offset in range(100):
+        rendered = seeds.render(seed, (), rng=np.random.default_rng(offset))
+        assert rendered.any()
+
+
+def test_uniform_bits_rejects_invalid_length() -> None:
+    with pytest.raises(ValueError):
+        seeds.uniform_bits(length=0)
+
+
+def test_uniform_bits_is_publicly_exported() -> None:
+    assert ca.uniform_bits is seeds.uniform_bits
+
+
+def test_uniform_bits_integrates_with_dyadlags_rollout() -> None:
+    dynamics = ca.Dynamics(
+        domain="t+0d",
+        shape=(),
+        rule=ca.dyadlags_0d_rule(),
+        neighborhoods=(ca.dyadlags_0d_neighborhood(),),
+        frontier=ca.time_slice(()),
+    )
+    seed_state = ca.seeds.render(ca.uniform_bits(length=3), ())
+
+    episode = ca.rollout(dynamics, rule_id=0, seed_state=seed_state, steps=4)
+
+    assert episode.states.shape == (4,)
 
 
 def test_constant_seed_renders_full_shape() -> None:

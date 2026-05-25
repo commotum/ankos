@@ -212,7 +212,7 @@ Neighborhoods:
 
 Seeds:
 
-- `pair`, `uniform_pair`, `constant`, `point`, `bernoulli`, `selector_seed`
+- `pair`, `uniform_pair`, `uniform_bits`, `constant`, `point`, `bernoulli`, `selector_seed`
 - `subspace`, `finite_segment`, `body`, `compound`, `region`, `periodic`
 - `path`, `transform`, `structured`
 

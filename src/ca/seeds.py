@@ -178,6 +178,29 @@ def uniform_pair(value_count: int = 97, reject_zero_zero: bool = True) -> Seed:
     )
 
 
+def uniform_bits(length: int, reject_all_zero: bool = False) -> Seed:
+    """Sample a fixed-length binary vector uniformly."""
+
+    length = int(length)
+    reject_all_zero = bool(reject_all_zero)
+    if length <= 0:
+        raise ValueError(f"length must be positive, got {length}")
+
+    return Seed(
+        support=None,
+        family="uniform_bits",
+        params={
+            "length": length,
+            "reject_all_zero": reject_all_zero,
+        },
+        distribution={
+            "family": "uniform_bits",
+            "length": length,
+            "reject_all_zero": reject_all_zero,
+        },
+    )
+
+
 def bernoulli(
     p_low: float = 0.0,
     p_high: float = 1.0,
@@ -875,6 +898,16 @@ def render(seed: Seed, shape: Sequence[int], rng: Any | None = None) -> Any:
         while True:
             values = rng.integers(value_count, size=2, dtype=np.int64)
             if not params["reject_zero_zero"] or bool(values.any()):
+                return values
+
+    if seed.family == "uniform_bits":
+        params = seed.params or {}
+        length = int(params["length"])
+        reject_all_zero = bool(params.get("reject_all_zero", False))
+
+        while True:
+            values = rng.integers(2, size=length, dtype=np.int64)
+            if not reject_all_zero or bool(values.any()):
                 return values
 
     value = seed.fill_value if seed.selected_value is None else seed.selected_value

@@ -17,7 +17,7 @@ from .rules import dyadlags_0d as dyadlags_0d_rule
 from .rules import dyadrads_1d as dyadrads_1d_rule
 from .rules import dyadaxes_2d as dyadaxes_2d_rule
 from .rules import dyadaxes_3d as dyadaxes_3d_rule
-from .seeds import Seed, bernoulli, constant, pair, point, render, selector_seed, uniform_pair
+from .seeds import Seed, bernoulli, constant, pair, point, render, selector_seed, uniform_bits, uniform_pair
 from .specs import Dynamics, RawBatch, RawEpisode, dynamics_from_spec
 
 __all__ = [
@@ -80,6 +80,7 @@ __all__ = [
     "splitmix64",
     "symbolic",
     "time_slice",
+    "uniform_bits",
     "uniform_pair",
     "valid_rule_ids",
     "von_neumann",
