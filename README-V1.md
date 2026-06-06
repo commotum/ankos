@@ -1,29 +1,89 @@
 # ankos
 
-ANKoS is a small Python lab for the central experiment in *A New Kind of
-Science*: take a very simple rule, run it for a while, and look at what it
-actually does.
+ANKoS ("A New Kind of Science") is a Python project for running
+cellular-automaton experiments inspired by Wolfram's book. Import it as `ca`.
 
-The bet of the project is the same bet Wolfram makes in the book. Equations and
-closed-form analysis are only one way to do science. Another way is to search
-the space of simple programs directly. Some rules die out, some repeat, some
-make nested structure, some look random, and a few make persistent moving
-structures that are hard to predict without just running them.
-
-This package gives those experiments one common spine:
+The aim is one construction API for many CA families: elementary, multi-color,
+totalistic, two-dimensional, three-dimensional, and continuous. These systems
+vary by dimension, geometry, alphabet, neighborhood, rule form, update schedule,
+boundary, and seed, but share a common spine:
 
 ```text
-domain:        scalar, line, plane, or volume through time
+domain:        the spacetime dimension of the automaton
 shape:         the finite extent of the run
 alphabet:      the possible cell states
 seed:          the initial state
-boundary:      what happens at the edge
-frontier:      which cells update
-neighborhood:  what each updated cell reads
+boundary:      the edge convention for neighborhood reads
+frontier:      the cells updated at the next step
+neighborhood:  what each active cell reads
 rule:          how reads become the next state
 ```
 
-Import it as `ca`.
+The package implements fixed-grid trajectory generation.
+
+## Model
+
+An episode is a full-state trajectory over canonical coordinates:
+
+```text
+[t, x, y, z]
+```
+
+The same address covers scalar through three-dimensional systems:
+
+```text
+t+0D: [t, 0, 0, 0]
+t+1D: [t, x, 0, 0]
+t+2D: [t, x, y, 0]
+t+3D: [t, x, y, z]
+```
+
+ANKoS follows Wolfram's next-state convention: state `t` is present in the
+trajectory; the rule reads it and writes `t + 1`.
+
+```text
+state t -> state t + 1
+```
+
+At each update time, a frontier selects current-state sites, neighborhoods read
+relative offsets around those sites, and a rule writes next-state values.
+Temporal recurrences may also read earlier source times such as `t - 1`.
+
+## API
+
+```text
+ca.Dynamics + rule_id + seed_state + steps
+    -> ca.rollout(...)
+    -> ca.RawEpisode
+```
+
+`ca.Dynamics` describes the system:
+
+- `domain`: `t+0d`, `t+1d`, `t+2d`, or `t+3d`
+- `shape`: native spatial shape
+- `rule`: rule family
+- `neighborhoods`: read stencils
+- `frontier`: update-site selector
+- `boundary`: spatial read behavior
+- `metadata`: optional result metadata
+
+`ca.RawEpisode` returns `states`, coordinates, and episode metadata.
+
+Package modules:
+
+```text
+src/ca
+|-- loci.py            coordinates, selectors, masks, gathering
+|-- alphabets.py       finite value spaces
+|-- seeds.py           seed specs and rendering
+|-- neighborhoods.py   read stencils
+|-- frontiers.py       update-site selectors
+|-- rules.py           rule channels and families
+|-- rollout.py         NumPy rollout
+|-- specs.py           manifests and result types
+|-- rng.py             reproducible RNG helpers
+`-- __init__.py        public exports
+```
 
 ## Quick Start
 
@@ -33,13 +93,7 @@ Install dependencies:
 uv sync
 ```
 
-Run the tests:
-
-```bash
-uv run pytest -q
-```
-
-Roll a scalar second-order recurrence:
+Roll a scalar second-order modular recurrence:
 
 ```python
 import numpy as np
@@ -90,119 +144,12 @@ seed_state = np.array(
     dtype=np.int64,
 )
 
-episode = ca.rollout(dynamics, rule_id=37, seed_state=seed_state, steps=8)
-
+episode = ca.rollout(dynamics, rule_id=0, seed_state=seed_state, steps=2)
 print(episode.states.shape)
-# (8, 3, 3)
+# (2, 3, 3)
 ```
 
-The important thing is not that this tiny example is impressive. The important
-thing is that the same API scales across the little families you want to sweep:
-change the rule id, seed, shape, dimension, boundary, or neighborhood, then
-look at the trajectory.
-
-## What This Is For
-
-ANKoS is not trying to be a giant CA framework. It is a fixed-grid trajectory
-generator and construction API for experiments inspired by the book:
-
-- Chapter 2's crucial experiment: simple cellular automata do not always behave
-  simply.
-- Chapter 3's broader claim: the same behavior types recur across many simple
-  program families.
-- Chapter 5's dimensional question: higher dimensions add geometry, but not a
-  totally different story.
-- Chapter 6's random-start experiments: order, randomness, and localized
-  structures can be studied systematically.
-- Chapter 7 and 8's modeling lesson: simple local rules can be explanatory
-  mechanisms, not just curve-fitting devices.
-- Chapter 10 through 12's computational lesson: perception, prediction,
-  randomness, universality, and irreducibility are part of the same story.
-
-The code is deliberately small so the moving parts stay visible. If you want to
-understand a run, read the rule, the neighborhood, the seed, and the rollout.
-There should not be much else hiding behind the curtain.
-
-## Mental Model
-
-An episode is a full-state trajectory over canonical coordinates:
-
-```text
-[t, x, y, z]
-```
-
-Unused spatial axes are fixed at zero:
-
-```text
-t+0D: [t, 0, 0, 0]
-t+1D: [t, x, 0, 0]
-t+2D: [t, x, y, 0]
-t+3D: [t, x, y, z]
-```
-
-ANKoS follows Wolfram's next-state convention:
-
-```text
-state t -> state t + 1
-```
-
-At each update time:
-
-1. The frontier selects current-state sites.
-2. The neighborhood reads offsets around each selected site.
-3. The rule maps those reads to a next value.
-4. The result is written at the same spatial coordinate on time `t + 1`.
-
-Temporal recurrences can also read earlier source times such as `t - 1`.
-
-## API
-
-The main runtime path is:
-
-```text
-ca.Dynamics + rule_id + seed_state + steps
-    -> ca.rollout(...)
-    -> ca.RawEpisode
-```
-
-`ca.Dynamics` describes the reusable mechanics:
-
-- `domain`: `t+0d`, `t+1d`, `t+2d`, or `t+3d`
-- `shape`: native spatial shape
-- `rule`: rule family
-- `neighborhoods`: read stencils
-- `frontier`: update-site selector
-- `boundary`: spatial read behavior
-- `metadata`: optional result metadata
-
-`ca.RawEpisode` returns raw states, flattened canonical coordinates, and
-metadata. State arrays keep their native rank:
-
-```text
-t+0d: (steps,)
-t+1d: (steps, x)
-t+2d: (steps, x, y)
-t+3d: (steps, x, y, z)
-```
-
-Use `ca.canonical_coords(domain, shape, steps)` when you want the flattened
-`[t, x, y, z]` coordinate table directly.
-
-For homogeneous batches, use:
-
-```python
-batch = ca.rollout_batch(
-    dynamics=dynamics,
-    rule_ids=np.array([0, 37, 255]),
-    seed_states=seed_states,
-    steps=32,
-)
-```
-
-Batch rows may use different rule ids and seeds. They share one `Dynamics`,
-shape, and horizon.
-
-## Loading From A Manifest
+Load dynamics from a manifest:
 
 ```python
 import numpy as np
@@ -234,8 +181,17 @@ shape (3,) -> x = -1, 0, 1
 shape (4,) -> x = -1, 0, 1, 2
 ```
 
-This makes odd-sized grids naturally center on zero while even-sized grids keep
-a deterministic integer convention.
+State arrays keep native rank:
+
+```text
+t+0d: (steps,)
+t+1d: (steps, x)
+t+2d: (steps, x, y)
+t+3d: (steps, x, y, z)
+```
+
+Use `ca.canonical_coords(domain, shape, steps)` for the flattened
+`[t, x, y, z]` table.
 
 ## Built-Ins
 
@@ -256,8 +212,7 @@ Neighborhoods:
 
 Seeds:
 
-- `pair`, `uniform_pair`, `uniform_bits`, `constant`, `point`, `bernoulli`,
-  `selector_seed`
+- `pair`, `uniform_pair`, `uniform_bits`, `constant`, `point`, `bernoulli`, `selector_seed`
 - `subspace`, `finite_segment`, `body`, `compound`, `region`, `periodic`
 - `path`, `transform`, `structured`
 
@@ -277,32 +232,6 @@ Boundary policies:
 {"policy": "reflective"}
 ```
 
-## File Structure
-
-```text
-src/ca
-|-- loci.py            canonical coordinates, selectors, masks, gathering
-|-- alphabets.py       finite raw value spaces
-|-- seeds.py           seed specs and rendering
-|-- neighborhoods.py   read stencils
-|-- frontiers.py       update-site selectors
-|-- rules.py           rule channels and families
-|-- rollout.py         NumPy rollout and batched rollout
-|-- specs.py           manifests and result types
-|-- rng.py             reproducible RNG helpers
-`-- __init__.py        public exports
-```
-
-The shortest path through the code is:
-
-```text
-README.md -> src/ca/specs.py -> src/ca/neighborhoods.py
-          -> src/ca/rules.py -> src/ca/rollout.py
-```
-
-For seed experiments, add `src/ca/seeds.py`. For coordinate behavior, start in
-`src/ca/loci.py`.
-
 ## Reproducible Seeds
 
 Use `ca.rng` to derive NumPy generators for stochastic seed rendering:
@@ -316,43 +245,16 @@ seed_state = ca.render(ca.bernoulli(p_low=0.5, p_high=0.5), shape=(16,), rng=rng
 
 Pass the rendered `seed_state` to `ca.rollout(...)`.
 
-## Current Scope
-
-The implemented runtime is intentionally narrower than the full generator
-schema in `ref/notes/generator.md`.
-
-Currently supported:
-
-- fixed-grid trajectories in `t+0d`, `t+1d`, `t+2d`, and `t+3d`
-- compact neighborhood reads
-- full time-slice frontiers
-- fixed, periodic, reflective, and no-boundary policies
-- named Phase 1 families: AR2, Dyadlags, Dyadrads, and Dyadaxes
-- raw NumPy rollout and same-dynamics batched rollout
-
-Not yet the full story:
-
-- arbitrary state-dependent frontiers
-- fixed-support neighborhoods with masks
-- clamp boundary policy
-- generic isotropic, semi-totalistic, totalistic, formulaic, or stochastic
-  rule manifests
-- non-grid systems such as mobile automata, substitution systems, networks, or
-  multiway systems
-
-Those are natural extensions, but the present package keeps the first surface
-small and testable.
-
 ## References
 
 ```text
 ref/A-New-Kind-of-Science/ANKoS-Atlas.md  book atlas and chapter map
-ref/notes/generator.md                    trajectory generator schema
 ref/notes/CA-Types.md                     construction taxonomy
+ref/notes/generator.md                    trajectory generator schema
 ```
 
 ## Development
 
 ```bash
-uv run pytest -q
+uv run pytest
 ```
