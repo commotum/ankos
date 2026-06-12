@@ -2,7 +2,7 @@
 name = "ankos"
 version = "0.1.0"
 description = "A New Kind of Science cellular automata library"
-readme = "README.md"
+readme = "README-V2.md"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=2.2",

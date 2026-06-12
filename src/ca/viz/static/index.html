@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ANKoS Viz</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f7f4;
+      --ink: #20211f;
+      --muted: #666a62;
+      --line: #c9cbc3;
+      --panel: #ffffff;
+      --accent: #176b5d;
+      --accent-ink: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: var(--bg);
+      font: 14px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    header,
+    footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-color: var(--line);
+      background: var(--panel);
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+
+    footer {
+      min-height: 36px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0;
+      margin-right: 6px;
+    }
+
+    .control {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 32px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    select,
+    input[type="range"],
+    input[type="file"],
+    button {
+      font: inherit;
+    }
+
+    select,
+    button {
+      height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    select {
+      padding: 0 8px;
+    }
+
+    button {
+      min-width: 36px;
+      padding: 0 10px;
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    input[type="range"] {
+      width: min(260px, 36vw);
+      accent-color: var(--accent);
+    }
+
+    main {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .stage {
+      min-height: 0;
+      position: relative;
+      display: grid;
+      place-items: stretch;
+      padding: 12px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      display: block;
+      border: 1px solid var(--line);
+      background: #fff;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .meta span {
+      white-space: nowrap;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      header {
+        align-items: stretch;
+      }
+
+      .control {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      input[type="range"] {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">ANKoS Viz</div>
+      <input id="fileInput" type="file" accept=".ankos,application/octet-stream">
+      <div class="control">
+        <label for="viewMode">View</label>
+        <select id="viewMode"></select>
+      </div>
+      <div class="control">
+        <label for="timeSlider">t</label>
+        <input id="timeSlider" type="range" min="0" max="0" value="0">
+        <span id="timeValue">0</span>
+      </div>
+      <button id="prevButton" title="Previous frame">&lt;</button>
+      <button id="playButton" class="primary" title="Play or pause">Play</button>
+      <button id="nextButton" title="Next frame">&gt;</button>
+      <div id="sliceControl" class="control hidden">
+        <label for="sliceAxis">Slice</label>
+        <select id="sliceAxis">
+          <option value="xy">xy</option>
+          <option value="xz">xz</option>
+          <option value="yz">yz</option>
+        </select>
+        <select id="projectionMode">
+          <option value="slice">slice</option>
+          <option value="max">max</option>
+          <option value="sum">sum</option>
+          <option value="first-active">first</option>
+        </select>
+        <input id="sliceSlider" type="range" min="0" max="0" value="0">
+        <span id="sliceValue">0</span>
+      </div>
+      <div class="control">
+        <label for="zoomSelect">Zoom</label>
+        <select id="zoomSelect">
+          <option value="fit">fit</option>
+          <option value="1">1x</option>
+          <option value="2">2x</option>
+          <option value="4">4x</option>
+          <option value="8">8x</option>
+          <option value="16">16x</option>
+        </select>
+      </div>
+    </header>
+    <main>
+      <div class="stage">
+        <canvas id="viewCanvas"></canvas>
+      </div>
+    </main>
+    <footer>
+      <div id="meta" class="meta"></div>
+    </footer>
+  </div>
+  <script src="ankos-viz.js"></script>
+  <script src="render2d.js"></script>
+  <script src="rendergl.js"></script>
+</body>
+</html>

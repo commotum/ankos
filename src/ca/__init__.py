@@ -1,6 +1,6 @@
 """A New Kind of Science cellular automata library."""
 
-from . import alphabets, frontiers, loci, neighborhoods, rng, rules, seeds
+from . import alphabets, frontiers, loci, neighborhoods, rng, rules, seeds, viz
 from .alphabets import Alphabet, boolean, float_range_alphabet, int_range_alphabet, symbolic
 from .frontiers import Frontier, time_slice
 from .neighborhoods import Neighborhood, ar2_0d, axis_shell, change_count_shell, directional_fov
@@ -83,5 +83,6 @@ __all__ = [
     "uniform_bits",
     "uniform_pair",
     "valid_rule_ids",
+    "viz",
     "von_neumann",
 ]
