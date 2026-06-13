@@ -1,6 +1,6 @@
 """A New Kind of Science cellular automata library."""
 
-from . import alphabets, frontiers, loci, neighborhoods, rng, rules, seeds, viz
+from . import alphabets, datasets, frontiers, loci, neighborhoods, rng, rules, seeds, viz
 from .alphabets import Alphabet, boolean, float_range_alphabet, int_range_alphabet, symbolic
 from .frontiers import Frontier, time_slice
 from .neighborhoods import Neighborhood, ar2_0d, axis_shell, change_count_shell, directional_fov
@@ -51,6 +51,7 @@ __all__ = [
     "dyadaxes_2d_rule",
     "dyadaxes_3d_neighborhood",
     "dyadaxes_3d_rule",
+    "datasets",
     "dynamics_from_spec",
     "eca",
     "float_range_alphabet",
