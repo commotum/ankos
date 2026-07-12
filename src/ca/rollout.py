@@ -23,8 +23,13 @@ from typing import Any
 
 import numpy as np
 
-from . import loci, rules
+from . import loci, rng, rules
 from .specs import Dynamics, RawBatch, RawEpisode
+
+
+LAGCOUNTS_0D_SEED_LENGTH = 10
+LAGCOUNTS_0D_STATE_MASK = (1 << LAGCOUNTS_0D_SEED_LENGTH) - 1
+LAGCOUNTS_0D_HASH_KEY = 0xD1B54A32D192ED03
 
 
 # ---------------------------------------------------------------------------
@@ -76,10 +81,7 @@ def rollout(
         steps=steps,
         states=np.asarray(states),
         coords=coords,
-        metadata={
-            "boundary": dict(dynamics.boundary),
-            **dict(dynamics.metadata or {}),
-        },
+        metadata=_episode_metadata(dynamics, rule),
     )
 
 
@@ -136,10 +138,7 @@ def rollout_batch(
         steps=steps,
         states=np.asarray(states),
         coords=coords,
-        metadata={
-            "boundary": dict(dynamics.boundary),
-            **dict(dynamics.metadata or {}),
-        },
+        metadata=_episode_metadata(dynamics, rule),
     )
 
 
@@ -160,6 +159,9 @@ def _rollout_states(
 
     if rule.family == "dyadlags_0d":
         return _rollout_temporal_lookup(seed_state, rule, steps)
+
+    if rule.family == "lagcounts_0d":
+        return _rollout_lagcounts(seed_state, rule, steps)
 
     if rule.family in {"dyadrads_1d", "dyadaxes_2d", "dyadaxes_3d"}:
         return _rollout_spatial_lookup(
@@ -192,6 +194,9 @@ def _rollout_batch_states(
 
     if rule.family == "dyadlags_0d":
         return _rollout_temporal_lookup_batch(seed_states, rule_ids, steps)
+
+    if rule.family == "lagcounts_0d":
+        return _rollout_lagcounts_batch(seed_states, rule_ids, steps)
 
     if rule.family in {"dyadrads_1d", "dyadaxes_2d", "dyadaxes_3d"}:
         return _rollout_spatial_lookup_batch(
@@ -228,6 +233,16 @@ def canonical_coords(
 
     space = loci.coordinate_space(shape_tuple, steps=int(steps))
     return loci.coord_grid(space).reshape(-1, 4)
+
+
+def _episode_metadata(dynamics: Dynamics, rule: Any) -> dict[str, Any]:
+    metadata = {
+        "boundary": dict(dynamics.boundary),
+        **dict(dynamics.metadata or {}),
+    }
+    if rule.family == "lagcounts_0d":
+        metadata.setdefault("prompt_prefix_states", LAGCOUNTS_0D_SEED_LENGTH)
+    return metadata
 
 
 def _validate_domain_shape(domain: str, shape: tuple[int, ...]) -> None:
@@ -292,6 +307,17 @@ def apply_rule(rule: Any, reads: Sequence[Any], rule_id: int) -> Any:
         )
         index = current | (previous << 1) | (older << 2)
         return (int(instantiated.rule_id) >> int(index)) & 1
+
+    if instantiated.family == "lagcounts_0d":
+        current = int(np.asarray(reads[0]).reshape(-1)[0])
+        bands = [np.asarray(reads[index], dtype=np.int64).reshape(-1) for index in range(1, 4)]
+        values = np.concatenate((np.asarray((current,), dtype=np.int64), *bands))
+        _validate_binary_values(values, label="lagcounts_0d reads")
+        context = _lagcounts_context_from_counts(
+            current=current,
+            counts=tuple(int(band.sum()) for band in bands),
+        )
+        return _sampled_context_bit(int(instantiated.rule_id), context)
 
     if instantiated.family in {"dyadrads_1d", "dyadaxes_2d", "dyadaxes_3d"}:
         channel_bits = []
@@ -386,6 +412,126 @@ def _rollout_temporal_lookup_batch(
         older, previous, current = previous, current, nxt
 
     return states
+
+
+def _rollout_lagcounts(initial_state: Any, rule: rules.Rule, steps: int) -> np.ndarray:
+    """Roll a scalar binary count-banded temporal lookup episode."""
+
+    seed = np.asarray(initial_state, dtype=np.int64).reshape(-1)
+    if seed.size != LAGCOUNTS_0D_SEED_LENGTH:
+        raise ValueError(
+            "lagcounts_0d initial_state must contain "
+            f"{LAGCOUNTS_0D_SEED_LENGTH} values, got {seed.size}"
+        )
+    _validate_binary_values(seed, label="lagcounts_0d initial_state")
+
+    steps = int(steps)
+    states = np.empty((steps,), dtype=np.int64)
+    prefix_steps = min(steps, LAGCOUNTS_0D_SEED_LENGTH)
+    states[:prefix_steps] = seed[:prefix_steps]
+    if steps <= LAGCOUNTS_0D_SEED_LENGTH:
+        return states
+
+    state = _lagcounts_seed_to_state(seed)
+    for index in range(LAGCOUNTS_0D_SEED_LENGTH, steps):
+        context = _lagcounts_context(state)
+        nxt = _sampled_context_bit(int(rule.rule_id), context)
+        states[index] = nxt
+        state = ((state << 1) & LAGCOUNTS_0D_STATE_MASK) | nxt
+
+    return states
+
+
+def _rollout_lagcounts_batch(
+    initial_states: Any,
+    rule_ids: np.ndarray,
+    steps: int,
+) -> np.ndarray:
+    seeds = np.asarray(initial_states, dtype=np.int64)
+    if seeds.ndim != 2 or seeds.shape[1] != LAGCOUNTS_0D_SEED_LENGTH:
+        raise ValueError(
+            "lagcounts_0d seed_states must have shape "
+            f"(B, {LAGCOUNTS_0D_SEED_LENGTH}), got {tuple(seeds.shape)}"
+        )
+    if seeds.shape[0] != rule_ids.size:
+        raise ValueError(
+            f"rule_ids has batch size {rule_ids.size}, but seed_states has batch size {seeds.shape[0]}"
+        )
+    _validate_binary_values(seeds, label="lagcounts_0d seed_states")
+
+    steps = int(steps)
+    states = np.empty((rule_ids.size, steps), dtype=np.int64)
+    prefix_steps = min(steps, LAGCOUNTS_0D_SEED_LENGTH)
+    states[:, :prefix_steps] = seeds[:, :prefix_steps]
+    if steps <= LAGCOUNTS_0D_SEED_LENGTH:
+        return states
+
+    state = _lagcounts_seeds_to_state(seeds)
+    for index in range(LAGCOUNTS_0D_SEED_LENGTH, steps):
+        context = _lagcounts_context_batch(state)
+        nxt = _sampled_context_bits(rule_ids, context)
+        states[:, index] = nxt
+        state = ((state << np.uint64(1)) & np.uint64(LAGCOUNTS_0D_STATE_MASK)) | nxt.astype(np.uint64)
+
+    return states
+
+
+def _lagcounts_seed_to_state(seed: np.ndarray) -> int:
+    state = 0
+    for lag, value in enumerate(seed[::-1].astype(np.int64).tolist()):
+        state |= int(value) << lag
+    return state
+
+
+def _lagcounts_seeds_to_state(seeds: np.ndarray) -> np.ndarray:
+    state = np.zeros((seeds.shape[0],), dtype=np.uint64)
+    for lag in range(LAGCOUNTS_0D_SEED_LENGTH):
+        values = seeds[:, LAGCOUNTS_0D_SEED_LENGTH - 1 - lag].astype(np.uint64)
+        state |= values << np.uint64(lag)
+    return state
+
+
+def _lagcounts_context(state: int) -> int:
+    current = int(state & 1)
+    counts = (
+        int((state >> 1) & 1) + int((state >> 2) & 1) + int((state >> 3) & 1),
+        int((state >> 4) & 1) + int((state >> 5) & 1) + int((state >> 6) & 1),
+        int((state >> 7) & 1) + int((state >> 8) & 1) + int((state >> 9) & 1),
+    )
+    return _lagcounts_context_from_counts(current, counts)
+
+
+def _lagcounts_context_batch(state: np.ndarray) -> np.ndarray:
+    current = state & np.uint64(1)
+    count_1 = ((state >> np.uint64(1)) & np.uint64(1)) + ((state >> np.uint64(2)) & np.uint64(1))
+    count_1 += (state >> np.uint64(3)) & np.uint64(1)
+    count_2 = ((state >> np.uint64(4)) & np.uint64(1)) + ((state >> np.uint64(5)) & np.uint64(1))
+    count_2 += (state >> np.uint64(6)) & np.uint64(1)
+    count_3 = ((state >> np.uint64(7)) & np.uint64(1)) + ((state >> np.uint64(8)) & np.uint64(1))
+    count_3 += (state >> np.uint64(9)) & np.uint64(1)
+    return (current + (count_1 << np.uint64(1)) + (count_2 << np.uint64(3)) + (count_3 << np.uint64(5))).astype(np.int64)
+
+
+def _lagcounts_context_from_counts(current: int, counts: Sequence[int]) -> int:
+    if len(counts) != 3:
+        raise ValueError(f"lagcounts_0d requires three count bands, got {len(counts)}")
+    return int(current) | (int(counts[0]) << 1) | (int(counts[1]) << 3) | (int(counts[2]) << 5)
+
+
+def _sampled_context_bit(rule_id: int, context: int) -> int:
+    base = (int(rule_id) ^ LAGCOUNTS_0D_HASH_KEY) & rng.UINT64_MASK
+    return int(rng.splitmix64(base, int(context)) & 1)
+
+
+def _sampled_context_bits(rule_ids: np.ndarray, contexts: np.ndarray) -> np.ndarray:
+    return np.fromiter(
+        (
+            _sampled_context_bit(int(rule_id), int(context))
+            for rule_id, context in zip(rule_ids, contexts, strict=True)
+        ),
+        dtype=np.int64,
+        count=int(rule_ids.size),
+    )
 
 
 def _validate_binary_values(values: np.ndarray, label: str) -> None:

@@ -7,6 +7,7 @@ from .neighborhoods import Neighborhood, ar2_0d, axis_shell, change_count_shell,
 from .neighborhoods import directional_line, eca, history, l1_shell, literal_offsets, metric_radius, moore
 from .neighborhoods import self_at, shell, von_neumann
 from .neighborhoods import dyadlags_0d as dyadlags_0d_neighborhood
+from .neighborhoods import lagcounts_0d as lagcounts_0d_neighborhood
 from .neighborhoods import dyadrads_1d as dyadrads_1d_neighborhood
 from .neighborhoods import dyadaxes_2d as dyadaxes_2d_neighborhood
 from .neighborhoods import dyadaxes_3d as dyadaxes_3d_neighborhood
@@ -14,6 +15,7 @@ from .rng import derive_episode_rng, numpy_rng, splitmix64
 from .rollout import apply_rule, canonical_coords, rollout, rollout_batch
 from .rules import Rule, RuleChannel, ar2_modular_0d, instantiate, rule_count, valid_rule_ids
 from .rules import dyadlags_0d as dyadlags_0d_rule
+from .rules import lagcounts_0d as lagcounts_0d_rule
 from .rules import dyadrads_1d as dyadrads_1d_rule
 from .rules import dyadaxes_2d as dyadaxes_2d_rule
 from .rules import dyadaxes_3d as dyadaxes_3d_rule
@@ -45,6 +47,8 @@ __all__ = [
     "directional_line",
     "dyadlags_0d_neighborhood",
     "dyadlags_0d_rule",
+    "lagcounts_0d_neighborhood",
+    "lagcounts_0d_rule",
     "dyadrads_1d_neighborhood",
     "dyadrads_1d_rule",
     "dyadaxes_2d_neighborhood",

@@ -407,6 +407,68 @@ def dyadlags_0d() -> Rule:
     )
 
 
+def _count_channel(component: int, max_count: int) -> RuleChannel:
+    params = {
+        "rule_type": "totalistic",
+        "component": int(component),
+        "aggregate": "count",
+        "state_count": int(max_count) + 1,
+    }
+    return RuleChannel(
+        component=int(component),
+        pipeline=(params,),
+        name="totalistic",
+        params=params,
+    )
+
+
+def lagcounts_0d(
+    band_size: int = 3,
+    band_count: int = 3,
+    sampled_rule_count: int = 256,
+) -> Rule:
+    """Build the 0D count-banded temporal sampled-lookup rule family.
+
+    The default context is current self plus three 3-lag active counts:
+    `2 * 4 * 4 * 4 = 128` possible contexts. Rule IDs select deterministic
+    sampled 128-entry binary tables instead of enumerating the full `2**128`
+    rule space.
+    """
+
+    band_size = int(band_size)
+    band_count = int(band_count)
+    sampled_rule_count = int(sampled_rule_count)
+    if band_size <= 0:
+        raise ValueError(f"band_size must be positive, got {band_size}")
+    if band_count <= 0:
+        raise ValueError(f"band_count must be positive, got {band_count}")
+    if sampled_rule_count <= 0:
+        raise ValueError(f"sampled_rule_count must be positive, got {sampled_rule_count}")
+
+    channels = [exhaustive(component=0, alphabet_size=2)]
+    channels.extend(
+        _count_channel(component=component, max_count=band_size)
+        for component in range(1, band_count + 1)
+    )
+    context_count = 2 * ((band_size + 1) ** band_count)
+
+    return Rule(
+        family="lagcounts_0d",
+        params={
+            "band_size": band_size,
+            "band_count": band_count,
+            "sampled_rule_count": sampled_rule_count,
+        },
+        channels=tuple(channels),
+        metadata={
+            "alphabet_size": 2,
+            "context_count": context_count,
+            "decode": "sampled_splitmix64_context_bits",
+            "R": sampled_rule_count,
+        },
+    )
+
+
 def dyadaxes_2d() -> Rule:
     """Build the 2D Dyadaxes composed binary rule family.
 

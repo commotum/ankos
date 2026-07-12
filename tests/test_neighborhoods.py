@@ -59,6 +59,30 @@ def test_dyadlags_0d_preserves_temporal_lag_components() -> None:
     assert _coords(neighborhood, component=2) == [[-2, 0, 0, 0]]
 
 
+def test_lagcounts_0d_preserves_self_and_temporal_count_bands() -> None:
+    neighborhood = neighborhoods.lagcounts_0d()
+
+    assert neighborhood.name == "lagcounts_0d"
+    assert neighborhood.params == {"band_size": 3, "band_count": 3}
+    assert len(neighborhood.components) == 4
+    assert _coords(neighborhood, component=0) == [[0, 0, 0, 0]]
+    assert _coords(neighborhood, component=1) == [
+        [-3, 0, 0, 0],
+        [-2, 0, 0, 0],
+        [-1, 0, 0, 0],
+    ]
+    assert _coords(neighborhood, component=2) == [
+        [-6, 0, 0, 0],
+        [-5, 0, 0, 0],
+        [-4, 0, 0, 0],
+    ]
+    assert _coords(neighborhood, component=3) == [
+        [-9, 0, 0, 0],
+        [-8, 0, 0, 0],
+        [-7, 0, 0, 0],
+    ]
+
+
 def test_metric_radius_builds_eca_stencil() -> None:
     neighborhood = neighborhoods.metric_radius(
         axes=("x",),

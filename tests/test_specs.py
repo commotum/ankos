@@ -77,6 +77,31 @@ def test_dynamics_from_spec_accepts_dyadlags_0d() -> None:
     assert episode.states.tolist() == [0, 0, 1, 1]
 
 
+def test_dynamics_from_spec_accepts_lagcounts_0d() -> None:
+    spec = {
+        "domain": "t+0d",
+        "shape": [],
+        "rule": "lagcounts_0d",
+        "neighborhoods": [{"family": "lagcounts_0d"}],
+        "frontier": "time_slice",
+    }
+
+    dynamics = ca.dynamics_from_spec(spec)
+    episode = ca.rollout(
+        dynamics=dynamics,
+        rule_id=37,
+        seed_state=np.array([1, 0, 1, 1, 0, 0, 1, 0, 1, 1], dtype=np.int64),
+        steps=12,
+    )
+
+    assert dynamics.domain == "t+0d"
+    assert dynamics.shape == ()
+    assert dynamics.rule.family == "lagcounts_0d"
+    assert dynamics.neighborhoods[0].name == "lagcounts_0d"
+    assert ca.rule_count(dynamics.rule) == 256
+    assert episode.states[:10].tolist() == [1, 0, 1, 1, 0, 0, 1, 0, 1, 1]
+
+
 def test_dynamics_from_spec_rejects_old_full_next_slice_name() -> None:
     spec = {
         "domain": "t+1d",

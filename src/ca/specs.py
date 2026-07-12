@@ -132,6 +132,8 @@ def rule_from_spec(spec: Mapping[str, Any] | str | rules_lib.Rule) -> rules_lib.
         )
     if family == "dyadlags_0d":
         return rules_lib.dyadlags_0d()
+    if family == "lagcounts_0d":
+        return rules_lib.lagcounts_0d(**params)
     if family == "dyadrads_1d":
         return rules_lib.dyadrads_1d()
     if family == "dyadaxes_2d":
@@ -167,6 +169,8 @@ def _neighborhood_from_one_spec(
         return neighborhoods_lib.ar2_0d(**params)
     if family == "dyadlags_0d":
         return neighborhoods_lib.dyadlags_0d(**params)
+    if family == "lagcounts_0d":
+        return neighborhoods_lib.lagcounts_0d(**params)
     if family == "dyadrads_1d":
         return neighborhoods_lib.dyadrads_1d(**params)
     if family == "dyadaxes_2d":

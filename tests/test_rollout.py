@@ -54,6 +54,17 @@ def _dyadlags_dynamics() -> ca.Dynamics:
     )
 
 
+def _lagcounts_dynamics() -> ca.Dynamics:
+    return ca.Dynamics(
+        domain="t+0d",
+        shape=(),
+        rule=rules.lagcounts_0d(),
+        neighborhoods=(neighborhoods.lagcounts_0d(),),
+        frontier=frontiers.time_slice(()),
+        metadata={"prompt_prefix_states": 10},
+    )
+
+
 def test_ar2_rollout_returns_raw_episode() -> None:
     dynamics = ca.Dynamics(
         domain="t+0d",
@@ -175,6 +186,77 @@ def test_dyadlags_rollout_rejects_non_binary_seed_values() -> None:
             rule_id=0,
             seed_state=np.array([0, 1, 2]),
             steps=2,
+        )
+
+
+def test_lagcounts_rollout_preserves_visible_prefix_then_generates() -> None:
+    seed = np.array([1, 0, 1, 1, 0, 0, 1, 0, 1, 1], dtype=np.int64)
+    episode = ca.rollout(
+        dynamics=_lagcounts_dynamics(),
+        rule_id=37,
+        seed_state=seed,
+        steps=14,
+    )
+
+    assert episode.domain == "t+0d"
+    assert episode.shape == ()
+    assert episode.states[:10].tolist() == seed.tolist()
+    assert set(episode.states.tolist()) <= {0, 1}
+    assert episode.metadata is not None
+    assert episode.metadata["prompt_prefix_states"] == 10
+    assert episode.coords is not None
+    assert episode.coords.tolist()[:3] == [
+        [0, 0, 0, 0],
+        [1, 0, 0, 0],
+        [2, 0, 0, 0],
+    ]
+
+
+def test_lagcounts_apply_rule_matches_first_generated_state() -> None:
+    seed = np.array([1, 0, 1, 1, 0, 0, 1, 0, 1, 1], dtype=np.int64)
+    episode = ca.rollout(
+        dynamics=_lagcounts_dynamics(),
+        rule_id=91,
+        seed_state=seed,
+        steps=11,
+    )
+    rule = rules.instantiate(rules.lagcounts_0d(), 91)
+    reads = (
+        np.array([seed[9]], dtype=np.int64),
+        seed[6:9],
+        seed[3:6],
+        seed[0:3],
+    )
+
+    assert episode.states[10] == ca.apply_rule(rule, reads, 91)
+
+
+def test_lagcounts_rollout_batch_matches_loop() -> None:
+    batch = _assert_batch_matches_loop(
+        dynamics=_lagcounts_dynamics(),
+        rule_ids=[0, 37, 150, 255],
+        seed_states=np.array(
+            [
+                [1, 0, 1, 1, 0, 0, 1, 0, 1, 1],
+                [0, 1, 0, 0, 1, 1, 0, 1, 0, 0],
+                [1, 1, 0, 0, 0, 1, 1, 0, 1, 0],
+                [0, 0, 0, 1, 1, 0, 0, 1, 1, 1],
+            ],
+            dtype=np.int64,
+        ),
+        steps=14,
+    )
+
+    assert batch.states.shape == (4, 14)
+
+
+def test_lagcounts_rollout_rejects_non_binary_seed_values() -> None:
+    with pytest.raises(ValueError, match="lagcounts_0d initial_state"):
+        ca.rollout(
+            dynamics=_lagcounts_dynamics(),
+            rule_id=0,
+            seed_state=np.array([0, 1, 2, 0, 1, 0, 1, 0, 1, 0]),
+            steps=12,
         )
 
 

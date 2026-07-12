@@ -655,6 +655,38 @@ def dyadlags_0d(time_offsets: Sequence[int] = (0, -1, -2)) -> Neighborhood:
     )
 
 
+def lagcounts_0d(band_size: int = 3, band_count: int = 3) -> Neighborhood:
+    """Build the 0D count-banded temporal read interface.
+
+    The default read components are current self plus three lag bands:
+    `x[t]`, `x[t-1:t-3]`, `x[t-4:t-6]`, and `x[t-7:t-9]`. The lag-band
+    component boundaries are preserved so the rule can count active bits in
+    each temporal band separately.
+    """
+
+    band_size = int(band_size)
+    band_count = int(band_count)
+    if band_size <= 0:
+        raise ValueError(f"band_size must be positive, got {band_size}")
+    if band_count <= 0:
+        raise ValueError(f"band_count must be positive, got {band_count}")
+
+    components = [self_at(time_offset=0, read_mode="compact")]
+    for band_index in range(band_count):
+        start = 1 + band_index * band_size
+        offsets = tuple((-lag, 0, 0, 0) for lag in range(start, start + band_size))
+        components.append(literal_offsets(offsets, read_mode="compact"))
+
+    neighborhood = compose(components)
+
+    return Neighborhood(
+        components=neighborhood.components,
+        combine=neighborhood.combine,
+        name="lagcounts_0d",
+        params={"band_size": band_size, "band_count": band_count},
+    )
+
+
 def dyadrads_1d(time_offset: int = 0) -> Neighborhood:
     """Build the 1D Dyadrads three-component neighborhood.
 
