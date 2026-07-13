@@ -1,6 +1,6 @@
 # 12-T30-MULTIWAY
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -25,6 +25,9 @@ Status: **IN PROGRESS**
 - Multiway tag code preserves duplicate derivations instead of applying `Union`. It is a distinct multiplicity-sensitive variant/source boundary and cannot silently inherit the base merge law.
 - Cyclic, multidimensional/network, tag, arithmetic, nondeterministic Turing, game, term-pattern, and Chapter 9 causal-event multiway systems require separately typed carriers/matchers even when they may reuse branch merging.
 - No canonical rule numbering, finite exhaustive count, or random-rule distribution is supplied. No pruning, beam width, maximum state count, or maximum word length is native.
+- Main book time labels count the initial layer as step 1; the implementation contract and goldens use zero-based `t0` and state the shift explicitly.
+- Every page-219 through page-224 local figure and every page-952 Notes observer has been inspected. Image-only page-223 examples establish diversity but lack textual seeds; no mandatory presets are fabricated.
+- Two source corruptions are repaired transparently: the alternative list code uses sequence blanks in the official CDF, and the sorted example is `AB->BBB, ABB->AAAB` in the official page-937 source.
 - Current runtime support is fixed dense coordinate arrays with scalar family-dispatched updates. It has no word-set state, all-match source, branch result bundle, exact deduplication, dead-end accounting, or multiway trace.
 
 ## Updated Assumptions
@@ -58,63 +61,148 @@ Reconstruct base multiway systems as exact finite word-set evolution: closed lit
 ## Search Log
 
 1. Verified CSV line 31 and read `ref/notes/CA-Types.md:814-835`; its API suggestions remain hypotheses.
-2. Read the complete main core `BOOK:2494-2566` and inspected page-219 through page-224 local figures. Detailed image rule recovery is still being cross-checked.
-3. Direct `multiway system(s)` search found 267 occurrences on 182 lines: 199/134 before the Index and 68/48 in it. The main core contributes 20/13; the native Notes neighborhood contributes 23/15.
-4. Conservative direct/alias/confluence vocabulary found 352 occurrences on 218 lines: 247/156 before the Index and 105/62 in the actual Index.
-5. The implementation-symbol sweep found 20 occurrences on 18 lines: 10/9 in native Notes plus 3/3 in the multiway-tag neighborhood. All candidates are under disposition.
-6. Read `BOOK:13921-13961` and verified that `MWStep1` enumerates every overlapping literal position and performs one splice, while `MWStep` maps over parents/rules and exact-`Union`s children.
-7. Verified exact deletion and merge trajectories against the official Chapter 5 CDF and inspected the official general-properties note to repair one local OCR-damaged sorted-system rule.
-8. Followed `BOOK:16511-16556` for compressed state graphs, derivation paths, confluence/normal forms, and causal-network relations.
-9. Current remaining work: complete figure/table recovery, split/actual-Index disposition, histories/variants, full adversarial oracle audit, and repository/global integration.
+2. Read the complete main core `BOOK:2494-2566` and its clean split duplicate `CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md:325-395`. Canonical provenance remains the monolith.
+3. Exact phrase `multiway system(s)` found 267 occurrences on 182 lines. The broader token regex `multi(?:way|-way)` found 277/186: 204/136 before the actual Index and 73/50 in it; the main core contributes 20/13 and native Notes 24/16.
+4. A narrower direct/alias/confluence vocabulary found 352/218. Expanding it to semi-Thue, string/term rewrite, production/associative/canonical systems, nondeterminism, generative grammar, Church-Rosser, word problem, branching time, and all-possible replacements found 388/224: 269/152 before the Index and 119/72 in it.
+5. The core implementation-symbol regex `MWStep1?|MWEvolveList|ReplaceList|StringReplacePart|StringPosition` found 18/16 whole, 15/14 before the Index, 3/2 in it, and 10/9 in native Notes. The extended sweep including multiway-tag symbols found 20/18.
+6. Inspected every local page-219 through page-224 raster and page-952 Notes raster. Exact main rules/seeds/layers/count anchors were decoded where present; page-223 panels with absent seeds remain observers, not invented presets.
+7. Read `BOOK:13921-14025` and verified the string/list implementations, no-match drop, exact `Union` merge, diagram multiplicity projection, growth, history, group/grammar relations, and all named variants.
+8. Verified deletion, page-224, and official sample trajectories independently. Inspected the official Chapter 5 CDF and official page-937 general-properties note to repair sequence-blank and sorted-rule OCR damage.
+9. Followed Chapter 9 `BOOK:6016-6076` and Notes `16511-16556` for paths, compressed spacetime graphs, convergence/confluence, completion, and causal-network relations.
+10. Followed `BOOK:19324-19339` for multiway tags/word problems and `19816-19822` for proof-search deduplication/heuristics. These are distinct variants/algorithms, not base stepping.
+11. Verified `BOOK:14275` explicitly excludes infinite random multiway initial conditions.
+12. Resolved the consolidated actual Index route `BOOK:21531-21556` after the actual Index start at `20826`. Every main, numeric, branching-time, confluence, causal, complexity, path, spacetime, tag, word-problem, and variant endpoint was dispositioned.
+13. Audited `simple_programs.md`, runtime modules, tests, prior T13/T16/T29 stages, and no-cheating constraints. No current multiway semantics were found.
+14. All direct names, aliases, figures, Notes/programs, actual Index/splits, history, variants, observers, and relations are dispositioned. The base literal construction has zero unresolved mechanics; explicit variant/source gaps are recorded rather than guessed.
 
 ## Book Excerpts
 
-Canonical `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. The final excerpt grouping remains open until the full search closes.
+Canonical `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. These 25 groups cover every unique construction-relevant passage; split duplicates and primary-source repairs are logged in the search.
 
 ### E01 — Collections of possible states
 
 - Provenance: `BOOK:2494-2510`, page-219.
-- Fact: each state is a word; every possible replacement is applied, and all distinct resulting words are kept.
+- Fact: each state is a finite word; every possible block replacement is applied, and all distinct resulting words are kept. The page-219 preset is `{A->A,A->AA}` from seed `{A}`.
 
-### E02 — Growth, deletion, and epsilon
+### E02 — Simple exact growth laws
 
-- Provenance: `BOOK:2512-2542`, pages 220-223.
-- Fact: state counts may grow uniformly, fluctuate, or explode. A three-rule example deletes blocks and visibly includes zero-element sequences.
+- Provenance: `BOOK:2512-2522` and local page-220 pictures 4/5/figure 6.
+- Fact: three literal presets have one-indexed counts `Ceiling[t/2]`, `t`, and `Fibonacci[t+1]`. The rules/seeds and zero-index layers are recorded in the oracle section.
 
-### E03 — Recurrent states and compressed state graph
+### E03 — Fluctuating slow growth
 
-- Provenance: `BOOK:2544-2566`, page-224.
-- Fact: a word can occur at multiple steps and always has the same outgoing behavior. One may display it once in a compressed network, but recurrence in the layered evolution remains real.
+- Provenance: `BOOK:2524-2532` and local page-220 figures 9-11.
+- Fact: two image-decoded systems show roughly quadratic and linear growth with essentially repetitive fluctuations at scales 40 and 161. Count/difference plots are observers, not state.
 
-### E04 — Exact all-match implementation
+### E04 — Deletion, epsilon, and complex count behavior
 
-- Provenance: `BOOK:13921-13937`.
-- Fact: `MWStep1` finds every literal occurrence and splices one occurrence per result; `MWStep` applies this to every rule and parent, then `Union` merges equal words.
+- Provenance: `BOOK:2534-2542` and local page-221 figures 2-3; printed page 206.
+- Fact: one clause deletes without inserting, so zero-element words appear. Count differences exhibit a shifted 1071-step repetition; rapid branching creates practical resource pressure but no semantic pruning.
 
-### E05 — Deletion program and exact trajectory
+### E05 — Rapid growth and layer geometry
 
-- Provenance: `BOOK:13950-13956`, official CDF.
-- Fact: `{AB->epsilon, ABA->ABBAB, ABABBB->AAAAABA}` on `ABABAB` produces exact word sets and reaches epsilon. Deletion is a valid result; epsilon and the empty layer differ.
+- Provenance: `BOOK:2542-2550` and local page-222 picture 3/page-223 figure 1.
+- Fact: a simple preset eventually generates all binary words beginning with `A` with Fibonacci layer counts and exact first-occurrence ranks. Other panels establish repetitive, nested, and complex layer geometries; several image-only seeds are absent and not reconstructed.
 
-### E06 — Diagram multiplicity projection
+### E06 — Recurrent layers and compressed state graph
 
-- Provenance: `BOOK:13959`.
-- Fact: pictures show only existence of a source-target relation, not the number of matching applications. Lossless event witnesses precede simple-edge projection.
+- Provenance: `BOOK:2552-2566` and local page-224 pictures 2/3/6.
+- Fact: an exact word can recur on several layers and always has the same outgoing relation. The figure shows repeated-per-layer, globally folded, and accumulated-network views of the same `{AA->epsilon,BA->ABB,BB->A}` evolution.
 
-### E07 — Sorted-word special representation
+### E07 — Exact string implementation
 
-- Provenance: `BOOK:13963-13968`, repaired against the official page-937 note.
-- Fact: for a special order-insensitive rule profile, words can be lowered to symbol-count vectors. This requires a proved invariant and is not general anagram equality.
+- Provenance: `BOOK:13921-13938`.
+- Fact: `StringPosition` finds every occurrence of one LHS and `StringReplacePart` produces one child per position; `MWStep` maps over every rule and old string and applies `Union`. `MWEvolveList` iterates complete layers.
 
-### E08 — Multiway variants
+### E08 — Equivalent list implementation and OCR repair
 
-- Provenance: `BOOK:13989-14025`.
-- Fact: pattern-variable, cyclic, multidimensional/network, tag, arithmetic/complex, nondeterministic-machine, and game variants change carrier, matching, or branch multiplicity and require separate audits.
+- Provenance: `BOOK:13940-13948` and the official Chapter 5 CDF.
+- Fact: list `ReplaceList` supplies equivalent positional context matching. The local `x_{--}`/`y_{--}` is OCR-damaged; the primary source has sequence blanks. This implementation device does not add rule-visible pattern variables to base literal clauses.
 
-### E09 — Compressed spacetime graph and confluence
+### E09 — Page-206 deletion program and dead-parent rule
 
-- Provenance: `BOOK:16511-16556`.
-- Fact: one node per distinct word gives a compressed graph; paths, causal networks, confluence, normal forms, and Church-Rosser properties are analyses of the rewrite relation.
+- Provenance: `BOOK:13950-13957`.
+- Fact: the exact three-clause program and `ABABAB` seed are supplied, and a string with no applicable replacement is explicitly dropped. Empty RHS is native.
+
+### E10 — Exact merging and diagram projection
+
+- Provenance: `BOOK:13959-13963`.
+- Fact: `Union` merging is crucial; pictures record only whether one state yields another, not how many rule applications do so. Explicit identity clauses retain old states.
+
+### E11 — Sorted count-vector profile
+
+- Provenance: `BOOK:13963-13968`, repaired against the official page-937 general-properties source.
+- Fact: when a program/seed invariant keeps all words sorted, exact words can be represented by symbol counts and clauses by difference vectors. The local printed rule is corrupt; the primary `AB->BBB, ABB->AAAB` gives deltas `(-1,2),(2,-1)`.
+
+### E12 — Page-206 properties and alternate seeds
+
+- Provenance: `BOOK:13970-13986` and page-952 Notes images.
+- Fact: total count is roughly quadratic with shifted 1071-period differences; new-string growth is roughly linear with 21-period differences; the third rule appears every step after 50. Stack/reach plots are observers. Seed `ABA` dies, while `ABAABABA` grows exponentially.
+
+### E13 — Frequency and history aliases
+
+- Provenance: `BOOK:13988-13989`.
+- Fact: qualitative random-rule frequencies lack a declared sampler. Historical aliases include semi-Thue, string/term rewrite, production, associative-calculus, and Post canonical systems; applications include formal languages and proofs.
+
+### E14 — Semigroup/group restrictions and Cayley graphs
+
+- Provenance: `BOOK:13990-14000`.
+- Fact: semigroup/group presentations add paired reverse/inverse rules. Reachability components represent algebra elements, while Cayley graphs connect quotient elements by generator append operations; neither changes exact base word equality.
+
+### E15 — Generative grammar restrictions
+
+- Provenance: `BOOK:14002-14012`.
+- Fact: regular, context-free, context-sensitive, and unrestricted grammars restrict rule shapes/nonterminals. A formal language accumulates terminal words over reachability; terminal no-match words still drop from the next active layer.
+
+### E16 — Multidimensional, cyclic, and tag boundaries
+
+- Provenance: `BOOK:14014-14016`.
+- Fact: array blocks, cyclic limited-size strings, and multiway tag systems are named variants with different support/matching or multiplicity questions. The short cyclic note does not define wrap-splice details.
+
+### E17 — Numeric, nondeterministic, physics, and game relations
+
+- Provenance: `BOOK:14017-14025`.
+- Fact: `n->{n+1,2n}` is a numeric exact-set lift; complex numbers, nondeterministic machines, fundamental-physics systems, and games share branching only and retain their own carriers/rules.
+
+### E18 — Infinite random initial conditions are excluded
+
+- Provenance: `BOOK:14275`.
+- Fact: an infinite random multiway seed would normally generate infinitely many possibilities, so the base construction cannot meaningfully use it. Finite exact seeds remain independent program data.
+
+### E19 — Multiple histories in Chapter 9
+
+- Provenance: `BOOK:6016-6022`.
+- Fact: a path chooses one single replacement at each event, while the multiway structure retains all such histories. This corroborates one-splice branches rather than simultaneous edits.
+
+### E20 — Path convergence and causal invariance
+
+- Provenance: `BOOK:6042-6076`.
+- Fact: alternative paths can diverge/converge and yield causal networks. Path-causal behavior is derived from event histories, not identical to the Chapter 5 state-transition graph.
+
+### E21 — Spacetime graph as an alternative model
+
+- Provenance: `BOOK:16511-16519`.
+- Fact: keeping one node per exact word ever produced defines a complete spacetime network instead of successive layers. This is explicitly an alternative representation/model and cannot justify global visited suppression in base stepping.
+
+### E22 — Convergence, confluence, normal forms, and completion
+
+- Provenance: `BOOK:16521-16556`.
+- Fact: convergence/Church-Rosser, termination, normal forms, and Knuth-Bendix-style completion are program properties or program-transforming analyses; causal networks can vary by rewrite path.
+
+### E23 — Multiway tags and word problems
+
+- Provenance: `BOOK:19324-19339`.
+- Fact: the supplied multiway-tag implementation flattens derivations without `Union`, so multiplicity may persist. Word reachability/equivalence is a decision problem over the graph, not state equality or stepping.
+
+### E24 — Proof-search optimizations
+
+- Provenance: `BOOK:19816-19822`.
+- Fact: path deduplication, length heuristics, lemmas, canonicalization, and bidirectional search optimize proof finding. They do not license pruning or quotienting an exact layer.
+
+### E25 — Actual Index routing
+
+- Provenance: consolidated actual Index route `BOOK:21531-21556`.
+- Fact: the Index routes main pages 204-209, numeric systems, branching time, canonical/confluence/causal properties, sequential comparison, completion, reducibility, termination, paths, spacetime networks, tags, word problems, grammars, groups, and variants to passages dispositioned above.
 
 ## Construction Model
 
@@ -318,6 +406,61 @@ in general: t_n = { A^k | 1 <= k <= n+1 }
 
 Identity retains shorter words only because it is an explicit clause. Each `A->AA` occurrence in `A^k` yields the same `A^(k+1)` and merges.
 
+### Three page-220 simple systems
+
+All use seed `{A}` and zero-based API layers.
+
+```text
+case 1: {A->AA, AA->A}
+  counts = 1,1,2,2,3,3,...
+  S0={A}
+  S1={AA}
+  S2={A,AAA}
+  S3={AA,AAAA}
+  book one-index formula: Ceiling[t/2]
+
+case 2: {A->A, A->AA, AA->A}
+  S_n={A^k | 1<=k<=n+1}
+  count=n+1
+  book one-index formula: t
+
+case 3: {A->AB, B->A}
+  counts = 1,1,2,3,5,8,13,21,...
+  S0={A}
+  S1={AB}
+  S2={AA,ABB}
+  S3={AAB,ABA,ABBB}
+  S4={AAA,AABB,ABAB,ABBA,ABBBB}
+```
+
+Case 3 eventually generates every binary word beginning with `A`. A word with `m` As and `n` Bs first appears at book step `2m+n-1`, or zero-based layer `2m+n-2`. These fixtures jointly guard single-splice timing, exact merging, recurrence, and the book/API time shift.
+
+### Two page-220 fluctuating systems
+
+The first image-decoded preset is:
+
+```text
+seed = {BABBAAB}
+rules = {ABA->BBAA, BAA->AAB}
+counts t0..t16 =
+  1,1,2,2,3,3,3,2,4,3,4,3,5,5,5,4,6
+c40=16, c80=40, c100=56, c200=172, c250=238
+```
+
+The book describes essentially 40-step fluctuation and roughly quadratic growth. It does not claim exact count periodicity, so conformance must not strengthen it.
+
+The second is:
+
+```text
+seed = {ABAAB}
+rules = {AA->BABBBBA, BAB->A}
+counts t0..t16 =
+  1,1,2,2,2,3,4,4,4,4,4,4,6,8,6,6,6
+c40=16, c80=27, c100=33, c161=55, c200=66, c250=86
+```
+
+Direct exact evolution of the decoded preset gives first differences with period 161 from index 2 and roughly linear growth, matching the caption. These count sequences are derived regression oracles; exact word layers remain authoritative state.
+
 ### Exact page-206 deletion trajectory
 
 Program and seed:
@@ -358,9 +501,17 @@ t3 = {
   BABBBABB,
   BBAB
 }
+
+t4 = {AAAAA,AAAAABBAB,ABBBBB,BABBBB,BB,BBBABB}
+t5 = {AAAAABB,AAAABAB,BBBB}
+t6 = {AAAAB,AAAABBABB}
+t7 = {AAA,AAAABBB,AAABABB}
+t8 = {AAABB,AAABBABBB}
+t9 = {AAABBBB,AAB,AABABBB}
+t10 = {A,AAAAAABA,AABBABBBB,AABBB}
 ```
 
-Epsilon is present as a real word at `t3` and disappears at `t4` unless regenerated. Starting instead from `{ABA}` yields layer cardinalities `1,2,2,1,0` for `t0..t4`, followed by empty-layer reference stutter. This distinguishes deletion, dead-end dropping, epsilon, all-dead advancement, and quiescence.
+The initial counts are `1,3,6,8,6,3,2,3,2,3,4`. Epsilon is present as a real word at `t3` and disappears at `t4` unless regenerated. Starting instead from `{ABA}` yields layer cardinalities `1,2,2,1,0` for `t0..t4`, followed by empty-layer reference stutter. This distinguishes deletion, dead-end dropping, epsilon, all-dead advancement, and quiescence.
 
 ### Exact cross-parent merge trajectory
 
@@ -382,6 +533,33 @@ t3 = {AABBBABBB, ABAABBBBB, BBBBBAB}
 ```
 
 There are four `t2 -> t3` rewrite witnesses but only three exact targets. `AABBBABBB` has one witness from each parent and appears once in `t3`. This is a direct differential oracle against path-copy state, per-parent-only deduplication, and witness-weighted branching.
+
+### Exact page-224 layered/folded/network fixture
+
+Program and seed:
+
+```text
+AA -> epsilon
+BA -> ABB
+BB -> A
+seed = {BBA}
+```
+
+The exact layers shown across the repeated, globally folded, and accumulated-network views are:
+
+```text
+S0 = {BBA}
+S1 = {AA,BABB}
+S2 = {epsilon,ABBBB,BAA}
+S3 = {AABB,ABAB,ABBA,B}
+S4 = {AAA,AABBB,ABABB,BB}
+S5 = {A,AAAB,AABA,AABBBB,ABAA,BBB}
+S6 = {AAABB,AABAB,AABBA,AB,BA,BBBB}
+S7 = {AAAA,AAABBB,AABABB,ABB,BAB,BBA}
+S8 = {AA,AAAAB,AAABA,AAABBBB,AABAA,ABBB,BABB}
+```
+
+At `S2 -> S3`, `ABBA` is reached from both `ABBBB` and `BAA`. At `S3 -> S4`, `AAA` is reached from both `AABB` and `ABBA`. In `AAA`, `AA` matches at positions 0 and 1 and both yield `A`, producing two witnesses but one child and one simple edge. Folding each word to its first picture occurrence must preserve these later layer memberships and outgoing applications.
 
 ### Sorted-word invariant profile
 
@@ -412,6 +590,12 @@ This is a strict invariant-backed lowering/optimization. Sorting an arbitrary wo
 12. **Exact reconstruction.** Recompute all match positions, splice every witness, set-union children, and compare dead ends/child groups exactly.
 13. **Order invariance.** Permuting old-layer, clause, match, hash, or worker order preserves semantic state and the mathematical witness set.
 14. **Validation.** Reject empty LHS, out-of-alphabet sides/seeds, stale snapshot, wrong span/LHS, fabricated/missing match, duplicate serialized clause, callback matcher/canonicalizer, and implicit cyclic matching.
+15. **Single versus simultaneous.** `{AA}` under `A->B` yields `{AB,BA}` at `t1` and `{BB}` at `t2`; `BB` must not appear at `t1`.
+16. **Self-loop multiplicity.** `AAA` under `A->A` yields one state and one simple self-edge but exactly three span witnesses.
+17. **Cross-rule duplicate.** `AA` under `A->B` and `AA->BA` yields `{AB,BA}`; `BA` has two witnesses but one semantic occurrence.
+18. **Symbol alpha-equivariance.** Apply any bijection to alphabet, program, and layer. Successor and witnesses must be the corresponding renaming.
+19. **Graph invariant.** `S_t` equals exact-length-`t` reachability from the seed in the simple state graph; accumulated graph nodes equal `union_{i<=t} S_i` without replacing `S_t`.
+20. **Resource limit.** A deliberately tiny cap returns an explicit resource/partial diagnostic and publishes no ordinary pruned successor.
 
 ## Variants, Relations, and Boundaries
 
@@ -424,7 +608,7 @@ This is a strict invariant-backed lowering/optimization. Sorting an arbitrary wo
 - **Cyclic limited-size systems:** the Notes state the idea but do not fix wraparound match/splice conventions; defer a separate cyclic-word matcher.
 - **Multidimensional and network substitution systems:** require block/subgraph topology and reconnection semantics.
 - **Multiway tag systems:** the supplied code omits `Union` and therefore retains duplicate derivations. Whether deliberate or incidental is underdetermined; treat it as a separate multiplicity-sensitive variant, not a base merge switch.
-- **Arithmetic/complex-number multiway systems:** typed numeric carriers and closed arithmetic results; they may reuse exact branch merging after their own evidence stages.
+- **Arithmetic/complex-number multiway systems:** typed numeric carriers and closed arithmetic results; they may reuse exact branch merging after their own evidence stages. The documented `n->{n+1,2n}` profile from 0 begins `{0}`, `{0,1}`, `{0,1,2}`, `{0,1,2,3,4}`, but must use a closed arithmetic AST coordinated with T34 rather than a callback.
 - **Nondeterministic Turing machines and games:** different state/control and move algebras; not word callbacks.
 - **Chapter 9 causal-event systems:** event order, causal invariance, and branchial/causal graphs require a separate audit.
 - **Infinite random initial words:** explicitly unsuitable for the base all-possible finite expansion in the cited seed discussion; finite exact seeds are native.
@@ -549,12 +733,27 @@ Completion requires:
 
 ## Completion Requirements
 
-- [ ] All names, aliases, figures, Notes/programs, actual Index entries, splits, history, variants, observers, and relations resolved with zero silent remainder.
-- [ ] Native word-set state, program, all-match source/read/result/update, exact merge, dead ends, epsilon/empty layer, recurrence, outcomes, and traces reconstructed.
-- [ ] Exact canonical trajectories and adversarial overlap/merge/recurrent/dead/identity/provenance invariants specified.
-- [ ] Current API/runtime/principles fit and T13/T16/T29 reuse/divergence explicit.
-- [ ] Goal 2 implementation/conformance handoff and global reintegration complete.
+- [x] All names, aliases, figures, Notes/programs, actual Index entries, splits, history, variants, observers, and relations resolved with zero silent remainder.
+- [x] Native word-set state, program, all-match source/read/result/update, exact merge, dead ends, epsilon/empty layer, recurrence, outcomes, and traces reconstructed.
+- [x] Exact canonical trajectories and adversarial overlap/merge/recurrent/dead/identity/provenance invariants specified.
+- [x] Current API/runtime/principles fit and T13/T16/T29 reuse/divergence explicit.
+- [x] Goal 2 implementation/conformance handoff and global reintegration complete.
 
 ## Stage Results
 
-In progress. Core prose and executable Notes already establish all-overlapping-match, one-splice-per-branch, exact-word union, dead-parent dropping, deletion, epsilon, and the layered-versus-compressed-graph distinction. The remaining figure/index/variant audit must close before the semantic contract is marked complete.
+T30 is complete. The exact-name audit dispositioned 267 occurrences on 182 lines and the broader token audit 277/186; narrower and expanded alias/confluence audits dispositioned 352/218 and 388/224; core and extended implementation-symbol audits dispositioned 18/16 and 20/18. Twenty-five canonical groups cover the definition, every page-219 through page-224 figure, executable Notes/programs, page-952 observers, actual Index/splits, history, groups/grammars, numeric/tag/structural variants, spacetime/causal graphs, confluence/completion, proof search, and relations. Zero base-literal mechanics remain unresolved.
+
+The construction is a finite exact set of finite words under a finite unordered relation `NonEmptyWord -> Word`. Every overlapping occurrence of every clause in every old parent independently produces one one-splice child; `DistinctBranchMerge` exact-word-unions all children and records dead parents plus every rewrite witness. Equal targets merge across positions, rules, and parents. Epsilon is a word; the empty layer is an event-free reference stutter reached only after an all-dead `Advanced` event. Recurring words fire on every layer, so a compressed one-node-per-word graph is downstream and never a global visited set.
+
+Page-219/page-220 layers and growth, page-206 `t0..t10` and extinction, the official four-layer cross-parent merge, page-224 repeated/folded/network views, repaired sorted count vectors, overlap, one-versus-simultaneous splice, diamond/cross-rule/cross-parent merging, identity/two-cycle recurrence, epsilon/empty, reconstruction, order, alpha, and graph invariants close the handoff. T13 words and T16 matching/splicing compose privately; their public updates/outcomes remain unchanged. T29 graph state remains distinct.
+
+## Integration Results
+
+- Added finite exact word-set layers and unordered epsilon-capable literal rewrite relations to the semantic inventory.
+- Added program-coupled every-overlapping-match sources and one-splice branch results while reusing T16's pure literal occurrence/edit kernel.
+- Added `DistinctBranchMerge` as the eighth public update law, with exact target union, dead-parent dropping, and lossless witness grouping.
+- Distinguished eventful identity/all-dead advancement, epsilon, and event-free empty-layer quiescence.
+- Separated layered state from derivation multiplicity, simple/derivation graphs, globally compressed spacetime graphs, accumulated languages, confluence, counts, proof search, and rendering.
+- Preserved base exact-set semantics while isolating the no-`Union` multiway-tag code and cyclic/pattern/block/numeric/control variants for separate audits.
+- Preserved T01/T09/T12/T13/T16/T17/T19/T20/T27/T29 conclusions; no prior stage is reopened.
+- Next stage: T31, Local Constraint Systems.
