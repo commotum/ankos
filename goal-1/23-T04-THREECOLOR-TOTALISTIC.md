@@ -1,10 +1,10 @@
 # 23-T04-THREECOLOR-TOTALISTIC
 
-Status: **REOPENED — ASSET REPAIR; ARCHITECTURE AUDIT COMPLETE**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
-Architecture authority: the T04 row and runner contract in `architecture-audit.md` supersede incompatible Goal 2 architecture below; the bounded asset repair remains independently open.
+Architecture authority: the T04 row and runner contract in `architecture-audit.md` supersede incompatible Goal 2 architecture below; the bounded T06 asset repair is complete.
 
-Alongside the independently bounded asset repair, the Goal 2 handoff has been reduced to a strict preset over the generic fixed-lattice local-rule construction.
+The repaired evidence/search closure and conformance fixtures are authoritative. The Goal 2 handoff remains a strict preset over the generic fixed-lattice local-rule construction.
 
 ## Current Facts
 
@@ -16,7 +16,7 @@ Alongside the independently bounded asset repair, the Goal 2 handoff has been re
 - White/gray/black names and tones are presentation labels for semantic values `0/1/2`, not a required palette (`BOOK:774-776`). Reflection is derived from the equal-weight symmetric stencil, additivity is a separately proved property of examples such as code 420, and classes, gallery order, crop, horizon, raster, and emulations remain analyzer/view/relation data (`BOOK:784,7912,11918`).
 - Fresh API inspection confirms partial structural fit but no executable T04 surface: `simple_programs.md:643-645,1768-1791` require fixed-arity reads and one old snapshot, while `simple_programs.md:1964-2032` conflates exact numeric sum with active count and color histogram. `src/ca/rules.py:198-217,262-295` records a loose aggregate channel but derives neither the seven cases nor the 2,187-rule range.
 - Fresh runtime inspection confirms that the correct radius-one stencil already exists (`src/ca/neighborhoods.py:551-569`; `tests/test_neighborhoods.py:86-98`), but spatial rollout is family-whitelisted and binary decoded (`src/ca/rollout.py:145-212,643-682`), batch rule IDs are coerced to `numpy.int64` (`src/ca/rollout.py:264-274`), and the manifest parser accepts only named Phase 1 families (`src/ca/specs.py:117-181`). No current test constructs, validates, or evolves a three-color seven-row program (`tests/test_rules.py:9-45`; `tests/test_rollout.py:263-424`).
-- T06's downstream reverse audit invalidated only T04's exhaustive asset-closure claim: retained `BOOK:17431` says `pictures below` but omits raster `BOOK:17433`, and retained `BOOK:2922` directly governs raster `BOOK:2924`, also omitted. The bounded source/asset/metadata/reverse-join repair is active. The strict three-color T03-preset semantics and D115-D118 remain unchanged.
+- T06's downstream reverse audit invalidated only T04's exhaustive asset-closure claim. The completed bounded repair adds `BOOK:2924` and `BOOK:2928` as excluded geometry/observer controls governed by `BOOK:2922,2926,2930`, and adds `BOOK:17433` as a relation-only feature-extraction application governed by `BOOK:17431`. The final manifest contains 75 assets and 150 exact reverse references. The strict three-color T03-preset semantics and D115-D118 remain unchanged.
 
 ## Updated Assumptions
 
@@ -694,7 +694,7 @@ All verbatim monolith material is in blockquotes so the oracle below can check e
 13. **`BOOK:2834` page-number contamination.** The extracted lone `238` follows `_page_253_Picture_1.jpeg`; it is the printed page footer, not a rule code. The raster visibly labels `code 1659`, official Chapter 6 text extraction gives `code 1659` followed separately by page `238`, and actual Index `BOOK:20980` routes `Code 1659, class 4 behavior in, 238`. Notes code `1662` at `BOOK:14223` is a separate, unpictured example and must not be substituted for 1659.
 14. **Metadata-to-source join repair.** An exact join against the independent 68-item raster ledger found 24 asset links that the earlier 44-asset source closure had not traversed: `BOOK:764,858,860,1280,1958,2172,2920,6336,6338,6642,7910,8306,8934,9164,11166,11170,11176,11182,11627,11629,14226,14228,14230,14232`. Seven are direct T04 evidence, one is an emulation relation, and sixteen are adjacent or negative controls. The manifest includes all 24 with exact source-to-ledger equality.
 15. **E14 reverse-link repair.** A reverse audit then found four directly linked control rasters governed by already quoted E14 captions: `BOOK:5220,5484,10393,10409`. They show reversible three-color rules, conserved three-color block rules, and two purpose-search comparisons; none is totalistic. This produced the historical 72-link/243-candidate closure without adding T04 mechanics.
-16. **T06 reverse-link repair.** The downstream audit found three links omitted from retained T04 routes. `BOOK:2922` directly governs two-dimensional binary totalistic raster `BOOK:2924`; `BOOK:2926` says the rules are the same kind as on the facing page, raster `BOOK:2928` visibly reuses codes `4,12,24,38,30,52`, and `BOOK:2930` identifies the panels as one-dimensional slices. Both rasters are excluded geometry/observer controls. Separately, `BOOK:17431` says `pictures below` and directly governs feature-extraction raster `BOOK:17433`, a relation-only application of 16 even-numbered binary five-neighbor totalistic rules. The same-construction frontier stops before `BOOK:2932`, where the page-264 Life/outer-totalistic chain begins. Adding the three links closes the final 75-link source/metadata equality and raises the disjoint source manifest to 246 without changing T04 mechanics.
+16. **T06 reverse-link repair.** The downstream audit found three links omitted from retained T04 routes. `BOOK:2922` directly governs two-dimensional binary totalistic raster `BOOK:2924`; `BOOK:2926` says the rules are the same kind as on the facing page, raster `BOOK:2928` visibly reuses codes `4,12,24,38,30,52`, and `BOOK:2930` identifies the panels as one-dimensional slices. Both rasters are excluded geometry/observer controls. Separately, `BOOK:17431` says `pictures below` and directly governs feature-extraction raster `BOOK:17433`, a relation-only application of 16 even-numbered binary five-neighbor totalistic rules. The same-construction frontier stops before physical line 2932, where the page-264 Life/outer-totalistic chain begins; that boundary is not T04 evidence. Adding the three links closes the final 75-link source/metadata equality and raises the disjoint source manifest to 246 without changing T04 mechanics.
 
 ### Citation, quote, source-repair, asset, and preset oracle
 
@@ -1608,19 +1608,19 @@ Picture 883/25 has exact executable settings and therefore receives a semantic t
 
 ## Completion Requirements
 
-- [ ] Every strict/Notes/split/actual-Index/alias/code/gallery/property/application/emulation candidate is dispositioned with zero remainder.
-- [ ] Every relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and explicit exclusions.
+- [x] Every strict/Notes/split/actual-Index/alias/code/gallery/property/application/emulation candidate is dispositioned with zero remainder.
+- [x] Every relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and explicit exclusions.
 - [x] The exact preset/program/run/property/view boundary and T03/T05/T06/T07/T08 relationship are proved.
 - [x] Current API/runtime fit and a concrete Goal 2 preset/conformance stage are implementation-ready.
-- [ ] Global ledgers, independent review, embedded checks, coverage/diff gates, and repository tests pass.
+- [x] Independent review, embedded checks, coverage/diff gates, and repository tests pass; the parent integration owns the corresponding global-ledger propagation.
 
 ## Stage Results
 
-**REOPENED during T06.** The prior 243-candidate/72-asset closure omitted two rasters explicitly governed by already-retained T04 captions: `BOOK:17431 -> 17433` and `BOOK:2922 -> 2924`. Source/asset counts, metadata, reverse closure, globals, and independent review are being repaired before T04 can be complete again. Both additions are evidence relations/profiles and do not change the strict `k=3,r=1` preset semantics below.
+**COMPLETE after bounded T06 asset repair.** The exact 12-query oracle closes 162 queried lines plus 84 governed follows, for 246 disjoint candidates in the partition `34/53/11/20/54/30/27/17`. Fifteen evidence groups close 260 cited provenance lines, 92 unique quote fragments, and 90 unique quote lines with zero remainder.
 
-The previous exact 12-query search oracle closed 243 candidates in the partition `34/53/11/20/51/30/27/17`; 15 evidence groups closed 253 cited provenance lines, 92 unique quote fragments, and 90 unique quote lines. Those historical source/asset totals are retained until the bounded repair is independently verified.
+The repaired source/metadata join closes 75 physical assets at `35 included / 34 excluded / 6 relation-only` and 150 exact reverse references. The three additions are `BOOK:2924` (excluded), `BOOK:2928` (excluded), and `BOOK:17433` (relation-only). Their governing prose, same-construction boundary, visible raster labels, bytes, dimensions, hashes, classifications, and forward/reverse joins pass independently. They add evidence relations and controls only; they do not change the strict `k=3,r=1` preset semantics.
 
-The construction is exactly the T03 preset `k=3`, `r=1`, `A=(0,1,2)`, and `nu(i)=i`, with seven sum cases, `3^7=2187` tables, and codes `0..2186`; preset resolution has the same structural program identity, hash, and executor types as the corresponding generic T03 program. It rejects valuation or parameter overrides. The page-76 50-code selection is not the 729-code T06 quiescent restriction, T07 reflection is derived, and T08 seed/run data remains separate. Exact code-777/code-867 trajectories and hashes, code-420 additivity, 15 structure plus five growth labels, and the corrected pictured-code labels 1659 and 1632 pass. Independent review, Markdown fences, `git diff --check`, and all 102 repository tests pass.
+The construction is exactly the T03 preset `k=3`, `r=1`, `A=(0,1,2)`, and `nu(i)=i`, with seven sum cases, `3^7=2187` tables, and codes `0..2186`; preset resolution has the same structural program identity, hash, and executor types as the corresponding generic T03 program. It rejects valuation or parameter overrides. The page-76 50-code selection is not the 729-code T06 quiescent restriction, T07 reflection is derived, and T08 seed/run data remains separate. Exact code-777/code-867 trajectories and hashes, code-420 additivity, 15 structure plus five growth labels, and the corrected pictured-code labels 1659 and 1632 pass. All six embedded oracles, independent review, Markdown-fence checks, `git diff --check`, and all 102 repository tests pass.
 
 ## Integration Results
 
@@ -1632,5 +1632,5 @@ The construction is exactly the T03 preset `k=3`, `r=1`, `A=(0,1,2)`, and `nu(i)
 6. Rule restriction, proof/property, seed/run profile, gallery selection, palette, raster, and emulation records remain separate from program identity.
 7. T05 remains the higher-color radius-one preset question; T06, T07, and T08 retain their restriction, derived-property, and seed-class responsibilities.
 8. Goal 2 implements T04 only after the shared G2-T03 aggregate-rule construction and executor conformance, by adding a preset constructor plus identity/rejection fixtures rather than another execution path.
-9. The widened T03 source/asset closure, exact T04 code and trace fixtures, 72-link asset manifest, independent review, and unchanged repository suite supply the conformance evidence.
+9. The widened T03 source/asset closure, exact T04 code and trace fixtures, repaired 75-link asset manifest, independent review, and unchanged repository suite supply the conformance evidence.
 10. The global API is simpler after reintegration: one fixed-lattice executor serves T01/T02/T03 and this T04 preset, while type traceability survives in preset and evidence metadata.
