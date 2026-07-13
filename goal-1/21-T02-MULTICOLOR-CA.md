@@ -34,15 +34,138 @@ Determine exhaustively whether multi-color nearest-neighbor cellular automata ar
 
 ## Search Log
 
-The controlled oracle, exact manifests, split/Notes/actual-Index routing, and zero-remainder dispositions are being built. Initial high-signal anchors are:
+The actual Index begins at `BOOK:20826`. The controlled oracle below asserts 29 regex manifests across the complete monolith and a disjoint disposition of their 157 unique physical candidate lines. Counts are candidate-line counts, not raw substring occurrences:
 
-- `BOOK:772-776`: three-color count and totalistic contrast;
-- `BOOK:4684`: arbitrary 27-entry ordered-neighborhood rule labels and mutation operations;
-- `BOOK:5218-5222`: reversible subset of the full three-color nearest-neighbor space;
-- `BOOK:7900-7912`: binary block emulation of multi-color rules, retained only as a relation unless it adds native mechanics;
-- actual-Index aliases around `BOOK:21134,21187,21323,21542` route color-encoding vocabulary and must be followed rather than counted as construction evidence.
+| Q | Search family | Pre-Index | Actual Index |
+|---:|---|---:|---:|
+| 01 | spelled `three-color` / `three colors` | 28 | 3 |
+| 02 | numeric `3-color` / `3 colors` | 18 | 2 |
+| 03 | more than two / more / several colors | 14 | 2 |
+| 04 | `k-color` / `k colors` | 29 | 0 |
+| 05 | multi-color/multicolor | 1 | 3 |
+| 06 | numeric colors near nearest-neighbor | 7 | 0 |
+| 07 | spelled color counts near nearest-neighbor | 9 | 0 |
+| 08 | possible colors near nearest-neighbor | 15 | 0 |
+| 09 | exact full count / `8 trillion` | 5 | 0 |
+| 10 | 27 possible neighborhoods | 1 | 0 |
+| 11 | general `k^(k^(2r+1))` formula | 3 | 0 |
+| 12 | general nearest-neighbor rule signature | 1 | 0 |
+| 13 | general-CA implementation phrases | 2 | 0 |
+| 14 | fixed line/array/organization | 2 | 0 |
+| 15 | old-neighbor/parallel-update phrases | 7 | 0 |
+| 16 | immediate neighbors | 15 | 0 |
+| 17 | general `k,r` rule phrases | 4 | 0 |
+| 18 | three/`k` colors near totalistic | 17 | 0 |
+| 19 | two-cell neighborhood boundary | 2 | 0 |
+| 20 | explicit/general implementation tokens | 3 | 0 |
+| 21 | `k=3,r=1` | 13 | 0 |
+| 22 | source rule numbers | 4 | 0 |
+| 23 | 27 neighborhoods/cases | 2 | 0 |
+| 24 | rules involving three colors | 4 | 0 |
+| 25 | CA `state` alias probe | 0 | 0 |
+| 26 | asymmetry / left-right positional probe | 5 | 0 |
+| 27 | literal `ordered neighborhood` probe | 0 | 0 |
+| 28 | `{n,k}` / `{k^2,k,1}` positional codec | 1 | 0 |
+| 29 | broad arbitrary-CA/neighborhood saturation | 4 | 0 |
 
-No search is yet called exhaustive and no candidate is silently excluded.
+The exact reproducible oracle is intentionally self-contained:
+
+```bash
+python3 - <<'PY'
+import re
+from pathlib import Path
+
+L=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md').read_text().splitlines()
+IX=20826
+def xs(s): return [] if s=='-' else list(map(int,s.split(',')))
+rows=[
+(r'(?i)\bthree[- ]color(?:ed)?\b|\bthree (?:possible )?colors\b','772,774,776,780,784,790,796,800,804,808,824,846,1282,2806,2822,2852,3352,5218,5222,5482,5486,7900,7912,10399,10411,11375,15972,18339','20967,21134,21933'),
+(r'(?i)\b3[- ]color(?:ed)?\b|\b3 (?:possible )?colors\b','3320,3324,4684,6340,8020,8040,8534,8544,8546,8560,8936,10395,12055,15661,18476,18744,18823,18877','20846,20972'),
+(r'(?i)\bmore than two (?:possible )?colors\b|\bmore colors\b|\bseveral colors\b','1282,7900,8072,8318,11283,12055,12311,12313,13619,15245,18339,18348,18592,18755','20965,22372'),
+(r'(?i)\bk[- ]color\b|\bk possible colors\b|\bk colors\b','11051,11052,11056,11060,11283,11889,11897,12042,12308,13483,13513,14040,14046,14285,14301,14352,14488,14512,14661,14672,16016,16123,16175,16429,17533,18363,18532,18672,20027','-'),
+(r'(?i)multi[- ]?colou?rs?','18532','21187,21323,21542'),
+(r'(?i)(?:\b\d+\s*-?\s*colors?.{0,100}nearest[- ]neighbor|nearest[- ]neighbor.{0,100}\b\d+\s*-?\s*colors?)','3316,3320,3324,7960,8144,18670,18672','-'),
+(r'(?i)(?:\b(?:three|four|five|seven|seventeen|eighteen|nineteen|twenty-eight)\s*-?\s*(?:possible )?colors?.{0,100}nearest[- ]neighbor|nearest[- ]neighbor.{0,100}\b(?:three|four|five|seven|seventeen|eighteen|nineteen|twenty-eight)\s*-?\s*(?:possible )?colors?)','2806,2822,2852,2868,5218,5222,7912,7986,18339','-'),
+(r'(?i)(?:possible colors.{0,80}nearest[- ]neighbor|nearest[- ]neighbor.{0,80}possible colors)','2798,2802,2806,2822,2852,2868,4684,7892,7912,7914,7986,8010,8140,8318,15307','-'),
+(r'7,625,597,484,987|7625597484987|8 trillion','772,5218,10399,10411,11897','-'),
+(r'(?i)27 possible.{0,30}neighborhood','4684','-'),
+(r'k\^\{k\^\{2r\+1\}\}','11897,14352,18348','-'),
+(r'(?i)general nearest[- ]neighbor rule with k colors','11051','-'),
+(r'(?i)implementation of general cellular automata|possible blocks of cells in each neighborhood','11004,11898','-'),
+(r'(?i)cellular automaton consists of a line of cells|fixed array of cells|underlying number and organization of cells','422,982','-'),
+(r'(?i)old values of neighbors|old value of (?:the )?left-hand neighbor|updated in parallel|all the cells.{0,20}updated in parallel','850,1254,5830,10984,10996,13889,16446','-'),
+(r'(?i)immediate neighbors','430,716,776,856,882,1533,1956,1960,1986,2002,2922,3956,6218,7884,15207','-'),
+(r'(?i)allowing k possible colors.{0,80}r neighbors on each side|general rule with k colors and range r|original rule with \*k\* colors and \*r\* neighbors|rules with k colors and range r','11052,11897,14352,18348','-'),
+(r'(?i)(?:three[- ]color|three possible colors|k[- ]color|k possible colors).{0,100}totalistic|totalistic.{0,100}(?:three[- ]color|three possible colors|k[- ]color|k possible colors)','774,776,784,790,796,800,804,808,824,846,1282,2806,2822,2852,7912,11056,11060','-'),
+(r'(?i)two-cell neighborhoods|2-neighbor rules|two rather than three neighboring cells','11881,18744','-'),
+(r'(?i)explicit replacements for all|Transpose\[\{RotateRight\[a\], a, RotateLeft\[a\]\}\]|IntegerDigits\[num, k, k\^2r\^1\]','11002,11014,11900','-'),
+(r'(?i)k\s*=\s*3\s*,\s*r\s*=\s*1|k=3\s*,\s*r=1','11164,11168,11897,14541,15493,16020,16024,16025,16027,18348,18748,20573,20577','-'),
+(r'921408|5407067979|1340716537107','10395,11164,20573,20577','-'),
+(r'(?i)27 (?:possible )?(?:3-cell neighborhoods|cases)','4684,20577','-'),
+(r'(?i)rules? (?:that )?(?:involve|involving|with) three colors|rules? with three colors|three-color rules?','772,7912,10399,10411','-'),
+(r'(?i)(?:(?:cellular automata|cellular automaton).{0,100}(?:more than two|three|3|k) (?:possible )?states|(?:more than two|three|3|k) (?:possible )?states.{0,100}(?:cellular automata|cellular automaton))','-','-'),
+(r'(?i)asymmetr(?:y|ic).{0,100}(?:cellular automaton )?rule|(?:cellular automaton )?rule.{0,100}asymmetr(?:y|ic)|left neighbor.{0,100}right neighbor','452,490,498,10988,17995','-'),
+(r'(?i)ordered.{0,100}neighborhood|neighborhood.{0,100}ordered','-','-'),
+(r'(?i)CellularAutomaton\[\{n, k\}|\{k\^2, k, 1\}','11066','-'),
+(r'(?i)arbitrary.{0,100}(?:cellular automaton|neighborhood)|(?:cellular automaton|neighborhood).{0,100}arbitrary','7156,14216,17431,19588','-'),
+]
+sets=[]
+for q,(pattern,pre_s,idx_s) in enumerate(rows,1):
+    found=[i for i,line in enumerate(L,1) if re.search(pattern,line)]
+    pre=[i for i in found if i<IX]; idx=[i for i in found if i>=IX]
+    assert pre==xs(pre_s),(q,pre,xs(pre_s))
+    assert idx==xs(idx_s),(q,idx,xs(idx_s))
+    sets.append(set(found))
+    print(f'Q{q:02d} pre={len(pre)} idx={len(idx)}')
+
+parts={
+'core':'422,430,452,490,498,716,772,850,982,1254,1533,4684,6218,7884,10984,10988,11002,11004,11014,11051,11052,11066,11164,11897,11898,11900,13513,16446,18348,20577',
+'target':'5218,5222,7900,7960,7986,8144,8318,10395,10399,10411,14216,15493,16016,16020,16024,16025,16027,16123,18339,18670,18672,20573',
+'totalistic':'774,776,780,784,790,796,800,804,808,824,846,1282,2802,2806,2822,2852,2868,3320,3324,3352,6340,7912,8936,11056,11060,11168,18748',
+'additive':'11283,14352,14488,14512,20027,20846',
+'other_ca':'1956,1960,1986,2002,2798,2922,3316,3956,5482,5486,7156,7892,7914,8010,8140,10996,11881,11889,13483,13619,14046,14285,14301,14541,14661,15307,15661,15972,16175,17431,18744,18755,19588',
+'false':'856,882,5830,8020,8040,8072,8534,8544,8546,8560,11375,12042,12055,12308,12311,12313,13889,14040,14672,15207,15245,16429,17533,18363,18476,18532,18592,18823,18877',
+'index_target':'20965,20967,21134,21187,21323,21542,21933,22372',
+'index_sibling':'20972',
+'incidental':'17995',
+}
+partition={name:xs(value) for name,value in parts.items()}
+flat=[i for values in partition.values() for i in values]
+union=set().union(*sets)
+assert len(rows)==29 and len(union)==157
+assert len(flat)==len(set(flat))==157 and set(flat)==union
+assert [len(partition[k]) for k in partition]==[30,22,27,6,33,29,8,1,1]
+print('T02 literal search oracle: PASS 29 queries; 157 unique candidate lines')
+print('partition=30,22,27,6,33,29,8,1,1')
+PY
+```
+
+The command ends:
+
+```text
+T02 literal search oracle: PASS 29 queries; 157 unique candidate lines
+partition=30,22,27,6,33,29,8,1,1
+```
+
+### Complete candidate disposition
+
+- **Core/definition (30):** `422,430,452,490,498,716,772,850,982,1254,1533,4684,6218,7884,10984,10988,11002,11004,11014,11051,11052,11066,11164,11897,11898,11900,13513,16446,18348,20577`. These establish fixed line/support, positional left/self/right reads, asymmetry, old-snapshot parallel update, arbitrary explicit/general rule forms, alphabet/range syntax, positional weights, exact count, implementation, and 27-case search semantics; unique mechanics are excerpted below.
+- **Valid T02 instances/corroboration (22):** `5218,5222,7900,7960,7986,8144,8318,10395,10399,10411,14216,15493,16016,16020,16024,16025,16027,16123,18339,18670,18672,20573`. These supply reversible members, arbitrary-color instances/emulators, purpose/search rules, general `k=3,r=1` profiles, encoding, and history. They cannot add hidden state or change base execution.
+- **Totalistic sibling (27):** `774,776,780,784,790,796,800,804,808,824,846,1282,2802,2806,2822,2852,2868,3320,3324,3352,6340,7912,8936,11056,11060,11168,18748`. These are members of the full table space but use a distinct aggregate rule description owned by T03/T04/T05. The page-75 figure and its single-gray/background convention do not define T02.
+- **Additive/associative sibling (6):** `11283,14352,14488,14512,20027,20846`. These are algebraic subfamilies/properties, with the last an Index pointer; no distinct T02 mechanics.
+- **Other CA construction/geometry/range/schedule or ancillary (33):** `1956,1960,1986,2002,2798,2922,3316,3956,5482,5486,7156,7892,7914,8010,8140,10996,11881,11889,13483,13619,14046,14285,14301,14541,14661,15307,15661,15972,16175,17431,18744,18755,19588`. These concern higher range, staggered two-cell, block/sequential/2D/continuous/probabilistic constructions, arbitrary initial conditions, or general implementation context and are bounded explicitly rather than imported.
+- **Other system/false positive (29):** `856,882,5830,8020,8040,8072,8534,8544,8546,8560,11375,12042,12055,12308,12311,12313,13889,14040,14672,15207,15245,16429,17533,18363,18476,18532,18592,18823,18877`. These are mobile/Turing/substitution/tag/multiway/physical/network/color-encoding contexts or unrelated uses of colors/states.
+- **Relevant actual-Index cross-references (8):** `20965,20967,21134,21187,21323,21542,21933,22372`. They route more-colors, three-colors, encoding/emulation, and reversibility vocabulary to already inspected passages but add no construction text.
+- **Actual-Index sibling (1):** `20972` routes a `3-color` Turing-machine entry, not T02.
+- **Incidental asymmetry false hit (1):** `17995` concerns an unrelated algebraic asymmetry statement.
+
+No candidate remains unresolved. The zero-hit probes are informative: the source does not literally say `ordered neighborhood` and uses `colors`, not a T02 `states` alias. Ordered dependence is a source-derived structural inference from positional left/center/right rules, asymmetric cases, sorted offsets, and the explicit `{k^2,k,1}` weights; it is not presented as a verbatim phrase.
+
+### Split and routing audit
+
+- Strict `BOOK:772` maps to Chapter 3 split line 89; `BOOK:422`, `850`, `982`, `4684`, `5218`, `7900/7912`, and `10411` route to the expected Chapter 2/3/8/9/11/12 duplicates. Minor split wording does not replace canonical monolith provenance.
+- The Chapter 12 split duplicates only part of the Notes through the source's printed-page-904 region and omits later Notes; `BACK-MATTER/Notes/Notes.md` is an unrelated one-line fragment. `BACK-MATTER/Index/Index.md` contains misrouted Notes and is not the actual Index.
+- Actual Index starts at `BOOK:20826`; all eight relevant pointers route to included/corroborating passages above. No duplicate excerpt is counted twice.
 
 ## Book Excerpts
 
@@ -155,6 +278,122 @@ code(T)              = sum(T(l,c,r) * k^context_index(l,c,r))
 - A sparse mutation label, reversibility claim, behavior classification, purpose search, raster, or binary block encoding cannot replace or feed the mathematical table/field.
 - T03/T04/T05 aggregation, T06 quiescence, T07 reflection, and emulation/property analyzers remain compositional siblings rather than T02 flags.
 
+## Exact Semantic Oracle
+
+This dependency-free oracle checks the positional codec, exact rule counts, T01 specialization, a direct non-totalistic ordered-context discriminator, arbitrary-precision pressure, the runnable Notes rule 921408, and the exact rule-5407067979 doubling profile. The finite arrays are causal-window realizations of the source profiles, not native support or rule identity.
+
+```bash
+python3 - <<'PY'
+from hashlib import sha256
+
+def contexts(k):
+    return ((l,c,r) for l in range(k) for c in range(k) for r in range(k))
+
+def address(k,l,c,r):
+    return k*k*l+k*c+r
+
+def output(code,k,l,c,r):
+    return code//(k**address(k,l,c,r))%k
+
+def table(code,k):
+    return tuple(output(code,k,*q) for q in contexts(k))
+
+def encode(outputs,k):
+    return sum(value*k**i for i,value in enumerate(outputs))
+
+assert [address(3,*q) for q in contexts(3)]==list(range(27))
+assert (address(3,0,1,2),address(3,0,2,1),address(3,1,0,2))==(5,7,11)
+assert 3**(3**3)==3**27==7625597484987
+
+# T01 is exactly the k=2 specialization, including context significance.
+for code in range(256):
+    for l,c,r in contexts(2):
+        assert output(code,2,l,c,r)==(code>>(4*l+2*c+r))&1
+
+for code,display in (
+    (921408,'000000000000001201210221020'),
+    (5407067979,'000000111221211100111212000'),
+):
+    outputs=table(code,3)
+    assert len(outputs)==27 and encode(outputs,3)==code
+    assert ''.join(map(str,reversed(outputs)))==display
+
+# Source rule 921408 distinguishes permutations with equal color sum.
+assert output(921408,3,0,0,1)==2
+assert output(921408,3,0,1,0)==1
+assert output(921408,3,1,0,0)==1
+
+# The dot-only mutation baseline expands to the total identity table.
+identity=tuple(c for l,c,r in contexts(3))
+identity_code=encode(identity,3)
+assert identity_code==7479532539765
+assert all(output(identity_code,3,l,c,r)==c for l,c,r in contexts(3))
+mutated=list(identity)
+i=address(3,2,0,1); old=mutated[i]; mutated[i]=(old+1)%3
+assert sum(a!=b for a,b in zip(identity,mutated))==1
+assert encode(mutated,3)-identity_code==(mutated[i]-old)*3**i
+
+# General k is finite but not fixed-width: R(4)=2^128.
+assert 4**(4**3)==2**128
+assert 4**64-1>2**63-1
+
+def evolve(code,seed,events):
+    pad=events+3
+    state=[0]*pad+list(seed)+[0]*pad
+    rows=[state]
+    for _ in range(events):
+        old=rows[-1]
+        rows.append([
+            output(code,3,old[x-1] if x else 0,old[x],
+                   old[x+1] if x+1<len(old) else 0)
+            for x in range(len(old))
+        ])
+    return rows
+
+def nonzero_word(row):
+    used=[i for i,v in enumerate(row) if v]
+    return ''.join(map(str,row[min(used):max(used)+1])) if used else ''
+
+# BOOK:20573-20574 counts serialized states: 3m-1 states = 3m-2 events.
+for m in range(1,33):
+    rows=evolve(5407067979,[1]*(m-1)+[2],3*m-2)
+    assert len(rows)==3*m-1
+    assert nonzero_word(rows[-1])=='1'*(2*m)
+trace=[nonzero_word(r) for r in evolve(5407067979,[1,1,2],7)]
+assert trace==['112','1211','2201','1012','20211','11101','11102','111111']
+
+# Exact 100-update causal window for the source's rule-921408 invocation.
+rows=evolve(921408,[1],100)
+crop=[row[3:204] for row in rows]  # width 201 around the centered seed
+blob=bytes(v for row in crop for v in row)
+assert len(crop)==101 and all(len(row)==201 for row in crop)
+assert tuple(blob.count(v) for v in range(3))==(17840,1568,893)
+assert sha256(blob).hexdigest()=='935f360febe2e58653bd52dff57139563bc706af963b2bdfbe0b116a7dbcacc3'
+
+print('T02 semantic oracle: PASS')
+print('rule_count_k3=',3**27)
+print('rule_921408_display=', ''.join(map(str,reversed(table(921408,3)))))
+print('rule_5407067979_display=', ''.join(map(str,reversed(table(5407067979,3)))))
+print('identity_code_k3=',identity_code)
+print('rule_5407067979_m3_trace=',','.join(trace))
+print('rule_921408_counts=',tuple(blob.count(v) for v in range(3)))
+print('rule_921408_sha256=',sha256(blob).hexdigest())
+PY
+```
+
+Recorded output:
+
+```text
+T02 semantic oracle: PASS
+rule_count_k3= 7625597484987
+rule_921408_display= 000000000000001201210221020
+rule_5407067979_display= 000000111221211100111212000
+identity_code_k3= 7479532539765
+rule_5407067979_m3_trace= 112,1211,2201,1012,20211,11101,11102,111111
+rule_921408_counts= (17840, 1568, 893)
+rule_921408_sha256= 935f360febe2e58653bd52dff57139563bc706af963b2bdfbe0b116a7dbcacc3
+```
+
 ## Detailed Implementation Plan
 
 1. Complete controlled searches and exact line manifests across strict, Notes, actual Index, splits, aliases, formulas, variants, applications, and emulation routes.
@@ -166,7 +405,40 @@ code(T)              = sum(T(l,c,r) * k^context_index(l,c,r))
 
 ## Goal 2 Implementation Stage
 
-Pending evidence completion. Expected pressure is a generic finite-alphabet ordered lookup/table codec and conformance presets, not a T02 executor branch. Exact modules, migrations, and tests will be named after the construction audit.
+### G2-T02 — General finite-alphabet nearest-neighbor tables
+
+**Objective:** broaden the T01 foundation once so `k=2` elementary and `k>=3` T02 programs share the same finite-alphabet ordered-table executor, exact positional codec, support lowering, typed assignment, and atomic update. A discoverable T02 preset returns an ordinary shared spec; it never dispatches on `multicolor`.
+
+**Dependencies:** synthesis-selected T01 fixed-support/all-sites/assignment/update semantics; T34's lossless exact nonnegative-integer/decimal-string serialization responsibility; explicit finite ordered alphabets and stable program references. No T02-specific executor or new update law is required.
+
+**Concrete files and changes:**
+
+1. Extend `src/ca/alphabets.py` so an immutable ordered alphabet exposes validated `rank(value)`/`value(rank)` mappings and membership. Retain `int_range_alphabet(k,0)` as the canonical source color order; do not infer order from a palette or host set.
+2. Add a synthesis-named `src/ca/rule_tables.py` containing immutable `ExhaustiveTable(alphabet_id,ordered_offsets,outputs)` and a versioned Wolfram positional codec. Validate exactly `k^3` outputs, all in the alphabet, fixed leading zeros, code range, and lossless arbitrary-precision encode/decode.
+3. Refine `src/ca/rules.py`: exhaustive inputs know alphabet and arity; program identity contains the decoded structural table. A numeric code is codec/provenance data, not bit-shift execution state.
+4. Replace named-family spatial dispatch in `src/ca/rollout.py` or the synthesis-selected executor with the generic T01/T02 protocol: gather one old snapshot, rank reads in declared order, table-gather outputs, emit typed assignments, and commit simultaneously. Scalar/batch execution shares this code and never stores semantic program codes in fixed-width NumPy shifts.
+5. Extend `src/ca/specs.py` and the support/lowering module with alphabet, native fixed ordered support, `AllSites`, typed update, explicit cycle/segment/causal-window realization, evolving constant/repeating initial backgrounds, event/snapshot counts, and observation crop metadata.
+6. Add `src/ca/presets/nearest_neighbor.py`: `elementary(n)` validates `k=2`; `multicolor_nearest_neighbor(k,code_or_table)` validates `k>=3`; both construct the same generic spec. Seed, horizon, boundary, palette, and mutation provenance remain run/view inputs.
+7. Add pure rule-table transforms/provenance only where synthesis selects them: reflection/color relabelling, explicit one-entry edits, and scoped reversibility claims. Do not add backwards rollout or trust a Boolean reversible flag.
+8. Update trace/export codecs to use stable program references and tagged decimal-string big integers. A viewer may use categorical palettes and sparse dot displays downstream, with explicit expansion back to a total table.
+9. Add `tests/test_rule_tables.py`, `tests/test_t02_multicolor_ca.py`, and shared support/executor/codec fixtures; preserve all T01 asymmetric and current tests.
+
+**Required conformance tests:**
+
+1. Assert `S=k^3`, `R=k^S`, `R(3)=7,625,597,484,987`, exact valid ranges, fixed table lengths/leading zeros, and rejection of booleans, invalid `k`, out-of-alphabet outputs, `-1`, and `R`.
+2. For every T01 code and all eight contexts, prove the generic `k=2` codec equals `(n>>(4*l+2*c+r))&1`. T02's preset rejects `k=2` while the shared construction accepts it.
+3. Round-trip codes/tables `0`, `1`, `921408`, `5407067979`, `R-1`, deterministic sampled `k=3/4` cases, and a valid `k=4` code above `2^63-1` through structural, decimal-string, and JSON-safe records without NumPy/float loss.
+4. Pin all 27 outputs and descending display digits of rules 921408 and 5407067979. Equal-sum contexts `(001,010,100)` must remain distinguishable; a mirrored context codec fails.
+5. Reproduce the exact rule-5407067979 doubling trace for multiple `m`, including the eight `m=3` serialized states; require `3m-2` events and `3m-1` states.
+6. Reproduce the 101-by-201 rule-921408 causal-window state digest/counts above and the source-permitted image oracle if retained by the asset audit.
+7. Expand the all-dot mutation baseline to the exact identity table/code, apply one explicit entry edit, and prove only that context changes. Missing rows without an explicit display default are invalid.
+8. Use a table with output color `2`, one with `T(000)!=0`, and an old-snapshot adversary to prove base-`k` output, evolving background, and atomic parallel semantics rather than binary masking, fixed-zero clamping, or in-place mutation.
+9. Run one table with centered, explicit cyclic, finite-block-on-constant, and finite-block-on-repeating initial fields. Program identity stays fixed; run/realization identity changes. Compare exact causal crops against a larger halo.
+10. Accept asymmetric, non-quiescent, non-totalistic tables in base T02. Validate totalistic/quiescent/symmetric restrictions only through their own explicit analyzers/presets; never require them for execution.
+11. Inspect the resolved T01/T02 specs and executor: no callback, family branch, partial-row fallback, hidden seed/background/palette/mutation schedule, binary block encoding, right-shift decoder, fixed-width code, or artificial maximum `k`.
+12. Preserve the full repository suite and exact finite `[t,x,0,0]` trace round-trips without weakening tests.
+
+**Completion evidence:** generic table execution passes all binary and nonbinary adversaries; source codes/oracles reproduce; big codes round-trip losslessly; all seeds/support realizations remain explicit; static inspection finds no T01/T02 branch, callback, binary emulation, hidden default, or fixed-width identity; current tests pass unchanged.
 
 ## No-Cheating Checks
 
@@ -175,6 +447,9 @@ Pending evidence completion. Expected pressure is a generic finite-alphabet orde
 - No view tone or integer digit arithmetic substituted for symbolic color identity.
 - No seed/background/boundary/reversibility restriction silently fused into the base rule.
 - No finite figure width/horizon presented as native lattice capacity or halt.
+- No `right_shift`, `&1`, float, JSON number, or `numpy.int64` path used as general rule-code identity.
+- No frozen initial constant/repeating background: arbitrary tables may evolve the entire background.
+- No artificial maximum `k`; inability to materialize a requested finite table is a typed resource outcome.
 
 ## Completion Requirements
 
