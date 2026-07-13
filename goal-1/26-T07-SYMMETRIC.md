@@ -39,7 +39,7 @@ T07 changes none of those four execution steps.
 
 ## Search Log
 
-`BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. Body plus Notes occupy canonical physical lines `1-20825`, the actual Index is `20826-22457`, and the Colophon begins at `22458`. Ten controlled pre-Index families produce 268 unique lexical lines. Fifteen syntactically governed continuations and 74 actual-Index routes yield the authoritative 357-line text universe.
+`BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. Body plus Notes occupy canonical physical lines `1-20825`, the actual Index is `20826-22457`, and the Colophon begins at `22458`. Ten controlled pre-Index families produce 268 unique lexical lines. Fifteen syntactically governed continuations and 74 actual-Index routes yield a 357-line bounded base. The hostile saturation protocol adds a disjoint 293-line remainder, producing the authoritative 650-line text universe described below.
 
 | Q | Controlled pre-Index family | Hits |
 |---:|---|---:|
@@ -200,7 +200,7 @@ T07 split/excerpt audit: PASS physical=325 exact=313 variants=12; 11 evidence gu
 
 ### Hostile saturation remainder and final source universe
 
-The bounded base failed an unlimited-distance and governed-adjacency adversary. The frozen repair deliberately overgenerates a disjoint remainder from eight sources: unbounded versions of all ten original queries; CA left/right relations; the next structural node after every prior caption/root; bridges of at most eight physical lines between prior roots; hard grammatical continuations; CA direction/orientation vocabulary; SimpleProgram alias/equivalence vocabulary; and explicit structural/table/direction anchors. Their overlaps yield 290 candidates. Three governed repairs add `BOOK:11639` (the opening of the Boolean-expression unit completed at `11844`) and the palindrome unit `12236,12238`, for an exact 293-line remainder.
+The bounded base failed an unlimited-distance and governed-adjacency adversary. Two executable expansions are frozen: removing all ten same-line distance caps adds 48 lines, and taking every nonempty line in a gap of at most eight lines between consecutive pre-Index base roots adds a disjoint 80. Six broader manual audits—CA left/right relations, next structural nodes, hard continuations, direction/orientation, SimpleProgram aliases/equivalences, and explicit anchors—supply a pinned 162-line adjudicated supplement. These three disjoint sets yield 290 candidates; the supplement's sorted-line digest is `b0ae99a26308010fdc20e6879f534094457cda6c2873167552f703e53d5ebf0`. Three governed repairs add `BOOK:11639` (the opening of the Boolean-expression unit completed at `11844`) and the palindrome unit `12236,12238`, for an exact 293-line remainder. This is an explicit frozen audit, not a claim that all six manual searches can be regenerated from unstated predicates.
 
 Every remainder line is explicitly dispositioned:
 
@@ -225,13 +225,13 @@ The authoritative audited textual universe is therefore 650 lines:
 
 Thus 397 pre-Index lines are retained as evidence or typed controls, 179 are explicit rejections, and 74 are Index routes. The saturation search adds no execution semantics; it strengthens boundaries that the architecture already requires.
 
-The 114 retained additions have a complete monolith/split join: 103 are byte-exact and 11 are pinned formatting/OCR/line-join variants. The LF-terminated mapping rows
+The 114 retained additions have a complete monolith-to-split reverse join: 103 are byte-exact and 11 are pinned formatting/OCR/line-join variants. The LF-terminated mapping rows
 
 ```text
 BOOKline|class|split-relative-path|split-line|E-or-V|sha256(monolith-line)|sha256(split-line)
 ```
 
-have combined SHA-256 `231764e9127c73686670feaff2d926af769ab904f79f0f24489204be19f73ac1`. No split-only semantic candidate is accepted.
+have combined SHA-256 `231764e9127c73686670feaff2d926af769ab904f79f0f24489204be19f73ac1`. The monolith is authoritative; this proves reverse coverage of every retained addition, not a separately exhaustive semantic search over every split-file wording variant.
 
 ```bash
 python3 - <<'PY'
@@ -277,7 +277,19 @@ for name,pat,want in env['rows']:
     wide.append({i for i,s in enumerate(M[:env['IX']-1],1) if re.search(pat,s,re.I)})
 wide_delta=set().union(*wide)-set().union(*env['sets'])
 assert len(wide_delta)==48 and wide_delta<=candidate
-assert len(candidate-{11639,12236,12238})==290
+assert digest(wide_delta)=='604da4bdee2b661f433709f7b720acc806af3b886115fdfd6e053825f570c0ef'
+roots=env['union']|env['governed']; bridge=set()
+for a,b in zip(sorted(roots),sorted(roots)[1:]):
+    if b-a<=8: bridge|={n for n in range(a+1,b) if M[n-1].strip()}
+bridge-=roots
+assert len(bridge)==80 and bridge.isdisjoint(wide_delta)
+assert digest(bridge)=='1dde6c2d35e6689d99e49239cd761f85115ef41f212248a9506f294196fec775'
+assert digest(bridge|wide_delta)=='d67be9b8e464c356639495d63a20f0011e14cddd2cd51ffd0d85a732a4149d57'
+manual=set(map(int,'396,424,452,458,466,492,498,518,520,826,848,862,1050,1052,1284,1547,2042,2168,2266,2610,2632,2808,2854,2870,2924,3026,3042,3338,3408,3806,3904,3916,3936,4022,4028,4034,4056,4060,4416,4430,4448,4880,5234,5472,5634,5640,5642,5816,5884,6098,6342,6540,6646,6958,7322,7360,7744,7914,7930,7972,7990,8008,8020,8210,8412,8534,8544,8854,8938,8998,9010,9168,9198,9340,9350,9364,9534,9907,9923,10019,10263,10647,10858,10882,10986,10988,10990,10992,11039,11170,11180,11477,11513,11521,11638,11844,12228,12281,12468,12615,13217,13298,13603,13618,14055,14398,14481,14617,14619,14627,14672,14681,14723,14878,14943,14971,15151,15199,15223,15322,15392,15636,15637,15710,15713,15749,15920,16039,16070,16215,16373,16377,16466,16603,16948,16996,17010,17035,17119,17297,17595,17726,18167,18430,18534,18772,18850,18916,19039,19272,19282,19405,19509,19588,20113,20170,20198,20269,20276,20284,20542,20600'.split(',')))
+assert len(manual)==162 and digest(manual)=='b0ae99a26308010fdc20e6879f534094457cda6c2873167552f703e53d5ebf0b'
+assert manual.isdisjoint(wide_delta|bridge)
+core=candidate-{11639,12236,12238}
+assert len(core)==290 and core==wide_delta|bridge|manual
 assert len(base|candidate)==650
 
 # Exact monolith/split join for every retained addition.
@@ -1005,8 +1017,8 @@ D111-D119 remain valid. The repaired working architecture proposes the following
 
 ## Detailed Implementation Plan
 
-1. **Complete:** close the ten-family 268-line lexical union, 15 governed continuations, 74 actual-Index routes, 325 split hits, 12 split variants, and exact `15/167/3/98/74` disposition.
-2. **Complete:** close the direction-sensitive 22-file/44-reference asset ledger at `4/7/11`, with exact metadata, hashes, visual label findings, and stop boundaries.
+1. **Complete:** retain the reproducible 357-line bounded base, add the disjoint 293-line hostile-saturation remainder, and close the authoritative 650-line monolith universe at `15 direct / 190 relevant / 25 incidental / 167 sibling-general / 179 excluded / 74 Index`. The bounded split check remains `325 = 313 exact + 12 variants`; all 114 retained saturation additions reverse-join to split material as `103 exact + 11 pinned variants` without claiming a separate exhaustive split-only semantic corpus.
+2. **Complete:** supersede the historical 22-file/44-reference diagnostic with the fixed-point asset universe derived from 397 retained source lines: `C4/P/Q = 215/46/13`, 271 physical JPEGs, 542 exact monolith/split references, 271 unique hashes, and `4 included / 38 relation-only / 229 excluded`.
 3. **Complete:** derive the reflection action, local fixed-point predicate, reflected-program involution, global covariance qualifications, exact counts/codecs, totalistic proof, and orbit representation.
 4. **Complete:** audit current documentation/runtime/tests and the T01-T06, two-dimensional/isotropy, seed, boundary, observer, and emulation boundaries.
 5. **Complete:** specify typed claims, evidence, unsupported results, validated selection, transform/representation identity, serialization, and migration.
@@ -1063,7 +1075,7 @@ D111-D119 remain valid. The repaired working architecture proposes the following
 
 ## Completion Requirements
 
-- [x] Every direct/alias/caption/Notes/actual-Index/split/cross-reference/equivalence/seed/pattern/control candidate is dispositioned with zero remainder under a declared reproducible protocol.
+- [x] Every authoritative-monolith candidate in the bounded base, executable widening, executable bridge closure, frozen manual supplement, governed repairs, and actual Index is dispositioned. Every retained saturation addition reverse-joins to split material; split mirrors are not claimed as a separate exhaustive semantic corpus.
 - [x] Every relevant governed asset is hash-pinned and classified, with every source-permitted semantic/raster check closed.
 - [x] The rule predicate, reflection action, transform/orbit identities, exact counts/code relations, compact representation, and rule/seed/boundary/trajectory/view distinctions are proved across supported descriptions.
 - [x] Current API/runtime fit and a concrete Goal 2 property/transform/conformance stage are implementation-ready.
