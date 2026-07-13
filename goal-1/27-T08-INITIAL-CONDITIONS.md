@@ -1,16 +1,16 @@
 # 27-T08-INITIAL-CONDITIONS
 
-Status: **IN PROGRESS — SOURCE/ASSET/ARCHITECTURE AUDIT ACTIVE**
+Status: **IN PROGRESS — SOURCE/ASSET CLOSED; HOSTILE ARCHITECTURE AND GLOBAL INTEGRATION ACTIVE**
 
 ## Current Facts
 
 - Exact catalog row: T08, CSV line 9, `Initial-Condition Classes`; taxonomy section 8 at `ref/notes/CA-Types.md:177-192` is search vocabulary only, not book evidence.
-- The working hypothesis is that T08 classifies seed/run inputs to an existing resolved program, not new transition semantics. The same program can be paired with several initial configurations without changing FRONTIER, NEIGHBORHOOD, RULE, UPDATE, or program identity.
+- The source/architecture conclusion is that T08 classifies event-zero configuration inputs/classes/laws for an existing resolved program, not new transition semantics. The same program can be paired with several initial configurations without changing FRONTIER, NEIGHBORHOOD, RULE, UPDATE, or program identity.
 - A deterministic seed description, a probability distribution over seeds, one realized initial configuration, a finite computation realization, and a displayed crop are different objects. Randomness used only to sample event-zero state is not hidden per-step executor state.
 - For an infinite fixed lattice, a point seed is naturally a total background field plus a finite override. Rendering that field into a centered finite array is a realization/projection choice, not the seed's native support or boundary policy.
 - Seed validity is configuration-schema dependent. A gray value must belong to the declared ALPHABET; composite/tagged control configurations must satisfy structural invariants; a temporal recurrence prefix contains Markov state that cannot be replaced by a spatial point marker.
 - T01-T07 already require program, seed, realization/boundary, trace, and view identities to remain distinct. T06/T07 property evidence cannot smuggle a preferred seed into program identity.
-- Current `src/ca/seeds.py` contains deterministic, selector-backed, stochastic, compound, geometric, and structured factories plus a finite-shape renderer. Its reusable role and its callback/finite-realization/RNG boundaries require fresh inspection; current behavior is not presumed to define T08.
+- Current `src/ca/seeds.py` contains useful deterministic, selector-backed, stochastic, compound, geometric, and structured finite-shape factories, but its scalar masks, callback/family dispatch, implicit finite realization, and RNG semantics do not define T08 authority.
 - DOMAIN means the task/program dimensional support/topology. A seed selects or constructs a valid configuration on that DOMAIN; “seed class” is not a new DOMAIN merely because its support pattern has a different shape.
 - Goal 1 changes only `goal-1/`; runtime, root documentation, and tests remain Goal 2 work.
 
@@ -27,7 +27,7 @@ next   = UPDATE.apply(state, active, writes)
 
 - Treat a seed as an explicit, typed constructor or sampler for one valid event-zero configuration. Do not add seed-aware RULE or rollout branches.
 - Require a lossless distinction among native configuration, compact seed descriptor, realized sample, finite materialization, and observation crop.
-- Keep open until book evidence closes: the exact named T08 classes; whether randomness is Bernoulli, fixed-density, uniform over a finite support, or underdetermined; which background/value/centering choices are source-mandated; and whether any seed class carries native symmetry or periodicity invariants beyond event zero.
+- Evidence closure distinguishes point/uniform, explicit finite/cyclic, periodic, finite-on-background, block-coded, nested-derived, constrained, exact-composition, temporal-prefix, and per-cell-random starts. `BOOK:2708` leaves independence/equal probability underdetermined; explicit statistical models and temporal cases are recorded separately. No seed class changes native rule semantics.
 
 ## Big Picture Objective
 
@@ -38,7 +38,7 @@ Determine exactly which initial-condition classes the source uses, reconstruct t
 - Stable ID: T08.
 - Exact CSV name: `Initial-Condition Classes`.
 - Taxonomy section: 8, vocabulary seed only.
-- Working entry kind: cataloged seed/run-profile classes over existing constructions; not a construction or executor.
+- Entry kind: cataloged configuration classes/constructors/laws and run profiles over existing constructions; not a construction or executor.
 - Initial vocabulary: initial condition/configuration/state/pattern/arrangement, simple and random initial conditions, single black/gray/white cell, point/finite/block/row/line seed, all-white/all-black background, periodic/repeating/random configurations, starting configuration, and changes/sensitivity in initial conditions.
 
 ## Search Log
@@ -131,6 +131,48 @@ Short fragments below are provenance anchors; the construction fact, behavior ob
 | `BOOK:20128,20577` | proof/search boundaries | run-specific occurrence; rule cases unvisited by an initial condition | a seed/run cannot certify a rule property or erase unsampled table rows |
 
 No retained source gives T08 a seed-dependent native transition rule, new firing locus, new write, or new update algebra. `BOOK:12352` and `15766` discuss derived emulation/mapping facts in which changing source input can change a constructed target artifact; they do not make the target rule inspect a seed family during execution.
+
+## Asset Ledger
+
+The asset audit is driven by the immutable 487-line source set, not by filenames or visual similarity:
+
+1. `C4` contains every exact JPEG reference within four physical monolith lines of a retained source line: 307 assets.
+2. `P` contains eight direction-sensitive explicit-pointer repairs `{4208,4210,4212,5086,5098,7866,7928,7942}`; five already lie in `C4`.
+3. Hostile review follows same-caption, facing-page, multi-panel, explicit-continuation, and governed run/plate companions to a pinned fixed point `Q` of 102 assets, disjoint from `C4 union P`.
+4. The final physical universe is therefore `U=C4 union P union Q`, with `307 + 3 + 102 = 412` assets.
+
+`P` repairs directionality that pure distance misses. Its final three additions capture an explicitly pointed universal-macrocell detail, mobile-automaton composite-state emulation, and Turing run; `BOOK:7944,7946` are relation companions in `Q`. The companion closure includes complete rule-110, three-color, symbolic, shift-map, six-panel PDE, 2D/3D, Chapter 6 initial-condition, reversible, encryption, universal-encoding, rule-54, and Notes image runs. This is a frozen adjudicated semantic fixed point, not a claim that arbitrary image semantics can be regenerated from distance alone.
+
+| Asset class | Count | Meaning |
+|---|---:|---|
+| `I` | 284 | directly presents/encodes an evidenced initial profile/class or a run beginning from it |
+| `R` | 120 | seed relation, later crop/continuation, aggregate, rule strip, emulation, IVP, or sibling comparison |
+| `X` | 8 | adjacency-only/nonseed control |
+
+The exact exclusions are `BOOK:590,1034,1036,1044,1048,3458,4200,8608`. Later/transformed evidence remains relation-only rather than being discarded—for example the rule-110 continuations `522-532`, compressed/final views `4302,6642,8260`, and IVP panels `2048-2062`.
+
+Every asset has exactly one physical JPEG, one monolith reference, and one split-file reference. The closure has 412 distinct byte hashes and 824 exact references. Its LF-terminated ledger row is
+
+```text
+BOOK-line | I/R/X | physical-relative-path | byte-size | width | height |
+sha256 | split-md-relative-path | split-line
+```
+
+and the complete sorted ledger SHA-256 is `7a58eb6581ba740465608db6538b4d55305b52901932c670d764f846af34c44f`. The exact `S`, `C4`, `P`, `Q`, `I/R/X`, paths, dimensions, sizes, hashes, reverse joins, and ledger digest are versioned in `goal-1/27-T08-asset-oracle.py`.
+
+```bash
+python3 goal-1/27-T08-asset-oracle.py
+```
+
+Recorded result:
+
+```text
+T08 final asset oracle: PASS source=487; C4/P/Q=307/8/102; assets=412;
+refs=824; classes=284,120,8; unique_hashes=412;
+ledger_sha256=7a58eb6581ba740465608db6538b4d55305b52901932c670d764f846af34c44f
+```
+
+The raster bytes can support only their declared visual/run relation. They do not prove probability independence, native infinite support, rule properties, exact transitions outside captions/code, or program identity. OCR defects at the seven source locations above remain pointer/relation evidence; the JPEG hashes preserve what was actually inspected.
 
 ## Construction Model
 
@@ -496,7 +538,11 @@ Current runtime reuse is real but narrower than the catalog abstraction:
 
 | Current surface | Reuse/classification | Required Goal 2 correction |
 |---|---|---|
+| `SHAPE` and “complete generator” (`simple_programs.md:169-196,2156-2180`) | realization responsibility plus identity mismatch | keep finite shape in computation realization; do not fold seed/profile into structural program/generator identity |
 | `Seed` fields (`src/ca/seeds.py:39-55`) | partial finite scalar presentation | replace `family: str`, `distribution: Any`, and untyped params with closed tagged schemas; bind to configuration schema and typed values |
+| `Dynamics` (`src/ca/specs.py:23-55,84-114`) | useful program/episode separation | retain exclusion of per-episode seed/steps, add configuration DomainSchema and structural decoders, and move finite boundary/shape into explicit realization where appropriate |
+| concrete `initial_state` input (`src/ca/rollout.py:40-67`) | direct responsibility | keep accepting an already valid event-zero configuration separately; stop family paths from reinterpreting its storage or hiding state |
+| scalar alphabet values (`src/ca/alphabets.py:40-56`) | insufficient representation | add typed product/tagged/structural schemas and invariant-aware codecs without mandating one decomposition |
 | Selector-backed factories | reusable finite support descriptions | preserve loci selection, but do not equate a selected finite mask with native infinite support or a full configuration |
 | `render(seed, shape, rng)` (`seeds.py:879-939`) | finite materializer | split validation, law sampling, exact configuration construction, and finite materialization; remove family dispatch from semantic resolution |
 | `rng=None` (`seeds.py:58-63`) | convenience only | reject or explicitly record nondeterministic entropy for semantic runs; retain algorithm/version/key/sample provenance |
@@ -530,6 +576,31 @@ Additional current defects must be made explicit in the migration:
 - Principle 11 keeps a one-time stochastic seed law distinct from RNG implementation and from stochastic transition rules.
 - Principle 12 keeps held-out-seed streams, batching, storage padding, centering, orchestration, and rasterization outside program semantics; a semantic halo/causal lowering separately requires a horizon proof.
 - Principles 13-16 require adversaries for variable support, graph renaming, background evolution, translation/centering, finite topology versus approximation, ALPHABET mismatch, structured composite invariants, law capability/identity, replay, temporal resume, and opaque callback/interpreter rejection.
+
+## Dependent Decision Audit
+
+No completed decision needs reopening. T08 sharpens these existing handoffs without changing their transition semantics:
+
+| Prior decisions | T08 consequence |
+|---|---|
+| D002 | a branch-free runner receives a complete validated configuration; current temporal seed-family branches and hidden history are migration defects |
+| D005, D015, D099 | native support/topology, compact default/override presentation, finite computation lowering, and view crop remain distinct |
+| D008, D035, D088, D118 | program/rule identity remains independent of point, scalar, machine, totalistic, or other initial profiles |
+| D010, D013, D014 | composite active/head roles must survive initial construction, complete traces, batching, and serialization; no storage decomposition is mandated |
+| D070-D074 | recurrence prefixes/history remain complete visible Markov configuration data; a future-sufficient but lossy scalar/window cannot replace canonical state |
+| D096, D100-D102 | exact/represented/random field starts and transition-time noise have separate identities; T08 does not authorize stochastic RULE execution |
+| D119, D120 | seed, boundary, and observed trajectory cannot certify quiescence or reflection properties; trajectory claims quantify compatible run data separately |
+
+T01's current `seeds.point` handoff is direct only as a finite scalar materializer. The native integer-line point field needs an explicit total default-plus-override presentation or a proved horizon lowering. T02-T07 conclusions remain unchanged; T09/T12 gain only the already-required ability to construct invariant-valid composite configurations. T43 needs typed exact scalar constructors, and T44 needs exact/default-field plus explicitly scoped random-field profiles. These are Goal 2 interface corrections, not reopened evidence stages.
+
+### D121 — Initial-condition classes are validated configurations, constructors, or laws, not execution semantics
+
+- **Status:** decision candidate; activate after final hostile/source/asset/global gates.
+- **Basis:** the source reuses one point profile across unchanged CA rules (`BOOK:418-518,730-790`), contrasts it with random starts (`2706-2710,3060-3106`), exposes periodic, random-block, block-coded, nested, finite-defect, and explicit background/offset forms (`3126-3210,3388-3406,11077-11150`), distinguishes finite from infinite information/scope (`13265,19072`), and states support-family-specific availability of random initial data (`14275`). It supplies no seed-dependent native transition.
+- **Configuration boundary:** `ConfigurationSchema` declares a DomainSchema, admitted support/topology instances, typed ALPHABET/components, and invariants. One exact `X_0 in Conf(C_P)` is direct ordinary state. Fixed-field point/periodic/override/piecewise forms and structural codecs are optional lossless representations or presets, not a universal field interface.
+- **Class/law boundary:** an `InitialConditionClass` denotes a schema-scoped subset but does not promise decidable membership. A deterministic constructor, mathematical law, construction record, sampling realization/sample record, denotational configuration, validation evidence, and any transform/derivation each retain separate identity. Source-underdetermined “random” never silently becomes fair iid; structured laws must preserve configuration invariants.
+- **Realization boundary:** native configuration, genuine finite topology, causal work lowering, approximation/boundary, storage padding, crop, trace, experiment, and view remain distinct. A claimed exact finite lowering commutes through every requested event/observation in its horizon, not only one step.
+- **Execution consequence:** after validation, the exact same branch-free FRONTIER/NEIGHBORHOOD/RULE/UPDATE runner executes. T08 adds no state family, firing locus, read, write, update policy, executor, successor, outcome, halt, rule property, or per-step RNG. Nonstep constraint, function, and PDE “initial conditions” remain their native relation/query/side-data roles unless an explicit relation derives a SimpleProgram.
 
 ## Detailed Implementation Plan
 
