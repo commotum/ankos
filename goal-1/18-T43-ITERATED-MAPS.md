@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T43 row and runner contract in `architecture-audit.md` supersede scalar-domain/executor and family-specific assignment names below.
+
 The evidence/search closure and conformance fixtures remain valid. T43 and T34 share one `t+0D` closed unary-map/assignment construction; real/fixed representations and self-map validation are tagged carriers and invariants.
 
 ## Current Facts

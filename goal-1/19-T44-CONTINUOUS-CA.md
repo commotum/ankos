@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T44 row and runner contract in `architecture-audit.md` supersede continuous-DOMAIN or construction-specific field-class claims below.
+
 The evidence/search closure and conformance fixtures remain valid. T44 has a discrete `t+1D` DOMAIN with continuous values and reuses the generic local-rule/assignment construction; deterministic profiles are closed rule presets.
 
 ## Current Facts

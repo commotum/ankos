@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T31 row and declarative-category handoff in `architecture-audit.md` supersede construction-specific class proliferation below; the non-transition finding remains authoritative.
+
 The evidence/search closure and conformance fixtures remain valid. T31 remains genuinely non-transition, but its histogram form and query/certificate records are being placed under one generic declarative relation/model-set category.
 
 ## Current Facts

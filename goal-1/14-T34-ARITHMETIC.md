@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T34 row and runner contract in `architecture-audit.md` supersede scalar-domain/executor and family-specific assignment names below.
+
 The evidence/search closure and conformance fixtures remain valid. T34 is a `t+0D` closed unary-map preset over an exact numeric value carrier and generic assignment, not a separate scalar executor.
 
 ## Current Facts

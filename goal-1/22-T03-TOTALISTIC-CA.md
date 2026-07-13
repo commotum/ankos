@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ASSET REPAIR AND ARCHITECTURE AUDIT**
 
+Architecture authority: the T03 row and runner contract in `architecture-audit.md` supersede incompatible rule-identity/class claims below; the bounded asset repair remains independently open.
+
 In addition to the bounded asset repair, the compact sum form and its validated exhaustive expansion are being reclassified as lossless representations of the same restricted local function, not distinct execution semantics.
 
 ## Current Facts

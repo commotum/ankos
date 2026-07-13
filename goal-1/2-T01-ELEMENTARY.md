@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T01 row and runner contract in `architecture-audit.md` supersede any executor/class claims below; evidence, construction facts, and conformance fixtures remain authoritative.
+
 The evidence/search closure and conformance fixtures remain valid. D004/D007 and the Goal 2 handoff are reopened to separate generic atomic assignment from T01's fixed-lattice/table presets.
 
 ## Current Facts

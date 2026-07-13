@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T13 row and runner contract in `architecture-audit.md` supersede any separate-executor/top-level-class framing below.
+
 The evidence/search closure and conformance fixtures remain valid. T13 justifies a support-changing ordered-replacement policy on the shared `UPDATE` axis, not a construction-specific executor or top-level semantic class.
 
 ## Current Facts

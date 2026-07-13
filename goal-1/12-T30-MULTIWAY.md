@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T30 row and runner contract in `architecture-audit.md` supersede deterministic-layer-only and multiway-executor framing below.
+
 The evidence/search closure and conformance fixtures remain valid. Multiway uses the shared rewrite runner with an UPDATE that lifts one successor to a set of successors; it does not require a multiway executor.
 
 ## Current Facts

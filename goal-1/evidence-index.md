@@ -7,6 +7,7 @@ This ledger is the authoritative coverage join between `ref/notes/CA-Types.csv`,
 - `PENDING`: the type stage has not begun.
 - `IN PROGRESS`: the stage file exists but at least one completion requirement remains unproved.
 - `REOPENED`: later evidence invalidated a completed conclusion and the stage must be re-derived.
+- `EVIDENCE CLOSED / ARCHITECTURE REOPENED`: searches/excerpts/fixtures remain complete, but API/runner/Goal 2 conclusions are being rederived; this does not count as globally complete.
 - `COMPLETE`: every candidate match is resolved, all unique construction-relevant excerpts are recorded, the construction and variants are reconstructed, API/runtime/principles fits are audited, the Goal 2 handoff is implementation-ready, and global integration is current.
 
 Only `COMPLETE` counts toward the 45-type coverage total. A search hit, a taxonomy summary, or a plausible API fit never changes status by itself.
@@ -23,6 +24,8 @@ Each type stage must make the following auditable:
 6. Re-integration into this ledger, `design-ledger.md`, and `0-plan.md`, including any reopened stage.
 
 ## Catalog Coverage
+
+Architecture-status override: every row currently shown `COMPLETE` is `EVIDENCE CLOSED / ARCHITECTURE REOPENED` until the mandatory matrix in `architecture-audit.md` is reclosed. T03/T04 additionally retain their explicit asset reopenings. The detailed row text remains the evidence-closure record, not an assertion that its former architecture survives.
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
@@ -75,9 +78,10 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 19 / 45.
-- Type stages reopened: 4.
-- Type stages unresolved: 21 pending; T06 is paused pending the architecture audit.
+- Type stages globally complete: 0 / 45 while the mandatory architecture audit is open.
+- Type stages evidence-closed / architecture-reopened: 21.
+- Type stages additionally asset-reopened: 2 (T03, T04).
+- Type stages unresolved: 21 pending; T06 is paused pending architecture reclosure.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 

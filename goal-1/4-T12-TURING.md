@@ -2,6 +2,8 @@
 
 Status: **REOPENED — REPRESENTATION ARCHITECTURE AUDIT**
 
+Architecture authority: the T12 row, commuting tagged representation, and runner contract in `architecture-audit.md` supersede incompatible separate-control/head-packing claims below.
+
 ## Current Facts
 
 - Reopening finding: distinct tape-symbol and head-state roles do not require distinct top-level storage classes. A transparent canonical cell alphabet is `Plain(TapeSymbol) | Head(HeadState,TapeSymbol)`, equivalently `TapeSymbol x Option[HeadState]`, with exactly one `Head` cell.

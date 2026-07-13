@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T27 row and runner contract in `architecture-audit.md` supersede separate-executor/class framing and imprecise DOMAIN terminology below.
+
 The evidence/search closure and conformance fixtures remain valid. Pose products, multiplicity-preserving bags, and parallel expansion with a bag combiner are transparent DOMAIN/ALPHABET/UPDATE choices inside the shared runner, not a geometric executor.
 
 ## Current Facts

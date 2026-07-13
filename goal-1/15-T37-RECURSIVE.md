@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T37 row and runner contract in `architecture-audit.md` supersede numbered-update/executor framing below while preserving the full-prefix state and noninjective-window result.
+
 The evidence/search closure and conformance fixtures remain valid. The stage's own sufficient-window result reopens the claim that a full prefix is the only canonical Markov state; endpoint growth is an UPDATE choice inside the shared runner, not a recursive-sequence executor.
 
 ## Current Facts

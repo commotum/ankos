@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T20 row and runner contract in `architecture-audit.md` supersede any prohibition on transparent structured values or symbolic-executor framing below.
+
 The evidence/search closure and conformance fixtures remain valid. Recursive tagged expressions and prefix-free replacements are transparent CONFIGURATION/RULE/UPDATE schemas inside the shared runner, not a symbolic executor.
 
 ## Current Facts

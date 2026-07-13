@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T17 row and runner contract in `architecture-audit.md` supersede any separate-executor/top-level-class framing below.
+
 The evidence/search closure and conformance fixtures remain valid. Prefix read/delete roles and atomic consume/append remain semantic FRONTIER/NEIGHBORHOOD/RULE/UPDATE data, but do not justify a separate queue executor.
 
 ## Current Facts

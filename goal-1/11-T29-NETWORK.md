@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T29 row and runner contract in `architecture-audit.md` supersede any prohibition on transparent graph schemas or network-executor framing below.
+
 The evidence/search closure and conformance fixtures remain valid. A rooted graph, graph occurrences/views, and typed create/rewire/project replacements are transparent DOMAIN/NEIGHBORHOOD/RULE/UPDATE choices inside the shared runner, not a network executor.
 
 ## Current Facts

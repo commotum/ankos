@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T02 row and runner contract in `architecture-audit.md` supersede any executor/class claims below; evidence, construction facts, and conformance fixtures remain authoritative.
+
 The evidence/search closure and conformance fixtures remain valid. Composite finite alphabets and semantic-table versus rank-codec identity are being reintegrated without a T02-specific runtime class.
 
 ## Current Facts

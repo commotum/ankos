@@ -7,7 +7,7 @@ This is the evolving architecture record for Goal 1. It inventories observed sem
 1. Principle 0 governs every entry: a prior plan or abstraction is revisable when construction evidence does not compose naturally.
 2. Book evidence precedes semantic reuse or extension. Catalog names and `CA-Types.md` sections provide search vocabulary, not construction proof.
 3. A mechanism is shared only when state, reads, rule result, commit, and successor semantics are genuinely the same.
-4. State must expose support/topology, values, and control needed to advance; executor-local control or opaque whole-state packing is not accepted.
+4. Configuration must expose its DOMAIN/support/topology, ALPHABET/value labels, structural invariants, and every control role needed to advance. Control may be a lossless tagged/product/marker role inside those labels or structures; executor-local control and opaque whole-state packing remain invalid.
 5. Program state, trace, ANKoS encoding, batching, visualization, solvers, and numerical approximations stay distinct unless evidence proves coupling is defining.
 6. A new primitive remains `PROVISIONAL` until a completed type stage supplies direct evidence, invariants, and at least one conformance case.
 
@@ -20,11 +20,28 @@ This is the evolving architecture record for Goal 1. It inventories observed sem
 - `NOT APPLICABLE`: the component is genuinely absent.
 - `UNRESOLVED`: evidence is insufficient or contradictory.
 
+## Architecture Audit Authority
+
+`architecture-audit.md` is the authoritative first-principles disposition of D000-D118 and every completed type-stage handoff. It establishes the branch-free SimpleProgram protocol:
+
+```text
+active = FRONTIER.select(configuration)
+reads  = NEIGHBORHOOD.read(configuration, active)
+writes = RULE(active, reads)
+next   = UPDATE.apply(configuration, active, writes)
+```
+
+DOMAIN/support/topology, ALPHABET/value schema, FRONTIER, NEIGHBORHOOD, RULE result, UPDATE composition/schedule, seed, and invariants are typed axes of that protocol. Cellular automata are one fixed-lattice/all-sites/local-stencil/scalar-write/parallel-update preset. Catalog types and axis implementations never select a family executor.
+
+The audit retires required top-level `SingleControl`, `TransitionControl`, `ArithmeticAssignment`, `MapAssignment`, and construction-named executor/state classes. Visible heads, active markers, counters, and cursors remain semantic roles, represented losslessly by tags, products, markers, or structural fields. Constraint/model sets, uniterated functions, and general PDE relations without a specified evolution problem remain declarative nonfits; multiway rewriting stays inside the runner through set-valued successors.
+
+The decision text and construction rows below retain their evidence bases and historical derivations. Wherever a status/consequence conflicts with the complete matrix in `architecture-audit.md`, that matrix supersedes it until the row is rewritten during its architecture reclosure.
+
 ## Construction Record Schema
 
 Every completed type will update the relevant rows below and record:
 
-- state = support/topology + values + control;
+- configuration = DOMAIN/support/topology + ALPHABET/value labels + structural invariants, with control as an explicit role rather than a mandated storage class;
 - active loci or frontier;
 - reads/access pattern and rule inputs;
 - explicit result type;
@@ -35,7 +52,7 @@ Every completed type will update the relevant rows below and record:
 - observables distinct from program state;
 - current API/runtime fit, evidence provenance, and Goal 2 dependencies.
 
-## Completed Construction Records
+## Evidence-Closed Construction Records (Architecture Reopened)
 
 | Type | State | Active/read/rule | Result/update | Successor and boundaries | Goal 2 obligation |
 |---|---|---|---|---|---|
@@ -114,15 +131,15 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 | Dimension | Current candidate | Status | Evidence users |
 |---|---|---|---|
-| Support/topology | Fixed fields including total Boolean/symbol/real-valued lattice fields, one scalar slot including a domain-tagged real interval, ordered sequences and indexed numeric prefixes, ordered finite/intensional integer domains, named banks, rooted trees, affine bags, rooted graphs, exact word sets, declarative model sets, and explicit real boxes/tori are support members; declared real/complex function domains can instead be definition scopes | PROVISIONAL lattice/scalar/real-interval/box/torus/sequence/prefix/integer-domain/bank/tree/bag/graph/word-set/model-set members plus function-definition domains; other continuous/general topology UNRESOLVED | T01, T02, T03, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T31, T34, T37, T39, T41, T43, T44 |
+| DOMAIN/support/topology | DOMAIN is the task/program space with its dimensional character, labeled support, and topology; it is not restricted to dense `Z^4`. Evidence includes fixed/variable 1D words and lattices, scalar `t+0D`, trees, bags in continuous geometry, rooted graphs, candidate supports, and continuous problem regions. Number systems, alphabets, address sets, function definition sets, and numeric representations are not DOMAINs. | ACTIVE shared axis; each topology has typed invariants/realizations, while declarative scopes remain explicit | T01, T02, T03, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T31, T34, T37, T39, T41, T43, T44, T45 |
 | Values/alphabet | Explicit finite values with ordered ranks and separately declared numeric color valuations; epsilon words; exact naturals/signed integers/reduced rationals; named/algebraic/certified/declared-precision real/complex values and enclosures; represented finite-format values; total exact/represented continuous fields; fixed numeric vectors; indexed prefixes/candidate partitions; pattern/geometry/graph values; exact sets; histograms and periodic fields | PROVISIONAL finite/infinite discrete, exact/declared/represented numeric and field, function/map value, prefix/filter, affine/point/vector, graph-reference, set-lifted, and constraint values | T01, T02, T03, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T31, T34, T37, T39, T41, T43, T44 |
-| Control | Visible Markov control includes `SingleControl(key,position,payload)` over typed addresses and construction-owned cursors such as the next sieve divisor; unit payload for T09/T19, finite head-state payload for T12 | PROVISIONAL single-control and explicit scalar-cursor members; multiple/structural control UNRESOLVED; absent from pure T41 definitions/queries and T43/T44 numeric transitions | T09, T12, T19, T39; absent T01/T02/T03/T13/T16/T17/T20/T27/T29-parallel/T30/T31/T34/T37/T41/T43/T44 |
+| Control roles | Heads, active markers, instruction markers, and stage cursors must be visible in the complete configuration, but may be lossless tagged/product/marker roles within the ALPHABET or structure. A separate control object is an optional commuting view, never a second source of truth. | ACTIVE representation-neutral invariant; top-level `SingleControl` mandate retired | T09, T12, T19, T39; absent where no control role exists |
 | Active loci | Firing/source selectors include sites, a unique scalar, the next sequence term or sieve stage, control loci, ordered/bag occurrences, network nodes, program-coupled flat/tree matches, queue prefixes, instructions, and every literal match across every word in a layer | PROVISIONAL fixed/scalar/prefix-end/stage/control/sequence/bag/graph/interval/queue/code/tree/multiway-match sources; not applicable to pure specifications/queries | T01, T02, T03, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T34, T37, T39, T43, T44; absent T31/T41 |
 | Reads/access | Ordered topology values, exact fixed-arity finite-color sum quotients, and continuous neighborhood triples; the complete current scalar or old vector tuple; fixed indexed old-prefix lags; complete explicit prefix contexts; proper-multiple survivor partitions; control payload; self values; spans/prefixes; operands; tree bindings; geometric poses; graph path/signatures; or exact matched parent intervals; read and mutation coverage may differ | PROVISIONAL for transition profiles; mathematical function evaluation remains a distinct pure query | T01, T02, T03, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T34, T37, T39, T43, T44; distinct T41 |
 | Rule choice | Complete ordered-context and exact-sum tables, total morphisms, ordered rewrite programs, closed instructions/templates/ASTs, topology tables, unordered finite literal relations, closed constant arithmetic, normalized fixed-lag affine programs, closed integer predicate/measurement plus schedules, a closed self-map AST, or a closed affine neighborhood aggregate followed by a scalar AST with replayable composite contract; no implicit defaults/callbacks | PROVISIONAL transition-program members; closed mathematical expressions are definition data for T41 and feedback programs under explicit T43/T44 contracts | T01, T02, T03, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T34, T37, T39, T43, T44; distinct T41 |
-| Rule result | Typed members include assignment/control effects, scalar/map/continuous-field assignments, numeric term appends, candidate-subset removals, word/queue/tree/bag/graph replacements, instruction branches, and one literal interval replacement per multiway witness | PROVISIONAL result sum; never a universal category; T41 evaluation/zero results are pure query records | T01, T02, T03, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T34, T37, T39, T43, T44; distinct T41 |
-| Commit/update | Explicit siblings: fixed effects, ordered replacement, one splice, queue edit, prefix-free tree replacement, bag replacement, rooted graph reroute/create/project, exact multiway branch union, numeric-prefix append, and monotone candidate-subset removal | PROVISIONAL ten-member transition family; T02/T03/T34/T43/T44 reuse fixed assignment, T37 adds append, T39 adds removal; T31, pure T39 specs, and T41 are categorically outside | T01, T02, T03, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T34, T37, T39, T43, T44; not applicable T31/pure T39/T41 |
-| Successors | Execution may yield one advanced successor—including unchanged scalar/field events and a complete set-valued macro successor—typed quiescence/reference stutter, retained zero-successor terminal outcome, or typed no-commit partial/evaluation failure | PROVISIONAL transition outcomes; T31/T41 pure query results and pure T39 filter/measurement results are distinct; derivatives UNRESOLVED | T01, T02, T03, T12, T16, T17, T19, T20, T27, T29, T30, T34, T37, T39, T43, T44; distinct T31/T41 |
+| RULE writes/replacements | Closed typed results name scalar/label writes, blocks, spans, tree/graph/geometry replacements, endpoint insertions, subset removals, marker moves, or successor alternatives. Semantic roles may be tags/products; no control-specific or family-specific result wrapper is required. | ACTIVE RULE axis; declarative query results remain outside rollout | T01, T02, T03, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T34, T37, T39, T43, T44; distinct T31/T41/T45 |
+| UPDATE composition/schedule | One runner calls a typed UPDATE axis. Implementations compose snapshot label writes, ordered replacements/splices, tree/bag/graph replacements, endpoint growth, subset removal, and set-valued successors according to explicit schedules and invariants. These are policies inside the protocol, not numbered executors or top-level construction classes. | ACTIVE shared axis; exact implementation sum remains Goal 2 work; not applicable to declarative nonfits | T01, T02, T03, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T34, T37, T39, T43, T44; not applicable T31/T41/T45 |
+| Successors | UPDATE may yield one configuration, a finite exact set of configurations for multiway rewriting, typed quiescence/reference stutter, a retained zero-successor terminal outcome, or typed no-commit failure. A powerset/layer view is an explicit lift with full witnesses. | ACTIVE runner result algebra; declarative query/model results remain distinct | T01, T02, T03, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T34, T37, T39, T43, T44; distinct T31/T41/T45 |
 | Halting/invalidity | Base continuation, terminal/no-match/prefix outcomes, quiescence, explicit exit, all-dead-to-empty advancement, empty-layer stutter, undefined/escape/evaluation failure, observers, certificates, projection, validation, resource, and rendering cutoffs are distinct | PROVISIONAL outcome model; T02/T03/T43/T44 strict fixed/cycle/convergence/background repetition has no native halt; query completeness/partiality/resources and render horizons are not native halts | T02, T03, T12, T16, T17, T19, T20, T27, T29, T30, T31, T34, T37, T39, T41, T43, T44 |
 | Trace encoding | Transition snapshots/events remain distinct from pure filter/measurement/function results, verified models, constraint/function/map/field-analysis records/certificates, numerical-realization relations, solver diagnostics, algorithm work traces, stochastic draw records, and downstream renderings | PROVISIONAL transition traces plus explicit non-trace records; `h` T43/T44 events produce `h+1` states; global schema UNRESOLVED | T01, T02, T03, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T31, T34, T37, T39, T41, T43, T44 |
 | Constraint/solution | Closed local relations denote mathematical model sets; periodic/open/window presentations have explicit scopes; exact verification differs from search and solution enumeration | ACTIVE category split; T32/T33 and other constraint carriers must re-audit relation syntax | T31 |
@@ -159,10 +176,10 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D004 — First validated executor algebra is fixed-lattice synchronous assignment
 
-- Status: PROVISIONAL; evidenced by T01 only.
+- Status: SUPERSEDED by the SimpleProgram architecture audit.
 - Basis: `goal-1/2-T01-ELEMENTARY.md`, especially `BOOK:418-430`, `850-854`, and `10984-10992`.
 - Shape: `AllSites -> ordered old-snapshot read -> exhaustive table -> Assign -> ParallelUpdate`.
-- Consequence: this is a substantive shared transition protocol candidate, not a universal executor conclusion. Move, replacement, structural mutation, branching, constraints, derivatives, and observations must still challenge it.
+- Consequence: T01 validates the cellular-automaton preset of the branch-free runner: fixed lattice, all-site frontier, local stencil, scalar label writes, and snapshot-parallel UPDATE. These are axis values, not the executor algebra. Step/rewrite systems share the runner; nonstep constraints/functions/general PDEs do not.
 
 ### D005 — Separate semantic support, computation realization, and trace extent
 
@@ -178,9 +195,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D007 — Same-site assignment is an explicit result member
 
-- Status: PROVISIONAL; evidenced by T01 only.
+- Status: ACTIVE as one RULE-result preset.
 - Basis: the rule chooses the center cell's next color (`BOOK:428-430`) and all such choices commit from old values in parallel (`:10984`).
-- Consequence: use a typed `Assign(value)`-equivalent with explicit parallel update. Do not generalize bare returned values into universal mutation semantics.
+- Consequence: use a typed same-locus label write with explicit snapshot-parallel UPDATE. Other typed replacements extend the RULE/UPDATE axes; do not create family-specific assignment wrappers or treat a bare callback-returned value as universal mutation semantics.
 
 ### D008 — Elementary identity is a strict preset over generic data semantics
 
@@ -190,39 +207,39 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D009 — Frontier selects firing sources, not writable targets
 
-- Status: REVALIDATED by the representation-architecture audit; consequence wording pending final integration.
+- Status: ACTIVE; revalidated by the representation-architecture audit.
 - Basis: T09's rule applies at the old active cell, writes that source, and independently moves control to a neighbor (`BOOK:854-862`, `11957-11970`).
-- Consequence: `FRONTIER.select(state)` returns rule-firing/source loci. `RULE` results name effect targets and `UPDATE` applies them. T01 remains valid because each source and assignment target coincide; current writable-next-coordinate frontier wording must migrate.
+- Consequence: `FRONTIER.select(configuration)` returns rule-firing loci, occurrences, or matches. `RULE` results name typed writes/replacements and `UPDATE` composes them. T01 is the all-sites/source-equals-target preset; the current writable-next-coordinate-only schema wording must broaden without adding a second executor.
 
-### D010 — Visible control is a first-class state component
+### D010 — Visible control is a role in the complete configuration, not a mandated storage class
 
-- Status: REOPENED by the representation-architecture audit.
-- Basis: Notes state `{list,n}` explicitly separates cell values from active position (`BOOK:11957`) and random initial values still require a definite active location (`:14275`).
-- Consequence: state snapshots, seeds, equality, serialization, batching, and traces must preserve typed control. Extra colors, metadata, executor locals, or display marks cannot stand in for it.
+- Status: ACTIVE after architecture correction.
+- Basis: Notes state `{list,n}` explicitly exposes values and active position (`BOOK:11957`), random values still require one active locus (`:14275`), and `ref/notes/alphabets.md:54-101` gives finite composite/tagged values as the lossless alternative.
+- Consequence: snapshots, seeds, equality, serialization, batching, and traces preserve every control role. `Plain(v) | Active(v)` with exactly one tag is equivalent to `(values,position)`; explicit products/markers are likewise valid. Metadata, executor locals, display marks, opaque integers, and any second unsynchronized control source remain invalid.
 
-### D011 — Transition results may be atomic compounds of typed effects
+### D011 — RULE may return multiple typed writes/replacements for one atomic UPDATE
 
-- Status: REOPENED by the representation-architecture audit.
+- Status: ACTIVE after architecture correction.
 - Basis: each T09 table entry returns new active-cell value plus displacement, and `MAStep` returns the changed field and relocated control together (`BOOK:11960-11970`); T12 also changes control payload (`BOOK:12014-12023`).
-- Consequence: the candidate protocol supports at least `Assign` and payload-bearing `TransitionControl`, with atomic application and unchanged-value preservation. T09 uses a unit payload. This does not yet justify insert/delete/rewire/branch semantics.
+- Consequence: the compact T09/T12 tuples lower to ordinary typed label writes at source/destination and commit from one old snapshot. Atomicity is required; `TransitionControl` is not. Other block/span/tree/bag/graph/set-valued replacements remain closed RULE-result/UPDATE-axis variants inside the same runner.
 
 ### D012 — Ordered read codec is shared across T01 and T09
 
-- Status: UNDER AUDIT; the ordered codec evidence is unaffected, but its placement in the revised structural lowering must be verified.
+- Status: ACTIVE; revalidated by the architecture audit.
 - Basis: T09 executable `Take[n-1..n+1]` and the rule figure establish physical `[left,self,right]`; its `{35,57}` bytes use `index=4L+2C+R`, the same ordering established by T01.
 - Consequence: no mobile-specific permutation is required. The shared current low-significance-first runtime codec remains a defect, and asymmetric physical `100`/`011` cases are required tests.
 
-### D013 — Full traces preserve control before observations compress them
+### D013 — Full traces preserve every control role before observations compress them
 
-- Status: UNDER AUDIT; complete Markov state remains required, while a separate control channel is not presumed.
+- Status: ACTIVE after representation-neutral correction.
 - Basis: the standard mobile trace includes both cell colors and active-position dots (`BOOK:5840`); record-extrema compression (`:878`) and causal networks derived from position history (`:16388`) are later transformations.
-- Consequence: raw state traces cannot be only dense value arrays. Frame compression, causal graph construction, and visualization are downstream and never feed execution.
+- Consequence: raw traces preserve the complete labeled configuration, including active/head tags or other visible control factors. A separate control stream is optional and must commute with the canonical representation. Frame compression, causal graphs, and visualization are downstream and never feed execution.
 
-### D014 — Single control carries an explicit finite payload
+### D014 — Head state is an explicit finite role in a lossless composite label
 
-- Status: REOPENED by the representation-architecture audit.
+- Status: ACTIVE after architecture correction.
 - Basis: Turing state explicitly separates head state, tape values, and head position (`BOOK:12014`), while each transition changes both state and position (`:12016-12023`).
-- Consequence: use `SingleControl(key,position,payload)` and atomic `TransitionControl(expected_from,to,next_payload)`. T09 is the unit-payload specialization; no separate hidden head-state channel is allowed.
+- Consequence: canonical cells may be `Plain(sigma) | Head(q,sigma)` (equivalently `Sigma x Option[Q]`) with exactly one head. This is bijective to a factored tape/position/state view and commutes one step at a time; the head-bearing cell retains the underlying symbol. `SingleControl` is at most an optional checked view/cache, never a required class or second source of truth.
 
 ### D015 — Unbounded fixed tapes use inspectable total fields
 
@@ -246,7 +263,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE.
 - Basis: T13 replaces every old occurrence by an ordered word and constructs successor support by concatenation (`BOOK:982-986`, `1058-1062`, `12099-12107`). Fixed-support assignment instead preserves loci.
-- Consequence: preserve a shared source/read/rule/update orchestration, but give it at least sibling `AtomicEffectsUpdate` and `ParallelReplaceConcat` implementations selected by typed spec/result contracts. `Assign` is not stretched into insertion, and no T13/family rollout branch is added.
+- Consequence: preserve one branch-free FRONTIER/NEIGHBORHOOD/RULE/UPDATE runner. UPDATE is a typed axis whose policies compose label writes, ordered structural replacements, graph/bag edits, or successor alternatives according to explicit schedules. T13's length growth justifies an ordered-replacement policy beyond same-locus scalar writes, not a second executor or top-level construction class.
 
 ### D019 — Ordered replacement consumes parents and derives children
 
@@ -274,9 +291,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D023 — Single interval splice is a distinct ordered update law
 
-- Status: ACTIVE for T16.
+- Status: ACTIVE as a restriction of the ordered-replacement UPDATE axis; former separate-law framing retired.
 - Basis: exactly one matched block is replaced per step while its prefix/suffix remain in order (`BOOK:1062-1068`, `2358`, `5936-5940`). T13 instead consumes every old occurrence and concatenates all child blocks.
-- Consequence: add `ReplaceInterval` plus `SingleSpliceUpdate` as a sibling of `ParallelReplaceConcat` and fixed-support atomic effects. Both ordered updates may share a private `ApplyOrderedSpans` kernel only after their public policies validate, respectively, complete singleton coverage or exactly one arbitrary span; the shared kernel never erases those laws.
+- Consequence: use one typed ordered-replacement UPDATE with an `exactly_one` old-span schedule, clause-priority/leftmost FRONTIER, and preserved prefix/suffix order. T13 uses the same axis with complete singleton coverage. Public presets retain their validators without separate executors.
 
 ### D024 — Empty source selection has construction-specific outcomes
 
@@ -298,9 +315,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D027 — Prefix consumption plus remote tail append is a distinct atomic update law
 
-- Status: ACTIVE for T17.
+- Status: ACTIVE as an anchored ordered-replacement UPDATE policy; former separate-law framing retired.
 - Basis: tag systems remove the beginning and tag the selected block onto the end (`BOOK:1112`, `1124`, `1132`); executable order is `Join[Drop[word,n],appendant]` (`:12300-12306`). For canonical `01->10`, `011` becomes `110`, whereas a T16 front splice would produce `101`.
-- Consequence: add `ConsumePrefixAppend` and `QueueSpliceUpdate` as a public sibling of `SingleSpliceUpdate`, `ParallelReplaceConcat`, and fixed-support atomic effects. A private ordered-edit carrier may perform deletion at zero plus insertion at the old endpoint only after queue geometry is validated; the two edits are one event and never independently observable.
+- Consequence: RULE returns the appendant and consume extent; the ordered UPDATE deletes `[0,d)` and inserts at the old endpoint atomically. Separate read/delete widths, old-tail order, and short-residue outcomes remain semantic validation, while the shared runner and ordered-replacement axis remain unchanged.
 
 ### D028 — Generic structural words/edits admit epsilon without weakening construction validators
 
@@ -328,15 +345,15 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D032 — Visible control may address immutable program data rather than mutable support
 
-- Status: ACTIVE for T19 and the general control/source boundary.
+- Status: ACTIVE after representation-neutral correction.
 - Basis: the program counter is visible state and selects the current instruction from a fixed sequence (`BOOK:1176-1180`, `12368`), while the selected instruction names its register operands.
-- Consequence: generalize `SingleControl` over typed address domains and add program-coupled `ActiveInstruction` plus instruction-owned operand access. The counter does not turn code or registers into spatial cells; no duplicated instruction table, hidden fetch loop, arbitrary-address callback, or family dispatcher is allowed.
+- Consequence: represent the program counter as one visible marker/tag or explicit product factor in the complete configuration. `ActiveInstruction` is a FRONTIER and instruction-owned operands are a NEIGHBORHOOD over typed address spaces. No `SingleControl` class, duplicated table, hidden fetch loop, arbitrary-address callback, or family dispatcher is required.
 
 ### D033 — Closed register instruction results reuse atomic typed effects
 
-- Status: ACTIVE for T19.
+- Status: ACTIVE after representation-neutral correction.
 - Basis: increment changes one register and falls through; positive decrement changes one register and jumps; zero decrement preserves the value and falls through (`BOOK:1166-1172` and the repaired `RMStep` at `BOOK:12377`).
-- Consequence: use `IncrementResult`, `DecrementJumpTaken`, and `ZeroFallthrough` to return validated `Assign(RegisterSlot, Natural)` and `TransitionControl` effects against one snapshot. Reuse `AtomicEffectsUpdate`; do not add a register-specific commit, partial value/control timing, formula callback, or zero-as-negative/clamp behavior.
+- Consequence: use tagged instruction results to return validated register-label and program-marker writes against one snapshot. The shared atomic UPDATE applies them together; no `TransitionControl`, register executor, partial timing, formula callback, or zero-as-negative/clamp behavior is required.
 
 ### D034 — Past-program-end quiescence and program-exit termination are distinct
 
@@ -370,9 +387,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D039 — Prefix-free parallel subtree replacement is a fifth update law
 
-- Status: ACTIVE for T20 and the general structural-update boundary.
+- Status: ACTIVE as a tree-topology UPDATE strategy; former ordinal-law framing retired.
 - Basis: one pass can consume several disjoint subtrees, preserve surrounding context, duplicate/delete/rearrange whole bound subtrees, and atomically produce one tree (`BOOK:1222-1224`, `12456`, `18924-18930`).
-- Consequence: add `ReplaceSubtree` and `ParallelPrefixFreeTreeReplace` with exact path/source validation, pairwise prefix independence, one old snapshot, and context/binding/literal lineage. T13 concatenation, T16 one-interval splice, T17 queue edit, and fixed-support effects remain distinct siblings; only a private persistent-tree edit kernel may be shared.
+- Consequence: add typed subtree replacement writes and a prefix-free tree UPDATE implementation with exact path/source validation, one old snapshot, context preservation, and lineage. It is one topology-specific strategy on the shared UPDATE axis, not a symbolic executor or fifth top-level law.
 
 ### D040 — No-pattern quiescence, applicable identity, and symbolic representations remain distinct
 
@@ -394,9 +411,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D043 — Full-generation occurrence-bag replacement is a sixth update law
 
-- Status: ACTIVE for T27 and the general structural-update boundary.
+- Status: ACTIVE as a bag-composition UPDATE strategy; former ordinal-law framing retired.
 - Basis: every old square is replaced once by all of its local children; parents disappear, newborns wait, descendants coexist through overlap, and duplicate/coincident branches retain multiplicity (`BOOK:2326-2354`, `13760-13762`).
-- Consequence: add `AllGeometricOccurrences`, self prototype/full-pose reads, `ReplaceGeometricOccurrence`, and atomic `ParallelOccurrenceBagReplace`. Validate exactly one authoritative result per old occurrence, consume all parents, compose every declared slot, bag-union every child, and record parent/slot lineage. T13 source-generation concepts may share private orchestration, but ordered concatenation, flat/tree splices, and fixed-support writes remain different public commits.
+- Consequence: use all-occurrence FRONTIER, self pose reads, typed child replacements, and a parallel occurrence UPDATE parameterized by the multiplicity-preserving bag combiner. Validate full old coverage, consume parents, compose slots, retain duplicates, and record lineage. This is not a geometric executor or sixth top-level law.
 
 ### D044 — Geometric overlap, enumeration order, limits, and rendering do not feed back
 
@@ -430,9 +447,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D049 — Parallel graph reroute/create/project is a seventh update law
 
-- Status: ACTIVE for T29 and the general structural-update boundary.
+- Status: ACTIVE as a justified graph UPDATE-axis extension; former ordinal-law framing retired.
 - Basis: every old node is rewritten from one old snapshot; old nodes persist in the raw successor, fresh nodes are installed, then `ConnectedNodes`/`RenumberNodes` retain directed reachability from node 1 (`BOOK:2440-2464`, `13848-13872`).
-- Consequence: add `ParallelRerouteCreateProject` with exact old coverage, frozen proposals, injective event allocation, raw graph construction, newborn deferral, directed root closure, and raw/retained/dropped provenance. In-place updates, weak connectivity, pre-commit pruning, keep-all flags, and relabeled tree/bag/assignment commits are different semantics.
+- Consequence: the shared runner needs a graph-capable UPDATE implementation with exact old coverage, frozen proposals, injective births, rewiring, newborn deferral, directed root projection, and provenance. Fixed-support label writes cannot create vertices without a hidden pool, but this does not justify a network executor or seventh top-level law.
 
 ### D050 — Rooted two-port isomorphism has an exact BFS codec
 
@@ -448,9 +465,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D052 — A base multiway layer is an exact finite set of words
 
-- Status: ACTIVE for T30.
+- Status: REVISED by the architecture audit.
 - Basis: the main definition retains all **distinct** sequences, and executable `MWStep` applies `Union` to all generated strings (`BOOK:2494-2510`, `13921-13938`).
-- Consequence: add `MultiwayLayer = FiniteSet[Word]` with exact word/set equality, epsilon allowed, no multiplicity/control/ancestry, and a distinct empty layer. Clause/worker/hash order is nonsemantic. Length, counts, anagrams, algebraic equivalence, graph nodes, and derivation copies cannot replace state.
+- Consequence: the smallest native configuration is one exact word. UPDATE returns its finite exact successor set; a `FiniteSet[Word]` layer is the explicit powerset/rollout lift across branches. Epsilon, the empty successor set, exact equality, nonmultiplicity, and full derivation witnesses remain distinct; clause/worker/hash order is nonsemantic.
 
 ### D053 — Multiway applicability selects every overlapping old literal match
 
@@ -460,9 +477,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D054 — Exact distinct-child branch merge is an eighth update law
 
-- Status: ACTIVE for T30 and the general successor/update boundary.
+- Status: ACTIVE as the generic successor-set lift; former ordinal-law framing retired.
 - Basis: `MWStep` maps all rules/parents and `Union`s exact targets; the Notes call merging crucial and explicitly erase derivation multiplicity in pictures (`BOOK:13923-13938`, `13959-13961`).
-- Consequence: add `DistinctBranchMerge`: validate complete match coverage, make one child per witness, exact-union across spans/rules/parents, and record all inbound witnesses plus dead parents. No random choice, path-copy bag, per-parent-only dedupe, repeated T16 rollout, or arbitrary successor callback.
+- Consequence: UPDATE makes one successor configuration per alternative write, deduplicates exact-equal children, and retains every inbound witness/dead end. Layer evolution exact-unions those successor sets. This is the runner's zero/many-successor result algebra, not a multiway executor or eighth top-level law.
 
 ### D055 — Dead parents, epsilon, all-dead advancement, and empty-layer stutter differ
 
@@ -484,9 +501,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D058 — Constraint systems denote model sets, not transitions
 
-- Status: ACTIVE categorical split; evidenced by T31.
+- Status: ACTIVE genuine nonfit; evidenced by T31 and revalidated by the architecture audit.
 - Basis: the main text contrasts explicit stepwise evolution with complete configurations implicitly selected by constraints and says search must go outside the system (`BOOK:2568-2578`, `2642-2664`).
-- Consequence: T31 has no source/read/result/update, successor, seed, time, halt, or trajectory. Add a separate constraint/specification category rather than a ninth update, zero-step dynamics, fixed-point rollout, or repair process.
+- Consequence: T31 has no canonical frontier/write/update, successor, seed, or trajectory. Use the generic declarative relation/model-set and query/certificate category, never zero-step dynamics, fixed-point rollout, or an invented repair process.
 
 ### D059 — Local count constraints are closed center-conditioned histogram relations
 
@@ -516,13 +533,13 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE boundary across T31/T32/T33.
 - Basis: neighbor counts occupy `BOOK:2568-2612`, exact oriented allowed templates begin `2614`, and a required occurrence begins `2632`.
-- Consequence: T31 owns orientation-insensitive histogram relations. T32 must preserve oriented templates and T33 a global existential condition. Do not collapse them into predicates/flags, over-attribute template/tiling undecidability to the 25 classified count profiles, or use CA/ground-state/network/tiling reductions as native coverage.
+- Consequence: count, oriented-template, and existential-template are tagged closed relation forms under one declarative constraint algebra, with distinct validation and denotation. Do not collapse their roles into opaque predicates/flags, over-attribute undecidability, or use reductions as native coverage.
 
 ### D064 — Arithmetic iteration is a unary exact scalar construction
 
-- Status: ACTIVE for T34.
+- Status: ACTIVE as a `t+0D` unary SimpleProgram preset.
 - Basis: the strict main examples start from one scalar and repeatedly add one constant or multiply by one constant (`BOOK:1439-1495`).
-- Consequence: use a domain-tagged scalar slot, `UniqueScalar`, the complete current-value read, and the closed public sum `AddConstant | MultiplyConstant`. Do not expose a general affine/expression AST, rule ID, predicate, formula callback, digit grid, temporal-history seed, or finite alphabet as the construction.
+- Consequence: use a singleton `t+0D` DOMAIN, an explicit exact numeric value carrier, singleton FRONTIER/self NEIGHBORHOOD, and closed unary RULE nodes `AddConstant | MultiplyConstant`. T43 shares this runner and write semantics. Do not introduce scalar executors, callbacks, digit-state packing, or hidden history.
 
 ### D065 — Exact numeric domains, typed identity, and serialization are explicit
 
@@ -534,7 +551,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE for T34.
 - Basis: each valid operation replaces the one old scalar with exactly one result and has no structural support change (`BOOK:1443-1495`).
-- Consequence: `ArithmeticAssignment` lowers to `Assign(ScalarSlot,next)` and atomic effects commit. Every valid event yields one `Advanced` successor, including identity events. T34 adds no ninth update law and no native halt, boundary, modulus, capacity, cycle stop, or target threshold.
+- Consequence: RULE emits the ordinary same-locus next value and the shared atomic UPDATE commits it. `ArithmeticAssignment` is at most an event/provenance role, not a semantic effect class. Every valid application advances, including identity, with no native halt/capacity/cycle/threshold.
 
 ### D067 — Digits and plots are exact observers, while modulus is an explicit sibling
 
@@ -550,9 +567,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D069 — Neighboring scalar catalogs share a shell, not one rule algebra
 
-- Status: ACTIVE boundary across T34-T45.
+- Status: REVISED: neighboring scalar catalogs share the unary-rule axis as well as the runner where their closed syntax fits.
 - Basis: parity branching begins T35 at `BOOK:1497`, digit feedback begins T36, recursive-history and real interval maps have different state/access invariants, and continuous fields/PDEs add spatial or derivative semantics.
-- Consequence: T35 may reuse the scalar carrier/source/effect but owns predicate-selected arms; T36 owns base-sensitive digit transforms; T37/T38 own growing histories; T43 owns closed nonlinear interval maps and real precision; T44/T45 remain field categories. Do not hide these behind operation flags or a universal 0D callback.
+- Consequence: T34/T35/T36/T43 can use one closed tagged unary RULE algebra over explicit value carriers and invariants; their predicates/digit transforms/self-map contracts remain typed nodes, not operation flags or callbacks. T37/T38 have growing sequence DOMAIN/support, T44 has a spatial field, and T45 is declarative unless a flow is derived.
 
 ### D070 — Recursive-sequence state is the complete indexed numeric prefix
 
@@ -568,9 +585,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D072 — One-term persistent append is the ninth update law
 
-- Status: ACTIVE for T37.
+- Status: ACTIVE as an endpoint-insertion UPDATE policy; former ordinal-law framing retired.
 - Basis: each step determines the next indexed term from the old sequence while every earlier term persists (`BOOK:1559-1567`).
-- Consequence: add `NextSequenceTerm`, old-prefix `FixedLagRead`, `AppendTerm`, and atomic `AppendOnlySequenceUpdate`. Validate one old-snapshot result, exact next index/dependencies, byte/value preservation of the entire old prefix, and exactly one newborn endpoint. Private endpoint-insert mechanics may compose, but T34 assignment, T16 nonempty splice, and T17 consume/append remain different public laws.
+- Consequence: use an endpoint FRONTIER, declared old-prefix reads, one typed term insertion, and the shared ordered structural UPDATE. Validate the exact next index/dependencies, preservation of the complete old prefix, and one newborn endpoint. This remains a construction preset/validator, not a recursive executor or ninth top-level law.
 
 ### D073 — Prefix traces may be stored compactly; lag windows are only quotients
 
@@ -604,9 +621,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D078 — Monotone candidate-subset removal is the tenth update law
 
-- Status: ACTIVE for T39 strict execution and candidate-elimination reuse.
+- Status: ACTIVE as a typed subset-removal/marker UPDATE policy; former ordinal-law framing retired.
 - Basis: each stage deletes a possibly noncontiguous survivor subset, never resurrects a removed value, and preserves every retained integer's identity and increasing order (`BOOK:1623-1627`; exact page-147 masks).
-- Consequence: add `RemoveCandidateSubset(stage,hits,newly_removed)` and atomic `MonotoneFilterUpdate`. Validate exact old-snapshot witnesses, subset membership, cursor increment, no resurrection, and retained identity/order. A finite Boolean mask can realize the law privately, but fixed assignment, interval/queue/tree/bag/graph/multiway updates, and prefix append retain different public validators.
+- Consequence: RULE returns typed survivor removals and the next-stage marker write; the shared UPDATE commits them atomically. Validate exact old-snapshot witnesses, subset membership, cursor advance, no resurrection, and retained identity/order. A mask is only a realization; no sieve executor or tenth top-level law is introduced.
 
 ### D079 — Literal display, mathematical domain, certification, and completion are explicit scopes
 
@@ -628,9 +645,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D082 — T41 mathematical functions are immutable closed definitions outside transition execution
 
-- Status: ACTIVE category split for T41.
+- Status: ACTIVE genuine nonfit; revalidated by the architecture audit.
 - Basis: the source asks about “functions themselves,” plots their curves, and describes finite arithmetic combinations without any update/evolution language (`BOOK:1834-1848`). Supporting Notes explicitly identify named mathematical functions as accepted primitives in formulas (`BOOK:17794-17798`).
-- Consequence: add a versioned unary `MathematicalFunctionSpec` declaring one argument, exact parameters, real/complex domain, scalar/fixed-vector codomain, closed expression, primitive registry, partiality, and branch conventions. It has no state/source/read/result/update/successor shell; multivariate syntax needs later evidence. Reuse T20 tree/codec responsibility only; callbacks, strings, host CAS objects, sampled arrays, and fake argument-as-time rollout are invalid.
+- Consequence: use a generic versioned closed-function definition plus query/result records declaring argument space/definition set, codomain, exact parameters, expression, primitives, partiality, and branches. It has no canonical frontier/write/update/successor. Iteration is an additional T43 SimpleProgram, not fake argument-as-time rollout.
 
 ### D083 — Mathematical domain and numerical query context are separate scopes
 
@@ -664,15 +681,15 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D088 — T43 state is one domain-tagged real scalar under one immutable closed self-map
 
-- Status: ACTIVE construction profile for strict T43.
+- Status: ACTIVE as a `t+0D` unary SimpleProgram profile.
 - Basis: the defining paragraph repeatedly updates “a number between 0 and 1” by a fixed map that returns a definite number in the same interval (`BOOK:1868-1872`). Strict figures use four unary expressions and separate exact initial conditions (`BOOK:1874-1896`; page-165 raster).
-- Consequence: add `IteratedMapSpec`, exact `RealInterval` state space, one scalar slot, exact/declared parameters, ordered map AST/version, and an independently serialized seed. State contains no orbit prefix, digit row, step counter, or hidden control. Strict `[0,1]` endpoints are explicit even though prose says “between.”
+- Consequence: use the same singleton FRONTIER/self-read/same-locus UPDATE as T34 with a real/represented value carrier, closed unary map AST, self-map invariant, and independent seed. `[0,1]` is a state/value interval, not DOMAIN; orbit prefixes, digits, counters, and hidden control stay outside configuration.
 
 ### D089 — T43 reuses complete scalar assignment and adds no eleventh update law
 
 - Status: ACTIVE reuse across T34/T43.
 - Basis: every event reads the current scalar, applies one map, and replaces it with one result; `NestList` confirms one initial snapshot plus one state per application (`BOOK:1870`, `10682-10687`).
-- Consequence: `UniqueScalar` returns a complete old-value read; `MapAssignment` lowers to `Assign(MapStateSlot,next)` and existing `AtomicEffectsUpdate`. A fixed point/identity event is still `Advanced(changed=false)`. Fixed-effects preservation is unchanged from T34; only value/program/evaluator profiles extend.
+- Consequence: singleton FRONTIER/self NEIGHBORHOOD and ordinary same-locus write/UPDATE are shared with T34. `UniqueScalar` and `MapAssignment` are descriptive roles/presets, not semantic classes. A fixed point application remains an event; only value, RULE, invariant, and realization profiles extend.
 
 ### D090 — Strict map admission requires replayable totality and invariance evidence
 
@@ -712,9 +729,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D096 — T44 state is a total real-valued fixed-lattice field
 
-- Status: ACTIVE construction profile for strict T44.
+- Status: ACTIVE generic-field specialization after DOMAIN/value correction.
 - Basis: each discrete cell has any gray level from white `0` to black `1`, the point seed is one black cell on white background, and every next field is computed locally (`BOOK:1954-1960`, `2018`). The cardinality Note gives `2^aleph_0` possible configurations (`BOOK:19070-19072`) but does not determine support: a single real cell or any nonempty finite real vector has that cardinality too.
-- Consequence: add a total `[0,1]` field over fixed ordered 1D support with no control/history. The strict-main integer-line interpretation is explicitly inferential; Notes separately prove a finite periodic-list realization. For deterministic spatially homogeneous point-seed profiles at finite horizons, normalized uniform-default plus finite overrides is an exact presentation, not finite semantic support; random-initial/noisy total fields require their own finite or lazy random-field/draw presentations. Seed, rule, support/realization, numeric profile, trace, and view remain separate.
+- Consequence: specialize the generic field configuration to a discrete `t+1D` fixed ordered lattice with continuous-valued `[0,1]` labels and no control/history. Value continuity does not make DOMAIN continuous. Preserve integer-line inference, periodic realization, sparse/default presentation, random-field provenance, and seed/rule/realization/trace/view separation.
 
 ### D097 — Closed affine aggregate and scalar map form one validated local program
 
@@ -726,7 +743,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE reuse across T01/T44.
 - Basis: all sites read the same old left/self/right values and assign one next value to the same site in parallel; Notes express the operation as one `Map` over old rotated lists (`BOOK:1956`, `13283-13292`).
-- Consequence: reuse `AllSites`, ordered old reads, typed `Assign(CellSlot,next)`, and atomic fixed-effects commit. Infinite semantic events may reference before/after total-field identities and compact reconstruction rather than enumerate infinite effects. In-place/asynchronous evaluation and partial commits are invalid. The provisional transition family remains at ten update members.
+- Consequence: reuse the CA preset's all-site FRONTIER, ordered old reads, typed next-label writes, and snapshot-parallel UPDATE. Infinite events may use compact before/after field identities. In-place/asynchronous/partial commit is invalid; there is one runner and no numbered update-family count.
 
 ### D099 — Native support, periodic helper, causal work, and raster crop stay distinct
 
@@ -754,9 +771,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D103 — T45 is a declarative differential problem and solution set, not an update system
 
-- Status: ACTIVE non-transition category for T45.
+- Status: ACTIVE genuine nonfit; revalidated by the architecture audit.
 - Basis: strict T45 removes explicit cells/time steps and specifies derivative relations (`BOOK:2018-2026`); the native Notes state that a PDE has no built-in evolution or time and is a constraint on a function over a region whose data may admit many or no solutions (`BOOK:13357`).
-- Consequence: `DifferentialEquationSpec` and `PDEProblem` are immutable definitions whose denotation is a solution set. T45 has no source, frontier, local result, commit, successor, or halt and adds no eleventh update law. Solver state, an explicit formula, and a derived flow are separate records rather than hidden transition semantics.
+- Consequence: closed differential relations/problems denote solution/model sets and have no canonical frontier/write/update/successor. They reuse generic declarative function/relation/query/certificate infrastructure. A fully specified and certified IVP may derive a SimpleProgram flow; solver work, formulas, discretizations, and views remain separate relations.
 
 ### D104 — T45 uses closed bound differential syntax over explicit variables and evidenced field codomains
 
@@ -804,13 +821,13 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE shared fixed-lattice construction for T01/T02.
 - Basis: strict T02 changes the elementary alphabet from two to three colors while retaining nearest-neighbor CA rules (`BOOK:772,4684`); the Notes expose the general nearest-neighbor form `{n,k}` (`BOOK:11051-11056`), the same ordered triple (`BOOK:11014`), and old-value parallel assignment (`BOOK:850,10984`).
-- Consequence: one generic finite-alphabet construction owns fixed ordered support, `AllSites`, old `(left,self,right)` reads, typed same-site assignments, atomic commit, successor, realization, and trace semantics. T01 is its `k=2` specialization and strict T02 is the validated `k>=3` preset; alphabet/table validation is parameter data. A T02 rollout branch, second executor, or eleventh update law would duplicate semantics and is rejected.
+- Consequence: the CA preset accepts any explicit finite ALPHABET, including product/tagged cells, with fixed ordered support, all-site FRONTIER, old local reads, typed next-label writes, snapshot UPDATE, realization, and trace semantics. T01 fixes `k=2`; strict T02 validates `k>=3`. No branch or executor is added.
 
 ### D112 — Ordered alphabets, complete structural tables, and positional codes have separate identities
 
 - Status: ACTIVE alphabet/table/codec policy for T01/T02.
 - Basis: three colors produce all 27 three-cell cases (`BOOK:4684`); Wolfram's general rule uses ordered positional weights `{k^2,k,1}` (`BOOK:11066-11067`), exactly `k^(k^(2r+1))` rules and base-`k` digit lookup (`BOOK:11897-11900`), with neighborhood colors ordered like their offsets (`BOOK:13513`).
-- Consequence: a rule is primarily one total structural table `T:A^3->A` with exactly `k^3` validated outputs over an explicit ordered alphabet/rank map. Its optional Wolfram codec uses `i=k^2*rank(left)+k*rank(self)+rank(right)` and `n=sum_i rank(T_i) k^i`, so `000` is least significant, leading-zero rows remain present, and `0<=n<k^(k^3)`. Codes use arbitrary-precision integers and tagged decimal-string serialization, never fixed-width, float, or JSON-number identity; a numeric code is codec/provenance, not execution state.
+- Consequence: the semantic RULE is a total function/table over explicit labels; rank order and Wolfram integer code are lossless serialization/provenance maps, not extra semantics unless the preset declares them. The codec formula, leading rows, bounds, bigint strings, and round-trip invariants remain exact.
 
 ### D113 — Mutation, reversibility, search, and emulation stay outside T02 execution state
 
@@ -832,9 +849,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D116 — The complete sum table is native; its code and exhaustive lowering are explicit relations
 
-- Status: ACTIVE table/codec/lowering identity for T03.
+- Status: REVISED by the lossless-representation audit.
 - Basis: the strict code places the result for average zero at the rightmost digit and proceeds through increasing averages to the left (`BOOK:776`); the general rule count gives `k^(1+(k-1)(2r+1))` tables (`BOOK:11897`); and the Notes construct a padded `M=1+(k-1)(2r+1)`-digit base-`k` rule and index it by the neighborhood sum (`BOOK:11902,11904,11908,11910,11912`).
-- Consequence: native T03 program identity contains valuation, equal-weight sum descriptor, and one complete structural table `U:{0,...,M-1}->A`. Its optional codec is `n=sum_s nu(U(s)) k^s`, so sum zero is least significant, leading zeros remain rows, and codes use arbitrary-precision/tagged decimal-string records. Lowering by `T(context)=U(sum_i nu(context_i))` is an injective verified compiler relation to a T01/T02 exhaustive table, never native T03 identity, an execution shortcut, or permission to substitute a histogram table.
+- Consequence: valuation, equal-weight sum descriptor, and complete `U` remain the compact source-faithful representation and codec provenance. The validated expansion `T(context)=U(sum_i nu(context_i))` is a lossless representation of the same local function and commutes one step at a time; it is not an arbitrary CA table, hidden shortcut, or permission to substitute a different reducer.
 
 ### D117 — T03 reuses fixed-lattice assignment and adds no executor or update law
 
@@ -846,7 +863,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE T03/T04/T05/T06/T07 and aggregate-sibling boundary.
 - Basis: the same totalistic construction is counted for two, three, and five colors (`BOOK:1282`); the displayed three-color survey explicitly filters rules that change the white background and attributes reflection symmetry to totalistic structure (`BOOK:784`); code 420 is separately identified as additive (`BOOK:11918`); built-in signatures distinguish general, totalistic, weighted, and outer-totalistic rules (`BOOK:11037,11056,11060,11068-11072`); and binary emulation of code 1599 is an explicit encoding relation (`BOOK:7912`).
-- Consequence: T04 fixes canonical `A=(0,1,2)` and `nu(i)=i` at `k=3,r=1`, rejects parameter or valuation overrides, and resolves to the same structural identity, hash, and executor types as its generic T03 program; a noncanonical three-symbol valuation remains generic T03 rather than a T04 variant. T05 fixes a concrete finite integer `k>=4`, `r=1`, canonical `A_k=(0,...,k-1)`, and `nu_k(i)=i`, rejects radius/alphabet/valuation/aggregate overrides, and resolves to the identical generic T03 structural program and executor; other radii, lower `k`, and noncanonical valuations remain generic T03. T06 is the predicate `U(0)=nu^-1(0)` (equivalently `n mod k=0` in the canonical codec), while T07 reflection is derived for the equal-weight symmetric stencil. Additivity is a property/proof; seed/background choice, classes, galleries, palettes, and emulations are run/analyzer/view/relation data. Outer/semi-totalistic, histogram/count, unequal-weight/threshold, higher-dimensional, and T44 continuous aggregate-map rules require their own typed constructions rather than T03 flags.
+- Consequence: T04/T05 remain strict presets; T06/T07 are validated predicates/properties; additivity, seeds, galleries, palettes, and emulations remain explicit roles. Outer/semi-totalistic, histogram/count, unequal-weight/threshold, higher-dimensional, and continuous-valued forms are typed DOMAIN/NEIGHBORHOOD/RULETYPE/ALPHABET axis extensions or presets when their one-step mappings commute—not automatically new construction classes or executors.
 
 ## Rejected Shortcuts
 

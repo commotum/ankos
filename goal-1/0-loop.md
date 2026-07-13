@@ -2,6 +2,21 @@
 
 This loop governs every stage in `goal-1/0-plan.md`. The plan is authoritative but revisable: `principles.md` Principle 0 requires re-derivation whenever evidence exposes a bad assumption.
 
+## Architecture Audit Overlay
+
+Future stages use the broad SimpleProgram abstraction established in `architecture-audit.md`:
+
+```text
+active = FRONTIER.select(configuration)
+reads  = NEIGHBORHOOD.read(configuration, active)
+writes = RULE(active, reads)
+next   = UPDATE.apply(configuration, active, writes)
+```
+
+DOMAIN is the task/program space with its dimensional character, support, and topology; ALPHABET is its label/value schema and may be a product or tagged union. FRONTIER selects rule-firing loci/occurrences/matches, RULE returns typed writes/replacements, and UPDATE composes them into zero, one, or many successor configurations. These are axes of one branch-free runner, not family executors.
+
+Distinct source names or semantic roles do not imply distinct runtime classes. Prefer parameterizations, named roles, invariants, and lossless structural representations. For a claimed equivalence, require an injective complete-state map `e` whose successor sets commute one step at a time and which calls no hidden source interpreter. Reject opaque whole-state packing, callbacks, lossy quotients, family dispatch, invented behavior, and altered schedules.
+
 ## Repeatable Loop
 
 1. Sync current state with the actual repository files, current Git diff, completed stage files, and verification results.

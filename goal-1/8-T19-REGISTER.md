@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T19 row and runner contract in `architecture-audit.md` supersede incompatible `SingleControl`/`TransitionControl` and register-executor claims below.
+
 The evidence/search closure and conformance fixtures remain valid. Register state is being re-derived as the transparent `FiniteRegisterBank × ProgramCounter` product on `t+0D`; `SingleControl`/`TransitionControl` are not required classes.
 
 ## Current Facts

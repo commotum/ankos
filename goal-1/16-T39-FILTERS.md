@@ -2,6 +2,8 @@
 
 Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
 
+Architecture authority: the T39 row and runner contract in `architecture-audit.md` supersede numbered-update/executor and separate-control framing below.
+
 The evidence/search closure and conformance fixtures remain valid. Visible `(survivors,cursor)` state remains required, while subset removal plus cursor advance is a typed UPDATE inside the shared runner, not a sieve executor.
 
 ## Current Facts

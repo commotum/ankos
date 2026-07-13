@@ -2,6 +2,8 @@
 
 Status: **REOPENED — REPRESENTATION ARCHITECTURE AUDIT**
 
+Architecture authority: the T09 row, commuting tagged representation, and runner contract in `architecture-audit.md` supersede incompatible separate-control/head-packing claims below.
+
 ## Current Facts
 
 - Reopening finding: visibility of the active role does not require a separate control object. `Plain(bit) | Active(bit)` preserves the cell value and active marker losslessly, with exactly one `Active` cell as a validated invariant.
