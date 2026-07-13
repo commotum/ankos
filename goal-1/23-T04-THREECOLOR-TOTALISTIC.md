@@ -78,7 +78,7 @@ The required public convenience is therefore `three_color_totalistic(code_or_tab
 
 - `neighborhoods.eca(radius=1)` produces the exact old `[left,self,right]` selector (`src/ca/neighborhoods.py:551-569`), with its offsets pinned by `tests/test_neighborhoods.py:86-98`.
 - `Dynamics` already keeps per-episode `rule_id`, seed state, and step count outside reusable mechanics (`src/ca/specs.py:23-55`; `src/ca/rollout.py:40-85`), and its fixed/periodic/reflective boundary mapping is explicit (`src/ca/specs.py:227-252`). These are useful run/realization boundaries even though Goal 2 must add stable structural program references.
-- Scalar and batch spatial loops compute each new slice from `states[index-1]`, preserving the old-snapshot transition shape (`src/ca/rollout.py:576-640`). Existing scalar/batch parity tests are useful regression evidence (`tests/test_rollout.py:285-309,345-376,404-424`).
+- Single-episode and batch spatial loops compute each new slice from `states[index-1]`, preserving the old-snapshot transition shape (`src/ca/rollout.py:576-640`). Existing single-episode/batch parity tests are useful regression evidence (`tests/test_rollout.py:285-309,345-376,404-424`).
 - The current point seed already represents the source single-gray-on-zero run as `point(value=1,fill_value=0)` without entering rule identity (`src/ca/seeds.py:260-313`; `tests/test_seeds.py:71-74`). Viewer palettes are explicit export arguments (`src/ca/viz/export.py:58-62,105-120,286-327`; `tests/test_viz_export.py:280-297`).
 
 **Blocking mismatches inherited from T03:**
@@ -102,6 +102,121 @@ Conclusion: current selector, seed, boundary, trace shape, and parallel-loop sca
 - **Principles 14 and 16 — HARD STOP gate.** A `three_color_totalistic` rollout branch, ternary bit-decoder patch, duplicated table/codec, hidden exhaustive expansion, or fixture-specific fallback means the T03 abstraction has not actually composed and must be redesigned (`principles.md:111-127`).
 
 The audit finds no architectural divergence requiring a new construction. It does find a real implementation dependency: T04 cannot ship before the generic G2-T03 path removes the current family/binary restrictions.
+
+## Exact Semantic Oracle
+
+T04 is a strict constructor boundary, not a distinct transition. It fixes `K=3`, `r=1`, canonical valuation, seven sum rows, and codes `0..2186`, then returns the same structural table and shared specification as generic T03. This oracle exhausts all 2,187 programs and all 27 local contexts; checks code/table bijection, permutation invariance, invalid preset inputs, named source rules, T06 and gallery-selection separation, seed independence, exact source runs, and injective behavior-preserving lowering to T02.
+
+```bash
+python3 - <<'PY'
+from hashlib import sha256
+from itertools import product,permutations
+
+K=3; RADIUS=1; M=7; RULES=3**7
+
+def decode(code):
+    if isinstance(code,bool) or not isinstance(code,int) or not 0<=code<RULES:
+        raise ValueError(code)
+    return tuple(code//3**s%3 for s in range(M))
+def encode(table):
+    if (len(table)!=M or any(isinstance(v,bool) or not isinstance(v,int)
+                             or not 0<=v<3 for v in table)):
+        raise ValueError(table)
+    return sum(v*3**s for s,v in enumerate(table))
+def output(code,q): return decode(code)[sum(q)]
+def step(code,state):
+    return [output(code,(state[i-1] if i else 0,state[i],
+                         state[i+1] if i+1<len(state) else 0))
+            for i in range(len(state))]
+def evolve(code,seed,events,pad=None):
+    pad=events+2 if pad is None else pad
+    state=[0]*pad+list(seed)+[0]*pad; rows=[state]
+    for _ in range(events):
+        state=step(code,state); rows.append(state)
+    return rows,pad
+def word(row):
+    used=[i for i,v in enumerate(row) if v]
+    return ''.join(map(str,row[min(used):max(used)+1])) if used else ''
+
+assert (K,RADIUS,M,RULES)==(3,1,7,2187)
+for code in range(RULES):
+    table=decode(code)
+    assert encode(table)==code
+    for q in product(range(3),repeat=3):
+        want=table[sum(q)]
+        assert output(code,q)==want
+        assert all(output(code,p)==want for p in set(permutations(q)))
+
+for bad in (-1,2187,True,False,1.0,'777',None):
+    try: decode(bad); raise AssertionError(bad)
+    except ValueError: pass
+for bad in ((0,)*6,(0,)*8,(0,0,0,0,0,0,3),
+            (0,0,0,0,0,0,True)):
+    try: encode(bad); raise AssertionError(bad)
+    except ValueError: pass
+
+assert decode(777)==(0,1,2,1,0,0,1)
+assert ''.join(map(str,reversed(decode(777))))=='1001210'
+assert decode(867)==(0,1,0,2,1,0,1)
+assert decode(420)==(0,2,1,0,2,1,0)
+assert all(output(420,q)==(-sum(q))%3
+           for q in product(range(3),repeat=3))
+assert any(output(421,q)!=(-sum(q))%3
+           for q in product(range(3),repeat=3))
+
+# T06 and the page-76 scan are restrictions/selections, never T04 identity.
+assert sum(code%3==0 for code in range(RULES))==3**6==729
+assert output(1,(0,0,0))==1
+scan=tuple(range(993,1141,3))
+assert len(scan)==50 and scan[0]==993 and scan[-1]==1140
+assert all(code%3==0 for code in scan)
+assert 990%3==1143%3==0 and 990 not in scan and 1143 not in scan
+
+rows,pad=evolve(777,[1],8)
+trace=tuple(word(row) for row in rows)
+assert trace==('1','111','12121','1100011','122101221',
+              '11001210011','1221110111221','110001222100011',
+              '12210110101101221')
+rows,pad=evolve(867,[1],50,pad=50)
+blob=bytes(v for row in rows for v in row)
+assert len(blob)==51*101
+assert tuple(blob.count(v) for v in range(3))==(3692,958,501)
+assert sha256(blob).hexdigest()==\
+       '185170c0866f76d129fbf3a8843cc731f98b9f012cb98286f01e420532fb53d9'
+
+# Seed is run data: one program admits distinct valid initial conditions.
+program=decode(777)
+run1,_=evolve(777,[1],4); run2,_=evolve(777,[2],4)
+assert program==decode(777) and run1!=run2
+
+# Exhaustive lowering preserves behavior but is not the preset's identity.
+def address(q): return 9*q[0]+3*q[1]+q[2]
+def lower(code):
+    return tuple(output(code,q) for q in product(range(3),repeat=3))
+seen=set()
+for code in range(RULES):
+    full=lower(code)
+    full_code=sum(v*3**i for i,v in enumerate(full))
+    assert full_code not in seen; seen.add(full_code)
+    assert all(full[address(q)]==output(code,q)
+               for q in product(range(3),repeat=3))
+assert len(seen)==RULES
+
+print('T04 semantic oracle: PASS')
+print('rule_count=',RULES,'quiescent_count=',729,'gallery_count=',len(scan))
+print('rule777_table=',decode(777),'trace=',','.join(trace))
+print('rule867_51x101_sha256=',sha256(blob).hexdigest())
+PY
+```
+
+Recorded output:
+
+```text
+T04 semantic oracle: PASS
+rule_count= 2187 quiescent_count= 729 gallery_count= 50
+rule777_table= (0, 1, 2, 1, 0, 0, 1) trace= 1,111,12121,1100011,122101221,11001210011,1221110111221,110001222100011,12210110101101221
+rule867_51x101_sha256= 185170c0866f76d129fbf3a8843cc731f98b9f012cb98286f01e420532fb53d9
+```
 
 ## Asset and Raster Audit
 
@@ -437,7 +552,7 @@ Picture 883/25 has exact executable settings and therefore receives a semantic t
 
 **Required conformance and rejection tests:**
 
-1. Assert preset and generic T03 construction compare structurally equal, share the same semantic program reference/hash and runtime classes, and generate identical scalar and batch traces for both code and table input. Catalog provenance may differ; semantic identity may not.
+1. Assert preset and generic T03 construction compare structurally equal, share the same semantic program reference/hash and runtime classes, and generate identical single-episode and batch traces for both code and table input. Catalog provenance may differ; semantic identity may not.
 2. Assert table/code round trips for `0,1,420,777,867,2186`; sum zero is least significant; leading zero rows survive; and output value `2` is produced. Reject codes `-1` and `2187`, booleans/floats/strings outside the tagged manifest codec, six/eight-row tables, sparse mappings, and outputs outside `0..2`.
 3. Assert the preset has no `k`, `r`, valuation, aggregate, alphabet, arity, executor, update, seed, boundary, filter, class, or palette override path. Equivalent generic T03 with a noncanonical symbolic valuation remains valid but is not silently relabeled T04.
 4. Execute code 777 from the single-gray run and match the exact early trace; execute code 867 and match the shared hash. Run the same program under point-`2`, explicit, random, all-zero, periodic, and fixed-exterior profiles and prove only run/realization identities change.
@@ -445,13 +560,13 @@ Picture 883/25 has exact executable settings and therefore receives a semantic t
 6. Evaluate `(0,2,0)` and `(1,0,1)` through a table whose row two is distinctive: both address sum row two despite different histograms. Reverse representative triples and prove equal output without a runtime `symmetric` flag; perform additivity checks for code 420 only in the analyzer/property API.
 7. Render one unchanged episode with two palettes and prove the program reference and raw states are identical. Changing gallery labels, class records, crop, horizon, or raster metadata must likewise leave the program unchanged.
 8. Static-scan resolved objects and runtime sources: no T04/three-color family dispatch, duplicate sum/table/codec, binary shift decoder, hidden `3^3=27` exhaustive table, callback, preset-specific `int64` exception, seed/filter/palette default, or test-only execution path.
-9. Preserve all G2-T03 generic/radius/bigint adversaries and the full existing suite. T04's small values cannot weaken generic valuation, arbitrary-precision, old-snapshot, nonbinary, and scalar/batch requirements.
+9. Preserve all G2-T03 generic/radius/bigint adversaries and the full existing suite. T04's small values cannot weaken generic valuation, arbitrary-precision, old-snapshot, nonbinary, and single-episode/batch requirements.
 
 **Completion evidence:** the preset resolves identically to generic T03; exact code/table/count/trace/selection fixtures pass; invalid codes/tables/overrides are rejected; seed, boundary, T06/T07/T08, property, gallery, palette, and view identities remain separate; static inspection finds no new runtime branch or duplicate semantics; focused and full repository tests pass unchanged.
 
 ## No-Cheating Checks
 
-- No T04/three-color rule family, `if k==3` runtime case, duplicate aggregate/table/codec/executor/update, ternary patch beside the shared T03 rule, or preset-specific scalar/batch path.
+- No T04/three-color rule family, `if k==3` runtime case, duplicate aggregate/table/codec/executor/update, ternary patch beside the shared T03 rule, or preset-specific single-episode/batch path.
 - No preset record that survives resolution as alternate semantics. `three_color_totalistic(777)` and generic T03 with `k=3,r=1,nu_3,777` must have the same structural program identity and executor types.
 - No hidden ordered 27-context table, aggregate-to-exhaustive expansion as native identity, sparse/wildcard table, partial seven-row table, implicit output, or fallback row. Lowering may exist only as an explicit verified relation.
 - No histogram, multiset, active/nonzero count, min/max, gate, callback, ordered tuple rank, or floating/tolerant average substituted for the exact `nu_3(left)+nu_3(self)+nu_3(right)` sum. `(0,2,0)` and `(1,0,1)` must merge.
