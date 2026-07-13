@@ -1,6 +1,6 @@
 # 18-T43-ITERATED-MAPS
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -78,9 +78,9 @@ Reconstruct iterated maps as exact or explicitly represented scalar-state evolut
 
 1. Read CSV line 44 and taxonomy section 43 in full, then strict main, clean chapter duplicate, native Notes, line-oriented Notes duplicate, all linked strict/Notes rasters at original resolution, actual Index, supporting/history passages, current program document, runtime, tests, and every followed cross-reference.
 2. Confirmed boundaries: strict T43 is `BOOK:1868-1946`; T44 begins at `1948`. Native Notes are `13215-13280`; T44 Notes begin at `13281`. The actual Index begins at `20826`, so counts were split there rather than trusting directory names.
-3. Exact T43 headings found **2/2** occurrences/unique lines. A conservative `iterated maps?` search found **106/89**: `44/36` pre-Index and `62/53` actual Index. Broader `iterat*` found **214/155**: `105/86 + 109/69`.
+3. Exact T43 headings found **2/2** occurrences/unique lines. A conservative `iterated map\w*` search covering map/maps/mapping found **106/89**: `44/36` pre-Index and `62/53` actual Index. A controlled broader iteration-word union found **214/155**: `105/86 + 109/69`.
 4. A high-signal union over direct names, map families, chaos, sensitivity, precision, and analysis terms found **332/210**: `172/115` pre-Index and `160/95` actual Index. Every line is assigned below or rejected as history, support, route, other type, or lexical false positive.
-5. Formula literals and map spellings found **36/28** (`35/27 + 1/1`). Shift found **23/23** (`17 + 6`); logistic/Verhulst **20/18** (`4/3 + 16/15`); tent **4/4**, doubling **2/2**, Gauss **2/2**, and quadratic-map wording **1/1**. Actual-Index-only hits add routes, not hidden mechanics.
+5. Formula literals and map spellings found **36/28** (`35/27 + 1/1`). The shift-map family found **23/23** (`17 + 6`); `logistic maps?|Verhulst` **20/18** (`4/3 + 16/15`); tent **4/4**, doubling **2/2**, Gauss **2/2**, and quadratic-map wording **1/1**. Actual-Index-only hits add routes, not hidden mechanics.
 6. Functional-iteration/iterated-mapping wording found **4/3**; continued-fraction map **3/3**; return maps **2/2**; Anosov **3/3**. Newton and complex-rational iteration are historical/variant support, not strict scalar-domain authority.
 7. `chaos phenomenon` found **14/11**, all pre-Index; `chaos theory` **83/70**; `chaotic` **8/7**; `sensitive` **45/40**. Native strict evidence separates sensitive dependence from intrinsic randomness production.
 8. Lyapunov found **12/9**, Feigenbaum **6/5**, period doubling **9/9**, bifurcat* **4/4**, attractor **76/57**, and precision-control vocabulary **18/12**. Lyapunov is native T43 Notes; attractor/bifurcation are supported analyzers because those words occur zero times in the native strict/Notes scope.
@@ -409,9 +409,16 @@ TrackedMapComputationState {
   approximate_value,
   reliability: PrecisionAndErrorProvenance
 }
+
+CertifiedMapComputationState {
+  ideal_map_id: IteratedMapId,
+  numerical_context_id,
+  enclosure,
+  coverage_evidence
+}
 ```
 
-The strict interval is serialized as `[0,1]`; membership is validated before a run. A represented value is a first-class bit/digit-format value, not an enclosure or a claim of exact equality to the ideal real. `TrackedMapComputationState` is reproducible evaluator work state tied to an ideal map/seed, not a third mathematical point-state ontology; its evolving uncertainty is stored in a computation trace. There is one scalar slot, no control, no stored iteration counter, no random source, and no orbit prefix. Event indices belong to run/trace records.
+The strict interval is serialized as `[0,1]`; membership is validated before a run. A represented value is a first-class bit/digit-format value, not an enclosure or a claim of exact equality to the ideal real. Certified/tracked computation states are reproducible evaluator work states tied to an ideal map/seed, not additional mathematical point-state ontologies; their evolving enclosure/uncertainty is stored in computation traces. There is one scalar slot, no control, no stored iteration counter, no random source, and no orbit prefix. Event indices belong to run/trace records.
 
 The immutable program is:
 
@@ -615,8 +622,8 @@ Formal/almost-everywhere slope magnitudes in the source's base-two convention gi
 ### Native Notes logistic and vector profiles
 
 - Logistic preset: `x -> a x(1-x)`, exact seed `1/8`, displayed `a={2.5,3.3,3.4,3.5,3.6,4}`. Page 936 is six orbit digit plates, not a bifurcation diagram; geometry is consistent with 40 visible digits and 81 initial-inclusive states.
-- Numerical anchors: `a=2.5` approaches fixed point `0.6` with base-two Lyapunov `-1`; `a=3.3` approaches `0.479427019824234... <-> 0.823603283206069...`; `a=3.4` approaches `0.451963247626153... <-> 0.842154399432671...`.
-- At `a=3.5`, a stable four-cycle is `0.382819683017324... -> 0.826940706591439... -> 0.500884210307218... -> 0.874997263602464...`. The `a=3.6` profile is chaotic with a method-dependent finite numerical base-two Lyapunov estimate near `+0.2667`; `a=4` has ideal exponent `1` away from exceptional points.
+- Independent approximate cycle anchors use seed `1/8`, 100-decimal arithmetic, and 5,000 discarded events: `a=2.5` approaches fixed point `0.6` with base-two Lyapunov `-1`; `a=3.3` approaches `0.479427019824234... <-> 0.823603283206069...`; `a=3.4` approaches `0.451963247626153... <-> 0.842154399432671...`.
+- Under the same cycle context, `a=3.5` approaches `0.382819683017324... -> 0.826940706591439... -> 0.500884210307218... -> 0.874997263602464...`. The `a=3.6` plate is qualitatively chaotic, but no finite Lyapunov decimal is made canonical: after a long horizon its value depends on the fully specified backend, rounding, expression order, burn-in, and estimator. `a=4` has ideal exponent `1` away from exceptional points.
 - Period-doubling anchors are `3`, `1+sqrt(6)=3.44948974278...`, `3.54409035955...`, `3.56440726610...`, accumulating at `3.569945672...`, consistent with source-rounded `3.569946`.
 - Logistic `a=4` relation: under `x=Sin[Pi u]^2`, the ideal map is semiconjugate/conjugate modulo the two-to-one coordinate ambiguity to `u -> FractionalPart[2u]`. Record the transformation and scope, not structural equality.
 - Anosov example: `{x,y} -> Mod[{{2,1},{1,1}}.{x,y},1]` on a two-torus, with both outputs computed from the old pair. Rational seeds under the displayed integer matrix have finite denominator classes and eventually repeat.
@@ -836,12 +843,18 @@ Reject:
 - [x] All page-165/166/168/170 and Notes assets have complete measurements/hashes; exact-rational or declared-high-precision oracles exist where the extracted source determines them, and missing-plate/rounding/compressed-layout limitations are explicit elsewhere.
 - [x] T34/T35/T36/T37/T41/T42/T44/T45, fast-forward formulas, smooth/complex/vector maps, sampling, and observer boundaries are explicit.
 - [x] Current API/runtime fit and the Goal 2 files/dependencies/test handoff are explicit.
-- [ ] Global ledgers, diff checks, Markdown checks, coverage count, and repository tests are integrated.
+- [x] Global ledgers, diff checks, Markdown checks, coverage count, and repository tests are integrated.
 
 ## Stage Results
 
-Textual/raster evidence, semantic construction, API/runtime audit, Goal 2 handoff, source repairs, all 11 asset identities, and every source-permitted exact/declared oracle are complete. Global ledger integration and final verification remain in progress.
+The direct map/mapping search found 106 occurrences on 89 lines, the controlled iteration union 214/155, and the high-signal map/chaos/precision/analysis union 332/210. Nineteen evidence groups disposition the strict main, native Notes, clean and line-oriented splits, actual Index, history, aliases, programs, precision profiles, analyzers, every followed relation, and every false positive. Zero textual or raster candidate remains unresolved.
+
+T43 establishes an immutable ideal self-map plus separately typed realized-map semantics. Ideal exact point state, certified/tracked computation work state, and fixed represented state are not interchangeable. `UniqueScalar`, complete old-value read, `MapAssignment`, and the existing fixed-effects atomic commit preserve T34's law; no eleventh update member appears. Strict total maps always advance, `h` events yield `h+1` states, and fixed/cycle/convergence/analyzer results never halt native execution. Mathematical map ID, realized-transition ID, equivalence, conjugacy, profile-specific orbit equality, and observation equality remain separate.
+
+All eight strict and three Notes assets have measured dimensions, byte sizes, and matching SHA-256 identities. Exact rational regeneration matches page 165 at `12960/12960` cells. The declared 180-decimal oracle matches page 168 at `29040/29040` and page 170 at `38720/38720`; classifier boxes, center rules, thresholds, precision, and `Pi` literal are recorded. The missing page-166 plate and underdetermined page-934/935/936 pixel contexts are not overclaimed. Binary collapse events `50/52`, the decimal 12-event preperiod and `195312500` period, logistic cycles, strict sensitivity horizons, and all source repairs are explicit.
+
+Independent semantic and raster oracles print `PASS`; all eleven hashes match; 19 excerpt groups and 29 `BOOK:` reference groups resolve; Markdown fences pass; `git diff --check` passes; and `uv run pytest -q` reports `102 passed`. Adversarial review found no remaining substantive issue. No earlier stage is reopened.
 
 ## Integration Results
 
-Pending final figure closure and global ledger update.
+`0-plan.md`, `evidence-index.md`, and `design-ledger.md` now record T43 as complete, 17 of 45 type stages complete, ten update laws unchanged, and T44 as the next active stage. T34 assignment, T41 syntax, and T31/T39 query discipline compose without reinterpretation; T37 prefix state, T42 substitution, T44 lattice aggregation, T45 continuous-time flows, and all orbit analyzers remain explicit boundaries. Goal 2 gains exact/represented numeric carriers, map/realization/state-space/evaluator/orbit/analysis/preset/view modules, and an explicit exact-real backend decision.

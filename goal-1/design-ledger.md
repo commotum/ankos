@@ -685,7 +685,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE trace/outcome policy for T43.
 - Basis: `NestList` includes its initial argument, and strict digit rasters contain 81 or 121 initial-inclusive rows. The source repeatedly speaks of iteration/evolution but specifies no halt (`BOOK:10682-10687`, page-165/page-168/page-170 rasters).
-- Consequence: `h` requested events yield `h+1` snapshots and `h` committed event records. Strict total maps always have one successor, even at fixed points and cycles. Exact cycle/fixed/period/convergence records, requested horizons, cancellation, resources, and render crops are analyzers/run outcomes; partial failures retain the last complete state.
+- Consequence: `h` requested events yield `h+1` snapshots and `h` committed event records. Strict total maps always have one successor, even at fixed points and cycles. Cycle/fixed witnesses use replay-safe equality for the selected profile—canonical exact values for ideal runs and complete represented-state identity or proven transition congruence for fixed realizations. Period/convergence records, requested horizons, cancellation, resources, and render crops are analyzers/run outcomes; partial failures retain the last complete state.
 
 ### D093 — Digit/sensitivity/Lyapunov/attractor/parameter views remain outside transition state
 
