@@ -24,8 +24,8 @@ Status: **IN PROGRESS**
 
 - Strict T43 state is one domain-tagged exact or explicitly numerical real value plus no hidden history. Program, initial value, numerical profile, requested horizon, and observations remain separate.
 - The active source is `UniqueScalar`; it reads the complete old value. A closed unary map expression returns the next typed scalar value, and atomic scalar assignment commits exactly one successor when evaluation succeeds.
-- Map validation proves the strict `[0,1] -> [0,1]` contract for the declared parameter/domain or requires an explicit partial/escape profile. Out-of-domain, discontinuity-side, nonfinite, evaluation-failure, and uncertainty outcomes are typed.
-- The piecewise boundary convention at `x=1/2`, fractional-part convention at integers, interval endpoint convention, and exact parameter values are semantic program data.
+- Map validation proves the strict `[0,1] -> [0,1]` contract for the declared parameter/domain or requires an explicit partial/escape profile. Out-of-domain, nonfinite, evaluation-failure, and unresolved-uncertainty outcomes are typed. A declared discontinuity is not itself a failure.
+- The piecewise boundary convention at `x=1/2`, `FractionalPart` value at integers, interval endpoint convention, and exact parameter values are semantic program data. One-sided derivative/sampling metadata remains an observer concern; the strict tent map is continuous at its cusp.
 - Exact rational/algebraic/named-real values, symbolic exact expressions, certified intervals, arbitrary-precision decimals, and fixed-precision machine values remain distinguishable in state and serialization.
 - Fixed-precision execution is a different declared numerical realization, not a transparent implementation of the exact orbit. Rounding base/mode/width and unknown-digit fill policy must be reproducible.
 - Orbit state/effects remain separate from digit/sizes/difference/period/attractor/bifurcation/Lyapunov observers and from solver/fast-forward formulas.
