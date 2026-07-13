@@ -351,7 +351,7 @@ For factored state `(tape,h,q)`, define `E(tape,h,q)[x] = Head(q,tape[x])` when 
 E(step_native(tape,h,q)) = step_tagged(E(tape,h,q)).
 ```
 
-This proves category-3 lossless reuse while preserving the compact `sk`-row program and `(2sk)^(sk)` count. A bare `Sigma union Q` is lossy; an arbitrary table over the `k(s+1)` composite labels is a different program. A full-slice target-local lowering can use radius one, but the unique-head/two-write form preserves the self-only semantic read directly.
+This proves category-3 lossless reuse while preserving the compact `sk`-row program and `(2sk)^(sk)` count. A bare `Sigma union Q` is lossy; an arbitrary table over the `k(s+1)` composite labels is a different program. The native `delta` decision consumes only the tagged source's `(q,symbol)`, but its transparent two-write lowering also reads the possible radius-one destinations so it can retain the symbol under the moved head. A full-slice target-local lowering likewise needs only radius one.
 
 ### Corrected axis fit
 
@@ -359,9 +359,9 @@ This proves category-3 lossless reuse while preserving the compact `sk`-row prog
 |---|---|
 | DOMAIN/configuration | Reuse fixed ordered 1D support; add total sparse/default composite-labeled tape and exactly-one-head invariant |
 | FRONTIER | Reuse the broad rule-firing role; add/reuse `UniqueTag(head)` |
-| NEIGHBORHOOD | Self-only projected `(q,symbol)` read from the head label; destination preservation is UPDATE mechanics, not rule input |
+| NEIGHBORHOOD | Radius-one structural access: project `(q,symbol)` at the tagged source for `delta`, then retain the selected destination label in the typed lowering |
 | RULE | Complete compact `Q x Sigma -> Q x Sigma x {L,R}` table plus structural two-write lowering |
-| UPDATE | Reuse old-snapshot atomic label writes; preserve destination symbol and validate one successor head |
+| UPDATE | Reuse old-snapshot atomic label-write commit; it does not reread or interpret Turing semantics, and validates one successor head |
 | Outcomes | Base total continuation, explicit terminal-head variant, external stops, horizons, and errors remain distinct |
 | Runner/trace | Shared branch-free runner; complete tagged tape snapshots and outcomes round-trip |
 
