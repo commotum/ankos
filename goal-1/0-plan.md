@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44 complete, 18 of 45 type stages complete, T45 Partial Differential Equation Systems in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 19 of 45 type stages complete, T02 Multi-Color Nearest-Neighbor Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
@@ -72,6 +72,9 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - Strict-main integer-line topology is an explicit inference; Notes separately prove a finite periodic list. Segment exterior policy, causal work/halo, raster crop, and support identity remain independent. Exact field state, certified/tracked computation records, and represented finite-arithmetic feedback are distinct.
 - Mean, fractional-`3/2`, add-constant, weighted, additive, boiling, coupled-map, noisy, probabilistic, complex-block, and PDE-related profiles retain the exact evidence boundaries established in D096-D102. Backgrounds, differences, parameter/class galleries, bubble/wrap records, and renderings are observers rather than hidden state or halts.
 - T44 closes 21 reproducible search queries and 25 evidence groups with zero unresolved candidates. Exact semantic rows, all 17 included asset identities, the page-339 exclusion, and page-172/173/174/175/Notes raster fits reproduce; all 102 repository tests pass.
+- T45 is a non-transition category: an immutable closed differential equation plus continuous region, parameterized-locus side data, `Classical` solution concept, and regularity contract denotes a solution set of real-scalar, complex-scalar, or fixed-real-vector fields. It adds no eleventh update law.
+- Closed multivariate binders, derivative multi-indices, fixed matrices, reusable candidate/trace bound expressions, and explicit versioned equation-class/locus/admissibility claims preserve the equation/problem/candidate/witness/realization/sample/view distinctions. Only a separately justified IVP derives a continuous flow.
+- T45 closes a 27-query exact-manifest oracle and 28 evidence groups with zero unresolved candidates. All 87 excerpts match their provenance; 23 included assets plus the Chapter 5 exclusion, exact semantic/metadata oracles, the heat raster fit, and all 102 repository tests pass. D103-D110 preserve proof strength, Classical-only v1 scope, explicit numerical relations, separate scopes/observers, and T31/T41/T44 reuse.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -623,7 +626,7 @@ The exact semantic oracle covers mean/coefficient/mass, fractional-`3/2`, add-qu
 
 ### 20-T45-PDE
 
-Status: **IN PROGRESS** in `goal-1/20-T45-PDE.md`.
+Status: **COMPLETE** in `goal-1/20-T45-PDE.md`.
 
 #### Big Picture Objective
 
@@ -637,7 +640,15 @@ Apply the common protocol, distinguishing the equation from discretization, inte
 
 All T45 evidence is captured; no discretized CA is presented as the PDE itself; any separate execution algebra is justified; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+The exact 27-query oracle emits and verifies every pre-Index/actual-Index candidate manifest, and 28 evidence groups close strict, Notes, split, Index, equation-family, condition, method, solution, continuum-relation, history, application, and observer evidence with zero unresolved remainder. T45 reconstructs immutable scalar/complex/fixed-vector differential equations and `Classical` continuous-region/side-data problems whose denotation is a solution set, with no native source, update, successor, halt, or eleventh law. Closed multivariate expressions, differential operators, fixed matrices, reduced-locus trace binders, versioned class/locus/admissibility claims, and proof-strength-preserving queries keep equation, problem, candidate, witness, realization, sample, and view identities distinct.
+
+The semantic oracle passes exact heat/wave identities, the incompatible diffusion caption datum, nonlinear potential endpoint counterexample, background amplitude/periods, and the finite-difference kernel/grid. Metadata pin 23 included assets plus one material exclusion, and the analytic heat raster oracle passes. D103-D110 record the declarative ontology, syntax, IVP, proof, discretization, scope, and observer boundaries. All 87 quotes, 44 source bounds, Markdown fences, `git diff --check`, independent review, and all 102 repository tests pass. No prior stage reopened. Next: T02.
+
 ### 21-T02-MULTICOLOR-CA
+
+Status: **IN PROGRESS** in `goal-1/21-T02-MULTICOLOR-CA.md`.
 
 #### Big Picture Objective
 

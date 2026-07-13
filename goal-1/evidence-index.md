@@ -27,7 +27,7 @@ Each type stage must make the following auditable:
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
 | T01 | 2 | Elementary Cellular Automata | 1 | `2-T01-ELEMENTARY.md` | COMPLETE | 8 search families; 23 excerpt groups; all split/Notes/Index/cross-reference candidates dispositioned; 0 unresolved |
-| T02 | 3 | Multi-Color Nearest-Neighbor Cellular Automata | 2 | `21-T02-MULTICOLOR-CA.md` | PENDING | Not started |
+| T02 | 3 | Multi-Color Nearest-Neighbor Cellular Automata | 2 | `21-T02-MULTICOLOR-CA.md` | IN PROGRESS | Catalog/taxonomy identity and exhaustive source audit active |
 | T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | PENDING | Not started |
 | T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | PENDING | Not started |
 | T05 | 6 | Higher-Color Totalistic Cellular Automata | 5 | `24-T05-HIGHERCOLOR-TOTALISTIC.md` | PENDING | Not started |
@@ -70,14 +70,14 @@ Each type stage must make the following auditable:
 | T42 | 43 | Continued-Fraction-Driven Substitution Systems | 42 | `46-T42-CF-SUBSTITUTION.md` | PENDING | Not started |
 | T43 | 44 | Iterated Maps | 43 | `18-T43-ITERATED-MAPS.md` | COMPLETE | Direct map/mapping 106 occurrences/89 lines; controlled iteration union 214/155; high-signal map/chaos/precision/analysis union 332/210; 19 excerpt groups; all strict main, eight strict/three Notes assets, native Notes/actual Index/splits, exact/realized/tracked state, closed map/invariance/update/trace/analyzer semantics, precision profiles, source repairs, T34/T41/T44 boundaries, current API/runtime, exact-rational page-165 and declared-180-decimal page-168/page-170 cell oracles dispositioned; 0 unresolved candidates |
 | T44 | 45 | Continuous Cellular Automata | 44 | `19-T44-CONTINUOUS-CA.md` | COMPLETE | Literal 21-query oracle; 25 evidence groups; all strict/Notes/actual-Index/split/history/alias/program/profile/application/noise/complex/PDE candidates; total `[0,1]` fixed-lattice field, closed affine aggregate plus scalar map, T01 parallel assignment reuse, exact/certified/tracked/represented distinctions, support/work/crop split, 17 included assets plus page-339 exclusion, semantic and raster oracles, D096-D102 boundaries, current API/runtime, and Goal 2 handoff dispositioned; 0 unresolved candidates |
-| T45 | 46 | Partial Differential Equation Systems | 45 | `20-T45-PDE.md` | IN PROGRESS | Strict main/Notes, equation/initial-boundary/solution/discretization/integrator vocabulary, assets, and T41/T44 boundaries under audit |
+| T45 | 46 | Partial Differential Equation Systems | 45 | `20-T45-PDE.md` | COMPLETE | Exact 27-query manifest oracle; 28 evidence groups; all strict/Notes/actual-Index/split/equation/condition/method/solution/continuum/history/application candidates; declarative real/complex/fixed-vector differential problems and Classical solution sets; closed multivariate/candidate/trace syntax; explicit class/locus/admissibility claims; proof-strength queries; numerical/scope/observer separation; 23 included assets plus Chapter 5 exclusion; semantic, metadata, and heat raster oracles; D103-D110 boundaries; 0 unresolved candidates |
 
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 18 / 45.
+- Type stages complete: 19 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 26 pending, 1 in progress.
+- Type stages unresolved: 25 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
