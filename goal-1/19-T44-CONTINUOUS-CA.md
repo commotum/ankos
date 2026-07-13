@@ -19,7 +19,7 @@ Status: **IN PROGRESS**
 - T43 supplies reusable scalar map-expression and numerical-realization responsibilities, but T44 is not a packed collection of independent T43 states: every new cell value depends on a neighborhood aggregate.
 - Native Notes state that exact rationals are essential for detailed profiles: ordinary 64-bit double precision makes the lower page-157 pattern qualitatively wrong and nearly every page-160 parameter panel wrong. Numerical realization therefore affects feedback semantics over the whole field.
 - The strict source exposes a potential two-level realization identity: the ideal exact field construction and a fully declared finite-arithmetic field recurrence. T43's ideal/tracked/fixed distinction must be lifted without conflating cell values, computation work state, or rendered gray levels.
-- The `c=1/4` background repeats every four events. Notes generalize this to rational `c`, with period equal to the reduced denominator; irrational `c` never repeats. Background periodicity is an observer/property, not a native halt.
+- The `c=1/4` background repeats every four events. On the source's admitted `c in [0,1]` family, Notes generalize this to rational `c`, with period equal to the reduced denominator; irrational `c` never repeats. Background periodicity is an observer/property, not a native halt.
 - Notes add an additive profile `Mod[RotateLeft[list]+RotateRight[list],1]`. With seed `1/k`, its exact integer-line cells are normalized Pascal residues `FractionalPart[Binomial/k]`; the prose's “Pascal triangle modulo k” describes the unnormalized residues, and “all possible” for irrational `k` means dense/equidistributed coverage rather than literal continuum enumeration.
 - Parameter scans, center-cell plots, background plots, adjacent-cell differences, localized-structure views, value equality, and pattern classes are observers. The page-175 difference image cannot replace the underlying field.
 - Coupled map lattices/lattice dynamical systems are a historical related family. Probabilistic cellular automata are explicitly an alternative discrete-value stochastic construction, not a T44 flag.
@@ -30,17 +30,17 @@ Status: **IN PROGRESS**
 
 ## Updated Assumptions
 
-- Strict ideal state is a total field from a declared 1D lattice support into exact/certified values in `[0,1]`, with no control or stored history.
+- Strict ideal state is a total field from a declared 1D lattice support into mathematical point reals in `[0,1]`, with exact presentations where available and no control or stored history. Certified enclosures and tracked values are computation work/results; fixed represented values form separate realized state.
 - A finite periodic list, a finite open segment, an infinite line with finite-support/default presentation, a causal window, and a rendered crop are distinct realizations/scopes.
 - `AllSites` is the active source. Each site reads the complete ordered old triple `(left,self,right)`, computes an exact average, applies one closed scalar expression, and returns a typed same-site assignment. All results commit atomically.
-- Aggregation order, rational divisor `3`, map expression, exact parameter, interval/endpoints, boundary, and numeric realization are reproducible data. They are not a formula callback or backend default.
+- Offset/weight association, rational divisor `3`, map expression, exact/declared parameter, interval/endpoints, boundary, and numeric realization are reproducible data. Ideal exact addition has no host reduction order; a represented realization records its reduction tree and rounding. None is a callback or backend default.
 - Source-spelled `FractionalPart` retains the T43/Wolfram `x-IntegerPart[x]` semantics. Strict aggregate/map arguments are nonnegative, where it agrees with modulo one; the additive Notes profile explicitly uses `Mod[...,1]` and remains a distinct primitive.
 - Ideal exact field state, certified/tracked computation state, and fixed represented field state remain different. Per-operation rounding locations include addition, division/average, map arithmetic, comparison, and assignment.
 - An unchanged field still represents a completed event. Diffusive convergence, exact background periods, repeated finite realizations, localized structures, and observer horizons do not halt the base construction.
 - A complete run with `h` events has `h+1` field snapshots. Compact events may reconstruct fields, but a bitmap/float tensor is not the semantic codec.
 - Exact field equality, realized-field equality, translational equivalence, observer equality, and visual equality are distinct.
 - Parameter-family scans execute separately identified rules/runs. The parameter coordinate is not hidden control and a gallery is not one evolving field.
-- Additive, coupled-map, stochastic, PDE-limit, higher-dimensional, alternate-neighborhood, weighted-average, and asynchronous profiles will be admitted only to the extent supported by evidence.
+- Additive, coupled-map, stochastic, PDE-limit, higher-dimensional, alternate-neighborhood, affine-weighted, and asynchronous profiles are admitted only to the extent supported by evidence.
 
 ## Big Picture Objective
 
@@ -355,20 +355,24 @@ Its sequential argmax placement, translated depletion profile, and decay define 
 
 > “the crucial constraint ... is unitarity: that the quantity Tr[Abs[list]^2] representing total probability should be conserved.”
 
-> “a continuous block cellular automaton in which the new value of each block is given by `{{1-xi,xi},{xi,1-xi}} . {a1,a2}`”
+> “one can reproduce the 1D diffusion equation with a continuous block cellular automaton in which the new value of each block is given by `{{1-xi,xi},{xi,1-xi}} . {a1,a2}`.”
+
+> “in the case of quantum mechanics one can consider having each new block be given by `{{Cos[theta],i Sin[theta]},{i Sin[theta],Cos[theta]}} . {a1,a2}`.”
 
 > “in non-trivial cases most of the cells generated at each step end up having distinct values. One can generalize the setup to more dimensions or to allow `n x n` matrices that are elements of `SU(n)`.”
 
 > “all rules based on matrices are additive ... Non-additive unitary rules can also be found. The analog of an external potential can be introduced by progressively changing values of certain cells at each step.”
 
-This changes value space and update interface; it is not hidden in the scalar gray constructor.
+The first matrix is the nonunitary diffusion relation; the second is the unitary quantum construction. Both change the strict update interface, and the latter also changes the value space; neither is hidden in the scalar gray constructor.
 
 ### E24 — Unbounded continuous-field state cardinality
 
 - Provenance: `BOOK:19072`, supporting continuum Notes.
 - Establishes: theoretical continuum cardinality, not a finite runtime capacity.
 
-> “Continuous cellular automata ... also have `2^aleph_0` possible states.”
+> “Continuous cellular automata (see page 155) also have `2^{N_0}` possible states.”
+
+The extracted `N_0` is the book's damaged rendering of `aleph_0`, established by the immediately preceding cardinality definitions at `BOOK:19070`; the quote is not silently normalized.
 
 ### E25 — Actual Index routes and extraction controls
 
@@ -392,7 +396,7 @@ The mathematical state is a total continuous-valued field over one fixed discret
 ```text
 ContinuousFieldState {
   support_id: FixedOneDimensionalSupportId,
-  field: TotalField[CellCoordinate, ExactRealValue]
+  field: TotalField[CellCoordinate, MathematicalRealPoint]
 }
 ```
 
@@ -418,18 +422,18 @@ ContinuousCASpec {
     validation_ref
   },
   source: AllSites,
-  result: SameSiteAssign,
+  result: Assign(target=source_site, value=next_value),
   update: AtomicEffectsUpdate
 }
 ```
 
-The exact strict seed is `X_0(0)=1` and `X_0(i)=0` for `i!=0`. A normalized uniform-default field with finite overrides is an exact presentation of this total field and of every finite-horizon strict point-seed state; it is not a finite-support redefinition of the semantic field.
+The exact strict seed is `X_0(0)=1` and `X_0(i)=0` for `i!=0`. For deterministic spatially homogeneous point-seed profiles, a normalized uniform-default field with finite overrides is an exact presentation of this total field and of every finite-horizon state; it is not a finite-support redefinition of the semantic field. A random initial field or per-site noisy profile generally needs an explicit finite realization or a separately typed lazy total random field/draw source and does not inherit this finite-deviation claim.
 
 The main section does not state a global topology explicitly. The ordinary-CA context, single black cell on white background, triangular causal cones, and T01 semantics make the integer line the best strict-main interpretation, but this remains a recorded inference rather than a quotation. The Notes' rotations prove a separately identified finite periodic cycle. A finite segment, causal work window, halo, and raster crop are also distinct.
 
 The mean profile's “uniform” limit depends on that choice: on the integer line the conserved unit mass spreads and every fixed site tends to uniform white `0`; on an `n`-site cycle it tends to the uniform value `1/n`. The prose does not collapse these realizations.
 
-For `FractionalPart[mean+c]`, zero padding is especially invalid: outside the seed's causal cone the uniform background changes globally. If `b_0=0`, then `b_t=FractionalPart[t c]`; the finite data at time `t` are deviations from `b_t`, not values outside a fixed-zero array.
+For the strict admitted `c in [0,1]` family of `FractionalPart[mean+c]`, zero padding is especially invalid: outside the seed's causal cone the uniform background changes globally. If `b_0=0`, then `b_t=FractionalPart[t c]`; the finite data at time `t` are deviations from `b_t`, not values outside a fixed-zero array. This theorem is not extrapolated to negative parameters, where source-faithful `FractionalPart` is not modulo one and may leave `[0,1]`.
 
 ### Source, read, aggregate, map, result, and update
 
@@ -474,7 +478,7 @@ If any required local evaluation fails, an atomic event commits no site. A parti
 
 A validated strict rule has exactly one successor at every event, including an unchanged field. There is no native halt. A request for `h` events produces `h+1` complete field snapshots and `h` event records. Exact background periods, finite-cycle repetition, convergence, uniformity, class labels, or localized structures are observers and never suppress an event.
 
-Compact integer-line events may reference before/after total-field identities, the closed rule, background transition, finite causal-deviation region, and reconstruction evidence instead of enumerating infinitely many effects. Materialized finite-cycle events may carry every local read/result. A crop or compressed event must reconstruct the claimed snapshots; it never becomes the canonical mathematical state.
+For deterministic homogeneous point-seed profiles, compact integer-line events may reference before/after total-field identities, the closed rule, background transition, finite causal-deviation region, and reconstruction evidence instead of enumerating infinitely many effects. Materialized finite-cycle events may carry every local read/result. Random/noisy fields require their own complete finite or lazy semantic presentations; a finite observation crop is not their full state. Any crop or compressed event must reconstruct the claimed snapshots and never becomes the canonical mathematical state.
 
 Keep separate:
 
@@ -540,7 +544,7 @@ and time 4 on `-5..5` is:
 70/81, 10/81, 4/81, 1/81, 0
 ```
 
-These exact rows repair the rounded and structurally corrupt Markdown tables. In general, reduced rational `c=p/q` gives the zero-background period `q`. Exact irrational `c` never repeats; represented arithmetic may.
+These exact rows repair the rounded and structurally corrupt Markdown tables. Within the admitted `c in [0,1]` family, reduced rational `c=p/q` gives the zero-background period `q`. Exact irrational `c` never repeats; represented arithmetic may.
 
 ### Supplementary algebraic anchors
 
@@ -611,9 +615,9 @@ The strict geometry and exact regeneration establish:
 
 - Page 171's extraction contains only the identity map diagram. The six-row diffusion evolution survives as rounded text; exact rows come from the trinomial oracle above.
 - Page 172 contains 151 initial-inclusive states `t=0..150` over a 203-cell visible central window. Its inset is exactly 31 cells by 23 states `t=0..22`, seed at index 15. Exact dyadic regeneration correlates with the sampled inset cell centers at `r=0.99588`, mean absolute gray error `5.42/255`; the unoccluded lower main raster gives `r=0.9933`, error about five levels. JPEG, grid/overlay, scaling, and unstated tone transfer preclude a literal byte-for-value claim. The main computation boundary is outside the visible crop.
-- Page 173 Picture 3 is a 50-cell periodic display by 30 initial-inclusive rows `t=0..29`, seed index 24. All 1,500 cell centers against exact rational regeneration give `r=0.99456`, mean error `6.60/255`. Picture 4 places the map discontinuity at `x=3/4`.
-- Page 174 is exactly the 21 rules `c=n/40`, `n=0..20`, labeled `0,.025,...,.5`. Each panel shows 101 cells by 51 states `t=0..50` from the exact point seed; the background is `FractionalPart[t c]`.
-- Page 175 labels `c={.1,.3,.325,.3299,.3299 differences,.35,.475,.495,.9}`. Each panel shows 201 states `t=0..200` over a central crop of about 185 cells. The duplicate `.3299` entries are one exact `3299/10000` trajectory and an adjacent absolute-difference observer, not two transition rules. Native Notes explicitly say exact rational generation is essential and that double precision makes almost every page-160 profile wrong, with the localized-structure panel as the exception.
+- Page 173 Picture 3 has 50 visible cells by 30 initial-inclusive rows `t=0..29`, seed index 24. All 1,500 cell centers against an exact rational Notes-ring regeneration give `r=0.99456`, mean error `6.60/255`. A wide integer-line crop gives the same 8-bit/JPEG result: the two differ only in 25 cells at `t>=25`, by at most `5.4e-10`. The raster therefore does not establish a boundary. Picture 4 places the map discontinuity at `x=3/4`.
+- Page 174 contains 21 labeled rules whose mathematical constants are `c=n/40`, `n=0..20`, displayed `0,.025,...,.5`. Each panel shows 101 cells by 51 states `t=0..50` from the point seed; exact-rational reconstruction matches the geometry and field appearance, but the raster does not by itself identify the source's finite numeric representation. The mathematical background is `FractionalPart[t c]`.
+- Page 175 labels `c={.1,.3,.325,.3299,.3299 differences,.35,.475,.495,.9}`. Each panel shows 201 states `t=0..200` over a central crop of about 185 cells. The duplicate declared-decimal `.3299` entries are one trajectory and an adjacent absolute-right-difference observer, not two transition rules. `3299/10000` is an exact-rational reconstruction, not established source identity: through this horizon it and IEEE binary64 `.3299` give the same 8-bit difference fit (`r=0.873586`, mean error `14.51/255`). The absolute-right convention is raster-derived—its correlation exceeds absolute-left, modulo-right, signed-right, and raw-field alternatives—while prose says only “difference.” Native Notes explicitly say exact rational generation is essential and that double precision makes almost every page-160 profile wrong, with this localized-structure panel as the exception.
 - Notes page 937 Picture 3 has two 501-parameter matrices for exact `c=n/500`, `n=0..500`: uniform background and center cell. Horizontal data coordinates are one pixel per parameter; the background source is exact `FractionalPart[t c]`. Vertical resampling/filter/axes mean correlation is a declared visual check, not an exact cell match.
 - Notes page 937 Picture 8 labels `k={2,3,7/3,81/73,Sqrt[2],Pi}` for the additive sibling. The rational profiles are finite-valued/nested and the two irrational profiles are irregular; raster appearance is not a proof of equidistribution.
 
@@ -633,7 +637,7 @@ The deep raster audit is still refining the page-175 absolute-difference crop fi
 8. The actual Index is multi-column-spliced; apparent collisions are not prose. Its `2/13` is OCR for page 243.
 9. Finite periodic boundary is explicit only in Notes code, not strict prose.
 10. The page-245 difference convention and random-field measure are not stated.
-11. The page-325 `x_-` is an extraction of Wolfram pattern syntax; draw independence, generator, finite boundary, and out-of-range handling remain unstated.
+11. The page-325 `x_-` is an extraction of Wolfram pattern syntax. `Random[]` fixes a uniform pseudorandom real marginal on `[0,1]`, but draw independence/correlation, exact seed/draws, call order, fully pinned historical generator, finite boundary, and out-of-range handling remain unstated.
 12. Exact precision, reduction order, horizons, raster transfer curves, and some crop conventions are unstated and cannot be recovered by appearance alone.
 
 ## Variants, Relations, and Boundaries
@@ -661,7 +665,7 @@ rule30 base: lambda(L+C+R+C*R)
 result: v + Sign(v-1/2) * U * delta
 ```
 
-`U` needs a declared distribution and replayable draw witness. A sampled realization records distribution, independence/correlation, generator/version, key/counter, and a coordinate-stable map from `(event,site,draw_slot)` to draws. Evaluation enumeration must not alter results. The literal source does not close over `[0,1]`; use a widened/partial profile or typed range failure, never silent clamp. The Notes' probabilistic CA instead has discrete values and random rule selection and remains an explicit alternative.
+The legacy Wolfram `Random[]` primitive fixes `U`'s marginal as a uniformly distributed pseudorandom real from 0 to 1; this is corroborated by the [official obsolete-symbol reference](https://reference.wolfram.com/language/ref/Random.html). A sampled realization still records primitive/version, seed or draw witnesses, generator, call/index order, and a coordinate-stable map from `(event,site,draw_slot)` to draws. Neither mathematical independence nor a fully pinned historical generator follows from the expression alone. Evaluation enumeration must not alter a declared coordinate-indexed reconstruction. The literal source does not close over `[0,1]`; use a widened/partial profile or typed range failure, never silent clamp. The Notes' probabilistic CA instead has discrete values and random rule selection and remains an explicit alternative.
 
 ### Cross-type boundaries
 
@@ -679,23 +683,23 @@ result: v + Sign(v-1/2) * U * delta
 
 | Construction concern | Fit | Evidence against current document |
 |---|---|---|
-| `DOMAIN`/`SHAPE` | `PARAMETERIZATION` for finite realizations; `PRINCIPLED EXTENSION` for native line | Finite 1D arrays fit explicit rings/segments but conflate support, work, crop, and trace (`simple_programs.md:115-167`) |
-| `ALPHABET` | `SEMANTIC MISMATCH` | A finite float set is not `[0,1]` (`simple_programs.md:169-233`) |
+| `DOMAIN`/`SHAPE` | `PARAMETERIZATION` for finite realizations; `PRINCIPLED EXTENSION` for native line | Finite 1D arrays fit explicit rings/segments but conflate support, work, crop, and trace (`simple_programs.md:115-198`) |
+| `ALPHABET` | `DIRECT` responsibility / `PRINCIPLED EXTENSION` | The abstract value-set responsibility fits, but the document supplies no continuous interval/exact-real contract (`simple_programs.md:200-233`) |
 | `SEED` | `DIRECT` responsibility / `PRINCIPLED EXTENSION` | Support/fill separation fits; exact continuous fields and random-real measures are absent (`:235-290`) |
-| `BOUNDARY` | `DIRECT` for finite realizations | Periodic matches Notes; fixed/reflective are distinct finite siblings; none means native infinity (`:292-358`) |
+| `BOUNDARY` | `DIRECT` for the three explicit finite policies; `PRINCIPLED EXTENSION` for native line | Periodic matches Notes; fixed/reflective are distinct finite siblings. No-boundary integer-line semantics is absent (`:292-358`) |
 | `NEIGHBORHOOD` | `DIRECT` | Radius-one current-snapshot offsets fit (`:360-494`) |
-| `FRONTIER` | `DIRECT` | Full next slice is finite `AllSites` (`:496-560`) |
+| `FRONTIER` | `DIRECT` for a finite time slice; `PRINCIPLED EXTENSION` for semantic unbounded `AllSites` | Full finite slices are directly expressible (`:1502-1510,1538-1563`); T01's source interpretation and integer line remain extensions |
 | Totalistic concept | `PARAMETERIZATION` at responsibility level | Permutation-invariant sum concept composes, but exact mean/divisor/range contract is absent (`:1964-1995`) |
 | Formulaic rule | `SEMANTIC MISMATCH` | Existing global-field callback is far too powerful and not stable closed data (`:2036-2065`) |
-| Same-site commit | `DIRECT` | Parallel fixed-support assignment is the required update law (`:2156-2199`) |
+| Same-site commit | `DIRECT` behavior / `PRINCIPLED EXTENSION` for typed result data | Parallel same-site writes are correct, but the document returns bare values rather than T01's explicit `Assign` (`:2156-2199`) |
 | Precision/realization | `PRINCIPLED EXTENSION` | No exact/certified/tracked/represented feedback identity exists |
-| Stochastic local rule | `PRINCIPLED EXTENSION` | Randomness lacks coordinate-stable semantic draw records |
+| Stochastic local rule | `PRINCIPLED EXTENSION` | Distributional value return is documented (`:2075-2122`), but randomness lacks coordinate-stable semantic draw records |
 | Persistent trace | `PARAMETERIZATION` / `PRINCIPLED EXTENSION` | Initial-inclusive dense episodes help, but state/trace/render scope and exact values are conflated |
 
 ## Current Runtime Fit
 
 - `src/ca/alphabets.py:40-126` — `SEMANTIC MISMATCH`: every alphabet is finite; `float_range_alphabet` explicitly discretizes a range.
-- `src/ca/loci.py:31-124,531-614` — `DIRECT` for finite coordinates and explicit periodic/fixed/reflective gathering; `PRINCIPLED EXTENSION` for integer-line/causal-window lowering.
+- `src/ca/loci.py:31-124,531-614` — `DIRECT` for finite coordinates and explicit periodic/fixed/reflective gathering; `PRINCIPLED EXTENSION` for integer-line/causal-window lowering. Runtime policy `none` raises on an out-of-bounds read and is not native infinity.
 - `src/ca/neighborhoods.py:110-230,551-569` — `DIRECT`: radius-one old-snapshot reads are reusable.
 - `src/ca/frontiers.py:37-80` — `DIRECT`: a full finite time slice is the correct finite source realization.
 - `src/ca/rules.py:30-328` — `SEMANTIC MISMATCH`: aggregates are `sum/count`, formulaic rules are callbacks, and executable spatial paths end in finite lookup.
