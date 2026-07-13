@@ -1,6 +1,6 @@
 # 22-T03-TOTALISTIC-CA
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -435,7 +435,7 @@ This check expands every `BOOK:` citation anywhere in this stage, verifies every
 
 ```bash
 python3 - <<'PY'
-import hashlib, re
+import hashlib, re, subprocess
 from pathlib import Path
 
 book=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md')
@@ -493,11 +493,31 @@ official={
 for name,want in official.items():
     data=Path(name).read_bytes()
     assert hashlib.sha256(data).hexdigest()==want,name
+
+def pdf_text(name):
+    raw=subprocess.check_output(['pdftotext','-layout',name,'-'],text=True,errors='replace')
+    return re.sub(r'\s+',' ',raw)
+strict=pdf_text('/tmp/nks-ch3.pdf')
+nts=pdf_text('/tmp/nks-nts-ch3.pdf')
+notes=pdf_text('/tmp/nks-notes.pdf')
+ch7=pdf_text('/tmp/nks-ch7.pdf')
+assert 'The idea of a totalistic rule is to take the new color of each cell to' in strict
+assert 'specific assignment of values to colors' in nts
+assert 'respectively k ^Table[i - 1, {i, 2 r + 1}] and Table[1, {2 r + 1}]' in nts
+assert 'page 927.' in notes
+assert 'This runs the totalistic k=3 , r =1 rule with code 867.' in notes
+assert 'In[11] : = Show[RasterGraphics[CellularAutomaton[{867, {3, 1}, 1}, {{1}, 0}, 50]]]' in notes
+assert 'Behavior of a two-dimensional cellular automaton starting from a random initial condition.' in ch7
+assert '9-cell neighborhood consisting of the cell itself and the 8 cells adjacent to it (including diagonals).' in ch7
+for fragment in ('If this total is less than 4','if the total is greater than 6',
+                 'exactly 5, then the cell becomes white','total is exactly 4, then it becomes black.'):
+    assert fragment in ch7
 asset=Path('ref/A-New-Kind-of-Science/CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_75_Figure_6.jpeg')
 assert hashlib.sha256(asset.read_bytes()).hexdigest()=='acb13963632286960ca61b616ff2f45a940750f3ab7deb5e6fbf696543015c15'
 
 # Independent finite arithmetic checks.
 assert 2**4==16 and 2**6==64 and 3**7==2187 and 5**13==1_220_703_125
+assert (2**3 + 2**2)//2 == (2**(1+1)*(1+2**1))//2 == 6
 sum_digits=[0,1,2,1,0,0,1]
 assert sum(d*3**s for s,d in enumerate(sum_digits))==777
 for k,r in ((2,1),(2,2),(3,1),(5,1),(8,1)):
@@ -1155,17 +1175,32 @@ No other included figure supplies all of exact serialized seed, boundary/backgro
 
 ## Completion Requirements
 
-- [ ] Every strict/Notes/split/actual-Index/alias/variant/application/emulation textual candidate is dispositioned reproducibly.
-- [ ] Every relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and exclusions.
-- [ ] Aggregate/value/case/table/code/read/update/successor/boundary/seed semantics and variants are explicit.
-- [ ] T01/T02/T04/T05/T06/T07/additive/weighted/emulation boundaries and current API/runtime fit are proved.
-- [ ] Goal 2 files/dependencies/tests and no-cheating gates are implementation-ready.
-- [ ] Global ledgers, independent review, diff checks, and repository tests are integrated.
+- [x] Every strict/Notes/split/actual-Index/alias/variant/application/emulation textual candidate is dispositioned reproducibly.
+- [x] Every relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and exclusions.
+- [x] Aggregate/value/case/table/code/read/update/successor/boundary/seed semantics and variants are explicit.
+- [x] T01/T02/T04/T05/T06/T07/additive/weighted/emulation boundaries and current API/runtime fit are proved.
+- [x] Goal 2 files/dependencies/tests and no-cheating gates are implementation-ready.
+- [x] Global ledgers, independent review, diff checks, and repository tests are integrated.
 
 ## Stage Results
 
-In progress. Direct evidence currently supports aggregate-plus-table parameterization, but the general value/case/code semantics and complete variant boundary are not yet closed.
+COMPLETE. The exact 16-query manifest closes 118 candidates in the disjoint partition `26 direct / 34 sibling / 25 relation / 23 false-control / 10 actual-Index`, and the 84 literal split occurrences match exactly. Eighteen evidence groups preserve 65 verbatim fragments across 63 physical monolith lines. Five damaged forms are normalized transparently against four hash-pinned official PDFs; every stage citation and quote passes the source oracle with zero unresolved candidate.
+
+T03 is one exact finite-sum rule description over the T01/T02 fixed-lattice construction. A program declares finite alphabet `A`, explicit bijection `nu:A->{0,...,k-1}`, fixed radius `r`, exact sum of the `2r+1` old reads, and one complete `M=1+(k-1)(2r+1)`-row structural table. Sum zero is the least-significant base-`k` digit. The source average is the exact label `s/(2r+1)`, not a float. T03 adds neither an executor nor an update law; T04/T05 are presets, T06/T07 restrictions/properties, and histogram, outer, weighted, higher-dimensional, continuous, additive, emulation, seed, class, and view material remains explicitly typed outside base execution.
+
+All six embedded audit blocks pass. They cover the source/evidence closure; exact `16/64/2187/1,220,703,125` counts; codes `777/867/420` and binary radius-two code `10`; permutation and equal-sum/different-histogram adversaries; a permuted symbolic valuation that defeats tuple-rank substitution; injective T01/T02 lowering; evolving background, old-snapshot, nonbinary, and arbitrary-precision behavior; 37 included/ten excluded/two relation-only assets; exact code-777/code-867 trajectories; and all 946 cells of the strict code-777 raster with zero mismatch. The current broad API and binary/family-dispatched runtime are documented as mismatches rather than preserved through a shim.
+
+G2-T03 names concrete alphabet, aggregate, table/codec, rule, executor, spec/preset, trace/export, migration, and test work with 15 adversarial conformance obligations. D115-D118, the completed-construction matrix, rejected shortcuts, integration log, open questions, `0-plan.md`, and `evidence-index.md` are updated. Independent semantic review found and closed the rank-versus-valuation gap; final independent review found no remaining blocker. Markdown/fence/table checks, every embedded oracle, `git diff --check`, coverage checks, and all 102 repository tests pass. No prior stage is reopened. Next: T04.
 
 ## Integration Results
 
-In progress. No prior decision is changed until the complete evidence audit determines whether D114's aggregate responsibility is sufficient.
+1. No prior assumption or primitive is invalidated. D114 is concretized: T02 rank and T03 numeric valuation are independent identities, while palette remains representation.
+2. T03 directly reuses T01/T02 support, `AllSites`, old-snapshot gathering, typed same-site assignment, atomic commit, successor, realization, and trace semantics without changing their meanings.
+3. The proposal adds no family branch, callback, flag, hidden state, duplicate executor, fallback, binary decoder, or exhaustive-table masquerade.
+4. State remains only support plus the current total color field; the immutable valuation/aggregate/table is program data and all information needed to reproduce a trace is explicit.
+5. Support, topology, values, numeric valuation, aggregate cases, structural table, code, run controls, representation, properties, and relations remain separately typed.
+6. Equal-weight fixed-arity sum followed by complete lookup is defining rule semantics and remains native. Integer vectorization, exact-average labels, bigint code, exhaustive lowering, solvers, gallery selection, and rasterization remain explicit incidental or relation layers.
+7. The proposed encoding preserves alphabet identity, independent `nu`, arity/radius, every sum row including leading zeros, arbitrary-precision code direction, run identity, and observation scope. The noncanonical symbolic fixture prevents rank collapse.
+8. No completed stage is reopened. T01/T02 are strengthened by an explicit verified lowering relation without changing native identity or execution.
+9. Goal 2 gains G2-T03 after the shared T01/T02 alphabet/table/executor responsibilities. T04/T05 depend on it as presets; T06/T07 consume predicates/proofs rather than flags; outer/weighted/histogram/higher-dimensional profiles remain separately staged.
+10. The overall API becomes simpler: one closed `valuation -> exact sum -> typed table` rule composes with the existing fixed-field executor, replacing the current loose `TOTALISTIC` bucket and binary family routing without adding an eleventh update law.
