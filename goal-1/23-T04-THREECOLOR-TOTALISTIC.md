@@ -1,6 +1,6 @@
 # 23-T04-THREECOLOR-TOTALISTIC
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -1560,16 +1560,27 @@ Picture 883/25 has exact executable settings and therefore receives a semantic t
 
 ## Completion Requirements
 
-- [ ] Every strict/Notes/split/actual-Index/alias/code/gallery/property/application/emulation candidate is dispositioned with zero remainder.
-- [ ] Every relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and explicit exclusions.
-- [ ] The exact preset/program/run/property/view boundary and T03/T05/T06/T07/T08 relationship are proved.
-- [ ] Current API/runtime fit and a concrete Goal 2 preset/conformance stage are implementation-ready.
-- [ ] Global ledgers, independent review, embedded checks, coverage/diff gates, and repository tests pass.
+- [x] Every strict/Notes/split/actual-Index/alias/code/gallery/property/application/emulation candidate is dispositioned with zero remainder.
+- [x] Every relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and explicit exclusions.
+- [x] The exact preset/program/run/property/view boundary and T03/T05/T06/T07/T08 relationship are proved.
+- [x] Current API/runtime fit and a concrete Goal 2 preset/conformance stage are implementation-ready.
+- [x] Global ledgers, independent review, embedded checks, coverage/diff gates, and repository tests pass.
 
 ## Stage Results
 
-In progress. Initial evidence supports a strict T03 preset; exhaustive closure has not yet proved it.
+COMPLETE. The exact 12-query search oracle closes 243 candidates in the partition `34/53/11/20/51/30/27/17`; 15 evidence groups close 253 cited provenance lines, 92 unique quote fragments, and 90 unique quote lines. The physical-evidence ledger closes 72 source-linked assets at `35 included / 32 excluded / 5 relation-only`, including the four required excluded controls. All six embedded source, evidence, semantic, metadata, asset-semantic, and strict code-777 raster blocks pass.
+
+The construction is exactly the T03 preset `k=3`, `r=1`, `A=(0,1,2)`, and `nu(i)=i`, with seven sum cases, `3^7=2187` tables, and codes `0..2186`; preset resolution has the same structural program identity, hash, and executor types as the corresponding generic T03 program. It rejects valuation or parameter overrides. The page-76 50-code selection is not the 729-code T06 quiescent restriction, T07 reflection is derived, and T08 seed/run data remains separate. Exact code-777/code-867 trajectories and hashes, code-420 additivity, 15 structure plus five growth labels, and the corrected pictured-code labels 1659 and 1632 pass. Independent review, Markdown fences, `git diff --check`, and all 102 repository tests pass.
 
 ## Integration Results
 
-In progress. No global decision changes until the T04-specific audit closes.
+1. T04 does not invalidate an earlier semantic conclusion. The T03 evidence gap discovered during this audit was repaired and independently reclosed before T04 completion.
+2. No new state carrier, source selector, read, result, successor, termination, executor, or update law is required.
+3. D115-D118 fully describe the construction and ownership boundary; no D119 is warranted.
+4. T04 is a strict, zero-residue preset over the ordinary T03 structural identity, not a family or runtime dispatch name.
+5. Canonical alphabet order and valuation are fixed to `(0,1,2)` and `nu(i)=i`; noncanonical three-symbol valuations remain generic T03 programs rather than T04 variants.
+6. Rule restriction, proof/property, seed/run profile, gallery selection, palette, raster, and emulation records remain separate from program identity.
+7. T05 remains the higher-color radius-one preset question; T06, T07, and T08 retain their restriction, derived-property, and seed-class responsibilities.
+8. Goal 2 implements T04 only after the shared G2-T03 aggregate-rule construction and executor conformance, by adding a preset constructor plus identity/rejection fixtures rather than another execution path.
+9. The widened T03 source/asset closure, exact T04 code and trace fixtures, 72-link asset manifest, independent review, and unchanged repository suite supply the conformance evidence.
+10. The global API is simpler after reintegration: one fixed-lattice executor serves T01/T02/T03 and this T04 preset, while type traceability survives in preset and evidence metadata.

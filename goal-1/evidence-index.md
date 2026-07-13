@@ -28,8 +28,8 @@ Each type stage must make the following auditable:
 |---|---:|---|---:|---|---|---|
 | T01 | 2 | Elementary Cellular Automata | 1 | `2-T01-ELEMENTARY.md` | COMPLETE | 8 search families; 23 excerpt groups; all split/Notes/Index/cross-reference candidates dispositioned; 0 unresolved |
 | T02 | 3 | Multi-Color Nearest-Neighbor Cellular Automata | 2 | `21-T02-MULTICOLOR-CA.md` | COMPLETE | Exact 29-query/157-candidate partition; 21 evidence groups; 48 verbatim fragments; ordered `k^3` table/base-`k` codec; 11 included/6 excluded/2 relation-only assets; seven source/semantic/metadata/Voronoi/reversible/raster oracles; 0 unresolved |
-| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | REOPENED | Widened 17-query/309-candidate source partition and 116-link asset manifest pass at 48 included/60 excluded/8 relation-only; core semantics remain valid while fresh global/independent review remains pending |
-| T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | IN PROGRESS | Three-color preset evidence audit active |
+| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | COMPLETE | Exact 17-query/309-candidate partition; 21 evidence groups; 88 fragments/85 source lines; 116 linked assets at 48 included/60 excluded/8 relation-only; exact sum/table/codec and radius-two codes 10/20/52; six passing oracles; 0 unresolved |
+| T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | COMPLETE | Exact 12-query/243-candidate partition; 15 evidence groups; 253 cited provenance lines, 92 quote fragments, 90 quote lines; 72 assets at 35 included/32 excluded/5 relation-only; exact `k=3,r=1,A=(0,1,2),nu(i)=i` T03 preset, 2,187-code domain, source trajectories/properties/gallery distinctions, corrected labels, six embedded oracles, Goal 2 handoff, independent review, and 102 tests; 0 unresolved candidates |
 | T05 | 6 | Higher-Color Totalistic Cellular Automata | 5 | `24-T05-HIGHERCOLOR-TOTALISTIC.md` | PENDING | Not started |
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | PENDING | Not started |
 | T07 | 8 | Left-Right Symmetric Cellular Automata | 7 | `26-T07-SYMMETRIC.md` | PENDING | Not started |
@@ -75,12 +75,12 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 20 / 45.
-- Type stages reopened: 1.
-- Type stages unresolved: 23 pending, 1 in progress.
+- Type stages complete: 22 / 45.
+- Type stages reopened: 0.
+- Type stages unresolved: 23 pending, 0 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
 ## Reopened-Stage Log
 
-- T03 reopened during T04: named code-357/code-1329 and binary radius-two code-20 follow-through exposed omitted text/profile candidates, direct assets, and wider raster chains, contradicting the former exhaustive-manifest/physical-superset claim. Widened source/excerpt closure and the 48 included, 60 excluded, and 8 relation-only asset audit now pass; fresh global/independent review is still required before recompletion.
+- T03 reopening resolved during T04: named code-357/code-1329 and binary radius-two code-20 follow-through invalidated the former 118-candidate/37-10-2 closure. The replacement 309-candidate/116-asset bidirectional audit, exact semantics, global integration, fresh independent review, and 102 tests pass; T03 is complete again.

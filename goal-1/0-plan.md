@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T02/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 20 of 45 type stages complete, T03 reopened for fresh global/independent review after its widened source-and-asset repair, T04 Three-Color Totalistic Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T02/T03/T04/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 22 of 45 type stages complete, no type reopened or in progress, T05 Higher-Color Totalistic Cellular Automata next, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
@@ -80,7 +80,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - Alphabet rank, T03 numeric valuation, and palette tone are distinct. T03 is an exact fixed-arity equal-weight sum quotient plus a complete structural sum table; average is an exact label, sum zero is the least-significant code digit, and a noncanonical symbolic valuation defeats rank substitution. Mutation histories, reversibility, purpose searches, behavior labels, and binary emulations remain provenance/property/analyzer/relation records.
 - T02 closes an exact 29-query/157-candidate search partition and 21 evidence groups with no remainder. Eleven included, six excluded, and two relation-only assets are hash-pinned; source, semantic, metadata, direct Voronoi priority-table, reversible/inverse-window, and rule-921408 raster oracles pass.
 - T02 exposes current runtime defects rather than adding a branch: exhaustive arity is wrong, selector significance is mirrored, general outputs are binary-masked, ordinary lookup is not executable, and batch rule identity is coerced to fixed-width `int64`.
-- T03's core aggregate semantics, definition/formula excerpts, official-source repairs, and strict code-777 raster remain valid. Its former 16-query/118-candidate claim is superseded by a widened 17-query/309-candidate partition and exact 116-link manifest at `48 included / 60 excluded / 8 relation-only`; fresh global and independent review remain pending.
+- T03's core aggregate semantics, definition/formula excerpts, official-source repairs, and strict code-777 raster remain valid. Its former 16-query/118-candidate claim is superseded by a widened 17-query/309-candidate partition, 21 evidence groups, and exact 116-link manifest at `48 included / 60 excluded / 8 relation-only`; all six blocks, fresh independent review, and 102 repository tests pass.
 - T03 reuses T01/T02 fixed support, all-site old-snapshot reads, typed assignment, atomic commit, realization, and trace semantics. D115-D118 add only explicit numeric valuation, the exact sum case domain/table/codec, and typed preset/restriction/sibling boundaries; no executor or eleventh update law is added.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
@@ -677,7 +677,7 @@ All seven embedded oracles pass. They cover the `3^27` count, every binary speci
 
 ### 22-T03-TOTALISTIC-CA
 
-Status: **REOPENED** in `goal-1/22-T03-TOTALISTIC-CA.md` after T04 exposed omitted named-code text/profile routes, code-357/code-1329 and code-20 assets, and related controls. Semantic conclusions remain valid; widened source and asset closure now pass at 309 candidates and `48/60/8`, while independent/global review remains pending.
+Status: **COMPLETE** in `goal-1/22-T03-TOTALISTIC-CA.md` after repairing the omissions exposed by T04. The widened source and asset audit closes 309 candidates and 116 rasters at `48/60/8`; semantics, global integration, independent review, and repository verification pass.
 
 #### Big Picture Objective
 
@@ -689,19 +689,19 @@ Apply the common protocol, emphasizing sums/averages, rule coding, state count, 
 
 #### Completion Requirements
 
-Before recompletion, the widened T03 textual evidence must be captured, aggregation and evaluation responsibilities must remain explicit, and Goal 2/global integration must be re-reviewed against the repaired audit.
+Complete: the widened T03 textual and physical evidence is closed, aggregation/evaluation responsibilities remain explicit, and Goal 2/global integration has been re-reviewed against the repaired audit.
 
 #### Stage Result
 
-REOPENED during T04: later named-code routes exposed omitted text/profile passages, direct code-357/code-1329 and binary radius-two code-20 figures, and wider adjacent raster chains. The widened audit now partitions 309 candidates and 116 rasters at `48 included / 60 excluded / 8 relation-only`; the semantic core remains valid, but the former completion claim stays withdrawn until global summaries and independent re-review pass.
+COMPLETE after reopening during T04: later named-code routes exposed omitted text/profile passages, direct code-357/code-1329 and binary radius-two code-20 figures, and wider adjacent raster chains. The repaired audit partitions 309 candidates and 116 rasters at `48 included / 60 excluded / 8 relation-only`, with 21 evidence groups and exact radius-two code `10/20/52` conformance.
 
 The former `16-query / 118-candidate / 26-34-25-23-10` partition and associated split/evidence-group totals are retained only as historical audit output, not current exhaustion evidence. The valid semantic result is an explicit numeric valuation `nu:A->{0,...,k-1}` followed by the exact sum of `2r+1` old reads and a complete `M=1+(k-1)(2r+1)`-row structural table. The optional Wolfram code uses sum zero as the least-significant base-`k` digit. T01/T02 fixed-lattice assignment and atomic update are reused unchanged.
 
-The three repaired asset blocks pass: `48/60/8` disjoint physical dispositions, 68 explicitly followed continuation/boundary links, a 102-link mechanical reverse join with 23 query-false-only siblings mechanically outside, binary radius-two codes `10/20/52`, code-20 survival counts, code-357/code-1329 labels, code-420 additivity, exact code-777/code-867 trajectories, and the 946-cell strict code-777 raster. D115-D118 continue to preserve T04/T05 presets, T06/T07 restrictions/properties, and additive/outer/weighted/histogram/higher-dimensional/continuous/emulation/observer boundaries. No current completion, full-suite, or “no stage reopened” claim is made while T03 awaits global and independent re-review.
+The six embedded blocks pass: source/evidence closure, exact semantics, `48/60/8` metadata, a 102-link mechanical reverse join with 23 query-false-only siblings outside, binary radius-two codes `10/20/52`, code-20 survival counts, code-357/code-1329 labels, code-420 additivity, exact code-777/code-867 trajectories, and the 946-cell strict code-777 raster. D115-D118 preserve T04/T05 presets, T06/T07 restrictions/properties, and additive/outer/weighted/histogram/higher-dimensional/continuous/emulation/observer boundaries. Fresh independent review, fences, `git diff --check`, and all 102 repository tests pass; the reopening is resolved. Next: T04.
 
 ### 23-T04-THREECOLOR-TOTALISTIC
 
-Status: **IN PROGRESS** in `goal-1/23-T04-THREECOLOR-TOTALISTIC.md`.
+Status: **COMPLETE** in `goal-1/23-T04-THREECOLOR-TOTALISTIC.md`.
 
 #### Big Picture Objective
 
@@ -714,6 +714,10 @@ Apply the common protocol, emphasizing seven sum cases, rule numbering, seeds, a
 #### Completion Requirements
 
 All T04 evidence is captured; catalog identity remains traceable without duplicate runtime semantics; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+COMPLETE: the 12-query oracle partitions 243 candidates, 15 evidence groups close `253/92/90` provenance/fragment/line counts, and 72 assets close at `35 included / 32 excluded / 5 relation-only`. All six embedded checks prove the exact `k=3,r=1,A=(0,1,2),nu(i)=i` preset, its seven cases and 2,187 codes, exact code-777/code-867 trajectories, code-420 property, page-76/T06 distinction, corrected 1659/1632 labels, and preset/generic T03 identity. D115-D118 suffice; independent review, fences, diff checks, and all 102 tests pass. No executor or update law was added. Next: T05.
 
 ### 24-T05-HIGHERCOLOR-TOTALISTIC
 
