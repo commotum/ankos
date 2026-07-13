@@ -1,6 +1,8 @@
 # 6-T16-SEQUENTIAL-SUBSTITUTION
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. Rule-major/leftmost selection and exactly-one-span replacement are being recast as FRONTIER and UPDATE restrictions inside the shared runner.
 
 ## Current Facts
 

@@ -1,6 +1,8 @@
 # 10-T27-GEOMETRIC
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. Pose products, multiplicity-preserving bags, and parallel expansion with a bag combiner are transparent DOMAIN/ALPHABET/UPDATE choices inside the shared runner, not a geometric executor.
 
 ## Current Facts
 

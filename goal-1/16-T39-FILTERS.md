@@ -1,6 +1,8 @@
 # 16-T39-FILTERS
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. Visible `(survivors,cursor)` state remains required, while subset removal plus cursor advance is a typed UPDATE inside the shared runner, not a sieve executor.
 
 ## Current Facts
 

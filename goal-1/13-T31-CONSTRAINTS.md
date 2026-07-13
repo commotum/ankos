@@ -1,6 +1,8 @@
 # 13-T31-CONSTRAINTS
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. T31 remains genuinely non-transition, but its histogram form and query/certificate records are being placed under one generic declarative relation/model-set category.
 
 ## Current Facts
 

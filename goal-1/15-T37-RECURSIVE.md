@@ -1,6 +1,8 @@
 # 15-T37-RECURSIVE
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. The stage's own sufficient-window result reopens the claim that a full prefix is the only canonical Markov state; endpoint growth is an UPDATE choice inside the shared runner, not a recursive-sequence executor.
 
 ## Current Facts
 

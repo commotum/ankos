@@ -1,6 +1,8 @@
 # 21-T02-MULTICOLOR-CA
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. Composite finite alphabets and semantic-table versus rank-codec identity are being reintegrated without a T02-specific runtime class.
 
 ## Current Facts
 

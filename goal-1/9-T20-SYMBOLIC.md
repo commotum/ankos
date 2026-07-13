@@ -1,6 +1,8 @@
 # 9-T20-SYMBOLIC
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. Recursive tagged expressions and prefix-free replacements are transparent CONFIGURATION/RULE/UPDATE schemas inside the shared runner, not a symbolic executor.
 
 ## Current Facts
 

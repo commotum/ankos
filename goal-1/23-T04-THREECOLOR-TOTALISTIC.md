@@ -1,6 +1,8 @@
 # 23-T04-THREECOLOR-TOTALISTIC
 
-Status: **REOPENED**
+Status: **REOPENED — ASSET REPAIR AND ARCHITECTURE AUDIT**
+
+In addition to the bounded asset repair, the Goal 2 handoff is being reduced to a strict preset over the generic fixed-lattice local-rule construction.
 
 ## Current Facts
 

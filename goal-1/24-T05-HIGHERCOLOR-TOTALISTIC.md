@@ -1,6 +1,8 @@
 # 24-T05-HIGHERCOLOR-TOTALISTIC
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. The Goal 2 handoff is being reduced to a strict preset over the generic fixed-lattice local-rule construction.
 
 ## Current Facts
 

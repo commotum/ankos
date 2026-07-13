@@ -1,6 +1,8 @@
 # 5-T13-PARALLEL-SUBSTITUTION
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. T13 justifies a support-changing ordered-replacement policy on the shared `UPDATE` axis, not a construction-specific executor or top-level semantic class.
 
 ## Current Facts
 

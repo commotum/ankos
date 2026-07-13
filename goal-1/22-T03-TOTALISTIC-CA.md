@@ -1,6 +1,8 @@
 # 22-T03-TOTALISTIC-CA
 
-Status: **REOPENED**
+Status: **REOPENED — ASSET REPAIR AND ARCHITECTURE AUDIT**
+
+In addition to the bounded asset repair, the compact sum form and its validated exhaustive expansion are being reclassified as lossless representations of the same restricted local function, not distinct execution semantics.
 
 ## Current Facts
 

@@ -1,6 +1,8 @@
 # 14-T34-ARITHMETIC
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. T34 is a `t+0D` closed unary-map preset over an exact numeric value carrier and generic assignment, not a separate scalar executor.
 
 ## Current Facts
 

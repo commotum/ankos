@@ -1,6 +1,8 @@
 # 17-T41-FUNCTIONS
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. T41 remains non-transition, while function forms and pure queries are being consolidated under generic closed-function and query/result records.
 
 ## Current Facts
 

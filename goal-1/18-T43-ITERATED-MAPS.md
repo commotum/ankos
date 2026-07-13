@@ -1,6 +1,8 @@
 # 18-T43-ITERATED-MAPS
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. T43 and T34 share one `t+0D` closed unary-map/assignment construction; real/fixed representations and self-map validation are tagged carriers and invariants.
 
 ## Current Facts
 

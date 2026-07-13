@@ -1,6 +1,8 @@
 # 7-T17-TAG
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. Prefix read/delete roles and atomic consume/append remain semantic FRONTIER/NEIGHBORHOOD/RULE/UPDATE data, but do not justify a separate queue executor.
 
 ## Current Facts
 

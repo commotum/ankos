@@ -1,6 +1,8 @@
 # 12-T30-MULTIWAY
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. Multiway uses the shared rewrite runner with an UPDATE that lifts one successor to a set of successors; it does not require a multiway executor.
 
 ## Current Facts
 

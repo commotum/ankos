@@ -1,6 +1,8 @@
 # 2-T01-ELEMENTARY
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. D004/D007 and the Goal 2 handoff are reopened to separate generic atomic assignment from T01's fixed-lattice/table presets.
 
 ## Current Facts
 

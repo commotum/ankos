@@ -190,7 +190,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D009 — Frontier selects firing sources, not writable targets
 
-- Status: REOPENED by the representation-architecture audit.
+- Status: REVALIDATED by the representation-architecture audit; consequence wording pending final integration.
 - Basis: T09's rule applies at the old active cell, writes that source, and independently moves control to a neighbor (`BOOK:854-862`, `11957-11970`).
 - Consequence: `FRONTIER.select(state)` returns rule-firing/source loci. `RULE` results name effect targets and `UPDATE` applies them. T01 remains valid because each source and assignment target coincide; current writable-next-coordinate frontier wording must migrate.
 

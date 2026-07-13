@@ -1,6 +1,8 @@
 # 25-T06-QUIESCENT
 
-Status: **IN PROGRESS**
+Status: **PAUSED — ARCHITECTURE AUDIT PREREQUISITE**
+
+No T06 work may continue until `architecture-audit.md` is complete and all dependent handoffs are reintegrated.
 
 ## Current Facts
 

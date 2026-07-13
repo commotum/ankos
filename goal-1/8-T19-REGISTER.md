@@ -1,6 +1,8 @@
 # 8-T19-REGISTER
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. Register state is being re-derived as the transparent `FiniteRegisterBank × ProgramCounter` product on `t+0D`; `SingleControl`/`TransitionControl` are not required classes.
 
 ## Current Facts
 

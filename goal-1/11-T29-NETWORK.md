@@ -1,6 +1,8 @@
 # 11-T29-NETWORK
 
-Status: **COMPLETE**
+Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+
+The evidence/search closure and conformance fixtures remain valid. A rooted graph, graph occurrences/views, and typed create/rewire/project replacements are transparent DOMAIN/NEIGHBORHOOD/RULE/UPDATE choices inside the shared runner, not a network executor.
 
 ## Current Facts
 
