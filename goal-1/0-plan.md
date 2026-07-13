@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17 complete, 6 of 45 type stages complete, and Synthesis and Goal 2 Handoff pending. The next adversarial stage is T19 Register Machines.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19 complete, 7 of 45 type stages complete, T20 Symbolic Systems in progress, and Synthesis and Goal 2 Handoff pending.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -70,6 +70,10 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T17 tables are total `Sigma^q -> Sigma*` maps, so empty appendants are native while missing/duplicate rows are errors. This broadens only private word/edit capability; T13/T16 public nonempty laws remain unchanged.
 - T17 has zero successors with a retained `InsufficientPrefix` residue when required spans are unavailable. Wolfram's supplied history maps that residue to `{}` on the next requested sample; this is an explicit reference projection, not a fabricated semantic transition.
 - T17 supplies the bounded count `(sum_{j=0}^r k^j)^(k^q)` and the direct `50,625` oracle, but no canonical integer rule codec. Finite words, full ragged traces, queue provenance, and derived length/first-symbol/checkpoint views stay separate.
+- T19 adds a finite named register bank over exact arbitrary-precision naturals plus visible unit-payload program-address control. Code addresses and register keys are typed domains, not lattice coordinates or finite alphabet values.
+- T19 uses program-coupled active-instruction selection and instruction-owned named operand reads. Closed increment/decrement-jump results reuse `Assign`, `TransitionControl`, and `AtomicEffectsUpdate`; no new update algebra, instruction callback, or family rollout is required.
+- T19 reference semantics are event-free absorbing `Quiescent(PastProgramEnd)` with the exact state retained; an explicit `ProgramExitStop` interpretation may instead terminate. The last valid event, reference stutter, optional halt, wrap, horizon, external stop, invalidity, and error remain distinct.
+- T19's counted in-program target profile has `(k(n+1))^n` structured programs and no canonical integer codec. A general positive-target profile permits deliberate past-end exits; seeds remain independent and compressed zero-hit/arithmetic views remain event-derived observers.
 
 ## Assumptions To Challenge
 
@@ -298,7 +302,7 @@ All 175 direct occurrences on 111 unique lines and the complete mechanism, capti
 
 ### 8-T19-REGISTER
 
-Status: **IN PROGRESS** in `goal-1/8-T19-REGISTER.md`.
+Status: **COMPLETE** in `goal-1/8-T19-REGISTER.md`.
 
 #### Big Picture Objective
 
@@ -312,7 +316,13 @@ Apply the common protocol, emphasizing register identity, instruction definition
 
 All T19 evidence is captured; instruction execution is not hidden in an opaque formula callback; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+All 129 direct occurrences on 94 lines, 135 direct/alias occurrences on 95 lines, and the complete mechanism, image/caption, Notes, actual Index/split, history, count, program-control/end/halting, seed, observer, variant, universality, compiler, and reduction searches were dispositioned with zero unresolved native-mechanics candidates and 25 canonical excerpt groups. Two locally truncated Notes facts were repaired narrowly from official primary pages and guarded by main prose, counts, and independent execution. T19 reconstructs a finite named bank over exact naturals plus visible program-address control; an immutable instruction selects named operand reads and returns branch-specific assignment/control effects for the shared atomic update. Program exhaustion is exact event-free quiescence, while special exit halt is an explicit interpretation and implicit wrap is forbidden. Structured count profiles, five/eight-instruction trajectories, page-100 zero-hit checkpoints, the repaired 1,280-step witness, square-root exit, and arbitrary-precision tests close the handoff. T09/T12 control/effect/outcome responsibilities compose without their spatial/tape carriers; no prior stage was reopened. Next: T20.
+
 ### 9-T20-SYMBOLIC
+
+Status: **IN PROGRESS** in `goal-1/9-T20-SYMBOLIC.md`.
 
 #### Big Picture Objective
 
