@@ -140,32 +140,300 @@ Models(C) = {
 }
 ```
 
-The remaining evidence pass must freeze exact figures/profile tables, scopes, verification/certificate APIs, solver outcomes, variants, runtime fit, adversarial tests, and Goal 2 handoff.
+`allowed[center]` may be empty, so the syntax can denote an inconsistent relation. Every histogram is a vector in declared alphabet order with nonnegative entries summing to `degree`. A constraint value is valid without knowing whether `Models(C)` is empty.
+
+There is no materialized “state containing all models.” `Models(C)` is the mathematical denotation of finite program data. It is not enumerated, evolved, approximated by one tile, or packed into an object array.
+
+### Exact count relation and local verification
+
+For a closed model representation `X` and locus `p`:
+
+```text
+observed(C,X,p) =
+    histogram(
+      X[p + delta]
+      for delta in C.footprint
+    )
+
+satisfied_at(C,X,p) =
+    observed(C,X,p) in C.allowed[X[p]]
+
+violation_at(C,X,p) =
+    None
+    if satisfied_at(...)
+    else LocalViolation(
+      locus=p,
+      center=X[p],
+      observed=observed(...),
+      allowed=C.allowed[X[p]]
+    )
+```
+
+This is a pure relation check. The locus is not an active source; the violation is not a rule result; changing a cell to “repair” it is not T31.
+
+The strict reusable representation profiles are:
+
+```text
+PeriodicLatticeModel = {
+    dimension,
+    period_lattice / rectangular_period,
+    finite_fundamental_domain_values,
+    origin
+}
+
+FinitePatch = {
+    finite_values,
+    checked_anchor_set,
+    required_halo
+}
+```
+
+A periodic model defines an exact total field by quotienting lattice points through its declared period. Since the constraint is translation invariant, checking one complete fundamental domain proves the infinite field. An origin shift changes the pointwise field even when it lies in the same translation orbit.
+
+A finite patch makes only a scoped claim. Every checked anchor must have its entire footprint halo in the finite value map. Passing this check yields `LocallyConsistentPatch`, not an infinite model. Open, periodic, and infinite scopes are explicit types and cannot share a silent boundary option.
+
+### Model equality, symmetries, and solution-set observations
+
+Semantic models are pointwise total fields. Two periodic representations can be compared exactly by reducing both to a common period; structural tile equality alone is not the only possible representation equality. General infinite extensional equality need not be decidable and is not promised by the API.
+
+Translations, rotations, reflections, color permutations, minimal periods, orbit representatives, model counts, uniqueness, and entropy are explicit relations/observers. A caption that displays “the only” pattern with its rotations/reflections does not authorize quotienting exact models or prove a particular origin convention.
+
+### Verifier, certificates, and solver queries
+
+Constraint data and solving remain separate:
+
+```text
+ConstraintSystem             # immutable denotation
+ConstraintVerifier           # pure exact checks
+ConstraintSolver             # optional external algorithm
+
+QueryOutcome =
+    Satisfiable(witness, claim_scope, verification)
+  | Unsatisfiable(certificate, claim_scope)
+  | Unknown(reason, explored_scope)
+  | ResourceLimit(resource, explored_scope)
+```
+
+Examples of sound claims:
+
+- a verified periodic witness proves global satisfiability;
+- a verified finite patch proves only local consistency on its anchors;
+- failure to find any tile up to a period bound proves only “no witness in this search scope” and returns `Unknown` for global existence;
+- an exhaustive finite obstruction can prove global unsatisfiability.
+
+An exact replayable finite obstruction is:
+
+```text
+ExhaustiveFiniteObstruction = {
+    anchors: FiniteSet[LatticePoint],
+    variables: anchors + footprint_halo
+}
+
+replay:
+  for every assignment variables -> alphabet:
+      at least one anchor violates its local relation
+```
+
+If a global model existed, its restriction to `variables` would contradict this finite exhaustive proof. The checker recomputes the finite enumeration; no solver callback or trusted “unsat” boolean is accepted. More compact SAT/resolution certificates may be added later only with their own closed proof AST/checker.
+
+Search algorithms—square-spiral growth, backtracking, propagation, de Bruijn graphs, SAT encodings, memoization, symmetry breaking, heuristic ordering, and periodic bounds—consume a constraint/query but never become fields of the constraint value. Their diagnostic search trees are not program trajectories.
+
+### Exact 1D de Bruijn analyzer
+
+For a contiguous allowed-block profile of length `n` over `k` symbols:
+
+1. vertices are all length-`n-1` words;
+2. each allowed length-`n` block gives an edge from its prefix to suffix;
+3. a bi-infinite model exists iff the remaining finite graph contains a directed cycle;
+4. a directed cycle yields a periodic witness of period at most `k^(n-1)`;
+5. a DAG/no-cycle certificate proves unsatisfiability.
+
+For the first T31 profile, allowed triples are:
+
+```text
+001, 011, 100, 110
+```
+
+and the graph is the one cycle:
+
+```text
+00 -> 01 -> 11 -> 10 -> 00
+```
+
+It yields translations of `(0011)^infinity` and saturates the `2^(3-1)=4` period bound.
+
+### Canonical strict profiles
+
+Using binary alphabet `0=white,1=black`:
+
+```text
+one_black_one_white_neighbors_1d:
+  dimension = 1
+  footprint = {(-1),(+1)}
+  allowed[0] = {(one 0, one 1)}
+  allowed[1] = {(one 0, one 1)}
+
+at_least_one_unlike_neighbor_1d:
+  dimension = 1
+  footprint = {(-1),(+1)}
+  allowed[0] = {
+      (one 0, one 1),
+      (zero 0, two 1)
+  }
+  allowed[1] = {
+      (two 0, zero 1),
+      (one 0, one 1)
+  }
+
+black1_white2_same_neighbors_2d:
+  dimension = 2
+  footprint = {(-1,0),(+1,0),(0,-1),(0,+1)}
+  allowed[0] = {(two 0, two 1)}
+  allowed[1] = {(three 0, one 1)}
+```
+
+The second profile is equivalently “every run has length at most two.” The third profile's exact periodic witness is:
+
+```text
+00110
+11000
+00011
+01100
+10001
+```
+
+with both axes periodic of length 5. All 25 torus anchors satisfy the relation. Flipping the top-left bit produces exactly five violations at `(0,0),(1,0),(4,0),(0,1),(0,4)` under zero-based `(x,y)` coordinates, a strong boundary/orientation/histogram oracle.
+
+### Adversarial conformance oracles
+
+1. **Period-4 proof.** Verify all four phases of `0011` and the exact de Bruijn cycle; reject a phase containing a triple run.
+2. **Run constraint.** Alternating and `0011` models pass the at-least-one-unlike profile; any `000` or `111` occurrence produces an exact violation.
+3. **2D torus.** The recovered `5x5` tile has zero violations across all anchors; its one-bit perturbation has the five exact violations above.
+4. **Center-conditioned rows.** Swapping `allowed[0]` and `allowed[1]` generally changes the result; color counts are not a single center-blind totalistic rule.
+5. **Footprint orientation.** Cardinal degree four excludes diagonals and center. Duplicating or including the center is invalid.
+6. **Histogram codec.** Permuting alphabet serialization together with histogram entries is equivariant; permuting counts alone is not.
+7. **Pointwise identity.** A translated periodic field is a separate model even when an orbit observer groups it.
+8. **Scope.** A locally consistent open patch cannot be accepted as an infinite/torus model; missing halo is reported, not padded.
+9. **Witness replay.** Every `Satisfiable` periodic witness independently re-verifies over its fundamental domain.
+10. **Unsat replay.** On the 1D nearest-neighbor profile `allowed[0]={(one 0,one 1)}` and `allowed[1]=empty`, anchors `{0,1,2}` with halo `{-1,0,1,2,3}` are an exhaustive obstruction: every anchor would have to be 0, so the middle anchor sees two 0 neighbors. The checker must independently replay all assignments.
+11. **Unknown.** Exhausting a deliberately small period/search bound returns `Unknown` for the global problem, never `Unsatisfiable`.
+12. **Search independence.** Different search orders may find different exact models but cannot change the constraint or validity of a witness.
+13. **No gray state.** Partial assignments belong only to a solver trace; model verification rejects undeclared gray/unassigned values.
+14. **Validation.** Reject empty alphabet/footprint, zero/duplicate/mixed-dimension offsets, missing center row, undeclared symbol, negative/wrong-sum histogram, malformed period, incomplete tile, and callbacks.
+
+## Variants, Relations, and Boundaries
+
+- **T31 local count constraints:** orientation-insensitive center-conditioned neighbor histograms on declared regular-lattice footprints.
+- **T32 template constraints:** exact oriented allowed local templates; histograms cannot preserve orientation.
+- **T33 seeded/required-template constraints:** adds an existential global occurrence/anchor requirement; not an optional T31 predicate.
+- **General allowed-block/subshift-of-finite-type systems:** a relation/bridge; contiguous 1D blocks admit the de Bruijn analyzer, while T32 owns general oriented template syntax.
+- **Cellular-automaton fixed points/spacetime encodings:** reductions/relations. A CA update or fixed-point search is not native constraint coverage.
+- **Spin/Ising ground states and energy minimization:** optimization constructions; zero-energy local clauses may compile only under proved equivalence.
+- **Tilings/Wang tiles and network constraints:** different carriers/topologies and matching rules.
+- **Sequence/string equations, pattern avoidance, PCP, Diophantine equations:** constraint relatives with separate value domains and decision problems.
+- **Finite periodic torus:** exact representation/query scope for a periodic infinite field, not a finite approximation or boundary default.
+- **Finite open region:** local verification/search scope only.
+- **Model finding, enumeration, counting, uniqueness, entropy, symmetry orbits, and visualization:** solver/query/observer layers.
+- **Repair dynamics, belief propagation, SAT, backtracking, and stochastic search:** algorithms external to the constraint semantics.
 
 ## Current API Fit
 
-Initial conclusion: finite alphabet and lattice offset geometry may be reusable data responsibilities, but every frontier/rule/update/trajectory mechanism is not applicable. Constraints require a declarative spec plus verifier/solver-query boundary outside the transition executor.
+| T31 responsibility | Current proposal fit | Required conclusion |
+|---|---|---|
+| Infinite regular domain | Current finite dense rank-0..3 shape | SEMANTIC MISMATCH; reuse T01 total-lattice concept and exact periodic realizations |
+| Alphabet | Declared finite symbolic/integer values | DIRECT |
+| Footprint | Offset neighborhoods/Von Neumann shapes | PARAMETERIZATION as topology-owned data, without time/boundary/update semantics |
+| Local summary | Totalistic neighbor aggregation | PRIVATE KERNEL REUSE for histograms only |
+| Constraint relation | Per-target next-value rule/predicate | SEMANTIC MISMATCH; add total center->allowed-histogram data |
+| State/time | Current snapshot/trajectory | NOT APPLICABLE; denotation is a model set |
+| Source/read/result/update | Frontier pipeline | NOT APPLICABLE; no transition event exists |
+| Seed/initial condition | Seed catalog | NOT APPLICABLE |
+| Boundary | Fixed/periodic/reflective gather | SEMANTIC MISMATCH as native semantics; scope/model representation owns periodicity |
+| Outcome | `Advanced/Terminal/Quiescent` | SEMANTIC MISMATCH; solver query outcomes are separate |
+| Trace | Dense temporal episode | NOT APPLICABLE; solver diagnostics and model encodings are separate |
+| Solver | `FORMULAIC` or family rollout | SEMANTIC MISMATCH; external explicit incomplete algorithms/certificates |
+
+This is the first categorical failure of the transition executor shell. Sharing finite alphabets, lattice offsets, histogram kernels, serialization, and error infrastructure remains meaningful, but no vacuous “zero-step rollout” or constraint `UPDATE` is introduced.
 
 ## Current Runtime Fit
 
-Initial audit finds no model-set, violation, periodic-witness, finite-obstruction, `Unknown`, or solver-certificate types. Totalistic CA summaries may share a private histogram kernel only; compiling to CA fixed points or adding a constraint family rollout is rejected.
+| Runtime area | Finding | T31 disposition |
+|---|---|---|
+| `alphabets.py` | Closed finite symbolic/integer alphabets | Reuse |
+| `loci.py` | Finite coordinate universes and predicates | Extract/reuse typed offsets only; no finite shape as `Z^d` |
+| `neighborhoods.py` | Axis/L1/Von Neumann geometry plus temporal gathers | Reuse a topology-owned footprint value, not CA read behavior |
+| `rules.py` | Aggregate/gate/lookup/callable next values | No constraint semantics; private histogram utility at most |
+| `frontiers.py` | Dense time slice | Not applicable |
+| `specs.py` | `Dynamics` with shape/rule/boundary | Add a separate constraint spec category, not a dynamics family |
+| `rollout.py` | Family-dispatched time evolution | Must not receive a constraint branch |
+| `datasets.py` | Trajectory planning/stacking | Constraint datasets require model/query/result records downstream |
+| tests | No verifier/certificate/unknown/scope coverage | Add independent structural tests |
+| visualization | Dense frame/trajectory views | Render verified models or solver diagnostics only downstream |
+
+No current verifier, periodic-model proof, obstruction certificate, scoped query outcome, or honest incomplete solver exists.
 
 ## Principles Audit
 
-Pending evidence closure. Provisional rejections include repair/update dynamics, predicate/solver callbacks, gray as a color, one witness as the solution set, bound exhaustion as unsatisfiability, open/periodic scope confusion, finite grids as `Z^d`, CA fixed-point substitution, automatic symmetry quotient, T32 oriented templates collapsed to counts, T33 existential requirements hidden in a global predicate, and solver traces as trajectories.
+- **Principle 0:** the model set/constraint relation must remain declarative. A repair trajectory or one witness does not preserve the construction.
+- **Principles 1-4:** immutable domain/footprint/histogram relation, exact verifier, and explicit query outcomes are closed data; transition responsibilities are correctly absent.
+- **Principle 5:** no hidden solver/search state is needed to define satisfaction. Partial assignments belong to algorithm diagnostics.
+- **Principles 6-8:** infinite loci, periodic quotient coordinates, finite patch loci, solver variables, display pixels, and batch slots are separate. No finite capacity fakes `Z^d`.
+- **Principles 9-10:** canonical profiles are strict constraint data presets, not solver/rollout families.
+- **Principle 11:** center-conditioned histogram membership at every site is semantic; enumeration order, SAT encoding, and heuristics are incidental.
+- **Principle 12:** verified model/certificate/query data precede tiles, symmetry representatives, search trees, and images.
+- **Principles 13-15:** period proofs, one-bit perturbation, open/torus scope, bounded `Unknown`, and certificate replay are adversarial tests.
+- **Principles 16-17:** constraints require a distinct semantic category rather than a ninth transition update. T32/T33 cannot be flags or callbacks.
+
+Rejected shortcuts:
+
+- repair CA/dynamics, fixed-point iteration, relaxation, belief propagation, or local recoloring presented as the constraint;
+- predicate/SAT/backtracking/whole-problem callback inside the spec or a `constraint` rollout family;
+- gray/unassigned as a semantic symbol, hidden search state, random seed, or solver trace as trajectory;
+- one witness as the whole solution set, one failed solver as unsatisfiability, one found tile as uniqueness, or symmetry orbit as pointwise equality;
+- bounded periodic/patch exhaustion as global unsat; unscoped/trusted certificates or `Unknown` collapsed into false;
+- finite grids/padding/boundaries as infinite fields; open edges used as torus/infinite checks;
+- CA fixed-point, totalistic next-value, tiling, energy, or graph compilation solely to claim native coverage;
+- T32 oriented templates collapsed to histograms or T33 existential requirements smuggled into a global predicate/flag.
 
 ## Detailed Implementation Plan
 
-1. Close direct/alias/proximity, figures, Notes, actual Index, split, search/complexity, allowed-block, periodicity, ground-state/CA, tiling, T32/T33, network, equation, and solver candidates.
-2. Freeze declarative carrier, histogram relation, exact model equality, infinite/periodic/open scopes, verification, witnesses, finite obstruction, solver outcomes, and incompleteness.
-3. Recover exact 1D/2D profiles, page-227 satisfiability table, periodic witnesses, and adversarial verification/certificate tests.
-4. Compare every responsibility with current API/runtime and prior transition stages; record the first categorical executor split.
-5. Audit no-cheating constraints, variants, symmetry/views, serialization, batching, and Goal 2 dependencies.
-6. Reintegrate all ledgers and write the implementation-ready constraint/verifier/solver handoff.
+1. Close direct/alias/proximity, figure, Notes, actual Index, split, history, allowed-block, periodicity, search/complexity, CA/ground-state, tiling, T32/T33, network, equation, solver, and observer candidates.
+2. Freeze declarative total-field denotation, footprint/histogram relation, exact pointwise model identity, periodic/open scopes, verifier/violations, witnesses, finite obstructions, solver outcomes, and incompleteness.
+3. Recover exact 1D profiles/de Bruijn proof, the 2D `5x5` tile, all page-227 profile classifications, and adversarial verification/certificate/scope tests.
+4. Compare every responsibility with `simple_programs.md`, current runtime/tests, and prior transition stages; record the first categorical executor split.
+5. Audit no-cheating constraints, variants, symmetry/views, serialization, model/query datasets, and Goal 2 dependencies.
+6. Reintegrate global evidence/design/plan ledgers and write the implementation-ready constraint/verifier/solver stage.
 
 ## Goal 2 Implementation Stage
 
-Pending evidence closure. It will specify immutable count-constraint data, infinite/periodic model representations, exact verifier/violations, replayable certificates, independent incomplete solver outcomes, canonical profiles, tests, and repository integration without a transition rollout or solver callback.
+### G2-T31 — Declarative local-count models, exact verification, and scoped solver results
+
+Dependencies: finite alphabet values; T01's semantic total-lattice/finite-realization distinction; a synthesis-selected exact lattice-point/offset value and error/serialization infrastructure. Do not depend on `Dynamics`, the transition executor, totalistic next-value rules, a SAT/solver callback, or T32/T33 semantics.
+
+1. Add a separate constraint-owned module such as `src/ca/constraints.py` with `LatticeFootprint`, `NeighborHistogram`, and immutable `LocalCountConstraintSystem`. Validate dimension, nonzero duplicate-free offsets, total center rows, alphabet order, histogram nonnegativity/degree, and closed serialization.
+2. Add exact `PeriodicLatticeModel` and `FinitePatch` representations with explicit period/origin or anchor/halo scopes. Implement exact point queries, normalization, pointwise comparison for periodic models, and no padding/boundary fallback.
+3. Add pure `observed_histogram`, `satisfied_at`, `violation_at`, `verify_periodic`, and `verify_patch`. Periodic verification checks a complete fundamental domain and returns proof metadata; patch verification labels only the checked scope.
+4. Add a separate constraint-query/result module with `ClaimScope` and closed `Satisfiable`, `Unsatisfiable`, `Unknown`, and `ResourceLimit` records. These must not implement or subclass transition `Advanced/Terminal/Quiescent` outcomes.
+5. Add replayable `ExhaustiveFiniteObstruction` checking: derive the complete halo, enumerate every finite assignment, and prove each violates an anchor. Keep future compact proof ASTs behind independent verified types, never callbacks or trusted booleans.
+6. Add a solver-owned module such as `src/ca/constraint_solvers.py` with an exact 1D de Bruijn analyzer, bounded periodic-model search, and bounded finite-obstruction search. Every returned witness/certificate rechecks independently; exhausted incomplete bounds return `Unknown`.
+7. Add strict constructors for the two 1D profiles, canonical 2D black1/white2 profile, recovered `5x5` model, and page-227 profile data once independently transcribed. Keep constraint, query bounds, and solver strategy separate.
+8. Add downstream symmetry-orbit, period, model-count, tile/image, search-tree, and dataset encodings. Do not represent solution sets as episodes or stack unlike query/model records into dense trajectories.
+9. Add exact canonical/adversarial tests below and cross-check small finite/periodic scopes by independent brute force. Image tests are supplementary.
+10. Audit exports, specs, docs, datasets, and production code for transition/family branches, callbacks, gray values, hidden bounds, one-witness collapse, false UNSAT, scope confusion, symmetry quotienting, finite-capacity claims, CA compilation, and T32/T33 flags.
+
+Completion requires:
+
+- constraint/footprint/histogram normalization, serialization, equality, and malformed-data tests;
+- exact `0011` translations, allowed triples, de Bruijn cycle/period bound, and a no-cycle unsat certificate;
+- at-least-one-unlike run tests including triple-run violations;
+- exact `5x5` periodic tile verification at all 25 anchors, rotations/reflections as explicit relations, and the five-violation one-bit perturbation;
+- page-227 `25` profile/classification data including the two unsatisfiable and infinite/two-family cells;
+- explicit pointwise-versus-symmetry-orbit and structural-versus-extensional periodic equality tests;
+- open patch/halo, torus, and infinite claim-scope separation;
+- a three-anchor 1D exhaustive obstruction such as `allowed[0]={(1,1)}, allowed[1]=empty`, with independent replay;
+- solver witness reverification, bounded-period exhaustion as `Unknown`, resource outcome, and search-order independence;
+- no gray/model callback/solver callback/repair dynamics/transition outcome/fake finite domain tests;
+- unchanged prior transition semantics, no constraint rollout branch, and all repository tests passing.
 
 ## No-Cheating Checks
 
@@ -179,6 +447,9 @@ Pending evidence closure. It will specify immutable count-constraint data, infin
 - No CA fixed-point compilation, totalistic next-value rule, ground-state minimizer, or T32/T33 collapse used merely to claim coverage.
 - No automatic translation/rotation/reflection/color quotient as model equality.
 - No solver search trace, branch ordering, heuristic, limit, or gray picture serialized as a program trajectory.
+- No `Advanced/Terminal/Quiescent` alias for solver results and no “zero-step dynamics” wrapper around the solution set.
+- No structural tile equality presented as full pointwise equality when periods/origins differ.
+- No incomplete bounded search allowed to publish an ordinary exact result.
 
 ## Completion Requirements
 
