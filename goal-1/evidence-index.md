@@ -28,7 +28,7 @@ Each type stage must make the following auditable:
 |---|---:|---|---:|---|---|---|
 | T01 | 2 | Elementary Cellular Automata | 1 | `2-T01-ELEMENTARY.md` | COMPLETE | 8 search families; 23 excerpt groups; all split/Notes/Index/cross-reference candidates dispositioned; 0 unresolved |
 | T02 | 3 | Multi-Color Nearest-Neighbor Cellular Automata | 2 | `21-T02-MULTICOLOR-CA.md` | COMPLETE | Exact 29-query/157-candidate partition; 21 evidence groups; 48 verbatim fragments; ordered `k^3` table/base-`k` codec; 11 included/6 excluded/2 relation-only assets; seven source/semantic/metadata/Voronoi/reversible/raster oracles; 0 unresolved |
-| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | COMPLETE | Exact repaired 18-query/312-candidate partition; 22 evidence groups; 211 cited provenance lines, 89 quote fragments on 86 lines; 118 assets at 50 included/60 excluded/8 relation-only; 104-link reverse join; code-1004600 Notes/plots repair; six embedded oracles, independent review, and 102 tests; semantic sum/table/codec result unchanged; 0 unresolved candidates |
+| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | REOPENED | T06 reverse traversal found retained caption BOOK:18770's omitted direct network raster at BOOK:18772; widening the prior 312-candidate/118-asset closure; semantic sum/table/codec result unchanged |
 | T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | COMPLETE | Exact 12-query/243-candidate partition; 15 evidence groups; 253 cited provenance lines, 92 quote fragments, 90 quote lines; 72 assets at 35 included/32 excluded/5 relation-only; exact `k=3,r=1,A=(0,1,2),nu(i)=i` T03 preset, 2,187-code domain, source trajectories/properties/gallery distinctions, corrected labels, six embedded oracles, Goal 2 handoff, independent review, and 102 tests; 0 unresolved candidates |
 | T05 | 6 | Higher-Color Totalistic Cellular Automata | 5 | `24-T05-HIGHERCOLOR-TOTALISTIC.md` | COMPLETE | Exact 11-query/142-lexical-line partition plus five governed follows and 25 assets = 172 candidates; 12 evidence groups at 47 provenance/47 fragments/40 quote lines; assets 5 included/13 relation-only/7 excluded; strict finite `k>=4,r=1` canonical T03 preset, code-1004600/cardinality/bigint/snapshot fixtures, five embedded oracles, independent review, and 102 tests; 0 unresolved candidates |
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | IN PROGRESS | Exact blank/white-background, invariant-state, rule-predicate, asset, API, and runtime audit active |
@@ -75,8 +75,8 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 23 / 45.
-- Type stages reopened: 0.
+- Type stages complete: 22 / 45.
+- Type stages reopened: 1.
 - Type stages unresolved: 21 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
@@ -84,3 +84,4 @@ Each type stage must make the following auditable:
 ## Reopened-Stage Log
 
 - T03 reopened and reclosed during T05: named code-`1004600` had been included as a four-color totalistic profile, but its Notes continuation at canonical line 19234 and linked lines 19236/19238 were absent from the claimed 309-candidate/116-asset closure. The repaired 18-query/312-candidate and 118-asset manifest, all six checks, fresh independent review, and 102 tests pass; the semantic result remains unchanged.
+- T03 reopened again during T06: the stage retained the quiescent-symmetric elementary emulation caption at `BOOK:18770` but omitted its explicit network raster link at `BOOK:18772`. The bounded source/asset/reverse-join repair and independent re-review are active; no semantic conclusion has changed.
