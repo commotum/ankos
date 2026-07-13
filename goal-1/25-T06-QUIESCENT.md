@@ -152,7 +152,7 @@ These 128 lines have no remainder inside the narrow query union, but that union 
 | 18 | actual-Index stable/bistable/metastable routes | 0 | 3 |
 | 19 | actual-Index uniformity/state routes | 0 | 18 |
 
-The 280-line protocol subledger has the disjoint semantic disposition `4/25/111/66/6/68`: direct native evidence, CA invariant-property relations, CA seed/background/profile/view evidence, sibling SimpleProgram aliases outside strict T06 eligibility, general controls, and actual-Index routes. This classification is deliberately strict: a line enters the CA-axis groups only when its subject is a cellular automaton or an explicit CA relation. The same words in substitutions, symbolic systems, PDEs, physics, networks, or generic data analysis remain sibling aliases or controls.
+The 280-line protocol subledger has the disjoint semantic disposition `4/25/112/65/6/68`: direct native evidence, CA invariant-property relations, CA seed/background/profile/view evidence, sibling SimpleProgram aliases outside strict T06 eligibility, general controls, and actual-Index routes. This classification is deliberately strict: a line enters the CA-axis groups only when its subject is a cellular automaton or an explicit CA relation. The same words in substitutions, symbolic systems, PDEs, physics, networks, or generic data analysis remain sibling aliases or controls.
 
 ```bash
 python3 - <<'PY'
@@ -168,11 +168,11 @@ index=ns('20900,20914,20946,20965,20967,20972,21014,21042,21046,21050,21054,2106
 
 direct=ns('784,1346,2798,2926')
 ca_property=ns('2714,2720,2726,2728,2730,2742,2750,2794,3230,3234,3236,3310,3958,4068,4070,4072,4078,4082,4084,4152,14046,14113,14717,18770,19266')
-ca_profile=ns('432,440,450,472,476,500,518,538,550,566,730,746,754,790,846,1348,1350,1956,1982,2180,2184,2230,2256,2262,2914,2916,2918,3046,3060,3066,3070,3076,3082,3084,3086,3090,3152,3158,3382,3388,3704,3780,3902,4264,4274,4306,4424,4480,5058,5232,5238,5242,5278,5316,6340,6636,6644,6684,6784,6788,7232,7722,7744,8400,8410,8416,8430,8606,8668,8754,9044,10648,11505,11579,11585,12065,13296,13579,14213,14241,14281,14317,14331,14341,14429,14536,14537,14748,14764,14776,15326,15581,15641,15959,16052,16053,16060,16173,17103,17813,18486,18498,18749,18764,19060,19072,19264,19584,20118,20126,20586')
-nonca=ns('478,1238,1886,1938,2102,2706,3072,3204,4032,4034,4086,4818,5258,5280,5360,5366,5488,5492,6200,6320,6332,6510,6526,6532,6538,6648,6796,6978,7028,8350,8578,8582,8584,8664,8744,8746,8748,8990,9178,11551,12452,12457,12470,12915,13265,13300,13722,13798,14386,14483,14699,14701,15191,15209,15546,15550,15554,15570,16109,16232,16241,18453,18956,19240,19242,20149')
+ca_profile=ns('432,440,450,472,476,500,518,538,550,566,730,746,754,790,846,1348,1350,1956,1982,2180,2184,2230,2256,2262,2914,2916,2918,3046,3060,3066,3070,3076,3082,3084,3086,3090,3152,3158,3382,3388,3704,3780,3902,4264,4274,4306,4424,4480,5058,5232,5238,5242,5278,5316,6340,6636,6644,6684,6784,6788,7232,7722,7744,8400,8410,8416,8430,8606,8668,8754,9044,10648,11505,11579,11585,12065,13296,13300,13579,14213,14241,14281,14317,14331,14341,14429,14536,14537,14748,14764,14776,15326,15581,15641,15959,16052,16053,16060,16173,17103,17813,18486,18498,18749,18764,19060,19072,19264,19584,20118,20126,20586')
+nonca=ns('478,1238,1886,1938,2102,2706,3072,3204,4032,4034,4086,4818,5258,5280,5360,5366,5488,5492,6200,6320,6332,6510,6526,6532,6538,6648,6796,6978,7028,8350,8578,8582,8584,8664,8744,8746,8748,8990,9178,11551,12452,12457,12470,12915,13265,13722,13798,14386,14483,14699,14701,15191,15209,15546,15550,15554,15570,16109,16232,16241,18453,18956,19240,19242,20149')
 controls=ns('3976,6548,6836,6864,16739,17263')
 parts=[direct,ca_property,ca_profile,nonca,controls,index]
-assert [len(x) for x in parts]==[4,25,111,66,6,68]
+assert [len(x) for x in parts]==[4,25,112,65,6,68]
 assert len(pre)==212 and len(index)==68 and max(pre)<IX<=min(index)
 assert sum(map(len,parts))==len(set().union(*parts))==280
 assert set().union(*parts)==pre|index
@@ -254,24 +254,24 @@ assert extras==narrow_only|governed and len(extras)==49
 merged_parts=[direct,ca_property|extra_property,ca_profile|extra_profile,
               nonca|extra_nonca,controls|extra_controls,index|extra_index]
 evidence=union|extras
-assert [len(x) for x in merged_parts]==[4,30,128,77,21,69]
+assert [len(x) for x in merged_parts]==[4,30,129,76,21,69]
 assert sum(map(len,merged_parts))==len(set().union(*merged_parts))==329
 assert set().union(*merged_parts)==evidence
-print('T06 lexical core: PASS 19 derived families; 212+68=280; partition=4,25,111,66,6,68')
-print('T06 evidence reconciliation: PASS 280 core + 44 narrow-only + 5 governed = 329; partition=4,30,128,77,21,69')
+print('T06 lexical core: PASS 19 derived families; 212+68=280; partition=4,25,112,65,6,68')
+print('T06 evidence reconciliation: PASS 280 core + 44 narrow-only + 5 governed = 329; partition=4,30,129,76,21,69')
 PY
 ```
 
 Recorded output:
 
 ```text
-T06 lexical core: PASS 19 derived families; 212+68=280; partition=4,25,111,66,6,68
-T06 evidence reconciliation: PASS 280 core + 44 narrow-only + 5 governed = 329; partition=4,30,128,77,21,69
+T06 lexical core: PASS 19 derived families; 212+68=280; partition=4,25,112,65,6,68
+T06 evidence reconciliation: PASS 280 core + 44 narrow-only + 5 governed = 329; partition=4,30,129,76,21,69
 ```
 
 ### Reconciled canonical evidence closure
 
-The authoritative evidence universe is the union proved above, not either regex family in isolation. The 44 narrow-only lines are `1170,2002,2036,2372,2438,2446,2722,3114,3402,3406,3792,4176,4178,5206,6392,6512,6842,8406,11124,11140,11277,13060,13304,13377,14099,14349,14693,14768,14795,16105,16257,16691,16737,16940,17033,17045,17439,17481,18113,18765,18850,19702,20521,21517`; the five governed continuations are `2868,2922,2930,14243,18766`. Together with the 280-line protocol core they close 329 distinct canonical lines in the exact disjoint disposition `4/30/128/77/21/69`. Continuous-CA profile lines remain CA profile evidence consistently with the core ledger; PDE limits, substitutions, networks, constraints, and other sibling programs remain outside strict T06 eligibility without becoming different runner families.
+The authoritative evidence universe is the union proved above, not either regex family in isolation. The 44 narrow-only lines are `1170,2002,2036,2372,2438,2446,2722,3114,3402,3406,3792,4176,4178,5206,6392,6512,6842,8406,11124,11140,11277,13060,13304,13377,14099,14349,14693,14768,14795,16105,16257,16691,16737,16940,17033,17045,17439,17481,18113,18765,18850,19702,20521,21517`; the five governed continuations are `2868,2922,2930,14243,18766`. Together with the 280-line protocol core they close 329 distinct canonical lines in the exact disjoint disposition `4/30/129/76/21/69`. Continuous-CA profile lines remain CA profile evidence consistently with the core ledger; PDE limits, substitutions, networks, constraints, and other sibling programs remain outside strict T06 eligibility without becoming different runner families.
 
 The Q01-Q13 split-corpus cross-check for the 19-family core found 224 raw matches. Seventeen split-only punctuation/line-join variants and 18 monolith non-byte mirrors reconcile without a new semantic candidate; one combined split line mirrors both `BOOK:8578` and `BOOK:8584`. The actual split Index offset is `+17443` at Colophon line 3383. No split-only construction changes the reconciled six-way disposition.
 
@@ -749,7 +749,7 @@ D111-D118 remain valid. The following T06 decision is integrated globally as D11
 
 ## Detailed Implementation Plan
 
-1. **Complete:** reconcile the retained nine-family diagnostic, the 19-family/280-line core, and five governed continuations into the exact 329-line `4/30/128/77/21/69` canonical closure across prose, Notes, actual Index, splits, relations, profiles, and controls.
+1. **Complete:** reconcile the retained nine-family diagnostic, the 19-family/280-line core, and five governed continuations into the exact 329-line `4/30/129/76/21/69` canonical closure across prose, Notes, actual Index, splits, relations, profiles, and controls.
 2. **Complete:** follow relevant assets in both directions and pin the exact 47-file/94-reference `5/29/13` closure.
 3. **Complete:** check structural predicates and counts for elementary, generic ordered-table, and totalistic rules, including arbitrary-blank and codec adversaries.
 4. **Complete:** audit current documentation/runtime/tests and the T01-T05/T07/T08 boundaries.
@@ -804,7 +804,7 @@ Goal 2 should expose a small convenience constructor for the catalog row only af
 
 ## Completion Requirements
 
-- [x] The independently inspected evidence union has exactly 329 canonical lines and the exact `4/30/128/77/21/69` disposition; its 19-family core remains pinned at 280, and split variants add no semantic candidate.
+- [x] The independently inspected evidence union has exactly 329 canonical lines and the exact `4/30/129/76/21/69` disposition; its 19-family core remains pinned at 280, and split variants add no semantic candidate.
 - [x] The exact 47 relevant assets are hash-pinned and classified `5/29/13`; all 94 monolith/split reverse references close.
 - [x] The predicate, typed member identity, verdicts, counts/code relations, and rule/seed/background/boundary/halt/property distinctions are closed across eligible rule descriptions.
 - [x] Current API/runtime fit and the 15-group Goal 2 restriction/conformance handoff are implementation-ready.
