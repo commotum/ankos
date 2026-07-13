@@ -118,6 +118,8 @@ Every presentation has:
 - validation that all values are ALPHABET members and all global invariants hold; and
 - an inverse or canonical re-encoding on the representation's declared image when it is claimed lossless.
 
+A constructor is not required to be invertible: two named presets may intentionally construct the same `X_0`. The inverse and one-step commuting obligations apply only when an object claims to be a compact representation or a finite-realization lowering of a configuration, not merely a convenient constructor.
+
 Overlapping overrides with unequal values, an uncovered piecewise region, a nonperiodic tile declaration, a dangling derivation, and an assignment outside the DOMAIN are invalid. Last-write-wins order is not invented. A palette rank cannot supply “white”, “gray”, or “black”; each source role resolves to an explicit typed alphabet member.
 
 The finite list used by a practical implementation has no intrinsic boundary meaning. An explicit list on a declared finite cyclic DOMAIN is a complete finite configuration. A window cut from an infinite point or periodic field is instead a materialization. The source's finite cyclic program and its infinite periodically repeated configuration can be related by a quotient/covering map, but they are not the same configuration object merely because their arrays coincide.
@@ -322,12 +324,23 @@ Current runtime reuse is real but narrower than the catalog abstraction:
 | `compound`/structured factories | useful presentation vocabulary | preserve component values, distributions, conflicts, DOMAIN, and provenance instead of reducing to one scalar mask/union |
 | `DatasetSpec`/`EpisodePlan` (`src/ca/datasets.py:57-128`) | downstream experiment recipes | keep shape, split, held-out stream, transforms, boundary, batching, and RNG planning outside program and mathematical law identity |
 | Raw episode records (`src/ca/specs.py:58-81`) | trace carrier | add exact initial-configuration/profile/sample references so temporal history and realization provenance are recoverable |
+| SplitMix helpers (`src/ca/rng.py:20-70`) | reusable deterministic key derivation | bind algorithm/version/counter and draw mapping to sample provenance; a stable integer key alone does not define the mathematical law |
+| Viewer/export (`src/ca/viz/export.py:177-195`) | explicitly lossy dense observer | retain as a declared view, but never use rejection of object/float/symbolic values to narrow semantic configuration types |
 
 All current rendered spatial values are coerced into `np.int64`; one `selected_value` and `fill_value` cannot carry a composite Turing cell, heterogeneous component assignment, exact real, symbolic value, or schema invariant. `support=None` and a finite `shape` silently turn “whole native DOMAIN” into “this tensor.” A point selector with a nonzero time coordinate is also not representable faithfully once rendering drops the time axis. These are representation gaps, not reasons for a seed executor.
 
 Temporal rollout reveals a more serious state boundary. `_rollout_ar2` treats `(x[-1],x[0])` as hidden previous/current values but serializes only `x[0],x[1],...` (`src/ca/rollout.py:334-359`). `_rollout_temporal_lookup` does the same with three lag values (`:362-413`). `_rollout_lagcounts` first serializes ten individual seed values, then evolves one packed ten-bit state (`:417-476`). The rule-generated successor depends on information absent from the serialized scalar “state,” and the apparent configuration schema changes during one episode. Goal 2 must make the tuple/shift register the ordinary `t+0D` configuration at every event and move scalar series into an observer projection.
 
 Current tests establish factory shapes, deterministic placement, some RNG reproducibility, and dataset behavior. They do not establish schema membership, typed/composite values, exact law identity, iid versus mixture/fixed composition, native infinite presentations, coordinate-order independence, temporal-state observability, lossless serialization, boundary separation, or unchanged program identity. Existing outputs are migration evidence, not authority where they conflict with the source-faithful model.
+
+Additional current defects must be made explicit in the migration:
+
+- `compound` unions component supports but drops their distinct values and distributions, then paints the union with one outer scalar (`src/ca/seeds.py:514-602`). It is not a lossless product/composition constructor.
+- Selector callables are admitted in `src/ca/loci.py:41-50,283-308`; `fractal` and `spiral` expose arbitrary predicate callbacks (`src/ca/seeds.py:733-780`). These fail the closed-data boundary even when their finite masks happen to be reproducible.
+- An out-of-window point silently renders as all fill, and a `point(t!=0)` loses its requested time because the spatial renderer/native-index path has no time axis (`src/ca/seeds.py:260-301,925-926`; `src/ca/loci.py:617-635`). Invalid scope cannot be silently reinterpreted as an empty event-zero selection.
+- `dedupe` renders candidates using implicit RNG state (`src/ca/seeds.py:942-965`), so stochastic profile “equality” can itself be nondeterministic. Profile, law, realized configuration, denotational equivalence, and transform-orbit dedupe need separate operations.
+- `EpisodePlan.id` omits later program/profile/shape/steps/boundary decisions (`src/ca/datasets.py:205-220`). “Held-out seed” currently means a different stream, not proved configuration disjointness (`:193-202,497-505`). Dataset transforms can be recorded as metadata without being applied (`:203,224-244,603-605`). IDs and claims must state exactly which relation they certify.
+- Batch rollout's one dense homogeneous shape (`src/ca/rollout.py:88-142,601-640`) is an adapter contract. Ragged words, trees, graphs, composite values, or different native supports require explicit offsets/containers or separate batches, never semantic padding.
 
 ## Principles Audit
 
@@ -397,6 +410,8 @@ Current tests establish factory shapes, deterministic placement, some RNG reprod
 - No single-black-cell assumption used to prove T06/T07 or a behavior class; no symmetric seed used as rule-symmetry evidence.
 - No “gray” value inferred from palette order without an explicit ALPHABET member/valuation.
 - No compact seed representation accepted without an inverse on its invariant-valid image and a one-step identity mapping after realization.
+- No requirement that every convenience constructor be invertible; the stronger round-trip/commutation claim is required only for representations and realization lowerings that claim equivalence.
+- No silent off-window drop, ignored time coordinate, sampling-based dedupe, unproved held-out-configuration claim, metadata-only transform claim, or dataset ID that omits identity-bearing decisions.
 
 ## Completion Requirements
 
