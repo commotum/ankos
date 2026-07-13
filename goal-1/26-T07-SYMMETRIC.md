@@ -1,6 +1,6 @@
 # 26-T07-SYMMETRIC
 
-Status: **IN PROGRESS — EVIDENCE CLOSED; DESIGN AND INTEGRATION ACTIVE**
+Status: **IN PROGRESS — EVIDENCE/ASSET CLOSURE REOPENED BY HOSTILE REVIEW; ARCHITECTURE REPAIRS ACTIVE**
 
 ## Current Facts
 
@@ -339,15 +339,15 @@ R = (p_1, ..., p_q),
 p_i = (component_i, slot_i, delta_i).
 ```
 
-The catalog reflection `h` acts on the one-dimensional spatial coordinate by `h(delta)=-delta`. A declared component involution `beta` is identity for the scalar T07 row and may be explicit for a generic multi-component action. The schema supplies stable typed slot identities. Eligibility requires one validated typed-position involution `gamma`, represented by a permutation `pi`, such that
+The catalog's local displacement reflection `h_delta` acts by `h_delta(delta)=-delta`. It is distinct from any point reflection of a concrete support realization. A declared component involution `beta` is identity for the scalar T07 row and may be explicit for a generic multi-component action. The schema supplies stable typed slot identities. Eligibility requires one validated typed-position involution `gamma`, represented by a permutation `pi`, such that
 
 ```text
 component_pi(i) = beta(component_i)
-delta_pi(i)     = h(delta_i)
+delta_pi(i)     = h_delta(delta_i)
 slot_pi(i)      = declared_mate(slot_i).
 ```
 
-Repeated geometric offsets in distinct components are valid schema positions: `(a,left,-1)` and `(b,left,-1)` can, for example, name explicit projections of a product label. This does not make two reads of one scalar field coordinate independently variable; reachable complete reads remain determined by the declared NEIGHBORHOOD accessors and ALPHABET structure. A canonical one-component stencil can derive its slot mates from its unique offsets; a richer schema must expose and validate them. Missing mates, a non-bijection, a non-involution, or an ambiguous *typed* mate is unsupported. Duplicate bare offsets alone are not an error and cannot define the action.
+Repeated geometric offsets in distinct components are valid schema positions: `(a,left,-1)` and `(b,left,-1)` can, for example, name explicit projections of a product label. This does not make two reads of one scalar field coordinate independently variable. Let `V_P` be the exact finite admissible complete-read space determined by the NEIGHBORHOOD accessors, ALPHABET structure, and structural invariants; eligibility requires `rho(V_P)=V_P`. For an ordinary one-field stencil with distinct sites, `V_P=A^q`. A canonical one-component stencil can derive its slot mates from its unique offsets; a richer schema must expose and validate them. Missing mates, a non-bijection, a non-involution, or an ambiguous *typed* mate is unsupported. Duplicate bare offsets alone are not an error and cannot define the action.
 
 For ordinary T07 colors, reflection leaves ALPHABET values unchanged. The complete-read action is the single simultaneous permutation
 
@@ -355,22 +355,22 @@ For ordinary T07 colors, reflection leaves ALPHABET values unchanged. The comple
 (rho v)_i = v_pi(i).
 ```
 
-For a centered one-component radius-`r` stencil this is ordinary vector reversal. For several components it applies the same physical group element diagonally to the entire heterogeneous typed product, rather than choosing an independent reflection per component. If the resolved deterministic local evaluator is `T:A^q->A` in the scalar case, define
+For a centered one-component radius-`r` stencil this is ordinary vector reversal. For several components it applies the same physical group element diagonally to the entire heterogeneous typed read, rather than choosing an independent reflection per component. If the resolved deterministic local evaluator is `T:V_P->A`, define
 
 ```text
 T^R(v) = T(rho v).
 
-LeftRightSymmetric(P,h)
-    iff T(v) = T(rho v) for every v in A^q.
+LeftRightSymmetric(P,h_delta)
+    iff T(v) = T(rho v) for every v in V_P.
 ```
 
-The property is universal over complete typed local reads. A sampled run, family name, Boolean flag, code-number shortcut, or palette cannot establish it.
+The property is universal over all admissible complete typed local reads, not merely sampled run reads and not impossible tuples manufactured by forgetting schema invariants. A family name, Boolean flag, code-number shortcut, or palette cannot establish it.
 
 The generic equivariant extension requires explicit value maps from each source component alphabet to its `beta`-mate alphabet and an output involution `alpha_out`. They are compatible exactly when `beta^2=id`, `alpha_{beta(c)} ∘ alpha_c=id_{A_c}` for every component, and `alpha_out^2=id`; together with `pi^2=id`, these laws make the complete-read action an involution. Writing that induced action as `rho_alpha`:
 
 ```text
 (rho_alpha v)_pi(i) = alpha_component_i(v_i)
-T^h(v)               = alpha_out(T(rho_alpha v))
+T^R(v)               = alpha_out(T(rho_alpha v))
 T(rho_alpha v)       = alpha_out(T(v)).
 ```
 
@@ -378,27 +378,37 @@ All maps are identity in the scalar-color T07 catalog row. Black/white conjugati
 
 ### DOMAIN, writes, and global covariance
 
-T07's DOMAIN is the existing `t+1D` support/topology. Reflection is an automorphism of its spatial coordinate, not a new DOMAIN type. For a one-field CA, let the involutive state-label action `alpha_state` be the evaluator's `alpha_out` (and let it induce the input-component maps). The configuration action is
+T07's DOMAIN is the existing `t+1D` support/topology. The local rule property binds `h_delta`, not a reflection center. A global covariance statement additionally chooses a support-point involution `h_D` compatible with the displacement action:
 
 ```text
-(H X)(x) = alpha_state(X(h x)),
+h_D(h_D(x)) = x
+h_delta(h_delta(delta)) = delta
+h_D(x + delta) = h_D(x) + h_delta(delta).
+```
+
+On native `Z`, `h_D,c(x)=c-x` is compatible with `h_delta(delta)=-delta`. On the finite segment `{0,...,n-1}`, the preserving point action is `h_D(x)=n-1-x`; its center/translation and exterior behavior belong to the realization/run, not T07 property identity. Thus even-length windows are not incorrectly required to close under `x->-x`.
+
+For a one-field CA, let the involutive state-label action `alpha_state` be the evaluator's `alpha_out` (and let it induce the input-component maps). The configuration action is
+
+```text
+(H X)(x) = alpha_state(X(h_D(x))),
 ```
 
 and the corresponding typed write action
 
 ```text
-(x, Assign(a)) -> (h x, Assign(alpha_state(a))),
+(x, Assign(a)) -> (h_D(x), Assign(alpha_state(a))),
 ```
 
 the shared atomic update gives the transform identity
 
 ```text
-H(Step_P(X)) = Step_(P^h)(H X).
+H(Step_P(X)) = Step_(P^R)(H X).
 ```
 
 Consequences are deliberately separated:
 
-- If `P^h=P`, then `Step_P` commutes with reflection.
+- If `P^R=P`, then `Step_P` commutes with every compatible concrete `H` whose realization/boundary/schedule obligations hold.
 - If the seed also satisfies `H X_0=X_0`, every later state is symmetric.
 - An asymmetric seed under a symmetric rule has a mirrored companion trajectory; it need not itself be symmetric.
 - A reflection-invariant random seed distribution gives ensemble symmetry, not necessarily symmetric samples.
@@ -472,27 +482,33 @@ Every valid T03/T04/T05 program therefore passes T07, independent of table rows 
 
 ### Lossless orbit-table representation
 
-With the catalog's identity output action, choose the canonical context key
+With the catalog's identity output action and a canonical order on the admissible typed reads, choose the context key
 
 ```text
 rep(v) = lexicographic_min(v, rho v).
 ```
 
-A complete compact table
+A complete compact table is generically
 
 ```text
-T_hat : A^q / C2 -> A
+T_hat : V_P / <rho> -> A.
 ```
 
-has exactly `O` rows and expands losslessly as
+Writing `C_P=|V_P|` and `F_P=|Fix(rho) intersect V_P|`, it has exactly
 
 ```text
-T(v) = T_hat(rep(v)).
+O_P = (C_P + F_P)/2
 ```
 
-This is an optional typed RULE representation of the same local function, not a second runner. An exhaustive passing program need not be rewritten or compressed during validation. Representation/provenance identity stays distinct even when a denotational semantic digest is shared.
+rows and expands losslessly only over its declared admissible read space:
 
-For a nontrivial action, a plain orbit-to-one-output table is not lossless. Outputs on a two-element input orbit are related by `alpha_out`, and a fixed read must map to an `alpha_out`-fixed output. In general let the finite complete-read space have size `C`, let `F_in=|Fix(rho_alpha)|`, let the output alphabet have size `k_out`, and let `f_out=|Fix(alpha_out)|`. The number of equivariant tables is
+```text
+T(v) = T_hat(rep(v)) for every v in V_P.
+```
+
+For the ordinary one-component centered distinct-site stencil, `V_P=A^q`, `C_P=k^(2r+1)`, `F_P=k^(r+1)`, and `O_P` is the earlier closed-form `O`. This is an optional typed RULE representation of the same local function, not a second runner. It neither adds impossible rows nor erases admissibility constraints. An exhaustive passing program need not be rewritten or compressed during validation. Representation/provenance identity stays distinct even when a denotational semantic digest is shared.
+
+For a nontrivial action, a plain orbit-to-one-output table is not lossless. Outputs on a two-element input orbit are related by `alpha_out`, and a fixed read must map to an `alpha_out`-fixed output. In general let the finite admissible complete-read space `V_P` have size `C`, let `F_in=|Fix(rho_alpha) intersect V_P|`, let the output alphabet have size `k_out`, and let `f_out=|Fix(alpha_out)|`. The number of equivariant total evaluators on `V_P` is
 
 ```text
 k_out^((C-F_in)/2) * f_out^F_in.
@@ -519,8 +535,8 @@ is invariant when `(a,left)<->(a,right)` and `(b,left)<->(b,right)` occur togeth
 T07 v1 reuses T06's strict CA property eligibility and adds action closure. The resolved program must expose:
 
 - a finite typed ordered alphabet;
-- a fixed homogeneous `t+1D` support with the canonical spatial reflection;
-- a static finite current-snapshot read schema of stable typed `(component,slot,offset)` positions closed under that reflection;
+- a fixed homogeneous `t+1D` support whose static displacements admit the canonical local reflection `h_delta(delta)=-delta`;
+- a static finite current-snapshot read schema of stable typed `(component,slot,offset)` positions and an exact finite admissible complete-read space `V_P` closed under that reflection;
 - a validated component action and one induced diagonal permutation of the complete typed read, allowing equal offsets in distinct components;
 - a closed total deterministic structural evaluator;
 - `AllSites`, exactly one typed same-site assignment per selected site, and old-snapshot parallel update; and
@@ -528,8 +544,8 @@ T07 v1 reuses T06's strict CA property eligibility and adds action closure. The 
 
 Verdicts are exact:
 
-1. **Invalid claim:** malformed/dangling program or action reference, inconsistent serialized typed-position map, wrong action version, a noncanonical spatial action, a nonidentity ALPHABET/output action for the scalar-color catalog preset, or failed canonical resolution. No semantic verdict exists.
-2. **`UnsupportedProperty`:** a valid claim references an opaque callback, non-reflection-closed schema, dynamic read, stochastic/multiway successor, asynchronous schedule, non-CA rewrite, or oriented labels without a supported explicit action. Unsupported is not evidence.
+1. **Invalid claim:** malformed/dangling program or local-action reference, inconsistent serialized typed-position map, wrong action version, a noncanonical displacement action, a nonidentity ALPHABET/output action for the scalar-color catalog preset, or failed canonical resolution. No semantic verdict exists.
+2. **`UnsupportedProperty`:** a valid claim references an opaque callback, non-reflection-closed schema/read space, unenumerable or uncertified read constraints, dynamic read, stochastic/multiway successor, asynchronous schedule, non-CA rewrite, or oriented labels without a supported explicit action. Unsupported is not evidence.
 3. **`DoesNotHold`:** an eligible checker finds a canonical context whose typed output differs from its reflected mate.
 4. **`Holds`:** exhaustive orbit comparison or a validated structural proof closes every obligation.
 
@@ -547,7 +563,7 @@ OrbitRuleRepresentation
 Run / realization / observer
 ```
 
-Evidence binds claim/program/action digests, the typed-position/component/value maps, checker/evaluator versions, method (`ExhaustiveOrbitCheck` or validated structural proof), applicable `C/F/O`, a canonical context-orbit digest, and—for failure—the first canonical representative, reflected read, and unequal typed outputs. Cancellation or resource exhaustion is not `DoesNotHold`. Passing selection returns the exact unchanged `P`; producing `P^h` or a compact table is a separate explicit transform.
+Evidence binds claim/program/local-action digests, the displacement/typed-position/component/value maps, checker/evaluator versions, method (`ExhaustiveOrbitCheck` or validated structural proof), applicable `C/F/O`, a canonical context-orbit digest, and—for failure—the first canonical representative, reflected read, and unequal typed outputs. A concrete support-point reflection, center, finite realization, and boundary belong to a separate transform/run relation. Cancellation or resource exhaustion is not `DoesNotHold`. Passing selection returns the exact unchanged `P`; producing `P^R` or a compact table is a separate explicit transform.
 
 ### Dependency-free semantic oracle
 
@@ -643,6 +659,18 @@ assert all(repeated[typed_pi[i]][0]==repeated[i][0] and
            for i in range(4))
 assert all(typed_pi[typed_pi[i]]==i for i in range(4))
 
+# Admissibility constraints survive the action and shrink the orbit table.
+admissible={v for v in product((0,1),repeat=4)
+            if v[0]==v[2] and v[1]==v[3]}
+assert {rho_v for v in admissible
+        for rho_v in (tuple(v[typed_pi[i]] for i in range(4)),)}==admissible
+fixed_admissible={v for v in admissible
+                  if tuple(v[typed_pi[i]] for i in range(4))==v}
+admissible_reps={min(v,tuple(v[typed_pi[i]] for i in range(4)))
+                 for v in admissible}
+assert (len(admissible),len(fixed_admissible),len(admissible_reps))==(4,2,3)
+assert len(admissible_reps)==(len(admissible)+len(fixed_admissible))//2
+
 # The diagonal over-quotient witness uses four distinct scalar coordinates.
 positions=(('a','left',-1),('a','right',1),
            ('b','left',-2),('b','right',2))
@@ -652,6 +680,16 @@ assert all(diag(v)==diag(rho(v,typed_pi)) for v in product((0,1),repeat=4))
 one_component_pi=(1,0,2,3)
 assert any(diag(v)!=diag(rho(v,one_component_pi))
            for v in product((0,1),repeat=4))
+
+# Point and displacement reflections are distinct but compatible.
+h_delta=lambda d:-d
+h_D=lambda x,c:c-x
+for c in (0,1,4):
+    for x in range(-3,4):
+        for d in range(-2,3):
+            assert h_D(x+d,c)==h_D(x,c)+h_delta(d)
+assert {h_D(x,1) for x in range(2)}==set(range(2))   # even segment
+assert {h_D(x,4) for x in range(5)}==set(range(5))   # odd segment
 
 program={'kind':'eca','code':90,'table':t90}
 def require(p):
@@ -719,10 +757,10 @@ D111-D119 remain valid. T07 closes the following post-audit decision for global 
 ### D120 — Left-right symmetry is a validated program property over an explicit action; orbit lookup is representation, not execution semantics
 
 - **Basis:** the source distinguishes nonsymmetric rule 30 (`BOOK:490,1348`), left/right table transformation and combined equivalence (`746,11636-11637`), the independent blank-preserving conjunction (`1346,2798`), totalistic structural symmetry (`784,11902-11916`), and all 64 symmetric elementary rules (`5064-5066`). No source supplies a distinct successor or update.
-- **Eligibility and predicate:** T07 v1 binds one resolved finite deterministic homogeneous `t+1D` CA program `P` to the canonical nonidentity spatial reflection with identity ALPHABET action. Its static read schema exposes stable typed `(component,slot,offset)` positions plus a validated component action; reflection closure induces one diagonal complete-read involution `rho`. Equal offsets in distinct components are valid. `Holds` iff the ordinary structural evaluator satisfies `T(v)=T(rho v)` for every complete typed read.
+- **Eligibility and predicate:** T07 v1 binds one resolved finite deterministic homogeneous `t+1D` CA program `P` to the canonical nonidentity displacement reflection `h_delta(delta)=-delta` with identity ALPHABET action. Its static read schema exposes stable typed `(component,slot,offset)` positions, the exact admissible finite read space `V_P`, and a validated component action; reflection closure induces one diagonal complete-read involution `rho` with `rho(V_P)=V_P`. Equal offsets in distinct components are valid without inventing independent duplicate-coordinate values. `Holds` iff the ordinary structural evaluator satisfies `T(v)=T(rho v)` for every `v in V_P`. A concrete support-point reflection and center are realization/run data, not property identity.
 - **Verdict and evidence:** invalid claims, `UnsupportedProperty`, `ReflectionSymmetryEvidence(DoesNotHold)`, and `ReflectionSymmetryEvidence(Holds)` are distinct. Evidence records action/program/schema digests, typed-position/component/value maps, proof method, applicable context/orbit counts and digest, and the first canonical mismatch on failure. Unsupported or incomplete checking is not evidence.
-- **Transform and trajectory:** the reflected evaluator `T^R=T∘rho` is an ordinary program transform and involution. `H(Step_P X)=Step_(P^R)(H X)`; a fixed rule commutes with reflection, while a symmetric trajectory additionally requires compatible seed, realization/boundary, frontier/schedule, and view.
-- **Representation:** for identity output action, a complete canonical orbit table with `(k^(2r+1)+k^(r+1))/2` rows is a lossless RULE representation. Complete-read actions are diagonal; nontrivial output actions require stabilizer-aware equivariant rows. Representation/provenance, transform, claim, evidence, selection, program, and run identities remain separate.
+- **Transform and trajectory:** the reflected evaluator `T^R=T∘rho` is an ordinary program transform and involution. A support action `h_D` must separately satisfy `h_D(x+delta)=h_D(x)+h_delta(delta)`; then `H(Step_P X)=Step_(P^R)(H X)`. A fixed rule commutes with compatible reflection, while a symmetric trajectory additionally requires compatible seed, realization/boundary, frontier/schedule, and view.
+- **Representation:** for identity output action, a complete canonical table on `V_P/<rho>` has `(|V_P|+|Fix(rho) intersect V_P|)/2` rows and is a lossless RULE representation on exactly `V_P`. The familiar `(k^(2r+1)+k^(r+1))/2` count is only the ordinary centered distinct-site specialization. Complete-read actions are diagonal; nontrivial output actions require stabilizer-aware equivariant rows. Representation/provenance, transform, claim, evidence, selection, program, and run identities remain separate.
 - **Consequence:** T07 adds no state, FRONTIER, NEIGHBORHOOD read, RULE result, UPDATE, executor, successor, outcome, halt, seed, boundary, observer, or family dispatch. A passing catalog selection resolves to the exact unchanged `P`; optional reflection or compaction is a separate explicit operation.
 
 ## Detailed Implementation Plan
@@ -740,9 +778,9 @@ D111-D119 remain valid. T07 closes the following post-audit decision for global 
 
 | Goal 2 surface | Required work |
 |---|---|
-| `simple_programs.md` action model | Define a versioned support/read/write action on the complete typed local interface. Correct `ISOTROPIC` from independent component orbits to a declared diagonal typed-position action; specify optional component permutations and input/output value actions. |
-| structural program/rule schema | Expose finite ordered typed `(component,slot,offset)` read positions, ALPHABET identity, complete total evaluator, same-site typed writes, and canonical program identity. Opaque callbacks remain uncertifiable. |
-| generic action module | Validate involution/group closure, support automorphism, typed reflection closure, stable slot mates, component permutation, input/output value actions, canonical action digest, and transformed-program construction. Equal offsets in distinct components are allowed. |
+| `simple_programs.md` action model | Separate support-point `h_D` from local-displacement `h_delta`; validate `h_D(x+delta)=h_D(x)+h_delta(delta)`. Define a versioned read/write action on the complete typed local interface. Correct `ISOTROPIC` from independent component orbits to a declared diagonal typed-position action; specify optional component permutations and input/output value actions. |
+| structural program/rule schema | Expose finite ordered typed `(component,slot,offset)` read positions, the exact finite admissible complete-read space and invariants, ALPHABET identity, complete total evaluator, same-site typed writes, and canonical program identity. Opaque callbacks remain uncertifiable. |
+| generic action module | Validate local and support involutions separately, their displacement compatibility, typed reflection closure, stable slot mates, component permutation, input/output value actions, canonical local-action digest, and transformed-program construction. Keep finite-realization center/translation outside property identity. Equal offsets in distinct components are allowed. |
 | generic property module | Add `RulePropertyClaim(kind=ReflectionEquivariance)`, invalid/unsupported/result boundaries, exhaustive-orbit and structural-proof checkers, canonical mismatch witnesses, and resource-incomplete handling. |
 | exhaustive and T03 adapters | Exhaustive tables compare one representative and mate per orbit. Equal-weight T03 descriptors emit a validated permutation-invariance proof without expansion. Paired weighted summaries may prove the same fact structurally. |
 | orbit-rule representation | Add a complete canonical orbit-key table for trivial output action and a stabilizer-aware equivariant form when nontrivial actions are supported. Validate cardinality, keys, outputs, action ID, expansion, and denotational equivalence. |
@@ -753,8 +791,8 @@ D111-D119 remain valid. T07 closes the following post-audit decision for global 
 
 ### Eighteen acceptance groups
 
-1. **Catalog action integrity:** accept only the canonical nonidentity `t+1D` left-right spatial reflection with identity ALPHABET/output action; reject an identity/noncanonical spatial action, wrong axis, noninvolutive/stale action, nonidentity catalog value action, or caller-invented typed-position map.
-2. **Strict eligibility:** accept resolved finite deterministic homogeneous CA programs; return `UnsupportedProperty` for opaque callbacks, dynamic reads, stochastic/multiway rules, asynchronous/partial schedules, and unrelated SimpleProgram shapes.
+1. **Catalog action integrity:** accept only the canonical nonidentity `t+1D` displacement reflection `h_delta(delta)=-delta` with identity ALPHABET/output action; reject an identity/noncanonical displacement action, wrong axis, noninvolutive/stale action, nonidentity catalog value action, or caller-invented typed-position map. Keep a concrete support reflection/center in transform/run data.
+2. **Strict eligibility:** accept resolved finite deterministic homogeneous CA programs with an enumerable or structurally certified admissible read space; return `UnsupportedProperty` for opaque callbacks/read constraints, dynamic reads, stochastic/multiway rules, asynchronous/partial schedules, and unrelated SimpleProgram shapes.
 3. **Typed reflection closure:** derive the canonical one-component slot permutation when unambiguous; otherwise validate stable `(component,slot,offset)` mates and the declared component involution. Permit equal offsets in distinct components; reject only missing/ambiguous typed mates, nonbijections, noninvolutions, or inconsistent serialized maps. A one-sided constant-rule schema is unsupported, not false.
 4. **Invalid versus semantic result:** malformed references produce validation diagnostics and no verdict; valid unsupported programs produce non-evidence; eligible programs produce `DoesNotHold` or `Holds` evidence.
 5. **ECA failures and transforms:** rule 30 fails on a canonical reversed-context witness and transforms exactly to 86; 2/16, 45/101, 60/102, 110/124, and 137/193 are exact pairs; transform is involutive.
@@ -767,7 +805,7 @@ D111-D119 remain valid. T07 closes the following post-audit decision for global 
 12. **Orbit representation:** complete compact tables expand losslessly; reject missing/duplicate/noncanonical keys, wrong row count/action ID, invalid values, bad fixed-orbit outputs, and independent-component overcollapse.
 13. **Output-action adversary:** an oriented tagged alphabet with swap involution catches omitted input/output actions and fixed-output constraints; scalar T07 must not accept it under identity action by accident.
 14. **Diagonal-action adversary:** use `a` at offsets `-1,+1` and `b` at `-2,+2`; the `(aL and bL) or (aR and bR)` evaluator passes the single simultaneous typed-position reflection but fails an independent one-component swap. Separately assert that equal offsets in distinct typed components are schema-valid without treating duplicate scalar-coordinate reads as independently variable. Bare-offset rejection and the documented overquotient cannot survive.
-15. **Trajectory qualification:** rule 204 with asymmetric seed disproves rule-symmetric implies state-symmetric; rule 30 on all zero disproves state-symmetric implies rule-symmetric; rule 90 with hostile exterior disproves boundary-free trajectory claims.
+15. **Trajectory qualification:** rule 204 with asymmetric seed disproves rule-symmetric implies state-symmetric; rule 30 on all zero disproves state-symmetric implies rule-symmetric; rule 90 with hostile exterior disproves boundary-free trajectory claims. Test native `Z`, odd/even finite segments, and translated centers so `h_D` is never confused with `h_delta`.
 16. **Identity separation:** property selection returns the exact original program object/hash; transforming or compacting creates separate artifacts; action, claim, evidence, selection, representation, program, and run IDs cannot collide.
 17. **Evidence trust/serialization:** recompute rather than trust serialized `Holds`; reject tampered witness/action/evaluator versions; cancellation or resource exhaustion cannot become `DoesNotHold`; canonical round trips preserve all references.
 18. **No-cheating/static:** no T07/symmetric/isotropic rollout branch, reverse-selector shim, code-number authority, table patch, seed default, boundary shortcut, dataset-transform proof, trusted Boolean, or sampled-raster proof.
@@ -804,6 +842,6 @@ IN PROGRESS pending final verification and global integration.
 5. **DOMAIN/ALPHABET boundary:** reflection acts on `t+1D` spatial support; scalar labels use identity action; oriented labels require an explicit typed involution.
 6. **T06/T08 boundary:** blank preservation is an independent property; initial-condition classes are independent run profiles.
 7. **Representation boundary:** 64 fixed rules, 160 reflection orbits, 88 combined orbits, code permutations, galleries, rasters, and BDDs are distinct codecs/analyses.
-8. **Global theorem boundary:** rule fixedness gives covariance; symmetric trajectories additionally require compatible seed, realization, frontier/schedule, and observer.
+8. **Global theorem boundary:** rule fixedness gives covariance only after a support-point reflection `h_D` is chosen compatibly with the local displacement reflection `h_delta`; symmetric trajectories additionally require compatible seed, realization, frontier/schedule, and observer.
 9. **Counterexamples:** rules 30/86 and 29, hostile exterior, asymmetric seed, symmetric all-zero trace, one-sided schema, nontrivial output action, and diagonal two-component action close the main cheats.
 10. **Global integration:** pending D120, plan/evidence/ledger/architecture-audit updates, and advancement to T08.

@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 25 type stages are complete, no stage is reopened or in progress, and 20 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06 and T07 close consistently under the same branch-free architecture with D119-D120. T08 is the first incomplete stage.
+- Execution status at this sync is Foundation complete, 24 type stages are complete, T07 is source/asset-reopened and in progress, and 20 later stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06 closes under D119, while proposed D120 is being reverified against T07's expanded closure. T08 follows that reclosure.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures a DOMAIN/support/topology subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program space with its dimensional character, support, and topology; ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -776,7 +776,7 @@ T06 resolves to the class-2 restriction `evaluate_P(exact_uniform_read_P(b)) = b
 
 ### 26-T07-SYMMETRIC
 
-Status: **COMPLETE** in `goal-1/26-T07-SYMMETRIC.md`; T07 is a validated class-2 program property, with reflection as a separate transform and orbit lookup as an optional class-3 representation.
+Status: **REOPENED — SOURCE/ASSET SATURATION AND HOSTILE ARCHITECTURE REVIEW ACTIVE** in `goal-1/26-T07-SYMMETRIC.md`. The class-2 property / separate transform / optional class-3 representation result remains the working hypothesis pending reclosure.
 
 #### Big Picture Objective
 
@@ -792,9 +792,9 @@ All T07 evidence is captured; symmetry is not duplicated as family behavior; Goa
 
 #### Stage Result
 
-COMPLETE: ten controlled query families, 15 governed continuations, and 74 actual-Index routes close 357 canonical source lines at `15 direct / 167 relevant CA relations / 3 incidental CA controls / 98 sibling/general controls / 74 Index`. The split audit closes 325 physical hits as 313 byte-exact monolith lines plus 12 formatting/OCR/line-join variants. The asset ledger closes 22 physical files and 44 exact references at `4 included / 7 relation-only / 11 excluded`.
+REOPENED: the earlier 357-line/22-asset manifest was not saturated. Hostile review found wider-context CA symmetry/view/representation controls and governed rasters outside its declared universe, including `BOOK:4416,6636,11844,15708,16051` and assets governed at `BOOK:4412,6642`. Those totals and the corresponding global completion claim are superseded pending a reproducible wider-context remainder protocol, direction-sensitive asset closure, and rerun of every gate.
 
-T07 adds no construction or execution branch. It validates left-right reflection as a class-2 property over one explicit diagonal complete-read action, keeps the reflected program as a distinct transform, and permits a canonical orbit table only as an optional lossless class-3 RULE representation. The corrupted `BOOK:11897` count formula is reconstructed and the PDE control at `BOOK:16203` is corrected from the stated `p1=p2` to the intended `p1=p3`. Exact guards distinguish 64 reflection-fixed ECA rules, 160 reflection-only rule orbits, 88 reflection-plus-color `V4` orbits, and the 32-rule quiescent/symmetric intersection. D120 and the 18-group Goal 2 handoff preserve the branch-free runner. All four embedded blocks and 102 repository tests pass. Next: T08.
+The architectural working result remains that T07 adds no construction or execution branch: local displacement reflection is a class-2 property over one admissible typed read space and diagonal action; reflected programs are separate transforms; orbit tables are optional class-3 RULE representations. Hostile review is also repairing typed-position, output-action, admissible-read, and support-point-versus-displacement details before D120 is reclosed. T08 must not start until this stage closes again.
 
 ### 27-T08-INITIAL-CONDITIONS
 

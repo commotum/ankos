@@ -25,7 +25,7 @@ Each type stage must make the following auditable:
 
 ## Catalog Coverage
 
-Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06-T07 are subsequently complete; D119-D120 preserve the same branch-free architecture, no stage remains reopened, and T08 is next.
+Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06 are subsequently complete under D119. T07 is source/asset-reopened after hostile review found wider-context lines and governed rasters outside its initial manifest; D120 and advancement to T08 await reclosure.
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
@@ -35,7 +35,7 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 | T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | COMPLETE | Exact 12-query/246-candidate partition `34/53/11/20/54/30/27/17`; 260 cited lines/92 fragments/90 quote lines; 75 assets at 35 included/34 excluded/6 relation-only and 150 reverse references; six embedded oracles, independent review, and 102 tests; strict T03 preset; 0 unresolved |
 | T05 | 6 | Higher-Color Totalistic Cellular Automata | 5 | `24-T05-HIGHERCOLOR-TOTALISTIC.md` | COMPLETE | Exact 11-query/142-lexical-line partition plus five governed follows and 25 assets = 172 candidates; 12 evidence groups at 47 provenance/47 fragments/40 quote lines; assets 5 included/13 relation-only/7 excluded; strict finite `k>=4,r=1` canonical T03 preset, code-1004600/cardinality/bigint/snapshot fixtures, five embedded oracles, independent review, and 102 tests; 0 unresolved candidates |
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | COMPLETE | Exact 329-line reconciled partition `4/30/129/76/21/69` with a pinned 19-family/280-line core; 47 physical assets at 5 included/29 relation-only/13 excluded and 94 reverse references; strict CA-axis eligibility, typed claim/evidence/selection/run identity, source/count/semantic/asset oracles, independent review, and 102 tests; 0 unresolved |
-| T07 | 8 | Left-Right Symmetric Cellular Automata | 7 | `26-T07-SYMMETRIC.md` | COMPLETE | Exact 357-line source closure partitioned `15/167/3/98/74`; 325 split hits reconcile to 313 byte-exact monolith lines plus 12 formatting/OCR/line-join variants; 22 physical assets/44 exact references at 4 included/7 relation-only/11 excluded; class-2 reflection property, separate transform, optional class-3 lossless orbit representation; source-formula/PDE-coefficient repairs; exact ECA counts 64 fixed/160 reflection orbits/88 `V4` orbits/32 quiescent intersection; four embedded oracles and 102 tests; D120; 0 unresolved |
+| T07 | 8 | Left-Right Symmetric Cellular Automata | 7 | `26-T07-SYMMETRIC.md` | REOPENED | Initial 357-line/22-asset closure superseded: hostile review found wider-context CA symmetry/view/representation controls and governed assets including `BOOK:4416,6636,11844,15708,16051,4412,6642`; saturation, direction-sensitive asset audit, typed-action repairs, D120 revalidation, and all gates in progress |
 | T08 | 9 | Initial-Condition Classes | 8 | `27-T08-INITIAL-CONDITIONS.md` | PENDING | Not started |
 | T09 | 10 | Mobile Automata | 9 | `3-T09-MOBILE.md` | COMPLETE | Evidence and architecture reclosed: `Plain(bit) \| Active(bit)`, exactly-one invariant, firing-source frontier, radius-one native read, typed two-write lowering, atomic UPDATE, and compact 65,536-rule identity; no control class or family executor |
 | T10 | 11 | Extended Mobile Automata | 10 | `28-T10-EXTENDED-MOBILE.md` | PENDING | Not started |
@@ -78,10 +78,10 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages globally complete: 25 / 45.
+- Type stages globally complete: 24 / 45.
 - Type stages evidence-closed / architecture-reopened: 0.
-- Type stages asset-reopened: 0.
-- Type stages unresolved: 20 pending; 0 in progress. T08 is first pending.
+- Type stages asset-reopened: 1 (T07; source closure is also reopened).
+- Type stages unresolved: 20 pending; 1 reopened/in progress. T08 follows T07 reclosure.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
