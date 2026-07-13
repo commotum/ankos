@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T02/T03/T04/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 22 of 45 type stages complete, no type reopened or in progress, T05 Higher-Color Totalistic Cellular Automata next, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T02/T03/T04/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 22 of 45 type stages complete, no type reopened, T05 Higher-Color Totalistic Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
@@ -720,6 +720,8 @@ All T04 evidence is captured; catalog identity remains traceable without duplica
 COMPLETE: the 12-query oracle partitions 243 candidates, 15 evidence groups close `253/92/90` provenance/fragment/line counts, and 72 assets close at `35 included / 32 excluded / 5 relation-only`. All six embedded checks prove the exact `k=3,r=1,A=(0,1,2),nu(i)=i` preset, its seven cases and 2,187 codes, exact code-777/code-867 trajectories, code-420 property, page-76/T06 distinction, corrected 1659/1632 labels, and preset/generic T03 identity. D115-D118 suffice; independent review, fences, diff checks, and all 102 tests pass. No executor or update law was added. Next: T05.
 
 ### 24-T05-HIGHERCOLOR-TOTALISTIC
+
+Status: **IN PROGRESS** in `goal-1/24-T05-HIGHERCOLOR-TOTALISTIC.md`.
 
 #### Big Picture Objective
 
