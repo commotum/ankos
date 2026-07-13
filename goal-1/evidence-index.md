@@ -44,7 +44,7 @@ Each type stage must make the following auditable:
 | T16 | 17 | Sequential Substitution Systems | 16 | `6-T16-SEQUENTIAL-SUBSTITUTION.md` | COMPLETE | 51 direct-name lines plus rule/position order, captions, Notes, aliases/history, Index/splits, stopping, overlap/confluence, finite-input, causal, generalized/multiway, and emulation routes dispositioned; 21 excerpt groups; 0 unresolved |
 | T17 | 18 | Tag Systems | 17 | `7-T17-TAG.md` | COMPLETE | 175 direct occurrences on 111 unique lines plus full-prefix/deletion/tail-order, captions/figure, Notes, Index/splits, Post/Wang/cyclic/multiway boundaries, halt/extinction, count, finite-input, and emulation routes dispositioned; 21 excerpt groups; 0 unresolved |
 | T18 | 19 | Cyclic Tag Systems | 18 | `32-T18-CYCLIC-TAG.md` | PENDING | Not started |
-| T19 | 20 | Register Machines | 19 | `8-T19-REGISTER.md` | PENDING | Not started |
+| T19 | 20 | Register Machines | 19 | `8-T19-REGISTER.md` | IN PROGRESS | Core mechanics/captions/examples, Notes/Index/splits/history, instruction encoding/count, program control/end/halting, initial conditions, variants, observers, and emulations under audit |
 | T20 | 21 | Symbolic Systems | 20 | `9-T20-SYMBOLIC.md` | PENDING | Not started |
 | T21 | 22 | Two-Dimensional Cellular Automata | 21 | `33-T21-2D-CA.md` | PENDING | Not started |
 | T22 | 23 | Moore-Neighborhood Cellular Automata | 22 | `34-T22-MOORE-CA.md` | PENDING | Not started |
@@ -77,7 +77,7 @@ Each type stage must make the following auditable:
 - Foundation: complete in `1-FOUNDATION.md`.
 - Type stages complete: 6 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 39 pending, 0 in progress.
+- Type stages unresolved: 38 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 

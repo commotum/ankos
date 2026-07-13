@@ -298,6 +298,8 @@ All 175 direct occurrences on 111 unique lines and the complete mechanism, capti
 
 ### 8-T19-REGISTER
 
+Status: **IN PROGRESS** in `goal-1/8-T19-REGISTER.md`.
+
 #### Big Picture Objective
 
 Test finite control over unbounded numeric values with instruction-pointer-dependent branching.
