@@ -11,7 +11,7 @@ Status: **REOPENED**
 - T01/T02 and D111-D114 already supply fixed ordered one-dimensional support, `AllSites`, old-snapshot reads, typed same-site assignment, atomic parallel commit, successor, seed, realization, trace/view separation, ordered alphabets, and arbitrary-precision integer serialization. T03 changes the rule's input quotient and program identity, not the executor or update law.
 - `simple_programs.md:1964-2027` groups numeric sums, active counts, and color histograms under one broad `TOTALISTIC` label. That API responsibility is wider than source T03: equal-sum contexts such as `(0,2,0)` and `(1,0,1)` must merge even though their color histograms differ.
 - The current runtime can sum an `int64` read vector, but `rules.totalistic` does not derive its case count, `_channel_state` ignores the declared `sum` versus `count` mode, generic `lookup` is not executable, spatial output remains binary right-shift/`&1`, and batch rule IDs are forced through `numpy.int64`. No current test executes a standalone three-color totalistic table or validates its codec.
-- The former 16-query/118-candidate and 17-query/309-candidate closures are historical and superseded. The current bounded repair closes 18 queries, 312 disjoint candidates, 22 evidence groups, five official PDFs, and 118 source-linked rasters partitioned as 50 included, 60 excluded, and 8 relation-only. The two new included rasters are the explicit Notes continuation for four-color totalistic code `1004600`; aggregate and execution semantics are unchanged. Independent review and global reintegration remain open while this stage is `REOPENED`.
+- The former 16-query/118-candidate and 17-query/309-candidate closures are historical and superseded. The current bounded repair closes 18 queries, 312 disjoint candidates, 22 evidence groups, 89 verbatim fragments on 86 source lines, five official PDFs, and 118 source-linked rasters partitioned as 50 included, 60 excluded, and 8 relation-only. The two new included rasters are the explicit Notes continuation for four-color totalistic code `1004600`; aggregate and execution semantics are unchanged. Independent review and global reintegration remain open while this stage is `REOPENED`.
 
 ## Updated Assumptions
 
@@ -239,7 +239,7 @@ asset_delta={2924,3900,3908,3912,5086,5092,5636,10259,11184,11186,11188,
 11190,13599,13603,13605,13607,13609,13611,13615,13648,13652,13656,15211,
 15213,15215,15217,15219,15223,15225,15227,15229,15231,15235,15237,15239,
 15241,15243,15313,15315,15317,15319,17433}
-historical=(set().union(*sets[:-1]))|{11069,11071,11914,13540}
+historical=(set().union(*sets[:-2]))|{11069,11071,11914,13540}
 assert len(t04_union)==243 and len(new23)==23 and len(asset_delta)==42 and len(historical)==118
 assert union==t04_union|new23|asset_delta|{18770,19234,19236,19238} and historical<=union
 t04_text=Path('goal-1/23-T04-THREECOLOR-TOTALISTIC.md').read_text()
@@ -277,6 +277,14 @@ for rel,want in split.items():
     got=[i for i,s in enumerate(lines,1) if re.search(r'(?i)totalistic',s)]
     assert got==xs(want),(rel,got,xs(want))
 assert sum(len(xs(v)) for v in split.values())==84
+code1004600_split={
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md':'549',
+'BACK-MATTER/Colophon/Colophon.md':'1791,3537',
+}
+for rel,want in code1004600_split.items():
+    lines=(root/rel).read_text().splitlines()
+    got=[i for i,s in enumerate(lines,1) if re.search(r'(?i)1004600',s)]
+    assert got==xs(want),(rel,got,xs(want))
 print('T03 source manifest: PASS 18 queries; 312 candidates; partition=87,11,41,53,100,20; assets=118; split=84; inherited=243/historical=118')
 PY
 ```
@@ -326,6 +334,7 @@ There is zero silent remainder: the six sets are pairwise disjoint and their uni
 ### Split, source, and asset routing
 
 - The 84 literal-totalistic monolith lines have exactly 84 split-file counterparts, pinned by the oracle. Strict `BOOK:772,774,776` map to Chapter 3 split `89,91,93`; count/implementation `BOOK:11897,11902-11916` map to Chapter 12 split `3278,3283-3297`.
+- The three code-`1004600` query hits map exactly as `BOOK:9166` to Chapter 12 split line `549`, and `BOOK:19234,20980` to Colophon split lines `1791,3537`. The latter actual-Index line retains interleaved-column OCR, while the Notes line is exact.
 - `BACK-MATTER/Index/Index.md` is misrouted Notes and has no `#### Index` header. The real split Index begins in `BACK-MATTER/Colophon/Colophon.md:3383`; the ten literal-totalistic routes remain split lines `3522,3526,3529,3537,3790,4288,4587,4703,4909,4949`, while ten additional named-code/property routes are pinned by the 20-line monolith Index partition above.
 - The only raster carrying construction data absent from OCR text is the strict figure referenced at `BOOK:778`: `CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_75_Figure_6.jpeg`, JPEG `610x446`, SHA-256 `acb13963632286960ca61b616ff2f45a940750f3ab7deb5e6fbf696543015c15`. Direct inspection gives displayed digits `1,0,0,1,2,1,0` from high sum to low sum, hence code `777`; the caption, not pixel colors, remains semantic authority. The full manifest now traverses 118 linked rasters—50 included, 60 explicit controls, and eight relation-only—and asserts exact basename/path-set equality with the independent metadata ledger. The two added page-1152 plots are observer/property evidence for code `1004600`; they contribute no additional native rows, seed, boundary, or stopping rule. The remaining rasters are profile, property, application, or exclusion evidence with the same boundary.
 
@@ -669,7 +678,7 @@ def refs(s):
 # sections maintained by other audit workers.
 cited=refs(text)
 assert cited and all(1 <= n <= len(L) for n in cited)
-assert len(cited)==207
+assert len(cited)==211
 for n in sorted(cited):
     _=L[n-1]
 
@@ -685,7 +694,7 @@ for row in ex.splitlines():
         hits={n for n in current if q in L[n-1].strip()}
         assert hits,(sorted(current),q)
         quote_lines |= hits; quote_count += 1
-assert quote_count==88 and len(quote_lines)==85
+assert quote_count==89 and len(quote_lines)==86
 
 # Pin every monolith defect normalized above.
 assert L[3913].startswith('total is exactly 4, then it becomes black.')
@@ -778,7 +787,7 @@ PY
 Expected terminal line:
 
 ```text
-T03 evidence oracle: PASS cited=207 quote_fragments=88 quote_lines=85 assets=116 repairs=6 pdfs=5
+T03 evidence oracle: PASS cited=211 quote_fragments=89 quote_lines=86 assets=118 repairs=6 pdfs=5
 ```
 
 ## Construction Model
@@ -1355,7 +1364,7 @@ T03 metadata oracle: PASS 50 included; 60 excluded; 8 relation-only
 
 ### Exact asset semantic oracle
 
-This dependency-free check independently reconstructs the strict code-`777` table and early single-gray trajectory, the exact 50-update Notes invocation for code `867`, binary radius-two codes `10`, `20`, and `52`, and all strict labelled gallery identities. It also pins the Chapter 6 structure/search labels, code-`20` survival counts, code-`420` additivity, all 68 explicitly followed continuation/boundary links, and a mechanical reverse join from the textual partition into 102 mandatory raster links. Tables are LSB-first by integer sum; displays reverse them.
+This dependency-free check independently reconstructs the strict code-`777` table and early single-gray trajectory, the exact 50-update Notes invocation for code `867`, binary radius-two codes `10`, `20`, and `52`, and all strict labelled gallery identities. It also pins the Chapter 6 structure/search labels, code-`20` survival counts, code-`420` additivity, all 70 explicitly followed continuation/boundary links, and a mechanical reverse join from the textual partition into 104 mandatory raster links. Tables are LSB-first by integer sum; displays reverse them.
 
 ```bash
 python3 - <<'PY'
@@ -1434,6 +1443,8 @@ links={
 15319:'![](_page_996_Picture_9.jpeg)',
 17433:'![](_page_1092_Picture_6.jpeg)',
 18746:'![](_page_1132_Picture_2.jpeg)',
+19236:'![](_page_1152_Figure_5.jpeg)',
+19238:'![](_page_1152_Figure_6.jpeg)',
 }
 assert all(book[n-1]==want for n,want in links.items())
 
@@ -1475,13 +1486,13 @@ reverse_required=close_image_runs(adjacent_images(positive)|bridge_seeds)
 repair_delta={2924,3900,3908,3912,5086,5092,5636,10259,11184,11186,
 11188,11190,13599,13603,13605,13607,13609,13611,13615,13648,13652,
 13656,15211,15213,15215,15217,15219,15223,15225,15227,15229,15231,
-15235,15237,15239,15241,15243,15313,15315,15317,15319,17433}
-assert len(reverse_required)==102 and repair_delta<=reverse_required
+15235,15237,15239,15241,15243,15313,15315,15317,15319,17433,19236,19238}
+assert len(reverse_required)==104 and len(repair_delta)==44 and repair_delta<=reverse_required
 
 items_src=stage.split('\nitems={',1)[1].split('\n}\n\ndef jpeg_size',1)[0]
 ledger_names={Path(path).name for path in re.findall(r"'([^']+\.jpeg)':\(",items_src)}
 ledger_lines={n for n,name in image_names.items() if name in ledger_names}
-assert len(ledger_names)==len(ledger_lines)==116 and reverse_required<=ledger_lines
+assert len(ledger_names)==len(ledger_lines)==118 and reverse_required<=ledger_lines
 
 # Query-false controls form a separately computed frontier. Twenty-three
 # visual siblings remain outside; the five selected members are explicit
@@ -1553,6 +1564,8 @@ for code,k,r in [(1815,3,1),(2007,3,1),(1659,3,1),(2043,3,1),
                  (219,3,1),(438,3,1),(1380,3,1),(1632,3,1),
                  (294,3,1),(1893,3,1),(1004600,4,1)]:
     table(code,k,r)
+r1004600=table(1004600,4,1)
+assert r1004600==(0,2,3,0,0,1,1,1,3,3)
 
 r420=table(420,3,1)
 assert r420==(0,2,1,0,2,1,0)
@@ -1580,6 +1593,7 @@ print('chapter6_structure_labels=',len(structures357)+len(structures1329),
 print('reverse_join_required=',len(reverse_required),'repair_delta=',len(repair_delta),
       'query_false_only_omitted=',len(control_only-ledger_lines))
 print('code20_survival=',survival20,'code420_additive_mod3= PASS')
+print('code1004600_table=',r1004600,'display=3311100320')
 print('pictured_class4_code=1659; borderline_code=1632; notes_only_code=1662')
 print('T03 asset semantic oracle: PASS')
 PY
@@ -1592,9 +1606,10 @@ code777_table= (0, 1, 2, 1, 0, 0, 1) display=1001210
 code777_t0_t8= 1,111,12121,1100011,122101221,11001210011,1221110111221,110001222100011,12210110101101221
 code867_51x101_sha256= 185170c0866f76d129fbf3a8843cc731f98b9f012cb98286f01e420532fb53d9
 code20_table= (0, 0, 1, 0, 1, 0) code52_table= (0, 0, 1, 0, 1, 1)
-chapter6_structure_labels= 15 growth_labels= 5 audited_links= 68
-reverse_join_required= 102 repair_delta= 42 query_false_only_omitted= 23
+chapter6_structure_labels= 15 growth_labels= 5 audited_links= 70
+reverse_join_required= 104 repair_delta= 44 query_false_only_omitted= 23
 code20_survival= ((1000, 72), (1000000, 60171), (1000000000, 71079205)) code420_additive_mod3= PASS
+code1004600_table= (0, 2, 3, 0, 0, 1, 1, 1, 3, 3) display=3311100320
 pictured_class4_code=1659; borderline_code=1632; notes_only_code=1662
 T03 asset semantic oracle: PASS
 ```
@@ -1739,15 +1754,15 @@ Picture 253/1 is repaired to visible code `1659`: the Actual Index routes 1659 t
 
 ## Stage Results
 
-**REOPENED during T05.** The T05 higher-color audit found the direct code-`1004600` Notes continuation at `BOOK:19234` and its two linked 20-million-step fluctuation plots at `BOOK:19236,19238`. T03 already treated code `1004600` as an included four-color totalistic profile, so omitting its named-code continuation invalidates the 309-candidate/116-asset exhaustive closure even though the aggregate semantics below remain unchanged. Those counts and completion claims are historical until a widened bidirectional source/asset repair, embedded checks, global integration, and independent review close again.
+**REOPENED during T05; bounded source/asset repair applied.** The T05 higher-color audit found the direct code-`1004600` Notes continuation at `BOOK:19234` and its two linked 20-million-step fluctuation plots at `BOOK:19236,19238`. T03 already treated code `1004600` as an included four-color totalistic profile, so omitting its named-code continuation invalidated the former 309-candidate/116-asset exhaustive closure even though aggregate semantics were unchanged. Q18 and the two linked plots now close an exact 18-query/312-candidate source manifest, 22 evidence groups with 89 verbatim fragments on 86 source lines, and 118 rasters at `50 included / 60 excluded / 8 relation-only`. All six embedded blocks pass; independent review and global reintegration remain open, so the stage stays `REOPENED` and the corresponding checkboxes stay unchecked.
 
-T04's named code-357/code-1329 routes at `BOOK:3320-3378` and binary radius-two code-20 follow-through first exposed omissions in T03's former exhaustive-manifest/superset claim; the subsequent bidirectional audit also found two-dimensional, weighted, Notes-chain, application, and inherited T04 E14 controls. That prior source and physical audit closed 17 queries, 309 dispositioned candidates, 21 evidence groups, 88 verbatim fragments on 85 source lines, five official PDFs, and 116 rasters at `48 included / 60 excluded / 8 relation-only`; the current repair must supersede rather than silently patch those totals.
+T04's named code-357/code-1329 routes at `BOOK:3320-3378` and binary radius-two code-20 follow-through first exposed omissions in T03's former exhaustive-manifest/superset claim; the subsequent bidirectional audit also found two-dimensional, weighted, Notes-chain, application, and inherited T04 E14 controls. That prior source and physical audit closed 17 queries, 309 dispositioned candidates, 21 evidence groups, 88 verbatim fragments on 85 source lines, five official PDFs, and 116 rasters at `48 included / 60 excluded / 8 relation-only`; those figures are retained only as historical provenance for the now-explicit three-line/two-asset delta.
 
 T03 is one exact finite-sum rule description over the T01/T02 fixed-lattice construction. A program declares finite alphabet `A`, explicit bijection `nu:A->{0,...,k-1}`, fixed radius `r`, exact sum of the `2r+1` old reads, and one complete `M=1+(k-1)(2r+1)`-row structural table. Sum zero is the least-significant base-`k` digit. The source average is the exact label `s/(2r+1)`, not a float. T03 adds neither an executor nor an update law; T04/T05 are presets, T06/T07 restrictions/properties, and histogram, outer, weighted, higher-dimensional, continuous, additive, emulation, seed, class, and view material remains explicitly typed outside base execution.
 
-The three repaired asset blocks pass. They cover `48/60/8` disjoint physical dispositions, 68 explicitly followed continuation/boundary links, the 102-link mechanical reverse-join closure, 23 mechanically outside query-false-only siblings, binary radius-two codes `10/20/52`, code-20 survival counts, code-357/code-1329 structure labels, code-420 additivity, exact code-777/code-867 trajectories, and all 946 cells of the strict code-777 raster with zero mismatch. The former 16-query/118-candidate exhaustion claim is superseded by the widened 17-query/309-candidate partition; the current broad API and binary/family-dispatched runtime remain documented as mismatches rather than preserved through a shim.
+The repaired asset blocks pass. They cover `50/60/8` disjoint physical dispositions, 70 explicitly followed continuation/boundary links, the 104-link mechanical reverse-join closure, 23 mechanically outside query-false-only siblings, binary radius-two codes `10/20/52`, the exact code-`1004600` table and long-run observer continuation, code-20 survival counts, code-357/code-1329 structure labels, code-420 additivity, exact code-777/code-867 trajectories, and all 946 cells of the strict code-777 raster with zero mismatch. The former 16-query/118-candidate and 17-query/309-candidate exhaustion claims are superseded by the widened 18-query/312-candidate partition; the current broad API and binary/family-dispatched runtime remain documented as mismatches rather than preserved through a shim.
 
-G2-T03 names concrete alphabet, aggregate, table/codec, rule, executor, spec/preset, trace/export, migration, and test work with 15 adversarial conformance obligations, including exact generic radius-two codes `10/20/52`. D115-D118 and the rank-versus-valuation repair remain active. All six embedded blocks, Markdown-fence and bidirectional source/asset checks, `git diff --check`, all 102 repository tests, and fresh independent review pass with no remaining T03 blocker.
+G2-T03 names concrete alphabet, aggregate, table/codec, rule, executor, spec/preset, trace/export, migration, and test work with 15 adversarial conformance obligations, including exact generic radius-two codes `10/20/52`. D115-D118 and the rank-versus-valuation repair remain active. All six embedded blocks and the widened bidirectional source/asset checks pass. Fresh independent review and global closure are still required before the historical completion claim can be restored.
 
 ## Integration Results
 
