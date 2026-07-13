@@ -1,6 +1,6 @@
 # 17-T41-FUNCTIONS
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -661,20 +661,31 @@ Paths are dependency targets for synthesis; later evidence may consolidate modul
 
 ## Completion Requirements
 
-- [ ] CSV/taxonomy identity, strict/Notes/T43 boundaries, aliases, variants, parameters, and relations are exact.
-- [ ] Strict main, native Notes, splits, actual Index, history, formula/evaluation relations, and all vocabulary candidates are dispositioned with zero unresolved matches.
-- [ ] All four strict and eight Notes rasters have identities, hashes, formulas, horizons or explicit uncertainty, source repairs, and independent anchors where possible.
-- [ ] Function spec, domains/codomains, exact/declared values, primitive/branch semantics, finite/infinite sums, identity, equivalence, and serialization are explicit.
-- [ ] Point/sample/zero/crossing/extremum queries and exact/certified/approximate/undefined/failure outcomes are explicit.
-- [ ] Page-160/161/162/163 presets, root conventions, T41/T42 seam, and Riemann-Siegel repairs are independently verified.
-- [ ] T20/T27/T31/T34/T39/T42/T43/T44/T45, ODE, sampling, plotting, sound, spectrum, and solver boundaries are explicit.
-- [ ] Current API/runtime fit and an implementation-ready Goal 2 file/dependency/test/no-cheating handoff are complete.
-- [ ] Global ledgers, exact verification commands, hashes, fence checks, coverage consistency, diff checks, and repository tests pass.
+- [x] CSV/taxonomy identity, strict/Notes/T43 boundaries, aliases, variants, parameters, and relations are exact.
+- [x] Strict main, native Notes, splits, actual Index, history, formula/evaluation relations, and all vocabulary candidates are dispositioned with zero unresolved matches.
+- [x] All four strict and eight Notes rasters have identities, hashes, formulas, horizons or explicit uncertainty, source repairs, and independent anchors where possible.
+- [x] Function spec, domains/codomains, exact/declared values, primitive/branch semantics, finite/infinite sums, identity, equivalence, and serialization are explicit.
+- [x] Point/sample/zero/crossing/extremum queries and exact/certified/approximate/undefined/failure outcomes are explicit.
+- [x] Page-160/161/162/163 presets, root conventions, T41/T42 seam, and Riemann-Siegel repairs are independently verified.
+- [x] T20/T27/T31/T34/T39/T42/T43/T44/T45, ODE, sampling, plotting, sound, spectrum, and solver boundaries are explicit.
+- [x] Current API/runtime fit and an implementation-ready Goal 2 file/dependency/test/no-cheating handoff are complete.
+- [x] Global ledgers, exact verification commands, hashes, fence checks, coverage consistency, diff checks, and repository tests pass.
 
 ## Stage Results
 
-Pending final integration and verification.
+- Exhaustive searches closed with zero unresolved source candidate. The direct-name union found `59/51`; formula literals `176/83`; crossing/rule mechanics `19/9`; all continued-fraction, Lissajous, Fourier/Gibbs/Weierstrass, zeta/Riemann-Siegel, music, quasiperiodic, actual-Index, history, evaluation, relation, and false-positive families are dispositioned in eighteen excerpt groups.
+- All four strict and eight supplementary rasters were inspected at original resolution. Their byte sizes, dimensions, formulas, parameters, windows or explicit uncertainty, and SHA-256 hashes are recorded. The broken monolith image links, 15-page filename offset, unspecified sampling, unlabeled observer conventions, and `a=0` approximation are explicit.
+- The design establishes a closed unary `MathematicalFunctionSpec` plus pure point/sample/real-zero/complex-zero/crossing/extremum queries. Exact/certified/approximate/undefined/failure values, multiplicity-aware zero events, completeness statuses, proofs/diagnostics, and rendering payloads stay separate from definitions and from transition execution.
+- Exact values, real/complex definition domains, scalar/fixed-vector codomains, primitive versions, partiality, analytic continuation, poles, branch conventions, ordered structural identity, certified equivalence, lossless codecs, bounded finite sums, and explicit infinite-series profiles are implementation-ready.
+- Page 161's first three exact inclusive root counts are `120/114/113` with interior counts one lower; the approximate three-sine observation is correctly non-certified. Page 162's four functions, factorizations, double tangent at zero, nonzero crossings, continued fractions, and interval-count bridge are pinned without absorbing T42 state.
+- The ODE Note was independently falsified as printed: derivative `2` yields `Sin[x]+Sin[sqrt(2)x]/sqrt(2)`, while the stated target needs `1+sqrt(2)`. Zeta's critical-line continuation, named continuous Riemann-Siegel phase, five 60-decimal values, and numerical `108/269` zero totals are likewise explicitly repaired/qualified.
+- Independent arbitrary-precision verification reported `T41 exact/declared-precision oracle: PASS; three-sine observed roots inclusive=112` and `T41 ODE source-repair oracle: PASS`. Focused search controls reproduced `mathematical functions 56/48`, strict/Notes image links `4/4` and `8/8`, and the native no-update/no-sampling result.
+- SHA-256 verification reproduced all twelve recorded asset hashes. Markdown fence parity passed for this stage and all `goal-1/*.md`; `git diff --check -- goal-1` passed.
+- Repository verification passed: `uv run pytest -q` reported `102 passed in 1.19s`.
 
 ## Integration Results
 
-Pending final integration and verification.
+- `0-plan.md` now records the non-transition function/query category, exact source/figure repairs, implementation-ready stage result, 16/45 completed types, and T43 as next work.
+- `evidence-index.md` records T41 complete with exact search counts, eighteen evidence groups, four strict/eight Notes rasters, all semantic/boundary/runtime obligations, and zero unresolved candidates; coverage is 16/45.
+- `design-ledger.md` adds the T41 construction record, function/denotation inventory category, D082-D087, current-dimension refinements, source-derived rejection criteria, open-question updates, and completed integration entry. The transition family remains at ten update laws.
+- T20/T27/T31/T34/T39 were re-audited and remain valid under responsibility-level reuse. No completed stage reopened. Next: T43 Iterated Maps.

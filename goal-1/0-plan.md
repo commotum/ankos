@@ -49,13 +49,17 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39 complete, 15 of 45 type stages complete, T41 Function-Combination Systems in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41 complete, 16 of 45 type stages complete, T43 Iterated Maps in progress, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
 - The literal page-147 profile really retains `1`: all 1,200 stage cells match the stated update and the final black set is `{1} union primes<=100`, while bottom labels omit `1`. The mathematical preset therefore starts at 2 explicitly. Finite certification after divisor 10, requested rows through 13, and infinite noncompletion remain distinct.
 - Page 148's six prime profiles are observers and page 150's five rows are closed measurements with exact ordering/sign/zero conventions. Their horizons, endpoints, extrema, OCR repairs, `PrimePi` wording, and `LogIntegral` normalization are independently pinned.
 - T39 resolves T37's Ulam question through `FirstAcceptedAscendingCandidate` over the complete old prefix followed by the existing append. The source prefix proves unordered pairs of distinct old indices; no fixed-lag extension or hidden pair-sum cache is introduced.
+- T41 is a non-transition category: an immutable unary `MathematicalFunctionSpec` declares exact parameters, real/complex definition domain, scalar/fixed-vector codomain, closed ordered expression, primitive version, partiality, and branch/continuation profiles. Point/sample/zero/crossing/extremum requests and their exact/certified/approximate/undefined/failure results are pure scoped records; T41 adds no eleventh update law.
+- Structural identity, certified functional equivalence, and observation equality remain distinct. Exact literals/algebraics/complex values are lossless; viewport, mesh, evaluator, precision, samples, rasters, sounds, histograms, and spectra do not enter function identity.
+- The four strict and eight Notes rasters are fully inventoried. Exact page-161 periods/zero families and endpoint conventions, the page-162 tangent/crossing count seam into T42, pole/branch segmentation, finite/infinite series separation, zeta analytic continuation, continuous Riemann-Siegel phase, and declared-precision values/numerical zero counts are pinned.
+- Source repairs remain visible: monolith image links are broken, page numbers are offset, the Notes ODE derivative `2` denotes a different curve than claimed, critical-line zeta needs continuation/phase, and the displayed `a=0` infinite lacunary sum cannot converge ordinarily.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -533,7 +537,7 @@ Ulam is now an honest T37/T39 composition: closed first-accepted ascending candi
 
 ### 17-T41-FUNCTIONS
 
-Status: **IN PROGRESS** in `goal-1/17-T41-FUNCTIONS.md`.
+Status: **COMPLETE** in `goal-1/17-T41-FUNCTIONS.md`.
 
 #### Big Picture Objective
 
@@ -547,7 +551,19 @@ Apply the common protocol, emphasizing expression state, continuous domain, samp
 
 All T41 evidence is captured; function definition and observation method remain distinct; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+The direct-name union found 59 occurrences on 51 lines; the formula-literal union 176/83; crossing/rule mechanics 19/9. Eighteen evidence groups cover the strict main, native Notes, clean split, actual Index, function/series/zero/evaluation history and relations, every alias/false positive, four strict rasters, eight Notes-only rasters, and source repairs. Zero candidate remains unresolved.
+
+T41 establishes a closed immutable unary function definition outside transition execution. `MathematicalFunctionSpec` carries one argument, exact/declared parameters, real/complex domain, scalar/fixed-vector codomain, ordered AST, versioned primitive semantics, partiality, and branches. Point/sample/real-zero/complex-zero/crossing/extremum queries declare their own scope and numerical context. Exact/certified/approximate/undefined/failure values, multiplicity-aware zero events, completeness, certificates, diagnostics, and renderings remain separate records.
+
+All page-160/161/162/163 and supplementary profiles are pinned to exact formulas or explicit uncertainty. Independent checks verify two-sine periods/counts, the page-162 factorization/continued fractions, special-function anchors, and 60-decimal Riemann-Siegel values plus numerical zero totals. Pole segmentation, endpoint inclusion, the page-162 double tangent, zeta continuation/phase, the divergent `a=0` profile, and the inconsistent ODE initial derivative are explicit adversaries/source repairs.
+
+T20 tree/codecs, T27 compatible numeric expressions, T31 query/certificate discipline, and T34 exact numbers are reused only at their established responsibilities. T42 owns continued-fraction substitution state/trace; T43/T44/T45 remain distinct. Exact/declared-precision assertions, all twelve hashes, search controls, Markdown fences, `git diff --check`, and all 102 repository tests pass. No prior stage reopened. Next: T43.
+
 ### 18-T43-ITERATED-MAPS
+
+Status: **IN PROGRESS** in `goal-1/18-T43-ITERATED-MAPS.md`.
 
 #### Big Picture Objective
 

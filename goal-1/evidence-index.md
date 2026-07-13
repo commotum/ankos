@@ -66,18 +66,18 @@ Each type stage must make the following auditable:
 | T38 | 39 | Variable-Index Recursive Sequences | 38 | `44-T38-VARIABLE-RECURRENCE.md` | PENDING | Not started |
 | T39 | 40 | Number-Theoretic Filtering Systems | 39 | `16-T39-FILTERS.md` | COMPLETE | Prime search 221 occurrences/134 lines; high-signal union 144/84; exact sieve/Eratosthenes each 6/6 plus complete predicate/measurement/history/Index families; 19 excerpt groups; all strict main, seven rasters/twelve profiles, Notes/actual Index/split, consecutive-stage masks, source repairs, finite/intensional scopes, filter/stream/measurement distinctions, Ulam composition, algorithms/emulations/boundaries, current API/runtime, and exact oracles dispositioned; 0 unresolved source candidates |
 | T40 | 41 | Mathematical-Constant Digit Systems | 40 | `45-T40-CONSTANT-DIGITS.md` | PENDING | Not started |
-| T41 | 42 | Function-Combination Systems | 41 | `17-T41-FUNCTIONS.md` | IN PROGRESS | Closed function expression, real/complex domain, exact/numerical evaluation, sampling and zero-event queries, page-160/161/162/163 figures, Notes/Index, T42/T43/T44/T45 boundaries, and current runtime under audit |
+| T41 | 42 | Function-Combination Systems | 41 | `17-T41-FUNCTIONS.md` | COMPLETE | Direct-name union 59 occurrences/51 lines; formula-literal union 176/83; crossing/rule union 19/9; 18 excerpt groups; all strict main, four strict/eight Notes rasters, native Notes/actual Index/splits, named functions/series/zeros/branches/evaluation, ODE/source repairs, page-162 T42 seam, current API/runtime, and exact/declared-precision oracles dispositioned; 0 unresolved candidates |
 | T42 | 43 | Continued-Fraction-Driven Substitution Systems | 42 | `46-T42-CF-SUBSTITUTION.md` | PENDING | Not started |
-| T43 | 44 | Iterated Maps | 43 | `18-T43-ITERATED-MAPS.md` | PENDING | Not started |
+| T43 | 44 | Iterated Maps | 43 | `18-T43-ITERATED-MAPS.md` | IN PROGRESS | Unary continuous-state map, exact/declared real values, piecewise/fractional/smooth map syntax, scalar update reuse, precision/rounding/uncertainty, digit-sensitive orbits, page-165/166/168/170 and Notes figures, observers, variants, boundaries, and current runtime under audit |
 | T44 | 45 | Continuous Cellular Automata | 44 | `19-T44-CONTINUOUS-CA.md` | PENDING | Not started |
 | T45 | 46 | Partial Differential Equation Systems | 45 | `20-T45-PDE.md` | PENDING | Not started |
 
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 15 / 45.
+- Type stages complete: 16 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 29 pending, 1 in progress.
+- Type stages unresolved: 28 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
