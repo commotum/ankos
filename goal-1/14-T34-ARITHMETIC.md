@@ -303,7 +303,8 @@ proposal = Write(
     operation=program.operation,
     value=step(program.operation, x_t),
 )
-x_(t+1) = UPDATE.apply(x_t, UniqueScalar, (proposal,)).successor
+step_result = UPDATE.apply(x_t, (UniqueScalar,), (proposal,))
+x_(t+1) = only(step_result.successors)  # singleton for this deterministic preset
 ```
 
 Every valid strict exact event has exactly one successor. An identity event—`AddConstant(0)`, `MultiplyConstant(1)`, or multiplication of zero—still returns `Advanced(changed=false)` and records an event. There is no native halt, fixed-point stop, cycle stop, digit-width cap, target magnitude, or convergence threshold. Those are observers or run policies.

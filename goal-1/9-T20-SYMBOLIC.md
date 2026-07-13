@@ -21,7 +21,7 @@ The evidence/search closure and conformance fixtures remain valid. Recursive tag
 - With `k` symbols and `n` leaves, the unary-expression profile contains `Catalan(n-1) k^n` structured expressions. No numeric rule/program codec or digit significance is supplied.
 - Functional, Polish, operator, binary-tree, and one-symbol bracket forms are representations or codecs. Brackets alone are lossless only for one-symbol unary expressions; bracket bitmaps, leaf count, depth, invariant values, and size differences are observers.
 - Combinators are a native specialization with ordered S/K rules; deterministic operator evolution is a broader one-pass pattern variant. Confluence, normalization, multiway equation application, CA emulation, lambda compilation, valuations, universality tests, and network analogs are relations or analyses, not alternate base execution.
-- T13's ordered lineage and T16's program-coupled matching are reusable responsibilities. T13 all-occurrence concatenation and T16 single-interval splice cannot implement a maximal nonoverlapping tree rewrite; T20 proves a fifth sibling update law.
+- T13's ordered lineage and T16's program-coupled matching are reusable responsibilities. T13 all-occurrence concatenation and T16 single-interval splice do not by themselves implement maximal nonoverlapping tree replacement; T20 supplies a typed prefix-free tree UPDATE policy on the common axis.
 - The current dense rank-0..3 runtime has no expression tree, typed tree path, pattern AST, binding environment, prefix-free match source, inert template instantiation, subtree replacement result, or ragged structural trace. No existing family branch is a semantic fit.
 
 ## Updated Assumptions
@@ -320,9 +320,9 @@ Literal/template application nodes receive creation provenance from `(clause_id,
 
 Repeated references may share immutable storage privately, but equality, matching, serialization, and later rewriting observe a tree. Unused bindings and unmatched descendants of a consumed subtree have deletion provenance. No template can mutate an old bound value.
 
-### Fifth sibling update law
+### Prefix-free tree UPDATE policy
 
-`ParallelPrefixFreeTreeReplace` is a new public commit algebra:
+The prefix-free tree policy commits one old-snapshot replacement set:
 
 1. Validate that every result names the same old state and a path resolving to the recorded matched subtree.
 2. Validate one result per selected source, pairwise prefix-incomparable paths, unique paths, valid template trees, and declared atoms.
@@ -331,7 +331,7 @@ Repeated references may share immutable storage privately, but equality, matchin
 
 Replacing one subtree by one subtree preserves sibling-role indices outside the selected occurrences, but it may change arbitrary depth and leaf count. There is no conflict merge because prefix-free coverage is a precondition, not a last-writer policy.
 
-This law is not:
+This policy differs from:
 
 - T13 `ParallelReplaceConcat`, which consumes every scalar occurrence and concatenates child words;
 - T16 `SingleSpliceUpdate`, which replaces exactly one flat interval;
@@ -339,7 +339,7 @@ This law is not:
 - fixed-support assignment; or
 - a sequence of in-place tree mutations whose later paths see earlier outputs.
 
-It is the fifth evidenced `UPDATE` sibling. A private persistent-tree reconstruction kernel may be shared, but its public invariants remain construction-specific.
+These validators justify a tree-capable policy on the shared `UPDATE` axis, not a fifth executor or top-level semantic class. A persistent-tree reconstruction kernel may be shared, while the prefix-free path invariants remain explicit program data.
 
 ### Exact step and outcome semantics
 
@@ -463,7 +463,7 @@ Additional required oracles:
 
 | Candidate | Disposition |
 |---|---|
-| Page-119 single-rule systems | Native deterministic programs under the same executor |
+| Page-119 single-rule systems | Native deterministic programs under the same runner |
 | S/K and single-j combinators | Native ordered-program specializations; same tree/matcher/update |
 | First-application-only technique | Documented selector variant over the same structural matcher; not the canonical all-disjoint pass |
 | Deterministic operator evolution | Native broader closed-pattern profile with once-per-step semantics; unsupported host features reject explicitly |

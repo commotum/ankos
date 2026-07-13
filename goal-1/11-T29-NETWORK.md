@@ -15,7 +15,7 @@ The evidence/search closure and conformance fixtures remain valid. A rooted grap
 - Semantic equality is root- and port-preserving vertex isomorphism. It never merges automorphic, bisimilar, or locally indistinguishable nodes.
 - An exact canonical serialization is available: breadth-first discovery from the root, visiting port `above` before `below`, and assigning integers on first discovery. For finite root-reachable deterministic two-port graphs this codec is an exact isomorphism canonicalizer, not a heuristic graph layout.
 - A path read is a finite word over ports, including epsilon. It folds left-to-right through one immutable old graph; epsilon returns the source node.
-- The local signature used by the contextual rules is a tuple of cardinalities of exact-length endpoint sets, not cumulative metric balls. For depth two the complete evidenced key domain is `(1,1),(1,2),(2,1),(2,2),(2,3),(2,4)`.
+- The local signature used by the contextual rules is a tuple of cardinalities of exact-length endpoint sets, not cumulative metric balls. For depth two the complete evidenced key set is `(1,1),(1,2),(2,1),(2,2),(2,3),(2,4)`.
 - Programs are finite closed data. A row returns two typed port-target expressions: either an old-snapshot path endpoint or one newly inserted node whose own two ports target old-snapshot path endpoints.
 - Every syntactic insertion occurrence allocates a distinct fresh node, even when two descriptors are equal or both parent ports request identical insertions. Fresh nodes cannot target one another in the evidenced grammar and never fire in their birth event.
 - All old nodes fire exactly once against the same old snapshot. Commit retains every old node, installs both rewritten old-node ports, installs all fresh-node ports, and only then projects to the directed forward closure of the preserved old root.
@@ -27,7 +27,7 @@ The evidence/search closure and conformance fixtures remain valid. A rooted grap
 - The page-216 restricted one-step grammar has 6 possible expressions per parent port, 36 per-node actions, and `36^2=1296` complete depth-one tables. No analogous finite depth-two alphabet or rule count is supplied.
 - Pages 217-218 and the Notes provide five exact depth-two tables and their node-count series through event 15; long-run anchors and one exact repeated-state period independently guard the implementation.
 - The parallel construction has zero unresolved native mechanics. A related sequential-network note supplies a six-row `{rewrite,move_port}` table and its figure evidences reachability pruning, but neither prose, figure, nor official program data determines old-edge versus committed-edge movement, projection anchor, or projection/movement order. That variant is explicitly deferred behind a source-acquisition gate rather than guessed.
-- Fixed-topology cellular automata and Boolean networks, undirected trivalent space networks, cluster substitution, network mobile automata, causal networks, multiway evolution, and constraint-defined networks are related constructions, not switches on the T29 parallel executor.
+- Fixed-topology cellular automata and Boolean networks, undirected trivalent space networks, cluster substitution, network mobile automata, causal networks, multiway evolution, and constraint-defined networks are related constructions, not switches on the T29 graph-axis preset.
 - T29 is the first catalog row whose Markov state contains mutable cyclic topology. T20 ordered trees cannot preserve arbitrary sharing/cycles, and T27 occurrence bags have no adjacency.
 - The current runtime contains no graph carrier, graph selector, port-path read, fresh-node write, graph UPDATE policy, isomorphism codec, or ragged graph trace. These are typed additions to the common axes, not grounds for a network executor.
 
@@ -37,7 +37,7 @@ The evidence/search closure and conformance fixtures remain valid. A rooted grap
 - Semantic vertex tokens are occurrence identities local to a snapshot. They support aliasing and cycles but are alpha-renamable. Integers emitted by the reference codec are not rule-visible identities.
 - Ports are ordered as `Above=1` then `Below=2` for path syntax and canonical traversal. Erasing or swapping the port order changes a graph unless an explicitly separate relation proves an isomorphism.
 - A path word is closed structural data, never a traversal callback. Its endpoint is evaluated only in the old graph and remains valid during proposal construction.
-- For depth `d`, `R_k(v)` is the set of endpoints of all port words of exactly length `k` from `v`. The contextual read is `(|R_1|,...,|R_d|)`. The necessary bound `|R_(k+1)| <= 2|R_k|` does not define a complete generic key domain.
+- For depth `d`, `R_k(v)` is the set of endpoints of all port words of exactly length `k` from `v`. The contextual read is `(|R_1|,...,|R_d|)`. The necessary bound `|R_(k+1)| <= 2|R_k|` does not define a complete generic key set.
 - A complete program declares one read profile and contains exactly one unique row for every declared key. Missing rows, duplicate rows, undeclared keys, invalid words, or implicit host-language fallthrough are invalid program data.
 - `InsertFresh(a,b)` is a generative value in the result algebra, not a side-effecting allocator. Commit assigns event-scoped fresh tokens injectively and records the mapping.
 - Identical fresh descriptors do not imply node identity. Node identity also never collapses merely because two nodes have equal outgoing pairs.
@@ -265,16 +265,16 @@ UniformNetworkRead:
     key(v) = Unit
 
 ExactLengthReachCounts(depth=1):
-    key domain = {(1), (2)}
+    key set = {(1), (2)}
 
 ExactLengthReachCounts(depth=2):
-    key domain = {
+    key set = {
         (1,1), (1,2),
         (2,1), (2,2), (2,3), (2,4)
     }
 ```
 
-Every depth-two key is realizable. More generally, `|R_(k+1)| <= 2|R_k|` is necessary but does not prove that an arbitrary tuple is realizable, and the book supplies no generic-depth table enumerator. The public program therefore carries an exact declared finite key domain rather than synthesizing one from this inequality.
+Every depth-two key is realizable. More generally, `|R_(k+1)| <= 2|R_k|` is necessary but does not prove that an arbitrary tuple is realizable, and the book supplies no generic-depth table enumerator. The public program therefore carries an exact declared finite key set rather than synthesizing one from this inequality.
 
 ### Equality and exact canonical representation
 
@@ -315,7 +315,7 @@ NodePortRewrite = {
 
 NetworkProbe =
     UniformNetworkRead
-  | ExactLengthReachCounts(depth, exact_key_domain)
+  | ExactLengthReachCounts(depth, exact_key_set)
 
 PortRewriteProgram = {
     probe: NetworkProbe,
@@ -328,7 +328,7 @@ Each path in a direct or fresh descriptor is interpreted relative to the firing 
 
 Program validation establishes:
 
-- the probe and exact key domain are well formed;
+- the probe and exact key set are well formed;
 - every key has exactly one row and no undeclared row exists;
 - every referenced path is a finite port word in the declared two-port alphabet;
 - both outputs exist;

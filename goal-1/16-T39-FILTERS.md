@@ -4,7 +4,7 @@ Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T39 row and runner contract in `architecture-audit.md` supersede numbered-update/executor and separate-control framing below.
 
-The evidence/search closure and conformance fixtures remain valid. Visible `(survivors,cursor)` state remains required, while subset removal plus cursor advance is a typed UPDATE inside the shared runner, not a sieve executor.
+The evidence/search closure and conformance fixtures remain valid. The complete configuration keeps candidate support/membership and the visible stage marker inspectable. A finite Boolean field and an ordered-survivor list are lossless representations of one another when the support is retained; the infinite profile is intensional. Both use the shared runner and require no sieve executor or construction-specific commit algebra.
 
 ## Current Facts
 
@@ -12,24 +12,24 @@ The evidence/search closure and conformance fixtures remain valid. Visible `(sur
 - The canonical strict section `The Sequence of Primes` is `BOOK:1619-1663`, with a clean duplicate at `CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:201-245`. T38 ends at `BOOK:1617`; T40 begins cleanly at `BOOK:1665`.
 - The page-147 construction processes every consecutive divisor `d=2,3,...`, removes larger surviving candidates divisible by `d`, and retains the stage cursor even when no candidate changes. Composite rows are therefore real events, not omitted work.
 - Original-resolution classification of all 1,200 page-147 stage cells exactly matches the stated rule. Black cells are current survivors; gray dots are every proper multiple at the current divisor, including values removed on earlier rows; white cells are neither.
-- The literal figure domain is `1..100`. Its rule never removes `1`, the raster keeps `1` black through row 13, and the bottom labels omit `1` while naming the 25 primes. The caption's claim that the permanent survivors are exactly primes is therefore a genuine source inconsistency.
-- The faithful display profile and the mathematical prime profile must remain distinct. The former preserves the anomalous `1`; the latter uses candidate domain `2..N` or an explicit pre-exclusion of `1`.
+- The literal figure support is `1..100`. Its rule never removes `1`, the raster keeps `1` black through row 13, and the bottom labels omit `1` while naming the 25 primes. The caption's claim that the permanent survivors are exactly primes is therefore a genuine source inconsistency.
+- The faithful display profile and the mathematical prime profile must remain distinct. The former preserves the anomalous `1`; the latter uses candidate support `2..N` or an explicit pre-exclusion of `1`.
 - A finite completed survivor set, the mathematical set of primes, an increasing prime stream, a query about one integer, and a sieve execution trace are different objects even when their integer outputs agree.
 - Page 148 contains six derived prime observers. Page 150 contains five pointwise arithmetic-measurement sequences. None is mutable survivor state merely because its values are indexed by integers.
-- T39 requires a typed monotone subset-removal UPDATE policy for atomic deletion of a noncontiguous candidate subset while preserving every survivor's identity and order. A Boolean raster assignment is one finite realization, not the native identity-bearing representation.
+- On finite declared support, T39 directly reuses old-snapshot finite writes: RULE writes `false` at every newly removed candidate locus and advances the stage marker atomically. The Boolean field retains candidate identity through its labeled support; an ordered-survivor list is merely its lossless packed view. The infinite/intensional profile advances the marker while survivor membership remains a closed derived relation.
 - T37's Ulam boundary resolves compositionally: T39 selects the first qualifying ascending candidate from the complete old prefix, then T37 commits its existing one-term append. The displayed Ulam prefix itself proves unordered, distinct-old-index pair counting.
-- Current selectors split universe/predicate/order responsibilities usefully, but require finite four-coordinate NumPy universes and unrestricted callables. Current rollout has no closed number-theoretic predicate, intensional infinite domain, survivor update, exact filter trace, or arithmetic-measurement profile.
+- Current selectors split universe/predicate/order responsibilities usefully, but require finite four-coordinate NumPy universes and unrestricted callables. Current rollout has no closed number-theoretic predicate, intensional infinite support, exact survivor writes/trace, or arithmetic-measurement profile.
 - The exhaustive audit found zero unresolved source candidates: seven raster files, twelve plotted profiles, strict main, Notes, actual Index, split, history, aliases, direct and analytic algorithms, decimation/Josephus, prime CA emulation, Ulam composition, and every broad-search candidate are dispositioned.
 
 ## Updated Assumptions
 
 - T39 has three separately typed semantic categories: `IntegerFilterSpec`, `SuccessiveDivisibilitySieve`, and `IntegerMeasurementSpec`. Only the sieve is a transition construction.
-- Candidate domain kind, lower and upper bounds, uniqueness, increasing order, stage schedule, next divisor, survivors, all predicate hits, newly removed values, and output projection are explicit.
+- Candidate-support kind, lower and upper bounds, uniqueness, increasing order, stage schedule, next divisor, membership/survivors, all predicate hits, newly removed values, and output projection are explicit.
 - Number-theoretic operations are closed inspectable data. A host predicate callback, `PrimeQ` function object, trusted Boolean, factor table, pickle, or precomputed prime list is not a program.
 - The strict stage schedule is `ConsecutiveIntegers(first=2)`. A next-surviving-prime pivot is an optimized named variant with a different trace, not a silent implementation choice.
 - Every validated stage advances the cursor. A composite stage with zero new removals is `Advanced(survivor_changed=false)`, not event-free stutter or a cycle halt.
 - The finite certificate `next_divisor^2 > upper_bound` is a run-policy observation, not the native transition's halt. For `N=100`, certification is available after divisor 10 while the figure deliberately continues through divisor 13.
-- Infinite sieve state is intensional. It stores a closed domain and processed-stage cursor, not an infinite array or a secretly bounded candidate list.
+- Infinite sieve state is intensional. It stores a closed support specification and processed-stage marker, not an infinite array or a secretly bounded candidate list.
 - A finite crop, requested figure horizon, requested number of emitted primes, classification certificate, cancellation, and mathematical infinitude are distinct scopes/outcomes.
 - Prime enumeration, `PrimePi`, gaps, residue-class excess, analytic approximation error, spectra, divisor incidence, and plot geometry remain observers and do not participate in sieve equality.
 - Representation counts declare ordered/unordered, sign, zero, repetition, and distinct-index conventions. English `ways` does not supply one universal convention.
@@ -37,7 +37,7 @@ The evidence/search closure and conformance fixtures remain valid. Visible `(sur
 
 ## Big Picture Objective
 
-Reconstruct number-theoretic filtering without forcing mathematical sets, constructive sieves, lazy streams, direct analyzers, and arithmetic measurements into one fake dynamics API. Pin down candidate domains, consecutive stage policy, structural predicates, survivor/removal state, finite and intensional scopes, exact update/trace semantics, output projections, source repairs, figure oracles, representation conventions, Ulam composition, and the smallest coherent Goal 2 integration.
+Reconstruct number-theoretic filtering without forcing mathematical sets, constructive sieves, lazy streams, direct analyzers, and arithmetic measurements into one fake dynamics API. Pin down candidate supports, consecutive stage policy, structural predicates, membership/removal state, finite and intensional scopes, exact update/trace semantics, output projections, source repairs, figure oracles, representation conventions, Ulam composition, and the smallest coherent Goal 2 integration.
 
 ## Catalog Identity
 
@@ -177,7 +177,7 @@ The raster reindexes this as 1,000 forward gaps `Prime[j+1]-Prime[j]` for `j=1..
 
 > “Two numbers are said to be relatively prime if they share no non-trivial factors.”
 
-None is strict sieve state. Relative-prime pairs require a product candidate domain rather than pretending the candidate is one scalar integer.
+None is strict sieve state. Relative-prime pairs require a product candidate set rather than pretending the candidate is one scalar integer.
 
 ### E12 — Divisor and aliquot measurements
 
@@ -255,7 +255,7 @@ The Index's `Prime (prime numbers), see Primes` and `Sieve of Eratosthenes, 132,
 
 ```text
 IntegerFilterSpec = {
-    candidate_domain,
+    candidate_support,
     closed_predicate,
     order: None | Increasing
 }
@@ -266,7 +266,7 @@ SuccessiveDivisibilitySieveProgram = {
 }
 
 IntegerMeasurementSpec = {
-    input_domain,
+    input_support,
     closed_measurement,
     representation_convention?
 }
@@ -274,10 +274,10 @@ IntegerMeasurementSpec = {
 
 An `IntegerFilterSpec` denotes accepted/rejected integers or an increasing enumeration. An `IntegerMeasurementSpec` denotes exact `g(n)` values. Only `SuccessiveDivisibilitySieveProgram` advances through stage events.
 
-### 2. Candidate domains and order
+### 2. Candidate supports and order
 
 ```text
-OrderedIntegerDomain =
+OrderedIntegerSupport =
     InclusiveNaturalInterval(first, last)
   | NaturalsFrom(first)
   | ExplicitDistinctAscendingIntegers(values)
@@ -285,7 +285,7 @@ OrderedIntegerDomain =
 
 The strict prime preset uses `first=2`. The exact page-147 display preset uses `1..100` and exposes its anomalous survivor rather than changing the input. Duplicate values, non-increasing explicit candidates, and non-natural strict candidates are invalid.
 
-Finite domain equality includes kind and exact bounds/values. Infinite domain equality is structural. A rendered width or query window never becomes the semantic upper bound of `NaturalsFrom`.
+Finite support equality includes kind and exact bounds/values. Infinite support equality is structural. A rendered width or query window never becomes the semantic upper bound of `NaturalsFrom`.
 
 ### 3. Closed predicate and measurement data
 
@@ -306,28 +306,36 @@ OrderedPrimePairCount(n)
 
 `Prime` is valid for a pure filter/query, not as the hidden implementation of a requested sieve event. `MeasurementCompare(AliquotDifference, Equal, 0)` denotes perfect numbers. No general arithmetic callback is introduced.
 
-### 4. Strict sieve state
+### 4. Strict sieve configuration
 
-For a finite interval:
+For finite declared support, the canonical transparent configuration is:
 
 ```text
-FiniteSieveState = {
-    program,
-    candidate_domain,
-    next_divisor,
-    ordered_survivors
+FiniteSieveConfiguration = {
+    candidate_support: OrderedIntegerSupport,
+    membership: TotalMap[candidate_support, Boolean],
+    stage_marker: next_divisor
 }
 ```
 
-The removed set is the exact domain complement and need not be duplicated in Markov state. First-removal witnesses live in the event trace. Two equal survivor lists with different `next_divisor` values are different execution states.
-
-For an infinite interval:
+All candidate identities and order come from the labeled support. The lossless packed view is
 
 ```text
-IntensionalSieveState = {
-    program,
-    candidate_domain=NaturalsFrom(2),
-    next_divisor
+pack(membership, stage_marker) =
+    (ordered_survivors = [n in support where membership[n]], stage_marker)
+
+unpack(ordered_survivors, stage_marker, support) =
+    (membership[n] = (n in ordered_survivors), stage_marker)
+```
+
+On the invariant-valid image these maps are mutual inverses. The removed set is the support complement and need not be duplicated. First-removal witnesses live in the event trace. Two equal membership fields or survivor lists with different stage markers are different configurations. The immutable sieve program remains the `program` argument to the runner, not a duplicate field in configuration.
+
+For infinite support:
+
+```text
+IntensionalSieveConfiguration = {
+    candidate_support: NaturalsFrom(2),
+    stage_marker: next_divisor
 }
 ```
 
@@ -335,56 +343,61 @@ After processing through `p=next_divisor-1`, membership is structural:
 
 ```text
 survives_p(n) iff
-    n is in candidate_domain and
+    n is in candidate_support and
     no k in [2, min(p, n-1)] divides n
 ```
 
-Finite-window materialization is a query on this state, not the state itself.
+Finite-window materialization is a query on this configuration, not the configuration itself.
 
-### 5. Source, read, result, and update
+### 5. FRONTIER, NEIGHBORHOOD, RULE writes, and UPDATE
 
-The active source is exactly the next scheduled divisor:
+The firing locus is exactly the next scheduled divisor marker:
 
 ```text
-NextSieveStage(state) -> StageDivisor(d=state.next_divisor)
+NextSieveStage(configuration) -> StageDivisor(d=configuration.stage_marker)
 ```
 
 The old-snapshot read distinguishes all hits from first-time deletion:
 
 ```text
 hits_d = {
-    n in original candidate_domain |
+    n in candidate_support |
     n > d and n mod d == 0
 }
 
-newly_removed_d = hits_d intersect old_survivors
-already_removed_hits_d = hits_d - old_survivors
+newly_removed_d = {n in hits_d | old_membership(n)}
+already_removed_hits_d = hits_d - newly_removed_d
 ```
 
-The typed semantic result is:
+For finite support, RULE returns ordinary typed component writes plus a witness record:
 
 ```text
-RemoveCandidateSubset(
-    stage_divisor=d,
-    hits=hits_d,
-    newly_removed=newly_removed_d
-)
+candidate_writes = {
+    Write(CandidateLocus(n), false)
+    for n in newly_removed_d
+}
+marker_write = Write(StageMarker, d + 1)
+event = SieveStageWitness(d, hits_d, newly_removed_d)
 ```
 
-`MonotoneFilterUpdate` atomically performs:
+The generic old-snapshot finite-write UPDATE validates coverage, membership, predicate witnesses, no resurrection, one stage increment, and write uniqueness, then atomically applies `candidate_writes union {marker_write}`. A zero-removal stage still has the marker write and therefore advances.
+
+For infinite support, `hits_d` and `newly_removed_d` are closed structural descriptors rather than impossible materialized lists. Membership after the event is derived from the updated stage marker, so RULE emits only the marker write plus the exact structural witness. No infinite array write is fabricated.
+
+In the packed finite representation the same event appears as:
 
 ```text
 next_survivors = old_survivors - newly_removed_d
 next_divisor = d + 1
 ```
 
-It validates subset membership, exact predicate witnesses, no resurrection, one stage increment, unchanged retained identities/values, and unchanged increasing order. Infinite events serialize `hits` by their structural proper-multiple descriptor rather than an impossible list.
+This is a representation-specific implementation of the same finite-write transition. It is valid only if the pack/unpack commuting square holds one step at a time and retained identities/order are unchanged.
 
-### 6. Why subset removal needs a typed UPDATE policy
+### 6. Lossless finite and intensional representations
 
-This event removes an arbitrary noncontiguous subset while persistent candidates keep their identities and relative order. T16 replaces one interval, T17 consumes one prefix and appends at the tail, T20 replaces selected tree substructures, T27 replaces every bag occurrence, T30 merges a successor set, T34 assigns one scalar, and T37 appends one endpoint. None has the same validator or conservation law.
+For a declared finite ordered support, the Boolean field plus marker and the ordered-survivor list plus marker carry exactly the same state. Candidate identity/order is restored from the support, the closed predicate remains program data, and removal provenance remains in the event witnesses. Therefore a finite bitmap/field lowering is not lossy and T39 does not justify a construction-specific public UPDATE law.
 
-A finite bitmap can lower survivors to Boolean assignments, but that loses native integer identity, removal provenance, intensional scope, and structural predicate data. Such lowering is an explicit realization, not a reason to collapse the public law.
+The infinite profile is not a finite bitmap. Its support and membership relation are intensional, with the stage marker sufficient to reconstruct which consecutive divisors have been processed. This is a tagged support/representation preset; it still uses the same runner and marker write, while queries materialize only requested finite windows.
 
 ### 7. Successors, event cardinality, and outcomes
 
@@ -466,12 +479,12 @@ If ordered pairs were counted, `3=1+2=2+1` would fail. If self-pairs were allowe
 ### 11. Equality, serialization, and trace
 
 - Program equality includes schedule and predicate tag.
-- Candidate-domain equality includes kind, exact bounds/values, uniqueness, and order.
-- Finite state equality includes program, domain, next divisor, and exact ordered survivors.
-- Intensional state equality is structural program/domain/cursor equality.
+- Candidate-support equality includes kind, exact bounds/values, uniqueness, and order.
+- Finite configuration equality includes support, exact Boolean membership (or its bijective ordered-survivor pack), and stage marker.
+- Intensional configuration equality is structural support/marker equality. Program identity remains separate; run identity pairs the program with the initial configuration.
 - Filter and measurement spec equality is normalized structural equality.
 - Prime-prefix equality compares exact ordered values.
-- Sieve-trace equality includes initial state, each divisor event, hit/new-removal witness, reconstructed states, and outcome.
+- Sieve-trace equality includes program identity, initial configuration, each divisor event, hit/new-removal witness, reconstructed configurations, and outcome.
 - Raster and plot equality is never semantic trace equality.
 
 Reuse T34/T37 decimal-string exact integer codecs:
@@ -590,7 +603,7 @@ Ordered-pair, self-pair, newborn-read, rescan, or fixed-lag interpretations fail
 - **Analytic `Prime[n]`:** alternative evaluator for one ordinal; no survivor state.
 - **Prime set/stream:** structural filter denotation or lazy ordered enumeration; no globally complete finite trace.
 - **Factorization/divisor tables:** analyzers or materialized data. A table cannot become hidden program state.
-- **Decimation:** uses every kth current survivor by rank; it can reuse `MonotoneFilterUpdate` only behind its own selector/read and trace.
+- **Decimation:** uses every kth current survivor by rank; on finite support it can reuse the same Boolean-field/marker write machinery only behind its own selector/read and trace.
 - **Josephus:** circular, order-sensitive elimination with a terminal-selected cell; not strict T39.
 - **Divisor incidence:** a two-dimensional observer/predicate relation, not evolving state.
 - **Perfect/pluperfect/quasiperfect values:** explicit comparisons over divisor measurements.
@@ -604,9 +617,9 @@ Ordered-pair, self-pair, newborn-read, rescan, or fixed-lag interpretations fail
 
 ## Corrected Architecture and Goal 2 Handoff
 
-The strict sieve is a SimpleProgram over ordered candidate support plus a visible stage marker/tag. FRONTIER selects the current stage/divisor marker locus. NEIGHBORHOOD reads candidate membership and derives the divisor's proper-multiple witnesses; those hits are read results and write targets, not firing loci. RULE returns survivor removals plus the next marker, and UPDATE commits both atomically. A zero-removal composite stage still fires because the marker advances. Pure integer filters, streams, and measurements remain non-transition query specifications.
+The strict sieve is a SimpleProgram over ordered candidate support plus a visible stage marker/tag. FRONTIER selects the current stage/divisor marker locus. NEIGHBORHOOD reads candidate membership and derives the divisor's proper-multiple witnesses; those hits are read results and write targets, not firing loci. On finite support, RULE returns ordinary candidate false-writes plus the next marker and the generic old-snapshot finite-write UPDATE commits them atomically. The ordered-survivor form is a lossless packed representation. On infinite support, membership is an intensional function of the support, program, and marker, so the marker write advances the same construction without pretending to materialize infinitely many writes. A zero-removal composite stage still fires because the marker advances. Pure integer filters, streams, and measurements remain non-transition query specifications.
 
-Revised G2-T39 adds explicit candidate support/set schemas, visible marker representation, a stage-marker FRONTIER, candidate membership/proper-multiple access, typed subset removals, marker writes, and a monotone structural UPDATE preset in the common runner. It removes tenth-law/sieve-executor/separate-control and candidate-DOMAIN framing while preserving identity/order, finite certification, figure-vs-math scope, exact masks, Ulam composition, observers, source repairs, and all existing oracles.
+Revised G2-T39 adds explicit candidate-support schemas, finite Boolean membership plus an ordered-survivor pack/unpack codec, an intensional infinite representation, a visible stage marker, stage-marker FRONTIER, candidate membership/proper-multiple access, typed candidate/marker writes, and exact witnesses in the common runner. It removes `MonotoneFilterUpdate`, tenth-law/sieve-executor/separate-control and candidate-DOMAIN framing while preserving identity/order, finite certification, figure-vs-math scope, exact masks, Ulam composition, observers, source repairs, and all existing oracles.
 
 The historical API/handoff below remains evidence provenance; this section governs its executor/class and DOMAIN terminology.
 
@@ -739,14 +752,14 @@ Paths are dependency targets for synthesis; Goal 2 may consolidate modules when 
 - [x] Every one of seven raster files/twelve plotted profiles has an exact identity, horizon, formula/convention, source repair, and independent oracle.
 - [x] Literal `1`, gray-hit/new-removal distinction, composite stages, certification, and finite/infinite scopes are explicit.
 - [x] Filter, stream, sieve, direct analyzer, measurement, prefix, trace, and observer categories remain distinct.
-- [x] State/frontier/read/write/UPDATE/outcome/equality/serialization semantics are explicit and the subset-removal/marker policy is justified against the smaller same-site and ordered-replacement policies.
+- [x] State/frontier/read/write/UPDATE/outcome/equality/serialization semantics are explicit; the finite field/survivor pack is bijective and commutes with generic finite writes, while the infinite membership profile remains intensional.
 - [x] Ulam/T37 composition and T40/current API/runtime boundaries are explicit.
 - [x] Goal 2 files, dependencies, behavior, canonical tests, migration constraints, and no-cheating cases are implementation-ready.
 - [x] Global ledgers, exact verification commands, diff checks, and repository tests are integrated successfully.
 
 ## Architecture-Reclosed Stage Result
 
-**COMPLETE.** T39's strict sieve uses ordered candidate support, a visible stage marker, hit/witness access, and atomic subset-removal/marker writes through the common UPDATE axis. Pure filters and measurements remain declarative queries; no sieve executor, control class, or ordinal law is required.
+**COMPLETE.** T39's strict sieve uses ordered candidate support, a visible stage marker, membership/proper-multiple access, and ordinary atomic candidate/marker writes through the common UPDATE axis. The finite Boolean field and ordered-survivor list are lossless commuting representations; the infinite profile keeps membership intensional. Pure filters and measurements remain declarative queries; no sieve executor, control class, subset-removal class, or ordinal law is required.
 
 ## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
