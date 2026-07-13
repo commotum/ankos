@@ -54,7 +54,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - DOMAIN names the task/program space with its dimensional character, support, and topology; ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
 - Pure constraint/model sets, uniterated function definitions, and general PDE relations without a specified evolution problem are the three evidenced nonfits. Multiway rewriting remains a SimpleProgram whose UPDATE returns a finite set of successors.
-- T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
+- T37 establishes a consecutive number-system-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and endpoint insertion through the ordered UPDATE axis. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
 - The literal page-147 profile really retains `1`: all 1,200 stage cells match the stated update and the final black set is `{1} union primes<=100`, while bottom labels omit `1`. The mathematical preset therefore starts at 2 explicitly. Finite certification after divisor 10, requested rows through 13, and infinite noncompletion remain distinct.
@@ -64,7 +64,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - Structural identity, certified functional equivalence, and observation equality remain distinct. Exact literals/algebraics/complex values are lossless; viewport, mesh, evaluator, precision, samples, rasters, sounds, histograms, and spectra do not enter function identity.
 - The four strict and eight Notes rasters are fully inventoried. Exact page-161 periods/zero families and endpoint conventions, the page-162 tangent/crossing count seam into T42, pole/branch segmentation, finite/infinite series separation, zeta analytic continuation, continuous Riemann-Siegel phase, and declared-precision values/numerical zero counts are pinned.
 - Source repairs remain visible: monolith image links are broken, page numbers are offset, the Notes ODE derivative `2` denotes a different curve than claimed, critical-line zeta needs continuation/phase, and the displayed `a=0` infinite lacunary sum cannot converge ordinarily.
-- T43 is one domain-tagged ideal real scalar under an immutable closed self-map plus a separately identified fixed numerical realization. Certified/tracked evaluator work state and represented feedback state do not masquerade as the exact mathematical point.
+- T43 is one ideal real scalar in an explicit state interval under an immutable closed self-map plus a separately identified fixed numerical realization. Its DOMAIN is discrete `t+0D`; certified/tracked evaluator work state and represented feedback state do not masquerade as the exact mathematical point.
 - `UniqueScalar`, complete old-value read, `MapAssignment`, and existing fixed-effects atomic commit reuse T34 unchanged; T43 adds no eleventh update law. A strict fixed point still advances unchanged, and `h` events always yield `h+1` snapshots.
 - Strict map syntax reuses T41 responsibilities with state references, exact predicates, ordered piecewise arms, source-faithful `FractionalPart`, and a distinct modulo-one primitive. Mathematical map ID, realized-transition ID, certified equivalence, conjugacy, profile-specific orbit equality, and finite observation equality remain distinct.
 - T43 numerical evidence separates ideal exact, certified enclosure, tracked significance, fixed binary, and fixed decimal feedback. Binary shift profiles collapse at events 50/52; the reconstructed decimal profile has a 12-event preperiod and period 195,312,500.
@@ -85,7 +85,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T02 closes an exact 29-query/157-candidate search partition and 21 evidence groups with no remainder. Eleven included, six excluded, and two relation-only assets are hash-pinned; source, semantic, metadata, direct Voronoi priority-table, reversible/inverse-window, and rule-921408 raster oracles pass.
 - T02 exposes current runtime defects rather than adding a branch: exhaustive arity is wrong, selector significance is mirrored, general outputs are binary-masked, ordinary lookup is not executable, and batch rule identity is coerced to fixed-width `int64`.
 - T03's core aggregate semantics, definition/formula excerpts, official-source repairs, and strict code-777 raster remain valid. Its former 16-query/118-candidate, 17-query/309-candidate, and 18-query/312-candidate closures are superseded by the independently reviewed 18-query/313-candidate partition and 119-asset manifest at `50 included / 60 excluded / 9 relation-only`; the T05 code-`1004600` continuation and T06 direction-linked emulation network are closed.
-- T03 reuses T01/T02 fixed support, all-site old-snapshot reads, typed assignment, atomic commit, realization, and trace semantics. D115-D118 add only explicit numeric valuation, the exact sum case domain/table/codec, and typed preset/restriction/sibling boundaries; no executor or eleventh update law is added.
+- T03 reuses T01/T02 fixed support, all-site old-snapshot reads, typed assignment, atomic commit, realization, and trace semantics. D115-D118 add only explicit numeric valuation, the exact reachable-sum case set/table/codec, and typed preset/restriction/sibling boundaries; no executor is added.
 - T05 closes an exact 11-query/142-lexical-line manifest plus five governed prose continuations and 25 linked assets: 172 candidates with zero remainder. Twelve evidence groups pin 47 provenance lines/47 fragments/40 quote lines; assets close at `5 included / 13 relation-only / 7 excluded` after independent review added four direct page-963 chart relations.
 - T05 is exactly the strict finite `k>=4,r=1,A=(0,...,k-1),nu(i)=i` preset over unchanged generic T03, with `M=3k-2`, arbitrary-precision `R=k^M`, and code `1004600` pinned as a structural table. D118 is sharpened; no new primitive, executor, update law, or decision is added. All five embedded checks, independent review, diff/fence gates, and 102 tests pass.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
@@ -108,7 +108,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T17 tables are total `Sigma^q -> Sigma*` maps, so empty appendants are native while missing/duplicate rows are errors. This broadens only private word/edit capability; T13/T16 public nonempty laws remain unchanged.
 - T17 has zero successors with a retained `InsufficientPrefix` residue when required spans are unavailable. Wolfram's supplied history maps that residue to `{}` on the next requested sample; this is an explicit reference projection, not a fabricated semantic transition.
 - T17 supplies the bounded count `(sum_{j=0}^r k^j)^(k^q)` and the direct `50,625` oracle, but no canonical integer rule codec. Finite words, full ragged traces, queue provenance, and derived length/first-symbol/checkpoint views stay separate.
-- T19 adds a finite named register bank over exact arbitrary-precision naturals plus visible unit-payload program-address control. Code addresses and register keys are typed domains, not lattice coordinates or finite alphabet values.
+- T19 adds a finite named register bank over exact arbitrary-precision naturals plus a visible program marker. Code addresses and register keys are typed address spaces, not DOMAIN coordinates or finite alphabet values.
 - T19 uses program-coupled active-instruction selection and instruction-owned named operand reads. Closed increment/decrement-jump results reuse `Assign`, `TransitionControl`, and `AtomicEffectsUpdate`; no new update algebra, instruction callback, or family rollout is required.
 - T19 reference semantics are event-free absorbing `Quiescent(PastProgramEnd)` with the exact state retained; an explicit `ProgramExitStop` interpretation may instead terminate. The last valid event, reference stutter, optional halt, wrap, horizon, external stop, invalidity, and error remain distinct.
 - T19's counted in-program target profile has `(k(n+1))^n` structured programs and no canonical integer codec. A general positive-target profile permits deliberate past-end exits; seeds remain independent and compressed zero-hit/arithmetic views remain event-derived observers.
@@ -423,7 +423,7 @@ All T27 evidence is captured; geometric semantics are not reduced to visualizati
 
 The conservative core search dispositioned 46 occurrences on 37 lines and the expanded alias/observer audit dispositioned 129 on 88, leaving 18 canonical excerpt groups and zero unresolved native-mechanics candidates. All main figures, Notes, actual Index/splits, exact and approximate affine rules, overlap/orientation, complex/IFS variants, dimensions, history, limits, observers, and relations were resolved; the official figure source recovered image-only page-191(d) without fabricating exact coefficients.
 
-T27 reconstructs finite bags of fully posed prototype occurrences, exact or explicitly declared affine domains, parent-local `P∘C` composition, permutation-invariant all-occurrence sources, self-only reads, and multiplicity-preserving `ParallelOccurrenceBagReplace` as the sixth update sibling. Exact centers/counts, overlap, same-center/same-footprint/different-frame, composition order, equivariance, duplicate slots, permutation, newborn timing, validation, and provenance close the handoff. Center/raster/union/limit observers remain downstream, while nonlinear complex branches use a distinct closed point-map profile. T13 lineage composes but ordered concatenation does not; no prior stage was reopened. Next: T29.
+T27 reconstructs finite bags of fully posed prototype occurrences, exact or explicitly declared affine scalar carriers, parent-local `P∘C` composition, permutation-invariant all-occurrence frontiers, self-only reads, and multiplicity-preserving bag replacement through the UPDATE axis. Exact centers/counts, overlap, same-center/same-footprint/different-frame, composition order, equivariance, duplicate slots, permutation, newborn timing, validation, and provenance close the handoff. Center/raster/union/limit observers remain downstream, while nonlinear complex branches use a distinct closed point-map RULE form. T13 lineage composes but ordered concatenation does not. Next: T29.
 
 ### 11-T29-NETWORK
 
@@ -511,7 +511,7 @@ All T34 evidence is captured; arithmetic state is not confused with its renderin
 
 The direct-name union dispositioned 65 occurrences on 55 lines, the conservative mechanics query 27/26, the focused native query 13/12, and exact code/observer forms 6/6. Thirty canonical groups cover the scoped main core, all seven main figures and Notes figures, Notes/programs/actual Index/splits/history, exact domains, addition/multiplication presets, nonlocal carries, digit/fraction/size observers, finite suffix quotients, CA/substitution relations, reversibility, precision, and fast-forward evaluation. Strict mechanics have zero unresolved candidates.
 
-T34 adds a domain-tagged exact scalar carrier and closed `AddConstant | MultiplyConstant` programs, read through `UniqueScalar` and committed as an existing typed assignment—no ninth update law. Arbitrary-precision integers/reduced rationals, decimal-string codecs, exact traces, structural program identity, eventful identity steps, explicit run outcomes, and base/radix/crop/repetend observers are implementation-ready. Page-117..122 row counts/endpoints, `3^499`, exact `(3/2)^t`, the 201-dot fractional plot, suffix period, overflow, carry, normalization, and cross-base tests close the handoff. `MultiplyMod`, CA/substitution compilers, and direct powers remain explicit siblings/observers; T35/T36/T37/T38/T43 stay separate. No prior stage was reopened. Next: T37.
+T34 is a discrete `t+0D` SimpleProgram over an exact numeric carrier with closed `AddConstant | MultiplyConstant` RULE nodes, self read, and ordinary same-locus UPDATE. Arbitrary-precision integers/reduced rationals, decimal-string codecs, exact traces, structural program identity, eventful identity steps, explicit run outcomes, and base/radix/crop/repetend observers are implementation-ready. Page-117..122 row counts/endpoints, `3^499`, exact `(3/2)^t`, the 201-dot fractional plot, suffix period, overflow, carry, normalization, and cross-base tests close the handoff. `MultiplyMod`, compilers, and direct powers remain explicit presets/relations/observers; T43 shares the unary runner.
 
 ### 15-T37-RECURSIVE
 
@@ -547,7 +547,7 @@ Test constructive filtering, sieving, and derived numeric sequences that may not
 
 #### Detailed Implementation Plan
 
-Apply the common protocol, distinguishing candidate domain, stage policy, predicates, survivors, removed values, and derived measurements.
+Apply the common protocol, distinguishing candidate support/set, stage policy, predicates, survivors, removed values, and derived measurements.
 
 #### Completion Requirements
 
@@ -735,7 +735,7 @@ Validate higher-color totalistic systems and parameter scalability against the s
 
 #### Detailed Implementation Plan
 
-Apply the common protocol, emphasizing general `k`, sum domains, rule counts, and finite-table validation.
+Apply the common protocol, emphasizing general `k`, reachable-sum sets, rule counts, and finite-table validation.
 
 #### Completion Requirements
 
@@ -979,7 +979,7 @@ Add required template occurrence and anchoring without conflating global require
 
 #### Detailed Implementation Plan
 
-Apply the common protocol, emphasizing existence constraints, fixed/anywhere anchors, symmetry breaking, and solution domains.
+Apply the common protocol, emphasizing existence constraints, fixed/anywhere anchors, symmetry breaking, and solution/model sets.
 
 #### Completion Requirements
 

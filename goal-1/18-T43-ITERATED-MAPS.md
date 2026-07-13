@@ -723,7 +723,13 @@ This method intentionally supplies no page-166 pixel claim because the plate is 
 12. Exact precision, sampling, rounding, and digit-window settings for several strict images are unstated. Raster appearance never supplies hidden defaults.
 13. The source's Mathematica `FractionalPart` is `x-IntegerPart[x]`, not globally `x-Floor[x]`; it is odd and differs from modulo one for negative inputs. The strict maps never expose the difference because their primitive arguments are nonnegative. Goal 2 versions both semantics explicitly rather than extrapolating the strict simplification. This is corroborated by the [official Wolfram Language reference](https://reference.wolfram.com/language/ref/FractionalPart.html).
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T43 is the T34 `t+0D` unary SimpleProgram with a real/represented value carrier, closed map RULE, self-map/partiality invariant, and explicit numeric realization profile. A continuous state interval does not make DOMAIN continuous. `UniqueScalar`/`MapAssignment` are roles, and fixed/certified/tracked variants are typed representations/relations rather than map executors.
+
+Revised G2-T43 reuses the singleton frontier/self-read/same-locus update, adds closed map syntax/invariance certificates and exact/represented feedback profiles, and retains all orbit/precision/cycle/raster/source-repair oracles. It removes scalar-domain, iterated-map executor, family-specific assignment, callback, and hidden-backend designs.
+
+## Historical Current API Fit (Superseded on DOMAIN/class wording)
 
 - `DIRECT` at responsibility level: `simple_programs.md` rank-zero time, a unique scalar source, complete old-value read, and same-slot assignment match T43. They do not by themselves supply real state, a closed map, or an evaluator.
 - `SEMANTIC MISMATCH`: the documented `FORMULAIC` rule is a callback, not inspectable map data; generic finite-value return also lacks invariant/partiality and numerical-realization contracts.
@@ -733,7 +739,7 @@ This method intentionally supplies no page-166 pixel claim because the plate is 
 - `PRINCIPLED EXTENSION`: no public type represents exact/algebraic real values, certified enclosures, represented-number profiles, interval/torus spaces, invariant proofs, map events, or analysis results.
 - `NOT APPLICABLE`: existing rule IDs and NumPy dtype inference cannot serve as map identity or numeric semantics.
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Evidence Retained)
 
 - `PARAMETERIZATION` at responsibility level: `src/ca/rollout.py:40-85,145-212` requires a positive finite step count and emits an initial-inclusive episode, matching requested finite-horizon shape.
 - `SEMANTIC MISMATCH`: that rollout dispatches by family and materializes NumPy arrays. Current rank-zero evolution is modular integer AR2; adding `if family == "iterated_map"` would bypass the typed source/result/effect executor established by earlier stages.
@@ -741,7 +747,7 @@ This method intentionally supplies no page-166 pixel claim because the plate is 
 - `PRINCIPLED EXTENSION`: `pyproject.toml` provides NumPy and pytest but no exact-real, symbolic, interval, arbitrary-precision, or proof backend. Goal 2 must choose an explicit dependency after cross-stage synthesis or initially limit executable exact primitives to operations it can certify.
 - `NOT APPLICABLE`: direct source/test search finds no iterated-map, fractional-part, logistic, precision, cycle, sensitivity, bifurcation, attractor, or Lyapunov implementation/conformance test to retain.
 
-## Principles Audit
+## Historical Principles Audit (Superseded on architecture wording)
 
 ### Clear ontological basis
 
@@ -776,7 +782,7 @@ General invariant proofs, exact comparison of arbitrary computable reals, asympt
 9. Goal 2 gains shared exact-real/represented values, state spaces, map evaluation/orbit/analysis modules, and pressure on the T44/T45 numerical backend decision.
 10. The API becomes more coherent by reusing one assignment law and one expression registry while separating mathematical maps, feedback realizations, and analysis records. A T43 family rollout would be less coherent and is rejected.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded on architecture wording)
 
 1. Extend the shared exact/declared numeric algebra with named/algebraic reals, certified enclosures, and explicitly represented finite formats; never silently coerce to binary float.
 2. Extend the T41 closed expression registry with state components, exact predicates, ordered piecewise syntax, source-faithful `IntegerPart`/`FractionalPart`, a distinct modulo-one primitive, and partial-domain metadata.
@@ -789,7 +795,7 @@ General invariant proofs, exact comparison of arbitrary computable reals, asympt
 9. Build typed visualization adapters from view data, not from raw exact state coerced into NumPy arrays.
 10. Add adversarial conformance tests for endpoints, jumps/cusps, exact versus fixed arithmetic, guard uncertainty, trace counts, equality relations, and observer separation.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 Build on shared T41/T34 foundations without changing the current family rollout:
 

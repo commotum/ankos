@@ -1099,7 +1099,13 @@ The legacy Wolfram `Random[]` primitive fixes `U`'s marginal as a uniformly dist
 - **Phyllotaxis:** sequential argmax placement and depletion update is only a list analogy.
 - **Random fields and noise:** seed sampling and transition draws are separate random sources. Neither is numerical error.
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T44 is a discrete `t+1D` fixed-lattice SimpleProgram with continuous-valued labels. It reuses T01's all-site FRONTIER, local old-snapshot NEIGHBORHOOD, and parallel UPDATE; aggregate-then-map is a factorized closed RULETYPE. Value continuity does not make DOMAIN continuous, and deterministic weighted/additive/coupled/boiling profiles are typed rule presets rather than construction classes.
+
+Revised G2-T44 generalizes field ALPHABET/numeric profiles and local RULE forms through the CA preset/runner, retaining exact/represented feedback, support/realization, observer, asset, and raster oracles. Stochastic draws and block schedules remain explicit RULE/UPDATE-axis data; PDEs remain declarative relations.
+
+## Historical Current API Fit (Superseded on DOMAIN/class wording)
 
 | Construction concern | Fit | Evidence against current document |
 |---|---|---|
@@ -1116,7 +1122,7 @@ The legacy Wolfram `Random[]` primitive fixes `U`'s marginal as a uniformly dist
 | Stochastic local rule | `PRINCIPLED EXTENSION` | Distributional value return is documented (`simple_programs.md:2075-2122`), but randomness lacks coordinate-stable semantic draw records |
 | Persistent trace | `PARAMETERIZATION` / `PRINCIPLED EXTENSION` | Initial-inclusive dense episodes help, but state/trace/render scope and exact values are conflated (`simple_programs.md:89-166`) |
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Evidence Retained)
 
 - `src/ca/alphabets.py:40-126` — `SEMANTIC MISMATCH`: every alphabet is finite; `float_range_alphabet` explicitly discretizes a range.
 - `src/ca/loci.py:31-124,531-614` — `DIRECT` for finite coordinates and explicit periodic/fixed/reflective gathering; `PRINCIPLED EXTENSION` for integer-line/causal-window lowering. Runtime policy `none` raises on an out-of-bounds read and is not native infinity.
@@ -1131,7 +1137,7 @@ The legacy Wolfram `Random[]` primitive fixes `U`'s marginal as a uniformly dist
 - `src/ca/viz/export.py:177-184` — `SEMANTIC MISMATCH`: float/object states are rejected rather than exported through a typed continuous-field view.
 - Concrete tests establish fixed/periodic/reflective gathering (`tests/test_loci.py:48-54`), radius-one old-time stencils (`tests/test_neighborhoods.py:86-119`), finite integer lookup and batching (`tests/test_rollout.py:263-310`), deterministic episode-level NumPy RNG derivation (`tests/test_rng.py:8-23`), integer point/Bernoulli seed rendering (`tests/test_seeds.py:71-82`), and deliberate rejection of float/object viewer states (`tests/test_viz_export.py:259-277`). No test covers interval state, rational field evolution, aggregate-then-map, fixed-precision divergence, weighted rules, additive continuous rules, coordinate-indexed stochastic draws, or typed gray-field views.
 
-## Principles Audit
+## Historical Principles Audit (Superseded on architecture wording)
 
 ### Clear ontological basis
 
@@ -1166,7 +1172,7 @@ The strict global topology, random-field law, difference convention, fixed machi
 9. Goal 2 gains shared continuous-field, local-numeric-rule, field-realization, run, stochastic-source, analysis, preset, and view work. The exact-real/backend synthesis question remains open.
 10. The API becomes more coherent by expressing T44 as ordinary fixed-field assignment with a typed local numeric program. A T44 family branch or finite float alphabet would be less coherent and is rejected.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded on architecture wording)
 
 1. Extend the exact/declared numeric layer with rational fields, declared decimals, enclosures, tracked values, and represented formats without implicit float coercion.
 2. Extend fixed support with normalized total-field presentations, integer-line causal lowering, finite rings/segments, and independent work/crop/trace records.
@@ -1177,7 +1183,7 @@ The strict global topology, random-field law, difference convention, fixed machi
 7. Add strict, weighted, and additive presets; two separately identified boiling records for literal threshold-conditional and strict-family reconstruction; noisy widened/partial presets; and a typed coupled-map relation/general closed constructor requiring a user-declared aggregate/map. Do not promise a book-exact coupled preset, and defer the complex-block sibling.
 8. Add exact row/formula, boundary/halo, numeric divergence, stochastic replay, observer separation, codec, and no-cheating conformance tests.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 Build on synthesis-selected T01/T41/T43 foundations without modifying the current family dispatch as a new T44 path:
 

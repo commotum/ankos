@@ -6,7 +6,7 @@ Status: **IN PROGRESS — HARD PREREQUISITE FOR T06 AND ALL FURTHER TYPE WORK**
 
 T09/T12 and decisions D009-D014 are reopened because they promoted one state decomposition—separate `SingleControl`/`TransitionControl` records—into a semantic requirement. The audit covers every completed decision and every proposed state, control, frontier, neighborhood, rule result, update law, executor, and runtime API extension. It updates affected stage files, the design ledger, the global plan, and Goal 2 handoffs before T06 or any other type stage resumes.
 
-In this audit, **DOMAIN** is the program's labeled support/topology, including its `t+0D`, `t+1D`, `t+2D`, or `t+3D` dimensional character and whether its coordinates are discrete or continuous. It is not restricted to a dense `Z^4` tensor. A tape alphabet, head-state set, scalar value set, parameter set, address set, or numeric representation is not a DOMAIN; those are ALPHABET/value-schema factors, keys, or profiles.
+In this audit, **DOMAIN** is the task/program's dimensional space together with its support/topology: `t+0D`, `t+1D`, `t+2D`, `t+3D`, and so on, with discreteness or continuity stated explicitly. The configuration labels or structures that space; DOMAIN itself is not restricted to a dense `Z^4` tensor. A tape alphabet, head-state set, scalar value set, parameter set, address set, or numeric representation is not a DOMAIN; those are ALPHABET/value-schema factors, keys, or profiles.
 
 ## Governing Simple-Program Algebra
 
@@ -37,6 +37,14 @@ e(step_A(state)) = step_B(e(state))
 
 Pure constraint/model sets, uniterated function definitions, and general PDE relations without a specified evolution problem lack canonical stepwise evolution and therefore remain genuine nonfits. Multiway systems still fit by lifting one successor to a set of configurations.
 
+### Primary Evidence for the Abstraction
+
+- `BOOK:402` defines programs by rules specifying what happens at each step and introduces cellular automata as one program class, not as the universal container.
+- `BOOK:684` and `BOOK:1248` deliberately vary fixed arrays, parallel application, and fixed size while retaining stepwise rule application.
+- `BOOK:7918` gives one-step cellular encodings of mobile automata and Turing machines using additional cell colors. This is direct evidence for transparent composite labels and a commuting representation, not evidence that their compact native rule tables become arbitrary CA tables.
+- `ref/notes/alphabets.md:54-101` explicitly records `CellAlphabet = TapeSymbol union (TapeSymbol x HeadState)` and treats tape-symbol and head-state roles inside a finite/composite alphabet.
+- `ref/roadmap/alphabets.py:33-67` already sketches product and tagged-union alphabet support as an extension of the existing alphabet axis.
+
 ## Classification Vocabulary
 
 1. **DIRECT REUSE** — an existing construction expresses the complete state and transition semantics unchanged.
@@ -58,7 +66,7 @@ invariant: exactly one coordinate contains Head(...)
 
 This is losslessly equivalent on valid states to a tape-symbol field plus one `(position,head_state)` record. It keeps both the head state and the symbol beneath it visible. A bare `TapeSymbol union HeadState` is not equivalent because it loses the underlying symbol.
 
-The compact rule remains `delta : Q x Sigma -> Q x Sigma x {L,R}`. `FRONTIER` selects the unique old head cell. From one old snapshot, the rule writes a plain symbol at that source and a head-tagged old destination symbol at the neighbor, then `UPDATE` commits both writes atomically. No zero-head or two-head intermediate configuration is observable. This does not identify the compact Turing program with the enormous set of arbitrary cellular-automaton tables over `Cell`.
+The compact rule remains `delta : Q x Sigma -> Q x Sigma x {L,R}`. `FRONTIER` selects the unique old head cell. The native decision reads `(q,sigma)` at the source; its structural lowering also reads the selected destination label so the symbol under the moved head is retained. From that one old snapshot, the rule writes a plain symbol at the source and a head-tagged old destination symbol at the neighbor, then `UPDATE` commits both writes atomically. No zero-head or two-head intermediate configuration is observable. This does not identify the compact Turing program with the enormous set of arbitrary cellular-automaton tables over `Cell`.
 
 The T09 specialization uses `Cell = Plain(bit) | Active(bit)` and the same exactly-one invariant. Its compact eight-row, four-result rule remains native. Because the mobile direction can depend on the old head's radius-one context, a full-slice radius-one target-local CA lowering is not assumed; a closed two-target structural lowering suffices, and any full-slice lowering must prove its required radius.
 
@@ -68,8 +76,8 @@ The T09 specialization uses `Cell = Plain(bit) | Active(bit)` and the same exact
 |---|---|---|---|---|---|
 | D009 / T09 | Mobile event originates at the old active cell | DIRECT REUSE | Simple-program `FRONTIER` as rule-firing loci | Select the unique tagged active cell; typed rule writes may target source and destination; broaden the current writable-coordinate-only schema | Retain source-frontier conclusion; revise storage assumptions and Goal 2 lowering |
 | D010 / T09 | Active position must be visible; former conclusion required a separate state component | LOSSLESS TAGGED / PRODUCT REPRESENTATION | Finite composite alphabet on the existing field | `Plain(bit) <-> (bit,None)`; `Active(bit) <-> (bit,Unit)`; exactly one active tag | Replace storage mandate with representation-neutral visibility and validation |
-| D011 / T09/T12 | Write and move/state change are one atomic event; former conclusion required `TransitionControl` effects | UNDER AUDIT | Existing atomic old-snapshot assignment commit plus a closed structural lowering | Two assignments computed from one valid old state; collision/coverage validation; valid successor | Determine whether a generic finite patch is direct reuse or a parameterization; remove unjustified effect class |
-| D012 / T01/T09 | Physical `[left,self,right]` read and codec are shared | DIRECT REUSE, pending placement check | Existing ordered neighborhood/read codec | Preserve ordering before lowering; no mobile permutation | No semantic reopening expected |
+| D011 / T09/T12 | Write and move/state change are one atomic event; former conclusion required `TransitionControl` effects | DIRECT REUSE / PARAMETERIZATION | Existing old-snapshot atomic UPDATE with a typed finite-write result | Two writes are computed from one valid old state; collision/coverage validation; successor preserves exactly-one tag | Reuse atomic commit, broaden its write schema, and remove the unjustified effect class |
+| D012 / T01/T09 | Physical `[left,self,right]` read and codec are shared | DIRECT REUSE | Existing ordered NEIGHBORHOOD/read codec | Preserve physical order before rule decoding; no mobile-specific permutation | Retain unchanged |
 | D013 / controlled traces | Raw traces must retain active/head information | PARAMETER / INVARIANT / NAMED ROLE | Existing complete state trace over composite values | Tagged field round-trips exactly; compressed/display traces remain observers | Rewrite representation-neutral wording |
 | D014 / T09/T12 | Head payload and position must be visible; former conclusion required `SingleControl` | LOSSLESS TAGGED / PRODUCT REPRESENTATION | Composite finite cell alphabet plus fixed field | `Plain(sigma) | Head(q,sigma)` isomorphic to `(tape,position,q)` on exactly-one states | Replace required class with optional named projection/view |
 
@@ -216,6 +224,21 @@ The classification number in this matrix refers to the four categories above. A 
 | D117 | Same lattice/frontier/read/commit | 1 | Shared CA preset/runner | General radius only parameterizes NEIGHBORHOOD/RULE validation | Keep |
 | D118 | T04/T05/T06/T07 and related reducers | 2/3 | Presets, predicates, properties, DOMAIN/NEIGHBORHOOD/RULETYPE variants | No executor flags; every representation/restriction validated | Keep preset ownership; rewrite claim that weighted/histogram/dimension/continuous values imply new construction classes |
 
+### Concrete Counterexample Gate
+
+The class-4 label and every axis extension are justified by behavior that the smaller candidate cannot express faithfully:
+
+| Candidate reuse | Concrete counterexample | Smallest justified response |
+|---|---|---|
+| Same-site fixed-support assignment UPDATE for T13 | The rule `a -> aa` changes support cardinality in one native event. A scalar write at the old locus cannot preserve both ordered children or their lineage. | Add an ordered block-replacement UPDATE implementation to the existing runner; do not add a substitution executor. |
+| Value-only fixed-support assignment UPDATE for T29 | A rule can allocate a fresh vertex and reroute two old ports to it in one event. Relabeling old vertices cannot express fresh identity or the new incidence relation. | Add typed graph writes plus a graph UPDATE implementation to the existing runner; do not add a network executor. |
+| Single-successor UPDATE for T30 | From word `aaa` under `aa -> b`, the two overlapping matches yield distinct children `ba` and `ab` in the same native step. Choosing one invents a schedule; merging them into one configuration loses branching. | Lift UPDATE's result from one configuration to a finite set while retaining match witnesses; do not add a multiway runner. |
+| SimpleProgram rollout for D058/T31 | The local constraint `x_i != x_(i+1)` denotes a model set but supplies no seed, distinguished firing locus, or next model. Any repair order or successor relation would be invented behavior. | Keep a generic declarative relation/model-set and query category outside rollout. |
+| SimpleProgram rollout for D082/T41 | The definition `f(x)=x^2` maps arguments to values but does not say that a value is state or that `f` must be iterated. Choosing an initial argument or feeding outputs back invents an iterated-map program. | Keep a generic closed-function/query category; derive a T43 program only when iteration is explicitly requested. |
+| SimpleProgram rollout for D103/T45 | The relation `u_xx + u_yy = 0` on a region, without boundary/initial data or a time variable, denotes possible fields and has no canonical state-to-state step. A mesh relaxation schedule would be an invented numerical method. | Keep a generic differential-relation/model-set category; derive evolution only from an explicitly posed, well-defined problem. |
+
+Two tempting collapses also fail the losslessness gate without justifying new executors. A T37 fixed-lag window is future-sufficient but cannot reconstruct the full source prefix, and `TapeSymbol | HeadState` cannot recover the tape symbol under a head. They remain optional quotients only when their information loss is explicit; neither may replace canonical state.
+
 ### Matrix Result
 
 - All canonical step/rewrite stages audited so far fit the same `SimpleProgram` runner. Differences live in DOMAIN/support/topology, ALPHABET/value schema, FRONTIER, NEIGHBORHOOD, RULE result, UPDATE composition/schedule, seed, and validation.
@@ -235,7 +258,7 @@ This table is the authoritative architecture replacement for the reopened stages
 | T04 | Exact `k=3,r=1` T03 data | T03 reuse | T03 reuse | Strict preset only; finish independent asset repair |
 | T05 | Exact finite `k>=4,r=1` canonical T03 data | T03 reuse | T03 reuse | Strict preset only |
 | T09 | Discrete `t+1D` line; `Plain(bit) | Active(bit)`; exactly one active tag | Unique active tag; physical left/self/right | Native `(new_bit,direction)` lowers to source value write plus tag movement; atomic UPDATE | Add composite alphabet, tag-selecting frontier, typed two-write result/lowering, invariant checks; no control class/mobile executor |
-| T12 | Discrete `t+1D` unbounded tape; `Plain(sigma) | Head(q,sigma)`; exactly one head | Unique head tag; self-only semantic read | Native `(q_next,sigma_next,direction)` writes symbol and moves tag while preserving destination symbol; atomic UPDATE | Reuse T09 axes with payload tag, total sparse field, terminal outcome; no `SingleControl`/Turing executor |
+| T12 | Discrete `t+1D` unbounded tape; `Plain(sigma) | Head(q,sigma)`; exactly one head | Unique head tag; source `(q,sigma)` for the native decision plus destination label for lossless structural lowering | Native `(q_next,sigma_next,direction)` writes symbol and moves tag while preserving destination symbol; atomic UPDATE | Reuse T09 axes with payload tag, total sparse field, terminal outcome; no `SingleControl`/Turing executor |
 | T13 | Discrete variable-support `t+1D` word; finite symbol labels | Every old occurrence; self symbol | Block replacement per occurrence; ordered snapshot-parallel concatenate UPDATE | Add ordered replacement UPDATE policy within runner; no substitution executor |
 | T16 | T13 word configuration | Rule-major/leftmost match; exact matched span | One replacement block; exactly-one splice UPDATE | Add program-coupled frontier and schedule restriction over ordered replacement |
 | T17 | Discrete variable-support `t+1D` word | Applicable prefix; required prefix access with separate read/delete widths | Appendant plus consume extent; atomic prefix-delete/old-tail-append UPDATE | Add prefix selector/access and anchored ordered update preset; no tag executor |
@@ -285,7 +308,7 @@ step(program, configuration):
 ## Completion Gate
 
 - [ ] D009-D014 have final classifications and revised consequences.
-- [ ] Every completed D001-D118 decision appears in the audit matrix, individually or in an explicit lossless grouped row with per-decision disposition.
+- [ ] Every completed D000-D118 decision appears in the audit matrix, individually or in an explicit lossless grouped row with per-decision disposition.
 - [ ] Every completed stage's state/control/frontier/read/result/update/executor/API claims have been checked from first principles.
 - [ ] Each class-4 abstraction includes a concrete counterexample against the smallest reusable base.
 - [ ] T09/T12 and every affected dependent stage have revised stage results and Goal 2 handoffs.

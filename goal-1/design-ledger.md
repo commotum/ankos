@@ -403,7 +403,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: the main construction replaces independently placed oriented squares, requires each parent's orientation, and permits later descendants to overlap (`BOOK:2326-2344`). In the exact page-190 orbit, two occurrences after three replacements have the same center and same square footprint but frames differing by 90 degrees and different next descendants (`goal-1/10-T27-GEOMETRIC.md`).
 - Consequence: add immutable local-frame prototypes and finite occurrence bags of `(prototype_id,full_local_to_world_affine_pose)`. Bag permutation is immaterial and multiplicity is material. Center clouds, present footprints, unions, rasters, prototype-symmetry quotients, branch indices, stable IDs, and list positions cannot replace native state; IDs/order remain trace or reference-codec data.
 
-### D042 — Child geometry is parent-local and composed in an explicit scalar domain
+### D042 — Child geometry is parent-local and composed in an explicit scalar carrier
 
 - Status: ACTIVE for T27.
 - Basis: the page-204 orientation arrow and primary rule diagrams require local child placement. The exact page-189/page-190 Notes formulas admit rational matrices with `A'=A_parent A_child` and `b'=A_parent b_child+b_parent`; a rotated/translated adversary distinguishes `P∘C` from `C∘P`. Page-191 also contains source-declared approximate coefficients.
@@ -541,7 +541,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: the strict main examples start from one scalar and repeatedly add one constant or multiply by one constant (`BOOK:1439-1495`).
 - Consequence: use a singleton `t+0D` DOMAIN, an explicit exact numeric value carrier, singleton FRONTIER/self NEIGHBORHOOD, and closed unary RULE nodes `AddConstant | MultiplyConstant`. T43 shares this runner and write semantics. Do not introduce scalar executors, callbacks, digit-state packing, or hidden history.
 
-### D065 — Exact numeric domains, typed identity, and serialization are explicit
+### D065 — Exact numeric carriers, typed identity, and serialization are explicit
 
 - Status: ACTIVE for T34 and shared numeric infrastructure.
 - Basis: canonical integer powers/addition and exact rational powers of `3/2` are stated directly, while the Notes distinguish real/finite representations and their limitations (`BOOK:1479-1495`, `12503-12536`, `13217-13247`).
@@ -581,7 +581,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE for T37.
 - Basis: the main text fixes positive distances behind `n`, and the Notes explicitly classify every page-128 row as linear (`BOOK:1561-1567`, `12690`). Factorial is separately named nonlinear evidence (`12692-12696`).
-- Consequence: strict programs are `bias + sum(coefficient[lag]*f[n-lag])` with unique positive literal lags and exact domain values. Fresh seed length equals `max_lag`; longer resumptions are replay-verified checkpoints. A named closed `Literal|TargetIndex|Lag|Neg|Add|Sub|Mul` extension covers factorial after strict conformance; callbacks, computed indices, branches, and arbitrary recursion remain excluded.
+- Consequence: strict programs are `bias + sum(coefficient[lag]*f[n-lag])` with unique positive literal lags and exact number-system values. Fresh seed length equals `max_lag`; longer resumptions are replay-verified checkpoints. A named closed `Literal|TargetIndex|Lag|Neg|Add|Sub|Mul` extension covers factorial after strict conformance; callbacks, computed indices, branches, and arbitrary recursion remain excluded.
 
 ### D072 — One-term persistent append is the ninth update law
 
@@ -671,7 +671,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE boundary for T41 Fourier/Weierstrass variants.
 - Basis: Notes distinguish finite sums with explicit `k` from approximations to an infinite weighted lacunary sum (`BOOK:13174-13192`). The displayed `a=0` terms do not approach zero generically, so ordinary infinite convergence is impossible.
-- Consequence: strict expressions support exact bounded finite sums or expanded additions. Infinite series use a distinct `SeriesFunctionSpec` with convergence domain, summation meaning, and evaluation context. No `infinity` sentinel in a finite binder, hidden truncation, raster width, or resource cap may masquerade as a mathematical infinite sum; the `a=0` picture is an explicitly truncated/otherwise specified approximation only.
+- Consequence: strict expressions support exact bounded finite sums or expanded additions. Infinite series use a distinct tagged definition with convergence set, summation meaning, and evaluation context. No `infinity` sentinel in a finite binder, hidden truncation, raster width, or resource cap may masquerade as a mathematical infinite sum; the `a=0` picture is an explicitly truncated/otherwise specified approximation only.
 
 ### D087 — Page 162 is a typed T41-query/T42-construction composition
 
@@ -679,7 +679,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: the main and Notes first derive two exact zero families and interval counts, then say the resulting word can be reproduced by a sequence of substitution rules whose choices come from continued-fraction terms (`BOOK:1850-1858`, `13170-13172`). The connection is explicitly absent for more than two sine terms.
 - Consequence: T41 owns source functions, zero/crossing/touch semantics, and exact interval-count query results. T42 owns continued-fraction expansion, coefficient stream, symbols, rule schedule, substitution state/update, and trace. A typed finalized T41 result may feed T42; neither category embeds the other's callbacks/state, and the page-162 bitmap is never executable source data.
 
-### D088 — T43 state is one domain-tagged real scalar under one immutable closed self-map
+### D088 — T43 state is one real scalar in an explicit state interval under one immutable closed self-map
 
 - Status: ACTIVE as a `t+0D` unary SimpleProgram profile.
 - Basis: the defining paragraph repeatedly updates “a number between 0 and 1” by a fixed map that returns a definite number in the same interval (`BOOK:1868-1872`). Strict figures use four unary expressions and separate exact initial conditions (`BOOK:1874-1896`; page-165 raster).

@@ -540,7 +540,13 @@ The nested add-one digit picture is related to a substitution pattern, and some 
 
 T34 is consequently neither “all formulaic 0D rules” nor “anything whose picture is made of digits.” Its closed operation and scalar-domain invariants are narrow enough to make exactness, totality, and serialization checkable.
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T34 is a discrete `t+0D` SimpleProgram with one exact numeric value, singleton FRONTIER, self NEIGHBORHOOD, a closed unary RULE (`AddConstant | MultiplyConstant`), and ordinary same-locus UPDATE. Integers/rationals are value carriers, not DOMAINs. T43 shares this core; `UniqueScalar` and `ArithmeticAssignment` are named roles/presets, not classes.
+
+Revised G2-T34 adds exact numeric carriers/codecs and closed unary RULE nodes through the generic runner, retaining all digit/fraction/size observers and exact oracles. It removes scalar-domain, arithmetic-executor, family-specific assignment, callback, capacity, and hidden-history designs.
+
+## Historical Current API Fit (Superseded on DOMAIN/class wording)
 
 | Responsibility | Current mechanism | Fit for T34 |
 |---|---|---|
@@ -560,7 +566,7 @@ T34 is consequently neither “all formulaic 0D rules” nor “anything whose p
 
 `simple_programs.md` allows a scalar `t+0D` address and `FORMULAIC`, but its finite state/alphabet assumptions and unrestricted formula route are not a sufficient construction. The source/read/result/update responsibilities survive; the current public data model does not.
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Evidence Retained)
 
 - `src/ca/rules.py:316-366` exposes an unrestricted `formulaic` callback and a special `ar2_modular_0d` family. The latter reads two temporal values, computes a second-order recurrence modulo `m`, decodes parameters from a finite rule ID, and is T37-like rather than T34.
 - `src/ca/neighborhoods.py:617-685` makes temporal history explicit for AR2/dyad-lag/count-lag rules; none expresses the sole current-scalar read as a typed arithmetic program.
@@ -572,7 +578,7 @@ T34 is consequently neither “all formulaic 0D rules” nor “anything whose p
 
 Goal 2 should add closed scalar values/programs and route them through the generic typed executor responsibilities. It must not add `if family == "arithmetic"` to the current rollout or store a `Fraction`, Python function, digit string, or big integer in an object cell merely to pass the old array interface.
 
-## Principles Audit
+## Historical Principles Audit (Superseded on architecture wording)
 
 ### Principle 0 — re-derive rather than preserve
 
@@ -594,7 +600,7 @@ The only Markov state is `x_t`. Time is a trace index; a recurrence need not sto
 
 Tests decode rows back to exact values, compare iterative and closed-form traces, cross rendering bases, exceed machine widths, check rational normalization, and distinguish quotient/approximate variants. Pixel resemblance alone is insufficient.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded on architecture wording)
 
 1. Complete all primary-source, figure, Notes, Index, program, history, and relation searches.
 2. Derive the minimal closed scalar-arithmetic operation and number-domain algebra.
@@ -603,7 +609,7 @@ Tests decode rows back to exact values, compare iterative and closed-form traces
 5. Audit current APIs/runtime/tests and record the smallest Goal 2 integration.
 6. Add adversarial no-cheating checks, update the global ledger/evidence/plan, and verify the repository.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### Stage A — exact scalar values
 
