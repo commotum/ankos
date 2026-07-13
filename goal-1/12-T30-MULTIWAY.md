@@ -16,8 +16,8 @@ The evidence/search closure and conformance fixtures remain valid. Multiway uses
 - The successor set exact-unions every generated child. Equal children produced by different rules/spans merge per configuration, and layer lifting merges equal children across parents while retaining every witness.
 - Parents with no applicable match contribute nothing. They do not persist unless an explicit identity rule regenerates them.
 - Epsilon is a valid word/configuration and differs from the empty successor set/layer. Epsilon has no successors when no empty-LHS rule is allowed.
-- The supplied reference `MWStep` maps the empty layer to itself. `Quiescent(EmptyLayer)` with an event-free self-successor is an architectural label for that exact stutter, not a book-named halt.
-- A nonempty layer whose branches all die returns `Advanced(empty_layer)` once. This is not T16 `Terminal(NoMatch)`.
+- The supplied reference `MWStep` maps the empty derived layer to itself. The generic layer lift labels that traversal state `Quiescent(EmptyLayer)`; this is not a native word configuration or a book-named halt.
+- A nonempty derived layer whose branches all die advances to the empty layer once. At native word level, each dead parent has an empty successor set with an explicit dead-end outcome; this is not T16's single-successor `Terminal(NoMatch)` contract.
 - Multiway branching is the shared runner's zero/many-successor result algebra. Exact set union is the generic powerset/layer lift, not a multiway executor or eighth top-level update law.
 - Raw events must retain every `(parent,clause,span,child)` rewrite witness and every dead-end parent. Witness multiplicity never weights or duplicates successor state.
 - Book diagrams deliberately record only whether a source leads to a target, not how many applications do so. A simple state graph and a witness multigraph are distinct trace projections.
@@ -32,11 +32,11 @@ The evidence/search closure and conformance fixtures remain valid. Multiway uses
 - Main book time labels count the initial layer as step 1; the implementation contract and goldens use zero-based `t0` and state the shift explicitly.
 - Every page-219 through page-224 local figure and every page-952 Notes observer has been inspected. Image-only page-223 examples establish diversity but lack textual seeds; no mandatory presets are fabricated.
 - Two source corruptions are repaired transparently: the alternative list code uses sequence blanks in the official CDF, and the sorted example is `AB->BBB, ABB->AAAB` in the official page-937 source.
-- Current runtime support is fixed dense coordinate arrays with scalar family-dispatched updates. It has no word-set state, all-match source, branch result bundle, exact deduplication, dead-end accounting, or multiway trace.
+- Current runtime support is fixed dense coordinate arrays with scalar family-dispatched updates. It has no word carrier, all-match FRONTIER, successor-set `StepResult`, exact deduplication, dead-end accounting, or multiway witness trace.
 
 ## Updated Assumptions
 
-- `Word = tuple[Symbol,...]` admits epsilon. `MultiwayLayer = FiniteSet[Word]` is exact structural set equality: layer order and multiplicity are immaterial, symbol and word order are material.
+- `Word = tuple[Symbol,...]` admits epsilon. The derived `MultiwayLayer = FiniteSet[Word]` uses exact structural set equality: layer order and multiplicity are immaterial, symbol and word order are material.
 - `{epsilon} != empty_layer`. The empty program and empty layer are valid finite data unless later direct evidence narrows them.
 - Program clauses are a mathematical relation, not an ordered rewrite list. Exact duplicate pairs should canonicalize or reject at validation; they cannot create branch weight.
 - Empty left sides are invalid because they introduce insertion-position conventions not evidenced by `StringPosition` examples. Empty right sides are native deletion.
@@ -44,13 +44,13 @@ The evidence/search closure and conformance fixtures remain valid. Multiway uses
 - A child is `prefix + rhs + suffix` for one match only. Overlapping matches produce separate children.
 - Exact child equality alone merges base branches. Length, symbol counts, anagram sorting, symmetry, group equivalence, normal form, or graph layout never defines base state identity.
 - A merged word fires once in the next layer while retaining all inbound derivations only in the event. It has no chosen parent occurrence or persistent ancestry.
-- A finite layer has one semantic successor even when it contains many word-level alternatives. The trace may expose the branch relation without turning executor behavior stochastic.
+- The generic lift maps a finite layer deterministically to the union of the native word-level successor sets. This traversal does not turn the native relation into stochastic executor behavior or make the layer the smallest configuration.
 - Resource exhaustion must not publish a pruned successor as exact. It is a distinct failure/stop diagnostic.
 - Counts, differences, accumulated languages, first-seen depth, paths, confluence, normal forms, causal graphs, compressed spacetime networks, and rendering are downstream.
 
 ## Big Picture Objective
 
-Reconstruct base multiway systems as exact finite word-set evolution: closed literal relation, every overlapping old match, one independent splice per branch, exact target merging, dead-end dropping, epsilon/empty-layer behavior, recurrent-layer semantics, lossless derivation provenance, and derived graph views. Determine the smallest honest reuse of T13/T16 plus the required branch-merge update while excluding repeated deterministic rollouts, callbacks, random branch choice, global visited suppression, pruning, witness-weighted state, family dispatch, and opaque graph packing.
+Reconstruct base multiway systems as an exact finite-successor relation on individual words, with finite word-set evolution as its generic powerset/reachability lift: closed literal relation, every overlapping old match, one independent splice per branch, exact target merging, dead-end dropping, epsilon/empty-layer behavior, recurrent-layer semantics, lossless derivation provenance, and derived graph views. Determine the smallest honest reuse of T13/T16 plus successor-set `StepResult` semantics while excluding repeated priority rollouts, callbacks, random branch choice, global visited suppression, pruning, witness-weighted state, family dispatch, and opaque graph packing.
 
 ## Catalog Identity
 
@@ -59,7 +59,7 @@ Reconstruct base multiway systems as exact finite word-set evolution: closed lit
 - CSV provenance: `ref/notes/CA-Types.csv:31`; taxonomy provenance: `ref/notes/CA-Types.md:814-835`.
 - Canonical section: Chapter 5 `Multiway Systems`, `BOOK:2494-2566`. T29 ends at `2492` and T31 begins at `2568`.
 - Native Notes core: `BOOK:13921-13961`; broader native/variant Notes neighborhood extends through `14025`.
-- Entry kind: deterministic set-lifted evolution generated by all possible single literal replacements.
+- Entry kind: finite-successor relation on words with a deterministic powerset/reachability lift.
 - Search vocabulary: multiway system(s), all possible replacement(s), possible/distinct states/sequences, branch/branching, merge/merging, state graph/network in time, semi-Thue/Thue, string rewrite, confluence/Church-Rosser/normal form, deletion/empty string, `MWStep`/`MWStep1`/`StringPosition`/`StringReplacePart`/`Union`, cyclic/multidimensional/tag/arithmetic/nondeterministic variants, causal network, derivation/path, and growth/count/period.
 
 ## Search Log
@@ -210,12 +210,12 @@ Canonical `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. The
 
 ## Construction Model
 
-### Exact word-set carrier
+### Exact word carrier and derived layer lift
 
 ```text
 Alphabet = FiniteNonEmptySet[Symbol]
 Word = FiniteTuple[Symbol]                 # epsilon allowed
-MultiwayLayer = FrozenSet[Word]            # finite, exact, unweighted
+Layer = FrozenSet[Word]                    # derived traversal container
 
 LiteralClause = {
     lhs: NonEmptyWord,
@@ -228,7 +228,7 @@ MultiwayLiteralProgram = {
 }
 ```
 
-Every word, clause side, and seed is alphabet-closed. Word order is semantic; layer enumeration is not. Equal word values occur at most once in a layer. No parent occurrence ID, branch weight, active control, derivation history, graph node, or first-seen depth is needed to advance.
+Every word configuration, clause side, and seed is alphabet-closed. Word order is semantic. A derived layer is finite, exact, and unweighted; its enumeration is not semantic and equal word values occur at most once. No parent occurrence ID, branch weight, active control, derivation history, graph node, or first-seen depth is needed to advance one word.
 
 The empty word and empty layer are distinct:
 
@@ -247,14 +247,14 @@ The finite program is a relation:
 - an exact duplicate pair is invalid at sequence/JSON construction and impossible in the normalized set value;
 - there is no missing-rule fallback, default identity, priority, numeric rule code, or implicit reverse rule.
 
-Empty `lhs` is rejected because it would require an insertion-position convention absent from the base sources. A finite empty program is valid and causes every nonempty seed state to die at its first event.
+Empty `lhs` is rejected because it would require an insertion-position convention absent from the base sources. A finite empty program is valid and gives every word an empty native successor set; its lifted seed layer becomes empty at the first traversal step.
 
 ### All applicable old matches
 
 Source selection is intrinsically program-coupled:
 
 ```text
-AllApplicableLiteralMatches.select(old_layer, program)
+AllApplicableLiteralMatches.select(parent_word, program)
   = {
       Match(
         snapshot_id,
@@ -263,17 +263,16 @@ AllApplicableLiteralMatches.select(old_layer, program)
         start,
         stop = start + len(clause.lhs)
       )
-      for every parent_word in old_layer
       for every clause in program.clauses
       for every exact occurrence of clause.lhs in parent_word
     }
 ```
 
-Occurrences include overlaps. For parent `AAA` and `AA -> B`, starts 0 and 1 both fire. Parent enumeration, clause enumeration, and match enumeration order cannot change the match set or successor.
+Occurrences include overlaps. For parent `AAA` and `AA -> B`, starts 0 and 1 both fire. Clause and match enumeration order cannot change the native successor set. The generic layer lift invokes this same selection independently for every parent, and parent enumeration cannot change its union.
 
 `MatchedWord` validates:
 
-- the source belongs to the declared snapshot/layer;
+- the source belongs to the declared word snapshot;
 - interval bounds are exact and in range;
 - the old slice equals the selected `lhs`;
 - clause/alphabet/program identity is authoritative;
@@ -582,13 +581,13 @@ This is a strict invariant-backed lowering/optimization. Sorting an arbitrary wo
 ### Adversarial conformance suite
 
 1. **Overlapping matches.** `AAA` under `AA->B` yields exactly `{BA,AB}`, not one preferred child, a simultaneous `B`, or an error.
-2. **Multiple RHS values.** `A->B` and `A->C` yield `{B,C}`. Permuting clause serialization preserves state and witness set.
+2. **Multiple RHS values.** `A->B` and `A->C` yield `{B,C}`. Permuting clause serialization preserves the successor set and witness set.
 3. **Newborn deferral.** `A->AA` gives `{A}->{AA}->{AAA}`. The two positions in `AA` both yield `AAA`, which appears once with two witnesses.
 4. **One-splice alternatives.** Disjoint matches do not combine in a child unless a later layer applies another clause.
 5. **Merge witness.** `{AA}` with `A->epsilon` and `AA->A` has three witnesses but successor exactly `{A}`.
 6. **Diamond merge.** `A->B,A->C,B->D,C->D,D->E` yields `{A}->{B,C}->{D}->{E}`. `D` fires once while its event retains both inbound witnesses.
 7. **Dead branch.** Seed `{A,C}` under `A->B` yields `{B}` with `C` recorded dead, then `empty_layer` with `B` dead.
-8. **Epsilon versus empty.** `{epsilon}` is nonempty state; with no empty-LHS clauses it advances once to `empty_layer`.
+8. **Epsilon versus empty.** `{epsilon}` is a nonempty layer containing one valid word configuration; with no empty-LHS clauses its lift advances once to `empty_layer`.
 9. **No global visited set.** `A->A` produces an event every layer; `A->B,B->A` alternates forever. A compressed graph cache cannot suppress recurrence.
 10. **Cross-parent merge.** If `AB` and `BA` both rewrite to `X`, successor is `{X}` with two inbound witnesses and no chosen parent.
 11. **No implicit accumulation.** A parent absent from all child values disappears even if it appeared in an earlier or compressed graph layer.
@@ -596,15 +595,15 @@ This is a strict invariant-backed lowering/optimization. Sorting an arbitrary wo
 13. **Order invariance.** Permuting old-layer, clause, match, hash, or worker order preserves semantic state and the mathematical witness set.
 14. **Validation.** Reject empty LHS, out-of-alphabet sides/seeds, stale snapshot, wrong span/LHS, fabricated/missing match, duplicate serialized clause, callback matcher/canonicalizer, and implicit cyclic matching.
 15. **Single versus simultaneous.** `{AA}` under `A->B` yields `{AB,BA}` at `t1` and `{BB}` at `t2`; `BB` must not appear at `t1`.
-16. **Self-loop multiplicity.** `AAA` under `A->A` yields one state and one simple self-edge but exactly three span witnesses.
+16. **Self-loop multiplicity.** `AAA` under `A->A` yields one successor word and one simple self-edge but exactly three span witnesses.
 17. **Cross-rule duplicate.** `AA` under `A->B` and `AA->BA` yields `{AB,BA}`; `BA` has two witnesses but one semantic occurrence.
-18. **Symbol alpha-equivariance.** Apply any bijection to alphabet, program, and layer. Successor and witnesses must be the corresponding renaming.
+18. **Symbol alpha-equivariance.** Apply any bijection to alphabet, program, and layer. Successor set and witnesses must be the corresponding renaming.
 19. **Graph invariant.** `S_t` equals exact-length-`t` reachability from the seed in the simple state graph; accumulated graph nodes equal `union_{i<=t} S_i` without replacing `S_t`.
 20. **Resource limit.** A deliberately tiny cap returns an explicit resource/partial diagnostic and publishes no ordinary pruned successor.
 
 ## Variants, Relations, and Boundaries
 
-- **Base literal multiway systems:** the native finite exact word-set construction above.
+- **Base literal multiway systems:** the native finite-successor word relation plus the generic exact layer lift above.
 - **Semi-Thue/Thue systems:** bidirectional clause-pair restrictions over the same literal engine; reachability equivalence is a relation, not base state identity.
 - **Semigroups/groups/monoids:** strict reverse/inverse rule presets plus algebraic interpretation. Connected components, equivalence classes, and Cayley graphs are observers/relations.
 - **Formal grammars:** regular/context-free/context-sensitive/unrestricted restrictions can use the literal engine where their rules are literal. Terminal/nonterminal status and accumulated terminal language are program metadata/observers.

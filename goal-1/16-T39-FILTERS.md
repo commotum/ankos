@@ -604,9 +604,9 @@ Ordered-pair, self-pair, newborn-read, rescan, or fixed-lag interpretations fail
 
 ## Corrected Architecture and Goal 2 Handoff
 
-The strict sieve is a SimpleProgram over ordered candidate support plus a visible stage marker/tag. FRONTIER selects the current divisor's proper-multiple hit loci, NEIGHBORHOOD reads survivor membership and exact witnesses, RULE returns survivor removals plus the next marker, and UPDATE commits both atomically. A zero-removal composite stage still fires because the marker advances. Pure integer filters, streams, and measurements remain non-transition query specifications.
+The strict sieve is a SimpleProgram over ordered candidate support plus a visible stage marker/tag. FRONTIER selects the current stage/divisor marker locus. NEIGHBORHOOD reads candidate membership and derives the divisor's proper-multiple witnesses; those hits are read results and write targets, not firing loci. RULE returns survivor removals plus the next marker, and UPDATE commits both atomically. A zero-removal composite stage still fires because the marker advances. Pure integer filters, streams, and measurements remain non-transition query specifications.
 
-Revised G2-T39 adds explicit candidate support/set schemas, visible marker representation, hit-locus FRONTIER, membership access, typed subset removals, marker writes, and a monotone structural UPDATE preset in the common runner. It removes tenth-law/sieve-executor/separate-control and candidate-DOMAIN framing while preserving identity/order, finite certification, figure-vs-math scope, exact masks, Ulam composition, observers, source repairs, and all existing oracles.
+Revised G2-T39 adds explicit candidate support/set schemas, visible marker representation, a stage-marker FRONTIER, candidate membership/proper-multiple access, typed subset removals, marker writes, and a monotone structural UPDATE preset in the common runner. It removes tenth-law/sieve-executor/separate-control and candidate-DOMAIN framing while preserving identity/order, finite certification, figure-vs-math scope, exact masks, Ulam composition, observers, source repairs, and all existing oracles.
 
 The historical API/handoff below remains evidence provenance; this section governs its executor/class and DOMAIN terminology.
 

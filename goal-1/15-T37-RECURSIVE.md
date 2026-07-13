@@ -17,7 +17,7 @@ The evidence/search closure and conformance fixtures remain valid. The full pref
 - Each valid event reads only old prefix terms, computes exactly one value, and append-preserves the entire old prefix. It uses the ordered UPDATE axis with an endpoint-insertion policy; T34 same-locus writes, T16 matched-span splice, and T17 prefix-consume/tail-append retain their distinct validators and schedules inside the same runner.
 - A lag window plus the next absolute index is future-sufficient for a fixed-lag program, but it is a lossy transition quotient. It is not canonical prefix equality and cannot reconstruct discarded terms without the seed/checkpoint and complete append log.
 - Every valid exact recurrence event has one successor forever. A repeated numeric term or periodic suffix never creates an unchanged state or full-state cycle because the indexed prefix grows.
-- Exact signed integers and reduced rationals reuse T34 value/domain/string-codec obligations. Fixed-width NumPy arithmetic, implicit modulus, floats, and unsafe JSON numbers cannot represent the strict construction.
+- Exact signed integers and reduced rationals reuse T34 value-carrier/string-codec obligations. Fixed-width NumPy arithmetic, implicit modulus, floats, and unsafe JSON numbers cannot represent the strict construction.
 - Current AR2 code is a related finite modular two-lag recurrence, not T37: it hides one seed value, reads trajectory times, decodes coefficients from a finite rule ID, coerces to `np.int64`, applies a modulus, and emits scalar samples rather than prefix states.
 - The direct-name union found 48 occurrences on 42 lines, the fixed-lag token query 23/13, the focused semantics query 32/20, the literal program token 20/20, the alias/control query 10/10, and named saturation 160/118. Every candidate is dispositioned and strict mechanics have zero unresolved search gaps.
 
@@ -27,7 +27,7 @@ The evidence/search closure and conformance fixtures remain valid. The full pref
 - A canonical fresh seed contains exactly `max_lag` contiguous terms. A longer prefix is a separately typed checkpoint and must be verified from the minimal seed before it can be resumed.
 - The strict public rule is `AffineFixedLag(carrier,bias,coefficients)`, where coefficients are a canonical sparse map from positive literal lags to exact scalars. At least one nonzero coefficient is required.
 - `FixedLagArithmeticExpr` is a named Notes extension with only literals, target index, positive literal lag references, negation, addition, subtraction, and multiplication. Computed indices, callbacks, branches, division, powers, and arbitrary recursive calls remain excluded.
-- Static validation rejects lag zero, negative lags, current/future references, duplicate lag entries, mixed domains, empty/short fresh seeds, and hidden defaults. Strict T37 needs no runtime invalid-index policy.
+- Static validation rejects lag zero, negative lags, current/future references, duplicate lag entries, mixed value schemas, empty/short fresh seeds, and hidden defaults. Strict T37 needs no runtime invalid-index policy.
 - Exact program identity is structural after constructor normalization. Mathematical equivalence of two recurrence formulas, characteristic roots, or closed forms is an observer and does not quotient program identity.
 - A compact seed-plus-append-event record may encode the full trace without materializing quadratically many nested prefixes. Storage compression does not change state semantics.
 - The book's final displayed row is a term-stream/prefix observer. A rollout trace is the nested sequence of prefix states and append events; these are not interchangeable.
@@ -175,21 +175,21 @@ The 20 direct-union Index lines route as follows: algebraic/linear recurrence an
 
 ### State and support
 
-For exact numeric domain `D`, define
+For exact numeric value schema `V`, define
 
 ```text
-NumericPrefix(D, o, (v_0, ..., v_(m-1)))
+NumericPrefix(V, o, (v_0, ..., v_(m-1)))
 ```
 
-where `m>0`, every `v_i` is canonical in `D`, and tuple position `i` denotes the stable term index `o+i`. The support is the consecutive integer interval `[o,o+m-1]`; it grows only at its high endpoint. There is no spatial boundary, fill value, control state, cursor, hidden clock, or mutable program.
+where `m>0`, every `v_i` is canonical in `V`, and tuple position `i` denotes the stable term index `o+i`. The support is the consecutive integer interval `[o,o+m-1]`; it grows only at its high endpoint. There is no spatial boundary, fill value, control state, cursor, hidden clock, or mutable program.
 
-Prefix equality includes the domain tag, absolute origin, length, and every ordered exact term. Two equal last-lag windows or equal newest values do not make prefixes equal. The complete run configuration also includes the immutable program; two configurations may share a state value while having different future behavior.
+Prefix equality includes the value-schema tag, absolute origin, length, and every ordered exact term. Two equal last-lag windows or equal newest values do not make prefixes equal. The complete run configuration also includes the immutable program; two configurations may share a state value while having different future behavior.
 
 ### Strict recurrence program
 
 ```text
 AffineFixedLag(
-    domain=D,
+    value_schema=V,
     bias=b,
     coefficients=((k_1,c_1), ..., (k_q,c_q))
 )
@@ -203,11 +203,11 @@ f[n] = b + sum(c_i * f[n-k_i] for i=1..q).
 
 Validation and normalization require:
 
-1. `D` has the exact addition/multiplication operations used; initial support is arbitrary-precision signed integers and reduced rationals.
-2. `b` and all `c_i` are canonical members of `D`; booleans and floats are not exact integers/rationals.
+1. `V` has the exact addition/multiplication operations used; initial support is arbitrary-precision signed integers and reduced rationals.
+2. `b` and all `c_i` are canonical members of `V`; booleans and floats are not exact integers/rationals.
 3. Each lag `k_i` is a positive literal integer, entries are sorted by increasing lag, and duplicate entries are rejected at the serialized boundary.
 4. Zero coefficients are removed canonically, and at least one nonzero coefficient remains.
-5. Program identity is the normalized domain, bias, and ordered sparse coefficient map—not a rule number, callback identity, closed-form equivalence class, or characteristic polynomial alone.
+5. Program identity is the normalized value schema, bias, and ordered sparse coefficient map—not a rule number, callback identity, closed-form equivalence class, or characteristic polynomial alone.
 
 The dependency footprint is exactly the coefficient keys; `L=max(k_i)` is the recurrence order/required fresh-seed length. Noncontiguous maps such as `{2:1,3:1}` are valid.
 
@@ -226,9 +226,9 @@ FixedLagArithmeticExpr =
   | Mul(nonempty_exprs)
 ```
 
-The dependency footprint is the set of literal `Lag(k)` nodes, and at least one lag is required. `TargetIndex` is injected exactly into `D`. This closed algebra covers factorial and can express the logistic recurrence under an exact rational profile. It deliberately excludes conditionals, comparisons, division, powers, modulus, absolute indices, term-value-computed indices, general function calls, evaluator strings, lambdas, and host arithmetic objects.
+The dependency footprint is the set of literal `Lag(k)` nodes, and at least one lag is required. `TargetIndex` is injected exactly into `V`. This closed algebra covers factorial and can express the logistic recurrence under an exact rational profile. It deliberately excludes conditionals, comparisons, division, powers, modulus, absolute indices, term-value-computed indices, general function calls, evaluator strings, lambdas, and host arithmetic objects.
 
-Expression identity is structural after literal/domain normalization and documented associative-node normalization; it is not quotient by symbolic algebra. Logistic's prefix program remains distinct from T43's scalar-map program.
+Expression identity is structural after literal/value-schema normalization and documented associative-node normalization; it is not quotient by symbolic algebra. Logistic's prefix program remains distinct from T43's scalar-map program.
 
 ### Seed and checkpoint
 
@@ -258,10 +258,10 @@ Dependency references are provenance and validation witnesses as well as inputs.
 
 ### Endpoint-insertion UPDATE preset
 
-The endpoint-insertion UPDATE preset validates the snapshot/source, exact target index, complete dependency footprint, old values, result domain, and one-result cardinality. It then returns
+The endpoint-insertion UPDATE preset validates the snapshot/source, exact target index, complete dependency footprint, old values, result value schema, and one-result cardinality. It then returns
 
 ```text
-NumericPrefix(D, o, old.terms ++ (result.value,)).
+NumericPrefix(value_schema=V, origin=o, terms=old.terms ++ (result.value,)).
 ```
 
 Every old index/value is preserved exactly, exactly one fresh endpoint is created, and the commit is atomic. This typed policy differs from T34 same-locus assignment because no old term is overwritten, from T16 interval splice because no nonempty match is consumed, and from T17 queue replacement because no prefix is deleted. The difference belongs on the UPDATE axis of the common runner; it is not a ninth execution algebra.
@@ -297,15 +297,15 @@ For `L=max_lag`, define
 Q_L(prefix) = (next_absolute_index, last_L_terms).
 ```
 
-When every reference is a fixed positive lag at most `L`, arithmetic is deterministic, and the exact domain/program are retained, `Q_L` commutes with one append. If `TargetIndex` is absent, the next index may be irrelevant to value evaluation but remains required to recover typed addresses.
+When every reference is a fixed positive lag at most `L`, arithmetic is deterministic, and the exact value schema/program are retained, `Q_L` commutes with one append. If `TargetIndex` is absent, the next index may be irrelevant to value evaluation but remains required to recover typed addresses.
 
-This quotient is future-sufficient and useful as an evaluator cache. It is lossy: prefixes `(1,1,2)` and `(9,1,2)` have the same last-two window and different state/history. A bare window cannot serialize a canonical prefix, answer arbitrary past-term queries, or reproduce the trace. The complete append log restores those abilities; a finite-domain window cycle still is not a growing-prefix cycle.
+This quotient is future-sufficient and useful as an evaluator cache. It is lossy: prefixes `(1,1,2)` and `(9,1,2)` have the same last-two window and different state/history. A bare window cannot serialize a canonical prefix, answer arbitrary past-term queries, or reproduce the trace. The complete append log restores those abilities; a finite-carrier window cycle still is not a growing-prefix cycle.
 
 ### Exact values and serialization
 
-Reuse T34's tagged exact integers/reduced rationals and decimal-string components. Domain tags participate in equality. Index origins, lags, append counts, and large term indices also serialize without unsafe JSON-number assumptions.
+Reuse T34's tagged exact integers/reduced rationals and decimal-string components. Value-schema tags participate in equality. Index origins, lags, append counts, and large term indices also serialize without unsafe JSON-number assumptions.
 
-Canonical decoding rejects duplicate lags, malformed signs/decimal strings, zero rational denominators, booleans, floats, mixed domains, unknown AST nodes, and hidden precision/modulus fields. A normalized program/prefix round trip is byte-stable at the canonical data level.
+Canonical decoding rejects duplicate lags, malformed signs/decimal strings, zero rational denominators, booleans, floats, mixed value schemas, unknown AST nodes, and hidden precision/modulus fields. A normalized program/prefix round trip is byte-stable at the canonical data level.
 
 ### Observers and analyzers
 
@@ -371,11 +371,11 @@ Additional exact conformance fixtures:
 ### Native profiles and principled closure
 
 - The six page-143 affine integer programs are the strict evidenced core.
-- Other exact integer/rational biases, coefficients, origins, and seeds are a principled closure when the declared domain is closed and fresh-seed coverage is exact.
+- Other exact integer/rational biases, coefficients, origins, and seeds are a principled closure when the declared value schema is closed and fresh-seed coverage is exact.
 - Noncontiguous positive lags are native, as Perrin demonstrates.
-- `FixedLagArithmeticExpr` is a named same-executor Notes extension for index-dependent coefficients and nonlinear arithmetic over fixed literal lags. Factorial is its canonical fixture.
-- A residue-ring/modular affine recurrence is an explicit domain variant. It may reuse fixed-lag dependency structure, but modulus and finite equality/periods are never implicit performance options.
-- Certified exact-real or declared finite-precision profiles require their own domain/equality context. Nothing in the strict figure justifies host-float defaults.
+- `FixedLagArithmeticExpr` is a named same-runner RULE extension for index-dependent coefficients and nonlinear arithmetic over fixed literal lags. Factorial is its canonical fixture.
+- A residue-ring/modular affine recurrence is an explicit value-schema variant. It may reuse fixed-lag dependency structure, but modulus and finite equality/periods are never implicit performance options.
+- Certified exact-real or declared finite-precision profiles require their own carrier/equality context. Nothing in the strict figure justifies host-float defaults.
 
 ### Relations and excluded recursive forms
 

@@ -12,7 +12,7 @@ The evidence/search closure and conformance fixtures remain valid. T34 is a `t+0
 - The book never uses the catalog title. The scoped source construction is the first part of Chapter 4 `Elementary Arithmetic`, `BOOK:1439-1495`; `Systems Based on Numbers` is a Chapter 4 umbrella and `arithmetic systems/recurrences` generally route to T35.
 - Native state is one exact scalar. The strict program repeatedly applies one fixed `AddConstant` or `MultiplyConstant`; seed `1`, addends `1..8`, multipliers `2`, `3`, and `3/2` are canonical presets.
 - Digit rows, digit counts/frequencies/lengths, leading digits, numeric/log-size plots, residues, and fractional parts are observers. Base, radix alignment, crop, padding, palette, and plot lines are not state and never feed back.
-- The canonical exact carriers are arbitrary-precision integers and reduced rationals. The main text supplies no fixed-precision-real preset; general real/irrational Notes require an explicit exact or declared numerical domain rather than host floats.
+- The canonical exact carriers are arbitrary-precision integers and reduced rationals. The main text supplies no fixed-precision-real preset; general real/irrational Notes require an explicit exact carrier or declared numerical profile rather than host floats.
 - Every valid strict event has exactly one successor and no native halt. Identity, fixed points, or principled negative-factor cycles remain eventful; horizon and resource failure are external.
 - The add-one image contains states `1..63`; the add-constant panels contain 84 rows; the two short integer-multiplication panels contain 64 rows; the long powers-of-three view contains 500 rows and is cropped only in presentation; the `3/2` digit view contains 256 exact rational rows.
 - T35 begins semantically at `BOOK:1497-1503` when parity selects an arithmetic branch. T36 makes digits/base rule-visible, T37/T38 store numeric history, and T43 feeds a nonlinear/fractional interval map back into the state.
@@ -25,7 +25,7 @@ The evidence/search closure and conformance fixtures remain valid. T34 is a `t+0
 
 - Exact integer/rational arithmetic is semantic in the strict profiles. Finite-precision and arbitrary exact-real behavior are separate typed domains and never silent implementation modes.
 - Public arithmetic updates are the closed structural sum `AddConstant | MultiplyConstant`, not unrestricted host-language callbacks or a generic affine/expression AST.
-- Typed state identity is domain-tagged; cross-domain numeric equivalence is an observer. Program identity is structural, so extensionally identical `Add(0)` and `Multiply(1)` remain distinct.
+- Typed state identity is carrier-tagged; cross-carrier numeric equivalence is an observer. Program identity is structural, so extensionally identical `Add(0)` and `Multiply(1)` remain distinct.
 - State-sequence equality, full trace identity, and visual equality are different relations.
 - Exact big integers and rational components serialize as decimal strings, avoiding JSON/JavaScript precision loss.
 - Representation-base digits and display geometry remain downstream. The explicit `MultiplyMod` quotient is a related program, not a view flag.
@@ -152,7 +152,7 @@ Representative reproducible commands used `rg -n -i` over the monolith with the 
 ### E17 — General real powers
 
 - Provenance: `BOOK:12580`.
-- Fact: the fractional parts of `h^n` are discussed for general real `h`, including exceptional Pisot numbers. This supports a domain-polymorphic arithmetic construction only when exact/approximate real semantics are declared; statistical theorems do not supply a finite real codec.
+- Fact: the fractional parts of `h^n` are discussed for general real `h`, including exceptional Pisot numbers. This supports a carrier-polymorphic arithmetic construction only when exact/approximate real semantics are declared; statistical theorems do not supply a finite real codec.
 
 ### E18 — Irrational additive orbits and substitution codings
 
@@ -229,13 +229,13 @@ A strict arithmetic-iteration run is determined by:
 
 ```text
 ArithmeticIterationProgram = {
-    domain: ScalarDomain,
+    value_schema: ScalarValueSchema,
     operation: AddConstant(c) | MultiplyConstant(c)
 }
 
 ArithmeticRun = {
     program: ArithmeticIterationProgram,
-    initial: ScalarValue(program.domain),
+    initial: ScalarValue(program.value_schema),
     event_count: Natural
 }
 ```
@@ -249,7 +249,7 @@ step(AddConstant(c),      x) = x + c
 step(MultiplyConstant(c), x) = x * c
 ```
 
-The operation is the same at every event. `c`, the old value, and the result must all belong to the declared domain. There is no implicit modulus, truncation, saturation, rounding, base conversion, conditional branch, or change of constant.
+The operation is the same at every event. `c`, the old value, and the result must all belong to the declared value schema. There is no implicit modulus, truncation, saturation, rounding, base conversion, conditional branch, or change of constant.
 
 ### Scalar domains and exactness
 
@@ -262,7 +262,7 @@ ExactRational = normalized (numerator: Integer, denominator: PositiveInteger)
 
 An `ExactInteger` program accepts only integer initial values and constants. An `ExactRational` program accepts normalized rationals, with integers embedded canonically as denominator one. Rational normalization uses positive denominator and coprime numerator/denominator; `1/2` and `2/4` therefore serialize and compare as the same value.
 
-The Notes also discuss general real multipliers and irrational additive orbits. That establishes a principled domain-polymorphic extension, not permission to use host floats silently. An exact-real profile must supply a closed, canonical, equality-preserving representation and total exact addition/multiplication for its admitted values, such as a certified algebraic-number domain. A declared finite-precision profile is a separate numerical approximation:
+The Notes also discuss general real multipliers and irrational additive orbits. That establishes a principled carrier-polymorphic extension, not permission to use host floats silently. An exact-real profile must supply a closed, canonical, equality-preserving representation and total exact addition/multiplication for its admitted values, such as a certified algebraic-number carrier. A declared finite-precision profile is a separate numerical approximation:
 
 ```text
 DeclaredFinitePrecision = {
@@ -279,17 +279,17 @@ Supporting negative or zero seeds/constants is a principled closure of exact add
 
 Validation is structural and occurs before execution:
 
-- the domain tag is known and its value codec is canonical;
+- the value-schema tag is known and its codec is canonical;
 - the operation is exactly one closed algebra member;
-- the constant and initial value belong to the same declared domain;
+- the constant and initial value belong to the same declared value schema;
 - exact rationals are finite and normalized;
 - finite-precision contexts declare every rounding/overflow parameter;
 - the requested event count is a nonnegative integer;
 - no callable, expression evaluator, predicate, conditional arm, modulus, digit window, or stop test is embedded in the strict program.
 
-Program identity is the tagged domain plus the normalized operation constant. A run identity additionally includes the normalized initial value. Event horizon and all observer settings are execution/view requests, not mathematical program identity.
+Program identity is the tagged value schema plus the normalized operation constant. A run identity additionally includes the normalized initial value. Event horizon and all observer settings are execution/view requests, not mathematical program identity.
 
-Identity is structural and domain-tagged. `ExactInteger(1)` and `ExactRational(1/1)` may be related by an explicit cross-domain numeric-equivalence observer, but they are not the same typed state. Likewise, `AddConstant(0)` and `MultiplyConstant(1)` remain distinct programs even though both induce identity transitions.
+Identity is structural and carrier-tagged. `ExactInteger(1)` and `ExactRational(1/1)` may be related by an explicit cross-carrier numeric-equivalence observer, but they are not the same typed state. Likewise, `AddConstant(0)` and `MultiplyConstant(1)` remain distinct programs even though both induce identity transitions.
 
 ### Event semantics and outcomes
 
@@ -308,7 +308,7 @@ x_(t+1) = UPDATE.apply(x_t, UniqueScalar, (proposal,)).successor
 
 Every valid strict exact event has exactly one successor. An identity event—`AddConstant(0)`, `MultiplyConstant(1)`, or multiplication of zero—still returns `Advanced(changed=false)` and records an event. There is no native halt, fixed-point stop, cycle stop, digit-width cap, target magnitude, or convergence threshold. Those are observers or run policies.
 
-The mathematical transition remains total even when a concrete evaluator runs out of memory or time. `ResourceExhausted`, `Cancelled`, invalid input, and `BackendFailure` are operational outcomes outside the successor algebra and must retain the last complete exact state. A completed finite request returns `RequestedIterationsCompleted` after exactly the requested number of events; it does not relabel the last value as terminal.
+The mathematical transition remains total even when a concrete evaluator runs out of memory or time. `ResourceExhausted`, `Cancelled`, invalid input, and `BackendFailure` are typed outcomes in the uniform `StepResult`/run-result envelope, not mathematical successor configurations; they must retain the last complete exact state. A completed finite request returns `RequestedIterationsCompleted` after exactly the requested number of events; it does not relabel the last value as terminal.
 
 ### Trace and time indexing
 
@@ -332,10 +332,10 @@ Fast exponentiation may answer a random-access query without replaying `t` event
 
 ### Equality and serialization
 
-- State equality is exact numeric equality within the declared scalar domain.
+- State equality is exact numeric equality within the declared scalar value schema.
 - Exact integers serialize in JSON as signed decimal **strings**, never lossy JSON number literals; exact rationals serialize as tagged normalized numerator/positive-denominator decimal-string pairs.
 - Program tags and constants serialize as closed data; host function names, source code, pickles, and lambdas are forbidden.
-- Exact and finite-precision values never compare equal across domain tags merely because a displayed decimal agrees.
+- Exact and finite-precision values never compare equal across carrier tags merely because a displayed decimal agrees.
 - Trace identity includes program/run provenance, exact states, exact events, and the typed run outcome. State-sequence equality is a separate observer and may hold for structurally different programs such as the identity operations. A rendering, crop, base, color palette, padding choice, or plotted curve is not part of either comparison.
 - Cycles and fixed points are detected on exact normalized state values. Rounded-display equality cannot establish recurrence.
 
@@ -503,7 +503,7 @@ This is exactly `(3^200 mod 2^200)/2^200`, approximately `0.187461128806`; using
 
 - Fixed addition and fixed multiplication over exact integers/rationals are the strict evidenced core.
 - Seed `1`, addends `1..8`, multipliers `2`, `3`, and `3/2`, and base-2 observations are canonical presets, not hard-coded executor branches.
-- Other exact seeds/constants, including zero and negative values, are a principled closure of the same total operations when the declared domain is closed under them.
+- Other exact seeds/constants, including zero and negative values, are a principled closure of the same total operations when the declared value schema is closed under them.
 - Certified exact-real and declared finite-precision real domains are separate scalar profiles. They share the unary event shape only when their arithmetic/equality contracts are explicit.
 - Fractional part, digit length/count/frequency, leading digits, residues, and numeric/log-size plots are observers.
 - Negative bases, non-power positional systems, and multiplicative digit decompositions are alternative representation schemes. They do not change an addition or multiplication program.
@@ -539,7 +539,7 @@ The nested add-one digit picture is related to a substitution pattern, and some 
 | T45 PDE | numeric fields | continuous space/time derivative constraint plus solver/discretization category |
 | Linear congruential RNG | multiplication suffix quotient | finite modulus is semantic state loss; randomness tests/distributions are observers |
 
-T34 is consequently neither “all formulaic 0D rules” nor “anything whose picture is made of digits.” Its closed operation and scalar-domain invariants are narrow enough to make exactness, totality, and serialization checkable.
+T34 is consequently neither “all formulaic 0D rules” nor “anything whose picture is made of digits.” Its closed operation and scalar-value invariants are narrow enough to make exactness, totality, and serialization checkable.
 
 ## Corrected Architecture and Goal 2 Handoff
 

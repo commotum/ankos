@@ -192,9 +192,9 @@ Reconstruct the complete register-machine instruction cycle, numeric state, cond
 
 ## Construction Model
 
-### State, program, and domains
+### State, program, and value/address schemas
 
-The base value domain is exact:
+The base value and address schemas are exact:
 
 ```text
 Natural = arbitrary-precision integer n with n >= 0
@@ -227,7 +227,7 @@ RegisterMachineState = (
 )
 ```
 
-Equivalently, the counter may be a unique visible marker over the finite program-address support. The product and marker encodings must have explicit inverse mappings on their valid images and commute one step at a time. Neither encoding requires a separate control class. The bank contains exactly `k` values. It is not a line: register 1 has no spatial neighbor relationship to register 2, and there is no boundary outside the bank. The counter addresses program text, not bank support. Program, seed, horizon, stop policy, and observers remain independent validated objects.
+Equivalently, the counter may be a unique visible marker over an explicit countably infinite `PositiveProgramCounter` address support; the program's finite instruction addresses are a distinguished subregion, so every valid past-end counter still round-trips. A deliberately bounded profile may instead restrict both encodings to one declared finite address set. The product and marker encodings must have explicit inverse mappings on their valid images and commute one step at a time. Neither encoding requires a separate control class. The bank contains exactly `k` values. It is not a line: register 1 has no spatial neighbor relationship to register 2, and there is no boundary outside the bank. The counter addresses program text, not bank support. Program, seed, horizon, stop policy, and observers remain independent validated objects.
 
 ### Source, operand reads, and closed instruction results
 
@@ -247,7 +247,7 @@ ActiveInstruction.select(state.program_counter, program) ->
 
 For `1 <= pc <= length`, the exact instruction determines the typed register read. Even increment reads the old operand so arithmetic and expected-old validation are inspectable. Base instructions read exactly one register; extended `eq`/`add` read two; register-indirect `jmp` reads the addressed register. There is no geometric neighborhood, arbitrary address callback, whole-bank formula, or executor-local instruction fetch.
 
-Base evaluation returns a closed result sum carrying typed effects:
+Base evaluation returns a closed result sum carrying typed writes:
 
 ```text
 IncrementResult(
@@ -271,7 +271,7 @@ ZeroFallthrough(
 )
 ```
 
-The result records its branch explicitly; zero need not fabricate a write from zero to zero. The ordinary finite-write UPDATE validates program identity, snapshot ownership, expected counter, expected old operand, register key/domain, write uniqueness, and next counter, then commits all component writes together. Any stale source, overflow/coercion, negative result, missing write, extra write, contradictory target, or partial failure is an error with no state mutation.
+The result records its branch explicitly; zero need not fabricate a write from zero to zero. The ordinary finite-write UPDATE validates program identity, snapshot ownership, expected counter, expected old operand, register key/value-schema membership, write uniqueness, and next counter, then commits all component writes together. Any stale source, overflow/coercion, negative result, missing write, extra write, contradictory target, or partial failure is an error with no state mutation.
 
 This is direct reuse of the same old-snapshot finite-write construction as T09/T12. A write targets a typed component of the transparent product; atomic update never requires all components to share a lattice or a runtime class. T19 adds register/address schemas and closed instruction RULE members, not another execution algebra.
 
@@ -281,14 +281,16 @@ For an executable counter:
 
 ```text
 old = state
-source = ActiveInstruction.select(old.control, program)
+source = ActiveInstruction.select(old.program_counter, program)
 read = InstructionOperandRead(old.bank, source.access_plan)
 result = ExecuteInstruction(source.instruction, read)
-next = AtomicEffectsUpdate.apply(old, result.effects)
-return Advanced(next, RegisterInstructionEvent(old, source, read, result, next))
+step_result = UPDATE.apply(old, (source,), result.writes)
+return step_result.with_event(
+    RegisterInstructionEvent(old, source, read, result, step_result.successors)
+)
 ```
 
-The counter in snapshot `t` identifies the instruction executed between snapshots `t` and `t+1`. The event preserves `pc_before`, instruction identity, operand key/value(s), branch, typed effects, `pc_after`, and full before/after bank values. An increment and its fallthrough are one event. A decrement and its conditional jump are one event. New values cannot influence the branch that produced them.
+The counter in snapshot `t` identifies the instruction executed between snapshots `t` and `t+1`. The event preserves `pc_before`, instruction identity, operand key/value(s), branch, typed writes, `pc_after`, and full before/after bank values. An increment and its fallthrough are one event. A decrement and its conditional jump are one event. New values cannot influence the branch that produced them.
 
 ### Program end, quiescence, and halting
 
