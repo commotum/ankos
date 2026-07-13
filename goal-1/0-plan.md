@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41 complete, 16 of 45 type stages complete, T43 Iterated Maps in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43 complete, 17 of 45 type stages complete, T44 Continuous Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
@@ -60,6 +60,14 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - Structural identity, certified functional equivalence, and observation equality remain distinct. Exact literals/algebraics/complex values are lossless; viewport, mesh, evaluator, precision, samples, rasters, sounds, histograms, and spectra do not enter function identity.
 - The four strict and eight Notes rasters are fully inventoried. Exact page-161 periods/zero families and endpoint conventions, the page-162 tangent/crossing count seam into T42, pole/branch segmentation, finite/infinite series separation, zeta analytic continuation, continuous Riemann-Siegel phase, and declared-precision values/numerical zero counts are pinned.
 - Source repairs remain visible: monolith image links are broken, page numbers are offset, the Notes ODE derivative `2` denotes a different curve than claimed, critical-line zeta needs continuation/phase, and the displayed `a=0` infinite lacunary sum cannot converge ordinarily.
+- T43 is one domain-tagged ideal real scalar under an immutable closed self-map plus a separately identified fixed numerical realization. Certified/tracked evaluator work state and represented feedback state do not masquerade as the exact mathematical point.
+- `UniqueScalar`, complete old-value read, `MapAssignment`, and existing fixed-effects atomic commit reuse T34 unchanged; T43 adds no eleventh update law. A strict fixed point still advances unchanged, and `h` events always yield `h+1` snapshots.
+- Strict map syntax reuses T41 responsibilities with state references, exact predicates, ordered piecewise arms, source-faithful `FractionalPart`, and a distinct modulo-one primitive. Mathematical map ID, realized-transition ID, certified equivalence, conjugacy, profile-specific orbit equality, and finite observation equality remain distinct.
+- T43 numerical evidence separates ideal exact, certified enclosure, tracked significance, fixed binary, and fixed decimal feedback. Binary shift profiles collapse at events 50/52; the reconstructed decimal profile has a 12-event preperiod and period 195,312,500.
+- Exact rational regeneration matches all 12,960 page-165 cells. A reproducible declared-180-decimal classifier matches all 29,040 page-168 and 38,720 page-170 cells; all eleven strict/Notes asset hashes match. The missing page-166 plate and underdetermined Notes pixel contexts are explicit rather than invented.
+- Source repairs include detached/reordered strict formulas, the missing page-166 plate, page-layout sentence interleaving, a false arbitrary-rational-`a` repetition claim, source-faithful negative `FractionalPart`, corrupted logistic/fast-forward formulas, and the integer-torus versus nonintegral-rational closed-box reading of the `{1,1}` vector witness.
+- Digit/value/sensitivity/cycle/Lyapunov/attractor/bifurcation/symbolic/fast-forward/rendering records remain analyzers. Sensitivity does not prove intrinsic randomness; a finite orbit/raster does not prove an attractor, asymptotic exponent, or bifurcation boundary.
+- T43 preserves T37 prefix, T42 substitution, T44 lattice aggregation, and T45 continuous-time boundaries. Current finite alphabets, callbacks, family rollout, NumPy arrays, and raw exporters remain semantic mismatches.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -563,7 +571,7 @@ T20 tree/codecs, T27 compatible numeric expressions, T31 query/certificate disci
 
 ### 18-T43-ITERATED-MAPS
 
-Status: **IN PROGRESS** in `goal-1/18-T43-ITERATED-MAPS.md`.
+Status: **COMPLETE** in `goal-1/18-T43-ITERATED-MAPS.md`.
 
 #### Big Picture Objective
 
@@ -577,7 +585,19 @@ Apply the common protocol, determining what can reuse scalar iteration while pre
 
 All T43 evidence is captured; map and representation policies are explicit; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+The direct map/mapping search found 106 occurrences on 89 lines, the controlled iteration union 214/155, and the high-signal map/chaos/precision/analysis union 332/210. Nineteen evidence groups cover strict main, native Notes, clean and line-oriented splits, actual Index, history, aliases, programs, precision profiles, analyzers, relations, all eight strict/three Notes assets, and every false positive. Zero candidate remains unresolved.
+
+T43 establishes one ideal exact scalar map state, distinct certified/tracked computation work states, and separately identified fixed represented recurrences. The immutable map owns state space, exact parameters, ordered expression, primitive version, and normalized self-map/partial contract; a realized program additionally owns full radix/format/rounding/comparison semantics and represented closure. `UniqueScalar`, complete read, typed map assignment, and fixed-effects commit reuse T34 without an eleventh update law. Strict maps always advance, including unchanged fixed points; `h` events produce `h+1` states.
+
+Exact rational reconstruction matches all 12,960 page-165 cells. The declared 180-decimal classifier matches page 168 at 29,040/29,040 and page 170 at 38,720/38,720 with recorded crop coordinates, thresholds, precision, and `Pi` literal. All eleven hashes match. Binary finite-storage collapse, decimal preperiod/period, logistic cycles, vector old-tuple update, discontinuity/cusp/endpoint semantics, and source repairs are pinned without overclaiming the missing page-166 plate or underdetermined Notes rasters.
+
+T34 assignment and T41 syntax compose without reinterpretation. T37 prefixes, T42 substitutions, T44 aggregate fields, T45 flows, fixed-realization identity, cycles, sensitivity, Lyapunov, attractor/bifurcation, symbolic views, and fast-forward evaluators remain explicit categories. Semantic/raster oracles, source references, Markdown fences, eleven hashes, `git diff --check`, and all 102 repository tests pass. No prior stage reopened. Next: T44.
+
 ### 19-T44-CONTINUOUS-CA
+
+Status: **IN PROGRESS** in `goal-1/19-T44-CONTINUOUS-CA.md`.
 
 #### Big Picture Objective
 

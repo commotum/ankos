@@ -68,16 +68,16 @@ Each type stage must make the following auditable:
 | T40 | 41 | Mathematical-Constant Digit Systems | 40 | `45-T40-CONSTANT-DIGITS.md` | PENDING | Not started |
 | T41 | 42 | Function-Combination Systems | 41 | `17-T41-FUNCTIONS.md` | COMPLETE | Direct-name union 59 occurrences/51 lines; formula-literal union 176/83; crossing/rule union 19/9; 18 excerpt groups; all strict main, four strict/eight Notes rasters, native Notes/actual Index/splits, named functions/series/zeros/branches/evaluation, ODE/source repairs, page-162 T42 seam, current API/runtime, and exact/declared-precision oracles dispositioned; 0 unresolved candidates |
 | T42 | 43 | Continued-Fraction-Driven Substitution Systems | 42 | `46-T42-CF-SUBSTITUTION.md` | PENDING | Not started |
-| T43 | 44 | Iterated Maps | 43 | `18-T43-ITERATED-MAPS.md` | IN PROGRESS | Unary continuous-state map, exact/declared real values, piecewise/fractional/smooth map syntax, scalar update reuse, precision/rounding/uncertainty, digit-sensitive orbits, page-165/166/168/170 and Notes figures, observers, variants, boundaries, and current runtime under audit |
-| T44 | 45 | Continuous Cellular Automata | 44 | `19-T44-CONTINUOUS-CA.md` | PENDING | Not started |
+| T43 | 44 | Iterated Maps | 43 | `18-T43-ITERATED-MAPS.md` | COMPLETE | Direct map/mapping 106 occurrences/89 lines; controlled iteration union 214/155; high-signal map/chaos/precision/analysis union 332/210; 19 excerpt groups; all strict main, eight strict/three Notes assets, native Notes/actual Index/splits, exact/realized/tracked state, closed map/invariance/update/trace/analyzer semantics, precision profiles, source repairs, T34/T41/T44 boundaries, current API/runtime, exact-rational page-165 and declared-180-decimal page-168/page-170 cell oracles dispositioned; 0 unresolved candidates |
+| T44 | 45 | Continuous Cellular Automata | 44 | `19-T44-CONTINUOUS-CA.md` | IN PROGRESS | Continuous `[0,1]` lattice field, radius-one mean plus closed scalar map, parallel assignment reuse, native versus finite-periodic support, exact/represented precision, six strict/two Notes assets, parameter/additive/coupled-map profiles, observers, T01/T43/T45 boundaries, and current runtime under audit |
 | T45 | 46 | Partial Differential Equation Systems | 45 | `20-T45-PDE.md` | PENDING | Not started |
 
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 16 / 45.
+- Type stages complete: 17 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 28 pending, 1 in progress.
+- Type stages unresolved: 27 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
