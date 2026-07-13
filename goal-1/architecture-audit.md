@@ -1,6 +1,6 @@
 # Goal 1 Representation and Execution Architecture Audit
 
-Status: **COMPLETE — ARCHITECTURE RECLOSED; T06 MAY RESUME**
+Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); T06 SUBSEQUENTLY COMPLETED UNDER D119**
 
 ## Trigger and Scope
 

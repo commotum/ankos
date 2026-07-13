@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete and all 23 completed type stages are evidence- and architecture-reclosed under `architecture-audit.md`; no stage remains reopened. T06 now resumes through the same common architecture.
+- Execution status at this sync is Foundation complete, 24 type stages are complete, no stage is reopened or in progress, and 21 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06 closes consistently under the same branch-free architecture with D119. T07 is the first incomplete stage.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures a DOMAIN/support/topology subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program space with its dimensional character, support, and topology; ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -89,6 +89,9 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T04's strict `k=3,r=1` preset semantics are unchanged. Its repaired 12-query manifest closes 246 candidates, 75 assets at `35 included / 34 excluded / 6 relation-only`, and 150 exact reverse references; the added page-262/page-263 controls and feature-extraction relation are evidence classifications, not execution machinery.
 - T05 closes an exact 11-query/142-lexical-line manifest plus five governed prose continuations and 25 linked assets: 172 candidates with zero remainder. Twelve evidence groups pin 47 provenance lines/47 fragments/40 quote lines; assets close at `5 included / 13 relation-only / 7 excluded` after independent review added four direct page-963 chart relations.
 - T05 is exactly the strict finite `k>=4,r=1,A=(0,...,k-1),nu(i)=i` preset over unchanged generic T03, with `M=3k-2`, arbitrary-precision `R=k^M`, and code `1004600` pinned as a structural table. D118 is sharpened; no new primitive, executor, update law, or decision is added. All five embedded checks, independent review, diff/fence gates, and 102 tests pass.
+- T06 is a typed property restriction over a strictly eligible resolved homogeneous fixed-support CA-axis program: finite typed alphabet, `AllSites`, complete fixed local reads, a closed deterministic evaluator, exactly one same-site typed label write per firing, and old-snapshot parallel update. Its predicate is `evaluate_P(exact_uniform_read_P(b)) = b`; structural ineligibility is `UnsupportedProperty`, not a false predicate result.
+- Program, property claim, replayable evidence, validated selection, and run identities remain separate. The claim binds the property semantic version, structural program reference, and an alphabet-member reference whose alphabet, rank, and canonical typed value agree. Evaluator/schema version and the exact witness belong to evidence. Passing resolves to the identical program and changes no update, successor, or halt semantics.
+- The local property excludes seed and realization data. A global all-`b` fixed-point claim on a finite realization additionally requires every exterior read to supply `b`; the finite causal-cone corollary also requires a finite stencil, snapshot-parallel update, finite initial deviation, and globally compatible background.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -748,7 +751,7 @@ COMPLETE: 11 controlled query families close 142 lexical lines, five governed fo
 
 ### 25-T06-QUIESCENT
 
-Status: **IN PROGRESS** in `goal-1/25-T06-QUIESCENT.md`; the architecture audit is complete and T06 may resume through the common SimpleProgram axes.
+Status: **COMPLETE** in `goal-1/25-T06-QUIESCENT.md`; T06 is a generic typed property/restriction over an unchanged eligible CA-axis program, not a construction or execution branch.
 
 #### Big Picture Objective
 
@@ -760,7 +763,13 @@ Apply the common protocol, grounding blank-state preservation and finite-seed be
 
 #### Completion Requirements
 
-All T06 evidence is captured; the invariant is placed once in the correct layer; Goal 2 and global integration are updated.
+All T06 evidence is captured; the invariant is placed once in the generic property layer; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+COMPLETE: the exact 19-family lexical protocol derives 280 unique canonical lines and closes the disjoint partition `4 direct / 25 CA property relations / 111 CA seed-background-profile controls / 66 non-CA SimpleProgram controls / 6 general controls / 68 actual-Index routes`. The physical-asset ledger closes 45 files at `5 included / 28 relation-only / 12 excluded`, with 90 monolith/split references, exact metadata, and zero unresolved remainder under the declared protocol.
+
+T06 resolves to the class-2 restriction `evaluate_P(exact_uniform_read_P(b)) = b` over a strictly eligible resolved CA program. Exact elementary/totalistic counts, a nonzero-blank codec adversary, the page-262 `64 total / 32 preserving / 30 displayed` source repair, hostile-boundary separation, finite-cone qualification, and identity preservation pass. D119 adds only generic claim/evidence/selection records; the 15-group Goal 2 handoff covers membership collisions, unsupported shapes, stale/tampered evidence, serialization, and no-cheating checks. No construction, runner branch, update law, outcome, halt, alphabet role, or sparse-background optimization is added, and no prior stage reopens. All six embedded checks, independent review, Markdown/diff gates, and 102 repository tests pass. Next: T07.
 
 ### 26-T07-SYMMETRIC
 

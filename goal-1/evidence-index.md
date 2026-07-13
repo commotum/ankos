@@ -25,7 +25,7 @@ Each type stage must make the following auditable:
 
 ## Catalog Coverage
 
-Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture. The bounded T03/T04 asset repairs are also complete; no stage remains reopened.
+Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06 are subsequently complete; D119 preserves the same branch-free architecture, no stage remains reopened, and T07 is next.
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
@@ -34,7 +34,7 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 | T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | COMPLETE | Exact 18-query/314-candidate partition `87/11/41/54/101/20`; 215 cited lines/89 fragments/86 quote lines; 120 assets at 50 included/61 excluded/9 relation-only; 72 audited and 106 reverse-required links; six embedded oracles, independent review, and 102 tests; aggregate semantics unchanged; 0 unresolved |
 | T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | COMPLETE | Exact 12-query/246-candidate partition `34/53/11/20/54/30/27/17`; 260 cited lines/92 fragments/90 quote lines; 75 assets at 35 included/34 excluded/6 relation-only and 150 reverse references; six embedded oracles, independent review, and 102 tests; strict T03 preset; 0 unresolved |
 | T05 | 6 | Higher-Color Totalistic Cellular Automata | 5 | `24-T05-HIGHERCOLOR-TOTALISTIC.md` | COMPLETE | Exact 11-query/142-lexical-line partition plus five governed follows and 25 assets = 172 candidates; 12 evidence groups at 47 provenance/47 fragments/40 quote lines; assets 5 included/13 relation-only/7 excluded; strict finite `k>=4,r=1` canonical T03 preset, code-1004600/cardinality/bigint/snapshot fixtures, five embedded oracles, independent review, and 102 tests; 0 unresolved candidates |
-| T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | IN PROGRESS | Exact blank/white-background, invariant-state, rule-predicate, asset, API, and runtime audit active |
+| T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | COMPLETE | Exact 19-family/280-line partition `4/25/111/66/6/68`; 45 physical assets at 5 included/28 relation-only/12 excluded and 90 reverse references; strict CA-axis eligibility, typed claim/evidence/selection/run identity, source/count/semantic/asset oracles, independent review, and 102 tests; 0 unresolved |
 | T07 | 8 | Left-Right Symmetric Cellular Automata | 7 | `26-T07-SYMMETRIC.md` | PENDING | Not started |
 | T08 | 9 | Initial-Condition Classes | 8 | `27-T08-INITIAL-CONDITIONS.md` | PENDING | Not started |
 | T09 | 10 | Mobile Automata | 9 | `3-T09-MOBILE.md` | COMPLETE | Evidence and architecture reclosed: `Plain(bit) \| Active(bit)`, exactly-one invariant, firing-source frontier, radius-one native read, typed two-write lowering, atomic UPDATE, and compact 65,536-rule identity; no control class or family executor |
@@ -78,10 +78,10 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages globally complete: 23 / 45.
+- Type stages globally complete: 24 / 45.
 - Type stages evidence-closed / architecture-reopened: 0.
 - Type stages asset-reopened: 0.
-- Type stages unresolved: 21 pending; T06 is in progress.
+- Type stages unresolved: 21 pending; 0 in progress. T07 is first pending.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 

@@ -1,6 +1,6 @@
 # 25-T06-QUIESCENT
 
-Status: **IN PROGRESS — EXACT 19-QUERY DERIVATION ORACLE PENDING**
+Status: **COMPLETE — EVIDENCE, ARCHITECTURE, AND GOAL 2 HANDOFF CLOSED**
 
 The architecture prerequisite and T06 evidence audit are complete. T06 uses the common SimpleProgram runner and CA axes; no upstream repair remains a prerequisite for this stage.
 
@@ -145,7 +145,12 @@ These 128 lines have no remainder inside the narrow query union, but that union 
 | 11 | single black/gray/white cell; simple/finite/localized initial condition; initial condition near white/blank background | 105 | 2 |
 | 12 | repetitive/periodic/random/regular and governed background aliases | 23 | 2 |
 | 13 | fixed point/state/configuration and remain-fixed aliases | 23 | 1 |
-| 14–19 | actual-Index drift guards: CA+initial/invariant/background; named initial-condition headings; background phases; invariant; stable/bistable/metastable; uniformity/state | — | 68-line union |
+| 14 | exact Index-only CA/random-initial, invariant-state, continuous-CA-background, and stable-background guards | 0 | 6 |
+| 15 | named actual-Index initial-condition entries | 0 | 50 |
+| 16 | actual-Index background routes | 0 | 4 |
+| 17 | actual-Index invariant routes | 0 | 5 |
+| 18 | actual-Index stable/bistable/metastable routes | 0 | 3 |
+| 19 | actual-Index uniformity/state routes | 0 | 18 |
 
 The resulting disjoint semantic disposition is `4/25/111/66/6/68`: direct native evidence, CA invariant-property relations, CA seed/background/profile/view evidence, non-CA SimpleProgram aliases, general controls, and actual-Index routes. This classification is deliberately strict: a line enters the CA-axis groups only when its subject is a cellular automaton or an explicit CA relation. The same words in substitutions, symbolic systems, PDEs, physics, networks, or generic data analysis remain non-CA aliases or controls.
 
@@ -475,7 +480,7 @@ T06 metadata oracle: PASS 5 included; 28 relation-only; 12 excluded
 | Support/topology | The referenced CA must declare a fixed regular lattice/domain, finite local offset schema, and `AllSites` frontier. The same local equality works in any eligible dimension, but eligibility is checked from the concrete support/frontier schema and global fixed-point consequences still depend on exterior compatibility. |
 | Values | `b` is an `AlphabetMemberRef(alphabet_ref, rank, canonical_typed_value)`. Resolution must prove that the program references the same alphabet, the rank is in range, and the value at that rank has the exact canonical typed encoding. “White”, zero, seed fill, and palette tone are not implicit synonyms. |
 | Read witness | Construct the program's complete fixed-arity local read with every slot equal to `b`, preserving component structure, offset multiplicity, center inclusion, and declared arity. |
-| Rule obligation | Evaluate through the same closed structural evaluator used by execution and require `rule(b,...,b)=b`. A property claim and its recomputed evidence are separate records. Outcomes are `Unsupported`, `DoesNotHold`, or `Holds`; malformed/dangling/mismatched claims are validation errors and are not `DoesNotHold`. |
+| Rule obligation | Evaluate through the same closed structural evaluator used by execution and require `rule(b,...,b)=b`. A property claim and its recomputed evidence are separate records. The checker returns `UniformBackgroundEvidence(status=Holds|DoesNotHold) | UnsupportedProperty`; malformed/dangling/mismatched claims are validation errors and produce neither result. |
 | Result/update | None added. A passing program still emits its ordinary typed assignments and uses its existing atomic update. A failing rule is rejected by the catalog restriction; its table is never patched. |
 | Successor/halt | Every requested event remains an ordinary deterministic successor, including an unchanged all-blank successor. T06 does not introduce fixed-point stopping or the event-free `Quiescent` outcome used by unrelated constructions. |
 | Seed/background | A finite nonblank seed on fill `b` is T08/run data. A constant exterior value is a finite-realization boundary choice. Neither proves the local property. A finite all-`b` realization is a global fixed point only when every exterior/boundary read is also `b`-compatible. |
@@ -490,11 +495,11 @@ A T06 claim is eligible only when its referenced program already resolves all of
 The result boundary is exact:
 
 1. **Invalid claim:** parsing, reference resolution, alphabet identity, rank, canonical typed value, predicate version, or program/blank compatibility fails. Validation reports an error and emits no semantic verdict.
-2. **`Unsupported`:** the claim is well formed, but the referenced program is outside the strict CA eligibility above or lacks inspectable complete evaluation.
+2. **`UnsupportedProperty`:** the claim is well formed, but the referenced program is outside the strict CA eligibility above or lacks inspectable complete evaluation. This is not `PropertyEvidence`.
 3. **`DoesNotHold`:** the program is eligible, the uniform witness evaluates normally, and the typed output differs from `b`.
 4. **`Holds`:** the program is eligible and the typed output is exactly `b`.
 
-No caller-supplied Boolean is trusted. `ValidatedProgramSelection` can be constructed only from `Holds` evidence, binds the exact claim, evidence, and program references, and resolves to that same program `P` before independent seed, boundary, horizon, observer, and run records are supplied.
+No caller-supplied or serialized status is trusted. The resolver revalidates the claim and recomputes evidence before `ValidatedProgramSelection` is constructed. Selection is possible only from freshly verified `Holds` evidence, binds the exact claim, evidence, and program references, and resolves to that same program `P` before independent seed, boundary, horizon, observer, and run records are supplied.
 
 ### Structural forms and codec corollaries
 
@@ -677,7 +682,7 @@ D111-D118 remain valid. T06 closes the following stage decision; the parent inte
 
 - **Basis:** direct source evidence selects already-defined rules by whether a white/blank uniform state is unchanged (`BOOK:784,1346,2798,2926`); invariant-state, convergence, seed, periodic-background, still-life, and emulation material is relational. No evidence supplies a distinct transition construction.
 - **Eligibility and claim:** a claim binds one resolved deterministic local CA `Program P`, predicate version, and one `AlphabetMemberRef(alphabet_ref, rank, canonical_typed_value)`. `P` must have a finite ordered alphabet, fixed regular lattice/domain, complete finite-arity local read, `AllSites` frontier, deterministic total rule with exactly one typed same-site assignment, and old-snapshot parallel commit.
-- **Verdict:** `Holds` iff `P`'s ordinary complete structural evaluator maps the exact uniform local read of that member to the same typed member. Invalid claim, `Unsupported`, `DoesNotHold`, and `Holds` are distinct.
+- **Verdict:** `Holds` iff `P`'s ordinary complete structural evaluator maps the exact uniform local read of that member to the same typed member. Invalid claim, `UnsupportedProperty`, `UniformBackgroundEvidence(status=DoesNotHold)`, and `UniformBackgroundEvidence(status=Holds)` are distinct; unsupported is not evidence.
 - **Identity and selection:** `Program`, `PropertyClaim`, `PropertyEvidence`, `ValidatedProgramSelection`, and `Run` identities remain separate. A validated catalog selection binds its claim/evidence and resolves to the exact unchanged `P` before seed, boundary, horizon, observer, or run data exists.
 - **Consequence:** T06 adds no state, read, rule-result, update, executor, successor, halt, boundary, seed, observer, or family-dispatch semantic. `Holds` makes an all-`b` infinite field—or a finite realization with `b`-compatible exterior reads—a global fixed point; it makes no such claim for a hostile exterior. Finite causal-cone containment additionally requires the eligible finite stencil, snapshot-parallel update, finite initial deviation, and globally `b`-compatible background.
 
@@ -696,27 +701,27 @@ D111-D118 remain valid. T06 closes the following stage decision; the parent inte
 
 | Goal 2 surface | Required work |
 |---|---|
-| `simple_programs.md` | Specify `AlphabetMemberRef`, `RulePropertyClaim`, `RulePropertyEvidence`, the four validation/verdict cases, and `ValidatedProgramSelection`; state the strict CA-axis eligibility and canonical encodings. |
+| `simple_programs.md` | Specify `AlphabetMemberRef`, `RulePropertyClaim`, `UniformBackgroundEvidence(status=Holds|DoesNotHold)`, `UnsupportedProperty`, validation errors, and `ValidatedProgramSelection`; state the strict CA-axis eligibility and canonical encodings. |
 | `src/ca/alphabets.py` | Provide stable alphabet identity and member resolution by `(alphabet_ref, rank, canonical_typed_value)`; reject rank/value/ref disagreement. Do not add a quiescent alphabet family. |
 | structural program/rule module established by G2-T01–T03 | Expose the same total typed evaluator used by execution. Certification may not inspect an opaque callback, infer a missing row, or branch on family names. |
-| new generic property module (expected `src/ca/properties.py`) | Parse/validate claims, check eligibility, construct the exact uniform read from the resolved schema, invoke the ordinary evaluator once, and emit canonical evidence with `Unsupported`/`DoesNotHold`/`Holds`. |
-| catalog/resolver layer | Filter only on recomputed `Holds` evidence and return the exact original `Program` reference/hash. Keep the selection record distinct from the program and from later runs. |
+| new generic property module (expected `src/ca/properties.py`) | Parse/validate claims, check eligibility, construct the exact uniform read from the resolved schema, and invoke the ordinary evaluator once. Eligible programs yield `UniformBackgroundEvidence(status=Holds|DoesNotHold)`; ineligible programs yield the separate non-evidence result `UnsupportedProperty`. |
+| catalog/resolver layer | Revalidate claims and recompute evidence; never trust a serialized status. Filter only on freshly recomputed `Holds` evidence and return the exact original `Program` reference/hash. Keep selection distinct from program and later runs. |
 | `src/ca/specs.py` and serialization | Round-trip claim, member, evidence, and validated-selection identities with explicit schema/predicate versions. Seed, boundary, horizon, observers, and run IDs remain outside every property hash. |
 | rollout/executor | No T06 change. Static tests must reject a `QUIESCENT` family branch, blank-cell skip, background freeze, fixed-point stop, or property-specific update. |
 | tests and source fixtures | Add the 15 acceptance groups below, source-line fixtures `784,1346,2798,2926`, the `64/32/30` repair guard, and the five direct asset hashes. |
 
 ### Fifteen acceptance groups
 
-1. **Strict eligibility:** accept structurally resolved deterministic exhaustive and exact-totalistic CA programs across dimensions; return `Unsupported` for opaque callbacks, stochastic/multiway rules, substitutions, networks, symbolic systems, constraints, mobile/Turing programs, and PDE relations.
+1. **Strict eligibility:** accept structurally resolved deterministic exhaustive and exact-totalistic CA programs across dimensions; return `UnsupportedProperty` for opaque callbacks, stochastic/multiway rules, substitutions, networks, symbolic systems, constraints, mobile/Turing programs, and PDE relations.
 2. **Member integrity:** accept only an `AlphabetMemberRef` whose alphabet reference, rank, and canonical typed value all resolve to the program alphabet; test dangling ref, negative/out-of-range rank, same-looking value of another type, and rank/value disagreement.
-3. **Invalid versus semantic verdict:** malformed claims raise validation diagnostics and emit no verdict; valid ineligible claims produce `Unsupported`; eligible failing/passing claims produce `DoesNotHold`/`Holds`.
+3. **Invalid versus semantic result:** malformed claims raise validation diagnostics and emit no result; valid ineligible claims produce `UnsupportedProperty` outside evidence; eligible failing/passing claims produce `UniformBackgroundEvidence` with `DoesNotHold`/`Holds`.
 4. **Ordinary evaluator witness:** spy/instrumentation proves exactly one complete uniform-schema evaluation through the same path as rollout, with no direct code-parity or family shortcut.
 5. **Canonical zero background:** ECA rule 30 and representative T03/T04/T05 tables hold for rank-zero blank; rule 1 does not.
 6. **Arbitrary/nonzero blank:** include a three-color table that holds for rank/value one while `code mod 3` is zero, and a zero table that fails for that blank; modulus cannot be authoritative.
 7. **Typed aggregate/valuation:** verify `U(q*nu(b))=b` with a nonidentity valuation and reject a valuation/alphabet mismatch.
 8. **Exact counts and source guards:** check 128 zero-preserving ECAs, 64 symmetric ECAs, their 32 intersection and exact labels, `2^6=64` two-dimensional totalistic rules, 32 qualifying zero-preserving rules, and the 30 displayed page-262 labels.
 9. **Identity separation:** changing claim version/member changes claim ID but not program ID; recomputation/evaluator version changes evidence ID; seed/boundary/horizon changes run ID only; validated-selection ID is distinct from all four.
-10. **Exact catalog resolution:** a passing selection returns the same program object/reference and semantic hash `P` before run construction; failure or unsupported evidence cannot construct a validated selection.
+10. **Exact catalog resolution:** the resolver recomputes the claim and evidence rather than trusting serialized status; a passing selection returns the same program object/reference and semantic hash `P` before run construction; `DoesNotHold` or `UnsupportedProperty` cannot construct one.
 11. **Run independence:** the same validated selection can feed multiple seeds, fills, boundaries, horizons, crops, and palettes without recertification or program mutation; no run field enters the property hash.
 12. **Boundary qualification:** an all-`b` finite state is fixed with a `b`-compatible exterior; a hostile fixed exterior can change edge cells while the local claim remains `Holds`; boundary data can neither repair nor falsify the local predicate.
 13. **Causal-cone qualification:** for a finite perturbation, finite stencil, snapshot-parallel update, and globally compatible background, deviations stay inside the iterated stencil cone; test that this does not assert shrinkage, eventual death, or finite total activity.
@@ -733,7 +738,7 @@ Goal 2 should expose a small convenience constructor for the catalog row only af
 - No acceptance based on a sampled finite run; the complete local uniform-blank row must be checked structurally.
 - No duplicate predicate under elementary, multicolor, totalistic, higher-color, or dimensional family names when one typed rule-application obligation is sufficient.
 - No Boolean `is_quiescent`, unbound scalar blank, rank-only member, or value-only member accepted as evidence; alphabet reference, rank, and canonical typed value must agree.
-- No conflation of invalid claim, `Unsupported`, `DoesNotHold`, and `Holds`, and no reuse of program, claim, evidence, validated-selection, or run hashes across those identity boundaries.
+- No conflation of invalid claim, `UnsupportedProperty`, `UniformBackgroundEvidence(DoesNotHold)`, and `UniformBackgroundEvidence(Holds)`, and no reuse of program, claim, evidence, validated-selection, or run hashes across those identity boundaries.
 - No global fixed-point or causal-cone claim without the explicit finite-stencil/snapshot-parallel and `b`-compatible-background qualifications.
 
 ## Completion Requirements
@@ -746,7 +751,7 @@ Goal 2 should expose a small convenience constructor for the catalog row only af
 
 ## Stage Results
 
-**COMPLETE.** Evidence closure is 280 canonical text lines, 45 assets, 90 reverse references, 13 canonical excerpt checks, three source repairs, and six passing embedded Python blocks. The architecture result is a strict CA-axis property/restriction over exact `Program P` plus `AlphabetMemberRef`; it introduces no execution algebra. D119 and the 15-group G2-T06 handoff are ready for parent-ledger integration. Repository verification: `102 passed in 1.19s`; Markdown fence and `git diff --check` gates pass.
+**COMPLETE.** Evidence closure is 280 canonical text lines, 45 assets, 90 reverse references, 13 canonical excerpt checks, three source repairs, and six passing embedded Python blocks. The architecture result is a strict CA-axis property/restriction over exact `Program P` plus `AlphabetMemberRef`; it introduces no execution algebra. D119 and the 15-group G2-T06 handoff are ready for parent-ledger integration. Repository verification: `102 passed in 1.21s`; Markdown fence and `git diff --check` gates pass.
 
 ## Integration Results
 
