@@ -34,11 +34,129 @@ Determine exactly what source evidence means by a blank/white background staying
 
 ## Search Log
 
-IN PROGRESS. The exact monolith, split, Notes, Index, cross-reference, and linked-asset manifests will replace this marker after every candidate has a recorded disposition.
+Closed for text. `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; its actual Index begins at physical `BOOK:20826`. Counts below are distinct physical lines, not raw regex matches. Nine controlled query families produce 146 raw hits; 18 deliberately broad lexical controls are removed before disposition, leaving exactly 128 candidates. Five governed continuation lines and the independently joined asset ledger are audited separately so prose, link, and physical-file counts are never conflated.
+
+| Q | Controlled family | Retained lines |
+|---:|---|---:|
+| 01 | `background` within 160 characters of a rule/state/pattern/structure/localized/blank/white/uniform term, in either direction | 66 |
+| 02 | invariant state/configuration in either order | 13 |
+| 03 | uniform white/black/state/configuration/background in either order | 20 |
+| 04 | literal `unchanged` | 22 |
+| 05 | literal all-white/all-black spellings | 8 |
+| 06 | literal `quiescent`/`quiescence` | 1 |
+| 07 | the exact only-white-state/unchanged phrase | 1 |
+| 08 | single-cell blank/white-background and localized-structure background aliases | 3 |
+| 09 | literal stable state/states | 9 |
+
+The query counts overlap. Their union is 128, partitioned as 7 direct/native lines, 63 property/application/control relations, 45 nonfits, and 13 actual-Index routes. The 18 removed raw controls are generic uses of “uniform”, “background”, or “invariant” that do not name the candidate property; keeping them explicit prevents a hand-tuned regex from silently hiding its false-positive boundary.
+
+### Exact reproducible text manifest
+
+```bash
+python3 - <<'PY'
+import re
+from pathlib import Path
+
+P=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md')
+L=P.read_text().splitlines()
+
+queries=[
+r'(?i)(?:background.{0,160}(?:cellular autom|rule|pattern|white|blank|initial|structure|localized|repetitive|uniform|state)|(?:cellular autom|rule|pattern|white|blank|initial|structure|localized|repetitive|uniform|state).{0,160}background)',
+r'(?i)invariant.{0,80}(?:state|configuration)|(?:state|configuration).{0,80}invariant',
+r'(?i)uniform.{0,80}(?:white|black|state|configuration|background)|(?:white|black|state|configuration|background).{0,80}uniform',
+r'(?i)unchanged',
+r'(?i)all[- ]white|all[- ]black',
+r'(?i)quiescent|quiescence',
+r'(?i)state.{0,80}only white.{0,80}unchanged',
+r'(?i)single (?:black|gray) cell.{0,160}(?:white|blank) background|(?:white|blank) background.{0,160}single (?:black|gray) cell|initial condition used contains a single gray cell|localized structures.{0,160}(?:blank|white) background|(?:blank|white) background.{0,160}localized structures',
+r'(?i)stable state(?:s)?',
+]
+
+# Deliberately broad lexical controls inspected before exclusion.
+controls={418,432,434,2180,2794,3236,3668,4166,4168,4642,4908,6200,
+          14827,14878,19266,20812,20914,21515}
+sets=[{i for i,s in enumerate(L,1) if re.search(q,s)}-controls
+      for q in queries]
+assert [len(s) for s in sets]==[66,13,20,22,8,1,1,3,9]
+
+direct={784,1346,2798,2926,3114,14046,18770}
+relation={500,538,790,2002,2036,2102,2714,2720,2722,2726,2728,2730,
+2742,2750,2914,2916,2918,3310,3382,3388,3402,3406,3792,3958,4068,
+4070,4072,4078,4082,4084,4152,4176,4178,5206,6340,8406,8410,8416,
+8430,11124,11140,11277,13265,13300,13304,13377,14099,14113,14241,
+14341,14349,14536,14764,14768,14776,14795,15581,16060,18749,18764,
+18765,19072,20118}
+nonfit={1170,2372,2438,2446,3976,4032,4034,4086,4480,5058,5232,
+5278,5316,6320,6332,6392,6510,6512,6526,6538,6548,6842,7028,12065,
+13060,13722,14693,16105,16241,16257,16691,16737,16739,16940,17033,
+17045,17439,17481,17813,18113,18453,18850,19702,20149,20521}
+index={20965,21050,21080,21335,21517,21877,21994,22000,22016,22064,
+       22120,22136,22304}
+parts=[direct,relation,nonfit,index]
+union=set().union(*sets)
+assert len(union)==128
+assert [len(x) for x in parts]==[7,63,45,13]
+assert sum(map(len,parts))==len(set().union(*parts))==128
+assert union==set().union(*parts)
+
+# Prose immediately governing retained assets but outside the regex union.
+follows={2868,2922,2930,14243,18766}
+assert follows.isdisjoint(union)
+assert L[2867].startswith('A sequence of totalistic rules involving nearest neighbors and four possible colors')
+assert L[2921].startswith('Examples of the evolution of two-dimensional cellular automata')
+assert L[2929].startswith('One-dimensional slices through the evolution')
+assert L[14242].startswith('■ Page 249 · Game of Life.')
+assert L[18765].startswith('- Rule 41.')
+print('T06 text manifest: PASS 9 queries; 128 lexical; partition=7,63,45,13; governed=5')
+PY
+```
+
+Recorded output:
+
+```text
+T06 text manifest: PASS 9 queries; 128 lexical; partition=7,63,45,13; governed=5
+```
+
+### Complete disjoint disposition
+
+- **Direct/native (7):** `784,1346,2798,2926,3114,14046,18770`. These state an unchanged white/blank selection, the 32-rule symmetric intersection, uniform-white invariance, the local invariant-block criterion, or the literal quiescent-symmetric relation.
+- **Property, application, and boundary controls (63):** `500,538,790,2002,2036,2102,2714,2720,2722,2726,2728,2730,2742,2750,2914,2916,2918,3310,3382,3388,3402,3406,3792,3958,4068,4070,4072,4078,4082,4084,4152,4176,4178,5206,6340,8406,8410,8416,8430,11124,11140,11277,13265,13300,13304,13377,14099,14113,14241,14341,14349,14536,14764,14768,14776,14795,15581,16060,18749,18764,18765,19072,20118`. These distinguish seed, periodic background, convergence, global invariant configurations, perturbation stability, reversibility, localized structures, application geometry, and boundary realization from the local T06 predicate.
+- **Nonfits (45):** `1170,2372,2438,2446,3976,4032,4034,4086,4480,5058,5232,5278,5316,6320,6332,6392,6510,6512,6526,6538,6548,6842,7028,12065,13060,13722,14693,16105,16241,16257,16691,16737,16739,16940,17033,17045,17439,17481,17813,18113,18453,18850,19702,20149,20521`. These are substitution, mobile, network, physics, packing, perception, arithmetic, language, and generic unchanged/stable/background usages with no T06 local-rule claim.
+- **Actual-Index routes (13):** `20965,21050,21080,21335,21517,21877,21994,22000,22016,22064,22120,22136,22304`. They route to already dispositioned invariant-state, background, Life, rule-110, or totalistic material and add no mechanics.
+
+There is zero textual remainder. `2868,2922,2930,14243,18766` are five explicitly governed continuations, not stealth query hits; asset links and split mirrors are counted by their own reverse joins below.
 
 ## Book Excerpts
 
-IN PROGRESS. Excerpt groups will be added only after provenance, exact fragments, and split mirrors are mechanically verified.
+The following are canonical, role-separated excerpts. Short fragments are quoted to make the inference auditable; the structural reconstruction, not the source's color words or gallery layout, is authoritative.
+
+**E01 — a gallery filter, not a rule family.** The three-color totalistic caption says rules that “change the white background are not included” (`BOOK:784`; Chapter 3 split `:101`). This directly supports a selection predicate over already defined rules. The adjacent single-gray start (`BOOK:790`) is initial-condition data, not part of that predicate.
+
+**E02 — the exact elementary/reflection intersection.** The history says the original search used “32 rules” with left-right symmetry whose blank backgrounds stayed unchanged (`BOOK:1346`; Chapter 3 split `:663`). The exhaustive reconstruction gives 64 symmetric rules and 128 zero-preserving rules, with exactly 32 in their intersection; symmetry and T06 are therefore independent properties.
+
+**E03 — unchanged all-white state.** The page-247 caption selects symmetric nearest-neighbor binary rules that leave states containing only white cells unchanged (`BOOK:2798`; Chapter 6 split `:97`). This is precisely a uniform-state fixed-point obligation, not a boundary, seed, halt condition, or special update.
+
+**E04 — the same property in two dimensions.** The page-262 caption describes a gallery of rules that leave an only-white state unchanged (`BOOK:2926`; Chapter 6 split `:223`). The attached raster contains 30 even codes `2..60`, while the source sentence says “most of the 64 possibilities”; the repair is recorded below. The property survives the source defect because all 32 qualifying six-row tables are independently derivable and the displayed 30 are a proper selected subset.
+
+**E05 — ordinary rule evaluation is the witness.** For rule 30, a uniformly white initial state yields uniform white forever (`BOOK:3114`; Chapter 6 split `:411`). The same paragraph's three “pictures below” show different repetitive initial conditions, so those assets are boundary controls: the uniform witness proves T06, while simple behavior from nonuniform starts does not.
+
+**E06 — periodic background is a counter-boundary.** Rule 110 structures “do not exist on a blank background” and instead inhabit a 14-cell repeating pattern (`BOOK:3388`; Chapter 6 split `:683`). This proves that “background” can mean a nonuniform space-time phase relation and must not be collapsed into uniform-blank preservation.
+
+**E07 — invariance is not convergence.** Two rules can both have all-white and all-black invariant states while only one reaches such a state from random input (`BOOK:4070,4078`; Chapter 7 split `:641,649`). Thus `T(b,...,b)=b` neither predicts attraction nor authorizes fixed-point stopping.
+
+**E08 — local invariant-block criterion.** The Notes reduce invariant one-dimensional configurations to permitted local blocks whose center agrees before and after evolution (`BOOK:14046`; Index split `:1947`). At one step and on the uniform block this specializes exactly to the T06 witness. The printed `t`/width mismatch is repaired below rather than silently generalized.
+
+**E09 — nonuniform invariant configurations are a sibling relation.** The two-dimensional Notes describe configurations assembled from neighborhoods whose center stays unchanged (`BOOK:14113`; Index split `:2014`). This classifies whole configurations and can include nonuniform repetitive states; it is not the designated uniform-blank predicate.
+
+**E10 — still lifes are applications, not T06 semantics.** The Life Notes list small structures that remain unchanged at every step (`BOOK:14795`; Index split `:2696`). Their raster is relation-only evidence for fixed configurations under one T06-compatible rule, not a new update law or proof that all passing rules contain still lifes.
+
+**E11 — “quiescent” is literal but still relational.** The Notes' emulation network is explicitly restricted to “quiescent symmetric elementary rules” (`BOOK:18770`; Colophon split `:1327`), while the nearby rule-73 note separately says “on a white background” (`BOOK:18764`; Colophon split `:1321`). The former confirms T06 vocabulary; neither emulation nor a run background belongs in the predicate.
+
+### Source repairs
+
+1. **Page 262 count/wording defect.** The repository text and the official Chapter 6 PDF both say “most of the 64 possibilities” at `BOOK:2926`. For a binary five-cell totalistic table there are `2^6=64` rules total and exactly `2^5=32` that preserve white. The raster at `BOOK:2924` visibly labels 30 even codes `2,4,...,60`, excluding `0` and `62`. This is a source wording/count inconsistency, not OCR. T06 records the prose faithfully, uses the independently proved 32-rule property count, and treats the 30-panel raster as a selected gallery.
+2. **Invariant-block horizon defect.** `BOOK:14046` says “after `t` steps” but gives block width `2r+1`; the official Notes PDF has the same wording. The general width is `2rt+1`. T06 uses this evidence only at `t=1`, where the printed width is correct, and does not promote the erroneous general formula.
+3. **Page 264 raster-only caption.** `_page_264_Picture_3.jpeg` contains a Life caption absent from the monolith OCR, including the 8-neighbor rule and outer-totalistic code 224. It is hash-pinned below as an application relation. No missing caption text is invented into the book corpus, and no Life-specific class enters T06.
 
 ## Construction Model
 
