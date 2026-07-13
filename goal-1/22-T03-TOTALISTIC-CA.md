@@ -191,9 +191,10 @@ assets.update({
 15243:'![](_page_994_Picture_19.jpeg)',15313:'![](_page_996_Picture_6.jpeg)',
 15315:'![](_page_996_Picture_7.jpeg)',15317:'![](_page_996_Picture_8.jpeg)',
 15319:'![](_page_996_Picture_9.jpeg)',17433:'![](_page_1092_Picture_6.jpeg)',
+18772:'![](_page_1133_Picture_8.jpeg)',
 })
 for n,want in assets.items(): assert L[n-1]==want,(n,L[n-1])
-assert len(assets)==118 and set(assets)<=follow
+assert len(assets)==119 and set(assets)<=follow
 
 assert r'\{0, 1, 0\}, \{1, 1, 1\}, \{0, 1, 0\}' in L[11068]
 assert r'\{0, k, 0\}, \{k, 1, k\}, \{0, k, 0\}' in L[11070]
@@ -206,7 +207,7 @@ parts={
 'three_color':'772,774,776,778,780,782,784,788,790,792,794,796,798,800,802,804,806,808,810,818,820,822,824,826,828,830,832,834,836,838,840,842,844,846,1280,1282,2804,2806,2822,2824,2826,2828,2830,2832,2836,2838,2844,2846,2848,2850,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6336,6338,6340,7900,7912,8306,8934,8936,11168,11170,11897,11918,14223,14224,14232,14827,16024,18348,18748',
 'generic_parent':'8320,11037,11056,11060,11902,11904,11908,11910,11912,11914,11916',
 'other_totalistic':'2800,2802,2866,2868,3298,3300,3302,3304,3306,3308,3310,3312,3314,3316,3326,3328,3330,3332,3334,3336,3338,3340,3342,3344,8308,9164,9166,11509,11585,11625,11627,11629,14226,14228,14230,14760,14762,18672,19234,19236,19238',
-'sibling_application':'1954,1958,2170,2172,2920,2922,3902,3914,5082,5088,5638,6642,6644,7910,10259,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431,17433',
+'sibling_application':'1954,1958,2170,2172,2920,2922,3902,3914,5082,5088,5638,6642,6644,7910,10259,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431,17433,18772',
 'controls':'764,858,860,1419,1427,2834,2924,3380,3900,3908,3912,5086,5092,5218,5220,5222,5482,5484,5486,5636,8534,8544,8546,8560,10393,10395,10399,10409,10411,11050,11164,11166,11176,11184,11186,11188,11190,11375,11919,12055,13599,13603,13605,13607,13609,13611,13615,13648,13652,13656,14392,14394,14541,14673,14675,14764,14766,15211,15213,15215,15217,15219,15223,15225,15227,15229,15231,15235,15237,15239,15241,15243,15313,15315,15317,15319,15493,15661,15972,16020,16025,16027,16049,16129,16157,16448,17139,17874,18339,18476,18744,18746,18770,18850,18877,20573,20577,20590,20592,20600',
 'index':'20846,20965,20967,20969,20972,20980,21134,21162,21223,21233,21241,21471,21517,21683,21731,21933,22030,22146,22352,22392',
 }
@@ -215,13 +216,13 @@ queried=set().union(*sets)
 flat=[i for v in partition.values() for i in v]
 union=queried|follow
 assert not (queried&follow)
-assert len(rows)==18 and len(queried)==127 and len(union)==312
-assert len(flat)==len(set(flat))==312 and set(flat)==union
-assert [len(partition[k]) for k in partition]==[87,11,41,53,100,20]
+assert len(rows)==18 and len(queried)==127 and len(union)==313
+assert len(flat)==len(set(flat))==313 and set(flat)==union
+assert [len(partition[k]) for k in partition]==[87,11,41,54,100,20]
 
 # Standalone set derivation plus a cross-stage drift guard. T03 defines its
 # own explicit follow and partition data above; this reconciliation proves
-# why the reopened union is 312 without importing T04's executable state.
+# why the reopened union is 313 without importing T04's executable state.
 t04_parts={
 'strict':'772,774,776,778,780,782,784,788,790,792,794,796,798,800,802,804,806,808,810,818,820,822,824,826,828,830,832,834,836,838,840,842,844,846',
 'preset_relation':'1280,1282,2804,2806,2822,2824,2826,2828,2830,2832,2836,2838,2844,2846,2848,2850,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6336,6338,6340,7900,7912,8306,8934,8936,11168,11170,11897,11918,14223,14224,14232,14827,16024,18348,18748',
@@ -238,9 +239,9 @@ new23={3298,3300,3302,3304,3306,3308,3310,3312,3326,3330,3332,3336,
 asset_delta={2924,3900,3908,3912,5086,5092,5636,10259,11184,11186,11188,
 11190,13599,13603,13605,13607,13609,13611,13615,13648,13652,13656,15211,
 15213,15215,15217,15219,15223,15225,15227,15229,15231,15235,15237,15239,
-15241,15243,15313,15315,15317,15319,17433}
+15241,15243,15313,15315,15317,15319,17433,18772}
 historical=(set().union(*sets[:-2]))|{11069,11071,11914,13540}
-assert len(t04_union)==243 and len(new23)==23 and len(asset_delta)==42 and len(historical)==118
+assert len(t04_union)==243 and len(new23)==23 and len(asset_delta)==43 and len(historical)==118
 assert union==t04_union|new23|asset_delta|{18770,19234,19236,19238} and historical<=union
 t04_text=Path('goal-1/23-T04-THREECOLOR-TOTALISTIC.md').read_text()
 t04_search=t04_text.split('## Search Log',1)[1].split('## Book Excerpts',1)[0]
@@ -248,14 +249,14 @@ m=re.search(r'\nparts=\{\n(.*?)\n\}\npartition=',t04_search,re.S); assert m
 live_t04=ast.literal_eval('{'+m.group(1)+'}')
 assert {k:set(xs(v)) for k,v in live_t04.items()}=={k:set(xs(v)) for k,v in t04_parts.items()}
 
-# Exact 118-link join to the independent T03 metadata oracle.
+# Exact 119-link join to the independent T03 metadata oracle.
 stage=Path('goal-1/22-T03-TOTALISTIC-CA.md').read_text()
 asset_audit=re.split(r'^## Asset and Raster Audit\s*$',stage,flags=re.M)[1]
 items_src=asset_audit.split('\nitems={',1)[1].split('\n}\n\ndef jpeg_size',1)[0]
 ledger_paths=set(re.findall(r"'([^']+\.jpeg)':\(",items_src))
 manifest_names={re.fullmatch(r'!\[\]\(([^)]+)\)',v).group(1) for v in assets.values()}
-assert len(ledger_paths)==len(manifest_names)==118
-assert len({Path(p).name for p in ledger_paths})==118
+assert len(ledger_paths)==len(manifest_names)==119
+assert len({Path(p).name for p in ledger_paths})==119
 assert {Path(p).name for p in ledger_paths}==manifest_names
 
 root=Path('ref/A-New-Kind-of-Science')
@@ -285,14 +286,16 @@ for rel,want in code1004600_split.items():
     lines=(root/rel).read_text().splitlines()
     got=[i for i,s in enumerate(lines,1) if re.search(r'(?i)1004600',s)]
     assert got==xs(want),(rel,got,xs(want))
-print('T03 source manifest: PASS 18 queries; 312 candidates; partition=87,11,41,53,100,20; assets=118; split=84; inherited=243/historical=118')
+colophon=(root/'BACK-MATTER/Colophon/Colophon.md').read_text().splitlines()
+assert colophon[1328]=='![](Images/_page_1133_Picture_8.jpeg)'
+print('T03 source manifest: PASS 18 queries; 313 candidates; partition=87,11,41,54,100,20; assets=119; split=84; inherited=243/historical=118')
 PY
 ```
 
 Expected terminal line:
 
 ```text
-T03 source manifest: PASS 18 queries; 312 candidates; partition=87,11,41,53,100,20; assets=118; split=84; inherited=243/historical=118
+T03 source manifest: PASS 18 queries; 313 candidates; partition=87,11,41,54,100,20; assets=119; split=84; inherited=243/historical=118
 ```
 
 ### Complete disjoint disposition
@@ -300,11 +303,11 @@ T03 source manifest: PASS 18 queries; 312 candidates; partition=87,11,41,53,100,
 - **Three-color strict, profile, and relation closure (87):** `772,774,776,778,780,782,784,788,790,792,794,796,798,800,802,804,806,808,810,818,820,822,824,826,828,830,832,834,836,838,840,842,844,846,1280,1282,2804,2806,2822,2824,2826,2828,2830,2832,2836,2838,2844,2846,2848,2850,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6336,6338,6340,7900,7912,8306,8934,8936,11168,11170,11897,11918,14223,14224,14232,14827,16024,18348,18748`. This is the complete inherited T04 definition/gallery/class/property route, now direct evidence for the general T03 construction.
 - **Generic construction and implementation (11):** `8320,11037,11056,11060,11902,11904,11908,11910,11912,11914,11916`. These establish the average alias, signatures, exact aggregate lookup, padded codec, and common-framework weight vector.
 - **Other one-dimensional totalistic profiles (41):** `2800,2802,2866,2868,3298,3300,3302,3304,3306,3308,3310,3312,3314,3316,3326,3328,3330,3332,3334,3336,3338,3340,3342,3344,8308,9164,9166,11509,11585,11625,11627,11629,14226,14228,14230,14760,14762,18672,19234,19236,19238`. These close binary radius-two code `10`/`20` and higher/lower-color profiles, including persistent-structure searches, survival data, universality context, frequency controls, and the explicit code-`1004600` long-run Notes continuation.
-- **Sibling geometry, aggregate, or application relations (53):** `1954,1958,2170,2172,2920,2922,3902,3914,5082,5088,5638,6642,6644,7910,10259,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431,17433`. These are continuous, two-dimensional, outer/growth/weighted, network, tiling, additive, block-emulation, Life-analogy, and feature-extraction relations. The two directly joined relation rasters are `10259` and `17433`.
-- **Excluded/query and linked-raster controls (100):** `764,858,860,1419,1427,2834,2924,3380,3900,3908,3912,5086,5092,5218,5220,5222,5482,5484,5486,5636,8534,8544,8546,8560,10393,10395,10399,10409,10411,11050,11164,11166,11176,11184,11186,11188,11190,11375,11919,12055,13599,13603,13605,13607,13609,13611,13615,13648,13652,13656,14392,14394,14541,14673,14675,14764,14766,15211,15213,15215,15217,15219,15223,15225,15227,15229,15231,15235,15237,15239,15241,15243,15313,15315,15317,15319,15493,15661,15972,16020,16025,16027,16049,16129,16157,16448,17139,17874,18339,18476,18744,18746,18770,18850,18877,20573,20577,20590,20592,20600`. These are non-totalistic constructions, false lexical hits, geometry/application raster chains, and negative comparators. `18770` is retained explicitly as the quiescent symmetric elementary-rule emulation-network boundary.
+- **Sibling geometry, aggregate, or application relations (54):** `1954,1958,2170,2172,2920,2922,3902,3914,5082,5088,5638,6642,6644,7910,10259,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431,17433,18772`. These are continuous, two-dimensional, outer/growth/weighted, network, tiling, additive, block-emulation, Life-analogy, feature-extraction, and quiescent-symmetric elementary-emulation relations. The three directly joined relation rasters are `10259`, `17433`, and `18772`.
+- **Excluded/query and linked-raster controls (100):** `764,858,860,1419,1427,2834,2924,3380,3900,3908,3912,5086,5092,5218,5220,5222,5482,5484,5486,5636,8534,8544,8546,8560,10393,10395,10399,10409,10411,11050,11164,11166,11176,11184,11186,11188,11190,11375,11919,12055,13599,13603,13605,13607,13609,13611,13615,13648,13652,13656,14392,14394,14541,14673,14675,14764,14766,15211,15213,15215,15217,15219,15223,15225,15227,15229,15231,15235,15237,15239,15241,15243,15313,15315,15317,15319,15493,15661,15972,16020,16025,16027,16049,16129,16157,16448,17139,17874,18339,18476,18744,18746,18770,18850,18877,20573,20577,20590,20592,20600`. These are non-totalistic constructions, false lexical hits, geometry/application raster chains, and negative comparators. `18770` is retained explicitly as the caption governing the separately classified `18772` quiescent-symmetric elementary-rule emulation relation.
 - **Actual-Index routes (20):** `20846,20965,20967,20969,20972,20980,21134,21162,21223,21233,21241,21471,21517,21683,21731,21933,22030,22146,22352,22392`. They route to already audited direct, profile, relation, or control material and add no transition mechanics.
 
-There is zero silent remainder: the six sets are pairwise disjoint and their union is the exact 312-candidate manifest.
+There is zero silent remainder: the six sets are pairwise disjoint and their union is the exact 313-candidate manifest.
 
 ### Actual-Index route closure
 
