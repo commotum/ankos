@@ -18,23 +18,25 @@ Status: **IN PROGRESS**
 - The 1D constraint “at least one differently colored neighbor” is exactly the set of binary sequences whose runs have length at most two. It admits many models, including alternating and `0011` periodic fields.
 - In one dimension, any satisfiable finite local constraint has some periodic model. This does not imply uniqueness or that arbitrary search bounds decide satisfiability.
 - The canonical 2D cardinal-neighbor profile requires a black center to have exactly one black neighbor and a white center exactly two white neighbors. A recovered `5x5` periodic tile verifies it exactly.
-- The page-227 grid studies all `5x5=25` pairs of same-color neighbor counts for black and white centers. Two profiles are unsatisfiable; the image labels require an independent transcription check before freezing.
+- The page-227 grid studies all `5x5=25` pairs of same-color neighbor counts for black and white centers. Its independently decoded matrix has two unsatisfiable profiles, three infinite-mixture profiles, three two-family profiles, and 17 one-family profiles.
 - Failure to find a model in a bounded tile/patch search is `Unknown`, never proof of infinite unsatisfiability. A sound unsatisfiability result requires a replayable certificate such as a finite obstruction with its full variable halo.
 - Gray/unassigned cells and backtracking order are solver diagnostics, never a third alphabet symbol or trajectory.
-- Infinite existence is undecidable in the broader setting and finite-region existence is NP-complete. No total solver, custom-solver fallback, or one-witness-as-whole-solution-set representation is honest.
+- Infinite existence is undecidable in the broader template/tiling setting and finite 2D constraint existence is NP-complete; the 25 binary cardinal-count profiles themselves are completely classified. No total generic solver, custom-solver fallback, or one-witness-as-whole-solution-set representation is honest.
 - Current runtime has finite dense trajectory arrays and totalistic update rules, but no immutable constraint specification, infinite-model verifier, solution-set semantics, certificate/query outcome, or honest incomplete solver boundary.
 - T31 is the first direct construction that breaks the transition `SOURCE -> READ -> RESULT -> UPDATE` shell: a constraint relation and solver query are different semantic categories.
+- Every literal T31 example is binary on nearest-neighbor `Z` or four-cardinal-neighbor `Z^2`. Arbitrary finite alphabets/dimensions/finite footprints in the proposed histogram data type are a labeled principled closure, not a claim that the main count subsection displays them all.
 
 ## Updated Assumptions
 
-- `LatticeFootprint` is an explicit finite unordered duplicate-free set of nonzero offsets in `Z^d`. It owns topology only; it is not a CA neighborhood with boundary/update policy.
-- `NeighborHistogram` is an alphabet-indexed tuple of nonnegative counts summing to footprint degree. Histogram ordering follows a declared alphabet codec, not hash order.
+- `LatticeFootprint` is an explicit finite unordered duplicate-free set of nonzero offsets in `Z^d`. Its geometric shape may be asymmetric. It owns topology only; it is not a CA neighborhood with boundary/update policy.
+- `NeighborHistogram` is a symbol-keyed nonnegative count map summing to footprint degree, canonically serialized in declared alphabet order. Alphabet order is representational: reordering/renaming symbols with their counts is equivariant.
 - `LocalCountConstraint` is total closed relation data `center_symbol -> allowed_histograms`. “Exactly,” “at least,” and “at most” profiles compile to finite allowed sets rather than predicate callbacks.
 - Native model scope is the total infinite field. A periodic tile plus lattice basis/origin denotes a total periodic field exactly. A finite open patch is only `LocallyConsistentPatch(scope)` and never silently a global solution.
 - `violation_at` is pure verification, not an evolution source. It reports locus, center symbol, observed histogram, and allowed set.
 - A solver is an independent algorithm over a constraint/query scope. Search order, propagation, SAT encoding, de Bruijn analysis, memoization, and bounds do not belong to the constraint object.
 - Query outcomes are `Satisfiable(witness,proof_scope)`, `Unsatisfiable(certificate,scope)`, `Unknown(reason,explored_scope)`, and `ResourceLimit`. They are not `Advanced`, `Terminal`, or program traces.
 - Any solver witness must reverify independently. Any unsatisfiability certificate must replay independently. Bounded exhaustion alone supplies neither.
+- Distinct infinite-lattice offsets always contribute separately. If two offsets alias to the same cell under a tiny periodic presentation, that cell contributes twice; wrapping never deduplicates footprint occurrences.
 - Finite periodic search in 2D is incomplete by design. The 1D de Bruijn analyzer may be complete for its explicitly bounded local profile.
 - Symmetry quotienting may summarize solutions only after exact pointwise models are established.
 
@@ -56,66 +58,163 @@ Reconstruct local constraint systems as declarative model sets over regular tota
 ## Search Log
 
 1. Verified CSV line 32 and read `ref/notes/CA-Types.md:842-864`; its predicate/global-requirement/custom-solver suggestions remain unaccepted.
-2. Read the strict main count-constraint core `BOOK:2568-2612` and inspected the page-225/page-226/page-227 figures. The page-227 profile labels remain under independent visual confirmation.
+2. Read the strict main count-constraint core `BOOK:2568-2612` and independently decoded every page-225/page-226/page-227 figure, including exact visible 1D rows, the `5x5` tile/formula, and all 25 profile classifications.
 3. Read `BOOK:2642-2666` for the defining absence of direct evolution and separation of constraint data from external search/backtracking.
 4. Read Notes `BOOK:14029-14047` for equations, allowed blocks, 1D periodicity, and the cellular-automaton fixed-point relation; read `14080-14084` for search, undecidability, and finite NP-completeness.
-5. Preliminary searches found exact `system(s) based on constraint(s)` 17/17 occurrences/lines, `constraint system(s)` 9/9, `local constraint(s)` 3/3, broad `constraint(s)` 467/312, and satisfy/constraint proximity 178/144. Counts remain provisional until actual Index/split disposition closes.
-6. Followed relations to CA/ground states, tilings, template/required-template systems, network constraints, sequence equations, pattern avoidance, PCP, Diophantine equations, CA fixed points/spacetime, and no-initial-condition evidence. Full disposition remains in progress.
-7. Audited current runtime/API pressure preliminarily. No constraint spec/verifier/solver-result boundary exists; the existing totalistic update pipeline is not a constraint engine.
+5. Direct component searches found `system(s) based on constraint(s)` 17/17 occurrences/lines, `constraint system(s)` 9/9, and `local constraint(s)` 3/3. Their union is 29 occurrences on 27 lines: 22/20 before the actual Index and 7/7 in it.
+6. A conservative family query covering direct names, satisfaction phrases, allowed/forbidden blocks/templates, subshifts/finite-complement languages, de Bruijn networks, network constraints, ground states, sequence equations, pattern avoidance, and tiling problems found 162/134: 125/104 before the Index and 37/30 in it.
+7. The expanded `constraint/satisfy/allowed/forbidden/subshift/de Bruijn/tiling/ground-state` audit found 815/415: 690/342 before the Index and 125/73 in it. Bare `constraint(s)` alone is 467/312. Every candidate was classified.
+8. Read `BOOK:3980-4084` for verification-versus-construction, repair/optimization heuristics, and the CA fixed-point relation; these are solver/reduction evidence, not T31 dynamics.
+9. Followed network/spacetime constraints `BOOK:5772-5812` and `16365-16373`, T32/T33 `2614-2698` and `14048-14112`, CA/ground-state/tiling/string relations `14113-14155`, finite complexity `15409-15422`, and tiling undecidability/history `19256-19280`.
+10. Verified `BOOK:14275` says constraint systems have no initial conditions. Read `19816` only as a proof-search analogy.
+11. Resolved all 27 direct-hit lines individually: 5 native T31, 3 whole-section/T32/T33 boundary, 4 search/behavior relations, 3 network-family hits, 4 distinct constraint/history relations, and 8 actual-Index routes. Zero remain undispositioned.
+12. Verified the clean strict-core duplicate `CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md:397-441`. The file named `BACK-MATTER/Index/Index.md` is actually a Notes duplicate; `BACK-MATTER/Notes/Notes.md` is unusable.
+13. Resolved actual Index routes at `BOOK:21042-21043`, `21090`, `21193`, `21501`, `21683`, `21927`, `22080`, `22134`, `22144`, and `22291-22310` after the actual Index start at `20826`. Split/mangled Colophon routes are duplicates.
+14. Audited `simple_programs.md`, runtime/tests, transition-stage decisions, verifier/solver/certificate boundaries, and no-cheating constraints. All names, figures, Notes, Index/splits, examples, relations, and source repairs are dispositioned; strict T31 mechanics have zero unresolved candidates.
 
 ## Book Excerpts
 
-Canonical `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. Final groups remain open until the figure/Index/variant audit closes.
+Canonical `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. These 28 groups cover every unique construction-relevant passage; duplicates and OCR qualifications are logged above.
 
 ### E01 — Constraints instead of evolution
 
-- Provenance: `BOOK:2568-2578`.
-- Fact: constraints specify which complete configurations are allowed without giving any procedure that generates them.
+- Provenance: `BOOK:2568-2580`, page-225.
+- Fact: unlike evolution rules, constraints define allowed complete configurations. The exact-one-black/one-white-neighbor profile forces translations of the period-4 field.
 
-### E02 — Unique 1D count profile
+### E02 — Permissive 1D models and periodic sufficiency
 
-- Provenance: `BOOK:2574-2582`, page-225.
-- Fact: requiring exactly one black and one white immediate neighbor forces the period-4 pattern, modulo translation.
+- Provenance: `BOOK:2582-2594`, page-226 top.
+- Fact: at least one unlike neighbor permits precisely runs of length at most two, with both irregular and periodic models. Any satisfiable finite local 1D constraint has some periodic model.
 
-### E03 — More permissive 1D profile and periodic sufficiency
+### E03 — Canonical 2D count profile
 
-- Provenance: `BOOK:2582-2598`, page-226 top.
-- Fact: requiring at least one unlike neighbor permits exactly runs of length at most two. More generally, every satisfiable finite local 1D constraint has a periodic model.
+- Provenance: `BOOK:2596-2604`, page-226 bottom.
+- Fact: on four cardinal neighbors, black centers require one black neighbor and white centers two white neighbors. The wrapped `5x5` tessellation is a periodic infinite witness; the source asserts its rotation/reflection family is exhaustive.
 
-### E04 — Canonical 2D neighbor-count model
+### E04 — Complete 25-profile gallery
 
-- Provenance: `BOOK:2596-2608`, page-226 bottom.
-- Fact: on the four-cardinal-neighbor square lattice, black requires one black neighbor and white requires two white neighbors; the displayed periodic `5x5` tessellation and symmetries satisfy it.
+- Provenance: `BOOK:2606-2612`, page-227.
+- Fact: the 25 black/white same-color count pairs contain two unsatisfiable, three infinite-mixture, three two-family, and 17 one-family cells. These particular satisfiable profiles always have periodic representatives.
 
-### E05 — Solution-set multiplicity and unsatisfiable profiles
+### E05 — Oriented-template boundary
 
-- Provenance: `BOOK:2608-2612`, page-227.
-- Fact: among the 25 same-color count pairs, some have no model, many one/two periodic families, and some infinitely many mixtures. A periodic model suffices whenever these specific profiles are satisfiable.
+- Provenance: `BOOK:2614-2630`.
+- Fact: exact allowed oriented local templates and the 171-pattern catalog introduce T32. Histograms do not preserve this orientation information.
 
-### E06 — Search is external to the system
+### E06 — Required-template boundary
 
-- Provenance: `BOOK:2642-2666`.
-- Fact: unlike explicit evolution, constraint satisfaction requires going outside the system to enumerate/build/backtrack. Finite obstructions can certify some global impossibility; large patches alone do not guarantee an infinite extension.
+- Provenance: `BOOK:2632-2640`.
+- Fact: requiring one template to occur at least somewhere adds a global existential condition and begins T33.
 
-### E07 — Notes equation/constraint distinction
+### E07 — External search and finite obstruction
 
-- Provenance: `BOOK:14029-14039`.
-- Fact: equations may encode evolution or same-time constraints; this distinction is often obscured in continuous mathematics.
+- Provenance: `BOOK:2642-2664`.
+- Fact: constraints supply no direct construction procedure; enumeration/backtracking occurs outside the system. A sound unsatisfiable finite region can obstruct a global model, while very large locally consistent patches need not extend infinitely. Gray marks undecided solver cells.
 
-### E08 — Allowed blocks and 1D periodic proof
+### E08 — Nonperiodic T33/CA-derived relation
+
+- Provenance: `BOOK:2666-2698`.
+- Fact: forced templates and CA spacetime encodings can enforce nonperiodicity. These use T33/T32 mechanics rather than altering T31 count relations.
+
+### E09 — Easy verification versus hard construction
+
+- Provenance: `BOOK:3980-4008`.
+- Fact: checking a complete candidate locally can be easy even when finding one is hard. Random enumeration and violation fractions are search/diagnostic methods.
+
+### E10 — Repair and optimization heuristics
+
+- Provenance: `BOOK:4010-4064`.
+- Fact: local repairs, minimization, and search can become trapped or fail. They are approximate solver algorithms, not the constraint system or proof of impossibility.
+
+### E11 — Cellular-automaton fixed-point relation
+
+- Provenance: `BOOK:4068-4084`.
+- Fact: satisfying configurations can correspond to CA fixed points, but ordinary CA evolution generally does not find them. Compilation does not make CA dynamics native constraint semantics.
+
+### E12 — Repetition/nesting observations
+
+- Provenance: `BOOK:4244` and `4324`.
+- Fact: constraint-generated patterns are compared with repetition/nesting in other systems. These are pattern observations only.
+
+### E13 — Network/spacetime constraint family
+
+- Provenance: `BOOK:5772-5796` and `5812`.
+- Fact: graph/spacetime constraints use a distinct carrier and reinforce the evolution-versus-search distinction. They are not a custom-graph option on T31.
+
+### E14 — Page-215 oriented-block cross-reference
+
+- Provenance: `BOOK:6976`.
+- Fact: the reference points to oriented 2D block constraints and therefore belongs to T32/view relations.
+
+### E15 — Equations and constraint semantics
+
+- Provenance: `BOOK:14027-14039`.
+- Fact: temporal equations may become explicit evolution, while same-time equations impose constraints. PDE, linear/nonlinear, and variational analogies do not erase the categorical distinction.
+
+### E16 — Allowed blocks, de Bruijn proof, and subshifts
 
 - Provenance: `BOOK:14040-14047`.
-- Fact: a finite allowed-block representation/de Bruijn argument proves a satisfiable 1D local constraint has a periodic solution and relates solutions to fixed points/spacetime patterns of cellular automata.
+- Fact: allowed length-`n` blocks define arcs on a `k^(n-1)`-vertex de Bruijn graph; any infinite 1D path has a periodic cycle of bounded period. CA fixed points and subshifts of finite type are relations.
 
-### E09 — Search complexity
+### E17 — Template implementation and generic search complexity
 
-- Provenance: `BOOK:14080-14084`.
-- Fact: general infinite satisfaction is undecidable and finite constraint satisfaction is NP-complete; search algorithms are external.
+- Provenance: `BOOK:14048-14084`.
+- Fact: T32 numbering/`SatisfiedQ`, periodic representations, square-spiral search, undecidability, and NP-completeness describe broader template constraints and solver methods. `SatisfiedQ` is not a total infinite T31 verifier.
 
-### E10 — No initial conditions
+### E18 — T33 formulas and forced-template variants
+
+- Provenance: `BOOK:14085-14112`.
+- Fact: nonperiodic formulas and required-template constructions confirm the T33 boundary.
+
+### E19 — CA invariant/spacetime relation and noncomputability
+
+- Provenance: `BOOK:14113-14123`.
+- Fact: local constraints can encode CA invariant configurations or spacetime histories and can define noncomputable patterns. These are reductions/stronger template profiles.
+
+### E20 — Tiling and polyomino history
+
+- Provenance: `BOOK:14124-14142`.
+- Fact: Wang/Penrose/polyomino tilings supply history and oriented-template relatives, not count-profile mechanics.
+
+### E21 — Ground states and other declarative relatives
+
+- Provenance: `BOOK:14144-14155`.
+- Fact: spin ground states, correspondence systems, sequence equations, and pattern avoidance are distinct declarative constructions/value domains.
+
+### E22 — No initial conditions
 
 - Provenance: `BOOK:14275`.
 - Fact: systems based on constraints do not have initial conditions.
+
+### E23 — Finite complexity and heuristic solver code
+
+- Provenance: `BOOK:15409-15422`.
+- Fact: finite 2D constraint existence is NP-complete while 1D analysis is efficient; `Cost`/`Move` are heuristic solver diagnostics, not semantic updates.
+
+### E24 — Physical mechanism relations
+
+- Provenance: `BOOK:15713` and `15930`.
+- Fact: lattice-gas history and self-assembly analogies describe distinct physical mechanisms.
+
+### E25 — Network constraint variants
+
+- Provenance: `BOOK:16365-16373`.
+- Fact: network constraints have graph topology and separate variants; T31 does not accept a custom graph callback.
+
+### E26 — Tiling/string undecidability history
+
+- Provenance: `BOOK:19256-19280`.
+- Fact: Wang/Berger tiling and PCP/string results establish undecidability for broader oriented-template/tiling families, not for the completely classified 25 cardinal-count profiles.
+
+### E27 — Proof-search analogy
+
+- Provenance: `BOOK:19816`.
+- Fact: proof search is compared with constraint search. It supplies no T31 state or solver default.
+
+### E28 — Actual Index routes
+
+- Provenance: `BOOK:21042-21043`, `21090`, `21193`, `21501`, `21683`, `21927`, `22080`, `22134`, `22144`, and `22291-22310`.
+- Fact: routes for constraints, satisfaction, local repetition, subshifts, tilings, formal languages, matching, networks, spin systems, and substitution relations all lead to passages dispositioned above.
 
 ## Construction Model
 
@@ -174,27 +273,30 @@ This is a pure relation check. The locus is not an active source; the violation 
 The strict reusable representation profiles are:
 
 ```text
-PeriodicLatticeModel = {
+PeriodicPresentation = {
     dimension,
-    period_lattice / rectangular_period,
+    axis_aligned_periods: tuple[PositiveInt],
     finite_fundamental_domain_values,
-    origin
 }
 
-FinitePatch = {
+FiniteWindow = {
+    anchors,
+    variables = anchors union (anchors + footprint)
+}
+
+OpenPatch = {
     finite_values,
-    checked_anchor_set,
-    required_halo
+    checkable_anchors
 }
 ```
 
-A periodic model defines an exact total field by quotienting lattice points through its declared period. Since the constraint is translation invariant, checking one complete fundamental domain proves the infinite field. An origin shift changes the pointwise field even when it lies in the same translation orbit.
+A periodic presentation defines an exact total field by componentwise modulo reduction. Since the constraint is translation invariant, checking one complete fundamental domain proves the infinite field. Axis-aligned periods suffice for T31: every finite-index period lattice has a rectangular superperiod, while a general basis would add redundant quotient complexity not demanded here.
 
-A finite patch makes only a scoped claim. Every checked anchor must have its entire footprint halo in the finite value map. Passing this check yields `LocallyConsistentPatch`, not an infinite model. Open, periodic, and infinite scopes are explicit types and cannot share a silent boundary option.
+A finite-window query constrains only its anchors but includes every halo variable needed to decide them. A finite-window witness makes only a scoped claim; a certified unsatisfiable finite window can obstruct a global model. An open patch checks only anchors whose complete footprint lies in its given values and is diagnostic even with zero violations. Open, finite-window, periodic, and global scopes are explicit types and cannot share a silent boundary option.
 
 ### Model equality, symmetries, and solution-set observations
 
-Semantic models are pointwise total fields. Two periodic representations can be compared exactly by reducing both to a common period; structural tile equality alone is not the only possible representation equality. General infinite extensional equality need not be decidable and is not promised by the API.
+Semantic models are pointwise total fields. Two periodic presentations can be compared exactly over the componentwise least-common-multiple box of their periods; structural tile equality alone is not model equality. General infinite extensional equality need not be decidable and is not promised by the API.
 
 Translations, rotations, reflections, color permutations, minimal periods, orbit representatives, model counts, uniqueness, and entropy are explicit relations/observers. A caption that displays “the only” pattern with its rotations/reflections does not authorize quotienting exact models or prove a particular origin convention.
 
@@ -217,24 +319,46 @@ QueryOutcome =
 Examples of sound claims:
 
 - a verified periodic witness proves global satisfiability;
-- a verified finite patch proves only local consistency on its anchors;
+- a satisfiable finite window proves only that scoped finite query;
+- a verified open patch proves only local consistency on its checkable anchors;
 - failure to find any tile up to a period bound proves only “no witness in this search scope” and returns `Unknown` for global existence;
 - an exhaustive finite obstruction can prove global unsatisfiability.
 
-An exact replayable finite obstruction is:
+The promotion rules are:
+
+| Result | Global consequence |
+|---|---|
+| periodic `Satisfiable` | global satisfiable |
+| finite-window certified `Unsatisfiable` with full halo | global unsatisfiable |
+| finite-window `Satisfiable` | none |
+| one-period `Unsatisfiable` | no model at that period only |
+| bounded periodic search exhaustion | `Unknown` |
+| open-patch zero violations | none |
+
+An open patch with no complete anchor reports `checked_anchors=0` and never promotes vacuous success to satisfiability. Unknown symbols/shapes/periods are validation errors, not local violations.
+
+An exact replayable finite obstruction certificate is:
 
 ```text
-ExhaustiveFiniteObstruction = {
+FiniteObstructionCertificate = {
     anchors: FiniteSet[LatticePoint],
     variables: anchors + footprint_halo
+    proof: ProofNode
 }
 
-replay:
-  for every assignment variables -> alphabet:
-      at least one anchor violates its local relation
+ProofNode =
+    CaseSplit(
+      variable: unassigned variable,
+      branches: TotalMap[alphabet_symbol, ProofNode]
+    )
+  | LocalDomainWipeout(anchor)
+
+replay LocalDomainWipeout:
+  no assignment to the still-unassigned center/neighbors
+  can complete any allowed histogram at this anchor
 ```
 
-If a global model existed, its restriction to `variables` would contradict this finite exhaustive proof. The checker recomputes the finite enumeration; no solver callback or trusted “unsat” boolean is accepted. More compact SAT/resolution certificates may be added later only with their own closed proof AST/checker.
+Every case split must cover the alphabet exactly. A full brute-force enumeration is one valid proof tree; early domain wipeouts compress it. If a global model existed, its restriction to `variables` would contradict the replayed tree. No solver callback or trusted “unsat” boolean is accepted. More compact SAT/resolution certificates may be added later only with their own closed proof AST/checker.
 
 Search algorithms—square-spiral growth, backtracking, propagation, de Bruijn graphs, SAT encodings, memoization, symmetry breaking, heuristic ordering, and periodic bounds—consume a constraint/query but never become fields of the constraint value. Their diagnostic search trees are not program trajectories.
 
@@ -302,12 +426,44 @@ The second profile is equivalently “every run has length at most two.” The t
 10001
 ```
 
-with both axes periodic of length 5. All 25 torus anchors satisfy the relation. Flipping the top-left bit produces exactly five violations at `(0,0),(1,0),(4,0),(0,1),(0,4)` under zero-based `(x,y)` coordinates, a strong boundary/orientation/histogram oracle.
+with both axes periodic of length 5. Equivalently, `X(r,c)=1` iff `(c+2r) mod 5` is 2 or 3. All 25 torus anchors satisfy the relation. Flipping the top-left bit produces exactly five violations at `(0,0),(1,0),(4,0),(0,1),(0,4)` under zero-based `(x,y)` coordinates, a strong boundary/orientation/histogram oracle.
+
+The page-225 raster visibly contains `(1100)^8`, a translation of the same period-4 field. The three page-226 permissive rows decode as:
+
+```text
+11001011001011010110101001101010
+10010010010010010010010010010010
+10101010101010101010101010101010
+```
+
+Every row avoids `000` and `111`; the latter two are visible crops of periods 3 and 2. They are alternative complete configurations, not time steps.
+
+### Complete page-227 exact-count profile gallery
+
+Let `b` be the number of black neighbors around a black center and `w` the number of white neighbors around a white center. The page-227 grid orders `b=0..4` top-to-bottom and `w=4..0` left-to-right. Its exact visual classification is:
+
+| `b \ w` | 4 | 3 | 2 | 1 | 0 |
+|---:|:---:|:---:|:---:|:---:|:---:|
+| 0 | one | one | one | none | one |
+| 1 | one | infinite mixtures | one | one | none |
+| 2 | one | two | infinite mixtures | one | one |
+| 3 | one | one | two | infinite mixtures | one |
+| 4 | two | one | one | one | one |
+
+Thus:
+
+- unsatisfiable profiles are `(b,w)=(0,1),(1,0)`;
+- infinite-mixture families are `(1,3),(2,2),(3,1)`;
+- two-family profiles are `(2,3),(3,2),(4,4)`;
+- the other 17 show one family;
+- the canonical `5x5` witness is profile `(1,2)`.
+
+This is classification metadata from the figure/prose. “One” means one displayed family modulo placement and stated rotations/reflections, not one literal pointwise model. The raster supplies neither canonical periods for every cell nor a grammar for infinite mixtures. The two blank cells are authoritative claims, but a Goal 2 solver may report them globally unsatisfiable only with a replayable proof/certificate, never because a bounded torus search failed.
 
 ### Adversarial conformance oracles
 
-1. **Period-4 proof.** Verify all four phases of `0011` and the exact de Bruijn cycle; reject a phase containing a triple run.
-2. **Run constraint.** Alternating and `0011` models pass the at-least-one-unlike profile; any `000` or `111` occurrence produces an exact violation.
+1. **Period-4 proof.** Verify all four phases of `0011` and the exact de Bruijn cycle; uniform and period-3 fields fail the strict profile.
+2. **Run constraint.** All three decoded page-226 rows pass the at-least-one-unlike profile; any `000` or `111` occurrence produces an exact violation.
 3. **2D torus.** The recovered `5x5` tile has zero violations across all anchors; its one-bit perturbation has the five exact violations above.
 4. **Center-conditioned rows.** Swapping `allowed[0]` and `allowed[1]` generally changes the result; color counts are not a single center-blind totalistic rule.
 5. **Footprint orientation.** Cardinal degree four excludes diagonals and center. Duplicating or including the center is invalid.
@@ -320,6 +476,12 @@ with both axes periodic of length 5. All 25 torus anchors satisfy the relation. 
 12. **Search independence.** Different search orders may find different exact models but cannot change the constraint or validity of a witness.
 13. **No gray state.** Partial assignments belong only to a solver trace; model verification rejects undeclared gray/unassigned values.
 14. **Validation.** Reject empty alphabet/footprint, zero/duplicate/mixed-dimension offsets, missing center row, undeclared symbol, negative/wrong-sum histogram, malformed period, incomplete tile, and callbacks.
+15. **Symmetry versus complement.** Translations, rotations, and reflections of the `5x5` tile verify. Its color complement does not satisfy the same center-conditioned `(1,2)` profile; it belongs to the swapped `(2,1)` relation.
+16. **Gallery coordinates.** Constructors for all 25 exact-count profiles reproduce the `(b,w)` coordinates and classification table without treating cells as time frames.
+17. **Page-227 obstruction.** For each impossible profile `(0,1)` and `(1,0)`, a `4x3` rectangular anchor set plus cardinal halo has 26 variables and is unsatisfiable; generate and independently replay a closed case-split/domain-wipeout certificate.
+18. **Wrapped alias multiplicity.** In period-1/period-2 presentations, distinct footprint offsets that land on one residue still contribute separately to the degree-four histogram.
+19. **Redundant periods.** Minimal and repeated tiles with different declared periods but the same pointwise field compare equivalent over their LCM box; raw dataclass inequality is not model inequality.
+20. **Vacuous open patch.** A patch with zero complete anchors reports zero checked anchors and cannot return global `Satisfiable`.
 
 ## Variants, Relations, and Boundaries
 
@@ -411,10 +573,10 @@ Rejected shortcuts:
 Dependencies: finite alphabet values; T01's semantic total-lattice/finite-realization distinction; a synthesis-selected exact lattice-point/offset value and error/serialization infrastructure. Do not depend on `Dynamics`, the transition executor, totalistic next-value rules, a SAT/solver callback, or T32/T33 semantics.
 
 1. Add a separate constraint-owned module such as `src/ca/constraints.py` with `LatticeFootprint`, `NeighborHistogram`, and immutable `LocalCountConstraintSystem`. Validate dimension, nonzero duplicate-free offsets, total center rows, alphabet order, histogram nonnegativity/degree, and closed serialization.
-2. Add exact `PeriodicLatticeModel` and `FinitePatch` representations with explicit period/origin or anchor/halo scopes. Implement exact point queries, normalization, pointwise comparison for periodic models, and no padding/boundary fallback.
-3. Add pure `observed_histogram`, `satisfied_at`, `violation_at`, `verify_periodic`, and `verify_patch`. Periodic verification checks a complete fundamental domain and returns proof metadata; patch verification labels only the checked scope.
+2. Add exact axis-aligned `PeriodicPresentation`, `FiniteWindow`, and `OpenPatch` representations. Implement componentwise-modulo point queries, LCM-box pointwise equivalence across redundant periods, canonical anchor/halo derivation, and no padding/boundary/value callback.
+3. Add pure `observed_histogram`, `satisfied_at`, `violation_at`, `verify_periodic`, and `verify_open_patch`. Periodic verification checks a complete fundamental domain; patch reports exact checked anchors including the vacuous-zero case. Offset contributions retain multiplicity after periodic aliasing.
 4. Add a separate constraint-query/result module with `ClaimScope` and closed `Satisfiable`, `Unsatisfiable`, `Unknown`, and `ResourceLimit` records. These must not implement or subclass transition `Advanced/Terminal/Quiescent` outcomes.
-5. Add replayable `ExhaustiveFiniteObstruction` checking: derive the complete halo, enumerate every finite assignment, and prove each violates an anchor. Keep future compact proof ASTs behind independent verified types, never callbacks or trusted booleans.
+5. Add replayable `FiniteObstructionCertificate` with closed `CaseSplit` and `LocalDomainWipeout` proof nodes. Validate exact halo, exhaustive alphabet branches, partial-assignment consistency, and every wipeout. A full exhaustive tree is the baseline; no callbacks or trusted booleans.
 6. Add a solver-owned module such as `src/ca/constraint_solvers.py` with an exact 1D de Bruijn analyzer, bounded periodic-model search, and bounded finite-obstruction search. Every returned witness/certificate rechecks independently; exhausted incomplete bounds return `Unknown`.
 7. Add strict constructors for the two 1D profiles, canonical 2D black1/white2 profile, recovered `5x5` model, and page-227 profile data once independently transcribed. Keep constraint, query bounds, and solver strategy separate.
 8. Add downstream symmetry-orbit, period, model-count, tile/image, search-tree, and dataset encodings. Do not represent solution sets as episodes or stack unlike query/model records into dense trajectories.
@@ -428,10 +590,11 @@ Completion requires:
 - at-least-one-unlike run tests including triple-run violations;
 - exact `5x5` periodic tile verification at all 25 anchors, rotations/reflections as explicit relations, and the five-violation one-bit perturbation;
 - page-227 `25` profile/classification data including the two unsatisfiable and infinite/two-family cells;
-- explicit pointwise-versus-symmetry-orbit and structural-versus-extensional periodic equality tests;
+- explicit pointwise-versus-symmetry-orbit, redundant-period LCM equivalence, and structural-versus-extensional periodic equality tests;
 - open patch/halo, torus, and infinite claim-scope separation;
-- a three-anchor 1D exhaustive obstruction such as `allowed[0]={(1,1)}, allowed[1]=empty`, with independent replay;
+- a three-anchor 1D obstruction such as `allowed[0]={(1,1)}, allowed[1]=empty` and page-227 `4x3`/26-variable certificates for both impossible profiles, all independently replayed;
 - solver witness reverification, bounded-period exhaustion as `Unknown`, resource outcome, and search-order independence;
+- period-1/2 offset-alias multiplicity and vacuous-open-patch tests;
 - no gray/model callback/solver callback/repair dynamics/transition outcome/fake finite domain tests;
 - unchanged prior transition semantics, no constraint rollout branch, and all repository tests passing.
 
