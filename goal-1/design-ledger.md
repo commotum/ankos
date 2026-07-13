@@ -105,18 +105,19 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 | Dimension | Current candidate | Status | Evidence users |
 |---|---|---|---|
-| Support/topology | Fixed fields, ordered sequences, named banks, rooted expression trees, affine occurrence bags, rooted port graphs, and finite exact sets of words are members | PROVISIONAL lattice/sequence/bank/tree/bag/graph/word-set members; continuous/general topology UNRESOLVED | T01, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30 |
-| Values/alphabet | Explicit finite field/word/atom values; independent value/control domains; epsilon-capable words; exact `Naturals`; pattern/geometry/graph values; finite word-set membership is exact and unweighted | PROVISIONAL finite/infinite discrete, affine/point, graph-reference, and set-lifted members; other continuous/function values UNRESOLVED | T01, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30 |
-| Control | `SingleControl(key,position,payload)` in visible Markov state over a typed address domain; unit payload for T09/T19, finite head-state payload for T12 | PROVISIONAL single-control member; multiple/structural control UNRESOLVED | T09, T12, T19; absent T01/T13/T16/T17/T20/T27/T29-parallel/T30 |
+| Support/topology | Fixed fields, ordered sequences, named banks, rooted trees, affine bags, rooted graphs, exact word sets, and declarative model sets over total lattice fields are members | PROVISIONAL lattice/sequence/bank/tree/bag/graph/word-set/model-set members; continuous/general topology UNRESOLVED | T01, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T31 |
+| Values/alphabet | Explicit finite values; epsilon words; exact `Naturals`; pattern/geometry/graph values; exact unweighted sets; symbol-keyed neighbor histograms and periodic field presentations | PROVISIONAL finite/infinite discrete, affine/point, graph-reference, set-lifted, and constraint values; other continuous/function values UNRESOLVED | T01, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T31 |
+| Control | `SingleControl(key,position,payload)` in visible Markov state over a typed address domain; unit payload for T09/T19, finite head-state payload for T12 | PROVISIONAL single-control member; multiple/structural control UNRESOLVED | T09, T12, T19; absent T01/T13/T16/T17/T20/T27/T29-parallel/T30/T31 |
 | Active loci | Firing/source selectors include sites, control loci, ordered/bag occurrences, network nodes, program-coupled flat/tree matches, queue prefixes, instructions, and every literal match across every word in a layer | PROVISIONAL fixed/control/sequence/bag/graph/interval/queue/code/tree/multiway-match sources | T01, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30 |
 | Reads/access | Ordered topology values, control payload, self values, spans/prefixes, operands, tree bindings, geometric poses, graph path/signatures, or exact matched parent intervals; read and mutation coverage may differ | PROVISIONAL for fixed/control/word/bank/tree/bag/graph/multiway profiles | T01, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30 |
 | Rule choice | Total tables/morphisms, ordered rewrite programs, closed instructions/templates/ASTs, topology tables, or unordered finite literal relations; no implicit defaults/callbacks | PROVISIONAL local/control/morphism/rewrite/queue/register/tree/geometric/graph/multiway programs; broader calculations UNRESOLVED | T01, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30 |
 | Rule result | Typed members include effects/control transitions, word/queue/tree/bag/graph replacements, instruction branches, and one literal interval replacement per multiway witness | PROVISIONAL result sum; never a universal category | T01, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30 |
-| Commit/update | Explicit siblings: fixed effects, ordered replacement, one splice, queue edit, prefix-free tree replacement, bag replacement, rooted graph reroute/create/project, and exact multiway branch union | PROVISIONAL eight-member update family; constraints/derivatives/other mutation remain distinct | T01, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30 |
-| Successors | Execution may yield one advanced successor—including a complete set-valued macro successor—typed quiescence/reference stutter, or retained zero-successor terminal outcome | PROVISIONAL deterministic/set-lifted/quiescent/terminal cases; solution sets/derivatives remain distinct and UNRESOLVED | T01, T12, T16, T17, T19, T20, T27, T29, T30 |
+| Commit/update | Explicit siblings: fixed effects, ordered replacement, one splice, queue edit, prefix-free tree replacement, bag replacement, rooted graph reroute/create/project, and exact multiway branch union | PROVISIONAL eight-member transition family; T31 proves constraints are categorically outside it; derivatives/other mutation remain distinct | T01, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30; not applicable T31 |
+| Successors | Execution may yield one advanced successor—including a complete set-valued macro successor—typed quiescence/reference stutter, or retained zero-successor terminal outcome | PROVISIONAL transition outcomes; T31 solution/model sets and query results are explicitly distinct; derivatives UNRESOLVED | T01, T12, T16, T17, T19, T20, T27, T29, T30; distinct T31 |
 | Halting/invalidity | Base continuation, terminal/no-match/prefix outcomes, quiescence, explicit exit, all-dead-to-empty advancement, empty-layer stutter, observers, projection, validation, resource, and rendering cutoffs are distinct | PROVISIONAL outcome model; other construction-specific invalidity UNRESOLVED | T12, T16, T17, T19, T20, T27, T29, T30 |
-| Trace encoding | Structured snapshots preserve fields/control, ragged words/trees, affine bags, rooted graphs, or exact word sets; events preserve effects/matches/paths/births/projection/branch witnesses before graph/count/render lowerings | PROVISIONAL fixed/ordered/bank/tree/geometry/graph/multiway traces; global schema UNRESOLVED | T01, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30 |
-| Solver/numerics | Exact rational/algebraic affine and point evaluation is semantic where declared; finite precision has explicit literal/precision/rounding provenance; limits, dimension, parameter filters, rendering, and tolerance are observers/algorithms | PROVISIONAL exact/declared numeric profiles and semantic-versus-observer boundary | T01 (not applicable), T27 |
+| Trace encoding | Transition snapshots/events remain distinct from verified models, constraint query records/certificates, solver diagnostics, and downstream renderings | PROVISIONAL fixed/ordered/bank/tree/geometry/graph/multiway traces plus explicit non-trace constraint records; global schema UNRESOLVED | T01, T09, T12, T13, T16, T17, T19, T20, T27, T29, T30, T31 |
+| Constraint/solution | Closed local relations denote mathematical model sets; periodic/open/window presentations have explicit scopes; exact verification differs from search and solution enumeration | ACTIVE category split; T32/T33 and other constraint carriers must re-audit relation syntax | T31 |
+| Solver/numerics | Exact numeric evaluation is semantic where declared; constraint solvers use separate scoped `Satisfiable/Unsatisfiable/Unknown/ResourceLimit` records with replayed witnesses/certificates; approximations/heuristics remain algorithms | PROVISIONAL exact/declared numeric and solver-result boundaries | T27, T31 |
 
 ## Decision Log
 
@@ -469,6 +470,42 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: semi-Thue/group and literal grammar profiles restrict clause data, while pattern variables, arrays/networks, cyclic strings, tags, numbers, machines/games, and causal-event systems alter matching, support, multiplicity, or state (`BOOK:13988-14025`, `19324-19339`).
 - Consequence: bidirectional and literal grammar presets may reuse base stepping without quotienting exact words. Defer separately typed variants; notably, multiway-tag code omits `Union` and cyclic conventions are underspecified. No canonical rule number/random distribution exists, and no mode flag or callback fills these gaps.
 
+### D058 — Constraint systems denote model sets, not transitions
+
+- Status: ACTIVE categorical split; evidenced by T31.
+- Basis: the main text contrasts explicit stepwise evolution with complete configurations implicitly selected by constraints and says search must go outside the system (`BOOK:2568-2578`, `2642-2664`).
+- Consequence: T31 has no source/read/result/update, successor, seed, time, halt, or trajectory. Add a separate constraint/specification category rather than a ninth update, zero-step dynamics, fixed-point rollout, or repair process.
+
+### D059 — Local count constraints are closed center-conditioned histogram relations
+
+- Status: ACTIVE for T31.
+- Basis: the strict examples constrain neighbor color counts around each center on the nearest-neighbor line or four-cardinal grid (`BOOK:2574-2612`).
+- Consequence: use `LatticeFootprint` plus total `center_symbol -> finite allowed NeighborHistogram set`. Footprint offsets are nonzero/distinct and each contributes once; alphabet/footprint order is representational. Exact/at-least profiles compile to explicit sets. No predicate, boundary, custom graph, solver, or totalistic next-value rule belongs in the spec.
+
+### D060 — Infinite, periodic, finite-window, and open-patch scopes are distinct
+
+- Status: ACTIVE for T31 and representation design.
+- Basis: the native line/grid is infinite, page-226 wrap/tessellation supplies an exact periodic witness, and the search discussion distinguishes finite regions from global extendibility (`BOOK:2594-2604`, `2642-2664`).
+- Consequence: support closed axis-aligned periodic presentations with exact LCM-box equivalence, finite windows with full variable halo, and diagnostic open patches. Periodic SAT promotes globally; finite-window SAT/open consistency does not; certified finite-window UNSAT may. No padding, fake finite `Z^d`, vacuous patch SAT, or silent boundary conversion.
+
+### D061 — Verification, solver results, and certificates are separate closed data
+
+- Status: ACTIVE for T31 and the solver boundary.
+- Basis: candidate checking is local while finding/proving absence can require backtracking and unbounded work (`BOOK:2642-2664`, `3980-4064`, `14080-14084`).
+- Consequence: pure violations and verification reports are separate from scoped `Satisfiable/Unsatisfiable/Unknown/ResourceLimit` query records. Reverify every witness; replay every closed case-split/domain-wipeout obstruction. Bounded failure is `Unknown`, solver state/gray cells are diagnostics, and no callback/trusted boolean enters semantics.
+
+### D062 — One-dimensional local constraints admit an exact de Bruijn analyzer
+
+- Status: ACTIVE for T31.
+- Basis: allowed length-`n` blocks form arcs among `k^(n-1)` overlap states, so any infinite path contains a periodic cycle (`BOOK:14040-14044`). The page-225 profile gives the exact 4-cycle.
+- Consequence: a cycle is a periodic global witness; acyclicity/topological order is an exact UNSAT certificate for the 1D profile. Periodic sufficiency does not say every model is periodic and does not generalize to arbitrary 2D constraints.
+
+### D063 — Count, oriented-template, and existential-template constraints stay separate
+
+- Status: ACTIVE boundary across T31/T32/T33.
+- Basis: neighbor counts occupy `BOOK:2568-2612`, exact oriented allowed templates begin `2614`, and a required occurrence begins `2632`.
+- Consequence: T31 owns orientation-insensitive histogram relations. T32 must preserve oriented templates and T33 a global existential condition. Do not collapse them into predicates/flags, over-attribute template/tiling undecidability to the 25 classified count profiles, or use CA/ground-state/network/tiling reductions as native coverage.
+
 ## Rejected Shortcuts
 
 These are globally rejected unless Principle 0 re-derivation replaces the goal itself:
@@ -490,6 +527,9 @@ These are globally rejected unless Principle 0 re-derivation replaces the goal i
 - sampling one multiway path, replaying priority/first-match rewrites, combining several matches in one child, rescanning newborns, preserving dead parents, or accumulating old layers without explicit identity clauses;
 - derivation-copy/weight state, incomplete/per-parent deduplication, chosen merged ancestry, global visited suppression, compressed graphs as live state, epsilon/empty collapse, or confluence/normal-form/algebraic quotient as exact word equality;
 - multiway successor/matcher/canonicalizer callbacks, fixed word/layer/branch caps, beam/pruning/truncation as exact evolution, or silently imposing base `Union` on multiplicity-sensitive tag variants;
+- repair/relaxation/fixed-point dynamics presented as a constraint system, predicate/solver/SAT callbacks in constraint data, gray/unassigned semantic values, hidden search state, or a constraint rollout family;
+- one constraint witness as the whole solution set/uniqueness proof, bounded failure as global UNSAT, trusted/unscoped certificates, open-patch success as an infinite model, or `Unknown` collapsed into false;
+- finite grids/padding/boundaries as native `Z^d`, wrapped-offset deduplication, structural tile equality as pointwise equality, automatic symmetry quotient, CA/ground-state/tiling/network compilation as native count constraints, or T32/T33 mechanics hidden behind flags;
 - compiling another construction to a CA merely to claim native coverage;
 - treating canonical `[t,x,y,z]` encoding or visualization coordinates as topology;
 - conflating a constraint with a solver, a PDE with a discretization/integrator, or a stochastic law with an RNG implementation;
@@ -509,13 +549,15 @@ These are globally rejected unless Principle 0 re-derivation replaces the goal i
 - `10-T27-GEOMETRIC` — COMPLETE: added finite multiplicity-preserving bags of prototype occurrences with full affine poses, exact/declared scalar profiles, parent-local child templates and `P∘C`, permutation-invariant all-occurrence sources, self-only full-pose reads, typed geometric results, and a sixth atomic bag-replacement law. Exact page-189/page-190 centers/counts, overlap, same-center/same-footprint/different-frame, composition-order, equivariance, duplicate-slot, permutation, and provenance oracles close the handoff. Center lists, rasters, unions, limits, dimensions, and Mandelbrot filters remain downstream; nonlinear branches use a distinct closed extended-complex point profile. T13 lineage composes but ordered concatenation does not; T01/T09/T12/T13/T16/T17/T19/T20 remain valid and no stage reopened.
 - `11-T29-NETWORK` — COMPLETE: added finite rooted two-port graphs, alpha-renamable vertex identity, old-snapshot port-path/exact-reach reads, closed direct/fresh result data, collision-free event births, and `ParallelRerouteCreateProject` as a seventh update law. Uniform periods/collapse, singleton growth, depth-one `1296`, five depth-two tables/count anchors, canonical BFS equality, signature witnesses, and frozen/projection/freshness/alias/provenance adversaries close the parallel handoff. Layout/dimension/fixed-network/constraint/causal/multiway/grammar variants remain distinct. Sequential pruning is evidenced but its anchor/order and move timing are source-underdetermined, so its executor is explicitly deferred. No prior stage reopened.
 - `12-T30-MULTIWAY` — COMPLETE: added finite exact word-set layers, unordered literal relations, every-overlapping-match selection, one-splice branch results, and `DistinctBranchMerge` as an eighth update law. Equal children merge across positions/rules/parents while full witnesses and dead parents remain trace data. Page-219/page-220, page-206 extinction, official cross-parent merge, page-224 folded-network, sorted-vector, overlap/diamond/recurrence/epsilon/reconstruction oracles close the handoff. Layer recurrence remains separate from compressed graphs and global visited state. Literal semi-Thue/grammar restrictions compose; tag/cyclic/pattern/block/numeric/control variants remain separate. T13/T16/T29 stay valid; no prior stage reopened.
+- `13-T31-CONSTRAINTS` — COMPLETE: established the first categorical split from transition execution. Added total-lattice local count relations, closed center-conditioned histograms, axis-aligned periodic/open/window scopes, exact local verification, pointwise periodic equivalence, replayable finite obstructions, and separate scoped solver outcomes. The `0011` de Bruijn cycle, permissive run profile, exact `5x5` tile/five-violation perturbation, full 25-profile gallery, 1D/page-227 obstructions, scope/Unknown/alias/equality tests close the handoff. T32 oriented templates and T33 existential occurrences stay distinct; CA/tiling/ground-state/network reductions and solver heuristics remain external. No prior transition stage reopened.
 
 ## Open Architecture Questions
 
 1. Which remaining catalog rows are constructions versus restrictions, presets, seed classes, observables, or solver-defined systems? T01 is a construction; T06/T07/T08 are already cross-referenced as restriction/seed hypotheses requiring their own evidence.
-2. The source/read/result/update protocol remains substantive through T30: one macro successor can be a complete exact branch set when `DistinctBranchMerge` is an explicit commit. T31 constraints are the next direct test because they denote models/solutions rather than transition sources/results.
+2. The source/read/result/update protocol remains substantive through T30 but explicitly does not cover T31. Constraint specifications, model representations, verifiers, query outcomes, certificates, and solvers form a separate category; derivatives and distributions must still be independently tested.
 3. T30 establishes that base branch occurrences are provenance, while exact child words form semantic set state and recur independently of a compressed graph. Which later stochastic/quantum/multiway-tag systems instead make weights or derivation multiplicity semantic must be separately evidenced.
-4. Can T14/T15 reuse the epsilon-capable private ordered-span kernel without erasing contextual eligibility or their own deletion laws? T17 proves reuse is safe only behind a distinct public queue validator/update.
-5. What trace encoding preserves types whose semantic address is not a rank-0..3 lattice coordinate? T20 establishes ragged typed paths/events and T27 exact occurrence bags/parent-slot lineage before lowering, but neither settles a universal schema.
-6. Which current selector, alphabet, rule-summary, seed, RNG, and raw-result components survive later evidence without semantic reinterpretation?
-7. Which current tests are canonical-construction evidence and which merely preserve incidental Phase 1 behavior? T01 shows that geometry and self-parity tests alone do not prove rule semantics.
+4. T31 proves that a single witness, an orbit representative, and a mathematical solution set are distinct. How should later T32/T33 template syntax and T45 PDE solution/operator categories reuse verifier/query infrastructure without collapsing their carriers?
+5. Can T14/T15 reuse the epsilon-capable private ordered-span kernel without erasing contextual eligibility or their own deletion laws? T17 proves reuse is safe only behind a distinct public queue validator/update.
+6. What trace/record encoding preserves types whose semantic address is not a rank-0..3 lattice coordinate while keeping non-trajectory constraint records separate?
+7. Which current selector, alphabet, rule-summary, seed, RNG, and raw-result components survive later evidence without semantic reinterpretation?
+8. Which current tests are canonical-construction evidence and which merely preserve incidental Phase 1 behavior? T01 shows that geometry and self-parity tests alone do not prove rule semantics.

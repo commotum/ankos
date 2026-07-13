@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30 complete, 11 of 45 type stages complete, T31 Local Constraint Systems in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31 complete, 12 of 45 type stages complete, T34 Arithmetic Iteration Systems in progress, and Synthesis and Goal 2 Handoff pending.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -93,6 +93,12 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - A nonempty all-dead layer advances eventfully to the empty layer; only the empty layer has event-free reference stutter. Identity and recurrent words remain eventful and cannot be suppressed by a global visited/compressed graph.
 - Layered state, derivation witnesses, simple edges, one-node-per-word compressed spacetime graphs, accumulated languages, counts, confluence/normal forms, proof search, and rendering are distinct.
 - T13 words and T16 literal occurrence/splice kernels compose privately without weakening their public rules/outcomes. Literal semi-Thue/grammar restrictions can reuse T30; tag multiplicity, cyclic/block/pattern/numeric/control variants remain separately typed.
+- T31 is the first categorical break from transition execution: an immutable local-count relation denotes a mathematical model set and has no source, rule result, update, successor, seed, time, or halt.
+- T31 uses a declared lattice footprint and total center-symbol-to-allowed-neighbor-histogram relation. Exact/at-least conditions compile to finite closed sets; no predicate, solver, boundary, or custom graph belongs in the spec.
+- Exact periodic presentations, finite-window queries, and open-patch diagnostics have distinct scopes. Periodic SAT promotes globally; a replayed full-halo finite obstruction may prove global UNSAT; bounded failure remains `Unknown`.
+- Constraint verification reports and scoped `Satisfiable/Unsatisfiable/Unknown/ResourceLimit` solver records are distinct from `Advanced/Terminal/Quiescent` outcomes and from solver search traces.
+- T31's exact `0011` de Bruijn cycle, permissive run models, `5x5` tile/five-violation perturbation, complete 25-profile gallery, finite obstructions, wrapped-alias, equality, scope, and certificate oracles close the handoff.
+- T32 retains oriented allowed templates and T33 a global existential required occurrence. Broader tiling undecidability, CA fixed points, ground states, network constraints, and repair/search algorithms are relations, not T31 mechanics.
 
 ## Assumptions To Challenge
 
@@ -427,7 +433,7 @@ T30 reconstructs finite exact word-set layers, unordered epsilon-capable literal
 
 ### 13-T31-CONSTRAINTS
 
-Status: **IN PROGRESS** in `goal-1/13-T31-CONSTRAINTS.md`.
+Status: **COMPLETE** in `goal-1/13-T31-CONSTRAINTS.md`.
 
 #### Big Picture Objective
 
@@ -441,7 +447,15 @@ Apply the common protocol, separating the constraint-defined solution set from s
 
 All T31 evidence is captured; the constraint/solver boundary is explicit; any executor split is justified rather than hidden; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+The direct-name union dispositioned 29 occurrences on 27 lines, conservative family search 162/134, expanded audit 815/415, and bare constraint search 467/312. Twenty-eight canonical groups cover every strict figure, Notes/Index/split, de Bruijn/periodic proof, search/repair/complexity passage, CA/tiling/ground-state/network/equation relation, and T32/T33 boundary. All 27 direct lines are classified; strict mechanics have zero unresolved candidates.
+
+T31 reconstructs a total-field model set defined by a closed center-conditioned neighbor-histogram relation. It adds exact periodic/open/window scopes, pure verification, pointwise periodic equivalence, replayable finite obstructions, and separate scoped solver results—no ninth transition update. The `0011` cycle, permissive rows, `5x5` tile, full 25-profile classification, perturbation/obstruction/scope/alias/equality/certificate tests close the handoff. Generic alphabet/dimension/footprint support is labeled principled closure, and broader template complexity is not misattributed. No prior stage was reopened. Next: T34.
+
 ### 14-T34-ARITHMETIC
+
+Status: **IN PROGRESS** in `goal-1/14-T34-ARITHMETIC.md`.
 
 #### Big Picture Objective
 

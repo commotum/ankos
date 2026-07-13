@@ -56,10 +56,10 @@ Each type stage must make the following auditable:
 | T28 | 29 | Neighbor-Dependent Two-Dimensional Substitution Systems | 28 | `39-T28-CONTEXTUAL-2D-SUBSTITUTION.md` | PENDING | Not started |
 | T29 | 30 | Network Systems | 29 | `11-T29-NETWORK.md` | COMPLETE | 44 direct occurrences/40 lines; conservative family audit 290/217; expanded graph/network audit 1,278/654; executable-symbol audit 27/19; 27 excerpt groups; all topology/port/path/reroute/create/projection mechanics, figures, Notes/programs, actual Index/splits, exact rules/counts/periods, identity, observers, variants, and relations dispositioned; 0 unresolved parallel mechanics; 1 explicit sequential primary-source limitation |
 | T30 | 31 | Multiway Systems | 30 | `12-T30-MULTIWAY.md` | COMPLETE | Exact phrase 267 occurrences/182 lines; broader token 277/186; expanded alias/confluence 388/224; core implementation symbols 18/16; 25 excerpt groups; all literal branching/overlap/one-splice/exact-merge/dead/epsilon/recurrence mechanics, figures, Notes/programs, actual Index/splits, histories, graphs, confluence, variants, and relations dispositioned; 0 unresolved base mechanics |
-| T31 | 32 | Local Constraint Systems | 31 | `13-T31-CONSTRAINTS.md` | IN PROGRESS | Neighbor-count relations, solution-set semantics, periodic models, verification/certificates, search/solver boundary, figures, Notes/Index, variants, and relations under audit |
+| T31 | 32 | Local Constraint Systems | 31 | `13-T31-CONSTRAINTS.md` | COMPLETE | Direct-name union 29 occurrences/27 lines; conservative family 162/134; expanded audit 815/415; 28 excerpt groups; all count-relation/model-set mechanics, page-225/226/227 figures, Notes/Index/splits, periodic/de Bruijn witnesses, verifier/certificate/solver boundary, complexity qualifications, T32/T33 boundaries, variants, observers, and relations dispositioned; 0 unresolved strict mechanics |
 | T32 | 33 | Template Constraint Systems | 32 | `40-T32-TEMPLATE-CONSTRAINTS.md` | PENDING | Not started |
 | T33 | 34 | Seeded Template Constraint Systems | 33 | `41-T33-SEEDED-CONSTRAINTS.md` | PENDING | Not started |
-| T34 | 35 | Arithmetic Iteration Systems | 34 | `14-T34-ARITHMETIC.md` | PENDING | Not started |
+| T34 | 35 | Arithmetic Iteration Systems | 34 | `14-T34-ARITHMETIC.md` | IN PROGRESS | Integer state/map semantics, arithmetic formulas, branch conditions, termination/cycles, seeds, figures, Notes/Index, variants, and relations under audit |
 | T35 | 36 | Piecewise Integer Maps | 35 | `42-T35-PIECEWISE-INTEGER.md` | PENDING | Not started |
 | T36 | 37 | Digit-Reversal Arithmetic Systems | 36 | `43-T36-DIGIT-REVERSAL.md` | PENDING | Not started |
 | T37 | 38 | Recursive Sequences | 37 | `15-T37-RECURSIVE.md` | PENDING | Not started |
@@ -75,9 +75,9 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 11 / 45.
+- Type stages complete: 12 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 33 pending, 1 in progress.
+- Type stages unresolved: 32 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 

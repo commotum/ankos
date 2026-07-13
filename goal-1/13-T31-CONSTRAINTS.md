@@ -1,6 +1,6 @@
 # 13-T31-CONSTRAINTS
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -616,12 +616,27 @@ Completion requires:
 
 ## Completion Requirements
 
-- [ ] All names, aliases, figures, Notes, actual Index entries, splits, history, variants, observers, and relations resolved with zero silent remainder.
-- [ ] Native local-count relation, total model set, exact equality, scopes, verifier, witnesses/certificates, solver outcomes, and complexity boundary reconstructed.
-- [ ] Exact 1D/2D periodic models and adversarial verification/unsat/unknown/scope invariants specified.
-- [ ] Current API/runtime/principles fit and transition-executor split explicit.
-- [ ] Goal 2 implementation/conformance handoff and global reintegration complete.
+- [x] All names, aliases, figures, Notes, actual Index entries, splits, history, variants, observers, and relations resolved with zero silent remainder.
+- [x] Native local-count relation, total model set, exact equality, scopes, verifier, witnesses/certificates, solver outcomes, and complexity boundary reconstructed.
+- [x] Exact 1D/2D periodic models and adversarial verification/unsat/unknown/scope invariants specified.
+- [x] Current API/runtime/principles fit and transition-executor split explicit.
+- [x] Goal 2 implementation/conformance handoff and global reintegration complete.
 
 ## Stage Results
 
-In progress. Core evidence already establishes that T31 is a declarative neighbor-count model set, not dynamics, and that verification, periodic representation, external search, incomplete outcomes, and solver certificates must remain distinct. The page-227 table, full search/variant disposition, and Goal 2 handoff remain open.
+T31 is complete. The direct-name union dispositioned 29 occurrences on 27 lines, the conservative family query 162/134, the expanded audit 815/415, and bare `constraint(s)` 467/312. Twenty-eight canonical groups cover strict count mechanics, every page-225/page-226/page-227 figure, Notes, actual Index/splits, external search/repair, allowed blocks/de Bruijn analysis, CA/ground-state/tiling/network/equation relations, complexity/history, T32/T33 boundaries, and no-initial-condition evidence. All 27 direct-hit lines are individually classified; zero strict mechanics remain unresolved.
+
+The construction denotes a mathematical set of total fields satisfying an immutable center-conditioned neighbor-histogram relation at every lattice site. It has no time, seed, source, result, update, successor, or halt. Exact periodic presentations and open/window scopes support pure verification; periodic SAT proves a global model, replayed finite obstruction can prove global UNSAT, and bounded failure remains `Unknown`. Solver outcomes/certificates and diagnostics are separate from both the constraint and transition outcomes. This is the first categorical split from the eight-member update family.
+
+The `0011` de Bruijn cycle/period bound, all three permissive page-226 rows, exact `5x5` tile/formula, five-violation one-bit perturbation, complete 25-profile classification, 1D/page-227 finite obstructions, periodic alias/equality, scope, vacuity, witness/certificate replay, and search-independence tests close the handoff. Generic finite alphabets/dimensions/footprints are labeled principled closure beyond the literal binary examples. Broader template/tiling undecidability is not misattributed to the classified count profiles.
+
+## Integration Results
+
+- Added a separate constraint/specification category outside `SOURCE -> READ -> RESULT -> UPDATE` and transition outcomes.
+- Added closed lattice footprints, symbol-keyed neighbor histograms, center-conditioned allowed sets, and total-field model-set denotation.
+- Added axis-aligned periodic presentations, exact LCM-box equality, finite-window/open scopes, and multiplicity-preserving wrapped footprint evaluation.
+- Added pure verification reports, scoped solver query outcomes, closed replayable case-split/domain-wipeout obstructions, and an exact 1D de Bruijn analyzer.
+- Separated pointwise models from symmetry orbits, model sets from witnesses, and constraint data from search/repair/SAT/CA/ground-state algorithms.
+- Preserved T32 oriented-template and T33 existential-template boundaries; no predicate/flag/custom-graph fallback was introduced.
+- Preserved all prior transition-stage conclusions; no stage is reopened.
+- Next stage: T34, Arithmetic Iteration Systems.
