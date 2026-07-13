@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T02/T03/T04/T05/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 23 of 45 type stages complete, T06 Quiescent-Background-Preserving Cellular Automata next, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T02/T03/T04/T05/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 23 of 45 type stages complete, T06 Quiescent-Background-Preserving Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
@@ -742,6 +742,8 @@ All T05 evidence is captured; parameter bounds and reuse are explicit; Goal 2 an
 COMPLETE: 11 controlled query families close 142 lexical lines, five governed follows and 25 assets expand the exact partition to 172 candidates, and 12 evidence groups close `47/47/40` provenance/fragment/quote-line counts. The asset audit closes `5 included / 13 relation-only / 7 excluded`; exact page-122/page-256 label corpora, code `1004600`, cardinality, bigint, snapshot, and boundary oracles pass. The result is the strict finite `k>=4,r=1` canonical preset over generic T03. T03's discovered source omission was repaired and reclosed; T04 remains complete. D118 is sharpened without D119, an executor, or an update law. Independent review, five embedded blocks, fences, diff checks, and all 102 tests pass. Next: T06.
 
 ### 25-T06-QUIESCENT
+
+Status: **IN PROGRESS** in `goal-1/25-T06-QUIESCENT.md`.
 
 #### Big Picture Objective
 
