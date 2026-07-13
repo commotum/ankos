@@ -1,0 +1,814 @@
+# Goal 1: Book-Grounded Universal Construction Design
+
+Shorthand: `UNIVERSAL-CONSTRUCTIONS`
+
+## Big-Picture Objective
+
+Derive the simplest coherent constructive API capable of representing every catalog entry in `ref/notes/CA-Types.csv` without family-specific rollouts, semantic disguises, fallback paths, or speculative universal abstractions.
+
+For each of the 45 catalog entries, exhaustively collect the relevant textual evidence from the local *A New Kind of Science* Markdown, extract the construction and its variants and parameters, compare it with `simple_programs.md` and the current `src/ca` runtime, determine the smallest honest semantic reuse or extension permitted by `principles.md`, and produce an implementation-ready Goal 2 stage handoff. After every type, fold the finding back into this plan and re-evaluate the cohesion of the whole design.
+
+Goal 1 is research, architecture, and implementation planning. It does not implement the expanded runtime.
+
+## Authoritative Inputs
+
+- `principles.md`: governing design constraints. Its Principle 0 outranks literal adherence to this plan.
+- `simple_programs.md`: current proposed generator semantics to test, not presumed truth.
+- `src/ca/`: current executable runtime to inspect in full.
+- `tests/`: current behavioral evidence and runtime contracts.
+- `ref/notes/CA-Types.csv`: authoritative 45-row coverage index.
+- `ref/notes/CA-Types.md`: taxonomy and search-vocabulary seed, not a substitute for book evidence.
+- `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`: canonical local book text for excerpt collection.
+- Split chapter files, atlas, notes, and index under `ref/A-New-Kind-of-Science/`: navigation and cross-reference aids. Do not duplicate an excerpt merely because it appears in both the monolith and a split file.
+
+## Non-Negotiable Constraints
+
+1. Evidence precedes abstraction. Do not decide how a type fits before collecting and reading its book evidence.
+2. Treat catalog types and proposed structural families as hypotheses.
+3. Preserve defining semantics. Do not compile a construction into a CA, pack the whole machine into an opaque value, or route it through unrestricted `FORMULAIC` merely to claim coverage.
+4. Do not force constraints, derivatives, distributions, observations, and mutations into one result type unless the evidence demonstrates a meaningful shared algebra.
+5. Do not add a flag, special case, compatibility shim, fallback conversion, second rollout path, hidden executor state, fake fixed capacity, or weakened test to make a type fit.
+6. One reference executor is a desired result only where semantics are genuinely shared. A vacuous executor that delegates the entire system to an arbitrary callback is failure.
+7. Keep program semantics, trace representation, ANKoS encoding, batching, and visualization distinct.
+8. Goal 1 does not modify `src/ca`, tests, or the root API documents. It records evidence, architecture decisions, rejected alternatives, and Goal 2 plans in `goal-1/`.
+9. If a type breaks the current design, reopen affected earlier stages and revise the global plan. Do not protect previous conclusions.
+10. Every catalog row must remain traceable even when several rows resolve to one shared construction.
+
+## Current Facts
+
+- `ref/notes/CA-Types.csv` has one header and 45 catalog rows.
+- `principles.md` contains 17 numbered principles, including Principle 0.
+- `simple_programs.md` currently specifies a `t+0D` through `t+3D` trajectory model with selectors, neighborhoods, writable frontiers, and per-target rules.
+- `src/ca` currently contains alphabets, datasets, frontiers, loci, neighborhoods, RNG, rollout, rules, seeds, and specifications, plus visualization modules.
+- The canonical monolithic book file contains 22,497 lines and includes chapter text, captions, notes, and index material that may contain relevant evidence.
+- There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
+
+## Assumptions To Challenge
+
+- The CSV is complete and each row names a construction worth independent coverage.
+- `CA-Types.md` has identified all aliases, core variants, and parameters needed to search the book.
+- A shared `FRONTIER -> NEIGHBORHOOD -> RULE -> UPDATE` algebra remains meaningful outside current CA families.
+- A type's state can be made Markovian without hiding semantically important history or control.
+- Canonical ANKoS addresses can encode every eventual trace without losing task-relevant structure.
+- The current runtime boundaries correspond to genuine semantic responsibilities.
+- A single Goal 2 stage per type remains the cleanest implementation plan after shared primitives and dependencies are known.
+
+## Required Goal 1 Artifacts
+
+Execution of this plan will create:
+
+- One stage file for foundation work.
+- One evidence-and-design stage file for each of the 45 catalog types.
+- `goal-1/evidence-index.md`: coverage ledger linking every CSV row to searches, excerpts, stage status, and unresolved candidates.
+- `goal-1/design-ledger.md`: evolving inventory of proposed state models, selectors, read models, result types, update algebras, invariants, and rejected abstractions.
+- `goal-1/goal-2-handoff.md`: dependency-aware implementation plan with a traceable conformance stage for every type.
+- One synthesis stage and one Goal 2 handoff stage.
+
+Do not create empty type stage files in advance. Create each from `0-loop.md` when its work begins so it reflects current facts.
+
+## Evidence Completeness Standard
+
+A type's evidence pass is complete only when all of the following are recorded:
+
+1. The CSV name, taxonomy index, aliases, singular/plural forms, historical names, named variants, rule examples, and parameter vocabulary used for searching.
+2. Searches across the canonical monolithic book for direct names, aliases, variant names, parameter terms, relevant section headings, captions, Notes references, and Index references.
+3. Context inspection around every candidate match. Search hits alone are not excerpts.
+4. Follow-up of relevant cross-references such as "see page" or references to earlier/later constructions.
+5. Every unique relevant passage copied into the stage file with exact source path, line provenance, surrounding section, and a short statement of what construction fact it establishes.
+6. Relevant captions included even when nearby prose appears duplicative, because captions often state rule mechanics or initial conditions more precisely.
+7. False positives and excluded candidates logged with reasons, so completeness can be audited.
+8. Duplicate text appearing in monolithic and split files recorded once, with the monolithic path as canonical provenance.
+9. No unresolved candidate matches or unsearched aliases remain. Genuine ambiguity is recorded as an open evidence question rather than silently resolved.
+
+"Every excerpt" means every unique passage found in the repository's local Markdown that materially describes the type's construction, core variants, parameters, initial conditions, update semantics, state organization, or relation to another catalog type. It does not mean every passing mention with no constructive content.
+
+## Common Type-Stage Protocol
+
+Each type stage must perform this loop:
+
+1. **Identify:** establish the exact catalog entry, aliases, whether it is an engine, specialization, filter, seed class, observable, solver-defined system, or another kind of entry.
+2. **Collect:** execute and log the exhaustive evidence search, then record all unique relevant excerpts.
+3. **Reconstruct:** derive the construction from the excerpts: state, support/topology, values, control, active loci, reads, rule inputs and outputs, update/commit semantics, successor structure, halting, boundaries, seed, parameters, and observables.
+4. **Compare:** map each construction element to `simple_programs.md` and concrete `src/ca` modules and tests. Label each element `direct`, `parameterization`, `principled extension`, `semantic mismatch`, or `not applicable`.
+5. **Minimize:** propose the smallest semantic classes or protocol changes not already present. Search prior stage results before inventing anything.
+6. **Challenge:** test the proposal against `principles.md`, identify abstraction pressure, and document rejected shortcuts and why they are forbidden.
+7. **Plan Goal 2:** write a self-contained implementation stage with files, API changes, migrations, tests, canonical examples, validation, dependencies, and completion requirements. Shared primitives are referenced, not re-planned as duplicate implementations.
+8. **Re-integrate:** update `0-plan.md`, `evidence-index.md`, and `design-ledger.md`. Re-evaluate every global abstraction touched by the new evidence and reopen earlier stages when necessary.
+
+## Success Metrics
+
+- All 45 CSV rows have complete, auditable evidence stages.
+- Every relevant unique local-book excerpt is captured with provenance.
+- Every type has a construction model grounded in those excerpts rather than inferred from its name.
+- Every type has an explicit current API/runtime fit analysis.
+- Proposed semantic additions are deduplicated across types and justified by at least one real construction.
+- No proposal relies on prohibited fallbacks, opaque packing, family-specific rollout, or vacuous callback interfaces.
+- The final design ledger names the genuinely shared execution algebra or algebras and explains any irreducible split.
+- `goal-2-handoff.md` contains a dependency-aware implementation and verification path covering all 45 entries.
+- Each type remains separately traceable in Goal 2 even when implementation is organized around shared primitives.
+- The final `0-plan.md` is internally cohesive and contains no stale decision contradicted by later evidence.
+
+## Verification Requirements
+
+- Confirm CSV row count, uniqueness, and one-to-one stage coverage mechanically.
+- Confirm every type stage contains its search log, excerpts, construction model, comparison, principles audit, Goal 2 handoff, and integration result.
+- Confirm all excerpt paths and line references resolve against current repository files.
+- Confirm every proposed new primitive is used by a documented construction and is not equivalent to an existing primitive.
+- Confirm all 45 types appear in `evidence-index.md` and `goal-2-handoff.md` exactly once as coverage obligations.
+- Review the final design for hidden family branches, `Any` escape hatches, padding-as-semantics, global formula bypasses, and duplicated execution logic.
+- Run `git diff --check` and verify Goal 1 has not modified runtime, tests, or root API documents.
+
+## Stages
+
+Stages are ordered to expose difficult semantic differences early. `TNN` records the stable CSV taxonomy index even though execution order is adversarial rather than numeric.
+
+### 1-FOUNDATION
+
+#### Big Picture Objective
+
+Establish an auditable baseline of the taxonomy, evidence source, current API, current runtime, and evolving design vocabulary before judging any type.
+
+#### Detailed Implementation Plan
+
+- Read `principles.md`, `simple_programs.md`, every top-level `src/ca` module, and the corresponding tests in full.
+- Validate the 45 CSV rows against `CA-Types.md` headings and establish stable `T01` through `T45` identifiers.
+- Create `evidence-index.md` and `design-ledger.md` with no premature family conclusions.
+- Define reproducible search logging, excerpt provenance, deduplication, fit labels, and Goal 2 handoff format.
+
+#### Completion Requirements
+
+- All 45 types are indexed exactly once with pending status and stable stage mapping.
+- Current runtime and API responsibilities are documented with file references.
+- Search and evidence standards are executable and leave no undefined meaning of "complete."
+- Initial assumptions and suspected abstractions are explicitly marked as hypotheses.
+
+### 2-T01-ELEMENTARY
+
+#### Big Picture Objective
+
+Establish elementary cellular automata as the fixed-lattice, synchronous, ordered-local-rule baseline.
+
+#### Detailed Implementation Plan
+
+Apply the common type-stage protocol, emphasizing binary alphabets, radius-one ordered neighborhoods, rule numbering, full parallel update, boundaries, and single-cell seeds.
+
+#### Completion Requirements
+
+All T01 evidence and search candidates are resolved; current runtime behavior is mapped precisely; its Goal 2 conformance stage is complete; global ledgers are updated.
+
+### 3-T09-MOBILE
+
+#### Big Picture Objective
+
+Stress the baseline with one active locus whose rule both changes state and moves control.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing active-cell state, local reads, write scope, movement, compressed observations, and whether frontier loci are sources or targets.
+
+#### Completion Requirements
+
+All T09 evidence is captured; control and movement semantics are explicit; no CA compilation is used as the proposed fit; Goal 2 and global integration are updated.
+
+### 4-T12-TURING
+
+#### Big Picture Objective
+
+Test tape values, head control state, symbol writes, state transitions, movement, blank support, and halting in one construction.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, distinguishing the tape alphabet from head state and testing whether complete Markov state remains visible to the shared executor.
+
+#### Completion Requirements
+
+All T12 variants and parameters are evidenced; write/move/control effects are modeled without hidden executor state; Goal 2 and global integration are updated.
+
+### 5-T13-PARALLEL-SUBSTITUTION
+
+#### Big Picture Objective
+
+Test variable support and source elements that emit ordered replacement blocks in parallel.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing neighbor independence, source identity, replacement concatenation, growth, ancestry, and the distinction between semantic support and rendering scale.
+
+#### Completion Requirements
+
+All T13 evidence is captured; no fixed-capacity padding or target-local inversion is accepted as core semantics; Goal 2 and global integration are updated.
+
+### 6-T16-SEQUENTIAL-SUBSTITUTION
+
+#### Big Picture Objective
+
+Test ordered matching, first-applicable replacement, one-event steps, and scan semantics.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, identifying which choices belong to frontier selection, rule ordering, and update semantics without introducing a family switch.
+
+#### Completion Requirements
+
+All T16 scan and match variants are evidenced; ordering is modeled as defining semantics; Goal 2 and global integration are updated.
+
+### 7-T17-TAG
+
+#### Big Picture Objective
+
+Test queue-like state changes that consume a prefix, inspect it, append a block remotely, and halt on insufficient input.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing deletion number, append lookup, positional reindexing, halting, and whether effects can remain structurally typed.
+
+#### Completion Requirements
+
+All T17 variants are evidenced; consume/append/halting semantics are direct rather than simulated; Goal 2 and global integration are updated.
+
+### 8-T19-REGISTER
+
+#### Big Picture Objective
+
+Test finite control over unbounded numeric values with instruction-pointer-dependent branching.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing register identity, instruction definitions, increment, decrement-jump, zero behavior, and complete control state.
+
+#### Completion Requirements
+
+All T19 evidence is captured; instruction execution is not hidden in an opaque formula callback; Goal 2 and global integration are updated.
+
+### 9-T20-SYMBOLIC
+
+#### Big Picture Objective
+
+Test hierarchical expression state, pattern bindings, subtree replacement, scan order, overlap, duplication, and deletion.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, comparing tree topology and graph encodings without treating display positions as semantics.
+
+#### Completion Requirements
+
+All T20 evidence is captured; pattern and rewrite semantics are explicit; no string-only workaround is accepted without proof of fidelity; Goal 2 and global integration are updated.
+
+### 10-T27-GEOMETRIC
+
+#### Big Picture Objective
+
+Test replacement of geometric objects by transformed descendants outside a rigid lattice.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing primitive geometry, scale, translation, rotation, reflection, overlap, orientation, and the boundary between program state and rendering.
+
+#### Completion Requirements
+
+All T27 evidence is captured; geometric semantics are not reduced to visualization metadata; Goal 2 and global integration are updated.
+
+### 11-T29-NETWORK
+
+#### Big Picture Objective
+
+Test dynamic topology whose connectivity, not drawing coordinates, defines state and neighborhoods.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing node identity, labeled connections, path-relative reads, rerouting, insertion, deletion, components, and isomorphism.
+
+#### Completion Requirements
+
+All T29 evidence is captured; topology is first-class; graph updates do not rely on incidental coordinates; Goal 2 and global integration are updated.
+
+### 12-T30-MULTIWAY
+
+#### Big Picture Objective
+
+Test all possible rewrites, multiple states per step, deduplication, repeated states, and causal/state graph construction.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, deciding from evidence whether the next state is a collection, a graph increment, multiple outcomes, or another explicit structure.
+
+#### Completion Requirements
+
+All T30 evidence is captured; branch identity and deduplication are explicit; no accidental single-path collapse occurs; Goal 2 and global integration are updated.
+
+### 13-T31-CONSTRAINTS
+
+#### Big Picture Objective
+
+Determine whether declarative local constraints share an executor with transition systems or require a distinct, honest semantic algebra.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, separating the constraint-defined solution set from search, propagation, enumeration, and visualization algorithms.
+
+#### Completion Requirements
+
+All T31 evidence is captured; the constraint/solver boundary is explicit; any executor split is justified rather than hidden; Goal 2 and global integration are updated.
+
+### 14-T34-ARITHMETIC
+
+#### Big Picture Objective
+
+Test scalar arithmetic iteration without assuming spatial locality or finite alphabets.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing number type, exactness, operation, initial value, representation base, and the difference between state and observable digits.
+
+#### Completion Requirements
+
+All T34 evidence is captured; arithmetic state is not confused with its rendering; Goal 2 and global integration are updated.
+
+### 15-T37-RECURSIVE
+
+#### Big Picture Objective
+
+Test growing historical state and fixed dependency references used to append new sequence terms.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing seeds, index origin, dependency support, append semantics, and whether history is state or trace.
+
+#### Completion Requirements
+
+All T37 evidence is captured; recurrence dependencies and invalid indices are explicit; Goal 2 and global integration are updated.
+
+### 16-T39-FILTERS
+
+#### Big Picture Objective
+
+Test constructive filtering, sieving, and derived numeric sequences that may not be ordinary state transitions.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, distinguishing candidate domain, stage policy, predicates, survivors, removed values, and derived measurements.
+
+#### Completion Requirements
+
+All T39 evidence is captured; filtering is not mislabeled as same-site update; Goal 2 and global integration are updated.
+
+### 17-T41-FUNCTIONS
+
+#### Big Picture Objective
+
+Test symbolic continuous functions and sampled or event-derived observables without inventing false dynamics.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing expression state, continuous domain, sampling, exact event detection, parameters, and derived outputs.
+
+#### Completion Requirements
+
+All T41 evidence is captured; function definition and observation method remain distinct; Goal 2 and global integration are updated.
+
+### 18-T43-ITERATED-MAPS
+
+#### Big Picture Objective
+
+Test continuous scalar state, repeated maps, piecewise behavior, precision, and optional digit representations.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, determining what can reuse scalar iteration while preserving interval and precision semantics.
+
+#### Completion Requirements
+
+All T43 evidence is captured; map and representation policies are explicit; Goal 2 and global integration are updated.
+
+### 19-T44-CONTINUOUS-CA
+
+#### Big Picture Objective
+
+Test the existing lattice algebra with continuous value spaces, local aggregation, numeric maps, and precision policy.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing gray-level range, averaging, map composition, exactness, and the boundary between mathematical values and finite numerical execution.
+
+#### Completion Requirements
+
+All T44 evidence is captured; reusable CA components and genuinely new numeric semantics are separated; Goal 2 and global integration are updated.
+
+### 20-T45-PDE
+
+#### Big Picture Objective
+
+Test continuous space and time, derivative-defined evolution, initial/boundary conditions, and numerical approximation as an explicitly separate concern.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, distinguishing the equation from discretization, integrator, stability, resolution, and finite trace encoding.
+
+#### Completion Requirements
+
+All T45 evidence is captured; no discretized CA is presented as the PDE itself; any separate execution algebra is justified; Goal 2 and global integration are updated.
+
+### 21-T02-MULTICOLOR-CA
+
+#### Big Picture Objective
+
+Determine whether multi-color nearest-neighbor CA is purely alphabet/rule parameterization of the baseline.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing color count, ordered neighborhood table size, coding, seeds, and validation limits.
+
+#### Completion Requirements
+
+All T02 evidence is captured; reuse versus extension is proven; Goal 2 and global integration are updated.
+
+### 22-T03-TOTALISTIC-CA
+
+#### Big Picture Objective
+
+Model totalistic rule reduction as an explicit aggregation construction rather than a separate rollout.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing sums/averages, rule coding, state count, neighborhood arity, and symmetry consequences.
+
+#### Completion Requirements
+
+All T03 evidence is captured; aggregation and evaluation responsibilities are explicit; Goal 2 and global integration are updated.
+
+### 23-T04-THREECOLOR-TOTALISTIC
+
+#### Big Picture Objective
+
+Validate the emphasized three-color totalistic catalog entry as a preset, restriction, or distinct construction.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing seven sum cases, rule numbering, seeds, and background filtering.
+
+#### Completion Requirements
+
+All T04 evidence is captured; catalog identity remains traceable without duplicate runtime semantics; Goal 2 and global integration are updated.
+
+### 24-T05-HIGHERCOLOR-TOTALISTIC
+
+#### Big Picture Objective
+
+Validate higher-color totalistic systems and parameter scalability against the shared aggregation model.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing general `k`, sum domains, rule counts, and finite-table validation.
+
+#### Completion Requirements
+
+All T05 evidence is captured; parameter bounds and reuse are explicit; Goal 2 and global integration are updated.
+
+### 25-T06-QUIESCENT
+
+#### Big Picture Objective
+
+Determine whether quiescent-background preservation is a rule invariant, family filter, boundary condition, or seed property.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, grounding blank-state preservation and finite-seed behavior in book evidence.
+
+#### Completion Requirements
+
+All T06 evidence is captured; the invariant is placed once in the correct layer; Goal 2 and global integration are updated.
+
+### 26-T07-SYMMETRIC
+
+#### Big Picture Objective
+
+Determine how left-right symmetry constrains rule construction and relates to isotropic and totalistic reductions.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing reflection orbits, validation, rule counts, and interactions with quiescence.
+
+#### Completion Requirements
+
+All T07 evidence is captured; symmetry is not duplicated as family behavior; Goal 2 and global integration are updated.
+
+### 27-T08-INITIAL-CONDITIONS
+
+#### Big Picture Objective
+
+Separate initial-condition experiment classes from program types while preserving catalog traceability.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing single-cell, single-gray, random, finite, and other book seed conventions.
+
+#### Completion Requirements
+
+All T08 evidence is captured; seeds remain independent where semantics permit; Goal 2 and global integration are updated.
+
+### 28-T10-EXTENDED-MOBILE
+
+#### Big Picture Objective
+
+Test wider local write scopes while retaining a single active locus and movement.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing multi-target effects, source-relative targets, atomicity, and overlap assumptions.
+
+#### Completion Requirements
+
+All T10 evidence is captured; wider writes reuse principled effects rather than a special rollout; Goal 2 and global integration are updated.
+
+### 29-T11-GENERALIZED-MOBILE
+
+#### Big Picture Objective
+
+Test multiple active loci, activity creation/deletion, simultaneous effects, and collisions.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing active-set state, split/disappear rules, update grouping, and evidence for conflict semantics.
+
+#### Completion Requirements
+
+All T11 evidence is captured; unspecified conflicts remain explicit obligations rather than invented behavior; Goal 2 and global integration are updated.
+
+### 30-T14-CONTEXTUAL-SUBSTITUTION
+
+#### Big Picture Objective
+
+Add neighbor-dependent replacement choice to variable-length parallel substitution.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing context windows, right-edge behavior, replacement alignment, and interaction between reads and source emissions.
+
+#### Completion Requirements
+
+All T14 evidence is captured; boundary and context semantics are explicit; Goal 2 and global integration are updated.
+
+### 31-T15-CREATION-DESTRUCTION
+
+#### Big Picture Objective
+
+Test empty and multi-element replacements, extinction, and balanced growth as native support changes.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing deletion, creation, ancestry, growth observables, and zero-length state.
+
+#### Completion Requirements
+
+All T15 evidence is captured; dynamic support handles creation/destruction without sentinels; Goal 2 and global integration are updated.
+
+### 32-T18-CYCLIC-TAG
+
+#### Big Picture Objective
+
+Add cyclic program control and conditional append behavior to tag-system semantics.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing program counter, trigger symbol, deletion, append schedule, and complete visible control state.
+
+#### Completion Requirements
+
+All T18 evidence is captured; cyclic control is state rather than executor memory; Goal 2 and global integration are updated.
+
+### 33-T21-2D-CA
+
+#### Big Picture Objective
+
+Validate dimensional and lattice generalization of CA with two-dimensional neighborhoods and seeds.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing square-grid geometry, orthogonal neighbors, totalistic variants, boundaries, and spatial initial patterns.
+
+#### Completion Requirements
+
+All T21 evidence is captured; dimension is parameterized without PE-specific semantics; Goal 2 and global integration are updated.
+
+### 34-T22-MOORE-CA
+
+#### Big Picture Objective
+
+Validate Moore adjacency and center inclusion as neighborhood/rule parameters.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing eight neighbors, center handling, neighbor counts, and square-grid symmetry.
+
+#### Completion Requirements
+
+All T22 evidence is captured; no duplicate executor or rule family is introduced; Goal 2 and global integration are updated.
+
+### 35-T23-3D-CA
+
+#### Big Picture Objective
+
+Validate cubic-lattice state, six- and twenty-six-neighbor variants, and 3D seeds.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, separating construction semantics from visualization requirements.
+
+#### Completion Requirements
+
+All T23 evidence is captured; 3D neighborhoods reuse general geometry where justified; Goal 2 and global integration are updated.
+
+### 36-T24-HIGHERDIM-CA
+
+#### Big Picture Objective
+
+Test arbitrary dimension, lattice geometry, and symmetry beyond the current `t+3D` API envelope.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, evaluating native rank, flattening, graph adjacency, metadata, and what distinctions ANKoS must preserve.
+
+#### Completion Requirements
+
+All T24 evidence is captured; any coordinate limitation or schema change is stated honestly; Goal 2 and global integration are updated.
+
+### 37-T25-2D-TURING
+
+#### Big Picture Objective
+
+Validate Turing-machine reuse when tape support and movement become two-dimensional.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing movement set, position, revisitation, blank support, and dimensional parameterization.
+
+#### Completion Requirements
+
+All T25 evidence is captured; dimensional reuse is proven without a separate rollout; Goal 2 and global integration are updated.
+
+### 38-T26-2D-SUBSTITUTION
+
+#### Big Picture Objective
+
+Test parallel replacement of tiles by oriented geometric patches.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing tile geometry, replacement arrays, scale, orientation, and assembly of neighboring outputs.
+
+#### Completion Requirements
+
+All T26 evidence is captured; shared replacement semantics and geometry-specific requirements are separated; Goal 2 and global integration are updated.
+
+### 39-T28-CONTEXTUAL-2D-SUBSTITUTION
+
+#### Big Picture Objective
+
+Combine 2D patch replacement with neighbor-dependent rule choice and boundary semantics.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, stressing alignment, overlapping context, orientation, and compositional reuse of T14 and T26 findings.
+
+#### Completion Requirements
+
+All T28 evidence is captured; no duplicated contextual-replacement engine is proposed; Goal 2 and global integration are updated.
+
+### 40-T32-TEMPLATE-CONSTRAINTS
+
+#### Big Picture Objective
+
+Model exact allowed local templates and overlap consistency as a specialization of constraint semantics.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing template shape, orientation, allowed sets, overlapping neighborhoods, and solver independence.
+
+#### Completion Requirements
+
+All T32 evidence is captured; template constraints reuse the correct declarative layer; Goal 2 and global integration are updated.
+
+### 41-T33-SEEDED-CONSTRAINTS
+
+#### Big Picture Objective
+
+Add required template occurrence and anchoring without conflating global requirements with initial state.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing existence constraints, fixed/anywhere anchors, symmetry breaking, and solution domains.
+
+#### Completion Requirements
+
+All T33 evidence is captured; seed requirements are placed in the correct semantic layer; Goal 2 and global integration are updated.
+
+### 42-T35-PIECEWISE-INTEGER
+
+#### Big Picture Objective
+
+Test predicate-selected arithmetic branches and exact integer closure.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing ordered predicates, formulas, residues, invalid outputs, and observables.
+
+#### Completion Requirements
+
+All T35 evidence is captured; branching reuses explicit rule choice without hiding arithmetic; Goal 2 and global integration are updated.
+
+### 43-T36-DIGIT-REVERSAL
+
+#### Big Picture Objective
+
+Test rules whose semantics explicitly depend on positional number representation.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing base, digit transform, leading zeros, reinterpretation, and arithmetic combination.
+
+#### Completion Requirements
+
+All T36 evidence is captured; semantic digit representation is distinguished from optional visualization; Goal 2 and global integration are updated.
+
+### 44-T38-VARIABLE-RECURRENCE
+
+#### Big Picture Objective
+
+Test data-dependent historical addresses and invalid-index semantics in growing recursive sequences.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing computed dependencies, guards, history availability, and halting or invalidity.
+
+#### Completion Requirements
+
+All T38 evidence is captured; dynamic reads are direct and validated; Goal 2 and global integration are updated.
+
+### 45-T40-CONSTANT-DIGITS
+
+#### Big Picture Objective
+
+Test exact constants as sources for indexed digit and continued-fraction sequences without inventing mutable dynamics.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing exact expression, representation, base, coefficient generation, and term limits.
+
+#### Completion Requirements
+
+All T40 evidence is captured; source definition and generated observable remain distinct; Goal 2 and global integration are updated.
+
+### 46-T42-CF-SUBSTITUTION
+
+#### Big Picture Objective
+
+Test substitution whose rule schedule is driven by an external continued-fraction coefficient stream.
+
+#### Detailed Implementation Plan
+
+Apply the common protocol, emphasizing coefficient-source state, generated rules, schedule, provenance from functions, and composition with substitution primitives.
+
+#### Completion Requirements
+
+All T42 evidence is captured; rule scheduling is explicit state or input rather than hidden control; Goal 2 and global integration are updated.
+
+### 47-SYNTHESIS
+
+#### Big Picture Objective
+
+Re-derive the complete architecture from all 45 evidence records and determine the smallest genuine construction algebra or set of algebras.
+
+#### Detailed Implementation Plan
+
+- Audit every proposed primitive against all type stages and merge only semantically identical concepts.
+- Re-test the candidate executor boundaries, state model, result types, update semantics, family index, and trace/encoding boundary.
+- Identify contradictions, reopen affected stages, and remove abstractions supported only by convenience.
+- Produce a cohesive proposed revision strategy for `simple_programs.md` and `src/ca` without implementing it.
+
+#### Completion Requirements
+
+- All 45 stages are complete and internally consistent.
+- Every primitive has evidence-backed users and explicit invariants.
+- Irreducible execution algebras are named and justified; apparent unity is not purchased through callbacks or `Any`.
+- No unresolved contradiction remains in `0-plan.md` or `design-ledger.md`.
+
+### 48-GOAL2-HANDOFF
+
+#### Big Picture Objective
+
+Turn the evidence-grounded architecture into a complete, dependency-aware Goal 2 implementation plan.
+
+#### Detailed Implementation Plan
+
+- Consolidate each type's Goal 2 handoff into `goal-1/goal-2-handoff.md`.
+- Order shared semantic primitives before the type conformance stages that depend on them.
+- Preserve a distinct traceable implementation/conformance obligation for every CSV row without duplicating shared implementation.
+- Define migrations, canonical examples, tests, coverage matrix, no-cheating checks, and final ANKoS universality verification.
+- Specify how a later `goal-2` scaffold should be generated, but do not implement Goal 2 in this goal.
+
+#### Completion Requirements
+
+- Every type appears exactly once as a Goal 2 coverage obligation.
+- Every implementation stage has dependencies, files, tests, completion evidence, and rollback/re-derivation triggers.
+- Shared work is planned once; no family-specific rollout or compatibility path is proposed.
+- The handoff is sufficient to scaffold and execute Goal 2 without repeating Goal 1 research.
