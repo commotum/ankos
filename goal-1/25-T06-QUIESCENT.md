@@ -1,24 +1,24 @@
 # 25-T06-QUIESCENT
 
-Status: **IN PROGRESS — ARCHITECTURE AUDIT COMPLETE**
+Status: **COMPLETE — EVIDENCE, ARCHITECTURE, AND GOAL 2 HANDOFF CLOSED**
 
-The architecture prerequisite is complete and its dependent handoffs are reintegrated. T06 resumes through the common SimpleProgram runner and CA-preset axes; T03/T04's bounded asset repairs remain independently active.
+The architecture prerequisite and T06 evidence audit are complete. T06 uses the common SimpleProgram runner and CA axes; no upstream repair remains a prerequisite for this stage.
 
 ## Current Facts
 
 - Exact catalog row: T06, CSV line 7, `Quiescent-Background-Preserving Cellular Automata`; taxonomy section 6 at `ref/notes/CA-Types.md:145-158` is search vocabulary only, not book evidence.
-- The taxonomy hypothesis calls this a construction filter: a designated blank value must reproduce itself from the uniform blank local context. For canonical elementary and totalistic codes this suggests the least-significant output digit is zero, but the full source, variant, and representation audit is not yet closed.
-- Inherited direct candidates include the three-color gallery exclusion at `BOOK:784`, the historical 32-rule intersection at `BOOK:1346`, the all-white-state gallery statement at `BOOK:2798`, the two-dimensional relation at `BOOK:2926`, the invariant-uniform-state discussion at `BOOK:4070`, and the literal quiescent-symmetric emulation relation at `BOOK:18770`. These are leads, not an exhaustive T06 evidence claim.
+- The taxonomy label resolves to a validated catalog filter: a designated alphabet member must reproduce itself from the uniform local context. For canonical rank-zero elementary and totalistic codecs this makes the least-significant output digit zero; source, variant, and representation closure is complete below.
+- The saturated direct set is exactly `BOOK:784,1346,2798,2926`. Invariant/convergence, local-block, fixed-point, emulation, background, seed, and application lines are explicit relations or profiles, not additional native mechanics.
 - T01/T02/T03 already establish immutable complete local rules, fixed ordered support, old-snapshot reads, typed same-site assignment, atomic parallel update, and uninterrupted deterministic continuation. D114 and D118 reserve quiescent/background-preserving predicates for T06 rather than base-rule flags.
-- A uniform blank field being invariant is provisionally a property of `(rule, designated blank)`; a finite nonblank seed, constant exterior, observation crop, stopping-on-fixed-point policy, behavior class, and the outcome word “quiescent” used by other constructions are distinct responsibilities unless direct evidence proves otherwise.
-- Current API/runtime and test support for structural rule predicates, designated-background validation, and restriction serialization remain under active audit. Goal 1 changes only `goal-1/`; no runtime, documentation, or test implementation occurs in this stage.
+- A uniform blank field being invariant is a property of `(eligible resolved CA program, AlphabetMemberRef)`; a finite nonblank seed, constant exterior, observation crop, stopping-on-fixed-point policy, behavior class, and the outcome word “quiescent” used by other constructions are distinct responsibilities.
+- Current API/runtime and test support for structural rule predicates, typed alphabet-member references, evidence serialization, and validated catalog selection are now audited and handed off below. Goal 1 changes only `goal-1/`; no runtime, documentation, or test implementation occurs in this stage.
 
 ## Updated Assumptions
 
-- Working hypothesis: T06 adds no state, read, result, executor, update, successor, or halt semantic. It validates an existing complete local rule against one explicit uniform-background fixed-point obligation.
-- Working hypothesis: the general structural test is `T(b,...,b)=b`. Canonical T01/T02 and T03 code congruences are derived codec accelerators, not the primary meaning and not valid when the blank is not codec rank/value zero.
-- Working hypothesis: the designated blank belongs to a restriction/run-background profile, not to the underlying rule's structural identity. Whether a separately identified validated restriction record is needed remains to be settled by evidence and the Goal 2 integration audit.
-- The claims above remain revisable under Principle 0 until aliases, captions, Notes, actual Index, splits, assets, current code, tests, and prior decision boundaries close with zero remainder.
+- Closed conclusion: T06 adds no state, read, result, executor, update, successor, or halt semantic. It validates an eligible resolved deterministic local CA program against one explicit uniform-background fixed-point obligation.
+- The authoritative structural test is `T(b,...,b)=b`. Canonical T01/T02 and T03 code congruences are derived codec checks, not the primary meaning and not valid when the blank is not codec rank/value zero.
+- The designated blank is an `AlphabetMemberRef` bound to the program alphabet, not seed fill or boundary data. Program, claim, evidence, validated-selection, and run identities are all distinct.
+- Evidence closure found no counterexample requiring a new state type, rule-result type, update law, executor, or family branch.
 
 ## Big Picture Objective
 
@@ -29,7 +29,7 @@ Determine exactly what source evidence means by a blank/white background staying
 - Stable ID: T06.
 - Exact CSV name: `Quiescent-Background-Preserving Cellular Automata`.
 - Taxonomy section: 6, vocabulary seed only.
-- Provisional entry kind: restriction/property over a complete local CA rule plus a designated blank value; not a distinct transition construction.
+- Entry kind: validated property/restriction over an eligible complete local CA program plus a designated `AlphabetMemberRef`; not a distinct transition construction.
 - Initial vocabulary: quiescent/quiescence, blank/white/all-white/uniform background, background stays/remains unchanged, rules that change/do not change the background, invariant uniform state, stable zero, finite/localized seed, single black/gray cell, symmetric blank-background searches, and code/table least-significant output conditions.
 
 ## Search Log
@@ -126,9 +126,9 @@ T06 text manifest: PASS 9 queries; 128 lexical; partition=7,63,45,13; governed=5
 
 These 128 lines have no remainder inside the narrow query union, but that union is not the evidence universe. `2868,2922,2930,14243,18766` remain useful governed continuations; the authoritative classification below absorbs the broader aliases and replaces the narrow `7/63/45/13` architecture count.
 
-### Authoritative 19-family saturation manifest
+### Authoritative inspected manifest from the 19-family saturation pass
 
-`BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; the actual Index begins at physical `BOOK:20826`. Nineteen controlled families close 280 unique canonical lines: 212 pre-Index and 68 actual-Index. Counts are distinct physical lines and overlap between families.
+`BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; the actual Index begins at physical `BOOK:20826`. The independently inspected result of the 19-family pass is 280 unique canonical lines: 212 pre-Index and 68 actual-Index. Counts are distinct physical lines and overlap between families. The table records the search protocol and observed counts; the embedded check pins the inspected canonical ledger and its disposition, rather than pretending that a broad union regex can reproduce all raw-hit exclusions by itself.
 
 | Q | Controlled family | Pre-Index | Actual Index |
 |---:|---|---:|---:|
@@ -172,9 +172,9 @@ assert len(pre)==212 and len(index)==68 and max(pre)<IX<=min(index)
 assert sum(map(len,parts))==len(set().union(*parts))==280
 assert set().union(*parts)==pre|index
 
-# Nineteen-family saturation guard. The exact canonical line ledger above is
-# primary; this guard ensures no ledger line has drifted away from every
-# controlled vocabulary family after corpus edits.
+# Vocabulary drift guard only. The exact independently inspected canonical
+# ledger above is primary; this is intentionally not represented as a proof
+# that a giant regex union reproduces the raw-query exclusion audit.
 families=[
 r'quiescen',r'background.{0,100}(?:unchang|remain|stay|preserv|invariant|stable)',
 r'blank.{0,80}background|background.{0,80}blank',
@@ -194,14 +194,14 @@ r'background|phases',r'invariant',r'stable|bistable|metastable',r'uniformity|uni
 assert len(families)==19
 guard=re.compile('|'.join(f'(?:{x})' for x in families),re.I)
 assert all(guard.search(L[n-1]) for n in pre|index)
-print('T06 saturation manifest: PASS 19 families; 280 lines; pre/index=212/68; partition=4,25,111,66,6,68')
+print('T06 canonical search ledger: PASS 19-family audit; 280 lines; pre/index=212/68; partition=4,25,111,66,6,68')
 PY
 ```
 
 Recorded output:
 
 ```text
-T06 saturation manifest: PASS 19 families; 280 lines; pre/index=212/68; partition=4,25,111,66,6,68
+T06 canonical search ledger: PASS 19-family audit; 280 lines; pre/index=212/68; partition=4,25,111,66,6,68
 ```
 
 The split-corpus cross-check found 224 raw matches. Seventeen split-only punctuation/line-join variants and 18 monolith non-byte mirrors reconcile without a new semantic candidate; one combined split line mirrors both `BOOK:8578` and `BOOK:8584`. The actual split Index offset is `+17443` at Colophon line 3383. No split-only construction changes the six-way disposition.
@@ -237,6 +237,53 @@ The following are canonical, role-separated excerpts. Short fragments are quoted
 1. **Page 262 count/wording defect.** The repository text and the official Chapter 6 PDF both say “most of the 64 possibilities” at `BOOK:2926`. For a binary five-cell totalistic table there are `2^6=64` rules total and exactly `2^5=32` that preserve white. The raster at `BOOK:2924` visibly labels 30 even codes `2,4,...,60`, excluding `0` and `62`. This is a source wording/count inconsistency, not OCR. T06 records the prose faithfully, uses the independently proved 32-rule property count, and treats the 30-panel raster as a selected gallery.
 2. **Invariant-block horizon defect.** `BOOK:14046` says “after `t` steps” but gives block width `2r+1`; the official Notes PDF has the same wording. The general width is `2rt+1`. T06 uses this evidence only at `t=1`, where the printed width is correct, and does not promote the erroneous general formula.
 3. **Page 264 raster-only caption.** `_page_264_Picture_3.jpeg` contains a Life caption absent from the monolith OCR, including the 8-neighbor rule and outer-totalistic code 224. It is hash-pinned below as an application relation. No missing caption text is invented into the book corpus, and no Life-specific class enters T06.
+
+### Canonical excerpt and source-repair oracle
+
+```bash
+python3 - <<'PY'
+from hashlib import sha256
+from pathlib import Path
+
+ROOT=Path('ref/A-New-Kind-of-Science')
+BOOK=(ROOT/'A-New-Kind-of-Science.md').read_text().splitlines()
+checks={
+784:('those that change the white background are not included','CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md',101),
+1346:('32 rules which had left-right symmetry and made blank backgrounds stay unchanged','CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md',663),
+2798:('leave states consisting only of white cells unchanged','CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md',97),
+2926:('most of the 64 possibilities that leave a state that contains only white cells unchanged','CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md',223),
+3114:('initial state is uniformly white, then rule 30 will just yield uniform white forever','CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md',411),
+3388:('structures in rule 110 do not exist on a blank background','CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md',683),
+4070:('all white and all black as invariant states','CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md',641),
+4078:('only invariant states are uniform in color','CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md',649),
+14046:('configurations that are left invariant after t steps','BACK-MATTER/Index/Index.md',1947),
+14113:('configurations that remain unchanged in the evolution of a 2D cellular automaton','BACK-MATTER/Index/Index.md',2014),
+14795:('remain unchanged at every step in the evolution','BACK-MATTER/Index/Index.md',2696),
+18764:('on a white background yields a pattern','BACK-MATTER/Colophon/Colophon.md',1321),
+18770:('quiescent symmetric elementary rules','BACK-MATTER/Colophon/Colophon.md',1327),
+}
+for n,(fragment,rel,split_n) in checks.items():
+    assert fragment in BOOK[n-1],(n,fragment)
+    assert fragment in (ROOT/rel).read_text().splitlines()[split_n-1],(rel,split_n)
+
+# The official PDFs are optional local verification inputs, not repository
+# dependencies. If present, their exact downloaded identities must match.
+pdfs={'/tmp/nks-ch3.pdf':'d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76',
+      '/tmp/nks-ch6.pdf':'5af1e53860bd4a6877961681cf49b16058a53ee55a2bfa8c64ac7cc13174bca0',
+      '/tmp/nks-notes.pdf':'549f043595653a7d276b07ba52d435700039b71427b4e1774a44b1a58eff4723'}
+for name,digest in pdfs.items():
+    p=Path(name)
+    if p.exists(): assert sha256(p.read_bytes()).hexdigest()==digest
+assert 2**6==64 and 2**5==32 and len(range(2,62,2))==30
+print('T06 excerpt/source oracle: PASS 13 excerpts; 3 split families; 64/32/30 repair pinned')
+PY
+```
+
+Recorded output:
+
+```text
+T06 excerpt/source oracle: PASS 13 excerpts; 3 split families; 64/32/30 repair pinned
+```
 
 ## Asset and Raster Audit
 
@@ -403,18 +450,31 @@ T06 metadata oracle: PASS 5 included; 28 relation-only; 12 excluded
 
 | Dimension | Reconstructed T06 meaning |
 |---|---|
-| Entry kind | A decidable local property of `(resolved deterministic local program, explicitly designated blank b)` and a catalog restriction that accepts only programs satisfying it. It is not a transition construction. |
+| Entry kind | A decidable property of an **eligible resolved deterministic local CA program** plus an explicit `AlphabetMemberRef b`, and a catalog restriction that accepts only `Holds`. It is not a transition construction. |
 | State | The ordinary CA total field from the referenced program. T06 adds no cell field, control, cache, active set, or background mask. |
 | Support/topology | Whatever fixed regular support and realization the referenced CA already declares. The predicate itself is dimension- and boundary-independent. |
-| Values | `b` must be one typed member of the referenced program's alphabet. “White”, zero, first rank, seed fill, and palette tone are not implicit synonyms. |
+| Values | `b` is an `AlphabetMemberRef(alphabet_ref, rank, canonical_typed_value)`. Resolution must prove that the program references the same alphabet, the rank is in range, and the value at that rank has the exact canonical typed encoding. “White”, zero, seed fill, and palette tone are not implicit synonyms. |
 | Read witness | Construct the program's complete fixed-arity local read with every slot equal to `b`, preserving component structure, offset multiplicity, center inclusion, and declared arity. |
-| Rule obligation | Evaluate through the same closed structural evaluator used by execution and require `rule(b,...,b)=b`. A property witness records the program reference, predicate version, typed blank, exact uniform input, actual output, and Boolean result. |
+| Rule obligation | Evaluate through the same closed structural evaluator used by execution and require `rule(b,...,b)=b`. A property claim and its recomputed evidence are separate records. Outcomes are `Unsupported`, `DoesNotHold`, or `Holds`; malformed/dangling/mismatched claims are validation errors and are not `DoesNotHold`. |
 | Result/update | None added. A passing program still emits its ordinary typed assignments and uses its existing atomic update. A failing rule is rejected by the catalog restriction; its table is never patched. |
 | Successor/halt | Every requested event remains an ordinary deterministic successor, including an unchanged all-blank successor. T06 does not introduce fixed-point stopping or the event-free `Quiescent` outcome used by unrelated constructions. |
-| Seed/background | A finite nonblank seed on fill `b` is T08/run data. A constant exterior value is a finite-realization boundary choice. Neither proves or defines the local property. |
-| Consequence | With a finite-radius stencil and a passing rule, a finite set of nonblank initial sites has finite causal dilation after every finite horizon. This does not imply monotonicity, eventual death, finite total activity, or halting. |
-| Program identity | The restriction returns the exact referenced structural program, semantic hash, and typed axis/preset schemas unchanged. The restriction request and reproducible property evidence have separate identities. |
+| Seed/background | A finite nonblank seed on fill `b` is T08/run data. A constant exterior value is a finite-realization boundary choice. Neither proves the local property. A finite all-`b` realization is a global fixed point only when every exterior/boundary read is also `b`-compatible. |
+| Consequence | For a finite-radius fixed-lattice program, a finite perturbation of a globally `b`-compatible background has deviation support contained in the finite iterated stencil cone at every finite horizon. This qualified locality result does not imply monotonicity, eventual death, finite total activity, or halting. |
+| Identity | `Program`, `PropertyClaim`, `PropertyEvidence`, `ValidatedProgramSelection`, and `Run` have separate canonical identities. A passing selection records the claim/evidence and returns the exact referenced program and semantic hash unchanged before any run is constructed. |
 | Observers/relations | Gallery membership, symmetry, invariant-state classifications, emulation graphs, behavior classes, death/growth claims, crops, rasters, and horizons remain property/analyzer/relation/view records. |
+
+### Strict CA-axis eligibility and verdicts
+
+A T06 claim is eligible only when its referenced program already resolves all of the following without family dispatch: a finite explicitly ordered alphabet; a fixed regular lattice/domain and complete finite-arity local read schema; a deterministic total structural rule whose ordinary evaluator returns the declared typed same-site value; and the ordinary snapshot-parallel CA update. Dimension, radius, neighborhood shape, color count, totalistic/exhaustive encoding, and symmetry may vary. Opaque callbacks without a complete structural evaluator, stochastic or multiway successors, mobile/Turing control encodings, substitutions, networks, symbolic rewrites, PDEs, and pure constraints are `Unsupported` by this CA property even if they use the word “blank”, “stable”, or “quiescent”. They remain expressible SimplePrograms; they are merely outside this predicate's declared axis.
+
+The result boundary is exact:
+
+1. **Invalid claim:** parsing, reference resolution, alphabet identity, rank, canonical typed value, predicate version, or program/blank compatibility fails. Validation reports an error and emits no semantic verdict.
+2. **`Unsupported`:** the claim is well formed, but the referenced program is outside the strict CA eligibility above or lacks inspectable complete evaluation.
+3. **`DoesNotHold`:** the program is eligible, the uniform witness evaluates normally, and the typed output differs from `b`.
+4. **`Holds`:** the program is eligible and the typed output is exactly `b`.
+
+No caller-supplied Boolean is trusted. `ValidatedProgramSelection` can be constructed only from `Holds` evidence, binds the exact claim, evidence, and program references, and resolves to that same program `P` before independent seed, boundary, horizon, observer, and run records are supplied.
 
 ### Structural forms and codec corollaries
 
@@ -442,15 +502,17 @@ The strict zero-background profile chooses `b=nu^-1(0)`, so it becomes `U(0)=b`,
 
 ### Boundary and invariant distinctions
 
+- On an infinite all-`b` field, or a finite realization whose every exterior read is `b`-compatible, `Holds` makes the all-`b` configuration a global fixed point. The local predicate alone makes no claim about a finite realization with a hostile exterior.
 - A passing rule plus a nonblank fixed exterior can change edge cells because edge reads are not uniform `b`; this does not falsify the rule property.
 - A failing rule plus fixed exterior `b` still changes an interior all-blank region; the boundary cannot repair it.
 - `b` being a fixed point of the uniform local rule is weaker than “the only invariant configurations are uniform”, convergence to a uniform state, eventual death, or stability under perturbations.
 - A repeating nonuniform background may be preserved by a space-time phase relation without satisfying the T06 uniform-blank predicate. Rule 110's periodic background is an explicit counter-boundary.
 - T07 reflection and T06 quiescence compose as independent evidence. There are 64 reflection-symmetric ECAs, 128 zero-quiescent ECAs, and exactly the source's 32-rule intersection.
+- If `S_0` is the finite deviation support from a globally `b`-compatible background and `N` is the finite local offset set, then after `t` snapshot-parallel events deviations are contained in `S_0 + N + ... + N` (`t` copies). This containment, not a promise of shrinking or finite lifetime, is the causal-cone claim.
 
 ### Dependency-free semantic oracle
 
-This oracle proves the structural predicate, all canonical code corollaries, arbitrary-blank failure of modulus shortcuts, exact ECA/T07 intersection, T03/T04/T05 counts, source gallery label sets, boundary separation, finite causal dilation, and identity-preserving restriction behavior.
+This dependency-free oracle checks the reconstructed algebra and selected adversarial fixtures: canonical codec corollaries, arbitrary-blank failure of modulus shortcuts, exact ECA/T07 intersection, T03/T04/T05 counts, source gallery label sets, one hostile-boundary example, a finite-radius cone example, and unchanged Python object identity on acceptance. It is not a proof about every runtime program, every boundary implementation, or raster semantics; those are Goal 2 conformance obligations.
 
 ```bash
 python3 - <<'PY'
@@ -511,6 +573,7 @@ page262=tuple(range(2,62,2))
 assert len(page76)==50 and all(n%3==0 for n in page76)
 assert len(page256)==32 and all(n%4==0 for n in page256)
 assert len(page262)==30 and all(n%2==0 for n in page262)
+assert 2**6==64 and len(range(0,64,2))==32 and len(page262)==30
 assert set(page262)==set(range(0,64,2))-{0,62}
 
 def eca_step(row,n,left=0,right=0):
@@ -558,7 +621,7 @@ galleries= 50 32 30 boundary_adversary= (1, 0, 1)
 | One-snapshot parallel rule/update | DIRECT shared semantics | Uniform input is evaluated through the ordinary rule; passing T06 changes no event or commit (`simple_programs.md:101-106,1767-1791,2124-2152`). |
 | `EXHAUSTIVE` complete ordered table | PARAMETERIZATION | Its total `T` has the correct structural row, but the document has no rule-property/check layer and no structural program reference (`simple_programs.md:1795-1831`). |
 | Broad `TOTALISTIC` aggregate/table | SEMANTIC MISMATCH for exact T03, reusable evaluator shape | Count, histogram, and numeric sum are conflated, so T06 must consume the synthesis-corrected typed T03 program rather than special-case this broad bucket (`simple_programs.md:1964-2032`). |
-| Rule restriction/property evidence | PRINCIPLED EXTENSION | Add one recomputable, versioned, program-bound property record. Do not add `QUIESCENT` to `RULETYPE` or the executor. |
+| Rule claim/evidence/selection boundary | PRINCIPLED EXTENSION | Add separate recomputable, versioned `PropertyClaim`, `PropertyEvidence`, and `ValidatedProgramSelection` records plus typed member resolution. Do not add `QUIESCENT` to `RULETYPE` or the executor. |
 | Complete generator object includes seed/boundary | SEMANTIC MISMATCH as program identity | Useful as a run configuration, but a T06 claim must bind only the structural program and blank, while seed/boundary/horizon vary independently (`simple_programs.md:2156-2211`). |
 
 ## Current Runtime Fit
@@ -586,22 +649,55 @@ Repository-wide search finds no implemented quiescent-background restriction API
 - **Principles 9 and 10:** the predicate genuinely couples one resolved program with one typed blank. Seed, boundary, horizon, palette, and fixed-point stopping remain independent. The catalog resolver validates and returns the ordinary program.
 - **Principle 11:** evaluating the uniform local witness defines the decidable property. Search enumeration and gallery rendering are incidental; ordinary synchronous update remains defining CA semantics.
 - **Principles 13 and 15:** adversaries include rule 30 versus rule 1, nonzero symbolic blank, noncanonical valuation, nonblank exterior, 128/64/32 ECA counts, T04/T05 counts, source label corpora, identity preservation, and continued all-blank events.
-- **Principle 16:** one versioned `RulePropertyEvidence` boundary is architecture. A trusted Boolean flag, even-code branch, background-freezing optimization, table patch, family switch, or boundary-derived shortcut is a shim.
+- **Principle 16:** one generic versioned claim/evidence/validated-selection boundary is architecture. A trusted Boolean flag, even-code branch, background-freezing optimization, table patch, family switch, or boundary-derived shortcut is a shim.
 
-D111-D118 remain valid. T06 requires one new decision, provisionally D119: uniform-background preservation is a program-bound local property/restriction with explicit blank and reproducible witness; it changes neither structural program identity nor execution. The decision will be activated only after source/asset closure and independent review.
+D111-D118 remain valid. T06 closes the following stage decision; the parent integration pass owns copying it into the global ledger without weakening it:
+
+**D119 — Uniform-background preservation is a validated CA program property, not execution semantics.** A claim binds one eligible resolved deterministic local CA `Program P`, predicate version, and one `AlphabetMemberRef(alphabet_ref, rank, canonical_typed_value)`. The claim `Holds` iff `P`'s ordinary complete structural evaluator maps the exact uniform local read of that member to the same typed member. Invalid claim, `Unsupported`, `DoesNotHold`, and `Holds` are distinct. `Program`, `PropertyClaim`, `PropertyEvidence`, `ValidatedProgramSelection`, and `Run` identities remain separate; a validated catalog selection binds its claim/evidence and resolves to the exact unchanged `P` before run data exists. T06 adds no state, read, rule-result, update, executor, successor, halt, boundary, seed, observer, or family-dispatch semantic.
 
 ## Detailed Implementation Plan
 
-1. Close an exact text manifest across direct names, aliases, descriptions, captions, Notes, actual Index, splits, code relations, invariant-state material, and unrelated blank/quiescent controls.
-2. Follow every relevant source-linked asset in both directions; pin exact file identity and classify direct evidence, relation-only material, and exclusions.
-3. Prove structural predicates and counts for elementary, generic ordered-table, and totalistic rules, including nonzero/symbolic blank adversaries and code-congruence limits.
-4. Audit current documentation, runtime, tests, D111-D118, completed T01-T05 stages, and T07/T08 plus higher-dimensional boundaries.
-5. Write the concrete Goal 2 property/restriction API, serialization, migration, conformance, and no-cheating plan.
-6. Run embedded source/evidence/semantic/asset checks, independent review, repository tests, fence/status/coverage/diff gates, then reintegrate all global ledgers.
+1. **Complete:** close the inspected 19-family/280-line canonical manifest across prose, Notes, actual Index, splits, relations, profiles, and controls.
+2. **Complete:** follow relevant assets in both directions and pin the exact 45-file/90-reference `5/28/12` closure.
+3. **Complete:** check structural predicates and counts for elementary, generic ordered-table, and totalistic rules, including arbitrary-blank and codec adversaries.
+4. **Complete:** audit current documentation/runtime/tests and the T01-T05/T07/T08 boundaries.
+5. **Complete:** specify the Goal 2 claim/evidence/selection API, serialization, identity, migration, conformance, and no-cheating plan.
+6. **Complete locally:** run all embedded checks, independent red-team, 102 repository tests, fence and diff gates. Parent integration owns the global plan/evidence-index/design-ledger copies because this task is intentionally restricted to this stage file.
 
 ## Goal 2 Implementation Stage
 
-IN PROGRESS. The handoff will name concrete files, dependencies, structural validation, source fixtures, adversarial tests, serialization/identity rules, and static checks after evidence closure.
+**G2-T06 — typed CA property claims and identity-preserving catalog selection.** Implement only after the T01/T02 structural-program/evaluator boundary and T03 exact aggregate/valuation boundary exist. This stage must not make the current callback-shaped `Rule` certifiable by guessing.
+
+| Goal 2 surface | Required work |
+|---|---|
+| `simple_programs.md` | Specify `AlphabetMemberRef`, `RulePropertyClaim`, `RulePropertyEvidence`, the four validation/verdict cases, and `ValidatedProgramSelection`; state the strict CA-axis eligibility and canonical encodings. |
+| `src/ca/alphabets.py` | Provide stable alphabet identity and member resolution by `(alphabet_ref, rank, canonical_typed_value)`; reject rank/value/ref disagreement. Do not add a quiescent alphabet family. |
+| structural program/rule module established by G2-T01–T03 | Expose the same total typed evaluator used by execution. Certification may not inspect an opaque callback, infer a missing row, or branch on family names. |
+| new generic property module (expected `src/ca/properties.py`) | Parse/validate claims, check eligibility, construct the exact uniform read from the resolved schema, invoke the ordinary evaluator once, and emit canonical evidence with `Unsupported`/`DoesNotHold`/`Holds`. |
+| catalog/resolver layer | Filter only on recomputed `Holds` evidence and return the exact original `Program` reference/hash. Keep the selection record distinct from the program and from later runs. |
+| `src/ca/specs.py` and serialization | Round-trip claim, member, evidence, and validated-selection identities with explicit schema/predicate versions. Seed, boundary, horizon, observers, and run IDs remain outside every property hash. |
+| rollout/executor | No T06 change. Static tests must reject a `QUIESCENT` family branch, blank-cell skip, background freeze, fixed-point stop, or property-specific update. |
+| tests and source fixtures | Add the 15 acceptance groups below, source-line fixtures `784,1346,2798,2926`, the `64/32/30` repair guard, and the five direct asset hashes. |
+
+### Fifteen acceptance groups
+
+1. **Strict eligibility:** accept structurally resolved deterministic exhaustive and exact-totalistic CA programs across dimensions; return `Unsupported` for opaque callbacks, stochastic/multiway rules, substitutions, networks, symbolic systems, constraints, mobile/Turing programs, and PDE relations.
+2. **Member integrity:** accept only an `AlphabetMemberRef` whose alphabet reference, rank, and canonical typed value all resolve to the program alphabet; test dangling ref, negative/out-of-range rank, same-looking value of another type, and rank/value disagreement.
+3. **Invalid versus semantic verdict:** malformed claims raise validation diagnostics and emit no verdict; valid ineligible claims produce `Unsupported`; eligible failing/passing claims produce `DoesNotHold`/`Holds`.
+4. **Ordinary evaluator witness:** spy/instrumentation proves exactly one complete uniform-schema evaluation through the same path as rollout, with no direct code-parity or family shortcut.
+5. **Canonical zero background:** ECA rule 30 and representative T03/T04/T05 tables hold for rank-zero blank; rule 1 does not.
+6. **Arbitrary/nonzero blank:** include a three-color table that holds for rank/value one while `code mod 3` is zero, and a zero table that fails for that blank; modulus cannot be authoritative.
+7. **Typed aggregate/valuation:** verify `U(q*nu(b))=b` with a nonidentity valuation and reject a valuation/alphabet mismatch.
+8. **Exact counts and source guards:** check 128 zero-preserving ECAs, 64 symmetric ECAs, their 32 intersection and exact labels, `2^6=64` two-dimensional totalistic rules, 32 qualifying zero-preserving rules, and the 30 displayed page-262 labels.
+9. **Identity separation:** changing claim version/member changes claim ID but not program ID; recomputation/evaluator version changes evidence ID; seed/boundary/horizon changes run ID only; validated-selection ID is distinct from all four.
+10. **Exact catalog resolution:** a passing selection returns the same program object/reference and semantic hash `P` before run construction; failure or unsupported evidence cannot construct a validated selection.
+11. **Run independence:** the same validated selection can feed multiple seeds, fills, boundaries, horizons, crops, and palettes without recertification or program mutation; no run field enters the property hash.
+12. **Boundary qualification:** an all-`b` finite state is fixed with a `b`-compatible exterior; a hostile fixed exterior can change edge cells while the local claim remains `Holds`; boundary data can neither repair nor falsify the local predicate.
+13. **Causal-cone qualification:** for a finite perturbation, finite stencil, snapshot-parallel update, and globally compatible background, deviations stay inside the iterated stencil cone; test that this does not assert shrinkage, eventual death, or finite total activity.
+14. **Continuation/no halt:** an unchanged all-blank event remains an ordinary successor. No fixed-point stop, `Quiescent` outcome, sparse skip, or suppressed assignment appears in traces.
+15. **Serialization and no-cheating:** canonical round trips preserve all references/verdicts/witness values; schema migration is explicit; static scans find no T06 family dispatch, trusted Boolean, table patch, code-parity authority, executor/update branch, or boundary-derived certification.
+
+Goal 2 should expose a small convenience constructor for the catalog row only after these generic types exist. That constructor creates a claim; it does not create a new program class or runner.
 
 ## No-Cheating Checks
 
@@ -610,19 +706,31 @@ IN PROGRESS. The handoff will name concrete files, dependencies, structural vali
 - No code parity/modulus used as the primary predicate when alphabet rank, designated blank, valuation, case-schema order, or codec differs.
 - No acceptance based on a sampled finite run; the complete local uniform-blank row must be checked structurally.
 - No duplicate predicate under elementary, multicolor, totalistic, higher-color, or dimensional family names when one typed rule-application obligation is sufficient.
+- No Boolean `is_quiescent`, unbound scalar blank, rank-only member, or value-only member accepted as evidence; alphabet reference, rank, and canonical typed value must agree.
+- No conflation of invalid claim, `Unsupported`, `DoesNotHold`, and `Holds`, and no reuse of program, claim, evidence, validated-selection, or run hashes across those identity boundaries.
+- No global fixed-point or causal-cone claim without the explicit finite-stencil/snapshot-parallel and `b`-compatible-background qualifications.
 
 ## Completion Requirements
 
-- [ ] Every direct/alias/caption/Notes/actual-Index/split/cross-reference/invariant/application/control candidate is dispositioned with zero remainder.
-- [ ] Every relevant source-linked asset is hash-pinned and classified, with every source-permitted semantic/raster oracle closed.
-- [ ] The exact predicate, designated-blank identity, counts/code relations, and rule/seed/background/boundary/halt/property distinctions are proved across supported rule descriptions.
-- [ ] Current API/runtime fit and a concrete Goal 2 restriction/conformance stage are implementation-ready.
-- [ ] Global ledgers, independent review, embedded checks, coverage/diff gates, and repository tests pass.
+- [x] The independently inspected 19-family manifest has exactly 280 canonical lines and the exact `4/25/111/66/6/68` disposition; split variants add no semantic candidate.
+- [x] The exact 45 relevant assets are hash-pinned and classified `5/28/12`; all 90 monolith/split reverse references close.
+- [x] The predicate, typed member identity, verdicts, counts/code relations, and rule/seed/background/boundary/halt/property distinctions are closed across eligible rule descriptions.
+- [x] Current API/runtime fit and the 15-group Goal 2 restriction/conformance handoff are implementation-ready.
+- [x] Independent red-team, six embedded checks, source/metadata/semantic gates, 102 repository tests, fence gate, and diff check pass. Global-file reintegration is explicitly handed to the parent task and was not performed here.
 
 ## Stage Results
 
-IN PROGRESS. No completion or architecture decision is recorded until all requirements close.
+**COMPLETE.** Evidence closure is 280 canonical text lines, 45 assets, 90 reverse references, 13 canonical excerpt checks, three source repairs, and six passing embedded Python blocks. The architecture result is a strict CA-axis property/restriction over exact `Program P` plus `AlphabetMemberRef`; it introduces no execution algebra. D119 and the 15-group G2-T06 handoff are ready for parent-ledger integration. Repository verification: `102 passed in 1.19s`; Markdown fence and `git diff --check` gates pass.
 
 ## Integration Results
 
-IN PROGRESS. The ten-question reintegration audit will be answered after evidence and design close.
+1. **Catalog kind:** restriction/property, not a new SimpleProgram construction.
+2. **Smallest base:** the resolved deterministic fixed-lattice local CA program from T01/T02, with T03/T04/T05 rule descriptors reused unchanged.
+3. **New state/read/result/update/executor:** none; the checker constructs one ordinary uniform read and invokes the existing evaluator.
+4. **New generic types:** `AlphabetMemberRef`, property claim/evidence/verdict, and validated selection only; these are validation/identity records, not runtime semantic classes.
+5. **T07/T08 boundary:** reflection remains an independent property; finite/single-cell initial conditions remain run profiles.
+6. **Boundary/halt boundary:** exterior policy is run data; all-blank fixed-point claims require `b` compatibility; unchanged events continue and never imply halt.
+7. **Representation boundary:** modulus/parity, colors, gallery order, rasters, and code labels are derived codecs/views; structural evaluation is authoritative.
+8. **Identity boundary:** program, claim, evidence, validated selection, and run hashes are separate; selection resolves to exact unchanged `P` pre-run.
+9. **Counterexamples:** nonzero blank, opaque callback, hostile exterior, rule 110 periodic background, invariant-but-not-attracting states, and `64/32/30` source repair all preserve the boundary.
+10. **Parent integration:** copy D119 verbatim and link this stage in the global plan, evidence index, design ledger, and Goal 2 roadmap; no runtime implementation or T06-specific branch is authorized in Goal 1.
