@@ -78,7 +78,7 @@ Representative commands used case-insensitive Perl occurrence/unique-line counte
 
 `BOOK` below means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. Quotations retain source wording; repairs and semantic dispositions follow each excerpt.
 
-### E01 — Prime domain and strict divisibility idea
+### E01 — Prime value set and strict divisibility idea
 
 - Provenance: `BOOK:1619-1623`, main `The Sequence of Primes`.
 - Establishes: primes are integers with no nontrivial divisor and the construction begins from the natural-number sequence.
@@ -321,14 +321,18 @@ FiniteSieveConfiguration = {
 All candidate identities and order come from the labeled support. The lossless packed view is
 
 ```text
-pack(membership, stage_marker) =
-    (ordered_survivors = [n in support where membership[n]], stage_marker)
+pack(candidate_support, membership, stage_marker) =
+    (candidate_support,
+     ordered_survivors = [n in candidate_support where membership[n]],
+     stage_marker)
 
-unpack(ordered_survivors, stage_marker, support) =
-    (membership[n] = (n in ordered_survivors), stage_marker)
+unpack(candidate_support, ordered_survivors, stage_marker) =
+    (candidate_support,
+     membership[n] = (n in ordered_survivors),
+     stage_marker)
 ```
 
-On the invariant-valid image these maps are mutual inverses. The removed set is the support complement and need not be duplicated. First-removal witnesses live in the event trace. Two equal membership fields or survivor lists with different stage markers are different configurations. The immutable sieve program remains the `program` argument to the runner, not a duplicate field in configuration.
+On the invariant-valid image these maps are mutual inverses across configurations with any declared finite support: the packed form retains `candidate_support`, not merely the survivors. The removed set is the support complement and need not be duplicated. First-removal witnesses live in the event trace. Different supports, different membership fields/survivor lists, or different stage markers are different configurations. The immutable sieve program remains the `program` argument to the runner, not a duplicate field in configuration.
 
 For infinite support:
 
@@ -412,15 +416,15 @@ The reference transition has no intrinsic halt. Run protocols may return:
 - `ResourceExhausted`;
 - `BackendFailure`.
 
-For a finite upper bound `N`, certification is available when `next_divisor^2 > N`. It can be requested as a stop policy, but it does not erase later explicit rows. An infinite domain never returns globally complete; the theorem that primes are infinite is not an executor outcome.
+For a finite upper bound `N`, certification is available when `next_divisor^2 > N`. It can be requested as a stop policy, but it does not erase later explicit rows. Infinite support never returns globally complete; the theorem that primes are infinite is not a runner outcome.
 
 ### 8. Filter and stream semantics
 
 ```text
 MaterializedFiniteFilterResult = {
     spec,
-    accepted_in_domain_order,
-    rejected_in_domain_order
+    accepted_in_support_order,
+    rejected_in_support_order
 }
 
 FilteredIntegerStream = lazy increasing enumeration of a closed spec
@@ -432,12 +436,12 @@ Direct primality is a pure analyzer. Prime-pivot Eratosthenes is a named alterna
 
 ### 9. Measurement semantics
 
-Measurements are stateless mappings over an ordered input domain. Representation data must include:
+Measurements are stateless mappings over an ordered input set. Representation data must include:
 
 ```text
 RepresentationConvention = {
     arity,
-    component_domain,
+    component_value_set,
     ordered,
     allow_repeated_values,
     require_distinct_indices,

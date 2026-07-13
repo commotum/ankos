@@ -346,11 +346,15 @@ The tree step and token-word step must commute under encode/decode for every val
 ### Exact step and outcome semantics
 
 ```text
+tree_active = OutermostNonOverlappingPatternMatches(spec.program).select(old)
+reads       = StructuralBindings.read(old, tree_active)
+tree_writes = InstantiateTemplates.apply(tree_active, reads)
+
 encoded_old = TreeTokenCodec.encode(old)
-active      = OutermostNonOverlappingPatternMatches(spec.program).select(encoded_old)
-reads       = StructuralBindings.read(encoded_old, active)
-writes      = InstantiateTemplates.apply(active, reads)
-result      = OrderedMultiSpanUpdate.apply(encoded_old, active, writes)
+span_active, span_writes = TreeTokenCodec.lower_replacements(
+    old, encoded_old, tree_active, tree_writes
+)
+result = OrderedMultiSpanUpdate.apply(encoded_old, span_active, span_writes)
 return result.map_states(TreeTokenCodec.decode)
 ```
 
@@ -584,7 +588,7 @@ Completion requires:
 ## Completion Requirements
 
 - [x] All direct names, aliases, captions/figures, Notes, actual Index entries, splits, history, variants, observers, and cross-references are resolved with zero silent remainder.
-- [x] Expression topology, atom/variable domains, paths, patterns, bindings, traversal, rule priority, overlap, instantiation, commit, seed, successor, and fixed behavior are reconstructed.
+- [x] Expression topology, atom/variable sets, paths, patterns, bindings, traversal, rule priority, overlap, instantiation, commit, seed, successor, and fixed behavior are reconstructed.
 - [x] Exact trajectories, fixed-point timing convention, counts, invariant, disjoint/overlap/newborn, duplication/deletion, priority, identity/no-match, validation, codec, and provenance oracles are specified.
 - [x] Current API/runtime fit and T13/T16 reuse/divergence are explicit.
 - [x] Principle 0 and every no-cheating pressure are audited.
