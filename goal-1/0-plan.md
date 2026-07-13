@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20 complete, 8 of 45 type stages complete, T27 Geometric Replacement And Fractal Systems in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27 complete, 9 of 45 type stages complete, no type stage in progress, and Synthesis and Goal 2 Handoff pending.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -78,6 +78,10 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T20 selects greedily but commits every selected disjoint subtree from one old snapshot through new `ParallelPrefixFreeTreeReplace`. Bound subtrees may be duplicated, deleted, or rearranged with occurrence-level lineage; T13 concatenation and T16 single splice remain distinct.
 - T20 exact no-match semantics are event-free absorbing `Quiescent(NoPatternMatch)`; an applicable identity remains `Advanced(changed=false)`. Fixed-point stopping, normalization, cycle detection, confluence, and horizons are separate observers/protocols.
 - T20 has structured Catalan expression counts but no rule codec. Functional/tree/Polish/bracket representations, valuations, depths, and size plots are codecs or observers; combinators and deterministic operator evolution are native profiles, while networks and multiway equations remain T29/T30.
+- T27 state is a finite multiplicity-preserving bag of immutable prototype occurrences with complete local-to-world affine poses. Every old occurrence reads only itself and emits its total row of parent-local child templates through `P∘C`; `ParallelOccurrenceBagReplace` is a sixth atomic update sibling.
+- T27 overlap and coincidence are inert: parents do not read neighbors, no footprint is exclusive, and multiplicity/lineage survive. The page-190 orbit proves that two occurrences can share a center and the same square footprint while different 90-degree frames produce different descendants.
+- T27 exact page-189/page-190 rules use rational matrices/vectors. Algebraic and explicitly declared finite-precision profiles remain distinct; semantic equality never uses an epsilon. Center lists, polygons, rasters, unions, generation stacks, dimensions, limits, and parameter filters are downstream.
+- T27's Möbius and inverse-square-root variant uses a distinct closed extended-complex point-map profile while sharing all-occurrence bag expansion. T13 lineage composes, but its ordered concatenation does not; T28 owns gridded neighbor interaction and T29 owns non-geometric network topology.
 
 ## Assumptions To Challenge
 
@@ -346,7 +350,7 @@ All 73 exact-name occurrences on 60 lines and the conservative 272-occurrence/16
 
 ### 10-T27-GEOMETRIC
 
-Status: **IN PROGRESS** in `goal-1/10-T27-GEOMETRIC.md`.
+Status: **COMPLETE** in `goal-1/10-T27-GEOMETRIC.md`.
 
 #### Big Picture Objective
 
@@ -359,6 +363,12 @@ Apply the common protocol, emphasizing primitive geometry, scale, translation, r
 #### Completion Requirements
 
 All T27 evidence is captured; geometric semantics are not reduced to visualization metadata; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+The conservative core search dispositioned 46 occurrences on 37 lines and the expanded alias/observer audit dispositioned 129 on 88, leaving 18 canonical excerpt groups and zero unresolved native-mechanics candidates. All main figures, Notes, actual Index/splits, exact and approximate affine rules, overlap/orientation, complex/IFS variants, dimensions, history, limits, observers, and relations were resolved; the official figure source recovered image-only page-191(d) without fabricating exact coefficients.
+
+T27 reconstructs finite bags of fully posed prototype occurrences, exact or explicitly declared affine domains, parent-local `P∘C` composition, permutation-invariant all-occurrence sources, self-only reads, and multiplicity-preserving `ParallelOccurrenceBagReplace` as the sixth update sibling. Exact centers/counts, overlap, same-center/same-footprint/different-frame, composition order, equivariance, duplicate slots, permutation, newborn timing, validation, and provenance close the handoff. Center/raster/union/limit observers remain downstream, while nonlinear complex branches use a distinct closed point-map profile. T13 lineage composes but ordered concatenation does not; no prior stage was reopened. Next: T29.
 
 ### 11-T29-NETWORK
 
