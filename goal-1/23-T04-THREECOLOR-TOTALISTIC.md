@@ -35,7 +35,7 @@ Determine whether the emphasized three-color totalistic entry is exactly a stric
 
 ## Search Log
 
-Closed for the canonical source audit. `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; its actual Index begins at physical `BOOK:20826`. Counts are distinct physical lines, not raw matches. Twelve controlled queries produce 161 unique monolith lines (144 pre-Index, 17 actual-Index). Thirty-three inspected asset, prose, and split-signature continuations produce an exact 194-candidate closure.
+Closed for the canonical source audit. `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; its actual Index begins at physical `BOOK:20826`. Counts are distinct physical lines, not raw matches. Twelve controlled queries produce 162 unique monolith lines (145 pre-Index, 17 actual-Index). Fifty-three inspected asset, prose, and split-signature continuations produce an exact 215-candidate closure.
 
 | Q | Search family | Pre-Index | Actual Index |
 |---:|---|---:|---:|
@@ -45,7 +45,7 @@ Closed for the canonical source audit. `BOOK` means `ref/A-New-Kind-of-Science/A
 | 04 | preset arithmetic/coding tokens `7,625,597,484,987`, `2187`, `3^7`, `7 cases`, `base 3` | 14 | 0 |
 | 05 | exact `k=3,r=1` signatures within 80 characters | 12 | 0 |
 | 06 | stable-white, single-gray, percentage, horizon, and long-continuation phrases | 7 | 0 |
-| 07 | 83 strict/profile/class code numbers following literal `code` | 23 | 3 |
+| 07 | 87 strict/profile/class code numbers following literal `code` | 24 | 3 |
 | 08 | `TotalisticCARule`, `ToTotalisticCARule`, assignment, implementation, and framework tokens | 6 | 0 |
 | 09 | class/additivity/reversibility/irreducibility/universality/emulation property phrases | 7 | 0 |
 | 10 | explicit lower/higher-color and range controls | 27 | 0 |
@@ -69,7 +69,7 @@ scan=list(range(993,1141,3))
 gallery=[777,600,843,870,1086,1167,1329,1572,1815,1842,
          219,957,966,1884,237,420,948,1749,177,912,2040,
          1041,1635,2049,357,1599,2058]
-other=[294,1893,867,438,792,924,1038,1662,2007]
+other=[294,1893,867,438,792,924,1038,1380,1632,1659,1662,2007,2043]
 codes=sorted(set(scan+gallery+other),reverse=True)
 
 rows=[
@@ -88,7 +88,7 @@ rows=[
 (r'(?i)those that change the white background are not included|single gray cell|About 85% of all three-color|following pages continue these patterns for 3000 steps|edge between growth and extinction|after a total of 8282 steps|Nine thousand steps in the evolution of the three-color',
  '784,790,808,810,838,840,846','-'),
 (r'(?i)code(?: number)?\s+(?:'+'|'.join(map(str,codes))+r')(?![0-9])',
- '790,800,806,828,832,838,846,2826,2830,3320,3324,3348,3352,3356,3360,3364,3370,3374,3378,7912,11168,11918,14827',
+ '790,800,806,828,832,838,846,2826,2830,2838,3320,3324,3348,3352,3356,3360,3364,3370,3374,3378,7912,11168,11918,14827',
  '20980,21223,21471'),
 (r'TotalisticCARule|ToTotalisticCARule|specific assignment of values to colors|Implementation of totalistic cellular automata|totalistic rules in the same framework',
  '11897,11902,11904,11908,11912,11916','-'),
@@ -113,8 +113,10 @@ for q,(pat,pre_s,idx_s) in enumerate(rows,1):
 # Raster links and immediate continuations whose evidence is absent from,
 # or split across, the controlled text hit lines.
 follow={778,782,788,792,794,798,802,818,820,822,826,830,836,842,844,
-        3314,3316,3318,3322,3350,3362,3368,3372,3376,
-        11069,11071,11297,11914,13540,14829,14831,14833,18746}
+        2800,2804,2824,2828,2832,2834,2836,2844,2846,2848,2850,2866,
+        3314,3316,3318,3322,3328,3334,3342,3350,3362,3368,3372,3376,3380,
+        11069,11071,11297,11301,11303,11305,11307,11914,13540,
+        14829,14831,14833,18746}
 assets={
 778:'![](_page_75_Figure_6.jpeg)',782:'![](_page_76_Figure_2.jpeg)',
 792:'![](_page_77_Figure_6.jpeg)',794:'![](_page_78_Figure_2.jpeg)',
@@ -123,16 +125,27 @@ assets={
 822:'![](_page_81_Picture_3.jpeg)',826:'![](_page_82_Picture_1.jpeg)',
 830:'![](_page_83_Picture_1.jpeg)',836:'![](_page_84_Picture_2.jpeg)',
 844:'![](_page_85_Picture_2.jpeg)',
+2800:'![](_page_248_Figure_2.jpeg)',2804:'![](_page_249_Picture_1.jpeg)',
+2824:'![](_page_251_Picture_1.jpeg)',2828:'![](_page_252_Picture_2.jpeg)',
+2832:'![](_page_253_Picture_1.jpeg)',2836:'![](_page_254_Picture_1.jpeg)',
+2844:'![](_page_255_Picture_2.jpeg)',2846:'![](_page_255_Picture_3.jpeg)',
+2848:'![](_page_255_Picture_4.jpeg)',2850:'![](_page_255_Picture_5.jpeg)',
+2866:'![](_page_256_Figure_2.jpeg)',
 3314:'![](_page_297_Picture_2.jpeg)',3318:'![](_page_297_Picture_4.jpeg)',
 3322:'![](_page_297_Picture_6.jpeg)',3350:'![](_page_301_Picture_2.jpeg)',
 3362:'![](_page_302_Picture_3.jpeg)',3368:'![](_page_303_Picture_2.jpeg)',
 3376:'![](_page_304_Picture_2.jpeg)',11297:'![](_page_885_Picture_21.jpeg)',
+3328:'![](_page_298_Figure_2.jpeg)',3334:'![](_page_299_Picture_3.jpeg)',
+3342:'![](_page_300_Figure_1.jpeg)',3380:'![](_page_305_Picture_2.jpeg)',
+11301:'![](_page_885_Picture_23.jpeg)',11303:'![](_page_885_Picture_24.jpeg)',
+11305:'![](_page_885_Picture_25.jpeg)',11307:'![](_page_885_Picture_26.jpeg)',
 14829:'![](_page_980_Picture_15.jpeg)',14831:'![](_page_980_Picture_16.jpeg)',
 14833:'![](_page_980_Picture_17.jpeg)',18746:'![](_page_1132_Picture_2.jpeg)',
 }
 for n,want in assets.items(): assert L[n-1]==want,(n,L[n-1])
 assert L[787].startswith('Using more complicated rules may be convenient')
 assert L[841].startswith('<sup>◀</sup> Three thousand steps')
+assert L[2833]=='238' # page/footer contamination; official/raster code is 1659
 assert L[3315]=='2 colors, next-nearest neighbors, code 20'
 assert L[3371]=='initial condition number 54,889'
 assert r'\{0, 1, 0\}, \{1, 1, 1\}, \{0, 1, 0\}' in L[11068]
@@ -142,20 +155,20 @@ assert L[13539].startswith('Apply[Plus, 2 ^ Join')
 
 parts={
 'strict':'772,774,776,778,780,782,784,788,790,792,794,796,798,800,802,804,806,808,810,818,820,822,824,826,828,830,832,834,836,838,840,842,844,846',
-'preset_relation':'1282,2806,2822,2826,2830,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6340,7900,7912,8936,11168,11897,11918,14223,14224,14827,16024,18348,18748',
+'preset_relation':'1282,2804,2806,2822,2824,2826,2828,2830,2832,2836,2838,2844,2846,2848,2850,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6340,7900,7912,8936,11168,11897,11918,14223,14224,14827,16024,18348,18748',
 'parent':'8320,11037,11056,11060,11902,11904,11908,11910,11912,11914,11916',
-'adjacent_totalistic':'2802,2868,3314,3316,9166,11509,11585,11625,18672',
-'sibling_application':'1954,2170,2922,3902,3914,5082,5088,5638,6644,10261,11068,11069,11070,11071,11072,11178,11297,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431',
-'non_totalistic':'5218,5222,5482,5486,8534,8544,8546,8560,10395,10399,10411,11164,12055,15661,15972,18339,18476,18744,18746,18877',
-'false_control':'1419,1427,11050,11375,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,17139,17874,18850,20573,20577,20590,20592,20600',
+'adjacent_totalistic':'2800,2802,2866,2868,3314,3316,3328,3334,3342,9166,11509,11585,11625,18672',
+'sibling_application':'1954,2170,2922,3902,3914,5082,5088,5638,6644,10261,11068,11069,11070,11071,11072,11178,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431',
+'non_totalistic':'5218,5222,5482,5486,3380,8534,8544,8546,8560,10395,10399,10411,11164,12055,15661,15972,18339,18476,18744,18746,18877',
+'false_control':'1419,1427,2834,11050,11375,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,17139,17874,18850,20573,20577,20590,20592,20600',
 'index':'20846,20965,20967,20969,20972,20980,21134,21223,21233,21471,21683,21731,21933,22030,22146,22352,22392',
 }
 partition={k:xs(v) for k,v in parts.items()}
 queried=set().union(*sets); union=queried|follow
 flat=[i for v in partition.values() for i in v]
-assert len(rows)==12 and len(queried)==161 and len(union)==194
-assert len(flat)==len(set(flat))==194 and set(flat)==union
-assert [len(partition[k]) for k in partition]==[34,36,11,9,41,20,26,17]
+assert len(rows)==12 and len(queried)==162 and len(union)==215
+assert len(flat)==len(set(flat))==215 and set(flat)==union
+assert [len(partition[k]) for k in partition]==[34,46,11,14,45,21,27,17]
 
 # Exact split-corpus saturation for the two core lexical families.
 root=Path('ref/A-New-Kind-of-Science')
@@ -189,28 +202,28 @@ for mapping,pat in ((split_totalistic,r'(?i)totalistic'),
         assert got==xs(want),(rel,got,xs(want))
 assert sum(len(xs(v)) for v in split_totalistic.values())==84
 assert sum(len(xs(v)) for v in split_three.values())==47
-print('T04 source manifest: PASS 12 queries; 194 candidates; partition=34,36,11,9,41,20,26,17; splits=84/47')
+print('T04 source manifest: PASS 12 queries; 215 candidates; partition=34,46,11,14,45,21,27,17; splits=84/47')
 PY
 ```
 
 Expected terminal line:
 
 ```text
-T04 source manifest: PASS 12 queries; 194 candidates; partition=34,36,11,9,41,20,26,17; splits=84/47
+T04 source manifest: PASS 12 queries; 215 candidates; partition=34,46,11,14,45,21,27,17; splits=84/47
 ```
 
 ### Complete disjoint disposition
 
 - **Strict preset and gallery (34):** `772,774,776,778,780,782,784,788,790,792,794,796,798,800,802,804,806,808,810,818,820,822,824,826,828,830,832,834,836,838,840,842,844,846`. This is the complete Chapter 3 strict run: definition, code-777 rule figure, 50-rule page-76 scan, behavior galleries, captions, standalone continuation labels, seed/filter conventions, horizons, and the 1599 resolution. Asset links are candidates because most code labels exist only in their pixels.
-- **T04 preset profiles, properties, and relations (36):** `1282,2806,2822,2826,2830,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6340,7900,7912,8936,11168,11897,11918,14223,14224,14827,16024,18348,18748`. These close exact counts, class/borderline galleries, every linked code-357/1329 structure/growth raster, random backgrounds, the runnable code-867 example, additivity, irreducibility, emulation, reversibility, and universality. They are profile/run/property evidence over the same preset, not extra successor mechanics.
+- **T04 preset profiles, properties, and relations (46):** `1282,2804,2806,2822,2824,2826,2828,2830,2832,2836,2838,2844,2846,2848,2850,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6340,7900,7912,8936,11168,11897,11918,14223,14224,14827,16024,18348,18748`. These close exact counts, the complete linked three-color/class/borderline asset chain, every linked code-357/1329 structure/growth raster, random backgrounds, the runnable code-867 example, additivity, irreducibility, emulation, reversibility, and universality. They are profile/run/property evidence over the same preset, not extra successor mechanics.
 - **Parent T03 construction and alias reuse (11):** `8320,11037,11056,11060,11902,11904,11908,11910,11912,11914,11916`. These give the generic average alias, symbolic signatures, aggregate lookup, codec, and shared framework. T04 specializes them with data; it does not duplicate them.
-- **Adjacent lower/higher-color totalistic controls (9):** `2802,2868,3314,3316,9166,11509,11585,11625,18672`. These are binary range-two, four-color, and other neighboring totalistic profiles, including the directly adjacent code-20 comparison raster. They prove the T03/T05 boundary and do not enter the T04 preset.
-- **Sibling geometry or application (41):** `1954,2170,2922,3902,3914,5082,5088,5638,6644,10261,11068,11069,11070,11071,11072,11178,11297,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431`. These are continuous, two-dimensional, outer/growth/weighted, network, tiling, feature-extraction, additive-mod-3, Life-analogy, and other application constructions. They bound the preset without changing its one-dimensional equal-weight rule.
-- **Non-totalistic three-color controls (20):** `5218,5222,5482,5486,8534,8544,8546,8560,10395,10399,10411,11164,12055,15661,15972,18339,18476,18744,18746,18877`. These are unrestricted, reversible, block, Turing-machine, fracture, reaction-diffusion, tag-system, purpose-search, general-rule, or 3-color 2-neighbor examples. Matching “three colors” is not enough to make them T04.
-- **False/query controls (26):** `1419,1427,11050,11375,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,17139,17874,18850,20573,20577,20590,20592,20600`. These are unrelated base-3 arithmetic, mosaic history, or general/additive/reversible/search `k,r` contexts. They contain no T04 construction.
+- **Adjacent lower/higher-color totalistic controls (14):** `2800,2802,2866,2868,3314,3316,3328,3334,3342,9166,11509,11585,11625,18672`. These are binary range-two, four-color, and other neighboring totalistic profiles, including directly linked code-20 enumeration/structure rasters. They prove the T03/T05 boundary and do not enter the T04 preset.
+- **Sibling geometry or application (45):** `1954,2170,2922,3902,3914,5082,5088,5638,6644,10261,11068,11069,11070,11071,11072,11178,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431`. These are continuous, two-dimensional, outer/growth/weighted, network, tiling, feature-extraction, additive-mod-3, post-Pascal modulo-2 comparisons, Life-analogy, and other application constructions. They bound the preset without changing its one-dimensional equal-weight rule.
+- **Non-totalistic three-color controls (21):** `5218,5222,5482,5486,3380,8534,8544,8546,8560,10395,10399,10411,11164,12055,15661,15972,18339,18476,18744,18746,18877`. These are unrestricted, reversible, block, elementary-rule-110, Turing-machine, fracture, reaction-diffusion, tag-system, purpose-search, general-rule, or 3-color 2-neighbor examples. Matching “three colors” or asset adjacency is not enough to make them T04.
+- **False/query controls (27):** `1419,1427,2834,11050,11375,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,17139,17874,18850,20573,20577,20590,20592,20600`. These are unrelated base-3 arithmetic, mosaic history, general/additive/reversible/search `k,r` contexts, plus the page-number artifact `238` at `BOOK:2834`. They contain no T04 construction.
 - **Actual-Index routes (17):** `20846,20965,20967,20969,20972,20980,21134,21223,21233,21471,21683,21731,21933,22030,22146,22352,22392`. They route to already audited strict, Notes, property, sibling, or control material and add no mechanics.
 
-There is zero silent remainder: the eight sets are pairwise disjoint and their union is the exact 194-candidate manifest.
+There is zero silent remainder: the eight sets are pairwise disjoint and their union is the exact 215-candidate manifest.
 
 ### Strict gallery and asset closure
 
@@ -231,24 +244,45 @@ The strict asset sequence is complete and ordered by the 13 pinned monolith link
 
 The page-76 scan is a display sample, not the preset catalog: all 50 codes are divisible by 3, so their least-significant ternary digit (the sum-zero/white-background output) is zero. This exactly realizes the caption's stable-white selection, but it is only 50 of the 729 T04 codes with a stable zero background, not all 2187 rules and not even all stable-background rules. The later galleries reuse codes across behavior views; repeated labels are not new programs.
 
-The asset-scope rule is exact: include every local raster directly linked by a dispositioned T04 definition/gallery/property line or required to interpret its named relation; include the immediately adjacent comparator raster as an explicit control, but do not recursively absorb the comparator's unrelated downstream gallery. Applying that rule adds the following 12 pinned assets beyond the 13-image strict run:
+The asset-scope rule is exact: include every local raster directly linked by a dispositioned T04 definition/gallery/property line or required to interpret its named relation, then retain its immediately adjacent/downstream comparator rasters as explicit controls. Applying that rule adds the following 31 pinned assets beyond the 13-image strict run:
 
 | BOOK link | Asset | Geometry | SHA-256 | Disposition |
 |---:|---|---:|---|---|
+| `2800` | Chapter 6 `_page_248_Figure_2.jpeg` | `1086x1389` | `b2a20cb8095eb211fedd963d622222ca98fe0428f397b71bef90db8fa6871957` | adjacent binary range-two totalistic gallery control |
+| `2804` | Chapter 6 `_page_249_Picture_1.jpeg` | `1082x1403` | `f7b2834be41656cff9512b7affdd5fa57640bbbb6ecd93da1440202bf113f7ef` | T04 sequence, exactly codes `1002..1095` step 3 |
+| `2824` | Chapter 6 `_page_251_Picture_1.jpeg` | `1123x1383` | `41cfc762284fdcd65e5663fb7631aa4c504aea46a746a8a4ed24407b76b89196` | T04 class-4 code 1815 |
+| `2828` | Chapter 6 `_page_252_Picture_2.jpeg` | `1121x1377` | `120e95a57f683744ff3e71981f4fa07ff850d0cad5633bf4d2f27906a76e909f` | T04 class-4 code 2007 |
+| `2832` | Chapter 6 `_page_253_Picture_1.jpeg` | `1227x1519` | `148a433a11b4889c91c1a7be3c6f00172a3961428e6d41c47a06954136245faf` | T04 class-4 code 1659; repairs monolith `238` contamination |
+| `2836` | Chapter 6 `_page_254_Picture_1.jpeg` | `1117x1383` | `d32b7fc3dedc9f262e5a3d3d928d1d7d94d1a219fd75aeeefdb988c74869a168` | T04 class-4 code 2043 |
+| `2844` | Chapter 6 `_page_255_Picture_2.jpeg` | `273x171` | `b175f64e60cf41042d8ba6a11ed8d04eec4a8101bef8f9f231aae532eca6ca06` | T04 borderline code 219 |
+| `2846` | Chapter 6 `_page_255_Picture_3.jpeg` | `259x167` | `00ef0063254d4f75734cd76d8f2d07de4ae1d6b041b9664197c2da99641d8b14` | T04 borderline code 438 |
+| `2848` | Chapter 6 `_page_255_Picture_4.jpeg` | `267x186` | `700d71a0beb145c953ca87f4d8649aecd7b7d60df69ccd569cba02f6daeb1acc` | T04 borderline code 1380 |
+| `2850` | Chapter 6 `_page_255_Picture_5.jpeg` | `273x165` | `ae44e4411841a03fced5b5114f6cef4be62793c6a58c9a4ce6c357d214c7ce35` | T04 borderline code 1632 |
+| `2866` | Chapter 6 `_page_256_Figure_2.jpeg` | `1092x1367` | `1c4967f6967d8e813b2a281e2615dc8bef272eb57789b60e23c950de5e6bc01f` | adjacent four-color totalistic gallery control |
 | `3314` | Chapter 6 `_page_297_Picture_2.jpeg` | `1111x408` | `953c15d2e64464aceadb6181639cf36973db9513d6e0b7fc3fb43564efc65be8` | adjacent binary range-two code-20 control |
+| `3328` | Chapter 6 `_page_298_Figure_2.jpeg` | `1159x1297` | `7cacf2667a3f923d35106ec7eff09b9ce551d79dd828f8661458dd121bda09df` | downstream binary code-20 initial-condition enumeration control |
+| `3334` | Chapter 6 `_page_299_Picture_3.jpeg` | `1150x600` | `32d4ed4b16a083fb731c37cc80c64efb9995756808c316a0ced0dea0e9bd5475` | downstream binary code-20 structures control |
+| `3342` | Chapter 6 `_page_300_Figure_1.jpeg` | `1150x1192` | `ee5ea91d3855bf31bd793f02677c0c19d9203ac20532b3b7bb07df838065294c` | downstream binary code-20 exhaustive-period control |
 | `3318` | Chapter 6 `_page_297_Picture_4.jpeg` | `1127x415` | `26b299987a91daf8d15fc226c845c7efa7d55b9aa4221a4e6d41646b8c384204` | code-357 class-4 overview |
 | `3322` | Chapter 6 `_page_297_Picture_6.jpeg` | `1123x408` | `b94ac983e3496b023a1a991b15a701de9a1c4c5cba75a84b16254c497a1c76f1` | code-1329 class-4 overview |
 | `3350` | Chapter 6 `_page_301_Picture_2.jpeg` | `906x699` | `3e9aec2832697e07ea20391c1454e022bc8578fcfb4c126bbb53e6fdfe3f6eb3` | six code-357 structure examples with initial-condition/period labels |
 | `3362` | Chapter 6 `_page_302_Picture_3.jpeg` | `1036x712` | `4ec6db32d4f0b659a8519110b7885e05487e68d0348b390323daa55e7b322fd1` | nine code-1329 structure examples with initial-condition/period labels |
 | `3368` | Chapter 6 `_page_303_Picture_2.jpeg` | `616x1053` | `26ec2731176f7ef4b471b4f395f3968eefa69e0eba88a3f672268129d68e07aa` | code-1329 unbounded growth, initial condition 54,889 |
 | `3376` | Chapter 6 `_page_304_Picture_2.jpeg` | `1109x1363` | `21cc5432bcfcc379619d43c076f3102a3e12d64cd724d9fe5709055b72874ecf` | five code-1329 growth examples: initial conditions 54,889; 97,439; 166,426; 115,396; 2,069,116 |
+| `3380` | Chapter 6 `_page_305_Picture_2.jpeg` | `1184x1342` | `7e75ba3d0cb57a0b35d5a7b29e803386617e1ede22eefae19ce6e21fc465a9c9` | downstream elementary-rule-110 random-background control |
 | `11297` | Chapter 12 `_page_885_Picture_21.jpeg` | `583x225` | `5f829c7776b53963e578df5a783553320da171c4e1c4d92c470899ec5bb3e40d` | related additive `Mod[left+right,3]` Pascal pattern; not native code-420 execution |
+| `11301` | Chapter 12 `_page_885_Picture_23.jpeg` | `139x141` | `f14931f6bb008435e34961947dce7b11d5ec6d0bd4cc5b936bcee81b830adc0a` | post-Pascal modulo-2 integer-function control |
+| `11303` | Chapter 12 `_page_885_Picture_24.jpeg` | `135x138` | `5b302ed9d6c9cbee590270c7bdc169b62b554b0e186a94fdb3d1952a69c0f8c5` | post-Pascal modulo-2 integer-function control |
+| `11305` | Chapter 12 `_page_885_Picture_25.jpeg` | `138x145` | `f5eb9593ba90b4b240dc6990bb0e7204066cc48e81e82b96186029ff866d40da` | post-Pascal modulo-2 integer-function control |
+| `11307` | Chapter 12 `_page_885_Picture_26.jpeg` | `135x155` | `badba07cc053bdf7f4e5b41d7d90b2b248d8acd75b9728898e10c69a59c7ceec` | post-Pascal modulo-2 integer-function control |
 | `14829` | Notes `_page_980_Picture_15.jpeg` | `160x195` | `641317f32d429dd61b8353e1ebe65bd80f30950df78f0ebdc3a7f99b6bd26cd9` | 2D Life “spacefiller” view, relation-only analogy to code 1329 |
 | `14831` | Notes `_page_980_Picture_16.jpeg` | `172x187` | `90df3d1e1e99ed74dd1844654ff41b04b23f6fe22552cefa2b72f659cd0c5fda` | 2D Life “spacefiller” view, relation-only analogy to code 1329 |
 | `14833` | Notes `_page_980_Picture_17.jpeg` | `223x207` | `3ad70eb7f740edf7749700ff107f08306830f3e3fd617f2df3f9e7e559178e21` | 2D Life “spacefiller” view, relation-only analogy to code 1329 |
 | `18746` | Notes `_page_1132_Picture_2.jpeg` | `606x308` | `422ce8c21c465e2ffdffdb0f691f9521a21b9389897336dd4e4a2c716295c589` | unrestricted 3-color 2-neighbor rule 2144 control adjacent to universality Notes |
 
-The six code-357/1329 property rasters contain initial-condition and repetition annotations, not additional rule rows. The additive modulo-3 picture is explicitly a related generalization of rule 90, the three Life pictures are two-dimensional analogies, and rule 2144 has a two-cell rather than three-cell neighborhood; all remain outside native T04 execution.
+The Chapter 6 class chain contains pictured codes `1815,2007,1659,2043` and borderline codes `219,438,1380,1632`; Notes code `1662` is a distinct, unpictured class-4 example. The six code-357/1329 property rasters contain initial-condition and repetition annotations, not additional rule rows. The additive modulo-3 picture is explicitly a related generalization of rule 90, the three Life pictures are two-dimensional analogies, and rule 2144 has a two-cell rather than three-cell neighborhood; all remain outside native T04 execution.
+
+The controlled union deliberately retains all of those downstream links. `BOOK:3328,3334,3342` remain binary code-20 controls; `BOOK:3380` is identified by `BOOK:3382` as elementary rule 110, not code 1329; and `BOOK:11301,11303,11305,11307` are identified by `BOOK:11309` as other integer functions reduced modulo 2, not further views of the three-color additive rule. Their inclusion makes the asset continuation closure auditable without broadening T04.
 
 ### Actual-Index route closure
 
@@ -259,7 +293,7 @@ The six code-357/1329 property rasters contain initial-condition and repetition 
 | `20967` | cellular automata, three-color, page 60 | strict T04 at `BOOK:772-846` |
 | `20969` | totalistic; weighted totalistic, page 427 | strict parent; weighted sibling at `BOOK:5082,5088` |
 | `20972` | class 4 in 3-color totalistic CAs, page 948 | class/property Notes at `BOOK:14223-14224` |
-| `20980` | 20 named routes from codes 177 through 2058 | strict/profile examples already closed; code 867 routes to the runnable Notes example |
+| `20980` | 22 named routes from codes 177 through 2058, including code 1659 at page 238 | strict/profile examples already closed; code 867 routes to the runnable Notes example |
 | `21134` | encoding of three colors by two, pages 655, 1111 | emulation relation at `BOOK:7900,7912,18348` |
 | `21223` | glider gun in code 1329, page 288 | persistent-structure profile at `BOOK:3360-3378` |
 | `21233` | growth totalistic rules, page 928 | two-dimensional sibling |
@@ -352,7 +386,7 @@ All verbatim monolith material is in blockquotes so the oracle below can check e
 
 ### E6 — Class and borderline galleries
 
-- Provenance: `BOOK:2806,2822,2826,2830,2852`.
+- Provenance: `BOOK:2806,2822,2826,2830,2838,2852`.
 - Establishes: nearest-neighbor three-color gallery identity, random initial conditions and 1500-step class-4 view, named codes 1815/2007, and the observer-dependent nature of borderline class labels.
 
 > A sequence of totalistic cellular automata with rules that involve only nearest neighbors, but where each cell can have three possible colors.
@@ -362,6 +396,8 @@ All verbatim monolith material is in blockquotes so the oracle below can check e
 > code 1815
 
 > code 2007
+
+> code 2043
 
 > Rare examples of borderline cellular automata that do not fit squarely into any one of the four basic classes described in the text. Different definitions based on different specific properties will place these cellular automata into different classes. The rules shown are totalistic ones involving nearest neighbors and three possible colors for each cell. The first rule can be either class 2 or class 4, the second class 3 or 4, the third class 2 or 3 and the fourth class 1, 2 or 3.
 
@@ -514,6 +550,8 @@ All verbatim monolith material is in blockquotes so the oracle below can check e
 
 > Code 1599
 
+> Code 1659, class 4 behavior in, 238
+
 > of three colors by two, 655, 1111
 
 > Glider gun in code 1329, 288
@@ -567,6 +605,7 @@ All verbatim monolith material is in blockquotes so the oracle below can check e
 10. **Program/run/property/view boundary.** The single-gray seed, stable-white scan, random backgrounds, finite horizons, palette, symmetry observation, class labels, additive identity, reversible prohibition, universality candidates, and binary emulation are explicit controls or relations. None creates a three-color executor, a hidden seed, a stopping condition, or a second codec.
 11. **Split and Index routing.** The split wording has minor normalization differences, and image labels remain raster-bound. `BACK-MATTER/Index/Index.md` is Notes; the actual split Index begins at `BACK-MATTER/Colophon/Colophon.md:3383`. Canonical `BOOK` physical lines and official PDFs are the provenance authorities.
 12. **Later property and relation assets.** `BOOK:3314-3378` interleaves code-20, code-357, and code-1329 rasters with captions. The official Chapter 6 page 287 contains a paragraph dropped by the monolith extraction: at initial condition 54,889, the repeating right-hand structure moves while leaving persistent structures, so the whole structure grows forever. This restores explanatory profile text only. The official all-Notes PDF also corroborates the related additive modulo-3 raster at `BOOK:11297`, the three Life-spacefiller analogy rasters at `BOOK:14829-14833`, and the unrestricted rule-2144 control at `BOOK:18746`. Their exact local hashes/geometries are pinned above and below; none supplies T04 rule rows.
+13. **`BOOK:2834` page-number contamination.** The extracted lone `238` follows `_page_253_Picture_1.jpeg`; it is the printed page footer, not a rule code. The raster visibly labels `code 1659`, official Chapter 6 text extraction gives `code 1659` followed separately by page `238`, and actual Index `BOOK:20980` routes `Code 1659, class 4 behavior in, 238`. Notes code `1662` at `BOOK:14223` is a separate, unpictured example and must not be substituted for 1659.
 
 ### Citation, quote, source-repair, asset, and preset oracle
 
@@ -931,7 +970,7 @@ All paths are relative to `ref/A-New-Kind-of-Science/`.
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_255_Picture_2.jpeg` | 7,400 | `273x171` | `b175f64e60cf41042d8ba6a11ed8d04eec4a8101bef8f9f231aae532eca6ca06` | Borderline-class code `219`; classification is a property. |
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_255_Picture_3.jpeg` | 13,612 | `259x167` | `00ef0063254d4f75734cd76d8f2d07de4ae1d6b041b9664197c2da99641d8b14` | Borderline-class code `438`; same disposition. |
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_255_Picture_4.jpeg` | 9,310 | `267x186` | `700d71a0beb145c953ca87f4d8649aecd7b7d60df69ccd569cba02f6daeb1acc` | Borderline-class code `1380`; same disposition. |
-| `CHAPTERS/6-Starting-from-Randomness/Images/_page_255_Picture_5.jpeg` | 11,188 | `273x165` | `ae44e4411841a03fced5b5114f6cef4be62793c6a58c9a4ce6c357d214c7ce35` | Borderline-class code `1622`; same disposition. |
+| `CHAPTERS/6-Starting-from-Randomness/Images/_page_255_Picture_5.jpeg` | 11,188 | `273x165` | `ae44e4411841a03fced5b5114f6cef4be62793c6a58c9a4ce6c357d214c7ce35` | Borderline-class code `1632`; same disposition. |
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_297_Picture_4.jpeg` | 117,894 | `1127x415` | `26b299987a91daf8d15fc226c845c7efa7d55b9aa4221a4e6d41646b8c384204` | Code `357` from a completely random initial condition, exhibiting the persistent structures used to introduce the later search. Random sample and crop are not serialized. |
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_297_Picture_6.jpeg` | 156,786 | `1123x408` | `b94ac983e3496b023a1a991b15a701de9a1c4c5cba75a84b16254c497a1c76f1` | Code `1329` companion under the same random-run/class-4 disposition. |
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_301_Picture_2.jpeg` | 134,324 | `906x699` | `3e9aec2832697e07ea20391c1454e022bc8578fcfb4c126bbb53e6fdfe3f6eb3` | Code-`357` base-3 initial-condition search: labelled `(28,48)`, `(7,795,19)`, `(1,706,588,26)`, `(4,803,890,41R)`, `(154,596,664,12)`, `(514,454,827,48L)`; the first two billion were tested and no period below 5 exists. Labels are property fixtures, not six new programs. |
@@ -1096,11 +1135,38 @@ T04 metadata oracle: PASS 35 included; 28 excluded; 5 relation-only
 
 ### Exact T04 asset semantic oracle
 
-This dependency-free oracle re-establishes the T04 subset rather than importing T03's result. It checks the seven-row base-3 codec, code `777`, the exact code-`867` Notes invocation, every strict labelled code, the 50-picture scan, and the distinction between that scan and all 729 stable-zero-background T04 rules.
+This dependency-free oracle re-establishes the T04 subset rather than importing T03's result. It checks the seven-row base-3 codec, code `777`, the exact code-`867` Notes invocation, every strict labelled code, the 50-picture scan, the distinction between that scan and all 729 stable-zero-background T04 rules, code-`420` additivity, the later code-`357`/`1329` structure labels, and all 20 newly followed physical links. Initial-condition/period labels are pinned as property evidence; they are not trajectory goldens.
 
 ```bash
 python3 - <<'PY'
 from hashlib import sha256
+from itertools import product
+from pathlib import Path
+
+book=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md').read_text().splitlines()
+links={
+3314:'![](_page_297_Picture_2.jpeg)',
+3318:'![](_page_297_Picture_4.jpeg)',
+3322:'![](_page_297_Picture_6.jpeg)',
+3328:'![](_page_298_Figure_2.jpeg)',
+3334:'![](_page_299_Picture_3.jpeg)',
+3342:'![](_page_300_Figure_1.jpeg)',
+3350:'![](_page_301_Picture_2.jpeg)',
+3362:'![](_page_302_Picture_3.jpeg)',
+3368:'![](_page_303_Picture_2.jpeg)',
+3376:'![](_page_304_Picture_2.jpeg)',
+3380:'![](_page_305_Picture_2.jpeg)',
+11297:'![](_page_885_Picture_21.jpeg)',
+11301:'![](_page_885_Picture_23.jpeg)',
+11303:'![](_page_885_Picture_24.jpeg)',
+11305:'![](_page_885_Picture_25.jpeg)',
+11307:'![](_page_885_Picture_26.jpeg)',
+14829:'![](_page_980_Picture_15.jpeg)',
+14831:'![](_page_980_Picture_16.jpeg)',
+14833:'![](_page_980_Picture_17.jpeg)',
+18746:'![](_page_1132_Picture_2.jpeg)',
+}
+assert all(book[n-1]==want for n,want in links.items())
 
 def table(code):
     assert 0<=code<3**7; out=[]
@@ -1149,15 +1215,37 @@ all_quiescent=[code for code in range(3**7) if table(code)[0]==0]
 assert len(all_quiescent)==3**6==729
 assert len(strict['p76'])==50 and set(strict['p76'])<set(all_quiescent)
 assert tuple(range(1002,1096,3))==tuple(1002+3*i for i in range(32))
-for code in (1815,2007,238,2043,219,438,1380,1622,294,1893): table(code)
+for code in (1815,2007,1659,2043,219,438,1380,1632,294,1893): table(code)
 class4=(357,438,600,792,924,1038,1041,1086,1329,1572,1599,
-        1635,1662,1815,2007,2049)
+        1635,1659,1662,1815,2007,2049)
 assert all(0<=code<2187 for code in class4)
+
+# BOOK:11918 calls code 420 additive.  Its aggregate table is linear over Z/3.
+r420=table(420)
+assert r420==(0,2,1,0,2,1,0)
+for a in product(range(3),repeat=3):
+    for b in product(range(3),repeat=3):
+        ab=tuple((x+y)%3 for x,y in zip(a,b))
+        assert r420[sum(ab)]==(r420[sum(a)]+r420[sum(b)])%3
+
+# Visible base-3 initial-condition labels and their period/direction suffixes.
+structures357=((28,'48'),(7795,'19'),(1706588,'26'),
+               (4803890,'41R'),(154596664,'12'),(514454827,'48L'))
+structures1329=((1,'78'),(52,'7'),(400,'2'),(800,'12'),(916,'31R'),
+                (2617,'9'),(2669,'48R'),(97357,'2'),(659197,'9'))
+growth1329=(54889,97439,166426,115396,2069116)
+assert structures357[0]==(28,'48') and structures357[3]==(4803890,'41R')
+assert structures1329[4]==(916,'31R') and structures1329[6]==(2669,'48R')
+assert len(set(growth1329))==5 and growth1329[:2]==(54889,97439)
+assert all(table(code)[0]==0 for code in (357,1329))
 
 print('code777_table=',r777,'display=1001210')
 print('code777_t0_t8=',','.join(words))
 print('code867_51x101_sha256=',sha256(blob).hexdigest())
 print('page76_selection=',len(strict['p76']),'all_quiescent=',len(all_quiescent))
+print('chapter6_structure_labels=',len(structures357)+len(structures1329),
+      'growth_labels=',len(growth1329),'audited_links=',len(links))
+print('code420_additive_mod3= PASS; pictured_class4_code=1659; notes_only_code=1662')
 print('T04 asset semantic oracle: PASS')
 PY
 ```
@@ -1169,6 +1257,8 @@ code777_table= (0, 1, 2, 1, 0, 0, 1) display=1001210
 code777_t0_t8= 1,111,12121,1100011,122101221,11001210011,1221110111221,110001222100011,12210110101101221
 code867_51x101_sha256= 185170c0866f76d129fbf3a8843cc731f98b9f012cb98286f01e420532fb53d9
 page76_selection= 50 all_quiescent= 729
+chapter6_structure_labels= 15 growth_labels= 5 audited_links= 20
+code420_additive_mod3= PASS; pictured_class4_code=1659; notes_only_code=1662
 T04 asset semantic oracle: PASS
 ```
 
@@ -1234,7 +1324,7 @@ T04 code-777 raster oracle: PASS 0 mismatches
 
 The official primary [Chapter 3 PDF](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch3.pdf) confirms the strict T04 sequence on PDF pages 11–21 / printed pages 60–70 and the page-71 mobile boundary on PDF page 22. The official [all-notes PDF](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf) confirms the exact code-`867` invocation on PDF page 20 / printed page 868 and, on PDF page 97 / printed page 948, repairs the cropped chart labels to `k=2,r=1`, `k=2,r=2`, `k=2,r=3`, and `k=3,r=1`. Filename page numbers are extraction routing identifiers, not printed-page assertions.
 
-Picture 883/25 has exact executable settings and therefore receives a semantic trajectory digest. Its tiny ungridded JPEG does not state crop/resampling, so it is not forced into a pixel fit. The other galleries omit at least one of serialized seed/random sample, boundary/background, initial-state-versus-update horizon, crop, palette, or resampling; no additional trajectory or raster golden is fabricated.
+Picture 883/25 has exact executable settings and therefore receives a semantic trajectory digest. Its tiny ungridded JPEG does not state crop/resampling, so it is not forced into a pixel fit. Picture 253/1 is repaired to visible code `1659`: the Actual Index routes code 1659 to printed page 238, while monolith `BOOK:2834` contains only the contaminated page number `238`; Notes code `1662` remains a distinct unpictured property example. The numbered code-`357`/`1329` panels provide exact base-3 initial-condition and period labels, but omit at least spatial digit orientation/padding or displayed horizon/crop. The remaining galleries likewise omit at least one of serialized seed/random sample, boundary/background, initial-state-versus-update horizon, crop, palette, or resampling, so no additional trajectory or raster golden is fabricated.
 
 ## Detailed Implementation Plan
 
