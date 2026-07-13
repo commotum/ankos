@@ -54,7 +54,7 @@ Each type stage must make the following auditable:
 | T26 | 27 | Two-Dimensional Substitution Systems | 26 | `38-T26-2D-SUBSTITUTION.md` | PENDING | Not started |
 | T27 | 28 | Geometric Replacement And Fractal Systems | 27 | `10-T27-GEOMETRIC.md` | COMPLETE | Conservative core regex 46 occurrences/37 lines; expanded alias/observer search 129/88; 18 excerpt groups; all mechanics, original figures, Notes/actual Index/splits, exact and approximate affine rules, overlap/orientation, complex/IFS variants, dimensions, history, limits, observers, and relations dispositioned; 0 unresolved |
 | T28 | 29 | Neighbor-Dependent Two-Dimensional Substitution Systems | 28 | `39-T28-CONTEXTUAL-2D-SUBSTITUTION.md` | PENDING | Not started |
-| T29 | 30 | Network Systems | 29 | `11-T29-NETWORK.md` | PENDING | Not started |
+| T29 | 30 | Network Systems | 29 | `11-T29-NETWORK.md` | IN PROGRESS | Core topology/port/path/rerouting/creation/component mechanics, figures, Notes/Index/splits/history, rule encodings/counts, seeds, isomorphism, observers, variants, and relations under audit |
 | T30 | 31 | Multiway Systems | 30 | `12-T30-MULTIWAY.md` | PENDING | Not started |
 | T31 | 32 | Local Constraint Systems | 31 | `13-T31-CONSTRAINTS.md` | PENDING | Not started |
 | T32 | 33 | Template Constraint Systems | 32 | `40-T32-TEMPLATE-CONSTRAINTS.md` | PENDING | Not started |
@@ -77,7 +77,7 @@ Each type stage must make the following auditable:
 - Foundation: complete in `1-FOUNDATION.md`.
 - Type stages complete: 9 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 36 pending, 0 in progress.
+- Type stages unresolved: 35 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 

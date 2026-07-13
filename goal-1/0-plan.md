@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27 complete, 9 of 45 type stages complete, no type stage in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27 complete, 9 of 45 type stages complete, T29 Network Systems in progress, and Synthesis and Goal 2 Handoff pending.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -371,6 +371,8 @@ The conservative core search dispositioned 46 occurrences on 37 lines and the ex
 T27 reconstructs finite bags of fully posed prototype occurrences, exact or explicitly declared affine domains, parent-local `P∘C` composition, permutation-invariant all-occurrence sources, self-only reads, and multiplicity-preserving `ParallelOccurrenceBagReplace` as the sixth update sibling. Exact centers/counts, overlap, same-center/same-footprint/different-frame, composition order, equivariance, duplicate slots, permutation, newborn timing, validation, and provenance close the handoff. Center/raster/union/limit observers remain downstream, while nonlinear complex branches use a distinct closed point-map profile. T13 lineage composes but ordered concatenation does not; no prior stage was reopened. Next: T29.
 
 ### 11-T29-NETWORK
+
+Status: **IN PROGRESS** in `goal-1/11-T29-NETWORK.md`.
 
 #### Big Picture Objective
 
