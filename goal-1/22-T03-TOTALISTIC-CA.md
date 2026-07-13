@@ -37,7 +37,7 @@ Reconstruct totalistic cellular automata exhaustively from strict text, captions
 
 ## Search Log
 
-Closed for the canonical source audit. `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; its actual Index begins at physical `BOOK:20826`. Counts below are distinct physical lines, not raw matches. Sixteen controlled queries produce 114 lines; four inspected continuation lines (`11069,11071,11914,13540`) produce an exact 118-line closure.
+Closed for the reopened canonical source audit. `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; its actual Index begins at physical `BOOK:20826`. Counts below are distinct physical lines, not raw matches. Sixteen controlled T03 queries produce 114 lines. An explicit 149-line inspected follow-through then reconciles the complete T04 closure, generic binary-radius-two profiles, raster links, captions, Notes, and Index routes into an exact 263-line closure. The oracle separately proves that all 118 historical T03 candidates and all 239 final T04 candidates survive in the new union.
 
 | Q | Search family | Pre-Index | Actual Index |
 |---:|---|---:|---:|
@@ -64,7 +64,7 @@ The zero hits matter: neither `semi-totalistic` nor literal `3k-2` occurs, and c
 
 ```bash
 python3 - <<'PY'
-import re
+import ast, re
 from pathlib import Path
 
 P=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md')
@@ -108,29 +108,118 @@ for q,(pat,pre_s,idx_s) in enumerate(rows,1):
     assert idx==xs(idx_s),(q,idx,xs(idx_s))
     sets.append(set(found))
 
-# Immediate continuation lines whose hit line otherwise split a signature,
-# heading, or formula across physical OCR lines.
-follow={11069,11071,11914,13540}
+# Explicit inspected follow-through: continuations, raster links, named-code
+# profiles, captions, controls, and actual-Index routes not hit by the 16
+# T03 lexical queries above.
+follow={764,778,780,782,788,792,794,798,802,810,818,820,822,826,828,830,832,
+836,840,842,844,858,860,1280,1419,1958,2172,2800,2804,2824,2828,2830,
+2832,2834,2836,2838,2844,2846,2848,2850,2866,2920,3298,3300,3302,3304,
+3306,3308,3310,3312,3314,3316,3318,3320,3322,3324,3326,3328,3330,3332,
+3334,3336,3338,3340,3342,3344,3348,3350,3352,3356,3360,3362,3364,3368,
+3370,3372,3374,3376,3378,3380,5218,5222,5482,5486,6336,6338,6642,7900,
+7910,8306,8308,8534,8544,8546,8560,8934,9164,10395,10399,10411,11069,
+11071,11166,11170,11176,11182,11297,11301,11303,11305,11307,11375,11627,
+11629,11914,12055,13540,14226,14228,14230,14232,14760,14762,14764,14766,
+14827,14829,14831,14833,15661,15972,17139,17874,18339,18476,18744,18746,
+18850,18877,20846,20967,21134,21162,21223,21241,21471,21517,21683,21933}
+assert len(follow)==149
+
+assets={
+764:'![](_page_74_Picture_5.jpeg)',778:'![](_page_75_Figure_6.jpeg)',
+782:'![](_page_76_Figure_2.jpeg)',792:'![](_page_77_Figure_6.jpeg)',
+794:'![](_page_78_Figure_2.jpeg)',798:'![](_page_78_Figure_4.jpeg)',
+802:'![](_page_79_Picture_2.jpeg)',818:'![](_page_81_Picture_1.jpeg)',
+820:'![](_page_81_Picture_2.jpeg)',822:'![](_page_81_Picture_3.jpeg)',
+826:'![](_page_82_Picture_1.jpeg)',830:'![](_page_83_Picture_1.jpeg)',
+836:'![](_page_84_Picture_2.jpeg)',844:'![](_page_85_Picture_2.jpeg)',
+858:'![](_page_86_Picture_7.jpeg)',860:'![](_page_86_Picture_8.jpeg)',
+1280:'![](_page_122_Figure_2.jpeg)',1958:'![](_page_171_Picture_5.jpeg)',
+2172:'![](_page_185_Picture_9.jpeg)',2800:'![](_page_248_Figure_2.jpeg)',
+2804:'![](_page_249_Picture_1.jpeg)',2824:'![](_page_251_Picture_1.jpeg)',
+2828:'![](_page_252_Picture_2.jpeg)',2832:'![](_page_253_Picture_1.jpeg)',
+2836:'![](_page_254_Picture_1.jpeg)',2844:'![](_page_255_Picture_2.jpeg)',
+2846:'![](_page_255_Picture_3.jpeg)',2848:'![](_page_255_Picture_4.jpeg)',
+2850:'![](_page_255_Picture_5.jpeg)',2866:'![](_page_256_Figure_2.jpeg)',
+2920:'![](_page_261_Figure_2.jpeg)',3314:'![](_page_297_Picture_2.jpeg)',
+3318:'![](_page_297_Picture_4.jpeg)',3322:'![](_page_297_Picture_6.jpeg)',
+3328:'![](_page_298_Figure_2.jpeg)',3334:'![](_page_299_Picture_3.jpeg)',
+3342:'![](_page_300_Figure_1.jpeg)',3350:'![](_page_301_Picture_2.jpeg)',
+3362:'![](_page_302_Picture_3.jpeg)',3368:'![](_page_303_Picture_2.jpeg)',
+3376:'![](_page_304_Picture_2.jpeg)',3380:'![](_page_305_Picture_2.jpeg)',
+6336:'![](_page_541_Picture_3.jpeg)',6338:'![](_page_541_Picture_4.jpeg)',
+6642:'![](_page_566_Figure_2.jpeg)',7910:'![](_page_670_Figure_1.jpeg)',
+8306:'![](_page_707_Figure_1.jpeg)',8934:'![](_page_753_Picture_3.jpeg)',
+9164:'![](_page_769_Figure_1.jpeg)',11166:'![](_page_883_Picture_23.jpeg)',
+11170:'![](_page_883_Picture_25.jpeg)',11176:'![](_page_883_Picture_28.jpeg)',
+11182:'![](_page_883_Picture_31.jpeg)',11297:'![](_page_885_Picture_21.jpeg)',
+11301:'![](_page_885_Picture_23.jpeg)',11303:'![](_page_885_Picture_24.jpeg)',
+11305:'![](_page_885_Picture_25.jpeg)',11307:'![](_page_885_Picture_26.jpeg)',
+11627:'![](_page_897_Picture_19.jpeg)',11629:'![](_page_897_Picture_20.jpeg)',
+14226:'![](_page_963_Picture_8.jpeg)',14228:'![](_page_963_Picture_9.jpeg)',
+14230:'![](_page_963_Picture_10.jpeg)',14232:'![](_page_963_Picture_11.jpeg)',
+14762:'![](_page_979_Figure_4.jpeg)',14766:'![](_page_979_Picture_6.jpeg)',
+14829:'![](_page_980_Picture_15.jpeg)',14831:'![](_page_980_Picture_16.jpeg)',
+14833:'![](_page_980_Picture_17.jpeg)',18746:'![](_page_1132_Picture_2.jpeg)',
+}
+for n,want in assets.items(): assert L[n-1]==want,(n,L[n-1])
+assert len(assets)==70 and set(assets)<=follow
+
 assert r'\{0, 1, 0\}, \{1, 1, 1\}, \{0, 1, 0\}' in L[11068]
 assert r'\{0, k, 0\}, \{k, 1, k\}, \{0, k, 0\}' in L[11070]
 assert L[11913].startswith('■ Common framework.')
 assert L[13539].startswith('Apply[Plus, 2 ^ Join')
+assert L[3315]=='2 colors, next-nearest neighbors, code 20'
+assert L[14759].startswith('■ Page 283 · Survival data.')
 
 parts={
-'direct':'772,774,776,1282,2802,2806,2868,6340,8320,11037,11056,11060,11168,11509,11585,11625,11897,11902,11904,11908,11910,11912,11914,11916,14223,14224',
-'sibling':'1954,2170,2922,3902,3914,5082,5088,5638,6644,10261,11068,11069,11070,11071,11072,11178,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,14239,14241,15221,15301,15321,15359,15955,15959',
-'relation':'784,790,796,800,804,806,808,824,834,838,846,2822,2826,2852,7912,8936,9166,11918,13658,14632,16024,17431,18348,18672,18748',
-'false_control':'1427,11050,11164,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,18770,20573,20577,20590,20592,20600',
-'index':'20965,20969,20972,20980,21233,21731,22030,22146,22352,22392',
+'three_color':'772,774,776,778,780,782,784,788,790,792,794,796,798,800,802,804,806,808,810,818,820,822,824,826,828,830,832,834,836,838,840,842,844,846,1280,1282,2804,2806,2822,2824,2826,2828,2830,2832,2836,2838,2844,2846,2848,2850,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6336,6338,6340,7900,7912,8306,8934,8936,11168,11170,11897,11918,14223,14224,14232,14827,16024,18348,18748',
+'generic_parent':'8320,11037,11056,11060,11902,11904,11908,11910,11912,11914,11916',
+'other_totalistic':'2800,2802,2866,2868,3298,3300,3302,3304,3306,3308,3310,3312,3314,3316,3326,3328,3330,3332,3334,3336,3338,3340,3342,3344,8308,9164,9166,11509,11585,11625,11627,11629,14226,14228,14230,14760,14762,18672',
+'sibling_application':'1954,1958,2170,2172,2920,2922,3902,3914,5082,5088,5638,6642,6644,7910,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431',
+'controls':'764,858,860,1419,1427,2834,3380,5218,5222,5482,5486,8534,8544,8546,8560,10395,10399,10411,11050,11164,11166,11176,11375,11919,12055,14392,14394,14541,14673,14675,14764,14766,15493,15661,15972,16020,16025,16027,16049,16129,16157,16448,17139,17874,18339,18476,18744,18746,18770,18850,18877,20573,20577,20590,20592,20600',
+'index':'20846,20965,20967,20969,20972,20980,21134,21162,21223,21233,21241,21471,21517,21683,21731,21933,22030,22146,22352,22392',
 }
 partition={k:xs(v) for k,v in parts.items()}
 queried=set().union(*sets)
-assert len(queried)==114
-union=queried|follow
 flat=[i for v in partition.values() for i in v]
-assert len(rows)==16 and len(union)==118
-assert len(flat)==len(set(flat))==118 and set(flat)==union
-assert [len(partition[k]) for k in partition]==[26,34,25,23,10]
+union=queried|follow
+assert len(rows)==16 and len(queried)==114 and len(union)==263
+assert len(flat)==len(set(flat))==263 and set(flat)==union
+assert [len(partition[k]) for k in partition]==[87,11,38,51,56,20]
+
+# Standalone set derivation plus a cross-stage drift guard. T03 defines its
+# own explicit follow and partition data above; this reconciliation proves
+# why the reopened union is 263 without importing T04's executable state.
+t04_parts={
+'strict':'772,774,776,778,780,782,784,788,790,792,794,796,798,800,802,804,806,808,810,818,820,822,824,826,828,830,832,834,836,838,840,842,844,846',
+'preset_relation':'1280,1282,2804,2806,2822,2824,2826,2828,2830,2832,2836,2838,2844,2846,2848,2850,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6336,6338,6340,7900,7912,8306,8934,8936,11168,11170,11897,11918,14223,14224,14232,14827,16024,18348,18748',
+'parent':'8320,11037,11056,11060,11902,11904,11908,11910,11912,11914,11916',
+'adjacent_totalistic':'2800,2802,2866,2868,3314,3316,3328,3334,3342,9164,9166,11509,11585,11625,11627,11629,14226,14228,14230,18672',
+'sibling_application':'1954,1958,2170,2172,2920,2922,3902,3914,5082,5088,5638,6642,6644,7910,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431',
+'non_totalistic':'764,858,860,3380,5218,5222,5482,5486,8534,8544,8546,8560,10395,10399,10411,11164,11166,11176,12055,15661,15972,18339,18476,18744,18746,18877',
+'false_control':'1419,1427,2834,11050,11375,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,17139,17874,18850,20573,20577,20590,20592,20600',
+'index':'20846,20965,20967,20969,20972,20980,21134,21223,21233,21471,21683,21731,21933,22030,22146,22352,22392',
+}
+t04_union=set().union(*(set(xs(v)) for v in t04_parts.values()))
+new23={3298,3300,3302,3304,3306,3308,3310,3312,3326,3330,3332,3336,
+       3338,3340,3344,8308,14760,14762,14764,14766,21162,21241,21517}
+historical=queried|{11069,11071,11914,13540}
+assert len(t04_union)==239 and len(new23)==23 and len(historical)==118
+assert union==t04_union|new23|{18770} and historical<=union
+t04_text=Path('goal-1/23-T04-THREECOLOR-TOTALISTIC.md').read_text()
+t04_search=t04_text.split('## Search Log',1)[1].split('## Book Excerpts',1)[0]
+m=re.search(r'\nparts=\{\n(.*?)\n\}\npartition=',t04_search,re.S); assert m
+assert ast.literal_eval('{'+m.group(1)+'}')==t04_parts
+
+# Exact 70-link join to the independent T03 metadata oracle.
+stage=Path('goal-1/22-T03-TOTALISTIC-CA.md').read_text()
+asset_audit=re.split(r'^## Asset and Raster Audit\s*$',stage,flags=re.M)[1]
+items_src=asset_audit.split('\nitems={',1)[1].split('\n}\n\ndef jpeg_size',1)[0]
+ledger_paths=set(re.findall(r"'([^']+\.jpeg)':\(",items_src))
+manifest_names={re.fullmatch(r'!\[\]\(([^)]+)\)',v).group(1) for v in assets.values()}
+assert len(ledger_paths)==len(manifest_names)==70
+assert len({Path(p).name for p in ledger_paths})==70
+assert {Path(p).name for p in ledger_paths}==manifest_names
 
 root=Path('ref/A-New-Kind-of-Science')
 split={
@@ -151,14 +240,14 @@ for rel,want in split.items():
     got=[i for i,s in enumerate(lines,1) if re.search(r'(?i)totalistic',s)]
     assert got==xs(want),(rel,got,xs(want))
 assert sum(len(xs(v)) for v in split.values())==84
-print('T03 source manifest: PASS 16 queries; 118 candidates; partition=26,34,25,23,10; split=84')
+print('T03 source manifest: PASS 16 queries; 263 candidates; partition=87,11,38,51,56,20; assets=70; split=84; inherited=239/historical=118')
 PY
 ```
 
 Expected terminal line:
 
 ```text
-T03 source manifest: PASS 16 queries; 118 candidates; partition=26,34,25,23,10; split=84
+T03 source manifest: PASS 16 queries; 263 candidates; partition=87,11,38,51,56,20; assets=70; split=84; inherited=239/historical=118
 ```
 
 ### Complete disjoint disposition
@@ -416,6 +505,67 @@ All verbatim monolith material is placed in blockquotes so the oracle below can 
 
 > in totalistic cellular automata, 693
 
+### E19 — Complete binary radius-two code-20 profile route
+
+- Provenance: `BOOK:3298,3300,3302,3304,3306,3308,3310,3312,3326,3330,3332,3336,3338,3340,3344`.
+- Establishes: the code-20 profile includes its random class-4 overview, exhaustive sub-nine-cell starts, named persistent structures, 25-billion-start search, and systematic period-through-15 search. These are run/property records over the binary `k=2,r=2` table, not extra transition rows.
+
+> The next page shows three typical examples of class 4 cellular automata.
+
+> Most of these structures eventually die out, sometimes in rather complicated ways.
+
+> And taking the code 20 cellular automaton from the top of the next page, the page that follows shows what happens in this system with each of the first couple of hundred possible initial conditions.
+
+> But when we reach initial condition number 151 we finally see a structure that persists.
+
+> And indeed at initial condition 187 we see a considerably more complicated structure, that instead of staying still moves systematically to the right, repeating its basic form only every 9 steps.
+
+> The existence of structures that move is a fundamental feature of class 4 systems.
+
+> It turns out, however, that initial condition 189 suddenly yields a much simpler structure—that just stays unchanged in one position at every step.
+
+> But going on to initial condition 195, we again find a more complicated structure—this time one that repeats only every 22 steps.
+
+> Three typical examples of class 4 cellular automata. In each case various kinds of persistent structures are seen.
+
+> The behavior of the code 20 cellular automaton from the top of the facing page for all initial conditions with black cells in a region of size less than nine.
+
+> So just what set of structures does the code 20 cellular automaton ultimately support?
+
+> Persistent structures found by testing the first twenty-five billion possible initial conditions for the code 20 cellular automaton shown on the previous page.
+
+> The largest structure in the picture above starts from a block that is 30 cells wide.
+
+> The picture on the facing page shows the results of using this procedure for repetition periods up to 15.
+
+> All the persistent structures with repetition periods up to 15 steps in the code 20 cellular automaton.
+
+### E20 — Universality, excluded-block network, and survival properties
+
+- Provenance: `BOOK:8308,14632,14760`.
+- Establishes: class-4 universality is a conjectural/property context; the code-20 excluded-block network and survival counts are measured properties. The `t=2` range typo in the second excerpt is repaired against the official Notes below.
+
+> Examples of cellular automata with class 4 overall behavior, as discussed in Chapter 6. I strongly suspect that all class 4 rules, like rule 110, will turn out to be universal.
+
+> The k = 2, t = 2 totalistic rule with code 20 gives a network with 65535 nodes after just 1 step.
+
+> (The shortest excluded block for code 20 is of length 36.)
+
+> ■ Page 283 · Survival data. The number of steps for which the pattern produced by each of the first 1000 initial conditions in code 20 survive are indicated in the picture below. 72 of these initial conditions lead to persistent structures. Among the first million initial conditions, 60,171 lead to persistent structures and among the first billion initial conditions the number is 71,079,205.
+
+### E21 — Post-profile boundary and actual-Index code-20 routes
+
+- Provenance: `BOOK:14764,21162,21241,21517`.
+- Establishes: the page-979 rule-110 background begins a distinct non-totalistic boundary; the actual Index routes code 20 to excluded blocks, transients, and Jonathan Millen's historical profile without adding mechanics.
+
+> ■ **Page 290 · Background.** At every step the background pattern in rule 110 consists of repetitions of the block  $b = \{1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0\}$ , as shown in the picture below.
+
+> in code 20, 958
+
+> for code 20, 964
+
+> Millen, Jonathan K. (USA, 1942–) and code 20 CA, 877
+
 ## Source Repairs
 
 1. **Primary files and hashes.** Strict text/captions were checked against the official [`nks-ch3.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch3.pdf), SHA-256 `d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76`. Chapter 3 Notes page 886 was checked against official [`nks-nts-ch3.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-nts-ch3.pdf), SHA-256 `21666aa07f49e47483cdc9883e285b8cd47d397dd18eea0b72f05d4d3272a009`. Built-in examples were checked against official [`nks-notes.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf), SHA-256 `549f043595653a7d276b07ba52d435700039b71427b4e1774a44b1a58eff4723`. The truncated 2D caption was checked against official [`nks-ch7.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch7.pdf), SHA-256 `44d1eebd831f780da80bd8a383016aa9cec6aa7ff666fd33690f679c8479210f`.
@@ -429,6 +579,7 @@ All verbatim monolith material is placed in blockquotes so the oracle below can 
 9. **Strict figure/code 777.** The OCR text never says `777`; the pinned strict raster visibly shows high-to-low digits `1,0,0,1,2,1,0`. Reversing into sum order gives `0,1,2,1,0,0,1`, whose base-3 value is 777. This repairs a missing text label only; raster tone and geometry remain observer data.
 10. **Split wording and routing.** Chapter 3 split line 89 changes strict `can not only` to `can be not only`; the official PDF agrees with the monolith. `BACK-MATTER/Index/Index.md` is Notes, while the actual split Index is embedded in `BACK-MATTER/Colophon/Colophon.md` from line 3383. Canonical `BOOK` physical lines remain primary.
 11. **Boundary discipline.** White-background filtering and the single-gray seed are gallery controls; additive, reversible, universal, quiescent, weighted, outer, growth, continuous, 2D, network, application, and emulation evidence is explicitly relation/sibling material. None supplies a default row, seed, boundary, stopping condition, alternate reducer, or T03 executor branch.
+12. **`BOOK:14632` radius OCR.** The monolith says `k = 2, t = 2 totalistic rule with code 20`, but `t` is an extraction substitution. Official all-Notes page 958 says `k = 2, r = 2 totalistic rule with code 20`. The same official passage confirms a 65,535-node network after one step and shortest excluded block length 36. The repair identifies the already-audited binary radius-two profile; the network size and excluded-block length remain properties, not transition semantics.
 
 ### Citation, verbatim, source-repair, asset, and combinatoric oracle
 
@@ -475,7 +626,7 @@ for row in ex.splitlines():
         hits={n for n in current if q in L[n-1].strip()}
         assert hits,(sorted(current),q)
         quote_lines |= hits; quote_count += 1
-assert quote_count==65 and len(quote_lines)==63
+assert quote_count==88 and len(quote_lines)==85
 
 # Pin every monolith defect normalized above.
 assert L[3913].startswith('total is exactly 4, then it becomes black.')
@@ -484,6 +635,7 @@ assert '$ln[11]' in L[11167] and 'code 867' in L[11167]
 assert '$k^{1/2}k^{r+1}$' in L[11896]
 assert '$k^{1+(k-1)(2r+1)}$' in L[11896]
 assert r'$k \wedge Table[i-1, \{i, 2r+1\}]$' in L[11915]
+assert 'k = 2, t = 2 totalistic rule with code 20' in L[14631]
 
 official={
 '/tmp/nks-ch3.pdf':'d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76',
@@ -508,6 +660,8 @@ assert 'respectively k ^Table[i - 1, {i, 2 r + 1}] and Table[1, {2 r + 1}]' in n
 assert 'page 927.' in notes
 assert 'This runs the totalistic k=3 , r =1 rule with code 867.' in notes
 assert 'In[11] : = Show[RasterGraphics[CellularAutomaton[{867, {3, 1}, 1}, {{1}, 0}, 50]]]' in notes
+assert 'The k = 2 , r = 2 totalistic rule with code 20 gives a network with 65535 nodes after just 1 step.' in notes
+assert 'The shortest excluded block for code 20 is of length 36.' in notes
 assert 'Behavior of a two-dimensional cellular automaton starting from a random initial condition.' in ch7
 assert '9-cell neighborhood consisting of the cell itself and the 8 cells adjacent to it (including diagonals).' in ch7
 for fragment in ('If this total is less than 4','if the total is greater than 6',
@@ -527,14 +681,14 @@ for k,r in ((2,1),(2,2),(3,1),(5,1),(8,1)):
     assert reachable==set(range(M))
     assert k**M==k**(1+(k-1)*(2*r+1))
 assert 8**22==2**66
-print(f'T03 evidence oracle: PASS cited={len(cited)} quote_fragments={quote_count} quote_lines={len(quote_lines)} repairs=5 pdfs=4')
+print(f'T03 evidence oracle: PASS cited={len(cited)} quote_fragments={quote_count} quote_lines={len(quote_lines)} repairs=6 pdfs=4')
 PY
 ```
 
 Expected terminal line:
 
 ```text
-T03 evidence oracle: PASS cited=<dynamic> quote_fragments=65 quote_lines=63 repairs=5 pdfs=4
+T03 evidence oracle: PASS cited=<dynamic> quote_fragments=88 quote_lines=85 repairs=6 pdfs=4
 ```
 
 ## Construction Model
