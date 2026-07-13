@@ -4,7 +4,7 @@ Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T19 row and runner contract in `architecture-audit.md` supersede incompatible `SingleControl`/`TransitionControl` and register-executor claims below.
 
-The evidence/search closure and conformance fixtures remain valid. Register state is being re-derived as the transparent `FiniteRegisterBank × ProgramCounter` product on `t+0D`; `SingleControl`/`TransitionControl` are not required classes.
+The evidence/search closure and conformance fixtures remain valid. Register state has been re-derived as the transparent `FiniteRegisterBank × ProgramCounter` product on `t+0D`; `SingleControl`/`TransitionControl` are not required classes.
 
 ## Current Facts
 
@@ -28,7 +28,7 @@ The evidence/search closure and conformance fixtures remain valid. Register stat
 - `Natural` is an exact infinite value carrier. It cannot be implemented as a large finite alphabet, NumPy `int64`, float, modular value, saturating counter, unary tape, or fixed-capacity field.
 - Source selection and reads are program-coupled in the same substantive sense as T16 match selection: the active instruction determines its operand-access plan. One immutable validated program owns instruction identity, register references, and jump targets; there is no duplicate selector configuration or instruction callback.
 - Base instruction evaluation is a closed tagged algebra. Adding a whole-machine function, `Any` payload, formula rule, opcode-family rollout, or host exception branch would erase the construction rather than generalize it.
-- `AtomicEffectsUpdate` can commit typed effects aimed at different state components. T19 reuses it for register assignment plus control transition after validating both against the same snapshot.
+- The shared old-snapshot finite-write UPDATE can commit typed writes aimed at different components of the transparent configuration product. T19's closed instruction RULE validates register and program-marker writes against one source snapshot; no named effects/control UPDATE is required.
 - `Quiescent(PastProgramEnd)` is neither an executed identity instruction nor necessarily a zero-successor terminal. The exact reference sampler may repeat it indefinitely; a `ProgramExitStop` policy may instead emit one retained terminal state and stop.
 - A successful instruction always changes state: increment changes a register, a positive decrement changes a register even when it jumps to the same address, and a zero branch advances the counter. State equality can therefore distinguish a reference stutter here, but trace semantics must still use the typed event/outcome rather than infer meaning from equality.
 - The finite enumeration profile and the general executable profile must remain distinct structured validators. The former restricts jump targets to `1..n`; the latter permits a positive target beyond `n` as an explicit exit. Neither permits zero/negative program counters or register references.
@@ -271,7 +271,7 @@ ZeroFallthrough(
 )
 ```
 
-The result records its branch explicitly; zero need not fabricate a write from zero to zero. The ordinary finite-write UPDATE validates program identity, snapshot ownership, expected counter, expected old operand, register key/value-schema membership, write uniqueness, and next counter, then commits all component writes together. Any stale source, overflow/coercion, negative result, missing write, extra write, contradictory target, or partial failure is an error with no state mutation.
+The result records its branch explicitly; zero need not fabricate a write from zero to zero. FRONTIER/NEIGHBORHOOD validation establishes program identity, snapshot ownership, the marked instruction, and exact old operands. Each closed instruction RULE-result constructor validates its branch, register keys/value schemas, nonnegative arithmetic, required write set, and next program marker. The ordinary finite-write UPDATE then checks only generic write obligations—same snapshot, typed targets, expected old target values, uniqueness/nonconflict—and commits all component writes together. A stale source, overflow/coercion, negative result, malformed branch result, contradictory target, or partial failure is an error with no state mutation.
 
 This is direct reuse of the same old-snapshot finite-write construction as T09/T12. A write targets a typed component of the transparent product; atomic update never requires all components to share a lattice or a runtime class. T19 adds register/address schemas and closed instruction RULE members, not another execution algebra.
 
@@ -283,14 +283,11 @@ For an executable counter:
 old = state
 source = ActiveInstruction.select(old.program_counter, program)
 read = InstructionOperandRead(old.bank, source.access_plan)
-result = ExecuteInstruction(source.instruction, read)
-step_result = UPDATE.apply(old, (source,), result.writes)
-return step_result.with_event(
-    RegisterInstructionEvent(old, source, read, result, step_result.successors)
-)
+writes = ExecuteInstruction(source.instruction, read)
+return UPDATE.apply(old, (source,), writes)
 ```
 
-The counter in snapshot `t` identifies the instruction executed between snapshots `t` and `t+1`. The event preserves `pc_before`, instruction identity, operand key/value(s), branch, typed writes, `pc_after`, and full before/after bank values. An increment and its fallthrough are one event. A decrement and its conditional jump are one event. New values cannot influence the branch that produced them.
+`ExecuteInstruction` returns a typed finite-write batch plus an `InstructionWitness` containing the instruction identity, operands, and branch. Generic UPDATE commits the writes and carries that witness uninterpreted into its uniform event envelope, adding the generic before/after state references. The counter in snapshot `t` identifies the instruction executed between snapshots `t` and `t+1`. The resulting event therefore preserves `pc_before`, instruction identity, operand key/value(s), branch, typed writes, `pc_after`, and full before/after bank values. An increment and its fallthrough are one event. A decrement and its conditional jump are one event. New values cannot influence the branch that produced them.
 
 ### Program end, quiescence, and halting
 

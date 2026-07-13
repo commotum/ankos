@@ -179,7 +179,7 @@ The classification number in this matrix refers to the four categories above. A 
 | D075 | Analyzers/modular/Ulam relations | 2 | Explicit observers/presets/compositions | No hidden global search or alternate trace | Keep |
 | D076 | Stateful sieve versus pure filters/measurements | 2 | SimpleProgram for sieve; generic pure-query category for others | The classification is the explicit category split; no fake transition state for pure definitions | Keep split without proliferating top-level classes |
 | D077 | Consecutive divisor stages and cursor | 3 | Visible marker/tag/product factor plus stage FRONTIER | Cursor round-trips; composite zero-removal stage still fires | Keep; no separate control class |
-| D078 | Remove subset and advance cursor | 3 | Generic old-snapshot finite writes over `BooleanMembership × StageMarker`, with an intensional marker-only representation for infinite support | Finite field/survivor pack-unpack is bijective and commutes one step; exact witnesses retained; infinite membership derived from support/program/marker; no resurrection | Rewrite/reclose as representation reuse; retire `MonotoneFilterUpdate` and tenth-law framing |
+| D078 | Remove subset and advance cursor | 3 | Generic old-snapshot finite writes over `CandidateSupport × BooleanMembership × StageMarker`, with a support-plus-marker intensional representation for infinite support | `CandidateSupport × BooleanMembership × StageMarker` and `CandidateSupport × OrderedSurvivors × StageMarker` pack/unpack bijectively and commute one step; exact witnesses retained; infinite membership derived from support/program/marker; no resurrection | Rewrite/reclose as representation reuse; retire `MonotoneFilterUpdate` and tenth-law framing |
 | D079 | Figure scope/certification/completion | 2 | Tagged seed/support/query/run profiles | Figure keeps 1; math preset starts 2; certification not native halt | Keep; rename candidate DOMAIN to set/support |
 | D080 | Measurement conventions | 2 | Generic pure measurement/query records | Tuple/sign/zero/repetition conventions explicit | Keep |
 | D081 | Ulam first-accepted selection plus append | 2 | Named selection/access/RULE composition feeding T37's unique-`End` RULE and T16 exactly-one splice | Complete prefix read; distinct unordered indices; accepted witness explicit | Keep as a preset/composition; no endpoint UPDATE or numbered ninth law |
@@ -228,7 +228,7 @@ The classification number in this matrix refers to the four categories above. A 
 
 ### Concrete Counterexample Gate
 
-The class-4 labels and each UPDATE/result-axis extension that is not an explicit lossless representation or restriction of the ordered-replacement/finite-write bases are justified by behavior that the smaller candidate cannot express faithfully. T20 and T37 are omitted from this table because D039 and D072 now give concrete one-step commuting tagged-word lowerings rather than new UPDATE implementations.
+The class-4 labels and each UPDATE/result-axis extension that is not an explicit lossless representation or restriction of the ordered-replacement/finite-write bases are justified by behavior that the smaller candidate cannot express faithfully. T20, T37, and T39 are omitted from this table because D039, D072, and D078 now give concrete one-step commuting representation lowerings rather than new UPDATE implementations.
 
 | Candidate reuse | Concrete counterexample | Smallest justified response |
 |---|---|---|

@@ -4,7 +4,7 @@ Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T05 row and runner contract in `architecture-audit.md` supersede incompatible Goal 2 architecture below; evidence and fixtures remain authoritative.
 
-The evidence/search closure and conformance fixtures remain valid. The Goal 2 handoff is being reduced to a strict preset over the generic fixed-lattice local-rule construction.
+The evidence/search closure and conformance fixtures remain valid. The Goal 2 handoff has been reduced to a strict preset over the generic fixed-lattice local-rule construction.
 
 ## Current Facts
 

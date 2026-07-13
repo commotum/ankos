@@ -159,7 +159,7 @@ The 20 direct-union Index lines route as follows: algebraic/linear recurrence an
 ### E17 — Ulam is a global-history append relation
 
 - Provenance: `BOOK:12840-12844`, final material under the broad Recursive Sequences Notes heading.
-- Fact: starting from `(1,2)`, Ulam appends the smallest integer with a unique representation as a sum of two distinct previous terms. It is genuinely append-only, but its rule searches candidates and queries an unbounded set of prior pairs rather than fixed term offsets. It is deferred as a T37-append/T39-filter composition candidate; it does not widen the strict recurrence read to an arbitrary callback.
+- Fact: starting from `(1,2)`, Ulam appends the smallest integer with a unique representation as a sum of two distinct previous terms. It is genuinely append-only, but its rule searches candidates and queries an unbounded set of prior pairs rather than fixed term offsets. This stage deferred it as a T37/T39 composition; T39 now resolves that composition with closed first-accepted selection feeding T37's unique-`End` RULE and T16 splice. It does not widen the strict recurrence read to an arbitrary callback.
 
 ### E18 — Finite generalized-Fibonacci generators are explicit variants
 
@@ -398,7 +398,7 @@ Logistic notation can be interpreted as a prefix recurrence or an iterated scala
 
 Ackermann and primitive/general recursive functions concern nested multiargument function evaluation and computability. They do not widen `FixedLagArithmeticExpr` into a universal evaluator.
 
-Ulam is a genuine growing sequence but computes the next term by searching candidates against all pairs in the complete prefix. Its read is neither a fixed lag nor a value-computed single index. It is recorded as a future composition question: reuse T37's prefix/append law with whatever constructive filtering/global-history read T39 evidence establishes. T37 does not hide that search in a formula node, and T39 must reopen this boundary if its evidence does not compose.
+Ulam is a genuine growing sequence but computes the next term by searching candidates against all pairs in the complete prefix. Its read is neither a fixed lag nor a value-computed single index. T39 resolves it as `FirstAcceptedAscendingCandidate` with `UniqueUnorderedDistinctPriorPairSum` over the complete prefix, followed by T37's `End(n) -> Val(n,next) · End(n+1)` RULE and T16 exactly-one splice. The global search remains outside `FixedLagArithmeticExpr`; no callback, endpoint UPDATE, or hidden pair-sum state is introduced.
 
 Characteristic equations, generating functions, matrix powers, memoization, shift-register realizations, closed forms, and fast Fibonacci algorithms are analyzers, evaluator strategies, or compilers. Sonification, plots, ratios, periods, prime divisibility, and time-series fitting are observers or external models.
 
@@ -415,7 +415,7 @@ Characteristic equations, generating functions, matrix powers, memoization, shif
 | T35 piecewise integer maps | exact scalar arithmetic | predicate-selected arms over one scalar, not fixed-lag prefix reads |
 | T36 digit-reversal arithmetic | exact integer terms and digit observers | representation base/digit transformation feeds back into one scalar update |
 | T38 variable-index recursion | exact prefix, append result/update, term references | dependency addresses are computed from term values and can be invalid at runtime |
-| T39 numeric filtering | ordered candidate streams and possible Ulam composition | native filtering/sieving policy must be evidenced; it is not a fixed-lag recurrence |
+| T39 numeric filtering | ordered candidate selection and the resolved Ulam composition | Ulam uses T39 closed first-accepted/pair-sum access, then T37's unique-`End` RULE and T16 splice; it is not a fixed-lag recurrence |
 | T40 constant digits | indexed exact output stream | digit-production/approximation semantics, not recurrence state by default |
 | T41 function combination | formulas and numeric samples | function/curve is native object; samples are observations |
 | T43 iterated maps | logistic can produce the same newest values | one scalar is iterated; prefix history is a trace, not native map state |

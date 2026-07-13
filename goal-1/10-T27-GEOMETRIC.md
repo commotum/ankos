@@ -281,13 +281,13 @@ The result cannot contain an arbitrary world-coordinate callback or pre-rendered
 
 ### Multiplicity-preserving bag UPDATE
 
-`ParallelOccurrenceBagReplace` commits one full generation:
+Before UPDATE, the geometric NEIGHBORHOOD/RULE-result constructors validate exact source/read values, the authoritative total row, unique declared child slots, and value-schema/dimension/prototype compatibility; they also compute each typed child as `parent_pose∘local_pose`.
 
-1. Validate one result for every and only old occurrence token, all against the same snapshot.
-2. Validate exact source/read values, the authoritative total row, unique declared child slots, and value-schema/dimension/prototype compatibility.
-3. Consume every parent.
-4. Create one child occurrence per slot using `parent_pose∘local_pose`.
-5. Bag-union every child, preserving multiplicity and emitting parent/slot lineage.
+`ParallelOccurrenceBagReplace` then commits one full generation:
+
+1. Validate one typed result for every and only old occurrence token, all against the same snapshot and bag-container schema.
+2. Consume every parent.
+3. Bag-union every already validated child, preserving multiplicity and emitting parent/slot lineage.
 
 There are no write conflicts because objects do not occupy exclusive cells. The update never intersects shapes, deduplicates poses, unions footprints, retains parents, rejects overlap, uses painter order, or fires newborns.
 
@@ -304,19 +304,14 @@ The old-snapshot all-parent orchestration and lineage kernel may be shared with 
 ### Exact generation and outcomes
 
 ```text
-step(spec, old_nonempty_bag):
-    sources = AllGeometricOccurrences(old)
-    reads = GeometricSelfRead(old, sources)
-    results = total_local_row_lookup_and_compose(spec.program, reads)
-    next, event = ParallelOccurrenceBagReplace(old, results)
-    return StepResult(
-        successors={next},
-        outcome=Advanced(changed=(next != old)),
-        event=event,
-    )
+active = AllGeometricOccurrences.select(old)
+reads = GeometricSelfRead.read(old, active)
+writes = GeometricChildRule(spec.program).apply(active, reads)
+result = ParallelOccurrenceBagReplace.apply(old, active, writes)
+return result
 ```
 
-Every strict canonical event has one deterministic successor. With at least two children per row, a nonempty state remains nonempty and cardinality grows, so no no-match, exhaustion, boundary, or intrinsic halt exists. A one-child identity row in the broader affine profile is still an applicable event even if the bag is equal.
+The bag UPDATE returns the uniform singleton `StepResult` and carries the typed parent/slot witness data without interpreting the geometric rule. Every strict canonical event has one deterministic successor. With at least two children per row, a nonempty state remains nonempty and cardinality grows, so no no-match, exhaustion, boundary, or intrinsic halt exists. A one-child identity row in the broader affine profile is still an applicable event even if the bag is equal.
 
 Episode depth, cancellation, resource exhaustion, invalid program/value schema, arithmetic failure, and rendering cutoff are explicit non-semantic outcomes. The closed point profile below totalizes poles and algebraic branch points over the Riemann sphere; a profile that instead chooses typed definition-set errors must declare that different contract rather than emit host NaNs. Convergence to a limiting set is never emitted as a final infinite state.
 

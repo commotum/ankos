@@ -4,7 +4,7 @@ Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T16 row and runner contract in `architecture-audit.md` supersede any separate-executor/top-level-class framing below.
 
-The evidence/search closure and conformance fixtures remain valid. Rule-major/leftmost selection and exactly-one-span replacement are being recast as FRONTIER and UPDATE restrictions inside the shared runner.
+The evidence/search closure and conformance fixtures remain valid. Rule-major/leftmost selection and exactly-one-span replacement have been recast as FRONTIER and UPDATE restrictions inside the shared runner.
 
 ## Current Facts
 

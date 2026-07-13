@@ -332,7 +332,7 @@ unpack(candidate_support, ordered_survivors, stage_marker) =
      stage_marker)
 ```
 
-On the invariant-valid image these maps are mutual inverses across configurations with any declared finite support: the packed form retains `candidate_support`, not merely the survivors. The removed set is the support complement and need not be duplicated. First-removal witnesses live in the event trace. Different supports, different membership fields/survivor lists, or different stage markers are different configurations. The immutable sieve program remains the `program` argument to the runner, not a duplicate field in configuration.
+On the invariant-valid image these maps are mutual inverses across configurations with any declared finite support: the packed form retains `candidate_support`, not merely the survivors. The removed set is the relative complement `candidate_support \ ordered_survivors` and need not be duplicated. First-removal witnesses live in the event trace. Different supports, different membership fields/survivor lists, or different stage markers are different configurations. The immutable sieve program remains the `program` argument to the runner, not a duplicate field in configuration.
 
 For infinite support:
 
@@ -384,7 +384,7 @@ marker_write = Write(StageMarker, d + 1)
 event = SieveStageWitness(d, hits_d, newly_removed_d)
 ```
 
-The generic old-snapshot finite-write UPDATE validates coverage, membership, predicate witnesses, no resurrection, one stage increment, and write uniqueness, then atomically applies `candidate_writes union {marker_write}`. A zero-removal stage still has the marker write and therefore advances.
+The closed sieve NEIGHBORHOOD/RULE-result validator establishes full proper-multiple witness coverage, partitions hits from newly removed candidates, forbids resurrection, and requires the marker write `d -> d+1`. The generic old-snapshot finite-write UPDATE then checks only snapshot ownership, typed targets, expected old target values, and write uniqueness/nonconflict before atomically applying `candidate_writes union {marker_write}`. A zero-removal stage still has the marker write and therefore advances.
 
 For infinite support, `hits_d` and `newly_removed_d` are closed structural descriptors rather than impossible materialized lists. Membership after the event is derived from the updated stage marker, so RULE emits only the marker write plus the exact structural witness. No infinite array write is fabricated.
 

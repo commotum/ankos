@@ -4,7 +4,7 @@ Status: **REOPENED — ASSET REPAIR; ARCHITECTURE AUDIT COMPLETE**
 
 Architecture authority: the T04 row and runner contract in `architecture-audit.md` supersede incompatible Goal 2 architecture below; the bounded asset repair remains independently open.
 
-In addition to the bounded asset repair, the Goal 2 handoff is being reduced to a strict preset over the generic fixed-lattice local-rule construction.
+Alongside the independently bounded asset repair, the Goal 2 handoff has been reduced to a strict preset over the generic fixed-lattice local-rule construction.
 
 ## Current Facts
 

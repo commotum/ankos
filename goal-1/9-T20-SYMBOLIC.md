@@ -324,12 +324,15 @@ Repeated references may share immutable storage privately, but equality, matchin
 
 Choose a canonical balanced/prefix token codec whose well-formed image has an explicit inverse and in which every subtree occupies one contiguous token span. For example, encode an atom as `Atom(symbol)` and an application as `OpenApply(arity) · Head · encode(head) · Arg(0) · encode(arg_0) · ... · Arg(arity-1) · encode(arg_(arity-1)) · CloseApply`. The arity, head tag, ordered argument tags, and balanced delimiters make decoding total on the validated image and preserve expression-valued heads and every child role. A prefix-free set of tree paths maps exactly to a set of disjoint token spans.
 
+Before UPDATE, the tree FRONTIER/NEIGHBORHOOD/RULE and `TreeTokenCodec.lower_replacements` validate that every match names the old tree, paths resolve to the recorded subtrees, paths are unique and prefix-incomparable, one template result exists per match, atoms/templates are valid, and each tree path/result maps to the exact old token span/replacement block. These are tree/profile obligations, not generic splice behavior.
+
 The generic ordered multi-span replacement UPDATE then commits one old-snapshot replacement set over the encoded word:
 
-1. Validate that every result names the same old state and a path resolving to the recorded matched subtree.
-2. Validate one result per selected source, pairwise prefix-incomparable paths, unique paths, valid template trees, and declared atoms.
-3. Replace the disjoint old token spans in source order, preserve every unselected token, validate the resulting word, and decode it back to the native tree view.
-4. Emit one atomic event containing the ordered match/result list and structural provenance.
+1. Validate one replacement block per selected old span, common snapshot ownership, in-bounds pairwise-disjoint spans, source ordering, and token value-schema membership.
+2. Replace those spans in source order and preserve every unselected token exactly.
+3. Return the encoded successor and generic span-write event atomically, carrying—but not interpreting—the structural witness record supplied by the typed lowering.
+
+The representation adapter validates that the encoded successor is in `TreeTokenCodec`'s well-formed image, decodes it to the native tree view, and lifts the `StepResult`. Valid closed tree writes guarantee this postcondition; failure denotes invalid data/internal error, never a partial mutation.
 
 Replacing one subtree by one subtree preserves sibling-role indices outside the selected occurrences, but it may change arbitrary depth and leaf count. There is no conflict merge because prefix-free coverage is a precondition, not a last-writer policy.
 
