@@ -79,7 +79,9 @@ EXPECTED_EXACT_MIRROR_COUNT = 442
 EXPECTED_EXACT_MIRROR_DIGEST = (
     "b85d35a696969b27e517923985d35c4dbfe73eb0213bae774e48d8d81b8a0961"
 )
-SPLIT_VARIANTS = frozenset(map(int, """
+# Operationally this is only the retained non-exact complement under the
+# complete-line comparison below; no cause or normalized mapping is inferred.
+SPLIT_NONEXACT_COMPLEMENT = frozenset(map(int, """
 450 460 472 550 566 1886 1898 1920 1924 1928 1938 1940 2066 2978 3140
 3156 3158 7708 7828 7936 8266 8350 8356 8372 8378 8380 8386 8396 8400
 8412 8416 8420 8430 8460 8532 8534 8544 8550 8554 12055 12115 12313
@@ -168,14 +170,14 @@ def main() -> int:
         for line in path.read_text(encoding="utf-8").splitlines()
     }
     exact_mirror = {n for n in RETAINED if physical_lines[n - 1] in split_lines}
-    split_variants = set(RETAINED) - exact_mirror
+    split_nonexact = set(RETAINED) - exact_mirror
     split_ok = (
         len(split_paths) == EXPECTED_SPLIT_FILE_COUNT
         and len(exact_mirror) == EXPECTED_EXACT_MIRROR_COUNT
         and digest(exact_mirror) == EXPECTED_EXACT_MIRROR_DIGEST
-        and split_variants == SPLIT_VARIANTS
-        and exact_mirror | split_variants == RETAINED
-        and not exact_mirror & split_variants
+        and split_nonexact == SPLIT_NONEXACT_COMPLEMENT
+        and exact_mirror | split_nonexact == RETAINED
+        and not exact_mirror & split_nonexact
     )
     ok &= split_ok
     print(
