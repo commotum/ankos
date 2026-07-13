@@ -35,7 +35,142 @@ Reconstruct arithmetic iteration as a native scalar transition construction. Pin
 
 ## Book Excerpts
 
-Canonical excerpt groups are under audit.
+`BOOK` below means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. These groups separate native mechanics from observers, exact quotients, compilers, and neighboring constructions.
+
+### E01 — Numbers and digit representations are distinct
+
+- Provenance: `BOOK:1390-1437`, Chapter 4 opening.
+- Fact: a number is treated abstractly by size but represented in a computer by digits in a base. Operations change those digit sequences, and different bases expose different patterns. This motivates digits as views; it does not make the digit cells the native state.
+
+### E02 — Fixed addition from seed one
+
+- Provenance: `BOOK:1439-1451`, printed page 117; `_page_132_Figure_10.jpeg`.
+- Fact: start at `1`, repeatedly add `1`, and include the initial value in the displayed succession. The exact scalar values are simple while their right-aligned base-2 rows form a nested pattern. The raster lists `1..63`.
+
+### E03 — Addition constants one through eight
+
+- Provenance: `BOOK:1453-1457`, printed page 118; `_page_133_Picture_2.jpeg`.
+- Fact: all eight panels start at `1` and use `n -> n+c` for visible labels `c=1..8`. Independent pixel/digit extraction finds 84 rows, `t=0..83`; terminal values are `84,167,250,333,416,499,582,665`. Their different fine structure shares the stated nested organization.
+
+### E04 — Multiplication by two and three
+
+- Provenance: `BOOK:1459-1469`, printed page 119; `_page_134_Figure_2.jpeg`, `_page_134_Figure_3.jpeg`.
+- Fact: both 64-row panels start at one. Multiplication by two shifts a base-2 row left and appends zero; multiplication by three produces the exact rows for `3^t` and a visually complex pattern. Shift behavior is a representation fact, not a different update.
+
+### E05 — Five hundred complete powers of three with a cropped view
+
+- Provenance: `BOOK:1471-1483`, printed page 120; `_page_135_Figure_2.jpeg`.
+- Fact: the native row is the complete base-2 expansion of `3^t` for the first 500 powers. The page crops the expanding left side; the underlying integer does not truncate. Width grows with average slope `log_2(3)`.
+
+### E06 — Exact rational multiplication
+
+- Provenance: `BOOK:1475-1489`, printed page 121; `_page_136_Figure_2.jpeg`.
+- Fact: starting at one and repeatedly multiplying by exact `3/2` yields `1,3/2,9/4,27/8,...`. The 256-row base-2 view aligns the radix point: integer digits lie to its left and fractional digits to its right. Division by two shifts places right, but the scalar update remains multiplication by `3/2`.
+
+### E07 — Fractional part is a base-independent observer
+
+- Provenance: `BOOK:1491-1495`, printed page 122; `_page_137_Figure_1.jpeg`.
+- Fact: the plotted dots are the fractional parts of successive powers of `3/2`. The source explicitly says the samples are independent of representation base and that connecting lines/shading are visual aids only.
+
+### E08 — T35 begins at the first branch
+
+- Provenance: `BOOK:1497-1503`, printed page 122.
+- Fact: the next example tests parity and chooses different formulas. Its state is still one integer, but predicate-controlled branching is construction-defining and belongs to T35. The shared section heading does not erase this semantic boundary.
+
+### E09 — Substitution relation and digit-count observer
+
+- Provenance: `BOOK:12538-12548`, Notes to page 117.
+- Fact: the add-one digit picture is a rotated substitution-system pattern. The black-cell count on row `n` is `DigitCount[n,2,1]`, with stated bounds and formulas. Both are derived descriptions of the digit view, not extra arithmetic state.
+
+### E10 — Alternative numeral systems
+
+- Provenance: `BOOK:12550-12557`.
+- Fact: negative bases, non-power positional weights, and multiplicative prime-factor digit sequences provide other representations. Non-power representations may be nonunique. These require explicit view codecs and cannot silently redefine state equality.
+
+### E11 — Exact powers-of-three row formula and statistics
+
+- Provenance: `BOOK:12559-12563`.
+- Fact: row `n` is exactly `IntegerDigits[3^n,2]`. The fraction of ones appears to approach one half, and suffix columns repeat with a period growing exponentially in the retained width. Apparent randomness/frequency claims are observers, while the row formula is an exact oracle.
+
+### E12 — Finite suffix quotient
+
+- Provenance: `BOOK:12563-12565`.
+- Fact: the rightmost `s` columns are `3^n mod 2^s`, a linear congruential generator with geometric regularities. This justifies an explicit finite quotient/observer relation and forbids hidden truncation of the native power trace.
+
+### E13 — Special local CA lowering for powers of three
+
+- Provenance: `BOOK:12567` and `BOOK:7382-7406`.
+- Fact: in base six, multiplying by three admits a six-color local CA rule. The general later discussion gives the digit formula `Mod[Quotient[m^t,k^n],k]`, says only special base/multiplier pairs eliminate arbitrarily propagating carries, and supplies other examples. Locality is conditional on the representation pair.
+
+### E14 — Leading digits
+
+- Provenance: `BOOK:12569`.
+- Fact: leading digits of powers follow a logarithmic rather than uniform distribution. This is a scalar-trace statistic and never selects a successor.
+
+### E15 — Exact fractional formula and qualified uniformity
+
+- Provenance: `BOOK:12570`.
+- Fact: the page-122 sample is exactly `Mod[(3/2)^n,1]`. Uniform distribution is reported as suggested by measurements and still unproved, so it cannot be a required finite-run invariant.
+
+### E16 — Base-six CA relation for `3/2`
+
+- Provenance: `BOOK:12572-12578`.
+- Fact: the Notes give an invertible base-six CA formula for `(3/2)^n` and discuss special multipliers `u`. This is an exact representation/compiler relation with a separate CA initial field, not evidence that the arithmetic state contains a digit lattice.
+
+### E17 — General real powers
+
+- Provenance: `BOOK:12580`.
+- Fact: the fractional parts of `h^n` are discussed for general real `h`, including exceptional Pisot numbers. This supports a domain-polymorphic arithmetic construction only when exact/approximate real semantics are declared; statistical theorems do not supply a finite real codec.
+
+### E18 — Irrational additive orbits and substitution codings
+
+- Provenance: `BOOK:12581-12595`.
+- Fact: `Mod[h*n,1]` repeats for rational `h` and is nonrepeating/uniform for irrational `h`. Difference codings can be generated by substitution schedules derived from continued fractions, with fixed substitutions for quadratic irrationals. These are fractional/difference observers and T42 relations over the underlying addition trace.
+
+### E19 — Other uniform sequences are relations, not T34 presets
+
+- Provenance: `BOOK:12597`.
+- Fact: `sqrt(n)`, `n log n`, `log(Fibonacci[n])`, and other sequences can also be uniformly distributed modulo one. They are not obtained by the strict fixed-add/fixed-multiply program merely because they share an observer statistic.
+
+### E20 — Notes boundary to piecewise integer maps
+
+- Provenance: `BOOK:12598-12640`.
+- Fact: the Notes implementation from `12598` onward uses `If[EvenQ[...]]`, discusses 3n+1 variants, cycles, reconstruction, and reversible branches. Those are T35 evidence. None supplies a halt/cycle condition or branch to T34.
+
+### E21 — Linear congruential random-number relation
+
+- Provenance: `BOOK:3718-3752`, Chapter 7.
+- Fact: repeated multiplication followed by retention of the rightmost 31 base-2 digits creates finite repeating generators and visible higher-dimensional regularities. The truncation/modulus is precisely why the generator differs from unbounded multiplication.
+
+### E22 — Direct power evaluation and computational reducibility
+
+- Provenance: `BOOK:7408-7424` and `BOOK:9058-9080`.
+- Fact: a digit at time `t` has a direct power formula, and exponentiation by squaring computes a requested power using the bits of `t`. A later powers-of-two example contrasts random-access work with explicit row-by-row evolution. These support a separate exact query evaluator, not altered event semantics.
+
+### E23 — CA emulation with explicit carry machinery
+
+- Provenance: `BOOK:7968-7980`.
+- Fact: a cellular automaton with 11 colors emulates repeated multiplication by three in base two; its complication propagates carries. Emulation requires added representation state and does not collapse T34 into T01.
+
+### E24 — Arithmetic over digit sequences is generally nonlocal
+
+- Provenance: `BOOK:8828-8842`.
+- Fact: carries in addition can propagate arbitrarily far, and general functions can make almost every input digit affect almost every output digit. This directly rules out assuming a finite digit neighborhood from scalar arithmetic syntax.
+
+### E25 — Historical/exactness context
+
+- Provenance: `BOOK:12532-12536`.
+- Fact: practical computations require explicit finite representations while continuum approximations can break down in complex behavior. The Notes trace digit-system history and distinguish whole, rational, and continuous numbers. Numeric representation/precision must therefore be explicit in an implementation.
+
+### E26 — Actual Index routes
+
+- Provenance: actual monolith Index beginning near `BOOK:20826`.
+- Fact: direct routes include `3, powers of` to pages 119/903; `3/2, powers of` to 121/903; `Addition ... in digit sequences` to 118; `Arithmetic ... processes of` to 117; `Arithmetic ... non-locality of` to 124/731; `Base 6, powers of 3 in` to 614/903; `Binary counter ... pattern made by` to 117; `Uniform distribution ... of powers` and `... of multiplicative sequences` to 903; and `Linear congruential generators` routes to the Chapter 7/Notes material. Every route resolves to a group above or a separately dispositioned relation.
+
+### E27 — Source repairs and figure authority
+
+- Provenance: clean split `CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:1-115`; local original rasters for extracted pages 132-137.
+- Fact: the canonical monolith's base-representation table is OCR-damaged, while the clean split repairs formulas and image paths. The rasters recover panel labels, row counts, radix alignment, and crop facts absent from prose. Canonical claims retain `BOOK` provenance; the split and raster are explicit repairs/independent guards.
 
 ## Construction Model
 
@@ -105,6 +240,8 @@ Validation is structural and occurs before execution:
 
 Program identity is the tagged domain plus the normalized operation constant. A run identity additionally includes the normalized initial value. Event horizon and all observer settings are execution/view requests, not mathematical program identity.
 
+Identity is structural and domain-tagged. `ExactInteger(1)` and `ExactRational(1/1)` may be related by an explicit cross-domain numeric-equivalence observer, but they are not the same typed state. Likewise, `AddConstant(0)` and `MultiplyConstant(1)` remain distinct programs even though both induce identity transitions.
+
 ### Event semantics and outcomes
 
 One event is evaluated against one immutable old scalar:
@@ -121,7 +258,7 @@ x_(t+1) = proposal.value
 
 Every valid strict exact event has exactly one successor. An identity event—`AddConstant(0)`, `MultiplyConstant(1)`, or multiplication of zero—still returns `Advanced(changed=false)` and records an event. There is no native halt, fixed-point stop, cycle stop, digit-width cap, target magnitude, or convergence threshold. Those are observers or run policies.
 
-The mathematical transition remains total even when a concrete evaluator runs out of memory or time. `ResourceLimit`, cancellation, invalid input, and backend error are operational outcomes outside the successor algebra and must retain the last complete exact state. A finite horizon returns `HorizonReached` after exactly the requested number of events; it does not relabel the last value as terminal.
+The mathematical transition remains total even when a concrete evaluator runs out of memory or time. `ResourceExhausted`, `Cancelled`, invalid input, and `BackendFailure` are operational outcomes outside the successor algebra and must retain the last complete exact state. A completed finite request returns `RequestedIterationsCompleted` after exactly the requested number of events; it does not relabel the last value as terminal.
 
 ### Trace and time indexing
 
@@ -146,10 +283,10 @@ Fast exponentiation may answer a random-access query without replaying `t` event
 ### Equality and serialization
 
 - State equality is exact numeric equality within the declared scalar domain.
-- Exact integers serialize as signed decimal integers; exact rationals serialize as normalized numerator/positive-denominator pairs.
+- Exact integers serialize in JSON as signed decimal **strings**, never lossy JSON number literals; exact rationals serialize as tagged normalized numerator/positive-denominator decimal-string pairs.
 - Program tags and constants serialize as closed data; host function names, source code, pickles, and lambdas are forbidden.
 - Exact and finite-precision values never compare equal across domain tags merely because a displayed decimal agrees.
-- A whole trace compares its exact state sequence and events. A rendering, crop, base, color palette, padding choice, or plotted curve is not part of trace equality.
+- Trace identity includes program/run provenance, exact states, exact events, and the typed run outcome. State-sequence equality is a separate observer and may hold for structurally different programs such as the identity operations. A rendering, crop, base, color palette, padding choice, or plotted curve is not part of either comparison.
 - Cycles and fixed points are detected on exact normalized state values. Rounded-display equality cannot establish recurrence.
 
 ### Digit and numeric observers
@@ -158,7 +295,7 @@ The figures make observers important, but no observer feeds back into the recurr
 
 `IntegerDigitRow(base)` requires `base >= 2` and returns the most-significant-to-least-significant digits of a nonnegative exact integer. The sign, if permitted by an extended view, is separate metadata. Leading blank cells used for alignment are not zero digits and are not state.
 
-`RationalDigitWindow(base, integer_places, fractional_places, repeat_policy)` renders a declared finite window around an explicit radix point. A rational has a terminating base-`b` expansion only when the reduced denominator divides some power of `b`; otherwise the exact expansion repeats indefinitely and the observer must either report a repeating cycle or use an explicit finite crop. It may never invent a finite exact row by truncation.
+`RationalDigitWindow(base, integer_places, fractional_places, repeat_policy)` renders a declared finite window around an explicit semantic radix position. A raster may visually omit the radix mark, as page 121 does, but metadata cannot. A rational has a terminating base-`b` expansion only when the reduced denominator divides some power of `b`; otherwise the exact expansion repeats indefinitely and the observer must either report a repeating cycle or use an explicit finite crop. It may never invent a finite exact row by truncation.
 
 Digit arrays declare:
 
@@ -172,7 +309,7 @@ Digit arrays declare:
 
 `FractionalPart(x) = x - floor(x)` is an exact scalar observer in `[0,1)` and is independent of display base. `DigitLength(base)`, population count, rightmost-`s` residue, numeric value, logarithmic size, leading digit, and digit-frequency statistics are other observers. Line segments and gray fill in a plot are decoration; the sampled points alone are values.
 
-Reducing after each event modulo `b^s` creates a finite quotient system/linear congruential generator. It exactly reproduces the rightmost `s` digits of an integer multiplication trace, but the quotient state is a different program and cannot replace the unbounded T34 scalar. Likewise, a digit-level cellular automaton can be an exact compiler target for special multiplier/base pairs, not native T34 state.
+Reducing after each event modulo `b^s` creates the explicit sibling `MultiplyMod(multiplier, modulus=b^s)` over a finite `ResidueRing`. It exactly reproduces the rightmost `s` digits of an integer multiplication trace, but the quotient state/program is different and cannot replace the unbounded T34 scalar. It is also not the current second-order modular AR2 family. Likewise, a digit-level cellular automaton can be an exact compiler target for special multiplier/base pairs, not native T34 state.
 
 ## Exact Book Presets and Oracles
 
@@ -283,22 +420,107 @@ Changing the digit-rendering base must not change these rational samples. The so
 8. Values beyond `2^63` remain exact; a fixed-width NumPy overflow is a test failure.
 9. Rational normalization makes `3/2`, `6/4`, and `-3/-2` the same constant and trace.
 10. An approximate context cannot compare equal to or silently replace the exact `3/2` preset.
+11. `(2^k-1)+1 = 2^k` for large `k`, forcing an arbitrarily long carry without changing scalar event semantics.
+12. Exact `1/3` in base two renders with repetend `01`, not as a finite exact digit row.
+13. `MultiplyConstant(-1)` has an observed two-cycle for a nonzero seed but never stops natively.
 
 ## Variants, Relations, and Boundaries
 
-T35 branching integer maps, digit systems, iterated maps, continuous systems, substitution systems, and cellular automata are under audit as relations rather than assumed flags.
+### Native profiles and principled closure
+
+- Fixed addition and fixed multiplication over exact integers/rationals are the strict evidenced core.
+- Seed `1`, addends `1..8`, multipliers `2`, `3`, and `3/2`, and base-2 observations are canonical presets, not hard-coded executor branches.
+- Other exact seeds/constants, including zero and negative values, are a principled closure of the same total operations when the declared domain is closed under them.
+- Certified exact-real and declared finite-precision real domains are separate scalar profiles. They share the unary event shape only when their arithmetic/equality contracts are explicit.
+- Fractional part, digit length/count/frequency, leading digits, residues, and numeric/log-size plots are observers.
+- Negative bases, non-power positional systems, and multiplicative digit decompositions are alternative representation schemes. They do not change an addition or multiplication program.
+
+### Quotients, direct formulas, and compilations
+
+`x -> c*x mod b^s` is a finite modular quotient of integer multiplication. It reproduces a declared suffix of the digit observation and is useful as a linear congruential generator, but it discards higher digits and has cycles absent from unbounded `c^t`. Modulus and truncation therefore cannot be hidden performance options on T34.
+
+The formulas `x_0+t*c` and `x_0*c^t` and exponentiation by squaring provide random-access evaluators. They are observationally equivalent at requested times; they do not redefine one recurrence event as a variable number of squarings.
+
+For certain multiplier/base pairs, digit rows lower exactly to a local cellular automaton—for example multiplier three in base six. Other cases require carry propagation, and multiplication by three in base two can be emulated using a larger-state CA. These are compilers/emulations with explicit state/trace mappings, not proof that T34 is a finite-alphabet lattice program.
+
+The nested add-one digit picture is related to a substitution pattern, and some irrational additive-orbit codings can be generated by continued-fraction-driven substitutions. Equality of a derived digit pattern does not identify the scalar recurrence with T13 or T42.
+
+### Catalog boundaries
+
+| Related type/construction | Shared part | Required separation |
+|---|---|---|
+| T01 elementary CA | deterministic events and typed assignment | fixed spatial lattice, finite alphabet, local neighbor read, simultaneous many-site commit |
+| T13 substitution | some digit pictures have substitution descriptions | symbol sequence is rewritten/grown; scalar arithmetic and carries are not the substitution state |
+| T19 register machine | arbitrary-precision integer carrier and typed slot assignment | multiple named registers plus program counter and branching instructions |
+| T27 geometry | exact rational/algebraic/declared-precision scalar infrastructure | T34 has one numeric state, not occurrence bags/poses |
+| T35 piecewise integer maps | same scalar carrier/source/effect shell | predicates and ordered arithmetic branches are rule-visible and begin at `BOOK:1497-1503` |
+| T36 digit-reversal arithmetic | same integer carrier and digit codecs | base and digit transformation feed back into the next state |
+| T37 recursive sequences | numeric values and fixed-lag formulas can reproduce powers | native state is a growing prefix/history and update appends a term |
+| T38 variable-index recursion | numeric sequence values | data-dependent earlier-term addressing requires a growing prefix and guarded computed indices |
+| T39 number-theoretic filters | integer arithmetic | filters/streams/sets of candidates, not one scalar successor |
+| T40 constant digits | number representations | expansion procedure has no repeated mutable scalar update in the base case |
+| T41 function combination | exact/approximate numeric expressions | native object is a function/curve; samples and crossings are observations |
+| T42 continued-fraction substitution | irrational parameters and symbolic observers | coefficient stream schedules changing substitution rules |
+| T43 iterated maps | unary scalar source, exactness concerns, assignment | broader nonlinear/piecewise interval maps and infinite-information real states need their own closed map algebra |
+| T44 continuous CA | continuous values | fixed lattice, local aggregation, and parallel field update |
+| T45 PDE | numeric fields | continuous space/time derivative constraint plus solver/discretization category |
+| Linear congruential RNG | multiplication suffix quotient | finite modulus is semantic state loss; randomness tests/distributions are observers |
+
+T34 is consequently neither “all formulaic 0D rules” nor “anything whose picture is made of digits.” Its closed operation and scalar-domain invariants are narrow enough to make exactness, totality, and serialization checkable.
 
 ## Current API Fit
 
-The repository API audit is in progress.
+| Responsibility | Current mechanism | Fit for T34 |
+|---|---|---|
+| Semantic domain | `Dynamics.domain="t+0d"` and rank-zero coordinate convention | `PARAMETERIZATION` only for the idea of one temporal scalar locus; current dense coordinate/tensor carrier is not exact scalar state |
+| Values | finite `Alphabet`, contiguous integer/float families | `SEMANTIC MISMATCH`; T34 needs unbounded exact integers/rationals and explicit real contexts, not a finite alphabet |
+| Source/frontier | fixed rank-zero site can act as one update site | `DIRECT` responsibility-level reuse as `UniqueScalar`; no spatial frontier policy is needed |
+| Read | `self_at(0)` concept plus temporal `history` neighborhoods | current-value self read is conceptually direct; `ar2_0d`, `dyadlags_0d`, and `lagcounts_0d` are mismatches because T34 reads no older slice |
+| Rule | `Rule`, `formulaic(fn)`, family strings, `rule_id` instantiation | `SEMANTIC MISMATCH`; add a closed `AddConstant`/`MultiplyConstant` algebra, never an unrestricted callable or sampled rule ID |
+| Update | scalar result written to the current rank-zero slot | `DIRECT` typed assignment/atomic commit responsibility; no new update law |
+| Seed | `pair`, `uniform_pair`, binary history seeds, ndarray rendering | `SEMANTIC MISMATCH`; use one normalized typed scalar run input |
+| Boundary | boundary mapping normalized in `Dynamics` | `NOT APPLICABLE`; one scalar has no spatial edge |
+| Episode | `RawEpisode(states: ndarray, rule_id, ...)` | `SEMANTIC MISMATCH`; fixed dtype cannot preserve large integers/rationals and `rule_id` is not program identity |
+| Horizon | rollout `steps` means number of returned states | needs an explicit `event_count`/`state_count` split to avoid off-by-one ambiguity |
+| Visualization | t+0D value plotting/export accepts integer NumPy arrays and rejects non-integers | reusable only downstream after typed scalar export; lacks rational/digit-window/radix/crop semantics |
+| Exact scalar infrastructure | T19 arbitrary naturals and T27 rational/algebraic/precision design obligations | `PRINCIPLED EXTENSION` with substantial reusable value/codecs, while signed domains and arithmetic programs remain T34 work |
+| Dataset/RNG | fixed family registry, finite rule pools, NumPy seed streams | `NOT APPLICABLE` to native semantics; later dataset plans must sample closed programs/values without changing them |
+
+`simple_programs.md` allows a scalar `t+0D` address and `FORMULAIC`, but its finite state/alphabet assumptions and unrestricted formula route are not a sufficient construction. The source/read/result/update responsibilities survive; the current public data model does not.
 
 ## Current Runtime Fit
 
-The repository runtime audit is in progress.
+- `src/ca/rules.py:316-366` exposes an unrestricted `formulaic` callback and a special `ar2_modular_0d` family. The latter reads two temporal values, computes a second-order recurrence modulo `m`, decodes parameters from a finite rule ID, and is T37-like rather than T34.
+- `src/ca/neighborhoods.py:617-685` makes temporal history explicit for AR2/dyad-lag/count-lag rules; none expresses the sole current-scalar read as a typed arithmetic program.
+- `src/ca/rollout.py:157-198,334-574` dispatches by family and materializes fixed NumPy arrays. It will overflow or coerce the canonical unbounded/rational traces and cannot be retained as the T34 implementation path.
+- `src/ca/specs.py:117-173` admits only current named Phase-1 rule/neighborhood families and carries irrelevant boundary/alphabet fields through `Dynamics`.
+- `src/ca/seeds.py:136-179` defines two-value scalar history seeds rather than one typed exact initial value.
+- `src/ca/specs.py:58-81` and visualization/export code treat raw episodes as rectangular arrays with an integer rule ID. Exact rational tags, arbitrary integer widths, operation identity, and ragged digit observations are absent.
+- Existing tests demonstrate current mechanics only: modular AR2, binary temporal lookup/count bands, dtype validation, and basic t+0D plotting. None is evidence for `x+c`, `c*x`, exact `3/2`, observer independence, or unbounded growth.
+
+Goal 2 should add closed scalar values/programs and route them through the generic typed executor responsibilities. It must not add `if family == "arithmetic"` to the current rollout or store a `Fraction`, Python function, digit string, or big integer in an object cell merely to pass the old array interface.
 
 ## Principles Audit
 
-No conclusions are closed until scalar state, exact arithmetic, closed programs, rendering boundaries, and source-complete evidence have been checked.
+### Principle 0 — re-derive rather than preserve
+
+T34 validates the general source/read/result/update responsibility split but rejects finite alphabets, temporal-history reads, current formula callbacks, modular AR2, dense fixed-width traces, and family dispatch. A single scalar slot with exact closed arithmetic is simpler and more faithful.
+
+### Principle 1 — preserve meaning
+
+The state is the number, not whichever digits happen to be visible. The operation is fixed arithmetic, not a bitmap transform. Exact and approximate domains, unbounded and modular systems, native recurrence and CA compilation, event traces and direct formulas, and values and renderings all remain separately typed.
+
+### Principle 2 — closed and inspectable data
+
+Programs are tagged constants and values are canonical tagged numbers. There are no lambdas, evaluator strings, predicates, backend-default floats, hidden modulus/width, or render-time feedback. Exact equality and program identity are serializable and replayable.
+
+### Principle 3 — no hidden state or policy
+
+The only Markov state is `x_t`. Time is a trace index; a recurrence need not store it. Horizon, cycle/fixed-point detection, resource limits, numeric context, radix, crop, padding, and plot styling are explicit run/observer inputs. There is no implicit carry buffer or cached exponent in semantic state.
+
+### Principle 4 — test the construction, not a picture
+
+Tests decode rows back to exact values, compare iterative and closed-form traces, cross rendering bases, exceed machine widths, check rational normalization, and distinguish quotient/approximate variants. Pixel resemblance alone is insufficient.
 
 ## Detailed Implementation Plan
 
@@ -311,11 +533,64 @@ No conclusions are closed until scalar state, exact arithmetic, closed programs,
 
 ## Goal 2 Implementation Stage
 
-The implementation handoff is pending the evidence audit.
+### Stage A — exact scalar values
+
+1. Add normalized arbitrary-precision signed integer and rational value codecs, domain membership, exact comparison/hash, and JSON-safe serialization.
+2. Reuse compatible T19/T27 numeric infrastructure rather than create arithmetic-only duplicate types.
+3. Define an explicit certified-exact-real interface and declared finite-precision context boundary; implement only profiles whose equality/arithmetic contract is actually available.
+
+### Stage B — closed arithmetic programs
+
+4. Add `ArithmeticIterationProgram(domain, AddConstant|MultiplyConstant)` with structural validation and stable identity.
+5. Add one typed scalar initial-value run input. Reject callables, branch predicates, modulus, representation fields, and mixed domains.
+6. Evaluate through `UniqueScalar -> CurrentScalar -> ArithmeticAssignment -> atomic Assign`, reusing generic assignment/effect responsibilities without a family switch.
+
+### Stage C — outcomes and traces
+
+7. Add an arbitrary-precision typed scalar trace with `h+1` states and `h` events, exact event provenance, and `Advanced(changed)` semantics.
+8. Keep horizon, cancellation, resource exhaustion, invalid input, and backend failures separate. Preserve the last complete exact state on operational interruption.
+9. Provide optional exact random-access evaluation from the closed forms, checked against iterative stepping.
+
+### Stage D — observers
+
+10. Add integer digit rows and rational digit windows with explicit radix, place range, alignment, blank/zero padding, sign, repeating/truncation, and crop metadata.
+11. Add exact fractional-part, residue, digit-length/count/frequency, numeric/log-size, and leading-digit observers. Never mutate or round the source trace.
+12. Export typed scalar traces and ragged digit rows to visualization without squeezing them into current finite NumPy state arrays.
+
+### Stage E — conformance
+
+13. Implement the addition `c=1..8`, multiplication `2/3`, 500-row powers-of-three, exact `3/2`, fractional sequence, modulo-suffix, horizon/identity, overflow, normalization, and rendering metamorphic oracles in this stage.
+14. Add negative tests for T35 predicates, T36 digit feedback, T37 history recurrence, T43 nonlinear maps, modular quotient substitution, and CA lowering masquerading as T34.
+15. Retain current Phase-1 tests during refactoring, but do not treat them as T34 evidence or add an arithmetic rollout branch.
 
 ## No-Cheating Checks
 
-The final suite must at minimum reject opaque arithmetic callbacks, digit-state conflation, silent floating-point substitution for exact arithmetic, hidden stop/cycle rules, T35 branching smuggled into T34, and rendering-dependent transitions.
+- No unrestricted host callback, expression evaluator, pickle, or family-name dispatch.
+- No finite rule ID used to encode an unbounded arithmetic constant/program.
+- No digit string, raster row, fixed-width bit vector, or object-typed NumPy cell masquerading as the scalar state.
+- No finite alphabet used to claim exact unbounded integers or rationals.
+- No `int64`/`uint64` overflow, saturation, wrap, or implicit modulus.
+- No silent float conversion of exact integers/rationals and no tolerance equality.
+- No undeclared precision, rounding, exponent range, NaN, infinity, or platform-dependent decimal parsing.
+- No temporal-history seed/read for a first-order scalar recurrence.
+- No hidden time counter, carry register, cached power, digit width, or radix in semantic state.
+- No representation base, crop, padding, palette, interpolation, or plot scale affecting `x_(t+1)`.
+- No trailing/leading blank cell reinterpreted as a significant zero digit.
+- No truncation of a repeating rational expansion labeled exact.
+- No two's-complement width selected implicitly for negative numbers.
+- No fixed-point/cycle/target/digit-width/magnitude stop added to the native program.
+- No horizon endpoint mislabeled as a mathematical halt.
+- No identity operation collapsed into an event-free stutter.
+- No direct `x_0*c^t` evaluator changing trace event counts or inventing intermediate events.
+- No left-cropped powers-of-three image presented as the complete numeric state.
+- No modulo suffix quotient presented as the unbounded multiplication program.
+- No CA emulation/local multiplier-base special case presented as native arithmetic state.
+- No substitution description of a digit picture presented as native scalar evolution.
+- No ordered predicate/update arms from T35 hidden in a generic formula.
+- No base-sensitive digit transformation from T36 admitted as plain arithmetic.
+- No prior-term buffer from T37 packed into one nominal scalar.
+- No nonlinear/fractional-part interval map from T43 smuggled into the strict add/multiply sum.
+- No weakening of current tests or duplicate T34-only assignment/executor primitive.
 
 ## Completion Requirements
 
