@@ -29,11 +29,11 @@ The evidence/search closure and conformance fixtures remain valid. Prefix read/d
 - Ends are properties of the finite word, not out-of-range lattice reads. Fixed, periodic, and reflective boundary policies are not applicable; wrapping or padding would create a different program.
 - A typed `InsufficientPrefix` terminal reason is construction-specific. It differs from T16 `NoMatch`, T12 terminal control, an externally requested stop, horizon exhaustion, invalid program data, and a successful event whose successor happens to be empty.
 - The Notes' short-to-empty behavior belongs in an explicit reference trace projection/totalizer. It may emit a normalized `{}` frame after the terminal residue for exact-source comparison, but it cannot manufacture another semantic transition or hide the retained terminal state.
-- Prefix deletion and endpoint insertion can share a private ordered edit engine only after `QueueSpliceUpdate` validates their coupled queue geometry. A public generic collection of arbitrary edits would weaken the construction and invite callbacks.
+- Prefix deletion and T37's tagged-endpoint splice can share the ordered replacement UPDATE only through their explicit schedules and validators. T17 still requires coupled prefix-consume/tail-append geometry; a public callback-based collection of arbitrary edits would erase that construction.
 
 ## Big Picture Objective
 
-Recover ordinary tag systems as direct finite-word prefix-queue transitions, including their exact Wolfram/Post/Wang selector distinctions, empty appendants, short-word halting, and source-code display convention. Add only a closed prefix source/read, total word table, typed consume-and-tail-append result, queue update law, and terminal/reference-projection boundary. Reuse ordered support and typed orchestration without adding a tag rollout, hidden deque, capacity, compiler, or family flag.
+Recover ordinary tag systems as direct finite-word prefix-queue transitions, including their exact Wolfram/Post/Wang selector distinctions, empty appendants, short-word halting, and source-code display convention. Add only a closed prefix source/read, total word table, typed consume-and-tail-append result, an anchored ordered-replacement schedule, and terminal/reference-projection boundary. Reuse ordered support and typed orchestration without adding a tag rollout, hidden deque, capacity, compiler, or family flag.
 
 ## Catalog Identity
 

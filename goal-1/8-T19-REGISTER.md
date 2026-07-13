@@ -158,7 +158,7 @@ Reconstruct the complete register-machine instruction cycle, numeric state, cond
 ### E19 — Continuous-register variant boundary
 
 - Provenance: `BOOK:19080-19086`, especially `19082-19084`.
-- Fact: continuous models generalize registers to arbitrary reals and usually add arithmetic primitives while retaining discrete programs/choices/steps. Arbitrary real initial digits or equation-solving primitives can smuggle oracle power. This is a separate construction, not a broadened base `Natural` domain.
+- Fact: continuous models generalize registers to arbitrary reals and usually add arithmetic primitives while retaining discrete programs/choices/steps. Arbitrary real initial digits or equation-solving primitives can smuggle oracle power. This is a separate construction, not a widening of the base `Natural` value carrier.
 
 ### E20 — Register machines as meta-program enumeration
 
@@ -463,7 +463,7 @@ The repaired eight-instruction halt witness must execute exactly 1,280 events an
 | `eq`, `add`, register-indirect `jmp` | Closed extended instruction members with exact Notes semantics; separate preset/profile. |
 | Subtract two registers | Mentioned in prose only; exact result/underflow semantics unresolved, so no implementation inferred. |
 | Many-register to two-register | Compiler using prime-power packing and stroboscopic checkpoints. |
-| Continuous real registers | Separate continuous-computation construction; never base domain widening. |
+| Continuous real registers | Separate continuous-computation construction; never a widening of the base value carrier. |
 | Fixed URM | Universal interpreter program plus encoded input; separate variant/compiler. |
 | CA, Turing, arithmetic, Diophantine, tiling encodings | Relations/reductions; never native T19 state, update, or trace. |
 | Life route | Historical incomplete proof, excluded as conformance evidence. |

@@ -183,7 +183,7 @@ Canonical `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. The
 ### E21 — Ground states and other declarative relatives
 
 - Provenance: `BOOK:14144-14155`.
-- Fact: spin ground states, correspondence systems, sequence equations, and pattern avoidance are distinct declarative constructions/value domains.
+- Fact: spin ground states, correspondence systems, sequence equations, and pattern avoidance are distinct declarative constructions with distinct value schemas.
 
 ### E22 — No initial conditions
 
@@ -355,14 +355,14 @@ ProofNode =
       variable: unassigned variable,
       branches: TotalMap[alphabet_symbol, ProofNode]
     )
-  | LocalDomainWipeout(anchor)
+  | LocalValueSetWipeout(anchor)
 
-replay LocalDomainWipeout:
+replay LocalValueSetWipeout:
   no assignment to the still-unassigned center/neighbors
   can complete any allowed histogram at this anchor
 ```
 
-Every case split must cover the alphabet exactly. A full brute-force enumeration is one valid proof tree; early domain wipeouts compress it. If a global model existed, its restriction to `variables` would contradict the replayed tree. No solver callback or trusted “unsat” boolean is accepted. More compact SAT/resolution certificates may be added later only with their own closed proof AST/checker.
+Every case split must cover the alphabet exactly. A full brute-force enumeration is one valid proof tree; early local-value-set wipeouts compress it. If a global model existed, its restriction to `variables` would contradict the replayed tree. No solver callback or trusted “unsat” boolean is accepted. More compact SAT/resolution certificates may be added later only with their own closed proof AST/checker.
 
 Search algorithms—square-spiral growth, backtracking, propagation, de Bruijn graphs, SAT encodings, memoization, symmetry breaking, heuristic ordering, and periodic bounds—consume a constraint/query but never become fields of the constraint value. Their diagnostic search trees are not program trajectories.
 
@@ -482,7 +482,7 @@ This is classification metadata from the figure/prose. “One” means one displ
 14. **Validation.** Reject empty alphabet/footprint, zero/duplicate/mixed-dimension offsets, missing center row, undeclared symbol, negative/wrong-sum histogram, malformed period, incomplete tile, and callbacks.
 15. **Symmetry versus complement.** Translations, rotations, and reflections of the `5x5` tile verify. Its color complement does not satisfy the same center-conditioned `(1,2)` profile; it belongs to the swapped `(2,1)` relation.
 16. **Gallery coordinates.** Constructors for all 25 exact-count profiles reproduce the `(b,w)` coordinates and classification table without treating cells as time frames.
-17. **Page-227 obstruction.** For each impossible profile `(0,1)` and `(1,0)`, a `4x3` rectangular anchor set plus cardinal halo has 26 variables and is unsatisfiable; generate and independently replay a closed case-split/domain-wipeout certificate.
+17. **Page-227 obstruction.** For each impossible profile `(0,1)` and `(1,0)`, a `4x3` rectangular anchor set plus cardinal halo has 26 variables and is unsatisfiable; generate and independently replay a closed case-split/local-value-set-wipeout certificate.
 18. **Wrapped alias multiplicity.** In period-1/period-2 presentations, distinct footprint offsets that land on one residue still contribute separately to the degree-four histogram.
 19. **Redundant periods.** Minimal and repeated tiles with different declared periods but the same pointwise field compare equivalent over their LCM box; raw dataclass inequality is not model inequality.
 20. **Vacuous open patch.** A patch with zero complete anchors reports zero checked anchors and cannot return global `Satisfiable`.
@@ -496,7 +496,7 @@ This is classification metadata from the figure/prose. “One” means one displ
 - **Cellular-automaton fixed points/spacetime encodings:** reductions/relations. A CA update or fixed-point search is not native constraint coverage.
 - **Spin/Ising ground states and energy minimization:** optimization constructions; zero-energy local clauses may compile only under proved equivalence.
 - **Tilings/Wang tiles and network constraints:** different carriers/topologies and matching rules.
-- **Sequence/string equations, pattern avoidance, PCP, Diophantine equations:** constraint relatives with separate value domains and decision problems.
+- **Sequence/string equations, pattern avoidance, PCP, Diophantine equations:** constraint relatives with separate value schemas and decision problems.
 - **Finite periodic torus:** exact representation/query scope for a periodic infinite field, not a finite approximation or boundary default.
 - **Finite open region:** local verification/search scope only.
 - **Model finding, enumeration, counting, uniqueness, entropy, symmetry orbits, and visualization:** solver/query/observer layers.
@@ -586,7 +586,7 @@ Dependencies: finite alphabet values; T01's semantic total-lattice/finite-realiz
 2. Add exact axis-aligned `PeriodicPresentation`, `FiniteWindow`, and `OpenPatch` representations. Implement componentwise-modulo point queries, LCM-box pointwise equivalence across redundant periods, canonical anchor/halo derivation, and no padding/boundary/value callback.
 3. Add pure `observed_histogram`, `satisfied_at`, `violation_at`, `verify_periodic`, and `verify_open_patch`. Periodic verification checks a complete fundamental domain; patch reports exact checked anchors including the vacuous-zero case. Offset contributions retain multiplicity after periodic aliasing.
 4. Add a separate constraint-query/result module with `ClaimScope` and closed `Satisfiable`, `Unsatisfiable`, `Unknown`, and `ResourceLimit` records. These must not implement or subclass transition `Advanced/Terminal/Quiescent` outcomes.
-5. Add replayable `FiniteObstructionCertificate` with closed `CaseSplit` and `LocalDomainWipeout` proof nodes. Validate exact halo, exhaustive alphabet branches, partial-assignment consistency, and every wipeout. A full exhaustive tree is the baseline; no callbacks or trusted booleans.
+5. Add replayable `FiniteObstructionCertificate` with closed `CaseSplit` and `LocalValueSetWipeout` proof nodes. Validate exact halo, exhaustive alphabet branches, partial-assignment consistency, and every wipeout. A full exhaustive tree is the baseline; no callbacks or trusted booleans.
 6. Add a solver-owned module such as `src/ca/constraint_solvers.py` with an exact 1D de Bruijn analyzer, bounded periodic-model search, and bounded finite-obstruction search. Every returned witness/certificate rechecks independently; exhausted incomplete bounds return `Unknown`.
 7. Add strict constructors for the two 1D profiles, canonical 2D black1/white2 profile, recovered `5x5` model, and page-227 profile data once independently transcribed. Keep constraint, query bounds, and solver strategy separate.
 8. Add downstream symmetry-orbit, period, model-count, tile/image, search-tree, and dataset encodings. Do not represent solution sets as episodes or stack unlike query/model records into dense trajectories.

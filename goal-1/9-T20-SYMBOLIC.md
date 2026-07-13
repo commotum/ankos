@@ -21,7 +21,7 @@ The evidence/search closure and conformance fixtures remain valid. Recursive tag
 - With `k` symbols and `n` leaves, the unary-expression profile contains `Catalan(n-1) k^n` structured expressions. No numeric rule/program codec or digit significance is supplied.
 - Functional, Polish, operator, binary-tree, and one-symbol bracket forms are representations or codecs. Brackets alone are lossless only for one-symbol unary expressions; bracket bitmaps, leaf count, depth, invariant values, and size differences are observers.
 - Combinators are a native specialization with ordered S/K rules; deterministic operator evolution is a broader one-pass pattern variant. Confluence, normalization, multiway equation application, CA emulation, lambda compilation, valuations, universality tests, and network analogs are relations or analyses, not alternate base execution.
-- T13's ordered lineage and T16's program-coupled matching are reusable responsibilities. T13 all-occurrence concatenation and T16 single-interval splice do not by themselves implement maximal nonoverlapping tree replacement; T20 supplies a typed prefix-free tree UPDATE policy on the common axis.
+- T13's ordered lineage and T16's program-coupled matching are reusable responsibilities. A canonical tagged tree/token codec maps each subtree to one contiguous span, so maximal nonoverlapping tree replacement is a prefix-free schedule over generic ordered multi-span replacement, not a new tree UPDATE policy.
 - The current dense rank-0..3 runtime has no expression tree, typed tree path, pattern AST, binding environment, prefix-free match source, inert template instantiation, subtree replacement result, or ragged structural trace. No existing family branch is a semantic fit.
 
 ## Updated Assumptions
@@ -40,7 +40,7 @@ The evidence/search closure and conformance fixtures remain valid. Recursive tag
 
 ## Big Picture Objective
 
-Reconstruct the complete symbolic-system expression carrier, pattern/binding language, traversal and overlap policy, template substitution, atomic tree update, fixed-point behavior, seeds, variants, observers, and computational relations. Determine the smallest construction-bearing tree-rewrite extension without flattening, unrestricted host evaluation, mutable-DAG semantics, family dispatch, fixed capacity, or conflation with T13, T16, T29, or T30.
+Reconstruct the complete symbolic-system expression carrier, pattern/binding language, traversal and overlap policy, template substitution, atomic replacement semantics, fixed-point behavior, seeds, variants, observers, and computational relations. Determine the smallest construction-bearing tree-rewrite profile and its lossless lowering to ordered multi-span replacement without unrestricted host evaluation, mutable-DAG semantics, family dispatch, fixed capacity, or conflation with T13, T16, T29, or T30.
 
 ## Catalog Identity
 
@@ -114,9 +114,9 @@ Reconstruct the complete symbolic-system expression carrier, pattern/binding lan
 ### E09 — Functional, Polish, operator, and tree representations
 
 - Provenance: `BOOK:12409-12426`.
-- Fact: the Notes give conversions among representations and state that unary expressions form binary trees. These are bijective codecs only over their declared domains, not alternate native update laws.
+- Fact: the Notes give conversions among representations and state that unary expressions form binary trees. These are bijective codecs only on their declared valid images, not alternate native update laws.
 
-### E10 — Bracket encoding's exact domain
+### E10 — Bracket encoding's exact valid image
 
 - Provenance: `BOOK:12428-12433`.
 - Fact: when one symbol appears, removing it leaves a balanced opening/closing-bracket description. This does not justify unlabeled bracket state for several symbols or arities.
@@ -322,21 +322,21 @@ Repeated references may share immutable storage privately, but equality, matchin
 
 ### Lossless token lowering to ordered multi-span UPDATE
 
-Choose a canonical balanced/prefix token codec whose well-formed image has an explicit inverse and in which every subtree occupies one contiguous token span. Expression-valued heads and ordered argument roles receive distinct tags, so the codec loses neither topology nor child role. A prefix-free set of tree paths maps exactly to a set of disjoint token spans.
+Choose a canonical balanced/prefix token codec whose well-formed image has an explicit inverse and in which every subtree occupies one contiguous token span. For example, encode an atom as `Atom(symbol)` and an application as `OpenApply(arity) · Head · encode(head) · Arg(0) · encode(arg_0) · ... · Arg(arity-1) · encode(arg_(arity-1)) · CloseApply`. The arity, head tag, ordered argument tags, and balanced delimiters make decoding total on the validated image and preserve expression-valued heads and every child role. A prefix-free set of tree paths maps exactly to a set of disjoint token spans.
 
-The generic ordered multi-span replacement UPDATE then commits one old-snapshot replacement set:
+The generic ordered multi-span replacement UPDATE then commits one old-snapshot replacement set over the encoded word:
 
 1. Validate that every result names the same old state and a path resolving to the recorded matched subtree.
 2. Validate one result per selected source, pairwise prefix-incomparable paths, unique paths, valid template trees, and declared atoms.
-3. Rebuild the tree once from the old root, replacing a selected path by its instantiated result and otherwise preserving the ordered context.
+3. Replace the disjoint old token spans in source order, preserve every unselected token, validate the resulting word, and decode it back to the native tree view.
 4. Emit one atomic event containing the ordered match/result list and structural provenance.
 
 Replacing one subtree by one subtree preserves sibling-role indices outside the selected occurrences, but it may change arbitrary depth and leaf count. There is no conflict merge because prefix-free coverage is a precondition, not a last-writer policy.
 
-This policy differs from:
+The FRONTIER/NEIGHBORHOOD/RULE profile differs from:
 
 - T13 `ParallelReplaceConcat`, which consumes every scalar occurrence and concatenates child words;
-- T16 `SingleSpliceUpdate`, which replaces exactly one flat interval;
+- T16's exactly-one splice schedule, which selects only one flat interval;
 - T17 queue consumption/append;
 - fixed-support assignment; or
 - a sequence of in-place tree mutations whose later paths see earlier outputs.
@@ -346,28 +346,15 @@ The tree step and token-word step must commute under encode/decode for every val
 ### Exact step and outcome semantics
 
 ```text
-step(spec, old):
-    matches = OutermostNonOverlappingPatternMatches(spec.program).select(old)
-
-    if matches is empty:
-        return Quiescent(
-            reason=NoPatternMatch,
-            state=old,
-            reference_successor=old,
-            events=()
-        )
-
-    results = [InstantiateTemplate(clause.right, match.bindings)
-               for match in matches]
-    new, event = ParallelPrefixFreeTreeReplace.commit(old, results)
-    return Advanced(
-        state=new,
-        events=(event,),
-        changed=(new != old)
-    )
+encoded_old = TreeTokenCodec.encode(old)
+active      = OutermostNonOverlappingPatternMatches(spec.program).select(encoded_old)
+reads       = StructuralBindings.read(encoded_old, active)
+writes      = InstantiateTemplates.apply(active, reads)
+result      = OrderedMultiSpanUpdate.apply(encoded_old, active, writes)
+return result.map_states(TreeTokenCodec.decode)
 ```
 
-Exact `NestList` reference sampling may request arbitrarily many repeated quiescent frames. `UntilQuiescent` may retain the first quiescent state and then stop without inventing a rewrite. `UntilValueFixed` may also stop after an applicable identity event; it must report a different observation reason. Longer cycles require an explicit cycle observer. Horizon, cancellation, resource exhaustion, invalid data, and internal error are never semantic fixed points.
+`OrderedMultiSpanUpdate` returns the uniform `StepResult`: an empty active set gives event-free `Quiescent(NoPatternMatch)`, while any applicable set gives one `Advanced(changed=...)` successor even for an identity rewrite. Exact `NestList` reference sampling may request arbitrarily many repeated quiescent frames. `UntilQuiescent` may retain the first quiescent state and then stop without inventing a rewrite. `UntilValueFixed` may also stop after an applicable identity event; it must report a different observation reason. Longer cycles require an explicit cycle observer. Horizon, cancellation, resource exhaustion, invalid data, and internal error are never semantic fixed points.
 
 ### Programs, seeds, profiles, and identity
 
@@ -403,7 +390,7 @@ For `k=1`, `n=1..8` gives `1,1,2,5,14,42,132,429`. For `k=2`, it gives `2,4,16,8
 ### Representations and observers
 
 - `FunctionalCodec` and `TreeCodec` preserve labeled head/argument roles.
-- `PolishCodec` is allowed only with a total domain validator and exact round trip.
+- `PolishCodec` is allowed only with a total image validator and exact round trip.
 - `OneSymbolUnaryBracketCodec` is bijective only for its restricted profile.
 - Operator-parenthesis rendering is a view unless a typed operator atom/program is explicitly selected.
 - `LeafCount`, structural maximum depth, right-branch depth, bracket raster, expression-size difference, invariant valuation, normal-form detection, causal/lineage tree, and cropped display are downstream observers.
@@ -458,7 +445,7 @@ Additional required oracles:
 - `e[e[e]]` produces event-free `Quiescent(NoPatternMatch)`;
 - an identity clause on `e[e][e]` produces one `Advanced(changed=false)` event;
 - malformed/cyclic trees, undeclared atoms, unbound RHS references, invalid argument indices, duplicate match paths, and non-prefix-free commit inputs are rejected;
-- parse/render/Polish/bracket codecs round-trip exactly on their declared domains and reject out-of-domain trees;
+- parse/render/Polish/bracket codecs round-trip exactly on their declared scopes and reject trees outside those scopes;
 - semantic tree equality and trajectories ignore internal allocation/hash-consing while provenance preserves occurrence multiplicity.
 
 ### Variant and relation disposition

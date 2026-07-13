@@ -628,10 +628,10 @@ configuration = one exact Word
 active = AllApplicableLiteralMatches(configuration, program)
 reads = exact old matched spans
 writes = one replacement alternative per match
-successors = UPDATE.apply(configuration, active, writes)
+result = UPDATE.apply(configuration, active, writes)
 ```
 
-`successors` is a finite exact set. For a layer `P`, `Lift(P) = union(Successors(p) for p in P)`. Every `(parent,clause,span,child)` witness is retained even when children deduplicate. This preserves all existing layer/graph oracles while placing T30 inside the same branch-free runner.
+`result.successors` is a finite exact set, with outcome and witnesses in the same uniform `StepResult` envelope used by single-successor programs. For a layer `P`, `Lift(P) = union(result(p).successors for p in P)`. Every `(parent,clause,span,child)` witness is retained even when children deduplicate. This preserves all existing layer/graph oracles while placing T30 inside the same branch-free runner.
 
 | Axis | Corrected fit |
 |---|---|

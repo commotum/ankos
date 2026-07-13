@@ -4,7 +4,7 @@ Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T37 row and runner contract in `architecture-audit.md` supersede numbered-update/executor framing below while preserving the full-prefix state and noninjective-window result.
 
-The evidence/search closure and conformance fixtures remain valid. The full prefix remains canonical because the sufficient fixed-lag window is noninjective and cannot reconstruct discarded history; endpoint growth is an UPDATE choice inside the shared runner, not a recursive-sequence executor.
+The evidence/search closure and conformance fixtures remain valid. The full prefix remains canonical because the sufficient fixed-lag window is noninjective and cannot reconstruct discarded history. A transparent `Val* · End(next_index)` encoding lowers endpoint growth one step for one step to T16's exactly-one ordered splice, so no recursive-sequence UPDATE or executor is needed.
 
 ## Current Facts
 
@@ -14,7 +14,7 @@ The evidence/search closure and conformance fixtures remain valid. The full pref
 - The strict page-143 figure contains six linear affine fixed-lag recurrences. It has exact displayed horizons `38,48,22,26,44,27`, including seeds; the unequal horizons are layout choices followed by ellipses, not native stop conditions.
 - The figure gives row (e) as `f[n]=f[n-1]-f[n-2]` and row (f) as `f[n]=-f[n-1]+f[n-2]`. `BOOK:12690` and the official Note incorrectly call row (f)'s characteristic equation case (e). This is a source erratum, not repository OCR damage.
 - A normalized `AffineFixedLag` program covers every strict row and noncontiguous fixed lags such as Perrin. The Notes' factorial example justifies a separately named closed fixed-lag arithmetic-expression extension; it does not justify a host callback.
-- Each valid event reads only old prefix terms, computes exactly one value, and append-preserves the entire old prefix. It uses the ordered UPDATE axis with an endpoint-insertion policy; T34 same-locus writes, T16 matched-span splice, and T17 prefix-consume/tail-append retain their distinct validators and schedules inside the same runner.
+- Each valid event reads only old prefix terms, computes exactly one value, and append-preserves the entire old prefix. Under the lossless tagged-word representation, FRONTIER selects the unique `End(next_index)` token and RULE replaces it with `Val(next_index,value) · End(next_index+1)` through T16's exactly-one ordered splice. T34 same-locus writes and T17 prefix-consume/tail-append retain their distinct schedules inside the same runner.
 - A lag window plus the next absolute index is future-sufficient for a fixed-lag program, but it is a lossy transition quotient. It is not canonical prefix equality and cannot reconstruct discarded terms without the seed/checkpoint and complete append log.
 - Every valid exact recurrence event has one successor forever. A repeated numeric term or periodic suffix never creates an unchanged state or full-state cycle because the indexed prefix grows.
 - Exact signed integers and reduced rationals reuse T34 value-carrier/string-codec obligations. Fixed-width NumPy arithmetic, implicit modulus, floats, and unsafe JSON numbers cannot represent the strict construction.
@@ -36,7 +36,7 @@ The evidence/search closure and conformance fixtures remain valid. The full pref
 
 ## Big Picture Objective
 
-Reconstruct fixed-dependency recursive sequences as an exact append construction. Pin down indexed prefix state, fresh seeds and verified checkpoints, a closed recurrence algebra, old-prefix dependency reads, one-term append results, the endpoint-insertion UPDATE preset, deterministic outcomes, equality and serialization, compact trace storage, lag-window quotients, canonical figure oracles, related nonlinear examples, neighboring construction boundaries, and the smallest honest Goal 2 integration.
+Reconstruct fixed-dependency recursive sequences as an exact append construction. Pin down indexed prefix state, fresh seeds and verified checkpoints, a closed recurrence algebra, old-prefix dependency reads, one-term append results, the lossless endpoint-tag lowering to ordered splice, deterministic outcomes, equality and serialization, compact trace storage, lag-window quotients, canonical figure oracles, related nonlinear examples, neighboring construction boundaries, and the smallest honest Goal 2 integration.
 
 ## Catalog Identity
 
@@ -185,6 +185,15 @@ where `m>0`, every `v_i` is canonical in `V`, and tuple position `i` denotes the
 
 Prefix equality includes the value-schema tag, absolute origin, length, and every ordered exact term. Two equal last-lag windows or equal newest values do not make prefixes equal. The evolving CONFIGURATION is the prefix alone; run identity separately pairs it with the immutable program. Two runs may therefore start from equal configurations while their different programs give different futures.
 
+The construction-bearing tagged-word representation is
+
+```text
+encode(NumericPrefix(V, o, (v_0, ..., v_(m-1)))) =
+    Val(o, v_0) · ... · Val(o+m-1, v_(m-1)) · End(o+m)
+```
+
+Its validated image has exactly one trailing `End`, all preceding tokens are `Val`, and their indices are consecutive from the declared origin to `End.index-1`. Decoding this image recovers `V`, `o`, length, and every term exactly; encoding and decoding are mutual inverses. The marker is transparent ALPHABET data, not hidden control.
+
 ### Strict recurrence program
 
 ```text
@@ -240,31 +249,37 @@ The main six presets use origin `1`; Perrin uses origin `0`. Origin is always st
 
 ### Source, reads, and result
 
-Each old snapshot has exactly one firing source:
+Each old snapshot has exactly one firing source, the span occupied by its unique trailing marker:
 
 ```text
-NextSequenceTerm(snapshot_id, target_index=o+len(terms))
+End(target_index=o+len(terms))
 ```
 
 `FixedLagRead` returns a canonical lag-keyed tuple of `TermRef(index=n-k,value=old[n-k])` for every required lag. All references are to the old prefix; no newborn/current/future term is readable. The expression extension additionally receives the exact target index.
 
-The rule returns:
+The rule returns the replacement word:
 
 ```text
-AppendTerm(source, dependency_refs, exact_value)
+ReplaceSpan(
+    source=End(n),
+    replacement=(Val(n, exact_value), End(n+1)),
+    dependency_refs=dependency_refs
+)
 ```
 
 Dependency references are provenance and validation witnesses as well as inputs. Reusing one lag multiple times in an expression reads the same old occurrence; it does not create multiple mutable terms.
 
-### Endpoint-insertion UPDATE preset
+### Lossless lowering to T16 ordered splice
 
-The endpoint-insertion UPDATE preset validates the snapshot/source, exact target index, complete dependency footprint, old values, result value schema, and one-result cardinality. It then returns
+The unique-`End` FRONTIER validates the snapshot and target index. NEIGHBORHOOD validates and reads the complete declared old dependency footprint. RULE validates the old values and result value schema, then replaces the one-token span `End(n)` with the two-token word `Val(n,next) · End(n+1)`. T16's generic exactly-one ordered-splice UPDATE validates one active span and commits that replacement atomically.
+
+Every old `Val` token is preserved exactly and exactly one fresh value plus the next endpoint marker is created. Decoding yields
 
 ```text
-NumericPrefix(value_schema=V, origin=o, terms=old.terms ++ (result.value,)).
+NumericPrefix(value_schema=V, origin=o, terms=old.terms ++ (next,)).
 ```
 
-Every old index/value is preserved exactly, exactly one fresh endpoint is created, and the commit is atomic. This typed policy differs from T34 same-locus assignment because no old term is overwritten, from T16 interval splice because no nonempty match is consumed, and from T17 queue replacement because no prefix is deleted. The difference belongs on the UPDATE axis of the common runner; it is not a ninth execution algebra.
+Thus `encode(step_prefix(s)) = step_splice(encode(s))` for every valid prefix. The apparent zero-width append needs no special UPDATE: consuming and recreating the explicit endpoint tag makes it an ordinary nonempty interval splice. T37 adds a codec plus FRONTIER/NEIGHBORHOOD/RULE presets, not an endpoint-insertion policy or ninth execution algebra.
 
 ### Successors, invalidity, and outcomes
 
@@ -409,9 +424,9 @@ Characteristic equations, generating functions, matrix powers, memoization, shif
 
 ## Corrected Architecture and Goal 2 Handoff
 
-T37 is a SimpleProgram over a variable-support indexed sequence configuration. FRONTIER selects the next endpoint, NEIGHBORHOOD follows declared old-prefix lag/index references, RULE returns one next term, and the ordered structural UPDATE inserts it at the endpoint. The complete prefix remains canonical because the proved lag-window map is noninjective; future sufficiency is not the user's lossless complete-state equivalence.
+T37 is a SimpleProgram over a discrete variable-support `t+1D` indexed sequence configuration. Its transparent encoding is `Val(o,v_0) · ... · Val(n-1,v_(n-o-1)) · End(n)`. FRONTIER selects the unique `End`, NEIGHBORHOOD follows declared old-prefix lag/index references, RULE replaces `End(n)` by `Val(n,next) · End(n+1)`, and T16's exactly-one ordered splice commits it. The complete prefix remains canonical because the proved lag-window map is noninjective; future sufficiency is not the user's lossless complete-state equivalence.
 
-Revised G2-T37 adds indexed sequence support, endpoint loci, closed lag/expression access, typed term insertion, and an endpoint-insertion UPDATE preset shared with ordered structural systems. It removes ninth-law/recursive-executor and numeric-DOMAIN framing while retaining full prefix state, compact lossless event-log reconstruction, checkpoint validation, the optional noninjective evaluation quotient, no-halt semantics, and every exact recurrence oracle.
+Revised G2-T37 adds indexed sequence support, the bijective prefix/tag codec, a unique-`End` FRONTIER, closed lag/expression access, and typed `End -> Val · End` RULE data over T16 ordered splice. It removes endpoint-UPDATE/ninth-law/recursive-executor and numeric-DOMAIN framing while retaining full prefix state, compact lossless event-log reconstruction, checkpoint validation, the optional noninjective evaluation quotient, no-halt semantics, and every exact recurrence oracle.
 
 The historical API/handoff below remains evidence provenance; this section governs its executor/class and DOMAIN terminology.
 
@@ -586,7 +601,7 @@ Suggested responsibility files are a shared exact-value module, `numeric_sequenc
 
 ## Architecture-Reclosed Stage Result
 
-**COMPLETE.** T37 keeps the complete indexed prefix as canonical state because the fixed-lag window is noninjective. Its endpoint frontier, dependency access, typed term write, and ordered endpoint-insertion UPDATE run through the common runner; no recursive executor or ordinal update-law inventory is required.
+**COMPLETE.** T37 keeps the complete indexed prefix as canonical state because the fixed-lag window is noninjective. Its prefix/tag encoding is bijective, and unique-`End` selection plus the `End(n) -> Val(n,next) · End(n+1)` write lowers each step to T16's exactly-one ordered splice. No endpoint UPDATE, recursive executor, or ordinal update-law inventory is required.
 
 ## Historical Stage Results (Evidence Retained; Architecture Superseded)
 

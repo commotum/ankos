@@ -26,7 +26,7 @@ Architecture authority: the T09 row, commuting tagged representation, and runner
 - “The active cell and its left and right neighbors” on `BOOK:11965` names the participants, not tuple order. The executable `Take[list,{n-1,n+1}]` on `:11968-11970` and the rule figure establish physical `[left,self,right]` order.
 - A frontier is where a rule fires, not a list of all locations a result might mutate. This re-derivation preserves T01 behavior and extends its protocol honestly.
 - The native rule returns `(new_bit,displacement)`. With `Plain(bit) | Active(bit)`, it lowers to two ordinary label writes—`source -> Plain(new_bit)` and `destination -> Active(old_destination_bit)`—applied atomically from one snapshot.
-- The Notes finite-list guard does not define wrapping, reflection, truncation, or halting. It is an implementation-domain guard around a construction that can use an infinite initial cell sequence.
+- The Notes finite-list guard does not define wrapping, reflection, truncation, or halting. It is a defined-input guard on the sample implementation around a construction that can use an infinite initial cell sequence.
 - Record-extrema compression and causal networks are derived observables. They must not feed the next transition.
 - Extended mobile automata, generalized mobile automata, Turing machines, 2D/network variants, and CA/substitution encodings are distinct constructions or emulations, not T09 options.
 
@@ -208,7 +208,7 @@ MAEvolveList[rule_, init_List, t_Integer] :=
   NestList[MAStep[rule, #] &, init, t]
 ```
 
-The executable `Take` yields `[list[n-1],list[n],list[n+1]] = [left,self,right]`; `ReplacePart` writes old position `n`; only then does the returned state carry `n+displacement`. The guard defines the sample function's domain, not a boundary or halt rule.
+The executable `Take` yields `[list[n-1],list[n],list[n+1]] = [left,self,right]`; `ReplacePart` writes old position `n`; only then does the returned state carry `n+displacement`. The guard defines the sample function's valid input set, not a boundary or halt rule.
 
 ### E11 — T10 changes the result type to a three-cell block
 
@@ -278,7 +278,7 @@ next = UPDATE.apply(configuration, source, writes)
 
 | Dimension | Reconstructed T09 semantics |
 |---|---|
-| Configuration | Fixed ordered 1D DOMAIN/support + composite finite labels `Plain(bit) | Active(bit)` with exactly one active tag. Factored `(values,position)` is a checked isomorphic view, not required storage. |
+| Configuration | Fixed ordered 1D DOMAIN/support + composite finite labels `Plain(bit) \| Active(bit)` with exactly one active tag. Factored `(values,position)` is a checked isomorphic view, not required storage. |
 | Support | Same fixed line class as T01; it may be unbounded. The number and organization of cells do not change. A finite work array is an explicit realization. |
 | Active/source frontier | `UniqueTag("active")`, exactly one source determined from the labeled configuration. It is where the rule fires, not the union of write targets. |
 | Read | Ordered physical `[left,self,right]` values around the source, from the pre-transition state. |
@@ -512,4 +512,4 @@ The current full-state formula callback is not a valid fallback: T09 has a finit
 
 **Reopened:** the evidence, native mobile rule, and source-frontier semantics remain valid, but the separate-control architecture is withdrawn pending `architecture-audit.md`. Neither visibility nor atomicity requires a `SingleControl` class; a unique tagged active cell supplies the firing locus and complete state.
 
-T09 is complete with zero unresolved evidence candidates. It preserves T01's fixed-lattice transition protocol only after a first-principles correction: `FRONTIER` selects rule-firing sources, while typed results name mutation targets. T09 adds directly evidenced visible control, `ControlLocus`, `RelocateControl`, a finite compound rule codomain, atomic multi-effect update, and structured control-preserving traces. The exact `{35,57}` codec uses physical `[left,self,right]`; an apparent prose-order ambiguity was resolved against executable Notes and the rule image, and independent asymmetric cases/trajectory prevent regression. T01 remains complete because its sources and assignment targets coincide. No family-specific executor, CA packing, boundary invention, or compressed-state shortcut is accepted. Next: T12 Turing Machines.
+T09 is complete with zero unresolved evidence candidates. It preserves T01's fixed-lattice transition protocol only after a first-principles correction: `FRONTIER` selects rule-firing sources, while typed results name mutation targets. T09 adds directly evidenced visible control, `ControlLocus`, `RelocateControl`, a finite compound rule-result schema, atomic multi-effect update, and structured control-preserving traces. The exact `{35,57}` codec uses physical `[left,self,right]`; an apparent prose-order ambiguity was resolved against executable Notes and the rule image, and independent asymmetric cases/trajectory prevent regression. T01 remains complete because its sources and assignment targets coincide. No family-specific executor, CA packing, boundary invention, or compressed-state shortcut is accepted. Next: T12 Turing Machines.

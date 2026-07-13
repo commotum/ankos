@@ -12,7 +12,7 @@ In addition to the bounded asset repair, the compact sum form and its validated 
 - The strict transition at `BOOK:772-776` distinguishes unrestricted three-color tables from totalistic rules. It assigns the colors exact values `0,1,2`, makes the next value depend only on the average of left/self/right, and orders the seven output cases from sum `0` at the least-significant/rightmost base-3 digit through sum `6` at the most-significant/leftmost digit.
 - The Notes give the direct generalization. For `k` colors and radius `r`, fixed arity is `q=2r+1`, reachable sums are `0..q(k-1)`, table length is `M=1+q(k-1)`, and the rule count is `R=k^M` (`BOOK:11897,11902-11916`). The structural output for sum `s` is digit `floor(n/k^s) mod k`; average `s/q` is an exact alternate label for the same case, not a floating computation.
 - The binary radius-two fixtures exercise that same generic six-row codec rather than a special profile: code `10 -> (0,1,0,1,0,0)` is stated directly as black on sums `1` and `3` (`BOOK:11625`); the labelled codes `20 -> (0,0,1,0,1,0)` and `52 -> (0,0,1,0,1,1)` follow exactly from the general codec plus their `k=2,r=2` source identities. Code 20 is textual at `BOOK:3316`; code 52 is visible in the hashed page-707 asset linked at `BOOK:8306`, with class-4 context at `BOOK:8308`; `BOOK:18748` names both as universality candidates. Their class, search, survival, and universality annotations are property/provenance fixtures, not trajectory goldens or run defaults.
-- T01/T02 and D111-D114 already supply fixed ordered one-dimensional support, `AllSites`, old-snapshot reads, typed same-site assignment, atomic parallel commit, successor, seed, realization, trace/view separation, ordered alphabets, and arbitrary-precision integer serialization. T03 changes the rule's input quotient and program identity, not the executor or update law.
+- T01/T02 and D111-D114 already supply fixed ordered one-dimensional support, `AllSites`, old-snapshot reads, typed same-site assignment, atomic parallel commit, successor, seed, realization, trace/view separation, ordered alphabets, and arbitrary-precision integer serialization. T03 changes the RULE's input quotient and program identity, not the common runner or `UPDATE` semantics.
 - `simple_programs.md:1964-2027` groups numeric sums, active counts, and color histograms under one broad `TOTALISTIC` label. That API responsibility is wider than source T03: equal-sum contexts such as `(0,2,0)` and `(1,0,1)` must merge even though their color histograms differ.
 - The current runtime can sum an `int64` read vector, but `rules.totalistic` does not derive its case count, `_channel_state` ignores the declared `sum` versus `count` mode, generic `lookup` is not executable, spatial output remains binary right-shift/`&1`, and batch rule IDs are forced through `numpy.int64`. No current test executes a standalone three-color totalistic table or validates its codec.
 - The former 16-query/118-candidate and 17-query/309-candidate closures are historical and superseded. T06 first widened the later 18-query/312-candidate/118-asset closure to 313/119 for `BOOK:18770 -> 18772`. T04's ensuing repair then proved that the same inherited two-dimensional gallery must include its page-263 slice raster at `BOOK:2928`; T03's asset/control closure is reopened for that bounded addition. Aggregate and execution semantics are unchanged.
@@ -36,7 +36,7 @@ Reconstruct totalistic cellular automata exhaustively from strict text, captions
 - Stable ID: T03.
 - Exact CSV name: `Totalistic Cellular Automata` at `ref/notes/CA-Types.csv:4`.
 - Taxonomy: `ref/notes/CA-Types.md:68-99`; vocabulary seed only.
-- Entry kind: exact finite-sum local-rule description over the T01/T02 fixed-lattice synchronous construction; it introduces a rule-input quotient/table identity but no executor or update law.
+- Entry kind: exact finite-sum local-rule description over the T01/T02 fixed-lattice synchronous construction; it introduces a rule-input quotient/table identity but no runner or `UPDATE` extension.
 - Initial vocabulary: totalistic/totalistic rule, sum, average, total/aggregate of neighboring colors, code, base-`k`, `3k-2`, `k^(1+(k-1)(2r+1))`, `2187`, `16`, `64`, `5^13`, three/five colors, range `r`, outer totalistic, weighted totalistic, symmetric, additive, quiescent, and named example codes `777`, `867`, `420`, `1599`, `1815`.
 
 ## Search Log
@@ -809,7 +809,7 @@ T03 evidence oracle: PASS cited=212 quote_fragments=89 quote_lines=86 assets=119
 | Read | For radius `r>=1`, read the fixed old-snapshot neighborhood at offsets `-r,...,0,...,+r`, including self exactly once. Its arity/multiplicity `q=2r+1` is defining even though aggregate output is permutation invariant. Strict T03 has `r=1`. |
 | Aggregate/cases | `s=sum_i nu(read_i)`. Every integer `s` in `0..q(k-1)` is reachable, giving exactly `M=1+q(k-1)` cases. The exact average label is `s/q`; it does not change case identity. |
 | Rule | One immutable complete structural table `U:{0,...,M-1}->A`. Equal sums must select the same row regardless of order or histogram. No missing row, default, wildcard, callback, gate, modulus, threshold, or formula is implicit. |
-| Result/update | One typed same-site `Assign(U(s))` per active site; T01's atomic parallel fixed-field commit applies all assignments from the same old field. T03 adds no update law. |
+| Result/update | One typed same-site `Assign(U(s))` per active site; the CA preset's atomic parallel `UPDATE` applies all assignments from the same old field. T03 adds no UPDATE policy. |
 | Successor/halting | One deterministic successor for every valid field/table, including unchanged fields. There is no branch, rejection, randomness, intrinsic halt, fixed-point stop, or background stop; finite horizon and resource outcomes are external. |
 | Seed/background/boundary | The initial total field and finite realization are independent run data. A single gray cell, random field, or uniform background does not identify the rule. A canonical zero background evolves whenever `U(0)!=nu^-1(0)`; T06 owns the stable-background restriction. |
 | Observers/provenance | Spacetime/raster views, exact-average labels, palette, symmetry and additivity claims, behavior class, period/growth/death analysis, gallery filters, emulation, search work, and code display remain outside state and native events. |
@@ -833,7 +833,7 @@ code(U)     = sum_{s=0}^{M-1} nu(U_s) * k^s
 
 | Profile | Semantic relation |
 |---|---|
-| `k=2,r=1` | Sixteen-rule totalistic restriction of T01; same T03 aggregate/table evaluator and shared assignment executor. |
+| `k=2,r=1` | Sixteen-rule totalistic restriction of T01; same T03 aggregate/table evaluator, common runner, and same-site parallel `UPDATE`. |
 | `k=3,r=1` | Strict profile and T04 preset; seven rows and 2,187 codes. |
 | Higher `k`, radius one | T05 parameterization; `M=3k-2`, with no new execution mechanics. |
 | General finite `r>=1` | Direct Notes parameterization with `q=2r+1`; changes read geometry and table cardinality under strict validation, not commit semantics. |
@@ -842,9 +842,9 @@ code(U)     = sum_{s=0}^{M-1} nu(U_s) * k^s
 | Left-right/reflection symmetry | Implied property of equal-weight sum for the symmetric radius stencil; T07 owns general classification/transforms, not a T03 flag. |
 | Code 420/additive profiles | A table may additionally satisfy an algebraic formula such as `U(s)=nu^-1((-s) mod 3)`; additivity is a property/proof or alternate description, not hidden formula execution. |
 | Color histogram/nonzero count | Different quotient: `(0,2,0)` and `(1,0,1)` have equal sum but different histograms. Neither can substitute for source T03 when `k>2`. |
-| Outer/semi-totalistic | Retains center or another designated value separately and therefore has a product case domain and different codec. |
+| Outer/semi-totalistic | Retains center or another designated value separately and therefore has a product case schema and different codec. |
 | Unequal/negative weights or thresholding | Different aggregate/image and often different symmetry; source weighted examples and generic weighted built-in forms are siblings, not T03 parameters. |
-| Higher-dimensional or continuous aggregates | Different geometry or value/rule codomain; T44's continuous aggregate-map feedback remains a separate construction. |
+| Higher-dimensional or continuous aggregates | Different geometry or value/rule-result schema; T44's continuous aggregate-map feedback remains a separate construction. |
 
 ## Corrected Architecture and Goal 2 Handoff
 
@@ -956,7 +956,7 @@ assert symbolic[sum(nu[value] for value in context)]=='blue'
 assert symbolic[sum(rank[value] for value in context)]=='green'
 try:
     nu['outside']
-    raise AssertionError('out-of-domain value accepted')
+    raise AssertionError('out-of-alphabet value accepted')
 except KeyError:
     pass
 
@@ -1142,7 +1142,7 @@ All paths below are relative to `ref/A-New-Kind-of-Science/`.
 | Asset path | Bytes | Dimensions | SHA-256 | Disposition |
 |---|---:|---:|---|---|
 | `CHAPTERS/11-The-Notion-of-Computation/Images/_page_670_Figure_1.jpeg` | 281,966 | `1064x1224` | `a1a2a5c04b509ecc0357273387b2950d179478c65406427751904987ec9e8d3e` | Relation-only: code `1599` is block-emulated by a binary radius-five CA. Encoding/decoding and the emulator are not T03 native events. |
-| `CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_171_Picture_5.jpeg` | 4,640 | `277x91` | `6695e1c946cf6adaa04a3915f2c720f69de4d18b74a81a01aaab346052119455` | Relation-only continuous average-map analog; continuous values/codomain belong to T44. |
+| `CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_171_Picture_5.jpeg` | 4,640 | `277x91` | `6695e1c946cf6adaa04a3915f2c720f69de4d18b74a81a01aaab346052119455` | Relation-only continuous average-map analog; the continuous value carrier belongs to T44. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_21.jpeg` | 25,918 | `583x225` | `5f829c7776b53963e578df5a783553320da171c4e1c4d92c470899ec5bb3e40d` | Relation-only `k=2..7` additive/Pascal-modulo-`k` gallery. Its `k=3` panel supplies the comparison cited for T03 code `420`, but the displayed rule is not a native equal-weight total over self plus neighbors. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_839_Figure_4.jpeg` | 36,753 | `1154x277` | `851cf63cb497d076054d9b3cedf0db108f0cb439a7876726075eb82b5cfe0f6c` | Relation-only two-dimensional additive outer-totalistic code `204` self-reproduction example. It illustrates the cited additive construction, but its geometry and center-separated rule are not T03. |
 | `BACK-MATTER/Index/Images/_page_980_Picture_15.jpeg` | 4,385 | `160x195` | `641317f32d429dd61b8353e1ebe65bd80f30950df78f0ebdc3a7f99b6bd26cd9` | Relation-only Life-spacefiller step 5, explicitly called analogous to code-`1329` unbounded growth. Two-dimensional Life is not T03. |
@@ -1775,21 +1775,21 @@ Picture 253/1 is repaired to visible code `1659`: the Actual Index routes 1659 t
 
 T04's named code-357/code-1329 routes at `BOOK:3320-3378` and binary radius-two code-20 follow-through first exposed omissions in T03's former exhaustive-manifest/superset claim; the subsequent bidirectional audit also found two-dimensional, weighted, Notes-chain, application, and inherited T04 E14 controls. That prior source and physical audit closed 17 queries, 309 dispositioned candidates, 21 evidence groups, 88 verbatim fragments on 85 source lines, five official PDFs, and 116 rasters at `48 included / 60 excluded / 8 relation-only`; those figures are retained only as historical provenance for the cumulative four-line/three-asset T05/T06 delta.
 
-T03 is one exact finite-sum rule description over the T01/T02 fixed-lattice construction. A program declares finite alphabet `A`, explicit bijection `nu:A->{0,...,k-1}`, fixed radius `r`, exact sum of the `2r+1` old reads, and one complete `M=1+(k-1)(2r+1)`-row structural table. Sum zero is the least-significant base-`k` digit. The source average is the exact label `s/(2r+1)`, not a float. T03 adds neither an executor nor an update law; T04/T05 are presets, T06/T07 restrictions/properties, and histogram, outer, weighted, higher-dimensional, continuous, additive, emulation, seed, class, and view material remains explicitly typed outside base execution.
+T03 is one exact finite-sum rule description over the T01/T02 fixed-lattice construction. A program declares finite alphabet `A`, explicit bijection `nu:A->{0,...,k-1}`, fixed radius `r`, exact sum of the `2r+1` old reads, and one complete `M=1+(k-1)(2r+1)`-row structural table. Sum zero is the least-significant base-`k` digit. The source average is the exact label `s/(2r+1)`, not a float. T03 changes neither the common runner nor its `UPDATE`; T04/T05 are presets, T06/T07 restrictions/properties, and histogram, outer, weighted, higher-dimensional, continuous, additive, emulation, seed, class, and view material remains explicitly typed outside base execution.
 
 The repaired asset blocks pass. They cover `50/60/9` disjoint physical dispositions, 71 explicitly followed continuation/boundary links, the 105-link mechanical reverse-join closure, and 22 mechanically outside control-only siblings, plus binary radius-two codes `10/20/52`, the exact code-`1004600` table and long-run observer continuation, code-20 survival counts, code-357/code-1329 structure labels, code-420 additivity, exact code-777/code-867 trajectories, and all 946 cells of the strict code-777 raster with zero mismatch. The former 16-query/118-candidate, 17-query/309-candidate, and 18-query/312-candidate exhaustion claims are superseded by the widened 18-query/313-candidate partition; the current broad API and binary/family-dispatched runtime remain documented as mismatches rather than preserved through a shim.
 
-G2-T03 names concrete alphabet, aggregate, table/codec, rule, executor, spec/preset, trace/export, migration, and test work with 15 adversarial conformance obligations, including exact generic radius-two codes `10/20/52`. D115-D118 and the rank-versus-valuation repair remain active. All six embedded blocks and the widened bidirectional source/asset checks pass. Fresh independent review found no content defect after the status/count refresh, and global closure is restored.
+G2-T03 names concrete alphabet, aggregate, table/codec, rule, common-runner integration, spec/preset, trace/export, migration, and test work with 15 adversarial conformance obligations, including exact generic radius-two codes `10/20/52`. D115-D118 and the rank-versus-valuation repair remain active. All six embedded blocks and the widened bidirectional source/asset checks pass. Fresh independent review found no content defect after the status/count refresh, and global closure is restored.
 
 ## Integration Results
 
 1. No prior assumption or primitive is invalidated. D114 is concretized: T02 rank and T03 numeric valuation are independent identities, while palette remains representation.
 2. T03 directly reuses T01/T02 support, `AllSites`, old-snapshot gathering, typed same-site assignment, atomic commit, successor, realization, and trace semantics without changing their meanings.
-3. The proposal adds no family branch, callback, flag, hidden state, duplicate executor, fallback, binary decoder, or exhaustive-table masquerade.
+3. The proposal adds no family branch, callback, flag, hidden state, duplicate runner, fallback, binary decoder, or exhaustive-table masquerade.
 4. State remains only support plus the current total color field; the immutable valuation/aggregate/table is program data and all information needed to reproduce a trace is explicit.
 5. Support, topology, values, numeric valuation, aggregate cases, structural table, code, run controls, representation, properties, and relations remain separately typed.
 6. Equal-weight fixed-arity sum followed by complete lookup is defining rule semantics and remains native. Integer vectorization, exact-average labels, bigint code, exhaustive lowering, solvers, gallery selection, and rasterization remain explicit incidental or relation layers.
 7. The proposed encoding preserves alphabet identity, independent `nu`, arity/radius, every sum row including leading zeros, arbitrary-precision code direction, run identity, and observation scope. The noncanonical symbolic fixture prevents rank collapse.
 8. T03 was reopened and reclosed first for T05's code-`1004600` Notes/assets and again for T06's direction-linked elementary-emulation network. The final 313-candidate/119-asset manifest and fresh independent review pass. T01/T02 remain completed; neither relation changes their native semantics. T04 is separately re-audited if its own retained captions expose an asset-closure defect.
-9. Goal 2 gains G2-T03 after the shared T01/T02 alphabet/table/executor responsibilities. T04/T05 depend on it as presets; T06/T07 consume predicates/proofs rather than flags; outer/weighted/histogram/higher-dimensional profiles remain separately staged.
-10. The overall API becomes simpler: one closed `valuation -> exact sum -> typed table` rule composes with the existing fixed-field executor, replacing the current loose `TOTALISTIC` bucket and binary family routing without adding an eleventh update law.
+9. Goal 2 gains G2-T03 after the shared T01/T02 alphabet/table/runner responsibilities. T04/T05 depend on it as presets; T06/T07 consume predicates/proofs rather than flags; outer/weighted/histogram/higher-dimensional profiles remain separately staged.
+10. The overall API becomes simpler: one closed `valuation -> exact sum -> typed table` RULE composes with the common branch-free runner and existing same-site parallel `UPDATE`, replacing the current loose `TOTALISTIC` bucket and binary family routing without another execution path.

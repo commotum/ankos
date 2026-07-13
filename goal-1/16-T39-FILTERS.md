@@ -466,7 +466,7 @@ UlamCandidateRead(prefix) = {
 }
 ```
 
-Rejected candidate checks form a nested `SelectionWitness`; they are not T37 prefix states. The accepted value becomes a T37 term-insertion write and uses the existing endpoint-insertion UPDATE preset. Pair-sum frequencies are a reproducible derived cache, never hidden semantic state.
+Rejected candidate checks form a nested `SelectionWitness`; they are not T37 prefix states. The accepted value feeds T37's transparent `End(n) -> Val(n,value) · End(n+1)` RULE and T16 exactly-one ordered splice. Pair-sum frequencies are a reproducible derived cache, never hidden semantic state.
 
 The canonical source prefix is:
 
@@ -581,7 +581,7 @@ Panel (b)'s label says primes “smaller than n,” while `PrimePi[n]` counts pr
 | (a) | `tau(n)=DivisorSigma[0,n]`, `n=1..1000` | prefix `1,2,2,3,2,4,2,4,3,4`; endpoint 16; max 32 at 840 |
 | (b) | `sigma_1(n)-2n`, `n=1..1000` | prefix `-1,-1,-2,-1,-4,0,-6,-1,-5,-2`; endpoint 340; min -996 at 997; max 1200 at 840; zeros `6,28,496` |
 | (c) | ordered signed `Z^3` square tuples, zero allowed, `n=1..1000` | prefix `6,12,8,6,24,24,0,12,30,24`; endpoint 144; max 552 at 941; 165 zeros, exactly `4^r(8s+7)` |
-| (d) | ordered signed `Z^4` square tuples, `8 sum_(d|n,4 does not divide d) d`, `n=1..1000` | prefix `8,24,32,24,48,96,64,24,104,144`; endpoint 3744; max 22464 at 990; never zero |
+| (d) | ordered signed `Z^4` square tuples, `8 sum_(d\|n,4 does not divide d) d`, `n=1..1000` | prefix `8,24,32,24,48,96,64,24,104,144`; endpoint 3744; max 22464 at 990; never zero |
 | (e) | ordered prime-pair count for even `n=2..2000` | prefix `0,1,1,2,3,2,3,4,4,4`; `H(10)=3`; endpoint 74; max 182 at 1890; only plotted zero is `n=2` |
 
 Rows (a)-(c) have labels only in the images; Markdown retains the (d)/(e) captions separately. These exact sequences repair `DivisorS`, missing subtraction signs, vague `ways`, and the unqualified Goldbach nonzero statement.

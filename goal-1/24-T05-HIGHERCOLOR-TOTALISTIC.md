@@ -11,7 +11,7 @@ The evidence/search closure and conformance fixtures remain valid. The Goal 2 ha
 - Exact catalog row: T05, CSV line 6, `Higher-Color Totalistic Cellular Automata`; taxonomy section 5 at `ref/notes/CA-Types.md:126-145` is search vocabulary only, not book evidence.
 - The taxonomy's initial hypothesis was a radius-one totalistic profile with four, five, or more values and no new support, read, update, successor, or halt semantics beyond T03. The completed book audit validates that grouping with the exact canonical `k>=4` boundary.
 - The strict five-color comparison states 13 sum cases and `5^13 = 1,220,703,125` possible rules, while a separate Notes/application example names four-color totalistic code `1004600`. The complete audit closes these and every alias, formula, caption, Notes, Index, split, application, control, and linked-asset route at 11 queries, 142 lexical lines, five governed prose continuations, and 25 assets: 172 candidates with zero remainder.
-- Canonical values `A_k=(0,...,k-1)`, `nu_k(i)=i`, `r=1`, and explicit “four or more colors” establish exactly the concrete finite range `k>=4`. T03 then gives arity `q=3`, sum domain `0..3(k-1)`, table length `M=3k-2`, and rule count `R=k^(3k-2)`. The general formula derives the otherwise nonliteral `k=4` values `M=10`, `R=4^10`; `k=5` is independently direct.
+- Canonical values `A_k=(0,...,k-1)`, `nu_k(i)=i`, `r=1`, and explicit “four or more colors” establish exactly the concrete finite range `k>=4`. T03 then gives arity `q=3`, reachable sum set `0..3(k-1)`, table length `M=3k-2`, and rule count `R=k^(3k-2)`. The general formula derives the otherwise nonliteral `k=4` values `M=10`, `R=4^10`; `k=5` is independently direct.
 - T01/T02/T03/T04 already establish fixed ordered support, all-site old-snapshot reads, typed same-site assignment, atomic parallel update, structural table identity, arbitrary-precision tagged code identity, and the preset/restriction/property/run/view boundary. T05 confirms D118: it is the strict canonical higher-color radius-one preset over T03, not a distinct construction.
 - The current API/runtime remains semantically incomplete for this profile: `simple_programs.md` and `src/ca/rules.py` conflate exact numeric sums with counts/histograms; spatial rollout is family-dispatched and binary-decoded; batch rule IDs use `numpy.int64`; no current test executes a four-or-more-color totalistic sum table.
 - T05 exposed one bounded T03 source-closure omission: code `1004600`'s Notes continuation and two plots. T03 was repaired, independently reviewed, and reclosed at 312 candidates and 118 assets without changing its semantics; T04 remained complete.
@@ -28,7 +28,7 @@ The evidence/search closure and conformance fixtures remain valid. The Goal 2 ha
 
 ## Big Picture Objective
 
-Determine the exact higher-color totalistic parameter domain and evidence bundle, prove whether it is only a strict T03 preset/range, and produce the smallest implementation-ready Goal 2 constructor and conformance plan without a higher-color executor or fixed-width shortcut.
+Determine the exact higher-color totalistic parameter range and evidence bundle, prove whether it is only a strict T03 preset/range, and produce the smallest implementation-ready Goal 2 constructor and conformance plan without a higher-color executor or fixed-width shortcut.
 
 ## Catalog Identity
 
@@ -456,7 +456,7 @@ source_repairs=4 split_checks= 19
 | State | The ordinary T01/T02/T03 total field over fixed ordered one-dimensional support. No code register, aggregate accumulator, class label, survival flag, or hidden control exists. |
 | Alphabet/valuation | For each concrete finite integer `k>=4`, `A_k=(0,...,k-1)` and the exact valuation is `nu_k(i)=i`. A noncanonical alphabet or valuation is an ordinary generic T03 program, not a T05 preset variant. |
 | Active loci/read | `AllSites`; each event reads old values at offsets `(-1,0,+1)`, including self exactly once. The arity is exactly three even though the sum is permutation invariant. |
-| Aggregate/cases | `s=nu(left)+nu(self)+nu(right)`. Every integer `0..3(k-1)` is reachable, so the complete case domain has `M=3k-2` rows. `s/3` is an exact average label, never a floating computation. |
+| Aggregate/cases | `s=nu(left)+nu(self)+nu(right)`. Every integer `0..3(k-1)` is reachable, so the complete case set has `M=3k-2` rows. `s/3` is an exact average label, never a floating computation. |
 | Rule | One immutable complete structural table `U:{0,...,3k-3}->A_k`. There is no sparse row, wildcard, default, gate, threshold, histogram, formula callback, or exhaustive-context table hidden behind the preset. |
 | Result/update | One typed same-site `Assign(U(s))` per site; T01's old-snapshot atomic parallel fixed-field update applies unchanged. |
 | Successor/halting | One deterministic successor always exists, including for unchanged or all-zero fields. “Dies out”, long survival, behavior class, and undecidability are analyzer/query claims, not native halts or executor state. |
@@ -531,16 +531,16 @@ Reusable mechanics are the radius-one selector, explicit finite boundaries, fini
 
 - **Principles 0, 1, 2, and 10:** the evidence-backed candidate is a strict range preset returning T03. A catalog label, larger alphabet, or large code space does not create an executor.
 - **Principles 3-5 and 11:** the fixed read, exact sum/table rule, typed assignment, and atomic old-snapshot update retain one responsibility each. Death, class, density, and undecidability are queries/properties, not effects, halts, or state.
-- **Principles 7-9:** every concrete `k` has a naturally finite complete `3k-2`-row table. `k`, canonical valuation, arity, case image, output domain, and codec are genuinely coupled and validate together; seed, realization, and view remain independent.
+- **Principles 7-9:** every concrete `k` has a naturally finite complete `3k-2`-row table. `k`, canonical valuation, arity, case image, output value schema, and codec are genuinely coupled and validate together; seed, realization, and view remain independent.
 - **Principles 8 and 12:** structural table and tagged bigint identity must survive serialization. Fixed `int64` batches, palette tones, crop, plots, and flattened traces cannot redefine the program.
 - **Principles 13 and 15:** adversaries must include a four-color nonbinary output, equal-sum/different-histogram contexts, in-place-versus-old-snapshot divergence, `k=8` bigint identity, quiescent and nonquiescent rules, preset/generic equality, and exact source code-label sets.
 - **Principles 14 and 16:** any higher-color rollout switch, hard maximum `k`, sparse/default table, binary decoder fallback, callback aggregate, or T05-only bigint path is a hard-stop architecture failure.
 
-D115-D118 suffice: the construction is the same equal-weight sum quotient and complete structural table over the same assignment executor. D118 is sharpened with the exact `k>=4,r=1,A_k,nu_k` preset boundary; no D119 or new update law is justified.
+D115-D118 suffice: the construction is the same equal-weight sum quotient and complete structural table through the common runner and same-site parallel `UPDATE`. D118 is sharpened with the exact `k>=4,r=1,A_k,nu_k` preset boundary; no D119 or new UPDATE policy is justified.
 
 ## Exact Semantic Oracle
 
-This dependency-free oracle pins the preset domain, table/cardinality/code invariants, page-label sets, code `1004600`, nonbinary sum semantics, T06 separation, old-snapshot update, preset/generic identity, invalid inputs, and arbitrary-precision pressure. It intentionally does not manufacture trajectories from source plates whose finite seed digits, crop, or palette are not fully serialized.
+This dependency-free oracle pins the preset range, table/cardinality/code invariants, page-label sets, code `1004600`, nonbinary sum semantics, T06 separation, old-snapshot update, preset/generic identity, invalid inputs, and arbitrary-precision pressure. It intentionally does not manufacture trajectories from source plates whose finite seed digits, crop, or palette are not fully serialized.
 
 ```bash
 python3 - <<'PY'
@@ -915,13 +915,13 @@ direct_property_links= (9164, 19236, 19238) direct_exact_cell_goldens= 0
 2. Export the resolver through `src/ca/presets/__init__.py`, `src/ca/__init__.py`, and the synthesis-selected catalog registry. The preset name and T05 ID may survive only as nonsemantic provenance; resolved rule/runtime classes, structural serialization, program reference, and semantic hash must equal generic T03.
 3. Extend `src/ca/specs.py` only at the pre-resolution configuration boundary. A JSON-safe request must use a discriminated table record or tagged nonnegative-decimal code; reject unknown/conflicting fields. The resolved record contains explicit `k`, valuation, arity three, `3k-2` structural rows, and optional codec relation—not a `family="higher_color_totalistic"` dispatch token.
 4. Make no T05-specific changes to alphabets, aggregates, rule tables, rules, executor/rollout, updates/effects, datasets, export, or visualization. Those modules change only for shared G2-T03. Static inspection must find no T05, higher-color, `k>=4`, four-color, five-color, or code-`1004600` execution branch.
-5. Update `simple_programs.md` to document T05 under strict presets and show its resolved T03 form. Split numeric sum from histogram/count summaries, preserve complete case-domain and bigint-code requirements, and keep run/query/view records outside the preset.
+5. Update `simple_programs.md` to document T05 under strict presets and show its resolved T03 form. Split numeric sum from histogram/count summaries, preserve complete case-set and bigint-code requirements, and keep run/query/view records outside the preset.
 6. Add transparent source fixtures under `tests/fixtures/t05_higher_color_totalistic.json` and conformance in `tests/test_t05_higher_color_totalistic.py`, reusing generic G2-T03 executor/codec tests rather than copying implementation. Asset hashes/labels and long-run claims belong only in reference fixtures/tests.
 
 **Required fixtures and tests:**
 
 1. Pin `(k,M,R)=(4,10,1048576)`, `(5,13,1220703125)`, and `(8,22,73786976294838206464)`. Assert code endpoints, complete-table lengths, arbitrary-precision tagged round trips, leading zero rows, and unambiguous multi-integer rows for `k>10`.
-2. Pin page-122 code sets `107395..107402` for `k=4` and `180197741..180197748` for `k=5`; pin the page-256 set `range(1000816,1000941,4)`; validate every label against its exact domain without treating gallery order as program semantics.
+2. Pin page-122 code sets `107395..107402` for `k=4` and `180197741..180197748` for `k=5`; pin the page-256 set `range(1000816,1000941,4)`; validate every label against its exact permitted range without treating gallery order as program semantics.
 3. Pin code `1004600 -> (0,2,3,0,0,1,1,1,3,3)` low-sum first and the reverse source display. Round-trip it through table, tagged code, preset, generic T03, single execution, and batch execution with the same structural program reference and runtime types.
 4. Reject `k=True`, nonintegers, `k=2/3`, code `-1`/`k^(3k-2)`, short/long/sparse tables, out-of-alphabet rows, both/neither code-table inputs, and all semantic override fields. Generic T03 remains available for lower `k`, other radii, and noncanonical valuations without being relabeled T05.
 5. For code `1004600`, assert `(0,2,0)` and `(1,0,1)` both select sum row two and output `3`; reverse/permutate contexts without a symmetry flag. On a periodic three-cell field `(0,0,1)`, assert the old-snapshot successor `(2,2,2)` and reject the left-to-right in-place result `(2,0,0)`.
@@ -943,7 +943,7 @@ direct_property_links= (9164, 19236, 19238) direct_exact_cell_goldens= 0
 
 - [x] Every direct/alias/formula/code/caption/Notes/actual-Index/split/cross-reference/application/control candidate is dispositioned with zero remainder.
 - [x] Every relevant source-linked asset is hash-pinned and classified, with every source-permitted semantic/raster oracle closed.
-- [x] The exact higher-color parameter domain, table/cardinality/code rules, canonical fixtures, and T03/T04/T06/T07/T08 boundaries are proved.
+- [x] The exact higher-color parameter range, table/cardinality/code rules, canonical fixtures, and T03/T04/T06/T07/T08 boundaries are proved.
 - [x] Current API/runtime fit and a concrete Goal 2 preset/conformance stage are implementation-ready.
 - [x] Global ledgers, independent review, embedded checks, coverage/diff gates, and repository tests pass.
 

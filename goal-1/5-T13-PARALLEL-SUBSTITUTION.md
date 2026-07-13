@@ -342,7 +342,7 @@ This is an unambiguous three-symbol fixture with output lengths 3, 2, and 1.
 
 > The specific definition given above works for neighbor-independent substitution systems whose elements have two possible colors, and in which each element is replaced at each step by at most two new elements.
 
-The compiler cannot define general T13 and remains an emulation even inside its restricted domain.
+The compiler cannot define general T13 and remains an emulation even within its restricted validity scope.
 
 ### E26 — plant L-system geometry adds semantic configuration
 

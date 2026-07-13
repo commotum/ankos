@@ -283,7 +283,7 @@ next = UPDATE.apply(configuration, source, writes)
 | Dimension | T12 semantics |
 |---|---|
 | Support/configuration | Fixed ordered integer line + total composite-labeled tape with exactly one `Head(q,sigma)` tag. Factored tape/position/state is a checked isomorphic view. |
-| Alphabet roles | Independent finite `Sigma` symbol and `Q` head-state factors inside `Plain(sigma) | Head(q,sigma)`. Blank is a distinguished seed/default symbol. |
+| Alphabet roles | Independent finite `Sigma` symbol and `Q` head-state factors inside `Plain(sigma) \| Head(q,sigma)`. Blank is a distinguished seed/default symbol. |
 | Source/read | `UniqueTag("head")`; the compact rule gets only `q` and the symbol in the head label. Neighbor symbols cannot affect rule choice. |
 | Rule | Complete unique table over `Q x Sigma`; named output fields `(next_state,write,move)`; `move in {-1,+1}` for base family. |
 | Result/update | The native tuple lowers to two composite-label writes applied atomically; all other labels and the destination's underlying symbol are preserved. |
@@ -297,7 +297,7 @@ next = UPDATE.apply(configuration, source, writes)
 - Input rows: `s*k`; legal base outputs per row: `s*k*2`; rule count `(2sk)^(sk)`.
 - `(2,2)`: `8^4=4096`; `(3,2)` and `(2,3)`: `12^6=2,985,984`; `(4,2)`: `16^8=2^32`.
 - Numeric codec inputs are state ascending and symbol descending; digits are padded big-endian base `2sk`; direction bit 0 is left and 1 is right.
-- Constructor validates distinct complete input keys, legal next state/write/move, and the correct domain/codomain. Named fields prevent tuple-order mistakes.
+- Constructor validates distinct complete input keys, legal next state/write/move, and the exact input/output schemas. Named fields prevent tuple-order mistakes.
 
 ### Exact table and trajectory oracle
 
@@ -324,7 +324,7 @@ t12 q=3 h= 4 ones={-1,0,2,4,5}
 | Kind | Semantics |
 |---|---|
 | Base | `Termination.Never`; total table always continues. Horizon returns `HorizonReached`, never `Halted`. |
-| Intrinsic terminal variant | Extend visible control payload with terminal set `H` (e.g. state 0); entering it produces a final terminal snapshot with zero successors. Validate its actual codomain/count separately from base. |
+| Intrinsic terminal variant | Extend visible control payload with terminal set `H` (e.g. state 0); entering it produces a final terminal snapshot with zero successors. Validate its actual output set/cardinality separately from base. |
 | External episode stop | Typed `HeadAt(position)` or `TapeMatches(pattern)` observation; stops the run with a distinct reason without changing rule/state semantics. |
 | Stationary example convention | Explicitly declared fixed-point stop predicate for that machine only; never infer halt from any self-loop. |
 | Errors | Missing rule, illegal symbol/state/move, and finite-realization edge are errors, not halt. |

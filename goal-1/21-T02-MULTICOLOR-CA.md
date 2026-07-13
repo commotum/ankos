@@ -22,7 +22,7 @@ The evidence/search closure and conformance fixtures remain valid. Composite fin
 - Preserve colors as distinct symbols or validated digits `0..k-1`; visual white/gray/black tones are a view convention unless a numeric aggregate such as totalistic averaging explicitly gives them arithmetic meaning.
 - Preserve ordered neighborhoods. A totalistic, semi-totalistic, symmetric, reversible, background-preserving, mutation-generated, or emulation profile is a restriction/property/relation unless evidence makes it defining.
 - Do not infer a single-gray-cell seed, unchanged white background, random seed, finite periodic boundary, or figure horizon as native T02 semantics.
-- Do not add an eleventh update law unless T02 evidence contradicts T01's fixed-effects atomic commit.
+- T02 reuses T01's fixed-effects atomic `UPDATE`; contrary evidence would force construction reclassification, not an ordinally numbered law.
 
 ## Big Picture Objective
 
@@ -465,7 +465,7 @@ T02 verbatim evidence oracle: PASS 34 lines; ordered addresses/count exact
 
 | Dimension | Reconstructed T02 semantics |
 |---|---|
-| State | `STATE = SUPPORT + VALUES`; no control. Support is the same fixed ordered one-dimensional regular lattice as T01. Values form a total field in one declared finite ordered alphabet `A`; strict T02 has `k=|A|>=3`. |
+| State | `STATE = SUPPORT + VALUES`; no control. Support is the same fixed ordered one-dimensional regular lattice as T01. Values form a total field in one declared finite ordered alphabet `A`; strict T02 has `k=\|A\|>=3`. |
 | Alphabet | Colors are distinct values. The ordered rank map `rho:A->{0,...,k-1}` is part of rule-code interpretation but does not make colors arithmetic magnitudes. Palette/tone is representation. |
 | Active loci | Every semantic site on every event, with finite causal-window lowering separated exactly as in T01. |
 | Read | The ordered old-snapshot triple `(left,self,right)`. Context order is semantic and homogeneous at every site. |
@@ -814,7 +814,7 @@ voronoi_priority_branches= (8, 5, 14)
 T02 Voronoi priority oracle: PASS 27 total entries
 ```
 
-The printed reversible and inverse-range labels also have an independent, dependency-free semantic check. The Notes state that cyclic words through length nine suffice for `k=3,r=1`; the same finite domain recovers the four printed inverse-window sizes. A window `start` is relative to the predecessor cell whose value is reconstructed.
+The printed reversible and inverse-range labels also have an independent, dependency-free semantic check. The Notes state that cyclic words through length nine suffice for `k=3,r=1`; the same finite cyclic-word test set recovers the four printed inverse-window sizes. A window `start` is relative to the predecessor cell whose value is reconstructed.
 
 ```bash
 python3 - <<'PY'
