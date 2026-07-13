@@ -25,7 +25,7 @@ Status: **IN PROGRESS**
 - Coupled map lattices/lattice dynamical systems are a historical related family. Probabilistic cellular automata are explicitly an alternative discrete-value stochastic construction, not a T44 flag.
 - Supporting pages add declared neighbor multiplier `1.13`, random-field parameter/class scans, a boiling application profile, and explicit noisy continuous analogs of rules 90/30. Boiling leaves its exact-equality threshold ambiguous; the noisy formula can exceed `[0,1]` and no clamp is stated. Neither ambiguity is silently repaired.
 - T45 removes discrete cells and discrete time and must remain a distinct continuous-space/time differential-equation category. A finite-difference approximation or PDE limit is a relation, not T44 native identity.
-- Six strict and two native-Notes assets plus classification, noise, boiling, and complex-block supporting assets are identified; the expanded raster audit is finalizing the authoritative count, hashes, dimensions, grids, constants, horizons, exact pixels, and underdetermined render conventions.
+- Six strict and two native-Notes assets plus nine classification/noise/boiling/complex-block supporting assets are closed: all 17 have exact paths, hashes, dimensions, roles, grids/crops where recoverable, and explicit underdetermined render conventions.
 - Current finite lattice selectors and parallel assignment are closer to T44 than to T43, but current alphabets discretize floats, current rules admit callbacks, current rollout uses family branches/NumPy rounding, and current exporters treat arrays/renders as the public result. Exact continuous-field semantics are absent.
 
 ## Updated Assumptions
@@ -332,6 +332,10 @@ The second signature is extraction-corrupt; the intended patterns are evidently 
 
 > “so-called ‘coupled map lattices’ or ‘lattice dynamical systems’ in which an iterated map (typically a logistic map) was applied at each step to a combination of neighboring cell value.”
 
+> “Most often considered, notably by Kunihiko Kaneko and co-workers, were” these systems.
+
+> “A transition from regular class 2 to irregular class 3 behavior, with class 4 behavior involving localized structures in between, was observed, and was studied in detail by Hugues Chaté and Paul Manneville”
+
 These names do not imply the strict radius-one mean, interval, or fractional map for every historical member.
 
 ### E15 — Exact background periods and a 501-rule scan
@@ -345,10 +349,18 @@ These names do not imply the strict radius-one mean, interval, or fractional map
 
 > “If a is not a rational number the background never repeats.”
 
+> “most cells whose values are not forced to be the same end up being at least slightly different—even in cases like a = 0.375.”
+
+> “in cases like a = 0.475 there is some trace of a pattern at every step—but it only becomes obvious when it makes values wrap around from 1 to 0.”
+
+The first is a finite-observation property, not an exact theorem that all unequal-role cells differ; the second distinguishes latent structure from the wrap event that makes it visually apparent.
+
 ### E16 — Additive modulo-one/Pascal sibling
 
 - Provenance: `BOOK:13306-13310`, native Notes.
-- Establishes: a separate no-center/no-division additive rule and its rational/irrational profiles.
+- Establishes: additivity of strict `c=0`, plus a separate no-center/no-division additive rule and its rational/irrational profiles.
+
+> “In the case a = 0 the systems on page 159 are purely additive. A simpler example is the rule”
 
 ```wolfram
 Mod[RotateLeft[list] + RotateRight[list], 1]
@@ -444,14 +456,14 @@ Its sequential argmax placement, translated depletion profile, and decay define 
 
 The first matrix is the nonunitary diffusion relation; the second is the unitary quantum construction. Both change the strict update interface, and the latter also changes the value space; neither is hidden in the scalar gray constructor.
 
-### E24 — Unbounded continuous-field state cardinality
+### E24 — Continuum configuration cardinality
 
 - Provenance: `BOOK:19072`, supporting continuum Notes.
-- Establishes: theoretical continuum cardinality, not a finite runtime capacity.
+- Establishes: theoretical continuum configuration cardinality, not support size or a finite runtime capacity.
 
 > “Continuous cellular automata (see page 155) also have `2^{N_0}` possible states.”
 
-The extracted `N_0` is the book's damaged rendering of `aleph_0`, established by the immediately preceding cardinality definitions at `BOOK:19070`; the quote is not silently normalized.
+The extracted `N_0` is the book's damaged rendering of `aleph_0`, established by the immediately preceding cardinality definitions at `BOOK:19070`; the quote is not silently normalized. A single real-valued cell and every nonempty finite real vector already have this same cardinality, so the statement cannot prove unbounded lattice support. The strict-main integer-line interpretation rests instead on the explicitly labeled T01/point-seed context inference.
 
 ### E25 — Actual Index routes and extraction controls
 
@@ -654,7 +666,111 @@ Binary64 evaluates the first displayed sum as `1.0`, itself illustrating why imp
 
 ### Semantic oracle
 
-An independent `fractions.Fraction` recurrence checked the exact rows, coefficient formula, symmetry, mass, period-four background, equality threshold, finite rational additive residues, weighted range, and high-precision `lambda(1)` inequality. It prints:
+This dependency-free command is the exact semantic oracle. It checks the printed rows, coefficient formula, symmetry, mass, period-four background, rational additive residues, weighted range, strict-versus-literal boiling equality divergence, and high-precision `lambda(1)` inequality:
+
+```bash
+python3 - <<'PY'
+from decimal import Decimal, getcontext
+from fractions import Fraction as F
+from functools import lru_cache
+from math import factorial
+
+getcontext().prec = 80
+
+def frac(x):
+    return x - x.numerator // x.denominator
+
+def recurrence(mode, c=F(0)):
+    @lru_cache(None)
+    def x(t, i):
+        if t == 0:
+            return F(1) if i == 0 else F(0)
+        u = (x(t-1, i-1) + x(t-1, i) + x(t-1, i+1)) / 3
+        return {'mean': u, 'scale': frac(3*u/2), 'add': frac(u+c)}[mode]
+    return x
+
+def trinomial(t, i):
+    total = 0
+    for left in range(t + 1):
+        for right in range(t - left + 1):
+            center = t - left - right
+            if right - left == i:
+                total += factorial(t)//(
+                    factorial(left)*factorial(center)*factorial(right)
+                )
+    return total
+
+mean = recurrence('mean')
+scale = recurrence('scale')
+addq = recurrence('add', F(1, 4))
+mean_t5 = [mean(5, i) for i in range(-5, 6)]
+scale_t4 = [scale(4, i) for i in range(-4, 5)]
+scale_t5 = [scale(5, i) for i in range(-5, 6)]
+addq_t4 = [addq(4, i) for i in range(-5, 6)]
+assert mean_t5 == [F(n, 243) for n in (1,5,15,30,45,51,45,30,15,5,1)]
+assert scale_t4 == [F(1,16),F(1,4),F(5,8),0,F(3,16),0,F(5,8),F(1,4),F(1,16)]
+assert scale_t5 == [F(1,32),F(5,32),F(15,32),F(7,16),F(13,32),F(3,32),
+                    F(13,32),F(7,16),F(15,32),F(5,32),F(1,32)]
+assert addq_t4 == [0,F(1,81),F(4,81),F(10,81),F(70,81),F(73,81),
+                   F(70,81),F(10,81),F(4,81),F(1,81),0]
+for t in range(9):
+    assert sum(mean(t, i) for i in range(-t, t+1)) == 1
+    for i in range(-t, t+1):
+        assert mean(t, i) == F(trinomial(t, i), 3**t)
+        assert mean(t, i) == mean(t, -i)
+
+def background(t, c):
+    value, out = F(0), [F(0)]
+    for _ in range(t):
+        value = frac(value+c)
+        out.append(value)
+    return out
+
+assert background(4, F(1,4)) == [0,F(1,4),F(1,2),F(3,4),0]
+assert background(12, F(3,4))[0] == background(12, F(3,4))[4]
+
+def additive(t, i, k):
+    @lru_cache(None)
+    def x(s, j):
+        if s == 0:
+            return 1/k if j == 0 else F(0)
+        return frac(x(s-1, j-1)+x(s-1, j+1))
+    return x(t, i)
+
+for k in (F(2),F(3),F(7,3),F(81,73)):
+    seen = set()
+    for t in range(11):
+        for i in range(-t, t+1):
+            expected = F(0)
+            if (t+i) % 2 == 0:
+                expected = frac(F(
+                    factorial(t),
+                    factorial((t+i)//2)*factorial((t-i)//2)
+                )/k)
+            assert additive(t, i, k) == expected
+            seen.add(expected)
+    assert len(seen) <= k.numerator
+
+weighted_max = (F(113,100)+1+F(113,100))/3
+assert weighted_max == F(163,150)
+strict_at_one = frac(F(1))
+literal_at_one = F(1) if F(1) <= 1 else frac(F(1))
+assert strict_at_one == 0 and literal_at_one == 1
+lambda1 = Decimal(1)+(-Decimal(40)).exp()
+assert lambda1 > 1
+
+print('T44 semantic oracle PASS')
+print('mean_t5', ','.join(map(str, mean_t5)))
+print('scale_t4', ','.join(map(str, scale_t4)))
+print('scale_t5', ','.join(map(str, scale_t5)))
+print('add_quarter_background', ','.join(map(str, background(4, F(1,4)))))
+print('add_quarter_t4', ','.join(map(str, addq_t4)))
+print('weighted_max', weighted_max)
+print('exact_one strict/literal', strict_at_one, literal_at_one)
+PY
+```
+
+Recorded output:
 
 ```text
 T44 semantic oracle PASS
@@ -664,11 +780,21 @@ scale_t5 1/32,5/32,15/32,7/16,13/32,3/32,13/32,7/16,15/32,5/32,1/32
 add_quarter_background 0,1/4,1/2,3/4,0
 add_quarter_t4 0,1/81,4/81,10/81,70/81,73/81,70/81,10/81,4/81,1/81,0
 weighted_max 163/150
+exact_one strict/literal 0 1
 ```
 
 ### Asset and raster audit
 
-The native strict/Notes block contains exactly eight linked assets. Nine additional assets materially illustrate supporting classification/noise/application/block passages. Canonical text remains the monolith; asset paths resolve through clean chapter/Notes splits.
+The native strict/Notes block contains exactly eight linked assets. Nine additional assets materially illustrate supporting classification/noise/application/block passages. Canonical text remains the monolith; exact asset roots are:
+
+```text
+SBN   = ref/A-New-Kind-of-Science/CHAPTERS/4-Systems-Based-on-Numbers/Images
+RAND  = ref/A-New-Kind-of-Science/CHAPTERS/6-Starting-from-Randomness/Images
+MECH  = ref/A-New-Kind-of-Science/CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images
+NOTES = ref/A-New-Kind-of-Science/BACK-MATTER/Index/Images
+```
+
+Table rows 1-6 use `SBN`, 7-8 and 15-17 use `NOTES`, 9-12 use `RAND`, and 13-14 use `MECH`; thus every basename below resolves to one exact repository path.
 
 | Asset | Role | Bytes | Dimensions | SHA-256 |
 |---|---|---:|---:|---|
@@ -690,35 +816,70 @@ The native strict/Notes block contains exactly eight linked assets. Nine additio
 | `_page_1009_Picture_7.jpeg` | boiling/heating `c=.1` | 10,078 | 263x134 | `733e4bfc8212ee9c7cce554e156fb3f62def9dd474277004a5f79711050d0047` |
 | `_page_1075_Picture_3.jpeg` | distinct complex unitary block-CA sibling | 15,585 | 579x141 | `2abb1adb633919a13091fd89fb2598011eb7d6344de7ebc249b6d041632a16ed` |
 
+The metadata table is reproducible with Pillow and the standard library:
+
+```bash
+python3 - <<'PY'
+from hashlib import sha256
+from pathlib import Path
+from PIL import Image
+
+roots = {
+    'SBN': Path('ref/A-New-Kind-of-Science/CHAPTERS/4-Systems-Based-on-Numbers/Images'),
+    'RAND': Path('ref/A-New-Kind-of-Science/CHAPTERS/6-Starting-from-Randomness/Images'),
+    'MECH': Path('ref/A-New-Kind-of-Science/CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images'),
+    'NOTES': Path('ref/A-New-Kind-of-Science/BACK-MATTER/Index/Images'),
+}
+assets = [
+ ('SBN','_page_171_Picture_5.jpeg'), ('SBN','_page_172_Picture_1.jpeg'),
+ ('SBN','_page_173_Picture_3.jpeg'), ('SBN','_page_173_Picture_4.jpeg'),
+ ('SBN','_page_174_Picture_2.jpeg'), ('SBN','_page_175_Figure_2.jpeg'),
+ ('NOTES','_page_937_Picture_3.jpeg'), ('NOTES','_page_937_Picture_8.jpeg'),
+ ('RAND','_page_258_Figure_1.jpeg'), ('RAND','_page_259_Picture_2.jpeg'),
+ ('RAND','_page_259_Picture_4.jpeg'), ('RAND','_page_259_Picture_6.jpeg'),
+ ('MECH','_page_340_Figure_2.jpeg'), ('MECH','_page_340_Figure_4.jpeg'),
+ ('NOTES','_page_1009_Picture_6.jpeg'), ('NOTES','_page_1009_Picture_7.jpeg'),
+ ('NOTES','_page_1075_Picture_3.jpeg'),
+]
+for root, name in assets:
+    path = roots[root]/name
+    print(path, path.stat().st_size, Image.open(path).size, sha256(path.read_bytes()).hexdigest())
+PY
+```
+
 The strict geometry and exact regeneration establish:
 
 - Page 171's extraction contains only the identity map diagram. The six-row diffusion evolution survives as rounded text; exact rows come from the trinomial oracle above.
-- Page 172 contains 151 initial-inclusive states `t=0..150` over a 203-cell visible central window. Its inset is exactly 31 cells by 23 states `t=0..22`, seed at index 15. Exact dyadic regeneration correlates with the sampled inset cell centers at `r=0.99588`, mean absolute gray error `5.42/255`; the unoccluded lower main raster gives `r=0.9933`, error about five levels. JPEG, grid/overlay, scaling, and unstated tone transfer preclude a literal byte-for-value claim. The main computation boundary is outside the visible crop.
-- Page 173 Picture 3 has 50 visible cells by 30 initial-inclusive rows `t=0..29`, seed index 24. All 1,500 cell centers against an exact rational Notes-ring regeneration give `r=0.99456`, mean error `6.60/255`. A wide integer-line crop gives the same 8-bit/JPEG result: the two differ only in 25 cells at `t>=25`, by at most `5.4e-10`. The raster therefore does not establish a boundary. Picture 4 places the map discontinuity at `x=3/4`.
-- Page 174 contains 21 labeled rules whose mathematical constants are `c=n/40`, `n=0..20`, displayed `0,.025,...,.5`. Each panel shows 101 cells by 51 states `t=0..50` from the point seed; exact-rational reconstruction matches the geometry and field appearance, but the raster does not by itself identify the source's finite numeric representation. The mathematical background is `FractionalPart[t c]`.
-- Page 175 labels `c={.1,.3,.325,.3299,.3299 differences,.35,.475,.495,.9}`. Each panel shows 201 states `t=0..200` over a central crop of about 185 cells. The duplicate declared-decimal `.3299` entries are one trajectory and an adjacent absolute-right-difference observer, not two transition rules. `3299/10000` is an exact-rational reconstruction, not established source identity: through this horizon it and IEEE binary64 `.3299` give the same 8-bit difference fit (`r=0.873586`, mean error `14.51/255`). The absolute-right convention is raster-derived—its correlation exceeds absolute-left, modulo-right, signed-right, and raw-field alternatives—while prose says only “difference.” Native Notes explicitly say exact rational generation is essential and that double precision makes almost every page-160 profile wrong, with this localized-structure panel as the exception.
-- Notes page 937 Picture 3 has two 501-parameter matrices for exact `c=n/500`, `n=0..500`: uniform background and center cell. Horizontal data coordinates are one pixel per parameter; the background source is exact `FractionalPart[t c]`. Vertical resampling/filter/axes mean correlation is a declared visual check, not an exact cell match.
-- Notes page 937 Picture 8 labels `k={2,3,7/3,81/73,Sqrt[2],Pi}` for the additive sibling. The rational profiles are finite-valued/nested and the two irrational profiles are irregular; raster appearance is not a proof of equidistribution.
+- Page 172 contains 151 initial-inclusive states `t=0..150` over a 203-cell visible central window. Resize the exact 151x203 gray array to half-open crop `x=39:1151,y=47:874` and compare only relative rows `300:` because the insets occlude the upper main raster: `r=.993335`, MAE `5.27/255`. The independent center trace at `x=595,y=47:874` gives `r=.98958`, MAE `7.31/255`. Its inset is exactly 31 cells by 23 states `t=0..22`, seed at index 15; boundaries are rounded `linspace(805,1127,32)` and `linspace(64,304,24)`, with integer midpoint samples. Exact dyadic regeneration gives `r=.9958826436`, MAE `5.42209/255`, maximum `30.89/255`. JPEG, grid/overlay, scaling, and unstated tone transfer preclude a literal byte-for-value claim. The main computation boundary is outside the visible crop.
+- Page 173 Picture 3 has 50 visible cells by 30 initial-inclusive rows `t=0..29`, seed index 24. Center samples use rounded boundaries `linspace(29,444,51)` and `linspace(16,265,31)`. All 1,500 centers against the exact Notes ring give `r=.9945625933`, MAE `6.60386/255`, maximum `40.45/255`. A wide integer-line crop gives the same 8-bit/JPEG result: the two differ only in 25 cells at `t>=25`, by at most `5.32e-10`. The raster therefore does not establish a boundary. Picture 4 places the map discontinuity at `x=3/4`.
+- Page 174 contains 21 row-major labeled rules whose mathematical constants are `c=n/40`, `n=0..20`, displayed `0,.025,...,.5`. Each panel shows 101 cells by 51 states `t=0..50` from the point seed. The representative `c=1/10` exact-rational reconstruction, bilinearly resized to `x=413:693,y=259:398`, gives `r=.99787`, MAE `2.11/255`; its center at `x=552` gives `r=.99196`, MAE `5.18/255`. This matches geometry/appearance but does not establish the source's numeric storage. The mathematical background is `FractionalPart[t c]`.
+- Page 175 labels `c={.1,.3,.325,.3299,.3299 differences,.35,.475,.495,.9}`. Each panel shows 201 states `t=0..200` over a resampled central crop of about 184-185 cells. The `c=1/10` exact-rational field reconstruction on 184 columns against `x=63:384,y=69:424` gives `r=.98779`, MAE `4.40/255`. The duplicate declared-decimal `.3299` entries are one trajectory and an adjacent absolute-right-difference observer: 185 reconstructed columns against `x=437:763,y=475:829` give `r=.99295`, MAE `3.80/255`. A coarser discriminator gives absolute-right `r=.87359`, versus absolute-left `.58219`, modulo-right `.25799`, signed-right `-.03042`, and raw field `.15146`. The convention is therefore strong raster inference—prose says only “difference.” `3299/10000` is a reconstruction, not proven source identity; exact rational and IEEE binary64 `.3299` yield the same 8-bit result through this horizon. Native Notes say exact rationals are essential and double precision makes almost every page-160 profile wrong, with this localized-structure panel as the exception.
+- Notes page 937 Picture 3 has two matrices over exact mathematical parameters `c=n/500`, `n=0..500`: uniform background and center cell. Columns are exactly `x=42+n`. The top represents `t=1..150`; bilinearly resizing its exact 150x501 background array into `x=42:543,y=23:143` gives `r=.72013`, MAE `26.22/255`, while the first-row gradient gives `r=.982`. Axes/JPEG and 150-to-120 vertical downsampling make this a visual check, not exact cell identity. The bottom uses the same axes/horizon for the exact center family.
+- Notes page 937 Picture 8 labels `k={2,3,7/3,81/73,Sqrt[2],Pi}` for the additive sibling. Each row-major panel encodes `t=0..50` and a 101-cell window in a 158x77 crop: `k=2` at `33:191,29:106`, `k=3` at `217:375,29:106`, `k=7/3` at `402:560,29:106`, `k=81/73` at `33:191,140:217`, `Sqrt[2]` at `217:375,140:217`, and `Pi` at `402:560,140:217`. Exact-rational fits for the first three are respectively `r=.87207/.83659/.87781`, MAE `5.04/5.97/7.49`; dense fourth and irrational panels are only about `.53-.56` under direct gray/JPEG fitting, so finite-raster precision remains underdetermined and appearance is not proof of equidistribution.
 
-The supporting page-258 gallery labels deterministic add-constant rules `c=0,.1,...,.9` but uses a random field whose measure/generator are absent. Page 259 labels `.39`, `.4`, and `{.5,1.13}` and shows only derived differences. Page 340 Figure 2 labels rule-90 perturbations `0%,5%,10%,15%` and rule-30 perturbations `0%,.5%,.8%,1%,2%,5%`; the full random draws are unrecoverable. Boiling labels heating rates `.05` and `.1`. The complex-block asset is dispositioned only as a sibling; it cannot test the strict gray rule.
+The supporting page-258 gallery directly labels deterministic add-constant rules `c=0,.1,...,.9` and random initial fields, but width/horizon, field measure, generator, and seed are absent; its roughly 250x100 panel cadence is raster inference only. Page 259 directly labels `.39`, `.4`, and `{.5,1.13}`, all with random initial fields and neighbor-difference views; the last means the divisor-three rule `FractionalPart[(1.13L+C+1.13R)/3+.5]`, not division by `3.26`. Page 340 Figure 2 labels rule-90 perturbations `0%,5%,10%,15%` and rule-30 perturbations `0%,.5%,.8%,1%,2%,5%`; the full `Random[]` draws are unrecoverable, and a roughly 101-state/201-cell geometry is only an aspect-ratio inference. Figure 4 is the source `lambda` icon over about `[0,4]`, not evidence of `[0,1]` closure. Boiling directly labels heating rates `.05` and `.1`, but initial field, boundary, width, horizon, RNG, and numeric storage are absent; the literal wrap predicate is a bubble/latent-heat observer. The complex asset is a distinct alternating pair-block unitary sibling and cannot test the strict gray rule.
 
-The deep raster audit is still refining the page-175 absolute-difference crop fit and the additive panel grid. No semantic conclusion depends on a renderer setting that the source does not state.
+Page 339 Figure 1 is explicitly excluded: it is discrete ECA rule 30 with varying counts of initial black cells, not continuous state (`108,161` bytes, `1105x410`, SHA-256 `8f3f13473abc794bc49321891b3c2ed636a9277c3faff84826772b74cd0e7ba9`). Probabilistic-CA page 591, PDE limits, and historical mentions are likewise distinct types or textual context. The cross-reference and raster audit is closed at 17 included assets and this one material exclusion; no semantic conclusion depends on an unstated renderer setting.
 
 ### Source and extraction repairs
 
 1. Monolith image links omit `Images/`; clean split directories provide asset provenance while monolith lines remain canonical text provenance.
-2. `BOOK:1962` and `1988` omit the initial center `1`; `1979` has blank/misaligned cells. The clean split fills/shifts some cells differently. All printed decimals are rounded, so neither table is an exact oracle.
-3. `BOOK:1970`'s “greater than 1” threshold conflicts with caption, formula, Notes, and exact rows at equality.
-4. `BOOK:13288` corrupts Wolfram pattern syntax in `CCAEvolveList`.
-5. `BOOK:13298`'s singular “neighboring cell value” is a grammar/extraction defect.
-6. `machineprecision` and `wrong-with` at `13294` have missing spacing/punctuation.
-7. `BOOK:13310`'s “all possible values” is not literal continuum enumeration.
-8. The actual Index is multi-column-spliced; apparent collisions are not prose. Its `2/13` is OCR for page 243.
-9. Finite periodic boundary is explicit only in Notes code, not strict prose.
-10. The page-245 difference convention and random-field measure are not stated.
-11. The page-325 `x_-` is an extraction of Wolfram pattern syntax. `Random[]` fixes a uniform pseudorandom real marginal on `[0,1]`, but draw independence/correlation, exact seed/draws, call order, fully pinned historical generator, finite boundary, and out-of-range handling remain unstated.
-12. Exact precision, reduction order, horizons, raster transfer curves, and some crop conventions are unstated and cannot be recovered by appearance alone.
-13. The boiling passage's “exceeds 1” threshold is not equivalent to the strict unconditional add-constant map at exact one. Its page-158 cross-reference suggests a repair but does not prove it; literal and reconstructed profiles stay separate.
+2. Notes assets for pages 937, 1009, and 1075 are physically under `BACK-MATTER/Index/Images`, and the line-oriented Notes prose is duplicated in `BACK-MATTER/Index/Index.md`; neither filesystem placement changes canonical provenance.
+3. Page 171 promises a diffusion evolution, but its extracted asset contains only the 277x91 identity-map icon. The six-row text table is the surviving evolution oracle.
+4. Early tables lose nonzero cells: pages 171/173 omit the time-zero center `1`; page 172 time 4 loses two `5/8` cells; page 173 time 2 loses two `11/18` cells. The split sometimes converts or misaligns blanks as zeros. Exact recurrence repairs them; rounded text is never exact state.
+5. `BOOK:1970`'s “greater than 1” threshold conflicts with caption, formula, Notes, and exact rows at equality.
+6. `BOOK:13288` corrupts Wolfram pattern separators in the `CCAEvolveList` signature; the `NestList` intent remains clear.
+7. `BOOK:13298`'s singular “neighboring cell value” is a grammar/extraction defect.
+8. `machineprecision` and `wrong-with` at `13294` have missing spacing/punctuation.
+9. `BOOK:13310`'s “all possible values” is not literal continuum enumeration.
+10. The actual Index is multi-column-spliced; apparent collisions are not prose. Its `2/13` is OCR for page 243.
+11. Page-259 parameter labels are detached from their assets; order resolves Picture 2 as `.39`, Picture 4 as `.4`, and Picture 6 as `{.5,1.13}`.
+12. Finite periodic boundary is explicit only in Notes code, not strict prose or central raster crops.
+13. The page-245 difference convention and random-field measure are not stated. Absolute-right difference is a raster-derived reconstruction, not a repaired quote.
+14. The page-325 `x_-` is an extraction of Wolfram pattern syntax. `Random[]` fixes a uniform pseudorandom real marginal on `[0,1]`, but draw independence/correlation, exact seed/draws, call order, fully pinned historical generator, finite boundary, and out-of-range handling remain unstated.
+15. Exact precision, reduction order, supporting horizons, raster transfer curves, and some crop conventions are unstated and cannot be recovered by appearance alone.
+16. The boiling passage's “exceeds 1” threshold is not equivalent to the strict unconditional add-constant map at exact one. Its page-158 cross-reference suggests a repair but does not prove it; literal and reconstructed profiles stay separate.
+17. The page-325 and boiling random/supporting rasters lack replay seeds or complete initial fields and therefore support preset/disposition evidence, not golden transition arrays.
 
 ## Variants, Relations, and Boundaries
 
@@ -787,9 +948,9 @@ The legacy Wolfram `Random[]` primitive fixes `U`'s marginal as a uniformly dist
 - `src/ca/rollout.py:145-212,576-682,742-777` — `SEMANTIC MISMATCH`: family dispatch, `int64` coercion, integer aggregation, and binary lookup cannot execute T44.
 - `src/ca/seeds.py:39-55,239-313,879-939` — `DIRECT` point-support responsibility; `SEMANTIC MISMATCH` for integer-only values/rendering and absent random-real seed semantics.
 - `src/ca/rng.py:20-70` — `PARAMETERIZATION` as an episode-seed helper only; it lacks distribution, generator-version, coordinate/time draw identity, and exact sampling semantics.
-- `RawEpisode`/`RawBatch` — `PARAMETERIZATION` as finite containers, but integer rule IDs, ndarray state, and absent event/outcome records are insufficient.
+- `RawEpisode`/`RawBatch` (`src/ca/specs.py:58-81`) — `PARAMETERIZATION` as finite containers, but integer rule IDs, ndarray state, and absent event/outcome records are insufficient.
 - `src/ca/viz/export.py:177-184` — `SEMANTIC MISMATCH`: float/object states are rejected rather than exported through a typed continuous-field view.
-- Current tests establish finite selectors, boundaries, batches, and integer lookup only. No test covers interval state, rational field evolution, aggregate-then-map, fixed-precision divergence, weighted rules, additive continuous rules, stochastic draws, or gray views.
+- Concrete tests establish fixed/periodic/reflective gathering (`tests/test_loci.py:48-54`), radius-one old-time stencils (`tests/test_neighborhoods.py:86-119`), finite integer lookup and batching (`tests/test_rollout.py:263-310`), deterministic episode-level NumPy RNG derivation (`tests/test_rng.py:8-23`), integer point/Bernoulli seed rendering (`tests/test_seeds.py:71-82`), and deliberate rejection of float/object viewer states (`tests/test_viz_export.py:259-277`). No test covers interval state, rational field evolution, aggregate-then-map, fixed-precision divergence, weighted rules, additive continuous rules, coordinate-indexed stochastic draws, or typed gray-field views.
 
 ## Principles Audit
 
@@ -834,7 +995,7 @@ The strict global topology, random-field law, difference convention, fixed machi
 4. Lower T44 local results through the generic T01 fixed-field executor; lift exact/certified/tracked/represented/stochastic evaluation without a family branch.
 5. Add initial-inclusive field runs, compact reconstruction, interruption/atomic-failure outcomes, identity/codecs, and finite-window queries.
 6. Add typed raw/difference/background/center/mass/parameter/class views and continuous-field visualization adapters.
-7. Add strict, weighted, additive, coupled, boiling, noisy, and separately deferred complex-block presets with provenance/repair records.
+7. Add strict, weighted, and additive presets; two separately identified boiling records for literal threshold-conditional and strict-family reconstruction; noisy widened/partial presets; and a typed coupled-map relation/general closed constructor requiring a user-declared aggregate/map. Do not promise a book-exact coupled preset, and defer the complex-block sibling.
 8. Add exact row/formula, boundary/halo, numeric divergence, stochastic replay, observer separation, codec, and no-cheating conformance tests.
 
 ## Goal 2 Implementation Stage
