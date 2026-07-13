@@ -28,7 +28,7 @@ Each type stage must make the following auditable:
 |---|---:|---|---:|---|---|---|
 | T01 | 2 | Elementary Cellular Automata | 1 | `2-T01-ELEMENTARY.md` | COMPLETE | 8 search families; 23 excerpt groups; all split/Notes/Index/cross-reference candidates dispositioned; 0 unresolved |
 | T02 | 3 | Multi-Color Nearest-Neighbor Cellular Automata | 2 | `21-T02-MULTICOLOR-CA.md` | COMPLETE | Exact 29-query/157-candidate partition; 21 evidence groups; 48 verbatim fragments; ordered `k^3` table/base-`k` codec; 11 included/6 excluded/2 relation-only assets; seven source/semantic/metadata/Voronoi/reversible/raster oracles; 0 unresolved |
-| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | REOPENED | Asset manifest repaired to 48 included/16 excluded/6 relation-only, including the full code-20 route and code-357/code-1329 panels; core semantics remain valid while widened source closure and fresh global/independent review remain pending |
+| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | REOPENED | Widened 17-query/309-candidate source partition and 116-link asset manifest pass at 48 included/60 excluded/8 relation-only; core semantics remain valid while fresh global/independent review remains pending |
 | T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | IN PROGRESS | Three-color preset evidence audit active |
 | T05 | 6 | Higher-Color Totalistic Cellular Automata | 5 | `24-T05-HIGHERCOLOR-TOTALISTIC.md` | PENDING | Not started |
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | PENDING | Not started |
@@ -83,4 +83,4 @@ Each type stage must make the following auditable:
 
 ## Reopened-Stage Log
 
-- T03 reopened during T04: named code-357/code-1329 and binary radius-two code-20 follow-through exposed omitted text/profile candidates, direct assets, and related controls, contradicting the former exhaustive-manifest/physical-superset claim. The physical repair now closes 48 included, 16 excluded, and 6 relation-only assets; semantic decisions remain active, but source/excerpt closure and fresh global/independent review are still required before recompletion.
+- T03 reopened during T04: named code-357/code-1329 and binary radius-two code-20 follow-through exposed omitted text/profile candidates, direct assets, and wider raster chains, contradicting the former exhaustive-manifest/physical-superset claim. Widened source/excerpt closure and the 48 included, 60 excluded, and 8 relation-only asset audit now pass; fresh global/independent review is still required before recompletion.
