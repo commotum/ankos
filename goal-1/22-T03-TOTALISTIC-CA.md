@@ -851,7 +851,7 @@ code(U)     = sum_{s=0}^{M-1} nu(U_s) * k^s
 
 T03 remains the same CA preset/runner as T01/T02. Its valuation, exact equal-weight sum, and complete sum table are a factorized RULE representation. The mechanically expanded exhaustive table denotes the same local function and commutes one step at a time; compact form and codec remain source-faithful identity/provenance rather than a distinct executor or construction class.
 
-Revised G2-T03 adds a typed factorized local RULE form, exact valuation/reachable-sum validation, lossless expand/compact relation, and bigint sum-table codec through the existing CA axes. T04/T05 are strict presets, T06/T07 restrictions/properties, and other reducers/dimensions/value carriers are typed axis variants when validated. The independent asset repair remains open and is not weakened by this architecture correction.
+Revised G2-T03 adds a typed factorized local RULE form, exact valuation/reachable-sum validation, lossless expand/compact relation, and bigint sum-table codec through the existing CA axes. T04/T05 are strict presets, T06/T07 restrictions/properties, and other reducers/dimensions/value carriers are typed axis variants when validated. The bounded independent asset repair is complete and does not weaken this architecture correction.
 
 ## Historical Current API Fit (Superseded on compact/expanded identity wording)
 
