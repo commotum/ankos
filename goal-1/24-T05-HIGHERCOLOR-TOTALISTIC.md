@@ -6,20 +6,21 @@ Status: **IN PROGRESS**
 
 - Exact catalog row: T05, CSV line 6, `Higher-Color Totalistic Cellular Automata`; taxonomy section 5 at `ref/notes/CA-Types.md:126-145` is search vocabulary only, not book evidence.
 - The taxonomy hypothesis is a radius-one totalistic profile with four, five, or more values. It claims no new support, read, update, successor, or halt semantics beyond T03; the book audit must prove or revise that grouping.
-- The strict five-color comparison states 13 sum cases and `5^13 = 1,220,703,125` possible rules, while a separate Notes/application example names a four-color totalistic code `1004600`. These are initial evidence routes, not yet an exhaustive closure.
-- If canonical values are `A_k=(0,...,k-1)` with `nu_k(i)=i` and `r=1`, T03 gives arity `q=3`, sum domain `0..3(k-1)`, table length `M=3k-2`, and rule count `R=k^(3k-2)`. The stage must independently verify the color valuation, range, code direction, examples, and whether “higher-color” means exactly `k>=4`.
-- T01/T02/T03/T04 already establish fixed ordered support, all-site old-snapshot reads, typed same-site assignment, atomic parallel update, structural table identity, arbitrary-precision tagged code identity, and the preset/restriction/property/run/view boundary. D118 currently predicts that T05 is the higher-color radius-one preset over T03; this is a hypothesis under evidence audit.
+- The strict five-color comparison states 13 sum cases and `5^13 = 1,220,703,125` possible rules, while a separate Notes/application example names four-color totalistic code `1004600`. The complete audit closes these and every alias, formula, caption, Notes, Index, split, application, control, and linked-asset route at 11 queries, 142 lexical lines, five governed prose continuations, and 25 assets: 172 candidates with zero remainder.
+- Canonical values `A_k=(0,...,k-1)`, `nu_k(i)=i`, `r=1`, and explicit “four or more colors” establish exactly the concrete finite range `k>=4`. T03 then gives arity `q=3`, sum domain `0..3(k-1)`, table length `M=3k-2`, and rule count `R=k^(3k-2)`. The general formula derives the otherwise nonliteral `k=4` values `M=10`, `R=4^10`; `k=5` is independently direct.
+- T01/T02/T03/T04 already establish fixed ordered support, all-site old-snapshot reads, typed same-site assignment, atomic parallel update, structural table identity, arbitrary-precision tagged code identity, and the preset/restriction/property/run/view boundary. T05 confirms D118: it is the strict canonical higher-color radius-one preset over T03, not a distinct construction.
 - The current API/runtime remains semantically incomplete for this profile: `simple_programs.md` and `src/ca/rules.py` conflate exact numeric sums with counts/histograms; spatial rollout is family-dispatched and binary-decoded; batch rule IDs use `numpy.int64`; no current test executes a four-or-more-color totalistic sum table.
-- Goal 1 remains evidence/design only. This stage may edit only `goal-1/` and must not implement a T05 runtime family.
+- T05 exposed one bounded T03 source-closure omission: code `1004600`'s Notes continuation and two plots. T03 was repaired, independently reviewed, and reclosed at 312 candidates and 118 assets without changing its semantics; T04 remained complete.
+- Goal 1 remains evidence/design only. This stage edits only `goal-1/` and does not implement a T05 runtime family.
 
 ## Updated Assumptions
 
-- Working hypothesis: T05 is a strictly validated catalog preset/range fixing `r=1`, canonical integer alphabet/valuation, and `k>=4`, then resolving to an ordinary generic T03 program with identical structural identity and executor types.
+- Validated result: T05 is a strict catalog preset/range fixing `r=1`, canonical integer alphabet/valuation, and `k>=4`, then resolving to an ordinary generic T03 program with identical structural identity and executor types.
 - A finite `k` is required for every concrete program. “Four, five, or more” does not authorize an unbounded or lazily partial table, wildcard rows, implicit defaults, or fake fixed capacity.
 - Structural sum-table identity remains primary. The optional numeric code is an arbitrary-precision relation whose digit count grows with `k`; fixed-width integers, floating values, or JSON numbers cannot define identity.
 - Alphabet order, exact numeric valuation, palette, and displayed color names remain distinct. Noncanonical valuations belong to generic T03 unless the source proves them part of T05.
 - Rule program, seed/background, finite realization, behavior class, property/proof, gallery selection, raster, and application relation remain separate identities.
-- No new decision will be added unless exhaustive evidence contradicts D115-D118 or proves a genuinely new semantic responsibility.
+- Exhaustive evidence does not contradict D115-D118 or prove a new semantic responsibility. D118 is sharpened with the exact preset boundary; no D119 is needed.
 
 ## Big Picture Objective
 
@@ -527,7 +528,7 @@ Reusable mechanics are the radius-one selector, explicit finite boundaries, fini
 - **Principles 13 and 15:** adversaries must include a four-color nonbinary output, equal-sum/different-histogram contexts, in-place-versus-old-snapshot divergence, `k=8` bigint identity, quiescent and nonquiescent rules, preset/generic equality, and exact source code-label sets.
 - **Principles 14 and 16:** any higher-color rollout switch, hard maximum `k`, sparse/default table, binary decoder fallback, callback aggregate, or T05-only bigint path is a hard-stop architecture failure.
 
-D115-D118 currently suffice: the construction is the same equal-weight sum quotient and complete structural table over the same assignment executor. Completion should sharpen D118 with the exact `k>=4,r=1,A_k,nu_k` preset boundary, but should add no D119 unless the remaining source/asset audit contradicts this model.
+D115-D118 suffice: the construction is the same equal-weight sum quotient and complete structural table over the same assignment executor. D118 is sharpened with the exact `k>=4,r=1,A_k,nu_k` preset boundary; no D119 or new update law is justified.
 
 ## Exact Semantic Oracle
 
@@ -667,6 +668,221 @@ code1004600_table= (0, 2, 3, 0, 0, 1, 1, 1, 3, 3) display= (3, 3, 1, 1, 1, 0, 0,
 page122_labels= 8 8 page256_labels= 32 quiescent_k4= 262144
 old_snapshot= (2, 2, 2) in_place_rejected= (2, 0, 0)
 ```
+
+## Asset and Raster Audit
+
+The closed bidirectional join contains 25 unique physical JPEGs: five direct T05 assets, thirteen relation-only assets, and seven excluded controls. The canonical monolith omits the Images/ directory component; each split link resolves to the single physical file pinned below. Basenames and digests are unique.
+
+| Disposition | Canonical link lines | Governed role |
+|---|---|---|
+| Included (5) | BOOK:1280,2866,9164,19236,19238 | Page-122 four/five-color labels; page-256 four-color labels/classes; code-1004600 finite-run and 20-million-step property plots |
+| Relation-only (13) | BOOK:778,7928,7932,7934,7984,11170,11297,14226,14228,14230,14232,14390,18759 | Generic/lower code order, emulations, additive and class-frequency profiles, commutative-monoid relation, and WireWorld application |
+| Excluded controls (7) | BOOK:3944,10393,10409,15313,15315,15317,15319 | Unrestricted four/higher-color rules, input-doubling comparators, and a non-totalistic phase-transition run |
+
+The four page-963 class-frequency charts are included relation-only because BOOK:14224 explicitly says “pie charts below.” Their visible labels are lower/generic comparators, but silently dropping their direct image run would invalidate linked-asset exhaustion.
+
+### Exact metadata and routing oracle
+
+~~~bash
+python3 - <<'PY'
+from hashlib import sha256
+from pathlib import Path
+
+ROOT=Path('ref/A-New-Kind-of-Science')
+book=(ROOT/'A-New-Kind-of-Science.md').read_text().splitlines()
+
+# relative path: (bytes,width,height,sha256,disposition)
+items={
+'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_75_Figure_6.jpeg':(51178,610,446,'acb13963632286960ca61b616ff2f45a940750f3ab7deb5e6fbf696543015c15','R'),
+'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_122_Figure_2.jpeg':(186914,1098,1164,'ccd7a43a495d01a22300c4b9abbb3ff1b13a3ef37389e77ca491ec805cbaa822','I'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_256_Figure_2.jpeg':(328297,1092,1367,'1c4967f6967d8e813b2a281e2615dc8bef272eb57789b60e23c950de5e6bc01f','I'),
+'CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_354_Picture_2.jpeg':(81505,1179,678,'81ebd51ac98816c63105d46e9cf279dd4450ace2dc1acd9261d87a0a20510695','X'),
+'CHAPTERS/11-The-Notion-of-Computation/Images/_page_672_Picture_1.jpeg':(52915,487,481,'7eaddca4f7e868881728f3ca94f5c6818daaaca2f8ebc2b34d7f5886cdc59813','R'),
+'CHAPTERS/11-The-Notion-of-Computation/Images/_page_672_Picture_3.jpeg':(6676,463,50,'9a6eeba3b31aa9d265993d036bea9f1febef1427a989f7a4154438300393ee39','R'),
+'CHAPTERS/11-The-Notion-of-Computation/Images/_page_672_Picture_4.jpeg':(13036,1071,35,'91b2a78cc9bfc00cdef4408a8db23ed252b5aae4e3cfd34eebfa5341bc50fcd2','R'),
+'CHAPTERS/11-The-Notion-of-Computation/Images/_page_677_Figure_2.jpeg':(173594,1033,1034,'8a59e423d080cdcfd5fbeb61170c099dc6ec904702e27385627427d56373f543','R'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_769_Figure_1.jpeg':(298516,1065,1308,'a980effe214906d991e8ca9180cb9f9d6eade2f978a8358487a60bb1728058f3','I'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_847_Figure_1.jpeg':(111064,1041,385,'2d36e7eaeb3b073e68621ef5f9c1c397ae24ddc74fe06f26e62546ccc3af2902','X'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_848_Figure_2.jpeg':(247033,1194,1308,'0bfecfeff1bd81072838e39704fc6572632dee083f91ddc4370909b0e2c5b5dd','X'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_25.jpeg':(5511,211,117,'d53637ce9ec50330d5fa6239b23f48d57b563266a0085a23517d4538020fd5fb','R'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_21.jpeg':(25918,583,225,'5f829c7776b53963e578df5a783553320da171c4e1c4d92c470899ec5bb3e40d','R'),
+'BACK-MATTER/Index/Images/_page_963_Picture_8.jpeg':(3114,144,152,'1fb4f0b4c03d8ba9f9fdeb67a0bbda2d786ed7ceeb13cdd8c31337ccd54bcdfb','R'),
+'BACK-MATTER/Index/Images/_page_963_Picture_9.jpeg':(3226,136,148,'515f5de1423a9164ed6def92d786346f64c15a0a87ba07b723c069e62829caf6','R'),
+'BACK-MATTER/Index/Images/_page_963_Picture_10.jpeg':(3654,138,158,'4b5ff621a668c5b706cdec0481cf3849facb7395d256dfd7c39b471d95fd018f','R'),
+'BACK-MATTER/Index/Images/_page_963_Picture_11.jpeg':(3717,136,152,'7c660bbbb03b2d3116aab32cd50a5a3ff094961d49b403148531b36759335d6b','R'),
+'BACK-MATTER/Index/Images/_page_967_Picture_22.jpeg':(9241,572,91,'c0819ec54636ca9e86d45baddd00ac0036c844c36d91461512997f53d9658742','R'),
+'BACK-MATTER/Index/Images/_page_996_Picture_6.jpeg':(9894,138,266,'b6d70c3a060261bb96c276ef158fd7bf7a3c1706b1003f5ab48621760baa299f','X'),
+'BACK-MATTER/Index/Images/_page_996_Picture_7.jpeg':(8413,131,266,'3d14c1bbb64711d9de00fdec771f592203daee10845daf0db519acdcbbe967e4','X'),
+'BACK-MATTER/Index/Images/_page_996_Picture_8.jpeg':(8414,123,260,'6a39699460a0c9e5314801b0de51c7e5f41a41466f10abe9d83edc03dc3e3feb','X'),
+'BACK-MATTER/Index/Images/_page_996_Picture_9.jpeg':(11018,145,256,'7595102ac69dcfab3a9b4817373c9ca2441e99f495b6b4c260e76d6f5da8aa26','X'),
+'BACK-MATTER/Colophon/Images/_page_1132_Figure_9.jpeg':(34740,562,307,'f32fa3e02c9c00f5b0b23ac0d67df82f9f8cb41ecf4abb8dcfecc65d821685ac','R'),
+'BACK-MATTER/Colophon/Images/_page_1152_Figure_5.jpeg':(7164,284,95,'b9c448472b4f1c2059e542b73a754cd44d7ca8460cea4a665ad206e93f680114','I'),
+'BACK-MATTER/Colophon/Images/_page_1152_Figure_6.jpeg':(6185,268,93,'c21b0f6c3ab30d2ff50c0384efedaa7c1fe2c1a576301ac3481a29b229cf778e','I'),
+}
+
+# BOOK line: (split document, split line, physical item)
+routes={
+778:('CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md',95,'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_75_Figure_6.jpeg'),
+1280:('CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md',597,'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_122_Figure_2.jpeg'),
+2866:('CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md',163,'CHAPTERS/6-Starting-from-Randomness/Images/_page_256_Figure_2.jpeg'),
+3944:('CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md',521,'CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_354_Picture_2.jpeg'),
+7928:('CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md',227,'CHAPTERS/11-The-Notion-of-Computation/Images/_page_672_Picture_1.jpeg'),
+7932:('CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md',231,'CHAPTERS/11-The-Notion-of-Computation/Images/_page_672_Picture_3.jpeg'),
+7934:('CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md',233,'CHAPTERS/11-The-Notion-of-Computation/Images/_page_672_Picture_4.jpeg'),
+7984:('CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md',283,'CHAPTERS/11-The-Notion-of-Computation/Images/_page_677_Figure_2.jpeg'),
+9164:('CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md',547,'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_769_Figure_1.jpeg'),
+10393:('CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md',1774,'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_847_Figure_1.jpeg'),
+10409:('CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md',1790,'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_848_Figure_2.jpeg'),
+11170:('CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md',2551,'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_25.jpeg'),
+11297:('CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md',2678,'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_21.jpeg'),
+14226:('BACK-MATTER/Index/Index.md',2127,'BACK-MATTER/Index/Images/_page_963_Picture_8.jpeg'),
+14228:('BACK-MATTER/Index/Index.md',2129,'BACK-MATTER/Index/Images/_page_963_Picture_9.jpeg'),
+14230:('BACK-MATTER/Index/Index.md',2131,'BACK-MATTER/Index/Images/_page_963_Picture_10.jpeg'),
+14232:('BACK-MATTER/Index/Index.md',2133,'BACK-MATTER/Index/Images/_page_963_Picture_11.jpeg'),
+14390:('BACK-MATTER/Index/Index.md',2291,'BACK-MATTER/Index/Images/_page_967_Picture_22.jpeg'),
+15313:('BACK-MATTER/Index/Index.md',3214,'BACK-MATTER/Index/Images/_page_996_Picture_6.jpeg'),
+15315:('BACK-MATTER/Index/Index.md',3216,'BACK-MATTER/Index/Images/_page_996_Picture_7.jpeg'),
+15317:('BACK-MATTER/Index/Index.md',3218,'BACK-MATTER/Index/Images/_page_996_Picture_8.jpeg'),
+15319:('BACK-MATTER/Index/Index.md',3220,'BACK-MATTER/Index/Images/_page_996_Picture_9.jpeg'),
+18759:('BACK-MATTER/Colophon/Colophon.md',1316,'BACK-MATTER/Colophon/Images/_page_1132_Figure_9.jpeg'),
+19236:('BACK-MATTER/Colophon/Colophon.md',1793,'BACK-MATTER/Colophon/Images/_page_1152_Figure_5.jpeg'),
+19238:('BACK-MATTER/Colophon/Colophon.md',1795,'BACK-MATTER/Colophon/Images/_page_1152_Figure_6.jpeg'),
+}
+
+def jpeg_size(data):
+    assert data[:2]==b'\xff\xd8'
+    sof={0xC0,0xC1,0xC2,0xC3,0xC5,0xC6,0xC7,0xC9,0xCA,0xCB,0xCD,0xCE,0xCF}
+    i=2
+    while i<len(data):
+        while i<len(data) and data[i]!=0xFF: i+=1
+        while i<len(data) and data[i]==0xFF: i+=1
+        marker=data[i]; i+=1
+        if marker in sof:
+            return (int.from_bytes(data[i+5:i+7],'big'),
+                    int.from_bytes(data[i+3:i+5],'big'))
+        if marker in {0x01,0xD8,0xD9} or 0xD0<=marker<=0xD7: continue
+        length=int.from_bytes(data[i:i+2],'big')
+        assert length>=2
+        i+=length
+    raise AssertionError('JPEG SOF not found')
+
+assert len(items)==len(routes)==25
+assert set(items)=={v[2] for v in routes.values()}
+assert len({Path(p).name for p in items})==25
+assert len({v[3] for v in items.values()})==25
+assert {s:sum(v[4]==s for v in items.values()) for s in 'IRX'}=={'I':5,'R':13,'X':7}
+for n,(split_rel,split_n,asset_rel) in routes.items():
+    name=Path(asset_rel).name
+    assert book[n-1].strip()==f'![]({name})'
+    split=(ROOT/split_rel).read_text().splitlines()
+    assert split[split_n-1].strip()==f'![](Images/{name})'
+for rel,(size,w,h,digest,_) in items.items():
+    data=(ROOT/rel).read_bytes()
+    assert len(data)==size
+    assert jpeg_size(data)==(w,h)
+    assert sha256(data).hexdigest()==digest
+print('T05 metadata oracle: PASS 25 assets; 5 included; 13 relation-only; 7 excluded')
+PY
+~~~
+
+Recorded output:
+
+~~~text
+T05 metadata oracle: PASS 25 assets; 5 included; 13 relation-only; 7 excluded
+~~~
+
+### Exact asset semantic oracle
+
+The direct plates authorize three exact code-label/table corpora and three property rasters. They do not jointly serialize seed values, palette-to-value mapping, horizon, crop/resampling, or a numeric plot series, so the number of source-authorized exact cell-trajectory goldens is zero.
+
+~~~bash
+python3 - <<'PY'
+from hashlib import sha256
+from pathlib import Path
+
+book=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md').read_text().splitlines()
+def cases(k): return 3*k-2
+def rule_count(k): return k**cases(k)
+def table(code,k):
+    assert 0<=code<rule_count(k)
+    return tuple(code//k**s%k for s in range(cases(k)))
+def corpus_hash(codes,k):
+    blob='\n'.join(f'{n}:{",".join(map(str,table(n,k)))}' for n in codes).encode()
+    return sha256(blob).hexdigest()
+
+p122_k4=tuple(range(107395,107403))
+p122_k5=tuple(range(180197741,180197749))
+p256_k4=tuple(range(1000816,1000941,4))
+assert (len(p122_k4),len(p122_k5),len(p256_k4))==(8,8,32)
+assert (cases(4),rule_count(4),cases(5),rule_count(5))==(10,1048576,13,1220703125)
+assert table(p122_k4[0],4)==(3,0,0,2,3,0,2,2,1,0)
+assert table(p122_k4[-1],4)==(2,2,0,2,3,0,2,2,1,0)
+assert table(p122_k5[0],5)==(1,3,4,1,1,3,2,1,1,2,3,3,0)
+assert table(p122_k5[-1],5)==(3,4,4,1,1,3,2,1,1,2,3,3,0)
+assert table(p256_k4[0],4)==(0,0,3,1,1,1,0,1,3,3)
+assert table(p256_k4[-1],4)==(0,3,2,3,1,1,0,1,3,3)
+assert all(table(n,4)[0]==0 for n in p256_k4)
+assert corpus_hash(p122_k4,4)=='fa4dc8a897879f316780d166e26ff5549a9d1e8242ec323979d78adf69d82abd'
+assert corpus_hash(p122_k5,5)=='06a040bce47ad991e7223275eccd7b43f22bceb8579dedebe636d4d256053222'
+assert corpus_hash(p256_k4,4)=='8b2c14a1a62591c80fcdcd98da0de6d6b352f867e373515f88695813803b79d0'
+
+table1004600=(0,2,3,0,0,1,1,1,3,3)
+assert table(1004600,4)==table1004600
+assert ''.join(map(str,reversed(table1004600)))=='3311100320'
+assert corpus_hash((1004600,),4)=='ffa5b12995ff8284f065ee95438ac673eb07234eb9674ebc0f48b4e4436a644b'
+properties={
+ 'death_steps':{'a':36,'b':1017},
+ 'reported_widths':{1000000:{'c':31000,'d':39718},
+                    10000000:{'c':339028,'d':390023}},
+ 'through_at_least_steps':20000000,
+ 'growth_cells_per_step':{'c':0.035,'d':0.039},
+ 'mean_nonwhite_fraction':0.28,
+ 'continued_fluctuations':True,
+}
+assert properties['death_steps']=={'a':36,'b':1017}
+assert properties['reported_widths'][10000000]=={'c':339028,'d':390023}
+assert properties['through_at_least_steps']==20000000
+assert properties['mean_nonwhite_fraction']==0.28
+for n,tokens in {
+1282:('13 cases','1,220,703,125','Allowing four or more colors'),
+2868:('totalistic rules','nearest neighbors','four possible colors'),
+9166:('36 steps','1017 steps','a million steps','code 1004600'),
+9170:('31,000','39,718','10 million','339,028','390,023'),
+19234:('0.035','0.039','28%','at least 20 million steps','fluctuations'),
+}.items():
+    assert all(t in book[n-1] for t in tokens)
+
+direct_label_corpora=(('p122-k4',p122_k4),('p122-k5',p122_k5),('p256-k4',p256_k4))
+direct_property_links=(9164,19236,19238)
+missing_for_trajectory={
+1280:{'serialized_seed','sampling_rule','palette_to_value','horizon','crop_resampling'},
+2866:{'serialized_seed','palette_to_value','horizon','crop_resampling'},
+9164:{'serialized_seed','palette_to_value','initial_row_convention','crop_resampling'},
+19236:{'numeric_series'},19238:{'numeric_series'},
+}
+direct_exact_cell_goldens=()
+assert len(direct_label_corpora)==3
+assert direct_property_links==(9164,19236,19238)
+assert set(missing_for_trajectory)=={1280,2866,9164,19236,19238}
+assert all(missing_for_trajectory.values())
+assert len(direct_exact_cell_goldens)==0
+print('T05 asset semantic oracle: PASS')
+print('label_corpora=',tuple((name,len(codes)) for name,codes in direct_label_corpora))
+print('corpus_hashes=',corpus_hash(p122_k4,4),corpus_hash(p122_k5,5),corpus_hash(p256_k4,4))
+print('code1004600=',table1004600,'display=3311100320')
+print('direct_property_links=',direct_property_links,'direct_exact_cell_goldens=',len(direct_exact_cell_goldens))
+PY
+~~~
+
+Recorded output:
+
+~~~text
+T05 asset semantic oracle: PASS
+label_corpora= (('p122-k4', 8), ('p122-k5', 8), ('p256-k4', 32))
+corpus_hashes= fa4dc8a897879f316780d166e26ff5549a9d1e8242ec323979d78adf69d82abd 06a040bce47ad991e7223275eccd7b43f22bceb8579dedebe636d4d256053222 8b2c14a1a62591c80fcdcd98da0de6d6b352f867e373515f88695813803b79d0
+code1004600= (0, 2, 3, 0, 0, 1, 1, 1, 3, 3) display=3311100320
+direct_property_links= (9164, 19236, 19238) direct_exact_cell_goldens= 0
+~~~
 
 ## Detailed Implementation Plan
 
