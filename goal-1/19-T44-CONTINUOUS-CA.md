@@ -23,7 +23,7 @@ Status: **IN PROGRESS**
 - Notes add an additive profile `Mod[RotateLeft[list]+RotateRight[list],1]`. With seed `1/k`, its exact integer-line cells are normalized Pascal residues `FractionalPart[Binomial/k]`; the prose's “Pascal triangle modulo k” describes the unnormalized residues, and “all possible” for irrational `k` means dense/equidistributed coverage rather than literal continuum enumeration.
 - Parameter scans, center-cell plots, background plots, adjacent-cell differences, localized-structure views, value equality, and pattern classes are observers. The page-175 difference image cannot replace the underlying field.
 - Coupled map lattices/lattice dynamical systems are a historical related family. Probabilistic cellular automata are explicitly an alternative discrete-value stochastic construction, not a T44 flag.
-- Supporting pages add declared neighbor multiplier `1.13`, random-field parameter/class scans, a boiling preset, and explicit noisy continuous analogs of rules 90/30. The noisy formula can exceed `[0,1]` and no clamp is stated; it is a widened/partial stochastic sibling, not strict T44 or numerical roundoff.
+- Supporting pages add declared neighbor multiplier `1.13`, random-field parameter/class scans, a boiling application profile, and explicit noisy continuous analogs of rules 90/30. Boiling leaves its exact-equality threshold ambiguous; the noisy formula can exceed `[0,1]` and no clamp is stated. Neither ambiguity is silently repaired.
 - T45 removes discrete cells and discrete time and must remain a distinct continuous-space/time differential-equation category. A finite-difference approximation or PDE limit is a relation, not T44 native identity.
 - Six strict and two native-Notes assets plus classification, noise, boiling, and complex-block supporting assets are identified; the expanded raster audit is finalizing the authoritative count, hashes, dimensions, grids, constants, horizons, exact pixels, and underdetermined render conventions.
 - Current finite lattice selectors and parallel assignment are closer to T44 than to T43, but current alphabets discretize floats, current rules admit callbacks, current rollout uses family branches/NumPy rounding, and current exporters treat arrays/renders as the public result. Exact continuous-field semantics are absent.
@@ -60,34 +60,79 @@ Reconstruct continuous cellular automata as exact or explicitly represented cont
 
 ## Search Log
 
-Canonical shorthand in this stage is `BOOK=ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. Searches used `rg -oi` for occurrence counts and `rg -in` for distinct matching-line counts, split before the actual Index at line 20826:
+Canonical shorthand in this stage is `BOOK=ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. The following is the literal, copy-paste search oracle. It uses `rg -oi` for occurrence counts and `rg -in` for distinct matching-line counts, split before the actual Index at line 20826; `LC_ALL=C` fixes byte-oriented case folding and line handling.
 
 ```bash
-sed -n '1,20825p' "$BOOK" | rg -oi 'PATTERN' | wc -l
-sed -n '1,20825p' "$BOOK" | rg -in 'PATTERN' | wc -l
-tail -n +20826 "$BOOK" | rg -oi 'PATTERN' | wc -l
-tail -n +20826 "$BOOK" | rg -in 'PATTERN' | wc -l
+export LC_ALL=C
+BOOK=ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md
+PRE=$(mktemp)
+INDEX=$(mktemp)
+sed -n '1,20825p' "$BOOK" > "$PRE"
+sed -n '20826,$p' "$BOOK" > "$INDEX"
+
+names=(
+  direct abbreviated aliases implementation rotations local_average fixed_map
+  exact_forms parameters background precision additive probabilistic pde noisy
+  complex real_aliases applications cardinality history local_map_aliases
+)
+patterns=(
+  'continuous cellular automata?'
+  'continuous CAs?\b'
+  'coupled map lattices?|lattice dynamical systems?'
+  'CCAEvolve(?:Step|List)'
+  'Rotate(?:Left|Right)\[list\]'
+  'average gray level|averag(?:e|ing) (?:the )?gray levels|average of (?:its|the) (?:own )?(?:gray level|temperature)|average of its predecessor'
+  'fixed mapping|fixed map|iterated map .*applied .*combination of neighboring'
+  'FractionalPart\[3#/2\]|FractionalPart\[# \+ 1/4\]|FractionalPart\[at\]|Mod\[RotateLeft\[list\] \+ RotateRight\[list\], 1\]'
+  'constant 1/4|a = n/500|a = 0\.[0-9]+|1\.13|parameter that can vary smoothly from 0 to 1'
+  'background is FractionalPart\[at\]|background never repeats|cycling through Denominator\[a\]|background simply repeats'
+  'exact rational numbers|machineprecision numbers|64-bit double-precision numbers|approximate numbers obtained using N'
+  'Pascal.s triangle modulo k|Mod\[RotateLeft\[list\] \+ RotateRight\[list\], 1\]'
+  'probabilistic cellular automata|probabilistic rules'
+  'finite difference|limiting case of the continuous cellular automaton|Courant condition|continuous PDE'
+  'Noisy cellular automata|randomly perturb(?:s|ed|ing)? the gray level|generalizations? of rules 90 and 30|Sign\[v'
+  'continuous complex number value|continuous block cellular automaton'
+  'continuous-valued|real-valued|gray-level automata|analog cellular automata'
+  'corresponding exactly to a continuous cellular automaton|much as in a continuous cellular automaton'
+  'Continuous cellular automata .*possible states'
+  'Kaneko|Chat[eé]|Manneville'
+  'local maps?|totalistic continuous rules?|diffusion(?:/| and )averaging CA|gray-level automata|analog CAs?\b'
+)
+
+for i in "${!names[@]}"; do
+  p=${patterns[$i]}
+  printf '%-18s %s/%s %s/%s\n' "${names[$i]}" \
+    "$(rg -oi "$p" "$PRE" | wc -l)" "$(rg -in "$p" "$PRE" | wc -l)" \
+    "$(rg -oi "$p" "$INDEX" | wc -l)" "$(rg -in "$p" "$INDEX" | wc -l)"
+done
+rm -f "$PRE" "$INDEX"
 ```
 
-| Controlled vocabulary | Pre-Index occurrences/lines | Actual Index occurrences/lines | Disposition |
+The output, recorded as `pre-index occurrences/lines` then `actual-index occurrences/lines`, was:
+
+| Query name | Pre-Index | Actual Index | Disposition |
 |---|---:|---:|---|
-| `continuous cellular automata?` | 34/31 | 2/2 | Every line inspected |
-| `continuous CAs?\b` | 0/0 | 20/18 | Every multi-column Index line resolved |
-| `coupled map lattices?|lattice dynamical systems?` | 2/1 | 2/2 | Historical aliases and redirects |
-| `CCAEvolve(?:Step|List)` | 3/3 | 0/0 | Native implementation |
-| `Rotate(?:Left|Right)\[list\]` | 5/3 | 0/0 | Periodic finite realization/additive rule |
-| Local-average phrase union | 8/7 | 0/0 | Strict law and applications |
-| Aggregate/fixed-map phrase union | 3/3 | 0/0 | T01/T43 composition |
-| Four exact `FractionalPart[...]` forms | 4/3 | 0/0 | Strict profiles/Notes |
-| `1/4|a\s*=|1\.13` controlled parameter union | 15/13 | 0/0 | Gallery, background, weighted variant |
-| Background/cycle union | 4/4 | 0/0 | Exact property |
-| Exact/machine-precision union | 6/2 | 0/0 | Numeric-feedback semantics |
-| Additive/Pascal union | 2/2 | 1/1 | Supplementary rule/property |
-| Probabilistic-CA union | 9/6 | 2/2 | Explicit alternative |
-| Finite-difference/PDE union | 7/7 | 0/0 | T45 relation/boundary |
-| Noisy-continuous-rule union | 4/3 | 0/0 | Stochastic sibling |
-| Complex/block union | 2/2 | 0/0 | Distinct block extension |
-| `continuous-valued|real-valued` aliases | 0/0 | 0/0 | No local-book alias hit |
+| `direct` | 34/31 | 2/2 | Every line inspected |
+| `abbreviated` | 0/0 | 20/18 | Every multi-column Index line resolved |
+| `aliases` | 2/1 | 2/2 | Historical aliases and redirects |
+| `implementation` | 3/3 | 0/0 | Native implementation |
+| `rotations` | 5/3 | 0/0 | Periodic finite realization/additive rule |
+| `local_average` | 10/9 | 0/0 | Strict law and applications |
+| `fixed_map` | 3/3 | 0/0 | T01/T43 composition |
+| `exact_forms` | 4/3 | 0/0 | Strict profiles/Notes |
+| `parameters` | 8/6 | 0/0 | Gallery, background, weighted variant |
+| `background` | 4/3 | 0/0 | Exact property |
+| `precision` | 5/1 | 0/0 | Numeric-feedback semantics |
+| `additive` | 2/2 | 0/0 | Supplementary rule/property |
+| `probabilistic` | 9/7 | 2/2 | Explicit alternative |
+| `pde` | 17/14 | 4/4 | T45 relation/boundary |
+| `noisy` | 4/4 | 1/1 | Stochastic sibling |
+| `complex` | 2/2 | 0/0 | Distinct block extension |
+| `real_aliases` | 0/0 | 0/0 | No local-book alias hit |
+| `applications` | 2/2 | 0/0 | Boiling/phyllotaxis disposition |
+| `cardinality` | 1/1 | 0/0 | Configuration-cardinality property |
+| `history` | 6/3 | 3/3 | Named historical routes |
+| `local_map_aliases` | 0/0 | 0/0 | No additional controlled-alias hit |
 
 The 31 pre-Index direct-name lines are `1948,1960,1982,1986,2002,2008,2014,2018,2036,2102,2878,2880,2884,2890,2904,3784,3804,13281,13283,13296,13314,13401,14234,14237,15074,15075,15644,15864,16237,17002,19072`. They resolve as follows:
 
@@ -100,7 +145,39 @@ The 31 pre-Index direct-name lines are `1948,1960,1982,1986,2002,2008,2014,2018,
 
 The two exact-name Index hits are the main entry at `BOOK:21046` and the lattice-dynamical redirect at `21434`. All 18 abbreviated `continuous CA` Index lines were followed: valid routes occur at `20972,21080,21086,21189,21195,21223,21405,21471,21475,21497,21711,21771,21815,21990,22352`; `20914,21735,21805` are multi-column collisions. In particular, the apparent “Particle accelerators for continuous CAs” at `21735` is not a sentence. Body/Notes resolve the intended parameter and precision routes. Zero textual candidate remains unresolved.
 
-Separate searches over `simple_programs.md`, `src/ca`, and `tests` for the exact name, aliases, `CCAEvolve`, `FractionalPart`, Pascal, exact rational, and precision policy found no T44 implementation or conformance test. The current-code matches used for fit analysis are recorded below rather than counted as book evidence.
+The repository-presence query was also literal and reproducible:
+
+```bash
+rg -in \
+  -e 'continuous cellular automata?' -e 'continuous CAs?\b' \
+  -e 'coupled map lattices?' -e 'lattice dynamical systems?' \
+  -e 'CCAEvolve(?:Step|List)' -e 'FractionalPart' \
+  -e 'Pascal.s triangle modulo k' -e 'exact rational' \
+  -e 'machineprecision|machine precision|precision policy' \
+  simple_programs.md src/ca tests
+```
+
+It produced no output and exit status `1`: there is no named T44 implementation or conformance test. Current API/runtime responsibilities were then inspected with these exact slices (their dispositions and concrete tests appear below rather than being counted as book evidence):
+
+```bash
+sed -n '115,494p;1502,1563p;1964,2122p;2156,2199p' simple_programs.md
+sed -n '40,126p' src/ca/alphabets.py
+sed -n '31,124p;531,614p' src/ca/loci.py
+sed -n '110,230p;551,569p' src/ca/neighborhoods.py
+sed -n '37,80p' src/ca/frontiers.py
+sed -n '30,328p' src/ca/rules.py
+sed -n '23,198p' src/ca/specs.py
+sed -n '145,212p;576,682p;742,777p' src/ca/rollout.py
+sed -n '39,55p;239,313p;879,939p' src/ca/seeds.py
+sed -n '20,70p' src/ca/rng.py
+sed -n '177,184p' src/ca/viz/export.py
+sed -n '48,54p' tests/test_loci.py
+sed -n '86,119p' tests/test_neighborhoods.py
+sed -n '263,310p' tests/test_rollout.py
+sed -n '8,23p' tests/test_rng.py
+sed -n '71,82p' tests/test_seeds.py
+sed -n '259,277p' tests/test_viz_export.py
+```
 
 ## Book Excerpts
 
@@ -326,16 +403,18 @@ noise:    v + Sign[v-1/2] Random[] delta
 
 The source formula has `lambda(1)=1+Exp[-40]>1`, and the perturbation can widen the range further. No clamp is stated.
 
-### E21 — Boiling is a genuine strict-family preset
+### E21 — Boiling application and equality ambiguity
 
 - Provenance: `BOOK:15644`, supporting application Notes.
-- Establishes: temperature interpretation of `FractionalPart[mean+heating]`.
+- Establishes: temperature interpretation of mean plus heating and a source-level equality ambiguity.
 
 > “each cell having a temperature from 0 to 1, corresponding exactly to a continuous cellular automaton of the kind discussed on page 155.”
 
 > “the temperature of every cell is given by the average of its temperature and the temperatures of its neighbors ... with a constant amount added to represent external heating.”
 
 > “If the temperature of any cell exceeds 1, then only the fractional part is kept”
+
+The prose cross-references the page-158 systems, but its literal conditional differs from unconditional `FractionalPart[mean+heating]` at exact value `1`. Preserve a literal threshold-conditional profile and a separately related strict-family reconstruction; the source/asset does not choose between them at equality.
 
 ### E22 — Phyllotaxis is only a list analogy
 
@@ -639,6 +718,7 @@ The deep raster audit is still refining the page-175 absolute-difference crop fi
 10. The page-245 difference convention and random-field measure are not stated.
 11. The page-325 `x_-` is an extraction of Wolfram pattern syntax. `Random[]` fixes a uniform pseudorandom real marginal on `[0,1]`, but draw independence/correlation, exact seed/draws, call order, fully pinned historical generator, finite boundary, and out-of-range handling remain unstated.
 12. Exact precision, reduction order, horizons, raster transfer curves, and some crop conventions are unstated and cannot be recovered by appearance alone.
+13. The boiling passage's “exceeds 1” threshold is not equivalent to the strict unconditional add-constant map at exact one. Its page-158 cross-reference suggests a repair but does not prove it; literal and reconstructed profiles stay separate.
 
 ## Variants, Relations, and Boundaries
 
@@ -648,7 +728,7 @@ The deep raster audit is still refining the page-175 absolute-difference crop fi
 - **Fractional `3/2`:** strict exact mean followed by the T43 `(a)` expression; exact rational primary conformance.
 - **Add-constant family:** strict exact mean followed by `FractionalPart[u+c]`; parameter is immutable rule data and each gallery panel is an independent run.
 - **Weighted neighbors:** closed affine aggregate `((w,L),(1,C),(w,R))/3` followed by the add-constant map. This does not justify an arbitrary reducer callback.
-- **Boiling:** the add-constant profile with temperature/heating/latent-heat interpretation; semantic rule reuse, not a separate executor.
+- **Boiling:** mean plus heating with latent-heat interpretation. Literal threshold-conditional and unconditional strict-family reconstruction agree except at exact one and share the executor, but remain different closed rule identities until evidence resolves the equality convention.
 - **Additive Pascal:** `Mod[L+R,1]`, excluding center and divisor. It can share fixed-field execution and closed arithmetic but is a distinct local-rule constructor.
 - **Coupled-map/lattice-dynamical systems:** broader closed combinations plus closed scalar maps such as logistic. The historical alias does not make all combinations strict presets.
 - **Noisy rule analogs:** a stochastic real-field sibling with closed lambda/rule expressions and explicit draws. After draws are resolved it uses the same parallel assignment commit; stochasticity is not roundoff.
@@ -806,7 +886,7 @@ Reject:
 - integer division or implicit float conversion of the mean;
 - hidden reduction order, FMA, precision, rounding, literal conversion, overflow, or `FractionalPart` semantics;
 - normalized weighted means substituted for the source's divisor-three rule;
-- applying `FractionalPart` only above one, or implicit clamp/saturation/reflection/modulo;
+- applying the strict `3/2` or add-constant `FractionalPart` only above one, silently choosing the boiling equality convention, or adding implicit clamp/saturation/reflection/modulo;
 - in-place/asynchronous updates or partial site commits;
 - history, time, parameter index, RNG seed, random draws, or differences stored as strict field state;
 - parameter galleries presented as one evolving field or observer output fed back into execution;
