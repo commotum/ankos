@@ -485,7 +485,7 @@ The historical API/handoff below remains evidence provenance; this section gover
 | Finite/infinite support choice | PRINCIPLED EXTENSION | Native support and finite realization/trace extent need separate typed objects, extending D005 |
 | All old occurrences as sources | PRINCIPLED EXTENSION of D009 | Current frontier selects absolute writable next coordinates (`:1412-1510`), not snapshot occurrence handles |
 | Self-symbol read | DIRECT conceptually | A one-value ordered read is sufficient, but it is relative to an occurrence rather than a dense coordinate |
-| Total finite table | DIRECT conceptually | Exhaustive lookup is reusable as table semantics (`:1795-1829`) after structured word codomain and validation |
+| Total finite table | DIRECT conceptually | Exhaustive lookup is reusable as table semantics (`:1795-1829`) after structured word-output schema and validation |
 | Replacement word result | PRINCIPLED EXTENSION | Current rule returns one alphabet value for a preselected target (`:1767-1793`) |
 | Structural commit | NEW UPDATE ALGEBRA | Current parallel write/copy-forward (`:2156-2199`) preserves support/loci and cannot consume/create ordered occurrences |
 | Seed | PARTIAL | Initial values exist, but fixed shape/fill selectors (`:235-290`) cannot express a word independently of capacity or an infinite stream |
@@ -538,7 +538,7 @@ This is not empty interface unification: assignment update preserves old loci; p
 
 1. Add explicit ordered-sequence support/state with snapshot-scoped occurrence handles; deliver finite words first while preserving a typed infinite-support extension point.
 2. Generalize frontier semantics from fixed-lattice locations to sources and add `AllOccurrences` without converting occurrences into next-slice targets.
-3. Reuse a self-symbol read and finite exhaustive table machinery with a structured nonempty-word codomain, total-key and alphabet-closure validation.
+3. Reuse a self-symbol read and finite exhaustive table machinery with a structured nonempty-word output schema, total-key and alphabet-closure validation.
 4. Add `ReplaceOccurrence(source,word)` and `ParallelReplaceConcat`; validate exact old-source coverage, snapshot ownership, uniqueness, order, and nonempty words.
 5. Return ragged structured snapshots and optional parent-child intervals before any coordinate encoding, batching, padding, visualization, or compression.
 6. Expose a strict `neighbor_independent_substitution(alphabet,table)` preset that remains independent of initial word/support realization.
@@ -555,7 +555,7 @@ This is not empty interface unification: assignment update preserves old loci; p
 - Synthesis-selected state/support module: `OrderedSequence`, finite ordered support, snapshot occurrence handles, and an explicit one-sided infinite/lazy support contract or a clearly tracked deferred implementation that does not narrow public semantics.
 - `frontiers.py`: generic source frontier plus `AllOccurrences`.
 - `neighborhoods.py`: `SelfSymbol` over sequence occurrences; do not reuse dense integer offsets as topology.
-- `rules.py`: total alphabet-keyed tables whose codomain is validated `NonEmptyWord[Symbol]`; no mandatory integer rule ID and no callable morphism escape hatch.
+- `rules.py`: total alphabet-keyed tables whose output schema is validated `NonEmptyWord[Symbol]`; no mandatory integer rule ID and no callable morphism escape hatch.
 - Typed results/update module: `ReplaceOccurrence` and `ParallelReplaceConcat` as a distinct update member, with exact coverage and ordered child construction.
 - Generic executor: dispatch by typed update/result protocol supplied in the ordinary spec, never by catalog/family name.
 - `specs.py`/preset index: `neighbor_independent_substitution(alphabet,table)` returns the ordinary structural spec; initial word and render/observation choices are episode inputs.

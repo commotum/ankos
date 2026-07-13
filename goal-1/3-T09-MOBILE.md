@@ -390,7 +390,7 @@ The historical analysis below is retained to show how the rejected separate-cont
 | Visible `SingleActive(position)` | PRINCIPLED EXTENSION | Current field-only state lacks Markov control; Principles 5 requires it in state |
 | Source frontier | SEMANTIC MISMATCH | Current frontier is specified as writable next-state coordinates (`:1412-1510`); T09 selects the firing source from control |
 | Ordered local read | DIRECT/PARAMETERIZATION | Relative reads fit (`:360-394`); pin physical `[-1,0,+1]` and T01's MSB-first codec |
-| Exhaustive input table | DIRECT conceptually | Existing exhaustive rule idea fits (`:1767-1829`); output codomain must become finite typed effects |
+| Exhaustive input table | DIRECT conceptually | Existing exhaustive rule idea fits (`:1767-1829`); output schema must become finite typed writes |
 | `Assign + RelocateControl` result | PRINCIPLED EXTENSION | Current rule returns one bare next value (`:1767-1791`) |
 | Atomic update | PRINCIPLED EXTENSION | One firing coordinates a source write and control move; unchanged values copy |
 | Initial values/control | PRINCIPLED EXTENSION | Value seed machinery can contribute, but initial active position must be explicit and validated |
@@ -407,14 +407,14 @@ T09 extends rather than splits the T01 protocol after `FRONTIER` is rederived as
 | `loci.CoordinateSpace` | PARAMETERIZATION only | Finite line/gathers can realize a window (`loci.py:31-94,531-614`); no unbounded moving support |
 | `neighborhoods.eca()` | DIRECT geometry/order | Physical lex `[left,self,right]` (`neighborhoods.py:551-569`); it must use the corrected MSB-first codec identified by T01 |
 | Frontier catalog | SEMANTIC MISMATCH | Only `time_slice` is executable (`frontiers.py:54-80`, `rollout.py:825-831`); spatial rollout updates the dense field rather than executing selected source coordinates (`rollout.py:576-660`) |
-| Rule/result | SEMANTIC MISMATCH | `Rule`/callable types expose `Any` and lookup assumes scalar alphabet output (`rules.py:1-30,64-78,262-295`); no typed finite compound codomain |
+| Rule/result | SEMANTIC MISMATCH | `Rule`/callable types expose `Any` and lookup assumes scalar alphabet output (`rules.py:1-30,64-78,262-295`); no typed finite compound result schema |
 | Executor/update | SEMANTIC MISMATCH | Family switches drive scalar/batch/rule application (`rollout.py:145-212,292-331`); no atomic effect application |
 | Seed/state | SEMANTIC MISMATCH | `Seed` renders only value arrays (`seeds.py:39-55,879-939`); active position would be hidden or lost |
 | Boundary | SEMANTIC MISMATCH for control | Gather policies affect reads (`loci.py:531-614`, `specs.py:227-252`) but define nothing about control relocation past a finite extent |
 | Raw trace | SEMANTIC MISMATCH | `RawEpisode.states` is one NumPy value array and coords enumerate those values (`specs.py:58-68`, `rollout.py:75-84,215-235`); identical fields with different control collapse |
 | Tests | NO COVERAGE | `tests/test_rollout.py:529-544` locks rejection of non-full frontiers; no control, compound-effect, source-frontier, code-pair, or control-trace test exists |
 
-The current full-state formula callback is not a valid fallback: T09 has a finite local table and finite typed result codomain. A callable would merely smuggle the construction.
+The current full-state formula callback is not a valid fallback: T09 has a finite local table and finite typed result schema. A callable would merely smuggle the construction.
 
 ## Historical Principles Audit (Superseded by Architecture Audit)
 
@@ -425,7 +425,7 @@ The current full-state formula callback is not a valid fallback: T09 has a finit
 | 4 | `Assign` and `RelocateControl` are distinct typed effects; movement is not disguised as a value. |
 | 5 | Active position is visible Markov control. Packing it into color or executor locals violates state completeness. |
 | 6–8 | The fixed line topology, unbounded/finite realization, value address, control trace, and visualization dot remain separately inspectable. |
-| 9 | Initial field and active start are independent; table arity/order and effect codomain are coupled and strictly validated. |
+| 9 | Initial field and active start are independent; table arity/order and write-result schema are coupled and strictly validated. |
 | 10 | `mobile(35,57)` may be a strict preset only if it returns the ordinary source/read/effect/update spec. |
 | 11–12 | Single-event schedule is defining. Compression, causal graph, emulation, batching, and plotting are downstream/incidental. |
 | 13–14 | Physical `100`/`011`, a moving head beyond a display window, and identical fields with different control are adversarial cases that expose false composition. |
@@ -437,7 +437,7 @@ The current full-state formula callback is not a valid fallback: T09 has a finit
 1. Generalize the T01 candidate protocol's frontier from write targets to firing sources without changing T01 behavior.
 2. Add visible structured state `support/topology + values + control` and a strict exactly-one active-position invariant.
 3. Reuse physical `[left,self,right]` reads and the MSB-first context codec established by T01.
-4. Give exhaustive tables a finite typed result codomain containing color and displacement, lowered to `Assign` and `RelocateControl` effects.
+4. Give exhaustive tables a finite typed result schema containing color and displacement, lowered to transparent composite-label writes.
 5. Apply both effects atomically, preserve untouched values, and validate exactly one active control marker in the successor.
 6. Execute over the native integer line or an explicit realization with declared control-edge semantics; never infer halt/wrap/reflect from the Notes guard.
 7. Emit a structured trace that preserves values and control, then derive canonical addresses, compressed frames, causal networks, batching, and visualization downstream.

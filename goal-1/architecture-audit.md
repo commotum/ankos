@@ -1,6 +1,6 @@
 # Goal 1 Representation and Execution Architecture Audit
 
-Status: **IN PROGRESS — HARD PREREQUISITE FOR T06 AND ALL FURTHER TYPE WORK**
+Status: **COMPLETE — ARCHITECTURE RECLOSED; T06 MAY RESUME**
 
 ## Trigger and Scope
 
@@ -313,11 +313,11 @@ The current audit does **not** yet admit stochastic/probabilistic execution mere
 
 ## Completion Gate
 
-- [ ] D009-D014 have final classifications and revised consequences.
-- [ ] Every completed D000-D118 decision appears in the audit matrix, individually or in an explicit lossless grouped row with per-decision disposition.
-- [ ] Every completed stage's state/control/frontier/read/result/update/executor/API claims have been checked from first principles.
-- [ ] Each class-4 abstraction includes a concrete counterexample against the smallest reusable base.
-- [ ] T09/T12 and every affected dependent stage have revised stage results and Goal 2 handoffs.
-- [ ] `0-plan.md`, `evidence-index.md`, and `design-ledger.md` agree exactly.
-- [ ] Fresh independent review, Markdown-fence checks, `git diff --check`, and scope checks pass.
-- [ ] Only after every gate passes may T06 or prior asset repairs resume.
+- [x] D009-D014 have final classifications and revised consequences.
+- [x] Every completed D000-D118 decision appears in the audit matrix, individually or in an explicit lossless grouped row with per-decision disposition.
+- [x] Every completed stage's state/control/frontier/read/result/update/executor/API claims have been checked from first principles.
+- [x] Each class-4 abstraction includes a concrete counterexample against the smallest reusable base.
+- [x] T09/T12 and every affected dependent stage have revised stage results and Goal 2 handoffs.
+- [x] `0-plan.md`, `evidence-index.md`, and `design-ledger.md` agree exactly.
+- [x] Fresh independent review, Markdown-fence checks, `git diff --check`, and scope checks pass.
+- [x] Only after every gate passes may T06 or prior asset repairs resume.

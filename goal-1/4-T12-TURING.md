@@ -388,7 +388,7 @@ The historical analysis below is retained to show how the rejected separate-cont
 | Firing source | DIRECT from T09 design | `ControlLocus("head")`; current write-target frontier (`:1412-1510`) remains a documented mismatch |
 | Self-only read | DIRECT/PARAMETERIZATION | Current-self selector fits (`:1303` and general relative reads `:360-394`) |
 | Product rule input | PRINCIPLED EXTENSION | Explicit product of source payload and self symbol; not a wider neighborhood |
-| Exhaustive table | DIRECT conceptually | Table semantics fit (`:1795-1829`) after finite typed product codomain support |
+| Exhaustive table | DIRECT conceptually | Table semantics fit (`:1795-1829`) after finite typed product-output support |
 | Atomic result/update | PRINCIPLED refinement | `Assign + TransitionControl(next_payload)` generalizes T09's relocation |
 | Seed/field | PARTIAL | Fill/selected values exist (`:235-290`); head start and total sparse field do not |
 | Boundary | NOT APPLICABLE natively | Fixed/periodic/reflective finite reads (`:292-358`) are not unbounded head/tape semantics |
@@ -414,7 +414,7 @@ The historical analysis below is retained to show how the rejected separate-cont
 | 3-4 | Frontier=head source; neighborhood=self tape read; rule=typed table result; update=assignment plus atomic control transition; termination remains explicit. |
 | 5 | Head state/position and tape default/overrides are visible Markov state. |
 | 6-8,12 | Integer topology, sparse total field, work window, structured trace, and canonical encoding stay separate. |
-| 9 | `Q`, `Sigma`, moves, table domain/codomain/count are coupled; machine rule and initial tape/head remain independent. |
+| 9 | `Q`, `Sigma`, moves, table input/output sets and count are coupled; machine rule and initial tape/head remain independent. |
 | 10 | A Turing preset returns the ordinary shared spec. |
 | 11 | Total/non-halting schedule or terminal policy is defining; numeric codec, emulation, compression, batching, external stop observation are separate. |
 | 13-15 | Neighbor independence, different head payloads, beyond-window moves, exact trajectory, and halt/error/stop distinctions are mandatory adversarial tests. |
