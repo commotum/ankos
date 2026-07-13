@@ -36,7 +36,158 @@ Reconstruct totalistic cellular automata exhaustively from strict text, captions
 
 ## Search Log
 
-In progress. The controlled search must separately cover strict definition/captions, general count and implementation Notes, actual-Index routes, split duplicates, aliases (`sum`, `average`, `outer totalistic`, weighted forms), color/range variants, code examples, symmetry/background restrictions, applications/emulations, and all linked assets. Every candidate will receive a disjoint included/sibling/relation/false-positive disposition.
+Closed for the canonical source audit. `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; its actual Index begins at physical `BOOK:20826`. Counts below are distinct physical lines, not raw matches. Sixteen controlled queries produce 114 lines; four inspected continuation lines (`11069,11071,11914,13540`) produce an exact 118-line closure.
+
+| Q | Search family | Pre-Index | Actual Index |
+|---:|---|---:|---:|
+| 01 | literal `totalistic` saturation | 74 | 10 |
+| 02 | strict `average color` / `average of ... colors` aliases | 6 | 0 |
+| 03 | exact counts `2187`, `1,220,703,125`, `3k-2`, `3^7`, `5^13` | 4 | 0 |
+| 04 | general totalistic count formula | 1 | 0 |
+| 05 | `TotalisticCARule` / `ToTotalisticCARule` implementation tokens | 3 | 0 |
+| 06 | named codes `420,777,867,1599,1815` | 8 | 1 |
+| 07 | `k=2..5` followed within 80 characters by `r=1..2` | 30 | 0 |
+| 08 | `outer totalistic` | 17 | 1 |
+| 09 | `growth totalistic` | 2 | 2 |
+| 10 | weighted-totalistic / totalistic-weights wording | 1 | 1 |
+| 11 | symmetry within 120 characters of totalistic | 4 | 0 |
+| 12 | background within 120 characters of totalistic | 3 | 0 |
+| 13 | additive within 120 characters, plus the code-420 follow-up | 2 | 0 |
+| 14 | literal `quiescen...` control | 1 | 0 |
+| 15 | exact sum/total aliases tied to totalistic construction | 3 | 1 |
+| 16 | emulation/network/reversibility/application/universality boundary phrases | 6 | 0 |
+
+The zero hits matter: neither `semi-totalistic` nor literal `3k-2` occurs, and code `777` occurs only in the strict figure, not OCR text. “Sum (totalistic) rules” is an actual-Index alias; the main strict text says average, while the implementation sums assigned integer values.
+
+### Exact reproducible manifest
+
+```bash
+python3 - <<'PY'
+import re
+from pathlib import Path
+
+P=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md')
+L=P.read_text().splitlines(); IX=20826
+def xs(s): return [] if s=='-' else list(map(int,s.split(',')))
+rows=[
+(r'(?i)totalistic',
+ '772,774,776,784,790,796,800,804,808,824,834,846,1282,1954,2170,2802,2806,2822,2852,2868,2922,3902,3914,5638,6340,6644,7912,8320,8936,9166,10261,11037,11056,11060,11068,11070,11072,11168,11178,11509,11585,11625,11897,11902,11904,11908,11910,11912,11916,13536,13538,13547,13548,13549,13601,13613,13650,13654,13658,14223,14224,14239,14241,14632,15221,15301,15321,15359,15955,15959,16024,17431,18672,18748',
+ '20965,20969,20972,20980,21233,21731,22030,22146,22352,22392'),
+(r'(?i)average (?:color|of (?:the previous colors|cells in its neighborhood))',
+ '774,776,2170,5082,5088,8320','-'),
+(r'2187|1,220,703,125|3k-2|3\^7|5\^13','774,1282,1427,11897','-'),
+(r'k\^\{1\+\(k-1\)\(2r\+1\)\}','11897','-'),
+(r'TotalisticCARule|ToTotalisticCARule','11904,11908,11912','-'),
+(r'(?i)code(?: number)? (?:420|777|867|1599|1815)',
+ '800,806,838,846,2826,7912,11168,11918','20980'),
+(r'(?i)k\s*=\s*[2345].{0,80}?r\s*=\s*(?:1|2)(?![0-9/])',
+ '11050,11164,11168,11509,11585,11625,11897,11919,14392,14394,14541,14673,14675,15493,16020,16024,16025,16027,16049,16129,16157,16448,18348,18672,18748,20573,20577,20590,20592,20600','-'),
+(r'(?i)outer totalistic',
+ '3902,5638,6644,10261,11072,13536,13538,13547,13601,13613,13650,13654,14239,14241,15301,15359,15959','21731'),
+(r'(?i)growth totalistic','13536,13549','21233,22030'),
+(r'(?i)(?:weights w.{0,180}totalistic|totalistic.{0,180}weights w|weighted totalistic)',
+ '11916','20969'),
+(r'(?i)(?:symmetr.{0,120}totalistic|totalistic.{0,120}symmetr)',
+ '784,11897,13536,15321','-'),
+(r'(?i)(?:background.{0,120}totalistic|totalistic.{0,120}background)',
+ '784,6340,14241','-'),
+(r'(?i)(?:additive.{0,120}totalistic|totalistic.{0,120}additive|Code 420 is an example of an additive rule)',
+ '10261,11918','-'),
+(r'(?i)quiescen','18770','-'),
+(r'(?i)(?:total is exactly 4.{0,100}totalistic|totalistic.{0,100}total is exactly 4|total number of black cells.{0,150}totalistic|totalistic.{0,150}total number of black cells|Sum\[RotateLeft\[a, i\]|Sum \(totalistic\))',
+ '3914,11908,13536','22146'),
+(r'(?i)three-color rule illustrated here is totalistic|Code 420 is an example of an additive rule|If the connections at each node are not labelled, then only totalistic|no non-trivial totalistic rule|even-numbered totalistic 5-neighbor rules|totalistic cellular automata can be universal',
+ '7912,11918,13658,16024,17431,18748','-'),
+]
+sets=[]
+for q,(pat,pre_s,idx_s) in enumerate(rows,1):
+    found=[i for i,s in enumerate(L,1) if re.search(pat,s)]
+    pre=[i for i in found if i<IX]; idx=[i for i in found if i>=IX]
+    assert pre==xs(pre_s),(q,pre,xs(pre_s))
+    assert idx==xs(idx_s),(q,idx,xs(idx_s))
+    sets.append(set(found))
+
+# Immediate continuation lines whose hit line otherwise split a signature,
+# heading, or formula across physical OCR lines.
+follow={11069,11071,11914,13540}
+assert '5-neighbor totalistic rule' in L[11069]
+assert '5-neighbor outer totalistic rule' in L[11071]
+assert L[11913].startswith('■ Common framework.')
+assert L[13539].startswith('Apply[Plus, 2 ^ Join')
+
+parts={
+'direct':'772,774,776,1282,2802,2806,2868,6340,8320,11037,11056,11060,11168,11509,11585,11625,11897,11902,11904,11908,11910,11912,11914,11916,14223,14224',
+'sibling':'1954,2170,2922,3902,3914,5082,5088,5638,6644,10261,11068,11069,11070,11071,11072,11178,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,14239,14241,15221,15301,15321,15359,15955,15959',
+'relation':'784,790,796,800,804,806,808,824,834,838,846,2822,2826,2852,7912,8936,9166,11918,13658,14632,16024,17431,18348,18672,18748',
+'false_control':'1427,11050,11164,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,18770,20573,20577,20590,20592,20600',
+'index':'20965,20969,20972,20980,21233,21731,22030,22146,22352,22392',
+}
+partition={k:xs(v) for k,v in parts.items()}
+union=set().union(*sets)|follow
+flat=[i for v in partition.values() for i in v]
+assert len(rows)==16 and len(union)==118
+assert len(flat)==len(set(flat))==118 and set(flat)==union
+assert [len(partition[k]) for k in partition]==[26,34,25,23,10]
+
+root=Path('ref/A-New-Kind-of-Science')
+split={
+'CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md':'89,91,93,101,107,113,117,121,125,141,151,163,599',
+'CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md':'411',
+'CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md':'27',
+'CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md':'101,105,121,149,165,219',
+'CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md':'479,491',
+'CHAPTERS/9-Fundamental-Physics/Fundamental-Physics.md':'473,1169',
+'CHAPTERS/10-Processes-of-Perception-and-Analysis/Processes-of-Perception-and-Analysis.md':'57',
+'CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md':'211,603',
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md':'319,549,1642,2418,2437,2441,2449,2451,2453,2549,2559,2890,2966,3006,3278,3283,3285,3289,3291,3293,3297',
+'BACK-MATTER/Index/Index.md':'1437,1439,1448,1449,1450,1502,1514,1551,1555,1559,2124,2125,2140,2142,2533,3122,3202,3222,3260,3856,3860,3925,5334',
+'BACK-MATTER/Colophon/Colophon.md':'1229,1305,3522,3526,3529,3537,3790,4288,4587,4703,4909,4949',
+}
+for rel,want in split.items():
+    lines=(root/rel).read_text().splitlines()
+    got=[i for i,s in enumerate(lines,1) if re.search(r'(?i)totalistic',s)]
+    assert got==xs(want),(rel,got,xs(want))
+assert sum(len(xs(v)) for v in split.values())==84
+print('T03 source manifest: PASS 16 queries; 118 candidates; partition=26,34,25,23,10; split=84')
+PY
+```
+
+Expected terminal line:
+
+```text
+T03 source manifest: PASS 16 queries; 118 candidates; partition=26,34,25,23,10; split=84
+```
+
+### Complete disjoint disposition
+
+- **Direct T03 definition, implementation, and one-dimensional profiles (26):** `772,774,776,1282,2802,2806,2868,6340,8320,11037,11056,11060,11168,11509,11585,11625,11897,11902,11904,11908,11910,11912,11914,11916,14223,14224`. These establish average/sum quotient semantics, exact value assignment, code direction, counts, general radius, implementation, and concrete one-dimensional profiles. Historical/profile lines add no hidden mechanics.
+- **Sibling construction or geometry (34):** `1954,2170,2922,3902,3914,5082,5088,5638,6644,10261,11068,11069,11070,11071,11072,11178,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,14239,14241,15221,15301,15321,15359,15955,15959`. These are continuous, two-dimensional, outer/growth totalistic, unequal/negative-weight, aggregation, tiling, and application-specific constructions. They bound T03; they do not broaden its native equal-weight one-dimensional sum table.
+- **Relation/property/view evidence (25):** `784,790,796,800,804,806,808,824,834,838,846,2822,2826,2852,7912,8936,9166,11918,13658,14632,16024,17431,18348,18672,18748`. These cover gallery filtering, seed/horizon, behavior classes, additive/reversible/universal properties, network applicability, image analysis, and emulation. They remain observers, predicates, applications, or explicit relations.
+- **False/control hits (23):** `1427,11050,11164,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,18770,20573,20577,20590,20592,20600`. `1427` is unrelated arithmetic; the rest are general/additive/reversible/sequential/search `k,r` contexts. The sole global quiescence hit, `18770`, concerns symmetric elementary-rule block emulations and contains no totalistic construction.
+- **Actual-Index routes (10):** `20965,20969,20972,20980,21233,21731,22030,22146,22352,22392`. They are routing evidence only and add no rule mechanics.
+
+There is zero silent remainder: the five sets are pairwise disjoint and their union is the exact 118-candidate manifest.
+
+### Actual-Index route closure
+
+| Actual Index | Exact route | Disposition |
+|---:|---|---|
+| `20965` | implementation of totalistic, page 886 | direct Notes at `BOOK:11902-11916` |
+| `20969` | totalistic cross-reference; weighted totalistic, page 427 | strict T03; weighted sibling at `BOOK:5082,5088` |
+| `20972` | class 4 in 3-color totalistic CAs, page 948 | behavior/property Notes at `BOOK:14223-14224` |
+| `20980` | code 294 for totalistic CAs, page 60 | named one-dimensional profile at `BOOK:6340` |
+| `21233` | growth totalistic rules, page 928 | two-dimensional sibling at `BOOK:13536,13549` |
+| `21731` | outer totalistic rules | two-dimensional sibling at `BOOK:13536-13547` |
+| `22030` | totalistic page 60; growth totalistic page 928 | strict definition and growth sibling |
+| `22146` | Sum (totalistic) rules, page 60 | confirms `sum` as the Index alias for strict average cases |
+| `22352` | Totalistic cellular automata page 60, 2D page 170, implementation page 886, non-reversibility page 1017 | routes to strict, sibling, implementation, and property passages already closed |
+| `22392` | universality in totalistic cellular automata, page 693 | relation at `BOOK:18748` |
+
+### Split, source, and asset routing
+
+- The 84 literal-totalistic monolith lines have exactly 84 split-file counterparts, pinned by the oracle. Strict `BOOK:772,774,776` map to Chapter 3 split `89,91,93`; count/implementation `BOOK:11897,11902-11916` map to Chapter 12 split `3278,3283-3297`.
+- `BACK-MATTER/Index/Index.md` is misrouted Notes and has no `#### Index` header. The real split Index begins in `BACK-MATTER/Colophon/Colophon.md:3383`; its ten T03 routes are split lines `3522,3526,3529,3537,3790,4288,4587,4703,4909,4949`.
+- The only raster carrying construction data absent from OCR text is the strict figure referenced at `BOOK:778`: `CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_75_Figure_6.jpeg`, JPEG `610x446`, SHA-256 `acb13963632286960ca61b616ff2f45a940750f3ab7deb5e6fbf696543015c15`. Direct inspection gives displayed digits `1,0,0,1,2,1,0` from high sum to low sum, hence code `777`; the caption, not pixel colors, remains semantic authority. Other adjacent rasters are behavior/application realizations and contribute no additional native rows, seed, boundary, or stopping rule.
 
 ## Book Excerpts
 
@@ -146,7 +297,7 @@ code(U)     = sum_{s=0}^{M-1} nu(U_s) * k^s
 | 13–15 | Canonical tests must use equal-sum/different-histogram contexts, nonbinary outputs, code-order fixtures, non-quiescent backgrounds, larger `r`, old-snapshot adversaries, and independent source codes. Pixels or scalar/batch parity alone are insufficient. |
 | 16 | One typed valuation/aggregate/case-table/codec boundary is architecture. A callback reducer, histogram substitution, exhaustive-table-only storage, family switch, reversed digits, or binary fallback is a shim. |
 
-D112's structural-table-first and arbitrary-precision policy composes at the finite-table/serialization responsibility level; T03 has a distinct sum-case domain and codec from T02's ordered context table. D114 is resolved concretely: T03 numeric valuation and aggregate are program semantics, ordered color identity supplies lossless values/code digits, and palette remains a view.
+D112's structural-table-first and arbitrary-precision policy composes at the finite-table/serialization responsibility level; T03 has a distinct sum-case domain and codec from T02's ordered context table. D114 is resolved concretely: T03's explicit valuation `nu` supplies both aggregate summands and output-code digits; T02 alphabet rank remains an independent identity and may coincide with `nu` only in the canonical integer profile; palette remains a view.
 
 Evidence still unresolved for this architecture pass: exact gallery trajectories/raster parameters; whether any source profile requires noncanonical or non-bijective numeric color values; and whether radius zero, dynamic/masked arity, histogram, outer-totalistic, weighted, or higher-dimensional rules should share a later generalized aggregate interface. Goal 2 must expose these as typed unsupported or separate constructions until their own evidence closes, not infer defaults.
 
@@ -179,6 +330,26 @@ assert digits(777,3,1)==(0,1,2,1,0,0,1)
 assert display(777,3,1)=='1001210'
 assert display(867,3,1)=='1012010'
 assert display(420,3,1)=='0120120'
+
+# A noncanonical valuation is semantic; tuple rank must not replace it.
+alphabet=('red','green','blue')
+rank={value:i for i,value in enumerate(alphabet)}
+nu={'red':2,'green':0,'blue':1}
+inverse={number:value for value,number in nu.items()}
+symbolic=tuple(inverse[number] for number in digits(777,3,1))
+assert symbolic==('green','blue','red','blue','green','green','blue')
+assert sum(nu[value]*3**s for s,value in enumerate(symbolic))==777
+assert tuple(inverse[number] for number in digits(777,3,1))==symbolic
+context=('red','red','red')
+assert sum(nu[value] for value in context)==6
+assert symbolic[sum(nu[value] for value in context)]=='blue'
+assert symbolic[sum(rank[value] for value in context)]=='green'
+try:
+    nu['outside']
+    raise AssertionError('out-of-domain value accepted')
+except KeyError:
+    pass
+
 assert all(out(420,3,1,q)==(-sum(q))%3 for q in product(range(3),repeat=3))
 assert digits(10,2,2)==(0,1,0,1,0,0)
 assert all(out(10,2,2,q)==(sum(q) in (1,3))
@@ -605,7 +776,7 @@ No other included figure supplies all of exact serialized seed, boundary/backgro
 
 **Concrete files and changes:**
 
-1. Extend `src/ca/alphabets.py` with an immutable validated numeric color valuation. The canonical constructor maps the declared colors bijectively to `0..k-1`; any symbolic relabeling stores the explicit forward/inverse map. Do not derive it from palette, a host set, or incidental array order.
+1. Extend `src/ca/alphabets.py` with an immutable validated numeric color valuation. The canonical constructor maps the declared colors bijectively to `0..k-1`; any symbolic relabeling stores the explicit forward/inverse map. Do not derive it from palette, a host set, incidental array order, or the independent T02 rank. Validate every rule output, seed value, fixed boundary/background value, and gathered read against the valuation domain.
 2. Add `src/ca/aggregates.py` with a closed `EqualWeightIntegerSum` descriptor/evaluator carrying valuation identity, fixed arity `q`, and exact image `0..q(k-1)`. It accepts no callback, float mean, dynamic mask, histogram, gate, or arbitrary weights. The exact average is a separate label/query `s/q`.
 3. Extend the synthesis-selected `src/ca/rule_tables.py` with a typed aggregate-case domain and immutable complete table `U[0..M-1]`. Reuse a generic finite-table carrier only if exhaustive-context and aggregate-sum domain tags cannot be confused. Validate `M=1+(k-1)q`, every output, leading zeros, stable identity, and lossless structural serialization.
 4. Add a versioned `WolframTotalisticCodec(k,q,valuation)` alongside—not inside—the table. Decode/encode with sum zero least significant, validate `0<=n<k^M`, and serialize arbitrary-precision codes as tagged decimal strings. Reuse bigint primitives, not T02's context-index formula.
@@ -625,20 +796,21 @@ No other included figure supplies all of exact serialized seed, boundary/backgro
 
 **Required conformance tests:**
 
-1. For validated `k>=2,r>=1`, derive `q=2r+1`, `M=1+(k-1)q`, and `R=k^M`; pin `R(2,1)=16`, `R(3,1)=2187`, `R(2,2)=64`, and `R(5,1)=1,220,703,125`. Reject booleans, invalid `k/r`, malformed valuations, wrong table lengths, out-of-alphabet outputs, `-1`, and `R`.
+1. For validated `k>=2,r>=1`, derive `q=2r+1`, `M=1+(k-1)q`, and `R=k^M`; pin `R(2,1)=16`, `R(3,1)=2187`, `R(2,2)=64`, and `R(5,1)=1,220,703,125`. Reject booleans, invalid `k/r`, malformed valuations, wrong table lengths, out-of-alphabet outputs, out-of-domain seed/boundary/read values, `-1`, and `R`.
 2. Prove every sum `0..q(k-1)` reachable for representative `k/r`, and that every permutation of one read multiset gives the same sum/output. Fixed arity, center inclusion, and repeated positions remain inspectable.
 3. Use `(0,2,0)` and `(1,0,1)` at `k=3`: both must address sum row `2` despite different histograms. A histogram-keyed implementation must fail this oracle.
-4. Round-trip structural tables/codes `0`, `1`, `420`, `777`, `867`, `R-1`, deterministic sampled `k/r` profiles, and a valid `k=8,r=1` code above `2^63-1` through table, tagged decimal string, and JSON-safe records without NumPy/float loss.
-5. Pin code 777's least-significant-first outputs as `(0,1,2,1,0,0,1)`. Assert `output(n,s)=floor(n/3^s) mod 3`, source display order is the reverse padded sequence, and color `2` survives execution.
-6. Prove code 420 has `U(s)=(-s) mod 3` for `s=0..6`, while remaining a normal structural table plus an additive property claim. No modulo formula may replace arbitrary T03 execution.
-7. For `k=2,r=2`, prove code 10 outputs one exactly for sums `1` and `3`. This catches a hard-coded radius-one/seven-row codec.
-8. Expand representative aggregate tables to T01/T02 exhaustive tables and compare all local contexts and several exact trajectories. The native T03 record must still serialize as valuation + aggregate + `M` rows, not the expansion.
-9. Run code 1 from an all-zero field and prove the entire background evolves; then validate T06 separately as `U(0)=0`, equivalently `code mod k=0`. No seed or finite-support shortcut may assume quiescence.
-10. Use binary radius-one code 2 on `[1,0,0]` with explicit fixed exterior: parallel old-snapshot update yields `[1,1,0]`, while left-to-right in-place mutation would yield `[1,1,1]`.
-11. Run one structural program with centered, explicit, random, periodic, finite-block-on-constant, and finite-block-on-repeating initial fields and with cycle/segment/causal-window realizations. Program identity stays fixed; run/realization/view identities change.
-12. Assert T04 and T05 presets return the same aggregate-rule/spec types as generic T03; T07 reflection is derived from equal-weight sum; outer, histogram, weighted, threshold, dynamic-arity, and continuous profiles are rejected or routed to their own typed constructions.
-13. Inspect the resolved spec/executor: no callback, family branch, partial-row fallback, hidden valuation/seed/background/palette, exhaustive-only identity, binary decoder, float mean, fixed-width rule code, or artificial maximum `k/r`.
-14. Preserve the full repository suite, T01/T02 asymmetric/nonbinary tests, scalar/batch parity as regression evidence, and finite trace/export round trips without weakening expectations.
+4. Declare alphabet order `('red','green','blue')` but valuation `{'red':2,'green':0,'blue':1}`. Pin a context whose valuation-sum differs from rank-sum, all seven code-777 symbolic outputs, execution, and encode/decode round-trip. An implementation that silently substitutes tuple rank must fail.
+5. Round-trip structural tables/codes `0`, `1`, `420`, `777`, `867`, `R-1`, deterministic sampled `k/r` profiles, and a valid `k=8,r=1` code above `2^63-1` through table, tagged decimal string, and JSON-safe records without NumPy/float loss.
+6. Pin code 777's least-significant-first outputs as `(0,1,2,1,0,0,1)`. Assert `output(n,s)=floor(n/3^s) mod 3`, source display order is the reverse padded sequence, and color `2` survives execution.
+7. Prove code 420 has `U(s)=(-s) mod 3` for `s=0..6`, while remaining a normal structural table plus an additive property claim. No modulo formula may replace arbitrary T03 execution.
+8. For `k=2,r=2`, prove code 10 outputs one exactly for sums `1` and `3`. This catches a hard-coded radius-one/seven-row codec.
+9. Expand representative aggregate tables to T01/T02 exhaustive tables and compare all local contexts and several exact trajectories. The native T03 record must still serialize as valuation + aggregate + `M` rows, not the expansion.
+10. Run code 1 from an all-zero field and prove the entire background evolves; then validate T06 separately as `U(0)=0`, equivalently `code mod k=0`. No seed or finite-support shortcut may assume quiescence.
+11. Use binary radius-one code 2 on `[1,0,0]` with explicit fixed exterior: parallel old-snapshot update yields `[1,1,0]`, while left-to-right in-place mutation would yield `[1,1,1]`.
+12. Run one structural program with centered, explicit, random, periodic, finite-block-on-constant, and finite-block-on-repeating initial fields and with cycle/segment/causal-window realizations. Program identity stays fixed; run/realization/view identities change.
+13. Assert T04 and T05 presets return the same aggregate-rule/spec types as generic T03; T07 reflection is derived from equal-weight sum; outer, histogram, weighted, threshold, dynamic-arity, and continuous profiles are rejected or routed to their own typed constructions.
+14. Inspect the resolved spec/executor: no callback, family branch, partial-row fallback, hidden valuation/seed/background/palette, exhaustive-only identity, binary decoder, float mean, fixed-width rule code, or artificial maximum `k/r`.
+15. Preserve the full repository suite, T01/T02 asymmetric/nonbinary tests, scalar/batch parity as regression evidence, and finite trace/export round trips without weakening expectations.
 
 **Completion evidence:** all structural/count/codec and independent trajectory oracles pass; equal-sum/different-histogram behavior is pinned; general big codes round-trip losslessly; non-quiescent backgrounds and nonbinary outputs execute; T04/T05 inspect as presets of one ordinary rule/spec; static inspection finds no totalistic/lookup branch, callback, histogram substitution, exhaustive masquerade, binary fallback, or hidden default; existing tests pass unchanged.
 
