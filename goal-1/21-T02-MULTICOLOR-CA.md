@@ -71,22 +71,89 @@ No search is yet called exhaustive and no candidate is silently excluded.
 
 ## Construction Model
 
-Active derivation: test the hypothesis `T02 = T01` with `FiniteAlphabet(k>2)` and a total ordered table `Sigma^3 -> Sigma`. The final model must pin color identity/order, table-index and integer-code conventions, background/seed restrictions, state/update/trace identity, variants, and all evidence boundaries before this section closes.
+### Native semantics
+
+| Dimension | Reconstructed T02 semantics |
+|---|---|
+| State | `STATE = SUPPORT + VALUES`; no control. Support is the same fixed ordered one-dimensional regular lattice as T01. Values form a total field in one declared finite ordered alphabet `A`; strict T02 has `k=|A|>=3`. |
+| Alphabet | Colors are distinct values. The ordered rank map `rho:A->{0,...,k-1}` is part of rule-code interpretation but does not make colors arithmetic magnitudes. Palette/tone is representation. |
+| Active loci | Every semantic site on every event, with finite causal-window lowering separated exactly as in T01. |
+| Read | The ordered old-snapshot triple `(left,self,right)`. Context order is semantic and homogeneous at every site. |
+| Rule | One total structural table `T:A^3->A`, containing exactly `k^3` entries. No reducer, symmetry, background default, wildcard, mutation generator, callback, or inverse is implicit. |
+| Result/update | One typed same-site `Assign(T(left,self,right))` per site; T01's atomic parallel fixed-effects commit applies all results from the same old field. No new update law. |
+| Successor/halting | One deterministic successor per valid field, including unchanged fields; no intrinsic halt, branch, rejection, or randomness. A finite horizon is an observation request. |
+| Seed | An independent total initial field. Single-gray, random, uniform, periodic, purpose-encoded, and sparse inputs are profiles, never program identity. |
+| Support/realization | Native integer line and explicit finite cycle/segment/causal-window realizations retain T01 meanings. No rule number or color count chooses a boundary. |
+| Observers/provenance | Spacetime/raster views, behavior class, reversibility, symmetry/color-relabelling orbit, purpose/optimality, emulation relation, and random table-mutation history remain separate from native state and events. |
+
+### Ordered base-`k` rule codec
+
+For ranked colors `l,c,r in {0,...,k-1}`:
+
+```text
+context_index(l,c,r) = k^2*l + k*c + r
+output(n,l,c,r)      = floor(n/k^context_index) mod k
+code(T)              = sum(T(l,c,r) * k^context_index(l,c,r))
+```
+
+- Context index zero is `000`; index `k^3-1` is `(k-1)(k-1)(k-1)`.
+- The padded base-`k` display table is ordered from the highest context down to `000`, while the output for `000` is the least-significant digit. This reduces exactly to T01's `4*l+2*c+r` bit codec at `k=2`.
+- There are `S=k^3` contexts, `R=k^S=k^(k^3)` total tables, and valid codes are exactly `0..R-1`. Leading zero digits are required table entries.
+- Structural `(alphabet,ordered table)` data are primary. The integer is a lossless optional codec tied to the alphabet order. Relabeling colors requires conjugating the table; changing only the palette does not change the program.
+- A sparse dot display such as `BOOK:4684` must first expand every dot to the explicit center output. A table mutation is a meta-level edit of exactly one context entry plus optional draw provenance; it is not a stochastic cell event or hidden fallback.
+- General `k` requires arbitrary-precision codes: at `k=4`, `R=4^64=2^128`, already beyond signed 64-bit storage. Batches therefore reference structural programs/stable IDs or lossless arbitrary-precision code strings rather than coercing semantic rule codes into `numpy.int64`.
+
+### Variant disposition
+
+| Profile | Semantic relation |
+|---|---|
+| `k=2` | Exactly the completed T01 specialization; T02 retains catalog traceability for `k>=3` without duplicating execution. |
+| `k=3`, all 27-entry tables | Direct strict profile; exact count `3^27=7,625,597,484,987`. |
+| General `k`, range one | Direct Notes generalization through `{n,k}` and `k^(k^3)`; same construction. |
+| General range `r`, two-cell staggered neighborhoods, or higher dimensions | Supporting general-CA siblings with different read geometry; not smuggled into T02's radius-one identity. |
+| Totalistic/weighted rules | Restricted alternate rule descriptions whose meaning depends on numeric color assignment for `k>2`; T03/T04/T05 own them. |
+| Blank-preserving or left-right symmetric tables | Validated restrictions over the same tables; T06/T07 own catalog evidence. |
+| Reversible tables | Scoped global property/certificate of the induced map, not a native inverse step or trusted Boolean flag. |
+| Random table-mutation sequence | Program-generation/provenance experiment producing successive immutable T02 tables, not CA state or RNG-driven cell evolution. |
+| Binary block encoding/emulation | Explicit relation between different programs, supports, steps, and decoders; never the native multi-color representation. |
+| Universal/purpose-doubling/mobile/Turing/substitution/computer examples | Named T02 program/seed/emulation profiles; their encoded machine, purpose, search work, or behavior is not extra T02 state. |
 
 ## Current API Fit
 
-Audit active. T01's semantic fixed-lattice/source/read/result/update responsibilities are candidate `DIRECT` reuse; finite alphabet/table data and base-`k` codecs are candidate `PARAMETERIZATION`; current formula callbacks, totalistic reducers, family dispatch, and binary-only rule helpers are not presumed compatible.
+| Construction element | Fit | Evidence and consequence |
+|---|---|---|
+| `ALPHABET` with `{0,...,K-1}` or symbols | DIRECT | `simple_programs.md:200-230` explicitly includes `K`-color and symbolic states; semantic alphabet order must be preserved. |
+| State/trace address | DIRECT with T01 qualification | A finite 1D trace fits `[t,x,0,0]`; finite `SHAPE` remains a realization, not native topology. |
+| Independent seed and explicit finite boundary | PARAMETERIZATION | Existing seed/boundary schemas can express finite profiles but must not enter program identity or imply an edge on `Z`. |
+| Ordered radius-one current read | DIRECT/PARAMETERIZATION | Relative selectors and the Wolfram source-time convention express old `(left,self,right)` when order is pinned. |
+| `EXHAUSTIVE T:A^3->A` | DIRECT conceptually | `simple_programs.md:1795-1829` states the correct structural table, but gives no normative arbitrary-base codec or table validator. |
+| Base-`k` rule codec/arbitrary-precision identity | PRINCIPLED EXTENSION | Required by `BOOK:11897-11900`; code depends on alphabet order and exceeds 64 bits for `k>=4`. |
+| Typed assignment/parallel commit | DIRECT T01 reuse | Same source, result, conflict-free atomic update, and deterministic successor; no eleventh law. |
+| Totalistic/symmetric/background/reversible/mutation/emulation data | NOT APPLICABLE to base execution | These are restrictions, claims, provenance, or relations rather than rule flags. |
 
 ## Current Runtime Fit
 
-Audit active across `src/ca/alphabets.py`, `loci.py`, `neighborhoods.py`, `rules.py`, `specs.py`, `rollout.py`, seeds, datasets, visualization, and corresponding tests. Existing finite-color declarations will be tested separately from arbitrary-table execution and exact codec coverage.
+| Component | Fit | Exact finding |
+|---|---|---|
+| `alphabets.int_range_alphabet(k)` | DIRECT data primitive | Supplies ordered digit colors `0..k-1` (`src/ca/alphabets.py:42-73`) but `Dynamics` does not carry/validate an alphabet. |
+| `alphabets.symbolic(values)` | DIRECT declaration, incomplete execution | Preserves explicit deterministic order (`alphabets.py:145-179`), while rollout coerces spatial fields/reads to `int64`; symbolic execution needs a validated rank/value layer rather than object cells. |
+| `neighborhoods.eca()` / loci / frontier | DIRECT T01 geometry for finite realization | Correct ordered radius-one component and full finite slice; native support/observation lowering remain absent. |
+| `rules.exhaustive(...,alphabet_size=k)` | SEMANTIC MISMATCH | Declares `state_count=k` regardless of three-read arity (`rules.py:173-195`), so it cannot derive `S=k^3` or `R=k^(k^3)`. |
+| `_channel_state` | SEMANTIC MISMATCH | Weights physical ordered reads by `[1,k,k^2]` (`rollout.py:748-760`), reversing the required left-most-significant context index just as T01 found. |
+| Spatial rule application | SEMANTIC MISMATCH | Uses binary right shifts and `&1` (`rollout.py:650-682`); it cannot decode base `k`, return general colors, or store a structural table. |
+| Generic lookup execution | SEMANTIC MISMATCH | Family whitelists still reject an ordinary `lookup`; no T02 branch may be added. |
+| `Rule.rule_id` / `RawEpisode.rule_id` | PARAMETERIZATION only for small codes | Python `int` is arbitrary precision, but batch normalization forces `numpy.int64` (`rollout.py:264-288`) and output contracts use a numeric rule-id array. General T02 requires structural program references/lossless codecs. |
+| `Dynamics` / seeds / boundary | PARAMETERIZATION / PRINCIPLED EXTENSION | Finite field mechanics fit, but alphabet, semantic support, typed result/update, table identity, and observation scope are missing. |
+| Tests | SEMANTIC MISMATCH as T02 evidence | Current rule/rollout tests cover binary named families and parity only; none checks `k=3`, 27 contexts, base-3 codes, symbolic order, or `>2^63` identities. |
 
 ## Principles Audit
 
-- Evidence must establish whether `k` is general or only three in the strict construction.
-- Alphabet cardinality may parameterize T01 only if support, reads, result, commit, and successor semantics remain unchanged.
-- A base-3 digit string, sparse mutation label, raster tone, or binary block encoding cannot replace the mathematical table/field.
-- Totalistic aggregation must stay in T03/T04; reversibility/background preservation/symmetry stay explicit restrictions or claims.
+- General `k` is directly supported by the Notes rule-count/implementation and `{n,k}` syntax; strict examples concentrate on `k=3`. T02 is therefore the `k>=3`, radius-one slice of the generic finite-alphabet lookup construction.
+- Alphabet cardinality parameterizes T01 without changing support, source coverage, reads, result, commit, or successor. Adding a separate update/executor would duplicate semantics.
+- A base-`k` integer is a codec for a complete table, not the rule's only in-memory form. Structural tables avoid fixed-width overflow and make validation/serialization inspectable.
+- Color rank for the codec, numeric value for totalistic aggregation, and palette tone for rendering are three different responsibilities.
+- A sparse mutation label, reversibility claim, behavior classification, purpose search, raster, or binary block encoding cannot replace or feed the mathematical table/field.
+- T03/T04/T05 aggregation, T06 quiescence, T07 reflection, and emulation/property analyzers remain compositional siblings rather than T02 flags.
 
 ## Detailed Implementation Plan
 
