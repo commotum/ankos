@@ -10,7 +10,7 @@ Status: **IN PROGRESS**
 - T01/T02 and D111-D114 already supply fixed ordered one-dimensional support, `AllSites`, old-snapshot reads, typed same-site assignment, atomic parallel commit, successor, seed, realization, trace/view separation, ordered alphabets, and arbitrary-precision integer serialization. T03 changes the rule's input quotient and program identity, not the executor or update law.
 - `simple_programs.md:1964-2027` groups numeric sums, active counts, and color histograms under one broad `TOTALISTIC` label. That API responsibility is wider than source T03: equal-sum contexts such as `(0,2,0)` and `(1,0,1)` must merge even though their color histograms differ.
 - The current runtime can sum an `int64` read vector, but `rules.totalistic` does not derive its case count, `_channel_state` ignores the declared `sum` versus `count` mode, generic `lookup` is not executable, spatial output remains binary right-shift/`&1`, and batch rule IDs are forced through `numpy.int64`. No current test executes a standalone three-color totalistic table or validates its codec.
-- Controlled search, source-repair, and asset closure are concurrent evidence dependencies. The architecture below uses only the strict definition and intact Notes formulas; exact gallery initial conditions, raster settings, and any additional variant claims remain unresolved until their protected sections close.
+- Evidence closure is exact: the 16-query manifest yields 118 disjoint candidates (`26/34/25/23/10`) plus 84 split duplicates; 18 evidence groups pin 65 verbatim fragments on 63 physical lines; five damaged source forms are repaired against four official PDFs; and 37 included, ten excluded, and two relation-only assets are hash/geometry pinned. All source, evidence, semantic, metadata, asset, and code-777 raster oracles pass with zero unresolved candidate.
 
 ## Updated Assumptions
 
@@ -31,7 +31,7 @@ Reconstruct totalistic cellular automata exhaustively from strict text, captions
 - Stable ID: T03.
 - Exact CSV name: `Totalistic Cellular Automata` at `ref/notes/CA-Types.csv:4`.
 - Taxonomy: `ref/notes/CA-Types.md:68-99`; vocabulary seed only.
-- Candidate entry kind: permutation-invariant local-rule construction/description over fixed-lattice synchronous assignment, subject to evidence audit.
+- Entry kind: exact finite-sum local-rule description over the T01/T02 fixed-lattice synchronous construction; it introduces a rule-input quotient/table identity but no executor or update law.
 - Initial vocabulary: totalistic/totalistic rule, sum, average, total/aggregate of neighboring colors, code, base-`k`, `3k-2`, `k^(1+(k-1)(2r+1))`, `2187`, `16`, `64`, `5^13`, three/five colors, range `r`, outer totalistic, weighted totalistic, symmetric, additive, quiescent, and named example codes `777`, `867`, `420`, `1599`, `1815`.
 
 ## Search Log
@@ -110,8 +110,8 @@ for q,(pat,pre_s,idx_s) in enumerate(rows,1):
 # Immediate continuation lines whose hit line otherwise split a signature,
 # heading, or formula across physical OCR lines.
 follow={11069,11071,11914,13540}
-assert '5-neighbor totalistic rule' in L[11069]
-assert '5-neighbor outer totalistic rule' in L[11071]
+assert r'\{0, 1, 0\}, \{1, 1, 1\}, \{0, 1, 0\}' in L[11068]
+assert r'\{0, k, 0\}, \{k, 1, k\}, \{0, k, 0\}' in L[11070]
 assert L[11913].startswith('■ Common framework.')
 assert L[13539].startswith('Apply[Plus, 2 ^ Join')
 
@@ -123,7 +123,9 @@ parts={
 'index':'20965,20969,20972,20980,21233,21731,22030,22146,22352,22392',
 }
 partition={k:xs(v) for k,v in parts.items()}
-union=set().union(*sets)|follow
+queried=set().union(*sets)
+assert len(queried)==114
+union=queried|follow
 flat=[i for v in partition.values() for i in v]
 assert len(rows)==16 and len(union)==118
 assert len(flat)==len(set(flat))==118 and set(flat)==union
@@ -191,7 +193,328 @@ There is zero silent remainder: the five sets are pairwise disjoint and their un
 
 ## Book Excerpts
 
-In progress. No excerpt will be treated as canonical until its complete candidate family and source repairs are closed.
+All verbatim monolith material is placed in blockquotes so the oracle below can check every fragment against the cited physical line.
+
+### E1 — Strict restriction, aggregate, valuation, and code order
+
+- Provenance: `BOOK:772,774,776`, strict Chapter 3 text and caption.
+- Establishes: totalistic is a restriction of the full three-color table; output depends on average rather than the individual ordered colors; values are exactly `0,1,2`; self and immediate neighbors are included; sum/average zero is the rightmost, least-significant base-3 row.
+
+> The 256 "elementary" rules that we have discussed so far are by most measures the simplest possible—and were the first ones I studied. But one can for example also look at rules that involve three colors, rather than two, so that cells can not only be black and white, but also gray. The total number of possible rules of this kind turns out to be immense—7,625,597,484,987 in all—but by considering only so-called "totalistic" ones, the number becomes much more manageable.
+
+> The idea of a totalistic rule is to take the new color of each cell to depend only on the average color of neighboring cells, and not on their individual colors. The picture below shows one example of how this works. And with three possible colors for each cell, there are 2187 possible totalistic rules, each of which can conveniently be identified by a code number as illustrated in the picture. The facing page shows a representative sequence of such rules.
+
+> Example of a totalistic cellular automaton with three possible colors for each cell. The rule is set up so that the new color of every cell is determined by the average of the previous colors of the cell and its immediate neighbors. With 0 representing white, 1 gray and 2 black, the rightmost element of the rule gives the result for average color 0, while the element immediately to its left gives the result for average color 1/3—and so on. Interpreting the sequence of new colors as a sequence of base 3 digits, one can assign a code number to each totalistic rule.
+
+### E2 — Gallery restrictions are not program identity
+
+- Provenance: `BOOK:784,790`, strict captions.
+- Establishes: white-background stability is an explicit gallery filter, reflection symmetry follows from the aggregate rule, and the single-gray cell is a figure convention.
+
+> A sequence of totalistic cellular automata with three possible colors for each cell. Although their basic rules are more complicated, the cellular automata shown here do not seem to have fundamentally more complicated behavior than the two-color cellular automata shown on previous pages. Note that in the sequence of rules shown here, those that change the white background are not included. The symmetry of all the patterns is a consequence of the basic structure of totalistic rules. But in fact the behavior we see on the previous page is not unlike what we already saw in many elementary cellular automata a few pages back. Having more complicated underlying rules has not, it seems, led to much greater complexity in overall behavior.
+
+> Examples of three-color totalistic rules that yield patterns which attain a certain size, then repeat forever. The maximum repetition period is found to be 78 steps, and is achieved by the rule with code number 1329. In the pictures shown here and on the following pages, the initial condition used contains a single gray cell.
+
+### E3 — Exact counts and one-dimensional color/range variants
+
+- Provenance: `BOOK:1282,2802,2806,2868`.
+- Establishes: the `k=2,3,5`, radius-one counts and explicit two-color higher-range, three-color, and four-color one-dimensional variants.
+
+> Examples of cellular automata with rules of varying complexity. The rules used are of the so-called totalistic type described on page 60. With two possible colors, just 4 cases need to be specified in such rules, and there are 16 possible rules in all. But as the number of colors increases, the rules rapidly become more complex. With three colors, there are 7 cases to be specified, and 2187 possible rules; with five colors, there are 13 cases to be specified, and 1,220,703,125 possible rules. But even though the underlying rules increase rapidly in complexity, the overall forms of behavior that we see do not change much. With two colors, it turns out that no totalistic rules yield anything other than repetitive or nested behavior. But as soon as three colors are allowed, much more complex behavior is immediately possible. Allowing four or more colors, however, does not further increase the complexity of the behavior, and, as the picture shows, even with five colors, simple repetitive and nested behavior can still occur.
+
+> Totalistic cellular automata whose rules involve nearest and next-nearest neighbors, and where each cell has two possible colors.
+
+> A sequence of totalistic cellular automata with rules that involve only nearest neighbors, but where each cell can have three possible colors.
+
+> A sequence of totalistic rules involving nearest neighbors and four possible colors for each cell chosen to show transitions between rules with different classes of behavior. Note that class 4 seems to occur between class 2 and class 3.
+
+### E4 — Continuous and two-dimensional siblings
+
+- Provenance: `BOOK:1954,2170,2922`.
+- Establishes: continuous gray-level systems are a cross-construction; the cited 2D profile has four neighbors plus self; its base-2 code uses totals from five down to zero. These do not silently redefine one-dimensional T03.
+
+> And to address this question, what I will do in this section is to consider a generalization of cellular automata in which each cell is not just black or white, but instead can have any of a continuous range of possible levels of gray. One can update the gray level of each cell by using rules that are in a sense a cross between the totalistic cellular automaton rules that we discussed at the beginning of the last chapter and the iterated maps that we just discussed in the previous section.
+
+> The form of the rule for a typical two-dimensional cellular automaton. In the cases discussed in this section, each cell is either black or white. Usually I consider so-called totalistic rules in which the new color of the center cell depends only on the average of the previous colors of its four neighbors, as well as on its own previous color.
+
+> Examples of the evolution of two-dimensional cellular automata with various totalistic rules starting from random initial conditions. The rules involve a cell and its four immediate neighbors. Each successive base 2 digit in the code number for the rule gives the outcome when the total of the cell and its four neighbors runs from 5 down to 0.
+
+### E5 — Outer and unequal-weight application boundaries
+
+- Provenance: `BOOK:3902,3914,5088`.
+- Establishes: outer totalistic can retain the center separately; a 2D totalistic caption is truncated in the monolith; negative unequal weights and thresholds form a separate application construction.
+
+> A two-dimensional cellular automaton first shown on page 178 with the rule that if out of the eight neighbors (including diagonals) around a given cell, there are exactly three black cells, then the cell itself becomes black on the next step. If the cell has 1, 2 or 4 black neighbors, then it stays the same color as before, and if it has 5 or more black neighbors, then it becomes white on the next step. (Outer totalistic code 746.) This simple rule produces randomness through the mechanism of intrinsic randomness generation, and this randomness in turn leads to a pattern of growth that takes on an increasingly smooth more-or-less circular form.
+
+> total is exactly 4, then it becomes black. (The rule has totalistic code 976.) The pictures show that on a large scale, the rule leads to regions of black and white whose boundaries behave in a seemingly smooth and continuous way. Note that each picture is 80 cells across, and is effectively wrapped around so that the left neighbor of the leftmost cell is the rightmost cell, and so on.
+
+> Evolution of simple two-dimensional cellular automata in which the color of each cell at each step is determined by looking at a weighted sum of the average colors of cells up to distance 3 away. In both rules shown the cell itself and its nearest neighbors enter with weight 1. Cells at distances 2 and 3 enter with negative weights -- -0.4 per cell for the first rule, and -0.2 for the second. A cell becomes black if the weighted sum is positive, and white otherwise. Starting from random initial conditions, both rules quickly evolve to stationary states that look very much like pigmentation patterns seen in animals.
+
+### E6 — Named profile, emulation, and definition corroboration
+
+- Provenance: `BOOK:6340,7912,8320`.
+- Establishes: codes 294/1893 are one-dimensional profiles; code 1599 can be block-emulated by a binary larger-range CA but remains native three-color T03; the average/not-individual-colors definition is repeated in the universality discussion.
+
+> Examples of one-dimensional cellular automata that support various forms of persistent structures even on largely random backgrounds. These are 3-color totalistic rules with codes 294 and 1893.
+
+> An example of how a cellular automaton with three possible colors and nearest-neighbor rules can be emulated by a cellular automaton with only two possible colors but a larger number of neighbors (in this case five on each side). The basic idea is to represent each cell in the three-color rule by a block of three cells in the two-color rule, according to the correspondence given on the left. The three-color rule illustrated here is totalistic code 1599 from page 70.
+
+> In fact, as illustrated in the pictures on the facing page, it is sufficient in such cases just to use so-called totalistic rules in which the new color of a cell depends only on the average color of cells in its neighborhood, and not on their individual colors.
+
+### E7 — Built-in signatures preserve construction distinctions
+
+- Provenance: `BOOK:11037,11056,11060,11068-11072`.
+- Establishes: direct one-dimensional nearest/range signatures are separate from 2D totalistic and outer-totalistic weighted-stencil signatures. The implementation pointer and the two multiline 2D forms require repairs below.
+
+> I discuss the implementation of totalistic cellular automata on page 886, and of higher-dimensional cellular automata on
+
+>             \{n, \{k, 1\}\} k-color nearest-neighbor totalistic rule
+
+> \{n, \{k, 1\}, r\} k-color range r totalistic rule
+
+>   {n, {k, 1}, {1, 1}} 9-neighbor totalistic rule
+
+> \{n, \{k, \{\{0, 1, 0\}, \{1, 1, 1\}, \{0, 1, 0\}\}, \{1, 1\}\}\}\}
+
+>                         5-neighbor totalistic rule
+
+> \{n, \{k, \{\{0, k, 0\}, \{k, 1, k\}, \{0, k, 0\}\}, \{1, 1\}\}\}
+
+>                        5-neighbor outer totalistic rule
+
+### E8 — Runnable named examples
+
+- Provenance: `BOOK:11168,11178`.
+- Establishes: code 867 is directly identified as `k=3,r=1`; code 3702 is explicitly a 2D nine-neighbor sibling. The invocations are OCR-damaged and normalized below.
+
+> This runs the totalistic k=3, r=1 rule with code 867.  $ln[11]:=Show[RasterGraphics[CellularAutomaton]{867, {3, 1}, 1}, {{1}, 0}, 50]]]$
+
+> This runs 2D 9-neighbor totalistic code 3702 for 25 steps, giving the results for the last 5 steps.
+
+### E9 — A concrete binary range-two table
+
+- Provenance: `BOOK:11625`.
+- Establishes: there are 64 binary range-two totalistic rules and code 10 outputs black exactly for sums 1 and 3 among five cells.
+
+> - **Code 10.** Rule 30 is by many measures the simplest cellular automaton that generates randomness from a single black initial cell. But there are other simple examples—that historically I noticed slightly earlier than rule 30, though did not study—that occur in k = 2, r = 2 totalistic rules. And indeed among the 64 such rules, 13 show randomness. An example shown below is code 10, which specifies that if 1 or 3 cells out of 5 are black then the next cell is black; otherwise it is white.
+
+### E10 — General rule count and value-assignment requirement
+
+- Provenance: `BOOK:11897`, page-60 Notes.
+- Establishes: exact general count `k^(1+(k-1)(2r+1))`, the `16/64/2187` checks, and the requirement that `k>2` totalistic identity is relative to a specific value assignment.
+
+> - **Page 60 · Numbers of rules.** Allowing k possible colors for each cell and considering r neighbors on each side, there are  $k^{k^{2r+1}}$  possible cellular automaton rules in all, of which  $k^{1/2}k^{r+1}$  are symmetric, and  $k^{1+(k-1)(2r+1)}$  are totalistic. (For k=2, r=1 there are therefore 256 possible rules altogether, of which 16 are totalistic. For k=2, r=2 there are 4,294,967,296 rules in all, of which 64 are totalistic. And for k=3, r=1 there are 7,625,597,484,987 rules in all, with 2187 totalistic ones.) Note that for k>2, a particular rule will in general be totalistic only for a specific assignment of values to colors. I first introduced totalistic rules in 1983.
+
+### E11 — Direct aggregate lookup and code conversion
+
+- Provenance: `BOOK:11902,11904,11908,11910,11912`.
+- Establishes: current-array rotations are summed over `-r..r`, the negative index selects sum rows in reverse list order, and the padded base-`k` digit length is exactly `1+(k-1)(2r+1)`.
+
+> ■ Implementation of totalistic cellular automata. To handle totalistic rules that involve *k* colors and nearest neighbors, one can add the definition
+
+> CAStep[TotalisticCARule[rule\_List, 1], a\_List] := rule[[-1 - (RotateLeft[a] + a + RotateRight[a])]]
+
+> CAStep[TotalisticCARule[rule\_List, r\_Integer], a\_List] := rule[[-1 - Sum[RotateLeft[a, i], {i, -r, r}]]]
+
+> One can generate the representation of totalistic rules used by these functions from code numbers using
+
+>  $ToTotalisticCARule[num\_Integer, k\_Integer, r\_Integer] := TotalisticCARule[IntegerDigits[num, k, 1 + (k - 1)(2r + 1)], r]$
+
+### E12 — One framework, different weights
+
+- Provenance: `BOOK:11914,11916`.
+- Establishes: the implementation framework can host both positional general-CA weights and all-one totalistic weights without making the two rule identities interchangeable.
+
+> ■ Common framework. The *Mathematica* built-in function *CellularAutomaton* discussed on page 867 handles general and
+
+> totalistic rules in the same framework by using ListConvolve[w, a, r+1] and taking the weights w to be respectively  $k \wedge Table[i-1, \{i, 2r+1\}]$  and  $Table[1, \{2r+1\}]$ .
+
+### E13 — Additivity is a relation, not base execution
+
+- Provenance: `BOOK:10261,11918`.
+- Establishes: outer-totalistic code 204 and one-dimensional code 420 are additionally additive. The extra algebraic property does not define every totalistic rule.
+
+> A two-dimensional cellular automaton that exhibits an almost trivial form of self-reproduction, in which multiple copies of any initial pattern appear every time the number of steps of evolution doubles. The rule used is additive, and takes a cell to be black whenever an odd number of its neighbors were black on the step before (outer totalistic code 204). The same basic self-reproduction phenomenon occurs in elementary rule 90, as well as in essentially any other additive rule, in any number of dimensions.
+
+> - Page 63 · Mod 3 rule. Code 420 is an example of an additive rule, and yields a pattern corresponding to Pascal's triangle modulo 3, as discussed on page 870.
+
+### E14 — Exact 2D outer/growth boundary
+
+- Provenance: `BOOK:13536,13538,13540,13547-13549`.
+- Establishes: binary 2D totalistic counts black cells; outer totalistic retains the center; growth totalistic makes black absorbing; their codecs/counts are sibling definitions.
+
+> symmetric in the table below if they preserve any possible rotational symmetry consistent with the underlying arrangement of cells. Totalistic rules depend only on the total number of black cells in a neighborhood; outer totalistic rules (as in the previous note) also depend on the color of the center cell. Growth totalistic rules make any cell that becomes black remain black forever.
+
+> In such a rule, given a list of how many neighbors around a given cell (out of s possible) make the cell turn black the outer totalistic code for the rule can be obtained from
+
+> Apply[Plus, 2 ^ Join[2 list, 2 Range[s + 1] - 1]]
+
+> | outer totalistic       | $2^{10} = 1024$               | $2^{18} \simeq 3 \times 10^5$     | $2^{14} = 16384$                  |
+
+> | totalistic             | $2^6 = 64$                    | $2^{10} = 1024$                   | $2^8 = 256$                       |
+
+> | growth totalistic      | $2^5 = 32$                    | $2^9 = 512$                       | $2^7 = 128$                       |
+
+### E15 — Unlabelled-network applicability
+
+- Provenance: `BOOK:13658`.
+- Establishes: unlabelled equal-degree networks admit only aggregate rules, but topology can still affect behavior. This is an application relation, not permission to replace T03's line by an arbitrary graph.
+
+> ■ Networks. Cellular automata can be set up so that each cell corresponds to a node in a network. (See page 936.) The only requirement is that around each node the network must have the same structure (or at least a limited number of possible structures). For nearest-neighbor rules, it suffices that each node has the same number of connections. For longer-range rules, the network must satisfy constraints of the kind discussed on page 483. (Cayley graphs of groups always have the necessary homogeneity.) If the connections at each node are not labelled, then only totalistic cellular automaton rules can be implemented. Many topological and geometrical properties of the underlying network can affect the overall behavior of a cellular automaton on it.
+
+### E16 — Named codes and general `k,r` coverage
+
+- Provenance: `BOOK:14223,14224`.
+- Establishes: the complete cited class-4 code list and explicit one-dimensional `k`-color, range-`r` parameterization.
+
+> - Page 235 · Class 4 rules. Other examples of class 4 totalistic rules with *k* = *3* colors include 357 (page 282), 438, 600, 792, 924, 1038, 1041, 1086, 1329 (page 282), 1572, 1599 (see page 70), 1635 (see page 67), 1662, 1815 (page 236), 2007 (page 237) and 2049 (see page 68).
+
+> - **Frequencies of classes.** The pie charts below show results for 1D totalistic cellular automata with *k* colors and range *r*. Class 3 tends to become more common as the number of elements in the rule increases because as soon as any of these elements yield class 3 behavior, that behavior dominates the system.
+
+### E17 — Reversibility, feature extraction, emulation, universality, and quiescence boundaries
+
+- Provenance: `BOOK:16024,17431,18348,18748,18770`.
+- Establishes: nontrivial totalistic rules are not reversible; 5-neighbor image rules are an application; binary block encoding is an emulation; universality is a property; the only literal quiescence hit is unrelated elementary-rule emulation.
+
+> - **Numbers of reversible rules.** For k = 2, r = 1, there are 6 reversible rules, as shown on page 436. For k = 2, r = 2 there are 62 reversible rules, in 20 families inequivalent under symmetries, out of a total of  $2^{32}$  or about 4 billion possible rules. For k = 3, r = 1 there are 1800 reversible rules, in 172 families. For k = 4, r = 1, some of the reversible rules can be constructed from the second-order cellular automata below. Note that for any k and r, no non-trivial totalistic rule can ever be reversible.
+
+> - Related models. Rather than requiring particular templates to be matched, one can consider applying arbitrary cellular automaton rules. The pictures below show results from a single step of the 16 even-numbered totalistic 5-neighbor rules. The results are surprisingly easy to interpret in terms of feature extraction.
+
+> The problem of encoding cells with several colors by blocks of black and white cells is related to standard problems in coding theory (see page 560). One approach is to use {1, 1} to indicate the boundary of each block, and then within each block to use all possible digit sequences which do not contain {1, 1}, as in the Fibonacci number system discussed on page 892. Note that the original rule with *k* colors and *r* neighbors involves  $Log[2, k^{k^{2r+1}}]$  bits of information; the two-color rule that emulates it involves  $Log[2, 2^{2^{2s+1}}]$  bits. As a result, the minimum possible s for k = 3, r = 1 is about 2.2; in the specific example shown in the main text it is 5.
+
+> - Totalistic rules. It is straightforward to show that totalistic cellular automata can be universal. Explicit simple candidates include k = 2, r = 2 rules with codes 20 and 52, as well as the various k = 3, r = 1 class 4 rules shown in Chapter 3.
+
+> ■ Page 702 · Rule emulations. The network below shows which quiescent symmetric elementary rules can emulate which with blocks of length 8 or less. (Compare page 269.)
+
+### E18 — Actual-Index routing fragments
+
+- Provenance: `BOOK:20965,20969,20972,20980,21233,21731,22030,22146,22352,22392`.
+- Establishes: all ten actual-Index candidates route to already audited strict, Notes, sibling, or relation passages.
+
+> implementation of totalistic, 886
+
+> totalistic see Totalistic cellular automata
+
+> weighted totalistic, 427
+
+> in 3-color totalistic CAs, 948
+
+> Code 294 for totalistic CAs, 60
+
+> Growth totalistic rules, 928
+
+> Outer totalistic rules
+
+> growth totalistic, 928
+
+> totalistic, 60
+
+> Sum (totalistic) rules, 60
+
+> Totalistic cellular automata, 60
+
+> in totalistic cellular automata, 693
+
+## Source Repairs
+
+1. **Primary files and hashes.** Strict text/captions were checked against the official [`nks-ch3.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch3.pdf), SHA-256 `d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76`. Chapter 3 Notes page 886 was checked against official [`nks-nts-ch3.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-nts-ch3.pdf), SHA-256 `21666aa07f49e47483cdc9883e285b8cd47d397dd18eea0b72f05d4d3272a009`. Built-in examples were checked against official [`nks-notes.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf), SHA-256 `549f043595653a7d276b07ba52d435700039b71427b4e1774a44b1a58eff4723`. The truncated 2D caption was checked against official [`nks-ch7.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch7.pdf), SHA-256 `44d1eebd831f780da80bd8a383016aa9cec6aa7ff666fd33690f679c8479210f`.
+2. **`BOOK:3914` truncation.** The monolith retains only the caption tail beginning `total is exactly 4`. The official Chapter 7 caption restores: a random initial condition; the nine-cell neighborhood of self plus eight adjacent cells including diagonals; white for totals below 4; black for totals above 6; white for total 5; and black for total 4. The Chapter 7 split line 491 also restores an opening clause but compresses away most of this official rule, so it is corroboration, not normalization authority.
+3. **`BOOK:11037` truncation.** The official all-Notes page continues the sentence with `page 927.` The normalized pointer is: totalistic implementation page 886; higher-dimensional implementation page 927. It carries routing only.
+4. **`BOOK:11168` invocation OCR.** `ln[11]`, displaced brackets, and the call shape are extraction errors. Official all-Notes gives normalized `In[11] := Show[RasterGraphics[CellularAutomaton[{867, {3, 1}, 1}, {{1}, 0}, 50]]]`. The prose identity `code 867`, `k=3`, `r=1` is intact in the monolith.
+5. **`BOOK:11897` formula OCR.** The totalistic formula `k^(1+(k-1)(2r+1))` and all three numeric checks are intact. The adjacent symmetric-count extraction `$k^{1/2}k^{r+1}$` is malformed; official page 886 shows `k^(1/2 k^(r+1) (1+k^r))`. That sibling formula is not used to derive T03.
+6. **`BOOK:11916` operator OCR.** The monolith's `$k \wedge Table[i-1,...]$` must be `$k^Table[i-1,...]$`; official page 886 visibly confirms the caret. The totalistic all-one vector `Table[1,{2r+1}]` is intact.
+7. **Average/sum reconciliation.** This is normalization, not a textual repair. With the required value assignment and fixed arity `q=2r+1`, average is exactly `sum/q`, so it induces the same ordered cases. No float arithmetic is licensed. For `k>2`, changing the values assigned to colors can change which rules are totalistic, exactly as `BOOK:11897` warns.
+8. **Digit direction.** `BOOK:776` puts average/sum zero at the rightmost displayed element. `IntegerDigits[num,k,M]` at `BOOK:11912` returns most-significant-first digits, and negative indexing at `BOOK:11904,11908` selects the rightmost digit for sum zero. Thus `U_s=floor(num/k^s) mod k`; leading zero digits are real rows, not omitted defaults.
+9. **Strict figure/code 777.** The OCR text never says `777`; the pinned strict raster visibly shows high-to-low digits `1,0,0,1,2,1,0`. Reversing into sum order gives `0,1,2,1,0,0,1`, whose base-3 value is 777. This repairs a missing text label only; raster tone and geometry remain observer data.
+10. **Split wording and routing.** Chapter 3 split line 89 changes strict `can not only` to `can be not only`; the official PDF agrees with the monolith. `BACK-MATTER/Index/Index.md` is Notes, while the actual split Index is embedded in `BACK-MATTER/Colophon/Colophon.md` from line 3383. Canonical `BOOK` physical lines remain primary.
+11. **Boundary discipline.** White-background filtering and the single-gray seed are gallery controls; additive, reversible, universal, quiescent, weighted, outer, growth, continuous, 2D, network, application, and emulation evidence is explicitly relation/sibling material. None supplies a default row, seed, boundary, stopping condition, alternate reducer, or T03 executor branch.
+
+### Citation, verbatim, source-repair, asset, and combinatoric oracle
+
+This check expands every `BOOK:` citation anywhere in this stage, verifies every monolith blockquote against its nearest provenance, pins all damaged monolith forms and official downloads, and checks the strict codec independently.
+
+```bash
+python3 - <<'PY'
+import hashlib, re
+from pathlib import Path
+
+book=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md')
+stage=Path('goal-1/22-T03-TOTALISTIC-CA.md')
+L=book.read_text().splitlines(); text=stage.read_text()
+
+def expand(spec):
+    out=set()
+    for item in spec.split(','):
+        if '-' in item:
+            a,b=map(int,item.split('-')); out.update(range(a,b+1))
+        else: out.add(int(item))
+    return out
+def refs(s):
+    out=set()
+    for m in re.finditer(r'BOOK:([0-9]+(?:-[0-9]+)?(?:,[0-9]+(?:-[0-9]+)?)*)',s):
+        out |= expand(m.group(1))
+    return out
+
+# Every cited physical line is explicitly traversed, including ranges in
+# sections maintained by other audit workers.
+cited=refs(text)
+assert cited and all(1 <= n <= len(L) for n in cited)
+for n in sorted(cited):
+    _=L[n-1]
+
+# All verbatim monolith material in Book Excerpts is a blockquote. Each
+# fragment must occur on one of the immediately preceding provenance lines.
+ex=text.split('## Book Excerpts',1)[1].split('## Source Repairs',1)[0]
+current=set(); quote_count=0; quote_lines=set()
+for row in ex.splitlines():
+    if row.startswith('- Provenance:'):
+        current=refs(row); assert current
+    elif row.startswith('> '):
+        q=row[2:].strip(); assert q and current
+        hits={n for n in current if q in L[n-1].strip()}
+        assert hits,(sorted(current),q)
+        quote_lines |= hits; quote_count += 1
+assert quote_count==65 and len(quote_lines)==63
+
+# Pin every monolith defect normalized above.
+assert L[3913].startswith('total is exactly 4, then it becomes black.')
+assert L[11036].endswith('higher-dimensional cellular automata on')
+assert '$ln[11]' in L[11167] and 'code 867' in L[11167]
+assert '$k^{1/2}k^{r+1}$' in L[11896]
+assert '$k^{1+(k-1)(2r+1)}$' in L[11896]
+assert r'$k \wedge Table[i-1, \{i, 2r+1\}]$' in L[11915]
+
+official={
+'/tmp/nks-ch3.pdf':'d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76',
+'/tmp/nks-nts-ch3.pdf':'21666aa07f49e47483cdc9883e285b8cd47d397dd18eea0b72f05d4d3272a009',
+'/tmp/nks-notes.pdf':'549f043595653a7d276b07ba52d435700039b71427b4e1774a44b1a58eff4723',
+'/tmp/nks-ch7.pdf':'44d1eebd831f780da80bd8a383016aa9cec6aa7ff666fd33690f679c8479210f',
+}
+for name,want in official.items():
+    data=Path(name).read_bytes()
+    assert hashlib.sha256(data).hexdigest()==want,name
+asset=Path('ref/A-New-Kind-of-Science/CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_75_Figure_6.jpeg')
+assert hashlib.sha256(asset.read_bytes()).hexdigest()=='acb13963632286960ca61b616ff2f45a940750f3ab7deb5e6fbf696543015c15'
+
+# Independent finite arithmetic checks.
+assert 2**4==16 and 2**6==64 and 3**7==2187 and 5**13==1_220_703_125
+sum_digits=[0,1,2,1,0,0,1]
+assert sum(d*3**s for s,d in enumerate(sum_digits))==777
+for k,r in ((2,1),(2,2),(3,1),(5,1),(8,1)):
+    q=2*r+1; M=1+(k-1)*q
+    reachable={sum(v) for v in __import__('itertools').product(range(k),repeat=q)}
+    assert reachable==set(range(M))
+    assert k**M==k**(1+(k-1)*(2*r+1))
+assert 8**22==2**66
+print(f'T03 evidence oracle: PASS cited={len(cited)} quote_fragments={quote_count} quote_lines={len(quote_lines)} repairs=5 pdfs=4')
+PY
+```
+
+Expected terminal line:
+
+```text
+T03 evidence oracle: PASS cited=<dynamic> quote_fragments=65 quote_lines=63 repairs=5 pdfs=4
+```
 
 ## Construction Model
 
@@ -299,7 +622,7 @@ code(U)     = sum_{s=0}^{M-1} nu(U_s) * k^s
 
 D112's structural-table-first and arbitrary-precision policy composes at the finite-table/serialization responsibility level; T03 has a distinct sum-case domain and codec from T02's ordered context table. D114 is resolved concretely: T03's explicit valuation `nu` supplies both aggregate summands and output-code digits; T02 alphabet rank remains an independent identity and may coincide with `nu` only in the canonical integer profile; palette remains a view.
 
-Evidence still unresolved for this architecture pass: exact gallery trajectories/raster parameters; whether any source profile requires noncanonical or non-bijective numeric color values; and whether radius zero, dynamic/masked arity, histogram, outer-totalistic, weighted, or higher-dimensional rules should share a later generalized aggregate interface. Goal 2 must expose these as typed unsupported or separate constructions until their own evidence closes, not infer defaults.
+Evidence closure supplies an exact strict code-777 cell raster and exact code-777/code-867 trajectories. Other galleries intentionally remain label/property fixtures because the source omits at least one of seed serialization, boundary, horizon convention, crop, palette, or resampling. No audited source requires a non-bijective valuation, radius zero, dynamic/masked arity, histogram, outer-totalistic, unequal weights, or higher-dimensional geometry; Goal 2 therefore exposes those as typed unsupported or separate constructions until their own stages justify sharing, rather than inferring defaults.
 
 ## Exact Semantic Oracle
 
