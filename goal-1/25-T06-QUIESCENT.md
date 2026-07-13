@@ -56,7 +56,7 @@ IN PROGRESS. Excerpt groups will be added only after provenance, exact fragments
 | Successor/halt | Every requested event remains an ordinary deterministic successor, including an unchanged all-blank successor. T06 does not introduce fixed-point stopping or the event-free `Quiescent` outcome used by unrelated constructions. |
 | Seed/background | A finite nonblank seed on fill `b` is T08/run data. A constant exterior value is a finite-realization boundary choice. Neither proves or defines the local property. |
 | Consequence | With a finite-radius stencil and a passing rule, a finite set of nonblank initial sites has finite causal dilation after every finite horizon. This does not imply monotonicity, eventual death, finite total activity, or halting. |
-| Program identity | The restriction returns the exact referenced structural program, semantic hash, and executor types. The restriction request and reproducible property evidence have separate identities. |
+| Program identity | The restriction returns the exact referenced structural program, semantic hash, and typed axis/preset schemas unchanged. The restriction request and reproducible property evidence have separate identities. |
 | Observers/relations | Gallery membership, symmetry, invariant-state classifications, emulation graphs, behavior classes, death/growth claims, crops, rasters, and horizons remain property/analyzer/relation/view records. |
 
 ### Structural forms and codec corollaries
@@ -250,7 +250,7 @@ IN PROGRESS. The handoff will name concrete files, dependencies, structural vali
 
 - No T06/quiescent family branch, executor, update law, background-freezing rule, implicit default row, sparse table, or fixed-capacity simulation.
 - No seed fill, exterior boundary, crop, palette, fixed-point stop, behavior class, or gallery selection used as proof of rule-level background preservation.
-- No code parity/modulus used as the primary predicate when alphabet rank, designated blank, valuation, case-domain order, or codec differs.
+- No code parity/modulus used as the primary predicate when alphabet rank, designated blank, valuation, case-schema order, or codec differs.
 - No acceptance based on a sampled finite run; the complete local uniform-blank row must be checked structurally.
 - No duplicate predicate under elementary, multicolor, totalistic, higher-color, or dimensional family names when one typed rule-application obligation is sufficient.
 

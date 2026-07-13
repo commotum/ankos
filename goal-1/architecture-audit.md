@@ -4,7 +4,7 @@ Status: **IN PROGRESS — HARD PREREQUISITE FOR T06 AND ALL FURTHER TYPE WORK**
 
 ## Trigger and Scope
 
-T09/T12 and decisions D009-D014 are reopened because they promoted one state decomposition—separate `SingleControl`/`TransitionControl` records—into a semantic requirement. The audit covers every completed decision and every proposed state, control, frontier, neighborhood, rule result, update law, executor, and runtime API extension. It updates affected stage files, the design ledger, the global plan, and Goal 2 handoffs before T06 or any other type stage resumes.
+T09/T12 and decisions D009-D014 were reopened because they promoted one state decomposition—separate `SingleControl`/`TransitionControl` records—into a semantic requirement. The completed audit covers every completed decision and every proposed state, control, frontier, neighborhood, rule result, update policy, executor, and runtime API extension. It updates affected stage files, the design ledger, the global plan, and Goal 2 handoffs before T06 resumes.
 
 In this audit, **DOMAIN** is the task/program's dimensional space together with its support/topology: `t+0D`, `t+1D`, `t+2D`, `t+3D`, and so on, with discreteness or continuity stated explicitly. The configuration labels or structures that space; DOMAIN itself is not restricted to a dense `Z^4` tensor. A tape alphabet, head-state set, scalar value set, parameter set, address set, or numeric representation is not a DOMAIN; those are ALPHABET/value-schema factors, keys, or profiles.
 
@@ -19,12 +19,12 @@ SimpleProgram:
     FRONTIER       rule-firing loci, occurrences, or matches
     NEIGHBORHOOD   information visible at each firing locus
     RULE           typed writes/replacements
-    UPDATE         composition/schedule producing Successors[Configuration]
+    UPDATE         composition/schedule producing StepResult[Configuration]
 
 active = FRONTIER.select(state)
 reads  = NEIGHBORHOOD.read(state, active)
 writes = RULE(active, reads)
-next   = UPDATE.apply(state, active, writes)
+next   = UPDATE.apply(state, active, writes)  # structured result with successor(s)
 ```
 
 The runner is branch-free over this protocol. Different domains/topologies, finite or structured alphabets, composite/tagged values, frontier selectors, access patterns, typed rule-result schemas, and update composition policies are implementations or values of these axes—not family executors or top-level semantic state classes. A cellular automaton is the fixed-lattice/all-sites/local-stencil/scalar-label/snapshot-parallel preset.
@@ -37,7 +37,7 @@ e(step_A(state)) = step_B(e(state))
 
 That commuting square concerns configurations and steps. A rule/program codec such as T03's compact totalistic table instead requires denotational equality of the local function, an explicit round trip on the represented program data, and retained source identity/provenance; it is not falsely presented as a configuration map.
 
-Pure constraint/model sets, uniterated function definitions, and general PDE relations without a specified evolution problem lack canonical stepwise evolution and therefore remain genuine nonfits. Multiway systems still fit because every UPDATE returns a typed `Successors[Configuration]`; a deterministic program returns a singleton and a multiway program may return any finite set.
+Pure constraint/model sets, uniterated function definitions, and general PDE relations without a specified evolution problem lack canonical stepwise evolution and therefore remain genuine nonfits. Multiway systems still fit because every UPDATE returns one typed `StepResult[Configuration]` whose successor component is a finite set; a deterministic program returns a singleton and a multiway program may return any finite set.
 
 ### Primary Evidence for the Abstraction
 
@@ -56,7 +56,7 @@ Pure constraint/model sets, uniterated function definitions, and general PDE rel
 
 Different source terminology, semantic role names, or decompositions of equally shaped state do not by themselves justify a new class. Conversely, a collapse is rejected if it requires hidden state, callbacks, family dispatch, lossy encoding, invented behavior, or altered update semantics.
 
-## Reopened Core Finding
+## Corrected Core Finding
 
 For a Turing machine, let
 
@@ -74,7 +74,7 @@ The T09 specialization uses `Cell = Plain(bit) | Active(bit)` and the same exact
 
 ## Audit Matrix
 
-| Decision / stage | Evidence and former claim | Classification | Smallest reusable base | Required invariants / structural mapping | Reopen action |
+| Decision / stage | Evidence and former claim | Classification | Smallest reusable base | Required invariants / structural mapping | Audit action |
 |---|---|---|---|---|---|
 | D009 / T09 | Mobile event originates at the old active cell | DIRECT REUSE | Simple-program `FRONTIER` as rule-firing loci | Select the unique tagged active cell; typed rule writes may target source and destination; broaden the current writable-coordinate-only schema | Retain source-frontier conclusion; revise storage assumptions and Goal 2 lowering |
 | D010 / T09 | Active position must be visible; former conclusion required a separate state component | LOSSLESS TAGGED / PRODUCT REPRESENTATION | Finite composite alphabet on the existing field | `Plain(bit) <-> (bit,None)`; `Active(bit) <-> (bit,Unit)`; exactly one active tag | Replace storage mandate with representation-neutral visibility and validation |
@@ -89,13 +89,13 @@ The classification number in this matrix refers to the four categories above. A 
 
 ### Foundation through T17 (D000-D030)
 
-| Decision | Basis / audit evidence | Class | Smallest reusable base | Required invariants or mapping | Disposition / reopen |
+| Decision | Basis / audit evidence | Class | Smallest reusable base | Required invariants or mapping | Final disposition |
 |---|---|---:|---|---|---|
-| D000 | Principles 0-2; `BOOK:402,1248` | 2 | Branch-free `SimpleProgram` protocol for step/rewrite systems | Nonstep categories do not receive fake empty fields | Rewrite candidate as confirmed scope; Foundation architecture reopens |
+| D000 | Principles 0-2; `BOOK:402,1248` | 2 | Branch-free `SimpleProgram` protocol for step/rewrite systems | Nonstep categories do not receive fake empty fields | Rewritten as confirmed scope; Foundation reclosed |
 | D001 | Principles 4,11; constraint/function/PDE counterexamples | 2 | Tagged semantic categories beside `SimpleProgram` | Different roles may share representation without sharing denotation | Keep and add role-vs-class guard |
 | D002 | Current family dispatch in `rollout.py`; Principles 2,14 | 1 | One runner calling typed axes | No `if family`, hidden state, callback, or duplicated rollout | Keep |
 | D003 | Exact CSV join | 2 | Provenance/conformance IDs | Catalog ID never chooses runtime class | Keep and clarify |
-| D004 | T01 old-snapshot step; `BOOK:418-430,10984-10992` | 2 | `SimpleProgram` CA preset | Fixed lattice/all sites/table are axis values, not the executor algebra | Rewrite; T01 handoff reopens |
+| D004 | T01 old-snapshot step; `BOOK:418-430,10984-10992` | 2 | `SimpleProgram` CA preset | Fixed lattice/all sites/table are axis values, not the executor algebra | Rewritten; T01 handoff reclosed |
 | D005 | T01 infinite line, finite realization, trace evidence | 3 | DOMAIN/support declaration plus explicit realization and trace mapping | Lowering is inspectable and lossless at declared scope | Keep; normalize DOMAIN vocabulary |
 | D006 | `BOOK:10988`; asymmetric runtime defect | 2 | Ordered NEIGHBORHOOD plus explicit table codec | Read order and serialization significance commute | Keep |
 | D007 | T01 center replacement | 2 | Generic typed write/replacement result | Same-site scalar assignment is one RULE-result preset | Rewrite class wording; no assignment subclass per family |
@@ -105,7 +105,7 @@ The classification number in this matrix refers to the four categories above. A 
 | D011 | T09/T12 simultaneous value/move evidence | 2 | RULE returns finite typed writes; UPDATE commits atomically | All reads from one snapshot; collision/coverage checks; valid successor | Rewrite; retire required `TransitionControl` effect |
 | D012 | Physical `[left,self,right]` Notes code | 1 | Shared ordered NEIGHBORHOOD/codec | No family permutation; asymmetric oracle | Keep |
 | D013 | Mobile trace/observer evidence | 2 | Full configuration trace | Composite tags round-trip; compression remains observer | Keep with representation-neutral wording |
-| D014 | Turing head-state evidence plus composite-alphabet note | 3 | `Plain(sigma) | Head(q,sigma)` | Exactly one head; underlying symbol retained; optional factored view commutes | Replace `SingleControl` mandate; T12/T19 dependencies reopen |
+| D014 | Turing head-state evidence plus composite-alphabet note | 3 | `Plain(sigma) | Head(q,sigma)` | Exactly one head; underlying symbol retained; optional factored view commutes | `SingleControl` mandate removed; T12/T19 dependencies reclosed |
 | D015 | Sparse blank tape Notes | 3 | Fixed-line DOMAIN with default/override labeled field | Total inspectable value at every integer; finite realization separate | Keep |
 | D016 | Base/nonhalting/Busy-Beaver/stop evidence | 2 | Typed run outcomes around runner | Terminal, external stop, horizon, invalidity, error distinct | Keep |
 | D017 | OCR-damaged codec plus code 3024 guards | 2 | Evidence/provenance policy | Repair explicit and independently replayed | Keep |
@@ -208,7 +208,7 @@ The classification number in this matrix refers to the four categories above. A 
 | D099 | Native support/ring/work/crop | 3 | DOMAIN/support/realization/view records | Boundary and finite work never masquerade as native support | Keep |
 | D100 | Whole-field numeric realization | 3 | Tagged representation/realization profile | Rounding locations and feedback semantics complete | Keep |
 | D101 | Initial-inclusive fields and observers | 2 | Shared trace/observer policy | Background/difference/gallery/view never feed rule | Keep |
-| D102 | Relations among deterministic, stochastic, block, and PDE cases | 2 | Closed RULETYPE and UPDATE-schedule variants; PDE declarative category | Draws explicit; block schedule typed; no discretization identity; D103 owns the PDE nonfit | Rewrite blanket separate-construction claim; re-audit unsupported block evidence |
+| D102 | Relations among deterministic, stochastic, block, and PDE cases | 2 | Explicit typed boundaries; only evidenced deterministic forms enter the current runner handoff | No hidden RNG or unweighted loss of probabilities; block schedule needs evidence; no discretization identity; D103 owns the PDE nonfit | Keep stochastic/probabilistic and unsupported block execution unresolved until probability-kernel or replayable-draw semantics are evidenced |
 | D103 | General PDE relation lacks canonical step | 4 | Declarative differential-relation/model-set category | No invented time/frontier/successor; specified IVP may derive a SimpleProgram | Keep nonfit; reuse T31/T41 infrastructure |
 | D104 | Bound differential syntax | 3 | Shared closed expression/function algebra | Variables, derivative multi-indices, codomain, matrices typed | Keep; rename definition-set terminology |
 | D105 | Equation/problem/candidate/witness/etc. | 3 | Referenced roles and identity layers | Equality never promoted across layers without relation | Keep roles, not unrelated ontologies |
@@ -254,6 +254,7 @@ This table is the authoritative architecture replacement for the reopened stages
 
 | Stage | DOMAIN / CONFIGURATION / ALPHABET | FRONTIER / NEIGHBORHOOD | RULE writes / UPDATE | Goal 2 correction |
 |---|---|---|---|---|
+| Foundation | Catalog/evidence scaffold; no construction state of its own | Not applicable | Establishes the audited protocol rather than a stage-specific rule | Preserve the evidence contract and stable IDs; synthesize all step/rewrite types through one branch-free runner, with declarative nonfits outside rollout |
 | T01 | Discrete `t+1D` fixed ordered lattice; Boolean labels | All sites; old left/self/right | One next label per active site; snapshot-parallel replacement | Implement the CA preset through the branch-free runner; fix table count/order, not a T01 executor |
 | T02 | T01 DOMAIN with arbitrary finite, including tagged/product, ALPHABET | T01 reuse | Complete local table; same UPDATE | Generalize alphabet/table validation and bigint codec; no rollout branch |
 | T03 | T01 DOMAIN; finite alphabet plus explicit numeric valuation | Radius/offset parameter; exact equal-weight sum view | Compact sum table and exhaustive expansion denote the same local RULE; T01 UPDATE | Add a factorized RULETYPE/codec mapping, not a T03 engine or identity split |
@@ -281,17 +282,19 @@ This table is the authoritative architecture replacement for the reopened stages
 ### Minimal Goal 2 Runner Contract
 
 ```text
-step(program, configuration) -> Successors[Configuration]:
+step(program, configuration) -> StepResult[Configuration]:
     validate(configuration, program.configuration_schema.invariants)
     active = program.frontier.select(configuration)
     reads = program.neighborhood.read(configuration, active)
     writes = program.rule.apply(active, reads)
-    successors = program.update.apply(configuration, active, writes)
-    validate_each(successors, program.configuration_schema.invariants)
-    return successors
+    result = program.update.apply(configuration, active, writes)
+    validate_each(result.successors, program.configuration_schema.invariants)
+    return result
 ```
 
-`Successors[C]` is the uniform runner result: deterministic programs return a singleton, terminal/no-successor events return the empty set with a typed outcome, and multiway programs may return any finite set. No family test chooses the container. Polymorphism occurs through the typed axes stored in the specification; the runner contains no catalog/family switch. RULE and UPDATE implementations are closed data/evaluators, never unrestricted callbacks. A preset returns an ordinary `SimpleProgram` specification.
+`StepResult[C]` is the uniform runner result. It contains a finite exact `successors` set, one typed outcome (`Advanced`, `Quiescent`, `Terminal`, `Invalid`, or `Error` with a reason), and typed event/witness records. Deterministic advancement has one successor; terminal/error results may have none; quiescence can retain an explicit self-successor while remaining event-free; multiway results retain every derivation witness separately from exact successor deduplication. Thus an empty set never loses why it is empty, and T30 never loses branch provenance. No family test chooses the envelope or container. Polymorphism occurs through the typed axes stored in the specification; the runner contains no catalog/family switch. RULE and UPDATE implementations are closed data/evaluators, never unrestricted callbacks. A preset returns an ordinary `SimpleProgram` specification.
+
+The current audit does **not** yet admit stochastic/probabilistic execution merely by putting random sampling inside RULE. A future stage must establish either a probability-bearing successor measure or explicit replayable draw inputs/state and extend `StepResult` losslessly. Until then, stochastic/noisy relations remain typed evidence boundaries; hidden RNG state and unweighted successor sets are invalid.
 
 ### Current-Code Migration Boundary
 

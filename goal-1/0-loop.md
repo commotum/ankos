@@ -10,10 +10,10 @@ Future stages use the broad SimpleProgram abstraction established in `architectu
 active = FRONTIER.select(configuration)
 reads  = NEIGHBORHOOD.read(configuration, active)
 writes = RULE(active, reads)
-next   = UPDATE.apply(configuration, active, writes)  # Successors[Configuration]
+next   = UPDATE.apply(configuration, active, writes)  # StepResult[Configuration]
 ```
 
-DOMAIN is the task/program space with its dimensional character, support, and topology; ALPHABET is its label/value schema and may be a product or tagged union. FRONTIER selects rule-firing loci/occurrences/matches, RULE returns typed writes/replacements, and UPDATE composes them into zero, one, or many successor configurations. These are axes of one branch-free runner, not family executors.
+DOMAIN is the task/program space with its dimensional character, support, and topology; ALPHABET is its label/value schema and may be a product or tagged union. FRONTIER selects rule-firing loci/occurrences/matches, RULE returns typed writes/replacements, and UPDATE returns one structured result containing zero, one, or many successor configurations plus typed outcome/event/witness data. These are axes of one branch-free runner, not family executors.
 
 Distinct source names or semantic roles do not imply distinct runtime classes. Prefer parameterizations, named roles, invariants, and lossless structural representations. For a claimed equivalence, require a complete-state map `e` with an explicit inverse on its invariant-valid image, one-step-granularity commuting successor sets, and no hidden source interpreter. Reject opaque whole-state packing, callbacks, lossy quotients, family dispatch, invented behavior, and altered schedules.
 

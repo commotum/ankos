@@ -772,7 +772,7 @@ Completion requires:
 
 ## Architecture-Reclosed Stage Result
 
-**COMPLETE.** T30's smallest configuration is one word and UPDATE returns `Successors[Word]`. A finite layer is the explicit powerset iteration lift; exact child deduplication does not erase separately retained rewrite witnesses. Branching extends the common result type without a multiway executor.
+**COMPLETE.** T30's smallest configuration is one word and UPDATE returns `StepResult[Word]` with a finite exact successor set. A finite layer is the explicit powerset iteration lift; exact child deduplication does not erase separately retained rewrite witnesses. Branching uses the common result envelope without a multiway executor.
 
 ## Historical Stage Results (Evidence Retained; Architecture Superseded)
 

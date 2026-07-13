@@ -1,5 +1,9 @@
 # 1-FOUNDATION
 
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
+
+Architecture authority: D000-D003, the governing algebra, and the runner/nonfit boundaries in `architecture-audit.md` supersede Foundation-time uncertainty about whether a common transition/rewrite protocol would survive type evidence.
+
 ## Current Facts
 
 - The `types` worktree was clean at stage start. `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no prior stage was in progress or reopened.
@@ -11,13 +15,25 @@
 - The eleven top-level `src/ca` Python modules total 5,338 lines. The nine `tests/test_*.py` files total 1,685 lines and contain 97 statically named tests.
 - The canonical local book monolith has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline). Foundation validates the source and procedure but does not collect type evidence; excerpt collection begins in T01.
 
-## Updated Assumptions
+## Foundation-Time Assumptions (Historical)
 
 - Still valid as hypotheses: support/topology, values, and control should be distinguished; grouped ordered reads may be reusable; a selector can be useful for finite loci; dataset and visualization concerns should remain downstream.
 - Changed: the current runtime does not implement the single documented per-target algebra. It dispatches on named rule families, and several temporal paths bypass declared neighborhood components.
 - Changed: the current trace is not always complete Markov state. AR2 omits one seed-history value, Dyadlags omits two, and Lagcounts later maintains a packed ten-bit history inside its executor.
 - Changed: `simple_programs.md` itself lacks an explicit `UPDATE` component and defines `FORMULAIC`/`STOCHASTIC` over the full field, so it cannot be treated as a safe implementation blueprint under the no-callback/no-smuggling constraints.
 - Needs type evidence: whether one substantive transition/rewrite algebra survives; whether canonical rank-0..3 coordinates preserve all required structure; which entries are constructions versus restrictions, seeds, observables, or solver-defined systems; which current primitives retain their meanings.
+
+## Architecture-Reclosed Foundation Disposition
+
+Evidence through T45 resolves the Foundation hypotheses without weakening its evidence discipline:
+
+- one branch-free `SimpleProgram` runner survives for every evidenced transition/rewrite construction;
+- DOMAIN is the task/program dimensional space with support/topology, while ALPHABET is its label/value schema and may use transparent products or tagged unions;
+- FRONTIER selects firing loci/occurrences/matches, NEIGHBORHOOD supplies access, RULE returns typed writes/replacements, and UPDATE returns a structured `StepResult[Configuration]` containing successor(s), outcome, and event/witness data;
+- CA is one fixed-lattice/all-sites/local-stencil/same-site-write/snapshot-parallel preset, not the library boundary;
+- catalog identity never selects a runtime class or executor;
+- model sets, uniterated function definitions, and unposed general PDE relations are declarative nonfits rather than fake programs;
+- the evidence-first procedure, stable T01-T45 join, source discipline, fit labels, and separation of execution/trace/encoding/solvers/views remain valid unchanged.
 
 ## Big Picture Objective
 
@@ -210,7 +226,7 @@ Dependencies: all 45 type stages and Synthesis. No runtime file is authorized to
 - The 45 catalog names are joined mechanically, not inferred from stage filenames.
 - All statuses begin pending; Foundation makes no type complete and records no book excerpt as type evidence.
 - Current family branches, callbacks, fixed support, hidden history, and rank limits are named explicitly rather than wrapped in a cosmetic interface.
-- The candidate transition/rewrite algebra remains a hypothesis in `design-ledger.md`; no universal executor is declared.
+- Foundation did not prematurely declare an executor; the later completed type audit now establishes one common runner for step/rewrite systems and explicit declarative nonfits outside rollout.
 - Test results are classified as current-runtime contracts only.
 - No change is made to `src/ca`, `tests`, `principles.md`, `simple_programs.md`, or any non-`goal-1/` path.
 
@@ -227,7 +243,11 @@ Dependencies: all 45 type stages and Synthesis. No runtime file is authorized to
 - [x] Current tests pass as a baseline.
 - [x] Whitespace and scope checks pass; Foundation status is folded into all global artifacts.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** Foundation's evidence procedure and catalog join remain authoritative. D000-D003 are reclosed around the common SimpleProgram runner, structural type axes, catalog-independent execution, and explicit nonfits described above; no Foundation runtime implementation is introduced.
+
+## Historical Stage Results (Foundation-Time Evidence Retained)
 
 Foundation established the required evidence and architecture scaffolding without changing runtime semantics. It exposed three immediate liabilities to carry into type work: current family-dispatched execution, current hidden temporal state, and a documented fixed-support value-assignment model that lacks explicit update/control/topology semantics.
 
