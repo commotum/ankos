@@ -1,8 +1,12 @@
 # 3-T09-MOBILE
 
-Status: **COMPLETE**
+Status: **REOPENED — REPRESENTATION ARCHITECTURE AUDIT**
 
 ## Current Facts
+
+- Reopening finding: visibility of the active role does not require a separate control object. `Plain(bit) | Active(bit)` preserves the cell value and active marker losslessly, with exactly one `Active` cell as a validated invariant.
+- The former claim that `FRONTIER` must select firing sources is not established. The shared schema may retain a writable frontier containing the source and destination while a named activation/source projection identifies the old active cell.
+- The compact 65,536-rule mobile table remains the native program identity; a structural lowering to tagged-cell assignments is not the identity of an arbitrary four-color cellular-automaton table.
 
 - Exact catalog row: T09, CSV line 10, `Mobile Automata`.
 - Complete taxonomy seed: `ref/notes/CA-Types.md:207-238`.
@@ -454,10 +458,12 @@ The current full-state formula callback is not a valid fallback: T09 has a finit
 - [x] All unique construction-relevant excerpts have exact canonical provenance.
 - [x] Visible control, read order, compound result, atomic update, support/boundary, seed, and observables are reconstructed.
 - [x] The 65,536 tables and canonical example have independent conformance oracles.
-- [x] Current API/runtime/test fit is mapped exactly and T01 reuse/revision is explicit.
-- [x] Goal 2 handoff has dependencies, files, migrations, canonical tests, completion evidence, and no-cheating checks.
-- [x] Global ledgers are re-integrated and verified.
+- [ ] Current API/runtime/test fit is reclassified without presuming separate control storage or a source-only frontier.
+- [ ] Goal 2 handoff is revised around a lossless composite state, exactly-one invariant, and structural atomic lowering.
+- [ ] Global ledgers and all dependent decisions are re-integrated and independently verified.
 
 ## Stage Results
+
+**Reopened:** the evidence and native mobile rule remain valid, but the former architectural conclusion is withdrawn pending `architecture-audit.md`. In particular, neither a separate `SingleControl` class nor a source-only `FRONTIER` follows from visibility or atomicity.
 
 T09 is complete with zero unresolved evidence candidates. It preserves T01's fixed-lattice transition protocol only after a first-principles correction: `FRONTIER` selects rule-firing sources, while typed results name mutation targets. T09 adds directly evidenced visible control, `ControlLocus`, `RelocateControl`, a finite compound rule codomain, atomic multi-effect update, and structured control-preserving traces. The exact `{35,57}` codec uses physical `[left,self,right]`; an apparent prose-order ambiguity was resolved against executable Notes and the rule image, and independent asymmetric cases/trajectory prevent regression. T01 remains complete because its sources and assignment targets coincide. No family-specific executor, CA packing, boundary invention, or compressed-state shortcut is accepted. Next: T12 Turing Machines.

@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T02/T05/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 21 of 45 type stages complete, T03 and T04 reopened for the bounded page-263 downstream-gallery asset repair, T06 Quiescent-Background-Preserving Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and 19 of 45 type stages complete; T03/T04 remain reopened for their bounded asset repairs, T09/T12 are reopened by the representation-architecture correction, and every completed design decision is under a mandatory first-principles audit recorded in `architecture-audit.md`. T06 is paused: no type work resumes until the audit matrix, dependent-stage dispositions, revised ledger, plan, and Goal 2 handoffs are complete.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
@@ -87,10 +87,10 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
-- T09 rederives `FRONTIER` as a selector of firing/source loci. Effect targets belong to typed rule results; T01 source and target happen to coincide.
-- T09 directly requires visible active-position control, `ControlLocus`, compound `Assign + RelocateControl` results, atomic effect application, and control-preserving structured traces. It extends rather than splits the T01 protocol.
+- T09's former source-only redefinition of `FRONTIER` is reopened. The current schema's writable frontier can be the old head/active cell together with the affected neighbor, while a separate activation/source role identifies the old head if a compact event lowering needs it.
+- T09 directly requires visible active-position information, exactly one active marker, atomic old-snapshot update, and full-state traces. It does not establish that these roles require a separate `SingleControl` runtime object: `Plain(bit) | Active(bit)` is a transparent lossless composite field representation.
 - The canonical mobile code pair `{35,57}` consumes physical `[left,self,right]`, sharing T01's corrected MSB-first context codec. The Notes finite-list guard is not a boundary or halt policy.
-- T12 refines position-only control to payload-bearing `SingleControl` and atomic `TransitionControl`; T09 is the unit-payload specialization. Turing rules combine the head payload with a self-only tape read.
+- T12 combines a head-state role with the symbol under the head, but the former requirement for payload-bearing `SingleControl`/`TransitionControl` is reopened. A canonical transparent state is `Plain(symbol) | Head(head_state,symbol)` (equivalently `TapeSymbol x Option[HeadState]`) with exactly one head; a factored `(field,position,payload)` form is only a lossless view when explicitly related and validated.
 - T12 base machines are total and non-halting, with `(2sk)^(sk)` rules. Special terminal head states, external head/tape stop observations, horizons, and errors are distinct outcomes/protocols.
 - T12 requires an inspectable total/default-symbol tape over `Z`; finite read boundaries cannot supply writes or control movement beyond capacity. Numeric rule decoding uses a documented repair of an OCR-lost `k`, guarded by known machine 3024.
 - T13 validates source-first generic orchestration but splits update semantics: fixed-locus assignment preserves support, while `ParallelReplaceConcat` consumes every old ordered occurrence and creates children from typed nonempty words.
@@ -261,7 +261,7 @@ The exhaustive direct-name, alias, named-rule, caption, Notes, Index, boundary, 
 
 ### 3-T09-MOBILE
 
-Status: **COMPLETE** in `goal-1/3-T09-MOBILE.md`.
+Status: **REOPENED** in `goal-1/3-T09-MOBILE.md` for the mandatory representation-architecture audit.
 
 #### Big Picture Objective
 
@@ -281,7 +281,7 @@ The exhaustive direct/control/function search produced 135 candidates, with targ
 
 ### 4-T12-TURING
 
-Status: **COMPLETE** in `goal-1/4-T12-TURING.md`.
+Status: **REOPENED** in `goal-1/4-T12-TURING.md` for the mandatory representation-architecture audit.
 
 #### Big Picture Objective
 
@@ -743,7 +743,7 @@ COMPLETE: 11 controlled query families close 142 lexical lines, five governed fo
 
 ### 25-T06-QUIESCENT
 
-Status: **IN PROGRESS** in `goal-1/25-T06-QUIESCENT.md`.
+Status: **PAUSED** in `goal-1/25-T06-QUIESCENT.md`; the architecture audit is a hard prerequisite.
 
 #### Big Picture Objective
 

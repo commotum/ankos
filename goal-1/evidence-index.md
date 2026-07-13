@@ -34,10 +34,10 @@ Each type stage must make the following auditable:
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | IN PROGRESS | Exact blank/white-background, invariant-state, rule-predicate, asset, API, and runtime audit active |
 | T07 | 8 | Left-Right Symmetric Cellular Automata | 7 | `26-T07-SYMMETRIC.md` | PENDING | Not started |
 | T08 | 9 | Initial-Condition Classes | 8 | `27-T08-INITIAL-CONDITIONS.md` | PENDING | Not started |
-| T09 | 10 | Mobile Automata | 9 | `3-T09-MOBILE.md` | COMPLETE | 19 direct query terms/families; 14 excerpt groups; 135 combined candidates plus targeted remainders/splits dispositioned; 0 unresolved |
+| T09 | 10 | Mobile Automata | 9 | `3-T09-MOBILE.md` | REOPENED | Evidence closure remains complete; D009-D014 and the required separate-control/head-packing conclusions are under representation-architecture audit |
 | T10 | 11 | Extended Mobile Automata | 10 | `28-T10-EXTENDED-MOBILE.md` | PENDING | Not started |
 | T11 | 12 | Generalized Mobile Automata | 11 | `29-T11-GENERALIZED-MOBILE.md` | PENDING | Not started |
-| T12 | 13 | Turing Machines | 12 | `4-T12-TURING.md` | COMPLETE | 278 direct-name lines plus all 74 halt lines/parameter/Notes/Index/split/emulation candidates dispositioned; 16 excerpt groups; 0 unresolved |
+| T12 | 13 | Turing Machines | 12 | `4-T12-TURING.md` | REOPENED | Evidence closure remains complete; the `SingleControl`/`TransitionControl` requirement and composite-alphabet alternative are under representation-architecture audit |
 | T13 | 14 | Neighbor-Independent Substitution Systems | 13 | `5-T13-PARALLEL-SUBSTITUTION.md` | COMPLETE | 288 direct-name lines plus definition/replacement/alias/Notes/Index/split/rendering/growth/infinite/stochastic/emulation candidates dispositioned; 26 excerpt groups; 0 unresolved |
 | T14 | 15 | Neighbor-Dependent Substitution Systems | 14 | `30-T14-CONTEXTUAL-SUBSTITUTION.md` | PENDING | Not started |
 | T15 | 16 | Creation-Destruction Substitution Systems | 15 | `31-T15-CREATION-DESTRUCTION.md` | PENDING | Not started |
@@ -75,9 +75,9 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 21 / 45.
-- Type stages reopened: 2.
-- Type stages unresolved: 21 pending, 1 in progress.
+- Type stages complete: 19 / 45.
+- Type stages reopened: 4.
+- Type stages unresolved: 21 pending; T06 is paused pending the architecture audit.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
@@ -87,3 +87,4 @@ Each type stage must make the following auditable:
 - T03 reopened and reclosed again during T06: retained `BOOK:18770` omitted its explicit forward network raster at `BOOK:18772`. The repaired 18-query/313-candidate and 119-asset manifest closes at `50/60/9`, its 105-link reverse join and all six checks pass, fresh independent review is clean, and all 102 tests pass; no semantic conclusion changed.
 - T04 reopened during T06: retained captions `BOOK:17431` and `BOOK:2922` explicitly govern omitted rasters `BOOK:17433` and `BOOK:2924`. The bounded source/asset/metadata/reverse-join repair and independent re-review are active; the strict T03 preset result is unchanged.
 - T03 reopened once more during the T04 repair: T04's own downstream-comparator rule proved that page-263 slice raster `BOOK:2928` belongs to the inherited two-dimensional totalistic gallery. The bounded one-control repair is active; aggregate semantics are unchanged.
+- T09 and T12 reopened before T06 continuation: D009-D014 promoted one lossless state decomposition—separate `SingleControl`/`TransitionControl`—into a required semantic abstraction and redefined `FRONTIER` away from the schema's writable-set role. `ref/notes/alphabets.md` instead explicitly supplies `CellAlphabet = TapeSymbol union (TapeSymbol x HeadState)`, and the schema already commits all writes from one old snapshot in parallel. Evidence search closure remains valid; architecture, downstream decisions, and Goal 2 handoffs are being re-derived in `architecture-audit.md`.

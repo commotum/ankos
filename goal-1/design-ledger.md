@@ -190,37 +190,37 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ### D009 — Frontier selects firing sources, not writable targets
 
-- Status: ACTIVE.
+- Status: REOPENED by the representation-architecture audit.
 - Basis: T09's rule applies at the old active cell, writes that source, and independently moves control to a neighbor (`BOOK:854-862`, `11957-11970`).
 - Consequence: `FRONTIER.select(state)` returns rule-firing/source loci. `RULE` results name effect targets and `UPDATE` applies them. T01 remains valid because each source and assignment target coincide; current writable-next-coordinate frontier wording must migrate.
 
 ### D010 — Visible control is a first-class state component
 
-- Status: PROVISIONAL; evidenced by T09.
+- Status: REOPENED by the representation-architecture audit.
 - Basis: Notes state `{list,n}` explicitly separates cell values from active position (`BOOK:11957`) and random initial values still require a definite active location (`:14275`).
 - Consequence: state snapshots, seeds, equality, serialization, batching, and traces must preserve typed control. Extra colors, metadata, executor locals, or display marks cannot stand in for it.
 
 ### D011 — Transition results may be atomic compounds of typed effects
 
-- Status: PROVISIONAL; evidenced by T01 and T09.
+- Status: REOPENED by the representation-architecture audit.
 - Basis: each T09 table entry returns new active-cell value plus displacement, and `MAStep` returns the changed field and relocated control together (`BOOK:11960-11970`); T12 also changes control payload (`BOOK:12014-12023`).
 - Consequence: the candidate protocol supports at least `Assign` and payload-bearing `TransitionControl`, with atomic application and unchanged-value preservation. T09 uses a unit payload. This does not yet justify insert/delete/rewire/branch semantics.
 
 ### D012 — Ordered read codec is shared across T01 and T09
 
-- Status: ACTIVE for these two constructions.
+- Status: UNDER AUDIT; the ordered codec evidence is unaffected, but its placement in the revised structural lowering must be verified.
 - Basis: T09 executable `Take[n-1..n+1]` and the rule figure establish physical `[left,self,right]`; its `{35,57}` bytes use `index=4L+2C+R`, the same ordering established by T01.
 - Consequence: no mobile-specific permutation is required. The shared current low-significance-first runtime codec remains a defect, and asymmetric physical `100`/`011` cases are required tests.
 
 ### D013 — Full traces preserve control before observations compress them
 
-- Status: ACTIVE for controlled systems.
+- Status: UNDER AUDIT; complete Markov state remains required, while a separate control channel is not presumed.
 - Basis: the standard mobile trace includes both cell colors and active-position dots (`BOOK:5840`); record-extrema compression (`:878`) and causal networks derived from position history (`:16388`) are later transformations.
 - Consequence: raw state traces cannot be only dense value arrays. Frame compression, causal graph construction, and visualization are downstream and never feed execution.
 
 ### D014 — Single control carries an explicit finite payload
 
-- Status: PROVISIONAL; evidenced by T09/T12.
+- Status: REOPENED by the representation-architecture audit.
 - Basis: Turing state explicitly separates head state, tape values, and head position (`BOOK:12014`), while each transition changes both state and position (`:12016-12023`).
 - Consequence: use `SingleControl(key,position,payload)` and atomic `TransitionControl(expected_from,to,next_payload)`. T09 is the unit-payload specialization; no separate hidden head-state channel is allowed.
 

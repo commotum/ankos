@@ -1,8 +1,12 @@
 # 4-T12-TURING
 
-Status: **COMPLETE**
+Status: **REOPENED — REPRESENTATION ARCHITECTURE AUDIT**
 
 ## Current Facts
+
+- Reopening finding: distinct tape-symbol and head-state roles do not require distinct top-level storage classes. A transparent canonical cell alphabet is `Plain(TapeSymbol) | Head(HeadState,TapeSymbol)`, equivalently `TapeSymbol x Option[HeadState]`, with exactly one `Head` cell.
+- The head-bearing value must retain both the head state and the tape symbol beneath it. A bare `TapeSymbol union HeadState` is lossy and remains invalid.
+- Old-snapshot parallel assignment can atomically write the old head cell and tag the destination; it exposes no intermediate zero-head or two-head state. The compact `Q x Sigma -> Q x Sigma x {L,R}` table remains native program identity rather than an arbitrary composite-alphabet CA table.
 
 - Exact catalog row: T12, CSV line 13, `Turing Machines`; taxonomy seed `ref/notes/CA-Types.md:294-330`.
 - Canonical source is `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md` (`BOOK`).
@@ -441,9 +445,11 @@ t12 q=3 h= 4 ones={-1,0,2,4,5}
 - [x] All unique construction-relevant excerpts have exact canonical provenance.
 - [x] Tape, symbol/head alphabets, visible control, read/result/update, support/boundary, seed, successor, and halting are reconstructed.
 - [x] Rule cardinalities, numeric codec, and canonical examples have independent conformance oracles.
-- [x] Current API/runtime/test fit and T09 refinement are explicit.
-- [x] Goal 2 handoff and global reintegration are complete and ready for verification.
+- [ ] Current API/runtime/test fit and T09 refinement are reclassified without presuming `SingleControl`/`TransitionControl` storage.
+- [ ] Goal 2 handoff and global reintegration are revised around the lossless composite representation and invariant.
 
 ## Stage Results
+
+**Reopened:** the Turing evidence, compact transition table, counts, tape semantics, and halt distinctions remain valid, but the required `SingleControl`/`TransitionControl` architecture and prohibition on transparent head packing are withdrawn pending `architecture-audit.md`.
 
 T12 is complete with zero unresolved evidence candidates. Its base family is a total non-halting `Q x Sigma -> Q x Sigma x {L,R}` transition on an unbounded default-symbol tape. It refines T09's control to `SingleControl(position,payload)` and `TransitionControl(...,next_payload)`, with T09 represented by a unit payload and no behavior change. Special terminal head states are an explicit variant; external head/tape/fixed-point criteria remain episode stop policies, and horizon/errors are neither. The OCR-damaged numeric codec is repaired transparently and guarded by known rule 3024. Nondeterministic, 2D, and emulation variants remain distinct. No prior completed stage is reopened. Next: T13 Neighbor-Independent Substitution Systems.
