@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43 complete, 17 of 45 type stages complete, T44 Continuous Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44 complete, 18 of 45 type stages complete, T45 Partial Differential Equation Systems in progress, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
@@ -68,6 +68,10 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - Source repairs include detached/reordered strict formulas, the missing page-166 plate, page-layout sentence interleaving, a false arbitrary-rational-`a` repetition claim, source-faithful negative `FractionalPart`, corrupted logistic/fast-forward formulas, and the integer-torus versus nonintegral-rational closed-box reading of the `{1,1}` vector witness.
 - Digit/value/sensitivity/cycle/Lyapunov/attractor/bifurcation/symbolic/fast-forward/rendering records remain analyzers. Sensitivity does not prove intrinsic randomness; a finite orbit/raster does not prove an attractor, asymptotic exponent, or bifurcation boundary.
 - T43 preserves T37 prefix, T42 substitution, T44 lattice aggregation, and T45 continuous-time boundaries. Current finite alphabets, callbacks, family rollout, NumPy arrays, and raw exporters remain semantic mismatches.
+- T44 is a total real-valued field on fixed ordered one-dimensional support. Every event reads the complete old left/self/right triple, applies a closed affine aggregate and closed scalar map, returns typed same-site assignments, and reuses T01's atomic fixed-effects update without an eleventh update law.
+- Strict-main integer-line topology is an explicit inference; Notes separately prove a finite periodic list. Segment exterior policy, causal work/halo, raster crop, and support identity remain independent. Exact field state, certified/tracked computation records, and represented finite-arithmetic feedback are distinct.
+- Mean, fractional-`3/2`, add-constant, weighted, additive, boiling, coupled-map, noisy, probabilistic, complex-block, and PDE-related profiles retain the exact evidence boundaries established in D096-D102. Backgrounds, differences, parameter/class galleries, bubble/wrap records, and renderings are observers rather than hidden state or halts.
+- T44 closes 21 reproducible search queries and 25 evidence groups with zero unresolved candidates. Exact semantic rows, all 17 included asset identities, the page-339 exclusion, and page-172/173/174/175/Notes raster fits reproduce; all 102 repository tests pass.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -597,7 +601,7 @@ T34 assignment and T41 syntax compose without reinterpretation. T37 prefixes, T4
 
 ### 19-T44-CONTINUOUS-CA
 
-Status: **IN PROGRESS** in `goal-1/19-T44-CONTINUOUS-CA.md`.
+Status: **COMPLETE** in `goal-1/19-T44-CONTINUOUS-CA.md`.
 
 #### Big Picture Objective
 
@@ -611,7 +615,15 @@ Apply the common protocol, emphasizing gray-level range, averaging, map composit
 
 All T44 evidence is captured; reusable CA components and genuinely new numeric semantics are separated; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+The literal 21-query search oracle reproduces every pre-Index/actual-Index count, and 25 evidence groups disposition all strict, Notes, split, Index, history, alias, implementation, parameter, application, stochastic, complex-block, and PDE candidates with zero unresolved remainder. T44 reconstructs one total `[0,1]` field on fixed ordered 1D support, synchronous old left/self/right reads, an exact affine aggregate plus closed scalar map, typed same-site assignments, and T01 atomic fixed-effects commit. Integer-line strict support remains a labeled inference; Notes ring, segment exterior, causal work, and render crop are distinct. Exact ideal fields, certified/tracked computation records, represented feedback, and stochastic draws have separate identities.
+
+The exact semantic oracle covers mean/coefficient/mass, fractional-`3/2`, add-quarter/background, additive residues, weighted range, boiling equality, and noisy closure. Metadata reproduce all 17 included assets plus the excluded discrete page-339 plate; the runnable raster oracle passes pages 172-175 and both Notes panels, including the absolute-right observer discriminator. D096-D102 record update reuse/no eleventh law, field/numeric/support/observer semantics, and additive/coupled/boiling/noisy/probabilistic/block/PDE boundaries. Search, source, fence, hash, raster, semantic, diff, and all 102 repository-test gates pass. No prior stage reopened. Next: T45.
+
 ### 20-T45-PDE
+
+Status: **IN PROGRESS** in `goal-1/20-T45-PDE.md`.
 
 #### Big Picture Objective
 

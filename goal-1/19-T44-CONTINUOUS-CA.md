@@ -1,6 +1,6 @@
 # 19-T44-CONTINUOUS-CA
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -444,13 +444,16 @@ Its sequential argmax placement, translated depletion profile, and decay define 
 
 > “One starts by assigning a continuous complex number value to each cell.”
 
-> “the crucial constraint ... is unitarity: that the quantity Tr[Abs[list]^2] representing total probability should be conserved.”
+> “the crucial constraint ... is unitarity: that the quantity Tr[Abs[list]<sup>2</sup>] representing total probability should be conserved.”
 
-> “one can reproduce the 1D diffusion equation with a continuous block cellular automaton in which the new value of each block is given by `{{1-xi,xi},{xi,1-xi}} . {a1,a2}`.”
+The extracted inline matrix expressions omit their multiplication operator and damage spacing. The following are explicitly normalized transcriptions, not verbatim quotes:
 
-> “in the case of quantum mechanics one can consider having each new block be given by `{{Cos[theta],i Sin[theta]},{i Sin[theta],Cos[theta]}} . {a1,a2}`.”
+```text
+diffusion: {{1-xi,xi},{xi,1-xi}} . {a1,a2}
+unitary:   {{Cos[theta],i Sin[theta]},{i Sin[theta],Cos[theta]}} . {a1,a2}
+```
 
-> “in non-trivial cases most of the cells generated at each step end up having distinct values. One can generalize the setup to more dimensions or to allow `n x n` matrices that are elements of `SU(n)`.”
+> “in non-trivial cases most of the cells generated at each step end up having distinct values. One can generalize the setup to more dimensions” and to larger special-unitary matrices.
 
 > “all rules based on matrices are additive ... Non-additive unitary rules can also be found. The analog of an external potential can be introduced by progressively changing values of certain cells at each step.”
 
@@ -1236,16 +1239,22 @@ Reject:
 
 ## Completion Requirements
 
-- [ ] Every strict main/Notes/actual-Index/split passage, history item, alias, figure, program, variant, relation, and false positive is dispositioned.
-- [ ] Support/value/control, source/read/aggregate/map/result/update, boundary/seed, precision/outcome, equality/serialization, trace, and observer semantics are explicit.
-- [ ] All six strict and two Notes assets have source-permitted exact or declared oracles, hashes, measurements, and source repairs.
-- [ ] T01/totalistic/T43/additive/coupled/probabilistic/T45 boundaries and reuse are explicit.
-- [ ] Current API/runtime fit, Goal 2 files/dependencies/tests, global ledgers, diff checks, and repository tests are integrated.
+- [x] Every strict main/Notes/actual-Index/split passage, history item, alias, figure, program, variant, relation, and false positive is dispositioned.
+- [x] Support/value/control, source/read/aggregate/map/result/update, boundary/seed, precision/outcome, equality/serialization, trace, and observer semantics are explicit.
+- [x] All six strict and two Notes assets have source-permitted exact or declared oracles, hashes, measurements, and source repairs.
+- [x] T01/totalistic/T43/additive/coupled/probabilistic/T45 boundaries and reuse are explicit.
+- [x] Current API/runtime fit, Goal 2 files/dependencies/tests, global ledgers, diff checks, and repository tests are integrated.
 
 ## Stage Results
 
-In progress.
+T44 is complete. The literal 21-query search oracle reproduces all occurrence/line counts; every direct, abbreviated, alias, program, formula, parameter, history, application, stochastic, complex, PDE, and Index candidate was inspected and resolved into 25 evidence groups with zero open textual candidate. The strict construction is a total `[0,1]` field on a fixed ordered one-dimensional lattice, read synchronously at left/self/right, passed through a closed affine aggregate and scalar map, returned as same-site `Assign`, and committed through T01's existing atomic fixed-effects update. No control, hidden history, family dispatch, callback, float alphabet, or eleventh update law is introduced.
+
+The exact semantic oracle passes the mean/coefficient/mass rows, `3/2` fractional rows, `c=1/4` field/background, rational additive residues, divisor-three weighted range, boiling equality seam, and high-precision noisy-range guard. All 17 included asset identities plus the material page-339 exclusion reproduce their bytes, dimensions, and SHA-256 values. The end-to-end raster oracle passes page 172/173/174/175 and both Notes assets, including an explicit page-175 observer discriminator. Strict topology remains honestly inferential; Notes separately prove a ring. Exact, certified/tracked work, and represented feedback stay distinct. Boiling literal/reconstructed rules, additive, coupled-map relation, noisy/probabilistic, complex-block, and PDE boundaries retain separate identities.
+
+Verification passed: literal search oracle; exact semantic oracle; 17-asset/exclusion metadata oracle; core raster oracle; 25-group/source-line and Markdown-fence checks; `git diff --check`; and all `102` repository tests. No unresolved source candidate, renderer-dependent semantic claim, or prior-stage contradiction remains.
 
 ## Integration Results
 
-In progress.
+T01's source/read/assignment/atomic-update law, T34's typed assignment responsibility, and T41/T43's closed numeric syntax and realization discipline compose without reinterpretation. T44 adds total continuous-field presentations, exact affine neighborhood aggregates, composite closure/range validation, field-wide numeric realization, initial-inclusive field runs, coordinate-stable stochastic draw records, and field observers. The provisional public transition-update family remains at ten members.
+
+Global decisions D096-D102 record the field carrier, aggregate-plus-map contract, update reuse, support/realization/exterior/crop split, numerical feedback, trace/observer separation, and typed sibling relations. No completed stage is reopened. T45 remains categorically responsible for continuous space/time, differential operators, solution concepts, boundary/initial data, solvers, and integrators; finite differences and limits are relations rather than identity. The global plan and evidence index advance to 18 of 45 completed types, with T45 next.
