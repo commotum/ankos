@@ -1,6 +1,6 @@
 # 22-T03-TOTALISTIC-CA
 
-Status: **COMPLETE**
+Status: **REOPENED**
 
 ## Current Facts
 
@@ -11,7 +11,7 @@ Status: **COMPLETE**
 - T01/T02 and D111-D114 already supply fixed ordered one-dimensional support, `AllSites`, old-snapshot reads, typed same-site assignment, atomic parallel commit, successor, seed, realization, trace/view separation, ordered alphabets, and arbitrary-precision integer serialization. T03 changes the rule's input quotient and program identity, not the executor or update law.
 - `simple_programs.md:1964-2027` groups numeric sums, active counts, and color histograms under one broad `TOTALISTIC` label. That API responsibility is wider than source T03: equal-sum contexts such as `(0,2,0)` and `(1,0,1)` must merge even though their color histograms differ.
 - The current runtime can sum an `int64` read vector, but `rules.totalistic` does not derive its case count, `_channel_state` ignores the declared `sum` versus `count` mode, generic `lookup` is not executable, spatial output remains binary right-shift/`&1`, and batch rule IDs are forced through `numpy.int64`. No current test executes a standalone three-color totalistic table or validates its codec.
-- The former 16-query/118-candidate and 17-query/309-candidate closures are historical and superseded. T06's bidirectional audit invalidated the later 18-query/312-candidate/118-asset closure because T03 retained the quiescent-symmetric emulation caption at `BOOK:18770` without following its explicit network raster at `BOOK:18772`. The repaired closure has 313 candidates and 119 assets at `50 included / 60 excluded / 9 relation-only`; all six embedded checks, independent review, diff/fence gates, and 102 tests pass. Aggregate and execution semantics are unchanged.
+- The former 16-query/118-candidate and 17-query/309-candidate closures are historical and superseded. T06 first widened the later 18-query/312-candidate/118-asset closure to 313/119 for `BOOK:18770 -> 18772`. T04's ensuing repair then proved that the same inherited two-dimensional gallery must include its page-263 slice raster at `BOOK:2928`; T03's asset/control closure is reopened for that bounded addition. Aggregate and execution semantics are unchanged.
 
 ## Updated Assumptions
 
@@ -1753,15 +1753,15 @@ Picture 253/1 is repaired to visible code `1659`: the Actual Index routes 1659 t
 ## Completion Requirements
 
 - [x] Every strict/Notes/split/actual-Index/alias/variant/application/emulation textual candidate is dispositioned reproducibly.
-- [x] Every currently identified relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and exclusions.
+- [ ] Every currently identified relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and exclusions.
 - [x] Aggregate/value/case/table/code/read/update/successor/boundary/seed semantics and variants are explicit.
 - [x] T01/T02/T04/T05/T06/T07/additive/weighted/emulation boundaries and current API/runtime fit are proved.
 - [x] Goal 2 files/dependencies/tests and no-cheating gates are implementation-ready.
-- [x] Global ledgers, independent review, diff checks, and repository tests are integrated.
+- [ ] Global ledgers, independent review, diff checks, and repository tests are integrated.
 
 ## Stage Results
 
-**COMPLETE after the bounded T06 repair.** The T05 higher-color audit repair remains valid. T06's reverse traversal found that retained `BOOK:18770` explicitly points forward to a network raster at `BOOK:18772`; T03 now dispositions that asset as elementary-rule emulation relation evidence without changing aggregate semantics. The repaired source/asset manifest, reverse join, metadata, globals, and independent review are closed.
+**REOPENED again during the T04/T06 repair.** The `BOOK:18770 -> 18772` repair remains valid, but the bounded T04 re-audit proved that page-263 raster `BOOK:2928` is an immediately downstream slice view of the same two-dimensional totalistic gallery already retained at `BOOK:2922-2924`. T03 source/asset counts, metadata, reverse closure, globals, and independent review are being widened by that one control asset. Aggregate semantics remain unchanged.
 
 T04's named code-357/code-1329 routes at `BOOK:3320-3378` and binary radius-two code-20 follow-through first exposed omissions in T03's former exhaustive-manifest/superset claim; the subsequent bidirectional audit also found two-dimensional, weighted, Notes-chain, application, and inherited T04 E14 controls. That prior source and physical audit closed 17 queries, 309 dispositioned candidates, 21 evidence groups, 88 verbatim fragments on 85 source lines, five official PDFs, and 116 rasters at `48 included / 60 excluded / 8 relation-only`; those figures are retained only as historical provenance for the cumulative four-line/three-asset T05/T06 delta.
 

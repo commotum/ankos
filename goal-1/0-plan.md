@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T02/T03/T05/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 22 of 45 type stages complete, T04 reopened by T06's two missing direct raster links, T06 Quiescent-Background-Preserving Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T02/T05/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 21 of 45 type stages complete, T03 and T04 reopened for the bounded page-263 downstream-gallery asset repair, T06 Quiescent-Background-Preserving Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
@@ -679,7 +679,7 @@ All seven embedded oracles pass. They cover the `3^27` count, every binary speci
 
 ### 22-T03-TOTALISTIC-CA
 
-Status: **COMPLETE** in `goal-1/22-T03-TOTALISTIC-CA.md` after bounded T05 and T06 source/asset repairs; the semantic result is unchanged.
+Status: **REOPENED** in `goal-1/22-T03-TOTALISTIC-CA.md`. T04's bounded repair proved that inherited page-263 raster `BOOK:2928` belongs to the already-retained two-dimensional totalistic gallery; the one-control asset repair is active and the semantic result is unchanged.
 
 #### Big Picture Objective
 

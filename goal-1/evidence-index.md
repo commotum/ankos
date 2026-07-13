@@ -28,7 +28,7 @@ Each type stage must make the following auditable:
 |---|---:|---|---:|---|---|---|
 | T01 | 2 | Elementary Cellular Automata | 1 | `2-T01-ELEMENTARY.md` | COMPLETE | 8 search families; 23 excerpt groups; all split/Notes/Index/cross-reference candidates dispositioned; 0 unresolved |
 | T02 | 3 | Multi-Color Nearest-Neighbor Cellular Automata | 2 | `21-T02-MULTICOLOR-CA.md` | COMPLETE | Exact 29-query/157-candidate partition; 21 evidence groups; 48 verbatim fragments; ordered `k^3` table/base-`k` codec; 11 included/6 excluded/2 relation-only assets; seven source/semantic/metadata/Voronoi/reversible/raster oracles; 0 unresolved |
-| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | COMPLETE | Exact 18-query/313-candidate partition; 22 evidence groups; 212 cited provenance lines, 89 quote fragments, 86 quote lines; 119 assets at 50 included/60 excluded/9 relation-only; 105-link reverse join; exact sum/table/codec and radius-two/code/trajectory/property fixtures; six embedded oracles, fresh independent review, and 102 tests; 0 unresolved candidates |
+| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | REOPENED | T04's bounded downstream-gallery repair found inherited page-263 raster BOOK:2928 missing from the 313-candidate/119-asset closure; one-control source/asset/reverse repair active; aggregate semantics unchanged |
 | T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | REOPENED | T06 found omitted direct raster links BOOK:17431->17433 and BOOK:2922->2924 in the claimed 243-candidate/72-asset closure; bounded source/asset/reverse-join repair active; preset semantics unchanged |
 | T05 | 6 | Higher-Color Totalistic Cellular Automata | 5 | `24-T05-HIGHERCOLOR-TOTALISTIC.md` | COMPLETE | Exact 11-query/142-lexical-line partition plus five governed follows and 25 assets = 172 candidates; 12 evidence groups at 47 provenance/47 fragments/40 quote lines; assets 5 included/13 relation-only/7 excluded; strict finite `k>=4,r=1` canonical T03 preset, code-1004600/cardinality/bigint/snapshot fixtures, five embedded oracles, independent review, and 102 tests; 0 unresolved candidates |
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | IN PROGRESS | Exact blank/white-background, invariant-state, rule-predicate, asset, API, and runtime audit active |
@@ -75,8 +75,8 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 22 / 45.
-- Type stages reopened: 1.
+- Type stages complete: 21 / 45.
+- Type stages reopened: 2.
 - Type stages unresolved: 21 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
@@ -86,3 +86,4 @@ Each type stage must make the following auditable:
 - T03 reopened and reclosed during T05: named code-`1004600` had been included as a four-color totalistic profile, but its Notes continuation at canonical line 19234 and linked lines 19236/19238 were absent from the claimed 309-candidate/116-asset closure. The repaired 18-query/312-candidate and 118-asset manifest, all six checks, fresh independent review, and 102 tests pass; the semantic result remains unchanged.
 - T03 reopened and reclosed again during T06: retained `BOOK:18770` omitted its explicit forward network raster at `BOOK:18772`. The repaired 18-query/313-candidate and 119-asset manifest closes at `50/60/9`, its 105-link reverse join and all six checks pass, fresh independent review is clean, and all 102 tests pass; no semantic conclusion changed.
 - T04 reopened during T06: retained captions `BOOK:17431` and `BOOK:2922` explicitly govern omitted rasters `BOOK:17433` and `BOOK:2924`. The bounded source/asset/metadata/reverse-join repair and independent re-review are active; the strict T03 preset result is unchanged.
+- T03 reopened once more during the T04 repair: T04's own downstream-comparator rule proved that page-263 slice raster `BOOK:2928` belongs to the inherited two-dimensional totalistic gallery. The bounded one-control repair is active; aggregate semantics are unchanged.

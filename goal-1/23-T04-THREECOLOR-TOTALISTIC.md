@@ -36,7 +36,7 @@ Determine whether the emphasized three-color totalistic entry is exactly a stric
 
 ## Search Log
 
-Closed again for the bounded T06 asset repair. `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; its actual Index begins at physical `BOOK:20826`. Counts are distinct physical lines, not raw matches. Twelve controlled queries produce 162 unique monolith lines (145 pre-Index, 17 actual-Index). Eighty-three inspected asset, prose, and split-signature continuations produce an exact 245-candidate closure.
+Closed again for the bounded T06 asset repair. `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; its actual Index begins at physical `BOOK:20826`. Counts are distinct physical lines, not raw matches. Twelve controlled queries produce 162 unique monolith lines (145 pre-Index, 17 actual-Index). Eighty-four inspected asset, prose, and split-signature continuations produce an exact 246-candidate closure.
 
 | Q | Search family | Pre-Index | Actual Index |
 |---:|---|---:|---:|
@@ -118,7 +118,7 @@ follow={764,778,782,788,792,794,798,802,818,820,822,826,830,836,842,844,858,860,
         2800,2804,2824,2828,2832,2834,2836,2844,2846,2848,2850,2866,
         3314,3316,3318,3322,3328,3334,3342,3350,3362,3368,3372,3376,3380,
         5220,5484,10393,10409,
-        2920,2924,6336,6338,6642,7910,8306,8934,9164,
+        2920,2924,2928,6336,6338,6642,7910,8306,8934,9164,
         11069,11071,11166,11170,11176,11182,11297,11301,11303,11305,11307,
         11627,11629,11914,13540,14226,14228,14230,14232,
         14829,14831,14833,17433,18746}
@@ -141,6 +141,7 @@ assets={
 2848:'![](_page_255_Picture_4.jpeg)',2850:'![](_page_255_Picture_5.jpeg)',
 2866:'![](_page_256_Figure_2.jpeg)',
 2920:'![](_page_261_Figure_2.jpeg)',2924:'![](_page_262_Figure_2.jpeg)',
+2928:'![](_page_263_Figure_2.jpeg)',
 3314:'![](_page_297_Picture_2.jpeg)',3318:'![](_page_297_Picture_4.jpeg)',
 3322:'![](_page_297_Picture_6.jpeg)',3350:'![](_page_301_Picture_2.jpeg)',
 3362:'![](_page_302_Picture_3.jpeg)',3368:'![](_page_303_Picture_2.jpeg)',
@@ -165,7 +166,7 @@ assets={
 assets.update({5220:'![](_page_451_Picture_6.jpeg)',5484:'![](_page_476_Figure_3.jpeg)',
                10393:'![](_page_847_Figure_1.jpeg)',10409:'![](_page_848_Figure_2.jpeg)'})
 for n,want in assets.items(): assert L[n-1]==want,(n,L[n-1])
-assert len(assets)==74
+assert len(assets)==75
 assert L[787].startswith('Using more complicated rules may be convenient')
 assert L[841].startswith('<sup>◀</sup> Three thousand steps')
 assert L[2833]=='238' # page/footer contamination; official/raster code is 1659
@@ -181,7 +182,7 @@ parts={
 'preset_relation':'1280,1282,2804,2806,2822,2824,2826,2828,2830,2832,2836,2838,2844,2846,2848,2850,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6336,6338,6340,7900,7912,8306,8934,8936,11168,11170,11897,11918,14223,14224,14232,14827,16024,18348,18748',
 'parent':'8320,11037,11056,11060,11902,11904,11908,11910,11912,11914,11916',
 'adjacent_totalistic':'2800,2802,2866,2868,3314,3316,3328,3334,3342,9164,9166,11509,11585,11625,11627,11629,14226,14228,14230,18672',
-'sibling_application':'1954,1958,2170,2172,2920,2922,2924,3902,3914,5082,5088,5638,6642,6644,7910,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431,17433',
+'sibling_application':'1954,1958,2170,2172,2920,2922,2924,2928,3902,3914,5082,5088,5638,6642,6644,7910,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431,17433',
 'non_totalistic':'764,858,860,3380,5218,5220,5222,5482,5484,5486,8534,8544,8546,8560,10393,10395,10399,10409,10411,11164,11166,11176,12055,15661,15972,18339,18476,18744,18746,18877',
 'false_control':'1419,1427,2834,11050,11375,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,17139,17874,18850,20573,20577,20590,20592,20600',
 'index':'20846,20965,20967,20969,20972,20980,21134,21223,21233,21471,21683,21731,21933,22030,22146,22352,22392',
@@ -189,23 +190,23 @@ parts={
 partition={k:xs(v) for k,v in parts.items()}
 queried=set().union(*sets); union=queried|follow
 flat=[i for v in partition.values() for i in v]
-assert len(rows)==12 and len(queried)==162 and len(union)==245
-assert len(flat)==len(set(flat))==245 and set(flat)==union
-assert [len(partition[k]) for k in partition]==[34,53,11,20,53,30,27,17]
+assert len(rows)==12 and len(queried)==162 and len(union)==246
+assert len(flat)==len(set(flat))==246 and set(flat)==union
+assert [len(partition[k]) for k in partition]==[34,53,11,20,54,30,27,17]
 
 # Mechanical join: every physical asset link in this source manifest must
-# be exactly one item in the independent 74-item metadata oracle below.
+# be exactly one item in the independent 75-item metadata oracle below.
 stage=Path('goal-1/23-T04-THREECOLOR-TOTALISTIC.md').read_text()
 asset_audit=stage.split('## Asset and Raster Audit',1)[1]
 items_src=asset_audit.split('\nitems={',1)[1].split('\n}\n\ndef jpeg_size',1)[0]
 ledger_paths=set(re.findall(r"'([^']+\.jpeg)':\(",items_src))
 manifest_names={re.fullmatch(r'!\[\]\(([^)]+)\)',v).group(1) for v in assets.values()}
-assert len(ledger_paths)==len(manifest_names)==74
+assert len(ledger_paths)==len(manifest_names)==75
 assert {Path(p).name for p in ledger_paths}==manifest_names
 
 # Every physical asset has exactly the monolith link and one split-corpus link.
-# This direction-sensitive reverse audit stops at captions: BOOK:2922 governs
-# 2924, but the unselected BOOK:2926 governs 2928, so no image-run leap occurs.
+# This direction-sensitive reverse audit follows the explicit same-kind bridge
+# through BOOK:2926/2928/2930, then stops before the page-264 Life construction.
 root=Path('ref/A-New-Kind-of-Science')
 refs={name:[] for name in manifest_names}
 for md in root.rglob('*.md'):
@@ -214,10 +215,13 @@ for md in root.rglob('*.md'):
             if re.fullmatch(r'!\[\]\((?:Images/)?'+re.escape(name)+r'\)',line):
                 refs[name].append((md.relative_to(root).as_posix(),line_no))
 assert all(len(v)==2 for v in refs.values())
-assert sum(map(len,refs.values()))==148
+assert sum(map(len,refs.values()))==150
 assert refs['_page_262_Figure_2.jpeg']==[
  ('A-New-Kind-of-Science.md',2924),
  ('CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md',221)]
+assert refs['_page_263_Figure_2.jpeg']==[
+ ('A-New-Kind-of-Science.md',2928),
+ ('CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md',225)]
 assert refs['_page_1092_Picture_6.jpeg']==[
  ('A-New-Kind-of-Science.md',17433),('BACK-MATTER/Index/Index.md',5336)]
 
@@ -253,14 +257,14 @@ for mapping,pat in ((split_totalistic,r'(?i)totalistic'),
         assert got==xs(want),(rel,got,xs(want))
 assert sum(len(xs(v)) for v in split_totalistic.values())==84
 assert sum(len(xs(v)) for v in split_three.values())==47
-print('T04 source manifest: PASS 12 queries; 245 candidates; partition=34,53,11,20,53,30,27,17; assets=74; refs=148; splits=84/47')
+print('T04 source manifest: PASS 12 queries; 246 candidates; partition=34,53,11,20,54,30,27,17; assets=75; refs=150; splits=84/47')
 PY
 ```
 
 Expected terminal line:
 
 ```text
-T04 source manifest: PASS 12 queries; 245 candidates; partition=34,53,11,20,53,30,27,17; assets=74; refs=148; splits=84/47
+T04 source manifest: PASS 12 queries; 246 candidates; partition=34,53,11,20,54,30,27,17; assets=75; refs=150; splits=84/47
 ```
 
 ### Complete disjoint disposition
@@ -269,12 +273,12 @@ T04 source manifest: PASS 12 queries; 245 candidates; partition=34,53,11,20,53,3
 - **T04 preset profiles, properties, and relations (53):** `1280,1282,2804,2806,2822,2824,2826,2828,2830,2832,2836,2838,2844,2846,2848,2850,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6336,6338,6340,7900,7912,8306,8934,8936,11168,11170,11897,11918,14223,14224,14232,14827,16024,18348,18748`. These close exact counts, the complete linked three-color/class/borderline asset chain, every linked code-357/1329 structure/growth raster, mixed-rule comparisons, random-background views, the runnable code-867 example, class frequency, additivity, irreducibility, emulation, reversibility, and universality. They are profile/run/property evidence over the same preset, not extra successor mechanics.
 - **Parent T03 construction and alias reuse (11):** `8320,11037,11056,11060,11902,11904,11908,11910,11912,11914,11916`. These give the generic average alias, symbolic signatures, aggregate lookup, codec, and shared framework. T04 specializes them with data; it does not duplicate them.
 - **Adjacent lower/higher-color totalistic controls (20):** `2800,2802,2866,2868,3314,3316,3328,3334,3342,9164,9166,11509,11585,11625,11627,11629,14226,14228,14230,18672`. These are binary range-two, four-color, and other neighboring totalistic profiles, including directly linked code-20 enumeration/structure rasters and lower/higher-color frequency comparators. They prove the T03/T05 boundary and do not enter the T04 preset.
-- **Sibling geometry or application (53):** `1954,1958,2170,2172,2920,2922,2924,3902,3914,5082,5088,5638,6642,6644,7910,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431,17433`. These are continuous, two-dimensional, outer/growth/weighted, block-emulation, network, tiling, feature-extraction, additive-mod-3, post-Pascal modulo-2 comparisons, Life-analogy, and other application constructions. `2924` is the direct two-dimensional gallery raster governed by `2922`; `17433` is the direct feature-extraction raster governed by `17431`. They bound the preset without changing its one-dimensional equal-weight rule.
+- **Sibling geometry or application (54):** `1954,1958,2170,2172,2920,2922,2924,2928,3902,3914,5082,5088,5638,6642,6644,7910,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431,17433`. These are continuous, two-dimensional, outer/growth/weighted, block-emulation, network, tiling, feature-extraction, additive-mod-3, post-Pascal modulo-2 comparisons, Life-analogy, and other application constructions. `2924` is the direct two-dimensional gallery raster governed by `2922`; `2928` is the same six-rule gallery's one-dimensional slice view governed by `2926,2930`; `17433` is the direct feature-extraction raster governed by `17431`. They bound the preset without changing its one-dimensional equal-weight rule.
 - **Non-totalistic three-color controls (30):** `764,858,860,3380,5218,5220,5222,5482,5484,5486,8534,8544,8546,8560,10393,10395,10399,10409,10411,11164,11166,11176,12055,15661,15972,18339,18476,18744,18746,18877`. These are unrestricted, mobile, reversible, block, elementary-rule-110, Turing-machine, fracture, reaction-diffusion, tag-system, purpose-search, general-rule, or 3-color 2-neighbor examples. The four added rasters are the directly linked views governed by E14's reversible, block-conservation, and purpose-search captions. Matching “three colors” or asset adjacency is not enough to make them T04.
 - **False/query controls (27):** `1419,1427,2834,11050,11375,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,17139,17874,18850,20573,20577,20590,20592,20600`. These are unrelated base-3 arithmetic, mosaic history, general/additive/reversible/search `k,r` contexts, plus the page-number artifact `238` at `BOOK:2834`. They contain no T04 construction.
 - **Actual-Index routes (17):** `20846,20965,20967,20969,20972,20980,21134,21223,21233,21471,21683,21731,21933,22030,22146,22352,22392`. They route to already audited strict, Notes, property, sibling, or control material and add no mechanics.
 
-There is zero silent remainder: the eight sets are pairwise disjoint and their union is the exact 245-candidate manifest.
+There is zero silent remainder: the eight sets are pairwise disjoint and their union is the exact 246-candidate manifest.
 
 ### Strict gallery and asset closure
 
@@ -295,7 +299,7 @@ The strict asset sequence is complete and ordered by the 13 pinned monolith link
 
 The page-76 scan is a display sample, not the preset catalog: all 50 codes are divisible by 3, so their least-significant ternary digit (the sum-zero/white-background output) is zero. This exactly realizes the caption's stable-white selection, but it is only 50 of the 729 T04 codes with a stable zero background, not all 2187 rules and not even all stable-background rules. The later galleries reuse codes across behavior views; repeated labels are not new programs.
 
-The asset-scope rule is exact: include every local raster directly linked by a dispositioned T04 definition/gallery/property line or required to interpret its named relation, then retain its immediately adjacent/downstream comparator rasters as explicit controls. Applying that rule adds 61 pinned assets beyond the 13-image strict run. The first 31 are the original continuation closure:
+The asset-scope rule is exact: include every local raster directly linked by a dispositioned T04 definition/gallery/property line or required to interpret its named relation, then retain its immediately adjacent/downstream comparator rasters as explicit controls. Applying that rule adds 62 pinned assets beyond the 13-image strict run. The first 31 are the original continuation closure:
 
 | BOOK link | Asset | Geometry | SHA-256 | Disposition |
 |---:|---|---:|---|---|
@@ -331,7 +335,7 @@ The asset-scope rule is exact: include every local raster directly linked by a d
 | `14833` | Notes `_page_980_Picture_17.jpeg` | `223x207` | `3ad70eb7f740edf7749700ff107f08306830f3e3fd617f2df3f9e7e559178e21` | 2D Life “spacefiller” view, relation-only analogy to code 1329 |
 | `18746` | Notes `_page_1132_Picture_2.jpeg` | `606x308` | `422ce8c21c465e2ffdffdb0f691f9521a21b9389897336dd4e4a2c716295c589` | unrestricted 3-color 2-neighbor rule 2144 control adjacent to universality Notes |
 
-The independent metadata and reverse-link joins contribute the remaining 30 links. This table is the human-readable form of the exact set-equality assertion in the manifest; `I`, `R`, and `X` agree with the metadata oracle's included, relation-only, and excluded/control classes.
+The independent metadata and reverse-link joins contribute the remaining 31 links. This table is the human-readable form of the exact set-equality assertion in the manifest; `I`, `R`, and `X` agree with the metadata oracle's included, relation-only, and excluded/control classes.
 
 | BOOK link(s) | Asset(s) | Ledger class | Source role |
 |---:|---|:---:|---|
@@ -348,6 +352,7 @@ The independent metadata and reverse-link joins contribute the remaining 30 link
 | `2172` | Chapter 5 `_page_185_Picture_9.jpeg` | X | two-dimensional form |
 | `2920` | Chapter 6 `_page_261_Figure_2.jpeg` | X | two-dimensional totalistic gallery |
 | `2924` | Chapter 6 `_page_262_Figure_2.jpeg` | X | direct continuation of the two-dimensional five-cell binary totalistic gallery; geometry/color-count control |
+| `2928` | Chapter 6 `_page_263_Figure_2.jpeg` | X | one-dimensional slices of the same six-rule gallery (`4,12,24,38,30,52`); observer/geometry control |
 | `6642` | Chapter 10 `_page_566_Figure_2.jpeg` | X | two-dimensional outer-totalistic codes `54,222,374` |
 | `9164` | Chapter 12 `_page_769_Figure_1.jpeg` | X | four-color totalistic code `1004600` |
 | `11166,11176,11182` | Chapter 12 `_page_883_Picture_23.jpeg`, `_page_883_Picture_28.jpeg`, `_page_883_Picture_31.jpeg` | X | general ordered `k=3,r=1`, callback-rule, and 2D nine-neighbor totalistic controls |
@@ -685,7 +690,7 @@ All verbatim monolith material is in blockquotes so the oracle below can check e
 13. **`BOOK:2834` page-number contamination.** The extracted lone `238` follows `_page_253_Picture_1.jpeg`; it is the printed page footer, not a rule code. The raster visibly labels `code 1659`, official Chapter 6 text extraction gives `code 1659` followed separately by page `238`, and actual Index `BOOK:20980` routes `Code 1659, class 4 behavior in, 238`. Notes code `1662` at `BOOK:14223` is a separate, unpictured example and must not be substituted for 1659.
 14. **Metadata-to-source join repair.** An exact join against the independent 68-item raster ledger found 24 asset links that the earlier 44-asset source closure had not traversed: `BOOK:764,858,860,1280,1958,2172,2920,6336,6338,6642,7910,8306,8934,9164,11166,11170,11176,11182,11627,11629,14226,14228,14230,14232`. Seven are direct T04 evidence, one is an emulation relation, and sixteen are adjacent or negative controls. The manifest includes all 24 with exact source-to-ledger equality.
 15. **E14 reverse-link repair.** A reverse audit then found four directly linked control rasters governed by already quoted E14 captions: `BOOK:5220,5484,10393,10409`. They show reversible three-color rules, conserved three-color block rules, and two purpose-search comparisons; none is totalistic. This produced the historical 72-link/243-candidate closure without adding T04 mechanics.
-16. **T06 reverse-link repair.** The downstream T06 audit found two more links governed by retained T04 captions: `BOOK:2922` directly governs two-dimensional binary totalistic raster `BOOK:2924`, an excluded geometry/color-count control, while `BOOK:17431` says `pictures below` and directly governs feature-extraction raster `BOOK:17433`, a relation-only application of 16 even-numbered binary five-neighbor totalistic rules. The direction-sensitive audit stops at captions: `BOOK:2924` does not jump across unselected `BOOK:2926` to raster `2928`. Adding these two links closes the final 74-link source/metadata equality and raises the disjoint source manifest to 245 without changing T04 mechanics.
+16. **T06 reverse-link repair.** The downstream audit found three links omitted from retained T04 routes. `BOOK:2922` directly governs two-dimensional binary totalistic raster `BOOK:2924`; `BOOK:2926` says the rules are the same kind as on the facing page, raster `BOOK:2928` visibly reuses codes `4,12,24,38,30,52`, and `BOOK:2930` identifies the panels as one-dimensional slices. Both rasters are excluded geometry/observer controls. Separately, `BOOK:17431` says `pictures below` and directly governs feature-extraction raster `BOOK:17433`, a relation-only application of 16 even-numbered binary five-neighbor totalistic rules. The same-construction frontier stops before `BOOK:2932`, where the page-264 Life/outer-totalistic chain begins. Adding the three links closes the final 75-link source/metadata equality and raises the disjoint source manifest to 246 without changing T04 mechanics.
 
 ### Citation, quote, source-repair, asset, and preset oracle
 
@@ -715,7 +720,7 @@ def refs(s):
 # Traverse every cited monolith line anywhere in this stage.
 cited=refs(text)
 assert cited and all(1 <= n <= len(L) for n in cited)
-assert len(cited)==257
+assert len(cited)==260
 for n in sorted(cited): _=L[n-1]
 
 # Every verbatim excerpt fragment must occur on a cited provenance line.
@@ -843,6 +848,7 @@ joined_assets={
 'CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_185_Picture_9.jpeg':((213,114),'abfbc90a8bdab839ac452194adf8f7e30258e877967a79ac71db59b1a716df75'),
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_261_Figure_2.jpeg':((1109,1297),'49f35fe65202ef7fbfee2da92b7460d36fc329b66a553782ebf8991f237944dd'),
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_262_Figure_2.jpeg':((1013,1291),'23df7e86bf96a148a17c13847eb53c773a24f86cc5a24f2e1a550f79b94439e3'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_263_Figure_2.jpeg':((1195,1355),'71f5ac8784f493b664a93aff52e157e1ac7bf94a6b2e910f98de9fef663736ec'),
 'CHAPTERS/9-Fundamental-Physics/Images/_page_541_Picture_3.jpeg':((436,268),'83d828ba45f3f3e7390bf66183643a32c3c7b83646cc3880aedf099a49284c1e'),
 'CHAPTERS/9-Fundamental-Physics/Images/_page_541_Picture_4.jpeg':((418,250),'d96c865b43b912ce4e2d6f0c2ddf659eed32f17db48c151161c364187fcc7a1f'),
 'CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_566_Figure_2.jpeg':((1032,699),'6d66d95c8e3c286272cded005d60557ce7a075ffebfd268486c23abe13a29a1e'),
@@ -868,7 +874,7 @@ control_assets={
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_847_Figure_1.jpeg':((1041,385),'2d36e7eaeb3b073e68621ef5f9c1c397ae24ddc74fe06f26e62546ccc3af2902'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_848_Figure_2.jpeg':((1194,1308),'0bfecfeff1bd81072838e39704fc6572632dee083f91ddc4370909b0e2c5b5dd'),
 }
-assert len(extra_assets)==31 and len(joined_assets)==26 and len(control_assets)==4
+assert len(extra_assets)==31 and len(joined_assets)==27 and len(control_assets)==4
 assert not (set(extra_assets)&set(joined_assets))
 assert not ((set(extra_assets)|set(joined_assets))&set(control_assets))
 all_extra={**extra_assets,**joined_assets,**control_assets}
@@ -883,7 +889,7 @@ asset_audit=text.split('## Asset and Raster Audit',1)[1]
 items_src=asset_audit.split('\nitems={',1)[1].split('\n}\n\ndef jpeg_size',1)[0]
 ledger_paths=set(re.findall(r"'([^']+\.jpeg)':\(",items_src))
 strict_paths={f'CHAPTERS/3-The-World-of-Simple-Programs/Images/{name}' for name in assets}
-assert len(ledger_paths)==74
+assert len(ledger_paths)==75
 assert strict_paths|set(all_extra)==ledger_paths
 
 # Independent preset/cardinality/codec checks.
@@ -899,7 +905,7 @@ for code in range(2187):
 
 assert quote_count==92 and len(quote_lines)==90
 asset_count=len(assets)+len(all_extra)
-assert asset_count==74
+assert asset_count==75
 print(f'T04 evidence oracle: PASS cited={len(cited)} quote_fragments={quote_count} quote_lines={len(quote_lines)} assets={asset_count} pdfs={len(official)}')
 PY
 ```
@@ -907,7 +913,7 @@ PY
 Expected terminal line:
 
 ```text
-T04 evidence oracle: PASS cited=257 quote_fragments=92 quote_lines=90 assets=74 pdfs=4
+T04 evidence oracle: PASS cited=260 quote_fragments=92 quote_lines=90 assets=75 pdfs=4
 ```
 
 ## Construction Model
@@ -1175,6 +1181,7 @@ All paths are relative to `ref/A-New-Kind-of-Science/`.
 | `BACK-MATTER/Index/Images/_page_980_Picture_15.jpeg` | 4,385 | `160x195` | `641317f32d429dd61b8353e1ebe65bd80f30950df78f0ebdc3a7f99b6bd26cd9` | Relation-only: step 5 of Life's 206-cell two-dimensional spacefiller, explicitly described as analogous to the code-`1329` growth profiles. |
 | `BACK-MATTER/Index/Images/_page_980_Picture_16.jpeg` | 5,858 | `172x187` | `90df3d1e1e99ed74dd1844654ff41b04b23f6fe22552cefa2b72f659cd0c5fda` | Relation-only: step 50 companion of the same Life analogy. |
 | `BACK-MATTER/Index/Images/_page_980_Picture_17.jpeg` | 8,261 | `223x207` | `3ad70eb7f740edf7749700ff107f08306830f3e3fd617f2df3f9e7e559178e21` | Relation-only: history view of that spacefiller; two-dimensional Life mechanics remain outside T04. |
+| `BACK-MATTER/Index/Images/_page_1092_Picture_6.jpeg` | 21,682 | `583x141` | `b13e50f8bb2f7e905b8580ea94d93c7295e5967125aa8042defe76936bdb1dd6` | Relation-only: feature-extraction application of the 16 even-numbered binary five-neighbor totalistic rules governed by `BOOK:17431`; not T04 execution. |
 | `CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_74_Picture_5.jpeg` | 134,131 | `858x423` | `713c4c55c6a004d76c5e47f1f39513bb1656f35feb0fe9aa72c4503ca311cdc6` | Immediate preceding rule-73 ECA: two-color exhaustive ordered rule. |
 | `CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_86_Picture_7.jpeg` | 30,221 | `240x500` | `59213fbf1a0e6904a6566043c889acd32853d799d5a71bfec1e2d0c45bb1eec5` | First post-T04 mobile evolution: one active site and sequential movement. |
 | `CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_86_Picture_8.jpeg` | 7,295 | `506x51` | `d844f2419d7ff2a748a93e4ae6dd09c947bf5ed0723aa1defb4354c810b1fb25` | Mobile rule diagram paired with Picture 86/7; all later mobile galleries inherit this boundary. |
@@ -1183,6 +1190,8 @@ All paths are relative to `ref/A-New-Kind-of-Science/`.
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_248_Figure_2.jpeg` | 281,697 | `1086x1389` | `b2a20cb8095eb211fedd963d622222ca98fe0428f397b71bef90db8fa6871957` | Binary radius-two totalistic gallery; lower color count and larger radius. |
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_256_Figure_2.jpeg` | 328,297 | `1092x1367` | `1c4967f6967d8e813b2a281e2615dc8bef272eb57789b60e23c950de5e6bc01f` | Four-color radius-one totalistic class sequence; T05 rather than T04. |
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_261_Figure_2.jpeg` | 309,273 | `1109x1297` | `49f35fe65202ef7fbfee2da92b7460d36fc329b66a553782ebf8991f237944dd` | Two-dimensional five-cell totalistic random gallery. |
+| `CHAPTERS/6-Starting-from-Randomness/Images/_page_262_Figure_2.jpeg` | 240,733 | `1013x1291` | `23df7e86bf96a148a17c13847eb53c773a24f86cc5a24f2e1a550f79b94439e3` | Continuation of the two-dimensional binary five-cell totalistic random gallery; geometry/color-count control. |
+| `CHAPTERS/6-Starting-from-Randomness/Images/_page_263_Figure_2.jpeg` | 295,433 | `1195x1355` | `71f5ac8784f493b664a93aff52e157e1ac7bf94a6b2e910f98de9fef663736ec` | One-dimensional slice views of the same rules, visibly labelled `4,12,24,38,30,52`; observer/geometry control. |
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_297_Picture_2.jpeg` | 50,047 | `1111x408` | `953c15d2e64464aceadb6181639cf36973db9513d6e0b7fc3fb43564efc65be8` | Interleaved code-`20` binary radius-two class-4 control; direct generic-T03 evidence, not T04. |
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_298_Figure_2.jpeg` | 209,088 | `1159x1297` | `7cacf2667a3f923d35106ec7eff09b9ce551d79dd828f8661458dd121bda09df` | Code-`20` control over every binary initial condition supported in a region of size below nine. |
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_299_Picture_3.jpeg` | 127,700 | `1150x600` | `32d4ed4b16a083fb731c37cc80c64efb9995756808c316a0ced0dea0e9bd5475` | Code-`20` structures found by testing the first 25 billion binary initial conditions. |
@@ -1208,7 +1217,7 @@ All paths are relative to `ref/A-New-Kind-of-Science/`.
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_26.jpeg` | 4,999 | `135x155` | `badba07cc053bdf7f4e5b41d7d90b2b248d8acd75b9728898e10c69a59c7ceec` | `StirlingS2[m,n]` modulo-2 companion; same exclusion. |
 | `BACK-MATTER/Colophon/Images/_page_1132_Picture_2.jpeg` | 68,468 | `606x308` | `422ce8c21c465e2ffdffdb0f691f9521a21b9389897336dd4e4a2c716295c589` | General three-color two-neighbor code `2144`; an ordered/unrestricted class-4 control, not a totalistic seven-row rule. |
 
-The monolith omits `Images/` from links; chapter splits reference these same bytes rather than duplicate files. Page-883/885 assets are Notes-for-Chapter-2 evidence despite Chapter-12 placement. Page-963/980 Notes images are physically under `BACK-MATTER/Index/Images`, while page 1132 is under `BACK-MATTER/Colophon/Images`. The Chapter 6 sequence at `BOOK:3314-3380` is deliberately interleaved: six code-`357`/`1329` assets are included, four code-`20` panels and the following rule-`110` panel are excluded. The four E14 image-governing captions at `BOOK:5222,5486,10395,10411` route to explicit reversible/block/purpose controls. The independent oracle below is authoritative for T04's 35 included, 32 excluded, and five relation-only dispositions.
+The monolith omits `Images/` from links; chapter splits reference these same bytes rather than duplicate files. Page-883/885 assets are Notes-for-Chapter-2 evidence despite Chapter-12 placement. Page-963/980/1092 Notes images are physically under `BACK-MATTER/Index/Images`, while page 1132 is under `BACK-MATTER/Colophon/Images`. The Chapter 6 sequence at `BOOK:3314-3380` is deliberately interleaved: six code-`357`/`1329` assets are included, four code-`20` panels and the following rule-`110` panel are excluded. The page-261/262/263 gallery closes at the same six two-dimensional totalistic rules; page 264 switches to Life/outer-totalistic code 224. The four E14 image-governing captions at `BOOK:5222,5486,10395,10411` route to explicit reversible/block/purpose controls. The independent oracle below is authoritative for T04's 35 included, 34 excluded, and six relation-only dispositions.
 
 ```bash
 python3 - <<'PY'
@@ -1257,6 +1266,7 @@ items={
 'BACK-MATTER/Index/Images/_page_980_Picture_15.jpeg':(4385,160,195,'641317f32d429dd61b8353e1ebe65bd80f30950df78f0ebdc3a7f99b6bd26cd9','R'),
 'BACK-MATTER/Index/Images/_page_980_Picture_16.jpeg':(5858,172,187,'90df3d1e1e99ed74dd1844654ff41b04b23f6fe22552cefa2b72f659cd0c5fda','R'),
 'BACK-MATTER/Index/Images/_page_980_Picture_17.jpeg':(8261,223,207,'3ad70eb7f740edf7749700ff107f08306830f3e3fd617f2df3f9e7e559178e21','R'),
+'BACK-MATTER/Index/Images/_page_1092_Picture_6.jpeg':(21682,583,141,'b13e50f8bb2f7e905b8580ea94d93c7295e5967125aa8042defe76936bdb1dd6','R'),
 'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_74_Picture_5.jpeg':(134131,858,423,'713c4c55c6a004d76c5e47f1f39513bb1656f35feb0fe9aa72c4503ca311cdc6','X'),
 'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_86_Picture_7.jpeg':(30221,240,500,'59213fbf1a0e6904a6566043c889acd32853d799d5a71bfec1e2d0c45bb1eec5','X'),
 'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_86_Picture_8.jpeg':(7295,506,51,'d844f2419d7ff2a748a93e4ae6dd09c947bf5ed0723aa1defb4354c810b1fb25','X'),
@@ -1265,6 +1275,8 @@ items={
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_248_Figure_2.jpeg':(281697,1086,1389,'b2a20cb8095eb211fedd963d622222ca98fe0428f397b71bef90db8fa6871957','X'),
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_256_Figure_2.jpeg':(328297,1092,1367,'1c4967f6967d8e813b2a281e2615dc8bef272eb57789b60e23c950de5e6bc01f','X'),
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_261_Figure_2.jpeg':(309273,1109,1297,'49f35fe65202ef7fbfee2da92b7460d36fc329b66a553782ebf8991f237944dd','X'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_262_Figure_2.jpeg':(240733,1013,1291,'23df7e86bf96a148a17c13847eb53c773a24f86cc5a24f2e1a550f79b94439e3','X'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_263_Figure_2.jpeg':(295433,1195,1355,'71f5ac8784f493b664a93aff52e157e1ac7bf94a6b2e910f98de9fef663736ec','X'),
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_297_Picture_2.jpeg':(50047,1111,408,'953c15d2e64464aceadb6181639cf36973db9513d6e0b7fc3fb43564efc65be8','X'),
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_298_Figure_2.jpeg':(209088,1159,1297,'7cacf2667a3f923d35106ec7eff09b9ce551d79dd828f8661458dd121bda09df','X'),
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_299_Picture_3.jpeg':(127700,1150,600,'32d4ed4b16a083fb731c37cc80c64efb9995756808c316a0ced0dea0e9bd5475','X'),
@@ -1312,20 +1324,20 @@ for name,(size,w,h,digest,kind) in items.items():
     data=(ROOT/name).read_bytes()
     assert (len(data),*jpeg_size(data),sha256(data).hexdigest())==(size,w,h,digest)
     assert digest not in digests; digests.add(digest); counts[kind]+=1
-assert counts=={'I':35,'X':32,'R':5}
-print('T04 metadata oracle: PASS 35 included; 32 excluded; 5 relation-only')
+assert counts=={'I':35,'X':34,'R':6}
+print('T04 metadata oracle: PASS 35 included; 34 excluded; 6 relation-only')
 PY
 ```
 
 Recorded output:
 
 ```text
-T04 metadata oracle: PASS 35 included; 32 excluded; 5 relation-only
+T04 metadata oracle: PASS 35 included; 34 excluded; 6 relation-only
 ```
 
 ### Exact T04 asset semantic oracle
 
-This dependency-free oracle re-establishes the T04 subset rather than importing T03's result. It checks the seven-row base-3 codec, code `777`, the exact code-`867` Notes invocation, every strict labelled code, the 50-picture scan, the distinction between that scan and all 729 stable-zero-background T04 rules, code-`420` additivity, the later code-`357`/`1329` structure labels, and all 24 newly followed physical links. Initial-condition/period labels are pinned as property evidence; they are not trajectory goldens.
+This dependency-free oracle re-establishes the T04 subset rather than importing T03's result. It checks the seven-row base-3 codec, code `777`, the exact code-`867` Notes invocation, every strict labelled code, the 50-picture scan, the distinction between that scan and all 729 stable-zero-background T04 rules, code-`420` additivity, the later code-`357`/`1329` structure labels, and all 27 audited repair links. Initial-condition/period labels are pinned as property evidence; they are not trajectory goldens.
 
 ```bash
 python3 - <<'PY'
@@ -1346,6 +1358,8 @@ links={
 3368:'![](_page_303_Picture_2.jpeg)',
 3376:'![](_page_304_Picture_2.jpeg)',
 3380:'![](_page_305_Picture_2.jpeg)',
+2924:'![](_page_262_Figure_2.jpeg)',
+2928:'![](_page_263_Figure_2.jpeg)',
 5220:'![](_page_451_Picture_6.jpeg)',
 5484:'![](_page_476_Figure_3.jpeg)',
 10393:'![](_page_847_Figure_1.jpeg)',
@@ -1358,6 +1372,7 @@ links={
 14829:'![](_page_980_Picture_15.jpeg)',
 14831:'![](_page_980_Picture_16.jpeg)',
 14833:'![](_page_980_Picture_17.jpeg)',
+17433:'![](_page_1092_Picture_6.jpeg)',
 18746:'![](_page_1132_Picture_2.jpeg)',
 }
 assert all(book[n-1]==want for n,want in links.items())
@@ -1451,7 +1466,7 @@ code777_table= (0, 1, 2, 1, 0, 0, 1) display=1001210
 code777_t0_t8= 1,111,12121,1100011,122101221,11001210011,1221110111221,110001222100011,12210110101101221
 code867_51x101_sha256= 185170c0866f76d129fbf3a8843cc731f98b9f012cb98286f01e420532fb53d9
 page76_selection= 50 all_quiescent= 729
-chapter6_structure_labels= 15 growth_labels= 5 audited_links= 24
+chapter6_structure_labels= 15 growth_labels= 5 audited_links= 27
 code420_additive_mod3= PASS; pictured_class4_code=1659; notes_only_code=1662
 T04 asset semantic oracle: PASS
 ```
