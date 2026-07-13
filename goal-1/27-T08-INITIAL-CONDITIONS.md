@@ -291,7 +291,7 @@ PY
 
 ## Current API Fit
 
-`simple_programs.md:235-290` already places `SEED` before rollout as support `S_0`, assignment law `mu_seed`, and initial fill `a_init`, while `BOUNDARY` starts separately at `simple_programs.md:292`. That separation is directionally correct and should survive. It must be generalized in Goal 2 because one finite support plus one fill cannot faithfully denote periodic tails, piecewise/derived configurations, exact-composition classes, configuration-wide invariants, or product/tagged values.
+`simple_programs.md:235-290` already places `SEED` before rollout as support `S_0`, assignment law `mu_seed`, and initial fill `a_init`, while `BOUNDARY` starts separately at `simple_programs.md:292`. That separation is directionally correct and should survive. At the mathematical level the formula can denote a periodic or constrained field by taking `S_0=D` and choosing an appropriate law. Goal 2 still needs a closed typed schema for those laws and compact presentations; the present support/fill prose and runtime cannot serialize or validate periodic tails, piecewise/derived configurations, exact-composition classes, configuration-wide invariants, or product/tagged values losslessly.
 
 The repaired generic API should expose:
 
@@ -348,7 +348,45 @@ Current tests establish factory shapes, deterministic placement, some RNG reprod
 
 ## Goal 2 Implementation Stage
 
-Pending evidence closure. The working target is **G2-T08 — typed seed profiles, stochastic realization, and configuration validation**, layered over resolved programs/configuration schemas with no executor change.
+**G2-T08 — typed initial-condition classes, presentations, laws, and realization.** Implement after G2-T01 establishes ordinary configuration schemas and alongside generic run/identity infrastructure. It changes event-zero construction and migration, not the SimpleProgram executor.
+
+| Goal 2 surface | Required work |
+|---|---|
+| configuration schema | Expose native DOMAIN, typed ALPHABET/components, complete-configuration validation, and structural invariants. Validate initial configurations through the same schema used for every later state. |
+| closed presentation algebra | Implement finite explicit, constant, periodic, finite override, closed piecewise, and explicit derived-configuration forms. Give each canonical evaluation/materialization behavior, validation, identity, and round trip on its claimed image. |
+| configuration-class layer | Add schema-scoped closed class descriptors for constant, finite perturbation, periodic, block image, exact composition, and supported local-language/generated images. Keep informal “simple” and behavior labels outside membership. |
+| stochastic-law layer | Add fixed categorical/product laws, explicit parameter-mixture laws, fixed-composition laws, macroblock laws, and supported constrained generators. Validate scope, probabilities, conditioning, normalization, and capability. |
+| sampling realization | Record law, sampler algorithm/version, canonical finite scope/order, key or entropy provenance, and exact sample/configuration digest. Distinguish mathematical infinite measures, finite-cylinder samples, and algorithmic pseudorandom fields. |
+| profile/catalog resolver | Resolve source-named convenience profiles to ordinary constructors/classes/laws bound to explicit typed alphabet roles and a configuration schema. Return the exact unchanged program separately. Reject underdetermined “random” profiles instead of inventing parameters. |
+| finite realization and boundary | Materialize requested windows explicitly; keep origin/centering, topology/quotient, halo/padding, storage, and boundary records separate. Do not treat initial fill as persistent exterior. |
+| temporal migration | Represent AR2, lag lookup, and lag-count histories as product/shift-register `t+0D` configurations at every event; make scalar series a projection observer. Preserve lossless pack/unpack relations and alignment provenance. |
+| transforms/relations | Add typed translation, reflection, value permutation, block decode, derivation, quotient/covering, and crop relations. Do not collapse related configurations or presentations into one identity. |
+| serialization/identity | Version and round-trip schema, class, presentation, law, sampling realization, realized configuration, run realization, boundary, and observer references independently. Reject stale/tampered digests and opaque payloads. |
+| rollout/executor | Accept one validated `X_0` and use the existing branch-free runner. Remove or bypass seed-family and temporal-family dispatch as semantic paths; no T08 flag may reach RULE or UPDATE. |
+| tests/source fixtures | Pin the final source/asset evidence and add the acceptance groups below, including exact probability, domain, invariant, replay, temporal-state, identity, and static no-cheating adversaries. |
+
+### Twenty acceptance groups
+
+1. **Program/profile separation:** pair one exact program object with point, uniform, periodic, and random profiles; assert unchanged program digest/object and identical FRONTIER/NEIGHBORHOOD/RULE/UPDATE types. Only run/profile/sample identities vary.
+2. **Schema and alphabet validation:** accept only typed ALPHABET members and complete component assignments; reject palette-derived gray, raw rank collisions, wrong exact-value types, missing components, and assignments outside the DOMAIN.
+3. **Global invariants:** accept a composite tape configuration with exactly one tagged head; reject zero/two heads and invalid states before rollout. Apply the same mechanism to every schema-scoped invariant rather than adding a Turing seed class.
+4. **Constant and point profiles:** resolve source white-background/single-black and white-background/single-gray forms using explicit member references and origin; evaluate them on native support without requiring a finite tensor.
+5. **Finite configuration versus window:** distinguish an explicit list on a finite segment, the same list on a finite cycle, and a crop of an infinite field. Array equality cannot merge DOMAIN/topology identities or infer a boundary.
+6. **Periodic configurations:** validate nonempty tile, period lattice, phase, and typed values; test negative coordinates and translation. Relate—not identify—an infinite periodic field and its compatible finite cyclic quotient.
+7. **Overrides and piecewise tails:** round-trip constant/periodic bases plus finite defects and ultimately periodic left/middle/right forms. Reject conflicting overrides, overlap, gaps, invalid region syntax, and phase ambiguity.
+8. **Block and generated images:** encode/decode paired-cell and macroblock classes losslessly; realize a substitution-derived nested configuration through an explicit referenced derivation. Reject partial decoders, dangling provenance, and hidden callbacks.
+9. **Fixed product laws:** enumerate small finite categorical/Bernoulli supports and assert total mass one, exact event probabilities, validated parameters, and canonical coordinate ordering.
+10. **Law nonidentity:** distinguish fixed-`p` iid, one-global-`p` mixtures, exact-composition sampling, macroblock sampling, and constraint-language sampling with explicit two- and four-site probability witnesses.
+11. **Underspecified randomness:** a source/profile that omits probabilities, finite scope, conditioning, or generator yields a typed underdetermined/unsupported result; it never defaults silently to fair Bernoulli or the current `[0,1]` mixture.
+12. **Infinite-law capability:** test finite-cylinder consistency for an abstract product measure; reject eager total materialization. Label a finite-key coordinate-hash field as an algorithmic realization, not proof of exact infinite independence.
+13. **Replay and provenance:** identical sampler version/key/scope/order reproduces the exact configuration digest; different query orders do not alter a coordinate-keyed algorithmic field. Missing entropy provenance, changed sampler version, or tampered sample digest fails validation.
+14. **Temporal Markov state:** AR2 pairs, three-lag tuples, and ten-bit shift registers remain complete states for every event. Two histories with the same visible scalar produce different successors where expected; pack/unpack and scalar observer projections round-trip without changing state schema mid-run.
+15. **Fill versus boundary:** rule 1 turns an event-zero all-zero field to ones; a zero initial fill is not reused as a permanent boundary. Vary fixed, periodic, and infinite realizations independently from the same initial profile.
+16. **Centering and translation:** pin the source's finite even/odd centering convention where requested, while proving that native point origin, finite placement, translated profile, materialization window, and display crop have separate identities.
+17. **Transforms and relations:** translation/reflection/value permutation preserve class or law only when the declared action proves it; block decoding, derivation, and quotienting emit relation records. A symmetric distribution does not imply each sample is symmetric.
+18. **Serialization and trust:** canonical round trips preserve typed values, DOMAIN, class, presentation, law, realization, and provenance separately. Reject stale schema/action versions, duplicate/conflicting assignments, NaN/invalid probabilities, and trusted serialized “valid” flags.
+19. **Dataset/observer separation:** held-out streams, batch shapes, token budgets, padding, augmentations, palettes, rasters, behavior labels, density estimates, and crops cannot alter program, class, or mathematical-law identity.
+20. **No-cheating/static:** no T08/seed-family branch below event-zero resolution, temporal hidden pre-state, `Any`/string family dispatch, opaque predicate, implicit RNG, scalar-only coercion, implicit finite DOMAIN, or callback fallback is accepted as canonical semantics.
 
 ## No-Cheating Checks
 
