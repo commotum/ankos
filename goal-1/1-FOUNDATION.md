@@ -9,7 +9,7 @@
 - `principles.md` contains Principle 0 plus Principles 1 through 16 (`:3-127`). They require evidence-first construction discovery, honest executor boundaries, typed results, complete visible state, separation of topology/representation/datasets, and re-derivation rather than patches.
 - `simple_programs.md` is a 2,199-line fixed-support trajectory proposal, not an established universal API.
 - The eleven top-level `src/ca` Python modules total 5,338 lines. The nine `tests/test_*.py` files total 1,685 lines and contain 97 statically named tests.
-- The canonical local book monolith contains 22,497 lines. Foundation validates the source and procedure but does not collect type evidence; excerpt collection begins in T01.
+- The canonical local book monolith has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline). Foundation validates the source and procedure but does not collect type evidence; excerpt collection begins in T01.
 
 ## Updated Assumptions
 
@@ -178,7 +178,7 @@ Suggested reproducible search forms, adjusted per type:
 rg -n -i -F '<literal term>' ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md
 rg -n -i '<bounded variant regex>' ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md
 sed -n '<start>,<end>p' ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md
-rg -n -i -F '<term>' ref/A-New-Kind-of-Science/Notes ref/A-New-Kind-of-Science/Index
+rg -n -i -F '<term>' ref/A-New-Kind-of-Science/BACK-MATTER/Notes/Notes.md ref/A-New-Kind-of-Science/BACK-MATTER/Index/Index.md
 ```
 
 The actual local layout must be checked before using the final command; recorded searches must name the paths that actually existed.

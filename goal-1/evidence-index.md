@@ -26,7 +26,7 @@ Each type stage must make the following auditable:
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
-| T01 | 2 | Elementary Cellular Automata | 1 | `2-T01-ELEMENTARY.md` | PENDING | Not started |
+| T01 | 2 | Elementary Cellular Automata | 1 | `2-T01-ELEMENTARY.md` | COMPLETE | 8 search families; 23 excerpt groups; all split/Notes/Index/cross-reference candidates dispositioned; 0 unresolved |
 | T02 | 3 | Multi-Color Nearest-Neighbor Cellular Automata | 2 | `21-T02-MULTICOLOR-CA.md` | PENDING | Not started |
 | T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | PENDING | Not started |
 | T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | PENDING | Not started |
@@ -34,14 +34,14 @@ Each type stage must make the following auditable:
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | PENDING | Not started |
 | T07 | 8 | Left-Right Symmetric Cellular Automata | 7 | `26-T07-SYMMETRIC.md` | PENDING | Not started |
 | T08 | 9 | Initial-Condition Classes | 8 | `27-T08-INITIAL-CONDITIONS.md` | PENDING | Not started |
-| T09 | 10 | Mobile Automata | 9 | `3-T09-MOBILE.md` | PENDING | Not started |
+| T09 | 10 | Mobile Automata | 9 | `3-T09-MOBILE.md` | COMPLETE | 19 direct query terms/families; 14 excerpt groups; 135 combined candidates plus targeted remainders/splits dispositioned; 0 unresolved |
 | T10 | 11 | Extended Mobile Automata | 10 | `28-T10-EXTENDED-MOBILE.md` | PENDING | Not started |
 | T11 | 12 | Generalized Mobile Automata | 11 | `29-T11-GENERALIZED-MOBILE.md` | PENDING | Not started |
-| T12 | 13 | Turing Machines | 12 | `4-T12-TURING.md` | PENDING | Not started |
-| T13 | 14 | Neighbor-Independent Substitution Systems | 13 | `5-T13-PARALLEL-SUBSTITUTION.md` | PENDING | Not started |
+| T12 | 13 | Turing Machines | 12 | `4-T12-TURING.md` | COMPLETE | 278 direct-name lines plus all 74 halt lines/parameter/Notes/Index/split/emulation candidates dispositioned; 16 excerpt groups; 0 unresolved |
+| T13 | 14 | Neighbor-Independent Substitution Systems | 13 | `5-T13-PARALLEL-SUBSTITUTION.md` | COMPLETE | 288 direct-name lines plus definition/replacement/alias/Notes/Index/split/rendering/growth/infinite/stochastic/emulation candidates dispositioned; 26 excerpt groups; 0 unresolved |
 | T14 | 15 | Neighbor-Dependent Substitution Systems | 14 | `30-T14-CONTEXTUAL-SUBSTITUTION.md` | PENDING | Not started |
 | T15 | 16 | Creation-Destruction Substitution Systems | 15 | `31-T15-CREATION-DESTRUCTION.md` | PENDING | Not started |
-| T16 | 17 | Sequential Substitution Systems | 16 | `6-T16-SEQUENTIAL-SUBSTITUTION.md` | PENDING | Not started |
+| T16 | 17 | Sequential Substitution Systems | 16 | `6-T16-SEQUENTIAL-SUBSTITUTION.md` | IN PROGRESS | Direct definition, captions, Notes implementation/order/halting, aliases, Index/splits, generalized/multiway variants, and emulations under resolution |
 | T17 | 18 | Tag Systems | 17 | `7-T17-TAG.md` | PENDING | Not started |
 | T18 | 19 | Cyclic Tag Systems | 18 | `32-T18-CYCLIC-TAG.md` | PENDING | Not started |
 | T19 | 20 | Register Machines | 19 | `8-T19-REGISTER.md` | PENDING | Not started |
@@ -75,9 +75,9 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 0 / 45.
+- Type stages complete: 4 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 45 pending, 0 in progress.
+- Type stages unresolved: 40 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 

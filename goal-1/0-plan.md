@@ -46,10 +46,22 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - `rollout.py` dispatches through family-name branches for AR2, Dyadlags, Lagcounts, and spatial Dyadrads/Dyadaxes rather than executing one shared selector/rule/update algebra.
 - Current temporal families use seed prefixes or packed local history inside family-specific rollout code; ordinary spatial lookup uses selector reads and current-time snapshots.
 - The current seed catalog separates selector-backed support from rendering, but `fractal` and `spiral` accept predicate callables and therefore remain current-runtime behavior to audit, not presumed Goal 2 primitives.
-- The canonical monolithic book file contains 22,497 lines and includes chapter text, captions, notes, and index material that may contain relevant evidence.
+- The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 0 of 45 type stages complete, T01 next, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation, T01, T09, T12, and T13 complete, 4 of 45 type stages complete, and Synthesis and Goal 2 Handoff pending. The next adversarial stage is T16 Sequential Substitution Systems.
+- T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
+- T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
+- T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
+- T09 rederives `FRONTIER` as a selector of firing/source loci. Effect targets belong to typed rule results; T01 source and target happen to coincide.
+- T09 directly requires visible active-position control, `ControlLocus`, compound `Assign + RelocateControl` results, atomic effect application, and control-preserving structured traces. It extends rather than splits the T01 protocol.
+- The canonical mobile code pair `{35,57}` consumes physical `[left,self,right]`, sharing T01's corrected MSB-first context codec. The Notes finite-list guard is not a boundary or halt policy.
+- T12 refines position-only control to payload-bearing `SingleControl` and atomic `TransitionControl`; T09 is the unit-payload specialization. Turing rules combine the head payload with a self-only tape read.
+- T12 base machines are total and non-halting, with `(2sk)^(sk)` rules. Special terminal head states, external head/tape stop observations, horizons, and errors are distinct outcomes/protocols.
+- T12 requires an inspectable total/default-symbol tape over `Z`; finite read boundaries cannot supply writes or control movement beyond capacity. Numeric rule decoding uses a documented repair of an OCR-lost `k`, guarded by known machine 3024.
+- T13 validates source-first generic orchestration but splits update semantics: fixed-locus assignment preserves support, while `ParallelReplaceConcat` consumes every old ordered occurrence and creates children from typed nonempty words.
+- T13 state is an explicit discrete ordered sequence with finite canonical and documented infinite-support variants. Snapshot indices, occurrence lineage, finite observation, ragged trace, padding, and rendering are separate.
+- T13 uses a total alphabet-closed `Sigma -> Sigma+` table. Empty words belong to T15; neighbor context to T14; first-match scanning to T16; probabilistic words and continued-fraction rule streams remain separate variants.
 
 ## Assumptions To Challenge
 
@@ -158,6 +170,8 @@ Foundation mechanically joined all 45 CSV rows to taxonomy sections, stable T ID
 
 ### 2-T01-ELEMENTARY
 
+Status: **COMPLETE** in `goal-1/2-T01-ELEMENTARY.md`.
+
 #### Big Picture Objective
 
 Establish elementary cellular automata as the fixed-lattice, synchronous, ordered-local-rule baseline.
@@ -170,7 +184,13 @@ Apply the common type-stage protocol, emphasizing binary alphabets, radius-one o
 
 All T01 evidence and search candidates are resolved; current runtime behavior is mapped precisely; its Goal 2 conformance stage is complete; global ledgers are updated.
 
+#### Stage Result
+
+The exhaustive direct-name, alias, named-rule, caption, Notes, Index, boundary, seed, equivalence, and restriction searches closed with zero unresolved candidates and 23 canonical excerpt groups. T01 reconstructs an arbitrary Boolean table over ordered `(left,self,right)` reads with Wolfram oracle `(n >> (4*left + 2*self + right)) & 1`, one same-site assignment per fixed lattice site, and old-snapshot parallel commit. The usual centered cell, random fields, finite cycles, and display crops are separate seed/realization choices; reflection and black/white conjugation yield 88 analysis orbits while all 256 rules remain executable. The first provisional shared executor algebra is therefore fixed-lattice synchronous assignment, not a universal construction claim. Goal 2 must fix generic exhaustive cardinality and ordering, introduce explicit support/realization/trace boundaries and typed assignment/update, and use a strict elementary preset over the generic executor with independent asymmetric rule-30 tests. No earlier stage was reopened. Next: T09.
+
 ### 3-T09-MOBILE
+
+Status: **COMPLETE** in `goal-1/3-T09-MOBILE.md`.
 
 #### Big Picture Objective
 
@@ -184,7 +204,13 @@ Apply the common protocol, emphasizing active-cell state, local reads, write sco
 
 All T09 evidence is captured; control and movement semantics are explicit; no CA compilation is used as the proposed fit; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+The exhaustive direct/control/function search produced 135 candidates, with targeted rule-count, compression, schedule, boundary, split-file, Notes, and Index remainders all dispositioned and zero unresolved. T09 reconstructs a fixed binary line plus one visible active position; physical `[left,self,right]` reads; an arbitrary 8-entry table returning a new source value and `{-1,+1}` displacement; and atomic source assignment plus control relocation. Its 65,536 rules are inspectable pairs of byte tables. The canonical `{35,57}` order was resolved against executable Notes and the rule image after detecting ambiguous prose, and independent asymmetric guards plus a sparse-field trajectory are recorded. T09 redefines frontier as firing-source selection and adds visible control, typed compound effects, atomic update, and structured traces while retaining the T01 executor protocol. CA/substitution encodings, active-color packing, display compression, finite edge guards, and family dispatch are explicitly rejected. T01 remains complete because its sources and write targets coincide. Next: T12.
+
 ### 4-T12-TURING
+
+Status: **COMPLETE** in `goal-1/4-T12-TURING.md`.
 
 #### Big Picture Objective
 
@@ -198,7 +224,13 @@ Apply the common protocol, distinguishing the tape alphabet from head state and 
 
 All T12 variants and parameters are evidenced; write/move/control effects are modeled without hidden executor state; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+All 278 direct-name lines, 74 halt lines, exact rule/count/codec candidates, captions, Notes, Index routes, split duplicates, named variants, and cross-system emulations were dispositioned with zero unresolved. T12 reconstructs a total `Q x Sigma -> Q x Sigma x {L,R}` table over a fixed integer tape, with visible `(position,state)` head control, a self-only tape read, source write, and atomic payload/position transition. It refines T09's control primitive to a payload-bearing form while preserving the shared executor and T09 behavior. The base family never halts; a special terminal control state is an intrinsic variant, while head/tape/fixed-point observations are external stop policies and horizon/errors remain distinct. The `(2sk)^(sk)` count, repaired mixed-radix codec, known code 3024, six-row Notes table, and independent sparse trajectory provide conformance oracles. Partial reachable emulation tables, head-color packing, finite edge guards, nondeterministic paths, and 2D movement do not alter base T12. No prior stage reopened. Next: T13.
+
 ### 5-T13-PARALLEL-SUBSTITUTION
+
+Status: **COMPLETE** in `goal-1/5-T13-PARALLEL-SUBSTITUTION.md`.
 
 #### Big Picture Objective
 
@@ -212,7 +244,13 @@ Apply the common protocol, emphasizing neighbor independence, source identity, r
 
 All T13 evidence is captured; no fixed-capacity padding or target-local inversion is accepted as core semantics; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+All 288 direct-name lines and the complete definition/replacement/alias/Notes/Index/split/rendering/growth/infinite/stochastic/emulation search families were dispositioned with zero unresolved candidates and 26 canonical excerpt groups. T13 reconstructs a total finite-alphabet morphism `Sigma -> Sigma+` over an explicit discrete ordered sequence. Every old occurrence fires once from the same snapshot, returns a typed nonempty word, and `ParallelReplaceConcat` consumes the parent generation and creates children in source/block order. This is a distinct structural update algebra rather than a generalized `Assign`, while the source-read-rule-update orchestration survives. The exact `1->10, 0->01` trajectory, Fibonacci/linear/multicolor growth fixtures, incidence counts, ordering adversaries, and lineage intervals form independent tests. Finite words, infinite random support with explicit cut/realization, ragged traces, ancestry IDs, and box/tree/path renderings are separated. T14/T15/T16, stochastic replacement, T42 rule streams, and CA/tag/geometric encodings remain distinct. No prior stage reopened. Next: T16.
+
 ### 6-T16-SEQUENTIAL-SUBSTITUTION
+
+Status: **IN PROGRESS** in `goal-1/6-T16-SEQUENTIAL-SUBSTITUTION.md`.
 
 #### Big Picture Objective
 
