@@ -673,7 +673,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE validation/partiality boundary for T43.
 - Basis: the strict definition requires every possible input to yield a definite in-domain output (`BOOK:1870`), while Gauss/Newton variants can have poles and the strict maps include defined jumps/cusps (`BOOK:13218-13222`; page-165 raster).
-- Consequence: admit a strict self-map only through a mechanically checked known constructor or replayable certificate tied to normalized syntax, state space, parameters, and primitive version. A trusted boolean is invalid. `FractionalPart` and ordered exact `Piecewise` are closed primitives; a discontinuity is not failure. Partial siblings return typed pole/missing-branch/outside/escape/evaluation outcomes and commit no partial event.
+- Consequence: admit a strict self-map only through a mechanically checked known constructor or replayable certificate tied to normalized syntax, state space, parameters, and primitive version. A trusted boolean is invalid. Source-faithful `FractionalPart(x)=x-IntegerPart(x)` and ordered exact `Piecewise` are closed primitives; on the strict nonnegative scope `FractionalPart` agrees with modulo one, but those tags differ on negative inputs. A discontinuity is not failure. Partial siblings return typed pole/missing-branch/outside/escape/evaluation outcomes and commit no partial event.
 
 ### D091 — Numerical feedback profiles are semantic and reproducible
 
@@ -703,7 +703,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE supplementary T43 profile and T44 boundary.
 - Basis: native Notes give `{x,y}->Mod[m.{x,y},1]`, while T44 applies a map to neighborhood aggregates at every site (`BOOK:13272`, `1954`, `1982`, `13298`).
-- Consequence: add fixed-dimensional `RealBox` and `UnitTorus` state spaces only as tagged siblings. Every output reads the same old tuple and commits one tuple assignment; torus quotient equality differs from box endpoint equality. The repeated “rational” sentence is read as integer versus nonintegral-rational matrices. T44 owns lattice support, neighborhoods, aggregation, and simultaneous field commit; complex, partial, stochastic, and continuous-time maps retain explicit boundaries.
+- Consequence: add fixed-dimensional `RealBox` and `UnitTorus` state spaces only as tagged siblings. Every output reads the same old tuple and commits one tuple assignment; torus quotient equality differs from box endpoint equality. Integer matrices descend to quotient-torus maps; nonintegral rational matrices generally require canonical half-open box coordinates because representative invariance fails. The repeated “rational” sentence is read in that integer/nonintegral sense. T44 owns lattice support, neighborhoods, aggregation, and simultaneous field commit; complex, partial, stochastic, and continuous-time maps retain explicit boundaries.
 
 ## Rejected Shortcuts
 

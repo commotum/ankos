@@ -22,7 +22,7 @@ Status: **IN PROGRESS**
 - A strict verified self-map has exactly one successor for every event, including a fixed-point/identity event reported as `Advanced(changed=false)`. It has no native halt, spatial boundary, or legitimate escape.
 - `h` requested events produce `h+1` snapshots. `NestList` supplies independent source support for this initial-inclusive convention. Fixed points, exact cycles, convergence, attractors, and analysis cutoffs do not stop native execution.
 - The closed map syntax reuses compatible T41 ordered expression nodes and adds state references, exact comparisons, ordered `Piecewise`, and `FractionalPart`. Formula strings, callbacks, host CAS expressions, lookup rasters, and primitive reflection are not map definitions.
-- `FractionalPart(y)=y-floor(y)` is a mathematical primitive, not a boundary-wrap policy. Its values at integers and the tent map's value at its cusp are defined; side limits and derivative sides belong to observers.
+- Source-spelled `FractionalPart(y)` is a mathematical primitive, not a boundary-wrap policy. Wolfram semantics are `y-IntegerPart(y)`, with truncation toward zero; on every nonnegative strict-map argument this equals `y-floor(y)` and `Mod[y,1]`. Its values at integers and the tent map's cusp are defined; negative-domain `FractionalPart` and modulo-one remain distinct.
 - Mathematical exact evolution, certified enclosure computation, tracked-significance computation, and a fixed-precision rounded recurrence are different profiles. Fixed rounded results feed back into later events and therefore define a different effective dynamical system, not a transparent observation context.
 - Native Notes explicitly distinguish roughly 53-bit computer storage, tracked arbitrary precision with progressively fewer reliable digits, fixed binary fill that drives the shift map to zero, and fixed decimal calculator arithmetic that yields another eventually periodic process.
 - Structural map identity, certified equality as functions on a domain, conjugacy/semiconjugacy, exact orbit equality, and equality of one numerical observation are different relations. Logistic `a=4` and the doubling map are related by `x=Sin[Pi u]^2`; they are not structurally identical programs.
@@ -32,12 +32,12 @@ Status: **IN PROGRESS**
 - The Anosov Notes sentence is coherent only when its second “rational numbers” means nonintegral rational matrix entries: an integer matrix preserves a finite denominator class modulo one, while nonintegral rational entries can grow denominators. It must not be silently “corrected” to irrational.
 - Eight strict image links and three native-Notes image links were found. The monolith's bare links are broken relative paths; clean split directories resolve the assets. Canonical text provenance and split-asset provenance therefore remain separate.
 - Current rank-zero rollout is fixed-width NumPy/family-dispatched and limited to finite alphabets and modular integer AR2. It has no inspectable real-map AST, exact/algebraic/interval carrier, precision realization, invariant proof, or digit-sensitive conformance path.
-- Exhaustive text/raster/API searches leave zero unresolved candidate. All 11 native assets are measured and hashed; exact regeneration matches the 12,960 page-165 cells, 9,680 page-168 digit cells, and 38,720 page-170 comparison cells.
+- Exhaustive text/raster/API searches leave zero unresolved candidate. All 11 native assets are measured and hashed; exact regeneration matches the 12,960 page-165 cells, all 29,040 cells across the three page-168 digit/comparison plates, and 38,720 page-170 comparison cells.
 
 ## Updated Assumptions
 
 - `IteratedMapSpec` is immutable closed program data: declared state space, exact/declared parameters, ordered output expression, primitive-registry version, and replayable totality/invariance evidence.
-- The strict state space is the closed real interval `[0,1]`. Although the prose says “between,” strict formulas and endpoints require a serialized interval/end-point convention. `FractionalPart` itself ranges over `[0,1)`.
+- The strict state space is the closed real interval `[0,1]`. Although the prose says “between,” strict formulas and endpoints require a serialized interval/end-point convention. For the strict nonnegative arguments, `FractionalPart` ranges over `[0,1)`; its general Wolfram range also contains negative values.
 - Strict state has one scalar slot and no control or history. A separately tagged fixed-vector extension reads and replaces the complete old tuple simultaneously.
 - `UniqueScalar` is the active source. A complete old value is read once; a pure closed expression returns a typed next value; `MapAssignment` lowers to the existing `Assign(MapStateSlot,next)` fixed effect.
 - A general expression's self-map property is not decidable by declaration. Strict admission requires a known constructor with mechanically checked range or a replayable proof/certificate. An unverified expression remains explicitly partial.
@@ -54,7 +54,7 @@ Status: **IN PROGRESS**
 - Lyapunov records declare seed, horizon, burn-in, perturbation/derivative method, precision, metric, and logarithm base. The source uses base two. Finite-time estimates and asymptotic exponents remain distinct.
 - Attractor records require a state-space topology/metric, set representation, basin scope, and evidence level. A finite orbit cannot certify attraction, and a periodic orbit can be repelling.
 - Parameter/bifurcation records are family-level observations. Sampled rasters are not proof of exact bifurcation thresholds.
-- `RealBox(d)` and `UnitTorus(d)` are distinct vector spaces. Torus quotient equality is not closed-box endpoint equality; all vector outputs are calculated from the same old tuple and committed atomically.
+- `RealBox(d)` and `UnitTorus(d)` are distinct vector spaces. Torus quotient equality is not box endpoint equality; all vector outputs are calculated from the same old tuple and committed atomically. An integer matrix descends to a torus map, while a nonintegral rational matrix generally requires canonical half-open coordinates because it is not well-defined under arbitrary integer-representative changes.
 - T37 may preserve an indexed logistic recurrence prefix; T43 preserves the current scalar. T41 supplies denotational expression responsibilities but not feedback execution. T44 adds spatial aggregation and simultaneous field update around a scalar map.
 - Smooth, discontinuous, piecewise, partial, complex, vector, bitwise, stochastic/noisy, and coupled-map uses share only evidence-backed responsibilities and never collapse into permissive flags or opaque callbacks.
 
@@ -95,7 +95,7 @@ Reconstruct iterated maps as exact or explicitly represented scalar-state evolut
 17. Supporting symbolic-dynamics/attractor text at `14693-14701`, chaos history at `14936-14944`, algebraic-iterate material at `18010-18048`, and initial-information/universality material at `19086,19102` are explicitly typed below.
 18. The T44 seam at `1954,1982,13298` makes T43 a scalar-map component of a coupled field construction; T44 owns neighborhoods, aggregation, lattice state, and simultaneous field commit.
 19. Direct repository search found no current T43 implementation or test. `simple_programs.md`, finite alphabets, opaque rules, fixed episode specs/rollout, and visualization exporters were inspected line by line for reusable responsibility versus semantic mismatch.
-20. Independent exact rational/high-precision and pixel checks regenerated page-165 traces and all 12,960 digit cells, both page-168 traces and 9,680 digit cells, and all four page-170 comparison panels and 38,720 cells.
+20. Independent exact rational/high-precision and pixel checks regenerated page-165 traces and all 12,960 digit cells, both page-168 traces and all 29,040 cells across two digit plates plus their comparison plate, and all four page-170 panels and 38,720 cells.
 21. Zero unresolved textual, split, Notes, actual-Index, history, alias, program, variant, relation, or false-positive candidate remains. Counts use only the canonical monolith so split duplicates are not double-counted.
 
 Representative commands used case-insensitive Perl occurrence/unique-line counters split at `BOOK:20826`, `rg -n -i` unions, `sed`/`nl` context reads, `rg --files`, `file`, `stat`, `sha256sum`, original-resolution inspection, exact `Fraction` recurrence checks, raster pixel classification, and independent high-precision arithmetic.
@@ -432,7 +432,7 @@ MapPredicate = Lt | Le | Eq | And | Or | Not
 
 The strict primitive registry adds `FractionalPart`; logistic and related profiles reuse multiplication/subtraction; Gauss/Newton siblings use division with explicit partiality. Ordered piecewise cases and their exact comparison semantics are identity-bearing. `If[x<1/2,...]` takes the second arm at equality, even though the strict tent expression is continuous there.
 
-`FractionalPart[y]=y-Floor[y]` is a mathematical operation. It is not implicit boundary wrap, is defined at integers, and cannot be added by a renderer or runtime because a value left the domain. `FractionalPart[3x/4]` remains structurally distinct from `3x/4`, even though they agree extensionally on `[0,1]`.
+Source-spelled `FractionalPart[y]=y-IntegerPart[y]` uses truncation toward zero and is odd. On the strict maps' nonnegative arguments it equals `y-Floor[y]` and `Mod[y,1]`; on negative arguments those operations differ and require distinct primitive tags. `FractionalPart` is not implicit boundary wrap, is defined at integers, and cannot be added by a runtime because a value left the domain. `FractionalPart[3x/4]` remains structurally distinct from `3x/4`, even though they agree extensionally on `[0,1]`.
 
 ### Source, read, result, and update
 
@@ -593,7 +593,7 @@ Constant-slope Lyapunov rates in the source's base-two convention are `log2(3/2)
 - Period-doubling anchors are `3`, `1+sqrt(6)=3.44948974278...`, `3.54409035955...`, `3.56440726610...`, accumulating at `3.569945672...`, consistent with source-rounded `3.569946`.
 - Logistic `a=4` relation: under `x=Sin[Pi u]^2`, the ideal map is semiconjugate/conjugate modulo the two-to-one coordinate ambiguity to `u -> FractionalPart[2u]`. Record the transformation and scope, not structural equality.
 - Anosov example: `{x,y} -> Mod[{{2,1},{1,1}}.{x,y},1]` on a two-torus, with both outputs computed from the old pair. Rational seeds under the displayed integer matrix have finite denominator classes and eventually repeat.
-- A nonintegral rational matrix can introduce new denominator factors at each event and produce complicated behavior even from an integer seed. This is the defensible reading of the otherwise confusing second “rational” clause.
+- A nonintegral rational matrix can introduce new denominator factors at each event and produce complicated behavior even from an integer seed. This is the defensible reading of the otherwise confusing second “rational” clause, but it denotes a componentwise fractional-part map on canonical `[0,1)^d` coordinates rather than a well-defined quotient-torus map unless representative invariance is separately proved.
 
 ### Asset ledger
 
@@ -620,7 +620,7 @@ Constant-slope Lyapunov rates in the source's base-two convention are `log2(3/2)
 - **Gauss/continued-fraction map:** `FractionalPart[1/x]` is partial at zero. It requires a domain excluding zero or a typed undefined result and cannot use the strict total profile unchanged.
 - **Newton/rational maps:** rational expression, usually partial at derivative zeros/poles; complex-domain variants require typed complex state and branch conventions.
 - **Affine/fractional-linear maps:** closed syntax with explicit domain and range proof; special fast-forward relations are evaluator artifacts.
-- **Vector Anosov maps:** fixed-dimensional torus state, simultaneous tuple assignment, componentwise modulo as program syntax.
+- **Vector Anosov maps:** the displayed integer matrix uses fixed-dimensional torus state and simultaneous tuple assignment. Nonintegral rational matrices use an explicitly different canonical half-open box profile unless they separately satisfy quotient well-definedness.
 - **Bitwise analogs:** relation to cellular automata, not permission to replace real scalar state with a digit array.
 - **Stochastic/noisy maps:** would add an explicit random source and transition distribution; no native evidence admits them into strict T43.
 
@@ -650,23 +650,25 @@ Constant-slope Lyapunov rates in the source's base-two convention are `log2(3/2)
 10. The algebraic table at `18014-18020` is structurally corrupted; only the surrounding qualitative statement and separately readable closed forms are usable.
 11. Raster graph vertical joins at mathematical jumps are a rendering artifact, not program semantics.
 12. Exact precision, sampling, rounding, and digit-window settings for several strict images are unstated. Raster appearance never supplies hidden defaults.
+13. The source's Mathematica `FractionalPart` is `x-IntegerPart[x]`, not globally `x-Floor[x]`; it is odd and differs from modulo one for negative inputs. The strict maps never expose the difference because their primitive arguments are nonnegative. Goal 2 versions both semantics explicitly rather than extrapolating the strict simplification. This is corroborated by the [official Wolfram Language reference](https://reference.wolfram.com/language/ref/FractionalPart.html).
 
 ## Current API Fit
 
-- `simple_programs.md` offers reusable responsibility names only: rank-zero time, a unique scalar source, complete old-value read, and same-slot assignment. Its current formula callback is not an inspectable map definition.
-- `src/ca/alphabets.py:43-56,88-126` explicitly represents finite value sets. `float_range_alphabet` discretizes a range and is not a mathematical real interval.
-- `src/ca/rules.py:25-30,64-78,316-328` stores opaque Python callables and family identifiers. Neither is stable structural program data.
-- `src/ca/specs.py:23-81,117-181` requires CA shape, rule, frontier, boundary, and dense episode assumptions that T43 does not possess.
-- No public type represents exact/algebraic real values, certified enclosures, represented-number profiles, interval/torus spaces, invariant proofs, map events, or analysis results.
-- Existing rule IDs and NumPy dtype inference cannot be reused as map identity or numeric semantics.
+- `DIRECT` at responsibility level: `simple_programs.md` rank-zero time, a unique scalar source, complete old-value read, and same-slot assignment match T43. They do not by themselves supply real state, a closed map, or an evaluator.
+- `SEMANTIC MISMATCH`: the documented `FORMULAIC` rule is a callback, not inspectable map data; generic finite-value return also lacks invariant/partiality and numerical-realization contracts.
+- `SEMANTIC MISMATCH`: `src/ca/alphabets.py:43-56,88-126` explicitly represents finite value sets. `float_range_alphabet` discretizes a range and is not a mathematical real interval.
+- `SEMANTIC MISMATCH`: `src/ca/rules.py:25-30,64-78,316-328` stores opaque Python callables and family identifiers. Neither is stable structural program data.
+- `SEMANTIC MISMATCH`: `src/ca/specs.py:23-81,117-181` requires CA shape, rule, frontier, boundary, and dense episode assumptions that T43 does not possess.
+- `PRINCIPLED EXTENSION`: no public type represents exact/algebraic real values, certified enclosures, represented-number profiles, interval/torus spaces, invariant proofs, map events, or analysis results.
+- `NOT APPLICABLE`: existing rule IDs and NumPy dtype inference cannot serve as map identity or numeric semantics.
 
 ## Current Runtime Fit
 
-- `src/ca/rollout.py:40-85,145-212` requires a positive finite step count, dispatches by family, and materializes NumPy episode arrays. Only the horizon requirement and initial-inclusive snapshot responsibility are reusable.
-- Current rank-zero evolution is modular integer AR2. Adding `if family == "iterated_map"` would perpetuate family dispatch and bypass the typed source/result/effect executor established by earlier stages.
-- `src/ca/viz/export.py:139-184` accepts `RawEpisode`/`RawBatch`, assumes integer rule IDs, and rejects float/object states. T43 needs typed trace/view export rather than forcing exact values into an array.
-- `pyproject.toml` provides NumPy and pytest but no exact-real, symbolic, interval, arbitrary-precision, or proof backend. Goal 2 must either choose an explicit dependency after cross-stage synthesis or initially limit executable exact primitives to operations it can certify.
-- Direct source/test search finds no iterated-map, fractional-part, logistic, precision, cycle, sensitivity, bifurcation, attractor, or Lyapunov implementation/conformance test.
+- `PARAMETERIZATION` at responsibility level: `src/ca/rollout.py:40-85,145-212` requires a positive finite step count and emits an initial-inclusive episode, matching requested finite-horizon shape.
+- `SEMANTIC MISMATCH`: that rollout dispatches by family and materializes NumPy arrays. Current rank-zero evolution is modular integer AR2; adding `if family == "iterated_map"` would bypass the typed source/result/effect executor established by earlier stages.
+- `SEMANTIC MISMATCH`: `src/ca/viz/export.py:139-184` accepts `RawEpisode`/`RawBatch`, assumes integer rule IDs, and rejects float/object states. T43 needs typed trace/view export rather than coercing exact values into an array.
+- `PRINCIPLED EXTENSION`: `pyproject.toml` provides NumPy and pytest but no exact-real, symbolic, interval, arbitrary-precision, or proof backend. Goal 2 must choose an explicit dependency after cross-stage synthesis or initially limit executable exact primitives to operations it can certify.
+- `NOT APPLICABLE`: direct source/test search finds no iterated-map, fractional-part, logistic, precision, cycle, sensitivity, bifurcation, attractor, or Lyapunov implementation/conformance test to retain.
 
 ## Principles Audit
 
@@ -690,10 +692,23 @@ Ordered syntax, exact parameters, state-space endpoints, totality evidence, prim
 
 General invariant proofs, exact comparison of arbitrary computable reals, asymptotic Lyapunov values, attractors, bifurcations, and complete periodic-point sets can be undecidable or computationally hard. Typed unsupported/unknown/resource outcomes are required; sampling is never relabeled proof.
 
+## Re-Integration Audit
+
+1. No prior assumption is invalidated. T43 confirms T34's unary assignment and T41's closed syntax responsibilities while sharpening the earlier numerical-context boundary: fixed rounding is query-local in T41 but transition-semantic when fed back in T43.
+2. `UniqueScalar`, complete scalar read, `Assign`, and `AtomicEffectsUpdate` are reused without semantic change. No eleventh update law is introduced.
+3. The proposal adds no family switch, flag bundle, hidden history/control, callback, or duplicate executor. Partial, vector, and represented-map profiles are tagged types with distinct validators.
+4. The current scalar or old vector tuple plus immutable map/realization data contains everything required to advance. Event index and orbit prefix are trace data only.
+5. State space, scalar/vector value, absent control, exact-versus-represented realization, digit projection, and rendering remain separate.
+6. One-step map evaluation and commit are defining. Invariant proof, fast-forward, periodic-point solving, Lyapunov/attractor/bifurcation analysis, and plotting are correctly separated algorithms/queries.
+7. Tagged exact values, interval/torus spaces, ordered ASTs, realization records, events, witnesses, and observer codecs preserve every evidenced distinction without binary-float or bitmap substitution.
+8. No completed stage is reopened. T34 assignment and T41 expression/query boundaries remain valid; T37 prefix state and T39 observer/query discipline remain distinct.
+9. Goal 2 gains shared exact-real/represented values, state spaces, map evaluation/orbit/analysis modules, and pressure on the T44/T45 numerical backend decision.
+10. The API becomes more coherent by reusing one assignment law and one expression registry while separating mathematical maps, feedback realizations, and analysis records. A T43 family rollout would be less coherent and is rejected.
+
 ## Detailed Implementation Plan
 
 1. Extend the shared exact/declared numeric algebra with named/algebraic reals, certified enclosures, and explicitly represented finite formats; never silently coerce to binary float.
-2. Extend the T41 closed expression registry with state components, exact predicates, ordered piecewise syntax, `Floor`/`FractionalPart`, and partial-domain metadata.
+2. Extend the T41 closed expression registry with state components, exact predicates, ordered piecewise syntax, source-faithful `IntegerPart`/`FractionalPart`, a distinct modulo-one primitive, and partial-domain metadata.
 3. Add interval, box, and torus state-space records with exact membership/equality/codecs and replayable invariant checks.
 4. Add immutable map specs, strict constructors, proof/certificate records, scalar/vector state, source/read/result records, and lowering to the existing fixed-effects assignment law.
 5. Implement one-event evaluators for ideal exact, certified enclosure, tracked significance, and declared fixed-rounded realizations with typed failures.
