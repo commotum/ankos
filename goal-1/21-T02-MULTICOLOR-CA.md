@@ -9,12 +9,12 @@ Status: **IN PROGRESS**
 - `BOOK:4684` directly describes arbitrary three-color nearest-neighbor tables over all 27 ordered three-cell neighborhoods and a mutation profile that adds or changes individual neighborhood entries.
 - `BOOK:5218-5222` directly identifies all `3^27` three-color nearest-neighbor rules and the 1,800 reversible members. Reversibility is a property/restriction, not a different forward update construction.
 - T01 already establishes a fixed ordered one-dimensional lattice, total field, synchronous old left/self/right reads, arbitrary finite lookup, typed same-site assignment, atomic parallel commit, and separate native/finite support, seed, trace, and view identities.
-- The central question is therefore whether T02 is exactly T01 parameterized by a finite alphabet of cardinality `k>2` plus a base-`k` ordered table codec, or whether direct evidence forces any new state/read/update primitive.
+- The completed evidence chain proves that T02 is exactly T01 parameterized by a finite ordered alphabet of cardinality `k>=3` plus a complete ordered table and optional base-`k` codec. No new state, read, result, update, successor, executor, or halt primitive is required.
 - Current runtime alphabet declarations can represent finite integer/symbolic colors, but the documented/executable exhaustive binary codec and family-dispatched rollout were already defective for T01. Existing nominal color capacity is not proof of an executable general `k^(k^3)` rule table.
 
 ## Updated Assumptions
 
-- Treat `k=3` as the strict directly enumerated profile. General `k` remains a candidate generalization until the Notes/Index/general-definition evidence is audited.
+- Treat `k=3` as the strict directly enumerated profile and general `k>=3`, range one, as the directly audited Notes generalization. `k=2` remains T01; general range, dimension, and alternate neighborhood geometry remain separate parameterizations/stages.
 - Preserve colors as distinct symbols or validated digits `0..k-1`; visual white/gray/black tones are a view convention unless a numeric aggregate such as totalistic averaging explicitly gives them arithmetic meaning.
 - Preserve ordered neighborhoods. A totalistic, semi-totalistic, symmetric, reversible, background-preserving, mutation-generated, or emulation profile is a restriction/property/relation unless evidence makes it defining.
 - Do not infer a single-gray-cell seed, unchanged white background, random seed, finite periodic boundary, or figure horizon as native T02 semantics.
@@ -431,8 +431,8 @@ addresses = {k*k*left + k*center + right
 assert addresses == set(range(k**3))
 assert [k*k*l + k*c + r for l,c,r in ((0,1,2),(0,2,1),(1,0,2))] == [5,7,11]
 assert k**(k**3) == 3**27 == 7_625_597_484_987
-assert 'totalistic' not in L[771].lower()
-assert 'totalistic' in L[773].lower()
+assert 'total number of possible rules of this kind' in L[771]
+assert 'The idea of a totalistic rule' in L[773]
 print('T02 verbatim evidence oracle: PASS 32 lines; ordered addresses/count exact')
 PY
 ```
@@ -644,6 +644,220 @@ rule_5407067979_m3_trace= 112,1211,2201,1012,20211,11101,11102,111111
 rule_921408_counts= (17840, 1568, 893)
 rule_921408_sha256= 935f360febe2e58653bd52dff57139563bc706af963b2bdfbe0b116a7dbcacc3
 ```
+
+## Asset and Raster Audit
+
+The strict Chapter 3 transition has no full-table T02 picture. Its immediately following page-60/page-61 assets are totalistic and are material exclusions. The bounded included set instead consists of one exact general-rule Notes fixture, the purpose/search and mutation galleries, the reversible gallery and its inverse-range Notes panels, and one supporting purpose-search asset. Visual tone is never imported into the color algebra.
+
+### Included asset manifest
+
+| Asset path under `ref/A-New-Kind-of-Science/` | Bytes | Dimensions | SHA-256 | Source-permitted meaning |
+|---|---:|---:|---|---|
+| `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_23.jpeg` | 4,478 | `160x117` | `132528352f363e52a20e73e1e8341203126448c0c6c8545eed48626eaddac16c` | Exact Notes invocation of general `k=3,r=1` rule `921408`, point `1` on repeating-`0` background, 100 updates. |
+| `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_847_Figure_1.jpeg` | 111,064 | `1041x385` | `2d36e7eaeb3b073e68621ef5f9c1c397ae24ddc74fe06f26e62546ccc3af2902` | Six-, four-, and three-color nearest-neighbor doubling constructions; case (c) is rule `5407067979`. |
+| `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_848_Figure_2.jpeg` | 247,033 | `1194x1308` | `0bfecfeff1bd81072838e39704fc6572632dee083f91ddc4370909b0e2c5b5dd` | Full three-color rule examples drawn from the `4,277` doubling rules found among all `3^27`; printed numbers are rule labels, not observer IDs. |
+| `CHAPTERS/8-Implications-for-Everyday-Systems/Images/_page_406_Picture_1.jpeg` | 200,732 | `1179x968` | `08c35506c17c24d45a9b00de910ea13674ee087fdaf827464e40bae81ba2fe23` | Three-color radius-one one-entry mutation sequence. Each label has 27 positions; a dot means retain the old center color. Exact random choices/tables are absent, so this is a disposition/provenance fixture rather than a golden trajectory. |
+| `CHAPTERS/9-Fundamental-Physics/Images/_page_451_Picture_6.jpeg` | 187,275 | `1103x483` | `e7bbbefb729e76dd5d080d0b841a485ece898d9c3197780b4871c742d61a4e89` | Six reversible full-rule panels labelled `270361043509`, `277206003607`, `1123289366095`, `1123956776897`, `3097483878567`, and `3681848058291`. |
+| `BACK-MATTER/Index/Images/_page_1032_Picture_10.jpeg` | 4,216 | `142x122` | `4a40921d9eb75316d5294c8cd22cefcd8649d12ffec3d5eb4df414835fbcf4ae` | Rule `2828556973047`; first of the inverse-neighborhood examples. |
+| `BACK-MATTER/Index/Images/_page_1032_Picture_11.jpeg` | 3,016 | `117x125` | `2b6326f90f10d4f887be2cfeb69ec6f7712a72572868dd0a49fe0dd407ce6093` | Rule `3762560660157`; second inverse-neighborhood example. |
+| `BACK-MATTER/Index/Images/_page_1032_Picture_12.jpeg` | 5,648 | `125x143` | `436feb4ebafa0c946142e22a2c45011d84ce23f0000e75e6cb5143969efba69c` | Rule `538556225233`; third inverse-neighborhood example. |
+| `BACK-MATTER/Index/Images/_page_1032_Picture_13.jpeg` | 4,424 | `128x143` | `0ca11e29343741d99227175123d39260b87854891cb81be88e1df96ff12c64e7` | Rule `3066231781977`; fourth inverse-neighborhood example. |
+| `BACK-MATTER/Colophon/Images/_page_1201_Picture_4.jpeg` | 18,451 | `386x261` | `5ce5638ca129527ea5c5fc2c7e2fe7e204c8af5fbf7349d3da60f445634292b7` | Supporting Notes panels labelled `304911688608`, `308527554123`, `1183925790477`, `2672802162657`; the first three yield `3n`, the last `2n-2`. Exact input/horizon is not restated there, so it is not a trajectory golden. |
+
+Page 847/Notes count the source's `3n-1` displayed states for rule `5407067979`: executable first arrival is `3n-2` transition events. The existing exact semantic oracle preserves this event/state distinction.
+
+### Explicit exclusions and relation-only dispositions
+
+| Asset path under `ref/A-New-Kind-of-Science/` | Bytes | Dimensions | SHA-256 | Disposition |
+|---|---:|---:|---|---|
+| `CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_75_Figure_6.jpeg` | 51,178 | `610x446` | `acb13963632286960ca61b616ff2f45a940750f3ab7deb5e6fbf696543015c15` | Totalistic code `777`; T04 material exclusion. |
+| `CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_76_Figure_2.jpeg` | 174,691 | `1109x1279` | `8c11659c8bd63d37a972c5ffab376b62948f7c4e05f9fd10f239e51464f4084d` | Three-color totalistic gallery; T04 material exclusion. |
+| `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_25.jpeg` | 5,511 | `211x117` | `d53637ce9ec50330d5fa6239b23f48d57b563266a0085a23517d4538020fd5fb` | Directly adjacent but explicitly totalistic `k=3` code `867`; not the general-rule fixture. |
+| `CHAPTERS/11-The-Notion-of-Computation/Images/_page_670_Figure_1.jpeg` | 281,966 | `1064x1224` | `a1a2a5c04b509ecc0357273387b2950d179478c65406427751904987ec9e8d3e` | Totalistic code `1599` encoded into a binary larger-neighborhood CA; emulation relation, not a T02 transition golden. |
+| `CHAPTERS/11-The-Notion-of-Computation/Images/_page_707_Figure_1.jpeg` | 327,160 | `1130x1111` | `974e12d28e8acc6fb4af26f7b1dd09eae1f30d802666a61f41abed8ec2d42e19` | Mixed gallery: ECA 110, second-order 37, two-color range-two totalistic 52, and three-color totalistic 1815. |
+| `CHAPTERS/11-The-Notion-of-Computation/Images/_page_675_Figure_1.jpeg` | 231,351 | `987x946` | `fd5d18341f9bb6067319739ea18d34467bc3ef5a568a280ecbc8cb693204f38b` | Valid 28-color nearest-neighbor instance, but its subject is sequential-substitution emulation and its full table/settings are absent; relation-only. |
+| `CHAPTERS/11-The-Notion-of-Computation/Images/_page_677_Figure_2.jpeg` | 173,594 | `1033x1034` | `8a59e423d080cdcfd5fbeb61170c099dc6ec904702e27385627427d56373f543` | Valid five-color nearest-neighbor instance, but its subject is logic-circuit emulation and its full table/settings are absent; relation-only. |
+
+The monolith omits `Images/` from links. `_page_883_Picture_23.jpeg` is Notes-for-Chapter-2 evidence despite its Chapter-12 filesystem placement; the four page-1032 Notes assets are under `Index/Images`; the page-1201 Notes asset is under `Colophon/Images`. The split/misrouted copies are duplicate references to these same bytes, not extra evidence or assets.
+
+The following dependency-free metadata oracle parses JPEG SOF markers directly and pins every included, excluded, and relation-only file:
+
+```bash
+python3 - <<'PY'
+from hashlib import sha256
+from pathlib import Path
+
+ROOT=Path('ref/A-New-Kind-of-Science')
+items={
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_23.jpeg':(4478,160,117,'132528352f363e52a20e73e1e8341203126448c0c6c8545eed48626eaddac16c','I'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_847_Figure_1.jpeg':(111064,1041,385,'2d36e7eaeb3b073e68621ef5f9c1c397ae24ddc74fe06f26e62546ccc3af2902','I'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_848_Figure_2.jpeg':(247033,1194,1308,'0bfecfeff1bd81072838e39704fc6572632dee083f91ddc4370909b0e2c5b5dd','I'),
+'CHAPTERS/8-Implications-for-Everyday-Systems/Images/_page_406_Picture_1.jpeg':(200732,1179,968,'08c35506c17c24d45a9b00de910ea13674ee087fdaf827464e40bae81ba2fe23','I'),
+'CHAPTERS/9-Fundamental-Physics/Images/_page_451_Picture_6.jpeg':(187275,1103,483,'e7bbbefb729e76dd5d080d0b841a485ece898d9c3197780b4871c742d61a4e89','I'),
+'BACK-MATTER/Index/Images/_page_1032_Picture_10.jpeg':(4216,142,122,'4a40921d9eb75316d5294c8cd22cefcd8649d12ffec3d5eb4df414835fbcf4ae','I'),
+'BACK-MATTER/Index/Images/_page_1032_Picture_11.jpeg':(3016,117,125,'2b6326f90f10d4f887be2cfeb69ec6f7712a72572868dd0a49fe0dd407ce6093','I'),
+'BACK-MATTER/Index/Images/_page_1032_Picture_12.jpeg':(5648,125,143,'436feb4ebafa0c946142e22a2c45011d84ce23f0000e75e6cb5143969efba69c','I'),
+'BACK-MATTER/Index/Images/_page_1032_Picture_13.jpeg':(4424,128,143,'0ca11e29343741d99227175123d39260b87854891cb81be88e1df96ff12c64e7','I'),
+'BACK-MATTER/Colophon/Images/_page_1201_Picture_4.jpeg':(18451,386,261,'5ce5638ca129527ea5c5fc2c7e2fe7e204c8af5fbf7349d3da60f445634292b7','I'),
+'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_75_Figure_6.jpeg':(51178,610,446,'acb13963632286960ca61b616ff2f45a940750f3ab7deb5e6fbf696543015c15','X'),
+'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_76_Figure_2.jpeg':(174691,1109,1279,'8c11659c8bd63d37a972c5ffab376b62948f7c4e05f9fd10f239e51464f4084d','X'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_25.jpeg':(5511,211,117,'d53637ce9ec50330d5fa6239b23f48d57b563266a0085a23517d4538020fd5fb','X'),
+'CHAPTERS/11-The-Notion-of-Computation/Images/_page_670_Figure_1.jpeg':(281966,1064,1224,'a1a2a5c04b509ecc0357273387b2950d179478c65406427751904987ec9e8d3e','X'),
+'CHAPTERS/11-The-Notion-of-Computation/Images/_page_707_Figure_1.jpeg':(327160,1130,1111,'974e12d28e8acc6fb4af26f7b1dd09eae1f30d802666a61f41abed8ec2d42e19','X'),
+'CHAPTERS/11-The-Notion-of-Computation/Images/_page_675_Figure_1.jpeg':(231351,987,946,'fd5d18341f9bb6067319739ea18d34467bc3ef5a568a280ecbc8cb693204f38b','R'),
+'CHAPTERS/11-The-Notion-of-Computation/Images/_page_677_Figure_2.jpeg':(173594,1033,1034,'8a59e423d080cdcfd5fbeb61170c099dc6ec904702e27385627427d56373f543','R'),
+}
+
+def jpeg_size(data):
+    assert data[:2]==b'\xff\xd8'
+    sof={0xc0,0xc1,0xc2,0xc3,0xc5,0xc6,0xc7,0xc9,0xca,0xcb,0xcd,0xce,0xcf}
+    i=2
+    while i<len(data):
+        while i<len(data) and data[i]!=0xff: i+=1
+        while i<len(data) and data[i]==0xff: i+=1
+        assert i<len(data)
+        marker=data[i]; i+=1
+        if marker in {0x00,0x01} or 0xd0<=marker<=0xd9:
+            continue
+        size=int.from_bytes(data[i:i+2],'big')
+        if marker in sof:
+            h=int.from_bytes(data[i+3:i+5],'big')
+            w=int.from_bytes(data[i+5:i+7],'big')
+            return w,h
+        i+=size
+    raise AssertionError('JPEG SOF marker not found')
+
+counts={'I':0,'X':0,'R':0}
+for name,(size,w,h,digest,kind) in items.items():
+    path=ROOT/name; data=path.read_bytes()
+    assert (len(data),*jpeg_size(data),sha256(data).hexdigest())==(size,w,h,digest)
+    counts[kind]+=1
+assert counts=={'I':10,'X':5,'R':2}
+print('T02 metadata oracle: PASS 10 included; 5 excluded; 2 relation-only')
+PY
+```
+
+Recorded output:
+
+```text
+T02 metadata oracle: PASS 10 included; 5 excluded; 2 relation-only
+```
+
+The printed reversible and inverse-range labels also have an independent, dependency-free semantic check. The Notes state that cyclic words through length nine suffice for `k=3,r=1`; the same finite domain recovers the four printed inverse-window sizes. A window `start` is relative to the predecessor cell whose value is reconstructed.
+
+```bash
+python3 - <<'PY'
+from itertools import product
+
+main=[270361043509,277206003607,1123289366095,
+      1123956776897,3097483878567,3681848058291]
+notes=[2828556973047,3762560660157,538556225233,3066231781977]
+
+def table(code):
+    out=[]
+    for _ in range(27): out.append(code%3); code//=3
+    assert code==0
+    return out
+
+def step(rule,state):
+    n=len(state)
+    return tuple(rule[9*state[(i-1)%n]+3*state[i]+state[(i+1)%n]]
+                 for i in range(n))
+
+for code in main+notes:
+    rule=table(code)
+    for n in range(1,10):
+        assert len({step(rule,a) for a in product(range(3),repeat=n)})==3**n
+
+def inverse_window(code):
+    rule=table(code); n=9
+    pairs=[(a,step(rule,a)) for a in product(range(3),repeat=n)]
+    for width in range(1,7):
+        for start in range(-6,7):
+            seen={}; valid=True
+            for old,new in pairs:
+                for i,value in enumerate(old):
+                    key=tuple(new[(i+start+j)%n] for j in range(width))
+                    prior=seen.setdefault(key,value)
+                    if prior!=value:
+                        valid=False; break
+                if not valid: break
+            if valid: return width,start,len(seen)
+    raise AssertionError(code)
+
+windows=[inverse_window(code) for code in notes]
+assert windows==[(3,1,27),(4,-1,81),(5,-2,243),(6,-2,729)]
+print('reversible_label_codes=',len(main+notes))
+print('inverse_windows=',windows)
+print('T02 reversible-label oracle: PASS')
+PY
+```
+
+Recorded output:
+
+```text
+reversible_label_codes= 10
+inverse_windows= [(3, 1, 27), (4, -1, 81), (5, -2, 243), (6, -2, 729)]
+T02 reversible-label oracle: PASS
+```
+
+### Official-source repair provenance
+
+The official primary [all-notes PDF](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf) was used only to repair extraction damage and confirm image labels. PDF page 20 / printed page 868 confirms the exact rule-`921408` invocation and 100-update request. PDF page 164 / printed page 1017 repairs `BOOK:16025` and the misrouted Index duplicate: the four rule labels are `2828556973047`, `3762560660157`, `538556225233`, `3066231781977`, and the examples are ordered by inverse neighborhood sizes `3,4,5,6`; the local repeated-`3` text is OCR corruption. PDF pages 330-331 / printed pages 1185-1186 confirm rule `5407067979`, the displayed-state count, and the four page-1201 labels. No web source changes native mechanics or supplies an unstated initial condition.
+
+### Direct rule-921408 raster oracle
+
+This is the sole source-permitted raster golden. It reconstructs the exact LSB-first base-3 table, 101 initial-inclusive states, and the actual 151-column nonzero support. The JPEG comparison uses half-open crop `(22,22,145,101)`, state-to-darkness values `0,128,255`, and bicubic resize from `151x101` to `123x79`. Tone and resampling are observer conventions only.
+
+```bash
+python3 - <<'PY'
+from math import sqrt
+from pathlib import Path
+from PIL import Image
+
+path=Path('ref/A-New-Kind-of-Science/CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_23.jpeg')
+code=921408
+rule=[]
+for _ in range(27):
+    rule.append(code%3); code//=3
+assert code==0
+
+state=[0]*201; state[100]=1; history=[]
+for _ in range(101):
+    history.append(state)
+    state=[rule[9*(state[i-1] if i else 0)+3*state[i]
+                +(state[i+1] if i+1<len(state) else 0)]
+           for i in range(201)]
+used=[i for row in history for i,value in enumerate(row) if value]
+assert (min(used),max(used))==(50,200)
+history=[row[50:201] for row in history]
+
+expected=Image.new('L',(151,101))
+expected.putdata([0 if v==0 else 128 if v==1 else 255
+                  for row in history for v in row])
+expected=list(expected.resize((123,79),Image.Resampling.BICUBIC).getdata())
+observed=[255-v for v in Image.open(path).convert('L')
+          .crop((22,22,145,101)).getdata()]
+n=len(observed); sa=sum(observed); sb=sum(expected)
+saa=sum(v*v for v in observed); sbb=sum(v*v for v in expected)
+sab=sum(a*b for a,b in zip(observed,expected))
+r=(n*sab-sa*sb)/sqrt((n*saa-sa*sa)*(n*sbb-sb*sb))
+mae=sum(abs(a-b) for a,b in zip(observed,expected))/n
+rmse=sqrt(sum((a-b)**2 for a,b in zip(observed,expected))/n)
+print(f'rule921408: r={r:.12f}; mae={mae:.9f}; rmse={rmse:.9f}; crop=123x79')
+assert r>=.985 and mae<=5.0 and rmse<=9.0
+print('T02 direct raster oracle: PASS')
+PY
+```
+
+Recorded output:
+
+```text
+rule921408: r=0.989621884093; mae=4.113100751; rmse=8.052767980; crop=123x79
+T02 direct raster oracle: PASS
+```
+
+The mutation, reversible, doubling-search, inverse-range, and emulation images do not state enough renderer settings, exact initial arrays, random choices, or full tables for additional pixel goldens. Their permitted roles are identity, property, provenance, and relation evidence only.
 
 ## Detailed Implementation Plan
 
