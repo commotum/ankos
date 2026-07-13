@@ -240,7 +240,7 @@ ArithmeticRun = {
 }
 ```
 
-Its state at event index `t` is one scalar `x_t`. There is no spatial support, alphabet of digit cells, cursor, head, branch control, mutable program, boundary condition, or hidden arithmetic accumulator. The canonical source is `UniqueScalar`, its read is the complete old scalar, the result is `Assign(ScalarSlot, x_next)`, and atomic single-slot replacement commits it. Thus T34 needs a scalar carrier and a closed arithmetic rule algebra, but not a ninth update law.
+Its state at event index `t` is one scalar `x_t`. There is no spatial support, alphabet of digit cells, cursor, head, branch control, mutable program, boundary condition, or hidden arithmetic accumulator. The singleton locus is the FRONTIER, its NEIGHBORHOOD is the complete old scalar, RULE returns `Write(ScalarSlot, x_next)`, and ordinary same-locus UPDATE commits it. Thus T34 needs a scalar value carrier and a closed arithmetic RULE algebra, but no construction-specific assignment class or executor.
 
 The two evidenced operations have exact semantics:
 
@@ -296,13 +296,14 @@ Identity is structural and domain-tagged. `ExactInteger(1)` and `ExactRational(1
 One event is evaluated against one immutable old scalar:
 
 ```text
-proposal = ArithmeticAssignment(
+proposal = Write(
+    locus=ScalarSlot,
     source=UniqueScalar,
     old=x_t,
     operation=program.operation,
     value=step(program.operation, x_t),
 )
-x_(t+1) = proposal.value
+x_(t+1) = UPDATE.apply(x_t, UniqueScalar, (proposal,)).successor
 ```
 
 Every valid strict exact event has exactly one successor. An identity event—`AddConstant(0)`, `MultiplyConstant(1)`, or multiplication of zero—still returns `Advanced(changed=false)` and records an event. There is no native halt, fixed-point stop, cycle stop, digit-width cap, target magnitude, or convergence threshold. Those are observers or run policies.

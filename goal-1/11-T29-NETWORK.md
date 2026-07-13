@@ -29,7 +29,7 @@ The evidence/search closure and conformance fixtures remain valid. A rooted grap
 - The parallel construction has zero unresolved native mechanics. A related sequential-network note supplies a six-row `{rewrite,move_port}` table and its figure evidences reachability pruning, but neither prose, figure, nor official program data determines old-edge versus committed-edge movement, projection anchor, or projection/movement order. That variant is explicitly deferred behind a source-acquisition gate rather than guessed.
 - Fixed-topology cellular automata and Boolean networks, undirected trivalent space networks, cluster substitution, network mobile automata, causal networks, multiway evolution, and constraint-defined networks are related constructions, not switches on the T29 parallel executor.
 - T29 is the first catalog row whose Markov state contains mutable cyclic topology. T20 ordered trees cannot preserve arbitrary sharing/cycles, and T27 occurrence bags have no adjacency.
-- The current runtime contains no graph carrier, graph selector, port-path read, fresh-node effect, graph commit, isomorphism codec, or ragged graph trace. A seventh update law is required.
+- The current runtime contains no graph carrier, graph selector, port-path read, fresh-node write, graph UPDATE policy, isomorphism codec, or ragged graph trace. These are typed additions to the common axes, not grounds for a network executor.
 
 ## Updated Assumptions
 
@@ -336,7 +336,7 @@ Program validation establishes:
 - row order is serialization only;
 - no missing-row fallback, first-match behavior, or Mathematica unmatched-expression behavior leaks into semantics.
 
-### All-node source selection and the seventh update law
+### All-node FRONTIER and graph UPDATE policy
 
 `AllNetworkNodes` selects every old vertex exactly once. The selector may expose snapshot-scoped source handles in any order because commit is equivariant; a reference order may use the current Notes list. `PortPathRead` evaluates all declared endpoints and the probe key against the immutable old graph. The result lookup returns the one closed row for that key.
 
@@ -361,7 +361,7 @@ ParallelPortGraphRewrite =
     UPDATE: ParallelRerouteCreateProject
 ```
 
-This is a seventh public update law. It is not fixed-support assignment: edges and support both change. It is not T13 concatenation or T27 bag expansion: old nodes survive, their topology mutates, and only some result occurrences create children. It is not T20 tree replacement: sharing and cycles are native. Private proposal-validation, lineage, token-allocation, and immutable-snapshot utilities may be shared.
+This typed graph UPDATE policy is not fixed-support assignment: edges and support both change. It is not T13 concatenation or T27 bag expansion: old nodes survive, their topology mutates, and only some result occurrences create children. It is not T20 tree replacement: sharing and cycles are native. Those differences justify the graph policy and its validators inside the common runner, not a seventh executor or top-level semantic class. Proposal validation, lineage, token allocation, and immutable-snapshot utilities may be shared.
 
 ### Why post-commit root projection is exact
 

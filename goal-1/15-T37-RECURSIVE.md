@@ -36,7 +36,7 @@ The evidence/search closure and conformance fixtures remain valid. The full pref
 
 ## Big Picture Objective
 
-Reconstruct fixed-dependency recursive sequences as an exact append construction. Pin down indexed prefix state, fresh seeds and verified checkpoints, a closed recurrence algebra, old-prefix dependency reads, one-term append results, the ninth update law, deterministic outcomes, equality and serialization, compact trace storage, lag-window quotients, canonical figure oracles, related nonlinear examples, neighboring construction boundaries, and the smallest honest Goal 2 integration.
+Reconstruct fixed-dependency recursive sequences as an exact append construction. Pin down indexed prefix state, fresh seeds and verified checkpoints, a closed recurrence algebra, old-prefix dependency reads, one-term append results, the endpoint-insertion UPDATE preset, deterministic outcomes, equality and serialization, compact trace storage, lag-window quotients, canonical figure oracles, related nonlinear examples, neighboring construction boundaries, and the smallest honest Goal 2 integration.
 
 ## Catalog Identity
 
@@ -256,15 +256,15 @@ AppendTerm(source, dependency_refs, exact_value)
 
 Dependency references are provenance and validation witnesses as well as inputs. Reusing one lag multiple times in an expression reads the same old occurrence; it does not create multiple mutable terms.
 
-### Ninth update law
+### Endpoint-insertion UPDATE preset
 
-`AppendOnlySequenceUpdate(old,result)` validates the snapshot/source, exact target index, complete dependency footprint, old values, result domain, and one-result cardinality. It then returns
+The endpoint-insertion UPDATE preset validates the snapshot/source, exact target index, complete dependency footprint, old values, result domain, and one-result cardinality. It then returns
 
 ```text
 NumericPrefix(D, o, old.terms ++ (result.value,)).
 ```
 
-Every old index/value is preserved exactly, exactly one fresh endpoint is created, and the commit is atomic. It is not T34 assignment because no old term is overwritten; not T16 splice because no nonempty match is consumed; and not T17 queue update because no prefix is deleted. A private persistent-vector endpoint-insert kernel may be shared without merging the public laws.
+Every old index/value is preserved exactly, exactly one fresh endpoint is created, and the commit is atomic. This typed policy differs from T34 same-locus assignment because no old term is overwritten, from T16 interval splice because no nonempty match is consumed, and from T17 queue replacement because no prefix is deleted. The difference belongs on the UPDATE axis of the common runner; it is not a ninth execution algebra.
 
 ### Successors, invalidity, and outcomes
 

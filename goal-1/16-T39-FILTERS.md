@@ -16,7 +16,7 @@ The evidence/search closure and conformance fixtures remain valid. Visible `(sur
 - The faithful display profile and the mathematical prime profile must remain distinct. The former preserves the anomalous `1`; the latter uses candidate domain `2..N` or an explicit pre-exclusion of `1`.
 - A finite completed survivor set, the mathematical set of primes, an increasing prime stream, a query about one integer, and a sieve execution trace are different objects even when their integer outputs agree.
 - Page 148 contains six derived prime observers. Page 150 contains five pointwise arithmetic-measurement sequences. None is mutable survivor state merely because its values are indexed by integers.
-- T39 adds a tenth public update sibling, `MonotoneFilterUpdate`, for atomic deletion of a noncontiguous candidate subset while preserving every survivor's identity and order. A Boolean raster assignment is only a finite realization of this law.
+- T39 requires a typed monotone subset-removal UPDATE policy for atomic deletion of a noncontiguous candidate subset while preserving every survivor's identity and order. A Boolean raster assignment is one finite realization, not the native identity-bearing representation.
 - T37's Ulam boundary resolves compositionally: T39 selects the first qualifying ascending candidate from the complete old prefix, then T37 commits its existing one-term append. The displayed Ulam prefix itself proves unordered, distinct-old-index pair counting.
 - Current selectors split universe/predicate/order responsibilities usefully, but require finite four-coordinate NumPy universes and unrestricted callables. Current rollout has no closed number-theoretic predicate, intensional infinite domain, survivor update, exact filter trace, or arithmetic-measurement profile.
 - The exhaustive audit found zero unresolved source candidates: seven raster files, twelve plotted profiles, strict main, Notes, actual Index, split, history, aliases, direct and analytic algorithms, decimation/Josephus, prime CA emulation, Ulam composition, and every broad-search candidate are dispositioned.
@@ -380,7 +380,7 @@ next_divisor = d + 1
 
 It validates subset membership, exact predicate witnesses, no resurrection, one stage increment, unchanged retained identities/values, and unchanged increasing order. Infinite events serialize `hits` by their structural proper-multiple descriptor rather than an impossible list.
 
-### 6. Why this is the tenth update law
+### 6. Why subset removal needs a typed UPDATE policy
 
 This event removes an arbitrary noncontiguous subset while persistent candidates keep their identities and relative order. T16 replaces one interval, T17 consumes one prefix and appends at the tail, T20 replaces selected tree substructures, T27 replaces every bag occurrence, T30 merges a successor set, T34 assigns one scalar, and T37 appends one endpoint. None has the same validator or conservation law.
 
@@ -453,7 +453,7 @@ UlamCandidateRead(prefix) = {
 }
 ```
 
-Rejected candidate checks form a nested `SelectionWitness`; they are not T37 prefix states. The accepted value becomes T37 `AppendTerm` and uses the existing ninth `AppendOnlySequenceUpdate`. Pair-sum frequencies are a reproducible derived cache, never hidden semantic state.
+Rejected candidate checks form a nested `SelectionWitness`; they are not T37 prefix states. The accepted value becomes a T37 term-insertion write and uses the existing endpoint-insertion UPDATE preset. Pair-sum frequencies are a reproducible derived cache, never hidden semantic state.
 
 The canonical source prefix is:
 
@@ -650,13 +650,13 @@ Existing spatial behavior remains valid. A later adapter may render finite sieve
 7. Infinite mathematical scope is structural. Fixed capacity, truncated arrays, and finite crop equality are rejected.
 8. Representation convention is semantic program data. The page-150 and Ulam oracles show that `ways` without ordering/distinctness data is insufficient.
 9. The source's `1`, `PrimePi`, OCR, and `LogIntegral` issues remain visible named repairs. Conformance never changes an awkward profile silently.
-10. T37 remains simpler after composition: its prefix, read timing, and ninth update are unchanged. T39 contributes a reusable first-accepted selection service, not a recurrence exception.
+10. T37 remains simpler after composition: its prefix, read timing, and endpoint-insertion UPDATE preset are unchanged. T39 contributes a reusable first-accepted selection service, not a recurrence exception.
 
 ### Re-integration audit
 
 1. Prior assumption invalidated: Ulam no longer remains unresolved. Its source prefix pins an honest T37/T39 composition.
 2. Reuse: exact integers, persistent ordered identity, generic outcomes, compact typed traces, and T37 append retain their meanings.
-3. New capability: one closed integer-domain/predicate/measurement layer and one tenth update law; no flags, hidden cursor, duplicate executor, or arbitrary callback.
+3. New capability: one closed integer-support/predicate/measurement layer and one typed subset-removal UPDATE policy; no flags, hidden cursor, duplicate executor, or arbitrary callback.
 4. State contains every advance-relevant value. Derived pair-sum caches and removed-set reconstructions are reproducible.
 5. Support, values, control, and representation remain distinct: candidate identity/order is support; cursor is control; predicates are programs; rasters are views.
 6. The defining consecutive sieve stays fused to its requested trace. Alternative primality/analytic solvers remain separate.

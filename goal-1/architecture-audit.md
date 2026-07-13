@@ -164,7 +164,7 @@ The classification number in this matrix refers to the four categories above. A 
 | D060 | Infinite/periodic/window/open scopes | 3 | Tagged support presentations/query scopes | Promotion rules explicit; no padding/boundary substitution | Keep |
 | D061 | Verification versus search/proof | 2 | Generic query/result/certificate envelope | Witnesses reverified; certificates replayed; bounded failure unknown | Keep; normalize value-set terminology |
 | D062 | 1D de Bruijn theorem | 2 | Analyzer/certificate preset | Scope limited to proved 1D relation | Keep outside state |
-| D063 | Count/oriented/existential evidence | 3 | Tagged relation forms in one constraint algebra | Orientation/global-existence roles preserved | Rewrite “separate classes” as variants; T31 handoff reopens |
+| D063 | Count/oriented/existential evidence | 3 | Tagged relation forms in one constraint algebra | Orientation/global-existence roles preserved | Rewritten/reclosed as variants; T31 remains a declarative nonfit |
 | D064 | Add/multiply one scalar per step | 2 | `t+0D` SimpleProgram with closed unary RULE and same-site write | Exact value carrier explicit; program/seed separate | Rewrite as unary-map presets, shared with T43 |
 | D065 | Integer/rational exactness and serialization | 3 | Tagged numeric ALPHABET/value carriers and representations | Exact normalization; no implicit float/promotion | Keep; replace numeric DOMAIN terminology |
 | D066 | One scalar replacement | 1 | Generic same-locus write and atomic UPDATE | One old read, one validated result; identity event advances | Keep reuse; retire `ArithmeticAssignment` class |
@@ -222,7 +222,7 @@ The classification number in this matrix refers to the four categories above. A 
 | D113 | Mutation/reversibility/search/emulation | 3 | Provenance/property/analyzer/representation relations | None becomes state or missing-row behavior | Keep |
 | D114 | Rank/valuation/palette roles | 2 | Mappings over one ALPHABET/value carrier | Each role explicit; equal shape does not imply same mapping | Keep and add role-vs-class rule |
 | D115 | Valuation-sum-table totalistic form | 3 | Factorized local RULE representation | Exact valuation, fixed arity, reachable-sum set, complete output table | Keep semantics; not a new executor/class |
-| D116 | Compact sum table expands losslessly to exhaustive table | 3 | Same denoted local function with two representations | Expansion/compaction commute and compact source identity/provenance retained | Rewrite denial of semantic equivalence; T03 handoff reopens |
+| D116 | Compact sum table expands losslessly to exhaustive table | 3 | Same denoted local function with two representations | Expansion/compaction commute and compact source identity/provenance retained | Rewritten/reclosed; T03 remains reopened only for independent asset repair |
 | D117 | Same lattice/frontier/read/commit | 1 | Shared CA preset/runner | General radius only parameterizes NEIGHBORHOOD/RULE validation | Keep |
 | D118 | T04/T05/T06/T07 and related reducers | 2 | Presets, predicates, properties, DOMAIN/NEIGHBORHOOD/RULETYPE variants | No executor flags; every representation/restriction validated | Keep preset ownership; rewrite claim that weighted/histogram/dimension/continuous values imply new construction classes |
 

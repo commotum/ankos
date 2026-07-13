@@ -218,27 +218,23 @@ RegisterProgram = (
 
 `EnumeratedInProgram` requires every target in `1..length` and is the profile counted by the book. `PositiveExitTargets` admits a target greater than `length`, which becomes exhausted control, and is required by E16. Zero/negative targets, invalid register keys, booleans masquerading as integers, missing/opaque instructions, and program mutation are invalid. They do not wrap, clamp, halt, or fall through.
 
-The visible Markov state is:
+The visible Markov state is the transparent product:
 
 ```text
-RegisterMachineState(
-    bank = FiniteRegisterBank[RegisterKey(k), Natural],
-    control = SingleControl(
-        key="program_counter",
-        position=PositiveProgramCounter,
-        payload=Unit,
-    ),
+RegisterMachineState = (
+    bank: FiniteRegisterBank[RegisterKey(k), Natural],
+    program_counter: PositiveProgramCounter,
 )
 ```
 
-The bank contains exactly `k` values. It is not a line: register 1 has no spatial neighbor relationship to register 2, and there is no boundary outside the bank. The counter addresses program text, not bank support. Program, seed, horizon, stop policy, and observers remain independent validated objects.
+Equivalently, the counter may be a unique visible marker over the finite program-address support. The product and marker encodings must have explicit inverse mappings on their valid images and commute one step at a time. Neither encoding requires a separate control class. The bank contains exactly `k` values. It is not a line: register 1 has no spatial neighbor relationship to register 2, and there is no boundary outside the bank. The counter addresses program text, not bank support. Program, seed, horizon, stop policy, and observers remain independent validated objects.
 
 ### Source, operand reads, and closed instruction results
 
 Program-coupled source selection is explicit:
 
 ```text
-ActiveInstruction.select(state.control, program) ->
+ActiveInstruction.select(state.program_counter, program) ->
     ExecutableInstructionSource(
         program_identity,
         snapshot_id,
@@ -257,27 +253,27 @@ Base evaluation returns a closed result sum carrying typed effects:
 IncrementResult(
     source,
     operand=(r, old),
-    effects=(Assign(RegisterSlot(r), old + 1),
-             TransitionControl(pc, pc + 1)),
+    writes=(Write(RegisterSlot(r), old + 1),
+            Write(ProgramCounterSlot, pc + 1)),
 )
 
 DecrementJumpTaken(
     source,
     operand=(r, old > 0),
-    effects=(Assign(RegisterSlot(r), old - 1),
-             TransitionControl(pc, target)),
+    writes=(Write(RegisterSlot(r), old - 1),
+            Write(ProgramCounterSlot, target)),
 )
 
 ZeroFallthrough(
     source,
     operand=(r, old == 0),
-    effects=(TransitionControl(pc, pc + 1),),
+    writes=(Write(ProgramCounterSlot, pc + 1),),
 )
 ```
 
-The result records its branch explicitly; zero need not fabricate an assignment from zero to zero. `AtomicEffectsUpdate` validates program identity, snapshot ownership, expected counter, expected old operand, register key/domain, effect uniqueness, and next counter, then commits all effects together. Any stale source, overflow/coercion, negative result, missing effect, extra write, contradictory target, or partial failure is an error with no state mutation.
+The result records its branch explicitly; zero need not fabricate a write from zero to zero. The ordinary finite-write UPDATE validates program identity, snapshot ownership, expected counter, expected old operand, register key/domain, write uniqueness, and next counter, then commits all component writes together. Any stale source, overflow/coercion, negative result, missing write, extra write, contradictory target, or partial failure is an error with no state mutation.
 
-This is substantive reuse of T09/T12. `Assign` targets a named value location and `TransitionControl` targets visible control; atomic update never required those targets to share a lattice. T19 adds instruction/result members but not a fifth update algebra.
+This is direct reuse of the same old-snapshot finite-write construction as T09/T12. A write targets a typed component of the transparent product; atomic update never requires all components to share a lattice or a runtime class. T19 adds register/address schemas and closed instruction RULE members, not another execution algebra.
 
 ### Exact instruction cycle
 

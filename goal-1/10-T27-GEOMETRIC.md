@@ -23,7 +23,7 @@ The evidence/search closure and conformance fixtures remain valid. Pose products
 - Arbitrary affine maps add translation, linear scaling, rotation, reflection, skew, and any finite dimension without changing full-generation bag expansion.
 - Nonlinear Möbius and inverse-square-root branch maps are an evidenced native point-map variant, not affine rigid-shape poses. They require a separate closed map AST/carrier while sharing all-occurrence branching and bag commit.
 - A limiting fractal/attractor, geometric union, 3D generation stack, complex-digit description, box-counting dimension, multifractal moments, and Mandelbrot parameter set are representations, observers, limits, or relations. None is the finite step state.
-- T13 supplies the all-old-occurrences/parent-child lineage pattern, but its ordered concatenation is not permutation-invariant bag union. T20 supplies typed structural provenance but not affine geometry. T27 proves a sixth sibling update law.
+- T13 supplies the all-old-occurrences/parent-child lineage pattern, but its ordered concatenation is not permutation-invariant bag union. T20 supplies typed structural provenance but not affine geometry. T27 requires a multiplicity-preserving bag-composition UPDATE policy on the common axis.
 - Current `seeds.fractal` is an unrestricted predicate rasterizer and current dataset “affine” transforms are downstream integer-coordinate augmentation metadata. Neither executes geometric replacement.
 
 ## Updated Assumptions
@@ -279,7 +279,7 @@ ReplaceGeometricOccurrence = {
 
 The result cannot contain an arbitrary world-coordinate callback or pre-rendered geometry. Composition is a visible typed calculation under the declared scalar domain.
 
-### Sixth sibling update law
+### Multiplicity-preserving bag UPDATE
 
 `ParallelOccurrenceBagReplace` commits one full generation:
 
@@ -291,7 +291,7 @@ The result cannot contain an arbitrary world-coordinate callback or pre-rendered
 
 There are no write conflicts because objects do not occupy exclusive cells. The update never intersects shapes, deduplicates poses, unions footprints, retains parents, rejects overlap, uses painter order, or fires newborns.
 
-This sixth public law differs from:
+This bag-composition UPDATE policy differs from:
 
 - T13 ordered parent/child concatenation, whose sequence order is semantic;
 - T20 prefix-free replacement inside one tree;

@@ -299,68 +299,69 @@ child(match) =
 
 One child contains one splice. Two overlapping or disjoint matches are alternatives, not a simultaneous edit set. A child is not rescanned until the next layer. Thus `A -> AA` sends `{A} -> {AA} -> {AAA}`, not directly to an unbounded result.
 
-### The eighth update law: exact branch merge
+### Native successor-set result and generic layer lift
 
-`DistinctBranchMerge` commits one old layer:
+The smallest native configuration is one exact word. For that word, the FRONTIER selects every applicable match of every clause against one frozen snapshot; the NEIGHBORHOOD exposes each exact span; and RULE returns one typed interval replacement per match. UPDATE applies the ordinary one-splice operation independently for each write and returns one uniform `StepResult[Word]`:
 
-1. validate that the supplied match/result set is exactly every applicable match of every clause in every old parent;
+1. validate that the supplied match/write collection is exactly the complete FRONTIER;
 2. apply one interval splice per match against the frozen parent word;
-3. group all results by exact child word;
-4. make the successor the set of group keys;
-5. record every parent with zero matches as a dead end;
-6. attach every rewrite witness to its child's derivation group;
-7. never carry an old parent merely because it existed in the previous layer.
+3. deduplicate successor words by exact equality;
+4. retain every `(parent, clause, span, child)` witness even when children coincide; and
+5. report a no-match parent with an empty successor set and an explicit quiescent/dead-end outcome.
 
 ```text
-ParallelLiteralMultiway =
-    STATE: MultiwayLayer
-    SOURCE: AllApplicableLiteralMatches
-    READ: MatchedWord
-    RULE: MultiwayLiteralProgram
-    RESULT: BranchIntervalReplacement
-    UPDATE: DistinctBranchMerge
+LiteralMultiwayStep =
+    CONFIGURATION: Word
+    FRONTIER: AllApplicableLiteralMatches
+    NEIGHBORHOOD: MatchedSpan
+    RULE: BranchIntervalReplacement
+    UPDATE: ExactSuccessorSet
+    RESULT: StepResult[Word]
 ```
 
-This is an eighth public update sibling after T29. T16's one-splice operation can be a private child-construction kernel, but T16 selects exactly one match and returns one word, whereas T30 covers all matches and exact-unions their children. Repeatedly invoking T16 with altered priorities cannot reproduce a single atomic multiway event without duplicating applicability, merge, dead-end, and snapshot semantics.
-
-The macro transition is deterministic:
+For a finite layer `P`, the generic powerset lift is
 
 ```text
-step: MultiwayLayer -> MultiwayLayer
+Lift(P) = union(result.successors for parent in P)
 ```
 
-Word-level alternatives do not imply random executor choice or a list of nondeterministic API returns. The one semantic successor is the complete set of alternatives.
+with witness provenance retained separately from exact child deduplication. T16's pure literal match/span/one-splice construction is therefore reused directly. T30 changes the successor cardinality and FRONTIER coverage; it does not require `MultiwayLayer` as native state, `DistinctBranchMerge` as an eighth law, or a multiway executor.
 
 ### Outcome semantics
 
-For every nonempty old layer:
+For one parent word with at least one match:
 
 ```text
-Advanced(
-    state = exact_set_of_children,
-    changed = (old_layer != exact_set_of_children),
-    event = MultiwayRewriteEvent(...)
+StepResult(
+    successors = exact_set_of_child_words,
+    outcome = Advanced(changed = (successors != {parent_word})),
+    event = MultiwayRewriteEvent(...),
 )
 ```
 
-This includes an all-dead event whose successor is `empty_layer`. An identity clause can produce an eventful `Advanced(changed=false)`. A recurrent layer or two-cycle continues to advance; no fixed/cycle stop is intrinsic.
+An identity clause can produce an eventful `Advanced(changed=false)`. A recurrent lifted layer or two-cycle continues to advance; no fixed/cycle stop is intrinsic.
 
-The executable reference maps `empty_layer` to itself with no witnesses. The architecture labels this:
+For a parent with no matches, the result has no successors and an explicit `Quiescent(DeadEnd)` outcome. The generic lift of an all-dead layer is the empty layer; lifting the empty layer again is event-free and remains empty. These typed outcomes distinguish both cases from invalidity or error, so an empty successor set is never ambiguous.
 
 ```text
-Quiescent(EmptyLayer, state=empty_layer)
-reference_successor = empty_layer
+StepResult(successors = {}, outcome = Quiescent(DeadEnd), event = ...)
+Lift({}) = {}
 ```
 
-This label distinguishes event-free empty-set stutter from the preceding all-dead rewrite event. It is not a claim that the book names a halt. Horizon, fixed/cycle observation, resource exhaustion, cancellation, invalidity, and error remain separate.
+This is not a claim that the book names a halt. Horizon, fixed/cycle observation, resource exhaustion, cancellation, invalidity, and error remain separate.
 
 ### Lossless trace and graph projections
 
-`MultiwayRewriteEvent` records:
+The generic layer traversal aggregates the per-word `StepResult` witnesses into a lossless `MultiwayLayerEvent`:
 
 ```text
 snapshot_id
 old_layer
+parent_results {
+    parent_word
+    outcome
+    exact_successors
+}
 rewrite_witnesses {
     parent_word
     clause
@@ -377,7 +378,7 @@ next_layer
 
 Exact reconstruction invariants are:
 
-- witnesses equal all and only applicable old matches;
+- each parent result is a native word-level step and witnesses equal all and only its applicable old matches;
 - every witness child equals the one-splice formula;
 - `next_layer` equals the exact set of witness children;
 - every next word has at least one witness;
