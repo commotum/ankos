@@ -332,25 +332,30 @@ T07 asset oracle: PASS 22 assets; refs=44; classes=4,7,11; unique_hashes=22
 
 ### Exact local action and predicate
 
-Let the ordered static read offsets of an eligible program be
+Let the ordered static read positions of an eligible program be
 
 ```text
-Delta = (delta_1, ..., delta_q).
+R = (p_1, ..., p_q),
+p_i = (component_i, slot_i, delta_i).
 ```
 
-The catalog reflection `h` acts on the one-dimensional spatial coordinate by `h(delta)=-delta`. Eligibility requires reflection closure and therefore a unique slot involution `pi` satisfying
+The catalog reflection `h` acts on the one-dimensional spatial coordinate by `h(delta)=-delta`. A declared component involution `beta` is identity for the scalar T07 row and may be explicit for a generic multi-component action. The schema supplies stable typed slot identities. Eligibility requires one validated typed-position involution `gamma`, represented by a permutation `pi`, such that
 
 ```text
-h(delta_i) = delta_pi(i).
+component_pi(i) = beta(component_i)
+delta_pi(i)     = h(delta_i)
+slot_pi(i)      = declared_mate(slot_i).
 ```
 
-For ordinary T07 colors, reflection leaves ALPHABET values unchanged. The complete-read action is
+Repeated geometric offsets in distinct components are valid: `(a,left,-1)` and `(b,left,-1)` are different typed positions. A canonical one-component stencil can derive its slot mates from its unique offsets; a richer schema must expose and validate them. Missing mates, a non-bijection, a non-involution, or an ambiguous *typed* mate is unsupported. Duplicate bare offsets alone are not an error and cannot define the action.
+
+For ordinary T07 colors, reflection leaves ALPHABET values unchanged. The complete-read action is the single simultaneous permutation
 
 ```text
 (rho v)_i = v_pi(i).
 ```
 
-For a centered radius-`r` stencil this is ordinary vector reversal. If the resolved deterministic local evaluator is `T:A^q->A`, define
+For a centered one-component radius-`r` stencil this is ordinary vector reversal. For several components it applies the same physical group element diagonally to the entire heterogeneous typed product, rather than choosing an independent reflection per component. If the resolved deterministic local evaluator is `T:A^q->A` in the scalar case, define
 
 ```text
 T^R(v) = T(rho v).
@@ -361,15 +366,15 @@ LeftRightSymmetric(P,h)
 
 The property is universal over complete typed local reads. A sampled run, family name, Boolean flag, code-number shortcut, or palette cannot establish it.
 
-The generic equivariant extension for oriented labels requires an explicit involution `alpha:A->A`:
+The generic equivariant extension requires compatible explicit value maps from each source component alphabet to its `beta`-mate alphabet and an output involution `alpha_out`. Writing their induced complete-read action as `rho_alpha`:
 
 ```text
-(rho_alpha v)_i = alpha(v_pi(i))
-T^h(v)           = alpha(T(rho_alpha v))
-T(rho_alpha v)   = alpha(T(v)).
+(rho_alpha v)_pi(i) = alpha_component_i(v_i)
+T^h(v)               = alpha_out(T(rho_alpha v))
+T(rho_alpha v)       = alpha_out(T(v)).
 ```
 
-That is not silently part of the scalar-color T07 catalog row. Black/white conjugation is explicitly separate in the source. An oriented tagged/product alphabet can support such an action, but the action, fixed outputs, and validation must be visible.
+All maps are identity in the scalar-color T07 catalog row. Black/white conjugation is explicitly separate in the source. An oriented tagged/product alphabet or component permutation can support a nontrivial action, but the position, component, input-value, output-value, fixed-output, and validation data must be visible.
 
 ### DOMAIN, writes, and global covariance
 
@@ -495,13 +500,13 @@ k^((k^(2r+1)-f*k^r)/2) * f^(f*k^r).
 
 The representation must encode those stabilizer constraints explicitly.
 
-The documented `ISOTROPIC` form also needs correction for multiple read components. Quotienting each component independently uses a product action and can over-collapse. One physical reflection must act diagonally on the complete read tuple, possibly permuting components. For example,
+The documented `ISOTROPIC` form also needs correction for multiple read components. Quotienting each component independently uses a product action and can over-collapse. One physical reflection must act diagonally on the complete read tuple, possibly permuting components. Equal geometric offsets in distinct components remain distinct typed positions. For example,
 
 ```text
 (a_left and b_left) or (a_right and b_right)
 ```
 
-is invariant when both components swap together, but not when just one swaps. Goal 2 must define one validated complete-read action, not unrelated per-component orbits.
+is invariant when `(a,left)<->(a,right)` and `(b,left)<->(b,right)` occur together, but not when just one component swaps. Goal 2 must define one validated action over typed positions, not infer identity from a bare offset multiset or form unrelated per-component orbits.
 
 ### Eligibility, results, and identity
 
@@ -509,8 +514,8 @@ T07 v1 reuses T06's strict CA property eligibility and adds action closure. The 
 
 - a finite typed ordered alphabet;
 - a fixed homogeneous `t+1D` support with the canonical spatial reflection;
-- a static finite current-snapshot read schema closed under that reflection;
-- a derived diagonal permutation of the complete read;
+- a static finite current-snapshot read schema of stable typed `(component,slot,offset)` positions closed under that reflection;
+- a validated component action and one induced diagonal permutation of the complete typed read, allowing equal offsets in distinct components;
 - a closed total deterministic structural evaluator;
 - `AllSites`, exactly one typed same-site assignment per selected site, and old-snapshot parallel update; and
 - the identity label/output action required by the catalog row.
@@ -536,7 +541,7 @@ OrbitRuleRepresentation
 Run / realization / observer
 ```
 
-Evidence binds claim/program/action digests, checker/evaluator versions, method (`ExhaustiveOrbitCheck` or validated structural proof), `C/F/O`, a canonical context-orbit digest, and—for failure—the first canonical representative, reflected read, and unequal typed outputs. Cancellation or resource exhaustion is not `DoesNotHold`. Passing selection returns the exact unchanged `P`; producing `P^h` or a compact table is a separate explicit transform.
+Evidence binds claim/program/action digests, the typed-position/component/value maps, checker/evaluator versions, method (`ExhaustiveOrbitCheck` or validated structural proof), applicable `C/F/O`, a canonical context-orbit digest, and—for failure—the first canonical representative, reflected read, and unequal typed outputs. Cancellation or resource exhaustion is not `DoesNotHold`. Passing selection returns the exact unchanged `P`; producing `P^h` or a compact table is a separate explicit transform.
 
 ### Dependency-free semantic oracle
 
