@@ -53,7 +53,7 @@ The literal absences are part of the result: contextual searches find no occurre
 | 10 | complexity/class/death/growth property phrases | 4 | 0 |
 | 11 | heading/Index drift guard | 11 | 6 |
 
-Q11 adds no new line to the union. The lexical union overlaps T03 on 110 of the full 168 candidates and T04 on 103; T05 therefore contributes respectively 58 and 65 independently found candidates beyond those inherited manifests. Neither prior stage can stand in for this stage's closure.
+Q11 adds no new line to the union. The full 168-candidate closure overlaps T03 on 110 lines and T04 on 103; T05 therefore contributes respectively 58 and 65 independently found candidates beyond those inherited manifests. Neither prior stage can stand in for this stage's closure.
 
 ### Exact reproducible source and split manifest
 
@@ -260,7 +260,7 @@ Twelve groups retain 28 verbatim fragments on 24 unique canonical source lines. 
 
 ### E9 — Class-frequency property boundary
 
-- Provenance: `BOOK:14224`; linked charts `BOOK:14226,14228,14230,14232`.
+- Provenance: `BOOK:14224`.
 - Establishes: one-dimensional totalistic systems are explicitly parameterized by `k` and `r`. Class frequency and chart sampling are analyzer/property evidence, not construction fields or preset defaults.
 
 > - **Frequencies of classes.** The pie charts below show results for 1D totalistic cellular automata with *k* colors and range *r*. Class 3 tends to become more common as the number of elements in the rule increases because as soon as any of these elements yield class 3 behavior, that behavior dominates the system.
