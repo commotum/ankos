@@ -274,6 +274,8 @@ All 51 direct-name lines and the complete rule/position-order, caption, Notes, I
 
 ### 7-T17-TAG
 
+Status: **IN PROGRESS** in `goal-1/7-T17-TAG.md`.
+
 #### Big Picture Objective
 
 Test queue-like state changes that consume a prefix, inspect it, append a block remotely, and halt on insufficient input.

@@ -42,7 +42,7 @@ Each type stage must make the following auditable:
 | T14 | 15 | Neighbor-Dependent Substitution Systems | 14 | `30-T14-CONTEXTUAL-SUBSTITUTION.md` | PENDING | Not started |
 | T15 | 16 | Creation-Destruction Substitution Systems | 15 | `31-T15-CREATION-DESTRUCTION.md` | PENDING | Not started |
 | T16 | 17 | Sequential Substitution Systems | 16 | `6-T16-SEQUENTIAL-SUBSTITUTION.md` | COMPLETE | 51 direct-name lines plus rule/position order, captions, Notes, aliases/history, Index/splits, stopping, overlap/confluence, finite-input, causal, generalized/multiway, and emulation routes dispositioned; 21 excerpt groups; 0 unresolved |
-| T17 | 18 | Tag Systems | 17 | `7-T17-TAG.md` | PENDING | Not started |
+| T17 | 18 | Tag Systems | 17 | `7-T17-TAG.md` | IN PROGRESS | Direct mechanics/examples, Notes/Index/splits/history, deletion/append/halting variants, numbering, initial conditions, and emulations under audit |
 | T18 | 19 | Cyclic Tag Systems | 18 | `32-T18-CYCLIC-TAG.md` | PENDING | Not started |
 | T19 | 20 | Register Machines | 19 | `8-T19-REGISTER.md` | PENDING | Not started |
 | T20 | 21 | Symbolic Systems | 20 | `9-T20-SYMBOLIC.md` | PENDING | Not started |
@@ -77,7 +77,7 @@ Each type stage must make the following auditable:
 - Foundation: complete in `1-FOUNDATION.md`.
 - Type stages complete: 5 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 40 pending, 0 in progress.
+- Type stages unresolved: 39 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
