@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 25 type stages are complete, no stage is reopened, and 20 later stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06 and T07 subsequently close under active D119 and D120. T08 is next.
+- Execution status at this sync is Foundation complete, 25 type stages are complete, T08 is in progress, no stage is reopened, and 19 later stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06 and T07 subsequently close under active D119 and D120.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures a DOMAIN/support/topology subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program space with its dimensional character, support, and topology; ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -797,6 +797,8 @@ COMPLETE after hostile reclosure. The original 357-line/22-asset manifest remain
 T07 adds no construction or execution branch: local displacement reflection is a class-2 property over one exact admissible typed read space and a single diagonal action; reflected programs are separate transforms; orbit tables are optional class-3 RULE representations. The repair separates typed positions, component/value/output actions, admissible-space closure `rho_alpha(V_P)=V_P`, and support-point from displacement reflection. D120 is active. All six embedded blocks, independent hostile review, Markdown/diff gates, and 102 repository tests pass. Next: T08.
 
 ### 27-T08-INITIAL-CONDITIONS
+
+Status: **IN PROGRESS — SOURCE/ASSET/ARCHITECTURE AUDIT ACTIVE** in `goal-1/27-T08-INITIAL-CONDITIONS.md`.
 
 #### Big Picture Objective
 

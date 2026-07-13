@@ -36,7 +36,7 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 | T05 | 6 | Higher-Color Totalistic Cellular Automata | 5 | `24-T05-HIGHERCOLOR-TOTALISTIC.md` | COMPLETE | Exact 11-query/142-lexical-line partition plus five governed follows and 25 assets = 172 candidates; 12 evidence groups at 47 provenance/47 fragments/40 quote lines; assets 5 included/13 relation-only/7 excluded; strict finite `k>=4,r=1` canonical T03 preset, code-1004600/cardinality/bigint/snapshot fixtures, five embedded oracles, independent review, and 102 tests; 0 unresolved candidates |
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | COMPLETE | Exact 329-line reconciled partition `4/30/129/76/21/69` with a pinned 19-family/280-line core; 47 physical assets at 5 included/29 relation-only/13 excluded and 94 reverse references; strict CA-axis eligibility, typed claim/evidence/selection/run identity, source/count/semantic/asset oracles, independent review, and 102 tests; 0 unresolved |
 | T07 | 8 | Left-Right Symmetric Cellular Automata | 7 | `26-T07-SYMMETRIC.md` | COMPLETE | Authoritative 650-line monolith protocol = bounded 357 + hostile remainder 293, partitioned `15/190/25/167/179/74`; 397 retained pre-Index lines; 114 retained additions reverse-join as 103 exact/11 variants without claiming exhaustive split-only semantics; 271 assets/542 references/271 hashes at 4 included/38 relation-only/229 excluded; diagonal typed action over exact `V_P`, generic admissible-space closure, six oracles, clean hostile review, and 102 tests; 0 unresolved |
-| T08 | 9 | Initial-Condition Classes | 8 | `27-T08-INITIAL-CONDITIONS.md` | PENDING | Not started |
+| T08 | 9 | Initial-Condition Classes | 8 | `27-T08-INITIAL-CONDITIONS.md` | IN PROGRESS | Source/asset/architecture audit active; testing typed deterministic/stochastic seed profiles, realized configuration, native support, finite realization, boundary, trace, and view separation over the shared runner |
 | T09 | 10 | Mobile Automata | 9 | `3-T09-MOBILE.md` | COMPLETE | Evidence and architecture reclosed: `Plain(bit) \| Active(bit)`, exactly-one invariant, firing-source frontier, radius-one native read, typed two-write lowering, atomic UPDATE, and compact 65,536-rule identity; no control class or family executor |
 | T10 | 11 | Extended Mobile Automata | 10 | `28-T10-EXTENDED-MOBILE.md` | PENDING | Not started |
 | T11 | 12 | Generalized Mobile Automata | 11 | `29-T11-GENERALIZED-MOBILE.md` | PENDING | Not started |
@@ -81,7 +81,7 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 - Type stages globally complete: 25 / 45.
 - Type stages evidence-closed / architecture-reopened: 0.
 - Type stages asset-reopened: 0.
-- Type stages unresolved: 20 pending; 0 reopened/in progress. T08 is next.
+- Type stages unresolved: 19 pending; 1 in progress (T08); 0 reopened.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
