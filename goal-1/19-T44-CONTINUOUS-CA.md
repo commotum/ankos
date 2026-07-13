@@ -188,6 +188,8 @@ sed -n '259,277p' tests/test_viz_export.py
 
 > “each cell is not just black or white, but instead can have any of a continuous range of possible levels of gray.”
 
+> “rules that are in a sense a cross between the totalistic cellular automaton rules ... and the iterated maps”
+
 > “The idea is to look at the average gray level of a cell and its immediate neighbors, and then to get the gray level for that cell at the next step by applying a fixed mapping to the result.”
 
 > “Starting from a single black cell, what happens in this case is that the gray essentially just diffuses away, leaving in the end a uniform pattern.”
@@ -499,7 +501,9 @@ The smallest closed strict program is:
 ContinuousCASpec {
   support: IntegerLine
          | FiniteCycle(length, labeled_origin)
-         | FiniteSegment(interval, exterior_policy),
+         | FiniteSegment(interval),
+  exterior: NoExterior
+          | SegmentExterior(policy, exterior_id),
   value_space: ClosedRealInterval(0, 1),
   neighborhood: OrderedOffsets(-1, 0, +1),
   local_rule: AggregateThenMap {
@@ -517,6 +521,8 @@ ContinuousCASpec {
   update: AtomicEffectsUpdate
 }
 ```
+
+Validation requires `NoExterior` for the integer line and intrinsic finite cycle, and one independently serialized `SegmentExterior` exactly for a finite segment. Thus the support ID, finite realization/topology ID, and exterior-read policy ID remain distinct even though one validated construction references all that it needs to advance.
 
 The exact strict seed is `X_0(0)=1` and `X_0(i)=0` for `i!=0`. For deterministic spatially homogeneous point-seed profiles, a normalized uniform-default field with finite overrides is an exact presentation of this total field and of every finite-horizon state; it is not a finite-support redefinition of the semantic field. A random initial field or per-site noisy profile generally needs an explicit finite realization or a separately typed lazy total random field/draw source and does not inherit this finite-deviation claim.
 
@@ -847,6 +853,149 @@ for root, name in assets:
 PY
 ```
 
+The following command was run verbatim from the repository root. It fixes the half-open crop convention, white/black transfer `round(255*(1-u))`, bilinear resampling, exact rational recurrence, score computation, and permissive JPEG thresholds; it writes no repository file:
+
+```bash
+uv run --with pillow --with numpy python - <<'PY'
+from fractions import Fraction
+from pathlib import Path
+from PIL import Image
+import numpy as np
+
+ROOT = Path('/home/jake/Developer/ankos')
+STRICT = ROOT / 'ref/A-New-Kind-of-Science/CHAPTERS/4-Systems-Based-on-Numbers/Images'
+NOTES = ROOT / 'ref/A-New-Kind-of-Science/BACK-MATTER/Index/Images'
+
+def gray(path):
+    return np.asarray(Image.open(path).convert('L'), dtype=np.float64)
+
+def render(q, shape):
+    h, w = shape
+    return np.asarray(
+        Image.fromarray(q).resize((w, h), Image.Resampling.BILINEAR),
+        dtype=np.float64,
+    )
+
+def score(name, obs, exp, r_min, mae_max):
+    r = float(np.corrcoef(obs.ravel(), exp.ravel())[0, 1])
+    mae = float(np.mean(np.abs(obs - exp)))
+    print(f'{name}: r={r:.12f}; mae={mae:.9f}; shape={obs.shape}')
+    assert obs.shape == exp.shape
+    assert r >= r_min, (name, r, r_min)
+    assert mae <= mae_max, (name, mae, mae_max)
+
+def evolve(width, seed, states, mode, c=Fraction(0)):
+    u = [Fraction(0) for _ in range(width)]
+    u[seed] = Fraction(1)
+    rows = []
+    for _ in range(states):
+        rows.append([float(x) for x in u])
+        if mode == 'mul32':
+            u = [((u[(i-1)%width]+u[i]+u[(i+1)%width])/2)%1
+                 for i in range(width)]
+        elif mode == 'addc':
+            u = [((u[(i-1)%width]+u[i]+u[(i+1)%width])/3+c)%1
+                 for i in range(width)]
+        elif mode == 'additive':
+            u = [(u[(i-1)%width]+u[(i+1)%width])%1
+                 for i in range(width)]
+        else:
+            raise ValueError(mode)
+    return np.asarray(rows, dtype=np.float64)
+
+def q8(u):
+    return np.rint(255.0*(1.0-u)).astype(np.uint8)
+
+# Page 172 main: 151 states; wide exact field, central 203-column crop.
+g = gray(STRICT/'_page_172_Picture_1.jpeg')
+u = evolve(601,300,151,'mul32')[:,199:402]
+obs = g[47:874,39:1151]
+exp = render(q8(u),obs.shape)
+score('p172-main-lower-unoccluded',obs[300:],exp[300:],.990,6.0)
+
+# Page 172 31x23 inset, direct cell-center samples.
+xb=np.rint(np.linspace(805,1127,32)).astype(int)
+yb=np.rint(np.linspace(64,304,24)).astype(int)
+xs=(xb[:-1]+xb[1:])//2
+ys=(yb[:-1]+yb[1:])//2
+obs=g[np.ix_(ys,xs)]
+u=evolve(31,15,23,'mul32')
+score('p172-inset-centers',obs,255.0*(1.0-u),.993,6.0)
+
+# Page 173 50x30 direct cell-center samples.
+g=gray(STRICT/'_page_173_Picture_3.jpeg')
+xb=np.rint(np.linspace(29,444,51)).astype(int)
+yb=np.rint(np.linspace(16,265,31)).astype(int)
+xs=(xb[:-1]+xb[1:])//2
+ys=(yb[:-1]+yb[1:])//2
+obs=g[np.ix_(ys,xs)]
+u=evolve(50,24,30,'addc',Fraction(1,4))
+score('p173-centers',obs,255.0*(1.0-u),.993,7.0)
+
+# Page 174 representative c=.1, 101x51.
+g=gray(STRICT/'_page_174_Picture_2.jpeg')
+u=evolve(101,50,51,'addc',Fraction(1,10))
+obs=g[259:398,413:693]
+score('p174-c0.1',obs,render(q8(u),obs.shape),.995,3.0)
+
+# Page 175 c=.1 state, 201 states, central 184-column reconstruction.
+g=gray(STRICT/'_page_175_Figure_2.jpeg')
+u=evolve(501,250,201,'addc',Fraction(1,10))[:,158:342]
+obs=g[69:424,63:384]
+score('p175-c0.1-state',obs,render(q8(u),obs.shape),.985,5.0)
+
+# Page 175 declared .3299, rational oracle, absolute right difference.
+u=evolve(501,250,201,'addc',Fraction(3299,10000))
+d=np.abs(u[:,158:343]-u[:,159:344])
+obs=g[475:829,437:763]
+score('p175-c0.3299-abs-right',obs,render(q8(d),obs.shape),.990,5.0)
+
+# Notes page 937 top: a=n/500 columns, t=1..150 rows.
+g=gray(NOTES/'_page_937_Picture_3.jpeg')
+n=np.arange(501,dtype=np.int64)[None,:]
+t=np.arange(1,151,dtype=np.int64)[:,None]
+u=((t*n)%500)/500.0
+obs=g[23:143,42:543]
+score('notes937-background',obs,render(q8(u),obs.shape),.700,30.0)
+
+# Notes page 937 additive first three exact-rational panels, 101x51.
+g=gray(NOTES/'_page_937_Picture_8.jpeg')
+for label,k,box in [
+    ('k2',Fraction(2),(33,29,191,106)),
+    ('k3',Fraction(3),(217,29,375,106)),
+    ('k7over3',Fraction(7,3),(402,29,560,106)),
+]:
+    u=[Fraction(0) for _ in range(101)]
+    u[50]=Fraction(1)/k
+    rows=[]
+    for _ in range(51):
+        rows.append([float(x) for x in u])
+        u=[(u[(i-1)%101]+u[(i+1)%101])%1 for i in range(101)]
+    rows=np.asarray(rows,dtype=np.float64)
+    x0,y0,x1,y1=box
+    obs=g[y0:y1,x0:x1]
+    score(f'notes937-additive-{label}',obs,render(q8(rows),obs.shape),.800,9.0)
+
+print('T44 core raster oracle: PASS')
+PY
+```
+
+Recorded output:
+
+```text
+p172-main-lower-unoccluded: r=0.993334649229; mae=5.274019494; shape=(527, 1112)
+p172-inset-centers: r=0.995882643601; mae=5.422086611; shape=(23, 31)
+p173-centers: r=0.994562593262; mae=6.603864422; shape=(30, 50)
+p174-c0.1: r=0.997868874924; mae=2.114080164; shape=(139, 280)
+p175-c0.1-state: r=0.987791869483; mae=4.398157167; shape=(355, 321)
+p175-c0.3299-abs-right: r=0.992953791832; mae=3.803447021; shape=(354, 326)
+notes937-background: r=0.720128343531; mae=26.222272122; shape=(120, 501)
+notes937-additive-k2: r=0.872066279505; mae=5.039536413; shape=(77, 158)
+notes937-additive-k3: r=0.836592450795; mae=5.971395693; shape=(77, 158)
+notes937-additive-k7over3: r=0.877814246188; mae=7.491533783; shape=(77, 158)
+T44 core raster oracle: PASS
+```
+
 The strict geometry and exact regeneration establish:
 
 - Page 171's extraction contains only the identity map diagram. The six-row diffusion evolution survives as rounded text; exact rows come from the trinomial oracle above.
@@ -857,7 +1006,7 @@ The strict geometry and exact regeneration establish:
 - Notes page 937 Picture 3 has two matrices over exact mathematical parameters `c=n/500`, `n=0..500`: uniform background and center cell. Columns are exactly `x=42+n`. The top represents `t=1..150`; bilinearly resizing its exact 150x501 background array into `x=42:543,y=23:143` gives `r=.72013`, MAE `26.22/255`, while the first-row gradient gives `r=.982`. Axes/JPEG and 150-to-120 vertical downsampling make this a visual check, not exact cell identity. The bottom uses the same axes/horizon for the exact center family.
 - Notes page 937 Picture 8 labels `k={2,3,7/3,81/73,Sqrt[2],Pi}` for the additive sibling. Each row-major panel encodes `t=0..50` and a 101-cell window in a 158x77 crop: `k=2` at `33:191,29:106`, `k=3` at `217:375,29:106`, `k=7/3` at `402:560,29:106`, `k=81/73` at `33:191,140:217`, `Sqrt[2]` at `217:375,140:217`, and `Pi` at `402:560,140:217`. Exact-rational fits for the first three are respectively `r=.87207/.83659/.87781`, MAE `5.04/5.97/7.49`; dense fourth and irrational panels are only about `.53-.56` under direct gray/JPEG fitting, so finite-raster precision remains underdetermined and appearance is not proof of equidistribution.
 
-The supporting page-258 gallery directly labels deterministic add-constant rules `c=0,.1,...,.9` and random initial fields, but width/horizon, field measure, generator, and seed are absent; its roughly 250x100 panel cadence is raster inference only. Page 259 directly labels `.39`, `.4`, and `{.5,1.13}`, all with random initial fields and neighbor-difference views; the last means the divisor-three rule `FractionalPart[(1.13L+C+1.13R)/3+.5]`, not division by `3.26`. Page 340 Figure 2 labels rule-90 perturbations `0%,5%,10%,15%` and rule-30 perturbations `0%,.5%,.8%,1%,2%,5%`; the full `Random[]` draws are unrecoverable, and a roughly 101-state/201-cell geometry is only an aspect-ratio inference. Figure 4 is the source `lambda` icon over about `[0,4]`, not evidence of `[0,1]` closure. Boiling directly labels heating rates `.05` and `.1`, but initial field, boundary, width, horizon, RNG, and numeric storage are absent; the literal wrap predicate is a bubble/latent-heat observer. The complex asset is a distinct alternating pair-block unitary sibling and cannot test the strict gray rule.
+The supporting page-258 gallery directly labels deterministic add-constant rules `c=0,.1,...,.9` and random initial fields, but width/horizon, field measure, generator, and seed are absent; its roughly 250x100 panel cadence is raster inference only. Page 259 directly labels `.39`, `.4`, and `{.5,1.13}`, all with random initial fields and neighbor-difference views; the last means the divisor-three rule `FractionalPart[(1.13L+C+1.13R)/3+.5]`, not division by `3.26`. Page 340 Figure 2 labels rule-90 perturbations `0%,5%,10%,15%` and rule-30 perturbations `0%,.5%,.8%,1%,2%,5%`; the full `Random[]` draws are unrecoverable, and a roughly 101-state/201-cell geometry is only an aspect-ratio inference. Figure 4 is the source `lambda` icon over about `[0,4]`, not evidence of `[0,1]` closure. Boiling directly labels heating rates `.05` and `.1`, but initial field, boundary, width, horizon, RNG, and numeric storage are absent. Its literal threshold-conditional wrap is transition semantics; emitted wrap/bubble-event records and their rendering are observers. The complex asset is a distinct alternating pair-block unitary sibling and cannot test the strict gray rule.
 
 Page 339 Figure 1 is explicitly excluded: it is discrete ECA rule 30 with varying counts of initial black cells, not continuous state (`108,161` bytes, `1105x410`, SHA-256 `8f3f13473abc794bc49321891b3c2ed636a9277c3faff84826772b74cd0e7ba9`). Probabilistic-CA page 591, PDE limits, and historical mentions are likewise distinct types or textual context. The cross-reference and raster audit is closed at 17 included assets and this one material exclusion; no semantic conclusion depends on an unstated renderer setting.
 
@@ -926,16 +1075,16 @@ The legacy Wolfram `Random[]` primitive fixes `U`'s marginal as a uniformly dist
 |---|---|---|
 | `DOMAIN`/`SHAPE` | `PARAMETERIZATION` for finite realizations; `PRINCIPLED EXTENSION` for native line | Finite 1D arrays fit explicit rings/segments but conflate support, work, crop, and trace (`simple_programs.md:115-198`) |
 | `ALPHABET` | `DIRECT` responsibility / `PRINCIPLED EXTENSION` | The abstract value-set responsibility fits, but the document supplies no continuous interval/exact-real contract (`simple_programs.md:200-233`) |
-| `SEED` | `DIRECT` responsibility / `PRINCIPLED EXTENSION` | Support/fill separation fits; exact continuous fields and random-real measures are absent (`:235-290`) |
-| `BOUNDARY` | `DIRECT` for the three explicit finite policies; `PRINCIPLED EXTENSION` for native line | Periodic matches Notes; fixed/reflective are distinct finite siblings. No-boundary integer-line semantics is absent (`:292-358`) |
-| `NEIGHBORHOOD` | `DIRECT` | Radius-one current-snapshot offsets fit (`:360-494`) |
-| `FRONTIER` | `DIRECT` for a finite time slice; `PRINCIPLED EXTENSION` for semantic unbounded `AllSites` | Full finite slices are directly expressible (`:1502-1510,1538-1563`); T01's source interpretation and integer line remain extensions |
-| Totalistic concept | `PARAMETERIZATION` at responsibility level | Permutation-invariant sum concept composes, but exact mean/divisor/range contract is absent (`:1964-1995`) |
-| Formulaic rule | `SEMANTIC MISMATCH` | Existing global-field callback is far too powerful and not stable closed data (`:2036-2065`) |
-| Same-site commit | `DIRECT` behavior / `PRINCIPLED EXTENSION` for typed result data | Parallel same-site writes are correct, but the document returns bare values rather than T01's explicit `Assign` (`:2156-2199`) |
-| Precision/realization | `PRINCIPLED EXTENSION` | No exact/certified/tracked/represented feedback identity exists |
-| Stochastic local rule | `PRINCIPLED EXTENSION` | Distributional value return is documented (`:2075-2122`), but randomness lacks coordinate-stable semantic draw records |
-| Persistent trace | `PARAMETERIZATION` / `PRINCIPLED EXTENSION` | Initial-inclusive dense episodes help, but state/trace/render scope and exact values are conflated |
+| `SEED` | `DIRECT` responsibility / `PRINCIPLED EXTENSION` | Support/fill separation fits; exact continuous fields and random-real measures are absent (`simple_programs.md:235-290`) |
+| `BOUNDARY` | `DIRECT` for the three explicit finite policies; `PRINCIPLED EXTENSION` for native line | Periodic matches Notes; fixed/reflective are distinct finite siblings. No-boundary integer-line semantics is absent (`simple_programs.md:292-358`) |
+| `NEIGHBORHOOD` | `DIRECT` | Radius-one current-snapshot offsets fit (`simple_programs.md:360-494`) |
+| `FRONTIER` | `DIRECT` for a finite time slice; `PRINCIPLED EXTENSION` for semantic unbounded `AllSites` | Full finite slices are directly expressible (`simple_programs.md:1502-1510,1538-1563`); T01's source interpretation and integer line remain extensions |
+| Totalistic concept | `PARAMETERIZATION` at responsibility level | Permutation-invariant sum concept composes, but exact mean/divisor/range contract is absent (`simple_programs.md:1964-1995`) |
+| Formulaic rule | `SEMANTIC MISMATCH` | Existing global-field callback is far too powerful and not stable closed data (`simple_programs.md:2036-2065`) |
+| Same-site commit | `DIRECT` behavior / `PRINCIPLED EXTENSION` for typed result data | Parallel same-site writes are correct, but the document returns bare values rather than T01's explicit `Assign` (`simple_programs.md:2156-2199`) |
+| Precision/realization | `PRINCIPLED EXTENSION` | The alphabet and rule schemas contain no exact/certified/tracked/represented feedback identity (`simple_programs.md:200-233,2036-2122`) |
+| Stochastic local rule | `PRINCIPLED EXTENSION` | Distributional value return is documented (`simple_programs.md:2075-2122`), but randomness lacks coordinate-stable semantic draw records |
+| Persistent trace | `PARAMETERIZATION` / `PRINCIPLED EXTENSION` | Initial-inclusive dense episodes help, but state/trace/render scope and exact values are conflated (`simple_programs.md:89-166`) |
 
 ## Current Runtime Fit
 

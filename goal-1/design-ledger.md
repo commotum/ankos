@@ -741,7 +741,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE trace/observation policy for T44.
 - Basis: `NestList[...,init,t]` yields the initial list plus `t` updates; strict captions distinguish background repetition, adjacent differences, parameter galleries, and localized structures from the evolving gray field (`BOOK:2002-2014`, `13283-13292`, `13300-13304`).
-- Consequence: `h` events yield `h+1` snapshots and never halt at an unchanged field, cycle, uniform limit, background period, or localized profile. Raw gray, center/background/mass, differences, palettes, sensitivity, parameter/class scans, and renders are typed consumers. Each gallery panel is an independently identified rule/run. Understated difference direction/sign/wrap/normalization remains declared reconstruction data.
+- Consequence: `h` events yield `h+1` snapshots and never halt at an unchanged field, cycle, uniform limit, background period, or localized profile. Raw gray, center/background/mass, differences, palettes, sensitivity, parameter/class scans, and renders are typed consumers. Each gallery panel is an independently identified rule/run. Prose states only an adjacent difference; raster evidence strongly supports an absolute-right reconstruction, while direction/sign/wrap/normalization remain explicitly serialized observer data rather than source formula.
 
 ### D102 — Additive, coupled, boiling, stochastic, probabilistic, block, and PDE relations remain typed siblings
 
