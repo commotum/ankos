@@ -115,18 +115,17 @@ for q,(pat,pre_s,idx_s) in enumerate(rows,1):
 # Explicit inspected follow-through: continuations, raster links, named-code
 # profiles, captions, controls, and actual-Index routes not hit by the 16
 # T03 lexical queries above.
-follow={764,778,780,782,788,792,794,798,802,810,818,820,822,826,828,830,832,
-836,840,842,844,858,860,1280,1419,1958,2172,2800,2804,2824,2828,2830,
-2832,2834,2836,2838,2844,2846,2848,2850,2866,2920,3298,3300,3304,
-3306,3308,3312,3314,3318,3320,3322,3324,3326,3328,
-3334,3338,3340,3342,3348,3350,3352,3356,3360,3362,3364,3368,
-3370,3372,3374,3376,3378,3380,5218,5222,5482,5486,6336,6338,6642,7900,
-7910,8306,8308,8534,8544,8546,8560,8934,9164,10395,10399,10411,11069,
-11071,11166,11170,11176,11182,11297,11301,11303,11305,11307,11375,11627,
-11629,11914,12055,13540,14226,14228,14230,14232,14762,14764,14766,
-14827,14829,14831,14833,15661,15972,17139,17874,18339,18476,18744,18746,
-18850,18877,20846,20967,21134,21223,21683,21933}
-assert len(follow)==137
+follow={764,778,780,782,788,792,794,798,802,810,818,820,822,826,828,830,832,836,
+840,842,844,858,860,1280,1419,1958,2172,2800,2804,2824,2828,2830,2832,2834,2836,2838,
+2844,2846,2848,2850,2866,2920,2924,3298,3300,3304,3306,3308,3312,3314,3318,3320,3322,3324,
+3326,3328,3334,3338,3340,3342,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,
+3378,3380,3900,3908,3912,5086,5092,5218,5220,5222,5482,5484,5486,5636,6336,6338,6642,7900,7910,8306,
+8308,8534,8544,8546,8560,8934,9164,10259,10393,10395,10399,10409,10411,11069,11071,11166,11170,11176,11182,11184,
+11186,11188,11190,11297,11301,11303,11305,11307,11375,11627,11629,11914,12055,13540,13599,13603,13605,13607,
+13609,13611,13615,13648,13652,13656,14226,14228,14230,14232,14762,14764,14766,14827,14829,14831,14833,15211,
+15213,15215,15217,15219,15223,15225,15227,15229,15231,15235,15237,15239,15241,15243,15313,15315,15317,15319,
+15661,15972,17139,17433,17874,18339,18476,18744,18746,18850,18877,20846,20967,21134,21223,21683,21933}
+assert len(follow)==183
 
 assets={
 764:'![](_page_74_Picture_5.jpeg)',778:'![](_page_75_Figure_6.jpeg)',
@@ -165,8 +164,33 @@ assets={
 14829:'![](_page_980_Picture_15.jpeg)',14831:'![](_page_980_Picture_16.jpeg)',
 14833:'![](_page_980_Picture_17.jpeg)',18746:'![](_page_1132_Picture_2.jpeg)',
 }
+assets.update({
+2924:'![](_page_262_Figure_2.jpeg)',3900:'![](_page_349_Figure_1.jpeg)',
+3908:'![](_page_350_Picture_4.jpeg)',3912:'![](_page_351_Figure_2.jpeg)',
+5086:'![](_page_442_Figure_5.jpeg)',5092:'![](_page_443_Picture_1.jpeg)',
+5220:'![](_page_451_Picture_6.jpeg)',5484:'![](_page_476_Figure_3.jpeg)',
+5636:'![](_page_488_Figure_2.jpeg)',10259:'![](_page_839_Figure_4.jpeg)',
+10393:'![](_page_847_Figure_1.jpeg)',10409:'![](_page_848_Figure_2.jpeg)',
+11184:'![](_page_883_Picture_32.jpeg)',11186:'![](_page_883_Picture_33.jpeg)',
+11188:'![](_page_883_Picture_34.jpeg)',11190:'![](_page_883_Picture_35.jpeg)',
+13599:'![](_page_943_Picture_21.jpeg)',13603:'![](_page_944_Picture_3.jpeg)',
+13605:'![](_page_944_Picture_4.jpeg)',13607:'![](_page_944_Picture_5.jpeg)',
+13609:'![](_page_944_Picture_6.jpeg)',13611:'![](_page_944_Picture_7.jpeg)',
+13615:'![](_page_944_Picture_9.jpeg)',13648:'![](_page_945_Picture_2.jpeg)',
+13652:'![](_page_945_Picture_4.jpeg)',13656:'![](_page_945_Picture_6.jpeg)',
+15211:'![](_page_994_Picture_3.jpeg)',15213:'![](_page_994_Picture_4.jpeg)',
+15215:'![](_page_994_Picture_5.jpeg)',15217:'![](_page_994_Picture_6.jpeg)',
+15219:'![](_page_994_Picture_7.jpeg)',15223:'![](_page_994_Picture_9.jpeg)',
+15225:'![](_page_994_Picture_10.jpeg)',15227:'![](_page_994_Picture_11.jpeg)',
+15229:'![](_page_994_Picture_12.jpeg)',15231:'![](_page_994_Picture_13.jpeg)',
+15235:'![](_page_994_Picture_15.jpeg)',15237:'![](_page_994_Picture_16.jpeg)',
+15239:'![](_page_994_Picture_17.jpeg)',15241:'![](_page_994_Picture_18.jpeg)',
+15243:'![](_page_994_Picture_19.jpeg)',15313:'![](_page_996_Picture_6.jpeg)',
+15315:'![](_page_996_Picture_7.jpeg)',15317:'![](_page_996_Picture_8.jpeg)',
+15319:'![](_page_996_Picture_9.jpeg)',17433:'![](_page_1092_Picture_6.jpeg)',
+})
 for n,want in assets.items(): assert L[n-1]==want,(n,L[n-1])
-assert len(assets)==70 and set(assets)<=follow
+assert len(assets)==116 and set(assets)<=follow
 
 assert r'\{0, 1, 0\}, \{1, 1, 1\}, \{0, 1, 0\}' in L[11068]
 assert r'\{0, k, 0\}, \{k, 1, k\}, \{0, k, 0\}' in L[11070]
@@ -179,51 +203,55 @@ parts={
 'three_color':'772,774,776,778,780,782,784,788,790,792,794,796,798,800,802,804,806,808,810,818,820,822,824,826,828,830,832,834,836,838,840,842,844,846,1280,1282,2804,2806,2822,2824,2826,2828,2830,2832,2836,2838,2844,2846,2848,2850,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6336,6338,6340,7900,7912,8306,8934,8936,11168,11170,11897,11918,14223,14224,14232,14827,16024,18348,18748',
 'generic_parent':'8320,11037,11056,11060,11902,11904,11908,11910,11912,11914,11916',
 'other_totalistic':'2800,2802,2866,2868,3298,3300,3302,3304,3306,3308,3310,3312,3314,3316,3326,3328,3330,3332,3334,3336,3338,3340,3342,3344,8308,9164,9166,11509,11585,11625,11627,11629,14226,14228,14230,14760,14762,18672',
-'sibling_application':'1954,1958,2170,2172,2920,2922,3902,3914,5082,5088,5638,6642,6644,7910,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431',
-'controls':'764,858,860,1419,1427,2834,3380,5218,5222,5482,5486,8534,8544,8546,8560,10395,10399,10411,11050,11164,11166,11176,11375,11919,12055,14392,14394,14541,14673,14675,14764,14766,15493,15661,15972,16020,16025,16027,16049,16129,16157,16448,17139,17874,18339,18476,18744,18746,18770,18850,18877,20573,20577,20590,20592,20600',
+'sibling_application':'1954,1958,2170,2172,2920,2922,3902,3914,5082,5088,5638,6642,6644,7910,10259,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431,17433',
+'controls':'764,858,860,1419,1427,2834,2924,3380,3900,3908,3912,5086,5092,5218,5220,5222,5482,5484,5486,5636,8534,8544,8546,8560,10393,10395,10399,10409,10411,11050,11164,11166,11176,11184,11186,11188,11190,11375,11919,12055,13599,13603,13605,13607,13609,13611,13615,13648,13652,13656,14392,14394,14541,14673,14675,14764,14766,15211,15213,15215,15217,15219,15223,15225,15227,15229,15231,15235,15237,15239,15241,15243,15313,15315,15317,15319,15493,15661,15972,16020,16025,16027,16049,16129,16157,16448,17139,17874,18339,18476,18744,18746,18770,18850,18877,20573,20577,20590,20592,20600',
 'index':'20846,20965,20967,20969,20972,20980,21134,21162,21223,21233,21241,21471,21517,21683,21731,21933,22030,22146,22352,22392',
 }
 partition={k:xs(v) for k,v in parts.items()}
 queried=set().union(*sets)
 flat=[i for v in partition.values() for i in v]
 union=queried|follow
-assert len(rows)==17 and len(queried)==126 and len(union)==263
-assert len(flat)==len(set(flat))==263 and set(flat)==union
-assert [len(partition[k]) for k in partition]==[87,11,38,51,56,20]
+assert len(rows)==17 and len(queried)==126 and len(union)==309
+assert len(flat)==len(set(flat))==309 and set(flat)==union
+assert [len(partition[k]) for k in partition]==[87,11,38,53,100,20]
 
 # Standalone set derivation plus a cross-stage drift guard. T03 defines its
 # own explicit follow and partition data above; this reconciliation proves
-# why the reopened union is 263 without importing T04's executable state.
+# why the reopened union is 309 without importing T04's executable state.
 t04_parts={
 'strict':'772,774,776,778,780,782,784,788,790,792,794,796,798,800,802,804,806,808,810,818,820,822,824,826,828,830,832,834,836,838,840,842,844,846',
 'preset_relation':'1280,1282,2804,2806,2822,2824,2826,2828,2830,2832,2836,2838,2844,2846,2848,2850,2852,3318,3320,3322,3324,3348,3350,3352,3356,3360,3362,3364,3368,3370,3372,3374,3376,3378,6336,6338,6340,7900,7912,8306,8934,8936,11168,11170,11897,11918,14223,14224,14232,14827,16024,18348,18748',
 'parent':'8320,11037,11056,11060,11902,11904,11908,11910,11912,11914,11916',
 'adjacent_totalistic':'2800,2802,2866,2868,3314,3316,3328,3334,3342,9164,9166,11509,11585,11625,11627,11629,14226,14228,14230,18672',
 'sibling_application':'1954,1958,2170,2172,2920,2922,3902,3914,5082,5088,5638,6642,6644,7910,10261,11068,11069,11070,11071,11072,11178,11182,11297,11301,11303,11305,11307,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,14829,14831,14833,15221,15301,15321,15359,15955,15959,17431',
-'non_totalistic':'764,858,860,3380,5218,5222,5482,5486,8534,8544,8546,8560,10395,10399,10411,11164,11166,11176,12055,15661,15972,18339,18476,18744,18746,18877',
+'non_totalistic':'764,858,860,3380,5218,5220,5222,5482,5484,5486,8534,8544,8546,8560,10393,10395,10399,10409,10411,11164,11166,11176,12055,15661,15972,18339,18476,18744,18746,18877',
 'false_control':'1419,1427,2834,11050,11375,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,17139,17874,18850,20573,20577,20590,20592,20600',
 'index':'20846,20965,20967,20969,20972,20980,21134,21223,21233,21471,21683,21731,21933,22030,22146,22352,22392',
 }
 t04_union=set().union(*(set(xs(v)) for v in t04_parts.values()))
 new23={3298,3300,3302,3304,3306,3308,3310,3312,3326,3330,3332,3336,
        3338,3340,3344,8308,14760,14762,14764,14766,21162,21241,21517}
+asset_delta={2924,3900,3908,3912,5086,5092,5636,10259,11184,11186,11188,
+11190,13599,13603,13605,13607,13609,13611,13615,13648,13652,13656,15211,
+15213,15215,15217,15219,15223,15225,15227,15229,15231,15235,15237,15239,
+15241,15243,15313,15315,15317,15319,17433}
 historical=(set().union(*sets[:-1]))|{11069,11071,11914,13540}
-assert len(t04_union)==239 and len(new23)==23 and len(historical)==118
-assert union==t04_union|new23|{18770} and historical<=union
+assert len(t04_union)==243 and len(new23)==23 and len(asset_delta)==42 and len(historical)==118
+assert union==t04_union|new23|asset_delta|{18770} and historical<=union
 t04_text=Path('goal-1/23-T04-THREECOLOR-TOTALISTIC.md').read_text()
 t04_search=t04_text.split('## Search Log',1)[1].split('## Book Excerpts',1)[0]
 m=re.search(r'\nparts=\{\n(.*?)\n\}\npartition=',t04_search,re.S); assert m
 live_t04=ast.literal_eval('{'+m.group(1)+'}')
 assert {k:set(xs(v)) for k,v in live_t04.items()}=={k:set(xs(v)) for k,v in t04_parts.items()}
 
-# Exact 70-link join to the independent T03 metadata oracle.
+# Exact 116-link join to the independent T03 metadata oracle.
 stage=Path('goal-1/22-T03-TOTALISTIC-CA.md').read_text()
 asset_audit=re.split(r'^## Asset and Raster Audit\s*$',stage,flags=re.M)[1]
 items_src=asset_audit.split('\nitems={',1)[1].split('\n}\n\ndef jpeg_size',1)[0]
 ledger_paths=set(re.findall(r"'([^']+\.jpeg)':\(",items_src))
 manifest_names={re.fullmatch(r'!\[\]\(([^)]+)\)',v).group(1) for v in assets.values()}
-assert len(ledger_paths)==len(manifest_names)==70
-assert len({Path(p).name for p in ledger_paths})==70
+assert len(ledger_paths)==len(manifest_names)==116
+assert len({Path(p).name for p in ledger_paths})==116
 assert {Path(p).name for p in ledger_paths}==manifest_names
 
 root=Path('ref/A-New-Kind-of-Science')
@@ -245,14 +273,14 @@ for rel,want in split.items():
     got=[i for i,s in enumerate(lines,1) if re.search(r'(?i)totalistic',s)]
     assert got==xs(want),(rel,got,xs(want))
 assert sum(len(xs(v)) for v in split.values())==84
-print('T03 source manifest: PASS 16 queries; 263 candidates; partition=87,11,38,51,56,20; assets=70; split=84; inherited=239/historical=118')
+print('T03 source manifest: PASS 17 queries; 309 candidates; partition=87,11,38,53,100,20; assets=116; split=84; inherited=243/historical=118')
 PY
 ```
 
 Expected terminal line:
 
 ```text
-T03 source manifest: PASS 16 queries; 263 candidates; partition=87,11,38,51,56,20; assets=70; split=84; inherited=239/historical=118
+T03 source manifest: PASS 17 queries; 309 candidates; partition=87,11,38,53,100,20; assets=116; split=84; inherited=243/historical=118
 ```
 
 ### Complete disjoint disposition
@@ -1043,29 +1071,71 @@ All paths below are relative to `ref/A-New-Kind-of-Science/`.
 | `CHAPTERS/11-The-Notion-of-Computation/Images/_page_670_Figure_1.jpeg` | 281,966 | `1064x1224` | `a1a2a5c04b509ecc0357273387b2950d179478c65406427751904987ec9e8d3e` | Relation-only: code `1599` is block-emulated by a binary radius-five CA. Encoding/decoding and the emulator are not T03 native events. |
 | `CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_171_Picture_5.jpeg` | 4,640 | `277x91` | `6695e1c946cf6adaa04a3915f2c720f69de4d18b74a81a01aaab346052119455` | Relation-only continuous average-map analog; continuous values/codomain belong to T44. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_21.jpeg` | 25,918 | `583x225` | `5f829c7776b53963e578df5a783553320da171c4e1c4d92c470899ec5bb3e40d` | Relation-only `k=2..7` additive/Pascal-modulo-`k` gallery. Its `k=3` panel supplies the comparison cited for T03 code `420`, but the displayed rule is not a native equal-weight total over self plus neighbors. |
+| `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_839_Figure_4.jpeg` | 36,753 | `1154x277` | `851cf63cb497d076054d9b3cedf0db108f0cb439a7876726075eb82b5cfe0f6c` | Relation-only two-dimensional additive outer-totalistic code `204` self-reproduction example. It illustrates the cited additive construction, but its geometry and center-separated rule are not T03. |
 | `BACK-MATTER/Index/Images/_page_980_Picture_15.jpeg` | 4,385 | `160x195` | `641317f32d429dd61b8353e1ebe65bd80f30950df78f0ebdc3a7f99b6bd26cd9` | Relation-only Life-spacefiller step 5, explicitly called analogous to code-`1329` unbounded growth. Two-dimensional Life is not T03. |
 | `BACK-MATTER/Index/Images/_page_980_Picture_16.jpeg` | 5,858 | `172x187` | `90df3d1e1e99ed74dd1844654ff41b04b23f6fe22552cefa2b72f659cd0c5fda` | Relation-only step-50 companion of the same analogy. |
 | `BACK-MATTER/Index/Images/_page_980_Picture_17.jpeg` | 8,261 | `223x207` | `3ad70eb7f740edf7749700ff107f08306830f3e3fd617f2df3f9e7e559178e21` | Relation-only history view of the Life spacefiller. |
+| `BACK-MATTER/Index/Images/_page_1092_Picture_6.jpeg` | 21,682 | `583x141` | `b13e50f8bb2f7e905b8580ea94d93c7295e5967125aa8042defe76936bdb1dd6` | Relation-only feature-extraction application using the 16 even-numbered five-neighbor totalistic rules. The named rule family is relevant, but the image-analysis pipeline is not native T03 evolution. |
 | `CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_74_Picture_5.jpeg` | 134,131 | `858x423` | `713c4c55c6a004d76c5e47f1f39513bb1656f35feb0fe9aa72c4503ca311cdc6` | Immediate preceding rule-73 ECA material; exhaustive ordered binary rule, not a totalistic fixture. |
 | `CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_86_Picture_7.jpeg` | 30,221 | `240x500` | `59213fbf1a0e6904a6566043c889acd32853d799d5a71bfec1e2d0c45bb1eec5` | First post-boundary mobile-automaton evolution: one active site and sequential movement, not all-site T03. |
 | `CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_86_Picture_8.jpeg` | 7,295 | `506x51` | `d844f2419d7ff2a748a93e4ae6dd09c947bf5ed0723aa1defb4354c810b1fb25` | Mobile-automaton rule diagram paired with Picture 86/7; same exclusion. All later page-86+ mobile galleries inherit this construction boundary. |
 | `CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_185_Picture_9.jpeg` | 3,425 | `213x114` | `abfbc90a8bdab839ac452194adf8f7e30258e877967a79ac71db59b1a716df75` | Two-dimensional center-plus-four-neighbor totalistic form; different support geometry. |
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_261_Figure_2.jpeg` | 309,273 | `1109x1297` | `49f35fe65202ef7fbfee2da92b7460d36fc329b66a553782ebf8991f237944dd` | Two-dimensional five-cell totalistic random gallery; geometry sibling, not a T03 raster. |
+| `CHAPTERS/6-Starting-from-Randomness/Images/_page_262_Figure_2.jpeg` | 240,733 | `1013x1291` | `23df7e86bf96a148a17c13847eb53c773a24f86cc5a24f2e1a550f79b94439e3` | Continuation of the two-dimensional totalistic random gallery; same geometry exclusion. |
 | `CHAPTERS/6-Starting-from-Randomness/Images/_page_305_Picture_2.jpeg` | 642,889 | `1184x1342` | `7e75ba3d0cb57a0b35d5a7b29e803386617e1ede22eefae19ce6e21fc465a9c9` | Rule-`110` binary boundary immediately after the code-`1329` sequence; a general ordered ECA, not totalistic. |
+| `CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_349_Figure_1.jpeg` | 303,889 | `1145x1301` | `318e1b2d307bb11fe72981139b9e27bc9ce2123c95cd79b259cb8f75bebe6f2b` | Two-dimensional outer-totalistic code `746` construction; geometry and center-separated codec exclude it. |
+| `CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_350_Picture_4.jpeg` | 85,362 | `1170x692` | `83000d21d7b66a38db4198b1340b5106c403df7f60e8d626b3bd00a68becdfa3` | Domain/initial-condition bridge in the same code-`976` two-dimensional construction continued on the next page; excluded with that construction. |
+| `CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_351_Figure_2.jpeg` | 230,794 | `1143x1255` | `617cf03ce1508fd00b3b54473d469849141efb77b84ed37ff9110bb6b082b3f2` | Two-dimensional totalistic code `976` continuation; different geometry. |
+| `CHAPTERS/8-Implications-for-Everyday-Systems/Images/_page_442_Figure_5.jpeg` | 86,047 | `1087x355` | `2c78e0ade6f15b54c6f693aeccc052a0aea3a326fc4c28c73988fb712e7c0d59` | Two-dimensional unequal/negative-weight cellular automaton; weighted sums are outside T03 equal-weight identity. |
+| `CHAPTERS/8-Implications-for-Everyday-Systems/Images/_page_443_Picture_1.jpeg` | 254,542 | `1147x952` | `9c82adac1ac31b45d85e3228a2000d06bf84edc6afc1a84bedf036e51b3d78c8` | Next-page weight-grid continuation of the same unequal-weight construction; excluded with it. |
+| `CHAPTERS/9-Fundamental-Physics/Images/_page_488_Figure_2.jpeg` | 119,358 | `1117x857` | `3589b325d67688d05fe0d9daa22eb1d0894fc119eff367426b00f08b509c0640` | Two-dimensional outer-totalistic codes `468,686,746` shown under different lattice orientations; geometry/orientation sibling only. |
 | `CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_566_Figure_2.jpeg` | 140,400 | `1032x699` | `6d66d95c8e3c286272cded005d60557ce7a075ffebfd268486c23abe13a29a1e` | Two-dimensional **outer** totalistic rules `54,222,374`; center is retained separately and the codec differs. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_23.jpeg` | 4,478 | `160x117` | `132528352f363e52a20e73e1e8341203126448c0c6c8545eed48626eaddac16c` | Adjacent exact general ordered-table rule `921408`; T02, not aggregate identity. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_28.jpeg` | 5,342 | `205x110` | `2da239aceec3720e5aeccd5de8898c37fe7e975230814c0b3a8e3dcacbde9096` | Adjacent function-callback neighborhood rule; callback execution is explicitly not T03. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_31.jpeg` | 4,370 | `117x117` | `ca086555513a6d8ba5bcbe92d97af26e55aa899cf629e0ab61d8fa8c71b81586` | Adjacent 2D nine-neighbor totalistic code `3702`; geometry exclusion. |
+| `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_32.jpeg` | 4,243 | `96x106` | `3acedb131c18307a21a76f249839dc24ad0838672ff715bb23816d1867164830` | Second panel in the contiguous code-`3702` two-dimensional Notes run; same geometry exclusion. |
+| `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_33.jpeg` | 4,287 | `99x104` | `ab5cc8d4ecaab3970bedea51d269b13bf68f051765a0d98dc3980c6471adafae` | Third panel in the code-`3702` run; same exclusion. |
+| `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_34.jpeg` | 4,514 | `105x106` | `ee453b116f28fbd33a87f8d372380b88d334f04164c873f0daf7fdf87425eed1` | Fourth panel in the code-`3702` run; same exclusion. |
+| `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_35.jpeg` | 4,793 | `106x108` | `f13b56a4eab2a216cab3b59670dbac309108d3ffc3c5e16883fdc6c12a235e1f` | Fifth panel in the code-`3702` run; same exclusion. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_23.jpeg` | 4,207 | `139x141` | `f14931f6bb008435e34961947dce7b11d5ec6d0bd4cc5b936bcee81b830adc0a` | First post-Pascal boundary: modulo-2 integer-function image, not a finite-color CA evolution. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_24.jpeg` | 5,507 | `135x138` | `5b302ed9d6c9cbee590270c7bdc169b62b554b0e186a94fdb3d1952a69c0f8c5` | `Multinomial[m,n]` modulo-2 companion; same exclusion. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_25.jpeg` | 4,057 | `138x145` | `f5eb9593ba90b4b240dc6990bb0e7204066cc48e81e82b96186029ff866d40da` | `StirlingS1[m,n]` modulo-2 companion; same exclusion. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_26.jpeg` | 4,999 | `135x155` | `badba07cc053bdf7f4e5b41d7d90b2b248d8acd75b9728898e10c69a59c7ceec` | `StirlingS2[m,n]` modulo-2 companion; same exclusion. |
 | `BACK-MATTER/Index/Images/_page_979_Picture_6.jpeg` | 23,347 | `579x111` | `f9fe6970d82502f70cf371b503160c71047d290954ca19d5d37b4fd65c12fdc1` | Immediate post-code-`20` Notes boundary: rule-`110` background blocks, a general ECA view. |
+| `BACK-MATTER/Index/Images/_page_943_Picture_21.jpeg` | 15,999 | `446x169` | `e83235d4ef16c1d9b077223255ed4cc7850d406e16142097313ae0b3b1beb1bb` | Historical complicated Ulam-system illustration; application context, not native T03 evidence. |
+| `BACK-MATTER/Index/Images/_page_944_Picture_3.jpeg` | 3,576 | `114x102` | `df3027b377ea701cf677fe6aff772e6206887b1aa0f3c6b145d58ab33d330465` | First simplified component in the Ulam-system comparison run; construction sibling only. |
+| `BACK-MATTER/Index/Images/_page_944_Picture_4.jpeg` | 3,646 | `94x114` | `48c13120c73f3af3bb1f257533f710b85dfdd8c8ba73ad7f83f2bd1c29affad4` | Second simplified component; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_944_Picture_5.jpeg` | 1,588 | `95x130` | `bf627766e988753602792aa2c26f3d16ecfc47e70a2b1dff98880ccc87cc146d` | Third simplified component; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_944_Picture_6.jpeg` | 4,200 | `107x124` | `3b777980e3dc09d80687d2c171b837d4bc4239dfc83d586e0076590dd3dd1b27` | Fourth simplified component, a two-dimensional outer-totalistic code-`686` sibling. |
+| `BACK-MATTER/Index/Images/_page_944_Picture_7.jpeg` | 3,785 | `91x123` | `bb254f61cbcc53e56e7f90b3f62cafebf988e34d089caa74cb59ad233be59f20` | Fifth simplified component, including a one-dimensional rule-`90` boundary rather than T03. |
+| `BACK-MATTER/Index/Images/_page_944_Picture_9.jpeg` | 25,952 | `577x243` | `6f09976c3f5eed3bb1c845bb621c323e7ddb53df0e537f16e6f21ee99f5cc813` | Two-dimensional outer-totalistic code `12`; geometry/codec sibling. |
+| `BACK-MATTER/Index/Images/_page_945_Picture_2.jpeg` | 25,176 | `548x175` | `2b17dc927842b7cefa8d1aa777b46fb2a8634f4fc62386c00e301482add40743` | Lattice/geometry construction diagram adjacent to totalistic applications; not a T03 evolution. |
+| `BACK-MATTER/Index/Images/_page_945_Picture_4.jpeg` | 38,810 | `545x247` | `6d138c039f5d319f8f8635d19b33cabbd6dbff7a68249de6810c7adfa79d5a71` | Pentagonal-tiling outer-totalistic code `4094`; non-one-dimensional support. |
+| `BACK-MATTER/Index/Images/_page_945_Picture_6.jpeg` | 40,329 | `573x225` | `350a3c7090182a8c74d8890e4a92bc38cd51da2c72b648aca0084f44cc529a8b` | Penrose-tiling outer-totalistic code `254`; nonregular two-dimensional support. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_3.jpeg` | 3,818 | `119x109` | `bbae1064a5c23d5e9638c8587d33c804de3eb0f7cd907b7d5065d89693831c4d` | First panel of the generalized aggregation/rule-shape comparison; not a native T03 profile. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_4.jpeg` | 3,789 | `107x112` | `b1430c29bed143b063fbc07a34f1b5232d87fc479d90b2beca1afd87df5abd6f` | Second generalized-aggregation panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_5.jpeg` | 3,379 | `110x119` | `7d47e459b95d2f9765ab732968f40db589be265d0691f06b267b75aa487962a9` | Third generalized-aggregation panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_6.jpeg` | 2,430 | `107x115` | `c7214b5edb00142fdf7b117089a2fa8fe763aafbeac051c0575e9d1a1eb76d5a` | Fourth generalized-aggregation panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_7.jpeg` | 2,528 | `100x136` | `301f9a8a252bfc39f65c0fe450c17ca5a9cd6a961bb020b590f40d4e40c08e31` | Fifth generalized-aggregation panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_9.jpeg` | 5,035 | `183x77` | `cfc169f6a14d82765024f97c4243fba07e701120b4bfda59a010ac6c2bd8d6b6` | First panel of the totalistic constraint-`242` stalled-cluster construction; construction/application evidence only. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_10.jpeg` | 2,912 | `107x82` | `f75756db8ca610ad57e570a4974f651ba441f87d8221a55a8b849f8f292b2c62` | Second constraint-`242` stalled-cluster panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_11.jpeg` | 4,189 | `154x98` | `2494697ab01fc243d1b92a3f4079943780348309e86b7fa250dac67331e3a4cf` | Third constraint-`242` stalled-cluster panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_12.jpeg` | 2,747 | `89x74` | `f1a42e9a257ad91313b0093366d9f53237fdbedb5990f262d9d78066defb4eca` | Fourth constraint-`242` stalled-cluster panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_13.jpeg` | 1,602 | `68x78` | `42de6c6c444417416834e76ccf5081d74c39c406e6c69f12744fdab39a87dc4d` | Fifth constraint-`242` stalled-cluster panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_15.jpeg` | 3,434 | `119x113` | `75640a3f1ff18594d23a2c36bc5d80bb88f56efe2f0f1e028ac8609e661c06ff` | First successful-growth continuation of the same totalistic constraint-`242` construction; application-only. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_16.jpeg` | 2,760 | `99x125` | `11e152c786dfdc81aef5e3712d5313fa83ede32fbc2076162ad39ba9df18d728` | Second successful-growth panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_17.jpeg` | 3,823 | `102x134` | `941d67d3a4bc47e7b97e2b484e7cc356c45f0d295b67fe686e18738add871130` | Third successful-growth panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_18.jpeg` | 3,893 | `105x125` | `b13beb4041b967b60132de63976f2af13f276564476351c0091002711f4ed37a` | Fourth successful-growth panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_994_Picture_19.jpeg` | 3,955 | `93x117` | `e5b6d42985f1eafaa432f7c346aee085d1b1500b16b899e4f1a869046b94a667` | Fifth successful-growth panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_996_Picture_6.jpeg` | 9,894 | `138x266` | `b6d70c3a060261bb96c276ef158fd7bf7a3c1706b1003f5ab48621760baa299f` | First panel in the adjacent four-panel one-dimensional transition-rule control run; not the later named two-dimensional code-`52` alternative. |
+| `BACK-MATTER/Index/Images/_page_996_Picture_7.jpeg` | 8,413 | `131x266` | `3d14c1bbb64711d9de00fdec771f592203daee10845daf0db519acdcbbe967e4` | Second transition-control panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_996_Picture_8.jpeg` | 8,414 | `123x260` | `6a39699460a0c9e5314801b0de51c7e5f41a41466f10abe9d83edc03dc3e3feb` | Third transition-control panel; same exclusion. |
+| `BACK-MATTER/Index/Images/_page_996_Picture_9.jpeg` | 11,018 | `145x256` | `7595102ac69dcfab3a9b4817373c9ca2441e99f495b6b4c260e76d6f5da8aa26` | Fourth transition-control panel; same exclusion. |
 | `BACK-MATTER/Colophon/Images/_page_1132_Picture_2.jpeg` | 68,468 | `606x308` | `422ce8c21c465e2ffdffdb0f691f9521a21b9389897336dd4e4a2c716295c589` | Adjacent three-color two-neighbor general rule `2144`; its totalistic-universality paragraph names candidates but this picture is not one. |
 
-The monolith omits `Images/` from links. Chapter split files route to the same physical JPEGs and are duplicate references, not additional assets. The page-883/885 and page-897 files are Notes-for-Chapter-2 evidence despite their Chapter-12 placement. Page-963, page-979, and page-980 Notes assets live under `BACK-MATTER/Index/Images`, while the page-1132 sibling lives under `BACK-MATTER/Colophon/Images`. The full code-`20` route now includes the random overview, all sub-nine-cell starts, 25-billion search, systematic period-15 set, and survival chart; code `52` remains present in both the radius-two gallery and the mixed class-4 panel. No two audited files have identical bytes.
+The monolith omits `Images/` from links. Chapter split files route to the same physical JPEGs and are duplicate references, not additional assets. The page-883/885 and page-897 files are Notes-for-Chapter-2 evidence despite their Chapter-12 placement. Page-943 onward Notes assets live under `BACK-MATTER/Index/Images`, while the page-1132 sibling lives under `BACK-MATTER/Colophon/Images`. The full code-`20` route includes the random overview, all sub-nine-cell starts, 25-billion search, systematic period-15 set, and survival chart; code `52` remains present in both the radius-two gallery and the mixed class-4 panel. The reverse join is finite and mechanical: start from every dispositioned textual candidate outside the query-false `controls` and index partitions, follow links at distance two, close contiguous image-only runs, and add only explicit prose-declared same-construction continuations. Images reachable solely from query-false controls remain outside this mandatory join unless separately selected as a boundary control. No two audited files have identical bytes.
 
-The dependency-free metadata oracle parses JPEG SOF markers and pins all 48 included, 16 excluded, and six relation-only files:
+The dependency-free metadata oracle parses JPEG SOF markers and pins all 48 included, 56 excluded, and eight relation-only files:
 
 ```bash
 python3 - <<'PY'
@@ -1125,24 +1195,66 @@ items={
 'CHAPTERS/11-The-Notion-of-Computation/Images/_page_670_Figure_1.jpeg':(281966,1064,1224,'a1a2a5c04b509ecc0357273387b2950d179478c65406427751904987ec9e8d3e','R'),
 'CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_171_Picture_5.jpeg':(4640,277,91,'6695e1c946cf6adaa04a3915f2c720f69de4d18b74a81a01aaab346052119455','R'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_21.jpeg':(25918,583,225,'5f829c7776b53963e578df5a783553320da171c4e1c4d92c470899ec5bb3e40d','R'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_839_Figure_4.jpeg':(36753,1154,277,'851cf63cb497d076054d9b3cedf0db108f0cb439a7876726075eb82b5cfe0f6c','R'),
 'BACK-MATTER/Index/Images/_page_980_Picture_15.jpeg':(4385,160,195,'641317f32d429dd61b8353e1ebe65bd80f30950df78f0ebdc3a7f99b6bd26cd9','R'),
 'BACK-MATTER/Index/Images/_page_980_Picture_16.jpeg':(5858,172,187,'90df3d1e1e99ed74dd1844654ff41b04b23f6fe22552cefa2b72f659cd0c5fda','R'),
 'BACK-MATTER/Index/Images/_page_980_Picture_17.jpeg':(8261,223,207,'3ad70eb7f740edf7749700ff107f08306830f3e3fd617f2df3f9e7e559178e21','R'),
+'BACK-MATTER/Index/Images/_page_1092_Picture_6.jpeg':(21682,583,141,'b13e50f8bb2f7e905b8580ea94d93c7295e5967125aa8042defe76936bdb1dd6','R'),
 'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_74_Picture_5.jpeg':(134131,858,423,'713c4c55c6a004d76c5e47f1f39513bb1656f35feb0fe9aa72c4503ca311cdc6','X'),
 'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_86_Picture_7.jpeg':(30221,240,500,'59213fbf1a0e6904a6566043c889acd32853d799d5a71bfec1e2d0c45bb1eec5','X'),
 'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_86_Picture_8.jpeg':(7295,506,51,'d844f2419d7ff2a748a93e4ae6dd09c947bf5ed0723aa1defb4354c810b1fb25','X'),
 'CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_185_Picture_9.jpeg':(3425,213,114,'abfbc90a8bdab839ac452194adf8f7e30258e877967a79ac71db59b1a716df75','X'),
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_261_Figure_2.jpeg':(309273,1109,1297,'49f35fe65202ef7fbfee2da92b7460d36fc329b66a553782ebf8991f237944dd','X'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_262_Figure_2.jpeg':(240733,1013,1291,'23df7e86bf96a148a17c13847eb53c773a24f86cc5a24f2e1a550f79b94439e3','X'),
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_305_Picture_2.jpeg':(642889,1184,1342,'7e75ba3d0cb57a0b35d5a7b29e803386617e1ede22eefae19ce6e21fc465a9c9','X'),
+'CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_349_Figure_1.jpeg':(303889,1145,1301,'318e1b2d307bb11fe72981139b9e27bc9ce2123c95cd79b259cb8f75bebe6f2b','X'),
+'CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_350_Picture_4.jpeg':(85362,1170,692,'83000d21d7b66a38db4198b1340b5106c403df7f60e8d626b3bd00a68becdfa3','X'),
+'CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_351_Figure_2.jpeg':(230794,1143,1255,'617cf03ce1508fd00b3b54473d469849141efb77b84ed37ff9110bb6b082b3f2','X'),
+'CHAPTERS/8-Implications-for-Everyday-Systems/Images/_page_442_Figure_5.jpeg':(86047,1087,355,'2c78e0ade6f15b54c6f693aeccc052a0aea3a326fc4c28c73988fb712e7c0d59','X'),
+'CHAPTERS/8-Implications-for-Everyday-Systems/Images/_page_443_Picture_1.jpeg':(254542,1147,952,'9c82adac1ac31b45d85e3228a2000d06bf84edc6afc1a84bedf036e51b3d78c8','X'),
+'CHAPTERS/9-Fundamental-Physics/Images/_page_488_Figure_2.jpeg':(119358,1117,857,'3589b325d67688d05fe0d9daa22eb1d0894fc119eff367426b00f08b509c0640','X'),
 'CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_566_Figure_2.jpeg':(140400,1032,699,'6d66d95c8e3c286272cded005d60557ce7a075ffebfd268486c23abe13a29a1e','X'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_23.jpeg':(4478,160,117,'132528352f363e52a20e73e1e8341203126448c0c6c8545eed48626eaddac16c','X'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_28.jpeg':(5342,205,110,'2da239aceec3720e5aeccd5de8898c37fe7e975230814c0b3a8e3dcacbde9096','X'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_31.jpeg':(4370,117,117,'ca086555513a6d8ba5bcbe92d97af26e55aa899cf629e0ab61d8fa8c71b81586','X'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_32.jpeg':(4243,96,106,'3acedb131c18307a21a76f249839dc24ad0838672ff715bb23816d1867164830','X'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_33.jpeg':(4287,99,104,'ab5cc8d4ecaab3970bedea51d269b13bf68f051765a0d98dc3980c6471adafae','X'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_34.jpeg':(4514,105,106,'ee453b116f28fbd33a87f8d372380b88d334f04164c873f0daf7fdf87425eed1','X'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_35.jpeg':(4793,106,108,'f13b56a4eab2a216cab3b59670dbac309108d3ffc3c5e16883fdc6c12a235e1f','X'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_23.jpeg':(4207,139,141,'f14931f6bb008435e34961947dce7b11d5ec6d0bd4cc5b936bcee81b830adc0a','X'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_24.jpeg':(5507,135,138,'5b302ed9d6c9cbee590270c7bdc169b62b554b0e186a94fdb3d1952a69c0f8c5','X'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_25.jpeg':(4057,138,145,'f5eb9593ba90b4b240dc6990bb0e7204066cc48e81e82b96186029ff866d40da','X'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_26.jpeg':(4999,135,155,'badba07cc053bdf7f4e5b41d7d90b2b248d8acd75b9728898e10c69a59c7ceec','X'),
 'BACK-MATTER/Index/Images/_page_979_Picture_6.jpeg':(23347,579,111,'f9fe6970d82502f70cf371b503160c71047d290954ca19d5d37b4fd65c12fdc1','X'),
+'BACK-MATTER/Index/Images/_page_943_Picture_21.jpeg':(15999,446,169,'e83235d4ef16c1d9b077223255ed4cc7850d406e16142097313ae0b3b1beb1bb','X'),
+'BACK-MATTER/Index/Images/_page_944_Picture_3.jpeg':(3576,114,102,'df3027b377ea701cf677fe6aff772e6206887b1aa0f3c6b145d58ab33d330465','X'),
+'BACK-MATTER/Index/Images/_page_944_Picture_4.jpeg':(3646,94,114,'48c13120c73f3af3bb1f257533f710b85dfdd8c8ba73ad7f83f2bd1c29affad4','X'),
+'BACK-MATTER/Index/Images/_page_944_Picture_5.jpeg':(1588,95,130,'bf627766e988753602792aa2c26f3d16ecfc47e70a2b1dff98880ccc87cc146d','X'),
+'BACK-MATTER/Index/Images/_page_944_Picture_6.jpeg':(4200,107,124,'3b777980e3dc09d80687d2c171b837d4bc4239dfc83d586e0076590dd3dd1b27','X'),
+'BACK-MATTER/Index/Images/_page_944_Picture_7.jpeg':(3785,91,123,'bb254f61cbcc53e56e7f90b3f62cafebf988e34d089caa74cb59ad233be59f20','X'),
+'BACK-MATTER/Index/Images/_page_944_Picture_9.jpeg':(25952,577,243,'6f09976c3f5eed3bb1c845bb621c323e7ddb53df0e537f16e6f21ee99f5cc813','X'),
+'BACK-MATTER/Index/Images/_page_945_Picture_2.jpeg':(25176,548,175,'2b17dc927842b7cefa8d1aa777b46fb2a8634f4fc62386c00e301482add40743','X'),
+'BACK-MATTER/Index/Images/_page_945_Picture_4.jpeg':(38810,545,247,'6d138c039f5d319f8f8635d19b33cabbd6dbff7a68249de6810c7adfa79d5a71','X'),
+'BACK-MATTER/Index/Images/_page_945_Picture_6.jpeg':(40329,573,225,'350a3c7090182a8c74d8890e4a92bc38cd51da2c72b648aca0084f44cc529a8b','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_3.jpeg':(3818,119,109,'bbae1064a5c23d5e9638c8587d33c804de3eb0f7cd907b7d5065d89693831c4d','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_4.jpeg':(3789,107,112,'b1430c29bed143b063fbc07a34f1b5232d87fc479d90b2beca1afd87df5abd6f','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_5.jpeg':(3379,110,119,'7d47e459b95d2f9765ab732968f40db589be265d0691f06b267b75aa487962a9','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_6.jpeg':(2430,107,115,'c7214b5edb00142fdf7b117089a2fa8fe763aafbeac051c0575e9d1a1eb76d5a','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_7.jpeg':(2528,100,136,'301f9a8a252bfc39f65c0fe450c17ca5a9cd6a961bb020b590f40d4e40c08e31','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_9.jpeg':(5035,183,77,'cfc169f6a14d82765024f97c4243fba07e701120b4bfda59a010ac6c2bd8d6b6','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_10.jpeg':(2912,107,82,'f75756db8ca610ad57e570a4974f651ba441f87d8221a55a8b849f8f292b2c62','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_11.jpeg':(4189,154,98,'2494697ab01fc243d1b92a3f4079943780348309e86b7fa250dac67331e3a4cf','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_12.jpeg':(2747,89,74,'f1a42e9a257ad91313b0093366d9f53237fdbedb5990f262d9d78066defb4eca','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_13.jpeg':(1602,68,78,'42de6c6c444417416834e76ccf5081d74c39c406e6c69f12744fdab39a87dc4d','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_15.jpeg':(3434,119,113,'75640a3f1ff18594d23a2c36bc5d80bb88f56efe2f0f1e028ac8609e661c06ff','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_16.jpeg':(2760,99,125,'11e152c786dfdc81aef5e3712d5313fa83ede32fbc2076162ad39ba9df18d728','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_17.jpeg':(3823,102,134,'941d67d3a4bc47e7b97e2b484e7cc356c45f0d295b67fe686e18738add871130','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_18.jpeg':(3893,105,125,'b13beb4041b967b60132de63976f2af13f276564476351c0091002711f4ed37a','X'),
+'BACK-MATTER/Index/Images/_page_994_Picture_19.jpeg':(3955,93,117,'e5b6d42985f1eafaa432f7c346aee085d1b1500b16b899e4f1a869046b94a667','X'),
+'BACK-MATTER/Index/Images/_page_996_Picture_6.jpeg':(9894,138,266,'b6d70c3a060261bb96c276ef158fd7bf7a3c1706b1003f5ab48621760baa299f','X'),
+'BACK-MATTER/Index/Images/_page_996_Picture_7.jpeg':(8413,131,266,'3d14c1bbb64711d9de00fdec771f592203daee10845daf0db519acdcbbe967e4','X'),
+'BACK-MATTER/Index/Images/_page_996_Picture_8.jpeg':(8414,123,260,'6a39699460a0c9e5314801b0de51c7e5f41a41466f10abe9d83edc03dc3e3feb','X'),
+'BACK-MATTER/Index/Images/_page_996_Picture_9.jpeg':(11018,145,256,'7595102ac69dcfab3a9b4817373c9ca2441e99f495b6b4c260e76d6f5da8aa26','X'),
 'BACK-MATTER/Colophon/Images/_page_1132_Picture_2.jpeg':(68468,606,308,'422ce8c21c465e2ffdffdb0f691f9521a21b9389897336dd4e4a2c716295c589','X'),
 }
 
@@ -1169,15 +1281,15 @@ for name,(size,w,h,digest,kind) in items.items():
     data=(ROOT/name).read_bytes()
     assert (len(data),*jpeg_size(data),sha256(data).hexdigest())==(size,w,h,digest)
     assert digest not in digests; digests.add(digest); counts[kind]+=1
-assert counts=={'I':48,'X':16,'R':6}
-print('T03 metadata oracle: PASS 48 included; 16 excluded; 6 relation-only')
+assert counts=={'I':48,'X':56,'R':8}
+print('T03 metadata oracle: PASS 48 included; 56 excluded; 8 relation-only')
 PY
 ```
 
 Recorded output:
 
 ```text
-T03 metadata oracle: PASS 48 included; 16 excluded; 6 relation-only
+T03 metadata oracle: PASS 48 included; 56 excluded; 8 relation-only
 ```
 
 ### Exact asset semantic oracle
