@@ -1,6 +1,6 @@
 # 16-T39-FILTERS
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -730,12 +730,22 @@ Paths are dependency targets for synthesis; Goal 2 may consolidate modules when 
 - [x] State/source/read/result/update/outcome/equality/serialization semantics are explicit and `MonotoneFilterUpdate` is justified against all prior laws.
 - [x] Ulam/T37 composition and T40/current API/runtime boundaries are explicit.
 - [x] Goal 2 files, dependencies, behavior, canonical tests, migration constraints, and no-cheating cases are implementation-ready.
-- [ ] Global ledgers, exact verification commands, diff checks, and repository tests are integrated successfully.
+- [x] Global ledgers, exact verification commands, diff checks, and repository tests are integrated successfully.
 
 ## Stage Results
 
-Evidence/design work is complete. Global integration and final verification are in progress.
+- Exhaustive searches closed with zero unresolved source candidates. The prime search found `221/134`; the high-signal union `144/84`; exact sieve/Eratosthenes each `6/6`; all direct functions, divisibility/divisor/factor, filtering/removal, measurement, history, Index, variant, relation, and false-positive families are dispositioned in nineteen evidence groups.
+- All seven raster files/twelve plotted profiles were inspected at original resolution. Pixel classification matched all 1,200 page-147 stage cells; exact formulas, horizons, conventions, extrema, source repairs, and hashes are recorded for pages 147, 148, and 150.
+- The design separates pure `IntegerFilterSpec` and `IntegerMeasurementSpec` categories from the strict `SuccessiveDivisibilitySieve` transition. It adds structural integer domains, closed predicates/measurements, explicit cursor and hit/removal reads, and `MonotoneFilterUpdate` as the tenth public update law.
+- The source's retained `1`, composite stage events, finite certificate, requested horizon, infinite intensional state, direct-query/stream/set distinctions, representation conventions, equality, serialization, outcomes, traces, and alternative-algorithm boundaries are explicit.
+- T37's Ulam boundary is resolved by closed first-accepted ascending selection over the complete old prefix followed by existing T37 append. The source prefix independently proves unordered distinct-old-index pair semantics; no prior stage changed or reopened.
+- Exact verification regenerated the page-147 masks/counts, prime endpoints/counts/residue walks/gaps, all five page-150 profiles, and the 18-term Ulam prefix: `T39 exact oracle: PASS`.
+- SHA-256 verification reproduced all seven recorded raster hashes. Markdown fence parity passed across `goal-1/*.md`; `git diff --check -- goal-1` passed.
+- Repository verification passed: `uv run pytest -q` reported `102 passed in 1.21s`.
 
 ## Integration Results
 
-Pending ledger integration and verification.
+- `0-plan.md` now records the three-category split, tenth update law, exact source inconsistency/profiles, Ulam resolution, implementation-ready stage result, and T41 as next work.
+- `evidence-index.md` records T39 complete with nineteen evidence groups, exact search counts, all source/profile/architecture obligations, and zero unresolved candidates; coverage is 15/45.
+- `design-ledger.md` adds the T39 construction record, extends the semantic inventory, activates D076-D081, resolves D075's Ulam boundary, adds T39 rejection criteria, and records the completed integration.
+- No earlier stage was reopened. Next: T41 Function-Combination Systems.

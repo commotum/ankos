@@ -64,9 +64,9 @@ Each type stage must make the following auditable:
 | T36 | 37 | Digit-Reversal Arithmetic Systems | 36 | `43-T36-DIGIT-REVERSAL.md` | PENDING | Not started |
 | T37 | 38 | Recursive Sequences | 37 | `15-T37-RECURSIVE.md` | COMPLETE | Direct union 48 occurrences/42 lines; fixed-lag tokens 23/13; focused mechanics 32/20; literal programs 20/20; aliases 10/10; named saturation 160/118; 19 excerpt groups; all strict main/raster rows, Notes/actual Index/splits, fixed/nonlinear/modular/global-history variants, source erratum, prefix/seed/checkpoint/read/append/trace/window semantics, programs/history/observers/boundaries, and exact oracles dispositioned; 0 unresolved strict mechanics |
 | T38 | 39 | Variable-Index Recursive Sequences | 38 | `44-T38-VARIABLE-RECURRENCE.md` | PENDING | Not started |
-| T39 | 40 | Number-Theoretic Filtering Systems | 39 | `16-T39-FILTERS.md` | IN PROGRESS | Prime search 221 occurrences/134 lines; high-signal union 144/84; exact sieve/Eratosthenes each 6/6 plus complete predicate/measurement/history/Index families; 19 excerpt groups; all strict main, seven rasters/twelve profiles, Notes/actual Index/split, consecutive-stage masks, source repairs, finite/intensional scopes, filter/stream/measurement distinctions, Ulam composition, algorithms/emulations/boundaries, current API/runtime, and exact oracles dispositioned; 0 unresolved source candidates; global verification pending |
+| T39 | 40 | Number-Theoretic Filtering Systems | 39 | `16-T39-FILTERS.md` | COMPLETE | Prime search 221 occurrences/134 lines; high-signal union 144/84; exact sieve/Eratosthenes each 6/6 plus complete predicate/measurement/history/Index families; 19 excerpt groups; all strict main, seven rasters/twelve profiles, Notes/actual Index/split, consecutive-stage masks, source repairs, finite/intensional scopes, filter/stream/measurement distinctions, Ulam composition, algorithms/emulations/boundaries, current API/runtime, and exact oracles dispositioned; 0 unresolved source candidates |
 | T40 | 41 | Mathematical-Constant Digit Systems | 40 | `45-T40-CONSTANT-DIGITS.md` | PENDING | Not started |
-| T41 | 42 | Function-Combination Systems | 41 | `17-T41-FUNCTIONS.md` | PENDING | Not started |
+| T41 | 42 | Function-Combination Systems | 41 | `17-T41-FUNCTIONS.md` | IN PROGRESS | Closed function expression, real/complex domain, exact/numerical evaluation, sampling and zero-event queries, page-160/161/162/163 figures, Notes/Index, T42/T43/T44/T45 boundaries, and current runtime under audit |
 | T42 | 43 | Continued-Fraction-Driven Substitution Systems | 42 | `46-T42-CF-SUBSTITUTION.md` | PENDING | Not started |
 | T43 | 44 | Iterated Maps | 43 | `18-T43-ITERATED-MAPS.md` | PENDING | Not started |
 | T44 | 45 | Continuous Cellular Automata | 44 | `19-T44-CONTINUOUS-CA.md` | PENDING | Not started |
@@ -75,9 +75,9 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 14 / 45.
+- Type stages complete: 15 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 30 pending, 1 in progress.
+- Type stages unresolved: 29 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 

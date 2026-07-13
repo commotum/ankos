@@ -49,8 +49,8 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37 complete, 14 of 45 type stages complete, T39 Number-Theoretic Filtering Systems in progress, and Synthesis and Goal 2 Handoff pending.
-- T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. Ulam is deferred to a T37/T39 composition audit.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39 complete, 15 of 45 type stages complete, T41 Function-Combination Systems in progress, and Synthesis and Goal 2 Handoff pending.
+- T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
 - The literal page-147 profile really retains `1`: all 1,200 stage cells match the stated update and the final black set is `{1} union primes<=100`, while bottom labels omit `1`. The mathematical preset therefore starts at 2 explicitly. Finite certification after divisor 10, requested rows through 13, and infinite noncompletion remain distinct.
@@ -503,11 +503,11 @@ The direct-name union dispositioned 48 occurrences on 42 lines, fixed-lag tokens
 
 T37 adds `NumericPrefix(domain,origin,terms)`, exact minimal fresh seeds and replay-verified checkpoints, normalized `AffineFixedLag` programs, a named closed factorial-capable expression extension, `NextSequenceTerm`, old-prefix fixed-lag reads, `AppendTerm`, and `AppendOnlySequenceUpdate` as the ninth public update law. Every valid event preserves all old terms and appends exactly one indexed term; repeated values still advance and fixed-reference invalidity is static. Compact seed-plus-event traces reconstruct `h+1` prefixes from `h` appends, while a lag window is only a future-sufficient non-injective quotient.
 
-Exact oracles pin the six page-143 horizons `38/48/22/26/44/27`, every displayed term and endpoint, the source's (e)/(f) characteristic-equation mislabel, Fibonacci beyond signed 64-bit, Lucas/Perrin/factorial, trace cardinality, checkpoint replay, and window loss. Closed forms, plots, sounds, and memoization remain downstream; current modular hidden-history AR2 is not the reference implementation. T38 computed indices and T43 scalar maps stay separate; Ulam becomes an explicit T37/T39 composition question. No prior stage was reopened. Next: T39.
+Exact oracles pin the six page-143 horizons `38/48/22/26/44/27`, every displayed term and endpoint, the source's (e)/(f) characteristic-equation mislabel, Fibonacci beyond signed 64-bit, Lucas/Perrin/factorial, trace cardinality, checkpoint replay, and window loss. Closed forms, plots, sounds, and memoization remain downstream; current modular hidden-history AR2 is not the reference implementation. T38 computed indices and T43 scalar maps stay separate; at T37 closure Ulam remained an explicit T37/T39 composition question, resolved by the following stage. No prior stage was reopened. Next: T39.
 
 ### 16-T39-FILTERS
 
-Status: **IN PROGRESS** in `goal-1/16-T39-FILTERS.md`.
+Status: **COMPLETE** in `goal-1/16-T39-FILTERS.md`.
 
 #### Big Picture Objective
 
@@ -529,9 +529,11 @@ T39 separates `IntegerFilterSpec`, `SuccessiveDivisibilitySieve`, and `IntegerMe
 
 All 1,200 page-147 cells match the literal `1..100`, divisors `2..13` trace. The source genuinely retains `1`, so exact display and corrected prime profiles are separate. Independent oracles pin all six page-148 formulas/horizons—including 1,000 forward gaps ending at 8—and all five page-150 measurements—including ordered Goldbach and signed ordered square tuples. Finite certification, infinite intensional queries, equality, serialization, trace, outcomes, numerical contexts, and no-cheating cases are explicit.
 
-Ulam is now an honest T37/T39 composition: closed first-accepted ascending candidate selection counts one unordered pair of distinct old indices in the complete old prefix, then the existing T37 append fires. The source's `1,2,3,4,...` prefix itself rejects ordered/self-pair alternatives. Current finite coordinate/callback selectors are semantic mismatches, while their universe/predicate/order responsibility split can be generalized structurally. No prior stage is reopened. Global verification is pending before closure; next remains T39 verification, then T41.
+Ulam is now an honest T37/T39 composition: closed first-accepted ascending candidate selection counts one unordered pair of distinct old indices in the complete old prefix, then the existing T37 append fires. The source's `1,2,3,4,...` prefix itself rejects ordered/self-pair alternatives. Current finite coordinate/callback selectors are semantic mismatches, while their universe/predicate/order responsibility split can be generalized structurally. Exact semantic assertions, seven raster hashes, Markdown fences, `git diff --check`, and all 102 repository tests pass. No prior stage is reopened. Next: T41.
 
 ### 17-T41-FUNCTIONS
+
+Status: **IN PROGRESS** in `goal-1/17-T41-FUNCTIONS.md`.
 
 #### Big Picture Objective
 
