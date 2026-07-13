@@ -19,7 +19,7 @@ t+3\mathrm{D}:&\quad c=[t,x,y,z].
 \end{aligned}
 $$
 
-At update time $t$, `FRONTIER` selects which current-state coordinates are active update sites. `NEIGHBORHOOD` reads around each selected current-state coordinate, `RULE` is applied in parallel, and the resulting values are written to the corresponding next-state coordinates at time $t+1$. Current-state sites not selected by the frontier are copied forward unchanged.
+At update time $t$, `FRONTIER` selects which next-state coordinates are writable. `RULE` is applied in parallel to all writable coordinates using current-state reads from `NEIGHBORHOOD`. All non-frontier coordinates are copied forward unchanged.
 
 ---
 
@@ -37,7 +37,7 @@ SPECIFICATION:
     RULE
 ```
 
-Each neighborhood is specified as a relative-offset read selector anchored at the current update site and built from the shared selector/mask utility:
+Each neighborhood is specified as a relative-offset read selector built from the shared selector/mask utility:
 
 ```text
 NEIGHBORHOOD[j]:
@@ -53,14 +53,14 @@ NEIGHBORHOOD[j]:
     READ_MODE ∈ {COMPACT_SELECTED, FIXED_SUPPORT_WITH_MASK}
 ```
 
-Each frontier component is specified as an absolute-coordinate update-site selector built from the same selector/mask utility:
+Each frontier component is specified as an absolute-coordinate write selector built from the same selector/mask utility:
 
 ```text
 FRONTIER[i]:
     SELECTOR[Q_F, C_F]
     Q_F = D
     C_F = (t, X̃⁽ᵗ⁾)
-    VARIABLE = c = [t, x, y, z]
+    VARIABLE = c⁺ = [t+1, x, y, z]
     FRAME = ABSOLUTE
     UNIVERSE = U_i : C_F → finite subsets of D
     PREDICATE = (φ_i,1, ..., φ_i,n)
@@ -92,7 +92,7 @@ $$
 X:D\to A.
 $$
 
-During generation, the partially written trajectory after completing updates through time $t$ is
+During generation, the trajectory after completing the update through time $t$ is
 
 $$
 X^{(t)}:D\to A.
@@ -104,7 +104,7 @@ $$
 \widetilde{X}^{(t)}:\mathbb{Z}^4\to A.
 $$
 
-The update time is the explicit time coordinate stored inside
+The update index is the explicit time coordinate $t$ inside
 
 $$
 c=[t,x,y,z].
@@ -201,7 +201,7 @@ $$
 
 `ALPHABET` is the set of possible values stored at each coordinate.
 
-Examples include binary states, $K$-color states, bounded integers, or symbolic states.
+Examples include binary states, $k$-color states, bounded integers, or symbolic states.
 
 Formally,
 
@@ -291,7 +291,7 @@ $$
 
 ## BOUNDARY
 
-`BOUNDARY` defines how spatial reads behave outside `SHAPE` at the requested read time. The time coordinate is preserved; boundary policies act only on the active spatial axes.
+`BOUNDARY` defines how spatial reads behave outside `SHAPE` at the current read time. The time coordinate is preserved; boundary policies act only on the active spatial axes.
 
 Supported values:
 
@@ -308,10 +308,10 @@ $$
 Let
 
 $$
-c=[\tau,x,y,z]
+c=[t,x,y,z]
 $$
 
-be a read coordinate whose time coordinate $\tau$ is available in the generated history, and let
+be a current-state read coordinate, and let
 
 $$
 I_s=I_x\times I_y\times I_z.
@@ -359,39 +359,39 @@ preserve the time coordinate and act coordinatewise on the spatial intervals in 
 
 ## NEIGHBORHOOD
 
-`NEIGHBORHOOD` is an ordered collection of read stencils anchored at a current-state update site.
+`NEIGHBORHOOD` is an ordered collection of relative read stencils anchored at the current-state source coordinate.
 
 ```text
 NEIGHBORHOOD = (NEIGHBORHOOD[1], ..., NEIGHBORHOOD[m])
 ```
 
-At update time $t$, a frontier-selected update site has coordinate
-
-$$
-c=[t,x,y,z].
-$$
-
-Each `NEIGHBORHOOD[j]` defines a finite, ordered relative-offset read interface around that current site. The offset coordinate is
+Each `NEIGHBORHOOD[j]` defines a finite, ordered relative-offset read interface. The offset coordinate is
 
 $$
 \delta=[\Delta t,\Delta x,\Delta y,\Delta z]\in\mathbb{Z}^4.
 $$
 
-The offset $\delta$ is interpreted relative to the current update site, not relative to the future write coordinate. Thus the queried coordinate is
+At update time $t$, the source coordinate associated with a writable next-state coordinate is
+
+$$
+c=[t,x,y,z].
+$$
+
+The offset $\delta$ is interpreted relative to this current-state source coordinate. Thus the queried coordinate is
 
 $$
 c+\delta=[t+\Delta t,\ x+\Delta x,\ y+\Delta y,\ z+\Delta z].
 $$
 
-For ordinary Wolfram-style cellular automata, spatial neighborhoods read the current state, so
+Under the Wolfram transition convention, every neighborhood read belongs to the current state:
 
 ```text
 Δt = 0
 ```
 
-for every spatial read. Temporal recurrences may additionally read past source times such as `Δt = -1`. Future reads with `Δt > 0` are non-causal for next-state generation.
+Negative and positive temporal offsets are not permitted. Programs requiring memory represent that memory inside the current state $S_t$.
 
-`NEIGHBORHOOD` and `FRONTIER` use the same selector/mask utility. They remain semantically distinct: a neighborhood selects **relative offsets to read around a current update site**, while a frontier selects **absolute current-state sites allowed to update**.
+`NEIGHBORHOOD` and `FRONTIER` use the same selector/mask utility. They remain semantically distinct: a neighborhood selects **relative offsets to read**, while a frontier selects **absolute coordinates to write**.
 
 ### Shared selector/mask utility
 
@@ -412,7 +412,7 @@ The fields have the following meanings:
 
 - `VARIABLE` names the candidate being tested.
 - `CONTEXT` lists the external values available to the universe generator and predicates.
-- `FRAME` records whether the candidate is an absolute coordinate or a source-relative offset.
+- `FRAME` records whether the candidate is an absolute coordinate or a relative offset.
 - `UNIVERSE` generates the finite candidate set to search.
 - `PREDICATE` filters candidate values.
 - `COMBINE` combines predicate values into one inclusion decision.
@@ -449,7 +449,7 @@ q\in\Omega_S(C):
 \right).
 $$
 
-If `ORDER = NONE`, the selected value is semantically an unordered finite set. If an implementation needs deterministic enumeration for batching, logging, visualization, or reproducible stochastic sampling, it may still use an implementation-level canonical enumeration without changing the mathematical update semantics.
+If `ORDER = NONE`, the selected value is semantically an unordered finite set. If an implementation needs deterministic enumeration for batching, logging, visualization, or reproducible stochastic sampling, it may still use an implementation-level canonical enumeration without changing the mathematical write semantics.
 
 ### Selector specialization for neighborhoods
 
@@ -548,7 +548,7 @@ $$
 \Omega_j(c,\widetilde{X}^{(t)})\subset\mathbb{Z}^4.
 $$
 
-For static current-state neighborhoods, `UNIVERSE` is usually a fixed finite offset set $\Omega_j$. For example,
+For static neighborhoods, `UNIVERSE` is usually a fixed finite offset set $\Omega_j$. For example,
 
 ```text
 UNIVERSE = {[0, Δx, Δy, 0] : Δx, Δy ∈ {-1,0,1}}
@@ -700,11 +700,11 @@ In later `RULE` formulas, $\mathcal{N}_j$ denotes the neighborhood read object p
 
 When $c+\delta\notin D$, the read is resolved by the boundary-extended field $\widetilde{X}^{(t)}$.
 
-### Source-time causal convention
+### Wolfram source-time convention
 
-For Wolfram-style next-state generation, neighborhoods read from the current source state or from past source states.
+For Wolfram-style next-state generation, neighborhoods read from the current source state.
 
-If a current update site is
+If the current source coordinate is
 
 $$
 c=[t,x,y,z],
@@ -716,17 +716,25 @@ $$
 \delta=[\Delta t,\Delta x,\Delta y,\Delta z]
 $$
 
-is source-time causal when
+is valid when
 
 $$
-\Delta t\le 0.
+\Delta t=0.
 $$
 
-The usual spatial cellular-automaton case uses $\Delta t=0$: the current state $s_t$ determines the next state $s_{t+1}$. Temporal-memory systems such as a second-order recurrence may use offsets like $\Delta t=0$ and $\Delta t=-1$ when computing the next value.
+Thus every neighborhood read has time coordinate
+
+$$
+t+\Delta t=t.
+$$
+
+The rule uses those current-state reads to produce the next state at time $t+1$. Memory-bearing programs carry their required history in $S_t$ rather than reading older trajectory slices.
 
 ### Predicate macros
 
 The macro layer includes `RADIUS`, `METRIC`, `REGION`, `FOV`, and axis-scoped `CHANGE_COUNT`. These are reusable predicate macros rather than primitive neighborhood fields.
+
+The previous implicit four-dimensional change-count concept is replaced by axis-scoped `CHANGE_COUNT`.
 
 A predicate macro is only syntax. It expands to an ordinary selector predicate and does not change the selector semantics.
 
@@ -822,7 +830,21 @@ $$
 \operatorname{change}_B(\delta)\in K_{\mathrm{set}}.
 $$
 
-Because the axes are explicit, temporal offsets such as $\Delta t=-1$ do not affect spatial change-count predicates unless `t` is explicitly included in the axis set.
+Examples:
+
+```text
+CHANGE_COUNT(axes={x,y}, K={1})
+```
+
+selects offsets where exactly one of the spatial axes $x,y$ changes.
+
+```text
+CHANGE_COUNT(axes={x,y,z}, K={3})
+```
+
+selects 3D corner-like offsets where all three spatial axes change.
+
+Because the axes are explicit, the required source-time coordinate $\Delta t=0$ does not affect spatial change-count predicates.
 
 #### `FOV`
 
@@ -849,7 +871,7 @@ The first case avoids division by zero at the reference offset.
 Useful derived predicates include:
 
 ```text
-TIME_OFFSET(h):          Δt = h
+SOURCE_TIME:             Δt = 0
 ZERO_AXES(B):            Δa = 0 for every a ∈ B
 NONZERO(axes=B):         exists a ∈ B such that Δa ≠ 0
 CURRENT_SPATIAL_CENTER:  Δt = 0 and Δx = Δy = Δz = 0 on active spatial axes
@@ -890,7 +912,7 @@ W = Δx = -1
 E = Δx = +1
 ```
 
-The examples assume Wolfram-style next-state generation, so spatial neighborhoods read from the current source state:
+The examples use the Wolfram source-time convention, so neighborhoods read from the current state:
 
 ```text
 Δt = 0
@@ -939,6 +961,43 @@ Selected offsets:
 
 For the nine-cell current-state spatial stencil, including the current spatial center `[0,0,0,0]`, remove `PREDICATE[2]`.
 
+### Example: Moore neighborhood in 3D
+
+The proper 3D Moore neighborhood is the 26 surrounding voxels on the current time slice of a $3\times3\times3$ cube.
+
+```text
+NEIGHBORHOOD Moore3D:
+    SELECTOR[Q_N, C_N]
+    Q_N = Z⁴
+    C_N = (c, X̃⁽ᵗ⁾)
+    VARIABLE = δ
+    FRAME = RELATIVE_TO_SOURCE
+
+    UNIVERSE =
+        {[0, Δx, Δy, Δz] :
+            Δx ∈ {-1,0,1},
+            Δy ∈ {-1,0,1},
+            Δz ∈ {-1,0,1}}
+
+    PREDICATE[1](δ) =
+        RADIUS(axes={x,y,z}, METRIC=LINF, REGION=FILLED, r=1)
+
+    PREDICATE[2](δ) =
+        NONZERO(axes={x,y,z})
+
+    COMBINE = AND
+    ORDER = LEX(Δt, Δx, Δy, Δz)
+    READ_MODE = COMPACT_SELECTED
+```
+
+Selected count:
+
+```text
+26 offsets
+```
+
+For the 27-cell current-state spatial stencil, including the current spatial center `[0,0,0,0]`, remove `PREDICATE[2]`.
+
 ### Example: Von Neumann neighborhood in 2D
 
 The proper 2D Von Neumann neighborhood is the four cardinal cells on the current time slice.
@@ -973,7 +1032,275 @@ Selected offsets:
 [0, 1, 0,0]   E
 ```
 
-### Example: current self only
+For the five-cell current-state cross, including the current spatial center, use
+
+```text
+RADIUS(axes={x,y}, METRIC=L1, REGION=FILLED, r=1)
+```
+
+instead of
+
+```text
+RADIUS(axes={x,y}, METRIC=L1, REGION=SHELL, r=1)
+```
+
+### Example: Von Neumann neighborhood in 3D
+
+The proper 3D Von Neumann neighborhood is the six axis-adjacent voxels on the current time slice.
+
+```text
+NEIGHBORHOOD VonNeumann3D:
+    SELECTOR[Q_N, C_N]
+    Q_N = Z⁴
+    C_N = (c, X̃⁽ᵗ⁾)
+    VARIABLE = δ
+    FRAME = RELATIVE_TO_SOURCE
+
+    UNIVERSE =
+        {[0, Δx, Δy, Δz] :
+            Δx ∈ {-1,0,1},
+            Δy ∈ {-1,0,1},
+            Δz ∈ {-1,0,1}}
+
+    PREDICATE[1](δ) =
+        RADIUS(axes={x,y,z}, METRIC=L1, REGION=SHELL, r=1)
+
+    COMBINE = IDENTITY
+    ORDER = LEX(Δt, Δx, Δy, Δz)
+    READ_MODE = COMPACT_SELECTED
+```
+
+Selected count:
+
+```text
+6 offsets
+```
+
+For the seven-cell current-state cross, including the current spatial center, use
+
+```text
+RADIUS(axes={x,y,z}, METRIC=L1, REGION=FILLED, r=1)
+```
+
+### Example: NW, N, and NE above a cell in 2D
+
+This reads the three cells directly above the source anchor, i.e. one unit in `+y` / north, on the current time slice:
+
+```text
+NW, N, NE
+```
+
+Relative to source anchor $[t,x,y,0]$, these are:
+
+```text
+[t-1, x-1, y+1, 0]
+[t-1, x,   y+1, 0]
+[t-1, x+1, y+1, 0]
+```
+
+As offsets:
+
+```text
+[0,-1, 1,0]
+[0, 0, 1,0]
+[0, 1, 1,0]
+```
+
+Selector:
+
+```text
+NEIGHBORHOOD NorthTriple2D:
+    SELECTOR[Q_N, C_N]
+    Q_N = Z⁴
+    C_N = (c, X̃⁽ᵗ⁾)
+    VARIABLE = δ
+    FRAME = RELATIVE_TO_SOURCE
+
+    UNIVERSE =
+        {[0, Δx, Δy, 0] :
+            Δx ∈ {-1,0,1},
+            Δy ∈ {1}}
+
+    PREDICATE[1](δ) = true
+
+    COMBINE = IDENTITY
+    ORDER = LEX(Δt, Δx, Δy, Δz)
+    READ_MODE = COMPACT_SELECTED
+```
+
+Equivalent predicate-style version:
+
+```text
+NEIGHBORHOOD NorthTriple2D:
+    SELECTOR[Q_N, C_N]
+    Q_N = Z⁴
+    C_N = (c, X̃⁽ᵗ⁾)
+    VARIABLE = δ
+    FRAME = RELATIVE_TO_SOURCE
+
+    UNIVERSE =
+        {[0, Δx, Δy, 0] :
+            Δx ∈ {-1,0,1},
+            Δy ∈ {-1,0,1}}
+
+    PREDICATE[1](δ) =
+        Δy = 1
+
+    PREDICATE[2](δ) =
+        RADIUS(axes={x}, METRIC=LINF, REGION=FILLED, r=1)
+
+    COMBINE = AND
+    ORDER = LEX(Δt, Δx, Δy, Δz)
+    READ_MODE = COMPACT_SELECTED
+```
+
+### Example: NW, N, and NE offset north by one row
+
+This reads the same horizontal triple one row farther north on the current time slice:
+
+```text
+[t-1, x-1, y+2, 0]
+[t-1, x,   y+2, 0]
+[t-1, x+1, y+2, 0]
+```
+
+As offsets:
+
+```text
+[0,-1, 2,0]
+[0, 0, 2,0]
+[0, 1, 2,0]
+```
+
+Selector:
+
+```text
+NEIGHBORHOOD NorthTriple2D_OffsetNorth1:
+    SELECTOR[Q_N, C_N]
+    Q_N = Z⁴
+    C_N = (c, X̃⁽ᵗ⁾)
+    VARIABLE = δ
+    FRAME = RELATIVE_TO_SOURCE
+
+    UNIVERSE =
+        {[0, Δx, Δy, 0] :
+            Δx ∈ {-1,0,1},
+            Δy ∈ {2}}
+
+    PREDICATE[1](δ) = true
+
+    COMBINE = IDENTITY
+    ORDER = LEX(Δt, Δx, Δy, Δz)
+    READ_MODE = COMPACT_SELECTED
+```
+
+Predicate-style version:
+
+```text
+NEIGHBORHOOD NorthTriple2D_OffsetNorth1:
+    SELECTOR[Q_N, C_N]
+    Q_N = Z⁴
+    C_N = (c, X̃⁽ᵗ⁾)
+    VARIABLE = δ
+    FRAME = RELATIVE_TO_SOURCE
+
+    UNIVERSE =
+        {[0, Δx, Δy, 0] :
+            Δx ∈ {-1,0,1},
+            Δy ∈ {-1,0,1,2}}
+
+    PREDICATE[1](δ) =
+        Δy = 2
+
+    PREDICATE[2](δ) =
+        RADIUS(axes={x}, METRIC=LINF, REGION=FILLED, r=1)
+
+    COMBINE = AND
+    ORDER = LEX(Δt, Δx, Δy, Δz)
+    READ_MODE = COMPACT_SELECTED
+```
+
+### Example: Only corners in 2D
+
+For a 2D $3\times3$ current-state spatial window, the corners are:
+
+```text
+[0,-1,-1,0]   SW
+[0,-1, 1,0]   NW
+[0, 1,-1,0]   SE
+[0, 1, 1,0]   NE
+```
+
+Selector:
+
+```text
+NEIGHBORHOOD Corners2D:
+    SELECTOR[Q_N, C_N]
+    Q_N = Z⁴
+    C_N = (c, X̃⁽ᵗ⁾)
+    VARIABLE = δ
+    FRAME = RELATIVE_TO_SOURCE
+
+    UNIVERSE =
+        {[0, Δx, Δy, 0] :
+            Δx ∈ {-1,0,1},
+            Δy ∈ {-1,0,1}}
+
+    PREDICATE[1](δ) =
+        CHANGE_COUNT(axes={x,y}, K={2})
+
+    COMBINE = IDENTITY
+    ORDER = LEX(Δt, Δx, Δy, Δz)
+    READ_MODE = COMPACT_SELECTED
+```
+
+Selected count:
+
+```text
+4 offsets
+```
+
+### Example: Only corners in 3D
+
+For a 3D $3\times3\times3$ current-state spatial cube, the corners are the eight offsets where every spatial coordinate changes by one:
+
+```text
+Δx ∈ {-1,1}
+Δy ∈ {-1,1}
+Δz ∈ {-1,1}
+```
+
+Selector:
+
+```text
+NEIGHBORHOOD Corners3D:
+    SELECTOR[Q_N, C_N]
+    Q_N = Z⁴
+    C_N = (c, X̃⁽ᵗ⁾)
+    VARIABLE = δ
+    FRAME = RELATIVE_TO_SOURCE
+
+    UNIVERSE =
+        {[0, Δx, Δy, Δz] :
+            Δx ∈ {-1,0,1},
+            Δy ∈ {-1,0,1},
+            Δz ∈ {-1,0,1}}
+
+    PREDICATE[1](δ) =
+        CHANGE_COUNT(axes={x,y,z}, K={3})
+
+    COMBINE = IDENTITY
+    ORDER = LEX(Δt, Δx, Δy, Δz)
+    READ_MODE = COMPACT_SELECTED
+```
+
+Selected count:
+
+```text
+8 offsets
+```
+
+### Example: Current self only
 
 Useful when the source cell's current state should be separated from its surrounding neighbors.
 
@@ -994,7 +1321,7 @@ NEIGHBORHOOD CurrentSelf:
     READ_MODE = COMPACT_SELECTED
 ```
 
-A Life-like or semi-totalistic rule can then use:
+A Life-like rule can then use:
 
 ```text
 NEIGHBORHOOD[1] = CurrentSelf
@@ -1003,61 +1330,103 @@ NEIGHBORHOOD[2] = Moore2D
 
 instead of using a single current-state spatial stencil that includes the current spatial center.
 
-### Example: Dyadaxes neighborhoods
-
-The V1.1 Dyadaxes family uses three current-state neighborhood components.
-
-In `t+1D`:
+### Example: Radius-r Moore neighborhood in 2D
 
 ```text
-CurrentSelf = {[0,  0,0,0]}
-Primary     = {[0, -1,0,0], [0, +1,0,0]}
-Secondary   = {[0, -2,0,0], [0, +2,0,0]}
+NEIGHBORHOOD Moore2D_RadiusR:
+    SELECTOR[Q_N, C_N]
+    Q_N = Z⁴
+    C_N = (c, X̃⁽ᵗ⁾)
+    VARIABLE = δ
+    FRAME = RELATIVE_TO_SOURCE
+
+    UNIVERSE =
+        {[0, Δx, Δy, 0] :
+            Δx ∈ {-r, ..., r},
+            Δy ∈ {-r, ..., r}}
+
+    PREDICATE[1](δ) =
+        RADIUS(axes={x,y}, METRIC=LINF, REGION=FILLED, r)
+
+    PREDICATE[2](δ) =
+        NONZERO(axes={x,y})
+
+    COMBINE = AND
+    ORDER = LEX(Δt, Δx, Δy, Δz)
+    READ_MODE = COMPACT_SELECTED
 ```
 
-In `t+2D`:
+### Example: Radius-r Von Neumann neighborhood in 2D
+
+Filled diamond:
 
 ```text
-CurrentSelf = {[0,  0,  0,0]}
-Primary     = RADIUS(axes={x,y}, METRIC=L1,   REGION=SHELL,  r=1)
-Secondary   = CHANGE_COUNT(axes={x,y}, K={2}) inside the 3x3 current-state window
+NEIGHBORHOOD VonNeumann2D_FilledRadiusR:
+    SELECTOR[Q_N, C_N]
+    Q_N = Z⁴
+    C_N = (c, X̃⁽ᵗ⁾)
+    VARIABLE = δ
+    FRAME = RELATIVE_TO_SOURCE
+
+    UNIVERSE =
+        {[0, Δx, Δy, 0] :
+            Δx ∈ {-r, ..., r},
+            Δy ∈ {-r, ..., r}}
+
+    PREDICATE[1](δ) =
+        RADIUS(axes={x,y}, METRIC=L1, REGION=FILLED, r)
+
+    PREDICATE[2](δ) =
+        NONZERO(axes={x,y})
+
+    COMBINE = AND
+    ORDER = LEX(Δt, Δx, Δy, Δz)
+    READ_MODE = COMPACT_SELECTED
 ```
 
-In `t+3D`:
+Shell only:
 
 ```text
-CurrentSelf = {[0, 0, 0, 0]}
-Primary     = RADIUS(axes={x,y,z}, METRIC=L1,   REGION=SHELL,  r=1)
-Secondary   = CHANGE_COUNT(axes={x,y,z}, K={2,3}) inside the 3x3x3 current-state window
-```
+NEIGHBORHOOD VonNeumann2D_ShellRadiusR:
+    SELECTOR[Q_N, C_N]
+    Q_N = Z⁴
+    C_N = (c, X̃⁽ᵗ⁾)
+    VARIABLE = δ
+    FRAME = RELATIVE_TO_SOURCE
 
-A second-order scalar recurrence can use source-time memory by reading the current scalar and the previous scalar:
+    UNIVERSE =
+        {[0, Δx, Δy, 0] :
+            Δx ∈ {-r, ..., r},
+            Δy ∈ {-r, ..., r}}
 
-```text
-Current = {[0, 0,0,0]}
-Prev    = {[-1,0,0,0]}
+    PREDICATE[1](δ) =
+        RADIUS(axes={x,y}, METRIC=L1, REGION=SHELL, r)
+
+    COMBINE = IDENTITY
+    ORDER = LEX(Δt, Δx, Δy, Δz)
+    READ_MODE = COMPACT_SELECTED
 ```
 
 ---
 
 ## FRONTIER
 
-`FRONTIER` is an ordered collection of absolute-coordinate update-site selectors.
+`FRONTIER` is an ordered collection of absolute-coordinate write selectors.
 
 ```text
 FRONTIER = (FRONTIER[1], ..., FRONTIER[q])
 ```
 
-Each `FRONTIER[i]` selects current-state update sites
+Each `FRONTIER[i]` selects actual writable coordinates
 
 $$
-c=[t,x,y,z]\in D
+c^+=[t+1,x,y,z]\in D
 $$
 
-from the persistent trajectory domain. Unlike neighborhoods, frontiers select absolute current coordinates, not relative offsets. The write coordinate associated with an update site is
+from the next state. Unlike neighborhoods, frontiers select absolute coordinates, not relative offsets. The current-state source anchor associated with a writable coordinate is
 
 $$
-c^+=[t+1,x,y,z].
+\operatorname{src}_t(c^+)=[t,x,y,z].
 $$
 
 ### Selector specialization for frontiers
@@ -1069,13 +1438,19 @@ FRONTIER[i]:
     SELECTOR[Q_F, C_F]
     Q_F = D
     C_F = (t, X̃⁽ᵗ⁾)
-    VARIABLE = c = [t, x, y, z]
+    VARIABLE = c⁺ = [t+1, x, y, z]
     FRAME = ABSOLUTE
     UNIVERSE = U_i : C_F → finite subsets of D
     PREDICATE = (φ_i,1, ..., φ_i,n)
     COMBINE = Φ_i
     ORDER = ord_i
 ```
+
+The frontier context is
+
+$$
+C_F=(t,\widetilde{X}^{(t)}).
+$$
 
 Each predicate has type
 
@@ -1086,22 +1461,22 @@ $$
 Equivalently,
 
 $$
-\phi_{i,\ell}(c,t,\widetilde{X}^{(t)})\in\{0,1\}.
+\phi_{i,\ell}(c^+,t,\widetilde{X}^{(t)})\in\{0,1\}.
 $$
 
-If a frontier predicate is purely geometric or time-scheduled, it may ignore $\widetilde{X}^{(t)}$.
+If a frontier predicate is purely geometric, it may ignore $\widetilde{X}^{(t)}$.
 
-The component update-site set is
+The component write set is
 
 $$
 F_{i,t}
 =
 \left\{
-c\in U_i(t,\widetilde{X}^{(t)}):
+c^+\in U_i(t,\widetilde{X}^{(t)}):
 \Phi_i\!\left(
-\phi_{i,1}(c,t,\widetilde{X}^{(t)}),
+\phi_{i,1}(c^+,t,\widetilde{X}^{(t)}),
 \dots,
-\phi_{i,n_i}(c,t,\widetilde{X}^{(t)})
+\phi_{i,n_i}(c^+,t,\widetilde{X}^{(t)})
 \right)=1
 \right\}.
 $$
@@ -1115,148 +1490,248 @@ $$
 combines the component frontiers into the active frontier predicate:
 
 $$
-\phi(c,t,\widetilde{X}^{(t)})
+\phi(c^+,t,\widetilde{X}^{(t)})
 =
 \Phi_{\mathrm{frontier}}\!\left(
-\mathbf{1}[c\in F_{1,t}],
+\mathbf{1}[c^+\in F_{1,t}],
 \dots,
-\mathbf{1}[c\in F_{q,t}]
+\mathbf{1}[c^+\in F_{q,t}]
 \right).
 $$
 
-The active update-site set at time $t$ is
-
-$$
-S_t=\{[t,x,y,z]\in D\}.
-$$
+The active write set for the transition from time $t$ to time $t+1$ is
 
 $$
 F_t
 =
-\{c\in S_t:\phi(c,t,\widetilde{X}^{(t)})=1\}.
+\{c^+\in D:\operatorname{time}(c^+)=t+1\ \land\ \phi(c^+,t,\widetilde{X}^{(t)})=1\}.
 $$
 
-All coordinates in $F_t$ are updated in parallel from the same current snapshot $\widetilde{X}^{(t)}$ and written to their corresponding next-time coordinates $c^+$.
+All coordinates in $F_t$ are updated in parallel from the same current-state snapshot $\widetilde{X}^{(t)}$.
 
 ### Defaults
 
 ```text
-UNIVERSE = current time slice { [t,x,y,z] }
+UNIVERSE = {c⁺ ∈ D : time(c⁺) = t + 1}
 COMBINE = IDENTITY        if there is one predicate
 COMBINE = AND             if multiple predicates are listed without another combiner
 ORDER = NONE
 FRONTIER_COMBINE = OR
 ```
 
-Inside one frontier selector, `COMBINE` combines that selector's predicates. Across multiple frontier components, `FRONTIER_COMBINE` combines the component update-site sets.
+Inside one frontier selector, `COMBINE` combines that selector's predicates. Across multiple frontier components, `FRONTIER_COMBINE` combines the component write sets.
+
+Equivalently, for multiple frontier components,
+
+$$
+\Phi_{\mathrm{frontier}}(b_1,\dots,b_q)=b_1\lor\cdots\lor b_q.
+$$
+
+If $q=1$, then
+
+$$
+\Phi_{\mathrm{frontier}}(b_1)=b_1.
+$$
 
 `ORDER = NONE` means frontier order has no mathematical effect because writes are parallel. An implementation may still use a deterministic enumeration such as lexicographic order for batching, logging, visualization, or reproducible stochastic sampling.
 
-### Example: Full current-state update slice
+### Example: Full next-state slice
 
-This is the standard cellular-automaton update schedule.
+This is the standard cellular-automaton update.
 
 ```text
-FRONTIER FullCurrentSlice:
+FRONTIER FullNextSlice:
     SELECTOR[Q_F, C_F]
     Q_F = D
     C_F = (t, X̃⁽ᵗ⁾)
-    VARIABLE = c
+    VARIABLE = c⁺
     FRAME = ABSOLUTE
 
-    UNIVERSE = {[t,x,y,z] : (x,y,z) in active spatial domain}
+    UNIVERSE = D
 
-    PREDICATE[1](c,t,X̃) = true
+    PREDICATE[1](c⁺,t,X̃) =
+        time(c⁺) = t + 1
 
     COMBINE = IDENTITY
     ORDER = NONE
 ```
 
-At time $t$, this selects
+At update time $t$, this writes
 
 $$
-F_t=\{[t,x,y,z]\in D\}.
+F_t=\{[t+1,x,y,z]\in D\}.
 $$
 
-The rule writes the selected sites to
+### Example: Single row in a 2D slice
 
-$$
-F_t^+=\{[t+1,x,y,z]:[t,x,y,z]\in F_t\}.
-$$
-
-### Example: Single row in a 2D current slice
-
-This updates only row $y=y_0$ of the current slice and writes the result to the same row in the next slice.
+This writes only row $y=y_0$ of the next slice.
 
 ```text
 FRONTIER SingleRow2D:
     SELECTOR[Q_F, C_F]
     Q_F = D
     C_F = (t, X̃⁽ᵗ⁾)
-    VARIABLE = c
+    VARIABLE = c⁺
     FRAME = ABSOLUTE
 
-    UNIVERSE = {[t,x,y,0] : x ∈ I_x, y ∈ I_y}
+    UNIVERSE = D
 
-    PREDICATE[1](c,t,X̃) =
+    PREDICATE[1](c⁺,t,X̃) =
+        time(c⁺) = t + 1
+
+    PREDICATE[2](c⁺,t,X̃) =
         y = y₀
 
-    COMBINE = IDENTITY
+    COMBINE = AND
     ORDER = NONE
 ```
 
-The update-site set is
+The write set is
 
 $$
-F_t=\{[t,x,y_0,0]\in D\}.
+F_t=\{[t+1,x,y_0,0]\in D\}.
 $$
 
-### Example: Checkerboard sublattice in the current slice
+### Example: Plane in 3D
 
-This updates alternating spatial cells and writes them to the next slice.
+```text
+FRONTIER Plane3D:
+    SELECTOR[Q_F, C_F]
+    Q_F = D
+    C_F = (t, X̃⁽ᵗ⁾)
+    VARIABLE = c⁺
+    FRAME = ABSOLUTE
+
+    UNIVERSE = D
+
+    PREDICATE[1](c⁺,t,X̃) =
+        time(c⁺) = t + 1
+
+    PREDICATE[2](c⁺,t,X̃) =
+        z = z₀
+
+    COMBINE = AND
+    ORDER = NONE
+```
+
+### Example: Main diagonal in 2D
+
+```text
+FRONTIER MainDiagonal2D:
+    SELECTOR[Q_F, C_F]
+    Q_F = D
+    C_F = (t, X̃⁽ᵗ⁾)
+    VARIABLE = c⁺
+    FRAME = ABSOLUTE
+
+    UNIVERSE = D
+
+    PREDICATE[1](c⁺,t,X̃) =
+        time(c⁺) = t + 1
+
+    PREDICATE[2](c⁺,t,X̃) =
+        x = y
+
+    COMBINE = AND
+    ORDER = NONE
+```
+
+### Example: Anti-diagonal in 2D
+
+```text
+FRONTIER AntiDiagonal2D:
+    SELECTOR[Q_F, C_F]
+    Q_F = D
+    C_F = (t, X̃⁽ᵗ⁾)
+    VARIABLE = c⁺
+    FRAME = ABSOLUTE
+
+    UNIVERSE = D
+
+    PREDICATE[1](c⁺,t,X̃) =
+        time(c⁺) = t + 1
+
+    PREDICATE[2](c⁺,t,X̃) =
+        x + y = b
+
+    COMBINE = AND
+    ORDER = NONE
+```
+
+### Example: Checkerboard sublattice in the next slice
+
+This writes alternating spatial cells.
 
 ```text
 FRONTIER Checkerboard2D:
     SELECTOR[Q_F, C_F]
     Q_F = D
     C_F = (t, X̃⁽ᵗ⁾)
-    VARIABLE = c
+    VARIABLE = c⁺
     FRAME = ABSOLUTE
 
-    UNIVERSE = {[t,x,y,0] : x ∈ I_x, y ∈ I_y}
+    UNIVERSE = D
 
-    PREDICATE[1](c,t,X̃) =
+    PREDICATE[1](c⁺,t,X̃) =
+        time(c⁺) = t + 1
+
+    PREDICATE[2](c⁺,t,X̃) =
         (x + y) mod 2 = 0
 
-    COMBINE = IDENTITY
+    COMBINE = AND
     ORDER = NONE
 ```
 
-Alternating checkerboards by current time can be written as:
+The complementary checkerboard is:
 
 ```text
-(x + y) mod 2 = t mod 2
+(x + y) mod 2 = 1
 ```
 
-### Example: State-dependent active wavefront
+### Example: Manhattan shell in 2D
 
-This updates current-slice coordinates adjacent to active cells in the current state.
+```text
+FRONTIER ManhattanShell2D:
+    SELECTOR[Q_F, C_F]
+    Q_F = D
+    C_F = (t, X̃⁽ᵗ⁾)
+    VARIABLE = c⁺
+    FRAME = ABSOLUTE
+
+    UNIVERSE = D
+
+    PREDICATE[1](c⁺,t,X̃) =
+        time(c⁺) = t + 1
+
+    PREDICATE[2](c⁺,t,X̃) =
+        |x - x₀| + |y - y₀| = r
+
+    COMBINE = AND
+    ORDER = NONE
+```
+
+### Example: State-dependent active frontier for next-state generation
+
+This writes next-slice coordinates adjacent to active cells in the current time slice.
 
 ```text
 FRONTIER ActiveWavefront2D:
     SELECTOR[Q_F, C_F]
     Q_F = D
     C_F = (t, X̃⁽ᵗ⁾)
-    VARIABLE = c
+    VARIABLE = c⁺
     FRAME = ABSOLUTE
 
-    UNIVERSE = {[t,x,y,0] : x ∈ I_x, y ∈ I_y}
+    UNIVERSE = D
 
-    PREDICATE[1](c,t,X̃) =
+    PREDICATE[1](c⁺,t,X̃) =
+        time(c⁺) = t + 1
+
+    PREDICATE[2](c⁺,t,X̃) =
         exists δ ∈ AdjacentCurrent2D :
-            X̃(c + δ) = a_active
+            X̃(src_t(c⁺) + δ) = a_active
 
-    COMBINE = IDENTITY
+    COMBINE = AND
     ORDER = NONE
 ```
 
@@ -1270,27 +1745,30 @@ AdjacentCurrent2D =
       [0,0, 1,0] }
 ```
 
-This is a wavefront frontier: the update-site region depends on the already generated current slice.
+For a candidate coordinate
+
+```text
+c⁺ = [t+1, x, y, 0]
+```
+
+these offsets read
+
+```text
+[t, x-1, y,   0]
+[t, x+1, y,   0]
+[t, x,   y-1, 0]
+[t, x,   y+1, 0]
+```
+
+This is a wavefront frontier: the writable next-state region depends on the current state.
 
 ---
 
 ## RULE
 
-`RULE` maps neighborhood reads at a current update site to the value written at the corresponding next-state site.
+`RULE` maps current-state neighborhood reads to a new value for each writable next-state coordinate in the active frontier.
 
 All rule types are filtered by `NEIGHBORHOOD`. They differ only in how the local input is represented before the output is selected.
-
-For a current-state coordinate in the current slice
-
-$$
-c=[t,x,y,z],
-$$
-
-let the corresponding next-state coordinate be
-
-$$
-c^+=[t+1,x,y,z].
-$$
 
 The generator update is
 
@@ -1298,19 +1776,19 @@ $$
 X^{(t+1)}(c^+)=
 \begin{cases}
 R\!\left(
-c,
+c^+,
 \widetilde{X}^{(t)},
-\mathcal{N}_1(c;\widetilde{X}^{(t)}),
+\mathcal{N}_1(\operatorname{src}_t(c^+);\widetilde{X}^{(t)}),
 \dots,
-\mathcal{N}_m(c;\widetilde{X}^{(t)})
+\mathcal{N}_m(\operatorname{src}_t(c^+);\widetilde{X}^{(t)})
 \right),
-& c\in F_t,\\
-X^{(t)}(c),
-& c\in S_t\setminus F_t.
+& c^+\in F_t,\\
+X^{(t)}(\operatorname{src}_t(c^+)),
+& \operatorname{time}(c^+)=t+1\ \land\ c^+\notin F_t.
 \end{cases}
 $$
 
-All coordinates in $F_t$ are updated in parallel from the same current snapshot $\widetilde{X}^{(t)}$.
+All coordinates in $F_t$ are updated in parallel from the same current-state snapshot $\widetilde{X}^{(t)}$.
 
 ---
 
@@ -1333,7 +1811,7 @@ $$
 An exhaustive rule is
 
 $$
-R(c,\widetilde{X}^{(t)},\mathcal{N})
+R(c^+,\widetilde{X}^{(t)},\mathcal{N})
 =T(\mathcal{N}),
 $$
 
@@ -1378,7 +1856,7 @@ $$
 An isotropic rule is
 
 $$
-R(c,\widetilde{X}^{(t)},\mathcal{N})
+R(c^+,\widetilde{X}^{(t)},\mathcal{N})
 =
 \widehat{T}\!\left(
 [\mathcal{N}_1]_{G_1},
@@ -1436,7 +1914,7 @@ $$
 A semi-totalistic rule is
 
 $$
-R(c,\widetilde{X}^{(t)},\mathcal{N})
+R(c^+,\widetilde{X}^{(t)},\mathcal{N})
 =
 T\!\left(
 \Pi_1(\mathcal{N}_1),
@@ -1464,10 +1942,10 @@ Z_m
 A.
 $$
 
-A common binary case keeps the center state explicit and aggregates the surrounding cells by active count. For a single neighborhood $N$, let $S=\{s\}$ be a singleton designated subset corresponding to the current self entry, and let $B=N\setminus S$. Then
+A common binary case keeps the center state explicit and aggregates the surrounding cells by active count. For a single neighborhood $N$, let $S=\{s\}$ be a singleton designated subset corresponding to the current-state self entry, and let $B=N\setminus S$. Then
 
 $$
-R(c,\widetilde{X}^{(t)},\mathcal{N})
+R(c^+,\widetilde{X}^{(t)},\mathcal{N})
 =
 T\!\left(
 \mathcal{N}_{s},
@@ -1479,7 +1957,7 @@ T\!\left(
 \right).
 $$
 
-If $s$ is the current self entry, then $\mathcal{N}_{s}=\widetilde{X}^{(t)}(c)$. This is the usual outer-totalistic form: the rule depends on the center state and on a totalistic summary of the outer neighborhood.
+If $s$ is the current-state self entry, then $\mathcal{N}_{s}=\widetilde{X}^{(t)}(\operatorname{src}_t(c^+))$. This is the usual outer-totalistic form: the rule depends on the center state and on a totalistic summary of the outer neighborhood.
 
 ---
 
@@ -1508,7 +1986,7 @@ $$
 A totalistic rule is
 
 $$
-R(c,\widetilde{X}^{(t)},\mathcal{N})
+R(c^+,\widetilde{X}^{(t)},\mathcal{N})
 =
 T\!\left(
 \Gamma_1(\mathcal{N}_1),
@@ -1562,10 +2040,10 @@ $$
 A formulaic rule is
 
 $$
-R(c,\widetilde{X}^{(t)},\mathcal{N})
+R(c^+,\widetilde{X}^{(t)},\mathcal{N})
 =
 f\!\left(
-c,
+c^+,
 \widetilde{X}^{(t)},
 \mathcal{N}_1,
 \dots,
@@ -1601,12 +2079,12 @@ is deterministic.
 A stochastic rule is
 
 $$
-R(c,\widetilde{X}^{(t)},\mathcal{N})
+R(c^+,\widetilde{X}^{(t)},\mathcal{N})
 \sim
 P\!\left(
 \cdot
 \mid
-c,
+c^+,
 \widetilde{X}^{(t)},
 \mathcal{N}_1,
 \dots,
@@ -1650,19 +2128,13 @@ The default trajectory-generation setting stores the full state at every causal 
 The state at time $t$ determines the state at time $t+1$:
 
 $$
-X_{t+1}=\mathcal{R}(X_{\le t}).
+X_{t+1}=\mathcal{R}(X_t).
 $$
 
-For ordinary cellular automata, the rule reads the current source state:
+Every neighborhood reads from the current source state:
 
 $$
 \Delta t=0.
-$$
-
-For temporal recurrences, the rule may additionally read past source states:
-
-$$
-\Delta t\le 0.
 $$
 
 For Wolfram elementary cellular automata, this is the usual form
@@ -1677,7 +2149,7 @@ a_{i+1}(t)
 \right).
 $$
 
-In transformer training terms, the model consumes state-token coordinates at time $t$ and predicts the corresponding state-token coordinates at time $t+1$. The generator uses explicit state coordinates rather than relying on a flat token order to express this causality.
+In transformer training terms, the model consumes state-token coordinates at time $t$ and predicts state-token coordinates at time $t+1$. The generator uses explicit state coordinates rather than relying on a flat token order to express this causality.
 
 ---
 
@@ -1707,25 +2179,21 @@ $$
 &\text{2. Initialize }X^{(0)}\text{ from } \mathrm{SEED}.\\
 &\text{3. For each update time }t=0,\dots,T-2:\\
 &\qquad
-S_t
-=
-\{
-c\in D:
-\mathrm{time}(c)=t
-\}.\\
-&\qquad
 F_t
 =
 \{
-c\in S_t:
-\phi(c,t,\widetilde{X}^{(t)})=1
+c^+\in D:
+\operatorname{time}(c^+)=t+1
+\ \land\
+\phi(c^+,t,\widetilde{X}^{(t)})=1
 \}.\\
 &\qquad
-\text{Read all } \mathcal{N}_j(c;\widetilde{X}^{(t)})
+\text{For each }c^+\text{, let }c=\operatorname{src}_t(c^+)\text{ and read all }
+\mathcal{N}_j(c;\widetilde{X}^{(t)})
 \text{ from the current snapshot.}\\
 &\qquad
-\text{Write all } c^+=[t+1,x,y,z] \text{ for } c\in F_t \text{ in parallel by } R.\\
+\text{Write all } c^+\in F_t \text{ in parallel by } R.\\
 &\qquad
-\text{Copy all } c^+=[t+1,x,y,z] \text{ for } c\in S_t\setminus F_t \text{ forward unchanged.}
+\text{Copy all next-state } c^+\notin F_t \text{ forward from }X^{(t)}(\operatorname{src}_t(c^+)).
 \end{aligned}
 $$
