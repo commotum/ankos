@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation, T01, T09, T12, and T13 complete, 4 of 45 type stages complete, and Synthesis and Goal 2 Handoff pending. The next adversarial stage is T16 Sequential Substitution Systems.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16 complete, 5 of 45 type stages complete, and Synthesis and Goal 2 Handoff pending. The next adversarial stage is T17 Tag Systems.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -62,6 +62,10 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T13 validates source-first generic orchestration but splits update semantics: fixed-locus assignment preserves support, while `ParallelReplaceConcat` consumes every old ordered occurrence and creates children from typed nonempty words.
 - T13 state is an explicit discrete ordered sequence with finite canonical and documented infinite-support variants. Snapshot indices, occurrence lineage, finite observation, ragged trace, padding, and rendering are separate.
 - T13 uses a total alphabet-closed `Sigma -> Sigma+` table. Empty words belong to T15; neighbor context to T14; first-match scanning to T16; probabilistic words and continued-fraction rule streams remain separate variants.
+- T16 reuses finite ordered-word support but not T13 source coverage or commit. An immutable ordered literal program selects the lexicographic first `(clause_index,start_position)` match, returns one typed interval replacement, and commits one atomic splice.
+- T16 refines the source-first shell: match applicability is intrinsically coupled to the program's left sides, so `FirstApplicableMatch` and result lookup share one validated program object. This is explicit coupling, not a duplicated matcher callback.
+- T16 has zero successors with `NoMatch` when no clause applies. The final state is retained once; an applicable identity rule remains an event/self-loop, and external stop, horizon, invalidity, and error stay distinct.
+- T16 supplies no canonical rule numbering and directly evidences only nonempty literal clause sides. Empty RHS/deletion remains an explicit T15 re-audit boundary rather than a flag or inferred base feature.
 
 ## Assumptions To Challenge
 
@@ -250,7 +254,7 @@ All 288 direct-name lines and the complete definition/replacement/alias/Notes/In
 
 ### 6-T16-SEQUENTIAL-SUBSTITUTION
 
-Status: **IN PROGRESS** in `goal-1/6-T16-SEQUENTIAL-SUBSTITUTION.md`.
+Status: **COMPLETE** in `goal-1/6-T16-SEQUENTIAL-SUBSTITUTION.md`.
 
 #### Big Picture Objective
 
@@ -263,6 +267,10 @@ Apply the common protocol, identifying which choices belong to frontier selectio
 #### Completion Requirements
 
 All T16 scan and match variants are evidenced; ordering is modeled as defining semantics; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+All 51 direct-name lines and the complete rule/position-order, caption, Notes, Index/split, alias/history, stopping, overlap/confluence, finite-input, causal-trace, generalized/multiway, and emulation searches were dispositioned with zero unresolved candidates and 21 canonical excerpt groups. T16 reconstructs a finite ordered word plus an immutable ordered list of nonempty literal clauses. Selection is rule-major then leftmost position, exactly one old-snapshot interval is replaced, scanning restarts on the next step, and absence of a match is a typed terminal outcome. Principle 0 refines source selection to consume one program-owned applicability view; `ReplaceInterval` and `SingleSpliceUpdate` form a sibling structural update while T13 ordered state/provenance can be reused unchanged. Exact canonical, sorting, priority, overlap, newborn, identity/no-match, and lineage oracles guard the handoff. Host regex/replace-all, hidden cursors, family dispatch, fixed capacity, CA compilation, and multiway branching are rejected. Empty RHS remains an evidence boundary for T15. No prior stage was reopened. Next: T17.
 
 ### 7-T17-TAG
 

@@ -43,6 +43,7 @@ Every completed type will update the relevant rows below and record:
 | T09 Mobile Automata | Fixed ordered 1D lattice + total Boolean field + exactly one visible unit-payload active position | `ControlLocus("active")`; ordered old `(left,self,right)`; arbitrary 8-entry finite table returning color/displacement | `Assign(source,value)` + `TransitionControl(active,source±1,Unit)`; atomic compound commit | One deterministic successor, no halt/stay/split; native line or explicit relocation-aware realization; initial values/control independent | Source-frontier semantics, structured state/control, finite typed result codec, compound effects/update, control-preserving trace; all 65,536 code pairs; no mobile branch/CA packing |
 | T12 Turing Machines | Fixed ordered integer tape + total default/override symbol field + one head `(position,state)` | `ControlLocus("head")`; control payload + self-only tape symbol; complete `Q×Sigma` table | `Assign(old_head,symbol)` + `TransitionControl(head,old±1,next_state)`; atomic | Base has one successor and never halts; terminal-control variant has zero successors after final state; external stops distinct; no native finite edge | Payload control, total tape, product-key/result table, termination/stop reasons, structured trace; `(2sk)^(sk)`/known-code/trajectory oracles; no head packing/Turing branch |
 | T13 Neighbor-Independent Substitution | Explicit discrete ordered symbol sequence; canonical finite support plus explicit countably infinite support/cut realization | `AllOccurrences` over old snapshot; self symbol only; total alphabet-closed `h:Sigma->Sigma+` | `ReplaceOccurrence(source,word)` + atomic `ParallelReplaceConcat`; parents consumed, children ordered by source then word position | One deterministic non-halting successor; empty input is a fixed successor; no endpoint boundary for self-only read | Ordered support/occurrence sources, structured nonempty-word tables, sibling structural update algebra, ragged/lineage trace and infinite realization; exact morphism/growth/order oracles; no padding/callback/compiler/branch |
+| T16 Sequential Substitution | Finite discrete ordered word; no cursor/control | Program-coupled `FirstApplicableMatch`; ordered literal `Sigma+->Sigma+` clauses; rule-major then leftmost interval | `ReplaceInterval(match,word)` + atomic `SingleSpliceUpdate`; prefix/suffix persist, match consumed, output created | One deterministic successor for a match; zero successors with retained final state for `NoMatch`; no endpoint wrap/boundary | Ordered rewrite IR, matched-span sources/reads, single-splice sibling update, typed no-match outcome, ragged event/lineage trace; exact priority/overlap/no-op oracles; no callback/regex/family branch |
 
 ## Current Documented API Baseline
 
@@ -97,17 +98,17 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 | Dimension | Current candidate | Status | Evidence users |
 |---|---|---|---|
-| Support/topology | Fixed regular line and total fields remain one member; explicit discrete ordered sequences may change occurrence support and may be finite or countably infinite with an explicit cut | PROVISIONAL fixed-lattice and ordered-sequence members; other dynamic topology UNRESOLVED | T01, T09, T12, T13 |
-| Values/alphabet | Explicit finite field values; independent value and control-payload domains | PROVISIONAL for finite alphabets; broader value spaces UNRESOLVED | T01, T09, T12 |
+| Support/topology | Fixed regular line and total fields remain one member; explicit discrete ordered sequences may change occurrence support, with T13 finite/infinite variants and T16 finite global-scan words | PROVISIONAL fixed-lattice and ordered-sequence members; other dynamic topology UNRESOLVED | T01, T09, T12, T13, T16 |
+| Values/alphabet | Explicit finite field/word values; independent value and control-payload domains | PROVISIONAL for finite alphabets; broader value spaces UNRESOLVED | T01, T09, T12, T13, T16 |
 | Control | `SingleControl(key,position,payload)` in visible Markov state; unit payload for T09, finite head-state payload for T12 | PROVISIONAL single-control member; multiple/structural control UNRESOLVED | T09, T12; absent T01 |
-| Active loci | Firing/source selector: symbolic `AllSites`, `ControlLocus`, or ordered `AllOccurrences`; finite materialization belongs to realization | PROVISIONAL fixed-lattice/control/sequence sources; matched/queued sources UNRESOLVED | T01, T09, T12, T13 |
-| Reads/access | Explicitly ordered topology-relative values, source-control payload, or occurrence self value as applicable | PROVISIONAL for fixed lattices/single control/sequence self; pattern/path access UNRESOLVED | T01, T09, T12, T13 |
-| Rule choice | Explicit total finite table with validated input roles and typed finite or structured codomain; no implicit defaults | PROVISIONAL for local/control tables and word morphisms; structured calculations UNRESOLVED | T01, T09, T12, T13 |
-| Rule result | Typed members include `Assign`, payload-bearing `TransitionControl`, and `ReplaceOccurrence(nonempty_word)` | PROVISIONAL result sum; never a universal category | T01, T09, T12, T13 |
-| Commit/update | Explicit sibling algebras: fixed-support atomic effects versus ordered parent-consumption/child-concatenation structural update | PROVISIONAL two-member update family; conflicts/other structural mutation UNRESOLVED | T01, T09, T12, T13 |
-| Successors | One deterministic next configuration | PROVISIONAL T01 case; branching/solutions/derivatives remain distinct and UNRESOLVED | T01 |
-| Halting/invalidity | Base continuation, terminal-control state, external stop policy, horizon, and error are distinct | PROVISIONAL terminal model; other construction-specific halt/invalidity UNRESOLVED | T12; no intrinsic halt T01/T09 |
-| Trace encoding | Structured snapshots preserve values/control/terminal status or ragged ordered occurrences and lineage; `[t,x,0,0]` is a downstream row-local value lowering | PROVISIONAL for fixed 1D and ordered sequences; global schema UNRESOLVED | T01, T09, T12, T13 |
+| Active loci | Firing/source selector: `AllSites`, `ControlLocus`, `AllOccurrences`, or program-coupled `FirstApplicableMatch`; finite materialization belongs to realization | PROVISIONAL fixed/control/sequence/matched sources; queued and branching sources UNRESOLVED | T01, T09, T12, T13, T16 |
+| Reads/access | Explicitly ordered topology-relative values, source-control payload, occurrence self value, or an exact variable-length matched span | PROVISIONAL for fixed lattices/single control/sequence self/literal spans; path access UNRESOLVED | T01, T09, T12, T13, T16 |
+| Rule choice | Explicit total finite tables, total word morphisms, or immutable ordered literal rewrite clauses with validated roles/codomains; no implicit defaults | PROVISIONAL for local/control/morphism/literal rewrite programs; structured calculations UNRESOLVED | T01, T09, T12, T13, T16 |
+| Rule result | Typed members include `Assign`, payload-bearing `TransitionControl`, `ReplaceOccurrence(nonempty_word)`, and `ReplaceInterval(match,nonempty_word)` | PROVISIONAL result sum; never a universal category | T01, T09, T12, T13, T16 |
+| Commit/update | Explicit siblings: fixed-support atomic effects, full-generation ordered replacement, and exactly-one-interval ordered splice | PROVISIONAL three-member update family; deletion/conflicts/other mutation UNRESOLVED | T01, T09, T12, T13, T16 |
+| Successors | Deterministic transition may yield one successor or a typed zero-successor terminal outcome | PROVISIONAL deterministic/terminal case; branching/solutions/derivatives remain distinct and UNRESOLVED | T01, T12, T16 |
+| Halting/invalidity | Base continuation, terminal-control state, no-applicable-clause terminal, external stop policy, horizon, and error are distinct | PROVISIONAL terminal model; other construction-specific halt/invalidity UNRESOLVED | T12, T16; no intrinsic halt T01/T09/T13 |
+| Trace encoding | Structured snapshots preserve values/control/terminal status or ragged ordered occurrences, rewrite events, and lineage; `[t,x,0,0]` is a downstream row-local lowering | PROVISIONAL for fixed 1D and ordered sequences; global schema UNRESOLVED | T01, T09, T12, T13, T16 |
 | Solver/numerics | None in deterministic table transition | NOT APPLICABLE to T01; global boundary remains UNRESOLVED | T01 |
 
 ## Decision Log
@@ -245,6 +246,30 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: only sequence order is significant when positions shift (`BOOK:1046`); ordinary substitution admits infinite random input (`:14275`); tree/path/box/2D views are alternate observations (`:996-1016`, `12210-12230`).
 - Consequence: represent a discrete ordered configuration natively, with explicit finite or countably infinite support and an explicit cut when needed. Row-local `[t,x,0,0]`, finite observation windows, ragged storage, lineage events, padding, and render scale are downstream layers. An infinite seeded field is inspectable/query-order-independent data, never a callback or hidden RNG cursor.
 
+### D022 — Match-source applicability may be intrinsically program-coupled
+
+- Status: ACTIVE for literal rewrite systems.
+- Basis: T16 must scan the whole word for clause 0 before trying clause 1, and choose that clause's leftmost match (`BOOK:1062-1078`, `12289`). A source interval cannot be selected without the ordered left sides.
+- Consequence: refine the source-first shell to `SOURCE.select(state, program.applicability)`. `FirstApplicableMatch` and result lookup consume one authoritative immutable `OrderedLiteralRewriteProgram`; no second LHS table, matcher callback, or claim of independent frontier/rule composition is allowed. T01/T09/T12/T13 remain program-independent special cases and are not reopened.
+
+### D023 — Single interval splice is a distinct ordered update law
+
+- Status: ACTIVE for T16.
+- Basis: exactly one matched block is replaced per step while its prefix/suffix remain in order (`BOOK:1062-1068`, `2358`, `5936-5940`). T13 instead consumes every old occurrence and concatenates all child blocks.
+- Consequence: add `ReplaceInterval` plus `SingleSpliceUpdate` as a sibling of `ParallelReplaceConcat` and fixed-support atomic effects. Both ordered updates may share a private `ApplyOrderedSpans` kernel only after their public policies validate, respectively, complete singleton coverage or exactly one arbitrary span; the shared kernel never erases those laws.
+
+### D024 — Empty source selection has construction-specific outcomes
+
+- Status: ACTIVE.
+- Basis: T16 effectively stops only when no replacement applies (`BOOK:12289`), while T13's empty occurrence set evolves vacuously and T12 can terminate through explicit control.
+- Consequence: the executor returns typed `Advanced` or `Terminal(reason)` outcomes; it has no global empty-frontier rule. T16 retains the final snapshot once and reports `NoMatch`. An applicable identity clause is an event/self-loop, not a terminal state; horizon, external stop, invalidity, and error remain distinct.
+
+### D025 — Base T16 is an ordered nonempty literal-clause program without rule numbering
+
+- Status: PROVISIONAL for T16; T15 must re-audit erasing outputs.
+- Basis: all direct examples and Notes rules use nonempty literal sides (`BOOK:1064-1072`, `12269-12288`), rule order matters (`:1070-1078`, `12289`), variable block sizes are ordinary (`:19164`), and no T16 numbering/count convention exists.
+- Consequence: validate an ordered nonempty clause sequence with `lhs,rhs in Sigma+`, preserve duplicates/order, and reject empty LHS. Do not require an integer ID or infer deletion from multiway examples/host syntax. If T15 proves `Sigma*` outputs, generalize the shared splice deliberately and re-audit T13/T16 instead of adding `allow_empty` flags.
+
 ## Rejected Shortcuts
 
 These are globally rejected unless Principle 0 re-derivation replaces the goal itself:
@@ -254,6 +279,7 @@ These are globally rejected unless Principle 0 re-derivation replaces the goal i
 - fixed-capacity padding presented as dynamic-support semantics;
 - unrestricted formula or predicate callbacks that contain the entire construction;
 - hidden head state, program counters, cyclic counters, history, RNG state, or solver state;
+- hidden scan cursors, host regex/rewrite engines, duplicated pattern tables, or unordered rule maps;
 - compiling another construction to a CA merely to claim native coverage;
 - treating canonical `[t,x,y,z]` encoding or visualization coordinates as topology;
 - conflating a constraint with a solver, a PDE with a discretization/integrator, or a stochastic law with an RNG implementation;
@@ -266,13 +292,14 @@ These are globally rejected unless Principle 0 re-derivation replaces the goal i
 - `3-T09-MOBILE` — COMPLETE: rederived frontier as source selection; added visible single-position control, typed compound assignment/relocation effects, atomic update, and control-preserving traces. Resolved physical read order against executable Notes and the rule image; recorded exhaustive `{35,57}` and 65,536-rule oracles. T01 was re-audited but not reopened because its source/target coincidence preserves its result.
 - `4-T12-TURING` — COMPLETE: refined control to a payload-bearing form, added self-only control/value product reads, total default-symbol tapes, and explicit terminal/stop/error distinctions. Reconstructed `(2sk)^(sk)` tables, repaired the OCR-damaged numeric codec with independent guards, and recorded exact table/trajectory tests. T09 remains valid as unit-payload control; no stage reopened.
 - `5-T13-PARALLEL-SUBSTITUTION` — COMPLETE: preserved the generic source/read/rule/update shell but split `UPDATE` into honest fixed-support and ordered structural members. Added explicit discrete ordered support, `AllOccurrences`, total `Sigma->Sigma+` tables, typed occurrence replacement, source-order child construction, ragged/lineage traces, and explicit infinite realization pressure. Empty/contextual/sequential/stochastic/scheduled/geometric variants remain separate. T01/T09/T12 were re-audited and remain valid; no stage reopened.
+- `6-T16-SEQUENTIAL-SUBSTITUTION` — COMPLETE: refined source selection with explicit program-owned applicability, added rule-major/leftmost `FirstApplicableMatch`, exact matched-span reads, typed single-interval replacement/splice, and `NoMatch` termination. Reused T13 ordered support/provenance but kept its all-occurrence commit distinct. Empty RHS remains an evidence boundary for T15. T01/T09/T12/T13 were re-audited and remain valid; no stage reopened.
 
 ## Open Architecture Questions
 
 1. Which remaining catalog rows are constructions versus restrictions, presets, seed classes, observables, or solver-defined systems? T01 is a construction; T06/T07/T08 are already cross-referenced as restriction/seed hypotheses requiring their own evidence.
-2. Where does the T01/T09/T12/T13 source-read-result-update protocol cease to be substantive? Ordered replacement validates a sibling update algebra; first-match, queue, branching, constraints, and derivatives remain adversarial.
+2. Where does the T01/T09/T12/T13/T16 source-read-result-update protocol cease to be substantive? Program-coupled first-match remains meaningful; queue, branching, constraints, and derivatives remain adversarial.
 3. Which state models require topology richer than T13's discrete order, lineage that affects future rules rather than traces only, or visible control beyond T12's single payload head?
-4. How much structural update machinery can T14-T16 reuse from `ParallelReplaceConcat` without erasing context eligibility, deletion, priority, or single-splice semantics, and how should branching remain outside deterministic update?
+4. Can T14/T15 reuse the ordered-span kernel without erasing context eligibility or deletion, and can T17 reuse it for prefix consumption plus remote append without collapsing queue semantics into a generic callback?
 5. What trace encoding preserves types whose semantic address is not a rank-0..3 lattice coordinate?
 6. Which current selector, alphabet, rule-summary, seed, RNG, and raw-result components survive later evidence without semantic reinterpretation?
 7. Which current tests are canonical-construction evidence and which merely preserve incidental Phase 1 behavior? T01 shows that geometry and self-parity tests alone do not prove rule semantics.

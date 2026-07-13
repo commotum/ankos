@@ -1,10 +1,10 @@
 # 6-T16-SEQUENTIAL-SUBSTITUTION
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
-- Exact catalog row: T16, CSV line 17, `Sequential Substitution Systems`; taxonomy seed `ref/notes/CA-Types.md:424-460`.
+- Exact catalog row: T16, CSV line 17, `Sequential Substitution Systems`; taxonomy seed `ref/notes/CA-Types.md:413-439`.
 - The native state is a finite ordered word over a declared finite alphabet. The construction depends on scanning a limited string, so an infinite random initial condition is not a native base case.
 - A program is an ordered list of literal block replacements. At every step it tries clause 0 over the whole word from left to right, then clause 1 from the left only if clause 0 has no match, and so on. Selection order is therefore lexicographic `(clause_index, start_position)`, not global leftmost position across clauses.
 - Exactly one matched interval is replaced per logical step. Search restarts from the first clause and the left edge on the next step; no persistent cursor is part of state.
@@ -31,11 +31,11 @@ Recover the exact deterministic first-match string-rewrite construction, then ad
 
 - Stable ID: T16.
 - Exact name: Sequential Substitution Systems.
-- Canonical aliases and relations: sequential substitution/replacement systems, production systems, string rewriting systems, Markov systems, Markov normal algorithms, and text-editor search-and-replace rules.
+- Canonical aliases and relations: sequential substitution/replacement systems, classifier systems, production systems, string rewriting systems, Markov systems, Markov normal algorithms, search-and-replace systems, and text-editor rules.
 - `semi-Thue system` is not treated as a T16 alias in this corpus: its direct occurrences name multiway systems.
 - Entry kind: deterministic ordered first-applicable literal string-rewrite construction.
 - Defining parameters: finite alphabet, finite initial word, ordered nonempty clause list, literal nonempty left side per clause, replacement word, rule-major priority, left-to-right occurrence order, and one replacement per step.
-- Search vocabulary: sequential substitution/system/replacement, string rewriting, production system, Markov system, normal algorithm, text editor, search-and-replace, scan string/sequence, left-to-right/right-to-left, first sequence/match/replacement, successive replacements/scans, one/single/all possible replacement, replacement order, overlap, stops/no replacement, `Flat`, `SSSEvolveList`, `StringReplace`, confluence, causal network, generalized substitution, multiway, finite/random initial string, emulation, and operator evolution.
+- Search vocabulary: sequential substitution/system/replacement, classifier system, string rewriting, production system, Markov system, normal algorithm, text editor, search-and-replace, scan string/sequence, left-to-right/right-to-left, first sequence/match/replacement, successive replacements/scans, one/single/all possible replacement, replacement order, overlap, stops/no replacement, `Flat`, `SSSEvolveList`, `StringReplace`, confluence, causal network, generalized substitution, multiway, finite/random initial string, emulation, and operator evolution.
 
 ## Search Log
 
@@ -82,10 +82,11 @@ Representative commands were `rg -n -i -e '<term>' BOOK`, followed by exact cont
 
 ### Split, Index, image, and source-defect audit
 
-- Chapter 3 split lines 371-423 duplicate canonical `BOOK:1054-1106`; no unique passage was added.
+- Chapter 3 split lines 371-423 duplicate canonical `BOOK:1054-1106`; Chapter 5 split lines 211-217/329-339, Chapter 9 lines 759-901, and Chapter 11 lines 247-259/323-339 duplicate the 2D, multiway, scheduling/causal, and emulation passages. No unique passage was added.
 - Mispartitioned `BACK-MATTER/Index/Index.md:168-197` duplicates canonical Notes `BOOK:12263-12292`; `BACK-MATTER/Notes/Notes.md` is a one-line unrelated truncation.
-- Atlas lines 93-95 are high-level summaries only.
-- The actual Index exists in the monolith. Its T16 entry at `BOOK:22096` routes to pages 88-92, implementation/history 893-894, causal networks 499, random initial conditions 949, CA emulations 660/667/1111/1113, multiway contrast 938, 2D generalization 192, and sequential-CA contrast 1034; all construction-bearing routes were followed. Markov and normal-algorithm redirects at `BOOK:21497` and `21701-21703` add names but no mechanics.
+- `BACK-MATTER/Colophon/Colophon.md` contains duplicated later Notes and the flattened actual Index. Atlas lines 93-96 are high-level summaries only.
+- The actual Index exists in the monolith. Its OCR-flattened T16 entry at `BOOK:22096` routes to pages 88-92, implementation/history 893-894, causal networks 499, computational reducibility 1134, random initial conditions 949, CA emulations 660/667/1111/1113, multiway contrast 204/938/1172, 2D generalization 192, genetic programs 1002, and sequential-CA contrast 1034; all construction-bearing routes were followed. Classifier, Markov, normal-algorithm, and search-and-replace redirects at `BOOK:20972`, `21497`, `21701-21703`, and `22080` add names but no mechanics.
+- The same flattened line interleaves adjacent Semigroup entries. `enumeration 805`, `history 1153`, `number 945`, `universality 1159`, Krohn-Rhodes, equivalence undecidability, and word-problem undecidability are not T16 routes. The separate computational-universality Index entry at `BOOK:22390` correctly routes T16 to page 667.
 - `_page_104_Picture_3.jpeg` was inspected to verify the selected `BA` event dots and rule glyph. Figure-only three-clause rules were not transcribed because clean Markdown does not preserve their labels reliably.
 - Notes page labels `82` and `85` at `BOOK:12269-12274` are extraction errors for the main-text pages 88/89; their literal 0/1 rules correspond to the A/B examples after symbol renaming.
 - `SSSEvolveList` declares `init_s` but the extracted body uses `init` (`BOOK:12282-12283`); `init_s` is the evident intended argument. This OCR/name defect does not determine semantics.
@@ -590,6 +591,7 @@ T01/T09/T12 use program-independent fixed/control source policies; T13 uses prog
 - Source-selection module/frontier: `FirstApplicableMatch` implementing exact nested loops `(clause_index, start_position)` and returning `RewriteMatch(snapshot_id, clause_index, start, stop, occurrence_ids)` or `NoApplicableClause`. It must read LHS patterns from the same program object used by the rule.
 - Read module: `MatchedWord`, validating snapshot ownership, interval bounds, contiguous occurrence order, clause index, and exact LHS equality before evaluation.
 - Result/update module: `ReplaceInterval(match, replacement_word)` and `SingleSpliceUpdate`; preserve prefix/suffix occurrences, consume only the match, create ordered output occurrences, and emit an optional `RewriteEvent`.
+- Ordered edit core: T13 and T16 may share a private `ApplyOrderedSpans` kernel only after `ParallelReplaceConcat` validates complete ordered singleton coverage and `SingleSpliceUpdate` validates exactly one arbitrary span. The public commit laws remain distinct.
 - Outcome/termination module: `TerminalReason.NoMatch` with the final snapshot retained once; keep terminal, external stop, horizon, and validation error distinct. An applicable identity clause produces a normal transition event.
 - Generic executor: accept the typed program-coupled source contract and update/outcome member. Dispatch only through ordinary protocols/results supplied by the spec, never by T16/catalog name.
 - `specs.py`/preset index: strict `sequential_substitution(alphabet, clauses)` returning the ordinary literal-rewrite spec. Initial word, horizon, and observers are episode choices.
@@ -637,14 +639,14 @@ T01/T09/T12 use program-independent fixed/control source policies; T13 uses prog
 
 ## Completion Requirements
 
-- [ ] All aliases, captions, Notes, Index entries, splits, variants, duplicates, source defects, and false positives are resolved.
-- [ ] All unique construction-relevant excerpts have canonical provenance and disposition.
-- [ ] Finite word, ordered clauses, match source, rule/position priority, read, one-splice update, seed, successor, termination, and observables are reconstructed.
-- [ ] Canonical trajectories and adversarial priority/overlap/no-op/no-match/provenance invariants have independent conformance oracles.
-- [ ] Current API/runtime/test fit and T13 reuse/divergence are explicit under Principle 0.
-- [ ] Goal 2 implementation/conformance handoff is implementation-ready, including the T15 deletion re-audit boundary.
-- [ ] Global ledgers and plan are reintegrated and all verification checks pass.
+- [x] All aliases, captions, Notes, Index entries, splits, variants, duplicates, source defects, and false positives are resolved.
+- [x] All unique construction-relevant excerpts have canonical provenance and disposition.
+- [x] Finite word, ordered clauses, match source, rule/position priority, read, one-splice update, seed, successor, termination, and observables are reconstructed.
+- [x] Canonical trajectories and adversarial priority/overlap/no-op/no-match/provenance invariants have independent conformance oracles.
+- [x] Current API/runtime/test fit and T13 reuse/divergence are explicit under Principle 0.
+- [x] Goal 2 implementation/conformance handoff is implementation-ready, including the T15 deletion re-audit boundary.
+- [x] Global ledgers and plan are reintegrated and all verification checks pass.
 
 ## Stage Results
 
-In progress pending final independent Notes/Index and implementation-fit audit, global reintegration, and verification.
+T16 is complete with zero unresolved evidence candidates. The nested scan is exactly rule-major then leftmost position, returns at most one snapshot-scoped interval, and restarts from clause 0 and the left edge after one splice. `FirstApplicableMatch` forces an honest refinement of the source-first shell because applicability and the ordered program are intrinsically coupled; one authoritative program supplies both matching left sides and the selected right side. `ReplaceInterval` plus `SingleSpliceUpdate` is distinct from T13's full-generation replacement, though both can reuse ordered support, provenance, and a policy-guarded private span-edit kernel. `NoMatch` is a typed zero-successor terminal outcome, while identity events, external stops, horizons, invalidity, and errors remain separate. Empty RHS is explicitly deferred to T15 evidence. The plan, evidence index, and design ledger are reintegrated; no prior stage is reopened. Focused source-reference, coverage, whitespace, and 102-test baseline verification passed. Next: T17 Tag Systems.
