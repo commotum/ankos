@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16 complete, 5 of 45 type stages complete, and Synthesis and Goal 2 Handoff pending. The next adversarial stage is T17 Tag Systems.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17 complete, 6 of 45 type stages complete, and Synthesis and Goal 2 Handoff pending. The next adversarial stage is T19 Register Machines.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -61,11 +61,15 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T12 requires an inspectable total/default-symbol tape over `Z`; finite read boundaries cannot supply writes or control movement beyond capacity. Numeric rule decoding uses a documented repair of an OCR-lost `k`, guarded by known machine 3024.
 - T13 validates source-first generic orchestration but splits update semantics: fixed-locus assignment preserves support, while `ParallelReplaceConcat` consumes every old ordered occurrence and creates children from typed nonempty words.
 - T13 state is an explicit discrete ordered sequence with finite canonical and documented infinite-support variants. Snapshot indices, occurrence lineage, finite observation, ragged trace, padding, and rendering are separate.
-- T13 uses a total alphabet-closed `Sigma -> Sigma+` table. Empty words belong to T15; neighbor context to T14; first-match scanning to T16; probabilistic words and continued-fraction rule streams remain separate variants.
+- T13 uses a total alphabet-closed `Sigma -> Sigma+` table. T17 later proves epsilon for a private word/edit carrier and its own appendants without weakening T13; T15 still owns creation-destruction audit, neighbor context T14, and other scheduled/probabilistic variants remain separate.
 - T16 reuses finite ordered-word support but not T13 source coverage or commit. An immutable ordered literal program selects the lexicographic first `(clause_index,start_position)` match, returns one typed interval replacement, and commits one atomic splice.
 - T16 refines the source-first shell: match applicability is intrinsically coupled to the program's left sides, so `FirstApplicableMatch` and result lookup share one validated program object. This is explicit coupling, not a duplicated matcher callback.
 - T16 has zero successors with `NoMatch` when no clause applies. The final state is retained once; an applicable identity rule remains an event/self-loop, and external stop, horizon, invalidity, and error stay distinct.
 - T16 supplies no canonical rule numbering and directly evidences only nonempty literal clause sides. Empty RHS/deletion remains an explicit T15 re-audit boundary rather than a flag or inferred base feature.
+- T17 reuses finite ordered support but requires a distinct queue event: read an exact leading `q`, consume a leading `d`, preserve the old suffix, and append a table-selected word at the remote tail. Wolfram ordinary tags pin `q=d`; Post and Wang variants prove the roles are independently meaningful.
+- T17 tables are total `Sigma^q -> Sigma*` maps, so empty appendants are native while missing/duplicate rows are errors. This broadens only private word/edit capability; T13/T16 public nonempty laws remain unchanged.
+- T17 has zero successors with a retained `InsufficientPrefix` residue when required spans are unavailable. Wolfram's supplied history maps that residue to `{}` on the next requested sample; this is an explicit reference projection, not a fabricated semantic transition.
+- T17 supplies the bounded count `(sum_{j=0}^r k^j)^(k^q)` and the direct `50,625` oracle, but no canonical integer rule codec. Finite words, full ragged traces, queue provenance, and derived length/first-symbol/checkpoint views stay separate.
 
 ## Assumptions To Challenge
 
@@ -274,7 +278,7 @@ All 51 direct-name lines and the complete rule/position-order, caption, Notes, I
 
 ### 7-T17-TAG
 
-Status: **IN PROGRESS** in `goal-1/7-T17-TAG.md`.
+Status: **COMPLETE** in `goal-1/7-T17-TAG.md`.
 
 #### Big Picture Objective
 
@@ -287,6 +291,10 @@ Apply the common protocol, emphasizing deletion number, append lookup, positiona
 #### Completion Requirements
 
 All T17 variants are evidenced; consume/append/halting semantics are direct rather than simulated; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+All 175 direct occurrences on 111 unique lines and the complete mechanism, caption/figure, Notes, Index/split, history, Post/Wang, cyclic/multiway boundary, halt/extinction, bounded-count, finite-input, randomness-observer, PCP, and emulation searches were dispositioned with zero unresolved candidates and 21 canonical excerpt groups. T17 reconstructs an immutable complete prefix-word program over a finite ordered word: Wolfram ordinary tags read and delete the same leading `n`, then atomically preserve the old suffix and append a possibly empty word; Post and Wang prove read width and deletion number are distinct generic roles. Principle 0 rejects T16 front replacement and adds `ConsumePrefixAppend` plus `QueueSpliceUpdate`, while reusing ordered support, provenance, outcomes, and an epsilon-capable private edit carrier without changing T13/T16 public contracts. Operationally a short word is terminal with its residue retained; the supplied short-to-empty history is a labeled projection, guarded by figure case (c)'s residue `0` at step 287 and `{}` at 288. Case (a), one-deletion/T13 checkpoints, tail-order, empty/missing-table, Post/Wang, count, and provenance oracles close the Goal 2 handoff. No prior stage was reopened. Next: T19.
 
 ### 8-T19-REGISTER
 

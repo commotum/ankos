@@ -4,7 +4,7 @@ Status: **COMPLETE**
 
 ## Current Facts
 
-- Exact catalog row: T17, CSV line 18, `Tag Systems`; taxonomy seed `ref/notes/CA-Types.md:441-466`.
+- Exact catalog row: T17, CSV line 18, `Tag Systems`; taxonomy seed `ref/notes/CA-Types.md:441-468`.
 - The native state is a finite ordered word with semantic front and back. At an eligible step, an exact leading word chooses an appendant, a fixed leading span is consumed, and that appendant is added after the old suffix in one atomic queue event.
 - Wolfram's ordinary construction reads exactly the same `n` leading symbols that it deletes. It is not Post's historical tag construction, whose appendant depends only on the first symbol even when `n` symbols are deleted.
 - The direct history also identifies Wang lag systems, which may inspect more than the first symbol but delete only the first. Read width and deletion number are therefore independent semantic integers in the evidenced prefix-queue family, not a mode flag or one overloaded neighborhood radius.
@@ -49,13 +49,15 @@ The taxonomy was treated only as search vocabulary. Independent passes searched 
 
 | Query family | Canonical hit count or disposition |
 |---|---:|
-| `tag system` / `tag systems` | All direct main-text, Notes, Index, compiler, universality, and cross-construction occurrences classified. |
-| `ordinary tag` / `Post's tag` / `one-element-dependence` | All Wolfram-versus-Post and universality routes classified. |
-| `lag system` / `Hao Wang` | Unique history passage plus Index redirect classified. |
+| `tag systems?` / `tag-system` | 175 occurrences on 111 unique lines: 81 before the Index and 30 OCR-interleaved Index lines; all classified. |
+| bare `tag`/`tags`/`tagged`/`tagging` | 177 occurrences on 112 unique lines; non-system uses excluded by context. |
+| `ordinary tag` / `Post's tag` / `one-element-dependence` | 3 / 2 / 4 unique lines respectively; all Wolfram-versus-Post and universality routes classified. |
+| `uniform tag system` / `lag system` / `multiway tag system` | 2 / 3 / 5 unique lines; T13 false friend, Wang variant, and branching construction separated. |
 | remove/delete/drop/take + beginning/first | Core, implementation, historical, cyclic, compiler, and unrelated list-operation contexts classified. |
 | append/tag/add + block/end | Core, implementation, cyclic, Turing-emulation, and unrelated string contexts classified. |
-| `TSEvolveList` / `CAToTS` / `TS1ToCT` / `TagToMTM` / `TSToPR` / `MWTSEvolve` | Every implementation/compiler occurrence inspected. |
-| halt/halting/extinct/empty/too short/length | T17 operational, reference-history, PCP, recursive-function, cyclic, and unrelated occurrences classified. |
+| `TSEvolve`/`TS1*`/`CAToTS`/`TagToMTM`/`TSToPR`/`TSToPCP` | 85 raw occurrences on 10 lines; the raw count is inflated by corrupted `TS1Step` duplication, and every line was inspected. |
+| halting state / reaches `{}` / all elements removed / `Length[#] < n` | 5 construction-bearing lines, all reconciled. |
+| fixed-number/beginning/end/first-element mechanical phrases | 2 / 6 / 7 / 4 direct lines respectively, all classified. |
 | rule count/number/enumeration / `50,625` | Notes count recovered; flattened Index interleaving rejected as a T17 numbering route. |
 | random initial condition / first-element sequence / length plot | Finite seed semantics separated from downstream observers. |
 | cyclic/multiway/substitution/CA/Turing/recursive/PCP relations | All construction-bearing routes included or explicitly bounded below. |
@@ -85,6 +87,7 @@ Representative commands were `rg -n -i -e '<term>' ref/A-New-Kind-of-Science/A-N
 ### Split, Index, image, and source-defect audit
 
 - Chapter 3 split lines 429-449 duplicate canonical `BOOK:1108-1132`; split Notes/Index material duplicates the monolith. Canonical provenance below always uses `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md` as `BOOK`.
+- `ANKoS-Atlas.md:97-103` is a high-level summary and adds no mechanics beyond the canonical core.
 - Mispartitioned `BACK-MATTER/Index/Index.md:199-218` duplicates canonical Notes `BOOK:12294-12313`; it is not the actual flattened Index. The actual Index is embedded near the end of the monolith.
 - The flattened Index entry at `BOOK:22150` routes Tag systems to pages 93-94, implementation/density/history at 894, random initial conditions at 949, emulation by CA/Turing/recursive functions and of CA/Turing machines, one-element dependence, multiway tags, undecidability, and universality. All construction-bearing routes were followed. Adjacent column text about string concatenation, sequential substitution, enumeration, or other systems was not assigned to T17.
 - `ref/A-New-Kind-of-Science/CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_109_Figure_2.jpeg` was inspected. The main caption and clean Notes establish case (a); an independent transcription/interpreter establishes case (c) as `11->011, 10->101, 01->000, 00->0` from seed `11`, reaching the short residue `0` at event-time step 287 and Notes-normalized `{}` at sample 288.
@@ -285,6 +288,26 @@ Lists of strings and all matching successors belong to a branching construction,
 > 1921: Emil Post looks at a simple tag system ... whose behavior is difficult to predict
 
 This corroborates the Post lineage but adds no rule semantics beyond E11.
+
+### E20 — one-element-dependence has a direct first-symbol executor and TM compiler
+
+`BOOK:18556-18568`:
+
+> the evolution of a tag system that depends only on its first element
+>
+> `Drop[Join[list, First[list] /. subs], n]`
+>
+> construct a tag system that emulates [a Turing machine]
+
+The extracted executor line is massively duplicated after its intelligible prefix, so only its independently corroborated first-symbol/read and fixed-delete roles are retained. The TM compiler and its seed `{a[i],a[i],c[i]}` are relation fixtures, not base mechanisms.
+
+### E21 — documented universality restrictions
+
+`BOOK:18877`:
+
+> Marvin Minsky showed in 1961 that oneelement-dependence tag systems ... can be universal. Hao Wang in 1963 constructed an example that deletes just 2 elements at each step and adds at most 3 elements—but has a large number of colors.
+
+Universality is a property of restricted tables/alphabet sizes. It neither changes queue execution nor imposes those bounds on the base program.
 
 ## Construction Model
 

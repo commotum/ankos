@@ -44,6 +44,7 @@ Every completed type will update the relevant rows below and record:
 | T12 Turing Machines | Fixed ordered integer tape + total default/override symbol field + one head `(position,state)` | `ControlLocus("head")`; control payload + self-only tape symbol; complete `Q×Sigma` table | `Assign(old_head,symbol)` + `TransitionControl(head,old±1,next_state)`; atomic | Base has one successor and never halts; terminal-control variant has zero successors after final state; external stops distinct; no native finite edge | Payload control, total tape, product-key/result table, termination/stop reasons, structured trace; `(2sk)^(sk)`/known-code/trajectory oracles; no head packing/Turing branch |
 | T13 Neighbor-Independent Substitution | Explicit discrete ordered symbol sequence; canonical finite support plus explicit countably infinite support/cut realization | `AllOccurrences` over old snapshot; self symbol only; total alphabet-closed `h:Sigma->Sigma+` | `ReplaceOccurrence(source,word)` + atomic `ParallelReplaceConcat`; parents consumed, children ordered by source then word position | One deterministic non-halting successor; empty input is a fixed successor; no endpoint boundary for self-only read | Ordered support/occurrence sources, structured nonempty-word tables, sibling structural update algebra, ragged/lineage trace and infinite realization; exact morphism/growth/order oracles; no padding/callback/compiler/branch |
 | T16 Sequential Substitution | Finite discrete ordered word; no cursor/control | Program-coupled `FirstApplicableMatch`; ordered literal `Sigma+->Sigma+` clauses; rule-major then leftmost interval | `ReplaceInterval(match,word)` + atomic `SingleSpliceUpdate`; prefix/suffix persist, match consumed, output created | One deterministic successor for a match; zero successors with retained final state for `NoMatch`; no endpoint wrap/boundary | Ordered rewrite IR, matched-span sources/reads, single-splice sibling update, typed no-match outcome, ragged event/lineage trace; exact priority/overlap/no-op oracles; no callback/regex/family branch |
+| T17 Tag Systems | Finite discrete ordered word with semantic front/back; no cursor/control | Program-coupled `RequiredQueuePrefix`; exact leading `q` read; total `Sigma^q->Sigma*` table; Wolfram pins `q=d` | `ConsumePrefixAppend(read_span,consume_span,word)` + atomic `QueueSpliceUpdate`; consumed front removed, old suffix persists, output created at tail | One deterministic successor when `len>=max(q,d)`; zero with retained residue for `InsufficientPrefix`; explicit Notes short-to-empty projection; no spatial boundary | Prefix-queue program/source/read/result/update, epsilon-capable private word/edit carrier, terminal/reference split, ragged event/lineage trace; case(a)/case(c)/Post/Wang/count oracles; no deque/callback/fallback/compiler/branch |
 
 ## Current Documented API Baseline
 
@@ -98,17 +99,17 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 | Dimension | Current candidate | Status | Evidence users |
 |---|---|---|---|
-| Support/topology | Fixed regular line and total fields remain one member; explicit discrete ordered sequences may change occurrence support, with T13 finite/infinite variants and T16 finite global-scan words | PROVISIONAL fixed-lattice and ordered-sequence members; other dynamic topology UNRESOLVED | T01, T09, T12, T13, T16 |
-| Values/alphabet | Explicit finite field/word values; independent value and control-payload domains | PROVISIONAL for finite alphabets; broader value spaces UNRESOLVED | T01, T09, T12, T13, T16 |
+| Support/topology | Fixed regular line and total fields remain one member; explicit discrete ordered sequences may change occurrence support, with T13 finite/infinite variants, T16 finite global-scan words, and T17 finite semantic front/back | PROVISIONAL fixed-lattice and ordered-sequence members; other dynamic topology UNRESOLVED | T01, T09, T12, T13, T16, T17 |
+| Values/alphabet | Explicit finite field/word values; independent value and control-payload domains; generic structural words include epsilon while construction validators may require nonempty | PROVISIONAL for finite alphabets/words; broader value spaces UNRESOLVED | T01, T09, T12, T13, T16, T17 |
 | Control | `SingleControl(key,position,payload)` in visible Markov state; unit payload for T09, finite head-state payload for T12 | PROVISIONAL single-control member; multiple/structural control UNRESOLVED | T09, T12; absent T01 |
-| Active loci | Firing/source selector: `AllSites`, `ControlLocus`, `AllOccurrences`, or program-coupled `FirstApplicableMatch`; finite materialization belongs to realization | PROVISIONAL fixed/control/sequence/matched sources; queued and branching sources UNRESOLVED | T01, T09, T12, T13, T16 |
-| Reads/access | Explicitly ordered topology-relative values, source-control payload, occurrence self value, or an exact variable-length matched span | PROVISIONAL for fixed lattices/single control/sequence self/literal spans; path access UNRESOLVED | T01, T09, T12, T13, T16 |
-| Rule choice | Explicit total finite tables, total word morphisms, or immutable ordered literal rewrite clauses with validated roles/codomains; no implicit defaults | PROVISIONAL for local/control/morphism/literal rewrite programs; structured calculations UNRESOLVED | T01, T09, T12, T13, T16 |
-| Rule result | Typed members include `Assign`, payload-bearing `TransitionControl`, `ReplaceOccurrence(nonempty_word)`, and `ReplaceInterval(match,nonempty_word)` | PROVISIONAL result sum; never a universal category | T01, T09, T12, T13, T16 |
-| Commit/update | Explicit siblings: fixed-support atomic effects, full-generation ordered replacement, and exactly-one-interval ordered splice | PROVISIONAL three-member update family; deletion/conflicts/other mutation UNRESOLVED | T01, T09, T12, T13, T16 |
-| Successors | Deterministic transition may yield one successor or a typed zero-successor terminal outcome | PROVISIONAL deterministic/terminal case; branching/solutions/derivatives remain distinct and UNRESOLVED | T01, T12, T16 |
-| Halting/invalidity | Base continuation, terminal-control state, no-applicable-clause terminal, external stop policy, horizon, and error are distinct | PROVISIONAL terminal model; other construction-specific halt/invalidity UNRESOLVED | T12, T16; no intrinsic halt T01/T09/T13 |
-| Trace encoding | Structured snapshots preserve values/control/terminal status or ragged ordered occurrences, rewrite events, and lineage; `[t,x,0,0]` is a downstream row-local lowering | PROVISIONAL for fixed 1D and ordered sequences; global schema UNRESOLVED | T01, T09, T12, T13, T16 |
+| Active loci | Firing/source selector: `AllSites`, `ControlLocus`, `AllOccurrences`, program-coupled `FirstApplicableMatch`, or program-width-coupled `RequiredQueuePrefix`; finite materialization belongs to realization | PROVISIONAL fixed/control/sequence/matched/queue-head sources; branching sources UNRESOLVED | T01, T09, T12, T13, T16, T17 |
+| Reads/access | Explicitly ordered topology-relative values, source-control payload, occurrence self value, exact matched span, or exact semantic word prefix; read and consumed spans may differ | PROVISIONAL for fixed lattices/single control/ordered words; path access UNRESOLVED | T01, T09, T12, T13, T16, T17 |
+| Rule choice | Explicit total finite tables, total word morphisms, immutable ordered literal clauses, or complete prefix-word tables with validated roles/codomains; no implicit defaults | PROVISIONAL for local/control/morphism/literal/prefix-queue programs; structured calculations UNRESOLVED | T01, T09, T12, T13, T16, T17 |
+| Rule result | Typed members include `Assign`, payload-bearing `TransitionControl`, `ReplaceOccurrence(nonempty_word)`, `ReplaceInterval(match,nonempty_word)`, and `ConsumePrefixAppend(source,word)` | PROVISIONAL result sum; never a universal category | T01, T09, T12, T13, T16, T17 |
+| Commit/update | Explicit siblings: fixed-support atomic effects, full-generation ordered replacement, exactly-one-interval ordered splice, and coupled prefix-consume/tail-append | PROVISIONAL four-member update family; conflicts/rewire/other mutation UNRESOLVED | T01, T09, T12, T13, T16, T17 |
+| Successors | Deterministic transition may yield one successor or a typed zero-successor terminal outcome, retaining a construction-specific final state | PROVISIONAL deterministic/terminal case; branching/solutions/derivatives remain distinct and UNRESOLVED | T01, T12, T16, T17 |
+| Halting/invalidity | Base continuation, terminal-control, no-applicable-clause, insufficient-prefix residue, external stop, horizon, reference projection, and error are distinct | PROVISIONAL terminal model; other construction-specific halt/invalidity UNRESOLVED | T12, T16, T17; no intrinsic halt T01/T09/T13 |
+| Trace encoding | Structured snapshots preserve values/control/terminal status or ragged ordered occurrences, structural events, and lineage; synthetic reference samples are labeled; `[t,x,0,0]` is downstream row-local lowering | PROVISIONAL for fixed 1D and ordered sequences; global schema UNRESOLVED | T01, T09, T12, T13, T16, T17 |
 | Solver/numerics | None in deterministic table transition | NOT APPLICABLE to T01; global boundary remains UNRESOLVED | T01 |
 
 ## Decision Log
@@ -268,7 +269,37 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: PROVISIONAL for T16; T15 must re-audit erasing outputs.
 - Basis: all direct examples and Notes rules use nonempty literal sides (`BOOK:1064-1072`, `12269-12288`), rule order matters (`:1070-1078`, `12289`), variable block sizes are ordinary (`:19164`), and no T16 numbering/count convention exists.
-- Consequence: validate an ordered nonempty clause sequence with `lhs,rhs in Sigma+`, preserve duplicates/order, and reject empty LHS. Do not require an integer ID or infer deletion from multiway examples/host syntax. If T15 proves `Sigma*` outputs, generalize the shared splice deliberately and re-audit T13/T16 instead of adding `allow_empty` flags.
+- Consequence: validate an ordered nonempty clause sequence with `lhs,rhs in Sigma+`, preserve duplicates/order, and reject empty LHS. Do not require an integer ID or infer deletion from multiway examples/host syntax. T17 later proves that the private word/edit carrier must support `Sigma*` (D028), but the T16 public validator remains nonempty; T15 must still audit deletion without an `allow_empty` flag.
+
+### D026 — Prefix-queue read width and deletion number are distinct semantic roles
+
+- Status: ACTIVE for the T17 family; Wolfram ordinary tags pin the roles equal.
+- Basis: Wolfram selects from and deletes the full leading `n` (`BOOK:1112`, `12296-12305`); Post selects by only the first element while deleting `n`, and Wang lag systems inspect more than the first while deleting one (`:12311-12313`).
+- Consequence: represent an immutable `PrefixQueueProgram(q,d,total Sigma^q->Sigma*)` with positive typed widths. `RequiredQueuePrefix` exposes separate read/consume spans and exact occurrence IDs. Strict `tag_system(n,table)` constructs `q=d=n`; Post/Wang restrictions are structured data, not booleans, widened neighborhoods, callbacks, or executor modes.
+
+### D027 — Prefix consumption plus remote tail append is a distinct atomic update law
+
+- Status: ACTIVE for T17.
+- Basis: tag systems remove the beginning and tag the selected block onto the end (`BOOK:1112`, `1124`, `1132`); executable order is `Join[Drop[word,n],appendant]` (`:12300-12306`). For canonical `01->10`, `011` becomes `110`, whereas a T16 front splice would produce `101`.
+- Consequence: add `ConsumePrefixAppend` and `QueueSpliceUpdate` as a public sibling of `SingleSpliceUpdate`, `ParallelReplaceConcat`, and fixed-support atomic effects. A private ordered-edit carrier may perform deletion at zero plus insertion at the old endpoint only after queue geometry is validated; the two edits are one event and never independently observable.
+
+### D028 — Generic structural words/edits admit epsilon without weakening construction validators
+
+- Status: ACTIVE.
+- Basis: canonical T17 case (a) has `10->{}` and the bounded count includes words of length zero (`BOOK:12298`, `12308`), while T13 and direct T16 evidence require their public outputs to remain nonempty.
+- Consequence: the private `Word`/ordered-edit carrier supports `Sigma*`. T17 `ConsumePrefixAppend` may carry epsilon; T13 `ReplaceOccurrence` and base T16 `ReplaceInterval` retain `NonEmptyWord` validation. No `allow_empty` flag, silent family-wide broadening, or reopening is needed; T15 will still audit its own deletion construction.
+
+### D029 — Insufficient prefix retains its residue; source-compatible extinction is a projection
+
+- Status: ACTIVE for T17 and the general outcome/trace boundary.
+- Basis: the direct prefix rules cannot apply to `|w|<n`, and PCP calls halt a state where no rule applies (`BOOK:12302-12306`, `19294`). The supplied `TSEvolveList` instead maps a short state to `{}` on the next requested sample (`:12300`); figure case (c) reaches disabled residue `0` at step 287 and reference `{}` at 288.
+- Consequence: return `Terminal(InsufficientPrefix, residue=w)` with zero successors. An opt-in, labeled reference-history projection may emit/pad `{}` while preserving its source residue/reason. Successful empty output, empty/short terminal state, `NoMatch`, external stop, horizon, invalidity, and error remain distinct; no fake deletion event or hidden normalization occurs.
+
+### D030 — Complete prefix-word tables have bounded counts but no canonical integer code
+
+- Status: ACTIVE for T17.
+- Basis: the Notes count `(sum_{j=0}^r k^j)^(k^n)` complete tables and give `50,625` for `k=2,n=2,r=3` (`BOOK:12308`); no numeric row/digit convention is supplied. Host `/.` would accidentally append an unmatched key unchanged.
+- Consequence: validate exactly one alphabet-closed output for every `Sigma^q` key, including epsilon, and reject missing/duplicate rows. Structured program serialization is authoritative; compute counts only under explicit bounds, use the sum form at `k=1`, and never invent a rule ID, default appendant, or first-match row priority.
 
 ## Rejected Shortcuts
 
@@ -280,6 +311,7 @@ These are globally rejected unless Principle 0 re-derivation replaces the goal i
 - unrestricted formula or predicate callbacks that contain the entire construction;
 - hidden head state, program counters, cyclic counters, history, RNG state, or solver state;
 - hidden scan cursors, host regex/rewrite engines, duplicated pattern tables, or unordered rule maps;
+- bounded queues, padded/ring-buffer fronts, missing prefix-table fallbacks, or unlabeled short-to-empty normalization;
 - compiling another construction to a CA merely to claim native coverage;
 - treating canonical `[t,x,y,z]` encoding or visualization coordinates as topology;
 - conflating a constraint with a solver, a PDE with a discretization/integrator, or a stochastic law with an RNG implementation;
@@ -293,13 +325,14 @@ These are globally rejected unless Principle 0 re-derivation replaces the goal i
 - `4-T12-TURING` — COMPLETE: refined control to a payload-bearing form, added self-only control/value product reads, total default-symbol tapes, and explicit terminal/stop/error distinctions. Reconstructed `(2sk)^(sk)` tables, repaired the OCR-damaged numeric codec with independent guards, and recorded exact table/trajectory tests. T09 remains valid as unit-payload control; no stage reopened.
 - `5-T13-PARALLEL-SUBSTITUTION` — COMPLETE: preserved the generic source/read/rule/update shell but split `UPDATE` into honest fixed-support and ordered structural members. Added explicit discrete ordered support, `AllOccurrences`, total `Sigma->Sigma+` tables, typed occurrence replacement, source-order child construction, ragged/lineage traces, and explicit infinite realization pressure. Empty/contextual/sequential/stochastic/scheduled/geometric variants remain separate. T01/T09/T12 were re-audited and remain valid; no stage reopened.
 - `6-T16-SEQUENTIAL-SUBSTITUTION` — COMPLETE: refined source selection with explicit program-owned applicability, added rule-major/leftmost `FirstApplicableMatch`, exact matched-span reads, typed single-interval replacement/splice, and `NoMatch` termination. Reused T13 ordered support/provenance but kept its all-occurrence commit distinct. Empty RHS remains an evidence boundary for T15. T01/T09/T12/T13 were re-audited and remain valid; no stage reopened.
+- `7-T17-TAG` — COMPLETE: added separate prefix read/delete roles, complete epsilon-valued prefix tables, one queue-head source, atomic prefix-consume/tail-append update, and retained-residue `InsufficientPrefix` termination with an explicit Notes history projection. Reused finite T13 ordered state/provenance, typed outcomes, and a broadened private ordered-edit carrier, but kept all T13/T16 public validators and commits unchanged. Wolfram/Post/Wang, case (a), case (c), bounded-count, and T13-checkpoint oracles close the handoff. T01/T09/T12/T13/T16 remain valid; no stage reopened.
 
 ## Open Architecture Questions
 
 1. Which remaining catalog rows are constructions versus restrictions, presets, seed classes, observables, or solver-defined systems? T01 is a construction; T06/T07/T08 are already cross-referenced as restriction/seed hypotheses requiring their own evidence.
-2. Where does the T01/T09/T12/T13/T16 source-read-result-update protocol cease to be substantive? Program-coupled first-match remains meaningful; queue, branching, constraints, and derivatives remain adversarial.
+2. Where does the T01/T09/T12/T13/T16/T17 source-read-result-update protocol cease to be substantive? Program-coupled first-match and a closed queue-head event remain meaningful; branching, constraints, and derivatives remain adversarial.
 3. Which state models require topology richer than T13's discrete order, lineage that affects future rules rather than traces only, or visible control beyond T12's single payload head?
-4. Can T14/T15 reuse the ordered-span kernel without erasing context eligibility or deletion, and can T17 reuse it for prefix consumption plus remote append without collapsing queue semantics into a generic callback?
+4. Can T14/T15 reuse the epsilon-capable private ordered-span kernel without erasing contextual eligibility or their own deletion laws? T17 proves reuse is safe only behind a distinct public queue validator/update.
 5. What trace encoding preserves types whose semantic address is not a rank-0..3 lattice coordinate?
 6. Which current selector, alphabet, rule-summary, seed, RNG, and raw-result components survive later evidence without semantic reinterpretation?
 7. Which current tests are canonical-construction evidence and which merely preserve incidental Phase 1 behavior? T01 shows that geometry and self-parity tests alone do not prove rule semantics.
