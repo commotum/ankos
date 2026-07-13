@@ -5,16 +5,28 @@ Status: **IN PROGRESS**
 ## Current Facts
 
 - Exact catalog row: T34, CSV line 35, `Arithmetic Iteration Systems`; taxonomy seed `ref/notes/CA-Types.md:937-964`. The taxonomy supplies search vocabulary, not authoritative mechanics.
-- The native state is one number advanced by repeated arithmetic, not a cell field. Digit rows, curves, value plots, lengths, and fractional-part plots are candidate observers until the primary text proves otherwise.
-- T35 piecewise integer maps begins at taxonomy section 35 and is a separate branch-selected construction. T34 must not absorb it merely because both evolve one scalar.
-- Canonical prose, figures, Notes, Index routes, exact arithmetic domains, presets, termination/cycle behavior, rendering semantics, repository fit, and conformance oracles remain under active audit.
+- The book never uses the catalog title. The scoped source construction is the first part of Chapter 4 `Elementary Arithmetic`, `BOOK:1439-1495`; `Systems Based on Numbers` is a Chapter 4 umbrella and `arithmetic systems/recurrences` generally route to T35.
+- Native state is one exact scalar. The strict program repeatedly applies one fixed `AddConstant` or `MultiplyConstant`; seed `1`, addends `1..8`, multipliers `2`, `3`, and `3/2` are canonical presets.
+- Digit rows, digit counts/frequencies/lengths, leading digits, numeric/log-size plots, residues, and fractional parts are observers. Base, radix alignment, crop, padding, palette, and plot lines are not state and never feed back.
+- The canonical exact carriers are arbitrary-precision integers and reduced rationals. The main text supplies no fixed-precision-real preset; general real/irrational Notes require an explicit exact or declared numerical domain rather than host floats.
+- Every valid strict event has exactly one successor and no native halt. Identity, fixed points, or principled negative-factor cycles remain eventful; horizon and resource failure are external.
+- The add-one image contains states `1..63`; the add-constant panels contain 84 rows; the two short integer-multiplication panels contain 64 rows; the long powers-of-three view contains 500 rows and is cropped only in presentation; the `3/2` digit view contains 256 exact rational rows.
+- T35 begins semantically at `BOOK:1497-1503` when parity selects an arithmetic branch. T36 makes digits/base rule-visible, T37/T38 store numeric history, and T43 feeds a nonlinear/fractional interval map back into the state.
+- Rightmost-digit truncation yields an explicit finite `MultiplyMod`/linear-congruential sibling. Special digit/base pairs can compile to cellular automata. Neither replaces unbounded T34.
+- No canonical T34 `NestList` implementation is printed; the first such program in the Notes is already the T35 parity branch at `BOOK:12598`.
+- The current `formulaic` callback, modular AR2, temporal 0D neighborhoods, fixed NumPy dtypes, family rollout, finite alphabets, and rectangular raw episodes do not implement this construction. Generic typed assignment responsibilities and T19/T27 exact-number work can be reused.
+- Exact textual, Notes, actual-Index, split, history, program, alias, and relation audits have zero unresolved T34 candidates. Figure endpoint audit is the final local evidence check before global integration.
 
 ## Updated Assumptions
 
-- Exact integer and rational arithmetic will be preferred wherever the source specifies it; finite-precision and arbitrary real behavior will not be conflated without evidence.
-- Arithmetic updates will be represented as closed structural data rather than unrestricted host-language callbacks.
-- State equality and trace semantics will be defined on the scalar values. Representation-base digits and display geometry will remain downstream unless a rule explicitly reads them.
-- Horizon, cycle detection, overflow/resource limits, and rendering policies will remain distinct from the mathematical recurrence.
+- Exact integer/rational arithmetic is semantic in the strict profiles. Finite-precision and arbitrary exact-real behavior are separate typed domains and never silent implementation modes.
+- Public arithmetic updates are the closed structural sum `AddConstant | MultiplyConstant`, not unrestricted host-language callbacks or a generic affine/expression AST.
+- Typed state identity is domain-tagged; cross-domain numeric equivalence is an observer. Program identity is structural, so extensionally identical `Add(0)` and `Multiply(1)` remain distinct.
+- State-sequence equality, full trace identity, and visual equality are different relations.
+- Exact big integers and rational components serialize as decimal strings, avoiding JSON/JavaScript precision loss.
+- Representation-base digits and display geometry remain downstream. The explicit `MultiplyMod` quotient is a related program, not a view flag.
+- Horizon, fixed/cycle observers, overflow/resource outcomes, precision contexts, and rendering policies remain distinct from the mathematical recurrence.
+- A fast closed-form/random-access evaluator may reuse associativity and repeated squaring but cannot fabricate or skip requested trace events.
 
 ## Big Picture Objective
 
@@ -25,13 +37,29 @@ Reconstruct arithmetic iteration as a native scalar transition construction. Pin
 - Stable ID: T34.
 - Exact name: Arithmetic Iteration Systems.
 - CSV provenance: `ref/notes/CA-Types.csv:35`; taxonomy provenance: `ref/notes/CA-Types.md:937-964`.
-- Canonical section, Notes, actual Index, figures, programs, and construction boundary: under audit.
+- Canonical main section: `Elementary Arithmetic`, strict core `BOOK:1439-1495`; clean duplicate `CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:43-99`.
+- Native Notes: `BOOK:12538-12597`; the T35 implementation begins at `12598`. Supporting relations are grouped in E09-E31 below.
+- Entry kind: deterministic unary scalar transition construction with a fixed closed arithmetic operation.
+- Strict profiles: constant addition over exact integers; constant multiplication over exact integers; exact rational multiplication by `3/2`.
+- Explicit sibling/relation: finite residue-ring `MultiplyMod`; certified-real/declared-precision domains are constrained extensions rather than strict presets.
+- Aliases/vocabulary: elementary arithmetic, arithmetic process, systems based on numbers, add/addition/successive numbers/binary counter, multiply/multiplication/powers, `2`, `3`, `3/2`, integer/rational/real, digit sequence/base/radix/carry, fractional part/size/length/leading digit, `IntegerDigits`, `Mod`, linear congruential, repeated squaring/power CA, locality/nonlocality, exactness/precision, and the neighboring names dispositioned below.
 
 ## Search Log
 
-1. Verified the CSV/taxonomy identity and read the complete taxonomy seed.
-2. Opened parallel audits for primary figures, Notes/Index/search coverage, and architecture/runtime fit.
-3. Remaining exhaustive searches and disposition counts are in progress.
+1. Verified CSV line 35, read taxonomy section 34 in full, and used it only to seed vocabulary. The exact book phrase `Arithmetic Iteration Systems` has `0` occurrences.
+2. Read canonical Chapter 4 framing/core `BOOK:1370-1503`, clean duplicate lines `1-107`, every extracted page-117 through page-122 raster, native Notes `BOOK:12538-12597`, and the first T35 Notes/program line `12598`.
+3. The direct-name union `Arithmetic Iteration Systems|Systems? Based on Numbers?|Elementary Arithmetic|Arithmetic Systems?|Arithmetic Process(?:es)?|Arithmetic Recurrences?` found 65 occurrences on 55 lines: 52/43 before the actual Index and 13/12 in it. All 55 lines were classified. Six pre-Index lines are strict/core, 20 are Chapter 4 umbrella context, three are direct T34 relations, nine are T35, five are other constructions/false positives; every Index line was routed. Zero unresolved.
+4. Component counts were: exact title `0/0`; `Systems? Based on Numbers?` `39/35` (35/31 pre-Index, 4/4 Index); `Elementary Arithmetic` `3/3`; `Arithmetic Systems?` `20/16` (13/9 pre, 7/7 Index); `Arithmetic Process(?:es)?` `1/1`; `Arithmetic Recurrences?` `2/2`, both Index.
+5. A conservative mechanics query for progressively/successively adding, successively multiplying, powers of `2/3/3/2`, multiplication factors, and fractional parts found 27 occurrences on 26 lines: 26/25 pre-Index and 1/1 Index. It classified 8/7 strict-main hits, 2/2 native Notes hits, 3/3 T34 relations, 13/13 lexical geometry/growth false positives, and one Index hit. Zero unresolved.
+6. A focused native query for the exact add/multiply phrases, first 500 powers, `IntegerDigits[3^n,2]`, and `Mod[(3/2)^n,1]` found 13 occurrences on 12 pre-Index lines: 10/9 main, one RNG relation, and 2/2 Notes. The exact code/observer union for integer/real digits, power rows, fractional parts, residues, and digit-cell formulas found 6/6 pre-Index lines at `7388,12503,12507,12559,12565,12570`.
+7. The actual Index begins at `BOOK:20826`. Resolved direct routes for powers `3`/`3/2`, addition/multiplication in digit sequences, arithmetic processes/nonlocality, bases 2/6/10, binary counters, digit sequences, LCGs, numbers, powers, reversibility, uniform distribution, and all mixed umbrella hits. The misnamed split `BACK-MATTER/Index/Index.md:402-500` is a Notes duplicate, not the Index; the actual split Index is OCR-interleaved under `BACK-MATTER/Colophon/Colophon.md:3383+`.
+8. Followed substitution/counter relations `BOOK:4260,12054,12117-12122`; random-generator relation `3722-3744`; power formulas/local CAs/repeated squaring `7380-7424`; CA emulation `7974-7980`; nonlocal arithmetic `1531-1537,8828-8842`; reducibility `9058,9080`; exact digit codecs `12503-12513`; T43 precision boundary `13217-13247`; reversibility `16066-16072`; and power/evaluation-chain material `17849-17920`.
+9. Searched executable/reference forms `IntegerDigits[3^n,2]`, `Mod[(3/2)^n,1]`, `Mod[3^n,2^s]`, and `Mod[Quotient[m^t,k^n],k]`. No T34 `NestList` program exists. Logged OCR corruption in the inverse digit fold near `12505` and power fold near `17857`; used surrounding prose, clean duplicates, mathematics, and independent generated values as guards rather than treating damaged token strings as APIs.
+10. Read `simple_programs.md`, every relevant `src/ca` module, tests, prior T19/T27 decisions, and the completed construction ledger. Classified `UniqueScalar`/typed assignment as responsibility-level reuse and every current finite/callback/history/dense execution route as mismatch or not applicable.
+11. Independent exact arithmetic regenerated the add, multiply, `3/2`, fractional, suffix-period, overflow, crop, and rendering anchors in this stage. Exact T34 mechanics have zero unresolved textual/Notes/Index/search candidates.
+12. Checked the official Chapter 4 programs CDF against the Notes/reference formulas. It confirms the implementation/CA relations and contains no hidden main-figure generator or additional T34 update mechanic.
+
+Representative reproducible commands used `rg -n -i` over the monolith with the regex unions above, `awk -F: '$1 >= 20826'` to isolate the actual Index, `sed`/`nl` for every context range, `rg --files` for splits/rasters, `view_image` for all seven canonical images, and exact `python3` integer/`Fraction` calculations for independent oracles.
 
 ## Book Excerpts
 
@@ -79,13 +107,13 @@ Reconstruct arithmetic iteration as a native scalar transition construction. Pin
 
 ### E09 — Substitution relation and digit-count observer
 
-- Provenance: `BOOK:12538-12548`, Notes to page 117.
+- Provenance: `BOOK:4260`, `12117-12122`, and `12538-12548`, Notes to page 117.
 - Fact: the add-one digit picture is a rotated substitution-system pattern. The black-cell count on row `n` is `DigitCount[n,2,1]`, with stated bounds and formulas. Both are derived descriptions of the digit view, not extra arithmetic state.
 
 ### E10 — Alternative numeral systems
 
-- Provenance: `BOOK:12550-12557`.
-- Fact: negative bases, non-power positional weights, and multiplicative prime-factor digit sequences provide other representations. Non-power representations may be nonunique. These require explicit view codecs and cannot silently redefine state equality.
+- Provenance: `BOOK:12503-12513,12550-12557`.
+- Fact: the Notes give whole-number `IntegerDigits`/`FromDigits` intent and a bounded fractional-digit codec, then discuss negative bases, non-power positional weights, and multiplicative prime-factor digit sequences. The sideways negabinary image spans integers `-42..85`, the range representable with at most seven shown digits; multiplicative digits are shown through 100. Non-power representations may be nonunique, and the bounded real-digit inverse is only approximate. These require explicit view codecs and cannot silently redefine state equality. OCR damage near `12505` is not treated as executable syntax.
 
 ### E11 — Exact powers-of-three row formula and statistics
 
@@ -127,6 +155,8 @@ Reconstruct arithmetic iteration as a native scalar transition construction. Pin
 - Provenance: `BOOK:12581-12595`.
 - Fact: `Mod[h*n,1]` repeats for rational `h` and is nonrepeating/uniform for irrational `h`. Difference codings can be generated by substitution schedules derived from continued fractions, with fixed substitutions for quadratic irrationals. These are fractional/difference observers and T42 relations over the underlying addition trace.
 
+The corresponding Notes figure uses `h=11/17`, `sqrt(2)`, `GoldenRatio`, and `cuberoot(4)`; only the rational case repeats.
+
 ### E19 — Other uniform sequences are relations, not T34 presets
 
 - Provenance: `BOOK:12597`.
@@ -144,17 +174,17 @@ Reconstruct arithmetic iteration as a native scalar transition construction. Pin
 
 ### E22 — Direct power evaluation and computational reducibility
 
-- Provenance: `BOOK:7408-7424` and `BOOK:9058-9080`.
-- Fact: a digit at time `t` has a direct power formula, and exponentiation by squaring computes a requested power using the bits of `t`. A later powers-of-two example contrasts random-access work with explicit row-by-row evolution. These support a separate exact query evaluator, not altered event semantics.
+- Provenance: `BOOK:7408-7424`, `9058-9080`, and `17849-17920`.
+- Fact: a digit at time `t` has a direct power formula, and exponentiation by squaring computes a requested power using the bits of `t`. A later powers-of-two example contrasts random-access work with explicit row-by-row evolution; the evaluation-chain material explicitly uses start-one/add-one and fixed multiplication and exploits associativity. The OCR-damaged fold near `17857` is repaired from the surrounding mathematics. These support a separate exact query evaluator, not altered event semantics.
 
 ### E23 — CA emulation with explicit carry machinery
 
-- Provenance: `BOOK:7968-7980`.
-- Fact: a cellular automaton with 11 colors emulates repeated multiplication by three in base two; its complication propagates carries. Emulation requires added representation state and does not collapse T34 into T01.
+- Provenance: `BOOK:7968-7980` and counter relation `BOOK:12054`.
+- Fact: a cellular automaton with 11 colors emulates repeated multiplication by three in base two; its complication propagates carries. Separately, a Turing machine can display reversed successive-number digits as a binary counter. Both require added representation/control state and do not collapse T34 into T01 or T12.
 
 ### E24 — Arithmetic over digit sequences is generally nonlocal
 
-- Provenance: `BOOK:8828-8842`.
+- Provenance: `BOOK:1531-1537` and `8828-8842`.
 - Fact: carries in addition can propagate arbitrarily far, and general functions can make almost every input digit affect almost every output digit. This directly rules out assuming a finite digit neighborhood from scalar arithmetic syntax.
 
 ### E25 — Historical/exactness context
@@ -171,6 +201,21 @@ Reconstruct arithmetic iteration as a native scalar transition construction. Pin
 
 - Provenance: clean split `CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:1-115`; local original rasters for extracted pages 132-137.
 - Fact: the canonical monolith's base-representation table is OCR-damaged, while the clean split repairs formulas and image paths. The rasters recover panel labels, row counts, radix alignment, and crop facts absent from prose. Canonical claims retain `BOOK` provenance; the split and raster are explicit repairs/independent guards.
+
+### E28 — No canonical T34 evolution program
+
+- Provenance: `BOOK:12598` immediately after the native Notes range.
+- Fact: the first explicit `NestList` implementation under the `Elementary Arithmetic` Notes is already the parity-selected T35 rule. T34 supplies exact formulas/observers but no host callback to copy, strengthening the closed add/multiply algebra rather than weakening it.
+
+### E29 — Fixed precision changes scalar-map behavior
+
+- Provenance: `BOOK:13217-13247`, iterated-map Notes.
+- Fact: finite stored digits and machine arithmetic can change exact real-map behavior. These passages belong to T43, but they establish why a finite-precision T34 extension must be separately typed and cannot silently implement exact `(3/2)^t`.
+
+### E30 — Reversibility follows the operation
+
+- Provenance: `BOOK:16066-16072`.
+- Fact: systems based on numbers can be reversible when their operation is invertible; the page-121 multiplication by `3/2` reverses by division by `3/2`. Reversibility is a property/observer and does not add backward state or a second forward successor.
 
 ## Construction Model
 
@@ -321,7 +366,7 @@ The page-117/118 figures use exact seed `x_0=1`, base-2 digit rows, and operatio
 x_t = 1 + c*t
 ```
 
-The `c=1` figure visibly lists states `1` through `63`; its first sixteen rows must decode as:
+The `c=1` figure has 63 rows, `t=0..62`, and visibly lists states `1` through `63`; its first sixteen rows must decode as:
 
 | `t` | `x_t` | base 2 |
 |---:|---:|---|
@@ -344,6 +389,15 @@ The `c=1` figure visibly lists states `1` through `63`; its first sixteen rows m
 
 At `t=31`, the `c=1..8` values are respectively `32,63,94,125,156,187,218,249`, with rows `100000`, `111111`, `1011110`, `1111101`, `10011100`, `10111011`, `11011010`, and `11111001`. These anchors catch an off-by-one seed, reversed digit order, and accidental update-by-row-label.
 
+The eight-panel page-118 image contains 84 rows, `t=0..83`. Its final values/rows are:
+
+```text
+c=1:  84 = 1010100       c=5: 416 = 110100000
+c=2: 167 = 10100111      c=6: 499 = 111110011
+c=3: 250 = 11111010      c=7: 582 = 1001000110
+c=4: 333 = 101001101     c=8: 665 = 1010011001
+```
+
 ### Integer multiplication
 
 The page-119/120 presets use `x_0=1` and `MultiplyConstant(2)` or `MultiplyConstant(3)`. Their exact state is `x_t=2^t` or `3^t`. The first eleven base-2 rows are:
@@ -363,6 +417,8 @@ The page-119/120 presets use `x_0=1` and `MultiplyConstant(2)` or `MultiplyConst
 | 10 | `10000000000` | `1110011010101001` |
 
 For multiplier two, each event appends one zero in base 2. For multiplier three, row width is `floor(t*log_2(3))+1`; the 500-row figure is cropped on the left and therefore cannot be decoded as a bounded integer state. The complete exact row remains `IntegerDigits(3^t,2)`.
+
+Both page-119 panels have 64 rows, `t=0..63`. Their last values are `2^63 = 9223372036854775808`, represented by one followed by 63 zero bits, and `3^63 = 1144561273430837494885949696427`, a 100-bit integer. The former is already one beyond the maximum signed 64-bit value. The page-120 long view uses `t=0..499`; its last complete row has 791 bits even though the page omits its left portion. Exact `3^499` crop guards are prefix `111011100011111000011101` and suffix `100111011111010001011011`.
 
 For a rightmost eight-bit observer, the first sixteen residues of `3^t mod 256` are:
 
@@ -392,6 +448,8 @@ The page-121/122 preset is exact `x_0=1`, `MultiplyConstant(3/2)`, with `x_t=3^t
 | 10 | `59049/1024` | `111001.1010101001` |
 | 11 | `177147/2048` | `1010110.01111111011` |
 
+The radix-aligned page-121 raster has 256 rows, `t=0..255`; its inset shows `t=0..15`. The final numerator `3^255` has 405 binary digits, split into 150 whole-number and 255 fractional places by the denominator `2^255`. Its final rational is exactly `3^255/2^255`; no finite-precision decimal trajectory can substitute for it.
+
 The fractional-part plot is exactly:
 
 ```text
@@ -407,6 +465,16 @@ Its first sixteen values are:
 ```
 
 Changing the digit-rendering base must not change these rational samples. The source reports apparent uniformity as an unproved measurement claim; it is not a verifier oracle.
+
+Pixel/value matching shows the page-122 graph contains 201 dots, `t=0..200` inclusive. Its final sample is:
+
+```text
+301238419698178094330228735350577461155754011486333945032865
+/
+1606938044258990275541962092341162602522202993782792835301376
+```
+
+This is exactly `(3^200 mod 2^200)/2^200`, approximately `0.187461128806`; using only 200 samples or shifting the seed to `t=1` is an off-by-one failure.
 
 ### Required metamorphic oracles
 
