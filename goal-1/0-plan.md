@@ -37,11 +37,19 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 ## Current Facts
 
 - `ref/notes/CA-Types.csv` has one header and 45 catalog rows.
+- The 45 `ca_type` values are nonempty and unique; the stable `T01` through `T45` mappings in this plan cover each row exactly once.
 - `principles.md` contains 17 numbered principles, including Principle 0.
 - `simple_programs.md` currently specifies a `t+0D` through `t+3D` trajectory model with selectors, neighborhoods, writable frontiers, and per-target rules.
-- `src/ca` currently contains alphabets, datasets, frontiers, loci, neighborhoods, RNG, rollout, rules, seeds, and specifications, plus visualization modules.
+- `simple_programs.md` currently limits neighborhoods to current-state reads (`Delta t = 0`), writes values at a fixed next-state support in parallel, and copies non-frontier values forward.
+- The eleven top-level `src/ca` Python modules are `__init__.py`, `alphabets.py`, `datasets.py`, `frontiers.py`, `loci.py`, `neighborhoods.py`, `rng.py`, `rollout.py`, `rules.py`, `seeds.py`, and `specs.py`; the package also exposes visualization modules.
+- The current `src/ca` runtime supports only `t+0d` through `t+3d`, spatial rank zero through three, and a `time_slice` frontier. `specs.py` resolves six named Phase 1 rule/neighborhood families.
+- `rollout.py` dispatches through family-name branches for AR2, Dyadlags, Lagcounts, and spatial Dyadrads/Dyadaxes rather than executing one shared selector/rule/update algebra.
+- Current temporal families use seed prefixes or packed local history inside family-specific rollout code; ordinary spatial lookup uses selector reads and current-time snapshots.
+- The current seed catalog separates selector-backed support from rendering, but `fractal` and `spiral` accept predicate callables and therefore remain current-runtime behavior to audit, not presumed Goal 2 primitives.
 - The canonical monolithic book file contains 22,497 lines and includes chapter text, captions, notes, and index material that may contain relevant evidence.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
+- At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
+- Execution status at this sync is Foundation complete, 0 of 45 type stages complete, T01 next, and Synthesis and Goal 2 Handoff pending.
 
 ## Assumptions To Challenge
 
@@ -124,6 +132,8 @@ Stages are ordered to expose difficult semantic differences early. `TNN` records
 
 ### 1-FOUNDATION
 
+Status: **COMPLETE** in `goal-1/1-FOUNDATION.md`.
+
 #### Big Picture Objective
 
 Establish an auditable baseline of the taxonomy, evidence source, current API, current runtime, and evolving design vocabulary before judging any type.
@@ -141,6 +151,10 @@ Establish an auditable baseline of the taxonomy, evidence source, current API, c
 - Current runtime and API responsibilities are documented with file references.
 - Search and evidence standards are executable and leave no undefined meaning of "complete."
 - Initial assumptions and suspected abstractions are explicitly marked as hypotheses.
+
+#### Stage Result
+
+Foundation mechanically joined all 45 CSV rows to taxonomy sections, stable T IDs, unique execution stages, and pending evidence-index records. It read and inventoried the complete governing API/runtime/test baseline, created `evidence-index.md` and `design-ledger.md`, and recorded current family-dispatched rollout, hidden temporal history, fixed-support assignment, and unrestricted callable pressure as liabilities rather than design commitments. The current suite passed with 102 tests; Goal 1 changes were confined to `goal-1/`. No type conclusion was made and no stage was reopened. Next: T01.
 
 ### 2-T01-ELEMENTARY
 
