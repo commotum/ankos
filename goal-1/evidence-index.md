@@ -28,7 +28,7 @@ Each type stage must make the following auditable:
 |---|---:|---|---:|---|---|---|
 | T01 | 2 | Elementary Cellular Automata | 1 | `2-T01-ELEMENTARY.md` | COMPLETE | 8 search families; 23 excerpt groups; all split/Notes/Index/cross-reference candidates dispositioned; 0 unresolved |
 | T02 | 3 | Multi-Color Nearest-Neighbor Cellular Automata | 2 | `21-T02-MULTICOLOR-CA.md` | COMPLETE | Exact 29-query/157-candidate partition; 21 evidence groups; 48 verbatim fragments; ordered `k^3` table/base-`k` codec; 11 included/6 excluded/2 relation-only assets; seven source/semantic/metadata/Voronoi/reversible/raster oracles; 0 unresolved |
-| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | REOPENED | T05 found the omitted code-1004600 Notes continuation at canonical line 19234 and two linked long-run plots; former 17-query/309-candidate and 116-asset closure is superseded pending widened source/asset repair and fresh review; semantic sum/table/codec result remains valid |
+| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | COMPLETE | Exact repaired 18-query/312-candidate partition; 22 evidence groups; 211 cited provenance lines, 89 quote fragments on 86 lines; 118 assets at 50 included/60 excluded/8 relation-only; 104-link reverse join; code-1004600 Notes/plots repair; six embedded oracles, independent review, and 102 tests; semantic sum/table/codec result unchanged; 0 unresolved candidates |
 | T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | COMPLETE | Exact 12-query/243-candidate partition; 15 evidence groups; 253 cited provenance lines, 92 quote fragments, 90 quote lines; 72 assets at 35 included/32 excluded/5 relation-only; exact `k=3,r=1,A=(0,1,2),nu(i)=i` T03 preset, 2,187-code domain, source trajectories/properties/gallery distinctions, corrected labels, six embedded oracles, Goal 2 handoff, independent review, and 102 tests; 0 unresolved candidates |
 | T05 | 6 | Higher-Color Totalistic Cellular Automata | 5 | `24-T05-HIGHERCOLOR-TOTALISTIC.md` | IN PROGRESS | Exact higher-color source/asset/semantic/API/runtime audit active |
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | PENDING | Not started |
@@ -75,12 +75,12 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 21 / 45.
-- Type stages reopened: 1.
+- Type stages complete: 22 / 45.
+- Type stages reopened: 0.
 - Type stages unresolved: 22 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
 ## Reopened-Stage Log
 
-- T03 reopened again during T05: named code-`1004600` had been included as a four-color totalistic profile, but its Notes continuation at canonical line 19234 and linked lines 19236/19238 were absent from the claimed 309-candidate/116-asset closure. The earlier code-357/code-1329/code-20 repair and semantic result remain valid; the widened manifest, checks, and independent review are pending.
+- T03 reopened and reclosed during T05: named code-`1004600` had been included as a four-color totalistic profile, but its Notes continuation at canonical line 19234 and linked lines 19236/19238 were absent from the claimed 309-candidate/116-asset closure. The repaired 18-query/312-candidate and 118-asset manifest, all six checks, fresh independent review, and 102 tests pass; the semantic result remains unchanged.

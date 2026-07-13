@@ -1,6 +1,6 @@
 # 22-T03-TOTALISTIC-CA
 
-Status: **REOPENED**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -11,7 +11,7 @@ Status: **REOPENED**
 - T01/T02 and D111-D114 already supply fixed ordered one-dimensional support, `AllSites`, old-snapshot reads, typed same-site assignment, atomic parallel commit, successor, seed, realization, trace/view separation, ordered alphabets, and arbitrary-precision integer serialization. T03 changes the rule's input quotient and program identity, not the executor or update law.
 - `simple_programs.md:1964-2027` groups numeric sums, active counts, and color histograms under one broad `TOTALISTIC` label. That API responsibility is wider than source T03: equal-sum contexts such as `(0,2,0)` and `(1,0,1)` must merge even though their color histograms differ.
 - The current runtime can sum an `int64` read vector, but `rules.totalistic` does not derive its case count, `_channel_state` ignores the declared `sum` versus `count` mode, generic `lookup` is not executable, spatial output remains binary right-shift/`&1`, and batch rule IDs are forced through `numpy.int64`. No current test executes a standalone three-color totalistic table or validates its codec.
-- The former 16-query/118-candidate and 17-query/309-candidate closures are historical and superseded. The current bounded repair closes 18 queries, 312 disjoint candidates, 22 evidence groups, 89 verbatim fragments on 86 source lines, five official PDFs, and 118 source-linked rasters partitioned as 50 included, 60 excluded, and 8 relation-only. The two new included rasters are the explicit Notes continuation for four-color totalistic code `1004600`; aggregate and execution semantics are unchanged. Independent review and global reintegration remain open while this stage is `REOPENED`.
+- The former 16-query/118-candidate and 17-query/309-candidate closures are historical and superseded. The completed bounded repair closes 18 queries, 312 disjoint candidates, 22 evidence groups, 89 verbatim fragments on 86 source lines, five official PDFs, and 118 source-linked rasters partitioned as 50 included, 60 excluded, and 8 relation-only. The two new included rasters are the explicit Notes continuation for four-color totalistic code `1004600`; aggregate and execution semantics are unchanged. Fresh independent review, global reintegration, and every gate pass.
 
 ## Updated Assumptions
 
@@ -1745,16 +1745,16 @@ Picture 253/1 is repaired to visible code `1659`: the Actual Index routes 1659 t
 
 ## Completion Requirements
 
-- [ ] Every strict/Notes/split/actual-Index/alias/variant/application/emulation textual candidate is dispositioned reproducibly.
-- [ ] Every currently identified relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and exclusions.
+- [x] Every strict/Notes/split/actual-Index/alias/variant/application/emulation textual candidate is dispositioned reproducibly.
+- [x] Every currently identified relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and exclusions.
 - [x] Aggregate/value/case/table/code/read/update/successor/boundary/seed semantics and variants are explicit.
 - [x] T01/T02/T04/T05/T06/T07/additive/weighted/emulation boundaries and current API/runtime fit are proved.
 - [x] Goal 2 files/dependencies/tests and no-cheating gates are implementation-ready.
-- [ ] Global ledgers, independent review, diff checks, and repository tests are integrated.
+- [x] Global ledgers, independent review, diff checks, and repository tests are integrated.
 
 ## Stage Results
 
-**REOPENED during T05; bounded source/asset repair applied.** The T05 higher-color audit found the direct code-`1004600` Notes continuation at `BOOK:19234` and its two linked 20-million-step fluctuation plots at `BOOK:19236,19238`. T03 already treated code `1004600` as an included four-color totalistic profile, so omitting its named-code continuation invalidated the former 309-candidate/116-asset exhaustive closure even though aggregate semantics were unchanged. Q18 and the two linked plots now close an exact 18-query/312-candidate source manifest, 22 evidence groups with 89 verbatim fragments on 86 source lines, and 118 rasters at `50 included / 60 excluded / 8 relation-only`. All six embedded blocks pass; independent review and global reintegration remain open, so the stage stays `REOPENED` and the corresponding checkboxes stay unchecked.
+**COMPLETE after the bounded T05 repair and fresh independent review.** The T05 higher-color audit found the direct code-`1004600` Notes continuation at `BOOK:19234` and its two linked 20-million-step fluctuation plots at `BOOK:19236,19238`. T03 already treated code `1004600` as an included four-color totalistic profile, so omitting its named-code continuation invalidated the former 309-candidate/116-asset exhaustive closure even though aggregate semantics were unchanged. Q18 and the two linked plots now close an exact 18-query/312-candidate source manifest, 22 evidence groups with 89 verbatim fragments on 86 source lines, and 118 rasters at `50 included / 60 excluded / 8 relation-only`. All six embedded blocks, independent review, global reintegration, fence/diff checks, and all 102 repository tests pass.
 
 T04's named code-357/code-1329 routes at `BOOK:3320-3378` and binary radius-two code-20 follow-through first exposed omissions in T03's former exhaustive-manifest/superset claim; the subsequent bidirectional audit also found two-dimensional, weighted, Notes-chain, application, and inherited T04 E14 controls. That prior source and physical audit closed 17 queries, 309 dispositioned candidates, 21 evidence groups, 88 verbatim fragments on 85 source lines, five official PDFs, and 116 rasters at `48 included / 60 excluded / 8 relation-only`; those figures are retained only as historical provenance for the now-explicit three-line/two-asset delta.
 
@@ -1762,7 +1762,7 @@ T03 is one exact finite-sum rule description over the T01/T02 fixed-lattice cons
 
 The repaired asset blocks pass. They cover `50/60/8` disjoint physical dispositions, 70 explicitly followed continuation/boundary links, the 104-link mechanical reverse-join closure, 23 mechanically outside query-false-only siblings, binary radius-two codes `10/20/52`, the exact code-`1004600` table and long-run observer continuation, code-20 survival counts, code-357/code-1329 structure labels, code-420 additivity, exact code-777/code-867 trajectories, and all 946 cells of the strict code-777 raster with zero mismatch. The former 16-query/118-candidate and 17-query/309-candidate exhaustion claims are superseded by the widened 18-query/312-candidate partition; the current broad API and binary/family-dispatched runtime remain documented as mismatches rather than preserved through a shim.
 
-G2-T03 names concrete alphabet, aggregate, table/codec, rule, executor, spec/preset, trace/export, migration, and test work with 15 adversarial conformance obligations, including exact generic radius-two codes `10/20/52`. D115-D118 and the rank-versus-valuation repair remain active. All six embedded blocks and the widened bidirectional source/asset checks pass. Fresh independent review and global closure are still required before the historical completion claim can be restored.
+G2-T03 names concrete alphabet, aggregate, table/codec, rule, executor, spec/preset, trace/export, migration, and test work with 15 adversarial conformance obligations, including exact generic radius-two codes `10/20/52`. D115-D118 and the rank-versus-valuation repair remain active. All six embedded blocks and the widened bidirectional source/asset checks pass. Fresh independent review found no content defect after the status/count refresh, and global closure is restored.
 
 ## Integration Results
 
@@ -1773,6 +1773,6 @@ G2-T03 names concrete alphabet, aggregate, table/codec, rule, executor, spec/pre
 5. Support, topology, values, numeric valuation, aggregate cases, structural table, code, run controls, representation, properties, and relations remain separately typed.
 6. Equal-weight fixed-arity sum followed by complete lookup is defining rule semantics and remains native. Integer vectorization, exact-average labels, bigint code, exhaustive lowering, solvers, gallery selection, and rasterization remain explicit incidental or relation layers.
 7. The proposed encoding preserves alphabet identity, independent `nu`, arity/radius, every sum row including leading zeros, arbitrary-precision code direction, run identity, and observation scope. The noncanonical symbolic fixture prevents rank collapse.
-8. T03 is reopened by the T05 code-`1004600` Notes/asset omission. T01/T02 and T04 remain completed; the missing higher-color observer continuation does not alter their native semantics, but T03 cannot reclose until the widened manifest and independent review pass.
+8. T03 was reopened by the T05 code-`1004600` Notes/asset omission and is now reclosed after the widened manifest and fresh independent review passed. T01/T02 and T04 remain completed; the higher-color observer continuation does not alter their native semantics.
 9. Goal 2 gains G2-T03 after the shared T01/T02 alphabet/table/executor responsibilities. T04/T05 depend on it as presets; T06/T07 consume predicates/proofs rather than flags; outer/weighted/histogram/higher-dimensional profiles remain separately staged.
 10. The overall API becomes simpler: one closed `valuation -> exact sum -> typed table` rule composes with the existing fixed-field executor, replacing the current loose `TOTALISTIC` bucket and binary family routing without adding an eleventh update law.
