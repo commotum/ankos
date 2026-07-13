@@ -58,6 +58,49 @@ Thus the full declared audit is `1,027 = 487 retained + 470 excluded + 70 Index`
 
 Known extraction defects are retained as evidence controls, not silently repaired: lost figure glyphs at `BOOK:10647,11277,14341,18764`; a truncated initial condition at `5552`; OCR corruption at `18394,18814`; and damaged `CellularAutomaton` syntax near `11077`. None changes the prose-level seed/configuration distinctions. The executable line-set/query/split oracle below freezes the exact protocol.
 
+| Q | Frozen query family | Total / pre-Index / Index |
+|---:|---|---:|
+| 01 | exact `initial condition(s)` | 621 / 570 / 51 |
+| 02 | `initial` plus state/configuration/pattern/sequence/field/string/word/network/value/data/input/etc. | 54 / 51 / 3 |
+| 03 | single/one colored cell, square, element, or point | 79 / 79 / 0 |
+| 04 | start/begin/evolve from or with single/random/finite/periodic/uniform/blank | 109 / 109 / 0 |
+| 05 | random-initial and start-from-random forms | 112 / 81 / 31 |
+| 06 | finite/localized near seed/initial/configuration/pattern/block vocabulary | 61 / 48 / 13 |
+| 07 | periodic/repetitive/repeating near initial/configuration/background/block vocabulary | 173 / 158 / 15 |
+| 08 | all/only/uniformly black/white/gray or uniform/homogeneous state/background | 29 / 29 / 0 |
+| 09 | named color/uniform/periodic/random/regular near background | 32 / 31 / 1 |
+| 10 | seed word forms | 19 / 10 / 9 |
+| 11 | nested/structured near seed/initial/configuration vocabulary | 136 / 125 / 11 |
+| 12 | quantified/described `initial condition(s)` | 128 / 125 / 3 |
+
+The exact regex strings, per-query digests, the complete 487-line `S`, governed set, derived `X`/Index sets, source hash, and the exact 45 split variants are versioned in `goal-1/27-T08-source-oracle.py`. Split equality means complete-line Unicode equality after UTF-8 decoding and `splitlines()` removal of line terminators only; no whitespace, case, punctuation, OCR, Markdown, or Unicode normalization is performed. An identical line may occur anywhere among the 17 split files, so this is occurrence coverage rather than a claimed one-to-one position map.
+
+```bash
+python3 goal-1/27-T08-source-oracle.py
+```
+
+Recorded result:
+
+```text
+source OK
+Q01 OK (621, 570, 51)
+Q02 OK (54, 51, 3)
+Q03 OK (79, 79, 0)
+Q04 OK (109, 109, 0)
+Q05 OK (112, 81, 31)
+Q06 OK (61, 48, 13)
+Q07 OK (173, 158, 15)
+Q08 OK (29, 29, 0)
+Q09 OK (32, 31, 1)
+Q10 OK (19, 10, 9)
+Q11 OK (136, 125, 11)
+Q12 OK (128, 125, 3)
+union/pre_index_union/index OK 1022/952/70
+matched_retained/retained/excluded OK 482/487/470
+structural OK
+split_exact_mirror OK 17 442 b85d35a696969b27e517923985d35c4dbfe73eb0213bae774e48d8d81b8a0961
+```
+
 ## Book Excerpts
 
 Short fragments below are provenance anchors; the construction fact, behavior observation, and implementation/view convention remain separate.
