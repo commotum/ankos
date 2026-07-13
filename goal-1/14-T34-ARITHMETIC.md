@@ -1,6 +1,6 @@
 # 14-T34-ARITHMETIC
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -15,7 +15,7 @@ Status: **IN PROGRESS**
 - Rightmost-digit truncation yields an explicit finite `MultiplyMod`/linear-congruential sibling. Special digit/base pairs can compile to cellular automata. Neither replaces unbounded T34.
 - No canonical T34 `NestList` implementation is printed; the first such program in the Notes is already the T35 parity branch at `BOOK:12598`.
 - The current `formulaic` callback, modular AR2, temporal 0D neighborhoods, fixed NumPy dtypes, family rollout, finite alphabets, and rectangular raw episodes do not implement this construction. Generic typed assignment responsibilities and T19/T27 exact-number work can be reused.
-- Exact textual, Notes, actual-Index, split, history, program, alias, and relation audits have zero unresolved T34 candidates. Figure endpoint audit is the final local evidence check before global integration.
+- Exact textual, Notes, actual-Index, split, history, program, alias, relation, and figure audits have zero unresolved T34 candidates.
 
 ## Updated Assumptions
 
@@ -662,17 +662,23 @@ Tests decode rows back to exact values, compare iterative and closed-form traces
 
 ## Completion Requirements
 
-- [ ] Every native main-text, figure, Notes, actual Index, program, history, and relation candidate is dispositioned.
-- [ ] Number domains, closed operations, seeds, transition/outcome semantics, equality, traces, and observers are explicit.
-- [ ] Every canonical preset has independently checked exact anchors and adversarial tests.
-- [ ] T34/T35 and all neighboring construction boundaries are explicit.
-- [ ] Current API/runtime fit and Goal 2 work are implementation-ready.
-- [ ] Design ledger, evidence index, global plan, diff checks, and tests are integrated.
+- [x] Every native main-text, figure, Notes, actual Index, program, history, and relation candidate is dispositioned.
+- [x] Number domains, closed operations, seeds, transition/outcome semantics, equality, traces, and observers are explicit.
+- [x] Every canonical preset has independently checked exact anchors and adversarial tests.
+- [x] T34/T35 and all neighboring construction boundaries are explicit.
+- [x] Current API/runtime fit and Goal 2 work are implementation-ready.
+- [x] Design ledger, evidence index, global plan, diff checks, and tests are integrated.
 
 ## Stage Results
 
-In progress.
+T34 is complete. The direct-name union found 65 occurrences on 55 lines, conservative mechanics 27/26, focused native forms 13/12, and exact code/observer forms 6/6. Thirty excerpt groups cover the scoped main core, all seven canonical main figures, Notes figures, Notes/programs/history, actual Index/splits, exact and approximate domain boundaries, nonlocality, representations, suffix quotients, CA/substitution/counter relations, reversibility, and fast evaluation. Every candidate is classified and strict mechanics have zero unresolved gaps.
+
+The reconstruction is one domain-tagged exact scalar plus a closed `AddConstant | MultiplyConstant` program. It uses `UniqueScalar`, a complete current read, `ArithmeticAssignment`, and the existing atomic typed assignment update. Every valid event has one successor, including identity events; no halt, boundary, modulus, capacity, digit base, or cycle stop is native. Exact integers/rationals, decimal-string codecs, structural program identity, typed trace/outcomes, and explicit exact/declared numerical profiles close the value model.
+
+The page-117 through page-122 oracles pin 63 add-one rows, 84 rows for each addend `1..8`, 64 short power rows, 500 complete powers of three behind a left crop, 256 exact `3/2` rows, and 201 exact fractional samples. Independent `python3` integer/`Fraction` checks passed for all listed sequences/endpoints, 791-bit `3^499` crop guards, `3^255` bit length, exact `f_200`, and the 64-period eight-bit suffix. `git diff --check -- goal-1` passed, Markdown fences are balanced, and `uv run pytest -q` passed all 102 tests in 1.18 seconds.
 
 ## Integration Results
 
-In progress.
+`design-ledger.md` now records T34, D064-D069, scalar/value/source/read/result/update/outcome/trace inventory changes, rejected numeric/rendering shortcuts, and the completed integration entry. `evidence-index.md` records T34 complete and 13/45 completed types. `0-plan.md` records the stage result and T37 as next.
+
+T19/T27 numeric obligations and the generic typed assignment/effect responsibility are reused without changing meaning. T34 adds no ninth update law, family branch, callback, hidden state, or dense packing. `MultiplyMod`, direct powers, CA/substitution encodings, and all digit/value views remain distinct. T35/T36/T37/T38/T43 boundaries are sharper; no prior stage is contradicted or reopened.

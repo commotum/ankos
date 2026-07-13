@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31 complete, 12 of 45 type stages complete, T34 Arithmetic Iteration Systems in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34 complete, 13 of 45 type stages complete, T37 Recursive Sequences in progress, and Synthesis and Goal 2 Handoff pending.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -455,7 +455,7 @@ T31 reconstructs a total-field model set defined by a closed center-conditioned 
 
 ### 14-T34-ARITHMETIC
 
-Status: **IN PROGRESS** in `goal-1/14-T34-ARITHMETIC.md`.
+Status: **COMPLETE** in `goal-1/14-T34-ARITHMETIC.md`.
 
 #### Big Picture Objective
 
@@ -469,7 +469,15 @@ Apply the common protocol, emphasizing number type, exactness, operation, initia
 
 All T34 evidence is captured; arithmetic state is not confused with its rendering; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+The direct-name union dispositioned 65 occurrences on 55 lines, the conservative mechanics query 27/26, the focused native query 13/12, and exact code/observer forms 6/6. Thirty canonical groups cover the scoped main core, all seven main figures and Notes figures, Notes/programs/actual Index/splits/history, exact domains, addition/multiplication presets, nonlocal carries, digit/fraction/size observers, finite suffix quotients, CA/substitution relations, reversibility, precision, and fast-forward evaluation. Strict mechanics have zero unresolved candidates.
+
+T34 adds a domain-tagged exact scalar carrier and closed `AddConstant | MultiplyConstant` programs, read through `UniqueScalar` and committed as an existing typed assignment—no ninth update law. Arbitrary-precision integers/reduced rationals, decimal-string codecs, exact traces, structural program identity, eventful identity steps, explicit run outcomes, and base/radix/crop/repetend observers are implementation-ready. Page-117..122 row counts/endpoints, `3^499`, exact `(3/2)^t`, the 201-dot fractional plot, suffix period, overflow, carry, normalization, and cross-base tests close the handoff. `MultiplyMod`, CA/substitution compilers, and direct powers remain explicit siblings/observers; T35/T36/T37/T38/T43 stay separate. No prior stage was reopened. Next: T37.
+
 ### 15-T37-RECURSIVE
+
+Status: **IN PROGRESS** in `goal-1/15-T37-RECURSIVE.md`.
 
 #### Big Picture Objective
 

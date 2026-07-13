@@ -59,10 +59,10 @@ Each type stage must make the following auditable:
 | T31 | 32 | Local Constraint Systems | 31 | `13-T31-CONSTRAINTS.md` | COMPLETE | Direct-name union 29 occurrences/27 lines; conservative family 162/134; expanded audit 815/415; 28 excerpt groups; all count-relation/model-set mechanics, page-225/226/227 figures, Notes/Index/splits, periodic/de Bruijn witnesses, verifier/certificate/solver boundary, complexity qualifications, T32/T33 boundaries, variants, observers, and relations dispositioned; 0 unresolved strict mechanics |
 | T32 | 33 | Template Constraint Systems | 32 | `40-T32-TEMPLATE-CONSTRAINTS.md` | PENDING | Not started |
 | T33 | 34 | Seeded Template Constraint Systems | 33 | `41-T33-SEEDED-CONSTRAINTS.md` | PENDING | Not started |
-| T34 | 35 | Arithmetic Iteration Systems | 34 | `14-T34-ARITHMETIC.md` | IN PROGRESS | Integer state/map semantics, arithmetic formulas, branch conditions, termination/cycles, seeds, figures, Notes/Index, variants, and relations under audit |
+| T34 | 35 | Arithmetic Iteration Systems | 34 | `14-T34-ARITHMETIC.md` | COMPLETE | Direct-name union 65 occurrences/55 lines; mechanics 27/26; focused native 13/12; code observers 6/6; 30 excerpt groups; all scalar/add/multiply/domain/exactness mechanics, seven main figures and Notes figures, programs/actual Index/splits/history, digit/fraction/size/crop/quotient/CA/substitution/fast-forward relations, T35/T36/T37/T38/T43 boundaries, and exact oracles dispositioned; 0 unresolved |
 | T35 | 36 | Piecewise Integer Maps | 35 | `42-T35-PIECEWISE-INTEGER.md` | PENDING | Not started |
 | T36 | 37 | Digit-Reversal Arithmetic Systems | 36 | `43-T36-DIGIT-REVERSAL.md` | PENDING | Not started |
-| T37 | 38 | Recursive Sequences | 37 | `15-T37-RECURSIVE.md` | PENDING | Not started |
+| T37 | 38 | Recursive Sequences | 37 | `15-T37-RECURSIVE.md` | IN PROGRESS | Prefix state, index origin, fixed dependencies, closed recurrence grammar, append semantics, compact realization, figures, Notes/Index, variants, and relations under audit |
 | T38 | 39 | Variable-Index Recursive Sequences | 38 | `44-T38-VARIABLE-RECURRENCE.md` | PENDING | Not started |
 | T39 | 40 | Number-Theoretic Filtering Systems | 39 | `16-T39-FILTERS.md` | PENDING | Not started |
 | T40 | 41 | Mathematical-Constant Digit Systems | 40 | `45-T40-CONSTANT-DIGITS.md` | PENDING | Not started |
@@ -75,9 +75,9 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 12 / 45.
+- Type stages complete: 13 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 32 pending, 1 in progress.
+- Type stages unresolved: 31 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
