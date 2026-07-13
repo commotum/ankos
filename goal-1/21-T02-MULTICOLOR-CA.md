@@ -508,7 +508,13 @@ code(T)              = sum(T(l,c,r) * k^context_index(l,c,r))
 | Binary block encoding/emulation | Explicit relation between different programs, supports, steps, and decoders; never the native multi-color representation. |
 | Universal/purpose-doubling/mobile/Turing/substitution/computer examples | Named T02 program/seed/emulation profiles; their encoded machine, purpose, search work, or behavior is not extra T02 state. |
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T02 is a parameterization of the same CA preset by an arbitrary explicit finite ALPHABET, including product/tagged cells. The semantic RULE is the complete label table; rank and Wolfram integer code are lossless codec/provenance maps. No executor, update, or alphabet subclass per semantic role is introduced.
+
+Revised G2-T02 generalizes finite alphabet/table validation and bigint codecs, preserves the exact rank/code oracles, and ensures composite alphabets can flow through the T01 axes. Existing evidence and tests remain authoritative.
+
+## Historical Current API Fit (Superseded only on composite-alphabet/identity wording)
 
 | Construction element | Fit | Evidence and consequence |
 |---|---|---|
@@ -521,7 +527,7 @@ code(T)              = sum(T(l,c,r) * k^context_index(l,c,r))
 | Typed assignment/parallel commit | DIRECT T01 reuse | Same source, result, conflict-free atomic update, and deterministic successor; no eleventh law. |
 | Totalistic/symmetric/background/reversible/mutation/emulation data | NOT APPLICABLE to base execution | These are restrictions, claims, provenance, or relations rather than rule flags. |
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Evidence Retained)
 
 | Component | Fit | Exact finding |
 |---|---|---|
@@ -536,7 +542,7 @@ code(T)              = sum(T(l,c,r) * k^context_index(l,c,r))
 | `Dynamics` / seeds / boundary | PARAMETERIZATION / PRINCIPLED EXTENSION | Finite field mechanics fit, but alphabet, semantic support, typed result/update, table identity, and observation scope are missing. |
 | Tests | SEMANTIC MISMATCH as T02 evidence | Current rule/rollout tests cover binary named families and parity only; none checks `k=3`, 27 contexts, base-3 codes, symbolic order, or `>2^63` identities. |
 
-## Principles Audit
+## Historical Principles Audit (Superseded only on architecture wording)
 
 - General `k` is directly supported by the Notes rule-count/implementation and `{n,k}` syntax; strict examples concentrate on `k=3`. T02 is therefore the `k>=3`, radius-one slice of the generic finite-alphabet lookup construction.
 - Alphabet cardinality parameterizes T01 without changing support, source coverage, reads, result, commit, or successor. Adding a separate update/executor would duplicate semantics.
@@ -924,7 +930,7 @@ T02 direct raster oracle: PASS
 
 The discrete-Voronoi, mutation, reversible, doubling-search, inverse-range, and emulation images do not state enough renderer settings, exact initial arrays, random choices, full tables, or observer transforms for additional pixel goldens. Their permitted roles are exact table semantics where supplied, plus identity, property, provenance, and relation evidence only.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded only on architecture wording)
 
 1. Complete controlled searches and exact line manifests across strict, Notes, actual Index, splits, aliases, formulas, variants, applications, and emulation routes.
 2. Record every unique construction-relevant excerpt verbatim and disposition every candidate.
@@ -933,7 +939,7 @@ The discrete-Voronoi, mutation, reversible, doubling-search, inverse-range, and 
 5. Audit current API/runtime/tests and completed decisions for exact reuse versus extension.
 6. Write concrete Goal 2 files/tests and no-cheating gates; independently review and integrate all global ledgers.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### G2-T02 — General finite-alphabet nearest-neighbor tables
 

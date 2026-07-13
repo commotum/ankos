@@ -538,7 +538,13 @@ The Lissajous coordinates are `(sin t,sin 2t)`, `(sin t,sin 3t/2)`, `(sin t,sin 
 - **T45 PDE:** owns differential equations, fields, boundary/initial conditions, solution definitions, and numerical solvers. Named special functions may be solutions without absorbing PDE execution.
 - **Plot/sampling/root algorithms:** external, versioned query implementations. Their diagnostic work traces do not replace semantic definitions or prove function equality.
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T41 remains a genuine nonfit to `SimpleProgram`: an uniterated function definition supplies no seed/feedback/successor. Unary/multivariate function forms, finite/infinite tagged definitions, and point/zero/crossing/extremum requests belong to generic closed-function and query/result schemas with explicit definition sets, codomains, branches, partiality, numerical contexts, and proof strength.
+
+Revised G2-T41 builds those generic declarative schemas and reuses structural expression/codecs without callbacks or fake argument-as-time execution. All exact formula, zero, crossing, series, source-repair, numerical, raster, identity/equivalence, and T42-composition oracles remain.
+
+## Historical Current API Fit (Superseded on class-generalization/DOMAIN wording)
 
 | Responsibility | Current document | Fit | Consequence |
 |---|---|---|---|
@@ -552,7 +558,7 @@ The Lissajous coordinates are `(sin t,sin 2t)`, `(sin t,sin 3t/2)`, `(sin t,sin 
 | Function spec and numerical query algebra | no current documented component | `PRINCIPLED EXTENSION` | Add outside transition execution; no function rollout family. |
 | Rendering/observers | current schema treats states as render source | `SEMANTIC MISMATCH` | Add explicit function/query adapters rather than pretending samples are trajectory state. |
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Evidence Retained)
 
 | Runtime element | Fit | Evidence and consequence |
 |---|---|---|
@@ -567,7 +573,7 @@ The Lissajous coordinates are `(sin t,sin 2t)`, `(sin t,sin 3t/2)`, `(sin t,sin 
 
 Existing CA runtime behavior remains valid for its scope. A future viewer may accept a distinct sampled-curve payload, but native T41 conformance cannot route through `RawEpisode`, object cells, a function callback, or rule-family dispatch.
 
-## Principles Audit
+## Historical Principles Audit (Superseded on architecture wording)
 
 1. Evidence forces a second pure-specification/query category alongside T31/T39 pure records. Giving T41 a source/read/result/update shell would make every transition field vacuous.
 2. A closed expression tree is necessary but insufficient. Domains, codomains, branches, continuation, named primitive versions, and exact parameters determine the mathematical object.
@@ -593,7 +599,7 @@ Existing CA runtime behavior remains valid for its scope. A future viewer may ac
 9. Goal 2 gains shared numeric-value, mathematical-expression/function, numerical-context, query/result, function-evaluation, and curve-view work before T41 conformance; T42 consumes only a typed query result.
 10. The API is more coherent because immutable definitions and pure queries no longer masquerade as CA episodes.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded on architecture wording)
 
 1. Record the exhaustive search, eighteen evidence groups, four strict/eight Notes raster identities, source repairs, exact formulas, and independent numerical anchors.
 2. Add closed function spec, primitive registry, exact numeric/branch/domain semantics, pure query/result algebra, zero events, and conservative identity/equivalence distinctions to the design inventory.
@@ -602,7 +608,7 @@ Existing CA runtime behavior remains valid for its scope. A future viewer may ac
 5. Map current API/runtime/tests and write an implementation-ready Goal 2 dependency/conformance stage without callbacks, fake time, or rollout family dispatch.
 6. Integrate `0-plan.md`, `evidence-index.md`, and `design-ledger.md`; run source/oracle, hash, fence, coverage, diff, and repository verification before closure.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### Objective and dependencies
 

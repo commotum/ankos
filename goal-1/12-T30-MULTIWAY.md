@@ -9,16 +9,16 @@ The evidence/search closure and conformance fixtures remain valid. Multiway uses
 ## Current Facts
 
 - Exact catalog row: T30, CSV line 31, `Multiway Systems`; taxonomy seed `ref/notes/CA-Types.md:814-835`. The taxonomy's proposed branch policies, custom state, pruning, memoization, and growth controls are hypotheses, not evidence.
-- The strict main/Notes construction evolves a finite set of distinct finite words. It is not one selected path and not a bag of derivation occurrences.
+- The smallest native configuration is one finite word. Its UPDATE returns the finite exact set of all distinct one-rewrite successors; the familiar finite layer is the explicit powerset/reachability lift over all current configurations.
 - A literal program is a finite relation of nonempty left words to epsilon-capable right words. The same left side may have multiple right sides; rule order is nonsemantic.
-- One event considers every exact occurrence of every left side in every parent word in the frozen old layer, including overlapping occurrences.
+- For one configuration, FRONTIER selects every exact occurrence of every left side, including overlaps. Layer traversal applies that same step independently to every old configuration.
 - Each match independently performs exactly one interval splice. Matches are alternatives; no child performs multiple matches simultaneously, and newborn words do not fire in their birth layer.
-- The successor exact-word-unions every generated child. Equal children produced by different rules, spans, or parents become one semantic word for the next event.
+- The successor set exact-unions every generated child. Equal children produced by different rules/spans merge per configuration, and layer lifting merges equal children across parents while retaining every witness.
 - Parents with no applicable match contribute nothing. They do not persist unless an explicit identity rule regenerates them.
-- Epsilon is a valid word/state and differs from the empty layer. A layer containing only epsilon advances to the empty layer when no empty-LHS rule is allowed.
+- Epsilon is a valid word/configuration and differs from the empty successor set/layer. Epsilon has no successors when no empty-LHS rule is allowed.
 - The supplied reference `MWStep` maps the empty layer to itself. `Quiescent(EmptyLayer)` with an event-free self-successor is an architectural label for that exact stutter, not a book-named halt.
 - A nonempty layer whose branches all die returns `Advanced(empty_layer)` once. This is not T16 `Terminal(NoMatch)`.
-- Multiway micro-branching therefore lifts to one deterministic set-valued macro successor. `DistinctBranchMerge` is a new update algebra, not a branch-policy option.
+- Multiway branching is the shared runner's zero/many-successor result algebra. Exact set union is the generic powerset/layer lift, not a multiway executor or eighth top-level update law.
 - Raw events must retain every `(parent,clause,span,child)` rewrite witness and every dead-end parent. Witness multiplicity never weights or duplicates successor state.
 - Book diagrams deliberately record only whether a source leads to a target, not how many applications do so. A simple state graph and a witness multigraph are distinct trace projections.
 - The same word can reappear at many time layers and must fire again. A compressed graph with one node per distinct word is downstream; global visited-state suppression changes evolution.
@@ -619,7 +619,34 @@ This is a strict invariant-backed lowering/optimization. Sorting an arbitrary wo
 - **Layered diagrams, compressed state graphs, derivation multigraphs, path-causal networks, confluence, Church-Rosser, normal forms, counts, growth, periods, frequencies, and rendering:** downstream analyses/views.
 - **Random-rule frequency claims:** no canonical enumeration, size profile, sampling distribution, or complexity criterion is supplied; no conformance sampler can be inferred.
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+### Native one-to-many step
+
+```text
+configuration = one exact Word
+active = AllApplicableLiteralMatches(configuration, program)
+reads = exact old matched spans
+writes = one replacement alternative per match
+successors = UPDATE.apply(configuration, active, writes)
+```
+
+`successors` is a finite exact set. For a layer `P`, `Lift(P) = union(Successors(p) for p in P)`. Every `(parent,clause,span,child)` witness is retained even when children deduplicate. This preserves all existing layer/graph oracles while placing T30 inside the same branch-free runner.
+
+| Axis | Corrected fit |
+|---|---|
+| DOMAIN/configuration | Discrete `t+1D` word with epsilon permitted |
+| FRONTIER | Every overlapping literal match in one old word |
+| NEIGHBORHOOD | Exact matched span and clause identity |
+| RULE | One typed interval replacement alternative per match |
+| UPDATE | Zero/many exact successor configurations with deduplication and full witnesses |
+| Layer/trace | Explicit powerset lift; recurrence, dead ends, simple graph, witness multigraph, and compressed graph remain distinct |
+
+Revised G2-T30 reuses the Word carrier and T16's pure literal match/span/one-splice operation, generalizes the runner result to a finite successor set, supplies exact deduplication and witness records, and implements layer traversal as a generic lift. It removes `MultiwayLayer` as the smallest native configuration, `DistinctBranchMerge` as an eighth law, repeated deterministic rollout, and any multiway family branch. All page-219/page-220/page-206/cross-parent/recurrence/epsilon/order/graph fixtures remain, now checked at both per-word and lifted-layer levels.
+
+The historical layer-first analysis below remains valuable evidence. This section governs its configuration/update classification.
+
+## Historical Current API Fit (Superseded by Architecture Audit)
 
 | T30 responsibility | Current proposal fit | Required conclusion |
 |---|---|---|
@@ -642,7 +669,7 @@ This is a strict invariant-backed lowering/optimization. Sorting an arbitrary wo
 
 T13 contributes finite ordered words and ragged word serialization. T16 contributes literal occurrence discovery, exact matched-span validation, and one interval splice. T30 changes program order, selection coverage, deletion validation, outcomes, state carrier, and commit, so neither prior public construction is weakened or repeatedly invoked as a workaround. T29's port graph is only a possible trace visualization target.
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Superseded by Architecture Audit)
 
 | Runtime area | Finding | T30 disposition |
 |---|---|---|
@@ -659,7 +686,7 @@ T13 contributes finite ordered words and ragged word serialization. T16 contribu
 
 No existing module provides all-match enumeration, exact child-set union, dead-end accounting, derivation witness groups, recurrent time layers, or compressed-state-graph lowering.
 
-## Principles Audit
+## Historical Principles Audit (Superseded by Architecture Audit)
 
 - **Principle 0:** all alternatives and exact merging are defining semantics. One sampled path, derivation bag, or precompressed graph changes the construction.
 - **Principles 1-4:** word-set state, all-match sources, matched spans, closed clauses, one-splice branch results, exact merge, and provenance are explicit.
@@ -683,7 +710,7 @@ Rejected shortcuts:
 - packing a whole layer/graph in a scalar, dense tensor, coordinate field, T29 graph, host graph engine, or `Any` payload;
 - applying base `Union` to the multiplicity-sensitive multiway-tag code without separate evidence.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded by Architecture Audit)
 
 1. Close direct-name, alias/confluence, implementation-symbol, main figure, Notes, program, actual Index, split, history, group/grammar, variant, graph, seed, growth, and relation searches with no silent candidates.
 2. Reconstruct exact word-set state, literal relation, all overlapping old matches, one-splice child results, exact branch union, dead ends, epsilon/empty layer, recurrence, outcomes, and traces.
@@ -693,7 +720,7 @@ Rejected shortcuts:
 6. Audit no-cheating constraints, resources, variant boundaries, ragged collation, and graph views.
 7. Reintegrate global evidence/design/plan ledgers and write the implementation-ready Goal 2 stage.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### G2-T30 — Exact literal multiway branching and distinct-child merge
 
@@ -724,7 +751,7 @@ Completion requires:
 - explicit rejection/defer tests for cyclic conventions and base-versus-tag multiplicity;
 - unchanged T13/T16/T29 semantics, one shared executor shell, no multiway rollout/callback, and all repository tests passing.
 
-## No-Cheating Checks
+## Historical No-Cheating Checks (Superseded where they reject the typed successor-set protocol)
 
 - No repeated deterministic-path executor, random branch choice, branch callback, `successors(state)` callback, or named multiway rollout.
 - No one-path selection, rule priority, first-match selection, simultaneous multi-match splice, in-step newborn firing, or no-match parent preservation.

@@ -407,7 +407,15 @@ Characteristic equations, generating functions, matrix powers, memoization, shif
 | Linear feedback/RNG | fixed lag arithmetic can be shared | finite residue ring, shift register, stochastic-use metadata, and period observers are explicit |
 | Closed-form solver | exact requested terms | random access cannot replace or fabricate requested append events |
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T37 is a SimpleProgram over a variable-support indexed sequence configuration. FRONTIER selects the next endpoint, NEIGHBORHOOD follows declared old-prefix lag/index references, RULE returns one next term, and the ordered structural UPDATE inserts it at the endpoint. The complete prefix remains canonical because the proved lag-window map is noninjective; future sufficiency is not the user's lossless complete-state equivalence.
+
+Revised G2-T37 adds indexed sequence support, endpoint loci, closed lag/expression access, typed term insertion, and an endpoint-insertion UPDATE preset shared with ordered structural systems. It removes ninth-law/recursive-executor and numeric-DOMAIN framing while retaining full prefix state, compact lossless event-log reconstruction, checkpoint validation, the optional noninjective evaluation quotient, no-halt semantics, and every exact recurrence oracle.
+
+The historical API/handoff below remains evidence provenance; this section governs its executor/class and DOMAIN terminology.
+
+## Historical Current API Fit (Superseded by Architecture Audit)
 
 | Responsibility | Current mechanism | Fit for T37 |
 |---|---|---|
@@ -428,7 +436,7 @@ Characteristic equations, generating functions, matrix powers, memoization, shif
 
 The documented source/read/rule/update responsibilities remain useful. The dense next-slice schema and unrestricted `FORMULAIC` escape hatch do not implement the construction.
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Superseded by Architecture Audit)
 
 - `src/ca/neighborhoods.py:524-543` preserves ordered temporal components, and `:617-636` defines a current/previous AR2 read. These offsets address trajectory times, not stable indices in current prefix state, so only the idea of ordered lag roles is reusable.
 - `src/ca/rules.py:336-365` computes `next=(a*x[t]+b*x[t-1]+constant) mod modulus`, decodes `a,b` from a finite rule ID, and fixes a coefficient grid. This is a finite modular two-lag relation, not the strict exact program.
@@ -445,7 +453,7 @@ The documented source/read/rule/update responsibilities remain useful. The dense
 
 Goal 2 may migrate current AR2 into an explicit residue-ring `AffineFixedLag` variant after decoding its coefficients and retaining its whole seed. It must not reuse the hidden-history rollout as the reference T37 executor or add `if family == "recursive"`.
 
-## Principles Audit
+## Historical Principles Audit (Superseded by Architecture Audit)
 
 ### Principle 0 — re-derive the state
 
@@ -484,7 +492,7 @@ Rows (e)/(f), origin-zero Perrin, factorial, machine-width Fibonacci, repeated v
 9. Goal 2 gains exact numeric prefixes, fixed-lag reads, append effects/update, compact prefix traces, and a future T38 reuse point. T39 must audit whether Ulam composes with filtering.
 10. The API is simpler because strict affine data is normalized and recurrence history is no longer split between seeds, trajectory storage, and family-specific rollout locals.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded by Architecture Audit)
 
 1. Complete direct-name, fixed-lag, named, Notes, actual-Index, split, program, history, alias, and relation searches.
 2. Decode all six raster rows and independently verify horizons, values, signs, endpoints, characteristic mappings, and source errata.
@@ -493,7 +501,7 @@ Rows (e)/(f), origin-zero Perrin, factorial, machine-width Fibonacci, repeated v
 5. Audit variants/observers/boundaries and current API/runtime/tests.
 6. Write the Goal 2 work package and adversarial suite; integrate global ledgers and verify the repository.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### Stage A — exact indexed prefix values
 
@@ -536,7 +544,7 @@ Suggested responsibility files are a shared exact-value module, `numeric_sequenc
 - Compact and materialized traces are observationally identical; a bare lag window is proven non-injective.
 - T34/T38/T39/T43 boundaries and current AR2 migration are explicit with no family branch or hidden compatibility behavior.
 
-## No-Cheating Checks
+## Historical No-Cheating Checks
 
 - No unrestricted callback, evaluator string, symbolic host expression, pickle, or family-name rollout dispatch.
 - No scalar, byte string, Python object cell, digit row, fixed tensor, or rule ID packing the whole prefix/program.

@@ -476,7 +476,15 @@ Additional required oracles:
 | Valuation, depth, leaf count, brackets, size plots | Observers/codecs |
 | Universality and Busy Beaver analyses | Properties/searches over structured programs |
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T20 is a SimpleProgram over an explicit recursive tree topology with a transparent tagged expression ALPHABET. FRONTIER performs the old-snapshot ordered maximal prefix-free match selection, NEIGHBORHOOD supplies matched subtrees/bindings, RULE instantiates replacement trees, and a tree-capable UPDATE applies the prefix-free path writes atomically. A whole expression may also have a lossless structured codec, but no opaque singleton/callback may hide matching or replacement.
+
+Revised G2-T20 adds recursive expression/path/pattern/template schemas, program-coupled tree FRONTIER, binding access, typed subtree replacements, and a prefix-free tree UPDATE strategy inside the common runner. It removes the fifth-law/symbolic-executor framing and the blanket prohibition on transparent structured values while retaining traversal, overlap, duplication/deletion, quiescence, identity, provenance, and exact trajectory oracles.
+
+The historical API/handoff below remains evidence provenance; this section governs its executor/class classification.
+
+## Historical Current API Fit (Superseded by Architecture Audit)
 
 | T20 responsibility | Current proposal fit | Required conclusion |
 |---|---|---|
@@ -495,7 +503,7 @@ Additional required oracles:
 
 T13 contributes ordered occurrence/lineage ideas, and T16 contributes program-coupled applicability and ordered priority. Neither contributes an equivalent source coverage or update. No earlier stage is reopened.
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Superseded by Architecture Audit)
 
 | Runtime area | Finding | T20 disposition |
 |---|---|---|
@@ -511,7 +519,7 @@ T13 contributes ordered occurrence/lineage ideas, and T16 contributes program-co
 
 The runtime contains no occurrence of a construction-bearing tree, pattern, binding, or rewrite primitive. A host symbolic package is useful only as an optional differential oracle; calling it from production would conceal exactly the semantics T20 is meant to represent.
 
-## Principles Audit
+## Historical Principles Audit (Superseded by Architecture Audit)
 
 - **Principle 0:** a typed tree matcher, binding environment, template instantiator, and prefix-free commit expose the construction. `expression -> host_replace(expression)` does not.
 - **Principles 1-2:** state, path, source, read, result, and update are all explicit. Atom values do not smuggle topology or programs.
@@ -534,7 +542,7 @@ Rejected shortcuts:
 - treating `//.`, confluence, or state equality as the one-step transition;
 - compiling through T13/T16/T29/T30/CA or adding a `symbolic` rollout branch.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded by Architecture Audit)
 
 1. Closed the exact-name, alias, mechanism, caption/figure, Notes, actual Index, split, history, implementation, pattern, order, overlap, fixed-point, observer, variant, and compiler searches with zero unresolved candidates.
 2. Reconstructed general and unary expression grammars, atom/variable namespaces, typed paths, structural patterns, binding equality, templates, ordered programs, seeds, counts, and representation boundaries.
@@ -545,7 +553,7 @@ Rejected shortcuts:
 7. Dispositioned combinators and deterministic operator evolution as native profiles; normalization, confluence, multiway, networks, emulations, valuations, and views remain explicit relations.
 8. Reintegrated the new decisions into the global plan, evidence index, and design ledger; no completed earlier stage is contradicted.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### G2-T20 — Ordered expression trees and atomic nonoverlapping pattern passes
 
@@ -572,7 +580,7 @@ Completion requires:
 - no changes to T13/T16 semantics and no symbolic-specific rollout;
 - all current and new tests passing with a clean static no-cheating audit.
 
-## No-Cheating Checks
+## Historical No-Cheating Checks (Superseded where they prohibit transparent structured values)
 
 - No symbolic-family rollout, host `ReplaceAll`, regex/text execution, formula/matcher/template callback, evaluator, or `Any` term/result.
 - No whole expression packed into a scalar alphabet member, CA row, Polish token stream, bracket string, numeric valuation, or integer rule code for native execution.

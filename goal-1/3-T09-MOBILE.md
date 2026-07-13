@@ -22,17 +22,17 @@ Architecture authority: the T09 row, commuting tagged representation, and runner
 
 ## Updated Assumptions
 
-- The active position is control state, not an extra cell color, a visualization mark, metadata, or executor-local variable.
+- The active position is a visible control role. Canonically it may be the unique `Active(bit)` tag in a composite finite ALPHABET; a factored position is an optional lossless view. Visualization marks, metadata, and executor locals are invalid substitutes.
 - “The active cell and its left and right neighbors” on `BOOK:11965` names the participants, not tuple order. The executable `Take[list,{n-1,n+1}]` on `:11968-11970` and the rule figure establish physical `[left,self,right]` order.
 - A frontier is where a rule fires, not a list of all locations a result might mutate. This re-derivation preserves T01 behavior and extends its protocol honestly.
-- Moving control is not a cell-value assignment. The rule returns `Assign(source,value)` and `RelocateControl(active,source+displacement)` as distinct typed effects, applied atomically.
+- The native rule returns `(new_bit,displacement)`. With `Plain(bit) | Active(bit)`, it lowers to two ordinary label writes—`source -> Plain(new_bit)` and `destination -> Active(old_destination_bit)`—applied atomically from one snapshot.
 - The Notes finite-list guard does not define wrapping, reflection, truncation, or halting. It is an implementation-domain guard around a construction that can use an infinite initial cell sequence.
 - Record-extrema compression and causal networks are derived observables. They must not feed the next transition.
 - Extended mobile automata, generalized mobile automata, Turing machines, 2D/network variants, and CA/substitution encodings are distinct constructions or emulations, not T09 options.
 
 ## Big Picture Objective
 
-Exhaustively recover basic mobile automata and use them to challenge the T01 transition protocol. Derive the smallest shared source/read/result/update semantics with visible control and atomic effects, without CA packing, hidden head state, fixed capacity, or a mobile-family rollout.
+Exhaustively recover basic mobile automata and use them to validate the broad SimpleProgram protocol. Derive the smallest source/read/write/update semantics with a visible tagged active role and atomic writes, without opaque packing, hidden state, fixed capacity, callbacks, or a mobile-family rollout.
 
 ## Catalog Identity
 
@@ -182,7 +182,7 @@ This is a cross-construction encoding, not evidence to use a substitution execut
 >
 > to emulate a mobile automaton with a cellular automaton ... divide the possible colors ... into two sets: lighter ones that correspond to ordinary cells ... and darker ones that correspond to active cells.
 
-The four-color active marker is precisely the prohibited packing shortcut.
+This passage supplies the exact lossless tagged representation: two plain and two active label variants. It is valid when the unique-active invariant and compact mobile table remain explicit; replacing the native program by an arbitrary four-color CA table or opaque color code remains invalid.
 
 ### E10 — exact state, table, read order, source write, control move, and iteration
 
@@ -261,29 +261,32 @@ These passages prove relations and variants but not native reuse by compilation.
 ### Native transition
 
 ```text
-state = (support, values, SingleActive(position))
-values : support -> {0,1}
+Cell = Plain(bit) | Active(bit)
+configuration : integer-line DOMAIN -> Cell
+invariant: exactly one Active(...)
 
-source = position
-reads  = (values[source-1], values[source], values[source+1])
+source = unique Active locus selected by FRONTIER
+reads  = projected bits at (source-1, source, source+1)
 (new_value, displacement) = table[reads]
 
-next = atomic_apply(state,
-  Assign(at=source, value=new_value),
-  RelocateControl(key="active", from=source, to=source+displacement))
+writes = {
+  source: Plain(new_value),
+  source+displacement: Active(old_bit[source+displacement])
+}
+next = UPDATE.apply(configuration, source, writes)
 ```
 
 | Dimension | Reconstructed T09 semantics |
 |---|---|
-| State | Fixed ordered 1D support/topology + total binary field + exactly one visible active position. No separate internal head state. |
+| Configuration | Fixed ordered 1D DOMAIN/support + composite finite labels `Plain(bit) | Active(bit)` with exactly one active tag. Factored `(values,position)` is a checked isomorphic view, not required storage. |
 | Support | Same fixed line class as T01; it may be unbounded. The number and organization of cells do not change. A finite work array is an explicit realization. |
-| Active/source frontier | `ControlLocus("active")`, exactly one source determined from state. It is where the rule fires, not the union of mutation targets. |
+| Active/source frontier | `UniqueTag("active")`, exactly one source determined from the labeled configuration. It is where the rule fires, not the union of write targets. |
 | Read | Ordered physical `[left,self,right]` values around the source, from the pre-transition state. |
 | Rule | Arbitrary total 8-entry table. Each entry returns `(new binary value, displacement in {-1,+1})`. |
-| Result | Compound typed effects: assign the source cell and relocate the active control marker one cell. |
-| Update | Apply both effects atomically; preserve every other value; validate one active marker before and after. Destination value is read but not written in base T09. |
+| Result | Native `(new_bit,displacement)` plus a structural two-label-write lowering. |
+| Update | Atomically replace the source label with `Plain(new_bit)` and the destination label with `Active(old_destination_bit)`; preserve every other label and validate exactly one active tag. The destination's underlying bit is not changed. |
 | Successor/halting | One deterministic successor; exactly one firing per step; no stay, branch, split, disappearance, rejection, or intrinsic halt. |
-| Seed | Initial value field and initial active position are distinct episode inputs. Values may be explicit, uniform, periodic, or random; control begins at one definite location. |
+| Seed | Initial bit field and active-tag locus are independently supplied parts of one valid labeled configuration. Values may be explicit, uniform, periodic, or random; exactly one locus is tagged. |
 | Boundary/realization | No base wrap/reflect/exterior rule is stated. Notes guard a finite implementation away from edges. Exact canonical execution uses an integer line or an explicit realization whose relocation semantics are declared. |
 | Observables | Full value plus active-position trace; record-extreme subsequence; update-event/causal network. Compression/network never feeds execution. |
 
@@ -341,7 +344,44 @@ Asymmetric ordering guards: physical `100` must move left (a self-first decoder 
 | Reversible three-cell examples | T10-like block write, not base T09 |
 | CA/substitution encodings | Exact emulations, explicitly rejected as native representation |
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+### Commuting representation
+
+For factored state `(v,h)`, define `E(v,h)[x] = Active(v[x])` when `x=h` and `Plain(v[x])` otherwise. On exactly-one-active configurations, `E` is bijective. If the compact rule gives `mu(v[h-1],v[h],v[h+1])=(b,d)`, the two writes above satisfy
+
+```text
+E(step_native(v,h)) = step_tagged(E(v,h)).
+```
+
+This proves category-3 lossless reuse. The eight-row/65,536-rule mobile program remains authoritative; arbitrary four-color CA tables are not admitted. A full-slice target-local lowering generally needs radius two, while the native unique-frontier/two-write form keeps the radius-one semantic read.
+
+### Corrected axis fit
+
+| Axis | Fit and Goal 2 delta |
+|---|---|
+| DOMAIN/configuration | Reuse fixed ordered 1D support; add composite finite labels and an exactly-one-tag invariant |
+| FRONTIER | Reuse the broad rule-firing role; add `UniqueTag(active)` over configuration labels |
+| NEIGHBORHOOD | Reuse ordered physical `[-1,0,+1]` access and T01 codec |
+| RULE | Add the closed eight-row `(bit,direction)` result schema and structural two-write lowering |
+| UPDATE | Reuse old-snapshot atomic label-write composition; validate distinct source/destination and exactly one successor tag |
+| Runner | Use the shared branch-free protocol; no mobile dispatch |
+| Trace | Store/encode the complete tagged configuration; optional factored active-position projection must round-trip |
+
+### Revised G2-T09
+
+- `alphabets.py`: finite tagged/product values and codecs; `Plain(bit) | Active(bit)` preset.
+- `frontiers.py`/`loci.py`: state-dependent `UniqueTag` firing selector over native/infinite or explicit finite realization support.
+- `neighborhoods.py`: existing ordered radius-one read projected from composite labels.
+- `rules.py`: inspectable eight-row or `{color_code,move_code}` mobile table; typed result and two-write lowering, never a callback.
+- UPDATE axis: atomic old-snapshot label writes with collision/coverage/invariant validation; no `RelocateControl` class.
+- `specs.py`/runner: structural axis decoding and branch-free execution; seed supplies one tagged configuration.
+- Tests retain all existing truth-table, asymmetric, trajectory, unbounded-movement, state-distinction, trace, observer, and 65,536-count oracles, and add pack/unpack plus commuting-square checks.
+- Static completion check: no family branch, hidden active position, opaque color code, arbitrary composite-CA table, boundary invention, or second control source.
+
+The historical analysis below is retained to show how the rejected separate-control conclusion arose. Wherever it conflicts with this section, this corrected handoff governs.
+
+## Historical Current API Fit (Superseded by Architecture Audit)
 
 | Construction element | Fit | Evidence and consequence |
 |---|---|---|
@@ -359,7 +399,7 @@ Asymmetric ordering guards: physical `100` must move left (a self-first decoder 
 
 T09 extends rather than splits the T01 protocol after `FRONTIER` is rederived as a source selector and `RULE`/`UPDATE` become explicit typed-effect boundaries. T01 is not reopened: every T01 source is also its assignment target, so its behavior and handoff remain correct.
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Superseded by Architecture Audit)
 
 | Component | Fit | Exact finding |
 |---|---|---|
@@ -376,7 +416,7 @@ T09 extends rather than splits the T01 protocol after `FRONTIER` is rederived as
 
 The current full-state formula callback is not a valid fallback: T09 has a finite local table and finite typed result codomain. A callable would merely smuggle the construction.
 
-## Principles Audit
+## Historical Principles Audit (Superseded by Architecture Audit)
 
 | Principle | T09 result |
 |---|---|
@@ -392,7 +432,7 @@ The current full-state formula callback is not a valid fallback: T09 has a finit
 | 15 | Tests must inspect both state components, both effects, tuple order, exact code pair, and atomicity. Value-only trajectories are insufficient. |
 | 16 | A structured-state/effect boundary is architectural. Four-color packing, family dispatch, hidden head metadata, and boundary fallback are shims. |
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded by Architecture Audit)
 
 1. Generalize the T01 candidate protocol's frontier from write targets to firing sources without changing T01 behavior.
 2. Add visible structured state `support/topology + values + control` and a strict exactly-one active-position invariant.
@@ -403,7 +443,7 @@ The current full-state formula callback is not a valid fallback: T09 has a finit
 7. Emit a structured trace that preserves values and control, then derive canonical addresses, compressed frames, causal networks, batching, and visualization downstream.
 8. Expose a strict preset over the shared executor and add independent truth-table/trajectory/state-distinction tests.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Revised G2-T09)
 
 ### G2-T09 — Visible control, source frontiers, typed compound effects, and Mobile conformance
 
@@ -441,7 +481,7 @@ The current full-state formula callback is not a valid fallback: T09 has a finit
 
 **Completion evidence:** all tests pass; static inspection finds no family-name dispatch for T09 and no control stored outside state; the code pair round-trips; physical input order and effect atomicity are independently proven; unbounded movement and structured trace survive; existing T01 and baseline tests pass unchanged.
 
-## No-Cheating Checks
+## Historical No-Cheating Checks (Superseded where they prohibit transparent tagged labels)
 
 - No four-color CA lowering or active-marker value packing.
 - No active position in executor locals, closure state, metadata, rule callable, or visualization marks.

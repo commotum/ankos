@@ -459,7 +459,15 @@ The Julia inverse-branch construction is native to this profile. Mandelbrot para
 | Mandelbrot set | Program-parameter filter/analysis |
 | Raster/union/3D stack/dimension/limit | View or observer |
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T27 is a SimpleProgram over geometric DOMAIN/support with transparent prototype/affine-pose products in a multiplicity-preserving bag. FRONTIER selects every old occurrence, NEIGHBORHOOD reads its prototype/full pose, RULE returns parent-local child occurrences, and UPDATE consumes parents and combines children with the commutative bag operation. This is the same occurrence-replacement pattern as T13 with a different container combiner, not a geometric executor.
+
+Revised G2-T27 adds geometric support/topology, scalar-carrier profiles, pose/product labels, all-occurrence selection, closed affine/point RULE forms, and bag-composition UPDATE policy inside the runner. It removes sixth-law/executor and numeric-DOMAIN framing while retaining pose order, multiplicity, overlap inertness, exact/declared arithmetic, branch behavior, lineage, and every center/count/equivariance oracle.
+
+The historical API/handoff below remains evidence provenance; this section governs its executor/class and DOMAIN terminology.
+
+## Historical Current API Fit (Superseded by Architecture Audit)
 
 | T27 responsibility | Current proposal fit | Required conclusion |
 |---|---|---|
@@ -478,7 +486,7 @@ The Julia inverse-branch construction is native to this profile. Mandelbrot para
 
 T13's all-parent lineage pattern is direct conceptual reuse. Its ordered sequence, concat update, and rule-visible order are not. T20 tree paths/patterns are not geometric state.
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Superseded by Architecture Audit)
 
 | Runtime area | Finding | T27 disposition |
 |---|---|---|
@@ -495,7 +503,7 @@ T13's all-parent lineage pattern is direct conceptual reuse. Its ordered sequenc
 
 Even the current matrix helpers use only integer experiment-coordinate transforms and omit per-occurrence parent-local composition, prototypes, multiplicity, and lineage. Reusing their name would conflate data augmentation with program semantics.
 
-## Principles Audit
+## Historical Principles Audit (Superseded by Architecture Audit)
 
 - **Principle 0:** native pose/multiplicity/orientation must survive. A center list or raster happens to reproduce pictures but fails arbitrary-state advancement.
 - **Principles 1-4:** bag occurrences, self reads, local child results, composition, atomic parent consumption, and provenance are explicit.
@@ -517,7 +525,7 @@ Rejected shortcuts:
 - stochastic chaos-game sampling substituted for all branches;
 - T13 concatenation or T20 subtree update renamed without preserving bag semantics.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded by Architecture Audit)
 
 1. Closed exact-name, expanded alias, mechanism, caption/raster, Notes, actual Index, split, history, affine/complex/IFS, overlap, seed, dimension, limit, parameter, and relation searches with zero unresolved candidates.
 2. Reconstructed the oriented placed-instance bag, scalar profiles, parent-local pose algebra, total child-template program, all-occurrence self read, multiplicity-preserving update, outcomes, seed, and trace.
@@ -528,7 +536,7 @@ Rejected shortcuts:
 7. Specified exact trajectories, count, overlap, composition, multiplicity, permutation, provenance, validation, numeric, and view/limit invariants.
 8. Reintegrated the global plan/evidence/design ledgers and prepared the Goal 2 implementation stage.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### G2-T27 — Exact affine occurrence bags and all-parent geometric replacement
 
@@ -555,7 +563,7 @@ Completion requires:
 - ragged trace then explicit center/polygon/raster/dimension lowering;
 - unchanged T13/T20 semantics, one shared executor shell, no geometric family rollout, and all repository tests passing.
 
-## No-Cheating Checks
+## Historical No-Cheating Checks
 
 - No geometric/fractal/IFS family rollout, whole-generation/transform callback, host scene engine, or `Any` geometry/result.
 - No center-only, point-cloud-only, branch-index-only, raster, union, lattice, CA, token, SVG string, or scalar-code substitute for affine placed state.

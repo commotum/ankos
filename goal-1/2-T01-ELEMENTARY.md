@@ -393,7 +393,13 @@ The strict eight-rule linear list, affine/negated-XOR usage for 105, generalized
 | Rule 30/90/110/250/254 | Canonical conformance presets/examples, not rollout families |
 | Sequential cellular automata | Different update semantics and therefore a different construction, not a T01 option |
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T01 is the cellular-automaton preset of the common SimpleProgram runner: discrete fixed `t+1D` DOMAIN, Boolean ALPHABET, all-site FRONTIER, ordered radius-one NEIGHBORHOOD, complete scalar-label RULE, and snapshot-parallel UPDATE. Its evidence and tests remain unchanged; the only correction is that this tuple is a preset of the runner rather than the first separate executor algebra.
+
+Revised G2-T01 fixes table cardinality/ordering, makes support/realization/trace explicit, implements the typed axes and branch-free runner, and exposes `elementary(n)` as ordinary preset data. It must leave extension points in ALPHABET/FRONTIER/NEIGHBORHOOD/RULE/UPDATE structural rather than CA-family branches.
+
+## Historical Current API Fit (Superseded only on executor classification)
 
 | Construction element | Fit | Evidence and consequence |
 |---|---|---|
@@ -413,7 +419,7 @@ The strict eight-rule linear list, affine/negated-XOR usage for 105, generalized
 | Deterministic successor | DIRECT | One next state; no halt/branch/RNG/solver |
 | Spacetime/crop/equivalence | NOT APPLICABLE to execution | Belongs after `program -> trace`, not in program state |
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Evidence Retained)
 
 | Component | Fit | Exact finding |
 |---|---|---|
@@ -438,7 +444,7 @@ The strict eight-rule linear list, affine/negated-XOR usage for 105, generalized
 - The only spatial rollout semantic oracle is rule-zero extinction for Dyadrads (`tests/test_rollout.py:263-283`). Its nonzero batch test compares batch against the same scalar implementation (`:285-310`), so it cannot catch shared bit-order defects.
 - There is no ECA rule-number, asymmetric trajectory, old-snapshot, 88-orbit, or preset test. The current suite passed (`uv run pytest -q`: `102 passed`), which proves no T01 rollout conformance.
 
-## Principles Audit
+## Historical Principles Audit (Superseded only on executor classification)
 
 | Principle | T01 result |
 |---|---|
@@ -456,7 +462,7 @@ The strict eight-rule linear list, affine/negated-XOR usage for 105, generalized
 
 No Foundation stage is reopened because it committed no type algebra. Its hypotheses of dense finite support and finite selector-produced active sets are now qualified in the global ledger.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded only on executor classification)
 
 1. Represent fixed regular support independently from finite execution and trace shape. For `Z` observations, compute the exact radius-times-horizon causal halo and crop; alternatively execute an explicitly finite cycle/segment.
 2. Make ordered exhaustive patterns validate `arity` with alphabet cardinality. For binary arity three, derive exactly 8 neighborhood states and 256 tables.
@@ -466,7 +472,7 @@ No Foundation stage is reopened because it committed no type algebra. Its hypoth
 6. Preserve current general selectors, stencils, seeds, boundary gathering, raw results, batching, and visualization only where their semantics already match.
 7. Add independent exhaustive and trajectory oracles before migrating any current family. Later type stages decide which current family behavior can enter the same executor.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### G2-T01 — Generic fixed-lattice synchronous assignment and Elementary conformance
 

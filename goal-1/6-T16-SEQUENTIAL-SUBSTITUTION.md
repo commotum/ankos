@@ -515,7 +515,15 @@ Clause 0 matches later at position 1 and must beat clause 1 at position 0. A pos
 | Causal network, black dots, record-length frames | Observers derived from full event/snapshot trace. |
 | Operator evolution | Related hierarchical construction requiring its own T20 evidence. |
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T16 reuses T13's ordered word DOMAIN/ALPHABET and ordered-replacement UPDATE. Its defining differences are axis data: a program-coupled FRONTIER selects the lexicographic first `(clause,start)` match, NEIGHBORHOOD reads that exact span, RULE returns one block, and UPDATE applies exactly one splice. `NoMatch` remains a typed zero-successor/terminal outcome; an applicable identity remains an event.
+
+Revised G2-T16 therefore adds ordered literal program data, first-applicable match selection, matched-span access, and the `exactly_one` schedule/validator over the shared ordered UPDATE. It removes a separate `SingleSpliceUpdate` law/executor while retaining every priority, overlap, newborn, identity, no-match, and lineage oracle.
+
+The historical API/handoff below remains evidence provenance; this section governs its executor/class classification.
+
+## Historical Current API Fit (Superseded by Architecture Audit)
 
 | Concern | Fit | Finding |
 |---|---|---|
@@ -533,7 +541,7 @@ Clause 0 matches later at position 1 and must beat clause 1 at position 0. A pos
 | Rule ID/count | NOT APPLICABLE | The book gives no bounded enumeration. An integer ID cannot be mandatory for arbitrary ordered finite clauses. |
 | Observers | PARAMETERIZATION | Dots, causal graphs, and record-length filtering can be downstream transformations once the raw event trace is retained. |
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Superseded by Architecture Audit)
 
 - `alphabets.symbolic()` is useful finite-value machinery (`src/ca/alphabets.py:146-177`), but it does not define ordered support or clause sides.
 - `CoordinateSpace` is finite rank 0-3 (`src/ca/loci.py:31-94`). It cannot represent length-changing occurrence support, and dense coordinate proximity cannot substitute for word order plus snapshot ownership.
@@ -548,7 +556,7 @@ Clause 0 matches later at position 1 and must beat clause 1 at position 0. A pos
 - Current seeds render fixed arrays for a requested shape (`src/ca/seeds.py:879-939`), and dataset batching stacks equal shapes (`src/ca/datasets.py:313-334`). Padding/masks are allowed only after native trace generation.
 - Current tests preserve fixed-shape and full-frontier behavior (`tests/test_rollout.py:263-309,529-560`; `tests/test_viz_export.py:72-105`). No test covers rule-major matching, overlaps, one-event splicing, match provenance, no-match termination, identity events, or finite-word scan semantics. Existing tests must remain valid through the rederived raw boundary, not be weakened.
 
-## Principles Audit
+## Historical Principles Audit (Superseded by Architecture Audit)
 
 | Principles | T16 result |
 |---|---|
@@ -573,7 +581,7 @@ outcome = UPDATE.apply(old_state, results)
 
 T01/T09/T12 use program-independent fixed/control source policies; T13 uses program-independent `AllOccurrences`; T16 supplies an explicitly coupled literal applicability object. This changes the independence assumption, not the source-first meaning established by D009. No prior construction needs a behavior change.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded by Architecture Audit)
 
 1. Record the closed evidence audit, source repairs, and evidence-strict empty-side boundary.
 2. Reconstruct rule-major matching as a typed source policy over one immutable ordered rewrite program, not a host callback.
@@ -582,7 +590,7 @@ T01/T09/T12 use program-independent fixed/control source policies; T13 uses prog
 5. Specify exact canonical, sorting, priority, overlap, newborn, terminal, lineage, validation, observer, and shared-executor conformance tests.
 6. Reintegrate the evidence index, plan, and design ledger; reopen earlier stages only if the explicit program/source coupling invalidates their behavior.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### G2-T16 — Ordered literal matching, single splice, and no-match termination
 
@@ -624,7 +632,7 @@ T01/T09/T12 use program-independent fixed/control source policies; T13 uses prog
 
 **Completion evidence:** all canonical/adversarial tests and the existing suite pass; selection is visibly rule-major/leftmost; exactly one structural event or a typed terminal outcome occurs; ragged words/events survive the raw boundary; T13 behavior remains unchanged; no T16 branch, host-regex escape hatch, fixed-capacity buffer, CA compiler, hidden cursor, global-leftmost shortcut, all-match fallback, or stutter-as-halt exists.
 
-## No-Cheating Checks
+## Historical No-Cheating Checks
 
 - No family-name rollout, sequential-only executor, or boolean mode inside a generic substitution branch.
 - No unrestricted whole-word function, regex callback, Mathematica engine, or `Any` result containing the transition.

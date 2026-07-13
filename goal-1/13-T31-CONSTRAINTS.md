@@ -502,7 +502,13 @@ This is classification metadata from the figure/prose. “One” means one displ
 - **Model finding, enumeration, counting, uniqueness, entropy, symmetry orbits, and visualization:** solver/query/observer layers.
 - **Repair dynamics, belief propagation, SAT, backtracking, and stochastic search:** algorithms external to the constraint semantics.
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T31 remains a genuine nonfit to `SimpleProgram`: a local relation denotes a model set but supplies no canonical firing locus, write, schedule, or successor. Count, oriented-template, and existential-template forms should be tagged nodes in one generic declarative relation algebra, with shared verification/query/result/certificate envelopes—not separate semantic classes or fake rollout.
+
+Revised G2-T31 builds that declarative category, exact support presentations, closed relation nodes, verifier, scoped solver records, and replayable certificates. All model/scope/de-Bruijn/obstruction/Unknown oracles remain. No transition placeholders or T31 solver class per relation form are introduced.
+
+## Historical Current API Fit (Superseded on class-generalization wording)
 
 | T31 responsibility | Current proposal fit | Required conclusion |
 |---|---|---|
@@ -521,7 +527,7 @@ This is classification metadata from the figure/prose. “One” means one displ
 
 This is the first categorical failure of the transition executor shell. Sharing finite alphabets, lattice offsets, histogram kernels, serialization, and error infrastructure remains meaningful, but no vacuous “zero-step rollout” or constraint `UPDATE` is introduced.
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Evidence Retained)
 
 | Runtime area | Finding | T31 disposition |
 |---|---|---|
@@ -538,7 +544,7 @@ This is the first categorical failure of the transition executor shell. Sharing 
 
 No current verifier, periodic-model proof, obstruction certificate, scoped query outcome, or honest incomplete solver exists.
 
-## Principles Audit
+## Historical Principles Audit (Superseded on architecture wording)
 
 - **Principle 0:** the model set/constraint relation must remain declarative. A repair trajectory or one witness does not preserve the construction.
 - **Principles 1-4:** immutable domain/footprint/histogram relation, exact verifier, and explicit query outcomes are closed data; transition responsibilities are correctly absent.
@@ -561,7 +567,7 @@ Rejected shortcuts:
 - CA fixed-point, totalistic next-value, tiling, energy, or graph compilation solely to claim native coverage;
 - T32 oriented templates collapsed to histograms or T33 existential requirements smuggled into a global predicate/flag.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded on architecture wording)
 
 1. Close direct/alias/proximity, figure, Notes, actual Index, split, history, allowed-block, periodicity, search/complexity, CA/ground-state, tiling, T32/T33, network, equation, solver, and observer candidates.
 2. Freeze declarative total-field denotation, footprint/histogram relation, exact pointwise model identity, periodic/open scopes, verifier/violations, witnesses, finite obstructions, solver outcomes, and incompleteness.
@@ -570,7 +576,7 @@ Rejected shortcuts:
 5. Audit no-cheating constraints, variants, symmetry/views, serialization, model/query datasets, and Goal 2 dependencies.
 6. Reintegrate global evidence/design/plan ledgers and write the implementation-ready constraint/verifier/solver stage.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### G2-T31 — Declarative local-count models, exact verification, and scoped solver results
 

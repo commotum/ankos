@@ -19,13 +19,13 @@ The evidence/search closure and conformance fixtures remain valid. Register stat
 - The program and seed are independent. The canonical figures use `pc=1` and zero registers, while arbitrary natural-valued register vectors are native. Prepending increments can compile an arbitrary seed into a zero-seed program, but changes the program and event timeline and is not semantic identity.
 - Compressed zero-hit diagrams, logarithmic register plots, executed-instruction subsequences, binary digit views, and the derived `3n+1` arithmetic recurrence are observers over full instruction events. They are not alternative machine state or a reduced executor.
 - More registers and the exact `eq`, `add`, and register-indirect `jmp` instructions are documented variants. Continuous real registers, universal fixed machines, and CA/Turing/arithmetic/Diophantine representations are separate variants, compilers, or reductions, never the native T19 carrier.
-- T09/T12's visible `SingleControl`, typed control transition, atomic compound effects, structured event traces, and outcome distinctions compose. Their spatial/tape supports, finite alphabets, and geometric reads do not. T19 adds an infinite `Naturals` value domain, finite named register bank, program-address source, instruction-owned operand access, typed arithmetic results, and a quiescent outcome; it does not require a new update algebra.
+- T09/T12's visible-control-role invariant, rule-firing FRONTIER, typed writes, atomic UPDATE, structured traces, and outcome distinctions compose. T19 adds an exact `Naturals` value carrier, finite named register bank, visible program marker, instruction-owned access, typed arithmetic results, and quiescence; it does not require a control class or executor.
 
 ## Updated Assumptions
 
-- `SingleControl` must be generic over a typed address domain. A program counter can point into immutable code without implying that instructions or registers are spatial cells.
+- A program counter is one visible marker/tag or product factor over a typed address space. It can point into immutable code without implying that instructions or registers are spatial cells; `SingleControl` is not required.
 - A finite register bank is named value support with no adjacency or boundary. Tuple order supplies stable serialization and keys, not a lattice topology or neighborhood geometry.
-- `Natural` is an exact infinite value domain. It cannot be implemented as a large finite alphabet, NumPy `int64`, float, modular value, saturating counter, unary tape, or fixed-capacity field.
+- `Natural` is an exact infinite value carrier. It cannot be implemented as a large finite alphabet, NumPy `int64`, float, modular value, saturating counter, unary tape, or fixed-capacity field.
 - Source selection and reads are program-coupled in the same substantive sense as T16 match selection: the active instruction determines its operand-access plan. One immutable validated program owns instruction identity, register references, and jump targets; there is no duplicate selector configuration or instruction callback.
 - Base instruction evaluation is a closed tagged algebra. Adding a whole-machine function, `Any` payload, formula rule, opcode-family rollout, or host exception branch would erase the construction rather than generalize it.
 - `AtomicEffectsUpdate` can commit typed effects aimed at different state components. T19 reuses it for register assignment plus control transition after validating both against the same snapshot.
@@ -469,7 +469,24 @@ The repaired eight-instruction halt witness must execute exactly 1,280 events an
 | Random initial register vector | No canonical distribution evidenced; accept explicit seed only. |
 | Integer program code | Not evidenced; retain structured program identity and exact count only. |
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+The complete configuration is the transparent product `FiniteRegisterBank[RegisterKey,Natural] × ProgramCounter[Address]`, or an equivalent labeled/marked structure with a checked bijection. The counter is semantic data but not a mandated top-level control class. `FRONTIER` selects the marked active instruction; `NEIGHBORHOOD` follows that instruction's declared register references; `RULE` emits tagged register and counter-marker writes; the shared UPDATE commits them atomically.
+
+| Axis | Corrected fit |
+|---|---|
+| DOMAIN/configuration | Discrete `t+0D` task with explicit register/instruction topology; natural-valued bank plus visible program marker/product factor |
+| FRONTIER | `ActiveInstruction` projection from the current marker and immutable program |
+| NEIGHBORHOOD | Closed instruction-owned named-register access, not geometric offsets or callbacks |
+| RULE | Tagged increment/decrement-branch results lowered to register-label and marker writes |
+| UPDATE/outcome | Shared atomic write composition; past-end quiescence and optional exit terminal remain distinct |
+| Runner | Same branch-free SimpleProgram runner; no register dispatch |
+
+Revised G2-T19 adds exact natural values, named register/instruction schemas, marker/address validation, active-instruction FRONTIER, keyed NEIGHBORHOOD access, closed instruction RULE nodes, typed component writes, structured traces, and the existing exact programs/oracles. It removes `SingleControl`, `TransitionControl`, register-specific commit, numeric DOMAIN terminology, and every family branch. Tests must compare product and marker representations through a pack/unpack commuting square and retain all counter/register/branch/past-end/arbitrary-precision witnesses.
+
+The historical analysis below is retained for evidence provenance. This section governs wherever it conflicts.
+
+## Historical Current API Fit (Superseded by Architecture Audit)
 
 | Concern | Fit | Finding |
 |---|---|---|
@@ -488,7 +505,7 @@ The repaired eight-instruction halt witness must execute exactly 1,280 events an
 | Program ID/count | PARAMETERIZATION | Structured instruction serialization and finite-profile counts are supported conceptually; requiring one integer ID would add unsupported semantics. |
 | Observers | PARAMETERIZATION | Zero-hit, instruction, logarithmic, binary, arithmetic, and halt-time views are derivable if full event provenance is retained. |
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Superseded by Architecture Audit)
 
 - `src/ca/alphabets.py:43-85` represents finite alphabets. It has no infinite exact natural domain. A huge finite range would create a fake maximum and make program behavior depend on storage capacity.
 - `Dynamics` requires a fixed shape and carries `Any`-like rule data (`src/ca/specs.py:23-55`); `RawEpisode`/`RawBatch` use a NumPy array plus scalar integer `rule_id` (`:58-81`). A fixed number of registers does not make an `int64` tensor faithful: values are unbounded, the counter has a different semantic role, and events/programs are structured.
@@ -500,7 +517,7 @@ The repaired eight-instruction halt witness must execute exactly 1,280 events an
 - Dense `canonical_coords` can lower a snapshot for downstream export, but treating `[t,x,0,0]` as native state would falsely make register-number proximity topological. A lowering must attach roles and preserve the structured program/control/event tables.
 - Existing tests cover current fixed-family/fixed-array behavior only. They contain no arbitrary-precision value, visible-counter discriminator, zero/nonzero branch pair, atomic rollback, program-end stutter/exit split, structured program count, or event-derived zero-hit observer.
 
-## Principles Audit
+## Historical Principles Audit (Superseded by Architecture Audit)
 
 | Principles | T19 result |
 |---|---|
@@ -527,7 +544,7 @@ It is not a vacuous executor because every boundary enforces T19 construction fa
 
 No earlier stage is reopened. T09's unit-payload active position and T12's payload-bearing head already required generic visible control; T19 clarifies that control addresses need not belong to the mutable value support. Their public state, rules, and outcomes do not change. The general outcome inventory expands with quiescence, and the value inventory expands with exact infinite domains.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded by Architecture Audit)
 
 1. Record the closed core/figure/Notes/Index/split/history/variant/emulation audit and the two narrow official OCR repairs.
 2. Add exact `Naturals`, `FiniteRegisterBank`, typed register keys, and program-address control without using finite alphabets, spatial coordinates, or NumPy scalar state.
@@ -538,7 +555,7 @@ No earlier stage is reopened. T09's unit-payload active position and T12's paylo
 7. Verify canonical trajectories, exact counts, repaired halt witness, square-root exit, branch/control discriminators, arbitrary precision, atomic rollback, immutability, observer provenance, and shared-executor operation.
 8. Reintegrate the plan, evidence index, and design ledger; re-audit T09/T12 reuse and reopen them only if public behavior changes.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### G2-T19 — Exact register banks, program-address control, closed instructions, and quiescent program exit
 
@@ -582,7 +599,7 @@ No earlier stage is reopened. T09's unit-payload active position and T12's paylo
 - Current tests remain passing through an explicit compatibility boundary; no family branch, callback, fixed capacity, object-array substitute, packing, hidden counter, or weakened assertion is introduced.
 - Documentation links T19 evidence, both official OCR repairs, structured program identity, target profiles, and every rejection directly to tests.
 
-## No-Cheating Checks
+## Historical No-Cheating Checks (Superseded where they mandate separate control)
 
 - No `register_machine` rollout family, opcode switch in rollout, whole-program callback, formula rule, `Any` instruction/result, or delegated arbitrary `step(state)`.
 - No packing `(pc,registers)` into a scalar, prime exponents, alphabet symbol, CA row, Turing tape, unary region, or URM seed as native representation.

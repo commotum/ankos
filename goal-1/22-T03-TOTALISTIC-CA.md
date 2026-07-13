@@ -846,7 +846,13 @@ code(U)     = sum_{s=0}^{M-1} nu(U_s) * k^s
 | Unequal/negative weights or thresholding | Different aggregate/image and often different symmetry; source weighted examples and generic weighted built-in forms are siblings, not T03 parameters. |
 | Higher-dimensional or continuous aggregates | Different geometry or value/rule codomain; T44's continuous aggregate-map feedback remains a separate construction. |
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T03 remains the same CA preset/runner as T01/T02. Its valuation, exact equal-weight sum, and complete sum table are a factorized RULE representation. The mechanically expanded exhaustive table denotes the same local function and commutes one step at a time; compact form and codec remain source-faithful identity/provenance rather than a distinct executor or construction class.
+
+Revised G2-T03 adds a typed factorized local RULE form, exact valuation/reachable-sum validation, lossless expand/compact relation, and bigint sum-table codec through the existing CA axes. T04/T05 are strict presets, T06/T07 restrictions/properties, and other reducers/dimensions/value carriers are typed axis variants when validated. The independent asset repair remains open and is not weakened by this architecture correction.
+
+## Historical Current API Fit (Superseded on compact/expanded identity wording)
 
 | Construction element | Fit | Evidence and consequence |
 |---|---|---|
@@ -863,7 +869,7 @@ code(U)     = sum_{s=0}^{M-1} nu(U_s) * k^s
 | Seed, boundary, trace, and views | PARAMETERIZATION / NOT APPLICABLE to program | Existing finite seed/boundary/trace forms can realize runs, while background filtering, average labels, palette, raster, class, and horizons remain downstream. |
 | Outer, weighted, histogram, additive, quiescent, symmetric profiles | NOT APPLICABLE to base T03 | These require separate summary types, properties, analyzers, or presets and cannot become permissive flags on the source aggregate. |
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Evidence Retained)
 
 | Component | Fit | Exact finding |
 |---|---|---|
@@ -887,7 +893,7 @@ code(U)     = sum_{s=0}^{M-1} nu(U_s) * k^s
 - No test distinguishes equal-sum/different-histogram contexts, produces output color `2`, exercises `k=3,r=1` code 777/867/420, checks `k=2,r=2` code 10, round-trips a code above signed 64-bit, or proves old-snapshot totalistic assignment.
 - There is no test that T04/T05 presets resolve to the same structural rule/executor, that T06 is exactly the sum-zero-row predicate, or that T07 symmetry is derived rather than a runtime flag.
 
-## Principles Audit
+## Historical Principles Audit (Superseded on architecture wording)
 
 | Principle | T03 result |
 |---|---|
@@ -1680,7 +1686,7 @@ The official primary [Chapter 3 PDF](https://files.wolframcdn.com/pub/www.wolfra
 
 Picture 253/1 is repaired to visible code `1659`: the Actual Index routes 1659 to printed page 238, while monolith `BOOK:2834` contains only the contaminated page number `238`; Notes code `1662` is a distinct unpictured example. Picture 255/5 visibly supplies borderline code `1632`. No other included figure supplies all of exact serialized seed, spatial digit orientation/padding, boundary/background, event-versus-state horizon, spatial crop, palette, and resampling. Consequently the numbered structure searches and remaining galleries have metadata, labels, filters, search bounds, and source-stated properties pinned, but no fabricated pixel or trajectory golden.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded on architecture wording)
 
 1. Build and execute a complete literal/regex manifest across the canonical monolith; disposition every candidate and follow all relevant references.
 2. Record every unique construction-relevant passage verbatim with exact provenance and explicit source repairs.
@@ -1689,7 +1695,7 @@ Picture 253/1 is repaired to visible code `1659`: the Actual Index routes 1659 t
 5. Audit current API/runtime/tests and completed T01/T02/D111-D114 decisions for direct reuse, parameterization, extension, or mismatch.
 6. Write an implementation-ready Goal 2 stage, no-cheating gates, independent review, and global ledger integration.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### G2-T03 — Exact finite-sum rule descriptions over the shared fixed-lattice executor
 

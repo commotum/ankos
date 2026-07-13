@@ -541,7 +541,15 @@ The checkpoints are exactly T13 generations under `h(1)=10,h(0)=01`; intermediat
 | Infinite random initial word | Not native ordinary-tag seed. |
 | Integer rule code | Not evidenced; only bounded rule cardinality is canonical. |
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T17 uses the same variable-support word configuration and ordered structural UPDATE. FRONTIER selects the applicable prefix, NEIGHBORHOOD exposes separate read width `q` and consume width `d`, RULE returns the appendant, and UPDATE atomically deletes `[0,d)` and inserts at the old endpoint. The `011 -> 110` adversary proves this anchored write geometry differs from a front splice, but it does not require a queue executor.
+
+Revised G2-T17 adds prefix loci/access, the `q,d` product roles, complete epsilon-capable tables, anchored delete/append writes, and `InsufficientPrefix` outcome/history projection through the shared runner. It removes `QueueSpliceUpdate` as a top-level law while preserving tail order, residue, Post/Wang, count, provenance, and all canonical trajectories.
+
+The historical API/handoff below remains evidence provenance; this section governs its executor/class classification.
+
+## Historical Current API Fit (Superseded by Architecture Audit)
 
 | Concern | Fit | Finding |
 |---|---|---|
@@ -559,7 +567,7 @@ The checkpoints are exactly T13 generations under `h(1)=10,h(0)=01`; intermediat
 | Rule ID/count | PARAMETERIZATION | Exhaustive table cardinality can be computed under `k,q,r`; no canonical integer ID may be required. |
 | Observers | PARAMETERIZATION | Length, leading-symbol, complete-cycle, CA-checkpoint, and Notes-extinction views are derivable once native states/events/outcomes are retained. |
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Superseded by Architecture Audit)
 
 - `alphabets.symbolic()` is useful finite-value machinery (`src/ca/alphabets.py:146-177`), but defines neither word order nor prefix/table roles.
 - `CoordinateSpace` is finite rank 0-3 (`src/ca/loci.py:31-94`). Dense coordinate proximity cannot make row-local index zero a persistent queue head or preserve occurrence identity across shifts.
@@ -573,7 +581,7 @@ The checkpoints are exactly T13 generations under `h(1)=10,h(0)=01`; intermediat
 - Seeds render fixed arrays (`src/ca/seeds.py:879-939`) and datasets stack equal shapes (`src/ca/datasets.py:313-334`). A fixed-capacity deque, padding symbol, mask, truncation, or overflow is not native T17 semantics.
 - Existing tests enforce current fixed-shape/full-frontier behavior but contain no prefix-read/delete discriminator, tail append, empty output, complete word table, short-residue halt, reference normalization, newborn timing, or queue provenance case. They must remain passing while the raw boundary is extended rather than weakened.
 
-## Principles Audit
+## Historical Principles Audit (Superseded by Architecture Audit)
 
 | Principles | T17 result |
 |---|---|
@@ -598,7 +606,7 @@ outcome = UPDATE.apply(old_state, result)
 
 T17 validates this shell only because each boundary is construction-bearing: `RequiredQueuePrefix`, `QueueHeadRead`, a total word table, `ConsumePrefixAppend`, and `QueueSpliceUpdate`. Replacing those with a whole-word function would make the shell decorative. No earlier public behavior changes: T13 remains nonerasing/full-generation, and T16 remains nonerasing/single-interval. The shared private ordered edit representation alone expands to carry epsilon insertions/deletions after public validation.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded by Architecture Audit)
 
 1. Record the closed direct/Notes/Index/split/image/history/variant/halting/count/emulation audit and the operational/reference short-state distinction.
 2. Reuse T13 finite ordered words and occurrence provenance; make generic low-level `Word` capable of empty values while preserving `NonEmptyWord` at T13/T16 public validators.
@@ -608,7 +616,7 @@ T17 validates this shell only because each boundary is construction-bearing: `Re
 6. Specify canonical case (a), figure case (c), T13 checkpoint, count, selector/delete, tail-order, empty/missing, newborn, lineage, and shared-executor conformance tests.
 7. Reintegrate the plan, evidence index, and design ledger; re-audit T13/T16 public nonempty guarantees and reopen them only if their behavior changes.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### G2-T17 — Prefix-queue programs, consume-and-tail-append update, and short-residue terminal projection
 
@@ -650,7 +658,7 @@ T17 validates this shell only because each boundary is construction-bearing: `Re
 
 **Completion evidence:** all canonical/adversarial and existing tests pass; Wolfram, Post, and Wang read/delete roles are inspectable; each eligible event performs exactly one old-prefix read and atomic consume/tail-append; incomplete input yields a retained typed residue; Notes projection is explicit; ragged words/events survive the raw boundary; T13/T16 behavior is unchanged; no T17 rollout branch, callback, capacity, padding, compiler, hidden phase, default row, or fake transition exists.
 
-## No-Cheating Checks
+## Historical No-Cheating Checks
 
 - No tag-family rollout, queue-special executor, `is_post`/`is_lag`/`allow_empty` flags, or string family switch.
 - No unrestricted whole-word formula, deque callback, predicate, host `ReplaceAll`, or `Any` result containing the transition.

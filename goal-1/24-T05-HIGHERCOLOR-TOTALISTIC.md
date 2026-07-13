@@ -493,7 +493,11 @@ code(U)     = sum_{s=0}^{M-1} U_s k^s
 | Initial conditions | T08/run data. The source plates do not turn a displayed point or finite seed strip into preset identity. |
 | Behavior/death/undecidability | Analyzer and scoped property records. Code `1004600` continues to have a deterministic successor after a pattern becomes all zero; deciding eventual death is not an executor halt. |
 
-## Current API Fit
+## Architecture Audit Disposition
+
+T05 remains a strict finite `k>=4,r=1` data/validation preset over the corrected T03 factorized RULE representation and the generic CA runner. It introduces no state, axis implementation, class, or executor. The former Goal 2 handoff is valid only with that interpretation.
+
+## Historical Current API Fit (Evidence Retained)
 
 | Construction element | Fit | Evidence and consequence |
 |---|---|---|

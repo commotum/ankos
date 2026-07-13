@@ -631,7 +631,15 @@ and mark `sequential_network_system` unavailable with a precise source-gap asser
 - **Pointers, linked lists, LISP, and circuits:** analogies/representations, not alternate T29 state encodings.
 - **Random-complexity frequency claims:** the main text's roughly one in 10,000 and the Notes' few in 1,000 use unspecified samples/criteria; neither is a conformance distribution.
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T29 is a SimpleProgram over rooted two-port graph DOMAIN/topology. FRONTIER selects old vertices, NEIGHBORHOOD evaluates declared port paths/reach views on the frozen graph, RULE returns direct/fresh reroute replacements, and a graph-capable UPDATE allocates vertices, rewires ports, and applies directed-root projection atomically. Fresh support proves fixed-label assignment alone is insufficient, but it justifies an UPDATE-axis implementation—not a network executor.
+
+Revised G2-T29 adds graph configuration/codec schemas, vertex loci, port-path access, typed direct/fresh replacements, and graph create/rewire/project UPDATE inside the branch-free runner. It removes seventh-law/executor and whole-graph-value prohibition framing while retaining root/port identity, cycles/sharing, freshness, projection order, alpha-equivalence, provenance, and the explicit sequential evidence boundary.
+
+The historical API/handoff below remains evidence provenance; this section governs its executor/class classification.
+
+## Historical Current API Fit (Superseded by Architecture Audit)
 
 | T29 responsibility | Current proposal fit | Required conclusion |
 |---|---|---|
@@ -651,7 +659,7 @@ and mark `sequential_network_system` unavailable with a precise source-gap asser
 
 The current proposal's `FORMULAIC` escape would merely hide graph traversal, mutation, and allocation in a callback. T20 trees preserve hierarchy but not graph sharing/cycles; T27 bags preserve identity/multiplicity but not adjacency; neither is a native substitute.
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Superseded by Architecture Audit)
 
 | Runtime area | Finding | T29 disposition |
 |---|---|---|
@@ -668,7 +676,7 @@ The current proposal's `FORMULAIC` escape would merely hide graph traversal, mut
 
 `simple_programs.md:31-73` and `64-77` define coordinate loci and callback-like rules; `37-80` defines coordinate frontiers; `23-81` and the later rollout sections assume fixed dense shapes. These are semantic mismatches, not missing adapters.
 
-## Principles Audit
+## Historical Principles Audit (Superseded by Architecture Audit)
 
 - **Principle 0:** connectivity, root, port order, aliasing, and freshness must survive. A drawing, adjacency image, or encoded scalar fails native advancement.
 - **Principles 1-4:** graph state, all-node sources, path/signature reads, closed results, simultaneous raw commit, projection, and event provenance are explicit.
@@ -692,7 +700,7 @@ Rejected shortcuts:
 - guessed sequential move/projection timing or an `old/new` convention flag;
 - T20 tree replacement, T27 bag expansion, or fixed-support assignment relabeled as graph evolution.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded by Architecture Audit)
 
 1. Closed exact-name, family/alias, broad graph, mechanism, caption/raster, Notes, executable-symbol, actual Index, split, history, layout/dimension, fixed-network, constraint, causal, multiway, grammar, mobile, random-seed, and relation searches.
 2. Reconstructed the finite rooted two-port graph, exact isomorphism, BFS canonical codec, old-snapshot path reads, exact-length signatures, complete programs, fresh-node result grammar, all-node source, raw commit, and directed projection.
@@ -703,7 +711,7 @@ Rejected shortcuts:
 7. Compared every responsibility with prior stages, `simple_programs.md`, the runtime, and tests; established a seventh update law without reopening earlier conclusions.
 8. Reintegrated the global plan/evidence/design ledgers and prepared an implementation-ready Goal 2 stage for the closed parallel profile.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### G2-T29 — Rooted two-port graphs and parallel reroute/create/project
 
@@ -733,7 +741,7 @@ Completion requires:
 - an explicit sequential-unavailable test documenting the unresolved source order;
 - unchanged prior construction semantics, one shared executor shell, no network rollout branch, and all repository tests passing.
 
-## No-Cheating Checks
+## Historical No-Cheating Checks (Superseded where they prohibit transparent graph schemas)
 
 - No network family rollout, whole-graph successor/rewrite/traversal/isomorphism callback, host graph engine, or `Any` graph/result payload.
 - No coordinate, drawing, lattice, tree, bag, adjacency image, padded tensor, scalar code, string, or fixed-capacity substitute for native graph topology.

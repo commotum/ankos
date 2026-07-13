@@ -938,7 +938,11 @@ For old field `x`, the local result is `U(nu_3(x[i-1])+nu_3(x[i])+nu_3(x[i+1]))`
 
 **Owned boundaries.** T04 fixes only the three numeric values, radius one, seven-row domain, and validation range. T06 owns `U(0)=0`; T07 consumes the reflection proof derived from equal weights on a symmetric stencil; T08 owns single-cell initial-condition profiles. Additivity, reversibility, universality, behavior class, frequency, gallery selection, emulation, seed/background, boundary, palette, raster, and observation remain separately typed claims or records.
 
-## Current API Fit
+## Architecture Audit Disposition
+
+T04 remains a strict data/validation preset over the corrected T03 factorized RULE representation and the generic CA runner. It introduces no state, axis implementation, class, or executor. The former Goal 2 handoff is valid only with that interpretation. Its bounded asset repair remains independently open.
+
+## Historical Current API Fit (Evidence Retained)
 
 The schema's separations are directionally correct: `ALPHABET`, `SEED`, `BOUNDARY`, `NEIGHBORHOOD`, `FRONTIER`, and `RULE` are distinct (`simple_programs.md:200-305`); lookup-like rules require fixed arity (`simple_programs.md:643-645`); and all writes use one old snapshot (`simple_programs.md:1768-1791`). Those contracts let the T04 preset return program data while callers choose seed, realization, and view.
 

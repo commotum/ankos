@@ -468,7 +468,15 @@ The finite reference executor may be delivered first, but the public semantic mo
 | Continued-fraction rule stream | T42 schedule/control construction; fixed quadratic cases collapse to ordinary T13 tables |
 | Digit finite automaton, incidence matrix, spectrum, compression | Derived analysis/accelerator/observation only |
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+T13 is the first evidence that the shared UPDATE axis must support variable-support ordered replacement: FRONTIER selects every old word occurrence, NEIGHBORHOOD reads its symbol, RULE returns an alphabet-closed nonempty block, and UPDATE consumes all old occurrences and concatenates child blocks in source/child order. The counterexample `1 -> 10` changes support cardinality and cannot be expressed by same-locus scalar writes without padding or opaque packing.
+
+Revised G2-T13 adds a variable-support ordered DOMAIN, occurrence loci, self reads, total morphism tables, typed block replacements, and a snapshot-parallel ordered-replacement UPDATE implementation inside the branch-free runner. Full coverage, order, newborn deferral, lineage, infinite-realization, and ragged-trace invariants remain. `ParallelReplaceConcat` may name the preset/policy, but it is not a substitution executor or second runner.
+
+The historical API/handoff below remains evidence provenance; this section governs its executor/class classification.
+
+## Historical Current API Fit (Superseded by Architecture Audit)
 
 | Element | Fit | Finding |
 |---|---|---|
@@ -496,7 +504,7 @@ next    = UPDATE.apply(old_state, results)  # selected by spec/result algebra
 
 This is not empty interface unification: assignment update preserves old loci; parallel replacement consumes a complete ordered source generation and derives new support. Each has different validation and commit laws.
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Superseded by Architecture Audit)
 
 - `alphabets.symbolic()` can provide a finite symbol domain (`src/ca/alphabets.py:146-177`), but an alphabet does not provide ordered support.
 - `CoordinateSpace` is finite rank 0-3 (`src/ca/loci.py:31-94`); its integer proximity cannot stand in for occurrence ancestry or a changing order.
@@ -512,7 +520,7 @@ This is not empty interface unification: assignment update preserves old loci; p
 - No current test covers a changing-length word, one-generation parallelism, ordered block concatenation, total/closed morphism validation, parent-child intervals, infinite support distinction, or rendering independence.
 - Existing rollout tests instead lock fixed shapes and reject non-full frontiers (`tests/test_rollout.py:263-309,529-560`); visualization export tests assume rectangular `T/TX/TXY/TXYZ` layouts (`tests/test_viz_export.py:72-105`). These are current-scope facts, not tests to weaken.
 
-## Principles Audit
+## Historical Principles Audit (Superseded by Architecture Audit)
 
 | Principles | T13 result |
 |---|---|
@@ -526,7 +534,7 @@ This is not empty interface unification: assignment update preserves old loci; p
 | 13-15 | Duplicate symbols, asymmetric words, source-order adversaries, changing lengths, infinite support, and lineage/render separation are mandatory tests. |
 | 16 | Typed replacement plus structural update is architecture; callbacks, CA compilation, target inversion, capacity masks, and family switches are shims. |
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded by Architecture Audit)
 
 1. Add explicit ordered-sequence support/state with snapshot-scoped occurrence handles; deliver finite words first while preserving a typed infinite-support extension point.
 2. Generalize frontier semantics from fixed-lattice locations to sources and add `AllOccurrences` without converting occurrences into next-slice targets.
@@ -536,7 +544,7 @@ This is not empty interface unification: assignment update preserves old loci; p
 6. Expose a strict `neighbor_independent_substitution(alphabet,table)` preset that remains independent of initial word/support realization.
 7. Add independent canonical, adversarial order, growth, lineage, invalidity, observer, finite/infinite-boundary, and shared-executor conformance tests.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### G2-T13 — Ordered sequence state, parallel replacement, and structural traces
 
@@ -576,7 +584,7 @@ This is not empty interface unification: assignment update preserves old loci; p
 
 **Completion evidence:** canonical and adversarial tests plus the existing suite pass; state length changes natively; every old source fires once; word/source order and lineage are inspectable; infinite support is not misrepresented; no T13 branch, padding, callback, CA compiler, missing-row fallback, or value-only fixed-shape trace exists.
 
-## No-Cheating Checks
+## Historical No-Cheating Checks
 
 - No fixed-capacity array, fake blank symbol, pad token, mask, truncation, or preallocated maximum as program semantics.
 - No deriving old sources by inverting next target coordinates and no same-index `Assign` reinterpretation.

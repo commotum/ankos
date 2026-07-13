@@ -602,7 +602,15 @@ Ordered-pair, self-pair, newborn-read, rescan, or fixed-lag interpretations fail
 - **T40:** owns digit sequence generation and number representations. Prime leading-digit analysis is a T40 observer over a T39 source.
 - **Polynomial/Diophantine/register/fraction encodings:** alternative computations or emulations, not native filter data.
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+The strict sieve is a SimpleProgram over ordered candidate support plus a visible stage marker/tag. FRONTIER selects the current divisor's proper-multiple hit loci, NEIGHBORHOOD reads survivor membership and exact witnesses, RULE returns survivor removals plus the next marker, and UPDATE commits both atomically. A zero-removal composite stage still fires because the marker advances. Pure integer filters, streams, and measurements remain non-transition query specifications.
+
+Revised G2-T39 adds explicit candidate support/set schemas, visible marker representation, hit-locus FRONTIER, membership access, typed subset removals, marker writes, and a monotone structural UPDATE preset in the common runner. It removes tenth-law/sieve-executor/separate-control and candidate-DOMAIN framing while preserving identity/order, finite certification, figure-vs-math scope, exact masks, Ulam composition, observers, source repairs, and all existing oracles.
+
+The historical API/handoff below remains evidence provenance; this section governs its executor/class and DOMAIN terminology.
+
+## Historical Current API Fit (Superseded by Architecture Audit)
 
 | Responsibility | Current document | Fit | Consequence |
 |---|---|---|---|
@@ -616,7 +624,7 @@ Ordered-pair, self-pair, newborn-read, rescan, or fixed-lag interpretations fail
 | Filter/measurement categories | no current document component | `PRINCIPLED EXTENSION` | Add pure specs/results outside the transition executor. |
 | `MonotoneFilterUpdate` | no current update member | `PRINCIPLED EXTENSION` | Add the tenth sibling with its own validator; no `sieve` rollout family branch. |
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Superseded by Architecture Audit)
 
 | Runtime element | Fit | Evidence and consequence |
 |---|---|---|
@@ -631,7 +639,7 @@ Ordered-pair, self-pair, newborn-read, rescan, or fixed-lag interpretations fail
 
 Existing spatial behavior remains valid. A later adapter may render finite sieve rows through it, but must not route native execution through a `"sieve"` family switch or claim bitmap equality.
 
-## Principles Audit
+## Historical Principles Audit (Superseded by Architecture Audit)
 
 1. Evidence forces a categorical split. The strict sieve has state and events; mathematical filters and measurements do not. A shared executor would make source/update responsibilities vacuous for two categories.
 2. The smallest strict Markov state is domain/program/cursor/survivors for finite domains or domain/program/cursor intensionally. Hit diagnostics and first-removal provenance belong in events, not duplicated state.
@@ -657,7 +665,7 @@ Existing spatial behavior remains valid. A later adapter may render finite sieve
 9. Goal 2 gains shared integer-domain, closed-predicate, filter/measurement, candidate-selection, sieve, observer, and Ulam-composition work before T39 conformance.
 10. The API becomes more coherent because one generic closed candidate-selection responsibility serves filters and Ulam while transition-only machinery remains isolated.
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded by Architecture Audit)
 
 1. Record the exhaustive search, nineteen evidence groups, seven raster hashes, source repairs, and exact independent profiles in this stage.
 2. Add `IntegerFilterSpec`, `IntegerMeasurementSpec`, structural integer domains, and closed arithmetic operations to the design inventory.
@@ -667,7 +675,7 @@ Existing spatial behavior remains valid. A later adapter may render finite sieve
 6. Map current API/runtime/tests and write an implementation-ready Goal 2 dependency/conformance stage.
 7. Integrate `0-plan.md`, `evidence-index.md`, and `design-ledger.md`; run exact oracles, fence checks, coverage consistency, `git diff --check`, and repository tests before closure.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Corrected Handoff)
 
 ### Objective and dependencies
 
@@ -705,7 +713,7 @@ Paths are dependency targets for synthesis; Goal 2 may consolidate modules when 
 - Page-150: prefixes, endpoints, extrema, perfect zeros, Legendre zero condition, Jacobi formula, ordered `H(10)=3`, and `n=2` Goldbach edge.
 - Ulam: exact 18-term prefix, pair convention, old snapshot, ascending scan, direct/cache equivalence, and append trace reconstruction.
 
-## No-Cheating Checks
+## Historical No-Cheating Checks
 
 - Literal page-147 mechanics must leave `1`; mathematical preset must explicitly start at `2` or explicitly exclude it.
 - Stage divisor never removes itself; primes `2,3,5,7` survive their own rows.

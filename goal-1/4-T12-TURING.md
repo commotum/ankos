@@ -12,32 +12,32 @@ Architecture authority: the T12 row, commuting tagged representation, and runner
 
 - Exact catalog row: T12, CSV line 13, `Turing Machines`; taxonomy seed `ref/notes/CA-Types.md:294-330`.
 - Canonical source is `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md` (`BOOK`).
-- Native state is a fixed ordered tape-symbol field plus one visible head control record `(position, finite head state)`.
+- Native configuration is a fixed ordered tape whose composite labels are `Plain(symbol) | Head(state,symbol)`, with exactly one head tag. A factored tape/position/state record is an equivalent optional view.
 - A base rule is a deterministic total map `Q x Sigma -> Q x Sigma x {-1,+1}`. It reads only head state and the symbol under the head, writes at the old head site, then changes head state and position atomically.
 - For `s=|Q|` and `k=|Sigma|`, there are `(2sk)^(sk)` base rules: 4,096 for `(2,2)`, 2,985,984 for `(3,2)` or `(2,3)`, and `2^32` for `(4,2)`.
 - The ordinary Chapter 3 family is non-halting. A special terminal head state, an externally observed head/tape condition, and an example-specific stationary transition convention are three distinct later notions of completion.
 - Blank tape, initial head state/position, arbitrary/random tape, one-sided computational input, finite observation, and stop policy are separate from the total transition table.
-- T12 refines T09's position-only control to payload-bearing `SingleControl` and `TransitionControl`; T09 uses a unit payload and remains semantically unchanged.
+- T12 refines T09's active tag with a finite head-state factor; both use the same unique-tag FRONTIER and atomic label-write UPDATE without a control-specific class.
 
 ## Updated Assumptions
 
-- Tape symbols and head states are distinct finite domains even when their cardinalities happen to match. Equal raw rule counts for `(3,2)` and `(2,3)` do not make their roles interchangeable.
-- Head state is carried by the active source passed to the rule, not disguised as a tape symbol or neighborhood value.
-- A single payload-bearing control transition atomically changes position and head state. A separate hidden state assignment would permit invalid intermediate control.
-- The finite-list `TMStep` guard is an implementation-domain guard, not tape capacity, boundary, or halt semantics. The sparse Notes implementation `a[_]=0` is the clean unbounded blank realization.
+- Tape symbols and head states are distinct finite roles/factors even when their cardinalities match. Equal raw rule counts for `(3,2)` and `(2,3)` do not make the factors interchangeable.
+- Head state is the `q` factor of the unique `Head(q,symbol)` label selected by FRONTIER, not a bare tape symbol or hidden executor value.
+- One old-snapshot UPDATE writes the old head label and moves the head tag/payload to its neighbor atomically; no invalid intermediate configuration is observable.
+- The finite-list `TMStep` guard is an implementation-scope guard, not tape capacity, boundary, or halt semantics. The sparse Notes implementation `a[_]=0` is the clean unbounded blank realization.
 - The base table is complete. A missing row is invalid, never an implicit halt or fallback.
 - Intrinsic terminal control, episode stop criteria, horizon exhaustion, realization failure, and a fixed point have distinct outcomes/reasons.
 - Nondeterministic, two-dimensional, quantum, CA/tag/register emulations, and multicolor-to-binary compilers are variants or relations, not switches inside base T12.
 
 ## Big Picture Objective
 
-Exhaustively reconstruct Turing machines and their construction-relevant variants, then extend the T01/T09 source-read-effect-update protocol with finite control payloads, total tape fields, and explicit termination while preserving independent alphabets and rejecting head packing, fixed capacity, callbacks, and family rollouts.
+Exhaustively reconstruct Turing machines and their construction-relevant variants, then express them through the shared SimpleProgram axes with a composite tape/head ALPHABET, unique-head FRONTIER, compact table, atomic label movement, total tape, and explicit termination—without lossy packing, hidden state, fixed capacity, callbacks, or family rollouts.
 
 ## Catalog Identity
 
 - Stable ID: T12.
 - Exact name: Turing Machines; Index abbreviation `TMs` redirects here. No local `a-machine` or `automatic machine` alias occurs.
-- Entry kind: fixed-support, single-control deterministic transition construction, with explicitly separated terminal and branching variants.
+- Entry kind: fixed-support, unique-head deterministic SimpleProgram, with explicitly separated terminal and branching variants.
 - Search vocabulary: Turing machine(s), TM/TMs, tape, head/active cell, head state/internal state, symbol/color/cell under head, blank tape/all cells white, read/write, new state/symbol, displacement/move left/right, 2-state/2-color, 4096, 2,985,984/three million, `TMStep`, `TMEvolveList`, rule numbering, head/tape boundary, halt/stop/Busy Beaver, universal/nondeterministic/2D/quantum Turing machines, worms/vants/turmites/turning machines, and CA/tag/register/recursive-function emulations.
 
 ## Search Log
@@ -229,7 +229,7 @@ For `(s,k)=(2,2)`, code `3024` has digits `[5,7,2,0]`, providing a clean known-n
 >
 > If the Turing machine has s states for its head, then the cellular automaton has k(s+1) colors for each cell.
 
-This explicitly identifies extra-color head markers as an encoding, not native T12 state.
+This supplies the exact lossless cell representation `k(s+1) = k + ks`: `k` plain labels and `ks` head-bearing labels. It is a valid native representation when the exactly-one-head invariant and compact Turing table remain explicit; an arbitrary CA table, opaque color code, or hidden decoder is not.
 
 ### E14 — base machines do not typically halt; emulation tables can be partial only on a trajectory
 
@@ -266,28 +266,27 @@ These become intrinsic terminal control versus episode stop policies with distin
 ### Base deterministic machine
 
 ```text
-state = (Line(Z), Tape(default_symbol, overrides),
-         SingleControl(key="head", position, payload=head_state))
+Cell = Plain(TapeSymbol) | Head(HeadState, TapeSymbol)
+configuration : integer-line DOMAIN -> Cell
+invariant: exactly one Head(...)
 
-source = head.position
-symbol = tape[source]
-(next_state, write, move) = table[(head.payload, symbol)]
+source = unique Head(q,symbol) locus selected by FRONTIER
+(next_state, write, move) = table[(q, symbol)]
 
-next = atomic_apply(state,
-  Assign(at=source, value=write),
-  TransitionControl(key="head",
-                    expected_from=source,
-                    to=source+move,
-                    next_payload=next_state))
+writes = {
+  source: Plain(write),
+  source+move: Head(next_state, old_symbol[source+move])
+}
+next = UPDATE.apply(configuration, source, writes)
 ```
 
 | Dimension | T12 semantics |
 |---|---|
-| Support/state | Fixed ordered integer line + total tape field + exactly one payload-bearing head control. |
-| Alphabets | Independent finite `Sigma` for tape and `Q` for running head states. Blank is a distinguished seed/default symbol, not a rule output role. |
-| Source/read | `ControlLocus("head")`; rule gets the source control payload and `self_at(0)` symbol only. Neighbor tape changes cannot affect the step. |
+| Support/configuration | Fixed ordered integer line + total composite-labeled tape with exactly one `Head(q,sigma)` tag. Factored tape/position/state is a checked isomorphic view. |
+| Alphabet roles | Independent finite `Sigma` symbol and `Q` head-state factors inside `Plain(sigma) | Head(q,sigma)`. Blank is a distinguished seed/default symbol. |
+| Source/read | `UniqueTag("head")`; the compact rule gets only `q` and the symbol in the head label. Neighbor symbols cannot affect rule choice. |
 | Rule | Complete unique table over `Q x Sigma`; named output fields `(next_state,write,move)`; `move in {-1,+1}` for base family. |
-| Result/update | Assign old head site plus payload-bearing control transition, applied atomically; all other symbols preserved. |
+| Result/update | The native tuple lowers to two composite-label writes applied atomically; all other labels and the destination's underlying symbol are preserved. |
 | Successor | Exactly one successor for a running base state. No missing-row fallback or branch. |
 | Seed | Tape default/overrides, initial head state, and initial head position are episode inputs. Canonical blank is `(default=0,state=1,position=0)`. |
 | Boundary | None on `Z`. Finite list guard is a realization error boundary only; read boundaries cannot make writes/head motion unbounded. |
@@ -342,7 +341,43 @@ t12 q=3 h= 4 ones={-1,0,2,4,5}
 | Multicolor-to-binary, CA/tag/register/integer conversions | Emulations, not primitive reuse |
 | Rule-60/110 machines | Named ordinary table/seed fixtures; reachable partial listings are not general partial rules |
 
-## Current API Fit
+## Corrected Architecture and Goal 2 Handoff
+
+### Commuting representation
+
+For factored state `(tape,h,q)`, define `E(tape,h,q)[x] = Head(q,tape[x])` when `x=h` and `Plain(tape[x])` otherwise. On exactly-one-head configurations, `E` is bijective. If `delta(q,tape[h])=(q_next,b,d)`, the two writes above satisfy
+
+```text
+E(step_native(tape,h,q)) = step_tagged(E(tape,h,q)).
+```
+
+This proves category-3 lossless reuse while preserving the compact `sk`-row program and `(2sk)^(sk)` count. A bare `Sigma union Q` is lossy; an arbitrary table over the `k(s+1)` composite labels is a different program. A full-slice target-local lowering can use radius one, but the unique-head/two-write form preserves the self-only semantic read directly.
+
+### Corrected axis fit
+
+| Axis | Fit and Goal 2 delta |
+|---|---|
+| DOMAIN/configuration | Reuse fixed ordered 1D support; add total sparse/default composite-labeled tape and exactly-one-head invariant |
+| FRONTIER | Reuse the broad rule-firing role; add/reuse `UniqueTag(head)` |
+| NEIGHBORHOOD | Self-only projected `(q,symbol)` read from the head label; destination preservation is UPDATE mechanics, not rule input |
+| RULE | Complete compact `Q x Sigma -> Q x Sigma x {L,R}` table plus structural two-write lowering |
+| UPDATE | Reuse old-snapshot atomic label writes; preserve destination symbol and validate one successor head |
+| Outcomes | Base total continuation, explicit terminal-head variant, external stops, horizons, and errors remain distinct |
+| Runner/trace | Shared branch-free runner; complete tagged tape snapshots and outcomes round-trip |
+
+### Revised G2-T12
+
+- Reuse G2-T09's composite alphabet, unique-tag FRONTIER, atomic write UPDATE, trace, and commuting-map tests; parameterize the head tag with finite `Q`.
+- Add inspectable total sparse/default tape realization over the integer-line DOMAIN without finite-edge semantics.
+- Add complete product-key Turing tables, named tuple results, exact `(2sk)^(sk)` validation, repaired numeric codec, and known-code/trajectory guards.
+- Lower one compact result to `source -> Plain(write)` and `destination -> Head(q_next,old_destination_symbol)`; no `SingleControl` or `TransitionControl`.
+- Add explicit terminal-tag policy and typed external stop/run outcomes; retain the last terminal snapshot exactly once.
+- Tests keep all table/count/code/trajectory/neighbor-independence/unbounded-tape/termination/trace oracles and add pack/unpack, commuting-square, exactly-one-head, underlying-symbol, and orientation-vs-direction adversaries.
+- Static completion check: no Turing branch, arbitrary composite-CA table, bare lossy union, hidden/factored second source of truth, callback, partial-table fallback, or implicit edge/horizon halt.
+
+The historical analysis below is retained to show how the rejected separate-control conclusion arose. Wherever it conflicts with this section, this corrected handoff governs.
+
+## Historical Current API Fit (Superseded by Architecture Audit)
 
 | Element | Fit | Finding |
 |---|---|---|
@@ -360,7 +395,7 @@ t12 q=3 h= 4 ones={-1,0,2,4,5}
 | Trace | PRINCIPLED EXTENSION | Must preserve values, position, payload, and termination before lowering |
 | Halting/stop reason | PRINCIPLED EXTENSION | No current terminal policy or outcome distinction |
 
-## Current Runtime Fit
+## Historical Current Runtime Fit (Superseded by Architecture Audit)
 
 - `alphabets.boolean()`/`symbolic()` can represent tape symbols (`src/ca/alphabets.py:129-177`), but `Dynamics` has no alphabet/structured state (`specs.py:23-68`). The module correctly says topology/role are not alphabet semantics (`alphabets.py:25-29`).
 - `neighborhoods.self_at(0)` is the correct tape read (`neighborhoods.py:110-137`). T12 must not reuse T09's radius-one read.
@@ -371,7 +406,7 @@ t12 q=3 h= 4 ones={-1,0,2,4,5}
 - Seeds render only value arrays (`seeds.py:39-55,879-939`). Raw results store one ndarray/dense coords (`specs.py:58-68`, `rollout.py:215-235`), collapsing head position/state/terminal status.
 - No current test covers a Turing table, control payload, self-only controlled source, atomic write/move/state change, unbounded sparse tape, or halting distinction.
 
-## Principles Audit
+## Historical Principles Audit (Superseded by Architecture Audit)
 
 | Principles | T12 result |
 |---|---|
@@ -385,7 +420,7 @@ t12 q=3 h= 4 ones={-1,0,2,4,5}
 | 13-15 | Neighbor independence, different head payloads, beyond-window moves, exact trajectory, and halt/error/stop distinctions are mandatory adversarial tests. |
 | 16 | Payload control/termination are architecture; extra-color packing, callbacks, family switches, partial fallbacks, and implicit edge halts are shims. |
 
-## Detailed Implementation Plan
+## Historical Detailed Implementation Plan (Superseded by Architecture Audit)
 
 1. Refine `SingleActive/RelocateControl` to payload-bearing `SingleControl/TransitionControl`; migrate T09 to unit payload without behavior change.
 2. Add an inspectable total/default tape field over `Line(Z)`; keep work/observation extents separate.
@@ -395,7 +430,7 @@ t12 q=3 h= 4 ones={-1,0,2,4,5}
 6. Preserve structured tape/control/terminal snapshots before trace encoding and observations.
 7. Expose strict table/numeric presets over the generic executor and add independent oracles.
 
-## Goal 2 Implementation Stage
+## Historical Goal 2 Implementation Stage (Superseded by Revised G2-T12)
 
 ### G2-T12 — Payload control, total tapes, termination, and Turing conformance
 
@@ -430,7 +465,7 @@ t12 q=3 h= 4 ones={-1,0,2,4,5}
 
 **Completion evidence:** all canonical/independent tests and existing suite pass; no Turing branch/packing/hidden control; base numeric/table count round-trips; terminal and external-stop reasons remain distinct; unbounded tape and structured trace are inspectable.
 
-## No-Cheating Checks
+## Historical No-Cheating Checks (Superseded where they prohibit transparent tagged labels)
 
 - No head position/state packed into tape color, executor locals, closure, metadata, or visualization.
 - No Turing family branch/dedicated rollout/callback.
