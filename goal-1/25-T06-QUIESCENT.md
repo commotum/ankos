@@ -117,7 +117,7 @@ Recorded output:
 T06 text manifest: PASS 9 queries; 128 lexical; partition=7,63,45,13; governed=5
 ```
 
-### Initial narrow disposition — superseded by saturation
+### Intermediate narrow disposition — superseded by final reconciliation
 
 - **Direct/native (7):** `784,1346,2798,2926,3114,14046,18770`. These state an unchanged white/blank selection, the 32-rule symmetric intersection, uniform-white invariance, the local invariant-block criterion, or the literal quiescent-symmetric relation.
 - **Property, application, and boundary controls (63):** `500,538,790,2002,2036,2102,2714,2720,2722,2726,2728,2730,2742,2750,2914,2916,2918,3310,3382,3388,3402,3406,3792,3958,4068,4070,4072,4078,4082,4084,4152,4176,4178,5206,6340,8406,8410,8416,8430,11124,11140,11277,13265,13300,13304,13377,14099,14113,14241,14341,14349,14536,14764,14768,14776,14795,15581,16060,18749,18764,18765,19072,20118`. These distinguish seed, periodic background, convergence, global invariant configurations, perturbation stability, reversibility, localized structures, application geometry, and boundary realization from the local T06 predicate.
@@ -219,17 +219,61 @@ assert got_index==index,(sorted(got_index-index),sorted(index-got_index))
 assert (len(got_pre),len(got_index),len(union))==(212,68,280)
 classified=set().union(*parts)
 assert union==classified==pre|index
-print('T06 lexical saturation: PASS 19 derived families; 212+68=280; zero remainder; partition=4,25,111,66,6,68')
+
+# Reconcile the retained narrow diagnostic instead of incorrectly assuming
+# that the broader-looking protocol is a set-theoretic superset.
+narrow_patterns=[
+r'(?i)(?:background.{0,160}(?:cellular autom|rule|pattern|white|blank|initial|structure|localized|repetitive|uniform|state)|(?:cellular autom|rule|pattern|white|blank|initial|structure|localized|repetitive|uniform|state).{0,160}background)',
+r'(?i)invariant.{0,80}(?:state|configuration)|(?:state|configuration).{0,80}invariant',
+r'(?i)uniform.{0,80}(?:white|black|state|configuration|background)|(?:white|black|state|configuration|background).{0,80}uniform',
+r'(?i)unchanged',
+r'(?i)all[- ]white|all[- ]black',
+r'(?i)quiescent|quiescence',
+r'(?i)state.{0,80}only white.{0,80}unchanged',
+r'(?i)single (?:black|gray) cell.{0,160}(?:white|blank) background|(?:white|blank) background.{0,160}single (?:black|gray) cell|initial condition used contains a single gray cell|localized structures.{0,160}(?:blank|white) background|(?:blank|white) background.{0,160}localized structures',
+r'(?i)stable state(?:s)?',
+]
+narrow_controls={418,432,434,2180,2794,3236,3668,4166,4168,4642,4908,
+                 6200,14827,14878,19266,20812,20914,21515}
+narrow_union=set().union(*({i for i,s in enumerate(L,1) if re.search(p,s)}-
+                            narrow_controls for p in narrow_patterns))
+narrow_only=narrow_union-union
+assert len(narrow_union)==128
+assert narrow_only==ns('1170,2002,2036,2372,2438,2446,2722,3114,3402,3406,3792,4176,4178,5206,6392,6512,6842,8406,11124,11140,11277,13060,13304,13377,14099,14349,14693,14768,14795,16105,16257,16691,16737,16940,17033,17045,17439,17481,18113,18765,18850,19702,20521,21517')
+governed=ns('2868,2922,2930,14243,18766')
+assert governed.isdisjoint(union|narrow_union)
+
+extra_property=ns('2722,3114,4176,5206,14795')
+extra_profile=ns('2002,2868,2922,2930,3402,3406,3792,8406,11124,11140,11277,13304,14243,14349,14768,18765,18766')
+extra_nonca=ns('1170,2036,2438,2446,4178,6392,6512,6842,13377,14099,18850')
+extra_controls=ns('2372,13060,14693,16105,16257,16691,16737,16940,17033,17045,17439,17481,18113,19702,20521')
+extra_index=ns('21517')
+extras=set().union(extra_property,extra_profile,extra_nonca,extra_controls,
+                   extra_index)
+assert extras==narrow_only|governed and len(extras)==49
+merged_parts=[direct,ca_property|extra_property,ca_profile|extra_profile,
+              nonca|extra_nonca,controls|extra_controls,index|extra_index]
+evidence=union|extras
+assert [len(x) for x in merged_parts]==[4,30,128,77,21,69]
+assert sum(map(len,merged_parts))==len(set().union(*merged_parts))==329
+assert set().union(*merged_parts)==evidence
+print('T06 lexical core: PASS 19 derived families; 212+68=280; partition=4,25,111,66,6,68')
+print('T06 evidence reconciliation: PASS 280 core + 44 narrow-only + 5 governed = 329; partition=4,30,128,77,21,69')
 PY
 ```
 
 Recorded output:
 
 ```text
-T06 lexical saturation: PASS 19 derived families; 212+68=280; zero remainder; partition=4,25,111,66,6,68
+T06 lexical core: PASS 19 derived families; 212+68=280; partition=4,25,111,66,6,68
+T06 evidence reconciliation: PASS 280 core + 44 narrow-only + 5 governed = 329; partition=4,30,128,77,21,69
 ```
 
-The split-corpus cross-check found 224 raw matches. Seventeen split-only punctuation/line-join variants and 18 monolith non-byte mirrors reconcile without a new semantic candidate; one combined split line mirrors both `BOOK:8578` and `BOOK:8584`. The actual split Index offset is `+17443` at Colophon line 3383. No split-only construction changes the six-way disposition.
+### Reconciled canonical evidence closure
+
+The authoritative evidence universe is the union proved above, not either regex family in isolation. The 44 narrow-only lines are `1170,2002,2036,2372,2438,2446,2722,3114,3402,3406,3792,4176,4178,5206,6392,6512,6842,8406,11124,11140,11277,13060,13304,13377,14099,14349,14693,14768,14795,16105,16257,16691,16737,16940,17033,17045,17439,17481,18113,18765,18850,19702,20521,21517`; the five governed continuations are `2868,2922,2930,14243,18766`. Together with the 280-line protocol core they close 329 distinct canonical lines in the exact disjoint disposition `4/30/128/77/21/69`. Continuous-CA profile lines remain CA profile evidence consistently with the core ledger; PDE limits, substitutions, networks, constraints, and other sibling programs remain outside strict T06 eligibility without becoming different runner families.
+
+The Q01-Q13 split-corpus cross-check for the 19-family core found 224 raw matches. Seventeen split-only punctuation/line-join variants and 18 monolith non-byte mirrors reconcile without a new semantic candidate; one combined split line mirrors both `BOOK:8578` and `BOOK:8584`. The actual split Index offset is `+17443` at Colophon line 3383. No split-only construction changes the reconciled six-way disposition.
 
 ## Book Excerpts
 
@@ -312,13 +356,13 @@ T06 excerpt/source oracle: PASS 13 excerpts; 3 split families; 64/32/30 repair p
 
 ## Asset and Raster Audit
 
-The asset scope starts from the four direct and 25 CA invariant-property lines, then performs a direction-sensitive forward/reverse join through explicit picture pointers, adjacent captions, and their complete multi-panel runs. It includes the page-281 three-image run governed by `BOOK:3114`, the page-368 uniformity-mechanism chain surrounding `BOOK:4152`, both page-369 comparators, and the four-file page-246 panel governed by `BOOK:2790` after retained `BOOK:2794`. The join stops at the next separately captioned gallery; therefore page-248/page-249 assets at `BOOK:2800,2804` are outside T06's asset closure. The exact result is 45 physical JPEGs and 90 reverse references: each asset occurs once in the monolith and once in its split mirror.
+The asset scope starts from the reconciled four direct and 30 CA invariant/property-relation lines, then performs a direction-sensitive forward/reverse join through explicit picture pointers, adjacent captions, and their complete multi-panel runs. It includes the page-281 three-image run governed by `BOOK:3114`, the page-368 uniformity-mechanism chain surrounding `BOOK:4152`, both page-369 comparators, the rule-51/rule-254 pair jointly captioned at `BOOK:5206`, and the four-file page-246 panel governed by `BOOK:2790` after retained `BOOK:2794`. The join stops at the next separately captioned gallery; therefore page-248/page-249 assets at `BOOK:2800,2804` and the six-rule reversibility gallery beginning at `BOOK:5214` are outside T06's asset closure. The exact result is 47 physical JPEGs and 94 reverse references: each asset occurs once in the monolith and once in its split mirror.
 
 | Class | BOOK links | Meaning |
 |---|---|---|
 | Included/direct (`I`, 5) | `778,782,2796,2866,2924` | rule-row/codec evidence and the four label-bearing quiescent gallery selections |
-| Relation-only (`R`, 28) | `2716,2718,2724,2732,2782,2784,2786,2788,2920,2928,2932,2934,2936,2938,2940,3954,4074,4076,4134,4140,4146,4148,4150,4174,8408,14111,14797,18772` | convergence, class, geometry, observer, invariant-configuration, uniformity-mechanism, background, still-life, and emulation relations |
-| Excluded/control (`X`, 12) | `3116,3118,3120,3380,4080,4156,4158,4160,4170,8414,14766,18768` | nonuniform repetitive starts, rule-110 periodic background, nonuniform invariant target, averaging/conservation, repetitive-background runs, and rule-41 controls |
+| Relation-only (`R`, 29) | `2716,2718,2724,2732,2782,2784,2786,2788,2920,2928,2932,2934,2936,2938,2940,3954,4074,4076,4134,4140,4146,4148,4150,4174,5204,8408,14111,14797,18772` | convergence, class, geometry, observer, invariant-configuration, uniformity-mechanism, background, reversibility, still-life, and emulation relations |
+| Excluded/control (`X`, 13) | `3116,3118,3120,3380,4080,4156,4158,4160,4170,5202,8414,14766,18768` | nonuniform repetitive starts, rule-110 periodic background, nonuniform invariant target, averaging/conservation, non-quiescent rule-51 comparator, repetitive-background runs, and rule-41 controls |
 
 The visual findings agree with the semantic oracle: page 247 contains exactly the 32 reflection-symmetric zero-preserving ECA labels; page 256 contains 32 displayed four-color codes divisible by four; page 262 contains 30 even labels `2..60`; page 263 is an observer slice of six rules; page 264 is a Life application; and the page-363 pair demonstrates that admitting a uniform invariant state does not imply reaching it.
 
@@ -345,16 +389,17 @@ links={
 4140:'_page_368_Picture_6.jpeg',4146:'_page_368_Picture_9.jpeg',4148:'_page_368_Picture_10.jpeg',
 4150:'_page_368_Picture_11.jpeg',4156:'_page_368_Picture_14.jpeg',4158:'_page_368_Picture_15.jpeg',
 4160:'_page_368_Picture_16.jpeg',4170:'_page_369_Picture_4.jpeg',4174:'_page_369_Picture_6.jpeg',
+5202:'_page_450_Picture_5.jpeg',5204:'_page_450_Picture_6.jpeg',
 8408:'_page_715_Figure_1.jpeg',8414:'_page_715_Figure_4.jpeg',14111:'_page_957_Picture_14.jpeg',
 14766:'_page_979_Picture_6.jpeg',14797:'_page_979_Picture_22.jpeg',
 18768:'_page_1133_Picture_6.jpeg',18772:'_page_1133_Picture_8.jpeg'}
-assert len(links)==45
+assert len(links)==47
 for n,name in links.items(): assert BOOK[n-1]==f'![]({name})',(n,BOOK[n-1])
 
 stage=Path('goal-1/25-T06-QUIESCENT.md').read_text()
 src=stage.split('### Exact metadata oracle',1)[1].split('\nitems={',1)[1].split('\n}\n\ndef jpeg_size',1)[0]
 paths=set(re.findall(r"'([^']+\.jpeg)':\(",src))
-assert len(paths)==45 and {Path(p).name for p in paths}==set(links.values())
+assert len(paths)==47 and {Path(p).name for p in paths}==set(links.values())
 
 refs={name:[] for name in links.values()}
 for md in ROOT.rglob('*.md'):
@@ -362,23 +407,29 @@ for md in ROOT.rglob('*.md'):
         for name in refs:
             if re.fullmatch(r'!\[\]\((?:Images/)?'+re.escape(name)+r'\)',line):
                 refs[name].append((md.relative_to(ROOT).as_posix(),line_no))
-assert all(len(v)==2 for v in refs.values()) and sum(map(len,refs.values()))==90
+assert all(len(v)==2 for v in refs.values()) and sum(map(len,refs.values()))==94
 assert refs['_page_246_Picture_8.jpeg']==[
  ('A-New-Kind-of-Science.md',2782),
  ('CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md',81)]
 assert refs['_page_264_Picture_3.jpeg']==[
  ('A-New-Kind-of-Science.md',2934),
  ('CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md',231)]
+assert refs['_page_450_Picture_5.jpeg']==[
+ ('A-New-Kind-of-Science.md',5202),
+ ('CHAPTERS/9-Fundamental-Physics/Fundamental-Physics.md',37)]
+assert refs['_page_450_Picture_6.jpeg']==[
+ ('A-New-Kind-of-Science.md',5204),
+ ('CHAPTERS/9-Fundamental-Physics/Fundamental-Physics.md',39)]
 assert refs['_page_1133_Picture_8.jpeg']==[
  ('A-New-Kind-of-Science.md',18772),('BACK-MATTER/Colophon/Colophon.md',1329)]
-print('T06 source/asset join: PASS 45 assets; refs=90; classes=5,28,12')
+print('T06 source/asset join: PASS 47 assets; refs=94; classes=5,29,13')
 PY
 ```
 
 Recorded output:
 
 ```text
-T06 source/asset join: PASS 45 assets; refs=90; classes=5,28,12
+T06 source/asset join: PASS 47 assets; refs=94; classes=5,29,13
 ```
 
 ### Exact metadata oracle
@@ -428,6 +479,8 @@ items={
 'CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_368_Picture_16.jpeg':(5432,279,141,'ae917b81e1b46322311b919c8e91a2a8881ee6b20b52642ccea9d63dd1a53eda','X'),
 'CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_369_Picture_4.jpeg':(21395,599,163,'2648b7a00fddf8cb0ec7a3d9fa9012006a67e86c0652d7a0dff83054dbfeeae2','X'),
 'CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_369_Picture_6.jpeg':(15663,950,172,'d1a0e734fc7ebb8474a3cfc93c626e7d082f51418939236214b2e71d05a6c621','R'),
+'CHAPTERS/9-Fundamental-Physics/Images/_page_450_Picture_5.jpeg':(39832,426,268,'865140ea1fefd2b552b46744c30306ffd1dbba9fb0de0c4cf0e02ae3bd632927','X'),
+'CHAPTERS/9-Fundamental-Physics/Images/_page_450_Picture_6.jpeg':(19837,415,266,'2f5f2f85fda429743311da82e072431763b5706c1e735b99124e551d8ef7e31e','R'),
 'CHAPTERS/11-The-Notion-of-Computation/Images/_page_715_Figure_1.jpeg':(201204,1123,468,'534b1e558bce374329e94da6ec9626bad2e7b67fb181a3322f691d8727a549d9','R'),
 'CHAPTERS/11-The-Notion-of-Computation/Images/_page_715_Figure_4.jpeg':(171594,1135,419,'1ce3e584535e776132894ff1b5ade249cf1fcf4ffcf5cff8141e1985af0221a1','X'),
 'BACK-MATTER/Index/Images/_page_957_Picture_14.jpeg':(11244,560,84,'957c224462a36129efb03f2413788e4bc4a4f0606372f27dc67ca1df05b87b35','R'),
@@ -458,15 +511,15 @@ for name,(size,w,h,digest,kind) in items.items():
     data=(ROOT/name).read_bytes()
     assert (len(data),*jpeg_size(data),sha256(data).hexdigest())==(size,w,h,digest)
     assert digest not in digests; digests.add(digest); counts[kind]+=1
-assert len(items)==45 and counts=={'I':5,'R':28,'X':12}
-print('T06 metadata oracle: PASS 5 included; 28 relation-only; 12 excluded')
+assert len(items)==47 and counts=={'I':5,'R':29,'X':13}
+print('T06 metadata oracle: PASS 5 included; 29 relation-only; 13 excluded')
 PY
 ```
 
 Recorded output:
 
 ```text
-T06 metadata oracle: PASS 5 included; 28 relation-only; 12 excluded
+T06 metadata oracle: PASS 5 included; 29 relation-only; 13 excluded
 ```
 
 ## Construction Model
@@ -684,7 +737,7 @@ Repository-wide search finds no implemented quiescent-background restriction API
 - **Principles 13 and 15:** the local oracle checks rule 30 versus rule 1, a nonzero blank, canonical count/label corpora, hostile exterior, finite-cone, and Python identity fixtures. The broader noncanonical valuation, typed-member mismatch, serialization, selection-identity, and continued-event cases are explicit Goal 2 acceptance adversaries, not claims about tests already implemented here.
 - **Principle 16:** one generic versioned claim/evidence/validated-selection boundary is architecture. A trusted Boolean flag, even-code branch, background-freezing optimization, table patch, family switch, or boundary-derived shortcut is a shim.
 
-D111-D118 remain valid. T06 closes the following stage decision; the parent integration pass owns copying it into the global ledger without weakening it:
+D111-D118 remain valid. The following T06 decision is integrated globally as D119 without weakening its stage-local wording:
 
 **D119 — Uniform-background preservation is a validated CA program property, not execution semantics.**
 
@@ -696,12 +749,12 @@ D111-D118 remain valid. T06 closes the following stage decision; the parent inte
 
 ## Detailed Implementation Plan
 
-1. **Complete:** close the inspected 19-family/280-line canonical manifest across prose, Notes, actual Index, splits, relations, profiles, and controls.
-2. **Complete:** follow relevant assets in both directions and pin the exact 45-file/90-reference `5/28/12` closure.
+1. **Complete:** reconcile the retained nine-family diagnostic, the 19-family/280-line core, and five governed continuations into the exact 329-line `4/30/128/77/21/69` canonical closure across prose, Notes, actual Index, splits, relations, profiles, and controls.
+2. **Complete:** follow relevant assets in both directions and pin the exact 47-file/94-reference `5/29/13` closure.
 3. **Complete:** check structural predicates and counts for elementary, generic ordered-table, and totalistic rules, including arbitrary-blank and codec adversaries.
 4. **Complete:** audit current documentation/runtime/tests and the T01-T05/T07/T08 boundaries.
 5. **Complete:** specify the Goal 2 claim/evidence/selection API, serialization, identity, migration, conformance, and no-cheating plan.
-6. **Complete locally:** run all embedded checks, independent red-team, 102 repository tests, fence and diff gates. Parent integration owns the global plan/evidence-index/design-ledger copies because this task is intentionally restricted to this stage file.
+6. **Complete:** run all embedded checks, independent red-team, 102 repository tests, fence and diff gates, then integrate the result into the global plan, evidence index, design ledger, and Goal 2 handoff.
 
 ## Goal 2 Implementation Stage
 
@@ -751,15 +804,15 @@ Goal 2 should expose a small convenience constructor for the catalog row only af
 
 ## Completion Requirements
 
-- [x] The independently inspected 19-family manifest has exactly 280 canonical lines and the exact `4/25/111/66/6/68` disposition; split variants add no semantic candidate.
-- [x] The exact 45 relevant assets are hash-pinned and classified `5/28/12`; all 90 monolith/split reverse references close.
+- [x] The independently inspected evidence union has exactly 329 canonical lines and the exact `4/30/128/77/21/69` disposition; its 19-family core remains pinned at 280, and split variants add no semantic candidate.
+- [x] The exact 47 relevant assets are hash-pinned and classified `5/29/13`; all 94 monolith/split reverse references close.
 - [x] The predicate, typed member identity, verdicts, counts/code relations, and rule/seed/background/boundary/halt/property distinctions are closed across eligible rule descriptions.
 - [x] Current API/runtime fit and the 15-group Goal 2 restriction/conformance handoff are implementation-ready.
-- [x] Independent red-team, six embedded checks, source/metadata/semantic gates, 102 repository tests, fence gate, and diff check pass. Global-file reintegration is explicitly handed to the parent task and was not performed here.
+- [x] Independent red-team, six embedded checks, source/metadata/semantic gates, 102 repository tests, fence gate, and diff check pass; the global plan, evidence index, design ledger, and Goal 2 handoff are integrated.
 
 ## Stage Results
 
-**COMPLETE.** Evidence closure is 280 canonical text lines, 45 assets, 90 reverse references, 13 canonical excerpt checks, three source repairs, and six passing embedded Python blocks. The architecture result is a strict CA-axis property/restriction over exact `Program P` plus `AlphabetMemberRef`; it introduces no execution algebra. D119 and the 15-group G2-T06 handoff are ready for parent-ledger integration. Repository verification: `102 passed in 1.21s`; Markdown fence and `git diff --check` gates pass.
+**COMPLETE.** Evidence closure is 329 canonical text lines (including the exact 280-line 19-family core), 47 assets, 94 reverse references, 13 canonical excerpt checks, three source repairs, and six passing embedded Python blocks. The architecture result is a strict CA-axis property/restriction over exact `Program P` plus `AlphabetMemberRef`; it introduces no execution algebra. D119 and the 15-group G2-T06 handoff are integrated globally. Repository verification: `102 passed in 1.25s`; Markdown fence and `git diff --check` gates pass.
 
 ## Integration Results
 
@@ -772,4 +825,4 @@ Goal 2 should expose a small convenience constructor for the catalog row only af
 7. **Representation boundary:** modulus/parity, colors, gallery order, rasters, and code labels are derived codecs/views; structural evaluation is authoritative.
 8. **Identity boundary:** program, claim, evidence, validated selection, and run hashes are separate; selection resolves to exact unchanged `P` pre-run.
 9. **Counterexamples:** nonzero blank, opaque callback, hostile exterior, rule 110 periodic background, invariant-but-not-attracting states, and `64/32/30` source repair all preserve the boundary.
-10. **Parent integration:** copy D119 verbatim and link this stage in the global plan, evidence index, design ledger, and Goal 2 roadmap; no runtime implementation or T06-specific branch is authorized in Goal 1.
+10. **Global integration:** D119 and this stage are linked from the global plan, evidence index, design ledger, and Goal 2 roadmap; no runtime implementation or T06-specific branch is authorized in Goal 1.
