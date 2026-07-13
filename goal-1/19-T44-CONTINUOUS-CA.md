@@ -357,6 +357,10 @@ Its sequential argmax placement, translated depletion profile, and decay define 
 
 > “a continuous block cellular automaton in which the new value of each block is given by `{{1-xi,xi},{xi,1-xi}} . {a1,a2}`”
 
+> “in non-trivial cases most of the cells generated at each step end up having distinct values. One can generalize the setup to more dimensions or to allow `n x n` matrices that are elements of `SU(n)`.”
+
+> “all rules based on matrices are additive ... Non-additive unitary rules can also be found. The analog of an external potential can be introduced by progressively changing values of certain cells at each step.”
+
 This changes value space and update interface; it is not hidden in the scalar gray constructor.
 
 ### E24 — Unbounded continuous-field state cardinality
@@ -581,7 +585,41 @@ weighted_max 163/150
 
 ### Asset and raster audit
 
-The strict, native-Notes, classification, noise, boiling, and complex-block assets are under final measurement. Exact early-grid reconstruction, parameter/horizon recovery, hashes, dimensions, source-permitted pixel oracles, and underdetermined render conventions will be inserted after the independent raster audit completes.
+The native strict/Notes block contains exactly eight linked assets. Nine additional assets materially illustrate supporting classification/noise/application/block passages. Canonical text remains the monolith; asset paths resolve through clean chapter/Notes splits.
+
+| Asset | Role | Bytes | Dimensions | SHA-256 |
+|---|---|---:|---:|---|
+| `_page_171_Picture_5.jpeg` | identity-map rule diagram; diffusion evolution raster absent | 4,640 | 277x91 | `6695e1c946cf6adaa04a3915f2c720f69de4d18b74a81a01aaab346052119455` |
+| `_page_172_Picture_1.jpeg` | `FractionalPart[3 mean/2]` rule, long field, early inset | 137,852 | 1192x911 | `55990561c9f118ca0cfd6c7818d845b19d027456af491fb036a8867a2dd343b2` |
+| `_page_173_Picture_3.jpeg` | `FractionalPart[mean+1/4]` early periodic grid | 34,836 | 470x279 | `fe6e23666bf0136fd84d4c3e10f7ebdb716409fa9f2e76b9914ca963cd907459` |
+| `_page_173_Picture_4.jpeg` | add-quarter rule diagram | 4,905 | 241x87 | `cfd37cb74c6c8d8c35b23b05f0125776536ac9ed20713a2577c7865ca50f44f0` |
+| `_page_174_Picture_2.jpeg` | 21-member strict constant gallery | 210,694 | 1104x1455 | `8a3262ca6ce522946165605a13dd361cfdf1cba20862467b88d1c925089fcef3` |
+| `_page_175_Figure_2.jpeg` | nine long profiles, including one difference view | 306,671 | 1199x1321 | `e286f430a42f9f5246120012b9bfb6b1e9508f59a63e8bc46ef75d5b7706aa4f` |
+| Notes `_page_937_Picture_3.jpeg` | background/center parameter-time scans | 59,149 | 558x326 | `52fdb59e6b6dbd8cc6a076da5e04b20cbec39d85e9cc894f9397f5dae460c6f1` |
+| Notes `_page_937_Picture_8.jpeg` | six additive Pascal profiles | 23,933 | 592x238 | `e1443f6b4aee358dad09728c67919c6ead43d3a8c583e8ff63c78b458e647ec7` |
+| `_page_258_Figure_1.jpeg` | ten random-seed parameter/class panels | 264,239 | 1092x1280 | `6e7bd2166885376ea79dce59500a35ea01bf6e91fd51b6241812ef15e97243c3` |
+| `_page_259_Picture_2.jpeg` | difference-view class-4 profile `c=.39` | 101,531 | 989x348 | `1797a19a5e12b8fd0f3165ecbdb9a6149646809ed71c6e1d8d8ae6f2414ab443` |
+| `_page_259_Picture_4.jpeg` | difference-view class-4 profile `c=.4` | 100,962 | 994x344 | `3f138bccbbaedbcfe9865069685819d618234ba9525749dc1c7afaeed695d30f` |
+| `_page_259_Picture_6.jpeg` | weighted profile `{c=.5,w=1.13}` difference view | 90,996 | 1000x343 | `7d9fd822a9dc2cabbdfc4c0030bef8b0f69d14f8ff9f5c8547bc2bf6010c9815` |
+| `_page_340_Figure_2.jpeg` | noisy continuous rule-90/rule-30 galleries | 173,739 | 908x1238 | `b9e4ce7d19b3e1697c3b6597c7eb6bc87a51c289e77407b615d05cdae095d429` |
+| `_page_340_Figure_4.jpeg` | smooth `lambda` rule graph | 4,761 | 208x142 | `30e81284df91ba52a7d0a401b868fa9a10a0f73ae5ed8d884a48bca8561a16d5` |
+| `_page_1009_Picture_6.jpeg` | boiling/heating `c=.05` | 8,459 | 270x132 | `2e0309aed825ace57ba916bb3d2332d707af7e0d1105bd67637151854a76d7d5` |
+| `_page_1009_Picture_7.jpeg` | boiling/heating `c=.1` | 10,078 | 263x134 | `733e4bfc8212ee9c7cce554e156fb3f62def9dd474277004a5f79711050d0047` |
+| `_page_1075_Picture_3.jpeg` | distinct complex unitary block-CA sibling | 15,585 | 579x141 | `2abb1adb633919a13091fd89fb2598011eb7d6344de7ebc249b6d041632a16ed` |
+
+The strict geometry and exact regeneration establish:
+
+- Page 171's extraction contains only the identity map diagram. The six-row diffusion evolution survives as rounded text; exact rows come from the trinomial oracle above.
+- Page 172 contains 151 initial-inclusive states `t=0..150` over a 203-cell visible central window. Its inset is exactly 31 cells by 23 states `t=0..22`, seed at index 15. Exact dyadic regeneration correlates with the sampled inset cell centers at `r=0.99588`, mean absolute gray error `5.42/255`; the unoccluded lower main raster gives `r=0.9933`, error about five levels. JPEG, grid/overlay, scaling, and unstated tone transfer preclude a literal byte-for-value claim. The main computation boundary is outside the visible crop.
+- Page 173 Picture 3 is a 50-cell periodic display by 30 initial-inclusive rows `t=0..29`, seed index 24. All 1,500 cell centers against exact rational regeneration give `r=0.99456`, mean error `6.60/255`. Picture 4 places the map discontinuity at `x=3/4`.
+- Page 174 is exactly the 21 rules `c=n/40`, `n=0..20`, labeled `0,.025,...,.5`. Each panel shows 101 cells by 51 states `t=0..50` from the exact point seed; the background is `FractionalPart[t c]`.
+- Page 175 labels `c={.1,.3,.325,.3299,.3299 differences,.35,.475,.495,.9}`. Each panel shows 201 states `t=0..200` over a central crop of about 185 cells. The duplicate `.3299` entries are one exact `3299/10000` trajectory and an adjacent absolute-difference observer, not two transition rules. Native Notes explicitly say exact rational generation is essential and that double precision makes almost every page-160 profile wrong, with the localized-structure panel as the exception.
+- Notes page 937 Picture 3 has two 501-parameter matrices for exact `c=n/500`, `n=0..500`: uniform background and center cell. Horizontal data coordinates are one pixel per parameter; the background source is exact `FractionalPart[t c]`. Vertical resampling/filter/axes mean correlation is a declared visual check, not an exact cell match.
+- Notes page 937 Picture 8 labels `k={2,3,7/3,81/73,Sqrt[2],Pi}` for the additive sibling. The rational profiles are finite-valued/nested and the two irrational profiles are irregular; raster appearance is not a proof of equidistribution.
+
+The supporting page-258 gallery labels deterministic add-constant rules `c=0,.1,...,.9` but uses a random field whose measure/generator are absent. Page 259 labels `.39`, `.4`, and `{.5,1.13}` and shows only derived differences. Page 340 Figure 2 labels rule-90 perturbations `0%,5%,10%,15%` and rule-30 perturbations `0%,.5%,.8%,1%,2%,5%`; the full random draws are unrecoverable. Boiling labels heating rates `.05` and `.1`. The complex-block asset is dispositioned only as a sibling; it cannot test the strict gray rule.
+
+The deep raster audit is still refining the page-175 absolute-difference crop fit and the additive panel grid. No semantic conclusion depends on a renderer setting that the source does not state.
 
 ### Source and extraction repairs
 
