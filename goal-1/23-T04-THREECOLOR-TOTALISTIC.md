@@ -1,6 +1,6 @@
 # 23-T04-THREECOLOR-TOTALISTIC
 
-Status: **COMPLETE**
+Status: **REOPENED**
 
 ## Current Facts
 
@@ -12,6 +12,7 @@ Status: **COMPLETE**
 - White/gray/black names and tones are presentation labels for semantic values `0/1/2`, not a required palette (`BOOK:774-776`). Reflection is derived from the equal-weight symmetric stencil, additivity is a separately proved property of examples such as code 420, and classes, gallery order, crop, horizon, raster, and emulations remain analyzer/view/relation data (`BOOK:784,7912,11918`).
 - Fresh API inspection confirms partial structural fit but no executable T04 surface: `simple_programs.md:643-645,1768-1791` require fixed-arity reads and one old snapshot, while `simple_programs.md:1964-2032` conflates exact numeric sum with active count and color histogram. `src/ca/rules.py:198-217,262-295` records a loose aggregate channel but derives neither the seven cases nor the 2,187-rule range.
 - Fresh runtime inspection confirms that the correct radius-one stencil already exists (`src/ca/neighborhoods.py:551-569`; `tests/test_neighborhoods.py:86-98`), but spatial rollout is family-whitelisted and binary decoded (`src/ca/rollout.py:145-212,643-682`), batch rule IDs are coerced to `numpy.int64` (`src/ca/rollout.py:264-274`), and the manifest parser accepts only named Phase 1 families (`src/ca/specs.py:117-181`). No current test constructs, validates, or evolves a three-color seven-row program (`tests/test_rules.py:9-45`; `tests/test_rollout.py:263-424`).
+- T06's downstream reverse audit invalidated only T04's exhaustive asset-closure claim: retained `BOOK:17431` says `pictures below` but omits raster `BOOK:17433`, and retained `BOOK:2922` directly governs raster `BOOK:2924`, also omitted. The bounded source/asset/metadata/reverse-join repair is active. The strict three-color T03-preset semantics and D115-D118 remain unchanged.
 
 ## Updated Assumptions
 
@@ -1560,15 +1561,17 @@ Picture 883/25 has exact executable settings and therefore receives a semantic t
 
 ## Completion Requirements
 
-- [x] Every strict/Notes/split/actual-Index/alias/code/gallery/property/application/emulation candidate is dispositioned with zero remainder.
-- [x] Every relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and explicit exclusions.
+- [ ] Every strict/Notes/split/actual-Index/alias/code/gallery/property/application/emulation candidate is dispositioned with zero remainder.
+- [ ] Every relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and explicit exclusions.
 - [x] The exact preset/program/run/property/view boundary and T03/T05/T06/T07/T08 relationship are proved.
 - [x] Current API/runtime fit and a concrete Goal 2 preset/conformance stage are implementation-ready.
-- [x] Global ledgers, independent review, embedded checks, coverage/diff gates, and repository tests pass.
+- [ ] Global ledgers, independent review, embedded checks, coverage/diff gates, and repository tests pass.
 
 ## Stage Results
 
-COMPLETE. The exact 12-query search oracle closes 243 candidates in the partition `34/53/11/20/51/30/27/17`; 15 evidence groups close 253 cited provenance lines, 92 unique quote fragments, and 90 unique quote lines. The physical-evidence ledger closes 72 source-linked assets at `35 included / 32 excluded / 5 relation-only`, including the four required excluded controls. All six embedded source, evidence, semantic, metadata, asset-semantic, and strict code-777 raster blocks pass.
+**REOPENED during T06.** The prior 243-candidate/72-asset closure omitted two rasters explicitly governed by already-retained T04 captions: `BOOK:17431 -> 17433` and `BOOK:2922 -> 2924`. Source/asset counts, metadata, reverse closure, globals, and independent review are being repaired before T04 can be complete again. Both additions are evidence relations/profiles and do not change the strict `k=3,r=1` preset semantics below.
+
+The previous exact 12-query search oracle closed 243 candidates in the partition `34/53/11/20/51/30/27/17`; 15 evidence groups closed 253 cited provenance lines, 92 unique quote fragments, and 90 unique quote lines. Those historical source/asset totals are retained until the bounded repair is independently verified.
 
 The construction is exactly the T03 preset `k=3`, `r=1`, `A=(0,1,2)`, and `nu(i)=i`, with seven sum cases, `3^7=2187` tables, and codes `0..2186`; preset resolution has the same structural program identity, hash, and executor types as the corresponding generic T03 program. It rejects valuation or parameter overrides. The page-76 50-code selection is not the 729-code T06 quiescent restriction, T07 reflection is derived, and T08 seed/run data remains separate. Exact code-777/code-867 trajectories and hashes, code-420 additivity, 15 structure plus five growth labels, and the corrected pictured-code labels 1659 and 1632 pass. Independent review, Markdown fences, `git diff --check`, and all 102 repository tests pass.
 

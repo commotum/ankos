@@ -1,6 +1,6 @@
 # 22-T03-TOTALISTIC-CA
 
-Status: **REOPENED**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -11,7 +11,7 @@ Status: **REOPENED**
 - T01/T02 and D111-D114 already supply fixed ordered one-dimensional support, `AllSites`, old-snapshot reads, typed same-site assignment, atomic parallel commit, successor, seed, realization, trace/view separation, ordered alphabets, and arbitrary-precision integer serialization. T03 changes the rule's input quotient and program identity, not the executor or update law.
 - `simple_programs.md:1964-2027` groups numeric sums, active counts, and color histograms under one broad `TOTALISTIC` label. That API responsibility is wider than source T03: equal-sum contexts such as `(0,2,0)` and `(1,0,1)` must merge even though their color histograms differ.
 - The current runtime can sum an `int64` read vector, but `rules.totalistic` does not derive its case count, `_channel_state` ignores the declared `sum` versus `count` mode, generic `lookup` is not executable, spatial output remains binary right-shift/`&1`, and batch rule IDs are forced through `numpy.int64`. No current test executes a standalone three-color totalistic table or validates its codec.
-- The former 16-query/118-candidate and 17-query/309-candidate closures are historical and superseded. T06's bidirectional audit has now invalidated the later 18-query/312-candidate/118-asset closure: T03 retained the quiescent-symmetric emulation caption at `BOOK:18770` but did not follow its explicit network raster at `BOOK:18772`. The bounded source/asset repair is active; aggregate and execution semantics remain unchanged.
+- The former 16-query/118-candidate and 17-query/309-candidate closures are historical and superseded. T06's bidirectional audit invalidated the later 18-query/312-candidate/118-asset closure because T03 retained the quiescent-symmetric emulation caption at `BOOK:18770` without following its explicit network raster at `BOOK:18772`. The repaired closure has 313 candidates and 119 assets at `50 included / 60 excluded / 9 relation-only`; all six embedded checks, independent review, diff/fence gates, and 102 tests pass. Aggregate and execution semantics are unchanged.
 
 ## Updated Assumptions
 
@@ -339,7 +339,7 @@ There is zero silent remainder: the six sets are pairwise disjoint and their uni
 - The 84 literal-totalistic monolith lines have exactly 84 split-file counterparts, pinned by the oracle. Strict `BOOK:772,774,776` map to Chapter 3 split `89,91,93`; count/implementation `BOOK:11897,11902-11916` map to Chapter 12 split `3278,3283-3297`.
 - The three code-`1004600` query hits map exactly as `BOOK:9166` to Chapter 12 split line `549`, and `BOOK:19234,20980` to Colophon split lines `1791,3537`. The latter actual-Index line retains interleaved-column OCR, while the Notes line is exact.
 - `BACK-MATTER/Index/Index.md` is misrouted Notes and has no `#### Index` header. The real split Index begins in `BACK-MATTER/Colophon/Colophon.md:3383`; the ten literal-totalistic routes remain split lines `3522,3526,3529,3537,3790,4288,4587,4703,4909,4949`, while ten additional named-code/property routes are pinned by the 20-line monolith Index partition above.
-- The only raster carrying construction data absent from OCR text is the strict figure referenced at `BOOK:778`: `CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_75_Figure_6.jpeg`, JPEG `610x446`, SHA-256 `acb13963632286960ca61b616ff2f45a940750f3ab7deb5e6fbf696543015c15`. Direct inspection gives displayed digits `1,0,0,1,2,1,0` from high sum to low sum, hence code `777`; the caption, not pixel colors, remains semantic authority. The full manifest now traverses 118 linked rasters—50 included, 60 explicit controls, and eight relation-only—and asserts exact basename/path-set equality with the independent metadata ledger. The two added page-1152 plots are observer/property evidence for code `1004600`; they contribute no additional native rows, seed, boundary, or stopping rule. The remaining rasters are profile, property, application, or exclusion evidence with the same boundary.
+- The only raster carrying construction data absent from OCR text is the strict figure referenced at `BOOK:778`: `CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_75_Figure_6.jpeg`, JPEG `610x446`, SHA-256 `acb13963632286960ca61b616ff2f45a940750f3ab7deb5e6fbf696543015c15`. Direct inspection gives displayed digits `1,0,0,1,2,1,0` from high sum to low sum, hence code `777`; the caption, not pixel colors, remains semantic authority. The full manifest now traverses 119 linked rasters—50 included, 60 explicit controls, and nine relation-only—and asserts exact basename/path-set equality with the independent metadata ledger. The two added page-1152 plots are observer/property evidence for code `1004600`; they contribute no additional native rows, seed, boundary, or stopping rule. The added page-1133 network is relation evidence for elementary-rule emulation by a quiescent symmetric rule and contributes no T03 row, seed, boundary, or executor. The remaining rasters are profile, property, application, or exclusion evidence with the same boundary.
 
 ## Book Excerpts
 
@@ -647,7 +647,7 @@ All verbatim monolith material is placed in blockquotes so the oracle below can 
 10. **Split wording and routing.** Chapter 3 split line 89 changes strict `can not only` to `can be not only`; the official PDF agrees with the monolith. `BACK-MATTER/Index/Index.md` is Notes, while the actual split Index is embedded in `BACK-MATTER/Colophon/Colophon.md` from line 3383. Canonical `BOOK` physical lines remain primary.
 11. **Boundary discipline.** White-background filtering and the single-gray seed are gallery controls; additive, reversible, universal, quiescent, weighted, outer, growth, continuous, 2D, network, application, and emulation evidence is explicitly relation/sibling material. None supplies a default row, seed, boundary, stopping condition, alternate reducer, or T03 executor branch.
 12. **`BOOK:14632` radius OCR.** The monolith says `k = 2, t = 2 totalistic rule with code 20`, but `t` is an extraction substitution. Official all-Notes page 958 says `k = 2, r = 2 totalistic rule with code 20`. The same official passage confirms a 65,535-node network after one step and shortest excluded block length 36. The repair identifies the already-audited binary radius-two profile; the network size and excluded-block length remain properties, not transition semantics.
-13. **Bidirectional source/asset closure.** Reverse traversal from every non-control textual disposition, across directly adjacent and contiguous same-construction image runs, now adds 48 physical links beyond the earlier 70-link ledger: `BOOK:2924,3900,3908,3912,5086,5092,5220,5484,5636,10259,10393,10409,11184,11186,11188,11190,13599,13603,13605,13607,13609,13611,13615,13648,13652,13656,15211,15213,15215,15217,15219,15223,15225,15227,15229,15231,15235,15237,15239,15241,15243,15313,15315,15317,15319,17433,19236,19238`. The additive self-reproduction and feature-extraction rasters (`10259,17433`) are relation-only; 44 are explicit geometry/application/non-totalistic controls; and the two page-1152 plots are included property continuations for code `1004600`. The final source oracle and independent metadata oracle assert exact equality over all 118 link targets, with ledger partition `50 I / 60 X / 8 R`.
+13. **Bidirectional source/asset closure.** Reverse traversal from every non-control textual disposition across directly adjacent and contiguous same-construction image runs, plus five explicitly direction-sensitive prose bridges, yields this 49-link governed repair set: `BOOK:2924,3900,3908,3912,5086,5092,5220,5484,5636,10259,10393,10409,11184,11186,11188,11190,13599,13603,13605,13607,13609,13611,13615,13648,13652,13656,15211,15213,15215,15217,15219,15223,15225,15227,15229,15231,15235,15237,15239,15241,15243,15313,15315,15317,15319,17433,18772,19236,19238`. The additive self-reproduction, feature-extraction, and elementary-emulation rasters (`10259,17433,18772`) are relation-only; 44 are explicit geometry/application/non-totalistic controls; and the two page-1152 plots are included property continuations for code `1004600`. `BOOK:18772` is seeded only by the caption's forward phrase `network below`; the preceding rule-41 raster is not pulled into the relation. The final source oracle and independent metadata oracle assert exact equality over all 119 link targets, with ledger partition `50 I / 60 X / 9 R`.
 14. **Code-`1004600` route repair.** `BOOK:9166` names the four-color totalistic rule and its undecidability application; `BOOK:20980` interleaves the actual-Index route `Code 1004600 ... undecidability, 754, 1137` with neighboring columns; `BOOK:19234` is the direct Notes continuation and `BOOK:19236,19238` are its two plots. The source states measurements through at least 20 million steps, not eventual outcomes. This repairs evidence closure without adding transition semantics.
 
 ### Citation, verbatim, source-repair, asset, and combinatoric oracle
@@ -681,7 +681,7 @@ def refs(s):
 # sections maintained by other audit workers.
 cited=refs(text)
 assert cited and all(1 <= n <= len(L) for n in cited)
-assert len(cited)==211
+assert len(cited)==212
 for n in sorted(cited):
     _=L[n-1]
 
@@ -749,19 +749,19 @@ for fragment in ('If this total is less than 4','if the total is greater than 6'
 asset=Path('ref/A-New-Kind-of-Science/CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_75_Figure_6.jpeg')
 assert hashlib.sha256(asset.read_bytes()).hexdigest()=='acb13963632286960ca61b616ff2f45a940750f3ab7deb5e6fbf696543015c15'
 
-# Independently replay the exact 118-link source/metadata join, then hash
+# Independently replay the exact 119-link source/metadata join, then hash
 # and dimension-check every physical raster named by the metadata ledger.
 search=re.split(r'^## Search Log\s*$',text,flags=re.M)[1]
 search=re.split(r'^## Book Excerpts\s*$',search,flags=re.M)[0]
 asset_code=search.split('assets={',1)[1].split('for n,want in assets.items()',1)[0]
 source_assets={int(n):v for n,v in re.findall(r"(\d+):'(!\[\]\([^)]+\.jpeg\))'",asset_code)}
-assert len(source_assets)==118
+assert len(source_assets)==119
 for n,want in source_assets.items(): assert L[n-1]==want,(n,L[n-1],want)
 manifest_names={re.fullmatch(r'!\[\]\(([^)]+)\)',v).group(1) for v in source_assets.values()}
 audit=re.split(r'^## Asset and Raster Audit\s*$',text,flags=re.M)[1]
 items_src=audit.split('\nitems={',1)[1].split('\n}\n\ndef jpeg_size',1)[0]
 items=ast.literal_eval('{'+items_src+'}')
-assert len(items)==118 and len({Path(p).name for p in items})==118
+assert len(items)==119 and len({Path(p).name for p in items})==119
 assert {Path(p).name for p in items}==manifest_names
 counts={'I':0,'X':0,'R':0}
 base=Path('ref/A-New-Kind-of-Science')
@@ -770,7 +770,7 @@ for rel,(size,w,h,digest,kind) in items.items():
     assert len(data)==size and hashlib.sha256(data).hexdigest()==digest,rel
     with Image.open(p) as im: assert im.size==(w,h),(rel,im.size,(w,h))
     counts[kind]+=1
-assert counts=={'I':50,'X':60,'R':8}
+assert counts=={'I':50,'X':60,'R':9}
 
 # Independent finite arithmetic checks.
 assert 2**4==16 and 2**6==64 and 3**7==2187 and 5**13==1_220_703_125
@@ -790,7 +790,7 @@ PY
 Expected terminal line:
 
 ```text
-T03 evidence oracle: PASS cited=211 quote_fragments=89 quote_lines=86 assets=118 repairs=6 pdfs=5
+T03 evidence oracle: PASS cited=212 quote_fragments=89 quote_lines=86 assets=119 repairs=6 pdfs=5
 ```
 
 ## Construction Model
@@ -1199,10 +1199,11 @@ All paths below are relative to `ref/A-New-Kind-of-Science/`.
 | `BACK-MATTER/Index/Images/_page_996_Picture_8.jpeg` | 8,414 | `123x260` | `6a39699460a0c9e5314801b0de51c7e5f41a41466f10abe9d83edc03dc3e3feb` | Third transition-control panel; same exclusion. |
 | `BACK-MATTER/Index/Images/_page_996_Picture_9.jpeg` | 11,018 | `145x256` | `7595102ac69dcfab3a9b4817373c9ca2441e99f495b6b4c260e76d6f5da8aa26` | Fourth transition-control panel; same exclusion. |
 | `BACK-MATTER/Colophon/Images/_page_1132_Picture_2.jpeg` | 68,468 | `606x308` | `422ce8c21c465e2ffdffdb0f691f9521a21b9389897336dd4e4a2c716295c589` | Adjacent three-color two-neighbor general rule `2144`; its totalistic-universality paragraph names candidates but this picture is not one. |
+| `BACK-MATTER/Colophon/Images/_page_1133_Picture_8.jpeg` | 23,917 | `424x349` | `9f933b79fdc7dd17b803ec2f9bc1a0e851500b6a14b7f494ccc3cf32d3e3290c` | Network explicitly governed by `BOOK:18770`; relation-only evidence that a quiescent symmetric elementary rule can emulate rule 54. Visible nodes are a subset of the page-247 rule class; unlabeled edges are not serialized. |
 
 The monolith omits `Images/` from links. Chapter split files route to the same physical JPEGs and are duplicate references, not additional assets. The page-883/885 and page-897 files are Notes-for-Chapter-2 evidence despite their Chapter-12 placement. Page-943 onward Notes assets live under `BACK-MATTER/Index/Images`, while the page-1132 sibling lives under `BACK-MATTER/Colophon/Images`. The full code-`20` route includes the random overview, all sub-nine-cell starts, 25-billion search, systematic period-15 set, and survival chart; code `52` remains present in both the radius-two gallery and the mixed class-4 panel. The reverse join is finite and mechanical: start from every dispositioned textual candidate outside the query-false `controls` and index partitions, follow links at distance two, close contiguous image-only runs, and add only explicit prose-declared same-construction continuations. Images reachable solely from query-false controls remain outside this mandatory join unless separately selected as a boundary control. No two audited files have identical bytes.
 
-The dependency-free metadata oracle parses JPEG SOF markers and pins all 50 included, 60 excluded, and eight relation-only files:
+The dependency-free metadata oracle parses JPEG SOF markers and pins all 50 included, 60 excluded, and nine relation-only files:
 
 ```bash
 python3 - <<'PY'
@@ -1329,6 +1330,7 @@ items={
 'BACK-MATTER/Index/Images/_page_996_Picture_8.jpeg':(8414,123,260,'6a39699460a0c9e5314801b0de51c7e5f41a41466f10abe9d83edc03dc3e3feb','X'),
 'BACK-MATTER/Index/Images/_page_996_Picture_9.jpeg':(11018,145,256,'7595102ac69dcfab3a9b4817373c9ca2441e99f495b6b4c260e76d6f5da8aa26','X'),
 'BACK-MATTER/Colophon/Images/_page_1132_Picture_2.jpeg':(68468,606,308,'422ce8c21c465e2ffdffdb0f691f9521a21b9389897336dd4e4a2c716295c589','X'),
+'BACK-MATTER/Colophon/Images/_page_1133_Picture_8.jpeg':(23917,424,349,'9f933b79fdc7dd17b803ec2f9bc1a0e851500b6a14b7f494ccc3cf32d3e3290c','R'),
 }
 
 def jpeg_size(data):
@@ -1354,20 +1356,20 @@ for name,(size,w,h,digest,kind) in items.items():
     data=(ROOT/name).read_bytes()
     assert (len(data),*jpeg_size(data),sha256(data).hexdigest())==(size,w,h,digest)
     assert digest not in digests; digests.add(digest); counts[kind]+=1
-assert counts=={'I':50,'X':60,'R':8}
-print('T03 metadata oracle: PASS 50 included; 60 excluded; 8 relation-only')
+assert counts=={'I':50,'X':60,'R':9}
+print('T03 metadata oracle: PASS 50 included; 60 excluded; 9 relation-only')
 PY
 ```
 
 Recorded output:
 
 ```text
-T03 metadata oracle: PASS 50 included; 60 excluded; 8 relation-only
+T03 metadata oracle: PASS 50 included; 60 excluded; 9 relation-only
 ```
 
 ### Exact asset semantic oracle
 
-This dependency-free check independently reconstructs the strict code-`777` table and early single-gray trajectory, the exact 50-update Notes invocation for code `867`, binary radius-two codes `10`, `20`, and `52`, and all strict labelled gallery identities. It also pins the Chapter 6 structure/search labels, code-`20` survival counts, code-`420` additivity, all 70 explicitly followed continuation/boundary links, and a mechanical reverse join from the textual partition into 104 mandatory raster links. Tables are LSB-first by integer sum; displays reverse them.
+This dependency-free check independently reconstructs the strict code-`777` table and early single-gray trajectory, the exact 50-update Notes invocation for code `867`, binary radius-two codes `10`, `20`, and `52`, and all strict labelled gallery identities. It also pins the Chapter 6 structure/search labels, code-`20` survival counts, code-`420` additivity, all 71 explicitly followed continuation/boundary links, and a mechanical reverse join from the textual partition into 105 mandatory raster links. Tables are LSB-first by integer sum; displays reverse them.
 
 ```bash
 python3 - <<'PY'
@@ -1446,14 +1448,15 @@ links={
 15319:'![](_page_996_Picture_9.jpeg)',
 17433:'![](_page_1092_Picture_6.jpeg)',
 18746:'![](_page_1132_Picture_2.jpeg)',
+18772:'![](_page_1133_Picture_8.jpeg)',
 19236:'![](_page_1152_Figure_5.jpeg)',
 19238:'![](_page_1152_Figure_6.jpeg)',
 }
 assert all(book[n-1]==want for n,want in links.items())
 
 # Reverse join: non-control/non-index textual dispositions govern image links
-# at distance two; image-only runs then close transitively. Four prose-declared
-# construction bridges seed runs interrupted by code or explanatory text.
+# at distance two; image-only runs then close transitively. Five prose-declared
+# Five construction bridges seed runs interrupted by code or explanatory text.
 stage=Path('goal-1/22-T03-TOTALISTIC-CA.md').read_text()
 search=stage.split('### Exact reproducible manifest',1)[1].split('## Book Excerpts',1)[0]
 m=re.search(r'\nparts=\{\n(.*?)\n\}\npartition=',search,re.S); assert m
@@ -1484,27 +1487,28 @@ assert 'pictures on the next page' in book[3903].lower()
 assert 'next page shows the final patterns' in book[5089].lower()
 assert 'last 5 steps' in book[11177] and 'GraphicsArray' in book[11179]
 assert 'rule illustrated above' in book[15232] and 'pictures below' in book[15232]
-bridge_seeds={3908,5092,11182,15235}
+assert 'network below' in book[18769].lower()
+bridge_seeds={3908,5092,11182,15235,18772}
 reverse_required=close_image_runs(adjacent_images(positive)|bridge_seeds)
 repair_delta={2924,3900,3908,3912,5086,5092,5636,10259,11184,11186,
 11188,11190,13599,13603,13605,13607,13609,13611,13615,13648,13652,
 13656,15211,15213,15215,15217,15219,15223,15225,15227,15229,15231,
-15235,15237,15239,15241,15243,15313,15315,15317,15319,17433,19236,19238}
-assert len(reverse_required)==104 and len(repair_delta)==44 and repair_delta<=reverse_required
+15235,15237,15239,15241,15243,15313,15315,15317,15319,17433,18772,19236,19238}
+assert len(reverse_required)==105 and len(repair_delta)==45 and repair_delta<=reverse_required
 
 items_src=stage.split('\nitems={',1)[1].split('\n}\n\ndef jpeg_size',1)[0]
 ledger_names={Path(path).name for path in re.findall(r"'([^']+\.jpeg)':\(",items_src)}
 ledger_lines={n for n,name in image_names.items() if name in ledger_names}
-assert len(ledger_names)==len(ledger_lines)==118 and reverse_required<=ledger_lines
+assert len(ledger_names)==len(ledger_lines)==119 and reverse_required<=ledger_lines
 
-# Query-false controls form a separately computed frontier. Twenty-three
+# Controls form a separately computed frontier. Twenty-two
 # visual siblings remain outside; the five selected members are explicit
 # inherited/boundary controls, not accidental gaps in the positive join.
 control_required=close_image_runs(adjacent_images(partition['controls']-image_lines))
 control_only=control_required-reverse_required
-assert len(control_only)==28
+assert len(control_only)==27
 assert control_only&ledger_lines=={5220,5484,10393,10409,14766}
-assert len(control_only-ledger_lines)==23
+assert len(control_only-ledger_lines)==22
 
 def table(code,k,r):
     width=1+(k-1)*(2*r+1); out=[]
@@ -1594,7 +1598,7 @@ print('code20_table=',table(20,2,2),'code52_table=',table(52,2,2))
 print('chapter6_structure_labels=',len(structures357)+len(structures1329),
       'growth_labels=',len(growth1329),'audited_links=',len(links))
 print('reverse_join_required=',len(reverse_required),'repair_delta=',len(repair_delta),
-      'query_false_only_omitted=',len(control_only-ledger_lines))
+      'control_only_omitted=',len(control_only-ledger_lines))
 print('code20_survival=',survival20,'code420_additive_mod3= PASS')
 print('code1004600_table=',r1004600,'display=3311100320')
 print('pictured_class4_code=1659; borderline_code=1632; notes_only_code=1662')
@@ -1609,8 +1613,8 @@ code777_table= (0, 1, 2, 1, 0, 0, 1) display=1001210
 code777_t0_t8= 1,111,12121,1100011,122101221,11001210011,1221110111221,110001222100011,12210110101101221
 code867_51x101_sha256= 185170c0866f76d129fbf3a8843cc731f98b9f012cb98286f01e420532fb53d9
 code20_table= (0, 0, 1, 0, 1, 0) code52_table= (0, 0, 1, 0, 1, 1)
-chapter6_structure_labels= 15 growth_labels= 5 audited_links= 70
-reverse_join_required= 104 repair_delta= 44 query_false_only_omitted= 23
+chapter6_structure_labels= 15 growth_labels= 5 audited_links= 71
+reverse_join_required= 105 repair_delta= 45 control_only_omitted= 22
 code20_survival= ((1000, 72), (1000000, 60171), (1000000000, 71079205)) code420_additive_mod3= PASS
 code1004600_table= (0, 2, 3, 0, 0, 1, 1, 1, 3, 3) display=3311100320
 pictured_class4_code=1659; borderline_code=1632; notes_only_code=1662
@@ -1749,21 +1753,21 @@ Picture 253/1 is repaired to visible code `1659`: the Actual Index routes 1659 t
 ## Completion Requirements
 
 - [x] Every strict/Notes/split/actual-Index/alias/variant/application/emulation textual candidate is dispositioned reproducibly.
-- [ ] Every currently identified relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and exclusions.
+- [x] Every currently identified relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and exclusions.
 - [x] Aggregate/value/case/table/code/read/update/successor/boundary/seed semantics and variants are explicit.
 - [x] T01/T02/T04/T05/T06/T07/additive/weighted/emulation boundaries and current API/runtime fit are proved.
 - [x] Goal 2 files/dependencies/tests and no-cheating gates are implementation-ready.
-- [ ] Global ledgers, independent review, diff checks, and repository tests are integrated.
+- [x] Global ledgers, independent review, diff checks, and repository tests are integrated.
 
 ## Stage Results
 
-**REOPENED during T06.** The T05 higher-color audit repair remains valid, but T06's reverse traversal found that the retained `BOOK:18770` caption explicitly points to a network raster at `BOOK:18772` that the claimed exhaustive asset closure omitted. T03 source/asset counts, the reverse join, metadata, global integration, and independent review are being widened before this stage can be complete again. The missing raster is an elementary-rule emulation relation and does not change T03 aggregate semantics.
+**COMPLETE after the bounded T06 repair.** The T05 higher-color audit repair remains valid. T06's reverse traversal found that retained `BOOK:18770` explicitly points forward to a network raster at `BOOK:18772`; T03 now dispositions that asset as elementary-rule emulation relation evidence without changing aggregate semantics. The repaired source/asset manifest, reverse join, metadata, globals, and independent review are closed.
 
-T04's named code-357/code-1329 routes at `BOOK:3320-3378` and binary radius-two code-20 follow-through first exposed omissions in T03's former exhaustive-manifest/superset claim; the subsequent bidirectional audit also found two-dimensional, weighted, Notes-chain, application, and inherited T04 E14 controls. That prior source and physical audit closed 17 queries, 309 dispositioned candidates, 21 evidence groups, 88 verbatim fragments on 85 source lines, five official PDFs, and 116 rasters at `48 included / 60 excluded / 8 relation-only`; those figures are retained only as historical provenance for the now-explicit three-line/two-asset delta.
+T04's named code-357/code-1329 routes at `BOOK:3320-3378` and binary radius-two code-20 follow-through first exposed omissions in T03's former exhaustive-manifest/superset claim; the subsequent bidirectional audit also found two-dimensional, weighted, Notes-chain, application, and inherited T04 E14 controls. That prior source and physical audit closed 17 queries, 309 dispositioned candidates, 21 evidence groups, 88 verbatim fragments on 85 source lines, five official PDFs, and 116 rasters at `48 included / 60 excluded / 8 relation-only`; those figures are retained only as historical provenance for the cumulative four-line/three-asset T05/T06 delta.
 
 T03 is one exact finite-sum rule description over the T01/T02 fixed-lattice construction. A program declares finite alphabet `A`, explicit bijection `nu:A->{0,...,k-1}`, fixed radius `r`, exact sum of the `2r+1` old reads, and one complete `M=1+(k-1)(2r+1)`-row structural table. Sum zero is the least-significant base-`k` digit. The source average is the exact label `s/(2r+1)`, not a float. T03 adds neither an executor nor an update law; T04/T05 are presets, T06/T07 restrictions/properties, and histogram, outer, weighted, higher-dimensional, continuous, additive, emulation, seed, class, and view material remains explicitly typed outside base execution.
 
-The repaired asset blocks pass. They cover `50/60/8` disjoint physical dispositions, 70 explicitly followed continuation/boundary links, the 104-link mechanical reverse-join closure, 23 mechanically outside query-false-only siblings, binary radius-two codes `10/20/52`, the exact code-`1004600` table and long-run observer continuation, code-20 survival counts, code-357/code-1329 structure labels, code-420 additivity, exact code-777/code-867 trajectories, and all 946 cells of the strict code-777 raster with zero mismatch. The former 16-query/118-candidate and 17-query/309-candidate exhaustion claims are superseded by the widened 18-query/312-candidate partition; the current broad API and binary/family-dispatched runtime remain documented as mismatches rather than preserved through a shim.
+The repaired asset blocks pass. They cover `50/60/9` disjoint physical dispositions, 71 explicitly followed continuation/boundary links, the 105-link mechanical reverse-join closure, and 22 mechanically outside control-only siblings, plus binary radius-two codes `10/20/52`, the exact code-`1004600` table and long-run observer continuation, code-20 survival counts, code-357/code-1329 structure labels, code-420 additivity, exact code-777/code-867 trajectories, and all 946 cells of the strict code-777 raster with zero mismatch. The former 16-query/118-candidate, 17-query/309-candidate, and 18-query/312-candidate exhaustion claims are superseded by the widened 18-query/313-candidate partition; the current broad API and binary/family-dispatched runtime remain documented as mismatches rather than preserved through a shim.
 
 G2-T03 names concrete alphabet, aggregate, table/codec, rule, executor, spec/preset, trace/export, migration, and test work with 15 adversarial conformance obligations, including exact generic radius-two codes `10/20/52`. D115-D118 and the rank-versus-valuation repair remain active. All six embedded blocks and the widened bidirectional source/asset checks pass. Fresh independent review found no content defect after the status/count refresh, and global closure is restored.
 
@@ -1776,6 +1780,6 @@ G2-T03 names concrete alphabet, aggregate, table/codec, rule, executor, spec/pre
 5. Support, topology, values, numeric valuation, aggregate cases, structural table, code, run controls, representation, properties, and relations remain separately typed.
 6. Equal-weight fixed-arity sum followed by complete lookup is defining rule semantics and remains native. Integer vectorization, exact-average labels, bigint code, exhaustive lowering, solvers, gallery selection, and rasterization remain explicit incidental or relation layers.
 7. The proposed encoding preserves alphabet identity, independent `nu`, arity/radius, every sum row including leading zeros, arbitrary-precision code direction, run identity, and observation scope. The noncanonical symbolic fixture prevents rank collapse.
-8. T03 was reopened by the T05 code-`1004600` Notes/asset omission and is now reclosed after the widened manifest and fresh independent review passed. T01/T02 and T04 remain completed; the higher-color observer continuation does not alter their native semantics.
+8. T03 was reopened and reclosed first for T05's code-`1004600` Notes/assets and again for T06's direction-linked elementary-emulation network. The final 313-candidate/119-asset manifest and fresh independent review pass. T01/T02 remain completed; neither relation changes their native semantics. T04 is separately re-audited if its own retained captions expose an asset-closure defect.
 9. Goal 2 gains G2-T03 after the shared T01/T02 alphabet/table/executor responsibilities. T04/T05 depend on it as presets; T06/T07 consume predicates/proofs rather than flags; outer/weighted/histogram/higher-dimensional profiles remain separately staged.
 10. The overall API becomes simpler: one closed `valuation -> exact sum -> typed table` rule composes with the existing fixed-field executor, replacing the current loose `TOTALISTIC` bucket and binary family routing without adding an eleventh update law.
