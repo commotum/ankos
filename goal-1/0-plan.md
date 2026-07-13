@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T02/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 20 of 45 type stages complete, T03 Totalistic Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T02/T03/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 21 of 45 type stages complete, T04 Three-Color Totalistic Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
@@ -77,9 +77,11 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T45 closes a 27-query exact-manifest oracle and 28 evidence groups with zero unresolved candidates. All 87 excerpts match their provenance; 23 included assets plus the Chapter 5 exclusion, exact semantic/metadata oracles, the heat raster fit, and all 102 repository tests pass. D103-D110 preserve proof strength, Classical-only v1 scope, explicit numerical relations, separate scopes/observers, and T31/T41/T44 reuse.
 - T02 is the `k>=3`, radius-one finite-alphabet parameterization of T01. It reuses fixed ordered support, `AllSites`, old left/self/right reads, typed same-site assignment, atomic commit, deterministic continuation, realization, and trace semantics without a new executor or update law.
 - A T02 program is primarily an explicit ordered alphabet plus one complete `k^3`-entry table. Its optional Wolfram base-`k` codec uses positional address `k^2*l+k*c+r`, keeps `000` least significant, and requires arbitrary-precision tagged identity; already `k=4` has `2^128` possible tables.
-- Alphabet rank, numeric totalistic value, and palette tone remain distinct. Mutation histories, reversibility, purpose searches, behavior labels, and binary emulations are provenance/property/analyzer/relation records; T03/T04/T05, T06, and T07 retain their own aggregation/background/symmetry audits.
+- Alphabet rank, T03 numeric valuation, and palette tone are distinct. T03 is an exact fixed-arity equal-weight sum quotient plus a complete structural sum table; average is an exact label, sum zero is the least-significant code digit, and a noncanonical symbolic valuation defeats rank substitution. Mutation histories, reversibility, purpose searches, behavior labels, and binary emulations remain provenance/property/analyzer/relation records.
 - T02 closes an exact 29-query/157-candidate search partition and 21 evidence groups with no remainder. Eleven included, six excluded, and two relation-only assets are hash-pinned; source, semantic, metadata, direct Voronoi priority-table, reversible/inverse-window, and rule-921408 raster oracles pass.
 - T02 exposes current runtime defects rather than adding a branch: exhaustive arity is wrong, selector significance is mirrored, general outputs are binary-masked, ordinary lookup is not executable, and batch rule identity is coerced to fixed-width `int64`.
+- T03 closes an exact 16-query/118-candidate partition, 84 split duplicates, 18 evidence groups, 65 quote fragments on 63 source lines, and five official-source repairs with no unresolved candidate. Thirty-seven included, ten excluded, and two relation-only assets are pinned; all six source/evidence/semantic/metadata/asset/raster blocks pass, including all 946 cells of the strict code-777 figure.
+- T03 reuses T01/T02 fixed support, all-site old-snapshot reads, typed assignment, atomic commit, realization, and trace semantics. D115-D118 add only explicit numeric valuation, the exact sum case domain/table/codec, and typed preset/restriction/sibling boundaries; no executor or eleventh update law is added.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -675,7 +677,7 @@ All seven embedded oracles pass. They cover the `3^27` count, every binary speci
 
 ### 22-T03-TOTALISTIC-CA
 
-Status: **IN PROGRESS** in `goal-1/22-T03-TOTALISTIC-CA.md`.
+Status: **COMPLETE** in `goal-1/22-T03-TOTALISTIC-CA.md`.
 
 #### Big Picture Objective
 
@@ -689,7 +691,15 @@ Apply the common protocol, emphasizing sums/averages, rule coding, state count, 
 
 All T03 evidence is captured; aggregation and evaluation responsibilities are explicit; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+The 16-query source oracle partitions all 118 candidates as `26/34/25/23/10`, matches 84 split duplicates, and closes 18 evidence groups with 65 verbatim fragments across 63 physical lines plus five transparent repairs against four official PDFs. T03 is an explicit numeric valuation `nu:A->{0,...,k-1}` followed by the exact sum of `2r+1` old reads and a complete `M=1+(k-1)(2r+1)`-row structural table. The optional Wolfram code uses sum zero as the least-significant base-`k` digit. T01/T02 fixed-lattice assignment and atomic update are reused unchanged.
+
+All six embedded audit blocks pass: exact counts/codes and radius variation, sum-versus-histogram and permuted-valuation adversaries, injective exhaustive lowering, evolving-background/old-snapshot/bigint behavior, 37 included/ten excluded/two relation-only assets, exact code-777/code-867 trajectories, and the 946-cell strict code-777 raster. D115-D118 preserve T04/T05 presets, T06/T07 restrictions/properties, and additive/outer/weighted/histogram/higher-dimensional/continuous/emulation/observer boundaries. Independent review, global ledgers, fences, `git diff --check`, and all 102 repository tests pass; no prior stage reopened. Next: T04.
+
 ### 23-T04-THREECOLOR-TOTALISTIC
+
+Status: **IN PROGRESS** in `goal-1/23-T04-THREECOLOR-TOTALISTIC.md`.
 
 #### Big Picture Objective
 
