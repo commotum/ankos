@@ -56,87 +56,115 @@ Audit in progress.
 Let a resolved program `P` expose a configuration schema
 
 ```text
-C_P = (DOMAIN_P, ALPHABET_P, component schema, structural invariants).
+C_P = (DomainSchema_P, AlphabetSchema_P, component schema, structural invariants).
 ```
 
-Write `Conf(C_P)` for the complete configurations valid under that schema. T08 does not change `P`; it describes elements, subsets, and probability laws over `Conf(C_P)` and the records by which one such element is supplied at event zero.
+Each configuration carries one support/topology instance admitted by `DomainSchema_P` plus its labels/components. A fixed lattice has one fixed support form; a word, tree, graph, or finite occurrence bag may have a different support/topology instance at each event. Write `Conf(C_P)` for all complete configurations valid under that schema. T08 does not change `P`; it describes elements, subsets, and probability laws over `Conf(C_P)` and the records by which one such element is supplied at event zero.
 
 | T08-related object | Audit class | Smallest reusable base | Consequence |
 |---|---:|---|---|
 | One exact initial configuration | 1 — direct reuse | ordinary invariant-valid `Configuration` | accepted unchanged by the shared runner |
 | Named deterministic profile | 2 — preset/parameterization | closed `ConfigurationConstructor` targeted at `C_P` | resolves before rollout to one ordinary configuration |
-| Initial-condition class | 2 — restriction/set | closed predicate or image of a closed constructor over `Conf(C_P)` | membership is analysis/validation, not execution |
+| Initial-condition class | 2 — restriction/set | declarative subset or image of a closed constructor over `Conf(C_P)` | membership capability may be decidable, certified, unknown, or unsupported; never execution |
 | Random initial-condition class | 2 — probability-bearing profile | `InitialDistribution` over an explicit configuration class | sampling occurs once before event zero |
 | Background-plus-exceptions, periodic, block-coded, or temporal-history form | 3 when lossless — tagged/product representation | ordinary configuration plus validated expansion/projection | no special seed evaluator inside the runner |
 | Finite materialization, quotient, crop, raster, dataset split, or behavior label | 2 — realization/relation/observer | existing run and observer records | excluded from seed and program identity |
 | New FRONTIER, NEIGHBORHOOD, RULE result, UPDATE, executor, or successor | 4 only with a counterexample | none found | no T08 execution semantic is authorized |
 
-The word *seed* is overloaded in the current documentation and runtime. Goal 2 should use the following lossless layers even if a convenience facade retains that word:
+The word *seed* is overloaded in the current documentation and runtime. Goal 2 should keep the following layers distinct even if a convenience facade retains that word:
 
 ```text
 ConfigurationSchema
-    defines Conf(C_P)
+    defines admissible support/topology instances, labels, and Conf(C_P)
 
 InitialConditionClass
     denotes K subseteq Conf(C_P)
 
-ConfigurationPresentation / ConfigurationConstructor
-    closed data that denotes or constructs X_0 in K
+ConfigurationPresentation
+    closed data denoting one exact X_0
+
+ConfigurationConstructor
+    closed parameterized map that constructs one exact X_0
 
 InitialDistribution
     optional probability law mu over K
 
-SampledInitialConfiguration
-    one exact X_0 plus law/sampler/key/provenance references
+ConstructionRecord
+    constructor/profile/arguments -> exact configuration reference
 
-Run
-    references P, X_0, realization/boundary, horizon, schedule, observers
+SamplingRealization / SampleRecord
+    law plus sampler/key/scope provenance -> exact configuration reference
+
+ValidatedInitialConfiguration
+    exact configuration reference plus schema-validation evidence
+
+ComputationRealization / LoweringRecord
+    optional native-to-work-state relation for a declared horizon
+
+RunRequest / NativeTrace / ExperimentRecipe / Observer
+    separate semantic execution, result, orchestration, and view records
 ```
 
 A source phrase can identify only a class without determining a probability law. “Random arrangements with exactly equal numbers” denotes a different class/law from independent fair choices; “random” without probabilities, conditioning, finite scope, or a generative rule is underdetermined and cannot silently become Bernoulli `p=1/2`.
 
-### Closed deterministic presentations
+### Exact configurations, constructors, and specialized presentations
 
-The public semantic object is a complete configuration, not a mask. A small closed presentation algebra can denote source-faithful configurations without forcing an infinite field into a tensor:
+The public semantic object is a complete configuration, not a mask. It contains an admitted support/topology instance and complete typed labels/components. Literal words, trees, graphs, register banks, geometric bags, scalar states, and fixed fields are all ordinary configurations; no point-evaluation or rectangular materialization API is imposed on all of them.
+
+Fixed-lattice profiles evidenced by T08 can use a capability-gated closed presentation algebra without forcing an infinite field into a tensor:
 
 ```text
-ExplicitFinite(domain_ref, assignments)
+ExplicitFiniteLattice(domain_instance_ref, assignments)
 ConstantField(value)
 PeriodicField(period_lattice, phase, finite_tile)
 Override(base_presentation, finite_typed_assignments)
 PiecewiseField(closed_disjoint_regions, presentations)
-DerivedConfiguration(source_run_or_constructor_ref, closed_decoder, certificate)
 ```
 
-`Override(ConstantField(white), {origin: black})` is the native point profile on an infinite fixed lattice. `PeriodicField` represents a fixed block repeated forever. `Override(PeriodicField(...), finite assignments)` covers a periodic background with a finite defect. `PiecewiseField` is needed for evidenced ultimately periodic left and right tails around a finite middle; its region language must be closed, serialized, disjoint, and total. `DerivedConfiguration` covers a nested condition generated by a substitution system, but the referenced generation and decoder happen explicitly before the target run. It is not permission for an opaque callback or hidden interpreter during rollout.
+`Override(ConstantField(white), {origin: black})` is the native point profile on an infinite fixed lattice. `PeriodicField` represents a fixed block repeated forever. `Override(PeriodicField(...), finite assignments)` covers a periodic background with a finite defect. `PiecewiseField` covers evidenced ultimately periodic left and right tails around a finite middle; its region language must be closed, serialized, disjoint, and total. These are lattice codecs/presets, not the universal `Configuration` interface.
+
+A nested initial condition produced by a substitution system is an explicit derivation relation, not a seed-presentation escape hatch:
+
+```text
+ConfigurationDerivation(
+    exact_source_configuration_ref,
+    source_program_and_finite_trace_or_certified_limit_ref,
+    closed_typed_transform,
+    exact_target_configuration_ref,
+    evidence)
+```
+
+The target run references the already frozen exact target configuration. It never lazily executes another program or arbitrary constructor while resolving or stepping the target.
 
 Every presentation has:
 
-- one declared target schema and DOMAIN;
-- a total typed value at every point of that DOMAIN, or a native finite assignment for a finite DOMAIN;
+- one declared target configuration schema and an admitted support/topology instance;
+- complete typed labels/components for that instance;
 - a canonical structural identity and expansion semantics;
 - validation that all values are ALPHABET members and all global invariants hold; and
 - an inverse or canonical re-encoding on the representation's declared image when it is claimed lossless.
 
-A constructor is not required to be invertible: two named presets may intentionally construct the same `X_0`. The inverse and one-step commuting obligations apply only when an object claims to be a compact representation or a finite-realization lowering of a configuration, not merely a convenient constructor.
+A constructor is not required to be invertible: two named presets may intentionally construct the same `X_0`. An inverse and one-step commuting law apply when an object claims to be a lossless representation of a native configuration/step. A finite execution lowering additionally owes the horizon-indexed relation below. Neither obligation applies merely because something is a convenient constructor.
 
 Overlapping overrides with unequal values, an uncovered piecewise region, a nonperiodic tile declaration, a dangling derivation, and an assignment outside the DOMAIN are invalid. Last-write-wins order is not invented. A palette rank cannot supply “white”, “gray”, or “black”; each source role resolves to an explicit typed alphabet member.
 
-The finite list used by a practical implementation has no intrinsic boundary meaning. An explicit list on a declared finite cyclic DOMAIN is a complete finite configuration. A window cut from an infinite point or periodic field is instead a materialization. The source's finite cyclic program and its infinite periodically repeated configuration can be related by a quotient/covering map, but they are not the same configuration object merely because their arrays coincide.
+The finite list used by a practical implementation has no intrinsic boundary meaning. An explicit list on a declared finite cyclic DOMAIN is a complete finite configuration. A window cut from an infinite point or periodic field is instead a lowering/materialization. The source's finite cyclic program and its infinite periodically repeated configuration can be related by a quotient/covering map, but they are not the same configuration object merely because their arrays coincide.
 
 ### Configuration classes and stochastic laws
 
-An `InitialConditionClass` is schema-scoped. Its membership can be given by a closed structural predicate or as the image of a closed constructor/decoder. Evidence requires at least these distinct families:
+An `InitialConditionClass` is schema-scoped. It denotes a subset through declarative structural data, a constructor image, or a referenced relation. Closed syntax does not imply decidability: exact asymptotic density on an infinite lattice, membership in a generated infinite image, normalization of a general generator, or a global invariant may be undecidable or not finitely checkable. A membership request therefore returns invalid, `UnsupportedMembership`, `Unknown`, certified `DoesNotHold`, or certified `Holds`; only supported finite/structural validators may decide it.
+
+The frozen source evidence distinguishes at least these families:
 
 - constant/uniform configurations;
 - finite perturbations of a declared background, including one distinguished cell;
 - finite explicit configurations on a declared finite topology;
 - periodic configurations and periodic backgrounds with finite or ultimately periodic defects;
 - block-coded or macrocell configurations, including images of another alphabet under a fixed block decoder;
-- substitution-derived or otherwise explicitly generated nested configurations;
+- substitution-derived nested configurations represented by frozen targets plus explicit derivation relations;
 - unrestricted assignments over a stated scope;
-- configurations with exact composition/density constraints; and
-- configurations satisfying a closed local-language constraint, such as a finite forbidden-block or allowed-macroblock condition.
+- finite-scope configurations with exact composition constraints, distinct from a random law's density parameter; and
+- configurations satisfying a supported closed local-language condition, such as an allowed finite macroblock decoder.
 
 “Simple initial condition” in the prose is not by itself a canonical decidable class. Goal 2 exposes only evidenced concrete profiles or explicitly declared structural classes; it does not turn an informal behavioral adjective into a Boolean field.
 
@@ -148,6 +176,7 @@ native sampling scope
 finite categorical probabilities or a closed generative law
 conditioning/composition constraints
 normalization and parameter domain
+supported probability/query/sampling capabilities
 law semantic version
 ```
 
@@ -158,12 +187,16 @@ iid Bernoulli(p)
 != draw p once, then conditionally iid Bernoulli(p)
 != uniform over strings with exactly m black cells
 != independent draws of allowed fixed-width macroblocks
-!= uniform over all strings accepted by a constraint language.
+!= a finite-length law over strings accepted by a constraint language.
 ```
 
-For a finite support, sampling uses a canonical coordinate order and records sampler algorithm/version, key or input entropy, and draw provenance. The mathematical law identity does not include a particular RNG implementation unless the source construction itself specifies that algorithm. A realized sample identity does.
+There is no generic “uniform over all strings accepted by a constraint language” without a finite length/scope or a separately specified probability measure on infinite sequences. Normalization and zero-mass conditioning must be proved for the declared scope; closed syntax alone supplies no sampler.
 
-An infinite product law is a probability measure characterized by consistent finite-cylinder probabilities, not an array that can be eagerly drawn. A practical finite-window sampler is an explicit realization of a requested cylinder. A coordinate-keyed pseudorandom total field can provide replayable order-independent queries, but with a finite key it is an algorithmic realization related to—not literally an exact draw from—the mathematical infinite independent product measure. Goal 2 must preserve that qualification rather than hide a mutable RNG cursor in execution state.
+For a finite fixed lattice, sampling may use a canonical coordinate order. A word uses declared sequence order; a graph law must be invariant to vertex renaming or declare a canonicalization with proof; other support instances use law-specific typed sampling requests. Each `SamplingRealization` records sampler algorithm/version, scope/enumeration or structural map, key or input entropy, and draw provenance. The mathematical law identity does not include a particular RNG implementation unless the source construction itself specifies that algorithm. The exact configuration digest likewise excludes provenance: the same `X_0` sampled by two laws has one configuration identity and two `SampleRecord` identities.
+
+Structured laws compose closed component laws, deterministic overlays, and pushforwards while preserving schema invariants. For example, a tape profile may sample tape symbols, choose one explicit head position/state, and then apply the lossless `Plain(symbol) | Head(q,symbol)` constructor. Treating whole composite cells as iid would almost surely violate the exactly-one-head invariant and is not an equivalent law.
+
+An infinite product law is a probability measure characterized by consistent finite-cylinder probabilities, not an array that can be eagerly drawn. Cylinder probability is an optional product-measure capability, not a universal distribution method. A practical finite-window sampler is an explicit realization of a requested cylinder. A coordinate-keyed pseudorandom total field can provide replayable order-independent queries, but with a finite key it is an algorithmic realization related to—not literally an exact draw from—the mathematical infinite independent product measure. Goal 2 must preserve that qualification rather than hide a mutable RNG cursor in execution state.
 
 ### Event-zero state and temporal history
 
@@ -175,18 +208,38 @@ step(state_t) = (x[t], f(x[t], x[t-1]))
 observe(state_t) = x[t].
 ```
 
-For a three-lag lookup the same construction uses a length-three product/tuple alphabet. A ten-lag count rule uses one length-ten shift-register state at every event. Serializing ten seed scalars and then silently changing to a packed integer is a representation boundary only if both encode the same tuple losslessly and the trace records the transition point; it cannot mean that one episode changes configuration schema halfway through.
+For a three-lag lookup the same construction uses three named lag factors. A ten-lag count rule uses one length-ten shift-register state at every event. A product label at the unique `t+0D` locus, named configuration components, or another transparent tuple codec are lossless representation choices; none is semantically mandatory. Serializing ten seed scalars and then silently changing to a packed integer is a representation boundary only if both encode the same complete state losslessly and the trace records the mapping; it cannot mean that one episode changes configuration schema halfway through.
 
-If the source supplies a temporal prefix before recurrence begins, the prefix is initialization data for the tuple state or an explicitly aligned prelude/trace projection. Hidden earlier values that affect the next state cannot be discarded from raw state while only the current scalar is called the configuration. This repair reuses an explicit product ALPHABET and ordinary `t+0D` state/update; it adds no seed-aware executor.
+If the source supplies a temporal prefix before recurrence begins, the prefix is initialization data for the complete Markov state or an explicitly aligned prelude/trace projection. Hidden earlier values that affect the next state cannot be discarded from raw state while only the current scalar is called the configuration. This repair uses ordinary transparent configuration structure and `t+0D` state/update; it adds no seed-aware executor and mandates no particular storage decomposition.
 
 ### Realization, boundary, execution, and identity
 
-For an infinite fixed-lattice profile, materialization into a finite computational window is separate from the seed presentation. It records the window/support map, coordinate origin, padding/halo, and precision/storage codec. `BOUNDARY` independently specifies reads beyond a finite computational realization. The event-zero background is not a boundary value that persists through time: a rule may change every background cell after the first step.
-
-After construction and validation:
+Construction, sampling, validation, and execution lowering are separate operations:
 
 ```text
-X_0    = realize(initial_profile, sample_record, C_P)
+construct(profile, closed_args) -> ConstructionRecord(X_0_ref)
+sample(law, sampling_realization) -> SampleRecord(X_0_ref)
+validate(X_0, C_P) -> ValidationEvidence
+lower(X_0, computation_realization, horizon) -> LoweringRecord(work_state_ref)
+```
+
+A deterministic profile has a construction record, not a fake sample. A sampled configuration has the same denotational configuration identity it would have if constructed literally; its law and RNG belong to `SampleRecord` provenance.
+
+For an infinite fixed-lattice profile, lowering into a finite computational work region is separate from the native configuration. A causal lowering records the support map, requested observation/horizon, and a proof that its work region contains the full dependency cone. It reads native values in that cone and invents no exterior boundary. A `BOUNDARY` belongs to a genuinely finite semantic topology or to an explicitly declared approximation; it must not silently stand in for an unbounded native field. Halo (semantic dependency sufficiency), storage padding, numeric/storage codec, and display crop are separate records.
+
+For a requested horizon `h`, a lowering that claims exactness must satisfy the horizon-indexed commuting obligation
+
+```text
+observe(step_native^t(X_0))
+    = observe(decode(step_lowered^t(lower(X_0,h))))
+for every 0 <= t <= h.
+```
+
+One-step agreement is insufficient: a radius-one crop with one halo cell can pass at `t=1` and fail at `t=2`. Approximate/truncated lowerings instead carry an explicit error/scope claim. The event-zero background is not a boundary value that persists through time: a rule may change every background cell after the first step.
+
+After native construction or a validated exact lowering, the runner remains:
+
+```text
 active = FRONTIER.select(X_t)
 reads  = NEIGHBORHOOD.read(X_t, active)
 writes = RULE(active, reads)
@@ -201,16 +254,17 @@ Keep the identities separate:
 Program
 ConfigurationSchema
 InitialConditionClass
-ConfigurationPresentation / Constructor
+ConfigurationPresentation
+ConfigurationConstructor / ConstructionRecord
 InitialDistribution
-SamplingRealization
-SampledInitialConfiguration
-FiniteComputationRealization / Boundary
-Run / Trace
-Observer / DatasetRecipe
+SamplingRealization / SampleRecord
+Configuration / ValidationEvidence
+ComputationRealization / LoweringRecord / BoundaryOrApproximation
+RunRequest / NativeTrace
+ExperimentRecipe / Observer / View
 ```
 
-Translation, reflection, color permutation/complement, block encoding, finite quotienting, and cropping are explicit transforms or relations. Two presentations may share a denotational configuration digest while retaining distinct representation/provenance identities. Two laws can produce the same realized `X_0` without becoming the same law. A run references one exact program and one exact realized configuration; neither absorbs the other.
+Translation, reflection, color permutation/complement, block encoding, finite quotienting, and cropping are explicit transforms or relations. Two presentations or constructors may denote the same configuration digest while retaining distinct representation/construction provenance. Two laws can produce the same `X_0` without becoming the same law. A semantic run request references one exact program and one validated native initial configuration (or an explicit exact/approximate lowering); an experiment recipe and observer reference the run without becoming its execution semantics.
 
 ### Cross-category scope boundary
 
