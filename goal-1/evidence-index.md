@@ -25,14 +25,14 @@ Each type stage must make the following auditable:
 
 ## Catalog Coverage
 
-Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture. T03/T04 remain reopened only for their bounded asset repairs.
+Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture. The bounded T03/T04 asset repairs are also complete; no stage remains reopened.
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
 | T01 | 2 | Elementary Cellular Automata | 1 | `2-T01-ELEMENTARY.md` | COMPLETE | 8 search families; 23 excerpt groups; all split/Notes/Index/cross-reference candidates dispositioned; 0 unresolved |
 | T02 | 3 | Multi-Color Nearest-Neighbor Cellular Automata | 2 | `21-T02-MULTICOLOR-CA.md` | COMPLETE | Exact 29-query/157-candidate partition; 21 evidence groups; 48 verbatim fragments; ordered `k^3` table/base-`k` codec; 11 included/6 excluded/2 relation-only assets; seven source/semantic/metadata/Voronoi/reversible/raster oracles; 0 unresolved |
-| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | REOPENED | T04's bounded downstream-gallery repair found inherited page-263 raster BOOK:2928 missing from the 313-candidate/119-asset closure; one-control source/asset/reverse repair active; aggregate semantics unchanged |
-| T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | REOPENED | T06 found omitted direct raster links BOOK:17431->17433 and BOOK:2922->2924 in the claimed 243-candidate/72-asset closure; bounded source/asset/reverse-join repair active; preset semantics unchanged |
+| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | COMPLETE | Exact 18-query/314-candidate partition `87/11/41/54/101/20`; 215 cited lines/89 fragments/86 quote lines; 120 assets at 50 included/61 excluded/9 relation-only; 72 audited and 106 reverse-required links; six embedded oracles, independent review, and 102 tests; aggregate semantics unchanged; 0 unresolved |
+| T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | COMPLETE | Exact 12-query/246-candidate partition `34/53/11/20/54/30/27/17`; 260 cited lines/92 fragments/90 quote lines; 75 assets at 35 included/34 excluded/6 relation-only and 150 reverse references; six embedded oracles, independent review, and 102 tests; strict T03 preset; 0 unresolved |
 | T05 | 6 | Higher-Color Totalistic Cellular Automata | 5 | `24-T05-HIGHERCOLOR-TOTALISTIC.md` | COMPLETE | Exact 11-query/142-lexical-line partition plus five governed follows and 25 assets = 172 candidates; 12 evidence groups at 47 provenance/47 fragments/40 quote lines; assets 5 included/13 relation-only/7 excluded; strict finite `k>=4,r=1` canonical T03 preset, code-1004600/cardinality/bigint/snapshot fixtures, five embedded oracles, independent review, and 102 tests; 0 unresolved candidates |
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | IN PROGRESS | Exact blank/white-background, invariant-state, rule-predicate, asset, API, and runtime audit active |
 | T07 | 8 | Left-Right Symmetric Cellular Automata | 7 | `26-T07-SYMMETRIC.md` | PENDING | Not started |
@@ -78,9 +78,9 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages globally complete: 21 / 45.
+- Type stages globally complete: 23 / 45.
 - Type stages evidence-closed / architecture-reopened: 0.
-- Type stages asset-reopened: 2 (T03, T04); their architecture is complete.
+- Type stages asset-reopened: 0.
 - Type stages unresolved: 21 pending; T06 is in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
@@ -89,6 +89,6 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 
 - T03 reopened and reclosed during T05: named code-`1004600` had been included as a four-color totalistic profile, but its Notes continuation at canonical line 19234 and linked lines 19236/19238 were absent from the claimed 309-candidate/116-asset closure. The repaired 18-query/312-candidate and 118-asset manifest, all six checks, fresh independent review, and 102 tests pass; the semantic result remains unchanged.
 - T03 reopened and reclosed again during T06: retained `BOOK:18770` omitted its explicit forward network raster at `BOOK:18772`. The repaired 18-query/313-candidate and 119-asset manifest closes at `50/60/9`, its 105-link reverse join and all six checks pass, fresh independent review is clean, and all 102 tests pass; no semantic conclusion changed.
-- T04 reopened during T06: retained captions `BOOK:17431` and `BOOK:2922` explicitly govern omitted rasters `BOOK:17433` and `BOOK:2924`. The bounded source/asset/metadata/reverse-join repair and independent re-review are active; the strict T03 preset result is unchanged.
-- T03 reopened once more during the T04 repair: T04's own downstream-comparator rule proved that page-263 slice raster `BOOK:2928` belongs to the inherited two-dimensional totalistic gallery. The bounded one-control repair is active; aggregate semantics are unchanged.
+- T04 reopened and reclosed during T06: retained captions `BOOK:17431`, `BOOK:2922`, and the inherited facing-page/slice chain explicitly govern omitted rasters `BOOK:17433`, `BOOK:2924`, and `BOOK:2928`. The repaired 12-query/246-candidate and 75-asset manifest closes at `35/34/6`, its 150-reference reverse join and all six checks pass, fresh independent review is clean, and all 102 tests pass; the strict T03 preset result is unchanged.
+- T03 reopened and reclosed once more during the T04 repair: T04's downstream-comparator rule proved that page-263 slice raster `BOOK:2928` belongs to the inherited two-dimensional totalistic gallery. The repaired 18-query/314-candidate and 120-asset manifest closes at `50/61/9`, with 72 audited links, a 106-link reverse join, all six checks, independent review, and all 102 tests passing; aggregate semantics are unchanged.
 - T09 and T12 reopened and reclosed before T06 continuation: D009-D014 had promoted one lossless state decomposition—separate `SingleControl`/`TransitionControl`—into a required semantic abstraction. The audit instead keeps `FRONTIER` as rule-firing sources, broadens the CA-shaped writable-target realization, and uses transparent composite labels with exactly-one invariants plus atomic typed writes. `ref/notes/alphabets.md` independently supplies the Turing composite-alphabet construction. All dependent decisions and Goal 2 handoffs were reclassified under the one branch-free SimpleProgram runner.

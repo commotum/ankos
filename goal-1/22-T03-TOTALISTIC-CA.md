@@ -652,7 +652,7 @@ All verbatim monolith material is placed in blockquotes so the oracle below can 
 10. **Split wording and routing.** Chapter 3 split line 89 changes strict `can not only` to `can be not only`; the official PDF agrees with the monolith. `BACK-MATTER/Index/Index.md` is Notes, while the actual split Index is embedded in `BACK-MATTER/Colophon/Colophon.md` from line 3383. Canonical `BOOK` physical lines remain primary.
 11. **Boundary discipline.** White-background filtering and the single-gray seed are gallery controls; additive, reversible, universal, quiescent, weighted, outer, growth, continuous, 2D, network, application, and emulation evidence is explicitly relation/sibling material. None supplies a default row, seed, boundary, stopping condition, alternate reducer, or T03 executor branch.
 12. **`BOOK:14632` radius OCR.** The monolith says `k = 2, t = 2 totalistic rule with code 20`, but `t` is an extraction substitution. Official all-Notes page 958 says `k = 2, r = 2 totalistic rule with code 20`. The same official passage confirms a 65,535-node network after one step and shortest excluded block length 36. The repair identifies the already-audited binary radius-two profile; the network size and excluded-block length remain properties, not transition semantics.
-13. **Bidirectional source/asset closure.** Reverse traversal from every non-control textual disposition across directly adjacent and contiguous same-construction image runs, plus six explicitly direction-sensitive prose bridges, yields this 50-link governed repair set: `BOOK:2924,2928,3900,3908,3912,5086,5092,5220,5484,5636,10259,10393,10409,11184,11186,11188,11190,13599,13603,13605,13607,13609,13611,13615,13648,13652,13656,15211,15213,15215,15217,15219,15223,15225,15227,15229,15231,15235,15237,15239,15241,15243,15313,15315,15317,15319,17433,18772,19236,19238`. The new bridge follows `BOOK:2926` (“same kind as on the facing page”) through raster `BOOK:2928` to the slice caption at `BOOK:2930`, and stops before the next Life construction at `BOOK:2932`; it makes `2928` an observer/geometry control, not native T03 evidence. The additive self-reproduction, feature-extraction, and elementary-emulation rasters (`10259,17433,18772`) are relation-only; 45 are explicit geometry/application/non-totalistic controls; and the two page-1152 plots are included property continuations for code `1004600`. `BOOK:18772` is seeded only by the caption's forward phrase `network below`; the preceding rule-41 raster is not pulled into the relation. The final source oracle and independent metadata oracle assert exact equality over all 120 link targets, with ledger partition `50 I / 61 X / 9 R`.
+13. **Bidirectional source/asset closure.** Reverse traversal from every non-control textual disposition across directly adjacent and contiguous same-construction image runs, plus six explicitly direction-sensitive prose bridges, yields this 50-link governed repair set: `BOOK:2924,2928,3900,3908,3912,5086,5092,5220,5484,5636,10259,10393,10409,11184,11186,11188,11190,13599,13603,13605,13607,13609,13611,13615,13648,13652,13656,15211,15213,15215,15217,15219,15223,15225,15227,15229,15231,15235,15237,15239,15241,15243,15313,15315,15317,15319,17433,18772,19236,19238`. The new bridge follows `BOOK:2926` (“same kind as on the facing page”) through raster `BOOK:2928` to the slice caption at `BOOK:2930`, and stops before the page-264 Life image chain at physical line 2932; it makes `2928` an observer/geometry control, not native T03 evidence. The additive self-reproduction, feature-extraction, and elementary-emulation rasters (`10259,17433,18772`) are relation-only; 45 are explicit geometry/application/non-totalistic controls; and the two page-1152 plots are included property continuations for code `1004600`. `BOOK:18772` is seeded only by the caption's forward phrase `network below`; the preceding rule-41 raster is not pulled into the relation. The final source oracle and independent metadata oracle assert exact equality over all 120 link targets, with ledger partition `50 I / 61 X / 9 R`.
 14. **Code-`1004600` route repair.** `BOOK:9166` names the four-color totalistic rule and its undecidability application; `BOOK:20980` interleaves the actual-Index route `Code 1004600 ... undecidability, 754, 1137` with neighboring columns; `BOOK:19234` is the direct Notes continuation and `BOOK:19236,19238` are its two plots. The source states measurements through at least 20 million steps, not eventual outcomes. This repairs evidence closure without adding transition semantics.
 
 ### Citation, verbatim, source-repair, asset, and combinatoric oracle
@@ -686,7 +686,7 @@ def refs(s):
 # sections maintained by other audit workers.
 cited=refs(text)
 assert cited and all(1 <= n <= len(L) for n in cited)
-assert len(cited)==217
+assert len(cited)==215
 for n in sorted(cited):
     _=L[n-1]
 
@@ -795,7 +795,7 @@ PY
 Expected terminal line:
 
 ```text
-T03 evidence oracle: PASS cited=217 quote_fragments=89 quote_lines=86 assets=120 repairs=6 pdfs=5
+T03 evidence oracle: PASS cited=215 quote_fragments=89 quote_lines=86 assets=120 repairs=6 pdfs=5
 ```
 
 ## Construction Model
@@ -1777,7 +1777,7 @@ Picture 253/1 is repaired to visible code `1659`: the Actual Index routes 1659 t
 
 ## Stage Results
 
-**RECLOSED after the bounded T04 inherited-asset repair.** The `BOOK:18770 -> 18772` repair remains valid, and the T04 re-audit proved that page-263 raster `BOOK:2928` is an immediately downstream slice view of the same two-dimensional totalistic gallery already retained at `BOOK:2922-2924`. T03 now carries that one inherited control through its source manifest, asset ledger, reverse closure, recorded results, and independent review. Aggregate semantics remain unchanged.
+**RECLOSED after the bounded T04 inherited-asset repair.** The `BOOK:18770 -> 18772` repair remains valid, and the T04 re-audit proved that page-263 raster `BOOK:2928` is an immediately downstream slice view of the same two-dimensional totalistic gallery already retained at `BOOK:2922,2924`. T03 now carries that one inherited control through its source manifest, asset ledger, reverse closure, recorded results, and independent review. Aggregate semantics remain unchanged.
 
 T04's named code-357/code-1329 routes at `BOOK:3320-3378` and binary radius-two code-20 follow-through first exposed omissions in T03's former exhaustive-manifest/superset claim; the subsequent bidirectional audit also found two-dimensional, weighted, Notes-chain, application, and inherited T04 E14 controls. That prior source and physical audit closed 17 queries, 309 dispositioned candidates, 21 evidence groups, 88 verbatim fragments on 85 source lines, five official PDFs, and 116 rasters at `48 included / 60 excluded / 8 relation-only`; those figures are retained only as historical provenance for the cumulative four-line/three-asset T05/T06 delta.
 

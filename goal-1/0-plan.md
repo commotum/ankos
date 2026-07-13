@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete and the architecture of all 21 evidence-closed type stages reclosed under `architecture-audit.md`; T03/T04 retain only their bounded asset repairs. T06 may resume through the same common architecture.
+- Execution status at this sync is Foundation complete and all 23 completed type stages are evidence- and architecture-reclosed under `architecture-audit.md`; no stage remains reopened. T06 now resumes through the same common architecture.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures a DOMAIN/support/topology subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program space with its dimensional character, support, and topology; ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -84,8 +84,9 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - Alphabet rank, T03 numeric valuation, and palette tone are distinct. T03 is an exact fixed-arity equal-weight sum quotient plus a complete structural sum table; average is an exact label, sum zero is the least-significant code digit, and a noncanonical symbolic valuation defeats rank substitution. Mutation histories, reversibility, purpose searches, behavior labels, and binary emulations remain provenance/property/analyzer/relation records.
 - T02 closes an exact 29-query/157-candidate search partition and 21 evidence groups with no remainder. Eleven included, six excluded, and two relation-only assets are hash-pinned; source, semantic, metadata, direct Voronoi priority-table, reversible/inverse-window, and rule-921408 raster oracles pass.
 - T02 exposes current runtime defects rather than adding a branch: exhaustive arity is wrong, selector significance is mirrored, general outputs are binary-masked, ordinary lookup is not executable, and batch rule identity is coerced to fixed-width `int64`.
-- T03's core aggregate semantics, definition/formula excerpts, official-source repairs, and strict code-777 raster remain valid. Its former 16-query/118-candidate, 17-query/309-candidate, and 18-query/312-candidate closures are superseded by the independently reviewed 18-query/313-candidate partition and 119-asset manifest at `50 included / 60 excluded / 9 relation-only`; the T05 code-`1004600` continuation and T06 direction-linked emulation network are closed.
+- T03's core aggregate semantics, definition/formula excerpts, official-source repairs, and strict code-777 raster remain valid. Its former 16-query/118-candidate, 17-query/309-candidate, and 18-query/312-candidate closures are superseded by the independently reviewed 18-query/314-candidate partition and 120-asset manifest at `50 included / 61 excluded / 9 relation-only`; the T05 code-`1004600` continuation, T06 direction-linked emulation network, and inherited page-263 slice control are closed.
 - T03 reuses T01/T02 fixed support, all-site old-snapshot reads, typed assignment, atomic commit, realization, and trace semantics. D115-D118 add only explicit numeric valuation, the exact reachable-sum case set/table/codec, and typed preset/restriction/sibling boundaries; no executor is added.
+- T04's strict `k=3,r=1` preset semantics are unchanged. Its repaired 12-query manifest closes 246 candidates, 75 assets at `35 included / 34 excluded / 6 relation-only`, and 150 exact reverse references; the added page-262/page-263 controls and feature-extraction relation are evidence classifications, not execution machinery.
 - T05 closes an exact 11-query/142-lexical-line manifest plus five governed prose continuations and 25 linked assets: 172 candidates with zero remainder. Twelve evidence groups pin 47 provenance lines/47 fragments/40 quote lines; assets close at `5 included / 13 relation-only / 7 excluded` after independent review added four direct page-963 chart relations.
 - T05 is exactly the strict finite `k>=4,r=1,A=(0,...,k-1),nu(i)=i` preset over unchanged generic T03, with `M=3k-2`, arbitrary-precision `R=k^M`, and code `1004600` pinned as a structural table. D118 is sharpened; no new primitive, executor, update law, or decision is added. All five embedded checks, independent review, diff/fence gates, and 102 tests pass.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
@@ -683,7 +684,7 @@ All seven embedded oracles pass. They cover the `3^27` count, every binary speci
 
 ### 22-T03-TOTALISTIC-CA
 
-Status: **REOPENED — ASSET REPAIR; ARCHITECTURE COMPLETE** in `goal-1/22-T03-TOTALISTIC-CA.md`. T04's bounded repair proved that inherited page-263 raster `BOOK:2928` belongs to the already-retained two-dimensional totalistic gallery; the one-control asset repair is active and the semantic result is unchanged.
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED** in `goal-1/22-T03-TOTALISTIC-CA.md`. T04's bounded repair proved that inherited page-263 raster `BOOK:2928` belongs to the already-retained two-dimensional totalistic gallery; the one-control repair is complete and the semantic result is unchanged.
 
 #### Big Picture Objective
 
@@ -699,15 +700,15 @@ Completed: widened the named-code source/asset closure, preserved the valid aggr
 
 #### Stage Result
 
-COMPLETE after bounded T05/T06 repairs: the T04-era repair partitioned 309 candidates and 116 rasters at `48 included / 60 excluded / 8 relation-only`; the code-`1004600` Notes continuation and two linked plots widened that to 312/118, then the direction-linked `BOOK:18770 -> 18772` emulation network exposed one final asset gap. The independently reviewed audit now partitions 313 candidates and 119 rasters at `50 included / 60 excluded / 9 relation-only`; exact radius-two code `10/20/52`, aggregate semantics, and all prior repairs remain valid.
+COMPLETE after bounded T05/T06/T04 repairs: the T04-era repair partitioned 309 candidates and 116 rasters at `48 included / 60 excluded / 8 relation-only`; the code-`1004600` Notes continuation and two linked plots widened that to 312/118, the direction-linked `BOOK:18770 -> 18772` emulation network widened it to 313/119, and the inherited page-263 slice control closes the final audit at 314 candidates and 120 rasters at `50 included / 61 excluded / 9 relation-only`. Exact radius-two code `10/20/52`, aggregate semantics, and all prior repairs remain valid.
 
 The former `16-query / 118-candidate / 26-34-25-23-10` partition and associated split/evidence-group totals are retained only as historical audit output, not current exhaustion evidence. The valid semantic result is an explicit numeric valuation `nu:A->{0,...,k-1}` followed by the exact sum of `2r+1` old reads and a complete `M=1+(k-1)(2r+1)`-row structural table. The optional Wolfram code uses sum zero as the least-significant base-`k` digit. T01/T02 fixed-lattice assignment and atomic update are reused unchanged.
 
-The six embedded blocks pass: source/evidence closure at 212 cited lines/89 fragments/86 quote lines, exact semantics, `50/60/9` metadata, a 105-link mechanical reverse join with 22 control-only siblings outside, binary radius-two codes `10/20/52`, code-20 survival counts, code-357/code-1329 labels, code-420 additivity, exact code-777/code-867 trajectories, code-`1004600` and its long-run observers, and the 946-cell strict code-777 raster. D115-D118 preserve T04/T05 presets, T06/T07 restrictions/properties, and additive/outer/weighted/histogram/higher-dimensional/continuous/emulation/observer boundaries. Fresh independent review, fences, `git diff --check`, and all 102 repository tests pass; both reopenings are resolved. Next: T04's bounded T06 asset re-audit.
+The six embedded blocks pass: source/evidence closure at 215 cited lines/89 fragments/86 quote lines, exact semantics, `50/61/9` metadata, 72 audited links, a 106-link mechanical reverse join with 22 control-only siblings outside, binary radius-two codes `10/20/52`, code-20 survival counts, code-357/code-1329 labels, code-420 additivity, exact code-777/code-867 trajectories, code-`1004600` and its long-run observers, and the 946-cell strict code-777 raster. D115-D118 preserve T04/T05 presets, T06/T07 restrictions/properties, and additive/outer/weighted/histogram/higher-dimensional/continuous/emulation/observer boundaries. Fresh independent review, fences, `git diff --check`, and all 102 repository tests pass; every reopening is resolved. T04's bounded repair is independently reclosed; next: T06.
 
 ### 23-T04-THREECOLOR-TOTALISTIC
 
-Status: **REOPENED — ASSET REPAIR; ARCHITECTURE COMPLETE** in `goal-1/23-T04-THREECOLOR-TOTALISTIC.md`. T06 found two direct raster links omitted from the claimed exhaustive closure: `BOOK:17431 -> 17433` and `BOOK:2922 -> 2924`. The bounded asset/reverse-join repair is active; preset semantics are unchanged.
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED** in `goal-1/23-T04-THREECOLOR-TOTALISTIC.md`. T06 found omitted direct raster links at `BOOK:17431 -> 17433` and `BOOK:2922 -> 2924`; the bounded audit also inherited the page-263 slice control. The asset/reverse-join repair is complete and preset semantics are unchanged.
 
 #### Big Picture Objective
 
@@ -719,11 +720,11 @@ Apply the common protocol, emphasizing seven sum cases, rule numbering, seeds, a
 
 #### Completion Requirements
 
-Repair the two explicit raster omissions, rerun all embedded/global gates, obtain fresh independent review, and preserve the already-proved preset semantics.
+Completed: repaired all three inherited raster omissions, reran every embedded/global gate, obtained fresh independent review, and preserved the already-proved preset semantics.
 
 #### Stage Result
 
-REOPENED during T06: the former 243-candidate/72-asset audit omitted rasters explicitly governed by already-retained captions at `BOOK:17431` and `BOOK:2922`. Counts, metadata, reverse closure, and independent review are being repaired. The exact `k=3,r=1,A=(0,1,2),nu(i)=i` preset, seven cases, 2,187 codes, D115-D118, and shared executor/update result remain unchanged.
+COMPLETE after bounded T06 repair: 12 queries plus governed follows close 246 candidates in the exact partition `34/53/11/20/54/30/27/17`; 15 evidence groups close 260 cited lines, 92 fragments, and 90 quote lines. The repaired ledger closes 75 assets at `35 included / 34 excluded / 6 relation-only` and 150 exact reverse references, including `BOOK:2924` and `BOOK:2928` as controls and `BOOK:17433` as a relation. All six embedded checks, asset identities, independent review, fences, `git diff --check`, and all 102 repository tests pass. The exact `k=3,r=1,A=(0,1,2),nu(i)=i` preset, seven cases, 2,187 codes, D115-D118, and shared executor/update result remain unchanged. Next: T06.
 
 ### 24-T05-HIGHERCOLOR-TOTALISTIC
 
