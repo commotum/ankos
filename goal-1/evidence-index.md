@@ -55,8 +55,8 @@ Each type stage must make the following auditable:
 | T27 | 28 | Geometric Replacement And Fractal Systems | 27 | `10-T27-GEOMETRIC.md` | COMPLETE | Conservative core regex 46 occurrences/37 lines; expanded alias/observer search 129/88; 18 excerpt groups; all mechanics, original figures, Notes/actual Index/splits, exact and approximate affine rules, overlap/orientation, complex/IFS variants, dimensions, history, limits, observers, and relations dispositioned; 0 unresolved |
 | T28 | 29 | Neighbor-Dependent Two-Dimensional Substitution Systems | 28 | `39-T28-CONTEXTUAL-2D-SUBSTITUTION.md` | PENDING | Not started |
 | T29 | 30 | Network Systems | 29 | `11-T29-NETWORK.md` | COMPLETE | 44 direct occurrences/40 lines; conservative family audit 290/217; expanded graph/network audit 1,278/654; executable-symbol audit 27/19; 27 excerpt groups; all topology/port/path/reroute/create/projection mechanics, figures, Notes/programs, actual Index/splits, exact rules/counts/periods, identity, observers, variants, and relations dispositioned; 0 unresolved parallel mechanics; 1 explicit sequential primary-source limitation |
-| T30 | 31 | Multiway Systems | 30 | `12-T30-MULTIWAY.md` | IN PROGRESS | Literal branching, overlapping matches, exact child merging, deletion/empty layers, figures, Notes/programs, compressed graphs, confluence, variants, and relations under audit |
-| T31 | 32 | Local Constraint Systems | 31 | `13-T31-CONSTRAINTS.md` | PENDING | Not started |
+| T30 | 31 | Multiway Systems | 30 | `12-T30-MULTIWAY.md` | COMPLETE | Exact phrase 267 occurrences/182 lines; broader token 277/186; expanded alias/confluence 388/224; core implementation symbols 18/16; 25 excerpt groups; all literal branching/overlap/one-splice/exact-merge/dead/epsilon/recurrence mechanics, figures, Notes/programs, actual Index/splits, histories, graphs, confluence, variants, and relations dispositioned; 0 unresolved base mechanics |
+| T31 | 32 | Local Constraint Systems | 31 | `13-T31-CONSTRAINTS.md` | IN PROGRESS | Neighbor-count relations, solution-set semantics, periodic models, verification/certificates, search/solver boundary, figures, Notes/Index, variants, and relations under audit |
 | T32 | 33 | Template Constraint Systems | 32 | `40-T32-TEMPLATE-CONSTRAINTS.md` | PENDING | Not started |
 | T33 | 34 | Seeded Template Constraint Systems | 33 | `41-T33-SEEDED-CONSTRAINTS.md` | PENDING | Not started |
 | T34 | 35 | Arithmetic Iteration Systems | 34 | `14-T34-ARITHMETIC.md` | PENDING | Not started |
@@ -75,9 +75,9 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 10 / 45.
+- Type stages complete: 11 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 34 pending, 1 in progress.
+- Type stages unresolved: 33 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
