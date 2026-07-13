@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19 complete, 7 of 45 type stages complete, T20 Symbolic Systems in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20 complete, 8 of 45 type stages complete, T27 Geometric Replacement And Fractal Systems in progress, and Synthesis and Goal 2 Handoff pending.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -74,6 +74,10 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T19 uses program-coupled active-instruction selection and instruction-owned named operand reads. Closed increment/decrement-jump results reuse `Assign`, `TransitionControl`, and `AtomicEffectsUpdate`; no new update algebra, instruction callback, or family rollout is required.
 - T19 reference semantics are event-free absorbing `Quiescent(PastProgramEnd)` with the exact state retained; an explicit `ProgramExitStop` interpretation may instead terminate. The last valid event, reference stutter, optional halt, wrap, horizon, external stop, invalidity, and error remain distinct.
 - T19's counted in-program target profile has `(k(n+1))^n` structured programs and no canonical integer codec. A general positive-target profile permits deliberate past-end exits; seeds remain independent and compressed zero-hit/arithmetic views remain event-derived observers.
+- T20 adds finite rooted ordered expression trees with typed head/argument paths, closed structural pattern/template programs, whole-subexpression bindings, and functional-left-to-right outermost prefix-free source selection.
+- T20 selects greedily but commits every selected disjoint subtree from one old snapshot through new `ParallelPrefixFreeTreeReplace`. Bound subtrees may be duplicated, deleted, or rearranged with occurrence-level lineage; T13 concatenation and T16 single splice remain distinct.
+- T20 exact no-match semantics are event-free absorbing `Quiescent(NoPatternMatch)`; an applicable identity remains `Advanced(changed=false)`. Fixed-point stopping, normalization, cycle detection, confluence, and horizons are separate observers/protocols.
+- T20 has structured Catalan expression counts but no rule codec. Functional/tree/Polish/bracket representations, valuations, depths, and size plots are codecs or observers; combinators and deterministic operator evolution are native profiles, while networks and multiway equations remain T29/T30.
 
 ## Assumptions To Challenge
 
@@ -322,7 +326,7 @@ All 129 direct occurrences on 94 lines, 135 direct/alias occurrences on 95 lines
 
 ### 9-T20-SYMBOLIC
 
-Status: **IN PROGRESS** in `goal-1/9-T20-SYMBOLIC.md`.
+Status: **COMPLETE** in `goal-1/9-T20-SYMBOLIC.md`.
 
 #### Big Picture Objective
 
@@ -336,7 +340,13 @@ Apply the common protocol, comparing tree topology and graph encodings without t
 
 All T20 evidence is captured; pattern and rewrite semantics are explicit; no string-only workaround is accepted without proof of fidelity; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+All 73 exact-name occurrences on 60 lines and the conservative 272-occurrence/166-line direct-and-alias search were dispositioned, together with every caption/figure, Notes, actual Index/split, history, representation, combinator/operator variant, fixed-point, observer, and compiler route. Twenty-four canonical excerpt groups remain after deduplication and zero native-mechanics candidates are unresolved. T20 reconstructs finite ordered expression trees, typed head/argument paths, closed patterns/templates, whole-subtree bindings, ordered outermost prefix-free match selection, inert instantiation, and atomic parallel subtree replacement. It adds `ParallelPrefixFreeTreeReplace` as the fifth update sibling, event-free no-match quiescence, and structural duplication/deletion lineage. Exact t0-t5, head/disjoint/overlap/newborn, invariant and initial-inclusive 264/65,555 timing, Catalan count, S/K, priority, identity, no-match, codec, and provenance oracles close the handoff. T13 lineage and T16 program coupling compose without reusing their update laws; no prior stage was reopened. Next: T27.
+
 ### 10-T27-GEOMETRIC
+
+Status: **IN PROGRESS** in `goal-1/10-T27-GEOMETRIC.md`.
 
 #### Big Picture Objective
 

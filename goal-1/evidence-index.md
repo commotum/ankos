@@ -45,14 +45,14 @@ Each type stage must make the following auditable:
 | T17 | 18 | Tag Systems | 17 | `7-T17-TAG.md` | COMPLETE | 175 direct occurrences on 111 unique lines plus full-prefix/deletion/tail-order, captions/figure, Notes, Index/splits, Post/Wang/cyclic/multiway boundaries, halt/extinction, count, finite-input, and emulation routes dispositioned; 21 excerpt groups; 0 unresolved |
 | T18 | 19 | Cyclic Tag Systems | 18 | `32-T18-CYCLIC-TAG.md` | PENDING | Not started |
 | T19 | 20 | Register Machines | 19 | `8-T19-REGISTER.md` | COMPLETE | 129 direct occurrences on 94 lines and 135 direct/alias occurrences on 95 lines plus mechanics, figures, Notes/official OCR repairs, Index/splits/history, count/control/end/halting, seeds, observers, variants, and emulations dispositioned; 25 excerpt groups; 0 unresolved |
-| T20 | 21 | Symbolic Systems | 20 | `9-T20-SYMBOLIC.md` | IN PROGRESS | Core expression/pattern/scan/overlap mechanics, figures, Notes/Index/splits/history, fixed points, seeds, variants, observers, and emulations under audit |
+| T20 | 21 | Symbolic Systems | 20 | `9-T20-SYMBOLIC.md` | COMPLETE | 73 exact-name occurrences on 60 lines; conservative combined direct/alias search 272 occurrences on 166 lines; 24 excerpt groups; all mechanics, figures, Notes/actual Index/splits, patterns/order/overlap, fixed points, seeds, representations, combinator/operator variants, observers, and emulations dispositioned; 0 unresolved |
 | T21 | 22 | Two-Dimensional Cellular Automata | 21 | `33-T21-2D-CA.md` | PENDING | Not started |
 | T22 | 23 | Moore-Neighborhood Cellular Automata | 22 | `34-T22-MOORE-CA.md` | PENDING | Not started |
 | T23 | 24 | Three-Dimensional Cellular Automata | 23 | `35-T23-3D-CA.md` | PENDING | Not started |
 | T24 | 25 | Higher-Dimensional Lattice Cellular Automata | 24 | `36-T24-HIGHERDIM-CA.md` | PENDING | Not started |
 | T25 | 26 | Two-Dimensional Turing Machines | 25 | `37-T25-2D-TURING.md` | PENDING | Not started |
 | T26 | 27 | Two-Dimensional Substitution Systems | 26 | `38-T26-2D-SUBSTITUTION.md` | PENDING | Not started |
-| T27 | 28 | Geometric Replacement And Fractal Systems | 27 | `10-T27-GEOMETRIC.md` | PENDING | Not started |
+| T27 | 28 | Geometric Replacement And Fractal Systems | 27 | `10-T27-GEOMETRIC.md` | IN PROGRESS | Core geometry/transform/replacement/overlap mechanics, figures, Notes/Index/splits/history, affine/complex/IFS variants, seeds, observers, limits, and relations under audit |
 | T28 | 29 | Neighbor-Dependent Two-Dimensional Substitution Systems | 28 | `39-T28-CONTEXTUAL-2D-SUBSTITUTION.md` | PENDING | Not started |
 | T29 | 30 | Network Systems | 29 | `11-T29-NETWORK.md` | PENDING | Not started |
 | T30 | 31 | Multiway Systems | 30 | `12-T30-MULTIWAY.md` | PENDING | Not started |
@@ -75,9 +75,9 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 7 / 45.
+- Type stages complete: 8 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 37 pending, 1 in progress.
+- Type stages unresolved: 36 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
