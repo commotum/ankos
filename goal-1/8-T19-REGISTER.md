@@ -297,10 +297,10 @@ The counter in snapshot `t` identifies the instruction executed between snapshot
 When `pc > length`, base reference execution returns:
 
 ```text
-Quiescent(
-    reason=PastProgramEnd(pc, length),
-    state=old,                 # exact pc and bank retained
-    instruction_event=None,
+StepResult(
+    successors={old},          # explicit event-free reference stutter
+    outcome=Quiescent(reason=PastProgramEnd(pc, length)),
+    event=None,
 )
 ```
 
@@ -309,7 +309,11 @@ A reference-history sampler may append the unchanged state for every further req
 An explicit episode policy can instead map the same first exhaustion observation to:
 
 ```text
-Terminal(reason=ProgramExit, final_state=old)
+StepResult(
+    successors={},
+    outcome=Terminal(reason=ProgramExit),
+    event=None,
+)
 ```
 
 and retain the final state once with zero further successors. This policy is appropriate for the Notes' optional halt analysis and practical-program view. It is not a boolean inside `RegisterProgram`, an implicit wrap policy, or a second executor.

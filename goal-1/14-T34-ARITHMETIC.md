@@ -23,7 +23,7 @@ The evidence/search closure and conformance fixtures remain valid. T34 is a `t+0
 
 ## Updated Assumptions
 
-- Exact integer/rational arithmetic is semantic in the strict profiles. Finite-precision and arbitrary exact-real behavior are separate typed domains and never silent implementation modes.
+- Exact integer/rational arithmetic is semantic in the strict profiles. Finite-precision and arbitrary exact-real behavior are separate typed carriers/profiles and never silent implementation modes.
 - Public arithmetic updates are the closed structural sum `AddConstant | MultiplyConstant`, not unrestricted host-language callbacks or a generic affine/expression AST.
 - Typed state identity is carrier-tagged; cross-carrier numeric equivalence is an observer. Program identity is structural, so extensionally identical `Add(0)` and `Multiply(1)` remain distinct.
 - State-sequence equality, full trace identity, and visual equality are different relations.
@@ -34,7 +34,7 @@ The evidence/search closure and conformance fixtures remain valid. T34 is a `t+0
 
 ## Big Picture Objective
 
-Reconstruct arithmetic iteration as a native scalar transition construction. Pin down number domains, closed operations, seeds, exactness, successor and outcome semantics, trajectory representation, digit/value renderings, canonical examples, termination and cycle observations, relations to piecewise maps and other scalar systems, and the smallest honest extension of the shared runtime.
+Reconstruct arithmetic iteration as a native scalar transition construction. Pin down numeric value carriers, closed operations, seeds, exactness, successor and outcome semantics, trajectory representation, digit/value renderings, canonical examples, termination and cycle observations, relations to piecewise maps and other scalar systems, and the smallest honest extension of the shared runtime.
 
 ## Catalog Identity
 
@@ -45,7 +45,7 @@ Reconstruct arithmetic iteration as a native scalar transition construction. Pin
 - Native Notes: `BOOK:12538-12597`; the T35 implementation begins at `12598`. Supporting relations are grouped in E09-E31 below.
 - Entry kind: deterministic unary scalar transition construction with a fixed closed arithmetic operation.
 - Strict profiles: constant addition over exact integers; constant multiplication over exact integers; exact rational multiplication by `3/2`.
-- Explicit sibling/relation: finite residue-ring `MultiplyMod`; certified-real/declared-precision domains are constrained extensions rather than strict presets.
+- Explicit sibling/relation: finite residue-ring `MultiplyMod`; certified-real/declared-precision carriers are constrained extensions rather than strict presets.
 - Aliases/vocabulary: elementary arithmetic, arithmetic process, systems based on numbers, add/addition/successive numbers/binary counter, multiply/multiplication/powers, `2`, `3`, `3/2`, integer/rational/real, digit sequence/base/radix/carry, fractional part/size/length/leading digit, `IntegerDigits`, `Mod`, linear congruential, repeated squaring/power CA, locality/nonlocality, exactness/precision, and the neighboring names dispositioned below.
 
 ## Search Log
@@ -251,7 +251,7 @@ step(MultiplyConstant(c), x) = x * c
 
 The operation is the same at every event. `c`, the old value, and the result must all belong to the declared value schema. There is no implicit modulus, truncation, saturation, rounding, base conversion, conditional branch, or change of constant.
 
-### Scalar domains and exactness
+### Scalar value schemas and exactness
 
 The strict book presets use exact integers and rationals:
 
@@ -505,7 +505,7 @@ This is exactly `(3^200 mod 2^200)/2^200`, approximately `0.187461128806`; using
 - Fixed addition and fixed multiplication over exact integers/rationals are the strict evidenced core.
 - Seed `1`, addends `1..8`, multipliers `2`, `3`, and `3/2`, and base-2 observations are canonical presets, not hard-coded executor branches.
 - Other exact seeds/constants, including zero and negative values, are a principled closure of the same total operations when the declared value schema is closed under them.
-- Certified exact-real and declared finite-precision real domains are separate scalar profiles. They share the unary event shape only when their arithmetic/equality contracts are explicit.
+- Certified exact-real and declared finite-precision real carriers are separate scalar profiles. They share the unary event shape only when their arithmetic/equality contracts are explicit.
 - Fractional part, digit length/count/frequency, leading digits, residues, and numeric/log-size plots are observers.
 - Negative bases, non-power positional systems, and multiplicative digit decompositions are alternative representation schemes. They do not change an addition or multiplication program.
 

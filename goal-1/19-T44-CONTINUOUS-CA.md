@@ -19,7 +19,7 @@ The evidence/search closure and conformance fixtures remain valid. T44 has a dis
 - A single black cell on white background is the strict seed. Program, initial field, boundary/realization, requested horizon, numerical profile, and rendering remain separate.
 - Notes implementation maps a scalar function over `(RotateLeft[list]+list+RotateRight[list])/3` and uses `NestList`, directly supporting old-snapshot averaging, simultaneous assignment, and initial-inclusive traces.
 - `RotateLeft`/`RotateRight` implements a finite periodic-list realization. The ordinary integer line with a finite observation crop is the best strict-main interpretation from T01 context and the point-seed causal cone, but global topology is not explicit in the strict prose and the inference remains labeled.
-- T01 already establishes fixed-lattice all-site old-snapshot reads and atomic parallel assignment. T44 appears to reuse that public update law with exact/declared real values, a closed aggregate-plus-map rule, and a new continuous value carrier; no new update law is presumed.
+- T01 already establishes fixed-lattice all-site old-snapshot reads and atomic parallel writes. T44 directly reuses that UPDATE with exact/declared real values, a closed aggregate-plus-map RULE, and a continuous value carrier; no construction-specific assignment or executor is presumed.
 - T43 supplies reusable scalar map-expression and numerical-realization responsibilities, but T44 is not a packed collection of independent T43 states: every new cell value depends on a neighborhood aggregate.
 - Native Notes state that exact rationals are essential for detailed profiles: ordinary 64-bit double precision makes the lower page-157 pattern qualitatively wrong and nearly every page-160 parameter panel wrong. Numerical realization therefore affects feedback semantics over the whole field.
 - The strict source exposes a potential two-level realization identity: the ideal exact field construction and a fully declared finite-arithmetic field recurrence. T43's ideal/tracked/fixed distinction must be lifted without conflating cell values, computation work state, or rendered gray levels.
@@ -44,7 +44,7 @@ The evidence/search closure and conformance fixtures remain valid. T44 has a dis
 - A complete run with `h` events has `h+1` field snapshots. Compact events may reconstruct fields, but a bitmap/float tensor is not the semantic codec.
 - Exact field equality, realized-field equality, translational equivalence, observer equality, and visual equality are distinct.
 - Parameter-family scans execute separately identified rules/runs. The parameter coordinate is not hidden control and a gallery is not one evolving field.
-- Additive, coupled-map, stochastic, PDE-limit, higher-dimensional, alternate-neighborhood, affine-weighted, and asynchronous profiles are admitted only to the extent supported by evidence.
+- Additive, evidenced deterministic coupled-map, higher-dimensional, alternate-neighborhood, and affine-weighted profiles are admitted only to the extent supported by evidence. Stochastic/noisy, block, PDE-limit, and asynchronous cases remain typed evidence boundaries until their execution semantics are independently established.
 
 ## Big Picture Objective
 
@@ -551,7 +551,7 @@ X_{t+1}     = AtomicEffectsUpdate(X_t, {result_i for every i})
 
 Every read uses the same complete old snapshot. New values never affect another site in the same event. The physical offsets remain ordered even when the strict aggregate is permutation invariant. Exact ideal addition is canonical mathematics; host reduction trees, fused operations, and intermediate rounding belong only to a represented realization.
 
-T44 reuses T01's `AllSites`, same-site `Assign`, and atomic parallel fixed-field commit without changing their meaning. It adds no eleventh update law. The new semantic capability is an exact affine neighborhood aggregate followed by a closed scalar expression. T43's expression/primitive/range-validation responsibilities compose, but its `IteratedMapSpec` does not: T44 feeds a neighborhood aggregate into the expression and commits a whole field.
+T44 reuses T01's `AllSites`, same-site writes, and atomic parallel fixed-field UPDATE without changing their meaning. The added RULE capability is an exact affine neighborhood aggregate followed by a closed scalar expression; it is not another executor or numbered law. T43's expression/primitive/range-validation responsibilities compose, but its map preset does not: T44 feeds a neighborhood aggregate into the expression and commits a whole field.
 
 Strict closure validates the complete composition
 
@@ -574,7 +574,7 @@ Four numerical categories remain distinct:
 
 A represented field-transition identity records radix/format, literal conversion, reduction tree, intermediate and assignment rounding locations, division behavior, `FractionalPart`/comparison implementation, subnormal/nonfinite/overflow policy, evaluator version, and replayable represented-closure evidence. Because every represented result feeds the next neighborhood read, these choices are transition semantics, not rendering context.
 
-If any required local evaluation fails, an atomic event commits no site. A partial or numerical sibling returns a typed outside-domain, uncertain-guard, nonfinite, resource, interruption, or backend outcome with the last complete field. Abstract infinite-field equality must not invent a global `changed` boolean; equality-decidable finite/compact presentations may report `Advanced(changed=...)`.
+If any required local evaluation fails, an atomic event commits no site. A partial or numerical profile returns a typed outside-value-space, uncertain-guard, nonfinite, resource, interruption, or backend outcome with the last complete field. Abstract infinite-field equality must not invent a global `changed` boolean; equality-decidable finite/compact presentations may report `Advanced(changed=...)`.
 
 ### Successors, traces, equality, and codecs
 
@@ -1071,7 +1071,7 @@ Page 339 Figure 1 is explicitly excluded: it is discrete ECA rule 30 with varyin
 - **Boiling:** mean plus heating with latent-heat interpretation. Literal threshold-conditional and unconditional strict-family reconstruction agree except at exact one and share the executor, but remain different closed rule identities until evidence resolves the equality convention.
 - **Additive Pascal:** `Mod[L+R,1]`, excluding center and divisor. It can share fixed-field execution and closed arithmetic but is a distinct local-rule constructor.
 - **Coupled-map/lattice-dynamical systems:** broader closed combinations plus closed scalar maps such as logistic. The historical alias does not make all combinations strict presets.
-- **Noisy rule analogs:** a stochastic real-field sibling with closed lambda/rule expressions and explicit draws. After draws are resolved it uses the same parallel assignment commit; stochasticity is not roundoff.
+- **Noisy rule analogs:** the source supplies stochastic real-field expressions, but the current architecture does not admit execution until a probability-bearing successor measure or explicit replayable draw inputs/state is specified. Stochasticity is not roundoff, and an unweighted successor set is insufficient.
 - **Complex unitary block CA:** complex amplitudes and pair-block unitary update. This needs the later block-CA update evidence and cannot be packed into scalar gray state.
 
 ### Stochastic profile boundary
@@ -1092,7 +1092,7 @@ The legacy Wolfram `Random[]` primitive fixes `U`'s marginal as a uniformly dist
 - **T01:** directly supplies fixed 1D support responsibilities, ordered old reads, `AllSites`, same-site assignment, parallel commit, causal halos, and support/realization/crop separation.
 - **T03/T04/T05 and totalistic CA:** finite discrete totalistic tables may share an aggregation responsibility but not continuous value/range/numeric semantics. Later evidence owns their exact restrictions.
 - **T34:** shares exact numeric values and assignment-effect responsibility, not spatial fields.
-- **T41:** shares closed expression, primitive, exact/declared value, domain, and evaluator records. A pure function query is not field evolution.
+- **T41:** shares closed expression, primitive, exact/declared value, definition-set, and evaluator records. A pure function query is not field evolution.
 - **T43:** shares scalar expression and fixed-feedback numerical discipline. T44 is not a vector of independent iterated maps; each output reads neighboring cells.
 - **T45:** owns continuous space/time, derivatives, initial/boundary conditions, solution concepts, solvers, and integration. Finite-difference schemes and continuum limits are typed relations, not identity.
 - **Block CA:** the complex unitary variant updates pairs and awaits the block construction's own phase/schedule evidence.
@@ -1103,7 +1103,7 @@ The legacy Wolfram `Random[]` primitive fixes `U`'s marginal as a uniformly dist
 
 T44 is a discrete `t+1D` fixed-lattice SimpleProgram with continuous-valued labels. It reuses T01's all-site FRONTIER, local old-snapshot NEIGHBORHOOD, and parallel UPDATE; aggregate-then-map is a factorized closed RULETYPE. Value continuity does not make DOMAIN continuous, and deterministic weighted/additive/coupled/boiling profiles are typed rule presets rather than construction classes.
 
-Revised G2-T44 generalizes field ALPHABET/numeric profiles and local RULE forms through the CA preset/runner, retaining exact/represented feedback, support/realization, observer, asset, and raster oracles. Stochastic draws and block schedules remain explicit RULE/UPDATE-axis data; PDEs remain declarative relations.
+Revised G2-T44 generalizes field ALPHABET/numeric profiles and deterministic local RULE forms through the CA preset/runner, retaining exact/represented feedback, support/realization, observer, asset, and raster oracles. Stochastic/noisy execution remains unresolved until probability-bearing successors or replayable draw-input semantics are established; block execution remains unresolved until its phase/schedule evidence is complete. PDEs remain declarative relations.
 
 ## Historical Current API Fit (Superseded on DOMAIN/class wording)
 
@@ -1163,13 +1163,13 @@ The strict global topology, random-field law, difference convention, fixed machi
 
 1. No prior primitive is invalidated. T44 confirms T01's fixed-lattice commit and T43's numerical-feedback split while showing that a scalar map's input may be an aggregate outside its own state interval.
 2. `AllSites`, ordered reads, `Assign`, `AtomicEffectsUpdate`, total default fields, causal halos, exact values, closed expressions, and primitive/version responsibilities are reused without reinterpretation.
-3. No exception flag, hidden periodic edge, field pack, callback, or type-specific rollout is introduced. Weighted, additive, stochastic, coupled, and block profiles are closed tagged siblings.
-4. The total field plus immutable rule/realization contains everything needed to advance; time, history, parameter index, draws, and views remain trace/run data. A stochastic state transition additionally consumes an explicit event draw record.
+3. No exception flag, hidden periodic edge, field pack, callback, or type-specific rollout is introduced. Deterministic weighted, additive, and evidenced coupled profiles are closed RULE presets; stochastic/noisy and block profiles remain typed evidence boundaries rather than admitted execution siblings.
+4. The deterministic total field plus immutable rule/realization contains everything needed to advance; time, history, parameter index, and views remain trace/run data. Future stochastic admission must define probability-bearing successors or explicit replayable draw inputs/state before draws can participate.
 5. Support, topology, values, control absence, representation, finite work window, and rendering remain separate.
 6. Neighborhood aggregation/map evaluation/parallel commit are defining mechanics. Parameter scanning, class analysis, difference rendering, finite differences, and PDE solvers are correctly separated.
 7. Tagged exact/declared/represented values, total-field codecs, rule syntax, boundaries, events, draws, and observers preserve every evidenced distinction.
 8. No completed stage reopens. T01/T34/T41/T43 compose at existing responsibilities; T45 and block evidence remain pending.
-9. Goal 2 gains shared continuous-field, local-numeric-rule, field-realization, run, stochastic-source, analysis, preset, and view work. The exact-real/backend synthesis question remains open.
+9. Goal 2 gains shared continuous-field, deterministic local-numeric-rule, field-realization, run, analysis, preset, and view work. Stochastic-source and block-schedule implementation are deferred; the exact-real/backend synthesis question remains open.
 10. The API becomes more coherent by expressing T44 as ordinary fixed-field assignment with a typed local numeric program. A T44 family branch or finite float alphabet would be less coherent and is rejected.
 
 ## Historical Detailed Implementation Plan (Superseded on architecture wording)

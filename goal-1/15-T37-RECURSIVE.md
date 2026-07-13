@@ -183,7 +183,7 @@ NumericPrefix(V, o, (v_0, ..., v_(m-1)))
 
 where `m>0`, every `v_i` is canonical in `V`, and tuple position `i` denotes the stable term index `o+i`. The support is the consecutive integer interval `[o,o+m-1]`; it grows only at its high endpoint. There is no spatial boundary, fill value, control state, cursor, hidden clock, or mutable program.
 
-Prefix equality includes the value-schema tag, absolute origin, length, and every ordered exact term. Two equal last-lag windows or equal newest values do not make prefixes equal. The complete run configuration also includes the immutable program; two configurations may share a state value while having different future behavior.
+Prefix equality includes the value-schema tag, absolute origin, length, and every ordered exact term. Two equal last-lag windows or equal newest values do not make prefixes equal. The evolving CONFIGURATION is the prefix alone; run identity separately pairs it with the immutable program. Two runs may therefore start from equal configurations while their different programs give different futures.
 
 ### Strict recurrence program
 
@@ -396,7 +396,7 @@ Characteristic equations, generating functions, matrix powers, memoization, shif
 | T17 tag systems | an old suffix may persist and new values appear at the tail | a positive prefix is consumed; queue prefix tables and insufficient-prefix termination differ |
 | T19 register machines | exact integer values and program/value separation | finite named bank, control address, instruction branches, and assignment effects |
 | T30 multiway systems | exact structured traces and provenance | set-valued branch layers and exact child merge, not one deterministic numeric append |
-| T34 arithmetic iteration | exact scalar domains; rows (a)/(c) share newest-value streams | T34 overwrites one scalar and has no retained indexed prefix/dependency references |
+| T34 arithmetic iteration | exact scalar carriers; rows (a)/(c) share newest-value streams | T34 overwrites one scalar and has no retained indexed prefix/dependency references |
 | T35 piecewise integer maps | exact scalar arithmetic | predicate-selected arms over one scalar, not fixed-lag prefix reads |
 | T36 digit-reversal arithmetic | exact integer terms and digit observers | representation base/digit transformation feeds back into one scalar update |
 | T38 variable-index recursion | exact prefix, append result/update, term references | dependency addresses are computed from term values and can be invalid at runtime |

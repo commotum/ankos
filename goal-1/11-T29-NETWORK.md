@@ -374,10 +374,10 @@ Consequently, after a raw successor disconnects vertices from the root, no futur
 Every valid strict graph/program pair returns:
 
 ```text
-Advanced(
-    state = retained_rooted_port_graph,
-    changed = not Isomorphic(old, retained),
-    event = NetworkRewriteEvent(...)
+StepResult(
+    successors = {retained_rooted_port_graph},
+    outcome = Advanced(changed = not Isomorphic(old, retained)),
+    event = NetworkRewriteEvent(...),
 )
 ```
 

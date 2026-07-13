@@ -38,11 +38,11 @@ The evidence/search closure and conformance fixtures remain valid. Pose products
 - The affine profile and nonlinear branched-point profile share only typed all-occurrence expansion and bag union. A generic transform callback would erase their distinct value/evaluation algebras.
 - The Notes center recurrence is a differential oracle for canonical snapshots up to reference ordering/path reversal. It is not the production state contract.
 - Overlap, intersection area, union, occlusion, antialiasing, viewport, and crop are observations. No overlap query is needed to advance.
-- Nonempty canonical programs always advance and have no intrinsic halt. Requested depth/horizon, analytical convergence, rendering cutoff, invalid point-map/domain data, numeric failure, and cancellation remain distinct.
+- Nonempty canonical programs always advance and have no intrinsic halt. Requested depth/horizon, analytical convergence, rendering cutoff, invalid point-map/value-schema data, numeric failure, and cancellation remain distinct.
 
 ## Big Picture Objective
 
-Reconstruct geometric replacement/fractal systems as native finite-generation geometry: placed primitive occurrences, exact/declared numeric domains, parent-local transform composition, all-occurrence source coverage, multiplicity-preserving commit, overlap independence, seeds, variants, and limit observations. Determine the smallest honest reuse beyond T13/T20 while excluding lattice/raster packing, transform callbacks, hidden scene engines, float tolerance, fixed canvases, random IFS shortcuts, and family dispatch.
+Reconstruct geometric replacement/fractal systems as native finite-generation geometry: placed primitive occurrences, exact/declared numeric carriers, parent-local transform composition, all-occurrence source coverage, multiplicity-preserving commit, overlap independence, seeds, variants, and limit observations. Determine the smallest honest reuse beyond T13/T20 while excluding lattice/raster packing, transform callbacks, hidden scene engines, float tolerance, fixed canvases, random IFS shortcuts, and family dispatch.
 
 ## Catalog Identity
 
@@ -167,12 +167,12 @@ Reconstruct geometric replacement/fractal systems as native finite-generation ge
 
 ## Construction Model
 
-### Scalar domains, affine space, and placed state
+### Scalar value schemas, affine space, and placed state
 
 The exact core needs rational affine geometry, not raster coordinates:
 
 ```text
-ScalarDomain =
+ScalarValueSchema =
     ExactRational
   | ExactAlgebraic
   | DeclaredFinitePrecision(precision, rounding, literal_provenance)
@@ -224,7 +224,7 @@ GeometricReplacementRow = {
 
 GeometricReplacementProgram = {
     dimension,
-    scalar_domain,
+    scalar_schema,
     prototypes,
     total_rows: PrototypeId -> GeometricReplacementRow
 }
@@ -240,7 +240,7 @@ The main-square profile validates:
 - finite, compatible, nonsingular similarity poses;
 - an explicit contraction certificate when a bounded fractal limit is claimed.
 
-Finite stepping does not require contraction. The general affine profile admits reflection, skew, and higher dimension with its own validator. Missing rows, duplicate slot IDs, mixed scalar domains/dimensions, NaN/infinity in finite-precision profiles, malformed matrices, and undeclared prototypes are invalid before execution.
+Finite stepping does not require contraction. The general affine profile admits reflection, skew, and higher dimension with its own validator. Missing rows, duplicate slot IDs, mixed scalar schemas/dimensions, NaN/infinity in finite-precision profiles, malformed matrices, and undeclared prototypes are invalid before execution.
 
 ### Source, self read, and parent-local result
 
@@ -277,14 +277,14 @@ ReplaceGeometricOccurrence = {
 }
 ```
 
-The result cannot contain an arbitrary world-coordinate callback or pre-rendered geometry. Composition is a visible typed calculation under the declared scalar domain.
+The result cannot contain an arbitrary world-coordinate callback or pre-rendered geometry. Composition is a visible typed calculation under the declared scalar value schema.
 
 ### Multiplicity-preserving bag UPDATE
 
 `ParallelOccurrenceBagReplace` commits one full generation:
 
 1. Validate one result for every and only old occurrence token, all against the same snapshot.
-2. Validate exact source/read values, the authoritative total row, unique declared child slots, and domain/dimension/prototype compatibility.
+2. Validate exact source/read values, the authoritative total row, unique declared child slots, and value-schema/dimension/prototype compatibility.
 3. Consume every parent.
 4. Create one child occurrence per slot using `parent_pose∘local_pose`.
 5. Bag-union every child, preserving multiplicity and emitting parent/slot lineage.
@@ -309,12 +309,16 @@ step(spec, old_nonempty_bag):
     reads = GeometricSelfRead(old, sources)
     results = total_local_row_lookup_and_compose(spec.program, reads)
     next, event = ParallelOccurrenceBagReplace(old, results)
-    return Advanced(next, event, changed=(next != old))
+    return StepResult(
+        successors={next},
+        outcome=Advanced(changed=(next != old)),
+        event=event,
+    )
 ```
 
 Every strict canonical event has one deterministic successor. With at least two children per row, a nonempty state remains nonempty and cardinality grows, so no no-match, exhaustion, boundary, or intrinsic halt exists. A one-child identity row in the broader affine profile is still an applicable event even if the bag is equal.
 
-Episode depth, cancellation, resource exhaustion, invalid program/domain, arithmetic failure, and rendering cutoff are explicit non-semantic outcomes. The closed point profile below totalizes poles and algebraic branch points over the Riemann sphere; a profile that instead chooses typed domain errors must declare that different contract rather than emit host NaNs. Convergence to a limiting set is never emitted as a final infinite state.
+Episode depth, cancellation, resource exhaustion, invalid program/value schema, arithmetic failure, and rendering cutoff are explicit non-semantic outcomes. The closed point profile below totalizes poles and algebraic branch points over the Riemann sphere; a profile that instead chooses typed definition-set errors must declare that different contract rather than emit host NaNs. Convergence to a limiting set is never emitted as a final infinite state.
 
 ### Overlap, multiplicity, and provenance
 
@@ -406,7 +410,7 @@ Further mandatory oracles:
 - two identical half-scale slots produce coincident multiplicities 2 then 4, never one;
 - permuting source materialization/reference order leaves semantic successor equality unchanged;
 - every parent fires exactly once, newborns wait, and provenance reconstructs the bag;
-- exact rational serialization round-trips; mixed domain/dimension, undeclared prototype, malformed/nonfinite values, missing/duplicate sources, and altered row children reject.
+- exact rational serialization round-trips; mixed value-schema/dimension, undeclared prototype, malformed/nonfinite values, missing/duplicate sources, and altered row children reject.
 
 Page-191(a-c) use the printed formula data; several literals are approximate. Page-191(d)'s recovered diagram has three children. Its source geometry may be tested directly, but no numeric rule is fabricated from the Markdown caption alone.
 
@@ -426,14 +430,14 @@ PointMap =
 BranchedPointProgram = NonEmptyFiniteMap[MapSlotId, PointMap]
 ```
 
-Every old point emits one occurrence for an affine or Möbius slot and both algebraic solutions `+sqrt(z-c)` and `-sqrt(z-c)` for an inverse-square-root slot, then commits through the same `ParallelOccurrenceBagReplace`. At `z=c`, the two branch occurrences are coincident zeros and multiplicity remains two; at infinity they are coincident infinities with multiplicity two. Möbius poles map to infinity. The principal-root choice, if used for deterministic trace enumeration, only labels the two result subslots and does not change their semantic bag. Map ASTs, exact-algebraic coefficient domains, map/result slot identities, and Riemann-sphere behavior are explicit. A declared finite-precision point profile is separate. Arbitrary algebraic functions, host complex callbacks, host NaNs, and silently dropped pole/branch results are forbidden.
+Every old point emits one occurrence for an affine or Möbius slot and both algebraic solutions `+sqrt(z-c)` and `-sqrt(z-c)` for an inverse-square-root slot, then commits through the same `ParallelOccurrenceBagReplace`. At `z=c`, the two branch occurrences are coincident zeros and multiplicity remains two; at infinity they are coincident infinities with multiplicity two. Möbius poles map to infinity. The principal-root choice, if used for deterministic trace enumeration, only labels the two result subslots and does not change their semantic bag. Map ASTs, exact-algebraic coefficient carriers, map/result slot identities, and Riemann-sphere behavior are explicit. A declared finite-precision point profile is separate. Arbitrary algebraic functions, host complex callbacks, host NaNs, and silently dropped pole/branch results are forbidden.
 
 The Julia inverse-branch construction is native to this profile. Mandelbrot parameter filtering, ordinary one-orbit iterated maps, and stochastic chaos-game sampling are separate analyses/constructions.
 
 ### Representations, limits, and observers
 
 - `ComplexSimilarityCodec` is bijective only for oriented 2D similarities; reflection/skew require matrices.
-- `CenterProjection` is lossy for general affine state; a center+branch-word codec round-trips only on its declared homogeneous singleton-seed domain.
+- `CenterProjection` is lossy for general affine state; a center+branch-word codec round-trips only on its declared homogeneous singleton-seed image.
 - Reference parent-major/slot order is a trace codec, not support topology.
 - Transformed polygons, paths, complex digits, branch words, scene graphs, overlap graphs, unions, rasters, bounding boxes, and cropped images are views/codecs.
 - The 3D stack uses generation as a display axis; time is not a geometric coordinate.

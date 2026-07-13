@@ -12,27 +12,27 @@ The evidence/search closure and conformance fixtures remain valid. T43 and T34 s
 - Canonical strict main `Iterated Maps and the Chaos Phenomenon` is `BOOK:1868-1946`; T44 begins cleanly at `1948`. The clean chapter duplicate is `CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:327-403`, with its separating blank line at 404.
 - Native Notes are `BOOK:13215-13280`; T44 Notes begin at `13281`. The useful line-oriented duplicate is misleadingly stored at `BACK-MATTER/Index/Index.md:1118-1183`. The actual Index begins at `BOOK:20826`.
 - The source defines a genuine transition: one number is repeatedly updated by one fixed rule that maps every admissible scalar back into the declared interval. Unlike T41 point evaluation, each result becomes the next event's state.
-- Strict state is one domain-tagged real scalar. The map definition, initial value, execution profile, requested horizon, trace, and observations are separate records; orbit history is not hidden in state.
+- Strict state is one value-schema-tagged real scalar on a `t+0D` task space. The map definition, initial value, execution profile, requested horizon, trace, and observations are separate records; orbit history is not hidden in state.
 - The page-165 raster fixes an association lost by extraction: `(a)` `FractionalPart[3x/2]`; `(b)` `If[x<1/2,3x/2,3(1-x)/2]`; `(c)` `FractionalPart[3x/4]`; `(d)` `FractionalPart[2x]`. The detached text lists them in `(c),(d),(b),(a)` order without labels.
 - The strict initial values are exact `1/2` and `Pi/4`. With seed `1/2`, cases `(a)` and `(b)` produce complicated rational orbits, `(c)` decreases geometrically, and `(d)` reaches exact zero after one update. With `Pi/4`, `(d)` shifts the exact binary expansion rather than generating new random information.
 - The page-165 digit grids contain exactly 40 binary columns and 81 initial-inclusive rows, hence 80 committed events. Independent exact-rational pixel classification matches all 12,960 cells; panel black-cell counts are `1176,1255,758,1`.
 - The exact page-165 prefixes are `(a)` `1/2,3/4,1/8,3/16,9/32,...`; `(b)` `1/2,3/4,3/8,9/16,21/32,...`; `(c)` `1/2,3/8,9/32,27/128,81/512,...`; `(d)` `1/2,0,0,...`.
 - Case `(c)` has exact orbit `x_t=(1/2)(3/4)^t`. Case `(a)` has reduced denominator `2^(t+1)` at event time `t` and cannot repeat. The latter is also a counterexample to a supporting Notes claim that rational `a` and rational seed always yield repetition under `Mod[ax,1]`.
-- Map-plot vertical strokes at the visible interior discontinuities `x=2/3` for `(a)` and `x=1/2` for `(d)` are renderer joins. They do not make the scalar state multivalued. On the chosen closed domain `(d)` also has a one-sided endpoint discontinuity at `x=1`. A mathematical discontinuity is not an undefined transition.
+- Map-plot vertical strokes at the visible interior discontinuities `x=2/3` for `(a)` and `x=1/2` for `(d)` are renderer joins. They do not make the scalar state multivalued. On the chosen closed state interval `(d)` also has a one-sided endpoint discontinuity at `x=1`. A mathematical discontinuity is not an undefined transition.
 - The `_page_166_Figure_2.jpeg` extraction is only a caption crop. The second strict `Pi/4` plate is absent as a complete raster even though its formulas, prose, and initial condition survive.
 - Page 168 compares the exact shift-map seed `Pi/4` with a value differing by `10^-18`; page 170 compares the four corresponding digit differences. Cases `(a)`, `(b)`, and `(d)` are sensitive; contraction `(c)` is not.
 - Strict visualizations are digit rows, scalar-value plots, map graphs, two-orbit differences, and digit-difference rows. They are downstream views, not numeric state, transition effects, or proofs of randomness.
-- T34 already established unary scalar state, complete old-value read, typed scalar assignment, and the fixed-effects atomic update law. T43 reuses that law with a richer exact/declared-real carrier and a closed map expression; it adds no eleventh update law.
+- T34 already established unary scalar state, complete old-value read, typed same-locus writes, and atomic UPDATE. T43 directly reuses those axes with a richer exact/declared-real carrier and a closed map expression; it adds no construction-specific assignment or executor.
 - A strict verified self-map has exactly one successor for every event, including a fixed-point/identity event reported as `Advanced(changed=false)`. It has no native halt, spatial boundary, or legitimate escape.
 - `h` requested events produce `h+1` snapshots. `NestList` supplies independent source support for this initial-inclusive convention. Fixed points, exact cycles, convergence, attractors, and analysis cutoffs do not stop native execution.
 - The closed map syntax reuses compatible T41 ordered expression nodes and adds state references, exact comparisons, ordered `Piecewise`, and `FractionalPart`. Formula strings, callbacks, host CAS expressions, lookup rasters, and primitive reflection are not map definitions.
-- Source-spelled `FractionalPart(y)` is a mathematical primitive, not a boundary-wrap policy. Wolfram semantics are `y-IntegerPart(y)`, with truncation toward zero; on every nonnegative strict-map argument this equals `y-floor(y)` and `Mod[y,1]`. Its values at integers and the tent map's cusp are defined; negative-domain `FractionalPart` and modulo-one remain distinct.
+- Source-spelled `FractionalPart(y)` is a mathematical primitive, not a boundary-wrap policy. Wolfram semantics are `y-IntegerPart(y)`, with truncation toward zero; on every nonnegative strict-map argument this equals `y-floor(y)` and `Mod[y,1]`. Its values at integers and the tent map's cusp are defined; for negative arguments, `FractionalPart` and modulo-one remain distinct.
 - Mathematical exact evolution, certified enclosure computation, tracked-significance computation, and a fixed-precision rounded recurrence are different profiles. Fixed rounded results feed back into later events and therefore define a different effective dynamical system, not a transparent observation context.
 - Native Notes explicitly distinguish roughly 53-bit computer storage, tracked arbitrary precision with progressively fewer reliable digits, fixed binary fill that drives the shift map to zero, and fixed decimal calculator arithmetic that yields another eventually periodic process.
-- Structural map identity, certified equality as functions on a domain, conjugacy/semiconjugacy, exact orbit equality, and equality of one numerical observation are different relations. Logistic `a=4` and the doubling map are related by `x=Sin[Pi u]^2`; they are not structurally identical programs.
+- Structural map identity, certified equality as functions on a declared definition set, conjugacy/semiconjugacy, exact orbit equality, and equality of one numerical observation are different relations. Logistic `a=4` and the doubling map are related by `x=Sin[Pi u]^2`; they are not structurally identical programs.
 - Digit views declare base, width/crop, blank-versus-zero policy, and the terminating convention for dyadics. Cycle queries use replay-safe profile equality—canonical exact values for ideal runs and represented-state identity/congruence for fixed realizations—never tolerance or a native halt.
 - Sensitivity comparison, finite-time/asymptotic Lyapunov analysis, attractor analysis, bifurcation/parameter sweeps, periodic-point solving, symbolic dynamics, rendering, and fast-forward formulas are typed observers or solvers. Native T43 Notes mention Lyapunov exponents but not attractors or bifurcations; the latter receive only supported extension status.
-- Notes add the logistic, Gauss, Newton/rational-complex, tent, and fixed-vector Anosov profiles. Strict scalar conformance stays primary; partial domains, complex state, and vector/torus state are explicit sibling profiles rather than flags on one scalar callback.
+- Notes add the logistic, Gauss, Newton/rational-complex, tent, and fixed-vector Anosov profiles. Strict scalar conformance stays primary; partial definition sets, complex state, and vector/torus state are explicit tagged profiles rather than flags on one scalar callback.
 - The Anosov Notes sentence is coherent only when its second “rational numbers” means nonintegral rational matrix entries: an integer matrix preserves a finite denominator class modulo one, while nonintegral rational entries can grow denominators. It must not be silently “corrected” to irrational.
 - Eight strict image links and three native-Notes image links were found. The monolith's bare links are broken relative paths; clean split directories resolve the assets. Canonical text provenance and split-asset provenance therefore remain separate.
 - Current rank-zero rollout is fixed-width NumPy/family-dispatched and limited to finite alphabets and modular integer AR2. It has no inspectable real-map AST, exact/algebraic/interval carrier, precision realization, invariant proof, or digit-sensitive conformance path.
@@ -47,9 +47,9 @@ The evidence/search closure and conformance fixtures remain valid. T43 and T34 s
 - A general expression's self-map property is not decidable by declaration. Strict admission requires a known constructor with mechanically checked range or a replayable proof/certificate. An unverified expression remains explicitly partial.
 - Exact integers, reduced rationals, named constants, algebraic expressions, certified exact reals, declared-precision decimals, enclosures, and represented-format values remain distinct. JSON binary floats never carry exact seeds or parameters.
 - Strict evaluation uses exact comparison/refinement or a typed failure. It never picks an arbitrary piecewise arm when an enclosure straddles a guard.
-- A discontinuity is ordinary defined behavior. Only a pole, missing branch, outside definition domain, undecidable exact guard, unsupported primitive, exhausted precision/resource, or backend failure produces an undefined/evaluation result.
+- A discontinuity is ordinary defined behavior. Only a pole, missing branch, value outside the definition set, undecidable exact guard, unsupported primitive, exhausted precision/resource, or backend failure produces an undefined/evaluation result.
 - Invalid strict seeds are rejected before execution. A verified strict evaluator producing an out-of-range value is a verifier/backend contract violation, not a valid `Escaped` outcome.
-- Explicit partial/open-domain siblings may retain the last complete state and return typed undefined, escape, or evaluation-failure outcomes without committing a partial event.
+- Explicit partial/open-definition-set profiles may retain the last complete state and return a typed `StepResult` error without committing a partial event.
 - The exact profile evolves canonical exact/certified values. A certified-enclosure profile approximates a set of possible ideal values; the enclosure is not the native one-point mathematical state.
 - Tracked-significance arithmetic preserves unknown digits as unknown and fails a branch or requested accuracy when it cannot certify it. It never invents trailing digits.
 - A fixed-rounded realization serializes radix, significand/exponent format, rounding mode, subnormal/nonfinite behavior, literal conversion, comparison semantics, and every rounding location. Its program/run identity is related to, but distinct from, the ideal map.
@@ -64,7 +64,7 @@ The evidence/search closure and conformance fixtures remain valid. T43 and T34 s
 
 ## Big Picture Objective
 
-Reconstruct iterated maps as exact or explicitly represented scalar-state evolution under one fixed closed self-map. Pin down state and domain carriers, expression/totality evidence, old-value read and atomic assignment, exact versus numerical feedback, outcomes and traces, equality/codecs, strict rasters and independent oracles, digit-sensitive randomness distinctions, analysis boundaries, related map profiles, and the smallest coherent Goal 2 extension of T34/T41 without callbacks, fake real numbers, or family dispatch.
+Reconstruct iterated maps as exact or explicitly represented scalar-state evolution under one fixed closed self-map. Pin down `t+0D` task space and scalar value carriers, expression/totality evidence, old-value read and atomic assignment, exact versus numerical feedback, outcomes and traces, equality/codecs, strict rasters and independent oracles, digit-sensitive randomness distinctions, analysis boundaries, related map profiles, and the smallest coherent Goal 2 extension of T34/T41 without callbacks, fake real numbers, or family dispatch.
 
 ## Catalog Identity
 
@@ -74,7 +74,7 @@ Reconstruct iterated maps as exact or explicitly represented scalar-state evolut
 - Canonical strict main: `BOOK:1868-1946`; clean duplicate `Systems-Based-on-Numbers.md:327-403`.
 - Native Notes: `BOOK:13215-13280`; T44 Notes begin at `13281`.
 - Entry kind: unary continuous-state transition construction with strict piecewise-linear/fractional maps.
-- Strict parameters: domain `[0,1]`, four fixed maps, exact seeds `1/2` and `Pi/4`, base-2 digit observer, and `10^-18` perturbation comparisons.
+- Strict parameters: state interval `[0,1]`, four fixed maps, exact seeds `1/2` and `Pi/4`, base-2 digit observer, and `10^-18` perturbation comparisons.
 - Supplementary profiles: smooth logistic maps, Gauss/continued-fraction maps, Newton rational/complex maps, vector torus maps, exact fast-forward relations, fixed numerical realizations, and analysis queries.
 - Aliases/routes: iterated/iteration maps, functional iteration, iteration theory, chaos/chaos phenomenon, shift/doubling/tent/logistic/Verhulst/Gauss/Anosov/Newton/return maps, sensitive dependence, Lyapunov exponent, attractor, period doubling, bifurcation, symbolic dynamics, and dynamical systems.
 
@@ -85,7 +85,7 @@ Reconstruct iterated maps as exact or explicitly represented scalar-state evolut
 3. Exact T43 headings found **2/2** occurrences/unique lines. A conservative `iterated map\w*` search covering map/maps/mapping found **106/89**: `44/36` pre-Index and `62/53` actual Index. A controlled broader iteration-word union found **214/155**: `105/86 + 109/69`.
 4. A high-signal union over direct names, map families, chaos, sensitivity, precision, and analysis terms found **332/210**: `172/115` pre-Index and `160/95` actual Index. Every line is assigned below or rejected as history, support, route, other type, or lexical false positive.
 5. Formula literals and map spellings found **36/28** (`35/27 + 1/1`). The shift-map family found **23/23** (`17 + 6`); `logistic maps?|Verhulst` **20/18** (`4/3 + 16/15`); tent **4/4**, doubling **2/2**, Gauss **2/2**, and quadratic-map wording **1/1**. Actual-Index-only hits add routes, not hidden mechanics.
-6. Functional-iteration/iterated-mapping wording found **4/3**; continued-fraction map **3/3**; return maps **2/2**; Anosov **3/3**. Newton and complex-rational iteration are historical/variant support, not strict scalar-domain authority.
+6. Functional-iteration/iterated-mapping wording found **4/3**; continued-fraction map **3/3**; return maps **2/2**; Anosov **3/3**. Newton and complex-rational iteration are historical/variant support, not strict scalar-carrier authority.
 7. `chaos phenomenon` found **14/11**, all pre-Index; `chaos theory` **83/70**; `chaotic` **8/7**; `sensitive` **45/40**. Native strict evidence separates sensitive dependence from intrinsic randomness production.
 8. Lyapunov found **12/9**, Feigenbaum **6/5**, period doubling **9/9**, bifurcat* **4/4**, attractor **76/57**, and precision-control vocabulary **18/12**. Lyapunov is native T43 Notes; attractor/bifurcation are supported analyzers because those words occur zero times in the native strict/Notes scope.
 9. Exact strict image links found **8/8** and native-Notes links **3/3**. File enumeration found no additional native T43 assets. The page-166 asset is demonstrably a caption crop rather than the missing full plate.
@@ -393,36 +393,27 @@ Composition does not identify categories: T43 performs one scalar map applicatio
 
 ### State, definition, and invariant contract
 
-Ideal mathematical state and fixed-realization state are distinct:
+Ideal mathematical and fixed-realization values are distinct tagged carriers on the same singleton configuration shape:
 
 ```text
-IdealMapState {
-  space_id: RealIntervalId,
-  value: ExactRealValue
-}
+ScalarMapLabel =
+    Ideal(space_id: StateSpaceId, value: ExactRealValue)
+  | Realized(
+        mathematical_space_id: StateSpaceId,
+        realization_id: MapRealizationId,
+        represented_value: RepresentedRealValue
+    )
 
-RealizedMapState {
-  mathematical_space_id: RealIntervalId,
-  realization_id: MapRealizationId,
-  represented_value: RepresentedRealValue
-}
+ScalarConfiguration = Singleton[ScalarMapLabel]
 
-TrackedMapComputationState {
-  ideal_map_id: IteratedMapId,
-  numerical_context_id,
-  approximate_value,
-  reliability: PrecisionAndErrorProvenance
-}
-
-CertifiedMapComputationState {
-  ideal_map_id: IteratedMapId,
-  numerical_context_id,
-  enclosure,
-  coverage_evidence
-}
+EvaluationWork =
+    Tracked(ideal_map_id, numerical_context_id, approximate_value,
+            reliability: PrecisionAndErrorProvenance)
+  | Certified(ideal_map_id, numerical_context_id, enclosure,
+              coverage_evidence)
 ```
 
-The strict interval is serialized as `[0,1]`; membership is validated before a run. A represented value is a first-class bit/digit-format value, not an enclosure or a claim of exact equality to the ideal real. Certified/tracked computation states are reproducible evaluator work states tied to an ideal map/seed, not additional mathematical point-state ontologies; their evolving enclosure/uncertainty is stored in computation traces. There is one scalar slot, no control, no stored iteration counter, no random source, and no orbit prefix. Event indices belong to run/trace records.
+The strict interval is serialized as `[0,1]`; membership is validated before a run. A represented value is a first-class bit/digit-format value, not an enclosure or a claim of exact equality to the ideal real. `EvaluationWork` records are reproducible evaluator work tied to an ideal map/seed, not additional semantic configuration classes; evolving enclosure/uncertainty belongs in computation traces. There is one scalar slot, no control, no stored iteration counter, no random source, and no orbit prefix. Event indices belong to run/trace records.
 
 The immutable program is:
 
@@ -469,21 +460,20 @@ MapPredicate = Lt | Le | Eq | And | Or | Not
 
 The strict primitive registry adds `FractionalPart`; logistic and related profiles reuse multiplication/subtraction; Gauss/Newton siblings use division with explicit partiality. Ordered piecewise cases and their exact comparison semantics are identity-bearing. `If[x<1/2,...]` takes the second arm at equality, even though the strict tent expression is continuous there.
 
-Source-spelled `FractionalPart[y]=y-IntegerPart[y]` uses truncation toward zero and is odd. On the strict maps' nonnegative arguments it equals `y-Floor[y]` and `Mod[y,1]`; on negative arguments those operations differ and require distinct primitive tags. `FractionalPart` is not implicit boundary wrap, is defined at integers, and cannot be added by a runtime because a value left the domain. `FractionalPart[3x/4]` remains structurally distinct from `3x/4`, even though they agree extensionally on `[0,1]`.
+Source-spelled `FractionalPart[y]=y-IntegerPart[y]` uses truncation toward zero and is odd. On the strict maps' nonnegative arguments it equals `y-Floor[y]` and `Mod[y,1]`; on negative arguments those operations differ and require distinct primitive tags. `FractionalPart` is not implicit boundary wrap, is defined at integers, and cannot be added by a runtime because a value left the declared state space. `FractionalPart[3x/4]` remains structurally distinct from `3x/4`, even though they agree extensionally on `[0,1]`.
 
 ### Source, read, result, and update
 
-T43's transition record is:
+T43 uses the generic singleton FRONTIER, self read, same-locus write, and uniform result envelope:
 
 ```text
-source = UniqueScalar(MapStateSlot)
-read   = CompleteOldScalar(value, space_id)
-result = MapStepResult(old, program_id, next, evaluation_provenance)
-effect = Assign(MapStateSlot, next)
-update = AtomicEffectsUpdate((effect,))
+active = FRONTIER.select(configuration)          # singleton locus
+read = NEIGHBORHOOD.read(configuration, active) # complete old label
+write = Write(active, evaluate(program, read))
+step_result = UPDATE.apply(configuration, active, (write,))
 ```
 
-`program_id` is either an ideal map ID or a realized-map ID. The expression is evaluated purely from the complete old value and immutable parameters/realization. A successful strict event yields exactly one successor. `next==old` under the profile's state equality still commits an event and returns `Advanced(changed=false)`; a fixed point is not quiescence. T34's scalar assignment and fixed-effects preservation law are reused unchanged, so T43 adds value/expression/realization profiles rather than an update-law member.
+The program identity is either an ideal map ID or a realized-map ID. The expression is evaluated purely from the complete old value and immutable parameters/realization. A successful strict event yields exactly one successor. `next==old` under the profile's state equality still commits an event and returns `Advanced(changed=false)`; a fixed point is not quiescence. T34's singleton write and atomic UPDATE are reused unchanged, so T43 adds value/expression/realization profiles rather than an assignment class or update member.
 
 For vector siblings, every output component reads the complete old tuple. All components are evaluated before a single tuple assignment, prohibiting in-place coordinate order effects.
 
@@ -491,35 +481,40 @@ For vector siblings, every output component reads the complete old tuple. All co
 
 1. **Ideal exact.** State contains canonical exact/certified reals. Operations return exact constructions where closed, or refine certified representations until a comparison/value is decided. Unsupported exact evaluation is typed, never coerced to binary float.
 2. **Certified enclosure.** The evaluator propagates a set guaranteed to contain the ideal value in an approximation/work trace. It is a computation about a one-point ideal orbit, not permission to redefine native state as an arbitrary interval-valued dynamical system.
-3. **Tracked significance.** `TrackedMapComputationState` carries the approximate value plus reliable-digit/error provenance between evaluator steps. Unknown digits remain unknown; precision decreases under sensitive iteration. A guard or requested accuracy that cannot be certified returns `PrecisionExhausted` or `IndeterminateComparison`. This reproduces a numerical computation without identifying its approximate work value with the ideal mathematical point.
-4. **Fixed rounded realization.** `RealizedMapState` is evaluated and rounded under a declared `MapRealizationSpec`, and that represented result feeds the next event. Realized-program identity includes the ideal map ID, radix, fields/width, rounding, subnormal/nonfinite policy, literal conversion, guard comparisons, rounding locations, and normalized represented closure contract—but not a particular proof artifact. Binary-computer and decimal-calculator recurrences are distinct represented maps.
+3. **Tracked significance.** A tagged `Tracked` work record carries the approximate value plus reliable-digit/error provenance between evaluator steps. Unknown digits remain unknown; precision decreases under sensitive iteration. A guard or requested accuracy that cannot be certified returns an explicit evaluator failure reason. This reproduces a numerical computation without identifying its approximate work value with the ideal mathematical point.
+4. **Fixed rounded realization.** A `Realized(...)` scalar label is evaluated and rounded under a declared `MapRealizationSpec`, and that represented result feeds the next event. Realized-program identity includes the ideal map ID, radix, fields/width, rounding, subnormal/nonfinite policy, literal conversion, guard comparisons, rounding locations, and normalized represented closure contract—but not a particular proof artifact. Binary-computer and decimal-calculator recurrences are distinct represented maps.
 
 T41 numerical context can remain query-local because function observations do not feed back. T43 fixed rounding changes every later transition, so it belongs to a run/program-realization identity and relation to the ideal spec.
 
 ### Outcomes and partial siblings
 
-A verified strict self-map can yield:
+A verified strict self-map returns the uniform envelope:
 
 ```text
-Advanced(changed: bool, event: MapStepResult)
-Interrupted(last_complete_state, committed_events, reason)
-Failure(last_complete_state, no_partial_event, diagnostic)
-```
-
-Invalid seed membership is a validation error. A supposedly verified evaluator returning a nonmember is `VerifierContractViolation` or `BackendFailure`, not normal escape.
-
-An explicitly partial/open-domain sibling may additionally return:
-
-```text
-UndefinedMapValue(Pole | MissingBranch | OutsideDefinitionDomain)
-EscapedDomain(value)
-EvaluationFailure(
-  Unsupported | IndeterminateComparison | PrecisionExhausted |
-  ResourceLimit | BackendFailure
+StepResult(
+    successors = {next_configuration},
+    outcome = Advanced(changed: bool),
+    event = MapStepWitness(...),
 )
 ```
 
-These outcomes retain the last complete state and commit no partial event. No clamp, saturation, reflection, tolerance stop, or implicit modulo is permitted.
+Invalid seed membership returns `StepResult(successors={}, outcome=Invalid(reason), event=None)`. A supposedly verified evaluator returning a nonmember returns `Error(VerifierContractViolation | BackendFailure)`, not normal escape. Run-level cancellation/interruption records retain the last complete configuration and committed-event count without inventing a partial event.
+
+An explicitly partial/open-definition-set profile returns no successor when evaluation is undefined:
+
+```text
+StepResult(
+    successors = {},
+    outcome = Error(
+        Pole | MissingBranch | OutsideDefinitionSet | EscapedStateSpace |
+        Unsupported | IndeterminateComparison | PrecisionExhausted |
+        ResourceLimit | BackendFailure
+    ),
+    event = None,
+)
+```
+
+These reasons are nested under the common outcome algebra rather than acting as construction-specific result classes. They retain the last complete configuration and commit no partial event. No clamp, saturation, reflection, tolerance stop, or implicit modulo is permitted.
 
 ### Trace, equality, and serialization
 
@@ -529,7 +524,7 @@ Keep at least six identities/relations distinct:
 
 1. normalized mathematical structural map identity, excluding evaluation/realization choices;
 2. realized-transition identity, which references one ideal map and complete finite-format feedback semantics;
-3. certified functional equivalence on a declared domain;
+3. certified functional equivalence on a declared definition set;
 4. conjugacy or semiconjugacy with the transformation and scope;
 5. state/orbit equality under the selected profile—canonical exact value for ideal runs, represented-state identity/canonicalization for fixed realizations;
 6. equality of one declared finite observation.
@@ -566,7 +561,7 @@ The original raster is `1196x1147`. It has four 40-column by 81-row digit grids 
 T43 page-165 exact/pixel oracle: PASS; cells=12960; black=1176,1255,758,1; states=81
 ```
 
-The map graphs visually join values across the interior jumps at `2/3` and `1/2`. Those vertical renderer strokes are not graph values or multivalued transitions. Case `(d)` also has a one-sided jump at closed-domain endpoint `1`; endpoint topology remains semantic even when a raster does not draw a second vertical join.
+The map graphs visually join values across the interior jumps at `2/3` and `1/2`. Those vertical renderer strokes are not graph values or multivalued transitions. Case `(d)` also has a one-sided jump at closed-state-interval endpoint `1`; endpoint topology remains semantic even when a raster does not draw a second vertical join.
 
 ### Strict page 166 — seed `Pi/4`
 
@@ -688,22 +683,22 @@ This method intentionally supplies no page-166 pixel claim because the plate is 
 
 - **Strict scalar piecewise/fractional maps:** verified total self-maps of `[0,1]`; exact primary conformance.
 - **Smooth logistic maps:** parameterized scalar family, exact polynomial syntax, invariant `[0,1]` only for an admitted parameter scope such as `0<=a<=4`; parameter sweep remains an observer.
-- **Gauss/continued-fraction map:** `FractionalPart[1/x]` is partial at zero. It requires a domain excluding zero or a typed undefined result and cannot use the strict total profile unchanged.
-- **Newton/rational maps:** rational expression, usually partial at derivative zeros/poles; complex-domain variants require typed complex state and branch conventions.
-- **Affine/fractional-linear maps:** closed syntax with explicit domain and range proof; special fast-forward relations are evaluator artifacts.
-- **Vector matrix maps:** the displayed integer Anosov matrix uses fixed-dimensional torus state and simultaneous tuple assignment. The nonintegral-rational extension uses an explicitly different ordinary closed-box representative profile, retaining `{1,1}` as distinct from `{0,0}` before the first componentwise `Mod[...,1]`, unless quotient well-definedness is separately proved.
+- **Gauss/continued-fraction map:** `FractionalPart[1/x]` is partial at zero. It requires a definition set excluding zero or a typed undefined result and cannot use the strict total profile unchanged.
+- **Newton/rational maps:** rational expression, usually partial at derivative zeros/poles; complex-value variants require typed complex state and branch conventions.
+- **Affine/fractional-linear maps:** closed syntax with explicit definition/state sets and range proof; special fast-forward relations are evaluator artifacts.
+- **Vector matrix maps:** the displayed integer Anosov matrix uses fixed-dimensional torus state and a simultaneous tuple write. The nonintegral-rational extension uses an explicitly different ordinary closed-box representative profile, retaining `{1,1}` as distinct from `{0,0}` before the first componentwise `Mod[...,1]`, unless quotient well-definedness is separately proved.
 - **Bitwise analogs:** relation to cellular automata, not permission to replace real scalar state with a digit array.
 - **Stochastic/noisy maps:** would add an explicit random source and transition distribution; no native evidence admits them into strict T43.
 
 ### Cross-type boundaries
 
-- **T34:** shares one scalar slot, complete read, scalar assignment, and fixed-effects update. T34's closed integer arithmetic is not an exact-real backend.
-- **T35:** piecewise integer parity maps use signed-integer state and different domain/branch evidence. T43 does not absorb them through a numeric union.
+- **T34:** shares one scalar slot, complete read, same-locus write, and atomic UPDATE. T34's closed integer arithmetic is not an exact-real backend.
+- **T35:** piecewise integer parity maps use signed-integer state and different value-set/branch evidence. T43 does not absorb them through a numeric union.
 - **T36:** digits are the evolving finite word in reversal systems; T43 digits are an observer of a real scalar.
-- **T37:** recurrence systems preserve an indexed prefix and append one term. A logistic recurrence can expose the same values, but T43 state is only the current scalar and reuses assignment.
+- **T37:** recurrence systems preserve an indexed prefix and append one term. A logistic recurrence can expose the same values, but T43 state is only the current scalar and reuses a same-locus write.
 - **T41:** shares exact numeric/expression/primitive responsibilities. T41 evaluation is a pure query; T43 feeds each result into the next committed event and makes fixed rounding transition-semantic.
 - **T42:** continued-fraction coefficient streams and substitution traces are separate constructions. A Gauss-map orbit may relate to coefficients but does not store a T42 word.
-- **T44:** applies scalar-map-like functions to neighborhood aggregates over a continuous lattice and commits a whole field simultaneously. T43 alone has no lattice, neighbor read, or boundary.
+- **T44:** applies scalar-map-like functions to neighborhood aggregates over a discrete lattice with continuous-valued labels and commits a whole field simultaneously. T43 alone has no lattice, neighbor read, or boundary.
 - **T45:** differential equations define continuous-time flows/solution queries. A return/Poincare map may be derived from a flow but is a separately specified discrete-time T43 relation.
 - **Analytic iterates/solvers:** certified random-access methods and periodic-point solutions are query records, never replacements for state/update semantics.
 
@@ -725,7 +720,7 @@ This method intentionally supplies no page-166 pixel claim because the plate is 
 
 ## Corrected Architecture and Goal 2 Handoff
 
-T43 is the T34 `t+0D` unary SimpleProgram with a real/represented value carrier, closed map RULE, self-map/partiality invariant, and explicit numeric realization profile. A continuous state interval does not make DOMAIN continuous. `UniqueScalar`/`MapAssignment` are roles, and fixed/certified/tracked variants are typed representations/relations rather than map executors.
+T43 is the T34 `t+0D` unary SimpleProgram with a tagged real/represented value carrier, closed map RULE, self-map/partiality invariant, and explicit numeric realization profile. A continuous state interval does not make DOMAIN continuous. The singleton locus and same-locus write are generic roles; fixed values are tagged feedback representations, while certified/tracked records are evaluator relations rather than map executors or state classes.
 
 Revised G2-T43 reuses the singleton frontier/self-read/same-locus update, adds closed map syntax/invariance certificates and exact/represented feedback profiles, and retains all orbit/precision/cycle/raster/source-repair oracles. It removes scalar-domain, iterated-map executor, family-specific assignment, callback, and hidden-backend designs.
 
@@ -771,16 +766,16 @@ General invariant proofs, exact comparison of arbitrary computable reals, asympt
 
 ## Re-Integration Audit
 
-1. No prior assumption is invalidated. T43 confirms T34's unary assignment and T41's closed syntax responsibilities while sharpening the earlier numerical-context boundary: fixed rounding is query-local in T41 but transition-semantic when fed back in T43.
-2. `UniqueScalar`, complete scalar read, `Assign`, and `AtomicEffectsUpdate` are reused without semantic change. No eleventh update law is introduced.
+1. No prior assumption is invalidated. T43 confirms T34's unary same-locus write and T41's closed syntax responsibilities while sharpening the earlier numerical-context boundary: fixed rounding is query-local in T41 but transition-semantic when fed back in T43.
+2. The singleton FRONTIER, complete scalar read, typed same-locus write, and atomic UPDATE are reused without semantic change. No map-specific assignment or executor is introduced.
 3. The proposal adds no family switch, flag bundle, hidden history/control, callback, or duplicate executor. Partial, vector, and represented-map profiles are tagged types with distinct validators.
 4. The current scalar or old vector tuple plus immutable map/realization data contains everything required to advance. Event index and orbit prefix are trace data only.
 5. State space, scalar/vector value, absent control, exact-versus-represented realization, digit projection, and rendering remain separate.
 6. One-step map evaluation and commit are defining. Invariant proof, fast-forward, periodic-point solving, Lyapunov/attractor/bifurcation analysis, and plotting are correctly separated algorithms/queries.
 7. Tagged exact values, interval/torus spaces, ordered ASTs, realization records, events, witnesses, and observer codecs preserve every evidenced distinction without binary-float or bitmap substitution.
-8. No completed stage is reopened. T34 assignment and T41 expression/query boundaries remain valid; T37 prefix state and T39 observer/query discipline remain distinct.
+8. No completed stage is reopened. T34's write semantics and T41 expression/query boundaries remain valid; T37 prefix state and T39 observer/query discipline remain distinct.
 9. Goal 2 gains shared exact-real/represented values, state spaces, map evaluation/orbit/analysis modules, and pressure on the T44/T45 numerical backend decision.
-10. The API becomes more coherent by reusing one assignment law and one expression registry while separating mathematical maps, feedback realizations, and analysis records. A T43 family rollout would be less coherent and is rejected.
+10. The API becomes more coherent by reusing generic same-locus UPDATE and one expression registry while separating mathematical maps, feedback realizations, and analysis records. A T43 family rollout is rejected.
 
 ## Historical Detailed Implementation Plan (Superseded on architecture wording)
 
@@ -835,7 +830,7 @@ Reject:
 - finite float alphabets, digit arrays, object cells, rule IDs, or NumPy arrays as the mathematical real state;
 - implicit machine floats, radix, precision, rounding, unknown-digit fill, tolerance equality, backend defaults, or unrecorded literal conversion;
 - storing the orbit prefix as scalar state, routing T43 through T37 append, or treating an evaluation mesh as time;
-- a trusted `total=true` flag, unchecked domain escape, implicit clamp/wrap/modulo, or treating a defined discontinuity as failure;
+- a trusted `total=true` flag, unchecked state-space escape, implicit clamp/wrap/modulo, or treating a defined discontinuity as failure;
 - arbitrary branch choice for uncertain comparisons or invented low-significance digits;
 - in-place vector-coordinate updates, box/torus equality conflation, or higher-dimensional state packed into one scalar;
 - tolerance-based cycle halts, convergence halts, fixed-point quiescence, or observer-fed transition changes;
