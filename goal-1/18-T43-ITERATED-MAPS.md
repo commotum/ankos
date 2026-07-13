@@ -5,119 +5,768 @@ Status: **IN PROGRESS**
 ## Current Facts
 
 - Exact catalog row: T43, CSV line 44, `Iterated Maps`; taxonomy vocabulary is `ref/notes/CA-Types.md:1184-1213`. T44 begins at taxonomy line 1215.
-- Canonical strict main `Iterated Maps and the Chaos Phenomenon` is `BOOK:1868-1946`; T44 begins cleanly at `1948`. The clean chapter duplicate is `CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:327-404`.
-- Native Notes are `BOOK:13215-13280`; T44 Notes begin at `13281`. The line-oriented duplicate is `BACK-MATTER/Index/Index.md:1118-1183`.
-- The source explicitly defines a transition construction: one number `x` between 0 and 1 is updated at every step by one fixed total self-map of that interval. Unlike T41, argument evaluation is now repeatedly committed as evolving state.
-- The strict page-165 raster fixes panel order that surrounding extracted formula lines obscure: (a) `FractionalPart[3x/2]`; (b) `If[x<1/2,3x/2,3(1-x)/2]`; (c) `FractionalPart[3x/4]`; (d) `FractionalPart[2x]`.
-- Strict initial conditions are `1/2` and `pi/4`. For `1/2`, (a)/(b) generate complex-looking rational orbits, (c) decays geometrically, and (d) reaches exact zero in one update. For `pi/4`, (d) shifts the exact binary digit sequence rather than intrinsically creating randomness.
-- The page-165 digit grids contain exactly 40 binary columns and 81 initial-inclusive rows (80 updates). Independent exact-rational pixel classification matches all 12,960 cells; panel black-cell counts are `1176,1255,758,1`. This pins terminating dyadic expansion, top-row initial-state inclusion, and strict panel formulas.
-- Every strict map is a unary piecewise-linear/fractional-part expression over `[0,1]`. A closed map AST can reuse compatible T41 expression nodes, but T43 adds scalar state, one current-value read, assignment, successors, and orbit traces; a function specification alone is not execution.
-- T34 already established unary scalar state and typed scalar assignment. T43 may reuse that update law if exact/declared real values and a richer closed map program preserve the same one-slot replacement semantics; no new update law is presumed.
-- Mathematical exact-real state, arbitrary-precision approximation with tracked uncertainty, fixed-precision rounded arithmetic, and interval/certified propagation are different execution profiles. In chaotic cases they can yield different later orbits, so precision policy cannot be incidental metadata.
-- Notes explicitly warn that fixed binary precision forces the shift map to zero, fixed decimal representation gives a different eventually repetitive process, and arbitrary-precision significance degrades as unknown initial digits are amplified.
-- `FractionalPart[2x]` has exact iterate `FractionalPart[2^n x]`. It exposes initial digits; sensitive dependence is not by itself evidence of intrinsic randomness. Digit rows, size plots, pairwise divergence, Lyapunov exponents, attractors, periods, and bifurcation diagrams are observers of an orbit/program.
-- Notes add smooth logistic maps, rational/complex Newton maps, Gauss maps, tent-map closed forms, higher-dimensional Anosov maps, parameter distributions, and bitwise analogs. Their state domains/map algebras and strict-versus-related status are under audit.
-- A probable Notes inconsistency is under review: the higher-dimensional paragraph first says rational initial values under an integer matrix are repetitive, then appears to say a rational matrix produces complexity from `{1,1}`. Exact wording, intended repair, and disposition must be resolved before closure.
-- Eight strict image links and three native-Notes image links have been identified; original formulas, horizons, pixels, hashes, and independent oracles are under parallel audit.
-- Current rank-0 rollout is update-oriented but fixed-width NumPy/family-dispatched and limited to modular integer AR2. It has no closed real-map AST, exact/interval real value, explicit precision/rounding semantics, or digit-sensitive conformance path.
+- Canonical strict main `Iterated Maps and the Chaos Phenomenon` is `BOOK:1868-1946`; T44 begins cleanly at `1948`. The clean chapter duplicate is `CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:327-403`, with its separating blank line at 404.
+- Native Notes are `BOOK:13215-13280`; T44 Notes begin at `13281`. The useful line-oriented duplicate is misleadingly stored at `BACK-MATTER/Index/Index.md:1118-1183`. The actual Index begins at `BOOK:20826`.
+- The source defines a genuine transition: one number is repeatedly updated by one fixed rule that maps every admissible scalar back into the declared interval. Unlike T41 point evaluation, each result becomes the next event's state.
+- Strict state is one domain-tagged real scalar. The map definition, initial value, execution profile, requested horizon, trace, and observations are separate records; orbit history is not hidden in state.
+- The page-165 raster fixes an association lost by extraction: `(a)` `FractionalPart[3x/2]`; `(b)` `If[x<1/2,3x/2,3(1-x)/2]`; `(c)` `FractionalPart[3x/4]`; `(d)` `FractionalPart[2x]`. The detached text lists them in `(c),(d),(b),(a)` order without labels.
+- The strict initial values are exact `1/2` and `Pi/4`. With seed `1/2`, cases `(a)` and `(b)` produce complicated rational orbits, `(c)` decreases geometrically, and `(d)` reaches exact zero after one update. With `Pi/4`, `(d)` shifts the exact binary expansion rather than generating new random information.
+- The page-165 digit grids contain exactly 40 binary columns and 81 initial-inclusive rows, hence 80 committed events. Independent exact-rational pixel classification matches all 12,960 cells; panel black-cell counts are `1176,1255,758,1`.
+- The exact page-165 prefixes are `(a)` `1/2,3/4,1/8,3/16,9/32,...`; `(b)` `1/2,3/4,3/8,9/16,21/32,...`; `(c)` `1/2,3/8,9/32,27/128,81/512,...`; `(d)` `1/2,0,0,...`.
+- Case `(c)` has exact orbit `x_t=(1/2)(3/4)^t`. Case `(a)` has reduced denominator `2^(t+1)` at event time `t` and cannot repeat. The latter is also a counterexample to a supporting Notes claim that rational `a` and rational seed always yield repetition under `Mod[ax,1]`.
+- Map-plot vertical strokes at the discontinuities `x=2/3` for `(a)` and `x=1/2` for `(d)` are renderer joins. They do not make the scalar state multivalued. A mathematical discontinuity is not an undefined transition.
+- The `_page_166_Figure_2.jpeg` extraction is only a caption crop. The second strict `Pi/4` plate is absent as a complete raster even though its formulas, prose, and initial condition survive.
+- Page 168 compares the exact shift-map seed `Pi/4` with a value differing by `10^-18`; page 170 compares the four corresponding digit differences. Cases `(a)`, `(b)`, and `(d)` are sensitive; contraction `(c)` is not.
+- Strict visualizations are digit rows, scalar-value plots, map graphs, two-orbit differences, and digit-difference rows. They are downstream views, not numeric state, transition effects, or proofs of randomness.
+- T34 already established unary scalar state, complete old-value read, typed scalar assignment, and the fixed-effects atomic update law. T43 reuses that law with a richer exact/declared-real carrier and a closed map expression; it adds no eleventh update law.
+- A strict verified self-map has exactly one successor for every event, including a fixed-point/identity event reported as `Advanced(changed=false)`. It has no native halt, spatial boundary, or legitimate escape.
+- `h` requested events produce `h+1` snapshots. `NestList` supplies independent source support for this initial-inclusive convention. Fixed points, exact cycles, convergence, attractors, and analysis cutoffs do not stop native execution.
+- The closed map syntax reuses compatible T41 ordered expression nodes and adds state references, exact comparisons, ordered `Piecewise`, and `FractionalPart`. Formula strings, callbacks, host CAS expressions, lookup rasters, and primitive reflection are not map definitions.
+- `FractionalPart(y)=y-floor(y)` is a mathematical primitive, not a boundary-wrap policy. Its values at integers and the tent map's value at its cusp are defined; side limits and derivative sides belong to observers.
+- Mathematical exact evolution, certified enclosure computation, tracked-significance computation, and a fixed-precision rounded recurrence are different profiles. Fixed rounded results feed back into later events and therefore define a different effective dynamical system, not a transparent observation context.
+- Native Notes explicitly distinguish roughly 53-bit computer storage, tracked arbitrary precision with progressively fewer reliable digits, fixed binary fill that drives the shift map to zero, and fixed decimal calculator arithmetic that yields another eventually periodic process.
+- Structural map identity, certified equality as functions on a domain, conjugacy/semiconjugacy, exact orbit equality, and equality of one numerical observation are different relations. Logistic `a=4` and the doubling map are related by `x=Sin[Pi u]^2`; they are not structurally identical programs.
+- Digit views declare base, width/crop, blank-versus-zero policy, and the terminating convention for dyadics. Exact cycle queries use normalized value equality and replayable witnesses, never tolerance or a native halt.
+- Sensitivity comparison, finite-time/asymptotic Lyapunov analysis, attractor analysis, bifurcation/parameter sweeps, periodic-point solving, symbolic dynamics, rendering, and fast-forward formulas are typed observers or solvers. Native T43 Notes mention Lyapunov exponents but not attractors or bifurcations; the latter receive only supported extension status.
+- Notes add the logistic, Gauss, Newton/rational-complex, tent, and fixed-vector Anosov profiles. Strict scalar conformance stays primary; partial domains, complex state, and vector/torus state are explicit sibling profiles rather than flags on one scalar callback.
+- The Anosov Notes sentence is coherent only when its second “rational numbers” means nonintegral rational matrix entries: an integer matrix preserves a finite denominator class modulo one, while nonintegral rational entries can grow denominators. It must not be silently “corrected” to irrational.
+- Eight strict image links and three native-Notes image links were found. The monolith's bare links are broken relative paths; clean split directories resolve the assets. Canonical text provenance and split-asset provenance therefore remain separate.
+- Current rank-zero rollout is fixed-width NumPy/family-dispatched and limited to finite alphabets and modular integer AR2. It has no inspectable real-map AST, exact/algebraic/interval carrier, precision realization, invariant proof, or digit-sensitive conformance path.
+- Exhaustive text/raster/API searches leave zero unresolved candidate. All 11 native assets are measured and hashed; exact regeneration matches the 12,960 page-165 cells, 9,680 page-168 digit cells, and 38,720 page-170 comparison cells.
 
 ## Updated Assumptions
 
-- Strict T43 state is one domain-tagged exact or explicitly numerical real value plus no hidden history. Program, initial value, numerical profile, requested horizon, and observations remain separate.
-- The active source is `UniqueScalar`; it reads the complete old value. A closed unary map expression returns the next typed scalar value, and atomic scalar assignment commits exactly one successor when evaluation succeeds.
-- Map validation proves the strict `[0,1] -> [0,1]` contract for the declared parameter/domain or requires an explicit partial/escape profile. Out-of-domain, nonfinite, evaluation-failure, and unresolved-uncertainty outcomes are typed. A declared discontinuity is not itself a failure.
-- The piecewise boundary convention at `x=1/2`, `FractionalPart` value at integers, interval endpoint convention, and exact parameter values are semantic program data. One-sided derivative/sampling metadata remains an observer concern; the strict tent map is continuous at its cusp.
-- Exact rational/algebraic/named-real values, symbolic exact expressions, certified intervals, arbitrary-precision decimals, and fixed-precision machine values remain distinguishable in state and serialization.
-- Fixed-precision execution is a different declared numerical realization, not a transparent implementation of the exact orbit. Rounding base/mode/width and unknown-digit fill policy must be reproducible.
-- Orbit state/effects remain separate from digit/sizes/difference/period/attractor/bifurcation/Lyapunov observers and from solver/fast-forward formulas.
-- Smooth, discontinuous, piecewise, higher-dimensional, complex, bitwise, stochastic/noisy, and continuous-CA uses will share only responsibilities justified by evidence; they will not be hidden behind flags in one permissive callback map.
+- `IteratedMapSpec` is immutable closed program data: declared state space, exact/declared parameters, ordered output expression, primitive-registry version, and replayable totality/invariance evidence.
+- The strict state space is the closed real interval `[0,1]`. Although the prose says “between,” strict formulas and endpoints require a serialized interval/end-point convention. `FractionalPart` itself ranges over `[0,1)`.
+- Strict state has one scalar slot and no control or history. A separately tagged fixed-vector extension reads and replaces the complete old tuple simultaneously.
+- `UniqueScalar` is the active source. A complete old value is read once; a pure closed expression returns a typed next value; `MapAssignment` lowers to the existing `Assign(MapStateSlot,next)` fixed effect.
+- A general expression's self-map property is not decidable by declaration. Strict admission requires a known constructor with mechanically checked range or a replayable proof/certificate. An unverified expression remains explicitly partial.
+- Exact integers, reduced rationals, named constants, algebraic expressions, certified exact reals, declared-precision decimals, enclosures, and represented-format values remain distinct. JSON binary floats never carry exact seeds or parameters.
+- Strict evaluation uses exact comparison/refinement or a typed failure. It never picks an arbitrary piecewise arm when an enclosure straddles a guard.
+- A discontinuity is ordinary defined behavior. Only a pole, missing branch, outside definition domain, undecidable exact guard, unsupported primitive, exhausted precision/resource, or backend failure produces an undefined/evaluation result.
+- Invalid strict seeds are rejected before execution. A verified strict evaluator producing an out-of-range value is a verifier/backend contract violation, not a valid `Escaped` outcome.
+- Explicit partial/open-domain siblings may retain the last complete state and return typed undefined, escape, or evaluation-failure outcomes without committing a partial event.
+- The exact profile evolves canonical exact/certified values. A certified-enclosure profile approximates a set of possible ideal values; the enclosure is not the native one-point mathematical state.
+- Tracked-significance arithmetic preserves unknown digits as unknown and fails a branch or requested accuracy when it cannot certify it. It never invents trailing digits.
+- A fixed-rounded realization serializes radix, significand/exponent format, rounding mode, subnormal/nonfinite behavior, literal conversion, comparison semantics, and every rounding location. Its program/run identity is related to, but distinct from, the ideal map.
+- Trace records distinguish snapshots, committed events, initial inclusion, interruption, and terminal evaluation outcomes. A random-access iterate formula cannot replace requested event provenance.
+- Cycle queries return a certified witness `(transient,period)`, `NoCycleWithin(h)`, or `Unknown`. Approximate proximity, apparent convergence, or finite repetition in a digit window is not exact state equality.
+- Lyapunov records declare seed, horizon, burn-in, perturbation/derivative method, precision, metric, and logarithm base. The source uses base two. Finite-time estimates and asymptotic exponents remain distinct.
+- Attractor records require a state-space topology/metric, set representation, basin scope, and evidence level. A finite orbit cannot certify attraction, and a periodic orbit can be repelling.
+- Parameter/bifurcation records are family-level observations. Sampled rasters are not proof of exact bifurcation thresholds.
+- `RealBox(d)` and `UnitTorus(d)` are distinct vector spaces. Torus quotient equality is not closed-box endpoint equality; all vector outputs are calculated from the same old tuple and committed atomically.
+- T37 may preserve an indexed logistic recurrence prefix; T43 preserves the current scalar. T41 supplies denotational expression responsibilities but not feedback execution. T44 adds spatial aggregation and simultaneous field update around a scalar map.
+- Smooth, discontinuous, piecewise, partial, complex, vector, bitwise, stochastic/noisy, and coupled-map uses share only evidence-backed responsibilities and never collapse into permissive flags or opaque callbacks.
 
 ## Big Picture Objective
 
-Reconstruct iterated maps as exact or explicitly numerical scalar-state evolution under a fixed closed self-map. Pin down state/domain/value carriers, piecewise/fractional/smooth map syntax, update and failure semantics, precision/rounding/uncertainty, orbit equality and traces, digit-sensitive randomness distinctions, strict figures and exact oracles, observer boundaries, related map profiles, and the smallest coherent Goal 2 extension of T34/T41 without callbacks or family dispatch.
+Reconstruct iterated maps as exact or explicitly represented scalar-state evolution under one fixed closed self-map. Pin down state and domain carriers, expression/totality evidence, old-value read and atomic assignment, exact versus numerical feedback, outcomes and traces, equality/codecs, strict rasters and independent oracles, digit-sensitive randomness distinctions, analysis boundaries, related map profiles, and the smallest coherent Goal 2 extension of T34/T41 without callbacks, fake real numbers, or family dispatch.
 
 ## Catalog Identity
 
 - Stable ID: T43.
 - Exact CSV name: `Iterated Maps` at `ref/notes/CA-Types.csv:44`.
 - Taxonomy vocabulary: `ref/notes/CA-Types.md:1184-1213`; search seed only.
-- Canonical strict main: `BOOK:1868-1946`; clean split `Systems-Based-on-Numbers.md:327-404`.
+- Canonical strict main: `BOOK:1868-1946`; clean duplicate `Systems-Based-on-Numbers.md:327-403`.
 - Native Notes: `BOOK:13215-13280`; T44 Notes begin at `13281`.
-- Entry kind: unary continuous-state transition construction with strict piecewise-linear/fractional maps; smooth, complex, vector, and numerical-realization variants require explicit profiles.
-- Strict parameters: invariant interval `[0,1]`, four fixed maps, initial values `1/2` and `pi/4`, digit base 2 observer, and small-initial-change comparisons.
-- Aliases/routes under audit: iterated maps/functions, iteration theory, chaos/chaos phenomenon, shift/tent/logistic/Gauss/Anosov/Newton maps, sensitive dependence, Lyapunov exponent, attractor, period doubling, bifurcation, symbolic dynamics, return maps, and dynamical systems.
+- Entry kind: unary continuous-state transition construction with strict piecewise-linear/fractional maps.
+- Strict parameters: domain `[0,1]`, four fixed maps, exact seeds `1/2` and `Pi/4`, base-2 digit observer, and `10^-18` perturbation comparisons.
+- Supplementary profiles: smooth logistic maps, Gauss/continued-fraction maps, Newton rational/complex maps, vector torus maps, exact fast-forward relations, fixed numerical realizations, and analysis queries.
+- Aliases/routes: iterated/iteration maps, functional iteration, iteration theory, chaos/chaos phenomenon, shift/doubling/tent/logistic/Verhulst/Gauss/Anosov/Newton/return maps, sensitive dependence, Lyapunov exponent, attractor, period doubling, bifurcation, symbolic dynamics, and dynamical systems.
 
 ## Search Log
 
-1. Read the catalog/taxonomy seed, strict main through the T44 boundary, native Notes through the T44 Notes boundary, clean splits, and initial strict raster at original resolution.
-2. Confirmed exact boundaries and opened parallel exhaustive text/Index/history, strict/Notes figure/oracle, and architecture/API/runtime audits.
-3. Direct names, aliases, map formulas, iteration/update terms, chaos/sensitivity/precision/digit vocabulary, observers, related higher-dimensional/complex/smooth profiles, and false positives are in progress.
+1. Read CSV line 44 and taxonomy section 43 in full, then strict main, clean chapter duplicate, native Notes, line-oriented Notes duplicate, all linked strict/Notes rasters at original resolution, actual Index, supporting/history passages, current program document, runtime, tests, and every followed cross-reference.
+2. Confirmed boundaries: strict T43 is `BOOK:1868-1946`; T44 begins at `1948`. Native Notes are `13215-13280`; T44 Notes begin at `13281`. The actual Index begins at `20826`, so counts were split there rather than trusting directory names.
+3. Exact T43 headings found **2/2** occurrences/unique lines. A conservative `iterated maps?` search found **106/89**: `44/36` pre-Index and `62/53` actual Index. Broader `iterat*` found **214/155**: `105/86 + 109/69`.
+4. A high-signal union over direct names, map families, chaos, sensitivity, precision, and analysis terms found **332/210**: `172/115` pre-Index and `160/95` actual Index. Every line is assigned below or rejected as history, support, route, other type, or lexical false positive.
+5. Formula literals and map spellings found **36/28** (`35/27 + 1/1`). Shift found **23/23** (`17 + 6`); logistic/Verhulst **20/18** (`4/3 + 16/15`); tent **4/4**, doubling **2/2**, Gauss **2/2**, and quadratic-map wording **1/1**. Actual-Index-only hits add routes, not hidden mechanics.
+6. Functional-iteration/iterated-mapping wording found **4/3**; continued-fraction map **3/3**; return maps **2/2**; Anosov **3/3**. Newton and complex-rational iteration are historical/variant support, not strict scalar-domain authority.
+7. `chaos phenomenon` found **14/11**, all pre-Index; `chaos theory` **83/70**; `chaotic` **8/7**; `sensitive` **45/40**. Native strict evidence separates sensitive dependence from intrinsic randomness production.
+8. Lyapunov found **12/9**, Feigenbaum **6/5**, period doubling **9/9**, bifurcat* **4/4**, attractor **76/57**, and precision-control vocabulary **18/12**. Lyapunov is native T43 Notes; attractor/bifurcation are supported analyzers because those words occur zero times in the native strict/Notes scope.
+9. Exact strict image links found **8/8** and native-Notes links **3/3**. File enumeration found no additional native T43 assets. The page-166 asset is demonstrably a caption crop rather than the missing full plate.
+10. Native source establishes no halt vocabulary. Fixed points, zeros, cycles, convergence, attractors, resource limits, and horizons are analyzers or run outcomes, never implicit transition stops.
+11. The general `NestList` example at `10682-10687` establishes initial-inclusive trace shape. It is responsibility evidence only; its host function argument is not a serializable T43 map.
+12. Supporting recurrence text at `12698-12702` gives a T37/T43 dual view of logistic values. Supporting CA text at `11254-11260` relates rule 170 to the doubling map through binary encoding. Neither collapses the native state categories.
+13. Native precision evidence at `13223-13255` partitions tracked arbitrary precision, fixed binary computer arithmetic, and fixed decimal calculator arithmetic. It directly requires numerical feedback profiles, not one generic plotting precision field.
+14. Native logistic evidence at `13266-13270` supplies `x -> a x(1-x)`, seed `1/8`, period doubling toward source-reported `3.569946`, and the `a=4` shift-map relation under `x=Sin[Pi u]^2`.
+15. Native vector evidence at `13272` supplies torus-style simultaneous vector evolution. The repeated word “rational” is dispositioned as integer versus nonintegral-rational matrix entries, not silently changed to irrational.
+16. Supporting periodicity text at `14468-14478` supplies periodic-point queries, the continued-fraction quadratic-irrational case, and Sarkovskii's relation. Its rational-`a` guarantee is false as written, and its logistic formula/executable line is extraction-corrupted.
+17. Supporting symbolic-dynamics/attractor text at `14693-14701`, chaos history at `14936-14944`, algebraic-iterate material at `18010-18048`, and initial-information/universality material at `19086,19102` are explicitly typed below.
+18. The T44 seam at `1954,1982,13298` makes T43 a scalar-map component of a coupled field construction; T44 owns neighborhoods, aggregation, lattice state, and simultaneous field commit.
+19. Direct repository search found no current T43 implementation or test. `simple_programs.md`, finite alphabets, opaque rules, fixed episode specs/rollout, and visualization exporters were inspected line by line for reusable responsibility versus semantic mismatch.
+20. Independent exact rational/high-precision and pixel checks regenerated page-165 traces and all 12,960 digit cells, both page-168 traces and 9,680 digit cells, and all four page-170 comparison panels and 38,720 cells.
+21. Zero unresolved textual, split, Notes, actual-Index, history, alias, program, variant, relation, or false-positive candidate remains. Counts use only the canonical monolith so split duplicates are not double-counted.
+
+Representative commands used case-insensitive Perl occurrence/unique-line counters split at `BOOK:20826`, `rg -n -i` unions, `sed`/`nl` context reads, `rg --files`, `file`, `stat`, `sha256sum`, original-resolution inspection, exact `Fraction` recurrence checks, raster pixel classification, and independent high-precision arithmetic.
 
 ## Book Excerpts
 
-Canonical excerpt groups are under audit.
+`BOOK` below means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. Quotations preserve source wording and extraction artifacts; repairs and dispositions follow them.
+
+### E01 — Fixed scalar map on an invariant interval
+
+- Provenance: `BOOK:1868-1872`, strict main.
+- Establishes: one scalar is repeatedly updated by one fixed total self-map; standard-function syntax is incidental.
+
+> “The basic idea of an iterated map is to take a number between 0 and 1, and then in a sequence of steps to update this number according to a fixed rule or \"map\".”
+
+> “Many of the maps I will consider can be expressed in terms of standard mathematical functions, but in general all that is needed is that the map take any possible number between 0 and 1 and yield some definite number that is also between 0 and 1.”
+
+“Between” is informal endpoint language. Goal 2 serializes the strict closed interval and validates each map's actual range.
+
+### E02 — Initial conditions, digit rows, and value plots
+
+- Provenance: `BOOK:1874-1886`, strict main/caption.
+- Establishes: exact initial conditions and two distinct observers; qualitative behavior differs among maps.
+
+> “Case (c) shows complexity in digit sequences, but the sizes of the numbers it generates rapidly tend to 0.”
+
+> “On the first of the next two pages all the examples start with the number 1/2—which has a simple digit sequence. But the examples on the second of the next two pages instead start with the number  $\pi/4$ —which has a seemingly random digit sequence.”
+
+> “For as the picture illustrates, the so-called shift map used in case (d) simply serves to shift all digits one position to the left at each step.”
+
+> “It is important to realize, however, that in no real sense is any randomness actually being generated by the evolution of this system. Instead, it is just that randomness that was inserted in the digit sequence of the original number shows up in the results one gets.”
+
+> “The pictures at the top of the page show the base 2 digit sequences of successive numbers obtained by iterating this mapping, while the pictures in the middle of the page plot the sizes of these numbers.”
+
+The raster, not the detached equation list, supplies the `(a,b,c,d)` association.
+
+### E03 — Literal map inventory and intrinsic complexity
+
+- Provenance: `BOOK:1888-1898`, strict main.
+- Establishes: the four literal expressions and the source's intrinsic-versus-transcribed distinction.
+
+> $x \rightarrow FractionalPart[3/4 x]$
+
+> $x \rightarrow FractionalPart[2 x]$
+
+> $x \to If[x < 1/2, 3/2 x, 3/2 (1 - x)]$
+
+> $x \rightarrow FractionalPart[3/2 x]$
+
+> “And the point is that these maps actually do intrinsically generate complexity and randomness; they do not just transcribe it when it is inserted in their initial conditions.”
+
+The extraction lists `(c),(d),(b),(a)` without labels; `_page_166_Figure_2.jpeg` is only a caption crop. Equation order must not be treated as case identity.
+
+### E04 — Sensitive dependence as digit transport
+
+- Provenance: `BOOK:1902-1922`, strict main/caption.
+- Establishes: a small initial-size difference becomes macroscopic, and digit transport explains it.
+
+> “But the essence of the so-called chaos phenomenon is that there are some systems where arbitrarily small changes in the size of a number can end up having large effects on the results that are produced.”
+
+> “The pictures at the top of the facing page show what happens if one uses as the initial conditions for this system two numbers whose sizes differ by just one part in a billion billion.”
+
+> “The point is that a small change in the size of the number in the initial conditions corresponds to a change in digits far to the right.”
+
+> “But the evolution of the system progressively shifts digits to the left, so that the digits which differ eventually become important.”
+
+The sentence beginning at `1908` resumes at `1922` after five images and a caption. That is page-layout interleaving, not two claims.
+
+### E05 — Sensitivity does not explain intrinsic randomness
+
+- Provenance: `BOOK:1924-1946`, strict main.
+- Establishes: sensitivity, initial information, intrinsic complexity, and convergence are distinct properties.
+
+> “The fact that small changes in initial conditions can lead to large changes in results is a somewhat interesting phenomenon. But as I will discuss at length in Chapter 7 one must realize that on its own this cannot explain why randomness—or complexity—should occur in any particular case.”
+
+> “But a crucial discovery in this book is that systems like (a) and (b) on pages 150 and 151 can show behavior that seems in many respects random even when their initial conditions show no sign of randomness and are in fact extremely simple.”
+
+> “Cases (a), (b) and (d) exhibit sensitive dependence on initial conditions, in the sense that a change in insignificant digits far to the right eventually grows to affect all digits.”
+
+> “Case (c) does not show such sensitivity to initial conditions, but instead always evolves to 0, independent of its initial conditions.”
+
+For nonzero exact `(c)` states, “evolves to 0” is asymptotic and does not establish finite arrival or a halt.
+
+### E06 — Initial-inclusive iteration program
+
+- Provenance: `BOOK:10682-10687`, general Notes.
+- Establishes: `NestList` includes the initial state and every successive application.
+
+> `Nest[f, x, 3] -> f[f[f[x]]]`
+
+> `NestList[f, x, 3] -> {x, f[x], f[f[x]], f[f[f[x]]]}`
+
+This fixes trace convention, not permission to serialize opaque `f` callbacks.
+
+### E07 — Rule 170 and the doubling map
+
+- Provenance: `BOOK:11254-11260`, supporting CA Notes.
+- Establishes: base-2 encoding relates a CA shift to `Mod[2x,1]`.
+
+> “Rule 170 is the classic shift map which shifts all cell values one position to the left without changing them.”
+
+> “below, this map has the form Mod[2x, 1] (compare page 153).”
+
+The sentence is split across column-interleaved lines. This is an encoding/conjugacy relation; a CA row and T43 scalar are not identical state carriers.
+
+### E08 — Logistic recurrence/T43 dual interpretation
+
+- Provenance: `BOOK:12698-12702`, recursive-sequence Notes.
+- Establishes: the same values admit prefix-recurrence and scalar-map interpretations.
+
+> `f[0] = x; f[n_] := a f[n-1] (1-f[n-1])`
+
+> “corresponds to an iterated map of the kind discussed on page 920, and has complicated behavior for many rational *x*.”
+
+The source's `f[n_{-}]` is an extraction artifact. T37 stores the indexed prefix; T43 stores only the current scalar.
+
+### E09 — History, aliases, and exact iterates
+
+- Provenance: `BOOK:13215-13222`, native Notes.
+- Establishes: Newton/return/logistic/Gauss variants and exact iterate formulas.
+
+> “Newton's method from the late 1600s for finding roots of polynomials ... can be thought of as a smooth iterated map ... in which a rational function is repeatedly applied.”
+
+> “In the 1890s Henri Poincaré studied so-called return maps giving for example positions of objects on successive orbits.”
+
+> “In connection with his study of continued fractions Carl Friedrich Gauss noted in 1799 complexity in the behavior of the iterated map  $x \to FractionalPart[1/x]$ .”
+
+> “For any integer a the  $n^{th}$  iterate of  $x \to FractionalPart[ax]$  can be written as  $FractionalPart[a^n x]$ .”
+
+The history's `4x(1-x)` delimiters are broken. `FractionalPart[1/x]` is partial at zero, and the alternate ArcTan/Cot iterate needs endpoint/branch conventions.
+
+### E10 — Precision and finite-storage artifacts
+
+- Provenance: `BOOK:13223-13255`, native Notes.
+- Establishes: tracked and fixed arithmetic have different feedback semantics.
+
+> “But in a practical computer, only a limited number of digits can ever be stored.”
+
+> “But a lowlevel language such as FORTRAN, C or Java always stores a fixed number of digits, typically around 53, in its standard double-precision floating-point representation of numbers.”
+
+> “When doing high-precision arithmetic, Mathematica follows the principle that it should only ever give digits that are known to be correct on the basis of the input that was provided.”
+
+> “This means that in simulating chaotic systems, the numbers produced will typically have progressively fewer digits.”
+
+> “What they do is to give a fixed number of digits as the result of every computation, whether or not all those digits are known to be correct.”
+
+> “On most computers, these additional digits are always 0. And so after some number of steps, all the digits in x are 0, and thus the value of x is simply 0.”
+
+> “For pocket calculators effectively represent numbers in base 10 ... not base 2, and fill in unknown digits with 0 in base 10.”
+
+> “In both cases the limited number of digits implies behavior that ultimately repeats-but only long after the other effects we discuss have occurred.”
+
+The missing article, `lowlevel`, and `repeats-but` are extraction defects. The mixed `<sup>` formulas are source records requiring reconstruction, not executable code.
+
+### E11 — Mathematical versus computational robustness
+
+- Provenance: `BOOK:13257-13265`, native Notes.
+- Establishes: digit structure and initial-information content are intentional semantics.
+
+> “Many mathematicians may object that digit sequences are just too fragile an entity to be worth studying.”
+
+> “But robustness with respect to mathematical operations is a different issue from robustness with respect to computational operations.”
+
+> “Common sense suggests that it is a quite different thing to specify a simple initial condition containing, say, a single black cell on a white background, than to specify an initial condition containing an infinite sequence of randomly chosen cells.”
+
+### E12 — Smooth logistic maps and period doubling
+
+- Provenance: `BOOK:13266-13270`, native Notes.
+- Establishes: smooth maps, parameterized rules, period doubling, and a shift relation.
+
+> “A particularly well-studied example (see page 918) is the so-called logistic map  $x \to ax(1-x)$ .”
+
+> “As a increases, the repetition period goes through a series of doublings.”
+
+> “As a approaches 3.569946, the period doublings get closer and closer together.”
+
+> “In the special case a = 4, it turns out that replacing x by  $Sin[\pi u]^2$ makes the mapping become just  $u \rightarrow FractionalPart[2u]$ .”
+
+`3.569946` is source-reported approximate data. The extracted substitution word is malformed and is an observer/relation, not native map state.
+
+### E13 — Higher dimension, parameter regions, and Lyapunov exponent
+
+- Provenance: `BOOK:13272-13279`, native Notes.
+- Establishes: a vector extension, parameter-space observations, and a native sensitivity measure.
+
+> “One can consider socalled Anosov maps such as  $\{x, y\} \rightarrow Mod[m.\{x, y\}, 1]$  where m is a matrix such as  $\{\{2, 1\}, \{1, 1\}\}$ .”
+
+> “Any initial condition containing only rational numbers will then yield repetitive behavior, much as in the shift map.”
+
+> “But as soon as m itself contains rational numbers, complicated behavior can be obtained even with an initial condition such as {1, 1}.”
+
+> “For iterated maps, unlike for discrete systems such as cellular automata, one can get continuous ranges of rules by varying parameters.”
+
+> “The number of new digits that are affected at each step by a small change in initial conditions gives the so-called Lyapunov exponent  $\lambda$  for the evolution.”
+
+> “After t steps, the difference in size resulting from the change in initial conditions will be multiplied by approximately  $2^{\lambda t}$ .”
+
+The second “rational” means nonintegral rational matrix entries in context. Vector evidence does not widen strict scalar conformance.
+
+### E14 — Periodic points, source inconsistency, and Sarkovskii
+
+- Provenance: `BOOK:14468-14478`, supporting periodicity Notes.
+- Establishes: periodic-point solvers and period relations, with a material false claim.
+
+> “An iterated map ... with rule  $x \rightarrow Mod[ax, 1]$  (with rational a) will yield repetitive behavior when its initial condition is a rational number.”
+
+> “The continued fraction map  $x \rightarrow Mod[1/x, 1]$  ... becomes repetitive whenever its initial condition is a solution to a quadratic equation.”
+
+> `Select[x /. Solve[Nest[f, x, p] == x, x], Im[#] == 0 &]`
+
+> “For any iterated map based on a continuous function such as a polynomial it was shown in 1962 that if an initial condition exists that gives period 3, then other initial conditions must exist that give any other period.”
+
+The rational-`a` guarantee is false: `a=3/2`, `x_0=1/2` has reduced denominator `2^(t+1)`. The intended logistic polynomial lost `x`, code and prose are joined, and `nfor` lacks a space. Period detection is a solver, not a halt rule.
+
+### E15 — Symbolic dynamics and attractor support
+
+- Provenance: `BOOK:14693-14701`, supporting Notes.
+- Establishes: digit partitions are observers; attractors are supported but non-native.
+
+> “Starting in the 1930s the idea of symbolic dynamics began to emerge, in which one partitions continuous values in a system into bins represented by discrete symbols, and then looks at the sequences of such symbols that can be produced by the evolution of the system.”
+
+> “There are fixed points, limit cycles and so-called strange attractors.”
+
+> “For maps of the form  $x \rightarrow ax(1-x)$ ... the attractor for small a is a fixed point, then a period 2 limit cycle, then period 4, 8, 16, etc.”
+
+`attractor` occurs zero times in native T43 main/Notes. These are supported analysis records, not strict state or termination semantics.
+
+### E16 — History and limits of chaos inference
+
+- Provenance: `BOOK:14936-14944`, supporting chaos Notes.
+- Establishes: approximate fitting and sensitivity cannot identify the ultimate source of randomness.
+
+> “The term \"chaos\" had been used since antiquity to describe various forms of randomness, but in the late 1970s it became specifically tied to the phenomenon of sensitive dependence on initial conditions.”
+
+> “But inevitably the fit will only be approximate, so there will always be room for effects from randomness in the environment.”
+
+> “And in general this kind of approach can never establish that sensitive dependence on initial conditions is actually the dominant source of randomness in a given system—say as opposed to intrinsic randomness generation.”
+
+> “Sensitive dependence on initial conditions is associated with a kind of uniform instability in systems. But vastly more common in practice is instability only at specific critical points—say bifurcation points.”
+
+`bifurcat*` occurs zero times in native T43 scope; parameter-family analysis is supplementary.
+
+### E17 — Algebraic fast-forward does not replace traces
+
+- Provenance: `BOOK:18010-18048`, supporting reducibility Notes.
+- Establishes: iterate expressions grow; special cases admit random-access relations.
+
+> “Each successive step in such a mapping can in principle be represented by an algebraic formula.”
+
+> “But the table below gives for example the actual algebraic formulas obtained in the case a = 4 after applying FullSimplify—and shows that these increase quite rapidly in complexity.”
+
+> “In the specific case a = 4, however, it turns out that by allowing more sophisticated mathematical functions one can get a complete formula.”
+
+> `Sin[2^t ArcSin[Sqrt[x]]]^2`
+
+> `(1 - ChebyshevT[2^t, 1 - 2x])/2`
+
+The table at `18014-18020` is structurally corrupted and `<sup>` forms need reconstruction. A fast-forward relation never substitutes for a requested one-event trace.
+
+### E18 — Constructible initial information and universality relation
+
+- Provenance: `BOOK:19086,19102`, supporting Principle/universality Notes.
+- Establishes: arbitrary real digits are not free executable oracles; continuous maps can emulate discrete systems on restricted subsets.
+
+> “Traditional mathematics tends to assume that real numbers with absolutely any digit sequence can be set up.”
+
+> “And if this were the case, then the digits of an initial condition could for example be the table for an oracle ... and even a simple shift mapping could then yield output that is computationally more sophisticated than any standard discrete system.”
+
+> “But ... any reasonably complete theory must address how such an initial condition could have been constructed.”
+
+> “the discrete system  $x \rightarrow If[EvenQ[x], 3x/2, 3(x+1)/2]$ ... can be emulated by the continuous iterated  $x \rightarrow (3 + 6x - 3\cos(\pi x))/4$ .”
+
+The smooth emulation acts on a distinguished discrete subset and is not a strict `[0,1]` preset.
+
+### E19 — T43/T44 composition seam
+
+- Provenance: `BOOK:1954,1982,13298`, T44 main/Notes.
+- Establishes: T44 owns lattice support/aggregation/parallel update; T43 contributes a scalar map.
+
+> “One can update the gray level of each cell by using rules that are in a sense a cross between the totalistic cellular automaton rules ... and the iterated maps that we just discussed in the previous section.”
+
+> “The rule takes the new gray level of each cell to be the fractional part of the average gray level of the cell and its neighbors multiplied by 3/2.”
+
+> “Note that the operation performed on individual average gray levels is exactly iterated map (a) from page 150.”
+
+> “Most often considered ... were so-called \"coupled map lattices\" ... in which an iterated map ... was applied at each step to a combination of neighboring cell value.”
+
+Composition does not identify categories: T43 performs one scalar map application; T44 adds spatial support, neighborhood aggregation, and simultaneous field commit.
 
 ## Construction Model
 
-The audit must resolve independently:
+### State, definition, and invariant contract
 
-1. exact/declared real scalar state and invariant domain;
-2. fixed closed unary map program, old-value read, typed next-value result, and scalar assignment;
-3. piecewise-boundary, fractional-part, discontinuity, partiality, escape, and evaluation-failure semantics;
-4. exact symbolic/rational versus arbitrary/fixed/certified numerical execution and reproducible serialization;
-5. orbit snapshots/events, compact reconstruction, equality, period/cycle, and interruption outcomes;
-6. digit, size, divergence, entropy/randomness, Lyapunov, attractor, bifurcation, and parameter-scan observers;
-7. related smooth, complex, vector, Newton/Gauss/Anosov/logistic/bitwise maps and T34/T35/T36/T37/T41/T44/T45 boundaries.
+Strict native state is:
+
+```text
+MapState {
+  space_id: RealIntervalId,
+  value: ExactRealValue
+}
+```
+
+The strict interval is serialized as `[0,1]`; membership is validated before a run. There is one scalar slot, no control, no stored iteration counter, no random source, and no orbit prefix. Event indices belong to run/trace records.
+
+The immutable program is:
+
+```text
+IteratedMapSpec {
+  id,
+  state_space: RealInterval | RealBox | UnitTorus,
+  parameters: OrderedTuple[ExactOrDeclaredValue],
+  outputs: OrderedTuple[MapExpr],
+  expression_registry_version,
+  map_profile: VerifiedSelfMap(proof) | ExplicitPartialMap(contract)
+}
+```
+
+For strict scalar maps, `outputs` has length one. A verified self-map must be admitted by a known constructor whose range check is mechanically reproduced or by a replayable certificate tied to normalized syntax, exact parameters, state space, and registry version. A trusted boolean such as `total=true` is insufficient; proving range inclusion for arbitrary expressions is undecidable in general.
+
+### Closed map syntax
+
+Reuse T41's exact value and ordered function-expression responsibilities, then add explicit state access and branching:
+
+```text
+MapExpr =
+    StateComponent(index) | ParameterRef(index)
+  | Integer | Rational | NamedConstant | Algebraic | DeclaredDecimal
+  | Neg | Add | Sub | Mul | Div | Pow
+  | PrimitiveCall(name, ordered_args)
+  | Piecewise(ordered_cases, default)
+
+MapPredicate = Lt | Le | Eq | And | Or | Not
+```
+
+The strict primitive registry adds `FractionalPart`; logistic and related profiles reuse multiplication/subtraction; Gauss/Newton siblings use division with explicit partiality. Ordered piecewise cases and their exact comparison semantics are identity-bearing. `If[x<1/2,...]` takes the second arm at equality, even though the strict tent expression is continuous there.
+
+`FractionalPart[y]=y-Floor[y]` is a mathematical operation. It is not implicit boundary wrap, is defined at integers, and cannot be added by a renderer or runtime because a value left the domain. `FractionalPart[3x/4]` remains structurally distinct from `3x/4`, even though they agree extensionally on `[0,1]`.
+
+### Source, read, result, and update
+
+T43's transition record is:
+
+```text
+source = UniqueScalar(MapStateSlot)
+read   = CompleteOldScalar(value, space_id)
+result = MapStepResult(old, map_id, next, evaluation_provenance)
+effect = Assign(MapStateSlot, next)
+update = AtomicEffectsUpdate((effect,))
+```
+
+The expression is evaluated purely from the complete old value and immutable parameters. A successful strict event yields exactly one successor. `next==old` still commits an event and returns `Advanced(changed=false)`; a fixed point is not quiescence. T34's scalar assignment and fixed-effects preservation law are reused unchanged, so T43 adds a value/expression profile rather than an update-law member.
+
+For vector siblings, every output component reads the complete old tuple. All components are evaluated before a single tuple assignment, prohibiting in-place coordinate order effects.
+
+### Execution profiles
+
+1. **Ideal exact.** State contains canonical exact/certified reals. Operations return exact constructions where closed, or refine certified representations until a comparison/value is decided. Unsupported exact evaluation is typed, never coerced to binary float.
+2. **Certified enclosure.** The evaluator propagates a set guaranteed to contain the ideal value. It is a computation about a one-point ideal orbit, not permission to redefine native state as an arbitrary interval-valued dynamical system.
+3. **Tracked significance.** Declared approximate input carries reliable-digit/error provenance. Unknown digits remain unknown; precision decreases under sensitive iteration. A guard or requested accuracy that cannot be certified returns `PrecisionExhausted` or `IndeterminateComparison`.
+4. **Fixed rounded realization.** Every event is evaluated and rounded under a declared finite representation, and that represented result feeds the next event. Identity includes radix, fields/width, rounding, subnormal/nonfinite policy, literal conversion, guard comparisons, and rounding locations. Binary-computer and decimal-calculator recurrences are distinct represented maps.
+
+T41 numerical context can remain query-local because function observations do not feed back. T43 fixed rounding changes every later transition, so it belongs to a run/program-realization identity and relation to the ideal spec.
+
+### Outcomes and partial siblings
+
+A verified strict self-map can yield:
+
+```text
+Advanced(changed: bool, event: MapStepResult)
+Interrupted(last_complete_state, committed_events, reason)
+Failure(last_complete_state, no_partial_event, diagnostic)
+```
+
+Invalid seed membership is a validation error. A supposedly verified evaluator returning a nonmember is `VerifierContractViolation` or `BackendFailure`, not normal escape.
+
+An explicitly partial/open-domain sibling may additionally return:
+
+```text
+UndefinedMapValue(Pole | MissingBranch | OutsideDefinitionDomain)
+EscapedDomain(value)
+EvaluationFailure(
+  Unsupported | IndeterminateComparison | PrecisionExhausted |
+  ResourceLimit | BackendFailure
+)
+```
+
+These outcomes retain the last complete state and commit no partial event. No clamp, saturation, reflection, tolerance stop, or implicit modulo is permitted.
+
+### Trace, equality, and serialization
+
+For requested horizon `h`, a complete orbit contains `h+1` snapshots and `h` committed event records. An interruption says whether it occurred before or after a commit. Random-access evaluators may answer an explicit time query but do not fabricate missing event provenance.
+
+Keep at least five relations distinct:
+
+1. normalized structural map identity;
+2. certified functional equivalence on a declared domain;
+3. conjugacy or semiconjugacy with the transformation and scope;
+4. exact equality of canonical state/orbit values;
+5. equality of a declared finite observation or numerical realization.
+
+Codec records use tagged JSON for decimal-string big integers, reduced rationals, named constants such as `Pi`, algebraics, declared decimals with precision provenance, enclosures, exact interval endpoints, ordered piecewise arms, registry versions, represented-format bit/digit patterns, events, outcomes, witnesses, and analyzer results. Proof artifacts validate specs but do not silently change mathematical identity. No exact field is encoded as a JSON number.
+
+### Observers and analyzers
+
+- **Value and digit views** consume traces. A digit view declares base, leading/fractional convention, width/window/crop, unknown/blank policy, and terminating-versus-repeating representation for dyadic rationals.
+- **Sensitivity comparison** executes two independent runs and records exact perturbation, metric, common horizon, execution profile, and difference view. It does not feed one orbit into the other.
+- **Cycle query** uses exact normalized equality and returns `CycleWitness(transient,period,replay)`, `NoCycleWithin(h)`, or `Unknown`. Tolerance matches and equal displayed digits are not cycles.
+- **Fixed-point/periodic-point solver** solves a separate scoped equation. It does not halt native iteration and does not claim all roots without a completeness certificate.
+- **Lyapunov query** records seed, horizon, burn-in, derivative or two-orbit method, side convention at cusps/jumps, precision, metric, and log base. Native Notes use base 2. Finite-time estimates and asymptotic/certified exponents are separate results.
+- **Attractor query** declares topology/metric, invariant-set representation, basin scope, evidence/certification, and parameter. A finite trace or periodic point alone cannot prove attraction.
+- **Parameter/bifurcation query** is family analysis. Burn-in/sample rasters and source-reported `3.569946` are approximate observations, not exact boundaries.
+- **Symbolic-dynamics view** declares a partition and endpoint convention. The resulting word is an observation, not the scalar state.
+- **Fast-forward query** uses a certified identity such as `FractionalPart[a^t x]`; it answers a random-access value request and never replaces requested sequential effects.
+- **Rendering** consumes typed view data. Line joins across discontinuities, pixel crop, antialiasing, axes, and viewport never alter map semantics.
 
 ## Exact Book Presets and Oracles
 
-Page-165/166 four-map profiles, page-168 perturbation comparison, page-170 digit differences, Notes finite-precision simulations, logistic map, all raster identities, and exact or declared-precision anchors are under reconstruction.
+### Strict page 165 — seed `1/2`
+
+| Case | Exact map | First five snapshots | Exact property |
+|---|---|---|---|
+| `(a)` | `FractionalPart[3x/2]` | `1/2,3/4,1/8,3/16,9/32` | reduced denominator at time `t` is `2^(t+1)`; nonperiodic |
+| `(b)` | `If[x<1/2,3x/2,3(1-x)/2]` | `1/2,3/4,3/8,9/16,21/32` | equality takes else arm; map remains continuous at cusp |
+| `(c)` | `FractionalPart[3x/4]` | `1/2,3/8,9/32,27/128,81/512` | `x_t=(1/2)(3/4)^t`; approaches zero but never reaches it |
+| `(d)` | `FractionalPart[2x]` | `1/2,0,0,0,0` | exact dyadic shift reaches fixed point after one event |
+
+The original raster is `1196x1147`. It has four 40-column by 81-row digit grids with the initial state at the top. Terminating dyadic expansions, exact rational iteration, and a coordinate classifier reproduce all `12,960` cells exactly, with black counts `1176,1255,758,1`. The independent oracle prints:
+
+```text
+T43 page-165 exact/pixel oracle: PASS; cells=12960; black=1176,1255,758,1; states=81
+```
+
+The map graphs visually join values across jumps at `2/3` and `1/2`. Those vertical renderer strokes are not graph values or multivalued transitions.
+
+### Strict page 166 — seed `Pi/4`
+
+The prose fixes the same four maps and exact seed `Pi/4`, but the extracted `_page_166_Figure_2.jpeg` is only `1199x203` and contains the caption region. No complete second plate is present among native assets. Goal 2 preserves the exact preset and can regenerate it, but closure will not invent raster dimensions, digit width, or pixel equivalence for a missing source image.
+
+For case `(d)`, exact time `t` is `FractionalPart[2^t Pi/4]`. This is an exact named-real expression and exposes successive binary digits; evaluating it through machine `pi` is a different fixed-rounded realization.
+
+Independent high-precision anchors at `t=80` are:
+
+- `(a)` `0.8851263439023357602140322920793285...`;
+- `(b)` `0.6500183088768673038030050560691047...`;
+- `(c)` `(Pi/4)(3/4)^80 = 7.9431168731335480458626e-11`;
+- `(d)` `FractionalPart[2^80 Pi/4] = 0.3849411523231692917741...`.
+
+### Strict page 168 — perturbation under the shift map
+
+The plate compares exact `x_0=Pi/4` with `x'_0=Pi/4+10^-18`, described as one part in a billion billion. Printed labels `.785398163397448310` and `.785398163397448311` are rounded displays, not exact rational state literals.
+
+Each digit plate has 80 columns and 121 initial-inclusive states, `t=0..120`. Exact high-precision binary expansion and shift iteration match all 9,680 logical cells. The comparison plate uses three values: common zero is white, common one is gray, and mismatch is black. Counts are `3348` common-zero, `2070` common-one, and `4262` mismatch cells.
+
+Exact/declared high-precision anchors are:
+
+- `t=50`: `0.03447074292687806517...` versus `0.03559664283372068917...`;
+- `t=57`: absolute difference `0.144115188075855872`;
+- `t=58`: ordinary absolute difference `0.711769623848288256`;
+- `t=100`: `0.05373841956329129163...` versus `0.28313991626649666763...`;
+- `t=120`: `0.81703199772940992838...` versus `0.72083905800975450438...`, difference `0.096192939719655424`.
+
+Figure 4 contains two `[0,1]` value plots over `t=0..120`; Figure 5 plots ordinary absolute difference on the same event horizon.
+
+### Strict page 170 — four-map sensitivity comparison
+
+The four panels compare the same exact seeds over 80 columns and 121 initial-inclusive states. They use page 168's white/common-zero, gray/common-one, black/mismatch encoding. Exact regeneration matches all 38,720 cells.
+
+| Case | Common zero | Common one | Mismatch | First `abs(delta)>=10^-3` | First `abs(delta)>=0.1` | First differing leading bit |
+|---|---:|---:|---:|---:|---:|---:|
+| `(a)` | 3071 | 3114 | 3495 | 86 | 97 | 99 |
+| `(b)` | 3093 | 3109 | 3478 | 86 | 97 | 96 |
+| `(c)` | 6186 | 3162 | 332 | none through 120 | none | none |
+| `(d)` | 3348 | 2070 | 4262 | 50 | 57 | 57 |
+
+Constant-slope Lyapunov rates in the source's base-two convention are `log2(3/2)=0.5849625007...` for `(a),(b)`, `log2(3/4)=-0.4150374993...` for `(c)`, and `1` for `(d)`. They explain the raster wedge slopes but remain analysis results. The picture is an observation of two runs, not a derivative, entropy proof, or transition feedback source.
+
+### Native Notes precision profiles
+
+- The high-precision example is `NestList[Mod[2#,1]&,N[Pi/4,40],200]`; tracked precision decreases as further unknown digits become relevant.
+- A computer-style fixed binary profile is described by a 53-bit truncation and successive doubling modulo `2^53`; it eventually becomes zero.
+- A calculator-style profile stores 12 base-10 digits, applies powers of two modulo `10^12`, and renders each decimal digit through four binary positions. It is eventually periodic but differs from the binary profile.
+- Notes page-934 pictures `(a),(b)` use `Pi/4` and `(c),(d)` use `1/3`; `(a),(c)` are computer profiles and `(b),(d)` are calculator profiles.
+- `Floor[2^53 Pi/4]=7074237752028440` has 2-adic valuation 3, so its binary shift reaches zero at event 50. `Floor[2^53/3]=3002399751580330` has valuation 1 and reaches zero at event 52.
+- Decimal seeds are `785398163397` and `333333333333`. Both are coprime to `10^12`; after a 12-event preperiod their doubling orbit has period `ord_(5^12)(2)=4*5^11=195312500`.
+- The compressed composite appears to allocate 60 slots and 101 initial-inclusive rows: 53 binary bits plus seven unavailable gray slots, or 48 BCD bits plus twelve unavailable slots. Those layout counts are raster-derived, not semantic or cell-perfect conformance claims.
+- The source does not provide a complete portable floating-format/rounding standard, so Goal 2 treats these as declared historical presets rather than a generic “machine float” default.
+- The page-935 multiplication-by-`3/2` pictures show that finite-arithmetic effects are map-dependent; unlike the doubling map, a typical computer may retain apparently complex behavior.
+- Page 935 does not state an exact repeated-`3/2` rounding rule and cannot be a cross-platform pixel oracle. Under ideal arithmetic, its simple `1/3` seed begins `1/3,1/2,3/4,1/8,3/16,9/32,...`.
+
+### Native Notes logistic and vector profiles
+
+- Logistic preset: `x -> a x(1-x)`, exact seed `1/8`, displayed `a={2.5,3.3,3.4,3.5,3.6,4}`. Page 936 is six orbit digit plates, not a bifurcation diagram; geometry is consistent with 40 visible digits and 81 initial-inclusive states.
+- Numerical anchors: `a=2.5` approaches fixed point `0.6` with base-two Lyapunov `-1`; `a=3.3` approaches `0.479427019824234... <-> 0.823603283206069...`; `a=3.4` approaches `0.451963247626153... <-> 0.842154399432671...`.
+- At `a=3.5`, a stable four-cycle is `0.382819683017324... -> 0.826940706591439... -> 0.500884210307218... -> 0.874997263602464...`. The `a=3.6` profile is chaotic with a method-dependent finite numerical base-two Lyapunov estimate near `+0.2667`; `a=4` has ideal exponent `1` away from exceptional points.
+- Period-doubling anchors are `3`, `1+sqrt(6)=3.44948974278...`, `3.54409035955...`, `3.56440726610...`, accumulating at `3.569945672...`, consistent with source-rounded `3.569946`.
+- Logistic `a=4` relation: under `x=Sin[Pi u]^2`, the ideal map is semiconjugate/conjugate modulo the two-to-one coordinate ambiguity to `u -> FractionalPart[2u]`. Record the transformation and scope, not structural equality.
+- Anosov example: `{x,y} -> Mod[{{2,1},{1,1}}.{x,y},1]` on a two-torus, with both outputs computed from the old pair. Rational seeds under the displayed integer matrix have finite denominator classes and eventually repeat.
+- A nonintegral rational matrix can introduce new denominator factors at each event and produce complicated behavior even from an integer seed. This is the defensible reading of the otherwise confusing second “rational” clause.
+
+### Asset ledger
+
+| Scope | Asset | Dimensions | Bytes | SHA-256 |
+|---|---|---:|---:|---|
+| strict | `_page_165_Figure_1.jpeg` | `1196x1147` | 283207 | `4581f6e83f6de80cecf11d98d79239e00248ff77e015f27ed641ca5c848f88bf` |
+| strict | `_page_166_Figure_2.jpeg` | `1199x203` | 64825 | `93dabe2074ed063e0f601509d30bbb1c7f79223ba29c9f997b361f84c10f0ddc` |
+| strict | `_page_168_Picture_1.jpeg` | `258x382` | 51127 | `ca745794f590aa388ca542c1e50c5589825ce78d70c2e90649116e95c49b9fa5` |
+| strict | `_page_168_Picture_2.jpeg` | `258x376` | 51555 | `d91032209f1a96488ab79fedc187fedc6f473383e87dfcfc5842aa80c729e9c6` |
+| strict | `_page_168_Picture_3.jpeg` | `258x392` | 46419 | `fd8ff1356ae3b1c5dbabafd4c409680756dcc38424a92a5bcfb2c10040160e2d` |
+| strict | `_page_168_Figure_4.jpeg` | `439x255` | 27579 | `9465c4286aff9a4f44196f4573fff7bc05943962a6f16d3be72caecdcce5af24` |
+| strict | `_page_168_Figure_5.jpeg` | `418x141` | 11021 | `2430931ed5e69d53b533a6f00fa2451655c2391bef476e69ba1b9da82283cc40` |
+| strict | `_page_170_Picture_2.jpeg` | `1104x417` | 166127 | `ba603585ba5ac85a34fe0088ed152036888fe6e85682b9533a657a99b03b9629` |
+| Notes | `_page_934_Picture_17.jpeg` | `599x293` | 37920 | `d0389c0e10c82574f7cf7f499b59920fc94d1dc3a43292d94e450b25b8d59ddc` |
+| Notes | `_page_935_Picture_3.jpeg` | `561x308` | 54057 | `cee09ed248e1877b550e88d4bab09132b85ad0e848dbae037c69fb16c470d3a0` |
+| Notes | `_page_936_Picture_3.jpeg` | `580x202` | 40172 | `d41132b549fc172dabb26e4d2a97ef13f0f04a9b9f413cf2fa49ce6d90727f94` |
 
 ## Variants, Relations, and Boundaries
 
-T34 exact arithmetic iteration, T35 piecewise integer maps, T36 digit reversal, T37 recursive prefixes, T41 function definitions, T44 continuous CA, T45 differential equations, exact fast-forward formulas, and numerical chaos diagnostics are under audit as reusable semantics, distinct state profiles, observers, or solvers.
+### Strict and supplementary T43 profiles
+
+- **Strict scalar piecewise/fractional maps:** verified total self-maps of `[0,1]`; exact primary conformance.
+- **Smooth logistic maps:** parameterized scalar family, exact polynomial syntax, invariant `[0,1]` only for an admitted parameter scope such as `0<=a<=4`; parameter sweep remains an observer.
+- **Gauss/continued-fraction map:** `FractionalPart[1/x]` is partial at zero. It requires a domain excluding zero or a typed undefined result and cannot use the strict total profile unchanged.
+- **Newton/rational maps:** rational expression, usually partial at derivative zeros/poles; complex-domain variants require typed complex state and branch conventions.
+- **Affine/fractional-linear maps:** closed syntax with explicit domain and range proof; special fast-forward relations are evaluator artifacts.
+- **Vector Anosov maps:** fixed-dimensional torus state, simultaneous tuple assignment, componentwise modulo as program syntax.
+- **Bitwise analogs:** relation to cellular automata, not permission to replace real scalar state with a digit array.
+- **Stochastic/noisy maps:** would add an explicit random source and transition distribution; no native evidence admits them into strict T43.
+
+### Cross-type boundaries
+
+- **T34:** shares one scalar slot, complete read, scalar assignment, and fixed-effects update. T34's closed integer arithmetic is not an exact-real backend.
+- **T35:** piecewise integer parity maps use signed-integer state and different domain/branch evidence. T43 does not absorb them through a numeric union.
+- **T36:** digits are the evolving finite word in reversal systems; T43 digits are an observer of a real scalar.
+- **T37:** recurrence systems preserve an indexed prefix and append one term. A logistic recurrence can expose the same values, but T43 state is only the current scalar and reuses assignment.
+- **T41:** shares exact numeric/expression/primitive responsibilities. T41 evaluation is a pure query; T43 feeds each result into the next committed event and makes fixed rounding transition-semantic.
+- **T42:** continued-fraction coefficient streams and substitution traces are separate constructions. A Gauss-map orbit may relate to coefficients but does not store a T42 word.
+- **T44:** applies scalar-map-like functions to neighborhood aggregates over a continuous lattice and commits a whole field simultaneously. T43 alone has no lattice, neighbor read, or boundary.
+- **T45:** differential equations define continuous-time flows/solution queries. A return/Poincare map may be derived from a flow but is a separately specified discrete-time T43 relation.
+- **Analytic iterates/solvers:** certified random-access methods and periodic-point solutions are query records, never replacements for state/update semantics.
+
+### Source and extraction repairs
+
+1. Monolith strict/Notes image links are broken relative paths; use monolith text plus clean-split asset provenance.
+2. The strict formula list is detached and ordered `(c),(d),(b),(a)`; the page-165 raster supplies correct labels.
+3. `_page_166_Figure_2.jpeg` is only a caption crop; the full second plate is missing.
+4. The page-168 sentence is split around five interleaved images/caption and resumes at `1922`.
+5. The Notes history's `4x(1-x)` math delimiter at `13217` is broken.
+6. `lowlevel`, `repeats-but`, `socalled`, `nfor`, and several code/prose joins are extraction artifacts.
+7. `BOOK:13272` uses “rational” twice. Read the second as nonintegral rational matrix entries; integer matrices plus rational seeds have a finite denominator class.
+8. `BOOK:14468` is mathematically false for arbitrary rational `a`; `a=3/2,x_0=1/2` is a strict counterexample. Preserve the literal claim and separately state the integer/denominator-preserving repair.
+9. `BOOK:14470-14472` loses the state variable in the logistic polynomial and joins the `Select[...]` code to prose.
+10. The algebraic table at `18014-18020` is structurally corrupted; only the surrounding qualitative statement and separately readable closed forms are usable.
+11. Raster graph vertical joins at mathematical jumps are a rendering artifact, not program semantics.
+12. Exact precision, sampling, rounding, and digit-window settings for several strict images are unstated. Raster appearance never supplies hidden defaults.
 
 ## Current API Fit
 
-In progress.
+- `simple_programs.md` offers reusable responsibility names only: rank-zero time, a unique scalar source, complete old-value read, and same-slot assignment. Its current formula callback is not an inspectable map definition.
+- `src/ca/alphabets.py:43-56,88-126` explicitly represents finite value sets. `float_range_alphabet` discretizes a range and is not a mathematical real interval.
+- `src/ca/rules.py:25-30,64-78,316-328` stores opaque Python callables and family identifiers. Neither is stable structural program data.
+- `src/ca/specs.py:23-81,117-181` requires CA shape, rule, frontier, boundary, and dense episode assumptions that T43 does not possess.
+- No public type represents exact/algebraic real values, certified enclosures, represented-number profiles, interval/torus spaces, invariant proofs, map events, or analysis results.
+- Existing rule IDs and NumPy dtype inference cannot be reused as map identity or numeric semantics.
 
 ## Current Runtime Fit
 
-In progress.
+- `src/ca/rollout.py:40-85,145-212` requires a positive finite step count, dispatches by family, and materializes NumPy episode arrays. Only the horizon requirement and initial-inclusive snapshot responsibility are reusable.
+- Current rank-zero evolution is modular integer AR2. Adding `if family == "iterated_map"` would perpetuate family dispatch and bypass the typed source/result/effect executor established by earlier stages.
+- `src/ca/viz/export.py:139-184` accepts `RawEpisode`/`RawBatch`, assumes integer rule IDs, and rejects float/object states. T43 needs typed trace/view export rather than forcing exact values into an array.
+- `pyproject.toml` provides NumPy and pytest but no exact-real, symbolic, interval, arbitrary-precision, or proof backend. Goal 2 must either choose an explicit dependency after cross-stage synthesis or initially limit executable exact primitives to operations it can certify.
+- Direct source/test search finds no iterated-map, fractional-part, logistic, precision, cycle, sensitivity, bifurcation, attractor, or Lyapunov implementation/conformance test.
 
 ## Principles Audit
 
-The strict source is a genuine scalar transition and should reuse T34's typed assignment if its preservation law remains unchanged. The map must nevertheless be closed inspectable data, and continuous-state precision cannot be hidden inside NumPy or a callback. No new update law, real-number representation, higher-dimensional generalization, or observer is accepted until the evidence audit closes it.
+### Clear ontological basis
+
+The ontology is one scalar state in a declared domain, one immutable closed self-map, one complete old-value read, one typed next value, and one atomic assignment. Map, state, trace, numerical realization, and observations have distinct identities.
+
+### Mechanism separated from observation
+
+Digit rows, sizes, pairwise differences, symbolic partitions, cycles, Lyapunov values, attractors, bifurcation plots, and renders consume completed state/events. None influences rule choice or commit. Fast-forward and solver work traces are likewise outside native evolution.
+
+### Minimal truthful generalization
+
+Strict scalar conformance comes first. T41 syntax and T34 assignment are reused. A vector torus is admitted only as an explicit Notes-backed sibling; complex, partial, stochastic, and coupled-field profiles do not hide behind flags.
+
+### Replayability and exactness
+
+Ordered syntax, exact parameters, state-space endpoints, totality evidence, primitive versions, execution realization, and every event are serializable. Approximate/certified/source-reported claims are labeled, and no raster or binary float substitutes for exact semantics.
+
+### Honest computational limits
+
+General invariant proofs, exact comparison of arbitrary computable reals, asymptotic Lyapunov values, attractors, bifurcations, and complete periodic-point sets can be undecidable or computationally hard. Typed unsupported/unknown/resource outcomes are required; sampling is never relabeled proof.
 
 ## Detailed Implementation Plan
 
-1. Complete strict main/raster, Notes, actual Index, split, history, program, alias, variant, cross-reference, and false-positive searches.
-2. Decode every strict map, parameter, initial value, horizon, digit/plot convention, perturbation, and source repair; regenerate exact or declared-precision oracles.
-3. Derive state/domain/value, map AST, source/read/result/update, precision, outcomes, equality, serialization, orbit trace, and observer categories from evidence.
-4. Separate T34/T35/T36/T37/T41/T44/T45, analytic fast-forward, parameter scans, and implementation work traces.
-5. Audit current API/runtime/tests and write an implementation-ready Goal 2 handoff without callbacks, fixed precision masquerading as exactness, or a T43 rollout branch.
-6. Integrate global artifacts and run source/oracle, hash, fence, coverage, diff, and repository verification before closure.
+1. Extend the shared exact/declared numeric algebra with named/algebraic reals, certified enclosures, and explicitly represented finite formats; never silently coerce to binary float.
+2. Extend the T41 closed expression registry with state components, exact predicates, ordered piecewise syntax, `Floor`/`FractionalPart`, and partial-domain metadata.
+3. Add interval, box, and torus state-space records with exact membership/equality/codecs and replayable invariant checks.
+4. Add immutable map specs, strict constructors, proof/certificate records, scalar/vector state, source/read/result records, and lowering to the existing fixed-effects assignment law.
+5. Implement one-event evaluators for ideal exact, certified enclosure, tracked significance, and declared fixed-rounded realizations with typed failures.
+6. Implement orbit requests/runs/traces with `h+1` snapshots, interruption semantics, realization provenance, and optional certified fast-forward queries that never fabricate events.
+7. Implement separate digit/value/sensitivity/cycle/periodic-point/finite-time-Lyapunov/attractor/parameter-sweep schemas and view models.
+8. Add strict four-map, precision, logistic, Gauss partial, and vector-torus presets with provenance and source-repair records.
+9. Build typed visualization adapters from view data, not from raw exact state coerced into NumPy arrays.
+10. Add adversarial conformance tests for endpoints, jumps/cusps, exact versus fixed arithmetic, guard uncertainty, trace counts, equality relations, and observer separation.
 
 ## Goal 2 Implementation Stage
 
-Pending the evidence audit.
+Build on shared T41/T34 foundations without changing the current family rollout:
+
+1. extend `src/ca/numeric_values.py` for exact-real, enclosure, tracked-significance, and represented-format values;
+2. extend `src/ca/function_expr.py` with state references, `FractionalPart`, exact guards, and ordered `Piecewise`;
+3. add `src/ca/state_spaces.py` for exact intervals, boxes, and tori;
+4. add `src/ca/iterated_maps.py` for definitions, invariant validation, state/source/read/result records, and assignment lowering;
+5. add `src/ca/map_eval.py` for exact/certified/tracked/represented one-step evaluation using the shared primitive registry;
+6. add `src/ca/map_orbits.py` for requests, runs, `h+1` traces, interruption, and fast-forward relations;
+7. add `src/ca/map_analysis.py` for cycles, sensitivity, finite-time Lyapunov, periodic points, attractor schemas, and parameter sweeps;
+8. add `src/ca/viz/iterated_maps.py` for typed view/render records;
+9. add `src/ca/presets/iterated_maps.py` for strict and supplementary profiles;
+10. add `tests/test_t43_iterated_maps.py` plus codec/property fixtures.
+
+Dependency selection remains a synthesis decision. The first executable exact subset may support integers, rationals, named `Pi`, algebraic constructions, interval refinement, and the strict closed primitives; unsupported exact transcendental comparisons must stay typed until a backend is chosen.
+
+### Required conformance tests
+
+- Validate all strict maps at `0`, `1/2`, `2/3`, and `1`; verify exact `[0,1]` invariance and `FractionalPart` endpoint behavior.
+- Match the four exact seed-`1/2` prefixes and all 12,960 page-165 digit cells.
+- Prove `(c)`'s closed form and `(a)`'s denominator growth; use the latter to reject the false rational-`a` periodicity claim.
+- Verify shift random access `FractionalPart[2^t x]` for rational seeds and exact `Pi/4` without machine-float substitution.
+- Show fixed binary shift collapse and a distinct decimal represented orbit under fully declared formats.
+- Return indeterminate/refinement for an enclosure straddling a guard; never choose an arm arbitrarily.
+- Distinguish exact cycle witnesses from tolerance and digit-window false positives.
+- Obtain shift finite-time Lyapunov value `1` in base two away from discontinuities and a typed side/undefined derivative result at a jump.
+- Verify vector components use the old tuple simultaneously and torus equality is quotient-aware.
+- Keep logistic-4 relation/conjugacy distinct from structural equality.
+- Round-trip map, realization, run, trace, witness, observer, and rendering records independently.
+- Ensure fixed points still emit successful unchanged events and `h` events always produce `h+1` complete snapshots.
 
 ## No-Cheating Checks
 
-The final stage must reject unrestricted map callbacks, `eval`/formula strings, opaque host numeric/symbolic objects, binary-float coercion of exact seeds, hidden precision/fill/rounding, finite digit arrays as exact reals, digit rasters as state, argument evaluation without committed orbit state, analytic iterate formulas substituted for a requested step trace, cycle/zero detection as native halt, observer-fed updates, higher-dimensional maps packed into one scalar, and family-specific rollout dispatch.
+Reject:
+
+- callbacks, `eval`, formula strings, opaque host CAS objects, dynamic primitive reflection, pickles, sampled lookup tables, or raster-decoded rules;
+- finite float alphabets, digit arrays, object cells, rule IDs, or NumPy arrays as the mathematical real state;
+- implicit machine floats, radix, precision, rounding, unknown-digit fill, tolerance equality, backend defaults, or unrecorded literal conversion;
+- storing the orbit prefix as scalar state, routing T43 through T37 append, or treating an evaluation mesh as time;
+- a trusted `total=true` flag, unchecked domain escape, implicit clamp/wrap/modulo, or treating a defined discontinuity as failure;
+- arbitrary branch choice for uncertain comparisons or invented low-significance digits;
+- in-place vector-coordinate updates, box/torus equality conflation, or higher-dimensional state packed into one scalar;
+- tolerance-based cycle halts, convergence halts, fixed-point quiescence, or observer-fed transition changes;
+- bifurcation rasters as proofs, finite differences across jumps as derivatives, finite Lyapunov estimates as asymptotic limits, or periodicity of displayed digits as exact state repetition;
+- treating `0.0111...` and `0.1000...` as different numeric states without an explicit representation observer;
+- substituting analytic iterates or periodic-point solver outputs for requested event provenance;
+- claiming shift-map sensitivity produces randomness or treating arbitrary real digits as a free oracle;
+- silently “repairing” the Anosov sentence to irrational entries or accepting the false arbitrary-rational-`a` repetition claim;
+- a T43-specific rollout branch or a continuous-map flag bolted onto the CA runtime.
 
 ## Completion Requirements
 
-- [ ] Every strict figure, main/Notes/actual-Index/split passage, history item, alias, map variant, program, and relation candidate is dispositioned.
-- [ ] State/domain/value, closed map syntax, source/read/result/update, precision/rounding/uncertainty, failure/outcome, equality/serialization, trace, and observation semantics are explicit.
-- [ ] Page-165/166/168/170 and Notes profiles have exact or declared-precision independent oracles, hashes, and source repairs.
-- [ ] T34/T35/T36/T37/T41/T44/T45, fast-forward formulas, smooth/complex/vector maps, sampling, and observer boundaries are explicit.
-- [ ] Current API/runtime fit, Goal 2 files/dependencies/tests, global ledgers, diff checks, and repository tests are integrated.
+- [x] Every strict main/Notes/actual-Index/split passage, history item, alias, map variant, program, relation, and textual false positive is dispositioned.
+- [x] State/domain/value, closed map syntax, source/read/result/update, precision/rounding/uncertainty, failure/outcome, equality/serialization, trace, and observation semantics are explicit.
+- [x] Page-165/166/168/170 and Notes assets have complete measurements, exact or declared-precision independent oracles, hashes, and source repairs.
+- [x] T34/T35/T36/T37/T41/T42/T44/T45, fast-forward formulas, smooth/complex/vector maps, sampling, and observer boundaries are explicit.
+- [x] Current API/runtime fit and the Goal 2 files/dependencies/test handoff are explicit.
+- [ ] Global ledgers, diff checks, Markdown checks, coverage count, and repository tests are integrated.
 
 ## Stage Results
 
-In progress.
+Textual/raster evidence, semantic construction, API/runtime audit, Goal 2 handoff, source repairs, all 11 asset identities, and exact/declared-precision oracles are complete. Global ledger integration and final verification remain in progress.
 
 ## Integration Results
 
-In progress.
+Pending final figure closure and global ledger update.
