@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T02/T04/T05/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 22 of 45 type stages complete, T03 reopened by T06's missing direct emulation-network raster, T06 Quiescent-Background-Preserving Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T02/T03/T05/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 22 of 45 type stages complete, T04 reopened by T06's two missing direct raster links, T06 Quiescent-Background-Preserving Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
@@ -80,7 +80,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - Alphabet rank, T03 numeric valuation, and palette tone are distinct. T03 is an exact fixed-arity equal-weight sum quotient plus a complete structural sum table; average is an exact label, sum zero is the least-significant code digit, and a noncanonical symbolic valuation defeats rank substitution. Mutation histories, reversibility, purpose searches, behavior labels, and binary emulations remain provenance/property/analyzer/relation records.
 - T02 closes an exact 29-query/157-candidate search partition and 21 evidence groups with no remainder. Eleven included, six excluded, and two relation-only assets are hash-pinned; source, semantic, metadata, direct Voronoi priority-table, reversible/inverse-window, and rule-921408 raster oracles pass.
 - T02 exposes current runtime defects rather than adding a branch: exhaustive arity is wrong, selector significance is mirrored, general outputs are binary-masked, ordinary lookup is not executable, and batch rule identity is coerced to fixed-width `int64`.
-- T03's core aggregate semantics, definition/formula excerpts, official-source repairs, and strict code-777 raster remain valid. Its former 16-query/118-candidate and 17-query/309-candidate closures are superseded by the independently reviewed 18-query/312-candidate partition and 118-asset manifest at `50 included / 60 excluded / 8 relation-only`; the T05-discovered code-`1004600` Notes continuation and two linked long-run plots are now closed.
+- T03's core aggregate semantics, definition/formula excerpts, official-source repairs, and strict code-777 raster remain valid. Its former 16-query/118-candidate, 17-query/309-candidate, and 18-query/312-candidate closures are superseded by the independently reviewed 18-query/313-candidate partition and 119-asset manifest at `50 included / 60 excluded / 9 relation-only`; the T05 code-`1004600` continuation and T06 direction-linked emulation network are closed.
 - T03 reuses T01/T02 fixed support, all-site old-snapshot reads, typed assignment, atomic commit, realization, and trace semantics. D115-D118 add only explicit numeric valuation, the exact sum case domain/table/codec, and typed preset/restriction/sibling boundaries; no executor or eleventh update law is added.
 - T05 closes an exact 11-query/142-lexical-line manifest plus five governed prose continuations and 25 linked assets: 172 candidates with zero remainder. Twelve evidence groups pin 47 provenance lines/47 fragments/40 quote lines; assets close at `5 included / 13 relation-only / 7 excluded` after independent review added four direct page-963 chart relations.
 - T05 is exactly the strict finite `k>=4,r=1,A=(0,...,k-1),nu(i)=i` preset over unchanged generic T03, with `M=3k-2`, arbitrary-precision `R=k^M`, and code `1004600` pinned as a structural table. D118 is sharpened; no new primitive, executor, update law, or decision is added. All five embedded checks, independent review, diff/fence gates, and 102 tests pass.
@@ -679,7 +679,7 @@ All seven embedded oracles pass. They cover the `3^27` count, every binary speci
 
 ### 22-T03-TOTALISTIC-CA
 
-Status: **REOPENED** in `goal-1/22-T03-TOTALISTIC-CA.md`. T05's code-`1004600` repair remains valid, but T06 found that retained caption `BOOK:18770` directly links an omitted emulation-network raster at `BOOK:18772`. The bounded source/asset repair is active; the semantic result is unchanged.
+Status: **COMPLETE** in `goal-1/22-T03-TOTALISTIC-CA.md` after bounded T05 and T06 source/asset repairs; the semantic result is unchanged.
 
 #### Big Picture Objective
 
@@ -695,15 +695,15 @@ Completed: widened the named-code source/asset closure, preserved the valid aggr
 
 #### Stage Result
 
-COMPLETE after the bounded T05 repair: the T04-era repair partitioned 309 candidates and 116 rasters at `48 included / 60 excluded / 8 relation-only`, but the newly discovered code-`1004600` Notes continuation and its two linked plots proved that closure was incomplete. The widened audit now partitions 312 candidates and 118 rasters at `50 included / 60 excluded / 8 relation-only`; exact radius-two code `10/20/52`, aggregate semantics, and all prior repairs remain valid.
+COMPLETE after bounded T05/T06 repairs: the T04-era repair partitioned 309 candidates and 116 rasters at `48 included / 60 excluded / 8 relation-only`; the code-`1004600` Notes continuation and two linked plots widened that to 312/118, then the direction-linked `BOOK:18770 -> 18772` emulation network exposed one final asset gap. The independently reviewed audit now partitions 313 candidates and 119 rasters at `50 included / 60 excluded / 9 relation-only`; exact radius-two code `10/20/52`, aggregate semantics, and all prior repairs remain valid.
 
 The former `16-query / 118-candidate / 26-34-25-23-10` partition and associated split/evidence-group totals are retained only as historical audit output, not current exhaustion evidence. The valid semantic result is an explicit numeric valuation `nu:A->{0,...,k-1}` followed by the exact sum of `2r+1` old reads and a complete `M=1+(k-1)(2r+1)`-row structural table. The optional Wolfram code uses sum zero as the least-significant base-`k` digit. T01/T02 fixed-lattice assignment and atomic update are reused unchanged.
 
-The six embedded blocks pass: source/evidence closure, exact semantics, `50/60/8` metadata, a 104-link mechanical reverse join with 23 query-false-only siblings outside, binary radius-two codes `10/20/52`, code-20 survival counts, code-357/code-1329 labels, code-420 additivity, exact code-777/code-867 trajectories, code-`1004600` and its long-run observers, and the 946-cell strict code-777 raster. D115-D118 preserve T04/T05 presets, T06/T07 restrictions/properties, and additive/outer/weighted/histogram/higher-dimensional/continuous/emulation/observer boundaries. Fresh independent review, fences, `git diff --check`, and all 102 repository tests pass; the reopening is resolved. Next: T05.
+The six embedded blocks pass: source/evidence closure at 212 cited lines/89 fragments/86 quote lines, exact semantics, `50/60/9` metadata, a 105-link mechanical reverse join with 22 control-only siblings outside, binary radius-two codes `10/20/52`, code-20 survival counts, code-357/code-1329 labels, code-420 additivity, exact code-777/code-867 trajectories, code-`1004600` and its long-run observers, and the 946-cell strict code-777 raster. D115-D118 preserve T04/T05 presets, T06/T07 restrictions/properties, and additive/outer/weighted/histogram/higher-dimensional/continuous/emulation/observer boundaries. Fresh independent review, fences, `git diff --check`, and all 102 repository tests pass; both reopenings are resolved. Next: T04's bounded T06 asset re-audit.
 
 ### 23-T04-THREECOLOR-TOTALISTIC
 
-Status: **COMPLETE** in `goal-1/23-T04-THREECOLOR-TOTALISTIC.md`.
+Status: **REOPENED** in `goal-1/23-T04-THREECOLOR-TOTALISTIC.md`. T06 found two direct raster links omitted from the claimed exhaustive closure: `BOOK:17431 -> 17433` and `BOOK:2922 -> 2924`. The bounded asset/reverse-join repair is active; preset semantics are unchanged.
 
 #### Big Picture Objective
 
@@ -715,11 +715,11 @@ Apply the common protocol, emphasizing seven sum cases, rule numbering, seeds, a
 
 #### Completion Requirements
 
-All T04 evidence is captured; catalog identity remains traceable without duplicate runtime semantics; Goal 2 and global integration are updated.
+Repair the two explicit raster omissions, rerun all embedded/global gates, obtain fresh independent review, and preserve the already-proved preset semantics.
 
 #### Stage Result
 
-COMPLETE: the 12-query oracle partitions 243 candidates, 15 evidence groups close `253/92/90` provenance/fragment/line counts, and 72 assets close at `35 included / 32 excluded / 5 relation-only`. All six embedded checks prove the exact `k=3,r=1,A=(0,1,2),nu(i)=i` preset, its seven cases and 2,187 codes, exact code-777/code-867 trajectories, code-420 property, page-76/T06 distinction, corrected 1659/1632 labels, and preset/generic T03 identity. D115-D118 suffice; independent review, fences, diff checks, and all 102 tests pass. No executor or update law was added. Next: T05.
+REOPENED during T06: the former 243-candidate/72-asset audit omitted rasters explicitly governed by already-retained captions at `BOOK:17431` and `BOOK:2922`. Counts, metadata, reverse closure, and independent review are being repaired. The exact `k=3,r=1,A=(0,1,2),nu(i)=i` preset, seven cases, 2,187 codes, D115-D118, and shared executor/update result remain unchanged.
 
 ### 24-T05-HIGHERCOLOR-TOTALISTIC
 
@@ -739,7 +739,7 @@ All T05 evidence is captured; parameter bounds and reuse are explicit; Goal 2 an
 
 #### Stage Result
 
-COMPLETE: 11 controlled query families close 142 lexical lines, five governed follows and 25 assets expand the exact partition to 172 candidates, and 12 evidence groups close `47/47/40` provenance/fragment/quote-line counts. The asset audit closes `5 included / 13 relation-only / 7 excluded`; exact page-122/page-256 label corpora, code `1004600`, cardinality, bigint, snapshot, and boundary oracles pass. The result is the strict finite `k>=4,r=1` canonical preset over generic T03. T03's discovered source omission was repaired and reclosed; T04 remains complete. D118 is sharpened without D119, an executor, or an update law. Independent review, five embedded blocks, fences, diff checks, and all 102 tests pass. Next: T06.
+COMPLETE: 11 controlled query families close 142 lexical lines, five governed follows and 25 assets expand the exact partition to 172 candidates, and 12 evidence groups close `47/47/40` provenance/fragment/quote-line counts. The asset audit closes `5 included / 13 relation-only / 7 excluded`; exact page-122/page-256 label corpora, code `1004600`, cardinality, bigint, snapshot, and boundary oracles pass. The result is the strict finite `k>=4,r=1` canonical preset over generic T03. T03's discovered source omissions were repaired and reclosed; T04 was later reopened only for its own T06-discovered asset gap. D118 is sharpened without D119, an executor, or an update law. Independent review, five embedded blocks, fences, diff checks, and all 102 tests pass. Next: T06.
 
 ### 25-T06-QUIESCENT
 
