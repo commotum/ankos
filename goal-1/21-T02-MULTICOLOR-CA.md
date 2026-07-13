@@ -192,6 +192,257 @@ No candidate remains unresolved. The zero-hit probes are informative: the source
 
 > “Examples of some of the 1800 reversible cellular automata with three colors and nearest-neighbor rules. Even though these systems exhibit complex behavior that scrambles the initial conditions, all of them are still reversible, so that starting from the configuration of cells at the bottom of each picture, it is always possible to deduce the configurations on all previous steps.”
 
+### E4 — Inherited line and nearest-neighbor read
+
+- Provenance: `BOOK:422,430`, inherited Chapter 2 construction.
+- Establishes: a one-dimensional line; the old left/self/right neighborhood; and a case table whose output is the next color of the center cell. The black/white alphabet in this introductory example is specialized by E1/E2, not retained as a T02 limit.
+
+> “The cellular automaton consists of a line of cells, each colored either black or white. At every step there is then a definite rule that determines the color of a given cell from the color of that cell and its immediate left and right neighbors on the step before.”
+
+> “gives one of the possible combinations of colors for a cell and its immediate neighbors. The bottom row then specifies what color the center cell should be on the next step in each of these cases. In the numbering scheme described in Chapter 3, this is cellular automaton rule 254.”
+
+### E5 — Left, center, and right are positional
+
+- Provenance: `BOOK:490,498`, inherited Chapter 2 behavior/rule description.
+- Establishes: left-right asymmetry can be encoded in the rule, and a rule case can distinguish the left neighbor from the center and right neighbor. This is evidence for ordered context even though the literal phrase `ordered neighborhood` never occurs.
+
+> “The asymmetry between the left and right-hand sides is a direct consequence of asymmetry that exists in the particular underlying cellular automaton rule used.”
+
+> “But now the specific rule used—that I call rule 110—takes the new color of a cell to be black in every case except when the previous colors of the cell and its two neighbors were all the same, or when the left neighbor was black and the cell and its right neighbor were both white.”
+
+### E6 — Fixed organization and parallel update
+
+- Provenance: `BOOK:850,982`, inherited Chapter 3 construction contrast.
+- Establishes: all cells update in parallel, while the underlying array organization remains fixed.
+
+> “One of the basic features of a cellular automaton is that the colors of all the cells it contains are updated in parallel at every step in its evolution.”
+
+> “One of the features that cellular automata, mobile automata and Turing machines all have in common is that at the lowest level they consist of a fixed array of cells. And this means that while the colors of these cells can be updated according to a wide range of different possible rules, the underlying number and organization of cells always stays the same.”
+
+### E7 — Parallel update reads the old field
+
+- Provenance: `BOOK:10984`, Notes implementation warning.
+- Establishes: a cellular-automaton rule reads old neighbor values; an in-place sequential implementation must preserve those values or use two arrays. This is direct support for snapshot evaluation followed by atomic commit.
+
+> “First, cellular automaton rules are always defined to use the old values of neighbors in determining the new value of any particular cell.”
+
+> “Another approach to this problem is to maintain two copies of the array of cells, and to interchange pointers to them after every step in the cellular automaton evolution.”
+
+### E8 — A general rule is an explicit neighborhood-case relation
+
+- Provenance: `BOOK:11002-11004`, Notes general-rule definition.
+- Establishes: general 1D CA rules are explicit replacements over all possible neighborhood blocks, not an aggregate reducer or callback.
+
+> “In general, however, a 1D cellular automaton rule can be given as a set of explicit replacements for all”
+
+> “possible blocks of cells in each neighborhood (see page 60).”
+
+### E9 — The executable context is an ordered triple
+
+- Provenance: `BOOK:11014`, Notes implementation.
+- Establishes: the implementation constructs a three-position record before applying the rule. Position is preserved; no sum/average is taken.
+
+> `Transpose[{RotateRight[a], a, RotateLeft[a]}]/. rule`
+
+### E10 — General and totalistic rules have distinct signatures
+
+- Provenance: `BOOK:11051-11056`, built-in-function Notes table.
+- Establishes: `{n,k}` is the general nearest-neighbor rule form; `{n,k,r}` changes range; the totalistic form has a separately tagged `{k,1}` rule specification.
+
+> `\{n, k\} general nearest-neighbor rule with k colors`
+
+> `\{n, k, r\} general rule with k colors and range r`
+
+> `\{n, \{k, 1\}\} k-color nearest-neighbor totalistic rule`
+
+### E11 — Base-`k` positional weights
+
+- Provenance: `BOOK:11066-11067`, Notes equivalence fragment.
+- Establishes: the general nearest-neighbor codec uses positional weights `k^2,k,1`, so left/center/right permutations have distinct addresses. The source extraction breaks the expression across lines; only the intact equivalence and weight vector are used.
+
+> `■ CellularAutomaton[{n, k},...] is equivalent to CellularAutomaton[{n, {k,`
+
+> `\{k^2, k, 1\}\}, \dots Common forms for 2D cellular automata include:`
+
+### E12 — Runnable general and totalistic `k=3,r=1` profiles
+
+- Provenance: `BOOK:11164-11168`, Notes examples.
+- Establishes: general rule number `921408` and totalistic code `867` use different rule signatures at the same alphabet size and range. The extracted invocations are OCR-damaged; their prose labels and rule identities are intact.
+
+> “This runs the general k=3, r=1 rule with rule number 921408. In[10]:=Show[RasterGraphics[CellularAutomaton]{921408, 3, 1}, {{1}, 0}, 100]]]”
+
+> “This runs the totalistic k=3, r=1 rule with code 867.  $ln[11]:=Show[RasterGraphics[CellularAutomaton]{867, {3, 1}, 1}, {{1}, 0}, 50]]]$ ”
+
+### E13 — General rule-count theorem and exact specialization
+
+- Provenance: `BOOK:11897`, page-60 Notes.
+- Establishes: a `k`-color range-`r` general rule has `k^(k^(2r+1))` possibilities; `k=3,r=1` has exactly `7,625,597,484,987`; totalistic rules are a much smaller separately counted subset.
+
+> “Allowing k possible colors for each cell and considering r neighbors on each side, there are  $k^{k^{2r+1}}$  possible cellular automaton rules in all”
+
+> “And for k=3, r=1 there are 7,625,597,484,987 rules in all, with 2187 totalistic ones.”
+
+> “Note that for k>2, a particular rule will in general be totalistic only for a specific assignment of values to colors.”
+
+### E14 — General base-`k` step implementation
+
+- Provenance: `BOOK:11898-11900`, page-60 Notes.
+- Establishes: general evolution computes a positional neighborhood address with powers of `k` and indexes a rule digit sequence. The extracted digit-count exponent is malformed and repaired only by the intact count theorem in E13.
+
+> “With *k* colors and *r* neighbors on each side, a single step in the evolution of a general cellular automaton is given by”
+
+> `CAStep[CARule[rule\_List,  $k_r$ ,  $r_r$ ],  $a_r$ List] :=  $rule[-1 - ListConvolve[k^Range[0, 2r], a, r + 1]]]$  where rule is obtained from a rule number num by  $IntegerDigits[num, k, k^2r^1]$ . (See also page 927.)`
+
+### E15 — Neighborhood offsets and colors share one order
+
+- Provenance: `BOOK:13513`, general-rules Notes.
+- Establishes: source offset lists have a defined ordering, and neighborhood colors are supplied in that same ordering.
+
+> “In this book such offset lists are always taken to be in the order given by *Sort*”
+
+> “One can specify a neighborhood configuration by giving in the same order as the offset list the color of each cell in the neighborhood.”
+
+### E16 — Sequential CA is a different schedule
+
+- Provenance: `BOOK:16446`, Notes construction contrast.
+- Establishes: ordinary CA updates every cell in parallel from previous-step colors; sequential CA can observe newly written colors and is therefore a distinct construction, not a T02 option.
+
+> “Ordinary cellular automata are set up so that every cell is updated in parallel at each step, based on the colors of neighboring cells on the previous step.”
+
+> “in sequential cellular automata the new color of a particular cell can depend on new rather than old colors of neighboring cells.”
+
+### E17 — Multicolor emulation is a relation, not native storage
+
+- Provenance: `BOOK:18339-18348`, page-655 Notes.
+- Establishes: a three-color nearest-neighbor rule can be encoded into a two-color larger-neighborhood rule, but the original general rule retains its own `k^(k^(2r+1))` information content. The encoding is not T02's native state representation.
+
+> “Given a rule that involves three colors and nearest neighbors, the following converts each case of the rule to a collection of cases for a rule with two colors:”
+
+> “Note that the original rule with *k* colors and *r* neighbors involves  $Log[2, k^{k^{2r+1}}]$  bits of information”
+
+### E18 — General-rule search uses all 27 cases
+
+- Provenance: `BOOK:20573-20579`, page-832/833 Notes.
+- Establishes: rule `5407067979` is explicitly `k=3,r=1`; the full rule has 27 cases; search pruning and unvisited cases are experiment-specific and do not reduce native table arity.
+
+> “Rule (c) is k = 3, r = 1 rule 5407067979”
+
+> “General rules can show subtle bugs; rule 1340716537107 for example first fails at n = 24. The total number of k = 3, r = 1 rules that need to be searched can easily be reduced from  $3^{27}$  to  $3^{21}$ . Several different rules that work can behave identically, since up to 6 of the 27 cases in each rule are not sampled with the initial conditions used.”
+
+> “rules that work, between 8 and 19 cases lead to a change in the color of a cell, with 14 cases being the most common.”
+
+### E19 — Actual-Index routes add no new mechanics
+
+- Provenance: actual Index `BOOK:20965,20967,21134,21187,21323,21542,21933,22372`.
+- Establishes: the Index routes more-color, three-color, encoding/emulation, and reversible-three-color vocabulary back to the inspected main/Notes passages. These are routing evidence only.
+
+> “with more colors, 107”
+
+> “three-color, 60”
+
+> “of three colors by two, 655, 1111”
+
+> “multicolor encodings, 1111”
+
+> “emulating multicolor, 1115”
+
+> “three-color, 436”
+
+> “emulating more colors, 669, 1113,”
+
+### E20 — Explicit sibling and neighborhood boundaries
+
+- Provenance: `BOOK:774,11881,18744`.
+- Establishes: totalistic averaging discards individual-color order; staggered two-cell neighborhoods have a different rule count; and `3-color 2-neighbor` is named separately. None changes T02's ordered three-cell construction.
+
+> “The idea of a totalistic rule is to take the new color of each cell to depend only on the average color of neighboring cells, and not on their individual colors.”
+
+> “By having cells on successive steps be arranged like hexagons or staggered bricks, as in the pictures below, one can set up cellular automata in which the new color of each cell depends on the previous colors of two rather than three neighboring cells.”
+
+> “Among 3-color 2-neighbor rules class 4 behavior seems to be comparatively rare; the picture at the top of the facing page shows an example with rule number 2144.”
+
+## Source Repairs
+
+1. **Strict boundary:** `BOOK:772` is the strict T02 paragraph. `BOOK:774` begins the totalistic sibling, so the page-75 totalistic figure, its base-3 aggregate code, excluded background-changing rules, and single-gray seed cannot define T02.
+2. **Ordered is reconstructed vocabulary:** the controlled literal probe finds no `ordered neighborhood` phrase. E4/E5/E9/E11/E15 jointly establish position-sensitive left/self/right order; the stage must call this a source-derived structural inference, not a quotation.
+3. **Color/state normalization:** the CA-specific `state`-alias probe has no hits. The book says `colors`; `state` is taxonomy/API normalization and must not imply a Turing-machine control state.
+4. **Count formula repair:** the first general formula and exact `k=3,r=1` instance at `BOOK:11897` are intact. The adjacent extracted symmetric-count expression is malformed and is not used. At `BOOK:11900`, `k^2r^1` is a broken extraction of the rule-digit-count exponent; E13 and the positional address expression, not this token, establish `k^(2r+1)` entries.
+5. **Invocation/codec extraction:** `BOOK:11066-11067` is split in the middle of the built-in equivalence, and both invocations at `BOOK:11164-11168` have bracket/OCR damage. Their prose labels, rule numbers, `k,r` values, and `{k^2,k,1}` vector are intact; any Goal 2 call syntax is a documented reconstruction rather than a verbatim executable expression.
+6. **Search pruning:** `BOOK:20577` reduces one doubling search from `3^27` to `3^21` because up to six cases are unsampled by those initial conditions. It does not revise the general rule-space count or authorize partial tables/default outputs.
+7. **Mutation dots:** at `BOOK:4684`, a dot means that the entry leaves the center color unchanged. It is not a wildcard, missing result, fourth color, or implicit default in the native table.
+8. **Boundary/run separation:** cyclic finite arrays at `BOOK:10986`, figure horizons, and retained display windows are implementation/observation choices. The construction evidence fixes lattice organization and parallel local update but does not select a finite boundary condition.
+9. **Seed separation:** no strict T02 seed convention is stated. Single-gray, random, uniform, sparse, periodic, and purpose-encoded initial fields remain independent profiles.
+10. **Sibling overlap:** a totalistic table is mathematically one member of the full general table space, but the source and taxonomy give it a different rule description/signature. T02's canonical program form is the explicit positional lookup; T03/T04/T05 own the aggregate construction.
+11. **Split routing:** the Chapter 3 split changes `can not only` to `can be not only` at its duplicate of `BOOK:772`; canonical quotation remains the monolith. The Chapter 12 split contains only an early Notes fragment; `BACK-MATTER/Notes/Notes.md` is one unrelated line, and `BACK-MATTER/Index/Index.md` contains misrouted Notes rather than the actual Index.
+12. **Actual Index:** the real Index begins at `BOOK:20826`. E19 pointers corroborate routing only and are not counted as independent construction evidence.
+13. **Official-PDF normalization authority:** the official Chapter 3 PDF, [`nks-ch3.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch3.pdf), was verified at SHA-256 `d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76`. Its printed page 886 visibly confirms the normalized general count `R = k^(k^(2r+1))`, the `ListConvolve[k^Range[0,2r], ...]` lookup, and `IntegerDigits[num,k,k^(2r+1)]`. The official all-Notes PDF, [`nks-notes.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf), was verified at SHA-256 `549f043595653a7d276b07ba52d435700039b71427b4e1774a44b1a58eff4723`; its printed page 867 visibly confirms the `{n,k}` equivalence with positional weights `{k^2,k,1}`. These normalized forms repair E11/E14 but are deliberately not presented as verbatim `BOOK` blockquotes.
+
+### Verbatim excerpt and repair oracle
+
+This dependency-free check pins the high-value quoted fragments to their physical monolith lines, verifies the strict/sibling boundary, and checks the exact combinatorics without trying to execute OCR-damaged Wolfram Language:
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+
+L = Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md').read_text().splitlines()
+checks = {
+    422: ('The cellular automaton consists of a line of cells', 'immediate left and right neighbors on the step before'),
+    430: ('possible combinations of colors for a cell and its immediate neighbors', 'what color the center cell should be on the next step'),
+    490: ('asymmetry between the left and right-hand sides', 'underlying cellular automaton rule'),
+    498: ('left neighbor was black', 'cell and its right neighbor were both white'),
+    772: ('rules that involve three colors, rather than two', '7,625,597,484,987'),
+    774: ('totalistic rule', 'average color of neighboring cells', 'not on their individual colors'),
+    850: ('colors of all the cells', 'updated in parallel at every step'),
+    982: ('fixed array of cells', 'underlying number and organization of cells always stays the same'),
+    4684: ('3 possible colors and nearest-neighbor rules', '27 possible 3-cell neighborhoods', 'does not change the color of the center cell'),
+    5218: ('7,625,597,484,987 cellular automata with three colors and nearest-neighbor rules', 'just 1800 that are reversible'),
+    10984: ('always defined to use the old values of neighbors', 'maintain two copies of the array of cells'),
+    11002: ('a 1D cellular automaton rule can be given as a set of explicit replacements for all',),
+    11004: ('possible blocks of cells in each neighborhood',),
+    11014: ('Transpose[{RotateRight[a], a, RotateLeft[a]}]/. rule',),
+    11051: ('general nearest-neighbor rule with k colors',),
+    11056: ('k-color nearest-neighbor totalistic rule',),
+    11066: ('CellularAutomaton[{n, k},...] is equivalent to CellularAutomaton[{n, {k,',),
+    11067: (r'\{k^2, k, 1\}',),
+    11164: ('general k=3, r=1 rule with rule number 921408',),
+    11168: ('totalistic k=3, r=1 rule with code 867',),
+    11897: ('k^{k^{2r+1}}', 'And for k=3, r=1 there are 7,625,597,484,987 rules in all'),
+    11898: ('single step in the evolution of a general cellular automaton',),
+    11900: ('ListConvolve[k^Range[0, 2r], a, r + 1]', 'IntegerDigits[num, k, k^2r^1]'),
+    13513: ('offset lists are always taken to be in the order given by *Sort*', 'in the same order as the offset list'),
+    16446: ('every cell is updated in parallel at each step', 'colors of neighboring cells on the previous step'),
+    18339: ('three colors and nearest neighbors', 'collection of cases for a rule with two colors'),
+    18348: ('Log[2, k^{k^{2r+1}}]', 'minimum possible s for k = 3, r = 1 is about 2.2'),
+    20573: ('k = 3, r = 1 rule 5407067979',),
+    20577: ('reduced from  $3^{27}$  to  $3^{21}$', 'up to 6 of the 27 cases'),
+    20967: ('three-color, 60',),
+    21134: ('of three colors by two, 655, 1111',),
+    21933: ('three-color, 436',),
+}
+for line_no, fragments in checks.items():
+    line = L[line_no - 1]
+    for fragment in fragments:
+        assert fragment in line, (line_no, fragment)
+
+k = 3
+addresses = {k*k*left + k*center + right
+             for left in range(k) for center in range(k) for right in range(k)}
+assert addresses == set(range(k**3))
+assert [k*k*l + k*c + r for l,c,r in ((0,1,2),(0,2,1),(1,0,2))] == [5,7,11]
+assert k**(k**3) == 3**27 == 7_625_597_484_987
+assert 'totalistic' not in L[771].lower()
+assert 'totalistic' in L[773].lower()
+print('T02 verbatim evidence oracle: PASS 32 lines; ordered addresses/count exact')
+PY
+```
+
+Expected output:
+
+```text
+T02 verbatim evidence oracle: PASS 32 lines; ordered addresses/count exact
+```
+
 ## Construction Model
 
 ### Native semantics
