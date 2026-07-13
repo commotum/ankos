@@ -320,9 +320,11 @@ Literal/template application nodes receive creation provenance from `(clause_id,
 
 Repeated references may share immutable storage privately, but equality, matching, serialization, and later rewriting observe a tree. Unused bindings and unmatched descendants of a consumed subtree have deletion provenance. No template can mutate an old bound value.
 
-### Prefix-free tree UPDATE policy
+### Lossless token lowering to ordered multi-span UPDATE
 
-The prefix-free tree policy commits one old-snapshot replacement set:
+Choose a canonical balanced/prefix token codec whose well-formed image has an explicit inverse and in which every subtree occupies one contiguous token span. Expression-valued heads and ordered argument roles receive distinct tags, so the codec loses neither topology nor child role. A prefix-free set of tree paths maps exactly to a set of disjoint token spans.
+
+The generic ordered multi-span replacement UPDATE then commits one old-snapshot replacement set:
 
 1. Validate that every result names the same old state and a path resolving to the recorded matched subtree.
 2. Validate one result per selected source, pairwise prefix-incomparable paths, unique paths, valid template trees, and declared atoms.
@@ -339,7 +341,7 @@ This policy differs from:
 - fixed-support assignment; or
 - a sequence of in-place tree mutations whose later paths see earlier outputs.
 
-These validators justify a tree-capable policy on the shared `UPDATE` axis, not a fifth executor or top-level semantic class. A persistent-tree reconstruction kernel may be shared, while the prefix-free path invariants remain explicit program data.
+The tree step and token-word step must commute under encode/decode for every valid configuration. These validators therefore justify a tree FRONTIER/NEIGHBORHOOD/RULE preset plus a lossless representation over the existing ordered-replacement base, not a tree-specific UPDATE, fifth executor, or top-level semantic class. A persistent-tree implementation may be used privately only if it matches that commuting specification.
 
 ### Exact step and outcome semantics
 
@@ -478,9 +480,9 @@ Additional required oracles:
 
 ## Corrected Architecture and Goal 2 Handoff
 
-T20 is a SimpleProgram over an explicit recursive tree topology with a transparent tagged expression ALPHABET. FRONTIER performs the old-snapshot ordered maximal prefix-free match selection, NEIGHBORHOOD supplies matched subtrees/bindings, RULE instantiates replacement trees, and a tree-capable UPDATE applies the prefix-free path writes atomically. A whole expression may also have a lossless structured codec, but no opaque singleton/callback may hide matching or replacement.
+T20 is a SimpleProgram over an explicit recursive tree topology with a transparent tagged expression ALPHABET. FRONTIER performs the old-snapshot ordered maximal prefix-free match selection, NEIGHBORHOOD supplies matched subtrees/bindings, and RULE instantiates replacement trees. A lossless balanced/prefix token codec maps every selected subtree to one disjoint span, so generic ordered multi-span UPDATE applies the replacements atomically and commutes with tree stepping. No opaque singleton/callback may hide matching or replacement.
 
-Revised G2-T20 adds recursive expression/path/pattern/template schemas, program-coupled tree FRONTIER, binding access, typed subtree replacements, and a prefix-free tree UPDATE strategy inside the common runner. It removes the fifth-law/symbolic-executor framing and the blanket prohibition on transparent structured values while retaining traversal, overlap, duplication/deletion, quiescence, identity, provenance, and exact trajectory oracles.
+Revised G2-T20 adds recursive expression/path/pattern/template schemas, a bijective tree/token codec, program-coupled tree FRONTIER, binding access, typed subtree replacements, and a prefix-free disjoint-span schedule over the existing ordered-replacement UPDATE. It removes the tree-specific/fifth-law/symbolic-executor framing and the blanket prohibition on transparent structured values while retaining traversal, overlap, duplication/deletion, quiescence, identity, provenance, and exact trajectory oracles.
 
 The historical API/handoff below remains evidence provenance; this section governs its executor/class classification.
 
@@ -603,7 +605,7 @@ Completion requires:
 
 ## Architecture-Reclosed Stage Result
 
-**COMPLETE.** T20 uses a discrete recursive-tree DOMAIN/topology, typed match loci and structural access, closed pattern/template RULE data, and a prefix-free tree UPDATE policy inside the common runner. Transparent structured values are native; opaque host evaluation and a symbolic executor remain rejected.
+**COMPLETE.** T20 uses a discrete recursive-tree DOMAIN/topology, typed match loci and structural access, and closed pattern/template RULE data. Its balanced/prefix token encoding is bijective, maps subtrees to contiguous spans, and lowers prefix-free replacements to the existing ordered multi-span UPDATE one step for one step. No tree UPDATE class or symbolic executor is required.
 
 ## Historical Stage Results (Evidence Retained; Architecture Superseded)
 

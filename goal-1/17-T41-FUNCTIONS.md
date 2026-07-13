@@ -16,8 +16,8 @@ The evidence/search closure and conformance fixtures remain valid. T41 remains n
 - The monolithic Markdown's four strict image links and eight Notes image links are bare and broken relative paths. The clean chapter/Notes duplicate resolves them through its local `Images/` directories. Canonical text provenance and split asset provenance must therefore be recorded separately.
 - Standard curves, finite combinations, an exact mathematical zero set, and the Riemann-Siegel curve are mathematical objects, not evolving states. Traversing an x-axis or evaluating a mesh does not create semantic time.
 - T41 is a pure specification/query category: an immutable closed mathematical-function definition is separate from point evaluation, curve sampling, exact or certified zero finding, crossing classification, plotting, sound rendering, spacing histograms, and spectral analysis.
-- A mathematical domain, a query interval or complex region, a sampling mesh, and a rendered viewport are different scopes. None of the twelve rasters states a sampling mesh, adaptivity rule, numerical precision, or error tolerance; raster dimensions cannot supply them.
-- `Tan` and `Sec` have poles; `Zeta` and complex powers require domain/continuation/branch conventions. An evaluator must return typed undefined/failure outcomes rather than draw clipped near-vertical strokes as function values.
+- A mathematical definition set, a query interval or complex region, a sampling mesh, and a rendered viewport are different scopes. None of the twelve rasters states a sampling mesh, adaptivity rule, numerical precision, or error tolerance; raster dimensions cannot supply them.
+- `Tan` and `Sec` have poles; `Zeta` and complex powers require definition-set/continuation/branch conventions. An evaluator must return typed undefined/failure outcomes rather than draw clipped near-vertical strokes as function values.
 - The page-161 two-sine functions have exact factorization, periods, and zero families. Inclusive `[0,250]` root counts are exactly `120`, `114`, and `113`; strictly interior counts are one smaller because `x=0` is included in the former convention.
 - The page-161 three-sine row has 112 numerically observed roots on inclusive `[0,250]`, but that result is approximate and non-certified. The book's much larger `0<x<10^6` count is a source-reported observer, not an independently certified strict-page oracle.
 - Page 162 must be split by clause. T41 owns each source function, exact zero families, crossing/touch classification, and interval-count query. T42 owns the continued-fraction coefficient stream, black/white word, per-step rule selection, substitutions, nested state, and generated trace.
@@ -33,20 +33,20 @@ The evidence/search closure and conformance fixtures remain valid. T41 remains n
 
 - Use a versioned, closed `MathematicalFunctionSpec`, not `Callable`, `eval`, a formula string, a host CAS object, pickle, or precomputed samples.
 - Reuse T20's ordered-tree carrier and exact structural codec responsibilities only. T41 expressions denote functions and are not T20 pattern-rewrite state or transition traces.
-- A strict function spec declares one argument, exact parameters, real/complex argument space, mathematical domain restrictions, scalar or fixed-vector codomain, closed output expressions, primitive registry version, partiality, and branch/continuation conventions. Multivariate arguments remain a later evidence question.
-- Primitive calls have declared arity and domain. The strict registry must at least cover `Sin`, `Cos`, `Tan`, `Sec`, `SinIntegral`, `BesselJ`, `AiryAi`, `Exp`, `Log`, `Arg`, `Gamma`, `Zeta`, and named `RiemannSiegelTheta`/`RiemannSiegelZ` profiles.
+- A strict function spec declares one argument, exact parameters, real/complex argument space, mathematical definition-set restrictions, scalar or fixed-vector output schema, a tagged closed definition, primitive registry version, partiality, and branch/continuation conventions. Multivariate arguments remain a later evidence question.
+- Primitive calls have declared arity and input/value sets. The strict registry must at least cover `Sin`, `Cos`, `Tan`, `Sec`, `SinIntegral`, `BesselJ`, `AiryAi`, `Exp`, `Log`, `Arg`, `Gamma`, `Zeta`, and named `RiemannSiegelTheta`/`RiemannSiegelZ` profiles.
 - Exact integers, reduced rationals, named constants, algebraic constructions, declared-precision decimals, and typed complex numbers remain distinct values. Binary floats never silently replace exact coefficients such as `3/2`, `10/7`, `sqrt(2)`, or `pi`.
 - Point evaluation, sampled curve, real-zero, complex-zero, crossing, extremum, spacing, plot, sound, and spectrum requests are different query/observer types rather than one callback with mode flags.
 - Every numerical query declares arithmetic mode, precision, rounding/error targets, method profile, resource limit, scope, and endpoint convention. Certification is explicit; an approximate answer is never relabeled exact or complete.
 - Sampled sign changes are root candidates only. They may miss tangent/even-multiplicity roots and may mistake a pole for a crossing.
 - Zero events distinguish zero from sign crossing, direction, tangent contact, multiplicity known/unknown, exact/certified/approximate location, and endpoint membership. A zero-set result separately declares completeness/certification status.
-- Structural identity, certified functional equivalence on a declared domain, and equality of a particular observation are different relations. Factored and expanded expressions need not have identical spec IDs even when a proof relates their denotations.
-- Finite sums may be expanded into the strict finite AST or represented by a closed bounded binder. Infinite series require a separate convergence/summation profile and cannot be smuggled into the strict AST through an unbounded loop.
+- Structural identity, certified functional equivalence on a declared definition set, and equality of a particular observation are different relations. Factored and expanded expressions need not have identical spec IDs even when a proof relates their denotations.
+- Finite sums may be expanded into the strict finite AST or represented by a closed bounded binder. Infinite series are a tagged `FunctionDefinition` variant with explicit convergence/summation data; they are not a separate top-level function class and cannot be smuggled into the finite expression node through an unbounded loop.
 - T42 substitution, T43 iteration, T44 continuous lattice updates, T45 PDE definitions/solution queries, differential-equation alternate definitions, and numerical solvers remain explicit typed boundaries.
 
 ## Big Picture Objective
 
-Reconstruct function-combination systems as inspectable mathematical definitions with separately typed evaluation and observation. Pin down exact expression syntax, domains/codomains, named-function semantics, singularities and branches, exact versus numerical outcomes, zero/crossing queries, sampling and rendering scopes, figure presets, series convergence, T42/T43/T44/T45 boundaries, current API/runtime pressure, and the smallest honest Goal 2 category without inventing an eleventh update law.
+Reconstruct function-combination systems as inspectable mathematical definitions with separately typed evaluation and observation. Pin down exact expression syntax, definition/input sets and output schemas, named-function semantics, singularities and branches, exact versus numerical outcomes, zero/crossing queries, sampling and rendering scopes, figure presets, series convergence, T42/T43/T44/T45 boundaries, current API/runtime pressure, and the smallest honest Goal 2 category without inventing transition semantics.
 
 ## Catalog Identity
 
@@ -57,7 +57,7 @@ Reconstruct function-combination systems as inspectable mathematical definitions
 - Native Notes: `BOOK:13146-13214`; T43 Notes begin at `13215`.
 - Entry kind: a pure mathematical-specification family plus typed queries and downstream observers; no transition state, source, result, update, successor, or halting semantics.
 - Strict profiles: six named real curves, four finite sine combinations, four two-cosine source curves shared with the T42 bridge, and a named Riemann-Siegel real curve derived from complex zeta.
-- Supplementary variants: fixed-vector parametric/Lissajous curves, complex-domain zero queries, rational and irrational frequency sums, finite Fourier sums, lacunary/Weierstrass sums, weighted convergent series, FM composition, and analytic continuation.
+- Supplementary variants: fixed-vector parametric/Lissajous curves, complex-region zero queries, rational and irrational frequency sums, finite Fourier sums, lacunary/Weierstrass sums, weighted convergent series, FM composition, and analytic continuation.
 - Aliases/routes: mathematical functions, standard functions, function combinations, sine/cosine functions, axis crossings/zeros, Lissajous/Bowditch, Fourier series, Gibbs phenomenon, Weierstrass/Zygmund series, quasiperiodicity/almost-periodic functions, waveforms/chords, zeta, Riemann-Siegel, and Riemann Hypothesis.
 
 ## Search Log
@@ -222,7 +222,7 @@ The ODE sentence is a source inconsistency. Substitution shows that the printed 
 ### E14 — Zeta continuation and exact RH statement
 
 - Provenance: `BOOK:13195`, native Notes.
-- Establishes: series/product domains, analytic continuation, prime relation, and exact root-line statement.
+- Establishes: series/product convergence sets, analytic continuation, prime relation, and exact root-line statement.
 
 > “For real s the Riemann zeta function Zeta[s] is given by  $Sum[1/n^s, \{n, \infty\}]$  or  $Product[1/(1-Prime[n]^s), \{n, \infty\}]$ . The zeta function as analytically continued for complex s was studied by Bernhard Riemann in 1859”
 
@@ -288,7 +288,7 @@ This line contains OCR-lost subtraction signs in later prime-count formulas; T39
 | State/control/frontier | `NOT APPLICABLE`; no mutable state, cursor, control, or active locus |
 | Read/rule/result/update | `NOT APPLICABLE`; evaluation is a query over a definition, not a transition |
 | Successor/halting | `NOT APPLICABLE`; finite query completion/resource outcomes are not system halts |
-| Native support | Declared real or complex argument space and mathematical domain restriction |
+| Native support | Declared real or complex argument set and mathematical definition restriction |
 | Native values | Exact/named/algebraic/declared-precision real or complex values; fixed vectors when declared |
 | Records | Function spec, query, typed evaluation/zero result, proof/certificate/diagnostic, and downstream observation |
 | Rendering | External finite view with explicit interval, sampling, segmentation, and numerical context |
@@ -302,13 +302,23 @@ MathematicalFunctionSpec = {
   argument: ArgumentDecl,
   parameters: OrderedTuple[ExactOrDeclaredNumericParameter],
   argument_space: Real | Complex,
-  domain: ClosedDomainSpec,
-  codomain: Real | Complex | FixedVector[Real|Complex, dimension],
-  outputs: NonEmptyTuple[FunctionExpr],
+  definition_set: ClosedDefinitionSet,
+  output_schema: Real | Complex | FixedVector[Real|Complex, dimension],
+  definition: FunctionDefinition,
   primitive_registry_version: Identifier,
   partiality: PartialityProfile,
   branch_conventions: OrderedTuple[BranchConvention]
 }
+
+FunctionDefinition =
+    ClosedExpression(outputs: NonEmptyTuple[FunctionExpr])
+  | InfiniteSeries(
+        index,
+        lower,
+        body,
+        convergence_set,
+        summation_mode
+    )
 
 FunctionExpr =
     ArgumentRef | ParameterRef | NumericLiteral | NamedConstant
@@ -319,17 +329,17 @@ FunctionExpr =
 ```
 
 - Strict scalar profiles use one output. Lissajous profiles use two or three output expressions sharing one parameter; they are not sampled point bags or T27 occurrence state.
-- The primitive registry is a versioned closed table of tags, arities, mathematical domains, codomains, continuation semantics, and evaluator contracts. Unsupported calls fail validation; no fallback invokes a host function by name.
-- `BoundedFiniteSum` is exact finite syntax. It may normalize to an expanded `Add` for small constant bounds. An infinite-series definition is a separate `SeriesFunctionSpec` with convergence domain and summation mode; `upper=infinity` is invalid in the finite node.
-- The closed domain predicate supports intervals, half-planes, finite exclusions such as trigonometric poles, products, and named analytic-continuation domains. It is structural data, not a predicate callback.
-- Domain and codomain are part of identity. A real restriction of a complex function and the complex function itself are different specs even if their formulas serialize similarly.
+- The primitive registry is a versioned closed table of tags, arities, mathematical input sets, output schemas, continuation semantics, and evaluator contracts. Unsupported calls fail validation; no fallback invokes a host function by name.
+- `BoundedFiniteSum` is exact finite syntax. It may normalize to an expanded `Add` for small constant bounds. `InfiniteSeries` is a tagged definition variant within the same `MathematicalFunctionSpec`; `upper=infinity` is invalid in the finite node.
+- The closed definition-set predicate supports intervals, half-planes, finite exclusions such as trigonometric poles, products, and named analytic-continuation sets. It is structural data, not a predicate callback.
+- Definition set and output schema are part of identity. A real restriction of a complex function and the complex function itself are different specs even if their formulas serialize similarly.
 
 ### Numeric and branch semantics
 
 - Exact numeric nodes include arbitrary-precision integers, reduced rationals, named `Pi`, `E`, and `I`, and structural algebraic values such as `Sqrt(2)` or `CubeRoot(5)`. They serialize as tagged strings/nodes rather than JSON binary numbers.
 - A decimal literal carries its original decimal string, declared precision, and rounding provenance. A complex value is a tagged pair of typed real components.
 - `Tan`/`Sec` return `Undefined(Pole)` at `pi/2+k*pi`; plot segmentation must not connect samples across those exclusions.
-- `Zeta` distinguishes the ordinary Dirichlet-series definition/domain from named analytic continuation. `RiemannSiegelZ` references the continued zeta function and the continuous `RiemannSiegelTheta` phase convention.
+- `Zeta` distinguishes the ordinary Dirichlet-series definition/convergence set from named analytic continuation. `RiemannSiegelZ` references the continued zeta function and the continuous `RiemannSiegelTheta` phase convention.
 - Complex `Log`, fractional `Pow`, roots, `Arg`, `LogGamma`, and related branch-bearing primitives name their branch conventions. `Gamma` itself is single-valued meromorphic and instead declares analytic continuation and poles. A generic library default cannot silently determine portable semantics.
 
 ### Pure query algebra
@@ -349,7 +359,7 @@ Point results form a closed sum:
 ExactValue(value)
 CertifiedEnclosure(enclosure, proof_or_method)
 ApproximateValue(value, error_estimate, context)
-UndefinedValue(Pole | BranchCut | OutsideDomain | Indeterminate)
+UndefinedValue(Pole | BranchCut | OutsideDefinitionSet | Indeterminate)
 EvaluationFailure(Unsupported | NonConvergence | ResourceLimit | Diagnostic)
 ```
 
@@ -381,8 +391,8 @@ ZeroSetResult = {
 
 ### Identity, equivalence, and serialization
 
-1. **Structural identity** compares normalized tagged function-spec data: the argument, parameter order/values, domain, codomain, ordered output AST, primitive registry version, partiality, and branches.
-2. **Functional equivalence** is a separately typed claim over a declared domain, supported by an exact derivation or certificate. It never rewrites IDs automatically.
+1. **Structural identity** compares normalized tagged function-spec data: the argument, parameter order/values, definition set, output schema, tagged definition/ordered AST, primitive registry version, partiality, and branches.
+2. **Functional equivalence** is a separately typed claim over a declared definition set, supported by an exact derivation or certificate. It never rewrites IDs automatically.
 3. **Observation equality** compares one query/result under its complete numerical context. Equal samples do not prove function equality.
 4. AST child order is preserved, including for mathematically commutative operators. Commutation, factoring, and reassociation require a separately certified equivalence; no general algebraic quotient, tolerance, sample hash, or host simplifier determines spec identity.
 5. Specs, queries, results, certificates, and renderings have separate tagged JSON schemas. Nonfinite values, arbitrary integers, rationals, algebraics, complex values, error bounds, and undefined reasons are lossless and explicit.
@@ -410,7 +420,7 @@ All are JFIF 1.01, density `1x1`, with no DPI/EXIF. Filename page numbers are 15
 
 ### Page 160 named curves
 
-| Function | Raster x window | Domain/segmentation | Independent anchors |
+| Function | Raster x window | Definition set/segmentation | Independent anchors |
 |---|---|---|---|
 | `Sin[x]` | `[-15,15]` | whole real | `Sin(15)=0.6502878402` |
 | `Tan[x]` | `[-10,10]` | exclude `pi/2+k*pi`; segment at poles | `Tan(10)=0.6483608275` |
@@ -419,7 +429,7 @@ All are JFIF 1.01, density `1x1`, with no DPI/EXIF. Filename page numbers are 15
 | `BesselJ[0,x]` | `[-30,30]` | whole real, even | `J0(0)=1`; `J0(30)=-0.08636798358`; first positive root `2.4048255577` |
 | `AiryAi[x]` | `[-20,5]` | whole real | `Ai(-20)=-0.1764061271`; `Ai(0)=0.3550280539`; `Ai(5)=0.00010834443` |
 
-The windows are rendering/query presets, not mathematical domains. Near-vertical clipped `Tan`/`Sec` strokes are separate branches, not values at poles. No mesh or precision is stated.
+The windows are rendering/query presets, not mathematical definition sets. Near-vertical clipped `Tan`/`Sec` strokes are separate branches, not values at poles. No mesh or precision is stated.
 
 ### Page 161 sine combinations
 
@@ -518,10 +528,10 @@ The Lissajous coordinates are `(sin t,sin 2t)`, `(sin t,sin 3t/2)`, `(sin t,sin 
 
 ## Variants, Relations, and Boundaries
 
-- **Named elementary/special functions:** strict primitive calls with declared domains and versions, not arbitrary callbacks.
+- **Named elementary/special functions:** strict primitive calls with declared input/definition sets and versions, not arbitrary callbacks.
 - **Finite sums:** exact closed expressions with explicit term count and coefficient/frequency schedule. The finite raster is not an infinite-limit claim.
-- **Infinite series:** separate `SeriesFunctionSpec` with convergence domain, summation definition, and evaluator context. `a>0` weighted lacunary sums converge absolutely; displayed `a=0` needs explicit truncation/other summation.
-- **Parametric/Lissajous curves:** fixed-vector codomain over one parameter. Closure horizon is an observer; irrational nonclosure is not nonhalting execution.
+- **Infinite series:** the tagged `InfiniteSeries` definition variant carries convergence set, summation definition, and evaluator context inside the shared function spec. `a>0` weighted lacunary sums converge absolutely; displayed `a=0` needs explicit truncation/other summation.
+- **Parametric/Lissajous curves:** fixed-vector output schema over one parameter. Closure horizon is an observer; irrational nonclosure is not nonhalting execution.
 - **Complex zeros:** region-scoped query with multiplicity and completeness, not a two-dimensional raster or T31 constraint state.
 - **ODE alternate definition:** the source-stated relation is inconsistent. A corrected relation uses `y'(0)=1+sqrt(2)` for the target, while the literal `y'(0)=2` IVP denotes `Sin[x]+Sin[sqrt(2)x]/sqrt(2)`. T45 may own differential operator/solution semantics; T41 retains the denoted closed function and explicit repair.
 - **Fourier/Gibbs/spectrum:** coefficient specs and downstream observers. A transform or power spectrum does not enter function identity unless it is the declared definition.
@@ -534,13 +544,13 @@ The Lissajous coordinates are `(sin t,sin 2t)`, `(sin t,sin 3t/2)`, `(sin t,sin 
 - **T40 digit systems:** base-digit dependence of Weierstrass values is an analysis relation, not digit state hidden inside the function.
 - **T42 continued-fraction substitution:** owns coefficient expansion, symbol sequence, rule schedule, word states, and trace; T41 owns source functions and root/count queries.
 - **T43 iterated maps:** owns repeated application and evolving scalar state. A T41 expression may define the map, but its denotation alone has no orbit.
-- **T44 continuous CA:** owns spatial continuous-valued state and local update. A continuous codomain does not make T41 a cellular automaton.
+- **T44 continuous CA:** owns spatial continuous-valued state and local update. A continuous output value set does not make T41 a cellular automaton.
 - **T45 PDE:** owns differential equations, fields, boundary/initial conditions, solution definitions, and numerical solvers. Named special functions may be solutions without absorbing PDE execution.
 - **Plot/sampling/root algorithms:** external, versioned query implementations. Their diagnostic work traces do not replace semantic definitions or prove function equality.
 
 ## Corrected Architecture and Goal 2 Handoff
 
-T41 remains a genuine nonfit to `SimpleProgram`: an uniterated function definition supplies no seed/feedback/successor. Unary/multivariate function forms, finite/infinite tagged definitions, and point/zero/crossing/extremum requests belong to generic closed-function and query/result schemas with explicit definition sets, codomains, branches, partiality, numerical contexts, and proof strength.
+T41 remains a genuine nonfit to `SimpleProgram`: an uniterated function definition supplies no seed/feedback/successor. Unary/multivariate function forms, finite/infinite tagged definitions, and point/zero/crossing/extremum requests belong to generic closed-function and query/result schemas with explicit definition sets, output schemas, branches, partiality, numerical contexts, and proof strength.
 
 Revised G2-T41 builds those generic declarative schemas and reuses structural expression/codecs without callbacks or fake argument-as-time execution. All exact formula, zero, crossing, series, source-repair, numerical, raster, identity/equivalence, and T42-composition oracles remain.
 
@@ -653,7 +663,7 @@ Paths are dependency targets for synthesis; later evidence may consolidate modul
 - No `Callable`, `eval`, formula string, pickle, host CAS expression, dynamic import, primitive-name reflection, or generic fallback may satisfy function-spec conformance.
 - Mathematical argument traversal cannot become rollout time; no seed, frontier, rule ID, step count, or state array is required for a function.
 - A sampled array, bitmap, contour, sound, zero-spacing histogram, spectrum, or cached table cannot stand in for the function definition.
-- Finite viewport, mesh, raster width, root-search horizon, and requested precision never become mathematical domain or function identity.
+- Finite viewport, mesh, raster width, root-search horizon, and requested precision never become the mathematical definition set or function identity.
 - Binary `float` cannot silently encode exact `3/2`, `10/7`, `sqrt(2)`, `cuberoot(5)`, `sqrt(e)`, or `pi`.
 - `Tan`/`Sec` pole sign changes are not zeros; plot branches are segmented and undefined points remain typed.
 - A uniform/adaptive sign scan cannot certify all roots without an independent proof/isolation contract; even roots and narrow crossings are adversarial cases.
@@ -674,7 +684,7 @@ Paths are dependency targets for synthesis; later evidence may consolidate modul
 - [x] CSV/taxonomy identity, strict/Notes/T43 boundaries, aliases, variants, parameters, and relations are exact.
 - [x] Strict main, native Notes, splits, actual Index, history, formula/evaluation relations, and all vocabulary candidates are dispositioned with zero unresolved matches.
 - [x] All four strict and eight Notes rasters have identities, hashes, formulas, horizons or explicit uncertainty, source repairs, and independent anchors where possible.
-- [x] Function spec, domains/codomains, exact/declared values, primitive/branch semantics, finite/infinite sums, identity, equivalence, and serialization are explicit.
+- [x] Function spec, definition/input sets, output schemas, exact/declared values, primitive/branch semantics, finite/infinite tagged definitions, identity, equivalence, and serialization are explicit.
 - [x] Point/sample/zero/crossing/extremum queries and exact/certified/approximate/undefined/failure outcomes are explicit.
 - [x] Page-160/161/162/163 presets, root conventions, T41/T42 seam, and Riemann-Siegel repairs are independently verified.
 - [x] T20/T27/T31/T34/T39/T42/T43/T44/T45, ODE, sampling, plotting, sound, spectrum, and solver boundaries are explicit.
