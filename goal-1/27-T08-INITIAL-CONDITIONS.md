@@ -212,6 +212,18 @@ Observer / DatasetRecipe
 
 Translation, reflection, color permutation/complement, block encoding, finite quotienting, and cropping are explicit transforms or relations. Two presentations may share a denotational configuration digest while retaining distinct representation/provenance identities. Two laws can produce the same realized `X_0` without becoming the same law. A run references one exact program and one exact realized configuration; neither absorbs the other.
 
+### Cross-category scope boundary
+
+T08's catalog row concerns event-zero configurations for stepwise programs. The English phrase *initial condition* also appears in nonstep categories and must not force them into this schema:
+
+- For T31/T32/T33 declarative model sets, a seed or fixed template condition restricts admissible models; it does not create a distinguished successor or event zero.
+- For T41 an argument/value condition belongs to a function definition or query; it is not a seed unless an explicit T43 iteration is derived.
+- For T45 an initial trace is side data in a differential problem. Only a separately justified IVP-to-flow relation can produce a SimpleProgram state and event-zero configuration.
+- A rule-110 initial field that encodes a cyclic tag system is target-run data plus an explicit emulation relation. Its encoded program payload does not become rule-110 program identity.
+- A multiway rewrite still has an ordinary initial configuration; branching begins in its successor result, not in a “multiway seed” executor.
+
+Thus equally named source roles reuse seed/profile infrastructure only when their denotation is actually an element or law over `Conf(C_P)`. Otherwise they remain typed constraint, problem-side-data, query, or relation records.
+
 ### Dependency-free semantic oracle
 
 ```bash
