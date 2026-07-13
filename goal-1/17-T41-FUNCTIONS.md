@@ -20,6 +20,7 @@ Status: **IN PROGRESS**
 - In `Cos[x]-Cos[alpha x]`, `x=0` is a double zero/touch, not a sign crossing. The caption's general phrase “axis crossing” cannot override exact multiplicity; endpoint and crossing conventions belong in the query/result record.
 - The main zeta Dirichlet series converges only for `Re(s)>1`, so it does not define the plotted critical-line values by itself. Native Notes explicitly supply analytic continuation and the Riemann-Siegel phase factor.
 - The source's `Arg[Gamma[...]]` notation for `RiemannSiegelTheta` requires the named continuous phase convention. A generic principal-`Arg` implementation would introduce jumps and is not an interchangeable primitive.
+- The Notes' ODE profile is internally inconsistent: `Sin[x]+Sin[sqrt(2)x]` has `y'(0)=1+sqrt(2)`, not `2`. The printed IVP instead solves to `Sin[x]+Sin[sqrt(2)x]/sqrt(2)`. Literal and corrected profiles must remain explicit.
 - The weighted Weierstrass caption says the curves are “approximations.” Its displayed `a=0` ordinary infinite series fails the term test generically; an implementation must require an explicit finite truncation or nonstandard summation profile rather than claim ordinary convergence.
 - Current `FormulaRule` and selector callbacks can hide an evaluator, but they are opaque and update-oriented. Current `Dynamics`, rollout arrays, finite float alphabets, rank-4 loci, family dispatch, and viewer export cannot represent a closed real/complex function spec or typed query result without semantic distortion.
 - The exhaustive textual and raster audits found zero unresolved candidate. Native strict and Notes scopes contain no `update` or `evolution` vocabulary and no sampling vocabulary; all `step`/`rule` hits in the strict range are T42 substitution language.
@@ -28,7 +29,7 @@ Status: **IN PROGRESS**
 
 - Use a versioned, closed `MathematicalFunctionSpec`, not `Callable`, `eval`, a formula string, a host CAS object, pickle, or precomputed samples.
 - Reuse T20's ordered-tree carrier and exact structural codec responsibilities only. T41 expressions denote functions and are not T20 pattern-rewrite state or transition traces.
-- A function spec declares arguments, exact parameters, real/complex argument space, mathematical domain restrictions, scalar or fixed-vector codomain, closed output expressions, primitive registry version, partiality, and branch/continuation conventions.
+- A strict function spec declares one argument, exact parameters, real/complex argument space, mathematical domain restrictions, scalar or fixed-vector codomain, closed output expressions, primitive registry version, partiality, and branch/continuation conventions. Multivariate arguments remain a later evidence question.
 - Primitive calls have declared arity and domain. The strict registry must at least cover `Sin`, `Cos`, `Tan`, `Sec`, `SinIntegral`, `BesselJ`, `AiryAi`, `Exp`, `Log`, `Arg`, `Gamma`, `Zeta`, and named `RiemannSiegelTheta`/`RiemannSiegelZ` profiles.
 - Exact integers, reduced rationals, named constants, algebraic constructions, declared-precision decimals, and typed complex numbers remain distinct values. Binary floats never silently replace exact coefficients such as `3/2`, `10/7`, `sqrt(2)`, or `pi`.
 - Point evaluation, sampled curve, real-zero, complex-zero, crossing, extremum, spacing, plot, sound, and spectrum requests are different query/observer types rather than one callback with mode flags.
@@ -170,6 +171,8 @@ The main Dirichlet-series formula is not valid on the plotted line by ordinary c
 
 > “diminished fifth or tritone chords that consist of two notes (such as C and Gb) with frequency ratio  $\sqrt{2}$  have generally been avoided as sounding discordant.”
 
+The ODE sentence is a source inconsistency. Substitution shows that the printed IVP yields `Sin[x]+Sin[sqrt(2)x]/sqrt(2)`; the stated target instead requires `y'[0]=1+sqrt(2)`. Goal 2 preserves a literal-source relation record and a separately named corrected relation.
+
 ### E10 — Three-term zero behavior
 
 - Provenance: `BOOK:13156-13164`, native Notes.
@@ -292,10 +295,10 @@ The minimum public data model is:
 
 ```text
 MathematicalFunctionSpec = {
-  arguments: NonEmptyTuple[ArgumentDecl],
+  argument: ArgumentDecl,
   parameters: OrderedTuple[ExactOrDeclaredNumericParameter],
   argument_space: Real | Complex,
-  domain: ClosedDomainPredicate,
+  domain: ClosedDomainSpec,
   codomain: Real | Complex | FixedVector[Real|Complex, dimension],
   outputs: NonEmptyTuple[FunctionExpr],
   primitive_registry_version: Identifier,
@@ -323,13 +326,13 @@ FunctionExpr =
 - A decimal literal carries its original decimal string, declared precision, and rounding provenance. A complex value is a tagged pair of typed real components.
 - `Tan`/`Sec` return `Undefined(Pole)` at `pi/2+k*pi`; plot segmentation must not connect samples across those exclusions.
 - `Zeta` distinguishes the ordinary Dirichlet-series definition/domain from named analytic continuation. `RiemannSiegelZ` references the continued zeta function and the continuous `RiemannSiegelTheta` phase convention.
-- Complex `Log`, fractional `Pow`, roots, `Arg`, `Gamma`, and related primitives name their branch conventions. A generic library default cannot silently determine portable semantics.
+- Complex `Log`, fractional `Pow`, roots, `Arg`, `LogGamma`, and related branch-bearing primitives name their branch conventions. `Gamma` itself is single-valued meromorphic and instead declares analytic continuation and poles. A generic library default cannot silently determine portable semantics.
 
 ### Pure query algebra
 
 The common query header declares `function_id`, scope, arithmetic mode, precision/rounding, absolute/relative error targets, method profile, certification request, and resource limits. Query members are:
 
-1. `PointEvaluation(argument_tuple)`;
+1. `PointEvaluation(argument)`;
 2. `SampleCurve(interval_or_path, endpoint_policy, mesh_strategy, segmentation_policy)`;
 3. `RealZeroQuery(interval, endpoint_policy, multiplicity_policy, completeness_request)`;
 4. `ComplexZeroQuery(region, boundary_policy, multiplicity_policy, completeness_request)`;
@@ -374,10 +377,10 @@ ZeroSetResult = {
 
 ### Identity, equivalence, and serialization
 
-1. **Structural identity** compares normalized tagged function-spec data: arguments, parameter order/values, domain, codomain, output AST, primitive registry version, partiality, and branches.
+1. **Structural identity** compares normalized tagged function-spec data: the argument, parameter order/values, domain, codomain, ordered output AST, primitive registry version, partiality, and branches.
 2. **Functional equivalence** is a separately typed claim over a declared domain, supported by an exact derivation or certificate. It never rewrites IDs automatically.
 3. **Observation equality** compares one query/result under its complete numerical context. Equal samples do not prove function equality.
-4. Commutative-node normalization may sort already normalized children if chosen globally, but no general algebraic quotient, tolerance, sample hash, or host simplifier determines spec identity.
+4. AST child order is preserved, including for mathematically commutative operators. Commutation, factoring, and reassociation require a separately certified equivalence; no general algebraic quotient, tolerance, sample hash, or host simplifier determines spec identity.
 5. Specs, queries, results, certificates, and renderings have separate tagged JSON schemas. Nonfinite values, arbitrary integers, rationals, algebraics, complex values, error bounds, and undefined reasons are lossless and explicit.
 
 ### Outcomes and trace
@@ -449,11 +452,11 @@ For coefficient `alpha`, let `r=(alpha-1)/(alpha+1)`. Then
 Cos[x]-Cos[alpha*x]
   = 2*Sin[(1+alpha)*x/2]*Sin[(alpha-1)*x/2]
 
-A_n = 2*pi*n/(1+alpha)
-B_m = 2*pi*m/(alpha-1).
+A_n = 2*pi*n/(1+alpha), n in Z
+B_m = 2*pi*m/(alpha-1), m in Z.
 ```
 
-Only `x=0` overlaps for these irrational coefficients; it is a double tangent zero. Every nonzero root is simple and crossing. In the open interval `(A_n,A_(n+1))`, the B-family count is exactly
+Only `x=0` overlaps for these irrational coefficients; it is a double tangent zero. Every nonzero root is simple and crossing. For the positive-axis interval word use `n,m>=0`. In the open interval `(A_n,A_(n+1))`, the B-family count is exactly
 
 ```text
 c_n = floor((n+1)*r) - floor(n*r) in {0,1}.
@@ -489,7 +492,7 @@ Z(250) = -0.91863341835615242704537890685860604320384086356064...
 Z(500) =  1.4724478510550852726639853209181484029747580350961...
 ```
 
-- There are exactly 108 positive critical-line zeros `<=250` and 269 `<=500` under the named Riemann-Siegel convention. Zero 269 is `498.580782429686542016675082912487905...`; zero 270 is `500.309084941690495539309390725171446...`.
+- Independent 60-decimal arbitrary-precision enumeration found 108 positive critical-line zeros `<=250` and 269 `<=500` under the named Riemann-Siegel convention. These totals are strong numerical oracles, not certified exact counts. Zero 269 is `498.580782429686542016675082912487905...`; zero 270 is `500.309084941690495539309390725171446...`.
 - The count and endpoint anchors verify the declared curve, not the raster's unspecified sampling. Main prose about all peaks/valleys is not used as an exact oracle.
 
 ### Notes-only raster inventory
@@ -516,7 +519,7 @@ The Lissajous coordinates are `(sin t,sin 2t)`, `(sin t,sin 3t/2)`, `(sin t,sin 
 - **Infinite series:** separate `SeriesFunctionSpec` with convergence domain, summation definition, and evaluator context. `a>0` weighted lacunary sums converge absolutely; displayed `a=0` needs explicit truncation/other summation.
 - **Parametric/Lissajous curves:** fixed-vector codomain over one parameter. Closure horizon is an observer; irrational nonclosure is not nonhalting execution.
 - **Complex zeros:** region-scoped query with multiplicity and completeness, not a two-dimensional raster or T31 constraint state.
-- **ODE alternate definition:** a certified relation between an ODE solution query and a function spec. T45 may own differential operator/solution semantics; T41 retains the denoted closed function.
+- **ODE alternate definition:** the source-stated relation is inconsistent. A corrected relation uses `y'(0)=1+sqrt(2)` for the target, while the literal `y'(0)=2` IVP denotes `Sin[x]+Sin[sqrt(2)x]/sqrt(2)`. T45 may own differential operator/solution semantics; T41 retains the denoted closed function and explicit repair.
 - **Fourier/Gibbs/spectrum:** coefficient specs and downstream observers. A transform or power spectrum does not enter function identity unless it is the declared definition.
 - **Sound/FM/chords:** waveform sampling and audio rendering consume a function/query. Sample rate, duration, phase, amplitude, and codec are observer parameters.
 - **T20 symbolic systems:** tree/codec responsibility can be reused; no pattern matching, rewrite pass, quiescence, or tree-update semantics apply.
@@ -566,7 +569,7 @@ Existing CA runtime behavior remains valid for its scope. A future viewer may ac
 2. A closed expression tree is necessary but insufficient. Domains, codomains, branches, continuation, named primitive versions, and exact parameters determine the mathematical object.
 3. Numerical context belongs to a query/result, not the function. The same spec supports exact symbolic, arbitrary-precision, certified interval, and approximate evaluation without changing identity.
 4. Zero finding is not sampling. Page-162's double zero and `Tan`/`Sec` poles are direct adversaries to sign-change-only logic.
-5. Structural equality must stay conservative. Exact factorization proves a relation without requiring a universal simplifier or making sample equality semantic.
+5. Structural equality must stay conservative. Exact factorization proves a relation without requiring a universal simplifier or making sample equality semantic; the inconsistent ODE Note proves alternate definitions also require independent verification.
 6. T42's bridge remains compositional: a pure T41 interval-count query can feed T42's closed initial/driver data, but T41 does not inherit substitution state.
 7. Infinite series require convergence/summation semantics. The source's `a=0` approximation prevents a permissive infinity bound or silent truncation.
 8. Named special functions can be closed primitive tags even when algorithms are complex. The source explicitly separates accepted primitives from high-precision evaluation cost.
@@ -618,7 +621,7 @@ Paths are dependency targets for synthesis; later evidence may consolidate modul
 
 ### Required implementation behavior
 
-- Constructors reject unknown primitive tags, wrong arity, unbound variables, inconsistent real/complex types, invalid domains, missing branch conventions, unsafe JSON numbers, unbounded finite sums, and callbacks/host objects.
+- Constructors reject unknown primitive tags, wrong arity, unbound variables, inconsistent real/complex types, invalid closed domain specs, missing branch conventions, unsafe JSON numbers, unbounded finite sums, multivariate strict specs, and callbacks/host objects.
 - Evaluators are selected outside the spec by explicit versioned profiles. Missing capabilities return typed failures; no library fallback silently changes semantics.
 - Pole/branch/outside-domain outcomes survive serialization and sampling. Segmenters never connect across undefined intervals.
 - Root results record endpoint policy, multiplicity/classification, certification, completeness, and diagnostics. Approximate sign scans cannot claim exact completeness.
@@ -631,7 +634,7 @@ Paths are dependency targets for synthesis; later evidence may consolidate modul
 - Page 160: all six exact ASTs/windows/domains; endpoint anchors; `Tan`/`Sec` poles and segmentation; special-function declared precision.
 - Page 161: exact periods, factorizations, family counts, endpoint inclusion, simple crossings, three-sine approximate/non-certified status, and sample-independence adversaries.
 - Page 162: four exact source specs, factorization, `x=0` tangent, nonzero crossings, exact `r`/continued fractions/count words, and strict T41/T42 ownership.
-- Page 163: analytic-continuation/phase spec, five high-precision values, 108/269 zero counts, zero 269/270 bracket, panel seam, and no Dirichlet-series-on-critical-line shortcut.
+- Page 163: analytic-continuation/phase spec, five high-precision values, independently numerical 108/269 zero counts, zero 269/270 locations, panel seam, certification labels, and no Dirichlet-series-on-critical-line shortcut.
 - Notes: five Lissajous vectors/closure horizons, complex-region query, reported spacing metadata, finite sum term counts, `a>0` convergence, and rejection of ordinary infinite `a=0`.
 - Equality/codec: factored versus expanded structural inequality plus certified equivalence; exact rational/algebraic round trips; declared decimal/complex/enclosure/undefined round trips; same-sample/different-function rejection.
 
@@ -650,6 +653,7 @@ Paths are dependency targets for synthesis; later evidence may consolidate modul
 - The zeta Dirichlet series cannot be evaluated ordinarily at `1/2+it`; analytic continuation and named continuous phase are mandatory.
 - A principal-`Arg` phase with jumps cannot pass `RiemannSiegelZ` conformance merely by matching isolated magnitudes.
 - Infinite series must declare convergence/summation. The `a=0` raster requires explicit approximation/truncation and cannot pass as an ordinarily convergent infinite preset.
+- The literal ODE initial derivative cannot certify the stated target. Conformance must distinguish the printed IVP from the corrected `y'(0)=1+sqrt(2)` relation and verify both exact solutions.
 - Structural identity cannot depend on samples, tolerances, algebraic simplification by a host system, evaluator version, or rendering.
 - Approximate values/results cannot lose precision/error/method metadata or be promoted to exact/certified/complete status.
 - No `"functions"` rollout branch, object-cell packing, finite float alphabet, fixed four-coordinate lattice, or `RawEpisode` adapter may be the native conformance path.
