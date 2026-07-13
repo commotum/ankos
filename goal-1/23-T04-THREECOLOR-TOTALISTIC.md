@@ -656,6 +656,7 @@ All verbatim monolith material is in blockquotes so the oracle below can check e
 11. **Split and Index routing.** The split wording has minor normalization differences, and image labels remain raster-bound. `BACK-MATTER/Index/Index.md` is Notes; the actual split Index begins at `BACK-MATTER/Colophon/Colophon.md:3383`. Canonical `BOOK` physical lines and official PDFs are the provenance authorities.
 12. **Later property and relation assets.** `BOOK:3314-3378` interleaves code-20, code-357, and code-1329 rasters with captions. The official Chapter 6 page 287 contains a paragraph dropped by the monolith extraction: at initial condition 54,889, the repeating right-hand structure moves while leaving persistent structures, so the whole structure grows forever. This restores explanatory profile text only. The official all-Notes PDF also corroborates the related additive modulo-3 raster at `BOOK:11297`, the three Life-spacefiller analogy rasters at `BOOK:14829-14833`, and the unrestricted rule-2144 control at `BOOK:18746`. Their exact local hashes/geometries are pinned above and below; none supplies T04 rule rows.
 13. **`BOOK:2834` page-number contamination.** The extracted lone `238` follows `_page_253_Picture_1.jpeg`; it is the printed page footer, not a rule code. The raster visibly labels `code 1659`, official Chapter 6 text extraction gives `code 1659` followed separately by page `238`, and actual Index `BOOK:20980` routes `Code 1659, class 4 behavior in, 238`. Notes code `1662` at `BOOK:14223` is a separate, unpictured example and must not be substituted for 1659.
+14. **Metadata-to-source join repair.** An exact join against the independent 68-item raster ledger found 24 asset links that the earlier 44-asset source closure had not traversed: `BOOK:764,858,860,1280,1958,2172,2920,6336,6338,6642,7910,8306,8934,9164,11166,11170,11176,11182,11627,11629,14226,14228,14230,14232`. Seven are direct T04 evidence, one is an emulation relation, and sixteen are adjacent or negative controls. The manifest now includes all 24, and both runnable oracles assert exact equality—not merely equal cardinality—between its 68 link targets and the metadata ledger.
 
 ### Citation, quote, source-repair, asset, and preset oracle
 
@@ -685,7 +686,7 @@ def refs(s):
 # Traverse every cited monolith line anywhere in this stage.
 cited=refs(text)
 assert cited and all(1 <= n <= len(L) for n in cited)
-assert len(cited)==225
+assert len(cited)==249
 for n in sorted(cited): _=L[n-1]
 
 # Every verbatim excerpt fragment must occur on a cited provenance line.
@@ -804,11 +805,48 @@ extra_assets={
 'BACK-MATTER/Index/Images/_page_980_Picture_17.jpeg':((223,207),'3ad70eb7f740edf7749700ff107f08306830f3e3fd617f2df3f9e7e559178e21'),
 'BACK-MATTER/Colophon/Images/_page_1132_Picture_2.jpeg':((606,308),'422ce8c21c465e2ffdffdb0f691f9521a21b9389897336dd4e4a2c716295c589'),
 }
-assert len(extra_assets)==31
-for rel,(size,want) in extra_assets.items():
+joined_assets={
+'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_74_Picture_5.jpeg':((858,423),'713c4c55c6a004d76c5e47f1f39513bb1656f35feb0fe9aa72c4503ca311cdc6'),
+'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_86_Picture_7.jpeg':((240,500),'59213fbf1a0e6904a6566043c889acd32853d799d5a71bfec1e2d0c45bb1eec5'),
+'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_86_Picture_8.jpeg':((506,51),'d844f2419d7ff2a748a93e4ae6dd09c947bf5ed0723aa1defb4354c810b1fb25'),
+'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_122_Figure_2.jpeg':((1098,1164),'ccd7a43a495d01a22300c4b9abbb3ff1b13a3ef37389e77ca491ec805cbaa822'),
+'CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_171_Picture_5.jpeg':((277,91),'6695e1c946cf6adaa04a3915f2c720f69de4d18b74a81a01aaab346052119455'),
+'CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_185_Picture_9.jpeg':((213,114),'abfbc90a8bdab839ac452194adf8f7e30258e877967a79ac71db59b1a716df75'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_261_Figure_2.jpeg':((1109,1297),'49f35fe65202ef7fbfee2da92b7460d36fc329b66a553782ebf8991f237944dd'),
+'CHAPTERS/9-Fundamental-Physics/Images/_page_541_Picture_3.jpeg':((436,268),'83d828ba45f3f3e7390bf66183643a32c3c7b83646cc3880aedf099a49284c1e'),
+'CHAPTERS/9-Fundamental-Physics/Images/_page_541_Picture_4.jpeg':((418,250),'d96c865b43b912ce4e2d6f0c2ddf659eed32f17db48c151161c364187fcc7a1f'),
+'CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_566_Figure_2.jpeg':((1032,699),'6d66d95c8e3c286272cded005d60557ce7a075ffebfd268486c23abe13a29a1e'),
+'CHAPTERS/11-The-Notion-of-Computation/Images/_page_670_Figure_1.jpeg':((1064,1224),'a1a2a5c04b509ecc0357273387b2950d179478c65406427751904987ec9e8d3e'),
+'CHAPTERS/11-The-Notion-of-Computation/Images/_page_707_Figure_1.jpeg':((1130,1111),'974e12d28e8acc6fb4af26f7b1dd09eae1f30d802666a61f41abed8ec2d42e19'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_753_Picture_3.jpeg':((912,565),'8cfad05d53abb9791d37dd6d8262ec12dbc08bb1d72866ce34c46ecb99a94a88'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_769_Figure_1.jpeg':((1065,1308),'a980effe214906d991e8ca9180cb9f9d6eade2f978a8358487a60bb1728058f3'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_23.jpeg':((160,117),'132528352f363e52a20e73e1e8341203126448c0c6c8545eed48626eaddac16c'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_25.jpeg':((211,117),'d53637ce9ec50330d5fa6239b23f48d57b563266a0085a23517d4538020fd5fb'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_28.jpeg':((205,110),'2da239aceec3720e5aeccd5de8898c37fe7e975230814c0b3a8e3dcacbde9096'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_31.jpeg':((117,117),'ca086555513a6d8ba5bcbe92d97af26e55aa899cf629e0ab61d8fa8c71b81586'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_897_Picture_19.jpeg':((553,155),'2cedbff5433363c86786feea8804c95229179daf455f07ee8071d6345223894b'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_897_Picture_20.jpeg':((543,329),'ee9cadafa6b0b5a45d9cfb4ed310aff751e84f46a86277821e9f971f3c067b3f'),
+'BACK-MATTER/Index/Images/_page_963_Picture_8.jpeg':((144,152),'1fb4f0b4c03d8ba9f9fdeb67a0bbda2d786ed7ceeb13cdd8c31337ccd54bcdfb'),
+'BACK-MATTER/Index/Images/_page_963_Picture_9.jpeg':((136,148),'515f5de1423a9164ed6def92d786346f64c15a0a87ba07b723c069e62829caf6'),
+'BACK-MATTER/Index/Images/_page_963_Picture_10.jpeg':((138,158),'4b5ff621a668c5b706cdec0481cf3849facb7395d256dfd7c39b471d95fd018f'),
+'BACK-MATTER/Index/Images/_page_963_Picture_11.jpeg':((136,152),'7c660bbbb03b2d3116aab32cd50a5a3ff094961d49b403148531b36759335d6b'),
+}
+assert len(extra_assets)==31 and len(joined_assets)==24
+assert not (set(extra_assets)&set(joined_assets))
+all_extra={**extra_assets,**joined_assets}
+for rel,(size,want) in all_extra.items():
     p=base/rel
     assert hashlib.sha256(p.read_bytes()).hexdigest()==want,rel
     with Image.open(p) as im: assert im.size==size,(rel,im.size,size)
+
+# Exact source-manifest/metadata-ledger equality, including paths rather
+# than only basenames or counts.
+asset_audit=text.split('## Asset and Raster Audit',1)[1]
+items_src=asset_audit.split('\nitems={',1)[1].split('\n}\n\ndef jpeg_size',1)[0]
+ledger_paths=set(re.findall(r"'([^']+\.jpeg)':\(",items_src))
+strict_paths={f'CHAPTERS/3-The-World-of-Simple-Programs/Images/{name}' for name in assets}
+assert len(ledger_paths)==68
+assert strict_paths|set(all_extra)==ledger_paths
 
 # Independent preset/cardinality/codec checks.
 k=3; r=1; q=2*r+1; M=1+(k-1)*q
@@ -822,8 +860,8 @@ for code in range(2187):
     assert len(digits)==7 and all(d in (0,1,2) for d in digits)
 
 assert quote_count==92 and len(quote_lines)==90
-asset_count=len(assets)+len(extra_assets)
-assert asset_count==44
+asset_count=len(assets)+len(all_extra)
+assert asset_count==68
 print(f'T04 evidence oracle: PASS cited={len(cited)} quote_fragments={quote_count} quote_lines={len(quote_lines)} assets={asset_count} pdfs={len(official)}')
 PY
 ```
@@ -831,7 +869,7 @@ PY
 Expected terminal line:
 
 ```text
-T04 evidence oracle: PASS cited=225 quote_fragments=92 quote_lines=90 assets=44 pdfs=4
+T04 evidence oracle: PASS cited=249 quote_fragments=92 quote_lines=90 assets=68 pdfs=4
 ```
 
 ## Construction Model

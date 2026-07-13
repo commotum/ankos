@@ -7,6 +7,7 @@ Status: **REOPENED**
 - Exact catalog row: T03, CSV line 4, `Totalistic Cellular Automata`; taxonomy vocabulary is `ref/notes/CA-Types.md:68-99` and remains a search seed rather than book evidence.
 - The strict transition at `BOOK:772-776` distinguishes unrestricted three-color tables from totalistic rules. It assigns the colors exact values `0,1,2`, makes the next value depend only on the average of left/self/right, and orders the seven output cases from sum `0` at the least-significant/rightmost base-3 digit through sum `6` at the most-significant/leftmost digit.
 - The Notes give the direct generalization. For `k` colors and radius `r`, fixed arity is `q=2r+1`, reachable sums are `0..q(k-1)`, table length is `M=1+q(k-1)`, and the rule count is `R=k^M` (`BOOK:11897,11902-11916`). The structural output for sum `s` is digit `floor(n/k^s) mod k`; average `s/q` is an exact alternate label for the same case, not a floating computation.
+- The binary radius-two fixtures exercise that same generic six-row codec rather than a special profile: code `10 -> (0,1,0,1,0,0)` is stated directly as black on sums `1` and `3` (`BOOK:11625`); the labelled codes `20 -> (0,0,1,0,1,0)` and `52 -> (0,0,1,0,1,1)` follow exactly from the general codec plus their `k=2,r=2` source identities. Code 20 is textual at `BOOK:3316`; code 52 is visible in the hashed page-707 asset linked at `BOOK:8306`, with class-4 context at `BOOK:8308`; `BOOK:18748` names both as universality candidates. Their class, search, survival, and universality annotations are property/provenance fixtures, not trajectory goldens or run defaults.
 - T01/T02 and D111-D114 already supply fixed ordered one-dimensional support, `AllSites`, old-snapshot reads, typed same-site assignment, atomic parallel commit, successor, seed, realization, trace/view separation, ordered alphabets, and arbitrary-precision integer serialization. T03 changes the rule's input quotient and program identity, not the executor or update law.
 - `simple_programs.md:1964-2027` groups numeric sums, active counts, and color histograms under one broad `TOTALISTIC` label. That API responsibility is wider than source T03: equal-sum contexts such as `(0,2,0)` and `(1,0,1)` must merge even though their color histograms differ.
 - The current runtime can sum an `int64` read vector, but `rules.totalistic` does not derive its case count, `_channel_state` ignores the declared `sum` versus `count` mode, generic `lookup` is not executable, spatial output remains binary right-shift/`&1`, and batch rule IDs are forced through `numpy.int64`. No current test executes a standalone three-color totalistic table or validates its codec.
@@ -694,9 +695,17 @@ except KeyError:
     pass
 
 assert all(out(420,3,1,q)==(-sum(q))%3 for q in product(range(3),repeat=3))
-assert digits(10,2,2)==(0,1,0,1,0,0)
-assert all(out(10,2,2,q)==(sum(q) in (1,3))
-           for q in product(range(2),repeat=5))
+r2_tables={
+    10:((0,1,0,1,0,0),{1,3}),
+    20:((0,0,1,0,1,0),{2,4}),
+    52:((0,0,1,0,1,1),{2,4,5}),
+}
+for code,(want,black_sums) in r2_tables.items():
+    got=digits(code,2,2)
+    assert got==want
+    assert sum(value*2**s for s,value in enumerate(got))==code
+    assert all(out(code,2,2,q)==(sum(q) in black_sums)
+               for q in product(range(2),repeat=5))
 
 # Equal sum, unequal histograms: the strict aggregate must merge these.
 assert out(777,3,1,(0,2,0))==out(777,3,1,(1,0,1))
@@ -779,7 +788,7 @@ print('rule_counts=',(rules(2,1),rules(2,2),rules(3,1),rules(5,1)))
 print('rule_777_digits=',digits(777,3,1))
 print('rule_777_display=',display(777,3,1))
 print('rule_420_display=',display(420,3,1))
-print('rule_10_r2_digits=',digits(10,2,2))
+print('rule_10_20_52_r2_digits=',tuple(digits(code,2,2) for code in (10,20,52)))
 print('rule_777_trace=',','.join(trace))
 print('rule_777_counts=',tuple(blob.count(v) for v in range(3)))
 print('rule_777_sha256=',sha256(blob).hexdigest())
@@ -795,7 +804,7 @@ rule_counts= (16, 64, 2187, 1220703125)
 rule_777_digits= (0, 1, 2, 1, 0, 0, 1)
 rule_777_display= 1001210
 rule_420_display= 0120120
-rule_10_r2_digits= (0, 1, 0, 1, 0, 0)
+rule_10_20_52_r2_digits= ((0, 1, 0, 1, 0, 0), (0, 0, 1, 0, 1, 0), (0, 0, 1, 0, 1, 1))
 rule_777_trace= 1,111,12121,1100011,122101221,11001210011,1221110111221,110001222100011,12210110101101221
 rule_777_counts= (13972, 4386, 2347)
 rule_777_sha256= 4e835285f8b44f62ff98ae3ed4eccf4083b93d565121c0ebbbcc7889fae8878e
@@ -1243,14 +1252,14 @@ Picture 253/1 is repaired to visible code `1659`: the Actual Index routes 1659 t
 2. Prove every sum `0..q(k-1)` reachable for representative `k/r`, and that every permutation of one read multiset gives the same sum/output. Fixed arity, center inclusion, and repeated positions remain inspectable.
 3. Use `(0,2,0)` and `(1,0,1)` at `k=3`: both must address sum row `2` despite different histograms. A histogram-keyed implementation must fail this oracle.
 4. Declare alphabet order `('red','green','blue')` but valuation `{'red':2,'green':0,'blue':1}`. Pin a context whose valuation-sum differs from rank-sum, all seven code-777 symbolic outputs, execution, and encode/decode round-trip. An implementation that silently substitutes tuple rank must fail.
-5. Round-trip structural tables/codes `0`, `1`, `420`, `777`, `867`, `R-1`, deterministic sampled `k/r` profiles, and a valid `k=8,r=1` code above `2^63-1` through table, tagged decimal string, and JSON-safe records without NumPy/float loss.
+5. Round-trip structural tables/codes `0`, `1`, `420`, `777`, `867`, `R-1`, all three binary radius-two fixtures `(10,20,52)`, deterministic sampled `k/r` profiles, and a valid `k=8,r=1` code above `2^63-1` through table, tagged decimal string, and JSON-safe records without NumPy/float loss.
 6. Pin code 777's least-significant-first outputs as `(0,1,2,1,0,0,1)`. Assert `output(n,s)=floor(n/3^s) mod 3`, source display order is the reverse padded sequence, and color `2` survives execution.
 7. Prove code 420 has `U(s)=(-s) mod 3` for `s=0..6`, while remaining a normal structural table plus an additive property claim. No modulo formula may replace arbitrary T03 execution.
-8. For `k=2,r=2`, prove code 10 outputs one exactly for sums `1` and `3`. This catches a hard-coded radius-one/seven-row codec.
+8. For `k=2,r=2`, pin the exact low-sum-first tables `10 -> (0,1,0,1,0,0)`, `20 -> (0,0,1,0,1,0)`, and `52 -> (0,0,1,0,1,1)`. Prove code/table/tagged-string construction yields the same ordinary `AggregateLookupRule`, resolved spec, semantic program identity, and executor for all three. This catches a radius-one/seven-row or code-10-only special case; no panel trajectory is a golden.
 9. Expand representative aggregate tables to T01/T02 exhaustive tables and compare all local contexts and several exact trajectories. The native T03 record must still serialize as valuation + aggregate + `M` rows, not the expansion.
 10. Run code 1 from an all-zero field and prove the entire background evolves; then validate T06 separately as `U(0)=0`, equivalently `code mod k=0`. No seed or finite-support shortcut may assume quiescence.
 11. Use binary radius-one code 2 on `[1,0,0]` with explicit fixed exterior: parallel old-snapshot update yields `[1,1,0]`, while left-to-right in-place mutation would yield `[1,1,1]`.
-12. Run one structural program with centered, explicit, random, periodic, finite-block-on-constant, and finite-block-on-repeating initial fields and with cycle/segment/causal-window realizations. Program identity stays fixed; run/realization/view identities change.
+12. Run one structural program with centered, explicit, random, periodic, finite-block-on-constant, and finite-block-on-repeating initial fields and with cycle/segment/causal-window realizations. Program identity stays fixed; run/realization/view identities change. Separately retain code-20 initial-condition/period/search/survival records and code-52 class/universality labels as analyzer/provenance data; none may become a program field, seed, boundary, horizon, or preset default.
 13. Assert T04 and T05 presets return the same aggregate-rule/spec types as generic T03; T07 reflection is derived from equal-weight sum; outer, histogram, weighted, threshold, dynamic-arity, and continuous profiles are rejected or routed to their own typed constructions.
 14. Inspect the resolved spec/executor: no callback, family branch, partial-row fallback, hidden valuation/seed/background/palette, exhaustive-only identity, binary decoder, float mean, fixed-width rule code, or artificial maximum `k/r`.
 15. Preserve the full repository suite, T01/T02 asymmetric/nonbinary tests, scalar/batch parity as regression evidence, and finite trace/export round trips without weakening expectations.
@@ -1268,6 +1277,7 @@ Picture 253/1 is repaired to visible code `1659`: the Actual Index routes 1659 t
 - No reversed sum-digit order: sum zero is least significant/rightmost, leading zeros are complete rows, and codes are range checked.
 - No partial sum table, implicit output/center/background default, wildcard, sparse mutation display, raster-decoded rule, or fixed gallery filter.
 - No binary `right_shift`/`&1`, float, JSON number, `numpy.int64`, or artificial `k/r` cap used for general program identity or output.
+- No code-`10`/`20`/`52` dispatch or fixture-only evaluator; all three radius-two examples resolve through the generic six-row codec, aggregate rule, spec, and executor.
 - No hidden seed, boundary, horizon, palette, background-freezing, behavior class, search work, RNG, or accumulator in state/execution.
 - No T06 quiescence or T07 symmetry flag fused into validation; no additive formula, outer/semi-totalistic center channel, unequal weight, threshold, higher-dimensional, or T44 continuous rule smuggled behind an aggregate option.
 - No proof from pixels, symmetric examples, rule zero, scalar/batch self-parity, or T01/T02 exhaustive expansion alone; independent sum/code/nonbinary/background/old-snapshot oracles are mandatory.
