@@ -1,6 +1,6 @@
 # 2-T01-ELEMENTARY
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T01 row and runner contract in `architecture-audit.md` supersede any executor/class claims below; evidence, construction facts, and conformance fixtures remain authoritative.
 

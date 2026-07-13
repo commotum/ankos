@@ -1,6 +1,6 @@
 # 4-T12-TURING
 
-Status: **REOPENED — REPRESENTATION ARCHITECTURE AUDIT**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T12 row, commuting tagged representation, and runner contract in `architecture-audit.md` supersede incompatible separate-control/head-packing claims below.
 
@@ -482,8 +482,8 @@ The historical analysis below is retained to show how the rejected separate-cont
 - [x] All unique construction-relevant excerpts have exact canonical provenance.
 - [x] Tape, symbol/head alphabets, visible control, read/result/update, support/boundary, seed, successor, and halting are reconstructed.
 - [x] Rule cardinalities, numeric codec, and canonical examples have independent conformance oracles.
-- [ ] Current API/runtime/test fit and T09 refinement are reclassified without presuming `SingleControl`/`TransitionControl` storage.
-- [ ] Goal 2 handoff and global reintegration are revised around the lossless composite representation and invariant.
+- [x] Current API/runtime/test fit and T09 refinement are reclassified without presuming `SingleControl`/`TransitionControl` storage.
+- [x] Goal 2 handoff and global reintegration are revised around the lossless composite representation and invariant.
 
 ## Architecture-Reclosed Stage Result
 

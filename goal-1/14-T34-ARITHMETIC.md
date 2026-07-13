@@ -1,6 +1,6 @@
 # 14-T34-ARITHMETIC
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T34 row and runner contract in `architecture-audit.md` supersede scalar-domain/executor and family-specific assignment names below.
 
@@ -673,7 +673,7 @@ Tests decode rows back to exact values, compare iterative and closed-form traces
 ## Completion Requirements
 
 - [x] Every native main-text, figure, Notes, actual Index, program, history, and relation candidate is dispositioned.
-- [x] Number domains, closed operations, seeds, transition/outcome semantics, equality, traces, and observers are explicit.
+- [x] Numeric value carriers, closed operations, seeds, transition/outcome semantics, equality, traces, and observers are explicit.
 - [x] Every canonical preset has independently checked exact anchors and adversarial tests.
 - [x] T34/T35 and all neighboring construction boundaries are explicit.
 - [x] Current API/runtime fit and Goal 2 work are implementation-ready.
@@ -691,7 +691,7 @@ The reconstruction is one domain-tagged exact scalar plus a closed `AddConstant 
 
 The page-117 through page-122 oracles pin 63 add-one rows, 84 rows for each addend `1..8`, 64 short power rows, 500 complete powers of three behind a left crop, 256 exact `3/2` rows, and 201 exact fractional samples. Independent `python3` integer/`Fraction` checks passed for all listed sequences/endpoints, 791-bit `3^499` crop guards, `3^255` bit length, exact `f_200`, and the 64-period eight-bit suffix. `git diff --check -- goal-1` passed, Markdown fences are balanced, and `uv run pytest -q` passed all 102 tests in 1.18 seconds.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 `design-ledger.md` now records T34, D064-D069, scalar/value/source/read/result/update/outcome/trace inventory changes, rejected numeric/rendering shortcuts, and the completed integration entry. `evidence-index.md` records T34 complete and 13/45 completed types. `0-plan.md` records the stage result and T37 as next.
 

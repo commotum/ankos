@@ -1,6 +1,6 @@
 # 18-T43-ITERATED-MAPS
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T43 row and runner contract in `architecture-audit.md` supersede scalar-domain/executor and family-specific assignment names below.
 
@@ -849,7 +849,7 @@ Reject:
 ## Completion Requirements
 
 - [x] Every strict main/Notes/actual-Index/split passage, history item, alias, map variant, program, relation, and textual false positive is dispositioned.
-- [x] State/domain/value, closed map syntax, source/read/result/update, precision/rounding/uncertainty, failure/outcome, equality/serialization, trace, and observation semantics are explicit.
+- [x] `t+0D` task space, state value carrier/interval, closed map syntax, frontier/read/write/UPDATE, precision/rounding/uncertainty, failure/outcome, equality/serialization, trace, and observation semantics are explicit.
 - [x] All page-165/166/168/170 and Notes assets have complete measurements/hashes; exact-rational or declared-high-precision oracles exist where the extracted source determines them, and missing-plate/rounding/compressed-layout limitations are explicit elsewhere.
 - [x] T34/T35/T36/T37/T41/T42/T44/T45, fast-forward formulas, smooth/complex/vector maps, sampling, and observer boundaries are explicit.
 - [x] Current API/runtime fit and the Goal 2 files/dependencies/test handoff are explicit.
@@ -869,6 +869,6 @@ All eight strict and three Notes assets have measured dimensions, byte sizes, an
 
 Independent semantic and raster oracles print `PASS`; all eleven hashes match; 19 excerpt groups and 29 `BOOK:` reference groups resolve; Markdown fences pass; `git diff --check` passes; and `uv run pytest -q` reports `102 passed`. Adversarial review found no remaining substantive issue. No earlier stage is reopened.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 `0-plan.md`, `evidence-index.md`, and `design-ledger.md` now record T43 as complete, 17 of 45 type stages complete, ten update laws unchanged, and T44 as the next active stage. T34 assignment, T41 syntax, and T31/T39 query discipline compose without reinterpretation; T37 prefix state, T42 substitution, T44 lattice aggregation, T45 continuous-time flows, and all orbit analyzers remain explicit boundaries. Goal 2 gains exact/represented numeric carriers, map/realization/state-space/evaluator/orbit/analysis/preset/view modules, and an explicit exact-real backend decision.

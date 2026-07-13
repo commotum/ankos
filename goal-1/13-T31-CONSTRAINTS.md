@@ -1,6 +1,6 @@
 # 13-T31-CONSTRAINTS
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T31 row and declarative-category handoff in `architecture-audit.md` supersede construction-specific class proliferation below; the non-transition finding remains authoritative.
 
@@ -644,7 +644,7 @@ The construction denotes a mathematical set of total fields satisfying an immuta
 
 The `0011` de Bruijn cycle/period bound, all three permissive page-226 rows, exact `5x5` tile/formula, five-violation one-bit perturbation, complete 25-profile classification, 1D/page-227 finite obstructions, periodic alias/equality, scope, vacuity, witness/certificate replay, and search-independence tests close the handoff. Generic finite alphabets/dimensions/footprints are labeled principled closure beyond the literal binary examples. Broader template/tiling undecidability is not misattributed to the classified count profiles.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 - Added a separate constraint/specification category outside `SOURCE -> READ -> RESULT -> UPDATE` and transition outcomes.
 - Added closed lattice footprints, symbol-keyed neighbor histograms, center-conditioned allowed sets, and total-field model-set denotation.

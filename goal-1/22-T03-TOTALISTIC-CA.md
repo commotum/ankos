@@ -1,6 +1,6 @@
 # 22-T03-TOTALISTIC-CA
 
-Status: **REOPENED — ASSET REPAIR AND ARCHITECTURE AUDIT**
+Status: **REOPENED — ASSET REPAIR; ARCHITECTURE AUDIT COMPLETE**
 
 Architecture authority: the T03 row and runner contract in `architecture-audit.md` supersede incompatible rule-identity/class claims below; the bounded asset repair remains independently open.
 

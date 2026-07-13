@@ -1,6 +1,6 @@
 # 9-T20-SYMBOLIC
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T20 row and runner contract in `architecture-audit.md` supersede any prohibition on transparent structured values or symbolic-executor framing below.
 
@@ -613,7 +613,7 @@ The construction is a finite ordered expression tree plus an immutable ordered s
 
 The canonical t0-t5 trajectory, head-path first match, disjoint and nested overlap sets, newborn deferral, invariant 256, initial-inclusive 264/65,555 timing convention, Catalan counts, S/K deletion/duplication, rule priority, identity, and no-match cases close the implementation handoff. T13 lineage and T16 program coupling compose at the responsibility level, but their update laws remain distinct. No prior stage is reopened.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 - Added native finite expression trees, typed head/argument paths, structural pattern/template programs, binding reads, and deterministic prefix-free source selection to the semantic inventory.
 - Added `ParallelPrefixFreeTreeReplace` as the fifth public update sibling and structural duplication/deletion lineage to trace requirements.

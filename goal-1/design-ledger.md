@@ -147,7 +147,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 | Constraint/solution | Closed local relations denote mathematical model sets; periodic/open/window presentations have explicit scopes; exact verification differs from search and solution enumeration | ACTIVE category split; T32/T33 and other constraint carriers must re-audit relation syntax | T31 |
 | Function/denotation | Closed unary mathematical expressions declare one argument, parameters, real/complex domain, scalar/fixed-vector codomain, primitive versions, partiality, and branches; point/sample/zero/crossing queries are separate; compatible syntax can sit inside a map contract | ACTIVE pure T41 category and reusable syntax responsibility; structural identity, certified functional equivalence, map relation, and observation equality remain distinct | T41, T43 |
 | Map/feedback | A closed self-map over an explicit state space repeatedly feeds one result into atomic state assignment; strict totality/invariance, partiality, and numerical realization are explicit | ACTIVE T43 transition category; ideal exact, certified computation, tracked significance, and fixed-rounded feedback are distinct profiles/relations | T43 |
-| Field/feedback | A closed affine neighborhood aggregate followed by a closed scalar expression updates a total real field from one old snapshot; exact/certified/tracked/fixed-rounded/stochastic profiles and support/work/crop scopes remain explicit | ACTIVE T44 transition category; reuses fixed assignment without a new update law and keeps additive/coupled/noisy/block/PDE siblings typed | T44 |
+| Field/feedback | A closed affine neighborhood aggregate followed by a closed scalar expression updates a total real field from one old snapshot; exact/certified/tracked/fixed-rounded/stochastic profiles and support/work/crop scopes remain explicit | ACTIVE T44 transition category; directly reuses the CA snapshot UPDATE and keeps additive/coupled/noisy/block/PDE siblings typed | T44 |
 | Solver/numerics | Exact numeric evaluation is semantic where declared; approximate/certified queries carry full context; fixed-rounded feedback changes T43's effective map and T44's effective field transition; constraint/function/map/field solvers use separate scoped results/certificates; evaluators and fast-forward methods never replace definitions or requested traces | PROVISIONAL exact/declared/represented numeric, evaluator, query-result, and solver boundaries | T27, T31, T34, T37, T39, T41, T43, T44 |
 
 ## Decision Log
@@ -289,7 +289,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE for literal rewrite systems.
 - Basis: T16 must scan the whole word for clause 0 before trying clause 1, and choose that clause's leftmost match (`BOOK:1062-1078`, `12289`). A source interval cannot be selected without the ordered left sides.
-- Consequence: refine the source-first shell to `SOURCE.select(state, program.applicability)`. `FirstApplicableMatch` and result lookup consume one authoritative immutable `OrderedLiteralRewriteProgram`; no second LHS table, matcher callback, or claim of independent frontier/rule composition is allowed. T01/T09/T12/T13 remain program-independent special cases and are not reopened.
+- Consequence: `FRONTIER.select(state)` remains the runner interface. A program-coupled `FirstApplicableMatch` frontier holds a typed reference to the one authoritative immutable `OrderedLiteralRewriteProgram` also used by RULE; it never receives a duplicate LHS table or unrestricted matcher callback. T01/T09/T12/T13 remain program-independent frontier presets.
 
 ### D023 — Single interval splice is an exactly-one ordered UPDATE schedule
 
@@ -819,7 +819,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: direct formula evaluation is distinct from following a solution (`BOOK:2032`); displayed dimensional slices are transformed observations (`BOOK:13340-13347`); source plates depend on numerical methods and can contain uncertain artifacts (`BOOK:13413-13443`); the nonlinear-Schrodinger plate displays `Abs[u]` rather than the complex field itself (`BOOK:13453`).
 - Consequence: iteration histories, adaptive/rejected steps, refinement and residual histories, energy/stability diagnostics, point/restriction/sample evaluations, projections/slices, absolute-value transforms, tones/palettes, crops, and labels never enter equation, problem, solution, or solver-realization identity. Work cannot feed back as hidden mathematical data, and a view cannot certify correctness.
 
-### D111 — T02 parameterizes T01 and adds no executor or update law
+### D111 — T02 parameterizes T01 and directly reuses its runner axes
 
 - Status: ACTIVE shared fixed-lattice construction for T01/T02.
 - Basis: strict T02 changes the elementary alphabet from two to three colors while retaining nearest-neighbor CA rules (`BOOK:772,4684`); the Notes expose the general nearest-neighbor form `{n,k}` (`BOOK:11051-11056`), the same ordered triple (`BOOK:11014`), and old-value parallel assignment (`BOOK:850,10984`).
@@ -855,11 +855,11 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: the strict code places the result for average zero at the rightmost digit and proceeds through increasing averages to the left (`BOOK:776`); the general rule count gives `k^(1+(k-1)(2r+1))` tables (`BOOK:11897`); and the Notes construct a padded `M=1+(k-1)(2r+1)`-digit base-`k` rule and index it by the neighborhood sum (`BOOK:11902,11904,11908,11910,11912`).
 - Consequence: valuation, equal-weight sum descriptor, and complete `U` remain the compact source-faithful representation and codec provenance. The validated expansion `T(context)=U(sum_i nu(context_i))` is a lossless representation of the same local function and commutes one step at a time; it is not an arbitrary CA table, hidden shortcut, or permission to substitute a different reducer.
 
-### D117 — T03 reuses fixed-lattice assignment and adds no executor or update law
+### D117 — T03 reuses the fixed-lattice CA preset and runner
 
 - Status: ACTIVE shared execution boundary for T01/T02/T03.
 - Basis: the direct one-dimensional nearest/range signatures remain ordinary cellular-automaton invocations (`BOOK:11037,11056,11060`); totalistic `CAStep` computes the complete next array from rotations of one input array and its sum-table rule (`BOOK:11902,11904,11908`); and the Notes place general and totalistic rules in one convolution framework with different weight descriptions (`BOOK:11914,11916`).
-- Consequence: fixed support, `AllSites`, one old-snapshot finite stencil, typed same-site `Assign`, atomic parallel commit, deterministic successor, support realization, and trace semantics remain the T01/T02 construction. T03 changes only the closed rule-input quotient/table; general `r` parameterizes read geometry and table validation. T03/T04/T05 presets must return this ordinary shared spec, with no `totalistic` branch, second executor, or eleventh update law.
+- Consequence: fixed support, `AllSites`, one old-snapshot finite stencil, typed same-site writes, atomic parallel commit, deterministic successor, support realization, and trace semantics remain the T01/T02 CA preset. T03 changes only the closed rule-input quotient/table; general `r` parameterizes read geometry and table validation. T03/T04/T05 presets must return this ordinary shared spec, with no `totalistic` branch, second executor, or new UPDATE policy.
 
 ### D118 — Totalistic presets, restrictions, properties, and siblings retain separate ownership
 

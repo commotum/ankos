@@ -1,6 +1,6 @@
 # 23-T04-THREECOLOR-TOTALISTIC
 
-Status: **REOPENED — ASSET REPAIR AND ARCHITECTURE AUDIT**
+Status: **REOPENED — ASSET REPAIR; ARCHITECTURE AUDIT COMPLETE**
 
 Architecture authority: the T04 row and runner contract in `architecture-audit.md` supersede incompatible Goal 2 architecture below; the bounded asset repair remains independently open.
 

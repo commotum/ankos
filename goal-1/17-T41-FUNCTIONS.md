@@ -1,6 +1,6 @@
 # 17-T41-FUNCTIONS
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T41 row and declarative-category handoff in `architecture-audit.md` supersede construction-specific class proliferation below; the non-transition finding remains authoritative.
 
@@ -697,7 +697,7 @@ Paths are dependency targets for synthesis; later evidence may consolidate modul
 - SHA-256 verification reproduced all twelve recorded asset hashes. Markdown fence parity passed for this stage and all `goal-1/*.md`; `git diff --check -- goal-1` passed.
 - Repository verification passed: `uv run pytest -q` reported `102 passed in 1.19s`.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 - `0-plan.md` now records the non-transition function/query category, exact source/figure repairs, implementation-ready stage result, 16/45 completed types, and T43 as next work.
 - `evidence-index.md` records T41 complete with exact search counts, eighteen evidence groups, four strict/eight Notes rasters, all semantic/boundary/runtime obligations, and zero unresolved candidates; coverage is 16/45.

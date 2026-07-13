@@ -283,7 +283,7 @@ This table is the authoritative architecture replacement for the reopened stages
 ```text
 step(program, configuration) -> Successors[Configuration]:
     validate(configuration, program.configuration_schema.invariants)
-    active = program.frontier.select(configuration, program.rule)
+    active = program.frontier.select(configuration)
     reads = program.neighborhood.read(configuration, active)
     writes = program.rule.apply(active, reads)
     successors = program.update.apply(configuration, active, writes)

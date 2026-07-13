@@ -1,8 +1,8 @@
 # 25-T06-QUIESCENT
 
-Status: **PAUSED — ARCHITECTURE AUDIT PREREQUISITE**
+Status: **IN PROGRESS — ARCHITECTURE AUDIT COMPLETE**
 
-No T06 work may continue until `architecture-audit.md` is complete and all dependent handoffs are reintegrated.
+The architecture prerequisite is complete and its dependent handoffs are reintegrated. T06 resumes through the common SimpleProgram runner and CA-preset axes; T03/T04's bounded asset repairs remain independently active.
 
 ## Current Facts
 

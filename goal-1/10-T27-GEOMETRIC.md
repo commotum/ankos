@@ -1,6 +1,6 @@
 # 10-T27-GEOMETRIC
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T27 row and runner contract in `architecture-audit.md` supersede separate-executor/class framing and imprecise DOMAIN terminology below.
 
@@ -596,7 +596,7 @@ The construction is a finite bag of oriented prototype occurrences with exact or
 
 Exact page-189/page-190 centers, counts, overlap area, composition direction, global equivariance, duplicate multiplicity, and the page-190 same-center/same-footprint/different-frame witness close the handoff. The Notes center list is retained as a reference projection/order, not hidden state. Nonlinear complex maps receive a distinct closed extended-complex point-map profile that shares bag expansion. T13 lineage composes but its ordered concatenation does not; T20 remains a tree construction. No prior stage is reopened.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 - Added finite affine placed-occurrence bags, exact/declared scalar domains, prototypes, local child templates, and parent-local composition to the semantic inventory.
 - Added permutation-invariant all-occurrence sources, full-pose self reads, multiplicity-preserving geometric provenance, and a sixth update law.

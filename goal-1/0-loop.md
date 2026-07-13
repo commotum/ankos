@@ -10,12 +10,12 @@ Future stages use the broad SimpleProgram abstraction established in `architectu
 active = FRONTIER.select(configuration)
 reads  = NEIGHBORHOOD.read(configuration, active)
 writes = RULE(active, reads)
-next   = UPDATE.apply(configuration, active, writes)
+next   = UPDATE.apply(configuration, active, writes)  # Successors[Configuration]
 ```
 
 DOMAIN is the task/program space with its dimensional character, support, and topology; ALPHABET is its label/value schema and may be a product or tagged union. FRONTIER selects rule-firing loci/occurrences/matches, RULE returns typed writes/replacements, and UPDATE composes them into zero, one, or many successor configurations. These are axes of one branch-free runner, not family executors.
 
-Distinct source names or semantic roles do not imply distinct runtime classes. Prefer parameterizations, named roles, invariants, and lossless structural representations. For a claimed equivalence, require an injective complete-state map `e` whose successor sets commute one step at a time and which calls no hidden source interpreter. Reject opaque whole-state packing, callbacks, lossy quotients, family dispatch, invented behavior, and altered schedules.
+Distinct source names or semantic roles do not imply distinct runtime classes. Prefer parameterizations, named roles, invariants, and lossless structural representations. For a claimed equivalence, require a complete-state map `e` with an explicit inverse on its invariant-valid image, one-step-granularity commuting successor sets, and no hidden source interpreter. Reject opaque whole-state packing, callbacks, lossy quotients, family dispatch, invented behavior, and altered schedules.
 
 ## Repeatable Loop
 
@@ -44,7 +44,7 @@ Distinct source names or semantic roles do not imply distinct runtime classes. P
 - Do not preserve an abstraction merely because an earlier stage introduced it.
 - Do not edit `src/ca`, `tests`, `simple_programs.md`, or `principles.md` during Goal 1. Record proposed changes for Goal 2.
 - Do not create family-specific rollouts, compatibility paths, fake capacity, opaque packing, or unrestricted callbacks in the proposed design.
-- Do not force one executor where the shared operations become semantically empty.
+- Do not fabricate steps to force declarative nonfits through the SimpleProgram runner.
 - Do not create empty future stage files. Create a stage file when its work begins.
 
 ## Type-Stage Evidence Procedure

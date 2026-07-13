@@ -1,6 +1,6 @@
 # 5-T13-PARALLEL-SUBSTITUTION
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T13 row and runner contract in `architecture-audit.md` supersede any separate-executor/top-level-class framing below.
 

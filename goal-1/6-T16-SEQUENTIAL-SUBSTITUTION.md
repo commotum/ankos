@@ -1,6 +1,6 @@
 # 6-T16-SEQUENTIAL-SUBSTITUTION
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T16 row and runner contract in `architecture-audit.md` supersede any separate-executor/top-level-class framing below.
 

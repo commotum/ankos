@@ -94,7 +94,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T09 correctly rederives the governing simple-program `FRONTIER` as rule-firing loci: it selects the unique tagged active cell. The current schema's writable-coordinate-only frontier is a CA-shaped realization that Goal 2 must broaden; the rule's typed writes may name both source and destination, and one `UPDATE` commits them atomically.
 - T09 directly requires visible active-position information, exactly one active marker, atomic old-snapshot update, and full-state traces. It does not establish that these roles require a separate `SingleControl` runtime object: `Plain(bit) | Active(bit)` is a transparent lossless composite field representation.
 - The canonical mobile code pair `{35,57}` consumes physical `[left,self,right]`, sharing T01's corrected MSB-first context codec. The Notes finite-list guard is not a boundary or halt policy.
-- T12 combines a head-state role with the symbol under the head, but the former requirement for payload-bearing `SingleControl`/`TransitionControl` is reopened. A canonical transparent state is `Plain(symbol) | Head(head_state,symbol)` (equivalently `TapeSymbol x Option[HeadState]`) with exactly one head; a factored `(field,position,payload)` form is only a lossless view when explicitly related and validated.
+- T12 combines a head-state role with the symbol under the head. Architecture reclosure withdraws the former payload-bearing `SingleControl`/`TransitionControl` requirement: the canonical transparent state may be `Plain(symbol) | Head(head_state,symbol)` (equivalently `TapeSymbol x Option[HeadState]`) with exactly one head, while a factored `(field,position,payload)` form is a lossless view only when explicitly related and validated.
 - T12 base machines are total and non-halting, with `(2sk)^(sk)` rules. Special terminal head states, external head/tape stop observations, horizons, and errors are distinct outcomes/protocols.
 - T12 requires an inspectable total/default-symbol tape over `Z`; finite read boundaries cannot supply writes or control movement beyond capacity. Numeric rule decoding uses a documented repair of an OCR-lost `k`, guarded by known machine 3024.
 - T13 validates source-first generic orchestration but splits update semantics: fixed-locus assignment preserves support, while `ParallelReplaceConcat` consumes every old ordered occurrence and creates children from typed nonempty words.
@@ -109,25 +109,25 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T17 has zero successors with a retained `InsufficientPrefix` residue when required spans are unavailable. Wolfram's supplied history maps that residue to `{}` on the next requested sample; this is an explicit reference projection, not a fabricated semantic transition.
 - T17 supplies the bounded count `(sum_{j=0}^r k^j)^(k^q)` and the direct `50,625` oracle, but no canonical integer rule codec. Finite words, full ragged traces, queue provenance, and derived length/first-symbol/checkpoint views stay separate.
 - T19 adds a finite named register bank over exact arbitrary-precision naturals plus a visible program marker. Code addresses and register keys are typed address spaces, not DOMAIN coordinates or finite alphabet values.
-- T19 uses program-coupled active-instruction selection and instruction-owned named operand reads. Closed increment/decrement-jump results reuse `Assign`, `TransitionControl`, and `AtomicEffectsUpdate`; no new update algebra, instruction callback, or family rollout is required.
+- T19 uses program-coupled active-instruction selection and instruction-owned named operand reads. Closed increment/decrement-jump results return typed register and marker writes through the shared atomic UPDATE; no generalized control class, instruction callback, or family rollout is required.
 - T19 reference semantics are event-free absorbing `Quiescent(PastProgramEnd)` with the exact state retained; an explicit `ProgramExitStop` interpretation may instead terminate. The last valid event, reference stutter, optional halt, wrap, horizon, external stop, invalidity, and error remain distinct.
 - T19's counted in-program target profile has `(k(n+1))^n` structured programs and no canonical integer codec. A general positive-target profile permits deliberate past-end exits; seeds remain independent and compressed zero-hit/arithmetic views remain event-derived observers.
 - T20 adds finite rooted ordered expression trees with typed head/argument paths, closed structural pattern/template programs, whole-subexpression bindings, and functional-left-to-right outermost prefix-free source selection.
 - T20 selects greedily but commits every selected disjoint subtree from one old snapshot through new `ParallelPrefixFreeTreeReplace`. Bound subtrees may be duplicated, deleted, or rearranged with occurrence-level lineage; T13 concatenation and T16 single splice remain distinct.
 - T20 exact no-match semantics are event-free absorbing `Quiescent(NoPatternMatch)`; an applicable identity remains `Advanced(changed=false)`. Fixed-point stopping, normalization, cycle detection, confluence, and horizons are separate observers/protocols.
 - T20 has structured Catalan expression counts but no rule codec. Functional/tree/Polish/bracket representations, valuations, depths, and size plots are codecs or observers; combinators and deterministic operator evolution are native profiles, while networks and multiway equations remain T29/T30.
-- T27 state is a finite multiplicity-preserving bag of immutable prototype occurrences with complete local-to-world affine poses. Every old occurrence reads only itself and emits its total row of parent-local child templates through `P∘C`; `ParallelOccurrenceBagReplace` is a sixth atomic update sibling.
+- T27 state is a finite multiplicity-preserving bag of immutable prototype occurrences with complete local-to-world affine poses. Every old occurrence reads only itself and emits its total row of parent-local child templates through `P∘C`; a bag-composition UPDATE policy consumes parents and retains ordered child-slot lineage inside the common runner.
 - T27 overlap and coincidence are inert: parents do not read neighbors, no footprint is exclusive, and multiplicity/lineage survive. The page-190 orbit proves that two occurrences can share a center and the same square footprint while different 90-degree frames produce different descendants.
 - T27 exact page-189/page-190 rules use rational matrices/vectors. Algebraic and explicitly declared finite-precision profiles remain distinct; semantic equality never uses an epsilon. Center lists, polygons, rasters, unions, generation stacks, dimensions, limits, and parameter filters are downstream.
 - T27's Möbius and inverse-square-root variant uses a distinct closed extended-complex point-map profile while sharing all-occurrence bag expansion. T13 lineage composes, but its ordered concatenation does not; T28 owns gridded neighbor interaction and T29 owns non-geometric network topology.
 - T29 adds finite nonempty root-reachable directed graphs with two semantic ports per vertex, alpha-renamable occurrence identity, exact root/port-preserving isomorphism, and a breadth-first canonical pair codec.
 - T29 programs are total closed tables over uniform or exact-length reach-signature reads. Results contain old-snapshot path endpoints or distinct event-local fresh-node occurrences; equal descriptors and equal local topology never merge identities.
-- T29 establishes `ParallelRerouteCreateProject` as the seventh update sibling: all old nodes propose from one graph, raw reroutes/births commit atomically, newborns wait, and directed forward closure from the preserved root is projected afterward.
+- T29 uses a graph UPDATE policy: all old nodes propose from one graph, raw reroutes/births commit atomically, newborns wait, and directed forward closure from the preserved root is projected afterward.
 - T29's exact uniform periods/collapse, singleton growth, depth-one `1296` count, five depth-two tables/count anchors, signature witnesses, frozen/projection/freshness/alias cases, and raw-event reconstruction close the parallel handoff.
 - The sequential-network table and pruning evidence are preserved, but primary sources do not determine move timing or projection anchor/order. Goal 2 must explicitly defer that executor rather than choose a convention or flag.
 - T30 state is a finite exact set of finite words, including epsilon. Its program is an unordered finite relation from nonempty literal left sides to epsilon-capable right sides.
 - T30 selects every overlapping match of every clause in every old parent. Each match independently creates one single-splice child; newborns wait and enumeration order is nonsemantic.
-- T30 establishes `DistinctBranchMerge` as the eighth update sibling: exact-equal children merge across spans, rules, and parents, while every rewrite witness and dead parent remains event provenance.
+- T30 uses the uniform `Successors[Configuration]` result: exact-equal children merge across spans, rules, and layer parents, while every rewrite witness and dead parent remains event provenance.
 - A nonempty all-dead layer advances eventfully to the empty layer; only the empty layer has event-free reference stutter. Identity and recurrent words remain eventful and cannot be suppressed by a global visited/compressed graph.
 - Layered state, derivation witnesses, simple edges, one-node-per-word compressed spacetime graphs, accumulated languages, counts, confluence/normal forms, proof search, and rendering are distinct.
 - T13 words and T16 literal occurrence/splice kernels compose privately without weakening their public rules/outcomes. Literal semi-Thue/grammar restrictions can reuse T30; tag multiplicity, cyclic/block/pattern/numeric/control variants remain separately typed.
@@ -489,7 +489,7 @@ All T31 evidence is captured; the constraint/solver boundary is explicit; any ex
 
 The direct-name union dispositioned 29 occurrences on 27 lines, conservative family search 162/134, expanded audit 815/415, and bare constraint search 467/312. Twenty-eight canonical groups cover every strict figure, Notes/Index/split, de Bruijn/periodic proof, search/repair/complexity passage, CA/tiling/ground-state/network/equation relation, and T32/T33 boundary. All 27 direct lines are classified; strict mechanics have zero unresolved candidates.
 
-T31 reconstructs a total-field model set defined by a closed center-conditioned neighbor-histogram relation. It adds exact periodic/open/window scopes, pure verification, pointwise periodic equivalence, replayable finite obstructions, and separate scoped solver results—no ninth transition update. The `0011` cycle, permissive rows, `5x5` tile, full 25-profile classification, perturbation/obstruction/scope/alias/equality/certificate tests close the handoff. Generic alphabet/dimension/footprint support is labeled principled closure, and broader template complexity is not misattributed. No prior stage was reopened. Next: T34.
+T31 reconstructs a total-field model set defined by a closed center-conditioned neighbor-histogram relation. It adds exact periodic/open/window scopes, pure verification, pointwise periodic equivalence, replayable finite obstructions, and separate scoped solver results outside rollout. The `0011` cycle, permissive rows, `5x5` tile, full 25-profile classification, perturbation/obstruction/scope/alias/equality/certificate tests close the handoff. Generic alphabet/dimension/footprint support is labeled principled closure, and broader template complexity is not misattributed. Next: T34.
 
 ### 14-T34-ARITHMETIC
 
@@ -635,7 +635,7 @@ All T44 evidence is captured; reusable CA components and genuinely new numeric s
 
 The literal 21-query search oracle reproduces every pre-Index/actual-Index count, and 25 evidence groups disposition all strict, Notes, split, Index, history, alias, implementation, parameter, application, stochastic, complex-block, and PDE candidates with zero unresolved remainder. T44 reconstructs one total `[0,1]` field on fixed ordered 1D support, synchronous old left/self/right reads, an exact affine aggregate plus closed scalar map, typed same-site assignments, and T01 atomic fixed-effects commit. Integer-line strict support remains a labeled inference; Notes ring, segment exterior, causal work, and render crop are distinct. Exact ideal fields, certified/tracked computation records, represented feedback, and stochastic draws have separate identities.
 
-The exact semantic oracle covers mean/coefficient/mass, fractional-`3/2`, add-quarter/background, additive residues, weighted range, boiling equality, and noisy closure. Metadata reproduce all 17 included assets plus the excluded discrete page-339 plate; the runnable raster oracle passes pages 172-175 and both Notes panels, including the absolute-right observer discriminator. D096-D102 record update reuse/no eleventh law, field/numeric/support/observer semantics, and additive/coupled/boiling/noisy/probabilistic/block/PDE boundaries. Search, source, fence, hash, raster, semantic, diff, and all 102 repository-test gates pass. No prior stage reopened. Next: T45.
+The exact semantic oracle covers mean/coefficient/mass, fractional-`3/2`, add-quarter/background, additive residues, weighted range, boiling equality, and noisy closure. Metadata reproduce all 17 included assets plus the excluded discrete page-339 plate; the runnable raster oracle passes pages 172-175 and both Notes panels, including the absolute-right observer discriminator. D096-D102 record direct snapshot-UPDATE reuse, field/numeric/support/observer semantics, and additive/coupled/boiling/noisy/probabilistic/block/PDE boundaries. Search, source, fence, hash, raster, semantic, diff, and all 102 repository-test gates pass. Next: T45.
 
 ### 20-T45-PDE
 
@@ -655,7 +655,7 @@ All T45 evidence is captured; no discretized CA is presented as the PDE itself; 
 
 #### Stage Result
 
-The exact 27-query oracle emits and verifies every pre-Index/actual-Index candidate manifest, and 28 evidence groups close strict, Notes, split, Index, equation-family, condition, method, solution, continuum-relation, history, application, and observer evidence with zero unresolved remainder. T45 reconstructs immutable scalar/complex/fixed-vector differential equations and `Classical` continuous-region/side-data problems whose denotation is a solution set, with no native source, update, successor, halt, or eleventh law. Closed multivariate expressions, differential operators, fixed matrices, reduced-locus trace binders, versioned class/locus/admissibility claims, and proof-strength-preserving queries keep equation, problem, candidate, witness, realization, sample, and view identities distinct.
+The exact 27-query oracle emits and verifies every pre-Index/actual-Index candidate manifest, and 28 evidence groups close strict, Notes, split, Index, equation-family, condition, method, solution, continuum-relation, history, application, and observer evidence with zero unresolved remainder. T45 reconstructs immutable scalar/complex/fixed-vector differential equations and `Classical` continuous-region/side-data problems whose denotation is a solution set, with no native source, UPDATE, successor, or halt unless a posed evolution derives one. Closed multivariate expressions, differential operators, fixed matrices, reduced-locus trace binders, versioned class/locus/admissibility claims, and proof-strength-preserving queries keep equation, problem, candidate, witness, realization, sample, and view identities distinct.
 
 The semantic oracle passes exact heat/wave identities, the incompatible diffusion caption datum, nonlinear potential endpoint counterexample, background amplitude/periods, and the finite-difference kernel/grid. Metadata pin 23 included assets plus one material exclusion, and the analytic heat raster oracle passes. D103-D110 record the declarative ontology, syntax, IVP, proof, discretization, scope, and observer boundaries. All 87 quotes, 44 source bounds, Markdown fences, `git diff --check`, independent review, and all 102 repository tests pass. No prior stage reopened. Next: T02.
 
@@ -683,7 +683,7 @@ All seven embedded oracles pass. They cover the `3^27` count, every binary speci
 
 ### 22-T03-TOTALISTIC-CA
 
-Status: **REOPENED** in `goal-1/22-T03-TOTALISTIC-CA.md`. T04's bounded repair proved that inherited page-263 raster `BOOK:2928` belongs to the already-retained two-dimensional totalistic gallery; the one-control asset repair is active and the semantic result is unchanged.
+Status: **REOPENED — ASSET REPAIR; ARCHITECTURE COMPLETE** in `goal-1/22-T03-TOTALISTIC-CA.md`. T04's bounded repair proved that inherited page-263 raster `BOOK:2928` belongs to the already-retained two-dimensional totalistic gallery; the one-control asset repair is active and the semantic result is unchanged.
 
 #### Big Picture Objective
 
@@ -707,7 +707,7 @@ The six embedded blocks pass: source/evidence closure at 212 cited lines/89 frag
 
 ### 23-T04-THREECOLOR-TOTALISTIC
 
-Status: **REOPENED** in `goal-1/23-T04-THREECOLOR-TOTALISTIC.md`. T06 found two direct raster links omitted from the claimed exhaustive closure: `BOOK:17431 -> 17433` and `BOOK:2922 -> 2924`. The bounded asset/reverse-join repair is active; preset semantics are unchanged.
+Status: **REOPENED — ASSET REPAIR; ARCHITECTURE COMPLETE** in `goal-1/23-T04-THREECOLOR-TOTALISTIC.md`. T06 found two direct raster links omitted from the claimed exhaustive closure: `BOOK:17431 -> 17433` and `BOOK:2922 -> 2924`. The bounded asset/reverse-join repair is active; preset semantics are unchanged.
 
 #### Big Picture Objective
 
@@ -747,7 +747,7 @@ COMPLETE: 11 controlled query families close 142 lexical lines, five governed fo
 
 ### 25-T06-QUIESCENT
 
-Status: **PAUSED** in `goal-1/25-T06-QUIESCENT.md`; the architecture audit is a hard prerequisite.
+Status: **IN PROGRESS** in `goal-1/25-T06-QUIESCENT.md`; the architecture audit is complete and T06 may resume through the common SimpleProgram axes.
 
 #### Big Picture Objective
 

@@ -1,6 +1,6 @@
 # 12-T30-MULTIWAY
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T30 row and runner contract in `architecture-audit.md` supersede deterministic-layer-only and multiway-executor framing below.
 
@@ -782,7 +782,7 @@ The construction is a finite exact set of finite words under a finite unordered 
 
 Page-219/page-220 layers and growth, page-206 `t0..t10` and extinction, the official four-layer cross-parent merge, page-224 repeated/folded/network views, repaired sorted count vectors, overlap, one-versus-simultaneous splice, diamond/cross-rule/cross-parent merging, identity/two-cycle recurrence, epsilon/empty, reconstruction, order, alpha, and graph invariants close the handoff. T13 words and T16 matching/splicing compose privately; their public updates/outcomes remain unchanged. T29 graph state remains distinct.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 - Added finite exact word-set layers and unordered epsilon-capable literal rewrite relations to the semantic inventory.
 - Added program-coupled every-overlapping-match sources and one-splice branch results while reusing T16's pure literal occurrence/edit kernel.

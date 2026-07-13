@@ -1,6 +1,6 @@
 # 7-T17-TAG
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T17 row and runner contract in `architecture-audit.md` supersede any separate-executor/top-level-class framing below.
 

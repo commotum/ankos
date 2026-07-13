@@ -1,6 +1,6 @@
 # 16-T39-FILTERS
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T39 row and runner contract in `architecture-audit.md` supersede numbered-update/executor and separate-control framing below.
 
@@ -739,7 +739,7 @@ Paths are dependency targets for synthesis; Goal 2 may consolidate modules when 
 - [x] Every one of seven raster files/twelve plotted profiles has an exact identity, horizon, formula/convention, source repair, and independent oracle.
 - [x] Literal `1`, gray-hit/new-removal distinction, composite stages, certification, and finite/infinite scopes are explicit.
 - [x] Filter, stream, sieve, direct analyzer, measurement, prefix, trace, and observer categories remain distinct.
-- [x] State/source/read/result/update/outcome/equality/serialization semantics are explicit and `MonotoneFilterUpdate` is justified against all prior laws.
+- [x] State/frontier/read/write/UPDATE/outcome/equality/serialization semantics are explicit and the subset-removal/marker policy is justified against the smaller same-site and ordered-replacement policies.
 - [x] Ulam/T37 composition and T40/current API/runtime boundaries are explicit.
 - [x] Goal 2 files, dependencies, behavior, canonical tests, migration constraints, and no-cheating cases are implementation-ready.
 - [x] Global ledgers, exact verification commands, diff checks, and repository tests are integrated successfully.
@@ -759,7 +759,7 @@ Paths are dependency targets for synthesis; Goal 2 may consolidate modules when 
 - SHA-256 verification reproduced all seven recorded raster hashes. Markdown fence parity passed across `goal-1/*.md`; `git diff --check -- goal-1` passed.
 - Repository verification passed: `uv run pytest -q` reported `102 passed in 1.21s`.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 - `0-plan.md` now records the three-category split, tenth update law, exact source inconsistency/profiles, Ulam resolution, implementation-ready stage result, and T41 as next work.
 - `evidence-index.md` records T39 complete with nineteen evidence groups, exact search counts, all source/profile/architecture obligations, and zero unresolved candidates; coverage is 15/45.

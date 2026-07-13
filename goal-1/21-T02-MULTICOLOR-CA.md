@@ -1,6 +1,6 @@
 # 21-T02-MULTICOLOR-CA
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T02 row and runner contract in `architecture-audit.md` supersede any executor/class claims below; evidence, construction facts, and conformance fixtures remain authoritative.
 
@@ -1010,6 +1010,6 @@ The semantic oracle proves the exact `3^27` count, all 256 T01 specializations, 
 
 All seven embedded evidence/semantic/asset blocks pass, all Markdown fences are balanced, `git diff --check` passes, and all 102 repository tests pass. Independent review found the initially omitted direct Voronoi fixture; after its evidence, metadata, adjacent-2D exclusion, and priority-table oracle were added, re-review found no substantive blocker.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 The design ledger now contains the T02 construction row and D111-D114. T01 is generalized without changing its meaning; no completed stage is contradicted or reopened, no family branch or executor is introduced, and the public transition-update family remains at ten members. T03 owns aggregate rules, T04/T05 their color-count profiles, T06 background preservation, T07 reflection symmetry, and emulation/reversibility/search retain relation/property/analyzer identities. The Goal 2 handoff broadens the shared T01 table executor once, adds ordered alphabet rank/value and arbitrary-precision structural codecs, preserves evolving backgrounds and realization boundaries, and supplies exact binary/nonbinary/adversarial conformance tests.

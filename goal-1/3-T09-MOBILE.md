@@ -1,6 +1,6 @@
 # 3-T09-MOBILE
 
-Status: **REOPENED — REPRESENTATION ARCHITECTURE AUDIT**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T09 row, commuting tagged representation, and runner contract in `architecture-audit.md` supersede incompatible separate-control/head-packing claims below.
 
@@ -500,9 +500,9 @@ The current full-state formula callback is not a valid fallback: T09 has a finit
 - [x] All unique construction-relevant excerpts have exact canonical provenance.
 - [x] Visible control, read order, compound result, atomic update, support/boundary, seed, and observables are reconstructed.
 - [x] The 65,536 tables and canonical example have independent conformance oracles.
-- [ ] Current API/runtime/test fit is reclassified without presuming separate control storage, while retaining source-frontier semantics.
-- [ ] Goal 2 handoff is revised around a lossless composite state, exactly-one invariant, and structural atomic lowering.
-- [ ] Global ledgers and all dependent decisions are re-integrated and independently verified.
+- [x] Current API/runtime/test fit is reclassified without presuming separate control storage, while retaining source-frontier semantics.
+- [x] Goal 2 handoff is revised around a lossless composite state, exactly-one invariant, and structural atomic lowering.
+- [x] Global ledgers and all dependent decisions are re-integrated and independently verified.
 
 ## Architecture-Reclosed Stage Result
 

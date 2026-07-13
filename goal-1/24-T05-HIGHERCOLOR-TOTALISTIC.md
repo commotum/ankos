@@ -1,6 +1,6 @@
 # 24-T05-HIGHERCOLOR-TOTALISTIC
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T05 row and runner contract in `architecture-audit.md` supersede incompatible Goal 2 architecture below; evidence and fixtures remain authoritative.
 
@@ -964,7 +964,7 @@ COMPLETE after a zero-remainder audit and independent re-review.
 - All five embedded source/evidence/semantic/metadata/asset-semantic blocks pass, all 22 Markdown fences balance, `git diff --check` passes, and all 102 repository tests pass. A final independent review returned `CLEAN` after the page-963 and fifth split-follow repairs.
 - D115-D117 remain unchanged. D118 is sharpened with the exact strict preset boundary; no D119, family-specific executor, callback, fallback, or eleventh update law is needed. Global plan, evidence index, and design ledger record the result. Next: T06.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 1. **Prior validity:** no semantic assumption, primitive, grouping, or executor boundary was invalidated. T03's claimed source closure was invalid and was repaired/reclosed; the first T05 asset manifest was also widened after independent review found four direct page-963 relations.
 2. **Primitive reuse:** yes. T05 resolves to the unchanged generic T03 valuation, equal-weight integer sum, complete aggregate-case table, optional codec relation, and ordinary T01/T02 fixed-lattice execution.

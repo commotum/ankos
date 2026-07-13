@@ -1,6 +1,6 @@
 # 11-T29-NETWORK
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T29 row and runner contract in `architecture-audit.md` supersede any prohibition on transparent graph schemas or network-executor framing below.
 
@@ -775,7 +775,7 @@ The construction is a finite nonempty root-reachable directed graph with two sem
 
 Uniform periods/collapse, singleton creation, the `1296` restricted count, five exact depth-two tables, short and long count anchors, `G49=G768`, all signature witnesses, and adversarial snapshot/projection/freshness/alias/provenance cases close the parallel handoff. The sequential table is preserved, and its pruning is evidenced, but move timing and projection anchor/order remain a transparent primary-source limitation. Goal 2 must not guess them.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 - Added finite rooted labeled graph state, alpha-renamable vertex identity, exact root/port isomorphism, and BFS canonical serialization to the semantic inventory.
 - Added all-vertex sources, port-word reads, exact-length topology signatures, closed reroute/create results, collision-free event freshness, and raw graph provenance.

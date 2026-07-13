@@ -1,10 +1,10 @@
 # 15-T37-RECURSIVE
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T37 row and runner contract in `architecture-audit.md` supersede numbered-update/executor framing below while preserving the full-prefix state and noninjective-window result.
 
-The evidence/search closure and conformance fixtures remain valid. The stage's own sufficient-window result reopens the claim that a full prefix is the only canonical Markov state; endpoint growth is an UPDATE choice inside the shared runner, not a recursive-sequence executor.
+The evidence/search closure and conformance fixtures remain valid. The full prefix remains canonical because the sufficient fixed-lag window is noninjective and cannot reconstruct discarded history; endpoint growth is an UPDATE choice inside the shared runner, not a recursive-sequence executor.
 
 ## Current Facts
 
@@ -14,7 +14,7 @@ The evidence/search closure and conformance fixtures remain valid. The stage's o
 - The strict page-143 figure contains six linear affine fixed-lag recurrences. It has exact displayed horizons `38,48,22,26,44,27`, including seeds; the unequal horizons are layout choices followed by ellipses, not native stop conditions.
 - The figure gives row (e) as `f[n]=f[n-1]-f[n-2]` and row (f) as `f[n]=-f[n-1]+f[n-2]`. `BOOK:12690` and the official Note incorrectly call row (f)'s characteristic equation case (e). This is a source erratum, not repository OCR damage.
 - A normalized `AffineFixedLag` program covers every strict row and noncontiguous fixed lags such as Perrin. The Notes' factorial example justifies a separately named closed fixed-lag arithmetic-expression extension; it does not justify a host callback.
-- Each valid event reads only old prefix terms, computes exactly one value, and append-preserves the entire old prefix. This requires a ninth public update law, `AppendOnlySequenceUpdate`; T34 assignment, T16 matched-span splice, and T17 prefix-consume/tail-append have different validators and mutation laws.
+- Each valid event reads only old prefix terms, computes exactly one value, and append-preserves the entire old prefix. It uses the ordered UPDATE axis with an endpoint-insertion policy; T34 same-locus writes, T16 matched-span splice, and T17 prefix-consume/tail-append retain their distinct validators and schedules inside the same runner.
 - A lag window plus the next absolute index is future-sufficient for a fixed-lag program, but it is a lossy transition quotient. It is not canonical prefix equality and cannot reconstruct discarded terms without the seed/checkpoint and complete append log.
 - Every valid exact recurrence event has one successor forever. A repeated numeric term or periodic suffix never creates an unchanged state or full-state cycle because the indexed prefix grows.
 - Exact signed integers and reduced rationals reuse T34 value/domain/string-codec obligations. Fixed-width NumPy arithmetic, implicit modulus, floats, and unsafe JSON numbers cannot represent the strict construction.
@@ -23,9 +23,9 @@ The evidence/search closure and conformance fixtures remain valid. The stage's o
 
 ## Updated Assumptions
 
-- `NumericPrefix(domain,index_origin,terms)` is canonical semantic state. The term at tuple position `i` has mathematical index `index_origin+i`.
+- `NumericPrefix(carrier,index_origin,terms)` is canonical semantic state. The term at tuple position `i` has mathematical index `index_origin+i`.
 - A canonical fresh seed contains exactly `max_lag` contiguous terms. A longer prefix is a separately typed checkpoint and must be verified from the minimal seed before it can be resumed.
-- The strict public rule is `AffineFixedLag(domain,bias,coefficients)`, where coefficients are a canonical sparse map from positive literal lags to exact scalars. At least one nonzero coefficient is required.
+- The strict public rule is `AffineFixedLag(carrier,bias,coefficients)`, where coefficients are a canonical sparse map from positive literal lags to exact scalars. At least one nonzero coefficient is required.
 - `FixedLagArithmeticExpr` is a named Notes extension with only literals, target index, positive literal lag references, negation, addition, subtraction, and multiplication. Computed indices, callbacks, branches, division, powers, and arbitrary recursive calls remain excluded.
 - Static validation rejects lag zero, negative lags, current/future references, duplicate lag entries, mixed domains, empty/short fresh seeds, and hidden defaults. Strict T37 needs no runtime invalid-index policy.
 - Exact program identity is structural after constructor normalization. Mathematical equivalence of two recurrence formulas, characteristic roots, or closed forms is an observer and does not quotient program identity.
@@ -577,7 +577,7 @@ Suggested responsibility files are a shared exact-value module, `numeric_sequenc
 ## Completion Requirements
 
 - [x] Every strict main-text, raster, Notes, actual Index, split, program, history, alias, named variant, observer, and relation candidate is dispositioned.
-- [x] Prefix/index/domain, strict and extended program, seed/checkpoint, dependency, append, outcome, equality, serialization, trace, and quotient semantics are explicit.
+- [x] Prefix/index/value-carrier, strict and extended program, seed/checkpoint, dependency, append, outcome, equality, serialization, trace, and quotient semantics are explicit.
 - [x] Every strict figure row and high-value variant has independently checked exact oracles and adversarial boundaries.
 - [x] The source erratum and overbroad caption claims are repaired transparently and guarded.
 - [x] T34/T38/T39/T43, Ulam, Ackermann, modular RNG, solver, and observer boundaries are explicit.
@@ -596,7 +596,7 @@ The reconstruction is a consecutive domain-tagged exact `NumericPrefix` plus a n
 
 Exact Python oracles regenerated all six raster rows at horizons `38/48/22/26/44/27`, their endpoints, `Fibonacci[93]`, Lucas, Perrin, factorial, the exact logistic relation, append/state/term cardinalities, checkpoint replay, lag-window non-injectivity/commutation, and the raster SHA-256. They passed. Markdown fences are balanced, `git diff --check -- goal-1` passed, and `uv run pytest -q` passed all 102 tests in 1.17 seconds.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 `design-ledger.md` now records the T37 construction, the ninth update member, D070-D075, numeric-prefix inventory changes, rejected shortcuts, Ulam's open composition question, and the completed integration entry. `evidence-index.md` records T37 complete and 14/45 completed types. `0-plan.md` records the implementation-ready result and T39 as next.
 

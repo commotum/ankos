@@ -1,6 +1,6 @@
 # 8-T19-REGISTER
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T19 row and runner contract in `architecture-audit.md` supersede incompatible `SingleControl`/`TransitionControl` and register-executor claims below.
 
@@ -632,7 +632,7 @@ T19 reconstructs a finite named bank over exact naturals plus visible unit-paylo
 
 Principle 0 preserves T09/T12 visible control, typed effects, atomic update, structured traces, and outcome distinctions while rejecting their spatial/tape support and finite alphabets. T19 adds exact infinite values, a register bank, code-address source/read responsibilities, closed instruction results, and quiescence without adding another update algebra. Canonical five- and eight-instruction trajectories, page-100 arithmetic checkpoints, exact counts, explicit program-boundary cases, the 1,280-step halt witness, the square-root exit, and values beyond `2^63` close the Goal 2 handoff. CA/TM/arithmetic/URM encodings and compressed observers remain relations only. No prior stage is reopened. Next: T20 Symbolic Systems.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 - Added T19 to the completed construction inventory with finite named numeric state, program-address control, instruction-owned reads, typed arithmetic/control effects, atomic commit, and quiescent/exit outcomes.
 - Generalized the control inventory from spatial/tape positions to typed address domains; control need not point into mutable value support.

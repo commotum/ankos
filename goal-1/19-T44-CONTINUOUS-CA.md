@@ -1,6 +1,6 @@
 # 19-T44-CONTINUOUS-CA
 
-Status: **REOPENED — ARCHITECTURE AUDIT; EVIDENCE CLOSED**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 Architecture authority: the T44 row and runner contract in `architecture-audit.md` supersede continuous-DOMAIN or construction-specific field-class claims below.
 
@@ -1267,7 +1267,7 @@ The exact semantic oracle passes the mean/coefficient/mass rows, `3/2` fractiona
 
 Verification passed: literal search oracle; exact semantic oracle; 17-asset/exclusion metadata oracle; core raster oracle; 25-group/source-line and Markdown-fence checks; `git diff --check`; and all `102` repository tests. No unresolved source candidate, renderer-dependent semantic claim, or prior-stage contradiction remains.
 
-## Integration Results
+## Historical Integration Results (Superseded by Architecture Audit)
 
 T01's source/read/assignment/atomic-update law, T34's typed assignment responsibility, and T41/T43's closed numeric syntax and realization discipline compose without reinterpretation. T44 adds total continuous-field presentations, exact affine neighborhood aggregates, composite closure/range validation, field-wide numeric realization, initial-inclusive field runs, coordinate-stable stochastic draw records, and field observers. The provisional public transition-update family remains at ten members.
 
