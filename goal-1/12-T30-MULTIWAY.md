@@ -118,55 +118,423 @@ Canonical `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. The
 
 ## Construction Model
 
-Evidence closure is in progress. The current candidate contract is:
+### Exact word-set carrier
 
 ```text
+Alphabet = FiniteNonEmptySet[Symbol]
 Word = FiniteTuple[Symbol]                 # epsilon allowed
-MultiwayLayer = FiniteSet[Word]
+MultiwayLayer = FrozenSet[Word]            # finite, exact, unweighted
 
 LiteralClause = {
     lhs: NonEmptyWord,
     rhs: Word
 }
 
-MultiwayLiteralProgram = FiniteRelation[LiteralClause]
-
-AllApplicableLiteralMatches(old_layer, program)
-  -> every (parent, clause, start, stop), overlaps included
-
-ReplaceInterval(match, rhs)
-  -> prefix(parent,start) + rhs + suffix(parent,stop)
-
-DistinctBranchMerge
-  -> exact set union of all one-match children
+MultiwayLiteralProgram = {
+    alphabet,
+    clauses: FiniteSet[LiteralClause]
+}
 ```
 
-The full contract, outcomes, traces, exact presets, adversarial tests, variants, API/runtime fit, principles audit, and Goal 2 implementation stage will be frozen after the remaining figure/search audit.
+Every word, clause side, and seed is alphabet-closed. Word order is semantic; layer enumeration is not. Equal word values occur at most once in a layer. No parent occurrence ID, branch weight, active control, derivation history, graph node, or first-seen depth is needed to advance.
+
+The empty word and empty layer are distinct:
+
+```text
+epsilon = ()
+{epsilon} = one live state whose word has length zero
+empty_layer = no live states
+```
+
+The finite program is a relation:
+
+- `lhs` is nonempty;
+- `rhs` may be epsilon;
+- several clauses may share one `lhs` if their `rhs` differs;
+- clause order is nonsemantic;
+- an exact duplicate pair is invalid at sequence/JSON construction and impossible in the normalized set value;
+- there is no missing-rule fallback, default identity, priority, numeric rule code, or implicit reverse rule.
+
+Empty `lhs` is rejected because it would require an insertion-position convention absent from the base sources. A finite empty program is valid and causes every nonempty seed state to die at its first event.
+
+### All applicable old matches
+
+Source selection is intrinsically program-coupled:
+
+```text
+AllApplicableLiteralMatches.select(old_layer, program)
+  = {
+      Match(
+        snapshot_id,
+        parent_word,
+        clause,
+        start,
+        stop = start + len(clause.lhs)
+      )
+      for every parent_word in old_layer
+      for every clause in program.clauses
+      for every exact occurrence of clause.lhs in parent_word
+    }
+```
+
+Occurrences include overlaps. For parent `AAA` and `AA -> B`, starts 0 and 1 both fire. Parent enumeration, clause enumeration, and match enumeration order cannot change the match set or successor.
+
+`MatchedWord` validates:
+
+- the source belongs to the declared snapshot/layer;
+- interval bounds are exact and in range;
+- the old slice equals the selected `lhs`;
+- clause/alphabet/program identity is authoritative;
+- the parent has not been packed or canonicalized by an observer.
+
+This reuses T16's exact literal matching and matched-span read meaning. It explicitly does not reuse `FirstApplicableMatch`, clause priority, or leftmost-only selection.
+
+### One splice per branch
+
+Each match independently yields:
+
+```text
+BranchIntervalReplacement = {
+    source: Match,
+    replacement: clause.rhs
+}
+
+child(match) =
+    parent_word[:start]
+    + replacement
+    + parent_word[stop:]
+```
+
+One child contains one splice. Two overlapping or disjoint matches are alternatives, not a simultaneous edit set. A child is not rescanned until the next layer. Thus `A -> AA` sends `{A} -> {AA} -> {AAA}`, not directly to an unbounded result.
+
+### The eighth update law: exact branch merge
+
+`DistinctBranchMerge` commits one old layer:
+
+1. validate that the supplied match/result set is exactly every applicable match of every clause in every old parent;
+2. apply one interval splice per match against the frozen parent word;
+3. group all results by exact child word;
+4. make the successor the set of group keys;
+5. record every parent with zero matches as a dead end;
+6. attach every rewrite witness to its child's derivation group;
+7. never carry an old parent merely because it existed in the previous layer.
+
+```text
+ParallelLiteralMultiway =
+    STATE: MultiwayLayer
+    SOURCE: AllApplicableLiteralMatches
+    READ: MatchedWord
+    RULE: MultiwayLiteralProgram
+    RESULT: BranchIntervalReplacement
+    UPDATE: DistinctBranchMerge
+```
+
+This is an eighth public update sibling after T29. T16's one-splice operation can be a private child-construction kernel, but T16 selects exactly one match and returns one word, whereas T30 covers all matches and exact-unions their children. Repeatedly invoking T16 with altered priorities cannot reproduce a single atomic multiway event without duplicating applicability, merge, dead-end, and snapshot semantics.
+
+The macro transition is deterministic:
+
+```text
+step: MultiwayLayer -> MultiwayLayer
+```
+
+Word-level alternatives do not imply random executor choice or a list of nondeterministic API returns. The one semantic successor is the complete set of alternatives.
+
+### Outcome semantics
+
+For every nonempty old layer:
+
+```text
+Advanced(
+    state = exact_set_of_children,
+    changed = (old_layer != exact_set_of_children),
+    event = MultiwayRewriteEvent(...)
+)
+```
+
+This includes an all-dead event whose successor is `empty_layer`. An identity clause can produce an eventful `Advanced(changed=false)`. A recurrent layer or two-cycle continues to advance; no fixed/cycle stop is intrinsic.
+
+The executable reference maps `empty_layer` to itself with no witnesses. The architecture labels this:
+
+```text
+Quiescent(EmptyLayer, state=empty_layer)
+reference_successor = empty_layer
+```
+
+This label distinguishes event-free empty-set stutter from the preceding all-dead rewrite event. It is not a claim that the book names a halt. Horizon, fixed/cycle observation, resource exhaustion, cancellation, invalidity, and error remain separate.
+
+### Lossless trace and graph projections
+
+`MultiwayRewriteEvent` records:
+
+```text
+snapshot_id
+old_layer
+rewrite_witnesses {
+    parent_word
+    clause
+    start
+    stop
+    matched_lhs
+    replacement_rhs
+    child_word
+}
+dead_end_parents
+child_to_witness_set
+next_layer
+```
+
+Exact reconstruction invariants are:
+
+- witnesses equal all and only applicable old matches;
+- every witness child equals the one-splice formula;
+- `next_layer` equals the exact set of witness children;
+- every next word has at least one witness;
+- dead ends equal old parents with no witness;
+- witness multiplicity does not change `next_layer`.
+
+From the raw layered trace one may derive:
+
+- a layered diagram with one occurrence of a word per time layer;
+- a simple layer edge relation `(parent,child)` with duplicate witnesses collapsed;
+- a derivation multigraph retaining clause/span witnesses;
+- a compressed graph with one node per exact word ever seen;
+- first-seen depth, accumulated language, path sets, causal networks, state/edge counts, growth differences, confluence, normal forms, and renderings.
+
+The same exact word can belong to many layers. Compressed-node reuse never suppresses its later firing. A merged child has all inbound witnesses but no chosen semantic parent or persistent occurrence identity.
+
+## Exact Book Presets and Oracles
+
+### Page-219 simple nested system
+
+For program `{A->A, A->AA}` and seed `{A}`:
+
+```text
+t0 = {A}
+t1 = {A, AA}
+t2 = {A, AA, AAA}
+t3 = {A, AA, AAA, AAAA}
+in general: t_n = { A^k | 1 <= k <= n+1 }
+```
+
+Identity retains shorter words only because it is an explicit clause. Each `A->AA` occurrence in `A^k` yields the same `A^(k+1)` and merges.
+
+### Exact page-206 deletion trajectory
+
+Program and seed:
+
+```text
+AB     -> epsilon
+ABA    -> ABBAB
+ABABBB -> AAAAABA
+
+t0 = {ABABAB}
+```
+
+The executable exact layers are:
+
+```text
+t1 = {
+  ABAB,
+  ABABBABB,
+  ABBABBAB
+}
+
+t2 = {
+  AB,
+  ABABBB,
+  ABBABB,
+  ABBABBBABB,
+  ABBBAB,
+  BABBAB
+}
+
+t3 = {
+  epsilon,
+  AAAAABA,
+  ABBABBBB,
+  ABBB,
+  ABBBBABB,
+  BABB,
+  BABBBABB,
+  BBAB
+}
+```
+
+Epsilon is present as a real word at `t3` and disappears at `t4` unless regenerated. Starting instead from `{ABA}` yields layer cardinalities `1,2,2,1,0` for `t0..t4`, followed by empty-layer reference stutter. This distinguishes deletion, dead-end dropping, epsilon, all-dead advancement, and quiescence.
+
+### Exact cross-parent merge trajectory
+
+Official program data for:
+
+```text
+AAB -> BB
+BA  -> ABB
+seed = {ABBAAB}
+```
+
+gives:
+
+```text
+t0 = {ABBAAB}
+t1 = {ABABBAB, ABBBB}
+t2 = {AABBBBAB, ABABABBB}
+t3 = {AABBBABBB, ABAABBBBB, BBBBBAB}
+```
+
+There are four `t2 -> t3` rewrite witnesses but only three exact targets. `AABBBABBB` has one witness from each parent and appears once in `t3`. This is a direct differential oracle against path-copy state, per-parent-only deduplication, and witness-weighted branching.
+
+### Sorted-word invariant profile
+
+The local OCR damages this example. The official page-937 primary source gives:
+
+```text
+AB  -> BBB       delta counts = (-1,+2)
+ABB -> AAAB      delta counts = (+2,-1)
+```
+
+For a proved invariant that every word is sorted as `A*B*`, the exact word can be represented by its count pair. From `(4,3)` the possible next pairs are `{(3,5),(6,2)}`.
+
+This is a strict invariant-backed lowering/optimization. Sorting an arbitrary word, identifying anagrams, or replacing exact word equality with count equality changes the base construction.
+
+### Adversarial conformance suite
+
+1. **Overlapping matches.** `AAA` under `AA->B` yields exactly `{BA,AB}`, not one preferred child, a simultaneous `B`, or an error.
+2. **Multiple RHS values.** `A->B` and `A->C` yield `{B,C}`. Permuting clause serialization preserves state and witness set.
+3. **Newborn deferral.** `A->AA` gives `{A}->{AA}->{AAA}`. The two positions in `AA` both yield `AAA`, which appears once with two witnesses.
+4. **One-splice alternatives.** Disjoint matches do not combine in a child unless a later layer applies another clause.
+5. **Merge witness.** `{AA}` with `A->epsilon` and `AA->A` has three witnesses but successor exactly `{A}`.
+6. **Diamond merge.** `A->B,A->C,B->D,C->D,D->E` yields `{A}->{B,C}->{D}->{E}`. `D` fires once while its event retains both inbound witnesses.
+7. **Dead branch.** Seed `{A,C}` under `A->B` yields `{B}` with `C` recorded dead, then `empty_layer` with `B` dead.
+8. **Epsilon versus empty.** `{epsilon}` is nonempty state; with no empty-LHS clauses it advances once to `empty_layer`.
+9. **No global visited set.** `A->A` produces an event every layer; `A->B,B->A` alternates forever. A compressed graph cache cannot suppress recurrence.
+10. **Cross-parent merge.** If `AB` and `BA` both rewrite to `X`, successor is `{X}` with two inbound witnesses and no chosen parent.
+11. **No implicit accumulation.** A parent absent from all child values disappears even if it appeared in an earlier or compressed graph layer.
+12. **Exact reconstruction.** Recompute all match positions, splice every witness, set-union children, and compare dead ends/child groups exactly.
+13. **Order invariance.** Permuting old-layer, clause, match, hash, or worker order preserves semantic state and the mathematical witness set.
+14. **Validation.** Reject empty LHS, out-of-alphabet sides/seeds, stale snapshot, wrong span/LHS, fabricated/missing match, duplicate serialized clause, callback matcher/canonicalizer, and implicit cyclic matching.
+
+## Variants, Relations, and Boundaries
+
+- **Base literal multiway systems:** the native finite exact word-set construction above.
+- **Semi-Thue/Thue systems:** bidirectional clause-pair restrictions over the same literal engine; reachability equivalence is a relation, not base state identity.
+- **Semigroups/groups/monoids:** strict reverse/inverse rule presets plus algebraic interpretation. Connected components, equivalence classes, and Cayley graphs are observers/relations.
+- **Formal grammars:** regular/context-free/context-sensitive/unrestricted restrictions can use the literal engine where their rules are literal. Terminal/nonterminal status and accumulated terminal language are program metadata/observers.
+- **Pattern-variable term/canonical systems:** require a structural matcher/template carrier, not literal-word flags or callbacks.
+- **Sorted systems:** exact count-vector lowering only under a proved sorted invariant.
+- **Cyclic limited-size systems:** the Notes state the idea but do not fix wraparound match/splice conventions; defer a separate cyclic-word matcher.
+- **Multidimensional and network substitution systems:** require block/subgraph topology and reconnection semantics.
+- **Multiway tag systems:** the supplied code omits `Union` and therefore retains duplicate derivations. Whether deliberate or incidental is underdetermined; treat it as a separate multiplicity-sensitive variant, not a base merge switch.
+- **Arithmetic/complex-number multiway systems:** typed numeric carriers and closed arithmetic results; they may reuse exact branch merging after their own evidence stages.
+- **Nondeterministic Turing machines and games:** different state/control and move algebras; not word callbacks.
+- **Chapter 9 causal-event systems:** event order, causal invariance, and branchial/causal graphs require a separate audit.
+- **Infinite random initial words:** explicitly unsuitable for the base all-possible finite expansion in the cited seed discussion; finite exact seeds are native.
+- **Layered diagrams, compressed state graphs, derivation multigraphs, path-causal networks, confluence, Church-Rosser, normal forms, counts, growth, periods, frequencies, and rendering:** downstream analyses/views.
+- **Random-rule frequency claims:** no canonical enumeration, size profile, sampling distribution, or complexity criterion is supplied; no conformance sampler can be inferred.
 
 ## Current API Fit
 
-Initial conclusion: T13 words and T16 literal span/splice values are direct reuse; fixed dense state, coordinate frontiers, ordered first-match priority, one-word outcomes, no-match termination, scalar results, family rollout, and fixed-shape traces are semantic mismatches.
+| T30 responsibility | Current proposal fit | Required conclusion |
+|---|---|---|
+| State/support | One dense `D -> A` field on rank-0..3 coordinates | SEMANTIC MISMATCH; add a finite exact set of finite words |
+| Alphabet/word value | Finite symbolic alphabet | PARAMETERIZATION for symbols; dynamic words/layers still required |
+| Source | Writable coordinate frontier | SEMANTIC MISMATCH; all program-owned matches in all parent words |
+| Read | Coordinate offsets or one selected match | T16 matched-span semantics DIRECT; selection coverage differs |
+| Program | Scalar table/formula or ordered literal clauses | PRINCIPLED EXTENSION; unordered finite literal relation with epsilon RHS |
+| Result | Same-site scalar or one interval replacement | T16 pure one-splice child construction DIRECT per branch |
+| Update | Fixed-support write or T16 single-splice successor | SEMANTIC MISMATCH; exact all-branch child union |
+| Equality | Array equality | SEMANTIC MISMATCH; exact word equality inside finite set equality |
+| No match | Copy-forward or T16 terminal state | SEMANTIC MISMATCH; dead parent drops from next layer |
+| Successor | One scalar/dense/word state | PRINCIPLED EXTENSION; one set-valued macro successor |
+| Trace | Dense fixed frame | SEMANTIC MISMATCH; ragged word sets plus witness groups |
+| Graph | No native state graph | NOT REQUIRED for execution; layered/compressed graphs are projections |
+| Horizon/resources | Dataset/executor limits | DIRECT only as external policy; pruning never exact state |
+| Orchestration | Source/read/result/update shell | DIRECT at the responsibility level |
+
+`simple_programs.md:3-22,87-105,169-195` fixes dense fields/shapes; `40-69,394-452` describes coordinate selectors; `1767-1791,2124-2198` assumes scalar fixed-support writes/copy-forward. `FORMULAIC` at `2036-2071` would hide branch enumeration/merge in a callback and is rejected.
+
+T13 contributes finite ordered words and ragged word serialization. T16 contributes literal occurrence discovery, exact matched-span validation, and one interval splice. T30 changes program order, selection coverage, deletion validation, outcomes, state carrier, and commit, so neither prior public construction is weakened or repeatedly invoked as a workaround. T29's port graph is only a possible trace visualization target.
 
 ## Current Runtime Fit
 
-Initial audit finds no native set-of-words state, all-match selector, exact child merge, dead-end accounting, derivation witness bundle, recurrent layered trace, or compressed-graph projection. `FORMULAIC` would hide the construction and is rejected.
+| Runtime area | Finding | T30 disposition |
+|---|---|---|
+| `alphabets.py` | Finite symbolic values exist | Reuse declared symbols, not scalar-array state |
+| `loci.py:31-94` | Finite coordinate loci and predicate callbacks | Cannot address word values/match intervals across a layer |
+| `frontiers.py:38-80` | Only dense `time_slice` | Wrong source coverage |
+| `neighborhoods.py:46-60` | Offset gathers, no literal matcher | Reuse none; synthesis may place shared matcher outside spatial neighborhoods |
+| `rules.py:30,65-78` | Scalar/callable family rule | Reject; add closed literal-relation data |
+| `specs.py:23-82` | Fixed shape and raw family payloads | Cannot validate finite word-set state/program |
+| `rollout.py:40-175,576-660,825-831` | Fixed preallocation plus family dispatch | No multiway execution; do not add a branch |
+| `datasets.py:321-330` | Equal-shape stack | Requires explicit ragged layer/episode collation |
+| current tests | No branching/merge/epsilon/recurrent-layer coverage | Add structural conformance tests |
+| visualization | Dense array assumptions | Add downstream layered/compressed graph renderer only after raw trace |
+
+No existing module provides all-match enumeration, exact child-set union, dead-end accounting, derivation witness groups, recurrent time layers, or compressed-state-graph lowering.
 
 ## Principles Audit
 
-Pending full evidence closure. Provisional rejections include repeated T16 rollouts, rule priority, simultaneous multi-splice children, random path choice, retained path copies, global visited suppression, preserve-no-match fallback, implicit old-layer accumulation, length/count/anagram quotient, witness weighting, pruning/caps, and whole-layer scalar/tensor/graph packing.
+- **Principle 0:** all alternatives and exact merging are defining semantics. One sampled path, derivation bag, or precompressed graph changes the construction.
+- **Principles 1-4:** word-set state, all-match sources, matched spans, closed clauses, one-splice branch results, exact merge, and provenance are explicit.
+- **Principle 5:** the current layer is Markovian. Global visited sets, accumulated language, first-seen depth, and chosen ancestry remain trace/observer data.
+- **Principles 6-8:** word positions, layer membership, derivation witnesses, compressed graph nodes, render coordinates, and batch slots are distinct address/identity domains.
+- **Principles 9-10:** named examples are strict clause/seed presets, not family executors or hidden branch policies.
+- **Principle 11:** overlapping all-match selection, one splice per child, newborn deferral, exact target union, and dead-parent dropping are semantic; enumeration/hash/worker order is incidental.
+- **Principle 12:** exact ragged layer/event traces precede count plots, layered drawings, compressed graphs, causal graphs, and batching.
+- **Principles 13-15:** overlap, diamonds, cross-parent merge, epsilon/empty, identity recurrence, and witness reconstruction are adversarial cases.
+- **Principles 16-17:** `DistinctBranchMerge` is an honest eighth update sibling. Replaying T16 or passing `successors(state)` to a generic loop would be a shim/vacuous executor.
+
+Rejected shortcuts:
+
+- repeated first-match/T16 rollouts, rule priority, leftmost choice, random branch sampling, or arbitrary `successors`/matcher/canonicalizer callback;
+- simultaneous multiple splices in one child, in-step rescan/newborn firing, or mutation of the old layer during enumeration;
+- derivation copies or weights as base state, per-parent-only deduplication, one chosen ancestry after a merge, or duplicate-clause branch weighting;
+- preserve-no-match fallback, implicit identity, accumulating prior layers, terminalizing each dead word, or collapsing all-dead advancement with empty-layer stutter;
+- global visited suppression, memoized first-seen-only firing, compressed graph used as live state, or confluence/normal-form quotient;
+- length, count, sorted/anagram, symmetry, semigroup/group, or renderer equality substituted for exact word equality;
+- fixed word length/state count/branch count, pruning, beam search, truncation, silent resource partials, or padded capacity presented as semantics;
+- packing a whole layer/graph in a scalar, dense tensor, coordinate field, T29 graph, host graph engine, or `Any` payload;
+- applying base `Union` to the multiplicity-sensitive multiway-tag code without separate evidence.
 
 ## Detailed Implementation Plan
 
-1. Close all direct, alias, figure, Notes, program, actual Index, split, history, confluence, variant, graph, seed, count, and relation candidates.
-2. Freeze word/layer equality, clause validation, overlapping match enumeration, one-splice branch construction, exact target merge, dead ends, epsilon, empty layer, recurrence, outcomes, and trace.
-3. Recover every executable rule/trajectory/count and independently derive adversarial branch/merge oracles.
-4. Compare T13/T16/T29 and every current API/runtime responsibility; decide the exact new update boundary.
-5. Audit no-cheating constraints, resource behavior, variants, lowerings, batching, and graph visualization.
-6. Write the complete Goal 2 implementation/conformance stage and reintegrate every global ledger.
+1. Close direct-name, alias/confluence, implementation-symbol, main figure, Notes, program, actual Index, split, history, group/grammar, variant, graph, seed, growth, and relation searches with no silent candidates.
+2. Reconstruct exact word-set state, literal relation, all overlapping old matches, one-splice child results, exact branch union, dead ends, epsilon/empty layer, recurrence, outcomes, and traces.
+3. Recover executable main/deletion/merge/sorted presets and independently derive overlap, diamond, recurrent, dead, and validation adversaries.
+4. Separate layered state, derivation multigraph, simple edges, compressed state graph, accumulated language, confluence, counts, and renderings.
+5. Compare every responsibility with T13/T16/T29, `simple_programs.md`, runtime, and tests; establish the eighth update law without reopening prior public validators/commits.
+6. Audit no-cheating constraints, resources, variant boundaries, ragged collation, and graph views.
+7. Reintegrate global evidence/design/plan ledgers and write the implementation-ready Goal 2 stage.
 
 ## Goal 2 Implementation Stage
 
-Pending evidence closure. It will specify closed word-set/program/match/result/update/outcome/trace APIs, shared T13/T16 dependencies, exact presets, validation, migrations, ragged batching, graph views, adversarial conformance tests, and forbidden-fallback audits without a multiway rollout branch.
+### G2-T30 — Exact literal multiway branching and distinct-child merge
+
+Dependencies: the synthesis-selected finite `Word` carrier and epsilon-capable private ordered edit from T13/T17; T16's pure literal occurrence/span/splice utilities; shared typed outcomes/errors and executor orchestration. Do not depend on T16 priority/terminal semantics, T29 graph state, a host rewrite engine, or a successor callback.
+
+1. Add immutable `MultiwayLayer` as a finite set of normalized alphabet-closed words with exact serialization/hash/equality and explicit epsilon/empty-layer distinctions.
+2. Add `MultiwayLiteralProgram` as a finite unordered relation `NonEmptyWord -> Word`. Reject duplicate serialized pairs, empty LHS, undeclared symbols, callbacks, and implicit reverse/identity/default behavior.
+3. Add program-coupled `AllApplicableLiteralMatches` and `MatchedWord` using shared literal occurrence code. Enumerate every overlapping occurrence in every old parent and retain exact snapshot/clause/span identity.
+4. Add `BranchIntervalReplacement` using the shared pure prefix+replacement+suffix kernel. Do not expose a simultaneous match set as one child result.
+5. Add `DistinctBranchMerge` through the shared executor shell. Validate exact match coverage, build one child per witness, exact-set-union children across rules/spans/parents, record dead parents and witness groups, and emit one atomic macro successor without a multiway family branch.
+6. Add `Advanced` for every nonempty old layer, including all-dead to empty and identity `changed=false`. Add event-free `Quiescent(EmptyLayer)` with explicit reference stutter. Keep horizon/fixed/cycle/resource/cancel/error policies separate.
+7. Add raw ragged `MultiwayTrace` frames/events. Build layered simple edges, witness multigraphs, compressed one-node-per-word graphs, counts, first-seen/accumulated-language, paths/confluence, and rendering strictly downstream.
+8. Add exact page-219, page-206, official merge, and sorted-invariant presets/diagnostics. Preserve source repairs/provenance and keep program, seed, and horizon independent.
+9. Represent semi-Thue/group/grammar profiles as strict data restrictions only where literal semantics match. Defer cyclic, pattern-term, multidimensional/network, tag-multiplicity, numeric, Turing/game, and causal-event variants to separately typed stages; add no mode flags.
+10. Audit exports/specs/serialization/datasets/batching/visualization and production source for callbacks, family dispatch, T16 replay, ordering leaks, global visited sets, path-copy state, improper dedupe, implicit persistence, pruning/caps, epsilon collapse, and observer feedback.
+
+Completion requires:
+
+- exact word/layer/program normalization, hashing, permutation invariance, epsilon/empty, and malformed-data tests;
+- every-overlapping-match and `AAA/AA->B` goldens;
+- page-219 `{A^1..A^(n+1)}` layers and newborn/identity merge witnesses;
+- page-206 `t0..t3` exact layers, `ABA` cardinalities `1,2,2,1,0`, epsilon disappearance, all-dead event, and empty-layer quiescence;
+- official cross-parent `t0..t3` trajectory, four-witness/three-child assertion, and child grouping;
+- three-witness/one-child, diamond, cross-parent, dead-branch, identity, two-cycle, no-accumulation, and clause/enumeration-order adversaries;
+- exact reconstruction of matches, one-splice children, next set, dead ends, and witnesses;
+- sorted-count lowering only after invariant proof, with repaired `{(-1,2),(2,-1)}` oracle;
+- raw ragged trace before explicit graph/count/render/batch lowering;
+- explicit rejection/defer tests for cyclic conventions and base-versus-tag multiplicity;
+- unchanged T13/T16/T29 semantics, one shared executor shell, no multiway rollout/callback, and all repository tests passing.
 
 ## No-Cheating Checks
 
@@ -176,6 +544,8 @@ Pending evidence closure. It will specify closed word-set/program/match/result/u
 - No epsilon/empty-layer collapse, terminal reinterpretation, fake boundary, fixed word/state capacity, pruning, beam search, or silent resource truncation.
 - No length/count/anagram/symmetry/group/normal-form quotient as base equality.
 - No whole layer/state graph packed in a scalar, tensor, coordinate lattice, T29 port graph, or host graph engine.
+- No partial semantic successor on resource exhaustion and no hidden maximum word/layer/branch count.
+- No base exact-state `Union` silently imposed on a variant whose primary executable code preserves multiplicity.
 
 ## Completion Requirements
 
