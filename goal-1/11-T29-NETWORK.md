@@ -218,3 +218,411 @@ Reconstruct Chapter 5 network systems as native deterministic evolution over mut
 - Provenance: actual Index entries at `BOOK:20918`, `21092`, `21213`, `21229-21231`, `21654`, `21683`, `21899`, `22096`, and `22144`.
 - Fact: routes for graph isomorphism/layout, network systems, causal and constraint networks, dimensionality, substitution/grammar, multiway evolution, and Boolean/CA-on-network variants all lead to passages dispositioned above.
 
+## Construction Model
+
+### Rooted two-port graph carrier
+
+The strict state contract is:
+
+```text
+Port = Above | Below
+PortWord = finite tuple[Port]              # epsilon is valid
+
+RootedPortGraph = {
+    vertices: FiniteNonEmptySet[VertexToken],
+    root: VertexToken,
+    next: TotalMap[(VertexToken, Port), VertexToken]
+}
+
+invariant:
+    root in vertices
+    every next target is in vertices
+    every vertex is reachable from root by a finite PortWord
+```
+
+`VertexToken` distinguishes occurrences within a snapshot. It carries no arithmetic, spatial, or persistent user-visible meaning. Both ports may target the same vertex; either may self-loop; cycles, sharing, and arbitrary finite incoming degree are ordinary.
+
+For graph `G`:
+
+```text
+follow(G, v, epsilon) = v
+follow(G, v, p :: rest) = follow(G, next(v,p), rest)
+
+R_k(G,v) = { follow(G,v,w) | w in Port^k }
+signature_d(G,v) = (|R_1|, ..., |R_d|)
+```
+
+Words fold in written order. For example `21` means follow `Below` and then `Above`. The read layer exposes the declared path endpoint map and, when requested, the exact-length signature. It does not expose the entire graph through a callback.
+
+The evidenced read profiles are:
+
+```text
+UniformNetworkRead:
+    key(v) = Unit
+
+ExactLengthReachCounts(depth=1):
+    key domain = {(1), (2)}
+
+ExactLengthReachCounts(depth=2):
+    key domain = {
+        (1,1), (1,2),
+        (2,1), (2,2), (2,3), (2,4)
+    }
+```
+
+Every depth-two key is realizable. More generally, `|R_(k+1)| <= 2|R_k|` is necessary but does not prove that an arbitrary tuple is realizable, and the book supplies no generic-depth table enumerator. The public program therefore carries an exact declared finite key domain rather than synthesizing one from this inequality.
+
+### Equality and exact canonical representation
+
+Two states are semantically equal exactly when a bijection maps root to root and preserves both port targets. Node list order and raw tokens are ignored; distinct vertices are never merged.
+
+For this carrier, canonicalization needs no general graph-isomorphism search:
+
+1. enqueue the root and assign it canonical index 0;
+2. dequeue in breadth-first order;
+3. inspect `Above` then `Below`;
+4. assign the next unused index at first encounter;
+5. emit each canonical node's ordered pair of canonical targets.
+
+Every node is reachable, so the process emits all nodes. A root/port-preserving isomorphism necessarily preserves discovery order, and equal canonical pair arrays construct such an isomorphism. The codec is therefore exact. An event retains both the raw-token-to-canonical map and any author/reference ordering; execution does not depend on either.
+
+The static page-209 values `1,3,14` use a coarser label-ignored enumeration relation for `n=1,2,3`. It may be implemented as an observer but cannot replace strict equality.
+
+### Closed program and typed results
+
+The result grammar is finite data:
+
+```text
+OldEndpoint =
+    DirectOld(path: PortWord)
+
+FreshEndpoint =
+    InsertFresh(
+        above_old_path: PortWord,
+        below_old_path: PortWord
+    )
+
+PortTargetExpr = DirectOld | InsertFresh
+
+NodePortRewrite = {
+    above: PortTargetExpr,
+    below: PortTargetExpr
+}
+
+NetworkProbe =
+    UniformNetworkRead
+  | ExactLengthReachCounts(depth, exact_key_domain)
+
+PortRewriteProgram = {
+    probe: NetworkProbe,
+    referenced_paths: FiniteSet[PortWord],
+    rows: TotalMap[probe.key, NodePortRewrite]
+}
+```
+
+Each path in a direct or fresh descriptor is interpreted relative to the firing old vertex in the old graph. Each syntactic `InsertFresh` occurrence creates one distinct vertex. Thus a row with fresh expressions in both parent ports creates two vertices, even if the descriptors are textually equal. A fresh vertex's two ports can only target old endpoints under the evidenced grammar; nested fresh expressions, fresh-to-fresh references, supplied global node IDs, arbitrary subgraph values, and callbacks are invalid.
+
+Program validation establishes:
+
+- the probe and exact key domain are well formed;
+- every key has exactly one row and no undeclared row exists;
+- every referenced path is a finite port word in the declared two-port alphabet;
+- both outputs exist;
+- every fresh descriptor supplies exactly two old path endpoints;
+- row order is serialization only;
+- no missing-row fallback, first-match behavior, or Mathematica unmatched-expression behavior leaks into semantics.
+
+### All-node source selection and the seventh update law
+
+`AllNetworkNodes` selects every old vertex exactly once. The selector may expose snapshot-scoped source handles in any order because commit is equivariant; a reference order may use the current Notes list. `PortPathRead` evaluates all declared endpoints and the probe key against the immutable old graph. The result lookup returns the one closed row for that key.
+
+`ParallelRerouteCreateProject` commits in this order:
+
+1. verify that there is exactly one proposal for every and only old vertex, and that its source, read, and result all belong to the same snapshot;
+2. allocate one collision-free event-local token for every `InsertFresh` occurrence, injectively across the whole event;
+3. retain every old vertex in a raw vertex set;
+4. replace both ports of every old vertex from its proposal, resolving direct endpoints to old vertices and inserted endpoints to their allocated fresh vertices;
+5. add each fresh vertex with both of its ports resolved to the firing source's old-snapshot path endpoints;
+6. construct the complete raw graph; no newborn is selected or rewritten in this event;
+7. compute directed forward closure from the preserved old root using the raw graph;
+8. discard raw vertices outside that closure and retain the old root as successor root;
+9. emit a graph event sufficient to reconstruct proposals, births, raw edges, retained/dropped sets, edge changes, and canonical renaming.
+
+```text
+ParallelPortGraphRewrite =
+    SOURCE: AllNetworkNodes
+    READ: PortPathRead
+    RULE: PortRewriteProgram
+    RESULT: NodePortRewrite
+    UPDATE: ParallelRerouteCreateProject
+```
+
+This is a seventh public update law. It is not fixed-support assignment: edges and support both change. It is not T13 concatenation or T27 bag expansion: old nodes survive, their topology mutates, and only some result occurrences create children. It is not T20 tree replacement: sharing and cycles are native. Private proposal-validation, lineage, token-allocation, and immutable-snapshot utilities may be shared.
+
+### Why post-commit root projection is exact
+
+Let `C` be the old forward-reachable class of a firing source. Every `DirectOld(path)` ends in `C`. Every fresh node created by that source targets only vertices in `C`, and its only incoming reference is installed by a source in `C`. No row can refer to a vertex outside the source's old class or to a dropped token by name.
+
+Consequently, after a raw successor disconnects vertices from the root, no future application of this parallel grammar to the retained class can reconnect those discarded vertices. Projecting after each event produces the same retained future as evolving the raw graph and observing only the root class. This justifies the Notes projection for this strict grammar without turning garbage collection into a general graph-runtime default.
+
+### Outcome and trace semantics
+
+Every valid strict graph/program pair returns:
+
+```text
+Advanced(
+    state = retained_rooted_port_graph,
+    changed = not Isomorphic(old, retained),
+    event = NetworkRewriteEvent(...)
+)
+```
+
+An applicable identity or isomorphic successor remains an event with `changed=false`. There is no base `NoMatch`, halt, boundary, or capacity outcome because the table is total and every nonempty state has sources. A vertex can fire and create raw descendants and then be dropped in the same event. The root always survives, so the strict state never becomes empty.
+
+`NetworkRewriteEvent` records at least:
+
+```text
+snapshot_id
+old_root
+per_old_node {
+    source_token
+    probe_key
+    path_endpoint_map
+    selected_row_key
+    result
+}
+fresh_births {
+    token
+    source_token
+    parent_port
+    insertion_ordinal
+    above_old_target
+    below_old_target
+}
+raw_vertex_set
+raw_port_pairs
+retained_vertex_set
+dropped_vertex_set
+old_edge_changes
+raw_to_canonical_vertex_map
+```
+
+The event plus old snapshot must reconstruct the raw graph exactly; the retained set and canonical map must reconstruct the successor. Optional policies may stop on a literal/isomorphic fixed point, a repeated canonical state, a node-count predicate, a horizon, resource exhaustion, or cancellation. They report their own reason without rewriting the transition. Layouts, adjacency matrices, node counts, dimensions, causal graphs, images, and padded batches are downstream projections of the raw typed trace.
+
+## Exact Book Presets and Oracles
+
+### Uniform path-rerouting rules
+
+The Notes reference seed is:
+
+```text
+G0 = {{5,2}, {1,3}, {2,4}, {3,5}, {4,1}}
+root = 1
+```
+
+Using port words `1=Above`, `2=Below` and result order `[Above,Below]`, the four page-214 rows are:
+
+```text
+a: [DirectOld(21),      DirectOld(2)]
+b: [DirectOld(11),      DirectOld(2)]
+c: [DirectOld(epsilon), DirectOld(2)]
+d: [DirectOld(epsilon), DirectOld(1)]
+```
+
+With root/port-preserving canonical equality:
+
+- (a) returns to `G0` after 5 events and has no earlier repeat;
+- (b) returns after 4 events and has no earlier repeat;
+- (c) reaches the directed five-cycle `{{1,2},{2,3},{3,4},{4,5},{5,1}}` after one event and is then fixed;
+- (d) has node counts `5,5,1`; at event 2 its retained state is `{{1,1}}` and remains fixed.
+
+These distinguish written path order, port order, old-snapshot reads, directed projection, and exact isomorphism equality.
+
+### Node-creating singleton rules
+
+Both page-215 presets start from `{{1,1}}` and rewrite the parent above port to a fresh node while leaving its below port direct:
+
+```text
+a: [InsertFresh(1,2), DirectOld(2)]
+b: [InsertFresh(2,1), DirectOld(2)]
+```
+
+Both have node counts `1,2,4,8,...`. In the Notes append-reference order:
+
+```text
+case a:
+  G1 = {{2,1}, {1,1}}
+  G2 = {{3,1}, {4,1}, {2,1}, {1,1}}
+
+case b:
+  G1 = {{2,1}, {1,1}}
+  G2 = {{3,1}, {4,1}, {1,2}, {1,1}}
+```
+
+The picture lays nodes out next to their parents, so picture order differs from append order. Only lineage and graph isomorphism may reconcile them.
+
+### Restricted depth-one grammar and exact count
+
+For the page-216 profile, every path endpoint is one old step (`1` or `2`). A parent-port expression is one of:
+
+```text
+DirectOld(1)
+DirectOld(2)
+InsertFresh(1,1)
+InsertFresh(1,2)
+InsertFresh(2,1)
+InsertFresh(2,2)
+```
+
+There are 6 expressions for each of two parent ports, hence 36 node actions. The probe has two keys, `(1)` and `(2)`, so a complete rule table count is `36^2 = 1296`.
+
+This count must not be extrapolated to `36^6` for depth two. Pages 217-218 use epsilon and length-two paths; the book supplies neither a finite sampling alphabet/distribution nor a complete depth-two enumeration/count. With arbitrary finite paths, the grammar is countably infinite.
+
+### Five exact depth-two programs
+
+Notation `N(a,b)` means `InsertFresh(a,b)`; an unwrapped word means `DirectOld(word)`. Keys are exact-length signatures.
+
+```text
+program a
+  11 -> [1, N(21,21)]
+  12 -> [N(epsilon,11), N(11,epsilon)]
+  21 -> [N(epsilon,epsilon), N(1,21)]
+  22 -> [N(11,21), N(2,21)]
+  23 -> [N(epsilon,epsilon), 2]
+  24 -> [N(22,epsilon), epsilon]
+
+program b
+  11 -> [N(epsilon,11), 2]
+  12 -> [2, N(epsilon,epsilon)]
+  21 -> [21, N(epsilon,1)]
+  22 -> [N(2,1), epsilon]
+  23 -> [12, 2]
+  24 -> [N(1,1), 21]
+
+program c
+  11 -> [N(11,1), 2]
+  12 -> [N(12,2), N(22,epsilon)]
+  21 -> [N(22,2), N(1,epsilon)]
+  22 -> [N(1,1), N(21,11)]
+  23 -> [21, 2]
+  24 -> [N(1,12), N(12,epsilon)]
+
+program d
+  11 -> [N(12,12), epsilon]
+  12 -> [22, N(1,1)]
+  21 -> [1, N(epsilon,2)]
+  22 -> [12, 21]
+  23 -> [N(21,2), 1]
+  24 -> [1, 11]
+
+program e
+  11 -> [epsilon, N(11,12)]
+  12 -> [N(epsilon,1), N(11,12)]
+  21 -> [2, epsilon]
+  22 -> [N(21,1), N(11,2)]
+  23 -> [22, 2]
+  24 -> [21, 2]
+```
+
+Starting from the one-node graph, node counts for events 0 through 15 are:
+
+```text
+a: 1,2,6,10,6,4,8,13,9,12,6,10,15,11,14,8
+b: 1,2,4,4,6,8,11,16,17,16,16,13,12,11,8,8
+c: 1,2,6,18,28,8,14,18,21,22,28,29,25,26,35,36
+d: 1,2,3,3,6,9,4,8,10,17,22,29,30,38,56,46
+e: 1,2,6,12,12,11,12,12,11,15,12,12,11,11,19,18
+```
+
+Long-run guards are:
+
+```text
+d: n100=205, n500=262, n1000=190, n2500=292,
+   n10000=163, n50000=214
+e: n100=55, n500=145, n1000=262, n2500=538, n5000=1101
+```
+
+For program (b), represented state `G49 = G768`, giving period 719 after the prefix. Program (c)'s node-count relation to binary digits supplies an independent observer oracle but does not replace graph-state comparison.
+
+### Minimal signature witnesses
+
+Using zero-based pair arrays and root 0, these graphs realize every depth-two key:
+
+```text
+(1,1): ((0,0),)
+(1,2): ((1,1),(0,1))
+(2,1): ((1,2),(0,0),(0,0))
+(2,2): ((0,1),(0,0))
+(2,3): ((0,1),(0,2),(0,0))
+(2,4): ((0,1),(2,3),(0,0),(0,0))
+```
+
+They guard exact-length rather than cumulative reach counts, sharing, and alias preservation.
+
+### Adversarial semantic oracles
+
+1. **Written path order.** Choose a graph whose root has `A=1,B=2` with `A(1)=3` and `A(2)=2`. `BA` ends at 2 while `AA` ends at 3; reversed-word evaluation fails.
+2. **Frozen snapshot.** Under uniform rule (a), `t0=((1,1),(0,0))` must become `t1=((0,1),(1,0))`. In-place source order incorrectly produces `((0,1),(0,0))`.
+3. **Directed projection.** Under rule (d), `t0=((0,1),(0,0))` has raw successor `((0,0),(1,0))`. Node 1 fired, but only the root singleton is retained even though the raw graph is weakly connected.
+4. **Fresh occurrence identity.** A singleton row with both parent ports equal to `InsertFresh(epsilon,epsilon)` produces raw graph `((1,2),(0,0),(0,0))` with 3 nodes, not 2. Reapplying produces 9 raw nodes before projection.
+5. **No structural deduplication.** Two nonroot nodes may have equal outgoing pairs or be automorphic. The root can still have signature `(2)`; merging them changes future rules.
+6. **Newborn deferral.** Raw count equals old count plus the number of syntactic insertion occurrences across old-node proposals; it does not recursively expand newborns.
+7. **Alpha equivariance.** Arbitrarily rename all old tokens and root consistently. The successor must be isomorphic, and event lineage must transform equivariantly.
+8. **Root and port preservation.** Moving the root or swapping only one port pair generally changes state, even if an unlabeled drawing looks identical.
+9. **Identity event.** `[epsilon,epsilon]` on the singleton returns `Advanced(changed=false)`, not terminal/quiescent/no-event.
+10. **Provenance reconstruction.** Applying the recorded proposals and birth mapping to the recorded old graph must reconstruct the raw graph exactly; projecting the recorded retained set must reconstruct the successor.
+11. **Validation.** Reject a dangling target, missing root, empty graph, unreachable seed node, incomplete/duplicate table, undeclared key, invalid port symbol, malformed path, read from another snapshot, missing/extra old-node proposal, reused fresh token, fresh-to-fresh target, and mismatched root projection.
+
+## Sequential Network Variant: Evidence Boundary
+
+The Notes give this exact table, where each row returns `(rewrite, move_port)`:
+
+```text
+11 -> ([N(epsilon,11), 2], 2)
+12 -> ([22, N(epsilon,22)], 2)
+21 -> ([epsilon, 22], 2)
+22 -> ([12, N(1,2)], 1)
+23 -> ([N(12,1), N(2,21)], 2)
+24 -> ([N(22,epsilon), 1], 1)
+```
+
+The prose says one active node is operated on and can then move along its above or below connection. The official CDF contains the six rows but no evaluator. The official node-count plot repeatedly drops sharply; because these rows only reroute/insert, it independently evidences some reachability garbage collection.
+
+The primary sources do **not** determine:
+
+- whether movement follows the old active node's selected port or its committed rewritten port;
+- whether movement occurs before or after graph projection;
+- whether projection is rooted at a persistent original root, the pre-move active node, the post-move active node, or another anchor;
+- whether pruning precedes or follows active-token relocation.
+
+The ambiguity changes behavior immediately. In the `(1,2)` row, the below port becomes a fresh node and the move is `Below`: old-edge timing moves to the old below target, while committed-edge timing moves to the newborn. Figures lack IDs and stepwise data needed to decide.
+
+Goal 2 must therefore expose no guessed sequential executor and no convenience timing flag. It may define the inert evidence schema:
+
+```text
+SequentialPortGraphState = {
+    graph: RootedPortGraph,
+    active: VertexToken,
+    projection_anchor: UnresolvedBySource
+}
+```
+
+and mark `sequential_network_system` unavailable with a precise source-gap assertion until a primary evaluator or decisive trajectory is acquired. If a convention is ever added for research, it must be named as a convention and cannot claim book conformance.
+
+## Variants, Relations, and Boundaries
+
+- **Strict parallel uniform/depth-one/depth-two profiles:** native T29 programs sharing the same graph update.
+- **Sequential network systems:** evidenced rule family, but transition order/anchor is underdetermined as above.
+- **Keep-all raw evolution:** useful diagnostic/reference relation, not the canonical retained state and not an update flag.
+- **Infinite arrays and trees represented as networks:** static/generative examples; the strict evolving carrier here is finite after each event.
+- **Random networks:** seed family requiring an explicit distribution/algorithm absent from the direct evidence.
+- **Network layout and effective dimension:** codecs/observers.
+- **Cellular automata and Boolean networks on a fixed graph:** node-value evolution on immutable topology, distinct from T29 edge evolution.
+- **Undirected trivalent Chapter 9 space networks:** different carrier/degree/rewrite rules.
+- **Local constraint systems:** T31 chooses satisfying configurations rather than applying one total local next-state map.
+- **Causal networks:** derived event-dependency graphs.
+- **Multiway systems:** T30 returns a set of alternative successor states and explicitly merges equality classes.
+- **Cluster/network substitution grammars:** replace subgraphs and reconnect boundaries; the per-node path/fresh result algebra cannot express them.
+- **Network mobile automata:** add visible active-node control and sequential locality under separately evidenced timing.
+- **Pointers, linked lists, LISP, and circuits:** analogies/representations, not alternate T29 state encodings.
+- **Random-complexity frequency claims:** the main text's roughly one in 10,000 and the Notes' few in 1,000 use unspecified samples/criteria; neither is a conformance distribution.
