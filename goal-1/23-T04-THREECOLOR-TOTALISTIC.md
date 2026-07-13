@@ -635,6 +635,7 @@ def refs(s):
 # Traverse every cited monolith line anywhere in this stage.
 cited=refs(text)
 assert cited and all(1 <= n <= len(L) for n in cited)
+assert len(cited)==225
 for n in sorted(cited): _=L[n-1]
 
 # Every verbatim excerpt fragment must occur on a cited provenance line.
@@ -655,9 +656,11 @@ assert '$k^{1/2}k^{r+1}$' in L[11896]
 assert '$k^{1+(k-1)(2r+1)}$' in L[11896]
 assert r'$k \wedge Table[i-1, \{i, 2r+1\}]$' in L[11915]
 assert L[11036].endswith('higher-dimensional cellular automata on')
+assert L[2833]=='238' and L[2835]=='![](_page_254_Picture_1.jpeg)'
 
 official={
 '/tmp/nks-ch3.pdf':'d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76',
+'/tmp/nks-ch6.pdf':'5af1e53860bd4a6877961681cf49b16058a53ee55a2bfa8c64ac7cc13174bca0',
 '/tmp/nks-nts-ch3.pdf':'21666aa07f49e47483cdc9883e285b8cd47d397dd18eea0b72f05d4d3272a009',
 '/tmp/nks-notes.pdf':'549f043595653a7d276b07ba52d435700039b71427b4e1774a44b1a58eff4723',
 }
@@ -667,6 +670,7 @@ def pdf_text(name):
     raw=subprocess.check_output(['pdftotext','-layout',name,'-'],text=True,errors='replace')
     return re.sub(r'\s+',' ',raw)
 strict=pdf_text('/tmp/nks-ch3.pdf')
+ch6=pdf_text('/tmp/nks-ch6.pdf')
 nts=pdf_text('/tmp/nks-nts-ch3.pdf')
 notes=pdf_text('/tmp/nks-notes.pdf')
 assert '1 0 0 1 2 1 0 = 777' in strict
@@ -677,12 +681,22 @@ assert len(scan)==50 and all(f'code {c}' in strict for c in scan)
 for c in (600,843,870,1086,1167,1329,1572,1815,1842,219,957,966,1884,
           237,420,948,1749,177,912,2040,1041,1635,2049,357,1599,2058):
     assert f'code {c}' in strict,c
+chapter6_scan=list(range(1002,1096,3))
+assert len(chapter6_scan)==32 and all(f'code {c}' in ch6 for c in chapter6_scan)
+for c in (1815,2007,1659,2043,219,438,1380,1632,357,1329):
+    assert f'code {c}' in ch6,c
+assert 'initial condition 54,889 is reached' in ch6
+assert 'initial condition 97,439' in ch6
 assert 'specific assignment of values to colors' in nts
 assert 'respectively k ^Table[i - 1, {i, 2 r + 1}] and Table[1, {2 r + 1}]' in nts
 assert 'page 927.' in notes
 assert 'This runs the totalistic k=3 , r =1 rule with code 867.' in notes
 assert 'In[11] : = Show[RasterGraphics[CellularAutomaton[{867, {3, 1}, 1}, {{1}, 0}, 50]]]' in notes
-assert 'Other examples of class 4 totalistic rules with k = 3 colors include 357' in notes
+assert 'Page 235 · Class 4 rules. Other examples of class 4 totalistic' in notes
+assert 'rules with k = 3 colors include 357 (page 282)' in notes
+assert '1662' in notes and 'rule number 2144' in notes
+assert 'closely analogous to those shown for code 1329 on page 287' in notes
+assert 'Other integer functions. The pictures above show patterns produced by reducing several integer functions modulo 2.' in notes
 
 root=Path('ref/A-New-Kind-of-Science/CHAPTERS/3-The-World-of-Simple-Programs/Images')
 assets={
@@ -706,6 +720,46 @@ for name,(size,want,codes) in assets.items():
     with Image.open(p) as im: assert im.size==size,(name,im.size,size)
     assert all(0 <= c < 2187 for c in codes)
 
+base=Path('ref/A-New-Kind-of-Science')
+extra_assets={
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_248_Figure_2.jpeg':((1086,1389),'b2a20cb8095eb211fedd963d622222ca98fe0428f397b71bef90db8fa6871957'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_249_Picture_1.jpeg':((1082,1403),'f7b2834be41656cff9512b7affdd5fa57640bbbb6ecd93da1440202bf113f7ef'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_251_Picture_1.jpeg':((1123,1383),'41cfc762284fdcd65e5663fb7631aa4c504aea46a746a8a4ed24407b76b89196'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_252_Picture_2.jpeg':((1121,1377),'120e95a57f683744ff3e71981f4fa07ff850d0cad5633bf4d2f27906a76e909f'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_253_Picture_1.jpeg':((1227,1519),'148a433a11b4889c91c1a7be3c6f00172a3961428e6d41c47a06954136245faf'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_254_Picture_1.jpeg':((1117,1383),'d32b7fc3dedc9f262e5a3d3d928d1d7d94d1a219fd75aeeefdb988c74869a168'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_255_Picture_2.jpeg':((273,171),'b175f64e60cf41042d8ba6a11ed8d04eec4a8101bef8f9f231aae532eca6ca06'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_255_Picture_3.jpeg':((259,167),'00ef0063254d4f75734cd76d8f2d07de4ae1d6b041b9664197c2da99641d8b14'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_255_Picture_4.jpeg':((267,186),'700d71a0beb145c953ca87f4d8649aecd7b7d60df69ccd569cba02f6daeb1acc'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_255_Picture_5.jpeg':((273,165),'ae44e4411841a03fced5b5114f6cef4be62793c6a58c9a4ce6c357d214c7ce35'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_256_Figure_2.jpeg':((1092,1367),'1c4967f6967d8e813b2a281e2615dc8bef272eb57789b60e23c950de5e6bc01f'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_297_Picture_2.jpeg':((1111,408),'953c15d2e64464aceadb6181639cf36973db9513d6e0b7fc3fb43564efc65be8'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_297_Picture_4.jpeg':((1127,415),'26b299987a91daf8d15fc226c845c7efa7d55b9aa4221a4e6d41646b8c384204'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_297_Picture_6.jpeg':((1123,408),'b94ac983e3496b023a1a991b15a701de9a1c4c5cba75a84b16254c497a1c76f1'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_298_Figure_2.jpeg':((1159,1297),'7cacf2667a3f923d35106ec7eff09b9ce551d79dd828f8661458dd121bda09df'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_299_Picture_3.jpeg':((1150,600),'32d4ed4b16a083fb731c37cc80c64efb9995756808c316a0ced0dea0e9bd5475'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_300_Figure_1.jpeg':((1150,1192),'ee5ea91d3855bf31bd793f02677c0c19d9203ac20532b3b7bb07df838065294c'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_301_Picture_2.jpeg':((906,699),'3e9aec2832697e07ea20391c1454e022bc8578fcfb4c126bbb53e6fdfe3f6eb3'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_302_Picture_3.jpeg':((1036,712),'4ec6db32d4f0b659a8519110b7885e05487e68d0348b390323daa55e7b322fd1'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_303_Picture_2.jpeg':((616,1053),'26ec2731176f7ef4b471b4f395f3968eefa69e0eba88a3f672268129d68e07aa'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_304_Picture_2.jpeg':((1109,1363),'21cc5432bcfcc379619d43c076f3102a3e12d64cd724d9fe5709055b72874ecf'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_305_Picture_2.jpeg':((1184,1342),'7e75ba3d0cb57a0b35d5a7b29e803386617e1ede22eefae19ce6e21fc465a9c9'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_21.jpeg':((583,225),'5f829c7776b53963e578df5a783553320da171c4e1c4d92c470899ec5bb3e40d'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_23.jpeg':((139,141),'f14931f6bb008435e34961947dce7b11d5ec6d0bd4cc5b936bcee81b830adc0a'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_24.jpeg':((135,138),'5b302ed9d6c9cbee590270c7bdc169b62b554b0e186a94fdb3d1952a69c0f8c5'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_25.jpeg':((138,145),'f5eb9593ba90b4b240dc6990bb0e7204066cc48e81e82b96186029ff866d40da'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_26.jpeg':((135,155),'badba07cc053bdf7f4e5b41d7d90b2b248d8acd75b9728898e10c69a59c7ceec'),
+'BACK-MATTER/Index/Images/_page_980_Picture_15.jpeg':((160,195),'641317f32d429dd61b8353e1ebe65bd80f30950df78f0ebdc3a7f99b6bd26cd9'),
+'BACK-MATTER/Index/Images/_page_980_Picture_16.jpeg':((172,187),'90df3d1e1e99ed74dd1844654ff41b04b23f6fe22552cefa2b72f659cd0c5fda'),
+'BACK-MATTER/Index/Images/_page_980_Picture_17.jpeg':((223,207),'3ad70eb7f740edf7749700ff107f08306830f3e3fd617f2df3f9e7e559178e21'),
+'BACK-MATTER/Colophon/Images/_page_1132_Picture_2.jpeg':((606,308),'422ce8c21c465e2ffdffdb0f691f9521a21b9389897336dd4e4a2c716295c589'),
+}
+assert len(extra_assets)==31
+for rel,(size,want) in extra_assets.items():
+    p=base/rel
+    assert hashlib.sha256(p.read_bytes()).hexdigest()==want,rel
+    with Image.open(p) as im: assert im.size==size,(rel,im.size,size)
+
 # Independent preset/cardinality/codec checks.
 k=3; r=1; q=2*r+1; M=1+(k-1)*q
 reachable={sum(v) for v in itertools.product(range(k),repeat=q)}
@@ -717,15 +771,17 @@ for code in range(2187):
     digits=[(code//(3**s))%3 for s in range(7)]
     assert len(digits)==7 and all(d in (0,1,2) for d in digits)
 
-assert quote_count==72 and len(quote_lines)==70
-print(f'T04 evidence oracle: PASS cited={len(cited)} quote_fragments={quote_count} quote_lines={len(quote_lines)} assets={len(assets)} pdfs={len(official)}')
+assert quote_count==92 and len(quote_lines)==90
+asset_count=len(assets)+len(extra_assets)
+assert asset_count==44
+print(f'T04 evidence oracle: PASS cited={len(cited)} quote_fragments={quote_count} quote_lines={len(quote_lines)} assets={asset_count} pdfs={len(official)}')
 PY
 ```
 
 Expected terminal line:
 
 ```text
-T04 evidence oracle: PASS cited=<dynamic> quote_fragments=72 quote_lines=70 assets=13 pdfs=3
+T04 evidence oracle: PASS cited=225 quote_fragments=92 quote_lines=90 assets=44 pdfs=4
 ```
 
 ## Construction Model

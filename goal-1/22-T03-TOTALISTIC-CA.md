@@ -10,7 +10,7 @@ Status: **REOPENED**
 - T01/T02 and D111-D114 already supply fixed ordered one-dimensional support, `AllSites`, old-snapshot reads, typed same-site assignment, atomic parallel commit, successor, seed, realization, trace/view separation, ordered alphabets, and arbitrary-precision integer serialization. T03 changes the rule's input quotient and program identity, not the executor or update law.
 - `simple_programs.md:1964-2027` groups numeric sums, active counts, and color histograms under one broad `TOTALISTIC` label. That API responsibility is wider than source T03: equal-sum contexts such as `(0,2,0)` and `(1,0,1)` must merge even though their color histograms differ.
 - The current runtime can sum an `int64` read vector, but `rules.totalistic` does not derive its case count, `_channel_state` ignores the declared `sum` versus `count` mode, generic `lookup` is not executable, spatial output remains binary right-shift/`&1`, and batch rule IDs are forced through `numpy.int64`. No current test executes a standalone three-color totalistic table or validates its codec.
-- Evidence closure is exact: the 16-query manifest yields 118 disjoint candidates (`26/34/25/23/10`) plus 84 split duplicates; 18 evidence groups pin 65 verbatim fragments on 63 physical lines; five damaged source forms are repaired against four official PDFs; and 37 included, ten excluded, and two relation-only assets are hash/geometry pinned. All source, evidence, semantic, metadata, asset, and code-777 raster oracles pass with zero unresolved candidate.
+- The former exact-closure claim is withdrawn while T03 is reopened. The repaired physical audit now hash/geometry pins `48` included, `16` excluded, and `6` relation-only assets, and its metadata/semantic/raster blocks pass. The older 118-candidate textual partition and associated evidence-group counts remain historical audit output, not a current exhaustion claim, until the Chapter 6 and nearby named-code follow-through is integrated and independently reviewed.
 
 ## Updated Assumptions
 
@@ -923,6 +923,16 @@ items={
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_255_Picture_4.jpeg':(9310,267,186,'700d71a0beb145c953ca87f4d8649aecd7b7d60df69ccd569cba02f6daeb1acc','I'),
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_255_Picture_5.jpeg':(11188,273,165,'ae44e4411841a03fced5b5114f6cef4be62793c6a58c9a4ce6c357d214c7ce35','I'),
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_256_Figure_2.jpeg':(328297,1092,1367,'1c4967f6967d8e813b2a281e2615dc8bef272eb57789b60e23c950de5e6bc01f','I'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_297_Picture_2.jpeg':(50047,1111,408,'953c15d2e64464aceadb6181639cf36973db9513d6e0b7fc3fb43564efc65be8','I'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_297_Picture_4.jpeg':(117894,1127,415,'26b299987a91daf8d15fc226c845c7efa7d55b9aa4221a4e6d41646b8c384204','I'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_297_Picture_6.jpeg':(156786,1123,408,'b94ac983e3496b023a1a991b15a701de9a1c4c5cba75a84b16254c497a1c76f1','I'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_298_Figure_2.jpeg':(209088,1159,1297,'7cacf2667a3f923d35106ec7eff09b9ce551d79dd828f8661458dd121bda09df','I'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_299_Picture_3.jpeg':(127700,1150,600,'32d4ed4b16a083fb731c37cc80c64efb9995756808c316a0ced0dea0e9bd5475','I'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_300_Figure_1.jpeg':(286267,1150,1192,'ee5ea91d3855bf31bd793f02677c0c19d9203ac20532b3b7bb07df838065294c','I'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_301_Picture_2.jpeg':(134324,906,699,'3e9aec2832697e07ea20391c1454e022bc8578fcfb4c126bbb53e6fdfe3f6eb3','I'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_302_Picture_3.jpeg':(123792,1036,712,'4ec6db32d4f0b659a8519110b7885e05487e68d0348b390323daa55e7b322fd1','I'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_303_Picture_2.jpeg':(136635,616,1053,'26ec2731176f7ef4b471b4f395f3968eefa69e0eba88a3f672268129d68e07aa','I'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_304_Picture_2.jpeg':(179601,1109,1363,'21cc5432bcfcc379619d43c076f3102a3e12d64cd724d9fe5709055b72874ecf','I'),
 'CHAPTERS/9-Fundamental-Physics/Images/_page_541_Picture_3.jpeg':(37411,436,268,'83d828ba45f3f3e7390bf66183643a32c3c7b83646cc3880aedf099a49284c1e','I'),
 'CHAPTERS/9-Fundamental-Physics/Images/_page_541_Picture_4.jpeg':(43238,418,250,'d96c865b43b912ce4e2d6f0c2ddf659eed32f17db48c151161c364187fcc7a1f','I'),
 'CHAPTERS/11-The-Notion-of-Computation/Images/_page_707_Figure_1.jpeg':(327160,1130,1111,'974e12d28e8acc6fb4af26f7b1dd09eae1f30d802666a61f41abed8ec2d42e19','I'),
@@ -935,17 +945,28 @@ items={
 'BACK-MATTER/Index/Images/_page_963_Picture_9.jpeg':(3226,136,148,'515f5de1423a9164ed6def92d786346f64c15a0a87ba07b723c069e62829caf6','I'),
 'BACK-MATTER/Index/Images/_page_963_Picture_10.jpeg':(3654,138,158,'4b5ff621a668c5b706cdec0481cf3849facb7395d256dfd7c39b471d95fd018f','I'),
 'BACK-MATTER/Index/Images/_page_963_Picture_11.jpeg':(3717,136,152,'7c660bbbb03b2d3116aab32cd50a5a3ff094961d49b403148531b36759335d6b','I'),
+'BACK-MATTER/Index/Images/_page_979_Figure_4.jpeg':(16090,573,120,'acbfe15808099d36b2802a8aa10a946bf4f70870241799b795f8b4d1dfcab132','I'),
 'CHAPTERS/11-The-Notion-of-Computation/Images/_page_670_Figure_1.jpeg':(281966,1064,1224,'a1a2a5c04b509ecc0357273387b2950d179478c65406427751904987ec9e8d3e','R'),
 'CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_171_Picture_5.jpeg':(4640,277,91,'6695e1c946cf6adaa04a3915f2c720f69de4d18b74a81a01aaab346052119455','R'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_21.jpeg':(25918,583,225,'5f829c7776b53963e578df5a783553320da171c4e1c4d92c470899ec5bb3e40d','R'),
+'BACK-MATTER/Index/Images/_page_980_Picture_15.jpeg':(4385,160,195,'641317f32d429dd61b8353e1ebe65bd80f30950df78f0ebdc3a7f99b6bd26cd9','R'),
+'BACK-MATTER/Index/Images/_page_980_Picture_16.jpeg':(5858,172,187,'90df3d1e1e99ed74dd1844654ff41b04b23f6fe22552cefa2b72f659cd0c5fda','R'),
+'BACK-MATTER/Index/Images/_page_980_Picture_17.jpeg':(8261,223,207,'3ad70eb7f740edf7749700ff107f08306830f3e3fd617f2df3f9e7e559178e21','R'),
 'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_74_Picture_5.jpeg':(134131,858,423,'713c4c55c6a004d76c5e47f1f39513bb1656f35feb0fe9aa72c4503ca311cdc6','X'),
 'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_86_Picture_7.jpeg':(30221,240,500,'59213fbf1a0e6904a6566043c889acd32853d799d5a71bfec1e2d0c45bb1eec5','X'),
 'CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_86_Picture_8.jpeg':(7295,506,51,'d844f2419d7ff2a748a93e4ae6dd09c947bf5ed0723aa1defb4354c810b1fb25','X'),
 'CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_185_Picture_9.jpeg':(3425,213,114,'abfbc90a8bdab839ac452194adf8f7e30258e877967a79ac71db59b1a716df75','X'),
 'CHAPTERS/6-Starting-from-Randomness/Images/_page_261_Figure_2.jpeg':(309273,1109,1297,'49f35fe65202ef7fbfee2da92b7460d36fc329b66a553782ebf8991f237944dd','X'),
+'CHAPTERS/6-Starting-from-Randomness/Images/_page_305_Picture_2.jpeg':(642889,1184,1342,'7e75ba3d0cb57a0b35d5a7b29e803386617e1ede22eefae19ce6e21fc465a9c9','X'),
 'CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_566_Figure_2.jpeg':(140400,1032,699,'6d66d95c8e3c286272cded005d60557ce7a075ffebfd268486c23abe13a29a1e','X'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_23.jpeg':(4478,160,117,'132528352f363e52a20e73e1e8341203126448c0c6c8545eed48626eaddac16c','X'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_28.jpeg':(5342,205,110,'2da239aceec3720e5aeccd5de8898c37fe7e975230814c0b3a8e3dcacbde9096','X'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_31.jpeg':(4370,117,117,'ca086555513a6d8ba5bcbe92d97af26e55aa899cf629e0ab61d8fa8c71b81586','X'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_23.jpeg':(4207,139,141,'f14931f6bb008435e34961947dce7b11d5ec6d0bd4cc5b936bcee81b830adc0a','X'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_24.jpeg':(5507,135,138,'5b302ed9d6c9cbee590270c7bdc169b62b554b0e186a94fdb3d1952a69c0f8c5','X'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_25.jpeg':(4057,138,145,'f5eb9593ba90b4b240dc6990bb0e7204066cc48e81e82b96186029ff866d40da','X'),
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_885_Picture_26.jpeg':(4999,135,155,'badba07cc053bdf7f4e5b41d7d90b2b248d8acd75b9728898e10c69a59c7ceec','X'),
+'BACK-MATTER/Index/Images/_page_979_Picture_6.jpeg':(23347,579,111,'f9fe6970d82502f70cf371b503160c71047d290954ca19d5d37b4fd65c12fdc1','X'),
 'BACK-MATTER/Colophon/Images/_page_1132_Picture_2.jpeg':(68468,606,308,'422ce8c21c465e2ffdffdb0f691f9521a21b9389897336dd4e4a2c716295c589','X'),
 }
 
@@ -972,24 +993,53 @@ for name,(size,w,h,digest,kind) in items.items():
     data=(ROOT/name).read_bytes()
     assert (len(data),*jpeg_size(data),sha256(data).hexdigest())==(size,w,h,digest)
     assert digest not in digests; digests.add(digest); counts[kind]+=1
-assert counts=={'I':37,'X':10,'R':2}
-print('T03 metadata oracle: PASS 37 included; 10 excluded; 2 relation-only')
+assert counts=={'I':48,'X':16,'R':6}
+print('T03 metadata oracle: PASS 48 included; 16 excluded; 6 relation-only')
 PY
 ```
 
 Recorded output:
 
 ```text
-T03 metadata oracle: PASS 37 included; 10 excluded; 2 relation-only
+T03 metadata oracle: PASS 48 included; 16 excluded; 6 relation-only
 ```
 
 ### Exact asset semantic oracle
 
-This dependency-free check independently reconstructs the strict code-`777` table and early single-gray trajectory, the exact 50-update Notes invocation for code `867`, the binary radius-two code-`10` rule, and all strict labelled gallery identities. Tables are LSB-first by integer sum; displays reverse them.
+This dependency-free check independently reconstructs the strict code-`777` table and early single-gray trajectory, the exact 50-update Notes invocation for code `867`, binary radius-two codes `10`, `20`, and `52`, and all strict labelled gallery identities. It also pins the Chapter 6 structure/search labels, code-`20` survival counts, code-`420` additivity, and all 22 followed physical links. Tables are LSB-first by integer sum; displays reverse them.
 
 ```bash
 python3 - <<'PY'
 from hashlib import sha256
+from itertools import product
+from pathlib import Path
+
+book=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md').read_text().splitlines()
+links={
+3314:'![](_page_297_Picture_2.jpeg)',
+3318:'![](_page_297_Picture_4.jpeg)',
+3322:'![](_page_297_Picture_6.jpeg)',
+3328:'![](_page_298_Figure_2.jpeg)',
+3334:'![](_page_299_Picture_3.jpeg)',
+3342:'![](_page_300_Figure_1.jpeg)',
+3350:'![](_page_301_Picture_2.jpeg)',
+3362:'![](_page_302_Picture_3.jpeg)',
+3368:'![](_page_303_Picture_2.jpeg)',
+3376:'![](_page_304_Picture_2.jpeg)',
+3380:'![](_page_305_Picture_2.jpeg)',
+11297:'![](_page_885_Picture_21.jpeg)',
+11301:'![](_page_885_Picture_23.jpeg)',
+11303:'![](_page_885_Picture_24.jpeg)',
+11305:'![](_page_885_Picture_25.jpeg)',
+11307:'![](_page_885_Picture_26.jpeg)',
+14762:'![](_page_979_Figure_4.jpeg)',
+14766:'![](_page_979_Picture_6.jpeg)',
+14829:'![](_page_980_Picture_15.jpeg)',
+14831:'![](_page_980_Picture_16.jpeg)',
+14833:'![](_page_980_Picture_17.jpeg)',
+18746:'![](_page_1132_Picture_2.jpeg)',
+}
+assert all(book[n-1]==want for n,want in links.items())
 
 def table(code,k,r):
     width=1+(k-1)*(2*r+1); out=[]
@@ -1024,6 +1074,7 @@ assert tuple(blob.count(v) for v in range(3))==(3692,958,501)
 assert sha256(blob).hexdigest()=='185170c0866f76d129fbf3a8843cc731f98b9f012cb98286f01e420532fb53d9'
 
 assert table(10,2,2)==(0,1,0,1,0,0)  # black iff sum is 1 or 3
+assert table(20,2,2)==(0,0,1,0,1,0)
 assert table(52,2,2)==(0,0,1,0,1,1)
 strict={
  'p76':tuple(range(993,1141,3)),
@@ -1046,13 +1097,37 @@ for k,codes in comparative.items():
     for code in codes: table(code,k,1)
 assert len(tuple(range(0,64,2)))==32
 assert len(tuple(range(1002,1096,3)))==32
-for code,k,r in [(1815,3,1),(2007,3,1),(238,3,1),(2043,3,1),
+assert 20 in range(0,64,2) and 52 in range(0,64,2)
+for code,k,r in [(1815,3,1),(2007,3,1),(1659,3,1),(2043,3,1),
+                 (219,3,1),(438,3,1),(1380,3,1),(1632,3,1),
                  (294,3,1),(1893,3,1),(1004600,4,1)]:
     table(code,k,r)
+
+r420=table(420,3,1)
+assert r420==(0,2,1,0,2,1,0)
+for a in product(range(3),repeat=3):
+    for b in product(range(3),repeat=3):
+        ab=tuple((x+y)%3 for x,y in zip(a,b))
+        assert r420[sum(ab)]==(r420[sum(a)]+r420[sum(b)])%3
+
+structures357=((28,'48'),(7795,'19'),(1706588,'26'),
+               (4803890,'41R'),(154596664,'12'),(514454827,'48L'))
+structures1329=((1,'78'),(52,'7'),(400,'2'),(800,'12'),(916,'31R'),
+                (2617,'9'),(2669,'48R'),(97357,'2'),(659197,'9'))
+growth1329=(54889,97439,166426,115396,2069116)
+survival20=((1000,72),(1000000,60171),(1000000000,71079205))
+assert structures357[3]==(4803890,'41R') and structures357[-1]==(514454827,'48L')
+assert structures1329[4]==(916,'31R') and structures1329[6]==(2669,'48R')
+assert len(set(growth1329))==5 and survival20[0]==(1000,72)
 
 print('code777_table=',r777,'display=1001210')
 print('code777_t0_t8=',','.join(words))
 print('code867_51x101_sha256=',sha256(blob).hexdigest())
+print('code20_table=',table(20,2,2),'code52_table=',table(52,2,2))
+print('chapter6_structure_labels=',len(structures357)+len(structures1329),
+      'growth_labels=',len(growth1329),'audited_links=',len(links))
+print('code20_survival=',survival20,'code420_additive_mod3= PASS')
+print('pictured_class4_code=1659; borderline_code=1632; notes_only_code=1662')
 print('T03 asset semantic oracle: PASS')
 PY
 ```
@@ -1063,6 +1138,10 @@ Recorded output:
 code777_table= (0, 1, 2, 1, 0, 0, 1) display=1001210
 code777_t0_t8= 1,111,12121,1100011,122101221,11001210011,1221110111221,110001222100011,12210110101101221
 code867_51x101_sha256= 185170c0866f76d129fbf3a8843cc731f98b9f012cb98286f01e420532fb53d9
+code20_table= (0, 0, 1, 0, 1, 0) code52_table= (0, 0, 1, 0, 1, 1)
+chapter6_structure_labels= 15 growth_labels= 5 audited_links= 22
+code20_survival= ((1000, 72), (1000000, 60171), (1000000000, 71079205)) code420_additive_mod3= PASS
+pictured_class4_code=1659; borderline_code=1632; notes_only_code=1662
 T03 asset semantic oracle: PASS
 ```
 
@@ -1119,7 +1198,7 @@ T03 code-777 raster oracle: PASS 0 mismatches
 
 The official primary [Chapter 3 PDF](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch3.pdf) confirms the strict sequence on PDF pages 11–21 / printed pages 60–70 and the mobile-automaton boundary on PDF page 22 / printed page 71. The official [all-notes PDF](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf) confirms the exact code-`867` invocation on PDF page 20 / printed page 868, code `10` on PDF page 34 / printed page 882, and the frequency charts on PDF page 97 / printed page 948. The extracted `_page_...` filenames are routing identifiers, not printed-page claims.
 
-No other included figure supplies all of exact serialized seed, boundary/background, event-versus-state horizon, spatial crop, palette, and resampling. Consequently the remaining galleries have metadata, labels, filters, and source-stated properties pinned, but no fabricated pixel or trajectory golden.
+Picture 253/1 is repaired to visible code `1659`: the Actual Index routes 1659 to printed page 238, while monolith `BOOK:2834` contains only the contaminated page number `238`; Notes code `1662` is a distinct unpictured example. Picture 255/5 visibly supplies borderline code `1632`. No other included figure supplies all of exact serialized seed, spatial digit orientation/padding, boundary/background, event-versus-state horizon, spatial crop, palette, and resampling. Consequently the numbered structure searches and remaining galleries have metadata, labels, filters, search bounds, and source-stated properties pinned, but no fabricated pixel or trajectory golden.
 
 ## Detailed Implementation Plan
 
@@ -1197,7 +1276,7 @@ No other included figure supplies all of exact serialized seed, boundary/backgro
 ## Completion Requirements
 
 - [ ] Every strict/Notes/split/actual-Index/alias/variant/application/emulation textual candidate is dispositioned reproducibly.
-- [ ] Every relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and exclusions.
+- [x] Every currently identified relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and exclusions.
 - [x] Aggregate/value/case/table/code/read/update/successor/boundary/seed semantics and variants are explicit.
 - [x] T01/T02/T04/T05/T06/T07/additive/weighted/emulation boundaries and current API/runtime fit are proved.
 - [x] Goal 2 files/dependencies/tests and no-cheating gates are implementation-ready.
@@ -1205,15 +1284,13 @@ No other included figure supplies all of exact serialized seed, boundary/backgro
 
 ## Stage Results
 
-REOPENED after T04 follow-through. T04's named code-357/code-1329 routes at `BOOK:3320-3378` and binary range-two code-20 follow-through exposed direct textual/profile candidates, physical assets, and adjacency controls omitted from T03's claimed exhaustive manifest/superset. The aggregate/table semantics, core definition/formula excerpts, API/runtime audit, and D115-D118 remain valid, but the source partition/excerpts, asset counts/metadata oracle, stage/global summaries, and independent completion review must be repaired before T03 can again be COMPLETE.
-
-COMPLETE. The exact 16-query manifest closes 118 candidates in the disjoint partition `26 direct / 34 sibling / 25 relation / 23 false-control / 10 actual-Index`, and the 84 literal split occurrences match exactly. Eighteen evidence groups preserve 65 verbatim fragments across 63 physical monolith lines. Five damaged forms are normalized transparently against four hash-pinned official PDFs; every stage citation and quote passes the source oracle with zero unresolved candidate.
+**REOPENED.** T04's named code-357/code-1329 routes at `BOOK:3320-3378` and binary radius-two code-20 follow-through exposed textual/profile candidates, physical assets, and adjacency controls omitted from T03's former exhaustive-manifest/superset claim. The physical repair is now complete at `48 included / 16 excluded / 6 relation-only`: it includes the complete code-20 panel route through the page-979 survival chart, all code-357/code-1329 panels, the additive/Pascal and Life relations, and explicit neighboring controls. The aggregate/table semantics, core definition/formula excerpts, API/runtime audit, and D115-D118 remain valid, but the source partition/excerpts and final independent/global review must still be repaired before T03 can be declared complete again.
 
 T03 is one exact finite-sum rule description over the T01/T02 fixed-lattice construction. A program declares finite alphabet `A`, explicit bijection `nu:A->{0,...,k-1}`, fixed radius `r`, exact sum of the `2r+1` old reads, and one complete `M=1+(k-1)(2r+1)`-row structural table. Sum zero is the least-significant base-`k` digit. The source average is the exact label `s/(2r+1)`, not a float. T03 adds neither an executor nor an update law; T04/T05 are presets, T06/T07 restrictions/properties, and histogram, outer, weighted, higher-dimensional, continuous, additive, emulation, seed, class, and view material remains explicitly typed outside base execution.
 
-All six embedded audit blocks pass. They cover the source/evidence closure; exact `16/64/2187/1,220,703,125` counts; codes `777/867/420` and binary radius-two code `10`; permutation and equal-sum/different-histogram adversaries; a permuted symbolic valuation that defeats tuple-rank substitution; injective T01/T02 lowering; evolving background, old-snapshot, nonbinary, and arbitrary-precision behavior; 37 included/ten excluded/two relation-only assets; exact code-777/code-867 trajectories; and all 946 cells of the strict code-777 raster with zero mismatch. The current broad API and binary/family-dispatched runtime are documented as mismatches rather than preserved through a shim.
+The three repaired asset blocks pass. They cover `48/16/6` disjoint physical dispositions, 22 followed links, binary radius-two codes `10/20/52`, code-20 survival counts, code-357/code-1329 structure labels, code-420 additivity, exact code-777/code-867 trajectories, and all 946 cells of the strict code-777 raster with zero mismatch. The preexisting semantic/construction blocks still pass mechanically, but their old source-exhaustion interpretation is explicitly withdrawn pending the remaining textual repair. The current broad API and binary/family-dispatched runtime remain documented as mismatches rather than preserved through a shim.
 
-G2-T03 names concrete alphabet, aggregate, table/codec, rule, executor, spec/preset, trace/export, migration, and test work with 15 adversarial conformance obligations. D115-D118, the completed-construction matrix, rejected shortcuts, integration log, open questions, `0-plan.md`, and `evidence-index.md` are updated. Independent semantic review found and closed the rank-versus-valuation gap; final independent review found no remaining blocker. Markdown/fence/table checks, every embedded oracle, `git diff --check`, coverage checks, and all 102 repository tests pass. No prior stage is reopened. Next: T04.
+G2-T03 continues to name concrete alphabet, aggregate, table/codec, rule, executor, spec/preset, trace/export, migration, and test work with 15 adversarial conformance obligations. D115-D118 and the rank-versus-valuation repair remain usable. The prior “final review/no blocker/no reopened stage” statement is withdrawn; T03 stays reopened until textual closure, global ledgers, diff checks, repository tests, and a fresh independent review are current.
 
 ## Integration Results
 
@@ -1224,6 +1301,6 @@ G2-T03 names concrete alphabet, aggregate, table/codec, rule, executor, spec/pre
 5. Support, topology, values, numeric valuation, aggregate cases, structural table, code, run controls, representation, properties, and relations remain separately typed.
 6. Equal-weight fixed-arity sum followed by complete lookup is defining rule semantics and remains native. Integer vectorization, exact-average labels, bigint code, exhaustive lowering, solvers, gallery selection, and rasterization remain explicit incidental or relation layers.
 7. The proposed encoding preserves alphabet identity, independent `nu`, arity/radius, every sum row including leading zeros, arbitrary-precision code direction, run identity, and observation scope. The noncanonical symbolic fixture prevents rank collapse.
-8. No completed stage is reopened. T01/T02 are strengthened by an explicit verified lowering relation without changing native identity or execution.
+8. T03 itself is reopened by the omitted follow-through. T01/T02 remain completed and are still related by the explicit verified lowering without changing native identity or execution.
 9. Goal 2 gains G2-T03 after the shared T01/T02 alphabet/table/executor responsibilities. T04/T05 depend on it as presets; T06/T07 consume predicates/proofs rather than flags; outer/weighted/histogram/higher-dimensional profiles remain separately staged.
 10. The overall API becomes simpler: one closed `valuation -> exact sum -> typed table` rule composes with the existing fixed-field executor, replacing the current loose `TOTALISTIC` bucket and binary family routing without adding an eleventh update law.
