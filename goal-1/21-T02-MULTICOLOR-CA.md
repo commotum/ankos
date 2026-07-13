@@ -331,7 +331,16 @@ No candidate remains unresolved. The zero-hit probes are informative: the source
 
 > “rules that work, between 8 and 19 cases lead to a change in the color of a cell, with 14 cases being the most common.”
 
-### E19 — Actual-Index routes add no new mechanics
+### E19 — An ordered priority rule still denotes a complete table
+
+- Provenance: `BOOK:15493-15495`, discrete-Voronoi Notes.
+- Establishes: a direct `k=3,r=1` instance may be written compactly as ordered overlapping patterns. Expanding priority produces one ordinary complete 27-entry T02 table; the derived Voronoi behavior is an application, not a new update construction.
+
+> `■ **Discrete Voronoi diagrams.** The k = 3, r = 1 cellular automaton`
+
+> ` $\{\{0 \mid 1, n : (0 \mid 1), 0 \mid 1\} \rightarrow n, \{\_, 0, \_\} \rightarrow 2, \{\_, n\_, \_\} \rightarrow n-1\}$ is an example of a system that generates discrete 1D Voronoi diagrams by having regions that grow from every initial black cell, but stop whenever they meet, as shown below.`
+
+### E20 — Actual-Index routes add no new mechanics
 
 - Provenance: actual Index `BOOK:20965,20967,21134,21187,21323,21542,21933,22372`.
 - Establishes: the Index routes more-color, three-color, encoding/emulation, and reversible-three-color vocabulary back to the inspected main/Notes passages. These are routing evidence only.
@@ -350,7 +359,7 @@ No candidate remains unresolved. The zero-hit probes are informative: the source
 
 > “emulating more colors, 669, 1113,”
 
-### E20 — Explicit sibling and neighborhood boundaries
+### E21 — Explicit sibling and neighborhood boundaries
 
 - Provenance: `BOOK:774,11881,18744`.
 - Establishes: totalistic averaging discards individual-color order; staggered two-cell neighborhoods have a different rule count; and `3-color 2-neighbor` is named separately. None changes T02's ordered three-cell construction.
@@ -374,8 +383,9 @@ No candidate remains unresolved. The zero-hit probes are informative: the source
 9. **Seed separation:** no strict T02 seed convention is stated. Single-gray, random, uniform, sparse, periodic, and purpose-encoded initial fields remain independent profiles.
 10. **Sibling overlap:** a totalistic table is mathematically one member of the full general table space, but the source and taxonomy give it a different rule description/signature. T02's canonical program form is the explicit positional lookup; T03/T04/T05 own the aggregate construction.
 11. **Split routing:** the Chapter 3 split changes `can not only` to `can be not only` at its duplicate of `BOOK:772`; canonical quotation remains the monolith. The Chapter 12 split contains only an early Notes fragment; `BACK-MATTER/Notes/Notes.md` is one unrelated line, and `BACK-MATTER/Index/Index.md` contains misrouted Notes rather than the actual Index.
-12. **Actual Index:** the real Index begins at `BOOK:20826`. E19 pointers corroborate routing only and are not counted as independent construction evidence.
+12. **Actual Index:** the real Index begins at `BOOK:20826`. E20 pointers corroborate routing only and are not counted as independent construction evidence.
 13. **Official-PDF normalization authority:** the official Chapter 3 PDF, [`nks-ch3.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch3.pdf), was verified at SHA-256 `d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76`. Its printed page 886 visibly confirms the normalized general count `R = k^(k^(2r+1))`, the `ListConvolve[k^Range[0,2r], ...]` lookup, and `IntegerDigits[num,k,k^(2r+1)]`. The official all-Notes PDF, [`nks-notes.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf), was verified at SHA-256 `549f043595653a7d276b07ba52d435700039b71427b4e1774a44b1a58eff4723`; its printed page 867 visibly confirms the `{n,k}` equivalence with positional weights `{k^2,k,1}`. These normalized forms repair E11/E14 but are deliberately not presented as verbatim `BOOK` blockquotes.
+14. **Priority-pattern expansion:** the direct `BOOK:15493-15495` Voronoi rule uses overlapping Wolfram-language patterns in written priority order. It is source-level shorthand for a total table, not a callback or sparse fallback. Expansion yields descending base-3 digits `111000222111011200111011200` and code `3681845932419`; initial black-cell positions, figure horizon, grid transfer, and the right-hand Voronoi observer remain unstated view/run data.
 
 ### Verbatim excerpt and repair oracle
 
@@ -411,6 +421,8 @@ checks = {
     11898: ('single step in the evolution of a general cellular automaton',),
     11900: ('ListConvolve[k^Range[0, 2r], a, r + 1]', 'IntegerDigits[num, k, k^2r^1]'),
     13513: ('offset lists are always taken to be in the order given by *Sort*', 'in the same order as the offset list'),
+    15493: ('Discrete Voronoi diagrams.', 'k = 3, r = 1 cellular automaton'),
+    15495: ('generates discrete 1D Voronoi diagrams', 'grow from every initial black cell'),
     16446: ('every cell is updated in parallel at each step', 'colors of neighboring cells on the previous step'),
     18339: ('three colors and nearest neighbors', 'collection of cases for a rule with two colors'),
     18348: ('Log[2, k^{k^{2r+1}}]', 'minimum possible s for k = 3, r = 1 is about 2.2'),
@@ -433,14 +445,14 @@ assert [k*k*l + k*c + r for l,c,r in ((0,1,2),(0,2,1),(1,0,2))] == [5,7,11]
 assert k**(k**3) == 3**27 == 7_625_597_484_987
 assert 'total number of possible rules of this kind' in L[771]
 assert 'The idea of a totalistic rule' in L[773]
-print('T02 verbatim evidence oracle: PASS 32 lines; ordered addresses/count exact')
+print('T02 verbatim evidence oracle: PASS 34 lines; ordered addresses/count exact')
 PY
 ```
 
 Expected output:
 
 ```text
-T02 verbatim evidence oracle: PASS 32 lines; ordered addresses/count exact
+T02 verbatim evidence oracle: PASS 34 lines; ordered addresses/count exact
 ```
 
 ## Construction Model
@@ -647,12 +659,13 @@ rule_921408_sha256= 935f360febe2e58653bd52dff57139563bc706af963b2bdfbe0b116a7dbc
 
 ## Asset and Raster Audit
 
-The strict Chapter 3 transition has no full-table T02 picture. Its immediately following page-60/page-61 assets are totalistic and are material exclusions. The bounded included set instead consists of one exact general-rule Notes fixture, the purpose/search and mutation galleries, the reversible gallery and its inverse-range Notes panels, and one supporting purpose-search asset. Visual tone is never imported into the color algebra.
+The strict Chapter 3 transition has no full-table T02 picture. Its immediately following page-60/page-61 assets are totalistic and are material exclusions. The bounded included set instead consists of the direct discrete-Voronoi ordered-rule fixture, one exact general-rule Notes fixture, the purpose/search and mutation galleries, the reversible gallery and its inverse-range Notes panels, and one supporting purpose-search asset. Visual tone is never imported into the color algebra.
 
 ### Included asset manifest
 
 | Asset path under `ref/A-New-Kind-of-Science/` | Bytes | Dimensions | SHA-256 | Source-permitted meaning |
 |---|---:|---:|---|---|
+| `BACK-MATTER/Index/Images/_page_1002_Picture_14.jpeg` | 16,254 | `581x97` | `c06ceb9699771663ab0e993ea17a5c3bf471bfca0328da88b83780dc61d619b0` | Direct `k=3,r=1` discrete-Voronoi fixture for the ordered three-clause rule at `BOOK:15493-15497`. Its left panel is a qualitative CA spacetime view and its right panel a Voronoi observer; exact seeds, horizon, boundary, grid transfer, and palette-to-digit map are not stated. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_23.jpeg` | 4,478 | `160x117` | `132528352f363e52a20e73e1e8341203126448c0c6c8545eed48626eaddac16c` | Exact Notes invocation of general `k=3,r=1` rule `921408`, point `1` on repeating-`0` background, 100 updates. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_847_Figure_1.jpeg` | 111,064 | `1041x385` | `2d36e7eaeb3b073e68621ef5f9c1c397ae24ddc74fe06f26e62546ccc3af2902` | Six-, four-, and three-color nearest-neighbor doubling constructions; case (c) is rule `5407067979`. |
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_848_Figure_2.jpeg` | 247,033 | `1194x1308` | `0bfecfeff1bd81072838e39704fc6572632dee083f91ddc4370909b0e2c5b5dd` | Full three-color rule examples drawn from the `4,277` doubling rules found among all `3^27`; printed numbers are rule labels, not observer IDs. |
@@ -666,6 +679,8 @@ The strict Chapter 3 transition has no full-table T02 picture. Its immediately f
 
 Page 847/Notes count the source's `3n-1` displayed states for rule `5407067979`: executable first arrival is `3n-2` transition events. The existing exact semantic oracle preserves this event/state distinction.
 
+For the Voronoi fixture, the three clauses are priority ordered. The first keeps the center only when all three inputs lie in `{0,1}`; the second applies to the remaining center-`0` contexts; the third applies to everything else. Once expanded, this is an ordinary total 27-entry T02 lookup, not a runtime callback or sparse fallback. The source's “initial black cell” is qualitative palette language: it does not identify the seed digit or fully specify the illustrated run/view, so the figure is not a trajectory or raster golden.
+
 ### Explicit exclusions and relation-only dispositions
 
 | Asset path under `ref/A-New-Kind-of-Science/` | Bytes | Dimensions | SHA-256 | Disposition |
@@ -675,6 +690,7 @@ Page 847/Notes count the source's `3n-1` displayed states for rule `5407067979`:
 | `CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_25.jpeg` | 5,511 | `211x117` | `d53637ce9ec50330d5fa6239b23f48d57b563266a0085a23517d4538020fd5fb` | Directly adjacent but explicitly totalistic `k=3` code `867`; not the general-rule fixture. |
 | `CHAPTERS/11-The-Notion-of-Computation/Images/_page_670_Figure_1.jpeg` | 281,966 | `1064x1224` | `a1a2a5c04b509ecc0357273387b2950d179478c65406427751904987ec9e8d3e` | Totalistic code `1599` encoded into a binary larger-neighborhood CA; emulation relation, not a T02 transition golden. |
 | `CHAPTERS/11-The-Notion-of-Computation/Images/_page_707_Figure_1.jpeg` | 327,160 | `1130x1111` | `974e12d28e8acc6fb4af26f7b1dd09eae1f30d802666a61f41abed8ec2d42e19` | Mixed gallery: ECA 110, second-order 37, two-color range-two totalistic 52, and three-color totalistic 1815. |
+| `BACK-MATTER/Index/Images/_page_1002_Picture_16.jpeg` | 17,313 | `576x114` | `297f7bd1bd904418960e0ab9af4d4db98dd6eafef4005c929f872a1d23937b7a` | Directly adjacent but explicitly an analogous **2D** cellular automaton; it is not the one-dimensional ordered-triple T02 rule or an additional view of Picture 14. |
 | `CHAPTERS/11-The-Notion-of-Computation/Images/_page_675_Figure_1.jpeg` | 231,351 | `987x946` | `fd5d18341f9bb6067319739ea18d34467bc3ef5a568a280ecbc8cb693204f38b` | Valid 28-color nearest-neighbor instance, but its subject is sequential-substitution emulation and its full table/settings are absent; relation-only. |
 | `CHAPTERS/11-The-Notion-of-Computation/Images/_page_677_Figure_2.jpeg` | 173,594 | `1033x1034` | `8a59e423d080cdcfd5fbeb61170c099dc6ec904702e27385627427d56373f543` | Valid five-color nearest-neighbor instance, but its subject is logic-circuit emulation and its full table/settings are absent; relation-only. |
 
@@ -689,6 +705,7 @@ from pathlib import Path
 
 ROOT=Path('ref/A-New-Kind-of-Science')
 items={
+'BACK-MATTER/Index/Images/_page_1002_Picture_14.jpeg':(16254,581,97,'c06ceb9699771663ab0e993ea17a5c3bf471bfca0328da88b83780dc61d619b0','I'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_23.jpeg':(4478,160,117,'132528352f363e52a20e73e1e8341203126448c0c6c8545eed48626eaddac16c','I'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_847_Figure_1.jpeg':(111064,1041,385,'2d36e7eaeb3b073e68621ef5f9c1c397ae24ddc74fe06f26e62546ccc3af2902','I'),
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_848_Figure_2.jpeg':(247033,1194,1308,'0bfecfeff1bd81072838e39704fc6572632dee083f91ddc4370909b0e2c5b5dd','I'),
@@ -704,6 +721,7 @@ items={
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_883_Picture_25.jpeg':(5511,211,117,'d53637ce9ec50330d5fa6239b23f48d57b563266a0085a23517d4538020fd5fb','X'),
 'CHAPTERS/11-The-Notion-of-Computation/Images/_page_670_Figure_1.jpeg':(281966,1064,1224,'a1a2a5c04b509ecc0357273387b2950d179478c65406427751904987ec9e8d3e','X'),
 'CHAPTERS/11-The-Notion-of-Computation/Images/_page_707_Figure_1.jpeg':(327160,1130,1111,'974e12d28e8acc6fb4af26f7b1dd09eae1f30d802666a61f41abed8ec2d42e19','X'),
+'BACK-MATTER/Index/Images/_page_1002_Picture_16.jpeg':(17313,576,114,'297f7bd1bd904418960e0ab9af4d4db98dd6eafef4005c929f872a1d23937b7a','X'),
 'CHAPTERS/11-The-Notion-of-Computation/Images/_page_675_Figure_1.jpeg':(231351,987,946,'fd5d18341f9bb6067319739ea18d34467bc3ef5a568a280ecbc8cb693204f38b','R'),
 'CHAPTERS/11-The-Notion-of-Computation/Images/_page_677_Figure_2.jpeg':(173594,1033,1034,'8a59e423d080cdcfd5fbeb61170c099dc6ec904702e27385627427d56373f543','R'),
 }
@@ -732,15 +750,58 @@ for name,(size,w,h,digest,kind) in items.items():
     path=ROOT/name; data=path.read_bytes()
     assert (len(data),*jpeg_size(data),sha256(data).hexdigest())==(size,w,h,digest)
     counts[kind]+=1
-assert counts=={'I':10,'X':5,'R':2}
-print('T02 metadata oracle: PASS 10 included; 5 excluded; 2 relation-only')
+assert counts=={'I':11,'X':6,'R':2}
+print('T02 metadata oracle: PASS 11 included; 6 excluded; 2 relation-only')
 PY
 ```
 
 Recorded output:
 
 ```text
-T02 metadata oracle: PASS 10 included; 5 excluded; 2 relation-only
+T02 metadata oracle: PASS 11 included; 6 excluded; 2 relation-only
+```
+
+The direct Voronoi rule has its own dependency-free priority-expansion oracle. `product(range(3), repeat=3)` enumerates `(left,self,right)` in increasing T02 address order `9*left+3*self+right`. The branch counts prove that all 27 contexts are covered exactly once after priority shadowing; in particular, the first clause must win over the center-`0` clause on contexts drawn wholly from `{0,1}`.
+
+```bash
+python3 - <<'PY'
+from collections import Counter
+from itertools import product
+
+def source_rule(left,self,right):
+    if left in (0,1) and self in (0,1) and right in (0,1):
+        return self,'keep-01'
+    if self==0:
+        return 2,'remaining-zero'
+    return self-1,'decrement'
+
+contexts=list(product(range(3),repeat=3))
+assert [9*l+3*c+r for l,c,r in contexts]==list(range(27))
+resolved=[source_rule(*context) for context in contexts]
+table=tuple(value for value,_ in resolved)
+assert table==(0,0,2,1,1,0,1,1,1,
+              0,0,2,1,1,0,1,1,1,
+              2,2,2,0,0,0,1,1,1)
+assert Counter(branch for _,branch in resolved)=={
+    'keep-01':8,'remaining-zero':5,'decrement':14}
+code=sum(value*3**address for address,value in enumerate(table))
+display=''.join(map(str,reversed(table)))
+assert code==3681845932419
+assert display=='111000222111011200111011200'
+print('voronoi_rule_code=',code)
+print('voronoi_rule_display=',display)
+print('voronoi_priority_branches=',(8,5,14))
+print('T02 Voronoi priority oracle: PASS 27 total entries')
+PY
+```
+
+Recorded output:
+
+```text
+voronoi_rule_code= 3681845932419
+voronoi_rule_display= 111000222111011200111011200
+voronoi_priority_branches= (8, 5, 14)
+T02 Voronoi priority oracle: PASS 27 total entries
 ```
 
 The printed reversible and inverse-range labels also have an independent, dependency-free semantic check. The Notes state that cyclic words through length nine suffice for `k=3,r=1`; the same finite domain recovers the four printed inverse-window sizes. A window `start` is relative to the predecessor cell whose value is reconstructed.
@@ -803,7 +864,7 @@ T02 reversible-label oracle: PASS
 
 ### Official-source repair provenance
 
-The official primary [all-notes PDF](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf) was used only to repair extraction damage and confirm image labels. PDF page 20 / printed page 868 confirms the exact rule-`921408` invocation and 100-update request. PDF page 164 / printed page 1017 repairs `BOOK:16025` and the misrouted Index duplicate: the four rule labels are `2828556973047`, `3762560660157`, `538556225233`, `3066231781977`, and the examples are ordered by inverse neighborhood sizes `3,4,5,6`; the local repeated-`3` text is OCR corruption. PDF pages 330-331 / printed pages 1185-1186 confirm rule `5407067979`, the displayed-state count, and the four page-1201 labels. No web source changes native mechanics or supplies an unstated initial condition.
+The official primary [all-notes PDF](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf) was used only to repair extraction damage and confirm image labels. PDF page 20 / printed page 868 confirms the exact rule-`921408` invocation and 100-update request. PDF page 135 / printed page 987 confirms the ordered discrete-Voronoi rule and the paired 1D illustration. PDF page 164 / printed page 1017 repairs `BOOK:16025` and the misrouted Index duplicate: the four rule labels are `2828556973047`, `3762560660157`, `538556225233`, `3066231781977`, and the examples are ordered by inverse neighborhood sizes `3,4,5,6`; the local repeated-`3` text is OCR corruption. PDF pages 330-331 / printed pages 1185-1186 confirm rule `5407067979`, the displayed-state count, and the four page-1201 labels. No web source changes native mechanics or supplies an unstated initial condition.
 
 ### Direct rule-921408 raster oracle
 
@@ -857,7 +918,7 @@ rule921408: r=0.989621884093; mae=4.113100751; rmse=8.052767980; crop=123x79
 T02 direct raster oracle: PASS
 ```
 
-The mutation, reversible, doubling-search, inverse-range, and emulation images do not state enough renderer settings, exact initial arrays, random choices, or full tables for additional pixel goldens. Their permitted roles are identity, property, provenance, and relation evidence only.
+The discrete-Voronoi, mutation, reversible, doubling-search, inverse-range, and emulation images do not state enough renderer settings, exact initial arrays, random choices, full tables, or observer transforms for additional pixel goldens. Their permitted roles are exact table semantics where supplied, plus identity, property, provenance, and relation evidence only.
 
 ## Detailed Implementation Plan
 
@@ -927,7 +988,7 @@ The mutation, reversible, doubling-search, inverse-range, and emulation images d
 
 ## Stage Results
 
-Evidence and design are complete pending the final independent-review/integration gate. The exact 29-query oracle partitions all 157 candidate lines with no remainder, and E1-E20 preserve every unique construction-relevant strict, Notes, actual-Index, split, variant, implementation, property, search, and emulation passage. All 46 quoted fragments match the canonical monolith after presentation-only quote/whitespace normalization; the 32-line source oracle and all cited `BOOK:` bounds pass. Official PDFs repair only the visibly damaged positional weights, digit-count exponent, invocations, and inverse-rule labels; normalized repairs are never passed off as local quotations.
+Evidence and design are complete pending the final independent-review/integration gate. The exact 29-query oracle partitions all 157 candidate lines with no remainder, and E1-E21 preserve every unique construction-relevant strict, Notes, actual-Index, split, variant, implementation, property, search, and emulation passage. All 48 quoted fragments match the canonical monolith after presentation-only quote/whitespace normalization; the 34-line source oracle and all cited `BOOK:` bounds pass. Official PDFs repair only the visibly damaged positional weights, digit-count exponent, invocations, and inverse-rule labels; normalized repairs are never passed off as local quotations.
 
 T02 is the `k>=3`, radius-one parameterization of T01: one total field over an explicit ordered finite alphabet, `AllSites`, ordered old `(left,self,right)` reads, one complete `k^3` table, typed same-site assignment, and T01 atomic commit. The optional Wolfram codec uses address `k^2*l+k*c+r`, has exactly `k^(k^3)` valid tables, and requires arbitrary-precision lossless identity. Rank, numeric aggregate, and palette are distinct. Seeds, backgrounds, finite realizations, horizons, mutation histories, reversibility claims, searches, behavior labels, rasters, and emulations remain independent records.
 
