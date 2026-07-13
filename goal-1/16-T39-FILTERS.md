@@ -744,7 +744,11 @@ Paths are dependency targets for synthesis; Goal 2 may consolidate modules when 
 - [x] Goal 2 files, dependencies, behavior, canonical tests, migration constraints, and no-cheating cases are implementation-ready.
 - [x] Global ledgers, exact verification commands, diff checks, and repository tests are integrated successfully.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T39's strict sieve uses ordered candidate support, a visible stage marker, hit/witness access, and atomic subset-removal/marker writes through the common UPDATE axis. Pure filters and measurements remain declarative queries; no sieve executor, control class, or ordinal law is required.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 - Exhaustive searches closed with zero unresolved source candidates. The prime search found `221/134`; the high-signal union `144/84`; exact sieve/Eratosthenes each `6/6`; all direct functions, divisibility/divisor/factor, filtering/removal, measurement, history, Index, variant, relation, and false-positive families are dispositioned in nineteen evidence groups.
 - All seven raster files/twelve plotted profiles were inspected at original resolution. Pixel classification matched all 1,200 page-147 stage cells; exact formulas, horizons, conventions, extrema, source repairs, and hashes are recorded for pages 147, 148, and 150.

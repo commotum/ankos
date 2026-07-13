@@ -681,7 +681,11 @@ Paths are dependency targets for synthesis; later evidence may consolidate modul
 - [x] Current API/runtime fit and an implementation-ready Goal 2 file/dependency/test/no-cheating handoff are complete.
 - [x] Global ledgers, exact verification commands, hashes, fence checks, coverage consistency, diff checks, and repository tests pass.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T41 is an evidenced declarative nonfit: a closed function definition provides an argument-to-value denotation but no seed or instruction to feed outputs back. Generic closed-function/query/result infrastructure stays outside rollout; T43 is derived only when iteration is explicit.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 - Exhaustive searches closed with zero unresolved source candidate. The direct-name union found `59/51`; formula literals `176/83`; crossing/rule mechanics `19/9`; all continued-fraction, Lissajous, Fourier/Gibbs/Weierstrass, zeta/Riemann-Siegel, music, quasiperiodic, actual-Index, history, evaluation, relation, and false-positive families are dispositioned in eighteen excerpt groups.
 - All four strict and eight supplementary rasters were inspected at original resolution. Their byte sizes, dimensions, formulas, parameters, windows or explicit uncertainty, and SHA-256 hashes are recorded. The broken monolith image links, 15-page filename offset, unspecified sampling, unlabeled observer conventions, and `a=0` approximation are explicit.

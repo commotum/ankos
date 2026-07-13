@@ -609,6 +609,10 @@ This is not empty interface unification: assignment update preserves old loci; p
 - [x] Goal 2 implementation/conformance handoff is implementation-ready.
 - [x] Global ledgers and plan are reintegrated and all verification checks pass.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T13 requires an ordered block-replacement UPDATE policy because native rules such as `a -> aa` change support in one event. That is a typed UPDATE-axis extension inside the common runner, not a substitution executor or a separate top-level algebra; the corrected handoff above governs.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 T13 is complete with zero unresolved evidence candidates. It forces the first principled split in update algebra. The shared transition shell remains useful, but fixed-locus `Assign` cannot express ordered replacement: `ParallelReplaceConcat` consumes every old occurrence exactly once and creates the next support by source-order concatenation of typed nonempty words. Finite canonical evolution, explicit infinite-sequence support/cuts, ragged trace, lineage, stochastic/rule-stream variants, and rendering are separated. T01/T09/T12 remain valid fixed-support members and no prior stage is reopened. Next: T16 Sequential Substitution Systems.

@@ -1255,7 +1255,11 @@ Reject:
 - [x] T01/totalistic/T43/additive/coupled/probabilistic/T45 boundaries and reuse are explicit.
 - [x] Current API/runtime fit, Goal 2 files/dependencies/tests, global ledgers, diff checks, and repository tests are integrated.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T44 is the CA preset of the common runner with a continuous-valued ALPHABET and factorized aggregate/map RULE representation. Its DOMAIN remains a discrete `t+1D` lattice and it directly reuses snapshot-parallel UPDATE; no continuous-CA executor or field class is required.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 T44 is complete. The literal 21-query search oracle reproduces all occurrence/line counts; every direct, abbreviated, alias, program, formula, parameter, history, application, stochastic, complex, PDE, and Index candidate was inspected and resolved into 25 evidence groups with zero open textual candidate. The strict construction is a total `[0,1]` field on a fixed ordered one-dimensional lattice, read synchronously at left/self/right, passed through a closed affine aggregate and scalar map, returned as same-site `Assign`, and committed through T01's existing atomic fixed-effects update. No control, hidden history, family dispatch, callback, float alphabet, or eleventh update law is introduced.
 

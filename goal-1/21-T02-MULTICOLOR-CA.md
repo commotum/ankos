@@ -996,7 +996,11 @@ The discrete-Voronoi, mutation, reversible, doubling-search, inverse-range, and 
 - [x] Goal 2 files/dependencies/tests and no-cheating gates are implementation-ready.
 - [x] Global plan/evidence/design ledgers, independent review, diff checks, and repository tests are integrated.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T02 is the arbitrary finite-ALPHABET/complete-table parameterization of T01's CA preset. Tagged and product labels are valid alphabet schemas, and exact table/code mappings preserve their roles; no multicolor executor or family branch is required.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 Complete. The exact 29-query oracle partitions all 157 candidate lines with no remainder, and E1-E21 preserve every unique construction-relevant strict, Notes, actual-Index, split, variant, implementation, property, search, and emulation passage. All 48 quoted fragments match the canonical monolith after presentation-only quote/whitespace normalization; the 34-line source oracle and all cited `BOOK:` bounds pass. Official PDFs repair only the visibly damaged positional weights, digit-count exponent, invocations, and inverse-rule labels; normalized repairs are never passed off as local quotations.
 

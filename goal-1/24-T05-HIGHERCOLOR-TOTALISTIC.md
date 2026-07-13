@@ -947,7 +947,11 @@ direct_property_links= (9164, 19236, 19238) direct_exact_cell_goldens= 0
 - [x] Current API/runtime fit and a concrete Goal 2 preset/conformance stage are implementation-ready.
 - [x] Global ledgers, independent review, embedded checks, coverage/diff gates, and repository tests pass.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T05 is the strict finite `k>=4,r=1` preset over T03's factorized local RULE representation and T01's CA UPDATE. It adds no semantic class, executor, or UPDATE policy; evidence and all conformance fixtures remain closed.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 COMPLETE after a zero-remainder audit and independent re-review.
 

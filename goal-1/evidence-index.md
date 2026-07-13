@@ -7,7 +7,7 @@ This ledger is the authoritative coverage join between `ref/notes/CA-Types.csv`,
 - `PENDING`: the type stage has not begun.
 - `IN PROGRESS`: the stage file exists but at least one completion requirement remains unproved.
 - `REOPENED`: later evidence invalidated a completed conclusion and the stage must be re-derived.
-- `EVIDENCE CLOSED / ARCHITECTURE REOPENED`: searches/excerpts/fixtures remain complete, but API/runner/Goal 2 conclusions are being rederived; this does not count as globally complete.
+- `EVIDENCE CLOSED / ARCHITECTURE REOPENED`: historical status used while the first-principles architecture audit was active; no stage remains in this state after audit closure.
 - `COMPLETE`: every candidate match is resolved, all unique construction-relevant excerpts are recorded, the construction and variants are reconstructed, API/runtime/principles fits are audited, the Goal 2 handoff is implementation-ready, and global integration is current.
 
 Only `COMPLETE` counts toward the 45-type coverage total. A search hit, a taxonomy summary, or a plausible API fit never changes status by itself.
@@ -25,7 +25,7 @@ Each type stage must make the following auditable:
 
 ## Catalog Coverage
 
-Architecture-status override: every row currently shown `COMPLETE` is `EVIDENCE CLOSED / ARCHITECTURE REOPENED` until the mandatory matrix in `architecture-audit.md` is reclosed. T03/T04 additionally retain their explicit asset reopenings. The detailed row text remains the evidence-closure record, not an assertion that its former architecture survives.
+Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture. T03/T04 remain reopened only for their bounded asset repairs.
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
@@ -37,10 +37,10 @@ Architecture-status override: every row currently shown `COMPLETE` is `EVIDENCE 
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | IN PROGRESS | Exact blank/white-background, invariant-state, rule-predicate, asset, API, and runtime audit active |
 | T07 | 8 | Left-Right Symmetric Cellular Automata | 7 | `26-T07-SYMMETRIC.md` | PENDING | Not started |
 | T08 | 9 | Initial-Condition Classes | 8 | `27-T08-INITIAL-CONDITIONS.md` | PENDING | Not started |
-| T09 | 10 | Mobile Automata | 9 | `3-T09-MOBILE.md` | REOPENED | Evidence closure remains complete; D009-D014 and the required separate-control/head-packing conclusions are under representation-architecture audit |
+| T09 | 10 | Mobile Automata | 9 | `3-T09-MOBILE.md` | COMPLETE | Evidence and architecture reclosed: `Plain(bit) | Active(bit)`, exactly-one invariant, firing-source frontier, radius-one native read, typed two-write lowering, atomic UPDATE, and compact 65,536-rule identity; no control class or family executor |
 | T10 | 11 | Extended Mobile Automata | 10 | `28-T10-EXTENDED-MOBILE.md` | PENDING | Not started |
 | T11 | 12 | Generalized Mobile Automata | 11 | `29-T11-GENERALIZED-MOBILE.md` | PENDING | Not started |
-| T12 | 13 | Turing Machines | 12 | `4-T12-TURING.md` | REOPENED | Evidence closure remains complete; the `SingleControl`/`TransitionControl` requirement and composite-alphabet alternative are under representation-architecture audit |
+| T12 | 13 | Turing Machines | 12 | `4-T12-TURING.md` | COMPLETE | Evidence and architecture reclosed: `Plain(symbol) | Head(q,symbol)`, exactly-one invariant, source decision plus destination-preservation access, typed two-write lowering, atomic UPDATE, compact `(2sk)^(sk)` rules, and explicit outcomes; no control class or family executor |
 | T13 | 14 | Neighbor-Independent Substitution Systems | 13 | `5-T13-PARALLEL-SUBSTITUTION.md` | COMPLETE | 288 direct-name lines plus definition/replacement/alias/Notes/Index/split/rendering/growth/infinite/stochastic/emulation candidates dispositioned; 26 excerpt groups; 0 unresolved |
 | T14 | 15 | Neighbor-Dependent Substitution Systems | 14 | `30-T14-CONTEXTUAL-SUBSTITUTION.md` | PENDING | Not started |
 | T15 | 16 | Creation-Destruction Substitution Systems | 15 | `31-T15-CREATION-DESTRUCTION.md` | PENDING | Not started |
@@ -78,10 +78,10 @@ Architecture-status override: every row currently shown `COMPLETE` is `EVIDENCE 
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages globally complete: 0 / 45 while the mandatory architecture audit is open.
-- Type stages evidence-closed / architecture-reopened: 21.
-- Type stages additionally asset-reopened: 2 (T03, T04).
-- Type stages unresolved: 21 pending; T06 is paused pending architecture reclosure.
+- Type stages globally complete: 21 / 45.
+- Type stages evidence-closed / architecture-reopened: 0.
+- Type stages asset-reopened: 2 (T03, T04); their architecture is complete.
+- Type stages unresolved: 21 pending; T06 is in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
@@ -91,4 +91,4 @@ Architecture-status override: every row currently shown `COMPLETE` is `EVIDENCE 
 - T03 reopened and reclosed again during T06: retained `BOOK:18770` omitted its explicit forward network raster at `BOOK:18772`. The repaired 18-query/313-candidate and 119-asset manifest closes at `50/60/9`, its 105-link reverse join and all six checks pass, fresh independent review is clean, and all 102 tests pass; no semantic conclusion changed.
 - T04 reopened during T06: retained captions `BOOK:17431` and `BOOK:2922` explicitly govern omitted rasters `BOOK:17433` and `BOOK:2924`. The bounded source/asset/metadata/reverse-join repair and independent re-review are active; the strict T03 preset result is unchanged.
 - T03 reopened once more during the T04 repair: T04's own downstream-comparator rule proved that page-263 slice raster `BOOK:2928` belongs to the inherited two-dimensional totalistic gallery. The bounded one-control repair is active; aggregate semantics are unchanged.
-- T09 and T12 reopened before T06 continuation: D009-D014 promoted one lossless state decomposition—separate `SingleControl`/`TransitionControl`—into a required semantic abstraction and redefined `FRONTIER` away from the schema's writable-set role. `ref/notes/alphabets.md` instead explicitly supplies `CellAlphabet = TapeSymbol union (TapeSymbol x HeadState)`, and the schema already commits all writes from one old snapshot in parallel. Evidence search closure remains valid; architecture, downstream decisions, and Goal 2 handoffs are being re-derived in `architecture-audit.md`.
+- T09 and T12 reopened and reclosed before T06 continuation: D009-D014 had promoted one lossless state decomposition—separate `SingleControl`/`TransitionControl`—into a required semantic abstraction. The audit instead keeps `FRONTIER` as rule-firing sources, broadens the CA-shaped writable-target realization, and uses transparent composite labels with exactly-one invariants plus atomic typed writes. `ref/notes/alphabets.md` independently supplies the Turing composite-alphabet construction. All dependent decisions and Goal 2 handoffs were reclassified under the one branch-free SimpleProgram runner.

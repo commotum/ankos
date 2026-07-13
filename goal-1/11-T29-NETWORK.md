@@ -763,7 +763,11 @@ Completion requires:
 - [x] Current API/runtime/principles fit and T20/T27 reuse/divergence are explicit.
 - [x] Goal 2 implementation/conformance handoff and global reintegration are complete.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T29 uses a discrete graph DOMAIN/topology, vertex firing loci, port-path/reach access, typed fresh/direct graph writes, and graph UPDATE in the common runner. Fresh identity and incidence justify the UPDATE policy, not a network executor; only the unresolved sequential schedule/profile remains deferred.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 T29 is complete. The direct name audit dispositioned 44 occurrences on 40 lines; the conservative family audit dispositioned 290/217, the expanded graph/network audit 1,278/654, and the executable-symbol audit 27/19. Twenty-seven canonical excerpt groups cover the main mechanics, every page-209 through page-218 figure, Notes and programs, actual Index/splits, identity/layout/dimension, fixed-network systems, constraints, causal/multiway/grammar/mobile relations, random seeds, and history. Zero parallel-mechanics candidates remain.
 

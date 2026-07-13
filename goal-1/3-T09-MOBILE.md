@@ -504,7 +504,11 @@ The current full-state formula callback is not a valid fallback: T09 has a finit
 - [ ] Goal 2 handoff is revised around a lossless composite state, exactly-one invariant, and structural atomic lowering.
 - [ ] Global ledgers and all dependent decisions are re-integrated and independently verified.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T09 uses `Plain(bit) | Active(bit)` with an exactly-one invariant, a firing-source frontier, the native radius-one read, exact source/destination writes, and atomic UPDATE in the common runner. The commuting map, compact rule identity, and revised Goal 2 handoff above replace the historical separate-control conclusion.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 **Reopened:** the evidence, native mobile rule, and source-frontier semantics remain valid, but the separate-control architecture is withdrawn pending `architecture-audit.md`. Neither visibility nor atomicity requires a `SingleControl` class; a unique tagged active cell supplies the firing locus and complete state.
 

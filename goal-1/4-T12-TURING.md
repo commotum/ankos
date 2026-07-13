@@ -485,7 +485,11 @@ The historical analysis below is retained to show how the rejected separate-cont
 - [ ] Current API/runtime/test fit and T09 refinement are reclassified without presuming `SingleControl`/`TransitionControl` storage.
 - [ ] Goal 2 handoff and global reintegration are revised around the lossless composite representation and invariant.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T12 uses `Plain(symbol) | Head(q,symbol)` with an exactly-one invariant. The native source decision and destination-preservation access produce two complete writes for atomic UPDATE in the common runner; the factored tape/head view is an optional commuting projection, not a required `SingleControl`/`TransitionControl` architecture.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 **Reopened:** the Turing evidence, compact transition table, counts, tape semantics, and halt distinctions remain valid, but the required `SingleControl`/`TransitionControl` architecture and prohibition on transparent head packing are withdrawn pending `architecture-audit.md`.
 

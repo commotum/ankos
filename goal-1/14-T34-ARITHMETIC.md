@@ -679,7 +679,11 @@ Tests decode rows back to exact values, compare iterative and closed-form traces
 - [x] Current API/runtime fit and Goal 2 work are implementation-ready.
 - [x] Design ledger, evidence index, global plan, diff checks, and tests are integrated.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T34 is a `t+0D` singleton SimpleProgram with an exact numeric value carrier, singleton frontier/self access, closed unary RULE, and generic same-locus UPDATE. Numeric-carrier tags are ALPHABET/value schema, not DOMAINs, and no arithmetic executor or assignment class is required.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 T34 is complete. The direct-name union found 65 occurrences on 55 lines, conservative mechanics 27/26, focused native forms 13/12, and exact code/observer forms 6/6. Thirty excerpt groups cover the scoped main core, all seven canonical main figures, Notes figures, Notes/programs/history, actual Index/splits, exact and approximate domain boundaries, nonlocality, representations, suffix quotients, CA/substitution/counter relations, reversibility, and fast evaluation. Every candidate is classified and strict mechanics have zero unresolved gaps.
 

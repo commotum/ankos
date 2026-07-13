@@ -534,6 +534,10 @@ No Foundation stage is reopened because it committed no type algebra. Its hypoth
 - [x] Goal 2 handoff has dependencies, files, migrations, canonical examples, tests, completion evidence, and no-cheating checks.
 - [x] `0-plan.md`, `evidence-index.md`, and `design-ledger.md` are re-integrated and verified.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T01 is the fixed-lattice/all-sites/local-stencil/same-site-write/snapshot-parallel CA preset of the common branch-free SimpleProgram runner. Its evidence, codecs, trajectories, and runtime defects remain closed; the corrected architecture and Goal 2 handoff above supersede any earlier claim that this preset bounds the library abstraction.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 T01 is complete with zero unresolved evidence candidates. It validates the first substantive shared transition algebra: fixed regular support, all-site ordered current-snapshot reads, an explicit finite table, typed same-site assignment, and atomic parallel update. It also disproves three current-runtime assumptions: finite `shape` cannot simultaneously mean native support, computation extent, and trace extent; ordered selector values cannot silently define rule-number digit significance; and a family-dispatched spatial lookup is not a generic executor. The implementation handoff uses a strict preset over shared semantics, exact causal-window lowering, and asymmetric independent oracles. No earlier type stage was reopened. Next in adversarial execution order: T09 Mobile Automata.

@@ -601,7 +601,11 @@ Completion requires:
 - [x] Principle 0 and every no-cheating pressure are audited.
 - [x] Goal 2 implementation/conformance handoff and global reintegration are complete.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T20 uses a discrete recursive-tree DOMAIN/topology, typed match loci and structural access, closed pattern/template RULE data, and a prefix-free tree UPDATE policy inside the common runner. Transparent structured values are native; opaque host evaluation and a symbolic executor remain rejected.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 T20 is complete. The conservative combined search dispositioned 272 direct/alias occurrences on 166 lines; the exact-name audit independently closed all 73 occurrences on 60 lines. Twenty-four canonical evidence groups cover the core, all figures/captions, Notes, actual Index routes, representations, combinators, operator evolution, order/confluence, fixed-point properties, and compiler boundaries with zero unresolved native-mechanics candidates.
 

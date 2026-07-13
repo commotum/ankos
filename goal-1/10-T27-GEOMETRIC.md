@@ -584,7 +584,11 @@ Completion requires:
 - [x] Current API/runtime/principles fit and T13/T20 reuse/divergence are explicit.
 - [x] Goal 2 implementation/conformance handoff and global reintegration are complete.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T27 uses the common runner with geometric support/value schemas, all-occurrence firing, parent-local pose access, and a multiplicity-preserving bag UPDATE policy. Geometry and pose are transparent typed structure; no geometric executor is required.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 T27 is complete. The conservative core regex dispositioned 46 occurrences on 37 lines, while the expanded alias/observer family audit dispositioned 129 occurrences on 88 lines. Eighteen canonical groups cover all main mechanics, original figures, Notes, actual Index/splits, exact and approximate affine rules, overlap, orientation, complex/IFS variants, dimensions, history, limits, and relations. Page-191(d) and other image-only facts were recovered from primary figure sources. Zero native-mechanics candidates remain.
 

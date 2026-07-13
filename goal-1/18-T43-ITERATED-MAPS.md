@@ -855,7 +855,11 @@ Reject:
 - [x] Current API/runtime fit and the Goal 2 files/dependencies/test handoff are explicit.
 - [x] Global ledgers, diff checks, Markdown checks, coverage count, and repository tests are integrated.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T43 directly reuses T34's `t+0D` singleton frontier, self access, generic same-locus write, and atomic UPDATE with a real/represented value carrier and closed unary map. Numeric realizations are explicit profiles; no map assignment class or iterated-map executor is required.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 The direct map/mapping search found 106 occurrences on 89 lines, the controlled iteration union 214/155, and the high-signal map/chaos/precision/analysis union 332/210. Nineteen evidence groups disposition the strict main, native Notes, clean and line-oriented splits, actual Index, history, aliases, programs, precision profiles, analyzers, every followed relation, and every false positive. Zero textual or raster candidate remains unresolved.
 

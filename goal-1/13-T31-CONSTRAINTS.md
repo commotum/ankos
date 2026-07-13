@@ -632,7 +632,11 @@ Completion requires:
 - [x] Current API/runtime/principles fit and transition-executor split explicit.
 - [x] Goal 2 implementation/conformance handoff and global reintegration complete.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T31 is an evidenced declarative nonfit: a model set supplies no canonical seed, firing locus, or successor, and any repair schedule would invent behavior. It reuses generic relation/query/certificate infrastructure outside rollout rather than receiving a construction-specific executor.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 T31 is complete. The direct-name union dispositioned 29 occurrences on 27 lines, the conservative family query 162/134, the expanded audit 815/415, and bare `constraint(s)` 467/312. Twenty-eight canonical groups cover strict count mechanics, every page-225/page-226/page-227 figure, Notes, actual Index/splits, external search/repair, allowed blocks/de Bruijn analysis, CA/ground-state/tiling/network/equation relations, complexity/history, T32/T33 boundaries, and no-initial-condition evidence. All 27 direct-hit lines are individually classified; zero strict mechanics remain unresolved.
 

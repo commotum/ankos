@@ -1,6 +1,6 @@
 # Goal 1 Design Ledger
 
-This is the evolving architecture record for Goal 1. It inventories observed semantics, current implementation mechanisms, evidence-backed decisions, hypotheses, rejected shortcuts, and integration consequences. It does not prescribe a universal executor in advance.
+This is the evolving architecture record for Goal 1. It inventories observed semantics, current implementation mechanisms, evidence-backed decisions, hypotheses, rejected shortcuts, and integration consequences. The completed architecture audit now establishes one branch-free runner for step/rewrite systems; declarative categories without canonical evolution remain outside rollout.
 
 ## Decision Rules
 
@@ -35,7 +35,7 @@ DOMAIN/support/topology, ALPHABET/value schema, FRONTIER, NEIGHBORHOOD, RULE res
 
 The audit retires required top-level `SingleControl`, `TransitionControl`, `ArithmeticAssignment`, `MapAssignment`, and construction-named executor/state classes. Visible heads, active markers, counters, and cursors remain semantic roles, represented losslessly by tags, products, markers, or structural fields. Constraint/model sets, uniterated functions, and general PDE relations without a specified evolution problem remain declarative nonfits; multiway rewriting stays inside the runner through set-valued successors.
 
-The decision text and construction rows below retain their evidence bases and historical derivations. Wherever a status/consequence conflicts with the complete matrix in `architecture-audit.md`, that matrix supersedes it until the row is rewritten during its architecture reclosure.
+The decision text and construction rows below retain their evidence bases and historical derivations. Wherever historical wording conflicts with the complete matrix in `architecture-audit.md`, that matrix and its stage-disposition table permanently supersede it.
 
 ## Construction Record Schema
 
@@ -52,7 +52,9 @@ Every completed type will update the relevant rows below and record:
 - observables distinct from program state;
 - current API/runtime fit, evidence provenance, and Goal 2 dependencies.
 
-## Evidence-Closed Construction Records (Architecture Reopened)
+## Historical Evidence-Closed Construction Records (Superseded Architecture)
+
+These rows preserve the pre-audit derivation and evidence inventory. The current construction classification and Goal 2 obligation for every row are the authoritative stage-disposition entries in `architecture-audit.md`; names such as `SingleControl`, ordinal update laws, and family-shaped state classes below are not current requirements.
 
 | Type | State | Active/read/rule | Result/update | Successor and boundaries | Goal 2 obligation |
 |---|---|---|---|---|---|
@@ -150,11 +152,11 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 ## Decision Log
 
-### D000 — No construction algebra selected at Foundation
+### D000 — Foundation defers, and the completed audit establishes, the common algebra
 
-- Status: ACTIVE.
+- Status: ACTIVE after architecture reclosure.
 - Basis: `principles.md:3-28` and the absence of completed type evidence.
-- Consequence: `FRONTIER -> NEIGHBORHOOD -> RULE -> UPDATE` remains a candidate for transition/rewrite systems, not a universal conclusion.
+- Consequence: evidence through T45 establishes the branch-free `FRONTIER -> NEIGHBORHOOD -> RULE -> UPDATE` SimpleProgram runner for transition/rewrite systems. Constraint/model sets, uniterated function definitions, and general PDE relations without a posed evolution remain evidenced nonfits rather than receiving fabricated steps.
 
 ### D001 — Preserve semantic categories in analysis
 
@@ -289,7 +291,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: T16 must scan the whole word for clause 0 before trying clause 1, and choose that clause's leftmost match (`BOOK:1062-1078`, `12289`). A source interval cannot be selected without the ordered left sides.
 - Consequence: refine the source-first shell to `SOURCE.select(state, program.applicability)`. `FirstApplicableMatch` and result lookup consume one authoritative immutable `OrderedLiteralRewriteProgram`; no second LHS table, matcher callback, or claim of independent frontier/rule composition is allowed. T01/T09/T12/T13 remain program-independent special cases and are not reopened.
 
-### D023 — Single interval splice is a distinct ordered update law
+### D023 — Single interval splice is an exactly-one ordered UPDATE schedule
 
 - Status: ACTIVE as a restriction of the ordered-replacement UPDATE axis; former separate-law framing retired.
 - Basis: exactly one matched block is replaced per step while its prefix/suffix remain in order (`BOOK:1062-1068`, `2358`, `5936-5940`). T13 instead consumes every old occurrence and concatenates all child blocks.
@@ -313,7 +315,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: Wolfram selects from and deletes the full leading `n` (`BOOK:1112`, `12296-12305`); Post selects by only the first element while deleting `n`, and Wang lag systems inspect more than the first while deleting one (`:12311-12313`).
 - Consequence: represent an immutable `PrefixQueueProgram(q,d,total Sigma^q->Sigma*)` with positive typed widths. `RequiredQueuePrefix` exposes separate read/consume spans and exact occurrence IDs. Strict `tag_system(n,table)` constructs `q=d=n`; Post/Wang restrictions are structured data, not booleans, widened neighborhoods, callbacks, or executor modes.
 
-### D027 — Prefix consumption plus remote tail append is a distinct atomic update law
+### D027 — Prefix consumption plus remote tail append is an anchored ordered UPDATE policy
 
 - Status: ACTIVE as an anchored ordered-replacement UPDATE policy; former separate-law framing retired.
 - Basis: tag systems remove the beginning and tag the selected block onto the end (`BOOK:1112`, `1124`, `1132`); executable order is `Join[Drop[word,n],appendant]` (`:12300-12306`). For canonical `01->10`, `011` becomes `110`, whereas a T16 front splice would produce `101`.
@@ -385,7 +387,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: each step scans functional notation once left to right, applies wherever possible, and avoids overlap; `NestList[# /. rule&,init,t]` fixes one-pass timing (`BOOK:1224`, `12407`, `12466`). Figure boxes and the exact trajectory establish head eligibility, disjoint coverage, ancestor suppression, and newborn deferral.
 - Consequence: use program-coupled outermost preorder selection: try clauses in order at a node, prune descendants of the first match, then continue head/arguments left to right. Every selected path and binding is snapshot-scoped. Bottom-up, rule-major, first-only, overlapping, unordered, in-place, or same-pass-rescan execution is a different construction.
 
-### D039 — Prefix-free parallel subtree replacement is a fifth update law
+### D039 — Prefix-free parallel subtree replacement is a tree UPDATE strategy
 
 - Status: ACTIVE as a tree-topology UPDATE strategy; former ordinal-law framing retired.
 - Basis: one pass can consume several disjoint subtrees, preserve surrounding context, duplicate/delete/rearrange whole bound subtrees, and atomically produce one tree (`BOOK:1222-1224`, `12456`, `18924-18930`).
@@ -409,7 +411,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: the page-204 orientation arrow and primary rule diagrams require local child placement. The exact page-189/page-190 Notes formulas admit rational matrices with `A'=A_parent A_child` and `b'=A_parent b_child+b_parent`; a rotated/translated adversary distinguishes `P∘C` from `C∘P`. Page-191 also contains source-declared approximate coefficients.
 - Consequence: total prototype rows contain closed local affine child templates and stable slot IDs. Composition is `parent_pose∘local_pose` over normalized exact rationals/algebraics or an explicitly separate finite-precision profile with literal, precision, and rounding provenance. No world-coordinate transform callback, silent float coercion, tolerance equality, or fabricated exactification is allowed.
 
-### D043 — Full-generation occurrence-bag replacement is a sixth update law
+### D043 — Full-generation occurrence-bag replacement is a bag-composition UPDATE strategy
 
 - Status: ACTIVE as a bag-composition UPDATE strategy; former ordinal-law framing retired.
 - Basis: every old square is replaced once by all of its local children; parents disappear, newborns wait, descendants coexist through overlap, and duplicate/coincident branches retain multiplicity (`BOOK:2326-2354`, `13760-13762`).
@@ -437,7 +439,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE for T29.
 - Basis: page-214 rules follow written labeled paths, while `Follow` and `NeighborNumbers` evaluate them against one old graph and compute exact-length endpoint-set cardinalities (`BOOK:2424-2484`, `13814-13887`).
-- Consequence: use finite `PortWord` data, `PortPathRead`, and declared `ExactLengthReachCounts` key domains. Epsilon is self; words fold left-to-right. No traversal callback, reversed codec, cumulative ball substitution, or synthesized generic-depth domain/count is allowed.
+- Consequence: use finite `PortWord` data, `PortPathRead`, and declared `ExactLengthReachCounts` key sets. Epsilon is self; words fold left-to-right. No traversal callback, reversed codec, cumulative ball substitution, or synthesized generic-depth key/count is allowed.
 
 ### D048 — Fresh graph vertices are typed result occurrences
 
@@ -445,7 +447,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: page-215 inserts one new node from every old node, and the Notes allocator appends distinct new nodes whose outgoing links resolve through old paths (`BOOK:2452-2464`, `13848-13872`).
 - Consequence: `NodePortRewrite` contains two `DirectOld(path) | InsertFresh(a,b)` expressions. Each syntactic insertion occurrence creates a distinct event-local token; equal descriptors never alias. Fresh targets are old endpoints, tokens are not rule data, and newborns do not fire.
 
-### D049 — Parallel graph reroute/create/project is a seventh update law
+### D049 — Parallel graph reroute/create/project is a graph UPDATE strategy
 
 - Status: ACTIVE as a justified graph UPDATE-axis extension; former ordinal-law framing retired.
 - Basis: every old node is rewritten from one old snapshot; old nodes persist in the raw successor, fresh nodes are installed, then `ConnectedNodes`/`RenumberNodes` retain directed reachability from node 1 (`BOOK:2440-2464`, `13848-13872`).
@@ -461,9 +463,9 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE evidence practice.
 - Basis: the sequential Notes and official CDF give six `{rewrite,move_port}` rows and a node-count figure evidences pruning, but no evaluator fixes old-versus-committed movement, projection anchor, or movement/projection order (`BOOK:13889-13903`).
-- Consequence: parallel T29 remains complete, but Goal 2 must mark the sequential executor unavailable pending decisive primary evidence. Do not silently inherit node-1 projection, choose a timing, expose both as flags, or treat figure layout as an oracle.
+- Consequence: parallel T29 remains complete, but Goal 2 must mark the sequential FRONTIER/schedule/profile unavailable pending decisive primary evidence. Do not silently inherit node-1 projection, choose a timing, expose both as flags, or treat figure layout as an oracle.
 
-### D052 — A base multiway layer is an exact finite set of words
+### D052 — A base multiway configuration is one word; layers are explicit finite-set lifts
 
 - Status: REVISED by the architecture audit.
 - Basis: the main definition retains all **distinct** sequences, and executable `MWStep` applies `Union` to all generated strings (`BOOK:2494-2510`, `13921-13938`).
@@ -475,7 +477,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: `StringPosition` enumerates every occurrence of each LHS in every old string, and `StringReplacePart` produces one result per position (`BOOK:13921-13948`); Chapter 9 describes paths as sequences of single replacements (`6016-6022`).
 - Consequence: add program-coupled `AllApplicableLiteralMatches` and reuse T16's pure matched-span/one-splice kernel per branch. Matches include overlaps, are alternatives rather than simultaneous edits, and newborns wait. T16 priority/leftmost selection and host pattern callbacks are not reused.
 
-### D054 — Exact distinct-child branch merge is an eighth update law
+### D054 — Multiway UPDATE returns an exact finite successor set
 
 - Status: ACTIVE as the generic successor-set lift; former ordinal-law framing retired.
 - Basis: `MWStep` maps all rules/parents and `Union`s exact targets; the Notes call merging crucial and explicitly erase derivation multiplicity in pictures (`BOOK:13923-13938`, `13959-13961`).
@@ -545,7 +547,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE for T34 and shared numeric infrastructure.
 - Basis: canonical integer powers/addition and exact rational powers of `3/2` are stated directly, while the Notes distinguish real/finite representations and their limitations (`BOOK:1479-1495`, `12503-12536`, `13217-13247`).
-- Consequence: initial Goal 2 support is arbitrary-precision signed integers and normalized rationals; domain tags participate in identity, while cross-domain numeric equivalence is an observer. Serialize big integer components as decimal strings. Certified-real and declared-precision profiles are separate; reject implicit promotion, booleans/floats, tolerance equality, undeclared rounding, or exact-to-approximate coercion.
+- Consequence: initial Goal 2 support is arbitrary-precision signed integers and normalized rationals; numeric-carrier tags participate in identity, while cross-carrier numeric equivalence is an observer. Serialize big integer components as decimal strings. Certified-real and declared-precision profiles are separate; reject implicit promotion, booleans/floats, tolerance equality, undeclared rounding, or exact-to-approximate coercion.
 
 ### D066 — Arithmetic scalar assignment reuses fixed typed effects
 
@@ -575,15 +577,15 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE for T37 and a required starting point for T38.
 - Basis: the source names stable terms `f[1],f[2],...`, computes `f[n]` from earlier terms, and presents the accumulated sequence (`BOOK:1555-1567`).
-- Consequence: add `NumericPrefix(domain,origin,terms)` with consecutive support and exact ordered values. A newest scalar, hidden trajectory history, or bounded lag window is not canonical equality. T34 remains unary scalar assignment even when its value stream matches a T37 projection.
+- Consequence: add `NumericPrefix(carrier,origin,terms)` with consecutive support and exact ordered values. A newest scalar, hidden trajectory history, or bounded lag window is not canonical equality. T34 remains unary scalar assignment even when its value stream matches a T37 projection.
 
 ### D071 — Strict T37 programs are normalized affine fixed-lag data
 
 - Status: ACTIVE for T37.
 - Basis: the main text fixes positive distances behind `n`, and the Notes explicitly classify every page-128 row as linear (`BOOK:1561-1567`, `12690`). Factorial is separately named nonlinear evidence (`12692-12696`).
-- Consequence: strict programs are `bias + sum(coefficient[lag]*f[n-lag])` with unique positive literal lags and exact number-system values. Fresh seed length equals `max_lag`; longer resumptions are replay-verified checkpoints. A named closed `Literal|TargetIndex|Lag|Neg|Add|Sub|Mul` extension covers factorial after strict conformance; callbacks, computed indices, branches, and arbitrary recursion remain excluded.
+- Consequence: strict programs are `bias + sum(coefficient[lag]*f[n-lag])` with unique positive literal lags and exact numeric-carrier values. Fresh seed length equals `max_lag`; longer resumptions are replay-verified checkpoints. A named closed `Literal|TargetIndex|Lag|Neg|Add|Sub|Mul` extension covers factorial after strict conformance; callbacks, computed indices, branches, and arbitrary recursion remain excluded.
 
-### D072 — One-term persistent append is the ninth update law
+### D072 — One-term persistent append is an endpoint-insertion UPDATE preset
 
 - Status: ACTIVE as an endpoint-insertion UPDATE policy; former ordinal-law framing retired.
 - Basis: each step determines the next indexed term from the old sequence while every earlier term persists (`BOOK:1559-1567`).
@@ -605,7 +607,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE boundary across T37/T38/T39/T43 and numeric infrastructure.
 - Basis: characteristic equations and Fibonacci formulas are derived evaluators; logistic is explicitly an iterated-map relation; generalized Fibonacci RNGs add modulus; Ulam searches all previous pairs for the next candidate (`BOOK:12146-12163`, `12698-12702`, `15049-15053`, `12840-12844`).
-- Consequence: closed forms/matrices/generating functions/memoization do not change requested append traces. Modular AR2 is a residue-domain variant, not exact T37. T39 resolves Ulam as `FirstAcceptedAscendingCandidate` over the complete old prefix followed by the existing T37 append; it is not hidden in the fixed-lag AST and does not reopen T37 state/update semantics.
+- Consequence: closed forms/matrices/generating functions/memoization do not change requested append traces. Modular AR2 uses a residue-ring value carrier, not exact T37. T39 resolves Ulam as `FirstAcceptedAscendingCandidate` over the complete old prefix followed by the existing T37 append; it is not hidden in the fixed-lag AST and does not reopen T37 state/update semantics.
 
 ### D076 — T39 splits transition sieves from pure filters and measurements
 
@@ -617,15 +619,15 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE for T39 strict execution.
 - Basis: the prose advances from divisor 2 to 3 “and so on,” and the page-147 raster labels every row `2..13`, including composite stages with zero new removals (`BOOK:1623-1627`). All 1,200 cells match the proper-multiple rule.
-- Consequence: `SuccessiveDivisibilitySieveProgram` has `ConsecutiveIntegers(first=2)` and finite/intensional state includes `next_divisor`. Hits are all original-domain proper multiples, while `newly_removed=hits intersect old_survivors`. Equal survivor sets at different cursors are unequal states; a zero-removal composite row is still `Advanced(changed=false)` because the cursor advances. Prime-pivot scheduling is an explicit trace-distinct variant.
+- Consequence: `SuccessiveDivisibilitySieveProgram` has `ConsecutiveIntegers(first=2)` and finite/intensional state includes a `next_divisor` marker. Hits are all original-support proper multiples, while `newly_removed=hits intersect old_survivors`. Equal survivor sets at different markers are unequal states; a zero-removal composite row is still `Advanced(changed=false)` because the marker advances. Prime-pivot scheduling is an explicit trace-distinct variant.
 
-### D078 — Monotone candidate-subset removal is the tenth update law
+### D078 — Monotone candidate-subset removal is a subset/marker UPDATE policy
 
 - Status: ACTIVE as a typed subset-removal/marker UPDATE policy; former ordinal-law framing retired.
 - Basis: each stage deletes a possibly noncontiguous survivor subset, never resurrects a removed value, and preserves every retained integer's identity and increasing order (`BOOK:1623-1627`; exact page-147 masks).
 - Consequence: RULE returns typed survivor removals and the next-stage marker write; the shared UPDATE commits them atomically. Validate exact old-snapshot witnesses, subset membership, cursor advance, no resurrection, and retained identity/order. A mask is only a realization; no sieve executor or tenth top-level law is introduced.
 
-### D079 — Literal display, mathematical domain, certification, and completion are explicit scopes
+### D079 — Literal display, candidate support, certification, and completion are explicit scopes
 
 - Status: ACTIVE for T39 and finite/infinite execution policy.
 - Basis: the caption starts with `1..100`, but the rule and raster retain `1` while bottom labels omit it; rows continue through 13 even though a bound-100 primality certificate is available after divisor 10 (`BOOK:1627`; original raster).
@@ -641,7 +643,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE across T37/T39.
 - Basis: the Ulam Note starts `(1,2)`, appends the smallest value having one representation as a sum of two previous values, and supplies `1,2,3,4,6,...` (`BOOK:12840-12844`). The value 3 rejects ordered-pair double counting; value 4 rejects self-pairs; advancement past 3 rejects rescanning emitted values.
-- Consequence: add `FirstAcceptedAscendingCandidate(start=last(prefix)+1,predicate,explicit_context)` with `UniqueUnorderedDistinctPriorPairSum` over indices `i<j` in the complete old prefix. Candidate checks form a nested selection witness; only the accepted value is T37 `AppendTerm`. Pair-sum tables are reproducible caches, not semantic state. T37's ninth update law and fixed-lag boundary remain unchanged.
+- Consequence: add `FirstAcceptedAscendingCandidate(start=last(prefix)+1,predicate,explicit_context)` with `UniqueUnorderedDistinctPriorPairSum` over indices `i<j` in the complete old prefix. Candidate checks form a nested selection witness; only the accepted value is a T37 endpoint insertion. Pair-sum tables are reproducible caches, not semantic state. T37's full-prefix state and fixed-lag boundary remain unchanged.
 
 ### D082 — T41 mathematical functions are immutable closed definitions outside transition execution
 
@@ -649,7 +651,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: the source asks about “functions themselves,” plots their curves, and describes finite arithmetic combinations without any update/evolution language (`BOOK:1834-1848`). Supporting Notes explicitly identify named mathematical functions as accepted primitives in formulas (`BOOK:17794-17798`).
 - Consequence: use a generic versioned closed-function definition plus query/result records declaring argument space/definition set, codomain, exact parameters, expression, primitives, partiality, and branches. It has no canonical frontier/write/update/successor. Iteration is an additional T43 SimpleProgram, not fake argument-as-time rollout.
 
-### D083 — Mathematical domain and numerical query context are separate scopes
+### D083 — Function argument set and numerical query context are separate scopes
 
 - Status: ACTIVE for T41 definition/evaluation boundaries.
 - Basis: strict rasters show finite windows while named functions have larger mathematical domains; `Tan`/`Sec` contain poles; high-precision evaluation depends on precision and algorithm (`BOOK:1838-1842`, `19185-19187`; original page-160 raster).
@@ -685,7 +687,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: the defining paragraph repeatedly updates “a number between 0 and 1” by a fixed map that returns a definite number in the same interval (`BOOK:1868-1872`). Strict figures use four unary expressions and separate exact initial conditions (`BOOK:1874-1896`; page-165 raster).
 - Consequence: use the same singleton FRONTIER/self-read/same-locus UPDATE as T34 with a real/represented value carrier, closed unary map AST, self-map invariant, and independent seed. `[0,1]` is a state/value interval, not DOMAIN; orbit prefixes, digits, counters, and hidden control stay outside configuration.
 
-### D089 — T43 reuses complete scalar assignment and adds no eleventh update law
+### D089 — T43 directly reuses generic singleton read/write/UPDATE
 
 - Status: ACTIVE reuse across T34/T43.
 - Basis: every event reads the current scalar, applies one map, and replaces it with one result; `NestList` confirms one initial snapshot plus one state per application (`BOOK:1870`, `10682-10687`).
@@ -739,7 +741,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: the strict law averages left/self/right and applies one fixed map; a later profile multiplies both neighbors by declared `1.13` before the literal division by three (`BOOK:1956`, `1982`, `2904`).
 - Consequence: add `AffineNeighborhoodAggregate(offset_weight_terms,divisor)` and `AggregateThenMap` with ordered closed scalar syntax and replayable composite range validation from the value cube to the output interval. The intermediate need not stay in `[0,1]`: exact reconstruction `{113/100,1,113/100}/3` reaches `163/150`. Never use an arbitrary reducer/map callback, a normalized `2w+1` divisor, a trusted closure flag, or implicit clamp/modulo.
 
-### D098 — T44 reuses T01 fixed-field assignment and adds no eleventh update law
+### D098 — T44 directly reuses T01 fixed-field snapshot UPDATE
 
 - Status: ACTIVE reuse across T01/T44.
 - Basis: all sites read the same old left/self/right values and assign one next value to the same site in parallel; Notes express the operation as one `Map` over old rotated lists (`BOOK:1956`, `13283-13292`).
@@ -910,7 +912,19 @@ These are globally rejected unless Principle 0 re-derivation replaces the goal i
 - conflating a constraint with a solver, a PDE with a discretization/integrator, or a stochastic law with an RNG implementation;
 - weakening tests, adding flags/shims/fallbacks, or duplicating shared primitives under family-specific names.
 
-## Integration Log
+## Architecture-Reclosed Integration Result
+
+- `architecture-audit.md` audits D000-D118 individually, assigns one primary class to each decision, and gives the smallest reusable base plus invariants and dependent-stage disposition.
+- Every evidenced transition/rewrite construction reuses one branch-free `SimpleProgram` runner. Differences are typed DOMAIN/topology, ALPHABET/value schema, FRONTIER, NEIGHBORHOOD, RULE-write, UPDATE-policy, seed, invariant, outcome, and representation choices—not catalog-family executors.
+- T09 and T12 use the commuting composite-label representations `Plain(bit) | Active(bit)` and `Plain(symbol) | Head(q,symbol)`. T19 uses an explicit marker/product role. None requires `SingleControl` or `TransitionControl`.
+- Ordered block/splice, tree, bag, graph, endpoint, subset/marker, snapshot-field, and finite-successor-set commits are implementations or presets of the UPDATE axis. Their counterexamples justify those typed policies, not ordinal top-level laws or construction executors.
+- T30's native configuration is one word and UPDATE returns `Successors[Word]`; a layer is the explicit finite-powerset lift and derivation witnesses remain separate from exact configuration deduplication.
+- T31 model sets, T41 uniterated function definitions, and T45 differential relations without a posed evolution are the three evidenced declarative nonfits. No fake seed/frontier/update is invented. A well-posed derived evolution may return to the common runner through an explicit relation.
+- The corrected stage addenda and Goal 2 handoffs supersede the historical integration entries below. T03/T04 remain reopened solely for bounded evidence-asset repairs; T06 resumes after this architecture closure.
+
+## Historical Integration Log (Superseded by Architecture Audit)
+
+The entries below preserve what each evidence stage originally concluded. Their search closure, excerpts, fixtures, and source repairs remain evidence; their class names, ordinal update-law inventory, and executor implications are not current architecture.
 
 - `1-FOUNDATION` — COMPLETE: established the catalog join, source/runtime/test baseline, fit labels, unresolved semantic dimensions, and global rejection criteria. No type evidence or construction primitive was declared complete.
 - `2-T01-ELEMENTARY` — COMPLETE: validated fixed-lattice synchronous assignment, explicit Wolfram pattern codec, and the separation of native support from finite realization and trace. Found current exhaustive cardinality (`R=4` instead of 256), mirrored asymmetric bit order, and non-executable generic lookup. Added the implementation/conformance handoff without an elementary rollout branch. No prior stage reopened.

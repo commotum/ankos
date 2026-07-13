@@ -620,7 +620,11 @@ No earlier stage is reopened. T09's unit-payload active position and T12's paylo
 - [x] Current API/runtime/principles fit and T09/T12 reuse/divergence are explicit.
 - [x] Goal 2 implementation/conformance handoff and global reintegration are complete.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T19 represents the program marker and register values as explicit configuration roles. The marked instruction frontier, referenced-register access, and typed register/marker writes reuse the common atomic UPDATE; no generalized control class or register executor is required.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 All 129 direct occurrences on 94 lines, 135 direct/alias occurrences on 95 lines, the complete mechanism, figures, Notes, actual Index and split-file duplicates, instruction/count/seed/end/halting searches, observers, history, native variants, universality routes, compilers, and reductions were dispositioned with zero unresolved native-mechanics candidates and 25 canonical excerpt groups. Two local Notes truncations were repaired narrowly from official primary pages and guarded by main prose, exact counts, and independent execution.
 

@@ -770,7 +770,11 @@ Completion requires:
 - [x] Current API/runtime/principles fit and T13/T16/T29 reuse/divergence explicit.
 - [x] Goal 2 implementation/conformance handoff and global reintegration complete.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T30's smallest configuration is one word and UPDATE returns `Successors[Word]`. A finite layer is the explicit powerset iteration lift; exact child deduplication does not erase separately retained rewrite witnesses. Branching extends the common result type without a multiway executor.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 T30 is complete. The exact-name audit dispositioned 267 occurrences on 182 lines and the broader token audit 277/186; narrower and expanded alias/confluence audits dispositioned 352/218 and 388/224; core and extended implementation-symbol audits dispositioned 18/16 and 20/18. Twenty-five canonical groups cover the definition, every page-219 through page-224 figure, executable Notes/programs, page-952 observers, actual Index/splits, history, groups/grammars, numeric/tag/structural variants, spacetime/causal graphs, confluence/completion, proof search, and relations. Zero base-literal mechanics remain unresolved.
 

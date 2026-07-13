@@ -584,7 +584,11 @@ Suggested responsibility files are a shared exact-value module, `numeric_sequenc
 - [x] Current API/runtime fit and a no-family-branch Goal 2 handoff are implementation-ready.
 - [x] Design ledger, evidence index, global plan, diff checks, and repository tests are integrated.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T37 keeps the complete indexed prefix as canonical state because the fixed-lag window is noninjective. Its endpoint frontier, dependency access, typed term write, and ordered endpoint-insertion UPDATE run through the common runner; no recursive executor or ordinal update-law inventory is required.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 T37 is complete. The direct union found 48 occurrences on 42 lines, fixed-lag tokens 23/13, focused mechanics 32/20, literal recurrence programs 20/20, alias/control forms 10/10, and named saturation 160/118. Nineteen excerpt groups disposition the strict main/raster, full recursive-sequence Notes cluster, actual Index/splits, programs/history, fixed/nonlinear/modular/global-history variants, analyzers, observers, and neighboring constructions. Strict mechanics have zero unresolved search candidates.
 

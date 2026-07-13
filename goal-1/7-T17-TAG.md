@@ -685,6 +685,10 @@ T17 validates this shell only because each boundary is construction-bearing: `Re
 - [x] Goal 2 implementation/conformance handoff is implementation-ready without a family rollout, callback, capacity, padding, compiler, or fallback.
 - [x] Global ledgers and plan are reintegrated and verification checks pass.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T17 uses prefix firing/access plus an anchored consume-at-front/insert-at-old-end UPDATE policy in the common runner. Separate read/delete widths and epsilon-capable appendants are typed roles and validators, not a tag-system executor; the corrected handoff above governs.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 T17 is complete with zero unresolved evidence candidates. Wolfram's ordinary tag system is a finite ordered word plus a complete `Sigma^n -> Sigma*` table: read and delete the same leading `n`, then atomically preserve the suffix and append the chosen word. Post and Wang variants prove that generic read width and deletion number are independent, while strict presets preserve each named construction. Empty appendants are direct and widen only the private word/edit carrier; T13 and T16 retain their public nonempty laws. `ConsumePrefixAppend` plus `QueueSpliceUpdate` is a new public sibling update because T16 front replacement fails tail order, though ordered support, provenance, typed outcomes, and a validated private span-edit kernel remain shared. Operational short input has zero successors with its residue retained; the Notes short-to-empty behavior is an explicit reference projection, independently guarded by figure case (c)'s `0` at step 287 and `{}` at sample 288. Complete-table validation, canonical case (a), one-deletion/T13 checkpoints, read/delete and tail-order discriminators, and provenance/length laws make the Goal 2 handoff executable. T01/T09/T12/T13/T16 remain complete and unchanged; no stage is reopened. Focused source-reference, coverage, whitespace, and 102-test baseline verification passed. Next: T19 Register Machines.

@@ -659,6 +659,10 @@ T01/T09/T12 use program-independent fixed/control source policies; T13 uses prog
 - [x] Goal 2 implementation/conformance handoff is implementation-ready, including the T15 deletion re-audit boundary.
 - [x] Global ledgers and plan are reintegrated and all verification checks pass.
 
-## Stage Results
+## Architecture-Reclosed Stage Result
+
+**COMPLETE.** T16 is the exactly-one, rule-priority/leftmost schedule over the ordered replacement axis, with a program-coupled firing frontier and typed no-match outcome. It adds neither a family executor nor a top-level state class; the corrected handoff above governs.
+
+## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
 T16 is complete with zero unresolved evidence candidates. The nested scan is exactly rule-major then leftmost position, returns at most one snapshot-scoped interval, and restarts from clause 0 and the left edge after one splice. `FirstApplicableMatch` forces an honest refinement of the source-first shell because applicability and the ordered program are intrinsically coupled; one authoritative program supplies both matching left sides and the selected right side. `ReplaceInterval` plus `SingleSpliceUpdate` is distinct from T13's full-generation replacement, though both can reuse ordered support, provenance, and a policy-guarded private span-edit kernel. `NoMatch` is a typed zero-successor terminal outcome, while identity events, external stops, horizons, invalidity, and errors remain separate. Empty RHS is explicitly deferred to T15 evidence. The plan, evidence index, and design ledger are reintegrated; no prior stage is reopened. Focused source-reference, coverage, whitespace, and 102-test baseline verification passed. Next: T17 Tag Systems.
