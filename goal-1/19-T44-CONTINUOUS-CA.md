@@ -332,9 +332,7 @@ The second signature is extraction-corrupt; the intended patterns are evidently 
 
 > “Versions of continuous cellular automata arose in the mid-1970s as idealizations of coupled ordinary differential equations for arrays of nonlinear oscillators, and implicitly in finite difference approximations to partial differential equations.”
 
-> “so-called ‘coupled map lattices’ or ‘lattice dynamical systems’ in which an iterated map (typically a logistic map) was applied at each step to a combination of neighboring cell value.”
-
-> “Most often considered, notably by Kunihiko Kaneko and co-workers, were” these systems.
+> “Most often considered, notably by Kunihiko Kaneko and co-workers, were so-called ‘coupled map lattices’ or ‘lattice dynamical systems’ in which an iterated map (typically a logistic map) was applied at each step to a combination of neighboring cell value.”
 
 > “A transition from regular class 2 to irregular class 3 behavior, with class 4 behavior involving localized structures in between, was observed, and was studied in detail by Hugues Chaté and Paul Manneville”
 
@@ -664,8 +662,7 @@ when `|i|<=t` and `t+i` is even, and zero otherwise. For the source's interval-v
 The noisy source profile exposes a precision-sensitive range defect:
 
 ```text
-lambda(1) = 1 + Exp[-40] > 1,
-max exact reconstructed weighted aggregate = 163/150 > 1.
+lambda(1) = 1 + Exp[-40] > 1.
 ```
 
 Binary64 evaluates the first displayed sum as `1.0`, itself illustrating why implicit machine arithmetic cannot settle mathematical closure. The stochastic rule also pushes values away from `1/2`; no clamp is stated.
@@ -850,6 +847,9 @@ assets = [
 for root, name in assets:
     path = roots[root]/name
     print(path, path.stat().st_size, Image.open(path).size, sha256(path.read_bytes()).hexdigest())
+excluded = roots['MECH']/'_page_339_Figure_1.jpeg'
+print('EXCLUDED', excluded, excluded.stat().st_size, Image.open(excluded).size,
+      sha256(excluded.read_bytes()).hexdigest())
 PY
 ```
 
@@ -906,6 +906,9 @@ def evolve(width, seed, states, mode, c=Fraction(0)):
 def q8(u):
     return np.rint(255.0*(1.0-u)).astype(np.uint8)
 
+def signed_q8(u):
+    return np.rint(127.5*(1.0-u)).clip(0,255).astype(np.uint8)
+
 # Page 172 main: 151 states; wide exact field, central 203-column crop.
 g = gray(STRICT/'_page_172_Picture_1.jpeg')
 u = evolve(601,300,151,'mul32')[:,199:402]
@@ -950,6 +953,21 @@ d=np.abs(u[:,158:343]-u[:,159:344])
 obs=g[475:829,437:763]
 score('p175-c0.3299-abs-right',obs,render(q8(d),obs.shape),.990,5.0)
 
+# Same crop, declared transfers: discriminate plausible source-understated views.
+alternatives = {
+    'abs-right': (d, False),
+    'abs-left': (np.abs(u[:,158:343]-u[:,157:342]), False),
+    'mod-right': ((u[:,158:343]-u[:,159:344])%1, False),
+    'signed-right': (u[:,158:343]-u[:,159:344], True),
+    'raw-field': (u[:,158:343], False),
+}
+alt_r = {}
+for name,(values,signed) in alternatives.items():
+    expected = render(signed_q8(values) if signed else q8(values), obs.shape)
+    alt_r[name] = float(np.corrcoef(obs.ravel(), expected.ravel())[0,1])
+    print(f'p175-discriminator-{name}: r={alt_r[name]:.12f}')
+assert alt_r['abs-right'] > max(v for k,v in alt_r.items() if k != 'abs-right')
+
 # Notes page 937 top: a=n/500 columns, t=1..150 rows.
 g=gray(NOTES/'_page_937_Picture_3.jpeg')
 n=np.arange(501,dtype=np.int64)[None,:]
@@ -989,6 +1007,11 @@ p173-centers: r=0.994562593262; mae=6.603864422; shape=(30, 50)
 p174-c0.1: r=0.997868874924; mae=2.114080164; shape=(139, 280)
 p175-c0.1-state: r=0.987791869483; mae=4.398157167; shape=(355, 321)
 p175-c0.3299-abs-right: r=0.992953791832; mae=3.803447021; shape=(354, 326)
+p175-discriminator-abs-right: r=0.992953791832
+p175-discriminator-abs-left: r=0.673256323467
+p175-discriminator-mod-right: r=0.250179257169
+p175-discriminator-signed-right: r=0.002777415336
+p175-discriminator-raw-field: r=0.140263839365
 notes937-background: r=0.720128343531; mae=26.222272122; shape=(120, 501)
 notes937-additive-k2: r=0.872066279505; mae=5.039536413; shape=(77, 158)
 notes937-additive-k3: r=0.836592450795; mae=5.971395693; shape=(77, 158)
@@ -999,12 +1022,12 @@ T44 core raster oracle: PASS
 The strict geometry and exact regeneration establish:
 
 - Page 171's extraction contains only the identity map diagram. The six-row diffusion evolution survives as rounded text; exact rows come from the trinomial oracle above.
-- Page 172 contains 151 initial-inclusive states `t=0..150` over a 203-cell visible central window. Resize the exact 151x203 gray array to half-open crop `x=39:1151,y=47:874` and compare only relative rows `300:` because the insets occlude the upper main raster: `r=.993335`, MAE `5.27/255`. The independent center trace at `x=595,y=47:874` gives `r=.98958`, MAE `7.31/255`. Its inset is exactly 31 cells by 23 states `t=0..22`, seed at index 15; boundaries are rounded `linspace(805,1127,32)` and `linspace(64,304,24)`, with integer midpoint samples. Exact dyadic regeneration gives `r=.9958826436`, MAE `5.42209/255`, maximum `30.89/255`. JPEG, grid/overlay, scaling, and unstated tone transfer preclude a literal byte-for-value claim. The main computation boundary is outside the visible crop.
-- Page 173 Picture 3 has 50 visible cells by 30 initial-inclusive rows `t=0..29`, seed index 24. Center samples use rounded boundaries `linspace(29,444,51)` and `linspace(16,265,31)`. All 1,500 centers against the exact Notes ring give `r=.9945625933`, MAE `6.60386/255`, maximum `40.45/255`. A wide integer-line crop gives the same 8-bit/JPEG result: the two differ only in 25 cells at `t>=25`, by at most `5.32e-10`. The raster therefore does not establish a boundary. Picture 4 places the map discontinuity at `x=3/4`.
-- Page 174 contains 21 row-major labeled rules whose mathematical constants are `c=n/40`, `n=0..20`, displayed `0,.025,...,.5`. Each panel shows 101 cells by 51 states `t=0..50` from the point seed. The representative `c=1/10` exact-rational reconstruction, bilinearly resized to `x=413:693,y=259:398`, gives `r=.99787`, MAE `2.11/255`; its center at `x=552` gives `r=.99196`, MAE `5.18/255`. This matches geometry/appearance but does not establish the source's numeric storage. The mathematical background is `FractionalPart[t c]`.
-- Page 175 labels `c={.1,.3,.325,.3299,.3299 differences,.35,.475,.495,.9}`. Each panel shows 201 states `t=0..200` over a resampled central crop of about 184-185 cells. The `c=1/10` exact-rational field reconstruction on 184 columns against `x=63:384,y=69:424` gives `r=.98779`, MAE `4.40/255`. The duplicate declared-decimal `.3299` entries are one trajectory and an adjacent absolute-right-difference observer: 185 reconstructed columns against `x=437:763,y=475:829` give `r=.99295`, MAE `3.80/255`. A coarser discriminator gives absolute-right `r=.87359`, versus absolute-left `.58219`, modulo-right `.25799`, signed-right `-.03042`, and raw field `.15146`. The convention is therefore strong raster inference—prose says only “difference.” `3299/10000` is a reconstruction, not proven source identity; exact rational and IEEE binary64 `.3299` yield the same 8-bit result through this horizon. Native Notes say exact rationals are essential and double precision makes almost every page-160 profile wrong, with this localized-structure panel as the exception.
-- Notes page 937 Picture 3 has two matrices over exact mathematical parameters `c=n/500`, `n=0..500`: uniform background and center cell. Columns are exactly `x=42+n`. The top represents `t=1..150`; bilinearly resizing its exact 150x501 background array into `x=42:543,y=23:143` gives `r=.72013`, MAE `26.22/255`, while the first-row gradient gives `r=.982`. Axes/JPEG and 150-to-120 vertical downsampling make this a visual check, not exact cell identity. The bottom uses the same axes/horizon for the exact center family.
-- Notes page 937 Picture 8 labels `k={2,3,7/3,81/73,Sqrt[2],Pi}` for the additive sibling. Each row-major panel encodes `t=0..50` and a 101-cell window in a 158x77 crop: `k=2` at `33:191,29:106`, `k=3` at `217:375,29:106`, `k=7/3` at `402:560,29:106`, `k=81/73` at `33:191,140:217`, `Sqrt[2]` at `217:375,140:217`, and `Pi` at `402:560,140:217`. Exact-rational fits for the first three are respectively `r=.87207/.83659/.87781`, MAE `5.04/5.97/7.49`; dense fourth and irrational panels are only about `.53-.56` under direct gray/JPEG fitting, so finite-raster precision remains underdetermined and appearance is not proof of equidistribution.
+- Page 172 contains 151 initial-inclusive states `t=0..150` over a 203-cell visible central window. Resize the exact 151x203 gray array to half-open crop `x=39:1151,y=47:874` and compare only relative rows `300:` because the insets occlude the upper main raster: `r=.993335`, MAE `5.27/255`. Its inset is exactly 31 cells by 23 states `t=0..22`, seed at index 15; boundaries are rounded `linspace(805,1127,32)` and `linspace(64,304,24)`, with integer midpoint samples. Exact dyadic regeneration gives `r=.9958826436`, MAE `5.42209/255`. JPEG, grid/overlay, scaling, and unstated tone transfer preclude a literal byte-for-value claim. The main computation boundary is outside the visible crop.
+- Page 173 Picture 3 has 50 visible cells by 30 initial-inclusive rows `t=0..29`, seed index 24. Center samples use rounded boundaries `linspace(29,444,51)` and `linspace(16,265,31)`. All 1,500 centers against the exact Notes ring give `r=.9945625933`, MAE `6.60386/255`. Because this is a central finite raster and strict prose states no edge behavior, it does not establish the global boundary. Picture 4 places the map discontinuity at `x=3/4`.
+- Page 174 contains 21 row-major labeled rules whose mathematical constants are `c=n/40`, `n=0..20`, displayed `0,.025,...,.5`. Each panel shows 101 cells by 51 states `t=0..50` from the point seed. The representative `c=1/10` exact-rational reconstruction, bilinearly resized to `x=413:693,y=259:398`, gives `r=.99787`, MAE `2.11/255`. This matches geometry/appearance but does not establish the source's numeric storage. The mathematical background is `FractionalPart[t c]`.
+- Page 175 labels `c={.1,.3,.325,.3299,.3299 differences,.35,.475,.495,.9}`. Each panel shows 201 states `t=0..200` over a resampled central crop of about 184-185 cells. The `c=1/10` exact-rational field reconstruction on 184 columns against `x=63:384,y=69:424` gives `r=.98779`, MAE `4.40/255`. The duplicate declared-decimal `.3299` entries are one trajectory and an adjacent absolute-right-difference observer: 185 reconstructed columns against `x=437:763,y=475:829` give `r=.99295`, MAE `3.80/255`. On that same crop and under the oracle's explicit transfers, absolute-right `r=.99295` decisively exceeds absolute-left `.67326`, modulo-right `.25018`, signed-right `.00278`, and raw field `.14026`. The convention is therefore strong raster inference—prose says only “difference.” `3299/10000` is a reconstruction, not proven source identity; the raster cannot identify its stored numeric representation. Native Notes say exact rationals are essential and double precision makes almost every page-160 profile wrong, with this localized-structure panel as the exception.
+- Notes page 937 Picture 3 has two matrices over exact mathematical parameters `c=n/500`, `n=0..500`: uniform background and center cell. Columns are exactly `x=42+n`. The top represents `t=1..150`; bilinearly resizing its exact 150x501 background array into `x=42:543,y=23:143` gives `r=.72013`, MAE `26.22/255`. Axes/JPEG and 150-to-120 vertical downsampling make this a visual check, not exact cell identity. The bottom uses the same axes/horizon for the exact center family.
+- Notes page 937 Picture 8 labels `k={2,3,7/3,81/73,Sqrt[2],Pi}` for the additive sibling. Each row-major panel encodes `t=0..50` and a 101-cell window in a 158x77 crop: `k=2` at `33:191,29:106`, `k=3` at `217:375,29:106`, `k=7/3` at `402:560,29:106`, `k=81/73` at `33:191,140:217`, `Sqrt[2]` at `217:375,140:217`, and `Pi` at `402:560,140:217`. Exact-rational fits for the first three are respectively `r=.87207/.83659/.87781`, MAE `5.04/5.97/7.49`. Finite-raster precision of the denser fourth and irrational panels remains underdetermined, and appearance is not proof of equidistribution.
 
 The supporting page-258 gallery directly labels deterministic add-constant rules `c=0,.1,...,.9` and random initial fields, but width/horizon, field measure, generator, and seed are absent; its roughly 250x100 panel cadence is raster inference only. Page 259 directly labels `.39`, `.4`, and `{.5,1.13}`, all with random initial fields and neighbor-difference views; the last means the divisor-three rule `FractionalPart[(1.13L+C+1.13R)/3+.5]`, not division by `3.26`. Page 340 Figure 2 labels rule-90 perturbations `0%,5%,10%,15%` and rule-30 perturbations `0%,.5%,.8%,1%,2%,5%`; the full `Random[]` draws are unrecoverable, and a roughly 101-state/201-cell geometry is only an aspect-ratio inference. Figure 4 is the source `lambda` icon over about `[0,4]`, not evidence of `[0,1]` closure. Boiling directly labels heating rates `.05` and `.1`, but initial field, boundary, width, horizon, RNG, and numeric storage are absent. Its literal threshold-conditional wrap is transition semantics; emitted wrap/bubble-event records and their rendering are observers. The complex asset is a distinct alternating pair-block unitary sibling and cannot test the strict gray rule.
 
@@ -1178,6 +1201,7 @@ No dependency is needed for a correctness-first rational strict subset. Certifie
 - Ensure unchanged fields emit events and `h` events yield `h+1` snapshots.
 - Ensure independent parameter runs/rule IDs and observer changes do not change traces.
 - Distinguish divisor-three `{w,1,w}` from normalized weights and declared `1.13` from exact `113/100`.
+- Give the two boiling rules distinct identities/provenance; at aggregate-plus-heat exactly `1`, require literal `if >1` to yield `1` and the strict unconditional reconstruction to yield `0`, while checking agreement away from that equality seam.
 - Match the additive Pascal formula and reject conflation with strict `c=0`.
 - Distinguish represented transitions by reduction/rounding locations; never call binary64 exact.
 - Separate random seed sampling from transition draws; make coordinate-indexed draws enumeration invariant.

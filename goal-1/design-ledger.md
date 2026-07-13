@@ -711,7 +711,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE construction profile for strict T44.
 - Basis: each discrete cell has any gray level from white `0` to black `1`, the point seed is one black cell on white background, and every next field is computed locally (`BOOK:1954-1960`, `2018`). The cardinality Note gives `2^aleph_0` possible configurations (`BOOK:19070-19072`) but does not determine support: a single real cell or any nonempty finite real vector has that cardinality too.
-- Consequence: add a total `[0,1]` field over fixed ordered 1D support with no control/history. The strict-main integer-line interpretation is explicitly inferential; Notes separately prove a finite periodic-list realization. Normalized uniform-default plus finite overrides is an exact presentation, not finite semantic support. Seed, rule, support/realization, numeric profile, trace, and view remain separate.
+- Consequence: add a total `[0,1]` field over fixed ordered 1D support with no control/history. The strict-main integer-line interpretation is explicitly inferential; Notes separately prove a finite periodic-list realization. For deterministic spatially homogeneous point-seed profiles at finite horizons, normalized uniform-default plus finite overrides is an exact presentation, not finite semantic support; random-initial/noisy total fields require their own finite or lazy random-field/draw presentations. Seed, rule, support/realization, numeric profile, trace, and view remain separate.
 
 ### D097 — Closed affine aggregate and scalar map form one validated local program
 
@@ -746,7 +746,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 ### D102 — Additive, coupled, boiling, stochastic, probabilistic, block, and PDE relations remain typed siblings
 
 - Status: ACTIVE T44 boundary record.
-- Basis: Notes separately give `Mod[L+R,1]`, broader coupled-map aliases, a discrete probabilistic-CA alternative, finite-difference relations, noisy continuous rule-90/rule-30 expressions, and a complex unitary block construction (`BOOK:13306-13314`, `13401-13403`, `15074-15081`, `17002-17008`).
+- Basis: Notes separately give broader coupled-map aliases, `Mod[L+R,1]`, a discrete probabilistic-CA alternative, finite-difference relations, noisy continuous rule-90/rule-30 expressions, boiling as mean-plus-heating with a literal `>1` wrap threshold, and a complex unitary block construction (`BOOK:13296-13298`, `13306-13314`, `13401-13403`, `15074-15081`, `15644`, `17002-17008`).
 - Consequence: the additive Pascal profile excludes center/division and has normalized binomial residues. Coupled maps are a typed relation/general constructor requiring user-declared closed combination/map data, not a promised book-exact logistic preset. Boiling keeps two records—literal threshold-conditional and strict cross-reference reconstruction—distinct at exact one. Noisy profiles consume explicit replayable draws and use widened/partial range because the literal formula exceeds `[0,1]`; numerical error is not noise. Discrete probabilistic CA, complex block updates, and T45 continuous-space/time equations do not enter strict T44 through flags, field packing, or discretization identity.
 
 ## Rejected Shortcuts
