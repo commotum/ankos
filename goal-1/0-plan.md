@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T02/T03/T04/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 22 of 45 type stages complete, T05 Higher-Color Totalistic Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T02/T03/T04/T05/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 23 of 45 type stages complete, T06 Quiescent-Background-Preserving Cellular Automata next, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
@@ -82,6 +82,8 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T02 exposes current runtime defects rather than adding a branch: exhaustive arity is wrong, selector significance is mirrored, general outputs are binary-masked, ordinary lookup is not executable, and batch rule identity is coerced to fixed-width `int64`.
 - T03's core aggregate semantics, definition/formula excerpts, official-source repairs, and strict code-777 raster remain valid. Its former 16-query/118-candidate and 17-query/309-candidate closures are superseded by the independently reviewed 18-query/312-candidate partition and 118-asset manifest at `50 included / 60 excluded / 8 relation-only`; the T05-discovered code-`1004600` Notes continuation and two linked long-run plots are now closed.
 - T03 reuses T01/T02 fixed support, all-site old-snapshot reads, typed assignment, atomic commit, realization, and trace semantics. D115-D118 add only explicit numeric valuation, the exact sum case domain/table/codec, and typed preset/restriction/sibling boundaries; no executor or eleventh update law is added.
+- T05 closes an exact 11-query/142-lexical-line manifest plus five governed prose continuations and 25 linked assets: 172 candidates with zero remainder. Twelve evidence groups pin 47 provenance lines/47 fragments/40 quote lines; assets close at `5 included / 13 relation-only / 7 excluded` after independent review added four direct page-963 chart relations.
+- T05 is exactly the strict finite `k>=4,r=1,A=(0,...,k-1),nu(i)=i` preset over unchanged generic T03, with `M=3k-2`, arbitrary-precision `R=k^M`, and code `1004600` pinned as a structural table. D118 is sharpened; no new primitive, executor, update law, or decision is added. All five embedded checks, independent review, diff/fence gates, and 102 tests pass.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -721,7 +723,7 @@ COMPLETE: the 12-query oracle partitions 243 candidates, 15 evidence groups clos
 
 ### 24-T05-HIGHERCOLOR-TOTALISTIC
 
-Status: **IN PROGRESS** in `goal-1/24-T05-HIGHERCOLOR-TOTALISTIC.md`.
+Status: **COMPLETE** in `goal-1/24-T05-HIGHERCOLOR-TOTALISTIC.md`.
 
 #### Big Picture Objective
 
@@ -734,6 +736,10 @@ Apply the common protocol, emphasizing general `k`, sum domains, rule counts, an
 #### Completion Requirements
 
 All T05 evidence is captured; parameter bounds and reuse are explicit; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+COMPLETE: 11 controlled query families close 142 lexical lines, five governed follows and 25 assets expand the exact partition to 172 candidates, and 12 evidence groups close `47/47/40` provenance/fragment/quote-line counts. The asset audit closes `5 included / 13 relation-only / 7 excluded`; exact page-122/page-256 label corpora, code `1004600`, cardinality, bigint, snapshot, and boundary oracles pass. The result is the strict finite `k>=4,r=1` canonical preset over generic T03. T03's discovered source omission was repaired and reclosed; T04 remains complete. D118 is sharpened without D119, an executor, or an update law. Independent review, five embedded blocks, fences, diff checks, and all 102 tests pass. Next: T06.
 
 ### 25-T06-QUIESCENT
 

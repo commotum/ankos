@@ -1,11 +1,11 @@
 # 24-T05-HIGHERCOLOR-TOTALISTIC
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
 - Exact catalog row: T05, CSV line 6, `Higher-Color Totalistic Cellular Automata`; taxonomy section 5 at `ref/notes/CA-Types.md:126-145` is search vocabulary only, not book evidence.
-- The taxonomy hypothesis is a radius-one totalistic profile with four, five, or more values. It claims no new support, read, update, successor, or halt semantics beyond T03; the book audit must prove or revise that grouping.
+- The taxonomy's initial hypothesis was a radius-one totalistic profile with four, five, or more values and no new support, read, update, successor, or halt semantics beyond T03. The completed book audit validates that grouping with the exact canonical `k>=4` boundary.
 - The strict five-color comparison states 13 sum cases and `5^13 = 1,220,703,125` possible rules, while a separate Notes/application example names four-color totalistic code `1004600`. The complete audit closes these and every alias, formula, caption, Notes, Index, split, application, control, and linked-asset route at 11 queries, 142 lexical lines, five governed prose continuations, and 25 assets: 172 candidates with zero remainder.
 - Canonical values `A_k=(0,...,k-1)`, `nu_k(i)=i`, `r=1`, and explicit “four or more colors” establish exactly the concrete finite range `k>=4`. T03 then gives arity `q=3`, sum domain `0..3(k-1)`, table length `M=3k-2`, and rule count `R=k^(3k-2)`. The general formula derives the otherwise nonliteral `k=4` values `M=10`, `R=4^10`; `k=5` is independently direct.
 - T01/T02/T03/T04 already establish fixed ordered support, all-site old-snapshot reads, typed same-site assignment, atomic parallel update, structural table identity, arbitrary-precision tagged code identity, and the preset/restriction/property/run/view boundary. T05 confirms D118: it is the strict canonical higher-color radius-one preset over T03, not a distinct construction.
@@ -31,7 +31,7 @@ Determine the exact higher-color totalistic parameter domain and evidence bundle
 - Stable ID: T05.
 - Exact CSV name: `Higher-Color Totalistic Cellular Automata` at `ref/notes/CA-Types.csv:6`.
 - Taxonomy section: 5, vocabulary seed only.
-- Entry hypothesis: parameter-range preset/profile over T03, presently expected to fix radius one, canonical valuation, and `k>=4`.
+- Entry kind: strict parameter-range preset/profile over T03 fixing radius one, canonical valuation, and concrete finite `k>=4`.
 - Initial vocabulary: higher-color/higher colour, more colors, four-color/4-color, five-color/5-color, four/five possible colors, `k=4`, `k=5`, `r=1`, 10 cases, 13 cases, `4^10`, `5^13`, `1,048,576`, `1,220,703,125`, code `1004600`, totalistic, average color, assignment of values to colors, rule complexity, dying out/undecidability, class behavior, and related non-totalistic color-count controls.
 
 ## Search Log
@@ -418,7 +418,7 @@ split_checks={
 'CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md':{599:'five colors'},
 'CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md':{165:'four possible colors'},
 'CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md':{
-549:'code 1004600',551:'1017 steps',553:'10 million steps',2458:'integers between 0 and k-1',
+549:'code 1004600',551:'1017 steps',553:'10 million steps',1792:'Examples of rules with three colors',2458:'integers between 0 and k-1',
 3278:'specific assignment of values to colors',3283:'Implementation of totalistic cellular automata',
 3285:'RotateLeft[a] + a + RotateRight[a]',3289:'Sum[RotateLeft[a, i]',3293:'IntegerDigits[num, k',
 3295:'Common framework',3297:r'Table[1, \{2r+1\}]'},
@@ -439,7 +439,7 @@ Recorded output:
 
 ```text
 T05 evidence oracle: PASS groups= 12 provenance= 47 fragments= 47 quote_lines= 40
-source_repairs=4 split_checks= 18
+source_repairs=4 split_checks= 19
 ```
 
 ## Construction Model
@@ -933,16 +933,34 @@ direct_property_links= (9164, 19236, 19238) direct_exact_cell_goldens= 0
 
 ## Completion Requirements
 
-- [ ] Every direct/alias/formula/code/caption/Notes/actual-Index/split/cross-reference/application/control candidate is dispositioned with zero remainder.
-- [ ] Every relevant source-linked asset is hash-pinned and classified, with every source-permitted semantic/raster oracle closed.
-- [ ] The exact higher-color parameter domain, table/cardinality/code rules, canonical fixtures, and T03/T04/T06/T07/T08 boundaries are proved.
-- [ ] Current API/runtime fit and a concrete Goal 2 preset/conformance stage are implementation-ready.
-- [ ] Global ledgers, independent review, embedded checks, coverage/diff gates, and repository tests pass.
+- [x] Every direct/alias/formula/code/caption/Notes/actual-Index/split/cross-reference/application/control candidate is dispositioned with zero remainder.
+- [x] Every relevant source-linked asset is hash-pinned and classified, with every source-permitted semantic/raster oracle closed.
+- [x] The exact higher-color parameter domain, table/cardinality/code rules, canonical fixtures, and T03/T04/T06/T07/T08 boundaries are proved.
+- [x] Current API/runtime fit and a concrete Goal 2 preset/conformance stage are implementation-ready.
+- [x] Global ledgers, independent review, embedded checks, coverage/diff gates, and repository tests pass.
 
 ## Stage Results
 
-IN PROGRESS. No completion or new architecture claim is made until all requirements close.
+COMPLETE after a zero-remainder audit and independent re-review.
+
+- Eleven controlled query families close 142 distinct lexical lines: 127 before the actual Index and all 15 actual-Index candidates. Five governed prose continuations and 25 source-linked assets bring the exact closure to 172 candidates. The lexical partition is `4 native / 14 generic-parent / 23 lower-color totalistic / 33 other-totalistic / 14 higher-color relations / 39 controls / 15 Index`; the expanded partition is `11 / 16 / 23 / 33 / 27 / 47 / 15`.
+- Twelve evidence groups pin 47 provenance lines, 47 verbatim fragments, and 40 unique quoted source lines. Four documented source repairs and all 19 selected split mirrors pass. No direct, alias, formula, code, caption, Notes, Index, application, or control candidate remains unresolved.
+- The bidirectional asset audit closes 25 physical JPEG routes at `5 included / 13 relation-only / 7 excluded`, with exact bytes, dimensions, hashes, source links, and reverse joins. Independent review found four directly linked page-963 class-frequency charts omitted from the first manifest; widening the manifest from 21 to 25 resolved the defect. Page-122's 8+8 and page-256's 32 visible labels have exact corpus hashes, while the source authorizes zero exact cell-trajectory goldens for those galleries.
+- T05 is exactly the strict finite preset `k>=4`, `r=1`, `A_k=(0,...,k-1)`, `nu_k(i)=i` over generic T03. It has `M=3k-2` sum rows and `R=k^M` programs: `(k,M,R)=(4,10,1048576)`, `(5,13,1220703125)`, and `k=8` already exceeds signed 64-bit range. Code `1004600` is pinned low-sum first as `(0,2,3,0,0,1,1,1,3,3)`, with source display `3311100320`; the old-snapshot witness `(0,0,1)->(2,2,2)` rejects in-place `(2,0,0)`.
+- The current API/runtime audit and G2-T05 handoff specify one strict resolver delegating to G2-T03, tagged arbitrary-precision code identity, exact validation and fixtures, shared scalar/batch execution, and static branch/duplication checks. T05 adds no alphabet, aggregate, table, codec, state, result, executor, update, successor, halt, analyzer, or view semantic.
+- T05 exposed an earlier T03 source-closure omission around code `1004600`. T03 was reopened, widened to 312 candidates and 118 assets, independently reviewed, and reclosed without a semantic change; T04 remained complete. No stage remains reopened.
+- All five embedded source/evidence/semantic/metadata/asset-semantic blocks pass, all 22 Markdown fences balance, `git diff --check` passes, and all 102 repository tests pass. A final independent review returned `CLEAN` after the page-963 and fifth split-follow repairs.
+- D115-D117 remain unchanged. D118 is sharpened with the exact strict preset boundary; no D119, family-specific executor, callback, fallback, or eleventh update law is needed. Global plan, evidence index, and design ledger record the result. Next: T06.
 
 ## Integration Results
 
-IN PROGRESS. The ten-question reintegration audit will be answered after the evidence and design close.
+1. **Prior validity:** no semantic assumption, primitive, grouping, or executor boundary was invalidated. T03's claimed source closure was invalid and was repaired/reclosed; the first T05 asset manifest was also widened after independent review found four direct page-963 relations.
+2. **Primitive reuse:** yes. T05 resolves to the unchanged generic T03 valuation, equal-weight integer sum, complete aggregate-case table, optional codec relation, and ordinary T01/T02 fixed-lattice execution.
+3. **Complexity hazards:** none are introduced. The proposal adds one closed configuration resolver, not an exception, runtime flag, hidden state, duplicate path, arbitrary callback, compatibility fallback, or preset-specific execution branch.
+4. **Reproducible state:** yes. The total field contains every value required for the next old-snapshot step; the immutable resolved T03 program and explicit realization/run record reproduce the trace. Gallery, property, and raster records are not hidden state.
+5. **Responsibility separation:** preserved. Support/realization, alphabet and valuation, aggregate/table program, run/seed, property/class, gallery selection, numeric codec, and palette/raster each retain distinct identities.
+6. **Algorithm boundary:** exact sum evaluation and complete-table lookup are native rule semantics. Code conversion, property analysis, gallery choice, long-run measurement, and raster comparison are incidental relations or observers and are not fused into execution.
+7. **Encoding fidelity:** the handoff preserves concrete finite `k`, radius one, canonical ordered alphabet and valuation, the complete `0..3(k-1)` row domain, least-significant-sum-first arbitrary-precision coding, source display direction, exact case rows, and structural identity.
+8. **Reopened stages:** T03 was reopened and reclosed during T05; T01, T02, and T04 remain complete. No reopened stage remains unresolved.
+9. **Goal 2 dependencies:** G2-T05 depends strictly on G2-T03's generic resolver/runtime and may share delivery sequencing with G2-T04. T06/T07 remain property restrictions and T08 remains a seed-class question; no new decision or implementation stage is added.
+10. **Coherence:** the API becomes simpler: one generic T03 construction plus a validating higher-color preset, with identical resolved structure and executor types instead of a duplicate higher-color family. The result is coherent, so no re-derivation is required.
