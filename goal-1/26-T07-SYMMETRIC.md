@@ -54,9 +54,9 @@ T07 changes none of those four execution steps.
 | 09 | quiescent near symmetric/reflection | 1 |
 | 10 | history/search/1981-84 near symmetry or totalistic | 22 |
 
-The disjoint final disposition is `15/167/3/98/74`: direct T07 evidence, relevant CA property/transform/context relations, incidental CA implementation/view controls, sibling SimpleProgram or general alias controls, and actual-Index navigation routes. The 15 governed lines are classified inside those semantic groups; nothing is left in an untyped adjacency bucket.
+The bounded lexical base disposition is `15/167/3/98/74`: direct T07 evidence, relevant CA property/transform/context relations, incidental CA implementation/view controls, sibling SimpleProgram or general alias controls, and actual-Index navigation routes. Hostile review showed that the original distance caps and asset adjacency were not a complete closure; the 293-line saturation remainder below supersedes any claim that this 357-line base alone is authoritative.
 
-### Exact canonical source oracle
+### Exact bounded lexical base oracle
 
 ```bash
 python3 - <<'PY'
@@ -108,21 +108,21 @@ assert [len(x) for x in parts]==[15,167,3,98,74]
 assert sum(map(len,parts))==len(set().union(*parts))==357
 assert L[2795]=='![](_page_247_Figure_2.jpeg)'
 assert L[5061]=='![](_page_439_Figure_3.jpeg)'
-print('T07 source manifest: PASS 10 families; lexical=268; governed=15; index=74; total=357; partition=15,167,3,98,74')
+print('T07 bounded source base: PASS 10 families; lexical=268; governed=15; index=74; total=357; partition=15,167,3,98,74')
 PY
 ```
 
 Recorded output:
 
 ```text
-T07 source manifest: PASS 10 families; lexical=268; governed=15; index=74; total=357; partition=15,167,3,98,74
+T07 bounded source base: PASS 10 families; lexical=268; governed=15; index=74; total=357; partition=15,167,3,98,74
 ```
 
 The actual Index is navigation-only. Its most useful routes are `BOOK:21130` (elementary equivalences), `21338` (isotropy), `21990` (rotational CA symmetry), `21992` (rule-30 asymmetry), `22070` (rule equivalences), `22146` (totalistic sums), `22150` (one- and two-dimensional symmetry), and `22352` (totalistic CA); none adds transition mechanics.
 
-### Split-corpus and excerpt oracle
+### Bounded-base split-corpus and excerpt oracle
 
-The same ten regexes produce 325 physical hits across `CHAPTERS` and `BACK-MATTER`. A mechanical audit finds 313 byte-exact monolith lines and 12 formatting/OCR/line-join variants, each mapped to one canonical line. This corrects an intermediate manual count that had grouped five byte-exact routed lines with the variants. The monolith remains authoritative and no split-only semantic candidate exists.
+The same ten bounded regexes produce 325 physical hits across `CHAPTERS` and `BACK-MATTER`. A mechanical audit finds 313 byte-exact monolith lines and 12 formatting/OCR/line-join variants, each mapped to one canonical line. This corrects an intermediate manual count that had grouped five byte-exact routed lines with the variants. The monolith remains authoritative; the saturation delta receives its own split join below.
 
 ```bash
 python3 - <<'PY'
@@ -198,6 +198,131 @@ Recorded output:
 T07 split/excerpt audit: PASS physical=325 exact=313 variants=12; 11 evidence guards; 2 source defects pinned
 ```
 
+### Hostile saturation remainder and final source universe
+
+The bounded base failed an unlimited-distance and governed-adjacency adversary. The frozen repair deliberately overgenerates a disjoint remainder from eight sources: unbounded versions of all ten original queries; CA left/right relations; the next structural node after every prior caption/root; bridges of at most eight physical lines between prior roots; hard grammatical continuations; CA direction/orientation vocabulary; SimpleProgram alias/equivalence vocabulary; and explicit structural/table/direction anchors. Their overlaps yield 290 candidates. Three governed repairs add `BOOK:11639` (the opening of the Boolean-expression unit completed at `11844`) and the palindrome unit `12236,12238`, for an exact 293-line remainder.
+
+Every remainder line is explicitly dispositioned:
+
+| Remainder class | Count | Meaning |
+|---|---:|---|
+| D | 0 | no new direct rule-fixedness evidence |
+| R | 23 | retained CA relation/context/source controls |
+| I | 22 | retained CA implementation, representation, or view controls |
+| N | 69 | retained sibling SimpleProgram, other-action, physical, or alias controls |
+| X | 179 | inspected and rejected lexical/adjacency/bridge remainder |
+
+The authoritative audited textual universe is therefore 650 lines:
+
+| Final class | Count |
+|---|---:|
+| Direct T07 | 15 |
+| Relevant CA relation/context | 190 |
+| Incidental CA implementation/view | 25 |
+| Sibling/general/alias control | 167 |
+| Explicit rejected remainder | 179 |
+| Actual Index navigation | 74 |
+
+Thus 397 pre-Index lines are retained as evidence or typed controls, 179 are explicit rejections, and 74 are Index routes. The saturation search adds no execution semantics; it strengthens boundaries that the architecture already requires.
+
+The 114 retained additions have a complete monolith/split join: 103 are byte-exact and 11 are pinned formatting/OCR/line-join variants. The LF-terminated mapping rows
+
+```text
+BOOKline|class|split-relative-path|split-line|E-or-V|sha256(monolith-line)|sha256(split-line)
+```
+
+have combined SHA-256 `231764e9127c73686670feaff2d926af769ab904f79f0f24489204be19f73ac1`. No split-only semantic candidate is accepted.
+
+```bash
+python3 - <<'PY'
+import contextlib, io, re
+from collections import defaultdict
+from hashlib import sha256
+from pathlib import Path
+
+ROOT=Path('ref/A-New-Kind-of-Science')
+STAGE=Path('goal-1/26-T07-SYMMETRIC.md')
+M=(ROOT/'A-New-Kind-of-Science.md').read_text().splitlines()
+
+D=set()
+R=set(map(int,'424,452,466,498,518,520,3904,3936,4416,5234,5634,5640,5642,6636,9334,10647,10882,11638,11906,11914,14398,15636,17661'.split(',')))
+I=set(map(int,'3026,3042,3272,5472,5816,6858,8668,10984,10986,10988,10990,10992,11639,11844,11893,11895,11898,11900,11934,14366,16051,16466'.split(',')))
+N=set(map(int,'862,1050,1052,2266,2460,4028,4056,4060,5686,5884,6540,7930,7972,8534,9058,9348,9534,9907,9923,10019,12236,12238,12468,12615,12639,13754,14048,14617,14619,14627,14672,15151,15287,15289,15619,15705,15710,15920,16039,16215,16257,16360,16373,16377,16597,16755,16875,17057,17297,17539,18430,18850,18916,18966,19039,19091,19231,19272,19282,19337,19405,19509,19571,19641,19713,20198,20269,20276,20284'.split(',')))
+X=set(map(int,'396,458,484,486,488,492,770,778,780,782,786,788,792,794,798,802,806,826,848,1284,1547,2042,2168,2602,2604,2606,2610,2632,2800,2804,2808,2854,2870,2924,3338,3408,3806,3916,4022,4034,4430,4448,4880,5804,6098,6342,6646,6958,7000,7322,7360,7744,7914,7990,8008,8020,8210,8408,8412,8544,8628,8648,8652,8654,8656,8726,8854,8874,8938,8998,9010,9162,9164,9168,9198,9340,9350,9356,9364,9488,10263,10597,10599,10858,11039,11057,11059,11061,11062,11063,11064,11065,11066,11067,11069,11071,11170,11180,11367,11477,11513,11521,11891,12228,12281,12358,12420,12422,13217,13298,13543,13553,13557,13603,13615,13618,13646,13648,13652,13656,13660,13662,13664,13992,14055,14481,14681,14723,14878,14943,14971,15199,15223,15322,15392,15637,15652,15713,15741,15742,15744,15745,15746,15749,15957,16025,16070,16086,16088,16603,16741,16926,16948,16996,17010,17035,17043,17063,17119,17381,17595,17726,17999,18167,18534,18772,18905,18906,18908,18912,19588,19620,20113,20170,20486,20501,20542,20600,20820'.split(',')))
+groups=(D,R,I,N,X); candidate=set().union(*groups)
+assert [len(s) for s in groups]==[0,23,22,69,179]
+assert sum(map(len,groups))==len(candidate)==293
+assert candidate==set().union(*groups)
+assert all(groups[a].isdisjoint(groups[b]) for a in range(5) for b in range(a))
+assert len(R|I|N)==114 and candidate-(R|I|N)==X
+
+def digest(s): return sha256(','.join(map(str,sorted(s))).encode()).hexdigest()
+assert digest(candidate)=='8e3061ae5043c5be09701204b65e5b9ecaffd2f693db091e0d54f259a0e13ecb'
+assert digest(R)=='aebe9edff0c447628954b7a39daef58d7dbf2ded5f6461578caa0085f63a8e20'
+assert digest(I)=='b94c8787ef4b79bf95add49bb142ab04a1422cc23b09a84a022b7f40d0809e5a'
+assert digest(N)=='6200f4fd83dee791779458f7f8b0dff334df67428bcdbe6b0113a70fde681684'
+assert digest(X)=='c1ae811fe7044e6b94ab4ff3192b86c84e020c4c5f51bf861e8450703f819ce4'
+assert digest(R|I|N)=='0233fef6903bcf0a87838e9b075d60947d6df097010f2b65590dac3f5550d507'
+
+# Re-execute the preceding bounded oracle to prove disjoint accounting and
+# mechanically remove all ten same-line distance caps.
+text=STAGE.read_text(); marker="```bash\npython3 - <<'PY'\n"
+base_code=text.split(marker,1)[1].split("\nPY\n```",1)[0]
+env={}
+with contextlib.redirect_stdout(io.StringIO()): exec(base_code,env)
+base=set().union(*env['parts']); assert len(base)==357 and base.isdisjoint(candidate)
+wide=[]
+for name,pat,want in env['rows']:
+    pat=re.sub(r'\.\{0,\d+\}',r'.*',pat)
+    wide.append({i for i,s in enumerate(M[:env['IX']-1],1) if re.search(pat,s,re.I)})
+wide_delta=set().union(*wide)-set().union(*env['sets'])
+assert len(wide_delta)==48 and wide_delta<=candidate
+assert len(candidate-{11639,12236,12238})==290
+assert len(base|candidate)==650
+
+# Exact monolith/split join for every retained addition.
+classes={**{n:'R' for n in R},**{n:'I' for n in I},**{n:'N' for n in N}}
+split_index=defaultdict(list); file_lines={}
+files=sorted((ROOT/'CHAPTERS').rglob('*.md'))+sorted((ROOT/'BACK-MATTER').rglob('*.md'))
+for p in files:
+    rel=p.relative_to(ROOT).as_posix(); lines=p.read_text().splitlines(); file_lines[rel]=lines
+    for j,s in enumerate(lines,1): split_index[s].append((rel,j))
+variants={
+424:('CHAPTERS/2-The-Crucial-Experiment/The-Crucial-Experiment.md',23),
+452:('CHAPTERS/2-The-Crucial-Experiment/The-Crucial-Experiment.md',47),
+466:('CHAPTERS/2-The-Crucial-Experiment/The-Crucial-Experiment.md',59),
+498:('CHAPTERS/2-The-Crucial-Experiment/The-Crucial-Experiment.md',87),
+862:('CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md',179),
+2266:('CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md',123),
+7930:('CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md',229),
+7972:('CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md',269),
+8534:('CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md',803),
+16755:('BACK-MATTER/Index/Index.md',4656),
+19337:('BACK-MATTER/Colophon/Colophon.md',1894),
+}
+rows=[]
+for n in sorted(classes):
+    hits=split_index.get(M[n-1],[])
+    if n in variants:
+        assert not hits; rel,j=variants[n]; mode='V'
+    else:
+        assert len(hits)==1,(n,hits); rel,j=hits[0]; mode='E'
+    split=file_lines[rel][j-1]
+    rows.append(f'{n}|{classes[n]}|{rel}|{j}|{mode}|{sha256(M[n-1].encode()).hexdigest()}|{sha256(split.encode()).hexdigest()}')
+payload='\n'.join(rows)+'\n'
+assert sum('|E|' in row for row in rows)==103 and sum('|V|' in row for row in rows)==11
+assert sha256(payload.encode()).hexdigest()=='231764e9127c73686670feaff2d926af769ab904f79f0f24489204be19f73ac1'
+assert 'symmetrical' in M[6635] and 'palindrome' in M[12235]
+print('T07 saturation oracle: PASS base=357 remainder=293 final=650; remainder=0,23,22,69,179; retained split=103 exact/11 variants')
+PY
+```
+
+Recorded output:
+
+```text
+T07 saturation oracle: PASS base=357 remainder=293 final=650; remainder=0,23,22,69,179; retained split=103 exact/11 variants
+```
+
 ## Book Excerpts and Evidence Groups
 
 1. **Asymmetric rule versus symmetric-rule restriction (`BOOK:490,1348`).** Rule 30 is explicitly called nonsymmetric; the unequal left/right regions in its centered-seed picture are attributed to the underlying rule. This is a useful counterexample, not permission to infer a rule property from arbitrary pixels.
@@ -211,6 +336,11 @@ T07 split/excerpt audit: PASS physical=325 exact=313 variants=12; 11 evidence gu
 9. **Rule/formula/pattern caution (`BOOK:17995-18001`).** Rule 254 is symmetric even though a derived NAND expression/result is described as asymmetric; reflecting rule 30 to rule 86 changes a downstream BDD sequence. Representations and observations do not replace the local table predicate.
 10. **Historical selection (`BOOK:11585`).** Nonsymmetric rules were once excluded for display convenience. That history is evidence for a restriction, not a new transition construction.
 11. **Source corrections (`BOOK:11897,16201-16207`).** The diffusion control assigns coefficients `p1,p2,p3` to left, center, right but says left-right symmetry implies `p1=p2`. Its next line uses equal outer coefficients, proving the intended relation is `p1=p3`. This PDE derivation is a control, not T07's definition.
+12. **Visual and lattice controls (`BOOK:3904,3936,4412-4416,5634-5642,6636-6644`).** Faceted CA growth reflects its lattice, and perception can identify that final pictures are symmetrical without recovering the rule that produced them. These are strong rule/state/view separation controls, not table-fixedness proofs.
+13. **Direction, boundary, schedule, and emulation controls (`BOOK:424,452,466,498,3026,3042,5472,7930,7972,10984-10992,16466`).** Left/right-sensitive rule prose, cyclic boundaries, alternating block pairings, in-place implementation hazards, and directional signals inside encodings all make coordinate roles observable without defining T07. The composed structural evaluator and declared schedule decide.
+14. **Representation terminology (`BOOK:11639-11844,11893-11900,11934,14366,14398`).** A “uniform and symmetrical” Boolean expression, a symmetric multiplication table, rotated code, or a display/table ordering can represent a rule or another algebra without making the underlying CA table reflection-fixed. Representation/action/program identities remain separate.
+15. **Palindrome aliases (`BOOK:12236-12238,12639`; Index `21731`).** A CA-derived vertical column or another digit sequence can be a palindrome/generalized reversal-symmetric pattern. This expands search vocabulary but remains a trajectory/observer or sibling-program claim, not T07 rule evidence.
+16. **Other symmetry actions (`BOOK:14048,15705-15710,16039-16051,18850`).** Constraint-template quotients, symmetric physical flow around an object, self-adjoint numerical approximations, directional reversibility, and Turing-machine equivalences use different objects or actions. They are retained controls precisely so a generic action vocabulary is not collapsed into the scalar T07 predicate.
 
 The source statement that totalistic gallery patterns are symmetric is shorthand in a centered single-cell, compatible-background experiment. The exact theorem is rule covariance; a particular trajectory remains symmetric only when its seed and realization are also reflection-compatible.
 
