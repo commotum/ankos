@@ -346,7 +346,9 @@ The source statement that totalistic gallery patterns are symmetric is shorthand
 
 ## Asset and Raster Audit
 
-The direction-sensitive source-to-asset closure contains 22 physical JPEGs and 44 exact monolith/split references. The partition is `4 included / 7 relation-only / 11 excluded-control`.
+### Superseded bounded diagnostic
+
+The first pass found 22 physical JPEGs and 44 exact monolith/split references at `4 included / 7 relation-only / 11 excluded-control`. Hostile review proved that this was only a bounded diagnostic: it omitted governed images adjacent to already retained captions, including `BOOK:4412` and `6642`, and did not close complete pointed image runs. The following table and oracle are retained to make that failure reproducible; they are not the final asset universe.
 
 | Class | BOOK links | Role |
 |---|---|---|
@@ -370,7 +372,7 @@ Direction-sensitive findings:
 
 The constraint/model-set images at `2598,2606,2626,2628`, spacetime-symmetry image `5804`, and emulation/display reversal at `8206` demonstrate why a generic transformation vocabulary cannot be collapsed into T07.
 
-### Exact asset, metadata, and reverse-reference oracle
+### Historical 22-asset diagnostic oracle
 
 ```bash
 python3 - <<'PY'
@@ -444,6 +446,103 @@ Recorded output:
 
 ```text
 T07 asset oracle: PASS 22 assets; refs=44; classes=4,7,11; unique_hashes=22
+```
+
+### Final source-derived and full-run asset closure
+
+The authoritative retained source set has 397 pre-Index lines. Let `C4` contain every monolith JPEG within four physical lines of one of those lines; it contains 215 files. A bounded explicit-pointer/full-run set `P` contributes 46 files, three already in `C4`. Iterating explicit caption/run obligations to a fixed stop adds the disjoint set
+
+```text
+Q = {446,526,528,530,532,1044,5878,8540,8542,14372,14374,15628,15630}.
+```
+
+The final universe is 271 physical JPEGs and 542 exact monolith/split references, partitioned `4 included / 38 relation-only / 229 excluded-control`. All 271 byte hashes are distinct. The LF-terminated ledger rows
+
+```text
+BOOKline|class|physical-relative-path|byte-size|width|height|sha256|split-md-relative-path|split-line
+```
+
+have combined SHA-256 `ab4d84f0e9644caaa1bf8e2dde9b64319c030b45adb1e3f24b160a657ce2f7f2`.
+
+The four direct fixtures remain `778,782,2796,5062`. Relation assets now also include the rule-90 trajectory/additivity run, lattice/faceted-growth pictures, the visual-symmetry control, two-dimensional action tables, and the complete anisotropy/isotropy run. They support relations or guards, never a new executor. The 229 X assets make adjacency and stop decisions explicit.
+
+Key fixed-point boundaries are exact: `446` is the prior-page rule-90 raster referenced at `458`; `526-532` finish the pointed rule-110 run; `1044` finishes the paired substitution run; `5878` finishes the causal-network run; `8540,8542` finish the three-image Turing run; `14372,14374` finish the rule-90 additivity run before rule 250; and `15628,15630` finish the hopper-crystal run before “Other models.”
+
+```bash
+python3 - <<'PY'
+import contextlib, io, re
+from hashlib import sha256
+from pathlib import Path
+
+ROOT=Path('ref/A-New-Kind-of-Science')
+STAGE=Path('goal-1/26-T07-SYMMETRIC.md')
+BOOK=(ROOT/'A-New-Kind-of-Science.md').read_text().splitlines()
+text=STAGE.read_text(); marker="```bash\npython3 - <<'PY'\n"
+
+# Recover the bounded base and hostile-saturation additions from their own
+# executable oracles so source and asset closure cannot drift.
+base_code=text.split(marker,1)[1].split("\nPY\n```",1)[0]
+base={}
+with contextlib.redirect_stdout(io.StringIO()): exec(base_code,base)
+sat_part=text.split('### Hostile saturation remainder and final source universe',1)[1]
+sat_code=sat_part.split(marker,1)[1].split("\nPY\n```",1)[0]
+sat={}
+with contextlib.redirect_stdout(io.StringIO()): exec(sat_code,sat)
+S=set().union(*base['parts'][:4]) | sat['R'] | sat['I'] | sat['N']
+assert len(S)==397
+
+image_re=re.compile(r'^!\[\]\(([^)]+\.jpeg)\)$')
+image_lines={i for i,s in enumerate(BOOK,1) if image_re.fullmatch(s)}
+C4={i for i in image_lines if any(abs(i-s)<=4 for s in S)}
+P=set(map(int,'732,734,818,2054,2056,2828,2832,2836,2844,2846,3908,4288,4290,4292,6870,7196,10938,11184,11186,11188,11190,11397,11399,11940,13607,14230,14232,14715,14727,15157,15159,15161,15163,15165,15215,15227,15229,15231,15275,15277,15732,16033,16035,16538,16540,20282'.split(',')))
+Q={446,526,528,530,532,1044,5878,8540,8542,14372,14374,15628,15630}
+U=C4|P|Q
+assert (len(C4),len(P),len(C4&P),len(Q),len(U))==(215,46,3,13,271)
+assert Q.isdisjoint(C4|P)
+
+I={778,782,2796,5062}
+R=set(map(int,'420,426,446,456,732,734,3334,3900,3908,3912,4412,5636,6642,7354,7356,8408,11641,13648,13652,13656,14297,14334,14368,14370,14372,14374,14715,14719,14723,14727,14729,15269,15271,15275,15277,15279,15281,18772'.split(',')))
+X=set(map(int,'468,488,492,514,516,522,524,526,528,530,532,748,764,792,794,798,802,818,820,822,826,830,836,844,858,860,866,1044,1048,1280,1543,1547,1958,2054,2056,2172,2268,2456,2458,2598,2606,2626,2628,2800,2804,2824,2828,2832,2836,2844,2846,2848,2850,2866,2920,2924,3040,3044,3268,3274,3404,3408,3802,3806,3934,3954,4018,4022,4030,4058,4080,4288,4290,4292,4302,4418,4876,4880,5228,5230,5470,5684,5690,5804,5878,5882,5886,6094,6100,6336,6338,6870,6952,6954,7192,7194,7196,7910,7928,7932,7934,7966,7968,8206,8414,8538,8540,8542,8934,9056,9164,9328,9360,9530,9538,9901,9919,9921,10021,10259,10621,10938,11166,11170,11176,11182,11184,11186,11188,11190,11387,11393,11395,11397,11399,11525,11627,11629,11877,11879,11885,11887,11891,11930,11932,11936,11938,11940,12057,12224,12228,12232,12464,12611,12633,12641,13565,13599,13603,13605,13607,13609,13611,13615,13640,13772,14052,14226,14228,14230,14232,14347,14354,14441,14447,15157,15159,15161,15163,15165,15211,15213,15215,15217,15219,15223,15225,15227,15229,15231,15263,15317,15319,15628,15630,15632,15634,15732,15734,15736,15974,16029,16031,16033,16035,16070,16133,16375,16462,16464,16468,16536,16538,16540,16599,17006,17012,17411,17433,17656,17658,17667,17991,18746,18753,18768,19284,20278,20282'.split(',')))
+assert [len(s) for s in (I,R,X)]==[4,38,229]
+assert len(I|R|X)==sum(map(len,(I,R,X)))==271 and I|R|X==U
+
+def jpeg_size(data):
+    assert data[:2]==b'\xff\xd8'; sof={0xc0,0xc1,0xc2,0xc3,0xc5,0xc6,0xc7,0xc9,0xca,0xcb,0xcd,0xce,0xcf}; i=2
+    while i<len(data):
+        while i<len(data) and data[i]!=0xff: i+=1
+        while i<len(data) and data[i]==0xff: i+=1
+        assert i<len(data); m=data[i]; i+=1
+        if m in {0x00,0x01} or 0xd0<=m<=0xd9: continue
+        size=int.from_bytes(data[i:i+2],'big')
+        if m in sof: return int.from_bytes(data[i+5:i+7],'big'),int.from_bytes(data[i+3:i+5],'big')
+        i+=size
+    raise AssertionError('JPEG SOF marker not found')
+
+md_files=sorted((ROOT/'CHAPTERS').rglob('*.md'))+sorted((ROOT/'BACK-MATTER').rglob('*.md'))
+rows=[]; hashes=set(); refs=0
+for n in sorted(U):
+    kind='I' if n in I else 'R' if n in R else 'X'
+    m=image_re.fullmatch(BOOK[n-1]); assert m; name=Path(m.group(1)).name
+    paths=[p for p in ROOT.rglob(name) if p.is_file()]; assert len(paths)==1,(n,paths)
+    p=paths[0]; data=p.read_bytes(); digest=sha256(data).hexdigest(); assert digest not in hashes; hashes.add(digest)
+    hits=[]
+    for md in md_files:
+        for j,line in enumerate(md.read_text().splitlines(),1):
+            if re.fullmatch(r'!\[\]\((?:Images/)?'+re.escape(name)+r'\)',line): hits.append((md,j))
+    assert len(hits)==1,(n,hits); refs+=2
+    split,j=hits[0]; w,h=jpeg_size(data)
+    rows.append(f'{n}|{kind}|{p.relative_to(ROOT).as_posix()}|{len(data)}|{w}|{h}|{digest}|{split.relative_to(ROOT).as_posix()}|{j}')
+payload='\n'.join(rows)+'\n'
+assert refs==542 and len(hashes)==271
+assert sha256(payload.encode()).hexdigest()=='ab4d84f0e9644caaa1bf8e2dde9b64319c030b45adb1e3f24b160a657ce2f7f2'
+print('T07 final asset oracle: PASS source=397; C4/P/Q=215/46/13; assets=271; refs=542; classes=4,38,229; unique_hashes=271')
+PY
+```
+
+Recorded output:
+
+```text
+T07 final asset oracle: PASS source=397; C4/P/Q=215/46/13; assets=271; refs=542; classes=4,38,229; unique_hashes=271
 ```
 
 ## Construction Model
