@@ -57,6 +57,7 @@ Closed for the reopened canonical source audit. `BOOK` means `ref/A-New-Kind-of-
 | 14 | literal `quiescen...` control | 1 | 0 |
 | 15 | exact sum/total aliases tied to totalistic construction | 3 | 1 |
 | 16 | emulation/network/reversibility/application/universality boundary phrases | 6 | 0 |
+| 17 | named binary radius-two codes `20` / `52`, including collision controls | 14 | 6 |
 
 The zero hits matter: neither `semi-totalistic` nor literal `3k-2` occurs, and code `777` occurs only in the strict figure, not OCR text. “Sum (totalistic) rules” is an actual-Index alias; the main strict text says average, while the implementation sums assigned integer values.
 
@@ -99,6 +100,9 @@ rows=[
  '3914,11908,13536','22146'),
 (r'(?i)three-color rule illustrated here is totalistic|Code 420 is an example of an additive rule|If the connections at each node are not labelled, then only totalistic|no non-trivial totalistic rule|even-numbered totalistic 5-neighbor rules|totalistic cellular automata can be universal',
  '7912,11918,13658,16024,17431,18748','-'),
+(r'(?i)code(?: number)?s?\s+(?:20|52)(?![0-9])',
+ '3302,3310,3316,3330,3332,3336,3344,11509,14632,14760,15301,15321,18672,18748',
+ '20980,21162,21241,21471,21517,22352'),
 ]
 sets=[]
 for q,(pat,pre_s,idx_s) in enumerate(rows,1):
@@ -113,16 +117,16 @@ for q,(pat,pre_s,idx_s) in enumerate(rows,1):
 # T03 lexical queries above.
 follow={764,778,780,782,788,792,794,798,802,810,818,820,822,826,828,830,832,
 836,840,842,844,858,860,1280,1419,1958,2172,2800,2804,2824,2828,2830,
-2832,2834,2836,2838,2844,2846,2848,2850,2866,2920,3298,3300,3302,3304,
-3306,3308,3310,3312,3314,3316,3318,3320,3322,3324,3326,3328,3330,3332,
-3334,3336,3338,3340,3342,3344,3348,3350,3352,3356,3360,3362,3364,3368,
+2832,2834,2836,2838,2844,2846,2848,2850,2866,2920,3298,3300,3304,
+3306,3308,3312,3314,3318,3320,3322,3324,3326,3328,
+3334,3338,3340,3342,3348,3350,3352,3356,3360,3362,3364,3368,
 3370,3372,3374,3376,3378,3380,5218,5222,5482,5486,6336,6338,6642,7900,
 7910,8306,8308,8534,8544,8546,8560,8934,9164,10395,10399,10411,11069,
 11071,11166,11170,11176,11182,11297,11301,11303,11305,11307,11375,11627,
-11629,11914,12055,13540,14226,14228,14230,14232,14760,14762,14764,14766,
+11629,11914,12055,13540,14226,14228,14230,14232,14762,14764,14766,
 14827,14829,14831,14833,15661,15972,17139,17874,18339,18476,18744,18746,
-18850,18877,20846,20967,21134,21162,21223,21241,21471,21517,21683,21933}
-assert len(follow)==149
+18850,18877,20846,20967,21134,21223,21683,21933}
+assert len(follow)==137
 
 assets={
 764:'![](_page_74_Picture_5.jpeg)',778:'![](_page_75_Figure_6.jpeg)',
@@ -183,7 +187,7 @@ partition={k:xs(v) for k,v in parts.items()}
 queried=set().union(*sets)
 flat=[i for v in partition.values() for i in v]
 union=queried|follow
-assert len(rows)==16 and len(queried)==114 and len(union)==263
+assert len(rows)==17 and len(queried)==126 and len(union)==263
 assert len(flat)==len(set(flat))==263 and set(flat)==union
 assert [len(partition[k]) for k in partition]==[87,11,38,51,56,20]
 
@@ -203,13 +207,14 @@ t04_parts={
 t04_union=set().union(*(set(xs(v)) for v in t04_parts.values()))
 new23={3298,3300,3302,3304,3306,3308,3310,3312,3326,3330,3332,3336,
        3338,3340,3344,8308,14760,14762,14764,14766,21162,21241,21517}
-historical=queried|{11069,11071,11914,13540}
+historical=(set().union(*sets[:-1]))|{11069,11071,11914,13540}
 assert len(t04_union)==239 and len(new23)==23 and len(historical)==118
 assert union==t04_union|new23|{18770} and historical<=union
 t04_text=Path('goal-1/23-T04-THREECOLOR-TOTALISTIC.md').read_text()
 t04_search=t04_text.split('## Search Log',1)[1].split('## Book Excerpts',1)[0]
 m=re.search(r'\nparts=\{\n(.*?)\n\}\npartition=',t04_search,re.S); assert m
-assert ast.literal_eval('{'+m.group(1)+'}')==t04_parts
+live_t04=ast.literal_eval('{'+m.group(1)+'}')
+assert {k:set(xs(v)) for k,v in live_t04.items()}=={k:set(xs(v)) for k,v in t04_parts.items()}
 
 # Exact 70-link join to the independent T03 metadata oracle.
 stage=Path('goal-1/22-T03-TOTALISTIC-CA.md').read_text()
@@ -568,7 +573,7 @@ All verbatim monolith material is placed in blockquotes so the oracle below can 
 
 ## Source Repairs
 
-1. **Primary files and hashes.** Strict text/captions were checked against the official [`nks-ch3.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch3.pdf), SHA-256 `d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76`. Chapter 3 Notes page 886 was checked against official [`nks-nts-ch3.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-nts-ch3.pdf), SHA-256 `21666aa07f49e47483cdc9883e285b8cd47d397dd18eea0b72f05d4d3272a009`. Built-in examples were checked against official [`nks-notes.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf), SHA-256 `549f043595653a7d276b07ba52d435700039b71427b4e1774a44b1a58eff4723`. The truncated 2D caption was checked against official [`nks-ch7.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch7.pdf), SHA-256 `44d1eebd831f780da80bd8a383016aa9cec6aa7ff666fd33690f679c8479210f`.
+1. **Primary files and hashes.** Strict text/captions were checked against the official [`nks-ch3.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch3.pdf), SHA-256 `d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76`. The pictured class-4 and code-20/357/1329 profiles were checked against official [`nks-ch6.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch6.pdf), SHA-256 `5af1e53860bd4a6877961681cf49b16058a53ee55a2bfa8c64ac7cc13174bca0`. Chapter 3 Notes page 886 was checked against official [`nks-nts-ch3.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-nts-ch3.pdf), SHA-256 `21666aa07f49e47483cdc9883e285b8cd47d397dd18eea0b72f05d4d3272a009`. Built-in examples were checked against official [`nks-notes.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf), SHA-256 `549f043595653a7d276b07ba52d435700039b71427b4e1774a44b1a58eff4723`. The truncated 2D caption was checked against official [`nks-ch7.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch7.pdf), SHA-256 `44d1eebd831f780da80bd8a383016aa9cec6aa7ff666fd33690f679c8479210f`.
 2. **`BOOK:3914` truncation.** The monolith retains only the caption tail beginning `total is exactly 4`. The official Chapter 7 caption restores: a random initial condition; the nine-cell neighborhood of self plus eight adjacent cells including diagonals; white for totals below 4; black for totals above 6; white for total 5; and black for total 4. The Chapter 7 split line 491 also restores an opening clause but compresses away most of this official rule, so it is corroboration, not normalization authority.
 3. **`BOOK:11037` truncation.** The official all-Notes page continues the sentence with `page 927.` The normalized pointer is: totalistic implementation page 886; higher-dimensional implementation page 927. It carries routing only.
 4. **`BOOK:11168` invocation OCR.** `ln[11]`, displaced brackets, and the call shape are extraction errors. Official all-Notes gives normalized `In[11] := Show[RasterGraphics[CellularAutomaton[{867, {3, 1}, 1}, {{1}, 0}, 50]]]`. The prose identity `code 867`, `k=3`, `r=1` is intact in the monolith.
@@ -639,6 +644,7 @@ assert 'k = 2, t = 2 totalistic rule with code 20' in L[14631]
 
 official={
 '/tmp/nks-ch3.pdf':'d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76',
+'/tmp/nks-ch6.pdf':'5af1e53860bd4a6877961681cf49b16058a53ee55a2bfa8c64ac7cc13174bca0',
 '/tmp/nks-nts-ch3.pdf':'21666aa07f49e47483cdc9883e285b8cd47d397dd18eea0b72f05d4d3272a009',
 '/tmp/nks-notes.pdf':'549f043595653a7d276b07ba52d435700039b71427b4e1774a44b1a58eff4723',
 '/tmp/nks-ch7.pdf':'44d1eebd831f780da80bd8a383016aa9cec6aa7ff666fd33690f679c8479210f',
@@ -651,17 +657,24 @@ def pdf_text(name):
     raw=subprocess.check_output(['pdftotext','-layout',name,'-'],text=True,errors='replace')
     return re.sub(r'\s+',' ',raw)
 strict=pdf_text('/tmp/nks-ch3.pdf')
+ch6=pdf_text('/tmp/nks-ch6.pdf')
 nts=pdf_text('/tmp/nks-nts-ch3.pdf')
 notes=pdf_text('/tmp/nks-notes.pdf')
 ch7=pdf_text('/tmp/nks-ch7.pdf')
 assert 'The idea of a totalistic rule is to take the new color of each cell to' in strict
+for c in (20,357,1329,1659,1632): assert f'code {c}' in ch6,c
+assert 'condition number 151 we finally see a structure that persists.' in ch6
+assert 'evolution from the first twenty-five billion possible initial conditions.' in ch6
+assert 'repetition periods up to 15' in ch6
 assert 'specific assignment of values to colors' in nts
 assert 'respectively k ^Table[i - 1, {i, 2 r + 1}] and Table[1, {2 r + 1}]' in nts
 assert 'page 927.' in notes
 assert 'This runs the totalistic k=3 , r =1 rule with code 867.' in notes
 assert 'In[11] : = Show[RasterGraphics[CellularAutomaton[{867, {3, 1}, 1}, {{1}, 0}, 50]]]' in notes
-assert 'The k = 2 , r = 2 totalistic rule with code 20 gives a network with 65535 nodes after just 1 step.' in notes
-assert 'The shortest excluded block for code 20 is of length 36.' in notes
+assert 'largest network, with 280 nodes and 551 arcs. The k = 2 , r = 2' in notes
+assert 'totalistic rule with code 20 gives a network with 65535 nodes' in notes
+assert 'sequences. (The shortest excluded block for code 20 is of' in notes
+assert 'length 36.)' in notes
 assert 'Behavior of a two-dimensional cellular automaton starting from a random initial condition.' in ch7
 assert '9-cell neighborhood consisting of the cell itself and the 8 cells adjacent to it (including diagonals).' in ch7
 for fragment in ('If this total is less than 4','if the total is greater than 6',
@@ -681,14 +694,14 @@ for k,r in ((2,1),(2,2),(3,1),(5,1),(8,1)):
     assert reachable==set(range(M))
     assert k**M==k**(1+(k-1)*(2*r+1))
 assert 8**22==2**66
-print(f'T03 evidence oracle: PASS cited={len(cited)} quote_fragments={quote_count} quote_lines={len(quote_lines)} repairs=6 pdfs=4')
+print(f'T03 evidence oracle: PASS cited={len(cited)} quote_fragments={quote_count} quote_lines={len(quote_lines)} repairs=6 pdfs=5')
 PY
 ```
 
 Expected terminal line:
 
 ```text
-T03 evidence oracle: PASS cited=<dynamic> quote_fragments=88 quote_lines=85 repairs=6 pdfs=4
+T03 evidence oracle: PASS cited=<dynamic> quote_fragments=88 quote_lines=85 repairs=6 pdfs=5
 ```
 
 ## Construction Model
