@@ -752,7 +752,7 @@ Repository-wide inspection finds no implemented T07 property or transform API. T
 - **Principles 13-15:** rule 30/86, rule 29, rule 90, hostile exterior, a one-sided schema, a diagonal two-component action, exact counts, and object identity are explicit adversaries. Current tests do not already prove them.
 - **Principle 16:** one generic action/property/transform/orbit-representation boundary is architecture. A `symmetric` flag, family branch, reversed selector, independent component quotient, or seed-based shortcut is a shim.
 
-D111-D119 remain valid. T07 closes the following post-audit decision for global integration:
+D111-D119 remain valid. The repaired working architecture proposes the following post-audit decision; D120 remains provisional until the reopened source/asset closure and hostile review pass:
 
 ### D120 — Left-right symmetry is a validated program property over an explicit action; orbit lookup is representation, not execution semantics
 
@@ -770,7 +770,7 @@ D111-D119 remain valid. T07 closes the following post-audit decision for global 
 3. **Complete:** derive the reflection action, local fixed-point predicate, reflected-program involution, global covariance qualifications, exact counts/codecs, totalistic proof, and orbit representation.
 4. **Complete:** audit current documentation/runtime/tests and the T01-T06, two-dimensional/isotropy, seed, boundary, observer, and emulation boundaries.
 5. **Complete:** specify typed claims, evidence, unsupported results, validated selection, transform/representation identity, serialization, and migration.
-6. **Complete locally:** run the four embedded oracles, independent review, repository tests, Markdown fences, diff/status gates, and then integrate D120 and the Goal 2 handoff globally.
+6. **In progress:** saturate the reopened wider-context/source-adjacency and direction-sensitive asset universes, rerun all embedded oracles and hostile review, then run repository tests, Markdown fences, diff/status gates, and reclose D120 and the Goal 2 handoff globally.
 
 ## Goal 2 Implementation Stage
 
