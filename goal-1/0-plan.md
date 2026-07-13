@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 19 of 45 type stages complete, T02 Multi-Color Nearest-Neighbor Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T02/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37/T39/T41/T43/T44/T45 complete, 20 of 45 type stages complete, T03 Totalistic Cellular Automata in progress, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
@@ -78,7 +78,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T02 is the `k>=3`, radius-one finite-alphabet parameterization of T01. It reuses fixed ordered support, `AllSites`, old left/self/right reads, typed same-site assignment, atomic commit, deterministic continuation, realization, and trace semantics without a new executor or update law.
 - A T02 program is primarily an explicit ordered alphabet plus one complete `k^3`-entry table. Its optional Wolfram base-`k` codec uses positional address `k^2*l+k*c+r`, keeps `000` least significant, and requires arbitrary-precision tagged identity; already `k=4` has `2^128` possible tables.
 - Alphabet rank, numeric totalistic value, and palette tone remain distinct. Mutation histories, reversibility, purpose searches, behavior labels, and binary emulations are provenance/property/analyzer/relation records; T03/T04/T05, T06, and T07 retain their own aggregation/background/symmetry audits.
-- T02 closes an exact 29-query/157-candidate search partition and 20 evidence groups with no remainder. Ten included, five excluded, and two relation-only assets are hash-pinned; source, semantic, metadata, reversible/inverse-window, and rule-921408 raster oracles pass.
+- T02 closes an exact 29-query/157-candidate search partition and 21 evidence groups with no remainder. Eleven included, six excluded, and two relation-only assets are hash-pinned; source, semantic, metadata, direct Voronoi priority-table, reversible/inverse-window, and rule-921408 raster oracles pass.
 - T02 exposes current runtime defects rather than adding a branch: exhaustive arity is wrong, selector significance is mirrored, general outputs are binary-masked, ordinary lookup is not executable, and batch rule identity is coerced to fixed-width `int64`.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
@@ -653,7 +653,7 @@ The semantic oracle passes exact heat/wave identities, the incompatible diffusio
 
 ### 21-T02-MULTICOLOR-CA
 
-Status: **IN PROGRESS** in `goal-1/21-T02-MULTICOLOR-CA.md`.
+Status: **COMPLETE** in `goal-1/21-T02-MULTICOLOR-CA.md`.
 
 #### Big Picture Objective
 
@@ -667,7 +667,15 @@ Apply the common protocol, emphasizing color count, ordered neighborhood table s
 
 All T02 evidence is captured; reuse versus extension is proven; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+The exact 29-query oracle partitions all 157 candidate lines, and 21 evidence groups close every strict, Notes, actual-Index, split, implementation, variant, property, application, search, and emulation route with no unresolved remainder. T02 is exactly the `k>=3`, radius-one finite-alphabet/table parameterization of T01: fixed ordered support, `AllSites`, ordered old left/self/right reads, one complete `k^3` table, typed same-site assignment, atomic commit, and deterministic continuation. The Wolfram codec uses `k^2*l+k*c+r`, preserves leading-zero rows, and requires arbitrary-precision tagged identity; no executor or update law is added.
+
+All seven embedded oracles pass. They cover the `3^27` count, every binary specialization, asymmetric codes and exact source traces, evolving-background and fixed-width adversaries, 11 included/six excluded/two relation-only assets, the direct Voronoi priority-table expansion, ten reversible labels and inverse windows `3,4,5,6`, and the direct rule-921408 JPEG regression. All 48 quotes match the monolith. D111-D114 preserve alphabet/table/codec identity, rank/aggregate/palette separation, and mutation/reversibility/search/emulation boundaries. Independent re-review, fences, `git diff --check`, and all 102 repository tests pass; no prior stage reopened. Next: T03.
+
 ### 22-T03-TOTALISTIC-CA
+
+Status: **IN PROGRESS** in `goal-1/22-T03-TOTALISTIC-CA.md`.
 
 #### Big Picture Objective
 

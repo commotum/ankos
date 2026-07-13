@@ -1,6 +1,6 @@
 # 21-T02-MULTICOLOR-CA
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -984,15 +984,17 @@ The discrete-Voronoi, mutation, reversible, doubling-search, inverse-range, and 
 - [x] Exact state/alphabet/table/code/read/update/successor/boundary/seed semantics and variants are explicit.
 - [x] T01/T03/T04/T06/T07/reversible/emulation boundaries and current API/runtime fit are proved.
 - [x] Goal 2 files/dependencies/tests and no-cheating gates are implementation-ready.
-- [ ] Global plan/evidence/design ledgers, independent review, diff checks, and repository tests are integrated.
+- [x] Global plan/evidence/design ledgers, independent review, diff checks, and repository tests are integrated.
 
 ## Stage Results
 
-Evidence and design are complete pending the final independent-review/integration gate. The exact 29-query oracle partitions all 157 candidate lines with no remainder, and E1-E21 preserve every unique construction-relevant strict, Notes, actual-Index, split, variant, implementation, property, search, and emulation passage. All 48 quoted fragments match the canonical monolith after presentation-only quote/whitespace normalization; the 34-line source oracle and all cited `BOOK:` bounds pass. Official PDFs repair only the visibly damaged positional weights, digit-count exponent, invocations, and inverse-rule labels; normalized repairs are never passed off as local quotations.
+Complete. The exact 29-query oracle partitions all 157 candidate lines with no remainder, and E1-E21 preserve every unique construction-relevant strict, Notes, actual-Index, split, variant, implementation, property, search, and emulation passage. All 48 quoted fragments match the canonical monolith after presentation-only quote/whitespace normalization; the 34-line source oracle and all cited `BOOK:` bounds pass. Official PDFs repair only the visibly damaged positional weights, digit-count exponent, invocations, and inverse-rule labels; normalized repairs are never passed off as local quotations.
 
 T02 is the `k>=3`, radius-one parameterization of T01: one total field over an explicit ordered finite alphabet, `AllSites`, ordered old `(left,self,right)` reads, one complete `k^3` table, typed same-site assignment, and T01 atomic commit. The optional Wolfram codec uses address `k^2*l+k*c+r`, has exactly `k^(k^3)` valid tables, and requires arbitrary-precision lossless identity. Rank, numeric aggregate, and palette are distinct. Seeds, backgrounds, finite realizations, horizons, mutation histories, reversibility claims, searches, behavior labels, rasters, and emulations remain independent records.
 
-The semantic oracle proves the exact `3^27` count, all 256 T01 specializations, positional asymmetry, codes `921408` and `5407067979`, the identity/mutation table, `k=4` fixed-width pressure, exact purpose-doubling traces, and the 101-by-201 rule-921408 digest. Metadata pin 10 included, five excluded, and two relation-only assets. All ten printed reversible codes pass cyclic injectivity through length nine; the four Notes examples reproduce inverse windows `3,4,5,6`. The direct rule-921408 JPEG regression passes with `r=0.989621884093`, MAE `4.113100751`, and RMSE `8.052767980`. No source-permitted second pixel golden exists.
+The semantic oracle proves the exact `3^27` count, all 256 T01 specializations, positional asymmetry, codes `921408` and `5407067979`, the identity/mutation table, `k=4` fixed-width pressure, exact purpose-doubling traces, and the 101-by-201 rule-921408 digest. Metadata pin 11 included, six excluded, and two relation-only assets. The direct Voronoi priority oracle expands all 27 contexts with branch counts `8/5/14`, display `111000222111011200111011200`, and code `3681845932419`. All ten printed reversible codes pass cyclic injectivity through length nine; the four Notes examples reproduce inverse windows `3,4,5,6`. The direct rule-921408 JPEG regression passes with `r=0.989621884093`, MAE `4.113100751`, and RMSE `8.052767980`. No source-permitted second pixel golden exists.
+
+All seven embedded evidence/semantic/asset blocks pass, all Markdown fences are balanced, `git diff --check` passes, and all 102 repository tests pass. Independent review found the initially omitted direct Voronoi fixture; after its evidence, metadata, adjacent-2D exclusion, and priority-table oracle were added, re-review found no substantive blocker.
 
 ## Integration Results
 
