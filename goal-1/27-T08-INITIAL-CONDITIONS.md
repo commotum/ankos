@@ -43,11 +43,51 @@ Determine exactly which initial-condition classes the source uses, reconstruct t
 
 ## Search Log
 
-Audit in progress. The final log will include exact monolith candidate generators, governed continuations, split reverse joins, Index routes, asset closure, classifications, and zero-remainder checks without claiming semantic exhaustiveness for unformalized manual supplements.
+`BOOK` means the canonical monolith `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. Its body and Notes occupy physical lines `1-20825`; the actual Index begins at `20826`. Twelve frozen regex families produce 1,022 unique candidates: 952 pre-Index lines and 70 actual-Index routes. Exact adjudication retains 482 matched pre-Index lines, rejects 470 pre-Index controls, and treats all 70 Index lines as navigation. Five governed continuations at `BOOK:978,1346,2216,12034,13304` produce the authoritative 487-line retained set.
+
+| Frozen set | Count | SHA-256 of sorted physical line numbers |
+|---|---:|---|
+| Twelve-query union `U` | 1,022 | `d075e4ebfb5972df0d9047f3c6e8d2271bd8b928b440c666906f0c46b282f362` |
+| Matched retained | 482 | `9f7276348fc17b183091f36fa21cc561d4e87f2ff827fd64841648d0e843ed92` |
+| Governed continuations | 5 | exact set above |
+| Authoritative retained `S` | 487 | `42733f504fa41a98a9f01f88ebeb43b7c8d3e24e0e620229fa9cae3ef62d6ace` |
+| Excluded/control pre-Index `X` | 470 | `9914e686142328cece65c6336a5e2797ee2dcbb2090de702139cf826e172840b` |
+| Actual-Index routes | 70 | `4e2da3563269b9fa8aa5fc698d2873d6d052a2cb89f2a9d3354d14600582fa13` |
+
+Thus the full declared audit is `1,027 = 487 retained + 470 excluded + 70 Index`, with zero unclassified lines. The 70 Index lines supply navigation only. The split corpus reverse-check finds normalized byte-exact mirrors for 442/487 retained monolith lines; the other 45 are pinned line-join/OCR variants. The normalized exact-mirror set digest is `b85d35a696969b27e517923985d35c4dbfe73eb0213bae774e48d8d81b8a0961`. The monolith remains authoritative rather than pretending those variants are independent evidence.
+
+Known extraction defects are retained as evidence controls, not silently repaired: lost figure glyphs at `BOOK:10647,11277,14341,18764`; a truncated initial condition at `5552`; OCR corruption at `18394,18814`; and damaged `CellularAutomaton` syntax near `11077`. None changes the prose-level seed/configuration distinctions. The executable line-set/query/split oracle below freezes the exact protocol.
 
 ## Book Excerpts
 
-Audit in progress.
+Short fragments below are provenance anchors; the construction fact, behavior observation, and implementation/view convention remain separate.
+
+| Source | Section/context | Short source fragment | Construction fact |
+|---|---|---|---|
+| `BOOK:418-432` | first CA example | “cell in the center is black and all other cells are white” | single distinguished label over an explicit uniform background |
+| `BOOK:746` | all 256 ECAs | “starting from a single black cell” | one profile can be reused across many unchanged programs |
+| `BOOK:790,846` | three-color totalistic gallery | “initial condition used contains a single gray cell” | gray is a typed source value/role, not a palette guess |
+| `BOOK:2706-2710` | Starting from Randomness | “usually started with just a single black cell”; “every cell is chosen ... at random” | simple point and per-cell-random classes are distinct; this passage does **not** specify independence or equal probability |
+| `BOOK:3060-3098` | rule 30/22/90 comparisons | random versus single/limited-region starts | the same RULE has different runs/behavior; seed is not program identity |
+| `BOOK:3126-3140` | Special Initial Conditions | “fixed block ... repeated forever”; “random sequence of ... blocks” | native periodic field and block-process class are distinct |
+| `BOOK:3150-3168` | rule-126/rule-90 block emulation | pairs of black or white cells act as cells | a block-coded seed class is a decoder image and emulation relation |
+| `BOOK:3204-3210` | rule 184 nested start | “nested initial conditions ... from substitution systems” | generated start requires an explicit derivation to a frozen target configuration |
+| `BOOK:3216,4294` | rule-184 random starts | “exactly equal numbers of black and white cells” | finite exact composition is distinct from iid/density-only randomness |
+| `BOOK:3388,3406` | rule-110 structures | “block of length 41 inserted between blocks of the background” | periodic background plus finite defect is native seed data |
+| `BOOK:5242` | reversible CA | “equal probability on the two successive first steps” | a program may need multiple temporal slices; equality is explicit here but independence is not |
+| `BOOK:7052,7058` | statistical models | “all possible sequences ... equal probability”; “fixed independent probability p” | explicit finite equal-sequence and iid-`p` laws are available, but cannot be retrofitted as the unstated law at `2708` |
+| `BOOK:8400` | rule 73 | “no run of an even number of black squares” | constrained initial-condition class differs from unrestricted random starts |
+| `BOOK:10899,11077-11150` | `CellularAutomaton` implementation | explicit cyclic list; finite values on constant/repeating background; offset blocks | configuration presentation, finite topology, background, offsets, and multidimensional forms are separately expressible |
+| `BOOK:11124-11150` | output specifications | affected region, `Automatic`, explicit offsets | work/output crop is not native initial support or boundary |
+| `BOOK:13265` | information content | single black on white versus “infinite sequence of randomly chosen cells” | compact finite and infinite random configurations have different information/scope |
+| `BOOK:14031` | differential problems | initial-value versus boundary-value specifications | T45 side data is not automatically a T08 event-zero configuration |
+| `BOOK:14213` | randomness each step | random changes during evolution | transition-time draws are not initial-condition sampling |
+| `BOOK:14275` | random starts in other systems | random tape colors with definite active cell; finite word/tag limits; random graphs; constraints have no starts | seed/profile schema is support-family-specific and does not force nonstep categories into rollout |
+| `BOOK:18674` | rule-110 cyclic-tag emulation | infinite left repetition, finite middle, infinite right repetition | ultimately periodic piecewise field is target-run data in an explicit emulation relation |
+| `BOOK:19072` | continuum/cardinality | finite-on-white arrangements versus infinite configurations | finite descriptors/materializations cannot stand in for arbitrary infinite configurations |
+| `BOOK:20128,20577` | proof/search boundaries | run-specific occurrence; rule cases unvisited by an initial condition | a seed/run cannot certify a rule property or erase unsampled table rows |
+
+No retained source gives T08 a seed-dependent native transition rule, new firing locus, new write, or new update algebra. `BOOK:12352` and `15766` discuss derived emulation/mapping facts in which changing source input can change a constructed target artifact; they do not make the target rule inspect a seed family during execution.
 
 ## Construction Model
 
@@ -283,7 +323,7 @@ Thus equally named source roles reuse seed/profile infrastructure only when thei
 ```bash
 python3 - <<'PY'
 from fractions import Fraction
-from itertools import product
+from itertools import permutations, product
 from math import comb
 
 def evaluate(presentation, x):
@@ -345,15 +385,47 @@ finite_cyclic=tuple(tile[x%3] for x in range(12))
 assert infinite_window==finite_cyclic
 assert ('Z-periodic',tile)!=('cycle-3',tile)
 
-# Schema membership and global invariants are initialization obligations.
+# One DomainSchema can admit variable-support words; fields are not universal.
+def valid_word(x): return x[0]=='word' and all(v in (0,1) for v in x[1])
+assert valid_word(('word',(1,))) and valid_word(('word',(1,0,1,1)))
+
+# Graph configuration identity is invariant to incidental vertex names/order.
+def canon_graph(edges):
+    vertices=sorted({v for e in edges for v in e})
+    rows=[]
+    for perm in permutations(range(len(vertices))):
+        ren=dict(zip(vertices,perm))
+        rows.append(tuple(sorted((ren[a],ren[b]) for a,b in edges)))
+    return min(rows)
+assert canon_graph(((0,1),(1,2)))==canon_graph(((2,0),(0,1)))
+
+# Same denotational configuration, different construction/sample provenance.
+x0=('word',(1,0,1))
+assert x0==tuple(['word',(1,0,1)])
+assert ('literal-profile','x0')!=('sample-law-A','key-7','x0')
+
+# Schema membership and structured global invariants are initialization obligations.
 def valid_head_config(xs):
     return all(symbol in (0,1) and head in (None,'q0','q1') for symbol,head in xs) \
            and sum(head is not None for _,head in xs)==1
-assert valid_head_config(((0,None),(1,'q0'),(0,None)))
+symbols=(0,1,0)
+structured=tuple((s,'q0' if i==1 else None) for i,s in enumerate(symbols))
+assert structured[1]==(1,'q0') and valid_head_config(structured)
 assert not valid_head_config(((0,'q0'),(1,'q1')))
 assert not valid_head_config(((2,None),(1,'q0')))
 
-print('T08 semantic oracle: PASS presentations, laws, temporal state, domains, invariants')
+# One-cell halo is exact for t=1 at x=0 but not automatically for t=2.
+def rule90(field,lo,hi,exterior=0):
+    get=lambda x: field.get(x,exterior)
+    return {x:get(x-1)^get(x+1) for x in range(lo,hi+1)}
+native={x:0 for x in range(-4,5)}; native[2]=1
+work={x:native[x] for x in range(-1,2)}
+n1=rule90(native,-4,4); w1=rule90(work,-1,1)
+assert n1[0]==w1[0]==0
+n2=rule90(n1,-4,4); w2=rule90(w1,-1,1)
+assert n2[0]==1 and w2[0]==0
+
+print('T08 semantic oracle: PASS fields, laws, variable domains, history, invariants, halo')
 PY
 ```
 
@@ -364,16 +436,16 @@ PY
 The repaired generic API should expose:
 
 ```text
-ConfigurationSchema.validate(configuration)
-ConfigurationPresentation.evaluate(point) / materialize(window)
-InitialConditionClass.contains(configuration) / certified_image(...)
-InitialDistribution.cylinder_probability(event) / sample(finite_scope, sampler)
-InitialProfile.resolve(schema, realization_request) -> SampledInitialConfiguration
+ConfigurationSchema.validate(configuration) -> ValidationResult/Evidence
+ConfigurationConstructor.construct(closed_args) -> ConstructionRecord
+InitialConditionClass.membership(configuration, capability) -> MembershipResult
+InitialDistribution.sample(typed_request, SamplingRealization) -> SampleRecord
+ComputationLowering.lower(configuration, horizon, observation) -> LoweringRecord
 ```
 
-Not every operation is available for every descriptor. An abstract infinite law can support cylinder probabilities but reject total materialization; a closed deterministic total field can support point evaluation; a finite explicit configuration can support exhaustive membership and hashing. Unsupported capability is typed and does not trigger a callback fallback.
+Optional capabilities are schema-specific. A fixed field presentation may support `evaluate(point)` and `materialize(window)`; a word supports indexed sequence access; a graph exposes structural loci and alpha-invariant identity. An abstract product measure may support cylinder probabilities but reject total materialization; an undecidable class may return `Unknown` or unsupported membership; a finite explicit configuration may support exhaustive hashing. No universal point/window/canonical-coordinate operation and no callback fallback is inferred from the generic interface.
 
-The smallest change to the conceptual SimpleProgram record is to replace the scalar-fill seed formula with a schema-targeted event-zero constructor/law reference. Program construction must not require a preferred seed. A run convenience preset may pair a program and an initial profile, but resolving that preset returns the same program object plus separate run inputs.
+The smallest change to the conceptual SimpleProgram/run model is to generalize the scalar-fill seed formula into schema-targeted event-zero construction/law records outside program identity. Program construction must not require a preferred seed. A convenience experiment preset may pair a program and an initial profile, but resolving it returns the same program object plus separate construction/sample, validation, realization, and run references.
 
 ## Current Runtime Fit
 
@@ -386,8 +458,8 @@ Current runtime reuse is real but narrower than the catalog abstraction:
 | `render(seed, shape, rng)` (`seeds.py:879-939`) | finite materializer | split validation, law sampling, exact configuration construction, and finite materialization; remove family dispatch from semantic resolution |
 | `rng=None` (`seeds.py:58-63`) | convenience only | reject or explicitly record nondeterministic entropy for semantic runs; retain algorithm/version/key/sample provenance |
 | Bernoulli renderer (`seeds.py:930-935`) | a different hierarchical law than its name suggests | it draws one global `p` uniformly in `[p_low,p_high]`, then cells conditionally; add an actual fixed-`p` product law, validate bounds, and name the mixture honestly |
-| `fractal`/`spiral` predicate params (`seeds.py:733-780`) | opaque callback shim | replace with closed support/expression or explicit derived-configuration data; never execute arbitrary predicates as seed semantics |
-| `compound`/structured factories | useful presentation vocabulary | preserve component values, distributions, conflicts, DOMAIN, and provenance instead of reducing to one scalar mask/union |
+| `fractal`/`spiral` predicate params (`seeds.py:733-780`) | opaque callback shim | replace with a supported closed support/expression or a frozen exact configuration plus relation; never execute arbitrary predicates/source programs as seed semantics |
+| `compound`/structured factories | useful presentation vocabulary | preserve component values, laws, conflicts, DomainSchema/support instance, invariant proof, and provenance instead of reducing to one scalar mask/union |
 | `DatasetSpec`/`EpisodePlan` (`src/ca/datasets.py:57-128`) | downstream experiment recipes | keep shape, split, held-out stream, transforms, boundary, batching, and RNG planning outside program and mathematical law identity |
 | Raw episode records (`src/ca/specs.py:58-81`) | trace carrier | add exact initial-configuration/profile/sample references so temporal history and realization provenance are recoverable |
 | SplitMix helpers (`src/ca/rng.py:20-70`) | reusable deterministic key derivation | bind algorithm/version/counter and draw mapping to sample provenance; a stable integer key alone does not define the mathematical law |
@@ -395,7 +467,7 @@ Current runtime reuse is real but narrower than the catalog abstraction:
 
 All current rendered spatial values are coerced into `np.int64`; one `selected_value` and `fill_value` cannot carry a composite Turing cell, heterogeneous component assignment, exact real, symbolic value, or schema invariant. `support=None` and a finite `shape` silently turn “whole native DOMAIN” into “this tensor.” A point selector with a nonzero time coordinate is also not representable faithfully once rendering drops the time axis. These are representation gaps, not reasons for a seed executor.
 
-Temporal rollout reveals a more serious state boundary. `_rollout_ar2` treats `(x[-1],x[0])` as hidden previous/current values but serializes only `x[0],x[1],...` (`src/ca/rollout.py:334-359`). `_rollout_temporal_lookup` does the same with three lag values (`:362-413`). `_rollout_lagcounts` first serializes ten individual seed values, then evolves one packed ten-bit state (`:417-476`). The rule-generated successor depends on information absent from the serialized scalar “state,” and the apparent configuration schema changes during one episode. Goal 2 must make the tuple/shift register the ordinary `t+0D` configuration at every event and move scalar series into an observer projection.
+Temporal rollout reveals a more serious state boundary. `_rollout_ar2` treats `(x[-1],x[0])` as hidden previous/current values but serializes only `x[0],x[1],...` (`src/ca/rollout.py:334-359`). `_rollout_temporal_lookup` does the same with three lag values (`:362-413`). `_rollout_lagcounts` first serializes ten individual seed values, then evolves one packed ten-bit state (`:417-476`). The rule-generated successor depends on information absent from the serialized scalar “state,” and the apparent configuration schema changes during one episode. Goal 2 must make the complete named-lag/shift-register state visible in the ordinary `t+0D` configuration at every event and move the scalar series into an observer projection; product labels, components, or tuple codecs remain representation choices.
 
 Current tests establish factory shapes, deterministic placement, some RNG reproducibility, and dataset behavior. They do not establish schema membership, typed/composite values, exact law identity, iid versus mixture/fixed composition, native infinite presentations, coordinate-order independence, temporal-state observability, lossless serialization, boundary separation, or unchanged program identity. Existing outputs are migration evidence, not authority where they conflict with the source-faithful model.
 
@@ -411,10 +483,10 @@ Additional current defects must be made explicit in the migration:
 ## Principles Audit
 
 - Principles 1, 9, and 10 suggest a discoverable catalog preset/profile over the independent seed axis, not a family executor.
-- Principles 5, 7, and 8 require every realized seed to be a complete valid configuration on native support; compact finite-exception and periodic forms need explicit lossless mappings.
+- Principles 5, 7, and 8 require every realized seed to be a complete valid configuration on one admitted native support/topology instance; variable-support words/trees/graphs remain first-class, while compact lattice forms need explicit lossless mappings.
 - Principle 11 keeps a one-time stochastic seed law distinct from RNG implementation and from stochastic transition rules.
-- Principle 12 keeps held-out-seed streams, batching, padding, centering, and rasterization outside program semantics.
-- Principles 13-16 require adversaries for background evolution, translation/centering, finite boundaries, ALPHABET mismatch, composite invariants, random-law identity, replay, and opaque callback rejection.
+- Principle 12 keeps held-out-seed streams, batching, storage padding, centering, orchestration, and rasterization outside program semantics; a semantic halo/causal lowering separately requires a horizon proof.
+- Principles 13-16 require adversaries for variable support, graph renaming, background evolution, translation/centering, finite topology versus approximation, ALPHABET mismatch, structured composite invariants, law capability/identity, replay, temporal resume, and opaque callback/interpreter rejection.
 
 ## Detailed Implementation Plan
 
@@ -431,41 +503,41 @@ Additional current defects must be made explicit in the migration:
 
 | Goal 2 surface | Required work |
 |---|---|
-| configuration schema | Expose native DOMAIN, typed ALPHABET/components, complete-configuration validation, and structural invariants. Validate initial configurations through the same schema used for every later state. |
-| closed presentation algebra | Implement finite explicit, constant, periodic, finite override, closed piecewise, and explicit derived-configuration forms. Give each canonical evaluation/materialization behavior, validation, identity, and round trip on its claimed image. |
-| configuration-class layer | Add schema-scoped closed class descriptors for constant, finite perturbation, periodic, block image, exact composition, and supported local-language/generated images. Keep informal “simple” and behavior labels outside membership. |
-| stochastic-law layer | Add fixed categorical/product laws, explicit parameter-mixture laws, fixed-composition laws, macroblock laws, and supported constrained generators. Validate scope, probabilities, conditioning, normalization, and capability. |
-| sampling realization | Record law, sampler algorithm/version, canonical finite scope/order, key or entropy provenance, and exact sample/configuration digest. Distinguish mathematical infinite measures, finite-cylinder samples, and algorithmic pseudorandom fields. |
+| configuration schema | Expose a native DomainSchema, admitted support/topology instances, typed ALPHABET/components, complete-configuration validation, and structural invariants. Validate initial configurations through the same schema used for later states, including variable-support words/trees/graphs. |
+| exact configurations and specialized presentations | Accept ordinary structural configurations directly. For fixed lattices, add finite explicit, constant, periodic, finite override, and closed piecewise codecs with capability-specific evaluation/materialization, validation, identity, and round trip on claimed images. Do not impose field APIs on other DOMAIN schemas. |
+| configuration-class layer | Add schema-scoped declarative descriptors for evidenced constant, finite perturbation, periodic, block image, finite exact composition, and supported local-language images. Membership returns invalid/unsupported/unknown/certified results; closed syntax does not promise decidability. |
+| stochastic-law layer | Add fixed categorical/product laws, explicit parameter-mixture laws, fixed-composition laws, macroblock laws, and supported structured composition/overlay/pushforward laws. Validate scope, probabilities, conditioning, normalization, invariant preservation, and advertised capabilities. |
+| sampling realization | Record law, sampler algorithm/version, law-specific scope/enumeration or structural map, key or entropy provenance, and exact configuration reference. Keep configuration digest independent of sample provenance; distinguish infinite measures, finite-cylinder samples, and algorithmic pseudorandom fields. |
 | profile/catalog resolver | Resolve source-named convenience profiles to ordinary constructors/classes/laws bound to explicit typed alphabet roles and a configuration schema. Return the exact unchanged program separately. Reject underdetermined “random” profiles instead of inventing parameters. |
-| finite realization and boundary | Materialize requested windows explicitly; keep origin/centering, topology/quotient, halo/padding, storage, and boundary records separate. Do not treat initial fill as persistent exterior. |
-| temporal migration | Represent AR2, lag lookup, and lag-count histories as product/shift-register `t+0D` configurations at every event; make scalar series a projection observer. Preserve lossless pack/unpack relations and alignment provenance. |
-| transforms/relations | Add typed translation, reflection, value permutation, block decode, derivation, quotient/covering, and crop relations. Do not collapse related configurations or presentations into one identity. |
-| serialization/identity | Version and round-trip schema, class, presentation, law, sampling realization, realized configuration, run realization, boundary, and observer references independently. Reject stale/tampered digests and opaque payloads. |
+| finite realization and boundary | Lower requested work regions with a dependency-cone proof for the full horizon; keep native support, origin/centering, topology/quotient, semantic halo, storage padding, codec, crop, genuine finite boundary, and approximate exterior separate. Do not treat initial fill as persistent exterior. |
+| temporal migration | Represent AR2, lag lookup, and lag-count histories as complete named-factor `t+0D` configurations at every event; product labels/components/tuple codecs are representation options. Make scalar series a projection observer and preserve resume/alignment provenance. |
+| transforms/relations | Add typed translation, reflection, value permutation, block decode, frozen derived-configuration, quotient/covering, and crop relations. A derivation consumes exact immutable references; it never runs a hidden source interpreter during target resolution. |
+| serialization/identity | Version and round-trip schema, class, presentation, constructor/construction record, law, sampling realization/sample record, denotational configuration, validation, lowering, run request/trace, experiment, boundary, and observer independently. Reject stale/tampered digests and opaque payloads. |
 | rollout/executor | Accept one validated `X_0` and use the existing branch-free runner. Remove or bypass seed-family and temporal-family dispatch as semantic paths; no T08 flag may reach RULE or UPDATE. |
-| tests/source fixtures | Pin the final source/asset evidence and add the acceptance groups below, including exact probability, domain, invariant, replay, temporal-state, identity, and static no-cheating adversaries. |
+| tests/source fixtures | Pin the final source/asset evidence and add the acceptance groups below, including variable support, alpha-renaming, probability capability, structured invariants, replay, temporal resume, horizon commutation, identity, and static no-cheating adversaries. |
 
 ### Twenty acceptance groups
 
-1. **Program/profile separation:** pair one exact program object with point, uniform, periodic, and random profiles; assert unchanged program digest/object and identical FRONTIER/NEIGHBORHOOD/RULE/UPDATE types. Only run/profile/sample identities vary.
-2. **Schema and alphabet validation:** accept only typed ALPHABET members and complete component assignments; reject palette-derived gray, raw rank collisions, wrong exact-value types, missing components, and assignments outside the DOMAIN.
-3. **Global invariants:** accept a composite tape configuration with exactly one tagged head; reject zero/two heads and invalid states before rollout. Apply the same mechanism to every schema-scoped invariant rather than adding a Turing seed class.
+1. **Program/profile/configuration identity:** pair one exact program object with point, uniform, periodic, and random profiles; assert unchanged program digest/object and identical runner axes. Two constructors and two laws that produce the same `X_0` share its configuration digest but retain distinct construction/sample provenance.
+2. **DomainSchema, variable support, and alphabet validation:** accept changing-length words and alpha-renamed graphs as admitted support/topology instances, plus typed ALPHABET/components. Reject palette-derived gray, rank/value collisions, wrong value types, missing components, invalid topology, and support outside the schema; never demand a rectangular point/window API.
+3. **Global invariants and structured randomness:** sample tape symbols, overlay one explicit head while retaining its symbol, and validate exactly one tag. Reject zero/two heads and show that iid whole composite cells are not equivalent. Apply the generic invariant mechanism rather than adding a Turing seed class.
 4. **Constant and point profiles:** resolve source white-background/single-black and white-background/single-gray forms using explicit member references and origin; evaluate them on native support without requiring a finite tensor.
-5. **Finite configuration versus window:** distinguish an explicit list on a finite segment, the same list on a finite cycle, and a crop of an infinite field. Array equality cannot merge DOMAIN/topology identities or infer a boundary.
+5. **Finite configuration versus lowering:** distinguish an explicit list on a finite segment, the same list on a finite cycle, and a crop/work state lowered from an infinite field. Array equality cannot merge DOMAIN/topology identities, infer a boundary, or prove horizon sufficiency.
 6. **Periodic configurations:** validate nonempty tile, period lattice, phase, and typed values; test negative coordinates and translation. Relate—not identify—an infinite periodic field and its compatible finite cyclic quotient.
 7. **Overrides and piecewise tails:** round-trip constant/periodic bases plus finite defects and ultimately periodic left/middle/right forms. Reject conflicting overrides, overlap, gaps, invalid region syntax, and phase ambiguity.
-8. **Block and generated images:** encode/decode paired-cell and macroblock classes losslessly; realize a substitution-derived nested configuration through an explicit referenced derivation. Reject partial decoders, dangling provenance, and hidden callbacks.
-9. **Fixed product laws:** enumerate small finite categorical/Bernoulli supports and assert total mass one, exact event probabilities, validated parameters, and canonical coordinate ordering.
-10. **Law nonidentity:** distinguish fixed-`p` iid, one-global-`p` mixtures, exact-composition sampling, macroblock sampling, and constraint-language sampling with explicit two- and four-site probability witnesses.
+8. **Block and frozen derived images:** encode/decode paired-cell and macroblock classes losslessly; verify a substitution-derived nested target through immutable source/trace-or-certificate/transform/target references. Reject partial decoders, dangling provenance, lazy source execution, and hidden callbacks.
+9. **Probability and membership capabilities:** enumerate small finite categorical/Bernoulli supports and assert total mass one, exact event probabilities, validated parameters, and law-specific enumeration. Reject zero-mass conditioning and unnormalized laws; return typed unknown/unsupported for nondecidable global membership or unavailable sampling/probability operations.
+10. **Law nonidentity:** distinguish fixed-`p` iid, one-global-`p` mixtures, exact-composition sampling, macroblock sampling, and finite-scope constraint-language sampling with explicit two- and four-site probability witnesses.
 11. **Underspecified randomness:** a source/profile that omits probabilities, finite scope, conditioning, or generator yields a typed underdetermined/unsupported result; it never defaults silently to fair Bernoulli or the current `[0,1]` mixture.
 12. **Infinite-law capability:** test finite-cylinder consistency for an abstract product measure; reject eager total materialization. Label a finite-key coordinate-hash field as an algorithmic realization, not proof of exact infinite independence.
-13. **Replay and provenance:** identical sampler version/key/scope/order reproduces the exact configuration digest; different query orders do not alter a coordinate-keyed algorithmic field. Missing entropy provenance, changed sampler version, or tampered sample digest fails validation.
+13. **Replay, structural order, and provenance:** identical sampler version/key/request reproduces the exact configuration digest across scalar/batch execution and row reorder. Coordinate query order cannot alter a coordinate-keyed field; graph vertex serialization cannot alter an alpha-invariant graph law. Missing entropy provenance, changed sampler version, or tampered sample reference fails validation.
 14. **Temporal Markov state:** AR2 pairs, three-lag tuples, and ten-bit shift registers remain complete states for every event. Two histories with the same visible scalar produce different successors where expected; pack/unpack and scalar observer projections round-trip without changing state schema mid-run.
-15. **Fill versus boundary:** rule 1 turns an event-zero all-zero field to ones; a zero initial fill is not reused as a permanent boundary. Vary fixed, periodic, and infinite realizations independently from the same initial profile.
+15. **Horizon lowering, fill, and boundary:** rule 1 turns an event-zero all-zero field to ones; a zero fill is not permanent exterior. Prove causal-halo commutation for every `t<=h`, including a radius-one one-halo counterexample that fails at `t=2`; distinguish native infinite execution, genuinely finite topology, and explicit boundary approximation.
 16. **Centering and translation:** pin the source's finite even/odd centering convention where requested, while proving that native point origin, finite placement, translated profile, materialization window, and display crop have separate identities.
-17. **Transforms and relations:** translation/reflection/value permutation preserve class or law only when the declared action proves it; block decoding, derivation, and quotienting emit relation records. A symmetric distribution does not imply each sample is symmetric.
-18. **Serialization and trust:** canonical round trips preserve typed values, DOMAIN, class, presentation, law, realization, and provenance separately. Reject stale schema/action versions, duplicate/conflicting assignments, NaN/invalid probabilities, and trusted serialized “valid” flags.
+17. **Transforms and relations:** translation/reflection/value permutation preserve class or law only when proved; block decoding, frozen derivation, quotienting, and lowering emit relation records. A symmetric distribution does not imply each sample is symmetric, and graph relabeling is not a new configuration.
+18. **Serialization and trust:** canonical round trips preserve typed values, DomainSchema/support instance, class, presentation, constructor/construction, law/sample, denotational configuration, validation, lowering, and provenance separately. Reject stale versions, duplicate/conflicting assignments, NaN/invalid probabilities, and trusted “valid” flags.
 19. **Dataset/observer separation:** held-out streams, batch shapes, token budgets, padding, augmentations, palettes, rasters, behavior labels, density estimates, and crops cannot alter program, class, or mathematical-law identity.
-20. **No-cheating/static:** no T08/seed-family branch below event-zero resolution, temporal hidden pre-state, `Any`/string family dispatch, opaque predicate, implicit RNG, scalar-only coercion, implicit finite DOMAIN, or callback fallback is accepted as canonical semantics.
+20. **No-cheating/static and cross-category scope:** no T08 branch below event-zero resolution, hidden temporal pre-state, `Any`/string family dispatch, opaque predicate/interpreter, implicit RNG, scalar-only coercion, implicit fixed lattice, or callback fallback. PDE side data, constraint seeds, and function arguments remain their native nonstep roles unless an explicit relation derives a SimpleProgram.
 
 ## No-Cheating Checks
 
@@ -473,10 +545,15 @@ Additional current defects must be made explicit in the migration:
 - No opaque predicate/callback or whole-configuration integer accepted as a semantic seed merely because it can render an array.
 - No RNG cursor hidden in executor state for a one-time seed draw; no stochastic seed distribution conflated with stochastic transition semantics.
 - No centered array, crop, padding, batch shape, held-out split, palette, or raster treated as the native initial configuration.
+- No fixed-lattice point/window API imposed on variable-support words, trees, graphs, bags, registers, or scalar configurations; no graph serialization order made semantic.
 - No single-black-cell assumption used to prove T06/T07 or a behavior class; no symmetric seed used as rule-symmetry evidence.
 - No “gray” value inferred from palette order without an explicit ALPHABET member/valuation.
-- No compact seed representation accepted without an inverse on its invariant-valid image and a one-step identity mapping after realization.
-- No requirement that every convenience constructor be invertible; the stronger round-trip/commutation claim is required only for representations and realization lowerings that claim equivalence.
+- No compact representation accepted without an inverse on its invariant-valid image and a one-step commuting law; no finite execution lowering accepted without commuting through the complete requested horizon and observation scope.
+- No requirement that every convenience constructor be invertible; stronger round-trip/commutation claims apply only to representations and lowerings that claim equivalence.
+- No closed predicate/generator treated as automatically decidable, normalized, or samplable; unsupported/unknown capabilities and zero-mass conditioning remain explicit.
+- No derivation descriptor that lazily runs another program/interpreter during target seed resolution; only frozen exact references plus a closed typed transform and evidence.
+- No product ALPHABET mandated for temporal history or composite controls; require complete visible Markov/configuration roles and a lossless mapping, not one storage decomposition.
+- No iid whole-cell law used when a structured component/overlay law is required to preserve exactly-one or other global invariants.
 - No silent off-window drop, ignored time coordinate, sampling-based dedupe, unproved held-out-configuration claim, metadata-only transform claim, or dataset ID that omits identity-bearing decisions.
 
 ## Completion Requirements
