@@ -607,7 +607,7 @@ LeftRightSymmetric(P,h_delta)
 
 The property is universal over all admissible complete typed local reads, not merely sampled run reads and not impossible tuples manufactured by forgetting schema invariants. A family name, Boolean flag, code-number shortcut, or palette cannot establish it.
 
-The generic equivariant extension requires explicit value maps from each source component alphabet to its `beta`-mate alphabet and an output involution `alpha_out`. They are compatible exactly when `beta^2=id`, `alpha_{beta(c)} ∘ alpha_c=id_{A_c}` for every component, and `alpha_out^2=id`; together with `pi^2=id`, these laws make the complete-read action an involution. Writing that induced action as `rho_alpha`:
+The generic equivariant extension requires explicit value maps from each source component alphabet to its `beta`-mate alphabet and an output involution `alpha_out`. They are compatible exactly when `beta^2=id`, `alpha_{beta(c)} ∘ alpha_c=id_{A_c}` for every component, `alpha_out^2=id`, and the induced action preserves the exact admissible space: `rho_alpha(V_P)=V_P`. Together with `pi^2=id`, the algebraic laws make the complete-read action an involution; admissible-space closure makes it an endomorphism of the evaluator's actual domain rather than merely of an unconstrained product alphabet. Writing that induced action as `rho_alpha`:
 
 ```text
 (rho_alpha v)_pi(i) = alpha_component_i(v_i)
@@ -923,6 +923,13 @@ admissible_reps={min(v,tuple(v[typed_pi[i]] for i in range(4)))
 assert (len(admissible),len(fixed_admissible),len(admissible_reps))==(4,2,3)
 assert len(admissible_reps)==(len(admissible)+len(fixed_admissible))//2
 
+# An involutive value map is still invalid when it leaves the exact
+# admissible read space; otherwise T(rho_alpha(v)) is not total on V_P.
+def value_swap(v): return tuple(1-x for x in v)
+nonclosed={(0,)}
+assert value_swap(value_swap((0,)))==(0,)
+assert {value_swap(v) for v in nonclosed} != nonclosed
+
 # The diagonal over-quotient witness uses four distinct scalar coordinates.
 positions=(('a','left',-1),('a','right',1),
            ('b','left',-2),('b','right',2))
@@ -1032,7 +1039,7 @@ D111-D119 remain valid. The repaired working architecture proposes the following
 |---|---|
 | `simple_programs.md` action model | Separate support-point `h_D` from local-displacement `h_delta`; validate `h_D(x+delta)=h_D(x)+h_delta(delta)`. Define a versioned read/write action on the complete typed local interface. Correct `ISOTROPIC` from independent component orbits to a declared diagonal typed-position action; specify optional component permutations and input/output value actions. |
 | structural program/rule schema | Expose finite ordered typed `(component,slot,offset)` read positions, the exact finite admissible complete-read space and invariants, ALPHABET identity, complete total evaluator, same-site typed writes, and canonical program identity. Opaque callbacks remain uncertifiable. |
-| generic action module | Validate local and support involutions separately, their displacement compatibility, typed reflection closure, stable slot mates, component permutation, input/output value actions, canonical local-action digest, and transformed-program construction. Keep finite-realization center/translation outside property identity. Equal offsets in distinct components are allowed. |
+| generic action module | Validate local and support involutions separately, their displacement compatibility, typed reflection closure, stable slot mates, component permutation, input/output value actions, induced-action closure `rho_alpha(V_P)=V_P`, canonical local-action digest, and transformed-program construction. Keep finite-realization center/translation outside property identity. Equal offsets in distinct components are allowed. |
 | generic property module | Add `RulePropertyClaim(kind=ReflectionEquivariance)`, invalid/unsupported/result boundaries, exhaustive-orbit and structural-proof checkers, canonical mismatch witnesses, and resource-incomplete handling. |
 | exhaustive and T03 adapters | Exhaustive tables compare one representative and mate per orbit. Equal-weight T03 descriptors emit a validated permutation-invariance proof without expansion. Paired weighted summaries may prove the same fact structurally. |
 | orbit-rule representation | Add a complete canonical orbit-key table for trivial output action and a stabilizer-aware equivariant form when nontrivial actions are supported. Validate cardinality, keys, outputs, action ID, expansion, and denotational equivalence. |
@@ -1045,7 +1052,7 @@ D111-D119 remain valid. The repaired working architecture proposes the following
 
 1. **Catalog action integrity:** accept only the canonical nonidentity `t+1D` displacement reflection `h_delta(delta)=-delta` with identity ALPHABET/output action; reject an identity/noncanonical displacement action, wrong axis, noninvolutive/stale action, nonidentity catalog value action, or caller-invented typed-position map. Keep a concrete support reflection/center in transform/run data.
 2. **Strict eligibility:** accept resolved finite deterministic homogeneous CA programs with an enumerable or structurally certified admissible read space; return `UnsupportedProperty` for opaque callbacks/read constraints, dynamic reads, stochastic/multiway rules, asynchronous/partial schedules, and unrelated SimpleProgram shapes.
-3. **Typed reflection closure:** derive the canonical one-component slot permutation when unambiguous; otherwise validate stable `(component,slot,offset)` mates and the declared component involution. Permit equal offsets in distinct components; reject only missing/ambiguous typed mates, nonbijections, noninvolutions, or inconsistent serialized maps. A one-sided constant-rule schema is unsupported, not false.
+3. **Typed reflection closure:** derive the canonical one-component slot permutation when unambiguous; otherwise validate stable `(component,slot,offset)` mates and the declared component involution. Permit equal offsets in distinct components; reject missing/ambiguous typed mates, nonbijections, noninvolutions, an induced input/value action that does not preserve `V_P`, or inconsistent serialized maps. A one-sided constant-rule schema is unsupported, not false; an involutive alphabet map that sends an invariant-constrained admissible tuple outside `V_P` is likewise unsupported.
 4. **Invalid versus semantic result:** malformed references produce validation diagnostics and no verdict; valid unsupported programs produce non-evidence; eligible programs produce `DoesNotHold` or `Holds` evidence.
 5. **ECA failures and transforms:** rule 30 fails on a canonical reversed-context witness and transforms exactly to 86; 2/16, 45/101, 60/102, 110/124, and 137/193 are exact pairs; transform is involutive.
 6. **Exact fixed tables:** assert the exact 64 ECA fixed labels and the page-439 asset hash/label fixture; rule 90 passes.
