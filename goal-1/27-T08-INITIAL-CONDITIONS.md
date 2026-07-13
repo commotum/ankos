@@ -51,25 +51,283 @@ Audit in progress.
 
 ## Construction Model
 
-Working model pending evidence closure:
+### Architecture classification
 
-- **Program:** one already resolved SimpleProgram; excluded from seed identity.
-- **Seed descriptor:** a typed deterministic configuration constructor or a typed probability law plus its parameters.
-- **Realized initial configuration:** one complete invariant-valid event-zero state on the native DOMAIN/support.
-- **Compact fixed-lattice form:** background value plus finite exceptions, or an explicit periodic/finite presentation when that is the declared native profile.
-- **Random form:** an explicit probability law and sampling scope; RNG algorithm/key/sample provenance are realization data unless the mathematical law names them.
-- **Execution:** unchanged FRONTIER/NEIGHBORHOOD/RULE/UPDATE after event zero.
-- **Relations:** translation, reflection, complement, density, finite crop, and seed equivalence are explicit transforms/claims, not implicit identity.
-- **Invalidity:** alphabet mismatch, unsupported infinite sampling/materialization, conflicting assignments, violated structural invariants, or missing stochastic parameters fail before rollout.
-- **Observers:** behavior class, growth, sensitivity, entropy, image, and dataset split remain downstream analyses.
+Let a resolved program `P` expose a configuration schema
+
+```text
+C_P = (DOMAIN_P, ALPHABET_P, component schema, structural invariants).
+```
+
+Write `Conf(C_P)` for the complete configurations valid under that schema. T08 does not change `P`; it describes elements, subsets, and probability laws over `Conf(C_P)` and the records by which one such element is supplied at event zero.
+
+| T08-related object | Audit class | Smallest reusable base | Consequence |
+|---|---:|---|---|
+| One exact initial configuration | 1 — direct reuse | ordinary invariant-valid `Configuration` | accepted unchanged by the shared runner |
+| Named deterministic profile | 2 — preset/parameterization | closed `ConfigurationConstructor` targeted at `C_P` | resolves before rollout to one ordinary configuration |
+| Initial-condition class | 2 — restriction/set | closed predicate or image of a closed constructor over `Conf(C_P)` | membership is analysis/validation, not execution |
+| Random initial-condition class | 2 — probability-bearing profile | `InitialDistribution` over an explicit configuration class | sampling occurs once before event zero |
+| Background-plus-exceptions, periodic, block-coded, or temporal-history form | 3 when lossless — tagged/product representation | ordinary configuration plus validated expansion/projection | no special seed evaluator inside the runner |
+| Finite materialization, quotient, crop, raster, dataset split, or behavior label | 2 — realization/relation/observer | existing run and observer records | excluded from seed and program identity |
+| New FRONTIER, NEIGHBORHOOD, RULE result, UPDATE, executor, or successor | 4 only with a counterexample | none found | no T08 execution semantic is authorized |
+
+The word *seed* is overloaded in the current documentation and runtime. Goal 2 should use the following lossless layers even if a convenience facade retains that word:
+
+```text
+ConfigurationSchema
+    defines Conf(C_P)
+
+InitialConditionClass
+    denotes K subseteq Conf(C_P)
+
+ConfigurationPresentation / ConfigurationConstructor
+    closed data that denotes or constructs X_0 in K
+
+InitialDistribution
+    optional probability law mu over K
+
+SampledInitialConfiguration
+    one exact X_0 plus law/sampler/key/provenance references
+
+Run
+    references P, X_0, realization/boundary, horizon, schedule, observers
+```
+
+A source phrase can identify only a class without determining a probability law. “Random arrangements with exactly equal numbers” denotes a different class/law from independent fair choices; “random” without probabilities, conditioning, finite scope, or a generative rule is underdetermined and cannot silently become Bernoulli `p=1/2`.
+
+### Closed deterministic presentations
+
+The public semantic object is a complete configuration, not a mask. A small closed presentation algebra can denote source-faithful configurations without forcing an infinite field into a tensor:
+
+```text
+ExplicitFinite(domain_ref, assignments)
+ConstantField(value)
+PeriodicField(period_lattice, phase, finite_tile)
+Override(base_presentation, finite_typed_assignments)
+PiecewiseField(closed_disjoint_regions, presentations)
+DerivedConfiguration(source_run_or_constructor_ref, closed_decoder, certificate)
+```
+
+`Override(ConstantField(white), {origin: black})` is the native point profile on an infinite fixed lattice. `PeriodicField` represents a fixed block repeated forever. `Override(PeriodicField(...), finite assignments)` covers a periodic background with a finite defect. `PiecewiseField` is needed for evidenced ultimately periodic left and right tails around a finite middle; its region language must be closed, serialized, disjoint, and total. `DerivedConfiguration` covers a nested condition generated by a substitution system, but the referenced generation and decoder happen explicitly before the target run. It is not permission for an opaque callback or hidden interpreter during rollout.
+
+Every presentation has:
+
+- one declared target schema and DOMAIN;
+- a total typed value at every point of that DOMAIN, or a native finite assignment for a finite DOMAIN;
+- a canonical structural identity and expansion semantics;
+- validation that all values are ALPHABET members and all global invariants hold; and
+- an inverse or canonical re-encoding on the representation's declared image when it is claimed lossless.
+
+Overlapping overrides with unequal values, an uncovered piecewise region, a nonperiodic tile declaration, a dangling derivation, and an assignment outside the DOMAIN are invalid. Last-write-wins order is not invented. A palette rank cannot supply “white”, “gray”, or “black”; each source role resolves to an explicit typed alphabet member.
+
+The finite list used by a practical implementation has no intrinsic boundary meaning. An explicit list on a declared finite cyclic DOMAIN is a complete finite configuration. A window cut from an infinite point or periodic field is instead a materialization. The source's finite cyclic program and its infinite periodically repeated configuration can be related by a quotient/covering map, but they are not the same configuration object merely because their arrays coincide.
+
+### Configuration classes and stochastic laws
+
+An `InitialConditionClass` is schema-scoped. Its membership can be given by a closed structural predicate or as the image of a closed constructor/decoder. Evidence requires at least these distinct families:
+
+- constant/uniform configurations;
+- finite perturbations of a declared background, including one distinguished cell;
+- finite explicit configurations on a declared finite topology;
+- periodic configurations and periodic backgrounds with finite or ultimately periodic defects;
+- block-coded or macrocell configurations, including images of another alphabet under a fixed block decoder;
+- substitution-derived or otherwise explicitly generated nested configurations;
+- unrestricted assignments over a stated scope;
+- configurations with exact composition/density constraints; and
+- configurations satisfying a closed local-language constraint, such as a finite forbidden-block or allowed-macroblock condition.
+
+“Simple initial condition” in the prose is not by itself a canonical decidable class. Goal 2 exposes only evidenced concrete profiles or explicitly declared structural classes; it does not turn an informal behavioral adjective into a Boolean field.
+
+An `InitialDistribution` separately declares:
+
+```text
+support_class_ref
+native sampling scope
+finite categorical probabilities or a closed generative law
+conditioning/composition constraints
+normalization and parameter domain
+law semantic version
+```
+
+Important nonidentities include:
+
+```text
+iid Bernoulli(p)
+!= draw p once, then conditionally iid Bernoulli(p)
+!= uniform over strings with exactly m black cells
+!= independent draws of allowed fixed-width macroblocks
+!= uniform over all strings accepted by a constraint language.
+```
+
+For a finite support, sampling uses a canonical coordinate order and records sampler algorithm/version, key or input entropy, and draw provenance. The mathematical law identity does not include a particular RNG implementation unless the source construction itself specifies that algorithm. A realized sample identity does.
+
+An infinite product law is a probability measure characterized by consistent finite-cylinder probabilities, not an array that can be eagerly drawn. A practical finite-window sampler is an explicit realization of a requested cylinder. A coordinate-keyed pseudorandom total field can provide replayable order-independent queries, but with a finite key it is an algorithmic realization related to—not literally an exact draw from—the mathematical infinite independent product measure. Goal 2 must preserve that qualification rather than hide a mutable RNG cursor in execution state.
+
+### Event-zero state and temporal history
+
+The complete Markov state required by `P` must be present at event zero. For a second-order scalar recurrence,
+
+```text
+state_t = (x[t-1], x[t])
+step(state_t) = (x[t], f(x[t], x[t-1]))
+observe(state_t) = x[t].
+```
+
+For a three-lag lookup the same construction uses a length-three product/tuple alphabet. A ten-lag count rule uses one length-ten shift-register state at every event. Serializing ten seed scalars and then silently changing to a packed integer is a representation boundary only if both encode the same tuple losslessly and the trace records the transition point; it cannot mean that one episode changes configuration schema halfway through.
+
+If the source supplies a temporal prefix before recurrence begins, the prefix is initialization data for the tuple state or an explicitly aligned prelude/trace projection. Hidden earlier values that affect the next state cannot be discarded from raw state while only the current scalar is called the configuration. This repair reuses an explicit product ALPHABET and ordinary `t+0D` state/update; it adds no seed-aware executor.
+
+### Realization, boundary, execution, and identity
+
+For an infinite fixed-lattice profile, materialization into a finite computational window is separate from the seed presentation. It records the window/support map, coordinate origin, padding/halo, and precision/storage codec. `BOUNDARY` independently specifies reads beyond a finite computational realization. The event-zero background is not a boundary value that persists through time: a rule may change every background cell after the first step.
+
+After construction and validation:
+
+```text
+X_0    = realize(initial_profile, sample_record, C_P)
+active = FRONTIER.select(X_t)
+reads  = NEIGHBORHOOD.read(X_t, active)
+writes = RULE(active, reads)
+X_t1   = UPDATE.apply(X_t, active, writes)
+```
+
+No line below event zero inspects a T08 family tag. `P`, its FRONTIER, NEIGHBORHOOD, RULE, UPDATE, successor cardinality, and object identity are unchanged when `X_0` changes.
+
+Keep the identities separate:
+
+```text
+Program
+ConfigurationSchema
+InitialConditionClass
+ConfigurationPresentation / Constructor
+InitialDistribution
+SamplingRealization
+SampledInitialConfiguration
+FiniteComputationRealization / Boundary
+Run / Trace
+Observer / DatasetRecipe
+```
+
+Translation, reflection, color permutation/complement, block encoding, finite quotienting, and cropping are explicit transforms or relations. Two presentations may share a denotational configuration digest while retaining distinct representation/provenance identities. Two laws can produce the same realized `X_0` without becoming the same law. A run references one exact program and one exact realized configuration; neither absorbs the other.
+
+### Dependency-free semantic oracle
+
+```bash
+python3 - <<'PY'
+from fractions import Fraction
+from itertools import product
+from math import comb
+
+def evaluate(presentation, x):
+    kind=presentation[0]
+    if kind=='constant': return presentation[1]
+    if kind=='periodic':
+        tile,phase=presentation[1:]
+        return tile[(x-phase)%len(tile)]
+    if kind=='override':
+        base,changes=presentation[1:]
+        return changes[x] if x in changes else evaluate(base,x)
+    raise ValueError(kind)
+
+point=('override',('constant',0),{0:1})
+periodic=('periodic',(1,0,0),0)
+defect=('override',periodic,{0:0,4:1})
+assert [evaluate(point,x) for x in range(-3,4)]==[0,0,0,1,0,0,0]
+assert [evaluate(periodic,x) for x in range(-3,4)]==[1,0,0,1,0,0,1]
+assert evaluate(defect,0)==0 and evaluate(defect,4)==1
+
+# An event-zero fill is not a persistent boundary. ECA rule 1 maps 000 to 1.
+def eca_step(rule,state):
+    n=len(state)
+    return tuple((rule >> (4*state[(i-1)%n]+2*state[i]+state[(i+1)%n]))&1
+                 for i in range(n))
+assert eca_step(1,(0,)*7)==(1,)*7
+
+# Product Bernoulli, a once-per-episode random p mixture, and fixed composition differ.
+fair11=Fraction(1,2)**2
+mixture11=Fraction(1,3)                 # integral_0^1 p^2 dp
+fixed_two11=Fraction(0,1)               # exactly one 1 among two sites
+assert fair11==Fraction(1,4) and mixture11!=fair11 and fixed_two11!=fair11
+def bernoulli_mass(bits,p):
+    return p**sum(bits)*(1-p)**(len(bits)-sum(bits))
+assert sum(bernoulli_mass(v,Fraction(1,3)) for v in product((0,1),repeat=4))==1
+assert comb(6,3)==20                    # fixed-composition class cardinality
+
+# Block-coded configurations are an image of a closed decoder, not scalar iid cells.
+decode={0:(0,0),1:(1,1)}
+macro=(1,0,1)
+decoded=tuple(y for x in macro for y in decode[x])
+assert decoded==(1,1,0,0,1,1)
+assert all(decoded[2*i]==decoded[2*i+1] for i in range(3))
+
+# Temporal history is complete Markov state; the visible scalar is a projection.
+def ar2_step(state):
+    prev,cur=state
+    return (cur,(cur+prev)%5)
+s=(2,3)
+assert ar2_step(s)==(3,0)
+assert ar2_step(ar2_step(s))==(0,3)
+assert ar2_step((1,3))!=(ar2_step(s))   # same visible current, different full state
+
+# A periodic infinite field and a finite cyclic quotient can agree under a relation
+# without sharing native DOMAIN/configuration identity.
+tile=(1,0,1)
+infinite_window=tuple(tile[x%3] for x in range(12))
+finite_cyclic=tuple(tile[x%3] for x in range(12))
+assert infinite_window==finite_cyclic
+assert ('Z-periodic',tile)!=('cycle-3',tile)
+
+# Schema membership and global invariants are initialization obligations.
+def valid_head_config(xs):
+    return all(symbol in (0,1) and head in (None,'q0','q1') for symbol,head in xs) \
+           and sum(head is not None for _,head in xs)==1
+assert valid_head_config(((0,None),(1,'q0'),(0,None)))
+assert not valid_head_config(((0,'q0'),(1,'q1')))
+assert not valid_head_config(((2,None),(1,'q0')))
+
+print('T08 semantic oracle: PASS presentations, laws, temporal state, domains, invariants')
+PY
+```
 
 ## Current API Fit
 
-Pending complete evidence and `simple_programs.md` audit.
+`simple_programs.md:235-290` already places `SEED` before rollout as support `S_0`, assignment law `mu_seed`, and initial fill `a_init`, while `BOUNDARY` starts separately at `simple_programs.md:292`. That separation is directionally correct and should survive. It must be generalized in Goal 2 because one finite support plus one fill cannot faithfully denote periodic tails, piecewise/derived configurations, exact-composition classes, configuration-wide invariants, or product/tagged values.
+
+The repaired generic API should expose:
+
+```text
+ConfigurationSchema.validate(configuration)
+ConfigurationPresentation.evaluate(point) / materialize(window)
+InitialConditionClass.contains(configuration) / certified_image(...)
+InitialDistribution.cylinder_probability(event) / sample(finite_scope, sampler)
+InitialProfile.resolve(schema, realization_request) -> SampledInitialConfiguration
+```
+
+Not every operation is available for every descriptor. An abstract infinite law can support cylinder probabilities but reject total materialization; a closed deterministic total field can support point evaluation; a finite explicit configuration can support exhaustive membership and hashing. Unsupported capability is typed and does not trigger a callback fallback.
+
+The smallest change to the conceptual SimpleProgram record is to replace the scalar-fill seed formula with a schema-targeted event-zero constructor/law reference. Program construction must not require a preferred seed. A run convenience preset may pair a program and an initial profile, but resolving that preset returns the same program object plus separate run inputs.
 
 ## Current Runtime Fit
 
-Pending complete `src/ca`, test, and dataset audit.
+Current runtime reuse is real but narrower than the catalog abstraction:
+
+| Current surface | Reuse/classification | Required Goal 2 correction |
+|---|---|---|
+| `Seed` fields (`src/ca/seeds.py:39-55`) | partial finite scalar presentation | replace `family: str`, `distribution: Any`, and untyped params with closed tagged schemas; bind to configuration schema and typed values |
+| Selector-backed factories | reusable finite support descriptions | preserve loci selection, but do not equate a selected finite mask with native infinite support or a full configuration |
+| `render(seed, shape, rng)` (`seeds.py:879-939`) | finite materializer | split validation, law sampling, exact configuration construction, and finite materialization; remove family dispatch from semantic resolution |
+| `rng=None` (`seeds.py:58-63`) | convenience only | reject or explicitly record nondeterministic entropy for semantic runs; retain algorithm/version/key/sample provenance |
+| Bernoulli renderer (`seeds.py:930-935`) | a different hierarchical law than its name suggests | it draws one global `p` uniformly in `[p_low,p_high]`, then cells conditionally; add an actual fixed-`p` product law, validate bounds, and name the mixture honestly |
+| `fractal`/`spiral` predicate params (`seeds.py:733-780`) | opaque callback shim | replace with closed support/expression or explicit derived-configuration data; never execute arbitrary predicates as seed semantics |
+| `compound`/structured factories | useful presentation vocabulary | preserve component values, distributions, conflicts, DOMAIN, and provenance instead of reducing to one scalar mask/union |
+| `DatasetSpec`/`EpisodePlan` (`src/ca/datasets.py:57-128`) | downstream experiment recipes | keep shape, split, held-out stream, transforms, boundary, batching, and RNG planning outside program and mathematical law identity |
+| Raw episode records (`src/ca/specs.py:58-81`) | trace carrier | add exact initial-configuration/profile/sample references so temporal history and realization provenance are recoverable |
+
+All current rendered spatial values are coerced into `np.int64`; one `selected_value` and `fill_value` cannot carry a composite Turing cell, heterogeneous component assignment, exact real, symbolic value, or schema invariant. `support=None` and a finite `shape` silently turn “whole native DOMAIN” into “this tensor.” A point selector with a nonzero time coordinate is also not representable faithfully once rendering drops the time axis. These are representation gaps, not reasons for a seed executor.
+
+Temporal rollout reveals a more serious state boundary. `_rollout_ar2` treats `(x[-1],x[0])` as hidden previous/current values but serializes only `x[0],x[1],...` (`src/ca/rollout.py:334-359`). `_rollout_temporal_lookup` does the same with three lag values (`:362-413`). `_rollout_lagcounts` first serializes ten individual seed values, then evolves one packed ten-bit state (`:417-476`). The rule-generated successor depends on information absent from the serialized scalar “state,” and the apparent configuration schema changes during one episode. Goal 2 must make the tuple/shift register the ordinary `t+0D` configuration at every event and move scalar series into an observer projection.
+
+Current tests establish factory shapes, deterministic placement, some RNG reproducibility, and dataset behavior. They do not establish schema membership, typed/composite values, exact law identity, iid versus mixture/fixed composition, native infinite presentations, coordinate-order independence, temporal-state observability, lossless serialization, boundary separation, or unchanged program identity. Existing outputs are migration evidence, not authority where they conflict with the source-faithful model.
 
 ## Principles Audit
 
@@ -113,4 +371,3 @@ Pending evidence closure. The working target is **G2-T08 — typed seed profiles
 ## Stage Results
 
 IN PROGRESS.
-
