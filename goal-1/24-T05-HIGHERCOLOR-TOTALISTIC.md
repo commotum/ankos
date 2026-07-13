@@ -35,9 +35,9 @@ Determine the exact higher-color totalistic parameter domain and evidence bundle
 
 ## Search Log
 
-Closed with zero remainder. `BOOK` below means the canonical monolith at `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; its actual Index begins at physical line 20826. Eleven controlled query families produce exactly 142 distinct lexical candidates: 127 before the actual Index and 15 in it. Their disjoint lexical disposition is `4 native / 14 generic-parent / 23 lower-color totalistic / 33 other-totalistic / 14 higher-color relations / 39 controls / 15 Index`. Five governed prose continuations and 21 linked rasters expand this to exactly 168 candidates, with full disposition `11 / 16 / 23 / 33 / 23 / 47 / 15` and assets `5 included / 9 relation-only / 7 excluded`.
+Closed with zero remainder. `BOOK` below means the canonical monolith at `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; its actual Index begins at physical line 20826. Eleven controlled query families produce exactly 142 distinct lexical candidates: 127 before the actual Index and 15 in it. Their disjoint lexical disposition is `4 native / 14 generic-parent / 23 lower-color totalistic / 33 other-totalistic / 14 higher-color relations / 39 controls / 15 Index`. Five governed prose continuations and 25 linked rasters expand this to exactly 172 candidates, with full disposition `11 / 16 / 23 / 33 / 27 / 47 / 15` and assets `5 included / 13 relation-only / 7 excluded`.
 
-The literal absences are part of the result: contextual searches find no occurrence of the catalog phrase `higher-color`, `10 cases`, `4^10`, or `5^13`. The `k=4` values `M=10` and `R=4^10` are derived from the general formula at `BOOK:11897`; `k=5`, 13 cases, and `1,220,703,125` are direct at `BOOK:1282`. Numeric collisions at `BOOK:3034,8356` are controls. Code `1004600` occurs exactly at `BOOK:9166,19234,20980`, and its application prose continues at `9168,9170` and `19236,19238`.
+The literal absences are part of the result: contextual searches find no occurrence of the catalog phrase `higher-color`, `10 cases`, `4^10`, or `5^13`. The `k=4` values `M=10` and `R=4^10` are derived from the general formula at `BOOK:11897`; `k=5`, 13 cases, and `1,220,703,125` are direct at `BOOK:1282`. Numeric collisions at `BOOK:3034,8356` are controls. Code `1004600` occurs exactly at `BOOK:9166,19234,20980`; application prose continues at `9168,9170`, and the Notes link plots at `19236,19238`.
 
 | Q | Controlled family | Pre-Index | Actual Index |
 |---:|---|---:|---:|
@@ -53,7 +53,7 @@ The literal absences are part of the result: contextual searches find no occurre
 | 10 | complexity/class/death/growth property phrases | 4 | 0 |
 | 11 | heading/Index drift guard | 11 | 6 |
 
-Q11 adds no new line to the union. The full 168-candidate closure overlaps T03 on 110 lines and T04 on 103; T05 therefore contributes respectively 58 and 65 independently found candidates beyond those inherited manifests. Neither prior stage can stand in for this stage's closure.
+Q11 adds no new line to the union. The full 172-candidate closure overlaps T03 on 114 lines and T04 on 107; T05 therefore contributes respectively 58 and 65 independently found candidates beyond those inherited manifests. Neither prior stage can stand in for this stage's closure.
 
 ### Exact reproducible source and split manifest
 
@@ -117,7 +117,7 @@ assert set().union(*roles)==lex and sum(map(len,roles))==len(lex)
 
 follow={9168,9170,10411,11077,11914}
 I={1280,2866,9164,19236,19238}
-R={778,7928,7932,7934,7984,11170,11297,14390,18759}
+R={778,7928,7932,7934,7984,11170,11297,14226,14228,14230,14232,14390,18759}
 X={3944,10393,10409,15313,15315,15317,15319}
 asset_names={
 778:'_page_75_Figure_6.jpeg',1280:'_page_122_Figure_2.jpeg',2866:'_page_256_Figure_2.jpeg',
@@ -125,16 +125,18 @@ asset_names={
 7934:'_page_672_Picture_4.jpeg',7984:'_page_677_Figure_2.jpeg',9164:'_page_769_Figure_1.jpeg',
 10393:'_page_847_Figure_1.jpeg',10409:'_page_848_Figure_2.jpeg',11170:'_page_883_Picture_25.jpeg',
 11297:'_page_885_Picture_21.jpeg',14390:'_page_967_Picture_22.jpeg',15313:'_page_996_Picture_6.jpeg',
+14226:'_page_963_Picture_8.jpeg',14228:'_page_963_Picture_9.jpeg',
+14230:'_page_963_Picture_10.jpeg',14232:'_page_963_Picture_11.jpeg',
 15315:'_page_996_Picture_7.jpeg',15317:'_page_996_Picture_8.jpeg',15319:'_page_996_Picture_9.jpeg',
 18759:'_page_1132_Figure_9.jpeg',19236:'_page_1152_Figure_5.jpeg',19238:'_page_1152_Figure_6.jpeg'}
 assets=I|R|X
-assert [len(I),len(R),len(X)]==[5,9,7] and assets==set(asset_names)
+assert [len(I),len(R),len(X)]==[5,13,7] and assets==set(asset_names)
 for n,name in asset_names.items(): assert L[n-1].strip()==f'![]({name})',(n,L[n-1])
 assert not (lex&follow or lex&assets or follow&assets)
 expanded=lex|follow|assets
 full=[native|{9168,9170}|I,parent|{11077,11914},lower,other,relation|R,control|{10411}|X,index]
-assert [len(x) for x in full]==[11,16,23,33,23,47,15]
-assert set().union(*full)==expanded and sum(map(len,full))==len(expanded)==168
+assert [len(x) for x in full]==[11,16,23,33,27,47,15]
+assert set().union(*full)==expanded and sum(map(len,full))==len(expanded)==172
 
 split_expected={
 'BACK-MATTER/Colophon/Colophon.md':'30,896,918,1149,1227,1229,1305,1312,1363,1791,1879,2351,3385,3522,3526,3529,3537,3750,3790,4288,4372,4547,4587,4703,4909,4929,4949',
@@ -168,18 +170,18 @@ PY
 Recorded output:
 
 ```text
-T05 source manifest: PASS 11 queries; 142 lexical; 5 text follow; 21 assets; 168 total
-lexical partition= 4 14 23 33 14 39 15 ; full partition= 11 16 23 33 23 47 15
-assets= 5 9 7 ; split= 142
+T05 source manifest: PASS 11 queries; 142 lexical; 5 text follow; 25 assets; 172 total
+lexical partition= 4 14 23 33 14 39 15 ; full partition= 11 16 23 33 27 47 15
+assets= 5 13 7 ; split= 142
 ```
 
 ## Book Excerpts
 
-Twelve groups retain 28 verbatim fragments on 24 unique canonical source lines. Linked asset lines are provenance rather than quote lines. The full 168-candidate disposition remains in the executable Search Log; these excerpts retain the construction, parameter, property, and boundary facts needed for the design.
+Twelve groups retain 47 provenance lines and 47 verbatim fragments on 40 unique canonical source lines. Seven linked/navigation lines are provenance rather than quote lines. The full 172-candidate disposition remains in the executable Search Log; these excerpts retain the construction, parameter, property, and boundary facts needed for the design.
 
 ### E1 — Inherited totalistic restriction, valuation, and code order
 
-- Provenance: `BOOK:772,774,776,11077`.
+- Provenance: `BOOK:772,774,776,11037,11056,11060,11077`.
 - Establishes: totalistic rules quotient ordered neighborhoods by an exact average/sum; the strict example includes left, self, and right; values `0,1,2` and least-significant sum-zero order are explicit. The built-in convention corroborates integer values `0..k-1` but does not make palette names semantic.
 
 > The 256 "elementary" rules that we have discussed so far are by most measures the simplest possible—and were the first ones I studied. But one can for example also look at rules that involve three colors, rather than two, so that cells can not only be black and white, but also gray. The total number of possible rules of this kind turns out to be immense—7,625,597,484,987 in all—but by considering only so-called "totalistic" ones, the number becomes much more manageable.
@@ -187,6 +189,10 @@ Twelve groups retain 28 verbatim fragments on 24 unique canonical source lines. 
 > The idea of a totalistic rule is to take the new color of each cell to depend only on the average color of neighboring cells, and not on their individual colors. The picture below shows one example of how this works. And with three possible colors for each cell, there are 2187 possible totalistic rules, each of which can conveniently be identified by a code number as illustrated in the picture. The facing page shows a representative sequence of such rules.
 
 > Example of a totalistic cellular automaton with three possible colors for each cell. The rule is set up so that the new color of every cell is determined by the average of the previous colors of the cell and its immediate neighbors. With 0 representing white, 1 gray and 2 black, the rightmost element of the rule gives the result for average color 0, while the element immediately to its left gives the result for average color 1/3—and so on. Interpreting the sequence of new colors as a sequence of base 3 digits, one can assign a code number to each totalistic rule.
+
+> \{n, \{k, 1\}\} k-color nearest-neighbor totalistic rule
+
+> \{n, \{k, 1\}, r\} k-color range r totalistic rule
 
 > • Normally, all elements in init and the evolution list are integers between 0 and k-1. • But when a general function is used, the elements of init and the evolution list do not have to be integers. • The second argument passed to fun is the step number, starting at 0. • Initial conditions are constructed from init as follows:
 
@@ -258,10 +264,14 @@ Twelve groups retain 28 verbatim fragments on 24 unique canonical source lines. 
 
 > totalistic rules in the same framework by using ListConvolve[w, a, r+1] and taking the weights w to be respectively  $k \wedge Table[i-1, \{i, 2r+1\}]$  and  $Table[1, \{2r+1\}]$ .
 
-### E9 — Class-frequency property boundary
+### E9 — Higher-color class and property boundary
 
-- Provenance: `BOOK:14224`.
-- Establishes: one-dimensional totalistic systems are explicitly parameterized by `k` and `r`. Class frequency and chart sampling are analyzer/property evidence, not construction fields or preset defaults.
+- Provenance: `BOOK:8318,8320,14224`.
+- Establishes: allowing more than two colors supplies further class-4 examples, and totalistic rules are sufficient for such examples. Class frequencies remain analyzer/property evidence rather than construction fields, preset defaults, or executor state.
+
+> Among the 256 so-called elementary cellular automata that allow only two possible colors for each cell and depend only on nearest neighbors, the only clear immediate example is rule 110—together with rules 124, 137 and 193 obtained by trivially reversing left and right or black and white. But as soon as one allows more than two possible colors, or allows dependence on more than just nearest neighbors, one immediately finds all sorts of further examples of class 4 behavior.
+
+> In fact, as illustrated in the pictures on the facing page, it is sufficient in such cases just to use so-called totalistic rules in which the new color of a cell depends only on the average color of cells in its neighborhood, and not on their individual colors.
 
 > - **Frequencies of classes.** The pie charts below show results for 1D totalistic cellular automata with *k* colors and range *r*. Class 3 tends to become more common as the number of elements in the rule increases because as soon as any of these elements yield class 3 behavior, that behavior dominates the system.
 
@@ -279,19 +289,45 @@ Twelve groups retain 28 verbatim fragments on 24 unique canonical source lines. 
 
 > - Page 755 · Code 1004600. In cases (c) and (d) steady growth at about 0.035 and 0.039 cells per step (of which 28% on average are non-white) is seen up to at least 20 million steps, though there continue to be fluctuations as shown below.
 
-### E12 — Actual-Index routing fragments
+### E12 — Complete actual-Index routing
 
-- Provenance: `BOOK:20965,20980,22352`.
-- Establishes: the relevant Index fragments route to page 107's comparison, page 886's implementation, page 754/1137's code-`1004600` application, page 60's strict definition, and page 1017's reversibility note. They add no transition semantics.
-- OCR boundary: `BOOK:20980` interleaves printed columns, so its two exact fragments must not be normalized as a contiguous monolith sentence without the already-audited Index-column repair.
+- Provenance: `BOOK:20828,20965,20969,20972,20980,21193,21233,21731,21815,21990,22030,22146,22352,22372,22392`.
+- Establishes: all 15 actual-Index candidates are retained. They route to strict totalistic definitions, higher-color comparison, implementation, code `1004600`, reversibility, universality, sibling totalistic families, or explicit lexical controls. They add no transition semantics.
+- OCR boundary: the actual Index is column-interleaved. Each blockquote is an exact fragment of its cited physical line, not a reconstructed sentence.
+
+> 4-color theorem see Four-Color Theorem
+
+> implementation of totalistic, 886
 
 > with more colors, 107
 
-> implementation of totalistic, 886
+> totalistic see Totalistic cellular automata
+
+> weighted totalistic, 427
+
+> in 3-color totalistic CAs, 948
 
 > Code 1004600
 
 > and undecidability, 754, 1137
+
+> Code 294 for totalistic CAs, 60
+
+> Five-neighbor rules (in CAs), 927
+
+> Growth totalistic rules, 928
+
+> Outer totalistic rules
+
+> rosettes in 4-color, 1078
+
+> in four-color printing, 1078
+
+> growth totalistic, 928
+
+> totalistic, 60
+
+> Sum (totalistic) rules, 60
 
 > Totalistic cellular automata, 60
 
@@ -299,9 +335,14 @@ Twelve groups retain 28 verbatim fragments on 24 unique canonical source lines. 
 
 > as not reversible, 1017
 
+> emulating more colors, 669, 1113,
+
+> in totalistic cellular automata, 693
+
 ## Source Repairs and Evidence Oracle
 
 - The canonical monolith omits `Images/` in its bare JPEG links; the split documents route those same references to the physical image files. They are one asset each, not duplicates.
+- `BOOK:11037` is truncated in both the monolith and split after `higher-dimensional cellular automata on`; the audited official Notes source completes the navigation route with `page 927.` This is navigation evidence only and adds no T05 mechanics.
 - `BOOK:11916` carries the OCR token `k \wedge Table[...]` where the general-rule weight vector requires exponentiation. T05 preserves the literal quote and uses the independently stated count/codec formulas at `BOOK:11897,11912`; the intact all-one totalistic vector is the only T05-relevant half of that sentence.
 - `BOOK:20980` is interleaved printed-Index text. Only the exact routed fragments are used; column neighbors are not reconstructed into a false sentence.
 - The page-122/page-256 code labels are visually recoverable from hash-pinned plates. The plates do not fully serialize seeds, horizons, crop, or palette, so they authorize label/table corpora but no invented cell trajectory.
@@ -315,16 +356,56 @@ from pathlib import Path
 book=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md').read_text().splitlines()
 stage=Path('goal-1/24-T05-HIGHERCOLOR-TOTALISTIC.md').read_text().splitlines()
 quotes=[line[2:] for line in stage if line.startswith('> ')]
-quote_lines=[
-772,774,776,11077,1282,2868,9166,9168,9170,11283,11897,
-11902,11904,11908,11910,11912,11914,11916,14224,16024,19234,
-20965,20965,20980,20980,22352,22352,22352]
+quote_lines=(
+    772,774,776,11056,11060,11077,
+    1282,
+    2868,
+    9166,9168,9170,
+    11283,
+    11897,
+    11902,11904,11908,11910,11912,
+    11914,11916,
+    8318,8320,14224,
+    16024,
+    19234,
+    20828,
+    20965,20965,
+    20969,20969,
+    20972,
+    20980,20980,20980,
+    21193,21233,21731,21815,21990,
+    22030,22030,
+    22146,
+    22352,22352,22352,
+    22372,22392,
+)
+expected_provenance={
+    772,774,776,1280,1282,2866,2868,8318,8320,
+    9164,9166,9168,9170,
+    11037,11056,11060,11077,
+    11283,11297,
+    11897,11902,11904,11908,11910,11912,11914,11916,
+    14224,16024,
+    19234,19236,19238,
+    20828,20965,20969,20972,20980,21193,21233,21731,
+    21815,21990,22030,22146,22352,22372,22392,
+}
+provenance_only={1280,2866,9164,11037,11297,19236,19238}
+provenance=set()
+for line in stage:
+    if line.startswith('- Provenance:'):
+        for body in re.findall(r'`BOOK:([^`]+)`',line):
+            provenance.update(map(int,re.findall(r'\d+',body)))
 groups=[line for line in stage if re.match(r'^### E\d+ —',line)]
 assert len(groups)==12
-assert len(quotes)==len(quote_lines)==28
-assert len(set(quote_lines))==24
+assert len(expected_provenance)==47
+assert len(quotes)==len(quote_lines)==47
+assert len(set(quote_lines))==40
+assert set(quote_lines)==expected_provenance-provenance_only
+assert provenance==expected_provenance
+assert provenance.isdisjoint({14226,14228,14230,14232})
 for fragment,n in zip(quotes,quote_lines):
-    assert fragment in book[n-1],(n,fragment)
+    assert fragment.strip() in book[n-1].strip(),(n,fragment)
 
 assert 'k \\wedge Table' in book[11916-1]
 assert 'k^{1+(k-1)(2r+1)}' in book[11897-1]
@@ -348,16 +429,16 @@ for rel,checks in split_checks.items():
     lines=(root/rel).read_text().splitlines()
     for n,fragment in checks.items(): assert fragment in lines[n-1],(rel,n,fragment)
 
-print('T05 evidence oracle: PASS groups=',len(groups),'fragments=',len(quotes),'quote_lines=',len(set(quote_lines)))
-print('source_repairs=3 split_checks=',sum(map(len,split_checks.values())))
+print('T05 evidence oracle: PASS groups=',len(groups),'provenance=',len(provenance),'fragments=',len(quotes),'quote_lines=',len(set(quote_lines)))
+print('source_repairs=4 split_checks=',sum(map(len,split_checks.values())))
 PY
 ```
 
 Recorded output:
 
 ```text
-T05 evidence oracle: PASS groups= 12 fragments= 28 quote_lines= 24
-source_repairs=3 split_checks= 19
+T05 evidence oracle: PASS groups= 12 provenance= 47 fragments= 47 quote_lines= 40
+source_repairs=4 split_checks= 18
 ```
 
 ## Construction Model
