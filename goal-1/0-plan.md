@@ -51,6 +51,11 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
 - Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37 complete, 14 of 45 type stages complete, T39 Number-Theoretic Filtering Systems in progress, and Synthesis and Goal 2 Handoff pending.
 - T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. Ulam is deferred to a T37/T39 composition audit.
+- T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
+- The strict sieve uses a visible `next_divisor` cursor and distinguishes every proper-multiple hit from newly removed survivors. Composite rows advance even when survivors do not change. `MonotoneFilterUpdate` is the tenth public update law because it deletes an arbitrary noncontiguous subset while preserving retained identities/order.
+- The literal page-147 profile really retains `1`: all 1,200 stage cells match the stated update and the final black set is `{1} union primes<=100`, while bottom labels omit `1`. The mathematical preset therefore starts at 2 explicitly. Finite certification after divisor 10, requested rows through 13, and infinite noncompletion remain distinct.
+- Page 148's six prime profiles are observers and page 150's five rows are closed measurements with exact ordering/sign/zero conventions. Their horizons, endpoints, extrema, OCR repairs, `PrimePi` wording, and `LogIntegral` normalization are independently pinned.
+- T39 resolves T37's Ulam question through `FirstAcceptedAscendingCandidate` over the complete old prefix followed by the existing append. The source prefix proves unordered pairs of distinct old indices; no fixed-lag extension or hidden pair-sum cache is introduced.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -515,6 +520,16 @@ Apply the common protocol, distinguishing candidate domain, stage policy, predic
 #### Completion Requirements
 
 All T39 evidence is captured; filtering is not mislabeled as same-site update; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+The exact heading, prime/sieve/direct-function, divisibility/divisor, factorization, survivor/candidate/filter/removal, perfect/Goldbach/number-theory, representation, history, actual-Index, and relation searches are fully dispositioned. The direct prime search found 221 occurrences on 134 lines; the high-signal union found 144/84, including 121/66 before the Index; nineteen evidence groups cover the strict main, seven raster files/twelve plotted profiles, native Notes, split, actual Index, algorithms, variants, history, emulation, source repairs, Ulam, and T40 boundary. Zero source candidate remains unresolved.
+
+T39 separates `IntegerFilterSpec`, `SuccessiveDivisibilitySieve`, and `IntegerMeasurementSpec`. Strict state has a structural finite/intensional natural domain, consecutive-integer stage program, visible next-divisor cursor, and finite ordered survivors when materialized. `NextSieveStage` reads all proper-multiple hits and their intersection with old survivors; `RemoveCandidateSubset` commits through tenth sibling `MonotoneFilterUpdate`. Every valid row advances, including composite zero-removal rows. Mathematical-set/stream/direct-query/measurement results stay outside transition execution.
+
+All 1,200 page-147 cells match the literal `1..100`, divisors `2..13` trace. The source genuinely retains `1`, so exact display and corrected prime profiles are separate. Independent oracles pin all six page-148 formulas/horizons—including 1,000 forward gaps ending at 8—and all five page-150 measurements—including ordered Goldbach and signed ordered square tuples. Finite certification, infinite intensional queries, equality, serialization, trace, outcomes, numerical contexts, and no-cheating cases are explicit.
+
+Ulam is now an honest T37/T39 composition: closed first-accepted ascending candidate selection counts one unordered pair of distinct old indices in the complete old prefix, then the existing T37 append fires. The source's `1,2,3,4,...` prefix itself rejects ordered/self-pair alternatives. Current finite coordinate/callback selectors are semantic mismatches, while their universe/predicate/order responsibility split can be generalized structurally. No prior stage is reopened. Global verification is pending before closure; next remains T39 verification, then T41.
 
 ### 17-T41-FUNCTIONS
 
