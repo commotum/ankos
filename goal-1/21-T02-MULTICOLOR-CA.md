@@ -918,17 +918,21 @@ The mutation, reversible, doubling-search, inverse-range, and emulation images d
 
 ## Completion Requirements
 
-- [ ] Every strict/Notes/split/actual-Index/alias/variant/application/emulation textual candidate is dispositioned with reproducible searches.
-- [ ] All relevant assets and source-permitted semantic/raster oracles are closed with hashes, geometry, labels, repairs, and exclusions.
-- [ ] Exact state/alphabet/table/code/read/update/successor/boundary/seed semantics and variants are explicit.
-- [ ] T01/T03/T04/T06/T07/reversible/emulation boundaries and current API/runtime fit are proved.
-- [ ] Goal 2 files/dependencies/tests and no-cheating gates are implementation-ready.
+- [x] Every strict/Notes/split/actual-Index/alias/variant/application/emulation textual candidate is dispositioned with reproducible searches.
+- [x] All relevant assets and source-permitted semantic/raster oracles are closed with hashes, geometry, labels, repairs, and exclusions.
+- [x] Exact state/alphabet/table/code/read/update/successor/boundary/seed semantics and variants are explicit.
+- [x] T01/T03/T04/T06/T07/reversible/emulation boundaries and current API/runtime fit are proved.
+- [x] Goal 2 files/dependencies/tests and no-cheating gates are implementation-ready.
 - [ ] Global plan/evidence/design ledgers, independent review, diff checks, and repository tests are integrated.
 
 ## Stage Results
 
-In progress. Initial direct evidence supports a three-color ordered 27-entry lookup as the same forward construction shape as T01, but neither exhaustive search closure nor general-`k` status is yet proved.
+Evidence and design are complete pending the final independent-review/integration gate. The exact 29-query oracle partitions all 157 candidate lines with no remainder, and E1-E20 preserve every unique construction-relevant strict, Notes, actual-Index, split, variant, implementation, property, search, and emulation passage. All 46 quoted fragments match the canonical monolith after presentation-only quote/whitespace normalization; the 32-line source oracle and all cited `BOOK:` bounds pass. Official PDFs repair only the visibly damaged positional weights, digit-count exponent, invocations, and inverse-rule labels; normalized repairs are never passed off as local quotations.
+
+T02 is the `k>=3`, radius-one parameterization of T01: one total field over an explicit ordered finite alphabet, `AllSites`, ordered old `(left,self,right)` reads, one complete `k^3` table, typed same-site assignment, and T01 atomic commit. The optional Wolfram codec uses address `k^2*l+k*c+r`, has exactly `k^(k^3)` valid tables, and requires arbitrary-precision lossless identity. Rank, numeric aggregate, and palette are distinct. Seeds, backgrounds, finite realizations, horizons, mutation histories, reversibility claims, searches, behavior labels, rasters, and emulations remain independent records.
+
+The semantic oracle proves the exact `3^27` count, all 256 T01 specializations, positional asymmetry, codes `921408` and `5407067979`, the identity/mutation table, `k=4` fixed-width pressure, exact purpose-doubling traces, and the 101-by-201 rule-921408 digest. Metadata pin 10 included, five excluded, and two relation-only assets. All ten printed reversible codes pass cyclic injectivity through length nine; the four Notes examples reproduce inverse windows `3,4,5,6`. The direct rule-921408 JPEG regression passes with `r=0.989621884093`, MAE `4.113100751`, and RMSE `8.052767980`. No source-permitted second pixel golden exists.
 
 ## Integration Results
 
-In progress. No completed stage is contradicted or reopened. T01 parameterization is a hypothesis under active evidence audit; the public transition-update family remains at ten members.
+The design ledger now contains the T02 construction row and D111-D114. T01 is generalized without changing its meaning; no completed stage is contradicted or reopened, no family branch or executor is introduced, and the public transition-update family remains at ten members. T03 owns aggregate rules, T04/T05 their color-count profiles, T06 background preservation, T07 reflection symmetry, and emulation/reversibility/search retain relation/property/analyzer identities. The Goal 2 handoff broadens the shared T01 table executor once, adds ordered alphabet rank/value and arbitrary-precision structural codecs, preserves evolving backgrounds and realization boundaries, and supplies exact binary/nonbinary/adversarial conformance tests.
