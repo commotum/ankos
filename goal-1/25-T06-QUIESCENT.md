@@ -34,7 +34,7 @@ Determine exactly what source evidence means by a blank/white background staying
 
 ## Search Log
 
-The original nine-family pass below is retained as a reproducible narrow diagnostic, not as closure. Independent saturation showed that it missed generic initial-condition, periodic-background, fixed-point, and actual-Index aliases named by this stage's own vocabulary. The authoritative closure is the 19-family, 280-line manifest later in this section.
+The original nine-family pass below is retained as a reproducible narrow diagnostic, not as closure. Independent saturation showed that it missed generic initial-condition, periodic-background, fixed-point, and actual-Index aliases named by this stage's own vocabulary. Conversely, the later 19-family/280-line protocol is not a superset of this diagnostic. The authoritative closure is therefore their exact union plus five explicitly governed continuations: 329 canonical lines, dispositioned below with no remainder.
 
 | Q | Controlled family | Retained lines |
 |---:|---|---:|
@@ -124,11 +124,11 @@ T06 text manifest: PASS 9 queries; 128 lexical; partition=7,63,45,13; governed=5
 - **Nonfits (45):** `1170,2372,2438,2446,3976,4032,4034,4086,4480,5058,5232,5278,5316,6320,6332,6392,6510,6512,6526,6538,6548,6842,7028,12065,13060,13722,14693,16105,16241,16257,16691,16737,16739,16940,17033,17045,17439,17481,17813,18113,18453,18850,19702,20149,20521`. These are substitution, mobile, network, physics, packing, perception, arithmetic, language, and generic unchanged/stable/background usages with no T06 local-rule claim.
 - **Actual-Index routes (13):** `20965,21050,21080,21335,21517,21877,21994,22000,22016,22064,22120,22136,22304`. They route to already dispositioned invariant-state, background, Life, rule-110, or totalistic material and add no mechanics.
 
-These 128 lines have no remainder inside the narrow query union, but that union is not the evidence universe. `2868,2922,2930,14243,18766` remain useful governed continuations; the authoritative classification below absorbs the broader aliases and replaces the narrow `7/63/45/13` architecture count.
+These 128 lines have no remainder inside the narrow query union, but that union is not the evidence universe. The 19-family protocol below contributes broader aliases but does not absorb 44 of these lines. The final reconciliation retains those 44 lines and the five governed continuations `2868,2922,2930,14243,18766`; it replaces both intermediate architecture counts.
 
 ### Exact 19-family lexical-saturation manifest
 
-`BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; the actual Index begins at physical `BOOK:20826`. The declared 19-family protocol derives exactly 280 unique canonical lines: 212 pre-Index and 68 actual-Index. Counts are distinct physical lines and overlap between families. The embedded oracle derives every scoped query set, checks every per-family count (including Index-only Q14 at `0/6`), proves exact equality with the inspected ledgers, and proves the six-way disposition has zero remainder. This is lexical saturation under the declared protocol, not a claim of global natural-language completeness.
+`BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; the actual Index begins at physical `BOOK:20826`. The declared 19-family protocol derives exactly 280 unique canonical lines: 212 pre-Index and 68 actual-Index. Counts are distinct physical lines and overlap between families. The embedded oracle derives every scoped query set, checks every per-family count (including Index-only Q14 at `0/6`), and proves exact equality with its inspected subledger. This is lexical saturation under the declared protocol, not a claim that the protocol subsumes the narrow diagnostic or achieves global natural-language completeness.
 
 | Q | Controlled family | Pre-Index | Actual Index |
 |---:|---|---:|---:|
@@ -139,7 +139,7 @@ These 128 lines have no remainder inside the narrow query union, but that union 
 | 05 | all-white/all-black/only-white/only-black state phrases | 12 | 0 |
 | 06 | uniform state/configuration/color/final-state phrases | 12 | 0 |
 | 07 | invariant within 40 characters of state/configuration | 9 | 5 |
-| 08 | stable within 40 characters of state/configuration | 9 | 3 |
+| 08 | `stable` immediately before state/configuration, or state/configuration within 40 characters before `stable` | 9 | 3 |
 | 09 | cellular automaton within 180 characters of unchanged | 5 | 0 |
 | 10 | white/blank within 100 characters of unchanged/remain/stay | 7 | 0 |
 | 11 | single black/gray/white cell; simple/finite/localized initial condition; initial condition near white/blank background | 105 | 2 |
@@ -152,7 +152,7 @@ These 128 lines have no remainder inside the narrow query union, but that union 
 | 18 | actual-Index stable/bistable/metastable routes | 0 | 3 |
 | 19 | actual-Index uniformity/state routes | 0 | 18 |
 
-The resulting disjoint semantic disposition is `4/25/111/66/6/68`: direct native evidence, CA invariant-property relations, CA seed/background/profile/view evidence, non-CA SimpleProgram aliases, general controls, and actual-Index routes. This classification is deliberately strict: a line enters the CA-axis groups only when its subject is a cellular automaton or an explicit CA relation. The same words in substitutions, symbolic systems, PDEs, physics, networks, or generic data analysis remain non-CA aliases or controls.
+The 280-line protocol subledger has the disjoint semantic disposition `4/25/111/66/6/68`: direct native evidence, CA invariant-property relations, CA seed/background/profile/view evidence, sibling SimpleProgram aliases outside strict T06 eligibility, general controls, and actual-Index routes. This classification is deliberately strict: a line enters the CA-axis groups only when its subject is a cellular automaton or an explicit CA relation. The same words in substitutions, symbolic systems, PDEs, physics, networks, or generic data analysis remain sibling aliases or controls.
 
 ```bash
 python3 - <<'PY'
@@ -533,11 +533,11 @@ The strict zero-background profile chooses `b=nu^-1(0)`, so it becomes `U(0)=b`,
 - `b` being a fixed point of the uniform local rule is weaker than “the only invariant configurations are uniform”, convergence to a uniform state, eventual death, or stability under perturbations.
 - A repeating nonuniform background may be preserved by a space-time phase relation without satisfying the T06 uniform-blank predicate. Rule 110's periodic background is an explicit counter-boundary.
 - T07 reflection and T06 quiescence compose as independent evidence. There are 64 reflection-symmetric ECAs, 128 zero-quiescent ECAs, and exactly the source's 32-rule intersection.
-- If `S_0` is the finite deviation support from a globally `b`-compatible background and `N` is the finite local offset set, then after `t` snapshot-parallel events deviations are contained in `S_0 + N + ... + N` (`t` copies). This containment, not a promise of shrinking or finite lifetime, is the causal-cone claim.
+- If `S_0` is the finite deviation support from a globally `b`-compatible background and `N_read` is the declared finite set of read offsets (a site `x` reads `x + delta`), then after `t` snapshot-parallel events deviations are contained in `S_0 + (-N_read) + ... + (-N_read)` (`t` copies), where `-N_read = {-delta : delta in N_read}`. This containment, not a promise of shrinking or finite lifetime, is the causal-cone claim.
 
 ### Dependency-free semantic oracle
 
-This dependency-free oracle checks the reconstructed algebra and selected adversarial fixtures: canonical codec corollaries, arbitrary-blank failure of modulus shortcuts, exact ECA/T07 intersection, T03/T04/T05 counts, source gallery label sets, one hostile-boundary example, a finite-radius cone example, and unchanged Python object identity on acceptance. It is not a proof about every runtime program, every boundary implementation, or raster semantics; those are Goal 2 conformance obligations.
+This dependency-free oracle checks the reconstructed algebra and selected adversarial fixtures: canonical codec corollaries, arbitrary-blank failure of modulus shortcuts, exact ECA/T07 intersection, T03/T04/T05 counts, source gallery label sets, one hostile-boundary example, symmetric and asymmetric finite-radius cone examples, and unchanged Python object identity on acceptance. It is not a proof about every runtime program, every boundary implementation, or raster semantics; those are Goal 2 conformance obligations.
 
 ```bash
 python3 - <<'PY'
@@ -613,6 +613,13 @@ for h in range(1,6):
     row=eca_step(row,30)
     assert not any(row[:10-h]) and not any(row[11+h:])
 
+# With the declared read offset +1, a deviation at y can affect x=y-1.
+# This asymmetric witness catches the otherwise invisible sign convention.
+deviations={0}
+for t in range(1,4):
+    deviations={x-1 for x in deviations}
+    assert deviations=={-t}
+
 program={'kind':'eca','code':30,'table':digits(30,2,8)}
 def require(program,b):
     if not exhaustive_quiescent(program['table'],2,b): raise ValueError
@@ -622,7 +629,8 @@ print('T06 semantic oracle: PASS')
 print('eca=',len(eca_q),len(eca_s),len(eca_qs),'labels=',eca_qs)
 print('counts=',3**26,3**6,4**9,5**12,'nonzero_blank_index=',ib)
 print('galleries=',len(page76),len(page256),len(page262),
-      'boundary_adversary=',eca_step((0,0,0),30,left=1,right=1))
+      'boundary_adversary=',eca_step((0,0,0),30,left=1,right=1),
+      'one_sided_cone=',next(iter(deviations)))
 PY
 ```
 
@@ -632,7 +640,7 @@ Recorded output:
 T06 semantic oracle: PASS
 eca= 128 64 32 labels= [0, 4, 18, 22, 32, 36, 50, 54, 72, 76, 90, 94, 104, 108, 122, 126, 128, 132, 146, 150, 160, 164, 178, 182, 200, 204, 218, 222, 232, 236, 250, 254]
 counts= 2541865828329 729 262144 244140625 nonzero_blank_index= 13
-galleries= 50 32 30 boundary_adversary= (1, 0, 1)
+galleries= 50 32 30 boundary_adversary= (1, 0, 1) one_sided_cone= -3
 ```
 
 ## Current API Fit
