@@ -1,6 +1,6 @@
 # 22-T03-TOTALISTIC-CA
 
-Status: **COMPLETE**
+Status: **REOPENED**
 
 ## Current Facts
 
@@ -1175,14 +1175,16 @@ No other included figure supplies all of exact serialized seed, boundary/backgro
 
 ## Completion Requirements
 
-- [x] Every strict/Notes/split/actual-Index/alias/variant/application/emulation textual candidate is dispositioned reproducibly.
-- [x] Every relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and exclusions.
+- [ ] Every strict/Notes/split/actual-Index/alias/variant/application/emulation textual candidate is dispositioned reproducibly.
+- [ ] Every relevant asset and source-permitted oracle is closed with hashes, geometry, repairs, and exclusions.
 - [x] Aggregate/value/case/table/code/read/update/successor/boundary/seed semantics and variants are explicit.
 - [x] T01/T02/T04/T05/T06/T07/additive/weighted/emulation boundaries and current API/runtime fit are proved.
 - [x] Goal 2 files/dependencies/tests and no-cheating gates are implementation-ready.
-- [x] Global ledgers, independent review, diff checks, and repository tests are integrated.
+- [ ] Global ledgers, independent review, diff checks, and repository tests are integrated.
 
 ## Stage Results
+
+REOPENED after T04 follow-through. T04's named code-357/code-1329 routes at `BOOK:3320-3378` and binary range-two code-20 follow-through exposed direct textual/profile candidates, physical assets, and adjacency controls omitted from T03's claimed exhaustive manifest/superset. The aggregate/table semantics, core definition/formula excerpts, API/runtime audit, and D115-D118 remain valid, but the source partition/excerpts, asset counts/metadata oracle, stage/global summaries, and independent completion review must be repaired before T03 can again be COMPLETE.
 
 COMPLETE. The exact 16-query manifest closes 118 candidates in the disjoint partition `26 direct / 34 sibling / 25 relation / 23 false-control / 10 actual-Index`, and the 84 literal split occurrences match exactly. Eighteen evidence groups preserve 65 verbatim fragments across 63 physical monolith lines. Five damaged forms are normalized transparently against four hash-pinned official PDFs; every stage citation and quote passes the source oracle with zero unresolved candidate.
 

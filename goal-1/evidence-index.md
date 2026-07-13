@@ -28,7 +28,7 @@ Each type stage must make the following auditable:
 |---|---:|---|---:|---|---|---|
 | T01 | 2 | Elementary Cellular Automata | 1 | `2-T01-ELEMENTARY.md` | COMPLETE | 8 search families; 23 excerpt groups; all split/Notes/Index/cross-reference candidates dispositioned; 0 unresolved |
 | T02 | 3 | Multi-Color Nearest-Neighbor Cellular Automata | 2 | `21-T02-MULTICOLOR-CA.md` | COMPLETE | Exact 29-query/157-candidate partition; 21 evidence groups; 48 verbatim fragments; ordered `k^3` table/base-`k` codec; 11 included/6 excluded/2 relation-only assets; seven source/semantic/metadata/Voronoi/reversible/raster oracles; 0 unresolved |
-| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | COMPLETE | Exact 16-query/118-candidate partition; 18 evidence groups/65 quote fragments; explicit valuation + exact sum table/base-`k` codec; 37 included/10 excluded/2 relation-only assets; six source/semantic/raster oracles; 0 unresolved |
+| T03 | 4 | Totalistic Cellular Automata | 3 | `22-T03-TOTALISTIC-CA.md` | REOPENED | T04 follow-through exposed omitted named-code text/profile routes, direct code-357/code-1329 and code-20 assets, and adjacency controls; core semantics remain valid while source/asset manifests and global summaries are repaired |
 | T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | IN PROGRESS | Three-color preset evidence audit active |
 | T05 | 6 | Higher-Color Totalistic Cellular Automata | 5 | `24-T05-HIGHERCOLOR-TOTALISTIC.md` | PENDING | Not started |
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | PENDING | Not started |
@@ -75,12 +75,12 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 21 / 45.
-- Type stages reopened: 0.
+- Type stages complete: 20 / 45.
+- Type stages reopened: 1.
 - Type stages unresolved: 23 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
 ## Reopened-Stage Log
 
-None at Foundation start. Add an entry here whenever later evidence invalidates a completed stage; do not erase the prior conclusion or silently downgrade it.
+- T03 reopened during T04: named code-357/code-1329 and binary range-two code-20 follow-through exposed omitted text/profile candidates, direct assets, and related controls, contradicting the claimed T03 exhaustive manifest and physical superset. Semantic decisions remain active; repair T03 source/asset manifests, excerpts, oracles, counts, and summaries and re-review before recompletion.
