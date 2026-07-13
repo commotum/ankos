@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27 complete, 9 of 45 type stages complete, T29 Network Systems in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29 complete, 10 of 45 type stages complete, T30 Multiway Systems in progress, and Synthesis and Goal 2 Handoff pending.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -82,6 +82,11 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T27 overlap and coincidence are inert: parents do not read neighbors, no footprint is exclusive, and multiplicity/lineage survive. The page-190 orbit proves that two occurrences can share a center and the same square footprint while different 90-degree frames produce different descendants.
 - T27 exact page-189/page-190 rules use rational matrices/vectors. Algebraic and explicitly declared finite-precision profiles remain distinct; semantic equality never uses an epsilon. Center lists, polygons, rasters, unions, generation stacks, dimensions, limits, and parameter filters are downstream.
 - T27's Möbius and inverse-square-root variant uses a distinct closed extended-complex point-map profile while sharing all-occurrence bag expansion. T13 lineage composes, but its ordered concatenation does not; T28 owns gridded neighbor interaction and T29 owns non-geometric network topology.
+- T29 adds finite nonempty root-reachable directed graphs with two semantic ports per vertex, alpha-renamable occurrence identity, exact root/port-preserving isomorphism, and a breadth-first canonical pair codec.
+- T29 programs are total closed tables over uniform or exact-length reach-signature reads. Results contain old-snapshot path endpoints or distinct event-local fresh-node occurrences; equal descriptors and equal local topology never merge identities.
+- T29 establishes `ParallelRerouteCreateProject` as the seventh update sibling: all old nodes propose from one graph, raw reroutes/births commit atomically, newborns wait, and directed forward closure from the preserved root is projected afterward.
+- T29's exact uniform periods/collapse, singleton growth, depth-one `1296` count, five depth-two tables/count anchors, signature witnesses, frozen/projection/freshness/alias cases, and raw-event reconstruction close the parallel handoff.
+- The sequential-network table and pruning evidence are preserved, but primary sources do not determine move timing or projection anchor/order. Goal 2 must explicitly defer that executor rather than choose a convention or flag.
 
 ## Assumptions To Challenge
 
@@ -372,7 +377,7 @@ T27 reconstructs finite bags of fully posed prototype occurrences, exact or expl
 
 ### 11-T29-NETWORK
 
-Status: **IN PROGRESS** in `goal-1/11-T29-NETWORK.md`.
+Status: **COMPLETE** in `goal-1/11-T29-NETWORK.md`.
 
 #### Big Picture Objective
 
@@ -386,7 +391,15 @@ Apply the common protocol, emphasizing node identity, labeled connections, path-
 
 All T29 evidence is captured; topology is first-class; graph updates do not rely on incidental coordinates; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+The direct-name search dispositioned 44 occurrences on 40 lines; conservative family, expanded graph/network, and executable-symbol audits dispositioned 290/217, 1,278/654, and 27/19 respectively. Twenty-seven canonical groups cover all main figures, Notes/programs, actual Index/splits, exact rule tables/counts/periods, isomorphism, projection, observers, variants, and relations. Parallel semantics have zero unresolved candidates; the sequential source limitation is explicit.
+
+T29 reconstructs finite rooted two-port graphs, old-snapshot paths and exact-length reach signatures, total direct/fresh result rows, collision-free event births, atomic raw rerouting, and post-commit directed root projection. Exact BFS canonicalization handles root/port isomorphism without merging nodes. This adds `ParallelRerouteCreateProject` as the seventh update law. Uniform, creation, depth-one/depth-two, snapshot, projection, freshness, alias, identity, and provenance oracles close the parallel handoff. Sequential timing/anchor remains unavailable pending decisive primary evidence. No prior stage was reopened. Next: T30.
+
 ### 12-T30-MULTIWAY
+
+Status: **IN PROGRESS** in `goal-1/12-T30-MULTIWAY.md`.
 
 #### Big Picture Objective
 

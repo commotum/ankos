@@ -626,3 +626,145 @@ and mark `sequential_network_system` unavailable with a precise source-gap asser
 - **Network mobile automata:** add visible active-node control and sequential locality under separately evidenced timing.
 - **Pointers, linked lists, LISP, and circuits:** analogies/representations, not alternate T29 state encodings.
 - **Random-complexity frequency claims:** the main text's roughly one in 10,000 and the Notes' few in 1,000 use unspecified samples/criteria; neither is a conformance distribution.
+
+## Current API Fit
+
+| T29 responsibility | Current proposal fit | Required conclusion |
+|---|---|---|
+| State/support | Dense `D -> A` over fixed rank-0..3 coordinates | SEMANTIC MISMATCH; add finite rooted labeled topology |
+| Vertex identity | Coordinate tuple | SEMANTIC MISMATCH; use alpha-renamable snapshot tokens |
+| Root/control anchor | No graph root; single-position control exists only in prior design | PRINCIPLED EXTENSION; graph root is state, not mobile control |
+| Source | Writable coordinate frontier | SEMANTIC MISMATCH; every old vertex fires exactly once |
+| Read | Fixed coordinate offsets | SEMANTIC MISMATCH; old-snapshot labeled path endpoints and exact-reach signatures |
+| Rule | Scalar table/formula result | SEMANTIC MISMATCH; closed total port-rewrite/create table |
+| Result | Same-site scalar assignment | SEMANTIC MISMATCH; two port expressions with typed fresh-node occurrences |
+| Update | Fixed-support copy/parallel write | SEMANTIC MISMATCH; raw graph rewrite, allocation, and root projection |
+| Boundary | Fixed/periodic/reflective coordinate edges | NOT APPLICABLE; graph is internally closed |
+| Equality | Dense array equality | SEMANTIC MISMATCH; exact root/port-preserving isomorphism |
+| Trace | Fixed dense frame | SEMANTIC MISMATCH; ragged graph snapshots plus raw/projection events |
+| Orchestration | Old-source/read/result/update responsibilities | DIRECT at the responsibility level |
+| Program/seed/horizon separation | Separate configuration responsibilities | DIRECT; keep graph seed and external stop independent |
+
+The current proposal's `FORMULAIC` escape would merely hide graph traversal, mutation, and allocation in a callback. T20 trees preserve hierarchy but not graph sharing/cycles; T27 bags preserve identity/multiplicity but not adjacency; neither is a native substitute.
+
+## Current Runtime Fit
+
+| Runtime area | Finding | T29 disposition |
+|---|---|---|
+| `alphabets.py` | Finite scalar integer/float/symbol values | Cannot represent graph topology or vertex references |
+| `loci.py:31-94` | Rank-0..3 integer coordinates and predicate loci | Cannot address alpha-renamable graph vertices |
+| `frontiers.py:38-80` | Only dense time-slice firing | Wrong support/source contract |
+| `neighborhoods.py:46-80` | Coordinate offset gathers/callables | No port-word traversal or topology signatures |
+| `rules.py:30-78` | Scalar results, named families, callable rule | Reject callback escape; add closed graph row data |
+| `specs.py:23-82` | Fixed shape and raw family/rule payloads | Cannot validate rooted graphs or graph programs |
+| `rollout.py:40-175,580-660` | Dense preallocation, copy-forward, and family branches | No graph execution; do not add a network branch |
+| `datasets.py:321-330` | Stacks equal-shaped arrays | Graph episodes require explicit ragged collation |
+| visualization | Coordinate/raster assumptions | Layout is an optional downstream graph renderer |
+| tests | No graph carrier/update/isomorphism coverage | Add structural goldens before image tests |
+
+`simple_programs.md:31-73` and `64-77` define coordinate loci and callback-like rules; `37-80` defines coordinate frontiers; `23-81` and the later rollout sections assume fixed dense shapes. These are semantic mismatches, not missing adapters.
+
+## Principles Audit
+
+- **Principle 0:** connectivity, root, port order, aliasing, and freshness must survive. A drawing, adjacency image, or encoded scalar fails native advancement.
+- **Principles 1-4:** graph state, all-node sources, path/signature reads, closed results, simultaneous raw commit, projection, and event provenance are explicit.
+- **Principle 5:** the strict state is Markovian. Fresh allocation is event-local; list IDs and lineage do not become hidden rule state.
+- **Principles 6-8:** vertex tokens, graph ports, display numbers, layouts, canonical indices, ANKoS addresses, and batch slots are separate domains. No capacity enters semantics.
+- **Principles 9-10:** page rules are strict presets over typed paths/tables rather than named executors.
+- **Principle 11:** frozen proposals, distinct insertion occurrences, newborn deferral, and post-commit directed projection are defining semantics; traversal caches and token choices are incidental.
+- **Principle 12:** raw ragged graph traces precede canonical pair arrays, adjacency matrices, layouts, node-count series, causal graphs, and batching.
+- **Principles 13-15:** written path order, in-place rewiring, weak versus directed projection, aliasing, duplicate fresh descriptors, and alpha-renaming are adversarial tests.
+- **Principles 16-17:** `ParallelRerouteCreateProject` is a real seventh update sibling. Reusing tree/bag/assignment names without topology semantics would be a shim.
+
+Rejected shortcuts:
+
+- coordinate layout, fixed lattice, adjacency raster/tensor, padded maximum-node matrix, or whole graph packed into one value;
+- arbitrary graph/rewrite/traversal/isomorphism callback, NetworkX as the semantic engine, or named network rollout branch;
+- persistent global node counter, rule-visible list index, hidden root, hidden component filter, or hidden path cache;
+- in-place/source-order rewiring, newborn firing, deletion before raw commit, weak/undirected projection, or silent keep-all behavior;
+- structural node deduplication, automorphism quotient of vertices, bisimulation collapse, edge-label erasure, or root erasure;
+- path reversal, unordered ports, cumulative-ball signature substituted for exact-length sets, missing-row fallback, or invented generic-depth count;
+- random graph sampler/distribution inferred from frequency prose;
+- guessed sequential move/projection timing or an `old/new` convention flag;
+- T20 tree replacement, T27 bag expansion, or fixed-support assignment relabeled as graph evolution.
+
+## Detailed Implementation Plan
+
+1. Closed exact-name, family/alias, broad graph, mechanism, caption/raster, Notes, executable-symbol, actual Index, split, history, layout/dimension, fixed-network, constraint, causal, multiway, grammar, mobile, random-seed, and relation searches.
+2. Reconstructed the finite rooted two-port graph, exact isomorphism, BFS canonical codec, old-snapshot path reads, exact-length signatures, complete programs, fresh-node result grammar, all-node source, raw commit, and directed projection.
+3. Proved projection is a correct factor for the strict grammar and separated it from a hypothetical keep-all update.
+4. Recovered the four uniform rules, two creating rules, depth-one `1296` count, five complete depth-two tables, short/long count anchors, and exact repeated-state witness.
+5. Derived all six depth-two key witnesses and adversarial path-order, frozen-update, directed-GC, freshness, alias, alpha, identity, provenance, and validation tests.
+6. Audited the sequential variant independently and recorded the source gap without contaminating the complete parallel construction.
+7. Compared every responsibility with prior stages, `simple_programs.md`, the runtime, and tests; established a seventh update law without reopening earlier conclusions.
+8. Reintegrated the global plan/evidence/design ledgers and prepared an implementation-ready Goal 2 stage for the closed parallel profile.
+
+## Goal 2 Implementation Stage
+
+### G2-T29 — Rooted two-port graphs and parallel reroute/create/project
+
+Dependencies: shared typed outcomes/errors and source/read/result/update orchestration; T13/T27 parent-child provenance concepts; an immutable snapshot/proposal validator. Do not depend on coordinate loci, T20 expression trees, T27 geometric bags, NetworkX semantics, or a graph callback.
+
+1. Add `src/ca/graphs.py` or the synthesis-selected graph-owned module with `Port`, normalized `PortWord`, immutable `RootedPortGraph`, validation, `follow`, directed closure, exact-length reach signatures, exact BFS canonicalization, serialization, hashing, and alpha-renaming helpers.
+2. Add `UniformNetworkRead` and `ExactLengthReachCounts` with explicit evidenced key domains. Reads return closed path endpoint maps/signatures and retain snapshot identity.
+3. Add `DirectOld`, `InsertFresh`, `NodePortRewrite`, and `PortRewriteProgram`. Validate total rows, key/path closure, port order, result shape, and the restriction to old-snapshot fresh targets.
+4. Add `AllNetworkNodes` and `PortPathRead` through the shared executor shell. No graph object or traversal function is passed to user code.
+5. Add `ParallelRerouteCreateProject` with exact old coverage, event-scoped fresh allocation, frozen proposal resolution, raw graph construction, newborn deferral, directed root closure, and complete graph provenance. Add no family dispatch.
+6. Add `Advanced(changed=...)` graph outcomes and raw ragged graph traces. Keep canonical pair-array, Notes list order, node-count series, layout, adjacency, dimension, cycle/fixed observers, and batching downstream.
+7. Add strict constructors for the five-node cyclic seed, singleton seed, four uniform rules, two creation rules, depth-one profile, and five depth-two tables. Preserve program/seed/horizon separation.
+8. Add a diagnostic keep-all raw graph projection only as event inspection, not a semantic successor option. Do not expose a pruning flag.
+9. Represent the sequential six-row table as evidence data if useful, but make its executor unavailable with a precise source-gap diagnostic. Add no guessed convention or timing switch.
+10. Audit exports, specs, serialization, dataset collation, rendering, and production code for callbacks, coordinate packing, padding/caps, hidden IDs/root/GC, in-place mutation, deduplication, port erasure, missing-row fallback, and family branches.
+
+Completion requires:
+
+- graph validation, alpha-renaming, port/root-preserving equality, BFS canonical round-trip, alias/cycle/self-loop, and malformed graph tests;
+- `Follow` epsilon/written-order tests and all six depth-two signature witnesses;
+- page-214 period 5/4, fixed-after-one, and `5,5,1` collapse goldens;
+- page-215 `1,2,4,8` and exact first-two reference snapshots;
+- page-216 grammar cardinality `1296` without invented depth-two count;
+- all five depth-two tables, counts through event 15, long anchors, and `G49=G768`;
+- frozen-snapshot, directed-projection, duplicate-fresh, newborn, alias, identity, exact raw-count, event-reconstruction, and validation adversaries;
+- raw ragged trace followed by explicit pair-array/layout/count lowering;
+- an explicit sequential-unavailable test documenting the unresolved source order;
+- unchanged prior construction semantics, one shared executor shell, no network rollout branch, and all repository tests passing.
+
+## No-Cheating Checks
+
+- No network family rollout, whole-graph successor/rewrite/traversal/isomorphism callback, host graph engine, or `Any` graph/result payload.
+- No coordinate, drawing, lattice, tree, bag, adjacency image, padded tensor, scalar code, string, or fixed-capacity substitute for native graph topology.
+- No hidden root, port order, source order, list index, node counter, allocation cursor, path cache, projection, or persistent lineage.
+- No in-place rewiring, partial commit, newborn firing, descriptor coalescing, weak-component pruning, pre-rewrite pruning, or direct deletion.
+- No node dedupe by equal edges, automorphism, bisimulation, layout, or hash collision.
+- No missing/duplicate rule fallback, implicit identity row, reversed path, cumulative reach count, or invented generic rule enumeration.
+- No graph size, degree padding, path-depth cap beyond the declared program, layout extent, observation window, or render limit as semantics.
+- No random seed/distribution inferred from qualitative frequency claims.
+- No sequential convention, keep-all switch, fixed-point stop, cycle cache, dimension estimator, causal graph, or node-count observer feeding execution.
+- No T20 tree update, T27 occurrence-bag update, T13 concatenation, or dense assignment relabeled as graph rewrite.
+
+## Completion Requirements
+
+- [x] All names, aliases, figures, Notes, executable programs, actual Index entries, splits, history, variants, observers, and relations are resolved with zero silent remainder.
+- [x] Native rooted graph/port state, equality, paths, signatures, source/read/result/update, freshness, raw commit, projection, seed, successor, and trace semantics are reconstructed.
+- [x] Exact uniform/creation/depth-one/depth-two tables, counts, trajectories, signature witnesses, and adversarial invariants are specified.
+- [x] Parallel mechanics are closed; the sequential source ambiguity is explicitly isolated rather than guessed.
+- [x] Current API/runtime/principles fit and T20/T27 reuse/divergence are explicit.
+- [x] Goal 2 implementation/conformance handoff and global reintegration are complete.
+
+## Stage Results
+
+T29 is complete. The direct name audit dispositioned 44 occurrences on 40 lines; the conservative family audit dispositioned 290/217, the expanded graph/network audit 1,278/654, and the executable-symbol audit 27/19. Twenty-seven canonical excerpt groups cover the main mechanics, every page-209 through page-218 figure, Notes and programs, actual Index/splits, identity/layout/dimension, fixed-network systems, constraints, causal/multiway/grammar/mobile relations, random seeds, and history. Zero parallel-mechanics candidates remain.
+
+The construction is a finite nonempty root-reachable directed graph with two semantic outgoing ports per vertex. Every old vertex follows closed paths and chooses a total topology-signature row against one old snapshot. One atomic update retains old vertices, reroutes both ports, allocates a distinct node per fresh expression, installs newborn ports to old endpoints, forms the raw graph, and projects directed forward closure from the preserved root. Exact root/port isomorphism has a simple BFS canonical codec. This establishes `ParallelRerouteCreateProject` as the seventh update sibling.
+
+Uniform periods/collapse, singleton creation, the `1296` restricted count, five exact depth-two tables, short and long count anchors, `G49=G768`, all signature witnesses, and adversarial snapshot/projection/freshness/alias/provenance cases close the parallel handoff. The sequential table is preserved, and its pruning is evidenced, but move timing and projection anchor/order remain a transparent primary-source limitation. Goal 2 must not guess them.
+
+## Integration Results
+
+- Added finite rooted labeled graph state, alpha-renamable vertex identity, exact root/port isomorphism, and BFS canonical serialization to the semantic inventory.
+- Added all-vertex sources, port-word reads, exact-length topology signatures, closed reroute/create results, collision-free event freshness, and raw graph provenance.
+- Added `ParallelRerouteCreateProject` as the seventh public update law with post-commit directed root projection.
+- Separated semantic state from Notes/display indices, layouts, adjacency encodings, node counts, dimensions, causal graphs, and compressed traces.
+- Isolated the sequential variant behind a source-acquisition gate and preserved its exact six-row table without a convention flag.
+- Preserved T01/T09/T12/T13/T16/T17/T19/T20/T27 conclusions; no prior stage is reopened.
+- Next stage: T30, Multiway Systems.
