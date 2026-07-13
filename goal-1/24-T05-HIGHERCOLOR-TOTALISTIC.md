@@ -35,11 +35,330 @@ Determine the exact higher-color totalistic parameter domain and evidence bundle
 
 ## Search Log
 
-IN PROGRESS. Direct terms, aliases, formulas, examples, captions, Notes, actual Index, split files, linked assets, and cross-references are being saturated. Every candidate will be placed in one exact manifest with zero remainder.
+Closed with zero remainder. `BOOK` below means the canonical monolith at `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; its actual Index begins at physical line 20826. Eleven controlled query families produce exactly 142 distinct lexical candidates: 127 before the actual Index and 15 in it. Their disjoint lexical disposition is `4 native / 14 generic-parent / 23 lower-color totalistic / 33 other-totalistic / 14 higher-color relations / 39 controls / 15 Index`. Five governed prose continuations and 21 linked rasters expand this to exactly 168 candidates, with full disposition `11 / 16 / 23 / 33 / 23 / 47 / 15` and assets `5 included / 9 relation-only / 7 excluded`.
+
+The literal absences are part of the result: contextual searches find no occurrence of the catalog phrase `higher-color`, `10 cases`, `4^10`, or `5^13`. The `k=4` values `M=10` and `R=4^10` are derived from the general formula at `BOOK:11897`; `k=5`, 13 cases, and `1,220,703,125` are direct at `BOOK:1282`. Numeric collisions at `BOOK:3034,8356` are controls. Code `1004600` occurs exactly at `BOOK:9166,19234,20980`, and its application prose continues at `9168,9170` and `19236,19238`.
+
+| Q | Controlled family | Pre-Index | Actual Index |
+|---:|---|---:|---:|
+| 01 | four/4-color spellings | 26 | 4 |
+| 02 | five/5-color spellings | 8 | 0 |
+| 03 | more/higher/four-or-more colors | 13 | 2 |
+| 04 | any-number/increasing-number color phrases | 5 | 0 |
+| 05 | literal `totalistic` saturation | 74 | 10 |
+| 06 | 10/13 cases and `4^10`/`5^13` numeric forms | 3 | 0 |
+| 07 | named code `1004600` | 2 | 1 |
+| 08 | average/implementation/value-assignment/general-count aliases | 10 | 0 |
+| 09 | explicit `k=4/5, r=1` adjacency | 3 | 0 |
+| 10 | complexity/class/death/growth property phrases | 4 | 0 |
+| 11 | heading/Index drift guard | 11 | 6 |
+
+Q11 adds no new line to the union. The lexical union overlaps T03 on 110 of the full 168 candidates and T04 on 103; T05 therefore contributes respectively 58 and 65 independently found candidates beyond those inherited manifests. Neither prior stage can stand in for this stage's closure.
+
+### Exact reproducible source and split manifest
+
+```bash
+python3 - <<'PY'
+import re
+from pathlib import Path
+
+B=Path('ref/A-New-Kind-of-Science')
+P=B/'A-New-Kind-of-Science.md'
+L=P.read_text().splitlines(); IX=20826
+def xs(s): return [] if s=='-' else list(map(int,s.split(',')))
+rows=[
+(r'(?i)(?<![a-z0-9])(?:four|4)[ -]?(?:possible[ -]?)?colou?rs?(?![a-z0-9])',
+ '1042,1046,2868,3946,7930,8490,8494,8530,8532,9166,9508,10395,10397,10399,14099,14388,15311,16294,16483,16489,16646,17473,18361,18670,18755,19794',
+ '20828,21193,21815,21990'),
+(r'(?i)(?<![a-z0-9])(?:five|5)[ -]?(?:possible[ -]?)?colou?rs?(?![a-z0-9])',
+ '1282,7986,8278,8504,8510,8520,8526,8558','-'),
+(r'(?i)(?:more than (?:two|three)|(?:four|4) or more|more|higher)[ -](?:possible[ -])?colou?rs',
+ '1282,7900,8072,8318,11283,12055,12311,12313,13619,15245,18339,18592,18755',
+ '20965,22372'),
+(r'(?i)(?:any number of colou?rs|any set of rules.{0,100}how many colou?rs|number of colou?rs increases)',
+ '1282,7902,8080,18806,19322','-'),
+(r'(?i)totalistic',
+ '772,774,776,784,790,796,800,804,808,824,834,846,1282,1954,2170,2802,2806,2822,2852,2868,2922,3902,3914,5638,6340,6644,7912,8320,8936,9166,10261,11037,11056,11060,11068,11070,11072,11168,11178,11509,11585,11625,11897,11902,11904,11908,11910,11912,11916,13536,13538,13547,13548,13549,13601,13613,13650,13654,13658,14223,14224,14239,14241,14632,15221,15301,15321,15359,15955,15959,16024,17431,18672,18748',
+ '20965,20969,20972,20980,21233,21731,22030,22146,22352,22392'),
+(r'(?i)(?:10 cases|13 cases|4\s*\^\s*10|5\s*\^\s*13|1,?048,?576|1,?220,?703,?125)',
+ '1282,3034,8356','-'),
+(r'(?i)(?:code(?: number)?\s*1004,?600|1004,?600)',
+ '9166,19234','20980'),
+(r'(?i)(?:average (?:color|of (?:the previous colors|cells in its neighborhood))|TotalisticCARule|ToTotalisticCARule|specific assignment of values to colors|k\^\{1\+\(k-1\)\(2r\+1\)\})',
+ '774,776,2170,5082,5088,8320,11897,11904,11908,11912','-'),
+(r'(?i)k\s*=\s*(?:4|5).{0,100}?r\s*=\s*1(?![0-9/])',
+ '14394,16024,16049','-'),
+(r'(?i)(?:rules of varying complexity|transitions between rules with different classes of behavior|dies out after 36 steps|steady growth at about 0\.035)',
+ '1282,2868,9166,19234','-'),
+(r'(?i)(?:Cellular automata.{0,100}with more colors|emulating more colors|Code 1004600|Sum \(totalistic\) rules|Totalistic cellular automata)',
+ '784,808,834,2802,2806,9166,11037,11902,14224,18748,19234',
+ '20969,20980,22146,22352,22372,22392'),
+]
+query_sets=[]
+for q,(pat,pre_s,idx_s) in enumerate(rows,1):
+    found=[i for i,s in enumerate(L,1) if re.search(pat,s)]
+    pre=[i for i in found if i<IX]; idx=[i for i in found if i>=IX]
+    assert pre==xs(pre_s),(q,pre,xs(pre_s))
+    assert idx==xs(idx_s),(q,idx,xs(idx_s))
+    query_sets.append(set(found))
+lex=set().union(*query_sets)
+assert len(lex)==142 and len({i for i in lex if i<IX})==127
+
+native= set(xs('1282,2868,9166,19234'))
+parent= set(xs('772,774,776,8320,11037,11056,11060,11897,11902,11904,11908,11910,11912,11916'))
+lower=  set(xs('784,790,796,800,804,808,824,834,846,2802,2806,2822,2852,6340,7912,8936,11168,11509,11585,11625,14223,14632,18672'))
+other=  set(xs('1954,2170,2922,3902,3914,5082,5088,5638,6644,10261,11068,11070,11072,11178,13536,13538,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,15221,15301,15321,15359,15955,15959,17431'))
+relation=set(xs('7900,7902,7930,7986,8318,11283,14224,14388,14394,16024,18361,18670,18748,18755'))
+control=set(xs('1042,1046,3034,3946,8072,8080,8278,8356,8490,8494,8504,8510,8520,8526,8530,8532,8558,9508,10395,10397,10399,12055,12311,12313,13619,14099,15245,15311,16049,16294,16483,16489,16646,17473,18339,18592,18806,19322,19794'))
+index=set(xs('20828,20965,20969,20972,20980,21193,21233,21731,21815,21990,22030,22146,22352,22372,22392'))
+roles=[native,parent,lower,other,relation,control,index]
+assert [len(x) for x in roles]==[4,14,23,33,14,39,15]
+assert set().union(*roles)==lex and sum(map(len,roles))==len(lex)
+
+follow={9168,9170,10411,11077,11914}
+I={1280,2866,9164,19236,19238}
+R={778,7928,7932,7934,7984,11170,11297,14390,18759}
+X={3944,10393,10409,15313,15315,15317,15319}
+asset_names={
+778:'_page_75_Figure_6.jpeg',1280:'_page_122_Figure_2.jpeg',2866:'_page_256_Figure_2.jpeg',
+3944:'_page_354_Picture_2.jpeg',7928:'_page_672_Picture_1.jpeg',7932:'_page_672_Picture_3.jpeg',
+7934:'_page_672_Picture_4.jpeg',7984:'_page_677_Figure_2.jpeg',9164:'_page_769_Figure_1.jpeg',
+10393:'_page_847_Figure_1.jpeg',10409:'_page_848_Figure_2.jpeg',11170:'_page_883_Picture_25.jpeg',
+11297:'_page_885_Picture_21.jpeg',14390:'_page_967_Picture_22.jpeg',15313:'_page_996_Picture_6.jpeg',
+15315:'_page_996_Picture_7.jpeg',15317:'_page_996_Picture_8.jpeg',15319:'_page_996_Picture_9.jpeg',
+18759:'_page_1132_Figure_9.jpeg',19236:'_page_1152_Figure_5.jpeg',19238:'_page_1152_Figure_6.jpeg'}
+assets=I|R|X
+assert [len(I),len(R),len(X)]==[5,9,7] and assets==set(asset_names)
+for n,name in asset_names.items(): assert L[n-1].strip()==f'![]({name})',(n,L[n-1])
+assert not (lex&follow or lex&assets or follow&assets)
+expanded=lex|follow|assets
+full=[native|{9168,9170}|I,parent|{11077,11914},lower,other,relation|R,control|{10411}|X,index]
+assert [len(x) for x in full]==[11,16,23,33,23,47,15]
+assert set().union(*full)==expanded and sum(map(len,full))==len(expanded)==168
+
+split_expected={
+'BACK-MATTER/Colophon/Colophon.md':'30,896,918,1149,1227,1229,1305,1312,1363,1791,1879,2351,3385,3522,3526,3529,3537,3750,3790,4288,4372,4547,4587,4703,4909,4929,4949',
+'BACK-MATTER/Index/Index.md':'216,218,1437,1439,1448,1449,1450,1502,1514,1520,1551,1555,1559,2000,2124,2125,2140,2142,2289,2295,2533,3122,3146,3202,3212,3222,3260,3856,3860,3925,3950,4195,4384,4390,4547,5334',
+'CHAPTERS/10-Processes-of-Perception-and-Analysis/Processes-of-Perception-and-Analysis.md':'57',
+'CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md':'199,201,211,229,285,361,367,563,601,603,633,765,769,779,781,789,795,799,801,825',
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md':'319,549,891,1642,1776,1778,1780,2418,2437,2441,2449,2451,2453,2549,2559,2664,2890,2966,3006,3278,3283,3285,3289,3291,3293,3297,3436',
+'CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md':'89,91,93,101,107,113,117,121,125,141,151,163,359,363,599',
+'CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md':'411',
+'CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md':'27',
+'CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md':'101,105,121,149,165,219,331',
+'CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md':'479,491,523',
+'CHAPTERS/8-Implications-for-Everyday-Systems/Implications-for-Everyday-Systems.md':'719,725',
+'CHAPTERS/9-Fundamental-Physics/Fundamental-Physics.md':'473,1169',
+}
+expected={(rel,n) for rel,ns in split_expected.items() for n in xs(ns)}
+found=set()
+for p in B.rglob('*.md'):
+    rel=str(p.relative_to(B))
+    if rel in {'A-New-Kind-of-Science.md','ANKoS-Atlas.md'}: continue
+    for n,line in enumerate(p.read_text().splitlines(),1):
+        if any(re.search(pat,line) for pat,_,_ in rows): found.add((rel,n))
+assert found==expected,(len(found),len(expected),sorted(found^expected)[:10])
+assert len(found)==142
+print('T05 source manifest: PASS',len(rows),'queries;',len(lex),'lexical;',len(follow),'text follow;',len(assets),'assets;',len(expanded),'total')
+print('lexical partition=',*[len(x) for x in roles],'; full partition=',*[len(x) for x in full])
+print('assets=',len(I),len(R),len(X),'; split=',len(found))
+PY
+```
+
+Recorded output:
+
+```text
+T05 source manifest: PASS 11 queries; 142 lexical; 5 text follow; 21 assets; 168 total
+lexical partition= 4 14 23 33 14 39 15 ; full partition= 11 16 23 33 23 47 15
+assets= 5 9 7 ; split= 142
+```
 
 ## Book Excerpts
 
-IN PROGRESS. Unique construction-relevant excerpts will be recorded verbatim with canonical line provenance after the candidate partition is closed.
+Twelve groups retain 28 verbatim fragments on 24 unique canonical source lines. Linked asset lines are provenance rather than quote lines. The full 168-candidate disposition remains in the executable Search Log; these excerpts retain the construction, parameter, property, and boundary facts needed for the design.
+
+### E1 — Inherited totalistic restriction, valuation, and code order
+
+- Provenance: `BOOK:772,774,776,11077`.
+- Establishes: totalistic rules quotient ordered neighborhoods by an exact average/sum; the strict example includes left, self, and right; values `0,1,2` and least-significant sum-zero order are explicit. The built-in convention corroborates integer values `0..k-1` but does not make palette names semantic.
+
+> The 256 "elementary" rules that we have discussed so far are by most measures the simplest possible—and were the first ones I studied. But one can for example also look at rules that involve three colors, rather than two, so that cells can not only be black and white, but also gray. The total number of possible rules of this kind turns out to be immense—7,625,597,484,987 in all—but by considering only so-called "totalistic" ones, the number becomes much more manageable.
+
+> The idea of a totalistic rule is to take the new color of each cell to depend only on the average color of neighboring cells, and not on their individual colors. The picture below shows one example of how this works. And with three possible colors for each cell, there are 2187 possible totalistic rules, each of which can conveniently be identified by a code number as illustrated in the picture. The facing page shows a representative sequence of such rules.
+
+> Example of a totalistic cellular automaton with three possible colors for each cell. The rule is set up so that the new color of every cell is determined by the average of the previous colors of the cell and its immediate neighbors. With 0 representing white, 1 gray and 2 black, the rightmost element of the rule gives the result for average color 0, while the element immediately to its left gives the result for average color 1/3—and so on. Interpreting the sequence of new colors as a sequence of base 3 digits, one can assign a code number to each totalistic rule.
+
+> • Normally, all elements in init and the evolution list are integers between 0 and k-1. • But when a general function is used, the elements of init and the evolution list do not have to be integers. • The second argument passed to fun is the step number, starting at 0. • Initial conditions are constructed from init as follows:
+
+### E2 — Strict higher-color comparison
+
+- Provenance: `BOOK:1282`; linked plate `BOOK:1280`.
+- Establishes: five colors directly require 13 cases and admit `1,220,703,125` rules; “four or more colors” is explicit source vocabulary. The caption's complexity observations are behavior properties. `k=4` having 10 cases and `4^10` rules is derived later, not literal here.
+- Asset fact: the plate labels eight `k=4` codes `107395..107402` and eight `k=5` codes `180197741..180197748`; these are gallery selections, not defaults.
+
+> Examples of cellular automata with rules of varying complexity. The rules used are of the so-called totalistic type described on page 60. With two possible colors, just 4 cases need to be specified in such rules, and there are 16 possible rules in all. But as the number of colors increases, the rules rapidly become more complex. With three colors, there are 7 cases to be specified, and 2187 possible rules; with five colors, there are 13 cases to be specified, and 1,220,703,125 possible rules. But even though the underlying rules increase rapidly in complexity, the overall forms of behavior that we see do not change much. With two colors, it turns out that no totalistic rules yield anything other than repetitive or nested behavior. But as soon as three colors are allowed, much more complex behavior is immediately possible. Allowing four or more colors, however, does not further increase the complexity of the behavior, and, as the picture shows, even with five colors, simple repetitive and nested behavior can still occur.
+
+### E3 — Direct four-color radius-one profile
+
+- Provenance: `BOOK:2868`; linked plate `BOOK:2866`.
+- Establishes: four colors and nearest neighbors directly identify `k=4,r=1`. Class transitions are gallery/property annotations, not rule state or execution semantics.
+- Asset fact: the plate supplies 32 codes `1000816,1000820,...,1000940`; the selected sequence does not define all T05 rules.
+
+> A sequence of totalistic rules involving nearest neighbors and four possible colors for each cell chosen to show transitions between rules with different classes of behavior. Note that class 4 seems to occur between class 2 and class 3.
+
+### E4 — Code `1004600` identity versus run properties
+
+- Provenance: `BOOK:9166,9168,9170`; linked plate `BOOK:9164`.
+- Establishes: code `1004600` is directly a four-color totalistic program. Death times, widths, survival horizons, initial patterns, and undecidability are run/property evidence; they do not create a halt instruction or alter the successor rule.
+
+> Cellular automaton evolution illustrating the phenomenon of undecidability. Pattern (a) dies out after 36 steps; pattern (b) takes 1017 steps. But what the final outcome in cases (c) and (d) will be is not clear after even a million steps. And in general there appears to be no finite computation that can guarantee to determine the final outcome of the evolution after an infinite number of steps. The cellular automaton rule used is a 4-color totalistic one with code 1004600. Whether a pattern in a cellular automaton ever dies out can be viewed as analogous to a version of the halting problem for Turing machines.
+
+> dies out. But already in example (b) it is not so easy. One can go for 1000 steps and still not know what is going to happen. And only after 1017 steps does it finally become clear that the pattern in fact dies out.
+
+> So what about examples (c) and (d)? What happens to these? After a million steps neither has died out; in fact they are respectively 31,000 and 39,718 cells wide. And after 10 million steps both are still going, now 339,028 and 390,023 cells wide. But even having traced the evolution this far, one still has no idea what its final outcome will be.
+
+### E5 — “More colors” rule-90 relation
+
+- Provenance: `BOOK:11283`; linked relation-only asset `BOOK:11297`.
+- Establishes: the source also uses “more colors” for generalizations of rule 90. This is a relation route, not evidence that every higher-color CA is T05 or that T05 changes its inherited three-site totalistic construction.
+
+> ■ More colors. The pictures below show generalizations of rule 90 to k possible colors using the rule
+
+### E6 — General count and value-assignment requirement
+
+- Provenance: `BOOK:11897`.
+- Establishes: totalistic rule count is `k^(1+(k-1)(2r+1))`; for `r=1`, this derives `M=3k-2`. Thus `k=4` gives 10 cases and `4^10=1,048,576`, while `k=5` independently reproduces the direct count in E2. For `k>2`, totalistic identity depends on a specific value assignment.
+- Boundary: neither `10 cases`, `4^10`, nor `1,048,576` appears literally as a T05 count in the book; all are exact substitutions into this formula.
+
+> - **Page 60 · Numbers of rules.** Allowing k possible colors for each cell and considering r neighbors on each side, there are  $k^{k^{2r+1}}$  possible cellular automaton rules in all, of which  $k^{1/2}k^{r+1}$  are symmetric, and  $k^{1+(k-1)(2r+1)}$  are totalistic. (For k=2, r=1 there are therefore 256 possible rules altogether, of which 16 are totalistic. For k=2, r=2 there are 4,294,967,296 rules in all, of which 64 are totalistic. And for k=3, r=1 there are 7,625,597,484,987 rules in all, with 2187 totalistic ones.) Note that for k>2, a particular rule will in general be totalistic only for a specific assignment of values to colors. I first introduced totalistic rules in 1983.
+
+### E7 — Direct sum lookup and padded base-`k` codec
+
+- Provenance: `BOOK:11902,11904,11908,11910,11912`.
+- Establishes: radius one sums left, self, and right; general radius sums offsets `-r..r`; the structural list has exactly `1+(k-1)(2r+1)` digits. Negative indexing plus E1's displayed order makes sum zero the least-significant code digit.
+- Boundary: `RotateLeft` supplies a finite cyclic implementation example, not a mandatory native boundary condition.
+
+> ■ Implementation of totalistic cellular automata. To handle totalistic rules that involve *k* colors and nearest neighbors, one can add the definition
+
+> CAStep[TotalisticCARule[rule\_List, 1], a\_List] := rule[[-1 - (RotateLeft[a] + a + RotateRight[a])]]
+
+> CAStep[TotalisticCARule[rule\_List, r\_Integer], a\_List] := rule[[-1 - Sum[RotateLeft[a, i], {i, -r, r}]]]
+
+> One can generate the representation of totalistic rules used by these functions from code numbers using
+
+>  $ToTotalisticCARule[num\_Integer, k\_Integer, r\_Integer] := TotalisticCARule[IntegerDigits[num, k, 1 + (k - 1)(2r + 1)], r]$
+
+### E8 — Shared execution framework
+
+- Provenance: `BOOK:11914,11916`.
+- Establishes: ordinary and totalistic rules use one framework with different weight vectors. Higher color does not justify a new executor.
+- Repair boundary: `BOOK:11916` contains the known OCR substitution `\wedge` for exponentiation; the all-one totalistic weight vector is intact.
+
+> ■ Common framework. The *Mathematica* built-in function *CellularAutomaton* discussed on page 867 handles general and
+
+> totalistic rules in the same framework by using ListConvolve[w, a, r+1] and taking the weights w to be respectively  $k \wedge Table[i-1, \{i, 2r+1\}]$  and  $Table[1, \{2r+1\}]$ .
+
+### E9 — Class-frequency property boundary
+
+- Provenance: `BOOK:14224`; linked charts `BOOK:14226,14228,14230,14232`.
+- Establishes: one-dimensional totalistic systems are explicitly parameterized by `k` and `r`. Class frequency and chart sampling are analyzer/property evidence, not construction fields or preset defaults.
+
+> - **Frequencies of classes.** The pie charts below show results for 1D totalistic cellular automata with *k* colors and range *r*. Class 3 tends to become more common as the number of elements in the rule increases because as soon as any of these elements yield class 3 behavior, that behavior dominates the system.
+
+### E10 — Reversibility boundary
+
+- Provenance: `BOOK:16024`.
+- Establishes: the `k=4,r=1` reversible-rule clause concerns the unrestricted CA space; the final sentence says no nontrivial totalistic rule is reversible. The first clause must not be misclassified as a T05 example.
+
+> - **Numbers of reversible rules.** For k = 2, r = 1, there are 6 reversible rules, as shown on page 436. For k = 2, r = 2 there are 62 reversible rules, in 20 families inequivalent under symmetries, out of a total of  $2^{32}$  or about 4 billion possible rules. For k = 3, r = 1 there are 1800 reversible rules, in 172 families. For k = 4, r = 1, some of the reversible rules can be constructed from the second-order cellular automata below. Note that for any k and r, no non-trivial totalistic rule can ever be reversible.
+
+### E11 — Code-`1004600` Notes continuation
+
+- Provenance: `BOOK:19234`; linked plots `BOOK:19236,19238`.
+- Establishes: the Notes extend observations only through at least 20 million steps. Growth rates, non-white density, and fluctuations are observer/property data; they prove neither eventual survival nor a native stopping condition.
+
+> - Page 755 · Code 1004600. In cases (c) and (d) steady growth at about 0.035 and 0.039 cells per step (of which 28% on average are non-white) is seen up to at least 20 million steps, though there continue to be fluctuations as shown below.
+
+### E12 — Actual-Index routing fragments
+
+- Provenance: `BOOK:20965,20980,22352`.
+- Establishes: the relevant Index fragments route to page 107's comparison, page 886's implementation, page 754/1137's code-`1004600` application, page 60's strict definition, and page 1017's reversibility note. They add no transition semantics.
+- OCR boundary: `BOOK:20980` interleaves printed columns, so its two exact fragments must not be normalized as a contiguous monolith sentence without the already-audited Index-column repair.
+
+> with more colors, 107
+
+> implementation of totalistic, 886
+
+> Code 1004600
+
+> and undecidability, 754, 1137
+
+> Totalistic cellular automata, 60
+
+> implementation of, 886
+
+> as not reversible, 1017
+
+## Source Repairs and Evidence Oracle
+
+- The canonical monolith omits `Images/` in its bare JPEG links; the split documents route those same references to the physical image files. They are one asset each, not duplicates.
+- `BOOK:11916` carries the OCR token `k \wedge Table[...]` where the general-rule weight vector requires exponentiation. T05 preserves the literal quote and uses the independently stated count/codec formulas at `BOOK:11897,11912`; the intact all-one totalistic vector is the only T05-relevant half of that sentence.
+- `BOOK:20980` is interleaved printed-Index text. Only the exact routed fragments are used; column neighbors are not reconstructed into a false sentence.
+- The page-122/page-256 code labels are visually recoverable from hash-pinned plates. The plates do not fully serialize seeds, horizons, crop, or palette, so they authorize label/table corpora but no invented cell trajectory.
+- Split routing is navigation evidence. `BACK-MATTER/Index/Index.md` contains Notes material while the printed actual Index begins inside `BACK-MATTER/Colophon/Colophon.md`; canonical `BOOK` physical lines remain primary.
+
+```bash
+python3 - <<'PY'
+import re
+from pathlib import Path
+
+book=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md').read_text().splitlines()
+stage=Path('goal-1/24-T05-HIGHERCOLOR-TOTALISTIC.md').read_text().splitlines()
+quotes=[line[2:] for line in stage if line.startswith('> ')]
+quote_lines=[
+772,774,776,11077,1282,2868,9166,9168,9170,11283,11897,
+11902,11904,11908,11910,11912,11914,11916,14224,16024,19234,
+20965,20965,20980,20980,22352,22352,22352]
+groups=[line for line in stage if re.match(r'^### E\d+ —',line)]
+assert len(groups)==12
+assert len(quotes)==len(quote_lines)==28
+assert len(set(quote_lines))==24
+for fragment,n in zip(quotes,quote_lines):
+    assert fragment in book[n-1],(n,fragment)
+
+assert 'k \\wedge Table' in book[11916-1]
+assert 'k^{1+(k-1)(2r+1)}' in book[11897-1]
+assert 'IntegerDigits[num, k, 1 + (k - 1)(2r + 1)]' in book[11912-1]
+assert all(token not in '\n'.join(book).lower() for token in ('higher-color','10 cases','4^10','5^13'))
+assert [i for i,s in enumerate(book,1) if re.search(r'(?i)1004,?600',s)]==[9166,19234,20980]
+
+split_checks={
+'CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md':{599:'five colors'},
+'CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md':{165:'four possible colors'},
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md':{
+549:'code 1004600',551:'1017 steps',553:'10 million steps',2458:'integers between 0 and k-1',
+3278:'specific assignment of values to colors',3283:'Implementation of totalistic cellular automata',
+3285:'RotateLeft[a] + a + RotateRight[a]',3289:'Sum[RotateLeft[a, i]',3293:'IntegerDigits[num, k',
+3295:'Common framework',3297:r'Table[1, \{2r+1\}]'},
+'BACK-MATTER/Index/Index.md':{3925:'no non-trivial totalistic rule'},
+'BACK-MATTER/Colophon/Colophon.md':{1791:'Code 1004600',3522:'with more colors',3537:'Code 1004600',4909:'Totalistic cellular automata'},
+}
+root=Path('ref/A-New-Kind-of-Science')
+for rel,checks in split_checks.items():
+    lines=(root/rel).read_text().splitlines()
+    for n,fragment in checks.items(): assert fragment in lines[n-1],(rel,n,fragment)
+
+print('T05 evidence oracle: PASS groups=',len(groups),'fragments=',len(quotes),'quote_lines=',len(set(quote_lines)))
+print('source_repairs=3 split_checks=',sum(map(len,split_checks.values())))
+PY
+```
+
+Recorded output:
+
+```text
+T05 evidence oracle: PASS groups= 12 fragments= 28 quote_lines= 24
+source_repairs=3 split_checks= 19
+```
 
 ## Construction Model
 
