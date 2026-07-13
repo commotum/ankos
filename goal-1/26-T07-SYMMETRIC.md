@@ -631,6 +631,17 @@ for k,r in ((2,1),(2,2),(3,1),(4,1)):
     table=tuple((3*s+1)%k for s in range(1+(k-1)*(2*r+1)))
     for v in contexts(k,r): assert table[sum(v)]==table[sum(v[::-1])]
 
+def weighted_eval(v,w,post): return post(sum(a*b for a,b in zip(v,w)))
+binary3=contexts(2,1)
+assert all(weighted_eval(v,(1,2,1),lambda s:s%2)==
+           weighted_eval(v[::-1],(1,2,1),lambda s:s%2) for v in binary3)
+asym_witness=next(v for v in binary3
+                  if weighted_eval(v,(1,0,2),lambda s:s%2)!=
+                     weighted_eval(v[::-1],(1,0,2),lambda s:s%2))
+assert asym_witness==(0,0,1)
+assert all(weighted_eval(v,(1,0,2),lambda s:0)==
+           weighted_eval(v[::-1],(1,0,2),lambda s:0) for v in binary3)
+
 t90=digits(90,2,8)
 compact={min(v,v[::-1]):t90[index(v,2)] for v in contexts(2,1)}
 expanded=tuple(compact[min(v,v[::-1])] for v in contexts(2,1))
@@ -801,7 +812,7 @@ D111-D119 remain valid. The repaired working architecture proposes the following
 8. **T06 composition:** assert the exact 32 reflection-fixed/zero-preserving ECA labels and page-247 asset fixture; neither property implies the other.
 9. **General counts/source repair:** assert `k^((k^(2r+1)+k^(r+1))/2)` including `2^20` and `3^18`; pin the corrupted `BOOK:11897` string so it cannot become authority.
 10. **Totalistic structural proof:** every small exhaustive expansion agrees with the T03 proof adapter; T04/T05 pass without table mutation or family dispatch; exact 16 binary radius-one totalistic rules are a strict subset of 64 symmetric rules.
-11. **Weighted/summary boundary:** paired symmetric unequal weights may pass; an asymmetric weighting produces a canonical witness. Never decide by the word `weighted` or `totalistic` alone.
+11. **Weighted/summary boundary:** paired symmetric weights pass for any downstream map; asymmetric weights with a separating downstream map fail with a canonical witness; asymmetric weights followed by a constant or otherwise collapsing map can still pass. Decide the composed evaluator, never the word `weighted`/`totalistic` or the weights alone.
 12. **Orbit representation:** complete compact tables expand losslessly; reject missing/duplicate/noncanonical keys, wrong row count/action ID, invalid values, bad fixed-orbit outputs, and independent-component overcollapse.
 13. **Output-action adversary:** an oriented tagged alphabet with swap involution catches omitted input/output actions and fixed-output constraints; scalar T07 must not accept it under identity action by accident.
 14. **Diagonal-action adversary:** use `a` at offsets `-1,+1` and `b` at `-2,+2`; the `(aL and bL) or (aR and bR)` evaluator passes the single simultaneous typed-position reflection but fails an independent one-component swap. Separately assert that equal offsets in distinct typed components are schema-valid without treating duplicate scalar-coordinate reads as independently variable. Bare-offset rejection and the documented overquotient cannot survive.
