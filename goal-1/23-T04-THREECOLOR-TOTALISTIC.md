@@ -35,11 +35,626 @@ Determine whether the emphasized three-color totalistic entry is exactly a stric
 
 ## Search Log
 
-In progress. The audit must independently close strict text/captions, all three-color gallery labels and continuations, Notes/implementations, actual Index, split duplicates, named codes, seed/background filters, properties, applications, emulations, and adjacent non-three-color controls.
+Closed for the canonical source audit. `BOOK` means `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`; its actual Index begins at physical `BOOK:20826`. Counts are distinct physical lines, not raw matches. Twelve controlled queries produce 161 unique monolith lines (144 pre-Index, 17 actual-Index). Nineteen inspected asset, prose, and split-signature continuations produce an exact 180-candidate closure.
+
+| Q | Search family | Pre-Index | Actual Index |
+|---:|---|---:|---:|
+| 01 | literal `three-color`, `3-color`, `three colors`, `three possible colors` | 42 | 6 |
+| 02 | broad literal `totalistic` saturation, independently retained from T03 | 74 | 10 |
+| 03 | strict `average color` / `average of ... colors` aliases | 6 | 0 |
+| 04 | preset arithmetic/coding tokens `7,625,597,484,987`, `2187`, `3^7`, `7 cases`, `base 3` | 14 | 0 |
+| 05 | exact `k=3,r=1` signatures within 80 characters | 12 | 0 |
+| 06 | stable-white, single-gray, percentage, horizon, and long-continuation phrases | 7 | 0 |
+| 07 | 83 strict/profile/class code numbers following literal `code` | 23 | 3 |
+| 08 | `TotalisticCARule`, `ToTotalisticCARule`, assignment, implementation, and framework tokens | 6 | 0 |
+| 09 | class/additivity/reversibility/irreducibility/universality/emulation property phrases | 7 | 0 |
+| 10 | explicit lower/higher-color and range controls | 27 | 0 |
+| 11 | actual-Index alias `of three colors by two` | 0 | 1 |
+| 12 | non-totalistic three-color construction controls | 5 | 0 |
+
+The zero is material: the emulation alias appears only in the actual Index; the main text instead describes blocks of three binary cells. Literal three-color candidates and broad totalistic reuse remain separate query families. Code `777` and the page-76 50-rule scan are raster text absent from the monolith OCR, so pinned asset lines are explicit inspected continuations rather than invented text hits.
+
+### Exact reproducible manifest
+
+```bash
+python3 - <<'PY'
+import re
+from pathlib import Path
+
+P=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md')
+L=P.read_text().splitlines(); IX=20826
+def xs(s): return [] if s=='-' else list(map(int,s.split(',')))
+
+scan=list(range(993,1141,3))
+gallery=[777,600,843,870,1086,1167,1329,1572,1815,1842,
+         219,957,966,1884,237,420,948,1749,177,912,2040,
+         1041,1635,2049,357,1599,2058]
+other=[294,1893,867,438,792,924,1038,1662,2007]
+codes=sorted(set(scan+gallery+other),reverse=True)
+
+rows=[
+(r'(?i)three[- ]color|3[- ]color|three possible colors|three colors',
+ '772,774,776,780,784,790,796,800,804,808,824,846,1282,2806,2822,2852,3320,3324,3352,5218,5222,5482,5486,6340,7900,7912,8534,8544,8546,8560,8936,10395,10399,10411,11375,12055,15661,15972,18339,18476,18744,18877',
+ '20846,20967,20972,21134,21683,21933'),
+(r'(?i)totalistic',
+ '772,774,776,784,790,796,800,804,808,824,834,846,1282,1954,2170,2802,2806,2822,2852,2868,2922,3902,3914,5638,6340,6644,7912,8320,8936,9166,10261,11037,11056,11060,11068,11070,11072,11168,11178,11509,11585,11625,11897,11902,11904,11908,11910,11912,11916,13536,13538,13547,13548,13549,13601,13613,13650,13654,13658,14223,14224,14239,14241,14632,15221,15301,15321,15359,15955,15959,16024,17431,18672,18748',
+ '20965,20969,20972,20980,21233,21731,22030,22146,22352,22392'),
+(r'(?i)average (?:color|of (?:the previous colors|cells in its neighborhood))',
+ '774,776,2170,5082,5088,8320','-'),
+(r'7,625,597,484,987|2187|3\^7|7 cases|base 3',
+ '772,774,776,1282,1419,1427,3352,5218,10411,11897,17139,17874,18850,20577','-'),
+(r'(?i)k\s*=\s*3.{0,80}?r\s*=\s*1(?![0-9/])',
+ '11164,11168,11897,15493,16020,16024,16025,16027,18348,18748,20573,20577','-'),
+(r'(?i)those that change the white background are not included|single gray cell|About 85% of all three-color|following pages continue these patterns for 3000 steps|edge between growth and extinction|after a total of 8282 steps|Nine thousand steps in the evolution of the three-color',
+ '784,790,808,810,838,840,846','-'),
+(r'(?i)code(?: number)?\s+(?:'+'|'.join(map(str,codes))+r')(?![0-9])',
+ '790,800,806,828,832,838,846,2826,2830,3320,3324,3348,3352,3356,3360,3364,3370,3374,3378,7912,11168,11918,14827',
+ '20980,21223,21471'),
+(r'TotalisticCARule|ToTotalisticCARule|specific assignment of values to colors|Implementation of totalistic cellular automata|totalistic rules in the same framework',
+ '11897,11902,11904,11908,11912,11916','-'),
+(r'(?i)Class 4 rules.{0,120}totalistic rules.{0,80}k.{0,10}3|Frequencies of classes.{0,120}1D totalistic|Code 420 is an example of an additive rule|no non-trivial totalistic rule|totalistic cellular automata can be universal|cellular automata shown here all have 3-color totalistic rules|three-color rule illustrated here is totalistic code 1599',
+ '7912,8936,11918,14223,14224,16024,18748','-'),
+(r'(?i)(?:two|2|four|4|five|5) (?:possible )?colors.{0,180}totalistic|totalistic.{0,180}(?:two|2|four|4|five|5) (?:possible )?colors|k\s*=\s*(?:2|4|5).{0,80}?r\s*=\s*(?:1|2)(?![0-9/])',
+ '1282,2802,2868,11050,11509,11585,11625,11897,11919,14392,14394,14541,14673,14675,16020,16024,16025,16027,16049,16129,16157,16448,18672,18748,20590,20592,20600','-'),
+(r'(?i)emulat.{0,120}(?:three colors|three-color)|(?:three colors|three-color).{0,120}emulat|encoding of three colors by two|of three colors by two',
+ '-','21134'),
+(r'(?i)7,625,597,484,987 cellular automata|general k=3, r=1 rule|reversible cellular automata with three colors|Block cellular automata with three possible colors|rules with three colors that achieve the purpose',
+ '5218,5222,5486,10411,11164','-'),
+]
+
+sets=[]
+for q,(pat,pre_s,idx_s) in enumerate(rows,1):
+    found=[i for i,s in enumerate(L,1) if re.search(pat,s)]
+    pre=[i for i in found if i<IX]; idx=[i for i in found if i>=IX]
+    assert pre==xs(pre_s),(q,pre,xs(pre_s))
+    assert idx==xs(idx_s),(q,idx,xs(idx_s))
+    sets.append(set(found))
+
+# Raster links and immediate continuations whose evidence is absent from,
+# or split across, the controlled text hit lines.
+follow={778,782,788,792,794,798,802,818,820,822,826,830,836,842,844,
+        11069,11071,11914,13540}
+assets={
+778:'![](_page_75_Figure_6.jpeg)',782:'![](_page_76_Figure_2.jpeg)',
+792:'![](_page_77_Figure_6.jpeg)',794:'![](_page_78_Figure_2.jpeg)',
+798:'![](_page_78_Figure_4.jpeg)',802:'![](_page_79_Picture_2.jpeg)',
+818:'![](_page_81_Picture_1.jpeg)',820:'![](_page_81_Picture_2.jpeg)',
+822:'![](_page_81_Picture_3.jpeg)',826:'![](_page_82_Picture_1.jpeg)',
+830:'![](_page_83_Picture_1.jpeg)',836:'![](_page_84_Picture_2.jpeg)',
+844:'![](_page_85_Picture_2.jpeg)',
+}
+for n,want in assets.items(): assert L[n-1]==want,(n,L[n-1])
+assert L[787].startswith('Using more complicated rules may be convenient')
+assert L[841].startswith('<sup>◀</sup> Three thousand steps')
+assert r'\{0, 1, 0\}, \{1, 1, 1\}, \{0, 1, 0\}' in L[11068]
+assert r'\{0, k, 0\}, \{k, 1, k\}, \{0, k, 0\}' in L[11070]
+assert L[11913].startswith('■ Common framework.')
+assert L[13539].startswith('Apply[Plus, 2 ^ Join')
+
+parts={
+'strict':'772,774,776,778,780,782,784,788,790,792,794,796,798,800,802,804,806,808,810,818,820,822,824,826,828,830,832,834,836,838,840,842,844,846',
+'preset_relation':'1282,2806,2822,2826,2830,2852,3320,3324,3348,3352,3356,3360,3364,3370,3374,3378,6340,7900,7912,8936,11168,11897,11918,14223,14224,14827,16024,18348,18748',
+'parent':'8320,11037,11056,11060,11902,11904,11908,11910,11912,11914,11916',
+'adjacent_totalistic':'2802,2868,9166,11509,11585,11625,18672',
+'sibling_application':'1954,2170,2922,3902,3914,5082,5088,5638,6644,10261,11068,11069,11070,11071,11072,11178,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,15221,15301,15321,15359,15955,15959,17431',
+'non_totalistic':'5218,5222,5482,5486,8534,8544,8546,8560,10395,10399,10411,11164,12055,15661,15972,18339,18476,18744,18877',
+'false_control':'1419,1427,11050,11375,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,17139,17874,18850,20573,20577,20590,20592,20600',
+'index':'20846,20965,20967,20969,20972,20980,21134,21223,21233,21471,21683,21731,21933,22030,22146,22352,22392',
+}
+partition={k:xs(v) for k,v in parts.items()}
+queried=set().union(*sets); union=queried|follow
+flat=[i for v in partition.values() for i in v]
+assert len(rows)==12 and len(queried)==161 and len(union)==180
+assert len(flat)==len(set(flat))==180 and set(flat)==union
+assert [len(partition[k]) for k in partition]==[34,29,11,7,37,19,26,17]
+
+# Exact split-corpus saturation for the two core lexical families.
+root=Path('ref/A-New-Kind-of-Science')
+split_totalistic={
+'CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md':'89,91,93,101,107,113,117,121,125,141,151,163,599',
+'CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md':'411',
+'CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md':'27',
+'CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md':'101,105,121,149,165,219',
+'CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md':'479,491',
+'CHAPTERS/9-Fundamental-Physics/Fundamental-Physics.md':'473,1169',
+'CHAPTERS/10-Processes-of-Perception-and-Analysis/Processes-of-Perception-and-Analysis.md':'57',
+'CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md':'211,603',
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md':'319,549,1642,2418,2437,2441,2449,2451,2453,2549,2559,2890,2966,3006,3278,3283,3285,3289,3291,3293,3297',
+'BACK-MATTER/Index/Index.md':'1437,1439,1448,1449,1450,1502,1514,1551,1555,1559,2124,2125,2140,2142,2533,3122,3202,3222,3260,3856,3860,3925,5334',
+'BACK-MATTER/Colophon/Colophon.md':'1229,1305,3522,3526,3529,3537,3790,4288,4587,4703,4909,4949',
+}
+split_three={
+'BACK-MATTER/Colophon/Colophon.md':'896,1033,1301,1434,3403,3524,3529,3691,4240,4490',
+'BACK-MATTER/Index/Index.md':'3562,3873',
+'CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md':'199,211,803,813,825',
+'CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md':'319,1776,1780,1792,2756,3436',
+'CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md':'89,91,93,97,101,107,113,117,121,125,141,163,599',
+'CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md':'105,121,149,615,619,647',
+'CHAPTERS/9-Fundamental-Physics/Fundamental-Physics.md':'53,57,317,321,1169',
+}
+for mapping,pat in ((split_totalistic,r'(?i)totalistic'),
+                    (split_three,r'(?i)three[- ]color|3[- ]color|three possible colors|three colors')):
+    for rel,want in mapping.items():
+        lines=(root/rel).read_text().splitlines()
+        got=[i for i,s in enumerate(lines,1) if re.search(pat,s)]
+        assert got==xs(want),(rel,got,xs(want))
+assert sum(len(xs(v)) for v in split_totalistic.values())==84
+assert sum(len(xs(v)) for v in split_three.values())==47
+print('T04 source manifest: PASS 12 queries; 180 candidates; partition=34,29,11,7,37,19,26,17; splits=84/47')
+PY
+```
+
+Expected terminal line:
+
+```text
+T04 source manifest: PASS 12 queries; 180 candidates; partition=34,29,11,7,37,19,26,17; splits=84/47
+```
+
+### Complete disjoint disposition
+
+- **Strict preset and gallery (34):** `772,774,776,778,780,782,784,788,790,792,794,796,798,800,802,804,806,808,810,818,820,822,824,826,828,830,832,834,836,838,840,842,844,846`. This is the complete Chapter 3 strict run: definition, code-777 rule figure, 50-rule page-76 scan, behavior galleries, captions, standalone continuation labels, seed/filter conventions, horizons, and the 1599 resolution. Asset links are candidates because most code labels exist only in their pixels.
+- **T04 preset profiles, properties, and relations (29):** `1282,2806,2822,2826,2830,2852,3320,3324,3348,3352,3356,3360,3364,3370,3374,3378,6340,7900,7912,8936,11168,11897,11918,14223,14224,14827,16024,18348,18748`. These close exact counts, class/borderline galleries, persistent structures, random backgrounds, the runnable code-867 example, additivity, irreducibility, emulation, reversibility, and universality. They are profile/run/property evidence over the same preset, not extra successor mechanics.
+- **Parent T03 construction and alias reuse (11):** `8320,11037,11056,11060,11902,11904,11908,11910,11912,11914,11916`. These give the generic average alias, symbolic signatures, aggregate lookup, codec, and shared framework. T04 specializes them with data; it does not duplicate them.
+- **Adjacent lower/higher-color totalistic controls (7):** `2802,2868,9166,11509,11585,11625,18672`. These are binary range-two, four-color, and other neighboring totalistic profiles. They prove the T03/T05 boundary and do not enter the T04 preset.
+- **Sibling geometry or application (37):** `1954,2170,2922,3902,3914,5082,5088,5638,6644,10261,11068,11069,11070,11071,11072,11178,13536,13538,13540,13547,13548,13549,13601,13613,13650,13654,13658,14239,14241,14632,15221,15301,15321,15359,15955,15959,17431`. These are continuous, two-dimensional, outer/growth/weighted, network, tiling, feature-extraction, and other application constructions. They bound the preset without changing its one-dimensional equal-weight rule.
+- **Non-totalistic three-color controls (19):** `5218,5222,5482,5486,8534,8544,8546,8560,10395,10399,10411,11164,12055,15661,15972,18339,18476,18744,18877`. These are unrestricted, reversible, block, Turing-machine, fracture, reaction-diffusion, tag-system, purpose-search, or general-rule examples. Matching “three colors” is not enough to make them T04.
+- **False/query controls (26):** `1419,1427,11050,11375,11919,14392,14394,14541,14673,14675,15493,16020,16025,16027,16049,16129,16157,16448,17139,17874,18850,20573,20577,20590,20592,20600`. These are unrelated base-3 arithmetic, mosaic history, or general/additive/reversible/search `k,r` contexts. They contain no T04 construction.
+- **Actual-Index routes (17):** `20846,20965,20967,20969,20972,20980,21134,21223,21233,21471,21683,21731,21933,22030,22146,22352,22392`. They route to already audited strict, Notes, property, sibling, or control material and add no mechanics.
+
+There is zero silent remainder: the eight sets are pairwise disjoint and their union is the exact 180-candidate manifest.
+
+### Strict gallery and asset closure
+
+The strict asset sequence is complete and ordered by the 13 pinned monolith links:
+
+| BOOK link | Strict asset | Visible semantic labels |
+|---:|---|---|
+| `778` | `_page_75_Figure_6.jpeg` | high-to-low digits `1,0,0,1,2,1,0`, `= 777` |
+| `782` | `_page_76_Figure_2.jpeg` | exactly 50 codes: `993,996,...,1140` (step 3) |
+| `792` | `_page_77_Figure_6.jpeg` | `600,843,870,1086,1167,1329,1572,1815,1842` |
+| `794` | `_page_78_Figure_2.jpeg` | `219,957,966,1884` |
+| `798` | `_page_78_Figure_4.jpeg` | `237,420,948,1749` |
+| `802` | `_page_79_Picture_2.jpeg` | `177,912,2040` |
+| `818,820,822` | three `_page_81_Picture_*.jpeg` files | `1041,1635,2049` |
+| `826,830` | `_page_82_Picture_1.jpeg`, `_page_83_Picture_1.jpeg` | long continuations of `1635`, `2049` |
+| `836` | `_page_84_Picture_2.jpeg` | `357,600,1599,2058` |
+| `844` | `_page_85_Picture_2.jpeg` | three 3000-step columns for `1599` |
+
+The page-76 scan is a display sample, not the preset catalog: all 50 codes are divisible by 3, so their least-significant ternary digit (the sum-zero/white-background output) is zero. This exactly realizes the caption's stable-white selection, but it is only 50 of the 729 T04 codes with a stable zero background, not all 2187 rules and not even all stable-background rules. The later galleries reuse codes across behavior views; repeated labels are not new programs.
+
+### Actual-Index route closure
+
+| Actual Index | Exact route(s) | Disposition |
+|---:|---|---|
+| `20846` | additive cellular automata with 3 colors, page 886 | code-420 property Notes at `BOOK:11918` |
+| `20965` | implementation of totalistic, page 886 | generic parent implementation at `BOOK:11902-11916` |
+| `20967` | cellular automata, three-color, page 60 | strict T04 at `BOOK:772-846` |
+| `20969` | totalistic; weighted totalistic, page 427 | strict parent; weighted sibling at `BOOK:5082,5088` |
+| `20972` | class 4 in 3-color totalistic CAs, page 948 | class/property Notes at `BOOK:14223-14224` |
+| `20980` | 20 named routes from codes 177 through 2058 | strict/profile examples already closed; code 867 routes to the runnable Notes example |
+| `21134` | encoding of three colors by two, pages 655, 1111 | emulation relation at `BOOK:7900,7912,18348` |
+| `21223` | glider gun in code 1329, page 288 | persistent-structure profile at `BOOK:3360-3378` |
+| `21233` | growth totalistic rules, page 928 | two-dimensional sibling |
+| `21471` | localized structures in code 357/code 1329, pages 286/287 | T04 property/run profiles at `BOOK:3348-3378` |
+| `21683` | networks of CA emulations, page 1118 | emulation/application relation |
+| `21731` | outer totalistic rules | two-dimensional sibling |
+| `21933` | reversible cellular automata, three-color, page 436 | non-totalistic control plus totalistic non-reversibility at `BOOK:16024` |
+| `22030` | totalistic page 60; growth totalistic page 928 | strict parent plus growth sibling |
+| `22146` | Sum (totalistic) rules, page 60 | confirms exact-sum alias |
+| `22352` | Totalistic cellular automata, pages 60/170/886/1017 | strict, sibling, implementation, and property routes already closed |
+| `22392` | universality in totalistic cellular automata, page 693 | property relation at `BOOK:18748` |
+
+### Split routing
+
+- The broad `totalistic` family has exactly 84 split-file hits, and the literal three-/3-color family has exactly 47; both lists are pinned in the manifest. Strict `BOOK:772,774,776,780,784,790,796,800,804,808,824,846` map to Chapter 3 split `89,91,93,97,101,107,113,117,121,125,141,163`.
+- `BACK-MATTER/Index/Index.md` is misrouted Notes, not the actual Index. The real split Index begins at `BACK-MATTER/Colophon/Colophon.md:3383`; canonical monolith physical lines remain primary.
 
 ## Book Excerpts
 
-In progress. Record every unique construction- or preset-relevant passage verbatim with exact monolith provenance and transparent source repairs.
+All verbatim monolith material is in blockquotes so the oracle below can check every fragment against its cited physical line.
+
+### E1 — Strict preset definition, valuation, aggregate, and codec
+
+- Provenance: `BOOK:772,774,776`.
+- Establishes: the emphasized entry is the totalistic restriction of unrestricted three-color nearest-neighbor rules; states are assigned values `0,1,2`; the aggregate covers self plus immediate neighbors; seven average/sum cases are encoded as base-3 digits with sum zero at the rightmost/least-significant end.
+
+> The 256 "elementary" rules that we have discussed so far are by most measures the simplest possible—and were the first ones I studied. But one can for example also look at rules that involve three colors, rather than two, so that cells can not only be black and white, but also gray. The total number of possible rules of this kind turns out to be immense—7,625,597,484,987 in all—but by considering only so-called "totalistic" ones, the number becomes much more manageable.
+
+> The idea of a totalistic rule is to take the new color of each cell to depend only on the average color of neighboring cells, and not on their individual colors. The picture below shows one example of how this works. And with three possible colors for each cell, there are 2187 possible totalistic rules, each of which can conveniently be identified by a code number as illustrated in the picture. The facing page shows a representative sequence of such rules.
+
+> Example of a totalistic cellular automaton with three possible colors for each cell. The rule is set up so that the new color of every cell is determined by the average of the previous colors of the cell and its immediate neighbors. With 0 representing white, 1 gray and 2 black, the rightmost element of the rule gives the result for average color 0, while the element immediately to its left gives the result for average color 1/3—and so on. Interpreting the sequence of new colors as a sequence of base 3 digits, one can assign a code number to each totalistic rule.
+
+### E2 — Gallery selection and seed are run controls
+
+- Provenance: `BOOK:780,784,788,790`.
+- Establishes: the facing-page scan is representative, excludes background-changing rules, and uses a single gray cell; reflection symmetry is a consequence of equal-weight aggregation. The filter, seed, palette, repetition measurement, and behavior grouping do not become program identity.
+
+> We might have expected that by allowing three colors rather than two we would immediately get noticeably more complicated behavior.
+
+> A sequence of totalistic cellular automata with three possible colors for each cell. Although their basic rules are more complicated, the cellular automata shown here do not seem to have fundamentally more complicated behavior than the two-color cellular automata shown on previous pages. Note that in the sequence of rules shown here, those that change the white background are not included. The symmetry of all the patterns is a consequence of the basic structure of totalistic rules. But in fact the behavior we see on the previous page is not unlike what we already saw in many elementary cellular automata a few pages back. Having more complicated underlying rules has not, it seems, led to much greater complexity in overall behavior.
+
+> Using more complicated rules may be convenient if one wants, say, to reproduce the details of particular natural systems, but it does not add fundamentally new features. Indeed, looking at the pictures on the previous page one sees exactly the same basic themes as in elementary cellular automata. There are some patterns that attain a definite size, then repeat forever, as shown below, others that continue to grow, but have a repetitive form, as at the top of the facing page, and still others that produce nested or fractal patterns, as at the bottom of the page.
+
+> Examples of three-color totalistic rules that yield patterns which attain a certain size, then repeat forever. The maximum repetition period is found to be 78 steps, and is achieved by the rule with code number 1329. In the pictures shown here and on the following pages, the initial condition used contains a single gray cell.
+
+### E3 — Repetitive, nested, random, and mixed-complexity views
+
+- Provenance: `BOOK:796,800,804,806,808,810,824`.
+- Establishes: gallery classes, codes, percentages, horizons, and eventual behavior are observations/profiles. They supply canonical examples, not distinct update laws.
+
+> Examples of three-color totalistic rules that yield patterns which grow forever but have a fundamentally repetitive structure.
+
+> Examples of three-color totalistic rules which yield nested patterns. In most cases, these patterns have an overall form that is similar to what was found with two-color rules. But code 420, for example, yields a pattern with a slightly different structure.
+
+> Examples of three-color totalistic rules that yield patterns with seemingly random features. Three hundred steps of evolution are shown in each case.
+
+> In detail, some of the patterns are definitely more complicated than those seen in elementary rules. But at the level of overall behavior, there are no fundamental differences. And in the case of nested patterns even the specific structures seen are usually the same as for elementary rules. Thus, for example, the structure in codes 237 and 948 is the most common, followed by the one in code 1749. The only new structure not already seen in elementary rules is the one in code 420—but this occurs only quite rarely.
+
+> About 85% of all three-color totalistic cellular automata produce behavior that is ultimately quite regular. But just as in elementary cellular automata, there are some rules that yield behavior that seems in many respects random. A few examples of this are given on the facing page.
+
+> Beyond fairly uniform random behavior, there are also cases similar to elementary rule 110 in which definite structures are produced that interact in complicated ways. The next page gives a few examples. In the first case shown, the pattern becomes repetitive after about 150 steps. In the other two cases, however, it is much less clear what will ultimately happen. The following pages continue these patterns for 3000 steps. But even after this many steps it is still quite unclear what the final behavior will be.
+
+> Examples of three-color totalistic rules with highly complex behavior showing a mixture of regularity and irregularity. The partitioning into identifiable structures is similar to what we saw in rule 110 on page 32.
+
+### E4 — Long continuations and growth/extinction
+
+- Provenance: `BOOK:828,832,834,838,840,842,846`.
+- Establishes: `1635`, `2049`, and `1599` continuation identities; fixed view horizons; and the observed 1599 resolution at step 8282. None is a stopping rule.
+
+> code 1635
+
+> code 2049
+
+> The pictures below show totalistic cellular automata whose overall patterns of growth seem, at least at first, quite complicated. But it turns out that after only about 100 steps, three out of four of these patterns have resolved into simple forms.
+
+> Examples of rules that yield patterns which seem to be on the edge between growth and extinction. For all but code 1599, the fate of these patterns in fact becomes clear after less than 100 steps. A total of 250 steps are shown here.
+
+> The one remaining pattern is, however, much more complicated. As shown on the next page, for several thousand steps it simply grows, albeit somewhat irregularly. But then its growth becomes slower. And inside the pattern parts begin to die out. Yet there continue to be occasional bursts of growth. But finally, after a total of 8282 steps, the pattern resolves into 31 simple repetitive structures.
+
+> <sup>◀</sup> Three thousand steps in the evolution of the last two cellular automata from page 66. Despite the simplicity of their underlying rules, the final patterns produced show immense complexity. In neither case is it clear what the final outcome will be—whether apparent randomness will take over, or whether a simple repetitive form will emerge.
+
+> Nine thousand steps in the evolution of the three-color totalistic cellular automaton with code number 1599. Starting from a single gray cell, each column corresponds to 3000 steps. The outcome of the evolution finally becomes clear after 8282 steps, when the pattern resolves into 31 simple repetitive structures.
+
+### E5 — Exact color-count boundary
+
+- Provenance: `BOOK:1282`.
+- Establishes: radius-one totals have `4/7/13` cases for `k=2/3/5`, yielding `16/2187/1,220,703,125` rules; three colors are the first totalistic radius-one setting in this comparison with complex behavior, while more colors do not define a new update mechanism.
+
+> Examples of cellular automata with rules of varying complexity. The rules used are of the so-called totalistic type described on page 60. With two possible colors, just 4 cases need to be specified in such rules, and there are 16 possible rules in all. But as the number of colors increases, the rules rapidly become more complex. With three colors, there are 7 cases to be specified, and 2187 possible rules; with five colors, there are 13 cases to be specified, and 1,220,703,125 possible rules. But even though the underlying rules increase rapidly in complexity, the overall forms of behavior that we see do not change much. With two colors, it turns out that no totalistic rules yield anything other than repetitive or nested behavior. But as soon as three colors are allowed, much more complex behavior is immediately possible. Allowing four or more colors, however, does not further increase the complexity of the behavior, and, as the picture shows, even with five colors, simple repetitive and nested behavior can still occur.
+
+### E6 — Class and borderline galleries
+
+- Provenance: `BOOK:2806,2822,2826,2830,2852`.
+- Establishes: nearest-neighbor three-color gallery identity, random initial conditions and 1500-step class-4 view, named codes 1815/2007, and the observer-dependent nature of borderline class labels.
+
+> A sequence of totalistic cellular automata with rules that involve only nearest neighbors, but where each cell can have three possible colors.
+
+> Examples of class 4 cellular automata with totalistic rules involving nearest neighbors and three possible colors for each cell. Each picture shows 1500 steps of evolution from random initial conditions.
+
+> code 1815
+
+> code 2007
+
+> Rare examples of borderline cellular automata that do not fit squarely into any one of the four basic classes described in the text. Different definitions based on different specific properties will place these cellular automata into different classes. The rules shown are totalistic ones involving nearest neighbors and three possible colors for each cell. The first rule can be either class 2 or class 4, the second class 3 or 4, the third class 2 or 3 and the fourth class 1, 2 or 3.
+
+### E7 — Persistent-structure and growth profiles
+
+- Provenance: `BOOK:3320,3324,3348,3352,3356,3360,3364,3370,3374,3378`.
+- Establishes: codes 357 and 1329 remain T04 programs while searches, initial-condition numbers, periods, moving structures, and growth outcomes are run/property evidence.
+
+> 3 colors, nearest neighbors, code 357
+
+> 3 colors, nearest neighbors, code 1329
+
+> The picture below shows the structures one finds by explicitly testing the first two billion possible initial conditions for the code 357 cellular automaton from page 282.
+
+> Persistent structures in the code 357 cellular automaton from page 282 obtained by testing the first two billion possible initial conditions. This cellular automaton allows three possible colors for each cell; the initial conditions thus correspond to the base 3 digits of the numbers given. No persistent structures of any size exist in this cellular automaton with repetition periods of less than 5 steps.
+
+> So are moving structures in fact possible in the code 357 cellular automaton? My experience with many different rules is that whenever sufficiently complicated persistent structures occur, structures that move can eventually be found. And indeed with code 357, initial condition 4,803,890 yields just such a structure.
+
+> The picture below shows the first few persistent structures found in the code 1329 cellular automaton from the bottom of page 282. The smallest structures are stationary, but at initial condition 916 a structure is found that moves—all much the same as in the two other class 4 cellular automata that we have just discussed.
+
+> Persistent structures in the code 1329 cellular automaton shown on page 282.
+
+> Unbounded growth in code 1329. The initial condition contains a block of 10 cells. The right-hand side of the pattern repeats every 256 steps, and as it moves it leaves behind an infinite sequence of persistent structures.
+
+> Yet looking at the picture above, one might suppose that when unlimited growth occurs, the pattern produced must be fairly complicated. But once again code 1329 has a surprise in store. For the facing page shows that when one reaches initial condition 97,439 there is again unlimited growth—but now the pattern that is produced is very simple. And in fact if one were just to see this pattern, one would probably assume that it came from a rule whose typical behavior is vastly simpler than code 1329.
+
+> Further examples of unbounded growth in code 1329. Most of the patterns produced are complex—but some are simple.
+
+### E8 — Random backgrounds, binary emulation, and irreducibility
+
+- Provenance: `BOOK:6340,7900,7912,8936`.
+- Establishes: codes 294/1893 on largely random backgrounds, block emulation of code 1599 by a binary range-five rule, and computational irreducibility as explicit relations/properties.
+
+> Examples of one-dimensional cellular automata that support various forms of persistent structures even on largely random backgrounds. These are 3-color totalistic rules with codes 294 and 1893.
+
+> What about rules that have more than two possible colors for each cell? It turns out that there is a general way of emulating such rules by using rules that have just two colors but a larger number of neighbors. The picture on the facing page shows an example. The idea is that each cell in the three-color cellular automaton is represented by a block of three cells in the two-color cellular automaton. And by looking at neighbors out to distance five on each side, the two-color cellular automaton can update these blocks at each step in direct correspondence with the rules of the three-color cellular automaton.
+
+> An example of how a cellular automaton with three possible colors and nearest-neighbor rules can be emulated by a cellular automaton with only two possible colors but a larger number of neighbors (in this case five on each side). The basic idea is to represent each cell in the three-color rule by a block of three cells in the two-color rule, according to the correspondence given on the left. The three-color rule illustrated here is totalistic code 1599 from page 70.
+
+> Examples of computational reducibility and irreducibility in the evolution of cellular automata. The first two rules yield simple repetitive computationally reducible behavior in which the outcome after many steps can readily be deduced without tracing each step. The third rule yields behavior that appears to be computationally irreducible, so that its outcome can effectively be found only by explicitly tracing each step. The cellular automata shown here all have 3-color totalistic rules.
+
+### E9 — General signature and runnable preset example
+
+- Provenance: `BOOK:8320,11056,11060,11168`.
+- Establishes: average-color alias, generic nearest-neighbor/range signatures, and an explicit `k=3,r=1`, code-867 invocation. The invocation is transparently repaired below.
+
+> In fact, as illustrated in the pictures on the facing page, it is sufficient in such cases just to use so-called totalistic rules in which the new color of a cell depends only on the average color of cells in its neighborhood, and not on their individual colors.
+
+> \{n, \{k, 1\}\} k-color nearest-neighbor totalistic rule
+
+> \{n, \{k, 1\}, r\} k-color range r totalistic rule
+
+> This runs the totalistic k=3, r=1 rule with code 867.  $ln[11]:=Show[RasterGraphics[CellularAutomaton]{867, {3, 1}, 1}, {{1}, 0}, 50]]]$
+
+### E10 — General count, assignment sensitivity, lookup, and codec
+
+- Provenance: `BOOK:11897,11902,11904,11908,11910,11912,11914,11916`.
+- Establishes: exact rule cardinality, the special role of a value assignment for `k>2`, direct sum lookup, padded base-`k` digits, and reuse of the same framework. The symmetric formula and one general-rule operator have OCR damage repaired below; the totalistic formula/vector are intact.
+
+> - **Page 60 · Numbers of rules.** Allowing k possible colors for each cell and considering r neighbors on each side, there are  $k^{k^{2r+1}}$  possible cellular automaton rules in all, of which  $k^{1/2}k^{r+1}$  are symmetric, and  $k^{1+(k-1)(2r+1)}$  are totalistic. (For k=2, r=1 there are therefore 256 possible rules altogether, of which 16 are totalistic. For k=2, r=2 there are 4,294,967,296 rules in all, of which 64 are totalistic. And for k=3, r=1 there are 7,625,597,484,987 rules in all, with 2187 totalistic ones.) Note that for k>2, a particular rule will in general be totalistic only for a specific assignment of values to colors. I first introduced totalistic rules in 1983.
+
+> ■ Implementation of totalistic cellular automata. To handle totalistic rules that involve *k* colors and nearest neighbors, one can add the definition
+
+> CAStep[TotalisticCARule[rule\_List, 1], a\_List] := rule[[-1 - (RotateLeft[a] + a + RotateRight[a])]]
+
+> CAStep[TotalisticCARule[rule\_List, r\_Integer], a\_List] := rule[[-1 - Sum[RotateLeft[a, i], {i, -r, r}]]]
+
+> One can generate the representation of totalistic rules used by these functions from code numbers using
+
+> $ToTotalisticCARule[num\_Integer, k\_Integer, r\_Integer] := TotalisticCARule[IntegerDigits[num, k, 1 + (k - 1)(2r + 1)], r]$
+
+> ■ Common framework. The *Mathematica* built-in function *CellularAutomaton* discussed on page 867 handles general and
+
+> totalistic rules in the same framework by using ListConvolve[w, a, r+1] and taking the weights w to be respectively  $k \wedge Table[i-1, \{i, 2r+1\}]$  and  $Table[1, \{2r+1\}]$ .
+
+### E11 — Additivity and behavior classes are properties
+
+- Provenance: `BOOK:11918,14223,14224`.
+- Establishes: code 420's additive/Pascal-mod-3 relation, the complete cited `k=3` class-4 code list, and class-frequency observations. None changes ordinary totalistic execution.
+
+> - Page 63 · Mod 3 rule. Code 420 is an example of an additive rule, and yields a pattern corresponding to Pascal's triangle modulo 3, as discussed on page 870.
+
+> - Page 235 · Class 4 rules. Other examples of class 4 totalistic rules with *k* = *3* colors include 357 (page 282), 438, 600, 792, 924, 1038, 1041, 1086, 1329 (page 282), 1572, 1599 (see page 70), 1635 (see page 67), 1662, 1815 (page 236), 2007 (page 237) and 2049 (see page 68).
+
+> - **Frequencies of classes.** The pie charts below show results for 1D totalistic cellular automata with *k* colors and range *r*. Class 3 tends to become more common as the number of elements in the rule increases because as soon as any of these elements yield class 3 behavior, that behavior dominates the system.
+
+### E12 — Reversibility, emulation cost, and universality
+
+- Provenance: `BOOK:16024,18348,18748`.
+- Establishes: the 1800 reversible `k=3,r=1` rules are unrestricted controls while no nontrivial totalistic rule is reversible; binary emulation expands range; and universality is a property of candidate rules, not preset execution.
+
+> - **Numbers of reversible rules.** For k = 2, r = 1, there are 6 reversible rules, as shown on page 436. For k = 2, r = 2 there are 62 reversible rules, in 20 families inequivalent under symmetries, out of a total of  $2^{32}$  or about 4 billion possible rules. For k = 3, r = 1 there are 1800 reversible rules, in 172 families. For k = 4, r = 1, some of the reversible rules can be constructed from the second-order cellular automata below. Note that for any k and r, no non-trivial totalistic rule can ever be reversible.
+
+> The problem of encoding cells with several colors by blocks of black and white cells is related to standard problems in coding theory (see page 560). One approach is to use {1, 1} to indicate the boundary of each block, and then within each block to use all possible digit sequences which do not contain {1, 1}, as in the Fibonacci number system discussed on page 892. Note that the original rule with *k* colors and *r* neighbors involves  $Log[2, k^{k^{2r+1}}]$  bits of information; the two-color rule that emulates it involves  $Log[2, 2^{2^{2s+1}}]$  bits. As a result, the minimum possible s for k = 3, r = 1 is about 2.2; in the specific example shown in the main text it is 5.
+
+> - Totalistic rules. It is straightforward to show that totalistic cellular automata can be universal. Explicit simple candidates include k = 2, r = 2 rules with codes 20 and 52, as well as the various k = 3, r = 1 class 4 rules shown in Chapter 3.
+
+### E13 — Lower- and higher-color totalistic controls
+
+- Provenance: `BOOK:2802,2868,9166,11625,18672`.
+- Establishes: binary range-two and four-color totalistic rules are adjacent profiles, including separate universality/undecidability examples. They do not widen T04 beyond `k=3,r=1`.
+
+> Totalistic cellular automata whose rules involve nearest and next-nearest neighbors, and where each cell has two possible colors.
+
+> A sequence of totalistic rules involving nearest neighbors and four possible colors for each cell chosen to show transitions between rules with different classes of behavior. Note that class 4 seems to occur between class 2 and class 3.
+
+> Cellular automaton evolution illustrating the phenomenon of undecidability. Pattern (a) dies out after 36 steps; pattern (b) takes 1017 steps. But what the final outcome in cases (c) and (d) will be is not clear after even a million steps. And in general there appears to be no finite computation that can guarantee to determine the final outcome of the evolution after an infinite number of steps. The cellular automaton rule used is a 4-color totalistic one with code 1004600. Whether a pattern in a cellular automaton ever dies out can be viewed as analogous to a version of the halting problem for Turing machines.
+
+> - **Code 10.** Rule 30 is by many measures the simplest cellular automaton that generates randomness from a single black initial cell. But there are other simple examples—that historically I noticed slightly earlier than rule 30, though did not study—that occur in k = 2, r = 2 totalistic rules. And indeed among the 64 such rules, 13 show randomness. An example shown below is code 10, which specifies that if 1 or 3 cells out of 5 are black then the next cell is black; otherwise it is white.
+
+> In 1984 I suggested that cellular automata showing what I called class 4 behavior should be universal-and I identified some simple rules (such as k = 2, r = 2 totalistic code 20) as explicit candidates.
+
+### E14 — Non-totalistic three-color boundaries
+
+- Provenance: `BOOK:5218,5222,5486,10395,10411,11164`.
+- Establishes: unrestricted reversible rules, block rules, purpose-search rules, and the general `k=3,r=1` invocation are adjacent constructions with a vastly larger code domain. Literal color count alone does not select T04.
+
+> So is it possible to get more complex behavior while maintaining reversibility? There are a total of 7,625,597,484,987 cellular automata with three colors and nearest-neighbor rules, and searching through these one finds just 1800 that are reversible. Of these 1800, many again exhibit simple behavior, much like the pictures above. But some exhibit more complex behavior, as in the pictures below.
+
+> Examples of some of the 1800 reversible cellular automata with three colors and nearest-neighbor rules. Even though these systems exhibit complex behavior that scrambles the initial conditions, all of them are still reversible, so that starting from the configuration of cells at the bottom of each picture, it is always possible to deduce the configurations on all previous steps.
+
+> Block cellular automata with three possible colors which conserve the combined number of black and gray cells. In rule (a), black and gray cells remain in localized regions. In rule (b), they move in fairly simple ways, and in rules (c) and (d), they move in a seemingly somewhat random way. The rules shown here are reversible, although their behavior is similar to that of non-reversible rules, at least after a few steps.
+
+> Examples of cellular automata that can be viewed as achieving the purpose of doubling the width of the pattern given in their input. Rule (a) involves 6 colors, and works sequentially, much as a typical traditional engineering system might. Rule (b) involves 4 colors, and works in parallel. Rule (c) was found by a large search, and involves only 3 colors. It takes the fewest steps of any 3-color rule to generate its result. Its rule number is 5407067979.
+
+> Examples of rules with three colors that achieve the purpose of doubling the width of the pattern given in their input. These examples are taken from the 4277 found in effect by searching exhaustively all 7,625,597,484,987 possible rules with three colors. In most cases the number of steps to generate the final pattern increases roughly linearly with the width of the input—although in the case of the fourth-to-last rule on the second row it is  $2(n^2 - n + 1)$  for width n.
+
+> This runs the general k=3, r=1 rule with rule number 921408. In[10]:=Show[RasterGraphics[CellularAutomaton]{921408, 3, 1}, {{1}, 0}, 100]]]
+
+### E15 — Actual-Index routing fragments
+
+- Provenance: `BOOK:20846,20965,20967,20969,20972,20980,21134,21223,21233,21471,21683,21731,21933,22030,22146,22352,22392`.
+- Establishes: all 17 actual-Index physical lines route to strict, Notes, profile, property, emulation, or sibling evidence already dispositioned.
+
+> Additive cellular automata with 3 colors, 886
+
+> implementation of totalistic, 886
+
+> three-color, 60
+
+> weighted totalistic, 427
+
+> in 3-color totalistic CAs, 948
+
+> Code 294 for totalistic CAs, 60
+
+> Code 1599
+
+> of three colors by two, 655, 1111
+
+> Glider gun in code 1329, 288
+
+> Growth totalistic rules, 928
+
+> in code 357 CA, 286
+
+> of CA emulations, 1118
+
+> Outer totalistic rules
+
+> three-color, 436
+
+> growth totalistic, 928
+
+> Sum (totalistic) rules, 60
+
+> Totalistic cellular automata, 60
+
+> in totalistic cellular automata, 693
+
+## Source Repairs
+
+1. **Primary official files and hashes.** Strict pages 60–70 were checked against official [`nks-ch3.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch3.pdf), SHA-256 `d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76`. Chapter 3 Notes page 886 was checked against official [`nks-nts-ch3.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-nts-ch3.pdf), SHA-256 `21666aa07f49e47483cdc9883e285b8cd47d397dd18eea0b72f05d4d3272a009`. Cross-chapter Notes, including class, reversibility, emulation, and universality routes, were checked against official [`nks-notes.pdf`](https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf), SHA-256 `549f043595653a7d276b07ba52d435700039b71427b4e1774a44b1a58eff4723`.
+2. **Strict raster label restoration.** The monolith OCR drops most labels embedded in gallery rasters. The official Chapter 3 PDF visibly and textually corroborates the labels. The pinned local assets are:
+
+   | Asset | Geometry | SHA-256 | Restored semantic text |
+   |---|---:|---|---|
+   | `_page_75_Figure_6.jpeg` | `610x446` | `acb13963632286960ca61b616ff2f45a940750f3ab7deb5e6fbf696543015c15` | digits `1,0,0,1,2,1,0 = 777` |
+   | `_page_76_Figure_2.jpeg` | `1109x1279` | `8c11659c8bd63d37a972c5ffab376b62948f7c4e05f9fd10f239e51464f4084d` | 50 codes `993..1140` step 3 |
+   | `_page_77_Figure_6.jpeg` | `892x716` | `4c1f8894016156dc4d473e911e0fa5c7db16711a8c2873fa493fb7854ad41c66` | `600,843,870,1086,1167,1329,1572,1815,1842` |
+   | `_page_78_Figure_2.jpeg` | `1107x615` | `5c5ca56f3e8141c3aa4d7648f3ebe34a911515bf9dfc9118795135736f69b879` | `219,957,966,1884` |
+   | `_page_78_Figure_4.jpeg` | `1134x621` | `088016843cb7d74ad621ebed323401dfb9783ce061ece275ba36b0815c7dfa28` | `237,420,948,1749` |
+   | `_page_79_Picture_2.jpeg` | `886x1399` | `355d13fde85b89c2e3e26d1ae199e30ad2191b0bcbd3d4c89ac76785fa1ebc86` | `177,912,2040` |
+   | `_page_81_Picture_1.jpeg` | `826x446` | `0617e6b01a1faa43e968051ff8716171b665e79d087c8c13a47811c0520f3014` | `1041` |
+   | `_page_81_Picture_2.jpeg` | `816x429` | `6efe4dc8703a3045bd6189f930a0cdb44e59dc71f38dc91a52e8faa84e801a7e` | `1635` |
+   | `_page_81_Picture_3.jpeg` | `869x470` | `b3812f8742bf08299270512de2cdffa57ac14be5b10a6cdefa60d4878173553c` | `2049` |
+   | `_page_82_Picture_1.jpeg` | `1061x1381` | `aa534aa358e74235ef5de86980c5c6f0895bac2b616e990c1cda7253639a4511` | continuation `1635` |
+   | `_page_83_Picture_1.jpeg` | `1067x1387` | `cd4f0434c12f9b86bdde3730270451df2dfb503194d22bc04d0609973e9d3a77` | continuation `2049` |
+   | `_page_84_Picture_2.jpeg` | `764x747` | `02782253cc66a9de075af5d1d02f224645e443040f5ff6001fef6467a7013cbe` | `357,600,1599,2058` |
+   | `_page_85_Picture_2.jpeg` | `1107x1360` | `2374289d970042909316f68cf240379d6f2826ba90dab95db0a317e672b91b0f` | continuation `1599` |
+
+3. **`BOOK:11168` invocation OCR.** `$ln[11]`, displaced braces, and the malformed call boundary are extraction errors. Official all-Notes gives normalized `In[11] := Show[RasterGraphics[CellularAutomaton[{867, {3, 1}, 1}, {{1}, 0}, 50]]]`. This is direct runnable evidence for a code-valued `k=3,r=1` totalistic preset; its `{{1},0}` seed/background and 50-step horizon remain run arguments.
+4. **`BOOK:11897` formula OCR.** The totalistic formula `k^(1+(k-1)(2r+1))`, the specific-value-assignment warning, and the `k=3,r=1` numeric checks are intact. The adjacent symmetric-count extraction `$k^{1/2}k^{r+1}$` is malformed; official page 886 shows `k^(1/2 k^(r+1) (1+k^r))`. The sibling formula is not used for T04.
+5. **`BOOK:11916` operator OCR.** The general-rule vector is `$k^Table[i-1,{i,2r+1}]$`, not the monolith's `$k \wedge Table[...]$`; official page 886 confirms the caret. The totalistic all-one weight vector is intact and is the only part used here.
+6. **`BOOK:11037` truncation.** Official all-Notes completes the routing sentence with `page 927.` It adds no preset mechanics.
+7. **Code 777 and digit direction.** The official strict figure shows high-sum-to-low-sum digits `1,0,0,1,2,1,0 = 777`. `BOOK:776` puts sum zero at the rightmost displayed element. Thus the sum-indexed table is `U_0..U_6=(0,1,2,1,0,0,1)` and `777=sum(U_s*3^s)`. This is a transparent raster-text restoration, not a palette-derived rule.
+8. **Stable-white scan.** With state/value zero as white and sum zero at the least-significant digit, stable white means `U_0=0`, equivalently `code mod 3=0`. Every page-76 code `993+3i`, `0<=i<50`, satisfies that predicate. The caption licenses the selection predicate, not a default background, seed, horizon, or reduced code domain.
+9. **Preset arithmetic.** For `k=3,r=1`, three values in `0..2` produce every integer sum `0..6`; a complete rule has seven output rows, each in `0..2`, hence `3^7=2187` codes `0..2186`. Average and sum induce the same cases because the arity is fixed at three; no floating-point reducer is licensed.
+10. **Program/run/property/view boundary.** The single-gray seed, stable-white scan, random backgrounds, finite horizons, palette, symmetry observation, class labels, additive identity, reversible prohibition, universality candidates, and binary emulation are explicit controls or relations. None creates a three-color executor, a hidden seed, a stopping condition, or a second codec.
+11. **Split and Index routing.** The split wording has minor normalization differences, and image labels remain raster-bound. `BACK-MATTER/Index/Index.md` is Notes; the actual split Index begins at `BACK-MATTER/Colophon/Colophon.md:3383`. Canonical `BOOK` physical lines and official PDFs are the provenance authorities.
+
+### Citation, quote, source-repair, asset, and preset oracle
+
+```bash
+python3 - <<'PY'
+import hashlib, itertools, re, subprocess
+from pathlib import Path
+from PIL import Image
+
+book=Path('ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md')
+stage=Path('goal-1/23-T04-THREECOLOR-TOTALISTIC.md')
+L=book.read_text().splitlines(); text=stage.read_text()
+
+def expand(spec):
+    out=set()
+    for item in spec.split(','):
+        if '-' in item:
+            a,b=map(int,item.split('-')); out.update(range(a,b+1))
+        else: out.add(int(item))
+    return out
+def refs(s):
+    out=set()
+    for m in re.finditer(r'BOOK:([0-9]+(?:-[0-9]+)?(?:,[0-9]+(?:-[0-9]+)?)*)',s):
+        out |= expand(m.group(1))
+    return out
+
+# Traverse every cited monolith line anywhere in this stage.
+cited=refs(text)
+assert cited and all(1 <= n <= len(L) for n in cited)
+for n in sorted(cited): _=L[n-1]
+
+# Every verbatim excerpt fragment must occur on a cited provenance line.
+ex=text.split('## Book Excerpts',1)[1].split('## Source Repairs',1)[0]
+current=set(); quote_count=0; quote_lines=set()
+for row in ex.splitlines():
+    if row.startswith('- Provenance:'):
+        current=refs(row); assert current
+    elif row.startswith('> '):
+        q=row[2:].strip(); assert q and current
+        hits={n for n in current if q in L[n-1].strip()}
+        assert hits,(sorted(current),q)
+        quote_lines |= hits; quote_count += 1
+
+# Pin the monolith defects and intact semantic portions.
+assert '$ln[11]' in L[11167] and 'code 867' in L[11167]
+assert '$k^{1/2}k^{r+1}$' in L[11896]
+assert '$k^{1+(k-1)(2r+1)}$' in L[11896]
+assert r'$k \wedge Table[i-1, \{i, 2r+1\}]$' in L[11915]
+assert L[11036].endswith('higher-dimensional cellular automata on')
+
+official={
+'/tmp/nks-ch3.pdf':'d4005b27774084c276e67d46a6c79106b93b785d4329893080223c9da8263e76',
+'/tmp/nks-nts-ch3.pdf':'21666aa07f49e47483cdc9883e285b8cd47d397dd18eea0b72f05d4d3272a009',
+'/tmp/nks-notes.pdf':'549f043595653a7d276b07ba52d435700039b71427b4e1774a44b1a58eff4723',
+}
+for name,want in official.items():
+    assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==want,name
+def pdf_text(name):
+    raw=subprocess.check_output(['pdftotext','-layout',name,'-'],text=True,errors='replace')
+    return re.sub(r'\s+',' ',raw)
+strict=pdf_text('/tmp/nks-ch3.pdf')
+nts=pdf_text('/tmp/nks-nts-ch3.pdf')
+notes=pdf_text('/tmp/nks-notes.pdf')
+assert '1 0 0 1 2 1 0 = 777' in strict
+assert 'those that change the white background are not included' in strict
+assert 'initial condition used contains a single gray cell' in strict
+scan=list(range(993,1141,3))
+assert len(scan)==50 and all(f'code {c}' in strict for c in scan)
+for c in (600,843,870,1086,1167,1329,1572,1815,1842,219,957,966,1884,
+          237,420,948,1749,177,912,2040,1041,1635,2049,357,1599,2058):
+    assert f'code {c}' in strict,c
+assert 'specific assignment of values to colors' in nts
+assert 'respectively k ^Table[i - 1, {i, 2 r + 1}] and Table[1, {2 r + 1}]' in nts
+assert 'page 927.' in notes
+assert 'This runs the totalistic k=3 , r =1 rule with code 867.' in notes
+assert 'In[11] : = Show[RasterGraphics[CellularAutomaton[{867, {3, 1}, 1}, {{1}, 0}, 50]]]' in notes
+assert 'Other examples of class 4 totalistic rules with k = 3 colors include 357' in notes
+
+root=Path('ref/A-New-Kind-of-Science/CHAPTERS/3-The-World-of-Simple-Programs/Images')
+assets={
+'_page_75_Figure_6.jpeg':((610,446),'acb13963632286960ca61b616ff2f45a940750f3ab7deb5e6fbf696543015c15',[777]),
+'_page_76_Figure_2.jpeg':((1109,1279),'8c11659c8bd63d37a972c5ffab376b62948f7c4e05f9fd10f239e51464f4084d',scan),
+'_page_77_Figure_6.jpeg':((892,716),'4c1f8894016156dc4d473e911e0fa5c7db16711a8c2873fa493fb7854ad41c66',[600,843,870,1086,1167,1329,1572,1815,1842]),
+'_page_78_Figure_2.jpeg':((1107,615),'5c5ca56f3e8141c3aa4d7648f3ebe34a911515bf9dfc9118795135736f69b879',[219,957,966,1884]),
+'_page_78_Figure_4.jpeg':((1134,621),'088016843cb7d74ad621ebed323401dfb9783ce061ece275ba36b0815c7dfa28',[237,420,948,1749]),
+'_page_79_Picture_2.jpeg':((886,1399),'355d13fde85b89c2e3e26d1ae199e30ad2191b0bcbd3d4c89ac76785fa1ebc86',[177,912,2040]),
+'_page_81_Picture_1.jpeg':((826,446),'0617e6b01a1faa43e968051ff8716171b665e79d087c8c13a47811c0520f3014',[1041]),
+'_page_81_Picture_2.jpeg':((816,429),'6efe4dc8703a3045bd6189f930a0cdb44e59dc71f38dc91a52e8faa84e801a7e',[1635]),
+'_page_81_Picture_3.jpeg':((869,470),'b3812f8742bf08299270512de2cdffa57ac14be5b10a6cdefa60d4878173553c',[2049]),
+'_page_82_Picture_1.jpeg':((1061,1381),'aa534aa358e74235ef5de86980c5c6f0895bac2b616e990c1cda7253639a4511',[1635]),
+'_page_83_Picture_1.jpeg':((1067,1387),'cd4f0434c12f9b86bdde3730270451df2dfb503194d22bc04d0609973e9d3a77',[2049]),
+'_page_84_Picture_2.jpeg':((764,747),'02782253cc66a9de075af5d1d02f224645e443040f5ff6001fef6467a7013cbe',[357,600,1599,2058]),
+'_page_85_Picture_2.jpeg':((1107,1360),'2374289d970042909316f68cf240379d6f2826ba90dab95db0a317e672b91b0f',[1599]),
+}
+for name,(size,want,codes) in assets.items():
+    p=root/name
+    assert hashlib.sha256(p.read_bytes()).hexdigest()==want,name
+    with Image.open(p) as im: assert im.size==size,(name,im.size,size)
+    assert all(0 <= c < 2187 for c in codes)
+
+# Independent preset/cardinality/codec checks.
+k=3; r=1; q=2*r+1; M=1+(k-1)*q
+reachable={sum(v) for v in itertools.product(range(k),repeat=q)}
+assert q==3 and M==7 and reachable==set(range(7)) and k**M==2187
+assert all(c%3==0 for c in scan) and len(range(0,2187,3))==729
+sum_digits=[0,1,2,1,0,0,1]
+assert sum(d*3**s for s,d in enumerate(sum_digits))==777
+for code in range(2187):
+    digits=[(code//(3**s))%3 for s in range(7)]
+    assert len(digits)==7 and all(d in (0,1,2) for d in digits)
+
+assert quote_count==72 and len(quote_lines)==70
+print(f'T04 evidence oracle: PASS cited={len(cited)} quote_fragments={quote_count} quote_lines={len(quote_lines)} assets={len(assets)} pdfs={len(official)}')
+PY
+```
+
+Expected terminal line:
+
+```text
+T04 evidence oracle: PASS cited=<dynamic> quote_fragments=72 quote_lines=70 assets=13 pdfs=3
+```
 
 ## Construction Model
 
@@ -138,6 +753,23 @@ def word(row):
     used=[i for i,v in enumerate(row) if v]
     return ''.join(map(str,row[min(used):max(used)+1])) if used else ''
 
+def generic_t03(*,k,r,alphabet,valuation,table):
+    assert k==len(alphabet)==len(valuation)
+    assert tuple(sorted(valuation))==tuple(range(k))
+    assert len(table)==1+(k-1)*(2*r+1)
+    return ('AggregateLookupRule',tuple(alphabet),tuple(valuation),
+            ('EqualWeightIntegerSum',2*r+1),tuple(table),
+            ('Assign','AtomicParallelUpdate'))
+
+def t04_preset(code_or_table,**overrides):
+    if overrides:
+        raise ValueError(tuple(sorted(overrides)))
+    table=decode(code_or_table) if isinstance(code_or_table,int) \
+          and not isinstance(code_or_table,bool) else tuple(code_or_table)
+    encode(table)  # complete canonical T04 validation
+    return generic_t03(k=3,r=1,alphabet=(0,1,2),valuation=(0,1,2),
+                       table=table)
+
 assert (K,RADIUS,M,RULES)==(3,1,7,2187)
 for code in range(RULES):
     table=decode(code)
@@ -150,10 +782,26 @@ for code in range(RULES):
 for bad in (-1,2187,True,False,1.0,'777',None):
     try: decode(bad); raise AssertionError(bad)
     except ValueError: pass
+    try: t04_preset(bad); raise AssertionError(('preset',bad))
+    except (ValueError,TypeError): pass
 for bad in ((0,)*6,(0,)*8,(0,0,0,0,0,0,3),
             (0,0,0,0,0,0,True)):
     try: encode(bad); raise AssertionError(bad)
     except ValueError: pass
+
+# Preset resolution is semantic identity with generic T03, not a family tag.
+generic777=generic_t03(k=3,r=1,alphabet=(0,1,2),valuation=(0,1,2),
+                       table=decode(777))
+assert t04_preset(777)==t04_preset(decode(777))==generic777
+assert sha256(repr(t04_preset(777)).encode()).hexdigest()==\
+       sha256(repr(generic777).encode()).hexdigest()
+for field in ('k','r','valuation','aggregate','alphabet','arity','executor',
+              'update','seed','boundary','filter','class_name','palette'):
+    try:
+        t04_preset(777,**{field:'override'})
+        raise AssertionError(field)
+    except ValueError:
+        pass
 
 assert decode(777)==(0,1,2,1,0,0,1)
 assert ''.join(map(str,reversed(decode(777))))=='1001210'
