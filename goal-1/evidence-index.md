@@ -25,7 +25,7 @@ Each type stage must make the following auditable:
 
 ## Catalog Coverage
 
-Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06 are subsequently complete under D119. T07 is source/asset-reopened after hostile review found wider-context lines and governed rasters outside its initial manifest; D120 and advancement to T08 await reclosure.
+Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07 are subsequently complete under active D119-D120. T08 is next.
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
@@ -35,7 +35,7 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 | T04 | 5 | Three-Color Totalistic Cellular Automata | 4 | `23-T04-THREECOLOR-TOTALISTIC.md` | COMPLETE | Exact 12-query/246-candidate partition `34/53/11/20/54/30/27/17`; 260 cited lines/92 fragments/90 quote lines; 75 assets at 35 included/34 excluded/6 relation-only and 150 reverse references; six embedded oracles, independent review, and 102 tests; strict T03 preset; 0 unresolved |
 | T05 | 6 | Higher-Color Totalistic Cellular Automata | 5 | `24-T05-HIGHERCOLOR-TOTALISTIC.md` | COMPLETE | Exact 11-query/142-lexical-line partition plus five governed follows and 25 assets = 172 candidates; 12 evidence groups at 47 provenance/47 fragments/40 quote lines; assets 5 included/13 relation-only/7 excluded; strict finite `k>=4,r=1` canonical T03 preset, code-1004600/cardinality/bigint/snapshot fixtures, five embedded oracles, independent review, and 102 tests; 0 unresolved candidates |
 | T06 | 7 | Quiescent-Background-Preserving Cellular Automata | 6 | `25-T06-QUIESCENT.md` | COMPLETE | Exact 329-line reconciled partition `4/30/129/76/21/69` with a pinned 19-family/280-line core; 47 physical assets at 5 included/29 relation-only/13 excluded and 94 reverse references; strict CA-axis eligibility, typed claim/evidence/selection/run identity, source/count/semantic/asset oracles, independent review, and 102 tests; 0 unresolved |
-| T07 | 8 | Left-Right Symmetric Cellular Automata | 7 | `26-T07-SYMMETRIC.md` | REOPENED | Initial 357-line/22-asset closure superseded: hostile review found wider-context CA symmetry/view/representation controls and governed assets including `BOOK:4416,6636,11844,15708,16051,4412,6642`; saturation, direction-sensitive asset audit, typed-action repairs, D120 revalidation, and all gates in progress |
+| T07 | 8 | Left-Right Symmetric Cellular Automata | 7 | `26-T07-SYMMETRIC.md` | COMPLETE | Authoritative 650-line monolith protocol = bounded 357 + hostile remainder 293, partitioned `15/190/25/167/179/74`; 397 retained pre-Index lines; 114 retained additions reverse-join as 103 exact/11 variants without claiming exhaustive split-only semantics; 271 assets/542 references/271 hashes at 4 included/38 relation-only/229 excluded; diagonal typed action over exact `V_P`, generic admissible-space closure, six oracles, clean hostile review, and 102 tests; 0 unresolved |
 | T08 | 9 | Initial-Condition Classes | 8 | `27-T08-INITIAL-CONDITIONS.md` | PENDING | Not started |
 | T09 | 10 | Mobile Automata | 9 | `3-T09-MOBILE.md` | COMPLETE | Evidence and architecture reclosed: `Plain(bit) \| Active(bit)`, exactly-one invariant, firing-source frontier, radius-one native read, typed two-write lowering, atomic UPDATE, and compact 65,536-rule identity; no control class or family executor |
 | T10 | 11 | Extended Mobile Automata | 10 | `28-T10-EXTENDED-MOBILE.md` | PENDING | Not started |
@@ -78,10 +78,10 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages globally complete: 24 / 45.
+- Type stages globally complete: 25 / 45.
 - Type stages evidence-closed / architecture-reopened: 0.
-- Type stages asset-reopened: 1 (T07; source closure is also reopened).
-- Type stages unresolved: 20 pending; 1 reopened/in progress. T08 follows T07 reclosure.
+- Type stages asset-reopened: 0.
+- Type stages unresolved: 20 pending; 0 reopened/in progress. T08 is next.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
@@ -92,3 +92,4 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 - T04 reopened and reclosed during T06: retained captions `BOOK:17431`, `BOOK:2922`, and the inherited facing-page/slice chain explicitly govern omitted rasters `BOOK:17433`, `BOOK:2924`, and `BOOK:2928`. The repaired 12-query/246-candidate and 75-asset manifest closes at `35/34/6`, its 150-reference reverse join and all six checks pass, fresh independent review is clean, and all 102 tests pass; the strict T03 preset result is unchanged.
 - T03 reopened and reclosed once more during the T04 repair: T04's downstream-comparator rule proved that page-263 slice raster `BOOK:2928` belongs to the inherited two-dimensional totalistic gallery. The repaired 18-query/314-candidate and 120-asset manifest closes at `50/61/9`, with 72 audited links, a 106-link reverse join, all six checks, independent review, and all 102 tests passing; aggregate semantics are unchanged.
 - T09 and T12 reopened and reclosed before T06 continuation: D009-D014 had promoted one lossless state decomposition—separate `SingleControl`/`TransitionControl`—into a required semantic abstraction. The audit instead keeps `FRONTIER` as rule-firing sources, broadens the CA-shaped writable-target realization, and uses transparent composite labels with exactly-one invariants plus atomic typed writes. `ref/notes/alphabets.md` independently supplies the Turing composite-alphabet construction. All dependent decisions and Goal 2 handoffs were reclassified under the one branch-free SimpleProgram runner.
+- T07 reopened and reclosed after hostile review: its initial 357-line/22-asset closure omitted wider-context symmetry/view/representation controls and governed rasters. The authoritative repair closes a declared 650-line monolith protocol and 271-asset fixed point, preserves the pinned/manual and split-reverse-coverage limitations, repairs typed diagonal actions and `rho_alpha(V_P)=V_P`, and passes all six embedded oracles, clean independent hostile review, Markdown/diff gates, and 102 tests. The class-2 property / separate transform / optional class-3 representation conclusion remains, now under active D120.

@@ -1,6 +1,6 @@
 # 26-T07-SYMMETRIC
 
-Status: **IN PROGRESS — EVIDENCE/ASSET CLOSURE REOPENED BY HOSTILE REVIEW; ARCHITECTURE REPAIRS ACTIVE**
+Status: **COMPLETE — HOSTILE SOURCE/ASSET/ARCHITECTURE RECLOSURE PASSED; D120 ACTIVE**
 
 ## Current Facts
 
@@ -1011,7 +1011,7 @@ Repository-wide inspection finds no implemented T07 property or transform API. T
 - **Principles 13-15:** rule 30/86, rule 29, rule 90, hostile exterior, a one-sided schema, a diagonal two-component action, exact counts, and object identity are explicit adversaries. Current tests do not already prove them.
 - **Principle 16:** one generic action/property/transform/orbit-representation boundary is architecture. A `symmetric` flag, family branch, reversed selector, independent component quotient, or seed-based shortcut is a shim.
 
-D111-D119 remain valid. The repaired working architecture proposes the following post-audit decision; D120 remains provisional until the reopened source/asset closure and hostile review pass:
+D111-D119 remain valid. The repaired architecture establishes the following active post-audit decision:
 
 ### D120 — Left-right symmetry is a validated program property over an explicit action; orbit lookup is representation, not execution semantics
 
@@ -1029,7 +1029,7 @@ D111-D119 remain valid. The repaired working architecture proposes the following
 3. **Complete:** derive the reflection action, local fixed-point predicate, reflected-program involution, global covariance qualifications, exact counts/codecs, totalistic proof, and orbit representation.
 4. **Complete:** audit current documentation/runtime/tests and the T01-T06, two-dimensional/isotropy, seed, boundary, observer, and emulation boundaries.
 5. **Complete:** specify typed claims, evidence, unsupported results, validated selection, transform/representation identity, serialization, and migration.
-6. **In progress:** saturate the reopened wider-context/source-adjacency and direction-sensitive asset universes, rerun all embedded oracles and hostile review, then run repository tests, Markdown fences, diff/status gates, and reclose D120 and the Goal 2 handoff globally.
+6. **Complete:** saturated the wider-context/source-adjacency and direction-sensitive asset universes, reran all six embedded oracles and hostile review, passed repository tests plus Markdown/diff gates, and reclosed D120 and the Goal 2 handoff globally.
 
 ## Goal 2 Implementation Stage
 
@@ -1086,11 +1086,13 @@ D111-D119 remain valid. The repaired working architecture proposes the following
 - [x] Every relevant governed asset is hash-pinned and classified, with every source-permitted semantic/raster check closed.
 - [x] The rule predicate, reflection action, transform/orbit identities, exact counts/code relations, compact representation, and rule/seed/boundary/trajectory/view distinctions are proved across supported descriptions.
 - [x] Current API/runtime fit and a concrete Goal 2 property/transform/conformance stage are implementation-ready.
-- [ ] Global ledgers, independent final review, all embedded checks, coverage/diff gates, and repository tests pass.
+- [x] Global ledgers, independent final review, all embedded checks, coverage/diff gates, and repository tests pass.
 
 ## Stage Results
 
-IN PROGRESS pending final verification and global integration.
+COMPLETE. The authoritative monolith protocol closes 650 lines: a reproducible 357-line bounded base plus a disjoint 293-line hostile-saturation remainder, partitioned `15 direct / 190 relevant / 25 incidental / 167 sibling-general / 179 excluded / 74 Index`. The 397 retained pre-Index lines drive the final asset closure. All 114 retained saturation additions reverse-join to split material as `103 exact + 11 pinned variants`; this is reverse coverage, not a claim of an independently exhaustive split-wording search.
+
+The authoritative asset universe closes 271 physical JPEGs and 542 exact monolith/split references with 271 unique hashes, partitioned `4 included / 38 relation-only / 229 excluded`. The final typed-action repair requires a single diagonal complete-read involution over exact `V_P`, including `rho_alpha(V_P)=V_P` for generic value actions, and keeps local displacement reflection distinct from concrete support-point reflection. All six embedded oracles pass, independent hostile review is clean, Markdown fences and `git diff --check` pass, and all 102 repository tests pass. D120 is active; T08 is next.
 
 ## Integration Results
 
@@ -1103,4 +1105,4 @@ IN PROGRESS pending final verification and global integration.
 7. **Representation boundary:** 64 fixed rules, 160 reflection orbits, 88 combined orbits, code permutations, galleries, rasters, and BDDs are distinct codecs/analyses.
 8. **Global theorem boundary:** rule fixedness gives covariance only after a support-point reflection `h_D` is chosen compatibly with the local displacement reflection `h_delta`; symmetric trajectories additionally require compatible seed, realization, frontier/schedule, and observer.
 9. **Counterexamples:** rules 30/86 and 29, hostile exterior, asymmetric seed, symmetric all-zero trace, one-sided schema, nontrivial output action, and diagonal two-component action close the main cheats.
-10. **Global integration:** pending D120, plan/evidence/ledger/architecture-audit updates, and advancement to T08.
+10. **Global integration:** D120, the plan, evidence index, design ledger, architecture-audit status, and Goal 2 handoff are reclosed consistently; T08 is next.
