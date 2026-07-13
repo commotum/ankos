@@ -49,7 +49,8 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34 complete, 13 of 45 type stages complete, T37 Recursive Sequences in progress, and Synthesis and Goal 2 Handoff pending.
+- Execution status at this sync is Foundation and T01/T09/T12/T13/T16/T17/T19/T20/T27/T29/T30/T31/T34/T37 complete, 14 of 45 type stages complete, T39 Number-Theoretic Filtering Systems in progress, and Synthesis and Goal 2 Handoff pending.
+- T37 establishes a consecutive domain-tagged exact numeric prefix as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, old-prefix term references, and `AppendOnlySequenceUpdate` as the ninth update law. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. Ulam is deferred to a T37/T39 composition audit.
 - T01 validates a fixed-lattice synchronous assignment protocol only: semantic `AllSites`, ordered old-snapshot reads, an explicit exhaustive table, typed same-site assignment, and atomic parallel update.
 - T01 requires semantic support, finite computation realization, and emitted trace extent to be separate. A finite `shape` is not automatically the native integer line.
 - T01 found three concrete runtime defects: binary arity-three exhaustive lookup derives 4 rather than 256 rules, the current digit codec mirrors asymmetric Wolfram rules, and generic lookup cannot execute through the family-dispatched rollout.
@@ -477,7 +478,7 @@ T34 adds a domain-tagged exact scalar carrier and closed `AddConstant | Multiply
 
 ### 15-T37-RECURSIVE
 
-Status: **IN PROGRESS** in `goal-1/15-T37-RECURSIVE.md`.
+Status: **COMPLETE** in `goal-1/15-T37-RECURSIVE.md`.
 
 #### Big Picture Objective
 
@@ -491,7 +492,17 @@ Apply the common protocol, emphasizing seeds, index origin, dependency support, 
 
 All T37 evidence is captured; recurrence dependencies and invalid indices are explicit; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+The direct-name union dispositioned 48 occurrences on 42 lines, fixed-lag tokens 23/13, focused mechanics 32/20, literal recurrence programs 20/20, aliases 10/10, and named saturation 160/118. Nineteen excerpt groups cover the strict main range and raster, Notes, actual Index/splits, programs/history, Fibonacci/Lucas/Perrin/factorial, logistic/Ackermann/Ulam/modular relations, analyzers/observers, and every construction boundary. Strict mechanics have zero unresolved candidates.
+
+T37 adds `NumericPrefix(domain,origin,terms)`, exact minimal fresh seeds and replay-verified checkpoints, normalized `AffineFixedLag` programs, a named closed factorial-capable expression extension, `NextSequenceTerm`, old-prefix fixed-lag reads, `AppendTerm`, and `AppendOnlySequenceUpdate` as the ninth public update law. Every valid event preserves all old terms and appends exactly one indexed term; repeated values still advance and fixed-reference invalidity is static. Compact seed-plus-event traces reconstruct `h+1` prefixes from `h` appends, while a lag window is only a future-sufficient non-injective quotient.
+
+Exact oracles pin the six page-143 horizons `38/48/22/26/44/27`, every displayed term and endpoint, the source's (e)/(f) characteristic-equation mislabel, Fibonacci beyond signed 64-bit, Lucas/Perrin/factorial, trace cardinality, checkpoint replay, and window loss. Closed forms, plots, sounds, and memoization remain downstream; current modular hidden-history AR2 is not the reference implementation. T38 computed indices and T43 scalar maps stay separate; Ulam becomes an explicit T37/T39 composition question. No prior stage was reopened. Next: T39.
+
 ### 16-T39-FILTERS
+
+Status: **IN PROGRESS** in `goal-1/16-T39-FILTERS.md`.
 
 #### Big Picture Objective
 

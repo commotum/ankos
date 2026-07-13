@@ -1,6 +1,6 @@
 # 15-T37-RECURSIVE
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Current Facts
 
@@ -564,18 +564,24 @@ Suggested responsibility files are a shared exact-value module, `numeric_sequenc
 
 ## Completion Requirements
 
-- [ ] Every strict main-text, raster, Notes, actual Index, split, program, history, alias, named variant, observer, and relation candidate is dispositioned.
-- [ ] Prefix/index/domain, strict and extended program, seed/checkpoint, dependency, append, outcome, equality, serialization, trace, and quotient semantics are explicit.
-- [ ] Every strict figure row and high-value variant has independently checked exact oracles and adversarial boundaries.
-- [ ] The source erratum and overbroad caption claims are repaired transparently and guarded.
-- [ ] T34/T38/T39/T43, Ulam, Ackermann, modular RNG, solver, and observer boundaries are explicit.
-- [ ] Current API/runtime fit and a no-family-branch Goal 2 handoff are implementation-ready.
-- [ ] Design ledger, evidence index, global plan, diff checks, and repository tests are integrated.
+- [x] Every strict main-text, raster, Notes, actual Index, split, program, history, alias, named variant, observer, and relation candidate is dispositioned.
+- [x] Prefix/index/domain, strict and extended program, seed/checkpoint, dependency, append, outcome, equality, serialization, trace, and quotient semantics are explicit.
+- [x] Every strict figure row and high-value variant has independently checked exact oracles and adversarial boundaries.
+- [x] The source erratum and overbroad caption claims are repaired transparently and guarded.
+- [x] T34/T38/T39/T43, Ulam, Ackermann, modular RNG, solver, and observer boundaries are explicit.
+- [x] Current API/runtime fit and a no-family-branch Goal 2 handoff are implementation-ready.
+- [x] Design ledger, evidence index, global plan, diff checks, and repository tests are integrated.
 
 ## Stage Results
 
-Evidence and construction work are complete; global integration and verification are in progress.
+T37 is complete. The direct union found 48 occurrences on 42 lines, fixed-lag tokens 23/13, focused mechanics 32/20, literal recurrence programs 20/20, alias/control forms 10/10, and named saturation 160/118. Nineteen excerpt groups disposition the strict main/raster, full recursive-sequence Notes cluster, actual Index/splits, programs/history, fixed/nonlinear/modular/global-history variants, analyzers, observers, and neighboring constructions. Strict mechanics have zero unresolved search candidates.
+
+The reconstruction is a consecutive domain-tagged exact `NumericPrefix` plus a normalized `AffineFixedLag` program. Minimal fresh seeds and replay-verified checkpoints make recurrence start unambiguous. `NextSequenceTerm -> FixedLagRead -> AppendTerm -> AppendOnlySequenceUpdate` preserves every old indexed term and adds exactly one endpoint, establishing the ninth update law. The factorial-capable expression extension is closed; runtime invalid indices, callbacks, fixed widths, modulus, and hidden trajectory history stay out of the strict profile.
+
+Exact Python oracles regenerated all six raster rows at horizons `38/48/22/26/44/27`, their endpoints, `Fibonacci[93]`, Lucas, Perrin, factorial, the exact logistic relation, append/state/term cardinalities, checkpoint replay, lag-window non-injectivity/commutation, and the raster SHA-256. They passed. Markdown fences are balanced, `git diff --check -- goal-1` passed, and `uv run pytest -q` passed all 102 tests in 1.17 seconds.
 
 ## Integration Results
 
-In progress.
+`design-ledger.md` now records the T37 construction, the ninth update member, D070-D075, numeric-prefix inventory changes, rejected shortcuts, Ulam's open composition question, and the completed integration entry. `evidence-index.md` records T37 complete and 14/45 completed types. `0-plan.md` records the implementation-ready result and T39 as next.
+
+T34 exact scalar values and shared orchestration/outcomes/traces are reused without changing meaning. T16/T17 public edit laws remain distinct. T38 can reuse prefix/append while adding computed-index reads and runtime reference outcomes; T39 must audit Ulam composition. Current AR2 remains an explicit modular migration relation. No prior stage is contradicted or reopened.

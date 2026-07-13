@@ -62,9 +62,9 @@ Each type stage must make the following auditable:
 | T34 | 35 | Arithmetic Iteration Systems | 34 | `14-T34-ARITHMETIC.md` | COMPLETE | Direct-name union 65 occurrences/55 lines; mechanics 27/26; focused native 13/12; code observers 6/6; 30 excerpt groups; all scalar/add/multiply/domain/exactness mechanics, seven main figures and Notes figures, programs/actual Index/splits/history, digit/fraction/size/crop/quotient/CA/substitution/fast-forward relations, T35/T36/T37/T38/T43 boundaries, and exact oracles dispositioned; 0 unresolved |
 | T35 | 36 | Piecewise Integer Maps | 35 | `42-T35-PIECEWISE-INTEGER.md` | PENDING | Not started |
 | T36 | 37 | Digit-Reversal Arithmetic Systems | 36 | `43-T36-DIGIT-REVERSAL.md` | PENDING | Not started |
-| T37 | 38 | Recursive Sequences | 37 | `15-T37-RECURSIVE.md` | IN PROGRESS | Prefix state, index origin, fixed dependencies, closed recurrence grammar, append semantics, compact realization, figures, Notes/Index, variants, and relations under audit |
+| T37 | 38 | Recursive Sequences | 37 | `15-T37-RECURSIVE.md` | COMPLETE | Direct union 48 occurrences/42 lines; fixed-lag tokens 23/13; focused mechanics 32/20; literal programs 20/20; aliases 10/10; named saturation 160/118; 19 excerpt groups; all strict main/raster rows, Notes/actual Index/splits, fixed/nonlinear/modular/global-history variants, source erratum, prefix/seed/checkpoint/read/append/trace/window semantics, programs/history/observers/boundaries, and exact oracles dispositioned; 0 unresolved strict mechanics |
 | T38 | 39 | Variable-Index Recursive Sequences | 38 | `44-T38-VARIABLE-RECURRENCE.md` | PENDING | Not started |
-| T39 | 40 | Number-Theoretic Filtering Systems | 39 | `16-T39-FILTERS.md` | PENDING | Not started |
+| T39 | 40 | Number-Theoretic Filtering Systems | 39 | `16-T39-FILTERS.md` | IN PROGRESS | Candidate domain/order, sieve stages, divisibility predicates, survivors/removals, finite/infinite scope, prime stream/set, derived measurements, figures, Notes/Index, Ulam composition, and current runtime under audit |
 | T40 | 41 | Mathematical-Constant Digit Systems | 40 | `45-T40-CONSTANT-DIGITS.md` | PENDING | Not started |
 | T41 | 42 | Function-Combination Systems | 41 | `17-T41-FUNCTIONS.md` | PENDING | Not started |
 | T42 | 43 | Continued-Fraction-Driven Substitution Systems | 42 | `46-T42-CF-SUBSTITUTION.md` | PENDING | Not started |
@@ -75,9 +75,9 @@ Each type stage must make the following auditable:
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages complete: 13 / 45.
+- Type stages complete: 14 / 45.
 - Type stages reopened: 0.
-- Type stages unresolved: 31 pending, 1 in progress.
+- Type stages unresolved: 30 pending, 1 in progress.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
