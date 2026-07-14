@@ -55,6 +55,12 @@ book_bytes = BOOK.read_bytes()
 assert len(book_bytes.decode("utf-8").splitlines()) == EXPECTED_BOOK_LINES
 assert sha256(book_bytes) == EXPECTED_BOOK_SHA256
 BOOK_LINES = book_bytes.decode("utf-8").splitlines()
+IMAGE_RE = re.compile(r"^!\[\]\(([^)]*?\.jpeg)\)$")
+BOOK_IMAGES = {
+    line_number: match.group(1)
+    for line_number, line in enumerate(BOOK_LINES, 1)
+    if (match := IMAGE_RE.fullmatch(line))
+}
 
 
 class AssetSpec(NamedTuple):
@@ -219,6 +225,17 @@ assert digest_lines(NATIVE) == "9bf42f4b66fe462d800a8b659ec866dca7f23597393f9cb2
 assert digest_lines(RELATION) == "ac31f08d2eaed3c8cfd457f9d4922b7fab79508739676c57158d156356528eb2"
 assert digest_lines(CONTROL) == "6159ae09901c63d9c720102232de4bbc096433209203024d3750c10068f2f0e9"
 assert digest_lines(GOVERNED) == "06e50ad4cf8480aed23443fd40147ac0fb35e0776e1883d025467943c4889411"
+ASSEMBLIES = {
+    assembly: frozenset(
+        line for line, asset in ASSETS.items() if asset.assembly == assembly
+    )
+    for assembly in {asset.assembly for asset in ASSETS.values()} - {"-"}
+}
+assert ASSEMBLIES == {
+    "geometric_orientation": frozenset({2328, 2330}),
+    "geometric_overlap": frozenset({2340, 2344}),
+}
+assert sum(map(len, ASSEMBLIES.values())) == 4
 
 
 # These source-adjacent images are deliberately not governed.  Freezing the
@@ -233,9 +250,39 @@ ADJACENCY_EXCLUSIONS = {
     13802: ("_page_950_Picture_4.jpeg", "Mandelbrot raster before the Notes heading"),
     13804: ("_page_950_Figure_5.jpeg", "Mandelbrot raster before the Notes heading"),
 }
-assert GOVERNED.isdisjoint(ADJACENCY_EXCLUSIONS)
+EXCLUDED = frozenset(ADJACENCY_EXCLUSIONS)
+assert GOVERNED.isdisjoint(EXCLUDED)
 for excluded_line, (excluded_name, _reason) in ADJACENCY_EXCLUSIONS.items():
     assert BOOK_LINES[excluded_line - 1] == f"![]({excluded_name})"
+
+# The candidate closure is explicit and reproducible: the exact 1D analog;
+# every image from the immediately preceding T25 plate through the native T28
+# plate; the CA-emulation paragraph with its preceding/following sibling
+# plates; and the three images mechanically adjacent to the Notes heading.
+# N/R/C plus the seven dispositions above exhaust it with no unresolved line.
+CANDIDATE_IMAGE_LINES = frozenset(
+    {1020}
+    | {line for line in BOOK_IMAGES if 2302 <= line <= 2362}
+    | {line for line in BOOK_IMAGES if 8018 <= line <= 8038}
+    | {line for line in BOOK_IMAGES if 13800 <= line <= 13806}
+)
+assert CANDIDATE_IMAGE_LINES == GOVERNED | EXCLUDED
+assert len(CANDIDATE_IMAGE_LINES) == 17
+assert digest_lines(EXCLUDED) == "8b6cbf265e37d7759d88fad5b1fa99c9814dc40293ea8a350f3a40b21bbd26f7"
+assert digest_lines(CANDIDATE_IMAGE_LINES) == (
+    "a2767e2fc3594f3aeabe748a5b584a31dc69bad4ca2b6eedcc7d8bec8ac3ea45"
+)
+CLASSIFICATION = {
+    **{line: "N" for line in NATIVE},
+    **{line: "R" for line in RELATION},
+    **{line: "C" for line in CONTROL},
+    **{line: "X" for line in EXCLUDED},
+}
+assert frozenset(CLASSIFICATION) == CANDIDATE_IMAGE_LINES
+assert tuple(CLASSIFICATION.values()).count("N") == 1
+assert tuple(CLASSIFICATION.values()).count("R") == 2
+assert tuple(CLASSIFICATION.values()).count("C") == 7
+assert tuple(CLASSIFICATION.values()).count("X") == 7
 
 
 # This is a manual reading of text and counts visibly printed inside the exact
@@ -356,6 +403,9 @@ def verify_source_interface() -> None:
         "RELATION_IMAGE_LINES": RELATION,
         "CONTROL_IMAGE_LINES": CONTROL,
         "GOVERNED_IMAGE_LINES": GOVERNED,
+        "EXCLUDED_IMAGE_LINES": EXCLUDED,
+        "CANDIDATE_IMAGE_LINES": CANDIDATE_IMAGE_LINES,
+        "UNRESOLVED_IMAGE_LINES": frozenset(),
     }
     for attribute, expected in required.items():
         actual = frozenset(getattr(source, attribute))
@@ -365,13 +415,6 @@ def verify_source_interface() -> None:
 def ledger() -> tuple[str, int, int, int, int]:
     """Verify every asset and return the canonical provenance ledger."""
 
-    image_re = re.compile(r"^!\[\]\(([^)]*?\.jpeg)\)$")
-    monolith_images = {
-        line_number: match.group(1)
-        for line_number, line in enumerate(BOOK_LINES, 1)
-        if (match := image_re.fullmatch(line))
-    }
-
     split_markdown = sorted(
         path
         for path in SOURCE_ROOT.rglob("*.md")
@@ -380,7 +423,7 @@ def ledger() -> tuple[str, int, int, int, int]:
     assert len(split_markdown) == 17
 
     monolith_by_name: dict[str, list[int]] = {}
-    for line_number, reference in monolith_images.items():
+    for line_number, reference in BOOK_IMAGES.items():
         monolith_by_name.setdefault(Path(reference).name, []).append(line_number)
 
     split_by_name: dict[str, list[tuple[Path, int]]] = {}
@@ -477,11 +520,12 @@ def main() -> None:
     )
     assert (monolith_refs, split_refs, hashes, total_bytes) == (10, 10, 10, 1_112_143)
     print(
-        "T28 asset oracle: PASS assets=10; classes N/R/C=1/2/7; "
+        "T28 asset oracle: PASS assets=10; classes N/R/C/X=1/2/7/7; "
         "adjacency_exclusions=7; refs=20(monolith=10,split=10); "
-        "unique_hashes=10; bytes=1112143; "
+        "unique_hashes=10; bytes=1112143; assemblies=2/4_files; "
         "boundary=10_HASH_BOUND/1_LIMITED_TRANSCRIBED/0_PIXEL_REPLAYED; "
-        "native_caption/wrap/counts=bound; glyphs/seed/trace=unrecovered"
+        "native_caption/wrap/counts=bound; glyphs/seed/trace=unrecovered; "
+        "unresolved=0"
     )
 
 

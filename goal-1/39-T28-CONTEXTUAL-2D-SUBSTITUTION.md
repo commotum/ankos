@@ -6,8 +6,9 @@ Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS ACTIV
 
 - T28 is CSV physical line 29, `Neighbor-Dependent Two-Dimensional Substitution Systems`; `ref/notes/CA-Types.md` section 28 is search vocabulary, not primary mechanics.
 - The main text first contrasts neighbor-independent grid subdivision and free geometric replacement, then says non-nested behavior comes from allowing a grid element's replacement to depend on neighboring elements (`BOOK:2350-2356`).
-- The main plate is `BOOK:2354 -> _page_207_Figure_1.jpeg`. Its printed caption declares a two-dimensional neighbor-dependent substitution system whose grid wraps in both dimensions, one seven-snapshot trace, five displayed compact rule rows, and eight eight-step examples. The rule glyphs remain raster evidence until any transcription is independently bounded and verified.
+- The main plate is `BOOK:2362 -> _page_207_Figure_1.jpeg`. Its printed caption declares a two-dimensional neighbor-dependent substitution system whose grid wraps in both dimensions, one seven-snapshot trace, five displayed compact rule rows, and eight eight-step examples. The rule glyphs remain raster evidence until any transcription is independently bounded and verified.
 - The Notes give the exact step skeleton `Flatten2D[Partition[list, {2, 2}, 1, -1] /. rule]` and one displayed contextual row, followed by an explicit warning that unequal subdivision can create arbitrarily many possible neighborhood configurations (`BOOK:13806-13810`).
+- The local extraction corrupts the first slot of that displayed row as `-`. The official Wolfram Science text at `https://www.wolframscience.com/nks/notes-5-4--neighbor-dependent-2d-substitution-systems/` gives the exact Mathematica blank `_`: `{{_,1},{0,1}} -> {{1,0},{1,1}}`. This is a one-glyph official-source repair, not a generic normalization rule.
 - The scalar fourth argument `-1` in this source expression aligns the old cell at the lower-right position of each cyclic `2 x 2` window. Together with the plate's wrap caption, the strict contextual read is provisionally the periodic northwest block `(NW,N,W,Self)` for every old tile; this alignment remains a semantic-oracle obligation rather than an uncited convention.
 - T14 established that overlapping old reads change FRONTIER/NEIGHBORHOOD/RULE choice without creating overlapping writes or a new executor. T26 established generic rank-two compatible mosaic assembly and its positive uniform-block preset. T28 must test their composition rather than introduce a contextual-2D engine.
 - The main plate appears to use uniform `2 x 2` outputs. The Notes explicitly allow a broader mixed-subdivision variant, but also state that its neighborhood configuration space is generally unbounded. The strict executable profile and that broader warning must not be conflated.
@@ -18,7 +19,7 @@ Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS ACTIV
 - **Retained:** T28 has canonical parallel stepwise evolution and belongs in the common `SimpleProgram` runner.
 - **Retained:** context selection belongs to NEIGHBORHOOD/RULE, while patch compatibility and assembly belong to UPDATE.
 - **Retained:** periodic boundary behavior is part of the strict source profile and must be explicit in CONFIGURATION/topology or its declared realization.
-- **Under test:** every strict source row can be represented losslessly as a finite closed contextual table over an ordered old-snapshot projection plus a positive rectangular patch.
+- **Under test:** every strict source row can be represented faithfully as a finite closed ordered literal/wildcard contextual table, or compiled to an exhaustive table while separately preserving source spelling/provenance, plus a positive rectangular patch. `ReplaceAll` establishes first-match priority; the audit must not reorder overlapping rows.
 - **Under test:** the strict plate is exactly the positive uniform `2 x 2` restriction of T26 UPDATE; the Notes' unequal-subdivision warning may instead be a non-finite-schema boundary rather than a second native preset.
 - **Rejected unless evidenced:** open, padded, reflected, dropped, infinite-background, or user-callback boundary menus; free geometric neighbors; sequential scans; hidden raster decoding; and a T28 executor.
 
@@ -64,7 +65,7 @@ Known high-signal candidates are `BOOK:2312-2356`, `BOOK:2358-2366`, `BOOK:8024-
 
 ### E02 — the main plate is the strict visual construction record
 
-- Source: `BOOK:2354 -> ref/A-New-Kind-of-Science/CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_207_Figure_1.jpeg`.
+- Source: `BOOK:2362 -> ref/A-New-Kind-of-Science/CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_207_Figure_1.jpeg`.
 - Section/context: page-192 figure between contextual-grid prose and the sequential-scanning boundary.
 - Establishes: the strict displayed grid wraps in both dimensions; one full trace reaches step 7; five compact rule glyphs and eight eight-step examples are shown.
 - Evidence boundary: image identity, dimensions, and linkage will be hash-bound. No rule row or trace cell is semantic data unless separately transcribed and verified.
@@ -74,6 +75,11 @@ Known high-signal candidates are `BOOK:2312-2356`, `BOOK:2358-2366`, `BOOK:8024-
 - Source: `BOOK:13806-13810`.
 - Section/context: Notes for page 192, `Neighbor-dependent substitution systems`.
 - Establishes: every step partitions the complete old rank-two list into overlapping periodic `2 x 2` contexts, applies individual replacement rules, and assembles the resulting patches with `Flatten2D`; unequal subdivision generally destroys a finite bounded neighborhood-schema assumption.
+- Source repair: the official online note corrects the local OCR/extraction glyph `-` to the Mathematica blank `_` in the exact example row:
+
+```text
+{{_,1},{0,1}} -> {{1,0},{1,1}}
+```
 
 ```text
 Flatten2D[Partition[list, {2, 2}, 1, -1] /. rule]
@@ -105,7 +111,7 @@ The following is provisional until source and semantic oracles close.
 - **SEED:** the plate begins from a displayed finite grid; exact raster transcription is not yet claimed.
 - **FRONTIER:** every old tile exactly once, with row/column product order used for assembly and source-bound lineage.
 - **NEIGHBORHOOD:** an ordered cyclic `2 x 2` old-snapshot block aligned so `Self` is the lower-right member; the compact plate appears to ignore/factor at least one slot, but the exact factorization remains to be proved.
-- **RULE:** a finite closed ordered contextual pattern table or its lossless exhaustive expansion, returning one positive rectangular patch over the same alphabet for each selected old source.
+- **RULE:** a finite closed ordered contextual pattern table over typed `Literal(label) | Any` slots, or a behavior-equivalent exhaustive expansion with source form retained separately, returning one positive rectangular patch over the same alphabet for each selected old source. Ordered overlap uses first match; validation proves every finite context has a match.
 - **UPDATE:** T26 `RankedBlockMosaicAssemble(rank=2)`; the strict uniform `2 x 2` plate uses `RankedUniformBlockAssemble(rank=2)`. UPDATE validates complete source/write coverage and mosaic compatibility before allocating and committing one successor.
 - **SCHEDULE:** all reads and rule choices use one immutable old toroidal snapshot; all patches commit atomically; newborn tiles wait until the next event.
 - **OUTCOME:** a valid complete strict table advances one deterministic generation even for an identity result. Invalid/missing/ambiguous pattern coverage or incompatible patches produce typed no-commit invalidity, not a halt or partial successor.
@@ -172,7 +178,7 @@ Required conformance will include the source's exact Notes row, synthetic exhaus
 - No flat concatenation substituted for rank-two product assembly.
 - No context cell assigned parenthood merely because it influenced a source's patch.
 - No newborn tile read during its producing event.
-- No missing or ambiguous compact pattern resolved by rule-order guesses unless the source establishes that order.
+- No compact pattern reordered or treated as an unordered map; the source's ordered first-match behavior is preserved, and missing coverage is rejected rather than delegated to host `ReplaceAll` fallback.
 - No unequal-subdivision profile declared finite/total without closing its potentially unbounded neighborhood configurations.
 
 ## Completion Requirements
@@ -182,6 +188,7 @@ Required conformance will include the source's exact Notes row, synthetic exhaus
 - [ ] The governed asset universe is exact, hash-bound, and honest about transcription and pixel replay.
 - [ ] Strict configuration, topology, seed, frontier, reads, rule data, writes, update, successor, invalidity, lineage, and observer semantics are reconstructed.
 - [ ] The `Partition[...,{2,2},1,-1]` alignment and wraparound behavior are independently proved.
+- [ ] The local `-`/official `_` source defect, literal/wildcard schema, first-match priority, and complete-coverage law are independently pinned.
 - [ ] Direct and generic one-step semantics commute non-vacuously, including adversarial boundaries, overlap, snapshot, assembly, and invalidity.
 - [ ] The compact-pattern and unequal-subdivision boundaries are explicit and do not introduce callbacks or hidden infinite schemas.
 - [ ] Current API/runtime/tests are inspected and the smallest Goal 2 delta is implementation-ready.
