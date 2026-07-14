@@ -1002,7 +1002,7 @@ These are globally rejected unless Principle 0 re-derivation replaces the goal i
 - T31 model sets, T41 uniterated function definitions, and T45 differential relations without a posed evolution are the three evidenced declarative nonfits. No fake seed/frontier/update is invented. A well-posed derived evolution may return to the common runner through an explicit relation.
 - T08 is an independent event-zero axis over the unchanged program: exact configurations, constructors, classes, laws, complete-configuration samples, finite-cylinder samples, algorithmic total-field realizations, validation, finite lowering, boundary/approximation, traces, and observers remain distinct. Only a complete validated `X_0` enters the unchanged native program and identifies a `NativeTrace`; a separately identified derived work specification may enter the same generic runner only as a computation realization.
 - T14 confirms the same factoring on dynamic ordered support: `HasRightNeighbor` and `(self,right)` parameterize FRONTIER and NEIGHBORHOOD, while T13's `OrderedGenerationConcat` rebuilds the complete successor from selected-source emissions. D124 adds no UPDATE algebra or executor.
-- The corrected stage addenda and Goal 2 handoffs supersede the historical integration entries below. The bounded T03/T04 repairs and T06/T07/T08/T10/T11/T14/T15 closures are integrated under active D119-D125. T18 follows.
+- The corrected stage addenda and Goal 2 handoffs supersede the historical integration entries below. The bounded T03/T04 repairs and T06/T07/T08/T10/T11/T14/T15 closures are integrated under active D119-D125. T18 is in progress.
 
 ## Historical Integration Log (Superseded by Architecture Audit)
 
