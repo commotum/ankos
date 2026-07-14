@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 35 type stages are complete, no type stage is in progress or reopened, and 10 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, and T24 are complete under D119-D130. T25 is next.
+- Execution status at this sync is Foundation complete, 35 type stages are complete, T25 is in progress, no stage is reopened, and 9 later stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, and T24 are complete under D119-D130. T25 is the current stage.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -1019,6 +1019,8 @@ COMPLETE. The repaired 30-query source oracle closes 218 lines at `168 pre-Index
 
 ### 37-T25-2D-TURING
 
+Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN** in `goal-1/37-T25-2D-TURING.md`.
+
 #### Big Picture Objective
 
 Validate Turing-machine reuse when tape support and movement become two-dimensional.
@@ -1030,6 +1032,10 @@ Apply the common protocol, emphasizing movement set, position, revisitation, bla
 #### Completion Requirements
 
 All T25 evidence is captured; dimensional reuse is proven without a separate rollout; Goal 2 and global integration are updated.
+
+#### Current Work
+
+Primary construction lines and the Notes implementation establish a square-grid head with four absolute moves, compact `Q x Sigma -> Q x Sigma x Move2D` rules, old-head symbol writes, and atomic head relocation. Turning-relative rules, hexagonal worms, Langton's ant, path visualization, and related 2D mobile automata are being audited as variants, relations, or controls rather than silently merged into the strict square-grid family. Exhaustive source, asset, semantic, architecture, and hostile closure remain open.
 
 ### 38-T26-2D-SUBSTITUTION
 
