@@ -8,6 +8,7 @@ Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN*
 - Chapter 5 explicitly changes T21's four surrounding cardinal cells to eight surrounding cells “including diagonals” (`BOOK:2212`). The center is retained separately by the rule. This is initial evidence for a NEIGHBORHOOD/RULE parameterization, not another executor.
 - The direct examples use center-conditioned black-neighbor counts and codes `175850`, `746`, and `174826` (`BOOK:2226-2234`). Seeds, horizons, shapes, and stopped growth are run data/observers until exact evidence says otherwise.
 - The Notes call this the `9-neighbor` profile because the eight surrounding cells plus self participate in the read. Their convolution assigns neighbor weight `2` and self weight `1`, yielding an 18-case `SelfValue x MooreCount` table (`BOOK:13475-13481`).
+- The same Notes definition generalizes to alphabet size `k` and spatial dimension `d` as `self + k*FullTotal`, with `3^d-1` surrounding values, table length `k*((3^d-1)*(k-1)+1)`, and therefore `k^(k*((3^d-1)*(k-1)+1))` tables. Strict T22 is the `d=2,k=2` profile; this generalization is a typed valuation/access parameterization and a T23 control, not a new executor.
 - The Notes distinguish `2^512` general positional rules, `2^18` outer-totalistic rules, `2^10` equal-sum totalistic rules, and `2^9` growth-totalistic rules for the nine-position square (`BOOK:13542-13549`). Those are distinct schema-tagged RULE representations/restrictions, not family modes.
 - T21/D127 already proves the branch-free fixed-lattice runner, explicit Self access, square-grid support/realization separation, Book-frame ordering, and basis/table permutation. Its semantic oracle includes a same-runner T22 control, but T22 still requires its own exhaustive source/assets/rule fixtures and architecture closure.
 - The current `dyadaxes_2d` access includes self, four cardinal, and four diagonal cells, so its geometry is a candidate realization. Its majority-gated cardinal/diagonal RULE is not automatically the Book's count table or a canonical T22 preset.
@@ -128,6 +129,81 @@ The semantic oracle must derive these values independently and reject swapped ce
 - The Book's arbitrary positional rule orders its nine offsets lexicographically and treats the first position as the most-significant context digit (`BOOK:13491-13531`). The current exhaustive channel assigns its first gathered value the least-significant weight (`src/ca/rollout.py:750-759`). Goal 2 needs one explicit order/codec correction or table permutation, shared with T01/T21, not a T22 reversal shim.
 - Scalar Python integers can hold a 512-bit general-rule code, but the batch path normalizes rule IDs to `numpy.int64` (`src/ca/rollout.py:264-274`). Complete typed tables or arbitrary-precision tagged codecs are the semantic representation; machine-width batch IDs are a realization limit, not a reason to shrink the rule family.
 - Current fixed `shape`, boundary, dense arrays, canonical coordinates, and rasters are finite computation/trace realizations. They do not replace native square-grid support, the chosen exterior/background law, or the complete mathematical configuration.
+
+## Provisional Axis Classification
+
+| Concern | Fit | Smallest reusable base | T22-specific obligation |
+|---|---|---|---|
+| DOMAIN | DIRECT | D127 discrete `t+2D` | none; Moore is not another dimensional space |
+| CONFIGURATION/support | DIRECT / PARAMETERIZATION | fixed square `Z^2` lattice plus explicit realization relation | preserve square topology, total support/background, and any finite quotient/exterior separately |
+| ALPHABET | DIRECT | T02 finite typed alphabet; strict profile is `Bit` | retain label rank, numeric valuation, and palette as different roles |
+| FRONTIER | DIRECT | `AllSites` | one firing occurrence per semantic site; finite enumeration is only a realization |
+| NEIGHBORHOOD | PARAMETERIZATION | D127 explicit composed local access | exactly one declared Self and eight unique Moore offsets in source order |
+| RULE input/representation | PARAMETERIZATION / LOSSLESS REPRESENTATION | T02 complete ordered table plus D115-D118 factor maps | keep 512-context, 18-case outer-totalistic, ten-case totalistic, and nine-free-bit growth restrictions schema-tagged |
+| RULE result | DIRECT | one complete same-site label assignment | no raster, shape, or behavior result |
+| UPDATE | DIRECT | D004/D117/D127 old-snapshot parallel same-site commit | preserve complete source coverage and fixed topology; no T22 update law |
+| seed/run/observers | DIRECT / PARAMETERIZATION | D121 configurations, constructors, laws, realizations, traces, and observers | keep row/point/random seeds, horizon, boundary, growth stop, outlines, and slices outside program identity |
+| outcome | DIRECT | deterministic `StepResult[Configuration]` | an unchanged successor remains an event result, not an inferred halt |
+
+The expected final classification is class 3 only because ordered-coordinate and compact-table representations require explicit isomorphisms. Execution itself is direct reuse. This remains provisional until the three evidence oracles and hostile review close.
+
+## Ordered-Position and Basis Obligations
+
+The Book's raw array-frame order for the complete radius-one square is
+
+```text
+BookNine =
+  ((-1,-1), (-1,0), (-1,1),
+   ( 0,-1), ( 0,0), ( 0,1),
+   ( 1,-1), ( 1,0), ( 1,1))
+```
+
+Under the declared basis map `(row,column) -> (x=column,y=-row)`, preserving that sequence and sorting the resulting ENU offsets are different operations. A direct derivation gives the candidate permutations
+
+```text
+runtime_to_book = (6,3,0,7,4,1,8,5,2)
+book_to_runtime = (2,5,8,1,4,7,0,3,6)
+```
+
+The semantic oracle must derive rather than assume them, prove that they are inverses, permute all 512 positional rows, and exhibit an asymmetric counterexample where re-sorting offsets while retaining the Book table changes the program. Count and sum tables are invariant under these position permutations and therefore cannot establish orientation.
+
+The complete positional address uses the first `BookNine` value as the most-significant binary digit and the last as the least-significant digit. Small periodic quotients may resolve several offsets to the same physical cell; those remain distinct access occurrences and retain their multiplicity. Deduplicating resolved coordinates would change the nine-input program and its count semantics.
+
+## Candidate Strict RULE Schemas
+
+```text
+GeneralNineRule:
+    cases = Bit^9 in BookNine order
+    table = CompleteMap(cases, Bit)
+    rule_count = 2^512
+
+OuterMooreRule:
+    cases = SelfValue x MooreCount[0..8]
+    table = CompleteMap(cases, Bit)
+    index = 2*MooreCount + SelfValue
+    rule_count = 2^18
+
+ValuedOuterMooreRule[k]:
+    valuation = Alphabet <-> {0,...,k-1}
+    cases = SelfValue x NeighborValueSum[0..8*(k-1)]
+    index = SelfValue + k*NeighborValueSum
+    case_count = k*(8*(k-1)+1)
+    rule_count = k^(k*(8*(k-1)+1))
+
+TotalisticNineRule:
+    cases = SelfPlusMooreSum[0..9]
+    table = CompleteMap(cases, Bit)
+    index = SelfPlusMooreSum
+    rule_count = 2^10
+
+GrowthMooreRule:
+    base = OuterMooreRule
+    invariant = table(SelfValue=1, count) == 1 for every count
+    free cases = table(SelfValue=0, count), count in 0..8
+    rule_count = 2^9
+```
+
+An outer-totalistic table expands to a general table only when every positional context with equal `(self,neighbor_count)` has the same result. A totalistic table requires the stronger equal-total-sum fiber condition. Factoring must reject a single disagreeing row, retain the source schema and code identity, and round-trip exactly on its qualifying image.
 
 ## Audit Questions
 
