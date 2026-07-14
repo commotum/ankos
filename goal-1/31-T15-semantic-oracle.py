@@ -49,6 +49,8 @@ class Alphabet:
 
 
 BINARY = Alphabet((0, 1))
+TERNARY = Alphabet((0, 1, 2))
+QUATERNARY = Alphabet((0, 1, 2, 3))
 
 
 def checked_word(values: Iterable[Symbol], alphabet: Alphabet) -> Word:
@@ -63,6 +65,10 @@ def checked_nonempty_word(values: Iterable[Symbol], alphabet: Alphabet) -> Word:
     if not word:
         raise ValueError("strict rule result must be in Sigma+")
     return word
+
+
+def digit_words(rows: tuple[str, ...]) -> tuple[Word, ...]:
+    return tuple(tuple(int(character) for character in row) for row in rows)
 
 
 def pair_contexts(alphabet: Alphabet) -> tuple[Pair, ...]:
@@ -459,7 +465,8 @@ def native_pair_trace(
     return tuple(rows)
 
 
-# Hash-bound page-101 rule/seed independently decoded by the asset audit.
+# Hash-bound page-101 rule/seed independently decoded by the asset audit
+# (SHA-256 9390efdb915dfdf78e870f85b0f2964791a00714f8619525e256098b98919c4e).
 # Color mapping is light=0, dark=1; glyph order is 11,10,01,00.  This is the
 # direct evidence that permits this oracle to model the contextual pair
 # schedule rather than merely hypothesize it from the preceding T14 section.
@@ -470,20 +477,249 @@ PAGE_101_RULE: PairTable = {
     (0, 0): (),
 }
 PAGE_101_SEED: Word = (0, 1, 1, 0)
-PAGE_101_EXPECTED_TRACE: tuple[Word, ...] = (
-    (0, 1, 1, 0),
-    (1, 0, 1, 1, 0),
-    (0, 1, 0, 1, 1, 0),
-    (1, 0, 0, 1, 0, 1, 1, 0),
+PAGE_101_EXPECTED_TRACE: tuple[Word, ...] = digit_words(
+    (
+        "0110",
+        "10110",
+        "010110",
+        "10010110",
+        "010010110",
+        "10010010110",
+        "010010010110",
+        "10010010010110",
+        "010010010010110",
+        "10010010010010110",
+        "010010010010010110",
+        "10010010010010010110",
+    )
 )
 
 
-# Filled only with independently trace-checked page-102 plates.  The separate
-# asset oracle owns raster identity/provenance; this semantic oracle owns the
-# transition reconstruction once those visual facts are closed.
+# Independently decoded page-102 plates.  The separate asset oracle owns the
+# raster identity/provenance (rule strip SHA-256
+# 77c261cf4c9b83d08aead4601916dbc6ac96f371b00a30549c96586295d18585;
+# evolution SHA-256
+# cc6b3fdffceecf66543d9f6dbfc1628913eec7356e11e5716473a112b5b728a4).
+# These hardcoded expected strings were sampled directly from the plate and
+# are not generated from the tables below.
+PAGE_102_RULE_A: PairTable = {
+    (2, 2): (0,),
+    (2, 1): (0,),
+    (2, 0): (2,),
+    (1, 2): (0, 0),
+    (1, 1): (0, 1),
+    (1, 0): (1, 1),
+    (0, 2): (2,),
+    (0, 1): (2,),
+    (0, 0): (0,),
+}
+PAGE_102_RULE_B: PairTable = {
+    (2, 2): (2,),
+    (2, 1): (0, 1),
+    (2, 0): (0,),
+    (1, 2): (),
+    (1, 1): (),
+    (1, 0): (2,),
+    (0, 2): (0,),
+    (0, 1): (0, 1),
+    (0, 0): (2,),
+}
+PAGE_102_RULE_C: PairTable = {
+    (2, 2): (1,),
+    (2, 1): (),
+    (2, 0): (0, 1),
+    (1, 2): (2, 1),
+    (1, 1): (0, 2),
+    (1, 0): (2, 2),
+    (0, 2): (),
+    (0, 1): (1, 2),
+    (0, 0): (0,),
+}
+PAGE_102_RULE_D: PairTable = {
+    (2, 2): (2, 0),
+    (2, 1): (1, 1),
+    (2, 0): (2, 0),
+    (1, 2): (2,),
+    (1, 1): (1,),
+    (1, 0): (),
+    (0, 2): (0,),
+    (0, 1): (0,),
+    (0, 0): (2, 1),
+}
+PAGE_102_RULE_E: PairTable = {
+    (3, 3): (1, 2),
+    (3, 2): (2, 3),
+    (3, 1): (0,),
+    (3, 0): (1, 0),
+    (2, 3): (),
+    (2, 2): (2,),
+    (2, 1): (1, 3),
+    (2, 0): (),
+    (1, 3): (2, 0),
+    (1, 2): (),
+    (1, 1): (1,),
+    (1, 0): (3, 0),
+    (0, 3): (),
+    (0, 2): (2, 0),
+    (0, 1): (3, 3),
+    (0, 0): (2, 2),
+}
+PAGE_102_RULE_F: PairTable = {
+    (3, 3): (1, 3),
+    (3, 2): (0, 3),
+    (3, 1): (2,),
+    (3, 0): (),
+    (2, 3): (0, 2),
+    (2, 2): (),
+    (2, 1): (0, 1),
+    (2, 0): (3,),
+    (1, 3): (0, 3),
+    (1, 2): (0,),
+    (1, 1): (2, 1),
+    (1, 0): (2, 2),
+    (0, 3): (),
+    (0, 2): (3,),
+    (0, 1): (1, 0),
+    (0, 0): (1, 3),
+}
+
+
 PAGE_102_FIXTURES: tuple[
     tuple[str, Alphabet, PairTable, Word, tuple[Word, ...]], ...
-] = ()
+] = (
+    (
+        "a",
+        TERNARY,
+        PAGE_102_RULE_A,
+        (0, 1, 1, 0),
+        digit_words(
+            (
+                "0110",
+                "20111",
+                "220101",
+                "022112",
+                "2000100",
+                "2002110",
+                "20200111",
+                "222020101",
+                "002222112",
+                "0200000100",
+                "2200002110",
+                "02000200111",
+            )
+        ),
+    ),
+    (
+        "b",
+        TERNARY,
+        PAGE_102_RULE_B,
+        (0, 1, 2, 1),
+        digit_words(
+            (
+                "0121",
+                "0101",
+                "01201",
+                "01001",
+                "012201",
+                "012001",
+                "010201",
+                "0120001",
+                "0102201",
+                "01202001",
+                "01000201",
+                "012220001",
+            )
+        ),
+    ),
+    (
+        "c",
+        TERNARY,
+        PAGE_102_RULE_C,
+        (0, 1, 1, 0),
+        digit_words(
+            (
+                "0110",
+                "120222",
+                "210111",
+                "22120202",
+                "1210101",
+                "2122122212",
+                "211211121",
+                "0221020221",
+                "122011",
+                "211011202",
+                "022212022101",
+                "11210112212",
+            )
+        ),
+    ),
+    (
+        "d",
+        TERNARY,
+        PAGE_102_RULE_D,
+        (0, 1, 2, 0),
+        digit_words(
+            (
+                "0120",
+                "0220",
+                "02020",
+                "020020",
+                "02021020",
+                "020011020",
+                "0202101020",
+                "0200110020",
+                "020210121020",
+                "0200110211020",
+                "02021010111020",
+                "0200110011020",
+            )
+        ),
+    ),
+    (
+        "e",
+        QUATERNARY,
+        PAGE_102_RULE_E,
+        (0, 1, 0, 0),
+        digit_words(
+            (
+                "0100",
+                "333022",
+                "121210202",
+                "1313302020",
+                "2002012102020",
+                "22203313302020",
+                "221202012102020",
+                "213203313302020",
+                "1320231202012102020",
+                "2023200203313302020",
+                "202322201202012102020",
+                "20232233203313302020",
+            )
+        ),
+    ),
+    (
+        "f",
+        QUATERNARY,
+        PAGE_102_RULE_F,
+        (0, 1, 0, 0),
+        digit_words(
+            (
+                "0100",
+                "102213",
+                "2230103",
+                "021022",
+                "301223",
+                "10002",
+                "2213133",
+                "010320313",
+                "1022033203",
+                "223313033",
+                "021320313",
+                "30103033203",
+            )
+        ),
+    ),
+)
 
 
 @dataclass(frozen=True)
@@ -532,17 +768,32 @@ def expect_value_error(action, message: str) -> None:
 
 def assert_raster_fixtures() -> None:
     assert validate_t15_pair_rows(PAGE_101_RULE.items(), BINARY) == PAGE_101_RULE
-    assert native_pair_trace(PAGE_101_RULE, PAGE_101_SEED, 3, BINARY) == (
-        PAGE_101_EXPECTED_TRACE
-    )
+    assert native_pair_trace(
+        PAGE_101_RULE, PAGE_101_SEED, len(PAGE_101_EXPECTED_TRACE) - 1, BINARY
+    ) == PAGE_101_EXPECTED_TRACE
     generic_rows = [encode_native(PAGE_101_SEED, BINARY)]
-    for _ in range(3):
+    for _ in range(len(PAGE_101_EXPECTED_TRACE) - 1):
         generic_rows.append(t15_step(PAGE_101_RULE, generic_rows[-1]).event.successor)
     assert tuple(row.values for row in generic_rows) == PAGE_101_EXPECTED_TRACE
 
+    assert tuple(fixture[0] for fixture in PAGE_102_FIXTURES) == (
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+    )
+    assert tuple(
+        sum(not output for output in fixture[2].values())
+        for fixture in PAGE_102_FIXTURES
+    ) == (0, 2, 2, 1, 4, 3)
     for name, alphabet, table, seed, expected_trace in PAGE_102_FIXTURES:
         assert name in {"a", "b", "c", "d", "e", "f"}
         assert validate_t15_pair_rows(table.items(), alphabet) == table
+        assert len(table) == len(alphabet.symbols) ** 2
+        assert len(expected_trace) == 12
+        assert expected_trace[0] == seed
         assert native_pair_trace(
             table, seed, len(expected_trace) - 1, alphabet
         ) == expected_trace
@@ -759,6 +1010,7 @@ def assert_exhaustive_pair_commutation(
         "explicit_epsilon_cases": 0,
         "explicit_epsilon_records": 0,
         "empty_successor_cases": 0,
+        "active_extinction_cases": 0,
     }
     for outputs in product(output_words, repeat=len(contexts)):
         table = dict(zip(contexts, outputs, strict=True))
@@ -806,6 +1058,8 @@ def assert_exhaustive_pair_commutation(
                 counters["explicit_epsilon_records"] += epsilon_records
             if not native_next:
                 counters["empty_successor_cases"] += 1
+                if len(word) >= 2:
+                    counters["active_extinction_cases"] += 1
 
             if not has_epsilon_row:
                 # ``table`` has already passed the strict public validator;
@@ -818,6 +1072,10 @@ def assert_exhaustive_pair_commutation(
     assert counters["strict_t14_tables"] == 1_296
     assert counters["strict_t14_cases"] == 164_592
     assert counters["zero_source_cases"] == 7_203
+    assert counters["explicit_epsilon_cases"] == 102_388
+    assert counters["explicit_epsilon_records"] == 176_988
+    assert counters["empty_successor_cases"] == 12_979
+    assert counters["active_extinction_cases"] == 5_776
     return counters
 
 
@@ -879,7 +1137,8 @@ def main() -> None:
         f"explicit_epsilon_cases={pair_counts['explicit_epsilon_cases']}; "
         f"explicit_epsilon_records={pair_counts['explicit_epsilon_records']}; "
         f"empty_successor_cases={pair_counts['empty_successor_cases']}; "
-        "page101_t0_t3=PASS; page102_fixtures="
+        f"active_extinction_cases={pair_counts['active_extinction_cases']}; "
+        "page101_t0_t11=PASS; page102_fixtures="
         f"{len(PAGE_102_FIXTURES)}; shared_ordered_UPDATE=PASS; "
         "epsilon_record_no_fake_children=PASS; newborn_deferral=PASS; "
         "rightmost_drop=PASS; snapshot_handle_scope=PASS; "
