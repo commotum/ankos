@@ -56,7 +56,9 @@ Heads, active markers, instruction pointers, cyclic counters, and any memory req
 
 The alphabet defines possible values. It does not by itself define where values exist, how locations relate, or what control state is active.
 
-## 6. Keep Addresses Separate From Topology
+## 6. Keep Domain, Addresses, and Topology Separate
+
+`DOMAIN` names the task/program's dimensional space—`t+0D`, `t+1D`, `t+2D`, and so on—with discrete or continuous character explicit. CONFIGURATION owns the support/topology that inhabits that space. Alphabets, value sets, parameter sets, and serialization addresses are not DOMAINs.
 
 The program core does not privilege a serialization address. Sequence order, graph adjacency, tree structure, and higher-dimensional geometry must remain explicit in state or metadata rather than being inferred accidentally from integer proximity.
 

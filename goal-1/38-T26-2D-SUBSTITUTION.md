@@ -558,7 +558,7 @@ T28 will compose contextual reads and its own boundary evidence with the ranked 
 | Silent `runpy.run_path(..., run_name='audit_import')` for all three | PASS; exit 0 and no output. |
 | Explicit in-memory compilation of all three oracles | PASS. |
 | `uv run pytest -q` | PASS; 102 tests in 1.29 seconds. |
-| `git diff --check` and Markdown/scope checks | Run after this file is written; results recorded below. |
+| `git diff --check` and Markdown/scope checks | PASS; no whitespace errors, Markdown fences are balanced, and this task changed only this stage file. |
 
 ## Stage Results
 
