@@ -150,7 +150,7 @@ RELATION_EVIDENCE = line_set(
     "17313,17315,17317,17319,17329,17350,17352,17354,17356,17611,20738"
 )
 CONTROL_EVIDENCE = line_set(
-    "1370,1439,1523,1529,1555,1565,1567,12054,12505,12623,12631,12633,"
+    "1370,1439,1523,1529,1555,1565,1567,12054,12503,12505,12623,12631,12633,"
     "12660,12662,12664,12666,12668,12670,12672,12674,12676,12678,"
     "12680,12682,12684,12686,12688,12692,12767,12974,16072"
 )
@@ -307,6 +307,185 @@ SOURCE_MODEL_RECORDS = (
 )
 
 
+# Source semantics are frozen as data, not scattered mutable literals in the
+# checks below.  Every record declares a semantic class, one exact BOOK line,
+# required positive substrings, and forbidden substrings.  A weakened needle
+# can therefore fail even when it happens to keep returning the same line.
+SOURCE_SEMANTIC_GUARDS = (
+    ("strict_main", 1497, ("systems that involve only whole numbers",), ()),
+    (
+        "strict_main",
+        1545,
+        (
+            "write its base 2 digits in reverse order",
+            "add the resulting number to the original one",
+            "starts with the number 16",
+            "After 180 steps",
+        ),
+        (),
+    ),
+    (
+        "strict_main",
+        1549,
+        (
+            "starting with the number 512",
+            "never seems to take on any kind of simple repetitive form",
+        ),
+        (),
+    ),
+    (
+        "strict_main",
+        1553,
+        ("starting at the millionth step", "extends about 700 times the width"),
+        (),
+    ),
+    ("notes_profiles", 12635, ("Page 125 · Reversal-addition systems",), ()),
+    (
+        "notes_profiles",
+        12637,
+        ("From Digits[Reverse[Integer Digits[n, 2]], 2]",),
+        ("FromDigits[Reverse[IntegerDigits[n, 2]], 2]",),
+    ),
+    (
+        "notes_profiles",
+        12639,
+        (
+            "generalized palindrome",
+            "at least one digit every two steps",
+            "effective period of 4 steps",
+            "n = 512",
+            "at least a million steps",
+            "568418 base 2 digits",
+        ),
+        (),
+    ),
+    (
+        "notes_profiles",
+        12643,
+        (
+            "fixed length, dropping any carries on the left",
+            "one new digit on the left at every step, even when it is 0",
+        ),
+        (),
+    ),
+    (
+        "notes_profiles",
+        12645,
+        ("often in base 10", "at least as long ago as 1939"),
+        (),
+    ),
+    (
+        "codec_carrier",
+        12503,
+        (
+            "A whole number n can be converted to a sequence of digits in base k",
+            "Integer Digits[n, k]",
+        ),
+        ("IntegerDigits[n, k]",),
+    ),
+    (
+        "codec_carrier",
+        12974,
+        ("whole numbers n (except 0 and 1 respectively)",),
+        (),
+    ),
+    ("algorithm_relations", 12646, ("Digit reversal. Sequences of the form",), ()),
+    ("algorithm_relations", 12648, ("Table[FromDigits[",), ()),
+    (
+        "algorithm_relations",
+        12650,
+        ("Reverse[IntegerDigits[n, k, m]], k]",),
+        (),
+    ),
+    (
+        "algorithm_relations",
+        12652,
+        (
+            "fast Fourier transform",
+            "quasi-Monte Carlo schemes",
+            "Johannes van der Corput in 1935",
+        ),
+        (),
+    ),
+    ("algorithm_relations", 17350, ("BitReverseOrder",), ()),
+    ("algorithm_relations", 17354, ("fast Fourier transform",), ()),
+    ("algorithm_relations", 17356, ("BitReverseOrder[data]",), ()),
+    (
+        "algorithm_relations",
+        17611,
+        ("digit reversal (see page 905) sequences",),
+        (),
+    ),
+    (
+        "algorithm_relations",
+        20738,
+        ("quasi-Monte Carlo methods based on simple sequences",),
+        (),
+    ),
+    (
+        "neighbor_boundaries",
+        1533,
+        ("systems based on numbers there is usually no such locality",),
+        (),
+    ),
+    (
+        "neighbor_boundaries",
+        1535,
+        ("carry", "propagate arbitrarily far"),
+        (),
+    ),
+    ("neighbor_boundaries", 1539, ("details of underlying rules",), ()),
+    ("neighbor_boundaries", 1555, ("Recursive Sequences",), ()),
+    ("neighbor_boundaries", 1565, ("_page_143_Figure_6.jpeg",), ()),
+    (
+        "neighbor_boundaries",
+        12054,
+        ("reverse of the base 2 digit sequences of successive numbers",),
+        (),
+    ),
+    (
+        "neighbor_boundaries",
+        16072,
+        ("Page 905 gives another example of a reversible system based on numbers",),
+        (),
+    ),
+    ("neighbor_boundaries", 12660, ("Iterated run-length encoding",), ()),
+    ("neighbor_boundaries", 12668, ("Digit count sequences",), ()),
+    ("neighbor_boundaries", 12676, ("Iterated bitwise operations",), ()),
+    (
+        "source_defects",
+        17313,
+        ("dvadic or Palev order",),
+        ("dyadic or Paley order",),
+    ),
+    (
+        "source_defects",
+        17315,
+        ("RitReverseOrder[a 1",),
+        ("BitReverseOrder[a_]",),
+    ),
+    (
+        "source_defects",
+        21525,
+        ("Monte Carlo methods", "MoebiusMu", "and digit reversal, 905"),
+        (),
+    ),
+    (
+        "source_defects",
+        22434,
+        ("Will Wozniakowski (digit reversal) sequences, 905",),
+        (),
+    ),
+)
+
+AUXILIARY_SEMANTIC_GUARDS = (
+    ("catalog", 37, ("Digit-Reversal Arithmetic Systems,",), ()),
+    ("taxonomy", 995, ("## 36. Digit-Reversal Arithmetic Systems",), ()),
+    ("taxonomy", 999, ("State is a single integer",), ()),
+    ("taxonomy", 1001, ("digit sequence is transformed",), ()),
+)
+
+
 # Filled with immutable observed counts and digests below.  These values bind
 # the result sets rather than merely asserting that searches returned something.
 EXPECTED_QUERY = {
@@ -341,11 +520,11 @@ EXPECTED_SET = {
     "index_excluded": (14, "ac87631a755acf79e4dc36898d557e2b45ff6aa999110f1112abd02fe0add1e7"),
     "native": (19, "5593d970e131366ac30082624db558c22281ca5496a81231b8a48cfbc3f098d4"),
     "relation": (19, "42d36affd4f4ff85aee6c153275d85194c5adc36875809c783dabef73dc3263d"),
-    "control": (31, "66a38d42da73ca47a4653d6601a47d2fbd441ec5fd9e3e37cca7062cc46d19dc"),
-    "retained": (69, "6f4773921f9d6b5d03a8789eeee108cffaa5695d0a91749af3b02bab265e55cd"),
+    "control": (32, "87763a6ac2919d08903708d79f16a2fe49d5a72bcfc137e87375dc5a27379960"),
+    "retained": (70, "2ea2acb9c3517d53b16ee11482d0e5913a84ca6483d0a8e32120bdbc144de620"),
     "excluded": (48, "41c681e4b91c82c9c5fe96848ced1c37530dc206a5f837834c18733ec3380d1c"),
     "retained_query_hits": (54, "3b17eed0e1c86ad14ddf920d605b3e8c0d1b91f4ad87afcd03cef953b400d2f0"),
-    "governed_continuations": (15, "1098aafe3b465503abce7dd46309859d8e252f5640473b90c69d860ee783c375"),
+    "governed_continuations": (16, "d12d57ab11cedf5c333b9a7507e06e3340e3bc062dfb5f70fe93659ec1ba5737"),
 }
 EXPECTED_EXCLUDED_CLASS = {
     "unrelated_positional_code": (9, "d106124c1b13b5b406900cc41cb6a9f51be8cb8c837d9dbc600b9f34b7ac57eb"),
@@ -410,6 +589,14 @@ EXPECTED_SOURCE_MODEL = (
     40,
     "c30f90d60537af4fcbf406f2f32b524c427250be4022d3d46f89b82c022093ff",
 )
+EXPECTED_SOURCE_SEMANTIC_GUARDS = (
+    34,
+    "f5b58083de869288e3a82af8710ba30195ae43c59efba1c9709b4b7dc1f21267",
+)
+EXPECTED_AUXILIARY_SEMANTIC_GUARDS = (
+    4,
+    "cba901a0a2f0fec9137533668fc30825b30c7dc477cac732ba227f50ce6974c8",
+)
 
 
 # The split corpus is independently hash-bound before any provenance join.
@@ -417,8 +604,8 @@ EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 EXPECTED_SPLIT_CROSSWALK = (
-    95,
-    "aa2664591fbccfa0256564de2c3d49a9eeffb947fe439891ff7263886dbb1677",
+    96,
+    "74f06b4ea61c34ad0fb8207acc96dbd01c0d94da9b41c65047653502ab450139",
 )
 EXPECTED_SPLIT_CLASSES = {
     "EXACT": (
@@ -437,15 +624,15 @@ EXPECTED_SPLIT_CLASSES = {
         "2880d34f8c894d078a4391182ce146b610fca85e006b297aa5d554b8ab1c3a9f",
     ),
     "STRUCTURAL_REPAIR": (
-        4,
-        "9817851ec26b218860d3f7420fac84780a6f98e88e4932b3589b117e8e5dc98f",
-        "5c686c3bf0635734f8748c07b40991becaa7b5e83b0552a8c59f8429abd78e0e",
+        5,
+        "57acb3713868437bbda7d9c5a62f7adf53de0981fb4999a73ed45da9547823ef",
+        "daac1c31a9feca86cb307b01f0190d8697a2d51246cd7edddf6010298fec0155",
     ),
 }
 EXPECTED_SPLIT_NORMALIZED_MINIMUM = 0.996587
 EXPECTED_SPLIT_REPAIR_WITNESSES = (
-    4,
-    "9ce86aadac14ff9379659295cd450ad0bcdf896de4af875b8ee55219b5ec8b0d",
+    5,
+    "ba0e08864c3e2859c8f07f02711f5444bc324146ffa77e6037fe9cedf0d2b9a4",
 )
 
 
@@ -463,6 +650,11 @@ EXPECTED_TRACE_512 = (
 # as provenance.  Each pair is structurally located first, then guarded by the
 # damaged monolith fragment and the independently repaired split fragment.
 SPLIT_STRUCTURAL_REPAIRS = {
+    12503: (
+        "BACK-MATTER/Index/Index.md:406",
+        "Integer Digits[n, k]",
+        "IntegerDigits[n, k]",
+    ),
     12637: (
         "BACK-MATTER/Index/Index.md:540",
         "From Digits[Reverse[Integer Digits",
@@ -547,7 +739,7 @@ def split_owner_record(line_no: int) -> str:
             "CHAPTERS/12-The-Principle-of-Computational-Equivalence/"
             "The-Principle-of-Computational-Equivalence.md:3435"
         )
-    if 12505 <= line_no <= 12974:
+    if 12503 <= line_no <= 12974:
         candidates.append(f"BACK-MATTER/Index/Index.md:{line_no - 12097}")
     if line_no == 16072:
         candidates.append("BACK-MATTER/Index/Index.md:3973")
@@ -640,6 +832,48 @@ def main() -> int:
     )
     ok = source_ok
     print("source", "OK" if source_ok else "MISMATCH")
+
+    semantic_guard_records = {
+        f"{class_name}:{line_no}:{'|'.join(positive)}!{'|'.join(negative)}"
+        for class_name, line_no, positive, negative in SOURCE_SEMANTIC_GUARDS
+    }
+    semantic_guards_actual = (
+        len(semantic_guard_records),
+        digest_records(semantic_guard_records),
+    )
+    semantic_guard_class_checks: dict[str, list[bool]] = {}
+    for class_name, line_no, positive, negative in SOURCE_SEMANTIC_GUARDS:
+        record_ok = (
+            bool(class_name)
+            and 1 <= line_no <= len(lines)
+            and bool(positive)
+            and all(positive)
+            and all(needle in at(line_no) for needle in positive)
+            and all(negative)
+            and all(needle not in at(line_no) for needle in negative)
+        )
+        semantic_guard_class_checks.setdefault(class_name, []).append(record_ok)
+    semantic_guard_class_ok = {
+        class_name: all(checks)
+        for class_name, checks in semantic_guard_class_checks.items()
+    }
+    semantic_guards_ok = (
+        len(semantic_guard_records) == len(SOURCE_SEMANTIC_GUARDS)
+        and semantic_guards_actual == EXPECTED_SOURCE_SEMANTIC_GUARDS
+        and all(semantic_guard_class_ok.values())
+    )
+    ok &= semantic_guards_ok
+    print(
+        "source_semantic_guard_contract",
+        "OK" if semantic_guards_ok else "MISMATCH",
+        *semantic_guards_actual,
+    )
+    for class_name in sorted(semantic_guard_class_ok):
+        print(
+            "source_semantic_guard_" + class_name,
+            "OK" if semantic_guard_class_ok[class_name] else "MISMATCH",
+            len(semantic_guard_class_checks[class_name]),
+        )
 
     hits: dict[str, set[int]] = {}
     query_pattern_records = {f"{name}:{pattern}" for name, pattern in QUERIES.items()}
@@ -943,41 +1177,24 @@ def main() -> int:
 
     # Primary formula, empirical qualifications, and explicit profile variants.
     main_ok = (
-        "systems that involve only whole numbers" in at(1497)
-        and "write its base 2 digits in reverse order" in at(1545)
-        and "add the resulting number to the original one" in at(1545)
-        and "starts with the number 16" in at(1545)
-        and "After 180 steps" in at(1545)
-        and "starting with the number 512" in at(1549)
-        and "never seems to take on any kind of simple repetitive form" in at(1549)
-        and "starting at the millionth step" in at(1553)
-        and "extends about 700 times the width" in at(1553)
+        semantic_guards_ok
+        and semantic_guard_class_ok.get("strict_main", False)
         and trace(16, 16) == EXPECTED_TRACE_16
         and trace(512, 16) == EXPECTED_TRACE_512
     )
     ok &= main_ok
     print("source_strict_base2_reversal_add_rule_and_seeds", "OK" if main_ok else "MISMATCH")
 
-    notes_formula_ok = (
-        "Page 125 · Reversal-addition systems" in at(12635)
-        and "From Digits[Reverse[Integer Digits[n, 2]], 2]" in at(12637)
-        and "FromDigits[Reverse[IntegerDigits[n, 2]], 2]" not in at(12637)
-        and "generalized palindrome" in at(12639)
-        and "at least one digit every two steps" in at(12639)
-        and "effective period of 4 steps" in at(12639)
-        and "n = 512" in at(12639)
-        and "at least a million steps" in at(12639)
-        and "568418 base 2 digits" in at(12639)
-        and "fixed length, dropping any carries on the left" in at(12643)
-        and "one new digit on the left at every step, even when it is 0" in at(12643)
-        and "often in base 10" in at(12645)
-        and "at least as long ago as 1939" in at(12645)
+    notes_formula_ok = semantic_guards_ok and semantic_guard_class_ok.get(
+        "notes_profiles", False
     )
     ok &= notes_formula_ok
     print("source_notes_formula_profiles_and_qualified_observations", "OK" if notes_formula_ok else "MISMATCH")
 
     codec_ok = (
-        encode_digits(0, 2) == (0,)
+        semantic_guards_ok
+        and semantic_guard_class_ok.get("codec_carrier", False)
+        and encode_digits(0, 2) == (0,)
         and encode_digits(2, 2) == (1, 0)
         and decode_digits((0, 1), 2) == 1
         and strict_step(0) == 0
@@ -986,7 +1203,6 @@ def main() -> int:
         and strict_step(12, 10) == 33
         and all(strict_step(n) > n for n in range(1, 4097))
         and all(decode_digits(encode_digits(n, b), b) == n for b in range(2, 17) for n in range(1024))
-        and "whole numbers n (except 0 and 1 respectively)" in at(12974)
     )
     ok &= codec_ok
     print("source_closed_canonical_codec_transform_exact_unbounded", "OK" if codec_ok else "MISMATCH")
@@ -1001,47 +1217,20 @@ def main() -> int:
     ok &= profile_ok
     print("source_width_profiles_visible_and_information_loss_counterexample", "OK" if profile_ok else "MISMATCH")
 
-    relation_ok = (
-        "Digit reversal. Sequences of the form" in at(12646)
-        and "Table[FromDigits[" in at(12648)
-        and "Reverse[IntegerDigits[n, k, m]], k]" in at(12650)
-        and "fast Fourier transform" in at(12652)
-        and "quasi-Monte Carlo schemes" in at(12652)
-        and "Johannes van der Corput in 1935" in at(12652)
-        and "BitReverseOrder" in at(17350)
-        and "fast Fourier transform" in at(17354)
-        and "BitReverseOrder[data]" in at(17356)
-        and "digit reversal (see page 905) sequences" in at(17611)
-        and "quasi-Monte Carlo methods based on simple sequences" in at(20738)
+    relation_ok = semantic_guards_ok and semantic_guard_class_ok.get(
+        "algorithm_relations", False
     )
     ok &= relation_ok
     print("source_fixed_width_enumeration_FFT_Walsh_QMC_relations", "OK" if relation_ok else "MISMATCH")
 
-    boundaries_ok = (
-        "systems based on numbers there is usually no such locality" in at(1533)
-        and "carry" in at(1535)
-        and "propagate arbitrarily far" in at(1535)
-        and "details of underlying rules" in at(1539)
-        and "Recursive Sequences" in at(1555)
-        and "_page_143_Figure_6.jpeg" in at(1565)
-        and "reverse of the base 2 digit sequences of successive numbers" in at(12054)
-        and "Page 905 gives another example of a reversible system based on numbers" in at(16072)
-        and "Iterated run-length encoding" in at(12660)
-        and "Digit count sequences" in at(12668)
-        and "Iterated bitwise operations" in at(12676)
+    boundaries_ok = semantic_guards_ok and semantic_guard_class_ok.get(
+        "neighbor_boundaries", False
     )
     ok &= boundaries_ok
     print("source_neighbor_relations_and_T37_boundary_are_controls", "OK" if boundaries_ok else "MISMATCH")
 
-    source_defects_ok = (
-        "dvadic or Palev order" in at(17313)
-        and "RitReverseOrder[a 1" in at(17315)
-        and "dyadic or Paley order" not in at(17313)
-        and "BitReverseOrder[a_]" not in at(17315)
-        and "Monte Carlo methods" in at(21525)
-        and "MoebiusMu" in at(21525)
-        and "and digit reversal, 905" in at(21525)
-        and "Will Wozniakowski (digit reversal) sequences, 905" in at(22434)
+    source_defects_ok = semantic_guards_ok and semantic_guard_class_ok.get(
+        "source_defects", False
     )
     ok &= source_defects_ok
     print("source_OCR_and_flattened_Index_hazards_guarded", "OK" if source_defects_ok else "MISMATCH")
@@ -1184,14 +1373,45 @@ def main() -> int:
         print("split_class_" + name, *actual)
 
     catalog_lines = CATALOG.read_text(encoding="utf-8").splitlines()
-    taxonomy_text = TAXONOMY.read_text(encoding="utf-8")
+    taxonomy_lines = TAXONOMY.read_text(encoding="utf-8").splitlines()
+    auxiliary_sources = {"catalog": catalog_lines, "taxonomy": taxonomy_lines}
+    auxiliary_guard_records = {
+        f"{source_name}:{line_no}:{'|'.join(positive)}!{'|'.join(negative)}"
+        for source_name, line_no, positive, negative in AUXILIARY_SEMANTIC_GUARDS
+    }
+    auxiliary_guards_actual = (
+        len(auxiliary_guard_records),
+        digest_records(auxiliary_guard_records),
+    )
+    auxiliary_guards_ok = (
+        len(auxiliary_guard_records) == len(AUXILIARY_SEMANTIC_GUARDS)
+        and auxiliary_guards_actual == EXPECTED_AUXILIARY_SEMANTIC_GUARDS
+        and all(
+            source_name in auxiliary_sources
+            and 1 <= line_no <= len(auxiliary_sources[source_name])
+            and bool(positive)
+            and all(positive)
+            and all(
+                needle in auxiliary_sources[source_name][line_no - 1]
+                for needle in positive
+            )
+            and all(negative)
+            and all(
+                needle not in auxiliary_sources[source_name][line_no - 1]
+                for needle in negative
+            )
+            for source_name, line_no, positive, negative in AUXILIARY_SEMANTIC_GUARDS
+        )
+    )
+    print(
+        "auxiliary_semantic_guard_contract",
+        "OK" if auxiliary_guards_ok else "MISMATCH",
+        *auxiliary_guards_actual,
+    )
     catalog_ok = (
-        len(catalog_lines) == 46
-        and catalog_lines[36] == "Digit-Reversal Arithmetic Systems,"
+        auxiliary_guards_ok
+        and len(catalog_lines) == 46
         and len(set(catalog_lines[1:])) == 45
-        and "## 36. Digit-Reversal Arithmetic Systems" in taxonomy_text
-        and "State is a single integer" in taxonomy_text
-        and "digit sequence is transformed" in taxonomy_text
         and not hits["Q00"]
     )
     ok &= catalog_ok
