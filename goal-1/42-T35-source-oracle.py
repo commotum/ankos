@@ -263,7 +263,7 @@ RELATION_CONTINUATIONS = line_set(
     "1200,1202,1204,8096,"
     "18628,18630,18634,18637,18641-18644,18646,"
     "18650,18653,18655,18657-18658,18664,"
-    "19439,19443-19444,19446-19448,19450-19451,19453,19455,19457-19458,"
+    "19439,19443-19444,19446-19448,19451,19453,19455,19457-19458,"
     "19462-19465,19468"
 )
 CONTROL_CONTINUATIONS = line_set(
@@ -439,19 +439,19 @@ EXPECTED_QUERY = {
     "Q36": (2, 2, 0, "5597aaeb5815f2bbf49f31584f274c471410a8537812109777126b5a1ac446f2"),
     "Q37": (13, 13, 0, "eb0599b3481bb207128d491751677db7d74176d607eeb10500a1d8b50984c696"),
     "Q38": (16, 9, 7, "4c2295155eb814d20b2cb239b3c05f7bbd529dabc47eeefd8cf996d3234a1849"),
-    "Q39": (1, 0, 1, "TO_BE_FROZEN"),
+    "Q39": (1, 0, 1, "d5b2f984bb5733c30680940aaf707f6cd58a91a8560a9df34272de0561f6d435"),
 }
 
 EXPECTED_SET = {
-    "union": (93, "edeed322c433ae5aa6a5aa496a1bf60dd4b1a4cba06454a65589a3757e1b93c5"),
+    "union": (94, "40b81c785336df789c3ce317fe9c92fc4be0754069790c50324e5c12277713a1"),
     "pre_index_union": (70, "a5ca5ad032a64d7d35bc6c3b84dee4c220b4c26e7a685884dea22381fd5ed6a7"),
-    "index": (23, "382ea160348f5429a8e0c999d0d74a0179c75f536903f6583e716c8f55b7948e"),
+    "index": (24, "d18e13eff7bc43436cadd01fa13dfe4ca2fb6ff7a650fd2b91f1252eb2698cd5"),
     "matched_retained": (63, "abe81df93c1a1006c8e97df9cf4d2c707696b6cf6b4849435062e7e694d8e1cc"),
-    "governed_continuations": (65, "d71d4c46f610feae93defe56b9abb3ac81dfebc2d3428f42fdc9e20a54882f54"),
-    "retained": (128, "014989b13a238d181d8039684eb508e3840df2d7d41cbbca0cff7e2d5b7f252b"),
+    "governed_continuations": (64, "48148cacf2f2518262f71062a660af61bcb837cad1e025b7b3c23ea06cdd7226"),
+    "retained": (127, "cadafc18e0fd96939ba51443d152252363876b16c39ef5fed84293fee5dd6401"),
     "excluded": (7, "d217cebdd1081002deb8a75cd08fd46ab4842822d96a9dc81f04fbf75cb8be61"),
     "native": (46, "90e59083b9fed98bcf868e74b70b721bf25025dd832cc54ac62478b8ab1b8c89"),
-    "relation": (64, "ba05d4cac4e856b8b42ded72b132b3ac9449a25a7f7af5a94ba64b6eec88e044"),
+    "relation": (63, "bb7b813f8c77819c89543b5f506576a5e5670c60cc8435e451dc218945a5857e"),
     "control": (18, "46d2af20cd2dd9e4b9bbab77c5bcfa7083617b55cf9d4ebc820b4e3e8ff105e9"),
     "candidate_images": (24, "310fe3a307edd50f320ff21fde967fe8f403e211b297406ec4118b5f252f8703"),
     "governed_images": (13, "b8f65bdb30c81add390024e294cee779846e8f0ab6efe0492ea27662cd6a0e41"),
@@ -463,13 +463,13 @@ EXPECTED_EXCLUDED_CLASS = {
     "later_T36_caption": (1, "75abf1771c0d9038e45203aa603758410f2418fd29b3fe0c25534009c579bb8e"),
 }
 EXPECTED_INDEX_CLASS = {
-    "core_alias_and_observer_routes": (14, "15c37fcfbfadb59500416e15e3bdc8f49b734e264bda1e6c78a98c63016ed8c1"),
+    "core_alias_and_observer_routes": (15, "54556fc5a7a309b8ab9668bc778df368153063775460cb728faabffb47fc67d9"),
     "arithmetic_and_emulation_routes": (6, "2150118212314c3de41c2c6b6811b35879d4651d01999735891fc1283dfcf6e7"),
     "ordered_fraction_routes": (3, "9a44ad617d7439ee0c7608b0a917e31d962759bb52c235d99cd10f89fffa3322"),
 }
 EXPECTED_INDEX_GUARDS = (
-    23,
-    "bf020508d3063deb0782398e75606fe0eede3e1c856ba86ff5aaef5dd070e376",
+    24,
+    "2d0d85b43107591528edc7eab044721f8f5cada44c3f6bc2438380d0ca604180",
 )
 EXPECTED_IMAGE_PARTITION = {
     "native": (5, "0c03146ee327f67d29869863e7180f135426d5a0d76003d5276678feb1c826b8"),
@@ -493,7 +493,7 @@ EXPECTED_VISUAL_ONLY_BOUNDARY = (
 )
 EXPECTED_SOURCE_MODEL = (
     36,
-    "a9c6a61dbcaf1a959dbaf75ca512414879840ac091bc30d3bbfc7fa640bd1247",
+    "4433f52ca18cd1a2ad37b5055df398de716f83e184bd46ed7820df445a1d4fef",
 )
 
 
@@ -524,36 +524,39 @@ SPLIT_QUERY_WITNESSES = {
     "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:163": 1559,
 }
 
-SPLIT_RETAINED_WITNESSES = {
-    1196: "CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md:513",
-    1493: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:97",
-    1499: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:103",
-    1501: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:105",
-    1503: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:107",
-    1505: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:109",
-    1517: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:121",
-    1519: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:123",
-    1523: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:127",
-    1525: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:129",
-    1543: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:147",
-    1559: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:163",
-    8086: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:379",
-    8098: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:391",
-    8100: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:393",
-    8102: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:395",
-    8104: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:397",
-    8106: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:399",
-    8107: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:400",
-    8108: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:401",
-    8109: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:402",
-    8110: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:403",
-    12611: "BACK-MATTER/Index/Index.md:514",
-    12633: "BACK-MATTER/Index/Index.md:536",
-    12637: "BACK-MATTER/Index/Index.md:540",
-    12641: "BACK-MATTER/Index/Index.md:544",
-    18662: "BACK-MATTER/Colophon/Colophon.md:1219",
-    19441: "BACK-MATTER/Colophon/Colophon.md:1998",
-}
+def retained_owner_record(line_no: int) -> str:
+    """Map a retained monolith line to its unique structural split owner."""
+
+    candidates: list[str] = []
+    if 1196 <= line_no <= 1204:
+        candidates.append(
+            "CHAPTERS/3-The-World-of-Simple-Programs/"
+            f"The-World-of-Simple-Programs.md:{line_no - 683}"
+        )
+    if 1491 <= line_no <= 1561:
+        candidates.append(
+            "CHAPTERS/4-Systems-Based-on-Numbers/"
+            f"Systems-Based-on-Numbers.md:{line_no - 1396}"
+        )
+    if 8086 <= line_no <= 8110:
+        candidates.append(
+            "CHAPTERS/11-The-Notion-of-Computation/"
+            f"The-Notion-of-Computation.md:{line_no - 7707}"
+        )
+    if line_no == 11544:
+        candidates.append(
+            "CHAPTERS/12-The-Principle-of-Computational-Equivalence/"
+            "The-Principle-of-Computational-Equivalence.md:2925"
+        )
+    if 12598 <= line_no <= 12690:
+        candidates.append(f"BACK-MATTER/Index/Index.md:{line_no - 12097}")
+    if line_no == 16072:
+        candidates.append("BACK-MATTER/Index/Index.md:3973")
+    if 18626 <= line_no <= 19933:
+        candidates.append(f"BACK-MATTER/Colophon/Colophon.md:{line_no - 17443}")
+    if len(candidates) != 1:
+        raise ValueError(f"retained line {line_no} has {len(candidates)} split owners")
+    return candidates[0]
 
 
 # Split-corpus values are frozen after the reverse provenance pass below.
@@ -561,12 +564,12 @@ EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 EXPECTED_SPLIT_QUERY = (
-    92,
-    "2bef8550a09a2c32b7cf59aa025b828094efb4d7be024e160b0c214e405b3114",
+    93,
+    "457c9f138e0b58efd275a4ded187457f9e39436d8f907b301adffc9550beca0e",
 )
 EXPECTED_SPLIT_QUERY_EXACT = (
-    74,
-    "940f357b5f6ee2419babbb044ce44f126ec971a5feeba15ba73e75419d01d272",
+    75,
+    "920e4e08b308c5220eb12c4bb0bb6e8ffae04a896c8980dc1b701639dbc7cc2d",
 )
 EXPECTED_SPLIT_QUERY_NONEXACT = (
     18,
@@ -574,24 +577,30 @@ EXPECTED_SPLIT_QUERY_NONEXACT = (
 )
 EXPECTED_SPLIT_QUERY_MAPPING = (
     18,
-    "3bfc618322bcfd96e7ed7f200452d6e238cc566f3d2aa5858988023cdfcc4f15",
+    "5c34cb454f3e69a4a847d737be3ed56325c021964efb8777e7eb31b252418ff4",
 )
-EXPECTED_SPLIT_RETAINED_EXACT = (
-    100,
-    "934cd8c249df0dd47fab8079a9574832ecd8d464b2e6a3f54bbe74c10a8ed008",
+EXPECTED_SPLIT_RETAINED_CROSSWALK = (
+    127,
+    "6e239a562708726d0c301a271a788b29db8d73013909a8f7b42e3d28531429a7",
 )
-EXPECTED_SPLIT_RETAINED_NONEXACT = (
-    28,
-    "0de29e75eebf9f4b859952171c6bc48a2105f9006067ce5a26173e319dd52ee4",
-)
-EXPECTED_SPLIT_RETAINED_MAPPING = (
-    28,
-    "1477e98ae2b38ecf0603f3e55595e99d8bed3d0ca2c9463101bf123364d36000",
-)
-EXPECTED_MONOLITH_ONLY = (
-    0,
-    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-)
+EXPECTED_SPLIT_RETAINED_CLASSES = {
+    "EXACT": (
+        98,
+        "52e701c7aa39a5d2940c5ce0f5ae19f14fe6c70e2e99a9fec16708e767772ce6",
+        "4ee7e68912499561dc46e842e94c3f7e112ab4cbf402dd05dfe80571dc5c5b44",
+    ),
+    "IMAGE_BASENAME": (
+        13,
+        "b8f65bdb30c81add390024e294cee779846e8f0ab6efe0492ea27662cd6a0e41",
+        "693e3f50dfef2409d6a5fd404b618e9fa69884b302bb491fbf50ca70e8448d5f",
+    ),
+    "NORMALIZED": (
+        16,
+        "b47d06dc5c9b7d04f1f685a302bcbd3ed45342e70e869be6e7087ab6e6398c18",
+        "0ef1fa1861438875c0b59abb01a00a7d8140c0ee7cf81aeca0de91d4969f8b82",
+    ),
+}
+EXPECTED_NORMALIZED_MINIMUM = 0.991511
 EXPECTED_ATLAS_HITS = (
     5,
     "bc2d3922561b25c21574253966619ebf550e76c0c42a04c6f4074133ad845c32",
@@ -617,6 +626,10 @@ def normalized_line(line: str) -> str:
     return " ".join(re.findall(r"[a-z0-9]+", text))
 
 
+def compact_line(line: str) -> str:
+    return normalized_line(line).replace(" ", "")
+
+
 def witness_similarity(canonical: str, candidate: str) -> tuple[float, float]:
     """Return symmetric token and ordered-text agreement for one declared pair."""
 
@@ -630,8 +643,26 @@ def witness_similarity(canonical: str, candidate: str) -> tuple[float, float]:
         if denominator
         else 0.0
     )
-    ordered = SequenceMatcher(None, left, right).ratio()
+    ordered = SequenceMatcher(None, left, right, autojunk=False).ratio()
     return dice, ordered
+
+
+def retained_crosswalk_evidence(monolith: str, split: str) -> tuple[str, float]:
+    if monolith == split:
+        return "EXACT", 1.0
+    monolith_image = IMAGE_RE.fullmatch(monolith.strip())
+    split_image = IMAGE_RE.fullmatch(split.strip())
+    if monolith_image and split_image:
+        if Path(monolith_image.group(1)).name == Path(split_image.group(1)).name:
+            return "IMAGE_BASENAME", 1.0
+        return "IMAGE_BASENAME", 0.0
+    score = SequenceMatcher(
+        None,
+        compact_line(monolith),
+        compact_line(split),
+        autojunk=False,
+    ).ratio()
+    return "NORMALIZED", score
 
 
 def main() -> int:
@@ -1177,14 +1208,12 @@ def main() -> int:
     split_records: set[str] = set()
     split_exact: set[str] = set()
     split_nonexact: set[str] = set()
-    split_lines: list[tuple[str, str]] = []
     split_texts: set[str] = set()
     split_record_text: dict[str, str] = {}
     for path, relative in zip(split_paths, relative_paths, strict=True):
         split_file_lines = path.read_text(encoding="utf-8").splitlines()
         for line_no, line in enumerate(split_file_lines, 1):
             record = f"{relative}:{line_no}"
-            split_lines.append((record, normalized_line(line)))
             split_texts.add(line)
             split_record_text[record] = line
             if not any(rx.search(line) for rx in compiled):
