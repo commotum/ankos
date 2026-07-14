@@ -491,3 +491,852 @@ EXPECTED_SPLIT_PATHS_DIGEST = (
 EXPECTED_SPLIT_MANIFEST_DIGEST = (
     "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 )
+
+# Filled from the independently recomputed reverse joins below.  These values
+# bind both exact duplication and normalized one-to-one provenance witnesses.
+EXPECTED_SPLIT_QUERY = (0, "")
+EXPECTED_SPLIT_QUERY_EXACT = (0, "")
+EXPECTED_SPLIT_QUERY_NONEXACT = (0, "")
+EXPECTED_SPLIT_QUERY_MAPPING = (0, "")
+EXPECTED_SPLIT_RETAINED_EXACT = (0, "")
+EXPECTED_SPLIT_RETAINED_NONEXACT = (0, "")
+EXPECTED_SPLIT_RETAINED_MAPPING = (0, "")
+EXPECTED_MONOLITH_ONLY = (0, "")
+EXPECTED_ATLAS_HITS = (0, "")
+
+SOURCE_MODEL_RECORDS = (
+    "category:declarative model-set relation, not transition evolution",
+    "strict-domain:static discrete 2D total field with no time axis",
+    "strict-alphabet:binary ordered symbols 0,1",
+    "strict-footprint:source-derived serialized (N,W,C,E,S) cardinal cross",
+    "strict-clause:exact oriented five-symbol assignment",
+    "strict-allowed:finite set drawn from all 32 assignments",
+    "satisfaction:every translated footprint assignment is allowed",
+    "overlap:translated reads share one underlying field",
+    "symmetry:rotation/reflection/color exchange are catalog quotients only",
+    "code:source-derived 32-bit mask over descending binary assignments",
+    "models:possibly empty and not restricted to periodic witnesses",
+    "periodic:presentation/witness property, not finite boundary policy",
+    "checker:external finite MatchQ verification over overlapping 3x3 windows",
+    "search:external square-spiral/backtracking/query algorithm",
+    "T31-boundary:center-conditioned neighbor counts lose orientation",
+    "T33-boundary:global required occurrence is an additional relation",
+    "extension:larger complete templates and more finite colors are source-backed",
+    "execution:no seed/frontier/write/update/successor/runner branch",
+)
+EXPECTED_SOURCE_MODEL = (0, "")
+
+
+def digest(values: set[int] | frozenset[int]) -> str:
+    payload = ",".join(map(str, sorted(values))).encode("ascii")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def digest_records(records: set[str] | list[str] | tuple[str, ...]) -> str:
+    payload = "\n".join(sorted(records)).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def normalized_line(line: str) -> str:
+    text = unicodedata.normalize("NFKD", line).lower().replace("\\", "")
+    return " ".join(re.findall(r"[a-z0-9]+", text))
+
+
+def best_witness(canonical: str, candidates: list[tuple[str, str]]) -> tuple[str, float]:
+    canonical_tokens = set(normalized_line(canonical).split())
+    scored: list[tuple[float, str]] = []
+    for record, normalized in candidates:
+        candidate_tokens = set(normalized.split())
+        denominator = min(len(canonical_tokens), len(candidate_tokens))
+        score = len(canonical_tokens & candidate_tokens) / denominator if denominator else 0.0
+        scored.append((score, record))
+    score, record = max(scored, key=lambda item: (item[0], item[1]))
+    return record, score
+
+
+def fixed_binary_digits(number: int, width: int) -> tuple[int, ...]:
+    if number < 0 or number >= 1 << width:
+        raise ValueError("number does not fit declared width")
+    return tuple((number >> shift) & 1 for shift in range(width - 1, -1, -1))
+
+
+def proof_template_universe() -> frozenset[tuple[int, ...]]:
+    """All strict assignments, independent of the unrecovered raster order."""
+
+    return frozenset(itertools.product((0, 1), repeat=len(CARDINAL_OFFSETS)))
+
+
+def source_template_catalog() -> tuple[tuple[int, ...], ...]:
+    """BOOK:13513-20 order, independently cross-referenced to page 941."""
+
+    ascending = tuple(itertools.product((0, 1), repeat=len(CARDINAL_OFFSETS)))
+    return tuple(reversed(ascending))
+
+
+def allowed_catalog_positions(number: int) -> frozenset[int]:
+    """One-based positions selected by the source mask, not template values."""
+
+    digits = fixed_binary_digits(number, 32)
+    return frozenset(index for index, digit in enumerate(digits, 1) if digit)
+
+
+def constraint_number_from_positions(positions: frozenset[int]) -> int:
+    if not positions <= frozenset(range(1, 33)):
+        raise ValueError("catalog position is outside 1 through 32")
+    digits = tuple(int(index in positions) for index in range(1, 33))
+    return sum(digit << (31 - index) for index, digit in enumerate(digits))
+
+
+def allowed_from_constraint_number(number: int) -> frozenset[tuple[int, ...]]:
+    catalog = source_template_catalog()
+    return frozenset(catalog[index - 1] for index in allowed_catalog_positions(number))
+
+
+def constraint_number_from_allowed(allowed: frozenset[tuple[int, ...]]) -> int:
+    catalog = source_template_catalog()
+    universe = frozenset(catalog)
+    if not allowed <= universe:
+        raise ValueError("allowed set contains a non-cross assignment")
+    positions = frozenset(
+        index for index, template in enumerate(catalog, 1) if template in allowed
+    )
+    return constraint_number_from_positions(positions)
+
+
+def periodic_cross_read(
+    fundamental: tuple[tuple[int, ...], ...], row: int, column: int
+) -> tuple[int, ...]:
+    """Read the exact infinite periodic field represented by a rectangle."""
+
+    if not fundamental or not all(fundamental):
+        raise ValueError("fundamental rectangle must be nonempty")
+    widths = {len(values) for values in fundamental}
+    if len(widths) != 1:
+        raise ValueError("fundamental rectangle must be rectangular")
+    height, width = len(fundamental), len(fundamental[0])
+    return tuple(
+        fundamental[(row + drow) % height][(column + dcolumn) % width]
+        for drow, dcolumn in CARDINAL_OFFSETS
+    )
+
+
+def periodic_cross_handles(
+    shape: tuple[int, int], row: int, column: int
+) -> tuple[tuple[int, int], ...]:
+    height, width = shape
+    if height <= 0 or width <= 0:
+        raise ValueError("periods must be positive")
+    return tuple(
+        ((row + drow) % height, (column + dcolumn) % width)
+        for drow, dcolumn in CARDINAL_OFFSETS
+    )
+
+
+def periodic_model_satisfies(
+    fundamental: tuple[tuple[int, ...], ...],
+    allowed: frozenset[tuple[int, ...]],
+) -> bool:
+    height, width = len(fundamental), len(fundamental[0])
+    return all(
+        periodic_cross_read(fundamental, row, column) in allowed
+        for row in range(height)
+        for column in range(width)
+    )
+
+
+def project_cross_from_3x3(
+    template: tuple[tuple[object, object, object], ...],
+) -> tuple[object, ...]:
+    if len(template) != 3 or any(len(row) != 3 for row in template):
+        raise ValueError("adapter requires a 3 by 3 source pattern")
+    return (
+        template[0][1],
+        template[1][0],
+        template[1][1],
+        template[1][2],
+        template[2][1],
+    )
+
+
+def neighbor_count_signature(template: tuple[int, ...]) -> tuple[int, int]:
+    north, west, center, east, south = template
+    return center, north + west + east + south
+
+
+def main() -> int:
+    if len(sys.argv) > 2:
+        raise SystemExit("usage: 40-T32-source-oracle.py [BOOK]")
+    book = Path(sys.argv[1]).resolve() if len(sys.argv) == 2 else DEFAULT_BOOK
+    raw = book.read_bytes()
+    lines = raw.decode("utf-8").splitlines()
+    at = lambda line_no: lines[line_no - 1]
+
+    official_raw = OFFICIAL_NOTE_SNAPSHOT.read_bytes()
+    official_text = official_raw.decode("utf-8")
+    decoded_template_matches = re.findall(
+        r"(?m)^Decoded-Template:\n([^\n]+)$", official_text
+    )
+    decoded_allowed_matches = re.findall(
+        r"(?m)^Decoded-Allowed-Pattern:\n([^\n]+)$", official_text
+    )
+    decoded_checker_matches = re.findall(
+        r"(?m)^Decoded-Checker:\n([^\n]+)$", official_text
+    )
+    official_template = (
+        decoded_template_matches[0] if len(decoded_template_matches) == 1 else ""
+    )
+    official_allowed_pattern = (
+        decoded_allowed_matches[0] if len(decoded_allowed_matches) == 1 else ""
+    )
+    official_checker = (
+        decoded_checker_matches[0] if len(decoded_checker_matches) == 1 else ""
+    )
+    official_ok = (
+        hashlib.sha256(official_raw).hexdigest()
+        == EXPECTED_OFFICIAL_NOTE_SNAPSHOT_SHA256
+        and official_text.count(f"Canonical-URL: {OFFICIAL_NOTE_URL}") == 1
+        and official_text.count(
+            f"Fetched-Document-SHA256: {EXPECTED_OFFICIAL_NOTE_DOCUMENT_SHA256}"
+        )
+        == 1
+        and official_text.count(OFFICIAL_RAW_ALLOWED_PATTERN_HTML) == 1
+        and official_text.count(OFFICIAL_RAW_TEMPLATE_HTML) == 1
+        and official_text.count(OFFICIAL_RAW_CHECKER_HTML) == 1
+        and official_template == OFFICIAL_DECODED_TEMPLATE
+        and official_allowed_pattern == OFFICIAL_DECODED_ALLOWED_PATTERN
+        and official_checker == OFFICIAL_DECODED_CHECKER
+        and official_text.count("The alternative bars and four Mathematica Blank underscores are copied exactly.")
+        == 1
+    )
+
+    language_raw = LANGUAGE_SEMANTICS_SNAPSHOT.read_bytes()
+    language_text = language_raw.decode("utf-8")
+    language_ok = (
+        hashlib.sha256(language_raw).hexdigest()
+        == EXPECTED_LANGUAGE_SEMANTICS_SNAPSHOT_SHA256
+        and language_text.count(
+            "Blank-Meta-Description: _ or Blank[] is a pattern object that can stand for any Wolfram Language expression."
+        )
+        == 1
+    )
+    source_ok = (
+        len(lines) == EXPECTED_BOOK_LINES
+        and hashlib.sha256(raw).hexdigest() == EXPECTED_BOOK_SHA256
+        and sha256(ATLAS) == EXPECTED_ATLAS_SHA256
+        and sha256(CATALOG) == EXPECTED_CATALOG_SHA256
+        and sha256(TAXONOMY) == EXPECTED_TAXONOMY_SHA256
+        and official_ok
+        and language_ok
+    )
+    ok = source_ok
+    print("source", "OK" if source_ok else "MISMATCH")
+
+    hits: dict[str, set[int]] = {}
+    for name, pattern in QUERIES.items():
+        found = {
+            line_no
+            for line_no, line in enumerate(lines, 1)
+            if re.search(pattern, line, re.IGNORECASE)
+        }
+        hits[name] = found
+        actual = (
+            len(found),
+            sum(line_no < INDEX_FIRST_LINE for line_no in found),
+            sum(line_no >= INDEX_FIRST_LINE for line_no in found),
+            digest(found),
+        )
+        good = actual == EXPECTED_QUERY[name]
+        ok &= good
+        print(name, "OK" if good else "MISMATCH", *actual)
+
+    union = set().union(*hits.values())
+    pre_index_union = {line_no for line_no in union if line_no < INDEX_FIRST_LINE}
+    index = union - pre_index_union
+    matched_retained = pre_index_union - set(EXCLUDED)
+    governed = set(RETAINED) - union
+    sets = {
+        "union": union,
+        "pre_index_union": pre_index_union,
+        "index": index,
+        "matched_retained": matched_retained,
+        "governed_continuations": governed,
+        "retained": set(RETAINED),
+        "excluded": set(EXCLUDED),
+        "native": set(NATIVE_EVIDENCE),
+        "relation": set(RELATION_EVIDENCE),
+        "control": set(CONTROL_EVIDENCE),
+        "candidate_images": set(CANDIDATE_IMAGE_LINES),
+        "governed_images": set(GOVERNED_IMAGE_LINES),
+        "excluded_images": set(EXCLUDED_IMAGE_LINES),
+    }
+    for name, values in sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_SET[name]
+        ok &= good
+        print(name, "OK" if good else "MISMATCH", *actual)
+
+    excluded_ok = (
+        set().union(*EXCLUDED_CLASS.values()) == set(EXCLUDED)
+        and sum(map(len, EXCLUDED_CLASS.values())) == len(EXCLUDED)
+    )
+    for name, values in EXCLUDED_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_EXCLUDED_CLASS[name]
+        excluded_ok &= good
+        print(f"excluded_{name}", "OK" if good else "MISMATCH", *actual)
+    classification_delta = matched_retained ^ set(MATCHED_RETAINED)
+    excluded_ok &= not classification_delta
+    ok &= excluded_ok
+    print(
+        "unresolved_pre_index",
+        "OK" if excluded_ok else "MISMATCH",
+        len(classification_delta),
+        *sorted(classification_delta),
+    )
+
+    index_ok = (
+        set().union(*INDEX_CLASS.values()) == index
+        and sum(map(len, INDEX_CLASS.values())) == len(index)
+    )
+    for name, values in INDEX_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_INDEX_CLASS[name]
+        index_ok &= good
+        print(f"index_{name}", "OK" if good else "MISMATCH", *actual)
+    guard_records = {
+        f"{class_name}:{line_no}:{'|'.join(needles)}"
+        for class_name, entries in INDEX_ENTRY_GUARDS.items()
+        for line_no, needles in entries.items()
+    }
+    guards_ok = (
+        set(INDEX_ENTRY_GUARDS) == set(INDEX_CLASS)
+        and all(
+            set(INDEX_ENTRY_GUARDS[class_name]) == set(INDEX_CLASS[class_name])
+            for class_name in INDEX_CLASS
+        )
+        and all(
+            all(needle in at(line_no).lower() for needle in needles)
+            for entries in INDEX_ENTRY_GUARDS.values()
+            for line_no, needles in entries.items()
+        )
+        and (len(guard_records), digest_records(guard_records))
+        == EXPECTED_INDEX_GUARDS
+    )
+    continuation_actual = (len(INDEX_CONTINUATIONS), digest(INDEX_CONTINUATIONS))
+    continuation_ok = (
+        continuation_actual == EXPECTED_INDEX_CONTINUATIONS
+        and all(at(line_no).strip() for line_no in INDEX_CONTINUATIONS)
+        and "from 2×2 squares, 1078" in at(22293)
+        and "undecidability" in at(22310)
+    )
+    index_ok &= guards_ok and continuation_ok
+    ok &= index_ok
+    print(
+        "index_entry_occurrence_guards",
+        "OK" if guards_ok else "MISMATCH",
+        len(guard_records),
+        digest_records(guard_records),
+    )
+    print(
+        "index_tiling_continuations",
+        "OK" if continuation_ok else "MISMATCH",
+        *continuation_actual,
+    )
+    print(
+        "unresolved_index",
+        "OK" if index_ok else "MISMATCH",
+        len(index ^ set(INDEX_ROUTED)),
+    )
+
+    derived_images = {
+        line_no for line_no in RETAINED if IMAGE_RE.fullmatch(at(line_no))
+    }
+    image_sets = {
+        "native": NATIVE_IMAGE_LINES,
+        "relation": RELATION_IMAGE_LINES,
+        "control": CONTROL_IMAGE_LINES,
+    }
+    image_paths_ok = True
+    for line_no in CANDIDATE_IMAGE_LINES:
+        match = IMAGE_RE.fullmatch(at(line_no))
+        image_paths_ok &= match is not None
+        if match is not None:
+            basename = Path(match.group(1)).name
+            image_paths_ok &= len(list(SOURCE_ROOT.rglob(basename))) == 1
+    images_ok = (
+        derived_images == set(GOVERNED_IMAGE_LINES)
+        and sum(map(len, image_sets.values())) == len(GOVERNED_IMAGE_LINES)
+        and CANDIDATE_IMAGE_LINES == GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
+        and not GOVERNED_IMAGE_LINES & EXCLUDED_IMAGE_LINES
+        and image_paths_ok
+    )
+    for name, values in image_sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_IMAGE_PARTITION[name]
+        images_ok &= good
+        print(f"images_{name}", "OK" if good else "MISMATCH", *actual)
+    visual_actual = (len(VISUAL_ONLY_BOUNDARY), digest_records(VISUAL_ONLY_BOUNDARY))
+    visual_ok = (
+        visual_actual == EXPECTED_VISUAL_ONLY_BOUNDARY
+        and not any("transcription" in record for record in VISUAL_ONLY_BOUNDARY)
+        and images_ok
+    )
+    ok &= visual_ok
+    print(
+        "governed_image_interface_hash_bound_no_transcription_no_replay",
+        "OK" if visual_ok else "MISMATCH",
+        len(derived_images),
+        digest(derived_images),
+        "candidates",
+        len(CANDIDATE_IMAGE_LINES),
+        digest(CANDIDATE_IMAGE_LINES),
+        "excluded",
+        len(EXCLUDED_IMAGE_LINES),
+        digest(EXCLUDED_IMAGE_LINES),
+    )
+
+    local_line = at(14055)
+    official_local_template = (
+        official_template.replace("{", r"\{").replace("}", r"\}")
+    )
+    official_local_allowed = "$t_1 | t_2 | t_3$"
+    repaired_line = local_line.replace(
+        LOCAL_CORRUPT_ALLOWED_PATTERN, official_local_allowed, 1
+    ).replace(LOCAL_CORRUPT_TEMPLATE, official_local_template, 1)
+    local_checker = " ".join(
+        " ".join(at(line_no) for line_no in (14058, 14059, 14060)).split()
+    )
+    repair_ok = (
+        official_ok
+        and language_ok
+        and local_line.count(LOCAL_CORRUPT_ALLOWED_PATTERN) == 1
+        and local_line.count(LOCAL_CORRUPT_TEMPLATE) == 1
+        and LOCAL_CORRUPT_ALLOWED_PATTERN.count("/") == 2
+        and LOCAL_CORRUPT_TEMPLATE.count("-") == 4
+        and "_" not in LOCAL_CORRUPT_TEMPLATE
+        and official_template.count("_") == 4
+        and official_allowed_pattern.count("|") == 2
+        and repaired_line.count(official_local_allowed) == 1
+        and repaired_line.count(official_local_template) == 1
+        and LOCAL_CORRUPT_ALLOWED_PATTERN not in repaired_line
+        and LOCAL_CORRUPT_TEMPLATE not in repaired_line
+        and local_checker == official_checker
+    )
+    ok &= repair_ok
+    print(
+        "source_hash_bound_official_Blank_alternative_checker_repair",
+        "OK" if repair_ok else "MISMATCH",
+        EXPECTED_OFFICIAL_NOTE_SNAPSHOT_SHA256,
+        EXPECTED_OFFICIAL_NOTE_DOCUMENT_SHA256,
+    )
+
+    main_ok = (
+        "local arrangement of colors around every cell" in at(2614)
+        and "fixed set of possible templates" in at(2614)
+        and "templates apply to every cell" in at(2618)
+        and "templates of neighboring cells overlapping" in at(2618)
+        and "1384774 and 328778790" in at(2618)
+        and "4,294,967,296 possible sets" in at(2620)
+        and "766,979,044" in at(2620)
+        and "3,527,988,252" in at(2620)
+        and "set of 171 repetitive patterns" in at(2620)
+        and "complete collection of all 171 patterns" in at(2630)
+        and "minimal constraint" in at(2630)
+        and "Patterns differing by overall reflection, rotation" in at(2630)
+    )
+    ok &= main_ok
+    print("source_strict_oriented_template_model_set", "OK" if main_ok else "MISMATCH")
+
+    notes_ok = (
+        "Page 215 · 2D constraints" in at(14048)
+        and "removing any of the allowed templates" in at(14048)
+        and "differ only by overall rotation, reflection" in at(14048)
+        and "total of 32 possible" in at(14048)
+        and "Position[IntegerDigits[n, 2, 32], 1]" in at(14050)
+        and "compatible with itself or with at least one other" in at(14054)
+        and "eight immediately adjacent positions" in at(14054)
+        and repair_ok
+        and local_checker == OFFICIAL_DECODED_CHECKER
+        and "Partition[list, {3, 3}, {1, 1}]" in local_checker
+        and "cyclic" not in local_checker.lower()
+        and "wrap" not in local_checker.lower()
+    )
+    ok &= notes_ok
+    print(
+        "source_notes_allowed_set_overlap_checker_no_periodic_argument",
+        "OK" if notes_ok else "MISMATCH",
+    )
+
+    offsets_ok = (
+        "for 2D 5-neighbor rules" in at(13513)
+        and r"\{(-1, 0), \{0, -1\}, \{0, 0\}, \{0, 1\}, \{1, 0\}\}" in at(13513)
+        and "offset lists are always taken to be in the order given by *Sort*" in at(13513)
+        and "possible neighborhood configurations are" in at(13513)
+        and "Reverse[Table[IntegerDigits[i - 1," in at(13516)
+        and "k, Length[os]], {i, k^Length[os]}]]" in at(13517)
+        and "page 941 for 5-neighbor rules" in at(13520)
+    )
+    ok &= offsets_ok
+    print(
+        "source_exact_sorted_N_W_C_E_S_offsets_and_page941_catalog_order",
+        "OK" if offsets_ok else "MISMATCH",
+    )
+
+    templates = source_template_catalog()
+    codec_ok = (
+        offsets_ok
+        and len(templates) == len(set(templates)) == 32
+        and frozenset(templates) == proof_template_universe()
+        and templates[0] == (1, 1, 1, 1, 1)
+        and templates[-1] == (0, 0, 0, 0, 0)
+        and allowed_catalog_positions(0) == frozenset()
+        and allowed_catalog_positions(1) == frozenset({32})
+        and allowed_catalog_positions(1 << 31) == frozenset({1})
+        and allowed_from_constraint_number(0) == frozenset()
+        and allowed_from_constraint_number(1) == frozenset({templates[-1]})
+        and allowed_from_constraint_number(1 << 31) == frozenset({templates[0]})
+        and constraint_number_from_allowed(frozenset(templates)) == (1 << 32) - 1
+        and all(
+            constraint_number_from_allowed(allowed_from_constraint_number(number))
+            == number
+            for number in (0, 1, 2, 3, 1384774, 328778790, (1 << 32) - 1)
+        )
+        and all(
+            constraint_number_from_positions(allowed_catalog_positions(number))
+            == number
+            for number in (0, 1, 2, 3, 1384774, 328778790, (1 << 32) - 1)
+        )
+        and len(allowed_from_constraint_number(1384774)) == 8
+        and len(allowed_from_constraint_number(328778790)) == 12
+        and 1 << len(templates) == 4_294_967_296
+    )
+    ok &= codec_ok
+    print(
+        "derived_exact_source_ordered_32_template_mask_codec_no_raster_read",
+        "OK" if codec_ok else "MISMATCH",
+        len(templates),
+        1 << len(templates),
+    )
+
+    source_pattern = (
+        ("_", 1, "_"),
+        (0, 0, 1),
+        ("_", 0, "_"),
+    )
+    projected = project_cross_from_3x3(source_pattern)
+    adapter_ok = (
+        repair_ok
+        and projected == (1, 0, 0, 1, 0)
+        and tuple(source_pattern[row][column] for row, column in ((0, 0), (0, 2), (2, 0), (2, 2)))
+        == ("_", "_", "_", "_")
+        and all(value != "_" for value in projected)
+        and len(CARDINAL_OFFSETS) == 5
+    )
+    ok &= adapter_ok
+    print(
+        "derived_3x3_MatchQ_adapter_projects_four_Blank_corners",
+        "OK" if adapter_ok else "MISMATCH",
+        projected,
+    )
+
+    fundamental = ((0, 1, 0), (1, 0, 1))
+    periodic_allowed = frozenset(
+        periodic_cross_read(fundamental, row, column)
+        for row in range(len(fundamental))
+        for column in range(len(fundamental[0]))
+    )
+    handles_here = periodic_cross_handles((2, 3), 0, 0)
+    handles_east = periodic_cross_handles((2, 3), 0, 1)
+    overlap_ok = (
+        periodic_model_satisfies(fundamental, periodic_allowed)
+        and len(periodic_allowed) == 2
+        and set(handles_here) & set(handles_east)
+        and handles_here[3] == handles_east[2]
+        and periodic_cross_read(fundamental, 0, 0)[3]
+        == periodic_cross_read(fundamental, 0, 1)[2]
+    )
+    ok &= overlap_ok
+    print(
+        "derived_one_field_overlapping_translated_reads_periodic_witness",
+        "OK" if overlap_ok else "MISMATCH",
+        len(periodic_allowed),
+        len(set(handles_here) & set(handles_east)),
+    )
+
+    north_black = (1, 0, 0, 0, 0)
+    west_black = (0, 1, 0, 0, 0)
+    count_loss_ok = (
+        north_black != west_black
+        and neighbor_count_signature(north_black)
+        == neighbor_count_signature(west_black)
+        == (0, 1)
+        and "various numbers of black and white neighbors" in at(2610)
+        and "local arrangement of colors" in at(2614)
+    )
+    ok &= count_loss_ok
+    print(
+        "derived_T31_histogram_loss_T32_orientation_witness",
+        "OK" if count_loss_ok else "MISMATCH",
+    )
+
+    all_white = (0, 0, 0, 0, 0)
+    all_black = (1, 1, 1, 1, 1)
+    local_allowed = frozenset({all_white, all_black})
+    white_model = ((0,),)
+    required_loss_ok = (
+        periodic_model_satisfies(white_model, local_allowed)
+        and all_black not in {
+            periodic_cross_read(white_model, 0, 0)
+        }
+        and "particular template from this set must appear at least somewhere" in at(2634)
+        and "certain template from this set must occur at least once" in at(2640)
+    )
+    ok &= required_loss_ok
+    print(
+        "derived_T33_global_occurrence_strictly_strengthens_T32",
+        "OK" if required_loss_ok else "MISMATCH",
+    )
+
+    periodic_and_search_ok = (
+        "tessellation of 5 x 10 blocks" in at(2618)
+        and "tessellation of 24 x 24 blocks" in at(2618)
+        and "one of the set of 171 repetitive patterns" in at(2620)
+        and "Representing repetitive patterns" in at(14063)
+        and "tessellations of rectangles whose corners overlap" in at(14063)
+        and "no such direct procedure" in at(2646)
+        and "go outside of the system" in at(2646)
+        and "build up patterns iteratively" in at(2650)
+        and "backtracking" in at(2650)
+        and "extend patterns along a square spiral" in at(14080)
+        and "formally undecidable" in at(14082)
+        and "finite region is NPcomplete" in at(14083)
+        and "Systems based on constraints do not have initial conditions" in at(14275)
+    )
+    ok &= periodic_and_search_ok
+    print(
+        "source_periodic_presentations_external_search_no_initial_state",
+        "OK" if periodic_and_search_ok else "MISMATCH",
+    )
+
+    extension_ok = (
+        "increase the size of the templates" in at(14097)
+        and "increase the number of possible colors for each cell" in at(14097)
+        and "3×3 templates with two colors" in at(14097)
+        and "complete  $3 \\times 3$  blocks" in at(2680)
+        and "only the 33 templates" in at(2684)
+        and "out of the 512 possible ones" in at(2684)
+        and "only 2×2 arrangements of colors" in at(14109)
+        and "51 blocks" in at(14109)
+    )
+    ok &= extension_ok
+    print(
+        "source_backed_larger_complete_templates_and_more_colors",
+        "OK" if extension_ok else "MISMATCH",
+    )
+
+    source_defects_ok = (
+        repair_ok
+        and " $56.3 \\times 3$  templates" in at(2694)
+        and "56 allowed templates" in at(2688)
+        and len(at(14105)) == 4254
+        and 14105 not in RETAINED
+        and 2694 in CONTROL_EVIDENCE
+    )
+    ok &= source_defects_ok
+    print(
+        "source_defects_scoped_blank_alternative_T33_typesetting_corrupt_relation",
+        "OK" if source_defects_ok else "MISMATCH",
+    )
+
+    structural = (
+        not NATIVE_EVIDENCE & RELATION_EVIDENCE
+        and not NATIVE_EVIDENCE & CONTROL_EVIDENCE
+        and not RELATION_EVIDENCE & CONTROL_EVIDENCE
+        and NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE == RETAINED
+        and MATCHED_RETAINED == RETAINED & pre_index_union
+        and GOVERNED_CONTINUATIONS == RETAINED - union
+        and not RETAINED & index
+    )
+    ok &= structural
+    print("structural", "OK" if structural else "MISMATCH")
+
+    split_paths = sorted(
+        path
+        for path in SOURCE_ROOT.rglob("*.md")
+        if path.resolve() not in {DEFAULT_BOOK.resolve(), ATLAS.resolve()}
+    )
+    relative_paths = [path.relative_to(SOURCE_ROOT).as_posix() for path in split_paths]
+    manifest = [
+        f"{relative}\0{len(path.read_bytes())}\0{sha256(path)}"
+        for path, relative in zip(split_paths, relative_paths, strict=True)
+    ]
+    split_manifest_ok = (
+        len(split_paths) == EXPECTED_SPLIT_FILE_COUNT
+        and digest_records(relative_paths) == EXPECTED_SPLIT_PATHS_DIGEST
+        and digest_records(manifest) == EXPECTED_SPLIT_MANIFEST_DIGEST
+    )
+    ok &= split_manifest_ok
+    print(
+        "split_manifest",
+        "OK" if split_manifest_ok else "MISMATCH",
+        len(split_paths),
+        digest_records(relative_paths),
+        digest_records(manifest),
+    )
+
+    compiled = [re.compile(pattern, re.IGNORECASE) for pattern in QUERIES.values()]
+    monolith_query_text = {at(line_no) for line_no in union}
+    split_records: set[str] = set()
+    split_exact: set[str] = set()
+    split_nonexact: set[str] = set()
+    split_lines: list[tuple[str, str]] = []
+    split_texts: set[str] = set()
+    split_record_text: dict[str, str] = {}
+    for path, relative in zip(split_paths, relative_paths, strict=True):
+        split_file_lines = path.read_text(encoding="utf-8").splitlines()
+        for line_no, line in enumerate(split_file_lines, 1):
+            record = f"{relative}:{line_no}"
+            split_lines.append((record, normalized_line(line)))
+            split_texts.add(line)
+            split_record_text[record] = line
+            if not any(rx.search(line) for rx in compiled):
+                continue
+            split_records.add(record)
+            (split_exact if line in monolith_query_text else split_nonexact).add(record)
+
+    monolith_witnesses = [
+        (str(line_no), normalized_line(at(line_no))) for line_no in sorted(union)
+    ]
+    query_mapping: set[str] = set()
+    query_mapping_ok = True
+    for record in sorted(split_nonexact):
+        witness, score = best_witness(split_record_text[record], monolith_witnesses)
+        query_mapping.add(f"{record}->{witness}:{score:.6f}")
+        query_mapping_ok &= score >= 0.50 and int(witness) in union
+    split_query_actual = (len(split_records), digest_records(split_records))
+    split_exact_actual = (len(split_exact), digest_records(split_exact))
+    split_nonexact_actual = (len(split_nonexact), digest_records(split_nonexact))
+    query_mapping_actual = (len(query_mapping), digest_records(query_mapping))
+    split_query_ok = (
+        split_query_actual == EXPECTED_SPLIT_QUERY
+        and split_exact_actual == EXPECTED_SPLIT_QUERY_EXACT
+        and split_nonexact_actual == EXPECTED_SPLIT_QUERY_NONEXACT
+        and query_mapping_actual == EXPECTED_SPLIT_QUERY_MAPPING
+        and query_mapping_ok
+    )
+    ok &= split_query_ok
+    print(
+        "split_query_reverse_join",
+        "OK" if split_query_ok else "MISMATCH",
+        *split_query_actual,
+        *split_exact_actual,
+        *split_nonexact_actual,
+        *query_mapping_actual,
+    )
+
+    exact_retained = {line_no for line_no in RETAINED if at(line_no) in split_texts}
+    nonexact_retained = set(RETAINED) - exact_retained
+    retained_mapping: set[str] = set()
+    monolith_only: set[int] = set()
+    for line_no in sorted(nonexact_retained):
+        witness, score = best_witness(at(line_no), split_lines)
+        if score >= 0.50:
+            retained_mapping.add(f"{line_no}->{witness}:{score:.6f}")
+        else:
+            monolith_only.add(line_no)
+    exact_retained_actual = (len(exact_retained), digest(exact_retained))
+    nonexact_retained_actual = (len(nonexact_retained), digest(nonexact_retained))
+    retained_mapping_actual = (len(retained_mapping), digest_records(retained_mapping))
+    monolith_only_actual = (len(monolith_only), digest(monolith_only))
+    split_retained_ok = (
+        exact_retained_actual == EXPECTED_SPLIT_RETAINED_EXACT
+        and nonexact_retained_actual == EXPECTED_SPLIT_RETAINED_NONEXACT
+        and retained_mapping_actual == EXPECTED_SPLIT_RETAINED_MAPPING
+        and monolith_only_actual == EXPECTED_MONOLITH_ONLY
+        and len(retained_mapping) + len(monolith_only) == len(nonexact_retained)
+    )
+    ok &= split_retained_ok
+    print(
+        "split_retained_reverse_join",
+        "OK" if split_retained_ok else "MISMATCH",
+        *exact_retained_actual,
+        *nonexact_retained_actual,
+        *retained_mapping_actual,
+        *monolith_only_actual,
+    )
+
+    atlas_lines = ATLAS.read_text(encoding="utf-8").splitlines()
+    atlas_patterns = (
+        re.compile(r"^### Systems Based on Constraints$", re.I),
+        re.compile(r"defined by what configurations are allowed", re.I),
+    )
+    atlas_hits = {
+        line_no
+        for line_no, line in enumerate(atlas_lines, 1)
+        if any(rx.search(line) for rx in atlas_patterns)
+    }
+    atlas_actual = (len(atlas_hits), digest(atlas_hits))
+    atlas_ok = (
+        len(atlas_lines) == 542
+        and atlas_actual == EXPECTED_ATLAS_HITS
+        and "Systems Based on Constraints" in atlas_lines[192]
+        and "defined by what configurations are allowed" in atlas_lines[194]
+    )
+    ok &= atlas_ok
+    print("atlas_summary_only", "OK" if atlas_ok else "MISMATCH", *atlas_actual)
+
+    catalog_lines = CATALOG.read_text(encoding="utf-8").splitlines()
+    taxonomy_text = TAXONOMY.read_text(encoding="utf-8")
+    catalog_ok = (
+        len(catalog_lines) == 46
+        and catalog_lines[32] == "Template Constraint Systems,"
+        and len(set(catalog_lines[1:])) == 45
+        and "## 32. Template Constraint Systems" in taxonomy_text
+        and "Each local neighborhood in the final pattern must match one of the allowed templates." in taxonomy_text
+        and "Neighbor-count constraints specify totals." in taxonomy_text
+        and "Template constraints specify exact allowed local arrangements." in taxonomy_text
+        and "required global occurrence" in taxonomy_text
+    )
+    ok &= catalog_ok
+    print("catalog_taxonomy_vocabulary_only", "OK" if catalog_ok else "MISMATCH")
+
+    model_actual = (len(SOURCE_MODEL_RECORDS), digest_records(SOURCE_MODEL_RECORDS))
+    architecture_ok = (
+        model_actual == EXPECTED_SOURCE_MODEL
+        and main_ok
+        and notes_ok
+        and offsets_ok
+        and codec_ok
+        and adapter_ok
+        and overlap_ok
+        and count_loss_ok
+        and required_loss_ok
+        and periodic_and_search_ok
+        and extension_ok
+        and source_defects_ok
+        and "evolution" not in "\n".join(at(n) for n in range(2614, 2631)).lower()
+    )
+    ok &= architecture_ok
+    print(
+        "source_fit_declarative_oriented_template_relation_not_runner",
+        "OK" if architecture_ok else "MISMATCH",
+        *model_actual,
+    )
+
+    unresolved_total = (
+        len(classification_delta)
+        + len(index ^ set(INDEX_ROUTED))
+        + len(monolith_only)
+    )
+    unresolved_ok = unresolved_total == 0
+    ok &= unresolved_ok
+    print("unresolved_total", "OK" if unresolved_ok else "MISMATCH", unresolved_total)
+    return 0 if ok else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

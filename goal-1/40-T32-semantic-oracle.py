@@ -43,10 +43,12 @@ pointwise model equality.  The oracle is dependency-free, deterministic,
 portable outside the repository root, silent on import, and fails closed under
 ``python -O``.
 
-Deliberately open source matters are recorded below rather than guessed: the
-raster-only order behind BOOK:14050's numeric constraint codec, the complete
-template rows for the numbered main-text examples, and the 171-pattern raster
-catalog are not reconstructed by this semantic oracle.
+BOOK:13513-13520 textually fixes the sorted five-neighbor slot order and its
+descending binary catalog, so BOOK:14050's 32-bit numeric constraint codec is
+reconstructed and guarded below without reading pixels.  Deliberately open
+source matters remain rather than being guessed: the complete displayed rows
+for the numbered main-text examples and the 171-pattern raster catalog are not
+reconstructed by this semantic oracle.
 """
 
 from __future__ import annotations
@@ -77,7 +79,11 @@ BOOK_CROSS_OFFSETS: tuple[Offset2, ...] = (
     (1, 0),   # South
 )
 BOOK_CROSS_SLOT_NAMES = ("North", "West", "Self", "East", "South")
-BINARY_TEMPLATES: tuple[Template, ...] = tuple(product((0, 1), repeat=5))
+SOURCE_BINARY_CATALOG: tuple[Template, ...] = tuple(
+    tuple((value >> shift) & 1 for shift in range(4, -1, -1))
+    for value in range(31, -1, -1)
+)
+BINARY_TEMPLATES: tuple[Template, ...] = SOURCE_BINARY_CATALOG
 
 SOURCE_CLAIMS: tuple[tuple[int, str], ...] = (
     (2614, "local arrangement of colors around every cell to match a fixed set of possible templates"),
@@ -86,6 +92,11 @@ SOURCE_CLAIMS: tuple[tuple[int, str], ...] = (
     (2634, "a particular template from this set must appear at least somewhere"),
     (2646, "there is no such direct procedure"),
     (2654, "no pattern that satisfies the constraint in a limited region"),
+    (13513, "for 2D 5-neighbor rules it is"),
+    (13513, "offset lists are always taken to be in the order given by *Sort*"),
+    (13516, "Reverse[Table[IntegerDigits[i - 1,"),
+    (13517, "k, Length[os]], {i, k^Length[os]}]]"),
+    (13520, "page 941 for 5-neighbor rules"),
     (14048, "total of 32 possible"),
     (14050, "Position[IntegerDigits[n, 2, 32], 1]"),
     (14055, "A set of allowed templates can be specified"),
@@ -99,8 +110,7 @@ SOURCE_CLAIMS: tuple[tuple[int, str], ...] = (
 )
 
 OPEN_SOURCE_MATTERS: tuple[str, ...] = (
-    "BOOK:14050 names a raster list whose exact 32-template ordering is not transcribed; no numeric ID codec is claimed.",
-    "BOOK:2616/2626/2628 contain raster-only example template sets and the 171-pattern catalog; no rows are invented here.",
+    "BOOK:2616/2626/2628 contain raster-only displayed example rows and the 171-pattern tiles; those pixels are not promoted to exact program or witness data here.",
     "The Book does not specify a canonical complete solver, proof-certificate AST, or finite search schedule for T32.",
 )
 
@@ -108,14 +118,17 @@ ARCHITECTURE_CLASSIFICATION: tuple[str, ...] = (
     "1: direct reuse of T31 model-set, scope, verifier, query-result, and certificate boundaries",
     "2: parameterize the closed local relation by an ordered footprint and exact allowed words; the binary cross is a preset",
     "3: lossless native cross-matrix and generic ordered-offset representations",
-    "4: no genuinely different execution algebra because T32 has no canonical evolution",
+    "4: inherit the established D058/T31 declarative model-set nonfit to SimpleProgram rollout; no canonical successor can be supplied faithfully, while the incremental T32 delta is classes 1-3 only and adds no class-4 category or execution algebra",
 )
 
 GOAL2_DELTA = (
-    "Add AllowedOrientedTemplates(offsets, allowed_words) as one closed node in "
+    "Add AllowedLocalPatterns(offsets, allowed_words) as one closed node in "
     "T31's declarative constraint algebra, plus orientation-preserving local "
     "violations and the binary-cross preset; reuse scope/model/verifier/query/"
-    "certificate infrastructure and add no rollout, frontier, rule-result, or update branch."
+    "certificate infrastructure and add no rollout, frontier, rule-result, or "
+    "update branch.  AllowedOrientedTemplates in this oracle is a proof model, "
+    "not a prescribed Goal 2 API name.  Include the guarded source-derived "
+    "32-bit numeric codec only for the strict binary N,W,Self,E,S cross preset."
 )
 
 
@@ -1559,7 +1572,7 @@ def audit_no_transition_surface() -> tuple[int, int, int]:
     return len(relation_fields), len(histogram_fields), len(verification_fields)
 
 
-EXPECTED_DIGEST = "8ab537fee80030d4c5a86c7ddbc7197094b8f915ad788405d959c5447e31669a"
+EXPECTED_DIGEST = "f6e2d1206adc62ab31a660ff533c57522fdbc832cfcbd94e01bb290cc11399db"
 
 
 def main() -> None:
@@ -1689,7 +1702,10 @@ def main() -> None:
         f"generalized_profile=3x3/{larger_arity}-slots+{larger_alphabet}-colors; "
         f"hostile_rejections={hostile}; transition_surface=absent"
     )
-    print("architecture=classes_1_2_3_reuse_parameterization_codec; class_4_execution_algebra=no")
+    print(
+        "architecture=D058_T31_class_4_declarative_nonfit_to_rollout_inherited; "
+        "incremental_T32_delta=classes_1_2_3; no_new_class_4_or_execution_algebra"
+    )
     print(f"semantic_digest={digest}")
 
 

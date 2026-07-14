@@ -9,7 +9,7 @@ Status: **IN PROGRESS — ARCHITECTURE RECONSTRUCTED; EVIDENCE ORACLES AND HOSTI
 - The strict main-text profile is binary on the square lattice. Its local support is the oriented five-site cross `Self/North/East/South/West`, so there are `2^5 = 32` possible local templates and `2^32 = 4,294,967,296` allowed-template sets.
 - Templates apply at every cell and neighboring anchored occurrences overlap. Overlap is pointwise equality in one candidate field, not a write collision or UPDATE policy (`BOOK:2614-2620`).
 - The strict family is unusually completely classified in the source: `766,979,044` allowed sets have no model and the remaining `3,527,988,252` have a periodic model represented by one of 171 displayed pattern families (`BOOK:2620-2630`). This source theorem does not by itself supply a machine-readable 171-pattern solver table.
-- The Notes define the 32-bit numbering scheme and check finite arrays with alternatives of `3 x 3` Mathematica patterns whose four corners are Blank. Those corners are outside the five-site cross support; they are not wildcard-valued semantic slots (`BOOK:14048-14060`).
+- The Notes define the 32-bit numbering scheme and check finite arrays with alternatives of `3 x 3` Mathematica patterns whose four corners are Blank. The general-rule Notes independently fix the sorted five-offset order and descending binary neighborhood catalog used by the page-941 plate (`BOOK:13513-13520`), so the numeric codec need not be inferred from pixels. The Blank corners are outside the five-site cross support; they are not wildcard-valued semantic slots (`BOOK:14048-14060`).
 - The local extraction renders the four Blank corners as `-`. The official Wolfram Science note gives `_`; this repair must be frozen and fail-closed before the adapter is executable.
 - Allowed sets are exact and oriented. Overall rotation, reflection, and black/white exchange omit equivalent gallery representatives; they are relations between constraints/models, not implicit matching modes (`BOOK:14048`).
 - T31 already owns the generic declarative model-set, exact periodic/open/window scopes, verifier reports, solver-query outcomes, witnesses, certificates, `Unknown`, pointwise model identity, and no-evolution boundary.
@@ -24,7 +24,7 @@ Status: **IN PROGRESS — ARCHITECTURE RECONSTRUCTED; EVIDENCE ORACLES AND HOSTI
 - **Retained:** T31's generic declarative category is the smallest semantic base. T32 is a tagged closed local-relation schema, not a second top-level constraint system.
 - **Retained:** native models are total fields on a static discrete plane. Exact periodic tiles and finite windows are representations/query scopes, not finite native grids or initial states.
 - **Retained:** every template is a total label map on one declared finite anchored support containing the zero offset; the allowed set may be empty and still denotes a valid, inconsistent relation.
-- **Retained:** support offsets are geometrically named. Serialization order is representational; source numbering additionally requires its own proven 32-template catalog order.
+- **Retained:** support offsets are geometrically named. Generic serialization order is representational; the NKS-numbered strict preset uses the independently source-fixed sorted order `(North,West,Self,East,South)` and descending binary catalog.
 - **Retained:** exact orientation is semantic. Rotation/reflection/color exchange must transform explicit data or be enumerated in the allowed set.
 - **Retained:** distinct support offsets remain distinct occurrences even when a tiny periodic presentation maps them to the same residue cell.
 - **Retained:** model verification and solving remain separate. Pairwise template compatibility, propagation, square-spiral extension, backtracking, memoization, symmetry pruning, and a recovered 171-pattern decision table are solver/analyzer concerns.
@@ -49,7 +49,7 @@ Reconstruct T32 as exact finite allowed-pattern relation data over static labele
 
 ## Source Audit
 
-`40-T32-source-oracle.py` will be the fail-closed textual evidence record. It must close direct names, allowed/fixed templates, overlap, exact counts, the 171-pattern result, constraint numbering, Notes implementation, Blank repair, finite/open checking, solver/search boundaries, T31/T33 boundaries, later template sizes/colors, CA/tiling/subshift relations, actual Index routes, governed image links, split reverse provenance, and false positives such as unrelated CA rule counts.
+`40-T32-source-oracle.py` will be the fail-closed textual evidence record. It must close direct names, allowed/fixed templates, overlap, exact counts, the 171-pattern result, the source-derived sorted-offset/template order and constraint numbering, Notes implementation, Blank repair, finite/open checking, solver/search boundaries, T31/T33 boundaries, later template sizes/colors, CA/tiling/subshift relations, actual Index routes, governed image links, split reverse provenance, and false positives such as unrelated CA rule counts.
 
 Final frozen counts, digests, snapshot hashes, source-oracle SHA, and unresolved total are pending the independent source audit.
 
@@ -82,8 +82,8 @@ Final frozen counts, digests, snapshot hashes, source-oracle SHA, and unresolved
 
 ### E06 — strict numbering and template catalog
 
-- Source: `BOOK:14048-14052`.
-- Establishes: there are 32 oriented cross templates; a 32-bit integer selects an allowed subset. The source image fixes catalog order, so a numeric codec must remain unavailable unless that order is independently recovered.
+- Source: `BOOK:13513-13520`, `14048-14052`.
+- Establishes: there are 32 oriented cross templates; sorted offsets are `(North,West,Self,East,South)`; `Reverse[Table[IntegerDigits[...]]]` fixes the descending binary catalog displayed on page 941; and the 32-bit integer selects catalog positions. This makes the numeric codec textually derivable and independently checkable without raster transcription.
 
 ### E07 — exact finite-array adapter
 
@@ -117,7 +117,7 @@ Final frozen counts, digests, snapshot hashes, source-oracle SHA, and unresolved
 
 ## Asset Audit
 
-`40-T32-asset-oracle.py` will bind the exact native/relation/control raster universe, monolith and split references, physical paths, byte sizes, dimensions, SHA-256 values, paired assemblies, and evidence boundaries. The printed-page-213 example plate, pages 214–215 171-family catalog, and page-941 32-template catalog are expected native candidates; T31 and T33 plates are relations/controls. Complete semantic transcription is not assumed.
+`40-T32-asset-oracle.py` will bind the exact native/relation/control raster universe, monolith and split references, physical paths, byte sizes, dimensions, SHA-256 values, paired assemblies, and evidence boundaries. The printed-page-213 example plate, pages 214–215 171-family catalog, and page-941 32-template catalog are expected native candidates; T31 and T33 plates are relations/controls. The asset oracle does not pixel-transcribe the catalog, even though its ordering is independently recovered from `BOOK:13513-13520`.
 
 Final governed counts, manifest SHA, limited-transcription boundary, and unresolved visual facts are pending the independent asset audit.
 
@@ -201,7 +201,7 @@ Every anchor observes the same candidate field. If two anchored occurrences over
 
 Allowed templates are exact oriented data. Rotation/reflection/color exchange acts by an explicit bijection on support and labels, inducing a mapped relation and mapped models. It is not semantic equality, automatic closure, or matching policy. Gallery orbit reduction is observer metadata.
 
-The NKS integer is a codec over an ordered catalog of 32 templates. The subset bits alone do not recover the catalog's offset/label order. Generic relation execution therefore uses explicit templates; a native-number constructor remains unavailable until the catalog order is machine-readably or independently recovered and hash-bound.
+The NKS integer is a codec over an ordered catalog of 32 templates. `BOOK:13513-13520` fixes sorted offsets `(N,W,Self,E,S)` and the catalog as descending five-bit words; `BOOK:14050` selects positions whose 32-bit mask digit is `1`. Generic relation execution still uses explicit templates, while the strict numeric constructor is a guarded source-derived codec with exhaustive singleton-bit and representative round-trip conformance.
 
 ### Scope, verification, and queries
 
@@ -262,7 +262,7 @@ The checked-in `src/ca` realization has no declarative constraint modules, scope
 2. Generalize the T31 verifier dispatch structurally over closed relation-node tags, keeping one shared report/scope/query API rather than relation-specific solver classes.
 3. Add pure exact-template observation and violation construction atop the same coordinate/presentation layer.
 4. Add a lossless T31 count-to-template compiler with retained compact source AST/provenance and conformance checks.
-5. Add the strict binary-cross constructor and guarded Notes adapter. Add an NKS numeric constructor only if the 32-template catalog order is independently recovered.
+5. Add the strict binary-cross constructor, guarded Notes adapter, and source-derived NKS numeric constructor using the exact sorted-offset/descending-binary catalog, with exhaustive positional conformance.
 6. Keep search/analyzer algorithms in the solver layer. A future recovered 171-witness table is data for a strict analyzer, not core semantics.
 7. Add explicit symmetry transforms/orbit observers; require enumeration for symmetry-invariant matching.
 8. Add no rollout branch, T32 state class, template predicate, matching flag, repair update, hidden boundary, T33 requirement, or trusted raster table.
@@ -280,7 +280,7 @@ The checked-in `src/ca` realization has no declarative constraint modules, scope
 - No finite/open checker promoted to a global witness without explicit scope.
 - No one periodic witness substituted for the complete model set.
 - No bounded search exhaustion promoted to global UNSAT.
-- No 171-pattern table, numeric template order, native examples, seed, or trace invented from raster layout.
+- No 171-pattern table, native example rows, seed, or trace invented from raster layout; the numeric template order is admitted only because separate textual Notes derive it exactly.
 - No T33 existential required occurrence packed into T32.
 - No generic undecidability claim used to contradict the strict source family's finite complete classification.
 
