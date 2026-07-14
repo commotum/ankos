@@ -42,11 +42,11 @@ Reconstruct T35 as a closed complete residue-indexed unary integer RULE represen
 
 ## Source Audit
 
-`42-T35-source-oracle.py` will be the fail-closed textual evidence record. It must close the whole-number/parity construction, exact A/B formulas, seeds, prefixes, cycles, event-count convention, standard `3n+1`, negative/signed variants, empirical-versus-proved claims, stopping-time rules, CA compiler, parity reconstruction, reversible system, general modulus tables, register encoding, ordered Conway fractions, current-family boundaries, assets, actual Index, split reverse provenance, and extraction defects.
+`42-T35-source-oracle.py` is the frozen fail-closed textual evidence record. Its 39 redundant query lanes produce a 93-line union at `70 pre-Index / 23 actual Index`. It retains 128 lines partitioned `46 native / 64 relation / 18 control`, excludes seven false positives, routes all 23 Index lines as `14 core/observer / 6 arithmetic-emulation / 3 ordered-fraction`, and leaves zero unresolved mechanics. The source-model record has 36 clauses and digest `a9c6a61dbcaf1a959dbaf75ca512414879840ac091bc30d3bbfc7fa640bd1247`.
 
 Known source hazards requiring guarded disposition include the page-122 extracted parity bit string, missing punctuation in the reconstruction code, damaged pattern underscores in `ASEvolveList`, the apparent `Table`/`Product` register-encoding conflict, and badly corrupt Turing/number-theory text near `BOOK:19460`. None may be silently repaired into executable semantics.
 
-Final query counts, retained N/R/C partition, exclusions, reverse provenance, source-model digest, image interface, oracle SHA, and unresolved total are pending the independent source audit.
+The split reverse join closes 92 query records at `74 exact + 18 mapped` and all 128 retained records at `100 exact + 28 mapped`, with zero monolith-only evidence. The exact image interface is 24 candidates = 13 governed (`5/5/3`) + 11 exclusions and matches the asset oracle. The catalog/taxonomy phrase remains search vocabulary absent from the primary Book; five Atlas hits are summary-only. The oracle SHA is `e33d7db5f5629d79ad0a24f648bf65746cc9999ea4ce4ca3f901bd679f605b8f`.
 
 ## Asset Audit
 
@@ -131,7 +131,7 @@ The scalar state does not contain its history. `A(1)=A(2)=3` is a concrete infor
 
 A complete residue table computes one canonical key and performs direct lookup. Its row order is serialization provenance only; there is no overlap or priority.
 
-An ordered fraction system instead selects the first fraction `p/q` for which the reduced denominator `q` divides the old integer. Order is behaviorally material. A finite ordered list can be compiled intensionally to a first-applicable decision over residues modulo the LCM of reduced denominators while retaining the selected-list-index witness, but materializing billions of rows is neither required nor desirable. The lowering is behavior-preserving, not generally injective: shadowed, duplicate, or otherwise redundant source entries can denote the same transition, so the ordered source AST/provenance must remain attached whenever structural program identity is claimed. Any such compilation must commute exactly and preserve the partial no-applicable outcome. The Book's implementation does not define that generic outcome, so Goal 2 must not invent halt, identity, or error as native source semantics.
+An ordered fraction system instead selects the first fraction `p/q` for which the reduced denominator `q` divides the old integer. Order is behaviorally material. A finite ordered list can be compiled intensionally to a first-applicable decision over residues modulo the LCM of reduced denominators while retaining the selected-list-index witness, but materializing billions of rows is neither required nor desirable. The lowering is behavior-preserving, not generally injective: shadowed, duplicate, or otherwise redundant source entries can denote the same transition, so the ordered source AST/provenance must remain attached whenever structural program identity is claimed. Any such compilation must commute exactly and preserve the partial no-applicable boundary. The Book's implementation leaves that generic case undefined. The shared runner therefore represents an attempted undefined step with its existing zero-successor `Error(reason=MissingBranch | UndefinedRuleAtState)` envelope, retaining the last complete configuration and committing no event. This evaluator result is not a source-native halt, identity step, or new T35 outcome class.
 
 ### Observers and relations
 
@@ -151,7 +151,7 @@ Parity sequences, digit renderings, logarithmic size, digit length, stopping tim
 - scalar-history noninjectivity via `A(1)=A(2)`;
 - ordered fraction first-applicable behavior and order-sensitive counterexamples;
 - exact intensional residue compilation with selected-row witnesses where claimed;
-- partial no-applicable outcome kept distinct from halt/identity;
+- partial no-applicable evaluation represented through the common zero-successor `Error` envelope and kept distinct from halt/identity;
 - observer/analyzer and compiler/relation separation;
 - generalized modulus/alphabet/invariant validation; and
 - absence of T35-specific state, frontier, neighborhood, UPDATE, or executor fields.
@@ -169,7 +169,7 @@ Ordered fractions close 100 branch witnesses, an order discriminator, six explic
 | Closed expression syntax | 1/3 | T43 closed unary/piecewise AST responsibility | exact integer residue predicates and quotient nodes |
 | RULE selection | 2/3 | complete finite key-indexed closed RULE data | residue-key constructor, direct lookup, branch witness |
 | RULE result/UPDATE | 1 | T34 same-locus assignment + atomic update | none |
-| Trace/outcomes | 1/2 | T34 scalar trace and generic outcomes | retain selected-row witness; partial fraction sibling explicit |
+| Trace/outcomes | 1/2 | T34 scalar trace and common `StepResult` outcomes | retain selected-row witness; undefined fraction step uses generic zero-successor `Error` |
 | Seeds/invariants | 2 | T08/T34 configuration validation | positive strict profile; natural/signed siblings tagged |
 | Ordered fraction sibling | 2/3 | same unary event + first-applicable closed rule schema | order-sensitive selection; no new executor |
 | Observers/relations | 1 | existing analyzer/relation boundaries | source-bound presets only |
@@ -185,7 +185,7 @@ The checked-in selectors already demonstrate the reusable geometry: `frontiers.t
 3. Add construction-time totality, unique-residue, exact integer-closure, and separately checked carrier-invariance validation with replayable evidence.
 4. Reuse T34 `UniqueScalar`, self access, assignment, atomic UPDATE, event result, and `h+1` trace; attach branch witnesses to events.
 5. Add named A/B/Collatz presets, source examples, and conformance fixtures separately from seeds and observers.
-6. Represent ordered fraction systems as an order-preserving closed RULE schema or certified intensional compilation on the same event. Keep no-applicable behavior explicitly partial until evidence resolves it.
+6. Represent ordered fraction systems as an order-preserving closed RULE schema or certified intensional compilation on the same event. Route no-applicable evaluation through the existing zero-successor `Error` envelope with no committed event; add no T35-specific outcome.
 7. Add no `PiecewiseIntegerState`, T35 executor, rollout branch, callback, hidden digit/register/history state, implicit finite width, or branch-set successor.
 
 ## No-Cheating Checks
@@ -196,7 +196,7 @@ The checked-in selectors already demonstrate the reusable geometry: `frontiers.t
 - No callback `If`/predicate evaluator; program syntax is closed structural data.
 - No precedence, overlap, fallback, or row order invented for complete residue tables.
 - No Conway/FRACTRAN list order erased by unordered residue compilation.
-- No no-applicable fraction silently called halt, identity, or invalidity without source evidence.
+- No no-applicable fraction silently called halt, identity, or invalidity, and no T35-specific outcome class; use the generic partial-evaluation `Error` envelope.
 - No fixed point/cycle/stopping threshold promoted to native halt.
 - No observer value, digit image, parity trace, stopping-time table, or empirical claim used as RULE semantics.
 - No source bit string trusted when it conflicts with formula/prefix chronology without raster alignment.
@@ -218,4 +218,4 @@ The checked-in selectors already demonstrate the reusable geometry: `frontiers.t
 
 ## Stage Results
 
-Asset and semantic closure pass. Source reverse provenance, global D136 integration, repository-wide gates, and fresh hostile review remain pending.
+Source, asset, semantic, and runtime-fit closure pass. Global D136 integration, repository-wide gates, and fresh hostile review remain pending.

@@ -527,7 +527,7 @@ The nested add-one digit picture is related to a substitution pattern, and some 
 | T13 substitution | some digit pictures have substitution descriptions | symbol sequence is rewritten/grown; scalar arithmetic and carries are not the substitution state |
 | T19 register machine | arbitrary-precision integer carrier and typed slot assignment | multiple named registers plus program counter and branching instructions |
 | T27 geometry | exact rational/algebraic/declared-precision scalar infrastructure | T34 has one numeric state, not occurrence bags/poses |
-| T35 piecewise integer maps | same scalar carrier/source/effect shell | predicates and ordered arithmetic branches are rule-visible and begin at `BOOK:1497-1503` |
+| T35 piecewise integer maps | same scalar carrier/source/effect shell | remainder predicates and closed arithmetic rows are rule-visible and begin at `BOOK:1497-1503`; complete residue tables use direct lookup without precedence, while only the separately tagged Conway-fraction sibling is ordered |
 | T36 digit-reversal arithmetic | same integer carrier and digit codecs | base and digit transformation feed back into the next state |
 | T37 recursive sequences | numeric values and fixed-lag formulas can reproduce powers | native state is a growing prefix/history and update appends a term |
 | T38 variable-index recursion | numeric sequence values | data-dependent earlier-term addressing requires a growing prefix and guarded computed indices |
@@ -666,7 +666,7 @@ Tests decode rows back to exact values, compare iterative and closed-form traces
 - No modulo suffix quotient presented as the unbounded multiplication program.
 - No CA emulation/local multiplier-base special case presented as native arithmetic state.
 - No substitution description of a digit picture presented as native scalar evolution.
-- No ordered predicate/update arms from T35 hidden in a generic formula.
+- No T35 residue-predicate maps or ordered-fraction arms hidden in a generic formula.
 - No base-sensitive digit transformation from T36 admitted as plain arithmetic.
 - No prior-term buffer from T37 packed into one nominal scalar.
 - No nonlinear/fractional-part interval map from T43 smuggled into the strict add/multiply sum.

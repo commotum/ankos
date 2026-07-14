@@ -693,7 +693,7 @@ This method intentionally supplies no page-166 pixel claim because the plate is 
 ### Cross-type boundaries
 
 - **T34:** shares one scalar slot, complete read, same-locus write, and atomic UPDATE. T34's closed integer arithmetic is not an exact-real backend.
-- **T35:** piecewise integer parity maps use signed-integer state and different value-set/branch evidence. T43 does not absorb them through a numeric union.
+- **T35:** the strict parity maps use positive exact-integer state with natural/signed profiles explicit, complete residue-indexed closed rows, and separately checked integer-closure/carrier-invariance evidence. T43 does not absorb them through a numeric union.
 - **T36:** digits are the evolving finite word in reversal systems; T43 digits are an observer of a real scalar.
 - **T37:** recurrence systems preserve an indexed prefix and append one term. A logistic recurrence can expose the same values, but T43 state is only the current scalar and reuses a same-locus write.
 - **T41:** shares exact numeric/expression/primitive responsibilities. T41 evaluation is a pure query; T43 feeds each result into the next committed event and makes fixed rounding transition-semantic.

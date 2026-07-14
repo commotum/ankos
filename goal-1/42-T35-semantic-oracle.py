@@ -398,6 +398,7 @@ class ResidueBranchWitness:
     formula: AffineQuotient
     old_value: int
     new_value: int
+    program_id: str
 
     def __post_init__(self) -> None:
         modulus = checked_modulus(self.modulus)
@@ -408,6 +409,7 @@ class ResidueBranchWitness:
             raise TypeError("witness formula must be exact AffineQuotient")
         object.__setattr__(self, "old_value", exact_int(self.old_value, "old value"))
         object.__setattr__(self, "new_value", exact_int(self.new_value, "new value"))
+        object.__setattr__(self, "program_id", checked_program_id(self.program_id))
 
 
 @dataclass(frozen=True)
@@ -455,6 +457,39 @@ class OrderedFractionProgram:
         object.__setattr__(self, "fractions", tuple(checked))
 
 
+def checked_program_id(value: object) -> str:
+    program_id = exact_str(value, "program_id")
+    if len(program_id) != 64 or any(character not in "0123456789abcdef" for character in program_id):
+        raise ValueError("program_id must be a lowercase SHA-256 digest")
+    return program_id
+
+
+def structural_program_id(program: object) -> str:
+    """Content-derived identity of the normalized closed source AST."""
+
+    if type(program) is CompleteResidueIntegerMap:
+        payload = (
+            "CompleteResidueIntegerMap/v1",
+            program.carrier,
+            program.modulus,
+            tuple(
+                (formula.multiplier, formula.offset, formula.divisor)
+                for formula in program.formulas
+            ),
+        )
+    elif type(program) is OrderedFractionProgram:
+        payload = (
+            "OrderedFractionProgram/v1",
+            tuple(
+                (fraction.numerator, fraction.denominator)
+                for fraction in program.fractions
+            ),
+        )
+    else:
+        raise TypeError("program identity requires a closed T35 rule node")
+    return sha256(repr(payload).encode("utf-8")).hexdigest()
+
+
 @dataclass(frozen=True)
 class FractionBranchWitness:
     selected_index: int
@@ -462,6 +497,7 @@ class FractionBranchWitness:
     tested_integral: tuple[bool, ...]
     old_value: int
     new_value: int
+    program_id: str
 
     def __post_init__(self) -> None:
         selected_index = exact_int(self.selected_index, "selected index")
@@ -482,32 +518,33 @@ class FractionBranchWitness:
         object.__setattr__(self, "tested_integral", tuple(flags))
         object.__setattr__(self, "old_value", checked_integer_value(self.old_value, POSITIVE, "old value"))
         object.__setattr__(self, "new_value", checked_integer_value(self.new_value, POSITIVE, "new value"))
+        object.__setattr__(self, "program_id", checked_program_id(self.program_id))
 
 
 @dataclass(frozen=True)
-class NoApplicableFraction:
-    """Typed partial/undefined result; the retained scalar is not advanced.
+class MissingBranch:
+    """Typed evidence nested under generic ``Error`` for undefined RULE data.
 
-    The source expression has no value when no product is integral.  This
-    record is therefore not a halt instruction, identity transition, error,
-    or fabricated terminal state; it reports why no successor was committed.
+    Conway's source expression has no value when no product is integral.  The
+    evaluator therefore returns the generic zero-successor error envelope; it
+    does not invent a halt instruction, identity event, or terminal state.
     """
 
-    retained: ScalarConfiguration
+    old_value: int
     tested_integral: tuple[bool, ...]
+    program_id: str
 
     def __post_init__(self) -> None:
-        if type(self.retained) is not ScalarConfiguration:
-            raise TypeError("retained state must be exact ScalarConfiguration")
-        if self.retained.carrier != POSITIVE:
-            raise ValueError("fraction systems retain a positive-integer state")
+        old_value = checked_integer_value(self.old_value, POSITIVE, "old value")
         raw = exact_tuple(self.tested_integral, "tested-integral flags")
         for flag in raw:
             if type(flag) is not bool:
                 raise TypeError("tested-integral flags must be exact bools")
             if flag:
-                raise ValueError("NoApplicableFraction cannot contain an applicable row")
+                raise ValueError("MissingBranch cannot contain an applicable row")
+        object.__setattr__(self, "old_value", old_value)
         object.__setattr__(self, "tested_integral", tuple(raw))
+        object.__setattr__(self, "program_id", checked_program_id(self.program_id))
 
 
 BranchWitness: TypeAlias = ResidueBranchWitness | FractionBranchWitness
@@ -530,12 +567,13 @@ def evaluate_closed_rule(
     program: object,
     configuration: ScalarConfiguration,
     old_value: int,
-) -> ProposedScalarWrite | NoApplicableFraction:
+) -> ProposedScalarWrite | MissingBranch:
     """Evaluate the closed RULE sum; UPDATE remains completely generic."""
 
     if type(program) is CompleteResidueIntegerMap:
         if configuration.carrier != program.carrier:
             raise ValueError("program and configuration carriers differ")
+        program_id = structural_program_id(program)
         residue, formula = program.formula_for(old_value)
         new_value = formula.apply(old_value)
         witness = ResidueBranchWitness(
@@ -544,6 +582,7 @@ def evaluate_closed_rule(
             formula,
             old_value,
             new_value,
+            program_id,
         )
         return ProposedScalarWrite(
             ScalarAssignment(SCALAR_LOCUS, new_value),
@@ -552,6 +591,7 @@ def evaluate_closed_rule(
     if type(program) is OrderedFractionProgram:
         if configuration.carrier != POSITIVE:
             raise ValueError("ordered fraction programs require positive integers")
+        program_id = structural_program_id(program)
         flags: list[bool] = []
         for index, fraction in enumerate(program.fractions):
             result = fraction.integral_product(old_value)
@@ -563,12 +603,13 @@ def evaluate_closed_rule(
                     tuple(flags),
                     old_value,
                     result,
+                    program_id,
                 )
                 return ProposedScalarWrite(
                     ScalarAssignment(SCALAR_LOCUS, result),
                     witness,
                 )
-        return NoApplicableFraction(configuration, tuple(flags))
+        return MissingBranch(old_value, tuple(flags), program_id)
     raise TypeError("program must be a closed T35 rule node")
 
 
@@ -579,7 +620,6 @@ class TransitionEvent:
     assignment: ScalarAssignment
     after: ScalarConfiguration
     witness: BranchWitness
-    outcome: str = "Advanced"
 
     def __post_init__(self) -> None:
         if type(self.before) is not ScalarConfiguration or type(self.after) is not ScalarConfiguration:
@@ -591,23 +631,83 @@ class TransitionEvent:
             raise TypeError("event assignment must be exact ScalarAssignment")
         if type(self.witness) not in (ResidueBranchWitness, FractionBranchWitness):
             raise TypeError("event witness has an unknown type")
-        if exact_str(self.outcome, "outcome") != "Advanced":
-            raise ValueError("committed transition outcome must be Advanced")
+        if self.before.carrier != self.after.carrier:
+            raise ValueError("event endpoints must retain the same scalar carrier")
+        if apply_scalar_assignment(self.before, self.assignment) != self.after:
+            raise ValueError("event assignment must produce the reported after state")
+        if self.witness.old_value != self.before.value:
+            raise ValueError("event witness must describe the reported before value")
+        if self.witness.new_value != self.after.value:
+            raise ValueError("event witness must describe the reported after value")
+        if type(self.witness) is ResidueBranchWitness:
+            if self.witness.residue != euclidean_mod(
+                self.witness.old_value,
+                self.witness.modulus,
+            ):
+                raise ValueError("residue witness does not select its old value")
+            if self.witness.formula.apply(self.witness.old_value) != self.witness.new_value:
+                raise ValueError("residue witness formula does not replay its result")
+        else:
+            fraction_result = self.witness.selected_fraction.integral_product(
+                self.witness.old_value
+            )
+            if fraction_result != self.witness.new_value:
+                raise ValueError("fraction witness does not replay its integral product")
 
 
 @dataclass(frozen=True)
 class Advanced:
-    configuration: ScalarConfiguration
-    event: TransitionEvent
+    changed: bool
+
+    def __post_init__(self) -> None:
+        if type(self.changed) is not bool:
+            raise TypeError("Advanced.changed must be an exact bool")
 
 
 @dataclass(frozen=True)
-class NoSuccessor:
-    configuration: ScalarConfiguration
-    outcome: NoApplicableFraction
+class Error:
+    reason: MissingBranch
+
+    def __post_init__(self) -> None:
+        if type(self.reason) is not MissingBranch:
+            raise TypeError("Error reason must be exact MissingBranch")
 
 
-StepResult: TypeAlias = Advanced | NoSuccessor
+StepOutcome: TypeAlias = Advanced | Error
+
+
+@dataclass(frozen=True)
+class StepResult:
+    """Relevant members of the repository-wide uniform runner envelope."""
+
+    successors: tuple[ScalarConfiguration, ...]
+    outcome: StepOutcome
+    event: TransitionEvent | None
+
+    def __post_init__(self) -> None:
+        raw = exact_tuple(self.successors, "successors")
+        successors: list[ScalarConfiguration] = []
+        for successor in raw:
+            if type(successor) is not ScalarConfiguration:
+                raise TypeError("successors must be exact ScalarConfiguration values")
+            successors.append(successor)
+        if type(self.outcome) is Advanced:
+            if len(successors) != 1:
+                raise ValueError("Advanced requires exactly one successor")
+            if type(self.event) is not TransitionEvent:
+                raise TypeError("Advanced requires one exact TransitionEvent")
+            if self.event.after != successors[0]:
+                raise ValueError("Advanced event must report its sole successor")
+            if self.outcome.changed != (self.event.before != self.event.after):
+                raise ValueError("Advanced.changed must match configuration equality")
+        elif type(self.outcome) is Error:
+            if successors:
+                raise ValueError("Error must have zero successors")
+            if self.event is not None:
+                raise ValueError("Error must not contain a committed event")
+        else:
+            raise TypeError("unknown StepResult outcome")
+        object.__setattr__(self, "successors", tuple(successors))
 
 
 def advance(program: object, configuration: object) -> StepResult:
@@ -620,8 +720,8 @@ def advance(program: object, configuration: object) -> StepResult:
         raise AssertionError("UniqueScalar must select exactly one locus")
     old_value = read_self(configuration, active[0])
     proposal = evaluate_closed_rule(program, configuration, old_value)
-    if type(proposal) is NoApplicableFraction:
-        return NoSuccessor(configuration, proposal)
+    if type(proposal) is MissingBranch:
+        return StepResult((), Error(proposal), None)
     if type(proposal) is not ProposedScalarWrite:
         raise TypeError("closed RULE returned an unknown result")
     next_configuration = apply_scalar_assignment(configuration, proposal.assignment)
@@ -632,17 +732,23 @@ def advance(program: object, configuration: object) -> StepResult:
         next_configuration,
         proposal.witness,
     )
-    return Advanced(next_configuration, event)
+    return StepResult(
+        (next_configuration,),
+        Advanced(next_configuration != configuration),
+        event,
+    )
 
 
 @dataclass(frozen=True)
 class ScalarTrace:
+    program_id: str
     requested_horizon: int
     states: tuple[ScalarConfiguration, ...]
     events: tuple[TransitionEvent, ...]
-    undefined_step: NoApplicableFraction | None
+    stopped_result: StepResult | None
 
     def __post_init__(self) -> None:
+        program_id = checked_program_id(self.program_id)
         horizon = checked_horizon(self.requested_horizon)
         states = exact_tuple(self.states, "trace states")
         events = exact_tuple(self.events, "trace events")
@@ -661,16 +767,26 @@ class ScalarTrace:
         for index, event in enumerate(events):
             if event.before != states[index] or event.after != states[index + 1]:
                 raise ValueError("trace event endpoints do not align with snapshots")
-        if self.undefined_step is None:
+        if self.stopped_result is None:
             if len(events) != horizon:
                 raise ValueError("a trace without an undefined step must reach its horizon")
         else:
-            if type(self.undefined_step) is not NoApplicableFraction:
-                raise TypeError("undefined step must be exact NoApplicableFraction")
-            if self.undefined_step.retained != states[-1]:
-                raise ValueError("undefined result must report the last snapshot")
+            if type(self.stopped_result) is not StepResult:
+                raise TypeError("stopped result must be exact StepResult")
+            if type(self.stopped_result.outcome) is not Error:
+                raise ValueError("this proof trace stops only on generic Error")
+            if self.stopped_result.successors or self.stopped_result.event is not None:
+                raise ValueError("stopped Error must have no successor or event")
+            if self.stopped_result.outcome.reason.old_value != states[-1].value:
+                raise ValueError("Error reason must report the last complete scalar")
+            if self.stopped_result.outcome.reason.program_id != program_id:
+                raise ValueError("Error reason and trace program provenance differ")
             if len(events) >= horizon:
                 raise ValueError("a partial-rule failure must occur before the horizon")
+        for event in events:
+            if event.witness.program_id != program_id:
+                raise ValueError("event witness and trace program provenance differ")
+        object.__setattr__(self, "program_id", program_id)
         object.__setattr__(self, "requested_horizon", horizon)
         object.__setattr__(self, "states", tuple(states))
         object.__setattr__(self, "events", tuple(events))
@@ -682,17 +798,20 @@ def run(program: object, seed: object, horizon: object) -> ScalarTrace:
     steps = checked_horizon(horizon)
     states = [seed]
     events: list[TransitionEvent] = []
-    undefined_step: NoApplicableFraction | None = None
+    stopped_result: StepResult | None = None
+    program_id = structural_program_id(program)
     for _ in range(steps):
         result = advance(program, states[-1])
-        if type(result) is NoSuccessor:
-            undefined_step = result.outcome
+        if type(result.outcome) is Error:
+            stopped_result = result
             break
-        if type(result) is not Advanced:
-            raise TypeError("executor returned an unknown StepResult")
-        states.append(result.configuration)
+        if type(result.outcome) is not Advanced:
+            raise TypeError("executor returned an unknown StepResult outcome")
+        states.append(result.successors[0])
+        if result.event is None:
+            raise AssertionError("Advanced result lost its event")
         events.append(result.event)
-    return ScalarTrace(steps, tuple(states), tuple(events), undefined_step)
+    return ScalarTrace(program_id, steps, tuple(states), tuple(events), stopped_result)
 
 
 def verify_residue_witness(
@@ -706,6 +825,8 @@ def verify_residue_witness(
     try:
         residue, formula = program.formula_for(witness.old_value)
         return (
+            witness.program_id == structural_program_id(program)
+            and
             witness.modulus == program.modulus
             and witness.residue == residue
             and witness.formula == formula
@@ -736,25 +857,64 @@ def verify_fraction_witness(
                 return False
             break
     return (
-        tuple(flags) == witness.tested_integral
+        witness.program_id == structural_program_id(program)
+        and tuple(flags) == witness.tested_integral
         and program.fractions[witness.selected_index] == witness.selected_fraction
         and result == witness.new_value
     )
 
 
-def verify_no_applicable(
+def verify_missing_branch(
     program: object,
-    outcome: object,
+    result: object,
 ) -> bool:
     if type(program) is not OrderedFractionProgram:
         return False
-    if type(outcome) is not NoApplicableFraction:
+    if type(result) is not StepResult:
         return False
+    if type(result.outcome) is not Error:
+        return False
+    if result.successors or result.event is not None:
+        return False
+    reason = result.outcome.reason
     flags = tuple(
-        fraction.integral_product(outcome.retained.value) is not None
+        fraction.integral_product(reason.old_value) is not None
         for fraction in program.fractions
     )
-    return flags == outcome.tested_integral and not any(flags)
+    return (
+        reason.program_id == structural_program_id(program)
+        and flags == reason.tested_integral
+        and not any(flags)
+    )
+
+
+def verify_transition_event(program: object, event: object) -> bool:
+    """Bind an internally coherent event to one exact closed source program."""
+
+    if type(event) is not TransitionEvent:
+        return False
+    try:
+        if event.read_value != event.before.value:
+            return False
+        if event.assignment != ScalarAssignment(SCALAR_LOCUS, event.after.value):
+            return False
+        if apply_scalar_assignment(event.before, event.assignment) != event.after:
+            return False
+        if type(program) is CompleteResidueIntegerMap:
+            return (
+                event.before.carrier == program.carrier
+                and type(event.witness) is ResidueBranchWitness
+                and verify_residue_witness(program, event.witness)
+            )
+        if type(program) is OrderedFractionProgram:
+            return (
+                event.before.carrier == POSITIVE
+                and type(event.witness) is FractionBranchWitness
+                and verify_fraction_witness(program, event.witness)
+            )
+        return False
+    except (TypeError, ValueError):
+        return False
 
 
 def parity_program_a(carrier: str = POSITIVE) -> CompleteResidueIntegerMap:
@@ -1234,10 +1394,11 @@ def audit_noninjective_history() -> tuple[int, int, int]:
     return merges, distinct_traces, retained_history_fields
 
 
-def audit_branch_witnesses() -> tuple[int, int, int]:
+def audit_branch_witnesses() -> tuple[int, int, int, int]:
     residue_witnesses = 0
     fraction_witnesses = 0
     forged_rejections = 0
+    transition_event_replays = 0
     for program in (
         parity_program_a(SIGNED),
         parity_program_b(SIGNED),
@@ -1249,6 +1410,7 @@ def audit_branch_witnesses() -> tuple[int, int, int]:
             witness = result.event.witness
             assert type(witness) is ResidueBranchWitness
             assert verify_residue_witness(program, witness)
+            assert verify_transition_event(program, result.event)
             forged_residue = ResidueBranchWitness(
                 witness.modulus,
                 (witness.residue + 1) % witness.modulus,
@@ -1259,6 +1421,7 @@ def audit_branch_witnesses() -> tuple[int, int, int]:
             assert not verify_residue_witness(program, forged_residue)
             forged_rejections += 1
             residue_witnesses += 1
+            transition_event_replays += 1
 
     fractions = OrderedFractionProgram(
         (
@@ -1274,7 +1437,9 @@ def audit_branch_witnesses() -> tuple[int, int, int]:
         witness = result.event.witness
         assert type(witness) is FractionBranchWitness
         assert verify_fraction_witness(fractions, witness)
+        assert verify_transition_event(fractions, result.event)
         fraction_witnesses += 1
+        transition_event_replays += 1
         if witness.selected_index + 1 < len(fractions.fractions):
             forged = FractionBranchWitness(
                 witness.selected_index + 1,
@@ -1285,7 +1450,41 @@ def audit_branch_witnesses() -> tuple[int, int, int]:
             )
             assert not verify_fraction_witness(fractions, forged)
             forged_rejections += 1
-    return residue_witnesses, fraction_witnesses, forged_rejections
+    return (
+        residue_witnesses,
+        fraction_witnesses,
+        forged_rejections,
+        transition_event_replays,
+    )
+
+
+def audit_cross_program_event_rejections() -> tuple[int, int]:
+    """Internally valid reports still cannot be replayed under another rule."""
+
+    a_event = advance(parity_program_a(), ScalarConfiguration(POSITIVE, 1))
+    assert type(a_event) is Advanced
+    assert verify_transition_event(parity_program_a(), a_event.event)
+    assert not verify_transition_event(parity_program_b(), a_event.event)
+
+    overlap = OrderedFractionProgram(
+        (PositiveFraction(3, 2), PositiveFraction(5, 2), PositiveFraction(1, 1))
+    )
+    shadowed_witness = FractionBranchWitness(
+        0,
+        PositiveFraction(5, 2),
+        (True,),
+        2,
+        5,
+    )
+    internally_valid_shadowed_event = TransitionEvent(
+        ScalarConfiguration(POSITIVE, 2),
+        2,
+        ScalarAssignment(SCALAR_LOCUS, 5),
+        ScalarConfiguration(POSITIVE, 5),
+        shadowed_witness,
+    )
+    assert not verify_transition_event(overlap, internally_valid_shadowed_event)
+    return 2, 2
 
 
 def audit_ordered_fraction_partiality() -> tuple[int, int, int, int, int]:
@@ -1493,6 +1692,7 @@ def audit_conway_source_program() -> tuple[int, int, int, int]:
     assert all(
         type(event.witness) is FractionBranchWitness
         and verify_fraction_witness(program, event.witness)
+        and verify_transition_event(program, event)
         for event in trace.events
     )
     power_exponents: list[int] = []
@@ -1691,6 +1891,85 @@ def audit_hostile_validation() -> int:
     )
     rejected += must_raise(ValueError, lambda: ScalarAssignment("head", 1))
     rejected += must_raise(TypeError, lambda: ScalarAssignment(SCALAR_LOCUS, True))
+    valid_a_witness = ResidueBranchWitness(
+        2,
+        1,
+        AffineQuotient(3, 3, 2),
+        1,
+        3,
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: TransitionEvent(
+            ScalarConfiguration(POSITIVE, 1),
+            1,
+            ScalarAssignment(SCALAR_LOCUS, 999),
+            ScalarConfiguration(POSITIVE, 2),
+            valid_a_witness,
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: TransitionEvent(
+            ScalarConfiguration(POSITIVE, 1),
+            1,
+            ScalarAssignment(SCALAR_LOCUS, 2),
+            ScalarConfiguration(POSITIVE, 2),
+            valid_a_witness,
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: TransitionEvent(
+            ScalarConfiguration(POSITIVE, 1),
+            1,
+            ScalarAssignment(SCALAR_LOCUS, 3),
+            ScalarConfiguration(SIGNED, 3),
+            valid_a_witness,
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: TransitionEvent(
+            ScalarConfiguration(POSITIVE, 1),
+            1,
+            ScalarAssignment(SCALAR_LOCUS, 3),
+            ScalarConfiguration(POSITIVE, 3),
+            ResidueBranchWitness(
+                2,
+                0,
+                AffineQuotient(3, 3, 2),
+                1,
+                3,
+            ),
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: TransitionEvent(
+            ScalarConfiguration(POSITIVE, 1),
+            1,
+            ScalarAssignment(SCALAR_LOCUS, 3),
+            ScalarConfiguration(POSITIVE, 3),
+            ResidueBranchWitness(2, 1, AffineQuotient(1, 0, 1), 1, 3),
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: TransitionEvent(
+            ScalarConfiguration(POSITIVE, 2),
+            2,
+            ScalarAssignment(SCALAR_LOCUS, 5),
+            ScalarConfiguration(POSITIVE, 5),
+            FractionBranchWitness(
+                0,
+                PositiveFraction(3, 2),
+                (True,),
+                2,
+                5,
+            ),
+        ),
+    )
     rejected += must_raise(
         ValueError,
         lambda: apply_scalar_assignment(

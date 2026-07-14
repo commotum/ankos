@@ -412,7 +412,7 @@ Characteristic equations, generating functions, matrix powers, memoization, shif
 | T19 register machines | exact integer values and program/value separation | finite named bank, control address, instruction branches, and assignment effects |
 | T30 multiway systems | exact structured traces and provenance | set-valued branch layers and exact child merge, not one deterministic numeric append |
 | T34 arithmetic iteration | exact scalar carriers; rows (a)/(c) share newest-value streams | T34 overwrites one scalar and has no retained indexed prefix/dependency references |
-| T35 piecewise integer maps | exact scalar arithmetic | predicate-selected arms over one scalar, not fixed-lag prefix reads |
+| T35 piecewise integer maps | exact scalar arithmetic | complete residue-selected closed rows over one scalar, not fixed-lag prefix reads |
 | T36 digit-reversal arithmetic | exact integer terms and digit observers | representation base/digit transformation feeds back into one scalar update |
 | T38 variable-index recursion | exact prefix, append result/update, term references | dependency addresses are computed from term values and can be invalid at runtime |
 | T39 numeric filtering | ordered candidate selection and the resolved Ulam composition | Ulam uses T39 closed first-accepted/pair-sum access, then T37's unique-`End` RULE and T16 splice; it is not a fixed-lag recurrence |
