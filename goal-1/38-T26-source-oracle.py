@@ -10,11 +10,12 @@ controls.
 
 The evidence supports a two-dimensional ordered patch-emission form of the
 existing SimpleProgram substitution construction.  It does not by itself
-justify a T26 executor or top-level state class.  The strict square-grid source
-uses uniformly aligned patches; orientation-sensitive off-grid geometry,
-neighbor-dependent choice, adaptive subdivision, rasters, and coordinate
-formulas are retained as variants, relations, controls, or observers rather
-than silently promoted into the strict rule.
+justify a T26 executor or top-level state class.  The strict square-grid core
+uses uniformly aligned patches, while the source also gives one executable
+mixed-patch encoded-label rule and seed.  Its geometric decoding and image,
+orientation-sensitive off-grid geometry, neighbor-dependent choice, adaptive
+subdivision, rasters, and coordinate formulas remain relations, controls, or
+observers rather than being silently promoted into the uniform core.
 """
 
 from __future__ import annotations
@@ -265,19 +266,20 @@ EXPECTED_QUERY = {
 
 
 # Every pre-Index query hit is assigned exactly once.  Native evidence is the
-# strict rank-two construction or its inherited parallel-substitution rule.
-# Relation evidence covers lossless/equivalent generators, analyzers, named
-# examples, dimensional generalization, shape encodings, and downstream uses.
+# strict rank-two construction, its inherited parallel-substitution rule, or
+# the source's complete executable mixed-patch encoded-label preset.  Relation
+# evidence covers lossless/equivalent generators, analyzers, named examples,
+# dimensional generalization, geometric decoding/images, and downstream uses.
 # Controls preserve the T27 geometric, T28 contextual, and sequential sibling
 # boundaries without treating those constructions as strict T26 mechanics.
 NATIVE_MATCHED = line_set(
     "984,986,992,994,"
     "2308,2312,2316,2318,2320,2324,"
-    "13681,13683,13686-13688,13692,13699,13722"
+    "13681,13683,13686-13688,13722,13744"
 )
 RELATION_MATCHED = line_set(
     "6676,6842,6978,6984,7312,7322,12249,12259,"
-    "13701,13726,13729-13731,13736,13738,13740,13744,13746,13754,"
+    "13692,13699,13701,13726,13729-13731,13736,13738,13740,13746,13754,"
     "13775,13786,14099,14109,17297,17299,17301,19197"
 )
 CONTROL_MATCHED = line_set(
@@ -285,11 +287,11 @@ CONTROL_MATCHED = line_set(
 )
 
 NATIVE_CONTINUATIONS = line_set(
-    "982,2310,2314,2322,13689,13695,13696,13724"
+    "982,2310,2314,2322,13689,13724"
 )
 RELATION_CONTINUATIONS = line_set(
     "6666,6668,6670,6840,6982,7284,7306,7316,7318,7320,"
-    "13710,13712,13714-13720,13732,13733,13742,13748,13750,13752,"
+    "13695,13696,13710,13712,13714-13720,13732,13733,13742,13748,13750,13752,"
     "13756,14102-14106,14111,17303,17305,17307,17309,17311"
 )
 CONTROL_CONTINUATIONS = line_set(
@@ -327,6 +329,28 @@ RELATION_IMAGE_LINES = line_set(
 CONTROL_IMAGE_LINES = line_set("2328,2330,2340,2344,2354,2362,13772")
 GOVERNED_IMAGE_LINES = (
     NATIVE_IMAGE_LINES | RELATION_IMAGE_LINES | CONTROL_IMAGE_LINES
+)
+
+
+# BOOK:13744 is complete executable encoded-label data even though the
+# accompanying BOOK:13742 picture and the unrecovered shape/orientation
+# decoding remain relation evidence.  The canonical row order here is an audit
+# representation; the source prints the four rows in descending label order.
+OTHER_SHAPES_ENCODED_ROWS = (
+    (0, ((3,),)),
+    (1, ((3, 2),)),
+    (2, ((1,), (3,))),
+    (3, ((1, 0), (3, 2))),
+)
+OTHER_SHAPES_ENCODED_SEED = ((3,),)
+OTHER_SHAPES_EXPECTED_SHAPES = (
+    (1, 1),
+    (2, 2),
+    (3, 3),
+    (5, 5),
+    (8, 8),
+    (13, 13),
+    (21, 21),
 )
 
 
@@ -405,8 +429,8 @@ EXPECTED_SET = {
     "governed_continuations": (59, "d57df06258e56b5ce592330eec7f9f9b49eea14f27f2d6a80c5886f9d828e012"),
     "retained": (115, "962eef0254ab18a40c72b64e8127f6356977fc3ff4dd15e29cf9094f502e7413"),
     "excluded": (11, "69a5794057817d20463c17a61395d9bd7f54aad527d9747c3f9635b30c50bfe8"),
-    "native": (26, "6e1fe6cad7bba3a647abfb578fb1069e1428c0681a53a35aeab368b207486e20"),
-    "relation": (64, "e97b0eaa2f71e6d2ce8abee067e3cb66bb8c0dad0555ee3429bff48a585c8637"),
+    "native": (23, "ef70c2761fd15a9c63d9a7c597e18bee94ceeb3cda7c41078f31b2dc44921f74"),
+    "relation": (67, "99cd6cfc9fbf549c65694fcedf58421f0a1f7e14dbf8e1f39a82dda50a219c49"),
     "control": (25, "34ce5350d22b028c7dbd345bd4655eb971b8be7c0a89581ed95981fe1f9177f7"),
     "governed_images": (26, "9018acedd5ff638608aa2a79feb5059de5b8a671792ab0c8ec501437eea85ee7"),
 }
@@ -544,6 +568,69 @@ def expand_uniform_grid(
         )
         for source_y in range(len(grid))
         for local_y in range(patch_height)
+    )
+
+
+def expand_compatible_mosaic(
+    grid: tuple[tuple[int, ...], ...],
+    rule: dict[int, tuple[tuple[int, ...], ...]],
+) -> tuple[tuple[int, ...], ...]:
+    """Replay one source-style mixed-patch ``Flatten2D`` event.
+
+    A source row must emit blocks with one common height, and a source column
+    must emit blocks with one common width.  Those are exactly the compatibility
+    conditions that make the variable rectangles a hole-free rectangular
+    mosaic while preserving both product axes.
+    """
+
+    assert grid and all(grid) and len({len(row) for row in grid}) == 1
+    height, width = len(grid), len(grid[0])
+    assert set(rule) == {0, 1, 2, 3}
+    patches = tuple(
+        tuple(rule[value] for value in row)
+        for row in grid
+    )
+    assert all(
+        patch
+        and all(patch_row for patch_row in patch)
+        and len({len(patch_row) for patch_row in patch}) == 1
+        and all(value in rule for patch_row in patch for value in patch_row)
+        for patch_row in patches
+        for patch in patch_row
+    )
+    row_heights = tuple(
+        next(iter(row_sizes))
+        for source_row in patches
+        for row_sizes in ({len(patch) for patch in source_row},)
+        if len(row_sizes) == 1
+    )
+    column_widths = tuple(
+        next(iter(column_sizes))
+        for source_column in range(width)
+        for column_sizes in (
+            {len(patches[source_row][source_column][0]) for source_row in range(height)},
+        )
+        if len(column_sizes) == 1
+    )
+    assert len(row_heights) == height
+    assert len(column_widths) == width
+    assert all(
+        len(patches[source_row][source_column]) == row_heights[source_row]
+        and all(
+            len(patch_row) == column_widths[source_column]
+            for patch_row in patches[source_row][source_column]
+        )
+        for source_row in range(height)
+        for source_column in range(width)
+    )
+    return tuple(
+        tuple(
+            patches[source_row][source_column][local_row][local_column]
+            for source_column in range(width)
+            for local_column in range(column_widths[source_column])
+        )
+        for source_row in range(height)
+        for local_row in range(row_heights[source_row])
     )
 
 
@@ -752,6 +839,8 @@ def main() -> int:
         and "finer grid of squares" in at(7312)
         and "one more digit in their coordinates" in at(7312)
         and "repeatedly applying the substitution system rule" in at(7322)
+        and {13692, 13695, 13696, 13699} <= RELATION_EVIDENCE
+        and not ({13692, 13695, 13696, 13699} & NATIVE_EVIDENCE)
     )
     ok &= coordinate_relation_ok
     print(
@@ -776,6 +865,35 @@ def main() -> int:
         "OK" if background_dimension_ok else "MISMATCH",
     )
 
+    mixed_rule_fragments = (
+        "3 \\rightarrow \\{\\{1, 0\\}, \\{3, 2\\}\\}",
+        "2 \\rightarrow \\{\\{1\\}, \\{3\\}\\}",
+        "1 \\rightarrow \\{\\{3, 2\\}\\}",
+        "0 \\rightarrow \\{\\{3\\}\\}",
+        "starting from initial condition {{3}}",
+    )
+    mixed_rule = dict(OTHER_SHAPES_ENCODED_ROWS)
+    mixed_trace = [OTHER_SHAPES_ENCODED_SEED]
+    for _ in range(len(OTHER_SHAPES_EXPECTED_SHAPES) - 1):
+        mixed_trace.append(expand_compatible_mosaic(mixed_trace[-1], mixed_rule))
+    mixed_native_ok = (
+        all(fragment in at(13744) for fragment in mixed_rule_fragments)
+        and set(mixed_rule) == {0, 1, 2, 3}
+        and tuple((len(grid), len(grid[0])) for grid in mixed_trace)
+        == OTHER_SHAPES_EXPECTED_SHAPES
+        and mixed_trace[1] == ((1, 0), (3, 2))
+        and mixed_trace[2] == ((3, 2, 3), (1, 0, 1), (3, 2, 3))
+        and 13744 in NATIVE_EVIDENCE
+        and 13744 not in RELATION_EVIDENCE
+    )
+    ok &= mixed_native_ok
+    print(
+        "source_mixed_patch_encoded_label_native",
+        "OK" if mixed_native_ok else "MISMATCH",
+        len(mixed_trace) - 1,
+        *(f"{height}x{width}" for height, width in OTHER_SHAPES_EXPECTED_SHAPES),
+    )
+
     shape_boundary_ok = (
         "pages 187 and 188 are based on subdividing squares" in at(13740)
         and "subdividing other geometrical figures" in at(13740)
@@ -786,10 +904,13 @@ def main() -> int:
         and "rigid grid" in at(2326)
         and "must take account of the orientation of that square" in at(2332)
         and "possible for the squares produced to overlap" in at(2334)
+        and 13742 in RELATION_IMAGE_LINES
+        and 13742 in RELATION_EVIDENCE
+        and 13742 not in NATIVE_IMAGE_LINES
     )
     ok &= shape_boundary_ok
     print(
-        "source_strict_grid_vs_shape_orientation_relation",
+        "source_uniform_core_and_geometric_image_boundary",
         "OK" if shape_boundary_ok else "MISMATCH",
     )
 
@@ -1014,6 +1135,7 @@ def main() -> int:
         and notes_assembly_ok
         and source_repairs_ok
         and background_dimension_ok
+        and mixed_native_ok
         and shape_boundary_ok
         and contextual_boundary_ok
         and derived_assembly_ok

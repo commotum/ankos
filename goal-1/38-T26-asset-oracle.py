@@ -73,8 +73,8 @@ GOVERNED = set(SOURCE.GOVERNED_IMAGE_LINES)
 # class or governing context must stop this dependent audit.
 EXPECTED_SOURCE_CONTRACT = {
     "retained": (115, "962eef0254ab18a40c72b64e8127f6356977fc3ff4dd15e29cf9094f502e7413"),
-    "native_evidence": (26, "6e1fe6cad7bba3a647abfb578fb1069e1428c0681a53a35aeab368b207486e20"),
-    "relation_evidence": (64, "e97b0eaa2f71e6d2ce8abee067e3cb66bb8c0dad0555ee3429bff48a585c8637"),
+    "native_evidence": (23, "ef70c2761fd15a9c63d9a7c597e18bee94ceeb3cda7c41078f31b2dc44921f74"),
+    "relation_evidence": (67, "99cd6cfc9fbf549c65694fcedf58421f0a1f7e14dbf8e1f39a82dda50a219c49"),
     "control_evidence": (25, "34ce5350d22b028c7dbd345bd4655eb971b8be7c0a89581ed95981fe1f9177f7"),
     "native_images": (3, "88c77dedfd94731adae1c3913a93edfea3ad631c7afc976b012c7024d169e83a"),
     "relation_images": (16, "33b72d4db3c3e99d04583d7a7e716ac8d2de973ae8786198a79958812453adf6"),
@@ -588,8 +588,10 @@ SOURCE_TEXT_GUARDS = {
     7312: "finite automaton at the bottom right",
     7322: "feeding the digit sequences of its y and x coordinates",
     13683: "initial condition such as {{1}}",
+    13692: "finite automaton from the digit sequences",
     13722: "Non-white backgrounds",
     13740: "subdividing other geometrical figures",
+    13744: "starting from initial condition {{3}}",
     13746: "Penrose tilings",
     13770: "3D pictures below show successive steps",
     14109: "only 51 of the 65,536 possible 2×2 blocks",
@@ -598,11 +600,45 @@ SOURCE_TEXT_GUARDS = {
 for source_line, fragment in SOURCE_TEXT_GUARDS.items():
     assert fragment in BOOK_LINES[source_line - 1], (source_line, fragment)
 
-assert 13683 in SOURCE.NATIVE_EVIDENCE
+MIXED_PATCH_RULE_FRAGMENTS = (
+    "3 \\rightarrow \\{\\{1, 0\\}, \\{3, 2\\}\\}",
+    "2 \\rightarrow \\{\\{1\\}, \\{3\\}\\}",
+    "1 \\rightarrow \\{\\{3, 2\\}\\}",
+    "0 \\rightarrow \\{\\{3\\}\\}",
+    "starting from initial condition {{3}}",
+)
+assert all(
+    fragment in BOOK_LINES[13744 - 1]
+    for fragment in MIXED_PATCH_RULE_FRAGMENTS
+)
+assert {13683, 13744} <= set(SOURCE.NATIVE_EVIDENCE)
+assert {13692, 13695, 13696, 13699} <= set(SOURCE.RELATION_EVIDENCE)
+assert not ({13692, 13695, 13696, 13699} & set(SOURCE.NATIVE_EVIDENCE))
 assert {2332, 2334, 2342, 2356, 2364, 13770} <= set(SOURCE.CONTROL_EVIDENCE)
 assert {
     6676, 6842, 6984, 7312, 7322, 13740, 13746, 14109, 17297
 } <= set(SOURCE.RELATION_EVIDENCE)
+assert SOURCE.OTHER_SHAPES_ENCODED_ROWS == (
+    (0, ((3,),)),
+    (1, ((3, 2),)),
+    (2, ((1,), (3,))),
+    (3, ((1, 0), (3, 2))),
+)
+assert SOURCE.OTHER_SHAPES_ENCODED_SEED == ((3,),)
+mixed_trace = [SOURCE.OTHER_SHAPES_ENCODED_SEED]
+for _ in range(len(SOURCE.OTHER_SHAPES_EXPECTED_SHAPES) - 1):
+    mixed_trace.append(
+        SOURCE.expand_compatible_mosaic(
+            mixed_trace[-1],
+            dict(SOURCE.OTHER_SHAPES_ENCODED_ROWS),
+        )
+    )
+assert tuple((len(grid), len(grid[0])) for grid in mixed_trace) == (
+    SOURCE.OTHER_SHAPES_EXPECTED_SHAPES
+)
+assert 13742 in SOURCE.RELATION_IMAGE_LINES
+assert 13742 in SOURCE.RELATION_EVIDENCE
+assert 13742 not in SOURCE.NATIVE_IMAGE_LINES
 
 
 HASH_BOUND_ASSETS = set(ASSETS)
