@@ -8,21 +8,21 @@ A blocker honestly reported is preferable to a working implementation built from
 
 ## 1. Discover Constructions; Do Not Assume Them
 
-Seek the smallest shared construction mechanisms demonstrated by the catalog. Treat the 45 types as evidence, not as proof that every entry is a preset of one preselected algebra.
+Seek the smallest shared construction mechanisms demonstrated by the catalog. Begin with the existing SimpleProgram axes and require a concrete semantic counterexample before adding a new execution algebra.
 
-Catalog labels do not create executors. Presets, restrictions, and aliases should resolve to shared constructions only when the constructions are genuinely the same.
+Catalog labels do not create executors. Different names, semantic roles, or state decompositions should resolve to shared constructions whenever a lossless one-step mapping preserves the complete state and transition semantics without hidden interpretation.
 
 ## 2. Share Execution Only Where Semantics Are Shared
 
 Use one reference executor wherever systems genuinely share an execution algebra. Never create family-specific rollouts, but never conceal fundamentally different semantics behind an empty universal interface.
 
-For transition and rewrite systems, the candidate common process is:
+For systems with canonical transition or rewrite evolution, the common process is:
 
 ```text
 active  = FRONTIER.select(state)
 reads   = NEIGHBORHOOD.read(state, active)
-results = RULE(active, reads)
-next    = UPDATE.apply(state, results)
+writes  = RULE(active, reads)
+next    = UPDATE.apply(state, active, writes)
 ```
 
 This process must be validated against representative constructions. If supporting a family requires `Any`, family switches, hidden engines, duplicated semantics, or global-state smuggling, stop and reconsider the algebra.
@@ -33,8 +33,8 @@ Within the common transition algebra:
 
 - `FRONTIER`: where rules fire.
 - `NEIGHBORHOOD`: what those loci can observe.
-- `RULE`: what semantic results are proposed.
-- `UPDATE`: how applicable results become the next state.
+- `RULE`: what typed writes or replacements are proposed.
+- `UPDATE`: how applicable writes become the next state or states.
 
 These boundaries are hypotheses too. Redraw them if a real construction demonstrates that the responsibilities are wrong.
 
@@ -49,10 +49,10 @@ Do not relabel constraints, derivatives, distributions, or observations as effec
 For structured state:
 
 ```text
-STATE = SUPPORT/TOPOLOGY + VALUES + CONTROL
+CONFIGURATION = SUPPORT/TOPOLOGY + VISIBLE STATE DATA + INVARIANTS
 ```
 
-`CONTROL` includes heads, active markers, instruction pointers, cyclic counters, and any memory required to make the process Markovian. It is part of state, not hidden executor state.
+Heads, active markers, instruction pointers, cyclic counters, and any memory required to make the process Markovian are semantic roles inside visible state, not hidden executor state. They may be represented losslessly as tagged/product values, as named factors of a configuration, or through another explicit isomorphism. A role does not require a separate runtime class.
 
 The alphabet defines possible values. It does not by itself define where values exist, how locations relate, or what control state is active.
 
@@ -71,6 +71,14 @@ Padding, truncation, and capacity limits belong only at explicit finite-computat
 ## 8. Separate Semantics From Representation
 
 A system fitting into a tensor does not mean its construction is tensor-local. Any lowering into canonical addresses must preserve every semantic distinction required by the task and remain inspectable.
+
+For evolving systems, the strongest reuse evidence is a lossless map `e` with an explicit inverse on its valid image and a one-step commuting law:
+
+```text
+e(step_A(state)) = step_B(e(state))
+```
+
+The mapping must preserve the complete state, require no hidden interpreter, and use one native step on each side. Encodability establishes a representation; it does not make two differently factored rule tables identical.
 
 Lossy projections are acceptable only when loss is the declared purpose, as in visualization or a chosen observable. They are not valid substitutes for the underlying state.
 
@@ -106,7 +114,7 @@ Flattening, padding, token ordering, type prefixes, coordinate metadata, loss ma
 
 Implement the smallest set of examples that exercises every suspected primitive and difficult interaction. Choose examples likely to break the design, not merely typical examples.
 
-Let those examples reveal the actual structural families. Expand to all 45 catalog entries only after the common mechanisms survive these tests without exceptions or duplicated paths.
+Let those examples reveal the actual axis parameters, invariants, and genuinely different update composition laws. Expand to all 45 catalog entries only after the common mechanisms survive these tests without exceptions or duplicated paths.
 
 ## 14. Treat Failed Composition as Design Information
 
