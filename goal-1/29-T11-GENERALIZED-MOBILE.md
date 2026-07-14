@@ -379,7 +379,7 @@ A transition may produce next_active = empty. That resulting configuration is co
 - GMAStep's Transpose assignment does not define the empty case successfully;
 - the book does not say terminal, absorbing, or error.
 
-Goal 2 should return a typed Quiescent(NoActiveSources) or equivalent non-advancing outcome while keeping terminal-versus-stutter projection outside the native construction. It must not synthesize an observer-visible duplicate state as though the book specified an absorbing transition.
+Goal 2 should return a typed SourceUndefined(NoActiveSources), or an equivalently explicit evidence-boundary result with no successor, while keeping terminal, quiescent-stutter, and error projections outside the native construction. It must not synthesize an observer-visible duplicate state as though the book specified an absorbing transition.
 
 ### DOMAIN, support, realization, and trace
 

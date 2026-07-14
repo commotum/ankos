@@ -119,8 +119,10 @@ def normalize_bits(bits: Mapping[int, int]) -> Bits:
 
 
 def normalize_active(active: Iterable[int]) -> ActiveSet:
-    assert all(isinstance(position, int) for position in active)
-    return frozenset(int(position) for position in active)
+    positions = tuple(active)
+    assert all(isinstance(position, int) for position in positions)
+    assert len(set(positions)) == len(positions)
+    return frozenset(int(position) for position in positions)
 
 
 def normalize_offsets(offsets: Iterable[int]) -> frozenset[int]:
@@ -379,6 +381,13 @@ def assert_table_validation() -> None:
         pass
     else:
         raise AssertionError("duplicate table row was accepted")
+
+    try:
+        normalize_active((0, 0))
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("duplicate active position was accepted")
 
 
 def assert_exhaustive_composition_commutation() -> int:
