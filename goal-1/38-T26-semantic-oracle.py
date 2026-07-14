@@ -1303,15 +1303,15 @@ def bag_step_result(
 ) -> BagStepResult:
     """Full successful runner envelope for the uniform T27 restriction."""
 
-    old_grid = decode_bag_as_grid(bag, bag.provenance.grid_token)
+    decode_bag_as_grid(bag, bag.provenance.grid_token)
     step = bag_step(table, bag)
-    successor_grid = decode_bag_as_grid(
+    decode_bag_as_grid(
         step.successor,
         step.successor.provenance.grid_token,
     )
     changed = (
-        successor_grid.cells != old_grid.cells
-        or successor_grid.shape != old_grid.shape
+        (step.successor.prototypes, step.successor.occurrences)
+        != (bag.prototypes, bag.occurrences)
     )
     return BagStepResult(Advanced(changed), (step.successor,), step)
 
@@ -1939,6 +1939,12 @@ def assert_source_fixture_and_rectangles() -> dict[str, int]:
     assert table_count(4, (2, 2)) == 4**16 == 2**32 == 4_294_967_296
 
     configuration = make_grid(PAGE_187_T0, 2)
+    exhaustive_tables = set(binary_tables_2x2())
+    exhaustive_cells = {grid.cells for grid in binary_grids()}
+    assert PAGE_187_TABLE in exhaustive_tables
+    assert PAGE_187_T0 in exhaustive_cells
+    assert PAGE_187_T1 in exhaustive_cells
+    assert PAGE_187_T2 not in exhaustive_cells
     assert native_step(PAGE_187_TABLE, configuration.cells) == PAGE_187_T1
     first = generic_step(PAGE_187_TABLE, configuration).successor
     assert first.cells == PAGE_187_T1
@@ -2002,7 +2008,11 @@ def assert_source_fixture_and_rectangles() -> dict[str, int]:
 
     return {
         "page187_generic_events": 4,
+        "page187_exhaustive_overlap_events": 2,
+        "page187_unique_nonoverlap_events": 2,
         "page187_bag_commuting_events": 2,
+        "page187_bag_exhaustive_overlap_events": 2,
+        "page187_bag_unique_nonoverlap_events": 0,
         "page187_exact_checkpoints": 3,
         "page187_trace_digest_words": len(trace_digest),
         "page187_trace_digest_int": int(trace_digest[:12], 16),
@@ -2120,6 +2130,7 @@ def assert_rank_parameterization() -> dict[str, int]:
     assert unselected_consumption_events == 15_190
     assert empty_input_events == 49
     assert singleton_to_empty_events == 98
+    assert selected_epsilon_events == 1_390
     assert fixed_events == 600
 
     adversarial = ClosedPatchTable(
@@ -2157,6 +2168,10 @@ def assert_rank_parameterization() -> dict[str, int]:
 
 def assert_boundaries_and_observers() -> dict[str, int]:
     all_white = make_grid(((0, 0), (0, 0)), 2)
+    exhaustive_tables = set(binary_tables_2x2())
+    exhaustive_cells = {grid.cells for grid in binary_grids()}
+    assert NONWHITE_BACKGROUND_TABLE in exhaustive_tables
+    assert all_white.cells in exhaustive_cells
     assert_commutes(NONWHITE_BACKGROUND_TABLE, all_white)
     changed = generic_step(NONWHITE_BACKGROUND_TABLE, all_white).successor
     assert any(value == 1 for row in changed.cells for value in row)
@@ -2177,6 +2192,7 @@ def assert_boundaries_and_observers() -> dict[str, int]:
         ),
     )
     identity_grid = make_grid(((0,),), 2)
+    assert identity_table not in exhaustive_tables
     identity_grid_result = generic_step_result(identity_table, identity_grid)
     identity_bag_result = bag_step_result(
         identity_table,
@@ -2184,6 +2200,8 @@ def assert_boundaries_and_observers() -> dict[str, int]:
     )
     assert identity_grid_result.outcome == Advanced(False)
     assert identity_bag_result.outcome == Advanced(False)
+    assert native_step(identity_table, identity_grid.cells) == identity_grid.cells
+    assert_commutes(identity_table, identity_grid)
     assert_bag_commutes(identity_table, identity_grid)
 
     mixed_shapes = {
@@ -2195,8 +2213,10 @@ def assert_boundaries_and_observers() -> dict[str, int]:
     # One event cannot recursively fire newborns.  The second event has a
     # different extent and is observably distinct from the first event.
     seed = make_grid(((1,),), 2)
+    assert seed.cells in exhaustive_cells
     assert_commutes(NONWHITE_BACKGROUND_TABLE, seed)
     first = generic_step(NONWHITE_BACKGROUND_TABLE, seed).successor
+    assert first.cells in exhaustive_cells
     assert_commutes(NONWHITE_BACKGROUND_TABLE, first)
     second = generic_step(NONWHITE_BACKGROUND_TABLE, first).successor
     assert first.shape == (2, 2)
@@ -2249,14 +2269,17 @@ def assert_boundaries_and_observers() -> dict[str, int]:
 
     return {
         "nonwhite_background_events": 1,
+        "nonwhite_background_exhaustive_overlap_events": 1,
         "implicit_white_identity_divergences": 1,
         "render_scale_variants": 2,
         "render_inputs_to_rule": 0,
         "identity_stepresult_events": 1,
+        "identity_unique_stepresult_events": 1,
         "identity_bag_stepresult_commutations": 1,
-        "other_shapes_relation_rows": len(OTHER_SHAPES_MIXED_RELATION),
+        "other_shapes_encoded_rows": len(OTHER_SHAPES_MIXED_RELATION),
         "other_shapes_strict_executions": len(OTHER_SHAPES_CHECKPOINTS) - 1,
         "newborn_deferral_events": 2,
+        "newborn_deferral_exhaustive_overlap_events": 2,
         "bag_permutation_checks": 1,
         "context_independence_checks": 1,
     }
@@ -2747,7 +2770,7 @@ def semantic_digest(counts: dict[str, int]) -> str:
 
 
 EXPECTED_SEMANTIC_DIGEST = (
-    "bfcf5b173fd6a1346b55251292389d1dd45181ed697ac6f6c99051631087c033"
+    "a472758fad406246b9a3fccaf7b24a8b314986aaca7424206d936a987724a9eb"
 )
 
 
@@ -2764,21 +2787,36 @@ def main() -> None:
         for group, values in groups.items()
         for key, value in values.items()
     }
+    assert groups["source"]["page187_generic_events"] == (
+        groups["source"]["page187_exhaustive_overlap_events"]
+        + groups["source"]["page187_unique_nonoverlap_events"]
+    )
+    assert groups["source"]["page187_bag_commuting_events"] == (
+        groups["source"]["page187_bag_exhaustive_overlap_events"]
+        + groups["source"]["page187_bag_unique_nonoverlap_events"]
+    )
+    assert groups["boundaries"]["nonwhite_background_events"] == groups[
+        "boundaries"
+    ]["nonwhite_background_exhaustive_overlap_events"]
+    assert groups["boundaries"]["newborn_deferral_events"] == groups[
+        "boundaries"
+    ]["newborn_deferral_exhaustive_overlap_events"]
     counts["total.native_generic_events"] = (
         groups["exhaustive"]["native_generic_events"]
-        + groups["source"]["page187_generic_events"]
+        + groups["source"]["page187_unique_nonoverlap_events"]
         + groups["source"]["rectangular_2x3_events"]
+        + groups["source"]["compatible_cross_column_width_events"]
         + groups["source"]["other_shapes_mosaic_events"]
-        + groups["boundaries"]["nonwhite_background_events"]
-        + groups["boundaries"]["newborn_deferral_events"]
+        + groups["boundaries"]["identity_unique_stepresult_events"]
     )
     counts["total.bag_stepresult_commutations"] = (
         groups["exhaustive"]["t27_bag_commuting_events"]
-        + groups["source"]["page187_bag_commuting_events"]
+        + groups["source"]["page187_bag_unique_nonoverlap_events"]
         + groups["source"]["rectangular_2x3_events"]
+        + groups["boundaries"]["identity_bag_stepresult_commutations"]
     )
     counts["total.rank1_mosaic_commutations"] = groups["rank"][
-        "t13_rank1_mosaic_events"
+        "rank1_selected_mosaic_events"
     ]
     counts["total.commuting_proofs"] = (
         counts["total.native_generic_events"]
@@ -2792,13 +2830,20 @@ def main() -> None:
     print(f"native_generic_events={counts['total.native_generic_events']}")
     print(f"commuting_proofs={counts['total.commuting_proofs']}")
     print(
-        "event_partition="
+        "unique_event_partition="
         f"binary_2x2:{groups['exhaustive']['native_generic_events']},"
-        f"page187:{groups['source']['page187_generic_events']},"
+        f"page187_nonoverlap:{groups['source']['page187_unique_nonoverlap_events']},"
         f"rectangular_2x3:{groups['source']['rectangular_2x3_events']},"
+        f"compatible_cross_column_width:{groups['source']['compatible_cross_column_width_events']},"
         f"other_shapes_mosaic:{groups['source']['other_shapes_mosaic_events']},"
-        f"nonwhite_background:{groups['boundaries']['nonwhite_background_events']},"
-        f"newborn_deferral:{groups['boundaries']['newborn_deferral_events']}"
+        f"identity_stepresult:{groups['boundaries']['identity_unique_stepresult_events']}"
+    )
+    print(
+        "named_overlap_coverage_nonadditive="
+        f"page187_native:{groups['source']['page187_exhaustive_overlap_events']},"
+        f"page187_bag:{groups['source']['page187_bag_exhaustive_overlap_events']},"
+        f"nonwhite:{groups['boundaries']['nonwhite_background_exhaustive_overlap_events']},"
+        f"newborn:{groups['boundaries']['newborn_deferral_exhaustive_overlap_events']}"
     )
     print(
         "strict_T26=discrete_t+2D;configuration=finite_nonempty_rectangular_tile_grid;"
@@ -2807,6 +2852,7 @@ def main() -> None:
     print(
         "rule=total_closed_TileLabel_to_nonempty_rectangular_patch;"
         "UPDATE=exact_rank2_compatible_Flatten2D_mosaic;old_snapshot=YES;newborn_deferral=YES;"
+        "incompatibility=Invalid(IncompatibleMosaic)+zero_successors+no_commit;"
         "overlap_policy=NOT_APPLICABLE"
     )
     print(
@@ -2815,22 +2861,31 @@ def main() -> None:
         "source_numeric_codec=NONE"
     )
     print(
-        "rank_relation=generic_ranked_mosaic_extends_D019;D019_is_rank1_member;"
+        "rank_relation=generic_ranked_mosaic_has_explicit_selected_source_indices;"
+        "unselected_sources=CONSUMED;epsilon=RETAINED;"
         "T26_is_rank2_member;"
-        f"rank1_commutations={groups['rank']['t13_rank1_mosaic_events']};"
+        f"rank1_commutations={groups['rank']['rank1_selected_mosaic_events']};"
+        f"original_positive_all_selected_subset={groups['rank']['rank1_original_positive_all_selected_subset']};"
+        f"all_selected_including_empty={groups['rank']['rank1_all_selected_events']};"
+        f"unselected_consumption={groups['rank']['rank1_unselected_consumption_events']};"
+        f"empty_input={groups['rank']['rank1_empty_input_events']};"
+        f"singleton_to_empty={groups['rank']['rank1_singleton_to_empty_events']};"
         f"fixed_block_subset={groups['rank']['t13_fixed_block_rank1_subset']};"
+        f"nonadditive_right_neighbor_subset={groups['rank']['rank1_right_neighbor_frontier_events']};"
+        f"nonadditive_selected_epsilon_subset={groups['rank']['rank1_selected_epsilon_events']};"
         "plain_row_major_T13_concatenation_for_rank2=REJECTED"
     )
     print(
         "bag_relation=lossless_restriction_of_T27_addressed_pose_bag;"
         f"bag_commutations={counts['total.bag_stepresult_commutations']};"
         "carrier=(prototype_id,pose);prototype_catalog=one_declared_unit_square_per_label;"
-        "proof=full_StepResult_snapshot_provenance_and_typed_lineage;"
+        "proof=full_StepResult+independent_successor_tokens+explicit_token_bijection+typed_lineage;"
+        "identity_changed_false=PROVED;"
         "required_invariant=aligned_uniform_no_hole_no_overlap_rectangular_tiling;"
         "arbitrary_free_geometry=T27"
     )
     print(
-        "other_shapes=finite_shape_orientation_roles_may_be_color_encoded;"
+        "other_shapes=encoded_labels_0_through_3;geometric_role_codec=UNSPECIFIED;"
         f"printed_mixed_patch_rule=NATIVE_T26;strict_executions={groups['source']['other_shapes_mosaic_events']};"
         "exact_sides=1,2,3,5,8,13,21;source_role_to_color_assignment=UNSPECIFIED;"
         "compatibility=row_equal_heights+equal_slab_widths"
