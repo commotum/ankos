@@ -92,9 +92,9 @@ def parse_assets(rows: str) -> dict[int, AssetSpec]:
 # the governed asset metrics.  Their formulas and interpretations remain text
 # evidence even though the referenced files are cryptographically bound here.
 ASSET_ROWS = r"""
-1543|N-T36-SEED-16|_page_140_Picture_5.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_140_Picture_5.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|147|140714|607|922|4adb983dd8fa5ec5a8904cca51dec2d6fef50b3f28924784ee832e4f2d8b5d6c|t36_main_trilogy|native printed-page-125 seed-16 digit presentation; source text, not pixels, states the rule, seed, and 180-step claim
-1547|N-T36-SEED-512|_page_141_Picture_2.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_141_Picture_2.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|151|359405|950|1461|2523481bae71468864a41f08ae0e0dcc1a823bfd49c5efdcc788625b00cd0fba|t36_main_trilogy|native printed-page-126 seed-512 presentation; source text supplies the thousand-step scope
-1551|N-T36-MILLIONTH-CONTINUATION|_page_142_Picture_2.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_142_Picture_2.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|155|516673|962|1476|d304e0089d5be1c9662e1645812b78f2d900f009e7805978a142b4f1b741700e|t36_main_trilogy|native printed-page-127 continuation at the millionth step; crop and complete-width statement remain prose evidence
+1543|N-T36-SEED-16|_page_140_Picture_5.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_140_Picture_5.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|147|140714|607|922|4adb983dd8fa5ec5a8904cca51dec2d6fef50b3f28924784ee832e4f2d8b5d6c|-|native printed-page-125 seed-16 digit presentation; source text, not pixels, states the rule, seed, and 180-step claim
+1547|N-T36-SEED-512|_page_141_Picture_2.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_141_Picture_2.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|151|359405|950|1461|2523481bae71468864a41f08ae0e0dcc1a823bfd49c5efdcc788625b00cd0fba|t36_seed_512_continuation|native printed-page-126 seed-512 presentation; source text supplies the thousand-step scope
+1551|N-T36-MILLIONTH-CONTINUATION|_page_142_Picture_2.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_142_Picture_2.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|155|516673|962|1476|d304e0089d5be1c9662e1645812b78f2d900f009e7805978a142b4f1b741700e|t36_seed_512_continuation|native printed-page-127 continuation at the millionth step; crop and complete-width statement remain prose evidence
 12641|N-T36-REGULAR-REGION-LENGTHS|_page_920_Figure_12.jpeg|BACK-MATTER/Index/Images/_page_920_Figure_12.jpeg|BACK-MATTER/Index/Index.md|544|13166|559|107|806545c68cad4830840650728e14b07bbab6a6de84eca6c95e83e1422f0d768a|-|native Notes plot of regular-region lengths; no values or measurement algorithm are transcribed from pixels
 12654|R-T36-FIXED-WIDTH-REVERSAL-A|_page_920_Picture_20.jpeg|BACK-MATTER/Index/Images/_page_920_Picture_20.jpeg|BACK-MATTER/Index/Index.md|557|6689|184|155|2029134c9db04ce2aff0d1659a3c8a349080c727e32232e8d678111a62de4de9|t36_digit_reversal_relation_trilogy|related fixed-width digit-reversal permutation plate A; the generic k,m formula is source text
 12656|R-T36-FIXED-WIDTH-REVERSAL-B|_page_920_Picture_21.jpeg|BACK-MATTER/Index/Images/_page_920_Picture_21.jpeg|BACK-MATTER/Index/Index.md|559|13053|181|153|f13f46847832eb97ca2665867c4dda09101f8f7f7448348961d702fe7fe14305|t36_digit_reversal_relation_trilogy|related fixed-width digit-reversal permutation plate B; FFT and quasi-Monte-Carlo uses remain prose relations
@@ -139,12 +139,12 @@ ASSEMBLIES = {
     for assembly in {asset.assembly for asset in ASSETS.values()} - {"-"}
 }
 assert ASSEMBLIES == {
-    "t36_main_trilogy": frozenset({1543, 1547, 1551}),
+    "t36_seed_512_continuation": frozenset({1547, 1551}),
     "t36_digit_reversal_relation_trilogy": frozenset(
         {12654, 12656, 12658}
     ),
 }
-assert sum(map(len, ASSEMBLIES.values())) == 6
+assert sum(map(len, ASSEMBLIES.values())) == 5
 
 
 # Exact adjacency fixed point: the last T35 and first T37 main plates, the
@@ -500,7 +500,7 @@ def ledger() -> tuple[str, str, int, int, int, int, int, int, int, int]:
 # Frozen after the canonical ledger was independently regenerated from the
 # exact manifests above.  No bypass sentinel is accepted.
 EXPECTED_LEDGER_SHA256 = (
-    "9e13f9abbc9f03864e49e304dd2b09349ace3db319324e41bb8794c94592856d"
+    "bace783750e95440b030b76110c86191e73bdac053bd0404a269d9f6ddebe9f1"
 )
 EXPECTED_EXCLUDED_LEDGER_SHA256 = (
     "7da1a0cc0bb03e39c6cfa18bca8e4fc12ab151e6b0d6c05ac6f3ee32c5d2efe6"
@@ -536,7 +536,7 @@ def main() -> None:
     print(
         "T36 asset oracle: PASS governed=7; classes N/R/C=4/3/0; "
         "candidates=16; excluded=9; refs=14(monolith=7,split=7); "
-        "unique_hashes=7; bytes=1062053; assemblies=2/6_files; "
+        "unique_hashes=7; bytes=1062053; assemblies=2/5_files; "
         "excluded_bound=9/18_refs/9_hashes/170822_bytes/1_assembly/5_files; "
         "boundary=7_HASH_BOUND/0_LIMITED_TRANSCRIBED/0_PIXEL_REPLAYED; "
         "formulas/seeds/traces/palettes/crops=source_text_only_or_unrecovered; "
