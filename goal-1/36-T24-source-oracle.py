@@ -44,8 +44,11 @@ EXPECTED_TAXONOMY_SHA256 = "4c30fe079b2fb8f69e4c8c0dde3d59065227d4224cbe4b7693a1
 # close alternative lattice, tiling, Penrose, and fixed-network incidence.
 # Q10--Q12 close update/realization and rule-restriction controls. Q13--Q14
 # establish the structural-network and schedule seams. Q15 independently
-# freezes actual-Index routes. Q16 follows geometry/isotropy references, and
-# Q17 closes the built-in function/time-dependent-rule control.
+# freezes actual-Index routes. Q16 follows geometry/isotropy references, Q17
+# closes the built-in function/time-dependent-rule control, and Q18--Q19
+# follow the lossless hexagonal-array implementation to both printed rules.
+# Q20 saturates the broad hexagonal/triangular aliases and exposes block-CA,
+# Turing-machine, random-walk, percolation, and biological false positives.
 QUERIES = {
     "Q00": r"\bhigher[- ]dimensional cellular automata\b",
     "Q01": (
@@ -177,7 +180,115 @@ QUERIES = {
         r"\bsecond argument passed to fun is the step number\b|"
         r"\bwhen a general function is used\b"
     ),
+    "Q18": (
+        r"\bregular arrays of atoms laid out much like the cells in a cellular automaton\b|"
+        r"\badjacent to a black cell will itself become black on the next step\b|"
+        r"\breflects directly the structure of the underlying lattice of cells\b|"
+        r"\ball the molecules in a snowflake ultimately lie on a simple hexagonal grid\b|"
+        r"\bcells become black if they have exactly one black neighbor\b|"
+        r"\beach cell on a hexagonal grid becomes black whenever exactly one\b"
+    ),
+    "Q19": (
+        r"\bOne can treat hexagonal lattices as distorted square lattices\b|"
+        r"\bcode 16382\b|\bcode 10926\b|"
+        r"\bcenters of an array of regular hexagons\b"
+    ),
+    "Q20": (
+        r"\bhexagonal (?:grid|lattice|lattices)\b|"
+        r"\btriangular lattice\b|\bpentagonal (?:example|cell|tiling)\b"
+    ),
 }
+
+
+def line_set(spec: str) -> frozenset[int]:
+    """Parse comma-separated line numbers and inclusive ranges."""
+    result: set[int] = set()
+    for item in filter(None, map(str.strip, spec.split(","))):
+        if "-" in item:
+            start, end = map(int, item.split("-", 1))
+            result.update(range(start, end + 1))
+        else:
+            result.add(int(item))
+    return frozenset(result)
+
+
+# Broad-query collisions are retained here, rather than silently disappearing.
+# The structural-network and alternate-schedule seams remain control evidence
+# below because they directly bound the native fixed-incidence construction.
+EXCLUDED_CLASS = {
+    "other_ca_family_or_dimension": line_set(
+        "1948,1986,2008,2014,2102,2878,2880,2884,2890,2904,3784,3804,"
+        "3902,7084,7092,13281,13296,13601,13613,13666,14234,14237,14241,"
+        "15074,15075,15359,15392,15959,17002,17588,19072"
+    ),
+    "broad_implementation_name_collision": line_set(
+        "11289,14358,14490,14573,14617,16755,17429,17722"
+    ),
+    "other_geometry_or_physics": line_set("3856,3862,4440,15507,15865"),
+}
+EXCLUDED = frozenset().union(*EXCLUDED_CLASS.values())
+
+
+# Strict native mechanics preserve the Book's own decomposition: finite label
+# values on fixed support, old-snapshot local reads, same-site label writes,
+# and parallel update.  This includes arbitrary integer-offset lattices,
+# distorted-array coordinates for a hexagonal lattice, congruent/nonrepetitive
+# tilings, and fixed networks whose connections are read but not rewritten.
+NATIVE_EVIDENCE = line_set(
+    "850,2154,2156,4408,4410,4412,4414,4422,4424,4428,4430,"
+    "10984,10986,10992,11050-11056,11060-11062,"
+    "13483,13485-13486,13488,13490,13492,13494-13495,13497,13499,"
+    "13501,13503,13505,13507,13513,13515-13518,13520,13522-13525,"
+    "13528,13530-13531,13642,13644,13646,13648,13650,13652,13654,"
+    "13656,13658,13909-13910,13913-13915,15608,15610,15612"
+)
+
+# Relations provide examples, topology/geometry derivations, symmetry facts,
+# and observer-level outcomes.  They do not silently define native coordinates,
+# rule identity, or an execution family.
+RELATION_EVIDENCE = line_set(
+    "4416,10261,13746,13748,13754,13756,15293,15467,15473-15475,"
+    "15485,15487,16253,16255,19588"
+)
+
+# Controls make representation and execution boundaries explicit: finite/crop
+# realization, unrestricted function/time dependence, stochastic/continuous
+# values, topology rewriting, per-node random rules, sequential scheduling, and
+# alternating block updates are not smuggled into strict T24.
+CONTROL_EVIDENCE = line_set(
+    "2018,2372,2426,2464,11037,11063-11065,11077,11079-11087,11090,"
+    "11092,11095-11100,11103,11106-11107,11110,11112,11114,11116,"
+    "11118,11120,11122,11124,13314,13464,13534,13536,13538,13540,"
+    "13542-13549,13835,13889,13891,13893,13917-13919,15708,16446"
+)
+
+RETAINED = NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE
+
+# Stable public interface for the independent asset audit.  Native images show
+# the dimensional/lattice setup and strict fixed-incidence CA examples;
+# relation images show the Penrose/Voronoi source routes; control images show
+# the explicitly excluded single-active-node network schedule.
+IMAGE_RE = re.compile(r"^!\[[^\]]*\]\(([^)]+)\)$")
+NATIVE_IMAGE_LINES = line_set("2154,4412,4428,13648,13652,13656")
+RELATION_IMAGE_LINES = line_set("13748,15487")
+CONTROL_IMAGE_LINES = line_set("13891,13893")
+GOVERNED_IMAGE_LINES = (
+    NATIVE_IMAGE_LINES | RELATION_IMAGE_LINES | CONTROL_IMAGE_LINES
+)
+
+
+# The actual Index supplies search routes, not construction semantics.
+INDEX_CLASS = {
+    "t24_geometry_and_topology_routes": line_set(
+        "20828,20836,20910,20918,20967,21054,21068,21102,21170,21181,"
+        "21243,21763,21934,22132,22150,22166,22352,22416,22434,22438"
+    ),
+    "other_rule_restriction_routes": line_set("21233,21731"),
+    "structural_or_sequential_network_routes": line_set("22096"),
+    "continuous_or_stochastic_routes": line_set("21046,21434,21735,21815"),
+    "broad_implementation_name_routes": line_set("21050,21471"),
+}
+INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
 
 
 def digest(values: set[int] | frozenset[int]) -> str:
@@ -221,7 +332,35 @@ def main() -> int:
             ",".join(map(str, sorted(found))),
         )
     print("union", len(union), digest(union), ",".join(map(str, sorted(union))))
-    return 0 if source_ok else 1
+    pre_index = {n for n in union if n < INDEX_FIRST_LINE}
+    index = union - pre_index
+    matched_retained = pre_index - EXCLUDED
+    governed = set(RETAINED) - union
+    print("pre_index", len(pre_index), digest(pre_index))
+    print("index", len(index), digest(index))
+    print("matched_retained", len(matched_retained), digest(matched_retained))
+    print("excluded", len(EXCLUDED), digest(EXCLUDED))
+    print("governed", len(governed), digest(governed))
+    print("retained", len(RETAINED), digest(RETAINED))
+    print("native", len(NATIVE_EVIDENCE), digest(NATIVE_EVIDENCE))
+    print("relation", len(RELATION_EVIDENCE), digest(RELATION_EVIDENCE))
+    print("control", len(CONTROL_EVIDENCE), digest(CONTROL_EVIDENCE))
+    print("images", len(GOVERNED_IMAGE_LINES), digest(GOVERNED_IMAGE_LINES))
+    print("missing_matched", sorted(matched_retained - set(RETAINED)))
+    print("extra_queried", sorted((set(RETAINED) & pre_index) - matched_retained))
+    print("index_missing", sorted(index - set(INDEX_ROUTED)))
+    print("index_extra", sorted(set(INDEX_ROUTED) - index))
+    structural = (
+        matched_retained == set(RETAINED) & pre_index
+        and pre_index == matched_retained | set(EXCLUDED)
+        and not NATIVE_EVIDENCE & RELATION_EVIDENCE
+        and not NATIVE_EVIDENCE & CONTROL_EVIDENCE
+        and not RELATION_EVIDENCE & CONTROL_EVIDENCE
+        and NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE == RETAINED
+        and index == set(INDEX_ROUTED)
+    )
+    print("structural", "OK" if structural else "MISMATCH")
+    return 0 if source_ok and structural else 1
 
 
 if __name__ == "__main__":

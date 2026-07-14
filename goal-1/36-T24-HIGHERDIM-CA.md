@@ -63,6 +63,108 @@ A proposed representation must supply a lossless map `e` satisfying `e(step_A(s)
 7. Does any example structurally change incidence, successor cardinality, or schedule, thereby requiring an existing different UPDATE implementation or a concrete new one?
 8. Can T21, T22, T23, and strict T24 examples execute through the identical generic step function with only dimension, topology, access, and RULE data changed?
 
+## Architecture Audit Result
+
+The read-only first-principles audit finds no T24 source profile that changes the execution algebra. Every native candidate has fixed support/incidence, all-site firing, finite old-snapshot reads, one same-site label result, snapshot-parallel commit, and one deterministic successor. The catalog entry groups two independent parameter families rather than one new construction:
+
+1. arbitrary-dimensional orthogonal or Bravais lattices; and
+2. alternative fixed-incidence supports, including periodic finite-motif tilings, nonperiodic finite-local-type tilings, and fixed homogeneous or finite-local-type networks.
+
+The dimensional boundary follows the repository-wide DOMAIN correction:
+
+| Native construction | DOMAIN | CONFIGURATION topology |
+|---|---|---|
+| `d`-dimensional hypercubic or Bravais lattice | discrete `t+dD` | fixed sites plus basis addressing/incidence |
+| pentagonal or Penrose tiling in the plane | discrete `t+2D` | fixed tiling-cell incidence |
+| crystal lattice in three-space | discrete `t+3D` | fixed crystal incidence |
+| abstract fixed network with no semantic embedding | discrete `t+0D` | immutable graph incidence |
+| fixed network whose drawing is only a layout | discrete `t+0D` | immutable graph incidence; layout is a view |
+| embedded fixed graph whose metric/embedding determines reads | discrete `t+dD` | immutable incidence plus semantic embedding provenance |
+| T29 structural graph rewrite | normally discrete `t+0D` | changing vertex/edge structure |
+
+`t+0D` does not mean “one scalar cell”; it means that no spatial coordinate dimension is native to the task. A fixed-network CA and T29 can therefore share DOMAIN while using different UPDATE implementations: T24 preserves vertices and edges and assigns labels, whereas T29 applies structural graph patches. A tensor rank, sparse carrier, flattening, projection, or drawing never determines DOMAIN.
+
+Finite site-type-indexed access and rule banks are closed data, not family dispatch:
+
+```text
+kind          : Site -> finite K
+access_schema : K -> closed finite access data
+rule_table    : K -> closed finite rule data
+```
+
+The common runner indexes these declarations by the visible finite tag. It never asks whether the program is “Penrose,” “FCC,” or “network.” Grouping equal schemas for execution is an optimization only. An unrestricted callback or `if family == ...` branch would not satisfy this model.
+
+## Construction Model Under Test
+
+- **DOMAIN:** discrete `t+dD` exactly when `d` spatial dimensions are native to the program. Abstract incidence-only networks use discrete `t+0D` unless a semantic embedding participates in reads.
+- **CONFIGURATION/support:** an immutable fixed support `V`, immutable finite-local incidence, optional finite `site_kind : V -> K`, and one dynamic label field `X : V -> A`. The topology, site kinds, port labels, and occurrence identities are visible and validated rather than hidden in executor state.
+- **ALPHABET:** a finite alphabet, with the existing tagged/product forms available when labels themselves have named factors. Static site kinds belong to topology unless a proved representation deliberately carries and preserves them as a label factor.
+- **Control:** none. Neither lattice identity, dimension, basis, site kind, nor port order is step control.
+- **FRONTIER:** `AllSites(V)`, with topology-generic site enumeration. A finite work region is a realization of this native selection, not a distinct frontier law.
+- **NEIGHBORHOOD:** finite old-snapshot incidence occurrences. A Bravais/hypercubic profile uses declared basis offsets. A finite-motif tiling uses kind-indexed port/offset data. A nonperiodic tiling or abstract network uses explicit immutable incidence. Labeled ports expose a stable ordered tuple; unlabeled connections expose only a permutation-invariant multiset/count interface. Parallel edges and quotient aliases remain separate read occurrences.
+- **RULE:** a closed total finite table over the declared local-read schema. Positional, totalistic, outer-totalistic, and certified symmetry-orbit tables remain distinct schema-tagged representations. A finite dependent sum over `site_kind` is closed table data, not a callback or construction branch.
+- **Writes:** exactly one compatible `AssignLabel(source, value)` per active old site.
+- **UPDATE:** the existing fixed-support same-site snapshot-parallel assignment. Topology and site kinds are unchanged; every read is from the old label snapshot.
+- **Successor/outcome:** one deterministic successor per valid event, including unchanged fixed points. No source evidence gives native halt, failure, branching, or topology mutation.
+- **Seed/realization/view:** initial labels, backgrounds, periodic quotients, finite halos, and sparse carriers are explicit seed/realization data. Basis embeddings, Voronoi cells, layouts, projections, slices, and rasters are representations or views unless the native rule reads their metric data.
+
+The candidate closed local-read carrier is a finite dependent sum:
+
+```text
+OrderedLocalRead = Sum[k in K](SiteKind[k] x Self[A] x Product[p in Ports[k]] A)
+UnlabeledCountRead = Sum[k in K](SiteKind[k] x Self[A] x HistogramOrCount[k,A])
+```
+
+The Book's “limited number of types” evidence permits finite local schemas; it does not by itself require distinct rule tables for each type. A type-indexed bank is therefore a conservative generic capability, while any strict preset must share tables exactly as its source states.
+
+## Current API and Runtime Fit
+
+The broad semantics already appear in `simple_programs.md`: finite alphabets (`:200-230`), ordered local access (`:360-395`), coordinate-dependent selectors (`:454-567`), full-slice firing (`:1412-1563`), snapshot-parallel commit (`:1510`, `:1769-1791`), and exhaustive/isotropic/semi-totalistic/totalistic table forms (`:1795-2032`). Its current schema is nevertheless a rectangular rank-three realization, not the SimpleProgram boundary: it fixes `N in {0,1,2,3}` and `[t,x,y,z]` (`:1-19`, `:115-165`), `D` and neighborhood candidates to subsets of `Z^4` (`:40-54`, `:138-195`, `:454-470`), and boundary handling to rectangular coordinate intervals (`:292-356`).
+
+| Current area | Fit | Goal 2 obligation |
+|---|---|---|
+| `simple_programs.md` fixed-lattice event | DIRECT for same-site label evolution | generalize addresses/support/access without changing the four-axis event |
+| `src/ca/loci.py:31-60,257-375` | DIRECT selector/order machinery; SEMANTIC MISMATCH for hard-coded `t/x/y/z` and rank `<=3` at `:19-28,62-103` | generic typed `SiteRef`, discrete dimension, and incidence-occurrence selection |
+| `src/ca/neighborhoods.py:140-307,501-520,572-614` | DIRECT/PARAMETERIZATION for rank-`<=3` literal/geometric offsets | add closed kind-indexed and explicit-incidence access; do not force every topology into `(n,4)` offsets (`:140-161`) |
+| `src/ca/frontiers.py:54-80` | DIRECT finite `AllSites` lowering | enumerate the declared support rather than only a rectangular tensor slice |
+| `src/ca/rules.py:49-78,173-313` | DIRECT/PARAMETERIZATION for closed channels, tables, and aggregates | add schema-tagged finite dependent tables/orbit codecs and exact wide keys; no formula callback |
+| `src/ca/rollout.py:576-682` | DIRECT mechanical old-snapshot spatial kernel | retain the kernel law behind the generic runner; remove rank `1..3` limits (`:583-586,625-626`) and broadcast-only offsets (`:685-702,732-739`) |
+| `src/ca/specs.py:23-55` | PARTIAL fixed experiment specification | declare ALPHABET and CONFIGURATION topology explicitly; remove named-family resolution at `:117-198` |
+| `src/ca/rollout.py:145-213` | SEMANTIC MISMATCH family dispatch | route every program through the branch-free SimpleProgram event |
+| `src/ca/loci.py:531-636` and boundary specs | DIRECT rectangular realization only | keep as one lowering; add explicit topology/quotient/halo realizations |
+| `src/ca/viz/export.py:257-279` | observer only | generic dimension/topology export must remain downstream of execution |
+
+The current runtime also limits rule addresses to fixed-width integers (`src/ca/rollout.py:264-275,750-759`). Binary full-Moore access in four dimensions already has 81 positions, so exact arbitrary-width closed keys/codecs are required; a callback is not an acceptable substitute.
+
+## Concrete Fit Witnesses
+
+These examples expose representation and parameter gaps, not category-4 execution algebras:
+
+1. **Fourth-axis copy.** A binary `Z^4` CA that copies the old `+e_4` label is rejected by current rank validators, although generic dimension plus one declared offset uses the unchanged snapshot-parallel assignment.
+2. **Alternating triangular motif.** In `Z^2 x {Up,Down}`, the two site kinds have different neighbor incidences. One globally broadcast offset tuple gives a wrong successor; finite kind-indexed access gives the native event without changing UPDATE.
+3. **Nonperiodic fixed incidence.** A degree-three fixed graph with “black iff exactly one incident neighbor was black” cannot derive its reads from tensor proximity. Explicit visible incidence fixes NEIGHBORHOOD while preserving the runner.
+4. **Unlabeled ports.** “Copy slot zero” changes under an automorphic edge permutation when ports are unlabeled. Positional access is invalid there; the source's totalistic restriction is enforced by a permutation-invariant rule schema.
+5. **Quotient aliases.** If two declared neighbor ports reach the same quotient site, set deduplication changes a totalistic count. Incidence occurrences, not unique destination IDs, form the read carrier.
+
+By contrast, a native event that creates/deletes sites or edges would defeat fixed-support assignment. That concrete counterexample is already owned by T29's structural graph UPDATE; none of the T24 evidence found so far performs it.
+
+## Provisional Goal 2 Architecture Handoff
+
+The smallest implementation set is:
+
+1. `DiscreteDomain(d)` rather than dimension-specific state classes or named geometries in DOMAIN.
+2. Generic typed site references/coordinate tuples with explicit lossless codecs.
+3. Immutable fixed-topology data containing site enumeration, incidence occurrences, optional finite site kinds, and optional stable port labels/order.
+4. Topology-aware `AllSites` and closed finite access schemas indexed by site kind.
+5. Closed positional, aggregate/count, symmetry-orbit, and finite dependent-sum RULE representations.
+6. The existing typed same-site label write and snapshot-parallel UPDATE unchanged.
+7. Arbitrary-width exact table keys and codecs.
+8. Separate finite realization, basis/motif, embedding, and view adapters with explicit inverses or stated one-way observer status.
+
+Required conformance includes a 4D axis-total rule, a 4D full-total rule, an asymmetric general-offset rule, six-neighbor hexagonal and 12-/14-neighbor FCC/BCC profiles, an alternating triangular motif, the pentagonal and Penrose source predicates, unlabeled and labeled-port fixed graphs, rank-four lowering, quotient-alias multiplicity, halo realization, embedding noninterference, and one T21/T22/T23/T24 runner invocation with no catalog dispatch. The source and asset oracles must decide which pictured whole configurations are replayable; local predicates may not be inflated into invented full-plate traces.
+
+No completed stage reopens on the architecture evidence. T21-T23 remain strict fixed-square/cubic presets. T29's handoff must preserve the explicit fixed-incidence-label versus structural-rewrite boundary, but its graph-write decision remains valid.
+
 ## Detailed Implementation Plan
 
 1. Freeze a zero-remainder source query union across the monolith, Notes, actual Index, split corpus, Atlas, catalog, and taxonomy; partition native, relation, control, exclusion, and governed continuation evidence.
