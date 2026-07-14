@@ -47,6 +47,17 @@ def digest_lines(values: set[int] | frozenset[int]) -> str:
     return sha256(",".join(map(str, sorted(values))).encode("ascii"))
 
 
+def digest_records(values: set[str] | frozenset[str]) -> str:
+    """Hash an unordered string-record set with unambiguous framing."""
+
+    payload = bytearray()
+    for value in sorted(values):
+        encoded = value.encode("utf-8")
+        payload.extend(len(encoded).to_bytes(8, "big"))
+        payload.extend(encoded)
+    return sha256(bytes(payload))
+
+
 book_bytes = BOOK.read_bytes()
 assert len(book_bytes.decode("utf-8").splitlines()) == EXPECTED_BOOK_LINES
 assert sha256(book_bytes) == EXPECTED_BOOK_SHA256
@@ -299,6 +310,88 @@ for source_line, fragment in SOURCE_GUARDS.items():
     assert fragment in BOOK_LINES[source_line - 1], (source_line, fragment)
 
 
+# These prose-bearing manifests are evidence, not comments.  Cardinality-only
+# checks would accept a weakened source guard, an inverted semantic boundary,
+# or a relabeled adjacency group, so every exact record set is independently
+# count- and content-bound here.
+EXPECTED_SOURCE_GUARD_COUNT = 16
+EXPECTED_SOURCE_GUARD_SHA256 = (
+    "30ec884b9ce9ba981e490a0c22220b29fcf4ae1870c3228dd8742c9aa08cef95"
+)
+EXPECTED_UNRECOVERED_RASTER_SEMANTICS_COUNT = 8
+EXPECTED_UNRECOVERED_RASTER_SEMANTICS_SHA256 = (
+    "52c26bf72f360566edd06a9401e8973bae39ec7ce8f4a475a36dc03e4a3f3605"
+)
+EXPECTED_SOURCE_DERIVED_NOT_PIXEL_TRANSCRIBED_COUNT = 5
+EXPECTED_SOURCE_DERIVED_NOT_PIXEL_TRANSCRIBED_SHA256 = (
+    "f8454ebccc13584c80ab4cea1be7609a47cd95adb8f75f9b5e332a46146ac6e7"
+)
+EXPECTED_ADJACENCY_EXCLUSION_RECORD_COUNT = 9
+EXPECTED_ADJACENCY_EXCLUSION_RECORD_SHA256 = (
+    "99acb25e31a5910440f1c12cb0019220a532032646a41fcee06ba1ad5938ff80"
+)
+EXPECTED_CANDIDATE_GROUP_RECORD_COUNT = 3
+EXPECTED_CANDIDATE_GROUP_RECORD_SHA256 = (
+    "98668ae62361436ed3a40de245fee2c1aa4a4bae2ca866295a789cb3c8a79e8c"
+)
+
+
+def verify_semantic_manifests() -> None:
+    """Reject same-cardinality weakening or inversion of prose evidence."""
+
+    source_guard_records = frozenset(
+        f"{line}\0{fragment}" for line, fragment in SOURCE_GUARDS.items()
+    )
+    unrecovered_records = frozenset(UNRECOVERED_RASTER_SEMANTICS)
+    source_derived_records = frozenset(SOURCE_DERIVED_NOT_PIXEL_TRANSCRIBED)
+    adjacency_records = frozenset(
+        f"{line}\0{name}\0{reason}"
+        for line, (name, reason) in ADJACENCY_EXCLUSIONS.items()
+    )
+    candidate_group_records = frozenset(
+        f"{name}\0{','.join(map(str, sorted(lines)))}"
+        for name, lines in SOURCE_DERIVED_CANDIDATE_GROUPS.items()
+    )
+    manifests = (
+        (
+            source_guard_records,
+            EXPECTED_SOURCE_GUARD_COUNT,
+            EXPECTED_SOURCE_GUARD_SHA256,
+        ),
+        (
+            unrecovered_records,
+            EXPECTED_UNRECOVERED_RASTER_SEMANTICS_COUNT,
+            EXPECTED_UNRECOVERED_RASTER_SEMANTICS_SHA256,
+        ),
+        (
+            source_derived_records,
+            EXPECTED_SOURCE_DERIVED_NOT_PIXEL_TRANSCRIBED_COUNT,
+            EXPECTED_SOURCE_DERIVED_NOT_PIXEL_TRANSCRIBED_SHA256,
+        ),
+        (
+            adjacency_records,
+            EXPECTED_ADJACENCY_EXCLUSION_RECORD_COUNT,
+            EXPECTED_ADJACENCY_EXCLUSION_RECORD_SHA256,
+        ),
+        (
+            candidate_group_records,
+            EXPECTED_CANDIDATE_GROUP_RECORD_COUNT,
+            EXPECTED_CANDIDATE_GROUP_RECORD_SHA256,
+        ),
+    )
+    for records, expected_count, expected_digest in manifests:
+        assert len(records) == expected_count, (
+            len(records), expected_count,
+        )
+        actual_digest = digest_records(records)
+        assert actual_digest == expected_digest, (
+            actual_digest, expected_digest,
+        )
+
+
+verify_semantic_manifests()
+
+
 def jpeg_size(data: bytes) -> tuple[int, int]:
     """Read a JPEG SOF marker without an image-library dependency."""
 
@@ -510,6 +603,7 @@ EXPECTED_EXCLUDED_LEDGER_SHA256 = (
 def main() -> None:
     if len(sys.argv) != 1:
         raise SystemExit("usage: 43-T36-asset-oracle.py")
+    verify_semantic_manifests()
     verify_source_interface()
     (
         payload, excluded_payload,
@@ -539,6 +633,7 @@ def main() -> None:
         "unique_hashes=7; bytes=1062053; assemblies=2/5_files; "
         "excluded_bound=9/18_refs/9_hashes/170822_bytes/1_assembly/5_files; "
         "boundary=7_HASH_BOUND/0_LIMITED_TRANSCRIBED/0_PIXEL_REPLAYED; "
+        "semantic_manifests=5/41_records; "
         "formulas/seeds/traces/palettes/crops=source_text_only_or_unrecovered; "
         "unresolved_image_dispositions=0"
     )

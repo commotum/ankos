@@ -100,7 +100,7 @@ QUERIES = {
         r"Digit count sequences|Iterated bitwise operations"
     ),
     "Q13": (
-        r"_page_139_Figure_1\.jpeg|_page_143_Figure_1\.jpeg|"
+        r"_page_139_Figure_1\.jpeg|_page_143_Figure_6\.jpeg|"
         r"_page_920_Figure_8\.jpeg|_page_920_Figure_30\.jpeg|"
         r"_page_921_Picture_[3-7]\.jpeg"
     ),
@@ -150,7 +150,7 @@ RELATION_EVIDENCE = line_set(
     "17313,17315,17317,17319,17329,17350,17352,17354,17356,17611,20738"
 )
 CONTROL_EVIDENCE = line_set(
-    "1370,1439,1523,1529,1555,1567,12054,12505,12623,12631,12633,"
+    "1370,1439,1523,1529,1555,1565,1567,12054,12505,12623,12631,12633,"
     "12660,12662,12664,12666,12668,12670,12672,12674,12676,12678,"
     "12680,12682,12684,12686,12688,12692,12767,12974,16072"
 )
@@ -323,7 +323,7 @@ EXPECTED_QUERY = {
     "Q10": (2, 2, 0, "36f2c919f4aa643e3199a628f354f4f40da6a818d3d7a06a344d505d94a33092"),
     "Q11": (3, 3, 0, "a51beef587a9032007d252e319f216fb334ab1999d9b2d727acb5a6295d1c436"),
     "Q12": (25, 10, 15, "0817c58bc380109493f97f38681c478a5535e056f9e7649d07fa4ec27b6d1342"),
-    "Q13": (8, 8, 0, "bc978be5e02e56a91500e8227ec7fda232daa8e9330f6f9bdbbbf70fa14572af"),
+    "Q13": (9, 9, 0, "72aa6b7545f1896ba5ee090fcb050c5d378e2c90898d49c6b3373811ded93689"),
     "Q14": (2, 2, 0, "31b9d54f7b3cf97c5d18e7b42a2f26ef25c42d0f83940e007ca68d4ca6b7e43f"),
     "Q15": (12, 0, 12, "03f65b7fe356e8639c81c8b3126adea70558c4907fcd09535b40639da7f289ae"),
     "Q16": (9, 2, 7, "a981824e8619fa467bc1b9abded5903af72d6c63da1300e92e3ca6338ea8214c"),
@@ -331,20 +331,20 @@ EXPECTED_QUERY = {
 }
 EXPECTED_QUERY_PATTERNS = (
     18,
-    "b2b79cc7c1ec8f5dcdd2a4e9938a5bc27eb9f13fef95e6e1b8b694183687ca2b",
+    "67196f1dc86c06408f43e237f51a86a72ffba920480bba3678a3525d4017ffbf",
 )
 EXPECTED_SET = {
-    "union": (124, "cba77ff46ec1aee8eaf91ab28a2a62e7a7e2f3f5a6e5a387598fce56cd22d091"),
-    "pre_index_union": (98, "7035010b90bcfac0d785986543507b90f3e44151e83eb0d5c7b0098a7055f5a4"),
+    "union": (125, "0641a6d586c9f3345bc7e0b785b2e8feba0afdb3746e30d37a5794eb5655de16"),
+    "pre_index_union": (99, "af94eac4c7aefc07413480264211eacf014a7f1c300ab379650627bfaf6a41a8"),
     "index_candidates": (26, "65b258164a9b12a28f16f029dc057cf265fa7e0b4192bea957251795361d49cb"),
     "index": (12, "03f65b7fe356e8639c81c8b3126adea70558c4907fcd09535b40639da7f289ae"),
     "index_excluded": (14, "ac87631a755acf79e4dc36898d557e2b45ff6aa999110f1112abd02fe0add1e7"),
     "native": (19, "5593d970e131366ac30082624db558c22281ca5496a81231b8a48cfbc3f098d4"),
     "relation": (19, "42d36affd4f4ff85aee6c153275d85194c5adc36875809c783dabef73dc3263d"),
-    "control": (30, "990b369600b8899bd1303a8702595c5d4651e7c52dd4fb79c37fbef780ac97fc"),
-    "retained": (68, "dda066679ce8844051d2d6b785adf5f1624a82f0772bcd5d7c4129f8be9c00a7"),
+    "control": (31, "66a38d42da73ca47a4653d6601a47d2fbd441ec5fd9e3e37cca7062cc46d19dc"),
+    "retained": (69, "6f4773921f9d6b5d03a8789eeee108cffaa5695d0a91749af3b02bab265e55cd"),
     "excluded": (48, "41c681e4b91c82c9c5fe96848ced1c37530dc206a5f837834c18733ec3380d1c"),
-    "retained_query_hits": (53, "3cab584c09a1ca3cd7febc2cae23f7d39d82a4dce601c926db907bd8c6e71f69"),
+    "retained_query_hits": (54, "3b17eed0e1c86ad14ddf920d605b3e8c0d1b91f4ad87afcd03cef953b400d2f0"),
     "governed_continuations": (15, "1098aafe3b465503abce7dd46309859d8e252f5640473b90c69d860ee783c375"),
 }
 EXPECTED_EXCLUDED_CLASS = {
@@ -417,8 +417,8 @@ EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 EXPECTED_SPLIT_CROSSWALK = (
-    94,
-    "26c5342e3352bca84fdfa90ea4cd904141de22aafe31712ce6e853598b036726",
+    95,
+    "aa2664591fbccfa0256564de2c3d49a9eeffb947fe439891ff7263886dbb1677",
 )
 EXPECTED_SPLIT_CLASSES = {
     "EXACT": (
@@ -427,9 +427,9 @@ EXPECTED_SPLIT_CLASSES = {
         "9f5b193ee8eb4042c57d8f007a90bca25d90b6b38784628ecd92019acae6d38e",
     ),
     "IMAGE_BASENAME": (
-        15,
-        "2078c06f5268d09eba452a4de1953238fcbdf68dbc6287d2bd691935c87b0040",
-        "ebc0f90bb8ca8d98975c01200697d0b33c50a0acbca51393e9ad03cedf55f201",
+        16,
+        "908f2831353adf6c52b599bd62f8de7971b2f99637c66a041a232a2ca1faa7c0",
+        "e2d51185bd0a158b805925a41e316862690ac9cd4df0d444e19442a21131b1c3",
     ),
     "NORMALIZED": (
         4,
@@ -1023,6 +1023,7 @@ def main() -> int:
         and "propagate arbitrarily far" in at(1535)
         and "details of underlying rules" in at(1539)
         and "Recursive Sequences" in at(1555)
+        and "_page_143_Figure_6.jpeg" in at(1565)
         and "reverse of the base 2 digit sequences of successive numbers" in at(12054)
         and "Page 905 gives another example of a reversible system based on numbers" in at(16072)
         and "Iterated run-length encoding" in at(12660)

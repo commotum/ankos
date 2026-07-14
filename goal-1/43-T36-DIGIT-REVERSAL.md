@@ -103,7 +103,7 @@ This formulation is a hypothesis to verify against complete Notes mechanics. A w
 
 Erasing width is not lossless: base-2 words `1` and `01` both decode to numeric value 1, but grow-width reversal-add sends them to `10` (value 2) and `011` (value 3), respectively. Deriving width from hidden event time or seed provenance would make resumed configuration incomplete. Strict and fixed-width profiles also diverge concretely at `b=2,m=1,n=1`: strict yields 2, while fixed-width carry dropping yields 0.
 
-## Architecture Fit Hypothesis
+## Architecture Fit Reconstruction
 
 | Responsibility | Provisional class | Smallest reusable construction | T36 delta to test |
 |---|---:|---|---|
@@ -115,7 +115,7 @@ Erasing width is not lossless: base-2 words `1` and `01` both decode to numeric 
 | Fixed/growing width | 2/3 | Explicit program parameter or product/tagged configuration | Preserve leading zeros and carry policy without hidden time or storage width |
 | Outcomes/traces | 1 | Common `StepResult` and scalar trace | Fixed points/cycles advance unless source says otherwise |
 
-No current evidence requires a genuinely different execution algebra. The likely Goal 2 delta is closed positional-expression data and invariants inside the shared unary RULE implementation.
+No evidence requires a genuinely different execution algebra. The Goal 2 delta is closed positional-expression data, exact codec/profile invariants, and width-tagged values inside the shared unary RULE implementation.
 
 ## Current Runtime Fit
 
@@ -190,13 +190,15 @@ D137 therefore classifies every T36 delta as direct reuse, parameterization/rest
 6. Reject malformed digits, base below two, negative values without a declared sign codec, overflow/truncation outside the fixed-width profile, forged witnesses, cross-program events, callbacks, implicit host-width behavior, and digest-only identity.
 7. Audit `simple_programs.md`, `src/ca`, tests, T34/T35/T43, the design ledger, and Goal 2 handoffs before proposing any new type.
 
-## Goal 2 Handoff Hypothesis
+## Corrected Goal 2 Handoff
 
-- Extend the shared closed unary expression algebra with versioned positional nodes such as `EncodeDigits(base,width_policy)`, `ReverseWord`, `DecodeDigits(base)`, and exact arithmetic composition.
-- Add canonical and fixed-width digit codecs with validation, structural identity, arbitrary-precision serialization, and replayable digit-transform witnesses.
-- Add explicit strict, fixed-width/drop-carry, and growing-width presets only after primary evidence closes their semantics.
-- Reuse the T34 event, assignment, UPDATE, outcomes, and trace envelope through the branch-free runner.
-- Add conformance tests for exact Book prefixes, base/zero/leading-zero cases, arbitrary precision, word/scalar commuting maps, width-loss counterexamples, and no family dispatch.
+- Extend D069's shared closed unary algebra with versioned positional nodes such as `EncodeCanonicalDigits(base)`, `EncodeFixedDigits(base,width)`, `ReverseWord`, `DecodeDigits(base)`, `Add`, and the exact fixed-width carry policy. Nodes are structural data, never host callbacks or operation strings.
+- Add exact `CanonicalNonnegative`, `FixedWidthDropCarry(base,width)`, and `GrowWidth(base)` profiles. The first reuses T34's arbitrary-precision scalar carrier; the second keeps width in program identity; the third uses a transparent `WidthTaggedNonnegative(value,width)` value or a proved-equivalent word.
+- Bind base, profile, width, carrier, and closed expression tree into exact structural program identity. A digest is derived metadata only.
+- Emit replayable positional witnesses containing old digits, reversed digits, addend, untruncated sum, dropped carry where applicable, old/new width, and exact program provenance.
+- Reuse the T34 `UniqueScalar` event, same-locus assignment, atomic UPDATE, outcomes, and `h`-event/`h+1`-state trace envelope through the branch-free runner. A same-value successor remains a real event.
+- Add conformance tests for the independently computed seed-16/512 prefixes, zero, arbitrary bases as explicit extensions, leading zeros, fixed/growing width, arbitrary precision, independent scalar/word commutation, exact replay, width-loss counterexamples, and absence of family dispatch.
+- Keep digit rows, effective periods, localized structures, region lengths, crops, FFT permutations, and quasi-Monte-Carlo sequences in observer/relation APIs with explicit provenance.
 - Add no `DigitReversalState` for strict scalar execution, T36 executor, digit-CA compiler path, host transform callback, fixed machine width, hidden width/time, observer feedback, or source-unsupported transform menu.
 
 ## No-Cheating Checks
