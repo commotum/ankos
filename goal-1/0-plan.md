@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 32 type stages are complete, T22 is in progress, no stage is reopened, and 12 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, and T21 are complete under D119-D127.
+- Execution status at this sync is Foundation complete, 33 type stages are complete, no type stage is in progress or reopened, and 12 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, and T22 are complete under D119-D128.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -959,7 +959,7 @@ COMPLETE. The repaired source fixed point closes 338 evidence lines at `130 nati
 
 ### 34-T22-MOORE-CA
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN** in `goal-1/34-T22-MOORE-CA.md`.
+Status: **COMPLETE** in `goal-1/34-T22-MOORE-CA.md`.
 
 #### Big Picture Objective
 
@@ -973,7 +973,13 @@ Apply the common protocol, emphasizing eight neighbors, center handling, neighbo
 
 All T22 evidence is captured; no duplicate executor or rule family is introduced; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+COMPLETE. The 17-query source union closes 164 lines at `117 pre-Index / 47 actual-Index`, with 270 retained (`96 native / 102 relation / 72 control`), 24 exclusions, and retained split closure `192 exact + 78 variants`. The asset fixed point closes 95 candidates as `68 governed + 27 adjacency-only`, 190 references, 95 hashes, and `95 hash-bound / 28 transcribed / 0 pixel-replayed`. The semantic oracle closes 1,419 native/generic events, complete positional/outer/totalistic/growth schemas, C4/D4 orbit restrictions at 140/102, printed `3702` to canonical `630`, 262,144 WireWorld predicate-count contexts, and a concrete Dyadaxes-loss witness. D128 reuses T01/T02/T03/T08/T21 through audit categories 1–3 without a state/control class, UPDATE, executor, family branch, hidden center/boundary, Life/symmetry engine, or raster rule. Clean hostile review, all portability/format/scope gates, and 102 tests pass. No prior stage reopens. Next: T23.
+
 ### 35-T23-3D-CA
+
+Status: **PENDING**. Stage file not yet opened.
 
 #### Big Picture Objective
 

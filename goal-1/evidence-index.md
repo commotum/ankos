@@ -25,7 +25,7 @@ Each type stage must make the following auditable:
 
 ## Catalog Coverage
 
-Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07/T08/T10/T11/T14/T15/T18 are subsequently complete under active D119-D126.
+Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07/T08/T10/T11/T14/T15/T18/T21/T22 closures are subsequently complete under active D119-D128.
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
@@ -50,7 +50,7 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 | T19 | 20 | Register Machines | 19 | `8-T19-REGISTER.md` | COMPLETE | 129 direct occurrences on 94 lines and 135 direct/alias occurrences on 95 lines plus mechanics, figures, Notes/official OCR repairs, Index/splits/history, count/control/end/halting, seeds, observers, variants, and emulations dispositioned; 25 excerpt groups; 0 unresolved |
 | T20 | 21 | Symbolic Systems | 20 | `9-T20-SYMBOLIC.md` | COMPLETE | 73 exact-name occurrences on 60 lines; conservative combined direct/alias search 272 occurrences on 166 lines; 24 excerpt groups; all mechanics, figures, Notes/actual Index/splits, patterns/order/overlap, fixed points, seeds, representations, combinator/operator variants, observers, and emulations dispositioned; 0 unresolved |
 | T21 | 22 | Two-Dimensional Cellular Automata | 21 | `33-T21-2D-CA.md` | COMPLETE | Repaired 19-query/283-line union at `222 pre-Index / 61 actual-Index`; 338 retained at `130 native / 75 relation / 133 control`, 42 exclusions, split closure `270 exact + 68 nonexact`; 113 assets at `53 governed + 60 adjacency-only` with 226 references/113 hashes and honest 14-record hash-bound transcription ledger; 17,728 independent commutations +160 Book-to-ENU permutation cases; explicit Self+cardinals, three 32/10/6 RULE schemas, D127, clean hostile review, and 102 tests; 0 unresolved |
-| T22 | 23 | Moore-Neighborhood Cellular Automata | 22 | `34-T22-MOORE-CA.md` | IN PROGRESS | Source, asset, semantic, and architecture audits opened; zero unresolved status not yet claimed |
+| T22 | 23 | Moore-Neighborhood Cellular Automata | 22 | `34-T22-MOORE-CA.md` | COMPLETE | 17-query/164-line union at `117 pre-Index / 47 actual-Index`; 270 retained at `96 native / 102 relation / 72 control`, 24 exclusions, split closure `192 exact + 78 variants`; 95 assets at `68 governed + 27 adjacency-only`, 190 refs/95 hashes, `95 hash-bound / 28 transcribed / 0 pixel-replayed`; 1,419 native/generic events, C4/D4 140/102 orbit restrictions, printed `3702`→canonical `630`, 262,144 WireWorld predicate-count contexts, Dyadaxes loss witness, D128, clean hostile review, and 102 tests; 0 unresolved |
 | T23 | 24 | Three-Dimensional Cellular Automata | 23 | `35-T23-3D-CA.md` | PENDING | Not started |
 | T24 | 25 | Higher-Dimensional Lattice Cellular Automata | 24 | `36-T24-HIGHERDIM-CA.md` | PENDING | Not started |
 | T25 | 26 | Two-Dimensional Turing Machines | 25 | `37-T25-2D-TURING.md` | PENDING | Not started |
@@ -78,10 +78,10 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages globally complete: 32 / 45.
+- Type stages globally complete: 33 / 45.
 - Type stages evidence-closed / architecture-reopened: 0.
 - Type stages asset-reopened: 0.
-- Type stages unresolved: 12 pending; 1 in progress; 0 reopened.
+- Type stages unresolved: 12 pending; 0 in progress; 0 reopened.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
