@@ -31,15 +31,44 @@ Coord = tuple[int, ...]
 Offset = tuple[int, ...]
 Cells = tuple[int, ...]
 
-NORTH: Offset = (-1, 0)
-WEST: Offset = (0, -1)
-EAST: Offset = (0, 1)
-SOUTH: Offset = (1, 0)
+NEG_AXIS_0: Offset = (-1, 0)
+NEG_AXIS_1: Offset = (0, -1)
+POS_AXIS_1: Offset = (0, 1)
+POS_AXIS_0: Offset = (1, 0)
 
 # BOOK:13513-13518 gives the sorted five-cell offset list including center.
 # The architecture normalized here keeps center in LocalRead/RULE and keeps
 # only the four geometric neighbors in the neighborhood axis.
-ORTHOGONAL_2D: tuple[Offset, ...] = (NORTH, WEST, EAST, SOUTH)
+ORTHOGONAL_2D: tuple[Offset, ...] = (
+    NEG_AXIS_0,
+    NEG_AXIS_1,
+    POS_AXIS_1,
+    POS_AXIS_0,
+)
+STRICT_T21_SORTED_INPUTS: tuple[Offset, ...] = (
+    NEG_AXIS_0,
+    NEG_AXIS_1,
+    (0, 0),
+    POS_AXIS_1,
+    POS_AXIS_0,
+)
+
+# Raw tuples are authoritative.  Compass words are coordinate-convention
+# isomorphisms, not offset identity.  A row/column raster convention and the
+# current simple-programs x-east/y-north convention attach different names to
+# precisely the same ordered geometry.
+ROW_COLUMN_COMPASS: tuple[tuple[str, Offset], ...] = (
+    ("north", NEG_AXIS_0),
+    ("west", NEG_AXIS_1),
+    ("east", POS_AXIS_1),
+    ("south", POS_AXIS_0),
+)
+XY_EAST_NORTH_COMPASS: tuple[tuple[str, Offset], ...] = (
+    ("west", NEG_AXIS_0),
+    ("south", NEG_AXIS_1),
+    ("north", POS_AXIS_1),
+    ("east", POS_AXIS_0),
+)
 
 # T22 boundary: the eight surrounding cells, still excluding center from the
 # geometric offset collection.  It uses the same kernel with a different
@@ -371,6 +400,136 @@ def projection_rule(alphabet_size: int, neighbor_slots: int, slot: int) -> Gener
         for context in product(range(alphabet.size), repeat=slots + 1)
     )
     return GeneralLookup(alphabet.size, slots, outputs)
+
+
+def strict_t21_sorted_context(read: LocalRead) -> tuple[int, int, int, int, int]:
+    """BOOK:13513 raw order: (-1,0),(0,-1),(0,0),(0,1),(1,0)."""
+
+    validate_read(read, 2, 4)
+    return (
+        read.neighbors[0],
+        read.neighbors[1],
+        read.center,
+        read.neighbors[2],
+        read.neighbors[3],
+    )
+
+
+def binary_digits_to_index(digits: tuple[int, ...]) -> int:
+    index = 0
+    for digit in digits:
+        if type(digit) is not int or digit not in (0, 1):
+            raise TypeError("binary context must contain exact bits")
+        index = 2 * index + digit
+    return index
+
+
+def strict_t21_general_from_code(code: int) -> GeneralLookup:
+    """Decode a 32-row binary rule using the book's raw sorted-offset order."""
+
+    checked = require_exact_int(code, "general 5-cell code")
+    if checked < 0 or checked >= 1 << 32:
+        raise ValueError("general 5-cell code is out of range")
+    outputs: list[int] = []
+    for context in product((0, 1), repeat=5):
+        # GeneralLookup's transparent carrier is center followed by geometric
+        # slots.  Rule-number significance is independently pinned to the
+        # book's sorted raw input tuples.
+        read = LocalRead(context[0], context[1:])
+        index = binary_digits_to_index(strict_t21_sorted_context(read))
+        outputs.append((checked >> index) & 1)
+    return GeneralLookup(2, 4, tuple(outputs))
+
+
+def strict_t21_general_to_code(table: GeneralLookup) -> int:
+    """Inverse of strict_t21_general_from_code for every 32-context table."""
+
+    if type(table) is not GeneralLookup:
+        raise TypeError("general rule must be GeneralLookup")
+    if table.alphabet_size != 2 or table.neighbor_slots != 4:
+        raise ValueError("strict T21 general table must be binary with four offsets")
+    code = 0
+    for context in product((0, 1), repeat=5):
+        read = LocalRead(context[0], context[1:])
+        index = binary_digits_to_index(strict_t21_sorted_context(read))
+        code |= table.evaluate(read) << index
+    return code
+
+
+def expand_outer_totalistic(rule: BinaryOuterTotalistic) -> GeneralLookup:
+    """Losslessly expand one qualifying Self x CardinalCount factor table."""
+
+    if type(rule) is not BinaryOuterTotalistic or rule.neighbor_slots != 4:
+        raise TypeError("strict T21 outer-totalistic rule is required")
+    outputs = tuple(
+        rule.evaluate(LocalRead(context[0], context[1:]))
+        for context in product((0, 1), repeat=5)
+    )
+    return GeneralLookup(2, 4, outputs)
+
+
+def factor_outer_totalistic(table: GeneralLookup) -> BinaryOuterTotalistic:
+    """Factor only tables constant on every (Self, cardinal count) fiber."""
+
+    if type(table) is not GeneralLookup:
+        raise TypeError("general rule must be GeneralLookup")
+    if table.alphabet_size != 2 or table.neighbor_slots != 4:
+        raise ValueError("strict T21 general table must have 32 binary contexts")
+    fibers: dict[tuple[int, int], int] = {}
+    for context in product((0, 1), repeat=5):
+        read = LocalRead(context[0], context[1:])
+        key = (read.center, sum(read.neighbors))
+        output = table.evaluate(read)
+        prior = fibers.setdefault(key, output)
+        if prior != output:
+            raise ValueError("table is not outer-totalistic")
+    if len(fibers) != 10:
+        raise AssertionError("outer-totalistic fibers are incomplete")
+    code = sum(
+        fibers[(center, count)] << (center + 2 * count)
+        for count in range(5)
+        for center in (0, 1)
+    )
+    factored = BinaryOuterTotalistic(code, 4)
+    if expand_outer_totalistic(factored) != table:
+        raise AssertionError("outer-totalistic factorization was not lossless")
+    return factored
+
+
+def expand_totalistic(rule: BinaryTotalistic) -> GeneralLookup:
+    """Losslessly expand one qualifying equal-sum six-row table."""
+
+    if type(rule) is not BinaryTotalistic or rule.neighbor_slots != 4:
+        raise TypeError("strict T21 totalistic rule is required")
+    outputs = tuple(
+        rule.evaluate(LocalRead(context[0], context[1:]))
+        for context in product((0, 1), repeat=5)
+    )
+    return GeneralLookup(2, 4, outputs)
+
+
+def factor_totalistic(table: GeneralLookup) -> BinaryTotalistic:
+    """Factor only tables constant on every center-plus-neighbors sum fiber."""
+
+    if type(table) is not GeneralLookup:
+        raise TypeError("general rule must be GeneralLookup")
+    if table.alphabet_size != 2 or table.neighbor_slots != 4:
+        raise ValueError("strict T21 general table must have 32 binary contexts")
+    fibers: dict[int, int] = {}
+    for context in product((0, 1), repeat=5):
+        read = LocalRead(context[0], context[1:])
+        key = read.center + sum(read.neighbors)
+        output = table.evaluate(read)
+        prior = fibers.setdefault(key, output)
+        if prior != output:
+            raise ValueError("table is not equal-sum totalistic")
+    if len(fibers) != 6:
+        raise AssertionError("totalistic fibers are incomplete")
+    code = sum(fibers[total] << total for total in range(6))
+    factored = BinaryTotalistic(code, 4)
+    if expand_totalistic(factored) != table:
+        raise AssertionError("totalistic factorization was not lossless")
+    return factored
 
 
 @dataclass(frozen=True)
@@ -764,6 +923,24 @@ def sparse_lattice_step(
     )
 
 
+def fixed_background_sparse_step(
+    program: CAProgram, old: SparseLatticeField
+) -> SparseLatticeField:
+    """Lowering for storage whose implicit background value cannot change."""
+
+    if program.alphabet != old.alphabet:
+        raise ValueError("program and sparse storage alphabets differ")
+    uniform = LocalRead(
+        old.background, tuple(old.background for _ in program.neighborhood.offsets)
+    )
+    if program.rule.evaluate(uniform) != old.background:
+        raise ValueError("fixed-background sparse lowering requires quiescence proof")
+    successor = sparse_lattice_step(program, old)
+    if successor.background != old.background:
+        raise AssertionError("proved fixed background changed")
+    return successor
+
+
 def expect_raises(error: type[BaseException], thunk: object) -> None:
     if not callable(thunk):
         raise TypeError("test thunk must be callable")
@@ -840,6 +1017,89 @@ def assert_book_codes_and_counts() -> None:
             assert rule_942.evaluate(LocalRead(center, neighbors)) == (
                 1 if count in (1, 4) else center
             )
+
+
+def assert_strict_local_form_roundtrips() -> dict[str, int]:
+    """Close general, outer-totalistic, and equal-sum representations."""
+
+    assert STRICT_T21_SORTED_INPUTS == tuple(sorted(STRICT_T21_SORTED_INPUTS))
+    assert STRICT_T21_SORTED_INPUTS == (
+        (-1, 0),
+        (0, -1),
+        (0, 0),
+        (0, 1),
+        (1, 0),
+    )
+
+    # Zero/full plus every one-hot digit prove the 32-bit positional codec;
+    # the directional projection supplies an asymmetric multi-bit guard.
+    asymmetric = projection_rule(2, 4, 0)  # raw (-1,0), not a compass assumption
+    asymmetric_code = strict_t21_general_to_code(asymmetric)
+    general_codes = {0, (1 << 32) - 1, asymmetric_code}
+    general_codes.update(1 << index for index in range(32))
+    for code in general_codes:
+        decoded = strict_t21_general_from_code(code)
+        assert strict_t21_general_to_code(decoded) == code
+        assert strict_t21_general_from_code(strict_t21_general_to_code(decoded)) == decoded
+
+    outer_cases = 0
+    for code in range(1 << 10):
+        compact = BinaryOuterTotalistic(code, 4)
+        exhaustive = expand_outer_totalistic(compact)
+        assert len(exhaustive.outputs) == 32
+        assert factor_outer_totalistic(exhaustive) == compact
+        assert expand_outer_totalistic(factor_outer_totalistic(exhaustive)) == exhaustive
+        assert strict_t21_general_from_code(strict_t21_general_to_code(exhaustive)) == exhaustive
+        outer_cases += 1
+
+    totalistic_cases = 0
+    for code in range(1 << 6):
+        compact = BinaryTotalistic(code, 4)
+        exhaustive = expand_totalistic(compact)
+        assert len(exhaustive.outputs) == 32
+        assert factor_totalistic(exhaustive) == compact
+        assert expand_totalistic(factor_totalistic(exhaustive)) == exhaustive
+        assert strict_t21_general_from_code(strict_t21_general_to_code(exhaustive)) == exhaustive
+        totalistic_cases += 1
+
+    # Quotient adversary 1: raw (-1,0)-only and (+1,0)-only contexts have the
+    # same cardinal count, yet an asymmetric exhaustive table distinguishes
+    # them.  Outer-totalistic compression must reject rather than lose it.
+    negative_axis_0_only = LocalRead(0, (1, 0, 0, 0))
+    positive_axis_0_only = LocalRead(0, (0, 0, 0, 1))
+    assert sum(negative_axis_0_only.neighbors) == sum(positive_axis_0_only.neighbors) == 1
+    assert asymmetric.evaluate(negative_axis_0_only) == 1
+    assert asymmetric.evaluate(positive_axis_0_only) == 0
+    expect_raises(ValueError, lambda: factor_outer_totalistic(asymmetric))
+
+    # Quotient adversary 2: (Self=1,count=0) and (Self=0,count=1) collide under
+    # the five-cell sum but are distinct in Self x CardinalCount.  A center
+    # projection is a valid outer table and an invalid equal-sum table.
+    center_projection = projection_rule(2, 4, -1)
+    self_one_count_zero = LocalRead(1, (0, 0, 0, 0))
+    self_zero_count_one = LocalRead(0, (1, 0, 0, 0))
+    assert self_one_count_zero.center + sum(self_one_count_zero.neighbors) == 1
+    assert self_zero_count_one.center + sum(self_zero_count_one.neighbors) == 1
+    assert center_projection.evaluate(self_one_count_zero) == 1
+    assert center_projection.evaluate(self_zero_count_one) == 0
+    assert expand_outer_totalistic(factor_outer_totalistic(center_projection)) == center_projection
+    expect_raises(ValueError, lambda: factor_totalistic(center_projection))
+
+    # One changed positional row is sufficient to invalidate a formerly
+    # qualifying factorization; qualification inspects all 32 rows.
+    valid = expand_outer_totalistic(BinaryOuterTotalistic(942, 4))
+    outputs = list(valid.outputs)
+    outputs[8] = 1 - outputs[8]
+    tampered = GeneralLookup(2, 4, tuple(outputs))
+    expect_raises(ValueError, lambda: factor_outer_totalistic(tampered))
+
+    assert outer_cases == 1024 and totalistic_cases == 64
+    assert len(general_codes) == 35
+    return {
+        "general_codec": len(general_codes),
+        "outer_factor": outer_cases,
+        "totalistic_factor": totalistic_cases,
+    }
 
 
 def assert_exhaustive_native_commutation() -> dict[str, int]:
@@ -962,10 +1222,10 @@ def assert_asymmetric_orientation_and_parallelism() -> None:
         expected = subtract_coord(seed, offset)
         assert nonzero_coords(successor) == (expected,)
 
-    west_program = strict_t21_program(projection_rule(2, 4, 1))
-    east_program = strict_t21_program(projection_rule(2, 4, 2))
-    assert nonzero_coords(generic_ca_step(west_program, old)) == ((2, 3),)
-    assert nonzero_coords(generic_ca_step(east_program, old)) == ((2, 1),)
+    negative_axis_1 = strict_t21_program(projection_rule(2, 4, 1))
+    positive_axis_1 = strict_t21_program(projection_rule(2, 4, 2))
+    assert nonzero_coords(generic_ca_step(negative_axis_1, old)) == ((2, 3),)
+    assert nonzero_coords(generic_ca_step(positive_axis_1, old)) == ((2, 1),)
 
     # A left-to-right in-place update loses the old black value before the
     # next site reads it.  The generic old-snapshot commit correctly shifts it.
@@ -976,15 +1236,16 @@ def assert_asymmetric_orientation_and_parallelism() -> None:
         cells_with_one(line_shape, (0, 0)),
         SnapshotToken(4),
     )
-    parallel = generic_ca_step(west_program, line_old)
+    parallel = generic_ca_step(negative_axis_1, line_old)
     assert parallel.cells == (0, 1, 0, 0)
 
     in_place = list(line_old.cells)
     for column in range(4):
-        west = 0 if column == 0 else in_place[column - 1]
-        # The projection table ignores all fields except the west slot.
-        in_place[column] = west_program.rule.evaluate(
-            LocalRead(in_place[column], (0, west, 0, 0))
+        negative_neighbor = 0 if column == 0 else in_place[column - 1]
+        # Under the explicitly declared row/column isomorphism, slot 1 is
+        # west.  The raw semantic identity remains offset (0,-1).
+        in_place[column] = negative_axis_1.rule.evaluate(
+            LocalRead(in_place[column], (0, negative_neighbor, 0, 0))
         )
     assert tuple(in_place) == (0, 0, 0, 0)
     assert tuple(in_place) != parallel.cells
@@ -993,7 +1254,7 @@ def assert_asymmetric_orientation_and_parallelism() -> None:
 def assert_boundary_and_support_separation() -> None:
     """Finite edge policies are realization data, not native Z^2 semantics."""
 
-    program = strict_t21_program(projection_rule(2, 4, 1))  # read west
+    program = strict_t21_program(projection_rule(2, 4, 1))  # read raw (0,-1)
     shape = (3, 3)
     edge_seed = cells_with_one(shape, (1, 2))
     periodic = GridConfiguration(
@@ -1082,21 +1343,30 @@ def assert_exact_infinite_support() -> None:
     # explicit array is needed.
     nonquiescent = strict_t21_program(BinaryOuterTotalistic(1, 4))
     uniform_white = make_sparse_field(2, 2, 0, ())
+    expect_raises(
+        ValueError,
+        lambda: fixed_background_sparse_step(nonquiescent, uniform_white),
+    )
     uniform_black = sparse_lattice_step(nonquiescent, uniform_white)
     assert uniform_black.background == 1 and uniform_black.entries == ()
     back_to_white = sparse_lattice_step(nonquiescent, uniform_black)
     assert back_to_white.background == 0 and back_to_white.entries == ()
+    quiescent_seed = make_sparse_field(2, 2, 0, (((0, 0), 1),))
+    assert fixed_background_sparse_step(growth, quiescent_seed) == sparse_lattice_step(
+        growth, quiescent_seed
+    )
 
-    # Exact finite-horizon dependency: with west projection, a source two
-    # cells west reaches the origin in two steps; one three cells west does not.
-    west = strict_t21_program(projection_rule(2, 4, 1))
+    # Exact finite-horizon dependency along raw axis 1: with (0,-1)
+    # projection, a source two negative-axis cells away reaches the origin in
+    # two steps; one three cells away does not.
+    negative_axis_1 = strict_t21_program(projection_rule(2, 4, 1))
     empty = make_sparse_field(2, 2, 0, ())
     outside_halo = make_sparse_field(2, 2, 0, (((0, -3), 1),))
     on_halo = make_sparse_field(2, 2, 0, (((0, -2), 1),))
     for _ in range(2):
-        empty = sparse_lattice_step(west, empty)
-        outside_halo = sparse_lattice_step(west, outside_halo)
-        on_halo = sparse_lattice_step(west, on_halo)
+        empty = sparse_lattice_step(negative_axis_1, empty)
+        outside_halo = sparse_lattice_step(negative_axis_1, outside_halo)
+        on_halo = sparse_lattice_step(negative_axis_1, on_halo)
     assert empty.value_at((0, 0)) == outside_halo.value_at((0, 0)) == 0
     assert on_halo.value_at((0, 0)) == 1
 
@@ -1127,8 +1397,8 @@ def assert_t22_moore_boundary() -> None:
         cells_with_one(shape, (0, 0)),
         SnapshotToken(0),
     )
-    moore = strict_t22_program(projection_rule(2, 8, 0))  # northwest
-    orthogonal = strict_t21_program(projection_rule(2, 4, 0))  # north
+    moore = strict_t22_program(projection_rule(2, 8, 0))  # raw (-1,-1)
+    orthogonal = strict_t21_program(projection_rule(2, 4, 0))  # raw (-1,0)
     assert generic_ca_step(moore, old).value_at((1, 1)) == 1
     assert generic_ca_step(orthogonal, old).value_at((1, 1)) == 0
     assert moore.neighborhood.offsets == MOORE_2D
@@ -1171,11 +1441,11 @@ def assert_hostile_validation() -> None:
         lambda: GridConfiguration(alphabet, topology, (0, 0, 2, 0), SnapshotToken(0)),
     )
 
-    expect_raises(TypeError, lambda: OffsetNeighborhood([NORTH, SOUTH]))
-    expect_raises(ValueError, lambda: OffsetNeighborhood(((0, 0), NORTH)))
-    expect_raises(ValueError, lambda: OffsetNeighborhood((NORTH, NORTH)))
-    expect_raises(ValueError, lambda: OffsetNeighborhood(((-1,), SOUTH)))
-    expect_raises(TypeError, lambda: OffsetNeighborhood(((-1, False), SOUTH)))
+    expect_raises(TypeError, lambda: OffsetNeighborhood([NEG_AXIS_0, POS_AXIS_0]))
+    expect_raises(ValueError, lambda: OffsetNeighborhood(((0, 0), NEG_AXIS_0)))
+    expect_raises(ValueError, lambda: OffsetNeighborhood((NEG_AXIS_0, NEG_AXIS_0)))
+    expect_raises(ValueError, lambda: OffsetNeighborhood(((-1,), POS_AXIS_0)))
+    expect_raises(TypeError, lambda: OffsetNeighborhood(((-1, False), POS_AXIS_0)))
     expect_raises(TypeError, lambda: BinaryOuterTotalistic(True, 4))
     expect_raises(ValueError, lambda: BinaryOuterTotalistic(1024, 4))
     expect_raises(TypeError, lambda: BinaryTotalistic(False, 4))
@@ -1185,6 +1455,11 @@ def assert_hostile_validation() -> None:
     expect_raises(TypeError, lambda: GeneralLookup(2, 1, (0, 1, 0, False)))
     expect_raises(TypeError, lambda: projection_rule(2, 4, True))
     expect_raises(ValueError, lambda: projection_rule(2, 4, 4))
+    expect_raises(TypeError, lambda: strict_t21_general_from_code(True))
+    expect_raises(ValueError, lambda: strict_t21_general_from_code(1 << 32))
+    expect_raises(TypeError, lambda: strict_t21_general_to_code(BinaryTotalistic(0, 4)))
+    expect_raises(TypeError, lambda: factor_outer_totalistic(BinaryTotalistic(0, 4)))
+    expect_raises(TypeError, lambda: factor_totalistic(BinaryOuterTotalistic(0, 4)))
 
     expect_raises(
         ValueError,
@@ -1353,7 +1628,13 @@ def main() -> None:
     assert ORTHOGONAL_2D == tuple(sorted(ORTHOGONAL_2D))
     assert MOORE_2D == tuple(sorted(MOORE_2D))
     assert (0, 0) not in ORTHOGONAL_2D and (0, 0) not in MOORE_2D
+    assert tuple(offset for _name, offset in ROW_COLUMN_COMPASS) == ORTHOGONAL_2D
+    assert tuple(offset for _name, offset in XY_EAST_NORTH_COMPASS) == ORTHOGONAL_2D
+    assert tuple(name for name, _offset in ROW_COLUMN_COMPASS) != tuple(
+        name for name, _offset in XY_EAST_NORTH_COMPASS
+    )
     assert_book_codes_and_counts()
+    form_counts = assert_strict_local_form_roundtrips()
     counts = assert_exhaustive_native_commutation()
     assert_wrapped_slot_multiplicity()
     assert_asymmetric_orientation_and_parallelism()
@@ -1372,12 +1653,18 @@ def main() -> None:
     print(f"totalistic_cases={counts['totalistic']}")
     print(f"positional_cases={counts['positional']}")
     print(f"ternary_alphabet_cases={counts['ternary']}")
+    print(f"general_codec_basis_cases={form_counts['general_codec']}")
+    print(f"outer_factor_roundtrips={form_counts['outer_factor']}")
+    print(f"totalistic_factor_roundtrips={form_counts['totalistic_factor']}")
     print("book_codes=1022,942; rule_counts=2^32,2^12,2^10,2^6")
     print("code_1022_t0_t6=PASS; exact_Z2_sparse_support=PASS")
     print("four_orthogonal_offsets=PASS; center_in_rule_schema=PASS")
     print("all_sites=PASS; old_snapshot_parallel_same_site=PASS")
+    print("raw_sorted_offsets=PASS; explicit_compass_isomorphisms=PASS")
     print("asymmetric_orientation=PASS; wrapped_slot_multiplicity=PASS")
+    print("outer_and_equal_sum_quotient_adversaries=PASS")
     print("finite_realization_boundary_separation=PASS")
+    print("fixed_background_sparse_quiescence_guard=PASS")
     print("dimension_agnostic_t1D_t2D_t3D=PASS")
     print("T22_moore_boundary=PASS; no_family_executor=PASS")
     print("exact_type_validation=PASS; opaque_snapshot_identity=PASS")
