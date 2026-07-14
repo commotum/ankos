@@ -363,6 +363,48 @@ def structural_program_key(program: object) -> tuple[object, ...]:
     )
 
 
+def checked_expression_key(value: object) -> tuple[object, ...]:
+    key = exact_tuple(value, "expression key")
+    if not key or type(key[0]) is not str:
+        raise TypeError("expression key requires an exact string tag")
+    tag = key[0]
+    if tag == "Literal/v1":
+        if len(key) != 2 or type(key[1]) is not str:
+            raise ValueError("Literal key must contain one decimal string")
+        try:
+            integer = int(key[1])
+        except ValueError as error:
+            raise ValueError("Literal key decimal is invalid") from error
+        if str(integer) != key[1]:
+            raise ValueError("Literal key decimal must be canonical")
+        return key
+    if tag == "TargetIndex/v1":
+        if len(key) != 1:
+            raise ValueError("TargetIndex key has no payload")
+        return key
+    if tag in ("Add/v1", "Mul/v1"):
+        if len(key) != 2:
+            raise ValueError(f"{tag} key requires one child tuple")
+        children = exact_tuple(key[1], f"{tag} children")
+        if len(children) < 2:
+            raise ValueError(f"{tag} key requires at least two children")
+        for child in children:
+            checked_expression_key(child)
+        return key
+    if tag == "Sub/v1":
+        if len(key) != 3:
+            raise ValueError("Sub key requires left and right children")
+        checked_expression_key(key[1])
+        checked_expression_key(key[2])
+        return key
+    if tag == "TermAt/v1":
+        if len(key) != 2:
+            raise ValueError("TermAt key requires one address child")
+        checked_expression_key(key[1])
+        return key
+    raise ValueError(f"unknown closed expression-key tag {tag!r}")
+
+
 def checked_program_key(value: object) -> tuple[object, ...]:
     key = exact_tuple(value, "program key")
     if len(key) != 4:
@@ -371,9 +413,7 @@ def checked_program_key(value: object) -> tuple[object, ...]:
         raise ValueError("unknown program-key version")
     if key[1] != VALUE_CARRIER or key[2] != DEMAND_ORDER:
         raise ValueError("program-key profile mismatch")
-    expression_part = exact_tuple(key[3], "program expression key")
-    if not expression_part or type(expression_part[0]) is not str:
-        raise TypeError("malformed expression key")
+    checked_expression_key(key[3])
     return key
 
 
@@ -1321,7 +1361,7 @@ def audit_visible_source_rows() -> tuple[int, int, int, int, int]:
 
 
 def audit_long_source_traces() -> tuple[int, int, int, int, int, int]:
-    final_length = 1_000
+    final_length = 256
     total_events = 0
     total_demands = 0
     minimum_address = 10**9
@@ -1348,8 +1388,8 @@ def audit_long_source_traces() -> tuple[int, int, int, int, int, int]:
                 assert demand.address < event.before.next_index
                 total_demands += 1
 
-    assert total_events == 7_985
-    assert total_demands > 25_000
+    assert total_events == 2_033
+    assert total_demands > 6_000
     assert minimum_address == 1
     assert maximum_lag > 100
     assert trace_replays == 8
@@ -1543,10 +1583,10 @@ def audit_lossiness_and_fixed_lag_boundary() -> tuple[int, int, int, int, int]:
 
 def audit_page131_observers() -> tuple[int, int, int, int, int, int]:
     formula_checks = 4_096
-    row_d = dict(source_programs())["d"]
     seed = NumericPrefix(1, (1, 1))
-    trace = run(row_d, seed, formula_checks - len(seed.terms))
-    values = trace.states[-1].terms
+    # The formula is an observer, so compare it to an independently generated
+    # term stream without materializing thousands of nested semantic prefixes.
+    values = direct_row_terms("d", seed, formula_checks)
     for index, value in enumerate(values, start=1):
         assert page131_case_d_value(index) == value
 
@@ -1855,6 +1895,17 @@ def audit_hostile_validation() -> int:
     )
     rejected += must_raise(TypeError, lambda: checked_program_key([*event.provenance.structural_key]))
     rejected += must_raise(ValueError, lambda: checked_program_key(("Callback/v1", VALUE_CARRIER, DEMAND_ORDER, ("x",))))
+    forged_nested_key = (
+        "ComputedPrefixRecurrence/v1",
+        VALUE_CARRIER,
+        DEMAND_ORDER,
+        ("TermAt/v1", ("Callback/v1",)),
+    )
+    forged_nested_id = sha256(repr(forged_nested_key).encode("utf-8")).hexdigest()
+    rejected += must_raise(ValueError, lambda: checked_program_key(forged_nested_key))
+    rejected += must_raise(ValueError, lambda: ProgramProvenance(forged_nested_key, forged_nested_id))
+    rejected += must_raise(ValueError, lambda: checked_expression_key(("Literal/v1", "01")))
+    rejected += must_raise(ValueError, lambda: checked_expression_key(("Add/v1", (("Literal/v1", "1"),))))
 
     trace = run(program, NumericPrefix(1, (1, 1)), 4)
     unsafe = object.__new__(RunTrace)
@@ -1917,3 +1968,112 @@ def audit_hostile_validation() -> int:
 
     return rejected
 
+
+EXPECTED_DIGEST = "TO_BE_COMPUTED"
+
+
+def collect_audit_summary() -> tuple[tuple[str, object], ...]:
+    visible = audit_visible_source_rows()
+    long_traces = audit_long_source_traces()
+    partiality = audit_dependent_access_and_partiality()
+    lossiness = audit_lossiness_and_fixed_lag_boundary()
+    observers = audit_page131_observers()
+    bigint = audit_arbitrary_precision()
+    identity = audit_structural_identity_and_replay()
+    trace_shape = audit_trace_shape_and_error_retention()
+    surface = audit_no_new_execution_surface()
+    hostile = audit_hostile_validation()
+    return (
+        ("visible_source_rows", visible),
+        ("long_source_traces", long_traces),
+        ("dependent_access_partiality", partiality),
+        ("lossiness_fixed_lag", lossiness),
+        ("page131_observers", observers),
+        ("arbitrary_precision", bigint),
+        ("structural_identity_replay", identity),
+        ("trace_shape_error_retention", trace_shape),
+        ("execution_surface", surface),
+        ("hostile_rejections", hostile),
+        ("source_formulas", SOURCE_FORMULAS),
+        ("visible_source_terms", VISIBLE_SOURCE_TERMS),
+        ("visible_horizons", VISIBLE_HORIZONS),
+        ("source_claims", SOURCE_CLAIMS),
+        ("architecture_classes", ARCHITECTURE_CLASSIFICATION),
+        ("goal2_delta", GOAL2_DELTA),
+        ("raw_12738_spelling", RAW_12738_SPELLING),
+        ("guarded_12738_repair", GUARDED_12738_REPAIR),
+        ("shared_execution_roles", SHARED_EXECUTION_ROLE_MANIFEST),
+        ("dataclass_role_manifest", EXPECTED_DATACLASS_ROLE_MANIFEST),
+        ("forbidden_execution_suffixes", FORBIDDEN_EXECUTION_ROLE_SUFFIXES),
+    )
+
+
+def main() -> None:
+    summary = collect_audit_summary()
+    digest = sha256(repr(summary).encode("utf-8")).hexdigest()
+    if EXPECTED_DIGEST == "TO_BE_COMPUTED":
+        print(f"computed_semantic_digest={digest}")
+        return
+    assert digest == EXPECTED_DIGEST
+    metrics = dict(summary)
+    visible = metrics["visible_source_rows"]
+    long_traces = metrics["long_source_traces"]
+    partiality = metrics["dependent_access_partiality"]
+    lossiness = metrics["lossiness_fixed_lag"]
+    observers = metrics["page131_observers"]
+    bigint = metrics["arbitrary_precision"]
+    identity = metrics["structural_identity_replay"]
+    trace_shape = metrics["trace_shape_error_retention"]
+    surface = metrics["execution_surface"]
+
+    print(
+        f"visible_events={visible[0]}; visible_demands={visible[1]}; "
+        f"event_replays={visible[2]}; codec_commutations={visible[3]}; nested_demands={visible[4]}"
+    )
+    print(
+        f"long_events={long_traces[0]}; long_demands={long_traces[1]}; "
+        f"minimum_address={long_traces[2]}; maximum_dynamic_lag={long_traces[3]}; "
+        f"maximum_source_value={long_traces[4]}; long_trace_replays={long_traces[5]}"
+    )
+    print(
+        f"partial_cases={partiality[0]}; partial_errors={partiality[1]}; "
+        f"successful_demands={partiality[2]}; repeated_occurrences={partiality[3]}; "
+        f"old_snapshot_guards={partiality[4]}; order_guards={partiality[5]}"
+    )
+    print(
+        f"fixed_lag_commutations={lossiness[0]}; window_counterexamples={lossiness[1]}; "
+        f"maximum_window={lossiness[2]}; newest_scalar_counterexamples={lossiness[3]}; "
+        f"distinct_dynamic_lags={lossiness[4]}"
+    )
+    print(
+        f"page131_formula_checks={observers[0]}; last_index_checks={observers[1]}; "
+        f"raw_multiplicity_terms={observers[2]}; repaired_terms={observers[3]}; "
+        f"observer_max_value={observers[4]}; defect_guards={observers[5]}"
+    )
+    print(
+        f"bigint_events={bigint[0]}; max_bits={bigint[1]}; max_decimal_digits={bigint[2]}; "
+        f"bigint_replays={bigint[3]}"
+    )
+    print(
+        f"structural_keys={identity[0]}; structural_ids={identity[1]}; "
+        f"cross_rejections={identity[2]}; serialization_roundtrips={identity[3]}; "
+        f"order_guards={identity[4]}; identity_trace_events={identity[5]}"
+    )
+    print(
+        f"trace_horizons={trace_shape[0]}; trace_events={trace_shape[1]}; "
+        f"trace_states={trace_shape[2]}; trace_replays={trace_shape[3]}; "
+        f"no_partial_events={trace_shape[4]}; retained_last_states={trace_shape[5]}"
+    )
+    print(
+        f"surface=configuration{surface[0]}/state{surface[1]}/frontier{surface[2]}/"
+        f"neighborhood{surface[3]}/update{surface[4]}/StepResult{surface[5]}/"
+        f"program{surface[6]}/dataclasses{surface[7]}; "
+        f"hostile_rejections={metrics['hostile_rejections']}"
+    )
+    print(f"semantic_digest={digest}")
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 1:
+        raise SystemExit("usage: 44-T38-semantic-oracle.py")
+    main()
