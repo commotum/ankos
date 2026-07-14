@@ -917,7 +917,7 @@ COMPLETE. The repaired 22-query/351-line source closure, 23-asset fixed point, s
 
 ### 32-T18-CYCLIC-TAG
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN** in `goal-1/32-T18-CYCLIC-TAG.md`.
+Status: **IN PROGRESS — SEMANTIC AUDIT CLOSED; SOURCE, ASSET, AND ARCHITECTURE AUDITS OPEN** in `goal-1/32-T18-CYCLIC-TAG.md`.
 
 #### Big Picture Objective
 
@@ -927,7 +927,7 @@ Add cyclic program control and conditional append behavior to tag-system semanti
 
 Apply the common protocol, emphasizing program counter, trigger symbol, deletion, append schedule, and complete visible control state.
 
-Current work is testing a lossless tagged-word representation `Phase(slot) · Data(word)`. The proof obligation is whether one old-snapshot ordered multi-span commit can replace the phase/head prefix and conditionally insert the scheduled block at the old endpoint, thereby reusing D027/D039 without a cyclic executor or new UPDATE algebra.
+The 71,442-case semantic oracle closes the lossless tagged-word representation `Phase(slot) · Data(word)`: one old-snapshot ordered multi-span commit replaces the phase/head prefix and conditionally inserts the scheduled block at the old endpoint, reusing D027/D039 without a cyclic executor or new UPDATE algebra. Source, asset, and final architecture closure remain in progress.
 
 #### Completion Requirements
 
