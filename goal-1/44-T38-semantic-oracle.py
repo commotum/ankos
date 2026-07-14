@@ -1437,7 +1437,7 @@ def demand_addresses(access: object) -> tuple[int, ...]:
     raise TypeError("demand_addresses requires an access result")
 
 
-def audit_complete_prefix_rule_factorization() -> tuple[int, int, int, int]:
+def audit_complete_prefix_rule_factorization() -> tuple[int, int, int, int, int, int, int]:
     """Prove computed lookup is RULE work over a reused complete-prefix read.
 
     ``resolve_rule_expression`` plus ``emit_endpoint_replacement`` is retained as
@@ -1445,52 +1445,102 @@ def audit_complete_prefix_rule_factorization() -> tuple[int, int, int, int]:
     closed RULE evaluator; it is not a required NEIGHBORHOOD semantic.
     """
 
-    successful = 0
-    demands = 0
+    def compiled_factor_step(program: RecurrenceProgram, prefix: NumericPrefix) -> StepResult:
+        before_word = encode_prefix(prefix)
+        position, active = select_unique_end(before_word)
+        reads = read_complete_prefix(prefix, active)
+        resolved = resolve_rule_expression(program, reads, active)
+        if type(resolved) is AccessFailure:
+            return StepResult((), ErrorOutcome(resolved.reason), None, resolved)
+        write = emit_endpoint_replacement(program, active, resolved)
+        if type(write) is ResultOutsideCarrier:
+            return StepResult((), ErrorOutcome(write), None, write)
+        after_word = apply_endpoint_splice(before_word, position, write)
+        after = decode_prefix(after_word)
+        event = AppendEvent(
+            program_provenance(program),
+            prefix,
+            before_word,
+            position,
+            active,
+            resolved,
+            write,
+            after_word,
+            after,
+        )
+        return StepResult((after,), Advanced(True), event, resolved)
+
+    def compare(program: RecurrenceProgram, prefix: NumericPrefix) -> StepResult:
+        merged = generic_step(program, prefix)
+        compiled = compiled_factor_step(program, prefix)
+        assert merged == compiled
+        return merged
+
+    visible = 0
+    long = 0
     partial = 0
+    fixed_lag = 0
+    bigint = 0
     failures = 0
 
     for preset in source_presets():
         requested = len(preset.visible_terms) - len(preset.seed.terms)
         trace = run(preset.program, preset.seed, requested)
         for event in trace.events:
-            _, active = select_unique_end(encode_prefix(event.before))
-            reads = read_complete_prefix(event.before, active)
-            assert reads is event.before
-            combined = evaluate_recurrence_rule(preset.program, active, reads)
-            resolved = resolve_rule_expression(preset.program, reads, active)
-            assert type(resolved) is ResolvedAccess
-            compiled = emit_endpoint_replacement(preset.program, active, resolved)
-            assert combined == compiled == event.write
-            successful += 1
-            demands += len(resolved.demands)
+            assert compare(preset.program, event.before).event == event
+            visible += 1
+
+        long_trace = run(preset.program, preset.seed, 256 - len(preset.seed.terms))
+        for event in long_trace.events:
+            assert compare(preset.program, event.before).event == event
+            long += 1
 
     partial_cases = (
-        (RecurrenceProgram(at(C(0))), NumericPrefix(1, (7, 11))),
-        (RecurrenceProgram(at(C(-1))), NumericPrefix(1, (7, 11))),
-        (RecurrenceProgram(at(N())), NumericPrefix(1, (7, 11))),
-        (RecurrenceProgram(Add((at(C(1)), at(N())))), NumericPrefix(1, (7, 11))),
-        (RecurrenceProgram(Sub(at(C(-1)), at(C(-1)))), NumericPrefix(1, (7, 11))),
-        (RecurrenceProgram(C(0)), NumericPrefix(1, (7, 11))),
+        (RecurrenceProgram(at(at(lag(1)))), NumericPrefix(1, (2, 1))),
+        (RecurrenceProgram(plus(lag(1), lag(1))), NumericPrefix(1, (1, 1))),
+        (RecurrenceProgram(lag(1)), NumericPrefix(1, (1, 1))),
+        (RecurrenceProgram(lag(2)), NumericPrefix(1, (1, 1))),
+        (RecurrenceProgram(at(C(0))), NumericPrefix(1, (7,))),
+        (RecurrenceProgram(at(C(-1))), NumericPrefix(1, (7,))),
+        (RecurrenceProgram(at(N())), NumericPrefix(1, (7,))),
+        (RecurrenceProgram(at(plus(N(), C(1)))), NumericPrefix(1, (7,))),
+        (RecurrenceProgram(Sub(at(C(-1)), at(C(-1)))), NumericPrefix(1, (9,))),
+        (RecurrenceProgram(plus(lag(1), at(C(0)))), NumericPrefix(1, (5,))),
+        (RecurrenceProgram(plus(at(C(0)), lag(1))), NumericPrefix(1, (5,))),
+        (RecurrenceProgram(at(at(C(0)))), NumericPrefix(1, (5,))),
+        (RecurrenceProgram(at(lag(1))), NumericPrefix(1, (7,))),
+        (RecurrenceProgram(Sub(C(1), lag(1))), NumericPrefix(1, (1,))),
     )
     for program, prefix in partial_cases:
-        _, active = select_unique_end(encode_prefix(prefix))
-        reads = read_complete_prefix(prefix, active)
-        combined = evaluate_recurrence_rule(program, active, reads)
-        resolved = resolve_rule_expression(program, reads, active)
-        if type(resolved) is AccessFailure:
-            assert combined == resolved
-        else:
-            combined_from_split = emit_endpoint_replacement(program, active, resolved)
-            assert combined == combined_from_split
-        assert type(combined) in (AccessFailure, ResultOutsideCarrier)
+        result = compare(program, prefix)
+        failures += type(result.outcome) is ErrorOutcome
         partial += 1
-        failures += 1
 
-    assert successful == 325
-    assert demands == 1_122
-    assert partial == failures == 6
-    return successful, demands, partial, failures
+    for length in range(2, 18):
+        terms = tuple((index * index % 17) + 1 for index in range(1, length + 1))
+        prefix = NumericPrefix(1, terms)
+        for distance in range(1, min(length, 7) + 1):
+            assert type(compare(RecurrenceProgram(lag(distance)), prefix).outcome) is Advanced
+            fixed_lag += 1
+
+    huge = (1 << 4096) + (1 << 2048) + 123456789
+    bigint_program = RecurrenceProgram(plus(C(huge), lag(1)))
+    bigint_trace = run(bigint_program, NumericPrefix(1, (1,)), 64)
+    for event in bigint_trace.events:
+        assert compare(bigint_program, event.before).event == event
+        bigint += 1
+
+    total = visible + long + partial + fixed_lag + bigint
+    assert (visible, long, partial, fixed_lag, bigint, failures, total) == (
+        325,
+        2_033,
+        14,
+        97,
+        64,
+        10,
+        2_533,
+    )
+    return visible, long, partial, fixed_lag, bigint, failures, total
 
 
 def audit_visible_source_rows() -> tuple[int, int, int, int, int]:
@@ -2233,7 +2283,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "5787d8ebc284ad8c4ba0c26069d1b520de14166595cd9876fb12bf5057a3b630"
+EXPECTED_DIGEST = "da544764d03c3171a3cd15535ae7bdc94d08e1c0f39e37ff845cdd7c279ebfbb"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
@@ -2297,10 +2347,13 @@ def main() -> None:
     surface = metrics["execution_surface"]
 
     print(
-        f"complete_prefix_rule_events={factorization[0]}; "
-        f"complete_prefix_rule_demands={factorization[1]}; "
-        f"compiled_partial_equivalences={factorization[2]}; "
-        f"compiled_failure_equivalences={factorization[3]}"
+        f"merged_compiled_visible={factorization[0]}; "
+        f"merged_compiled_long={factorization[1]}; "
+        f"merged_compiled_partial={factorization[2]}; "
+        f"merged_compiled_fixed_lag={factorization[3]}; "
+        f"merged_compiled_bigint={factorization[4]}; "
+        f"merged_compiled_failures={factorization[5]}; "
+        f"merged_compiled_total={factorization[6]}"
     )
     print(
         f"visible_events={visible[0]}; visible_demands={visible[1]}; "
