@@ -25,7 +25,7 @@ Each type stage must make the following auditable:
 
 ## Catalog Coverage
 
-Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07/T08/T10/T11/T14/T15/T18/T21/T22/T23/T24/T25/T26/T28/T32/T33/T35/T36/T38/T40/T42 closures are subsequently complete under active D119-D140.
+Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07/T08/T10/T11/T14/T15/T18/T21/T22/T23/T24/T25/T26/T28/T32/T33/T35/T36/T38/T40/T42 closures are subsequently complete under D119-D140; D141 integrates the final 45-row synthesis and Goal 2 dependency structure.
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
@@ -82,8 +82,8 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 - Type stages evidence-closed / architecture-reopened: 0.
 - Type stages asset-reopened: 0.
 - Type stages unresolved: 0 pending; 0 in progress; 0 reopened.
-- Synthesis: pending.
-- Goal 2 handoff: pending.
+- Synthesis: in progress — D141 and `47-SYNTHESIS.md` drafted; final hostile/global gates pending.
+- Goal 2 handoff: in progress — dependency DAG and exact 45-row coverage matrix drafted; final hostile/global gates pending.
 
 ## Reopened-Stage Log
 

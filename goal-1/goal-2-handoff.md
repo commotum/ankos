@@ -78,7 +78,7 @@ The exact internal split may be refined without changing the semantic ownership 
 | G2-08 | G2-02 | Multiplicity-preserving occurrence bags | 1 |
 | G2-09 | G2-04, G2-05, G2-07, G2-08 | Ordered generation/edit/mosaic substrate, sieve composition, and scheduled presets | 13 |
 | G2-10 | G2-02 | Rooted port-graph access and structural commit | 1 |
-| G2-11 | G2-09, G2-10 | Finite successor-set lift and branch-witness merge | 1 |
+| G2-11 | G2-09 | Finite successor-set lift and branch-witness merge | 1 |
 | G2-12 | G2-03..G2-11 | Registry, migration, datasets/viz, all-catalog verification | None; verifies all 45 |
 
 The ordering is semantic, not a family hierarchy. For example, G2-09 depends on G2-07 only because the T42 preset consumes a complete T40 result, and on G2-08 only to verify T26's restricted posed-bag representation.
@@ -97,7 +97,7 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 | G2-08 | C27 |
 | G2-09 | `C13 -> {C14,C16,C17,C26}`; C15 after C14; C18 after C17; C20 and C37 after C16; C28 after C14, C21, and C26; C38 after C37; C39 after C37; C42 after C13 and C40 |
 | G2-10 | C29 |
-| G2-11 | C30 after C16 and C29 |
+| G2-11 | C30 after C16; its compressed/folded graph remains a trace/view relation rather than a T29 runtime dependency |
 
 ## Detailed Goal 2 Stages
 
@@ -291,7 +291,7 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 
 ### G2-09 — Ordered Generation, Structural Edit, Mosaic, Sieve Composition, and Scheduled Presets
 
-**Depends on:** G2-04, G2-07, and G2-08.
+**Depends on:** G2-04, G2-05, G2-07, and G2-08.
 
 **Files:** `src/ca/configurations.py`, `loci.py`, `frontiers.py`, `neighborhoods.py`, `rules.py`, `updates.py`, `traces.py`, `serialization.py`; `tests/conformance/test_t13_t18.py`, `test_t20.py`, `test_t26_t28.py`, `test_t37_t39.py`, `test_t42.py`.
 

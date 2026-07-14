@@ -212,7 +212,7 @@ The executable invariants are: a finite immutable schedule of exact positive coe
 | Axis | Current surface | Smallest Goal 2 treatment |
 |---|---|---|
 | DOMAIN/configuration | rank-0..3 NumPy arrays with fixed shape | Implement the already-required T13 finite ordered variable-support configuration and ragged trace |
-| ALPHABET | flat finite `int | float | str` values | Implement the generic product/tagged schemas already required across SimplePrograms; T42 uses `PhaseIndex x Bit` plus a uniform-phase invariant |
+| ALPHABET | flat finite `int \| float \| str` values | Implement the generic product/tagged schemas already required across SimplePrograms; T42 uses `PhaseIndex x Bit` plus a uniform-phase invariant |
 | FRONTIER | executable `time_slice` only; `loci.py` already composes selector, predicate, and mask descriptions | Generalize that composition to typed occurrences, then compose T13 `AllOccurrences` with the required closed applicability restriction `phase < L`; at `L`, common D024 outcome handling returns `ScheduleExhausted`; no T42 selector class |
 | NEIGHBORHOOD | `self_at` already exists, but only for array loci | Generalize the existing self projection to typed word occurrences; no T42 access class |
 | RULE | structural channel/lookup/compose descriptions already exist, while executable rollout remains scalar/family-specific | Implement the word-valued closed T13 table already required by T13 and compile the schedule into phase-indexed rows, including unselected terminal totalization rows |

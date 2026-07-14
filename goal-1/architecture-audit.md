@@ -1,6 +1,6 @@
 # Goal 1 Representation and Execution Architecture Audit
 
-Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); ALL SUBSEQUENT STAGES INTEGRATED THROUGH ACTIVE D140; 45/45 TYPES COMPLETE; SYNTHESIS NEXT**
+Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); ALL SUBSEQUENT STAGES AND SYNTHESIS INTEGRATED THROUGH ACTIVE D141; 45/45 TYPES COMPLETE; FINAL HANDOFF REVIEW IN PROGRESS**
 
 ## Trigger and Scope
 
@@ -15,11 +15,16 @@ The library target is Wolfram's finitely described transition/rewrite system, no
 ```text
 SimpleProgram:
     CONFIGURATION  labeled support/topology within DOMAIN plus structural invariants
-    SEED           one valid initial configuration
     FRONTIER       rule-firing loci, occurrences, or matches
     NEIGHBORHOOD   information visible at each firing locus
     RULE           typed writes/replacements
     UPDATE         composition/schedule producing StepResult[Configuration]
+
+RunSpec:
+    PROGRAM
+    SEED           one complete valid initial configuration or closed constructor/law
+    REALIZATION
+    HORIZON / EXTERNAL STOPS
 
 active = FRONTIER.select(state)
 reads  = NEIGHBORHOOD.read(state, active)
@@ -27,7 +32,7 @@ writes = RULE(active, reads)
 next   = UPDATE.apply(state, active, writes)  # structured result with successor(s)
 ```
 
-The runner is branch-free over this protocol. Different domains/topologies, finite or structured alphabets, composite/tagged values, frontier selectors, access patterns, typed rule-result schemas, and update composition policies are implementations or values of these axes—not family executors or top-level semantic state classes. A cellular automaton is the fixed-lattice/all-sites/local-stencil/scalar-label/snapshot-parallel preset.
+The runner is branch-free over the transition protocol. SEED remains a first-class SimplePrograms-library responsibility, but a concrete initial configuration/constructor, realization, horizon, and external stop belong to run/preset identity rather than transition-program identity. Different domains/topologies, finite or structured alphabets, composite/tagged values, frontier selectors, access patterns, typed rule-result schemas, and update composition policies are implementations or values of these axes—not family executors or top-level semantic state classes. A cellular automaton is the fixed-lattice/all-sites/local-stencil/scalar-label/snapshot-parallel preset.
 
 A lossless representation map `e` establishes reuse when it preserves the complete configuration, has an explicit inverse on its invariant-valid image, requires no hidden interpreter, preserves one native step rather than simulating it with several hidden steps, and commutes one step at a time:
 
@@ -323,7 +328,7 @@ This table is the authoritative architecture replacement for the reopened stages
 | T24 | Discrete `t+dD` for native embedded dimension; immutable fixed incidence/site kinds/ports in CONFIGURATION; abstract unembedded fixed networks use `t+0D`; finite quotients, basis/motif/staggered codecs, layouts, and rasters remain realizations/representations/views | All sites; semantic basis-offset slots, kind-indexed ports, or explicit incidence occurrences; strict unlabeled connections expose inclusive exact-totalistic reads, the Notes profile exposes canonical `(Above,Self,Below)` slots, and aliases retain multiplicity | One same-site label write; T01 snapshot-parallel UPDATE. General positional, inclusive totalistic, outer-totalistic, hex orbit/growth, and finite kind-/site-indexed tables are distinct closed schema-tagged data; sampled Boolean rule banks are frozen program data, while fixed-network labels do not invoke T29 structural writes | Add generic discrete dimension/SiteRef, immutable typed incidence, topology-aware AllSites/access, closed dependent rule sums, finite site-indexed banks with setup provenance, inclusive exact-total and canonical-slot validation, exact wide keys, and conformance; no T24 state/control, UPDATE, executor, family branch, hidden topology/embedding, callback, eager giant table, runtime RNG, or raster rule |
 | T25 | Discrete `t+2D`; total default-plus-overrides field on a declared square-grid realization; `Plain(sigma) \| Head(q,sigma)` with exactly one head; factored state is an isomorphic view | Unique head tag; self-only `(q,sigma)` projection. Four source-stated square-grid movement choices or six hex ports belong to CONFIGURATION topology/movement resolution, not RULE-visible neighbor reads; exact square coordinate vectors are declared, not source-transcribed | Closed `Q x Sigma -> AssignSource + MoveHead` table; D011 UPDATE resolves the port, preserves the old destination symbol, and applies atomically. Relative turns use an explicit finite heading action; Langton is an eight-row fixture | Compose T12, D127, and D130; add total sparse `Z^2`, semantic movement writes, frame validation, and T25 presets/conformance only; no state/control class, new UPDATE, executor, family branch, callback, hidden control, arbitrary-CA identity, or invented worm codec |
 | T26 | Discrete `t+2D`; finite nonempty rectangular grid of finite tile labels; display scale is derived. The proved addressed posed-bag step representation is restricted to the uniform aligned full-tiling image | Every old tile exactly once; self label only. `BOOK:13744` supplies operationally opaque labels after one explicit surplus-brace repair; no label-to-shape/orientation codec is constructed, and image `BOOK:13742` remains relation evidence | Total closed `TileLabel -> nonempty rectangular patch`; generic `RankedBlockMosaicAssemble` validates equal heights within each source row and equal total slab widths across source rows, not per-column widths, then commits exact product-order assembly from one snapshot with newborn deferral. Incompatibility is `Invalid(IncompatibleMosaic)` with no successor/commit. D019 selected-source concatenation is its rank-one member; the named uniform wrapper requires positive extents. The uniform T27 adapter maps labels to distinct `prototype_id` values with shared declared geometry. Encoding maps the source token; grid and bag derive successor tokens independently; a reversible bijection over the two source/successor pairs preserves the complete result envelope, poses, rectangles, and every parent-local child witness | Add generic ranked block tables/writes/mosaic assembly, rectangular dynamic configurations, old-snapshot handles, lineage, typed invalid results, and ragged traces. Preserve D019 and T27's unrestricted geometry; no T26 class, new execution algebra, family executor, callback, padding/cropping, raster rule, implicit white identity, invented geometric codec, mixed-mosaic T27 commutation claim, or T28 context |
-| T28 | Discrete `t+2D`; finite nonempty rectangular product grid with cyclic row/column incidence and potentially changing compatible extent; complete raster program remains unavailable | Every old Cartesian source once; declared periodic lower-right `(NW,N,W,Self)` access from one immutable snapshot, retaining aliased slot occurrences. T14 supplies contextual responsibility but not its open-right frontier | Ordered closed `Literal | AnonymousAny` product clauses lower behaviorally to a total exhaustive context-to-positive-rectangular-patch table while retaining source AST/provenance; source Blank `_` is explicit; first match wins. T26 writes and D132 rank-two mosaic UPDATE commit compatible aligned patches, consume parents, defer newborns, and preserve exact lineage. Missing coverage is construction-invalid; incompatible mosaics are typed no-commit step results. Context participants are not co-parents | Add named periodic product access, axis codec, ordered finite pattern schema, totalization/compiler, and conformance atop D127/D132. Keep adaptive unequal subdivision open pending carrier/incidence/matching/update evidence; no T28 state, UPDATE, executor, branch, callback, implicit fallback, raster program, boundary menu, flat assembly, or hidden scan |
+| T28 | Discrete `t+2D`; finite nonempty rectangular product grid with cyclic row/column incidence and potentially changing compatible extent; complete raster program remains unavailable | Every old Cartesian source once; declared periodic lower-right `(NW,N,W,Self)` access from one immutable snapshot, retaining aliased slot occurrences. T14 supplies contextual responsibility but not its open-right frontier | Ordered closed `Literal \| AnonymousAny` product clauses lower behaviorally to a total exhaustive context-to-positive-rectangular-patch table while retaining source AST/provenance; source Blank `_` is explicit; first match wins. T26 writes and D132 rank-two mosaic UPDATE commit compatible aligned patches, consume parents, defer newborns, and preserve exact lineage. Missing coverage is construction-invalid; incompatible mosaics are typed no-commit step results. Context participants are not co-parents | Add named periodic product access, axis codec, ordered finite pattern schema, totalization/compiler, and conformance atop D127/D132. Keep adaptive unequal subdivision open pending carrier/incidence/matching/update evidence; no T28 state, UPDATE, executor, branch, callback, implicit fallback, raster program, boundary menu, flat assembly, or hidden scan |
 | T27 | Canonical continuous-coordinate `t+2D` geometric support; prototype/pose products in a multiplicity-preserving bag | Every old occurrence; self prototype/full pose | Parent-local child occurrences; parallel bag-replacement UPDATE | Add geometric support/value schemas and bag combiner policy; no geometric executor |
 | T29 | Discrete `t+0D`; rooted port-labeled graph configuration support/topology | Old vertices; port-path/reach views | Direct/fresh reroutes; create/rewire/root-project UPDATE | Add graph support/topology, structural access, and graph update policy within runner; no network executor |
 | T30 | Discrete `t+1D` word configuration with finite successor-set semantics | Every overlapping literal match; matched span | One child per match; UPDATE returns exact finite set of successor configurations | Generalize runner result to configuration(s); preserve witness trace; no multiway executor |
@@ -366,7 +371,7 @@ The current audit does **not** yet admit stochastic/probabilistic execution mere
 
 | Current area | Smallest Goal 2 revision |
 |---|---|
-| package metadata/module docs | Describe the project as a SimplePrograms library and CA as one preset; treat `src/ca` as a namespace/compatibility fact rather than an executor boundary |
+| package metadata/module docs | Describe the project as a SimplePrograms library and CA as one preset; retain `src/ca` as the historical package path while migrating its implementation in place, with no second package or compatibility executor |
 | `alphabets.py` | Add finite product/tagged-union and structured value schemas with invariant-aware codecs; keep role maps explicit |
 | `loci.py` | Generalize finite coordinate-only selectors to typed loci/occurrences/matches while retaining existing geometric selectors |
 | `frontiers.py` | Restore rule-firing semantics and add all-occurrence, unique-tag, match, prefix, endpoint, graph, and candidate selectors as typed implementations; preserve generic closed selector/predicate composition so T42 can require `phase<L` without a catalog selector |
@@ -388,4 +393,6 @@ The current audit does **not** yet admit stochastic/probabilistic execution mere
 - [x] T09/T12 and every affected dependent stage have revised stage results and Goal 2 handoffs.
 - [x] `0-plan.md`, `evidence-index.md`, and `design-ledger.md` agree exactly.
 - [x] Fresh independent review, Markdown-fence checks, `git diff --check`, and scope checks pass.
-- [x] Only after every gate passes may T06 or prior asset repairs resume.
+- [x] The original audit gates passed before T06 and the bounded asset repairs resumed.
+- [x] The final stage-disposition table contains every T01-T45 exactly once, including the previously omitted T06/T07/T11/T14/T15/T36 summary rows.
+- [ ] D141, `47-SYNTHESIS.md`, and `goal-2-handoff.md` pass final hostile review and global verification.

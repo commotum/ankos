@@ -45,11 +45,16 @@ There is **one execution algebra** and **one non-execution declarative algebra**
 SimpleProgram[C, L, R, W]:
     DOMAIN
     CONFIGURATION_SCHEMA
-    SEED_SCHEMA
     FRONTIER
     NEIGHBORHOOD
     RULE
     UPDATE
+
+RunSpec[C]:
+    PROGRAM
+    SEED_OR_INITIAL_CONFIGURATION
+    REALIZATION
+    HORIZON_AND_EXTERNAL_STOPS
 
 step(program, state) -> StepResult[C]:
     validate state against program.configuration_schema
@@ -62,6 +67,8 @@ step(program, state) -> StepResult[C]:
 ```
 
 Every line is a typed success/failure sum. A failure becomes one common no-commit `StepResult` and suppresses later semantic work. Specifications use sealed structural descriptors and versioned codecs; they do not contain unrestricted callables, evaluator strings, host expressions, or hidden producer objects.
+
+SEED remains a first-class SimplePrograms-library responsibility and must produce one complete valid event-zero configuration, but a concrete seed, horizon, realization, or external stop is run/preset identity rather than transition-program identity. This is why T08 can generalize initial-condition construction without changing execution and why T42's strict `(0,)` seed is absent from its transition table identity.
 
 ### 2. Declarative definition/relation/query
 
@@ -79,6 +86,8 @@ answer = evaluate_or_verify(definition, scope, query)
 This layer constructs and validates immutable mathematical definitions, relations, candidates, queries, results, witnesses, and certificates. A solver or numerical method is an explicit implementation relation with its own scope and diagnostics. It is not an UPDATE and its work trace is not the mathematical object.
 
 T31-T33 instantiate model-set relations; T41 instantiates closed function definitions; T40 is an arity-zero exact-denotation/representation specialization with separately identified work programs; T45 instantiates differential equations/problems/solution relations. When an IVP, coefficient algorithm, verifier search, or other computation has an evidenced step law, that work object may independently be a `SimpleProgram`; this does not turn the declarative object itself into rollout.
+
+T39 is intentionally mixed: its consecutive-divisor sieve is a SimpleProgram, while direct integer filters, streams, and arithmetic measurements are declarative queries/observers. The catalog obligation preserves both without making the query siblings into steps.
 
 ## The Irreducible Axes
 
