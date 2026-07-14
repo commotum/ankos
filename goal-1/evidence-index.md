@@ -25,7 +25,7 @@ Each type stage must make the following auditable:
 
 ## Catalog Coverage
 
-Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07/T08 are subsequently complete under active D119-D121. T10 is next.
+Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07/T08 are subsequently complete under active D119-D121. T10 is in progress.
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
@@ -38,7 +38,7 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 | T07 | 8 | Left-Right Symmetric Cellular Automata | 7 | `26-T07-SYMMETRIC.md` | COMPLETE | Authoritative 650-line monolith protocol = bounded 357 + hostile remainder 293, partitioned `15/190/25/167/179/74`; 397 retained pre-Index lines; 114 retained additions reverse-join as 103 exact/11 variants without claiming exhaustive split-only semantics; 271 assets/542 references/271 hashes at 4 included/38 relation-only/229 excluded; diagonal typed action over exact `V_P`, generic admissible-space closure, six oracles, clean hostile review, and 102 tests; 0 unresolved |
 | T08 | 9 | Initial-Condition Classes | 8 | `27-T08-INITIAL-CONDITIONS.md` | COMPLETE | Exact 16-query protocol: 1,205 query-union lines plus five governed continuations; declared audit 1,210 at 701 retained/439 duplicate-control/70 actual-Index, with split reverse coverage `634 exact + 67 variants`; 577 assets at 363 direct/198 relation/16 control, 1,152 references (`577 monolith + 575 split`), two explicit split omissions, and 577 hashes; typed configuration/constructor/class/law/realization/validation/lowering/observer separation over unchanged program and native runner; D121, source/asset/semantic oracles, hostile review, and 102 tests; 0 unresolved |
 | T09 | 10 | Mobile Automata | 9 | `3-T09-MOBILE.md` | COMPLETE | Evidence and architecture reclosed: `Plain(bit) \| Active(bit)`, exactly-one invariant, firing-source frontier, radius-one native read, typed two-write lowering, atomic UPDATE, and compact 65,536-rule identity; no control class or family executor |
-| T10 | 11 | Extended Mobile Automata | 10 | `28-T10-EXTENDED-MOBILE.md` | PENDING | Not started |
+| T10 | 11 | Extended Mobile Automata | 10 | `28-T10-EXTENDED-MOBILE.md` | IN PROGRESS | Exhaustive source/asset audit and T09-reuse/atomic multi-write architecture review active |
 | T11 | 12 | Generalized Mobile Automata | 11 | `29-T11-GENERALIZED-MOBILE.md` | PENDING | Not started |
 | T12 | 13 | Turing Machines | 12 | `4-T12-TURING.md` | COMPLETE | Evidence and architecture reclosed: `Plain(symbol) \| Head(q,symbol)`, exactly-one invariant, source decision plus destination-preservation access, typed two-write lowering, atomic UPDATE, compact `(2sk)^(sk)` rules, and explicit outcomes; no control class or family executor |
 | T13 | 14 | Neighbor-Independent Substitution Systems | 13 | `5-T13-PARALLEL-SUBSTITUTION.md` | COMPLETE | 288 direct-name lines plus definition/replacement/alias/Notes/Index/split/rendering/growth/infinite/stochastic/emulation candidates dispositioned; 26 excerpt groups; 0 unresolved |
@@ -81,7 +81,7 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 - Type stages globally complete: 26 / 45.
 - Type stages evidence-closed / architecture-reopened: 0.
 - Type stages asset-reopened: 0.
-- Type stages unresolved: 19 pending; 0 in progress; 0 reopened.
+- Type stages unresolved: 18 pending; 1 in progress (T10); 0 reopened.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 

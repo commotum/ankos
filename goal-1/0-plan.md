@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 26 type stages are complete, no stage is in progress or reopened, and 19 later stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, and T08 subsequently close under active D119-D121. T10 is next.
+- Execution status at this sync is Foundation complete, 26 type stages are complete, T10 is in progress, no stage is reopened, and 18 later stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, and T08 subsequently close under active D119-D121.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures a DOMAIN/support/topology subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program space with its dimensional character, support, and topology; ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -820,13 +820,15 @@ T08 adds no construction-specific DOMAIN, state family, FRONTIER, NEIGHBORHOOD, 
 
 ### 28-T10-EXTENDED-MOBILE
 
+Status: **IN PROGRESS — SOURCE/ASSET/ARCHITECTURE AUDIT ACTIVE** in `goal-1/28-T10-EXTENDED-MOBILE.md`.
+
 #### Big Picture Objective
 
 Test wider local write scopes while retaining a single active locus and movement.
 
 #### Detailed Implementation Plan
 
-Apply the common protocol, emphasizing multi-target effects, source-relative targets, atomicity, and overlap assumptions.
+Apply the common protocol, emphasizing source-relative multi-target writes, atomicity, compact rule identity, active-marker preservation, boundary scope, and the distinction between T09 parameterization and any genuinely new execution algebra.
 
 #### Completion Requirements
 
