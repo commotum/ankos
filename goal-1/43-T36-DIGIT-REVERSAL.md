@@ -1,11 +1,11 @@
 # 43-T36-DIGIT-REVERSAL
 
-Status: **IN PROGRESS — FIRST-PRINCIPLES CONSTRUCTION RECONSTRUCTED; SOURCE/ASSET/SEMANTIC ORACLES PENDING**
+Status: **COMPLETE — EVIDENCE, ASSETS, SEMANTICS, ARCHITECTURE, AND HOSTILE REVIEW CLOSED**
 
 ## Current Facts
 
 - T36 is CSV physical line 37, `Digit-Reversal Arithmetic Systems`; `ref/notes/CA-Types.md` section 36 is search vocabulary, not primary evidence.
-- The strict main rule keeps one nonnegative integer: write its canonical base-2 digits in reverse order, interpret that reversed word as an integer, and add it to the old integer (`BOOK:1497`, `BOOK:12503`, `BOOK:1543-1553`, `BOOK:12635-12643`). Seed 16 yields the page-125 pattern; seed 512 yields the page-126 million-step nonrepeating observation. The showcased positive seeds do not impose a positive-only carrier.
+- The strict main rule keeps one nonnegative integer: write its canonical base-2 digits in reverse order, interpret that reversed word as an integer, and add it to the old integer (`BOOK:1497`, `BOOK:1543-1553`, `BOOK:12635-12643`). The shared whole-number digit codec is independently established at `BOOK:12503`; it is control evidence rather than T36-specific mechanics. Seed 16 yields the page-125 pattern; seed 512 yields the page-126 million-step nonrepeating observation. The showcased positive seeds do not impose a positive-only carrier.
 - The Notes state the operation as `n -> n + FromDigits[Reverse[IntegerDigits[n,2]],2]`, despite extraction damage that inserts spaces into `FromDigits` and `IntegerDigits` (`BOOK:12635-12643`).
 - Strict T36 therefore has a discrete `t+0D` exact-integer configuration. The canonical digit word is a lossless, rule-visible presentation of that integer, not automatically a second native state or a `t+1D` lattice.
 - Base choice is semantically required because digit reversal depends on positional representation. The strict source fixes base 2; the History note mentions similar base-10 systems, while arbitrary `b >= 2` remains an explicit validated generalization. Base is program data, not DOMAIN, configuration topology, or hidden executor dispatch.
@@ -44,26 +44,26 @@ Reconstruct T36 from primary evidence as a closed positional-representation unar
 
 ## Primary-Source and Asset Closure
 
-The fail-closed source oracle uses 18 independent query lanes. Their union contains 124 monolith rows: 98 before the physical Index and 26 actual-Index candidates. The Index boundary is exact: 12 rows are routed T36 aliases/relations and 14 are guarded flattened-column or recursive-sequence collisions. The complete governed partition is 19 native, 19 relation, and 30 control rows (68 retained), with 48 explicit exclusions and zero unresolved rows.
+The fail-closed source oracle uses 18 independent query lanes. Their union contains 125 monolith rows: 99 before the physical Index and 26 actual-Index candidates. The Index boundary is exact: 12 rows are routed T36 aliases/relations and 14 are guarded flattened-column or recursive-sequence collisions. The complete governed partition is 19 native, 19 relation, and 32 control rows (70 retained), with 48 explicit exclusions and zero unresolved rows. Thirty-four frozen Book-semantic guards across six classes and four auxiliary catalog/taxonomy guards bind the meanings used below rather than merely their row counts.
 
-The retained evidence reverse-joins to 94 unique split-corpus owners:
+The retained evidence reverse-joins to 96 unique split-corpus owners:
 
 | Join class | Rows | Boundary |
 |---|---:|---|
 | Exact text | 71 | Byte-normalized text agrees exactly |
-| Image basename | 15 | Monolith and split rows name the same opaque asset |
+| Image basename | 16 | Monolith and split rows name the same opaque asset |
 | Normalized text | 4 | Minimum score `0.996587`; no low-score fuzzy acceptance |
-| Structural OCR repair | 4 | Exact owner plus frozen damaged and repaired needles |
+| Structural OCR repair | 5 | Exact owner plus frozen damaged and repaired needles |
 
-The four structural repairs cover the extracted `FromDigits`/`IntegerDigits` spacing damage and the `dyadic`/`Paley`/`BitReverseOrder` corruption. Actual-Index routes, neighboring-column sentinels, exclusions, query contracts, and repair witnesses have separately frozen records; clearing or weakening them fails the oracle.
+The five structural repairs cover the extracted `FromDigits`/`IntegerDigits` spacing damage, the shared whole-number digit codec at `BOOK:12503`, and the `dyadic`/`Paley`/`BitReverseOrder` corruption. Actual-Index routes, neighboring-column sentinels, exclusions, query contracts, and repair witnesses have separately frozen records; clearing or weakening them fails the oracle. The corrected T37 boundary explicitly owns `_page_143_Figure_6.jpeg`; it is not a T36 asset.
 
 The evidence roles are:
 
 | Role | Primary evidence | Semantic boundary |
 |---|---|---|
-| Native scalar rule and observations | `BOOK:1497`, `1543-1553`, `12503`, `12635-12645` | Nonnegative exact scalar, base-2 canonical codec, seeds 16/512, empirical growth/periodicity qualifications, fixed/growing-width variants |
+| Native scalar rule and observations | `BOOK:1497`, `1543-1553`, `12635-12645` | Nonnegative exact scalar, base-2 reversal-add rule, seeds 16/512, empirical growth/periodicity qualifications, fixed/growing-width variants |
 | Positional relations | `BOOK:8838`, `12646-12658`, `17313-17356`, `17611`, `20738` | Fixed-width digit-reversal permutation, FFT/Walsh reorderings, van-der-Corput/quasi-Monte-Carlo relations; not reversal-add state evolution |
-| Controls | T35/T37 neighbors, digit codecs, Turing-counter displays, recursive/bitwise/run-length sequences, and `BOOK:12974` | Establish boundaries and confirm that the Book's “whole number” usage includes zero; do not add T36 mechanics |
+| Controls | T35/T37 neighbors, shared digit codec `BOOK:12503`, Turing-counter displays, recursive/bitwise/run-length sequences, and `BOOK:12974` | Establish boundaries, supply the shared whole-number codec, and confirm that the Book's “whole number” usage includes zero; do not add T36-specific mechanics |
 
 The asset boundary contains exactly seven governed files at `4 native / 3 relation / 0 control` and nine excluded neighbor files. The governed set has 14 monolith/split references, seven distinct hashes, 1,062,053 bytes, and two assemblies across five grouped files. The exclusions have 18 references, nine hashes, 170,822 bytes, and one assembly across five grouped files. All seven governed assets are hash-bound; none is pixel-transcribed or pixel-replayed. Consequently the numeric prefixes below are independently computed from the source-pinned formula and seeds, not claimed as raster transcriptions.
 
@@ -213,13 +213,19 @@ D137 therefore classifies every T36 delta as direct reuse, parameterization/rest
 
 ## Completion Requirements
 
-- [ ] Every direct/alias/mechanics search, Notes item, actual Index route, continuation, split witness, image link, and false positive is dispositioned with zero unresolved mechanics.
-- [ ] Strict formula, carrier, base, canonical digit convention, seeds, exact prefixes, events, and empirical qualifications are closed.
-- [ ] Fixed-width/drop-carry and growing-width profiles have exact typed state/program boundaries and no hidden leading-zero semantics.
-- [ ] Scalar/word and width-product representations commute losslessly where claimed; information-loss counterexamples block false collapse.
-- [ ] Source, asset, semantic, runtime-fit, hostile, portability, fail-closed, tests, mode, Markdown, diff, and scope gates pass.
-- [ ] D137, plan, evidence index, design ledger, architecture audit, and Goal 2 handoff are synchronized without a T36 executor.
+- [x] Every direct/alias/mechanics search, Notes item, actual Index route, continuation, split witness, image link, and false positive is dispositioned with zero unresolved mechanics.
+- [x] Strict formula, carrier, base, canonical digit convention, seeds, exact prefixes, events, and empirical qualifications are closed.
+- [x] Fixed-width/drop-carry and growing-width profiles have exact typed state/program boundaries and no hidden leading-zero semantics.
+- [x] Scalar/word and width-product representations commute losslessly where claimed; information-loss counterexamples block false collapse.
+- [x] Source, asset, semantic, runtime-fit, hostile, portability, fail-closed, tests, mode, Markdown, diff, and scope gates pass.
+- [x] D137, plan, evidence index, design ledger, architecture audit, and Goal 2 handoff are synchronized without a T36 executor.
 
 ## Stage Results
 
-In progress. The primary strict construction and the representation boundary are reconstructed; exhaustive source, asset, semantic, runtime, integration, and hostile-review closure remain pending.
+COMPLETE. Eighteen frozen query lanes close a 125-row source union at `99 pre-Index / 26 actual-Index`; the Index partitions `12 routed / 14 guarded exclusions`. The governed source partition is `19 native / 19 relation / 32 control = 70 retained`, with 48 exclusions and zero unresolved. Ninety-six unique split owners close at `71 exact / 16 image-basename / 4 normalized / 5 structural repair`; 34 Book-semantic guards across six classes and four auxiliary guards bind the evidence content. The source-oracle SHA is `7a4cf99382aab7a6a6867798a06f3f0ce5d07887fce3217d1e6a6ae0a5326733`.
+
+Seven governed assets at `4 native / 3 relation / 0 control` plus nine exclusions close 32 monolith/split references, 16 hashes, and 1,232,875 bytes. All seven governed files are hash-bound; none supplies pixel-transcribed or pixel-replayed semantics. Five independent semantic manifests bind 41 exact source-role, adjacency, candidate-group, and source-derived/nonpixel records. The asset-oracle SHA is `972450eb675396bb352c2cac0bf4a7a4dc878c17b3f364e466ca2a0577bfd33a`.
+
+The semantic oracle closes 1,180 source events and independent word replays, 22,036 scalar/word commutations (`11,275 canonical / 5,022 fixed / 5,739 grow`), 1,881 fixed-reversal entries, five arbitrary-precision profiles up to 6,644 bits/2,001 digits, 260 horizons/8,320 trace-event replays, one executable two-state width-loss counterexample, seven exact structural keys, three cross-program rejections, and 68 hostile rejections. Its SHA is `cbbe63f4f4ad8f517df7532719c423e9ff796bbf3b1cfeae3e150540554e4791`; semantic digest is `30539868a2202ffdae0e4574e0ceefb68e5715d6d3a7a543efd63bd730a5ccc8`.
+
+D137 reuses T34's exact discrete `t+0D` scalar event and extends D069 only with closed positional encode/reverse/decode/add nodes and explicit canonical/fixed/grow profiles. Strict state is nonnegative: zero performs the continuing event `0 -> 0`, while positive states strictly increase. Canonical words commute losslessly; growing width remains visible because equal scalar projections at widths one and two have different successors. No T36 state class, FRONTIER, NEIGHBORHOOD, UPDATE, executor, family branch, callback, machine-width behavior, hidden width/time, digit-CA fallback, raster rule, or observer-controlled evolution is added. Root/relocated/import/compile/optimized/bad-usage, mode, Markdown, diff, scope, repository-test, and independent hostile-review gates pass; no prior stage reopens. Next: T38.

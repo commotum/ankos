@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 41 type stages are complete, no stage is reopened, T36 is in progress, and 3 type stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, T32, T33, and T35 are complete under D119-D136.
+- Execution status at this sync is Foundation complete, 42 type stages are complete, no stage is reopened, T38 is next, and 3 type stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, T32, T33, T35, and T36 are complete under D119-D137.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -1147,7 +1147,7 @@ Oracle SHAs are source `af06b40b5e35fe97a97b58ad148336c7e9884029d2785a4186f4456e
 
 ### 43-T36-DIGIT-REVERSAL
 
-Status: **IN PROGRESS — FIRST-PRINCIPLES CONSTRUCTION RECONSTRUCTED; SOURCE/ASSET/SEMANTIC ORACLES PENDING** in `goal-1/43-T36-DIGIT-REVERSAL.md`.
+Status: **COMPLETE — EVIDENCE, ASSETS, SEMANTICS, ARCHITECTURE, AND HOSTILE REVIEW CLOSED** in `goal-1/43-T36-DIGIT-REVERSAL.md`; D137 is active.
 
 #### Big Picture Objective
 
@@ -1160,6 +1160,14 @@ Apply the common protocol. Reuse T34's exact discrete `t+0D` singleton event and
 #### Completion Requirements
 
 All T36 evidence is captured; semantic digit representation is distinguished from optional visualization; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+COMPLETE. The 18-query source audit closes 125 rows at `99 pre-Index / 26 actual-Index`, retains 70 at `19 native / 19 relation / 32 control`, excludes 48, reverse-closes 96 unique split owners at `71 exact / 16 image-basename / 4 normalized / 5 structural repair`, binds 34 Book-semantic guards plus four auxiliary guards, and leaves zero unresolved. Seven governed assets at `4/3/0` plus nine exclusions close 32 references, 16 hashes, 1,232,875 bytes, and five semantic manifests/41 exact records; all seven governed assets are hash-bound and none supplies pixel-derived semantics. The semantic oracle closes 1,180 source events and independent word replays, 22,036 scalar/word commutations, 1,881 fixed-reversal entries, five arbitrary-precision profiles, 260 horizons/8,320 event replays, an executable width-erasure counterexample, seven structural program keys, three cross-program rejections, and 68 hostile rejections.
+
+D137 keeps strict T36 as T34's exact discrete `t+0D` nonnegative scalar event and extends D069 only with closed positional encode/reverse/decode/add nodes plus canonical/fixed/grow profiles. Zero is a continuing fixed-point event; canonical words commute losslessly; growing width remains visible because equal scalar projections can have different successors. No T36 state, frontier, neighborhood, assignment, UPDATE, executor, family branch, callback, machine-width behavior, hidden width/time, digit-CA fallback, raster rule, or observer-controlled evolution is added.
+
+Oracle SHAs are source `7a4cf99382aab7a6a6867798a06f3f0ce5d07887fce3217d1e6a6ae0a5326733`, asset `972450eb675396bb352c2cac0bf4a7a4dc878c17b3f364e466ca2a0577bfd33a`, and semantic `cbbe63f4f4ad8f517df7532719c423e9ff796bbf3b1cfeae3e150540554e4791`; semantic digest is `30539868a2202ffdae0e4574e0ceefb68e5715d6d3a7a543efd63bd730a5ccc8`. Root/relocated/import/compile/optimized/bad-usage, mode, Markdown, diff, scope, 102-test, and independent hostile-review gates pass. No prior stage reopens. Next: T38.
 
 ### 44-T38-VARIABLE-RECURRENCE
 
