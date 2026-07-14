@@ -71,23 +71,44 @@ EXPECTED_PAGE_85_RULE_2_TRACE: tuple[Word, ...] = (
 )
 
 
+@dataclass(frozen=True, eq=False)
+class SnapshotToken:
+    """Opaque configuration identity; generation is diagnostic metadata only."""
+
+    generation: int
+
+    def __post_init__(self) -> None:
+        if self.generation < 0:
+            raise ValueError("generation must be nonnegative")
+
+
 @dataclass(frozen=True)
 class OrderedConfiguration:
-    """Transparent word plus nonsemantic address scope for old-source handles."""
+    """Transparent word plus a nonsemantic, identity-scoped address token."""
 
     values: Word
-    # The key scopes occurrence handles to one old snapshot.  It is explicit
-    # verifier/address metadata, not rule-visible configuration state, so it is
-    # deliberately excluded from semantic configuration equality.
-    snapshot_key: int = field(default=0, compare=False, repr=False)
+    # Snapshot identity is intentionally excluded from semantic equality.  The
+    # token itself has object-identity equality (SnapshotToken has eq=False), so
+    # equal generation numbers never make independently encoded states aliases.
+    snapshot_token: SnapshotToken = field(
+        default_factory=lambda: SnapshotToken(0), compare=False, repr=False
+    )
+
+    @property
+    def generation(self) -> int:
+        return self.snapshot_token.generation
 
 
-@dataclass(frozen=True, order=True)
+@dataclass(frozen=True)
 class SourceHandle:
-    """One occurrence bound to the snapshot from which it was selected."""
+    """One occurrence bound by identity to exactly one old configuration."""
 
-    snapshot_key: int
+    snapshot_token: SnapshotToken = field(repr=False)
     index: int
+
+    @property
+    def generation(self) -> int:
+        return self.snapshot_token.generation
 
 
 @dataclass(frozen=True)
@@ -143,11 +164,16 @@ def validate_rule_rows(rows: Iterable[tuple[Pair, Word]]) -> RuleTable:
     return table
 
 
-def encode_native(word: Word, *, snapshot_key: int = 0) -> OrderedConfiguration:
-    """Lossless native-word to generic-configuration map e."""
-    if snapshot_key < 0:
-        raise ValueError("snapshot key must be nonnegative")
-    return OrderedConfiguration(checked_word(word), snapshot_key=snapshot_key)
+def make_configuration(word: Word, *, generation: int) -> OrderedConfiguration:
+    """Allocate a fresh opaque snapshot identity for one semantic word."""
+
+    return OrderedConfiguration(checked_word(word), SnapshotToken(generation))
+
+
+def encode_native(word: Word, *, generation: int = 0) -> OrderedConfiguration:
+    """Lossless map e; every call allocates a distinct address scope."""
+
+    return make_configuration(word, generation=generation)
 
 
 def decode_generic(configuration: OrderedConfiguration) -> Word:
@@ -160,7 +186,7 @@ def all_occurrences(
 ) -> tuple[SourceHandle, ...]:
     """T13 FRONTIER: every old occurrence emits once."""
     return tuple(
-        SourceHandle(configuration.snapshot_key, index)
+        SourceHandle(configuration.snapshot_token, index)
         for index in range(len(configuration.values))
     )
 
@@ -170,7 +196,7 @@ def all_right_context_anchors(
 ) -> tuple[SourceHandle, ...]:
     """T14 FRONTIER: every old occurrence having an immediate right neighbor."""
     return tuple(
-        SourceHandle(configuration.snapshot_key, index)
+        SourceHandle(configuration.snapshot_token, index)
         for index in range(max(0, len(configuration.values) - 1))
     )
 
@@ -179,7 +205,7 @@ def read_self(
     configuration: OrderedConfiguration, active: tuple[SourceHandle, ...]
 ) -> tuple[Bit, ...]:
     values = configuration.values
-    if any(source.snapshot_key != configuration.snapshot_key for source in active):
+    if any(source.snapshot_token is not configuration.snapshot_token for source in active):
         raise ValueError("stale or foreign source handle")
     if any(source.index < 0 or source.index >= len(values) for source in active):
         raise ValueError("source handle is outside the old snapshot")
@@ -191,7 +217,7 @@ def read_self_right(
 ) -> tuple[Pair, ...]:
     """Ordered, overlapping reads from one immutable old snapshot."""
     values = configuration.values
-    if any(source.snapshot_key != configuration.snapshot_key for source in active):
+    if any(source.snapshot_token is not configuration.snapshot_token for source in active):
         raise ValueError("stale or foreign source handle")
     if any(source.index < 0 or source.index >= len(values) - 1 for source in active):
         raise ValueError("right-context source is outside the old snapshot")
@@ -243,7 +269,7 @@ def apply_ordered_generation(
     """
     if tuple(sorted(set(active), key=lambda handle: handle.index)) != active:
         raise ValueError("active source handles must be unique and ordered")
-    if any(source.snapshot_key != old.snapshot_key for source in active):
+    if any(source.snapshot_token is not old.snapshot_token for source in active):
         raise ValueError("stale or foreign source handle")
     if any(source.index < 0 or source.index >= len(old.values) for source in active):
         raise ValueError("source handle is outside the old snapshot")
@@ -260,13 +286,13 @@ def apply_ordered_generation(
 
     active_indices = {source.index for source in active}
     dropped = tuple(
-        SourceHandle(old.snapshot_key, index)
+        SourceHandle(old.snapshot_token, index)
         for index in range(len(old.values))
         if index not in active_indices
     )
     return OrderedGenerationStep(
-        successor=OrderedConfiguration(
-            tuple(next_values), snapshot_key=old.snapshot_key + 1
+        successor=make_configuration(
+            tuple(next_values), generation=old.generation + 1
         ),
         child_intervals=tuple(intervals),
         dropped_sources=dropped,
@@ -356,10 +382,12 @@ def assert_update_reuse_and_counterexamples() -> None:
 
     t14 = shared_t14_notes_step(PAGE_85_RULE_1, old)
     assert t14.successor.values == (0, 1, 0)
-    assert t14.dropped_sources == (SourceHandle(0, 2),)
+    assert t14.successor.snapshot_token is not old.snapshot_token
+    assert t14.successor.generation == old.generation + 1
+    assert t14.dropped_sources == (SourceHandle(old.snapshot_token, 2),)
     assert t14.child_intervals == (
-        ChildInterval(SourceHandle(0, 0), 0, 1),
-        ChildInterval(SourceHandle(0, 1), 1, 3),
+        ChildInterval(SourceHandle(old.snapshot_token, 0), 0, 1),
+        ChildInterval(SourceHandle(old.snapshot_token, 1), 1, 3),
     )
 
     # A self-only T13 morphism cannot express T14: the same source symbol 0
@@ -393,23 +421,35 @@ def assert_update_reuse_and_counterexamples() -> None:
 
 def assert_update_result_validation() -> None:
     """Reject malformed handles/results before ordered-generation commit."""
-    old = encode_native((0, 1, 0), snapshot_key=7)
-    handle_0 = SourceHandle(7, 0)
-    handle_1 = SourceHandle(7, 1)
-    handle_2 = SourceHandle(7, 2)
+    old = encode_native((0, 1, 0), generation=7)
+    handle_0, handle_1, handle_2 = all_occurrences(old)
     emission_0 = OrderedEmission(handle_0, (0,))
     emission_1 = OrderedEmission(handle_1, (1,))
-    foreign_same_index = SourceHandle(6, 0)
-    out_of_range = SourceHandle(7, 3)
+
+    # Generation is diagnostic, never identity: an independently encoded
+    # configuration at generation 7 owns a different token at the same index.
+    same_generation_peer = encode_native((1, 0, 1), generation=7)
+    foreign_same_generation = all_occurrences(same_generation_peer)[0]
+    assert foreign_same_generation.generation == handle_0.generation == 7
+    assert foreign_same_generation.snapshot_token is not old.snapshot_token
+
+    prior = encode_native((0, 1, 0), generation=6)
+    stale_prior_generation = all_occurrences(prior)[0]
+    out_of_range = SourceHandle(old.snapshot_token, 3)
 
     invalid_inputs = (
         # Duplicate and unordered source handles are ambiguous orderings.
         ((handle_0, handle_0), (emission_0, emission_0)),
         ((handle_1, handle_0), (emission_1, emission_0)),
-        # Same-index foreign-generation and out-of-range handles both fail.
+        # Same-generation foreign identity, stale prior generation, and bounds
+        # are independent rejection dimensions.
         (
-            (foreign_same_index,),
-            (OrderedEmission(foreign_same_index, (0,)),),
+            (foreign_same_generation,),
+            (OrderedEmission(foreign_same_generation, (0,)),),
+        ),
+        (
+            (stale_prior_generation,),
+            (OrderedEmission(stale_prior_generation, (0,)),),
         ),
         (
             (handle_0, out_of_range),
@@ -443,6 +483,26 @@ def assert_update_result_validation() -> None:
     assert epsilon_base.successor.values == ()
     assert epsilon_base.child_intervals == (ChildInterval(handle_0, 0, 0),)
 
+    # The foreign peer is rejected on reads as well as commit, despite equal
+    # generation and a valid same index.
+    try:
+        read_self(old, (foreign_same_generation,))
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("same-generation foreign handle was accepted")
+
+    successor = apply_ordered_generation(
+        old, (handle_0,), (OrderedEmission(handle_0, (0, 1)),)
+    ).successor
+    assert successor.snapshot_token is not old.snapshot_token
+    try:
+        read_self(successor, (handle_0,))
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("prior-generation handle was accepted by successor")
+
     epsilon_t14_rows = tuple(
         (context, () if context == (0, 0) else word)
         for context, word in PAGE_85_RULE_1.items()
@@ -460,10 +520,11 @@ def assert_short_word_semantics() -> None:
         # The unguarded Partition/Flatten operator evaluates exactly this way.
         assert notes_partition_step(PAGE_85_RULE_1, word) == ()
         assert native_step(PAGE_85_RULE_1, word) == ()
-        notes_shared = shared_t14_notes_step(PAGE_85_RULE_1, encode_native(word))
+        encoded = encode_native(word)
+        notes_shared = shared_t14_notes_step(PAGE_85_RULE_1, encoded)
         assert notes_shared.successor == OrderedConfiguration(())
         assert notes_shared.dropped_sources == tuple(
-            SourceHandle(0, index) for index in range(len(word))
+            SourceHandle(encoded.snapshot_token, index) for index in range(len(word))
         )
 
         # No RULE row returned epsilon: there simply were zero eligible anchors.
@@ -560,7 +621,7 @@ def assert_exhaustive_bounded_commutation(max_input_length: int = 6) -> tuple[in
 
                 if length >= 2:
                     assert generic_step.dropped_sources == (
-                        SourceHandle(0, length - 1),
+                        SourceHandle(encoded.snapshot_token, length - 1),
                     )
                 else:
                     assert notes_next == ()
@@ -588,7 +649,7 @@ def main() -> None:
         f"singleton_pair_CA_cases={pair_ca_cases}; "
         "page85_rule1_t0_t3=PASS; page85_rule2_raster_t0_t3=PASS; "
         "shared_ordered_UPDATE=PASS; overlap_is_read_only=PASS; "
-        "hostile_result_validation=PASS; snapshot_handle_scope=PASS; "
+        "hostile_result_validation=PASS; opaque_snapshot_identity=PASS; "
         "rightmost_drop=PASS; pair_XOR_sheared_rule90=PASS; "
         "shared_word_carrier=SigmaStar; T14_validator=SigmaPlus; "
         "short_native_profile=empty_successor; "

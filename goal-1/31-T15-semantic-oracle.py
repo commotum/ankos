@@ -130,24 +130,43 @@ def validate_t13_morphism(
     return table
 
 
+@dataclass(frozen=True, eq=False)
+class SnapshotToken:
+    """Opaque configuration identity; generation is diagnostic metadata only."""
+
+    generation: int
+
+    def __post_init__(self) -> None:
+        if self.generation < 0:
+            raise ValueError("generation must be nonnegative")
+
+
 @dataclass(frozen=True)
 class OrderedConfiguration:
-    """Semantic finite word plus nonsemantic snapshot address scope."""
+    """Semantic finite word plus a nonsemantic identity-scoped token."""
 
     alphabet: Alphabet
     values: Word
-    snapshot_key: int = field(default=0, compare=False, repr=False)
+    snapshot_token: SnapshotToken = field(
+        default_factory=lambda: SnapshotToken(0), compare=False, repr=False
+    )
 
     def __post_init__(self) -> None:
         checked_word(self.values, self.alphabet)
-        if self.snapshot_key < 0:
-            raise ValueError("snapshot key must be nonnegative")
+
+    @property
+    def generation(self) -> int:
+        return self.snapshot_token.generation
 
 
-@dataclass(frozen=True, order=True)
+@dataclass(frozen=True)
 class SourceHandle:
-    snapshot_key: int
+    snapshot_token: SnapshotToken = field(repr=False)
     index: int
+
+    @property
+    def generation(self) -> int:
+        return self.snapshot_token.generation
 
 
 @dataclass(frozen=True)
@@ -212,12 +231,22 @@ class Terminal:
 StepOutcome: TypeAlias = Transition | Terminal
 
 
-def encode_native(
-    word: Word, alphabet: Alphabet, *, snapshot_key: int = 0
+def make_configuration(
+    word: Word, alphabet: Alphabet, *, generation: int
 ) -> OrderedConfiguration:
-    """Lossless native-word to generic-configuration map e."""
+    """Allocate a fresh opaque snapshot identity for one semantic word."""
 
-    return OrderedConfiguration(alphabet, checked_word(word, alphabet), snapshot_key)
+    return OrderedConfiguration(
+        alphabet, checked_word(word, alphabet), SnapshotToken(generation)
+    )
+
+
+def encode_native(
+    word: Word, alphabet: Alphabet, *, generation: int = 0
+) -> OrderedConfiguration:
+    """Lossless map e; every call allocates a distinct address scope."""
+
+    return make_configuration(word, alphabet, generation=generation)
 
 
 def decode_generic(configuration: OrderedConfiguration) -> Word:
@@ -230,7 +259,7 @@ def all_occurrences(
     """T13 FRONTIER: every old occurrence is selected."""
 
     return tuple(
-        SourceHandle(configuration.snapshot_key, index)
+        SourceHandle(configuration.snapshot_token, index)
         for index in range(len(configuration.values))
     )
 
@@ -241,7 +270,7 @@ def all_right_context_anchors(
     """T14/T15 FRONTIER: each old occurrence having a right neighbor."""
 
     return tuple(
-        SourceHandle(configuration.snapshot_key, index)
+        SourceHandle(configuration.snapshot_token, index)
         for index in range(max(0, len(configuration.values) - 1))
     )
 
@@ -254,7 +283,7 @@ def _check_active(
     if tuple(sorted(set(active), key=lambda handle: handle.index)) != active:
         raise ValueError("active handles must be unique and in source order")
     upper = len(old.values) - (1 if require_right_neighbor else 0)
-    if any(source.snapshot_key != old.snapshot_key for source in active):
+    if any(source.snapshot_token is not old.snapshot_token for source in active):
         raise ValueError("stale or foreign source handle")
     if any(source.index < 0 or source.index >= upper for source in active):
         raise ValueError("source handle is outside its old-snapshot role")
@@ -315,8 +344,10 @@ def validate_generation_witness(
     _check_active(old, active)
     if event.successor.alphabet != old.alphabet:
         raise ValueError("UPDATE changed the alphabet")
-    if event.successor.snapshot_key != old.snapshot_key + 1:
-        raise ValueError("successor snapshot scope is not the next generation")
+    if event.successor.snapshot_token is old.snapshot_token:
+        raise ValueError("successor reused the old snapshot identity")
+    if event.successor.generation != old.generation + 1:
+        raise ValueError("successor generation diagnostic is not old + 1")
     if tuple(record.source for record in event.emission_records) != active:
         raise ValueError("records must cover the selected frontier exactly in order")
 
@@ -337,7 +368,7 @@ def validate_generation_witness(
 
     active_indices = {source.index for source in active}
     expected_dropped = tuple(
-        SourceHandle(old.snapshot_key, index)
+        SourceHandle(old.snapshot_token, index)
         for index in range(len(old.values))
         if index not in active_indices
     )
@@ -378,13 +409,13 @@ def apply_ordered_generation(
 
     active_indices = {source.index for source in active}
     dropped = tuple(
-        SourceHandle(old.snapshot_key, index)
+        SourceHandle(old.snapshot_token, index)
         for index in range(len(old.values))
         if index not in active_indices
     )
     event = OrderedGenerationStep(
-        successor=OrderedConfiguration(
-            old.alphabet, tuple(next_values), old.snapshot_key + 1
+        successor=make_configuration(
+            tuple(next_values), old.alphabet, generation=old.generation + 1
         ),
         emission_records=tuple(records),
         dropped_sources=dropped,

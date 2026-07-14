@@ -11,8 +11,9 @@ split-source reverse joins, and the important extraction limitations:
 * the displayed T15 rules live in images and have no Notes transcription;
 * disappearance, a T14 source that is ineligible for lack of a right neighbor,
   and an extinction outcome are three different claims; and
-* the only text-transcribed empty right-hand side found by this audit belongs
-  to a tag system, whose consume-prefix/append-tail schedule is not T15.
+* text-transcribed empty right-hand sides occur in a T17 tag rule, a T20
+  bracket-string observer encoding, and a T30 multiway rewrite rule; none is a
+  native T15 table and their different schedules are not interchangeable.
 """
 
 from __future__ import annotations
@@ -56,8 +57,10 @@ EXPECTED_TAXONOMY_SHA256 = (
 # extinction, and broad lexical false positives.  Q08--Q10 and Q16 freeze
 # terminology absences rather than silently converting prose into notation.
 # Q11--Q15 cover shared generation, nonempty predecessor, parallel schedule,
-# order, and rendering.  Q17 follows L-system aliases.  Q18 proves that the
-# corpus's only explicit syntactic empty right-hand side is a T17 tag row.
+# order, and rendering.  Q17 follows L-system aliases.  Q18 covers all source
+# arrow spellings plus list/string empty RHS notation.  It separates a T17
+# empty appendant, a T20 observer's removal of literal ``e`` during bracket
+# encoding, and a T30 multiway transition with an empty replacement string.
 # Q19--Q21 close the adjacent T14, T16, and T17 schedule/outcome boundaries.
 QUERIES = {
     "Q00": r"\bcreation(?:[\s-]+)destruction(?:[\s-]+)substitution systems?\b",
@@ -116,7 +119,7 @@ QUERIES = {
     ),
     "Q16": r"\bpages? 8[67]\b",
     "Q17": r"\b(?:D?0L|D?1L|L) systems?\b|\bLindenmayer\b",
-    "Q18": r"(?:\\rightarrow|->)\s*\\?\{\s*\\?\}",
+    "Q18": r'(?:\\rightarrow|\\to|->)\s*(?:\\?\{\s*\\?\}|"")',
     "Q19": (
         r"\brightmost element is always dropped\b|"
         r"\bno rule is given for how to replace it\b"
@@ -159,7 +162,7 @@ EXPECTED_QUERY = {
     "Q15": (1, 1, 0, "340ab11db8d1a7435cb4b4a0492a9eee7b8e388e3e4a1714bcd3b69df3d8f1e1"),
     "Q16": (0, 0, 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
     "Q17": (9, 4, 5, "b4b84b2c1ba9fff3da3ecfb0bcdf3f15212b09ff151d6bd3061e734928d576f0"),
-    "Q18": (1, 1, 0, "87197b952f19907a74f06509f6aaadb1fa7f98ed63b3ca3d83cbd5664c36022f"),
+    "Q18": (3, 3, 0, "3d42270f3b8ff87a098061cea8e7386f61f5ba691c82e863dc91160ba66feb55"),
     "Q19": (1, 1, 0, "f00f2e7bca65e9f8409fdb3bcddfa031664224255d7bd2f6b3de8ff11ababe20"),
     "Q20": (2, 2, 0, "660eb1b620d8fcff0db511647b3516e8f26a1acc690c960127cc267f919954f4"),
     "Q21": (2, 2, 0, "a588fe146215a0363439a99ed7254df685585fe50fbadeabe313abe80d9ef0f9"),
@@ -214,15 +217,24 @@ GOVERNED_CONTINUATIONS = frozenset(
 )
 RETAINED = MATCHED_RETAINED | GOVERNED_CONTINUATIONS
 
+# Q18's non-T17 hits are explicitly excluded.  BOOK:12432 maps literal ``e``
+# to an empty list only while observing a T20 expression as a bracket string.
+# BOOK:13953 is a genuine empty-string T30 multiway rewrite, but its match and
+# branching successor schedule is not T15 ordered generation.
+EMPTY_RHS_EXCLUDED_CONTROLS = {
+    12432: "T20 bracket-string observer encoding",
+    13953: "T30 multiway empty-string transition",
+}
+
 
 EXPECTED_SET = {
-    "union": (349, "d5d15e7a4c2c9555440c64782dca47ad02c1550c01bde86e0cd4648d2d67813a"),
-    "pre_index_union": (271, "da7be8b67ea869d5ba3e4ceccd48b254ca01d0dbf90b1067e3f4db4d4d708fcb"),
+    "union": (351, "e0a877e8d80f232e52fbe579f4baa1d4a4da14e8d8573b58d997207e50a39ead"),
+    "pre_index_union": (273, "ca4b700251ed6fdb25ed5b5e9ecc70cff5e6ba94c02e341319dc68f0c57a8ea0"),
     "index": (78, "e811eee57e862b90876a86bfa6096928dc6e122e2ac31bac663397c7314e576f"),
     "matched_retained": (32, "5763517afb52b5b2c6843e5ab69f424d3d26ef7a45bb5936f95c04f6faa0cbd5"),
     "governed_continuations": (8, "c43d14e3c2e389ccd0d3fb8bc2f1767df0962596bd79eec328e06fb05af8a420"),
     "retained": (40, "03fc9177af658074d7a276757fcc742a1afb3e5fe976ec6b08d438c1a57f7e73"),
-    "excluded": (239, "65d4ccb8d5d2c2f6d97db0d035d5c6e3f0c9193ef695325361ec9dfcf7926b24"),
+    "excluded": (241, "7c3a93ce4cf56e72940e48578ffd3347d4ef3544a327d0b3edbb6f82b43114f3"),
 }
 
 # The actual Index has no creation/destruction heading.  These are broad
@@ -249,12 +261,12 @@ EXPECTED_SPLIT_MANIFEST_DIGEST = (
     "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 )
 EXPECTED_SPLIT_QUERY_RECORDS = (
-    348,
-    "e772398b1da0e731d3f906814d7a59f4c32f7764613ed7c4795b4b29755105a9",
+    350,
+    "e2404716c0ac15af08929655a8de9b0c08f29a4cbdcadc27f3b5ed54cc4926d7",
 )
 EXPECTED_SPLIT_EXACT_QUERY_RECORDS = (
-    319,
-    "c6e1afe6a4f415f383a06194f4f3ea859bbf037815ab360536d6070540b70157",
+    321,
+    "771931cf60fead5c4e6d82187701436f5e7bcd40c00efe916f5d1971a694bee5",
 )
 
 # Every non-exact split query hit is joined to its canonical monolith line.
@@ -449,7 +461,10 @@ def main() -> int:
     # empty configuration means.  The exact T15 tables are image evidence.
     # BOOK:1022/T14 instead drops an endpoint because it has no eligible pair;
     # its complete Notes table has no empty row.  BOOK:12298 is a real empty
-    # output, but for T17's different queue schedule.
+    # output, but for T17's different queue schedule.  BOOK:12432 is a second
+    # syntactic empty RHS used only to erase ``e`` in a T20 bracket observer.
+    # BOOK:13953 has a genuine T30 empty-string rewrite under a branching
+    # match schedule.  Neither line is a T15 transition row.
     core_text = "\n".join(lines[1025:1052])
     source_semantics_ok = (
         lines[979] == "#### **Substitution Systems**"
@@ -487,7 +502,11 @@ def main() -> int:
         and hits["Q08"] == set()
         and hits["Q09"] == set()
         and hits["Q10"] == {19751, 19976, 20454, 21148}
-        and hits["Q18"] == {12298}
+        and hits["Q18"] == {12298, 12432, 13953}
+        and '"e" \\to \\{\\}' in lines[12431]
+        and "sequence of opening and closing brackets" in lines[12427]
+        and '"AB" \\to ""' in lines[13952]
+        and "MWStep[rule_List" in lines[13945]
         and t14_notes_step([]) == []
         and t14_notes_step([1]) == []
         and t14_notes_step([0, 1]) == [0]
@@ -500,8 +519,9 @@ def main() -> int:
         and not GOVERNED_CONTINUATIONS & union
         and pre_index_union == matched_retained | excluded
         and not matched_retained & excluded
+        and set(EMPTY_RHS_EXCLUDED_CONTROLS) <= excluded
         and not RETAINED & index
-        and len(union | GOVERNED_CONTINUATIONS) == 357
+        and len(union | GOVERNED_CONTINUATIONS) == 359
     )
     ok &= structural
     print("structural", "OK" if structural else "MISMATCH")

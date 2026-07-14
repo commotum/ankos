@@ -905,7 +905,7 @@ Test empty and multi-element replacements, extinction, and balanced growth as na
 
 #### Detailed Implementation Plan
 
-The 22-query source closure, 23-asset fixed point, seven exact tables/seeds/traces, and 304,927-case commuting oracle are complete. Finish independent hostile review and global gates, then close D125 and proceed to T18.
+The source, asset, and semantic audits plus D125 architecture integration are complete. Repair the hostile-review source/handle findings, rerun final gates, close T15, and proceed to T18.
 
 #### Completion Requirements
 
