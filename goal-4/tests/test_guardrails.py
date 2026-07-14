@@ -19,6 +19,7 @@ from guardrail_lib import (  # noqa: E402
     load_json,
     sha256_file,
     validate_contract,
+    validate_exact_goal_output,
     validate_publication_target,
     validate_root_relationship,
 )
@@ -119,6 +120,25 @@ class GuardrailContractTests(unittest.TestCase):
 
 
 class PathAndPublicationTests(unittest.TestCase):
+    def test_compatibility_output_is_exactly_goal_owned(self) -> None:
+        expected = validate_exact_goal_output(
+            ROOT,
+            Path("goal-4/compatibility-baseline.json"),
+            "goal-4/compatibility-baseline.json",
+        )
+        self.assertEqual(expected, ROOT / "goal-4/compatibility-baseline.json")
+        for unsafe in (
+            Path("ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md"),
+            Path("goal-1/compatibility-baseline.json"),
+            Path("goal-4/../goal-1/compatibility-baseline.json"),
+        ):
+            with self.assertRaises(GuardrailError):
+                validate_exact_goal_output(
+                    ROOT,
+                    unsafe,
+                    "goal-4/compatibility-baseline.json",
+                )
+
     def test_prefix_named_sibling_is_component_wise_valid(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -181,6 +201,7 @@ class PathAndPublicationTests(unittest.TestCase):
                 "files": [
                     {
                         "path": "README.md",
+                        "entry_type": "FILE",
                         "sha256": sha256_file(payload),
                         "byte_size": payload.stat().st_size,
                         "mode": format(payload.stat().st_mode & 0o7777, "04o"),
@@ -188,7 +209,7 @@ class PathAndPublicationTests(unittest.TestCase):
                 ]
             }
             self.assertEqual(validate_publication_target(target, legacy, trusted), "MANIFEST_OWNED")
-            (target / "unowned.txt").write_bytes(b"x")
+            (target / "unowned-empty-directory").mkdir()
             with self.assertRaisesRegex(GuardrailError, "unowned"):
                 validate_publication_target(target, legacy, trusted)
 
@@ -205,6 +226,7 @@ class PathAndPublicationTests(unittest.TestCase):
                 "files": [
                     {
                         "path": "release.txt",
+                        "entry_type": "FILE",
                         "sha256": sha256_file(payload),
                         "byte_size": 2,
                         "mode": format(payload.stat().st_mode & 0o7777, "04o"),
@@ -217,6 +239,31 @@ class PathAndPublicationTests(unittest.TestCase):
             payload.unlink()
             payload.symlink_to(legacy, target_is_directory=True)
             with self.assertRaisesRegex(GuardrailError, "symlink"):
+                validate_publication_target(target, legacy, trusted)
+
+    def test_hardlinked_publication_file_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            legacy = root / "A-New-Kind-of-Science"
+            target = root / "A-New-Kind-of-Science-Repaired"
+            legacy.mkdir()
+            target.mkdir()
+            source = legacy / "asset.jpeg"
+            source.write_bytes(b"asset")
+            linked = target / "asset.jpeg"
+            os.link(source, linked)
+            trusted = {
+                "files": [
+                    {
+                        "path": "asset.jpeg",
+                        "entry_type": "FILE",
+                        "sha256": sha256_file(linked),
+                        "byte_size": linked.stat().st_size,
+                        "mode": format(linked.stat().st_mode & 0o7777, "04o"),
+                    }
+                ]
+            }
+            with self.assertRaisesRegex(GuardrailError, "hardlinked"):
                 validate_publication_target(target, legacy, trusted)
 
 
@@ -257,6 +304,23 @@ class BaselineTests(unittest.TestCase):
             check_files=True,
             check_current_scripts=True,
         )
+
+    def test_output_byte_mutation_invalidates_baseline(self) -> None:
+        baseline_path = ROOT / "goal-4/compatibility-baseline.json"
+        if not baseline_path.exists():
+            self.skipTest("compatibility baseline is materialized after the contract tests")
+        baseline = load_json(baseline_path)
+        baseline["oracles"][0]["stdout"]["base64"] += "AA=="
+        with self.assertRaises(GuardrailError):
+            validate_contract(
+                load_json(ROOT / "goal-4/guardrails.json"),
+                load_json(ROOT / "goal-4/quality-evaluation.json"),
+                load_json(ROOT / "goal-4/licensing-contract.json"),
+                ROOT,
+                baseline=baseline,
+                check_files=True,
+                check_current_scripts=True,
+            )
 
 
 if __name__ == "__main__":

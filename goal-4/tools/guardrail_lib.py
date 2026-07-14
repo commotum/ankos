@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import hashlib
+import base64
 import json
 import os
 import stat
@@ -115,6 +116,23 @@ def validate_root_relationship(
     return legacy, repaired
 
 
+def validate_exact_goal_output(
+    repo_root: Path,
+    output: Path,
+    expected_relative: str,
+) -> Path:
+    repo_root = repo_root.resolve(strict=True)
+    expected_rel = safe_relative_posix(expected_relative)
+    require(expected_rel.parts[0] == "goal-4", "owned generated output must be under goal-4")
+    expected = repo_root / Path(*expected_rel.parts)
+    candidate = output if output.is_absolute() else repo_root / output
+    require(not candidate.is_symlink(), "generated output path may not be a symlink")
+    require(candidate.parent.resolve(strict=True) == expected.parent.resolve(strict=True), "generated output parent drift")
+    require(candidate.name == expected.name, "generated output must use the exact owned filename")
+    require(candidate.resolve(strict=False) == expected.resolve(strict=False), "generated output path alias drift")
+    return expected
+
+
 def _file_mode(path: Path) -> str:
     return format(stat.S_IMODE(path.stat(follow_symlinks=False).st_mode), "04o")
 
@@ -145,21 +163,28 @@ def validate_publication_target(
         require(isinstance(row, dict), "trusted manifest file row must be an object")
         relative = str(safe_relative_posix(row.get("path", "")))
         require(relative not in expected, f"duplicate trusted manifest path: {relative}")
+        require(row.get("entry_type") in {"FILE", "DIRECTORY"}, f"unknown trusted entry type: {relative}")
         expected[relative] = row
-    observed: dict[str, Path] = {}
+    observed: dict[str, tuple[Path, str]] = {}
     for path in sorted(target.rglob("*"), key=lambda item: item.as_posix()):
         require(not path.is_symlink(), f"symlink in publication target: {path}")
+        relative = path.relative_to(target).as_posix()
         if path.is_file():
-            relative = path.relative_to(target).as_posix()
-            observed[relative] = path
+            require(path.stat().st_nlink == 1, f"hardlinked publication file: {relative}")
+            observed[relative] = (path, "FILE")
         else:
             require(path.is_dir(), f"unsupported target entry: {path}")
+            observed[relative] = (path, "DIRECTORY")
     require(set(observed) == set(expected), "publication target has missing or unowned files")
-    for relative, path in observed.items():
+    for relative, (path, entry_type) in observed.items():
         row = expected[relative]
-        require(row.get("sha256") == sha256_file(path), f"owned target hash drift: {relative}")
-        require(row.get("byte_size") == path.stat().st_size, f"owned target size drift: {relative}")
+        require(row.get("entry_type") == entry_type, f"owned target type drift: {relative}")
         require(row.get("mode") == _file_mode(path), f"owned target mode drift: {relative}")
+        if entry_type == "FILE":
+            require(row.get("sha256") == sha256_file(path), f"owned target hash drift: {relative}")
+            require(row.get("byte_size") == path.stat().st_size, f"owned target size drift: {relative}")
+        else:
+            require("sha256" not in row and "byte_size" not in row, f"directory has file fields: {relative}")
     return "MANIFEST_OWNED"
 
 
@@ -171,6 +196,21 @@ def framed_behavior_digest(exit_code: int, stdout: bytes, stderr: bytes) -> str:
         frame.extend(len(stream).to_bytes(8, "big"))
         frame.extend(stream)
     return sha256_bytes(bytes(frame))
+
+
+def aggregate_behavior_digest(rows: list[dict[str, Any]]) -> str:
+    projection = [
+        {
+            "path": row["path"],
+            "status_kind": row["status_kind"],
+            "exit_code": row["exit_code"],
+            "stdout_sha256": row["stdout_sha256"],
+            "stderr_sha256": row["stderr_sha256"],
+            "framed_behavior_sha256": row["framed_behavior_sha256"],
+        }
+        for row in sorted(rows, key=lambda item: item["path"])
+    ]
+    return sha256_bytes(canonical_json_bytes(projection))
 
 
 def filename_set_digest(names: Iterable[str]) -> str:
@@ -344,6 +384,8 @@ def validate_compatibility_baseline(
     )
     require(sum(row.get("recursive_markdown") is True for row in classifications) == 39, "recursive Markdown census mismatch")
     require(sum(row.get("recursive_image_or_basename") is True for row in classifications) == 26, "recursive image census mismatch")
+    require(sum(row.get("direct_legacy_path") is True for row in classifications) == 2, "direct legacy semantic census mismatch")
+    require(sum(row.get("kind") == "NO_LEGACY_PATH" for row in classifications) == 17, "no-path semantic census mismatch")
     records = baseline.get("oracles", [])
     require(len(records) == 39, "compatibility behavior must cover all 39 recursive affected oracles")
     require(
@@ -351,12 +393,32 @@ def validate_compatibility_baseline(
         "behavior/affected-classification join mismatch",
     )
     context = baseline.get("closure", {})
+    classification_by_path = {row["path"]: row for row in classifications}
+    aggregate_rows: list[dict[str, Any]] = []
     for row in records:
         require(row.get("repeat_count") == 2, f"oracle was not repeated twice: {row.get('path')}")
         require(row.get("repeat_identical") is True, f"oracle repeat drift: {row.get('path')}")
         stdout = row.get("stdout", {})
         stderr = row.get("stderr", {})
         require(isinstance(stdout.get("base64"), str) and isinstance(stderr.get("base64"), str), "raw output bytes not captured")
+        try:
+            stdout_bytes = base64.b64decode(stdout["base64"], validate=True)
+            stderr_bytes = base64.b64decode(stderr["base64"], validate=True)
+        except (ValueError, TypeError) as error:
+            raise GuardrailError(f"invalid raw output base64: {row.get('path')}") from error
+        require(stdout.get("byte_count") == len(stdout_bytes), f"stdout byte count drift: {row.get('path')}")
+        require(stderr.get("byte_count") == len(stderr_bytes), f"stderr byte count drift: {row.get('path')}")
+        require(stdout.get("sha256") == sha256_bytes(stdout_bytes), f"stdout hash drift: {row.get('path')}")
+        require(stderr.get("sha256") == sha256_bytes(stderr_bytes), f"stderr hash drift: {row.get('path')}")
+        require(
+            row.get("framed_behavior_sha256")
+            == framed_behavior_digest(row.get("exit_code"), stdout_bytes, stderr_bytes),
+            f"framed behavior drift: {row.get('path')}",
+        )
+        require(
+            row.get("script_sha256") == classification_by_path[row["path"]].get("script_sha256"),
+            f"classification/behavior script hash drift: {row.get('path')}",
+        )
         require(
             row.get("transitive_dependency_fingerprint") == context.get("dependency_fingerprint_before"),
             f"oracle dependency fingerprint missing/drifted: {row.get('path')}",
@@ -365,6 +427,18 @@ def validate_compatibility_baseline(
             script = repo_root / row["path"]
             require(script.is_file(), f"oracle script missing: {row['path']}")
             require(sha256_file(script) == row.get("script_sha256"), f"oracle script drift: {row['path']}")
+        aggregate_rows.append(
+            {
+                "path": row["path"],
+                "status_kind": row["status_kind"],
+                "exit_code": row["exit_code"],
+                "stdout_sha256": stdout["sha256"],
+                "stderr_sha256": stderr["sha256"],
+                "framed_behavior_sha256": row["framed_behavior_sha256"],
+            }
+        )
+    recomputed_behavior = aggregate_behavior_digest(aggregate_rows)
+    require(baseline.get("behavior_digest") == recomputed_behavior, "aggregate behavior digest drift")
     require(context.get("git_head_before") == context.get("git_head_after"), "git HEAD moved during capture")
     require(context.get("dependency_fingerprint_before") == context.get("dependency_fingerprint_after"), "dependency closure moved during capture")
     require(context.get("legacy_tree_digest_before") == context.get("legacy_tree_digest_after"), "legacy tree moved during capture")
@@ -376,6 +450,10 @@ def validate_compatibility_baseline(
     require(probe.get("target_state") == "EMPTY", "empty sibling probe did not use an empty target")
     require(probe.get("all_behavior_identical") is True, "empty sibling changed oracle behavior")
     require(probe.get("baseline_behavior_digest") == probe.get("empty_sibling_behavior_digest"), "empty sibling aggregate mismatch")
+    require(probe.get("baseline_behavior_digest") == recomputed_behavior, "empty sibling probe is not bound to baseline")
+    health = baseline.get("health_summary", {})
+    require(health.get("exit_zero") == sum(row.get("exit_code") == 0 for row in records), "health zero count drift")
+    require(health.get("exit_nonzero") == sum(row.get("exit_code") != 0 for row in records), "health nonzero count drift")
     require(baseline.get("goal_3", {}).get("executable_validator_count") == 0, "Stage 1 Goal 3 executable census drift")
 
 

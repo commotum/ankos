@@ -13,6 +13,7 @@ import platform
 import re
 import subprocess
 import sys
+import tempfile
 import unicodedata
 from pathlib import Path
 from typing import Any
@@ -28,6 +29,7 @@ from guardrail_lib import (
     sha256_bytes,
     sha256_file,
     validate_contract,
+    validate_exact_goal_output,
 )
 
 
@@ -411,10 +413,12 @@ def main() -> int:
     parser.add_argument("--replace", action="store_true")
     args = parser.parse_args()
     root = args.repo_root.resolve(strict=True)
-    output = args.output or root / "goal-4/compatibility-baseline.json"
-    if not output.is_absolute():
-        output = root / output
     try:
+        output = validate_exact_goal_output(
+            root,
+            args.output or Path("goal-4/compatibility-baseline.json"),
+            "goal-4/compatibility-baseline.json",
+        )
         require(args.interpreter.is_file(), f"interpreter missing: {args.interpreter}")
         require(not output.exists() or args.replace, f"refusing to overwrite baseline: {output}")
         contract = load_json(root / "goal-4/guardrails.json")
@@ -429,7 +433,26 @@ def main() -> int:
             args.timeout,
             args.workers,
         )
-        output.write_bytes(canonical_json_bytes(baseline))
+        payload = canonical_json_bytes(baseline)
+        temporary_path: Path | None = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="wb",
+                prefix=".compatibility-baseline.",
+                suffix=".tmp",
+                dir=output.parent,
+                delete=False,
+            ) as handle:
+                temporary_path = Path(handle.name)
+                handle.write(payload)
+                handle.flush()
+                os.fsync(handle.fileno())
+            temporary_path.chmod(0o644)
+            os.replace(temporary_path, output)
+            temporary_path = None
+        finally:
+            if temporary_path is not None and temporary_path.exists():
+                temporary_path.unlink()
         validate_contract(
             contract,
             quality,
