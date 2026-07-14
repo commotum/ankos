@@ -73,18 +73,28 @@ def near(source_lines: set[int], radius: int = 4) -> set[int]:
 
 
 # C4 is the mechanical radius-four closure over the frozen source set.  Q adds
-# the complete four-raster page-93 one-deletion ordinary-tag predecessor plate;
-# the immediately following page-94 predecessor plate is already in C4.  Every
-# direct multi-raster caption and rule-110 relation group is otherwise closed
-# by C4, so another iteration adds nothing.
+# three page-92 sequential-substitution views and the missing companions from
+# two emulation captions whenever C4 reaches another member.  The page-93/94
+# ordinary-tag plates and every direct/rule-110 multi-raster group are already
+# complete in C4; another caption-companion iteration adds nothing.
 C4 = near(S)
 assert C4 == {
+    1104,
+    1116,
+    1118,
+    1120,
+    1122,
     1130,
     1140,
     1142,
     1146,
     1152,
     1156,
+    7956,
+    8036,
+    8042,
+    8044,
+    8048,
     8062,
     8068,
     8070,
@@ -101,9 +111,14 @@ assert C4 == {
     8236,
     8240,
     8260,
+    8496,
+    14273,
+    17682,
     18738,
+    18874,
+    19318,
 }
-Q = {1116, 1118, 1120, 1122}
+Q = {1098, 1100, 1102, 7958, 8038}
 assert C4.isdisjoint(Q)
 U = C4 | Q
 
@@ -119,6 +134,8 @@ R = {
     1120,
     1122,
     1130,
+    8042,
+    8044,
     8062,
     8068,
     8070,
@@ -134,24 +151,44 @@ R = {
     8236,
     8240,
     8260,
+    8496,
     18738,
 }
-X = {8084}
+X = {
+    1098,
+    1100,
+    1102,
+    1104,
+    7956,
+    7958,
+    8036,
+    8038,
+    8048,
+    8084,
+    14273,
+    17682,
+    18874,
+    19318,
+}
 STRICT_U = C | O
 assert C | O | R | X == U
 classes = (C, O, R, X)
 assert all(not (left & right) for i, left in enumerate(classes) for right in classes[i + 1 :])
 assert (len(C4), len(Q), len(U), len(C), len(O), len(R), len(X)) == (
-    23,
-    4,
-    27,
+    38,
+    5,
+    43,
     4,
     1,
-    21,
-    1,
+    24,
+    14,
 )
 
 REASON = {
+    1098: "sequential-substitution preceding same-caption control",
+    1100: "sequential-substitution preceding same-caption control",
+    1102: "sequential-substitution preceding same-caption control",
+    1104: "sequential-substitution preceding same-caption control",
     1116: "ordinary one-deletion tag predecessor trace control",
     1118: "ordinary one-deletion tag predecessor trace control",
     1120: "ordinary one-deletion tag predecessor trace control",
@@ -162,6 +199,13 @@ REASON = {
     1146: "native two-block cyclic rule summary",
     1152: "native five rule pairs, one-black seeds, and 100-step traces",
     1156: "derived length-fluctuation observer for rules d/e",
+    7956: "CA/sequential-substitution same-caption adjacency control",
+    7958: "CA/sequential-substitution same-caption adjacency control",
+    8036: "sequential-substitution/CA same-caption adjacency control",
+    8038: "sequential-substitution/CA same-caption adjacency control",
+    8042: "ordinary-tag/CA predecessor emulation relation",
+    8044: "ordinary-tag/CA predecessor emulation relation",
+    8048: "symbolic-system/CA adjacent emulation control",
     8062: "cyclic-tag encoding of a first-element ordinary tag system",
     8068: "multicolor-to-binary Turing-machine relation in the cyclic universality chain",
     8070: "multicolor-to-binary Turing-machine relation in the cyclic universality chain",
@@ -178,7 +222,12 @@ REASON = {
     8236: "rule-110 compiler collision close-up relation",
     8240: "rule-110 compiler collision close-up relation",
     8260: "rule-110 schematics for four cyclic rule pairs",
+    8496: "Turing-machine/ordinary-tag emulation relation",
+    14273: "unrelated moving-structure adjacency before finite-seed evidence",
+    17682: "finite-size CA period adjacency before the NLFSR analogy",
     18738: "compiled cyclic-rule/seed to rule-110 initial-block relation",
+    18874: "Turing-machine glitch observer adjacent to tag-universality history",
+    19318: "PCP solution observer adjacent to the multiway-tag boundary",
 }
 assert set(REASON) == U
 
@@ -534,8 +583,8 @@ def ledger() -> tuple[str, int, int, int]:
 
 EXPECTED_STRICT_UNIVERSE_SHA256 = "95411e9d7c6de49bdd05049d5435bf0b935a6afdcde29619b5775b2205cfe82c"
 EXPECTED_STRICT_LEDGER_SHA256 = "bc91ba39ffb022ac91cdbbad2c7685523f8209de542d51a5f7d543c44f6fb488"
-EXPECTED_UNIVERSE_SHA256 = "9e95aed53f7aa329a9f82567a05031e51558c0e0b978ca5eb246fb758e454838"
-EXPECTED_LEDGER_SHA256 = "fa1ee814d45e3e085918627109124990635c91688655f37cbcc1ecb48e454e63"
+EXPECTED_UNIVERSE_SHA256 = "986bcee8482b59913595889d5ef18523ac90ee2203feb4e70d919e6315a15f46"
+EXPECTED_LEDGER_SHA256 = "1fce963be60513e3fead38d48f3a6ba8472a65e203a5e4c495da32908efb422b"
 
 
 def main() -> None:
@@ -555,12 +604,12 @@ def main() -> None:
     assert strict_ledger_digest == EXPECTED_STRICT_LEDGER_SHA256
     assert universe_digest == EXPECTED_UNIVERSE_SHA256
     assert ledger_digest == EXPECTED_LEDGER_SHA256
-    assert len(strict_rows) == 5 and len(payload.splitlines()) == 27
-    assert (monolith_references, split_references, hashes) == (27, 27, 27)
+    assert len(strict_rows) == 5 and len(payload.splitlines()) == 43
+    assert (monolith_references, split_references, hashes) == (43, 43, 43)
     print(
-        f"T18 asset oracle: PASS source={len(S)}; C4/Q=23/4; assets=27; strict=5; "
-        "classes C/O/R/X=4/1/21/1; "
-        "refs=54(monolith=27,split=27); unique_hashes=27; "
+        f"T18 asset oracle: PASS source={len(S)}; C4/Q=38/5; assets=43; strict=5; "
+        "classes C/O/R/X=4/1/24/14; "
+        "refs=86(monolith=43,split=43); unique_hashes=43; "
         "page95_rule/seed/t0_t24=PASS; page96_rules/seeds/t0_t99=PASS; "
         "mechanical_plate_absent=PASS; page_offset=PASS; "
         "actual_Index/malformed_split_reverse=PASS"

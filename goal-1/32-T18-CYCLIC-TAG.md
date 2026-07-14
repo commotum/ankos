@@ -24,10 +24,10 @@ Status: **IN PROGRESS — SEMANTIC AUDIT CLOSED; SOURCE, ASSET, AND ARCHITECTURE
   next   = UPDATE.apply(configuration, active, writes)
   ```
 
-- `32-T18-semantic-oracle.py` proves that `(slot,word)` maps losslessly to `Phase(slot) · Data(word)` with exactly one phase marker at the left endpoint.
+- `32-T18-semantic-oracle.py` proves that the occurrence-addressed normalization `(slot,word)` maps losslessly to `Phase(slot) · Data(word)` with exactly one phase marker at the left endpoint. The literal Notes pair `{rotated block values,word}` is its step-compatible quotient when a cycle has rotational symmetry; it is not falsely claimed to distinguish equal rotations.
 - On a nonempty event, the generic pipeline reads the marker and first data symbol from one immutable snapshot, replaces that prefix by `Phase(next_slot)`, conditionally inserts the scheduled data block at the old endpoint, and commits both anchored writes atomically.
 - On an empty event, `Phase(slot)` has no data head. The explicit Notes clause and semantic oracle give one identity successor with the phase frozen, not T17's zero-successor `InsufficientPrefix`.
-- The bounded 71,442-case commuting square finds no counterexample requiring a new UPDATE algebra. The phase marker is a tagged ALPHABET role and invariant, not a family control class.
+- The bounded 71,442-case commuting square finds no counterexample requiring a new UPDATE algebra. Empty activity also flows through empty NEIGHBORHOOD/RULE collections before the configured UPDATE/outcome is invoked, so the four-axis call path needs no family branch. The phase marker is a tagged ALPHABET role and invariant, not a family control class.
 
 ## Big Picture Objective
 
@@ -42,7 +42,62 @@ Reconstruct cyclic tag systems from primary evidence, prove whether visible cycl
 
 ## Search Log
 
-Source and asset fixed-point oracles are in progress. No exhaustive count, digest, or zero-remainder claim is made yet.
+`32-T18-source-oracle.py` freezes 19 case-insensitive line queries, their hashes, and every pre-Index/actual-Index disposition. Per-query counts are:
+
+| Query | Scope | total | pre-Index | actual-Index |
+|---|---|---:|---:|---:|
+| Q00 | direct cyclic-tag name | 60 | 44 | 16 |
+| Q01 | broad tag-system family | 111 | 81 | 30 |
+| Q02 | ordinary/Post/Wang/uniform/multiway boundary names | 17 | 11 | 6 |
+| Q03 | native scheduled-block definition | 5 | 5 | 0 |
+| Q04 | head removal, trigger, and tail append | 6 | 6 | 0 |
+| Q05 | alternation/cycle/rotary schedule | 13 | 13 | 0 |
+| Q06 | implementation/compiler symbols | 17 | 17 | 0 |
+| Q07 | generalized cycles/values/block lengths | 5 | 5 | 0 |
+| Q08 | growth and substitution properties | 7 | 7 | 0 |
+| Q09 | history names and Kolakoski relation | 21 | 20 | 1 |
+| Q10 | randomness/frequency observations | 7 | 7 | 0 |
+| Q11 | initial-condition scope | 8 | 8 | 0 |
+| Q12 | cyclic-tag emulation relations | 24 | 21 | 3 |
+| Q13 | universality routes | 13 | 12 | 1 |
+| Q14 | substitution controls | 33 | 30 | 3 |
+| Q15 | rule-110 saturation control | 138 | 121 | 17 |
+| Q16 | focused Turing/CA tag relations | 21 | 16 | 5 |
+| Q17 | empty clause versus trough overflow | 2 | 2 | 0 |
+| Q18 | requested terminology/alias control | 3 | 2 | 1 |
+
+After union and deduplication:
+
+- query union: 305, digest `db3643b42768e2079aa28e248b05aeeb77bcaae4c6e0e610fd080d63ca4ab15c`;
+- pre-Index: 259, digest `ec4955e232ed49260218ca482044cd632cadc5bf726366f2cceba763370fc78a`;
+- actual Index: 46, digest `34dc4b774ced6937c57f069923339c584525ebae542cd59d83678ecb317afaf6`;
+- matched native/relation/control lines: `30/43/36`;
+- governed continuations: 51;
+- final retained: 160, digest `698fb02434bd7d28565f4dd5c6e8597c079f41d94339374638e9d2a925e7630c`;
+- retained partition: 39 native, 84 explicit relations, and 37 construction controls;
+- excluded pre-Index candidates: 150, digest `d0a2a1652b2ca5aaf5e897cf236f1d70e790ba28ca009606fa346ce518e64f0b`.
+
+The excluded partition is exhaustive: 102 unrelated rule-110 background lines, 23 substitution background lines, one other tag-family line, 15 history lines, and nine contextual false positives. The 46 actual-Index candidates likewise partition into 16 T18 routes, 16 tag controls, two substitution controls, 11 rule-110 background routes, and one history route. Both unresolved remainders are zero.
+
+Candidate disposition is closed:
+
+| Region | Final disposition |
+|---|---|
+| `BOOK:1134-1158` | direct definition, five native programs/seeds/traces, and growth observers |
+| `BOOK:1108-1132` | ordinary/Post/Wang tag predecessors and extinction controls |
+| `BOOK:7952,8032-8080` | uniform/ordinary-tag and Turing/CA compiler chain; explicit relation only |
+| `BOOK:8172-8272` | rule-110 realization, alternate views, mechanisms, and compiler constraints; relation only |
+| `BOOK:12315-12364` | native Notes implementation, visible rotated schedule, empty totalization, generalizations, properties, mechanical realization, and history |
+| `BOOK:13265,14275` | finite-initial-condition qualifications, not queue capacity |
+| `BOOK:17236` | derived growth observer |
+| `BOOK:18514-18530` | `TS1ToCT` ordinary-tag compiler relation |
+| `BOOK:18672-18740` | rule-110 initial-condition compiler and multiple-of-six constraints; encoding restrictions only |
+| `BOOK:18215,18488-18568,18794-19324` | neighboring recursive/Turing/multiway/compiler controls |
+| `BOOK:20908-22390` | all 16 actual-Index T18 routes followed and classified |
+
+The direct Notes state is `{rotating rule list, finite word}`: cyclic focus is visible state, not executor time. `BOOK:12323` is OCR-damaged and is not treated as literal executable evidence; the main prose and hash-bound native rasters independently fix the black-trigger branch. The requested phrases “program counter”, “trigger symbol”, “deletion number”, and “appendant” are useful typed roles but are not native cyclic-tag terminology in the Book.
+
+All 17 split documents are hash-bound. The split query closure has 302 records—269 exact and 33 explicitly reverse-joined extraction variants—with digests `eefde3b65b5fb97ca3a4c52a3d6addd9d8df2f36b4c1e382d18e1cede5acfa96`, `7ded0f714fdf9f2d971d0e9cb57f4638e47c85d4c43971ea2f10cdf249202b35`, and `d1c7c63f615bd2e4d728c79540ea2532ac1f899d1a019d7c3ffde229c4e7d0b2`. Retained evidence reverse-joins as 125 exact and 35 nonexact records. The 542-line Atlas contributes nine broad routes and no additional native rule table. Catalog/taxonomy identity passes. Root and `/tmp` runs pass; optimized mode fails closed; import is silent. Zero source candidate remains unresolved.
 
 ## Book Excerpts
 
@@ -110,7 +165,7 @@ The extraction damages the black-head clause, so no executable text is invented 
 
 ## Asset Audit
 
-`32-T18-asset-oracle.py` derives a radius-four closure from the frozen source set and adds the complete four-raster page-93 ordinary-tag predecessor plate. The resulting universe has 27 assets: `C/O/R/X = 4/1/21/1`, where the 21 relation/control assets include five separately tracked ordinary-tag predecessor controls (`C/O/R/K/X = 4/1/16/5/1`). It closes 27 monolith references, 27 split references, 27 physical files, and 27 unique hashes. The complete universe digest is `9e95aed53f7aa329a9f82567a05031e51558c0e0b978ca5eb246fb758e454838`; its manifest digest is `b44c97f322587807deecf8de786e0d70a40d69acf527824815f5700a72c2be52`.
+`32-T18-asset-oracle.py` derives a 38-asset radius-four closure from the frozen source set and adds five governed source-bound companions. The resulting universe has 43 assets at `C/O/R/X = 4/1/24/14`. It closes 43 monolith references, 43 split references, 43 physical files, and 43 unique hashes. The complete universe digest is `986bcee8482b59913595889d5ef18523ac90ee2203feb4e70d919e6315a15f46`; its manifest digest is `1fce963be60513e3fead38d48f3a6ba8472a65e203a5e4c495da32908efb422b`.
 
 The strict native/observer subledger is exactly five files (`C/O = 4/1`), with universe digest `95411e9d7c6de49bdd05049d5435bf0b935a6afdcde29619b5775b2205cfe82c` and manifest digest `bc91ba39ffb022ac91cdbbad2c7685523f8209de542d51a5f7d543c44f6fb488`:
 
@@ -184,7 +239,7 @@ has an explicit inverse on the invariant-valid image. For every binary block of 
 - 40,176 nonempty events with no appended data;
 - opaque exact-snapshot source identity, fresh snapshot identity, phase-marker persistence, consumed-head identity, old-suffix order, and fresh-tail lineage.
 
-The same generic `apply_ordered_spans` function independently realizes 1,806 bounded T17 prefix-delete/tail-append cases. T18 changes the prefix write from pure deletion to replacement by the next phase marker; the old-end insertion and one-snapshot atomicity remain the same ordered multi-span UPDATE. A 255-case bounded audit also confirms the Notes multiplicity generalization, in which a removed natural value `n` appends `n` copies of the scheduled block.
+The same generic `apply_ordered_spans` composition function independently realizes 1,806 bounded T17 prefix-delete/tail-append cases. Those cases establish shared old-coordinate span composition and provenance; T18's `apply_update` wrapper separately validates exact snapshot ownership, source/result correspondence, phase evolution, and its construction-specific witnesses. T18 changes the prefix write from pure deletion to replacement by the next phase marker; the old-end insertion and one-snapshot atomicity remain the same ordered multi-span UPDATE. A 255-case bounded audit also confirms the Notes multiplicity generalization, in which a removed natural value `n` appends `n` copies of the scheduled block.
 
 The adversarial cases establish:
 
@@ -194,7 +249,11 @@ The adversarial cases establish:
 - one-block and cycles longer than two use the same semantics and no special execution path;
 - same-generation foreign, stale, and successor-reused handles reject through opaque snapshot identity;
 - missing, reordered, wrong-phase, wrong-anchor, and fake-append results reject before commit;
-- structured program/state serialization retains phase and duplicate slot positions.
+- strict program and direct-state serialization rejects coercion and retains the occurrence-addressed phase; full tagged-configuration/event/trace serialization remains a Goal 2 conformance requirement.
+
+The normalized integer phase is a faithful visible-control cover of the Notes' rotated block-value list. If a cycle is rotationally periodic, distinct named phases can project to the same Notes value-state; the oracle checks that their projected successors also agree. Goal 2 may therefore use named slot occurrences, or the explicit quotient by equal rotations, but it must declare which identity it serializes. It may not infer either representation from trace time.
+
+Occurrence IDs are nonsemantic provenance. Reusing the phase marker's ID while its slot label changes is the audited canonical lineage profile, not a source-mandated semantic requirement; another lossless provenance policy is acceptable if visible phase, uniqueness, and one-step evolution are unchanged.
 
 The canonical Notes rule `{{1,1},{1,0}}` from a one-black seed passes the hash-bound page-95 `t0..t24` trace. Both semantic paths also reproduce all five full page-96 `t0..t99` profiles, for 500 book-fixture states, including occurrence-distinct phase values and exact full-trace digests.
 
@@ -218,14 +277,14 @@ The broad SimpleProgram responsibilities fit, while their current CA-shaped real
 | Concern | Fit | Finding |
 |---|---|---|
 | DOMAIN | DIRECT | T18 is discrete `t+1D`; DOMAIN does not mean the phase carrier or queue storage class. |
-| CONFIGURATION/support | PRINCIPLED EXTENSION | `simple_programs.md:87-169` fixes a dense slice shape. T18 needs a finite variable-length ordered support with one tagged left-end phase invariant. |
+| CONFIGURATION/support | REUSE + CURRENT GAP | T17/D027 already require finite variable-length ordered support; T18 composes it with one tagged left-end phase invariant. `simple_programs.md:87-169` has not implemented that generic support yet. |
 | ALPHABET | PARAMETERIZATION | The value responsibility at `:200-233` generalizes to `Phase(slot) | Data(symbol)`; strict binary and natural-multiplicity data are validators/presets. |
-| FRONTIER | PRINCIPLED EXTENSION | Absolute writable coordinates at `:1412-1510` must generalize to the unique old phase/head occurrence pair, or zero data-head sources when empty. |
-| NEIGHBORHOOD | PRINCIPLED EXTENSION | Geometric offsets at `:360-731` must generalize to structural endpoint access; all reads still come from one old snapshot. |
-| RULE/write | PRINCIPLED EXTENSION | Scalar next-coordinate values at `:1767-1793` must admit two closed ordered span writes computed from `(phase,head)` and immutable program data. |
+| FRONTIER | PARAMETERIZATION + CURRENT GAP | Parameterize T17's anchored prefix selector to the unique old phase/head occurrence pair, or zero data-head sources when empty. Absolute writable coordinates at `:1412-1510` do not yet realize structural loci. |
+| NEIGHBORHOOD | PARAMETERIZATION + CURRENT GAP | Reuse ordered endpoint/prefix access for `(phase,head)`; all reads still come from one old snapshot. Geometric offsets at `:360-731` do not yet implement that access type. |
+| RULE/write | PARAMETERIZATION + CURRENT GAP | A closed immutable cycle/trigger preset emits two D039 ordered span writes from `(phase,head)`. Scalar next-coordinate values at `:1767-1793` do not yet admit the generic result carrier. |
 | UPDATE | PARAMETERIZATION | D039 generic ordered multi-span commit already expresses phase/head prefix replacement plus old-end insertion; no cyclic update or executor is needed. |
 | outcome | PARAMETERIZATION | D024's construction-specific empty policy gains an evidenced identity event with frozen phase; T17 `InsufficientPrefix` remains unchanged. |
-| trace/encoding | PRINCIPLED EXTENSION | Dense copied slices at `:2124-2199` cannot natively preserve ragged tagged words, event provenance, and zero/nonzero-length distinctions. |
+| trace/encoding | REUSE + CURRENT GAP | Reuse T13/T17 ragged ordered snapshots and lineage, adding visible phase/witness fields. Dense copied slices at `:2124-2199` have not implemented that boundary. |
 
 ## Current Runtime Fit
 
@@ -259,7 +318,7 @@ The broad SimpleProgram responsibilities fit, while their current CA-shaped real
 | D029 short residue | T17 direct evidence versus T18 empty clause | 2 | typed outcome envelope | keep T17 unchanged |
 | D032 visible counter | cyclic schedule focus is required Markov state | 3 | marker/named configuration factor | reuse visible-control representation |
 | D039 span commit | 71,442 commuting cases | 3 | generic atomic ordered multi-span replacement | reuse; no UPDATE addition |
-| D126 T18 boundary | direct state plus tagged inverse | 3 | `Phase(slot) · Data(word)` preset/invariant | add T18 composition only |
+| D126 T18 boundary | occurrence-addressed direct state, tagged inverse, and Notes quotient | 3 | T17 ordered support + visible phase + anchored access + closed cycle/trigger + D039 spans + D024 empty policy | add T18 composition only |
 
 No row is class 4. Source and asset closure may narrow evidence scope but would need a concrete noncommuting counterexample to justify a new execution algebra.
 
@@ -307,15 +366,15 @@ These are component roles and validators, not a requirement for one class per li
 
 - Generic alphabet/schema module: closed `TaggedUnion(PhaseSlot(n),Data(alphabet))` plus the structural invariant `Phase(slot) · Data*`. Do not use an object cell or pack the word behind one value.
 - Ordered configuration module: reuse T17's finite word, occurrence IDs, opaque snapshot identity, ragged trace, and old-end anchor. The phase marker is ordinary visible state and survives with its occurrence identity as its slot label changes.
-- Program module: immutable nonempty ordered block cycle, alphabet-closed `Word` blocks including epsilon, explicit trigger policy, and structured slot occurrence order. Duplicate/equal blocks do not erase slot identity. Strict Chapter 3 construction uses binary `TriggerEquals(black)`.
+- Program module: immutable nonempty ordered block cycle, alphabet-closed `Word` blocks including epsilon, explicit trigger policy, and a declared schedule identity. The occurrence-addressed profile preserves named slot positions even when values repeat; an optional Notes-value profile quotients phases only when their complete rotated block lists are equal. Strict Chapter 3 construction uses binary `TriggerEquals(black)`.
 - Generalized preset: represent the Notes natural-value variant with a closed `RepeatScheduledBlockByRemovedNatural` rule form. It is not an `allow_multicolor` flag or callback.
 - FRONTIER: select exactly the left phase marker plus first data occurrence when present. On `Phase(slot)` alone, select no data-head source but still invoke the configured UPDATE/outcome policy.
 - NEIGHBORHOOD: return the old marker slot, removed value, exact occurrence IDs, and old endpoint. It does not read trace time, mutate/rotate program data, or inspect newborns.
 - RULE/result: return two explicit ordered writes—`Replace([0,2),Phase(next))` and `Insert(old_endpoint,conditional_block)`—plus scheduled-slot/trigger witnesses. An epsilon insertion remains an explicit result, not a missing write or table row.
-- UPDATE: reuse the generic atomic ordered multi-span committer. Validate exact snapshot ownership, prefix/end anchors, write ordering/nonoverlap, phase successor, source/result coverage, alphabet closure, reused phase ID, consumed head ID, persisted suffix IDs/order, and fresh appended IDs.
+- UPDATE: reuse the generic atomic ordered multi-span committer. Validate exact snapshot ownership, prefix/end anchors, write ordering/nonoverlap, phase successor, source/result coverage, alphabet closure, consumed head identity, persisted suffix order, and fresh appended occurrences. Reusing the phase marker ID is the canonical lineage preset, not semantic identity.
 - Outcome module: successful extinction is an advanced event with the next phase; a subsequent empty input is an identity event with frozen phase and one successor. T17 `InsufficientPrefix`, T16 `NoMatch`, T15 post-extinction empty rebuilding, halt, error, invalidity, and horizon remain distinct.
 - Spec/preset module: `cyclic_tag_system(blocks,initial_phase=0,trigger=black)` returns the ordinary shared components. The catalog/family name never reaches execution.
-- Runner: always executes selected component data. No `if cyclic_tag`, phase-from-step, mutable rule rotation, callback, formula fallback, or CA compiler.
+- Runner: always executes selected component data. Empty activity yields empty reads and writes and still reaches the configured UPDATE/outcome. No `if cyclic_tag`, phase-from-step, hidden mutable rule rotation, callback, formula fallback, or CA compiler.
 - Structured trace/raw boundary: retain tagged ragged states, phase/head/tail events, outcome witnesses, and optional lineage. Length, first-element, growth, substitution checkpoints, mechanical layouts, rule-110 encodings, and rasters are downstream records.
 - Tests: add T18 conformance tests and shared tagged-alphabet/ordered-span/outcome/serialization tests; rerun T17 and every existing runtime test.
 
@@ -328,7 +387,7 @@ These are component roles and validators, not a requirement for one class per li
 5. Assert phase advances on every nonempty event even when nothing is appended; it wraps exactly modulo the number of slot occurrences.
 6. Assert successful extinction advances phase once, then `Phase(slot)` produces an identity successor with phase frozen and a distinct empty-stutter witness.
 7. Test cycles of one, two, and more than two blocks. One-block repetition is a property, never a halt or executor mode.
-8. Test duplicate equal block values in different slots and round-trip their occurrence-distinct phase identity.
+8. Test duplicate equal block values in different named slots and round-trip occurrence-addressed phase identity; separately test that rotationally identical Notes value-lists form a step-compatible quotient rather than claiming a false inverse.
 9. Test the natural multiplicity rule with removed values zero, one, and greater than one; reject negative/nonintegral multiplicities rather than invoking host `Table` behavior.
 10. Prove the tagged encoder has an inverse and the direct/generic square commutes over the bounded 399-program/71,442-state audit.
 11. Run T17 prefix-delete/tail-append cases through the same ordered-span committer and prove T17 `InsufficientPrefix` and public program schema do not admit cyclic phase.
@@ -339,7 +398,7 @@ These are component roles and validators, not a requirement for one class per li
 
 ### Completion evidence
 
-One shared runner and generic ordered-span UPDATE execute T17 and T18 from typed component data. All direct fixtures and the commuting square pass; phase is present in every native snapshot; empty and extinction witnesses remain distinct; structured traces serialize losslessly; existing tests pass; and no cyclic state class, UPDATE algebra, executor, branch, hidden counter, callback, capacity, sentinel, or compiler fallback exists.
+One shared runner and generic ordered-span UPDATE execute T17 and T18 from typed component data. All direct fixtures and the commuting square pass; phase is present in every native snapshot; the named-slot/Notes-value identity choice is explicit; empty and extinction witnesses remain distinct; structured traces serialize losslessly; existing tests pass; and no cyclic state class, UPDATE algebra, executor, branch, hidden counter, callback, capacity, sentinel, or compiler fallback exists.
 
 ## No-Cheating Checks
 

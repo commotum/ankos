@@ -30,6 +30,8 @@ class BinaryCyclicProgram:
     trigger: Symbol
 
     def __post_init__(self) -> None:
+        if self.alphabet != (0, 1) or self.trigger != 1:
+            raise ValueError("the strict Chapter 3 preset is binary with trigger 1")
         if not self.alphabet or len(set(self.alphabet)) != len(self.alphabet):
             raise ValueError("alphabet must be finite, nonempty, and duplicate-free")
         if not self.blocks:
@@ -109,6 +111,23 @@ def direct_step(
         appended,
         next_state,
     )
+
+
+def rotated_rule_value(
+    program: BinaryCyclicProgram, state: DirectState
+) -> tuple[Word, ...]:
+    """Literal Notes-style visible schedule value for the named-slot state."""
+
+    check_direct_state(program, state)
+    return program.blocks[state.phase :] + program.blocks[: state.phase]
+
+
+def notes_value_projection(
+    program: BinaryCyclicProgram, state: DirectState
+) -> tuple[tuple[Word, ...], Word]:
+    """Projection to the Notes pair {rotated rule values, finite word}."""
+
+    return rotated_rule_value(program, state), state.word
 
 
 @dataclass(frozen=True)
@@ -331,6 +350,21 @@ def read_neighborhood(
     )
 
 
+def read_neighborhoods(
+    program: BinaryCyclicProgram,
+    old: OrderedConfiguration,
+    active: tuple[CyclicSource, ...],
+) -> tuple[CyclicRead, ...]:
+    """Collection-shaped access used by the branch-free runner protocol."""
+
+    validate_tagged(program, old)
+    if not active:
+        if len(old.tokens) != 1:
+            raise ValueError("an empty frontier is valid only for an empty data word")
+        return ()
+    return (read_neighborhood(program, old, active),)
+
+
 def evaluate_rule(
     program: BinaryCyclicProgram,
     source: CyclicSource,
@@ -356,6 +390,21 @@ def evaluate_rule(
         scheduled,
         appended,
         (prefix, tail),
+    )
+
+
+def evaluate_rules(
+    program: BinaryCyclicProgram,
+    active: tuple[CyclicSource, ...],
+    reads: tuple[CyclicRead, ...],
+) -> tuple[CyclicRuleResult, ...]:
+    """Collection-shaped RULE evaluation; empty input produces empty writes."""
+
+    if len(active) != len(reads):
+        raise ValueError("one read is required for each cyclic source")
+    return tuple(
+        evaluate_rule(program, source, read)
+        for source, read in zip(active, reads, strict=True)
     )
 
 
@@ -414,11 +463,11 @@ def apply_update(
     program: BinaryCyclicProgram,
     old: OrderedConfiguration,
     active: tuple[CyclicSource, ...],
-    result: CyclicRuleResult | None,
+    results: tuple[CyclicRuleResult, ...],
 ) -> CyclicEvent:
     validate_tagged(program, old)
     if not active:
-        if len(old.tokens) != 1 or result is not None:
+        if len(old.tokens) != 1 or results:
             raise ValueError("empty-source policy applies only to empty data words")
         successor = apply_ordered_spans(old, ())
         validate_tagged(program, successor)
@@ -434,6 +483,9 @@ def apply_update(
             (),
         )
 
+    if len(results) != 1:
+        raise ValueError("one cyclic result is required for the live source")
+    result = results[0]
     read = read_neighborhood(program, old, active)
     expected = evaluate_rule(program, active[0], read)
     if result != expected:
@@ -470,11 +522,9 @@ def generic_step(
     program: BinaryCyclicProgram, old: OrderedConfiguration
 ) -> CyclicEvent:
     active = select_frontier(program, old)
-    if not active:
-        return apply_update(program, old, active, None)
-    read = read_neighborhood(program, old, active)
-    result = evaluate_rule(program, active[0], read)
-    return apply_update(program, old, active, result)
+    reads = read_neighborhoods(program, old, active)
+    writes = evaluate_rules(program, active, reads)
+    return apply_update(program, old, active, writes)
 
 
 CANONICAL_PROGRAM = BinaryCyclicProgram(
@@ -842,6 +892,12 @@ def assert_adversaries() -> None:
     assert decode_tagged(extinction_program, empty.successor) == DirectState(1, ())
     assert empty.successor == extinction.successor
     assert empty.successor.snapshot_token is not extinction.successor.snapshot_token
+    empty_active = select_frontier(extinction_program, extinction.successor)
+    empty_reads = read_neighborhoods(
+        extinction_program, extinction.successor, empty_active
+    )
+    empty_writes = evaluate_rules(extinction_program, empty_active, empty_reads)
+    assert (empty_active, empty_reads, empty_writes) == ((), (), ())
 
     one_block = BinaryCyclicProgram((0, 1), ((1,),), 1)
     one = generic_step(one_block, encode_direct(one_block, DirectState(0, (1,))))
@@ -858,6 +914,27 @@ def assert_adversaries() -> None:
     )
     assert direct_step(duplicate_slots, duplicate_phase_zero).phase_after == 1
     assert direct_step(duplicate_slots, duplicate_phase_one).phase_after == 2
+    assert notes_value_projection(
+        duplicate_slots, duplicate_phase_zero
+    ) != notes_value_projection(duplicate_slots, duplicate_phase_one)
+
+    # Named phase slots form an occurrence-addressed cover of the Notes'
+    # rotated value-list state.  Rotationally periodic cycles can identify
+    # distinct named phases, but the quotient remains step-compatible.
+    periodic = BinaryCyclicProgram(
+        (0, 1), ((1,), (0,), (1,), (0,)), 1
+    )
+    periodic_zero = DirectState(0, (1, 0))
+    periodic_two = DirectState(2, (1, 0))
+    assert periodic_zero != periodic_two
+    assert notes_value_projection(periodic, periodic_zero) == notes_value_projection(
+        periodic, periodic_two
+    )
+    assert notes_value_projection(
+        periodic, direct_step(periodic, periodic_zero).successor
+    ) == notes_value_projection(
+        periodic, direct_step(periodic, periodic_two).successor
+    )
 
     old = encode_direct(phase_program, DirectState(0, (1, 0)), generation=7)
     active = select_frontier(phase_program, old)
@@ -879,7 +956,7 @@ def assert_adversaries() -> None:
         "stale source was accepted",
     )
 
-    successor = apply_update(phase_program, old, active, valid).successor
+    successor = apply_update(phase_program, old, active, (valid,)).successor
     expect_value_error(
         lambda: read_neighborhood(phase_program, successor, active),
         "old handle was accepted by successor",
@@ -903,7 +980,7 @@ def assert_adversaries() -> None:
     )
     for bad in bad_results:
         expect_value_error(
-            lambda bad=bad: apply_update(phase_program, old, active, bad),
+            lambda bad=bad: apply_update(phase_program, old, active, (bad,)),
             "tampered cyclic rule result was accepted",
         )
 
@@ -933,6 +1010,10 @@ def assert_adversaries() -> None:
         "empty program cycle was accepted",
     )
     expect_value_error(
+        lambda: BinaryCyclicProgram((0, 1, 2), ((1,),), 1),
+        "nonbinary data was accepted by the strict preset",
+    )
+    expect_value_error(
         lambda: MultiplicityProgram(((1, -1),)),
         "negative multiplicity data was accepted",
     )
@@ -941,6 +1022,16 @@ def assert_adversaries() -> None:
             MultiplicityProgram(((1,),)), DirectState(0, (1.5,))
         ),
         "nonintegral multiplicity data was accepted",
+    )
+    expect_value_error(
+        lambda: deserialize_program(
+            {"alphabet": [0, True], "blocks": [[1]], "trigger": 1}
+        ),
+        "coercive program deserialization was accepted",
+    )
+    expect_value_error(
+        lambda: deserialize_state({"phase": 0, "word": [1.0]}),
+        "coercive state deserialization was accepted",
     )
 
 
@@ -958,13 +1049,17 @@ def deserialize_program(payload: dict[str, object]) -> BinaryCyclicProgram:
     trigger = payload["trigger"]
     if not isinstance(raw_alphabet, list) or not isinstance(raw_blocks, list):
         raise ValueError("malformed program payload")
-    if not isinstance(trigger, int):
+    if type(trigger) is not int:
         raise ValueError("malformed trigger")
     if any(not isinstance(block, list) for block in raw_blocks):
         raise ValueError("malformed block payload")
+    if any(type(value) is not int for value in raw_alphabet):
+        raise ValueError("malformed alphabet payload")
+    if any(type(value) is not int for block in raw_blocks for value in block):
+        raise ValueError("malformed block payload")
     return BinaryCyclicProgram(
-        tuple(int(value) for value in raw_alphabet),
-        tuple(tuple(int(value) for value in block) for block in raw_blocks),
+        tuple(raw_alphabet),
+        tuple(tuple(block) for block in raw_blocks),
         trigger,
     )
 
@@ -976,9 +1071,11 @@ def serialize_state(state: DirectState) -> dict[str, object]:
 def deserialize_state(payload: dict[str, object]) -> DirectState:
     phase = payload["phase"]
     word = payload["word"]
-    if not isinstance(phase, int) or not isinstance(word, list):
+    if type(phase) is not int or not isinstance(word, list):
         raise ValueError("malformed state payload")
-    return DirectState(phase, tuple(int(value) for value in word))
+    if any(type(value) is not int for value in word):
+        raise ValueError("malformed state payload")
+    return DirectState(phase, tuple(word))
 
 
 def assert_serialization() -> None:
@@ -1017,7 +1114,7 @@ DECISION_MATRIX = (
         2,
         "anchored prefix-consume and old-end append schedule",
         "REUSE",
-        "data-tail order and conditional appendant are unchanged",
+        "T18 composes old-end insertion with phase/head prefix replacement",
     ),
     DecisionRow(
         "D028",
@@ -1036,7 +1133,7 @@ DECISION_MATRIX = (
     DecisionRow(
         "D032",
         3,
-        "visible marker or named configuration factor",
+        "visible named phase marker or Notes rotated-value quotient",
         "REUSE_VISIBLE_CONTROL_ROLE",
         "the cyclic focus is state, not executor time",
     ),
@@ -1050,9 +1147,9 @@ DECISION_MATRIX = (
     DecisionRow(
         "D126",
         3,
-        "tagged Phase(slot) followed by Data(word)",
+        "T17 ordered support plus visible phase, anchored access, spans, and empty policy",
         "ADD_T18_PRESET",
-        "lossless tagged state and validation add no execution algebra",
+        "the named-slot tagged cover and Notes quotient add no execution algebra",
     ),
 )
 
@@ -1105,9 +1202,10 @@ def main() -> None:
         f"multiplicity_cases={multiplicity_cases}; "
         f"book_fixture_states={book_fixture_cases}; "
         "canonical_t0_t24=PASS; page96_t0_t99=PASS; visible_phase=PASS; "
-        "tagged_inverse=PASS; opaque_snapshot_identity=PASS; "
+        "branch_free_axis_calls=PASS; tagged_inverse=PASS; "
+        "notes_rotation_quotient=PASS; opaque_snapshot_identity=PASS; "
         "phase_head_tail_atomic=PASS; extinction_then_stutter=PASS; "
-        "shared_ordered_multispan_UPDATE=PASS; serialization=PASS; "
+        "shared_ordered_multispan_UPDATE=PASS; direct_serialization=PASS; "
         "decision_matrix=PASS)"
     )
 
