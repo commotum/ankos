@@ -552,6 +552,35 @@ PAGE_OFFSET_NAMES = {
 }
 assert {line: Path(images[line]).name for line in PAGE_OFFSET_NAMES} == PAGE_OFFSET_NAMES
 assert all(not Path(images[line]).name.startswith("_page_17") for line in PAGE_OFFSET_NAMES)
+PAGE_NUMBER_FALSE_FRIENDS = {
+    1942: "_page_170_Picture_2.jpeg",
+    1958: "_page_171_Picture_5.jpeg",
+}
+assert {line: Path(images[line]).name for line in PAGE_NUMBER_FALSE_FRIENDS} == PAGE_NUMBER_FALSE_FRIENDS
+assert set(PAGE_NUMBER_FALSE_FRIENDS).isdisjoint(C4)
+
+# The back-matter extraction is mispartitioned: T21 Notes live in the split
+# Index document, while the genuine flattened Index lives in split Colophon.
+# Freeze representative reverse joins in addition to every image join in both
+# ledgers.  Image references differ only by the split ``Images/`` prefix.
+notes_split = ASSET_ROOT / "BACK-MATTER/Index/Index.md"
+notes_split_lines = notes_split.read_text(encoding="utf-8").splitlines()
+nominal_notes = ASSET_ROOT / "BACK-MATTER/Notes/Notes.md"
+assert len(nominal_notes.read_text(encoding="utf-8").splitlines()) == 1
+for book_line, split_line in {
+    13460: 1361,
+    13467: 1368,
+    13469: 1370,
+    13471: 1372,
+    13563: 1464,
+    13642: 1543,
+}.items():
+    assert lines[book_line - 1] == notes_split_lines[split_line - 1]
+
+colophon = ASSET_ROOT / "BACK-MATTER/Colophon/Colophon.md"
+colophon_lines = colophon.read_text(encoding="utf-8").splitlines()
+assert lines[20957 - 1] == colophon_lines[3514 - 1]
+assert lines[22380 - 1] == colophon_lines[4937 - 1]
 
 
 # Guard the semantic captions and Notes that entitle the visual transcription.
@@ -575,14 +604,56 @@ for line_number, fragment in guards.items():
     assert fragment in lines[line_number - 1], (line_number, fragment)
 
 
+EXPECTED_STRICT_UNIVERSE_SHA256 = "3da48eb699bfb93323502ae28d549cc718b4a897d5475f2509881219b00ef19b"
+EXPECTED_STRICT_LEDGER_SHA256 = "5f28624e0329f6f9c189e521b3849183a5a0174990e8badb371a6a0b354c743d"
+EXPECTED_GOVERNED_UNIVERSE_SHA256 = "6506db2a360d66442ec6d810b2ad32754724854a29a92cb4a176f753d59083f9"
+EXPECTED_GOVERNED_LEDGER_SHA256 = "71335c5aebc7fb93e16abb3c7fd1d99e99c9d876433c969203586c51a74dc5dc"
+EXPECTED_ADJACENCY_UNIVERSE_SHA256 = "85a5f38b8668147c53a88079a931f77199793487eb13a4c057444b5593f31ca2"
+EXPECTED_ADJACENCY_LEDGER_SHA256 = "985f4f983f0d88b670c6bf7de5661103a96a87de6c7f1ec5b0f804e359cf0391"
+
+
 def main() -> None:
-    # Source-bound universe, class partition, complete ledger, and frozen
-    # digests are added once the independent source oracle publishes RETAINED.
+    payload, monolith_refs, split_refs, hashes = ledger()
+    adjacency_payload, adjacency_monolith_refs, adjacency_split_refs, adjacency_hashes = adjacency_ledger()
+
+    governed_universe_digest = hashlib.sha256(
+        ",".join(map(str, sorted(U))).encode("ascii")
+    ).hexdigest()
+    governed_ledger_digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    adjacency_universe_digest = hashlib.sha256(
+        ",".join(map(str, sorted(ADJACENCY_ONLY))).encode("ascii")
+    ).hexdigest()
+    adjacency_ledger_digest = hashlib.sha256(adjacency_payload.encode("utf-8")).hexdigest()
+
+    strict_rows = [
+        row for row in payload.splitlines() if int(row.split("|", 1)[0]) in STRICT_U
+    ]
+    strict_payload = "\n".join(strict_rows) + "\n"
+    strict_universe_digest = hashlib.sha256(
+        ",".join(map(str, sorted(STRICT_U))).encode("ascii")
+    ).hexdigest()
+    strict_ledger_digest = hashlib.sha256(strict_payload.encode("utf-8")).hexdigest()
+
+    assert strict_universe_digest == EXPECTED_STRICT_UNIVERSE_SHA256
+    assert strict_ledger_digest == EXPECTED_STRICT_LEDGER_SHA256
+    assert governed_universe_digest == EXPECTED_GOVERNED_UNIVERSE_SHA256
+    assert governed_ledger_digest == EXPECTED_GOVERNED_LEDGER_SHA256
+    assert adjacency_universe_digest == EXPECTED_ADJACENCY_UNIVERSE_SHA256
+    assert adjacency_ledger_digest == EXPECTED_ADJACENCY_LEDGER_SHA256
+    assert len(strict_rows) == 16
+    assert len(payload.splitlines()) == 53
+    assert len(adjacency_payload.splitlines()) == 60
+    assert (monolith_refs, split_refs, hashes) == (53, 53, 53)
+    assert (adjacency_monolith_refs, adjacency_split_refs, adjacency_hashes) == (60, 60, 60)
+    all_rows = payload.splitlines() + adjacency_payload.splitlines()
+    assert len({row.split("|")[7] for row in all_rows}) == 113
+
     print(
-        "T21 asset oracle: PROVISIONAL direct=16; "
-        "classes native C10/C6/O=10/2/4; "
-        "codes 1022/942 + cardinal galleries=PASS; "
-        "six-case sum galleries=PASS; native hashes/page offset=PASS"
+        f"T21 asset oracle: PASS source={len(S)}; C4=113; governed=53; adjacency_only=60; "
+        "governed C10/C6/O/R/X22/X23/X24=10/2/4/12/14/8/3; "
+        "adjacency typed/property/other=30/5/25; refs=226; unique_hashes=113; "
+        "codes1022/942_steps=PASS; cardinal_22/44=PASS; equal_sum_1/2/5/100/500=PASS; "
+        "page_offset=PASS; Notes/actual_Index_reverse=PASS"
     )
 
 

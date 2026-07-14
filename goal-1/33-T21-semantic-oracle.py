@@ -70,6 +70,15 @@ XY_EAST_NORTH_COMPASS: tuple[tuple[str, Offset], ...] = (
     ("east", POS_AXIS_0),
 )
 
+# Projection codes for the five raw BOOK positions in exact sorted order.
+BOOK_GENERAL_PROJECTION_CODES: tuple[int, ...] = (
+    0xFFFF0000,
+    0xFF00FF00,
+    0xF0F0F0F0,
+    0xCCCCCCCC,
+    0xAAAAAAAA,
+)
+
 # T22 boundary: the eight surrounding cells, still excluding center from the
 # geometric offset collection.  It uses the same kernel with a different
 # explicit neighborhood value.
@@ -247,27 +256,73 @@ class GridConfiguration:
 
 
 @dataclass(frozen=True)
-class OffsetNeighborhood:
-    """Ordered geometric access offsets; center is intentionally absent."""
+class SelfAccess:
+    """Declared access to the firing locus itself."""
 
-    offsets: tuple[Offset, ...]
+
+@dataclass(frozen=True)
+class OffsetAccess:
+    """Declared access at one raw displacement from the firing locus."""
+
+    offset: Offset
 
     def __post_init__(self) -> None:
-        raw_offsets = require_exact_tuple(self.offsets, "offsets")
-        if not raw_offsets:
-            raise ValueError("a spatial neighborhood must have at least one offset")
-        first = require_exact_tuple(raw_offsets[0], "offset")
-        if not first:
-            raise ValueError("offsets must have positive dimension")
-        dimension = len(first)
-        checked: list[Offset] = []
-        for raw in raw_offsets:
-            offset = checked_coord(raw, dimension, "offset")
-            if all(component == 0 for component in offset):
-                raise ValueError("center belongs to RULE input, not geometric offsets")
-            checked.append(offset)
-        if len(set(checked)) != len(checked):
-            raise ValueError("geometric offsets must be unique")
+        raw = require_exact_tuple(self.offset, "access offset")
+        if not raw:
+            raise ValueError("access offsets must have positive dimension")
+        checked = tuple(require_exact_int(value, "access offset component") for value in raw)
+        if all(value == 0 for value in checked):
+            raise ValueError("zero displacement must be declared as SelfAccess")
+
+
+AccessComponent = SelfAccess | OffsetAccess
+
+
+@dataclass(frozen=True)
+class LocalAccess:
+    """Complete NEIGHBORHOOD schema: Self plus ordered offset components."""
+
+    components: tuple[AccessComponent, ...]
+
+    def __post_init__(self) -> None:
+        raw_components = require_exact_tuple(self.components, "access components")
+        if not raw_components:
+            raise ValueError("local access must declare components")
+        if sum(type(component) is SelfAccess for component in raw_components) != 1:
+            raise ValueError("local access must declare Self exactly once")
+        offsets: list[Offset] = []
+        dimension: int | None = None
+        for component in raw_components:
+            if type(component) is SelfAccess:
+                continue
+            if type(component) is not OffsetAccess:
+                raise TypeError("unsupported local access component")
+            offset = component.offset
+            if dimension is None:
+                dimension = len(offset)
+            if len(offset) != dimension:
+                raise ValueError("local access offsets have different dimensions")
+            offsets.append(offset)
+        if dimension is None or not offsets:
+            raise ValueError("spatial local access must declare at least one offset")
+        if len(set(offsets)) != len(offsets):
+            raise ValueError("local access offsets must be unique")
+
+    @property
+    def offsets(self) -> tuple[Offset, ...]:
+        return tuple(
+            component.offset
+            for component in self.components
+            if type(component) is OffsetAccess
+        )
+
+    @property
+    def self_position(self) -> int:
+        return next(
+            index
+            for index, component in enumerate(self.components)
+            if type(component) is SelfAccess
+        )
 
     @property
     def dimension(self) -> int:
@@ -276,6 +331,16 @@ class OffsetNeighborhood:
     @property
     def slots(self) -> int:
         return len(self.offsets)
+
+
+def make_local_access(offsets: tuple[Offset, ...], self_position: int) -> LocalAccess:
+    raw_offsets = require_exact_tuple(offsets, "offsets")
+    position = require_exact_int(self_position, "Self position")
+    if position < 0 or position > len(raw_offsets):
+        raise ValueError("Self position is outside the composed access schema")
+    components: list[AccessComponent] = [OffsetAccess(offset) for offset in raw_offsets]
+    components.insert(position, SelfAccess())
+    return LocalAccess(tuple(components))
 
 
 @dataclass(frozen=True)
@@ -456,6 +521,92 @@ def strict_t21_general_to_code(table: GeneralLookup) -> int:
     return code
 
 
+def book_row_column_to_enu(raw_offset: object) -> Offset:
+    """Declared basis map (row,column) -> (x=column,y=-row)."""
+
+    row, column = checked_coord(raw_offset, 2, "BOOK row/column offset")
+    return (column, -row)
+
+
+def basis_permutations() -> tuple[
+    tuple[Offset, ...], tuple[Offset, ...], tuple[int, ...], tuple[int, ...]
+]:
+    """Derive BOOK-order/lex-runtime permutations from the basis map."""
+
+    transformed_in_book_order = tuple(
+        book_row_column_to_enu(offset) for offset in STRICT_T21_SORTED_INPUTS
+    )
+    lex_runtime_positions = tuple(sorted(transformed_in_book_order))
+    runtime_to_book = tuple(
+        transformed_in_book_order.index(position) for position in lex_runtime_positions
+    )
+    book_to_runtime = tuple(
+        lex_runtime_positions.index(position) for position in transformed_in_book_order
+    )
+    return (
+        transformed_in_book_order,
+        lex_runtime_positions,
+        runtime_to_book,
+        book_to_runtime,
+    )
+
+
+def runtime_context_to_book_context(
+    runtime_context: tuple[int, int, int, int, int]
+) -> tuple[int, int, int, int, int]:
+    raw = require_exact_tuple(runtime_context, "runtime context")
+    if len(raw) != 5:
+        raise ValueError("runtime context must contain five values")
+    for value in raw:
+        if type(value) is not int or value not in (0, 1):
+            raise TypeError("runtime context must contain exact bits")
+    _transformed, _runtime, _runtime_to_book, book_to_runtime = basis_permutations()
+    return tuple(raw[runtime_index] for runtime_index in book_to_runtime)  # type: ignore[return-value]
+
+
+def book_context_to_runtime_context(
+    book_context: tuple[int, int, int, int, int]
+) -> tuple[int, int, int, int, int]:
+    raw = require_exact_tuple(book_context, "BOOK context")
+    if len(raw) != 5:
+        raise ValueError("BOOK context must contain five values")
+    for value in raw:
+        if type(value) is not int or value not in (0, 1):
+            raise TypeError("BOOK context must contain exact bits")
+    _transformed, _runtime, runtime_to_book, _book_to_runtime = basis_permutations()
+    return tuple(raw[book_index] for book_index in runtime_to_book)  # type: ignore[return-value]
+
+
+def permute_book_code_to_runtime(code: int) -> int:
+    """Reindex all 32 table rows for lexicographic ENU runtime inputs."""
+
+    checked = require_exact_int(code, "BOOK general code")
+    if checked < 0 or checked >= 1 << 32:
+        raise ValueError("BOOK general code is out of range")
+    runtime_code = 0
+    for runtime_context in product((0, 1), repeat=5):
+        book_context = runtime_context_to_book_context(runtime_context)
+        book_index = binary_digits_to_index(book_context)
+        runtime_index = binary_digits_to_index(runtime_context)
+        runtime_code |= ((checked >> book_index) & 1) << runtime_index
+    return runtime_code
+
+
+def permute_runtime_code_to_book(code: int) -> int:
+    """Inverse table reindexing from lexicographic ENU inputs to BOOK inputs."""
+
+    checked = require_exact_int(code, "runtime general code")
+    if checked < 0 or checked >= 1 << 32:
+        raise ValueError("runtime general code is out of range")
+    book_code = 0
+    for book_context in product((0, 1), repeat=5):
+        runtime_context = book_context_to_runtime_context(book_context)
+        runtime_index = binary_digits_to_index(runtime_context)
+        book_index = binary_digits_to_index(book_context)
+        book_code |= ((checked >> runtime_index) & 1) << book_index
+    return book_code
+
+
 def expand_outer_totalistic(rule: BinaryOuterTotalistic) -> GeneralLookup:
     """Losslessly expand one qualifying Self x CardinalCount factor table."""
 
@@ -535,14 +686,14 @@ def factor_totalistic(table: GeneralLookup) -> BinaryTotalistic:
 @dataclass(frozen=True)
 class CAProgram:
     alphabet: FiniteAlphabet
-    neighborhood: OffsetNeighborhood
+    neighborhood: LocalAccess
     rule: Rule
 
     def __post_init__(self) -> None:
         if type(self.alphabet) is not FiniteAlphabet:
             raise TypeError("program alphabet must be FiniteAlphabet")
-        if type(self.neighborhood) is not OffsetNeighborhood:
-            raise TypeError("program neighborhood must be OffsetNeighborhood")
+        if type(self.neighborhood) is not LocalAccess:
+            raise TypeError("program neighborhood must be complete LocalAccess")
         if type(self.rule) not in (BinaryOuterTotalistic, BinaryTotalistic, GeneralLookup):
             raise TypeError("program rule must be a closed local rule schema")
         if self.rule.alphabet_size != self.alphabet.size:
@@ -552,11 +703,19 @@ class CAProgram:
 
 
 def strict_t21_program(rule: Rule) -> CAProgram:
-    return CAProgram(FiniteAlphabet(rule.alphabet_size), OffsetNeighborhood(ORTHOGONAL_2D), rule)
+    return CAProgram(
+        FiniteAlphabet(rule.alphabet_size),
+        make_local_access(ORTHOGONAL_2D, self_position=2),
+        rule,
+    )
 
 
 def strict_t22_program(rule: Rule) -> CAProgram:
-    return CAProgram(FiniteAlphabet(rule.alphabet_size), OffsetNeighborhood(MOORE_2D), rule)
+    return CAProgram(
+        FiniteAlphabet(rule.alphabet_size),
+        make_local_access(MOORE_2D, self_position=4),
+        rule,
+    )
 
 
 @dataclass(frozen=True)
@@ -616,18 +775,31 @@ def validate_handles(
 def read_local(
     old: GridConfiguration,
     active: tuple[SiteHandle, ...],
-    neighborhood: OffsetNeighborhood,
+    neighborhood: LocalAccess,
 ) -> tuple[LocalRead, ...]:
     validate_handles(old, active)
+    if type(neighborhood) is not LocalAccess:
+        raise TypeError("neighborhood must be complete LocalAccess")
     if neighborhood.dimension != old.topology.dimension:
         raise ValueError("neighborhood and configuration dimensions differ")
-    return tuple(
-        LocalRead(
-            old.value_at(handle.coord),
-            tuple(old.value_at(add_coord(handle.coord, offset)) for offset in neighborhood.offsets),
+    reads: list[LocalRead] = []
+    for handle in active:
+        declared_values = tuple(
+            old.value_at(handle.coord)
+            if type(component) is SelfAccess
+            else old.value_at(add_coord(handle.coord, component.offset))
+            for component in neighborhood.components
         )
-        for handle in active
-    )
+        center = declared_values[neighborhood.self_position]
+        neighbors = tuple(
+            value
+            for component, value in zip(
+                neighborhood.components, declared_values, strict=True
+            )
+            if type(component) is OffsetAccess
+        )
+        reads.append(LocalRead(center, neighbors))
+    return tuple(reads)
 
 
 def rule_assignments(
@@ -790,23 +962,125 @@ def decode_generic(state: GridConfiguration) -> Native2DState:
     )
 
 
-def native_2d_step(program: CAProgram, old: Native2DState) -> Native2DState:
-    """Direct T21 definition, independent of handles and generic UPDATE."""
+def native_book_context(
+    old: Native2DState, row: int, column: int
+) -> tuple[int, int, int, int, int]:
+    """Literal BOOK row/column positions: (-1,0),(0,-1),Self,(0,1),(1,0)."""
 
-    if program.neighborhood.dimension != 2:
-        raise ValueError("native 2D step requires a two-dimensional neighborhood")
-    if program.alphabet.size != old.alphabet_size:
-        raise ValueError("native program/state alphabets differ")
+    if type(old) is not Native2DState:
+        raise TypeError("native state must be Native2DState")
+    row = require_exact_int(row, "row")
+    column = require_exact_int(column, "column")
+    return (
+        old.value_at(row - 1, column),
+        old.value_at(row, column - 1),
+        old.value_at(row, column),
+        old.value_at(row, column + 1),
+        old.value_at(row + 1, column),
+    )
+
+
+def native_book_general_step(code: int, old: Native2DState) -> Native2DState:
+    """Independent 32-context evaluator using the literal BOOK bit formula."""
+
+    checked = require_exact_int(code, "native general code")
+    if checked < 0 or checked >= 1 << 32:
+        raise ValueError("native general code is out of range")
+    if old.alphabet_size != 2:
+        raise ValueError("native general code requires the binary alphabet")
     values: list[int] = []
     for row in range(old.shape[0]):
         for column in range(old.shape[1]):
-            center = old.value_at(row, column)
-            neighbors = tuple(
-                old.value_at(row + offset[0], column + offset[1])
-                for offset in program.neighborhood.offsets
+            negative_0, negative_1, center, positive_1, positive_0 = (
+                native_book_context(old, row, column)
             )
-            values.append(program.rule.evaluate(LocalRead(center, neighbors)))
-    return Native2DState(old.alphabet_size, old.shape, old.boundary, tuple(values))
+            index = (
+                16 * negative_0
+                + 8 * negative_1
+                + 4 * center
+                + 2 * positive_1
+                + positive_0
+            )
+            values.append((checked >> index) & 1)
+    return Native2DState(2, old.shape, old.boundary, tuple(values))
+
+
+def native_book_outer_step(code: int, old: Native2DState) -> Native2DState:
+    """Independent Self+2*cardinal-count evaluator for the ten-row form."""
+
+    checked = require_exact_int(code, "native outer-totalistic code")
+    if checked < 0 or checked >= 1 << 10:
+        raise ValueError("native outer-totalistic code is out of range")
+    if old.alphabet_size != 2:
+        raise ValueError("native outer-totalistic code requires binary cells")
+    values: list[int] = []
+    for row in range(old.shape[0]):
+        for column in range(old.shape[1]):
+            negative_0, negative_1, center, positive_1, positive_0 = (
+                native_book_context(old, row, column)
+            )
+            cardinal_count = negative_0 + negative_1 + positive_1 + positive_0
+            values.append((checked >> (center + 2 * cardinal_count)) & 1)
+    return Native2DState(2, old.shape, old.boundary, tuple(values))
+
+
+def native_book_totalistic_step(code: int, old: Native2DState) -> Native2DState:
+    """Independent equal-sum evaluator for the six-row BOOK:2922 form."""
+
+    checked = require_exact_int(code, "native totalistic code")
+    if checked < 0 or checked >= 1 << 6:
+        raise ValueError("native totalistic code is out of range")
+    if old.alphabet_size != 2:
+        raise ValueError("native totalistic code requires binary cells")
+    values: list[int] = []
+    for row in range(old.shape[0]):
+        for column in range(old.shape[1]):
+            total = sum(native_book_context(old, row, column))
+            values.append((checked >> total) & 1)
+    return Native2DState(2, old.shape, old.boundary, tuple(values))
+
+
+def native_book_projection_step(
+    sorted_position: int, old: Native2DState
+) -> Native2DState:
+    """Independent finite-alphabet projection used by positional guards."""
+
+    selected = require_exact_int(sorted_position, "native sorted position")
+    if selected < 0 or selected >= 5:
+        raise ValueError("native sorted position is out of range")
+    values = tuple(
+        native_book_context(old, row, column)[selected]
+        for row in range(old.shape[0])
+        for column in range(old.shape[1])
+    )
+    return Native2DState(old.alphabet_size, old.shape, old.boundary, values)
+
+
+def native_row_column_to_enu_grid(
+    state: Native2DState, generation: int = 0
+) -> GridConfiguration:
+    """Map a finite row/column realization through x=column,y=-row.
+
+    The added y translation by rows-1 only keeps finite array indices
+    nonnegative; it does not alter the declared linear basis map.
+    """
+
+    if type(state) is not Native2DState:
+        raise TypeError("native state must be Native2DState")
+    generation = require_exact_int(generation, "generation")
+    rows, columns = state.shape
+    runtime_shape = (columns, rows)
+    runtime_cells = [0] * (rows * columns)
+    for row in range(rows):
+        for column in range(columns):
+            runtime_coord = (column, rows - 1 - row)
+            runtime_cells[flat_index(runtime_shape, runtime_coord)] = state.value_at(row, column)
+    return GridConfiguration(
+        FiniteAlphabet(state.alphabet_size),
+        FiniteGrid(runtime_shape, state.boundary),
+        tuple(runtime_cells),
+        SnapshotToken(generation),
+    )
 
 
 @dataclass(frozen=True)
@@ -1110,6 +1384,7 @@ def assert_exhaustive_native_commutation() -> dict[str, int]:
     outer_cases = 0
     totalistic_cases = 0
     positional_cases = 0
+    nonaliasing_directional_cases = 0
     ternary_cases = 0
 
     # All 1024 four-neighbor binary outer-totalistic tables and every binary
@@ -1120,7 +1395,7 @@ def assert_exhaustive_native_commutation() -> dict[str, int]:
         for cells in binary_states:
             native = Native2DState(2, (2, 2), periodic, cells)
             encoded = encode_native(native, generation=7)
-            direct = native_2d_step(program, native)
+            direct = native_book_outer_step(code, native)
             generic = generic_ca_step(program, encoded)
             assert decode_generic(generic) == direct
             assert generic.snapshot_token is not encoded.snapshot_token
@@ -1133,27 +1408,57 @@ def assert_exhaustive_native_commutation() -> dict[str, int]:
         program = strict_t21_program(BinaryTotalistic(code, 4))
         for cells in binary_states:
             native = Native2DState(2, (2, 2), periodic, cells)
-            direct = native_2d_step(program, native)
+            direct = native_book_totalistic_step(code, native)
             generic = generic_ca_step(program, encode_native(native))
             assert decode_generic(generic) == direct
             totalistic_cases += 1
 
     # Totalistic tests cannot catch an offset-order reversal.  Each center or
     # directional projection is therefore checked against every 2x2 state.
+    local_to_sorted = {0: 0, 1: 1, -1: 2, 2: 3, 3: 4}
+    assert tuple(BOOK_GENERAL_PROJECTION_CODES) == (
+        0xFFFF0000,
+        0xFF00FF00,
+        0xF0F0F0F0,
+        0xCCCCCCCC,
+        0xAAAAAAAA,
+    )
     for selected in (-1, 0, 1, 2, 3):
-        program = strict_t21_program(projection_rule(2, 4, selected))
+        sorted_position = local_to_sorted[selected]
+        code = BOOK_GENERAL_PROJECTION_CODES[sorted_position]
+        program = strict_t21_program(strict_t21_general_from_code(code))
         for cells in binary_states:
             native = Native2DState(2, (2, 2), periodic, cells)
-            direct = native_2d_step(program, native)
+            direct = native_book_general_step(code, native)
             generic = generic_ca_step(program, encode_native(native))
             assert decode_generic(generic) == direct
             positional_cases += 1
+
+    # A 5x5 fixed box prevents opposite directions from aliasing.  Every
+    # literal BOOK projection is checked from every one-hot source location
+    # against the independent numeric-code evaluator.
+    for sorted_position, code in enumerate(BOOK_GENERAL_PROJECTION_CODES):
+        program = strict_t21_program(strict_t21_general_from_code(code))
+        for seed in all_coords((5, 5)):
+            native = Native2DState(
+                2,
+                (5, 5),
+                FixedBoundary(0),
+                cells_with_one((5, 5), seed),
+            )
+            direct = native_book_general_step(code, native)
+            generic = generic_ca_step(program, encode_native(native))
+            assert decode_generic(generic) == direct
+            # The independent projection helper is a second direct guard on
+            # the pinned code significance.
+            assert direct == native_book_projection_step(sorted_position, native)
+            nonaliasing_directional_cases += 1
 
     # Finite alphabet is an axis, not a binary/T21 executor assumption.
     ternary_program = strict_t21_program(projection_rule(3, 4, 2))
     for cells in product(range(3), repeat=4):
         native = Native2DState(3, (2, 2), periodic, cells)
-        direct = native_2d_step(ternary_program, native)
+        direct = native_book_projection_step(3, native)
         generic = generic_ca_step(ternary_program, encode_native(native))
         assert decode_generic(generic) == direct
         ternary_cases += 1
@@ -1161,11 +1466,13 @@ def assert_exhaustive_native_commutation() -> dict[str, int]:
     assert outer_cases == 16_384
     assert totalistic_cases == 1_024
     assert positional_cases == 80
+    assert nonaliasing_directional_cases == 125
     assert ternary_cases == 81
     return {
         "outer": outer_cases,
         "totalistic": totalistic_cases,
         "positional": positional_cases,
+        "nonaliasing_directional": nonaliasing_directional_cases,
         "ternary": ternary_cases,
     }
 
@@ -1181,7 +1488,7 @@ def assert_wrapped_slot_multiplicity() -> None:
         SnapshotToken(0),
     )
     handle = SiteHandle(old.snapshot_token, (0, 0))
-    neighborhood = OffsetNeighborhood(ORTHOGONAL_2D)
+    neighborhood = make_local_access(ORTHOGONAL_2D, self_position=2)
     read = read_local(old, (handle,), neighborhood)[0]
     assert read == LocalRead(0, (1, 0, 0, 1))
 
@@ -1304,7 +1611,7 @@ def assert_dimension_agnostic_kernel() -> None:
         offsets = axis_offsets(dimension)
         program = CAProgram(
             FiniteAlphabet(2),
-            OffsetNeighborhood(offsets),
+            make_local_access(offsets, self_position=0),
             projection_rule(2, len(offsets), 0),
         )
         shape = (3,) * dimension
@@ -1441,11 +1748,15 @@ def assert_hostile_validation() -> None:
         lambda: GridConfiguration(alphabet, topology, (0, 0, 2, 0), SnapshotToken(0)),
     )
 
-    expect_raises(TypeError, lambda: OffsetNeighborhood([NEG_AXIS_0, POS_AXIS_0]))
-    expect_raises(ValueError, lambda: OffsetNeighborhood(((0, 0), NEG_AXIS_0)))
-    expect_raises(ValueError, lambda: OffsetNeighborhood((NEG_AXIS_0, NEG_AXIS_0)))
-    expect_raises(ValueError, lambda: OffsetNeighborhood(((-1,), POS_AXIS_0)))
-    expect_raises(TypeError, lambda: OffsetNeighborhood(((-1, False), POS_AXIS_0)))
+    expect_raises(TypeError, lambda: make_local_access([NEG_AXIS_0, POS_AXIS_0], 1))
+    expect_raises(ValueError, lambda: make_local_access(((0, 0), NEG_AXIS_0), 1))
+    expect_raises(ValueError, lambda: make_local_access((NEG_AXIS_0, NEG_AXIS_0), 1))
+    expect_raises(ValueError, lambda: make_local_access(((-1,), POS_AXIS_0), 1))
+    expect_raises(TypeError, lambda: make_local_access(((-1, False), POS_AXIS_0), 1))
+    expect_raises(ValueError, lambda: LocalAccess((OffsetAccess(NEG_AXIS_0),)))
+    expect_raises(ValueError, lambda: LocalAccess((SelfAccess(), SelfAccess(), OffsetAccess(NEG_AXIS_0))))
+    expect_raises(TypeError, lambda: LocalAccess((SelfAccess(), object())))
+    expect_raises(TypeError, lambda: make_local_access((NEG_AXIS_0,), True))
     expect_raises(TypeError, lambda: BinaryOuterTotalistic(True, 4))
     expect_raises(ValueError, lambda: BinaryOuterTotalistic(1024, 4))
     expect_raises(TypeError, lambda: BinaryTotalistic(False, 4))
@@ -1463,11 +1774,19 @@ def assert_hostile_validation() -> None:
 
     expect_raises(
         ValueError,
-        lambda: CAProgram(alphabet, OffsetNeighborhood(ORTHOGONAL_2D), projection_rule(3, 4, 0)),
+        lambda: CAProgram(
+            alphabet,
+            make_local_access(ORTHOGONAL_2D, 2),
+            projection_rule(3, 4, 0),
+        ),
     )
     expect_raises(
         ValueError,
-        lambda: CAProgram(alphabet, OffsetNeighborhood(ORTHOGONAL_2D), projection_rule(2, 3, 0)),
+        lambda: CAProgram(
+            alphabet,
+            make_local_access(ORTHOGONAL_2D, 2),
+            projection_rule(2, 3, 0),
+        ),
     )
 
     program = strict_t21_program(projection_rule(2, 4, 1))

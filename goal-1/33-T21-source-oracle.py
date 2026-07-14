@@ -552,11 +552,135 @@ def main() -> int:
     print("split_manifest", "OK" if split_manifest_ok else "MISMATCH",
           len(split_paths), digest_records(relative_paths), digest_records(manifest))
 
+    compiled_queries = {
+        name: re.compile(pattern, re.I) for name, pattern in QUERIES.items()
+    }
+    monolith_query_text = {at(n) for n in union}
+    split_records: set[str] = set()
+    split_exact_records: set[str] = set()
+    split_nonexact_records: set[str] = set()
+    split_record_text: dict[str, str] = {}
+    split_texts: set[str] = set()
+    split_lines: list[tuple[str, str]] = []
+    split_direct_counts: dict[str, int] = {}
+    for path, relative in zip(split_paths, relative_paths, strict=True):
+        split_document = path.read_text(encoding="utf-8")
+        direct_count = len(DIRECT_NAME_STREAM_RX.findall(split_document))
+        if direct_count:
+            split_direct_counts[relative] = direct_count
+        for line_no, line in enumerate(split_document.splitlines(), 1):
+            record = f"{relative}:{line_no}"
+            split_record_text[record] = line
+            split_texts.add(line)
+            split_lines.append((record, normalized_line(line)))
+            if not any(rx.search(line) for rx in compiled_queries.values()):
+                continue
+            split_records.add(record)
+            if line in monolith_query_text:
+                split_exact_records.add(record)
+            else:
+                split_nonexact_records.add(record)
+
+    query_mapping_records = {
+        f"{record}->{','.join(map(str, targets))}"
+        for record, targets in SPLIT_NONEXACT_QUERY_WITNESSES.items()
+    }
+    query_reverse_overlap = True
+    for record, targets in SPLIT_NONEXACT_QUERY_WITNESSES.items():
+        split_tokens = set(normalized_line(split_record_text[record]).split())
+        for target in targets:
+            mono_tokens = set(normalized_line(at(target)).split())
+            smaller = min(len(split_tokens), len(mono_tokens))
+            query_reverse_overlap &= (
+                target in union
+                and smaller > 0
+                and len(split_tokens & mono_tokens) / smaller >= 0.50
+            )
+    direct_count_records = {
+        f"{path}:{count}" for path, count in split_direct_counts.items()
+    }
+    split_query_ok = (
+        (len(split_records), digest_records(split_records))
+        == EXPECTED_SPLIT_QUERY_RECORDS
+        and (len(split_exact_records), digest_records(split_exact_records))
+        == EXPECTED_SPLIT_EXACT_QUERY_RECORDS
+        and split_nonexact_records == set(SPLIT_NONEXACT_QUERY_WITNESSES)
+        and digest_records(split_nonexact_records)
+        == EXPECTED_SPLIT_NONEXACT_QUERY_DIGEST
+        and digest_records(query_mapping_records)
+        == EXPECTED_SPLIT_QUERY_MAPPING_DIGEST
+        and split_direct_counts == EXPECTED_SPLIT_DIRECT_COUNTS
+        and sum(split_direct_counts.values()) == 133
+        and digest_records(direct_count_records)
+        == EXPECTED_SPLIT_DIRECT_COUNTS_DIGEST
+        and query_reverse_overlap
+    )
+    ok &= split_query_ok
+    print(
+        "split_query_reverse_join",
+        "OK" if split_query_ok else "MISMATCH",
+        len(split_records),
+        len(split_exact_records),
+        len(split_nonexact_records),
+        digest_records(split_records),
+    )
+
+    exact_retained = {n for n in RETAINED if at(n) in split_texts}
+    nonexact_retained = set(RETAINED) - exact_retained
+    retained_mapping: dict[int, str] = dict(MANUAL_RETAINED_WITNESSES)
+    auto_join_ok = True
+    for line_no in sorted(
+        nonexact_retained - MONOLITH_ONLY_RETAINED - set(MANUAL_RETAINED_WITNESSES)
+    ):
+        canonical = normalized_line(at(line_no))
+        matches = [
+            record
+            for record, split_normalized in split_lines
+            if len(canonical) >= 12
+            and (canonical in split_normalized or split_normalized in canonical)
+            and min(len(canonical), len(split_normalized))
+            / max(len(canonical), len(split_normalized))
+            > 0.45
+        ]
+        auto_join_ok &= len(matches) == 1
+        if len(matches) == 1:
+            retained_mapping[line_no] = matches[0]
+
+    retained_mapping_records = {
+        f"{line_no}->{record}" for line_no, record in retained_mapping.items()
+    }
+    retained_witness_records = set(retained_mapping.values())
+    split_retained_ok = (
+        (len(exact_retained), digest(exact_retained))
+        == EXPECTED_EXACT_RETAINED_MIRRORS
+        and (len(nonexact_retained), digest(nonexact_retained))
+        == EXPECTED_SPLIT_NONEXACT_RETAINED
+        and MONOLITH_ONLY_RETAINED == nonexact_retained - set(retained_mapping)
+        and digest(MONOLITH_ONLY_RETAINED) == EXPECTED_MONOLITH_ONLY_DIGEST
+        and len(retained_mapping) == EXPECTED_RETAINED_MAPPING_COUNT
+        and digest_records(retained_mapping_records)
+        == EXPECTED_RETAINED_MAPPING_DIGEST
+        and digest_records(retained_witness_records)
+        == EXPECTED_RETAINED_WITNESS_DIGEST
+        and retained_witness_records <= set(split_record_text)
+        and at(670) not in split_texts
+        and at(672) not in split_texts
+        and auto_join_ok
+    )
+    ok &= split_retained_ok
+    print(
+        "split_retained_reverse_join",
+        "OK" if split_retained_ok else "MISMATCH",
+        len(exact_retained),
+        len(nonexact_retained),
+        len(retained_mapping),
+        digest_records(retained_mapping_records),
+    )
+
     atlas_lines = ATLAS.read_text(encoding="utf-8").splitlines()
-    compiled = [re.compile(pattern, re.I) for pattern in QUERIES.values()]
     atlas_hits = {
         n for n, line in enumerate(atlas_lines, 1)
-        if any(rx.search(line) for rx in compiled)
+        if any(rx.search(line) for rx in compiled_queries.values())
     }
     atlas_retained = atlas_hits | {13}
     atlas_ok = (
