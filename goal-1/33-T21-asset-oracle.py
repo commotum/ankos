@@ -57,8 +57,8 @@ def load_source_oracle():
 
 SOURCE = load_source_oracle()
 S = set(SOURCE.RETAINED)
-EXPECTED_SOURCE_COUNT = 312
-EXPECTED_SOURCE_DIGEST = "50caf57ebaa912d54ca50df2ec22ebcd418d2b898fbe03414de0af282e9fa60d"
+EXPECTED_SOURCE_COUNT = 338
+EXPECTED_SOURCE_DIGEST = "b6e1ac355e48891cf644372ba96271e6fcb637dcc15d9212e118612b0e82e227"
 assert len(S) == EXPECTED_SOURCE_COUNT
 assert SOURCE.digest(S) == EXPECTED_SOURCE_DIGEST
 
@@ -394,15 +394,17 @@ trace_942 = center_conditioned_trace(942, 29)
 assert tuple(len(trace_942[label - 1][1]) for label in CODE_942_PANEL_LABELS) == CODE_942_LIVE_COUNTS
 
 # Odd gallery codes invert the otherwise uniform background on odd events;
-# the even 22/44-event plates return it to white.  This complete-state fact is
-# why a white raster crop must not be mistaken for a permanently white native
-# background or an in-place finite-array boundary.
+# the even 22/44-event labels therefore imply a white background at the shown
+# horizons.  This proves only the exterior/background fact, not replay of any
+# gallery pixels.  It is why a white raster crop must not be mistaken for a
+# permanently white native background or an in-place finite-array boundary.
 assert center_conditioned_trace(451, 1)[1][0] == 1
 assert center_conditioned_trace(451, 2)[2][0] == 0
 assert all(center_conditioned_trace(code, 22)[-1][0] == 0 for code in CARDINAL_GALLERY_22_CODES)
 assert all(center_conditioned_trace(code, 44)[-1][0] == 0 for code in CARDINAL_GALLERY_44_CODES)
 
-# Six-case convention and white-background filter.
+# Six-case convention and white-background filter.  No random-gallery state is
+# replayed: the source does not serialize the required random initial state.
 assert tuple(equal_sum_output(52, total) for total in range(6)) == (0, 0, 1, 0, 1, 1)
 assert all(equal_sum_output(code, 0) == 0 for code in SUM_500_CODES)
 
@@ -608,6 +610,75 @@ for line_number, fragment in guards.items():
     assert fragment in lines[line_number - 1], (line_number, fragment)
 
 
+# This ledger freezes the human-reviewed label transcription without pretending
+# that the JPEGs provide executable configurations.  Each row includes the
+# governing Book line (and its text hash), the referenced physical asset (and
+# its independently checked byte hash), and the exact tuple transcribed from
+# that asset.  Only the code-1022/code-942 rows are replayable from text: their
+# captions supply both the complete rule predicate and the one-cell seed.
+FIXTURE_TRANSCRIPT_SPECS = (
+    (
+        "code1022_panel_checkpoints",
+        2176,
+        2178,
+        (CODE_1022_PANEL_LABELS, CODE_1022_LIVE_COUNTS),
+    ),
+    (
+        "code942_panel_checkpoints",
+        2182,
+        2184,
+        (CODE_942_PANEL_LABELS, CODE_942_LIVE_COUNTS),
+    ),
+    ("cardinal_gallery_22_code_labels", 2192, 2194, CARDINAL_GALLERY_22_CODES),
+    ("cardinal_gallery_44_code_labels", 2196, 2198, CARDINAL_GALLERY_44_CODES),
+    ("cardinal_slice_code_labels", 2200, 2202, CARDINAL_SLICE_CODES),
+    (
+        "equal_sum_random_gallery_labels",
+        2920,
+        2922,
+        (SUM_GALLERY_CODES, SUM_GALLERY_CHECKPOINT_LABELS),
+    ),
+    ("equal_sum_500_code_labels", 2924, 2926, SUM_500_CODES),
+    ("equal_sum_slice_code_labels", 2928, 2930, SUM_SLICE_CODES),
+    *(
+        (f"growth_cardinal_counts_{asset_line}", asset_line, 13563, counts)
+        for asset_line, counts in zip(
+            (13565, 13567, 13569, 13571, 13573),
+            GROWTH_CARDINAL_COUNTS,
+            strict=True,
+        )
+    ),
+    ("code942_slice_offset_labels", 13577, 13575, CODE_942_SLICE_OFFSETS),
+)
+
+
+def fixture_transcript_payload() -> str:
+    rows: list[str] = []
+    names: set[str] = set()
+    for name, asset_line, source_line, values in FIXTURE_TRANSCRIPT_SPECS:
+        assert name not in names
+        names.add(name)
+        assert asset_line in STRICT_U
+        assert asset_line in HASH_BOUND_NATIVE
+        assert source_line in S
+        asset_digest = HASH_BOUND_NATIVE[asset_line][3]
+        source_digest = hashlib.sha256(lines[source_line - 1].encode("utf-8")).hexdigest()
+        rows.append(
+            f"{name}|asset={asset_line}|asset_sha256={asset_digest}|"
+            f"source={source_line}|source_sha256={source_digest}|values={values!r}"
+        )
+    assert len(rows) == 14
+    return "\n".join(rows) + "\n"
+
+
+FIXTURE_TRANSCRIPT_PAYLOAD = fixture_transcript_payload()
+FIXTURE_TRANSCRIPT_SHA256 = hashlib.sha256(
+    FIXTURE_TRANSCRIPT_PAYLOAD.encode("utf-8")
+).hexdigest()
+EXPECTED_FIXTURE_TRANSCRIPT_SHA256 = "861b62b711faa82a7aee2d80a25921928b47c509f15e2c4d33bd8d18d5f10eba"
+assert FIXTURE_TRANSCRIPT_SHA256 == EXPECTED_FIXTURE_TRANSCRIPT_SHA256
+
+
 EXPECTED_STRICT_UNIVERSE_SHA256 = "3da48eb699bfb93323502ae28d549cc718b4a897d5475f2509881219b00ef19b"
 EXPECTED_STRICT_LEDGER_SHA256 = "5f28624e0329f6f9c189e521b3849183a5a0174990e8badb371a6a0b354c743d"
 EXPECTED_GOVERNED_UNIVERSE_SHA256 = "6506db2a360d66442ec6d810b2ad32754724854a29a92cb4a176f753d59083f9"
@@ -656,7 +727,13 @@ def main() -> None:
         f"T21 asset oracle: PASS source={len(S)}; C4=113; governed=53; adjacency_only=60; "
         "governed C10/C6/O/R/X22/X23/X24=10/2/4/12/14/8/3; "
         "adjacency typed/property/other=30/5/25; refs=226; unique_hashes=113; "
-        "codes1022/942_steps=PASS; cardinal_22/44=PASS; equal_sum_1/2/5/100/500=PASS; "
+        f"transcript_records={len(FIXTURE_TRANSCRIPT_SPECS)}; "
+        f"transcript_sha256={FIXTURE_TRANSCRIPT_SHA256}; "
+        "transcriptions=HASH_BOUND_NOT_PIXEL_REPLAYED; "
+        "codes1022/942_text_seed_count_checkpoints=PASS; "
+        "cardinal_gallery_background_at_22/44_only=PASS; "
+        "equal_sum_schema/quiescence_only=PASS; "
+        "random_gallery_replay=UNAVAILABLE(no_serialized_PRNG/seed/crop/boundary); "
         "page_offset=PASS; Notes/actual_Index_reverse=PASS"
     )
 

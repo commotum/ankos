@@ -2050,8 +2050,14 @@ DECISION_MATRIX: tuple[tuple[str, str, str, str], ...] = (
     (
         "DOMAIN",
         "parameterization",
-        "DiscreteLattice(d=2)",
-        "square Z^2 support; finite boxes are explicit realizations",
+        "DiscreteSpace(dimension=2)",
+        "the task/program space is discrete t+2D; support is not DOMAIN",
+    ),
+    (
+        "CONFIGURATION",
+        "parameterization",
+        "FixedLattice(SquareGrid(Z^2), FiniteAlphabet)",
+        "total fixed support/topology with one closed label per site",
     ),
     (
         "ALPHABET",
@@ -2073,9 +2079,9 @@ DECISION_MATRIX: tuple[tuple[str, str, str, str], ...] = (
     ),
     (
         "RULE",
-        "preset/restriction",
-        "ClosedLocalMap",
-        "general, totalistic, and outer-totalistic tables share one schema",
+        "restriction/lossless representation",
+        "SchemaTaggedClosedLocalMap",
+        "distinct 32-context, Self x count, and equal-sum schemas; compact forms factor only qualifying exhaustive maps",
     ),
     (
         "UPDATE",
@@ -2084,27 +2090,36 @@ DECISION_MATRIX: tuple[tuple[str, str, str, str], ...] = (
         "all reads use one old snapshot; exactly one write per active site",
     ),
     (
-        "BOUNDARY",
+        "SEED",
+        "direct reuse",
+        "IndependentValidatedConfiguration",
+        "event-zero state is separate from immutable program identity",
+    ),
+    (
+        "REALIZATION",
         "realization parameter",
-        "PeriodicOrFixedFiniteGrid",
-        "never inferred as native Z^2 semantics",
+        "FiniteGrid(boundary, axis_map, work_extent)",
+        "periodic quotient, fixed exterior, causal work, and viewport never define native Z^2 semantics",
     ),
 )
 
 
 def assert_decision_matrix() -> None:
-    assert len(DECISION_MATRIX) == 7
+    assert len(DECISION_MATRIX) == 9
     assert tuple(row[0] for row in DECISION_MATRIX) == (
         "DOMAIN",
+        "CONFIGURATION",
         "ALPHABET",
         "FRONTIER",
         "NEIGHBORHOOD",
         "RULE",
         "UPDATE",
-        "BOUNDARY",
+        "SEED",
+        "REALIZATION",
     )
     assert DECISION_MATRIX[0][1] == "parameterization"
-    assert DECISION_MATRIX[5][1] == "direct reuse"
+    assert DECISION_MATRIX[6][1] == "direct reuse"
+    assert "lossless representation" in DECISION_MATRIX[5][1]
     assert all("executor" not in row[2].lower() for row in DECISION_MATRIX)
 
 
@@ -2170,7 +2185,7 @@ def main() -> None:
     print("dimension_agnostic_t1D_t2D_t3D=PASS")
     print("T22_moore_boundary=PASS; no_family_executor=PASS")
     print("exact_type_validation=PASS; opaque_snapshot_identity=PASS")
-    print("proposed_D127=dimension/neighborhood parameterization of generic CA preset")
+    print("proposed_D127=configuration/neighborhood parameterization + lossless RULE representations")
     print("counterexample=NONE; new_shared_axis=NONE")
 
 

@@ -664,6 +664,21 @@ def main() -> int:
             else:
                 split_nonexact_records.add(record)
 
+    seed_realization_split_ok = (
+        set(SEED_REALIZATION_SPLIT_MIRRORS)
+        == set(SEED_REALIZATION_CONTINUATIONS)
+        and all(
+            split_record_text.get(record) == at(line_no)
+            for line_no, record in SEED_REALIZATION_SPLIT_MIRRORS.items()
+        )
+    )
+    ok &= seed_realization_split_ok
+    print(
+        "seed_realization_split_mirrors",
+        "OK" if seed_realization_split_ok else "MISMATCH",
+        len(SEED_REALIZATION_SPLIT_MIRRORS),
+    )
+
     query_mapping_records = {
         f"{record}->{','.join(map(str, targets))}"
         for record, targets in SPLIT_NONEXACT_QUERY_WITNESSES.items()
