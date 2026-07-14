@@ -197,7 +197,7 @@ This makes the prose/code relation inspectable rather than a family convention:
 - The rule “stay unchanged except become black at count 3” sets every odd bit and bit `6`: `174762 + 64 = 174826`.
 - Code `746` sets both count-3 bits `6,7` and the old-black bits for counts `0,1,2,4`, namely `1,3,5,9`: `64+128+2+8+32+512 = 746`. Thus count 3 becomes black, counts 0/1/2/4 retain self, and counts 5 through 8 become white.
 - Life `B3/S23` sets the white-center birth bit `6` and the black-center survival bits `5,7`: `64+32+128 = 224`. The named Life program is therefore an ordinary value in the same 18-case schema.
-- Printed totalistic code `3702` uses the fixed ten-digit source width, so the three high radix blocks are noncanonical spelling only: `3702 = 3*1024 + 630`. Canonical code `630` has black outputs at all-nine sums `1,2,4,5,6,9`; its complete table, not the raw printed integer, is program identity.
+- Printed totalistic code `3702` uses the fixed ten-digit source width, so the high quotient `3` (two excess high bits) is noncanonical spelling only: `3702 = 3*1024 + 630`. Canonical code `630` has black outputs at all-nine sums `1,2,4,5,6,9`; its complete table, not the raw printed integer, is program identity.
 
 The semantic oracle derives these values independently and rejects swapped center/count significance, digit reversal, a hidden-center convention, and accidental agreement on symmetric fixtures.
 

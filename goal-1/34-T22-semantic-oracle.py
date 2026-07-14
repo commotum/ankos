@@ -368,6 +368,54 @@ class BinaryTotalistic:
         return (self.code >> (read.center + sum(read.neighbors))) & 1
 
 
+@dataclass(frozen=True)
+class LabelEquals:
+    """Closed typed predicate descriptor, never an executor callback."""
+
+    label: int
+
+    def __post_init__(self) -> None:
+        label = require_int(self.label, "predicate label")
+        if label < 0:
+            raise ValueError("predicate label must be nonnegative")
+
+    def matches(self, value: int) -> bool:
+        return require_int(value, "predicate input") == self.label
+
+
+@dataclass(frozen=True)
+class PredicateCountLookup:
+    """Output table indexed by (Self, count(neighbor satisfying predicate))."""
+
+    alphabet_size: int
+    neighbor_slots: int
+    predicate: LabelEquals
+    outputs: tuple[tuple[int, ...], ...]
+
+    def __post_init__(self) -> None:
+        alphabet = FiniteAlphabet(self.alphabet_size)
+        slots = require_int(self.neighbor_slots, "predicate-count neighbor slots")
+        if slots <= 0:
+            raise ValueError("predicate-count neighbor slots must be positive")
+        if type(self.predicate) is not LabelEquals:
+            raise TypeError("predicate must be a closed LabelEquals descriptor")
+        alphabet.check(self.predicate.label, "predicate label")
+        raw_outputs = require_tuple(self.outputs, "predicate-count outputs")
+        if len(raw_outputs) != alphabet.size:
+            raise ValueError("predicate-count table has the wrong Self arity")
+        for raw_row in raw_outputs:
+            row = require_tuple(raw_row, "predicate-count output row")
+            if len(row) != slots + 1:
+                raise ValueError("predicate-count output row is incomplete")
+            for output in row:
+                alphabet.check(output, "predicate-count output")
+
+    def evaluate(self, read: LocalRead) -> int:
+        validate_read(read, self.alphabet_size, self.neighbor_slots)
+        match_count = sum(self.predicate.matches(value) for value in read.neighbors)
+        return self.outputs[read.center][match_count]
+
+
 def full_total_product_case_count(dimension: int, alphabet_size: int) -> int:
     """BOOK:13475-13481 count for Self + k*FullTotal profiles."""
 
@@ -440,7 +488,13 @@ class GeneralLookup:
         return self.outputs[index]
 
 
-Rule = BinaryOuterTotalistic | BinaryTotalistic | FullTotalProduct | GeneralLookup
+Rule = (
+    BinaryOuterTotalistic
+    | BinaryTotalistic
+    | PredicateCountLookup
+    | FullTotalProduct
+    | GeneralLookup
+)
 
 CASE_ZERO_IS_LEAST_SIGNIFICANT = "case-0-is-least-significant"
 
@@ -504,6 +558,39 @@ def projection_rule(alphabet_size: int, slots: int, selected: int) -> GeneralLoo
         for context in product(range(alphabet.size), repeat=count + 1)
     )
     return GeneralLookup(alphabet.size, count, outputs)
+
+
+def wireworld_rule() -> PredicateCountLookup:
+    """Source table with neighbor predicate label == electron-head label 1."""
+
+    return PredicateCountLookup(
+        alphabet_size=4,
+        neighbor_slots=8,
+        predicate=LabelEquals(1),
+        outputs=(
+            (0,) * 9,
+            (2,) * 9,
+            (3,) * 9,
+            (3, 1, 1, 3, 3, 3, 3, 3, 3),
+        ),
+    )
+
+
+def dyadaxes_2d_summary(read: LocalRead) -> tuple[int, bool, bool]:
+    """Current lossy channels: Self and two strict-majority gate bits."""
+
+    validate_read(read, 2, 8)
+    cardinal_count = sum(
+        value
+        for offset, value in zip(MOORE_OFFSETS, read.neighbors, strict=True)
+        if abs(offset[0]) + abs(offset[1]) == 1
+    )
+    diagonal_count = sum(
+        value
+        for offset, value in zip(MOORE_OFFSETS, read.neighbors, strict=True)
+        if abs(offset[0]) + abs(offset[1]) == 2
+    )
+    return (read.center, cardinal_count > 2, diagonal_count > 2)
 
 
 def book_nine_context(read: LocalRead) -> tuple[int, ...]:
@@ -831,6 +918,7 @@ class CAProgram:
         if type(self.rule) not in (
             BinaryOuterTotalistic,
             BinaryTotalistic,
+            PredicateCountLookup,
             FullTotalProduct,
             GeneralLookup,
         ):
@@ -1171,6 +1259,44 @@ def native_full_total_product_step(
         old.boundary,
         tuple(values),
     )
+
+
+def native_wireworld_local(book_context: tuple[int, ...]) -> int:
+    """Independent literal source transition over one raw Book context."""
+
+    raw = require_tuple(book_context, "native WireWorld context")
+    if len(raw) != 9:
+        raise ValueError("native WireWorld context must have nine positions")
+    for value in raw:
+        if type(value) is not int:
+            raise TypeError("native WireWorld context values must be exact ints")
+        if value < 0 or value >= 4:
+            raise ValueError("native WireWorld context value is outside range(4)")
+    center = raw[4]
+    head_count = sum(value == 1 for value in (*raw[:4], *raw[5:]))
+    if center == 0:
+        return 0
+    if center == 1:
+        return 2
+    if center == 2:
+        return 3
+    assert center == 3
+    return 1 if head_count in (1, 2) else 3
+
+
+def native_wireworld_step(old: Native2DState) -> Native2DState:
+    """Independent literal row-major WireWorld evaluator."""
+
+    if type(old) is not Native2DState:
+        raise TypeError("native WireWorld state must be Native2DState")
+    if old.alphabet_size != 4:
+        raise ValueError("native WireWorld requires four cell labels")
+    values = tuple(
+        native_wireworld_local(native_book_context(old, row, column))
+        for row in range(old.shape[0])
+        for column in range(old.shape[1])
+    )
+    return Native2DState(4, old.shape, old.boundary, values)
 
 
 def native_projection_step(position: int, old: Native2DState) -> Native2DState:
@@ -1532,6 +1658,73 @@ def assert_printed_code_provenance() -> dict[str, int]:
         "width": spelling.width,
         "radix": spelling.radix,
         "high_quotient": spelling.printed // (spelling.radix**spelling.width),
+    }
+
+
+def assert_wireworld_predicate_count() -> dict[str, int]:
+    """Close all 4^9 local contexts against an independent literal rule."""
+
+    rule = wireworld_rule()
+    assert rule.alphabet_size == 4 and rule.neighbor_slots == 8
+    assert rule.predicate == LabelEquals(1)
+    assert rule.outputs == (
+        (0,) * 9,
+        (2,) * 9,
+        (3,) * 9,
+        (3, 1, 1, 3, 3, 3, 3, 3, 3),
+    )
+    fiber_counts: dict[tuple[int, int], int] = {}
+    local_contexts = 0
+    for context in product(range(4), repeat=9):
+        neighbors = context[:4] + context[5:]
+        read = LocalRead(context[4], neighbors)
+        head_count = sum(value == 1 for value in neighbors)
+        expected = native_wireworld_local(context)
+        assert rule.evaluate(read) == expected
+        key = (read.center, head_count)
+        fiber_counts[key] = fiber_counts.get(key, 0) + 1
+        local_contexts += 1
+    assert local_contexts == 4**9 == 262_144
+    assert len(fiber_counts) == 4 * 9 == 36
+    assert all(
+        fiber_counts[(center, count)] == comb(8, count) * 3 ** (8 - count)
+        for center in range(4)
+        for count in range(9)
+    )
+
+    # Equal numeric sums can have different typed predicate counts and outputs.
+    two_heads = LocalRead(3, (1, 1, 0, 0, 0, 0, 0, 0))
+    one_tail = LocalRead(3, (2, 0, 0, 0, 0, 0, 0, 0))
+    assert sum(two_heads.neighbors) == sum(one_tail.neighbors) == 2
+    assert sum(value == 1 for value in two_heads.neighbors) == 2
+    assert sum(value == 1 for value in one_tail.neighbors) == 0
+    assert (rule.evaluate(two_heads), rule.evaluate(one_tail)) == (1, 3)
+
+    return {
+        "local_contexts": local_contexts,
+        "predicate_fibers": len(fiber_counts),
+        "numeric_sum_collisions": 1,
+    }
+
+
+def assert_dyadaxes_lossy_summary() -> dict[str, int]:
+    """Exhibit a Moore distinction erased by the current channel summary."""
+
+    empty = LocalRead(0, (0,) * 8)
+    three_neighbors = LocalRead(0, (1, 1, 0, 1, 0, 0, 0, 0))
+    assert len(empty.neighbors) == len(three_neighbors.neighbors) == len(MOORE_OFFSETS)
+    assert sum(empty.neighbors) == 0
+    assert sum(three_neighbors.neighbors) == 3
+    assert dyadaxes_2d_summary(empty) == dyadaxes_2d_summary(three_neighbors)
+    assert dyadaxes_2d_summary(empty) == (0, False, False)
+
+    named = BinaryOuterTotalistic(174826, 8)
+    assert (named.evaluate(empty), named.evaluate(three_neighbors)) == (0, 1)
+    return {
+        "counterexamples": 1,
+        "first_moore_count": sum(empty.neighbors),
+        "second_moore_count": sum(three_neighbors.neighbors),
+        "distinct_required_outputs": 2,
     }
 
 
@@ -1909,6 +2102,7 @@ def assert_native_generic_commutation() -> dict[str, int]:
         "general_basis": 0,
         "directional": 0,
         "named": 0,
+        "wireworld": 0,
         "ternary_projection": 0,
         "ternary_full_total": 0,
     }
@@ -2008,6 +2202,34 @@ def assert_native_generic_commutation() -> dict[str, int]:
     ) == direct
     counts["named"] += 1
 
+    wireworld_cells = [0] * 25
+    for coord, value in (
+        ((2, 1), 1),
+        ((1, 1), 2),
+        ((2, 2), 3),
+        ((2, 3), 3),
+        ((4, 4), 3),
+    ):
+        wireworld_cells[flat_index((5, 5), coord)] = value
+    native = Native2DState(
+        4,
+        (5, 5),
+        FixedBoundary(0),
+        tuple(wireworld_cells),
+    )
+    direct = native_wireworld_step(native)
+    assert tuple(
+        direct.value_at(*coord)
+        for coord in ((2, 1), (1, 1), (2, 2), (2, 3), (4, 4))
+    ) == (2, 3, 1, 3, 3)
+    assert decode_generic(
+        generic_step(
+            strict_t22_program(wireworld_rule()),
+            encode_native(native),
+        )
+    ) == direct
+    counts["wireworld"] += 1
+
     ternary_program = strict_t22_program(book_position_projection(8, alphabet_size=3))
     for cells in product(range(3), repeat=4):
         native = Native2DState(3, (2, 2), periodic, cells)
@@ -2036,6 +2258,7 @@ def assert_native_generic_commutation() -> dict[str, int]:
         "general_basis": 514,
         "directional": 225,
         "named": 5,
+        "wireworld": 1,
         "ternary_projection": 81,
         "ternary_full_total": 81,
     }
@@ -2214,6 +2437,51 @@ def assert_hostile_validation() -> None:
     expect_raises(TypeError, lambda: BinaryTotalistic(False, 8))
     expect_raises(ValueError, lambda: BinaryTotalistic(1 << 10, 8))
     expect_raises(ValueError, lambda: BinaryTotalistic(3702, 8))
+    expect_raises(TypeError, lambda: LabelEquals(True))
+    expect_raises(ValueError, lambda: LabelEquals(-1))
+    expect_raises(TypeError, lambda: LabelEquals(1).matches(False))
+    expect_raises(
+        TypeError,
+        lambda: PredicateCountLookup(4, 8, object(), ((0,) * 9,) * 4),
+    )
+    expect_raises(
+        ValueError,
+        lambda: PredicateCountLookup(4, 8, LabelEquals(4), ((0,) * 9,) * 4),
+    )
+    expect_raises(
+        ValueError,
+        lambda: PredicateCountLookup(4, 8, LabelEquals(1), ((0,) * 9,) * 3),
+    )
+    expect_raises(
+        ValueError,
+        lambda: PredicateCountLookup(4, 8, LabelEquals(1), ((0,) * 8,) * 4),
+    )
+    expect_raises(
+        TypeError,
+        lambda: PredicateCountLookup(
+            4,
+            8,
+            LabelEquals(1),
+            ((0,) * 9, (0,) * 9, (0,) * 9, (*((0,) * 8), False)),
+        ),
+    )
+    expect_raises(
+        ValueError,
+        lambda: wireworld_rule().evaluate(LocalRead(3, (1,) * 7)),
+    )
+    expect_raises(
+        ValueError,
+        lambda: wireworld_rule().evaluate(LocalRead(4, (1,) * 8)),
+    )
+    expect_raises(TypeError, lambda: native_wireworld_local([0] * 9))
+    expect_raises(ValueError, lambda: native_wireworld_local((0,) * 8))
+    expect_raises(
+        TypeError,
+        lambda: native_wireworld_local((*((0,) * 8), False)),
+    )
+    expect_raises(ValueError, lambda: native_wireworld_local((*((0,) * 8), 4)))
+    expect_raises(ValueError, lambda: dyadaxes_2d_summary(LocalRead(0, (0,) * 7)))
+    expect_raises(ValueError, lambda: dyadaxes_2d_summary(LocalRead(2, (0,) * 8)))
     expect_raises(
         TypeError,
         lambda: PrintedCodeProvenance(
