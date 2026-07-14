@@ -43,6 +43,7 @@ VALUE_SCHEMA = "exact_real_denotation"
 BRANCH_CONVENTIONS = "positive_principal_real"
 POSITIONAL_SCOPE = "fractional_coefficients_after_radix"
 POSITIONAL_CANONICAL_TAIL = "terminating_zero_tail"
+POSITIONAL_SIGN_CONVENTION = "leading_minus_magnitude"
 CF_CANONICAL_TERMINAL = "last_coefficient_gt_one_unless_singleton"
 FINITE_TERMINATED = "finite_terminated"
 PREFIX_OF_INFINITE = "prefix_of_infinite"
@@ -64,6 +65,7 @@ SOURCE_CLAIMS = (
     ("BOOK:12972-12976", "finite digit evidence does not prove randomness or base-specific normality"),
     ("BOOK:13030-13060", "continued-fraction coefficients arise from reciprocal fractional-part iteration"),
     ("BOOK:13052-13074", "continued-fraction coefficients are unbounded"),
+    ("BOOK:12587-12589", "simple-CF a0 is floor(h), hence signed, while every tail coefficient is positive"),
 )
 
 
@@ -84,7 +86,9 @@ GOAL2_DELTA = (
     "Add pure positional/simple-CF queries and keep exact, certified, partial, resource, unsupported, unknown, approximate, probable, and failure results distinct.",
     "Use exact rationals, arbitrary-precision integers, algebraic nodes, and certified rational enclosures; never float digits.",
     "Canonical positional rationals use the terminating zero tail rather than an eventual all-(base-1) dual.",
+    "Keep a leading positional minus sign separate from unsigned magnitude digits and bind that convention in the representation key.",
     "Canonical finite simple continued fractions use a final coefficient greater than one except for a singleton.",
+    "Simple continued fractions use a signed integer a0 and strictly positive tail coefficients.",
     "Treat coefficient prefixes as immutable indexed result payloads, not T37 state, End loci, append writes, or rollout time.",
     "Expose optional work algorithms with complete visible work and explicit provenance only when their traces are requested.",
     "Restrict the Book r>s square-root procedure to integer-safe input; label r>=s+1 as the rational repair.",
@@ -98,6 +102,7 @@ T42_HANDOFF_CONTRACT = (
     "producer=T40_representation_query",
     "payload=immutable_indexed_simple_CF_coefficients",
     "accepted_strength=complete_exact_or_complete_certified",
+    "coefficient_domain=a0_signed_integer_and_positive_tail",
     "consumer=T42_substitution_schedule",
     "forbidden=lazy_hidden_coefficient_evaluator_or_partial_prefix",
 )
@@ -201,7 +206,7 @@ class RationalLiteral:
     denominator: int
 
     def __post_init__(self) -> None:
-        numerator = checked_nonnegative(self.numerator, "rational numerator")
+        numerator = exact_int(self.numerator, "rational numerator")
         denominator = checked_positive(self.denominator, "rational denominator")
         object.__setattr__(self, "numerator", numerator)
         object.__setattr__(self, "denominator", denominator)
@@ -232,8 +237,27 @@ class SquareRoot:
         object.__setattr__(self, "radicand", radicand)
 
 
-ClosedNumericExpr: TypeAlias = RationalLiteral | PiConstant | EulerConstant | SquareRoot
-CLOSED_EXPR_TYPES = (RationalLiteral, PiConstant, EulerConstant, SquareRoot)
+@dataclass(frozen=True)
+class NegatedSquareRoot:
+    radicand: int
+
+    def __post_init__(self) -> None:
+        radicand = checked_positive(self.radicand, "negated square-root radicand")
+        if isqrt(radicand) ** 2 == radicand:
+            raise ValueError("strict negated quadratic-surd node requires a nonsquare radicand")
+        object.__setattr__(self, "radicand", radicand)
+
+
+ClosedNumericExpr: TypeAlias = (
+    RationalLiteral | PiConstant | EulerConstant | SquareRoot | NegatedSquareRoot
+)
+CLOSED_EXPR_TYPES = (
+    RationalLiteral,
+    PiConstant,
+    EulerConstant,
+    SquareRoot,
+    NegatedSquareRoot,
+)
 
 
 def checked_closed_expr(value: object) -> ClosedNumericExpr:
@@ -266,13 +290,15 @@ class MathematicalDenotationSpec:
 def expression_key(expression: object) -> tuple[object, ...]:
     node = checked_closed_expr(expression)
     if type(node) is RationalLiteral:
-        return ("RationalLiteral/v1", str(node.numerator), str(node.denominator))
+        return ("RationalLiteral/v2", str(node.numerator), str(node.denominator))
     if type(node) is PiConstant:
         return ("PiConstant/v1",)
     if type(node) is EulerConstant:
         return ("EulerConstant/v1",)
     if type(node) is SquareRoot:
         return ("SquareRoot/v1", str(node.radicand))
+    if type(node) is NegatedSquareRoot:
+        return ("NegatedSquareRoot/v1", str(node.radicand))
     raise TypeError("unreachable numeric expression")
 
 
@@ -315,6 +341,7 @@ class PositionalDigits:
     base: int
     coefficient_scope: str = POSITIONAL_SCOPE
     canonical_tail: str = POSITIONAL_CANONICAL_TAIL
+    sign_convention: str = POSITIONAL_SIGN_CONVENTION
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "base", checked_base(self.base))
@@ -322,6 +349,8 @@ class PositionalDigits:
             raise ValueError("unknown positional coefficient scope")
         if exact_str(self.canonical_tail, "canonical tail") != POSITIONAL_CANONICAL_TAIL:
             raise ValueError("positional rationals require a terminating zero tail")
+        if exact_str(self.sign_convention, "positional sign convention") != POSITIONAL_SIGN_CONVENTION:
+            raise ValueError("unknown positional sign convention")
 
 
 @dataclass(frozen=True)
@@ -397,10 +426,11 @@ def representation_key(spec: object) -> tuple[object, ...]:
     representation = checked_representation(spec)
     if type(representation) is PositionalDigits:
         return (
-            "PositionalDigits/v1",
+            "PositionalDigits/v2",
             str(representation.base),
             representation.coefficient_scope,
             representation.canonical_tail,
+            representation.sign_convention,
         )
     return ("SimpleContinuedFraction/v1", representation.canonical_terminal)
 
@@ -484,7 +514,7 @@ class MachinCertificate:
         if type(self.interval) is not RationalInterval:
             raise TypeError("Machin certificate requires a rational interval")
         key = exact_tuple(self.representation_key, "certificate representation key")
-        if not key or key[0] not in ("PositionalDigits/v1", "SimpleContinuedFraction/v1"):
+        if not key or key[0] not in ("PositionalDigits/v2", "SimpleContinuedFraction/v1"):
             raise ValueError("malformed certificate representation key")
         integers = exact_tuple(self.integer_digits, "certificate integer digits")
         coefficients = exact_tuple(self.certified_coefficients, "certified coefficients")
@@ -598,7 +628,7 @@ class Probable:
         if not candidates:
             raise ValueError("probable result requires candidate coefficients")
         for candidate in candidates:
-            checked_nonnegative(candidate, "probable candidate coefficient")
+            exact_int(candidate, "probable candidate coefficient")
         if not exact_str(self.confidence_basis, "probable confidence basis"):
             raise ValueError("probable confidence basis cannot be empty")
         probability = exact_fraction(
@@ -664,6 +694,7 @@ class ExpansionResult:
     start_index: int
     coefficients: tuple[int, ...]
     integer_digits: tuple[int, ...]
+    sign: int | None
     outcome: QueryOutcome
     termination: str
 
@@ -694,13 +725,24 @@ class ExpansionResult:
             checked_digit_tuple(integers, base, "result integer digits")
             if type(self.outcome) in (CompleteExact, CompleteCertified, Partial) and not integers:
                 raise ValueError("completed positional results require integer digits")
+            if type(self.outcome) in (CompleteExact, CompleteCertified, Partial):
+                sign = exact_int(self.sign, "positional result sign")
+                if sign not in (-1, 1):
+                    raise ValueError("positional result sign must be -1 or 1")
+            else:
+                if self.sign is not None:
+                    raise ValueError("non-authoritative positional results cannot assert a sign")
+                sign = None
         else:
             if integers:
                 raise ValueError("continued-fraction results have no positional integer field")
+            if self.sign is not None:
+                raise ValueError("continued fractions carry sign in a0, not a separate sign field")
+            sign = None
             for offset, value in enumerate(coefficients):
                 coefficient = exact_int(value, "continued-fraction coefficient")
                 absolute_index = start + offset
-                if coefficient < 0 or (absolute_index > 0 and coefficient < 1):
+                if absolute_index > 0 and coefficient < 1:
                     raise ValueError("invalid simple continued-fraction coefficient")
         target = (
             self.query.selection.count
@@ -753,7 +795,7 @@ class ExpansionResult:
                     else self.query.selection.index
                 )
                 for offset, candidate in enumerate(candidates):
-                    if candidate < 0 or (candidate_start + offset > 0 and candidate < 1):
+                    if candidate_start + offset > 0 and candidate < 1:
                         raise ValueError("invalid probable simple-CF candidate")
             expected_candidates = target
             if len(candidates) != expected_candidates:
@@ -779,12 +821,15 @@ class ExpansionResult:
                     raise ValueError("certificate does not cover random-access coefficient")
             if integers != certificate.integer_digits:
                 raise ValueError("certificate integer digits do not match the result")
+            if type(self.query.representation) is PositionalDigits and sign != 1:
+                raise ValueError("Machin positional certificates require a positive sign")
         if type(self.outcome) is CompleteExact:
             expected = expected_exact_components(self.query, self.context)
             actual = (
                 start,
                 coefficients,
                 integers,
+                sign,
                 termination,
                 self.outcome.derivation,
             )
@@ -801,6 +846,7 @@ class ExpansionResult:
         object.__setattr__(self, "start_index", start)
         object.__setattr__(self, "coefficients", coefficients)
         object.__setattr__(self, "integer_digits", integers)
+        object.__setattr__(self, "sign", sign)
 
 
 def encode_nonnegative_integer(value: object, base: object) -> tuple[int, ...]:
@@ -841,6 +887,7 @@ class RationalPositionalExpansion:
     integer_digits: tuple[int, ...]
     nonrepeating: tuple[int, ...]
     period: tuple[int, ...]
+    sign: int = 1
 
     def __post_init__(self) -> None:
         base = checked_base(self.base)
@@ -857,6 +904,11 @@ class RationalPositionalExpansion:
             raise ValueError("repeating block must be primitive")
         if period and all(digit == base - 1 for digit in period):
             raise ValueError("eventual all-(base-1) dual is not canonical")
+        sign = exact_int(self.sign, "positional expansion sign")
+        if sign not in (-1, 1):
+            raise ValueError("positional expansion sign must be -1 or 1")
+        if sign == -1 and not any(integers + nonrepeating + period):
+            raise ValueError("zero has no negative canonical positional expansion")
         object.__setattr__(self, "base", base)
         object.__setattr__(self, "integer_digits", integers)
         object.__setattr__(self, "nonrepeating", nonrepeating)
@@ -878,6 +930,7 @@ def raw_positional_value(
     nonrepeating: object,
     period: object,
     base: object,
+    sign: object,
 ) -> Fraction:
     radix = checked_base(base)
     integers = checked_digit_tuple(integer_digits, radix, "raw integer digits")
@@ -893,15 +946,20 @@ def raw_positional_value(
             decode_digits(repeating, radix),
             radix ** len(finite) * (radix ** len(repeating) - 1),
         )
-    return value
+    direction = exact_int(sign, "raw positional sign")
+    if direction not in (-1, 1):
+        raise ValueError("raw positional sign must be -1 or 1")
+    if direction == -1 and value == 0:
+        raise ValueError("zero has no negative canonical positional spelling")
+    return direction * value
 
 
 def rational_positional_expansion(value: object, base: object) -> RationalPositionalExpansion:
     rational = exact_fraction(value, "rational value")
-    if rational < 0:
-        raise ValueError("strict oracle positional profile is nonnegative")
     radix = checked_base(base)
-    whole, remainder = divmod(rational.numerator, rational.denominator)
+    sign = -1 if rational < 0 else 1
+    magnitude = abs(rational)
+    whole, remainder = divmod(magnitude.numerator, magnitude.denominator)
     integer_digits = encode_nonnegative_integer(whole, radix)
     digits: list[int] = []
     seen: dict[int, int] = {}
@@ -918,12 +976,19 @@ def rational_positional_expansion(value: object, base: object) -> RationalPositi
         split = seen[remainder]
         nonrepeating = tuple(digits[:split])
         period = tuple(digits[split:])
-    expansion = RationalPositionalExpansion(radix, integer_digits, nonrepeating, period)
+    expansion = RationalPositionalExpansion(
+        radix,
+        integer_digits,
+        nonrepeating,
+        period,
+        sign,
+    )
     if raw_positional_value(
         expansion.integer_digits,
         expansion.nonrepeating,
         expansion.period,
         radix,
+        expansion.sign,
     ) != rational:
         raise ArithmeticError("rational positional expansion did not round-trip")
     return expansion
@@ -939,7 +1004,7 @@ class CanonicalContinuedFraction:
         if not coefficients:
             raise ValueError("continued fraction cannot be empty")
         checked = tuple(exact_int(value, "continued-fraction coefficient") for value in coefficients)
-        if checked[0] < 0 or any(value < 1 for value in checked[1:]):
+        if any(value < 1 for value in checked[1:]):
             raise ValueError("invalid simple continued-fraction coefficients")
         if type(self.terminated) is not bool:
             raise TypeError("terminated must be an exact bool")
@@ -953,7 +1018,7 @@ def continued_fraction_value(coefficients: object) -> Fraction:
     if not raw:
         raise ValueError("continued fraction cannot be empty")
     values = tuple(exact_int(value, "continued-fraction coefficient") for value in raw)
-    if values[0] < 0 or any(value < 1 for value in values[1:]):
+    if any(value < 1 for value in values[1:]):
         raise ValueError("invalid simple continued fraction")
     result = Fraction(values[-1], 1)
     for coefficient in reversed(values[:-1]):
@@ -963,8 +1028,6 @@ def continued_fraction_value(coefficients: object) -> Fraction:
 
 def rational_continued_fraction(value: object) -> CanonicalContinuedFraction:
     current = exact_fraction(value, "rational value")
-    if current < 0:
-        raise ValueError("strict oracle CF profile is nonnegative")
     coefficients: list[int] = []
     while True:
         coefficient = current.numerator // current.denominator
@@ -984,6 +1047,7 @@ class PositionalCylinder:
     base: int
     integer_digits: tuple[int, ...]
     prefix: tuple[int, ...]
+    sign: int
     lower: Fraction
     upper: Fraction
 
@@ -991,33 +1055,50 @@ class PositionalCylinder:
         base = checked_base(self.base)
         integers = checked_digit_tuple(self.integer_digits, base, "cylinder integer digits")
         prefix = checked_digit_tuple(self.prefix, base, "cylinder prefix")
+        sign = exact_int(self.sign, "positional cylinder sign")
+        if sign not in (-1, 1):
+            raise ValueError("positional cylinder sign must be -1 or 1")
         lower = exact_fraction(self.lower, "cylinder lower")
         upper = exact_fraction(self.upper, "cylinder upper")
         scale = base ** len(prefix)
-        expected = Fraction(decode_digits(integers, base) * scale + (decode_digits(prefix, base) if prefix else 0), scale)
-        if lower != expected or upper != expected + Fraction(1, scale):
+        magnitude = Fraction(decode_digits(integers, base) * scale + (decode_digits(prefix, base) if prefix else 0), scale)
+        if sign == 1:
+            expected_lower, expected_upper = magnitude, magnitude + Fraction(1, scale)
+        else:
+            expected_lower, expected_upper = -(magnitude + Fraction(1, scale)), -magnitude
+        if lower != expected_lower or upper != expected_upper:
             raise ValueError("positional cylinder endpoints do not match prefix")
         object.__setattr__(self, "base", base)
 
     def contains(self, value: object) -> bool:
         rational = exact_fraction(value, "cylinder probe")
-        return self.lower <= rational < self.upper
+        if self.sign == 1:
+            return self.lower <= rational < self.upper
+        return self.lower < rational <= self.upper and rational < 0
 
 
 def positional_cylinder(
     integer_digits: object,
     prefix: object,
     base: object,
+    sign: object,
 ) -> PositionalCylinder:
     radix = checked_base(base)
     integers = checked_digit_tuple(integer_digits, radix, "integer digits")
     digits = checked_digit_tuple(prefix, radix, "prefix")
     scale = radix ** len(digits)
-    lower = Fraction(
+    direction = exact_int(sign, "positional cylinder sign")
+    if direction not in (-1, 1):
+        raise ValueError("positional cylinder sign must be -1 or 1")
+    magnitude = Fraction(
         decode_digits(integers, radix) * scale + (decode_digits(digits, radix) if digits else 0),
         scale,
     )
-    return PositionalCylinder(radix, integers, digits, lower, lower + Fraction(1, scale))
+    if direction == 1:
+        lower, upper = magnitude, magnitude + Fraction(1, scale)
+    else:
+        lower, upper = -(magnitude + Fraction(1, scale)), -magnitude
+    return PositionalCylinder(radix, integers, digits, direction, lower, upper)
 
 
 def convergent_pair(coefficients: object) -> tuple[int, int, int, int]:
@@ -1028,7 +1109,7 @@ def convergent_pair(coefficients: object) -> tuple[int, int, int, int]:
     q_minus_two, q_minus_one = 1, 0
     for index, value in enumerate(raw):
         coefficient = exact_int(value, "continued-fraction coefficient")
-        if coefficient < 0 or (index > 0 and coefficient < 1):
+        if index > 0 and coefficient < 1:
             raise ValueError("invalid simple continued-fraction prefix")
         p = coefficient * p_minus_one + p_minus_two
         q = coefficient * q_minus_one + q_minus_two
@@ -1149,7 +1230,7 @@ def verify_machin_certificate(certificate: object) -> bool:
         if certificate.interval != machin_pi_interval(certificate.terms):
             return False
         key = certificate.representation_key
-        if key[0] == "PositionalDigits/v1":
+        if key[0] == "PositionalDigits/v2":
             base = int(key[1])
             integers, coefficients = certified_positional_prefix(
                 certificate.interval,
@@ -1198,6 +1279,25 @@ def sqrt_cf_prefix(radicand: object, count: object) -> tuple[int, ...]:
         return ()
     a0, period = sqrt_cf_period(radicand)
     return (a0,) + tuple(period[(index - 1) % len(period)] for index in range(1, requested))
+
+
+def negated_sqrt_cf_prefix(radicand: object, count: object) -> tuple[int, ...]:
+    """Return the canonical prefix of -sqrt(radicand) with signed a0."""
+
+    requested = checked_nonnegative(count, "negated square-root CF count")
+    if requested == 0:
+        return ()
+    positive = sqrt_cf_prefix(radicand, requested + 2)
+    leading = -positive[0] - 1
+    if requested == 1:
+        return (leading,)
+    if positive[1] == 1:
+        transformed = (leading, positive[2] + 1) + positive[3:]
+    else:
+        transformed = (leading, 1, positive[1] - 1) + positive[2:]
+    result = transformed[:requested]
+    CanonicalContinuedFraction(result, False)
+    return result
 
 
 def e_cf_coefficient(index: object) -> int:
@@ -1254,7 +1354,7 @@ def select_coefficients(full_prefix: tuple[int, ...], selection: Selection) -> t
 def expected_exact_components(
     query: object,
     context: object,
-) -> tuple[int, tuple[int, ...], tuple[int, ...], str, str]:
+) -> tuple[int, tuple[int, ...], tuple[int, ...], int | None, str, str]:
     if type(query) is not RepresentationQuery or type(context) is not EvaluationContext:
         raise TypeError("exact component validation requires a query and context")
     if context.method != EXACT_METHOD:
@@ -1266,36 +1366,47 @@ def expected_exact_components(
         expansion = rational_positional_expansion(expression.value, representation.base)
         full = expansion.prefix(target)
         integers = expansion.integer_digits
+        sign: int | None = expansion.sign
         termination = FINITE_TERMINATED if not expansion.period else PREFIX_OF_INFINITE
-        derivation = "exact_long_division_denotation"
+        derivation = "exact_signed_magnitude_long_division_denotation"
     elif type(expression) is RationalLiteral and type(representation) is SimpleContinuedFraction:
         expansion = rational_continued_fraction(expression.value)
         full = expansion.coefficients[:target]
         integers = ()
+        sign = None
         termination = FINITE_TERMINATED
         derivation = "exact_euclidean_continued_fraction"
     elif type(expression) is SquareRoot and type(representation) is SimpleContinuedFraction:
         full = sqrt_cf_prefix(expression.radicand, target)
         integers = ()
+        sign = None
         termination = PREFIX_OF_INFINITE
         derivation = "exact_quadratic_surd_period"
+    elif type(expression) is NegatedSquareRoot and type(representation) is SimpleContinuedFraction:
+        full = negated_sqrt_cf_prefix(expression.radicand, target)
+        integers = ()
+        sign = None
+        termination = PREFIX_OF_INFINITE
+        derivation = "exact_negated_quadratic_surd_period"
     elif type(expression) is SquareRoot and type(representation) is PositionalDigits:
         if representation.base != 2 or expression.radicand not in (2, 3):
             raise ValueError("direct exact square-root positional preset is normalized base two")
         all_bits = direct_sqrt_bits(Fraction(expression.radicand, 1), target + 1)
         full = all_bits[1:]
         integers = (1,)
+        sign = 1
         termination = PREFIX_OF_INFINITE
         derivation = "exact_integer_square_comparison"
     elif type(expression) is EulerConstant and type(representation) is SimpleContinuedFraction:
         full = e_cf_prefix(target)
         integers = ()
+        sign = None
         termination = PREFIX_OF_INFINITE
         derivation = "Euler_simple_CF_pattern"
     else:
         raise ValueError("unsupported exact result profile")
     start, selected = select_coefficients(full, query.selection)
-    return start, selected, integers, termination, derivation
+    return start, selected, integers, sign, termination, derivation
 
 
 def exact_result(
@@ -1303,6 +1414,7 @@ def exact_result(
     context: EvaluationContext,
     full_prefix: tuple[int, ...],
     integer_digits: tuple[int, ...],
+    sign: int | None,
     termination: str,
     derivation: str,
 ) -> ExpansionResult:
@@ -1314,6 +1426,7 @@ def exact_result(
         start,
         selected,
         integer_digits,
+        sign,
         CompleteExact(derivation),
         termination,
     )
@@ -1335,8 +1448,9 @@ def evaluate_exact_query(
             context,
             expansion.prefix(target),
             expansion.integer_digits,
+            expansion.sign,
             FINITE_TERMINATED if not expansion.period else PREFIX_OF_INFINITE,
-            "exact_long_division_denotation",
+            "exact_signed_magnitude_long_division_denotation",
         )
     if type(expression) is RationalLiteral and type(representation) is SimpleContinuedFraction:
         expansion = rational_continued_fraction(expression.value)
@@ -1345,6 +1459,7 @@ def evaluate_exact_query(
             context,
             expansion.coefficients[:target],
             (),
+            None,
             FINITE_TERMINATED,
             "exact_euclidean_continued_fraction",
         )
@@ -1354,8 +1469,19 @@ def evaluate_exact_query(
             context,
             sqrt_cf_prefix(expression.radicand, target),
             (),
+            None,
             PREFIX_OF_INFINITE,
             "exact_quadratic_surd_period",
+        )
+    if type(expression) is NegatedSquareRoot and type(representation) is SimpleContinuedFraction:
+        return exact_result(
+            query,
+            context,
+            negated_sqrt_cf_prefix(expression.radicand, target),
+            (),
+            None,
+            PREFIX_OF_INFINITE,
+            "exact_negated_quadratic_surd_period",
         )
     if type(expression) is SquareRoot and type(representation) is PositionalDigits:
         if representation.base != 2 or expression.radicand not in (2, 3):
@@ -1366,6 +1492,7 @@ def evaluate_exact_query(
             context,
             all_bits[1:],
             (1,),
+            1,
             PREFIX_OF_INFINITE,
             "exact_integer_square_comparison",
         )
@@ -1375,6 +1502,7 @@ def evaluate_exact_query(
             context,
             e_cf_prefix(target),
             (),
+            None,
             PREFIX_OF_INFINITE,
             "Euler_simple_CF_pattern",
         )
@@ -1398,6 +1526,7 @@ def evaluate_pi_query(
             0 if type(query.selection) is Prefix else query.selection.index,
             (),
             (),
+            None,
             ResourceLimit("Machin_terms", 0, target),
             PREFIX_OF_INFINITE,
         )
@@ -1425,10 +1554,12 @@ def evaluate_pi_query(
         start, selected = select_coefficients(certified, query.selection)
         outcome: QueryOutcome = CompleteCertified(certificate)
         result_integers = integers
+        result_sign = 1 if type(query.representation) is PositionalDigits else None
     elif type(query.selection) is Prefix and completed > 0:
         start, selected = 0, certified
         outcome = Partial(completed, target, "Machin term budget exhausted", certificate)
         result_integers = integers
+        result_sign = 1 if type(query.representation) is PositionalDigits else None
     else:
         return ExpansionResult(
             query,
@@ -1437,6 +1568,7 @@ def evaluate_pi_query(
             0 if type(query.selection) is Prefix else query.selection.index,
             (),
             (),
+            None,
             ResourceLimit("Machin_terms", context.term_budget, target),
             PREFIX_OF_INFINITE,
         )
@@ -1447,6 +1579,7 @@ def evaluate_pi_query(
         start,
         selected,
         result_integers,
+        result_sign,
         outcome,
         PREFIX_OF_INFINITE,
     )
@@ -1483,6 +1616,8 @@ def profile_is_supported(query: RepresentationQuery, context: EvaluationContext)
             and representation.base == 2
             and expression.radicand in (2, 3)
         )
+    if type(expression) is NegatedSquareRoot:
+        return type(representation) is SimpleContinuedFraction
     if type(expression) is EulerConstant:
         return type(representation) is SimpleContinuedFraction
     return False
@@ -1507,6 +1642,7 @@ def non_authoritative_result(
         start,
         (),
         (),
+        None,
         outcome,
         UNKNOWN_TERMINATION,
     )
@@ -1592,7 +1728,7 @@ class LongDivisionWork:
         if remainder >= self.source.denominator:
             raise ValueError("long-division remainder must be below denominator")
         emitted = checked_digit_tuple(self.emitted, base, "long-division emitted digits")
-        expected = self.source.numerator % self.source.denominator
+        expected = abs(self.source.numerator) % self.source.denominator
         replayed: list[int] = []
         for _ in emitted:
             digit, expected = divmod(expected * base, self.source.denominator)
@@ -1608,7 +1744,7 @@ def begin_long_division(source: object, base: object) -> LongDivisionWork:
     if type(source) is not RationalLiteral:
         raise TypeError("long-division source must be RationalLiteral")
     radix = checked_base(base)
-    return LongDivisionWork(source, radix, source.numerator % source.denominator, ())
+    return LongDivisionWork(source, radix, abs(source.numerator) % source.denominator, ())
 
 
 def long_division_next(work: object) -> LongDivisionWork:
@@ -1709,12 +1845,10 @@ class GaussMapWork:
             raise TypeError("Gauss source must be RationalLiteral")
         if self.current is not None:
             exact_fraction(self.current, "Gauss current value")
-            if self.current < 0:
-                raise ValueError("Gauss current value must be nonnegative")
         coefficients = exact_tuple(self.coefficients, "Gauss coefficients")
         for index, coefficient in enumerate(coefficients):
             value = exact_int(coefficient, "Gauss coefficient")
-            if value < 0 or (index > 0 and value < 1):
+            if index > 0 and value < 1:
                 raise ValueError("invalid Gauss coefficient")
         expected: Fraction | None = self.source.value
         replayed: list[int] = []
@@ -1764,7 +1898,7 @@ class T42CoefficientInput:
             raise ValueError("T42 coefficient input cannot be empty")
         for index, coefficient in enumerate(coefficients):
             value = exact_int(coefficient, "T42 coefficient")
-            if value < 0 or (index > 0 and value < 1):
+            if index > 0 and value < 1:
                 raise ValueError("invalid T42 simple-CF coefficient")
         strength = exact_str(self.proof_strength, "T42 proof strength")
         if strength not in ("complete_exact", "complete_certified"):
@@ -1782,6 +1916,7 @@ def result_key(result: object) -> tuple[object, ...]:
         str(result.start_index),
         tuple(str(value) for value in result.coefficients),
         tuple(str(value) for value in result.integer_digits),
+        None if result.sign is None else str(result.sign),
         outcome_name,
         result.termination,
     )
@@ -1966,6 +2101,10 @@ def sqrt_spec(radicand: object) -> MathematicalDenotationSpec:
     return MathematicalDenotationSpec(SquareRoot(radicand))
 
 
+def negated_sqrt_spec(radicand: object) -> MathematicalDenotationSpec:
+    return MathematicalDenotationSpec(NegatedSquareRoot(radicand))
+
+
 def exact_context() -> EvaluationContext:
     return EvaluationContext(EXACT_METHOD, 0)
 
@@ -1980,39 +2119,42 @@ def reported_context() -> EvaluationContext:
 
 def audit_rational_positional_and_duals() -> tuple[int, int, int, int, int]:
     cases = (
-        (Fraction(3, 8), 10, (0,), (3, 7, 5), ()),
-        (Fraction(1, 3), 10, (0,), (), (3,)),
-        (Fraction(1, 7), 10, (0,), (), (1, 4, 2, 8, 5, 7)),
-        (Fraction(1, 6), 10, (0,), (1,), (6,)),
-        (Fraction(1, 81), 10, (0,), (), (0, 1, 2, 3, 4, 5, 6, 7, 9)),
-        (Fraction(1, 3), 2, (0,), (), (0, 1)),
-        (Fraction(1, 7), 2, (0,), (), (0, 0, 1)),
-        (Fraction(3, 8), 2, (0,), (0, 1, 1), ()),
+        (Fraction(3, 8), 10, (0,), (3, 7, 5), (), 1),
+        (Fraction(1, 3), 10, (0,), (), (3,), 1),
+        (Fraction(1, 7), 10, (0,), (), (1, 4, 2, 8, 5, 7), 1),
+        (Fraction(1, 6), 10, (0,), (1,), (6,), 1),
+        (Fraction(1, 81), 10, (0,), (), (0, 1, 2, 3, 4, 5, 6, 7, 9), 1),
+        (Fraction(1, 3), 2, (0,), (), (0, 1), 1),
+        (Fraction(1, 7), 2, (0,), (), (0, 0, 1), 1),
+        (Fraction(3, 8), 2, (0,), (0, 1, 1), (), 1),
+        (Fraction(-7, 3), 10, (2,), (), (3,), -1),
     )
     roundtrips = 0
     prefix_checks = 0
     total_period = 0
     terminating = 0
-    for value, base, integer_digits, nonrepeating, period in cases:
+    for value, base, integer_digits, nonrepeating, period, sign in cases:
         expansion = rational_positional_expansion(value, base)
         assert expansion.integer_digits == integer_digits
         assert expansion.nonrepeating == nonrepeating
         assert expansion.period == period
-        assert raw_positional_value(integer_digits, nonrepeating, period, base) == value
+        assert expansion.sign == sign
+        assert raw_positional_value(integer_digits, nonrepeating, period, base, sign) == value
+        assert all(digit >= 0 for digit in integer_digits + nonrepeating + period)
         roundtrips += 1
         total_period += len(period)
         terminating += not period
         for count in range(25):
             prefix = expansion.prefix(count)
-            cylinder = positional_cylinder(integer_digits, prefix, base)
+            cylinder = positional_cylinder(integer_digits, prefix, base, sign)
             assert cylinder.contains(value)
             prefix_checks += 1
 
-    terminating_half = raw_positional_value((0,), (5,), (), 10)
-    repeating_dual = raw_positional_value((0,), (4,), (9,), 10)
+    terminating_half = raw_positional_value((0,), (5,), (), 10, 1)
+    repeating_dual = raw_positional_value((0,), (4,), (9,), 10, 1)
     assert terminating_half == repeating_dual == Fraction(1, 2)
     canonical_half = rational_positional_expansion(Fraction(1, 2), 10)
-    assert canonical_half == RationalPositionalExpansion(10, (0,), (5,), ())
+    assert canonical_half == RationalPositionalExpansion(10, (0,), (5,), (), 1)
 
     canonical_cf = rational_continued_fraction(Fraction(1, 2))
     assert canonical_cf.coefficients == (0, 2)
@@ -2027,6 +2169,7 @@ def audit_long_division_realization() -> tuple[int, int, int, int]:
         (RationalLiteral(1, 6), 10, 40),
         (RationalLiteral(3, 8), 2, 30),
         (RationalLiteral(22, 7), 10, 45),
+        (RationalLiteral(-7, 3), 10, 35),
         (RationalLiteral(2**130 + 17, 2**67 + 9), 16, 55),
     )
     one_step_commutations = 0
@@ -2046,7 +2189,7 @@ def audit_long_division_realization() -> tuple[int, int, int, int]:
             assert work.emitted[-1] == expected_digit
             assert work.remainder == expected_remainder
             direct_value = (
-                (source.numerator % source.denominator) * base ** (index + 1)
+                (abs(source.numerator) % source.denominator) * base ** (index + 1)
             ) // source.denominator
             assert work.emitted == fixed_width_digits(direct_value, base, index + 1)
             one_step_commutations += 1
@@ -2120,11 +2263,11 @@ def audit_pi_certification() -> tuple[int, int, int, int, int, int, int]:
         assert verify_result(result)
         assert verify_machin_certificate(result.outcome.certificate)
 
-    decimal_cylinder = positional_cylinder((3,), decimal.coefficients, 10)
+    decimal_cylinder = positional_cylinder((3,), decimal.coefficients, 10, 1)
     decimal_interval = decimal.outcome.certificate.interval
     assert decimal_cylinder.lower <= decimal_interval.lower
     assert decimal_interval.upper < decimal_cylinder.upper
-    binary_cylinder = positional_cylinder((1, 1), binary.coefficients, 2)
+    binary_cylinder = positional_cylinder((1, 1), binary.coefficients, 2, 1)
     binary_interval = binary.outcome.certificate.interval
     assert binary_cylinder.lower <= binary_interval.lower
     assert binary_interval.upper < binary_cylinder.upper
@@ -2148,7 +2291,7 @@ def audit_pi_certification() -> tuple[int, int, int, int, int, int, int]:
     )
 
 
-def audit_exact_cf_families() -> tuple[int, int, int, int, int]:
+def audit_exact_cf_families() -> tuple[int, int, int, int, int, int]:
     expected_periods = {
         2: (1, (2,)),
         3: (1, (1, 2)),
@@ -2187,7 +2330,28 @@ def audit_exact_cf_families() -> tuple[int, int, int, int, int]:
     e_result = evaluate_query(e_query, context)
     assert e_result.coefficients == e_cf_prefix(120)
     assert type(e_result.outcome) is CompleteExact and verify_result(e_result)
-    return period_checks, prefix_checks, maximum_period, len(expected_e), len(e_result.coefficients)
+
+    negative_query = RepresentationQuery(
+        negated_sqrt_spec(2),
+        SimpleContinuedFraction(),
+        Prefix(80),
+    )
+    negative_result = evaluate_query(negative_query, context)
+    expected_negative = (-2, 1, 1) + (2,) * 77
+    assert negative_result.coefficients == expected_negative
+    assert negative_result.coefficients == negated_sqrt_cf_prefix(2, 80)
+    assert type(negative_result.outcome) is CompleteExact and verify_result(negative_result)
+    assert negative_result.coefficients[0] < 0
+    assert all(coefficient > 0 for coefficient in negative_result.coefficients[1:])
+    signed_prefix_checks = len(negative_result.coefficients)
+    return (
+        period_checks,
+        prefix_checks,
+        maximum_period,
+        len(expected_e),
+        len(e_result.coefficients),
+        signed_prefix_checks,
+    )
 
 
 def audit_sqrt_digit_realization() -> tuple[int, int, int, int, int, int, int]:
@@ -2320,7 +2484,7 @@ def audit_prefix_random_access_consistency() -> tuple[int, int, int, int]:
 def audit_finite_prefix_lossiness_and_cylinders() -> tuple[int, int, int, int, int]:
     half = Fraction(1, 2)
     fifty_five_hundredths = Fraction(11, 20)
-    cylinder = positional_cylinder((0,), (5,), 10)
+    cylinder = positional_cylinder((0,), (5,), 10, 1)
     assert cylinder.contains(half)
     assert cylinder.contains(fifty_five_hundredths)
     assert half != fifty_five_hundredths
@@ -2347,7 +2511,7 @@ def audit_finite_prefix_lossiness_and_cylinders() -> tuple[int, int, int, int, i
 
     half_exact = rational_positional_expansion(half, 10)
     assert half_exact.prefix(40) == (5,) + (0,) * 39
-    assert raw_positional_value((0,), (4,), (9,), 10) == half
+    assert raw_positional_value((0,), (4,), (9,), 10, 1) == half
     canonical_dual_resolution = 1
     assert continued_fraction_value((0, 2)) == continued_fraction_value((0, 1, 1))
     cf_dual_resolution = 1

@@ -476,7 +476,7 @@ Only `x=0` overlaps for these irrational coefficients; it is a double tangent ze
 c_n = floor((n+1)*r) - floor(n*r) in {0,1}.
 ```
 
-T41 owns that exact count query. T40 owns the continued-fraction expansion/coefficient query for `r`. T42 consumes the finalized coefficients or an explicit coefficient source, interprets `c_n` as a black/white word, and generates it through substitutions. The sine-sum bridge uses the source-stated half-shift:
+T41 owns that exact count query. T40 owns the continued-fraction expansion/coefficient query for `r`. T42 consumes the finalized coefficients or an explicit coefficient source and generates the black/white word beginning with `c_1`; an observer that wants the `n=0` origin prepends the separately known `c_0=0` for `0<r<1`. The sine-sum bridge uses the source-stated half-shift:
 
 ```text
 floor((n+1)*r - 1/2) - floor(n*r - 1/2).
@@ -491,7 +491,7 @@ The continued-fraction anchors are:
 | `2+cuberoot(5)` | `0.575369381363576556...` | `[0;1,1,2,1,4,2,...]` |
 | `1+sqrt(e)` | `0.451862761877606044...` | `[0;2,4,1,2,3,...]` |
 
-The raster shows substitution steps bottom-to-top and coefficients alongside them top-to-bottom in reverse visible order. It prints no numeric x window; substitution-aligned pixel geometry cannot safely reconstruct one.
+The displayed forward substitutions run top-to-bottom: each rule icon maps its upper source cell to the lower replacement block, and the word rows become finer below. The coefficient labels are therefore the finalized continued-fraction tail in reverse execution order; reading them bottom-to-top recovers natural coefficient order. The raster prints no numeric x window, and its first Fold word aligns with interval count `c_1`, not `c_0`, so substitution-aligned pixel geometry cannot safely reconstruct either the x window or an implicit index origin.
 
 ### Page 163 Riemann-Siegel curve
 
