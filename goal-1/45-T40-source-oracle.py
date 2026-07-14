@@ -11,8 +11,8 @@ are realizations of the denotation, not hidden executor state or T40's identity.
 The Book does not use the catalog label.  Twenty bounded, redundant query
 lanes freeze discovery witnesses, while independent fixed universes close all
 117 nonblank rows in the strict main section and all 897 nonblank rows in the
-canonical physical Index block.  A separate 108-row vocabulary scan and a
-65-row hostile page/vocabulary/continuation review must have no unexplained
+canonical physical Index block.  A separate 114-row vocabulary scan and a
+70-row hostile page/vocabulary/continuation review must have no unexplained
 match.  The chapter split is intentionally treated as an abridged summary:
 compressed tables and omitted mechanics are explicit split dispositions
 rather than silently invented matches.
@@ -771,7 +771,7 @@ SOURCE_SEMANTIC_GUARDS = (
     ),
     ("trigonometric_source_observer", 1848, ("adding together various sine functions", "ultimately repetitive", "chords"), ()),
     ("cf_substitution_interrupted_claim", 1852, ("square root", "purely repetitive"), ("generated pattern nested",)),
-    ("cf_substitution_completion", 1858, ("generated pattern nested", "no particular connection"), ()),
+    ("cf_substitution_completion", 1858, ("generated pattern nested", "no longer seems to be any particular connection"), ()),
     (
         "page560_encoding_context",
         6766,
@@ -863,7 +863,8 @@ SOURCE_SEMANTIC_GUARDS = (
     ),
     ("substitution_digit_automaton", 12194, ("Connections with digit sequences", "substitution system", "successive digits"), ()),
     ("substitution_digit_automaton_rule", 12198, ("finite automaton", "digit sequences in base k", "nested structure"), ()),
-    ("fibonacci_position_codec", 12204, ("generalize the notion of digit sequences", "base k", "Fibonacci"), ()),
+    ("fibonacci_position_codec", 12204, ("generalize the notion of digit sequences", "base k", "construct numbers according to"), ()),
+    ("fibonacci_position_codec_completion", 12206, ("Fibonacci", "representation is unique", "last digit"), ()),
     ("fibonacci_position_uniqueness", 12206, ("representation is unique", "adjacent 1's", "substitution system"), ()),
     ("symbolic_dynamics_boundary", 12528, ("symbolic dynamics approach", "digit sequence approach", "digit expansions"), ()),
     ("symbolic_dynamics_scope", 12530, ("only shifts", "simple operations", "not been seen"), ()),
@@ -970,9 +971,9 @@ SOURCE_SEMANTIC_GUARDS = (
     ("negative_base_locality", 17851, ("locality in negative bases", "k = -6", "four neighboring cells"), ()),
     ("power_ca_behavior", 17853, ("class 3 systems", "small changes in initial conditions"), ()),
     ("particular_power_digit_cost", 17863, ("particular digit", "t Log[t]^2", "base k"), ()),
-    ("base_conversion_cost", 17865, ("particular base k digit", "converting to base k", "takes about t divisions"), ()),
+    ("base_conversion_cost", 17865, ("particular base k digit", "converting to base k", "takes about", "divisions"), ()),
     ("single_power_digit_boundary", 17874, ("single digit", "no way", "all the other digits"), ()),
-    ("power_algorithm_context", 17855, ("Computing powers", "repeated squaring", "IntegerDigits"), ()),
+    ("power_algorithm_context", 17855, ("Computing powers", "repeated squaring", "building up the sequence"), ()),
     ("bit_carrier_pluralism", 18211, ("bits of data", "represent information of absolutely any kind", "Numbers"), ()),
     ("multicolor_encoding_context", 18339, ("More colors", "three colors", "two colors"), ()),
     ("fibonacci_block_encoding", 18348, ("coding theory", "digit sequences", "Fibonacci number system"), ()),
@@ -992,7 +993,7 @@ SOURCE_SEMANTIC_GUARDS = (
     ("oracle_initial_condition_boundary", 19086, ("absolutely any digit sequence", "table for an oracle", "must address"), ()),
     ("constructible_real_boundary", 19087, ("Constructible reals", "successive digits", "mechanical processes"), ()),
     ("constructible_real_completion", 19089, ("robotics", "algebraic numbers", "degree 4"), ()),
-    ("precision_resource_boundary", 19185, ("n-digit numbers", "pi", "n-digit precision", "bit operations"), ()),
+    ("precision_resource_boundary", 19185, ("two *n*-digit numbers", "pi", "n-digit precision", "bit operations"), ()),
     ("iterative_precision_resource", 19187, ("iterative procedure", "Log[n] steps", "n digits", "NIntegrate"), ()),
     ("bit_extraction_evaluator", 19194, ("extracts the digit", "base 2 digit sequence"), ()),
     ("short_computation_context", 19190, ("Short computations", "Some properties include"), ()),
@@ -1351,8 +1352,8 @@ EXPECTED_IMAGE_ASSET_MANIFEST = (
     "4685ebad9a58b1cc8082b4a03118ad1bcd1780706bceba2bf29184cd8df05b10",
 )
 EXPECTED_SOURCE_SEMANTIC_GUARDS = (
-    139,
-    "53d520ca9e8891eb17387fcfb24ffcaa5b0065f65789c3bf3d333147699ae478",
+    140,
+    "29d4a9af09bf70a5fdd46b3925d022ee811922f84741a713c2de67260700631f",
 )
 EXPECTED_SOURCE_DEFECT_GUARDS = (
     30,
@@ -1417,7 +1418,7 @@ EXPECTED_LOGIC_RECORDS = (
     7,
     "d525310251895f506ca06d964ba736dd53ab659e07fed14d7fbe5422b1648754",
 )
-EXPECTED_AUDIT_DIGEST = "7bd67422250b13fa3077614e4e0637eb6bc2237627140dc8192961900b31ae9c"
+EXPECTED_AUDIT_DIGEST = "5eeb98409dc44e07284e142355054d9dde66e7566fde4c9f36e35c0642840623"
 
 
 IMAGE_PARTITION = {

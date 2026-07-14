@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """Fail-closed asset/provenance audit for T40 constant representations.
 
-The closed T40 image universe contains three main-section JPEGs, twenty-one
-native-Notes JPEGs, and five explicitly followed representation-relation JPEGs.
-Every file is bound to its sole monolith reference, optional
-split-Markdown reference, physical path, byte length, JPEG dimensions, and
-SHA-256 digest.  The split omits exactly the page-154 long-division link and
-the page-156 square-root link even though both physical files exist.
+The closed T40 image universe contains fifty-three governed JPEGs and ten
+explicitly excluded sibling JPEGs.  Every candidate is bound to its sole
+monolith reference, optional split-Markdown reference, physical path, byte
+length, JPEG dimensions, and SHA-256 digest.  The split omits exactly the
+page-154 long-division link and the page-156 square-root link even though both
+physical files exist.
 
-All twenty-nine assets are HASH_BOUND.  No formula, digit, remainder, seed,
-coefficient, curve sample, palette, or program is inferred from pixels.  The
-long-division and strict integer square-root checks below independently replay
-only formulas stated in source text; their JSON interface is deliberately
-separate from the raster ledger.
+All sixty-three candidates are HASH_BOUND.  No formula, digit, remainder,
+seed, coefficient, curve sample, palette, or program is inferred from pixels.
+The long-division and strict integer square-root checks below independently
+replay only formulas stated in source text; their JSON interface is
+deliberately separate from the raster ledgers.
 """
 
 from __future__ import annotations
@@ -102,13 +102,24 @@ def parse_assets(rows: str) -> dict[int, AssetSpec]:
     return assets
 
 
-ASSET_ROWS = r"""
+GOVERNED_ROWS = r"""
+998|R-neighbor-independent-substitution-source|_page_98_Figure_2.jpeg|CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_98_Figure_2.jpeg|CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md|315|96138|1082|689|3f8f959f0661ca4019b451af24fd9236b58a858486178e4fb9bfd0105e337a8c|cross-page-substitution-four|HASH_BOUND|relation observer physically on page 98 and invoked by the retained page-83 substitution-system relation; no pixel-derived rule
+1008|R-substitution-tree-source|_page_99_Figure_1.jpeg|CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_99_Figure_1.jpeg|CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md|325|132555|1188|621|9faa8b2973fdf9a11f77e4b9cf169cee9d907a429e1153a1af75923f79267592|cross-page-substitution-four|HASH_BOUND|relation observer physically on page 99 and invoked by the retained page-84 substitution-tree relation; no pixel-derived branching
+1014|R-substitution-branch-source|_page_99_Picture_4.jpeg|CHAPTERS/3-The-World-of-Simple-Programs/Images/_page_99_Picture_4.jpeg|CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md|331|46147|1158|325|49727d9cd4bd099d127fb4a3e531f665fd3bdcccbdd66c9a9181c4709cbbafae|cross-page-substitution-four|HASH_BOUND|relation observer physically on page 99 and invoked by the retained page-84 substitution-branch relation; no pixel-derived tree
+1449|R-nested-binary-digit-source|_page_132_Figure_10.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_132_Figure_10.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|53|56915|169|1250|396c235b7d5d7881de7a4823778065c557644da9738a61b4052de918e5d2e8b5|cross-page-substitution-four|HASH_BOUND|relation observer physically on page 132 and invoked by the retained page-117 nested-digit relation; no pixel-derived sequence
 1677|N-pi-binary-walk-observer|_page_151_Figure_7.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_151_Figure_7.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|259|62314|1153|533|f70a1bf71c4afb4073ce6f895f93202bd2e4974559d7824cbeefd789544856fc|-|HASH_BOUND|native 20000-digit base-two walk view; the constant, digits, horizon, and walk rule remain source text
 1711|N-rational-long-division|_page_154_Figure_2.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_154_Figure_2.jpeg|-|0|102867|1133|472|b607ffb9d9b5d4d90108f77d04a2ca808157a98829a4af088c31ae54117f9ecd|-|HASH_BOUND|native rational base-two long-division remainder and digit panels; split image link is explicitly absent
 1744|N-square-root-generator|_page_156_Figure_1.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_156_Figure_1.jpeg|-|0|139449|899|892|6774d48ee79161a4abb53235c3c44eec5a877655fd7a82e5eff0ac680efefaa2|-|HASH_BOUND|native strict-integer square-root r-s generator panels; split image link is explicitly absent
-12524|R-gray-code-number-order|_page_916_Figure_12.jpeg|BACK-MATTER/Index/Images/_page_916_Figure_12.jpeg|BACK-MATTER/Index/Index.md|427|16342|561|150|96edfc6a58c171c735a75ec87f9d54f90135d953af15bd814c5206fb999a9d79|-|HASH_BOUND|followed Gray-code ordering relation behind the page-928 concatenation sibling; not a T40 positional-expansion rule
-12552|R-negative-base-representation|_page_917_Picture_11.jpeg|BACK-MATTER/Index/Images/_page_917_Picture_11.jpeg|BACK-MATTER/Index/Index.md|455|9004|572|48|9d98da9314261068e9616f51b2f2ade3aca8497bc346e576de4c3efeccf7d214|-|HASH_BOUND|followed negative-base representation relation; strict T40 v1 remains positive-radix and does not infer digits from pixels
-12557|R-multiplicative-digit-representation|_page_918_Figure_2.jpeg|BACK-MATTER/Index/Images/_page_918_Figure_2.jpeg|BACK-MATTER/Index/Index.md|460|12033|585|75|537e2542e9042a89760407db9f1526688b62a081faa2a43487023d1c9de14ba7|-|HASH_BOUND|followed multiplicative prime-exponent digit relation; not a positional-expansion rule and no pixel-derived coefficients
+1846|R-trigonometric-crossing-family|_page_161_Figure_1.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_161_Figure_1.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|305|156748|1210|909|a478c2818f9c720ae68e528849ef3cda2f904c9a837ef97a8018f151e655e328|p161-162-crossing-cf-pair|HASH_BOUND|relation observer for sine-family crossing structure; the continued-fraction connection remains source text
+1854|R-continued-fraction-substitution|_page_162_Figure_1.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_162_Figure_1.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|313|206693|1050|1155|ab5e7bbab2a14b3d4fb832dad43842ceb4f206653810d7dfcd23238095741cfe|p161-162-crossing-cf-pair|HASH_BOUND|relation observer for continued-fraction-driven generalized substitution; no coefficient stream is read from pixels
+6768|R-number-representation-schemas|_page_575_Figure_5.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_575_Figure_5.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Processes-of-Perception-and-Analysis.md|181|58746|1143|404|3f81679d8812332b34c6f907dbb4fa0cf85bf512b0b56a856d77fb5874a6cdb7|p560-561-representation-pair|HASH_BOUND|relation observer for unary, binary, self-delimiting, and Fibonacci representations; codecs remain source text
+6776|R-run-length-representation-application|_page_576_Figure_4.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_576_Figure_4.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Processes-of-Perception-and-Analysis.md|189|82301|1191|604|af6f0c64170d7ec290ff508bed88e6e6d5c01fb0bfe3d30131d7408d63c38efa|p560-561-representation-pair|HASH_BOUND|downstream run-length application of representation e; not a native T40 positional transition
+7116|R-block-frequency-composite|_page_609_Picture_2.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_609_Picture_2.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Processes-of-Perception-and-Analysis.md|527|7463|242|165|a701cd6cd935009250ba7bd269517ffe382f60ddb4cb364b98fb5a2c1dd2eb37|-|HASH_BOUND|page-609 block-frequency composite invoked by the retained page-594 Sturmian relation; not a digit generator
+9246|C-turing-complexity-resource-boundary|_page_776_Figure_2.jpeg|CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_776_Figure_2.jpeg|CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md|629|205466|1167|1215|77a6940d63479c1d9affe067bcee9cecdb6a17c032615cdcdfe5c87e01019ee0|-|HASH_BOUND|page-776 Turing-complexity control invoked by the retained page-761 resource boundary; no T40 mechanics inferred
+11252|R-ca-cantor-map-representation|_page_884_Figure_30.jpeg|CHAPTERS/12-The-Principle-of-Computational-Equivalence/Images/_page_884_Figure_30.jpeg|CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md|2633|29517|593|408|0b46d9fe0de9337a7e2d5aaca5ea73445c601ca52e2a6165adb916b040482e7e|-|HASH_BOUND|relation observer for a cellular-automaton Cantor-map representation; not native T40 evolution
+12524|R-gray-code-number-order|_page_916_Figure_12.jpeg|BACK-MATTER/Index/Images/_page_916_Figure_12.jpeg|BACK-MATTER/Index/Index.md|427|16342|561|150|96edfc6a58c171c735a75ec87f9d54f90135d953af15bd814c5206fb999a9d79|p916-918-representation-three|HASH_BOUND|followed Gray-code ordering relation behind the page-928 concatenation sibling; not a T40 positional-expansion rule
+12552|R-negative-base-representation|_page_917_Picture_11.jpeg|BACK-MATTER/Index/Images/_page_917_Picture_11.jpeg|BACK-MATTER/Index/Index.md|455|9004|572|48|9d98da9314261068e9616f51b2f2ade3aca8497bc346e576de4c3efeccf7d214|p916-918-representation-three|HASH_BOUND|followed negative-base representation relation; strict T40 v1 remains positive-radix and does not infer digits from pixels
+12557|R-multiplicative-digit-representation|_page_918_Figure_2.jpeg|BACK-MATTER/Index/Images/_page_918_Figure_2.jpeg|BACK-MATTER/Index/Index.md|460|12033|585|75|537e2542e9042a89760407db9f1526688b62a081faa2a43487023d1c9de14ba7|p916-918-representation-three|HASH_BOUND|followed multiplicative prime-exponent digit relation; not a positional-expansion rule and no pixel-derived coefficients
 12960|N-rational-digit-panels|_page_927_Figure_14.jpeg|BACK-MATTER/Index/Images/_page_927_Figure_14.jpeg|BACK-MATTER/Index/Index.md|863|68967|596|372|8b72b409f1dcf50a971e51ebf9ba6827eb28d17d7fad4aa157e39a4ea71a6a8f|-|HASH_BOUND|native base-two rational m-over-n digit panels; period facts remain source text
 12992|R-concatenation-digits|_page_928_Figure_9.jpeg|BACK-MATTER/Index/Images/_page_928_Figure_9.jpeg|BACK-MATTER/Index/Index.md|895|28539|563|123|ab7f30102a14fec2439ebcf44b8d93cc8d3c015a284cc2d6ce8b1d5b26de4742|p928-concatenation-walk-trilogy|HASH_BOUND|related concatenated integer-digit sequence; not a constant-expansion transition
 12996|R-concatenation-walk|_page_928_Figure_11.jpeg|BACK-MATTER/Index/Images/_page_928_Figure_11.jpeg|BACK-MATTER/Index/Index.md|899|9524|565|131|1cc65d82eb4cfead5603b65fc1154aad1339ec38057c56a3ccd1abef38faaac0|p928-concatenation-walk-trilogy|HASH_BOUND|related signed walk over concatenated digits; rendering is not evolving source state
@@ -130,11 +141,38 @@ ASSET_ROWS = r"""
 13125|R-digital-slope-d|_page_931_Figure_12.jpeg|BACK-MATTER/Index/Images/_page_931_Figure_12.jpeg|BACK-MATTER/Index/Index.md|1028|6192|110|155|d4cd35ac79902f539674d4114bba8bd7a12a1674ef334903028ebcd9f1a260e8|p931-digital-slope-five|HASH_BOUND|digital-slope representation relation D; source formula supplies segments
 13127|R-digital-slope-e|_page_931_Figure_13.jpeg|BACK-MATTER/Index/Images/_page_931_Figure_13.jpeg|BACK-MATTER/Index/Index.md|1030|3562|75|155|66c9d76cf184c965d21af617adbf5c87b8a6d88632494eb5be39b46386dc5b95|p931-digital-slope-five|HASH_BOUND|digital-slope representation relation E; source formula supplies segments
 13134|C-operator-representation-boundary|_page_931_Figure_17.jpeg|BACK-MATTER/Index/Images/_page_931_Figure_17.jpeg|BACK-MATTER/Index/Index.md|1037|31696|576|254|50b5d23c00d10b064ed4c26b03944ba2e793bdf3dd30d367d9314b273e58ec07|-|HASH_BOUND|operator-representation complexity control; no coefficient evolution is defined by the raster
+14176|R-pell-continued-fraction-size|_page_960_Figure_3.jpeg|BACK-MATTER/Index/Images/_page_960_Figure_3.jpeg|BACK-MATTER/Index/Index.md|2077|16558|574|209|4909c893d1c85a6206b6b053284838c58721ff83f61ff7e81d334859bac69121|-|HASH_BOUND|relation observer for Pell continued-fraction term sizes; no coefficients are inferred from the raster
+14925|R-billiard-cf-slope-a|_page_986_Picture_4.jpeg|BACK-MATTER/Index/Images/_page_986_Picture_4.jpeg|BACK-MATTER/Index/Index.md|2826|2185|118|99|dce3420f6ab4b0cda93c35df05fc0f1af1477889fcf988251894fd4c53e94a2f|p986-billiard-cf-five|HASH_BOUND|billiard continued-fraction slope relation panel A; source text supplies the relation
+14927|R-billiard-cf-slope-b|_page_986_Picture_5.jpeg|BACK-MATTER/Index/Images/_page_986_Picture_5.jpeg|BACK-MATTER/Index/Index.md|2828|2449|93|92|0cf2cee6cf4e44d42f09a4116cfd09a5e622fc9799901fcf05cc4a744a17cfe6|p986-billiard-cf-five|HASH_BOUND|billiard continued-fraction slope relation panel B; source text supplies the relation
+14929|R-billiard-cf-slope-c|_page_986_Picture_6.jpeg|BACK-MATTER/Index/Images/_page_986_Picture_6.jpeg|BACK-MATTER/Index/Index.md|2830|4105|99|103|91ccba8bb1c4a855376d1573507072af4ae310e06aaeb751e4a4de912f518234|p986-billiard-cf-five|HASH_BOUND|billiard continued-fraction slope relation panel C; source text supplies the relation
+14931|R-billiard-cf-slope-d|_page_986_Picture_7.jpeg|BACK-MATTER/Index/Images/_page_986_Picture_7.jpeg|BACK-MATTER/Index/Index.md|2832|5402|92|96|5d4ced55b1fed2900320f0f2d61df6dc43e63339726c33bb1bcef528e0497608|p986-billiard-cf-five|HASH_BOUND|billiard continued-fraction slope relation panel D; source text supplies the relation
+14933|R-billiard-cf-slope-e|_page_986_Picture_8.jpeg|BACK-MATTER/Index/Images/_page_986_Picture_8.jpeg|BACK-MATTER/Index/Index.md|2834|6253|102|111|a1983299e03d94a78d251a7116ede9184b32a24bf8e9f9a0402cd18420749b7f|p986-billiard-cf-five|HASH_BOUND|billiard continued-fraction slope relation panel E; source text supplies the relation
 17167|R-number-representation-lengths|_page_1085_Figure_16.jpeg|BACK-MATTER/Index/Images/_page_1085_Figure_16.jpeg|BACK-MATTER/Index/Index.md|5068|11809|570|114|23d4a862a4d99266f778a28c18acce5b8c10f828a3d517799542091a2ff5c9fd|p1085-number-representation-pair|HASH_BOUND|followed page-560 observer comparing unary, binary, self-delimiting, base-3-coded, and Fibonacci representation lengths
 17171|R-number-representation-completeness|_page_1085_Picture_18.jpeg|BACK-MATTER/Index/Images/_page_1085_Picture_18.jpeg|BACK-MATTER/Index/Index.md|5072|12491|573|134|93b9a5e9478a8757c6c8dc5ac9f0fa5974eeaad0e8bdd14ab89a29053cbb1317|p1085-number-representation-pair|HASH_BOUND|followed page-560 completeness observer for self-delimiting representation schemas; no pixel-derived codec
+17762|R-rule60-difference-table|_page_1106_Picture_4.jpeg|BACK-MATTER/Colophon/Images/_page_1106_Picture_4.jpeg|BACK-MATTER/Colophon/Colophon.md|319|19649|567|141|1b1e146be02a30f906c2bcf535f9b50d87e763c907109925bcf2b4bcbf7a4595|-|HASH_BOUND|composite rule-60 difference-table relation including pi digits; not a T40 digit generator
+17876|R-base-two-power-tree|_page_1109_Picture_5.jpeg|BACK-MATTER/Colophon/Images/_page_1109_Picture_5.jpeg|BACK-MATTER/Colophon/Colophon.md|433|3747|277|52|498e773d1bfb4f6342382c109cd82563202dac362dc929d7d8b1f84d7e719789|p1109-prefix-method-pair|HASH_BOUND|whole-prefix base-two power-tree computation observer; not a one-digit transition
+17878|R-base-three-conversion|_page_1109_Picture_6.jpeg|BACK-MATTER/Colophon/Images/_page_1109_Picture_6.jpeg|BACK-MATTER/Colophon/Colophon.md|435|5011|280|52|2ba5d3697687cd5b224b5e4e61c934bef48a5bc230cd7aef4d16d59ee20dcfd7|p1109-prefix-method-pair|HASH_BOUND|whole-prefix base-three conversion observer; not a one-digit transition
+20588|R-minimal-ca-repetitive-context|_page_1201_Picture_6.jpeg|BACK-MATTER/Colophon/Images/_page_1201_Picture_6.jpeg|BACK-MATTER/Colophon/Colophon.md|3145|100915|567|573|1f02e8e4d9a4875aacea4400d24d42187ce222f280eb9048230ce4f11cf3c2a1|p1201-minimal-ca-four|HASH_BOUND|minimal-CA repetitive-sequence context observer; not native T40 evolution
+20594|R-minimal-ca-powers-of-two|_page_1201_Picture_9.jpeg|BACK-MATTER/Colophon/Images/_page_1201_Picture_9.jpeg|BACK-MATTER/Colophon/Colophon.md|3151|5685|142|154|ca8bd4d605adf94e71306497286b3220c56645d793b2d66514004f3c2741b9f0|p1201-minimal-ca-four|HASH_BOUND|minimal-CA powers-of-two relation observer; not native T40 evolution
+20596|R-minimal-ca-squares|_page_1201_Picture_10.jpeg|BACK-MATTER/Colophon/Images/_page_1201_Picture_10.jpeg|BACK-MATTER/Colophon/Colophon.md|3153|5764|117|170|d63f0244a2aa68116b98e23024b7f0a595906de277838d954401329a36f944d5|p1201-minimal-ca-four|HASH_BOUND|minimal-CA squares relation observer; not native T40 evolution
+20598|R-minimal-ca-thue-morse|_page_1201_Picture_11.jpeg|BACK-MATTER/Colophon/Images/_page_1201_Picture_11.jpeg|BACK-MATTER/Colophon/Colophon.md|3155|12744|278|175|8274d856359c610851e478a5dcdf376b2b25387c693787fcb028e688a1a8aa37|p1201-minimal-ca-four|HASH_BOUND|minimal-CA Thue-Morse relation observer; not native T40 evolution
 """
 
-ASSETS = parse_assets(ASSET_ROWS)
+EXCLUDED_ROWS = r"""
+1649|X-sequence-property-sibling-a|_page_150_Figure_1.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_150_Figure_1.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|231|44033|1185|241|aba1ec87beb6d6b3308ae2bc4e6e46f58592daf0134a715fd4b8a2f2faf6572b|X-p150-sequence-property-five|HASH_BOUND|page-150 sequence-property sibling observer A lies before the T40 mathematical-constants span
+1651|X-sequence-property-sibling-b|_page_150_Figure_2.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_150_Figure_2.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|233|41035|1164|245|6e3dffd17a8a0e806b25fbd3db9b350ef0e217ef9e27c7e8253abdfb1d0ba1e1|X-p150-sequence-property-five|HASH_BOUND|page-150 sequence-property sibling observer B lies before the T40 mathematical-constants span
+1653|X-sequence-property-sibling-c|_page_150_Figure_3.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_150_Figure_3.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|235|45042|1175|223|4a7e843f39f9e629e8c172ee9a8791201d6657519d93e59711d2be37de2a827d|X-p150-sequence-property-five|HASH_BOUND|page-150 sequence-property sibling observer C lies before the T40 mathematical-constants span
+1655|X-sequence-property-sibling-d|_page_150_Figure_4.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_150_Figure_4.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|237|36180|1183|219|18fedd7b593d7c1db04bb4a1d93d8c1fe5bda4975224ec2d5ef7cc75c7f7dee9|X-p150-sequence-property-five|HASH_BOUND|page-150 sequence-property sibling observer D lies before the T40 mathematical-constants span
+1657|X-sequence-property-sibling-e|_page_150_Figure_5.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_150_Figure_5.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|239|36172|1140|228|b7e272b42566d54cdf0b04e98581e4d77783bcd5947912b0edc68f37b613bdfe|X-p150-sequence-property-five|HASH_BOUND|page-150 sequence-property sibling observer E lies before the T40 mathematical-constants span
+12844|X-pre-t40-prime-section-sibling|_page_923_Figure_21.jpeg|BACK-MATTER/Index/Images/_page_923_Figure_21.jpeg|BACK-MATTER/Index/Index.md|747|9807|576|79|d5f1729767f4379de49c08cb2508f5ce08e35fee6f28028e39e82a249f6fd160|-|HASH_BOUND|page-923 prime-section sibling observer is not T40 constant-representation evidence
+12917|X-aliquot-sum-sibling|_page_926_Figure_14.jpeg|BACK-MATTER/Index/Images/_page_926_Figure_14.jpeg|BACK-MATTER/Index/Index.md|820|7898|563|104|d46dfaffe665ce852110f1e98054e1c25e2d8defd9b54c0f4273c7ab25ea79fa|-|HASH_BOUND|page-926 aliquot-sum sibling observer precedes the T40 Notes section
+17593|X-least-squares-model-fit-sibling|_page_1099_Figure_1.jpeg|BACK-MATTER/Colophon/Images/_page_1099_Figure_1.jpeg|BACK-MATTER/Colophon/Colophon.md|150|8888|593|97|59eb6c37e2e3b98d9c342354563b78f97dced9f2bc5d22f73aa0a58a5de80743|-|HASH_BOUND|page-1099 least-squares model-fit sibling is not the later retained Sturmian relation
+17847|X-visible-lattice-point-sibling|_page_1108_Figure_13.jpeg|BACK-MATTER/Colophon/Images/_page_1108_Figure_13.jpeg|BACK-MATTER/Colophon/Colophon.md|404|14375|566|154|679821a74b328013dc9970a6ced553e01310a9871f886fb93fd7344a5e1f0ab3|-|HASH_BOUND|page-1108 visible-lattice-point observer is an adjacent unrelated sibling
+20584|X-doubling-rule-sibling|_page_1201_Picture_4.jpeg|BACK-MATTER/Colophon/Images/_page_1201_Picture_4.jpeg|BACK-MATTER/Colophon/Colophon.md|3141|18451|386|261|5ce5638ca129527ea5c5fc2c7e2fe7e204c8af5fbf7349d3da60f445634292b7|-|HASH_BOUND|page-1201 doubling-rule sibling precedes the governed minimal-CA sequence assembly
+"""
+
+ASSETS = parse_assets(GOVERNED_ROWS)
+EXCLUDED_ASSETS = parse_assets(EXCLUDED_ROWS)
 
 NATIVE_IMAGE_LINES = frozenset({
     1677, 1711, 1744, 12960,
@@ -142,18 +180,21 @@ NATIVE_IMAGE_LINES = frozenset({
     13090,
 })
 RELATION_IMAGE_LINES = frozenset({
+    998, 1008, 1014, 1449, 1846, 1854, 6768, 6776, 7116, 11252,
     12524, 12552, 12557, 12992, 12996, 13000, 13020, 13076, 13094, 13098,
-    13119, 13121, 13123, 13125, 13127, 17167, 17171,
+    13119, 13121, 13123, 13125, 13127, 14176, 14925, 14927, 14929, 14931,
+    14933, 17167, 17171, 17762, 17876, 17878, 20588, 20594, 20596, 20598,
 })
-CONTROL_IMAGE_LINES = frozenset({13134})
+CONTROL_IMAGE_LINES = frozenset({9246, 13134})
 GOVERNED_IMAGE_LINES = (
     NATIVE_IMAGE_LINES | RELATION_IMAGE_LINES | CONTROL_IMAGE_LINES
 )
-EXCLUDED_IMAGE_LINES: frozenset[int] = frozenset()
-CANDIDATE_IMAGE_LINES = GOVERNED_IMAGE_LINES
+EXCLUDED_IMAGE_LINES = frozenset(EXCLUDED_ASSETS)
+CANDIDATE_IMAGE_LINES = GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
 UNRESOLVED_IMAGE_LINES: frozenset[int] = frozenset()
 
 assert GOVERNED_IMAGE_LINES == frozenset(ASSETS)
+assert not GOVERNED_IMAGE_LINES & EXCLUDED_IMAGE_LINES
 assert not (
     NATIVE_IMAGE_LINES & RELATION_IMAGE_LINES
     or NATIVE_IMAGE_LINES & CONTROL_IMAGE_LINES
@@ -162,24 +203,32 @@ assert not (
 assert (
     len(NATIVE_IMAGE_LINES), len(RELATION_IMAGE_LINES),
     len(CONTROL_IMAGE_LINES), len(GOVERNED_IMAGE_LINES),
-) == (11, 17, 1, 29)
+) == (11, 40, 2, 53)
 
-EXPECTED_DISPOSITION_METRICS = (11, 17, 1, 29, 0)
-EXPECTED_REFERENCE_METRICS = (29, 27, 56)
-EXPECTED_PHYSICAL_METRICS = (29, 29, 636_440)
-EXPECTED_ASSEMBLY_METRICS = (5, 18)
-EXPECTED_BOUNDARY_METRICS = (29, 0, 0)
+EXPECTED_DISPOSITION_METRICS = (11, 40, 2, 53, 10)
+EXPECTED_REFERENCE_METRICS = (53, 51, 104)
+EXPECTED_EXCLUDED_REFERENCE_METRICS = (10, 10, 20)
+EXPECTED_PHYSICAL_METRICS = (53, 53, 1_905_596)
+EXPECTED_EXCLUDED_PHYSICAL_METRICS = (10, 10, 261_881)
+EXPECTED_ASSEMBLY_METRICS = (12, 40)
+EXPECTED_EXCLUDED_ASSEMBLY_METRICS = (1, 5)
+EXPECTED_BOUNDARY_METRICS = (63, 0, 0)
 
-HASH_BOUND_IMAGE_LINES = GOVERNED_IMAGE_LINES
+HASH_BOUND_IMAGE_LINES = CANDIDATE_IMAGE_LINES
 LIMITED_TRANSCRIBED_IMAGE_LINES: frozenset[int] = frozenset()
 PIXEL_REPLAYED_IMAGE_LINES: frozenset[int] = frozenset()
 assert all(asset.boundary == "HASH_BOUND" for asset in ASSETS.values())
+assert all(asset.boundary == "HASH_BOUND" for asset in EXCLUDED_ASSETS.values())
 
 SPLIT_OMISSION_IMAGE_LINES = frozenset({1711, 1744})
 SPLIT_REFERENCED_IMAGE_LINES = GOVERNED_IMAGE_LINES - SPLIT_OMISSION_IMAGE_LINES
-assert len(SPLIT_REFERENCED_IMAGE_LINES) == 27
+assert len(SPLIT_REFERENCED_IMAGE_LINES) == 51
 
 ASSEMBLIES = {
+    "cross-page-substitution-four": frozenset({998, 1008, 1014, 1449}),
+    "p161-162-crossing-cf-pair": frozenset({1846, 1854}),
+    "p560-561-representation-pair": frozenset({6768, 6776}),
+    "p916-918-representation-three": frozenset({12524, 12552, 12557}),
     "p928-concatenation-walk-trilogy": frozenset({12992, 12996, 13000}),
     "p929-continued-fraction-residual-six": frozenset({
         13040, 13042, 13044, 13046, 13048, 13050,
@@ -188,13 +237,31 @@ ASSEMBLIES = {
     "p931-digital-slope-five": frozenset({
         13119, 13121, 13123, 13125, 13127,
     }),
+    "p986-billiard-cf-five": frozenset({
+        14925, 14927, 14929, 14931, 14933,
+    }),
     "p1085-number-representation-pair": frozenset({17167, 17171}),
+    "p1109-prefix-method-pair": frozenset({17876, 17878}),
+    "p1201-minimal-ca-four": frozenset({20588, 20594, 20596, 20598}),
 }
-assert sum(map(len, ASSEMBLIES.values())) == 18
+EXCLUDED_ASSEMBLIES = {
+    "X-p150-sequence-property-five": frozenset({
+        1649, 1651, 1653, 1655, 1657,
+    }),
+}
+assert sum(map(len, ASSEMBLIES.values())) == 40
+assert sum(map(len, EXCLUDED_ASSEMBLIES.values())) == 5
 assert all(
     frozenset(line for line, asset in ASSETS.items() if asset.assembly == name)
     == lines
     for name, lines in ASSEMBLIES.items()
+)
+assert all(
+    frozenset(
+        line for line, asset in EXCLUDED_ASSETS.items()
+        if asset.assembly == name
+    ) == lines
+    for name, lines in EXCLUDED_ASSEMBLIES.items()
 )
 
 
