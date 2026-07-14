@@ -123,6 +123,16 @@ SQUARE_SCHEMA = MoveSchema(
     ),
 )
 
+SWAPPED_FRAME_SCHEMA = MoveSchema(
+    "explicit-axis-swap-witness-v1",
+    (
+        ("axis0+", (0, 1)),
+        ("axis0-", (0, -1)),
+        ("axis1+", (1, 0)),
+        ("axis1-", (-1, 0)),
+    ),
+)
+
 HEX_SCHEMA = MoveSchema(
     "axial-hex-witness-v1",
     (
@@ -970,12 +980,102 @@ def assert_realization_and_outcome_boundaries() -> dict[str, int]:
     assert state.head_position == (20, 0)
     assert viewport_exits == 18
 
+    # Port labels are semantic only together with an explicit coordinate-frame
+    # map.  Silently reusing the same label under a swapped frame diverges;
+    # applying the visible coordinate isomorphism restores one-step commutation.
+    frame_rows = (
+        (0, 0, Transition(0, 1, "axis0+")),
+        (0, 1, Transition(0, 0, "axis0+")),
+    )
+    book_table = ClosedTMTable(1, 2, SQUARE_SCHEMA, frame_rows)
+    swapped_table = ClosedTMTable(1, 2, SWAPPED_FRAME_SCHEMA, frame_rows)
+    book_state = NativeState(
+        1,
+        SQUARE_SCHEMA,
+        tape_with_values(2, 0, {(1, 0): 1}),
+        0,
+        (0, 0),
+    )
+
+    def swap_coord(coord: Coord) -> Coord:
+        return (coord[1], coord[0])
+
+    def swap_state(state: NativeState) -> NativeState:
+        return NativeState(
+            state.state_count,
+            SWAPPED_FRAME_SCHEMA,
+            TotalTape(
+                state.tape.alphabet_size,
+                state.tape.default_symbol,
+                tuple(sorted((swap_coord(coord), symbol) for coord, symbol in state.tape.overrides)),
+            ),
+            state.head_state,
+            swap_coord(state.head_position),
+            state.generation,
+        )
+
+    assert_commutes(book_table, book_state)
+    swapped_state = swap_state(book_state)
+    assert_commutes(swapped_table, swapped_state)
+    mapped_book_next = swap_state(native_step(book_table, book_state))
+    swapped_next = native_step(swapped_table, swapped_state)
+    assert semantic_key(mapped_book_next) == semantic_key(swapped_next)
+
+    silently_swapped_next = native_step(
+        swapped_table,
+        replace(book_state, schema=SWAPPED_FRAME_SCHEMA),
+    )
+    assert native_step(book_table, book_state).head_position == (1, 0)
+    assert silently_swapped_next.head_position == (0, 1)
+    assert native_step(book_table, book_state).head_position != silently_swapped_next.head_position
+
     return {
         "unbounded_viewport_events": events,
         "viewport_exit_continuations": viewport_exits,
         "quotient_alias_rejections": 2,
         "locally_injective_quotients": 1,
         "native_halts": 0,
+        "frame_native_generic_events": 2,
+        "explicit_frame_commutations": 1,
+        "silent_frame_relabel_divergences": 1,
+    }
+
+
+def assert_frozen_program_provenance() -> dict[str, int]:
+    # The source's randomly chosen examples sample a complete table at setup.
+    # This witness enters execution only as immutable closed rows; no runtime
+    # transition draw, callback, or hidden RNG participates in a step.
+    table = ClosedTMTable(2, 2, SQUARE_SCHEMA, baseline_rows(2, 2, SQUARE_SCHEMA))
+    table_digest = sha256(repr(table.rows).encode("utf-8")).hexdigest()
+    assert table_digest == "96f68c00a5ced8344d990cecd8f6386eecc2309249ca48be0db306211a09b485"
+    initial = NativeState(
+        2,
+        SQUARE_SCHEMA,
+        tape_with_values(2, 0, {(-1, 0): 1, (0, 0): 1, (0, 1): 1}),
+        1,
+        (0, 0),
+    )
+
+    def replay() -> tuple[tuple[object, ...], ...]:
+        state = initial
+        trace: list[tuple[object, ...]] = [semantic_key(state)]
+        for _ in range(12):
+            assert_commutes(table, state)
+            state = native_step(table, state)
+            trace.append(semantic_key(state))
+        return tuple(trace)
+
+    first = replay()
+    second = replay()
+    assert first == second
+    assert sha256(repr(table.rows).encode("utf-8")).hexdigest() == table_digest
+    return {
+        "frozen_setup_tables": 1,
+        "frozen_setup_rows": len(table.rows),
+        "replay_native_generic_events": 24,
+        "runtime_rule_draws": 0,
+        "table_digest_words": len(table_digest),
+        "table_digest_int": int(table_digest[:12], 16),
     }
 
 
@@ -1174,7 +1274,7 @@ def semantic_digest(counts: dict[str, int]) -> str:
     return sha256(transcript.encode("utf-8")).hexdigest()
 
 
-EXPECTED_SEMANTIC_DIGEST = "54e28af252f5b926771061d9d9dc2ea6724dccbeb46ec988afb70efdfc5dbaca"
+EXPECTED_SEMANTIC_DIGEST = "8eed091c1b3635661fb160ce76a49738f282ae1ec94a71fcb8a303a8735434e2"
 
 
 def main() -> None:
@@ -1183,6 +1283,7 @@ def main() -> None:
         "turning": assert_langton_and_turning(),
         "hex": assert_hex_topology_parameterization(),
         "realization": assert_realization_and_outcome_boundaries(),
+        "provenance": assert_frozen_program_provenance(),
         "rules": assert_rule_spaces_and_distinctions(),
         "atomicity": assert_atomicity_and_observer_separation(),
         "hostile": assert_hostile_validation(),
@@ -1198,6 +1299,8 @@ def main() -> None:
         + groups["turning"]["langton_trace_events"]
         + groups["hex"]["hex_topology_witness_events"]
         + groups["realization"]["unbounded_viewport_events"]
+        + groups["realization"]["frame_native_generic_events"]
+        + groups["provenance"]["replay_native_generic_events"]
     )
     counts["total.native_generic_events"] = native_generic_events
     digest = semantic_digest(counts)
@@ -1211,7 +1314,9 @@ def main() -> None:
         f"langton_context:{groups['turning']['langton_context_events']},"
         f"langton_trace:{groups['turning']['langton_trace_events']},"
         f"hex_topology_witness:{groups['hex']['hex_topology_witness_events']},"
-        f"unbounded_viewport:{groups['realization']['unbounded_viewport_events']}"
+        f"unbounded_viewport:{groups['realization']['unbounded_viewport_events']},"
+        f"frame_mapping:{groups['realization']['frame_native_generic_events']},"
+        f"frozen_table_replay:{groups['provenance']['replay_native_generic_events']}"
     )
     print(
         "strict_square=discrete_t+2D;raw_book_array_frame;four_semantic_axis_ports;"
@@ -1244,19 +1349,25 @@ def main() -> None:
         "one_native_event=one_generic_event;bare_union_is_lossy;CA_microsteps=NONE"
     )
     print(
-        "update=old_snapshot_atomic_two_label_commit;"
+        "update=old_snapshot_atomic_tagged_move;concrete_two_label_commit_is_lowering;"
         f"zero_head_intermediate_rejections={groups['atomicity']['zero_head_intermediate_rejections']};"
         "path+visit_history+time_lift_are_observers"
     )
     print(
         "realizations=size1_and_size2_periodic_aliases_rejected;size3_local_ports_injective;"
         f"viewport_exit_continuations={groups['realization']['viewport_exit_continuations']};"
-        "finite_edge_or_viewport_exit_is_not_halt"
+        "finite_edge_or_viewport_exit_is_not_halt;explicit_frame_map_commutes;"
+        "silent_frame_relabel_diverges"
     )
     print(
-        "runtime_audit=reuse_finite_values+selector_concepts+atomic_assignments;"
+        "rule_provenance=random_sampling_is_setup_only;closed_table_is_immutable;"
+        f"replay_events={groups['provenance']['replay_native_generic_events']};"
+        "runtime_rule_draws=0"
+    )
+    print(
+        "runtime_audit=reuse_finite_values+selector_concepts+old_snapshot_UPDATE;"
         "gaps=composite_alphabet,UniqueTag,total_sparse_Z2,typed_ports,closed_product_tables,"
-        "multiwrite_results,structured_traces;family_dispatch_is_not_semantics"
+        "typed_assignment_and_movement_writes,structured_traces;family_dispatch_is_not_semantics"
     )
     print(
         "classification=T12+T21+T24_categories1_to_3;new_T25_UPDATE=NONE;"
