@@ -6,7 +6,9 @@ classifies every returned line plus governed continuations, routes the actual
 Index, and reverse-joins the split corpus.  It audits evidence rather than
 executing damaged Wolfram Language fragments or decoding raster pixels.
 
-The source-faithful core is a singleton exact-integer configuration whose
+Opaque image assets are identity-bound by relative path, size, and SHA-256;
+their pixels are not interpreted.  The source-faithful core is a singleton
+exact-integer configuration whose
 current residue selects one closed arithmetic branch.  The residue dispatch,
 not a new executor, is the construction-defining addition to T34's unary
 scalar rule.  Digit rows, parity words, sizes, cycles, stopping times, and
@@ -596,6 +598,10 @@ EXPECTED_INDEX_ONLY_CONTEXT = (
     (3, "14d0c19320692f89c791a531e22c7916aeedcaed6c966c44277956384ed8006d"),
     (26, "3e51dddaa304781967587e8044b9419f688ef7aded34938c068d31ac4e283e37"),
 )
+EXPECTED_IMAGE_ASSET_MANIFEST = (
+    26,
+    "21580ddc004136889d5d6aa6d3e26df42bd375924b4e391ae55b048e56f758b3",
+)
 EXPECTED_IMAGE_PARTITION = {
     "native": (5, "0c03146ee327f67d29869863e7180f135426d5a0d76003d5276678feb1c826b8"),
     "relation": (5, "24dbbd9b5294a09803addca6e12765187f465d74144f1bcde1fddb7f82b4f89a"),
@@ -692,6 +698,26 @@ def retained_owner_record(line_no: int) -> str:
     return candidates[0]
 
 
+def index_context_owner_record(line_no: int) -> str:
+    """Map one Index-only context line to its structural split owner."""
+
+    candidates: list[str] = []
+    if line_no in {8834, 8838}:
+        candidates.append(
+            "CHAPTERS/12-The-Principle-of-Computational-Equivalence/"
+            f"The-Principle-of-Computational-Equivalence.md:{line_no - 8615}"
+        )
+    if 18594 <= line_no <= 18617:
+        candidates.append(
+            f"BACK-MATTER/Colophon/Colophon.md:{line_no - 17443}"
+        )
+    if len(candidates) != 1:
+        raise ValueError(
+            f"Index context line {line_no} has {len(candidates)} split owners"
+        )
+    return candidates[0]
+
+
 # Split-corpus values are frozen after the reverse provenance pass below.
 EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
@@ -752,6 +778,31 @@ EXPECTED_SPLIT_RETAINED_CLASSES = {
     ),
 }
 EXPECTED_NORMALIZED_MINIMUM = 0.991511
+EXPECTED_SPLIT_INDEX_CONTEXT_CROSSWALK = (
+    26,
+    "504f98c258c8d461384cc0c1c8a2e18f52583d51e7b842767ffda5274660085e",
+)
+EXPECTED_SPLIT_INDEX_CONTEXT_OWNERS = (
+    26,
+    "2216f83c7369f530de69f417ca859e3e5ac6c1d5909a5f25c198ca29526ef792",
+)
+EXPECTED_SPLIT_INDEX_CONTEXT_CLASSES = {
+    "EXACT": (
+        26,
+        "3e51dddaa304781967587e8044b9419f688ef7aded34938c068d31ac4e283e37",
+        "504f98c258c8d461384cc0c1c8a2e18f52583d51e7b842767ffda5274660085e",
+    ),
+    "IMAGE_BASENAME": (
+        0,
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ),
+    "NORMALIZED": (
+        0,
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ),
+}
 EXPECTED_ATLAS_HITS = (
     5,
     "bc2d3922561b25c21574253966619ebf550e76c0c42a04c6f4074133ad845c32",
@@ -1001,13 +1052,37 @@ def main() -> int:
         "relation": RELATION_IMAGE_LINES,
         "control": CONTROL_IMAGE_LINES,
     }
+    # Bind every routed opaque asset without interpreting its pixels.  The
+    # monolith supplies only basenames, so the unique corpus-relative path is
+    # part of each frozen record together with byte size and SHA-256.
+    image_asset_lines = CANDIDATE_IMAGE_LINES | OUT_OF_SCOPE_RELATED_IMAGE_LINES
+    image_asset_manifest: set[str] = set()
     image_paths_ok = True
-    for line_no in CANDIDATE_IMAGE_LINES | OUT_OF_SCOPE_RELATED_IMAGE_LINES:
+    for line_no in image_asset_lines:
         match = IMAGE_RE.fullmatch(at(line_no))
         image_paths_ok &= match is not None
         if match is not None:
             basename = Path(match.group(1)).name
-            image_paths_ok &= len(list(SOURCE_ROOT.rglob(basename))) == 1
+            matches = list(SOURCE_ROOT.rglob(basename))
+            image_paths_ok &= len(matches) == 1
+            if len(matches) != 1:
+                continue
+            asset = matches[0]
+            image_paths_ok &= asset.is_file()
+            if not asset.is_file():
+                continue
+            relative = asset.relative_to(SOURCE_ROOT).as_posix()
+            image_asset_manifest.add(
+                f"{line_no}->{relative}\0{asset.stat().st_size}\0{sha256(asset)}"
+            )
+    image_asset_actual = (
+        len(image_asset_manifest),
+        digest_records(image_asset_manifest),
+    )
+    image_paths_ok &= (
+        len(image_asset_manifest) == len(image_asset_lines)
+        and image_asset_actual == EXPECTED_IMAGE_ASSET_MANIFEST
+    )
     images_ok = (
         derived_images == set(GOVERNED_IMAGE_LINES)
         and sum(map(len, image_sets.values())) == len(GOVERNED_IMAGE_LINES)
@@ -1069,7 +1144,7 @@ def main() -> int:
     )
     ok &= visual_ok
     print(
-        "governed_image_interface_asset_hash_routed_no_pixel_replay",
+        "governed_image_interface_asset_manifest_routed_no_pixel_replay",
         "OK" if visual_ok else "MISMATCH",
         len(derived_images),
         digest(derived_images),
@@ -1079,6 +1154,8 @@ def main() -> int:
         "excluded",
         len(EXCLUDED_IMAGE_LINES),
         digest(EXCLUDED_IMAGE_LINES),
+        "assets",
+        *image_asset_actual,
     )
     print(
         "out_of_candidate_T43_page165_page166_relation",
@@ -1592,6 +1669,80 @@ def main() -> int:
         f"normalized_min={normalized_minimum:.6f}",
     )
 
+    context_crosswalk: set[str] = set()
+    context_owner_records: set[str] = set()
+    context_class_lines: dict[str, set[int]] = {
+        "EXACT": set(),
+        "IMAGE_BASENAME": set(),
+        "NORMALIZED": set(),
+    }
+    context_class_records: dict[str, set[str]] = {
+        name: set() for name in context_class_lines
+    }
+    split_context_ok = True
+    for line_no in sorted(index_context_targets):
+        try:
+            witness = index_context_owner_record(line_no)
+        except ValueError:
+            split_context_ok = False
+            continue
+        if witness in context_owner_records or witness not in split_record_text:
+            split_context_ok = False
+            continue
+        context_owner_records.add(witness)
+        mode, score = retained_crosswalk_evidence(
+            at(line_no), split_record_text[witness]
+        )
+        if mode not in context_class_lines:
+            split_context_ok = False
+            continue
+        if mode == "NORMALIZED":
+            split_context_ok &= score >= 0.98
+        else:
+            split_context_ok &= score == 1.0
+        record = f"{line_no}->{witness}:{mode}:{score:.6f}"
+        context_crosswalk.add(record)
+        context_class_lines[mode].add(line_no)
+        context_class_records[mode].add(record)
+
+    context_crosswalk_actual = (
+        len(context_crosswalk),
+        digest_records(context_crosswalk),
+    )
+    context_owners_actual = (
+        len(context_owner_records),
+        digest_records(context_owner_records),
+    )
+    split_context_ok &= (
+        context_crosswalk_actual == EXPECTED_SPLIT_INDEX_CONTEXT_CROSSWALK
+        and context_owners_actual == EXPECTED_SPLIT_INDEX_CONTEXT_OWNERS
+        and len(context_owner_records) == len(index_context_targets)
+        and set().union(*context_class_lines.values()) == index_context_targets
+        and sum(map(len, context_class_lines.values()))
+        == len(index_context_targets)
+        and not context_owner_records & retained_owner_records
+        and not context_owner_records & split_records
+    )
+    context_class_actual: dict[str, tuple[int, str, str]] = {}
+    for name in context_class_lines:
+        actual = (
+            len(context_class_lines[name]),
+            digest(context_class_lines[name]),
+            digest_records(context_class_records[name]),
+        )
+        context_class_actual[name] = actual
+        split_context_ok &= (
+            actual == EXPECTED_SPLIT_INDEX_CONTEXT_CLASSES[name]
+        )
+    ok &= split_context_ok
+    print(
+        "split_index_context_owner_crosswalk",
+        "OK" if split_context_ok else "MISMATCH",
+        *context_crosswalk_actual,
+        *context_owners_actual,
+        *(f"{name}:{context_class_actual[name]}" for name in context_class_actual),
+    )
+
     atlas_lines = ATLAS.read_text(encoding="utf-8").splitlines()
     atlas_patterns = (
         re.compile(r"^## 4\. Systems Based on Numbers$", re.I),
@@ -1668,6 +1819,8 @@ def main() -> int:
         len(classification_delta)
         + len(index ^ set(INDEX_ROUTED))
         + (len(RETAINED) - len(retained_crosswalk))
+        + (len(index_context_targets) - len(context_crosswalk))
+        + (len(image_asset_lines) - len(image_asset_manifest))
     )
     unresolved_ok = unresolved_total == 0
     ok &= unresolved_ok
