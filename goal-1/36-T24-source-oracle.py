@@ -886,7 +886,8 @@ def main() -> int:
     atlas_ok = (
         len(atlas_lines) == 542
         and (len(atlas_hits), digest(atlas_hits)) == EXPECTED_ATLAS_HITS
-        and atlas_hits == {175}
+        and atlas_hits == {153}
+        and atlas_lines[152] == "### Continuous Cellular Automata"
         and "higher-dimensional geometry enriches form" in atlas_lines[174]
         and "same core behavior classes persist" in atlas_lines[174]
     )

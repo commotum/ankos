@@ -39,6 +39,7 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass, field
+from hashlib import sha256
 from itertools import permutations, product
 from math import comb, prod
 from typing import Protocol
@@ -1436,3 +1437,1029 @@ def expect_raises(error: type[BaseException], action: object) -> None:
         raise AssertionError(f"expected {error.__name__}, got {type(caught).__name__}") from caught
     raise AssertionError(f"expected {error.__name__}")
 
+
+# ---------------------------------------------------------------------------
+# Source-schema and semantic proofs
+# ---------------------------------------------------------------------------
+
+
+def assert_source_schemas_and_codes() -> dict[str, int]:
+    formula_checks = 0
+    positional_formula_checks = 0
+    for dimension in range(1, 7):
+        axes = axis_offsets(dimension)
+        full = full_shell_offsets(dimension)
+        assert len(axes) == 2 * dimension
+        assert len(full) == 3**dimension - 1
+        assert axes == tuple(sorted(axes))
+        assert full == tuple(sorted(full))
+        for alphabet_size in (2, 3, 4):
+            assert self_count_case_count(len(axes), alphabet_size) == (
+                alphabet_size * (2 * dimension * (alphabet_size - 1) + 1)
+            )
+            assert self_count_case_count(len(full), alphabet_size) == (
+                alphabet_size * ((3**dimension - 1) * (alphabet_size - 1) + 1)
+            )
+            formula_checks += 2
+
+    assert axis_positions(1) == ((-1,), (0,), (1,))
+    assert axis_positions(2) == ((-1, 0), (0, -1), (0, 0), (0, 1), (1, 0))
+    for dimension in range(1, 6):
+        for alphabet_size in (2, 3):
+            positions = axis_positions(dimension)
+            assert len(positions) == 2 * dimension + 1
+            assert alphabet_size ** len(positions) == alphabet_size ** (2 * dimension + 1)
+            positional_formula_checks += 1
+        assert len(full_positions(dimension)) == 3**dimension
+        positional_formula_checks += 1
+
+    address_roundtrips = 0
+    for alphabet_size in (2, 3):
+        for width in range(1, 8):
+            for index in range(alphabet_size**width):
+                context = context_from_index(index, width, alphabet_size)
+                assert context_index(context, alphabet_size) == index
+                address_roundtrips += 1
+
+    outer_code_cases = 0
+    old_self_preservation_cases = 0
+    for degree, code in ((3, 254), (5, 4094), (6, 16382)):
+        rows = 2 * (degree + 1)
+        table = binary_table_from_code(code, rows)
+        assert binary_code_from_table(table) == code
+        assert table.outputs == (0, *((1,) * (rows - 1)))
+        for center in (0, 1):
+            for neighbor_count in range(degree + 1):
+                index = center + 2 * neighbor_count
+                assert table.at(index) == int(center == 1 or neighbor_count > 0)
+                outer_code_cases += 1
+                if center == 1 and neighbor_count == 0:
+                    assert table.at(index) == 1
+                    old_self_preservation_cases += 1
+
+    source_10926 = binary_table_from_code(10926, 14)
+    assert binary_code_from_table(source_10926) == 10926
+    assert source_10926.outputs == (0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)
+    for center in (0, 1):
+        for neighbor_count in range(7):
+            assert source_10926.at(center + 2 * neighbor_count) == int(
+                center == 1 or neighbor_count == 1
+            )
+
+    # A full 4D 3^d positional map is finite (2^81 input rows for k=2)
+    # without being eagerly materialized.  This is closed data, not a callback.
+    huge_rows = 2 ** len(full_positions(4))
+    huge = DefaultOverridesTable(2, huge_rows, 0, ((0, 1), (huge_rows - 1, 1)))
+    assert huge.at(0) == huge.at(huge_rows - 1) == 1
+    assert huge.at(1) == 0
+
+    return {
+        "formula_checks": formula_checks,
+        "positional_formula_checks": positional_formula_checks,
+        "mixed_radix_roundtrips": address_roundtrips,
+        "outer_code_local_cases": outer_code_cases,
+        "old_self_preservation_cases": old_self_preservation_cases,
+        "closed_4d_positional_rows_exponent": len(full_positions(4)),
+    }
+
+
+def assert_translation_commutation() -> dict[str, int]:
+    shapes: dict[int, tuple[int, ...]] = {
+        1: (5,),
+        2: (3, 4),
+        3: (3, 2, 2),
+        4: (2, 2, 2, 2),
+        5: (2, 2, 2, 2, 2),
+    }
+    count_events = 0
+    positional_events = 0
+    large_positional_events = 0
+
+    for dimension, shape in shapes.items():
+        for profile_offsets in (axis_offsets(dimension), full_shell_offsets(dimension)):
+            for alphabet_size in (2, 3):
+                table = deterministic_table(
+                    alphabet_size,
+                    self_count_case_count(len(profile_offsets), alphabet_size),
+                    dimension + len(profile_offsets),
+                )
+                program = count_program(alphabet_size, len(profile_offsets), table)
+                for variant in range(4):
+                    native = NativeTranslationState(
+                        shape,
+                        alphabet_size,
+                        cells_pattern(prod(shape), alphabet_size, variant),
+                        generation=variant,
+                    )
+                    expected = native_translation_count_step(native, profile_offsets, table)
+                    generic = encode_translation(native, profile_offsets)
+                    actual = decode_translation(generic_step(program, generic), shape)
+                    assert actual == expected
+                    count_events += 1
+
+        positions = axis_positions(dimension)
+        positional_table = deterministic_table(2, 2 ** len(positions), dimension)
+        positional = positional_program(2, len(positions), positional_table)
+        for variant in range(3):
+            native = NativeTranslationState(
+                shape,
+                2,
+                cells_pattern(prod(shape), 2, variant + 1),
+                generation=9 + variant,
+            )
+            expected = native_translation_positional_step(native, positions, positional_table)
+            generic = encode_translation(native, positions)
+            actual = decode_translation(generic_step(positional, generic), shape)
+            assert actual == expected
+            positional_events += 1
+
+    # Complete full positional maps use a closed sparse table representation.
+    # The table remains total over every input row; only non-default rows are
+    # stored explicitly.
+    for dimension, shape, variant in ((3, (2, 2, 2), 2), (4, (1, 1, 1, 1), 1)):
+        positions = full_positions(dimension)
+        native = NativeTranslationState(
+            shape,
+            2,
+            cells_pattern(prod(shape), 2, variant),
+            generation=4,
+        )
+        reached = sorted(
+            {
+                context_index(
+                    tuple(native.value_at(add_coord(coord, offset)) for offset in positions),
+                    2,
+                )
+                for coord in all_coords(shape)
+            }
+        )
+        table = DefaultOverridesTable(
+            2,
+            2 ** len(positions),
+            0,
+            tuple((index, 1) for index in reached),
+        )
+        program = positional_program(2, len(positions), table)
+        expected = native_translation_positional_step(native, positions, table)
+        actual = decode_translation(
+            generic_step(program, encode_translation(native, positions)),
+            shape,
+        )
+        assert actual == expected
+        large_positional_events += 1
+
+    coordinate_roundtrips = 0
+    for dimension, shape in shapes.items():
+        for index in range(prod(shape)):
+            coord = coord_from_flat(shape, index)
+            assert flat_index(shape, coord) == index
+            coordinate_roundtrips += 1
+
+    # Exact coefficient-basis representations for two common 3D witnesses.
+    fcc_offsets = tuple(
+        sorted(
+            {
+                offset
+                for vector in (
+                    (1, 0, 0),
+                    (0, 1, 0),
+                    (0, 0, 1),
+                    (1, -1, 0),
+                    (1, 0, -1),
+                    (0, 1, -1),
+                )
+                for offset in (vector, tuple(-item for item in vector))
+            }
+        )
+    )
+    bcc_offsets = tuple(
+        sorted(
+            {
+                offset
+                for vector in (
+                    (1, 0, 0),
+                    (0, 1, 0),
+                    (0, 0, 1),
+                    (1, 1, 1),
+                    (1, 1, 0),
+                    (1, 0, 1),
+                    (0, 1, 1),
+                )
+                for offset in (vector, tuple(-item for item in vector))
+            }
+        )
+    )
+    fcc = LatticeDescriptor(
+        "fcc-coordinate-witness",
+        ((0, 1, 1), (1, 0, 1), (1, 1, 0)),
+        fcc_offsets,
+    )
+    bcc = LatticeDescriptor(
+        "bcc-coordinate-witness",
+        ((-1, 1, 1), (1, -1, 1), (1, 1, -1)),
+        bcc_offsets,
+    )
+    assert len(fcc.offsets) == 12 and len(bcc.offsets) == 14
+    assert bareiss_determinant(fcc.basis) != 0
+    assert bareiss_determinant(bcc.basis) != 0
+    embedded = 0
+    for descriptor in (fcc, bcc):
+        images = {descriptor.embed(coord) for coord in product(range(-1, 2), repeat=3)}
+        assert len(images) == 27
+        embedded += len(images)
+
+    return {
+        "translation_count_events": count_events,
+        "translation_positional_events": positional_events,
+        "large_closed_positional_events": large_positional_events,
+        "coordinate_roundtrips": coordinate_roundtrips,
+        "basis_embedding_witnesses": embedded,
+    }
+
+
+def assert_hexagonal_semantics() -> dict[str, int]:
+    contexts = tuple(product((0, 1), repeat=7))
+    rotations = orbit_partition(contexts, "rotation")
+    dihedral = orbit_partition(contexts, "dihedral")
+    assert len(rotations) == 28
+    assert len(dihedral) == 26
+    assert sum(len(orbit) for orbit in rotations) == 128
+    assert sum(len(orbit) for orbit in dihedral) == 128
+
+    rotation_outputs = tuple(index % 2 for index in range(len(rotations)))
+    complete_rotation = expand_orbit_table(rotation_outputs, rotations)
+    assert factor_orbit_table(complete_rotation, rotations) == rotation_outputs
+    dihedral_outputs = tuple((index // 2) % 2 for index in range(len(dihedral)))
+    complete_dihedral = expand_orbit_table(dihedral_outputs, dihedral)
+    assert factor_orbit_table(complete_dihedral, dihedral) == dihedral_outputs
+
+    # Directional projection is a complete map but is not rotationally
+    # invariant; compact orbit data must reject it.
+    directional = DenseTable(2, 128, tuple(context[1] for context in contexts))
+    expect_raises(ValueError, lambda: factor_orbit_table(directional, rotations))
+
+    outer_fiber_checks = 0
+    for code in (16382, 10926):
+        compact = binary_table_from_code(code, 14)
+        complete = expand_self_count_table(6, compact)
+        assert factor_self_count_table(6, complete) == compact
+        for center in (0, 1):
+            for count in range(7):
+                fiber = tuple(
+                    context
+                    for context in contexts
+                    if context[0] == center and sum(context[1:]) == count
+                )
+                assert len(fiber) == comb(6, count)
+                values = {complete.at(context_index(context, 2)) for context in fiber}
+                assert values == {compact.at(center + 2 * count)}
+                outer_fiber_checks += len(fiber)
+
+    totalistic_fibers = Counter(sum(context) for context in contexts)
+    assert tuple(totalistic_fibers[count] for count in range(8)) == tuple(comb(7, count) for count in range(8))
+    assert sum(totalistic_fibers.values()) == 128
+
+    # Explicit group/action derivation of the source rule-space exponents.
+    assert 2**128 == 2 ** len(contexts)  # complete positional maps
+    assert 2**28 == 2 ** len(rotations)
+    assert 2**26 == 2 ** len(dihedral)
+    assert 2**14 == 2 ** (2 * 7)  # Self x six-neighbor count
+    assert 2**8 == 2 ** (7 + 1)  # inclusive total count 0..7
+    assert 2**7 == 2 ** 7  # growth: only white-center count cases are free
+
+    codec_roundtrips = 0
+    centers: set[Coord] = set()
+    for address in product(range(-4, 5), repeat=2):
+        center = HEX_CODEC.encode(address)
+        assert HEX_CODEC.decode(center) == address
+        centers.add(center)
+        codec_roundtrips += 1
+    assert len(centers) == codec_roundtrips
+    displacements = tuple(HEX_CODEC.encode(offset) for offset in HEX_SQUARE_OFFSETS)
+    assert len(set(displacements)) == 6
+    assert all(HEX_CODEC.squared_scaled_distance(delta) == 4 for delta in displacements)
+    expect_raises(ValueError, lambda: HEX_CODEC.decode((0, 1)))
+
+    global_events = 0
+    shape = (3, 3)
+    for code in (16382, 10926):
+        table = binary_table_from_code(code, 14)
+        program = count_program(2, 6, table)
+        for mask in range(1 << prod(shape)):
+            cells = tuple((mask >> index) & 1 for index in range(prod(shape)))
+            native = NativeTranslationState(shape, 2, cells, generation=2)
+            expected = native_translation_count_step(native, HEX_SQUARE_OFFSETS, table)
+            actual = decode_translation(
+                generic_step(program, encode_translation(native, HEX_SQUARE_OFFSETS)),
+                shape,
+            )
+            assert actual == expected
+            global_events += 1
+
+    return {
+        "hex_rotation_orbits": len(rotations),
+        "hex_dihedral_orbits": len(dihedral),
+        "hex_outer_fiber_rows": outer_fiber_checks,
+        "hex_totalistic_contexts": sum(totalistic_fibers.values()),
+        "hex_codec_roundtrips": codec_roundtrips,
+        "hex_native_generic_events": global_events,
+        "hex_noninvariant_rejections": 1,
+    }
+
+
+def assert_fixed_incidence_semantics() -> dict[str, int]:
+    degree_profile_events = 0
+    named_degree_profiles = 0
+    for _name, dimension, degree in SOURCE_NEAREST_DEGREES:
+        assert dimension in (2, 3, 4)
+        assert degree in (4, 6, 8, 12, 14, 16, 24)
+        size = degree + 3 if (degree + 3) % 2 else degree + 4
+        rows = circulant_rows(size, degree)
+        assert all(len(row) == degree for row in rows)
+        for salt in (1, 4):
+            table = deterministic_table(2, self_count_case_count(degree, 2), salt)
+            cases = (CountCase("cell", degree, table),)
+            program = typed_count_program(2, cases)
+            for variant in range(4):
+                native = NativeIncidenceState(
+                    tuple((index,) for index in range(size)),
+                    ("cell",) * size,
+                    rows,
+                    False,
+                    2,
+                    cells_pattern(size, 2, variant),
+                    generation=variant,
+                )
+                expected = native_count_step(native, cases)
+                actual = decode_incidence(generic_step(program, encode_incidence(native)), native)
+                assert actual == expected
+                assert actual.rows == native.rows
+                degree_profile_events += 1
+        named_degree_profiles += 1
+    assert named_degree_profiles == 10
+
+    # Congruent pentagonal-cell profile: five incidences and complete code
+    # 4094.  K6 is only a bounded degree-5 semantic fixture; it is not claimed
+    # to be the Book plate's planar global topology.
+    pentagonal_events = 0
+    pentagonal_rows = tuple(
+        tuple(target for target in range(6) if target != site)
+        for site in range(6)
+    )
+    pentagonal_table = binary_table_from_code(4094, 12)
+    pentagonal_cases = (CountCase("pentagon", 5, pentagonal_table),)
+    pentagonal_program = typed_count_program(2, pentagonal_cases)
+    for mask in range(64):
+        cells = tuple((mask >> index) & 1 for index in range(6))
+        native = NativeIncidenceState(
+            tuple((index,) for index in range(6)),
+            ("pentagon",) * 6,
+            pentagonal_rows,
+            False,
+            2,
+            cells,
+        )
+        expected = native_count_step(native, pentagonal_cases)
+        actual = decode_incidence(generic_step(pentagonal_program, encode_incidence(native)), native)
+        assert actual == expected
+        pentagonal_events += 1
+
+    # Two source tile shapes treated by the same degree-3 code 254 table.
+    # K3,3 proves the typed/same-rule invariant without pretending to replay a
+    # Penrose patch not specified as coordinates in the prose.
+    two_shape_events = 0
+    two_shape_rows = complete_bipartite_rows(3, 3)
+    code254 = binary_table_from_code(254, 8)
+    two_shape_cases = (
+        CountCase("shape-A", 3, code254),
+        CountCase("shape-B", 3, code254),
+    )
+    two_shape_program = typed_count_program(2, two_shape_cases)
+    for mask in range(64):
+        cells = tuple((mask >> index) & 1 for index in range(6))
+        native = NativeIncidenceState(
+            tuple((index,) for index in range(6)),
+            ("shape-A",) * 3 + ("shape-B",) * 3,
+            two_shape_rows,
+            False,
+            2,
+            cells,
+        )
+        expected = native_count_step(native, two_shape_cases)
+        actual = decode_incidence(generic_step(two_shape_program, encode_incidence(native)), native)
+        assert actual == expected
+        two_shape_events += 1
+
+    # A triangle tiling has two cell orientations.  Its incidence is fixed but
+    # site-conditioned; the same code 254 applies to both types.
+    alternating_events = 0
+    alternating_cases = (
+        CountCase("up", 3, code254),
+        CountCase("down", 3, code254),
+    )
+    alternating_program = typed_count_program(2, alternating_cases)
+    for mask in range(256):
+        cells = tuple((mask >> index) & 1 for index in range(8))
+        native = triangular_tile_state((2, 2), cells)
+        expected = native_count_step(native, alternating_cases)
+        actual = decode_incidence(generic_step(alternating_program, encode_incidence(native)), native)
+        assert actual == expected
+        alternating_events += 1
+
+    # Concrete failure of one global static Cartesian offset list over
+    # (row,column,orientation).  Even if orientation is reduced mod 2, the
+    # row/column signs disagree on a quotient with extent > 2.
+    up_offsets = ((0, 0, 1), (-1, 0, 1), (0, -1, 1))
+    down_offsets = ((0, 0, -1), (1, 0, -1), (0, 1, -1))
+    assert set(up_offsets) != set(down_offsets)
+    down_site = (2, 2, 1)
+    wrong_from_global_up = ((down_site[0] - 1) % 5, down_site[1], 0)
+    required_from_down = ((down_site[0] + 1) % 5, down_site[1], 0)
+    assert wrong_from_global_up == (1, 2, 0)
+    assert required_from_down == (3, 2, 0)
+    assert wrong_from_global_up != required_from_down
+
+    # A fixed finite-type network may give each type its own incidence degree
+    # and complete count table while using the same runner and UPDATE.
+    finite_type_events = 0
+    finite_type_rows = complete_bipartite_rows(2, 3)
+    high_table = deterministic_table(2, 8, 1)  # degree 3
+    low_table = deterministic_table(2, 6, 0)  # degree 2
+    finite_type_cases = (
+        CountCase("degree-3", 3, high_table),
+        CountCase("degree-2", 2, low_table),
+    )
+    finite_type_program = typed_count_program(2, finite_type_cases)
+    for mask in range(32):
+        cells = tuple((mask >> index) & 1 for index in range(5))
+        native = NativeIncidenceState(
+            tuple((index,) for index in range(5)),
+            ("degree-3",) * 2 + ("degree-2",) * 3,
+            finite_type_rows,
+            False,
+            2,
+            cells,
+        )
+        expected = native_count_step(native, finite_type_cases)
+        actual = decode_incidence(generic_step(finite_type_program, encode_incidence(native)), native)
+        assert actual == expected
+        finite_type_events += 1
+
+    # Unlabelled ports may be stored in any row order, but only a
+    # permutation-invariant rule can consume them.
+    local_permutation_checks = 0
+    degree3_case = CountCase("cell", 3, code254)
+    degree3_rule = SelfCountRule(2, (degree3_case,))
+    for context in product((0, 1), repeat=4):
+        center, neighbors = context[0], context[1:]
+        expected = degree3_rule.evaluate(LocalRead(0, "cell", center, neighbors, False, None))
+        for permuted in permutations(neighbors):
+            actual = degree3_rule.evaluate(LocalRead(0, "cell", center, permuted, False, None))
+            assert actual == expected
+            local_permutation_checks += 1
+
+    unlabelled_global_events = 0
+    k4_rows = tuple(tuple(target for target in range(4) if target != site) for site in range(4))
+    reversed_rows = tuple(tuple(reversed(row)) for row in k4_rows)
+    unlabelled_program = typed_count_program(2, (degree3_case,))
+    for mask in range(16):
+        cells = tuple((mask >> index) & 1 for index in range(4))
+        first = NativeIncidenceState(
+            tuple((index,) for index in range(4)),
+            ("cell",) * 4,
+            k4_rows,
+            False,
+            2,
+            cells,
+        )
+        second = NativeIncidenceState(
+            first.keys,
+            first.site_types,
+            reversed_rows,
+            False,
+            2,
+            cells,
+        )
+        next_first = generic_step(unlabelled_program, encode_incidence(first))
+        next_second = generic_step(unlabelled_program, encode_incidence(second))
+        assert decode_incidence(next_first, first) == native_count_step(first, (degree3_case,))
+        assert decode_incidence(next_second, second) == native_count_step(second, (degree3_case,))
+        assert next_first.cells == next_second.cells
+        unlabelled_global_events += 2
+
+    projection_table = DenseTable(2, 8, tuple(context[0] for context in product((0, 1), repeat=3)))
+    positional_case = PositionalCase("cell", 3, projection_table)
+    positional_on_unlabelled = typed_positional_program(2, (positional_case,))
+    unlabelled_fixture = NativeIncidenceState(
+        tuple((index,) for index in range(4)),
+        ("cell",) * 4,
+        k4_rows,
+        False,
+        2,
+        (1, 0, 0, 0),
+    )
+    expect_raises(
+        ValueError,
+        lambda: generic_step(positional_on_unlabelled, encode_incidence(unlabelled_fixture)),
+    )
+
+    # Labelled ports make ordered positional data meaningful.  A closed table
+    # projects the left port; reversing the rows without permuting the rule is
+    # observably different, as it should be.
+    labelled_events = 0
+    cycle_size = 5
+    labelled_rows = tuple(((site - 1) % cycle_size, (site + 1) % cycle_size) for site in range(cycle_size))
+    labelled_port_rows = tuple(("left", "right") for _ in range(cycle_size))
+    left_projection = DenseTable(2, 4, (0, 0, 1, 1))
+    labelled_case = PositionalCase("cell", 2, left_projection)
+    labelled_program = typed_positional_program(2, (labelled_case,))
+    labelled_witness_outputs: tuple[Cells, Cells] | None = None
+    for mask in range(32):
+        cells = tuple((mask >> index) & 1 for index in range(cycle_size))
+        native = NativeIncidenceState(
+            tuple((index,) for index in range(cycle_size)),
+            ("cell",) * cycle_size,
+            labelled_rows,
+            True,
+            2,
+            cells,
+            port_labels=labelled_port_rows,
+        )
+        expected = native_positional_step(native, (labelled_case,))
+        actual = decode_incidence(generic_step(labelled_program, encode_incidence(native)), native)
+        assert actual == expected
+        labelled_events += 1
+        reversed_native = NativeIncidenceState(
+            native.keys,
+            native.site_types,
+            tuple(tuple(reversed(row)) for row in native.rows),
+            True,
+            2,
+            cells,
+            port_labels=tuple(("right", "left") for _ in range(cycle_size)),
+        )
+        reversed_output = native_positional_step(reversed_native, (labelled_case,)).cells
+        if expected.cells != reversed_output and labelled_witness_outputs is None:
+            labelled_witness_outputs = (expected.cells, reversed_output)
+    assert labelled_witness_outputs is not None
+
+    return {
+        "source_degree_profiles": named_degree_profiles,
+        "degree_profile_events": degree_profile_events,
+        "pentagonal_code4094_events": pentagonal_events,
+        "two_shape_code254_events": two_shape_events,
+        "alternating_orientation_events": alternating_events,
+        "finite_type_network_events": finite_type_events,
+        "unlabelled_local_permutation_checks": local_permutation_checks,
+        "unlabelled_global_events": unlabelled_global_events,
+        "labelled_positional_events": labelled_events,
+        "unlabelled_positional_rejections": 1,
+        "static_offset_failure_witnesses": 1,
+    }
+
+
+def assert_alias_multiplicity_and_parallel_update() -> dict[str, int]:
+    alias_events = 0
+
+    # On the 1^4 quotient, eight distinct axial offsets all address the one
+    # stored site.  Occurrence multiplicity gives sum=8, not deduplicated sum=1.
+    axes4 = axis_offsets(4)
+    one = NativeTranslationState((1, 1, 1, 1), 2, (1,))
+    rows = self_count_case_count(8, 2)
+    distinguishing = DefaultOverridesTable(2, rows, 0, ((17, 1),))
+    encoded = encode_translation(one, axes4)
+    relation = encoded.support.relation("local")
+    assert len(relation.rows[0]) == 8 and len(set(relation.rows[0])) == 1
+    expected = native_translation_count_step(one, axes4, distinguishing)
+    actual = decode_translation(generic_step(count_program(2, 8, distinguishing), encoded), one.shape)
+    assert expected.cells == actual.cells == (1,)
+    assert distinguishing.at(3) == 0  # the incorrect deduplicated address
+    alias_events += 1
+
+    # Full 2D access on 2x2 has three targets with multiplicities 4,2,2.
+    square = NativeTranslationState((2, 2), 2, (1, 0, 0, 0))
+    full2 = full_shell_offsets(2)
+    square_generic = encode_translation(square, full2)
+    first_row_counts = sorted(Counter(square_generic.support.relation("local").rows[0]).values())
+    assert first_row_counts == [2, 2, 4]
+    square_table = deterministic_table(2, self_count_case_count(8, 2), 1)
+    assert decode_translation(
+        generic_step(count_program(2, 8, square_table), square_generic),
+        square.shape,
+    ) == native_translation_count_step(square, full2, square_table)
+    alias_events += 1
+
+    # Three parallel ports to the same peer remain three occurrences.
+    parallel_rows = ((1, 1, 1), (0, 0, 0))
+    parallel = NativeIncidenceState(
+        ((0,), (1,)),
+        ("cell", "cell"),
+        parallel_rows,
+        False,
+        2,
+        (0, 1),
+    )
+    port_table = DefaultOverridesTable(2, 8, 0, ((6, 1),))
+    port_case = CountCase("cell", 3, port_table)
+    parallel_next = generic_step(typed_count_program(2, (port_case,)), encode_incidence(parallel))
+    assert parallel_next.cells[0] == 1
+    assert port_table.at(2) == 0  # the incorrect set-valued/deduplicated address
+    assert decode_incidence(parallel_next, parallel) == native_count_step(parallel, (port_case,))
+    alias_events += 1
+
+    # Snapshot-parallel evaluation differs from an in-place site-order loop.
+    predecessor_rows = ((2,), (0,), (1,))
+    labels = (("predecessor",),) * 3
+    old = NativeIncidenceState(
+        ((0,), (1,), (2,)),
+        ("cell",) * 3,
+        predecessor_rows,
+        True,
+        2,
+        (1, 0, 0),
+        port_labels=labels,
+    )
+    identity = DenseTable(2, 2, (0, 1))
+    case = PositionalCase("cell", 1, identity)
+    expected = native_positional_step(old, (case,))
+    old_generic = encode_incidence(old)
+    actual_generic = generic_step(typed_positional_program(2, (case,)), old_generic)
+    actual = decode_incidence(actual_generic, old)
+    assert actual == expected
+    assert actual.cells == (0, 1, 0)
+    in_place = list(old.cells)
+    for site, row in enumerate(old.rows):
+        in_place[site] = in_place[row[0]]
+    assert tuple(in_place) == (0, 0, 0)
+    assert tuple(in_place) != actual.cells
+    assert actual_generic.support is old_generic.support
+
+    return {
+        "alias_multiplicity_events": alias_events,
+        "old_snapshot_events": 1,
+        "in_place_disagreement_witnesses": 1,
+    }
+
+
+RUNTIME_GAP_MATRIX: tuple[tuple[str, str, str], ...] = (
+    (
+        "src/ca/alphabets.py",
+        "direct reuse for strict T24",
+        "boolean/int-range/symbolic finite scalar labels suffice; broader product/tagged alphabets remain a separate Goal2 gap",
+    ),
+    (
+        "src/ca/loci.py",
+        "parameterization gap",
+        "canonical coordinates are hard-limited to [t,x,y,z] and spatial rank 0..3",
+    ),
+    (
+        "src/ca/neighborhoods.py",
+        "partial reuse/gap",
+        "literal and metric selectors work through rank 3; no arbitrary-d coefficient offsets or typed fixed-incidence relation",
+    ),
+    (
+        "src/ca/frontiers.py",
+        "semantic reuse/realization gap",
+        "time_slice is AllSites for dense rank<=3 tensors; fixed-incidence supports are not exposed",
+    ),
+    (
+        "src/ca/rules.py",
+        "schema gap",
+        "no closed arbitrary-d count/positional tables, typed site cases, or labelled-port schemas",
+    ),
+    (
+        "src/ca/rollout.py",
+        "implementation gap",
+        "evaluation branches on named families and dense numpy rank instead of applying a closed typed RULE to a support relation",
+    ),
+    (
+        "src/ca/rollout.py:_normalize_rule_ids",
+        "representation gap",
+        "numpy int64 coercion cannot carry arbitrary-precision finite rule codes",
+    ),
+    (
+        "src/ca/specs.py + datasets.py",
+        "manifest gap",
+        "Phase-1 family dispatch has no dimension/basis/incidence/access/table descriptors",
+    ),
+    (
+        "src/ca/viz",
+        "observer",
+        "rank-3 coordinates, projections, palettes, and distorted centers are views, never topology or RULE identity",
+    ),
+)
+
+
+DECISION_MATRIX: tuple[tuple[str, str, str, str], ...] = (
+    (
+        "DOMAIN",
+        "parameterization",
+        "DiscreteSpace(dimension=d)",
+        "arbitrary finite d is dimensional task space, not a HigherDimensionalCA class",
+    ),
+    (
+        "CONFIGURATION",
+        "parameterization/lossless representation",
+        "FixedSupport(FiniteAlphabet,TopologyOrIncidence)",
+        "Z^d coefficients, finite quotients, and literal fixed incidence preserve complete label state and topology",
+    ),
+    (
+        "ALPHABET",
+        "direct reuse",
+        "FiniteAlphabet",
+        "binary and finite-k source profiles need no lattice-named alphabet",
+    ),
+    (
+        "FRONTIER",
+        "direct reuse",
+        "AllSites",
+        "every fixed-support site fires once",
+    ),
+    (
+        "NEIGHBORHOOD",
+        "parameterization/lossless representation",
+        "OrderedOffsets | TypedIncidence | LabelledPorts",
+        "occurrence multiplicity, site type, and port labels are explicit access data",
+    ),
+    (
+        "RULE",
+        "restriction/lossless representation",
+        "ClosedTable(Positional | SelfXCount | OrbitFactor)",
+        "compact tables factor complete maps only on certified constant fibers",
+    ),
+    (
+        "UPDATE",
+        "direct reuse",
+        "SnapshotParallelSameSite",
+        "strict T24 changes labels only and preserves support/incidence",
+    ),
+    (
+        "REALIZATION/VIEW",
+        "parameterization/observer",
+        "FiniteQuotient + BasisCodec + Projection",
+        "quotients preserve access occurrences; embeddings and displayed centers do not drive evolution",
+    ),
+)
+
+
+def assert_architecture_and_structural_control() -> dict[str, int]:
+    assert tuple(row[0] for row in DECISION_MATRIX) == (
+        "DOMAIN",
+        "CONFIGURATION",
+        "ALPHABET",
+        "FRONTIER",
+        "NEIGHBORHOOD",
+        "RULE",
+        "UPDATE",
+        "REALIZATION/VIEW",
+    )
+    assert DECISION_MATRIX[6][1] == "direct reuse"
+    assert all("executor" not in row[2].lower() for row in DECISION_MATRIX)
+    assert len(RUNTIME_GAP_MATRIX) == 9
+    assert sum("gap" in row[1] for row in RUNTIME_GAP_MATRIX) == 7
+    assert any(row[1] == "observer" for row in RUNTIME_GAP_MATRIX)
+
+    # Concrete category-4 control: structural node creation cannot be the
+    # result of same-site label assignments because that UPDATE preserves the
+    # support object and site cardinality.  This is routed to the already
+    # evidenced graph-write axis (T29), not made a T24 executor.
+    old_rows = ((1, 2), (0, 2), (0, 1))
+    old = NativeIncidenceState(
+        ((0,), (1,), (2,)),
+        ("cell",) * 3,
+        old_rows,
+        False,
+        2,
+        (1, 0, 0),
+    )
+    table = deterministic_table(2, self_count_case_count(2, 2), 1)
+    case = CountCase("cell", 2, table)
+    label_successor = generic_step(typed_count_program(2, (case,)), encode_incidence(old))
+    assert label_successor.support.keys == old.keys
+    assert len(label_successor.support.keys) == 3
+    native_structural_keys = (*old.keys, (3,))
+    native_structural_rows = ((1, 2, 3), (0, 2), (0, 1), (0,))
+    assert len(native_structural_keys) == 4
+    assert native_structural_rows != old.rows
+    assert len(native_structural_keys) != len(label_successor.support.keys)
+
+    return {
+        "audit_category_1_to_3_rows": len(DECISION_MATRIX),
+        "structural_graph_counterexamples": 1,
+        "new_strict_t24_update_algebras": 0,
+    }
+
+
+def assert_hostile_validation() -> dict[str, int]:
+    rejection_count = 0
+
+    def rejects(error: type[BaseException], action: object) -> None:
+        nonlocal rejection_count
+        expect_raises(error, action)
+        rejection_count += 1
+
+    rejects(TypeError, lambda: FiniteAlphabet(True))
+    rejects(ValueError, lambda: FiniteAlphabet(1))
+    rejects(TypeError, lambda: DenseTable(2, 2, [0, 1]))
+    rejects(ValueError, lambda: DenseTable(2, 2, (0,)))
+    rejects(ValueError, lambda: DenseTable(2, 2, (0, 2)))
+    rejects(ValueError, lambda: DefaultOverridesTable(2, 4, 0, ((2, 1), (2, 0))))
+    rejects(ValueError, lambda: DefaultOverridesTable(2, 4, 0, ((4, 1),)))
+    rejects(TypeError, lambda: validate_closed_table(lambda index: 0, 2, 4))
+    rejects(ValueError, lambda: axis_offsets(0))
+    rejects(ValueError, lambda: full_shell_offsets(-1))
+    rejects(TypeError, lambda: checked_shape([2, 2]))
+    rejects(ValueError, lambda: coord_from_flat((2, 2), 4))
+    rejects(ValueError, lambda: context_from_index(8, 3, 2))
+    rejects(ValueError, lambda: LatticeDescriptor("singular", ((1, 1), (1, 1)), ((1, 0),)))
+    rejects(ValueError, lambda: LatticeDescriptor("duplicate", identity_basis(2), ((1, 0), (1, 0))))
+    rejects(ValueError, lambda: IncidenceRelation("bad", ((0,),), False, (("port",),)))
+    rejects(ValueError, lambda: IncidenceRelation("bad", ((0, 0),), True, (("x", "x"),)))
+    rejects(
+        ValueError,
+        lambda: FixedSupport(((0,),), ("cell",), (IncidenceRelation("x", ((1,),), False),)),
+    )
+    rejects(
+        ValueError,
+        lambda: FixedSupport(
+            ((0,),),
+            ("cell",),
+            (IncidenceRelation("x", ((0,),), False), IncidenceRelation("x", ((0,),), False)),
+        ),
+    )
+    rejects(ValueError, lambda: SnapshotToken(-1))
+    rejects(TypeError, lambda: SnapshotToken(False))
+    rejects(ValueError, lambda: CountCase("cell", -1, DenseTable(2, 2, (0, 1))))
+    rejects(
+        ValueError,
+        lambda: SelfCountRule(2, (CountCase("cell", 2, DenseTable(2, 5, (0,) * 5)),)),
+    )
+    rejects(
+        ValueError,
+        lambda: PositionalRule(2, (PositionalCase("cell", 2, DenseTable(2, 3, (0,) * 3)),)),
+    )
+    rejects(ValueError, lambda: HEX_CODEC.decode((1, 0)))
+    rejects(ValueError, lambda: orbit_partition(tuple(product((0, 1), repeat=7)), "bad"))
+
+    fixture = NativeIncidenceState(
+        ((0,), (1,)),
+        ("cell", "cell"),
+        ((1,), (0,)),
+        False,
+        2,
+        (1, 0),
+    )
+    generic = encode_incidence(fixture)
+    table = deterministic_table(2, 4, 1)
+    rule = SelfCountRule(2, (CountCase("cell", 1, table),))
+    program = typed_count_program(2, rule.cases)
+    active = select_all_sites(generic, program.frontier)
+    reads = read_neighborhood(generic, active, program.neighborhood)
+    writes = make_assignments(generic, program, active, reads)
+    peer = encode_incidence(fixture)
+    foreign = (SiteHandle(peer.snapshot_token, 0), active[1])
+    rejects(ValueError, lambda: read_neighborhood(generic, foreign, program.neighborhood))
+    rejects(ValueError, lambda: read_neighborhood(generic, (active[0], active[0]), program.neighborhood))
+    rejects(
+        ValueError,
+        lambda: apply_parallel(
+            generic,
+            active,
+            (SiteAssignment(writes[0].source, 1, writes[0].value), writes[1]),
+        ),
+    )
+    successor = apply_parallel(generic, active, writes)
+    rejects(ValueError, lambda: read_neighborhood(successor, active, program.neighborhood))
+
+    # Wrong type-conditioned arity is rejected before any rule evaluation.
+    wrong_case = CountCase("cell", 2, deterministic_table(2, 6, 0))
+    rejects(
+        ValueError,
+        lambda: generic_step(typed_count_program(2, (wrong_case,)), generic),
+    )
+
+    return {"hostile_rejections": rejection_count}
+
+
+def semantic_digest(counts: dict[str, int]) -> str:
+    transcript = "\n".join(f"{key}={counts[key]}" for key in sorted(counts))
+    return sha256(transcript.encode("utf-8")).hexdigest()
+
+
+EXPECTED_SEMANTIC_DIGEST = "5911d160e338f2f1e81bcde4985081f933580712e9b3804715b3a361b9c8daf9"
+
+
+def main() -> None:
+    groups = {
+        "source": assert_source_schemas_and_codes(),
+        "translation": assert_translation_commutation(),
+        "hex": assert_hexagonal_semantics(),
+        "incidence": assert_fixed_incidence_semantics(),
+        "update": assert_alias_multiplicity_and_parallel_update(),
+        "architecture": assert_architecture_and_structural_control(),
+        "hostile": assert_hostile_validation(),
+    }
+    counts = {
+        f"{group}.{key}": value
+        for group, values in groups.items()
+        for key, value in values.items()
+    }
+    native_generic_events = sum(
+        value
+        for key, value in counts.items()
+        if key.endswith("_events") and "in_place" not in key
+    )
+    counts["total.native_generic_events"] = native_generic_events
+    digest = semantic_digest(counts)
+    if EXPECTED_SEMANTIC_DIGEST != "TO_BE_FROZEN_AFTER_FIRST_PASS":
+        assert digest == EXPECTED_SEMANTIC_DIGEST
+
+    print("T24 semantic oracle: PASS")
+    print(f"native_generic_events={native_generic_events}")
+    print(
+        "event_partition="
+        f"translation_count:{groups['translation']['translation_count_events']},"
+        f"translation_positional:{groups['translation']['translation_positional_events']},"
+        f"large_closed_positional:{groups['translation']['large_closed_positional_events']},"
+        f"hex:{groups['hex']['hex_native_generic_events']},"
+        f"declared_degree:{groups['incidence']['degree_profile_events']},"
+        f"pentagonal:{groups['incidence']['pentagonal_code4094_events']},"
+        f"two_shape:{groups['incidence']['two_shape_code254_events']},"
+        f"alternating_orientation:{groups['incidence']['alternating_orientation_events']},"
+        f"finite_type_network:{groups['incidence']['finite_type_network_events']},"
+        f"unlabelled_global:{groups['incidence']['unlabelled_global_events']},"
+        f"labelled_positional:{groups['incidence']['labelled_positional_events']},"
+        f"alias:{groups['update']['alias_multiplicity_events']},"
+        f"old_snapshot:{groups['update']['old_snapshot_events']}"
+    )
+    print(
+        "arbitrary_d_formulas="
+        "axes_degree=2d,axes_cases=k*(2d*(k-1)+1);"
+        "full_degree=3^d-1,full_cases=k*((3^d-1)*(k-1)+1);"
+        "positional_rows=k^s,positional_rule_count=k^(k^s);"
+        f"checks:{groups['source']['formula_checks'] + groups['source']['positional_formula_checks']}"
+    )
+    print(
+        "closed_rule_data="
+        "DenseTable|DefaultOverridesTable; callbacks=NONE;"
+        "4D_full_width=81,rows=2^81; eager_materialization=NOT_REQUIRED"
+    )
+    print(
+        "hex_rule_spaces="
+        "general:2^128,rotation:2^28,dihedral_complete:2^26,"
+        "outer:2^14,totalistic:2^8,growth:2^7;"
+        f"explicit_orbits:{groups['hex']['hex_rotation_orbits']}/"
+        f"{groups['hex']['hex_dihedral_orbits']};"
+        f"fiber_rows:{groups['hex']['hex_outer_fiber_rows']}"
+    )
+    print(
+        "hex_codec=(row,column)->(row,2*column-row);inverse=PASS;"
+        "six_access_displacements_have_scaled_distance_squared_4;"
+        "sqrt3_center_embedding=VIEW_ONLY"
+    )
+    print(
+        "source_outer_codes="
+        "degree3:254,degree5:4094,degree6:16382 all equal complete growth OR tables;"
+        "old_Self_preserved_at_neighbor_count0;"
+        "degree6_code10926=old_Self_persistence_OR_exactly_one_neighbor_birth"
+    )
+    print(
+        "fixed_incidence="
+        f"source_degree_profiles:{groups['incidence']['source_degree_profiles']};"
+        "Book_degree_only_entries_do_not_invent_global_topology;"
+        "typed/site-conditioned_access=PASS; fixed_topology=PASS"
+    )
+    print(
+        "unlabelled_incidence="
+        f"permutation_checks:{groups['incidence']['unlabelled_local_permutation_checks']};"
+        "count_rule_invariant=PASS; positional_rule_rejected=PASS;"
+        "labelled_ports_positional=PASS"
+    )
+    print(
+        "alternating_orientation_static_offset_counterexample="
+        "global_up_offset(-1,0,+1)@down(2,2,1)->(1,2,0),"
+        "native_down_neighbor=(3,2,0); typed_incidence_repairs_without_new_UPDATE"
+    )
+    print(
+        "occurrence_multiplicity="
+        "1^4_axes:eight_aliases_not_one;2x2_full:multiplicities[2,2,4];"
+        "parallel_ports:three_aliases_not_one; PASS"
+    )
+    print("old_snapshot_parallelism=PASS; same_site_atomic_commit=PASS; in_place_witness=PASS")
+    print(
+        "runtime_audit="
+        "scalar_alphabet+selector concepts+AllSites+same-site kernel reusable;"
+        "gaps=rank<=3,typed_incidence,closed_schema_tables,bigint_ids,family_dispatch;"
+        "views_are_observers"
+    )
+    print(
+        "classification=categories1_to_3_for_all_strict_T24_profiles;"
+        "new_T24_UPDATE=NONE;new_executor=NONE;"
+        "structural_node_creation_is_concrete_nonfit_routed_to_existing_graph-write_axis"
+    )
+    print(f"hostile_rejections={groups['hostile']['hostile_rejections']}")
+    print(f"semantic_digest={digest}")
+
+
+if __name__ == "__main__":
+    main()
