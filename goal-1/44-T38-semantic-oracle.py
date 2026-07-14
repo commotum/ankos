@@ -2496,6 +2496,34 @@ def audit_hostile_validation() -> int:
         ),
     )
 
+    # Complementary provenance sentinel: these different closed programs fail
+    # on the same exact prefix with the same carrier reason.  Only the program
+    # identity distinguishes which terminal attempt belongs to the trace.
+    provenance_left_program = RecurrenceProgram(Sub(C(1), lag(1)))
+    provenance_right_program = RecurrenceProgram(Sub(C(2), plus(lag(1), C(1))))
+    shared_failure_prefix = NumericPrefix(1, (1,))
+    provenance_left = run(provenance_left_program, shared_failure_prefix, 1)
+    provenance_right = run(provenance_right_program, shared_failure_prefix, 1)
+    assert type(provenance_left.outcome) is ErrorOutcome
+    assert type(provenance_right.outcome) is ErrorOutcome
+    assert type(provenance_left.terminal_attempt) is RuleFailure
+    assert type(provenance_right.terminal_attempt) is RuleFailure
+    assert provenance_left.outcome == provenance_right.outcome
+    assert provenance_left.terminal_attempt.old_prefix == provenance_right.terminal_attempt.old_prefix
+    assert provenance_left.provenance != provenance_right.provenance
+    rejected += must_raise(
+        ValueError,
+        lambda: RunTrace(
+            provenance_left.provenance,
+            provenance_left.initial,
+            provenance_left.requested_events,
+            provenance_left.states,
+            provenance_left.events,
+            provenance_left.outcome,
+            provenance_right.terminal_attempt,
+        ),
+    )
+
     # Explicit semantic mutation sentinels.
     invalid = generic_step(RecurrenceProgram(at(C(-1))), NumericPrefix(1, (7, 11)))
     assert type(invalid.outcome) is ErrorOutcome
@@ -2534,7 +2562,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "3f56c8a84f473b5a7551f7a5cb91489cf96537426bb07536fa4d869e083f2f65"
+EXPECTED_DIGEST = "416670f63d52cdb84982dfc4f135c4fa51e3d64a8c9a6579b0d1533c8d693b06"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
