@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Frozen native physical-asset fixed point for T11 Generalized Mobile Automata.
 
-This oracle deliberately starts from the native Chapter 3 construction and
-its malformed Notes implementation fragment.  The broader source-neighborhood
-ledger is bound below through ``29-T11-source-oracle.py`` once that source
-closure is frozen; it must never be inferred from the catalog summary.
+This oracle starts from the native Chapter 3 construction and its malformed
+Notes implementation fragment, then binds the exhaustive source-neighborhood
+ledger through ``29-T11-source-oracle.py``.  Nothing is inferred from the
+catalog summary.
 """
 
 from __future__ import annotations
@@ -88,30 +88,34 @@ assert not (
     or PREDECESSOR_C4 & SUCCESSOR_C4
 )
 
-# C: direct construction/rule evidence.  O: direct evolution observer.  R:
-# typed predecessor/successor relation.  X: mechanical Notes adjacency control.
+# C: direct construction/rule evidence.  O: direct evolution observer.  The
+# final R/X classes are completed after binding the exhaustive source closure.
 # Figure 932 contains both eight rules and their evolutions, so construction is
 # its stronger role; C/O never imply that raster layout is native state.
 C = {922, 932}
 O = {926}
-R = PREDECESSOR_C4 | SUCCESSOR_C4
-X = NOTES_C4
-U_NATIVE = C | O | R | X
-assert U_NATIVE == CHAPTER_C4 | NOTES_C4 | PREDECESSOR_C4 | SUCCESSOR_C4
-assert (len(C), len(O), len(R), len(X), len(U_NATIVE)) == (2, 1, 7, 2, 12)
+STRICT_U = C | O
+assert STRICT_U == CHAPTER_C4 and len(STRICT_U) == 3
 
-REASON_NATIVE: dict[int, str] = {}
-for line_number in C:
-    REASON_NATIVE[line_number] = "native generalized-mobile rule/construction plate"
-for line_number in O:
-    REASON_NATIVE[line_number] = "native generalized-mobile evolution observer"
-for line_number in PREDECESSOR_C4:
-    REASON_NATIVE[line_number] = "single-active extended-mobile predecessor relation"
-for line_number in SUCCESSOR_C4:
-    REASON_NATIVE[line_number] = "single-head Turing successor relation"
-for line_number in X:
-    REASON_NATIVE[line_number] = "preceding page-75 motion-note adjacency control"
-assert set(REASON_NATIVE) == U_NATIVE
+# Hash-bound visual transcription.  This is deliberately more precise than
+# the prose shorthand "move", "split in two", and "disappear": black activity
+# dots in the result glyphs occupy relative offsets in {-1, 0, +1}.  In
+# particular, the native plates visibly contain empty, stationary-only,
+# stationary-plus-right, and all-three output sets.  Thus the raster evidence
+# rules out any result schema restricted to one moving destination or exactly
+# two children.  It does not by itself define behavior outside this strict
+# radius-one binary construction.
+DIRECT_VISUAL_SHA256 = {
+    922: "841e52174bee649faa4f32c351235609b41f08d875351f4e04e328fe1d0dc3db",
+    926: "2c1a760d55d31820631bfee265514a276033fe3c6c720a43c2e27da9306e50fe",
+    932: "5bb405f6fa8114431bc2d83d4005d8154d026a5337fda5277defa11c41989f1c",
+}
+VISUAL_FACTS = {
+    922: "rule strip returns a new source color plus a set of relative activity dots",
+    926: "evolution shows simultaneous persistence/proliferation of multiple active dots",
+    932: "rule/evolution plate visibly includes {}, {0}, {0,+1}, and {-1,0,+1} activity outputs",
+}
+assert set(DIRECT_VISUAL_SHA256) == set(VISUAL_FACTS) == C | O
 
 guards = {
     904: "example shown on the facing page",
@@ -142,6 +146,55 @@ def load_source_oracle():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+SOURCE = load_source_oracle()
+S = set(SOURCE.RETAINED)
+assert len(S) == 26
+assert SOURCE.digest(S) == "15ec07596824fc5034feaba4735d329e74826b2849fa260b7053bbf07fe1ce8c"
+
+# Mechanical zero-remainder ledger from all 26 retained source lines.  The
+# only incidental raster is 844, the preceding cellular-automaton plate.  Q
+# adds six explicitly governed predecessor/successor companions that are not
+# within radius four of a retained source line.  No caption, facing-page,
+# Notes, or section-boundary pointer remains outside U.
+C4 = near(S)
+assert C4 == {844, 858, 860, 866, 910, 922, 926, 932, 12004, 12006}
+Q = (PREDECESSOR_C4 | SUCCESSOR_C4) - C4
+assert Q == {900, 902, 906, 908, 944, 946}
+assert C4.isdisjoint(Q)
+U = C4 | Q
+
+R_SOURCE = {858, 860, 866, 910}
+R = R_SOURCE | PREDECESSOR_C4 | SUCCESSOR_C4
+X = {844} | NOTES_C4
+assert C | O | R | X == U
+assert not (C & O or C & R or C & X or O & R or O & X or R & X)
+assert (len(C4), len(Q), len(U), len(C), len(O), len(R), len(X)) == (
+    10,
+    6,
+    16,
+    2,
+    1,
+    10,
+    3,
+)
+
+REASON: dict[int, str] = {}
+for line_number in C:
+    REASON[line_number] = "native generalized-mobile rule/construction plate"
+for line_number in O:
+    REASON[line_number] = "native generalized-mobile evolution observer"
+for line_number in R_SOURCE:
+    REASON[line_number] = "ordinary/extended single-active inherited-shape relation"
+for line_number in PREDECESSOR_C4 - R_SOURCE:
+    REASON[line_number] = "single-active extended-mobile predecessor relation"
+for line_number in SUCCESSOR_C4:
+    REASON[line_number] = "single-head Turing successor relation"
+REASON[844] = "mechanical previous-section cellular-automaton adjacency control"
+for line_number in NOTES_C4:
+    REASON[line_number] = "preceding page-75 motion-note adjacency control"
+assert set(REASON) == U
 
 
 def jpeg_size(data: bytes) -> tuple[int, int]:
@@ -215,6 +268,8 @@ def ledger(universe: set[int], classes: dict[int, str]) -> tuple[str, int, int, 
         data = path.read_bytes()
         digest = hashlib.sha256(data).hexdigest()
         assert digest not in hashes, (book_line, digest)
+        if book_line in DIRECT_VISUAL_SHA256:
+            assert digest == DIRECT_VISUAL_SHA256[book_line], (book_line, digest)
         hashes.add(digest)
         width, height = jpeg_size(data)
         split_path, split_line = split_hits[0]
@@ -228,28 +283,40 @@ def ledger(universe: set[int], classes: dict[int, str]) -> tuple[str, int, int, 
     return payload, monolith_references, split_references, len(hashes)
 
 
-EXPECTED_NATIVE_UNIVERSE_SHA256 = "03213cdcaadd65139dd945acb5feb30c5b1d8a8a177a29f58f67234289fe87af"
-EXPECTED_NATIVE_LEDGER_SHA256 = "4cba5c5a9871543eb977b9aeb3facd368daad6be7400ed656048d2c04b11cd73"
+EXPECTED_STRICT_UNIVERSE_SHA256 = "daa4b34781edb487e6dc388cbe60f94a261c27d2fcc9c00a23a0d5bca2d2d7f1"
+EXPECTED_STRICT_LEDGER_SHA256 = "0c713a3c4775fac478c8b75907cd35fc0ec9518131c4790b116e92dac8ccd346"
+EXPECTED_UNIVERSE_SHA256 = "48158fc4a89e8dcfdc2611799b0152309478a5c7d5f3aea439597f946b12fc8b"
+EXPECTED_LEDGER_SHA256 = "bc00a4fac328069714ba8cd20713a6bb47774c1d0f2e8d06b491526f5a127c89"
 
 
 def main() -> None:
-    universe_payload = ",".join(map(str, sorted(U_NATIVE))).encode("ascii")
+    universe_payload = ",".join(map(str, sorted(U))).encode("ascii")
     universe_digest = hashlib.sha256(universe_payload).hexdigest()
     classes = {
         line_number: (
             "C" if line_number in C else "O" if line_number in O else "R" if line_number in R else "X"
         )
-        for line_number in U_NATIVE
+        for line_number in U
     }
-    payload, monolith_references, split_references, hashes = ledger(U_NATIVE, classes)
+    payload, monolith_references, split_references, hashes = ledger(U, classes)
     ledger_digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
-    assert universe_digest == EXPECTED_NATIVE_UNIVERSE_SHA256
-    assert ledger_digest == EXPECTED_NATIVE_LEDGER_SHA256
-    assert len(payload.splitlines()) == 12
-    assert (monolith_references, split_references, hashes) == (12, 12, 12)
+    strict_universe_payload = ",".join(map(str, sorted(STRICT_U))).encode("ascii")
+    strict_universe_digest = hashlib.sha256(strict_universe_payload).hexdigest()
+    strict_rows = [
+        row for row in payload.splitlines() if int(row.split("|", 1)[0]) in STRICT_U
+    ]
+    strict_payload = "\n".join(strict_rows) + "\n"
+    strict_ledger_digest = hashlib.sha256(strict_payload.encode("utf-8")).hexdigest()
+    assert strict_universe_digest == EXPECTED_STRICT_UNIVERSE_SHA256
+    assert strict_ledger_digest == EXPECTED_STRICT_LEDGER_SHA256
+    assert universe_digest == EXPECTED_UNIVERSE_SHA256
+    assert ledger_digest == EXPECTED_LEDGER_SHA256
+    assert len(strict_rows) == 3 and len(payload.splitlines()) == 16
+    assert (monolith_references, split_references, hashes) == (16, 16, 16)
     print(
-        "T11 native asset oracle: PASS assets=12; classes C/O/R/X=2/1/7/2(direct=3); "
-        "refs=24(monolith=12,split=12); unique_hashes=12; source_binding=pending"
+        "T11 asset oracle: PASS source=26; C4/Q=10/6; assets=16; strict=3; "
+        "classes C/O/R/X=2/1/10/3(direct=3); "
+        "refs=32(monolith=16,split=16); unique_hashes=16"
     )
 
 
