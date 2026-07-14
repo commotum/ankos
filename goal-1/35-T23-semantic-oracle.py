@@ -10,12 +10,13 @@ SimpleProgram route used by T21 and T22:
     writes = RULE(active, reads)
     next   = UPDATE.apply(configuration, active, writes)
 
-The source-backed T23 profiles are explicit Self-plus-six-face and
-Self-plus-twenty-six-cube accesses.  Their compact tables use
-Self + k*AxesTotal and Self + k*FullTotal respectively.  Dimension, access,
-and table schema are parameters; finite boundaries, sparse lowering,
-coordinate adapters, and views are separate realization/representation roles.
-No construction-named state, UPDATE, executor, or family branch appears here.
+The source-backed T23 accesses have six face or twenty-six cube shell slots.
+Self is an explicit optional component: direct shell predicates omit it, while
+Self + k*AxesTotal, Self + k*FullTotal, majority, Life, and complete positional
+schemas declare it.  Dimension, access, and table schema are parameters;
+finite boundaries, sparse lowering, coordinate adapters, and views are
+separate realization/representation roles.  No construction-named state,
+UPDATE, executor, or family branch appears here.
 """
 
 from __future__ import annotations
@@ -1600,6 +1601,9 @@ def assert_source_profiles_and_formulas() -> dict[str, int]:
     for (name, rule), (_same_name, _profile, derived_code) in zip(
         named_rules(), NAMED_CODES, strict=True
     ):
+        assert program_for(rule).neighborhood.has_self == (
+            type(rule) is CountProductRule
+        )
         product_rule = expand_shell_to_product(rule) if type(rule) is ShellCountRule else rule
         assert code_from_outputs(product_rule.outputs) == derived_code, name
     majority = dict(named_rules())["face_self_plus_six_majority"]
@@ -1612,9 +1616,10 @@ def assert_source_profiles_and_formulas() -> dict[str, int]:
     # ternary face context without invoking any family dispatch.
     binary_face_contexts = 0
     exact_one = named_rules()[1][1]
-    for context in product((0, 1), repeat=7):
-        read = LocalRead(context[0], context[1:])
-        assert exact_one.evaluate(read) == int(sum(context[1:]) == 1)
+    assert type(exact_one) is ShellCountRule
+    for context in product((0, 1), repeat=6):
+        read = LocalRead(None, context)
+        assert exact_one.evaluate(read) == int(sum(context) == 1)
         binary_face_contexts += 1
     ternary_face_contexts = 0
     ternary = CountProductRule("axes", 3, 3, tuple(index % 3 for index in range(39)))
@@ -1765,6 +1770,29 @@ def assert_frame_and_table_permutations() -> dict[str, int]:
         ) == permuted.outputs
         face_projection_tables += 1
 
+    # Concrete asymmetric failure mode: raw Book position (-1,0,0) is the
+    # negative-layer projection.  Under the declared frame adapter it lands at
+    # runtime offset (0,0,-1), which is neighbor slot 2 after runtime sorting.
+    # Retaining the raw Book table while merely re-sorting coordinates makes
+    # that same table project runtime context position 0 (Self) instead.
+    asymmetric_position = BOOK_FACE_POSITIONS[0]
+    assert asymmetric_position == (-1, 0, 0)
+    asymmetric_book_table = book_projection_face_table(asymmetric_position)
+    certified_table = permute_book_face_table_to_runtime(asymmetric_book_table)
+    naive_resorted_table = GeneralLookup(2, 6, asymmetric_book_table)
+    runtime_context = (0, 0, 0, 1, 0, 0, 0)
+    book_context = runtime_context_to_book_context(
+        runtime_context,
+        BOOK_FACE_POSITIONS,
+        RUNTIME_FACE_ACCESS,
+    )
+    assert book_context == (1, 0, 0, 0, 0, 0, 0)
+    native_book_output = asymmetric_book_table[context_index(book_context, 2)]
+    read = LocalRead(runtime_context[0], runtime_context[1:])
+    certified_output = certified_table.evaluate(read)
+    naive_output = naive_resorted_table.evaluate(read)
+    assert (native_book_output, certified_output, naive_output) == (1, 1, 0)
+
     zero = (0,) * 27
     full = (1,) * 27
     full_digit_bases = (zero, full) + tuple(
@@ -1797,6 +1825,7 @@ def assert_frame_and_table_permutations() -> dict[str, int]:
         "face_context_cases": face_context_cases,
         "face_table_bases": face_table_bases,
         "face_projection_tables": face_projection_tables,
+        "naive_resort_counterexamples": 1,
         "full_digit_bases": len(full_digit_bases),
         "full_position_permutation": len(runtime_to_book_positions),
         "view_separation_witnesses": 1,
@@ -2136,12 +2165,14 @@ def assert_dyadaxes_information_loss() -> dict[str, int]:
     assert dyadaxes_3d_summary(empty) == dyadaxes_3d_summary(one_face) == (0, False, False)
     face_exactly_one = named_rules()[1][1]
     full_exactly_one = named_rules()[2][1]
-    face_read_empty = LocalRead(0, tuple(empty.neighbors[RUNTIME_FULL_OFFSETS.index(offset)] for offset in RUNTIME_FACE_OFFSETS))
-    face_read_one = LocalRead(0, tuple(one_face.neighbors[RUNTIME_FULL_OFFSETS.index(offset)] for offset in RUNTIME_FACE_OFFSETS))
+    face_read_empty = LocalRead(None, tuple(empty.neighbors[RUNTIME_FULL_OFFSETS.index(offset)] for offset in RUNTIME_FACE_OFFSETS))
+    face_read_one = LocalRead(None, tuple(one_face.neighbors[RUNTIME_FULL_OFFSETS.index(offset)] for offset in RUNTIME_FACE_OFFSETS))
     assert face_exactly_one.evaluate(face_read_empty) == 0
     assert face_exactly_one.evaluate(face_read_one) == 1
-    assert full_exactly_one.evaluate(empty) == 0
-    assert full_exactly_one.evaluate(one_face) == 1
+    full_empty = LocalRead(None, empty.neighbors)
+    full_one_face = LocalRead(None, one_face.neighbors)
+    assert full_exactly_one.evaluate(full_empty) == 0
+    assert full_exactly_one.evaluate(full_one_face) == 1
 
     # A second witness loses full edge/corner counts 0 versus 1 as well.
     one_other_values = [0] * 26
@@ -2153,7 +2184,7 @@ def assert_dyadaxes_information_loss() -> dict[str, int]:
     one_other_values[other_slot] = 1
     one_other = LocalRead(0, tuple(one_other_values))
     assert dyadaxes_3d_summary(empty) == dyadaxes_3d_summary(one_other)
-    assert full_exactly_one.evaluate(one_other) == 1
+    assert full_exactly_one.evaluate(LocalRead(None, one_other.neighbors)) == 1
     return {
         "summary_collision_pairs": 2,
         "face_required_output_splits": 1,
@@ -2238,8 +2269,8 @@ DECISION_MATRIX: tuple[tuple[str, str, str, str], ...] = (
     (
         "NEIGHBORHOOD",
         "parameterization",
-        "Compose(Self,OrderedOffsets[6|26])",
-        "face and full-cube access are explicit ordered data",
+        "Compose(OptionalExplicitSelf,OrderedOffsets[6|26])",
+        "shell rules omit Self; product/positional rules declare it once",
     ),
     (
         "RULE",
@@ -2301,7 +2332,12 @@ def assert_hostile_validation() -> None:
     expect_raises(ValueError, lambda: book_offset_to_runtime((0, 0)))
     expect_raises(TypeError, lambda: access_for_profile(1))
     expect_raises(ValueError, lambda: access_for_profile("unknown"))
+    expect_raises(
+        TypeError,
+        lambda: access_for_profile("axes", include_self=1),
+    )
     expect_raises(TypeError, lambda: make_access(list(RUNTIME_FACE_OFFSETS), 3))
+    expect_raises(TypeError, lambda: make_access(RUNTIME_FACE_OFFSETS, True))
     expect_raises(
         ValueError,
         lambda: make_access((RUNTIME_FACE_OFFSETS[0], RUNTIME_FACE_OFFSETS[0]), 1),
@@ -2340,6 +2376,34 @@ def assert_hostile_validation() -> None:
             FiniteAlphabet(2),
             RUNTIME_FULL_ACCESS,
             binary_count_rule("axes", 0),
+        ),
+    )
+    expect_raises(
+        ValueError,
+        lambda: CAProgram(
+            FiniteAlphabet(2),
+            RUNTIME_FACE_SHELL_ACCESS,
+            binary_count_rule("axes", 0),
+        ),
+    )
+    expect_raises(
+        ValueError,
+        lambda: CAProgram(
+            FiniteAlphabet(2),
+            RUNTIME_FACE_ACCESS,
+            binary_shell_rule("axes", 0),
+        ),
+    )
+    expect_raises(
+        ValueError,
+        lambda: binary_count_rule("axes", 0).evaluate(
+            LocalRead(None, (0,) * 6)
+        ),
+    )
+    expect_raises(
+        ValueError,
+        lambda: binary_shell_rule("axes", 0).evaluate(
+            LocalRead(0, (0,) * 6)
         ),
     )
     expect_raises(
@@ -2397,6 +2461,7 @@ def assert_hostile_validation() -> None:
     foreign = (SiteHandle(peer.snapshot_token, active[0].coord), *active[1:])
     expect_raises(ValueError, lambda: read_local(old, foreign, program.neighborhood))
     expect_raises(ValueError, lambda: read_local(old, (active[0], active[0]), program.neighborhood))
+    assert reads[0].center is not None
     tampered_reads = (LocalRead(1 - reads[0].center, reads[0].neighbors), *reads[1:])
     expect_raises(
         ValueError,
@@ -2442,7 +2507,8 @@ def main() -> None:
         f"ternary:{commutation_counts['ternary']}"
     )
     print(
-        "declared_access=Self+6_faces|Self+26_face_edge_corner; "
+        "declared_access=6_faces|26_face_edge_corner_shell_slots;"
+        "OptionalExplicit(SelfAt)=shell_absent,product+positional_present; "
         "raw_Book_triples_lexicographic=PASS"
     )
     print(
@@ -2459,7 +2525,7 @@ def main() -> None:
     )
     print(
         "local_context_checks="
-        f"binary_face:{source_counts['binary_face_contexts']},"
+        f"binary_face_shell:{source_counts['binary_face_contexts']},"
         f"ternary_face:{source_counts['ternary_face_contexts']}"
     )
     print(
@@ -2496,8 +2562,14 @@ def main() -> None:
         f"positions:{permutation_counts['frame_position_cases']},"
         f"face_contexts:{permutation_counts['face_context_cases']},"
         f"face_table_bases:{permutation_counts['face_table_bases']},"
+        f"naive_resort_counterexamples:{permutation_counts['naive_resort_counterexamples']},"
         f"full_digit_bases:{permutation_counts['full_digit_bases']}; "
         f"adapter:{BOOK_TO_RUNTIME_FRAME}; inverse=PASS"
+    )
+    print(
+        "naive_resort_witness=Book_projection(-1,0,0),"
+        "runtime_context=(0,0,0,1,0,0,0),"
+        "outputs(native_book/certified/naive)=1/1/0"
     )
     print(
         "view_separation=Cuboid[-Reverse(position)]_display_only; "

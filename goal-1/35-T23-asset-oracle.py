@@ -212,7 +212,7 @@ REASON = {
     13638: "30-update projection of exact-three-of-26 from a 3x1x1 block",
     13640: "30-update projection of exact-three-of-26 from a 3x3x1 block",
     13648: "T24 alternative three-dimensional nearest-neighbor lattice control",
-    14273: "successive-step moving-structure observer for named B5/S45 preset",
+    14273: "successive-step moving-structure observer for source-listed parameter tuple (4,5,5)",
 }
 assert set(REASON) == U
 
@@ -236,7 +236,9 @@ GOVERNED_LEDGER_REASON = {
 }
 
 
-# Radius four is a mechanical source-proximity audit, not semantic ownership.
+# C4 is the declared one-hop radius-four source-proximity universe, not
+# semantic ownership.  Only the original retained source lines are centers;
+# rasters reached by this pass do not recursively become new search centers.
 # All 32 ungoverned candidates remain in the physical ledger.  In particular,
 # the T22 plates between the T23 introduction and its direct examples are the
 # preceding row-of-eleven two-dimensional evolution, not 3D fixtures.
@@ -405,7 +407,7 @@ def life3d_predicate(parameters: tuple[int, int, int], self_value: int, count: i
 assert tuple(face_predicate("any", count) for count in range(7)) == (0, 1, 1, 1, 1, 1, 1)
 assert tuple(face_predicate("exact1", count) for count in range(7)) == (0, 1, 0, 0, 0, 0, 0)
 assert all(sum(full_predicate(exact, count) for count in range(27)) == 1 for exact in (1, 2, 3))
-NAMED_CLASS4 = ((5, 7, 6), (4, 5, 5), (5, 6, 5))
+SOURCE_LISTED_CLASS4_PARAMETERS = ((5, 7, 6), (4, 5, 5), (5, 6, 5))
 assert tuple(
     count
     for count in range(27)
@@ -416,6 +418,11 @@ assert tuple(
     for count in range(27)
     if life3d_predicate((4, 5, 5), 1, count)
 ) == (4, 5)
+
+# This B/S notation is a derived canonical spelling of the source-listed
+# parameter tuple, not a label supplied by BOOK:14263--14271.
+DERIVED_CANONICAL_SPELLING = {(4, 5, 5): "B5/S45"}
+assert DERIVED_CANONICAL_SPELLING[(4, 5, 5)] == "B5/S45"
 
 
 # Human transcriptions are hash- and source-bound metadata.  ``step 1`` is the
@@ -463,10 +470,10 @@ TRANSCRIPT_SPECS = (
         ("exact3_of_26", "3x3x1", 30, "top_view_nearer_darker"),
     ),
     (
-        "class4_b5_s45",
+        "class4_source_tuple_4_5_5",
         14273,
         (14263, 14271),
-        ((4, 5, 5), "B5/S45", "successive_steps_of_moving_structure"),
+        ((4, 5, 5), "successive_steps_of_moving_structure"),
     ),
 )
 assert len(TRANSCRIPT_SPECS) == 9
@@ -497,6 +504,7 @@ def transcript_payload() -> str:
 
 TRANSCRIPT_PAYLOAD = transcript_payload()
 TRANSCRIPT_SHA256 = hashlib.sha256(TRANSCRIPT_PAYLOAD.encode("utf-8")).hexdigest()
+assert "B5/S45" not in TRANSCRIPT_PAYLOAD
 
 
 # Printed pages 182--183 are extracted as physical JPEG pages 197--198 after
@@ -570,11 +578,11 @@ assert len(UNREPLAYABLE_RANDOM_ASSETS) == 7
 assert UNREPLAYABLE_RANDOM_ASSETS <= ADJACENCY_ONLY
 
 
-EXPECTED_TRANSCRIPT_SHA256 = "c4b2fa894509d8bb84c2e6af2bab2265bfaecc00b1f484c3b33d7c439e0b0179"
+EXPECTED_TRANSCRIPT_SHA256 = "07d1261a07ddd0f5ecb5fcf311335b2310d148174e1a09641070a6daa492deed"
 EXPECTED_STRICT_UNIVERSE_SHA256 = "8fd664af3fbc564763b551e5475494bb19661c9a352100ba840d028172ac0d97"
-EXPECTED_STRICT_LEDGER_SHA256 = "e830c568d092d1ae114b4d2078232b3225b257fbc09bf8c3c42725637c3494f0"
+EXPECTED_STRICT_LEDGER_SHA256 = "ea0d1fc8e38281cdc470cf2f5eb15e132fcef0b6f3d2c444c29a933e6039826f"
 EXPECTED_GOVERNED_UNIVERSE_SHA256 = EXPECTED_GOVERNED_IMAGE_DIGEST
-EXPECTED_GOVERNED_LEDGER_SHA256 = "de90b87633c10882c823893038224dfa87d148cc65517ef40f68ed485d1663db"
+EXPECTED_GOVERNED_LEDGER_SHA256 = "c9e97695a427f4355cd9e6edffe6ba919b55b23a195a236ae0bfceeaaca597c8"
 EXPECTED_ADJACENCY_UNIVERSE_SHA256 = "be476acd01d8f280750fbc03126b41e5f4f2e3b4e941d85fee721e04f2fc3ea7"
 EXPECTED_ADJACENCY_LEDGER_SHA256 = "6d68210c6b265dcbb9fcb3ab2297501cb4a32c59b74f454f8e8707ad8204f34d"
 EXPECTED_CANDIDATE_UNIVERSE_SHA256 = "dcb93e36f067ee718cb7b0abf6bbd18ba42dd872b119178533e03933c014cc30"
@@ -596,6 +604,7 @@ def main() -> None:
         adjacency_ledger()
     )
     strict_payload = selected_payload(payload, STRICT_U)
+    assert "B5/S45" not in payload
 
     assert TRANSCRIPT_SHA256 == EXPECTED_TRANSCRIPT_SHA256
     assert digest_set(STRICT_U) == EXPECTED_STRICT_UNIVERSE_SHA256
@@ -622,7 +631,8 @@ def main() -> None:
         f"transcript_records=9; transcript_sha256={TRANSCRIPT_SHA256}; "
         "HASH_BOUND=42; TRANSCRIBED=9; PIXEL_REPLAYED=0; "
         "face_any/exact1_and_full_exact1/exact2/exact3=PASS; "
-        "named_class4_B5/S45=PASS; projections=OBSERVER_ONLY; "
+        "source_class4_tuple_(4,5,5)=PASS; derived_canonical_B5/S45=PASS; "
+        "projections=OBSERVER_ONLY; "
         "random/stochastic_replay=UNAVAILABLE(no_serialized_configuration/RNG/distribution/renderer); "
         "page_offset=PASS; Notes_reverse_join=PASS; unresolved=0"
     )
