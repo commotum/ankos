@@ -205,6 +205,32 @@ GrowthMooreRule:
 
 An outer-totalistic table expands to a general table only when every positional context with equal `(self,neighbor_count)` has the same result. A totalistic table requires the stronger equal-total-sum fiber condition. Factoring must reject a single disagreeing row, retain the source schema and code identity, and round-trip exactly on its qualifying image.
 
+## Independent Semantic Oracle
+
+`34-T22-semantic-oracle.py` implements two separate paths. The literal native reference reads Book row/column positions and evaluates general, outer-totalistic, equal-sum, and generalized finite-`k` formulas directly. The generic path constructs opaque snapshot-scoped source handles, explicit Self-plus-offset access, typed closed rules, one same-site write per source, and atomic old-snapshot parallel commit. Neither path calls the other evaluator.
+
+The closed oracle reports 1,416 native/generic commutations:
+
+```text
+outer compact bases          320
+equal-sum compact bases      192
+general positional bases     514
+nonaliasing directional      225
+named codes                    3
+ternary positional projection 81
+ternary FullTotal             81
+```
+
+Its representation proof covers all 262,144 18-bit outer signatures and independently proves the complete 512-context fiber map plus its 20 affine bit bases. It expands and factors all 1,024 equal-sum tables. The arbitrary 512-row schema is covered by zero, one, and all 512 unit table bases for 514 exact code round trips. This factorization avoids claiming a wasteful `2^18 * 512` Cartesian run while proving every independent table bit and every context fiber.
+
+The coordinate proof covers all `9 * 512 = 4,608` projection/context cases and all 512 table unit bases. It derives `runtime_to_book=(6,3,0,7,4,1,8,5,2)` and its inverse, then demonstrates that naive ENU re-sorting moves the projected source in a complete asymmetric step while certified table permutation commutes.
+
+The generalized Notes profile is checked for seven `(dimension,k)` pairs. For `d=2,k=3`, all `3^9 = 19,683` positional contexts hit exactly 51 `SelfValue x NeighborValueSum` cases with independently counted fibers, and 81 ternary native/generic steps commute. Binary overlap with the strict 18-case function is denotationally exact while the two schema types remain distinct.
+
+Further adversaries preserve access-slot multiplicity on small periodic tori, separate fixed from periodic boundaries and native `Z^2` from finite realization, reject fixed-background sparse lowering without a quiescence proof, distinguish snapshot-parallel from in-place traversal, require exactly one explicit Self and eight unique offsets, reject malformed/stale/foreign source data and writes before commit, and execute T21/T22/T23 through one generic step function.
+
+Root and relocated `/tmp` execution produce identical evidence; silent import, byte compilation, exact-type checks, and fail-closed optimized mode pass. The semantic decision matrix proposes D128 as access/RULE parameterization and lossless representation only.
+
 ## Audit Questions
 
 1. Does any T22 evidence alter CONFIGURATION, FRONTIER, RULE result, UPDATE, successor cardinality, or outcome semantics rather than only access/RULE data?

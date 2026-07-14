@@ -193,10 +193,17 @@ def code_174826_predicate(self_value: int, count: int) -> bool:
     return count == 3 or (self_value == 1 and count != 3)
 
 
+def code_224_life_predicate(self_value: int, count: int) -> bool:
+    """Life B3/S23 in the same 18-case code convention."""
+
+    return count == 3 or (self_value == 1 and count == 2)
+
+
 NAMED_CODE_PREDICATES = {
     175_850: code_175850_predicate,
     746: code_746_predicate,
     174_826: code_174826_predicate,
+    224: code_224_life_predicate,
 }
 for named_code, predicate in NAMED_CODE_PREDICATES.items():
     assert encode_outer_count(predicate) == named_code
@@ -308,11 +315,13 @@ assert len(STRICT_TRANSCRIPT_SPECS) == 12
 
 
 # Source-entitled relations and controls.  R keeps deterministic Moore-family
-# applications/observers outside the strict Chapter 5 fixture.  The X classes
-# make close but semantically distinct constructions visible: T21 cardinal
-# access, T23 3D access, T24 other lattices, Life as a named preset, and pure
-# constraints/stochastic aggregation, which do not share T22's deterministic
-# one-successor rule despite using 3x3 templates or eight-neighbor geometry.
+# applications/observers outside the strict Chapter 5 fixture.  P keeps Game
+# of Life visible as the ordinary named B3/S23 preset (outer-count code 224)
+# over this same T22 algebra.  The X classes mark actual construction controls:
+# T21 cardinal access, T23 3D access, T24 other lattices, and a pure constraint
+# model set.  S separately records stochastic aggregation: it has canonical
+# evolution, but its RNG/distribution semantics belong to its owning stage and
+# are not silently imported into strict deterministic T22.
 R = {
     3900,
     3908,
@@ -335,7 +344,7 @@ R = {
 X21 = {2920}
 X23 = {2252, 2254, 2258, 2260, 13634, 13636, 13638, 13640, 14273}
 X24 = {4428, 13648, 13652, 13656}
-XLIFE = {
+P = {
     14789,
     14793,
     14797,
@@ -356,22 +365,24 @@ XLIFE = {
     14843,
     18753,
 }
-XNONFIT = {2682, 15223, 15225, 15227, 15229, 15231}
-U = STRICT_U | R | X21 | X23 | X24 | XLIFE | XNONFIT
+S_STOCHASTIC = {15223, 15225, 15227, 15229, 15231}
+XCONSTRAINT = {2682}
+U = STRICT_U | R | P | S_STOCHASTIC | X21 | X23 | X24 | XCONSTRAINT
 
-classes = (C18, C512, O, R, X21, X23, X24, XLIFE, XNONFIT)
+classes = (C18, C512, O, R, P, S_STOCHASTIC, X21, X23, X24, XCONSTRAINT)
 assert all(not (left & right) for i, left in enumerate(classes) for right in classes[i + 1 :])
-assert (len(U), len(C18), len(C512), len(O), len(R), len(X21), len(X23), len(X24), len(XLIFE), len(XNONFIT)) == (
+assert (len(U), len(C18), len(C512), len(O), len(R), len(P), len(S_STOCHASTIC), len(X21), len(X23), len(X24), len(XCONSTRAINT)) == (
     68,
     4,
     0,
     8,
     17,
+    19,
+    5,
     1,
     9,
     4,
-    19,
-    6,
+    1,
 )
 
 
@@ -388,10 +399,12 @@ for line_number in X23:
     REASON[line_number] = "T23 three-dimensional cellular-automaton control"
 for line_number in X24:
     REASON[line_number] = "T24 alternative-lattice control"
-for line_number in XLIFE:
-    REASON[line_number] = "Game of Life named-preset relation/control"
-for line_number in XNONFIT:
-    REASON[line_number] = "constraint or stochastic-aggregation nonfit/control"
+for line_number in P:
+    REASON[line_number] = "Game of Life named B3/S23 outer-count-code-224 preset/relation"
+for line_number in S_STOCHASTIC:
+    REASON[line_number] = "stochastic eight-neighbor aggregation relation; RNG semantics deferred"
+for line_number in XCONSTRAINT:
+    REASON[line_number] = "pure 3x3-template constraint/model-set nonstep control"
 REASON.update(
     {
         2220: "code-175850 row-7 trace and rough-growth plate",
@@ -416,11 +429,169 @@ REASON.update(
         15281: "other Moore rule 10,000-update relation",
         18759: "four-color WireWorld eight-neighbor relation",
         2682: "pure 3x3-template constraint with no stepwise evolution",
-        15223: "stochastic eight-neighbor aggregation control",
-        15225: "stochastic eight-neighbor aggregation control",
-        15227: "stochastic eight-neighbor aggregation control",
-        15229: "stochastic eight-neighbor aggregation control",
-        15231: "stochastic eight-neighbor aggregation control",
+        15223: "stochastic eight-neighbor aggregation relation; RNG semantics deferred",
+        15225: "stochastic eight-neighbor aggregation relation; RNG semantics deferred",
+        15227: "stochastic eight-neighbor aggregation relation; RNG semantics deferred",
+        15229: "stochastic eight-neighbor aggregation relation; RNG semantics deferred",
+        15231: "stochastic eight-neighbor aggregation relation; RNG semantics deferred",
     }
 )
 assert set(REASON) == U
+
+
+CODE_746_REPRISE_LABELS = tuple(range(1, 17)) + (50, 100, 200, 300, 400)
+CODE_976_RANDOM_LABELS = (
+    1,
+    2,
+    3,
+    4,
+    5,
+    10,
+    20,
+    30,
+    40,
+    50,
+    100,
+    150,
+    200,
+    250,
+    300,
+    350,
+    400,
+    450,
+    500,
+    550,
+    600,
+    700,
+    800,
+)
+CODE_3702_ASSETS = (11182, 11184, 11186, 11188, 11190)
+OTHER_MOORE_RULE_ASSETS_AND_SEEDS = (
+    (15275, 7),
+    (15277, 6),
+    (15279, 7),
+    (15281, 11),
+)
+
+RELATION_TRANSCRIPT_SPECS = (
+    (
+        "code746_reprise",
+        3900,
+        (3902,),
+        (746, CODE_746_REPRISE_LABELS, "intrinsic_randomness", "roughly_circular"),
+    ),
+    (
+        "domain_boundary_observer",
+        3908,
+        (3910,),
+        ("initial_black_rectangle", 39, 29, "shrinks_to_nothing"),
+    ),
+    (
+        "code976_random_periodic",
+        3912,
+        (3914,),
+        (976, CODE_976_RANDOM_LABELS, "random_initial", "periodic_width_80"),
+    ),
+    (
+        "code746_orientation",
+        5636,
+        (5638,),
+        (746, (10, 40, 110), "rule_c_100_updates", "orientation_observer"),
+    ),
+    *(
+        (
+            f"code3702_last_five_{asset_line}",
+            asset_line,
+            (11178, 11180),
+            (3702, "one_of_last_five_outputs_after_25_updates"),
+        )
+        for asset_line in CODE_3702_ASSETS
+    ),
+    (
+        "code746_anisotropy_15269",
+        15269,
+        (15267,),
+        (746, "anisotropy_about_4_percent_after_a_few_thousand_updates"),
+    ),
+    (
+        "code746_anisotropy_15271",
+        15271,
+        (15267,),
+        (746, "anisotropy_about_4_percent_after_a_few_thousand_updates"),
+    ),
+    *(
+        (
+            f"other_moore_rule_{asset_line}",
+            asset_line,
+            (15273,),
+            ("finite_row", seed_length, "10,000_updates"),
+        )
+        for asset_line, seed_length in OTHER_MOORE_RULE_ASSETS_AND_SEEDS
+    ),
+    (
+        "wireworld_relation",
+        18759,
+        (18755, 18757),
+        ("four_colors", "eight_neighbors_counting_value_1", "1D_CA_emulation"),
+    ),
+)
+assert len(RELATION_TRANSCRIPT_SPECS) == 16
+
+
+# Printed pages 177--181 are extracted as physical JPEG pages 192--196 after
+# fifteen pages of front matter.  Literal physical page-178/180/181 assets are
+# unrelated Chapter 4 number-system plates.
+PAGE_OFFSET_NAMES = {
+    2220: "_page_192_Figure_2.jpeg",
+    2224: "_page_192_Picture_4.jpeg",
+    2228: "_page_193_Picture_2.jpeg",
+    2232: "_page_194_Picture_1.jpeg",
+    2240: "_page_195_Picture_2.jpeg",
+    2242: "_page_196_Picture_2.jpeg",
+    2244: "_page_196_Picture_3.jpeg",
+    2246: "_page_196_Picture_4.jpeg",
+    2248: "_page_196_Picture_5.jpeg",
+}
+assert {line: Path(images[line]).name for line in PAGE_OFFSET_NAMES} == PAGE_OFFSET_NAMES
+PAGE_NUMBER_FALSE_FRIENDS = {
+    2048: "_page_178_Picture_2.jpeg",
+    2084: "_page_180_Picture_2.jpeg",
+    2104: "_page_181_Picture_2.jpeg",
+}
+assert {line: Path(images[line]).name for line in PAGE_NUMBER_FALSE_FRIENDS} == PAGE_NUMBER_FALSE_FRIENDS
+
+
+TRANSCRIPT_SPECS = STRICT_TRANSCRIPT_SPECS + RELATION_TRANSCRIPT_SPECS
+
+
+def transcript_payload() -> str:
+    rows: list[str] = []
+    names: set[str] = set()
+    for name, asset_line, source_lines, values in TRANSCRIPT_SPECS:
+        assert name not in names
+        names.add(name)
+        assert asset_line in U
+        assert source_lines and set(source_lines) <= S
+        asset_data = physical_image(asset_line).read_bytes()
+        asset_digest = hashlib.sha256(asset_data).hexdigest()
+        source_record = "\x1e".join(
+            f"{line_number}:{lines[line_number - 1]}" for line_number in source_lines
+        )
+        source_digest = hashlib.sha256(source_record.encode("utf-8")).hexdigest()
+        rows.append(
+            f"{name}|asset={asset_line}|asset_sha256={asset_digest}|"
+            f"source={','.join(map(str, source_lines))}|source_sha256={source_digest}|"
+            f"values={values!r}"
+        )
+    assert len(rows) == 28
+    return "\n".join(rows) + "\n"
+
+
+TRANSCRIPT_PAYLOAD = transcript_payload()
+TRANSCRIPT_SHA256 = hashlib.sha256(TRANSCRIPT_PAYLOAD.encode("utf-8")).hexdigest()
+
+# These plates disclose no executable random stream.  Their labels and images
+# are retained, but replay requires an RNG/distribution/seed or explicit finite
+# configuration that the Book does not serialize here.
+UNREPLAYABLE_RANDOM_ASSETS = {3912} | S_STOCHASTIC
+assert UNREPLAYABLE_RANDOM_ASSETS <= U
