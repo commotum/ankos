@@ -1849,6 +1849,8 @@ def assert_frame_and_table_permutations() -> dict[str, int]:
 def assert_native_generic_commutation() -> dict[str, int]:
     counts = {
         "face_quotient": 0,
+        "face_product_fibers": 0,
+        "face_shell_cases": 0,
         "full_quotient": 0,
         "full_product_fibers": 0,
         "full_shell_cases": 0,
@@ -1856,6 +1858,47 @@ def assert_native_generic_commutation() -> dict[str, int]:
         "named": 0,
         "ternary": 0,
     }
+
+    center_coord = (1, 1, 1)
+
+    def count_fixture(
+        profile: str, center_value: int, neighbor_count: int
+    ) -> Native3DState:
+        offsets = (
+            BOOK_FACE_OFFSETS
+            if profile == "axes"
+            else BOOK_FULL_OFFSETS
+            if profile == "full"
+            else None
+        )
+        if offsets is None:
+            raise ValueError("profile must be axes or full")
+        assert center_value in (0, 1) and 0 <= neighbor_count <= len(offsets)
+        points = [
+            (
+                (
+                    center_coord[0] + offset[0],
+                    center_coord[1] + offset[1],
+                    center_coord[2] + offset[2],
+                ),
+                1,
+            )
+            for offset in offsets[:neighbor_count]
+        ]
+        if center_value:
+            points.append((center_coord, 1))
+        native = Native3DState(
+            2,
+            (3, 3, 3),
+            FixedBoundary(0),
+            native_cells_with_points((3, 3, 3), tuple(points)),
+        )
+        assert native.value_at(*center_coord) == center_value
+        assert (
+            sum(native_neighbor_values(native, *center_coord, profile))
+            == neighbor_count
+        )
+        return native
 
     face_bases = (
         binary_count_rule("axes", 0),
@@ -1869,6 +1912,33 @@ def assert_native_generic_commutation() -> dict[str, int]:
             generic = generic_step(program, encode_native(native))
             assert decode_generic(generic) == native_count_step(rule, native)
             counts["face_quotient"] += 1
+
+    # Periodic aliases on 2x2x2 certify slot multiplicity but realize only
+    # even face sums.  Nonaliasing central fixtures separately fire every
+    # face product fiber and shell-only case with its matching unit table.
+    for neighbor_count in range(7):
+        for center_value in (0, 1):
+            index = center_value + 2 * neighbor_count
+            rule = binary_count_rule("axes", 1 << index)
+            native = count_fixture("axes", center_value, neighbor_count)
+            native_next = native_count_step(rule, native)
+            generic_next = decode_generic(
+                generic_step(program_for(rule), encode_native(native))
+            )
+            assert generic_next == native_next
+            assert native_next.value_at(*center_coord) == 1
+            counts["face_product_fibers"] += 1
+
+    for neighbor_count in range(7):
+        rule = binary_shell_rule("axes", 1 << neighbor_count)
+        native = count_fixture("axes", neighbor_count % 2, neighbor_count)
+        native_next = native_count_step(rule, native)
+        generic_next = decode_generic(
+            generic_step(program_for(rule), encode_native(native))
+        )
+        assert generic_next == native_next
+        assert native_next.value_at(*center_coord) == 1
+        counts["face_shell_cases"] += 1
 
     full_bases = (
         binary_count_rule("full", 0),
@@ -1886,42 +1956,15 @@ def assert_native_generic_commutation() -> dict[str, int]:
             )
             counts["full_quotient"] += 1
 
-    # The small quotient above is deliberately hostile to read-slot
+    # The small full quotient is deliberately hostile to read-slot
     # deduplication, but its 2/4/8 alias weights do not realize every full-cube
     # count.  Fire each product fiber and shell-only case once at the center of
     # a nonaliasing 3x3x3 fixed-boundary fixture with its matching unit table.
-    center_coord = (1, 1, 1)
-
-    def full_count_fixture(center_value: int, neighbor_count: int) -> Native3DState:
-        assert center_value in (0, 1) and 0 <= neighbor_count <= 26
-        points = [
-            (
-                (
-                    center_coord[0] + offset[0],
-                    center_coord[1] + offset[1],
-                    center_coord[2] + offset[2],
-                ),
-                1,
-            )
-            for offset in BOOK_FULL_OFFSETS[:neighbor_count]
-        ]
-        if center_value:
-            points.append((center_coord, 1))
-        native = Native3DState(
-            2,
-            (3, 3, 3),
-            FixedBoundary(0),
-            native_cells_with_points((3, 3, 3), tuple(points)),
-        )
-        assert native.value_at(*center_coord) == center_value
-        assert sum(native_neighbor_values(native, *center_coord, "full")) == neighbor_count
-        return native
-
     for neighbor_count in range(27):
         for center_value in (0, 1):
             index = center_value + 2 * neighbor_count
             rule = binary_count_rule("full", 1 << index)
-            native = full_count_fixture(center_value, neighbor_count)
+            native = count_fixture("full", center_value, neighbor_count)
             native_next = native_count_step(rule, native)
             generic_next = decode_generic(generic_step(program_for(rule), encode_native(native)))
             assert generic_next == native_next
@@ -1930,7 +1973,7 @@ def assert_native_generic_commutation() -> dict[str, int]:
 
     for neighbor_count in range(27):
         rule = binary_shell_rule("full", 1 << neighbor_count)
-        native = full_count_fixture(neighbor_count % 2, neighbor_count)
+        native = count_fixture("full", neighbor_count % 2, neighbor_count)
         native_next = native_count_step(rule, native)
         generic_next = decode_generic(generic_step(program_for(rule), encode_native(native)))
         assert generic_next == native_next
@@ -1957,7 +2000,6 @@ def assert_native_generic_commutation() -> dict[str, int]:
             )
             counts["directional"] += 1
 
-    fixtures: dict[str, Native3DState] = {}
     single = Native3DState(
         2,
         (5, 5, 5),
@@ -1973,17 +2015,37 @@ def assert_native_generic_commutation() -> dict[str, int]:
             ((((2, 2, 1), 1), ((2, 2, 2), 1), ((2, 2, 3), 1))),
         ),
     )
-    for name, _rule in named_rules():
-        fixtures[name] = (
-            line_three
-            if name in ("full_exactly_two", "full_exactly_three")
-            else single
-        )
+    # Direct predicates retain their source-backed seed fixtures.  Majority
+    # and the three class-4 tuples use separately identified synthetic central
+    # triggers because the source does not serialize their exact 3D seeds.
+    fixtures: dict[str, Native3DState] = {
+        "face_any_neighbor": single,
+        "face_exactly_one": single,
+        "full_exactly_one": single,
+        "full_exactly_two": line_three,
+        "full_exactly_three": line_three,
+        "face_self_plus_six_majority": count_fixture("axes", 1, 3),
+        "life3d_5_7_6": count_fixture("full", 0, 6),
+        "life3d_4_5_5": count_fixture("full", 0, 5),
+        "life3d_5_6_5": count_fixture("full", 0, 5),
+    }
+    assert set(fixtures) == {name for name, _rule in named_rules()}
+    central_trigger_names = {
+        "face_self_plus_six_majority",
+        "life3d_5_7_6",
+        "life3d_4_5_5",
+        "life3d_5_6_5",
+    }
     for name, rule in named_rules():
         native = fixtures[name]
-        assert decode_generic(generic_step(program_for(rule), encode_native(native))) == native_count_step(
-            rule, native
+        native_next = native_count_step(rule, native)
+        generic_next = decode_generic(
+            generic_step(program_for(rule), encode_native(native))
         )
+        assert generic_next == native_next
+        assert 0 < sum(native_next.cells) < len(native_next.cells)
+        if name in central_trigger_names:
+            assert native_next.value_at(*center_coord) == 1
         counts["named"] += 1
 
     ternary_cells = tuple((index * 2 + 1) % 3 for index in range(27))
@@ -2015,6 +2077,14 @@ def assert_native_generic_commutation() -> dict[str, int]:
             len({neighbor_sum for seen_center, neighbor_sum in signatures if seen_center == center}) > 1
             for center in range(3)
         )
+        assert any(
+            left_center == right_center
+            and left_sum != right_sum
+            and rule.outputs[left_center + 3 * left_sum]
+            != rule.outputs[right_center + 3 * right_sum]
+            for left_center, left_sum in signatures
+            for right_center, right_sum in signatures
+        )
         native_next = native_count_step(rule, ternary_native)
         generic_next = decode_generic(
             generic_step(program_for(rule), encode_native(ternary_native))
@@ -2025,6 +2095,8 @@ def assert_native_generic_commutation() -> dict[str, int]:
 
     assert counts == {
         "face_quotient": 4_096,
+        "face_product_fibers": 14,
+        "face_shell_cases": 7,
         "full_quotient": 896,
         "full_product_fibers": 54,
         "full_shell_cases": 27,
@@ -2592,12 +2664,14 @@ def main() -> None:
     assert_hostile_validation()
 
     commutations = sum(commutation_counts.values())
-    assert commutations == 5_118
+    assert commutations == 5_139
     print("T23 semantic oracle: PASS")
     print(f"native_generic_commutations={commutations}")
     print(
         "commutation_partition="
         f"face_quotient:{commutation_counts['face_quotient']},"
+        f"face_product_fibers:{commutation_counts['face_product_fibers']},"
+        f"face_shell_cases:{commutation_counts['face_shell_cases']},"
         f"full_quotient:{commutation_counts['full_quotient']},"
         f"full_product_fibers:{commutation_counts['full_product_fibers']},"
         f"full_shell_cases:{commutation_counts['full_shell_cases']},"
