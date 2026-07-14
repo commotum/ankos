@@ -57,8 +57,8 @@ def load_source_oracle():
 
 SOURCE = load_source_oracle()
 S = set(SOURCE.RETAINED)
-EXPECTED_SOURCE_COUNT = 0
-EXPECTED_SOURCE_DIGEST = ""
+EXPECTED_SOURCE_COUNT = 160
+EXPECTED_SOURCE_DIGEST = "698fb02434bd7d28565f4dd5c6e8597c079f41d94339374638e9d2a925e7630c"
 assert len(S) == EXPECTED_SOURCE_COUNT
 assert SOURCE.digest(S) == EXPECTED_SOURCE_DIGEST
 
@@ -108,13 +108,20 @@ assert C4.isdisjoint(Q)
 U = C4 | Q
 
 # C = native construction evidence, O = derived observer, R = an explicit
-# encoding/emulation relation, K = predecessor control, and X = a mechanically
-# captured but excluded adjacency companion.  In particular, rule-110 plates
-# remain relations even when they redraw an exact cyclic-tag history.
+# predecessor/control/encoding relation, and X = a mechanically captured but
+# excluded adjacency companion.  In particular, rule-110 plates remain
+# relations even when they redraw an exact cyclic-tag history.
 C = {1140, 1142, 1146, 1152}
 O = {1156}
 R = {
+    1116,
+    1118,
+    1120,
+    1122,
+    1130,
     8062,
+    8068,
+    8070,
     8074,
     8180,
     8182,
@@ -129,21 +136,19 @@ R = {
     8260,
     18738,
 }
-K = {1116, 1118, 1120, 1122, 1130}
-X = {8068, 8070, 8084}
+X = {8084}
 STRICT_U = C | O
-assert C | O | R | K | X == U
-classes = (C, O, R, K, X)
+assert C | O | R | X == U
+classes = (C, O, R, X)
 assert all(not (left & right) for i, left in enumerate(classes) for right in classes[i + 1 :])
-assert (len(C4), len(Q), len(U), len(C), len(O), len(R), len(K), len(X)) == (
+assert (len(C4), len(Q), len(U), len(C), len(O), len(R), len(X)) == (
     23,
     4,
     27,
     4,
     1,
-    14,
-    5,
-    3,
+    21,
+    1,
 )
 
 REASON = {
@@ -158,8 +163,8 @@ REASON = {
     1152: "native five rule pairs, one-black seeds, and 100-step traces",
     1156: "derived length-fluctuation observer for rules d/e",
     8062: "cyclic-tag encoding of a first-element ordinary tag system",
-    8068: "adjacent multicolor-to-binary Turing-machine companion excluded",
-    8070: "adjacent multicolor-to-binary Turing-machine companion excluded",
+    8068: "multicolor-to-binary Turing-machine relation in the cyclic universality chain",
+    8070: "multicolor-to-binary Turing-machine relation in the cyclic universality chain",
     8074: "ordinary-tag/Turing emulation relation in the cyclic universality chain",
     8084: "adjacent register-machine emulation plate excluded",
     8180: "rule-110 lowering relation: native cyclic view",
@@ -195,6 +200,28 @@ NATIVE_FILE_FACTS = {
     1152: (106_271, 1185, 547),
     1156: (99_927, 1237, 650),
 }
+NATIVE_IMAGE_NAMES = {
+    1140: "_page_110_Picture_4.jpeg",
+    1142: "_page_110_Picture_5.jpeg",
+    1146: "_page_110_Picture_7.jpeg",
+    1152: "_page_111_Figure_1.jpeg",
+    1156: "_page_111_Figure_3.jpeg",
+}
+assert {line: Path(images[line]).name for line in STRICT_U} == NATIVE_IMAGE_NAMES
+
+# Printed book pages 95--96 are PDF image pages 110--111 because the physical
+# filenames count front matter.  Literal page-95/page-96 filenames at these
+# monolith lines are earlier Turing-machine plates and are not T18 assets.
+PAGE_NUMBER_FALSE_FRIENDS = {
+    968: "_page_95_Figure_2.jpeg",
+    972: "_page_96_Picture_2.jpeg",
+    974: "_page_96_Picture_3.jpeg",
+    976: "_page_96_Picture_4.jpeg",
+}
+assert {
+    line: Path(images[line]).name for line in PAGE_NUMBER_FALSE_FRIENDS
+} == PAGE_NUMBER_FALSE_FRIENDS
+assert set(PAGE_NUMBER_FALSE_FRIENDS).isdisjoint(U)
 VISUAL_FACTS = {
     "phase": "two circle states alternate on successive live steps",
     "frontier": "exactly the leftmost old symbol is removed",
@@ -271,6 +298,31 @@ PAGE_96_PREFIX_ROWS = {
     ),
 }
 
+PAGE_96_FINAL_ROWS = {
+    "a": "10101010101110101010",
+    "b": "11111111111111111111111111111111111111111111111111",
+    "c": "11101110111110111110111011111011111011101111101110111110111110",
+    "d": "110110111011011110111011011101101111011110111011011",
+    "e": "001110011101110111011100111001110111011111101111110111",
+}
+PAGE_96_TRACE_SHA256 = {
+    "a": "c9d9199aacac4298a05c9810d19654aa45ff1193067e636c3361cf4f87e21e79",
+    "b": "d9a237a460cccbcd90bddc1b47a204b03f7a03941be3fc43388a0af9ae4966ef",
+    "c": "adadc131e58c22729fc2651a1989d2fd5fae618cb402807f93e1b7648cbfe019",
+    "d": "b7d44cb49a4fa6c6e84564e93ff29f85e12bce9eedc8ba1c6cb5324a4c29577a",
+    "e": "024da84c4d9e88aa4af7c6e2ef7441b805af16708be7f2157ec4ffdfabd4cfc1",
+}
+
+# BOOK:8180/8184 independently redraws the page-96 rule (d) while lowering it
+# toward rule 110.  Its first 21 displayed rows agree exactly, but the asset
+# stays class R because the surrounding plate is an encoding relation.
+RULE110_RELATION_ROWS = (
+    "1", "1", "101", "011", "11", "11", "1101", "1011", "011101",
+    "11101", "1101101", "1011011", "011011101", "11011101",
+    "1011101101", "0111011011", "111011011", "110110111",
+    "10110111101", "01101111011", "1101111011",
+)
+
 
 def live_step(rules: Rule, state: State) -> State:
     """One raster-visible event; empty-word outcome policy is out of scope."""
@@ -299,11 +351,18 @@ def words(states: tuple[State, ...]) -> tuple[str, ...]:
     return tuple("".join(map(str, word)) for _, word in states)
 
 
+def trace_digest(states: tuple[State, ...]) -> str:
+    payload = "\n".join(words(states)) + "\n"
+    return hashlib.sha256(payload.encode("ascii")).hexdigest()
+
+
 assert DIRECT_RULES["a"] == ((1, 1), (1, 0))
 assert words(trace(DIRECT_RULES["a"], DIRECT_SEEDS["a"], 25)) == PAGE_95_ROWS
 for name, rule in DIRECT_RULES.items():
     states = trace(rule, DIRECT_SEEDS[name], 100)
     assert words(states[:16]) == PAGE_96_PREFIX_ROWS[name]
+    assert words(states)[-1] == PAGE_96_FINAL_ROWS[name]
+    assert trace_digest(states) == PAGE_96_TRACE_SHA256[name]
     assert tuple(phase for phase, _ in states[:16]) == tuple(i % 2 for i in range(16))
     assert all(word for _, word in states)
 
@@ -313,6 +372,7 @@ for name, rule in DIRECT_RULES.items():
 assert live_step(DIRECT_RULES["a"], (0, (1,))) == (1, (1, 1))
 assert live_step(DIRECT_RULES["a"], (1, (1,))) == (0, (1, 0))
 assert live_step(DIRECT_RULES["a"], (0, (0, 1))) == (1, (1,))
+assert words(trace(DIRECT_RULES["d"], DIRECT_SEEDS["d"], 21)) == RULE110_RELATION_ROWS
 
 
 # The mechanical illustration is absent from this extraction.  Both source
@@ -324,9 +384,32 @@ assert lines[12348 - 1] == "#### 000000000000000000000000000000000000000"
 assert not (set(images) & set(range(12345, 12350)))
 notes_split = ASSET_ROOT / "BACK-MATTER/Index/Index.md"
 notes_split_lines = notes_split.read_text(encoding="utf-8").splitlines()
+nominal_notes = ASSET_ROOT / "BACK-MATTER/Notes/Notes.md"
+assert len(nominal_notes.read_text(encoding="utf-8").splitlines()) == 1
+assert "Cyclic Tag Systems" in notes_split_lines[220 - 1]
+assert "Implementation" in notes_split_lines[222 - 1]
+assert "Generalizations" in notes_split_lines[242 - 1]
 assert "Mechanical implementation" in notes_split_lines[251 - 1]
+assert "Properties" in notes_split_lines[253 - 1]
+assert "History" in notes_split_lines[261 - 1]
 assert not any(image_re.fullmatch(line) for line in notes_split_lines[249 - 1 : 254])
 assert not any(path.name.startswith("_page_895_") for path in ASSET_ROOT.rglob("*.jpeg"))
+
+# The genuine flattened Index and late compiler Notes are mispartitioned into
+# the split Colophon document.  Freeze those exact reverse joins, including the
+# one expected image-reference spelling difference at BOOK:18738.
+colophon = ASSET_ROOT / "BACK-MATTER/Colophon/Colophon.md"
+colophon_lines = colophon.read_text(encoding="utf-8").splitlines()
+for book_line, split_line in {
+    18514: 1071,
+    18674: 1231,
+    18740: 1297,
+    21068: 3625,
+    22150: 4707,
+}.items():
+    assert lines[book_line - 1] == colophon_lines[split_line - 1]
+assert lines[18738 - 1] == "![](_page_1131_Figure_8.jpeg)"
+assert colophon_lines[1295 - 1] == "![](Images/_page_1131_Figure_8.jpeg)"
 
 
 guards = {
@@ -418,7 +501,6 @@ def ledger() -> tuple[str, int, int, int]:
             "C" if book_line in C else
             "O" if book_line in O else
             "R" if book_line in R else
-            "K" if book_line in K else
             "X"
         )
         name = Path(images[book_line]).name
@@ -453,7 +535,7 @@ def ledger() -> tuple[str, int, int, int]:
 EXPECTED_STRICT_UNIVERSE_SHA256 = "95411e9d7c6de49bdd05049d5435bf0b935a6afdcde29619b5775b2205cfe82c"
 EXPECTED_STRICT_LEDGER_SHA256 = "bc91ba39ffb022ac91cdbbad2c7685523f8209de542d51a5f7d543c44f6fb488"
 EXPECTED_UNIVERSE_SHA256 = "9e95aed53f7aa329a9f82567a05031e51558c0e0b978ca5eb246fb758e454838"
-EXPECTED_LEDGER_SHA256 = "49b1ce0a15ba3e4e989c59ce9ef1be51c5443e41df967f948ddad92f7f166008"
+EXPECTED_LEDGER_SHA256 = "fa1ee814d45e3e085918627109124990635c91688655f37cbcc1ecb48e454e63"
 
 
 def main() -> None:
@@ -477,10 +559,11 @@ def main() -> None:
     assert (monolith_references, split_references, hashes) == (27, 27, 27)
     print(
         f"T18 asset oracle: PASS source={len(S)}; C4/Q=23/4; assets=27; strict=5; "
-        "classes C/O/R/K/X=4/1/14/5/3; "
+        "classes C/O/R/X=4/1/21/1; "
         "refs=54(monolith=27,split=27); unique_hashes=27; "
-        "page95_rule/seed/t0_t24=PASS; page96_rules/seeds/prefixes=PASS; "
-        "mechanical_plate_absent=PASS; actual_Index/split_reverse=PASS"
+        "page95_rule/seed/t0_t24=PASS; page96_rules/seeds/t0_t99=PASS; "
+        "mechanical_plate_absent=PASS; page_offset=PASS; "
+        "actual_Index/malformed_split_reverse=PASS"
     )
 
 

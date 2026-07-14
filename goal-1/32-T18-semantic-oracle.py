@@ -8,6 +8,7 @@ lowering through one generic old-snapshot ordered-span UPDATE.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass, field, replace
 from enum import Enum
 from itertools import product
@@ -482,21 +483,62 @@ CANONICAL_PROGRAM = BinaryCyclicProgram(
     trigger=1,
 )
 
-EXPECTED_CANONICAL_TRACE: tuple[DirectState, ...] = (
-    DirectState(0, (1,)),
-    DirectState(1, (1, 1)),
-    DirectState(0, (1, 1, 0)),
-    DirectState(1, (1, 0, 1, 1)),
-    DirectState(0, (0, 1, 1, 1, 0)),
-    DirectState(1, (1, 1, 1, 0)),
-    DirectState(0, (1, 1, 0, 1, 0)),
-    DirectState(1, (1, 0, 1, 0, 1, 1)),
-    DirectState(0, (0, 1, 0, 1, 1, 1, 0)),
-    DirectState(1, (1, 0, 1, 1, 1, 0)),
-    DirectState(0, (0, 1, 1, 1, 0, 1, 0)),
-    DirectState(1, (1, 1, 1, 0, 1, 0)),
-    DirectState(0, (1, 1, 0, 1, 0, 1, 0)),
+BOOK_PAGE_95_ROWS = (
+    "1",
+    "11",
+    "110",
+    "1011",
+    "01110",
+    "1110",
+    "11010",
+    "101011",
+    "0101110",
+    "101110",
+    "0111010",
+    "111010",
+    "1101010",
+    "10101011",
+    "010101110",
+    "10101110",
+    "010111010",
+    "10111010",
+    "011101010",
+    "11101010",
+    "110101010",
+    "1010101011",
+    "01010101110",
+    "1010101110",
+    "01010111010",
 )
+EXPECTED_CANONICAL_TRACE: tuple[DirectState, ...] = tuple(
+    DirectState(index % 2, tuple(int(bit) for bit in row))
+    for index, row in enumerate(BOOK_PAGE_95_ROWS)
+)
+
+# Independent semantic copies of the five page-96 native profiles.  The asset
+# oracle separately hash-binds their raster transcription; this oracle proves
+# that both the direct and shared tagged execution paths generate it.
+BOOK_PAGE_96_PROGRAMS = {
+    "a": BinaryCyclicProgram((0, 1), ((1, 1), (1, 0)), 1),
+    "b": BinaryCyclicProgram((0, 1), ((1,), (1, 1)), 1),
+    "c": BinaryCyclicProgram((0, 1), ((1, 0), (1, 1)), 1),
+    "d": BinaryCyclicProgram((0, 1), ((1,), (1, 0, 1)), 1),
+    "e": BinaryCyclicProgram((0, 1), ((1, 1, 1), (0,)), 1),
+}
+BOOK_PAGE_96_FINAL_ROWS = {
+    "a": "10101010101110101010",
+    "b": "11111111111111111111111111111111111111111111111111",
+    "c": "11101110111110111110111011111011111011101111101110111110111110",
+    "d": "110110111011011110111011011101101111011110111011011",
+    "e": "001110011101110111011100111001110111011111101111110111",
+}
+BOOK_PAGE_96_TRACE_SHA256 = {
+    "a": "c9d9199aacac4298a05c9810d19654aa45ff1193067e636c3361cf4f87e21e79",
+    "b": "d9a237a460cccbcd90bddc1b47a204b03f7a03941be3fc43388a0af9ae4966ef",
+    "c": "adadc131e58c22729fc2651a1989d2fd5fae618cb402807f93e1b7648cbfe019",
+    "d": "b7d44cb49a4fa6c6e84564e93ff29f85e12bce9eedc8ba1c6cb5324a4c29577a",
+    "e": "024da84c4d9e88aa4af7c6e2ef7441b805af16708be7f2157ec4ffdfabd4cfc1",
+}
 
 
 def direct_trace(
@@ -517,6 +559,32 @@ def generic_trace(
         configuration = generic_step(program, configuration).successor
         states.append(decode_tagged(program, configuration))
     return tuple(states)
+
+
+def word_rows(states: tuple[DirectState, ...]) -> tuple[str, ...]:
+    return tuple("".join(map(str, state.word)) for state in states)
+
+
+def word_trace_digest(states: tuple[DirectState, ...]) -> str:
+    payload = "\n".join(word_rows(states)) + "\n"
+    return hashlib.sha256(payload.encode("ascii")).hexdigest()
+
+
+def assert_book_fixtures() -> int:
+    cases = 0
+    for name, program in BOOK_PAGE_96_PROGRAMS.items():
+        direct = direct_trace(program, DirectState(0, (1,)), 99)
+        generic = generic_trace(program, DirectState(0, (1,)), 99)
+        assert direct == generic
+        assert word_rows(direct)[-1] == BOOK_PAGE_96_FINAL_ROWS[name]
+        assert word_trace_digest(direct) == BOOK_PAGE_96_TRACE_SHA256[name]
+        assert tuple(state.phase for state in direct) == tuple(
+            index % 2 for index in range(100)
+        )
+        assert all(state.word for state in direct)
+        cases += len(direct)
+    assert cases == 500
+    return cases
 
 
 def words_through(
@@ -634,7 +702,11 @@ class MultiplicityProgram:
     def __post_init__(self) -> None:
         if not self.blocks:
             raise ValueError("multiplicity program needs at least one block")
-        if any(value < 0 for block in self.blocks for value in block):
+        if any(
+            not isinstance(value, int) or isinstance(value, bool) or value < 0
+            for block in self.blocks
+            for value in block
+        ):
             raise ValueError("multiplicity data must be nonnegative")
 
 
@@ -643,7 +715,10 @@ def multiplicity_step(
 ) -> DirectState:
     if state.phase < 0 or state.phase >= len(program.blocks):
         raise ValueError("phase is outside the program cycle")
-    if any(value < 0 for value in state.word):
+    if any(
+        not isinstance(value, int) or isinstance(value, bool) or value < 0
+        for value in state.word
+    ):
         raise ValueError("multiplicity state must contain natural values")
     if not state.word:
         return state
@@ -772,6 +847,18 @@ def assert_adversaries() -> None:
     one = generic_step(one_block, encode_direct(one_block, DirectState(0, (1,))))
     assert decode_tagged(one_block, one.successor).phase == 0
 
+    duplicate_slots = BinaryCyclicProgram(
+        (0, 1), ((1,), (1,), (0,)), 1
+    )
+    assert deserialize_program(serialize_program(duplicate_slots)) == duplicate_slots
+    duplicate_phase_zero = DirectState(0, (1,))
+    duplicate_phase_one = DirectState(1, (1,))
+    assert serialize_state(duplicate_phase_zero) != serialize_state(
+        duplicate_phase_one
+    )
+    assert direct_step(duplicate_slots, duplicate_phase_zero).phase_after == 1
+    assert direct_step(duplicate_slots, duplicate_phase_one).phase_after == 2
+
     old = encode_direct(phase_program, DirectState(0, (1, 0)), generation=7)
     active = select_frontier(phase_program, old)
     read = read_neighborhood(phase_program, old, active)
@@ -844,6 +931,16 @@ def assert_adversaries() -> None:
     expect_value_error(
         lambda: BinaryCyclicProgram((0, 1), (), 1),
         "empty program cycle was accepted",
+    )
+    expect_value_error(
+        lambda: MultiplicityProgram(((1, -1),)),
+        "negative multiplicity data was accepted",
+    )
+    expect_value_error(
+        lambda: multiplicity_step(
+            MultiplicityProgram(((1,),)), DirectState(0, (1.5,))
+        ),
+        "nonintegral multiplicity data was accepted",
     )
 
 
@@ -984,12 +1081,13 @@ def assert_decision_matrix() -> None:
 
 
 def main() -> None:
-    assert direct_trace(CANONICAL_PROGRAM, DirectState(0, (1,)), 12) == (
+    assert direct_trace(CANONICAL_PROGRAM, DirectState(0, (1,)), 24) == (
         EXPECTED_CANONICAL_TRACE
     )
-    assert generic_trace(CANONICAL_PROGRAM, DirectState(0, (1,)), 12) == (
+    assert generic_trace(CANONICAL_PROGRAM, DirectState(0, (1,)), 24) == (
         EXPECTED_CANONICAL_TRACE
     )
+    book_fixture_cases = assert_book_fixtures()
     bounded = assert_bounded_commutation()
     t17_cases = assert_t17_shared_ordered_update()
     multiplicity_cases = assert_multiplicity_generalization()
@@ -1005,7 +1103,8 @@ def main() -> None:
         f"no_append_cases={bounded['no_append_cases']}; "
         f"shared_T17_update_cases={t17_cases}; "
         f"multiplicity_cases={multiplicity_cases}; "
-        "canonical_t0_t12=PASS; visible_phase=PASS; "
+        f"book_fixture_states={book_fixture_cases}; "
+        "canonical_t0_t24=PASS; page96_t0_t99=PASS; visible_phase=PASS; "
         "tagged_inverse=PASS; opaque_snapshot_identity=PASS; "
         "phase_head_tail_atomic=PASS; extinction_then_stutter=PASS; "
         "shared_ordered_multispan_UPDATE=PASS; serialization=PASS; "
