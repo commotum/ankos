@@ -459,6 +459,33 @@ EXPECTED_IMAGE_PARTITION = {
 EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
+EXPECTED_SPLIT_QUERY = (
+    91, "e4270e6f329e1d7577a7b977c7bf1adbef523002e821e5863fb661e3a343499e"
+)
+EXPECTED_SPLIT_QUERY_EXACT = (
+    79, "1ec62b5ac576ad92ab682559f7493ee70519da790800b0318e4ffdf2b6753409"
+)
+EXPECTED_SPLIT_QUERY_NONEXACT = (
+    12, "10abd9e89f9e571d2679ed835449e98fc9a0e73ba4976412f04fb14915785503"
+)
+EXPECTED_SPLIT_QUERY_MAPPING = (
+    12, "25952289bcf9f3844b60191a67e85c8d3204771736d1c9316c8ae8f1f40039ff"
+)
+EXPECTED_SPLIT_RETAINED_EXACT = (
+    77, "b7b403d3e42c844094acb12f3942613e09c9124ccd476298704c10c412938492"
+)
+EXPECTED_SPLIT_RETAINED_NONEXACT = (
+    34, "0f8b0f5e406c224e9163046f94e14a0b0968231d431819bf9e5722505694b496"
+)
+EXPECTED_SPLIT_RETAINED_MAPPING = (
+    34, "17b1157d3537e671e01a6895cd938ac46455e697ba1f29b132a4eeb59f1a3e2b"
+)
+EXPECTED_MONOLITH_ONLY = (
+    0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+)
+EXPECTED_ATLAS_HITS = (
+    2, "d6ef54ffa4ed4062c4cce2ec86050f137de9e2b75fdeea0b6e2cf6a9de0ae307"
+)
 
 
 def digest(values: set[int] | frozenset[int]) -> str:
@@ -525,6 +552,8 @@ def main() -> int:
     book = Path(sys.argv[1]).resolve() if len(sys.argv) == 2 else DEFAULT_BOOK
     raw = book.read_bytes()
     lines = raw.decode("utf-8").splitlines()
+    at = lambda line_no: lines[line_no - 1]
+
     source_ok = (
         len(lines) == EXPECTED_BOOK_LINES
         and hashlib.sha256(raw).hexdigest() == EXPECTED_BOOK_SHA256
@@ -532,26 +561,479 @@ def main() -> int:
         and sha256(CATALOG) == EXPECTED_CATALOG_SHA256
         and sha256(TAXONOMY) == EXPECTED_TAXONOMY_SHA256
     )
+    ok = source_ok
     print("source", "OK" if source_ok else "MISMATCH")
+
     hits: dict[str, set[int]] = {}
     for name, pattern in QUERIES.items():
         found = {n for n, line in enumerate(lines, 1) if re.search(pattern, line, re.I)}
         hits[name] = found
-        print(
-            name,
+        actual = (
             len(found),
             sum(n < INDEX_FIRST_LINE for n in found),
             sum(n >= INDEX_FIRST_LINE for n in found),
             digest(found),
-            ",".join(map(str, sorted(found))),
         )
+        good = actual == EXPECTED_QUERY.get(name)
+        ok &= good
+        print(name, "OK" if good else "MISMATCH", *actual)
+
     union = set().union(*hits.values())
-    pre = {n for n in union if n < INDEX_FIRST_LINE}
-    index = union - pre
-    print("union", len(union), digest(union), ",".join(map(str, sorted(union))))
-    print("pre", len(pre), digest(pre), ",".join(map(str, sorted(pre))))
-    print("index", len(index), digest(index), ",".join(map(str, sorted(index))))
-    return 0 if source_ok else 1
+    pre_index_union = {n for n in union if n < INDEX_FIRST_LINE}
+    index = union - pre_index_union
+    matched_retained = pre_index_union - set(EXCLUDED)
+    governed = set(RETAINED) - union
+    sets = {
+        "union": union,
+        "pre_index_union": pre_index_union,
+        "index": index,
+        "matched_retained": matched_retained,
+        "governed_continuations": governed,
+        "retained": set(RETAINED),
+        "excluded": set(EXCLUDED),
+        "native": set(NATIVE_EVIDENCE),
+        "relation": set(RELATION_EVIDENCE),
+        "control": set(CONTROL_EVIDENCE),
+        "governed_images": set(GOVERNED_IMAGE_LINES),
+    }
+    for name, values in sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_SET.get(name)
+        ok &= good
+        print(name, "OK" if good else "MISMATCH", *actual)
+
+    excluded_ok = (
+        set().union(*EXCLUDED_CLASS.values()) == set(EXCLUDED)
+        and sum(map(len, EXCLUDED_CLASS.values())) == len(EXCLUDED)
+    )
+    for name, values in EXCLUDED_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_EXCLUDED_CLASS.get(name)
+        excluded_ok &= good
+        print(f"excluded_{name}", "OK" if good else "MISMATCH", *actual)
+    classification_delta = matched_retained ^ set(MATCHED_RETAINED)
+    excluded_ok &= not classification_delta
+    ok &= excluded_ok
+    print(
+        "unresolved_pre_index", "OK" if excluded_ok else "MISMATCH",
+        len(classification_delta), *sorted(classification_delta),
+    )
+
+    index_ok = (
+        set().union(*INDEX_CLASS.values()) == index
+        and sum(map(len, INDEX_CLASS.values())) == len(index)
+    )
+    for name, values in INDEX_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_INDEX_CLASS.get(name)
+        index_ok &= good
+        print(f"index_{name}", "OK" if good else "MISMATCH", *actual)
+    guard_records = {
+        f"{class_name}:{line_no}:{'|'.join(needles)}"
+        for class_name, entries in INDEX_ENTRY_GUARDS.items()
+        for line_no, needles in entries.items()
+    }
+    index_entry_guards_ok = (
+        set(INDEX_ENTRY_GUARDS) == set(INDEX_CLASS)
+        and all(
+            set(INDEX_ENTRY_GUARDS[class_name]) == set(INDEX_CLASS[class_name])
+            for class_name in INDEX_CLASS
+        )
+        and all(
+            all(needle in at(line_no).lower() for needle in needles)
+            for entries in INDEX_ENTRY_GUARDS.values()
+            for line_no, needles in entries.items()
+        )
+        and (len(guard_records), digest_records(guard_records))
+        == EXPECTED_INDEX_ENTRY_GUARDS
+    )
+    index_ok &= index_entry_guards_ok
+    print(
+        "index_entry_occurrence_guards",
+        "OK" if index_entry_guards_ok else "MISMATCH",
+        len(guard_records), digest_records(guard_records),
+    )
+    ok &= index_ok
+    print(
+        "unresolved_index", "OK" if index_ok else "MISMATCH",
+        len(index ^ set(INDEX_ROUTED)),
+    )
+
+    derived_images = {n for n in RETAINED if IMAGE_RE.fullmatch(at(n))}
+    image_sets = {
+        "native": NATIVE_IMAGE_LINES,
+        "relation": RELATION_IMAGE_LINES,
+        "control": CONTROL_IMAGE_LINES,
+    }
+    images_ok = (
+        derived_images == set(GOVERNED_IMAGE_LINES)
+        and sum(map(len, image_sets.values())) == len(GOVERNED_IMAGE_LINES)
+        and NATIVE_IMAGE_LINES <= NATIVE_EVIDENCE
+        and RELATION_IMAGE_LINES <= RELATION_EVIDENCE
+        and CONTROL_IMAGE_LINES <= CONTROL_EVIDENCE
+        and all(IMAGE_RE.fullmatch(at(n)) for n in GOVERNED_IMAGE_LINES)
+    )
+    for name, values in image_sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_IMAGE_PARTITION.get(name)
+        images_ok &= good
+        print(f"images_{name}", "OK" if good else "MISMATCH", *actual)
+    ok &= images_ok
+    print(
+        "governed_image_interface", "OK" if images_ok else "MISMATCH",
+        len(derived_images), digest(derived_images),
+    )
+
+    inherited_parallel_ok = (
+        "fixed array of cells" in at(982)
+        and "underlying number and organization of cells always stays the same" in at(982)
+        and "number of elements can change" in at(984)
+        and "at each step each one of these elements is replaced by a new block" in at(984)
+        and "fixed block of new elements" in at(986)
+        and "independent of the colors of any neighboring elements" in at(986)
+        and "at every step each kind of element is replaced" in at(992)
+        and "subdividing each element into several that are drawn smaller" in at(994)
+    )
+    ok &= inherited_parallel_ok
+    print(
+        "source_inherited_parallel_independent_block_replacement",
+        "OK" if inherited_parallel_ok else "MISMATCH",
+    )
+
+    square_core_ok = (
+        at(2308) == "#### **Substitution Systems and Fractals**"
+        and "progressively subdividing each element" in at(2310)
+        and "two-dimensional substitution systems that work in essentially the same way" in at(2312)
+        and "each square is replaced by four smaller squares at every step" in at(2316)
+        and "simple nested structure" in at(2318)
+        and "at every step" in at(2320)
+        and "replace each black square with several smaller black squares" in at(2320)
+        and "identical copy of the whole pattern" in at(2324)
+    )
+    ok &= square_core_ok
+    print("source_square_grid_core", "OK" if square_core_ok else "MISMATCH")
+
+    notes_assembly_ok = (
+        "rule on page 187" in at(13683)
+        and "1 \\to \\{\\{1, 0\\}, \\{1, 1\\}\\}" in at(13683)
+        and "0 \\to \\{\\{0, 0\\}, \\{0, 0\\}\\}" in at(13683)
+        and "initial condition such as {{1}}" in at(13683)
+        and at(13686).startswith("SS2DEvolve[rule_, init_")
+        and "Nest[Flatten2D[# /. rule] &, init, t]" in at(13687)
+        and at(13688) == "Flatten2D[list_] :="
+        and "Apply[Join, Map[MapThread[Join, #] &, list]]" in at(13689)
+    )
+    ok &= notes_assembly_ok
+    print("source_notes_rank2_patch_assembly", "OK" if notes_assembly_ok else "MISMATCH")
+
+    source_repairs_ok = (
+        "t_1 :=" in at(13686)
+        and "IntegerDigits[{i, i}, k, n]" in at(13695)
+        and "\\{j, 0, k^n - 1\\}" in at(13696)
+        and "ddimensional substitution system" in at(13726)
+        and "d-1hyperplane" in at(13738)
+        and "The pictures below substitution systems" in at(13722)
+        and at(13752).count(":\\rightarrow With") >= 20
+        and len(at(14105)) > 2500
+    )
+    ok &= source_repairs_ok
+    print(
+        "source_extraction_defects_retained_not_repaired",
+        "OK" if source_repairs_ok else "MISMATCH",
+    )
+
+    coordinate_relation_ok = (
+        "finite automaton from the digit sequences" in at(13692)
+        and "At step *n*, the complete array of cells is" in at(13692)
+        and "pattern on page 187, k = 2" in at(13699)
+        and "patterns (a) through (f) on page 188, k = 3" in at(13699)
+        and "excluded pairs of digits" in at(13699)
+        and "finer grid of squares" in at(7312)
+        and "one more digit in their coordinates" in at(7312)
+        and "repeatedly applying the substitution system rule" in at(7322)
+    )
+    ok &= coordinate_relation_ok
+    print(
+        "source_coordinate_finite_automaton_relation_not_update",
+        "OK" if coordinate_relation_ok else "MISMATCH",
+    )
+
+    background_dimension_ok = (
+        "Non-white backgrounds" in at(13722)
+        and "white squares are replaced by blocks which contain black squares" in at(13722)
+        and "state of a ddimensional substitution system" in at(13726)
+        and "nested list of depth d" in at(13726)
+        and "SSEvolve[rule_, init_, t_, d_Integer]" in at(13729)
+        and "Nest[FlattenArray[# /. rule, d] &, init, t]" in at(13730)
+        and "MapThread[Join" in at(13732)
+        and "analog in 3D of the 2D rule on page 187" in at(13736)
+        and "each black cell must be replaced by at least d+1 black cells" in at(13738)
+    )
+    ok &= background_dimension_ok
+    print(
+        "source_background_and_rank_generalization",
+        "OK" if background_dimension_ok else "MISMATCH",
+    )
+
+    shape_boundary_ok = (
+        "pages 187 and 188 are based on subdividing squares" in at(13740)
+        and "subdividing other geometrical figures" in at(13740)
+        and "two distinct shapes" in at(13744)
+        and "Labelling each shape and orientation with a different color" in at(13744)
+        and "reproduced with equal-sized squares" in at(13744)
+        and "nothing about this basic process" in at(2326)
+        and "rigid grid" in at(2326)
+        and "must take account of the orientation of that square" in at(2332)
+        and "possible for the squares produced to overlap" in at(2334)
+    )
+    ok &= shape_boundary_ok
+    print(
+        "source_strict_grid_vs_shape_orientation_relation",
+        "OK" if shape_boundary_ok else "MISMATCH",
+    )
+
+    contextual_boundary_ok = (
+        "replacement for a particular element" in at(2350)
+        and "characteristics of other neighboring elements" in at(2350)
+        and "sets up elements on a grid" in at(2356)
+        and "depend on its neighbors" in at(2356)
+        and "no immediate way to generalize sequential substitution systems" in at(2366)
+        and "Page 192 · Neighbor-dependent substitution systems" in at(13806)
+        and "Flatten2D[Partition[list, {2, 2}, 1, -1] /. rule]" in at(13808)
+        and "arbitrarily large set of different possible neighborhood configurations" in at(13810)
+    )
+    ok &= contextual_boundary_ok
+    print(
+        "source_contextual_and_sequential_sibling_boundary",
+        "OK" if contextual_boundary_ok else "MISMATCH",
+    )
+
+    relations_ok = (
+        "two-dimensional recursive subdivision" in at(6842)
+        and "square either remains the same or is subdivided" in at(6842)
+        and "quadtree representation" in at(6842)
+        and "generated from the two-dimensional substitution systems shown" in at(6978)
+        and "limitation in our powers of visual perception" in at(6978)
+        and "4 billion or so possible such systems" in at(14099)
+        and "2×2 blocks and up to four colors" in at(14099)
+        and "51 of the 65,536 possible 2×2 blocks" in at(14109)
+        and "or equivalently from a Kronecker product" in at(17297)
+        and "pattern can be generated by a 2D substitution system with rule" in at(19197)
+    )
+    ok &= relations_ok
+    print(
+        "source_encoding_constraint_and_algebra_relations",
+        "OK" if relations_ok else "MISMATCH",
+    )
+
+    page187_rule = {
+        1: ((1, 0), (1, 1)),
+        0: ((0, 0), (0, 0)),
+    }
+    generation_1 = expand_uniform_grid(((1,),), page187_rule)
+    generation_2 = expand_uniform_grid(generation_1, page187_rule)
+    derived_assembly_ok = (
+        generation_1 == ((1, 0), (1, 1))
+        and generation_2
+        == ((1, 0, 0, 0), (1, 1, 0, 0), (1, 0, 1, 0), (1, 1, 1, 1))
+        and all(
+            len(expand_uniform_grid(((1,),), page187_rule)) == 2
+            for _ in range(2)
+        )
+    )
+    ok &= derived_assembly_ok
+    print(
+        "derived_uniform_patch_assembly",
+        "OK" if derived_assembly_ok else "MISMATCH",
+        len(generation_2), len(generation_2[0]),
+    )
+
+    strict_binary_rule_count = 2 ** (2 * 2 * 2)
+    strict_ternary_rule_count = 3 ** (3 * 3 * 3)
+    four_color_rule_count = 4 ** (4 * 2 * 2)
+    derived_counts_ok = (
+        strict_binary_rule_count == 256
+        and strict_ternary_rule_count == 3**27
+        and four_color_rule_count == 2**32 == 4_294_967_296
+        and "4 billion or so" in at(14099)
+    )
+    ok &= derived_counts_ok
+    print(
+        "derived_fixed_patch_table_counts",
+        "OK" if derived_counts_ok else "MISMATCH",
+        strict_binary_rule_count, strict_ternary_rule_count, four_color_rule_count,
+    )
+
+    structural = (
+        not NATIVE_EVIDENCE & RELATION_EVIDENCE
+        and not NATIVE_EVIDENCE & CONTROL_EVIDENCE
+        and not RELATION_EVIDENCE & CONTROL_EVIDENCE
+        and NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE == RETAINED
+        and MATCHED_RETAINED == RETAINED & pre_index_union
+        and GOVERNED_CONTINUATIONS == RETAINED - union
+        and not RETAINED & index
+    )
+    ok &= structural
+    print("structural", "OK" if structural else "MISMATCH")
+
+    split_paths = sorted(
+        path for path in SOURCE_ROOT.rglob("*.md")
+        if path.resolve() not in {DEFAULT_BOOK.resolve(), ATLAS.resolve()}
+    )
+    relative_paths = [path.relative_to(SOURCE_ROOT).as_posix() for path in split_paths]
+    manifest = [
+        f"{relative}\0{len(path.read_bytes())}\0{sha256(path)}"
+        for path, relative in zip(split_paths, relative_paths, strict=True)
+    ]
+    split_manifest_ok = (
+        len(split_paths) == EXPECTED_SPLIT_FILE_COUNT
+        and digest_records(relative_paths) == EXPECTED_SPLIT_PATHS_DIGEST
+        and digest_records(manifest) == EXPECTED_SPLIT_MANIFEST_DIGEST
+    )
+    ok &= split_manifest_ok
+    print(
+        "split_manifest", "OK" if split_manifest_ok else "MISMATCH",
+        len(split_paths), digest_records(relative_paths), digest_records(manifest),
+    )
+
+    compiled = [re.compile(pattern, re.I) for pattern in QUERIES.values()]
+    monolith_query_text = {at(n) for n in union}
+    split_records: set[str] = set()
+    split_exact: set[str] = set()
+    split_nonexact: set[str] = set()
+    split_lines: list[tuple[str, str]] = []
+    split_texts: set[str] = set()
+    split_record_text: dict[str, str] = {}
+    for path, relative in zip(split_paths, relative_paths, strict=True):
+        for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            record = f"{relative}:{line_no}"
+            split_lines.append((record, normalized_line(line)))
+            split_texts.add(line)
+            split_record_text[record] = line
+            if not any(rx.search(line) for rx in compiled):
+                continue
+            split_records.add(record)
+            (split_exact if line in monolith_query_text else split_nonexact).add(record)
+
+    query_mapping: set[str] = set()
+    query_mapping_ok = True
+    monolith_witnesses = [
+        (str(line_no), normalized_line(at(line_no))) for line_no in sorted(union)
+    ]
+    for record in sorted(split_nonexact):
+        witness, score = best_witness(split_record_text[record], monolith_witnesses)
+        query_mapping.add(f"{record}->{witness}:{score:.6f}")
+        query_mapping_ok &= score >= 0.50 and int(witness) in union
+    split_query_ok = (
+        (len(split_records), digest_records(split_records)) == EXPECTED_SPLIT_QUERY
+        and (len(split_exact), digest_records(split_exact)) == EXPECTED_SPLIT_QUERY_EXACT
+        and (len(split_nonexact), digest_records(split_nonexact))
+        == EXPECTED_SPLIT_QUERY_NONEXACT
+        and (len(query_mapping), digest_records(query_mapping))
+        == EXPECTED_SPLIT_QUERY_MAPPING
+        and query_mapping_ok
+    )
+    ok &= split_query_ok
+    print(
+        "split_query_reverse_join", "OK" if split_query_ok else "MISMATCH",
+        len(split_records), digest_records(split_records),
+        len(split_exact), digest_records(split_exact),
+        len(split_nonexact), digest_records(split_nonexact),
+        len(query_mapping), digest_records(query_mapping),
+    )
+
+    exact_retained = {n for n in RETAINED if at(n) in split_texts}
+    nonexact_retained = set(RETAINED) - exact_retained
+    retained_mapping: set[str] = set()
+    monolith_only: set[int] = set()
+    for line_no in sorted(nonexact_retained):
+        witness, score = best_witness(at(line_no), split_lines)
+        if score >= 0.50:
+            retained_mapping.add(f"{line_no}->{witness}:{score:.6f}")
+        else:
+            monolith_only.add(line_no)
+    split_retained_ok = (
+        (len(exact_retained), digest(exact_retained))
+        == EXPECTED_SPLIT_RETAINED_EXACT
+        and (len(nonexact_retained), digest(nonexact_retained))
+        == EXPECTED_SPLIT_RETAINED_NONEXACT
+        and (len(retained_mapping), digest_records(retained_mapping))
+        == EXPECTED_SPLIT_RETAINED_MAPPING
+        and (len(monolith_only), digest(monolith_only)) == EXPECTED_MONOLITH_ONLY
+        and len(retained_mapping) + len(monolith_only) == len(nonexact_retained)
+    )
+    ok &= split_retained_ok
+    print(
+        "split_retained_reverse_join", "OK" if split_retained_ok else "MISMATCH",
+        len(exact_retained), digest(exact_retained),
+        len(nonexact_retained), digest(nonexact_retained),
+        len(retained_mapping), digest_records(retained_mapping),
+        len(monolith_only), digest(monolith_only),
+    )
+
+    atlas_lines = ATLAS.read_text(encoding="utf-8").splitlines()
+    atlas_patterns = (
+        re.compile(r"^### Substitution Systems and Fractals$", re.I),
+        re.compile(r"two-dimensional replacement rules and fractal generation", re.I),
+    )
+    atlas_hits = {
+        n for n, line in enumerate(atlas_lines, 1)
+        if any(rx.search(line) for rx in atlas_patterns)
+    }
+    atlas_ok = (
+        len(atlas_lines) == 542
+        and (len(atlas_hits), digest(atlas_hits)) == EXPECTED_ATLAS_HITS
+        and "Substitution Systems and Fractals" in atlas_lines[180]
+        and "two-dimensional replacement rules" in atlas_lines[182]
+    )
+    ok &= atlas_ok
+    print(
+        "atlas_summary_only", "OK" if atlas_ok else "MISMATCH",
+        len(atlas_hits), digest(atlas_hits),
+    )
+
+    catalog_lines = CATALOG.read_text(encoding="utf-8").splitlines()
+    taxonomy_text = TAXONOMY.read_text(encoding="utf-8")
+    catalog_ok = (
+        len(catalog_lines) == 46
+        and catalog_lines[26] == "Two-Dimensional Substitution Systems,"
+        and len(set(catalog_lines[1:])) == 45
+        and "## 26. Two-Dimensional Substitution Systems" in taxonomy_text
+        and "each tile is replaced by a block of smaller tiles" in taxonomy_text
+        and "Replacements are applied in parallel" in taxonomy_text
+        and "`replacement_rule`" in taxonomy_text
+        and "`orientation_policy`" in taxonomy_text
+    )
+    ok &= catalog_ok
+    print("catalog_taxonomy_vocabulary_only", "OK" if catalog_ok else "MISMATCH")
+
+    architecture_inference_ok = (
+        inherited_parallel_ok
+        and square_core_ok
+        and notes_assembly_ok
+        and source_repairs_ok
+        and background_dimension_ok
+        and shape_boundary_ok
+        and contextual_boundary_ok
+        and derived_assembly_ok
+        and derived_counts_ok
+    )
+    ok &= architecture_inference_ok
+    print(
+        "source_fit_rank2_parallel_patch_substitution_not_new_executor",
+        "OK" if architecture_inference_ok else "MISMATCH",
+    )
+
+    unresolved_total = (
+        len(classification_delta)
+        + len(index - set(INDEX_ROUTED))
+        + len(set(INDEX_ROUTED) - index)
+        + len(monolith_only)
+    )
+    unresolved_ok = unresolved_total == 0
+    ok &= unresolved_ok
+    print("unresolved_total", "OK" if unresolved_ok else "MISMATCH", unresolved_total)
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":
