@@ -19,7 +19,8 @@ code.  In particular it:
 * checks cyclic Partition alignment on every binary rectangle through 3 by 3;
 * exhausts all 65,536 Boolean choices over the 16 binary 2 by 2 contexts on a
   de Bruijn torus containing every context exactly once, using two distinct
-  uniform 2 by 2 output patches;
+  uniform 2 by 2 output patches, and commutes independently typed complete
+  results through an explicit reversible source/successor-token bijection;
 * proves compatible mixed mosaics, typed incompatible/no-commit outcomes,
   exact lineage, old-snapshot reads, newborn deferral, and product placement;
 * rejects fixed/open/reflected boundaries, sequential mutation, flat patch
@@ -184,12 +185,12 @@ def make_grid(
 
 
 @dataclass(frozen=True)
-class AnyLabel:
-    """Closed pattern atom corresponding to Wolfram Language Blank ``_``."""
+class AnonymousAny:
+    """Internal anonymous wildcard mapped explicitly from source Blank ``_``."""
 
 
-ANY = AnyLabel()
-PatternAtom = int | AnyLabel
+ANY = AnonymousAny()
+PatternAtom = int | AnonymousAny
 
 
 @dataclass(frozen=True)
@@ -402,6 +403,158 @@ class PatchStepResult:
     outcome: Advanced | Invalid
     successors: tuple[PeriodicRectGrid, ...]
     step: PatchStep | None
+
+
+# The direct evaluator deliberately uses independent carrier, token, witness,
+# outcome, and result types.  Equality below is established only through an
+# explicit reversible mapping; sharing the generic classes would turn a
+# same-implementation check into a false commutation proof.
+
+
+@dataclass(frozen=True, eq=False)
+class DirectSnapshotToken:
+    generation: int
+    parent: DirectSnapshotToken | None = field(default=None, repr=False)
+
+    def __post_init__(self) -> None:
+        generation = exact_int(self.generation, "direct generation")
+        if generation < 0:
+            raise ValueError("direct generation must be nonnegative")
+        if self.parent is not None:
+            if type(self.parent) is not DirectSnapshotToken:
+                raise TypeError("direct parent must be a DirectSnapshotToken")
+            if generation != self.parent.generation + 1:
+                raise ValueError("direct successor must advance its parent once")
+
+
+@dataclass(frozen=True)
+class DirectPeriodicGrid:
+    alphabet_size: int
+    cells: Grid
+    token: DirectSnapshotToken = field(compare=False, repr=False)
+
+    def __post_init__(self) -> None:
+        checked_alphabet_size(self.alphabet_size)
+        checked_grid(self.cells, self.alphabet_size)
+        if type(self.token) is not DirectSnapshotToken:
+            raise TypeError("direct grid token must be a DirectSnapshotToken")
+
+    @property
+    def shape(self) -> tuple[int, int]:
+        return (len(self.cells), len(self.cells[0]))
+
+
+@dataclass(frozen=True)
+class DirectSource:
+    token: DirectSnapshotToken = field(repr=False)
+    row: int
+    column: int
+
+
+@dataclass(frozen=True)
+class DirectContextRead:
+    source: DirectSource
+    values: Context4
+
+
+@dataclass(frozen=True)
+class DirectPatchWrite:
+    source: DirectSource
+    context: Context4
+    patch: Patch
+
+
+@dataclass(frozen=True)
+class DirectRectangle:
+    source: DirectSource
+    row_start: int
+    row_stop: int
+    column_start: int
+    column_stop: int
+
+
+@dataclass(frozen=True)
+class DirectChild:
+    source: DirectSource
+    local_row: int
+    local_column: int
+    target_row: int
+    target_column: int
+    label: int
+
+
+@dataclass(frozen=True)
+class DirectAdvanced:
+    changed: bool
+
+
+@dataclass(frozen=True)
+class DirectIncompatible:
+    kind: str
+    source_row: int | None
+    expected: int
+    actual: int
+
+
+@dataclass(frozen=True)
+class DirectInvalid:
+    reason: DirectIncompatible
+
+
+@dataclass(frozen=True)
+class DirectStep:
+    source_token: DirectSnapshotToken = field(repr=False)
+    successor: DirectPeriodicGrid
+    reads: tuple[DirectContextRead, ...]
+    writes: tuple[DirectPatchWrite, ...]
+    rectangles: tuple[DirectRectangle, ...]
+    children: tuple[DirectChild, ...]
+
+
+@dataclass(frozen=True)
+class DirectResult:
+    outcome: DirectAdvanced | DirectInvalid
+    successors: tuple[DirectPeriodicGrid, ...]
+    step: DirectStep | None
+
+
+@dataclass(frozen=True)
+class TokenBijection:
+    """Explicit reversible map between independently minted token pairs."""
+
+    pairs: tuple[tuple[DirectSnapshotToken, SnapshotToken], ...]
+
+    def __post_init__(self) -> None:
+        pairs = exact_tuple(self.pairs, "token-bijection pairs")
+        if not pairs:
+            raise ValueError("token bijection cannot be empty")
+        direct_ids: set[int] = set()
+        generic_ids: set[int] = set()
+        for raw_pair in pairs:
+            pair = exact_tuple(raw_pair, "token-bijection pair")
+            if len(pair) != 2:
+                raise ValueError("token-bijection pairs must have arity two")
+            direct, generic = pair
+            if type(direct) is not DirectSnapshotToken:
+                raise TypeError("left token must be a DirectSnapshotToken")
+            if type(generic) is not SnapshotToken:
+                raise TypeError("right token must be a SnapshotToken")
+            if id(direct) in direct_ids or id(generic) in generic_ids:
+                raise ValueError("token mapping must be one-to-one")
+            direct_ids.add(id(direct))
+            generic_ids.add(id(generic))
+
+    def to_generic(self, token: DirectSnapshotToken) -> SnapshotToken:
+        matches = tuple(generic for direct, generic in self.pairs if direct is token)
+        if len(matches) != 1:
+            raise ValueError("direct token is outside the bijection")
+        return matches[0]
+
+    def to_direct(self, token: SnapshotToken) -> DirectSnapshotToken:
+        matches = tuple(direct for direct, generic in self.pairs if generic is token)
+        if len(matches) != 1:
+            raise ValueError("generic token is outside the bijection")
+        return matches[0]
 
 
 def all_old_tiles(configuration: PeriodicRectGrid) -> tuple[TileHandle, ...]:
@@ -695,6 +848,272 @@ def direct_notes_step(cells: Grid, table: ClosedContextPatchTable) -> Grid | Non
     return direct_flatten2d(patches)
 
 
+def make_direct_grid(
+    cells: object,
+    alphabet_size: int = 2,
+    *,
+    generation: int = 0,
+) -> DirectPeriodicGrid:
+    checked = checked_grid(cells, alphabet_size)
+    return DirectPeriodicGrid(alphabet_size, checked, DirectSnapshotToken(generation))
+
+
+def direct_typed_step(
+    old: DirectPeriodicGrid,
+    table: ClosedContextPatchTable,
+) -> DirectResult:
+    """Independent typed reading of Partition/ReplaceAll/Flatten2D."""
+
+    if table.alphabet_size != old.alphabet_size:
+        raise ValueError("direct rule table and configuration alphabets differ")
+    windows = direct_partition_windows(old.cells)
+    height, width = old.shape
+    reads: list[DirectContextRead] = []
+    writes: list[DirectPatchWrite] = []
+    patch_rows: list[tuple[Patch, ...]] = []
+    for row in range(height):
+        patches: list[Patch] = []
+        for column in range(width):
+            source = DirectSource(old.token, row, column)
+            context = windows[row][column]
+            patch = table.at(context)
+            reads.append(DirectContextRead(source, context))
+            writes.append(DirectPatchWrite(source, context, patch))
+            patches.append(patch)
+        patch_rows.append(tuple(patches))
+
+    row_heights: list[int] = []
+    slab_widths: list[int] = []
+    for row, patch_row in enumerate(patch_rows):
+        expected_height = len(patch_row[0])
+        slab_width = 0
+        for patch in patch_row:
+            actual_height, patch_width = patch_shape(patch)
+            if actual_height != expected_height:
+                return DirectResult(
+                    DirectInvalid(
+                        DirectIncompatible(
+                            "row_patch_height", row, expected_height, actual_height
+                        )
+                    ),
+                    (),
+                    None,
+                )
+            slab_width += patch_width
+        row_heights.append(expected_height)
+        slab_widths.append(slab_width)
+    expected_width = slab_widths[0]
+    for row, actual_width in enumerate(slab_widths[1:], start=1):
+        if actual_width != expected_width:
+            return DirectResult(
+                DirectInvalid(
+                    DirectIncompatible(
+                        "row_slab_width", row, expected_width, actual_width
+                    )
+                ),
+                (),
+                None,
+            )
+
+    successor_cells = direct_flatten2d(tuple(patch_rows))
+    if successor_cells is None:
+        raise RuntimeError("direct compatibility and Flatten2D disagree")
+    successor = DirectPeriodicGrid(
+        old.alphabet_size,
+        successor_cells,
+        DirectSnapshotToken(old.token.generation + 1, old.token),
+    )
+
+    row_offsets: list[int] = []
+    row_cursor = 0
+    for row_height in row_heights:
+        row_offsets.append(row_cursor)
+        row_cursor += row_height
+    rectangles: list[DirectRectangle] = []
+    children: list[DirectChild] = []
+    for row in range(height):
+        column_cursor = 0
+        for column in range(width):
+            write = writes[row * width + column]
+            patch_height, patch_width = patch_shape(write.patch)
+            row_start = row_offsets[row]
+            rectangles.append(
+                DirectRectangle(
+                    write.source,
+                    row_start,
+                    row_start + patch_height,
+                    column_cursor,
+                    column_cursor + patch_width,
+                )
+            )
+            for local_row in range(patch_height):
+                for local_column in range(patch_width):
+                    children.append(
+                        DirectChild(
+                            write.source,
+                            local_row,
+                            local_column,
+                            row_start + local_row,
+                            column_cursor + local_column,
+                            write.patch[local_row][local_column],
+                        )
+                    )
+            column_cursor += patch_width
+
+    step = DirectStep(
+        old.token,
+        successor,
+        tuple(reads),
+        tuple(writes),
+        tuple(rectangles),
+        tuple(children),
+    )
+    return DirectResult(
+        DirectAdvanced(successor.cells != old.cells),
+        (successor,),
+        step,
+    )
+
+
+def _compare_source(
+    direct: DirectSource,
+    generic: TileHandle,
+    tokens: TokenBijection,
+) -> None:
+    assert tokens.to_generic(direct.token) is generic.token
+    assert tokens.to_direct(generic.token) is direct.token
+    assert (direct.row, direct.column) == (generic.row, generic.column)
+
+
+def compare_complete_results(
+    direct_old: DirectPeriodicGrid,
+    generic_old: PeriodicRectGrid,
+    direct: DirectResult,
+    generic: PatchStepResult,
+) -> TokenBijection:
+    """Prove the full result square modulo explicit opaque-token renaming."""
+
+    assert direct_old.alphabet_size == generic_old.alphabet_size
+    assert direct_old.cells == generic_old.cells
+    assert direct_old.token.generation == generic_old.token.generation
+
+    if type(direct.outcome) is DirectInvalid:
+        assert type(generic.outcome) is Invalid
+        assert direct.successors == () and generic.successors == ()
+        assert direct.step is None and generic.step is None
+        assert (
+            direct.outcome.reason.kind,
+            direct.outcome.reason.source_row,
+            direct.outcome.reason.expected,
+            direct.outcome.reason.actual,
+        ) == (
+            generic.outcome.reason.kind,
+            generic.outcome.reason.source_row,
+            generic.outcome.reason.expected,
+            generic.outcome.reason.actual,
+        )
+        return TokenBijection(((direct_old.token, generic_old.token),))
+
+    assert type(direct.outcome) is DirectAdvanced
+    assert type(generic.outcome) is Advanced
+    assert direct.outcome.changed == generic.outcome.changed
+    assert len(direct.successors) == len(generic.successors) == 1
+    assert direct.step is not None and generic.step is not None
+    direct_successor = direct.successors[0]
+    generic_successor = generic.successors[0]
+    assert direct.step.successor is direct_successor
+    assert generic.step.successor is generic_successor
+    assert direct.step.source_token is direct_old.token
+    assert generic.step.source_token is generic_old.token
+
+    # The two evaluators mint genuinely independent successor tokens.  The
+    # declared two-pair bijection, not raw identity, relates their witnesses.
+    assert type(direct_successor.token) is DirectSnapshotToken
+    assert type(generic_successor.token) is SnapshotToken
+    tokens = TokenBijection(
+        (
+            (direct_old.token, generic_old.token),
+            (direct_successor.token, generic_successor.token),
+        )
+    )
+    assert tokens.to_generic(direct_old.token) is generic_old.token
+    assert tokens.to_direct(generic_old.token) is direct_old.token
+    assert tokens.to_generic(direct_successor.token) is generic_successor.token
+    assert tokens.to_direct(generic_successor.token) is direct_successor.token
+    assert direct_successor.token.parent is direct_old.token
+    assert generic_successor.token.parent is generic_old.token
+    assert direct_successor.token.generation == generic_successor.token.generation
+    assert direct_successor.alphabet_size == generic_successor.alphabet_size
+    assert direct_successor.cells == generic_successor.cells
+
+    assert len(direct.step.reads) == len(generic.step.reads)
+    for direct_read, generic_read in zip(
+        direct.step.reads, generic.step.reads, strict=True
+    ):
+        _compare_source(direct_read.source, generic_read.source, tokens)
+        assert direct_read.values == generic_read.values
+
+    assert len(direct.step.writes) == len(generic.step.writes)
+    for direct_write, generic_write in zip(
+        direct.step.writes, generic.step.writes, strict=True
+    ):
+        _compare_source(direct_write.source, generic_write.source, tokens)
+        assert direct_write.context == generic_write.context
+        assert direct_write.patch == generic_write.patch
+
+    assert len(direct.step.rectangles) == len(generic.step.child_rectangles)
+    for direct_rectangle, generic_rectangle in zip(
+        direct.step.rectangles, generic.step.child_rectangles, strict=True
+    ):
+        _compare_source(direct_rectangle.source, generic_rectangle.source, tokens)
+        assert (
+            direct_rectangle.row_start,
+            direct_rectangle.row_stop,
+            direct_rectangle.column_start,
+            direct_rectangle.column_stop,
+        ) == (
+            generic_rectangle.row_start,
+            generic_rectangle.row_stop,
+            generic_rectangle.column_start,
+            generic_rectangle.column_stop,
+        )
+
+    assert len(direct.step.children) == len(generic.step.child_occurrences)
+    for direct_child, generic_child in zip(
+        direct.step.children, generic.step.child_occurrences, strict=True
+    ):
+        _compare_source(direct_child.source, generic_child.source, tokens)
+        assert (
+            direct_child.local_row,
+            direct_child.local_column,
+            direct_child.target_row,
+            direct_child.target_column,
+            direct_child.label,
+        ) == (
+            generic_child.local_row,
+            generic_child.local_column,
+            generic_child.target_row,
+            generic_child.target_column,
+            generic_child.label,
+        )
+
+    direct_lineage = {
+        (child.target_row, child.target_column): child.label
+        for child in direct.step.children
+    }
+    generic_lineage = {
+        (child.target_row, child.target_column): child.label
+        for child in generic.step.child_occurrences
+    }
+    successor_cells = {
+        (row, column): direct_successor.cells[row][column]
+        for row in range(direct_successor.shape[0])
+        for column in range(direct_successor.shape[1])
+    }
+    assert direct_lineage == generic_lineage == successor_cells
+    return tokens
+
+
 def verify_success_result(old: PeriodicRectGrid, result: PatchStepResult) -> None:
     if type(result.outcome) is not Advanced:
         raise AssertionError("expected an Advanced result")
@@ -817,8 +1236,11 @@ def audit_book_row_and_pattern_lowering() -> tuple[int, int]:
     assert tuple((clause.pattern.slots, clause.patch) for clause in exact_clauses) == program.table.rows
 
     old = make_grid(DEBRUIJN_TORUS)
+    direct_old = make_direct_grid(DEBRUIJN_TORUS)
     result = generic_step(old, program.table)
+    direct_result = direct_typed_step(direct_old, program.table)
     verify_success_result(old, result)
+    compare_complete_results(direct_old, old, direct_result, result)
     assert result.successors[0].cells == direct_notes_step(old.cells, program.table)
     source_row_reads = tuple(
         read for read in result.step.reads if pattern.matches(read.values)  # type: ignore[union-attr]
@@ -844,18 +1266,18 @@ def audit_bounded_commutation() -> tuple[int, int, int]:
     assert len(set(contexts)) == 16
 
     old = make_grid(DEBRUIJN_TORUS)
+    direct_old = make_direct_grid(DEBRUIJN_TORUS)
     event_count = 0
     firing_count = 0
     child_count = 0
     for rule_number in range(2**16):
         table = binary_basis_table(rule_number)
-        direct = direct_notes_step(old.cells, table)
-        assert direct is not None
+        direct = direct_typed_step(direct_old, table)
         generic = generic_step(old, table)
+        tokens = compare_complete_results(direct_old, old, direct, generic)
+        assert len(tokens.pairs) == 2
         assert type(generic.outcome) is Advanced
-        assert len(generic.successors) == 1
         assert generic.step is not None
-        assert generic.successors[0].cells == direct
         assert len(generic.step.reads) == 16
         assert len(generic.step.child_occurrences) == 64
         event_count += 1
@@ -903,6 +1325,32 @@ def wrong_in_place_step(cells: Grid, table: ClosedContextPatchTable) -> Grid:
     return tuple(tuple(row) for row in mutable)
 
 
+def wrong_upper_left_anchor_step(
+    cells: Grid,
+    table: ClosedContextPatchTable,
+) -> Grid:
+    """Deliberately place the source at the window's NW, not lower right."""
+
+    height = len(cells)
+    width = len(cells[0])
+    out: list[tuple[int, ...]] = []
+    for row in range(height):
+        out_row: list[int] = []
+        for column in range(width):
+            wrong_context: Context4 = (
+                cells[row][column],
+                cells[row][(column + 1) % width],
+                cells[(row + 1) % height][column],
+                cells[(row + 1) % height][(column + 1) % width],
+            )
+            patch = table.at(wrong_context)
+            if patch_shape(patch) != (1, 1):
+                raise ValueError("upper-left control requires singleton patches")
+            out_row.append(patch[0][0])
+        out.append(tuple(out_row))
+    return tuple(out)
+
+
 def wrong_flat_patch_concatenation(writes: tuple[PatchWrite, ...]) -> tuple[int, ...]:
     return tuple(
         label
@@ -916,6 +1364,7 @@ def audit_schedule_boundary_and_assembly() -> dict[str, int]:
     counts = {
         "snapshot": 0,
         "boundary": 0,
+        "lower_right_anchor": 0,
         "identity": 0,
         "mixed_compatible": 0,
         "typed_invalid": 0,
@@ -928,8 +1377,11 @@ def audit_schedule_boundary_and_assembly() -> dict[str, int]:
     # reads and gives an all-zero row instead of the correct checker pattern.
     xor_table = table_from_function(lambda context: ((context[1] ^ context[2],),))
     old = make_grid(((1, 0), (0, 0)))
+    direct_old = make_direct_grid(old.cells)
     result = generic_step(old, xor_table)
+    direct_result = direct_typed_step(direct_old, xor_table)
     verify_success_result(old, result)
+    compare_complete_results(direct_old, old, direct_result, result)
     assert result.successors[0].cells == ((0, 1), (1, 0))
     assert wrong_in_place_step(old.cells, xor_table) == ((0, 0), (0, 0))
     assert wrong_in_place_step(old.cells, xor_table) != result.successors[0].cells
@@ -949,11 +1401,24 @@ def audit_schedule_boundary_and_assembly() -> dict[str, int]:
     # Applicable identity remains Advanced(changed=false), not halt/quiescence.
     identity_table = table_from_function(lambda context: ((context[3],),))
     identity_old = make_grid(((0, 1, 0), (1, 1, 0)))
+    direct_identity_old = make_direct_grid(identity_old.cells)
     identity = generic_step(identity_old, identity_table)
+    direct_identity = direct_typed_step(direct_identity_old, identity_table)
     verify_success_result(identity_old, identity)
+    compare_complete_results(
+        direct_identity_old, identity_old, direct_identity, identity
+    )
     assert identity.successors[0].cells == identity_old.cells
     assert identity.outcome == Advanced(False)
     counts["identity"] += 1
+
+    # The scalar Partition alignment -1 puts Self at lower right.  Treating
+    # the source as upper left instead makes the same Self projection read the
+    # southeast neighbor and diverges on this nonsymmetric torus.
+    upper_left_wrong = wrong_upper_left_anchor_step(identity_old.cells, identity_table)
+    assert upper_left_wrong == ((1, 0, 1), (1, 0, 0))
+    assert upper_left_wrong != identity.successors[0].cells
+    counts["lower_right_anchor"] += 1
 
     # Context-dependent crossed widths: both slabs have width three, although
     # each old source column sees patch widths {1,2}.  Per-column equality is
@@ -966,8 +1431,13 @@ def audit_schedule_boundary_and_assembly() -> dict[str, int]:
     crossed_table = table_from_function(
         lambda context: patch_a if context == context_a else patch_b
     )
+    direct_crossed_old = make_direct_grid(crossed_old.cells)
     crossed = generic_step(crossed_old, crossed_table)
+    direct_crossed = direct_typed_step(direct_crossed_old, crossed_table)
     verify_success_result(crossed_old, crossed)
+    compare_complete_results(
+        direct_crossed_old, crossed_old, direct_crossed, crossed
+    )
     assert crossed.successors[0].shape == (2, 3)
     assert crossed.successors[0].cells == ((0, 1, 0), (1, 0, 0))
     assert direct_notes_step(crossed_old.cells, crossed_table) == crossed.successors[0].cells
@@ -1014,6 +1484,15 @@ def audit_schedule_boundary_and_assembly() -> dict[str, int]:
     before_cells = crossed_old.cells
     before_token = crossed_old.token
     invalid_height = generic_step(crossed_old, incompatible_height_table)
+    direct_invalid_height = direct_typed_step(
+        direct_crossed_old, incompatible_height_table
+    )
+    compare_complete_results(
+        direct_crossed_old,
+        crossed_old,
+        direct_invalid_height,
+        invalid_height,
+    )
     assert invalid_height == PatchStepResult(
         Invalid(IncompatibleMosaic("row_patch_height", 0, 1, 2)), (), None
     )
@@ -1028,6 +1507,16 @@ def audit_schedule_boundary_and_assembly() -> dict[str, int]:
         lambda context: patch_b if context == wide_only_row_zero else patch_a
     )
     invalid_width = generic_step(slab_old, incompatible_width_table)
+    direct_slab_old = make_direct_grid(slab_old.cells)
+    direct_invalid_width = direct_typed_step(
+        direct_slab_old, incompatible_width_table
+    )
+    compare_complete_results(
+        direct_slab_old,
+        slab_old,
+        direct_invalid_width,
+        invalid_width,
+    )
     assert invalid_width == PatchStepResult(
         Invalid(IncompatibleMosaic("row_slab_width", 1, 4, 3)), (), None
     )
@@ -1240,7 +1729,7 @@ def audit_rule_counts() -> tuple[int, int]:
     return full_binary_2x2_table_count, bounded_basis_count
 
 
-EXPECTED_DIGEST = "2f29901fa65a83b51f6841673172d1141b570e60d2c89d9478e2a10605456f40"
+EXPECTED_DIGEST = "TO_BE_FROZEN"
 
 
 def main() -> None:
@@ -1259,6 +1748,7 @@ def main() -> None:
         ("bounded_commutations", events),
         ("bounded_firings", firings),
         ("bounded_children", children),
+        ("proof_envelope", "full_result_with_reversible_two_token_bijection"),
         ("schedule", tuple(sorted(schedule.items()))),
         ("hostile_rejections", hostile),
         ("typed_invalid_no_commit", schedule["typed_invalid"]),
@@ -1278,11 +1768,11 @@ def main() -> None:
     )
     print(
         "source_row="
-        f"guarded_minus_to_Blank; wildcard_matches={book_matches}; "
+        f"guarded_minus_to_Blank_to_AnonymousAny; wildcard_matches={book_matches}; "
         f"compiled_contexts={compiled_contexts}; first_match_order=explicit"
     )
     print(
-        "bounded_commutation="
+        "bounded_full_result_commutation="
         f"{events} events/{firings} firings/{children} child witnesses"
     )
     print(
