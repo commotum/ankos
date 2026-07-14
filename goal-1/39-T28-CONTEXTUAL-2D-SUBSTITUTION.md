@@ -11,7 +11,7 @@ Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS ACTIV
 - The local extraction corrupts the first slot of that displayed row as `-`. The official Wolfram Science text at `https://www.wolframscience.com/nks/notes-5-4--neighbor-dependent-2d-substitution-systems/` gives the exact Mathematica blank `_`: `{{_,1},{0,1}} -> {{1,0},{1,1}}`. This is a one-glyph official-source repair, not a generic normalization rule.
 - The scalar fourth argument `-1` in this source expression aligns the old cell at the lower-right position of each cyclic `2 x 2` window. Together with the plate's wrap caption, the strict contextual read is provisionally the periodic northwest block `(NW,N,W,Self)` for every old tile; this alignment remains a semantic-oracle obligation rather than an uncited convention.
 - T14 established that overlapping old reads change FRONTIER/NEIGHBORHOOD/RULE choice without creating overlapping writes or a new executor. T26 established generic rank-two compatible mosaic assembly and its positive uniform-block preset. T28 must test their composition rather than introduce a contextual-2D engine.
-- The main plate appears to use uniform `2 x 2` outputs. The Notes explicitly allow a broader mixed-subdivision variant, but also state that its neighborhood configuration space is generally unbounded. The strict executable profile and that broader warning must not be conflated.
+- The Notes recover one binary `2 x 2` output row, but not the complete plate table or a palette-to-label map. Uniform `2 x 2` output is therefore a declared executable restriction used in the proof, not a claimed transcription of all five raster glyphs. The Notes explicitly allow a broader mixed-subdivision variant and state that its neighborhood configuration space is generally unbounded; the finite rectangular profile and that broader warning must not be conflated.
 - Current `simple_programs.md` and `src/ca` are fixed-array/CA-shaped realizations. They do not currently expose changing rectangular support, source-bound patch writes, explicit UPDATE policies, structured step results, or branch-free family-independent execution. These are Goal 2 gaps, not evidence for a T28 state class or rollout.
 
 ## Updated Assumptions
@@ -20,7 +20,7 @@ Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS ACTIV
 - **Retained:** context selection belongs to NEIGHBORHOOD/RULE, while patch compatibility and assembly belong to UPDATE.
 - **Retained:** periodic boundary behavior is part of the strict source profile and must be explicit in CONFIGURATION/topology or its declared realization.
 - **Under test:** every strict source row can be represented faithfully as a finite closed ordered literal/wildcard contextual table, or compiled to an exhaustive table while separately preserving source spelling/provenance, plus a positive rectangular patch. `ReplaceAll` establishes first-match priority; the audit must not reorder overlapping rows.
-- **Under test:** the strict plate is exactly the positive uniform `2 x 2` restriction of T26 UPDATE; the Notes' unequal-subdivision warning may instead be a non-finite-schema boundary rather than a second native preset.
+- **Retained:** any finite source-defined compatible patch table uses D132 directly; a declared common positive `2 x 2` shape uses D132's uniform restriction. The complete raster plate is not replayable, so its full shape table is unclaimed.
 - **Rejected unless evidenced:** open, padded, reflected, dropped, infinite-background, or user-callback boundary menus; free geometric neighbors; sequential scans; hidden raster decoding; and a T28 executor.
 
 ## Big Picture Objective
@@ -146,12 +146,12 @@ The evidence boundary is `10 HASH_BOUND / 1 LIMITED_TRANSCRIBED / 0 PIXEL_REPLAY
 
 - **DOMAIN:** discrete `t+2D`.
 - **CONFIGURATION:** finite nonempty rectangular grid with periodic incidence in both spatial axes; dimensions may change after replacement.
-- **ALPHABET:** finite tile labels; the strict plate is binary.
-- **SEED:** the plate begins from a displayed finite grid; exact raster transcription is not yet claimed.
+- **ALPHABET:** finite tile labels. The exact Notes row uses `0/1`; the proof's binary profile is explicit, while the raster palette-to-label map remains untranscribed.
+- **SEED:** the plate begins from a displayed finite grid; no exact raster seed is claimed.
 - **FRONTIER:** every old tile exactly once, with row/column product order used for assembly and source-bound lineage.
-- **NEIGHBORHOOD:** an ordered cyclic `2 x 2` old-snapshot block aligned so `Self` is the lower-right member; the compact plate appears to ignore/factor at least one slot, but the exact factorization remains to be proved.
+- **NEIGHBORHOOD:** an ordered cyclic `2 x 2` old-snapshot block aligned so `Self` is the lower-right member. The one exact Notes row ignores its northwest slot; no global factorization of the unrecovered plate table is claimed.
 - **RULE:** a finite closed ordered contextual product-pattern table over typed `Literal(label) | Blank` slots, or a behavior-equivalent exhaustive expansion with source form retained separately, returning one positive rectangular patch over the same alphabet for each selected old source. Ordered overlap uses first match; validation proves every finite context has a match. A desired fallback must be an explicit final row, never host `ReplaceAll` behavior.
-- **UPDATE:** T26 `RankedBlockMosaicAssemble(rank=2)`; the strict uniform `2 x 2` plate uses `RankedUniformBlockAssemble(rank=2)`. UPDATE validates complete source/write coverage and mosaic compatibility before allocating and committing one successor.
+- **UPDATE:** T26 `RankedBlockMosaicAssemble(rank=2)`; a declared uniform positive `2 x 2` rule set uses `RankedUniformBlockAssemble(rank=2)`. UPDATE validates complete source/write coverage and mosaic compatibility before allocating and committing one successor. No exact execution of the unrecovered plate table is claimed.
 - **SCHEDULE:** all reads and rule choices use one immutable old toroidal snapshot; all patches commit atomically; newborn tiles wait until the next event.
 - **OUTCOME:** a valid complete strict table advances one deterministic generation even for an identity result. Invalid/missing/ambiguous pattern coverage or incompatible patches produce typed no-commit invalidity, not a halt or partial successor.
 - **LINEAGE:** every old tile owns its emitted patch rectangle and exact parent-local children. Context cells influence rule choice without becoming additional parents.
@@ -188,7 +188,7 @@ The repaired Notes row means exactly
     -> ((1,0), (1,1))
 ```
 
-and therefore matches both values of the northwest slot in the binary profile. Rows are immutable ordered data. First-match priority is observable when two patterns overlap, so an unordered map or row sorting is not equivalent. Because the finite alphabet and four slots make the strict context space finite, validation can expand rows to a complete literal table and reject any missing context before execution. Expansion is a behavior realization, not by itself a lossless encoding of source syntax: shadowed rows, different factorizations, and different orderings can denote the same literal function. Retaining the normalized source rows and provenance alongside the compiled table preserves program identity without a hidden host-pattern interpreter.
+and therefore matches both values of the northwest slot in the binary profile. Rows are immutable ordered data. First-match priority is observable when two patterns overlap, so an unordered map or row sorting is not equivalent. Because the finite alphabet and four slots make the strict context space finite, validation can expand rows to a complete literal table and reject any missing context before execution. If a separate importer promises exact Mathematica `ReplaceAll` behavior for incomplete rule lists, it must materialize every nonmatch as explicit context-preserving literal rows (or an explicit closed final template) during import; the core runtime never inherits a host fallback implicitly. Expansion is a behavior realization, not by itself a lossless encoding of source syntax: shadowed rows, different factorizations, and different orderings can denote the same literal function. Retaining the normalized source rows and provenance alongside the compiled table preserves program identity without a hidden host-pattern interpreter.
 
 The complete native plate table, native seed, and native trace are raster-only and deliberately unavailable. The executable oracle therefore uses the one exact repaired row as a matching fixture and independently declared synthetic complete tables to prove the construction. It never claims to replay the page-192 example.
 
@@ -198,18 +198,48 @@ The complete native plate table, native seed, and native trace are raster-only a
 
 The honest result is an open profile inside the same SimpleProgram architecture: it may require a dynamic hierarchical/cell-complex CONFIGURATION and a topology-derived NEIGHBORHOOD, while still using the same branch-free select/read/write/apply runner. Goal 2 must not add a callback, unbounded opaque pattern object, family executor, or padded rectangular approximation. The strict finite periodic profile can be implemented independently; the adaptive profile remains unavailable until primary evidence or an explicit separately sourced specification closes those mechanics.
 
-## Current API Fit
+## Semantic Proof
 
-| Element | Provisional fit | Smallest base | Gap/obligation |
+`39-T28-semantic-oracle.py` defines two independent evaluators:
+
+1. a direct mathematical operator that takes periodic lower-right `2 x 2` contexts, chooses the first matching clause, and performs compatible rank-two mosaic assembly; and
+2. the generic four-axis pipeline with snapshot-bound sources, declared ordered access, compiled closed table rows, source-bound patch writes, and D132 UPDATE.
+
+The comparison is over complete typed results rather than successor pixels alone. Each evaluator independently mints source/successor tokens; an explicit reversible token relation compares them while preserving outcome, successor cardinality, `changed`, step presence, grid/topology, every source/read/write record, patch rectangle, local child ordinal/coordinate, parent ownership, and complete lineage. The test never makes raw token equality semantic.
+
+The bounded proof includes a binary order-four de Bruijn torus containing all sixteen ordered contexts exactly once, exhaustive small periodic rectangles including degenerate `1 x 1`, `1 x 2`, `2 x 1`, and larger asymmetric shapes, multiple complete uniform tables, compatible mixed patches, identity advancement, and a one-cell-output fixed-support restriction. The repaired source row is tested for both northwest values.
+
+The hostile set independently forces divergences or typed rejection for:
+
+- lower-right versus upper-left alignment;
+- periodic versus open/padded boundaries;
+- four ordered incidence occurrences versus coordinate deduplication on small tori;
+- first-match clause order versus unordered/reordered rows;
+- missing table coverage and implicit host fallback;
+- stale, cross-run, duplicate, missing, and forged source handles;
+- old-snapshot evaluation versus row-major newborn/in-place reads;
+- product-aware mosaic assembly versus flat source-block concatenation;
+- context participants incorrectly recorded as co-parents;
+- patch incompatibility, partial commit, padding, or cropping;
+- syntax-losing wildcard compilation, raster-derived rules, callbacks, and family dispatch; and
+- treating the adaptive unequal-subdivision caveat as a finite four-slot rectangular preset.
+
+The mixed-size boundary is constructive: adjacent sources emitting `1 x 1` and `2 x 2` patches fail D132's row compatibility, while the Book warns that a faithful adaptive continuation can require unbounded neighborhood configurations. This counterexample proves only that the regular rectangular preset is not total for the broader variant. It does not justify a T28 executor or prove that the shared SimpleProgram runner is inadequate.
+
+## API Classification
+
+| Element | Audit class | Smallest reusable base | Required invariant or mapping |
 |---|---|---|---|
-| DOMAIN | `PARAMETERIZATION` | discrete `t+2D` | normalize DOMAIN/support vocabulary |
-| Periodic changing grid | `PRINCIPLED EXTENSION` of current document realization | D127 periodic incidence plus D132 changing rectangular support | explicit configuration/topology and per-successor validation |
-| FRONTIER | `DIRECT` | T26 `AllOldTiles` | opaque exact-snapshot handles |
-| Context read | `PARAMETERIZATION` | generic ordered access; T14 contextual-read precedent | exact periodic `2 x 2` alignment and slot significance |
-| Pattern table | `PARAMETERIZATION` or lossless representation | closed finite tuple-key table | prove totality, rule order/overlap behavior, wildcard expansion, and inverse-on-image |
-| Patch write | `DIRECT` | T26 source-bound rectangular patch | bind to exact old source and alphabet |
-| UPDATE | `DIRECT` if strict outputs are uniform; otherwise D132 general policy | `RankedBlockMosaicAssemble(rank=2)` | full coverage, compatibility, no-commit invalidity, lineage |
-| Trace/result | `PARAMETERIZATION` | structured `PatchStepResult` | ragged generation shapes and periodic topology metadata |
+| DOMAIN | 2, parameterization | D127 discrete `t+2D` | DOMAIN records dimensional task space only; support/topology stay in CONFIGURATION |
+| Periodic changing grid | 1/2, direct composition | D127 periodic incidence + D132 rectangular changing configuration | finite nonempty rectangle, both axes cyclic, successor revalidated; no fixed NumPy-shape assumption |
+| FRONTIER | 1, direct reuse | T26 `AllOldTiles` | every old tile exactly once with an opaque exact-snapshot handle |
+| Context read | 2, parameterization/new schema on an existing axis | generic ordered product access, with T14 contextual responsibility and D127 periodic slots | declared `(NW,N,W,Self)` order, lower-right alignment, periodic slot multiplicity, old-snapshot provenance |
+| Pattern table | 2 plus behavior realization | generic closed finite RULE data | immutable ordered `Literal | Blank` rows, first-match priority, finite total coverage, explicit defaults only; exhaustive compilation retains source rows/provenance because compilation is not injective |
+| Patch write | 1, direct reuse | T26 source-bound positive rectangular patch | owner is `Self`; context participants are influences, not parents |
+| UPDATE | 1, direct reuse | D132 `RankedBlockMosaicAssemble(rank=2)`; uniform plate restriction uses its named uniform wrapper | complete coverage, mosaic compatibility, exact product placement, atomic no-commit invalidity, parent consumption, newborn deferral, lineage |
+| Result/trace | 2, parameterization | D132 structured `PatchStepResult` | dynamic shapes, periodic topology, full read/write witnesses, opaque token relation, typed invalidity |
+
+T28 therefore uses audit categories 1–3 and introduces no category-4 execution algebra. The only Goal 2 implementation additions specifically exposed by T28 are reusable access and RULE schemas. D132 already owns the required UPDATE implementation.
 
 ## Current Runtime Fit
 
