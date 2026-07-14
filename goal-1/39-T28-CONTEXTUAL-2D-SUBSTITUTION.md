@@ -226,6 +226,17 @@ The hostile set independently forces divergences or typed rejection for:
 
 The mixed-size boundary is constructive: adjacent sources emitting `1 x 1` and `2 x 2` patches fail D132's row compatibility, while the Book warns that a faithful adaptive continuation can require unbounded neighborhood configurations. This counterexample proves only that the regular rectangular preset is not total for the broader variant. It does not justify a T28 executor or prove that the shared SimpleProgram runner is inadequate.
 
+The frozen proof closes:
+
+- 682 exhaustive binary periodic rectangles through `3 x 3`, comprising 5,506 independently checked `(NW,N,W,Self)` reads;
+- the guarded source Blank row, which matches exactly two of sixteen binary contexts;
+- 65,536 bounded full-`StepResult` commutations on the `4 x 4` de Bruijn torus, comprising 1,048,576 firings and 4,194,304 parent-local child witnesses;
+- one D132-compatible crossed-width mixed mosaic and two independently commuting typed incompatible/no-commit outcomes;
+- one explicit lower-right/upper-left divergence; and
+- 57 hostile construction, provenance, representation, boundary, schedule, and shortcut rejections.
+
+The bounded family chooses between two distinct asymmetric `2 x 2` patches for each of the sixteen binary contexts. It is a proof basis of `2^16 = 65,536` tables, not a source-authored rule numbering. The full derived binary uniform-`2 x 2` family has `(2^4)^(2^4) = 2^64` tables; the Book supplies no integer codec for it. The frozen semantic digest is `82b03edcc186e9ceccdffb33f1e90fb671a64e4dd008eec057a11f6339f44209`.
+
 ## API Classification
 
 | Element | Audit class | Smallest reusable base | Required invariant or mapping |

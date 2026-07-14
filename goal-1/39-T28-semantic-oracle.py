@@ -4,10 +4,11 @@
 The strict Book construction is a finite positive rectangular grid with cyclic
 incidence in both axes.  Every old tile fires once.  Its ordered old-snapshot
 read is the 2 by 2 block ``((NW, N), (W, Self))`` produced by
-``Partition[list, {2, 2}, 1, -1]``.  A closed ordered Literal/Any pattern
-program chooses one nonempty rectangular patch, and the already established
-T26 ranked block-mosaic UPDATE assembles every patch atomically.  Context cells
-influence the row choice but do not become parents of the emitted children.
+``Partition[list, {2, 2}, 1, -1]``.  A closed ordered
+Literal/AnonymousAny pattern program chooses one nonempty rectangular patch,
+and the already established T26 ranked block-mosaic UPDATE assembles every
+patch atomically.  Context cells influence the row choice but do not become
+parents of the emitted children.
 
 This file proves that composition directly.  It does not implement runtime
 code.  In particular it:
@@ -38,7 +39,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from hashlib import sha256
 from itertools import product
-from typing import Callable, Iterable
+from typing import Callable
 
 
 if not __debug__:
@@ -255,7 +256,7 @@ class ClosedContextPatchTable:
 
 @dataclass(frozen=True)
 class ClosedOrderedPatternProgram:
-    """Ordered Literal/Any clauses plus an explicit exhaustive lowering.
+    """Ordered Literal/AnonymousAny clauses plus an exhaustive lowering.
 
     Clause order is semantic first-match data.  Missing coverage is invalid.
     The original clauses remain stored because lowering overlapping or shadowed
@@ -1062,10 +1063,14 @@ def compare_complete_results(
         assert direct_write.patch == generic_write.patch
 
     assert len(direct.step.rectangles) == len(generic.step.child_rectangles)
-    for direct_rectangle, generic_rectangle in zip(
-        direct.step.rectangles, generic.step.child_rectangles, strict=True
+    for direct_rectangle, generic_rectangle, direct_write in zip(
+        direct.step.rectangles,
+        generic.step.child_rectangles,
+        direct.step.writes,
+        strict=True,
     ):
         _compare_source(direct_rectangle.source, generic_rectangle.source, tokens)
+        assert direct_rectangle.source == direct_write.source
         assert (
             direct_rectangle.row_start,
             direct_rectangle.row_stop,
@@ -1077,8 +1082,21 @@ def compare_complete_results(
             generic_rectangle.column_start,
             generic_rectangle.column_stop,
         )
+        extracted = tuple(
+            direct_successor.cells[row][
+                direct_rectangle.column_start : direct_rectangle.column_stop
+            ]
+            for row in range(
+                direct_rectangle.row_start, direct_rectangle.row_stop
+            )
+        )
+        assert extracted == direct_write.patch
 
     assert len(direct.step.children) == len(generic.step.child_occurrences)
+    direct_write_by_coord = {
+        (write.source.row, write.source.column): write
+        for write in direct.step.writes
+    }
     for direct_child, generic_child in zip(
         direct.step.children, generic.step.child_occurrences, strict=True
     ):
@@ -1096,6 +1114,13 @@ def compare_complete_results(
             generic_child.target_column,
             generic_child.label,
         )
+        parent_write = direct_write_by_coord[
+            (direct_child.source.row, direct_child.source.column)
+        ]
+        assert (
+            parent_write.patch[direct_child.local_row][direct_child.local_column]
+            == direct_child.label
+        )
 
     direct_lineage = {
         (child.target_row, child.target_column): child.label
@@ -1110,6 +1135,8 @@ def compare_complete_results(
         for row in range(direct_successor.shape[0])
         for column in range(direct_successor.shape[1])
     }
+    assert len(direct_lineage) == len(direct.step.children)
+    assert len(generic_lineage) == len(generic.step.child_occurrences)
     assert direct_lineage == generic_lineage == successor_cells
     return tokens
 
@@ -1565,6 +1592,30 @@ def audit_hostile_rejections() -> int:
     reject(TypeError, lambda: PeriodicRectGrid(2, ((0,),), "token"))  # type: ignore[arg-type]
     reject(ValueError, lambda: SnapshotToken(-1))
     reject(ValueError, lambda: SnapshotToken(3, SnapshotToken(1)))
+    direct_token = DirectSnapshotToken(0)
+    generic_token = SnapshotToken(0)
+    other_direct_token = DirectSnapshotToken(0)
+    other_generic_token = SnapshotToken(0)
+    reject(ValueError, lambda: TokenBijection(()))
+    reject(
+        TypeError,
+        lambda: TokenBijection(((generic_token, direct_token),)),  # type: ignore[arg-type]
+    )
+    reject(
+        ValueError,
+        lambda: TokenBijection(
+            ((direct_token, generic_token), (direct_token, other_generic_token))
+        ),
+    )
+    reject(
+        ValueError,
+        lambda: TokenBijection(
+            ((direct_token, generic_token), (other_direct_token, generic_token))
+        ),
+    )
+    one_pair_tokens = TokenBijection(((direct_token, generic_token),))
+    reject(ValueError, lambda: one_pair_tokens.to_generic(other_direct_token))
+    reject(ValueError, lambda: one_pair_tokens.to_direct(other_generic_token))
 
     reject(TypeError, lambda: checked_context([0, 0, 0, 0], 2))
     reject(ValueError, lambda: checked_context((0, 0, 0), 2))
@@ -1714,7 +1765,7 @@ def audit_hostile_rejections() -> int:
     reject(TypeError, lambda: checked_grid(((lambda: 0,),), 2))
     reject(TypeError, lambda: checked_context((0, 0, 0, {"whole_grid": old.cells}), 2))
 
-    assert rejects == 51
+    assert rejects == 57
     return rejects
 
 
@@ -1729,7 +1780,7 @@ def audit_rule_counts() -> tuple[int, int]:
     return full_binary_2x2_table_count, bounded_basis_count
 
 
-EXPECTED_DIGEST = "TO_BE_FROZEN"
+EXPECTED_DIGEST = "82b03edcc186e9ceccdffb33f1e90fb671a64e4dd008eec057a11f6339f44209"
 
 
 def main() -> None:
@@ -1783,7 +1834,8 @@ def main() -> None:
     print(
         "controls="
         f"hostile={hostile}; typed_invalid_no_commit={schedule['typed_invalid']}; "
-        "compatible_mixed=1; adaptive_unequal_subdivision=unbounded-context boundary"
+        "compatible_mixed=1; lower_right_anchor_witness=1; "
+        "adaptive_unequal_subdivision=unbounded-context boundary"
     )
     print(
         "rule_counts="
