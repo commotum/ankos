@@ -1,6 +1,6 @@
 # Goal 1 Representation and Execution Architecture Audit
 
-Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); SUBSEQUENT STAGES INTEGRATED THROUGH ACTIVE D126**
+Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); SUBSEQUENT STAGES INTEGRATED THROUGH ACTIVE D127**
 
 ## Trigger and Scope
 
@@ -226,13 +226,14 @@ The classification number in this matrix refers to the four categories above. A 
 | D117 | Same lattice/frontier/read/commit | 1 | Shared CA preset/runner | General radius only parameterizes NEIGHBORHOOD/RULE validation | Keep |
 | D118 | T04/T05/T06/T07 and related reducers | 2 | Presets, predicates, properties, dimensional-DOMAIN/NEIGHBORHOOD/RULETYPE variants | No executor flags; every representation/restriction validated | Keep preset ownership; rewrite claim that weighted/histogram/dimension/continuous values imply new construction classes |
 
-### Post-audit type integration (D119-D126)
+### Post-audit type integration (D119-D127)
 
-D119-D125 are recorded in `design-ledger.md` by their completed stages. T18 adds the following audited row:
+D119-D125 are recorded in `design-ledger.md` by their completed stages. T18 and T21 add the following audited rows:
 
 | Decision | Basis / audit evidence | Class | Smallest reusable base | Required invariants or mapping | Disposition / reopen |
 |---|---|---:|---|---|---|
 | D126 / T18 | direct Chapter 3 queue/schedule mechanics, explicit Notes empty clause/generalizations, 160-line source closure, 43-asset closure, five `t0..t99` fixtures, and 71,442 direct/tagged commuting cases | 3 | T17 finite ordered support and endpoint geometry + D032 visible phase + closed cycle/trigger RULE + D039 ordered spans + D024 empty policy | Named `(phase,word) <-> Phase · Data*` bijection; literal rotated-value Notes state is the declared quotient under equal complete rotations; empty reads/writes still reach UPDATE; live extinction advances phase and empty identity freezes it | Add one composition/preset only; no stage reopens and no state class, UPDATE algebra, executor, or family branch is added |
+| D127 / T21 | 338-line source closure; 113-asset candidate closure at 53 governed + 60 adjacency-only; three source-pinned 32/10/6-case rule schemas; 17,728 independent native/generic commutations; 160 Book-row/column-to-ENU permutation cases | 3 | T01/T02 fixed-lattice CA preset + T03 factorized RULE maps + T08 configurations, parameterized by discrete `t+2D`, square-grid support, and composed local access | DOMAIN contains dimension only; CONFIGURATION owns square `Z^2` support/topology; exactly one declared Self plus four ordered cardinal offsets; compact tables factor only qualifying exhaustive maps; coordinate basis/table permutation commutes; boundary/work/view remain explicit | Add geometry/access/RULE presets and codecs only; no stage reopens and no state class, new UPDATE, executor, family branch, hidden center read, or raster semantics is added |
 
 ### Concrete Counterexample Gate
 
@@ -258,6 +259,7 @@ Two tempting collapses also fail the losslessness gate without justifying new ex
 - No completed transition stage supplies a counterexample requiring a family executor or top-level `SingleControl`, `TransitionControl`, `ArithmeticAssignment`, `MapAssignment`, or construction-named state class.
 - T10 subsequently supplies an exact proper extension of the strict T09 RULE-result preset, from a center bit plus movement to a three-bit block plus movement. Its 2,048-case commuting oracle lowers every result to D011 finite writes, so it adds D122 but no UPDATE law or executor.
 - T18 subsequently composes a visible cyclic schedule with T17 ordered support and D039 spans. Its named-slot tagged cover is bijective, its Notes rotated-value projection explicitly handles periodic-cycle quotienting, and empty activity still traverses all four runner axes. D126 adds no UPDATE law or executor.
+- T21 subsequently parameterizes the fixed-lattice CA preset by discrete `t+2D`, square-grid configuration support, and explicit Self-plus-cardinal access. Its 10-case and 6-case tables are schema-tagged lossless representations only for qualifying 32-context maps, and its Book-to-ENU basis adapter carries a certified table permutation. D127 adds no UPDATE law or executor.
 
 ## Stage Disposition and Revised Goal 2 Handoffs
 
@@ -281,6 +283,7 @@ This table is the authoritative architecture replacement for the reopened stages
 | T18 | Discrete variable-support `t+1D`; finite word plus visible cyclic focus, represented as `Phase(slot) · Data*` or the declared equal-rotation Notes quotient | Unique phase/head pair when live; structural phase/head and old-end access; empty activity yields empty reads/writes | Replace phase/head prefix by next phase and conditionally insert the scheduled block at the old endpoint through generic ordered multi-span UPDATE; empty identity freezes phase | Compose T17 ordered support, D032 visible control, closed cycle/trigger RULE, D039 spans, and D024 empty policy; no cyclic state/control class, UPDATE, or executor |
 | T19 | Discrete `t+0D` task with explicit register/instruction topology; natural values plus visible program marker/product factor | Marked active instruction; referenced registers | Tagged register and marker writes; atomic UPDATE | Add named-key/marker labels, instruction frontier, reference access; no generalized control or register executor |
 | T20 | Discrete `t+0D`; recursive-tree configuration support/topology with tagged expression labels; lossless balanced/prefix token-word representation | Ordered maximal prefix-free matches; matched subtrees/bindings; paths map to contiguous token spans | Replacement trees lower to disjoint token blocks; generic ordered multi-span UPDATE | Add tree/path/pattern schemas, token pack/unpack codec, and prefix-free schedule preset over ordered replacement; no tree UPDATE or symbolic executor |
+| T21 | Discrete `t+2D`; total finite-alphabet field on fixed square-grid `Z^2` support; finite boxes/quotients/background-deviation fields are explicit realizations | All sites; exactly one declared Self plus four unique ordered cardinal offsets in a tagged coordinate frame | One same-site label write; T01 snapshot-parallel UPDATE. General 32-context, `Self x count` 10-case, and self-plus-cardinals sum 6-case RULE schemas stay distinct with certified factor/codec maps | Parameterize the shared CA preset by dimension, square topology/access, and schema-tagged RULE data; add Book-to-ENU table permutation and realization validation; no 2D state, UPDATE, executor, family branch, implicit center/boundary, or raster rule |
 | T27 | Canonical continuous-coordinate `t+2D` geometric support; prototype/pose products in a multiplicity-preserving bag | Every old occurrence; self prototype/full pose | Parent-local child occurrences; parallel bag-replacement UPDATE | Add geometric support/value schemas and bag combiner policy; no geometric executor |
 | T29 | Discrete `t+0D`; rooted port-labeled graph configuration support/topology | Old vertices; port-path/reach views | Direct/fresh reroutes; create/rewire/root-project UPDATE | Add graph support/topology, structural access, and graph update policy within runner; no network executor |
 | T30 | Discrete `t+1D` word configuration with finite successor-set semantics | Every overlapping literal match; matched span | One child per match; UPDATE returns exact finite set of successor configurations | Generalize runner result to configuration(s); preserve witness trace; no multiway executor |
