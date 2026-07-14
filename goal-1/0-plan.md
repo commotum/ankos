@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 37 type stages are complete, no stage is reopened, T28 is in progress, and 7 later type stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, and T26 are complete under D119-D132.
+- Execution status at this sync is Foundation complete, 38 type stages are complete, no stage is reopened, and 7 type stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, and T28 are complete under D119-D133. Next: T32.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -1059,7 +1059,7 @@ COMPLETE. The frozen Q00-Q29 source audit closes a 94-line query union at `67 pr
 
 ### 39-T28-CONTEXTUAL-2D-SUBSTITUTION
 
-Status: **IN PROGRESS** in `goal-1/39-T28-CONTEXTUAL-2D-SUBSTITUTION.md`.
+Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, RUNTIME-FIT, ARCHITECTURE, AND INDEPENDENT HOSTILE REVIEW CLOSED** in `goal-1/39-T28-CONTEXTUAL-2D-SUBSTITUTION.md`; D133 is active.
 
 #### Big Picture Objective
 
@@ -1072,6 +1072,10 @@ Apply the common protocol, stressing the source's finite periodic two-dimensiona
 #### Completion Requirements
 
 All T28 evidence is captured; no duplicated contextual-replacement engine is proposed; Goal 2 and global integration are updated.
+
+#### Stage Results
+
+COMPLETE. The frozen 25-query source audit closes 67 lines at `52 pre-Index / 15 actual-Index`, retains 71 at `6 native / 13 relation / 52 control`, excludes 11, reverse-closes retained split evidence at `48 exact + 23 mapped`, and leaves zero monolith-only/unresolved evidence. Ten governed assets partition `1 native / 2 relation / 7 control`, close 20 references, ten hashes, 1,112,143 bytes and two assemblies/four files, and remain `10 hash-bound / 1 limited-transcribed / 0 pixel-replayed`; the complete raster rule table, seed, trace, and palette mapping remain unavailable. The semantic oracle closes 682 periodic configurations/5,506 ordered reads, the repaired Blank row at two of sixteen contexts, 65,536 independently typed complete-result commutations/1,048,576 firings/4,194,304 child witnesses, 57 hostile rejections, one compatible crossed-width aligned mixed mosaic, two typed invalid/no-commit commutations, and one lower-right/upper-left divergence. D133 composes D127 periodic configuration/access, T14 contextual-read responsibility, T26 source-bound patches, and D132 rank-two mosaic UPDATE. Ordered closed `Literal | AnonymousAny` product rows use first match and construction-time totality; exhaustive compilation retains source AST/provenance; context cells are not parents. The unequal-subdivision warning remains an open adaptive carrier/topology profile. Oracle SHAs are source `e421340e073597f2750b61a03838e0b8c2c0cc91494eef9428fbd77a67372271`, asset `95fe4b6dbda261a9068d6c7a6b8aa1765bcb0ef19e444abebe47895569731c77`, and semantic `1faca62a3261a4b328cb70d6daebd00b916788c63e4e4f77109754ccee8715ef`; the semantic digest is `82b03edcc186e9ceccdffb33f1e90fb671a64e4dd008eec057a11f6339f44209`. No T28 state, UPDATE, executor, branch, callback, implicit fallback, raster program, padding/reflection menu, hidden scan, or flat assembly is added. All gates pass; no prior stage reopens. Next: T32.
 
 ### 40-T32-TEMPLATE-CONSTRAINTS
 

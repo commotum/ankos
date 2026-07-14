@@ -1,6 +1,6 @@
 # 39-T28-CONTEXTUAL-2D-SUBSTITUTION
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS ACTIVE**
+Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, RUNTIME-FIT, ARCHITECTURE, AND INDEPENDENT HOSTILE REVIEW CLOSED**
 
 ## Current Facts
 
@@ -9,7 +9,7 @@ Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS ACTIV
 - The main plate is `BOOK:2362 -> _page_207_Figure_1.jpeg`. Its printed caption declares a two-dimensional neighbor-dependent substitution system whose grid wraps in both dimensions, one seven-snapshot trace, five displayed compact rule rows, and eight eight-step examples. The rule glyphs remain raster evidence until any transcription is independently bounded and verified.
 - The Notes give the exact step skeleton `Flatten2D[Partition[list, {2, 2}, 1, -1] /. rule]` and one displayed contextual row, followed by an explicit warning that unequal subdivision can create arbitrarily many possible neighborhood configurations (`BOOK:13806-13810`).
 - The local extraction corrupts the first slot of that displayed row as `-`. The official Wolfram Science text at `https://www.wolframscience.com/nks/notes-5-4--neighbor-dependent-2d-substitution-systems/` gives the exact Mathematica blank `_`: `{{_,1},{0,1}} -> {{1,0},{1,1}}`. This is a one-glyph official-source repair, not a generic normalization rule.
-- The scalar fourth argument `-1` in this source expression aligns the old cell at the lower-right position of each cyclic `2 x 2` window. Together with the plate's wrap caption, the strict contextual read is provisionally the periodic northwest block `(NW,N,W,Self)` for every old tile; this alignment remains a semantic-oracle obligation rather than an uncited convention.
+- The scalar fourth argument `-1` in this source expression aligns the old cell at the lower-right position of each cyclic `2 x 2` window. Together with the plate's wrap caption, the finite aligned contextual read is the periodic northwest block `(NW,N,W,Self)` for every old tile; 682 exhaustive small-torus configurations and a divergent upper-left control independently close the alignment.
 - T14 established that overlapping old reads change FRONTIER/NEIGHBORHOOD/RULE choice without creating overlapping writes or a new executor. T26 established generic rank-two compatible mosaic assembly and its positive uniform-block preset. T28 must test their composition rather than introduce a contextual-2D engine.
 - The Notes recover one binary `2 x 2` output row, but not the complete plate table or a palette-to-label map. Uniform `2 x 2` output is therefore a declared executable restriction used in the proof, not a claimed transcription of all five raster glyphs. The Notes explicitly allow a broader mixed-subdivision variant and state that its neighborhood configuration space is generally unbounded; the finite rectangular profile and that broader warning must not be conflated.
 - Current `simple_programs.md` and `src/ca` are fixed-array/CA-shaped realizations. They do not currently expose changing rectangular support, source-bound patch writes, explicit UPDATE policies, structured step results, or branch-free family-independent execution. These are Goal 2 gaps, not evidence for a T28 state class or rollout.
@@ -320,19 +320,23 @@ Required conformance includes the exact Notes row, synthetic exhaustive tables o
 
 ## Completion Requirements
 
-- [ ] Every direct name, alias, variant, caption, Notes line, actual Index route, cross-reference, candidate match, and false positive is dispositioned with zero unresolved candidates.
-- [ ] Every retained line has canonical monolith provenance and split reverse coverage or an explicit split omission.
-- [ ] The governed asset universe is exact, hash-bound, and honest about transcription and pixel replay.
-- [ ] Strict configuration, topology, seed, frontier, reads, rule data, writes, update, successor, invalidity, lineage, and observer semantics are reconstructed.
-- [ ] The `Partition[...,{2,2},1,-1]` alignment and wraparound behavior are independently proved.
-- [ ] The local `-`/official `_` source defect, literal/wildcard schema, first-match priority, and complete-coverage law are independently pinned.
-- [ ] Direct and generic one-step semantics commute non-vacuously, including adversarial boundaries, overlap, snapshot, assembly, and invalidity.
-- [ ] The compact-pattern and unequal-subdivision boundaries are explicit and do not introduce callbacks or hidden infinite schemas.
-- [ ] Current API/runtime/tests are inspected and the smallest Goal 2 delta is implementation-ready.
-- [ ] T14/T26 reuse and every affected ledger decision are re-audited; contradicted stages are reopened rather than patched.
-- [ ] All oracle, portability, fail-closed, import, compile, repository-test, mode, Markdown, diff, scope, and hostile-review gates pass.
-- [ ] `0-plan.md`, `evidence-index.md`, `design-ledger.md`, and `architecture-audit.md` are synchronized.
+- [x] Every direct name, alias, variant, caption, Notes line, actual Index route, cross-reference, candidate match, and false positive is dispositioned with zero unresolved candidates.
+- [x] Every retained line has canonical monolith provenance and split reverse coverage or an explicit split omission.
+- [x] The governed asset universe is exact, hash-bound, and honest about transcription and pixel replay.
+- [x] Strict configuration, topology, seed boundary, frontier, reads, rule data, writes, update, successor, invalidity, lineage, and observer semantics are reconstructed.
+- [x] The `Partition[...,{2,2},1,-1]` alignment and wraparound behavior are independently proved.
+- [x] The local `-`/official `_` source defect, literal/wildcard schema, first-match priority, and complete-coverage law are independently pinned.
+- [x] Direct and generic one-step semantics commute non-vacuously, including adversarial boundaries, overlap, snapshot, assembly, invalidity, and full typed results.
+- [x] The compact-pattern and unequal-subdivision boundaries are explicit and do not introduce callbacks or hidden infinite schemas.
+- [x] Current API/runtime/tests are inspected and the smallest Goal 2 delta is implementation-ready.
+- [x] T14/T26 reuse and every affected ledger decision are re-audited; no completed stage is contradicted.
+- [x] All oracle, portability, fail-closed, import, compile, repository-test, mode, Markdown, diff, scope, and hostile-review gates pass.
+- [x] `0-plan.md`, `evidence-index.md`, `design-ledger.md`, and `architecture-audit.md` are synchronized.
 
 ## Stage Results
 
-**IN PROGRESS.** Source, asset, and semantic audits are running independently. No final construction classification, decision ID, metric, hash, or completion claim is frozen yet.
+**COMPLETE.** The frozen 25-query source audit closes 67 canonical lines at `52 pre-Index / 15 actual-Index`; 41 matched-retained lines plus 30 governed continuations yield 71 retained lines at `6 native / 13 relation / 52 control`, with 11 exclusions, retained split closure `48 exact + 23 mapped`, and zero monolith-only or unresolved evidence. Its SHA is `e421340e073597f2750b61a03838e0b8c2c0cc91494eef9428fbd77a67372271`. The ten governed assets partition `1 native / 2 relation / 7 control`, close 20 monolith/split references, ten hashes, 1,112,143 bytes, and two assemblies/four files, and remain `10 hash-bound / 1 limited-transcribed / 0 pixel-replayed`; seven adjacency candidates are explicitly excluded. The asset SHA is `95fe4b6dbda261a9068d6c7a6b8aa1765bcb0ef19e444abebe47895569731c77`.
+
+The semantic oracle closes 682 exhaustive binary periodic configurations/5,506 ordered reads, the repaired source Blank row at exactly two of sixteen contexts, and 65,536 independently typed complete-result commutations comprising 1,048,576 firings and 4,194,304 child witnesses. An explicit reversible source/successor-token bijection preserves outcomes, changed flags, successor cardinality, step presence, carriers, reads, writes, rectangles, local children, and lineage. Fifty-seven hostile rejections, one lower-right/upper-left divergence, one compatible crossed-width aligned mixed mosaic, and two typed incompatible/no-commit commutations close the adversaries. The semantic SHA is `1faca62a3261a4b328cb70d6daebd00b916788c63e4e4f77109754ccee8715ef`; its digest is `82b03edcc186e9ceccdffb33f1e90fb671a64e4dd008eec057a11f6339f44209`.
+
+D133 classifies the finite aligned construction in categories 1–3: discrete `t+2D` periodic rectangular CONFIGURATION; T26 `AllOldTiles`; a declared lower-right `(NW,N,W,Self)` old-snapshot access with alias multiplicity; ordered closed `Literal | AnonymousAny` product rows with first-match and construction-time totality; T26 source-bound patches; and direct D132 `RankedBlockMosaicAssemble(rank=2)`. Compiled exhaustive behavior retains the ordered source AST/provenance because compilation alone is not injective. Context participants are not parents. Malformed/incomplete programs reject before execution, while state-dependent incompatibility yields no commit. The raster table, seed, trace, and palette map remain unrecovered, and `BOOK:13810` unequal subdivision remains an open adaptive carrier/incidence/matching/update profile rather than a false D132 claim. No state class, UPDATE, executor, family branch, callback, implicit host fallback, raster program, padding/reflection menu, hidden scan, or flat concatenation is added. All portability, fail-closed, silent-import, compile, repository-test, mode, Markdown, diff, scope, runtime-fit, and independent hostile-review gates pass; no prior stage reopens. Next: T32.
