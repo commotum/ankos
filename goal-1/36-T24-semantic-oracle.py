@@ -283,6 +283,18 @@ def extensional_table_identity(table: TableCarrier) -> tuple[int, int, tuple[tup
     return (table.alphabet_size, table.row_count, nonzero)
 
 
+def table_from_extensional_identity(
+    identity: tuple[int, int, tuple[tuple[int, int], ...]],
+) -> DefaultOverridesTable:
+    raw = require_tuple(identity, "extensional table identity")
+    if len(raw) != 3:
+        raise ValueError("extensional table identity must have three fields")
+    alphabet_size = require_int(raw[0], "identity alphabet size")
+    row_count = require_int(raw[1], "identity row count")
+    overrides = require_tuple(raw[2], "identity nonzero rows")
+    return DefaultOverridesTable(alphabet_size, row_count, 0, overrides)
+
+
 def binary_table_from_code(code: int, row_count: int) -> DenseTable:
     number = require_int(code, "binary rule code")
     rows = require_int(row_count, "binary table row count")
@@ -1451,11 +1463,11 @@ def native_local_value_sum_step(
     if set(case_by_type) != set(old.site_types):
         raise ValueError("native local-sum cases do not cover site types")
     next_cells: list[int] = []
-    for site_type, row in zip(old.site_types, old.rows, strict=True):
+    for site_index, (site_type, row) in enumerate(zip(old.site_types, old.rows, strict=True)):
         case = case_by_type[site_type]
         if len(row) != case.degree:
             raise ValueError("native local-sum degree mismatch")
-        local_sum = old.cells[len(next_cells)] + sum(old.cells[target] for target in row)
+        local_sum = old.cells[site_index] + sum(old.cells[target] for target in row)
         next_cells.append(case.table.at(local_sum))
     return NativeIncidenceState(
         old.keys,
@@ -2852,6 +2864,7 @@ def assert_fixed_incidence_semantics() -> dict[str, int]:
 
 def assert_alias_multiplicity_and_parallel_update() -> dict[str, int]:
     alias_events = 0
+    changed_sum_output_witnesses = 0
 
     # On the 1^4 quotient, eight distinct axial offsets all address the one
     # stored site.  Occurrence multiplicity gives sum=8, not deduplicated sum=1.
@@ -2866,6 +2879,7 @@ def assert_alias_multiplicity_and_parallel_update() -> dict[str, int]:
     actual = decode_translation(generic_step(count_program(2, 8, distinguishing), encoded), one.shape)
     assert expected.cells == actual.cells == (1,)
     assert distinguishing.at(3) == 0  # the incorrect deduplicated address
+    changed_sum_output_witnesses += 1
     alias_events += 1
 
     # Full 2D access on 2x2 has three targets with multiplicities 4,2,2.
@@ -2875,6 +2889,20 @@ def assert_alias_multiplicity_and_parallel_update() -> dict[str, int]:
     first_row_counts = sorted(Counter(square_generic.support.relation("local").rows[0]).values())
     assert first_row_counts == [2, 2, 4]
     square_table = self_sum_sensitive_table(2, 8, 1)
+    square_witnessed = False
+    for site_index, row in enumerate(square_generic.support.relation("local").rows):
+        occurrence_sum = sum(square.cells[target] for target in row)
+        deduplicated_sum = sum(square.cells[target] for target in set(row))
+        if occurrence_sum == deduplicated_sum:
+            continue
+        center = square.cells[site_index]
+        if square_table.at(center + 2 * occurrence_sum) != square_table.at(
+            center + 2 * deduplicated_sum
+        ):
+            square_witnessed = True
+            break
+    assert square_witnessed
+    changed_sum_output_witnesses += 1
     assert decode_translation(
         generic_step(count_program(2, 8, square_table), square_generic),
         square.shape,
@@ -2898,6 +2926,7 @@ def assert_alias_multiplicity_and_parallel_update() -> dict[str, int]:
     assert port_table.at(2) == 0  # the incorrect set-valued/deduplicated address
     assert decode_incidence(parallel_next, parallel) == native_count_step(parallel, (port_case,))
     alias_events += 1
+    changed_sum_output_witnesses += 1
 
     # Snapshot-parallel evaluation differs from an in-place site-order loop.
     predecessor_rows = ((2,), (0,), (1,))
@@ -2928,6 +2957,7 @@ def assert_alias_multiplicity_and_parallel_update() -> dict[str, int]:
 
     return {
         "alias_multiplicity_events": alias_events,
+        "alias_changed_sum_output_witnesses": changed_sum_output_witnesses,
         "old_snapshot_events": 1,
         "in_place_disagreement_witnesses": 1,
     }
@@ -3016,7 +3046,7 @@ DECISION_MATRIX: tuple[tuple[str, str, str, str], ...] = (
     (
         "RULE",
         "restriction/lossless representation",
-        "ClosedTable(Positional | SelfXCount | OrbitFactor)",
+        "ClosedTable(Positional | SelfXCount | LocalValueSum | OrbitFactor)",
         "compact tables factor complete maps only on certified constant fibers",
     ),
     (
@@ -3035,6 +3065,8 @@ DECISION_MATRIX: tuple[tuple[str, str, str, str], ...] = (
 
 
 def assert_architecture_and_structural_control() -> dict[str, int]:
+    assert all(len(row) == 3 for row in RUNTIME_GAP_MATRIX)
+    assert all(len(row) == 4 for row in DECISION_MATRIX)
     assert tuple(row[0] for row in DECISION_MATRIX) == (
         "DOMAIN",
         "CONFIGURATION",
@@ -3097,6 +3129,8 @@ def assert_hostile_validation() -> dict[str, int]:
     rejects(ValueError, lambda: DenseTable(2, 2, (0, 2)))
     rejects(ValueError, lambda: DefaultOverridesTable(2, 4, 0, ((2, 1), (2, 0))))
     rejects(ValueError, lambda: DefaultOverridesTable(2, 4, 0, ((4, 1),)))
+    rejects(ValueError, lambda: DefaultOverridesTable(2, 4, 1, ((0, 0),)))
+    rejects(ValueError, lambda: DefaultOverridesTable(2, 4, 0, ((1, 0),)))
     rejects(TypeError, lambda: validate_closed_table(lambda index: 0, 2, 4))
     rejects(ValueError, lambda: axis_offsets(0))
     rejects(ValueError, lambda: full_shell_offsets(-1))
@@ -3106,6 +3140,8 @@ def assert_hostile_validation() -> dict[str, int]:
     rejects(ValueError, lambda: LatticeDescriptor("singular", ((1, 1), (1, 1)), ((1, 0),)))
     rejects(ValueError, lambda: LatticeDescriptor("duplicate", identity_basis(2), ((1, 0), (1, 0))))
     rejects(ValueError, lambda: IncidenceRelation("bad", ((0,),), False, (("port",),)))
+    rejects(ValueError, lambda: IncidenceRelation("bad", ((0,),), True))
+    rejects(ValueError, lambda: IncidenceRelation("bad", ((0, 0),), True, (("only-one",),)))
     rejects(ValueError, lambda: IncidenceRelation("bad", ((0, 0),), True, (("x", "x"),)))
     rejects(
         ValueError,
@@ -3128,7 +3164,14 @@ def assert_hostile_validation() -> dict[str, int]:
     )
     rejects(
         ValueError,
-        lambda: PositionalRule(2, (PositionalCase("cell", 2, DenseTable(2, 3, (0,) * 3)),)),
+        lambda: PositionalRule(
+            2,
+            (PositionalCase("cell", ("a", "b"), DenseTable(2, 3, (0,) * 3)),),
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: PositionalCase("cell", ("same", "same"), DenseTable(2, 4, (0,) * 4)),
     )
     rejects(ValueError, lambda: HEX_CODEC.decode((1, 0)))
     rejects(ValueError, lambda: orbit_partition(tuple(product((0, 1), repeat=7)), "bad"))
@@ -3142,7 +3185,7 @@ def assert_hostile_validation() -> dict[str, int]:
         (1, 0),
     )
     generic = encode_incidence(fixture)
-    table = deterministic_table(2, 4, 1)
+    table = self_sum_sensitive_table(2, 1, 1)
     rule = SelfCountRule(2, (CountCase("cell", 1, table),))
     program = typed_count_program(2, rule.cases)
     active = select_all_sites(generic, program.frontier)
@@ -3163,14 +3206,138 @@ def assert_hostile_validation() -> dict[str, int]:
     successor = apply_parallel(generic, active, writes)
     rejects(ValueError, lambda: read_neighborhood(successor, active, program.neighborhood))
 
+    def forged_reads(first: LocalRead) -> tuple[LocalRead, ...]:
+        return (first, *reads[1:])
+
+    rejects(
+        ValueError,
+        lambda: make_assignments(
+            generic,
+            program,
+            active,
+            forged_reads(replace(reads[0], neighbors=(1 - reads[0].neighbors[0],))),
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: make_assignments(
+            generic,
+            program,
+            active,
+            forged_reads(replace(reads[0], snapshot_token=SnapshotToken(generic.generation))),
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: make_assignments(
+            generic,
+            program,
+            active,
+            forged_reads(replace(reads[0], support=peer.support)),
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: make_assignments(
+            generic,
+            program,
+            active,
+            forged_reads(replace(reads[0], relation=peer.support.relation("local"))),
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: make_assignments(
+            generic,
+            program,
+            active,
+            forged_reads(replace(reads[0], site_type="forged")),
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: make_assignments(
+            generic,
+            program,
+            active,
+            forged_reads(replace(reads[0], schema=RelationNeighborhood("local", True))),
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: make_assignments(generic, program, active, tuple(reversed(reads))),
+    )
+
+    labelled_fixture = NativeIncidenceState(
+        ((0,), (1,)),
+        ("cell", "cell"),
+        ((0, 1), (1, 0)),
+        True,
+        2,
+        (1, 0),
+        port_labels=(("left", "right"), ("left", "right")),
+    )
+    labelled_case = PositionalCase(
+        "cell",
+        ("left", "right"),
+        slot_sensitive_table(2, ("left", "right"), 0),
+    )
+    labelled_program = typed_positional_program(2, (labelled_case,))
+    labelled_generic = encode_incidence(labelled_fixture)
+    labelled_active = select_all_sites(labelled_generic, labelled_program.frontier)
+    labelled_reads = read_neighborhood(
+        labelled_generic,
+        labelled_active,
+        labelled_program.neighborhood,
+    )
+    rejects(
+        ValueError,
+        lambda: make_assignments(
+            labelled_generic,
+            labelled_program,
+            labelled_active,
+            (replace(labelled_reads[0], port_labels=("right", "left")), labelled_reads[1]),
+        ),
+    )
+    mismatched_case = PositionalCase(
+        "cell",
+        ("left", "missing"),
+        slot_sensitive_table(2, ("left", "missing"), 0),
+    )
+    rejects(
+        ValueError,
+        lambda: generic_step(
+            typed_positional_program(2, (mismatched_case,)),
+            labelled_generic,
+        ),
+    )
+
+    no_self_program = SimpleProgram(
+        FiniteAlphabet(2),
+        AllSites(),
+        RelationNeighborhood("local", False),
+        LocalValueSumRule(2, (CountCase("cell", 1, local_sum_sensitive_table(2, 1, 0)),)),
+    )
+    rejects(ValueError, lambda: generic_step(no_self_program, generic))
+
     # Wrong type-conditioned arity is rejected before any rule evaluation.
-    wrong_case = CountCase("cell", 2, deterministic_table(2, 6, 0))
+    wrong_case = CountCase("cell", 2, self_sum_sensitive_table(2, 2, 0))
     rejects(
         ValueError,
         lambda: generic_step(typed_count_program(2, (wrong_case,)), generic),
     )
 
-    return {"hostile_rejections": rejection_count}
+    dense_identity = DenseTable(2, 4, (0, 1, 0, 1))
+    sparse_identity = DefaultOverridesTable(2, 4, 0, ((1, 1), (3, 1)))
+    canonical_identity = extensional_table_identity(dense_identity)
+    assert canonical_identity == extensional_table_identity(sparse_identity)
+    assert table_from_extensional_identity(canonical_identity) == sparse_identity
+
+    return {
+        "hostile_rejections": rejection_count,
+        "canonical_table_identity_checks": 1,
+        "canonical_table_identity_roundtrips": 1,
+    }
 
 
 def semantic_digest(counts: dict[str, int]) -> str:
@@ -3178,7 +3345,7 @@ def semantic_digest(counts: dict[str, int]) -> str:
     return sha256(transcript.encode("utf-8")).hexdigest()
 
 
-EXPECTED_SEMANTIC_DIGEST = "df6481886ae13040679ea00f005ce58b5382452bfc3ed72e7b59dcc25b8aa2f4"
+EXPECTED_SEMANTIC_DIGEST = "71ad5808fbd6ebeb2be9c0a7e5801e47dbc4507aab31b531b632eaa477f25842"
 
 
 def main() -> None:
@@ -3206,35 +3373,47 @@ def main() -> None:
     if EXPECTED_SEMANTIC_DIGEST != "TO_BE_FROZEN_AFTER_FIRST_PASS":
         assert digest == EXPECTED_SEMANTIC_DIGEST
 
+    event_partition = (
+        ("translation_count", groups["translation"]["translation_count_events"]),
+        ("translation_positional", groups["translation"]["translation_positional_events"]),
+        ("large_closed_positional", groups["translation"]["large_closed_positional_events"]),
+        ("basis_access", groups["translation"]["basis_access_events"]),
+        ("basis_physical_incidence", groups["translation"]["basis_physical_incidence_events"]),
+        ("hex", groups["hex"]["hex_native_generic_events"]),
+        ("declared_degree", groups["incidence"]["degree_profile_events"]),
+        ("pentagonal", groups["incidence"]["pentagonal_code4094_events"]),
+        ("two_shape", groups["incidence"]["two_shape_code254_events"]),
+        ("alternating_orientation", groups["incidence"]["alternating_orientation_events"]),
+        (
+            "alternating_offset_counterexample",
+            groups["incidence"]["alternating_offset_counterexample_events"],
+        ),
+        ("finite_type_network", groups["incidence"]["finite_type_network_events"]),
+        ("unlabelled_global", groups["incidence"]["unlabelled_global_events"]),
+        ("netca_local_sum", groups["incidence"]["netca_local_sum_events"]),
+        ("netca_labelled", groups["incidence"]["netca_labelled_positional_events"]),
+        ("labelled_positional", groups["incidence"]["labelled_positional_events"]),
+        ("alias", groups["update"]["alias_multiplicity_events"]),
+        ("old_snapshot", groups["update"]["old_snapshot_events"]),
+    )
+    assert sum(value for _name, value in event_partition) == native_generic_events
+
     print("T24 semantic oracle: PASS")
     print(f"native_generic_events={native_generic_events}")
-    print(
-        "event_partition="
-        f"translation_count:{groups['translation']['translation_count_events']},"
-        f"translation_positional:{groups['translation']['translation_positional_events']},"
-        f"large_closed_positional:{groups['translation']['large_closed_positional_events']},"
-        f"basis_access:{groups['translation']['basis_access_events']},"
-        f"hex:{groups['hex']['hex_native_generic_events']},"
-        f"declared_degree:{groups['incidence']['degree_profile_events']},"
-        f"pentagonal:{groups['incidence']['pentagonal_code4094_events']},"
-        f"two_shape:{groups['incidence']['two_shape_code254_events']},"
-        f"alternating_orientation:{groups['incidence']['alternating_orientation_events']},"
-        f"finite_type_network:{groups['incidence']['finite_type_network_events']},"
-        f"unlabelled_global:{groups['incidence']['unlabelled_global_events']},"
-        f"labelled_positional:{groups['incidence']['labelled_positional_events']},"
-        f"alias:{groups['update']['alias_multiplicity_events']},"
-        f"old_snapshot:{groups['update']['old_snapshot_events']}"
-    )
+    print("event_partition=" + ",".join(f"{name}:{value}" for name, value in event_partition))
     print(
         "arbitrary_d_formulas="
         "axes_degree=2d,axes_cases=k*(2d*(k-1)+1);"
         "full_degree=3^d-1,full_cases=k*((3^d-1)*(k-1)+1);"
+        "local_value_sum_rows=(degree+1)*(k-1)+1;"
         "positional_rows=k^s,positional_rule_count=k^(k^s);"
         f"checks:{groups['source']['formula_checks'] + groups['source']['positional_formula_checks']}"
     )
     print(
         "closed_rule_data="
         "DenseTable|DefaultOverridesTable; callbacks=NONE;"
+        "DefaultOverridesTable=canonical_zero_default+nonzero_overrides;"
+        "extensional_identity_roundtrip=PASS;"
         "4D_full_width=81,rows=2^81; eager_materialization=NOT_REQUIRED"
     )
     print(
@@ -3248,7 +3427,14 @@ def main() -> None:
     print(
         "hex_codec=(row,column)->(row,2*column-row);inverse=PASS;"
         "six_access_displacements_have_scaled_distance_squared_4;"
-        "sqrt3_center_embedding=VIEW_ONLY"
+        f"physical_event_commutations:{groups['hex']['hex_physical_codec_commutations']};"
+        "C6_slot_cycle=(0,2,4,5,3,1);sqrt3_center_embedding=VIEW_ONLY"
+    )
+    print(
+        "basis_codec="
+        f"inverse_roundtrips:{groups['translation']['basis_inverse_roundtrips']};"
+        f"off_image_rejections:{groups['translation']['basis_image_rejections']};"
+        "FCC/BCC_coefficient=physical_incidence=generic_successor"
     )
     print(
         "source_outer_codes="
@@ -3265,18 +3451,30 @@ def main() -> None:
     print(
         "unlabelled_incidence="
         f"permutation_checks:{groups['incidence']['unlabelled_local_permutation_checks']};"
-        "count_rule_invariant=PASS; positional_rule_rejected=PASS;"
-        "labelled_ports_positional=PASS"
+        "inclusive_LocalValueSum_invariant=PASS; positional_rule_rejected=PASS;"
+        "labelled_ports_positional=PASS;storage_target_label_reorder=IDENTITY"
+    )
+    print(
+        "netca_source_views="
+        "unlabelled_explicit_Self+connections->inclusive_LocalValueSum;"
+        "labelled_slots=(Above,Self,Below);"
+        f"triple_commutations:{groups['incidence']['netca_triple_commutations']};"
+        "equal_total_histogram_collision=PASS;Self_neighbor_tradeoff=PASS"
     )
     print(
         "alternating_orientation_static_offset_counterexample="
         "global_up_offset(-1,0,+1)@down(2,2,1)->(1,2,0),"
-        "native_down_neighbor=(3,2,0); typed_incidence_repairs_without_new_UPDATE"
+        "native_down_neighbor=(3,2,0);labels=(0,0,0)!=(0,1,0);"
+        "closed_rule_successors_diverge;typed_native_generic_commutes"
     )
     print(
         "occurrence_multiplicity="
         "1^4_axes:eight_aliases_not_one;2x2_full:multiplicities[2,2,4];"
         "parallel_ports:three_aliases_not_one; PASS"
+    )
+    print(
+        "read_provenance=SnapshotToken+Support+Relation+Schema;"
+        "forged/stale/foreign/value/type/port-order reads rejected before RULE"
     )
     print("old_snapshot_parallelism=PASS; same_site_atomic_commit=PASS; in_place_witness=PASS")
     print(

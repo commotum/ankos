@@ -64,14 +64,14 @@ GOVERNED = set(SOURCE.GOVERNED_IMAGE_LINES)
 
 # Filled from the source oracle's final public contract.  These values make a
 # changed evidence partition fail before the asset universe can silently move.
-EXPECTED_SOURCE_COUNT = 145
-EXPECTED_SOURCE_DIGEST = "52c5ea5e4964df3ec11e3c2994691a4fb9eda6b0ee9ce61a5ea91f87d7df37fa"
+EXPECTED_SOURCE_COUNT = 166
+EXPECTED_SOURCE_DIGEST = "6df18eafb55416cb2cdfb0972da8bcaf958e1605df5e8e64785187212ff137f5"
 EXPECTED_NATIVE_SOURCE_COUNT = 80
 EXPECTED_NATIVE_SOURCE_DIGEST = "1c7fa838bfa3e42073f8f8b7f8dfe2647a16a188f515063421892fb7255df2c3"
-EXPECTED_RELATION_SOURCE_COUNT = 16
-EXPECTED_RELATION_SOURCE_DIGEST = "d74e8224571c62fff7eb6ed75171a60a0be1a19c299dc9fe8a83bd9f4942585b"
-EXPECTED_CONTROL_SOURCE_COUNT = 49
-EXPECTED_CONTROL_SOURCE_DIGEST = "eaaa54ac9aa56764b6b86260be2c0d978067d24db4c17884fad1632b784bff99"
+EXPECTED_RELATION_SOURCE_COUNT = 21
+EXPECTED_RELATION_SOURCE_DIGEST = "765f57ae96e7b9c673423056032c498f84be315d95d40821a1259e801753ca45"
+EXPECTED_CONTROL_SOURCE_COUNT = 65
+EXPECTED_CONTROL_SOURCE_DIGEST = "b65f6092999ffd35c43394980ce559c35612378cb5efe26801c5e085b86a4ece"
 EXPECTED_GOVERNED_COUNT = 11
 EXPECTED_GOVERNED_DIGEST = "07b740cf80d9e0caef2500ebb6882c4322a6969b9fc284e3e77af4b9a611b62d"
 EXPECTED_NATIVE_IMAGE_DIGEST = "e6b89d89fdb76ba4bb76560fcbcd6dd0f22169301ab98bc8017e8bf0571b085f"
@@ -249,16 +249,19 @@ assert set(images) & S == GOVERNED
 C4 = near(S)
 ADJACENCY_ONLY = C4 - GOVERNED
 assert GOVERNED <= C4
-assert len(C4) == 22
-assert len(ADJACENCY_ONLY) == 11
+assert len(C4) == 36
+assert len(ADJACENCY_ONLY) == 25
 
 ADJ_STRUCTURAL_NETWORK = {2422, 2430}
 ADJ_NATURAL_OBSERVER = {4418}
-ADJ_OTHER_CA = {10259, 13312, 13638, 13640}
+ADJ_OTHER_CA = {2920, 2932, 2934, 10259, 13312, 13571, 13573, 13638, 13640}
 ADJ_SUBSTITUTION = {13742}
 ADJ_NETWORK_OBSERVER = {13907}
 ADJ_STATIC_GEOMETRY = {15479}
 ADJ_SEQUENTIAL_CA = {16450}
+ADJ_SLICE_VIEW = {2200, 2928, 13577}
+ADJ_PHYSICS_OBSERVER = {5330, 5332, 5338}
+ADJ_STATIC_NETWORK_GEOMETRY = {6374, 16810, 16812}
 adjacency_classes = (
     ADJ_STRUCTURAL_NETWORK,
     ADJ_NATURAL_OBSERVER,
@@ -267,6 +270,9 @@ adjacency_classes = (
     ADJ_NETWORK_OBSERVER,
     ADJ_STATIC_GEOMETRY,
     ADJ_SEQUENTIAL_CA,
+    ADJ_SLICE_VIEW,
+    ADJ_PHYSICS_OBSERVER,
+    ADJ_STATIC_NETWORK_GEOMETRY,
 )
 assert all(
     not (left & right)
@@ -274,7 +280,7 @@ assert all(
     for right in adjacency_classes[i + 1 :]
 )
 assert set().union(*adjacency_classes) == ADJACENCY_ONLY
-assert tuple(map(len, adjacency_classes)) == (2, 1, 4, 1, 1, 1, 1)
+assert tuple(map(len, adjacency_classes)) == (2, 1, 9, 1, 1, 1, 1, 3, 3, 3)
 
 
 GOVERNING_SOURCE_LINES = {
@@ -317,17 +323,31 @@ GOVERNED_LEDGER_REASON = {
 
 
 ADJACENCY_REASON = {
+    2200: "one-dimensional slice view of two-dimensional CA evolution; observer, not native support",
     2422: "structural-network snapshot preceding topology-rerouting mechanics",
     2430: "network-layout observer; drawing position is not native dimensional support",
+    2920: "other two-dimensional totalistic CA random-initial-condition gallery",
+    2928: "one-dimensional slice/depth-shaded view of two-dimensional CA evolution",
+    2932: "other two-dimensional CA time-history observer plate",
+    2934: "Game of Life/depth-shading explanatory plate, not T24 native state",
     4418: "photographs of natural snowflakes, not CA configuration data",
+    5330: "physics particle-box CA application panel, not T24 source state",
+    5332: "physics particle-box CA application panel, not T24 source state",
+    5338: "derived paddle-force time-series observer, not a configuration",
+    6374: "fixed-network embedding diagram; drawing layout is an observer",
     10259: "unrelated two-dimensional additive self-reproduction CA plate",
     13312: "continuous-value additive CA relation from the Notes",
+    13571: "other two-dimensional CA Notes evolution plate",
+    13573: "other two-dimensional CA Notes evolution plate",
+    13577: "Code-942 vertical-slice observer, not native configuration data",
     13638: "T23 exact-three-of-26 depth-shaded projection",
     13640: "T23 exact-three-of-26 depth-shaded projection",
     13742: "other-shape substitution-system plate, not fixed-incidence CA evolution",
     13907: "dimensionality plot for structural network systems, not a fixed-network CA trace",
     15479: "static discrete circle-packing constraint plate with no CA step",
     16450: "sequential-cell-update CA control with new-value reads",
+    16810: "hyperbolic/Cayley network geometry in a Poincare-disk embedding",
+    16812: "hyperbolic/Cayley network geometry in a Poincare-disk embedding",
 }
 assert set(ADJACENCY_REASON) == ADJACENCY_ONLY
 
@@ -369,7 +389,10 @@ def adjacency_kind(book_line: int) -> str:
         "A-SUBSTITUTION" if book_line in ADJ_SUBSTITUTION else
         "A-NETWORK-OBSERVER" if book_line in ADJ_NETWORK_OBSERVER else
         "A-STATIC-GEOMETRY" if book_line in ADJ_STATIC_GEOMETRY else
-        "A-SEQUENTIAL-CA"
+        "A-SEQUENTIAL-CA" if book_line in ADJ_SEQUENTIAL_CA else
+        "A-SLICE-VIEW" if book_line in ADJ_SLICE_VIEW else
+        "A-PHYSICS-OBSERVER" if book_line in ADJ_PHYSICS_OBSERVER else
+        "A-STATIC-NETWORK-GEOMETRY"
     )
 
 
@@ -383,13 +406,25 @@ def adjacency_ledger() -> tuple[str, int, int, int]:
 
 HASH_BOUND_CANDIDATES = {
     2154: (41_417, 933, 307, "fc490b29b4e9bccca63211d15a343bb12f54073324aa3f679694506ce705a151"),
+    2200: (261_068, 1153, 1341, "97e2f28e497096fd83d4c051ff15a93dc732515fabe1f7db4c8816d609804e8c"),
     2422: (92_766, 1128, 767, "af0f9a518be6e813de266014ea84ef65acd7ab3c0bce6dc4b77304086bb0404c"),
     2430: (45_490, 905, 412, "f6dda658647f60f79be0157922ce5fa5279e96141566e761f8e02258629f48a1"),
+    2920: (309_273, 1109, 1297, "49f35fe65202ef7fbfee2da92b7460d36fc329b66a553782ebf8991f237944dd"),
+    2928: (295_433, 1195, 1355, "71f5ac8784f493b664a93aff52e157e1ac7bf94a6b2e910f98de9fef663736ec"),
+    2932: (171_688, 701, 1133, "795c798b4c9b2bbd24febea8333176ebd7bc33852a4905894e5bff4a1426a757"),
+    2934: (50_190, 651, 254, "0689cd062ff648358aaef8ac0fae47cfb64538e5c0ed55a2c5fe660e6943eeb5"),
     4412: (59_518, 853, 294, "b3abd7c2f4f658cb3e405eb31dfba25f7b4ddde8de513f3f9cf8788e8d36f7b1"),
     4418: (87_360, 904, 453, "1fb4c22a34260fdfd050a7cacee9d9b4efa3bd8af60c35c4110a082881fcf739"),
     4428: (203_762, 1117, 900, "8c110e0b3fd53ff59a60dc9f2522a6bbdeef920ea46494d1a4dd18004fb94060"),
+    5330: (44_690, 408, 438, "c75a61ef29396cab0e25bc6f37a6320bce45c2bae1ff7fa5bbd3168333170789"),
+    5332: (100_204, 581, 419, "8c9a21ae92dd0f03d2457f6780ef0b583d8537af98a1835984b99ac2e856bd87"),
+    5338: (49_337, 932, 369, "4a823b5becc1c04fd8231240e97222df64a85fa60cd2a5cc5c94f93939cdb0e6"),
+    6374: (14_665, 262, 266, "71ec846d9b285fded9d3ee086f36a7dc3d4257f8f50c522be1eb6d75ce6c2c08"),
     10259: (36_753, 1154, 277, "851cf63cb497d076054d9b3cedf0db108f0cb439a7876726075eb82b5cfe0f6c"),
     13312: (23_933, 592, 238, "e1443f6b4aee358dad09728c67919c6ead43d3a8c583e8ff63c78b458e647ec7"),
+    13571: (3_067, 108, 126, "4aedb5c05e6a92981e626f362bec72d58e07d738ef565987a78c9acffc9fa8c2"),
+    13573: (3_675, 90, 120, "3da001aec8b59909e106dcba350d68f866cc7559b05f784ff88040d96263f296"),
+    13577: (16_819, 597, 231, "8227893d712fabbc2713f800a48cf00dd4bd810e4394ecdd17cb764a170512df"),
     13638: (3_967, 132, 153, "0a556a9e6208e87f94d87b0a476f4b2f38de12967431cd4eef8ac76ed63c0927"),
     13640: (4_169, 131, 161, "1d3b216e84533b46ce242e6dd682684f914572560afe38b0b52f4534fa7b6740"),
     13648: (25_176, 548, 175, "2b17dc927842b7cefa8d1aa777b46fb2a8634f4fc62386c00e301482add40743"),
@@ -404,6 +439,8 @@ HASH_BOUND_CANDIDATES = {
     15479: (48_777, 573, 284, "bc0eb1da6c34a828981031939e0ac0e1b7a3136581655c5a27771ddc32d19193"),
     15487: (42_208, 536, 195, "fddb41a6fd05e1afa24d654b44bf516dc240ec5ae36bec4f726d1937d11c7413"),
     16450: (104_351, 552, 503, "f109e4b50674bff8f054e83d8c70da6cfdbd767511eb4de2b8eafeb02af63ce1"),
+    16810: (5_117, 119, 111, "0771456ee14bf02451b8982f169499ca676893d00dda7e7445d2519a4d71d5a0"),
+    16812: (5_111, 117, 122, "e686b3389b3b58c458fe8d8ea55db44e663afa302df8bfb64ca4d4661140fa7c"),
 }
 assert set(HASH_BOUND_CANDIDATES) == C4
 for book_line, (expected_bytes, expected_width, expected_height, expected_digest) in (
@@ -613,7 +650,7 @@ for book_line, split_line in {
 HASH_BOUND_ASSETS = set(C4)
 TRANSCRIBED_ASSETS = {asset_line for _, asset_line, _, _, _ in TRANSCRIPT_SPECS}
 PIXEL_REPLAYED_ASSETS: set[int] = set()
-assert len(HASH_BOUND_ASSETS) == 22
+assert len(HASH_BOUND_ASSETS) == 36
 assert TRANSCRIBED_ASSETS == NATIVE
 assert len(TRANSCRIBED_ASSETS) == 6
 assert not PIXEL_REPLAYED_ASSETS

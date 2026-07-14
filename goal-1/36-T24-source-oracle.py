@@ -919,7 +919,8 @@ def main() -> int:
     )
     # The executable Notes row is explicitly {above, Self, below}; it does not
     # support a neighbor-only/no-Self interpretation of the main-text word
-    # "totalistic". This closed exact-one totalistic witness preserves Self.
+    # "totalistic". This closed exact-one totalistic witness includes explicit
+    # Self in every read tuple.
     fixed_net = ((1, 0, 2), (2, 1, 3), (3, 2, 0), (0, 3, 1))
     old_colors = (1, 0, 1, 0)
     read_colors = tuple(
@@ -941,7 +942,7 @@ def main() -> int:
         "OK" if fixed_network_source_ok and structural_network_control_ok else "MISMATCH",
     )
     print(
-        "derived_notes_fixed_incidence_snapshot_event_with_self",
+        "derived_notes_fixed_incidence_snapshot_event_includes_self",
         "OK" if fixed_network_derivation_ok else "MISMATCH", *new_colors,
     )
 

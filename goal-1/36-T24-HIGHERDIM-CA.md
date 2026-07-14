@@ -43,11 +43,11 @@ Reconstruct higher-dimensional and alternative-lattice cellular automata from pr
 
 ## Search Log
 
-`36-T24-source-oracle.py` freezes 21 overlapping direct-name, arbitrary-dimension, formula, ordered-offset, chapter-introduction, alternative-lattice, tiling, Penrose, network, update, realization, rule-restriction, structural-network, alternate-schedule, actual-Index, isotropy, function-rule, crystal-growth, distorted-hexagonal, and broad geometry queries. Their union contains 142 unique monolith lines: 113 before the actual Index and 29 actual-Index routes. The union digest is `23247daa90ba3ad9bf8892f02e9c010cdeff596c2f99652504405c8254fb7fee`.
+`36-T24-source-oracle.py` freezes 30 overlapping direct-name, arbitrary-dimension, formula, ordered-offset, chapter-introduction, alternative-lattice, tiling, Penrose, network, update, realization, rule-restriction, structural-network, alternate-schedule, actual-Index, isotropy, function-rule, crystal-growth, distorted-hexagonal, broad geometry, historical-alias, tessellation/honeycomb, slice, embedding, Cayley, Boolean-network, Bravais/Brillouin, mixed-dense-Index, and Graphs/Networks queries. Their union contains 218 unique monolith lines: 168 before the actual Index and 50 actual-Index routes. The union digest is `962900aed133abc4c2df18dccc4c85f3729388b2e9f589c5dbc8fefcb1e474c9`.
 
-The 113 pre-Index candidates partition exactly as 69 matched retained lines plus 44 exclusions; 76 governed continuations produce 145 retained evidence lines. Their semantic partition is `80 native / 16 relation / 49 control`, with digest `52c5ea5e4964df3ec11e3c2994691a4fb9eda6b0ee9ce61a5ea91f87d7df37fa`. The exclusions are `31 other CA family or dimension / 8 broad implementation-name collisions / 5 other geometry or physics`. No pre-Index candidate remains unresolved.
+The 168 pre-Index candidates partition exactly as 91 matched retained lines plus 77 exclusions; 75 governed continuations produce 166 retained evidence lines. Their semantic partition is `80 native / 21 relation / 65 control`, with digest `6df18eafb55416cb2cdfb0972da8bcaf958e1605df5e8e64785187212ff137f5`. The exclusions are `31 other CA family or dimension / 8 broad implementation-name collisions / 5 other geometry or physics / 26 other-program or schedule vocabulary / 7 unrelated slice, embedding, or honeycomb collisions`. No pre-Index candidate remains unresolved.
 
-The 29 actual-Index routes partition as `20 T24 geometry/topology / 2 other rule restrictions / 1 structural or sequential network / 4 continuous or stochastic / 2 broad implementation-name` routes. They supply navigation vocabulary only. All seventeen split Markdown files are hash-bound. The query reverse join closes as `134 exact + 8 mapped variants`; the full retained reverse join closes as `131 exact + 14 mapped variants + 0 monolith-only`. One Atlas record is summary/navigation only. The catalog and taxonomy are checked for stable identity and vocabulary but never promoted into Book semantics. The stable asset interface contains eleven governed image lines at `6 native / 2 relation / 3 control`.
+The 50 actual-Index lines partition as `20 T24 geometry/topology / 4 historical aliases / 9 Boolean-network variants / 2 observer or embedding / 7 mixed T24-alias-variant-observer / 2 T24 rule restrictions / 1 structural or sequential network / 4 continuous or stochastic / 1 broad implementation-name` routes. Every dense line has an entry-specific occurrence guard, so an unrelated same-line match cannot stand in for a T24 route. These lines supply navigation vocabulary only. All seventeen split Markdown files are hash-bound. The query reverse join closes as `208 exact + 10 mapped variants`; the full retained reverse join closes as `150 exact + 16 mapped variants + 0 monolith-only`. One Atlas record is summary/navigation only. The catalog and taxonomy are checked for stable identity and vocabulary but never promoted into Book semantics. The stable asset interface contains eleven governed image lines at `6 native / 2 relation / 3 control`.
 
 The source oracle independently guards the arbitrary-dimensional formulas and positional codec; the six-neighbor hexagonal rule-space counts; the exact source wording and derived decodings for codes `4094`, `254`, `16382`, and `10926`; the distorted-square/hexagonal access map; the fixed-incidence one-step event; the fixed-network-versus-T29 boundary; and function, stochastic, continuous-value, structural, and schedule controls. Root and relocated-cwd runs pass, optimized mode fails closed, import is silent, explicit compilation passes, and `unresolved_total=0`.
 
@@ -92,30 +92,34 @@ Every candidate has one monolith and one split reference, giving 44 references, 
 
 `36-T24-semantic-oracle.py` defines independent native translation-lattice and fixed-incidence evaluators plus a generic four-axis SimpleProgram evaluator. The generic side uses immutable support/incidence, exact site handles tied to one snapshot, closed `DenseTable | DefaultOverridesTable` RULE data, one same-site assignment per active site, and atomic parallel commit. It contains no callback, family field, catalog switch, microstep encoding, or eager exhaustive-table requirement.
 
-The oracle closes 1,689 native/generic one-event commutations:
+The repaired oracle closes 1,791 native/generic one-event commutations:
 
 ```text
 translation count                80
 translation positional           15
 large closed positional           2
-basis/access codec                 4
+basis coefficient access           4
+basis physical incidence           4
 hexagonal                       1024
 declared source degree            80
 pentagonal                        64
 two-shape fixed incidence         64
 alternating orientation          256
+alternating offset counterexample   2
 finite-type fixed network         32
-unlabelled global count           32
-labelled-port positional          32
+unlabelled inclusive total         32
+NetCAStep inclusive total          32
+NetCAStep labelled triple          32
+labelled-port positional           64
 alias/parallel-port multiplicity   3
 old-snapshot adversary             1
                                   ----
-                                  1689
+                                  1791
 ```
 
 Fifty-one formula/profile checks cover arbitrary `d` axis/full aggregate sizes, complete positional row counts, and exact context codecs. A binary four-dimensional full neighborhood has width 81 and `2^81` positional rows; a canonical `DefaultOverridesTable` proves that a complete bounded closed function need not be eagerly materialized or replaced by a callback. This carrier's declared image uses distinguished default zero and rejects redundant overrides, giving one sparse spelling per map in that image; dense and sparse carriers share an explicit extensional table identity. Translation-count fixtures span dimensions and alphabets, while asymmetric positional fixtures prevent a count rule or silent reordering from passing.
 
-The hexagonal audit independently enumerates the `C6` and `D6` actions on the six neighbor positions. With the center fixed separately, it obtains exactly 28 rotational and 26 complete-symmetry context orbits, checks 256 compact-table fiber rows, and proves the source exponents `128/28/26/14/8/7`. The exact staggered-array codec
+The hexagonal audit independently derives the `C6` and `D6` actions from the six physical center displacements rather than treating sorted storage order as cyclic order. With the center fixed separately, it obtains exactly 28 rotational and 26 complete-symmetry context orbits, checks 256 compact-table fiber rows, proves the physical rotation cycle `(0,2,4,5,3,1)`, and proves the source exponents `128/28/26/14/8/7`. The exact staggered-array codec
 
 ```text
 (row, column) -> (row, 2*column - row)
@@ -125,13 +129,13 @@ round-trips, maps all six source access offsets to equal scaled distance, and co
 
 The code oracle proves—not merely assumes—that degree-three `254`, degree-five `4094`, and degree-six `16382` are the complete outer-totalistic growth tables: an old black Self persists at count zero, and a white cell is born when at least one neighbor is black. Degree-six `10926` preserves every old black Self and births a white cell exactly at neighbor count one. Source wording and these derived canonical tables remain separately labeled.
 
-Ten source-declared lattice degree profiles execute through arbitrary validated fixed incidence without inventing global FCC, BCC, Penrose, or pentagonal topology. Separate fixtures prove kind-conditioned access for alternating orientations, a two-shape shared-rule support, and a finite-type fixed network. Across 96 edge permutations, unlabeled count rules remain invariant and positional rules fail validation; explicitly labeled ports admit positional tables.
+Ten source-declared lattice degree profiles execute through arbitrary validated fixed incidence without inventing global FCC, BCC, Penrose, or pentagonal topology. Separate sum-sensitive fixtures prove kind-conditioned access for alternating orientations, a two-shape shared-rule support, and a finite-type fixed network. Across 96 edge permutations, unlabeled inclusive-total rules remain invariant and positional rules fail validation. The Notes profile commutes both as an inclusive total over explicit Self plus connections and as canonical `(Above,Self,Below)` positional slots; reordering stored target/label pairs leaves the semantic tuple unchanged.
 
-The alternating-orientation adversary gives a concrete current-runtime failure: at a down-oriented site, one broadcast “up” offset reaches a different site from the native typed incidence. Kind-indexed access repairs the event with the same UPDATE. A `1^4` quotient retains eight axial occurrences rather than one unique destination; a `2x2` full quotient retains multiplicities `[2,2,4]`; three parallel ports remain three reads. An in-place adversary diverges from the old-snapshot result, while the generic parallel commit matches the native event.
+The alternating-orientation adversary gives a concrete current-runtime event failure: at a down-oriented site, one broadcast “up” offset reaches a different site from the native typed incidence; the two targets carry different labels, and a closed rule produces divergent successors. Kind-indexed access restores native/generic commutation with the same UPDATE. A `1^4` quotient retains eight axial occurrences rather than one unique destination; a `2x2` full quotient retains multiplicities `[2,2,4]`; three parallel ports remain three reads. An in-place adversary diverges from the old-snapshot result, while the generic parallel commit matches the native event.
 
-Four additional coefficient-basis commutations prove that derived FCC/BCC basis access and its explicit coordinate codec preserve the complete native event; the Book's degree statements still do not authorize an invented global crystal topology.
+Four coefficient-access commutations plus four independent physical-incidence commutations prove that derived FCC/BCC basis access and its exact coordinate codec preserve the complete event. The inverse closes 686 coefficient/physical round trips and rejects two off-image points; the Book's degree statements still do not authorize an invented global crystal topology.
 
-The semantic digest is `df6481886ae13040679ea00f005ce58b5382452bfc3ed72e7b59dcc25b8aa2f4`. Root and relocated runs pass, optimized mode fails closed, import is silent, and explicit compilation passes. Every strict T24 profile lands in audit categories 1-3. Structural node creation is the concrete fixed-support nonfit already routed to T29's graph-write UPDATE; T24 adds neither an UPDATE nor an executor.
+Every `LocalRead` is bound to its exact snapshot token, support, relation, and neighborhood schema; forged, stale, foreign, value-changed, type-changed, and port-reordered reads fail before RULE evaluation. Forty-six hostile rejection cases close those boundaries. The semantic digest is `71ad5808fbd6ebeb2be9c0a7e5801e47dbc4507aab31b531b632eaa477f25842`. Root passes; relocated, optimized fail-closed, silent-import, and explicit-compilation gates are being finalized. Every strict T24 profile lands in audit categories 1-3. Structural node creation is the concrete fixed-support nonfit already routed to T29's graph-write UPDATE; T24 adds neither an UPDATE nor an executor.
 
 ## First-Principles Fit Standard
 
