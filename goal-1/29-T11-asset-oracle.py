@@ -57,6 +57,17 @@ def near(source_lines: set[int], radius: int = 4) -> set[int]:
 CHAPTER_ROOTS = {916, 918, 920, 924, 928, 930, 934}
 CHAPTER_C4 = near(CHAPTER_ROOTS)
 assert CHAPTER_C4 == {922, 926, 932}
+assert set(images) & set(range(916, 935)) == CHAPTER_C4
+direct_page_files = {
+    path.name
+    for path in ASSET_ROOT.rglob("*.jpeg")
+    if re.fullmatch(r"_page_9[12]_.+\.jpeg", path.name)
+}
+assert direct_page_files == {
+    "_page_91_Figure_6.jpeg",
+    "_page_91_Figure_8.jpeg",
+    "_page_92_Figure_1.jpeg",
+}
 
 # The extracted Notes lost the Generalized Mobile Automata heading and the
 # opening of its implementation paragraph.  Lines 12008/12010 are nevertheless
@@ -66,6 +77,7 @@ assert CHAPTER_C4 == {922, 926, 932}
 NOTES_ROOTS = {12008, 12010}
 NOTES_C4 = near(NOTES_ROOTS)
 assert NOTES_C4 == {12004, 12006}
+assert not (set(images) & set(range(12008, 12012)))
 
 # Relation siblings close the native section boundaries.  The predecessor
 # paragraph explicitly points both upward and to its facing page; the successor
@@ -112,12 +124,19 @@ DIRECT_VISUAL_SHA256 = {
 }
 VISUAL_FACTS = {
     922: "rule strip returns a new source color plus a set of relative activity dots",
-    926: "evolution shows simultaneous persistence/proliferation of multiple active dots",
-    932: "rule/evolution plate visibly includes {}, {0}, {0,+1}, and {-1,0,+1} activity outputs",
+    926: "uniform-white visible initial row has one central active dot; evolution proliferates dots",
+    932: "all eight panels start from one dot on white; rules include {}, {0}, {0,+1}, {-1,0,+1}",
 }
 assert set(DIRECT_VISUAL_SHA256) == set(VISUAL_FACTS) == C | O
+# Panel frames/crops expose no boundary symbol, edge rule, wrapping, reflection,
+# finite capacity, or other semantic boundary behavior.
+VISUAL_BOUNDARY_FINDING = "display crop only; no native finite-edge semantics"
 
 guards = {
+    846: "three-color totalistic cellular automaton with code number 1599",
+    862: "An example of a mobile automaton",
+    868: "Examples of mobile automata with various rules",
+    898: "A mobile automaton that yields a pattern with seemingly random features",
     904: "example shown on the facing page",
     912: "Each column above shows 400 steps",
     916: "a class of generalized mobile automata",

@@ -78,12 +78,15 @@ QUERIES = {
     "Q10": (
         r"\b(?:sequential automata|mobile cellular automata?|moving "
         r"automata?|moving automaton|moving heads?|multi-active|"
-        r"multiple-active)\b|\b(?:multiple|many|several) active cells?\b"
+        r"multiple-active)\b|\b(?:multiple|many|several) "
+        r"(?:possible )?active cells?\b|\bactive (?:sites?|positions?|"
+        r"markers?|loci)\b"
     ),
     "Q11": (
         r"\b(?:write conflict policy|conflict policy|collision policy|"
         r"overlapping active neighborhoods?|simultaneous write conflicts?|"
-        r"activity rule|active set|active layer)\b"
+        r"activity rule|active set|set of active cells?|active-cell set|"
+        r"active layer)\b"
     ),
     "Q12": (
         r"\b(?:essentially like a cellular automaton|ordinary mobile automata "

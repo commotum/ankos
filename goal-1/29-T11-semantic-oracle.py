@@ -22,8 +22,10 @@ obligation explicit.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from itertools import combinations, permutations, product
+from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
 
@@ -43,6 +45,50 @@ ACTIVITY_SUBSETS = tuple(
     for subset in combinations(ACTIVITY_OFFSETS, size)
 )
 ROW_RESULTS = tuple(product(BITS, ACTIVITY_SUBSETS))
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+PAGE_91_RULE_ASSET = (
+    REPO_ROOT
+    / "ref/A-New-Kind-of-Science/CHAPTERS/3-The-World-of-Simple-Programs/Images"
+    / "_page_91_Figure_6.jpeg"
+)
+PAGE_91_RULE_ASSET_SHA256 = (
+    "841e52174bee649faa4f32c351235609b41f08d875351f4e04e328fe1d0dc3db"
+)
+
+
+# BOOK:922.  This is a derived visual transcription of the hash-bound native
+# rule strip, not a source-defined integer code.  Rows are physical L/C/R.
+PAGE_91_RULE: Rule = {
+    (1, 1, 1): (0, frozenset({1})),
+    (1, 1, 0): (0, frozenset({1})),
+    (1, 0, 1): (1, frozenset({1})),
+    (1, 0, 0): (1, frozenset({0, 1})),
+    (0, 1, 1): (1, frozenset({-1})),
+    (0, 1, 0): (1, frozenset({-1, 1})),
+    (0, 0, 1): (1, frozenset({-1})),
+    (0, 0, 0): (1, frozenset({-1, 1})),
+}
+
+
+# Independently recomputed from PAGE_91_RULE, an all-zero field, and A_0={0}.
+# Each row is (positions whose underlying bit is 1, active positions).
+EXPECTED_PAGE_91_TRACE = (
+    ((), (0,)),
+    ((0,), (-1, 1)),
+    ((-1, 0, 1), (-2, 1, 2)),
+    ((-2, -1, 0, 2), (-3, 2, 3)),
+    ((-3, -2, -1, 0, 2, 3), (-4, 1, 3, 4)),
+    ((-4, -3, -2, -1, 0, 1, 2, 4), (-5, 2, 4, 5)),
+    ((-5, -4, -3, -2, -1, 0, 1, 4, 5), (-6, 3, 5, 6)),
+    ((-6, -5, -4, -3, -2, -1, 0, 1, 3, 4, 6), (-7, 2, 6, 7)),
+    ((-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 6, 7), (-8, 3, 5, 7, 8)),
+    ((-8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 4, 5, 6, 8), (-9, 4, 6, 8, 9)),
+    ((-9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 4, 5, 8, 9), (-10, 3, 7, 9, 10)),
+    ((-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 7, 8, 10), (-11, 4, 6, 10, 11)),
+    ((-11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 5, 6, 7, 8, 10, 11), (-12, 5, 7, 9, 11, 12)),
+)
 
 
 class NoActiveSources(RuntimeError):
@@ -289,6 +335,18 @@ def assert_rule_schema() -> None:
     assert normalize_offsets((1, -1, 0, 1)) == frozenset((-1, 0, 1))
 
 
+def assert_page_91_asset_and_rule() -> None:
+    assert PAGE_91_RULE_ASSET.is_file()
+    digest = hashlib.sha256(PAGE_91_RULE_ASSET.read_bytes()).hexdigest()
+    assert digest == PAGE_91_RULE_ASSET_SHA256
+    assert set(PAGE_91_RULE) == set(CONTEXTS)
+    assert all(result in ROW_RESULTS for result in PAGE_91_RULE.values())
+
+    # The visually easy-to-misread 000 result has left/right activity only;
+    # the center output cell is not active.
+    assert PAGE_91_RULE[(0, 0, 0)] == (1, frozenset({-1, 1}))
+
+
 def assert_table_validation() -> None:
     rule = constant_rule(0, ())
     assert set(rule) == set(CONTEXTS)
@@ -471,8 +529,19 @@ def assert_target_local_ca_needs_radius_two() -> None:
     assert high_next.get(0, (PLAIN, 0))[0] == PLAIN
 
 
+def page_91_trace(steps: int) -> tuple[tuple[tuple[int, ...], tuple[int, ...]], ...]:
+    state: tuple[Bits, ActiveSet] = ({}, frozenset({0}))
+    trace = []
+    for _ in range(steps + 1):
+        bits, active = state
+        trace.append((tuple(sorted(bits)), tuple(sorted(active))))
+        state, _events = factored_step(PAGE_91_RULE, state)
+    return tuple(trace)
+
+
 def main() -> None:
     assert_rule_schema()
+    assert_page_91_asset_and_rule()
     assert_table_validation()
     cases = assert_exhaustive_composition_commutation()
     assert_notes_split_and_newborn_schedule()
@@ -482,6 +551,8 @@ def main() -> None:
     assert_old_snapshot_not_sequential()
     assert_source_order_is_nonsemantic()
     assert_target_local_ca_needs_radius_two()
+    trace = page_91_trace(12)
+    assert trace == EXPECTED_PAGE_91_TRACE
     print(
         "T11 semantic oracle: PASS "
         f"({cases} exhaustive composition/representation cases; "
@@ -489,7 +560,8 @@ def main() -> None:
         f"derived_rule_space={len(ROW_RESULTS) ** len(CONTEXTS)}; "
         "old_snapshot=PASS; activity_union=PASS; split/disappear/offset0=PASS; "
         "collision/source-overlap=PASS; source_order=PASS; "
-        "radius2_CA_witness=PASS; empty_frontier_outcome=UNSPECIFIED)"
+        "radius2_CA_witness=PASS; page91_hash/rule/t0_t12=PASS; "
+        "empty_frontier_outcome=UNSPECIFIED)"
     )
 
 
