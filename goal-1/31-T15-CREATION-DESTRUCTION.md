@@ -1,13 +1,16 @@
 # 31-T15-CREATION-DESTRUCTION
 
-Status: **IN PROGRESS — EXHAUSTIVE SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN**
+Status: **IN PROGRESS — SOURCE CLOSED; ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN**
 
 ## Current Facts
 
 - T15 is CSV line 16, Creation-Destruction Substitution Systems. The catalog and `CA-Types.md` supply search vocabulary only; neither is primary construction evidence.
+- The frozen 22-query source audit closes 349 unique lines at 271 pre-Index and 78 actual-Index. It retains 32 matched hits plus eight governed continuations, excludes 239 pre-Index false positives, reverse-closes all 17 split documents, and leaves zero source candidate unresolved.
+- The catalog name does not occur in the Book or Atlas. The actual Index has no dedicated T15 heading; eight broad 0L/1L/D1L/L-system/substitution routes lead to pages 82–87 and 70 Index candidates are excluded.
 - The direct Chapter 3 discussion begins at `BOOK:1028` immediately after the strict nonempty neighbor-dependent examples. It says elements may disappear, distinguishes excessive disappearance from rapid growth, and studies rules whose creation and destruction are nearly balanced (`BOOK:1028-1040`).
 - The direct figures use variable-cardinality ordered words. Equal-total-width and fixed-box rows are alternate views, and only sequence order remains semantic as insertions/deletions shift later displayed positions (`BOOK:1032-1048`).
 - The facing-page three- and four-color examples retain the same creation/destruction theme; one has a CA-like regular region away from the right edge and the others create and destroy elements throughout (`BOOK:1044-1052`). Exact table arity, empty rows, seeds, and boundary behavior must be decoded and independently bound before this becomes a construction claim.
+- No T15 rule table, seed, or operator is transcribed in the Notes. The prose contains no literal “empty replacement”, “epsilon”, or erasing terminology; the corpus's only explicit syntactic empty right-hand side is a T17 tag-system row at `BOOK:12298`, under a different consume-prefix/append-tail schedule.
 - T14 established `OrderedGenerationConcat`: selected old anchors emit ordered words and UPDATE consumes the old generation, concatenating writes in source/child order. T13 and strict T14 currently validate `Sigma+`; T15 must determine whether the reusable base is actually `Sigma*` with nonempty output only a preset invariant.
 - An empty RULE emission, zero selected sources, an empty successor, extinction, halt, and zero successors are distinct. T14's `[]->[]`/singleton-to-empty behavior comes from zero eligible pairs and cannot serve as evidence for a native epsilon-valued T15 row.
 - DOMAIN is expected to remain discrete `t+1D`; the finite ordered word and its occurrence topology belong to CONFIGURATION. This remains a hypothesis until the direct rule plates and Notes/Index routes close.
@@ -36,7 +39,60 @@ Reconstruct creation-destruction substitution directly from exhaustive primary e
 
 ## Search Log
 
-The exhaustive frozen source oracle is in progress. Direct anchors already requiring disposition include `BOOK:1028-1052`, their linked plates and captions, relevant Notes and actual Index routes, split-document counterparts, growth/property continuations, and T13/T14/T16/T17 relations. No search count or closure claim is made until every candidate is frozen and classified.
+`31-T15-source-oracle.py` freezes 22 case-insensitive line queries, hashes, and every disposition. Per-query counts are:
+
+| Query | total | pre-Index | actual-Index |
+|---|---:|---:|---:|
+| Q00 catalog analytic name | 0 | 0 | 0 |
+| Q01 broad substitution family | 288 | 213 | 75 |
+| Q02 direct disappearance wording | 1 | 1 | 0 |
+| Q03 creation/destruction/addition/subtraction | 4 | 4 | 0 |
+| Q04 balance/slow/fixed growth | 8 | 7 | 1 |
+| Q05 extinction/die-out/removal | 22 | 22 | 0 |
+| Q06 disappear forms | 15 | 15 | 0 |
+| Q07 destruction/destroy forms | 12 | 12 | 0 |
+| Q08 literal empty replacement/block/word | 0 | 0 | 0 |
+| Q09 erasing terminology | 0 | 0 | 0 |
+| Q10 epsilon terminology control | 4 | 3 | 1 |
+| Q11 shared substitution implementation | 2 | 2 | 0 |
+| Q12 strict nonempty predecessor | 1 | 1 | 0 |
+| Q13 old-generation parallel schedule | 1 | 1 | 0 |
+| Q14 order/position shift | 1 | 1 | 0 |
+| Q15 rendering alternatives | 1 | 1 | 0 |
+| Q16 literal page 86/87 control | 0 | 0 | 0 |
+| Q17 0L/1L/L-system aliases | 9 | 4 | 5 |
+| Q18 syntactic empty RHS | 1 | 1 | 0 |
+| Q19 T14 right-edge boundary | 1 | 1 | 0 |
+| Q20 T16 sequential boundary | 2 | 2 | 0 |
+| Q21 T17 short/extinction boundary | 2 | 2 | 0 |
+
+After union and deduplication:
+
+- query union: 349, digest `d5d15e7a4c2c9555440c64782dca47ad02c1550c01bde86e0cd4648d2d67813a`;
+- pre-Index: 271, digest `da7be8b67ea869d5ba3e4ceccd48b254ca01d0dbf90b1067e3f4db4d4d708fcb`;
+- actual Index: 78, digest `e811eee57e862b90876a86bfa6096928dc6e122e2ac31bac663397c7314e576f`;
+- matched retained: 32; governed continuations: eight; final retained: 40, digest `03fc9177af658074d7a276757fcc742a1afb3e5fe976ec6b08d438c1a57f7e73`;
+- excluded pre-Index candidates: 239, digest `65d4ccb8d5d2c2f6d97db0d035d5c6e3f0c9193ef695325361ec9dfcf7926b24`;
+- eight relevant broad Index routes and 70 dispositioned Index false positives.
+
+Candidate disposition is closed:
+
+| Region | Final disposition |
+|---|---|
+| `BOOK:980-992` | T13 variable-word and ordinary replacement setup |
+| `BOOK:1018-1026` | strict T14 contextual/nonempty/right-edge predecessor boundary |
+| `BOOK:1028-1052` | direct T15 disappearance, balance, four plates, order, multicolor behavior, and CA-like relation |
+| `BOOK:1054-1062` | T16 transition plus explicit contrast with prior old-generation parallelism |
+| `BOOK:1132` | T17 extinction relation, not T15 mechanics |
+| `BOOK:2358` | shared every-old-element substitution schedule |
+| `BOOK:7940-7950` | dynamic-support/CA-emulation relation, not native fallback |
+| `BOOK:12097-12113` | T13/T14 implementation boundary; no T15 table transcription |
+| `BOOK:12136` | extraction-truncated neighbor-dependent growth observation; no missing text invented |
+| `BOOK:12251` | 1L/T14 historical alias route |
+| `BOOK:12298-12300` | explicit T17 empty appendant and short-state totalizer; different schedule |
+| `BOOK:20828,21068,21422,21461,21652,21656,22114,22144` | all relevant actual-Index routes followed |
+
+All 17 split documents are hash-bound. The 348 split query records reverse-join as 319 exact and 29 mapped extraction variants; retained evidence reverse-joins as 30 exact and ten mapped variants with zero omission. Atlas has four broad summary hits and no executable or rule-table T15 evidence. Root and `/tmp` runs pass; optimized mode fails closed. Zero source candidate remains unresolved.
 
 ## Book Excerpts
 
