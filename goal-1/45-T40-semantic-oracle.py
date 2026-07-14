@@ -837,6 +837,13 @@ class ExpansionResult:
                 raise ValueError("certificate integer digits do not match the result")
             if type(self.query.representation) is PositionalDigits and sign != 1:
                 raise ValueError("Machin positional certificates require a positive sign")
+        if (
+            type(self.query.denotation.expression) is PiConstant
+            and self.context.method == MACHIN_METHOD
+            and type(self.outcome) in (CompleteCertified, Partial, ResourceLimit)
+            and termination != PREFIX_OF_INFINITE
+        ):
+            raise ValueError("Pi/Machin outcomes must retain the known infinite representation status")
         if type(self.outcome) is CompleteExact:
             expected = expected_exact_components(self.query, self.context)
             actual = (
@@ -1700,14 +1707,19 @@ def verify_result(result: object) -> bool:
 
 @dataclass(frozen=True)
 class ExactEquivalenceCertificate:
-    left: DenotationProvenance
-    right: DenotationProvenance
+    left: MathematicalDenotationSpec
+    right: MathematicalDenotationSpec
     common_rational: Fraction
 
     def __post_init__(self) -> None:
-        if type(self.left) is not DenotationProvenance or type(self.right) is not DenotationProvenance:
-            raise TypeError("equivalence certificate requires denotation provenance")
-        exact_fraction(self.common_rational, "common rational")
+        if type(self.left) is not MathematicalDenotationSpec or type(self.right) is not MathematicalDenotationSpec:
+            raise TypeError("equivalence certificate requires complete denotation specifications")
+        if type(self.left.expression) is not RationalLiteral or type(self.right.expression) is not RationalLiteral:
+            raise ValueError("rational equivalence certificates require rational denotations")
+        common = exact_fraction(self.common_rational, "common rational")
+        if self.left.expression.value != common or self.right.expression.value != common:
+            raise ValueError("equivalence certificate does not replay both rational denotations")
+        object.__setattr__(self, "common_rational", common)
 
 
 def certify_rational_equivalence(
@@ -1721,8 +1733,8 @@ def certify_rational_equivalence(
     if left.expression.value != right.expression.value:
         return None
     return ExactEquivalenceCertificate(
-        denotation_provenance(left),
-        denotation_provenance(right),
+        left,
+        right,
         left.expression.value,
     )
 
@@ -2897,7 +2909,7 @@ def audit_no_float_digit_invention() -> tuple[int, int, int, int]:
     return boundary_refusals, result_float_checks, interval_checks, exact_carrier_checks
 
 
-def audit_no_native_execution_surface() -> tuple[int, int, int, int, int]:
+def audit_no_native_execution_surface() -> tuple[int, int, int, int]:
     forbidden = forbidden_execution_role_symbols(dict(globals()))
     assert dict(forbidden) == {
         "State": (),
@@ -2925,7 +2937,7 @@ def audit_no_native_execution_surface() -> tuple[int, int, int, int, int]:
     }
     assert not any(forbidden_fields.intersection(field_names) for _, field_names in manifest)
     work_types = sum(name.endswith("Work") for name in names)
-    return len(manifest), work_types, len(forbidden), 0, 0
+    return len(manifest), work_types, len(forbidden), 0
 
 
 def audit_hostile_validation() -> int:
@@ -3029,6 +3041,10 @@ def audit_hostile_validation() -> int:
             result.termination,
         ),
     )
+    rejected += must_raise(
+        ValueError,
+        lambda: replace(result, termination=EVENTUALLY_ZERO_INFINITE),
+    )
     unsupported = evaluate_query(query, exact_context())
     assert type(unsupported.outcome) is Unsupported and verify_result(unsupported)
     rejected += must_raise(
@@ -3071,6 +3087,14 @@ def audit_hostile_validation() -> int:
             exact.sign,
             exact.outcome,
             exact.termination,
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ExactEquivalenceCertificate(
+            rational_spec(1, 2),
+            rational_spec(1, 3),
+            Fraction(999, 1),
         ),
     )
 
@@ -3138,6 +3162,20 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(TypeError, lambda: T42CoefficientInput(object()))
 
     partial = evaluate_query(query, machin_context(3))
+    assert type(partial.outcome) is Partial
+    rejected += must_raise(
+        ValueError,
+        lambda: replace(partial, termination=EVENTUALLY_ZERO_INFINITE),
+    )
+    partial_cf = evaluate_query(
+        RepresentationQuery(pi_spec(), SimpleContinuedFraction(), Prefix(20)),
+        machin_context(3),
+    )
+    assert type(partial_cf.outcome) is Partial
+    rejected += must_raise(
+        ValueError,
+        lambda: replace(partial_cf, termination=FINITE_TERMINATED),
+    )
     rejected += must_raise(ValueError, lambda: make_t42_coefficient_input(partial))
     positional = evaluate_query(query, machin_context(20))
     rejected += must_raise(ValueError, lambda: make_t42_coefficient_input(positional))
@@ -3165,7 +3203,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "1b24a9d0da60631d08adfdb5bd6e44139bebd31991f5d146e8e6197a616ee02e"
+EXPECTED_DIGEST = "f0b3f635928335fa3becb8a9660c5a724e20157bba98d01cc4eb4cd2643b2fc0"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
@@ -3292,7 +3330,7 @@ def main() -> None:
     print(
         f"surface=dataclasses:{surface[0]}/optional_work_records:{surface[1]}/"
         f"forbidden_role_groups:{surface[2]}/native_execution_roles:{surface[3]}/"
-        f"class4_algebras:{surface[4]}; hostile_rejections={metrics['hostile_rejections']}"
+        f"class4_design:classes_1_to_3_reviewed; hostile_rejections={metrics['hostile_rejections']}"
     )
     print(f"semantic_digest={digest}")
 

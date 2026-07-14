@@ -11,8 +11,8 @@ are realizations of the denotation, not hidden executor state or T40's identity.
 The Book does not use the catalog label.  Twenty bounded, redundant query
 lanes freeze discovery witnesses, while independent fixed universes close all
 117 nonblank rows in the strict main section and all 897 nonblank rows in the
-canonical physical Index block.  A separate 103-row vocabulary scan and a
-59-row hostile page/vocabulary/continuation review must have no unexplained
+canonical physical Index block.  A separate 108-row vocabulary scan and a
+65-row hostile page/vocabulary/continuation review must have no unexplained
 match.  The chapter split is intentionally treated as an abridged summary:
 compressed tables and omitted mechanics are explicit split dispositions
 rather than silently invented matches.
@@ -59,7 +59,7 @@ def line_set(spec: str) -> frozenset[int]:
 
 
 # Exactly twenty bounded lanes from the first-principles audit.  Q00 proves
-# that the catalog label is external vocabulary; Q15/Q16 close all 24 images.
+# that the catalog label is external vocabulary; Q15/Q16 close all 27 images.
 QUERIES = {
     "Q00": r"Mathematical-Constant Digit Systems?",
     "Q01": r"Mathematical Constants",
@@ -189,6 +189,7 @@ QUERY_NATIVE = line_set(
 QUERY_RELATION = line_set(
     "1850,1852,1856,11260,11531,"
     "12503,12515,12524,12532,12536,12550,12552,12554,12555,12557,12569,"
+    "12984,12986,12988,12990,"
     "12992,12996,13000,13004,13018,13020,13022,13023,13029,13062,"
     "13074,13076,13084,13092,13094,13096,13098,13102,13103,13111,"
     "13119,13121,13123,13125,13127,14172,14468,14923,17236,17599,"
@@ -562,7 +563,7 @@ IMAGE_ASSEMBLY_BOUNDARIES = (
     "page931:13119,13121,13123,13125,13127 form five digital-slope panels",
     "main:1711 and 1744 have physical files but no split Markdown references",
     "paths:monolith references omit Images while split references include it",
-    "boundary:all 24 assets are hash-bound and supply no pixel-derived mechanics",
+    "boundary:all 27 assets are hash-bound and supply no pixel-derived mechanics",
 )
 
 
@@ -895,27 +896,29 @@ EXPECTED_QUERY = {
     "Q13": (2, 2, 0, "6a8ea11b4ec5fdca405e59703e8853736502a0daffd3cd153c166cead6e74577"),
     "Q14": (12, 0, 12, "7b99c1393251c1d6e507801a46576a77d9b33a78557f42bd2e29ffc26c5ff277"),
     "Q15": (3, 3, 0, "29e023f7db02bec1f2a16113a10f2ad22d45f9741ac3563d630c38b4ae641240"),
-    "Q16": (21, 21, 0, "2780612ef55f979f24f756be9a8532494bb13c4ecb6029715a649a89ba1274c4"),
+    "Q16": (24, 24, 0, "9a61ea933ad33af301fc5bcb85590ebdd6d010282b79d440e3acde5a926608ec"),
     "Q17": (4, 4, 0, "8a4e0a5a0bdb3f5e00e29d2c34e66980cec3634c02ac67dbee9b0c5d2bc8c8fd"),
+    "Q18": (18, 9, 9, "daf82880161836bececa0947adf26627fa19027a039194069ea0c6db95155450"),
+    "Q19": (5, 0, 5, "dfd6b9bb5fb0d37bb9dec4176afc40f7273b06a1b7b2d732a66ffea2d3b5f71f"),
 }
 EXPECTED_QUERY_PATTERNS = (
-    18,
-    "8e2ca87c4588620a2f8d67128cb85ec633822fd3e1bde143bba74be8abadd7a9",
+    20,
+    "aa82c1623fbe5efda23e94ae79a80383e373516e0b9f9467ee1d5d91db24cacb",
 )
 EXPECTED_SET = {
-    "union": (144, "6dabdf0a8cb82dc2344bf3e0feed786a105af6cdbf6d182ff5d4c4eafd69c935"),
-    "pre_index": (99, "39e469b9638ca0458a66f3e312e7bcaac5d61e5d6501b8781fd1d4ce1eb5e303"),
-    "index_candidates": (45, "a352580c74fff6a60081acceaed2937c024e89c9cec5948b002f7c70504f79ba"),
+    "union": (166, "45923b5f5f09804961668838532a9a905d503bacb7473349eedad24c145aa228"),
+    "pre_index": (111, "511153c482b0893320a0d1e929615f600e63515343162cf4dfc9c12fc4f39120"),
+    "index_candidates": (55, "f42d657863bef3a638029d7994ba498468a7bfb857f99a3249a08df1a6b2f3ae"),
     "query_native": (46, "90c5667940c7b23109fec16cce632cd493d64aa5bf3c6eeda290417cee80093d"),
-    "query_relation": (41, "aaa1d5ac0262e3910c7d48c3428d1550dbaa488888807ad83b38f64e865b9f88"),
+    "query_relation": (53, "0ea85c90b9f0e905df3a1dd6358a23b014851f0287fc2b7aa748895768efef1c"),
     "query_control": (7, "aa826f1310f068dd0ba264d1a4155fcd46ae2fe1f318c5dd5e159ac7eef21c2e"),
     "excluded": (5, "01c97a261db7b3a9cc557d83e011e5aa7a280433144e5df6d2b22bedd051f8f8"),
     "native": (169, "eba1f729ab1ed14b6809c181e74ac86b64a363c0bcecb684f7cdbdad8f76ca2b"),
-    "relation": (89, "1f267ef9ef0d8d5d114a36c6c207e6bc06cdf756fc6edf2a37b7a442746f2c37"),
+    "relation": (112, "5af6adef4121efe338e89e295406761baef00f2488b1254c4cd7ed1000e864f5"),
     "control": (9, "350e9aec3d0ce5466da723cf905a398bcb183fcafee5963145a2e8d8149a564e"),
-    "retained": (267, "9356ac2126f4ccdc10fc268fbda0394a56a0b704f2beb4f31f6657075e23a8b8"),
-    "retained_query": (94, "165209df95c945a005adeb119f6282d55c64b89f663beecee826dc08f7eecb52"),
-    "continuations": (173, "523a1246c70c3c114465c0f2ee0b2f3156e408e4de8d4f7b8f72ca4be5a4b08b"),
+    "retained": (290, "bb53336eff27df45a8772dd4e38d57ad17232a13540fc0fb89e6a69dbb35edf1"),
+    "retained_query": (106, "fbb6850d5bad62e4b36a2e41a22a208de8f62b195fc46ab21114d0888e138d21"),
+    "continuations": (184, "9c835f4e8074b9dd34d7f07cb987de8f2efd25e0f6ba33ba19b2cf0d38857c5b"),
 }
 EXPECTED_EXCLUDED_CLASS = {
     "name_collision": (1, "0a5b046d07f6f971b7776de682f57c5b9cdc8fa060db7ef59de82e721c8098f4"),
@@ -924,7 +927,7 @@ EXPECTED_EXCLUDED_CLASS = {
 }
 EXPECTED_INDEX_CLASS = {
     "native": (30, "3b16acd55987dcf28f7ed4b681251e34c2e0bc176b3cb6b255450b18f735f181"),
-    "relation": (93, "dd169f9790b6b51b45ceb874cfa5a5dc039ec79e8f77ef8721141b94f5c97735"),
+    "relation": (99, "b21507eb0f288c514f0ec949094228be53f17b5d936f96a79f6214ba99a0837c"),
     "control": (2, "b218edfa8ee128a727a7add20c49c3ab3ecfd99c0ab39a4505d587b637ac9f4f"),
 }
 EXPECTED_INDEX_CONTENT = (
@@ -934,34 +937,34 @@ EXPECTED_INDEX_CONTENT = (
 EXPECTED_INDEX_BOUNDS = (20826, 20828, 22456, 22458)
 EXPECTED_INDEX_BOUNDARY_TEXT = ("#### Index", "#### Colophon")
 EXPECTED_INDEX_SEMANTIC_UNIVERSE = (
-    125,
-    "6506671a99f5a07bbe522dad9b0abd36c7d613d18184874a32b458051bdb8d0b",
+    131,
+    "4d6efab64c29295d8de92f5dc74f0ce313c1ac653a7fc4043d6c3a747bb5c092",
 )
 EXPECTED_INDEX_QUERY_MISSES = (
-    80,
-    "03102ba3d460def2f5dd062308b9e91059f926947eec495739eda29b1c0a2226",
+    76,
+    "42cb4863e86aa5cc1b0947cb264f04a78a1375fe08cd15ddbb908be26b8c9683",
 )
 EXPECTED_INDEX_BROAD_VOCABULARY = (
-    103,
-    "a033f5dcb776e11b95335497d9aa5374aa92ad36e94f45586cafc65f2647d1c0",
+    108,
+    "9703e5dd0c89395b317f2ac703cdd233cc21aec85f8f819371365b1776d7d784",
 )
 EXPECTED_INDEX_HOSTILE_AUDIT_CANDIDATES = (
-    59,
-    "e28eced6406a843e574b61a41c54671ae58e87e92786ffe9fed10c57c065a684",
+    65,
+    "49d69946889aa1cbe5545b8918e55e8a572ceec0a0ff635442c352e9a6955783",
 )
 EXPECTED_INDEX_AUDIT_CANDIDATES = (
-    139,
-    "3d77faddd09611f6fc6ca70ae718729825a0742d98039f4024ba46525b11220a",
+    145,
+    "a791c662d2d37fbd157cc7b3169119b911abde141f88cfb0e7aae32415d5d69e",
 )
 EXPECTED_INDEX_BROAD_PATTERN_DIGEST = (
-    "d0a0e1b4b615d15ea3a2cf503738fa66c3ececf631b08da5aba653ac534097e8"
+    "f7fb322c04a30e46bc41f360d2ff0663d15d16c3637e02d3603e1377a945dd89"
 )
 EXPECTED_INDEX_DISPOSITION = {
     "native": EXPECTED_INDEX_CLASS["native"],
     "relation": EXPECTED_INDEX_CLASS["relation"],
     "control": EXPECTED_INDEX_CLASS["control"],
     "excluded": (16, "0cba561e4c20a6bac1b7ed2d58c255b8250b6fc5bb4da0449c382b50247b0411"),
-    "unrelated": (756, "fb18d8f3599294848f313e46d34e2dd1aca435d803a79e3a1f761b33767e322c"),
+    "unrelated": (750, "6be5c64df048eae2acac7c6f7939a848c1f2dd697408ad27e7a97bc7500cd095"),
 }
 EXPECTED_STRICT_MAIN_PARTITION = {
     "native": (102, "bd76954762c925f2ecf6bf0fa97d9c15db19d598a297a9c56d74e12d1dc41d59"),
@@ -980,11 +983,11 @@ EXPECTED_STRICT_NOTES_PARTITION = {
 }
 EXPECTED_IMAGE_PARTITION = {
     "native": (11, "45fe870caa33fa2cc0b702a8158564f987fb186a1742f1bbafc940cf8c738894"),
-    "relation": (12, "1733851c97444c9a966ea16d19b86a37310e23f393ee8ba1f8089e3a522c49a2"),
+    "relation": (15, "f922813319fbb841d89b09209a82ef8269e18764c641bac6b75972ba45958d5a"),
     "control": (1, "71887428c764ac67b3bd6ce9f4212ff7e7fe6803e507b5b11345d7c6a6c95a1e"),
-    "governed": (24, "2dcad870ac6f500bf924a74b60c04093ae591911c688ef4f3bfb81b8130103ca"),
+    "governed": (27, "826a9447681a048169747d57b7cf9b1c067c7357199d3cf92bf408961ac23999"),
     "excluded": (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
-    "candidate": (24, "2dcad870ac6f500bf924a74b60c04093ae591911c688ef4f3bfb81b8130103ca"),
+    "candidate": (27, "826a9447681a048169747d57b7cf9b1c067c7357199d3cf92bf408961ac23999"),
 }
 EXPECTED_IMAGE_ROLE_PARTITION = {
     "native": EXPECTED_IMAGE_PARTITION["native"],
@@ -1004,12 +1007,12 @@ EXPECTED_UNRESOLVED_IMAGE_LINES = (
     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 )
 EXPECTED_IMAGE_ASSET_MANIFEST = (
-    24,
-    "1cbfe8ffc3de77048a2d407c7ef63896dac86a8fc3ec83c7b00c1ea84e6f019e",
+    27,
+    "9fb44dd3086ff0c853d09a867ccdfdd60716037fc4f52d527f6ec1bc217d6ffc",
 )
 EXPECTED_SOURCE_SEMANTIC_GUARDS = (
-    42,
-    "76ba47d0a82d2fae8d2dea007939b1f1937360ed64a1de643e80182da40dd9bb",
+    58,
+    "f647547a7d1c19982b659df6112d6408992129768ff1ca38ab9eb61da5d58205",
 )
 EXPECTED_SOURCE_DEFECT_GUARDS = (
     24,
@@ -1017,18 +1020,18 @@ EXPECTED_SOURCE_DEFECT_GUARDS = (
 )
 EXPECTED_RECORDS = {
     "excluded_line_hashes": (5, "d3b3134fe2e22ca121f65e3617dce002e45e1880600c264b4c5a100d9614efef"),
-    "index_guards": (125, "13fb445170aa1abee369537b9046621307fbbd47d72e73712aa69155da16137a"),
+    "index_guards": (131, "f1c4bc047a578f6d75c530b5b9145a25e838b6ff76024ca3757d137d5575bf44"),
     "index_excluded_guards": (16, "473fe5dcba32ca177fe1913efb1879f35f72492ee7fd3b2f9fe231025c20382b"),
-    "index_dispositions": (897, "7fb3b037b55446f768f6975a1ac62e78caa6fd4a3525036b25b9451b75aa9ca2"),
+    "index_dispositions": (897, "074ed3b22f74c03a671476dab976205566a2808559605cfdd0387f49e62966a0"),
     "index_sentinels": (8, "129bc6a4ef7cc76b5020676e603a2b5621ef56354b8ca2cd2fb4361938791710"),
     "strict_main_dispositions": (117, "94bed33e54122c19903a478a562a10d69491890aef04978d417bb53b3b13db91"),
-    "strict_notes_dispositions": (0, ""),
+    "strict_notes_dispositions": (126, "3d4cb793dae2cfa4df4d14bb4070efeb32ccba45ebfc221234700c2734f645aa"),
     "semantic_guards": EXPECTED_SOURCE_SEMANTIC_GUARDS,
     "auxiliary_guards": (8, "bb1c06175c4a5856879b75936917159d7125f734ad6350cc26f618cb2da23b18"),
     "source_defects": EXPECTED_SOURCE_DEFECT_GUARDS,
-    "source_model": (32, "8ba5c526bd482ac86447e79c616bd3da5f678cc0c60fe4943a01d70cc71e6be0"),
-    "image_roles": (24, "9f4b951e3444c26c6a256ef3461ec3132175efb2601f3b89c3073cb6d9f9689f"),
-    "image_assembly_boundaries": (7, "60395054223bb245396b3936dda4349e63a68a6b6306efaf34c5f4484e51132b"),
+    "source_model": (36, "2f4276973762eeb1ec30411e091c262fa7cf36cdaba90f7a6a8697c47a915ea3"),
+    "image_roles": (27, "cf05077adb83b35b0d22b54d35270cc229042e60cdddc413aceaa92d7775a811"),
+    "image_assembly_boundaries": (8, "4c1a07019ffc1eede0c5eeb651f0c752216a8b451fe44b6c561a4eaf4f6995bd"),
     "split_omissions": (89, "0c3dc82ba4879e60782fa0459e4e12768e8e48f4b950474bdc731f382fab6c8f"),
     "split_boundary_witnesses": (7, "c32f23773dbe2707c96bde64ea3fd95445e3ff6efd2bb809718c22d28b9a9884"),
 }
@@ -1036,24 +1039,24 @@ EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 EXPECTED_SPLIT_CROSSWALK = (
-    1179,
-    "b150e9f3e3d58c0642a5a733503c83494bf3f7ddcc34887e7d35467ddc63872e",
+    1202,
+    "a239d56b412a32c46953f5b3043344e865c7adaf1db13bd7f390de9ec84510a6",
 )
 EXPECTED_SPLIT_CLASSES = {
     "EXACT": (
-        1031,
-        "3294b656e03a72f58eda7c47792797c84cb7439db2010393b68cdc17b6741533",
-        "a34c480fcb6e6b46319cb21bd7211235360e3a36589e3ea4415fb1eff8287f12",
+        1049,
+        "7d5e69d7aad89564947400e4605a9fce5edcf9d19bfea559b360737d78eefd9f",
+        "13d6900b6c69f322fbbd9fc544be58cf5f40967413f10defa0ed34862bd963db",
     ),
     "IMAGE_BASENAME": (
-        22,
-        "f1c7069e4d51217045092da88b101b8c34b9c6d60af4080ce6e64d870245e061",
-        "0b8db2d77d1426451dbdebffda4c817e79cbd2aa136773144314bf6a0ba1f56f",
+        25,
+        "181db30e3c6d7359eff4288ba5941fdddd0223b928bb9f19fda43c23c751df58",
+        "ee32725fff6455434802d7c4eed69040abb26e56e6365181ff1dc60679b5e67d",
     ),
     "NORMALIZED": (
-        23,
-        "132e0cb06870878ee5240224268c617441996f59480dcfd8e0f5c0a9510d0fb0",
-        "7e931352aee66d0ab07c4625f2e68a4a11e48235e707ed3352ccc79c66354019",
+        25,
+        "d6660096a957a05dc6d601c43769a6b7cfd5194074cd54ba5f2c3ce85ff5c359",
+        "b0b61fb98c619aac14c38aae885039ad9877d31ea5937d98ab0f43efe516e82e",
     ),
     "SUMMARY": (
         14,
@@ -1071,7 +1074,7 @@ EXPECTED_LOGIC_RECORDS = (
     7,
     "d525310251895f506ca06d964ba736dd53ab659e07fed14d7fbe5422b1648754",
 )
-EXPECTED_AUDIT_DIGEST = "acbea84b531d016a53fa0b0d81da18362b0e008898050e9d895f0a74136611ae"
+EXPECTED_AUDIT_DIGEST = "62f4005c9bf3c2441dccb7fe28e1d7ae3291c1ce60357fc4e8fa419e56608e80"
 
 
 IMAGE_PARTITION = {
