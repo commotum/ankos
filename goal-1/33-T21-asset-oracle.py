@@ -256,10 +256,12 @@ HASH_BOUND_NATIVE = {
 assert set(HASH_BOUND_NATIVE) == C | O
 
 
-# Direct raster transcriptions, governed by BOOK:2174--2198 and
-# BOOK:2922--2930.  The first gallery uses every integer code 450..498 after
-# 22 updates from one black cell; its second plate shows this exact labelled
-# subset after twice as many updates.  The slice plate is an observer.
+# Human-reviewed raster-label transcriptions, governed by BOOK:2174--2198 and
+# BOOK:2922--2930.  These tuples are metadata, not an OCR or pixel replay.  A
+# fail-closed manifest below binds every tuple to its source line and physical
+# asset hash.  The first gallery labels every integer code 450..498 after 22
+# updates from one black cell; its second plate labels the exact subset shown
+# after twice as many updates.  The slice plate is an observer.
 CARDINAL_GALLERY_22_CODES = tuple(range(450, 499))
 CARDINAL_GALLERY_44_CODES = (
     451,
@@ -290,9 +292,10 @@ assert len(CARDINAL_SLICE_CODES) == 32
 assert set(CARDINAL_GALLERY_44_CODES) <= set(CARDINAL_GALLERY_22_CODES)
 
 # The equal-sum random gallery carries one common, visually displayed but not
-# serialized random sample.  Checkpoint labels are exact plate data; they do
-# not define a PRNG, seed law, crop, or boundary.  The continuation contains
-# every nonzero even code below 62 (all-white preserving), excluding 0 and 62.
+# serialized random sample.  Its code and checkpoint labels are hash-bound
+# transcription data only: they do not define a PRNG, seed law, crop, or
+# boundary and therefore cannot support replay.  The continuation labels every
+# nonzero even code below 62 (all-white preserving), excluding 0 and 62.
 SUM_GALLERY_CODES = (4, 12, 24, 30, 38, 52)
 SUM_GALLERY_CHECKPOINT_LABELS = (1, 2, 5, 100, 500)
 SUM_500_CODES = tuple(range(2, 62, 2))
@@ -301,7 +304,8 @@ assert len(SUM_500_CODES) == 30
 assert set(SUM_GALLERY_CODES) <= set(SUM_500_CODES)
 
 # Notes growth-rule labels transcribed from the five hash-bound panels.  The
-# source formula, not the plotted shapes, defines the center-conditioned rule.
+# manifest below binds each tuple to its own panel hash.  The source formula,
+# not the plotted shapes, defines the center-conditioned rule.
 GROWTH_CARDINAL_COUNTS = (
     (1,),
     (1, 2),

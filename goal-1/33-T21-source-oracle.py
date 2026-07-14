@@ -160,7 +160,7 @@ def line_set(spec: str) -> frozenset[int]:
 
 
 # 180 queried lines are retained after review; 42 broad-query collisions are
-# excluded.  The other 132 retained lines are governed continuations, source-
+# excluded.  The other 158 retained lines are governed continuations, source-
 # bound images, multiline implementations, and typed close-family controls.
 MATCHED_RETAINED = line_set(
     "142,670,672,850,1254,2156,2168,2170,2174,2178,2180,2184,2190,2194,"
@@ -181,6 +181,16 @@ MATCHED_RETAINED = line_set(
     "19274,19588,20480"
 )
 
+SEED_REALIZATION_CONTINUATIONS = (
+    frozenset(range(11081, 11088))
+    | frozenset({11090, 11092})
+    | frozenset(range(11095, 11101))
+    | line_set(
+        "11103,11106,11107,11110,11112,11114,11116,11118,11120,11122,11124"
+    )
+)
+EXPECTED_SEED_REALIZATION_DIGEST = "9898b607ccc3a32a8dfc380f7efb5f68806c56dbe9af7e3b7c1932e33d6e45a7"
+
 GOVERNED_CONTINUATIONS = line_set(
     "2172,2176,2182,2186,2188,2192,2196,2200,2204,2210,2214,2216,2220,"
     "2222,2224,2228,2232,2240,2242,2244,2246,2248,2252,2254,2258,2260,"
@@ -194,11 +204,11 @@ GOVERNED_CONTINUATIONS = line_set(
     "13592,13593,13594,13595,13596,13597,13599,13603,13605,13607,13609,"
     "13611,13615,13624,13626,13628,13630,13632,13634,13636,13638,13640,"
     "13646,13648,13652,13656,13658"
-)
+) | SEED_REALIZATION_CONTINUATIONS
 
 RETAINED = MATCHED_RETAINED | GOVERNED_CONTINUATIONS
-EXPECTED_SOURCE_COUNT = 312
-EXPECTED_SOURCE_DIGEST = "50caf57ebaa912d54ca50df2ec22ebcd418d2b898fbe03414de0af282e9fa60d"
+EXPECTED_SOURCE_COUNT = 338
+EXPECTED_SOURCE_DIGEST = "b6e1ac355e48891cf644372ba96271e6fcb637dcc15d9212e118612b0e82e227"
 
 # Native T21 mechanics are only the square/cardinal construction, the shared
 # old-snapshot update, its three explicit rule representations, seeds, and
@@ -215,6 +225,7 @@ NATIVE_EVIDENCE = (
         "13555,13556,13557,13558,13559,13561,13563,13565,13567,13569,13571,"
         "13573,13575,13577,13617,13619,14301,14336"
     )
+    | SEED_REALIZATION_CONTINUATIONS
 )
 
 T22_CONTROL = line_set(
@@ -245,10 +256,10 @@ EXPECTED_SET = {
     "pre_index_union": (222, "6dd224ef51b5d767b3f1aa15264680584323dcd41f0cecb5cbc3178eb6ac2710"),
     "index": (61, "0d24061a7997946b106a2afe88529d9af0ecdf285b46b3c1d96ca729414d2684"),
     "matched_retained": (180, "5998b9deafc9b19404c07de328dc188771b80b8fcaece58e46f403eecb269584"),
-    "governed_continuations": (132, "1f693900e93176cd68716b4f8a9edc7c2673d9216c6a295e0fe2d6b24aed1b92"),
-    "retained": (312, EXPECTED_SOURCE_DIGEST),
+    "governed_continuations": (158, "a086ab8b3e6c05a33c2fd79bb5f251e6e56a0c52240b96b47ed956e4de3d9fc0"),
+    "retained": (338, EXPECTED_SOURCE_DIGEST),
     "excluded": (42, "c09e0fd7840d9479290be19d0c6f32fc632a2900ad03154839ec019055c770ba"),
-    "native": (104, "dadb04aef72a78f676cd06ef87109faf2581b6dde190fddc813fbe873220a640"),
+    "native": (130, "a91fea141447726e6079889ead171148744131dfa112ecd8f785ccab67cc4ed0"),
     "relation": (75, "e8de98fc89586c37b194a028f97211f38a109433bea50f34ed60c8cee3abb10f"),
     "control": (133, "374a2a8a05ea9a10db23aace923856cfd116394b2e64c3fba9c18a43abe72224"),
 }
@@ -310,7 +321,7 @@ EXPECTED_SPLIT_DIRECT_COUNTS = {
 }
 EXPECTED_SPLIT_DIRECT_COUNTS_DIGEST = "ab544ec1361afc04d4f33a8db64d488ec91cc9797fb719b60fde70ca5274f224"
 
-EXPECTED_EXACT_RETAINED_MIRRORS = (244, "0f6aad633c172e9089bb0f5ab7fa6ef7cdbd99363461040567c543597f6df895")
+EXPECTED_EXACT_RETAINED_MIRRORS = (270, "678bd4fbc4749643dcda0e3a2e9738e9fcd69ba223bf83c719d32de1b9339233")
 EXPECTED_SPLIT_NONEXACT_RETAINED = (68, "dec93299051fddeddfde24bdc9365789d7224fc005958ac153a2fe9cecd3ff29")
 MONOLITH_ONLY_RETAINED = frozenset({670, 672})
 EXPECTED_MONOLITH_ONLY_DIGEST = "e92cb1a2eccf4c40fee9c336e8d42bd0e32a46aeda886ad95524aa9a318b622e"
@@ -323,6 +334,35 @@ MANUAL_RETAINED_WITNESSES = {
 EXPECTED_RETAINED_MAPPING_COUNT = 66
 EXPECTED_RETAINED_MAPPING_DIGEST = "5c757acfb0a537ea2538bcad0ab6ddb36f309b57929d1e36e8aab1977f78e0d9"
 EXPECTED_RETAINED_WITNESS_DIGEST = "dae36d70a1c812eeb498dabc7ab396dfa775847cb8858806b27a5a6827ef330b"
+
+SEED_REALIZATION_SPLIT_MIRRORS = {
+    11081: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2462",
+    11082: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2463",
+    11083: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2464",
+    11084: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2465",
+    11085: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2466",
+    11086: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2467",
+    11087: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2468",
+    11090: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2471",
+    11092: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2473",
+    11095: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2476",
+    11096: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2477",
+    11097: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2478",
+    11098: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2479",
+    11099: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2480",
+    11100: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2481",
+    11103: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2484",
+    11106: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2487",
+    11107: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2488",
+    11110: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2491",
+    11112: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2493",
+    11114: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2495",
+    11116: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2497",
+    11118: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2499",
+    11120: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2501",
+    11122: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2503",
+    11124: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2505",
+}
 
 
 def digest(lines: set[int] | frozenset[int]) -> str:
@@ -501,6 +541,49 @@ def main() -> int:
     )
     ok &= update_domain_ok
     print("discrete_t_plus_2d_configuration_topology", "OK" if update_domain_ok else "MISMATCH")
+
+    seed_realization_trace_ok = (
+        len(SEED_REALIZATION_CONTINUATIONS) == 26
+        and digest(SEED_REALIZATION_CONTINUATIONS)
+        == EXPECTED_SEED_REALIZATION_DIGEST
+        and "superimposed on a b background" in at(11081)
+        and "b_1, b_2" in at(11082)
+        and "superimposed on a background of" in at(11083)
+        and "repetitions of b_1" in at(11084)
+        and "off_1" in at(11085)
+        and "at offsets off_i on a background" in at(11086)
+        and "a_{11}" in at(11087)
+        and "explicit list of values in two dimensions" in at(11090)
+        and "values in d dimensions with d-dimensional padding" in at(11090)
+        and "positive direction in each coordinate relative to the origin" in at(11092)
+        and "All all steps 0 through t" in at(11095)
+        and "u steps 0 through u" in at(11096)
+        and "last step (step t)" in at(11097)
+        and "step u" in at(11098)
+        and "steps u_1 through u_2" in at(11099)
+        and "u_1 + du" in at(11100)
+        and "evolution list of length t+1" in at(11103)
+        and "Space offsets" in at(11103)
+        and "all cells that can be affected" in at(11106)
+        and "initial condition" in at(11107)
+        and "region that differs from the background" in at(11110)
+        and "aligned with beginning of aspec" in at(11112)
+        and "offsets up to x on the right" in at(11114)
+        and "offsets up to x on the left" in at(11116)
+        and "cell at offset x to the right" in at(11118)
+        and "cells at offsets" in at(11120)
+        and "x_1 + dx" in at(11122)
+        and "always the same size" in at(11124)
+        and "region that can be affected after t steps" in at(11124)
+        and "Automatic can be used to trim off background" in at(11124)
+    )
+    ok &= seed_realization_trace_ok
+    print(
+        "seed_background_trace_realization",
+        "OK" if seed_realization_trace_ok else "MISMATCH",
+        len(SEED_REALIZATION_CONTINUATIONS),
+        digest(SEED_REALIZATION_CONTINUATIONS),
+    )
 
     controls_ok = (
         "eight neighbors—including diagonals" in at(2212)

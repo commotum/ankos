@@ -10,14 +10,14 @@ parameterization of the already-generic cellular-automaton construction:
 
 The native support is the square integer lattice.  Finite periodic/fixed
 boxes are explicit computational realizations, never an implicit change to
-that support.  The center cell is a distinct member of the RULE input schema;
-the T21 geometric neighborhood contains exactly the four orthogonal offsets.
+that support.  The NEIGHBORHOOD read schema explicitly composes one Self
+component with exactly four ordered orthogonal OffsetAccess components; the
+RULE input preserves Self separately from the four surrounding values.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
 from itertools import product
 from math import prod
 from typing import Protocol
@@ -36,9 +36,9 @@ NEG_AXIS_1: Offset = (0, -1)
 POS_AXIS_1: Offset = (0, 1)
 POS_AXIS_0: Offset = (1, 0)
 
-# BOOK:13513-13518 gives the sorted five-cell offset list including center.
-# The architecture normalized here keeps center in LocalRead/RULE and keeps
-# only the four geometric neighbors in the neighborhood axis.
+# BOOK:13513-13518 gives the sorted five-cell position list including center.
+# The complete access schema below represents its zero displacement as a
+# declared Self component and its other four positions as OffsetAccess values.
 ORTHOGONAL_2D: tuple[Offset, ...] = (
     NEG_AXIS_0,
     NEG_AXIS_1,
@@ -1151,11 +1151,20 @@ def sparse_read(
     if program.neighborhood.dimension != field_state.dimension:
         raise ValueError("program and infinite field dimensions differ")
     checked = checked_coord(coord, field_state.dimension)
+    declared_values = tuple(
+        field_state.value_at(checked)
+        if type(component) is SelfAccess
+        else field_state.value_at(add_coord(checked, component.offset))
+        for component in program.neighborhood.components
+    )
     return LocalRead(
-        field_state.value_at(checked),
+        declared_values[program.neighborhood.self_position],
         tuple(
-            field_state.value_at(add_coord(checked, offset))
-            for offset in program.neighborhood.offsets
+            value
+            for component, value in zip(
+                program.neighborhood.components, declared_values, strict=True
+            )
+            if type(component) is OffsetAccess
         ),
     )
 
@@ -1309,6 +1318,20 @@ def assert_strict_local_form_roundtrips() -> dict[str, int]:
     # the directional projection supplies an asymmetric multi-bit guard.
     asymmetric = projection_rule(2, 4, 0)  # raw (-1,0), not a compass assumption
     asymmetric_code = strict_t21_general_to_code(asymmetric)
+    projection_tables = (
+        projection_rule(2, 4, 0),
+        projection_rule(2, 4, 1),
+        projection_rule(2, 4, -1),
+        projection_rule(2, 4, 2),
+        projection_rule(2, 4, 3),
+    )
+    assert tuple(strict_t21_general_to_code(table) for table in projection_tables) == (
+        0xFFFF0000,
+        0xFF00FF00,
+        0xF0F0F0F0,
+        0xCCCCCCCC,
+        0xAAAAAAAA,
+    )
     general_codes = {0, (1 << 32) - 1, asymmetric_code}
     general_codes.update(1 << index for index in range(32))
     for code in general_codes:
@@ -1376,6 +1399,101 @@ def assert_strict_local_form_roundtrips() -> dict[str, int]:
     }
 
 
+def assert_book_to_runtime_basis_permutation() -> int:
+    """Prove the row/column -> ENU basis and table permutation commute."""
+
+    transformed, runtime_sorted, runtime_to_book, book_to_runtime = basis_permutations()
+    assert transformed == (
+        (0, 1),
+        (-1, 0),
+        (0, 0),
+        (1, 0),
+        (0, -1),
+    )
+    assert runtime_sorted == (
+        (-1, 0),
+        (0, -1),
+        (0, 0),
+        (0, 1),
+        (1, 0),
+    )
+    assert runtime_to_book == (1, 4, 2, 0, 3)
+    assert book_to_runtime == (3, 0, 2, 4, 1)
+
+    expected_runtime_projection_codes = (
+        0xCCCCCCCC,
+        0xFFFF0000,
+        0xF0F0F0F0,
+        0xAAAAAAAA,
+        0xFF00FF00,
+    )
+    assert tuple(
+        permute_book_code_to_runtime(code) for code in BOOK_GENERAL_PROJECTION_CODES
+    ) == expected_runtime_projection_codes
+    assert tuple(
+        permute_runtime_code_to_book(code) for code in expected_runtime_projection_codes
+    ) == BOOK_GENERAL_PROJECTION_CODES
+
+    permutation_cases = 0
+    for book_code in BOOK_GENERAL_PROJECTION_CODES:
+        runtime_code = permute_book_code_to_runtime(book_code)
+        assert permute_runtime_code_to_book(runtime_code) == book_code
+        for runtime_context in product((0, 1), repeat=5):
+            book_context = runtime_context_to_book_context(runtime_context)
+            assert book_context_to_runtime_context(book_context) == runtime_context
+            book_output = (
+                book_code >> binary_digits_to_index(book_context)
+            ) & 1
+            runtime_output = (
+                runtime_code >> binary_digits_to_index(runtime_context)
+            ) & 1
+            assert runtime_output == book_output
+            permutation_cases += 1
+
+    # Naively reusing the BOOK code after lexicographically sorting the ENU
+    # positions silently changes north projection into west projection.
+    book_north_code = BOOK_GENERAL_PROJECTION_CODES[0]
+    runtime_north_code = permute_book_code_to_runtime(book_north_code)
+    runtime_context = (0, 0, 0, 1, 0)  # W,S,Self,N,E in lex ENU order
+    book_context = runtime_context_to_book_context(runtime_context)
+    assert book_context == (1, 0, 0, 0, 0)
+    direct_output = (
+        book_north_code >> binary_digits_to_index(book_context)
+    ) & 1
+    naive_output = (
+        book_north_code >> binary_digits_to_index(runtime_context)
+    ) & 1
+    certified_output = (
+        runtime_north_code >> binary_digits_to_index(runtime_context)
+    ) & 1
+    assert (direct_output, naive_output, certified_output) == (1, 0, 1)
+    assert runtime_north_code == 0xCCCCCCCC
+
+    # The same distinction is visible in a complete non-aliasing 5x5 step.
+    native = Native2DState(
+        2,
+        (5, 5),
+        FixedBoundary(0),
+        cells_with_one((5, 5), (2, 2)),
+    )
+    native_next = native_book_general_step(book_north_code, native)
+    runtime_old = native_row_column_to_enu_grid(native)
+    certified_program = strict_t21_program(
+        strict_t21_general_from_code(runtime_north_code)
+    )
+    naive_program = strict_t21_program(strict_t21_general_from_code(book_north_code))
+    certified_next = generic_ca_step(certified_program, runtime_old)
+    naive_next = generic_ca_step(naive_program, runtime_old)
+    expected_runtime_next = native_row_column_to_enu_grid(native_next, generation=1)
+    assert certified_next == expected_runtime_next
+    assert naive_next != expected_runtime_next
+    assert nonzero_coords(certified_next) == ((2, 1),)
+    assert nonzero_coords(naive_next) == ((3, 2),)
+
+    assert permutation_cases == 160
+    return permutation_cases
+
+
 def assert_exhaustive_native_commutation() -> dict[str, int]:
     """Prove e(step_native(x)) = step_generic(e(x)) on bounded universes."""
 
@@ -1384,6 +1502,7 @@ def assert_exhaustive_native_commutation() -> dict[str, int]:
     outer_cases = 0
     totalistic_cases = 0
     positional_cases = 0
+    general_basis_cases = 0
     nonaliasing_directional_cases = 0
     ternary_cases = 0
 
@@ -1412,6 +1531,29 @@ def assert_exhaustive_native_commutation() -> dict[str, int]:
             generic = generic_ca_step(program, encode_native(native))
             assert decode_generic(generic) == direct
             totalistic_cases += 1
+
+    # Every one-hot row of the full 32-context code is exercised at the
+    # center of a non-aliasing 5x5 native configuration; zero and full tables
+    # guard both endpoints.  This tests the direct numeric evaluator beyond
+    # the five projection patterns.
+    general_basis_codes = (0, (1 << 32) - 1, *(1 << index for index in range(32)))
+    for code in general_basis_codes:
+        active_index = code.bit_length() - 1 if code and code != (1 << 32) - 1 else 0
+        context = tuple((active_index >> shift) & 1 for shift in (4, 3, 2, 1, 0))
+        literal_positions = ((1, 2), (2, 1), (2, 2), (2, 3), (3, 2))
+        native_cells = [0] * 25
+        for coord, value in zip(literal_positions, context, strict=True):
+            native_cells[flat_index((5, 5), coord)] = value
+        native = Native2DState(2, (5, 5), FixedBoundary(0), tuple(native_cells))
+        direct = native_book_general_step(code, native)
+        generic = generic_ca_step(
+            strict_t21_program(strict_t21_general_from_code(code)),
+            encode_native(native),
+        )
+        assert decode_generic(generic) == direct
+        if code not in (0, (1 << 32) - 1):
+            assert direct.value_at(2, 2) == 1
+        general_basis_cases += 1
 
     # Totalistic tests cannot catch an offset-order reversal.  Each center or
     # directional projection is therefore checked against every 2x2 state.
@@ -1466,12 +1608,14 @@ def assert_exhaustive_native_commutation() -> dict[str, int]:
     assert outer_cases == 16_384
     assert totalistic_cases == 1_024
     assert positional_cases == 80
+    assert general_basis_cases == 34
     assert nonaliasing_directional_cases == 125
     assert ternary_cases == 81
     return {
         "outer": outer_cases,
         "totalistic": totalistic_cases,
         "positional": positional_cases,
+        "general_basis": general_basis_cases,
         "nonaliasing_directional": nonaliasing_directional_cases,
         "ternary": ternary_cases,
     }
@@ -1757,6 +1901,7 @@ def assert_hostile_validation() -> None:
     expect_raises(ValueError, lambda: LocalAccess((SelfAccess(), SelfAccess(), OffsetAccess(NEG_AXIS_0))))
     expect_raises(TypeError, lambda: LocalAccess((SelfAccess(), object())))
     expect_raises(TypeError, lambda: make_local_access((NEG_AXIS_0,), True))
+    expect_raises(TypeError, lambda: LocalAccess([SelfAccess(), OffsetAccess(NEG_AXIS_0)]))
     expect_raises(TypeError, lambda: BinaryOuterTotalistic(True, 4))
     expect_raises(ValueError, lambda: BinaryOuterTotalistic(1024, 4))
     expect_raises(TypeError, lambda: BinaryTotalistic(False, 4))
@@ -1771,6 +1916,15 @@ def assert_hostile_validation() -> None:
     expect_raises(TypeError, lambda: strict_t21_general_to_code(BinaryTotalistic(0, 4)))
     expect_raises(TypeError, lambda: factor_outer_totalistic(BinaryTotalistic(0, 4)))
     expect_raises(TypeError, lambda: factor_totalistic(BinaryOuterTotalistic(0, 4)))
+    expect_raises(TypeError, lambda: book_row_column_to_enu([-1, 0]))
+    expect_raises(TypeError, lambda: book_row_column_to_enu((-1, False)))
+    expect_raises(TypeError, lambda: permute_book_code_to_runtime(True))
+    expect_raises(ValueError, lambda: permute_book_code_to_runtime(1 << 32))
+    expect_raises(TypeError, lambda: runtime_context_to_book_context([0, 0, 0, 0, 0]))
+    expect_raises(
+        TypeError,
+        lambda: runtime_context_to_book_context((0, 0, False, 0, 0)),
+    )
 
     expect_raises(
         ValueError,
@@ -1807,6 +1961,7 @@ def assert_hostile_validation() -> None:
         ),
     )
     expect_raises(ValueError, lambda: read_local(old, (active[0], active[0]), program.neighborhood))
+    expect_raises(TypeError, lambda: read_local(old, active, object()))
 
     tampered_reads = (LocalRead(1 - reads[0].center, reads[0].neighbors), *reads[1:])
     expect_raises(
@@ -1859,6 +2014,16 @@ def assert_hostile_validation() -> None:
         ValueError,
         lambda: Native2DState(2, (2, 2, 2), PeriodicBoundary(), (0,) * 8),
     )
+    native = Native2DState(2, (2, 2), PeriodicBoundary(), (0, 0, 0, 0))
+    expect_raises(TypeError, lambda: native_book_general_step(True, native))
+    expect_raises(ValueError, lambda: native_book_general_step(1 << 32, native))
+    expect_raises(TypeError, lambda: native_book_outer_step(False, native))
+    expect_raises(ValueError, lambda: native_book_outer_step(1 << 10, native))
+    expect_raises(TypeError, lambda: native_book_totalistic_step(False, native))
+    expect_raises(ValueError, lambda: native_book_totalistic_step(1 << 6, native))
+    expect_raises(TypeError, lambda: native_book_projection_step(True, native))
+    expect_raises(ValueError, lambda: native_book_projection_step(5, native))
+    expect_raises(TypeError, lambda: native_row_column_to_enu_grid(native, generation=True))
     expect_raises(
         TypeError,
         lambda: make_sparse_field(2, True, 0, ()),
@@ -1903,8 +2068,8 @@ DECISION_MATRIX: tuple[tuple[str, str, str, str], ...] = (
     (
         "NEIGHBORHOOD",
         "parameterization",
-        "OrderedOffsets",
-        "four unique orthogonal offsets; center remains a RULE input role",
+        "ComposedLocalAccess(Self,OrderedOffsets)",
+        "exactly one declared Self plus four unique ordered cardinal offsets",
     ),
     (
         "RULE",
@@ -1952,8 +2117,20 @@ def main() -> None:
     assert tuple(name for name, _offset in ROW_COLUMN_COMPASS) != tuple(
         name for name, _offset in XY_EAST_NORTH_COMPASS
     )
+    t21_access = strict_t21_program(BinaryTotalistic(0, 4)).neighborhood
+    assert tuple(type(component) for component in t21_access.components) == (
+        OffsetAccess,
+        OffsetAccess,
+        SelfAccess,
+        OffsetAccess,
+        OffsetAccess,
+    )
+    assert t21_access.self_position == 2 and t21_access.offsets == ORTHOGONAL_2D
+    t22_access = strict_t22_program(BinaryTotalistic(0, 8)).neighborhood
+    assert t22_access.self_position == 4 and t22_access.offsets == MOORE_2D
     assert_book_codes_and_counts()
     form_counts = assert_strict_local_form_roundtrips()
+    basis_cases = assert_book_to_runtime_basis_permutation()
     counts = assert_exhaustive_native_commutation()
     assert_wrapped_slot_multiplicity()
     assert_asymmetric_orientation_and_parallelism()
@@ -1965,21 +2142,27 @@ def main() -> None:
     assert_decision_matrix()
 
     total_cases = sum(counts.values())
-    assert total_cases == 17_569
+    assert total_cases == 17_728
+    assert basis_cases == 160
     print("T21 semantic oracle: PASS")
     print(f"commutation_cases={total_cases}")
     print(f"outer_totalistic_cases={counts['outer']}")
     print(f"totalistic_cases={counts['totalistic']}")
     print(f"positional_cases={counts['positional']}")
+    print(f"general_basis_commutation_cases={counts['general_basis']}")
+    print(f"nonaliasing_directional_cases={counts['nonaliasing_directional']}")
     print(f"ternary_alphabet_cases={counts['ternary']}")
+    print(f"basis_permutation_cases={basis_cases}")
     print(f"general_codec_basis_cases={form_counts['general_codec']}")
     print(f"outer_factor_roundtrips={form_counts['outer_factor']}")
     print(f"totalistic_factor_roundtrips={form_counts['totalistic_factor']}")
     print("book_codes=1022,942; rule_counts=2^32,2^12,2^10,2^6")
     print("code_1022_t0_t6=PASS; exact_Z2_sparse_support=PASS")
-    print("four_orthogonal_offsets=PASS; center_in_rule_schema=PASS")
+    print("projection_codes=FFFF0000,FF00FF00,F0F0F0F0,CCCCCCCC,AAAAAAAA")
+    print("complete_declared_access=Self+four_orthogonal_offsets=PASS")
     print("all_sites=PASS; old_snapshot_parallel_same_site=PASS")
-    print("raw_sorted_offsets=PASS; explicit_compass_isomorphisms=PASS")
+    print("raw_sorted_offsets=PASS; row_column_to_ENU_basis_permutation=PASS")
+    print("naive_resort_adversary=PASS; certified_table_input_permutation=PASS")
     print("asymmetric_orientation=PASS; wrapped_slot_multiplicity=PASS")
     print("outer_and_equal_sum_quotient_adversaries=PASS")
     print("finite_realization_boundary_separation=PASS")
