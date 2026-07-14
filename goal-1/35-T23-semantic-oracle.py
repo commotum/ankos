@@ -1061,6 +1061,7 @@ NAMED_CODES: tuple[tuple[str, str, int], ...] = (
     ("full_exactly_one", "full", 12),
     ("full_exactly_two", "full", 48),
     ("full_exactly_three", "full", 192),
+    ("face_self_plus_six_majority", "axes", 16_256),
     ("life3d_5_7_6", "full", 47_104),
     ("life3d_4_5_5", "full", 3_584),
     ("life3d_5_6_5", "full", 11_264),
@@ -1091,6 +1092,16 @@ def named_rules() -> tuple[tuple[str, CountProductRule | ShellCountRule], ...]:
         ("full_exactly_one", shell_predicate_rule("full", lambda count: int(count == 1))),
         ("full_exactly_two", shell_predicate_rule("full", lambda count: int(count == 2))),
         ("full_exactly_three", shell_predicate_rule("full", lambda count: int(count == 3))),
+        (
+            "face_self_plus_six_majority",
+            binary_count_rule(
+                "axes",
+                named_count_code(
+                    lambda center, count: int(center + count >= 4),
+                    6,
+                ),
+            ),
+        ),
         ("life3d_5_7_6", binary_count_rule("full", life3d_code(5, 7, 6))),
         ("life3d_4_5_5", binary_count_rule("full", life3d_code(4, 5, 5))),
         ("life3d_5_6_5", binary_count_rule("full", life3d_code(5, 6, 5))),
@@ -1318,3 +1329,1082 @@ def book_projection_face_table(book_position: Offset) -> tuple[int, ...]:
         raise ValueError("position is outside Book face access")
     selected = BOOK_FACE_POSITIONS.index(position)
     return tuple(context[selected] for context in product((0, 1), repeat=7))
+
+
+@dataclass(frozen=True)
+class SparseField:
+    """Exact uniform-background-plus-finite-deviations Z^d representation."""
+
+    dimension: int
+    alphabet_size: int
+    background: int
+    entries: tuple[tuple[Coord, int], ...]
+
+    def __post_init__(self) -> None:
+        dimension = require_int(self.dimension, "sparse dimension")
+        if dimension <= 0:
+            raise ValueError("sparse dimension must be positive")
+        alphabet = FiniteAlphabet(self.alphabet_size)
+        alphabet.check(self.background, "sparse background")
+        raw = require_tuple(self.entries, "sparse entries")
+        prior: Coord | None = None
+        for coord, value in raw:
+            checked = checked_coord(coord, dimension, "sparse coordinate")
+            alphabet.check(value, "sparse value")
+            if value == self.background:
+                raise ValueError("sparse entry must differ from background")
+            if prior is not None and checked <= prior:
+                raise ValueError("sparse entries must be uniquely sorted")
+            prior = checked
+
+    def value_at(self, raw_coord: object) -> int:
+        coord = checked_coord(raw_coord, self.dimension)
+        for key, value in self.entries:
+            if key == coord:
+                return value
+            if key > coord:
+                break
+        return self.background
+
+
+def sparse_field(
+    dimension: int,
+    alphabet_size: int,
+    background: int,
+    entries: tuple[tuple[Coord, int], ...],
+) -> SparseField:
+    raw = require_tuple(entries, "sparse entries")
+    normalized = tuple(sorted(raw))
+    return SparseField(dimension, alphabet_size, background, normalized)
+
+
+def sparse_step(program: CAProgram, old: SparseField) -> SparseField:
+    if type(program) is not CAProgram or type(old) is not SparseField:
+        raise TypeError("sparse step needs exact program and field")
+    if program.alphabet.size != old.alphabet_size:
+        raise ValueError("sparse program and field alphabets differ")
+    if program.neighborhood.dimension != old.dimension:
+        raise ValueError("sparse program and field dimensions differ")
+    uniform = LocalRead(old.background, (old.background,) * program.neighborhood.slots)
+    next_background = program.rule.evaluate(uniform)
+    candidates: set[Coord] = set()
+    for coord, _value in old.entries:
+        candidates.add(coord)
+        for offset in program.neighborhood.offsets:
+            candidates.add(subtract_coord(coord, offset))
+    next_entries: list[tuple[Coord, int]] = []
+    for coord in sorted(candidates):
+        read = LocalRead(
+            old.value_at(coord),
+            tuple(old.value_at(add_coord(coord, offset)) for offset in program.neighborhood.offsets),
+        )
+        value = program.rule.evaluate(read)
+        if value != next_background:
+            next_entries.append((coord, value))
+    return SparseField(
+        old.dimension,
+        old.alphabet_size,
+        next_background,
+        tuple(next_entries),
+    )
+
+
+def expect_raises(error: type[BaseException], action: object) -> None:
+    if not callable(action):
+        raise TypeError("test action must be callable")
+    try:
+        action()
+    except error:
+        return
+    except Exception as exc:
+        raise AssertionError(
+            f"expected {error.__name__}, received {type(exc).__name__}"
+        ) from exc
+    raise AssertionError(f"expected {error.__name__}")
+
+
+def assert_source_profiles_and_formulas() -> dict[str, int]:
+    assert BOOK_CUBE_POSITIONS == tuple(sorted(BOOK_CUBE_POSITIONS))
+    assert BOOK_FACE_POSITIONS == tuple(sorted(BOOK_FACE_POSITIONS))
+    assert len(BOOK_FACE_POSITIONS) == 7
+    assert len(BOOK_FACE_OFFSETS) == 6
+    assert len(BOOK_CUBE_POSITIONS) == 27
+    assert len(BOOK_FULL_OFFSETS) == 26
+    assert (0, 0, 0) not in BOOK_FACE_OFFSETS
+    assert (0, 0, 0) not in BOOK_FULL_OFFSETS
+
+    formula_cases = 0
+    for dimension in range(1, 5):
+        for alphabet_size in range(2, 5):
+            axes_shell = 2 * dimension * (alphabet_size - 1) + 1
+            full_shell = (3**dimension - 1) * (alphabet_size - 1) + 1
+            assert shell_count_case_count("axes", dimension, alphabet_size) == axes_shell
+            assert shell_count_case_count("full", dimension, alphabet_size) == full_shell
+            assert count_product_case_count("axes", dimension, alphabet_size) == alphabet_size * axes_shell
+            assert count_product_case_count("full", dimension, alphabet_size) == alphabet_size * full_shell
+            formula_cases += 4
+
+    assert shell_count_case_count("axes", 3, 2) == 7
+    assert count_product_case_count("axes", 3, 2) == 14
+    assert shell_count_case_count("full", 3, 2) == 27
+    assert count_product_case_count("full", 3, 2) == 54
+    assert shell_count_case_count("axes", 3, 3) == 13
+    assert count_product_case_count("axes", 3, 3) == 39
+    assert shell_count_case_count("full", 3, 3) == 53
+    assert count_product_case_count("full", 3, 3) == 159
+
+    predicates = {
+        "face_any_neighbor": lambda center, count: int(count > 0),
+        "face_exactly_one": lambda center, count: int(count == 1),
+        "full_exactly_one": lambda center, count: int(count == 1),
+        "full_exactly_two": lambda center, count: int(count == 2),
+        "full_exactly_three": lambda center, count: int(count == 3),
+    }
+    derived = {
+        name: named_count_code(predicate, 6 if name.startswith("face") else 26)
+        for name, predicate in predicates.items()
+    }
+    assert derived == {
+        "face_any_neighbor": 16_380,
+        "face_exactly_one": 12,
+        "full_exactly_one": 12,
+        "full_exactly_two": 48,
+        "full_exactly_three": 192,
+    }
+    assert life3d_code(5, 7, 6) == 47_104
+    assert life3d_code(4, 5, 5) == 3_584
+    assert life3d_code(5, 6, 5) == 11_264
+    assert named_count_code(lambda center, count: int(center + count >= 4), 6) == 16_256
+    assert tuple((name, rule.profile) for name, rule in named_rules()) == tuple(
+        (name, profile) for name, profile, _code in NAMED_CODES
+    )
+    for (name, rule), (_same_name, _profile, derived_code) in zip(
+        named_rules(), NAMED_CODES, strict=True
+    ):
+        product_rule = expand_shell_to_product(rule) if type(rule) is ShellCountRule else rule
+        assert code_from_outputs(product_rule.outputs) == derived_code, name
+    majority = dict(named_rules())["face_self_plus_six_majority"]
+    for count in range(7):
+        for center in (0, 1):
+            read = LocalRead(center, (1,) * count + (0,) * (6 - count))
+            assert majority.evaluate(read) == int(center + count >= 4)
+
+    # Literal local evaluators cover every binary face context and every
+    # ternary face context without invoking any family dispatch.
+    binary_face_contexts = 0
+    exact_one = named_rules()[1][1]
+    for context in product((0, 1), repeat=7):
+        read = LocalRead(context[0], context[1:])
+        assert exact_one.evaluate(read) == int(sum(context[1:]) == 1)
+        binary_face_contexts += 1
+    ternary_face_contexts = 0
+    ternary = CountProductRule("axes", 3, 3, tuple(index % 3 for index in range(39)))
+    for context in product(range(3), repeat=7):
+        read = LocalRead(context[0], context[1:])
+        assert ternary.evaluate(read) == (context[0] + 3 * sum(context[1:])) % 3
+        ternary_face_contexts += 1
+    return {
+        "formula_cases": formula_cases,
+        "binary_face_contexts": binary_face_contexts,
+        "ternary_face_contexts": ternary_face_contexts,
+    }
+
+
+def assert_ignore_self_factor() -> dict[str, int]:
+    face_signatures = 0
+    for code in range(1 << 7):
+        shell = binary_shell_rule("axes", code)
+        assert factor_product_to_shell(expand_shell_to_product(shell)) == shell
+        face_signatures += 1
+
+    full_bases = (
+        binary_shell_rule("full", 0),
+        binary_shell_rule("full", (1 << 27) - 1),
+        *(binary_shell_rule("full", 1 << index) for index in range(27)),
+    )
+    for shell in full_bases:
+        assert factor_product_to_shell(expand_shell_to_product(shell)) == shell
+
+    valid = expand_shell_to_product(binary_shell_rule("axes", 0))
+    broken_outputs = list(valid.outputs)
+    broken_outputs[1] = 1
+    broken = CountProductRule("axes", 3, 2, tuple(broken_outputs))
+    expect_raises(ValueError, lambda: factor_product_to_shell(broken))
+    assert broken.evaluate(LocalRead(0, (0,) * 6)) == 0
+    assert broken.evaluate(LocalRead(1, (0,) * 6)) == 1
+    return {
+        "face_shell_signatures": face_signatures,
+        "full_shell_bases": len(full_bases),
+        "self_row_rejections": 1,
+    }
+
+
+def assert_complete_compact_maps() -> dict[str, int]:
+    face_signatures = 0
+    for code in range(1 << 14):
+        compact = binary_count_rule("axes", code)
+        complete = expand_face(compact)
+        assert factor_face(complete) == compact
+        face_signatures += 1
+
+    face_multiplicities = fiber_multiplicities(6)
+    assert len(face_multiplicities) == 14
+    assert sum(face_multiplicities) == 128
+    assert face_multiplicities == tuple(
+        comb(6, count) for count in range(7) for _center in (0, 1)
+    )
+
+    full_bases = (
+        binary_count_rule("full", 0),
+        binary_count_rule("full", (1 << 54) - 1),
+        *(binary_count_rule("full", 1 << index) for index in range(54)),
+    )
+    for compact in full_bases:
+        expanded = expand_symbolic(compact)
+        assert expanded.row_count == 1 << 27
+        assert factor_symbolic(expanded) == compact
+
+    full_multiplicities = fiber_multiplicities(26)
+    assert len(full_multiplicities) == 54
+    assert sum(full_multiplicities) == 1 << 27
+    assert full_multiplicities == tuple(
+        comb(26, count) for count in range(27) for _center in (0, 1)
+    )
+    full_zero = binary_count_rule("full", 0)
+    disagreement_context = (0, 1, *((0,) * 25))
+    broken = SymbolicCompleteMap(
+        full_zero,
+        ((disagreement_context, 1),),
+    )
+    expect_raises(ValueError, lambda: factor_symbolic(broken))
+    peer_context = (0, 0, 1, *((0,) * 24))
+    assert sum(disagreement_context[1:]) == sum(peer_context[1:]) == 1
+    assert broken.evaluate_context(disagreement_context) == 1
+    assert broken.evaluate_context(peer_context) == 0
+
+    face_zero = expand_face(binary_count_rule("axes", 0))
+    face_outputs = list(face_zero.outputs)
+    face_outputs[context_index((0, 1, 0, 0, 0, 0, 0), 2)] = 1
+    face_broken = GeneralLookup(2, 6, tuple(face_outputs))
+    expect_raises(ValueError, lambda: factor_face(face_broken))
+    return {
+        "face_compact_signatures": face_signatures,
+        "face_complete_rows_per_signature": 128,
+        "face_expanded_rows_checked": face_signatures * 128,
+        "full_compact_bases": len(full_bases),
+        "full_complete_rows": 1 << 27,
+        "face_fibers": len(face_multiplicities),
+        "full_fibers": len(full_multiplicities),
+        "disagreement_rejections": 2,
+    }
+
+
+def assert_frame_and_table_permutations() -> dict[str, int]:
+    assert BOOK_TO_RUNTIME_FRAME.endswith("_v1")
+    for position in BOOK_CUBE_POSITIONS:
+        assert runtime_offset_to_book(book_offset_to_runtime(position)) == position
+    for position in RUNTIME_CUBE_POSITIONS:
+        assert book_offset_to_runtime(runtime_offset_to_book(position)) == position
+    assert set(RUNTIME_FACE_OFFSETS) == set(axis_offsets(3))
+    assert set(RUNTIME_FULL_OFFSETS) == set(cube_offsets(3))
+    assert RUNTIME_FACE_ACCESS.offsets == tuple(sorted(RUNTIME_FACE_OFFSETS))
+    assert RUNTIME_FULL_ACCESS.offsets == tuple(sorted(RUNTIME_FULL_OFFSETS))
+
+    face_context_cases = 0
+    for book_context in product((0, 1), repeat=7):
+        runtime = book_context_to_runtime_context(
+            book_context, BOOK_FACE_POSITIONS, RUNTIME_FACE_ACCESS
+        )
+        assert runtime_context_to_book_context(
+            runtime, BOOK_FACE_POSITIONS, RUNTIME_FACE_ACCESS
+        ) == book_context
+        face_context_cases += 1
+
+    face_table_bases = 0
+    for row in range(128):
+        book_table = tuple(int(index == row) for index in range(128))
+        runtime = permute_book_face_table_to_runtime(book_table)
+        assert permute_runtime_face_table_to_book(runtime) == book_table
+        face_table_bases += 1
+
+    face_projection_tables = 0
+    for position in BOOK_FACE_POSITIONS:
+        book_table = book_projection_face_table(position)
+        permuted = permute_book_face_table_to_runtime(book_table)
+        projection = projection_program("axes", position).rule
+        assert type(projection) is ProjectionRule
+        assert tuple(
+            projection.evaluate(LocalRead(context[0], context[1:]))
+            for context in product((0, 1), repeat=7)
+        ) == permuted.outputs
+        face_projection_tables += 1
+
+    zero = (0,) * 27
+    full = (1,) * 27
+    full_digit_bases = (zero, full) + tuple(
+        tuple(int(index == selected) for index in range(27))
+        for selected in range(27)
+    ) + tuple(
+        tuple(int(index != selected) for index in range(27))
+        for selected in range(27)
+    )
+    assert len(full_digit_bases) == 56
+    for book_context in full_digit_bases:
+        runtime = permute_full_book_context(book_context)
+        assert inverse_permute_full_context(runtime) == book_context
+        assert context_from_index(context_index(runtime, 2), 27, 2) == runtime
+
+    runtime_to_book_positions = tuple(
+        BOOK_CUBE_POSITIONS.index(runtime_offset_to_book(position))
+        for position in RUNTIME_CUBE_POSITIONS
+    )
+    assert sorted(runtime_to_book_positions) == list(range(27))
+
+    # The Notes' graphics coordinate is separately typed and demonstrably not
+    # used as this representation adapter.
+    witness = (1, 0, 0)
+    assert book_offset_to_runtime(witness) == (0, 0, 1)
+    assert book_cuboid_view_position(witness) == (0, 0, -1)
+    assert book_offset_to_runtime(witness) != book_cuboid_view_position(witness)
+    return {
+        "frame_position_cases": 54,
+        "face_context_cases": face_context_cases,
+        "face_table_bases": face_table_bases,
+        "face_projection_tables": face_projection_tables,
+        "full_digit_bases": len(full_digit_bases),
+        "full_position_permutation": len(runtime_to_book_positions),
+        "view_separation_witnesses": 1,
+    }
+
+
+def assert_native_generic_commutation() -> dict[str, int]:
+    counts = {
+        "face_quotient": 0,
+        "full_quotient": 0,
+        "directional": 0,
+        "named": 0,
+        "ternary": 0,
+    }
+
+    face_bases = (
+        binary_count_rule("axes", 0),
+        binary_count_rule("axes", (1 << 14) - 1),
+        *(binary_count_rule("axes", 1 << index) for index in range(14)),
+    )
+    for rule in face_bases:
+        program = program_for(rule)
+        for mask in range(256):
+            native = Native3DState(2, (2, 2, 2), PeriodicBoundary(), cells_from_mask((2, 2, 2), mask))
+            generic = generic_step(program, encode_native(native))
+            assert decode_generic(generic) == native_count_step(rule, native)
+            counts["face_quotient"] += 1
+
+    full_bases = (
+        binary_count_rule("full", 0),
+        binary_count_rule("full", (1 << 54) - 1),
+        *(binary_count_rule("full", 1 << index) for index in range(54)),
+    )
+    masks = (0, 255, 1, 2, 4, 8, 16, 32, 64, 128, 254, 253, 251, 247, 239, 223)
+    assert len(masks) == 16
+    for rule in full_bases:
+        program = program_for(rule)
+        for mask in masks:
+            native = Native3DState(2, (2, 2, 2), PeriodicBoundary(), cells_from_mask((2, 2, 2), mask))
+            assert decode_generic(generic_step(program, encode_native(native))) == native_count_step(
+                rule, native
+            )
+            counts["full_quotient"] += 1
+
+    directional_native = Native3DState(
+        2,
+        (3, 4, 5),
+        FixedBoundary(0),
+        native_cells_with_points((3, 4, 5), ((((1, 2, 2), 1), ((0, 0, 4), 1)))),
+    )
+    for profile, positions in (
+        ("axes", BOOK_FACE_POSITIONS),
+        ("full", BOOK_CUBE_POSITIONS),
+    ):
+        for position in positions:
+            generic = generic_step(
+                projection_program(profile, position),
+                encode_native(directional_native),
+            )
+            assert decode_generic(generic) == native_projection_step(
+                position, profile, directional_native
+            )
+            counts["directional"] += 1
+
+    fixtures: dict[str, Native3DState] = {}
+    single = Native3DState(
+        2,
+        (5, 5, 5),
+        FixedBoundary(0),
+        native_cells_with_points((5, 5, 5), ((((2, 2, 2), 1),))),
+    )
+    line_three = Native3DState(
+        2,
+        (5, 5, 5),
+        FixedBoundary(0),
+        native_cells_with_points(
+            (5, 5, 5),
+            ((((2, 2, 1), 1), ((2, 2, 2), 1), ((2, 2, 3), 1))),
+        ),
+    )
+    for name, _rule in named_rules():
+        fixtures[name] = line_three if name == "full_exactly_two" else single
+    for name, rule in named_rules():
+        native = fixtures[name]
+        assert decode_generic(generic_step(program_for(rule), encode_native(native))) == native_count_step(
+            rule, native
+        )
+        counts["named"] += 1
+
+    ternary_cells = tuple((index * 2 + 1) % 3 for index in range(8))
+    ternary_native = Native3DState(3, (2, 2, 2), PeriodicBoundary(), ternary_cells)
+    for profile, width in (("axes", 39), ("full", 159)):
+        rule = CountProductRule(profile, 3, 3, tuple(index % 3 for index in range(width)))
+        assert decode_generic(
+            generic_step(program_for(rule), encode_native(ternary_native))
+        ) == native_count_step(rule, ternary_native)
+        counts["ternary"] += 1
+
+    assert counts == {
+        "face_quotient": 4_096,
+        "full_quotient": 896,
+        "directional": 34,
+        "named": 9,
+        "ternary": 2,
+    }
+    return counts
+
+
+@dataclass(frozen=True)
+class CompletePositionalSchema:
+    """Declared finite domain for an arbitrary complete positional map."""
+
+    alphabet_size: int
+    positions: tuple[Offset, ...]
+
+    def __post_init__(self) -> None:
+        FiniteAlphabet(self.alphabet_size)
+        raw = require_tuple(self.positions, "positional schema")
+        if not raw:
+            raise ValueError("positional schema must be nonempty")
+        dimension: int | None = None
+        seen: set[Offset] = set()
+        for position in raw:
+            checked = require_tuple(position, "position")
+            if dimension is None:
+                dimension = len(checked)
+            if len(checked) != dimension:
+                raise ValueError("position dimensions differ")
+            normalized = tuple(require_int(value, "position component") for value in checked)
+            if normalized in seen:
+                raise ValueError("positions must be unique")
+            seen.add(normalized)
+
+    @property
+    def context_rows(self) -> int:
+        return self.alphabet_size ** len(self.positions)
+
+    def address(self, context: tuple[int, ...]) -> int:
+        if len(require_tuple(context, "schema context")) != len(self.positions):
+            raise ValueError("schema context has wrong width")
+        return context_index(context, self.alphabet_size)
+
+    def decode_address(self, address: int) -> tuple[int, ...]:
+        return context_from_index(address, len(self.positions), self.alphabet_size)
+
+
+def assert_complete_positional_domains() -> dict[str, int]:
+    face = CompletePositionalSchema(2, BOOK_FACE_POSITIONS)
+    full = CompletePositionalSchema(2, BOOK_CUBE_POSITIONS)
+    assert face.context_rows == 128
+    assert full.context_rows == 134_217_728 == 1 << 27
+
+    face_addresses = 0
+    for address in range(face.context_rows):
+        context = face.decode_address(address)
+        assert face.address(context) == address
+        face_addresses += 1
+
+    zero = (0,) * 27
+    ones = (1,) * 27
+    algebraic_context_witnesses = (zero, ones) + tuple(
+        tuple(int(index == selected) for index in range(27))
+        for selected in range(27)
+    ) + tuple(
+        tuple(int(index != selected) for index in range(27))
+        for selected in range(27)
+    )
+    for context in algebraic_context_witnesses:
+        assert full.decode_address(full.address(context)) == context
+    # address/decode are the same exact finite mixed-radix algorithms for every
+    # declared row; the 56 witnesses certify digit placement, not all tables.
+    assert full.decode_address(0) == zero
+    assert full.decode_address(full.context_rows - 1) == ones
+    return {
+        "face_declared_rows": face.context_rows,
+        "face_exhaustive_addresses": face_addresses,
+        "full_declared_rows": full.context_rows,
+        "full_digit_address_witnesses": len(algebraic_context_witnesses),
+        "full_positional_projections": 27,
+    }
+
+
+def assert_small_quotient_and_parallelism() -> None:
+    def multiplicities(offsets: tuple[Offset, ...]) -> tuple[int, ...]:
+        counts: dict[Coord, int] = {}
+        for offset in offsets:
+            resolved = tuple(value % 2 for value in offset)
+            counts[resolved] = counts.get(resolved, 0) + 1
+        return tuple(sorted(counts.values()))
+
+    assert multiplicities(RUNTIME_FACE_OFFSETS) == (2, 2, 2)
+    assert multiplicities(RUNTIME_FULL_OFFSETS) == (2, 2, 2, 4, 4, 4, 8)
+
+    topology = FiniteGrid((2, 2, 2), PeriodicBoundary())
+    face_old = GridConfiguration(
+        FiniteAlphabet(2),
+        topology,
+        cells_with_one((2, 2, 2), (1, 0, 0)),
+        SnapshotToken(0),
+    )
+    handle = SiteHandle(face_old.snapshot_token, (0, 0, 0))
+    face_read = read_local(face_old, (handle,), RUNTIME_FACE_ACCESS)[0]
+    assert sum(face_read.neighbors) == 2
+    assert len(face_read.neighbors) == 6
+
+    corner_old = GridConfiguration(
+        FiniteAlphabet(2),
+        topology,
+        cells_with_one((2, 2, 2), (1, 1, 1)),
+        SnapshotToken(0),
+    )
+    corner_handle = SiteHandle(corner_old.snapshot_token, (0, 0, 0))
+    full_read = read_local(corner_old, (corner_handle,), RUNTIME_FULL_ACCESS)[0]
+    assert sum(full_read.neighbors) == 8
+    assert len(full_read.neighbors) == 26
+
+    # Runtime -x projection shifts the one toward +x under one old snapshot.
+    selected = RUNTIME_FACE_ACCESS.offsets.index((-1, 0, 0))
+    shift = program_for(
+        ProjectionRule(2, 6, selected),
+        RUNTIME_FACE_ACCESS,
+    )
+    line = GridConfiguration(
+        FiniteAlphabet(2),
+        FiniteGrid((4, 1, 1), FixedBoundary(0)),
+        cells_with_one((4, 1, 1), (0, 0, 0)),
+        SnapshotToken(4),
+    )
+    assert generic_step(shift, line).cells == (0, 1, 0, 0)
+    in_place = list(line.cells)
+    for x in range(4):
+        old_left = 0 if x == 0 else in_place[x - 1]
+        in_place[x] = old_left
+    assert tuple(in_place) == (0, 0, 0, 0)
+
+
+def assert_support_boundary_and_background() -> None:
+    selected = RUNTIME_FACE_ACCESS.offsets.index((-1, 0, 0))
+    shift = program_for(ProjectionRule(2, 6, selected), RUNTIME_FACE_ACCESS)
+    shape = (3, 3, 3)
+    edge = cells_with_one(shape, (2, 1, 1))
+    periodic = GridConfiguration(
+        FiniteAlphabet(2), FiniteGrid(shape, PeriodicBoundary()), edge, SnapshotToken(0)
+    )
+    fixed = GridConfiguration(
+        FiniteAlphabet(2), FiniteGrid(shape, FixedBoundary(0)), edge, SnapshotToken(0)
+    )
+    assert nonzero_coords(generic_step(shift, periodic)) == ((0, 1, 1),)
+    assert nonzero_coords(generic_step(shift, fixed)) == ()
+
+    face_any = program_for(named_rules()[0][1])
+    state = sparse_field(3, 2, 0, ((((0, 0, 0), 1),)))
+    expected_sizes = (1, 6, 19, 44)
+    for expected_size in expected_sizes:
+        assert state.background == 0
+        assert len(state.entries) == expected_size
+        state = sparse_step(face_any, state)
+
+    # A nonquiescent rule evolves the uniform background explicitly; it is not
+    # smuggled in as a fixed finite boundary.
+    toggle = binary_count_rule("axes", 1)
+    white = sparse_field(3, 2, 0, ())
+    black = sparse_step(program_for(toggle), white)
+    assert black.background == 1 and black.entries == ()
+    white_again = sparse_step(program_for(toggle), black)
+    # Code 1 is one only for Self=0,count=0; uniform black maps to zero.
+    assert white_again.background == 0 and white_again.entries == ()
+
+    # Exact sparse lowering and a sufficiently padded fixed-background work
+    # realization agree inside the one-step causal region.
+    sparse_seed = sparse_field(3, 2, 0, ((((0, 0, 0), 1),)))
+    sparse_next = sparse_step(face_any, sparse_seed)
+    finite_seed = GridConfiguration(
+        FiniteAlphabet(2),
+        FiniteGrid((5, 5, 5), FixedBoundary(0)),
+        cells_with_one((5, 5, 5), (2, 2, 2)),
+        SnapshotToken(0),
+    )
+    finite_next = generic_step(face_any, finite_seed)
+    translated = tuple(
+        sorted(
+            ((coord[0] - 2, coord[1] - 2, coord[2] - 2), finite_next.value_at(coord))
+            for coord in nonzero_coords(finite_next)
+        )
+    )
+    assert translated == sparse_next.entries
+
+
+def assert_same_runner_across_t21_t22_t23() -> None:
+    profiles = (
+        (2, axis_offsets(2)),
+        (2, cube_offsets(2)),
+        (3, axis_offsets(3)),
+        (3, cube_offsets(3)),
+    )
+    outputs: list[GridConfiguration] = []
+    for dimension, offsets in profiles:
+        access = make_access(offsets, self_position=len(offsets) // 2)
+        rule = ProjectionRule(2, len(offsets), 0)
+        program = CAProgram(FiniteAlphabet(2), access, rule)
+        shape = (3,) * dimension
+        seed = (1,) * dimension
+        old = GridConfiguration(
+            FiniteAlphabet(2),
+            FiniteGrid(shape, FixedBoundary(0)),
+            cells_with_one(shape, seed),
+            SnapshotToken(0),
+        )
+        successor = generic_step(program, old)
+        assert nonzero_coords(successor) == (subtract_coord(seed, offsets[0]),)
+        outputs.append(successor)
+    assert tuple(output.topology.dimension for output in outputs) == (2, 2, 3, 3)
+
+
+def dyadaxes_3d_summary(read: LocalRead) -> tuple[int, bool, bool]:
+    """Current src/ca summary: Self, face majority, other at-least-ten."""
+
+    validate_read(read, 2, 26)
+    by_offset = dict(zip(RUNTIME_FULL_OFFSETS, read.neighbors, strict=True))
+    face_count = sum(by_offset[offset] for offset in RUNTIME_FACE_OFFSETS)
+    other_count = sum(
+        value for offset, value in by_offset.items() if offset not in RUNTIME_FACE_OFFSETS
+    )
+    return (read.center, face_count > 3, other_count >= 10)
+
+
+def assert_dyadaxes_information_loss() -> dict[str, int]:
+    empty = LocalRead(0, (0,) * 26)
+    values = [0] * 26
+    face_slot = RUNTIME_FULL_OFFSETS.index(RUNTIME_FACE_OFFSETS[0])
+    values[face_slot] = 1
+    one_face = LocalRead(0, tuple(values))
+    assert dyadaxes_3d_summary(empty) == dyadaxes_3d_summary(one_face) == (0, False, False)
+    face_exactly_one = named_rules()[1][1]
+    full_exactly_one = named_rules()[2][1]
+    face_read_empty = LocalRead(0, tuple(empty.neighbors[RUNTIME_FULL_OFFSETS.index(offset)] for offset in RUNTIME_FACE_OFFSETS))
+    face_read_one = LocalRead(0, tuple(one_face.neighbors[RUNTIME_FULL_OFFSETS.index(offset)] for offset in RUNTIME_FACE_OFFSETS))
+    assert face_exactly_one.evaluate(face_read_empty) == 0
+    assert face_exactly_one.evaluate(face_read_one) == 1
+    assert full_exactly_one.evaluate(empty) == 0
+    assert full_exactly_one.evaluate(one_face) == 1
+
+    # A second witness loses full edge/corner counts 0 versus 1 as well.
+    one_other_values = [0] * 26
+    other_slot = next(
+        index
+        for index, offset in enumerate(RUNTIME_FULL_OFFSETS)
+        if offset not in RUNTIME_FACE_OFFSETS
+    )
+    one_other_values[other_slot] = 1
+    one_other = LocalRead(0, tuple(one_other_values))
+    assert dyadaxes_3d_summary(empty) == dyadaxes_3d_summary(one_other)
+    assert full_exactly_one.evaluate(one_other) == 1
+    return {
+        "summary_collision_pairs": 2,
+        "face_required_output_splits": 1,
+        "full_required_output_splits": 2,
+    }
+
+
+RUNTIME_GAP_MATRIX: tuple[tuple[str, str, str], ...] = (
+    (
+        "src/ca/alphabets.py",
+        "reuse",
+        "finite value/rank schema already admits binary, k-color, product, and tagged values",
+    ),
+    (
+        "src/ca/loci.py",
+        "reuse",
+        "rank-3 [t,x,y,z] coordinate spaces, selectors, gather, and boundary reads already exist",
+    ),
+    (
+        "src/ca/neighborhoods.py",
+        "reuse/parameterize",
+        "Self, von_neumann/l1_shell six-face, moore/full-cube twenty-six, and literal offsets exist",
+    ),
+    (
+        "src/ca/frontiers.py",
+        "reuse",
+        "time_slice over the complete rank-3 shape supplies AllSites",
+    ),
+    (
+        "src/ca/rollout.py:apply_rule",
+        "gap",
+        "public evaluation branches on named family instead of applying one closed typed RULE descriptor",
+    ),
+    (
+        "src/ca/rollout.py:_normalize_rule_ids",
+        "gap",
+        "rule ids are coerced to numpy int64, which cannot serialize arbitrary-precision T23 table codes",
+    ),
+    (
+        "src/ca/rules.py:dyadaxes_3d",
+        "lossy preset only",
+        "Self plus face-majority plus edge/corner-atLeast10 cannot recover exact 6/26 shell counts",
+    ),
+    (
+        "src/ca/specs.py + datasets.py",
+        "gap",
+        "named Phase-1 family dispatch and the 256-rule dyadaxes pool do not expose schema-tagged T23 maps",
+    ),
+    (
+        "src/ca/viz",
+        "observer",
+        "TXYZ export, slices, projections, palettes, and Cuboid-style transforms are views, never program identity",
+    ),
+)
+
+
+DECISION_MATRIX: tuple[tuple[str, str, str, str], ...] = (
+    (
+        "DOMAIN",
+        "parameterization",
+        "DiscreteSpace(dimension=3)",
+        "t+3D is dimensional task space, not a construction class",
+    ),
+    (
+        "CONFIGURATION",
+        "parameterization",
+        "FixedLattice(CubicGrid(Z^3),FiniteAlphabet)",
+        "labels evolve while support/topology stay fixed",
+    ),
+    (
+        "ALPHABET",
+        "direct reuse",
+        "FiniteAlphabet",
+        "binary examples and finite-k formulas need no 3D alphabet class",
+    ),
+    (
+        "FRONTIER",
+        "direct reuse",
+        "AllSites",
+        "every old lattice site fires exactly once",
+    ),
+    (
+        "NEIGHBORHOOD",
+        "parameterization",
+        "Compose(Self,OrderedOffsets[6|26])",
+        "face and full-cube access are explicit ordered data",
+    ),
+    (
+        "RULE",
+        "restriction/lossless representation",
+        "SchemaTagged(Positional|ShellCount|SelfXCount)",
+        "IgnoreSelf, product, and arbitrary positional domains remain distinct",
+    ),
+    (
+        "UPDATE",
+        "direct reuse",
+        "SnapshotParallelSameSite",
+        "one complete same-site assignment per old source",
+    ),
+    (
+        "SEED",
+        "direct reuse",
+        "IndependentValidatedConfiguration",
+        "point, line, random, and structure fixtures are run data",
+    ),
+    (
+        "REALIZATION/VIEW",
+        "parameterization/observer",
+        "BoundaryWorkFrameCropProjection",
+        "finite boundaries, frame adapters, and graphics do not define native Z^3",
+    ),
+)
+
+
+def assert_architecture_matrices() -> None:
+    assert tuple(row[0] for row in DECISION_MATRIX) == (
+        "DOMAIN",
+        "CONFIGURATION",
+        "ALPHABET",
+        "FRONTIER",
+        "NEIGHBORHOOD",
+        "RULE",
+        "UPDATE",
+        "SEED",
+        "REALIZATION/VIEW",
+    )
+    assert DECISION_MATRIX[6][1] == "direct reuse"
+    assert "lossless representation" in DECISION_MATRIX[5][1]
+    assert all("executor" not in row[2].lower() for row in DECISION_MATRIX)
+    assert len(RUNTIME_GAP_MATRIX) == 9
+    assert sum(row[1] == "gap" for row in RUNTIME_GAP_MATRIX) == 3
+    assert any(row[1] == "lossy preset only" for row in RUNTIME_GAP_MATRIX)
+    assert any(row[1] == "observer" for row in RUNTIME_GAP_MATRIX)
+
+
+def assert_hostile_validation() -> None:
+    expect_raises(TypeError, lambda: FiniteAlphabet(True))
+    expect_raises(ValueError, lambda: FiniteAlphabet(1))
+    expect_raises(TypeError, lambda: FiniteGrid([2, 2, 2], PeriodicBoundary()))
+    expect_raises(ValueError, lambda: FiniteGrid((2, 0, 2), PeriodicBoundary()))
+    expect_raises(TypeError, lambda: FixedBoundary(False))
+    expect_raises(TypeError, lambda: SnapshotToken(True))
+    expect_raises(ValueError, lambda: SnapshotToken(-1))
+    expect_raises(TypeError, lambda: book_offset_to_runtime([0, 0, 0]))
+    expect_raises(ValueError, lambda: book_offset_to_runtime((0, 0)))
+    expect_raises(TypeError, lambda: access_for_profile(1))
+    expect_raises(ValueError, lambda: access_for_profile("unknown"))
+    expect_raises(TypeError, lambda: make_access(list(RUNTIME_FACE_OFFSETS), 3))
+    expect_raises(
+        ValueError,
+        lambda: make_access((RUNTIME_FACE_OFFSETS[0], RUNTIME_FACE_OFFSETS[0]), 1),
+    )
+    expect_raises(
+        ValueError,
+        lambda: LocalAccess(
+            (SelfAccess(), OffsetAccess((-1, 0, 0)), SelfAccess())
+        ),
+    )
+    expect_raises(TypeError, lambda: LocalAccess((SelfAccess(), object())))
+    expect_raises(TypeError, lambda: count_product_case_count("axes", 3, False))
+    expect_raises(ValueError, lambda: count_product_case_count("bad", 3, 2))
+    expect_raises(ValueError, lambda: shell_count_case_count("bad", 3, 2))
+    expect_raises(
+        ValueError,
+        lambda: CountProductRule("axes", 3, 2, (0,) * 13),
+    )
+    expect_raises(
+        ValueError,
+        lambda: ShellCountRule("full", 3, 2, (0,) * 26),
+    )
+    expect_raises(
+        TypeError,
+        lambda: ShellCountRule("axes", 3, 2, (*((0,) * 6), False)),
+    )
+    expect_raises(ValueError, lambda: GeneralLookup(2, 6, (0,) * 127))
+    expect_raises(TypeError, lambda: GeneralLookup(2, 1, (0, 0, 0, False)))
+    expect_raises(ValueError, lambda: ProjectionRule(2, 6, 6))
+    expect_raises(TypeError, lambda: ProjectionRule(2, 6, False))
+    expect_raises(ValueError, lambda: binary_count_rule("axes", 1 << 14))
+    expect_raises(ValueError, lambda: binary_shell_rule("full", 1 << 27))
+    expect_raises(
+        ValueError,
+        lambda: CAProgram(
+            FiniteAlphabet(2),
+            RUNTIME_FULL_ACCESS,
+            binary_count_rule("axes", 0),
+        ),
+    )
+    expect_raises(
+        ValueError,
+        lambda: CompletePositionalSchema(2, ((0, 0, 0), (0, 0, 0))),
+    )
+    expect_raises(
+        ValueError,
+        lambda: CompletePositionalSchema(2, ((0, 0), (0, 0, 1))),
+    )
+    expect_raises(
+        ValueError,
+        lambda: permute_book_face_table_to_runtime((0,) * 127),
+    )
+    expect_raises(
+        TypeError,
+        lambda: permute_book_face_table_to_runtime((*((0,) * 127), False)),
+    )
+    expect_raises(ValueError, lambda: runtime_slot_for_book_position((1, 1, 0), RUNTIME_FACE_ACCESS))
+    expect_raises(
+        ValueError,
+        lambda: SymbolicCompleteMap(
+            binary_count_rule("full", 0),
+            (((0,) * 27, 0), ((0,) * 27, 0)),
+        ),
+    )
+    expect_raises(
+        ValueError,
+        lambda: SparseField(3, 2, 0, ((((0, 0, 0), 0),))),
+    )
+    expect_raises(
+        ValueError,
+        lambda: SparseField(
+            3,
+            2,
+            0,
+            ((((0, 0, 0), 1), ((0, 0, 0), 1))),
+        ),
+    )
+
+    alphabet = FiniteAlphabet(2)
+    topology = FiniteGrid((2, 2, 2), FixedBoundary(0))
+    old = GridConfiguration(
+        alphabet,
+        topology,
+        cells_with_one((2, 2, 2), (0, 0, 0)),
+        SnapshotToken(5),
+    )
+    program = program_for(binary_count_rule("axes", 12))
+    active = select_all_sites(old)
+    reads = read_local(old, active, program.neighborhood)
+    writes = make_assignments(program, active, reads)
+    validate_plan(old, program, active, reads, writes)
+    peer = GridConfiguration(alphabet, topology, old.cells, SnapshotToken(5))
+    foreign = (SiteHandle(peer.snapshot_token, active[0].coord), *active[1:])
+    expect_raises(ValueError, lambda: read_local(old, foreign, program.neighborhood))
+    expect_raises(ValueError, lambda: read_local(old, (active[0], active[0]), program.neighborhood))
+    tampered_reads = (LocalRead(1 - reads[0].center, reads[0].neighbors), *reads[1:])
+    expect_raises(
+        ValueError,
+        lambda: validate_plan(old, program, active, tampered_reads, writes),
+    )
+    wrong_target = (
+        SiteAssignment(writes[0].source, (1, 1, 1), writes[0].value),
+        *writes[1:],
+    )
+    expect_raises(
+        ValueError,
+        lambda: validate_plan(old, program, active, reads, wrong_target),
+    )
+    successor = apply_parallel(old, active, writes)
+    assert successor.snapshot_token is not old.snapshot_token
+    expect_raises(ValueError, lambda: read_local(successor, active, program.neighborhood))
+
+
+def main() -> None:
+    source_counts = assert_source_profiles_and_formulas()
+    ignore_self_counts = assert_ignore_self_factor()
+    representation_counts = assert_complete_compact_maps()
+    positional_counts = assert_complete_positional_domains()
+    permutation_counts = assert_frame_and_table_permutations()
+    commutation_counts = assert_native_generic_commutation()
+    assert_small_quotient_and_parallelism()
+    assert_support_boundary_and_background()
+    assert_same_runner_across_t21_t22_t23()
+    dyadaxes_counts = assert_dyadaxes_information_loss()
+    assert_architecture_matrices()
+    assert_hostile_validation()
+
+    commutations = sum(commutation_counts.values())
+    assert commutations == 5_037
+    print("T23 semantic oracle: PASS")
+    print(f"native_generic_commutations={commutations}")
+    print(
+        "commutation_partition="
+        f"face_quotient:{commutation_counts['face_quotient']},"
+        f"full_quotient:{commutation_counts['full_quotient']},"
+        f"directional:{commutation_counts['directional']},"
+        f"named:{commutation_counts['named']},"
+        f"ternary:{commutation_counts['ternary']}"
+    )
+    print(
+        "declared_access=Self+6_faces|Self+26_face_edge_corner; "
+        "raw_Book_triples_lexicographic=PASS"
+    )
+    print(
+        "case_formulas="
+        "AxesShell=2d(k-1)+1,AxesProduct=k*(2d(k-1)+1),"
+        "FullShell=(3^d-1)(k-1)+1,FullProduct=k*((3^d-1)(k-1)+1); "
+        f"formula_checks:{source_counts['formula_cases']}; "
+        "d3k2=7/14_axes,27/54_full; d3k3=13/39_axes,53/159_full"
+    )
+    print(
+        "local_context_checks="
+        f"binary_face:{source_counts['binary_face_contexts']},"
+        f"ternary_face:{source_counts['ternary_face_contexts']}"
+    )
+    print(
+        "IgnoreSelf_factor="
+        f"all_face_shell_signatures:{ignore_self_counts['face_shell_signatures']},"
+        f"full_shell_algebraic_bases:{ignore_self_counts['full_shell_bases']},"
+        f"one_Self_row_rejected:{ignore_self_counts['self_row_rejections']}; "
+        "shell_predicate_identity_primary=PASS"
+    )
+    print(
+        "complete_compact_maps="
+        f"all_face_product_signatures:{representation_counts['face_compact_signatures']},"
+        f"face_rows_each:{representation_counts['face_complete_rows_per_signature']},"
+        f"face_rows_checked:{representation_counts['face_expanded_rows_checked']},"
+        f"full_product_algebraic_bases:{representation_counts['full_compact_bases']},"
+        f"fibers:{representation_counts['face_fibers']}/{representation_counts['full_fibers']},"
+        f"one_row_disagreements_rejected:{representation_counts['disagreement_rejections']}"
+    )
+    print(
+        "general_positional_domains="
+        f"face_rows:{positional_counts['face_declared_rows']},"
+        f"full_rows:{positional_counts['full_declared_rows']}; "
+        "binary_rule_counts=2^128_face_general,2^(2^27)_full_general,"
+        "2^7_face_shell,2^14_face_product,2^27_full_shell,2^54_full_product"
+    )
+    print(
+        "full_positional_address_proof="
+        f"mixed_radix_digit_witnesses:{positional_counts['full_digit_address_witnesses']},"
+        f"ordered_projections:{positional_counts['full_positional_projections']}; "
+        "declared_domain_is_all_2^27_contexts; arbitrary_table_not_eagerly_enumerated"
+    )
+    print(
+        "frame_and_table_permutation="
+        f"positions:{permutation_counts['frame_position_cases']},"
+        f"face_contexts:{permutation_counts['face_context_cases']},"
+        f"face_table_bases:{permutation_counts['face_table_bases']},"
+        f"full_digit_bases:{permutation_counts['full_digit_bases']}; "
+        f"adapter:{BOOK_TO_RUNTIME_FRAME}; inverse=PASS"
+    )
+    print(
+        "view_separation=Cuboid[-Reverse(position)]_display_only; "
+        "not_native_coordinates; witness=PASS"
+    )
+    print(
+        "named_structural_profiles="
+        "face(any,exact1,self+shell>=4);full(exact1,exact2,exact3);"
+        "Life3D[(5,7,6),(4,5,5),(5,6,5)]"
+    )
+    print(
+        "derived_canonical_codes_under_index_self+2*shell_count="
+        "16380,12,16256,12,48,192,47104,3584,11264; "
+        "not_source_given_rule_numbers"
+    )
+    print(
+        "fiber_multiplicity="
+        "face:2*C(6,n)_total128;full:2*C(26,n)_total134217728; "
+        "small_2^3_quotient=faces[2,2,2],full[2,2,2,4,4,4,8]"
+    )
+    print("old_snapshot_parallelism=PASS; same_site_atomic_commit=PASS")
+    print("exact_Z3_sparse_background=PASS; finite_boundary/support/view_separation=PASS")
+    print(
+        "dyadaxes_3d_information_loss="
+        f"collision_pairs:{dyadaxes_counts['summary_collision_pairs']},"
+        f"face_output_splits:{dyadaxes_counts['face_required_output_splits']},"
+        f"full_output_splits:{dyadaxes_counts['full_required_output_splits']}; "
+        "summary=(self,face_count>3,other_count>=10)"
+    )
+    print(
+        "runtime_audit="
+        "rank3_loci+6/26_access+boundaries+views_reusable; "
+        "gaps=family_branches,schema_tables,bigint_rule_ids; "
+        "dyadaxes_is_lossy_preset"
+    )
+    print("T21_T22_T23_same_runner=PASS; new_UPDATE=NONE; family_executor=NONE")
+    print("exact_type_and_opaque_snapshot_validation=PASS")
+    print(
+        "proposed_D129=3D cubic dimension/access and schema-tagged RULE "
+        "parameterizations; audit_categories_1_to_3; no category_4 execution algebra"
+    )
+
+
+if __name__ == "__main__":
+    main()

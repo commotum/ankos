@@ -193,6 +193,7 @@ U = CFACE | CFULL | OPROJ | P_CLASS4 | X24
 STRICT_U = CFACE | CFULL | OPROJ | P_CLASS4
 
 assert U == set(SOURCE.GOVERNED_IMAGE_LINES)
+assert set(images) & S == U
 assert digest_set(U) == EXPECTED_GOVERNED_IMAGE_DIGEST
 classes = (CFACE, CFULL, OPROJ, P_CLASS4, X24)
 assert all(not (left & right) for i, left in enumerate(classes) for right in classes[i + 1 :])
@@ -436,7 +437,7 @@ TRANSCRIPT_SPECS = (
         (("exact1", "single_black", DISPLAYED_STEPS),
          ("exact2", "line_of_3", DISPLAYED_STEPS)),
     ),
-    ("full26_icon", 2260, (2262,), ("twenty_six_face_edge_corner_neighbors",)),
+    ("full26_icon", 2260, (2262,), ("twenty_six_surrounding_positions",)),
     (
         "projection_exact1",
         13634,
@@ -569,7 +570,7 @@ assert len(UNREPLAYABLE_RANDOM_ASSETS) == 7
 assert UNREPLAYABLE_RANDOM_ASSETS <= ADJACENCY_ONLY
 
 
-EXPECTED_TRANSCRIPT_SHA256 = "75b3ad2d7bc291c21bc467a3190e488bc58ea6d8a102bb709fed2bf8b477bac3"
+EXPECTED_TRANSCRIPT_SHA256 = "c4b2fa894509d8bb84c2e6af2bab2265bfaecc00b1f484c3b33d7c439e0b0179"
 EXPECTED_STRICT_UNIVERSE_SHA256 = "8fd664af3fbc564763b551e5475494bb19661c9a352100ba840d028172ac0d97"
 EXPECTED_STRICT_LEDGER_SHA256 = "e830c568d092d1ae114b4d2078232b3225b257fbc09bf8c3c42725637c3494f0"
 EXPECTED_GOVERNED_UNIVERSE_SHA256 = EXPECTED_GOVERNED_IMAGE_DIGEST
@@ -622,7 +623,7 @@ def main() -> None:
         "HASH_BOUND=42; TRANSCRIBED=9; PIXEL_REPLAYED=0; "
         "face_any/exact1_and_full_exact1/exact2/exact3=PASS; "
         "named_class4_B5/S45=PASS; projections=OBSERVER_ONLY; "
-        "stochastic_replay=UNAVAILABLE(no_serialized_configuration/RNG/distribution/renderer); "
+        "random/stochastic_replay=UNAVAILABLE(no_serialized_configuration/RNG/distribution/renderer); "
         "page_offset=PASS; Notes_reverse_join=PASS; unresolved=0"
     )
 
