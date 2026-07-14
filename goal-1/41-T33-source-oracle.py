@@ -191,7 +191,164 @@ QUERIES = {
         r"forcing nested patterns|non-computable patterns|"
         r"constraints[^.]{0,160}halting problem"
     ),
+    "Q31": (
+        r"Forcing of nested patterns, 942|"
+        r"Non-computable patterns from constraints, 943"
+    ),
 }
+
+
+def line_set(spec: str) -> frozenset[int]:
+    result: set[int] = set()
+    for item in filter(None, map(str.strip, spec.split(","))):
+        if "-" in item:
+            start, end = map(int, item.split("-", 1))
+            result.update(range(start, end + 1))
+        else:
+            result.add(int(item))
+    return frozenset(result)
+
+
+# Every pre-Index query hit is classified exactly once.  Native is the strict
+# singleton occurrence construction, its all-required Notes extension, and
+# the source-backed larger-support instances.  Relations retain encodings and
+# sibling constraint systems.  Controls preserve the T31/T32 base, solver
+# boundary, and the decisive no-initial-condition statement.
+NATIVE_MATCHED = line_set(
+    "2634,2636,2638,2640,2662,2664,2666,2668,2670,2672,2674,2678,"
+    "2680,2682,2684,2686,2688,2690,2692,2694,2696,14085,14095,14097"
+)
+RELATION_MATCHED = line_set(
+    "4244,4324,5788,14099,14109,14115,14119,14121,14123,14130,"
+    "14145,14146,15930,19274,20754"
+)
+CONTROL_MATCHED = line_set(
+    "2568,2590,2594,2614,2618,2642,2646,2650,4046,6976,14027,"
+    "14055,14080,14082,14083,14275,19816"
+)
+
+NATIVE_CONTINUATIONS = line_set("2632,2698,14087-14093")
+RELATION_CONTINUATIONS = line_set(
+    "5772,5776,5778,5780,5782,5784,5786,5790,5792,5794,6974,"
+    "14111,14113,14117,14124,14126,14128,14132,14134,14136,14138,"
+    "14140,14142,14144"
+)
+CONTROL_CONTINUATIONS = line_set(
+    "1449,1451,1455,1457,1463,1465,1467,1481,1483,1487,1489,1493,1495,"
+    "2570,2572,2574,2576,2578,2580,2582,2584,2586,2588,2592,2596,"
+    "2598,2600,2602,2604,2606,2608,2610,2612,2616,2620,2626,2628,2630,"
+    "2644,2648,2652,2654,2656,2658,2660,"
+    "4030,4032,4040,4042,4044,"
+    "14048,14050,14052,14054,14084"
+)
+
+NATIVE_EVIDENCE = NATIVE_MATCHED | NATIVE_CONTINUATIONS
+RELATION_EVIDENCE = RELATION_MATCHED | RELATION_CONTINUATIONS
+CONTROL_EVIDENCE = CONTROL_MATCHED | CONTROL_CONTINUATIONS
+MATCHED_RETAINED = NATIVE_MATCHED | RELATION_MATCHED | CONTROL_MATCHED
+GOVERNED_CONTINUATIONS = (
+    NATIVE_CONTINUATIONS | RELATION_CONTINUATIONS | CONTROL_CONTINUATIONS
+)
+RETAINED = NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE
+
+# The deliberately broad discovery lanes return no pre-Index lexical false
+# positive after relational and control evidence is dispositioned.
+EXCLUDED_CLASS: dict[str, frozenset[int]] = {}
+EXCLUDED = frozenset()
+
+
+IMAGE_RE = re.compile(r"^!\[[^\]]*\]\(([^)]+)\)$")
+NATIVE_IMAGE_LINES = line_set("2638,2662,2670,2682,2686,2690,2692")
+RELATION_IMAGE_LINES = line_set("5786,6974,14111,14117,14136,14138,14142")
+CONTROL_IMAGE_LINES = line_set(
+    "1449,1455,1463,1465,1481,1487,1493,"
+    "2576,2584,2598,2606,2616,2626,2628,"
+    "4030,4040,4042,4044,14052"
+)
+GOVERNED_IMAGE_LINES = (
+    NATIVE_IMAGE_LINES | RELATION_IMAGE_LINES | CONTROL_IMAGE_LINES
+)
+# Exact adjacent ownership guards: the preceding multiway plate, the first
+# piecewise-number plate, and unrelated neighboring Notes plates are visible
+# candidates but do not belong to T33 evidence.
+EXCLUDED_IMAGE_CLASS = {
+    "preceding_multiway": line_set("2564"),
+    "following_piecewise_integer_map": line_set("1505"),
+    "nearby_notes_non_T33": line_set("14162"),
+}
+EXCLUDED_IMAGE_LINES = frozenset().union(*EXCLUDED_IMAGE_CLASS.values())
+CANDIDATE_IMAGE_LINES = GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
+
+
+INDEX_CLASS = {
+    "constraint_and_solver_routes": line_set("20908,21044,22080"),
+    "forcing_and_noncomputability_routes": line_set("21193,21689"),
+    "rule30_rule60_forced_pattern_routes": line_set("21994,21998"),
+    "sibling_constraint_family_routes": line_set("22134,22146"),
+}
+INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
+INDEX_ENTRY_GUARDS = {
+    "constraint_and_solver_routes": {
+        20908: ("backtracking", "in satisfying constraints, 941"),
+        21044: ("systems based on, 210-221", "producing complexity with"),
+        22080: ("satisfying constraints, 210–221", "to satisfy constraints, 343, 941"),
+    },
+    "forcing_and_noncomputability_routes": {
+        21193: ("forcing of nested patterns, 942",),
+        21689: ("non-computable patterns from constraints, 943",),
+    },
+    "rule30_rule60_forced_pattern_routes": {
+        21994: ("rule 30", "pattern forced by constraints, 221"),
+        21998: ("rule 60", "pattern forced by constraints, 220"),
+    },
+    "sibling_constraint_family_routes": {
+        22134: ("spin systems", "as systems based on constraints, 944"),
+        22146: ("substitution systems", "systems based on constraints, 942"),
+    },
+}
+
+
+VISUAL_ONLY_BOUNDARY = (
+    "required-cross-gallery-and-centered-display",
+    "gray-partial-search-stages",
+    "nonperiodic-nested-witness-and-required-glyph",
+    "larger-template-rule60-rule30-programs-and-witnesses",
+    "formula-colors-and-coordinate-origin-not-pixel-decoded",
+    "T31-T32-T34-sibling-and-relation-plates",
+)
+
+
+RAW_CORRUPT_RULE30_TEMPLATE_TEXT = r"$56.3 \times 3$"
+SPLIT_RULE30_TEMPLATE_TEXT = "56 3 x 3 templates"
+RAW_OPAQUE_FORMULA_PATTERN = "a[x_{-}, y_{-}]"
+
+
+SOURCE_MODEL_RECORDS = (
+    "category:static declarative model-set relation, not transition evolution",
+    "strict-domain:binary discrete two-dimensional total field with no native time axis",
+    "base:T32 finite exact allowed-local-pattern relation remains unchanged everywhere",
+    "strict-requirement:one selected oriented five-site cross assignment",
+    "quantifier:there exists at least one translated occurrence somewhere",
+    "conjunction:local allowed relation and global required occurrence hold in the same field",
+    "syntax-count:32 independent required-template choices times 2^32 allowed masks",
+    "required-not-allowed:well-formed by full source count and semantically empty by conjunction",
+    "numbering:printed decimal is the prior allowed-mask number and required template is separately displayed",
+    "codec:no source-defined combined 37-bit integer order",
+    "translation:centered figure and search are witness gauges, not a fixed semantic anchor",
+    "identity:page-219 model is unique only modulo trivial translations",
+    "witness:anchor belongs to verification or solver provenance, not model state",
+    "repetition:T33 examples may be repetitive, nonrepetitive, satisfiable, or unsatisfiable",
+    "search:gray partial assignments, propagation, choices, and backtracking are external solver state",
+    "bounded-search:large finite extension need not imply an infinite model",
+    "notes-formula:opaque denotation witness, not executable transition code",
+    "extension:larger complete supports and more colors change only the T32 base relation",
+    "all-required:finite conjunction with an independently existential anchor for each template",
+    "CA-relation:rule60 and rule30 spacetime encodings are source mappings, not T33 evolution",
+    "initial-condition:Book explicitly says systems based on constraints do not have initial conditions",
+    "execution:no seed/frontier/read/write/update/successor/halting/runner branch",
+    "source-defect:monolith 56.3-times-3 token is guarded against split 56 3-by-3 wording and 56-count prose",
+    "source-defect:page-219 Mathematica blanks are extraction-corrupt and retained as opaque text only",
+)
 
 
 def digest(values: set[int] | frozenset[int]) -> str:
