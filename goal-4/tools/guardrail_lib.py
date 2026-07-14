@@ -342,20 +342,28 @@ def validate_compatibility_baseline(
         {row.get("path") for row in records} == {row.get("path") for row in affected},
         "behavior/affected-classification join mismatch",
     )
+    context = baseline.get("closure", {})
     for row in records:
         require(row.get("repeat_count") == 2, f"oracle was not repeated twice: {row.get('path')}")
         require(row.get("repeat_identical") is True, f"oracle repeat drift: {row.get('path')}")
         stdout = row.get("stdout", {})
         stderr = row.get("stderr", {})
         require(isinstance(stdout.get("base64"), str) and isinstance(stderr.get("base64"), str), "raw output bytes not captured")
+        require(
+            row.get("transitive_dependency_fingerprint") == context.get("dependency_fingerprint_before"),
+            f"oracle dependency fingerprint missing/drifted: {row.get('path')}",
+        )
         if check_current_scripts:
             script = repo_root / row["path"]
             require(script.is_file(), f"oracle script missing: {row['path']}")
             require(sha256_file(script) == row.get("script_sha256"), f"oracle script drift: {row['path']}")
-    context = baseline.get("closure", {})
     require(context.get("git_head_before") == context.get("git_head_after"), "git HEAD moved during capture")
     require(context.get("dependency_fingerprint_before") == context.get("dependency_fingerprint_after"), "dependency closure moved during capture")
     require(context.get("legacy_tree_digest_before") == context.get("legacy_tree_digest_after"), "legacy tree moved during capture")
+    require(
+        context.get("legacy_content_fingerprint_before") == context.get("legacy_content_fingerprint_after"),
+        "legacy content bytes moved during capture",
+    )
     probe = baseline.get("empty_sibling_probe", {})
     require(probe.get("target_state") == "EMPTY", "empty sibling probe did not use an empty target")
     require(probe.get("all_behavior_identical") is True, "empty sibling changed oracle behavior")

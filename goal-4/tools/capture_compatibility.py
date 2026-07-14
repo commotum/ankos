@@ -73,19 +73,23 @@ def git_tree(root: Path, revision_path: str) -> str:
 
 def dependency_paths(root: Path) -> list[Path]:
     candidates: set[Path] = set()
-    for subtree in (
-        root / "ref/A-New-Kind-of-Science",
-        root / "goal-1",
-        root / "goal-3",
-    ):
-        if subtree.exists():
-            candidates.update(path for path in subtree.rglob("*") if path.is_file() and not path.is_symlink())
+    legacy = root / "ref/A-New-Kind-of-Science"
+    candidates.update(path for path in legacy.rglob("*") if path.is_file() and not path.is_symlink())
+    candidates.update(
+        path
+        for path in (root / "goal-1").glob("*-oracle.py")
+        if path.is_file()
+        and not path.is_symlink()
+        and path.name.endswith(("-source-oracle.py", "-asset-oracle.py"))
+    )
     for relative in (
         "ref/notes/CA-Types.csv",
         "ref/notes/CA-Types.md",
-        "api.md",
-        "simple_programs.md",
-        "principles.md",
+        "goal-1/39-T28-official-note-snapshot.txt",
+        "goal-1/39-T28-wolfram-language-semantics-snapshot.txt",
+        "goal-1/40-T32-official-checking-note-snapshot.txt",
+        "goal-1/40-T32-official-partition-semantics-snapshot.txt",
+        "goal-1/46-T42-semantic-oracle.py",
     ):
         path = root / relative
         if path.is_file() and not path.is_symlink():
@@ -105,6 +109,11 @@ def closure_fingerprint(root: Path, paths: list[Path]) -> tuple[str, list[dict[s
             }
         )
     return sha256_bytes(canonical_json_bytes(rows)), rows
+
+
+def row_subset_fingerprint(rows: list[dict[str, Any]], prefix: str) -> str:
+    subset = [row for row in rows if row["path"].startswith(prefix)]
+    return sha256_bytes(canonical_json_bytes(subset))
 
 
 def classify_oracles(root: Path) -> list[dict[str, Any]]:
@@ -248,6 +257,9 @@ def make_baseline(
     dependency_list = dependency_paths(root)
     head_before = git_head(root)
     fingerprint_before, dependency_rows_before = closure_fingerprint(root, dependency_list)
+    legacy_content_before = row_subset_fingerprint(
+        dependency_rows_before, "ref/A-New-Kind-of-Science/"
+    )
     legacy_before = legacy_recursive_signature(root / contract["architecture"]["legacy_root"])
     legacy_git_tree_before = git_tree(root, f"{head_before}:ref/A-New-Kind-of-Science")
 
@@ -272,6 +284,9 @@ def make_baseline(
         "dependency path set changed during capture",
     )
     fingerprint_after, dependency_rows_after = closure_fingerprint(root, dependency_list_after)
+    legacy_content_after = row_subset_fingerprint(
+        dependency_rows_after, "ref/A-New-Kind-of-Science/"
+    )
     legacy_after = legacy_recursive_signature(root / contract["architecture"]["legacy_root"])
     legacy_git_tree_after = git_tree(root, f"{head_after}:ref/A-New-Kind-of-Science")
     require(head_before == head_after, "git HEAD moved during compatibility capture; discard and retry")
@@ -297,6 +312,7 @@ def make_baseline(
                 "path": run["path"],
                 "kind": classification["kind"],
                 "script_sha256": classification["script_sha256"],
+                "transitive_dependency_fingerprint": fingerprint_before,
                 "argv": run["argv"],
                 "status_kind": run["status_kind"],
                 "exit_code": run["exit_code"],
@@ -358,6 +374,8 @@ def make_baseline(
             "legacy_regular_file_count": len(legacy_before["markdown_paths"]) + len(legacy_before["jpeg_paths"]),
             "legacy_tree_digest_before": legacy_before["signature_sha256"],
             "legacy_tree_digest_after": legacy_after["signature_sha256"],
+            "legacy_content_fingerprint_before": legacy_content_before,
+            "legacy_content_fingerprint_after": legacy_content_after,
         },
         "behavior_digest": baseline_aggregate,
         "oracles": oracle_rows,
