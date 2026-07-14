@@ -1,6 +1,6 @@
 # 40-T32-TEMPLATE-CONSTRAINTS
 
-Status: **IN PROGRESS — ARCHITECTURE RECONSTRUCTED; EVIDENCE ORACLES AND HOSTILE REVIEW PENDING**
+Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, RUNTIME-FIT, ARCHITECTURE, AND INDEPENDENT HOSTILE REVIEW CLOSED**
 
 ## Current Facts
 
@@ -292,16 +292,20 @@ The checked-in `src/ca` realization has no declarative constraint modules, scope
 
 ## Completion Requirements
 
-- [ ] Every direct name, alias, strict line, variant, Notes item, actual Index route, continuation, split witness, image link, and false positive is dispositioned with zero unresolved strict mechanics.
-- [ ] The official Blank-and-Alternatives repair and finite Notes adapter are frozen fail-closed.
-- [ ] The governed asset universe and transcription boundary are exact and hash-bound.
-- [ ] Static support, alphabet, templates, overlap, denotation, scopes, verification, query outcomes, symmetries, numbering, and T31/T33 boundaries are reconstructed.
-- [ ] T31 lowering and the orientation counterexample prove the exact reuse boundary.
-- [ ] Direct/generic semantic reports commute under adversarial periodic/open/scope/orientation/malformed cases.
-- [ ] Current runtime/tests are inspected and the smallest Goal 2 delta is implementation-ready.
-- [ ] Stage, plan, evidence index, design ledger, and architecture matrix are synchronized.
-- [ ] Root/`/tmp`, optimized fail-closed, silent import, in-memory compile, repository tests, modes, Markdown, diff, scope, and independent hostile review pass.
+- [x] Every direct name, alias, strict line, variant, Notes item, actual Index route, continuation, split witness, image link, and false positive is dispositioned with zero unresolved strict mechanics.
+- [x] The official Blank-and-Alternatives repair and finite Notes adapter are frozen fail-closed.
+- [x] The governed asset universe and transcription boundary are exact and hash-bound.
+- [x] Static support, alphabet, templates, overlap, denotation, scopes, verification, query outcomes, symmetries, numbering, and T31/T33 boundaries are reconstructed.
+- [x] T31 lowering and the orientation counterexample prove the exact reuse boundary.
+- [x] Direct/generic semantic reports commute under adversarial periodic/open/scope/orientation/malformed cases.
+- [x] Current runtime/tests are inspected and the smallest Goal 2 delta is implementation-ready.
+- [x] Stage, plan, evidence index, design ledger, and architecture matrix are synchronized.
+- [x] Root/`/tmp`, optimized fail-closed, silent import, in-memory compile, repository tests, modes, Markdown, diff, scope, and independent hostile review pass.
 
 ## Stage Results
 
-Pending source, asset, semantic, integration, and hostile-review closure.
+COMPLETE. The 39-query source audit closes 92 lines at `77 pre-Index / 15 actual-Index`, retains 169 at `18 native / 67 relation / 84 control`, excludes two, reverse-closes retained split evidence at `119 exact + 50 mapped`, and leaves zero unresolved. Official checking-note and three-argument `Partition` snapshots freeze the Blank/`Alternatives` repair and complete-window/drop-incomplete behavior under SHAs `15e06813de186756952e5ec1d465ed4cec7931fc388b68e08437af1cd0c6678f` and `716958949c69e2c6ade2e196a412c7baa8391c31eaa20119a97712275617edf9`. Forty-two governed assets partition `4 native / 12 relation / 26 control`, close 84 references, 42 hashes, 3,571,461 bytes, and eight assemblies/23 files, and remain `42 hash-bound / 0 limited-transcribed / 0 pixel-replayed`; the raster 171-family matching/analyzer table remains unrecovered.
+
+The semantic oracle closes 666 configurations/5,328 native-generic full reports/43,664 checks; all 1,024 T31 histogram relations with 21,712 lowering commutations/109,200 checks; explicit C4, determinant-negative reflection, binary color-exchange, and generic support-order transforms; strict source-derived numeric codecs; overlap/alias/scope/query/T33 boundaries; and 68 hostile rejections. The strict family is a static discrete 2D declarative model set with no native `t`: D134 adds one closed `AllowedLocalPatterns` node inside D058/T31, T31 normalizes losslessly into it, and the north/east same-histogram witness prevents a false reverse collapse. Codec slot order, raw Book coordinates, compass adapters, symmetry transforms, pointwise identity, and orbit observers remain explicit and separate. T33's global occurrence remains its own relation node.
+
+Oracle SHAs are source `7ac7b234fe272bd2992f5e83594f4333f05b433d96abfac7f4f3b1f68e5f5881`, asset `1ba29a655bde67ac853e3160bbb92c901f79ae784adcd6c7c2cfc381998ba18f`, and semantic `055e54f4bf2bac09fe0b2ed2290cdb950472ef04f467b277b32537d655c768db`; the semantic digest is `72b671c04ac5e5a27ab1c2c2e86612b4ac1e493ab5722e89dc187b4d0939cbd5`. Root and relocated runs pass, optimized mode fails closed, imports are silent, in-memory compile and formatting/scope gates pass, and all 102 repository tests pass. No state/category, transition axis, UPDATE, executor, callback, implicit matching, repair dynamics, hidden solver, finite boundary, trusted raster program, or T33 flag is added. No prior stage reopens; 39 of 45 type stages are complete. Next: T33.
