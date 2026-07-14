@@ -1157,9 +1157,15 @@ SOURCE_SEED_DESCRIPTORS: tuple[tuple[str, str], ...] = (
     ("face_any_neighbor", "single_black_cell"),
     ("face_exactly_one", "single_black_cell"),
     ("full_exactly_one", "single_black_cell"),
-    ("full_exactly_two", "3x1x1_black_block"),
+    ("full_exactly_two", "line_of_three_black_cells"),
     ("full_exactly_three", "3x1x1_black_block"),
     ("full_exactly_three_projection_variant", "3x3x1_black_block"),
+)
+
+# A line of three becomes a 3x1x1 array only after a coordinate axis is
+# declared.  Preserve that lossless realization separately from source words.
+DERIVED_SEED_REALIZATIONS: tuple[tuple[str, str, str], ...] = (
+    ("line_of_three_black_cells", "3x1x1_black_block", "declared_axis"),
 )
 
 
@@ -1568,9 +1574,12 @@ def assert_source_profiles_and_formulas() -> dict[str, int]:
         ("face_any_neighbor", "single_black_cell"),
         ("face_exactly_one", "single_black_cell"),
         ("full_exactly_one", "single_black_cell"),
-        ("full_exactly_two", "3x1x1_black_block"),
+        ("full_exactly_two", "line_of_three_black_cells"),
         ("full_exactly_three", "3x1x1_black_block"),
         ("full_exactly_three_projection_variant", "3x3x1_black_block"),
+    )
+    assert DERIVED_SEED_REALIZATIONS == (
+        ("line_of_three_black_cells", "3x1x1_black_block", "declared_axis"),
     )
 
     predicates = {
@@ -1622,10 +1631,15 @@ def assert_source_profiles_and_formulas() -> dict[str, int]:
         assert exact_one.evaluate(read) == int(sum(context) == 1)
         binary_face_contexts += 1
     ternary_face_contexts = 0
-    ternary = CountProductRule("axes", 3, 3, tuple(index % 3 for index in range(39)))
+    ternary = CountProductRule(
+        "axes",
+        3,
+        3,
+        tuple(((index % 3) + (index // 3)) % 3 for index in range(39)),
+    )
     for context in product(range(3), repeat=7):
         read = LocalRead(context[0], context[1:])
-        assert ternary.evaluate(read) == (context[0] + 3 * sum(context[1:])) % 3
+        assert ternary.evaluate(read) == (context[0] + sum(context[1:])) % 3
         ternary_face_contexts += 1
     return {
         "formula_cases": formula_cases,
@@ -1836,6 +1850,8 @@ def assert_native_generic_commutation() -> dict[str, int]:
     counts = {
         "face_quotient": 0,
         "full_quotient": 0,
+        "full_product_fibers": 0,
+        "full_shell_cases": 0,
         "directional": 0,
         "named": 0,
         "ternary": 0,
@@ -1869,6 +1885,57 @@ def assert_native_generic_commutation() -> dict[str, int]:
                 rule, native
             )
             counts["full_quotient"] += 1
+
+    # The small quotient above is deliberately hostile to read-slot
+    # deduplication, but its 2/4/8 alias weights do not realize every full-cube
+    # count.  Fire each product fiber and shell-only case once at the center of
+    # a nonaliasing 3x3x3 fixed-boundary fixture with its matching unit table.
+    center_coord = (1, 1, 1)
+
+    def full_count_fixture(center_value: int, neighbor_count: int) -> Native3DState:
+        assert center_value in (0, 1) and 0 <= neighbor_count <= 26
+        points = [
+            (
+                (
+                    center_coord[0] + offset[0],
+                    center_coord[1] + offset[1],
+                    center_coord[2] + offset[2],
+                ),
+                1,
+            )
+            for offset in BOOK_FULL_OFFSETS[:neighbor_count]
+        ]
+        if center_value:
+            points.append((center_coord, 1))
+        native = Native3DState(
+            2,
+            (3, 3, 3),
+            FixedBoundary(0),
+            native_cells_with_points((3, 3, 3), tuple(points)),
+        )
+        assert native.value_at(*center_coord) == center_value
+        assert sum(native_neighbor_values(native, *center_coord, "full")) == neighbor_count
+        return native
+
+    for neighbor_count in range(27):
+        for center_value in (0, 1):
+            index = center_value + 2 * neighbor_count
+            rule = binary_count_rule("full", 1 << index)
+            native = full_count_fixture(center_value, neighbor_count)
+            native_next = native_count_step(rule, native)
+            generic_next = decode_generic(generic_step(program_for(rule), encode_native(native)))
+            assert generic_next == native_next
+            assert native_next.value_at(*center_coord) == 1
+            counts["full_product_fibers"] += 1
+
+    for neighbor_count in range(27):
+        rule = binary_shell_rule("full", 1 << neighbor_count)
+        native = full_count_fixture(neighbor_count % 2, neighbor_count)
+        native_next = native_count_step(rule, native)
+        generic_next = decode_generic(generic_step(program_for(rule), encode_native(native)))
+        assert generic_next == native_next
+        assert native_next.value_at(*center_coord) == 1
+        counts["full_shell_cases"] += 1
 
     directional_native = Native3DState(
         2,
@@ -1922,7 +1989,12 @@ def assert_native_generic_commutation() -> dict[str, int]:
     ternary_cells = tuple((index * 2 + 1) % 3 for index in range(8))
     ternary_native = Native3DState(3, (2, 2, 2), PeriodicBoundary(), ternary_cells)
     for profile, width in (("axes", 39), ("full", 159)):
-        rule = CountProductRule(profile, 3, 3, tuple(index % 3 for index in range(width)))
+        rule = CountProductRule(
+            profile,
+            3,
+            3,
+            tuple(((index % 3) + (index // 3)) % 3 for index in range(width)),
+        )
         assert decode_generic(
             generic_step(program_for(rule), encode_native(ternary_native))
         ) == native_count_step(rule, ternary_native)
@@ -1931,6 +2003,8 @@ def assert_native_generic_commutation() -> dict[str, int]:
     assert counts == {
         "face_quotient": 4_096,
         "full_quotient": 896,
+        "full_product_fibers": 54,
+        "full_shell_cases": 27,
         "directional": 34,
         "named": 9,
         "ternary": 2,
@@ -2495,13 +2569,15 @@ def main() -> None:
     assert_hostile_validation()
 
     commutations = sum(commutation_counts.values())
-    assert commutations == 5_037
+    assert commutations == 5_118
     print("T23 semantic oracle: PASS")
     print(f"native_generic_commutations={commutations}")
     print(
         "commutation_partition="
         f"face_quotient:{commutation_counts['face_quotient']},"
         f"full_quotient:{commutation_counts['full_quotient']},"
+        f"full_product_fibers:{commutation_counts['full_product_fibers']},"
+        f"full_shell_cases:{commutation_counts['full_shell_cases']},"
         f"directional:{commutation_counts['directional']},"
         f"named:{commutation_counts['named']},"
         f"ternary:{commutation_counts['ternary']}"
@@ -2591,12 +2667,15 @@ def main() -> None:
         "source_seed_descriptors="
         f"{source_counts['source_seed_descriptors']}; "
         "single_cell(face_any,face_exact1,full_exact1),"
-        "3x1x1(full_exact2,full_exact3),3x3x1(full_exact3_projection_variant); "
+        "line_of_three(full_exact2),3x1x1(full_exact3),"
+        "3x3x1(full_exact3_projection_variant); "
+        "derived_line_to_3x1x1_requires_declared_axis; "
         "class4_exact_seed_not_in_text"
     )
     print(
         "fiber_multiplicity="
-        "face:2*C(6,n)_total128;full:2*C(26,n)_total134217728; "
+        "each_(Self,n)=C(shell,n);combined_Self_pair="
+        "face:2*C(6,n)_total128,full:2*C(26,n)_total134217728; "
         "small_2^3_quotient=faces[2,2,2],full[2,2,2,4,4,4,8]"
     )
     print("old_snapshot_parallelism=PASS; same_site_atomic_commit=PASS")
