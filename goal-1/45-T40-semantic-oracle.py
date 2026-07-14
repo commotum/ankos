@@ -1954,9 +1954,11 @@ class T42CoefficientInput:
             raise ValueError("T42 input requires complete exact or certified coefficients")
         if result.termination != PREFIX_OF_INFINITE:
             raise ValueError("strict T42 excludes rational-complete continued fractions")
-        if self.source_kind != IRRATIONAL_PREFIX:
+        source_kind = exact_str(self.source_kind, "T42 source kind")
+        orientation = exact_str(self.orientation, "T42 coefficient orientation")
+        if source_kind != IRRATIONAL_PREFIX:
             raise ValueError("strict T42 source kind must be an irrational prefix")
-        if self.orientation != NATURAL_SIMPLE_CF_PREFIX:
+        if orientation != NATURAL_SIMPLE_CF_PREFIX:
             raise ValueError("T42 input coefficients must be in natural simple-CF order")
         coefficients = exact_tuple(result.coefficients, "T42 coefficients")
         if not coefficients:
@@ -1965,6 +1967,8 @@ class T42CoefficientInput:
             value = exact_int(coefficient, "T42 coefficient")
             if index > 0 and value < 1:
                 raise ValueError("invalid T42 simple-CF coefficient")
+        object.__setattr__(self, "source_kind", source_kind)
+        object.__setattr__(self, "orientation", orientation)
 
     @property
     def source_query_id(self) -> str:
@@ -2941,6 +2945,9 @@ def audit_no_native_execution_surface() -> tuple[int, int, int, int]:
 
 
 def audit_hostile_validation() -> int:
+    class StringSubclass(str):
+        pass
+
     rejected = 0
     rejected += must_raise(TypeError, lambda: RationalLiteral(True, 2))
     rejected += must_raise(TypeError, lambda: RationalLiteral(1, 2.0))
@@ -3157,6 +3164,20 @@ def audit_hostile_validation() -> int:
             -1,
             negative_cf.outcome,
             negative_cf.termination,
+        ),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: T42CoefficientInput(
+            negative_cf,
+            source_kind=StringSubclass(IRRATIONAL_PREFIX),
+        ),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: T42CoefficientInput(
+            negative_cf,
+            orientation=StringSubclass(NATURAL_SIMPLE_CF_PREFIX),
         ),
     )
     rejected += must_raise(TypeError, lambda: T42CoefficientInput(object()))

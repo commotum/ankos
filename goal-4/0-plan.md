@@ -41,7 +41,7 @@ Goal 4 must deliver all of the following:
 10. **Do not silently correct the author.** Keep faithful transcription repair separate from source errata annotations and normalized search text. Apparent mathematical, factual, or historical errors remain author text unless the witness proves an OCR error.
 11. **Every repair is explicit and reversible.** Each replacement, deletion, move, or source-verified insertion has a stable ID, guarded preimage or two-sided insertion anchors, occurrence count, raw/witness location and hashes, before/after text, classification, evidence, reviewer state, and inverse.
 12. **Fail on preimage drift.** A repair must not apply if its expected raw text, count, source hash, or evidence hash changes.
-13. **Conservation is two-way.** Every monolith author-text span appears exactly once in the canonical repaired documents or receives an explicit typed exclusion; every authoritative page region maps to repaired output, `NOT_APPLICABLE`, or a release-blocking source gap; and every repaired author-text span maps to raw text or an authoritative-witness insertion record. Generated metadata is separately labeled.
+13. **Conservation is two-way.** Every monolith author-text span appears exactly once in the canonical repaired documents or receives an explicit typed exclusion; every authoritative page region maps to repaired output, a narrowly typed `NOT_APPLICABLE` non-authorial reason, or a release-blocking source gap; and every repaired author-text span maps to raw text or an authoritative-witness insertion record. `NOT_APPLICABLE` reasons are enumerated, evidenced, and independently reviewed; illegible or untranscribed authorial content is always a blocker. Generated metadata is separately labeled.
 14. **No unreviewed bulk replacement.** Mechanical rules need an allowlist, bounded contexts, exact expected counts, false-positive review, inverse operation, and mutation test. `APPLIED_MECHANICALLY_PROVEN` is restricted to non-author-text structure/path/metadata or byte-preserving transformations; every author-text token change, including repeated dehyphenation, is `APPLIED_WITNESS_VERIFIED` per occurrence.
 15. **Formula and code edits are high risk.** Every changed token needs authoritative visual/textual evidence and independently recorded review by someone other than the change author. Parsing, rendering, or execution is necessary where useful but never proof of source fidelity.
 16. **Index reconstruction requires page-level column evidence.** Do not infer authorial Index order from the flattened OCR or regenerate the Index from body text.
@@ -333,7 +333,7 @@ Stages 8–36 process author text. Each assigned batch must:
 - Every one of the monolith's 22,498 raw logical lines and every deterministic raw author-text block maps into the 29 `CANONICAL_AUTHOR_TEXT` documents exactly once, with no silent gap, overlap, reorder, deletion, or duplication; all 17 split derivatives have routing/difference dispositions and Atlas remains separate metadata.
 - Exactly 29 ordered `CANONICAL_AUTHOR_TEXT` documents exist: 2 front matter, 12 chapters, 13 Notes, Index, and Colophon. The `DERIVED_AGGREGATE` monolith is excluded from this count and separately reproduces canonical sequence/counts.
 - Chapter 12 contains only Chapter 12 main text; all 13 Notes documents have correct ownership; Index and Colophon begin at their actual boundaries.
-- Every one of the expected 1,280 physical pages/plates is present in the witness census with edition identity and per-region legibility or an explicit `NOT_APPLICABLE` status; no blank, figure-only, or Index page disappears silently.
+- Every physical leaf/page/plate derived from the authoritative witness is present in the census with edition identity and per-region legibility or an independently reviewed non-authorial `NOT_APPLICABLE` status; no blank, figure-only, or Index page disappears silently. The witness-derived count is reconciled to the Colophon's 1,280-page clue under a documented counting definition rather than forced to equal it.
 - Every repair and candidate has complete provenance, workflow closure, and one final disposition.
 - Zero `UNRESOLVED_SOURCE_NEEDED` item affecting an authorial layer remains in a release claimed as fully repaired.
 - The Stage 6 zero-repair canonical baseline contains the monolith's 1,444 legacy image references in identical order and ownership totals of Preface 2, chapters 820, Notes 622, and zero elsewhere; the derived aggregate independently mirrors that count/order.
@@ -462,7 +462,7 @@ Secure and validate authoritative, edition-identical page-level evidence suffici
 #### Detailed Implementation Plan
 
 - Locate official/licensed page images, PDF, print-assisted captures, or equivalent authoritative evidence.
-- Fingerprint the edition and enumerate all expected 1,280 physical pages/plates, including blank, figure-only, publication, and Index pages; detect missing/duplicate pages.
+- Fingerprint the edition and derive the complete leaf/page/plate universe from the witness, including covers, blanks, figure-only material, publication matter, and Index pages; detect missing/duplicate units and reconcile the result to the Colophon's 1,280-page clue under an explicit counting definition.
 - Partition pages into nonoverlapping authorial regions and record per-region legibility for prose/punctuation, formulas/code/data, figures/captions/color, and Index columns.
 - Record source URL/location, access date, permissions, file/page hashes, and immutable local review method.
 - Independently transcribe/adjudicate the pre-frozen held-out sample from the witness before reviewers see proposed repairs.
@@ -470,7 +470,7 @@ Secure and validate authoritative, edition-identical page-level evidence suffici
 
 #### Completion Requirements
 
-- Every expected physical page/plate has a pinned mapping and each region has a legibility or `NOT_APPLICABLE` status; gaps become explicit downstream/release blockers rather than disappearing.
+- Every witness-derived physical leaf/page/plate has a pinned mapping and each region has a legibility or independently reviewed enumerated non-authorial `NOT_APPLICABLE` reason; every illegible/untranscribed authorial region becomes a downstream/release blocker.
 - Formula/code/data symbols, figure components/captions, and Index columns are legible in the relevant witness.
 - Witness provenance and permitted storage/use are documented.
 - Tampered or missing witness pages fail verification.
@@ -1081,6 +1081,7 @@ Produce witness-verified repaired Notes for Chapter 12.
 - Apply the Batch Repair Contract to raw lines 19028–20825.
 - Verify computation-equivalence material, formulas, code, figures, captions, names, and Chapter 12 routes.
 - Preserve the true Notes/Index boundary and review all high-risk technical content.
+- Reconcile the operational complete-Notes count across General Notes and Chapters 1–12 with the Colophon's 1,350-note clue.
 - Rebuild and review the complete Notes document.
 
 #### Completion Requirements
@@ -1088,6 +1089,7 @@ Produce witness-verified repaired Notes for Chapter 12.
 - Every Chapter 12 Notes block/page is reviewed and dispositioned.
 - Technical changes have authoritative token evidence and independent review.
 - The document ends exactly before the actual Index.
+- The operational Notes count and any difference from 1,350 are reproducibly explained.
 - Notes render, provenance, links, inverse, and review checks pass.
 
 ### 34-INDEX-AF
@@ -1161,13 +1163,15 @@ Perform a corpus-wide specialist audit of every formula, symbol, rule table, dat
 - Compare every span token-by-token with authoritative pages, including blocks unchanged by earlier stages.
 - Classify all 254 current fenced regions and repair misfenced prose, truncated code, escaped syntax, delimiters, operators, subscripts, and superscripts.
 - Parse/render where possible, but retain visual/source review as the authority.
-- Independently review every changed technical token and a stratified unchanged sample.
+- Independently review every changed technical token and the pre-frozen technical holdout.
+- Define an operational program-count rule and reconcile it with the Colophon's 796 Mathematica-program clue without forcing equality.
 
 #### Completion Requirements
 
 - Every technical span has a witness, transcription status, parse/render status, and review disposition.
 - Zero unreviewed delimiter, fence, formula, code, rule-table, or semantic-data candidate remains.
 - Every technical edit is token-evidenced, reversible, and independently reviewed.
+- The operational program count and any difference from 796 are reproducibly explained.
 - Mutation of one operator, sign, digit, subscript, superscript, brace, or fence fails verification.
 
 ### 38-FIGURES

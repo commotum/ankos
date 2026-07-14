@@ -6,9 +6,9 @@ Use this protocol for every stage in `goal-4/0-plan.md`. The purpose is to produ
 
 ### Foundations: Stages 1–7
 
-Define the fidelity contract, freeze raw inputs, secure authoritative page witnesses, build the reversible pipeline, reconstruct the document tree, close asset handling, and establish the Markdown style.
+Define the fidelity contract, freeze the explicit raw-input allowlist, census authoritative page witnesses, build the reversible pipeline, reconstruct the document tree, close asset handling, and validate the Markdown style.
 
-No witness-dependent author-text repair begins before Stages 1–7 pass. The Stage 5/6 output is a zero-content-repair structural baseline.
+Stages 4–7 may proceed while particular witness pages remain blocked. No witness-dependent batch may touch an uncovered region, but fully witnessed batches may proceed independently. The Stage 5/6 output is a zero-content-repair structural baseline; Stage 42 remains blocked until the complete witness/authorial-region gate passes.
 
 ### Sequential content repair: Stages 8–36
 
@@ -24,7 +24,7 @@ Audit technical notation, figures/captions, and navigation globally; reach resid
 
 1. Sync current state with actual files, hashes, ledgers, tests, witnesses, worktree scope, and prior stage results.
 2. Update `goal-4/0-plan.md` with current facts before starting the next stage.
-3. Select the first incomplete stage whose prerequisites are satisfied.
+3. Select the lowest-numbered incomplete stage whose dependencies and assigned witness regions are satisfied, skipping explicitly blocked but dependency-independent work and keeping at most one stage `IN_PROGRESS`.
 4. Create or refresh `goal-4/[INDEX]-[SHORTHAND].md` from the stage template below.
 5. Implement only that stage, starting every build from frozen raw inputs rather than prior generated output.
 6. Add verification, provenance, inverse, visual-review, and no-cheating checks proportional to the stage's risks.
@@ -41,17 +41,19 @@ Audit technical notation, figures/captions, and navigation globally; reach resid
 - Prefer small, low-complexity changes that narrow uncertainty and remain independently reviewable.
 - Convert blockers into concrete work: alternate authoritative witnesses, narrower diagnostics, proof obligations, review queues, or acquisition steps.
 - Preserve the distinction between immutable input, repair overlay, derived author text, source errata annotation, search normalization, generated metadata, verifier, diagnostic, and fallback path.
-- Keep all legacy `ref/A-New-Kind-of-Science/**` inputs byte-for-byte unchanged throughout Goal 4.
+- Keep the explicit 19-Markdown/1,444-JPEG legacy allowlist under `ref/A-New-Kind-of-Science/` byte-for-byte unchanged; never rediscover raw inputs with a recursive glob that could include `ref/A-New-Kind-of-Science-Repaired/`.
 - Never use repaired/generated output as input to the next build.
 - Never apply a repair to a stale or non-unique preimage.
-- Every author-text output block must map to a raw block plus zero or more explicit repairs.
+- Every canonical author-text output span must map to raw text or a source-verified anchored insertion, and every authoritative page region must map to canonical output, an enumerated/evidenced/independently reviewed non-authorial `NOT_APPLICABLE` reason, or a release blocker. Illegible or untranscribed authorial content is never `NOT_APPLICABLE`.
 - Generated anchors, page markers, navigation, and alt text must be typed as editorial metadata.
+- Canonical author text, derived aggregate, errata/editorial sidecars, and search normalization are distinct targets with class-enforced overlays.
 - Never treat the current split and monolith as independent OCR witnesses.
 - Never treat language plausibility, OCR confidence, spell-checking, parsing, rendering, code execution, or mathematical consistency as source proof.
 - Never silently correct an apparent authorial error.
-- Formula, code, rule-table, data, caption-association, and Index edits require authoritative evidence and independent review.
-- Preserve every raw image byte; never infer caption/group ownership from proximity or filenames alone.
-- An unresolved high-risk ambiguity remains a release blocker unless the user explicitly changes the objective.
+- Every author-text token/layout change requires per-occurrence authoritative witness evidence; `APPLIED_MECHANICALLY_PROVEN` is limited to non-author-text structure/path/generated metadata or byte-preserving transformations.
+- Formula, code, rule-table, data, caption-association, and Index edits require authoritative evidence and machine-enforced independent review.
+- Preserve every legacy image byte; never infer caption/group ownership from proximity or filenames alone, and do not call the visual edition complete while a witness-visible plate/component is missing.
+- Any unresolved source-needed ambiguity affecting an authorial layer remains a release blocker unless the user explicitly changes the objective.
 - Do not claim human review when the review was automated or agent-only.
 - Do not migrate existing Goal 1/3 paths, hashes, or line citations during Goal 4.
 - Preserve unrelated dirty work and inspect scope before and after every stage.
@@ -68,14 +70,16 @@ Use one of these states in `0-plan.md` and the stage file:
 
 `SOURCE_BLOCKED` and `REVIEW_BLOCKED` are evidence-bearing states, not completion. Record the exact missing witness/review, affected blocks, impact, attempted alternatives, and unblock action.
 
+Record explicit dependencies in every stage file. At most one stage is `IN_PROGRESS`. A blocked stage may be bypassed only by a stage whose dependency row in `0-plan.md` does not require the blocked material.
+
 ## Start-Of-Stage Sync
 
 Before implementing a stage:
 
 1. Read `0-plan.md`, `0-loop.md`, the current stage file if present, and all prior stage result summaries that constrain it.
 2. Run `git status --short` and identify unrelated changes that must remain untouched.
-3. Recompute governed raw hashes and compare them with `corpus-manifest.json`.
-4. Verify required witness pages/hashes and permissions for the stage.
+3. Recompute the explicit governed raw allowlist hashes and compare them with `corpus-manifest.json`; confirm the sibling repaired folder is excluded.
+4. Verify required witness page-region hashes, legibility, permissions, and audit-mount availability for the stage.
 5. Validate every governed ledger and ensure there is no stale generated-output dependency.
 6. Rebuild the latest accepted output from raw inputs plus overlays into a fresh directory.
 7. Confirm stage prerequisites and outstanding blockers.
@@ -90,12 +94,14 @@ Every proposed repair gets a stable ID before application.
 Required fields:
 
 - repair ID and class;
+- workflow state and owning closure stage;
 - risk level;
 - immutable raw file/hash;
 - raw byte/block ID and logical lines;
-- exact preimage and expected occurrence count;
+- operation type;
+- exact preimage and expected occurrence count, or stable two-sided anchors and expected adjacency for source-visible content absent from raw;
 - proposed after-text or typed metadata;
-- authoritative witness edition/page/location/hash;
+- class-conditional evidence: authoritative witness edition/page-region/location/hash for author-text/layout, or independently reproducible proof for non-author-text mechanical/generated changes;
 - explanation and confidence;
 - author/editorial/source-erratum layer;
 - creator and reviewer type/identity;
@@ -103,6 +109,8 @@ Required fields:
 - forward and inverse operation;
 - before/witness/after render references when applicable;
 - disposition and verification results.
+
+Workflow states are `CAPTURED`, `EVIDENCE_READY`, `PENDING_SPECIALIST_REVIEW`, `PENDING_INDEPENDENT_REVIEW`, `SOURCE_BLOCKED`, and `CLOSED`. Final dispositions are assigned only when `CLOSED`.
 
 Allowed final dispositions:
 
@@ -119,9 +127,9 @@ A record is not “verified” merely because its patch applies. It must also sa
 
 Use this procedure for Stages 8–36:
 
-1. Freeze the stage's raw block list and authoritative page list.
+1. Freeze the stage's unique raw-block assignments and nonoverlapping authoritative page-region list.
 2. Open the raw block, split routing witnesses, primary page witness, and current repaired render together.
-3. Compare the entire block sequentially, not only detector hits.
+3. Compare every raw block and every witness region sequentially, not only detector hits; create an anchored insertion candidate for witness content wholly missing from raw.
 4. Identify candidate defects in:
    - text and punctuation;
    - paragraph/list continuity and hyphenation;
@@ -131,20 +139,22 @@ Use this procedure for Stages 8–36:
    - images, figure groups, and captions;
    - page/section/Notes/Index cross-references;
    - Markdown syntax and rendering.
-5. Create repair records or explicit valid-text/source-needed dispositions.
+5. Create repair records, pending specialist/reviewer routes, or explicit valid-text/source-needed dispositions.
 6. Apply only source-authorized repairs through the overlay pipeline.
 7. Generate and inspect before/witness/after views for changed blocks.
 8. Add technical and figure items to their specialist ledgers.
 9. Rebuild from raw, run focused verification, and reverse the overlay.
-10. Review all changed blocks and a stratified unchanged sample.
-11. Require independent review for every high-risk edit.
-12. Close the batch matrix: every raw block, witness page, candidate, repair, unresolved item, figure group, and technical span has one governed status.
+10. Review all changed blocks and the pre-frozen manifest-seeded changed/unchanged holdout.
+11. Require an independently recorded witness decision for every high-risk edit by a reviewer ID different from the creator; unresolved disagreement blocks closure.
+12. Close the batch matrix: every raw block, witness region, candidate, repair, unresolved item, figure group, and technical span is closed or has one governed pending state and owning later stage.
 
 ## Evidence Policy
 
 ### Mechanically provable changes
 
 Examples include structural partitioning from independently verified boundaries, deterministic path rewriting, generated navigation metadata, or final-newline policy.
+
+`APPLIED_MECHANICALLY_PROVEN` cannot change an author-text token or source-significant layout. Even a repeated spelling/dehyphenation change requires `APPLIED_WITNESS_VERIFIED` per occurrence.
 
 They still require:
 
@@ -169,6 +179,8 @@ Corrections require an edition-identical primary witness. Candidate detectors ma
 
 Do not globally repair a token because it looks wrong. Proper names, compounds, historical spelling, and intentional typography require witness review.
 
+Build mode applies frozen overlays without requiring network/live evidence. Audit mode mounts the authorized pinned witness and rechecks source content. A witness hash without readable authorized content is not evidence that a repair is correct.
+
 ### Formulas, code, rules, and data
 
 Every changed token requires page evidence and independent review. Preserve exact operators, signs, digits, braces, pattern syntax, subscripts, superscripts, colors, seeds, state tables, and sequence values.
@@ -177,7 +189,7 @@ Parsing/rendering/execution can detect inconsistency but cannot authorize a repl
 
 ### Figures and captions
 
-Use full page context. One printed figure may map to multiple cropped JPEGs. A JPEG may be only a caption or partial plate.
+Use full page context. One printed figure may map to multiple cropped JPEGs. A JPEG may be only a caption or partial plate. Independently census every witness-visible printed figure/component; preserving 1,444 local assets alone does not prove visual completeness.
 
 Track:
 
@@ -219,7 +231,7 @@ An automated repair rule requires:
 4. exact expected match count;
 5. complete hit inventory;
 6. false-positive review;
-7. authoritative evidence where author text changes;
+7. per-occurrence authoritative evidence for every author-text/layout change;
 8. forward and inverse operations;
 9. mutation fixtures;
 10. post-build visual/AST review.
@@ -235,7 +247,7 @@ For each stage, distinguish:
 - independent agent review;
 - human review.
 
-High-risk changes require a reviewer independent of the change author. Disagreements remain open until resolved against evidence.
+High-risk changes require creator ID ≠ reviewer ID, an evidence-view hash, and preferably a blind witness transcription/association decision recorded before the proposed repair is shown. Validators reject self-review and unresolved disagreements.
 
 The review ledger must include:
 
@@ -254,11 +266,15 @@ Do not record a blanket “reviewed” flag without enumerated coverage.
 Every build must prove:
 
 - all raw inputs match frozen hashes;
-- every raw author-text block maps exactly once;
+- every monolith author-text block maps exactly once into `CANONICAL_AUTHOR_TEXT`;
+- every authoritative authorial page region maps to canonical output, `NOT_APPLICABLE`, or a release blocker;
+- every canonical author-text span maps to raw content or witness-backed insertion evidence;
 - all exclusions are typed and justified;
 - output author text contains no unlogged change;
 - repair order is deterministic;
 - generated metadata is distinguishable and removable;
+- the derived aggregate duplicates canonical content only as an explicitly excluded serialized view;
+- errata/editorial/search overlays cannot enter canonical author text;
 - inverse replay recovers raw block hashes/order;
 - old raw locations map to stable repaired anchors;
 - output never becomes the next input.
@@ -267,8 +283,9 @@ The conservation verifier must be independently implemented from the builder's o
 
 ## Asset Checks
 
-For all 1,444 JPEGs:
+For all 1,444 legacy JPEGs:
 
+- distinct asset ID;
 - basename;
 - current raw path;
 - byte size;
@@ -282,6 +299,8 @@ For all 1,444 JPEGs:
 - crop/completeness status;
 - accessibility metadata status.
 
+Separately census final witness-visible printed figure groups/components and source-verified canonical replacements. Identical hashes do not authorize deduplicating distinct asset IDs. Canonical-fragment and derived-aggregate reference counts are validated separately.
+
 Required negative tests include:
 
 - delete an asset;
@@ -292,28 +311,31 @@ Required negative tests include:
 - attach a caption to the wrong group;
 - omit one of the three known split-reference gaps;
 - silently recompress/copy with hash drift.
+- omit a witness-only/missing plate;
+- double-count references by mixing canonical and aggregate views;
+- add repaired Markdown or a duplicate-basename image beneath a temporary legacy root without compatibility detection.
 
 ## Focused Verification By Stage Kind
 
 ### Guardrails, baseline, and witnesses
 
 - Confirm architecture/scope against actual consumers.
-- Independently hash inputs and witnesses.
-- Verify edition/page coverage and licensing/provenance records.
+- Independently hash the explicit inputs and witnesses.
+- Verify the complete witness-derived leaf/page/plate and authorial-region census, its documented reconciliation to the 1,280-page clue, legibility, licensing/provenance, and build/audit modes.
 - Test missing/tampered input and witness failures.
 
 ### Pipeline, structure, media, and style
 
 - Build zero-repair output twice.
-- Prove 29-segment coverage and inverse reconstruction.
-- Verify all assets/references and structural ownership.
+- Prove 29 canonical-segment coverage, separate aggregate counts, two-way provenance, and inverse reconstruction.
+- Verify all legacy assets/reference ordinals, ownership totals, and structural signatures.
 - Run parser/render fixtures and all core mutations.
 
 ### Main-text and Notes batches
 
-- Verify total raw-block and witness-page coverage.
-- Inspect every repair and unresolved disposition.
-- Run changed-block and unchanged-sample reviews.
+- Verify total raw-block and nonoverlapping witness-region coverage.
+- Inspect every closed repair/final disposition and governed pending specialist/reviewer route.
+- Run changed-block and the pre-frozen unchanged/changed holdout.
 - Run technical, figure, provenance, inverse, render, and link checks.
 
 ### Index batches
@@ -329,8 +351,8 @@ Required negative tests include:
 
 ### Saturation, hostile review, and release
 
-- Rerun all detectors to a documented fixed point.
-- Review stratified changed/unchanged samples.
+- Rerun all detectors to two consecutive full no-new-class rounds and prove recall on known sentinels/mutations.
+- Review the pre-frozen blind-adjudicated sample and class-specific thresholds.
 - Run every mutation and full offline/relocated build.
 - Compare two fresh releases byte-for-byte.
 - Verify raw scope and final claims.
@@ -339,6 +361,12 @@ Required negative tests include:
 
 ```markdown
 # [INDEX]-[SHORTHAND]
+
+Status: NOT_STARTED
+
+Dependencies:
+
+- Stage IDs, witness regions, reviews, or other prerequisites.
 
 ## Current Facts
 
@@ -387,23 +415,25 @@ Required negative tests include:
 Before Stage 42 may complete:
 
 1. Recompute all legacy raw hashes and compare with the frozen manifest.
-2. Verify authoritative witness coverage, identity, and hashes for every reviewed page.
+2. Verify the complete physical-page/plate/region witness census, identity, legibility, permissions, and hashes.
 3. Validate every ledger schema, unique ID, join, status, and digest.
-4. Prove all 22,498 raw logical lines and every raw block map exactly once.
-5. Verify exactly 29 ordered repaired author-text documents.
-6. Verify every repair preimage, evidence, inverse, review, and disposition.
-7. Require zero unqualified high-risk unresolved item.
-8. Verify all 1,444 asset hashes and repaired references, including the three restored omissions.
+4. Prove all 22,498 monolith logical lines/raw blocks map exactly once into 29 canonical documents, and every witness authorial region maps back from canonical output.
+5. Verify exactly 29 ordered `CANONICAL_AUTHOR_TEXT` documents and separate expected counts for `DERIVED_AGGREGATE` and metadata/sidecar targets.
+6. Verify every repair operation/preimage or insertion anchor, class-conditional evidence, inverse, workflow closure, independent review, and final disposition.
+7. Require zero unresolved source-needed item affecting any authorial layer and zero unresolved review disagreement.
+8. Verify all 1,444 legacy asset IDs/hashes/baseline reference ordinals, the three restored omissions, and the final witness-complete printed-figure/component inventory.
 9. Parse and render all Markdown; check headings, fences, HTML, math delimiters, code blocks, figures, and Index structure.
 10. Verify all links, unique anchors, page routes, Notes routes, Index routes, navigation reachability, and legacy compatibility mappings.
-11. Run every mutation fixture and inspect that it fails for the intended reason.
+11. Run every mutation and known-defect-regression fixture and inspect that it fails/routes for the intended reason.
 12. Build twice from raw in clean fresh directories and compare outputs byte-for-byte.
 13. Run offline, relocated, and optimized-mode checks where applicable.
 14. Reverse all repair overlays and recover raw block hashes/order.
-15. Run direct trailing-whitespace and fence checks over tracked and untracked Goal 4/repaired files.
+15. Run direct trailing-whitespace and fence checks over tracked and untracked Goal 4 and sibling repaired files.
 16. Run `git diff --check` and inspect `git status --short` for scope.
-17. Confirm legacy raw, Goal 1, Goal 2, Goal 3, runtime, and unrelated references are unchanged.
-18. Read the final report's claims against actual unresolved/review ledgers.
+17. Confirm legacy raw, Goal 1, Goal 2, Goal 3, runtime, and unrelated references are unchanged, and affected Goal 1 oracle output digests match the pre-release baseline.
+18. Run audit mode against the authorized witness mount and pass the pre-frozen class-specific quality thresholds.
+19. Reconcile operational illustration/Notes/program/Index counts with 973/1,350/796/14,967 and explain differences.
+20. Read the final report's claims against actual unresolved/review/witness-region ledgers.
 
 ## Session Stop / Resume Contract
 

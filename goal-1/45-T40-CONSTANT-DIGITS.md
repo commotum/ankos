@@ -352,7 +352,7 @@ The smallest honest model is therefore an immutable exact denotation plus a type
 
 ## Current Runtime Fit
 
-The current `src/ca` package exposes names resembling the shared axes, but its executable realization remains CA-shaped and family-dispatched. T40 therefore exercises shared migrations and declarative modules, not a `constant_digits` rollout branch.
+`src/ca` is the current implementation location of the intended SimplePrograms library, not a claim that every catalog construction is semantically a cellular automaton. Its executable realization nevertheless remains CA-shaped and family-dispatched today. T40 therefore exercises shared migrations and declarative modules, not a `constant_digits` rollout branch.
 
 | Responsibility | Current mechanism | Goal 2 disposition |
 |---|---|---|
@@ -381,6 +381,7 @@ The current `src/ca` package exposes names resembling the shared axes, but its e
 
 - No exact constant represented by an approximate float, rendered digit string, finite prefix, raster, host symbolic object, or opaque callback.
 - No base, sign/radix convention, canonicalization, evaluator version, precision, or certificate context left implicit.
+- No unary, negative-radix, non-power/mixed-weight, multiplicative, Gray-code, self-delimiting, or Fibonacci/Zeckendorf representation mislabeled as strict v1 `Positional(base>=2)`; each future codec needs its own closed tag, inverse, and ambiguity/completeness invariants.
 - No `term_count` used as state, control, capacity, native halt, or constant identity; it is a query horizon.
 - No terminating positional expansion mislabeled finite when the strict representation includes trailing zeros; suppression remains rendering.
 - No rational continued fraction extended after exact finite completion; no reciprocal-of-zero failure substituted for the query's normal completion.

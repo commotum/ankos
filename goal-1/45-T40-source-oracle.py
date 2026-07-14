@@ -59,7 +59,7 @@ def line_set(spec: str) -> frozenset[int]:
 
 
 # Exactly twenty bounded lanes from the first-principles audit.  Q00 proves
-# that the catalog label is external vocabulary; Q15/Q16 close all 29 images.
+# that the catalog label is external vocabulary; Q15/Q16 close all 35 images.
 QUERIES = {
     "Q00": r"Mathematical-Constant Digit Systems?",
     "Q01": r"Mathematical Constants",
@@ -124,7 +124,9 @@ QUERIES = {
     ),
     "Q15": r"_page_(?:151_Figure_7|154_Figure_2|156_Figure_1)\.jpeg",
     "Q16": (
-        r"_page_(?:916_Figure_12|917_Picture_11|918_Figure_2|"
+        r"_page_(?:575_Figure_5|576_Figure_4|"
+        r"162_Figure_1|884_Figure_30|960_Figure_3|1099_Figure_1|"
+        r"916_Figure_12|917_Picture_11|918_Figure_2|"
         r"927_Figure_14|928_Figure_(?:9|11|13|22)|"
         r"929_Picture_1[1-6]|930_(?:Picture_(?:4|12|14)|Figure_10)|"
         r"931_Figure_(?:9|10|11|12|13|17)|"
@@ -197,13 +199,14 @@ QUERY_NATIVE = line_set(
     "13086,13090"
 )
 QUERY_RELATION = line_set(
-    "654,1850,1852,1856,11260,11531,11532,11536,"
+    "654,1850,1852,1854,1856,6768,6772,6776,"
+    "11252,11260,11531,11532,11536,"
     "12503,12515,12524,12532,12536,12550,12552,12554,12555,12557,12569,"
     "12984,12986,12988,12990,"
     "12992,12996,13000,13004,13018,13020,13022,13023,13029,13062,"
     "13074,13076,13084,13092,13094,13096,13098,13102,13103,13111,"
-    "13119,13121,13123,13125,13127,13219,14172,14468,14923,15517,"
-    "17107,17130,17167,17171,17236,17599,17851,20507,20592"
+    "13119,13121,13123,13125,13127,13219,14172,14176,14468,14923,15517,"
+    "17107,17130,17167,17171,17236,17593,17599,17851,20507,20592"
 )
 QUERY_CONTROL = line_set(
     "1619,1834,12846,13134,13146,17101,19058,19074,19076,19078,19080"
@@ -211,7 +214,6 @@ QUERY_CONTROL = line_set(
 
 EXCLUDED_CLASS = {
     "name_collision": line_set("146"),
-    "unrelated_representation_context": line_set("6772"),
     "generic_algorithm_cross_reference": line_set("17845,19345,19563"),
 }
 EXCLUDED = frozenset().union(*EXCLUDED_CLASS.values())
@@ -255,15 +257,17 @@ NATIVE_CONTINUATIONS = line_set(
     "13088,13100"
 )
 RELATION_CONTINUATIONS = line_set(
-    "656,12505,12507,12509,12511,12513,12517-12520,12522,"
+    "656,1858,6766,6770,6774,6778,6780,6782,"
+    "11250,11254,11256,"
+    "12505,12507,12509,12511,12513,12517-12520,12522,"
     "12526,12528,12530,12534,"
     "12587,12589,12591,12593,12595,"
     "12994,12998,13002,13006-13016,13025,13027,13064-13068,"
     "13078-13082,13105,13107,13109,13113,13115,13117,13129,13130,"
-    "13132,13136,13138-13144,17105,"
+    "13132,13136,13138-13144,14170,14174,17105,"
     "17131-17133,17135-17137,17139,17141-17145,17147,17149-17151,"
-    "17153,17155-17159,17161,17163,17165,17169,17173,"
-    "19066,19068,19070,19072"
+    "17153,17155-17159,17161,17163,17165,17169,17173,17175,"
+    "17597,19066,19068,19070,19072"
 )
 CONTROL_CONTINUATIONS = line_set("1663,12919")
 
@@ -307,7 +311,7 @@ INDEX_CLASS = {
         "21891,21907,22136"
     ),
     "relation": line_set(
-        "20836,20840,20846,20850,20862,20864,20868,20904,20906,20914,20940,"
+        "20836,20840,20846,20850,20862,20864,20868,20882,20904,20906,20914,20940,"
         "20942,20967,20972,21014,21022,21038,21042,21050,21080,"
         "21086,21090,21114,21132,21134,21148,21150,21162,21168,"
         "21172,21173,21181,21185,21187,21193,21195,21197,21203,"
@@ -319,7 +323,7 @@ INDEX_CLASS = {
         "22110,22112,22114,22144,22146,22148,22150,22352,22380,"
         "22382,22394,22434,22452,22456"
     ),
-    "control": line_set("20970,22096"),
+    "control": line_set("20970,22096,22362"),
 }
 INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
 INDEX_EXCLUDED = line_set(
@@ -340,19 +344,20 @@ INDEX_BROAD_VOCABULARY_PATTERN = (
     r"champernowne|stoneham|khinchin|power.?mod|plouffe|euclid.s algorithm|"
     r"[0-9]+ \(base\)|(?:negative|arbitrary|non-power) bases|"
     r"representation of, 902, 942|unary representation of numbers|"
-    r"zeckendorff representation"
+    r"zeckendorff representation|Arithmetic algorithmic randomness|"
+    r"computable numbers, 1128|computable reals, 1128|continuous computation, 1128"
 )
 
 # A separate independent page/vocabulary/flattened-continuation review found
 # rows that the broad textual pattern cannot see.  Its positive and noisy
 # candidates are intentionally frozen together, before semantic disposition.
 INDEX_HOSTILE_AUDIT_CANDIDATES = line_set(
-    "20836,20846,20862,20864,20868,20888,20904,20906,20908,20940,20942,20965,"
+    "20836,20846,20862,20864,20868,20882,20888,20904,20906,20908,20940,20942,20965,"
     "20970,20980,21022,21042,21072,21080,21086,21090,21102,21108,"
     "21148,21181,21189,21233,21274,21277,21290,21329,21333,21338,"
     "21362,21420,21454,21460,21471,21515,21545,21586,21602,21642,21646,21648,"
     "21731,21771,21777,21783,21803,21841,21877,21881,21903,21923,"
-    "21925,22016,22112,22114,22132,22146,22382,22412,22434,22452,22456"
+    "21925,22016,22112,22114,22132,22146,22362,22382,22412,22434,22452,22456"
 )
 
 INDEX_ENTRY_GUARDS = {
@@ -364,6 +369,7 @@ INDEX_ENTRY_GUARDS = {
     20862: ("in hierarchy of numbers, 916", "Algorithmically simple integers, 916"),
     20864: ("and history of numbers, 902",),
     20868: ("Archimedes (Sicily, 287–212 BC)", "and  $\\pi$ , 911"),
+    20882: ("Arithmetic algorithmic randomness in, 1067",),
     20904: ("and computing  $\\pi$ , 911",),
     20906: ("and computing *Sqrt*, 913",),
     20908: ("Base 1 (unary), 560, 1070", "Base 2 (binary), 116"),
@@ -485,6 +491,11 @@ INDEX_ENTRY_GUARDS = {
     22148: ("Superstrings", "runs of digits"),
     22150: ("Symbolic programming", "leading digits"),
     22352: ("Toffoli, Tommaso", "Egyptian fractions"),
+    22362: (
+        "and computable numbers, 1128, 1137",
+        "and continuous computation, 1128",
+        "and computable reals, 1128",
+    ),
     22380: ("Two's complement number representation, 902, 942",),
     22382: ("Unary representation of numbers, 560, 1070",),
     22394: ("Valuation functions", "nested digit sequences"),
@@ -531,7 +542,8 @@ NATIVE_IMAGE_LINES = line_set(
     "1677,1711,1744,12960,13040,13042,13044,13046,13048,13050,13090"
 )
 RELATION_IMAGE_LINES = line_set(
-    "12524,12552,12557,12992,12996,13000,13020,13076,13094,13098,"
+    "1854,6768,6776,11252,12524,12552,12557,12992,12996,13000,13020,13076,"
+    "13094,13098,14176,17593,"
     "13119,13121,13123,13125,13127"
 )
 CONTROL_IMAGE_LINES = line_set("13134")
@@ -546,6 +558,10 @@ IMAGE_ROLE_RECORDS = (
     "1677:native:page151 pi base-two walk observer",
     "1711:native:page154 rational long-division work panels",
     "1744:native:page156 square-root product-state work panels",
+    "1854:relation:page162 continued-fraction-driven substitution observer",
+    "6768:relation:page560 unary binary self-delimiting and Fibonacci representation observer",
+    "6776:relation:page561 run-length application of page560 representation-e observer",
+    "11252:relation:page884 cellular-automaton Cantor-map representation observer",
     "12524:relation:page916 Gray-code representation observer",
     "12552:relation:page917 negative-base representation observer",
     "12557:relation:page918 multiplicative-digit representation observer",
@@ -570,8 +586,12 @@ IMAGE_ROLE_RECORDS = (
     "13125:relation:page931 digital-slope panel d",
     "13127:relation:page931 digital-slope panel e",
     "13134:control:page931 operator-representation boundary",
+    "14176:relation:page960 Pell continued-fraction size observer",
+    "17593:relation:page1099 block-frequency and statistical-model composite observer",
 )
 IMAGE_ASSEMBLY_BOUNDARIES = (
+    "page560-561:6768,6776 form representation and downstream run-length application observers",
+    "continuation-assets:1854,11252,14176,17593 are governed by retained adjacent relation spans",
     "page916-918:12524,12552,12557 are governed representation-relation assets",
     "page928:12992,12996,13000 form the concatenation-walk trilogy",
     "page929:13040,13042,13044,13046,13048,13050 form six residual panels",
@@ -579,7 +599,7 @@ IMAGE_ASSEMBLY_BOUNDARIES = (
     "page931:13119,13121,13123,13125,13127 form five digital-slope panels",
     "main:1711 and 1744 have physical files but no split Markdown references",
     "paths:monolith references omit Images while split references include it",
-    "boundary:all 27 assets are hash-bound and supply no pixel-derived mechanics",
+    "boundary:all 35 assets are hash-bound and supply no pixel-derived mechanics",
 )
 
 
@@ -599,6 +619,56 @@ SOURCE_SEMANTIC_GUARDS = (
     ("continued_fraction_completion", 1794, ("rational numbers", "limited length", "go on forever"), ()),
     ("symbolic_evaluation_cost", 1796, ("symbolic expressions", "difficult", "actual value"), ()),
     ("representation_conclusion", 1832, ("intrinsic sense complex", "particular representation"), ()),
+    (
+        "pi_complexity_history",
+        654,
+        ("digit sequence of a number like", "more than a hundred digits", "appeared quite random"),
+        (),
+    ),
+    ("pi_complexity_history_completion", 656, ("simple rules like those for computing", "produce complex results"), ()),
+    (
+        "cf_substitution_relation",
+        1850,
+        ("generalized substitution system", "continued fraction representation"),
+        (),
+    ),
+    ("cf_substitution_interrupted_claim", 1852, ("square root", "purely repetitive"), ("generated pattern nested",)),
+    ("cf_substitution_completion", 1858, ("generated pattern nested", "no particular connection"), ()),
+    (
+        "page560_encoding_context",
+        6766,
+        ("run-length encoding", "number \"53\"", "black and white cells"),
+        (),
+    ),
+    (
+        "page560_representation_caption",
+        6770,
+        ("unary", "ordinary binary or base 2", "self-delimiting", "binary-coded-ternary", "Fibonacci sequence"),
+        (),
+    ),
+    ("page560_delimitation_problem", 6772, ("digit sequence", "short representation for a number", "no way to tell"), ()),
+    (
+        "page560_delimitation_schemes",
+        6774,
+        ("specification of how many digits", "two cells representing each digit", "non-integer base"),
+        (),
+    ),
+    ("page561_representation_application", 6782, ("representation (e) from page 560", "run-length encoding", "compression is achieved"), ()),
+    (
+        "ca_cantor_map_relation",
+        11250,
+        ("state space of a 1D cellular automaton", "Cantor set", "continuous mapping"),
+        (),
+    ),
+    ("ca_digit_map_relation", 11256, ("digits of rational numbers", "Rule 170", "classic shift map"), ()),
+    ("ca_digit_map_completion", 11260, ("this map has the form Mod[2x, 1]", "page 153"), ()),
+    (
+        "pi_randomness_history",
+        11532,
+        ("digits of", "transcendental numbers", "apparent randomness", "process of calculation"),
+        (),
+    ),
+    ("venn_pi_history", 11536, ("John Venn", "randomness of the digits"), ()),
     (
         "whole_positional_encode",
         12503,
@@ -653,6 +723,8 @@ SOURCE_SEMANTIC_GUARDS = (
         ("digit sequence picture", "BitXor[i, Floor[i/2]]", "rule 60 cellular automaton"),
         (),
     ),
+    ("symbolic_dynamics_boundary", 12528, ("symbolic dynamics approach", "digit sequence approach", "digit expansions"), ()),
+    ("symbolic_dynamics_scope", 12530, ("only shifts", "simple operations", "not been seen"), ()),
     (
         "number_history_scope",
         12532,
@@ -731,9 +803,34 @@ SOURCE_SEMANTIC_GUARDS = (
     ("approximation_observer", 13088, ("closeness of successive rational approximations",), ()),
     ("euclid_relation", 13092, ("Euclid's algorithm", "ContinuedFraction[a/b]"), ()),
     ("digital_slope_relation", 13111, ("Digital slope representation", "Floor[nh] - Floor[(n-1)h]"), ()),
+    ("gauss_cf_map_history", 13219, ("Carl Friedrich Gauss", "continued fractions", "FractionalPart[1/x]"), ()),
+    ("pell_cf_relation", 14170, ("Pell equation", "infinitely many solutions", "smallest solution"), ()),
+    ("pell_cf_observer", 14174, ("plotted below", "complicated variation", "1766319049"), ()),
+    ("number_repetition_relation", 15517, ("Repetition in numbers", "digits in rational numbers", "continued fraction terms"), ()),
+    ("randomness_history_scope", 17105, ("History", "statistical hypothesis testing", "tests for randomness"), ()),
+    ("normal_number_history", 17107, ("Emile Borel", "normal numbers", "algorithmic randomness"), ()),
+    ("page560_notes_heading", 17130, ("Page 560", "Number representations", "sequence of 1's and 0's"), ()),
+    ("page560_notes_unary_binary", 17131, ("Unary", "Not self-delimited"), ()),
+    ("page560_notes_length_prefix", 17133, ("Length prefixed", "unary specification of its length"), ()),
+    ("page560_notes_binary_ternary", 17139, ("Binary-coded base 3", "pair of base 2 digits"), ()),
+    ("page560_notes_fibonacci", 17147, ("Fibonacci encoding", "decomposes", "no pair of 1's"), ()),
+    ("page560_notes_lengths", 17161, ("Lengths of representations", "GoldenRatio"), ()),
+    ("page560_notes_completeness", 17169, ("Completeness", "valid representation", "complete number"), ()),
+    ("page560_notes_distribution", 17173, ("different number representations", "different distributions", "Maximal compression"), ()),
+    ("page560_notes_practical_boundary", 17175, ("Practical computing", "fixed length", "self-delimiting"), ()),
+    ("sturmian_span", 17597, ("Block frequencies", "Sturmian type",), ()),
+    ("sturmian_completion", 17599, ("page 916", "n^{th}", "irrational number"), ()),
     ("number_classification", 13136, ("Number classification", "undecidable", "same number"), ()),
     ("noncomputable_definition", 17101, ("formal descriptions", "algorithmically random", "Chaitin"), ()),
     ("noncomputable_coefficients", 19058, ("nth digit", "far from being computable", "halting problem"), ()),
+    ("real_cf_encoding", 19066, ("real number x", "represented as a set of integers"), ()),
+    ("real_cf_encoding_formula", 19068, ("ContinuedFraction[x]", "FoldList"), ()),
+    ("real_encoding_cardinality", 19070, ("not finite", "Cantor's diagonal argument", "RealDigits[list]"), ()),
+    ("infinite_configuration_digits", 19072, ("infinite configurations", "digit sequences of real numbers", "Cantor set"), ()),
+    ("computable_real_definition", 19074, ("computable real numbers", "n<sup>th</sup> digit", "finite number of steps"), ()),
+    ("noncomputable_reals_boundary", 19076, ("non-computable reals", "successive digits", "infinitely long time"), ()),
+    ("diagonal_digit_boundary", 19078, ("Diagonal arguments", "nth base 2 digit", "1 - f[n, n]"), ()),
+    ("continuous_digit_computation", 19080, ("Continuous computation", "real numbers in terms of digits", "discrete processes"), ()),
     (
         "representation_pluralism",
         20507,
