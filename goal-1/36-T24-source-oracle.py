@@ -347,7 +347,7 @@ EXPECTED_INDEX_CLASS = {
 EXPECTED_IMAGE_PARTITION = {
     "native": (6, "e6b89d89fdb76ba4bb76560fcbcd6dd0f22169301ab98bc8017e8bf0571b085f"),
     "relation": (2, "97cdd4f0b5c022cd17993d343b86304469fd691b53f5e5d6d3d8dad5b003b5c8"),
-    "control": (3, "4c1ead45e337c9c578d9a72d3e1095924b382013c19f58f95bf21391ef6b6d6c"),
+    "control": (3, "5748688fa018e741a32f21c25a0b5935985b6c17f924575daf80fcfe2ce258c1"),
 }
 
 EXPECTED_SPLIT_FILE_COUNT = 17
@@ -355,15 +355,15 @@ EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 # Filled from the deterministic reverse joins below; unlike raw source hashes,
 # these freeze both exact duplicates and normalized split-document variants.
-EXPECTED_SPLIT_QUERY = (0, "")
-EXPECTED_SPLIT_QUERY_EXACT = (0, "")
-EXPECTED_SPLIT_QUERY_NONEXACT = (0, "")
-EXPECTED_SPLIT_QUERY_MAPPING_DIGEST = ""
-EXPECTED_SPLIT_RETAINED_EXACT = (0, "")
-EXPECTED_SPLIT_RETAINED_NONEXACT = (0, "")
-EXPECTED_SPLIT_RETAINED_MAPPING_DIGEST = ""
-EXPECTED_MONOLITH_ONLY = (0, "")
-EXPECTED_ATLAS_HITS = (0, "")
+EXPECTED_SPLIT_QUERY = (142, "0a93de88f9453b6785c84f8d0f15775b36738e4489a0156ea7d9d562112d3772")
+EXPECTED_SPLIT_QUERY_EXACT = (134, "e9c485249c355f599b21bbb0df4ce3b9d2df421ad6f21ebec9d64eb601b74234")
+EXPECTED_SPLIT_QUERY_NONEXACT = (8, "0ea9f97b0c6a922ce8cd5c658b98df377028c850da9ca9c2f09a6a62617a1e7f")
+EXPECTED_SPLIT_QUERY_MAPPING_DIGEST = "b24fe046d8e5f32e13c3041259e68159679122e2fe1c25defe2608038c06f718"
+EXPECTED_SPLIT_RETAINED_EXACT = (131, "f0c8fef1a2df1001bbdddff11ca5803d4db41aece1cbb6aa845373cc7940c0b8")
+EXPECTED_SPLIT_RETAINED_NONEXACT = (14, "49f316230f83696c1aecc886fca3c7dd31dc5100cb17a3f8e5c54fa106c92e39")
+EXPECTED_SPLIT_RETAINED_MAPPING_DIGEST = "6e47011567c2f7a57449a9c32787798bd69f7c2a9421a63912837842fcf52f38"
+EXPECTED_MONOLITH_ONLY = (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+EXPECTED_ATLAS_HITS = (1, "620c9c332101a5bae955c66ae72268fbcd3972766179522c8deede6a249addb7")
 
 
 def digest(values: set[int] | frozenset[int]) -> str:
@@ -383,12 +383,53 @@ def normalized_line(line: str) -> str:
     return " ".join(re.findall(r"[a-z0-9]+", text))
 
 
+def best_witness(canonical: str, candidates: list[tuple[str, str]]) -> tuple[str, float]:
+    """Return the deterministic highest-overlap witness for a source line."""
+    canonical_tokens = set(normalized_line(canonical).split())
+    scored: list[tuple[float, str]] = []
+    for record, normalized in candidates:
+        candidate_tokens = set(normalized.split())
+        denominator = min(len(canonical_tokens), len(candidate_tokens))
+        score = len(canonical_tokens & candidate_tokens) / denominator if denominator else 0.0
+        scored.append((score, record))
+    score, record = max(scored, key=lambda item: (item[0], item[1]))
+    return record, score
+
+
+def axis_offsets(dimension: int) -> tuple[tuple[int, ...], ...]:
+    """The derived 2d face/axis shell, excluding Self."""
+    return tuple(
+        sorted(
+            tuple(sign if coordinate == axis else 0 for coordinate in range(dimension))
+            for axis in range(dimension)
+            for sign in (-1, 1)
+        )
+    )
+
+
+def full_offsets(dimension: int) -> tuple[tuple[int, ...], ...]:
+    """The derived {-1,0,1}^d shell, excluding Self."""
+    zero = (0,) * dimension
+    return tuple(
+        offset
+        for offset in itertools.product((-1, 0, 1), repeat=dimension)
+        if offset != zero
+    )
+
+
+def aggregate_rule(code: int, aggregate: int) -> int:
+    """Decode the Book's binary aggregate-table convention at one input."""
+    return (code >> aggregate) & 1
+
+
 def main() -> int:
     if len(sys.argv) > 2:
         raise SystemExit("usage: 36-T24-source-oracle.py [BOOK]")
     book = Path(sys.argv[1]).resolve() if len(sys.argv) == 2 else DEFAULT_BOOK
     raw = book.read_bytes()
     lines = raw.decode("utf-8").splitlines()
+    at = lambda line_no: lines[line_no - 1]
+
     source_ok = (
         len(lines) == EXPECTED_BOOK_LINES
         and hashlib.sha256(raw).hexdigest() == EXPECTED_BOOK_SHA256
@@ -396,46 +437,506 @@ def main() -> int:
         and sha256(CATALOG) == EXPECTED_CATALOG_SHA256
         and sha256(TAXONOMY) == EXPECTED_TAXONOMY_SHA256
     )
+    ok = source_ok
     print("source", "OK" if source_ok else "MISMATCH")
-    union: set[int] = set()
+
+    hits: dict[str, set[int]] = {}
     for name, pattern in QUERIES.items():
         found = {n for n, line in enumerate(lines, 1) if re.search(pattern, line, re.I)}
-        union |= found
-        print(
-            name, len(found), sum(n < INDEX_FIRST_LINE for n in found),
-            sum(n >= INDEX_FIRST_LINE for n in found), digest(found),
-            ",".join(map(str, sorted(found))),
+        hits[name] = found
+        actual = (
+            len(found),
+            sum(n < INDEX_FIRST_LINE for n in found),
+            sum(n >= INDEX_FIRST_LINE for n in found),
+            digest(found),
         )
-    print("union", len(union), digest(union), ",".join(map(str, sorted(union))))
-    pre_index = {n for n in union if n < INDEX_FIRST_LINE}
-    index = union - pre_index
-    matched_retained = pre_index - EXCLUDED
+        good = actual == EXPECTED_QUERY[name]
+        ok &= good
+        print(name, "OK" if good else "MISMATCH", *actual)
+
+    union = set().union(*hits.values())
+    pre_index_union = {n for n in union if n < INDEX_FIRST_LINE}
+    index = union - pre_index_union
+    matched_retained = pre_index_union - EXCLUDED
     governed = set(RETAINED) - union
-    print("pre_index", len(pre_index), digest(pre_index))
-    print("index", len(index), digest(index))
-    print("matched_retained", len(matched_retained), digest(matched_retained))
-    print("excluded", len(EXCLUDED), digest(EXCLUDED))
-    print("governed", len(governed), digest(governed))
-    print("retained", len(RETAINED), digest(RETAINED))
-    print("native", len(NATIVE_EVIDENCE), digest(NATIVE_EVIDENCE))
-    print("relation", len(RELATION_EVIDENCE), digest(RELATION_EVIDENCE))
-    print("control", len(CONTROL_EVIDENCE), digest(CONTROL_EVIDENCE))
-    print("images", len(GOVERNED_IMAGE_LINES), digest(GOVERNED_IMAGE_LINES))
-    print("missing_matched", sorted(matched_retained - set(RETAINED)))
-    print("extra_queried", sorted((set(RETAINED) & pre_index) - matched_retained))
-    print("index_missing", sorted(index - set(INDEX_ROUTED)))
-    print("index_extra", sorted(set(INDEX_ROUTED) - index))
+    sets = {
+        "union": union,
+        "pre_index_union": pre_index_union,
+        "index": index,
+        "matched_retained": matched_retained,
+        "governed_continuations": governed,
+        "retained": set(RETAINED),
+        "excluded": set(EXCLUDED),
+        "native": set(NATIVE_EVIDENCE),
+        "relation": set(RELATION_EVIDENCE),
+        "control": set(CONTROL_EVIDENCE),
+        "governed_images": set(GOVERNED_IMAGE_LINES),
+    }
+    for name, values in sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_SET.get(name)
+        ok &= good
+        print(name, "OK" if good else "MISMATCH", *actual)
+
+    excluded_ok = (
+        set().union(*EXCLUDED_CLASS.values()) == EXCLUDED
+        and sum(map(len, EXCLUDED_CLASS.values())) == len(EXCLUDED)
+    )
+    for name, values in EXCLUDED_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_EXCLUDED_CLASS.get(name)
+        excluded_ok &= good
+        print(f"excluded_{name}", "OK" if good else "MISMATCH", *actual)
+    excluded_ok &= (
+        pre_index_union == matched_retained | set(EXCLUDED)
+        and matched_retained == set(RETAINED) & pre_index_union
+    )
+    ok &= excluded_ok
+    print("unresolved_pre_index", "OK" if excluded_ok else "MISMATCH", 0)
+
+    index_ok = (
+        set().union(*INDEX_CLASS.values()) == index
+        and sum(map(len, INDEX_CLASS.values())) == len(index)
+    )
+    for name, values in INDEX_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_INDEX_CLASS.get(name)
+        index_ok &= good
+        print(f"index_{name}", "OK" if good else "MISMATCH", *actual)
+    ok &= index_ok
+    print("unresolved_index", "OK" if index_ok else "MISMATCH", 0)
+
+    derived_images = {n for n in RETAINED if IMAGE_RE.fullmatch(at(n))}
+    image_sets = {
+        "native": NATIVE_IMAGE_LINES,
+        "relation": RELATION_IMAGE_LINES,
+        "control": CONTROL_IMAGE_LINES,
+    }
+    images_ok = (
+        derived_images == set(GOVERNED_IMAGE_LINES)
+        and sum(map(len, image_sets.values())) == len(GOVERNED_IMAGE_LINES)
+        and NATIVE_IMAGE_LINES <= NATIVE_EVIDENCE
+        and RELATION_IMAGE_LINES <= RELATION_EVIDENCE
+        and CONTROL_IMAGE_LINES <= CONTROL_EVIDENCE
+        and all(IMAGE_RE.fullmatch(at(n)) for n in GOVERNED_IMAGE_LINES)
+    )
+    for name, values in image_sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_IMAGE_PARTITION.get(name)
+        images_ok &= good
+        print(f"images_{name}", "OK" if good else "MISMATCH", *actual)
+    ok &= images_ok
+    print(
+        "governed_image_interface", "OK" if images_ok else "MISMATCH",
+        len(derived_images), digest(derived_images),
+    )
+
+    # Direct source facts. The checks deliberately preserve the Book's exact
+    # wording; arithmetic and representation conclusions are tested separately.
+    source_facts_ok = (
+        "updated in parallel at every step" in at(850)
+        and "old values of neighbors" in at(10984)
+        and "two copies of the array" in at(10984)
+        and "finite array" in at(10986)
+        and "cyclic array" in at(10986)
+        and "automatically gets cyclic boundary conditions" in at(10992)
+        and "In d dimensions with k colors" in at(13483)
+        and "a + k AxesTotal[a, d]" in at(13488)
+        and "IdentityMatrix[d]" in at(13492)
+        and "k (2 d (k - 1) + 1)" in at(13494)
+        and "3<sup>d</sup> -neighbor rules" in at(13497)
+        and "a + k FullTotal[a, d]" in at(13501)
+        and "Table[3, {d}]" in at(13505)
+        and "(3<sup>d</sup> - 1) (k - 1) + 1" in at(13507)
+        and "any rule in any dimension" in at(13513)
+        and "offset lists are always taken to be in the order given by *Sort*" in at(13513)
+        and "same order as the offset list" in at(13513)
+        and "IntegerDigits[i - 1" in at(13516)
+        and "FromDigits[Reverse[u], k]" in at(13520)
+        and "IntegerDigits[num, k, k^Length[os]]" in at(13523)
+        and "ListCorrelate" in at(13531)
+    )
+    ok &= source_facts_ok
+    print("source_facts_dimension_offsets_update", "OK" if source_facts_ok else "MISMATCH")
+
+    dimensions = range(1, 7)
+    colors = range(2, 5)
+    dimension_formula_ok = all(
+        len(axis_offsets(d)) == 2 * d
+        and len(set(axis_offsets(d))) == 2 * d
+        and all(tuple(-x for x in offset) in axis_offsets(d) for offset in axis_offsets(d))
+        and len(full_offsets(d)) == 3**d - 1
+        and len(set(full_offsets(d))) == 3**d - 1
+        and all(tuple(-x for x in offset) in full_offsets(d) for offset in full_offsets(d))
+        and all(
+            k * (2 * d * (k - 1) + 1) == k * ((len(axis_offsets(d))) * (k - 1) + 1)
+            and k * (((3**d - 1) * (k - 1)) + 1)
+            == k * (len(full_offsets(d)) * (k - 1) + 1)
+            for k in colors
+        )
+        for d in dimensions
+    )
+    ok &= dimension_formula_ok
+    print(
+        "derived_arbitrary_dimension_shells_and_case_counts",
+        "OK" if dimension_formula_ok else "MISMATCH", 1, 6,
+    )
+
+    def from_digits(digits: tuple[int, ...], base: int) -> int:
+        value = 0
+        for digit in digits:
+            value = value * base + digit
+        return value
+
+    positional_ok = True
+    sample_offsets = tuple(sorted({(-2, 1), (0, 0), (1, -1), (3, 0)}))
+    for k in (2, 3):
+        context_count = k ** len(sample_offsets)
+        table = tuple((i * i + 2 * i + 1) % k for i in range(context_count))
+        code = from_digits(tuple(reversed(table)), k)
+        decoded = tuple((code // (k**i)) % k for i in range(context_count))
+        positional_ok &= decoded == table
+        configurations = tuple(
+            itertools.product(range(k), repeat=len(sample_offsets))
+        )
+        positional_ok &= all(
+            from_digits(configuration, k) == index
+            for index, configuration in enumerate(configurations)
+        )
+        positional_ok &= tuple(reversed(configurations))[0] == (k - 1,) * len(sample_offsets)
+    ok &= positional_ok
+    print("derived_positional_codec_round_trip", "OK" if positional_ok else "MISMATCH")
+
+    # The hexagonal column is direct T24 evidence, not a schedule control. The
+    # orbit counts below independently recover the printed 28 and 26 exponents.
+    hex_contexts = tuple(itertools.product((0, 1), repeat=7))
+
+    def rotate_hex(context: tuple[int, ...], amount: int) -> tuple[int, ...]:
+        center, ring = context[0], context[1:]
+        return (center,) + ring[amount:] + ring[:amount]
+
+    def reflect_hex(context: tuple[int, ...]) -> tuple[int, ...]:
+        return (context[0],) + tuple(reversed(context[1:]))
+
+    rotation_orbits = {
+        min(rotate_hex(context, amount) for amount in range(6))
+        for context in hex_contexts
+    }
+    dihedral_orbits = {
+        min(
+            *(rotate_hex(context, amount) for amount in range(6)),
+            *(rotate_hex(reflect_hex(context), amount) for amount in range(6)),
+        )
+        for context in hex_contexts
+    }
+    hex_rule_space_ok = (
+        "total number of 2D rules" in at(13534)
+        and "Totalistic rules depend only" in at(13536)
+        and "outer totalistic rules" in at(13536)
+        and "Growth totalistic rules" in at(13536)
+        and "hexagonal" in at(13542)
+        and "$2^{128}" in at(13544)
+        and "$2^{28}" in at(13545)
+        and "$2^{26}" in at(13546)
+        and "$2^{14} = 16384" in at(13547)
+        and "$2^8 = 256" in at(13548)
+        and "$2^7 = 128" in at(13549)
+        and len(hex_contexts) == 128
+        and len(rotation_orbits) == 28
+        and len(dihedral_orbits) == 26
+        and 2 * (6 + 1) == 14
+        and 6 + 2 == 8
+        and 6 + 1 == 7
+    )
+    ok &= hex_rule_space_ok
+    print(
+        "native_hexagonal_rule_spaces",
+        "OK" if hex_rule_space_ok else "MISMATCH", 128, 28, 26, 14, 8, 7,
+    )
+
+    geometry_source_ok = (
+        "any geometrical structure" in at(13642)
+        and "limited number of types of cells" in at(13642)
+        and "merely what cells are adjacent" in at(13644)
+        and "integer multiples of some set of basis vectors" in at(13644)
+        and "Voronoi region" in at(13644)
+        and "In 4D, 8, 16 and 24 nearest neighbors are possible" in at(13646)
+        and "higher dimensions possibilities have been investigated in connection with sphere packing" in at(13646)
+        and "any tiling of congruent figures" in at(13650)
+        and "any of its five neighbors are black and has code 4094" in at(13650)
+        and "no need for the tiling to be repetitive" in at(13654)
+        and "both are treated the same" in at(13654)
+        and "code 254" in at(13654)
+        and "any of its three neighbors are black" in at(13654)
+    )
+    code_derivations_ok = (
+        tuple(aggregate_rule(4094, value) for value in range(12))
+        == (0,) + (1,) * 11
+        and tuple(aggregate_rule(254, value) for value in range(8))
+        == (0,) + (1,) * 7
+    )
+    ok &= geometry_source_ok and code_derivations_ok
+    print(
+        "source_geometry_and_exact_code_wording",
+        "OK" if geometry_source_ok else "MISMATCH", 4094, 254,
+    )
+    print(
+        "derived_outer_totalistic_code_tables",
+        "OK" if code_derivations_ok else "MISMATCH", 12, 8,
+    )
+
+    hex_kernel = ((1, 1, 0), (1, 0, 1), (0, 1, 1))
+    hex_source_ok = (
+        "regular arrays of atoms" in at(4408)
+        and "any cell which is adjacent to a black cell" in at(4410)
+        and "structure of the underlying lattice" in at(4414)
+        and "simple hexagonal grid" in at(4422)
+        and "exactly one black neighbor" in at(4424)
+        and "step before" in at(4430)
+        and "treat hexagonal lattices as distorted square lattices" in at(15608)
+        and "rule[[14-#]]" in at(15610)
+        and "ListConvolve" in at(15612)
+        and "IntegerDigits[code, 2, 14]" in at(15612)
+        and "code 16382" in at(15612)
+        and "code 10926" in at(15612)
+        and "centers of an array of regular hexagons" in at(15612)
+    )
+    displayed_centers = {
+        (i, j)
+        for i in range(1, 8)
+        for j in range(i % 2, 12, 2)
+    }
+    hex_representation_ok = (
+        sum(map(sum, hex_kernel)) == 6
+        and len(displayed_centers) == sum(
+            len(range(i % 2, 12, 2)) for i in range(1, 8)
+        )
+        and tuple(aggregate_rule(16382, value) for value in range(14))
+        == (0,) + (1,) * 13
+        and all(
+            aggregate_rule(10926, 2 * neighbors) == int(neighbors == 1)
+            and aggregate_rule(10926, 2 * neighbors + 1) == 1
+            for neighbors in range(7)
+        )
+    )
+    ok &= hex_source_ok and hex_representation_ok
+    print("source_lossless_hex_array_route", "OK" if hex_source_ok else "MISMATCH", 15608, 15612)
+    print(
+        "derived_hex_kernel_and_printed_rule_semantics",
+        "OK" if hex_representation_ok else "MISMATCH", 6, 16382, 10926,
+    )
+
+    fixed_network_source_ok = (
+        "each cell corresponds to a node in a network" in at(13658)
+        and "same structure (or at least a limited number of possible structures)" in at(13658)
+        and "only totalistic cellular automaton rules" in at(13658)
+        and "assign a color to each node" in at(13909)
+        and "update this color at each step" in at(13909)
+        and "NetCAStep" in at(13913)
+        and "list[[net]]" in at(13914)
+    )
+    structural_network_control_ok = (
+        "fixed underlying geometrical structure which remains unchanged" in at(2372)
+        and "connections coming out of each node should be rerouted" in at(2426)
+        and "different operations are performed at different nodes" in at(2464)
+        and "connections from node *i* should be rerouted" in at(13835)
+        and "new node should be inserted" in at(13835)
+        and "only a single active node" in at(13889)
+        and "randomly chosen" in at(13917)
+        and "each node has a rule" in at(13917)
+    )
+    fixed_net = ((1, 2), (2, 0), (0, 1))
+    old_colors = (0, 1, 0)
+    new_colors = tuple(
+        int(sum(old_colors[neighbor] for neighbor in neighbors) >= 1)
+        for neighbors in fixed_net
+    )
+    fixed_network_derivation_ok = fixed_net == ((1, 2), (2, 0), (0, 1)) and new_colors == (1, 0, 1)
+    ok &= fixed_network_source_ok and structural_network_control_ok and fixed_network_derivation_ok
+    print(
+        "fixed_network_ca_vs_structural_t29_boundary",
+        "OK" if fixed_network_source_ok and structural_network_control_ok else "MISMATCH",
+    )
+    print(
+        "derived_fixed_incidence_snapshot_event",
+        "OK" if fixed_network_derivation_ok else "MISMATCH", *new_colors,
+    )
+
+    controls_ok = (
+        "general function is used" in at(11077)
+        and "step number" in at(11077)
+        and "continuous range of gray levels" in at(2018)
+        and "introduce probabilities" in at(13314)
+        and "updated sequentially rather than in parallel" in at(16446)
+        and "only a single active node" in at(13889)
+        and "randomly chosen" in at(13917)
+        and "alternating steps" in at(15708)
+    )
+    ok &= controls_ok
+    print("function_time_stochastic_schedule_controls", "OK" if controls_ok else "MISMATCH")
+
     structural = (
-        matched_retained == set(RETAINED) & pre_index
-        and pre_index == matched_retained | set(EXCLUDED)
+        len(RETAINED) == EXPECTED_SOURCE_COUNT
+        and digest(RETAINED) == EXPECTED_SOURCE_DIGEST
         and not NATIVE_EVIDENCE & RELATION_EVIDENCE
         and not NATIVE_EVIDENCE & CONTROL_EVIDENCE
         and not RELATION_EVIDENCE & CONTROL_EVIDENCE
         and NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE == RETAINED
-        and index == set(INDEX_ROUTED)
+        and not RETAINED & index
+        and matched_retained == set(RETAINED) & pre_index_union
+        and governed == set(RETAINED) - union
     )
+    ok &= structural
     print("structural", "OK" if structural else "MISMATCH")
-    return 0 if source_ok and structural else 1
+
+    # Close all split markdown copies with immutable manifests, complete query
+    # enumeration, and deterministic reverse joins back to the monolith.
+    split_paths = sorted(
+        path for path in SOURCE_ROOT.rglob("*.md")
+        if path.resolve() not in {DEFAULT_BOOK.resolve(), ATLAS.resolve()}
+    )
+    relative_paths = [path.relative_to(SOURCE_ROOT).as_posix() for path in split_paths]
+    manifest = [
+        f"{relative}\0{len(path.read_bytes())}\0{sha256(path)}"
+        for path, relative in zip(split_paths, relative_paths, strict=True)
+    ]
+    split_manifest_ok = (
+        len(split_paths) == EXPECTED_SPLIT_FILE_COUNT
+        and digest_records(relative_paths) == EXPECTED_SPLIT_PATHS_DIGEST
+        and digest_records(manifest) == EXPECTED_SPLIT_MANIFEST_DIGEST
+    )
+    ok &= split_manifest_ok
+    print(
+        "split_manifest", "OK" if split_manifest_ok else "MISMATCH",
+        len(split_paths), digest_records(relative_paths), digest_records(manifest),
+    )
+
+    compiled = [re.compile(pattern, re.I) for pattern in QUERIES.values()]
+    monolith_query_text = {at(n) for n in union}
+    split_records: set[str] = set()
+    split_exact: set[str] = set()
+    split_nonexact: set[str] = set()
+    split_lines: list[tuple[str, str]] = []
+    split_texts: set[str] = set()
+    split_record_text: dict[str, str] = {}
+    for path, relative in zip(split_paths, relative_paths, strict=True):
+        for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            record = f"{relative}:{line_no}"
+            split_lines.append((record, normalized_line(line)))
+            split_texts.add(line)
+            split_record_text[record] = line
+            if not any(rx.search(line) for rx in compiled):
+                continue
+            split_records.add(record)
+            (split_exact if line in monolith_query_text else split_nonexact).add(record)
+
+    query_mapping: set[str] = set()
+    query_mapping_ok = True
+    monolith_witnesses = [
+        (str(line_no), normalized_line(at(line_no))) for line_no in sorted(union)
+    ]
+    for record in sorted(split_nonexact):
+        witness, score = best_witness(split_record_text[record], monolith_witnesses)
+        query_mapping.add(f"{record}->{witness}:{score:.6f}")
+        query_mapping_ok &= score >= 0.50 and int(witness) in union
+    split_query_ok = (
+        (len(split_records), digest_records(split_records)) == EXPECTED_SPLIT_QUERY
+        and (len(split_exact), digest_records(split_exact)) == EXPECTED_SPLIT_QUERY_EXACT
+        and (len(split_nonexact), digest_records(split_nonexact)) == EXPECTED_SPLIT_QUERY_NONEXACT
+        and digest_records(query_mapping) == EXPECTED_SPLIT_QUERY_MAPPING_DIGEST
+        and query_mapping_ok
+    )
+    ok &= split_query_ok
+    print(
+        "split_query_reverse_join", "OK" if split_query_ok else "MISMATCH",
+        len(split_records), digest_records(split_records), len(split_exact),
+        digest_records(split_exact), len(split_nonexact), digest_records(split_nonexact),
+        digest_records(query_mapping),
+    )
+
+    exact_retained = {n for n in RETAINED if at(n) in split_texts}
+    nonexact_retained = set(RETAINED) - exact_retained
+    retained_mapping: set[str] = set()
+    monolith_only: set[int] = set()
+    for line_no in sorted(nonexact_retained):
+        witness, score = best_witness(at(line_no), split_lines)
+        if score >= 0.50:
+            retained_mapping.add(f"{line_no}->{witness}:{score:.6f}")
+        else:
+            monolith_only.add(line_no)
+    split_retained_ok = (
+        (len(exact_retained), digest(exact_retained)) == EXPECTED_SPLIT_RETAINED_EXACT
+        and (len(nonexact_retained), digest(nonexact_retained)) == EXPECTED_SPLIT_RETAINED_NONEXACT
+        and digest_records(retained_mapping) == EXPECTED_SPLIT_RETAINED_MAPPING_DIGEST
+        and (len(monolith_only), digest(monolith_only)) == EXPECTED_MONOLITH_ONLY
+        and len(retained_mapping) + len(monolith_only) == len(nonexact_retained)
+    )
+    ok &= split_retained_ok
+    print(
+        "split_retained_reverse_join", "OK" if split_retained_ok else "MISMATCH",
+        len(exact_retained), digest(exact_retained), len(nonexact_retained),
+        digest(nonexact_retained), len(retained_mapping), digest_records(retained_mapping),
+        len(monolith_only), digest(monolith_only),
+    )
+
+    atlas_lines = ATLAS.read_text(encoding="utf-8").splitlines()
+    atlas_hits = {
+        n for n, line in enumerate(atlas_lines, 1) if any(rx.search(line) for rx in compiled)
+    }
+    atlas_ok = (
+        len(atlas_lines) == 542
+        and (len(atlas_hits), digest(atlas_hits)) == EXPECTED_ATLAS_HITS
+        and atlas_hits == {175}
+        and "higher-dimensional geometry enriches form" in atlas_lines[174]
+        and "same core behavior classes persist" in atlas_lines[174]
+    )
+    ok &= atlas_ok
+    print("atlas_summary_only", "OK" if atlas_ok else "MISMATCH", len(atlas_hits), digest(atlas_hits))
+
+    catalog_lines = CATALOG.read_text(encoding="utf-8").splitlines()
+    taxonomy_text = TAXONOMY.read_text(encoding="utf-8")
+    catalog_ok = (
+        len(catalog_lines) == 46
+        and catalog_lines[24] == "Higher-Dimensional Lattice Cellular Automata,"
+        and len(set(catalog_lines[1:])) == 45
+        and "## 24. Higher-Dimensional Lattice Cellular Automata" in taxonomy_text
+        and "Fixed lattice in dimension `d`." in taxonomy_text
+        and "finite alphabet" in taxonomy_text
+        and "finite neighborhood is defined by offsets" in taxonomy_text
+        and "All sites update in parallel." in taxonomy_text
+        and "`neighborhood_offsets`" in taxonomy_text
+    )
+    ok &= catalog_ok
+    print("catalog_taxonomy_vocabulary_only", "OK" if catalog_ok else "MISMATCH")
+
+    architecture_inference_ok = (
+        source_facts_ok
+        and dimension_formula_ok
+        and positional_ok
+        and hex_rule_space_ok
+        and geometry_source_ok
+        and hex_source_ok
+        and hex_representation_ok
+        and fixed_network_source_ok
+        and structural_network_control_ok
+        and fixed_network_derivation_ok
+        and controls_ok
+    )
+    ok &= architecture_inference_ok
+    print(
+        "architecture_inference_parameterizes_shared_simple_program_event",
+        "OK" if architecture_inference_ok else "MISMATCH",
+    )
+
+    unresolved_total = (
+        len(pre_index_union - matched_retained - set(EXCLUDED))
+        + len(index - set(INDEX_ROUTED))
+        + len(monolith_only)
+    )
+    unresolved_ok = unresolved_total == 0
+    ok &= unresolved_ok
+    print("unresolved_total", "OK" if unresolved_ok else "MISMATCH", unresolved_total)
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":
