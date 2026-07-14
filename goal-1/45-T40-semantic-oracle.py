@@ -71,7 +71,8 @@ ARCHITECTURE_CLASSIFICATION = (
     "2: specialize the declarative definition category to arity zero and parameterize positional/simple-CF queries",
     "2: canonicalize terminating positional tails and finite simple-CF terminals without changing denotation identity",
     "3: retain lossless structural source/query/evaluator provenance and explicit T40-to-T42 coefficient handoffs",
-    "4: no native execution algebra; optional long-division, sqrt, and Gauss work procedures are separate realizations",
+    "1-3 only: D139 stays inside D082/T41's declarative category and adds no class-4 category or execution algebra",
+    "D082 nonfit: forcing a pure denotation query into rollout is invalid; optional work procedures separately reuse the runner",
 )
 
 
@@ -85,6 +86,7 @@ GOAL2_DELTA = (
     "Treat coefficient prefixes as immutable indexed result payloads, not T37 state, End loci, append writes, or rollout time.",
     "Expose optional work algorithms with complete visible work and explicit provenance only when their traces are requested.",
     "Restrict the Book r>s square-root procedure to integer-safe input; label r>=s+1 as the rational repair.",
+    "For rational misuse the printed sqrt algebraic identity still propagates, but nonnegative-r and approximation bounds fail.",
     "T42 consumes explicit finalized T40 continued-fraction coefficients and never invokes a hidden evaluator.",
     "Add no T40 state, frontier, neighborhood, rule-result, update, StepResult, executor, callback, or family dispatch.",
 )
@@ -1540,3 +1542,330 @@ def forbidden_execution_role_symbols(
         )
         rows.append((suffix, names))
     return tuple(rows)
+
+
+def rational_spec(numerator: object, denominator: object) -> MathematicalDenotationSpec:
+    return MathematicalDenotationSpec(RationalLiteral(numerator, denominator))
+
+
+def pi_spec() -> MathematicalDenotationSpec:
+    return MathematicalDenotationSpec(PiConstant())
+
+
+def e_spec() -> MathematicalDenotationSpec:
+    return MathematicalDenotationSpec(EulerConstant())
+
+
+def sqrt_spec(radicand: object) -> MathematicalDenotationSpec:
+    return MathematicalDenotationSpec(SquareRoot(radicand))
+
+
+def exact_context() -> EvaluationContext:
+    return EvaluationContext(EXACT_METHOD, 0)
+
+
+def machin_context(terms: object) -> EvaluationContext:
+    return EvaluationContext(MACHIN_METHOD, terms)
+
+
+def audit_rational_positional_and_duals() -> tuple[int, int, int, int, int]:
+    cases = (
+        (Fraction(3, 8), 10, (0,), (3, 7, 5), ()),
+        (Fraction(1, 3), 10, (0,), (), (3,)),
+        (Fraction(1, 7), 10, (0,), (), (1, 4, 2, 8, 5, 7)),
+        (Fraction(1, 6), 10, (0,), (1,), (6,)),
+        (Fraction(1, 81), 10, (0,), (), (0, 1, 2, 3, 4, 5, 6, 7, 9)),
+        (Fraction(1, 3), 2, (0,), (), (0, 1)),
+        (Fraction(1, 7), 2, (0,), (), (0, 0, 1)),
+        (Fraction(3, 8), 2, (0,), (0, 1, 1), ()),
+    )
+    roundtrips = 0
+    prefix_checks = 0
+    total_period = 0
+    terminating = 0
+    for value, base, integer_digits, nonrepeating, period in cases:
+        expansion = rational_positional_expansion(value, base)
+        assert expansion.integer_digits == integer_digits
+        assert expansion.nonrepeating == nonrepeating
+        assert expansion.period == period
+        assert raw_positional_value(integer_digits, nonrepeating, period, base) == value
+        roundtrips += 1
+        total_period += len(period)
+        terminating += not period
+        for count in range(25):
+            prefix = expansion.prefix(count)
+            cylinder = positional_cylinder(integer_digits, prefix, base)
+            assert cylinder.contains(value)
+            prefix_checks += 1
+
+    terminating_half = raw_positional_value((0,), (5,), (), 10)
+    repeating_dual = raw_positional_value((0,), (4,), (9,), 10)
+    assert terminating_half == repeating_dual == Fraction(1, 2)
+    canonical_half = rational_positional_expansion(Fraction(1, 2), 10)
+    assert canonical_half == RationalPositionalExpansion(10, (0,), (5,), ())
+
+    canonical_cf = rational_continued_fraction(Fraction(1, 2))
+    assert canonical_cf.coefficients == (0, 2)
+    assert continued_fraction_value((0, 2)) == continued_fraction_value((0, 1, 1))
+    dual_checks = 4
+    return len(cases), roundtrips, prefix_checks, total_period, terminating + dual_checks
+
+
+def audit_long_division_realization() -> tuple[int, int, int, int]:
+    cases = (
+        (RationalLiteral(1, 7), 10, 50),
+        (RationalLiteral(1, 6), 10, 40),
+        (RationalLiteral(3, 8), 2, 30),
+        (RationalLiteral(22, 7), 10, 45),
+        (RationalLiteral(2**130 + 17, 2**67 + 9), 16, 55),
+    )
+    one_step_commutations = 0
+    remainder_map_checks = 0
+    arbitrary_precision_bits = 0
+    zero_tail_steps = 0
+    for source, base, horizon in cases:
+        work = begin_long_division(source, base)
+        assert work.emitted == ()
+        for index in range(horizon):
+            old_remainder = work.remainder
+            work = long_division_next(work)
+            expected_digit, expected_remainder = divmod(
+                old_remainder * base,
+                source.denominator,
+            )
+            assert work.emitted[-1] == expected_digit
+            assert work.remainder == expected_remainder
+            direct_value = (
+                (source.numerator % source.denominator) * base ** (index + 1)
+            ) // source.denominator
+            assert work.emitted == fixed_width_digits(direct_value, base, index + 1)
+            one_step_commutations += 1
+            remainder_map_checks += 1
+            zero_tail_steps += expected_remainder == 0
+        arbitrary_precision_bits = max(
+            arbitrary_precision_bits,
+            source.numerator.bit_length(),
+            source.denominator.bit_length(),
+        )
+    return one_step_commutations, remainder_map_checks, arbitrary_precision_bits, zero_tail_steps
+
+
+PI_DECIMAL_60 = "141592653589793238462643383279502884197169399375105820974944"
+PI_BINARY_96 = (
+    "001001000011111101101010100010001000010110100011"
+    "000010001101001100010011000110011000101000101110"
+)
+PI_CF_30 = (
+    3,
+    7,
+    15,
+    1,
+    292,
+    1,
+    1,
+    1,
+    2,
+    1,
+    3,
+    1,
+    14,
+    2,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    1,
+    84,
+    2,
+    1,
+    1,
+    15,
+    3,
+    13,
+    1,
+    4,
+)
+
+
+def audit_pi_certification() -> tuple[int, int, int, int, int, int, int]:
+    denotation = pi_spec()
+    context = machin_context(70)
+    decimal_query = RepresentationQuery(denotation, PositionalDigits(10), Prefix(60))
+    binary_query = RepresentationQuery(denotation, PositionalDigits(2), Prefix(96))
+    cf_query = RepresentationQuery(denotation, SimpleContinuedFraction(), Prefix(30))
+    decimal = evaluate_query(decimal_query, context)
+    binary = evaluate_query(binary_query, context)
+    continued = evaluate_query(cf_query, context)
+    assert type(decimal.outcome) is CompleteCertified
+    assert type(binary.outcome) is CompleteCertified
+    assert type(continued.outcome) is CompleteCertified
+    assert decimal.integer_digits == (3,)
+    assert binary.integer_digits == (1, 1)
+    assert "".join(str(digit) for digit in decimal.coefficients) == PI_DECIMAL_60
+    assert "".join(str(digit) for digit in binary.coefficients) == PI_BINARY_96
+    assert continued.coefficients == PI_CF_30
+    for result in (decimal, binary, continued):
+        assert verify_result(result)
+        assert verify_machin_certificate(result.outcome.certificate)
+
+    decimal_cylinder = positional_cylinder((3,), decimal.coefficients, 10)
+    decimal_interval = decimal.outcome.certificate.interval
+    assert decimal_cylinder.lower <= decimal_interval.lower
+    assert decimal_interval.upper < decimal_cylinder.upper
+    binary_cylinder = positional_cylinder((1, 1), binary.coefficients, 2)
+    binary_interval = binary.outcome.certificate.interval
+    assert binary_cylinder.lower <= binary_interval.lower
+    assert binary_interval.upper < binary_cylinder.upper
+    cf_cylinder = continued_fraction_cylinder(continued.coefficients)
+    cf_interval = continued.outcome.certificate.interval
+    assert cf_cylinder.lower < cf_interval.lower < cf_interval.upper < cf_cylinder.upper
+    widths = (
+        decimal_interval.upper - decimal_interval.lower,
+        binary_interval.upper - binary_interval.lower,
+        cf_interval.upper - cf_interval.lower,
+    )
+    assert all(width > 0 for width in widths)
+    return (
+        len(decimal.coefficients),
+        len(binary.coefficients),
+        len(continued.coefficients),
+        sum(result.outcome.certificate.terms for result in (decimal, binary, continued)),
+        3,
+        max(len(str(width.denominator)) for width in widths),
+        3,
+    )
+
+
+def audit_exact_cf_families() -> tuple[int, int, int, int, int]:
+    expected_periods = {
+        2: (1, (2,)),
+        3: (1, (1, 2)),
+        5: (2, (4,)),
+        7: (2, (1, 1, 1, 4)),
+        23: (4, (1, 3, 1, 8)),
+    }
+    period_checks = 0
+    prefix_checks = 0
+    maximum_period = 0
+    context = exact_context()
+    for radicand, expected in expected_periods.items():
+        assert sqrt_cf_period(radicand) == expected
+        maximum_period = max(maximum_period, len(expected[1]))
+        period_checks += 1
+        query = RepresentationQuery(
+            sqrt_spec(radicand),
+            SimpleContinuedFraction(),
+            Prefix(80),
+        )
+        result = evaluate_query(query, context)
+        assert type(result.outcome) is CompleteExact
+        assert result.coefficients == sqrt_cf_prefix(radicand, 80)
+        assert verify_result(result)
+        for index in range(80):
+            expected_coefficient = expected[0] if index == 0 else expected[1][(index - 1) % len(expected[1])]
+            assert result.coefficients[index] == expected_coefficient
+            prefix_checks += 1
+
+    expected_e = (
+        2, 1, 2, 1, 1, 4, 1, 1, 6, 1, 1, 8, 1, 1, 10, 1, 1, 12,
+        1, 1, 14, 1, 1, 16, 1, 1, 18, 1, 1, 20,
+    )
+    assert e_cf_prefix(len(expected_e)) == expected_e
+    e_query = RepresentationQuery(e_spec(), SimpleContinuedFraction(), Prefix(120))
+    e_result = evaluate_query(e_query, context)
+    assert e_result.coefficients == e_cf_prefix(120)
+    assert type(e_result.outcome) is CompleteExact and verify_result(e_result)
+    return period_checks, prefix_checks, maximum_period, len(expected_e), len(e_result.coefficients)
+
+
+def audit_sqrt_digit_realization() -> tuple[int, int, int, int, int, int, int]:
+    commutations = 0
+    invariant_checks = 0
+    strict_runs = 0
+    repaired_runs = 0
+    for radicand, profile, horizon in (
+        (Fraction(2, 1), BOOK_INTEGER_SQRT, 90),
+        (Fraction(3, 1), BOOK_INTEGER_SQRT, 90),
+        (Fraction(9, 4), REPAIRED_RATIONAL_SQRT, 70),
+        (Fraction(11, 5), REPAIRED_RATIONAL_SQRT, 70),
+        (Fraction(17, 9), REPAIRED_RATIONAL_SQRT, 70),
+    ):
+        work = begin_sqrt_digit_work(radicand, profile)
+        strict_runs += profile == BOOK_INTEGER_SQRT
+        repaired_runs += profile == REPAIRED_RATIONAL_SQRT
+        for iteration in range(1, horizon + 1):
+            work = sqrt_digit_next(work)
+            assert work.visible_bits == direct_sqrt_bits(radicand, iteration)
+            assert work.s * work.s + 4 * work.r == Fraction(4 ** (iteration + 1), 1) * radicand
+            commutations += 1
+            invariant_checks += 2
+
+    two = sqrt_digit_next(begin_sqrt_digit_work(Fraction(2, 1), REPAIRED_RATIONAL_SQRT))
+    nine_fourths = sqrt_digit_next(
+        begin_sqrt_digit_work(Fraction(9, 4), REPAIRED_RATIONAL_SQRT)
+    )
+    assert (two.r, two.s) == (Fraction(4, 1), 4)
+    assert (nine_fourths.r, nine_fourths.s) == (Fraction(5, 1), 4)
+    assert two.visible_bits == nine_fourths.visible_bits == (1,)
+    two_next = sqrt_digit_next(two)
+    nine_fourths_next = sqrt_digit_next(nine_fourths)
+    assert two_next.visible_bits == (1, 0)
+    assert nine_fourths_next.visible_bits == (1, 1)
+    prefix_loss_witnesses = 1
+
+    repaired = sqrt_digit_next(
+        begin_sqrt_digit_work(Fraction(11, 5), REPAIRED_RATIONAL_SQRT)
+    )
+    assert (repaired.r, repaired.s) == (Fraction(24, 5), 4)
+    literal_r, literal_s = unsafe_literal_rational_sqrt_next(repaired.r, repaired.s)
+    repaired_next = sqrt_digit_next(repaired)
+    old_identity = repaired.s * repaired.s + 4 * repaired.r
+    literal_identity = literal_s * literal_s + 4 * literal_r
+    assert literal_identity == 4 * old_identity
+    assert literal_r == Fraction(-4, 5)
+    assert repaired_next.r == Fraction(96, 5)
+    scaled_value = Fraction(4 ** (repaired.iteration + 2), 1) * repaired.radicand
+    assert not literal_s * literal_s <= scaled_value < (literal_s + 4) ** 2
+    assert repaired_next.s * repaired_next.s <= scaled_value < (repaired_next.s + 4) ** 2
+    algebraic_identity_survives = 1
+    failed_literal_nonnegative_and_bound = 2
+    return (
+        commutations,
+        invariant_checks,
+        strict_runs,
+        repaired_runs,
+        prefix_loss_witnesses,
+        algebraic_identity_survives,
+        failed_literal_nonnegative_and_bound,
+    )
+
+
+def audit_gauss_map_realization() -> tuple[int, int, int, int]:
+    sources = (
+        RationalLiteral(1, 2),
+        RationalLiteral(22, 7),
+        RationalLiteral(415, 93),
+        RationalLiteral(355, 113),
+        RationalLiteral(2**140 + 1, 2**73 + 19),
+    )
+    coefficients = 0
+    one_step_commutations = 0
+    completions = 0
+    maximum_coefficient_bits = 0
+    for source in sources:
+        expected = rational_continued_fraction(source.value).coefficients
+        work = begin_gauss_map(source)
+        for index, coefficient in enumerate(expected):
+            work = gauss_map_next(work)
+            assert work.coefficients == expected[: index + 1]
+            assert work.coefficients[-1] == coefficient
+            coefficients += 1
+            one_step_commutations += 1
+            maximum_coefficient_bits = max(maximum_coefficient_bits, coefficient.bit_length())
+        assert work.current is None
+        assert work.coefficients == expected
+        completions += 1
+        assert continued_fraction_value(work.coefficients) == source.value
+    return len(sources), coefficients, one_step_commutations, completions + maximum_coefficient_bits

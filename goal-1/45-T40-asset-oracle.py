@@ -158,6 +158,12 @@ assert (
     len(CONTROL_IMAGE_LINES), len(GOVERNED_IMAGE_LINES),
 ) == (11, 12, 1, 24)
 
+EXPECTED_DISPOSITION_METRICS = (11, 12, 1, 24, 0)
+EXPECTED_REFERENCE_METRICS = (24, 22, 46)
+EXPECTED_PHYSICAL_METRICS = (24, 24, 574_761)
+EXPECTED_ASSEMBLY_METRICS = (4, 16)
+EXPECTED_BOUNDARY_METRICS = (24, 0, 0)
+
 HASH_BOUND_IMAGE_LINES = GOVERNED_IMAGE_LINES
 LIMITED_TRANSCRIBED_IMAGE_LINES: frozenset[int] = frozenset()
 PIXEL_REPLAYED_IMAGE_LINES: frozenset[int] = frozenset()
@@ -295,6 +301,7 @@ TEXTUAL_REPLAY_INTERFACE = {
 EXPECTED_TEXTUAL_REPLAY_JSON_SHA256 = (
     "6fd8578623171650e57a405f2d3e9740b895724609fceb38132ceb202055c1fa"
 )
+EXPECTED_TEXTUAL_REPLAY_METRICS = (8_255, 96, 3)
 
 # The structural set digest uses the same length-framed record convention as
 # the recent source/asset interfaces.  The auxiliary ordered digest instead
@@ -660,14 +667,32 @@ def main() -> None:
     )
     assert (24, structural_digest) == EXPECTED_IMAGE_ASSET_MANIFEST
     assert (24, ordered_digest) == EXPECTED_ORDERED_SHA256SUM_MANIFEST
-    assert metrics == (24, 22, 24, 574_761), metrics
+    assert (
+        metrics[0], metrics[1], metrics[0] + metrics[1]
+    ) == EXPECTED_REFERENCE_METRICS
+    assert (metrics[2], metrics[2], metrics[3]) == EXPECTED_PHYSICAL_METRICS
+    assert (
+        long_checks, sqrt_events, sqrt_source_mismatches
+    ) == EXPECTED_TEXTUAL_REPLAY_METRICS
+    assert (
+        len(NATIVE_IMAGE_LINES), len(RELATION_IMAGE_LINES),
+        len(CONTROL_IMAGE_LINES), len(GOVERNED_IMAGE_LINES),
+        len(EXCLUDED_IMAGE_LINES),
+    ) == EXPECTED_DISPOSITION_METRICS
+    assert (len(ASSEMBLIES), sum(map(len, ASSEMBLIES.values()))) == (
+        EXPECTED_ASSEMBLY_METRICS
+    )
+    assert (
+        len(HASH_BOUND_IMAGE_LINES), len(LIMITED_TRANSCRIBED_IMAGE_LINES),
+        len(PIXEL_REPLAYED_IMAGE_LINES),
+    ) == EXPECTED_BOUNDARY_METRICS
     assert len(ROLE_RECORDS) == 24 and len(SOURCE_GUARDS) == 21
 
     print(
         "T40 asset oracle: PASS governed=24; classes N/R/C=11/12/1; "
         "candidates=24; excluded=0; refs=46(monolith=24,split=22); "
         "split_link_omissions=2(page154,page156); unique_hashes=24; "
-        "bytes=574761; assemblies=4/16_files; "
+        "physical_files=24; bytes=574761; assemblies=4/16_files; "
         "boundary=24_HASH_BOUND/0_LIMITED_TRANSCRIBED/0_PIXEL_REPLAYED; "
         f"textual_replay=long_division_{long_checks}_states/"
         f"sqrt_{sqrt_events}_events; "

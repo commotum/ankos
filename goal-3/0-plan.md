@@ -1,0 +1,708 @@
+# Goal 3: Whole-Book ANKoS Construction Taxonomy Audit
+
+Shorthand: `BOOK-TAXONOMY`
+
+## Big-Picture Objective
+
+Audit the complete local *A New Kind of Science* corpus independently of the existing T01–T45 catalog and determine every book-grounded construction, generator, relation, constraint, input-processing mechanism, or other finitely described formal system that deserves traceable coverage.
+
+The audit must answer two different questions:
+
+1. What named constructions, presets, restrictions, seed/input classes, declarative systems, and materially distinct variants does the Book require the project to cover?
+2. What is the smaller set of genuinely distinct semantic families after aliases, presets, properties, representations, observers, applications, and lossless parameterizations are separated?
+
+Success is not a preferred count. Success is an evidence-complete census in which every part of the Book has been screened, every candidate has a source-grounded semantic fingerprint and final disposition, every relevant cross-reference and image has been accounted for, the existing 45 entries are independently rediscovered or diagnosed, and every proposed addition or close exclusion survives hostile review.
+
+Goal 3 is a research, taxonomy, and architecture-pressure audit. It does not implement runtime changes, rewrite Goal 1, renumber T01–T45, or modify the Book sources or current catalog unless the user later authorizes a separate integration step.
+
+## Governing Questions
+
+1. Is the current 45-row catalog exhaustive for the whole Book, rather than merely exhaustive for its original Chapters 3–5 seed scope?
+2. Which unlisted passages specify genuinely new constructions, and which are variants, compositions, properties, seed classes, observers, applications, or emulations of existing constructions?
+3. Which Book names deserve distinct catalog coverage even when they share one semantic implementation family?
+4. Which apparently similar systems differ in state, history, update schedule, probability semantics, structural mutation, branching, completion, or witness requirements?
+5. Do any newly discovered constructions invalidate the current proposed SimpleProgram API or require a principled clarification?
+6. What exact changes should a later authorized integration make to `ref/notes/CA-Types.csv`, Goal 1, Goal 2, and API planning?
+
+## Non-Negotiable Constraints
+
+1. **Book-first discovery.** Do not use T01–T45, `CA-Types.md`, Goal 1 stage conclusions, the proposed API, or runtime capabilities to decide what exists in the Book during the blind discovery phase.
+2. **Artifact-level independence, not a false claim of amnesia.** Prior context is known, but blind discovery artifacts use provisional `B####` candidate IDs and contain no T-ID mappings or API-fit decisions until Stage 19.
+3. **Sequential coverage precedes search saturation.** Keyword searches, headings, Index terms, and the Atlas can find omissions but cannot substitute for reading every source unit in order.
+4. **The monolith is canonical.** Use `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md` for completeness, order, and canonical provenance. Split Markdown is a secondary witness and image-location aid.
+5. **Main text and Notes are paired.** Review each chapter's main-text span together with its corresponding Notes span. Do not trust split directory names to identify semantic ownership.
+6. **Figures count as evidence.** Screen every image reference. Inspect construction-bearing figures and their surrounding caption/context; do not infer exact rules from pixels when the source does not establish them.
+7. **No count target.** Do not protect 45, inflate the number of additions, or collapse candidates merely to preserve an elegant API.
+8. **Coverage catalog and semantic families remain separate.** A named preset can deserve a catalog row without a new executor. Conversely, two systems can fit the same five fields while remaining semantically distinct.
+9. **Names do not establish identity.** Different names may be aliases or presets; the same name may cover several constructions.
+10. **API fit does not establish taxonomy.** Do not decide that two systems are one type merely because both fit `seed/alphabet/frontier/neighborhood/rule`.
+11. **Equivalence requires a real proof.** Claims of same-family reuse require a lossless complete-state representation, an inverse on the valid image, and preservation of one native event/result—including schedule, branching/probability, completion, and witnesses—without a hidden source interpreter.
+12. **New-family claims require a counterexample.** Show a concrete native event or denotation that the nearest existing family cannot preserve honestly. Opaque packing, callbacks, phase hidden in an executor, or multi-step simulation are not evidence of reuse.
+13. **Do not conflate semantic roles.** Keep construction, property/restriction, seed/input/boundary class, representation, observer/analyzer, solver, application, emulation, and historical mention distinct.
+14. **Randomness distinctions are explicit.** Separate random initial data, a stochastic transition law, an external draw stream, a finite PRNG realization, and a downstream distribution.
+15. **Declarative objects are not fake trajectories.** A constraint, function, constant, equation, or model set may be in scope without a native update.
+16. **Insufficient source evidence is a resolved boundary, not permission to invent.** Record the exact missing mechanics and classify the candidate as `INSUFFICIENT_BOOK_EVIDENCE` after exhaustive review.
+17. **External sources are auxiliary only.** They may clarify terminology or document a source defect, but they cannot create Book coverage or silently fill absent Book semantics.
+18. **Preserve source defects.** OCR errors, missing assets, contradictory claims, and underdetermined rules remain visible and are never silently repaired.
+19. **Scope writes to Goal 3.** During execution, preserve current dirty work and write audit artifacts only under `goal-3/` unless the user explicitly authorizes integration elsewhere.
+20. **No stage completes on green tooling alone.** Validators prove ledger integrity; they do not prove that a human or agent read and correctly understood the source.
+
+## Definitions
+
+### Source Unit
+
+A deterministic, hash-bound unit of the canonical monolith: heading, paragraph, list item, code/formula block, caption, table-like block, image reference, or other indivisible review unit. Source units must partition the canonical corpus without silent gaps or overlaps.
+
+### Candidate
+
+A source-grounded possibility that the Book specifies a construction or a catalog-worthy semantic role. Candidates use stable provisional IDs `B0001`, `B0002`, and so on until final reconciliation.
+
+### Semantic Fingerprint
+
+Every candidate records:
+
+- object kind and native notion of time, if any;
+- carrier, support, topology, and structural invariants;
+- alphabet or value schema;
+- complete state, visible history, and control;
+- seed, input, boundary, and external data;
+- frontier, activation, or schedule;
+- readable dependencies or neighborhood;
+- rule, relation, constraint, function, or probability law;
+- writes, replacement, assembly, or commit semantics;
+- successor cardinality, determinism, branching, or stochastic measure;
+- termination, completion, failure, and witness semantics;
+- parameters and variants;
+- observers and representations kept outside native identity;
+- evidence strength and any missing mechanics.
+
+### Coverage Catalog
+
+The traceable inventory of Book constructions and separately named coverage obligations. It may include presets, restrictions, seed classes, or declarative categories that do not require distinct execution machinery.
+
+### Semantic Family
+
+A group whose members have an explicit lossless structural/relational correspondence preserving complete native semantics. Similar behavior, a shared renderer, emulation, or a common top-level API shape is insufficient.
+
+### Final Candidate Dispositions
+
+Every candidate must receive exactly one primary final disposition:
+
+- `EXACT_EXISTING_COVERAGE`
+- `SPECIALIZATION_OR_PRESET`
+- `PROPERTY_OR_RESTRICTION`
+- `SEED_INPUT_OR_BOUNDARY_CLASS`
+- `COMPOSITION_OR_HYBRID`
+- `REPRESENTATION_CODEC_OR_OBSERVER`
+- `APPLICATION_OR_EMULATION`
+- `DECLARATIVE_NONTRANSITION_OBJECT`
+- `DUPLICATE_OR_ALIAS`
+- `INSUFFICIENT_BOOK_EVIDENCE`
+- `GENUINE_NEW_CONSTRUCTION`
+
+Secondary tags may preserve relationships, but they cannot replace the primary disposition.
+
+## Authoritative Inputs
+
+- User directions and `principles.md`.
+- `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`: canonical Book transcription.
+- The 12 chapter Markdown files and split back matter: secondary witnesses and resolvable image links.
+- The 1,444 local Book images: visual evidence governed through a basename/hash crosswalk.
+- `ANKoS-Atlas.md`: late-stage navigation and missed-section comparator only, never primary Book evidence.
+- The actual Index within the canonical monolith: alias and cross-reference discovery, not construction proof by itself.
+- `ref/notes/CA-Types.csv`, `ref/notes/CA-Types.md`, Goal 1, Goal 2, `api.md`, `simple_programs.md`, and `src/ca`: withheld during blind discovery and opened only for reconciliation and architecture-pressure analysis.
+
+## Current Facts
+
+These are scaffold-time facts to reverify and hash-pin in Stage 2:
+
+- `CA-Types.md` explicitly says its source scope is Chapters 3–5. Goal 1 makes the 45-row CSV exhaustive relative to that seed catalog, not relative to an independent whole-book discovery pass.
+- The current catalog has stable identifiers T01–T45. At scaffold time, Goal 1 reports 43 complete types, T40 in progress, and T42 pending; Goal 3 must resync rather than depend on that snapshot.
+- The local ANKoS tree contains 19 Markdown files and 1,444 physical JPEGs.
+- The canonical monolith has 22,497 physical newline-terminated lines and 22,498 logical lines because the final line lacks a trailing newline.
+- The monolith contains 1,444 image references with 1,444 unique basenames. Split Markdown contains 1,441 references; three monolith-referenced assets are omitted from the split Markdown.
+- Split back-matter names are misleading: `BACK-MATTER/Notes/Notes.md` is one stray line; Chapter 12 crosses into General Notes; files named `Index.md` and `Colophon.md` contain large Notes continuations.
+- `ANKoS-Atlas.md` is derivative and useful only as a checklist after blind reading.
+- The EPUB briefly inspected in the repository was deleted and is not an audit source.
+- Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
+- Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.
+
+## Canonical Monolith Map
+
+Stage 2 must rederive this map rather than trust it blindly:
+
+| Material | Canonical logical lines |
+|---|---:|
+| Cover, copyright, printed contents | 1–85 |
+| Preface | 86–167 |
+| Chapter 1 | 168–399 |
+| Chapter 2 | 400–681 |
+| Chapter 3 | 682–1369 |
+| Chapter 4 | 1370–2143 |
+| Chapter 5 | 2144–2701 |
+| Chapter 6 | 2702–3421 |
+| Chapter 7 | 3422–4337 |
+| Chapter 8 | 4338–5165 |
+| Chapter 9 | 5166–6587 |
+| Chapter 10 | 6588–7693 |
+| Chapter 11 | 7694–8609 |
+| Chapter 12 | 8610–10622 |
+| General Notes | 10623–10817 |
+| Chapter 1 Notes | 10818–10894 |
+| Chapter 2 Notes | 10895–11630 |
+| Chapter 3 Notes | 11631–12498 |
+| Chapter 4 Notes | 12499–13459 |
+| Chapter 5 Notes | 13460–14198 |
+| Chapter 6 Notes | 14199–14847 |
+| Chapter 7 Notes | 14848–15582 |
+| Chapter 8 Notes | 15583–16011 |
+| Chapter 9 Notes | 16012–17086 |
+| Chapter 10 Notes | 17087–18194 |
+| Chapter 11 Notes | 18195–19027 |
+| Chapter 12 Notes | 19028–20825 |
+| Actual Index | 20826–22457 |
+| Actual Colophon | 22458–22498 |
+
+## Assumptions To Challenge
+
+- The current 45 entries are all independently recoverable from a blind Book pass.
+- The Book provides enough mechanics to settle every candidate rather than only name it.
+- Every important construction appears in prose or headings rather than only in captions, code, formulas, or images.
+- Chapter boundaries and Book terminology align with semantic-family boundaries.
+- Applications in Chapters 7–10 only reuse earlier mechanics rather than defining new coupled or stochastic constructions.
+- Reversibility, conservation, symmetry, universality, and behavior classes are always properties rather than sometimes being enforced by a different construction.
+- A schedule can always be treated as ordinary visible state without changing the construction's semantic family.
+- Probability-bearing rules, structural mutation, multi-time state, and input streams fit existing families without semantic loss.
+- The final five-field API can express every new candidate without hidden state, a separate update policy, or a vacuous callback.
+- One catalog row should correspond to one semantic family.
+
+## Required Goal 3 Artifacts
+
+Execution of the stages will create, refine, and verify:
+
+- `goal-3/corpus-manifest.json`: hashes, file/asset counts, canonical segments, split anomalies, and chapter↔Notes pairings.
+- `goal-3/source-units.jsonl`: deterministic canonical source units with stable IDs and hashes.
+- `goal-3/reading-ledger.csv`: one review disposition and candidate/support links for every source unit.
+- `goal-3/candidate-ledger.jsonl`: stable B IDs, provenance, aliases, evidence strength, semantic fingerprints, and uncertainty.
+- `goal-3/search-rounds.json`: reproducible query rounds, result digests, match dispositions, and fixed-point evidence.
+- `goal-3/cross-reference-ledger.csv`: relevant page/section/Notes/Index routes and their reviewed targets.
+- `goal-3/asset-ledger.csv`: image references, physical paths/hashes, source ownership, evidence role, inspection status, and uncertainty.
+- `goal-3/classification-ledger.csv`: final primary disposition and proof for every candidate.
+- `goal-3/coverage-matrix.csv`: B candidates, existing T01–T45 obligations, proposed additions, and source coverage joins.
+- `goal-3/near-pair-matrix.md`: explicit comparisons among easily conflated candidates.
+- `goal-3/whole-book-catalog.md`: the final traceable coverage catalog.
+- `goal-3/semantic-families.md`: the deduplicated semantic-family inventory and equivalence/non-equivalence arguments.
+- `goal-3/hostile-review.md`: independent findings and reclosure records.
+- `goal-3/taxonomy-report.md`: final answer, counts, evidence limits, corrections, and integration consequences.
+- `goal-3/integration-handoff.md`: proposed T46+ additions and Goal 1/2/API work, without performing those changes.
+- Small validators/oracles under `goal-3/tools/` that fail closed when coverage, joins, hashes, or dispositions are incomplete.
+
+## Success Metrics
+
+- All 19 Markdown files and all 1,444 physical images are present in the source manifest or explicitly diagnosed.
+- Every canonical logical line belongs to exactly one segment and every deterministic source unit has exactly one reading-ledger disposition.
+- Preface/bookends, 12/12 main chapters, General Notes, 12/12 chapter Notes spans, actual Index, and Colophon are screened.
+- Every image reference has an asset-ledger row; every construction-bearing image is inspected with its surrounding source context.
+- Every relevant cross-reference reaches a reviewed target or a documented missing target.
+- Sequential discovery and recursive search reach a declared fixed point with no undispositioned search hit.
+- Every candidate has complete provenance, a semantic fingerprint, and exactly one final disposition.
+- Every T01–T45 entry is independently rediscovered or receives a source-backed diagnostic.
+- Every proposed new catalog entry and every close collapse/exclusion receives independent hostile review.
+- The final coverage-catalog count and semantic-family count are both reported and never conflated.
+- Zero source units, candidates, search hits, cross-references, and required assets remain silently unresolved.
+- Genuine `INSUFFICIENT_BOOK_EVIDENCE` dispositions identify the exact missing mechanics and the evidence boundary.
+- Input hashes and all audit ledgers are reproducible; mutation tests prove the validators detect missing units, links, classifications, and source changes.
+
+## Verification Requirements
+
+- Independently parse the raw monolith and compare it with the manifest and source-unit ledger; do not derive expected coverage from the same ledger being tested.
+- Prove segment and source-unit union equals the canonical corpus with no gaps or overlaps.
+- Verify every source reference, split witness, image basename/path, and hash resolves or has an explicit defect record.
+- Verify candidate IDs, source-unit links, cross-reference targets, search dispositions, classification rows, and coverage-matrix joins are total and unique.
+- Verify blind artifacts were frozen before T reconciliation and contain no T-ID mapping or API-fit fields.
+- Re-run all search rounds and compare query/result digests.
+- Mutation-test deletion or corruption of a source unit, candidate link, search disposition, cross-reference, asset row, and classification; each mutation must fail verification.
+- Run validators from the repository root and a relocated copy, byte-compile/import silently where applicable, fail closed under optimized Python if assertions are used, and avoid working-directory assumptions.
+- Run `git diff --check -- goal-3` and inspect scope with `git status --short`.
+- Confirm Goal 3 did not edit Book sources, `ref/notes`, Goal 1, Goal 2, runtime, tests, or root API documents without explicit authorization.
+
+## Stages
+
+### 1-GUARDRAILS
+
+#### Big Picture Objective
+
+Fix the audit's inclusion threshold, evidence model, candidate identity, disposition vocabulary, semantic-equivalence standard, blind-discovery boundary, and success/failure criteria before inspecting the Book for additions.
+
+#### Detailed Implementation Plan
+
+- Read `principles.md` and this scaffold in full.
+- Define construction-bearing eligibility broadly enough to include transitions, generators, input processors, stochastic laws, relations, constraints, functions/constants/equations, and structural replacement systems.
+- Define exclusion and secondary-role categories without pre-classifying known examples.
+- Freeze provisional B-ID allocation, source-evidence strength, semantic-fingerprint fields, and final disposition vocabulary.
+- Specify how isolated discovery workers receive only assigned Book ranges, Goal 3 guardrails, and ledger schemas.
+- Define the proof obligations for same-family, specialization, composition, new construction, and insufficient evidence.
+
+#### Completion Requirements
+
+- Eligibility and all disposition categories have necessary and sufficient operational criteria.
+- The distinction between coverage catalog and semantic family is explicit and testable.
+- Blind-phase allowed/forbidden inputs are recorded.
+- No current candidate is accepted, rejected, or mapped to T01–T45.
+- The stage records commands, facts, and any changes folded back into this plan.
+
+### 2-CORPUS-MAP
+
+#### Big Picture Objective
+
+Create a trustworthy, hash-pinned map of the entire local Book corpus despite malformed split boundaries and broken monolith image paths.
+
+#### Detailed Implementation Plan
+
+- Inventory and hash all Markdown and image files.
+- Re-derive canonical logical-line boundaries for front matter, all chapters, General Notes, all chapter Notes, actual Index, and Colophon.
+- Crosswalk split Markdown paragraphs and image references back to canonical segments.
+- Reconcile the 1,444 monolith references, 1,441 split references, and physical assets, including the three known split omissions.
+- Record malformed split ownership without rewriting source files.
+
+#### Completion Requirements
+
+- `corpus-manifest.json` accounts for every Markdown file and physical image.
+- Canonical segments cover all logical lines exactly once.
+- Every image reference resolves through a unique basename/hash or has an explicit defect.
+- Split anomalies and ownership mappings are machine-verifiable.
+- Independent source-manifest verification and mutation checks pass.
+
+### 3-AUDIT-HARNESS
+
+#### Big Picture Objective
+
+Build the ledgers and validators that make sequential reading, candidate capture, cross-reference closure, asset inspection, and final classification auditable.
+
+#### Detailed Implementation Plan
+
+- Deterministically extract source units with stable IDs and hashes.
+- Create schemas for the reading, candidate, search-round, cross-reference, asset, classification, and coverage ledgers.
+- Implement validators for total unit coverage, unique IDs, resolvable provenance, complete joins, empty work queues, and stale source hashes.
+- Add mutation fixtures proving each required row/link is enforced.
+- Keep discovery schemas free of T mappings and API-fit fields until Stage 19.
+
+#### Completion Requirements
+
+- Validators detect missing/duplicate source units, broken provenance, unresolved cross-references, undispositioned hits/candidates, missing assets, and stale hashes.
+- The source-unit ledger partitions the canonical corpus without gaps or overlaps.
+- The harness runs from root and a relocated copy and fails closed under declared modes.
+- Stage 4 can begin with empty, valid, resumable ledgers.
+
+### 4-BOOKENDS
+
+#### Big Picture Objective
+
+Blindly screen cover/contents, Preface, General Notes, and Colophon for construction-bearing material and establish the sequential review discipline before chapter work.
+
+#### Detailed Implementation Plan
+
+- Read every assigned source unit in order with no current-catalog reconciliation.
+- Inspect each owned image and surrounding caption/context.
+- Create B candidates with complete provisional fingerprints whenever mechanics may be present.
+- Record supports, controls, applications, historical-only material, and no-construction units explicitly.
+- Queue every relevant page/section/alias route that points outside the assigned spans.
+
+#### Completion Requirements
+
+- All assigned source units and images have review dispositions.
+- Every candidate and support claim has canonical provenance.
+- No within-stage cross-reference remains unreviewed; routed edges are in the global queue.
+- The stage contains no T-ID mapping or API-fit conclusion.
+
+### 5-CH01-FOUNDATIONS
+
+#### Big Picture Objective
+
+Blindly audit Chapter 1 main text and Chapter 1 Notes for construction-bearing systems.
+
+#### Detailed Implementation Plan
+
+- Sequentially review canonical main lines 168–399 and Notes lines 10818–10894 after revalidated Stage 2 mapping.
+- Inspect all owned captions, code/formulas, tables, and images through split witnesses.
+- Record B candidates and full provisional semantic fingerprints.
+- Run a range-local trigger/alias search only after sequential reading.
+- Queue cross-range references without consulting the existing catalog.
+
+#### Completion Requirements
+
+- Every source unit/image in the paired spans is dispositioned.
+- Every local trigger hit is reconciled to a reviewed unit.
+- Candidate provenance and fingerprints are complete to the limit of the source.
+- No blind-phase boundary is violated.
+
+### 6-CH02-EXPERIMENT
+
+#### Big Picture Objective
+
+Blindly audit Chapter 2 main text and Chapter 2 Notes.
+
+#### Detailed Implementation Plan
+
+- Sequentially review canonical main lines 400–681 and Notes lines 10895–11630.
+- Apply the same source-unit, image, candidate, local-search, and cross-reference protocol established in Stage 5.
+- Treat rules, initial conditions, behavior classes, properties, renderings, and historical commentary as distinct roles.
+
+#### Completion Requirements
+
+- The paired ranges have zero unreviewed units/images and zero undispositioned local search hits.
+- Every construction candidate has a source-grounded fingerprint.
+- Properties and observed behavior are not silently promoted to constructions.
+- Cross-range routes are recorded for later closure.
+
+### 7-CH03-PROGRAMS
+
+#### Big Picture Objective
+
+Blindly audit Chapter 3 main text and Chapter 3 Notes without using the catalog originally derived from this chapter.
+
+#### Detailed Implementation Plan
+
+- Sequentially review canonical main lines 682–1369 and Notes lines 11631–12498.
+- Inspect implementation code, rule tables, figure-only mechanics, variants, histories, and cross-system comparisons.
+- Allocate B candidates independently of T IDs or familiar names.
+- Preserve distinctions among native construction, restriction, representation, emulation, observer, and behavior.
+
+#### Completion Requirements
+
+- Every unit/image in both spans has a disposition.
+- Every rule/mechanism passage and local search hit is linked to candidates or an explicit exclusion.
+- No current taxonomy row or Goal 1 conclusion is used as discovery evidence.
+- All outgoing cross-references are queued.
+
+### 8-CH04-NUMBERS
+
+#### Big Picture Objective
+
+Blindly audit Chapter 4 main text and Chapter 4 Notes.
+
+#### Detailed Implementation Plan
+
+- Sequentially review canonical main lines 1370–2143 and Notes lines 12499–13459.
+- Separate immutable definitions, representation queries, iterative work procedures, sequences, filters, maps, continuous systems, equations, observations, and numerical methods.
+- Inspect every formula, implementation fragment, caption, and governed image.
+- Record exactness, partiality, completion, and hidden-work-state requirements in candidate fingerprints.
+
+#### Completion Requirements
+
+- All paired source units/images and local search hits are dispositioned.
+- Denotations, algorithms, trajectories, queries, and observers are not conflated.
+- Every candidate has explicit result kind and evidence strength.
+- Cross-range references are queued with no silent omissions.
+
+### 9-CH05-DIMENSIONS
+
+#### Big Picture Objective
+
+Blindly audit Chapter 5 main text and Chapter 5 Notes.
+
+#### Detailed Implementation Plan
+
+- Sequentially review canonical main lines 2144–2701 and Notes lines 13460–14198.
+- Record topology, dimensionality, structural replacement, graph identity, branching, constraints, schedules, and witness semantics explicitly.
+- Inspect rule diagrams and construction-bearing images in full context.
+- Preserve underdetermined variants rather than choosing convenient conventions.
+
+#### Completion Requirements
+
+- Every unit/image and local search hit in the paired spans is dispositioned.
+- Structural variants have complete fingerprints or explicit missing-mechanics fields.
+- Constraints, solvers, networks, multiway histories, and renderings remain distinct.
+- All relevant outgoing references are queued.
+
+### 10-CH06-RANDOMNESS
+
+#### Big Picture Objective
+
+Blindly audit Chapter 6 main text and Chapter 6 Notes.
+
+#### Detailed Implementation Plan
+
+- Sequentially review canonical main lines 2702–3421 and Notes lines 14199–14847.
+- Distinguish behavior classes, ensembles, random seeds, attractors, perturbations, finite-size protocols, and any native construction changes.
+- Record probability laws only where the Book specifies them.
+- Inspect all captions/images and run local saturation after reading.
+
+#### Completion Requirements
+
+- All paired units/images and trigger hits are dispositioned.
+- Initial-condition randomness is not confused with stochastic transition semantics.
+- Behavior/property/analyzer records are separated from construction candidates.
+- Cross-range references are completely queued.
+
+### 11-CH07-MECHANISMS
+
+#### Big Picture Objective
+
+Blindly audit Chapter 7 main text and Chapter 7 Notes.
+
+#### Detailed Implementation Plan
+
+- Sequentially review canonical main lines 3422–4337 and Notes lines 14848–15582.
+- Pay explicit attention to stochastic movement, aggregation, constraint satisfaction, continuity/discreteness mechanisms, and systems introduced as explanatory examples.
+- Record event selection, probability, frontier growth, and ensemble/observer distinctions.
+- Inspect every construction-bearing figure and follow local references.
+
+#### Completion Requirements
+
+- All paired source units/images and search hits are dispositioned.
+- Stochastic laws, random inputs, averaged observations, and deterministic intrinsic randomness are distinguished.
+- Candidate fingerprints include draw/event timing and measure semantics where evidenced.
+- No relevant reference is lost.
+
+### 12-CH08-EVERYDAY
+
+#### Big Picture Objective
+
+Blindly audit Chapter 8 main text and Chapter 8 Notes.
+
+#### Detailed Implementation Plan
+
+- Sequentially review canonical main lines 4338–5165 and Notes lines 15583–16011.
+- Determine whether each application merely instantiates earlier mechanics or specifies new coupling, mutation, global selection, growth, stochastic, or hybrid semantics.
+- Keep physical interpretation and display conventions outside native construction identity unless the Book makes them causal.
+- Inspect all figures and implementation details.
+
+#### Completion Requirements
+
+- Every paired unit/image and local trigger hit is dispositioned.
+- Each application candidate states whether new mechanics are actually specified.
+- Hybrid/composed systems identify component boundaries and coupling laws.
+- All cross-range routes are queued.
+
+### 13-CH09-PHYSICS
+
+#### Big Picture Objective
+
+Blindly audit Chapter 9 main text and Chapter 9 Notes.
+
+#### Detailed Implementation Plan
+
+- Sequentially review canonical main lines 5166–6587 and Notes lines 16012–17086.
+- Record multi-time state, reversibility constructions, block schedules, conserved systems, network rewrites, causal event structures, branching, and sequencing evidence without forcing them into prior categories.
+- Distinguish derived causal representations from native evolution and distinguish property restrictions from construction-enforced mechanics.
+- Inspect all relevant rule diagrams, network figures, and formulas.
+
+#### Completion Requirements
+
+- Every paired unit/image and local search hit is dispositioned.
+- Schedule, visible history, structural mutation, and causal witness semantics are explicit.
+- Close property-versus-construction cases retain evidence on both sides.
+- Outgoing references are fully queued.
+
+### 14-CH10-PERCEPTION
+
+#### Big Picture Objective
+
+Blindly audit Chapter 10 main text and Chapter 10 Notes.
+
+#### Detailed Implementation Plan
+
+- Sequentially review canonical main lines 6588–7693 and Notes lines 17087–18194.
+- Separate analyzers and compression/view procedures from generative probabilistic models, transducers, automata, and stochastic cellular systems.
+- Record consumed input, hidden state, output semantics, likelihood/probability roles, and learning/fitting procedures where specified.
+- Inspect code, formulas, captions, and all governed images.
+
+#### Completion Requirements
+
+- All paired units/images and search hits are dispositioned.
+- Model definitions, inference algorithms, observers, and data transformations are not conflated.
+- Input-processing candidates have complete input/state/output fingerprints.
+- Every relevant reference is queued.
+
+### 15-CH11-COMPUTATION
+
+#### Big Picture Objective
+
+Blindly audit Chapter 11 main text and Chapter 11 Notes.
+
+#### Detailed Implementation Plan
+
+- Sequentially review canonical main lines 7694–8609 and Notes lines 18195–19027.
+- Distinguish native constructions from emulations, universal presets, encodings, proof artifacts, and computational properties.
+- Record any construction mechanics introduced only to establish universality.
+- Inspect all diagrams, encodings, implementation passages, and cross-references.
+
+#### Completion Requirements
+
+- Every paired unit/image and local trigger hit is dispositioned.
+- Emulation and universality do not create false native types.
+- Any genuinely specified machine/system has a complete provisional fingerprint.
+- Cross-range routes are fully queued.
+
+### 16-CH12-EQUIVALENCE
+
+#### Big Picture Objective
+
+Blindly audit Chapter 12 main text and Chapter 12 Notes.
+
+#### Detailed Implementation Plan
+
+- Sequentially review canonical main lines 8610–10622 and Notes lines 19028–20825.
+- Separate philosophical claims, mathematical examples, axiom systems, proof/search relations, computations, and actual formal constructions.
+- Record any explicitly instantiated rewrite, proof, equation, machine, or generative mechanism.
+- Inspect all images and follow every locally resolvable route.
+
+#### Completion Requirements
+
+- Every paired unit/image and local search hit is dispositioned.
+- Abstract discussion is not mistaken for executable mechanics, and declarative formal systems are not discarded merely for lacking time evolution.
+- Candidate evidence boundaries are explicit.
+- All outgoing routes are queued for Stage 18.
+
+### 17-INDEX-CLOSURE
+
+#### Big Picture Objective
+
+Use the Book's actual Index and then the Atlas to find names, aliases, and sections missed by sequential reading without treating either as primary construction evidence.
+
+#### Detailed Implementation Plan
+
+- Sequentially inspect relevant actual-Index headwords and subentries at canonical lines 20826–22457.
+- Follow every construction-relevant page route to an already reviewed source unit or reopen the owning chapter stage.
+- Compare the Atlas's section/term inventory against discovered candidates only after Index review.
+- Record Index-only and Atlas-only leads, false positives, and unresolved OCR routes.
+
+#### Completion Requirements
+
+- Every construction-relevant Index route is mapped, excluded with reason, or assigned a documented missing target.
+- Every Atlas lead maps to reviewed Book evidence or a clear derivative-only exclusion.
+- Any missed construction reopens and re-closes its owning stage.
+- Index/Atlas text is never the sole mechanics evidence for an accepted candidate.
+
+### 18-SATURATION
+
+#### Big Picture Objective
+
+Reach a reproducible vocabulary and cross-reference fixed point across the full corpus after sequential discovery is complete.
+
+#### Detailed Implementation Plan
+
+- Run frozen search families over headings, captions, Notes labels, mechanism nouns, update verbs, schedules, probability terms, constraints, generators, equations, and input/output language.
+- Add every alias, operation, named example, and parameter learned from reviewed candidates to the next search round.
+- Partition every hit into governed candidate/support, duplicate, cross-reference, control, or exclusion.
+- Drain all page/section/alias cross-reference queues and inspect every remaining construction-adjacent image.
+- Repeat until a full round adds no new vocabulary, candidate, evidence group, or unresolved route.
+
+#### Completion Requirements
+
+- `search-rounds.json` reproduces every round and result digest.
+- Every search hit has a disposition and there is no remainder.
+- The final round adds zero vocabulary, candidates, evidence, or routes.
+- All cross-reference and asset work queues are empty.
+- Blind B-candidate artifacts are frozen before Stage 19.
+
+### 19-REDISCOVERY
+
+#### Big Picture Objective
+
+Reveal the existing catalog only after blind discovery, then test whether T01–T45 were independently recovered from the Book.
+
+#### Detailed Implementation Plan
+
+- Snapshot current `CA-Types.csv`, `CA-Types.md`, Goal 1 ledgers/stages, Goal 2 plans, and relevant architecture documents.
+- Map each T entry to one or more frozen B candidates without changing blind records.
+- Identify T entries not independently rediscovered and diagnose whether the blind pass failed, the catalog is a preset/property rather than a construction, or source support is defective.
+- Mine existing exclusion/boundary/future-stage records for candidates the blind audit may have missed; reopen owning discovery stages as needed.
+
+#### Completion Requirements
+
+- Every T01–T45 row has a unique reconciliation record and source-backed result.
+- Every B candidate is linked to zero or more T entries without premature final classification.
+- Missed Book evidence reopens and re-closes the responsible stage.
+- The baseline snapshot and joins are hash-pinned and reproducible.
+
+### 20-DISPOSITIONS
+
+#### Big Picture Objective
+
+Assign every B candidate one final primary disposition and identify proposed catalog additions without yet deduplicating semantic families.
+
+#### Detailed Implementation Plan
+
+- Compare every candidate against its nearest existing and newly discovered neighbors.
+- Require explicit base construction and parameter/predicate for presets and restrictions.
+- Require absence of native mechanics for observer/application/emulation dispositions.
+- Require exact missing facts for insufficient-evidence dispositions.
+- Require a concrete non-preservation counterexample for genuine new constructions.
+- Allocate proposed T46+ identifiers only after all earlier IDs remain stable.
+
+#### Completion Requirements
+
+- Every B candidate has exactly one primary disposition and evidence-backed rationale.
+- No `AMBIGUOUS`, `UNREVIEWED`, or silent catch-all row remains.
+- Every proposed T46+ entry has a complete Book evidence packet and nearest-family counterexample.
+- Every close exclusion/collapse is flagged for hostile review.
+
+### 21-SEMANTIC-FAMILIES
+
+#### Big Picture Objective
+
+Build the deduplicated semantic-family inventory and test newly discovered constructions against the proposed API without allowing API convenience to rewrite the taxonomy.
+
+#### Detailed Implementation Plan
+
+- Group catalog entries only when complete fingerprints and lossless native-result correspondences justify it.
+- Build near-pair comparisons for schedule, history, branching/probability, structural mutation, input consumption, completion, and witness differences.
+- Map each accepted construction to the minimal API fields and result semantics.
+- Record where the five-field design fits directly, needs clarification, or genuinely fails.
+- State implementation sharing separately from Book catalog identity.
+
+#### Completion Requirements
+
+- Every final catalog entry maps to exactly one semantic family or an explicitly irreducible declarative category.
+- Every same-family claim includes a lossless map and native-event/result preservation argument.
+- Every close non-equivalence includes a concrete counterexample.
+- Every accepted addition has an honest API-pressure disposition with no callback or opaque-packing escape hatch.
+
+### 22-HOSTILE-REVIEW
+
+#### Big Picture Objective
+
+Independently challenge source coverage, every proposed addition, every close exclusion/collapse, every semantic-family grouping, and the audit validators.
+
+#### Detailed Implementation Plan
+
+- Give independent reviewers raw source ranges, frozen ledgers, and explicit challenge assignments.
+- Re-read all proposed-new evidence and nearest-family evidence.
+- Sample exclusions and no-construction source units across every chapter.
+- Test high-risk distinctions: property versus mechanics, seed versus stochastic law, synchronous versus sequential/block schedule, hidden history, graph label evolution versus graph rewrite, application versus coupling, equation versus flow/solver, and emulation versus native construction.
+- Run independent coverage arithmetic and destructive mutation tests against copies of the ledgers.
+- Route every finding back to the owning stage; no waiver closes a failure.
+
+#### Completion Requirements
+
+- Every proposed addition and close classification has at least one independent review record.
+- Sampling covers every canonical segment and every final disposition class.
+- All validator mutation tests fail when required evidence is removed or corrupted.
+- Every hostile finding is resolved by re-opening/re-closing its owning stage.
+- `hostile-review.md` has zero unresolved blocking findings.
+
+### 23-FINAL-CENSUS
+
+#### Big Picture Objective
+
+Produce the final evidence-backed whole-book catalog, semantic-family inventory, exact coverage proof, and a non-mutating integration handoff.
+
+#### Detailed Implementation Plan
+
+- Freeze source, ledger, search, classification, and report hashes.
+- Generate final catalog and semantic-family counts from verified ledger rows rather than handwritten summaries.
+- Report every T01–T45 correction, every proposed T46+ addition, every insufficient-evidence boundary, and every API pressure.
+- Explain why every high-risk candidate was included, collapsed, or excluded.
+- Write a dependency-aware handoff for later authorized changes to `ref/notes`, Goal 1, Goal 2, API documents, and runtime planning.
+- Run all final source, join, mutation, relocation, Markdown, diff, and scope gates.
+
+#### Completion Requirements
+
+- The coverage catalog and semantic-family inventory are complete, internally consistent, and separately counted.
+- Every source unit, image, search hit, cross-reference, candidate, T entry, proposed addition, and family join is accounted for.
+- No unresolved hostile finding or silent evidence gap remains.
+- Final reports state limitations honestly and do not convert insufficient evidence into invented semantics.
+- Only `goal-3/` changed unless separate integration was explicitly authorized.
+- The original objective—determining whether and how the whole Book expands or corrects the current taxonomy—is actually answered.
