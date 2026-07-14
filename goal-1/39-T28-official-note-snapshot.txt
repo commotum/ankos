@@ -1,0 +1,17 @@
+T28 official Wolfram Science note evidence snapshot
+
+Canonical-URL: https://www.wolframscience.com/nks/notes-5-4--neighbor-dependent-2d-substitution-systems/
+Retrieved-UTC-Date: 2026-07-14
+Fetched-Document-SHA256: f28a332211082048417abce950a75756a4bdae7c7d48f3f12ab87ffdab02328c
+Fetched-HTML-Line: 937
+
+Exact-Raw-HTML-Rule:
+<span class="inlinecode clipboard-inline">{{_, 1}, {0, 1}} <span class="special-character Rule">&#62754;</span> {{1, 0}, {1, 1}}</span>
+
+Exact-Raw-HTML-Step:
+<span class="clipboard-block">Flatten2D[Partition[list, {2, 2}, 1, -1] /. rule]</span>
+
+Decoded-Rule:
+{{_, 1}, {0, 1}} -> {{1, 0}, {1, 1}}
+
+Normalization-Scope: The official private-use Rule entity &#62754; is rendered as ASCII -> only in Decoded-Rule. The Mathematica Blank underscore is copied exactly. No other source text is normalized.

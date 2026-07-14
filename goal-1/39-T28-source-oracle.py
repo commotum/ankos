@@ -38,6 +38,7 @@ NATIVE_RASTER = (
     SOURCE_ROOT
     / "CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_207_Figure_1.jpeg"
 )
+OFFICIAL_NOTE_SNAPSHOT = ROOT / "goal-1/39-T28-official-note-snapshot.txt"
 
 INDEX_FIRST_LINE = 20826
 EXPECTED_BOOK_LINES = 22498
@@ -46,6 +47,12 @@ EXPECTED_ATLAS_SHA256 = "5ffab93f0007bbeb5da60af7cc08570f9a358c9f9f94e37c5e00f9f
 EXPECTED_CATALOG_SHA256 = "26cef05af1155f80bc301900d2df95469a90de027ba860730519d25d096c2b73"
 EXPECTED_TAXONOMY_SHA256 = "4c30fe079b2fb8f69e4c8c0dde3d59065227d4224cbe4b7693a17c0126cc3f1a"
 EXPECTED_NATIVE_RASTER_SHA256 = "e7f0112ebc4a6b4276bffeaccc043855335527d38e638c2ed37c428451d57b1c"
+EXPECTED_OFFICIAL_NOTE_SNAPSHOT_SHA256 = (
+    "ba1aff54973afd0cd42cb7afc41220dd11835a0cb5b3d8d9ce8f5e9fe3d1b866"
+)
+EXPECTED_OFFICIAL_NOTE_DOCUMENT_SHA256 = (
+    "f28a332211082048417abce950a75756a4bdae7c7d48f3f12ab87ffdab02328c"
+)
 
 
 # Each lane has a distinct purpose.  Direct names and mechanics find the
@@ -309,12 +316,19 @@ NATIVE_RASTER_TRANSCRIPTION = (
 RAW_EXAMPLE_ROW = (
     r"\{\{-, 1\}, \{0, 1\}\} \rightarrow \{\{1, 0\}, \{1, 1\}\}"
 )
-REPAIRED_EXAMPLE_ROW = (
-    r"\{\{_, 1\}, \{0, 1\}\} \rightarrow \{\{1, 0\}, \{1, 1\}\}"
-)
 OFFICIAL_NOTE_URL = (
     "https://www.wolframscience.com/nks/"
     "notes-5-4--neighbor-dependent-2d-substitution-systems/"
+)
+OFFICIAL_DECODED_EXAMPLE_ROW = "{{_, 1}, {0, 1}} -> {{1, 0}, {1, 1}}"
+OFFICIAL_RAW_RULE_HTML = (
+    '<span class="inlinecode clipboard-inline">{{_, 1}, {0, 1}} '
+    '<span class="special-character Rule">&#62754;</span> '
+    "{{1, 0}, {1, 1}}</span>"
+)
+OFFICIAL_RAW_STEP_HTML = (
+    '<span class="clipboard-block">'
+    "Flatten2D[Partition[list, {2, 2}, 1, -1] /. rule]</span>"
 )
 
 
@@ -456,6 +470,35 @@ def main() -> int:
     raw = book.read_bytes()
     lines = raw.decode("utf-8").splitlines()
     at = lambda line_no: lines[line_no - 1]
+    official_snapshot_raw = OFFICIAL_NOTE_SNAPSHOT.read_bytes()
+    official_snapshot_text = official_snapshot_raw.decode("utf-8")
+    decoded_rule_matches = re.findall(
+        r"(?m)^Decoded-Rule:\n([^\n]+)$", official_snapshot_text
+    )
+    official_decoded_example_row = (
+        decoded_rule_matches[0] if len(decoded_rule_matches) == 1 else ""
+    )
+    official_repaired_example_row = (
+        official_decoded_example_row.replace("{", r"\{")
+        .replace("}", r"\}")
+        .replace(" -> ", r" \rightarrow ")
+    )
+    official_snapshot_ok = (
+        hashlib.sha256(official_snapshot_raw).hexdigest()
+        == EXPECTED_OFFICIAL_NOTE_SNAPSHOT_SHA256
+        and official_snapshot_text.count(f"Canonical-URL: {OFFICIAL_NOTE_URL}") == 1
+        and official_snapshot_text.count(
+            f"Fetched-Document-SHA256: {EXPECTED_OFFICIAL_NOTE_DOCUMENT_SHA256}"
+        )
+        == 1
+        and official_snapshot_text.count(OFFICIAL_RAW_RULE_HTML) == 1
+        and official_snapshot_text.count(OFFICIAL_RAW_STEP_HTML) == 1
+        and official_decoded_example_row == OFFICIAL_DECODED_EXAMPLE_ROW
+        and official_snapshot_text.count(
+            "The Mathematica Blank underscore is copied exactly."
+        )
+        == 1
+    )
     source_ok = (
         len(lines) == EXPECTED_BOOK_LINES
         and hashlib.sha256(raw).hexdigest() == EXPECTED_BOOK_SHA256
@@ -463,6 +506,7 @@ def main() -> int:
         and sha256(CATALOG) == EXPECTED_CATALOG_SHA256
         and sha256(TAXONOMY) == EXPECTED_TAXONOMY_SHA256
         and sha256(NATIVE_RASTER) == EXPECTED_NATIVE_RASTER_SHA256
+        and official_snapshot_ok
     )
     ok = source_ok
     print("source", "OK" if source_ok else "MISMATCH")
@@ -620,13 +664,16 @@ def main() -> int:
         "OK" if raster_ok else "MISMATCH", *raster_transcription_actual,
     )
 
-    repaired_line = at(13806).replace(RAW_EXAMPLE_ROW, REPAIRED_EXAMPLE_ROW, 1)
+    repaired_line = at(13806).replace(
+        RAW_EXAMPLE_ROW, official_repaired_example_row, 1
+    )
     repair_ok = (
-        at(13806).count(RAW_EXAMPLE_ROW) == 1
+        official_snapshot_ok
+        and at(13806).count(RAW_EXAMPLE_ROW) == 1
         and RAW_EXAMPLE_ROW.count("-") == 1
         and "_" not in RAW_EXAMPLE_ROW
-        and RAW_EXAMPLE_ROW.replace("-", "_") == REPAIRED_EXAMPLE_ROW
-        and repaired_line.count(REPAIRED_EXAMPLE_ROW) == 1
+        and RAW_EXAMPLE_ROW.replace("-", "_") == official_repaired_example_row
+        and repaired_line.count(official_repaired_example_row) == 1
         and RAW_EXAMPLE_ROW not in repaired_line
         and OFFICIAL_NOTE_URL.endswith(
             "notes-5-4--neighbor-dependent-2d-substitution-systems/"
@@ -637,8 +684,10 @@ def main() -> int:
     )
     ok &= repair_ok
     print(
-        "source_official_exact_blank_OCR_repair_one_example_row_only",
+        "source_hash_bound_official_exact_blank_OCR_repair_one_example_row_only",
         "OK" if repair_ok else "MISMATCH",
+        EXPECTED_OFFICIAL_NOTE_SNAPSHOT_SHA256,
+        EXPECTED_OFFICIAL_NOTE_DOCUMENT_SHA256,
     )
 
     main_construction_ok = (
@@ -691,7 +740,7 @@ def main() -> int:
         and windows[1][2] == ((1, 2), (4, 5))
         and example_window[0][1] == 1
         and example_window[1] == (0, 1)
-        and REPAIRED_EXAMPLE_ROW.endswith(
+        and official_repaired_example_row.endswith(
             r"\rightarrow \{\{1, 0\}, \{1, 1\}\}"
         )
     )
