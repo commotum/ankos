@@ -1,0 +1,20 @@
+T32 official Wolfram Science checking-note evidence snapshot
+
+Canonical-URL: https://www.wolframscience.com/nks/notes-5-7--checking-tilings-with-constraints/
+Retrieved-UTC-Date: 2026-07-14
+Fetched-Document-SHA256: 9d11a2fa1f1bce6b40a7cf896303749c7fe562b4b68244b860226e91b0348bfb
+Fetched-HTML-Line: 937
+
+Exact-Raw-HTML-Template:
+<span class="inlinecode clipboard-inline">{{_, 1, _}, {0, 0, 1}, {_, 0, _}}</span>
+
+Exact-Raw-HTML-Checker:
+<span class="clipboard-block">SatisfiedQ[list_, allowed_] := <span class="spacer-2"></span>Apply[And, Map[MatchQ[#, allowed] &amp;, <span class="spacer-5"></span> Partition[list, {3, 3}, {1, 1}], {2}], {0, 1}]</span>
+
+Decoded-Template:
+{{_, 1, _}, {0, 0, 1}, {_, 0, _}}
+
+Decoded-Checker:
+SatisfiedQ[list_, allowed_] := Apply[And, Map[MatchQ[#, allowed] &, Partition[list, {3, 3}, {1, 1}], {2}], {0, 1}]
+
+Normalization-Scope: HTML spacer spans are removed and &amp; is decoded to & only in Decoded-Checker. The four Mathematica Blank underscores are copied exactly in both raw and decoded template evidence. No other source text is normalized.
