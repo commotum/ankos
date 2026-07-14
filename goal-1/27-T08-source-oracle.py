@@ -9,7 +9,8 @@ import sys
 from pathlib import Path
 
 
-DEFAULT_BOOK = Path("ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md")
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_BOOK = ROOT / "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md"
 INDEX_FIRST_LINE = 20826
 EXPECTED_BOOK_LINES = 22498
 EXPECTED_BOOK_SHA256 = (
