@@ -329,6 +329,10 @@ EXPECTED_QUERY = {
     "Q16": (9, 2, 7, "a981824e8619fa467bc1b9abded5903af72d6c63da1300e92e3ca6338ea8214c"),
     "Q17": (48, 48, 0, "d3e2ac1abedefa903ee8238ff9776ff9ffaacea3dd4b44f36b516afc18176027"),
 }
+EXPECTED_QUERY_PATTERNS = (
+    18,
+    "b2b79cc7c1ec8f5dcdd2a4e9938a5bc27eb9f13fef95e6e1b8b694183687ca2b",
+)
 EXPECTED_SET = {
     "union": (124, "cba77ff46ec1aee8eaf91ab28a2a62e7a7e2f3f5a6e5a387598fce56cd22d091"),
     "pre_index_union": (98, "7035010b90bcfac0d785986543507b90f3e44151e83eb0d5c7b0098a7055f5a4"),
@@ -372,6 +376,10 @@ EXPECTED_INDEX_CLOSURE = {
     "literal_digit_reversal": (7, "2363fb16a70d4ad6039b905e6cc341cde6c7210e277d1955ca29ec6ab2d9a192"),
     "page905_named_networks": (2, "1622f922824b49aa8f54ff6997542a8b43eec615c2145a4654d1855ff8d8886c"),
 }
+EXPECTED_INDEX_CLOSURE_PATTERNS = (
+    4,
+    "4c0723f13d88adc48ffd8d1e03f895e68a7fa10e3840cd35d2d970c35e2d3eba",
+)
 EXPECTED_INDEX_CLOSURE_UNION = (
     12,
     "03f65b7fe356e8639c81c8b3126adea70558c4907fcd09535b40639da7f289ae",
@@ -634,13 +642,23 @@ def main() -> int:
     print("source", "OK" if source_ok else "MISMATCH")
 
     hits: dict[str, set[int]] = {}
-    query_contract_ok = set(QUERIES) == set(EXPECTED_QUERY)
+    query_pattern_records = {f"{name}:{pattern}" for name, pattern in QUERIES.items()}
+    query_patterns_actual = (
+        len(query_pattern_records),
+        digest_records(query_pattern_records),
+    )
+    query_contract_ok = (
+        set(QUERIES) == set(EXPECTED_QUERY)
+        and all(QUERIES.values())
+        and query_patterns_actual == EXPECTED_QUERY_PATTERNS
+    )
     ok &= query_contract_ok
     print(
         "query_contract",
         "OK" if query_contract_ok else "MISMATCH",
         len(QUERIES),
         len(EXPECTED_QUERY),
+        *query_patterns_actual,
     )
     for name, pattern in QUERIES.items():
         rx = re.compile(pattern, re.IGNORECASE)
@@ -816,7 +834,23 @@ def main() -> int:
     print("unresolved_index", "OK" if index_ok else "MISMATCH", len(index ^ set(INDEX_ROUTED)))
 
     closure_hits: dict[str, set[int]] = {}
-    closure_ok = set(INDEX_CLOSURE_QUERIES) == set(EXPECTED_INDEX_CLOSURE)
+    closure_pattern_records = {
+        f"{name}:{pattern}" for name, pattern in INDEX_CLOSURE_QUERIES.items()
+    }
+    closure_patterns_actual = (
+        len(closure_pattern_records),
+        digest_records(closure_pattern_records),
+    )
+    closure_ok = (
+        set(INDEX_CLOSURE_QUERIES) == set(EXPECTED_INDEX_CLOSURE)
+        and all(INDEX_CLOSURE_QUERIES.values())
+        and closure_patterns_actual == EXPECTED_INDEX_CLOSURE_PATTERNS
+    )
+    print(
+        "index_closure_pattern_contract",
+        "OK" if closure_ok else "MISMATCH",
+        *closure_patterns_actual,
+    )
     for name, pattern in INDEX_CLOSURE_QUERIES.items():
         rx = re.compile(pattern, re.IGNORECASE)
         found = {

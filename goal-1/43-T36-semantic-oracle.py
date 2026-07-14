@@ -1065,7 +1065,7 @@ def audit_fixed_reversal_tables() -> tuple[int, int, int, int]:
     return entries, involutions, digests, permutation_profiles
 
 
-def audit_width_and_leading_zero_boundaries() -> tuple[int, int, int, int, int, int]:
+def audit_width_and_leading_zero_boundaries() -> tuple[int, int, int, int, int, int, int]:
     checks = 0
 
     canonical_two = advance(
@@ -1150,7 +1150,8 @@ def audit_width_and_leading_zero_boundaries() -> tuple[int, int, int, int, int, 
     assert narrow_result.event.witness.digits == (1,)
     assert padded_result.event.witness.digits == (0, 1)
     assert narrow_result.successors[0] != padded_result.successors[0]
-    width_loss_counterexamples = 2
+    width_loss_counterexample_pairs = 1
+    width_loss_witness_states = 2
 
     fixed_cycle = run(
         fixed_program(2, 4),
@@ -1162,7 +1163,8 @@ def audit_width_and_leading_zero_boundaries() -> tuple[int, int, int, int, int, 
     continuing_cycle_events = len(fixed_cycle.events)
     return (
         checks,
-        width_loss_counterexamples,
+        width_loss_counterexample_pairs,
+        width_loss_witness_states,
         zero_fixed_point_events,
         len(grow_zero.events),
         continuing_cycle_events,
@@ -1580,6 +1582,57 @@ def audit_hostile_validation() -> int:
     )
     assert not verify_transition_event(valid_program, forged_event)
     rejected += 1
+    forged_witness_trace = ScalarTrace(
+        program_provenance(valid_program),
+        1,
+        (forged_event.before, forged_event.after),
+        (forged_event,),
+    )
+    assert not verify_trace_provenance(valid_program, forged_witness_trace)
+    rejected += 1
+
+    valid_two_event_trace = run(
+        valid_program,
+        ScalarConfiguration(POSITIVE, 16),
+        2,
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ScalarTrace(
+            valid_two_event_trace.provenance,
+            2,
+            (
+                valid_two_event_trace.states[0],
+                valid_two_event_trace.states[2],
+                valid_two_event_trace.states[2],
+            ),
+            valid_two_event_trace.events,
+        ),
+    )
+
+    unsafe_discontinuous_trace = object.__new__(ScalarTrace)
+    object.__setattr__(
+        unsafe_discontinuous_trace,
+        "provenance",
+        valid_two_event_trace.provenance,
+    )
+    object.__setattr__(unsafe_discontinuous_trace, "requested_horizon", 2)
+    object.__setattr__(
+        unsafe_discontinuous_trace,
+        "states",
+        (
+            valid_two_event_trace.states[0],
+            valid_two_event_trace.states[2],
+            valid_two_event_trace.states[2],
+        ),
+    )
+    object.__setattr__(
+        unsafe_discontinuous_trace,
+        "events",
+        valid_two_event_trace.events,
+    )
+    assert not verify_trace_provenance(valid_program, unsafe_discontinuous_trace)
+    rejected += 1
     forged_addend = replace(
         witness,
         addend=witness.addend + 1,
@@ -1666,13 +1719,18 @@ def audit_hostile_validation() -> int:
     assert advance(grow_program(2), ScalarConfiguration(WIDTH_TAGGED, WidthTaggedInteger(2, 4))).successors[0].value == WidthTaggedInteger(6, 5)
     assert decode_digits(tuple(reversed(encode_fixed(2, 2, 5))), 2) + 2 == 10
     rejected += 1
+    mutated_namespace = dict(globals())
+    mutated_namespace["DigitReversalExecutor"] = object()
+    mutated_roles = dict(forbidden_execution_role_symbols(mutated_namespace))
+    assert mutated_roles["Executor"] == ("DigitReversalExecutor",)
+    rejected += 1
     return rejected
 
 
-EXPECTED_DIGEST = "872840cc4d6d6ece66c0842b4f3216442b18aa481c02c935d1b2eb69d2aa9c94"
+EXPECTED_DIGEST = "30539868a2202ffdae0e4574e0ceefb68e5715d6d3a7a543efd63bd730a5ccc8"
 
 
-def main() -> None:
+def collect_audit_summary() -> tuple[tuple[str, object], ...]:
     source_metrics = audit_source_traces()
     commutation_metrics = audit_scalar_word_commutations()
     table_metrics = audit_fixed_reversal_tables()
@@ -1683,7 +1741,7 @@ def main() -> None:
     surface_metrics = audit_no_new_execution_surface()
     hostile_rejections = audit_hostile_validation()
 
-    summary = (
+    return (
         ("source", source_metrics),
         ("commutations", commutation_metrics),
         ("fixed_tables", table_metrics),
@@ -1693,12 +1751,29 @@ def main() -> None:
         ("structural_identity", identity_metrics),
         ("execution_surface", surface_metrics),
         ("hostile_rejections", hostile_rejections),
-        ("source_claims", len(SOURCE_CLAIMS)),
-        ("architecture_classes", len(ARCHITECTURE_CLASSIFICATION)),
-        ("goal2_delta", len(GOAL2_DELTA)),
+        ("source_claims", SOURCE_CLAIMS),
+        ("architecture_classes", ARCHITECTURE_CLASSIFICATION),
+        ("goal2_delta", GOAL2_DELTA),
+        ("dataclass_role_manifest", EXPECTED_DATACLASS_ROLE_MANIFEST),
+        ("shared_execution_roles", SHARED_EXECUTION_ROLE_MANIFEST),
+        ("forbidden_execution_suffixes", FORBIDDEN_EXECUTION_ROLE_SUFFIXES),
     )
+
+
+def main() -> None:
+    summary = collect_audit_summary()
     digest = sha256(repr(summary).encode("utf-8")).hexdigest()
     assert digest == EXPECTED_DIGEST
+    metrics = dict(summary)
+    source_metrics = metrics["source"]
+    commutation_metrics = metrics["commutations"]
+    table_metrics = metrics["fixed_tables"]
+    width_metrics = metrics["width_boundaries"]
+    bigint_metrics = metrics["arbitrary_precision"]
+    trace_metrics = metrics["trace_shape"]
+    identity_metrics = metrics["structural_identity"]
+    surface_metrics = metrics["execution_surface"]
+    hostile_rejections = metrics["hostile_rejections"]
 
     print(
         "source_events="
@@ -1716,7 +1791,9 @@ def main() -> None:
         "bigint_cases="
         f"{bigint_metrics[0]}; max_bits={bigint_metrics[1]}; "
         f"max_decimal_digits={bigint_metrics[2]}; "
-        f"width_loss_counterexamples={width_metrics[1]}"
+        f"width_loss_counterexample_pairs={width_metrics[1]}; "
+        f"width_loss_witness_states={width_metrics[2]}; "
+        f"zero_fixed_events={width_metrics[3]}"
     )
     print(
         "trace_horizons="
@@ -1733,7 +1810,8 @@ def main() -> None:
         f"state{surface_metrics[0]}/assignment{surface_metrics[1]}/"
         f"frontier{surface_metrics[2]}/neighborhood{surface_metrics[3]}/"
         f"update{surface_metrics[4]}/executor{surface_metrics[5]}/"
-        f"StepResult{surface_metrics[6]}/tagged_value{surface_metrics[7]}"
+        f"StepResult{surface_metrics[6]}/tagged_value{surface_metrics[7]}/"
+        f"dataclasses{surface_metrics[8]}"
     )
     print(f"semantic_digest={digest}")
 

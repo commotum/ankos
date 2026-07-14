@@ -42,6 +42,31 @@ Reconstruct T36 from primary evidence as a closed positional-representation unar
 - Entry kind: deterministic exact unary integer transition whose closed RULE explicitly factors through a positional digit codec.
 - Strict DOMAIN: discrete `t+0D`.
 
+## Primary-Source and Asset Closure
+
+The fail-closed source oracle uses 18 independent query lanes. Their union contains 124 monolith rows: 98 before the physical Index and 26 actual-Index candidates. The Index boundary is exact: 12 rows are routed T36 aliases/relations and 14 are guarded flattened-column or recursive-sequence collisions. The complete governed partition is 19 native, 19 relation, and 30 control rows (68 retained), with 48 explicit exclusions and zero unresolved rows.
+
+The retained evidence reverse-joins to 94 unique split-corpus owners:
+
+| Join class | Rows | Boundary |
+|---|---:|---|
+| Exact text | 71 | Byte-normalized text agrees exactly |
+| Image basename | 15 | Monolith and split rows name the same opaque asset |
+| Normalized text | 4 | Minimum score `0.996587`; no low-score fuzzy acceptance |
+| Structural OCR repair | 4 | Exact owner plus frozen damaged and repaired needles |
+
+The four structural repairs cover the extracted `FromDigits`/`IntegerDigits` spacing damage and the `dyadic`/`Paley`/`BitReverseOrder` corruption. Actual-Index routes, neighboring-column sentinels, exclusions, query contracts, and repair witnesses have separately frozen records; clearing or weakening them fails the oracle.
+
+The evidence roles are:
+
+| Role | Primary evidence | Semantic boundary |
+|---|---|---|
+| Native scalar rule and observations | `BOOK:1497`, `1543-1553`, `12503`, `12635-12645` | Nonnegative exact scalar, base-2 canonical codec, seeds 16/512, empirical growth/periodicity qualifications, fixed/growing-width variants |
+| Positional relations | `BOOK:8838`, `12646-12658`, `17313-17356`, `17611`, `20738` | Fixed-width digit-reversal permutation, FFT/Walsh reorderings, van-der-Corput/quasi-Monte-Carlo relations; not reversal-add state evolution |
+| Controls | T35/T37 neighbors, digit codecs, Turing-counter displays, recursive/bitwise/run-length sequences, and `BOOK:12974` | Establish boundaries and confirm that the Book's “whole number” usage includes zero; do not add T36 mechanics |
+
+The asset boundary contains exactly seven governed files at `4 native / 3 relation / 0 control` and nine excluded neighbor files. The governed set has 14 monolith/split references, seven distinct hashes, 1,062,053 bytes, and two assemblies across five grouped files. The exclusions have 18 references, nine hashes, 170,822 bytes, and one assembly across five grouped files. All seven governed assets are hash-bound; none is pixel-transcribed or pixel-replayed. Consequently the numeric prefixes below are independently computed from the source-pinned formula and seeds, not claimed as raster transcriptions.
+
 ## Initial Construction Model
 
 The reusable generalized profile below declares `b >= 2`; strict T36 instantiates `b=2` and the nonnegative carrier:
@@ -91,6 +116,24 @@ Erasing width is not lossless: base-2 words `1` and `01` both decode to numeric 
 | Outcomes/traces | 1 | Common `StepResult` and scalar trace | Fixed points/cycles advance unless source says otherwise |
 
 No current evidence requires a genuinely different execution algebra. The likely Goal 2 delta is closed positional-expression data and invariants inside the shared unary RULE implementation.
+
+## Current Runtime Fit
+
+The current modules already expose the right SimpleProgram responsibilities, but not yet the exact T36 value/rule schemas. T36 therefore needs small shared-axis additions, not a catalog executor.
+
+| Responsibility | Current `src/ca` mechanism | T36 disposition |
+|---|---|---|
+| DOMAIN/locus | Rank-zero `t+0d` shape plus the time-slice frontier | Reuse the one-locus responsibility as `UniqueScalar`; base and digit width are not DOMAIN axes |
+| ALPHABET/value | `alphabets.py:40-85` admits finite enumerated `int/float/str` ranges | Reuse T34's planned arbitrary-precision nonnegative integer value; add a transparent product/tagged value only for growing width. Do not enumerate an unbounded alphabet or use object-array packing |
+| FRONTIER | Current time-slice selection | Restrict to the unique scalar locus; no T36 frontier type |
+| NEIGHBORHOOD | `neighborhoods.py:110-137` provides current self access | Direct responsibility-level reuse; no digit stencil or temporal history |
+| RULE | `rules.py:65-78,316-328` stores family strings and an unrestricted callable | Add closed positional nodes to D069's shared unary RULE algebra; never use `formulaic`, a transform callback, or an operation-name switch |
+| UPDATE | One rule result becomes the next value | Reuse generic same-locus atomic assignment. Fixed carry dropping and growing-width construction are RULE-result semantics, not UPDATE laws |
+| Runner | `rollout.py:145-212,292-331` dispatches on named families | Replace with the shared structural runner in Goal 2; adding `if family == "digit_reversal"` would be a regression |
+| Seeds/traces | Pair/history seeds and fixed NumPy `RawEpisode.states` (`seeds.py:136-178`, `specs.py:58-81`) | Use one exact scalar seed and `h` events/`h+1` exact states; fixed dtypes cannot preserve the million-step or arbitrary-precision construction |
+| Visualization | Viewer export encodes finite integer code arrays | Keep digit rows, widths, crops, localized structures, and regular-region plots downstream as observers with explicit codecs |
+
+The seed-512 value already exceeds signed 64-bit range after 82 events. That is a concrete runtime counterexample to retaining the current fixed-width episode representation, but it does not justify a T36 runner: it just exercises T34's exact scalar carrier and the closed positional RULE delta.
 
 ## Evidence and Oracle Work Plan
 
