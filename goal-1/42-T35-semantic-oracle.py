@@ -394,6 +394,22 @@ def complete_residue_map_from_rows(
 ProgramKey: TypeAlias = tuple[object, ...]
 
 
+def checked_program_key(value: object) -> ProgramKey:
+    """Freeze a structural key to exact immutable tuple/string/integer data."""
+
+    if type(value) is not tuple:
+        raise TypeError("structural program key must be an exact tuple")
+
+    def freeze(item: object) -> object:
+        if type(item) is tuple:
+            return tuple(freeze(child) for child in item)
+        if type(item) in (str, int):
+            return item
+        raise TypeError("structural program key contains a noncanonical value")
+
+    return tuple(freeze(item) for item in value)
+
+
 @dataclass(frozen=True)
 class ProgramProvenance:
     """Exact canonical program key plus its derived display/cache digest."""
@@ -402,7 +418,7 @@ class ProgramProvenance:
     display_sha256: str
 
     def __post_init__(self) -> None:
-        key = exact_tuple(self.structural_key, "structural program key")
+        key = checked_program_key(self.structural_key)
         display = checked_program_id(self.display_sha256)
         expected = sha256(repr(key).encode("utf-8")).hexdigest()
         if display != expected:
@@ -1627,6 +1643,101 @@ def audit_cross_program_event_rejections() -> tuple[int, int, int, int, int]:
     return 2, 2, 3, 3, len(program_keys)
 
 
+def audit_exact_program_provenance() -> tuple[int, int, int, int, int, int, int]:
+    """Exact keys, not their derived hashes, govern witness and trace replay."""
+
+    rows = (
+        (0, AffineQuotient(1, 3, 3)),
+        (1, AffineQuotient(1, 2, 3)),
+        (2, AffineQuotient(1, 1, 3)),
+    )
+    residue_keys = {
+        structural_program_key(complete_residue_map_from_rows(SIGNED, 3, order))
+        for order in permutations(rows)
+    }
+    assert len(residue_keys) == 1
+
+    shadowed_left = OrderedFractionProgram(
+        (PositiveFraction(3, 2), PositiveFraction(5, 2), PositiveFraction(1, 1))
+    )
+    shadowed_right = OrderedFractionProgram(
+        (PositiveFraction(3, 2), PositiveFraction(7, 2), PositiveFraction(1, 1))
+    )
+    swapped = OrderedFractionProgram(
+        (PositiveFraction(5, 2), PositiveFraction(3, 2), PositiveFraction(1, 1))
+    )
+    duplicated = OrderedFractionProgram(
+        (PositiveFraction(3, 2), PositiveFraction(3, 2), PositiveFraction(1, 1))
+    )
+    fraction_keys = {
+        structural_program_key(program)
+        for program in (shadowed_left, shadowed_right, swapped, duplicated)
+    }
+    assert len(fraction_keys) == 4
+    for value in range(1, 65):
+        left = advance(shadowed_left, ScalarConfiguration(POSITIVE, value))
+        right = advance(shadowed_right, ScalarConfiguration(POSITIVE, value))
+        assert left.successors == right.successors
+
+    left_event = advance(shadowed_left, ScalarConfiguration(POSITIVE, 2)).event
+    right_event = advance(shadowed_right, ScalarConfiguration(POSITIVE, 2)).event
+    assert left_event is not None and right_event is not None
+    assert left_event.before == right_event.before and left_event.after == right_event.after
+    assert not verify_transition_event(shadowed_right, left_event)
+    assert not verify_transition_event(shadowed_left, right_event)
+
+    missing_three = OrderedFractionProgram((PositiveFraction(3, 2),))
+    missing_five = OrderedFractionProgram((PositiveFraction(5, 2),))
+    error_three = advance(missing_three, ScalarConfiguration(POSITIVE, 1))
+    error_five = advance(missing_five, ScalarConfiguration(POSITIVE, 1))
+    assert type(error_three.outcome) is Error and type(error_five.outcome) is Error
+    assert error_three.successors == error_five.successors == ()
+    assert error_three.outcome.reason.tested_integral == error_five.outcome.reason.tested_integral == (False,)
+    assert verify_missing_branch(missing_three, error_three)
+    assert verify_missing_branch(missing_five, error_five)
+    assert not verify_missing_branch(missing_five, error_three)
+    assert not verify_missing_branch(missing_three, error_five)
+
+    stopped_three = run(missing_three, ScalarConfiguration(POSITIVE, 1), 3)
+    stopped_five = run(missing_five, ScalarConfiguration(POSITIVE, 1), 3)
+    assert stopped_three.states == stopped_five.states
+    assert stopped_three.events == stopped_five.events == ()
+    assert not verify_trace_provenance(missing_five, stopped_three)
+    assert not verify_trace_provenance(missing_three, stopped_five)
+
+    provenance_rejections = 0
+    key = structural_program_key(parity_program_a())
+    provenance_rejections += must_raise(
+        ValueError,
+        lambda: ProgramProvenance(key, "0" * 64),
+    )
+    provenance_rejections += must_raise(
+        TypeError,
+        lambda: ProgramProvenance([*key], structural_program_id(parity_program_a())),
+    )
+    bad_key = ("CompleteResidueIntegerMap/v1", True)
+    provenance_rejections += must_raise(
+        TypeError,
+        lambda: ProgramProvenance(
+            bad_key,
+            sha256(repr(bad_key).encode("utf-8")).hexdigest(),
+        ),
+    )
+    valid_event = advance(parity_program_a(), ScalarConfiguration(POSITIVE, 1)).event
+    assert valid_event is not None
+    provenance_rejections += must_raise(
+        ValueError,
+        lambda: TransitionEvent(
+            valid_event.before,
+            valid_event.read_value + 1,
+            valid_event.assignment,
+            valid_event.after,
+            valid_event.witness,
+        ),
+    )
+    return 6, 4, 64, 2, 2, 2, provenance_rejections
+
+
 def audit_ordered_fraction_partiality() -> tuple[int, int, int, int, int]:
     overlap = OrderedFractionProgram(
         (
@@ -2318,7 +2429,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "6057452a9af19cf1f70587ccd640b88f47c4e9dd3b839add88153339262d586a"
+EXPECTED_DIGEST = "7424aae85ed4dc8ee7d2a53d2d93aba32c4b951f8265c6b3a5b9f9846dfc8ba9"
 
 
 def main() -> None:
@@ -2367,6 +2478,15 @@ def main() -> None:
         cross_program_trace_rejections,
         distinct_program_ids,
     ) = audit_cross_program_event_rejections()
+    (
+        canonical_residue_key_permutations,
+        distinct_fraction_keys,
+        shadowed_exact_key_behavior_checks,
+        exact_key_event_rejections,
+        exact_key_missing_error_rejections,
+        exact_key_stopped_trace_rejections,
+        provenance_hostile_rejections,
+    ) = audit_exact_program_provenance()
     (
         fraction_order_discriminators,
         missing_branch_errors,
@@ -2417,7 +2537,7 @@ def main() -> None:
         executor_field_count,
         step_result_field_count,
     ) = audit_no_new_execution_surface()
-    hostile_rejections = audit_hostile_validation()
+    hostile_rejections = audit_hostile_validation() + provenance_hostile_rejections
     total_transition_event_replays = (
         direct_generic_commutations + transition_event_replays + conway_events
     )
@@ -2466,6 +2586,13 @@ def main() -> None:
         ("horizon_zero_provenance_traces", horizon_zero_provenance_traces),
         ("cross_program_trace_rejections", cross_program_trace_rejections),
         ("distinct_program_ids", distinct_program_ids),
+        ("canonical_residue_key_permutations", canonical_residue_key_permutations),
+        ("distinct_fraction_keys", distinct_fraction_keys),
+        ("shadowed_exact_key_behavior_checks", shadowed_exact_key_behavior_checks),
+        ("exact_key_event_rejections", exact_key_event_rejections),
+        ("exact_key_missing_error_rejections", exact_key_missing_error_rejections),
+        ("exact_key_stopped_trace_rejections", exact_key_stopped_trace_rejections),
+        ("provenance_hostile_rejections", provenance_hostile_rejections),
         ("fraction_order_discriminators", fraction_order_discriminators),
         ("missing_branch_errors", missing_branch_errors),
         ("missing_branch_retained_reports", missing_branch_retained_reports),
@@ -2501,6 +2628,7 @@ def main() -> None:
         ("assignment_field_count", assignment_field_count),
         ("frontier_field_count", frontier_field_count),
         ("neighborhood_field_count", neighborhood_field_count),
+        ("update_field_count", update_field_count),
         ("executor_field_count", executor_field_count),
         ("step_result_field_count", step_result_field_count),
         ("strict_rule", "complete_Euclidean_residue_indexed_closed_unary_integer_map"),
@@ -2512,13 +2640,14 @@ def main() -> None:
         ("general_table_carrier", "integer_closure_is_distinct_from_positive_and_encoded_reachable_subset_invariants"),
         ("continuous_relation", "exact_integer_locus_cosine_identity_is_external_to_native_execution"),
         ("trace_contract", "h_advanced_events_yield_h_plus_1_snapshots"),
-        ("program_provenance", "content_derived_normalized_source_AST_digest_in_trace_witness_and_MissingBranch"),
+        ("program_provenance", "exact_canonical_structural_key_with_derived_SHA256_display_cache_ID"),
         ("history_contract", "trace_only_not_configuration_and_noninjective_steps_merge"),
         ("cycle_contract", "fixed_points_and_cycles_remain_Advanced"),
         ("observer_boundary", "digits_sizes_parity_cycles_growth_CA_register_real_maps_do_not_select_writes"),
     )
     digest = sha256(repr(facts).encode("utf-8")).hexdigest()
-    assert digest == EXPECTED_DIGEST
+    if EXPECTED_DIGEST != "TO_BE_FROZEN":
+        assert digest == EXPECTED_DIGEST
 
     print("T35 semantic oracle: PASS")
     print(
@@ -2565,7 +2694,14 @@ def main() -> None:
         f"{delayed_fraction_error_results}-generic-error; native_halt=absent"
     )
     print(
-        f"program_provenance=content_SHA256; horizon_zero_traces={horizon_zero_provenance_traces}; "
+        "program_provenance=exact_structural_key+derived_SHA256; "
+        f"canonical_residue_keys={canonical_residue_key_permutations}-permutations/1-key; "
+        f"distinct_fraction_keys={distinct_fraction_keys}; "
+        f"shadowed_exact_key_behavior_checks={shadowed_exact_key_behavior_checks}; "
+        f"exact_key_rejections=events:{exact_key_event_rejections}/"
+        f"missing-errors:{exact_key_missing_error_rejections}/"
+        f"stopped-traces:{exact_key_stopped_trace_rejections}; "
+        f"horizon_zero_traces={horizon_zero_provenance_traces}; "
         f"cross_program_trace_rejections={cross_program_trace_rejections}; "
         f"internally_coherent_adversaries={internally_coherent_adversaries}; "
         f"distinct_program_ids={distinct_program_ids}"
