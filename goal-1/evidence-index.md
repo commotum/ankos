@@ -25,7 +25,7 @@ Each type stage must make the following auditable:
 
 ## Catalog Coverage
 
-Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07/T08/T10/T11/T14/T15/T18/T21/T22/T23/T24 closures are subsequently complete under active D119-D130.
+Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07/T08/T10/T11/T14/T15/T18/T21/T22/T23/T24/T25 closures are subsequently complete under active D119-D131.
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
@@ -53,7 +53,7 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 | T22 | 23 | Moore-Neighborhood Cellular Automata | 22 | `34-T22-MOORE-CA.md` | COMPLETE | 17-query/164-line union at `117 pre-Index / 47 actual-Index`; 270 retained at `96 native / 102 relation / 72 control`, 24 exclusions, split closure `192 exact + 78 variants`; 95 assets at `68 governed + 27 adjacency-only`, 190 refs/95 hashes, `95 hash-bound / 28 transcribed / 0 pixel-replayed`; 1,419 native/generic events, C4/D4 140/102 orbit restrictions, printed `3702`→canonical `630`, 262,144 WireWorld predicate-count contexts, Dyadaxes loss witness, D128, clean hostile review, and 102 tests; 0 unresolved |
 | T23 | 24 | Three-Dimensional Cellular Automata | 23 | `35-T23-3D-CA.md` | COMPLETE | 19-query/151-line union at `104 pre-Index / 47 actual-Index`; 138 retained at `76 native / 16 relation / 46 control`, 32 exclusions, split closure `123 exact + 15 variants`; declared one-hop 42-asset universe at `10 governed + 32 adjacency-only`, 84 refs/42 hashes, `42 hash-bound / 9 transcribed / 0 pixel-replayed`; 5,139 native/generic events with explicit 14/7 face and 54/27 full product/shell index firings, frame/table and quotient-multiplicity proofs, nonvacuous named/ternary fixtures, Dyadaxes loss witnesses, D129, clean hostile review, and 102 tests; 0 unresolved |
 | T24 | 25 | Higher-Dimensional Lattice Cellular Automata | 24 | `36-T24-HIGHERDIM-CA.md` | COMPLETE | Repaired 30-query/218-line union at `168 pre-Index / 50 actual-Index`; 166 retained at `80 native / 21 relation / 65 control`, 77 exclusions, split closure `150 exact + 16 variants`, all dense Index entries explicitly guarded; bounded 36-asset universe at `11 governed + 25 adjacency-only`, 72 refs/36 hashes, `36 hash-bound / 6 transcribed / 0 pixel-replayed`; 1,791 non-vacuous native/generic events +46 hostile rejections; D130 categories 1–3; clean hostile review and 102 tests; 0 unresolved |
-| T25 | 26 | Two-Dimensional Turing Machines | 25 | `37-T25-2D-TURING.md` | IN PROGRESS | Primary square-grid/four-move construction and `TM2DStep` implementation located; turning-relative, worm/hexagonal, ant/turmite/vant/turning-machine aliases, Index/split/caption, asset, semantic, and architecture closure in progress |
+| T25 | 26 | Two-Dimensional Turing Machines | 25 | `37-T25-2D-TURING.md` | COMPLETE | Q00-Q29 closes 71 lines at `50 pre-Index / 21 actual-Index`; 63 retained at `30 native / 29 relation / 4 control`, 13 exclusions, all retained split-covered; 12 governed assets/24 refs/12 hashes at `12 hash-bound / 0 transcribed / 0 pixel-replayed`; 3,118 native/generic events +38 hostile rejections; self-only RULE, typed head movement, destination-preserving UPDATE, Langton/turn/hex/frame/alias/provenance closure; D131 categories 1–3; no new executor; 0 unresolved |
 | T26 | 27 | Two-Dimensional Substitution Systems | 26 | `38-T26-2D-SUBSTITUTION.md` | PENDING | Not started |
 | T27 | 28 | Geometric Replacement And Fractal Systems | 27 | `10-T27-GEOMETRIC.md` | COMPLETE | Conservative core regex 46 occurrences/37 lines; expanded alias/observer search 129/88; 18 excerpt groups; all mechanics, original figures, Notes/actual Index/splits, exact and approximate affine rules, overlap/orientation, complex/IFS variants, dimensions, history, limits, observers, and relations dispositioned; 0 unresolved |
 | T28 | 29 | Neighbor-Dependent Two-Dimensional Substitution Systems | 28 | `39-T28-CONTEXTUAL-2D-SUBSTITUTION.md` | PENDING | Not started |
@@ -78,10 +78,10 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages globally complete: 35 / 45.
+- Type stages globally complete: 36 / 45.
 - Type stages evidence-closed / architecture-reopened: 0.
 - Type stages asset-reopened: 0.
-- Type stages unresolved: 9 pending; 1 in progress; 0 reopened.
+- Type stages unresolved: 9 pending; 0 in progress; 0 reopened.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 

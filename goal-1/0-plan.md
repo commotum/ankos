@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 35 type stages are complete, T25 is in progress, no stage is reopened, and 9 later stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, and T24 are complete under D119-D130. T25 is the current stage.
+- Execution status at this sync is Foundation complete, 36 type stages are complete, no stage is reopened, and 9 later stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, and T25 are complete under D119-D131. T26 is the current stage.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -1019,7 +1019,7 @@ COMPLETE. The repaired 30-query source oracle closes 218 lines at `168 pre-Index
 
 ### 37-T25-2D-TURING
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN** in `goal-1/37-T25-2D-TURING.md`.
+Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, ARCHITECTURE, AND HOSTILE REVIEW CLOSED** in `goal-1/37-T25-2D-TURING.md`; D131 is active.
 
 #### Big Picture Objective
 
@@ -1033,9 +1033,9 @@ Apply the common protocol, emphasizing movement set, position, revisitation, bla
 
 All T25 evidence is captured; dimensional reuse is proven without a separate rollout; Goal 2 and global integration are updated.
 
-#### Current Work
+#### Stage Result
 
-Primary construction lines and the Notes implementation establish a square-grid head with four absolute moves, compact `Q x Sigma -> Q x Sigma x Move2D` rules, old-head symbol writes, and atomic head relocation. Turning-relative rules, hexagonal worms, Langton's ant, path visualization, and related 2D mobile automata are being audited as variants, relations, or controls rather than silently merged into the strict square-grid family. Exhaustive source, asset, semantic, architecture, and hostile closure remain open.
+COMPLETE. The Q00-Q29 source oracle closes 71 lines at `50 pre-Index / 21 actual-Index`, retains 63 at `30 native / 29 relation / 4 control`, excludes 13, reverse-joins all retained lines to the split corpus, and leaves zero unresolved. The dependent 12-image universe closes 24 references, 12 hashes, 562,275 bytes, and `12 hash-bound / 0 transcribed / 0 pixel-replayed`. The semantic oracle proves 3,118 native/generic events and 38 hostile rejections: tagged/factored one-step equivalence, self-only RULE visibility, destination-preserving UPDATE, all strict local outcomes, exact Langton C4, relative-turn nonimages, six-port topology, coordinate-frame mapping, quotient aliases, unbounded travel, immutable setup provenance, and observer separation. D131 composes T12, D011, D127, and D130 in audit categories 1–3. `src/ca` remains the shared SimpleProgram substrate; T25 adds no state/control class, UPDATE algebra, executor, branch, callback, hidden control, arbitrary-CA identity, destination-label RULE read, implicit boundary, raster program, or invented worm codec. All gates and 102 repository tests pass. No prior stage reopens. Next: T26.
 
 ### 38-T26-2D-SUBSTITUTION
 

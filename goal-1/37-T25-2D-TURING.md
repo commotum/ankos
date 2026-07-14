@@ -168,7 +168,7 @@ These routes recover provenance and variants. They do not supply the missing exa
 
 The rule plates remain visual evidence only; no glyph row, arrow, coordinate direction, palette, configuration, or trace is recovered from pixels. The page-673 assembly is relation evidence for a one-dimensional Turing machine, not native T25 identity. Root/relocated, optimized rejection, silent import, compile, diff, and mode-644 gates pass. Oracle SHA-256: `06f802c706c26dc4093db6f2004e0ca926a891d10a8a1f16edd5a97de2004e42`.
 
-## Construction Model Under Test
+## Construction Model
 
 ```text
 DOMAIN = discrete t+2D
@@ -230,6 +230,7 @@ The legacy `simple_programs.md` specification has reusable mathematical and geom
 
 Current Phase-1 code supplies useful pieces but not yet this generic composition:
 
+- `pyproject.toml:4` and current `rules.py`/`frontiers.py` module prose call the package CA-oriented. Those descriptions lag the governing SimpleProgram design and should be corrected in Goal 2; the `src/ca` path may remain a compatibility namespace without becoming an architecture boundary.
 - `src/ca/alphabets.py:40-55` has finite scalar values; tagged/product schemas are the small missing alphabet extension.
 - `src/ca/loci.py:31-94` supplies typed coordinate/selectors but only finite rank-0..3 shapes; `:531-614` supplies finite read-boundary machinery, not native unbounded head motion.
 - `src/ca/neighborhoods.py:110-137` supplies the correct self access. Cardinal geometry at `:594-614` is reusable as topology-port data, not as T25 RULE input.
@@ -284,6 +285,7 @@ Canonical tests are the semantic-oracle partitions above plus static absence of 
 
 - No `TwoDimensionalTuringState`, T25 rollout, family-name branch, callback, hidden head/orientation, or opaque CA compiler.
 - No bare `TapeSymbol union HeadState` that loses the symbol beneath the head.
+- No candidate destination label added to NEIGHBORHOOD or exposed to RULE; UPDATE alone resolves/preserves it.
 - No arrow glyph, palette, raster orientation, storage row order, or coordinate convention used as semantic movement without an explicit mapping.
 - No finite tensor edge, crop, horizon, unvisited cell, fixed point, or missing rule treated as native halt.
 - No path image, visit count, behavior class, or random-rule ensemble fed back into the transition.
@@ -292,16 +294,18 @@ Canonical tests are the semantic-oracle partitions above plus static absence of 
 
 ## Completion Requirements
 
-- [ ] Every alias, variant, caption, Notes line, actual Index route, cross-reference, candidate match, and false positive is dispositioned.
-- [ ] Every unique construction-relevant excerpt has exact canonical provenance and split-source coverage.
-- [ ] The strict family and each source-supported variant have complete state/read/rule/write/update/seed/outcome semantics.
-- [ ] Source-governed assets close with honest transcription and replay boundaries.
-- [ ] Independent semantic oracles prove non-vacuous native/generic commutation and hostile invariant rejection.
-- [ ] Current API/runtime/principles fit and smallest Goal 2 delta are implementation-ready.
-- [ ] Any claimed new execution algebra has a concrete one-event counterexample; otherwise categories 1–3 reuse is recorded.
-- [ ] Independent hostile review and all oracle/test/Markdown/diff/scope gates pass.
-- [ ] `0-plan.md`, `evidence-index.md`, `design-ledger.md`, `architecture-audit.md`, and `goal-2-handoff.md` are synchronized.
+- [x] Every alias, variant, caption, Notes line, actual Index route, cross-reference, candidate match, and false positive is dispositioned.
+- [x] Every unique construction-relevant excerpt has exact canonical provenance and split-source coverage.
+- [x] The strict family and each source-supported variant have complete state/read/rule/write/update/seed/outcome semantics.
+- [x] Source-governed assets close with honest transcription and replay boundaries.
+- [x] Independent semantic oracles prove non-vacuous native/generic commutation and hostile invariant rejection.
+- [x] Current API/runtime/principles fit and smallest Goal 2 delta are implementation-ready.
+- [x] All profiles classify in categories 1–3; no new execution algebra is claimed.
+- [x] Independent hostile review and all oracle/test/Markdown/diff/scope gates pass.
+- [x] `0-plan.md`, `evidence-index.md`, `design-ledger.md`, and `architecture-audit.md` are synchronized; the final cross-stage `goal-2-handoff.md` remains the goal-level synthesis deliverable.
 
 ## Stage Results
 
-In progress. Source, asset, semantic, architecture, hostile-review, and global integration closure remain open.
+**COMPLETE.** The frozen Q00-Q29 source audit closes 71 lines at `50 pre-Index / 21 actual-Index`, retains 63 at `30 native / 29 relation / 4 control`, excludes 13, reverse-joins every retained line to the split corpus, and leaves zero unresolved. The dependent 12-image universe closes at 24 exact references, 12 unique hashes, 562,275 bytes, and `12 hash-bound / 0 transcribed / 0 pixel-replayed`. The semantic oracle proves 3,118 native/generic one-event commutations and 38 hostile rejections, including self-only RULE visibility, destination-preserving UPDATE, factored/tagged equivalence, all strict local transitions, exact Langton C4 behavior, six-port topology reuse, relative-turn nonimage counterexamples, coordinate-frame commutation/divergence, quotient aliases, unbounded travel, atomicity, frozen setup provenance, and observer separation.
+
+D131 records a categories-1-to-3 composition of T12, D127, D130, and D011. `src/ca` remains the shared SimpleProgram substrate: T25 adds no state/control class, UPDATE algebra, executor, family branch, callback, hidden interpreter, arbitrary-CA identity, implicit boundary, or invented worm codec. No completed stage reopens. Source, asset, semantic, architecture, hostile-review, portability, fail-closed, import, compile, Markdown, diff, scope, mode, and repository-test gates pass. T26 is next.
