@@ -215,6 +215,25 @@ REASON = {
 }
 assert set(REASON) == U
 
+GOVERNING_SOURCE_LINES = {
+    2252: (2256,),
+    2254: (2256,),
+    2258: (2262,),
+    2260: (2262,),
+    13634: (13632,),
+    13636: (13632,),
+    13638: (13632,),
+    13640: (13632,),
+    13648: (13644, 13646),
+    14273: (14263, 14271),
+}
+assert set(GOVERNING_SOURCE_LINES) == U
+assert all(set(source_lines) <= S for source_lines in GOVERNING_SOURCE_LINES.values())
+GOVERNED_LEDGER_REASON = {
+    book_line: f"{REASON[book_line]}; source={','.join(map(str, GOVERNING_SOURCE_LINES[book_line]))}"
+    for book_line in U
+}
+
 
 # Radius four is a mechanical source-proximity audit, not semantic ownership.
 # All 32 ungoverned candidates remain in the physical ledger.  In particular,
@@ -232,7 +251,8 @@ ADJ_T22 = {
     2224, 2228, 2232, 2240, 2242, 2248, 11188, 11190, 13626, 13628, 13630,
 }
 ADJ_T24 = {13652}
-ADJ_STOCHASTIC = {2888, 2892, 2900, 3802, 3806, 7082, 7090}
+ADJ_RANDOM_REALIZATION = {2888, 2892, 2900}
+ADJ_STOCHASTIC_UPDATE = {3802, 3806, 7082, 7090}
 ADJ_NONSTEP = {15487}
 ADJ_ALTERNATE_UPDATE = {16450}
 ADJ_RELATION = {
@@ -241,7 +261,8 @@ ADJ_RELATION = {
 adjacency_classes = (
     ADJ_T22,
     ADJ_T24,
-    ADJ_STOCHASTIC,
+    ADJ_RANDOM_REALIZATION,
+    ADJ_STOCHASTIC_UPDATE,
     ADJ_NONSTEP,
     ADJ_ALTERNATE_UPDATE,
     ADJ_RELATION,
@@ -252,7 +273,7 @@ assert all(
     for right in adjacency_classes[i + 1 :]
 )
 assert set().union(*adjacency_classes) == ADJACENCY_ONLY
-assert tuple(map(len, adjacency_classes)) == (11, 1, 7, 1, 1, 11)
+assert tuple(map(len, adjacency_classes)) == (11, 1, 3, 4, 1, 1, 11)
 
 ADJACENCY_REASON = {
     2010: "continuous-cell-value CA relation reached only by source proximity",
@@ -291,6 +312,21 @@ ADJACENCY_REASON = {
 assert set(ADJACENCY_REASON) == ADJACENCY_ONLY
 
 
+def nearest_retained(book_line: int) -> tuple[int, ...]:
+    distance = min(abs(book_line - source_line) for source_line in S)
+    assert distance <= 4
+    return tuple(sorted(source_line for source_line in S if abs(book_line - source_line) == distance))
+
+
+ADJACENCY_LEDGER_REASON = {
+    book_line: (
+        f"{ADJACENCY_REASON[book_line]}; "
+        f"nearest_retained={','.join(map(str, nearest_retained(book_line)))}"
+    )
+    for book_line in ADJACENCY_ONLY
+}
+
+
 def governed_kind(book_line: int) -> str:
     return (
         "C-FACE" if book_line in CFACE else
@@ -305,7 +341,8 @@ def adjacency_kind(book_line: int) -> str:
     return (
         "A-T22" if book_line in ADJ_T22 else
         "A-T24" if book_line in ADJ_T24 else
-        "A-STOCHASTIC" if book_line in ADJ_STOCHASTIC else
+        "A-RANDOM-SEED" if book_line in ADJ_RANDOM_REALIZATION else
+        "A-STOCHASTIC-UPDATE" if book_line in ADJ_STOCHASTIC_UPDATE else
         "A-NONSTEP" if book_line in ADJ_NONSTEP else
         "A-ALT-UPDATE" if book_line in ADJ_ALTERNATE_UPDATE else
         "A-RELATION"
@@ -313,11 +350,11 @@ def adjacency_kind(book_line: int) -> str:
 
 
 def ledger() -> tuple[str, int, int, int]:
-    return _ledger(U, governed_kind, REASON)
+    return _ledger(U, governed_kind, GOVERNED_LEDGER_REASON)
 
 
 def adjacency_ledger() -> tuple[str, int, int, int]:
-    return _ledger(ADJACENCY_ONLY, adjacency_kind, ADJACENCY_REASON)
+    return _ledger(ADJACENCY_ONLY, adjacency_kind, ADJACENCY_LEDGER_REASON)
 
 
 HASH_BOUND_GOVERNED = {
@@ -459,3 +496,136 @@ def transcript_payload() -> str:
 
 TRANSCRIPT_PAYLOAD = transcript_payload()
 TRANSCRIPT_SHA256 = hashlib.sha256(TRANSCRIPT_PAYLOAD.encode("utf-8")).hexdigest()
+
+
+# Printed pages 182--183 are extracted as physical JPEG pages 197--198 after
+# fifteen pages of front matter.  The Notes and class-4 fixtures live on their
+# own physical page numbers.  Freeze names so a display-page/printed-page mixup
+# cannot silently substitute another plate.
+PAGE_OFFSET_NAMES = {
+    2252: "_page_197_Picture_1.jpeg",
+    2254: "_page_197_Figure_2.jpeg",
+    2258: "_page_198_Picture_2.jpeg",
+    2260: "_page_198_Picture_3.jpeg",
+}
+assert {line: Path(images[line]).name for line in PAGE_OFFSET_NAMES} == PAGE_OFFSET_NAMES
+
+
+guards = {
+    2156: "shown is a cubic lattice",
+    2256: "six neighbors with which it shares a face",
+    2262: "depend on all 26 neighbors that share either a face or a corner",
+    13483: "In d dimensions with k colors",
+    13488: "a + k AxesTotal[a, d]",
+    13497: "generalize to 3<sup>d</sup> -neighbor rules",
+    13501: "a + k FullTotal[a, d]",
+    13509: "positions of black cells can conveniently be displayed",
+    13511: "Graphics3D[Map[Cuboid[-Reverse[#]]",
+    13632: "Looking from above, with closer cells shown darker",
+    13644: "in 3D (as found by Evgraf Fedorov in 1885) the cube (6)",
+    14263: "3D class 4 rules",
+    14266: "LifeStep3D",
+    14271: "{5, 7, 6}, {4, 5, 5}, and {5, 6, 5}",
+}
+for line_number, fragment in guards.items():
+    assert line_number in S
+    assert fragment in lines[line_number - 1], (line_number, fragment)
+
+
+# Notes are physically stored in split Index, while nominal split Notes is
+# empty.  These representative reverse joins cover face/full mechanics,
+# 3D display, projections, other-lattice control, and the named class-4 preset.
+notes_split = ASSET_ROOT / "BACK-MATTER/Index/Index.md"
+notes_split_lines = notes_split.read_text(encoding="utf-8").splitlines()
+nominal_notes = ASSET_ROOT / "BACK-MATTER/Notes/Notes.md"
+assert len(nominal_notes.read_text(encoding="utf-8").splitlines()) == 1
+for book_line, split_line in {
+    13483: 1384,
+    13497: 1398,
+    13501: 1402,
+    13509: 1410,
+    13632: 1533,
+    13644: 1545,
+    14263: 2164,
+    14271: 2172,
+}.items():
+    assert lines[book_line - 1] == notes_split_lines[split_line - 1]
+
+
+HASH_BOUND_ASSETS = set(C4)
+TRANSCRIBED_ASSETS = {asset_line for _, asset_line, _, _ in TRANSCRIPT_SPECS}
+PIXEL_REPLAYED_ASSETS: set[int] = set()
+assert len(HASH_BOUND_ASSETS) == 42
+assert len(TRANSCRIBED_ASSETS) == 9
+assert TRANSCRIBED_ASSETS == STRICT_U
+assert not PIXEL_REPLAYED_ASSETS
+
+# Random-seed realizations remain deterministic programs; external
+# perturbations and probability-valued rules instead alter transition-time
+# semantics.  Neither group serializes the complete configuration/sample
+# stream needed for exact raster replay.
+UNREPLAYABLE_RANDOM_ASSETS = ADJ_RANDOM_REALIZATION | ADJ_STOCHASTIC_UPDATE
+assert len(UNREPLAYABLE_RANDOM_ASSETS) == 7
+assert UNREPLAYABLE_RANDOM_ASSETS <= ADJACENCY_ONLY
+
+
+EXPECTED_TRANSCRIPT_SHA256 = "75b3ad2d7bc291c21bc467a3190e488bc58ea6d8a102bb709fed2bf8b477bac3"
+EXPECTED_STRICT_UNIVERSE_SHA256 = "8fd664af3fbc564763b551e5475494bb19661c9a352100ba840d028172ac0d97"
+EXPECTED_STRICT_LEDGER_SHA256 = "e830c568d092d1ae114b4d2078232b3225b257fbc09bf8c3c42725637c3494f0"
+EXPECTED_GOVERNED_UNIVERSE_SHA256 = EXPECTED_GOVERNED_IMAGE_DIGEST
+EXPECTED_GOVERNED_LEDGER_SHA256 = "de90b87633c10882c823893038224dfa87d148cc65517ef40f68ed485d1663db"
+EXPECTED_ADJACENCY_UNIVERSE_SHA256 = "be476acd01d8f280750fbc03126b41e5f4f2e3b4e941d85fee721e04f2fc3ea7"
+EXPECTED_ADJACENCY_LEDGER_SHA256 = "6d68210c6b265dcbb9fcb3ab2297501cb4a32c59b74f454f8e8707ad8204f34d"
+EXPECTED_CANDIDATE_UNIVERSE_SHA256 = "dcb93e36f067ee718cb7b0abf6bbd18ba42dd872b119178533e03933c014cc30"
+
+
+def selected_payload(payload: str, selected: set[int]) -> str:
+    rows = [
+        row
+        for row in payload.splitlines()
+        if int(row.split("|", 1)[0]) in selected
+    ]
+    assert len(rows) == len(selected)
+    return "\n".join(rows) + "\n"
+
+
+def main() -> None:
+    payload, monolith_refs, split_refs, hashes = ledger()
+    adjacency_payload, adjacency_monolith_refs, adjacency_split_refs, adjacency_hashes = (
+        adjacency_ledger()
+    )
+    strict_payload = selected_payload(payload, STRICT_U)
+
+    assert TRANSCRIPT_SHA256 == EXPECTED_TRANSCRIPT_SHA256
+    assert digest_set(STRICT_U) == EXPECTED_STRICT_UNIVERSE_SHA256
+    assert hashlib.sha256(strict_payload.encode("utf-8")).hexdigest() == EXPECTED_STRICT_LEDGER_SHA256
+    assert digest_set(U) == EXPECTED_GOVERNED_UNIVERSE_SHA256
+    assert hashlib.sha256(payload.encode("utf-8")).hexdigest() == EXPECTED_GOVERNED_LEDGER_SHA256
+    assert digest_set(ADJACENCY_ONLY) == EXPECTED_ADJACENCY_UNIVERSE_SHA256
+    assert hashlib.sha256(adjacency_payload.encode("utf-8")).hexdigest() == EXPECTED_ADJACENCY_LEDGER_SHA256
+    assert digest_set(C4) == EXPECTED_CANDIDATE_UNIVERSE_SHA256
+
+    assert len(payload.splitlines()) == 10
+    assert len(adjacency_payload.splitlines()) == 32
+    assert (monolith_refs, split_refs, hashes) == (10, 10, 10)
+    assert (adjacency_monolith_refs, adjacency_split_refs, adjacency_hashes) == (32, 32, 32)
+    all_rows = payload.splitlines() + adjacency_payload.splitlines()
+    assert len({row.split("|")[7] for row in all_rows}) == 42
+
+    print(
+        f"T23 asset oracle: PASS source={len(S)}; C4=42; governed=10; adjacency_only=32; "
+        "governed C-face/C-full/O-projection/P-class4/X24=2/2/4/1/1; "
+        "adjacency T22/T24/random-seed/stochastic-update/nonstep/alternate-update/relation="
+        "11/1/3/4/1/1/11; "
+        "refs=84; unique_hashes=42; "
+        f"transcript_records=9; transcript_sha256={TRANSCRIPT_SHA256}; "
+        "HASH_BOUND=42; TRANSCRIBED=9; PIXEL_REPLAYED=0; "
+        "face_any/exact1_and_full_exact1/exact2/exact3=PASS; "
+        "named_class4_B5/S45=PASS; projections=OBSERVER_ONLY; "
+        "stochastic_replay=UNAVAILABLE(no_serialized_configuration/RNG/distribution/renderer); "
+        "page_offset=PASS; Notes_reverse_join=PASS; unresolved=0"
+    )
+
+
+if __name__ == "__main__":
+    main()
