@@ -57,7 +57,7 @@ The source oracle independently guards the arbitrary-dimensional formulas and po
 
 The governed set contains six native plates—dimensional arrangements, hexagonal any-neighbor growth, the hexagonal exact-one snowflake rule, the alternative-lattice/Voronoi-neighbor plate, pentagonal code `4094`, and Penrose code `254`—plus two relation plates for Penrose construction and Voronoi geometry, and three structural/sequential-network controls. The adjacency-only set partitions as `2 structural-network / 1 natural observer / 4 other CA / 1 substitution / 1 network observer / 1 static geometry / 1 sequential CA` plates.
 
-Every candidate has one monolith and one split reference, giving 44 references, 22 physical files, and 22 unique hashes. Six source-bound transcript records retain only nearby textual claims and code labels. The transcript digest is `c8dea3a540c8bf6dca319bc1d8387daf33b45a7d830cba1a7facc3150f7e3ba3`. The honest boundary is `HASH_BOUND=22 / TRANSCRIBED=6 / PIXEL_REPLAYED=0`. The fixed-network CA evidence is text-only. No plate supplies a complete Penrose, pentagonal, crystal, or network topology; no missing seed, horizon, boundary, renderer, or trace is reconstructed from pixels. Root and relocated runs/imports pass, optimized mode fails closed, explicit compilation passes, and no candidate remains unresolved.
+Every candidate has one monolith and one split reference, giving 44 references, 22 physical files, and 22 unique hashes. Six source-bound transcript records keep nearby source-stated claims and code labels separate from explicitly marked code-semantic derivations. The transcript digest is `883f86d4ec52345e1dc0be35b7e4a33abd91d49d29b179c84057657b2021a23a`. The honest boundary is `HASH_BOUND=22 / TRANSCRIBED=6 / PIXEL_REPLAYED=0`. The fixed-network CA evidence is text-only. No plate supplies a complete Penrose, pentagonal, crystal, or network topology; no missing seed, horizon, boundary, renderer, or trace is reconstructed from pixels. Root and relocated runs/imports pass, optimized mode fails closed, explicit compilation passes, and no candidate remains unresolved.
 
 ## Primary Book Evidence
 
@@ -193,7 +193,7 @@ The common runner indexes these declarations by the visible finite tag. It never
 - **ALPHABET:** a finite alphabet, with the existing tagged/product forms available when labels themselves have named factors. Static site kinds belong to topology unless a proved representation deliberately carries and preserves them as a label factor.
 - **Control:** none. Neither lattice identity, dimension, basis, site kind, nor port order is step control.
 - **FRONTIER:** `AllSites(V)`, with topology-generic site enumeration. A finite work region is a realization of this native selection, not a distinct frontier law.
-- **NEIGHBORHOOD:** finite old-snapshot incidence occurrences. A Bravais/hypercubic profile uses declared basis offsets. A finite-motif tiling uses kind-indexed port/offset data. A nonperiodic tiling or abstract network uses explicit immutable incidence. Labeled ports expose a stable ordered tuple; unlabeled connections expose only a permutation-invariant multiset/count interface. Parallel edges and quotient aliases remain separate read occurrences.
+- **NEIGHBORHOOD:** finite old-snapshot incidence occurrences. A Bravais/hypercubic profile uses declared semantic offset slots. A finite-motif tiling uses kind-indexed port/offset data. A nonperiodic tiling or abstract network uses explicit immutable incidence. Labeled incidence is canonicalized against a declared finite slot schema before exposing a positional tuple; storage row order is never semantic. The strict source preset for unlabeled connections exposes only the exact numeric neighbor-value total. Parallel edges and quotient aliases remain separate read occurrences before aggregation.
 - **RULE:** a closed total finite table over the declared local-read schema. Positional, totalistic, outer-totalistic, and certified symmetry-orbit tables remain distinct schema-tagged representations. A finite dependent sum over `site_kind` is closed table data, not a callback or construction branch.
 - **Writes:** exactly one compatible `AssignLabel(source, value)` per active old site.
 - **UPDATE:** the existing fixed-support same-site snapshot-parallel assignment. Topology and site kinds are unchanged; every read is from the old label snapshot.
@@ -203,11 +203,11 @@ The common runner indexes these declarations by the visible finite tag. It never
 The candidate closed local-read carrier is a finite dependent sum:
 
 ```text
-OrderedLocalRead = Sum[k in K](SiteKind[k] x Self[A] x Product[p in Ports[k]] A)
-UnlabeledCountRead = Sum[k in K](SiteKind[k] x Self[A] x HistogramOrCount[k,A])
+OrderedLocalRead = Sum[k in K](SiteKind[k] x Self[A] x Product[p in SlotSchema[k]] A)
+UnlabeledTotalisticRead = Sum[k in K](SiteKind[k] x Self[A] x NeighborValueSum[k,nu])
 ```
 
-The Book's “limited number of types” evidence permits finite local schemas; it does not by itself require distinct rule tables for each type. A type-indexed bank is therefore a conservative generic capability, while any strict preset must share tables exactly as its source states.
+Here `nu : A -> Z` is the explicit numeric valuation used by the source rule code. Permutation invariance is necessary but not sufficient for this totalistic quotient: a histogram or arbitrary multiset rule is broader and needs separate evidence. The Book's “limited number of types” evidence permits finite local schemas; it does not by itself require distinct rule tables for each type. A type-indexed bank is therefore a conservative generic capability, while any strict preset must share tables exactly as its source states.
 
 ## Current API and Runtime Fit
 
@@ -221,7 +221,8 @@ The broad semantics already appear in `simple_programs.md`: finite alphabets (`:
 | `src/ca/frontiers.py:54-80` | DIRECT finite `AllSites` lowering | enumerate the declared support rather than only a rectangular tensor slice |
 | `src/ca/rules.py:49-78,173-313` | DIRECT/PARAMETERIZATION for closed channels, tables, and aggregates | add schema-tagged finite dependent tables/orbit codecs and exact wide keys; no formula callback |
 | `src/ca/rollout.py:576-682` | DIRECT mechanical old-snapshot spatial kernel | retain the kernel law behind the generic runner; remove rank `1..3` limits (`:583-586,625-626`) and broadcast-only offsets (`:685-702,732-739`) |
-| `src/ca/specs.py:23-55` | PARTIAL fixed experiment specification | declare ALPHABET and CONFIGURATION topology explicitly; remove named-family resolution at `:117-198` |
+| `src/ca/specs.py:23-55` immutable experiment record | DIRECT | retain the data-record role |
+| `src/ca/specs.py:23-55,117-198` current carrier and named resolution | SEMANTIC MISMATCH | declare ALPHABET and CONFIGURATION topology explicitly; remove named-family resolution |
 | `src/ca/rollout.py:145-213` | SEMANTIC MISMATCH family dispatch | route every program through the branch-free SimpleProgram event |
 | `src/ca/loci.py:531-636` and boundary specs | DIRECT rectangular realization only | keep as one lowering; add explicit topology/quotient/halo realizations |
 | `src/ca/viz/export.py:257-279` | observer only | generic dimension/topology export must remain downstream of execution |
@@ -235,7 +236,7 @@ These examples expose representation and parameter gaps, not category-4 executio
 1. **Fourth-axis copy.** A binary `Z^4` CA that copies the old `+e_4` label is rejected by current rank validators, although generic dimension plus one declared offset uses the unchanged snapshot-parallel assignment.
 2. **Alternating triangular motif.** In `Z^2 x {Up,Down}`, the two site kinds have different neighbor incidences. One globally broadcast offset tuple gives a wrong successor; finite kind-indexed access gives the native event without changing UPDATE.
 3. **Nonperiodic fixed incidence.** A degree-three fixed graph with “black iff exactly one incident neighbor was black” cannot derive its reads from tensor proximity. Explicit visible incidence fixes NEIGHBORHOOD while preserving the runner.
-4. **Unlabeled ports.** “Copy slot zero” changes under an automorphic edge permutation when ports are unlabeled. Positional access is invalid there; the source's totalistic restriction is enforced by a permutation-invariant rule schema.
+4. **Unlabeled ports.** “Copy slot zero” changes under an automorphic edge permutation when ports are unlabeled. Positional access is invalid there. The strict source preset factors through the exact numeric sum: for a three-color valuation, `{0,2}` and `{1,1}` must remain indistinguishable even though their histograms differ.
 5. **Quotient aliases.** If two declared neighbor ports reach the same quotient site, set deduplication changes a totalistic count. Incidence occurrences, not unique destination IDs, form the read carrier.
 
 By contrast, a native event that creates/deletes sites or edges would defeat fixed-support assignment. That concrete counterexample is already owned by T29's structural graph UPDATE; none of the T24 evidence found so far performs it.
@@ -246,14 +247,14 @@ The smallest implementation set is:
 
 1. `DiscreteDomain(d)` rather than dimension-specific state classes or named geometries in DOMAIN.
 2. Generic typed site references/coordinate tuples with explicit lossless codecs.
-3. Immutable fixed-topology data containing site enumeration, incidence occurrences, optional finite site kinds, and optional stable port labels/order.
+3. Immutable fixed-topology data containing site enumeration, incidence occurrences, optional finite site kinds, and optional declared semantic slot schemas; storage order is nonsemantic.
 4. Topology-aware `AllSites` and closed finite access schemas indexed by site kind.
-5. Closed positional, aggregate/count, symmetry-orbit, and finite dependent-sum RULE representations.
+5. Closed positional, exact numeric-total, symmetry-orbit, and finite dependent-sum RULE representations; histogram/multiset aggregation is not attributed to the unlabeled-network source restriction.
 6. The existing typed same-site label write and snapshot-parallel UPDATE unchanged.
 7. Arbitrary-width exact table keys and codecs.
 8. Separate finite realization, basis/motif, embedding, and view adapters with explicit inverses or stated one-way observer status.
 
-Required conformance includes a 4D axis-total rule, a 4D full-total rule, an asymmetric general-offset rule, six-neighbor hexagonal and 12-/14-neighbor FCC/BCC profiles, an alternating triangular motif, the pentagonal and Penrose source predicates, unlabeled and labeled-port fixed graphs, rank-four lowering, quotient-alias multiplicity, halo realization, embedding noninterference, and one T21/T22/T23/T24 runner invocation with no catalog dispatch. The source and asset oracles must decide which pictured whole configurations are replayable; local predicates may not be inflated into invented full-plate traces.
+Required conformance includes a 4D axis-total rule, a 4D full-total rule, an asymmetric general-offset rule, six-neighbor hexagonal and 12-/14-neighbor FCC/BCC profiles, an alternating triangular motif, the pentagonal and Penrose source predicates, an unlabeled exact-sum fixed graph, a labeled-port graph invariant under storage-row reordering, rank-four lowering, quotient-alias multiplicity, halo realization, embedding noninterference, and one T21/T22/T23/T24 runner invocation with no catalog dispatch. The source and asset oracles must decide which pictured whole configurations are replayable; local predicates may not be inflated into invented full-plate traces.
 
 No completed stage reopens on the architecture evidence. T21-T23 remain strict fixed-square/cubic presets. T29's handoff must preserve the explicit fixed-incidence-label versus structural-rewrite boundary, but its graph-write decision remains valid.
 
@@ -274,6 +275,8 @@ No completed stage reopens on the architecture evidence. T21-T23 remain strict f
 - No finite tensor, crop, slice, projection, density, shape, palette, or raster promoted into native program identity without source evidence.
 - No fixed-incidence label evolution conflated with T29 structural graph rewriting, and no graph spelling rejected merely because it is not a dense tensor.
 - No compact count or symmetry table accepted as a complete positional rule without a validated constant-fiber proof.
+- No histogram or arbitrary permutation-invariant multiset rule presented as the source's stricter unlabeled totalistic quotient.
+- No positional meaning inferred from incidence-row order; semantic offsets or a declared canonical port-slot schema must carry every slot identity.
 - No arbitrary CA encodability substituted for native one-event reuse.
 
 ## Completion Requirements

@@ -284,6 +284,10 @@ class IncidenceRelation:
 
     Rows deliberately permit repeated targets: distinct offsets, ports, or
     parallel edges remain distinct rule inputs after quotient aliasing.
+
+    ``ordered`` means semantically positional, not merely stored in a tuple.
+    Such rows therefore require unique stable port labels.  Unlabelled rows are
+    occurrence-valued but permutation invariant.
     """
 
     name: str
@@ -302,6 +306,8 @@ class IncidenceRelation:
                 if index < 0:
                     raise ValueError("incidence targets must be nonnegative")
         if self.port_labels is None:
+            if self.ordered:
+                raise ValueError("ordered incidence requires explicit semantic port labels")
             return
         labels = require_tuple(self.port_labels, "port-label rows")
         if not self.ordered:
@@ -436,12 +442,17 @@ class LocalRead:
         for value in raw:
             require_int(value, "read neighbor")
         require_bool(self.ordered, "read ordered flag")
-        if self.port_labels is not None:
-            labels = require_tuple(self.port_labels, "read port labels")
-            if len(labels) != len(raw) or not self.ordered:
-                raise ValueError("read port labels require aligned ordered neighbors")
-            for label in labels:
-                require_str(label, "read port label")
+        if self.port_labels is None:
+            if self.ordered:
+                raise ValueError("ordered reads require explicit semantic port labels")
+            return
+        labels = require_tuple(self.port_labels, "read port labels")
+        if len(labels) != len(raw) or not self.ordered:
+            raise ValueError("read port labels require aligned ordered neighbors")
+        for label in labels:
+            require_str(label, "read port label")
+        if len(set(labels)) != len(labels):
+            raise ValueError("read port labels must be unique")
 
 
 @dataclass(frozen=True)
@@ -513,21 +524,29 @@ class SelfCountRule:
 @dataclass(frozen=True)
 class PositionalCase:
     site_type: str
-    width: int
+    slots: tuple[str, ...]
     table: TableCarrier
 
     def __post_init__(self) -> None:
         require_str(self.site_type, "positional-case site type")
-        width = require_int(self.width, "positional-case width")
-        if width <= 0:
-            raise ValueError("positional-case width must be positive")
+        slots = require_tuple(self.slots, "positional-case slot schema")
+        if not slots:
+            raise ValueError("positional-case slot schema must be nonempty")
+        for slot in slots:
+            require_str(slot, "positional-case slot")
+        if len(set(slots)) != len(slots):
+            raise ValueError("positional-case slots must be unique")
         if type(self.table) not in (DenseTable, DefaultOverridesTable):
             raise TypeError("positional-case table must be a closed table")
+
+    @property
+    def width(self) -> int:
+        return len(self.slots)
 
 
 @dataclass(frozen=True)
 class PositionalRule:
-    """Complete map over an explicitly ordered occurrence list."""
+    """Complete map over a declared semantic port-slot schema."""
 
     alphabet_size: int
     cases: tuple[PositionalCase, ...]
@@ -558,22 +577,29 @@ class PositionalRule:
         if read.include_self:
             raise ValueError("positional Self, if used, must be a declared relation slot")
         relation = support.relation(read.relation_name)
-        if not relation.ordered:
-            raise ValueError("unlabelled incidence supports only permutation-invariant rules")
+        if not relation.ordered or relation.port_labels is None:
+            raise ValueError("positional rules require explicitly labelled semantic slots")
         for site_index, site_type in enumerate(support.site_types):
             case = self.case_for(site_type)
             if len(relation.rows[site_index]) != case.width:
                 raise ValueError("positional-rule width does not match typed incidence")
+            labels = relation.port_labels[site_index]
+            if len(labels) != case.width or set(labels) != set(case.slots):
+                raise ValueError("positional relation labels do not match the declared slot schema")
         if set(support.site_types) != {case.site_type for case in self.cases}:
             raise ValueError("positional cases must exactly cover support site types")
 
     def evaluate(self, read: LocalRead) -> int:
-        if read.center is not None or not read.ordered:
-            raise ValueError("positional rule requires ordered slots and no implicit Self")
+        if read.center is not None or not read.ordered or read.port_labels is None:
+            raise ValueError("positional rule requires labelled slots and no implicit Self")
         case = self.case_for(read.site_type)
         if len(read.neighbors) != case.width:
             raise ValueError("positional-rule read has the wrong width")
-        return case.table.at(context_index(read.neighbors, self.alphabet_size))
+        if len(read.port_labels) != case.width or set(read.port_labels) != set(case.slots):
+            raise ValueError("positional read labels do not match the declared slot schema")
+        by_slot = dict(zip(read.port_labels, read.neighbors, strict=True))
+        canonical = tuple(by_slot[slot] for slot in case.slots)
+        return case.table.at(context_index(canonical, self.alphabet_size))
 
 
 Rule = SelfCountRule | PositionalRule
@@ -769,6 +795,25 @@ def full_positions(dimension: int) -> tuple[Offset, ...]:
     return tuple(product((-1, 0, 1), repeat=d))
 
 
+def offset_slot_schema(offsets: tuple[Offset, ...]) -> tuple[str, ...]:
+    """Give each literal translation offset a stable semantic slot identity."""
+
+    raw = require_tuple(offsets, "translation slot offsets")
+    if not raw:
+        raise ValueError("translation slot offsets must be nonempty")
+    first = require_tuple(raw[0], "translation slot offset")
+    checked = tuple(
+        checked_coord(offset, len(first), "translation slot offset")
+        for offset in raw
+    )
+    if len(set(checked)) != len(checked):
+        raise ValueError("translation slot offsets must be unique")
+    return tuple(
+        "offset[" + ",".join(str(component) for component in offset) + "]"
+        for offset in checked
+    )
+
+
 def self_count_case_count(degree: int, alphabet_size: int) -> int:
     s = require_int(degree, "neighbor degree")
     k = require_int(alphabet_size, "alphabet size")
@@ -849,6 +894,29 @@ class LatticeDescriptor:
             for row in range(self.dimension)
         )
 
+    def decode(self, raw_physical: object) -> Coord:
+        """Invert ``embed`` exactly, rejecting points outside its lattice image."""
+
+        physical = checked_coord(raw_physical, self.dimension, "physical lattice coordinate")
+        determinant = bareiss_determinant(self.basis)
+        coefficients: list[int] = []
+        for replaced_column in range(self.dimension):
+            cramer_matrix = tuple(
+                tuple(
+                    physical[row] if column == replaced_column else self.basis[row][column]
+                    for column in range(self.dimension)
+                )
+                for row in range(self.dimension)
+            )
+            numerator = bareiss_determinant(cramer_matrix)
+            if numerator % determinant:
+                raise ValueError("physical coordinate is outside the declared lattice image")
+            coefficients.append(numerator // determinant)
+        result = tuple(coefficients)
+        if self.embed(result) != physical:
+            raise AssertionError("exact lattice inverse failed to reconstruct its input")
+        return result
+
 
 def identity_basis(dimension: int) -> tuple[tuple[int, ...], ...]:
     d = require_int(dimension, "dimension")
@@ -913,13 +981,17 @@ def compile_translation_support(
             targets.append(key_to_index[resolved])
         rows.append(tuple(targets))
     labels = None
-    if port_names is not None:
-        names = require_tuple(port_names, "port names")
+    if ordered:
+        names = offset_slot_schema(checked) if port_names is None else require_tuple(port_names, "port names")
         if len(names) != len(checked):
             raise ValueError("port names do not match translation offsets")
         for name in names:
             require_str(name, "port name")
+        if len(set(names)) != len(names):
+            raise ValueError("translation port names must be unique")
         labels = tuple(tuple(names) for _ in coords)
+    elif port_names is not None:
+        raise ValueError("unlabelled translation incidence cannot declare port names")
     relation = IncidenceRelation(relation_name, tuple(rows), ordered, labels)
     return FixedSupport(coords, ("cell",) * len(coords), (relation,))
 
@@ -1006,9 +1078,14 @@ def count_program(alphabet_size: int, degree: int, table: TableCarrier, relation
     )
 
 
-def positional_program(alphabet_size: int, width: int, table: TableCarrier, relation: str = "local") -> SimpleProgram:
+def positional_program(
+    alphabet_size: int,
+    slots: tuple[str, ...],
+    table: TableCarrier,
+    relation: str = "local",
+) -> SimpleProgram:
     k = require_int(alphabet_size, "alphabet size")
-    case = PositionalCase("cell", width, table)
+    case = PositionalCase("cell", slots, table)
     return SimpleProgram(
         FiniteAlphabet(k),
         AllSites(),

@@ -448,27 +448,30 @@ assert outer_totalistic_growth_any_code(5) == 4094
 assert outer_totalistic_growth_any_code(3) == 254
 
 
-# Human transcriptions contain only source-stated metadata for the six native
-# plates.  They neither recover arrays from pictures nor promote observers to
-# construction data.
+# Human transcriptions keep source-stated metadata separate from explicitly
+# derived code semantics for the six native plates.  They neither recover
+# arrays from pictures nor promote observers to construction data.
 TRANSCRIPT_SPECS = (
     (
         "dimensional_arrangements",
         2154,
         (2156,),
         ("1D_line", "2D_square_with_triangular_and_hexagonal_alternatives", "3D_cubic_with_other_and_nonrepetitive_alternatives"),
+        (),
     ),
     (
         "hex_growth_page_369",
         4412,
         (4410, 4414, 15608, 15610, 15612),
-        ("distorted_square_representation_of_hexagonal_lattice", 6, "persistent_or_any_neighbor", 16382),
+        ("distorted_square_representation_of_hexagonal_lattice", 6, 16382),
+        ("derived_code_semantics", "persistent_or_any_neighbor"),
     ),
     (
         "hex_growth_page_371",
         4428,
         (4422, 4424, 4430, 15608, 15610, 15612),
-        ("distorted_square_representation_of_hexagonal_lattice", 6, "persistent_or_exactly_one_neighbor", 10926),
+        ("distorted_square_representation_of_hexagonal_lattice", 6, 10926),
+        ("derived_code_semantics", "persistent_or_exactly_one_neighbor"),
     ),
     (
         "nearest_neighbor_lattice_shapes",
@@ -484,18 +487,21 @@ TRANSCRIPT_SPECS = (
             ("3D_truncated_octahedron_bcc", 14),
             ("4D_possible_counts", (8, 16, 24)),
         ),
+        (),
     ),
     (
         "pentagonal_growth",
         13652,
         (13650,),
-        ("congruent_pentagonal_tiling", 5, "outer_totalistic", 4094, "persistent_or_any_neighbor"),
+        ("congruent_pentagonal_tiling", 5, "outer_totalistic", 4094),
+        ("derived_code_semantics", "persistent_or_any_neighbor"),
     ),
     (
         "penrose_growth",
         13656,
         (13654,),
-        ("nested_nonrepetitive_Penrose_tiling", "two_tile_shapes_treated_same", 3, "outer_totalistic", 254, "persistent_or_any_neighbor"),
+        ("nested_nonrepetitive_Penrose_tiling", "two_tile_shapes_treated_same", 3, "outer_totalistic", 254),
+        ("derived_code_semantics", "persistent_or_any_neighbor"),
     ),
 )
 assert len(TRANSCRIPT_SPECS) == 6
@@ -504,7 +510,7 @@ assert len(TRANSCRIPT_SPECS) == 6
 def transcript_payload() -> str:
     rows: list[str] = []
     names: set[str] = set()
-    for name, asset_line, source_lines, values in TRANSCRIPT_SPECS:
+    for name, asset_line, source_lines, source_values, derived_values in TRANSCRIPT_SPECS:
         assert name not in names
         names.add(name)
         assert asset_line in NATIVE
@@ -518,7 +524,7 @@ def transcript_payload() -> str:
         rows.append(
             f"{name}|asset={asset_line}|asset_sha256={asset_digest}|"
             f"source={','.join(map(str, source_lines))}|source_sha256={source_digest}|"
-            f"values={values!r}"
+            f"source_values={source_values!r}|derived_values={derived_values!r}"
         )
     assert len(rows) == 6
     return "\n".join(rows) + "\n"
@@ -604,7 +610,7 @@ for book_line, split_line in {
 
 
 HASH_BOUND_ASSETS = set(C4)
-TRANSCRIBED_ASSETS = {asset_line for _, asset_line, _, _ in TRANSCRIPT_SPECS}
+TRANSCRIBED_ASSETS = {asset_line for _, asset_line, _, _, _ in TRANSCRIPT_SPECS}
 PIXEL_REPLAYED_ASSETS: set[int] = set()
 assert len(HASH_BOUND_ASSETS) == 22
 assert TRANSCRIBED_ASSETS == NATIVE
@@ -620,7 +626,7 @@ assert TOPOLOGY_NOT_SERIALIZED == TRANSCRIBED_ASSETS
 assert TRACE_NOT_REPLAYABLE <= TRANSCRIBED_ASSETS
 
 
-EXPECTED_TRANSCRIPT_SHA256 = "c8dea3a540c8bf6dca319bc1d8387daf33b45a7d830cba1a7facc3150f7e3ba3"
+EXPECTED_TRANSCRIPT_SHA256 = "883f86d4ec52345e1dc0be35b7e4a33abd91d49d29b179c84057657b2021a23a"
 EXPECTED_GOVERNED_UNIVERSE_SHA256 = EXPECTED_GOVERNED_DIGEST
 EXPECTED_GOVERNED_LEDGER_SHA256 = "36a902946f4c447733483b49e05ecae7ba29e3ed0d05fb76606c87491d6869ff"
 EXPECTED_ADJACENCY_UNIVERSE_SHA256 = "2b47127033ba2b7d5b363e36fc20188a906da8ef0b3b3c86a4a3e6c272fc3cfa"
