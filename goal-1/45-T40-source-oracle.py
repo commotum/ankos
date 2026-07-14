@@ -36,6 +36,8 @@ if not __debug__:
 SCRIPT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BOOK = SCRIPT_ROOT / "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md"
 INDEX_FIRST_LINE = 20826
+INDEX_CONTENT_FIRST_LINE = 20828
+INDEX_CONTENT_LAST_LINE = 22456
 EXPECTED_BOOK_LINES = 22498
 EXPECTED_BOOK_SHA256 = "55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20"
 EXPECTED_ATLAS_SHA256 = "5ffab93f0007bbeb5da60af7cc08570f9a358c9f9f94e37c5e00f9fc0997bc8a"
@@ -133,6 +135,12 @@ def digest(values: set[int] | frozenset[int]) -> str:
     ).hexdigest()
 
 
+def newline_number_digest(values: set[int] | frozenset[int]) -> str:
+    return hashlib.sha256(
+        "".join(f"{number}\n" for number in sorted(values)).encode("ascii")
+    ).hexdigest()
+
+
 def digest_records(records: set[str] | list[str] | tuple[str, ...]) -> str:
     return hashlib.sha256("\n".join(sorted(records)).encode("utf-8")).hexdigest()
 
@@ -219,6 +227,7 @@ NATIVE_CONTINUATIONS = line_set(
     "13088,13100"
 )
 RELATION_CONTINUATIONS = line_set(
+    "12587,12589,12591,12593,12595,"
     "12994,12998,13002,13006-13016,13025,13027,13064-13068,"
     "13078-13082,13105,13107,13109,13113,13115,13117,13129,13130,"
     "13132,13136,13138-13144"
@@ -233,62 +242,103 @@ RETAINED = NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE
 
 INDEX_CLASS = {
     "native": line_set(
-        "20828,20910,20916,20918,20946,21044,21054,21088,21255,"
-        "21337,21360,21416,21473,21475,21501,21683,21705,21711,"
-        "21735,21779,21793,21801,21891,21907,22136"
+        "20828,20908,20910,20916,20918,20946,21044,21054,21072,"
+        "21088,21102,21189,21255,21329,21337,21360,21416,21473,"
+        "21475,21501,21683,21705,21711,21735,21779,21793,21801,"
+        "21891,21907,22136"
     ),
     "relation": line_set(
-        "20840,20850,20914,20967,20972,21014,21038,21050,21114,"
-        "21132,21134,21150,21162,21168,21172,21173,21185,21187,"
-        "21193,21195,21197,21203,21207,21213,21223,21231,21264,"
-        "21432,21450,21497,21525,21675,21687,21689,21695,21805,"
-        "21813,21819,21845,21893,21915,21927,21929,21933,21982,"
-        "21990,21994,22030,22080,22110,22144,22148,22150,22352,"
-        "22380,22394"
+        "20840,20846,20850,20862,20868,20904,20906,20914,20940,"
+        "20942,20967,20972,21014,21022,21038,21042,21050,21080,"
+        "21086,21090,21114,21132,21134,21148,21150,21162,21168,"
+        "21172,21173,21181,21185,21187,21193,21195,21197,21203,"
+        "21207,21213,21223,21231,21233,21264,21277,21290,21333,"
+        "21420,21432,21450,21454,21460,21497,21525,21586,21602,"
+        "21642,21675,21687,21689,21695,21731,21771,21777,21803,"
+        "21805,21813,21819,21841,21845,21877,21893,21903,21915,"
+        "21923,21927,21929,21933,21982,21990,21994,22030,22080,"
+        "22110,22112,22114,22144,22146,22148,22150,22352,22380,"
+        "22394,22434,22456"
     ),
-    "control": line_set("22096"),
+    "control": line_set("20970,22096"),
 }
 INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
-INDEX_EXCLUDED = frozenset()
-INDEX_RELEVANT_UNIVERSE = line_set(
-    "20828,20840,20850,20910,20914,20916,20918,20946,20967,20972,"
-    "21014,21038,21044,21050,21054,21088,21114,21132,21134,21150,"
-    "21162,21168,21172,21173,21185,21187,21193,21195,21197,21203,"
-    "21207,21213,21223,21231,21255,21264,21337,21360,21416,21432,"
-    "21450,21473,21475,21497,21501,21525,21675,21683,21687,21689,"
-    "21695,21705,21711,21735,21779,21793,21801,21805,21813,21819,"
-    "21845,21891,21893,21907,21915,21927,21929,21933,21982,21990,"
-    "21994,22030,22080,22096,22110,22136,22144,22148,22150,22352,"
-    "22380,22394"
+INDEX_EXCLUDED = line_set(
+    "20888,20965,20980,21108,21274,21338,21362,21471,21515,21545,"
+    "21783,21881,21925,22016,22132,22412"
+)
+INDEX_SEMANTIC_UNIVERSE = INDEX_ROUTED
+
+# This lane reproduces a deliberately broad hostile-review vocabulary scan
+# over the fixed physical Index block.  It is independent of the hand-routed
+# semantic rows; every match must be routed or explicitly excluded.
+INDEX_BROAD_VOCABULARY_PATTERN = (
+    r"digit|base [0-9]|binary|decimal|hexadec|continued fraction|"
+    r"partial quotient|number representation|long division|integerdigits|"
+    r"rational|irrational|radical|square root|normal number|leading digit|"
+    r"recurring|concatenation sequence|digital slope|first digit|nth.?digit|"
+    r"n\^.?th.*digit|transcendental|mathematical constant|catalan|"
+    r"champernowne|stoneham|khinchin|power.?mod|plouffe|euclid.s algorithm"
+)
+
+# A separate independent page/vocabulary/flattened-continuation review found
+# rows that the broad textual pattern cannot see.  Its positive and noisy
+# candidates are intentionally frozen together, before semantic disposition.
+INDEX_HOSTILE_AUDIT_CANDIDATES = line_set(
+    "20846,20862,20868,20888,20904,20906,20908,20940,20942,20965,"
+    "20970,20980,21022,21042,21072,21080,21086,21090,21102,21108,"
+    "21148,21181,21189,21233,21274,21277,21290,21329,21333,21338,"
+    "21362,21420,21454,21460,21471,21515,21545,21586,21602,21642,"
+    "21731,21771,21777,21783,21803,21841,21877,21881,21903,21923,"
+    "21925,22016,22112,22114,22132,22146,22412,22434,22456"
 )
 
 INDEX_ENTRY_GUARDS = {
     20828: ("continued fraction for, 144", "digits of, 142"),
     20840: ("Addition cellular automata based on", "in digit sequences, 118"),
+    20846: ("representing numbers using, 916",),
     20850: ("nested digit sequences",),
+    20862: ("in hierarchy of numbers, 916", "Algorithmically simple integers, 916"),
+    20868: ("Archimedes (Sicily, 287–212 BC)", "and  $\\pi$ , 911"),
+    20904: ("and computing  $\\pi$ , 911",),
+    20906: ("and computing *Sqrt*, 913",),
+    20908: ("Base 1 (unary), 560, 1070", "Base 2 (binary), 116"),
     20910: ("Base 16 (hex)", "normal numbers, 912"),
     20914: ("leading digits", "Egyptian fractions"),
     20916: ("Bits in numbers, 116", "see also Digit sequences"),
     20918: ("Blocks", "normal numbers, 912"),
+    20940: ("Bresenham's algorithm, 916",),
+    20942: ("Buffon's needle (for evaluating  $\\pi$ ), 1192",),
     20946: ("Catalan (Catalan's constant)", "and digit sequences, 902"),
     20967: ("states vs. digit sequences, 950",),
+    20970: ("Chaitin, Gregory J.", "and algorithmic randomness, 1068"),
     20972: ("Champernowne number", "normal numbers, 912"),
     21014: ("of number representations, 1070",),
+    21022: ("of computing  $\\pi$ , 912",),
     21038: ("Concatenation sequences", "continued fractions for, 915"),
+    21042: ("Constants mathematical, 136–144",),
     21044: ("Continued fraction map", "Continued fractions, 143, 914"),
     21050: ("Corollaries", "nested radicals"),
     21054: ("Cryptanalysis continued fraction for, 914", "digits of, 141"),
+    21072: ("Decimal numbers, 116", "recurring, 138"),
+    21080: ("minimal in rational numbers, 950",),
+    21086: ("numbers generated from, 916",),
     21088: ("Digit sequences, 116-127, 136-142",),
+    21090: ("DigitCount, 902", "lines on digital, 916"),
+    21102: ("Divide (/)", "in terms of digits, 139"),
     21114: ("Dynamic programming", "Egyptian fractions"),
     21132: ("runs of digits",),
     21134: ("ENIAC (computer)", "and digits of  $\\pi$ , 911"),
+    21148: ("as defining numbers, 916", "Transcendental equations"),
     21150: ("Equidistribution", "concatenation sequences"),
     21162: ("Exact solutions", "Euclid's algorithm"),
     21168: ("ExpIntegralEi", "Egyptian fractions"),
     21172: ("leading digits", "Factorial2"),
     21173: ("multiplicative digit sequences, 902",),
+    21181: ("Feigenbaum's constant, 913",),
     21185: ("Feynman diagrams", "leading digits"),
     21187: ("Fibonacci number representation. 560, 1070",),
+    21189: ("First digits, 914", "of powers, 903"),
     21193: ("and digital slopes, 916",),
     21195: ("Fractional linear transformations and continued fractions, 914",),
     21197: ("Fraenkel", "leading digits"),
@@ -297,18 +347,29 @@ INDEX_ENTRY_GUARDS = {
     21213: ("Generalization", "Euclid's algorithm"),
     21223: ("Gibbs phenomenon", "Euclid's algorithm"),
     21231: ("Graphics3D", "concatenation sequences"),
+    21233: ("Halton (digit reversal) sequences",),
     21255: ("Human thinking", "Hurwitz numbers"),
     21264: ("and continued fractions, 914<br>",),
+    21277: ("from rational integral, 916",),
+    21290: ("IBM 7090 computer, and $\\pi$ , 911",),
+    21329: ("IntegerDigits basic examples of, 854", "concatenation of 913"),
+    21333: ("Integrate", "numbers generated by, 916"),
     21337: ("Irrational numbers", "iterated multiplication by, 903"),
     21360: ("Iterated division", "continued fractions, 143"),
     21416: ("Khinchin", "Khinchin's constant"),
+    21420: ("KleinInvariantJ", "and almost integers, 915"),
     21432: ("and continued fractions, 915", "Lagrange points"),
     21450: ("LatticeReduce", "Leading digits"),
+    21454: ("Leibniz, Gottfried W. v.", "and binary numbers, 902"),
+    21460: ("Light as defining rationals, 916",),
     21473: ("Log (logarithm)", "computation of  $n^{th}$  digits"),
     21475: ("Long division, 139",),
     21497: ("Markov partitions and digit sequences, 901",),
     21501: ("Mathematical constants, 136-144",),
     21525: ("Multiplicative digit sequences, 902", "and continued fractions, 914"),
+    21586: ("for  $\\pi$ , 912",),
+    21602: ("Napier, John", "and binary numbers, 902"),
+    21642: ("Needle, Buffon's for  $\\pi$ , 1192",),
     21675: ("Nested radicals, 915",),
     21683: ("NestWhileList", "concatenation sequences"),
     21687: ("leading digits",),
@@ -316,7 +377,10 @@ INDEX_ENTRY_GUARDS = {
     21695: ("Non-locality and Bell's inequalities", "in digit sequences, 730"),
     21705: ("Normal numbers, 912", "concatenation sequences"),
     21711: ("Number representations, 142",),
+    21731: ("number of (DigitCount), 902", "Operator representations"),
     21735: ("Partial quotients", "in continued fractions, 914"),
+    21771: ("Periods (number type), 916",),
+    21777: ("Physical constants numerology for, 1025", "approximations to, 912"),
     21779: (
         "computation of nth digits in, 912",
         "continued fraction for, 143, 914",
@@ -324,14 +388,19 @@ INDEX_ENTRY_GUARDS = {
     ),
     21793: ("Plouffe, Simon", "computation of  $\\pi$"),
     21801: ("PolyLog (polylogarithms)", "and computing  $n^{th}$  digits, 912"),
+    21803: ("Population count (DigitCount), 902", "Positional notation for numbers, 116"),
     21805: ("PowerMod", "digit sequences of, 119, 614, 749"),
     21813: ("leading digits in, 914",),
     21819: ("ProductLog", "concatenation sequences"),
+    21841: ("use of base 2 in, 902",),
     21845: ("Pythagoreans", "continued fraction map"),
+    21877: ("Quasi-Monte Carlo methods", "and digit reversal, 905"),
     21891: ("Radicals continued fractions for, 144", "digit sequences for, 139"),
     21893: ("from digits of  $\\pi$ , 136, 912", "in digit of square roots, 139"),
     21907: ("Rational numbers approximation by",),
     21915: ("Reciprocals", "Egyptian fractions"),
+    21903: ("lines on digital, 916",),
+    21923: ("Register machines, 97–102", "for computing Sqrt, 1114"),
     21927: ("in digit sequences, 138",),
     21929: ("Repetitive sequences", "Egyptian fractions"),
     21933: ("Reversal, of digit sequences, 905",),
@@ -342,13 +411,37 @@ INDEX_ENTRY_GUARDS = {
     22080: ("Russian peasant method", "concatenation sequences"),
     22096: ("see also Digit sequences", "Semi-Thue systems"),
     22110: ("Shallit, Jeffrey O.", "and continued fractions, 914"),
+    22112: ("Shortest descriptions", "for integers, 916"),
+    22114: ("Slopes digital representation of, 916",),
     22136: ("Stoneham", "normal numbers, 912"),
     22144: ("Substitution systems, 82-87", "and continued fractions, 914"),
+    22146: ("sequential, 88-92", "Sum, numbers generated from, 917"),
     22148: ("Superstrings", "runs of digits"),
     22150: ("Symbolic programming", "leading digits"),
     22352: ("Toffoli, Tommaso", "Egyptian fractions"),
     22380: ("Two's complement number representation, 902, 942",),
     22394: ("Valuation functions", "nested digit sequences"),
+    22434: ("Wozniakowski (digit reversal) sequences, 905",),
+    22456: ("from rational integrals, 916", "Zeta (Riemann zeta function)"),
+}
+
+INDEX_EXCLUDED_GUARDS = {
+    20888: ("Associative algebras, 801", "as generalizing numbers, 1168"),
+    20965: ("Gray code sequence of, 352",),
+    20980: ("Code 1893 on inspirational cover, 17",),
+    21108: ("Dungeons & Dragons shapes of dice in, 971",),
+    21274: ("and trinomial coefficients, 1091",),
+    21338: ("Irreducible representations (of groups)",),
+    21362: ("IUPAC chemical nomenclature",),
+    21471: ("Littlewood, John E.", "and numbers of primes, 910"),
+    21515: ("Planck's constant",),
+    21545: ("generating Euclidean spaces, 1036",),
+    21783: ("Planck's constant, 1061",),
+    21881: ("Racah coefficients, see 6 j symbols",),
+    21925: ("inspirational book cover, 864",),
+    22016: ("Rule 129 enumerating powers of 2, 641",),
+    22132: ("Spectra (atomic)",),
+    22412: ("Verhulst equation and iterated maps. 918",),
 }
 
 # A handful of witnesses prove that the actual flattened Index is located in
@@ -437,6 +530,36 @@ SOURCE_SEMANTIC_GUARDS = (
     ("finite_precision_probability", 12951, ("finite-precision arithmetic", "probability exists", "incorrect results"), ()),
     ("normality_base", 12976, ('normal" in a particular base', "does not imply anything"), ()),
     ("sqrt_invariant_claim", 12982, ("s^2 + 4r = 4^t n", "any rational number", "1 \\le n < 4"), ()),
+    (
+        "irrational_cf_substitution_seam",
+        12587,
+        ("any h that is not a rational number", "continued fraction form", "first m rules"),
+        (),
+    ),
+    (
+        "cf_tail_drops_integer_part",
+        12589,
+        ("Reverse", "Rest", "ContinuedFraction", "h, m"),
+        (),
+    ),
+    (
+        "signed_cf_integer_part",
+        12591,
+        ("Floor[h] + Fold", "original sequence"),
+        (),
+    ),
+    (
+        "quadratic_cf_periodicity",
+        12593,
+        ("solution to a quadratic equation", "continued fraction form is repetitive"),
+        (),
+    ),
+    (
+        "cf_substitution_examples",
+        12595,
+        ("neighbor-independent substitution system", "GoldenRatio", "sqrt{2}", "sqrt{3}"),
+        (),
+    ),
     ("continued_fraction_query", 13030, ("first n terms", "ContinuedFraction"), ()),
     ("continued_fraction_iteration", 13032, ("Floor[NestList[1/Mod[#, 1] &, x, n-1]]",), ()),
     ("continued_fraction_inverse", 13034, ("reconstructed", "FromContinuedFraction"), ()),
@@ -644,18 +767,24 @@ EXPECTED_EXCLUDED_CLASS = {
     "generic_algorithm_cross_reference": (3, "0af5fb1f1971b936e8052cc34fe7605caf6f6916a28992ff9485914a39d55704"),
 }
 EXPECTED_INDEX_CLASS = {
-    "native": (25, "46e883d59f112ae1427bfd09299e7f457c5a2328d0f9326ebbc62421220cd3b3"),
-    "relation": (56, "3d107040293822a0baf0c3be1a0f5aad69262921910f7c1b90a8824135ac0931"),
-    "control": (1, "2754f6e1f004d4298d7ed6444c52385d98a70aee827877053ef7d43e519ac10f"),
+    "native": (0, ""),
+    "relation": (0, ""),
+    "control": (0, ""),
 }
-EXPECTED_INDEX_RELEVANT_UNIVERSE = (
-    82,
-    "5e23e53aff0b8ea8b53ba588e44496d31ea600b8ebde0c5e36a8183b1eedae3d",
-)
-EXPECTED_INDEX_QUERY_MISSES = (
-    37,
-    "6aa6edc52301504475891b295fd59cd706295e90f9c2503d5ccdb22f629ae3f9",
-)
+EXPECTED_INDEX_CONTENT = (0, "")
+EXPECTED_INDEX_SEMANTIC_UNIVERSE = (0, "")
+EXPECTED_INDEX_QUERY_MISSES = (0, "")
+EXPECTED_INDEX_BROAD_VOCABULARY = (0, "")
+EXPECTED_INDEX_HOSTILE_AUDIT_CANDIDATES = (0, "")
+EXPECTED_INDEX_AUDIT_CANDIDATES = (0, "")
+EXPECTED_INDEX_BROAD_PATTERN_DIGEST = ""
+EXPECTED_INDEX_DISPOSITION = {
+    "native": (0, ""),
+    "relation": (0, ""),
+    "control": (0, ""),
+    "excluded": (0, ""),
+    "unrelated": (0, ""),
+}
 EXPECTED_STRICT_MAIN_PARTITION = {
     "native": (102, "bd76954762c925f2ecf6bf0fa97d9c15db19d598a297a9c56d74e12d1dc41d59"),
     "relation": (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
@@ -703,7 +832,9 @@ EXPECTED_SOURCE_DEFECT_GUARDS = (
 )
 EXPECTED_RECORDS = {
     "excluded_line_hashes": (5, "d3b3134fe2e22ca121f65e3617dce002e45e1880600c264b4c5a100d9614efef"),
-    "index_guards": (82, "8b5c9ce6a3cc644d42fc142e8f78e2b33f964671a9afb7883289fb8e7e33edfc"),
+    "index_guards": (0, ""),
+    "index_excluded_guards": (0, ""),
+    "index_dispositions": (0, ""),
     "index_sentinels": (8, "129bc6a4ef7cc76b5020676e603a2b5621ef56354b8ca2cd2fb4361938791710"),
     "strict_main_dispositions": (117, "94bed33e54122c19903a478a562a10d69491890aef04978d417bb53b3b13db91"),
     "semantic_guards": EXPECTED_SOURCE_SEMANTIC_GUARDS,
@@ -812,6 +943,8 @@ def split_owner_record(line_no: int) -> str:
         )
     if line_no == 12569:
         return "BACK-MATTER/Index/Index.md:472"
+    if 12587 <= line_no <= 12595:
+        return f"BACK-MATTER/Index/Index.md:{line_no - 12097}"
     if line_no == 12846:
         return "BACK-MATTER/Index/Index.md:749"
     raise ValueError(f"line {line_no} has no frozen split disposition")
@@ -1088,40 +1221,107 @@ def main(argv: list[str] | None = None) -> int:
         check("strict_main_" + name, good, *actual)
     check("strict_main_partition", strict_ok, strict_unresolved)
 
-    index_query_misses = set(INDEX_RELEVANT_UNIVERSE) - index_candidates
-    index_unresolved = (
-        len(set(INDEX_RELEVANT_UNIVERSE) ^ set(INDEX_ROUTED))
-        + len(index_candidates - set(INDEX_RELEVANT_UNIVERSE))
+    index_actual_content = {
+        number
+        for number in range(INDEX_CONTENT_FIRST_LINE, INDEX_CONTENT_LAST_LINE + 1)
+        if at(number).strip()
+    }
+    index_broad_candidates = {
+        number
+        for number in index_actual_content
+        if re.search(INDEX_BROAD_VOCABULARY_PATTERN, at(number), re.IGNORECASE)
+    }
+    index_audit_candidates = index_broad_candidates | set(INDEX_HOSTILE_AUDIT_CANDIDATES)
+    index_unrelated = index_actual_content - set(INDEX_ROUTED) - set(INDEX_EXCLUDED)
+    index_disposition = {
+        **INDEX_CLASS,
+        "excluded": INDEX_EXCLUDED,
+        "unrelated": frozenset(index_unrelated),
+    }
+    index_disposition_union = set().union(*index_disposition.values())
+    index_disposition_overlap = (
+        sum(map(len, index_disposition.values())) - len(index_disposition_union)
     )
+    index_candidate_unexplained = (
+        index_audit_candidates - set(INDEX_ROUTED) - set(INDEX_EXCLUDED)
+    )
+    index_query_misses = set(INDEX_SEMANTIC_UNIVERSE) - index_candidates
+    index_unresolved = (
+        len(index_actual_content ^ index_disposition_union)
+        + index_disposition_overlap
+        + len(index_candidate_unexplained)
+    )
+    index_content_actual = (len(index_actual_content), digest(index_actual_content))
     index_universe_actual = (
-        len(INDEX_RELEVANT_UNIVERSE),
-        digest(INDEX_RELEVANT_UNIVERSE),
+        len(INDEX_SEMANTIC_UNIVERSE),
+        digest(INDEX_SEMANTIC_UNIVERSE),
     )
     index_miss_actual = (len(index_query_misses), digest(index_query_misses))
+    index_broad_actual = (
+        len(index_broad_candidates),
+        newline_number_digest(index_broad_candidates),
+    )
+    index_hostile_actual = (
+        len(INDEX_HOSTILE_AUDIT_CANDIDATES),
+        digest(INDEX_HOSTILE_AUDIT_CANDIDATES),
+    )
+    index_audit_candidate_actual = (
+        len(index_audit_candidates),
+        digest(index_audit_candidates),
+    )
+    index_pattern_actual = digest_records({INDEX_BROAD_VOCABULARY_PATTERN})
     index_ok = (
         set(INDEX_CLASS) == set(EXPECTED_INDEX_CLASS)
         and frozenset().union(*INDEX_CLASS.values()) == INDEX_ROUTED
         and sum(map(len, INDEX_CLASS.values())) == len(INDEX_ROUTED)
         and not INDEX_ROUTED & INDEX_EXCLUDED
-        and INDEX_RELEVANT_UNIVERSE == INDEX_ROUTED
-        and index_candidates <= set(INDEX_RELEVANT_UNIVERSE)
-        and index_universe_actual == EXPECTED_INDEX_RELEVANT_UNIVERSE
+        and INDEX_SEMANTIC_UNIVERSE == INDEX_ROUTED
+        and index_candidates <= set(INDEX_SEMANTIC_UNIVERSE)
+        and index_actual_content == index_disposition_union
+        and index_disposition_overlap == 0
+        and not index_candidate_unexplained
+        and index_content_actual == EXPECTED_INDEX_CONTENT
+        and index_universe_actual == EXPECTED_INDEX_SEMANTIC_UNIVERSE
         and index_miss_actual == EXPECTED_INDEX_QUERY_MISSES
+        and index_broad_actual == EXPECTED_INDEX_BROAD_VOCABULARY
+        and index_hostile_actual == EXPECTED_INDEX_HOSTILE_AUDIT_CANDIDATES
+        and index_audit_candidate_actual == EXPECTED_INDEX_AUDIT_CANDIDATES
+        and index_pattern_actual == EXPECTED_INDEX_BROAD_PATTERN_DIGEST
     )
-    check("index_relevant_universe", index_universe_actual == EXPECTED_INDEX_RELEVANT_UNIVERSE, *index_universe_actual)
+    check("index_content", index_content_actual == EXPECTED_INDEX_CONTENT, *index_content_actual)
+    check("index_semantic_universe", index_universe_actual == EXPECTED_INDEX_SEMANTIC_UNIVERSE, *index_universe_actual)
     check("index_query_misses", index_miss_actual == EXPECTED_INDEX_QUERY_MISSES, *index_miss_actual)
+    check("index_broad_vocabulary", index_broad_actual == EXPECTED_INDEX_BROAD_VOCABULARY, *index_broad_actual)
+    check("index_hostile_candidates", index_hostile_actual == EXPECTED_INDEX_HOSTILE_AUDIT_CANDIDATES, *index_hostile_actual)
+    check("index_audit_candidates", index_audit_candidate_actual == EXPECTED_INDEX_AUDIT_CANDIDATES, *index_audit_candidate_actual)
+    check("index_broad_pattern", index_pattern_actual == EXPECTED_INDEX_BROAD_PATTERN_DIGEST, index_pattern_actual)
     for name, values in INDEX_CLASS.items():
         actual = (len(values), digest(values))
         good = actual == EXPECTED_INDEX_CLASS.get(name)
         index_ok &= good
         check("index_" + name, good, *actual)
     index_records, index_guards_ok = occurrence_records(INDEX_ENTRY_GUARDS, lines)
+    index_excluded_records, index_excluded_guards_ok = occurrence_records(
+        INDEX_EXCLUDED_GUARDS, lines
+    )
     sentinel_records, sentinels_ok = occurrence_records(INDEX_FLATTENING_SENTINELS, lines)
     index_ok &= (
         set(INDEX_ENTRY_GUARDS) == set(INDEX_ROUTED)
+        and set(INDEX_EXCLUDED_GUARDS) == set(INDEX_EXCLUDED)
         and set(INDEX_FLATTENING_SENTINELS) <= set(INDEX_ROUTED)
         and index_guards_ok
+        and index_excluded_guards_ok
         and sentinels_ok
+    )
+    for name, values in index_disposition.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_INDEX_DISPOSITION.get(name)
+        index_ok &= good
+        check("index_disposition_" + name, good, *actual)
+    check(
+        "index_candidate_closure",
+        not index_candidate_unexplained,
+        len(index_candidate_unexplained),
     )
     check("index_partition", index_ok, index_unresolved)
 
@@ -1173,6 +1373,11 @@ def main(argv: list[str] | None = None) -> int:
         for role, values in STRICT_MAIN_DISPOSITION.items()
         for number in values
     }
+    index_disposition_records = {
+        f"{role}:{number}:{hashlib.sha256(at(number).encode('utf-8')).hexdigest()}"
+        for role, values in index_disposition.items()
+        for number in values
+    }
     omission_records = {
         f"{number}:{reason}"
         for reason, values in SPLIT_OMISSION_GROUPS.items()
@@ -1181,6 +1386,14 @@ def main(argv: list[str] | None = None) -> int:
     record_actuals = {
         "excluded_line_hashes": (len(excluded_hash_records), digest_records(excluded_hash_records)),
         "index_guards": (len(index_records), digest_records(index_records)),
+        "index_excluded_guards": (
+            len(index_excluded_records),
+            digest_records(index_excluded_records),
+        ),
+        "index_dispositions": (
+            len(index_disposition_records),
+            digest_records(index_disposition_records),
+        ),
         "index_sentinels": (len(sentinel_records), digest_records(sentinel_records)),
         "strict_main_dispositions": (
             len(strict_disposition_records),
@@ -1288,7 +1501,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # Split closure is driven by the independent strict-main and actual-Index
     # universes, not merely by rows reached through discovery regexes.
-    independent_crosswalk_universe = STRICT_MAIN_CONTENT | INDEX_RELEVANT_UNIVERSE
+    independent_crosswalk_universe = STRICT_MAIN_CONTENT | frozenset(index_actual_content)
     crosswalk_lines = RETAINED | independent_crosswalk_universe
     crosswalk_records: set[str] = set()
     class_lines: dict[str, set[int]] = {

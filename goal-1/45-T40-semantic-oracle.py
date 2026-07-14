@@ -49,6 +49,8 @@ FINITE_TERMINATED = "finite_terminated"
 EVENTUALLY_ZERO_INFINITE = "eventually_zero_infinite"
 PREFIX_OF_INFINITE = "prefix_of_infinite"
 UNKNOWN_TERMINATION = "unknown_termination"
+IRRATIONAL_PREFIX = "irrational_prefix"
+NATURAL_SIMPLE_CF_PREFIX = "natural_simple_cf_prefix"
 EXACT_METHOD = "closed_exact"
 MACHIN_METHOD = "machin_rational_interval"
 REPORTED_METHOD = "reported_non_authoritative"
@@ -101,8 +103,10 @@ GOAL2_DELTA = (
 
 T42_HANDOFF_CONTRACT = (
     "producer=T40_representation_query",
-    "payload=immutable_indexed_simple_CF_coefficients",
+    "payload=replay_verified_immutable_T40_result_plus_typed_natural_CF_view",
     "accepted_strength=complete_exact_or_complete_certified",
+    "accepted_source=irrational_prefix_only; rational_complete_is_typed_and_rejected_by_strict_T42",
+    "orientation=natural_simple_CF_prefix",
     "coefficient_domain=a0_signed_integer_and_positive_tail",
     "consumer=T42_substitution_schedule",
     "forbidden=lazy_hidden_coefficient_evaluator_or_partial_prefix",
@@ -111,7 +115,7 @@ T42_HANDOFF_CONTRACT = (
 
 WORK_REALIZATION_RELATIONS = (
     "long_division=T35_complete_remainder_branch_plus_T43_iterated_remainder_map_with_emitted_digit_witness",
-    "square_root=existing_product_value_and_closed_branch_realization_with_visible_r_s_and_exact_invariant",
+    "square_root=direct_source_product_r_s; lossless_fixed-program_reachable_quotient_radicand_profile_s_reconstructs_phase_r_and_prefix",
     "Gauss_map=T43_exact_rational_reciprocal_fractional_part_realization_with_finite_completion",
     "all_work_traces=optional_algorithm_records_not_T40_denotation_or_representation_result_identity",
 )
@@ -1834,6 +1838,33 @@ def sqrt_digit_next(work: object) -> SqrtDigitWork:
     )
 
 
+def reconstruct_sqrt_work_from_program_and_s(
+    radicand: object,
+    profile: object,
+    s: object,
+) -> SqrtDigitWork:
+    """Invert the reachable fixed-program projection ``(r,s,bits,t) -> s``."""
+
+    value = exact_fraction(radicand, "square-root quotient radicand")
+    mode = exact_str(profile, "square-root quotient profile")
+    visible_s = checked_nonnegative(s, "square-root quotient s")
+    if visible_s == 0:
+        iteration = 0
+    else:
+        if visible_s % 4:
+            raise ValueError("reachable square-root quotient s must be divisible by four")
+        iteration = (visible_s // 4).bit_length()
+    r = (Fraction(4 ** (iteration + 1), 1) * value - visible_s * visible_s) / 4
+    return SqrtDigitWork(
+        value,
+        mode,
+        iteration,
+        r,
+        visible_s,
+        direct_sqrt_bits(value, iteration),
+    )
+
+
 def unsafe_literal_rational_sqrt_next(r: object, s: object) -> tuple[Fraction, int]:
     """Literal source spelling, retained only to demonstrate its rational defect."""
 
@@ -1893,26 +1924,61 @@ def gauss_map_next(work: object) -> GaussMapWork:
 
 @dataclass(frozen=True)
 class T42CoefficientInput:
-    source_query_id: str
-    source_result_id: str
-    coefficients: tuple[int, ...]
-    proof_strength: str
+    source_result: ExpansionResult
+    source_kind: str = IRRATIONAL_PREFIX
+    orientation: str = NATURAL_SIMPLE_CF_PREFIX
 
     def __post_init__(self) -> None:
-        source_query = exact_str(self.source_query_id, "T42 source query id")
-        source_result = exact_str(self.source_result_id, "T42 source result id")
-        if len(source_query) != 64 or len(source_result) != 64:
-            raise ValueError("T42 handoff ids must be SHA-256 hex strings")
-        coefficients = exact_tuple(self.coefficients, "T42 coefficients")
+        if type(self.source_result) is not ExpansionResult:
+            raise TypeError("T42 input must carry the complete verified T40 result")
+        if not verify_result(self.source_result):
+            raise ValueError("T42 input source result does not replay")
+        result = self.source_result
+        if type(result.query.representation) is not SimpleContinuedFraction:
+            raise ValueError("T42 input requires simple continued-fraction coefficients")
+        if type(result.query.selection) is not Prefix or result.start_index != 0:
+            raise ValueError("T42 input requires a natural prefix beginning at a0")
+        if type(result.outcome) not in (CompleteExact, CompleteCertified):
+            raise ValueError("T42 input requires complete exact or certified coefficients")
+        if result.termination != PREFIX_OF_INFINITE:
+            raise ValueError("strict T42 excludes rational-complete continued fractions")
+        if self.source_kind != IRRATIONAL_PREFIX:
+            raise ValueError("strict T42 source kind must be an irrational prefix")
+        if self.orientation != NATURAL_SIMPLE_CF_PREFIX:
+            raise ValueError("T42 input coefficients must be in natural simple-CF order")
+        coefficients = exact_tuple(result.coefficients, "T42 coefficients")
         if not coefficients:
             raise ValueError("T42 coefficient input cannot be empty")
         for index, coefficient in enumerate(coefficients):
             value = exact_int(coefficient, "T42 coefficient")
             if index > 0 and value < 1:
                 raise ValueError("invalid T42 simple-CF coefficient")
-        strength = exact_str(self.proof_strength, "T42 proof strength")
-        if strength not in ("complete_exact", "complete_certified"):
-            raise ValueError("T42 requires complete exact or certified coefficients")
+
+    @property
+    def source_query_id(self) -> str:
+        return self.source_result.provenance.query_id
+
+    @property
+    def source_result_id(self) -> str:
+        return sha256(repr(self.source_result).encode("utf-8")).hexdigest()
+
+    @property
+    def coefficients(self) -> tuple[int, ...]:
+        return self.source_result.coefficients
+
+    @property
+    def proof_strength(self) -> str:
+        if type(self.source_result.outcome) is CompleteExact:
+            return "complete_exact"
+        return "complete_certified"
+
+    @property
+    def coefficient_start(self) -> int:
+        return self.source_result.start_index
+
+    @property
+    def requested_count(self) -> int:
+        return self.source_result.query.selection.count
 
 
 def result_key(result: object) -> tuple[object, ...]:
@@ -1941,19 +2007,9 @@ def make_t42_coefficient_input(result: object) -> T42CoefficientInput:
         raise ValueError("T42 handoff requires simple continued-fraction coefficients")
     if type(result.query.selection) is not Prefix or result.start_index != 0:
         raise ValueError("T42 handoff requires a prefix beginning at coefficient zero")
-    if type(result.outcome) is CompleteExact:
-        strength = "complete_exact"
-    elif type(result.outcome) is CompleteCertified:
-        strength = "complete_certified"
-    else:
+    if type(result.outcome) not in (CompleteExact, CompleteCertified):
         raise ValueError("T42 handoff requires a complete exact or complete certified outcome")
-    key = result_key(result)
-    return T42CoefficientInput(
-        result.provenance.query_id,
-        sha256(repr(key).encode("utf-8")).hexdigest(),
-        result.coefficients,
-        strength,
-    )
+    return T42CoefficientInput(result)
 
 
 def dataclass_manifest(namespace: dict[str, object]) -> tuple[tuple[str, tuple[str, ...]], ...]:
@@ -2377,11 +2433,12 @@ def audit_exact_cf_families() -> tuple[int, int, int, int, int, int]:
     )
 
 
-def audit_sqrt_digit_realization() -> tuple[int, int, int, int, int, int, int]:
+def audit_sqrt_digit_realization() -> tuple[int, int, int, int, int, int, int, int]:
     commutations = 0
     invariant_checks = 0
     strict_runs = 0
     repaired_runs = 0
+    fixed_program_quotient_commutations = 0
     for radicand, profile, horizon in (
         (Fraction(2, 1), BOOK_INTEGER_SQRT, 90),
         (Fraction(3, 1), BOOK_INTEGER_SQRT, 90),
@@ -2396,8 +2453,17 @@ def audit_sqrt_digit_realization() -> tuple[int, int, int, int, int, int, int]:
             work = sqrt_digit_next(work)
             assert work.visible_bits == direct_sqrt_bits(radicand, iteration)
             assert work.s * work.s + 4 * work.r == Fraction(4 ** (iteration + 1), 1) * radicand
+            reconstructed = reconstruct_sqrt_work_from_program_and_s(
+                radicand,
+                profile,
+                work.s,
+            )
+            assert reconstructed == work
+            if iteration < horizon:
+                assert sqrt_digit_next(reconstructed) == sqrt_digit_next(work)
             commutations += 1
             invariant_checks += 2
+            fixed_program_quotient_commutations += 1
 
     two = sqrt_digit_next(begin_sqrt_digit_work(Fraction(2, 1), REPAIRED_RATIONAL_SQRT))
     nine_fourths = sqrt_digit_next(
@@ -2410,7 +2476,13 @@ def audit_sqrt_digit_realization() -> tuple[int, int, int, int, int, int, int]:
     nine_fourths_next = sqrt_digit_next(nine_fourths)
     assert two_next.visible_bits == (1, 0)
     assert nine_fourths_next.visible_bits == (1, 1)
-    prefix_loss_witnesses = 1
+    cross_program_s_without_identity_loss = 1
+    assert reconstruct_sqrt_work_from_program_and_s(two.radicand, two.profile, two.s) == two
+    assert reconstruct_sqrt_work_from_program_and_s(
+        nine_fourths.radicand,
+        nine_fourths.profile,
+        nine_fourths.s,
+    ) == nine_fourths
 
     repaired = sqrt_digit_next(
         begin_sqrt_digit_work(Fraction(11, 5), REPAIRED_RATIONAL_SQRT)
@@ -2433,9 +2505,10 @@ def audit_sqrt_digit_realization() -> tuple[int, int, int, int, int, int, int]:
         invariant_checks,
         strict_runs,
         repaired_runs,
-        prefix_loss_witnesses,
+        cross_program_s_without_identity_loss,
         algebraic_identity_survives,
         failed_literal_nonnegative_and_bound,
+        fixed_program_quotient_commutations,
     )
 
 
@@ -2739,8 +2812,11 @@ def audit_t42_handoff() -> tuple[int, int, int, int, int]:
         ),
         exact_context(),
     )
-    negative_rational_handoff = make_t42_coefficient_input(negative_rational_result)
-    assert negative_rational_handoff.coefficients == (-3, 1, 2)
+    assert negative_rational_result.termination == FINITE_TERMINATED
+    rational_rejection = must_raise(
+        ValueError,
+        lambda: make_t42_coefficient_input(negative_rational_result),
+    )
 
     negative_irrational_result = evaluate_query(
         RepresentationQuery(
@@ -2752,20 +2828,18 @@ def audit_t42_handoff() -> tuple[int, int, int, int, int]:
     )
     negative_irrational_handoff = make_t42_coefficient_input(negative_irrational_result)
     assert negative_irrational_handoff.coefficients == (-2, 1, 1) + (2,) * 9
-    assert all(
-        handoff.coefficients[0] < 0
-        and all(coefficient > 0 for coefficient in handoff.coefficients[1:])
-        for handoff in (negative_rational_handoff, negative_irrational_handoff)
-    )
+    assert negative_irrational_handoff.coefficients[0] < 0
+    assert all(coefficient > 0 for coefficient in negative_irrational_handoff.coefficients[1:])
+    assert negative_irrational_handoff.source_kind == IRRATIONAL_PREFIX
+    assert negative_irrational_handoff.orientation == NATURAL_SIMPLE_CF_PREFIX
     exact_coefficient_count = sum(
         len(handoff.coefficients)
         for handoff in (
             exact_handoff,
-            negative_rational_handoff,
             negative_irrational_handoff,
         )
     )
-    return 4, exact_coefficient_count, len(certified_handoff.coefficients), 2, 1
+    return 3, exact_coefficient_count, len(certified_handoff.coefficients), 1, rational_rejection
 
 
 def has_binary_float(value: object, seen: set[int] | None = None) -> bool:
@@ -3061,15 +3135,7 @@ def audit_hostile_validation() -> int:
             negative_cf.termination,
         ),
     )
-    rejected += must_raise(
-        ValueError,
-        lambda: T42CoefficientInput(
-            "0" * 64,
-            "1" * 64,
-            (-2, 0),
-            "complete_exact",
-        ),
-    )
+    rejected += must_raise(TypeError, lambda: T42CoefficientInput(object()))
 
     partial = evaluate_query(query, machin_context(3))
     rejected += must_raise(ValueError, lambda: make_t42_coefficient_input(partial))
@@ -3099,7 +3165,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "504ff639c122f74e969f43a86e3105b2b1c861c72c75297adec2f70dc9223126"
+EXPECTED_DIGEST = "1b24a9d0da60631d08adfdb5bd6e44139bebd31991f5d146e8e6197a616ee02e"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
@@ -3199,7 +3265,8 @@ def main() -> None:
         f"work_realizations=long_division_steps:{long_division[0]}/"
         f"remainder_commutations:{long_division[1]}/max_bits:{long_division[2]}; "
         f"sqrt_commutations:{sqrt_realization[0]}/invariants:{sqrt_realization[1]}/"
-        f"prefix_loss_5_4_vs_4_4:{sqrt_realization[4]}; "
+        f"cross_program_s_without_identity_loss:{sqrt_realization[4]}/"
+        f"fixed_program_s_quotient_commutations:{sqrt_realization[7]}; "
         f"sqrt_literal_identity_survives:{sqrt_realization[5]}/"
         f"nonnegative_bound_failures:{sqrt_realization[6]}; "
         f"Gauss_sources:{gauss[0]}/steps:{gauss[1]}/commutations:{gauss[2]}"

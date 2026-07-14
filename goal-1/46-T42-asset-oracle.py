@@ -691,6 +691,84 @@ def ledger() -> tuple[
     )
 
 
+def expect_assertion(operation: object) -> None:
+    assert callable(operation)
+    try:
+        operation()
+    except AssertionError:
+        return
+    raise AssertionError("hostile mutation was accepted")
+
+
+def verify_hostile_mutation_gates() -> tuple[int, int]:
+    """Prove byte and same-cardinality manifest mutations fail closed."""
+
+    asset_rejections = 0
+    for line, asset in ASSETS.items():
+        data = bytearray((SOURCE_ROOT / asset.physical).read_bytes())
+        mutation_index = len(data) // 2
+        data[mutation_index] ^= 0x01
+        expect_assertion(
+            lambda line=line, asset=asset, data=bytes(data):
+            verify_asset_bytes(line, asset, data)
+        )
+        asset_rejections += 1
+
+    manifest_rejections = 0
+    manifests = {
+        "source_guards": SOURCE_GUARDS,
+        "roles": ROLE_RECORDS,
+        "candidate_scopes": CANDIDATE_SCOPE_RECORDS,
+        "raster_boundary": RASTER_BOUNDARY_RECORDS,
+        "references": REFERENCE_RECORDS,
+        "trace_mechanics": TRACE_MECHANICS_RECORDS,
+    }
+    for name, records in manifests.items():
+        original = min(records)
+        mutated = (records - {original}) | {original + "\0mutated"}
+        assert len(mutated) == len(records)
+        assert digest_records(mutated) != EXPECTED_MANIFEST_DIGESTS[name]
+        manifest_rejections += 1
+
+    semantic_mutant = list(EXPECTED_ASSET_SEMANTIC_MANIFEST)
+    semantic_mutant[-1] = ("pixel_program_forbidden", False)
+    mutant_payload = json.dumps(
+        semantic_mutant, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    assert sha256(mutant_payload) != EXPECTED_ASSET_SEMANTIC_MANIFEST_SHA256
+    manifest_rejections += 1
+
+    native = ASSETS[1854]
+    digest_mutant = native._replace(digest="0" * 64)
+    native_data = (SOURCE_ROOT / native.physical).read_bytes()
+    expect_assertion(
+        lambda: verify_asset_bytes(1854, digest_mutant, native_data)
+    )
+    manifest_rejections += 1
+
+    trace_mutant = list(EXPECTED_ASSET_SEMANTIC_MANIFEST)
+    fixture_field = next(
+        index for index, field in enumerate(trace_mutant)
+        if field[0] == "fixtures"
+    )
+    fixtures = list(trace_mutant[fixture_field][1])
+    first = list(fixtures[0])
+    first[2] = (3,) + tuple(first[2][1:])
+    fixtures[0] = tuple(first)
+    trace_mutant[fixture_field] = ("fixtures", tuple(fixtures))
+    expect_assertion(lambda: replay_native_traces(tuple(trace_mutant)))
+    manifest_rejections += 1
+
+    partition_mutant = NATIVE_IMAGE_LINES | frozenset({12583})
+    assert partition_mutant != NATIVE_IMAGE_LINES
+    assert digest_lines(partition_mutant) != (
+        EXPECTED_IMAGE_ROLE_PARTITION["native"][1]
+    )
+    manifest_rejections += 1
+
+    return asset_rejections, manifest_rejections
+
+
 EXPECTED_IMAGE_ASSET_MANIFEST = (
     12,
     "881c5c67fbf2aa6eb6bc6b8b0417b77df0057e24d657e72a08aac4f58d8cd2f5",
@@ -710,6 +788,7 @@ EXPECTED_REFERENCE_METRICS = (12, 12, 24)
 EXPECTED_PHYSICAL_METRICS = (12, 12, 285_055)
 EXPECTED_PROFILE_METRICS = (12, 12)
 EXPECTED_DISPOSITION_METRICS = (1, 11, 0, 12, 0, 0)
+EXPECTED_HOSTILE_MUTATION_METRICS = (12, 10)
 
 
 IMAGE_ASSET_INTERFACE = (
@@ -732,6 +811,7 @@ def main() -> None:
     semantic_manifest = load_semantic_manifest()
     trace_digest, trace_metrics = replay_native_traces(semantic_manifest)
     payload, metrics, structural_digest, ordered_digest, profiles = ledger()
+    hostile_mutations = verify_hostile_mutation_gates()
     ledger_digest = sha256(payload.encode("utf-8"))
 
     assert ledger_digest == EXPECTED_LEDGER_SHA256, (
@@ -746,6 +826,7 @@ def main() -> None:
     )
     assert (metrics[2], metrics[2], metrics[3]) == EXPECTED_PHYSICAL_METRICS
     assert profiles == EXPECTED_PROFILE_METRICS
+    assert hostile_mutations == EXPECTED_HOSTILE_MUTATION_METRICS
     assert (
         len(NATIVE_IMAGE_LINES), len(RELATION_IMAGE_LINES),
         len(CONTROL_IMAGE_LINES), len(GOVERNED_IMAGE_LINES),
@@ -766,6 +847,8 @@ def main() -> None:
         f"native_trace=fixtures_{trace_metrics[0]}/events_{trace_metrics[1]}/"
         f"source_firings_{trace_metrics[2]}/children_{trace_metrics[3]}/"
         f"rule_icon_entries_{trace_metrics[4]}; "
+        f"mutation_gates=assets_{hostile_mutations[0]}/"
+        f"manifests_{hostile_mutations[1]}; "
         "pixel_inference=0; source_and_semantic_interfaces=PASS; "
         "unresolved_image_dispositions=0"
     )
