@@ -14,6 +14,7 @@ Status: **IN PROGRESS — FIRST-PRINCIPLES ARCHITECTURE RECONSTRUCTED; EVIDENCE 
 - T34 already owns the discrete `t+0D` singleton configuration, `UniqueScalar` frontier, self read, same-locus assignment, atomic update, exact scalar trace, and arbitrary-precision serialization responsibility. T35 adds closed integer predicate/expression data and validation, not a state, UPDATE, executor, or family branch.
 - T43's closed predicate/piecewise-expression syntax is reusable by responsibility, but T35 retains a typed exact-integer carrier and mechanically checked integer closure. A numeric union must not erase this invariant.
 - Conway fraction systems use ordered first-applicable selection, `First[Select[fracs n,IntegerQ,1]]` (`BOOK:18648-18664`). That is a separately tagged ordered unary RULE schema or compilation relation, not precedence semantics for canonical residue tables. The generic no-applicable outcome is not source-defined and must remain explicitly partial rather than silently called halt.
+- The main text's contrast with cellular automata is specifically that digit-level arithmetic is usually nonlocal (`BOOK:1531-1539`). It changes the native ALPHABET/configuration and NEIGHBORHOOD choice—a complete scalar read rather than a local digit stencil—not the shared SimpleProgram runner or execution algebra.
 
 ## Updated Assumptions
 
