@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 37 type stages are complete, no stage is reopened, and 8 later stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, and T26 are complete under D119-D132. T28 is the next stage.
+- Execution status at this sync is Foundation complete, 37 type stages are complete, no stage is reopened, T28 is in progress, and 7 later type stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, and T26 are complete under D119-D132.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -1059,13 +1059,15 @@ COMPLETE. The frozen Q00-Q29 source audit closes a 94-line query union at `67 pr
 
 ### 39-T28-CONTEXTUAL-2D-SUBSTITUTION
 
+Status: **IN PROGRESS** in `goal-1/39-T28-CONTEXTUAL-2D-SUBSTITUTION.md`.
+
 #### Big Picture Objective
 
 Combine 2D patch replacement with neighbor-dependent rule choice and boundary semantics.
 
 #### Detailed Implementation Plan
 
-Apply the common protocol, stressing alignment, overlapping context, orientation, and compositional reuse of T14 and T26 findings.
+Apply the common protocol, stressing the source's finite periodic two-dimensional grid, all-old-tile firing, immutable overlapping `2 x 2` contextual windows, closed pattern-to-patch choice, exact old-snapshot `Flatten2D` assembly, parent consumption, newborn deferral, and compositional reuse of T14's contextual-read result with T26's rank-two mosaic UPDATE. Audit the exact `Partition[list,{2,2},1,-1]` alignment and cyclic boundary rather than importing a menu of boundary policies. Keep raster-only rule rows, free geometry, sequential scanning, constraints, and arbitrary callbacks outside the strict construction unless primary evidence proves them.
 
 #### Completion Requirements
 
