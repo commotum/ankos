@@ -13,7 +13,7 @@ writes = RULE(active, reads)
 next   = UPDATE.apply(configuration, active, writes)  # StepResult[Configuration]
 ```
 
-DOMAIN is the task/program space with its dimensional character, support, and topology; ALPHABET is its label/value schema and may be a product or tagged union. FRONTIER selects rule-firing loci/occurrences/matches, RULE returns typed writes/replacements, and UPDATE returns one structured result containing zero, one, or many successor configurations plus typed outcome/event/witness data. These are axes of one branch-free runner, not family executors.
+DOMAIN is the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares the native support/topology that inhabits that DOMAIN plus structural invariants. ALPHABET is its label/value schema and may be a product or tagged union. FRONTIER selects rule-firing loci/occurrences/matches, RULE returns typed writes/replacements, and UPDATE returns one structured result containing zero, one, or many successor configurations plus typed outcome/event/witness data. These are axes of one branch-free runner, not family executors.
 
 Distinct source names or semantic roles do not imply distinct runtime classes. Prefer parameterizations, named roles, invariants, and lossless structural representations. For a claimed equivalence, require a complete-state map `e` with an explicit inverse on its invariant-valid image, one-step-granularity commuting successor sets, and no hidden source interpreter. Reject opaque whole-state packing, callbacks, lossy quotients, family dispatch, invented behavior, and altered schedules.
 

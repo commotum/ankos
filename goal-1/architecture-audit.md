@@ -6,7 +6,7 @@ Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); T06/T07/T08/T10 SUBSEQ
 
 T09/T12 and decisions D009-D014 were reopened because they promoted one state decomposition—separate `SingleControl`/`TransitionControl` records—into a semantic requirement. The completed audit covers every completed decision and every proposed state, control, frontier, neighborhood, rule result, update policy, executor, and runtime API extension. It updates affected stage files, the design ledger, the global plan, and Goal 2 handoffs before T06 resumes.
 
-In this audit, **DOMAIN** is the task/program's dimensional space together with its support/topology: `t+0D`, `t+1D`, `t+2D`, `t+3D`, and so on, with discreteness or continuity stated explicitly. The configuration labels or structures that space; DOMAIN itself is not restricted to a dense `Z^4` tensor. A tape alphabet, head-state set, scalar value set, parameter set, address set, or numeric representation is not a DOMAIN; those are ALPHABET/value-schema factors, keys, or profiles.
+In this audit, **DOMAIN** is the task/program's dimensional space: `t+0D`, `t+1D`, `t+2D`, `t+3D`, and so on, with discreteness or continuity stated explicitly. CONFIGURATION declares and labels or structures the native support/topology within that DOMAIN; a finite shape or dense `Z^4` tensor is only one possible realization. A tape alphabet, head-state set, scalar value set, parameter set, address set, or numeric representation is not a DOMAIN; those are ALPHABET/value-schema factors, keys, or profiles.
 
 ## Governing Simple-Program Algebra
 

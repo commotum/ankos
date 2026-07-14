@@ -11,6 +11,10 @@ from __future__ import annotations
 from itertools import product
 
 
+if not __debug__:
+    raise RuntimeError("T10 semantic verification requires assertions; do not run with -O")
+
+
 PLAIN = "plain"
 ACTIVE = "active"
 CONTEXTS = tuple(product((0, 1), repeat=3))
@@ -29,6 +33,22 @@ PAGE_73_RULE = {
     (0, 0, 1): ((1, 0, 1), 1),
     (0, 0, 0): ((1, 1, 1), 1),
 }
+
+EXPECTED_PAGE_73_TRACE = (
+    ((), 0),
+    ((-1, 0, 1), 1),
+    ((-1, 0, 2), 0),
+    ((-1, 1, 2), -1),
+    ((-1, 0, 1, 2), -2),
+    ((-3, -1, 0, 1, 2), -1),
+    ((-3, 1, 2), 0),
+    ((-3, -1, 1, 2), 1),
+    ((-3, -1), 2),
+    ((-3, -1, 1, 2, 3), 3),
+    ((-3, -1, 1, 2, 4), 2),
+    ((-3, -1, 1, 3, 4), 1),
+    ((-3, -1, 1, 2, 3, 4), 0),
+)
 
 
 def normalize_bits(bits: dict[int, int]) -> dict[int, int]:
@@ -83,6 +103,42 @@ def factored_step(
     return normalize_bits(successor), active + move
 
 
+def lower_result(
+    active: int,
+    result: tuple[tuple[int, int, int], int],
+) -> dict[int, tuple[str, int]]:
+    """Losslessly lower one native block/direction result to three label writes."""
+    replacement, move = result
+    assert replacement in OUTPUTS and move in MOVES
+    writes = {
+        active + offset: (PLAIN, value)
+        for offset, value in zip((-1, 0, 1), replacement)
+    }
+    writes[active + move] = (ACTIVE, replacement[move + 1])
+    return writes
+
+
+def unlower_result(
+    active: int,
+    writes: dict[int, tuple[str, int]],
+) -> tuple[tuple[int, int, int], int]:
+    """Recover the native result from a valid strict-T10 three-write bundle."""
+    assert set(writes) == {active - 1, active, active + 1}
+    assert all(tag in (PLAIN, ACTIVE) and value in (0, 1) for tag, value in writes.values())
+    tagged_offsets = tuple(
+        offset for offset in (-1, 0, 1) if writes[active + offset][0] == ACTIVE
+    )
+    assert len(tagged_offsets) == 1 and tagged_offsets[0] in MOVES
+    move = tagged_offsets[0]
+    assert writes[active][0] == PLAIN
+    assert all(
+        writes[active + offset][0] == (ACTIVE if offset == move else PLAIN)
+        for offset in (-1, 0, 1)
+    )
+    replacement = tuple(writes[active + offset][1] for offset in (-1, 0, 1))
+    return replacement, move  # type: ignore[return-value]
+
+
 def tagged_step(
     rule: dict[tuple[int, int, int], tuple[tuple[int, int, int], int]],
     cells: dict[int, tuple[str, int]],
@@ -101,12 +157,7 @@ def tagged_step(
 
     # All complete label writes are derived from the same old snapshot.  The
     # destination tag is attached to its NEW replacement value, not its old bit.
-    writes = {
-        active + offset: (PLAIN, value)
-        for offset, value in zip((-1, 0, 1), replacement)
-    }
-    destination = active + move
-    writes[destination] = (ACTIVE, replacement[move + 1])
+    writes = lower_result(active, (replacement, move))
     successor = dict(cells)
     successor.update(writes)
     return normalize_tagged(successor)
@@ -150,8 +201,14 @@ def assert_exhaustive_commutation() -> int:
                     rule = {candidate: ((0, 0, 0), -1) for candidate in CONTEXTS}
                     rule[context] = (replacement, move)
 
+                    lowered = lower_result(0, (replacement, move))
+                    assert unlower_result(0, lowered) == (replacement, move)
+                    encoded = encode(bits, 0)
+                    assert decode(encoded) == (normalize_bits(bits), 0)
+                    assert encode(*decode(encoded)) == encoded
+
                     factored_next = factored_step(rule, (bits, 0))
-                    tagged_next = tagged_step(rule, encode(bits, 0))
+                    tagged_next = tagged_step(rule, encoded)
                     assert tagged_next == encode(*factored_next)
 
                     next_bits, next_active = factored_next
@@ -207,19 +264,14 @@ def main() -> None:
     assert_destination_uses_new_value()
     assert_target_local_ca_needs_radius_two()
     trace = page_73_trace(12)
-    # A replayable checkpoint rather than an image-derived assertion.
-    assert trace[:5] == (
-        ((), 0),
-        ((-1, 0, 1), 1),
-        ((-1, 0, 2), 0),
-        ((-1, 1, 2), -1),
-        ((-1, 0, 1, 2), -2),
-    )
+    # A complete replayable t0..t12 fixture rather than an image-derived assertion.
+    assert trace == EXPECTED_PAGE_73_TRACE
     print(
         "T10 semantic oracle: PASS "
         f"({cases} exhaustive commutation cases; rule_space={16**8}; "
         f"derived_planes={derived_plane_codes(PAGE_73_RULE)}; "
-        f"page73_checkpoint={trace[:5]}; radius2_CA_witness=PASS)"
+        f"page73_t0_t12=PASS(last={trace[-1]}); lowering_inverse=PASS; "
+        f"radius2_CA_witness=PASS)"
     )
 
 
