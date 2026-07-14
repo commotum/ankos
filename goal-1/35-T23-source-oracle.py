@@ -51,7 +51,8 @@ EXPECTED_TAXONOMY_SHA256 = "4c30fe079b2fb8f69e4c8c0dde3d59065227d4224cbe4b7693a1
 # positional rules, views, class-4 presets, and the majority preset. Q08--Q12
 # deliberately search stochastic, realization/update, T24, and T44 seams.
 # Q13 closes T22/higher-dimensional aliases; Q14 symmetry/isotropy; Q15 the
-# actual-Index vocabulary independently; Q16 seeds; Q17 rule restrictions.
+# actual-Index vocabulary independently; Q16 seeds; Q17 rule restrictions;
+# Q18 freezes the hostile-review discovery under Localized structures.
 QUERIES = {
     "Q00": (
         r"\b(?:three[- ]dimensional|3D) cellular autom(?:aton|ata)\b|"
@@ -137,6 +138,7 @@ QUERIES = {
         r"\bTotalistic rules depend only on the total number\b|"
         r"\bGrowth totalistic rules make any cell\b"
     ),
+    "Q18": r"\bin three dimensions 949\b",
 }
 
 EXPECTED_QUERY = {
@@ -158,6 +160,7 @@ EXPECTED_QUERY = {
     "Q15": (14, 7, 7, "fdb8988f94a0be1c42c9b7101c42875162ba9d5897822b9f1f4f039f6c5cd682"),
     "Q16": (13, 13, 0, "739f4a67d856c2eda9317c087ea730a01a26afde7a15aa23eea374df628df6a0"),
     "Q17": (3, 3, 0, "3b69fa045d438628a80e2c906aea86cc5193774b0451ba0b1b6e3514d2cf7013"),
+    "Q18": (1, 0, 1, "70ed69b6f26f98cea25f99d53163821dc2d5535704c071950dcad20d7436040e"),
 }
 
 
@@ -243,7 +246,7 @@ EXCLUDED = frozenset().union(*EXCLUDED_CLASS.values())
 
 # The actual Index is routing vocabulary, never primary semantic evidence.
 INDEX_CLASS = {
-    "t23_routes": line_set("20910,20972,21068,21090,21231,21495,22262"),
+    "t23_routes": line_set("20910,20972,21068,21090,21231,21473,21495,22262"),
     "t22_t24_routes": line_set(
         "20918,21004,21170,21181,21243,21525,21934,22416"
     ),
@@ -264,9 +267,9 @@ INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
 EXPECTED_SOURCE_COUNT = 138
 EXPECTED_SOURCE_DIGEST = "92ce01dbf10875f7549f3eedb180a9001c72c588494247ec13d6b9f5d7160c07"
 EXPECTED_SET = {
-    "union": (150, "b83279b2f6d82400249fc77f20769d750c9de4de1075f771f7ef4808496ba823"),
+    "union": (151, "03268aed2534b66f807af417c006cf1a9209d195bc5d7f36d36b7a17134ae875"),
     "pre_index_union": (104, "6cc99039ed61f7e5c2566ebf71e9b0bc400637f5e1488452ee32d803f671afc5"),
-    "index": (46, "67050867d1c7b02f7e01ff622e0c85e75c5229845dcae40ec904bd08859bc41d"),
+    "index": (47, "739d429e33df93489ed54bfe36cbe013b498e7a11c53c27fd83a473d7478d22e"),
     "matched_retained": (72, "60b0151a40c057b0d457014835f118a2b3544ad982aa5c3a6492e304beceff13"),
     "governed_continuations": (66, "a34d522a306d42e688cfa8d10d41e790174db2e55bdf4feb607066c8d1ca8ab2"),
     "retained": (138, EXPECTED_SOURCE_DIGEST),
@@ -284,7 +287,7 @@ EXPECTED_EXCLUDED_CLASS = {
     "broad_rule_phrase": (1, "a398152fa8e559b07ad69683d6f51a0e9cefad1d0e0c495642fe10b2e1170417"),
 }
 EXPECTED_INDEX_CLASS = {
-    "t23_routes": (7, "f6d03c73bc527824ac93feb709cb6edd8b42a843f5defe462aa37a9bc39bc727"),
+    "t23_routes": (8, "0ac2b1e75d049571dbb00db4429524b6b2438c552f04a8fc5606b5c976799aa4"),
     "t22_t24_routes": (8, "cecc07d8175bcf5e02d59ce2708037b6a2300388ba047c5604a51961ab7381af"),
     "t44_routes": (17, "7228e9b0a3064f40151340dd5fb4fdde8cdcf21ec2688d88dac23ef2cc2289b1"),
     "stochastic_routes": (7, "9230116c0996408425cc17c1f92c7cad18e1a3da0f5b67f764714cb5a5886149"),
@@ -294,8 +297,8 @@ EXPECTED_INDEX_CLASS = {
 EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
-EXPECTED_SPLIT_QUERY = (150, "9e813db49902f6065332a9a212e6352aa537d4673d03c0887310890558429be5")
-EXPECTED_SPLIT_QUERY_EXACT = (141, "fcfa29b9c9b069dc2912f9b355f73ee8e4041c05284f91397882cc362791ccfe")
+EXPECTED_SPLIT_QUERY = (151, "c594bf08b9c675fc4693ce51dfe00513da4528b048c182e21fd4947e67b25413")
+EXPECTED_SPLIT_QUERY_EXACT = (142, "6de73915b6d70b5fdde2565e102706b6cb50896bf3d67d9d62a2495573558ba0")
 EXPECTED_SPLIT_QUERY_NONEXACT = (9, "2fe74b7de0c2013d050dee23c1b1da8a6c4441f1471ac1b5aea0110811fe4300")
 EXPECTED_SPLIT_QUERY_MAPPING_DIGEST = "941b3d82e0d98afe43c0140ce29adf798d0249f73b7be6220c002465b5b38256"
 EXPECTED_SPLIT_RETAINED_EXACT = (123, "ecb52f0ad759547f90ba7489c1a3e37ecd00ae8bc46f500f2a159eabfd8e989e")
@@ -437,6 +440,18 @@ def main() -> int:
         print(f"index_{name}", "OK" if good else "MISMATCH", *actual)
     ok &= index_ok
     print("unresolved_index", "OK" if index_ok else "MISMATCH", 0)
+
+    localized_route_ok = (
+        hits["Q18"] == {21473}
+        and 21473 in INDEX_CLASS["t23_routes"]
+        and "same in different 2D rules, 949" in at(21473)
+        and "in three dimensions 949" in at(21473)
+    )
+    ok &= localized_route_ok
+    print(
+        "localized_structures_3d_index_route",
+        "OK" if localized_route_ok else "MISMATCH", 21473,
+    )
 
     derived_images = {n for n in RETAINED if IMAGE_RE.fullmatch(at(n))}
     images_ok = derived_images == set(GOVERNED_IMAGE_LINES)

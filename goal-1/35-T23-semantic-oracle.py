@@ -251,8 +251,9 @@ class LocalAccess:
 
     def __post_init__(self) -> None:
         raw = require_tuple(self.components, "access components")
-        if sum(type(component) is SelfAccess for component in raw) != 1:
-            raise ValueError("local access must declare Self exactly once")
+        self_count = sum(type(component) is SelfAccess for component in raw)
+        if self_count > 1:
+            raise ValueError("local access cannot declare duplicate Self")
         offsets: list[Offset] = []
         dimension: int | None = None
         for component in raw:
@@ -271,12 +272,19 @@ class LocalAccess:
             raise ValueError("offsets must be unique")
 
     @property
-    def self_position(self) -> int:
+    def self_position(self) -> int | None:
         return next(
-            index
-            for index, component in enumerate(self.components)
-            if type(component) is SelfAccess
+            (
+                index
+                for index, component in enumerate(self.components)
+                if type(component) is SelfAccess
+            ),
+            None,
         )
+
+    @property
+    def has_self(self) -> bool:
+        return self.self_position is not None
 
     @property
     def offsets(self) -> tuple[Offset, ...]:
@@ -295,33 +303,50 @@ class LocalAccess:
         return len(self.offsets)
 
 
-def make_access(offsets: tuple[Offset, ...], self_position: int) -> LocalAccess:
+def make_access(
+    offsets: tuple[Offset, ...], self_position: int | None
+) -> LocalAccess:
     raw = require_tuple(offsets, "offsets")
-    position = require_int(self_position, "Self position")
-    if position < 0 or position > len(raw):
-        raise ValueError("Self position is outside the schema")
     components: list[AccessComponent] = [OffsetAccess(offset) for offset in raw]
-    components.insert(position, SelfAccess())
+    if self_position is not None:
+        position = require_int(self_position, "Self position")
+        if position < 0 or position > len(raw):
+            raise ValueError("Self position is outside the schema")
+        components.insert(position, SelfAccess())
     return LocalAccess(tuple(components))
 
 
 @dataclass(frozen=True)
 class LocalRead:
-    center: int
+    center: int | None
     neighbors: tuple[int, ...]
 
     def __post_init__(self) -> None:
-        require_int(self.center, "center value")
+        if self.center is not None:
+            require_int(self.center, "center value")
         raw = require_tuple(self.neighbors, "neighbor values")
         for value in raw:
             require_int(value, "neighbor value")
 
 
-def validate_read(read: LocalRead, alphabet_size: int, slots: int) -> None:
+def validate_read(
+    read: LocalRead,
+    alphabet_size: int,
+    slots: int,
+    *,
+    require_self: bool,
+) -> None:
     if type(read) is not LocalRead:
         raise TypeError("rule input must be LocalRead")
     alphabet = FiniteAlphabet(alphabet_size)
-    alphabet.check(read.center, "center value")
+    if type(require_self) is not bool:
+        raise TypeError("require_self must be an exact bool")
+    if require_self:
+        if read.center is None:
+            raise ValueError("rule input is missing required Self")
+        alphabet.check(read.center, "center value")
+    elif read.center is not None:
+        raise ValueError("shell-only rule input must omit Self")
     if len(read.neighbors) != slots:
         raise ValueError("wrong neighbor arity")
     for value in read.neighbors:
@@ -350,6 +375,16 @@ def count_product_case_count(profile: str, dimension: int, alphabet_size: int) -
     if slots is None:
         raise ValueError("profile must be axes or full")
     return alphabet.size * (slots * (alphabet.size - 1) + 1)
+
+
+def complete_context_case_count(profile: str, dimension: int, alphabet_size: int) -> int:
+    if type(profile) is not str:
+        raise TypeError("profile must be an exact str")
+    alphabet = FiniteAlphabet(alphabet_size)
+    slots = axes_slots(dimension) if profile == "axes" else full_slots(dimension) if profile == "full" else None
+    if slots is None:
+        raise ValueError("profile must be axes or full")
+    return alphabet.size ** (slots + 1)
 
 
 class LocalRule(Protocol):
@@ -386,7 +421,13 @@ class CountProductRule:
         object.__setattr__(self, "neighbor_slots", slots)
 
     def evaluate(self, read: LocalRead) -> int:
-        validate_read(read, self.alphabet_size, self.neighbor_slots)
+        validate_read(
+            read,
+            self.alphabet_size,
+            self.neighbor_slots,
+            require_self=True,
+        )
+        assert read.center is not None
         return self.outputs[read.center + self.alphabet_size * sum(read.neighbors)]
 
 
@@ -417,7 +458,12 @@ class ShellCountRule:
         object.__setattr__(self, "neighbor_slots", slots)
 
     def evaluate(self, read: LocalRead) -> int:
-        validate_read(read, self.alphabet_size, self.neighbor_slots)
+        validate_read(
+            read,
+            self.alphabet_size,
+            self.neighbor_slots,
+            require_self=False,
+        )
         return self.outputs[sum(read.neighbors)]
 
 
@@ -441,7 +487,13 @@ class GeneralLookup:
             alphabet.check(value, "lookup output")
 
     def evaluate(self, read: LocalRead) -> int:
-        validate_read(read, self.alphabet_size, self.neighbor_slots)
+        validate_read(
+            read,
+            self.alphabet_size,
+            self.neighbor_slots,
+            require_self=True,
+        )
+        assert read.center is not None
         return self.outputs[context_index((read.center, *read.neighbors), self.alphabet_size)]
 
 
@@ -463,7 +515,13 @@ class ProjectionRule:
             raise ValueError("selected position is out of range")
 
     def evaluate(self, read: LocalRead) -> int:
-        validate_read(read, self.alphabet_size, self.neighbor_slots)
+        validate_read(
+            read,
+            self.alphabet_size,
+            self.neighbor_slots,
+            require_self=True,
+        )
+        assert read.center is not None
         return read.center if self.selected == -1 else read.neighbors[self.selected]
 
 
@@ -492,6 +550,11 @@ class CAProgram:
             raise ValueError("rule and alphabet disagree")
         if self.neighborhood.slots != self.rule.neighbor_slots:
             raise ValueError("rule and neighborhood arities disagree")
+        if type(self.rule) is ShellCountRule:
+            if self.neighborhood.has_self:
+                raise ValueError("shell-only rule access must omit Self")
+        elif not self.neighborhood.has_self:
+            raise ValueError("product/positional rule access requires Self")
         if type(self.rule) in (CountProductRule, ShellCountRule):
             if self.neighborhood.dimension != self.rule.dimension:
                 raise ValueError("profile and neighborhood dimensions disagree")
@@ -571,7 +634,11 @@ def read_local(
             else old.value_at(add_coord(handle.coord, component.offset))
             for component in neighborhood.components
         )
-        center = declared[neighborhood.self_position]
+        center = (
+            None
+            if neighborhood.self_position is None
+            else declared[neighborhood.self_position]
+        )
         neighbors = tuple(
             value
             for component, value in zip(neighborhood.components, declared, strict=True)
@@ -699,22 +766,31 @@ RUNTIME_FULL_OFFSETS: tuple[Offset, ...] = tuple(
 )
 RUNTIME_FACE_ACCESS = make_access(RUNTIME_FACE_OFFSETS, self_position=3)
 RUNTIME_FULL_ACCESS = make_access(RUNTIME_FULL_OFFSETS, self_position=13)
+RUNTIME_FACE_SHELL_ACCESS = make_access(RUNTIME_FACE_OFFSETS, self_position=None)
+RUNTIME_FULL_SHELL_ACCESS = make_access(RUNTIME_FULL_OFFSETS, self_position=None)
 
 
-def access_for_profile(profile: str, dimension: int = 3) -> LocalAccess:
+def access_for_profile(
+    profile: str, dimension: int = 3, *, include_self: bool = True
+) -> LocalAccess:
     if type(profile) is not str:
         raise TypeError("profile must be an exact str")
+    if type(include_self) is not bool:
+        raise TypeError("include_self must be an exact bool")
     checked = require_int(dimension, "dimension")
     if checked <= 0:
         raise ValueError("dimension must be positive")
     if checked == 3 and profile == "axes":
-        return RUNTIME_FACE_ACCESS
+        return RUNTIME_FACE_ACCESS if include_self else RUNTIME_FACE_SHELL_ACCESS
     if checked == 3 and profile == "full":
-        return RUNTIME_FULL_ACCESS
+        return RUNTIME_FULL_ACCESS if include_self else RUNTIME_FULL_SHELL_ACCESS
     offsets = axis_offsets(checked) if profile == "axes" else cube_offsets(checked) if profile == "full" else None
     if offsets is None:
         raise ValueError("profile must be axes or full")
-    return make_access(offsets, self_position=len(offsets) // 2)
+    return make_access(
+        offsets,
+        self_position=len(offsets) // 2 if include_self else None,
+    )
 
 
 def axis_offsets(dimension: int) -> tuple[Offset, ...]:
@@ -747,7 +823,11 @@ def program_for(rule: Rule, access: LocalAccess | None = None) -> CAProgram:
     if access is None:
         if type(rule) not in (CountProductRule, ShellCountRule):
             raise ValueError("non-profile rules require explicit access")
-        access = access_for_profile(rule.profile, rule.dimension)
+        access = access_for_profile(
+            rule.profile,
+            rule.dimension,
+            include_self=type(rule) is CountProductRule,
+        )
     return CAProgram(FiniteAlphabet(rule.alphabet_size), access, rule)
 
 
@@ -1056,6 +1136,9 @@ def named_count_code(predicate: object, neighbor_slots: int) -> int:
 
 
 NAMED_CODES: tuple[tuple[str, str, int], ...] = (
+    # BOOK:2256,2262,13632,14263,19588 supply predicates/triples.  These
+    # integers are derived below under the declared least-significant-case
+    # convention; they are not printed source rule numbers.
     ("face_any_neighbor", "axes", 16_380),
     ("face_exactly_one", "axes", 12),
     ("full_exactly_one", "full", 12),
@@ -1065,6 +1148,17 @@ NAMED_CODES: tuple[tuple[str, str, int], ...] = (
     ("life3d_5_7_6", "full", 47_104),
     ("life3d_4_5_5", "full", 3_584),
     ("life3d_5_6_5", "full", 11_264),
+)
+
+SOURCE_SEED_DESCRIPTORS: tuple[tuple[str, str], ...] = (
+    # BOOK:2256,2262 and BOOK:13632.  The latter's "rather than" identifies
+    # the 3x1x1 control for the displayed 3x3x1 exact-three variant.
+    ("face_any_neighbor", "single_black_cell"),
+    ("face_exactly_one", "single_black_cell"),
+    ("full_exactly_one", "single_black_cell"),
+    ("full_exactly_two", "3x1x1_black_block"),
+    ("full_exactly_three", "3x1x1_black_block"),
+    ("full_exactly_three_projection_variant", "3x3x1_black_block"),
 )
 
 
@@ -1185,6 +1279,7 @@ class SymbolicCompleteMap:
                 LocalRead(checked[0], checked[1:]),
                 self.compact.alphabet_size,
                 self.compact.neighbor_slots,
+                require_self=True,
             )
             self.compact.alphabet_size
             FiniteAlphabet(self.compact.alphabet_size).check(output, "override output")
@@ -1199,7 +1294,12 @@ class SymbolicCompleteMap:
     def evaluate_context(self, context: tuple[int, ...]) -> int:
         raw = require_tuple(context, "complete context")
         read = LocalRead(raw[0], raw[1:])
-        validate_read(read, self.compact.alphabet_size, self.compact.neighbor_slots)
+        validate_read(
+            read,
+            self.compact.alphabet_size,
+            self.compact.neighbor_slots,
+            require_self=True,
+        )
         for key, output in self.overrides:
             if raw == key:
                 return output
@@ -1385,7 +1485,10 @@ def sparse_step(program: CAProgram, old: SparseField) -> SparseField:
         raise ValueError("sparse program and field alphabets differ")
     if program.neighborhood.dimension != old.dimension:
         raise ValueError("sparse program and field dimensions differ")
-    uniform = LocalRead(old.background, (old.background,) * program.neighborhood.slots)
+    uniform = LocalRead(
+        old.background if program.neighborhood.has_self else None,
+        (old.background,) * program.neighborhood.slots,
+    )
     next_background = program.rule.evaluate(uniform)
     candidates: set[Coord] = set()
     for coord, _value in old.entries:
@@ -1395,7 +1498,7 @@ def sparse_step(program: CAProgram, old: SparseField) -> SparseField:
     next_entries: list[tuple[Coord, int]] = []
     for coord in sorted(candidates):
         read = LocalRead(
-            old.value_at(coord),
+            old.value_at(coord) if program.neighborhood.has_self else None,
             tuple(old.value_at(add_coord(coord, offset)) for offset in program.neighborhood.offsets),
         )
         value = program.rule.evaluate(read)
@@ -1442,7 +1545,13 @@ def assert_source_profiles_and_formulas() -> dict[str, int]:
             assert shell_count_case_count("full", dimension, alphabet_size) == full_shell
             assert count_product_case_count("axes", dimension, alphabet_size) == alphabet_size * axes_shell
             assert count_product_case_count("full", dimension, alphabet_size) == alphabet_size * full_shell
-            formula_cases += 4
+            assert complete_context_case_count(
+                "axes", dimension, alphabet_size
+            ) == alphabet_size ** (2 * dimension + 1)
+            assert complete_context_case_count(
+                "full", dimension, alphabet_size
+            ) == alphabet_size ** (3**dimension)
+            formula_cases += 6
 
     assert shell_count_case_count("axes", 3, 2) == 7
     assert count_product_case_count("axes", 3, 2) == 14
@@ -1452,6 +1561,16 @@ def assert_source_profiles_and_formulas() -> dict[str, int]:
     assert count_product_case_count("axes", 3, 3) == 39
     assert shell_count_case_count("full", 3, 3) == 53
     assert count_product_case_count("full", 3, 3) == 159
+    assert complete_context_case_count("axes", 3, 2) == 128
+    assert complete_context_case_count("full", 3, 2) == 134_217_728
+    assert SOURCE_SEED_DESCRIPTORS == (
+        ("face_any_neighbor", "single_black_cell"),
+        ("face_exactly_one", "single_black_cell"),
+        ("full_exactly_one", "single_black_cell"),
+        ("full_exactly_two", "3x1x1_black_block"),
+        ("full_exactly_three", "3x1x1_black_block"),
+        ("full_exactly_three_projection_variant", "3x3x1_black_block"),
+    )
 
     predicates = {
         "face_any_neighbor": lambda center, count: int(count > 0),
@@ -1507,6 +1626,7 @@ def assert_source_profiles_and_formulas() -> dict[str, int]:
         "formula_cases": formula_cases,
         "binary_face_contexts": binary_face_contexts,
         "ternary_face_contexts": ternary_face_contexts,
+        "source_seed_descriptors": len(SOURCE_SEED_DESCRIPTORS),
     }
 
 
@@ -1514,7 +1634,9 @@ def assert_ignore_self_factor() -> dict[str, int]:
     face_signatures = 0
     for code in range(1 << 7):
         shell = binary_shell_rule("axes", code)
-        assert factor_product_to_shell(expand_shell_to_product(shell)) == shell
+        product_rule = expand_shell_to_product(shell)
+        assert factor_product_to_shell(product_rule) == shell
+        assert factor_product_to_shell(factor_face(expand_face(product_rule))) == shell
         face_signatures += 1
 
     full_bases = (
@@ -1523,7 +1645,11 @@ def assert_ignore_self_factor() -> dict[str, int]:
         *(binary_shell_rule("full", 1 << index) for index in range(27)),
     )
     for shell in full_bases:
-        assert factor_product_to_shell(expand_shell_to_product(shell)) == shell
+        product_rule = expand_shell_to_product(shell)
+        assert factor_product_to_shell(product_rule) == shell
+        assert factor_product_to_shell(
+            factor_symbolic(expand_symbolic(product_rule))
+        ) == shell
 
     valid = expand_shell_to_product(binary_shell_rule("axes", 0))
     broken_outputs = list(valid.outputs)
@@ -1752,7 +1878,11 @@ def assert_native_generic_commutation() -> dict[str, int]:
         ),
     )
     for name, _rule in named_rules():
-        fixtures[name] = line_three if name == "full_exactly_two" else single
+        fixtures[name] = (
+            line_three
+            if name in ("full_exactly_two", "full_exactly_three")
+            else single
+        )
     for name, rule in named_rules():
         native = fixtures[name]
         assert decode_generic(generic_step(program_for(rule), encode_native(native))) == native_count_step(
@@ -1988,7 +2118,7 @@ def assert_same_runner_across_t21_t22_t23() -> None:
 def dyadaxes_3d_summary(read: LocalRead) -> tuple[int, bool, bool]:
     """Current src/ca summary: Self, face majority, other at-least-ten."""
 
-    validate_read(read, 2, 26)
+    validate_read(read, 2, 26, require_self=True)
     by_offset = dict(zip(RUNTIME_FULL_OFFSETS, read.neighbors, strict=True))
     face_count = sum(by_offset[offset] for offset in RUNTIME_FACE_OFFSETS)
     other_count = sum(
@@ -2034,8 +2164,8 @@ def assert_dyadaxes_information_loss() -> dict[str, int]:
 RUNTIME_GAP_MATRIX: tuple[tuple[str, str, str], ...] = (
     (
         "src/ca/alphabets.py",
-        "reuse",
-        "finite value/rank schema already admits binary, k-color, product, and tagged values",
+        "reuse for T23 / broader gap",
+        "boolean/int-range/symbolic cover T23 finite labels; Value excludes product/tagged values and has no composite constructor",
     ),
     (
         "src/ca/loci.py",
@@ -2323,6 +2453,11 @@ def main() -> None:
         "d3k2=7/14_axes,27/54_full; d3k3=13/39_axes,53/159_full"
     )
     print(
+        "complete_positional_formulas="
+        "axes_context_rows=k^(2d+1),axes_rules=k^(k^(2d+1));"
+        "full_context_rows=k^(3^d),full_rules=k^(k^(3^d))"
+    )
+    print(
         "local_context_checks="
         f"binary_face:{source_counts['binary_face_contexts']},"
         f"ternary_face:{source_counts['ternary_face_contexts']}"
@@ -2375,8 +2510,17 @@ def main() -> None:
     )
     print(
         "derived_canonical_codes_under_index_self+2*shell_count="
-        "16380,12,16256,12,48,192,47104,3584,11264; "
+        "face_any:16380,face_exact1:12,full_exact1:12,full_exact2:48,"
+        "full_exact3:192,face_self_plus_six_majority:16256,"
+        "Life3D:47104/3584/11264; "
         "not_source_given_rule_numbers"
+    )
+    print(
+        "source_seed_descriptors="
+        f"{source_counts['source_seed_descriptors']}; "
+        "single_cell(face_any,face_exact1,full_exact1),"
+        "3x1x1(full_exact2,full_exact3),3x3x1(full_exact3_projection_variant); "
+        "class4_exact_seed_not_in_text"
     )
     print(
         "fiber_multiplicity="
@@ -2394,9 +2538,9 @@ def main() -> None:
     )
     print(
         "runtime_audit="
-        "rank3_loci+6/26_access+boundaries+views_reusable; "
+        "finite_scalar_alphabet+rank3_loci+6/26_access+boundaries+views_reusable; "
         "gaps=family_branches,schema_tables,bigint_rule_ids; "
-        "dyadaxes_is_lossy_preset"
+        "broader_composite_alphabet_gap=product/tagged; dyadaxes_is_lossy_preset"
     )
     print("T21_T22_T23_same_runner=PASS; new_UPDATE=NONE; family_executor=NONE")
     print("exact_type_and_opaque_snapshot_validation=PASS")
