@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 29 type stages are complete, no stage is in progress or reopened, and 16 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, and T14 subsequently close under active D119-D124.
+- Execution status at this sync is Foundation complete, 29 type stages are complete, T15 is in progress, no stage is reopened, and 15 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, and T14 subsequently close under active D119-D124.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -894,6 +894,8 @@ All T14 evidence is captured; boundary and context semantics are explicit; Goal 
 COMPLETE. The 308-line source audit, 22-asset fixed point, direct page-85 rules/seeds/traces, open-right boundary, empty/singleton behavior, 164,592-case generic commuting proof, 4,080 singleton-output relation proof, snapshot-bound handle adversary, architecture audit, Goal 2 handoff, and global integration are closed. T14 parameterizes the shared ordered-generation construction with `HasRightNeighbor`, `(Self,Right)`, and `Sigma^2 -> Sigma+`; it adds no UPDATE algebra or executor. Independent hostile review is clean after its status, handle-scope, and raster-wording findings were repaired. All root/`/tmp`/optimized-mode, Markdown, diff, scope, coverage, and 102-test gates pass. No prior stage reopens. Next: T15.
 
 ### 31-T15-CREATION-DESTRUCTION
+
+Status: **IN PROGRESS — EXHAUSTIVE SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN** in `goal-1/31-T15-CREATION-DESTRUCTION.md`.
 
 #### Big Picture Objective
 
