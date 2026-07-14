@@ -1,6 +1,6 @@
 # 36-T24-HIGHERDIM-CA
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS CLOSED; HOSTILE REVIEW OPEN**
+Status: **IN PROGRESS — REPAIRED SOURCE CLOSED; ASSET/SEMANTIC GATES AND FINAL HOSTILE REVIEW OPEN**
 
 ## Current Facts
 
@@ -53,11 +53,11 @@ The source oracle independently guards the arbitrary-dimensional formulas and po
 
 ## Source-Bound Asset Audit
 
-`36-T24-asset-oracle.py` applies one nonrecursive radius-four source-proximity pass to the full retained evidence set. This produces a bounded 22-plate candidate universe, not an iterative fixed point. It partitions without remainder into eleven governed and eleven separately ledgered adjacency-only plates.
+`36-T24-asset-oracle.py` applies one nonrecursive radius-four source-proximity pass to the repaired full retained evidence set. This produces a bounded 36-plate candidate universe, not an iterative fixed point. It partitions without remainder into eleven governed and 25 separately ledgered adjacency-only plates.
 
-The governed set contains six native plates—dimensional arrangements, hexagonal any-neighbor growth, the hexagonal exact-one snowflake rule, the alternative-lattice/Voronoi-neighbor plate, pentagonal code `4094`, and Penrose code `254`—plus two relation plates for Penrose construction and Voronoi geometry, and three structural/sequential-network controls. The adjacency-only set partitions as `2 structural-network / 1 natural observer / 4 other CA / 1 substitution / 1 network observer / 1 static geometry / 1 sequential CA` plates.
+The governed set contains six native plates—dimensional arrangements, hexagonal any-neighbor growth, the hexagonal exact-one snowflake rule, the alternative-lattice/Voronoi-neighbor plate, pentagonal code `4094`, and Penrose code `254`—plus two relation plates for Penrose construction and Voronoi geometry, and three structural/sequential-network controls. The adjacency-only set partitions as `2 structural-network / 1 natural observer / 9 other CA / 1 substitution / 1 network observer / 1 static geometry / 1 sequential CA / 3 slice view / 3 physics observer / 3 static-network geometry` plates.
 
-Every candidate has one monolith and one split reference, giving 44 references, 22 physical files, and 22 unique hashes. Six source-bound transcript records keep nearby source-stated claims and code labels separate from explicitly marked code-semantic derivations. The transcript digest is `883f86d4ec52345e1dc0be35b7e4a33abd91d49d29b179c84057657b2021a23a`. The honest boundary is `HASH_BOUND=22 / TRANSCRIBED=6 / PIXEL_REPLAYED=0`. The fixed-network CA evidence is text-only. No plate supplies a complete Penrose, pentagonal, crystal, or network topology; no missing seed, horizon, boundary, renderer, or trace is reconstructed from pixels. Root and relocated runs/imports pass, optimized mode fails closed, explicit compilation passes, and no candidate remains unresolved.
+Every candidate has one monolith and one split reference, giving 72 references, 36 physical files, and 36 unique hashes. Six source-bound transcript records keep nearby source-stated claims and code labels separate from explicitly marked code-semantic derivations. The transcript digest is `883f86d4ec52345e1dc0be35b7e4a33abd91d49d29b179c84057657b2021a23a`. The honest boundary is `HASH_BOUND=36 / TRANSCRIBED=6 / PIXEL_REPLAYED=0`. The fixed-network CA evidence is text-only. No plate supplies a complete Penrose, pentagonal, crystal, or network topology; no missing seed, horizon, boundary, renderer, or trace is reconstructed from pixels. The root oracle passes; portability/fail-closed/import/compile gates are being finalized, and no candidate remains unresolved.
 
 ## Primary Book Evidence
 
@@ -85,7 +85,7 @@ Every candidate has one monolith and one split reference, giving 44 references, 
 
 - `BOOK:13746-13756` relates Penrose support to substitution/projection from five dimensions; it does not replace the native fixed tiling by a five-dimensional CA step.
 - `BOOK:15293,15467-15487` supplies lattice-isotropy and Voronoi geometry relations. Neither defines a RULE or a mandatory geometry solver.
-- `BOOK:13835-13919` separates topology-changing network systems and per-node random Boolean rules from fixed-network label evolution. `BOOK:16446` separates sequential update from the strict snapshot-parallel schedule.
+- `BOOK:13835-13919` separates topology-changing network systems from fixed-network label evolution. Random Boolean networks differ at program generation: each node's closed rule is sampled at setup. Once those per-node tables are visible and fixed, their execution is the same fixed-incidence label-update event through a finite site-indexed RULE bank; the ensemble provenance does not authorize runtime RNG or a family executor. `BOOK:16446` separates sequential update from the strict snapshot-parallel schedule.
 - `BOOK:11063-11065` describes unrestricted function/time-dependent built-in forms. They are controls, not authorization for callbacks in the closed SimpleProgram RULE algebra.
 
 ## Independent Semantic Oracle
@@ -198,7 +198,7 @@ The common runner indexes these declarations by the visible finite tag. It never
 - **Control:** none. Neither lattice identity, dimension, basis, site kind, nor port order is step control.
 - **FRONTIER:** `AllSites(V)`, with topology-generic site enumeration. A finite work region is a realization of this native selection, not a distinct frontier law.
 - **NEIGHBORHOOD:** finite old-snapshot incidence occurrences. A Bravais/hypercubic profile uses declared semantic offset slots. A finite-motif tiling uses kind-indexed port/offset data. A nonperiodic tiling or abstract network uses explicit immutable incidence. Labeled incidence is canonicalized against a declared finite slot schema before exposing a positional tuple; storage row order is never semantic. The strict unlabeled fixed-network restriction exposes only the exact numeric total across the declared local positions, including one explicit Self. The executable Notes profile separately declares positional `(Above, Self, Below)` slots. Parallel edges and quotient aliases remain separate read occurrences before aggregation.
-- **RULE:** a closed total finite table over the declared local-read schema. Positional, totalistic, outer-totalistic, and certified symmetry-orbit tables remain distinct schema-tagged representations. A finite dependent sum over `site_kind` is closed table data, not a callback or construction branch.
+- **RULE:** a closed total finite table over the declared local-read schema. Positional, totalistic, outer-totalistic, and certified symmetry-orbit tables remain distinct schema-tagged representations. A finite dependent sum over `site_kind` or a finite visible site-indexed table bank is closed program data, not a callback or construction branch. Random setup may produce such a bank, but stepping never samples it again.
 - **Writes:** exactly one compatible `AssignLabel(source, value)` per active old site.
 - **UPDATE:** the existing fixed-support same-site snapshot-parallel assignment. Topology and site kinds are unchanged; every read is from the old label snapshot.
 - **Successor/outcome:** one deterministic successor per valid event, including unchanged fixed points. No source evidence gives native halt, failure, branching, or topology mutation.
@@ -256,7 +256,7 @@ The smallest implementation set is:
 2. Generic typed site references/coordinate tuples with explicit lossless codecs.
 3. Immutable fixed-topology data containing site enumeration, incidence occurrences, optional finite site kinds, and optional declared semantic slot schemas; storage order is nonsemantic.
 4. Topology-aware `AllSites` and closed finite access schemas indexed by site kind.
-5. Closed positional, inclusive exact-totalistic, outer-totalistic `Self x NeighborValueSum`, symmetry-orbit, and finite dependent-sum RULE representations; histogram/multiset aggregation is not attributed to the unlabeled-network source restriction.
+5. Closed positional, inclusive exact-totalistic, outer-totalistic `Self x NeighborValueSum`, symmetry-orbit, finite kind-dependent, and finite site-indexed RULE representations; histogram/multiset aggregation is not attributed to the unlabeled-network source restriction, and stochastic program generation remains provenance outside the step.
 6. The existing typed same-site label write and snapshot-parallel UPDATE unchanged.
 7. Arbitrary-width exact table keys and codecs.
 8. Separate finite realization, basis/motif, embedding, and view adapters with explicit inverses or stated one-way observer status.
@@ -298,4 +298,4 @@ No completed stage reopens on the architecture evidence. T21-T23 remain strict f
 
 ## Stage Results
 
-Source, asset, semantic, and architecture audits are closed under D130. Root and relocated oracle runs, optimized fail-closed guards, silent imports, explicit compilation, Markdown fence parity, `git diff --check`, Goal-1 scope, and 102 repository tests pass. Independent hostile review and final global status synchronization remain open.
+The repaired source audit is closed. The expanded asset universe and strengthened semantic oracle are at green local checkpoints but still need their portability/fail-closed/import/compile gates and a fresh final hostile pass. D130 and global status synchronization therefore remain provisional.

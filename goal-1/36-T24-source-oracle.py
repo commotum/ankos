@@ -6,9 +6,10 @@ separates the Book's arbitrary-dimensional and fixed-incidence cellular-
 automaton mechanics from geometric representations, observers, cross-reference
 routes, and structurally evolving network systems.  The architectural result
 is intentionally narrower than the source collection: dimension, fixed
-topology/incidence, ordered finite access, and closed rule data are candidate
-parameters of the shared SimpleProgram event; this oracle does not manufacture
-a T24 executor from the catalog name.
+topology/incidence, ordered finite access, and closed rule data--including a
+visible site-indexed rule bank sampled during setup--are candidate parameters
+of the shared SimpleProgram event; this oracle does not manufacture a T24
+executor from the catalog name.
 """
 
 from __future__ import annotations
@@ -55,10 +56,12 @@ EXPECTED_TAXONOMY_SHA256 = "4c30fe079b2fb8f69e4c8c0dde3d59065227d4224cbe4b7693a1
 # expose broad tessellation/honeycomb, slice, and embedding vocabulary so views
 # and lexical collisions remain visible. Q25 follows the fixed-network Cayley
 # cross-reference, and Q26 closes the random-Boolean-network variant/history
-# and its dense actual-Index routes. Q27 independently guards the Bravais and
-# Brillouin-zone actual-Index route used by the basis-coordinate handoff. Q28
-# gives every dense mixed line an independent T24 occurrence, and Q29 closes
-# the Graphs/Networks index entries for fixed-incidence cellular automata.
+# and its dense actual-Index routes.  Its randomness selects per-node tables at
+# setup; a sampled visible bank is still closed fixed-incidence rule data. Q27
+# independently guards the Bravais and Brillouin-zone actual-Index route used
+# by the basis-coordinate handoff. Q28 gives every dense mixed line an
+# independent T24 occurrence, and Q29 closes the Graphs/Networks index entries
+# for fixed-incidence cellular automata.
 QUERIES = {
     "Q00": r"\bhigher[- ]dimensional cellular automata\b",
     "Q01": (
@@ -333,8 +336,10 @@ RELATION_EVIDENCE = line_set(
 
 # Controls make representation and execution boundaries explicit: finite/crop
 # realization, unrestricted function/time dependence, stochastic/continuous
-# values, topology rewriting, per-node random rules, sequential scheduling, and
-# alternating block updates are not smuggled into strict T24.
+# values, topology rewriting, random rule-bank generation/ensemble provenance,
+# sequential scheduling, and alternating block updates are not smuggled into
+# strict T24.  Once sampled into visible finite per-node tables, however, a
+# Boolean rule bank uses the same fixed-incidence snapshot event.
 CONTROL_EVIDENCE = line_set(
     "2018,2202,2204,2206,2372,2426,2464,2910,2912,2918,2930,5334,"
     "6376,11037,11063-11065,11077,11079-11087,11090,"
@@ -563,6 +568,28 @@ def full_offsets(dimension: int) -> tuple[tuple[int, ...], ...]:
 def aggregate_rule(code: int, aggregate: int) -> int:
     """Decode the Book's binary aggregate-table convention at one input."""
     return (code >> aggregate) & 1
+
+
+def sampled_site_rule_step(
+    state: tuple[int, ...],
+    incidence: tuple[tuple[int, ...], ...],
+    rule_bank: tuple[tuple[int, ...], ...],
+) -> tuple[int, ...]:
+    """Apply visible per-site Boolean tables from one old snapshot."""
+
+    assert state and len(state) == len(incidence) == len(rule_bank)
+    assert all(value in (0, 1) for value in state)
+    assert all(
+        sources
+        and all(0 <= source < len(state) for source in sources)
+        and len(table) == 2 ** len(sources)
+        and all(value in (0, 1) for value in table)
+        for sources, table in zip(incidence, rule_bank)
+    )
+    return tuple(
+        table[sum(state[source] << bit for bit, source in enumerate(sources))]
+        for sources, table in zip(incidence, rule_bank)
+    )
 
 
 def main() -> int:
@@ -914,8 +941,15 @@ def main() -> int:
         and "connections from node *i* should be rerouted" in at(13835)
         and "new node should be inserted" in at(13835)
         and "only a single active node" in at(13889)
-        and "randomly chosen" in at(13917)
-        and "each node has a rule" in at(13917)
+    )
+    boolean_setup_control_ok = (
+        "like cellular automata on networks" in at(13917)
+        and "when they are set up each node has a rule" in at(13917)
+        and "randomly chosen from all" in at(13917)
+        and "$2^{2^s}$" in at(13917)
+        and "possible ones with s inputs" in at(13917)
+        and "averages are in effect taken over possible configurations" in at(13919)
+        and {11563, 13917, 13918, 13919} <= CONTROL_EVIDENCE
     )
     # The executable Notes row is explicitly {above, Self, below}; it does not
     # support a neighbor-only/no-Self interpretation of the main-text word
@@ -936,14 +970,41 @@ def main() -> int:
         and read_colors == ((0, 1, 1), (1, 0, 0), (0, 1, 1), (1, 0, 0))
         and new_colors == (0, 1, 0, 1)
     )
-    ok &= fixed_network_source_ok and structural_network_control_ok and fixed_network_derivation_ok
+    sampled_boolean_incidence = ((1, 2), (0, 2), (0, 1))
+    sampled_boolean_rule_bank = (
+        (0, 1, 1, 0),  # XOR
+        (0, 0, 0, 1),  # AND
+        (1, 0, 0, 1),  # equality
+    )
+    sampled_boolean_old = (1, 0, 1)
+    sampled_boolean_new = sampled_site_rule_step(
+        sampled_boolean_old,
+        sampled_boolean_incidence,
+        sampled_boolean_rule_bank,
+    )
+    sampled_boolean_derivation_ok = sampled_boolean_new == (1, 1, 0)
+    ok &= (
+        fixed_network_source_ok
+        and structural_network_control_ok
+        and boolean_setup_control_ok
+        and fixed_network_derivation_ok
+        and sampled_boolean_derivation_ok
+    )
     print(
         "fixed_network_ca_vs_structural_t29_boundary",
         "OK" if fixed_network_source_ok and structural_network_control_ok else "MISMATCH",
     )
     print(
+        "random_boolean_setup_provenance_control",
+        "OK" if boolean_setup_control_ok else "MISMATCH",
+    )
+    print(
         "derived_notes_fixed_incidence_snapshot_event_includes_self",
         "OK" if fixed_network_derivation_ok else "MISMATCH", *new_colors,
+    )
+    print(
+        "derived_sampled_boolean_rule_bank_fixed_incidence_snapshot_event",
+        "OK" if sampled_boolean_derivation_ok else "MISMATCH", *sampled_boolean_new,
     )
 
     historical_aliases = (
@@ -1030,11 +1091,14 @@ def main() -> int:
         and "introduce probabilities" in at(13314)
         and "updated sequentially rather than in parallel" in at(16446)
         and "only a single active node" in at(13889)
-        and "randomly chosen" in at(13917)
+        and "when they are set up each node has a rule that is randomly chosen" in at(13917)
         and "alternating steps" in at(15708)
     )
     ok &= controls_ok
-    print("function_time_stochastic_schedule_controls", "OK" if controls_ok else "MISMATCH")
+    print(
+        "function_time_stochastic_setup_schedule_controls",
+        "OK" if controls_ok else "MISMATCH",
+    )
 
     structural = (
         len(RETAINED) == EXPECTED_SOURCE_COUNT
@@ -1181,14 +1245,16 @@ def main() -> int:
         and hex_representation_ok
         and fixed_network_source_ok
         and structural_network_control_ok
+        and boolean_setup_control_ok
         and fixed_network_derivation_ok
+        and sampled_boolean_derivation_ok
         and alias_variant_route_guards_ok
         and boundary_vocabulary_guards_ok
         and controls_ok
     )
     ok &= architecture_inference_ok
     print(
-        "architecture_inference_parameterizes_shared_simple_program_event",
+        "architecture_inference_parameterizes_shared_simple_program_event_with_sampled_rule_bank",
         "OK" if architecture_inference_ok else "MISMATCH",
     )
 

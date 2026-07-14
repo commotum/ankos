@@ -667,9 +667,9 @@ assert TRACE_NOT_REPLAYABLE <= TRANSCRIBED_ASSETS
 EXPECTED_TRANSCRIPT_SHA256 = "883f86d4ec52345e1dc0be35b7e4a33abd91d49d29b179c84057657b2021a23a"
 EXPECTED_GOVERNED_UNIVERSE_SHA256 = EXPECTED_GOVERNED_DIGEST
 EXPECTED_GOVERNED_LEDGER_SHA256 = "36a902946f4c447733483b49e05ecae7ba29e3ed0d05fb76606c87491d6869ff"
-EXPECTED_ADJACENCY_UNIVERSE_SHA256 = "2b47127033ba2b7d5b363e36fc20188a906da8ef0b3b3c86a4a3e6c272fc3cfa"
-EXPECTED_ADJACENCY_LEDGER_SHA256 = "3091c88d840e3283bdf349ad43355ad4590af8d368ca7b82426829dbec423200"
-EXPECTED_CANDIDATE_UNIVERSE_SHA256 = "d2d1265a973f27484c6fc8bc797c3a903c46b4f734e11d854a66af562a271fa8"
+EXPECTED_ADJACENCY_UNIVERSE_SHA256 = "44b5cf4e236bcfaa8058ac00b04a0b3ac8f15a14cc0a29521860e6fa745ad754"
+EXPECTED_ADJACENCY_LEDGER_SHA256 = "b68c210bfc0f6cb2a82227081881daf8e3cbf011ce65d5c85de0adcd543e8b7a"
+EXPECTED_CANDIDATE_UNIVERSE_SHA256 = "2cd7228bd389b80c02f98762ea03d1695e646e088991e93e6deb5f936460c549"
 
 
 def main() -> None:
@@ -688,21 +688,22 @@ def main() -> None:
     assert digest_set(C4) == EXPECTED_CANDIDATE_UNIVERSE_SHA256
 
     assert len(governed_payload.splitlines()) == 11
-    assert len(adjacency_payload.splitlines()) == 11
+    assert len(adjacency_payload.splitlines()) == 25
     assert (governed_monolith_refs, governed_split_refs, governed_hashes) == (11, 11, 11)
-    assert (adjacency_monolith_refs, adjacency_split_refs, adjacency_hashes) == (11, 11, 11)
+    assert (adjacency_monolith_refs, adjacency_split_refs, adjacency_hashes) == (25, 25, 25)
     all_rows = governed_payload.splitlines() + adjacency_payload.splitlines()
-    assert len({row.split("|")[7] for row in all_rows}) == 22
+    assert len({row.split("|")[7] for row in all_rows}) == 36
 
     print(
-        f"T24 asset oracle: PASS source={len(S)}; C4=22; governed=11; adjacency_only=11; "
+        f"T24 asset oracle: PASS source={len(S)}; C4=36; governed=11; adjacency_only=25; "
         "governed native/relation/control=6/2/3; "
         "native dimension/hex-any/hex-exact1/lattices/pentagon/Penrose=1/1/1/1/1/1; "
         "adjacency structural-network/natural-observer/other-CA/substitution/"
-        "network-observer/static-geometry/sequential-CA=2/1/4/1/1/1/1; "
-        "refs=44; unique_hashes=22; "
+        "network-observer/static-geometry/sequential-CA/slice-view/physics-observer/"
+        "static-network-geometry=2/1/9/1/1/1/1/3/3/3; "
+        "refs=72; unique_hashes=36; "
         f"transcript_records=6; transcript_sha256={TRANSCRIPT_SHA256}; "
-        "HASH_BOUND=22; TRANSCRIBED=6; PIXEL_REPLAYED=0; "
+        "HASH_BOUND=36; TRANSCRIBED=6; PIXEL_REPLAYED=0; "
         "hex_codes_16382/10926=PASS; pentagonal_4094/Penrose_254=PASS; "
         "fixed_network=TEXT_ONLY; topology/seed/trace=NOT_SERIALIZED; "
         "monolith/split/image_guards=PASS; Notes_reverse_join=PASS; unresolved=0"
