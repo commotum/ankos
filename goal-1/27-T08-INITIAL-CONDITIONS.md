@@ -191,7 +191,7 @@ Each configuration carries one support/topology instance admitted by `DomainSche
 | One exact initial configuration | 1 — direct reuse | ordinary invariant-valid `Configuration` | accepted unchanged by the shared runner |
 | Named deterministic profile | 2 — preset/parameterization | closed `ConfigurationConstructor` targeted at `C_P` | resolves before rollout to one ordinary configuration |
 | Initial-condition class | 2 — restriction/set | declarative subset or image of a closed constructor over `Conf(C_P)` | membership capability may be decidable, certified, unknown, or unsupported; never execution |
-| Random initial-condition class | 2 — probability-bearing profile | `InitialDistribution` over an explicit configuration class | sampling occurs once before event zero |
+| Random initial-condition class | 2 — probability-bearing profile | `InitialDistribution` over an explicit configuration class | a supported complete realization occurs before event zero; a finite cylinder alone is not `X_0` |
 | Background-plus-exceptions, periodic, block-coded, or temporal-history form | 3 when lossless — tagged/product representation | ordinary configuration plus validated expansion/projection | no special seed evaluator inside the runner |
 | Finite materialization, quotient, crop, raster, dataset split, or behavior label | 2 — realization/relation/observer | existing run and observer records | excluded from seed and program identity |
 | New FRONTIER, NEIGHBORHOOD, RULE result, UPDATE, executor, or successor | 4 only with a counterexample | none found | no T08 execution semantic is authorized |
@@ -217,8 +217,16 @@ InitialDistribution
 ConstructionRecord
     constructor/profile/arguments -> exact configuration reference
 
-SamplingRealization / SampleRecord
-    law plus sampler/key/scope provenance -> exact configuration reference
+FullConfigurationSamplingRealization / ConfigurationSampleRecord
+    law plus sampler/key/native-scope provenance -> exact configuration reference
+
+CylinderSamplingRealization / CylinderSampleRecord
+    law plus finite cylinder/sampler/key provenance -> partial observation/work data,
+    never an exact native configuration reference
+
+AlgorithmicFieldRealization
+    closed total coordinate evaluator plus key/version -> exact algorithmic field,
+    with a qualified relation rather than false equality to an ideal product-law draw
 
 ValidatedInitialConfiguration
     exact configuration reference plus schema-validation evidence
@@ -317,11 +325,11 @@ iid Bernoulli(p)
 
 There is no generic “uniform over all strings accepted by a constraint language” without a finite length/scope or a separately specified probability measure on infinite sequences. Normalization and zero-mass conditioning must be proved for the declared scope; closed syntax alone supplies no sampler.
 
-For a finite fixed lattice, sampling may use a canonical coordinate order. A word uses declared sequence order; a graph law must be invariant to vertex renaming or declare a canonicalization with proof; other support instances use law-specific typed sampling requests. Each `SamplingRealization` records sampler algorithm/version, scope/enumeration or structural map, key or input entropy, and draw provenance. The mathematical law identity does not include a particular RNG implementation unless the source construction itself specifies that algorithm. The exact configuration digest likewise excludes provenance: the same `X_0` sampled by two laws has one configuration identity and two `SampleRecord` identities.
+For a finite fixed lattice, sampling may use a canonical coordinate order. A word uses declared sequence order; a graph law must be invariant to vertex renaming or declare a canonicalization with proof; other support instances use law-specific typed sampling requests. Each realization records sampler algorithm/version, scope/enumeration or structural map, key or input entropy, and draw provenance. The mathematical law identity does not include a particular RNG implementation unless the source construction itself specifies that algorithm. For a supported complete realization, the exact configuration digest likewise excludes provenance: the same `X_0` sampled by two laws has one configuration identity and two `ConfigurationSampleRecord` identities.
 
 Structured laws compose closed component laws, deterministic overlays, and pushforwards while preserving schema invariants. For example, a tape profile may sample tape symbols, choose one explicit head position/state, and then apply the lossless `Plain(symbol) | Head(q,symbol)` constructor. Treating whole composite cells as iid would almost surely violate the exactly-one-head invariant and is not an equivalent law.
 
-An infinite product law is a probability measure characterized by consistent finite-cylinder probabilities, not an array that can be eagerly drawn. Cylinder probability is an optional product-measure capability, not a universal distribution method. A practical finite-window sampler is an explicit realization of a requested cylinder. A coordinate-keyed pseudorandom total field can provide replayable order-independent queries, but with a finite key it is an algorithmic realization related to—not literally an exact draw from—the mathematical infinite independent product measure. Goal 2 must preserve that qualification rather than hide a mutable RNG cursor in execution state.
+An infinite product law is a probability measure characterized by consistent finite-cylinder probabilities, not an array that can be eagerly drawn. Cylinder probability is an optional product-measure capability, not a universal distribution method. A practical finite-window sampler returns a `CylinderSampleRecord` for that finite scope; it is not a member of the native infinite `Conf(C_P)`, has no global configuration digest, and cannot seed a native run. Overlapping cylinder requests must have projectively consistent laws, while replay claims bind the exact requested scope and sampler realization. A coordinate-keyed pseudorandom total field can provide a complete replayable order-independent algorithmic configuration, but with a finite key it is an `AlgorithmicFieldRealization` related to—not literally an exact draw from—the mathematical infinite independent product measure. Goal 2 must preserve both qualifications rather than hide a mutable RNG cursor in execution state.
 
 ### Event-zero state and temporal history
 
@@ -343,14 +351,16 @@ Construction, sampling, validation, and execution lowering are separate operatio
 
 ```text
 construct(profile, closed_args) -> ConstructionRecord(X_0_ref)
-sample(law, sampling_realization) -> SampleRecord(X_0_ref)
+sample_complete(law, full_realization) -> ConfigurationSampleRecord(X_0_ref) | Unsupported
+sample_cylinder(law, finite_scope, cylinder_realization) -> CylinderSampleRecord
+realize_algorithmic_field(closed_field, key_and_version) -> AlgorithmicFieldRealization(X_0_ref)
 validate(X_0, C_P) -> ValidationEvidence
 lower(X_0, computation_realization, horizon) -> LoweringRecord(work_state_ref)
 ```
 
-A deterministic profile has a construction record, not a fake sample. A sampled configuration has the same denotational configuration identity it would have if constructed literally; its law and RNG belong to `SampleRecord` provenance.
+A deterministic profile has a construction record, not a fake sample. A completely sampled configuration has the same denotational configuration identity it would have if constructed literally; its law and RNG belong to `ConfigurationSampleRecord` provenance. A cylinder has only a scope-bound partial-record identity. It may populate a proved finite dependency cone for a computation request, but it cannot pass complete-configuration validation or identify a `NativeTrace`.
 
-For an infinite fixed-lattice profile, lowering into a finite computational work region is separate from the native configuration. A causal lowering records the support map, requested observation/horizon, and a proof that its work region contains the full dependency cone. It reads native values in that cone and invents no exterior boundary. A `BOUNDARY` belongs to a genuinely finite semantic topology or to an explicitly declared approximation; it must not silently stand in for an unbounded native field. Halo (semantic dependency sufficiency), storage padding, numeric/storage codec, and display crop are separate records.
+For an infinite fixed-lattice profile, lowering into a finite computational work region is separate from the native configuration. A causal lowering records the support map, requested observation/horizon, and a proof that its work region contains the full dependency cone. It reads native values throughout that cone. Operationally it either evaluates only the event-indexed valid work loci whose complete reads are present, or supplies an explicit computational edge completion together with a proof that no completed edge can influence the requested observations through the horizon. That valid-locus schedule or proof-irrelevant completion belongs to `LoweringRecord`; it neither changes `P.FRONTIER` nor asserts a native exterior boundary. A semantic `BOUNDARY` belongs to a genuinely finite topology or to an explicitly declared approximation and must not silently stand in for an unbounded field. Halo, storage padding, numeric/storage codec, and display crop remain separate records.
 
 For a requested horizon `h`, a lowering that claims exactness must satisfy the horizon-indexed commuting obligation
 
@@ -382,7 +392,9 @@ InitialConditionClass
 ConfigurationPresentation
 ConfigurationConstructor / ConstructionRecord
 InitialDistribution
-SamplingRealization / SampleRecord
+FullConfigurationSamplingRealization / ConfigurationSampleRecord
+CylinderSamplingRealization / CylinderSampleRecord
+AlgorithmicFieldRealization
 Configuration / ValidationEvidence
 ComputationRealization / LoweringRecord / BoundaryOrApproximation
 RunRequest / NativeTrace
