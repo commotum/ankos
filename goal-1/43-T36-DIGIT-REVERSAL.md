@@ -135,6 +135,51 @@ The current modules already expose the right SimpleProgram responsibilities, but
 
 The seed-512 value already exceeds signed 64-bit range after 82 events. That is a concrete runtime counterexample to retaining the current fixed-width episode representation, but it does not justify a T36 runner: it just exercises T34's exact scalar carrier and the closed positional RULE delta.
 
+## Semantic Closure
+
+The semantic oracle evaluates every governed profile through both an integer encode/reverse/decode/add path and an independent grade-school digit-word addition path. Its exact results are:
+
+- 1,180 source-seed events (`180 + 1000`), with all 1,180 replayed through the independent word evaluator and exact program provenance;
+- 22,036 scalar/word commutations: 11,275 canonical, 5,022 fixed-width, and 5,739 growing-width;
+- 1,881 exhaustive fixed digit-reversal entries over `(base,width) = (2,7), (2,10), (3,6)`, each a proved involutive permutation;
+- five arbitrary-precision profiles reaching 6,644 bits and 2,001 decimal digits;
+- 260 trace horizons, 8,320 committed events and replays, and 2,080 `changed=false` events that still advance normally;
+- seven exact structural program keys, three cross-program replay rejections, 68 hostile rejections, and 14 exact dataclass-role records;
+- zero new FRONTIER, NEIGHBORHOOD, UPDATE, or executor symbols.
+
+Representative exact boundaries are:
+
+| Profile | Old configuration | Successor | Point proved |
+|---|---|---|---|
+| Strict canonical base 2 | `0` | `0` | Native fixed point; event exists with `changed=false` |
+| Strict canonical base 2 | `16` | `17` | Binary reversal, not decimal string reversal |
+| Strict canonical base 2 | `2` (`10`) | `3` | Reversed intermediate `01` is valid but noncanonical |
+| Fixed base 2, width 4 | `2` (`0010`) | `6` (`0110`) | Width is immutable program data |
+| Fixed base 2, width 4 | `15` | `14` | Untruncated sum 30 drops one left carry |
+| Growing base 2 | `(2,4)` | `(6,5)` | Width is visible successor state |
+| Growing base 2 | `(6,5)` | `(18,6)` | One position is added at every event |
+
+The width-erasure counterexample is executable, not rhetorical: `(value,width)=(1,1)` and `(1,2)` have the same numeric projection, but one step produces `(2,2)`/`10` and `(3,3)`/`011`. Therefore the scalar projection is not a lossless configuration map for the growing profile. By contrast, strict canonical words and integers commute one event at a time because the canonical codec is bijective on nonnegative integers.
+
+For the source-pinned positive seeds, the independently computed seed-16 trace ends after 180 events at `3987197239207620088799663177286543360` (122 bits), while the seed-512 value after 1,000 events has 627 bits. These are deterministic formula checks, not recovered raster values; the source's one-million-event observation remains an empirical qualification rather than a reproduced million-event fixture.
+
+The oracle binds complete source claims, architecture classifications, Goal 2 deltas, structural program keys, role manifests, witnesses, events, outcomes, and traces. Hostile mutations prove that removing event replay, removing trace continuity, adding a `DigitReversalExecutor`, or changing any architecture/source/handoff claim makes the oracle fail.
+
+## Final Architecture Classification
+
+| Responsibility | Class | Smallest reusable base | Required T36 invariant/delta |
+|---|---:|---|---|
+| Strict configuration/DOMAIN | 1/2 | T34 discrete `t+0D` exact singleton | Nonnegative carrier and base-2 canonical profile; zero is native |
+| Base/profile identity | 2 | Closed unary-program parameters | Exact base and canonical/fixed/grow tag; fixed width in program identity |
+| FRONTIER/NEIGHBORHOOD | 1 | `UniqueScalar` plus `Self` | No new selector or access pattern |
+| RULE | 2 | D069 shared closed unary algebra | Typed encode/reverse/decode/add and explicit width/carry profile |
+| Assignment/UPDATE/outcome/trace | 1 | T34 generic same-locus atomic assignment and `StepResult` | Fixed points continue; complete state equality controls `changed` |
+| Canonical word representation | 3 | Exact canonical integer codec | Bijection and one-event commuting square |
+| Growing-width representation | 3 | Tagged `(value,width)` or width-preserving word | Preserve semantic width; scalar erasure is prohibited by the counterexample |
+| New execution algebra | Not justified | Shared branch-free SimpleProgram runner | No T36 state class, executor, family branch, or UPDATE law |
+
+D137 therefore classifies every T36 delta as direct reuse, parameterization/restriction, or lossless tagged/product representation. There is no class-4 execution-algebra delta.
+
 ## Evidence and Oracle Work Plan
 
 1. Build a redundant source-query union covering reversal-add, reverse/digit/base/leading-zero/carry terms, main captions, Notes, Index, history, positional codecs, FFT/digit-reversal sequences, and false-positive mathematical digit reversal.
