@@ -120,7 +120,8 @@ QUERIES = {
     ),
     "Q15": r"_page_(?:151_Figure_7|154_Figure_2|156_Figure_1)\.jpeg",
     "Q16": (
-        r"_page_(?:927_Figure_14|928_Figure_(?:9|11|13|22)|"
+        r"_page_(?:916_Figure_12|917_Picture_11|918_Figure_2|"
+        r"927_Figure_14|928_Figure_(?:9|11|13|22)|"
         r"929_Picture_1[1-6]|930_(?:Picture_(?:4|12|14)|Figure_10)|"
         r"931_Figure_(?:9|10|11|12|13|17))\.jpeg"
     ),
@@ -130,7 +131,7 @@ QUERIES = {
     ),
     "Q18": (
         r"Implementation of digit sequences|History of numbers|"
-        r"History of digit sequences|Negative bases|Non-power bases|"
+        r"History of digit sequences|Gray code ordering|Negative bases|Non-power bases|"
         r"Multiplicative digit sequences|Greek and Roman number systems"
     ),
     "Q19": (
@@ -186,10 +187,12 @@ QUERY_NATIVE = line_set(
     "13086,13090"
 )
 QUERY_RELATION = line_set(
-    "1850,1852,1856,11260,11531,12569,12984,12986,12988,12990,"
+    "1850,1852,1856,11260,11531,"
+    "12503,12515,12524,12532,12536,12550,12552,12554,12555,12557,12569,"
     "12992,12996,13000,13004,13018,13020,13022,13023,13029,13062,"
     "13074,13076,13084,13092,13094,13096,13098,13102,13103,13111,"
-    "13119,13121,13123,13125,13127,14172,14468,14923,17236,17599,20592"
+    "13119,13121,13123,13125,13127,14172,14468,14923,17236,17599,"
+    "17851,20507,20592"
 )
 QUERY_CONTROL = line_set("1619,1834,12846,13134,13146,17101,19058")
 
@@ -239,6 +242,7 @@ NATIVE_CONTINUATIONS = line_set(
     "13088,13100"
 )
 RELATION_CONTINUATIONS = line_set(
+    "12505,12507,12509,12511,12513,12517-12520,12522,12534,"
     "12587,12589,12591,12593,12595,"
     "12994,12998,13002,13006-13016,13025,13027,13064-13068,"
     "13078-13082,13105,13107,13109,13113,13115,13117,13129,13130,"
@@ -252,6 +256,32 @@ CONTROL_EVIDENCE = QUERY_CONTROL | CONTROL_CONTINUATIONS
 RETAINED = NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE
 
 
+# The native Notes section for T40 is a second fixed source universe, not a
+# collection assembled from successful regex hits.  Every nonblank row from
+# the first Notes claim through the last substantive Notes row is already in
+# one semantic evidence role and must remain so.
+STRICT_NOTES_FIRST_LINE = 12921
+STRICT_NOTES_LAST_LINE = 13144
+STRICT_NOTES_CONTENT = line_set(
+    "12921,12923,12925-12927,12929,12931,12933,12935,12937-12939,12941,"
+    "12943,12945-12946,12948-12949,12951,12953-12956,12958,12960,12962,"
+    "12964,12966,12968,12970,12972,12974,12976,12978,12980,12982,12984,"
+    "12986,12988,12990,12992,12994,12996,12998,13000,13002,13004,"
+    "13006-13010,13012,13014,13016,13018,13020,13022-13023,13025,13027,"
+    "13029-13030,13032,13034,13036,13038,13040,13042,13044,13046,13048,"
+    "13050,13052,13054,13056,13058,13060,13062,13064-13068,13070,13072,"
+    "13074,13076,13078,13080-13082,13084,13086,13088,13090,13092,13094,"
+    "13096,13098,13100,13102-13103,13105,13107,13109,13111,13113,13115,"
+    "13117,13119,13121,13123,13125,13127,13129-13130,13132,13134,13136,"
+    "13138-13142,13144"
+)
+STRICT_NOTES_DISPOSITION = {
+    "native": NATIVE_EVIDENCE & STRICT_NOTES_CONTENT,
+    "relation": RELATION_EVIDENCE & STRICT_NOTES_CONTENT,
+    "control": CONTROL_EVIDENCE & STRICT_NOTES_CONTENT,
+}
+
+
 INDEX_CLASS = {
     "native": line_set(
         "20828,20908,20910,20916,20918,20946,21044,21054,21072,"
@@ -260,17 +290,17 @@ INDEX_CLASS = {
         "21891,21907,22136"
     ),
     "relation": line_set(
-        "20840,20846,20850,20862,20868,20904,20906,20914,20940,"
+        "20836,20840,20846,20850,20862,20864,20868,20904,20906,20914,20940,"
         "20942,20967,20972,21014,21022,21038,21042,21050,21080,"
         "21086,21090,21114,21132,21134,21148,21150,21162,21168,"
         "21172,21173,21181,21185,21187,21193,21195,21197,21203,"
         "21207,21213,21223,21231,21233,21264,21277,21290,21333,"
         "21420,21432,21450,21454,21460,21497,21525,21586,21602,"
-        "21642,21675,21687,21689,21695,21731,21771,21777,21803,"
+        "21642,21646,21648,21675,21687,21689,21695,21731,21771,21777,21803,"
         "21805,21813,21819,21841,21845,21877,21893,21903,21915,"
         "21923,21927,21929,21933,21982,21990,21994,22030,22080,"
         "22110,22112,22114,22144,22146,22148,22150,22352,22380,"
-        "22394,22434,22456"
+        "22382,22394,22434,22452,22456"
     ),
     "control": line_set("20970,22096"),
 }
@@ -290,27 +320,32 @@ INDEX_BROAD_VOCABULARY_PATTERN = (
     r"rational|irrational|radical|square root|normal number|leading digit|"
     r"recurring|concatenation sequence|digital slope|first digit|nth.?digit|"
     r"n\^.?th.*digit|transcendental|mathematical constant|catalan|"
-    r"champernowne|stoneham|khinchin|power.?mod|plouffe|euclid.s algorithm"
+    r"champernowne|stoneham|khinchin|power.?mod|plouffe|euclid.s algorithm|"
+    r"[0-9]+ \(base\)|(?:negative|arbitrary|non-power) bases|"
+    r"representation of, 902, 942|unary representation of numbers|"
+    r"zeckendorff representation"
 )
 
 # A separate independent page/vocabulary/flattened-continuation review found
 # rows that the broad textual pattern cannot see.  Its positive and noisy
 # candidates are intentionally frozen together, before semantic disposition.
 INDEX_HOSTILE_AUDIT_CANDIDATES = line_set(
-    "20846,20862,20868,20888,20904,20906,20908,20940,20942,20965,"
+    "20836,20846,20862,20864,20868,20888,20904,20906,20908,20940,20942,20965,"
     "20970,20980,21022,21042,21072,21080,21086,21090,21102,21108,"
     "21148,21181,21189,21233,21274,21277,21290,21329,21333,21338,"
-    "21362,21420,21454,21460,21471,21515,21545,21586,21602,21642,"
+    "21362,21420,21454,21460,21471,21515,21545,21586,21602,21642,21646,21648,"
     "21731,21771,21777,21783,21803,21841,21877,21881,21903,21923,"
-    "21925,22016,22112,22114,22132,22146,22412,22434,22456"
+    "21925,22016,22112,22114,22132,22146,22382,22412,22434,22452,22456"
 )
 
 INDEX_ENTRY_GUARDS = {
     20828: ("continued fraction for, 144", "digits of, 142"),
+    20836: ("60 (base) of Babylonian numbers, 902", "5/2, multiplication system, 123"),
     20840: ("Addition cellular automata based on", "in digit sequences, 118"),
     20846: ("representing numbers using, 916",),
     20850: ("nested digit sequences",),
     20862: ("in hierarchy of numbers, 916", "Algorithmically simple integers, 916"),
+    20864: ("and history of numbers, 902",),
     20868: ("Archimedes (Sicily, 287–212 BC)", "and  $\\pi$ , 911"),
     20904: ("and computing  $\\pi$ , 911",),
     20906: ("and computing *Sqrt*, 913",),
@@ -382,6 +417,8 @@ INDEX_ENTRY_GUARDS = {
     21586: ("for  $\\pi$ , 912",),
     21602: ("Napier, John", "and binary numbers, 902"),
     21642: ("Needle, Buffon's for  $\\pi$ , 1192",),
+    21646: ("Negative bases, 902", "Negative numbers"),
+    21648: ("representation of, 902, 942",),
     21675: ("Nested radicals, 915",),
     21683: ("NestWhileList", "concatenation sequences"),
     21687: ("leading digits",),
@@ -432,8 +469,10 @@ INDEX_ENTRY_GUARDS = {
     22150: ("Symbolic programming", "leading digits"),
     22352: ("Toffoli, Tommaso", "Egyptian fractions"),
     22380: ("Two's complement number representation, 902, 942",),
+    22382: ("Unary representation of numbers, 560, 1070",),
     22394: ("Valuation functions", "nested digit sequences"),
     22434: ("Wozniakowski (digit reversal) sequences, 905",),
+    22452: ("Zeckendorff representation, 892, 1070",),
     22456: ("from rational integrals, 916", "Zeta (Riemann zeta function)"),
 }
 
@@ -475,7 +514,8 @@ NATIVE_IMAGE_LINES = line_set(
     "1677,1711,1744,12960,13040,13042,13044,13046,13048,13050,13090"
 )
 RELATION_IMAGE_LINES = line_set(
-    "12992,12996,13000,13020,13076,13094,13098,13119,13121,13123,13125,13127"
+    "12524,12552,12557,12992,12996,13000,13020,13076,13094,13098,"
+    "13119,13121,13123,13125,13127"
 )
 CONTROL_IMAGE_LINES = line_set("13134")
 GOVERNED_IMAGE_LINES = (
@@ -489,6 +529,9 @@ IMAGE_ROLE_RECORDS = (
     "1677:native:page151 pi base-two walk observer",
     "1711:native:page154 rational long-division work panels",
     "1744:native:page156 square-root product-state work panels",
+    "12524:relation:page916 Gray-code representation observer",
+    "12552:relation:page917 negative-base representation observer",
+    "12557:relation:page918 multiplicative-digit representation observer",
     "12960:native:page927 rational digit panels",
     "12992:relation:page928 concatenation digits",
     "12996:relation:page928 concatenation walk",
@@ -512,6 +555,7 @@ IMAGE_ROLE_RECORDS = (
     "13134:control:page931 operator-representation boundary",
 )
 IMAGE_ASSEMBLY_BOUNDARIES = (
+    "page916-918:12524,12552,12557 are governed representation-relation assets",
     "page928:12992,12996,13000 form the concatenation-walk trilogy",
     "page929:13040,13042,13044,13046,13048,13050 form six residual panels",
     "page930:13094,13098 form the Euclidean-algorithm relation pair",
@@ -538,6 +582,96 @@ SOURCE_SEMANTIC_GUARDS = (
     ("continued_fraction_completion", 1794, ("rational numbers", "limited length", "go on forever"), ()),
     ("symbolic_evaluation_cost", 1796, ("symbolic expressions", "difficult", "actual value"), ()),
     ("representation_conclusion", 1832, ("intrinsic sense complex", "particular representation"), ()),
+    (
+        "whole_positional_encode",
+        12503,
+        ("whole number n", "sequence of digits in base k", "Integer Digits[n, k]"),
+        (),
+    ),
+    (
+        "whole_positional_inverse",
+        12505,
+        ("Reverse[Mod[NestWhileList", "FromDigits[list, k]"),
+        (),
+    ),
+    (
+        "fractional_positional_query",
+        12507,
+        ("number x between 0 and 1", "first m digits", "RealDigits[x, k, m]"),
+        (),
+    ),
+    (
+        "fractional_residual_iteration",
+        12509,
+        ("Floor[k NestList[Mod[k#, 1]",),
+        (),
+    ),
+    (
+        "fractional_reconstruction_claim",
+        12511,
+        ("reconstruct an approximation", "FromDigits[{list, 0}, k]"),
+        (),
+    ),
+    (
+        "fractional_reconstruction_fold",
+        12513,
+        ("Fold[#1/k + #2", "Reverse[list]"),
+        (),
+    ),
+    (
+        "gray_code_relation",
+        12515,
+        ("Gray code ordering", "successive numbers", "differ in only one digit"),
+        (),
+    ),
+    (
+        "gray_code_construction",
+        12519,
+        ("Nest[Join", "Length[#] + Reverse[#]"),
+        (),
+    ),
+    (
+        "gray_code_observer_boundary",
+        12522,
+        ("digit sequence picture", "BitXor[i, Floor[i/2]]", "rule 60 cellular automaton"),
+        (),
+    ),
+    (
+        "number_history_scope",
+        12532,
+        ("History of numbers", "whole numbers", "rational numbers", "square roots"),
+        (),
+    ),
+    (
+        "explicit_representation_history",
+        12534,
+        ("explicit representation for numbers", "sequence of digits", "certain length"),
+        (),
+    ),
+    (
+        "arbitrary_base_history",
+        12536,
+        ("Babylonian base 60", "Hindu-Arabic base 10", "arbitrary bases"),
+        (),
+    ),
+    (
+        "negative_base_relation",
+        12550,
+        ("Negative bases", "From Digits[list, -k]", "base -2"),
+        (),
+    ),
+    (
+        "non_power_base_relation",
+        12554,
+        ("Non-power bases", "f[n] need not be", "representation is not generally unique"),
+        (),
+    ),
+    (
+        "multiplicative_digit_relation",
+        12555,
+        ("Multiplicative digit sequences", "combined not by addition but by multiplication"),
+        (),
+    ),
     ("direct_nth", 12943, ("without explicitly finding previous ones", "overwhelming probability"), ("certainly exact",)),
     ("finite_precision_probability", 12951, ("finite-precision arithmetic", "probability exists", "incorrect results"), ()),
     ("normality_base", 12976, ('normal" in a particular base', "does not imply anything"), ()),
@@ -583,6 +717,12 @@ SOURCE_SEMANTIC_GUARDS = (
     ("number_classification", 13136, ("Number classification", "undecidable", "same number"), ()),
     ("noncomputable_definition", 17101, ("formal descriptions", "algorithmically random", "Chaitin"), ()),
     ("noncomputable_coefficients", 19058, ("nth digit", "far from being computable", "halting problem"), ()),
+    (
+        "representation_pluralism",
+        20507,
+        ("Greek and Roman number systems", "base-10 positional notation", "base-2 positional notation", "many other quite different ways to represent numbers"),
+        (),
+    ),
     ("left_boundary", 1619, ("The Sequence of Primes",), ("Mathematical Constants",)),
     ("right_boundary", 1834, ("Mathematical Functions",), ("Mathematical Constants",)),
     ("notes_left_boundary", 12846, ("The Sequence of Primes",), ()),
@@ -644,9 +784,12 @@ SOURCE_MODEL_RECORDS = (
     "query:prefix count or coefficient-at index is scope not mutable state",
     "result:exact certified approximate probable completion unsupported unknown resource or failure",
     "positional:base at least two and digit coefficients bounded by base",
+    "positional-source:whole and fractional encoders expose quotient or residual iteration and explicit inverses",
     "positional-canonical:terminating rational uses infinite zero tail not eventual base-minus-one tail",
+    "representation-relations:unary negative-base non-power Zeckendorff and multiplicative forms are scoped siblings not strict presets",
     "continued-fraction:integer coefficients are unbounded",
     "continued-fraction-canonical:finite tail has final coefficient greater than one when length exceeds one",
+    "continued-fraction-seam:arbitrary irrational h exposes signed Floor[h] integer part and substitution rules from remaining coefficients",
     "finite-prefix:lossy query result and never the complete exact value",
     "rendering:digit row walk histogram and coefficient plots are observers",
     "work-long-division:explicit discrete t-plus-0D exact remainder configuration",
@@ -661,6 +804,7 @@ SOURCE_MODEL_RECORDS = (
     "architecture:no ConstantDigitsState T40 update executor runner branch family dispatch or callback",
     "architecture:optional work algorithms reuse existing SimplePrograms axes and branch-free runner",
     "architecture:no hidden remainder residual prefix cache precision state or CAS object",
+    "architecture:representation diversity changes typed codecs and invariants not the shared SimpleProgram executor",
     "relation:realization certificate connects a work trace to a denotation query",
     "boundary:T36 supplies positional codecs without importing its transition identity",
     "boundary:T37 append state is not universal because direct nth access exists",
@@ -827,6 +971,13 @@ EXPECTED_STRICT_MAIN_PARTITION = {
     "structural": (15, "8b83af3e32debd18eab8f148b46b187ff2ca50001b037a5d5cd71f81989c5e54"),
     "content": (117, "6c39a18a84e5186f11f8082c2bc5380846269c7f67b62d759b9fea0bea0ea2a9"),
 }
+EXPECTED_STRICT_NOTES_BOUNDS = (12921, 13144)
+EXPECTED_STRICT_NOTES_PARTITION = {
+    "native": (58, "4ab54e30b13566048a6792fb4a6c4927d9eeeee02d8fa8a48329510ddc4ef8c3"),
+    "relation": (67, "65468ee428fd50d0ef083d74016eb81caa7d8c97510b04300b6d50065769216e"),
+    "control": (1, "71887428c764ac67b3bd6ce9f4212ff7e7fe6803e507b5b11345d7c6a6c95a1e"),
+    "content": (126, "879d9d3e52bf0619b461288ee403d1dea7e6f75ad95648bfa12bcc3acac50e68"),
+}
 EXPECTED_IMAGE_PARTITION = {
     "native": (11, "45fe870caa33fa2cc0b702a8158564f987fb186a1742f1bbafc940cf8c738894"),
     "relation": (12, "1733851c97444c9a966ea16d19b86a37310e23f393ee8ba1f8089e3a522c49a2"),
@@ -871,6 +1022,7 @@ EXPECTED_RECORDS = {
     "index_dispositions": (897, "7fb3b037b55446f768f6975a1ac62e78caa6fd4a3525036b25b9451b75aa9ca2"),
     "index_sentinels": (8, "129bc6a4ef7cc76b5020676e603a2b5621ef56354b8ca2cd2fb4361938791710"),
     "strict_main_dispositions": (117, "94bed33e54122c19903a478a562a10d69491890aef04978d417bb53b3b13db91"),
+    "strict_notes_dispositions": (0, ""),
     "semantic_guards": EXPECTED_SOURCE_SEMANTIC_GUARDS,
     "auxiliary_guards": (8, "bb1c06175c4a5856879b75936917159d7125f734ad6350cc26f618cb2da23b18"),
     "source_defects": EXPECTED_SOURCE_DEFECT_GUARDS,
@@ -966,7 +1118,7 @@ def split_owner_record(line_no: int) -> str:
         return f"BACK-MATTER/Index/Index.md:{line_no - 12097}"
     if line_no in {14172, 14468, 14923, 17101, 17236}:
         return f"BACK-MATTER/Index/Index.md:{line_no - 12099}"
-    if line_no in {17599, 19058, 20592} or line_no >= INDEX_FIRST_LINE:
+    if line_no in {17599, 17851, 19058, 20507, 20592} or line_no >= INDEX_FIRST_LINE:
         return f"BACK-MATTER/Colophon/Colophon.md:{line_no - 17443}"
     chapter_12 = {11260: 2641, 11531: 2912}
     if line_no in chapter_12:
@@ -975,6 +1127,8 @@ def split_owner_record(line_no: int) -> str:
             "The-Principle-of-Computational-Equivalence.md:"
             f"{chapter_12[line_no]}"
         )
+    if 12503 <= line_no <= 12557:
+        return f"BACK-MATTER/Index/Index.md:{line_no - 12097}"
     if line_no == 12569:
         return "BACK-MATTER/Index/Index.md:472"
     if 12587 <= line_no <= 12595:
@@ -1255,6 +1409,38 @@ def main(argv: list[str] | None = None) -> int:
         check("strict_main_" + name, good, *actual)
     check("strict_main_partition", strict_ok, strict_unresolved)
 
+    strict_notes_actual_content = {
+        number
+        for number in range(STRICT_NOTES_FIRST_LINE, STRICT_NOTES_LAST_LINE + 1)
+        if at(number).strip()
+    }
+    strict_notes_union = set().union(*STRICT_NOTES_DISPOSITION.values())
+    strict_notes_overlap = (
+        sum(map(len, STRICT_NOTES_DISPOSITION.values())) - len(strict_notes_union)
+    )
+    strict_notes_unresolved = (
+        len(strict_notes_actual_content ^ strict_notes_union) + strict_notes_overlap
+    )
+    strict_notes_sets = {
+        **STRICT_NOTES_DISPOSITION,
+        "content": STRICT_NOTES_CONTENT,
+    }
+    strict_notes_ok = (
+        (STRICT_NOTES_FIRST_LINE, STRICT_NOTES_LAST_LINE)
+        == EXPECTED_STRICT_NOTES_BOUNDS
+        and set(strict_notes_sets) == set(EXPECTED_STRICT_NOTES_PARTITION)
+        and strict_notes_actual_content == strict_notes_union
+        and strict_notes_union == set(STRICT_NOTES_CONTENT)
+        and strict_notes_overlap == 0
+        and STRICT_NOTES_CONTENT <= RETAINED
+    )
+    for name, values in strict_notes_sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_STRICT_NOTES_PARTITION.get(name)
+        strict_notes_ok &= good
+        check("strict_notes_" + name, good, *actual)
+    check("strict_notes_partition", strict_notes_ok, strict_notes_unresolved)
+
     index_actual_content = {
         number
         for number in range(INDEX_CONTENT_FIRST_LINE, INDEX_CONTENT_LAST_LINE + 1)
@@ -1422,6 +1608,11 @@ def main(argv: list[str] | None = None) -> int:
         for role, values in STRICT_MAIN_DISPOSITION.items()
         for number in values
     }
+    strict_notes_disposition_records = {
+        f"{role}:{number}:{hashlib.sha256(at(number).encode('utf-8')).hexdigest()}"
+        for role, values in STRICT_NOTES_DISPOSITION.items()
+        for number in values
+    }
     index_disposition_records = {
         f"{role}:{number}:{hashlib.sha256(at(number).encode('utf-8')).hexdigest()}"
         for role, values in index_disposition.items()
@@ -1447,6 +1638,10 @@ def main(argv: list[str] | None = None) -> int:
         "strict_main_dispositions": (
             len(strict_disposition_records),
             digest_records(strict_disposition_records),
+        ),
+        "strict_notes_dispositions": (
+            len(strict_notes_disposition_records),
+            digest_records(strict_notes_disposition_records),
         ),
         "semantic_guards": semantic_actual,
         "auxiliary_guards": (len(auxiliary_records), digest_records(auxiliary_records)),
@@ -1624,6 +1819,7 @@ def main(argv: list[str] | None = None) -> int:
     unresolved_total = (
         len(pre_index ^ set().union(*query_partition))
         + strict_unresolved
+        + strict_notes_unresolved
         + index_unresolved
         + (len(crosswalk_lines) - len(crosswalk_records))
         + len(UNRESOLVED_IMAGE_LINES)
@@ -1642,6 +1838,9 @@ def main(argv: list[str] | None = None) -> int:
         f"strict:{name}:{len(values)}:{digest(values)}"
         for name, values in strict_sets.items()
     } | {
+        f"strict-notes:{name}:{len(values)}:{digest(values)}"
+        for name, values in strict_notes_sets.items()
+    } | {
         f"index-class:{name}:{len(values)}:{digest(values)}"
         for name, values in INDEX_CLASS.items()
     } | {
@@ -1659,6 +1858,7 @@ def main(argv: list[str] | None = None) -> int:
         f"index-pattern:{index_pattern_actual}",
         f"index-candidate-unexplained:{len(index_candidate_unexplained)}",
         f"strict-unresolved:{strict_unresolved}",
+        f"strict-notes-unresolved:{strict_notes_unresolved}",
         f"index-unresolved:{index_unresolved}",
     } | {
         f"split:{name}:{count}:{line_digest}:{record_digest}"
@@ -1692,6 +1892,11 @@ def main(argv: list[str] | None = None) -> int:
                 "structural": len(STRICT_MAIN_STRUCTURAL),
                 "unresolved": strict_unresolved,
             },
+            "strict_notes": {
+                "content": len(STRICT_NOTES_CONTENT),
+                "digest": digest(STRICT_NOTES_CONTENT),
+                "unresolved": strict_notes_unresolved,
+            },
             "index": {
                 "audit_candidates": len(index_audit_candidates),
                 "broad_candidates": len(index_broad_candidates),
@@ -1719,6 +1924,11 @@ def main(argv: list[str] | None = None) -> int:
             f"retained={len(RETAINED)}",
             f"strict-main={len(STRICT_MAIN_CONTENT)}(N/S="
             f"{len(STRICT_MAIN_NATIVE)}/{len(STRICT_MAIN_STRUCTURAL)},closure={strict_unresolved})",
+            f"strict-notes={len(STRICT_NOTES_CONTENT)}(N/R/C="
+            f"{len(STRICT_NOTES_DISPOSITION['native'])}/"
+            f"{len(STRICT_NOTES_DISPOSITION['relation'])}/"
+            f"{len(STRICT_NOTES_DISPOSITION['control'])},"
+            f"closure={strict_notes_unresolved})",
             f"index={len(index_actual_content)}(N/R/C/X/U="
             f"{len(INDEX_CLASS['native'])}/{len(INDEX_CLASS['relation'])}/"
             f"{len(INDEX_CLASS['control'])}/{len(INDEX_EXCLUDED)}/"

@@ -338,6 +338,8 @@ class ScheduledMorphismProgram:
         if self.schedule.source_kind == RATIONAL_COMPLETE:
             raise ValueError("the strict Book construction excludes rational h")
         seed = checked_word(self.seed, "program seed")
+        if seed != (0,):
+            raise ValueError("the strict Book construction fixes the seed to (0,)")
         if self.rule_codec != RULE_CODEC_VERSION or self.schema != PROGRAM_SCHEMA_VERSION:
             raise ValueError("unknown scheduled-morphism schema or rho codec")
         payload = {
@@ -1595,6 +1597,7 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(ValueError, lambda: program_from_natural_prefix(rational_prefix))
     program = program_from_natural_prefix(good_prefix)
     rejected += must_raise(ValueError, lambda: ScheduledMorphismProgram(program.schedule, program_id="f" * 64))
+    rejected += must_raise(ValueError, lambda: ScheduledMorphismProgram(program.schedule, seed=(1,)))
     rejected += must_raise(FrozenInstanceError, lambda: setattr(program, "program_id", "0" * 64))
     rejected += must_raise(ValueError, lambda: DirectConfiguration(0, ()))
     rejected += must_raise(TypeError, lambda: DirectConfiguration(False, (0,)))
@@ -1738,7 +1741,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "017d2557aa15e403d6e91991b98f55124cf91c63273e726af57547427531a47e"
+EXPECTED_DIGEST = "cbb1f9b5fbfdfa8272431e425f906f549ad870645bb96dbec5446bba9700d7ff"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
