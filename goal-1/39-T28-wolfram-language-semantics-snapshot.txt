@@ -1,0 +1,26 @@
+T28 official Wolfram Language semantics evidence snapshot
+
+Retrieved-UTC-Date: 2026-07-14
+Extraction: Exact text content at the named HTML anchors, with markup removed and typeset subscripts rendered as ASCII. No semantic words are normalized.
+
+Partition-URL: https://reference.wolfram.com/language/ref/Partition.html
+Partition-Fetched-Document-SHA256: 8aa77bf72ab99e507767c443d4150d5f466627e73c5e221c56e15a12690867f1
+Partition-Anchor-11320: Partition[list,n,d,k] is equivalent to Partition[list,n,d,{k,k}].
+Partition-Anchor-21074: {-1,-1} — allow maximal overhang at the beginning.
+Partition-Anchor-4983: list — pad by treating list as cyclic (default).
+Partition-Anchor-26746: Partition[list,{n1,n2,...},d] uses offset d at every level.
+Partition-Anchor-10425: {kL,kR} is taken to be equivalent to {{kL,kL,...},{kR,kR,...}}.
+Partition-Anchor-18775: Partition into 2x2 blocks with offset 1, taking the array to be cyclic in both dimensions.
+Partition-Anchor-18775-Code: Partition[{{11,12,13},{21,22,23},{31,32,33}},{2,2},1,1]
+
+Part-URL: https://reference.wolfram.com/language/ref/Part.html
+Part-Fetched-Document-SHA256: 942ef91b5cb8275b1ef594e8802ad568ed88a8444b5138576380bd861c9fd470
+Part-Meta-Description: expr[[-i]] counts from the end.
+
+ReplaceAll-URL: https://reference.wolfram.com/language/ref/ReplaceAll.html
+ReplaceAll-Fetched-Document-SHA256: e3e1e4e2f3a47c677b17c83e8541f9a355ce2c72d844b7fd9a366e4938626366
+ReplaceAll-Anchor-3097: The first rule that applies to a particular part is used; no further rules are tried on that part or on any of its subparts.
+ReplaceAll-Anchor-6000: expr/.rules returns expr if none of the rules apply.
+ReplaceAll-Anchor-388185595: Only the first rule that matches is applied to each part.
+
+Derived-T28-Consequences: With n={2,2}, scalar d=1 applies at both levels. Scalar k=-1 expands to {-1,-1}, then to the same beginning-overhang alignment in both levels. Negative position -1 is the last position, and default padding is cyclic. Therefore the first window has the first old element at its lower-right slot and cyclic predecessors above and left; every old element is the lower-right member of exactly one window. ReplaceAll preserves rule-list priority, while a context matched by no imported rule remains unchanged in the source host expression.

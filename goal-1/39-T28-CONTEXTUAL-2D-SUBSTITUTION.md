@@ -38,7 +38,7 @@ Reconstruct the exact two-dimensional contextual substitution construction and e
 
 ## Source Audit
 
-`39-T28-source-oracle.py` is the fail-closed evidence record. Its 25 frozen query lanes cover the direct construction name, contextual mechanics, the exact Notes expression, wrap/cyclic aliases, page routes, the T14 one-dimensional analog, the T26 aligned base, the T27 free-geometric contrast, the higher-dimensional sequential-scan boundary, the CA singleton-output relation, network and constraint controls, actual Index entries, native/cross-reference image links, and explicit absence of common modern aliases and padding language.
+`39-T28-source-oracle.py` is the fail-closed evidence record. The offline `39-T28-official-note-snapshot.txt` freezes the canonical Wolfram Science URL, retrieval date, fetched-document SHA-256, exact raw HTML rule and step spans, decoded rule, and one-glyph normalization scope; the oracle hash-checks the snapshot and derives the repaired Book row from it. Its 25 frozen query lanes cover the direct construction name, contextual mechanics, the exact Notes expression, wrap/cyclic aliases, page routes, the T14 one-dimensional analog, the T26 aligned base, the T27 free-geometric contrast, the higher-dimensional sequential-scan boundary, the CA singleton-output relation, network and constraint controls, actual Index entries, native/cross-reference image links, and explicit absence of common modern aliases and padding language.
 
 The query union contains 67 canonical monolith lines: 52 before the actual Index and 15 actual-Index routes. The pre-Index hits close as 41 retained plus 11 excluded. Thirty semantically governed continuation lines make 71 retained lines in total, partitioned as `6 native / 13 relation / 52 control`. All 15 Index routes are guarded by exact entry fragments and partition as `2 native T28 / 3 T14 alias controls / 10 T26 sibling routes`. The split-corpus reverse join closes 66 query records as `53 exact + 13 mapped` and all 71 retained lines as `48 exact + 23 mapped`, with zero monolith-only retained evidence and zero unresolved candidates.
 
@@ -80,7 +80,7 @@ The oracle deliberately returns no direct hits for modern phrases such as `conte
 - Source: `BOOK:13806-13810`.
 - Section/context: Notes for page 192, `Neighbor-dependent substitution systems`.
 - Establishes: every step partitions the complete old rank-two list into overlapping periodic `2 x 2` contexts, applies individual replacement rules, and assembles the resulting patches with `Flatten2D`; unequal subdivision generally destroys a finite bounded neighborhood-schema assumption.
-- Source repair: the official online note corrects the local OCR/extraction glyph `-` to the Mathematica blank `_` in the exact example row:
+- Source repair: the hash-bound official-note snapshot corrects the local OCR/extraction glyph `-` to the Mathematica blank `_` in the exact example row. The snapshot SHA is `ba1aff54973afd0cd42cb7afc41220dd11835a0cb5b3d8d9ce8f5e9fe3d1b866`; it records fetched-document SHA `f28a332211082048417abce950a75756a4bdae7c7d48f3f12ab87ffdab02328c`:
 
 ```text
 {{_,1},{0,1}} -> {{1,0},{1,1}}
@@ -126,7 +126,7 @@ Flatten2D[Partition[list, {2, 2}, 1, -1] /. rule]
 
 ### Exact source-repair boundary
 
-The local monolith's `BOOK:13806` renders the first pattern slot as `-`, which is not executable as the intended Mathematica blank. The official Wolfram Science note, `notes-5-4--neighbor-dependent-2d-substitution-systems`, gives `_`. The audit permits exactly this one substitution in exactly this one example row. It does not repair any raster glyph, infer a complete table, or establish a general OCR-normalization policy.
+The local monolith's `BOOK:13806` renders the first pattern slot as `-`, which is not executable as the intended Mathematica blank. The official Wolfram Science note, `notes-5-4--neighbor-dependent-2d-substitution-systems`, gives `_`. The offline snapshot stores the exact raw HTML span and the `Flatten2D` span, is itself SHA-bound, and records the SHA of the fetched official document; the oracle derives the escaped repaired row from the decoded snapshot row. The audit permits exactly this one substitution in exactly this one example row. It does not repair any raster glyph, infer a complete table, or establish a general OCR-normalization policy.
 
 ## Asset Audit
 
@@ -335,7 +335,7 @@ Required conformance includes the exact Notes row, synthetic exhaustive tables o
 
 ## Stage Results
 
-**COMPLETE.** The frozen 25-query source audit closes 67 canonical lines at `52 pre-Index / 15 actual-Index`; 41 matched-retained lines plus 30 governed continuations yield 71 retained lines at `6 native / 13 relation / 52 control`, with 11 exclusions, retained split closure `48 exact + 23 mapped`, and zero monolith-only or unresolved evidence. Its SHA is `e421340e073597f2750b61a03838e0b8c2c0cc91494eef9428fbd77a67372271`. The ten governed assets partition `1 native / 2 relation / 7 control`, close 20 monolith/split references, ten hashes, 1,112,143 bytes, and two assemblies/four files, and remain `10 hash-bound / 1 limited-transcribed / 0 pixel-replayed`; seven adjacency candidates are explicitly excluded. The asset SHA is `95fe4b6dbda261a9068d6c7a6b8aa1765bcb0ef19e444abebe47895569731c77`.
+**COMPLETE.** The frozen 25-query source audit closes 67 canonical lines at `52 pre-Index / 15 actual-Index`; 41 matched-retained lines plus 30 governed continuations yield 71 retained lines at `6 native / 13 relation / 52 control`, with 11 exclusions, retained split closure `48 exact + 23 mapped`, and zero monolith-only or unresolved evidence. Its SHA is `de2abdf1825b9ad7688a563d2443f9d6dd1a1a4489917122ccbb02c3473d37dd`. The hash-bound official-note snapshot SHA is `ba1aff54973afd0cd42cb7afc41220dd11835a0cb5b3d8d9ce8f5e9fe3d1b866`, recording fetched-document SHA `f28a332211082048417abce950a75756a4bdae7c7d48f3f12ab87ffdab02328c`. The ten governed assets partition `1 native / 2 relation / 7 control`, close 20 monolith/split references, ten hashes, 1,112,143 bytes, and two assemblies/four files, and remain `10 hash-bound / 1 limited-transcribed / 0 pixel-replayed`; seven adjacency candidates are explicitly excluded. The asset SHA is `95fe4b6dbda261a9068d6c7a6b8aa1765bcb0ef19e444abebe47895569731c77`.
 
 The semantic oracle closes 682 exhaustive binary periodic configurations/5,506 ordered reads, the repaired source Blank row at exactly two of sixteen contexts, and 65,536 independently typed complete-result commutations comprising 1,048,576 firings and 4,194,304 child witnesses. An explicit reversible source/successor-token bijection preserves outcomes, changed flags, successor cardinality, step presence, carriers, reads, writes, rectangles, local children, and lineage. Fifty-seven hostile rejections, one lower-right/upper-left divergence, one compatible crossed-width aligned mixed mosaic, and two typed incompatible/no-commit commutations close the adversaries. The semantic SHA is `1faca62a3261a4b328cb70d6daebd00b916788c63e4e4f77109754ccee8715ef`; its digest is `82b03edcc186e9ceccdffb33f1e90fb671a64e4dd008eec057a11f6339f44209`.
 
