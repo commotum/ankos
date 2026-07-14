@@ -195,6 +195,7 @@ UNRESOLVED_IMAGE_LINES: frozenset[int] = frozenset()
 
 assert GOVERNED_IMAGE_LINES == frozenset(ASSETS)
 assert not GOVERNED_IMAGE_LINES & EXCLUDED_IMAGE_LINES
+assert len(CANDIDATE_IMAGE_LINES) == 63
 assert not (
     NATIVE_IMAGE_LINES & RELATION_IMAGE_LINES
     or NATIVE_IMAGE_LINES & CONTROL_IMAGE_LINES
@@ -263,9 +264,20 @@ assert all(
     ) == lines
     for name, lines in EXCLUDED_ASSEMBLIES.items()
 )
+assert {
+    asset.assembly for asset in ASSETS.values() if asset.assembly != "-"
+} == set(ASSEMBLIES)
+assert {
+    asset.assembly
+    for asset in EXCLUDED_ASSETS.values()
+    if asset.assembly != "-"
+} == set(EXCLUDED_ASSEMBLIES)
 
 
 SOURCE_GUARDS = frozenset({
+    "1000|Examples of substitution systems|Thue-Morse sequence|Fibonacci sequence",
+    "1016|same substitution systems|shown in terms of trees|every branch",
+    "1451|Digit sequences of successive numbers|base 2|intricate nested form",
     "1679|first 20,000 digits|curve drawn goes up every time a digit is 1",
     "1707|Digit sequences for various rational numbers|period of at most q-1 steps",
     "1709|successive steps|base 2 digit sequence|rational numbers p/q",
@@ -275,6 +287,13 @@ SOURCE_GUARDS = frozenset({
     "1738|procedure for generating the base 2 digit sequence|square root",
     "1740|two numbers r and s|4(r-s-1)|2(s+2)",
     "1746|starts by setting r=n and s=0|r>s|digits of s in base 2",
+    "1856|pattern of axis crossings|generalized substitution system|continued fraction representation",
+    "6770|Various representations of numbers|ordinary binary|self-delimiting|Fibonacci sequence",
+    "6778|Examples of run-length encoding|output|two black cells",
+    "7118|Statistics of block frequencies|successively greater lengths|substitution systems",
+    "9248|Examples of computations|maximum for input of length n|never halts",
+    "11250|Mathematical interpretation of cellular automata|Cantor set|continuous mapping",
+    "11254|representations of the mappings|Sum[a[t+1|Sum[a[t",
     "12515|Gray code ordering|successive numbers are arranged to differ in only one digit",
     "12522|BitXor[i, Floor[i/2]]|rule 60 cellular automaton",
     "12550|Negative bases|base -2|alternating black and white blocks",
@@ -291,9 +310,21 @@ SOURCE_GUARDS = frozenset({
     "13092|Euclid's algorithm|ContinuedFraction[a/b]",
     "13111|Digital slope representation|Floor[nh] - Floor[(n-1)h]",
     "13130|Operator representations|trees of operations|single constant",
+    "14170|Pell equation|infinitely many solutions|smallest solution",
+    "14172|FromContinuedFraction|ContinuedFraction",
+    "14923|Billiards|continued fraction form|related to substitution systems",
     "17130|Page 560|Number representations|sequence of 1's and 0's",
     "17165|representations (b) through (e)|numbers 1 through 500|grow roughly linearly",
     "17169|Completeness|representations (c), (d) and (e)|valid representation",
+    "17760|Difference tables and polynomials|rule 60|digits of  $\\pi$",
+    "17874|power tree in base 2|conversion from base 3|computing all the other digits",
+    "20586|Minimal cellular automata for sequences|center column|repetitive sequences",
+    "20592|powers of two|squares|Thue-Morse sequence|digits of  $\\sqrt{2}$",
+    "12846|#### The Sequence of Primes",
+    "12915|Iterated aliquot sums|DivisorSigma|perfect numbers",
+    "17591|Complexity of models|least squares fits|external considerations",
+    "17845|lattice points|EulerPhi|Euclid's algorithm",
+    "20582|Other functions|3n|doubling",
 })
 
 ROLE_RECORDS = frozenset(
@@ -301,21 +332,38 @@ ROLE_RECORDS = frozenset(
     for line, asset in ASSETS.items()
 )
 
+EXCLUSION_REASON_RECORDS = frozenset(
+    f"{line}|{asset.role}|{asset.assembly}|{asset.reason}"
+    for line, asset in EXCLUDED_ASSETS.items()
+)
+
 ASSEMBLY_RECORDS = frozenset(
     f"{name}|{','.join(map(str, sorted(lines)))}"
     for name, lines in ASSEMBLIES.items()
 )
 
+EXCLUDED_ASSEMBLY_RECORDS = frozenset(
+    f"{name}|{','.join(map(str, sorted(lines)))}"
+    for name, lines in EXCLUDED_ASSEMBLIES.items()
+)
+
 REFERENCE_RECORDS = frozenset({
-    "monolith|29|one-reference-per-file",
-    "split|27|one-reference-per-linked-file",
-    "total-source-references|56",
+    "governed-monolith|53|one-reference-per-file",
+    "governed-split|51|one-reference-per-linked-file",
+    "governed-total-source-references|104",
+    "excluded-monolith|10|one-reference-per-file",
+    "excluded-split|10|one-reference-per-file",
+    "excluded-total-source-references|20",
+    "candidate-total-source-references|124",
     "split-omissions|1711,1744|physical-files-still-required",
-    "physical-files|29|unique-names-and-paths",
-    "unique-hashes|29",
-    "total-bytes|636440",
-    "boundary|29-HASH_BOUND|0-LIMITED_TRANSCRIBED|0-PIXEL_REPLAYED",
-    "roles|N=11|R=17|C=1",
+    "governed-physical-files|53|unique-names-and-paths",
+    "excluded-physical-files|10|unique-names-and-paths",
+    "candidate-unique-hashes|63",
+    "governed-total-bytes|1905596",
+    "excluded-total-bytes|261881",
+    "candidate-total-bytes|2167477",
+    "boundary|63-HASH_BOUND|0-LIMITED_TRANSCRIBED|0-PIXEL_REPLAYED",
+    "roles|N=11|R=40|C=2|X=10",
 })
 
 TEXTUAL_MECHANICS_RECORDS = frozenset({
@@ -333,10 +381,12 @@ TEXTUAL_MECHANICS_RECORDS = frozenset({
 })
 
 EXPECTED_MANIFEST_DIGESTS = {
-    "source_guards": "b1a57a86341eeb7226da8bc2d7507022be1f7e82eb32069132e2b4fc4119fda3",
-    "roles": "846fc786f8998d93eb417b60c8cd27f7e4d0ddd478f03ebd458d70cb24550d9c",
-    "assemblies": "4c1672f121651214ac4cfd973f9661661f737ebc0fa2901ee90fee5c529fd239",
-    "references": "522cb95db5cfe278b32af6611afce83a57990618c3afcadb28fdcb54312cdfad",
+    "source_guards": "7f904f47370bc4ea6e9bd4c4c417527776b4e8f3ee3011b8ac4dc37f96d40424",
+    "roles": "73231495b94f18a885bd7825f5980e4a42c66ea141fa28f68e4cd5af6c15ba03",
+    "exclusion_reasons": "6f42990d3053281dea23e81229ec6a2669b27af840dc4f5211466a72a5bbb667",
+    "assemblies": "ab6c28930e7b9cbc16044e6223ddffd0412d0538cb72055464a9c9b637742452",
+    "excluded_assemblies": "697583156b3a2ba1ceb310593301587aa68adde714a3b06fd8ec4302fefda708",
+    "references": "41aa839ecc18635acb920ef24ebe9b9a65740ba017180bcd4eef393401fdd4b0",
     "textual_mechanics": "92fa66e92084ad11a2f364ac70237f616f5ba326595ddb1a85efa541448f0f59",
 }
 
@@ -388,12 +438,12 @@ EXPECTED_TEXTUAL_REPLAY_METRICS = (8_255, 96, 3)
 # the recent source/asset interfaces.  The auxiliary ordered digest instead
 # binds the literal `sha256sum`-style path-ordered manifest requested for T40.
 EXPECTED_IMAGE_ASSET_MANIFEST = (
-    29,
-    "1fc4c0e9d7829254d34493c43aa76ce5e91ff989dc545a764b265d4e6f405808",
+    63,
+    "4685ebad9a58b1cc8082b4a03118ad1bcd1780706bceba2bf29184cd8df05b10",
 )
 EXPECTED_ORDERED_SHA256SUM_MANIFEST = (
-    29,
-    "b06ceb5e71f0e92a4d9ca33f110913669666e95beb6085f8a8164f5f5732f772",
+    63,
+    "b46991f5872d58e462716822da8d499a2cde638ffefe5b8920febfd1c69e4601",
 )
 
 
@@ -401,7 +451,9 @@ def verify_semantic_manifests() -> None:
     manifests = {
         "source_guards": SOURCE_GUARDS,
         "roles": ROLE_RECORDS,
+        "exclusion_reasons": EXCLUSION_REASON_RECORDS,
         "assemblies": ASSEMBLY_RECORDS,
+        "excluded_assemblies": EXCLUDED_ASSEMBLY_RECORDS,
         "references": REFERENCE_RECORDS,
         "textual_mechanics": TEXTUAL_MECHANICS_RECORDS,
     }
@@ -510,6 +562,21 @@ def verify_source_interface() -> None:
     assert tuple(source["EXPECTED_IMAGE_ASSET_MANIFEST"]) == (
         EXPECTED_IMAGE_ASSET_MANIFEST
     )
+
+    source_role_by_line: dict[int, str] = {}
+    for record in source["IMAGE_ROLE_RECORDS"]:
+        line_text, role, _description = record.split(":", 2)
+        line = int(line_text)
+        assert line not in source_role_by_line
+        source_role_by_line[line] = role
+    expected_role_by_line = {
+        **{line: "native" for line in NATIVE_IMAGE_LINES},
+        **{line: "relation" for line in RELATION_IMAGE_LINES},
+        **{line: "control" for line in CONTROL_IMAGE_LINES},
+        **{line: "excluded" for line in EXCLUDED_IMAGE_LINES},
+    }
+    assert source_role_by_line == expected_role_by_line
+    assert len(source["IMAGE_ASSEMBLY_BOUNDARIES"]) == 18
 
 
 def long_division_step(r: int, q: int) -> tuple[int, int]:
@@ -651,95 +718,112 @@ def split_and_physical_indices() -> tuple[
     return split_by_name, physical_by_name
 
 
-def ledger() -> tuple[str, tuple[int, int, int, int], str, str]:
-    """Verify the closed universe and return ledger/manifest payloads."""
-
-    scoped_main = {
-        line for line in BOOK_IMAGES if 1665 < line < 1834
-    }
-    scoped_notes = {
-        line for line in BOOK_IMAGES if 12921 < line < 13146
-    }
-    scoped_followed_relations = {12524, 12552, 12557, 17167, 17171}
-    assert frozenset(
-        scoped_main | scoped_notes | scoped_followed_relations
-    ) == GOVERNED_IMAGE_LINES
-    assert (
-        len(scoped_main), len(scoped_notes), len(scoped_followed_relations)
-    ) == (3, 21, 5)
+def ledger() -> tuple[
+    str, str, tuple[int, int, int, int], tuple[int, int, int, int], str, str
+]:
+    """Verify governed/excluded ledgers and the all-candidate manifests."""
 
     split_by_name, physical_by_name = split_and_physical_indices()
-    rows: list[str] = []
     structural_records: set[str] = set()
-    ordered_sha256sum_rows: list[str] = []
-    hashes: set[str] = set()
-    names: set[str] = set()
-    physical_paths: set[Path] = set()
-    total_bytes = 0
-    monolith_references = 0
-    split_references = 0
+    ordered_entries: list[tuple[str, str]] = []
+    candidate_hashes: set[str] = set()
+    candidate_names: set[str] = set()
+    candidate_paths: set[Path] = set()
 
-    for book_line, asset in sorted(ASSETS.items()):
-        role = asset.role[0]
-        assert role in {"N", "R", "C"} and asset.role[1] == "-"
-        assert book_line in {
-            "N": NATIVE_IMAGE_LINES,
-            "R": RELATION_IMAGE_LINES,
-            "C": CONTROL_IMAGE_LINES,
-        }[role]
+    def verify_group(
+        assets: dict[int, AssetSpec], excluded: bool
+    ) -> tuple[str, tuple[int, int, int, int]]:
+        rows: list[str] = []
+        hashes: set[str] = set()
+        names: set[str] = set()
+        physical_paths: set[Path] = set()
+        total_bytes = 0
+        monolith_references = 0
+        split_references = 0
 
-        assert BOOK_IMAGES[book_line] == asset.name
-        assert [
-            line for line, reference in BOOK_IMAGES.items()
-            if Path(reference).name == asset.name
-        ] == [book_line]
-        monolith_references += 1
+        for book_line, asset in sorted(assets.items()):
+            role = asset.role[0]
+            assert asset.role[1] == "-"
+            if excluded:
+                assert role == "X" and book_line in EXCLUDED_IMAGE_LINES
+                assert book_line not in SPLIT_OMISSION_IMAGE_LINES
+            else:
+                assert role in {"N", "R", "C"}
+                assert book_line in {
+                    "N": NATIVE_IMAGE_LINES,
+                    "R": RELATION_IMAGE_LINES,
+                    "C": CONTROL_IMAGE_LINES,
+                }[role]
 
-        split_hits = split_by_name.get(asset.name, [])
-        if book_line in SPLIT_OMISSION_IMAGE_LINES:
-            assert asset.split_markdown == "-" and asset.split_line == 0
-            assert split_hits == [], (book_line, split_hits)
-        else:
-            expected_split = SOURCE_ROOT / asset.split_markdown
-            assert split_hits == [(
-                expected_split, asset.split_line,
-                f"![](Images/{asset.name})",
-            )], (book_line, split_hits)
-            split_references += 1
+            assert BOOK_IMAGES[book_line] == asset.name
+            assert [
+                line for line, reference in BOOK_IMAGES.items()
+                if Path(reference).name == asset.name
+            ] == [book_line]
+            monolith_references += 1
 
-        physical_path = SOURCE_ROOT / asset.physical
-        assert physical_by_name.get(asset.name) == [physical_path]
-        data = physical_path.read_bytes()
-        digest = verify_asset_bytes(book_line, asset, data)
-        assert asset.name not in names
-        assert physical_path not in physical_paths
-        assert digest not in hashes
-        names.add(asset.name)
-        physical_paths.add(physical_path)
-        hashes.add(digest)
-        total_bytes += len(data)
+            split_hits = split_by_name.get(asset.name, [])
+            if book_line in SPLIT_OMISSION_IMAGE_LINES:
+                assert asset.split_markdown == "-" and asset.split_line == 0
+                assert split_hits == [], (book_line, split_hits)
+            else:
+                expected_split = SOURCE_ROOT / asset.split_markdown
+                assert split_hits == [(
+                    expected_split, asset.split_line,
+                    f"![](Images/{asset.name})",
+                )], (book_line, split_hits)
+                split_references += 1
 
-        rows.append("|".join((str(book_line),) + tuple(map(str, asset))))
-        structural_records.add(
-            f"{book_line}->{asset.physical}\0{asset.byte_length}\0{digest}"
+            physical_path = SOURCE_ROOT / asset.physical
+            assert physical_by_name.get(asset.name) == [physical_path]
+            data = physical_path.read_bytes()
+            digest = verify_asset_bytes(book_line, asset, data)
+            assert asset.name not in names and asset.name not in candidate_names
+            assert physical_path not in physical_paths
+            assert physical_path not in candidate_paths
+            assert digest not in hashes and digest not in candidate_hashes
+            names.add(asset.name)
+            physical_paths.add(physical_path)
+            hashes.add(digest)
+            candidate_names.add(asset.name)
+            candidate_paths.add(physical_path)
+            candidate_hashes.add(digest)
+            total_bytes += len(data)
+
+            rows.append("|".join((str(book_line),) + tuple(map(str, asset))))
+            structural_records.add(
+                f"{book_line}->{asset.physical}\0{asset.byte_length}\0{digest}"
+            )
+            root_relative = physical_path.relative_to(ROOT).as_posix()
+            ordered_entries.append((root_relative, digest))
+
+        assert len(names) == len(physical_paths) == len(hashes) == len(assets)
+        payload = "\n".join(rows) + "\n"
+        return payload, (
+            monolith_references, split_references, len(hashes), total_bytes
         )
-        root_relative = physical_path.relative_to(ROOT).as_posix()
-        ordered_sha256sum_rows.append(f"{digest}  {root_relative}\n")
 
-    assert len(names) == len(physical_paths) == len(hashes) == 29
-    assert (monolith_references, split_references) == (29, 27)
-    payload = "\n".join(rows) + "\n"
-    ordered_payload = "".join(ordered_sha256sum_rows)
+    governed_payload, governed_metrics = verify_group(ASSETS, False)
+    excluded_payload, excluded_metrics = verify_group(EXCLUDED_ASSETS, True)
+    assert len(candidate_names) == len(candidate_paths) == len(candidate_hashes) == 63
+    ordered_payload = "".join(
+        f"{digest}  {path}\n" for path, digest in sorted(ordered_entries)
+    )
     return (
-        payload,
-        (monolith_references, split_references, len(hashes), total_bytes),
+        governed_payload,
+        excluded_payload,
+        governed_metrics,
+        excluded_metrics,
         digest_records(structural_records),
         sha256(ordered_payload.encode("utf-8")),
     )
 
 
-EXPECTED_LEDGER_SHA256 = (
-    "c5c030aa35a158fe7797fbee2060200dc9e3f89fdac4066c73c978711943780f"
+EXPECTED_GOVERNED_LEDGER_SHA256 = (
+    "fc2a90430e488e07c55b8451a06b268ac6301531295a1f8485fc1c465c6751b3"
+)
+EXPECTED_EXCLUDED_LEDGER_SHA256 = (
+    "0d20ce40ce927edd5d032d6d763d52cf257b8e8957718219db216a2911ad26fe"
 )
 
 
@@ -751,17 +835,36 @@ def main() -> None:
     verify_source_guards()
     verify_source_interface()
     long_checks, sqrt_events, sqrt_source_mismatches = verify_textual_replays()
-    payload, metrics, structural_digest, ordered_digest = ledger()
-    ledger_digest = sha256(payload.encode("utf-8"))
-    assert ledger_digest == EXPECTED_LEDGER_SHA256, (
-        "ledger", ledger_digest, EXPECTED_LEDGER_SHA256,
+    (
+        governed_payload, excluded_payload, governed_metrics, excluded_metrics,
+        structural_digest, ordered_digest,
+    ) = ledger()
+    governed_ledger_digest = sha256(governed_payload.encode("utf-8"))
+    excluded_ledger_digest = sha256(excluded_payload.encode("utf-8"))
+    assert governed_ledger_digest == EXPECTED_GOVERNED_LEDGER_SHA256, (
+        "governed ledger", governed_ledger_digest,
+        EXPECTED_GOVERNED_LEDGER_SHA256,
     )
-    assert (29, structural_digest) == EXPECTED_IMAGE_ASSET_MANIFEST
-    assert (29, ordered_digest) == EXPECTED_ORDERED_SHA256SUM_MANIFEST
+    assert excluded_ledger_digest == EXPECTED_EXCLUDED_LEDGER_SHA256, (
+        "excluded ledger", excluded_ledger_digest,
+        EXPECTED_EXCLUDED_LEDGER_SHA256,
+    )
+    assert (63, structural_digest) == EXPECTED_IMAGE_ASSET_MANIFEST
+    assert (63, ordered_digest) == EXPECTED_ORDERED_SHA256SUM_MANIFEST
     assert (
-        metrics[0], metrics[1], metrics[0] + metrics[1]
+        governed_metrics[0], governed_metrics[1],
+        governed_metrics[0] + governed_metrics[1]
     ) == EXPECTED_REFERENCE_METRICS
-    assert (metrics[2], metrics[2], metrics[3]) == EXPECTED_PHYSICAL_METRICS
+    assert (
+        excluded_metrics[0], excluded_metrics[1],
+        excluded_metrics[0] + excluded_metrics[1]
+    ) == EXPECTED_EXCLUDED_REFERENCE_METRICS
+    assert (
+        governed_metrics[2], governed_metrics[2], governed_metrics[3]
+    ) == EXPECTED_PHYSICAL_METRICS
+    assert (
+        excluded_metrics[2], excluded_metrics[2], excluded_metrics[3]
+    ) == EXPECTED_EXCLUDED_PHYSICAL_METRICS
     assert (
         long_checks, sqrt_events, sqrt_source_mismatches
     ) == EXPECTED_TEXTUAL_REPLAY_METRICS
@@ -774,22 +877,31 @@ def main() -> None:
         EXPECTED_ASSEMBLY_METRICS
     )
     assert (
+        len(EXCLUDED_ASSEMBLIES),
+        sum(map(len, EXCLUDED_ASSEMBLIES.values())),
+    ) == EXPECTED_EXCLUDED_ASSEMBLY_METRICS
+    assert (
         len(HASH_BOUND_IMAGE_LINES), len(LIMITED_TRANSCRIBED_IMAGE_LINES),
         len(PIXEL_REPLAYED_IMAGE_LINES),
     ) == EXPECTED_BOUNDARY_METRICS
-    assert len(ROLE_RECORDS) == 29 and len(SOURCE_GUARDS) == 28
+    assert len(ROLE_RECORDS) == 53
+    assert len(EXCLUSION_REASON_RECORDS) == 10
+    assert len(SOURCE_GUARDS) == 50
 
     print(
-        "T40 asset oracle: PASS governed=29; classes N/R/C=11/17/1; "
-        "candidates=29; excluded=0; refs=56(monolith=29,split=27); "
-        "split_link_omissions=2(page154,page156); unique_hashes=29; "
-        "physical_files=29; bytes=636440; assemblies=5/18_files; "
-        "boundary=29_HASH_BOUND/0_LIMITED_TRANSCRIBED/0_PIXEL_REPLAYED; "
+        "T40 asset oracle: PASS governed=53; classes N/R/C=11/40/2; "
+        "candidates=63; excluded=10; "
+        "governed_refs=104(monolith=53,split=51); "
+        "excluded_refs=20(monolith=10,split=10); "
+        "split_link_omissions=2(page154,page156); unique_hashes=63; "
+        "physical_files=63; governed_bytes=1905596; excluded_bytes=261881; "
+        "assemblies=12/40_files; excluded_assemblies=1/5_files; "
+        "boundary=63_HASH_BOUND/0_LIMITED_TRANSCRIBED/0_PIXEL_REPLAYED; "
         f"textual_replay=long_division_{long_checks}_states/"
         f"sqrt_{sqrt_events}_events; "
         f"sqrt2_extracted_bit_defect=guarded_{sqrt_source_mismatches}_mismatches; "
         "rational_sqrt_extension_counterexample=11/5_guarded; "
-        "ordered_manifest=b06ceb5e71f0e92a4d9ca33f110913669666e95beb6085f8a8164f5f5732f772; "
+        f"ordered_manifest={ordered_digest}; "
         "pixel_inference=0; unresolved_image_dispositions=0"
     )
 

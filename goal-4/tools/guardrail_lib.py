@@ -178,6 +178,36 @@ def filename_set_digest(names: Iterable[str]) -> str:
     return sha256_bytes(payload)
 
 
+def legacy_recursive_signature(root: Path) -> dict[str, Any]:
+    """Diagnostic recursive signature used only to detect consumer contamination."""
+
+    require(root.is_dir(), f"legacy fixture root is missing: {root}")
+    markdown: list[str] = []
+    jpeg: list[str] = []
+    basenames: dict[str, list[str]] = {}
+    for path in sorted(root.rglob("*"), key=lambda item: item.as_posix()):
+        require(not path.is_symlink(), f"legacy fixture contains a symlink: {path}")
+        if not path.is_file():
+            continue
+        relative = path.relative_to(root).as_posix()
+        if path.suffix == ".md":
+            markdown.append(relative)
+        elif path.suffix == ".jpeg":
+            jpeg.append(relative)
+            basenames.setdefault(path.name, []).append(relative)
+    signature_body = {
+        "markdown_paths": markdown,
+        "jpeg_paths": jpeg,
+        "duplicate_jpeg_basenames": {
+            name: paths for name, paths in sorted(basenames.items()) if len(paths) > 1
+        },
+    }
+    return {
+        **signature_body,
+        "signature_sha256": sha256_bytes(canonical_json_bytes(signature_body)),
+    }
+
+
 EXPECTED_REPAIR_CLASSES = {
     "STRUCTURE_BOUNDARY",
     "MARKDOWN_STRUCTURE",
