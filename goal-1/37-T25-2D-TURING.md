@@ -58,7 +58,7 @@ Closure:
 - Index: all 21 routed lines have exact entry guards, including artificial ants, hexagonal/square lattices, randomness, named people, Logo/robotics, worms, `TMs`, Turing aliases, vants, turmites, and turning machines.
 - Split corpus: 17 files; query reverse join `63 exact + 7 normalized variants`; retained reverse join `47 exact + 16 normalized variants`; 0 monolith-only.
 - Atlas: one taxonomy-summary hit only. Catalog/taxonomy are vocabulary controls.
-- Frozen source-oracle SHA-256: `4a1dab6f8f5158d84a5a879b0f18e5131e0ae11dbe26c8dc398bafb5e9dbb920`.
+- Frozen source-oracle SHA-256: `be3b9651605805ca4d947dcb7a09c2adf5a06214627c9ff33b8b42a31fadf29d`.
 - Root, relocated-cwd, optimized-mode rejection, silent import, explicit compile, diff, and mode-644 gates pass; `unresolved_total=0`.
 
 ## Book Excerpts
@@ -143,12 +143,12 @@ This is evidence for a lossless tagged representation within the existing simple
 
 Sampling chooses a complete immutable table or seed before execution. No per-event RNG, stochastic UPDATE, or hidden random state follows.
 
-### E11 — 2D mobile automata remain a distinct RULE restriction
+### E11 — 2D mobile automata use a distinct read/RULE schema
 
 - Source: `BOOK:13679`, with the T25 schema at `BOOK:13662`.
-- Establishes: the adjacent 2D-mobile family has `(4k)^k` rules because it has no independent head-state factor; T25 has `(4sk)^(sk)`.
+- Establishes: the adjacent 2D-mobile family reads the active cell plus four neighbors, writes one of `k` colors, and chooses one of four moves. Its intended count is therefore `(4k)^(k^5)`, or `8^32 = 79,228,162,514,264,337,593,543,950,336` for `k=2`, matching the same sentence's “nearly `10^29`”. The local Markdown's displayed `(4k)^k` has lost the exponent and would give only `64`. T25 instead reads only `(q,a)` and has `(4sk)^(sk)` rules.
 
-Both use the same SimpleProgram axes and runner. Their different compact input/result schemas are presets, not executor boundaries.
+Both use the same SimpleProgram axes and runner. Their different compact access/table schemas are typed configurations of those axes, not executor boundaries and not restrictions of one another.
 
 ### E12 — histories, paths, and aliases do not add state
 
@@ -208,7 +208,7 @@ It proves `decode(generic_step(delta,encode(native))) = native_step(delta,native
 
 The strict exhaustive set proves, for the declared cardinal realization, that changing every candidate destination symbol never changes RULE output, while UPDATE preserves the selected old destination symbol. This proof is structural in the four distinct semantic ports and does not claim the coordinate vectors were transcribed from the unparsed figure. The exact Langton formula independently supplies its own four unit-complex displacements, expands to eight closed rows, and round-trips through the C4 relative-turn restriction. Two counterexamples prove that arbitrary absolute tables need not factor through relative turns. The hex witness proves topology/action reuse while explicitly leaving the source's `1296` worm schema underdetermined.
 
-Additional guards cover total-default canonicalization, product-table completeness, exact types, stale snapshot tokens, foreign topology frames, invalid ports/states/symbols, zero/two heads, bare-union information loss, atomic zero-head intermediate rejection, size-1/size-2 quotient aliases, size-3 local injectivity, silent coordinate-frame divergence, immutable setup-table replay, observer noninterference, and 38 hostile failures. Semantic digest: `8eed091c1b3635661fb160ce76a49738f282ae1ec94a71fcb8a303a8735434e2`. Root/relocated outputs match, optimized mode fails closed, import is silent, compilation/diff gates pass, and mode is `644`.
+Additional guards cover total-default canonicalization, product-table completeness, exact types, stale snapshot tokens, foreign topology frames, invalid ports/states/symbols, zero/two heads, bare-union information loss, atomic zero-head intermediate rejection, size-1/size-2 quotient aliases, size-3 local injectivity, silent coordinate-frame divergence, immutable setup-table replay, the repaired `8^32` 2D-mobile control count, observer noninterference, and 38 hostile failures. Semantic digest: `10625dab78d4e75580c254a2a99337e0a9562935689dd17e7cbe76998f6f80ab`. Root/relocated outputs match, optimized mode fails closed, import is silent, compilation/diff gates pass, and mode is `644`.
 
 ## Current API Fit
 

@@ -115,7 +115,8 @@ QUERIES = {
     "Q10": (
         r"\b2D mobile automata\b|"
         r"\bMobile automata can be generalized just like Turing machines\b|"
-        r"\$\(4k\)\^k\$ possible rules"
+        r"\$\(4k\)\^k\$ possible rules|"
+        r"nearly\s+\$10\^\{29\}\$\s+even for k = 2"
     ),
     "Q11": (
         r"\bline of cells, known as the \"tape\"\b|"
@@ -286,8 +287,10 @@ RELATION_EVIDENCE = line_set(
 
 # Controls prevent nearby language from becoming invented semantics: random
 # rule sampling and observed randomness are not stochastic UPDATE; a missing
-# printed 3-state formula is not reconstructed; 2D mobile automata are a
-# different read rule; and CA emulation is not the native compact program.
+# printed 3-state formula is not reconstructed; the malformed 2D-mobile
+# exponent is repaired only from its five-cell input and same-line magnitude;
+# 2D mobile automata are a different read rule; and CA emulation is not the
+# native compact program.
 CONTROL_EVIDENCE = line_set(
     "2278,13676,13679,16400"
 )
@@ -705,6 +708,7 @@ def main() -> int:
         "OK" if hex_worm_source_limit_ok else "MISMATCH", 1296,
     )
 
+    mobile_2d_binary_count = (4 * 2) ** (2**5)
     experiment_controls_ok = (
         "million randomly chosen rules" in at(2278)
         and "one of the rules" in at(2294)
@@ -713,11 +717,14 @@ def main() -> int:
         and at(13678).startswith("- Rules based on turning.")
         and "2D mobile automata" in at(13679)
         and "$(4k)^k$" in at(13679)
+        and "$10^{29}$" in at(13679)
+        and mobile_2d_binary_count == 8**32
+        and 10**28 < mobile_2d_binary_count < 10**29
     )
     ok &= experiment_controls_ok
     print(
-        "random_ensemble_missing_formula_mobile_control",
-        "OK" if experiment_controls_ok else "MISMATCH",
+        "random_ensemble_and_mobile_ocr_control",
+        "OK" if experiment_controls_ok else "MISMATCH", mobile_2d_binary_count,
     )
 
     # Conditional rule-space count: inherited Q x Sigma input and typed output

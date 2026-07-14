@@ -256,6 +256,8 @@ The network consumes the full evolution; it is not state required by `MAStep`.
 
 These passages prove relations and variants but not native reuse by compilation.
 
+The displayed 2D-mobile formula in the local Markdown has lost an exponent. The same source sentence says the binary count is nearly `10^29`; a rule reads the active cell plus four neighbors (`k^5` contexts) and chooses a new color plus one of four moves (`4k` outputs), so the repaired count is `(4k)^(k^5)`, giving `8^32 ≈ 7.92×10^28` for `k=2`. The corrupt `(4k)^k=64` fragment is retained above only as verbatim corpus provenance.
+
 ## Construction Model
 
 ### Native transition

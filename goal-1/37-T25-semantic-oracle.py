@@ -300,6 +300,14 @@ def general_rule_count(state_count: int, symbol_count: int, movement_count: int)
     return (moves * states * symbols) ** (states * symbols)
 
 
+def mobile_2d_rule_count(symbol_count: int) -> int:
+    """Four-neighbor mobile rule: k^5 reads and 4k possible results."""
+    symbols = exact_int(symbol_count, "mobile alphabet size")
+    if symbols < 2:
+        raise ValueError("mobile alphabet must contain at least two symbols")
+    return (4 * symbols) ** (symbols**5)
+
+
 @dataclass(frozen=True)
 class Plain:
     symbol: int
@@ -1089,14 +1097,19 @@ def assert_rule_spaces_and_distinctions() -> dict[str, int]:
     assert general_rule_count(3, 2, 4) == 24**6 == 191_102_976
     assert general_rule_count(4, 2, 4) == 32**8 == 2**40
     assert general_rule_count(2, 2, 2) == 8**4 == 4_096  # T12 one-dimensional control
-    mobile_2d_count = (4 * 2) ** 2
-    assert mobile_2d_count == 64
+    # The local Markdown drops the exponent on BOOK:13679, but the same
+    # sentence says "nearly 10^29" for k=2.  Four neighbors plus the active
+    # cell give k^5 inputs; each row chooses one of k writes and four moves.
+    mobile_2d_count = mobile_2d_rule_count(2)
+    assert mobile_2d_count == 8**32
+    assert 10**28 < mobile_2d_count < 10**29
     assert mobile_2d_count != general_rule_count(2, 2, 4)
     return {
         "derived_rule_count_checks": 5,
         "square_two_state_binary_rules": general_rule_count(2, 2, 4),
         "square_three_state_binary_rules": general_rule_count(3, 2, 4),
         "square_four_state_binary_rules": general_rule_count(4, 2, 4),
+        "mobile_2d_binary_rules": mobile_2d_count,
         "strict_move_ports": 4,
         "source_numeric_codecs": 0,
     }
@@ -1279,7 +1292,7 @@ def semantic_digest(counts: dict[str, int]) -> str:
     return sha256(transcript.encode("utf-8")).hexdigest()
 
 
-EXPECTED_SEMANTIC_DIGEST = "8eed091c1b3635661fb160ce76a49738f282ae1ec94a71fcb8a303a8735434e2"
+EXPECTED_SEMANTIC_DIGEST = "10625dab78d4e75580c254a2a99337e0a9562935689dd17e7cbe76998f6f80ab"
 
 
 def main() -> None:
@@ -1338,6 +1351,7 @@ def main() -> None:
         f"square_s2k2:{groups['rules']['square_two_state_binary_rules']};"
         f"square_s3k2:{groups['rules']['square_three_state_binary_rules']};"
         f"square_s4k2:{groups['rules']['square_four_state_binary_rules']};"
+        f"mobile_2d_k2:{groups['rules']['mobile_2d_binary_rules']};"
         "source_numeric_codec=NONE"
     )
     print(
