@@ -6,7 +6,7 @@ Status: **IN PROGRESS — DEPENDENCY PLAN AND 45-ROW COVERAGE MATRIX DRAFTED; FI
 
 Implement the evidence-grounded SimplePrograms architecture in `src/ca` without repeating Goal 1 research, without introducing a second executor, and without losing the separate conformance identity of any row in `ref/notes/CA-Types.csv`.
 
-This handoff is subordinate to the evidence and semantic boundaries in the 45 type-stage files, `architecture-audit.md`, `design-ledger.md`, and `47-SYNTHESIS.md`. If implementation pressure contradicts those records, stop and re-derive the affected Goal 1 decision; do not add a family switch, compatibility path, callback, or lossy representation.
+This handoff is subordinate to the evidence and semantic boundaries in the 45 type-stage files, `architecture-audit.md`, `design-ledger.md`, and `47-SYNTHESIS.md`. If implementation pressure contradicts those records, stop and re-derive the affected Goal 1 decision; do not add a family switch, second semantic/execution compatibility path, callback, or lossy representation.
 
 ## Target Architecture
 
@@ -32,7 +32,7 @@ Declarative constraints, closed function/constant definitions, and differential 
 5. UPDATE policies are typed implementations of one axis. Do not assign ordinal “update-law” classes or construction-named executors.
 6. A preset constructs an ordinary `SimpleProgram`; it does not register a rollout function.
 7. A representation claim requires an inverse on the invariant-valid image and one-native-step full-result commutation. A compiler, numerical method, or simulation that fails that test remains an explicit relation.
-8. Current APIs are migrated atomically to the new model. Do not retain a `LegacyDynamics`, old family rollout, fallback conversion, or shadow compatibility implementation.
+8. Public execution is migrated atomically to the new model. Do not retain a `LegacyDynamics`, old family rollout, fallback conversion, or shadow semantic implementation. A deprecated construction-time façade is permitted only if its total lossless mapping immediately returns an ordinary `SimpleProgram` and never selects or implements execution.
 9. Goal 1 raster assets remain evidence fixtures under their recorded authority levels. Hash binding or limited transcription does not authorize pixel-decoded rules.
 10. Unsupported evidence boundaries fail with typed reasons. They are never filled with textbook defaults or implementation convenience.
 
@@ -99,6 +99,56 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 | G2-10 | C29 |
 | G2-11 | C30 after C16; its compressed/folded graph remains a trace/view relation rather than a T29 runtime dependency |
 
+The following matrix is normative. `Cnn` is the leaf obligation for `Tnn`; `—` means that the leaf has no prerequisite catalog proof beyond its shared-stage substrate. These are direct leaf dependencies, while the stage DAG above supplies transitive implementation dependencies.
+
+| Catalog row | Leaf | Direct leaf dependencies |
+|---|---|---|
+| T01 | C01 | — |
+| T02 | C02 | C01 |
+| T03 | C03 | C02 |
+| T04 | C04 | C03 |
+| T05 | C05 | C03 |
+| T06 | C06 | C03 |
+| T07 | C07 | C02 |
+| T08 | C08 | — |
+| T09 | C09 | — |
+| T10 | C10 | C09 |
+| T11 | C11 | C09 |
+| T12 | C12 | C09 |
+| T13 | C13 | — |
+| T14 | C14 | C13 |
+| T15 | C15 | C14 |
+| T16 | C16 | C13 |
+| T17 | C17 | C13 |
+| T18 | C18 | C17 |
+| T19 | C19 | — |
+| T20 | C20 | C16 |
+| T21 | C21 | C03 |
+| T22 | C22 | C21 |
+| T23 | C23 | C22 |
+| T24 | C24 | C23 |
+| T25 | C25 | C12, C21, C24 |
+| T26 | C26 | C13, C27 |
+| T27 | C27 | — |
+| T28 | C28 | C14, C21, C26 |
+| T29 | C29 | — |
+| T30 | C30 | C16 |
+| T31 | C31 | — |
+| T32 | C32 | C31 |
+| T33 | C33 | C32 |
+| T34 | C34 | — |
+| T35 | C35 | C34 |
+| T36 | C36 | C34 |
+| T37 | C37 | C16 |
+| T38 | C38 | C37 |
+| T39 | C39 | C37 |
+| T40 | C40 | C34, C36, C41, C43 |
+| T41 | C41 | — |
+| T42 | C42 | C13, C40 |
+| T43 | C43 | C34 |
+| T44 | C44 | C01, C43 |
+| T45 | C45 | C31, C41, C44 |
+
 ## Detailed Goal 2 Stages
 
 ### G2-00 — Freeze the Baseline and Migration Contract
@@ -109,15 +159,15 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 
 **Implementation:**
 
-- Record the current 119-test baseline and classify each assertion as canonical evidence, retained public behavior, or incidental Phase 1 behavior.
+- Record the current 141-test baseline and classify each assertion as canonical evidence, retained public behavior, or incidental Phase 1 behavior.
 - Create a machine-readable 45-row conformance manifest joining CSV ID, exact name, Goal 1 stage, Goal 2 stage, canonical fixtures/oracles, and evidence authority.
-- State the in-place migration: `SimpleProgram` replaces the current CA-only `Dynamics` contract; current CA constructors become direct presets; repeated `rollout` becomes generic iteration of `step`; no legacy executor survives.
+- State the in-place migration: `SimpleProgram` replaces the current CA-only `Dynamics` semantic contract; current CA constructors become direct presets; repeated `rollout` becomes generic iteration of `step`; no legacy executor survives. Decide separately whether a deprecated construction-only façade is worth retaining under rule 8.
 - Update project language to “SimplePrograms library based on *A New Kind of Science*” while retaining `ca` as the package path.
 - Pin the Python/NumPy serialization assumptions that must be removed from semantic identity.
 
 **Tests/evidence:** current suite passes before semantic changes; CSV/manifest join proves 45 unique rows; fixture hashes match Goal 1; source inventory is frozen.
 
-**Complete when:** the baseline and migration manifest are reviewed, every current behavior has a disposition, and no promised compatibility path requires two implementations.
+**Complete when:** the baseline and migration manifest are reviewed, every current behavior has a disposition, and no promised compatibility surface requires two semantic implementations or execution paths.
 
 **Re-derive if:** a current behavior claimed as canonical contradicts a Goal 1 oracle, or package migration would require a second executor rather than a direct replacement.
 
@@ -131,7 +181,7 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 
 - Add explicit discrete/continuous `t+dD` descriptors without embedding support shapes.
 - Add finite ordered alphabets, product factors, tagged unions, semantic address/key types, and exact cardinality/order validation.
-- Add exact naturals, integers, reduced rationals, algebraic/deferred-exact tags, and explicit represented-real profiles. Machine floats never impersonate exact values.
+- Add exact naturals, integers, reduced rationals, algebraic values, sealed structural exact-denotation profiles with typed `Unsupported` evaluation where no backend exists, and explicit represented-real profiles. Machine floats never impersonate exact values, and an exact-denotation profile never contains a lazy evaluator or CAS object.
 - Add complete carriers for fixed/total/sparse fields, finite words, keyed products, scalars, prefixes, bags, and rooted graphs as structural schemas, while delaying their UPDATE behavior to later stages.
 - Add invariant combinators such as exactly-one tag, uniform product factor, nonempty word, total default-plus-overrides field, graph port/root constraints, and carrier closure.
 - Define canonical structural equality, identity, provenance, and JSON-safe bigint/exact-value codecs. Digests are derived from validated structure.
@@ -160,10 +210,11 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 - Add exact finite successor sets and `Advanced | Quiescent | Terminal | Invalid | Error` outcomes with typed reasons, events, witnesses, and provenance.
 - Make every axis fallible through one generic bind; later axes do not execute after failure.
 - Separate raw semantic traces from coordinates, padding, batches, and renderings.
+- Keep this runner non-public scaffolding until G2-12 performs the single atomic public cutover. Intermediate conformance stages may test it directly, but no released/public call graph may expose both the old and new executors.
 
 **Tests/evidence:** AST/source inspection forbids catalog/family dispatch in `step` and repeated run; axis-spy ordering; snapshot identity; no-commit failure; invariant validation before/after; deterministic singleton, quiescent self, terminal empty, and exact multi-successor envelopes; witness retention; replay; batch/scalar parity.
 
-**Complete when:** current fixed-field behavior can be expressed by ordinary axis data, and the runner has no knowledge of any catalog construction or closed policy tag beyond the typed interface it invokes.
+**Complete when:** current fixed-field behavior can be expressed by ordinary axis data, the runner has no knowledge of any catalog construction or closed policy tag beyond the typed interface it invokes, and the public API still exposes exactly one execution path pending the G2-12 cutover.
 
 **Re-derive if:** a type needs runner-visible family information, failure requires an ad hoc early-return branch, or result data cannot distinguish outcome from successor cardinality.
 
@@ -364,13 +415,13 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 
 - Replace the current six-family `specs.py` resolution with versioned construction of closed axis descriptors and presets. Registry tags choose codecs/constructors only.
 - Replace all family branches in `rollout.py` with generic `step`/run/batch traversal; delete the old paths in the same change.
-- Migrate current CA manifests, constructors, datasets, exports, and tests to `SimpleProgram`; do not keep a `Dynamics` wrapper or fallback executor.
+- Atomically expose the generic runner and migrate current CA manifests, constructors, datasets, exports, and tests to `SimpleProgram`. Remove every fallback executor. A deprecated `Dynamics`-named constructor may remain only if it is a total lossless façade that immediately returns `SimpleProgram`, has no semantic methods or serialized identity of its own, and passes direct-construction equivalence tests.
 - Make dataset planning select already constructed programs/seeds; RNG remains explicit seed/realization work and never hidden transition state.
 - Generalize raw trace export without flattening semantic state into canonical `[t,x,y,z]`; coordinates and visualization remain type-specific views over raw structural traces.
 - Publish the 45-row preset/conformance manifest and validate that every preset is ordinary structural axis data.
 - Update the API document to the synthesis algebra, document declarative query APIs separately, and state every typed unsupported boundary.
 
-**Tests/evidence:** all shared/unit/conformance/mutation/replay suites; all 45 Goal 1 oracle interfaces or ported fixtures; current canonical behavior; serialization compatibility only through the new versioned schema; runner AST no-family gate; no-callback/no-`Any` schema gate; all-catalog one-to-one join; docs examples; install/import/export/dataset/viz smoke tests.
+**Tests/evidence:** all shared/unit/conformance/mutation/replay suites; all 45 Goal 1 oracle interfaces or ported fixtures; current canonical behavior; serialization compatibility only through the new versioned schema; runner AST no-family gate; no-callback/no-`Any` schema gate; all-catalog one-to-one join; optional deprecated-façade direct-construction equivalence and call-graph tests; docs examples; install/import/export/dataset/viz smoke tests.
 
 **Complete when:** all 45 rows pass their unique conformance obligation, the old executor is gone, one runner advances every stepwise preset, declarative objects never enter rollout, and source inspection finds no semantic family branch or fallback path.
 
@@ -378,7 +429,7 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 
 ## Exact 45-Row Coverage Matrix
 
-The `Coverage stage` column assigns each catalog row exactly once. Leaf obligation `Cnn` is definitionally the conformance obligation for catalog row `Tnn`; there is no independent remapping. The normative leaf-order table above enumerates all 45 `Cnn` obligations exactly once and gives their direct proof dependencies, while the stage DAG supplies the shared-substrate dependencies. Shared implementation is planned above and is not duplicated here. The named Goal 1 file is the authority for exact fixtures, source repairs, variants, and negative tests.
+The `Coverage stage` column assigns each catalog row exactly once. Leaf obligation `Cnn` is definitionally the conformance obligation for catalog row `Tnn`; there is no independent remapping. The normative 45-row leaf-dependency matrix above maps every row exactly once and gives direct proof dependencies, while the stage DAG supplies the shared-substrate dependencies. Shared implementation is planned above and is not duplicated here. The named Goal 1 file is the authority for exact fixtures, source repairs, variants, and negative tests.
 
 | ID | Exact catalog name | Coverage stage | Goal 1 authority | Required conformance focus |
 |---|---|---|---|---|
@@ -443,13 +494,13 @@ The `Coverage stage` column assigns each catalog row exactly once. Leaf obligati
 | ID/digest authority | Mutate payload under retained ID and ID under retained payload; both fail/rederive structurally |
 | Solver as semantics | Query result requires scope and replayable witness/certificate; work trace and mathematical object IDs differ |
 | Duplicate catalog work | Mechanical CSV/manifest/table join proves 45 unique IDs and exact names, each with one coverage stage |
-| Compatibility fork | Source scan and call-graph test prove the old family rollout and fallback conversions are removed |
+| Second semantic/execution compatibility fork | Source scan and call-graph tests prove the old family rollout and fallback conversions are removed; any deprecated constructor returns the ordinary structural program before execution |
 
 ## Migration Map
 
 | Current Phase 1 responsibility | Goal 2 disposition |
 |---|---|
-| `Dynamics(domain, shape, rule, neighborhoods, frontier, boundary)` | Replace with `SimpleProgram` whose DOMAIN, configuration schema/realization, axes, and invariants are typed separately |
+| `Dynamics(domain, shape, rule, neighborhoods, frontier, boundary)` | Replace the semantic contract with `SimpleProgram`, whose DOMAIN, configuration schema/realization, axes, and invariants are typed separately; an optional deprecated name may only be a direct construction façade |
 | Fixed `Alphabet` helpers | Retain as finite-alphabet constructors; add ordered/product/tagged schemas and exact value separation |
 | Tensor `Frontier` | Generalize to firing-source selection; fixed next-slice behavior becomes one preset |
 | Offset-only `Neighborhood` | Retain offset access and add closed named/span/path/product patterns |
@@ -482,7 +533,7 @@ Goal 2 is complete only when:
 - [ ] Every stepwise type advances through the same inspected `step` implementation.
 - [ ] Every declarative type is constructible/queryable without fake rollout.
 - [ ] All Goal 1 semantic/source/asset oracle interfaces or faithfully ported fixtures pass.
-- [ ] The old family executor, legacy compatibility path, opaque callback fields, and silent conversions are absent.
+- [ ] The old family executor, second semantic/execution compatibility path, opaque callback fields, and silent conversions are absent; any deprecated construction façade is lossless and executor-free.
 - [ ] Serialization is structural, versioned, fail-closed, and replay-complete.
 - [ ] Documentation, datasets, and visualization consume semantic results without redefining them.
 - [ ] Repository-wide tests, type/schema checks, mutation tests, Markdown/code examples, and `git diff --check` pass.
