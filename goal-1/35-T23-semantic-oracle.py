@@ -1986,8 +1986,8 @@ def assert_native_generic_commutation() -> dict[str, int]:
         )
         counts["named"] += 1
 
-    ternary_cells = tuple((index * 2 + 1) % 3 for index in range(8))
-    ternary_native = Native3DState(3, (2, 2, 2), PeriodicBoundary(), ternary_cells)
+    ternary_cells = tuple((index * 2 + 1) % 3 for index in range(27))
+    ternary_native = Native3DState(3, (3, 3, 3), FixedBoundary(0), ternary_cells)
     for profile, width in (("axes", 39), ("full", 159)):
         rule = CountProductRule(
             profile,
@@ -1995,9 +1995,32 @@ def assert_native_generic_commutation() -> dict[str, int]:
             3,
             tuple(((index % 3) + (index // 3)) % 3 for index in range(width)),
         )
-        assert decode_generic(
+        signatures = tuple(
+            (
+                ternary_native.value_at(layer, row, column),
+                sum(
+                    native_neighbor_values(
+                        ternary_native,
+                        layer,
+                        row,
+                        column,
+                        profile,
+                    )
+                ),
+            )
+            for layer, row, column in product(range(3), repeat=3)
+        )
+        assert len({neighbor_sum for _center, neighbor_sum in signatures}) > 1
+        assert any(
+            len({neighbor_sum for seen_center, neighbor_sum in signatures if seen_center == center}) > 1
+            for center in range(3)
+        )
+        native_next = native_count_step(rule, ternary_native)
+        generic_next = decode_generic(
             generic_step(program_for(rule), encode_native(ternary_native))
-        ) == native_count_step(rule, ternary_native)
+        )
+        assert generic_next == native_next
+        assert set(native_next.cells) == {0, 1, 2}
         counts["ternary"] += 1
 
     assert counts == {
