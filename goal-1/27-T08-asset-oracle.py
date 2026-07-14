@@ -73,18 +73,22 @@ def jpeg_size(data):
 
 def ledger():
     base=ROOT/'ref/A-New-Kind-of-Science'
-    md_files=sorted((base/'CHAPTERS').rglob('*.md'))+sorted((base/'BACK-MATTER').rglob('*.md'))
+    md_files=sorted(p for p in base.rglob('*.md')
+                    if p.resolve()!=BOOK.resolve() and p.name!='ANKoS-Atlas.md')
+    assert len(md_files)==17
     rows=[]; hashes=set(); refs=0
     for n in sorted(U):
         kind='I' if n in I else 'R' if n in R else 'X'
         name=Path(imgs[n]).name
+        monolith_hits=[j for j,ref in imgs.items() if Path(ref).name==name]
+        assert monolith_hits==[n],(n,monolith_hits)
         paths=[p for p in base.rglob(name) if p.is_file()]; assert len(paths)==1,(n,paths)
         p=paths[0]; data=p.read_bytes(); digest=hashlib.sha256(data).hexdigest(); assert digest not in hashes; hashes.add(digest)
         hits=[]
         for md in md_files:
             for j,line in enumerate(md.read_text(encoding='utf-8').splitlines(),1):
                 if re.fullmatch(r'!\[\]\((?:Images/)?'+re.escape(name)+r'\)',line): hits.append((md,j))
-        assert len(hits)==1,(n,hits); refs+=2
+        assert len(hits)==1,(n,hits); refs+=len(monolith_hits)+len(hits)
         split,j=hits[0]; w,h=jpeg_size(data)
         rows.append(f'{n}|{kind}|{p.relative_to(base).as_posix()}|{len(data)}|{w}|{h}|{digest}|{split.relative_to(base).as_posix()}|{j}')
     payload='\n'.join(rows)+'\n'

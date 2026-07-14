@@ -4,7 +4,7 @@ Status: **IN PROGRESS — SOURCE/ASSET CLOSED; HOSTILE ARCHITECTURE AND GLOBAL I
 
 ## Current Facts
 
-- Exact catalog row: T08, CSV line 9, `Initial-Condition Classes`; taxonomy section 8 at `ref/notes/CA-Types.md:177-192` is search vocabulary only, not book evidence.
+- Exact catalog row: T08, CSV line 9, `Initial-Condition Classes`; taxonomy section 8 at `ref/notes/CA-Types.md:177-188` is search vocabulary only, not book evidence.
 - The source/architecture conclusion is that T08 classifies event-zero configuration inputs/classes/laws for an existing resolved program, not new transition semantics. The same program can be paired with several initial configurations without changing FRONTIER, NEIGHBORHOOD, RULE, UPDATE, or program identity.
 - A deterministic seed description, a probability distribution over seeds, one realized initial configuration, a finite computation realization, and a displayed crop are different objects. Randomness used only to sample event-zero state is not hidden per-step executor state.
 - For an infinite fixed lattice, a point seed is naturally a total background field plus a finite override. Rendering that field into a centered finite array is a realization/projection choice, not the seed's native support or boundary policy.
@@ -54,9 +54,9 @@ Determine exactly which initial-condition classes the source uses, reconstruct t
 | Excluded/control pre-Index `X` | 470 | `9914e686142328cece65c6336a5e2797ee2dcbb2090de702139cf826e172840b` |
 | Actual-Index routes | 70 | `4e2da3563269b9fa8aa5fc698d2873d6d052a2cb89f2a9d3354d14600582fa13` |
 
-Thus the full declared audit is `1,027 = 487 retained + 470 excluded + 70 Index`, with zero unclassified lines. The 70 Index lines supply navigation only. The split corpus reverse-check finds normalized byte-exact mirrors for 442/487 retained monolith lines; the other 45 are pinned line-join/OCR variants. The normalized exact-mirror set digest is `b85d35a696969b27e517923985d35c4dbfe73eb0213bae774e48d8d81b8a0961`. The monolith remains authoritative rather than pretending those variants are independent evidence.
+Thus the full declared audit is `1,027 = 487 retained + 470 excluded + 70 Index`, with zero unclassified lines. The 70 Index lines supply navigation only. The split reverse-check finds 442/487 complete-line exact-text occurrences after UTF-8 decoding and line-terminator removal only. The remaining 45 form the pinned non-exact complement; no normalization, cause, or monolith-to-split span mapping is asserted. The exact-occurrence set digest is `b85d35a696969b27e517923985d35c4dbfe73eb0213bae774e48d8d81b8a0961`. The monolith remains authoritative rather than pretending the split material is independent evidence.
 
-Known extraction defects are retained as evidence controls, not silently repaired: lost figure glyphs at `BOOK:10647,11277,14341,18764`; a truncated initial condition at `5552`; OCR corruption at `18394,18814`; and damaged `CellularAutomaton` syntax near `11077`. None changes the prose-level seed/configuration distinctions. The executable line-set/query/split oracle below freezes the exact protocol.
+Known extraction defects are retained as evidence controls, not silently repaired: lost figure glyphs at `BOOK:10647,11277,14341,18764`; a truncated initial condition at `5552`; OCR corruption at `18394,18814`; damaged `CellularAutomaton` syntax near `11077`; and truncated final concrete condition expressions at `20128`. Only the intact opening sentences at `20128` support its row below. None changes the prose-level seed/configuration distinctions. The executable line-set/query/split oracle below freezes the exact protocol.
 
 | Q | Frozen query family | Total / pre-Index / Index |
 |---:|---|---:|
@@ -73,7 +73,7 @@ Known extraction defects are retained as evidence controls, not silently repaire
 | 11 | nested/structured near seed/initial/configuration vocabulary | 136 / 125 / 11 |
 | 12 | quantified/described `initial condition(s)` | 128 / 125 / 3 |
 
-The exact regex strings, per-query digests, the complete 487-line `S`, governed set, derived `X`/Index sets, source hash, and the exact 45 split variants are versioned in `goal-1/27-T08-source-oracle.py`. Split equality means complete-line Unicode equality after UTF-8 decoding and `splitlines()` removal of line terminators only; no whitespace, case, punctuation, OCR, Markdown, or Unicode normalization is performed. An identical line may occur anywhere among the 17 split files, so this is occurrence coverage rather than a claimed one-to-one position map.
+The exact regex strings, per-query digests, complete retained/governed/excluded/Index line sets, source hash, and the exact 45-line non-exact complement are versioned in `goal-1/27-T08-source-oracle.py`. Every line-set digest hashes ascending decimal physical line numbers, comma-joined as ASCII with no trailing LF. Split equality means complete-line Unicode equality after UTF-8 decoding and `splitlines()` removal of line terminators only; no whitespace, case, punctuation, OCR, Markdown, or Unicode normalization is performed. An identical line may occur anywhere among the split files, so this is occurrence coverage rather than a claimed one-to-one position map.
 
 ```bash
 python3 goal-1/27-T08-source-oracle.py
@@ -115,7 +115,7 @@ Short fragments below are provenance anchors; the construction fact, behavior ob
 | `BOOK:3126-3140` | Special Initial Conditions | “fixed block ... repeated forever”; “random sequence of ... blocks” | native periodic field and block-process class are distinct |
 | `BOOK:3150-3168` | rule-126/rule-90 block emulation | pairs of black or white cells act as cells | a block-coded seed class is a decoder image and emulation relation |
 | `BOOK:3204-3210` | rule 184 nested start | “nested initial conditions ... from substitution systems” | generated start requires an explicit derivation to a frozen target configuration |
-| `BOOK:3216,4294` | rule-184 random starts | “exactly equal numbers of black and white cells” | finite exact composition is distinct from iid/density-only randomness |
+| `BOOK:3216,4294` | rule-184 random starts | “exactly equal numbers of black and white cells” | an exact-composition constraint differs from a marginal-density or independent-choice law; conditioning and uniformity are unstated |
 | `BOOK:3388,3406` | rule-110 structures | “block of length 41 inserted between blocks of the background” | periodic background plus finite defect is native seed data |
 | `BOOK:5242` | reversible CA | “equal probability on the two successive first steps” | a program may need multiple temporal slices; equality is explicit here but independence is not |
 | `BOOK:7052,7058` | statistical models | “all possible sequences ... equal probability”; “fixed independent probability p” | explicit finite equal-sequence and iid-`p` laws are available, but cannot be retrofitted as the unstated law at `2708` |
@@ -128,7 +128,7 @@ Short fragments below are provenance anchors; the construction fact, behavior ob
 | `BOOK:14275` | random starts in other systems | random tape colors with definite active cell; finite word/tag limits; random graphs; constraints have no starts | seed/profile schema is support-family-specific and does not force nonstep categories into rollout |
 | `BOOK:18674` | rule-110 cyclic-tag emulation | infinite left repetition, finite middle, infinite right repetition | ultimately periodic piecewise field is target-run data in an explicit emulation relation |
 | `BOOK:19072` | continuum/cardinality | finite-on-white arrangements versus infinite configurations | finite descriptors/materializations cannot stand in for arbitrary infinite configurations |
-| `BOOK:20128,20577` | proof/search boundaries | run-specific occurrence; rule cases unvisited by an initial condition | a seed/run cannot certify a rule property or erase unsampled table rows |
+| `BOOK:20128,20577` | proof/search boundaries | run-specific occurrence; rule cases unvisited by an initial condition | a seed/run cannot certify a rule property or erase unsampled table rows; the `20128` claim uses only its intact opening sentences |
 
 No retained source gives T08 a seed-dependent native transition rule, new firing locus, new write, or new update algebra. `BOOK:12352` and `15766` discuss derived emulation/mapping facts in which changing source input can change a constructed target artifact; they do not make the target rule inspect a seed family during execution.
 
@@ -238,7 +238,7 @@ RunRequest / NativeTrace / ExperimentRecipe / Observer
     separate semantic execution, result, orchestration, and view records
 ```
 
-A source phrase can identify only a class without determining a probability law. “Random arrangements with exactly equal numbers” denotes a different class/law from independent fair choices; “random” without probabilities, conditioning, finite scope, or a generative rule is underdetermined and cannot silently become Bernoulli `p=1/2`.
+A source phrase can identify only a class without determining a probability law. “Random arrangements with exactly equal numbers” denotes a different support constraint/class from unconstrained independent fair choices; the cited passage does not specify conditioning or uniformity. More generally, “random” without probabilities, finite scope, conditioning, or a generative rule is underdetermined and cannot silently become Bernoulli `p=1/2`.
 
 ### Exact configurations, constructors, and specialized presentations
 
@@ -313,21 +313,13 @@ supported probability/query/sampling capabilities
 law semantic version
 ```
 
-Important nonidentities include:
-
-```text
-iid Bernoulli(p)
-!= draw p once, then conditionally iid Bernoulli(p)
-!= uniform over strings with exactly m black cells
-!= independent draws of allowed fixed-width macroblocks
-!= a finite-length law over strings accepted by a constraint language.
-```
+Important constructor distinctions include fixed-`p` iid Bernoulli versus a non-degenerate episode-level mixture over `p`, exact-composition sampling, fixed-width macroblock sampling, and finite-scope constraint-language sampling. Their denotations are not presumed equal without proof; degenerate parameters or identity codecs can make particular cases coincide. Law identity remains structural unless a scoped equivalence is certified.
 
 There is no generic “uniform over all strings accepted by a constraint language” without a finite length/scope or a separately specified probability measure on infinite sequences. Normalization and zero-mass conditioning must be proved for the declared scope; closed syntax alone supplies no sampler.
 
 For a finite fixed lattice, sampling may use a canonical coordinate order. A word uses declared sequence order; a graph law must be invariant to vertex renaming or declare a canonicalization with proof; other support instances use law-specific typed sampling requests. Each realization records sampler algorithm/version, scope/enumeration or structural map, key or input entropy, and draw provenance. The mathematical law identity does not include a particular RNG implementation unless the source construction itself specifies that algorithm. For a supported complete realization, the exact configuration digest likewise excludes provenance: the same `X_0` sampled by two laws has one configuration identity and two `ConfigurationSampleRecord` identities.
 
-Structured laws compose closed component laws, deterministic overlays, and pushforwards while preserving schema invariants. For example, a tape profile may sample tape symbols, choose one explicit head position/state, and then apply the lossless `Plain(symbol) | Head(q,symbol)` constructor. Treating whole composite cells as iid would almost surely violate the exactly-one-head invariant and is not an equivalent law.
+Structured laws compose closed component laws, deterministic overlays, and pushforwards while preserving schema invariants. For example, a tape profile may sample tape symbols, choose one explicit head position/state, and then apply the lossless `Plain(symbol) | Head(q,symbol)` constructor. An iid whole-composite-cell law does not enforce exactly one head and, on ordinary finite support, assigns positive mass to invalid zero- or multiple-head configurations; on an infinite iid field with nonzero head probability, violation is almost sure. It is not accepted as the structured law without conditioning or a proof of equivalence.
 
 An infinite product law is a probability measure characterized by consistent finite-cylinder probabilities, not an array that can be eagerly drawn. Cylinder probability is an optional product-measure capability, not a universal distribution method. A practical finite-window sampler returns a `CylinderSampleRecord` for that finite scope; it is not a member of the native infinite `Conf(C_P)`, has no global configuration digest, and cannot seed a native run. Overlapping cylinder requests must have projectively consistent laws, while replay claims bind the exact requested scope and sampler realization. A coordinate-keyed pseudorandom total field can provide a complete replayable order-independent algorithmic configuration, but with a finite key it is an `AlgorithmicFieldRealization` related to—not literally an exact draw from—the mathematical infinite independent product measure. Goal 2 must preserve both qualifications rather than hide a mutable RNG cursor in execution state.
 
@@ -536,7 +528,10 @@ The repaired generic API should expose:
 ConfigurationSchema.validate(configuration) -> ValidationResult/Evidence
 ConfigurationConstructor.construct(closed_args) -> ConstructionRecord
 InitialConditionClass.membership(configuration, capability) -> MembershipResult
-InitialDistribution.sample(typed_request, SamplingRealization) -> SampleRecord
+InitialDistribution.sample_complete(typed_request, FullConfigurationSamplingRealization)
+    -> ConfigurationSampleRecord | Unsupported
+InitialDistribution.sample_cylinder(finite_scope, CylinderSamplingRealization)
+    -> CylinderSampleRecord | Unsupported
 ComputationLowering.lower(configuration, horizon, observation) -> LoweringRecord
 ```
 
@@ -610,7 +605,7 @@ T01's current `seeds.point` handoff is direct only as a finite scalar materializ
 - **Status:** decision candidate; activate after final hostile/source/asset/global gates.
 - **Basis:** the source reuses one point profile across unchanged CA rules (`BOOK:418-518,730-790`), contrasts it with random starts (`2706-2710,3060-3106`), exposes periodic, random-block, block-coded, nested, finite-defect, and explicit background/offset forms (`3126-3210,3388-3406,11077-11150`), distinguishes finite from infinite information/scope (`13265,19072`), and states support-family-specific availability of random initial data (`14275`). It supplies no seed-dependent native transition.
 - **Configuration boundary:** `ConfigurationSchema` declares a DomainSchema, admitted support/topology instances, typed ALPHABET/components, and invariants. One exact `X_0 in Conf(C_P)` is direct ordinary state. Fixed-field point/periodic/override/piecewise forms and structural codecs are optional lossless representations or presets, not a universal field interface.
-- **Class/law boundary:** an `InitialConditionClass` denotes a schema-scoped subset but does not promise decidable membership. A deterministic constructor, mathematical law, construction record, sampling realization/sample record, denotational configuration, validation evidence, and any transform/derivation each retain separate identity. Source-underdetermined “random” never silently becomes fair iid; structured laws must preserve configuration invariants.
+- **Class/law boundary:** an `InitialConditionClass` denotes a schema-scoped subset but does not promise decidable membership. A deterministic constructor, mathematical law, construction record, complete-configuration sample, finite-cylinder sample, algorithmic-field realization, denotational configuration, validation evidence, and any transform/derivation each retain separate identity. A cylinder is not a complete native configuration. Source-underdetermined “random” never silently becomes fair iid; structured laws must preserve configuration invariants.
 - **Realization boundary:** native configuration, genuine finite topology, causal work lowering, approximation/boundary, storage padding, crop, trace, experiment, and view remain distinct. A claimed exact finite lowering commutes through every requested event/observation in its horizon, not only one step.
 - **Execution consequence:** after validation, the exact same branch-free FRONTIER/NEIGHBORHOOD/RULE/UPDATE runner executes. T08 adds no state family, firing locus, read, write, update policy, executor, successor, outcome, halt, rule property, or per-step RNG. Nonstep constraint, function, and PDE “initial conditions” remain their native relation/query/side-data roles unless an explicit relation derives a SimpleProgram.
 
@@ -633,12 +628,12 @@ T01's current `seeds.point` handoff is direct only as a finite scalar materializ
 | exact configurations and specialized presentations | Accept ordinary structural configurations directly. For fixed lattices, add finite explicit, constant, periodic, finite override, and closed piecewise codecs with capability-specific evaluation/materialization, validation, identity, and round trip on claimed images. Do not impose field APIs on other DOMAIN schemas. |
 | configuration-class layer | Add schema-scoped declarative descriptors for evidenced constant, finite perturbation, periodic, block image, finite exact composition, and supported local-language images. Membership returns invalid/unsupported/unknown/certified results; closed syntax does not promise decidability. |
 | stochastic-law layer | Add fixed categorical/product laws, explicit parameter-mixture laws, fixed-composition laws, macroblock laws, and supported structured composition/overlay/pushforward laws. Validate scope, probabilities, conditioning, normalization, invariant preservation, and advertised capabilities. |
-| sampling realization | Record law, sampler algorithm/version, law-specific scope/enumeration or structural map, key or entropy provenance, and exact configuration reference. Keep configuration digest independent of sample provenance; distinguish infinite measures, finite-cylinder samples, and algorithmic pseudorandom fields. |
+| sampling realization | Split complete-configuration samples, finite-cylinder samples, and algorithmic total-field realizations. Only the first and third may reference an exact complete `X_0`, and the algorithmic field retains a qualified relation—not equality—to an ideal infinite product-law draw. Record law/relation, sampler/evaluator version, exact scope or structural map, key/entropy provenance, and result reference. Keep complete-configuration identity independent of provenance; never give a cylinder a global configuration digest or native-run authority. |
 | profile/catalog resolver | Resolve source-named convenience profiles to ordinary constructors/classes/laws bound to explicit typed alphabet roles and a configuration schema. Return the exact unchanged program separately. Reject underdetermined “random” profiles instead of inventing parameters. |
 | finite realization and boundary | Lower requested work regions with a dependency-cone proof for the full horizon; keep native support, origin/centering, topology/quotient, semantic halo, storage padding, codec, crop, genuine finite boundary, and approximate exterior separate. Do not treat initial fill as persistent exterior. |
 | temporal migration | Represent AR2, lag lookup, and lag-count histories as complete named-factor `t+0D` configurations at every event; product labels/components/tuple codecs are representation options. Make scalar series a projection observer and preserve resume/alignment provenance. |
 | transforms/relations | Add typed translation, reflection, value permutation, block decode, frozen derived-configuration, quotient/covering, and crop relations. A derivation consumes exact immutable references; it never runs a hidden source interpreter during target resolution. |
-| serialization/identity | Version and round-trip schema, class, presentation, constructor/construction record, law, sampling realization/sample record, denotational configuration, validation, lowering, run request/trace, experiment, boundary, and observer independently. Reject stale/tampered digests and opaque payloads. |
+| serialization/identity | Version and round-trip schema, class, presentation, constructor/construction record, law, complete/cylinder/algorithmic realization records, denotational configuration, validation, lowering, run request/trace, experiment, boundary, and observer independently. Reject stale/tampered digests and opaque payloads. |
 | rollout/executor | Accept one validated `X_0` and use the existing branch-free runner. Remove or bypass seed-family and temporal-family dispatch as semantic paths; no T08 flag may reach RULE or UPDATE. |
 | tests/source fixtures | Pin the final source/asset evidence and add the acceptance groups below, including variable support, alpha-renaming, probability capability, structured invariants, replay, temporal resume, horizon commutation, identity, and static no-cheating adversaries. |
 
@@ -655,8 +650,8 @@ T01's current `seeds.point` handoff is direct only as a finite scalar materializ
 9. **Probability and membership capabilities:** enumerate small finite categorical/Bernoulli supports and assert total mass one, exact event probabilities, validated parameters, and law-specific enumeration. Reject zero-mass conditioning and unnormalized laws; return typed unknown/unsupported for nondecidable global membership or unavailable sampling/probability operations.
 10. **Law nonidentity:** distinguish fixed-`p` iid, one-global-`p` mixtures, exact-composition sampling, macroblock sampling, and finite-scope constraint-language sampling with explicit two- and four-site probability witnesses.
 11. **Underspecified randomness:** a source/profile that omits probabilities, finite scope, conditioning, or generator yields a typed underdetermined/unsupported result; it never defaults silently to fair Bernoulli or the current `[0,1]` mixture.
-12. **Infinite-law capability:** test finite-cylinder consistency for an abstract product measure; reject eager total materialization. Label a finite-key coordinate-hash field as an algorithmic realization, not proof of exact infinite independence.
-13. **Replay, structural order, and provenance:** identical sampler version/key/request reproduces the exact configuration digest across scalar/batch execution and row reorder. Coordinate query order cannot alter a coordinate-keyed field; graph vertex serialization cannot alter an alpha-invariant graph law. Missing entropy provenance, changed sampler version, or tampered sample reference fails validation.
+12. **Infinite-law capability:** test projectively consistent probabilities and replay on overlapping finite cylinders for an abstract product measure; reject eager total materialization and reject every cylinder as a complete configuration or native-run seed. Label a finite-key coordinate-hash field as an algorithmic total-field realization, not proof of exact infinite independence.
+13. **Replay, structural order, and provenance:** identical sampler version/key/request reproduces the exact complete-configuration digest or the exact scope-bound cylinder digest, as applicable, across scalar/batch execution and row reorder. Coordinate query order cannot alter a coordinate-keyed field; graph vertex serialization cannot alter an alpha-invariant graph law. Missing entropy provenance, changed sampler version, scope substitution, or tampered sample reference fails validation.
 14. **Temporal Markov state:** AR2 pairs, three-lag tuples, and ten-bit shift registers remain complete states for every event. Two histories with the same visible scalar produce different successors where expected; pack/unpack and scalar observer projections round-trip without changing state schema mid-run.
 15. **Horizon lowering, fill, and boundary:** rule 1 turns an event-zero all-zero field to ones; a zero fill is not permanent exterior. Prove causal-halo commutation for every `t<=h`, including a radius-one one-halo counterexample that fails at `t=2`; distinguish native infinite execution, genuinely finite topology, and explicit boundary approximation.
 16. **Centering and translation:** pin the source's finite even/odd centering convention where requested, while proving that native point origin, finite placement, translated profile, materialization window, and display crop have separate identities.
@@ -680,6 +675,7 @@ T01's current `seeds.point` handoff is direct only as a finite scalar materializ
 - No derivation descriptor that lazily runs another program/interpreter during target seed resolution; only frozen exact references plus a closed typed transform and evidence.
 - No product ALPHABET mandated for temporal history or composite controls; require complete visible Markov/configuration roles and a lossless mapping, not one storage decomposition.
 - No iid whole-cell law used when a structured component/overlay law is required to preserve exactly-one or other global invariants.
+- No finite cylinder, crop, or dependency-cone sample accepted as a complete infinite configuration or used to identify a native run; no algorithmic pseudorandom field asserted equal to an ideal product-measure draw.
 - No silent off-window drop, ignored time coordinate, sampling-based dedupe, unproved held-out-configuration claim, metadata-only transform claim, or dataset ID that omits identity-bearing decisions.
 
 ## Completion Requirements
