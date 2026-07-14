@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Fail-closed primary-source audit for T38 variable-index recurrences.
 
-T38 is a computed-access specialization of the shared SimplePrograms
-construction, not a request for a family executor.  The native state is the
-complete consecutive prefix; a closed recurrence computes addresses into one
-old snapshot and a successful event appends one term.  Main-text plates are
+T38 is a closed-RULE specialization of the shared SimplePrograms construction,
+not a request for a family executor.  The native state is the complete
+consecutive prefix; the reused NEIGHBORHOOD exposes that old snapshot, a closed
+recurrence computes addresses into it, and a successful event appends one term.  Main-text plates are
 opaque here: their pixels belong to the asset oracle, while this oracle freezes
 their identities, roles, exclusions, and monolith/split provenance.
 
@@ -427,10 +427,10 @@ SOURCE_MODEL_RECORDS = (
     "state:complete exact integer prefix rather than newest scalar or hidden memo cache",
     "seed:origin-one finite consecutive values",
     "frontier:reuse T37 unique endpoint selector",
-    "neighborhood:closed computed-address old-prefix access",
+    "neighborhood:reuse complete explicit old-prefix context",
     "access-validity:one through n-minus-one in the immutable old prefix",
     "access-order:source profile is leftmost innermost and retains demanded occurrences",
-    "rule:closed integer expression consumes typed resolved reads",
+    "rule:closed integer expression evaluates dependent TermAt reads and emits the endpoint write",
     "write:one exact term at the unique endpoint",
     "update:reuse T37-to-T16 atomic single-splice append",
     "failure:demanded absent address gives common zero-successor no-commit error",
@@ -439,7 +439,7 @@ SOURCE_MODEL_RECORDS = (
     "observer:digit formula fluctuations p-q plots evaluation trees and sounds do not feed back",
     "relation:primitive-recursive classification does not replace append-event provenance",
     "architecture:no T38 state class update law executor runner branch or family dispatch",
-    "architecture:computed access is the only class-two axis delta established by source",
+    "architecture:closed dependent TermAt syntax is the only class-two axis delta established by source",
     "source-epistemic:catalog taxonomy supplies vocabulary but not primary mechanics",
     "source-epistemic:raster-only formula seed and row claims belong to asset verification",
     "source-epistemic:meaningless reference does not itself name a halt or policy menu",
@@ -555,7 +555,7 @@ EXPECTED_RECORDS = {
     "semantic_guards": EXPECTED_SOURCE_SEMANTIC_GUARDS,
     "auxiliary_guards": (5, "b85864acc356516285636c63040d648c2528e9c11bc0e6bd10a75f9694c1ffcd"),
     "source_defects": EXPECTED_SOURCE_DEFECT_GUARDS,
-    "source_model": (22, "641b613eb78b049b2754bda4fdc77114409317d054f2ff0d16a292d61fe6d171"),
+    "source_model": (22, "94bf8172b7ec622cabe52b0762f2715ac6803850c3ed1daee63f4769c88e031a"),
     "image_roles": (4, "694eda0f0bf637f6d27cf861b3c7b4212f68113a15ab45d138fcaaabb74a5fae"),
     "image_exclusion_reasons": (11, "cc68366a0b17271866ac99c1bdaf7ea4ba1411af697a04cdef3520bd08a84430"),
     "image_assembly_boundaries": (5, "2a2dc89f2d3403126b25fa68e03ce6e5deb59578e882cb313802ccaffd6ab43c"),
@@ -1143,7 +1143,7 @@ def main(argv: list[str] | None = None) -> int:
         and source_ok
     )
     ok &= architecture_ok
-    print("source_fit_computed_access_over_T37_append_no_new_executor", "OK" if architecture_ok else "MISMATCH", *model_actual)
+    print("source_fit_closed_rule_over_T37_append_no_new_executor", "OK" if architecture_ok else "MISMATCH", *model_actual)
 
     unresolved_total = (
         len(pre_index ^ set().union(*query_partition))

@@ -2,15 +2,15 @@
 """Dependency-free semantic oracle for T38 variable-index recurrences.
 
 T38 reuses T37's complete indexed prefix, unique trailing ``End`` locus,
-``End -> Val End`` write, and T16 exactly-one ordered splice.  Its only native
-delta is a closed, program-coupled old-prefix access expression whose demanded
-addresses may depend on values read earlier in the same expression.  Every read
-comes from one immutable old prefix and is resolved leftmost-innermost.
+complete-prefix NEIGHBORHOOD read, ``End -> Val End`` write, and T16 exactly-one
+ordered splice.  Its only native delta is a closed RULE expression whose
+``TermAt`` addresses may depend on values read earlier in the same expression.
+Every demand is evaluated leftmost-innermost against one immutable old prefix.
 
 This oracle independently evaluates the eight Book rows as direct equations and
 through the structural SimpleProgram path:
 
-    NumericPrefix -> unique End -> ordered computed access -> pure RULE
+    NumericPrefix -> unique End -> complete old-prefix read -> closed RULE
                   -> endpoint replacement -> T16 single splice
 
 It binds successful and partial ``StepResult`` envelopes, complete access
@@ -54,7 +54,8 @@ SOURCE_CLAIMS = (
 
 ARCHITECTURE_CLASSIFICATION = (
     "1: reuse D070/T37 NumericPrefix, exact positive values, unique End, endpoint write, trace, and StepResult",
-    "2: add a closed dependent old-prefix access role with ordered nested TermAt demands and exact witnesses",
+    "1: reuse T37 complete explicit old-prefix NEIGHBORHOOD access without a T38 selector or neighborhood type",
+    "2: extend the closed RULE AST with ordered nested TermAt demands and exact witnesses",
     "2: a demanded absent old term is common Error(UndefinedTermReference), not Invalid, halt, boundary, or default",
     "3: inherit D072's lossless Val* End representation and T16 exactly-one splice commuting square",
     "4: add no T38 state, frontier, update, executor, family branch, callback, hidden memo table, or execution algebra",
@@ -64,8 +65,9 @@ ARCHITECTURE_CLASSIFICATION = (
 GOAL2_DELTA = (
     "Reuse the complete consecutive NumericPrefix and its bijective Val* End codec.",
     "Reuse the unique trailing End selector and End(n) to Val(n,value) End(n+1) replacement.",
-    "Extend the closed integer expression algebra with structural TermAt(address_expression) nodes.",
-    "Resolve TermAt occurrences leftmost-innermost against one immutable old prefix and retain occurrence multiplicity.",
+    "Reuse complete explicit old-prefix NEIGHBORHOOD access; add no T38 selector or neighborhood type.",
+    "Extend the closed RULE expression algebra with structural TermAt(address_expression) nodes.",
+    "Evaluate TermAt occurrences leftmost-innermost against that immutable read and retain occurrence multiplicity.",
     "Record exact target, address, stable indexed handle, expression path, demand order, and program provenance.",
     "Return common zero-successor Error(UndefinedTermReference) on a demanded address outside [origin,next_index).",
     "Keep malformed AST, value type, seed, and tagged-word inputs as construction/invariant rejection.",
@@ -570,12 +572,27 @@ class _DemandFailure(Exception):
         self.reason = reason
 
 
-def resolve_computed_access(
+def read_complete_prefix(
+    prefix: object,
+    active: object,
+) -> NumericPrefix:
+    """Reused T37 NEIGHBORHOOD: expose the complete immutable old prefix."""
+
+    if type(prefix) is not NumericPrefix:
+        raise TypeError("complete-prefix read requires exact NumericPrefix")
+    if type(active) is not End:
+        raise TypeError("complete-prefix read source must be the trailing End token")
+    if active.next_index != prefix.next_index:
+        raise ValueError("active End does not match complete-prefix target")
+    return prefix
+
+
+def resolve_rule_expression(
     program: object,
     prefix: object,
     active: object,
 ) -> AccessResult:
-    """Resolve one authoritative closed expression against one old snapshot."""
+    """RULE helper: resolve one closed AST against its complete old-prefix read."""
 
     if type(program) is not RecurrenceProgram:
         raise TypeError("access requires exact RecurrenceProgram")
@@ -689,6 +706,24 @@ def emit_endpoint_replacement(
         provenance=provenance,
         access=access,
     )
+
+
+RuleAttempt: TypeAlias = EndpointReplacement | AccessFailure | ResultOutsideCarrier
+
+
+def evaluate_recurrence_rule(
+    program: object,
+    active: object,
+    old_prefix: object,
+) -> RuleAttempt:
+    """Closed RULE: evaluate TermAt nodes and emit the existing endpoint write."""
+
+    if type(old_prefix) is not NumericPrefix:
+        raise TypeError("RULE requires the complete NumericPrefix read")
+    access = resolve_rule_expression(program, old_prefix, active)
+    if type(access) is AccessFailure:
+        return access
+    return emit_endpoint_replacement(program, active, access)
 
 
 def apply_endpoint_splice(
@@ -820,12 +855,13 @@ def generic_step(program: object, prefix: object) -> StepResult:
         raise TypeError("step requires exact NumericPrefix")
     before_word = encode_prefix(prefix)
     position, active = select_unique_end(before_word)
-    access = resolve_computed_access(program, prefix, active)
-    if type(access) is AccessFailure:
-        return StepResult((), ErrorOutcome(access.reason), None, access)
-    write = emit_endpoint_replacement(program, active, access)
+    reads = read_complete_prefix(prefix, active)
+    write = evaluate_recurrence_rule(program, active, reads)
+    if type(write) is AccessFailure:
+        return StepResult((), ErrorOutcome(write.reason), None, write)
     if type(write) is ResultOutsideCarrier:
         return StepResult((), ErrorOutcome(write), None, write)
+    access = write.access
     after_word = apply_endpoint_splice(before_word, position, write)
     after = decode_prefix(after_word)
     event = AppendEvent(
@@ -1401,6 +1437,62 @@ def demand_addresses(access: object) -> tuple[int, ...]:
     raise TypeError("demand_addresses requires an access result")
 
 
+def audit_complete_prefix_rule_factorization() -> tuple[int, int, int, int]:
+    """Prove computed lookup is RULE work over a reused complete-prefix read.
+
+    ``resolve_rule_expression`` plus ``emit_endpoint_replacement`` is retained as
+    an optional compiled factorization.  It must agree exactly with the single
+    closed RULE evaluator; it is not a required NEIGHBORHOOD semantic.
+    """
+
+    successful = 0
+    demands = 0
+    partial = 0
+    failures = 0
+
+    for preset in source_presets():
+        requested = len(preset.visible_terms) - len(preset.seed.terms)
+        trace = run(preset.program, preset.seed, requested)
+        for event in trace.events:
+            _, active = select_unique_end(encode_prefix(event.before))
+            reads = read_complete_prefix(event.before, active)
+            assert reads is event.before
+            combined = evaluate_recurrence_rule(preset.program, active, reads)
+            resolved = resolve_rule_expression(preset.program, reads, active)
+            assert type(resolved) is ResolvedAccess
+            compiled = emit_endpoint_replacement(preset.program, active, resolved)
+            assert combined == compiled == event.write
+            successful += 1
+            demands += len(resolved.demands)
+
+    partial_cases = (
+        (RecurrenceProgram(at(C(0))), NumericPrefix(1, (7, 11))),
+        (RecurrenceProgram(at(C(-1))), NumericPrefix(1, (7, 11))),
+        (RecurrenceProgram(at(N())), NumericPrefix(1, (7, 11))),
+        (RecurrenceProgram(Add((at(C(1)), at(N())))), NumericPrefix(1, (7, 11))),
+        (RecurrenceProgram(Sub(at(C(-1)), at(C(-1)))), NumericPrefix(1, (7, 11))),
+        (RecurrenceProgram(C(0)), NumericPrefix(1, (7, 11))),
+    )
+    for program, prefix in partial_cases:
+        _, active = select_unique_end(encode_prefix(prefix))
+        reads = read_complete_prefix(prefix, active)
+        combined = evaluate_recurrence_rule(program, active, reads)
+        resolved = resolve_rule_expression(program, reads, active)
+        if type(resolved) is AccessFailure:
+            assert combined == resolved
+        else:
+            combined_from_split = emit_endpoint_replacement(program, active, resolved)
+            assert combined == combined_from_split
+        assert type(combined) in (AccessFailure, ResultOutsideCarrier)
+        partial += 1
+        failures += 1
+
+    assert successful == 325
+    assert demands == 1_122
+    assert partial == failures == 6
+    return successful, demands, partial, failures
+
+
 def audit_visible_source_rows() -> tuple[int, int, int, int, int]:
     events = 0
     demands = 0
@@ -1891,8 +1983,8 @@ SHARED_EXECUTION_ROLE_MANIFEST = (
     ("configuration", "NumericPrefix", "D070/T37 complete consecutive indexed prefix"),
     ("alphabet", "positive exact int", "shared arbitrary-precision numeric carrier"),
     ("frontier", "select_unique_end", "T37 unique trailing End role"),
-    ("neighborhood", "resolve_computed_access", "named dependent restriction over complete old-prefix access"),
-    ("rule", "emit_endpoint_replacement", "pure closed expression plus End-to-Val-End write"),
+    ("neighborhood", "read_complete_prefix", "T37 complete explicit old-prefix context"),
+    ("rule", "evaluate_recurrence_rule", "closed TermAt AST plus End-to-Val-End write"),
     ("update", "apply_endpoint_splice", "D072/T16 exactly-one ordered splice"),
     ("result", "StepResult", "common Advanced/Error envelope"),
     ("trace", "RunTrace", "D073 complete prefix/event reconstruction"),
@@ -1973,7 +2065,8 @@ def audit_no_new_execution_surface() -> tuple[int, int, int, int, int, int, int,
     assert len([name for name in manifest if name == "StepResult"]) == 1
     assert len([name for name in manifest if name == "RecurrenceProgram"]) == 1
     assert SHARED_EXECUTION_ROLE_MANIFEST[2][1] == "select_unique_end"
-    assert SHARED_EXECUTION_ROLE_MANIFEST[4][1] == "emit_endpoint_replacement"
+    assert SHARED_EXECUTION_ROLE_MANIFEST[3][1] == "read_complete_prefix"
+    assert SHARED_EXECUTION_ROLE_MANIFEST[4][1] == "evaluate_recurrence_rule"
     assert SHARED_EXECUTION_ROLE_MANIFEST[5][1] == "apply_endpoint_splice"
     return 1, 0, 0, 0, 0, 1, 1, len(manifest)
 
@@ -2008,7 +2101,7 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(ValueError, lambda: checked_word((End(1), Val(1, 1))))
     rejected += must_raise(ValueError, lambda: apply_endpoint_splice(valid_word, 0, EndpointReplacement(
         End(4), (Val(4, 4), End(5)), program_provenance(RecurrenceProgram(lag(1))),
-        resolve_computed_access(RecurrenceProgram(lag(1)), valid_prefix, End(4)),
+        resolve_rule_expression(RecurrenceProgram(lag(1)), valid_prefix, End(4)),
     )))
 
     program = dict(source_programs())["e"]
@@ -2140,10 +2233,11 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "faee16f26234a7b90da40e8642ddef63224898ac217e436efd9091df7f3764b9"
+EXPECTED_DIGEST = "5787d8ebc284ad8c4ba0c26069d1b520de14166595cd9876fb12bf5057a3b630"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
+    factorization = audit_complete_prefix_rule_factorization()
     visible = audit_visible_source_rows()
     long_traces = audit_long_source_traces()
     partiality = audit_dependent_access_and_partiality()
@@ -2156,6 +2250,7 @@ def collect_audit_summary() -> tuple[tuple[str, object], ...]:
     surface = audit_no_new_execution_surface()
     hostile = audit_hostile_validation()
     return (
+        ("complete_prefix_rule_factorization", factorization),
         ("visible_source_rows", visible),
         ("long_source_traces", long_traces),
         ("dependent_access_partiality", partiality),
@@ -2189,6 +2284,7 @@ def main() -> None:
         return
     assert digest == EXPECTED_DIGEST
     metrics = dict(summary)
+    factorization = metrics["complete_prefix_rule_factorization"]
     visible = metrics["visible_source_rows"]
     long_traces = metrics["long_source_traces"]
     partiality = metrics["dependent_access_partiality"]
@@ -2200,6 +2296,12 @@ def main() -> None:
     compact_trace = metrics["compact_trace_reconstruction"]
     surface = metrics["execution_surface"]
 
+    print(
+        f"complete_prefix_rule_events={factorization[0]}; "
+        f"complete_prefix_rule_demands={factorization[1]}; "
+        f"compiled_partial_equivalences={factorization[2]}; "
+        f"compiled_failure_equivalences={factorization[3]}"
+    )
     print(
         f"visible_events={visible[0]}; visible_demands={visible[1]}; "
         f"event_replays={visible[2]}; codec_commutations={visible[3]}; nested_demands={visible[4]}"
