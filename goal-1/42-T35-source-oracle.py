@@ -221,6 +221,11 @@ QUERIES = {
         r"Minsky, Marvin L\..*and register machines, 896, 1115|"
         r"Number theory.*and Turing machine 600720, 1145"
     ),
+    "Q41": (
+        r"Non-locality.*in digit sequences, 730|"
+        r"and register machines, 1114 as rule 60 initial condition|"
+        r"longest halting times for, 1144"
+    ),
 }
 
 
@@ -313,10 +318,10 @@ OUT_OF_SCOPE_RELATED_IMAGE_LINES = line_set("1884,1888")
 INDEX_CLASS = {
     "core_alias_and_observer_routes": line_set(
         "20828,20836,20908,20946,20957,20980,21088,21090,21233,21329,21471,"
-        "21497,21893,21933,22150,22287,22382"
+        "21497,21695,21893,21933,22150,22287,22378,22382"
     ),
     "arithmetic_and_emulation_routes": line_set(
-        "20882,20894,21173,21223,21475,21521,21711,21923,22390"
+        "20882,20894,21173,21223,21475,21521,21711,21813,21923,22390"
     ),
     "ordered_fraction_routes": line_set("21050,21195,21805,21807"),
 }
@@ -335,10 +340,12 @@ INDEX_ENTRY_GUARDS = {
         21329: ("IntegerExponent and 3n + 1 problem, 904",),
         21471: ("Localized structures and 3n + 1 problem, 904",),
         21497: ("Markov processes, 1084 and 3n + 1 problem, 904",),
+        21695: ("Non-locality", "in digit sequences, 730"),
         21893: ("Random walks and 3n+1 problem, 904",),
         21933: ("Reversible 3 n + 1 problem, 905",),
         22150: ("Syracuse problem (3 n+1 problem)",),
         22287: ("Thwaites conjecture (3 n + 1 problem), 904",),
+        22378: ("Turing machines", "longest halting times for, 1144"),
         22382: ("Ulam's problem (3 n + 1 problem)",),
     },
     "arithmetic_and_emulation_routes": {
@@ -349,6 +356,7 @@ INDEX_ENTRY_GUARDS = {
         21475: ("Machine 600720", "properties of, 1145"),
         21521: ("Minsky, Marvin L.", "and register machines, 896, 1115"),
         21711: ("Number theory, 135", "and Turing machine 600720, 1145"),
+        21813: ("Primes", "and register machines, 1114"),
         21923: ("Register machines, 97–102", "emulated by arithmetic systems, 673. 1114"),
         22390: ("of arithmetic systems, 673",),
     },
@@ -455,6 +463,7 @@ EXPECTED_QUERY = {
     "Q38": (16, 9, 7, "4c2295155eb814d20b2cb239b3c05f7bbd529dabc47eeefd8cf996d3234a1849"),
     "Q39": (1, 0, 1, "d5b2f984bb5733c30680940aaf707f6cd58a91a8560a9df34272de0561f6d435"),
     "Q40": (0, 0, 0, ""),
+    "Q41": (0, 0, 0, ""),
 }
 
 EXPECTED_SET = {
