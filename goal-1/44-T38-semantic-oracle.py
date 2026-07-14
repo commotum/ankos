@@ -678,7 +678,31 @@ class EndpointReplacement:
         object.__setattr__(self, "replacement", replacement)
 
 
-RuleResult: TypeAlias = EndpointReplacement | ResultOutsideCarrier
+@dataclass(frozen=True)
+class RuleFailure:
+    provenance: ProgramProvenance
+    source: End
+    access: ResolvedAccess
+    reason: ResultOutsideCarrier
+
+    def __post_init__(self) -> None:
+        if type(self.provenance) is not ProgramProvenance:
+            raise TypeError("RULE failure provenance must be ProgramProvenance")
+        if type(self.source) is not End:
+            raise TypeError("RULE failure source must be End")
+        if type(self.access) is not ResolvedAccess:
+            raise TypeError("RULE failure must retain ResolvedAccess")
+        if type(self.reason) is not ResultOutsideCarrier:
+            raise TypeError("RULE failure reason must be ResultOutsideCarrier")
+        if (
+            self.access.provenance != self.provenance
+            or self.access.target_index != self.source.next_index
+            or self.reason.target_index != self.source.next_index
+        ):
+            raise ValueError("RULE failure source/access/reason mismatch")
+
+
+RuleResult: TypeAlias = EndpointReplacement | RuleFailure
 
 
 def emit_endpoint_replacement(
@@ -699,7 +723,12 @@ def emit_endpoint_replacement(
         raise ValueError("RULE access does not belong to program/source")
     value = evaluate_resolved(access.resolved_expression)
     if value <= 0:
-        return ResultOutsideCarrier(active.next_index, value)
+        return RuleFailure(
+            provenance,
+            active,
+            access,
+            ResultOutsideCarrier(active.next_index, value),
+        )
     return EndpointReplacement(
         source=active,
         replacement=(Val(active.next_index, value), End(active.next_index + 1)),
@@ -708,7 +737,7 @@ def emit_endpoint_replacement(
     )
 
 
-RuleAttempt: TypeAlias = EndpointReplacement | AccessFailure | ResultOutsideCarrier
+RuleAttempt: TypeAlias = EndpointReplacement | AccessFailure | RuleFailure
 
 
 def evaluate_recurrence_rule(
@@ -716,14 +745,106 @@ def evaluate_recurrence_rule(
     active: object,
     old_prefix: object,
 ) -> RuleAttempt:
-    """Closed RULE: evaluate TermAt nodes and emit the existing endpoint write."""
+    """Closed RULE: independently evaluate TermAt nodes and emit the endpoint write.
 
+    This merged interpreter deliberately does not call ``resolve_rule_expression``
+    or ``emit_endpoint_replacement``.  The audit compares it with that optional
+    split compilation as two independently implemented semantic paths.
+    """
+
+    if type(program) is not RecurrenceProgram:
+        raise TypeError("RULE requires exact RecurrenceProgram")
+    if type(active) is not End:
+        raise TypeError("RULE source must be End")
     if type(old_prefix) is not NumericPrefix:
         raise TypeError("RULE requires the complete NumericPrefix read")
-    access = resolve_rule_expression(program, old_prefix, active)
-    if type(access) is AccessFailure:
-        return access
-    return emit_endpoint_replacement(program, active, access)
+    if active.next_index != old_prefix.next_index:
+        raise ValueError("RULE source does not match complete-prefix target")
+
+    provenance = program_provenance(program)
+    demands: list[ReadDemand] = []
+
+    def evaluate(node: Expression, path: tuple[int, ...]) -> tuple[int, ResolvedExpression]:
+        checked_expression(node)
+        if type(node) is Literal:
+            return node.value, node
+        if type(node) is TargetIndex:
+            return active.next_index, Literal(active.next_index)
+        if type(node) is Add:
+            values: list[int] = []
+            resolved_terms: list[ResolvedExpression] = []
+            for index, term in enumerate(node.terms):
+                value, resolved = evaluate(term, path + (index,))
+                values.append(value)
+                resolved_terms.append(resolved)
+            return sum(values), Add(tuple(resolved_terms))
+        if type(node) is Sub:
+            left_value, left = evaluate(node.left, path + (0,))
+            right_value, right = evaluate(node.right, path + (1,))
+            return left_value - right_value, Sub(left, right)
+        if type(node) is Mul:
+            value = 1
+            resolved_factors: list[ResolvedExpression] = []
+            for index, factor in enumerate(node.factors):
+                factor_value, resolved = evaluate(factor, path + (index,))
+                value *= factor_value
+                resolved_factors.append(resolved)
+            return value, Mul(tuple(resolved_factors))
+        if type(node) is TermAt:
+            address, _ = evaluate(node.address, path + (0,))
+            if not old_prefix.origin <= address < active.next_index:
+                raise _DemandFailure(
+                    UndefinedTermReference(
+                        active.next_index,
+                        address,
+                        old_prefix.origin,
+                        active.next_index,
+                        path,
+                        len(demands),
+                    )
+                )
+            handle = TermHandle(address, old_prefix.value_at(address))
+            demands.append(
+                ReadDemand(
+                    len(demands),
+                    path,
+                    active.next_index,
+                    address,
+                    handle,
+                )
+            )
+            return handle.value, Literal(handle.value)
+        raise TypeError("unreachable expression node")
+
+    try:
+        value, resolved_expression = evaluate(program.expression, ())
+    except _DemandFailure as failure:
+        return AccessFailure(
+            provenance,
+            active.next_index,
+            tuple(demands),
+            failure.reason,
+        )
+
+    access = ResolvedAccess(
+        provenance,
+        active.next_index,
+        resolved_expression,
+        tuple(demands),
+    )
+    if value <= 0:
+        return RuleFailure(
+            provenance,
+            active,
+            access,
+            ResultOutsideCarrier(active.next_index, value),
+        )
+    return EndpointReplacement(
+        active,
+        (Val(active.next_index, value), End(active.next_index + 1)),
+        provenance,
+        access,
+    )
 
 
 def apply_endpoint_splice(
@@ -807,7 +928,7 @@ class AppendEvent:
         object.__setattr__(self, "active_position", position)
 
 
-AttemptWitness: TypeAlias = ResolvedAccess | AccessFailure | ResultOutsideCarrier
+AttemptWitness: TypeAlias = ResolvedAccess | AccessFailure | RuleFailure
 Outcome: TypeAlias = Advanced | ErrorOutcome
 
 
@@ -836,11 +957,11 @@ class StepResult:
             if type(self.attempt) is AccessFailure:
                 if self.outcome.reason != self.attempt.reason:
                     raise ValueError("access failure/outcome mismatch")
-            elif type(self.attempt) is ResultOutsideCarrier:
-                if self.outcome.reason != self.attempt:
+            elif type(self.attempt) is RuleFailure:
+                if self.outcome.reason != self.attempt.reason:
                     raise ValueError("rule failure/outcome mismatch")
             else:
-                raise TypeError("Error attempt must be AccessFailure or ResultOutsideCarrier")
+                raise TypeError("Error attempt must be AccessFailure or RuleFailure")
         else:
             raise TypeError("unknown StepResult outcome")
         object.__setattr__(self, "successors", successors)
@@ -859,8 +980,8 @@ def generic_step(program: object, prefix: object) -> StepResult:
     write = evaluate_recurrence_rule(program, active, reads)
     if type(write) is AccessFailure:
         return StepResult((), ErrorOutcome(write.reason), None, write)
-    if type(write) is ResultOutsideCarrier:
-        return StepResult((), ErrorOutcome(write), None, write)
+    if type(write) is RuleFailure:
+        return StepResult((), ErrorOutcome(write.reason), None, write)
     access = write.access
     after_word = apply_endpoint_splice(before_word, position, write)
     after = decode_prefix(after_word)
@@ -1160,7 +1281,7 @@ class RunTrace:
     states: tuple[NumericPrefix, ...]
     events: tuple[AppendEvent, ...]
     outcome: Advanced | ErrorOutcome | None
-    terminal_attempt: AccessFailure | ResultOutsideCarrier | None
+    terminal_attempt: AccessFailure | RuleFailure | None
 
     def __post_init__(self) -> None:
         if type(self.provenance) is not ProgramProvenance:
@@ -1188,9 +1309,9 @@ class RunTrace:
             if requested == 0 or len(events) != requested or self.terminal_attempt is not None:
                 raise ValueError("completed trace must commit every requested event")
         elif type(self.outcome) is ErrorOutcome:
-            if len(events) >= requested or type(self.terminal_attempt) not in (AccessFailure, ResultOutsideCarrier):
+            if len(events) >= requested or type(self.terminal_attempt) not in (AccessFailure, RuleFailure):
                 raise ValueError("error trace must stop before requested event count")
-            reason = self.terminal_attempt.reason if type(self.terminal_attempt) is AccessFailure else self.terminal_attempt
+            reason = self.terminal_attempt.reason
             if reason != self.outcome.reason:
                 raise ValueError("trace error reason/attempt mismatch")
         else:
@@ -1250,7 +1371,7 @@ CompactTraceProjection: TypeAlias = tuple[
     NumericPrefix,
     int,
     tuple[CompactAppendRecord, ...],
-    AccessFailure | ResultOutsideCarrier | None,
+    AccessFailure | RuleFailure | None,
 ]
 
 
@@ -1284,7 +1405,7 @@ def replay_compact_trace(program: object, value: object) -> RunTrace:
         raise TypeError("compact trace initial state must be NumericPrefix")
     requested = checked_nonnegative(requested_raw, "compact requested events")
     records = exact_tuple(records_raw, "compact append records")
-    if terminal_attempt is not None and type(terminal_attempt) not in (AccessFailure, ResultOutsideCarrier):
+    if terminal_attempt is not None and type(terminal_attempt) not in (AccessFailure, RuleFailure):
         raise TypeError("compact terminal attempt has an invalid type")
     if len(records) > requested:
         raise ValueError("compact trace contains more records than requested")
@@ -1445,7 +1566,11 @@ def audit_complete_prefix_rule_factorization() -> tuple[int, int, int, int, int,
     closed RULE evaluator; it is not a required NEIGHBORHOOD semantic.
     """
 
+    compiled_calls = 0
+
     def compiled_factor_step(program: RecurrenceProgram, prefix: NumericPrefix) -> StepResult:
+        nonlocal compiled_calls
+        compiled_calls += 1
         before_word = encode_prefix(prefix)
         position, active = select_unique_end(before_word)
         reads = read_complete_prefix(prefix, active)
@@ -1453,8 +1578,8 @@ def audit_complete_prefix_rule_factorization() -> tuple[int, int, int, int, int,
         if type(resolved) is AccessFailure:
             return StepResult((), ErrorOutcome(resolved.reason), None, resolved)
         write = emit_endpoint_replacement(program, active, resolved)
-        if type(write) is ResultOutsideCarrier:
-            return StepResult((), ErrorOutcome(write), None, write)
+        if type(write) is RuleFailure:
+            return StepResult((), ErrorOutcome(write.reason), None, write)
         after_word = apply_endpoint_splice(before_word, position, write)
         after = decode_prefix(after_word)
         event = AppendEvent(
@@ -1540,6 +1665,7 @@ def audit_complete_prefix_rule_factorization() -> tuple[int, int, int, int, int,
         10,
         2_533,
     )
+    assert compiled_calls == total
     return visible, long, partial, fixed_lag, bigint, failures, total
 
 
@@ -1754,7 +1880,16 @@ def audit_dependent_access_and_partiality() -> tuple[int, int, int, int, int, in
     assert type(nonpositive_result.outcome.reason) is ResultOutsideCarrier
     assert nonpositive_result.outcome.reason.value == 0
     assert nonpositive_result.successors == () and nonpositive_result.event is None
-    assert type(nonpositive_result.attempt) is ResultOutsideCarrier
+    assert type(nonpositive_result.attempt) is RuleFailure
+    assert nonpositive_result.attempt.reason == nonpositive_result.outcome.reason
+    assert demand_addresses(nonpositive_result.attempt.access) == (1,)
+    same_reason_other_program = generic_step(
+        RecurrenceProgram(Sub(C(2), plus(lag(1), C(1)))),
+        NumericPrefix(1, (1,)),
+    )
+    assert same_reason_other_program.outcome.reason == nonpositive_result.outcome.reason
+    assert same_reason_other_program.attempt != nonpositive_result.attempt
+    assert same_reason_other_program.attempt.access.provenance != nonpositive_result.attempt.access.provenance
     successful_demands += 1
     errors += 1
     cases += 1
@@ -1969,7 +2104,8 @@ def audit_compact_trace_reconstruction() -> tuple[int, int, int, int, int, int]:
     partial_program = RecurrenceProgram(Sub(lag(1), C(1)))
     partial = run(partial_program, NumericPrefix(1, (2,)), 5)
     assert type(partial.outcome) is ErrorOutcome
-    assert type(partial.terminal_attempt) is ResultOutsideCarrier
+    assert type(partial.terminal_attempt) is RuleFailure
+    assert demand_addresses(partial.terminal_attempt.access) == (2,)
     assert len(partial.events) == 1
     full_traces.append((partial_program, partial))
 
@@ -2057,6 +2193,7 @@ EXPECTED_DATACLASS_ROLE_MANIFEST = (
     "RecurrenceProgram",
     "ResolvedAccess",
     "ResultOutsideCarrier",
+    "RuleFailure",
     "RunTrace",
     "SourcePreset",
     "StepResult",
@@ -2155,6 +2292,38 @@ def audit_hostile_validation() -> int:
     )))
 
     program = dict(source_programs())["e"]
+
+    class _AxisProbe(Exception):
+        pass
+
+    original_read = read_complete_prefix
+
+    def read_probe(prefix: object, active: object) -> NumericPrefix:
+        raise _AxisProbe("complete-prefix NEIGHBORHOOD was invoked")
+
+    globals()["read_complete_prefix"] = read_probe
+    try:
+        rejected += must_raise(
+            _AxisProbe,
+            lambda: generic_step(program, NumericPrefix(1, (1, 1))),
+        )
+    finally:
+        globals()["read_complete_prefix"] = original_read
+
+    original_rule = evaluate_recurrence_rule
+
+    def rule_probe(program_value: object, active: object, reads: object) -> RuleAttempt:
+        raise _AxisProbe("merged closed RULE was invoked")
+
+    globals()["evaluate_recurrence_rule"] = rule_probe
+    try:
+        rejected += must_raise(
+            _AxisProbe,
+            lambda: generic_step(program, NumericPrefix(1, (1, 1))),
+        )
+    finally:
+        globals()["evaluate_recurrence_rule"] = original_rule
+
     event = generic_step(program, NumericPrefix(1, (1, 1))).event
     assert verify_append_event(program, event)
     bad_after = NumericPrefix(1, event.after.terms[:-1] + (99,))
@@ -2283,7 +2452,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "da544764d03c3171a3cd15535ae7bdc94d08e1c0f39e37ff845cdd7c279ebfbb"
+EXPECTED_DIGEST = "86d8d41247c64cb15b0820ac4c69a192990951ab48c289e4ba33e092854af34a"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
