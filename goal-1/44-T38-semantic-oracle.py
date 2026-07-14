@@ -542,6 +542,7 @@ class ResolvedAccess:
 class AccessFailure:
     provenance: ProgramProvenance
     target_index: int
+    old_prefix: NumericPrefix
     successful_demands: tuple[ReadDemand, ...]
     reason: UndefinedTermReference
 
@@ -549,16 +550,27 @@ class AccessFailure:
         if type(self.provenance) is not ProgramProvenance:
             raise TypeError("access failure provenance must be exact ProgramProvenance")
         target = checked_positive(self.target_index, "failure target")
+        if type(self.old_prefix) is not NumericPrefix:
+            raise TypeError("access failure must retain exact NumericPrefix")
+        if self.old_prefix.next_index != target:
+            raise ValueError("access failure prefix must end at target")
         demands = exact_tuple(self.successful_demands, "successful demands")
         for order, demand in enumerate(demands):
             if type(demand) is not ReadDemand:
                 raise TypeError("successful demands must contain ReadDemand")
             if demand.order != order or demand.target_index != target:
                 raise ValueError("failure demand order/target mismatch")
+            if self.old_prefix.value_at(demand.address) != demand.handle.value:
+                raise ValueError("failure demand handle does not match retained prefix")
         if type(self.reason) is not UndefinedTermReference:
             raise TypeError("access failure reason must be UndefinedTermReference")
         if self.reason.target_index != target or self.reason.demand_order != len(demands):
             raise ValueError("failure reason must follow all successful demands")
+        if (
+            self.reason.support_start != self.old_prefix.origin
+            or self.reason.support_stop != self.old_prefix.next_index
+        ):
+            raise ValueError("failure reason support must match retained prefix")
         object.__setattr__(self, "target_index", target)
         object.__setattr__(self, "successful_demands", demands)
 
@@ -648,7 +660,13 @@ def resolve_rule_expression(
     try:
         resolved = resolve(program.expression, ())
     except _DemandFailure as failure:
-        return AccessFailure(provenance, active.next_index, tuple(demands), failure.reason)
+        return AccessFailure(
+            provenance,
+            active.next_index,
+            prefix,
+            tuple(demands),
+            failure.reason,
+        )
     return ResolvedAccess(provenance, active.next_index, resolved, tuple(demands))
 
 
@@ -682,6 +700,7 @@ class EndpointReplacement:
 class RuleFailure:
     provenance: ProgramProvenance
     source: End
+    old_prefix: NumericPrefix
     access: ResolvedAccess
     reason: ResultOutsideCarrier
 
@@ -690,6 +709,8 @@ class RuleFailure:
             raise TypeError("RULE failure provenance must be ProgramProvenance")
         if type(self.source) is not End:
             raise TypeError("RULE failure source must be End")
+        if type(self.old_prefix) is not NumericPrefix:
+            raise TypeError("RULE failure must retain exact NumericPrefix")
         if type(self.access) is not ResolvedAccess:
             raise TypeError("RULE failure must retain ResolvedAccess")
         if type(self.reason) is not ResultOutsideCarrier:
@@ -698,8 +719,14 @@ class RuleFailure:
             self.access.provenance != self.provenance
             or self.access.target_index != self.source.next_index
             or self.reason.target_index != self.source.next_index
+            or self.old_prefix.next_index != self.source.next_index
         ):
-            raise ValueError("RULE failure source/access/reason mismatch")
+            raise ValueError("RULE failure source/prefix/access/reason mismatch")
+        for demand in self.access.demands:
+            if self.old_prefix.value_at(demand.address) != demand.handle.value:
+                raise ValueError("RULE failure demand handle does not match retained prefix")
+        if evaluate_resolved(self.access.resolved_expression) != self.reason.value:
+            raise ValueError("RULE failure reason must equal the resolved RULE value")
 
 
 RuleResult: TypeAlias = EndpointReplacement | RuleFailure
@@ -708,6 +735,7 @@ RuleResult: TypeAlias = EndpointReplacement | RuleFailure
 def emit_endpoint_replacement(
     program: object,
     active: object,
+    old_prefix: object,
     access: object,
 ) -> RuleResult:
     """Pure RULE: evaluate already-resolved exact data and emit one splice."""
@@ -716,16 +744,24 @@ def emit_endpoint_replacement(
         raise TypeError("RULE requires exact RecurrenceProgram")
     if type(active) is not End:
         raise TypeError("RULE source must be End")
+    if type(old_prefix) is not NumericPrefix:
+        raise TypeError("RULE emitter requires complete NumericPrefix read")
     if type(access) is not ResolvedAccess:
         raise TypeError("RULE requires successful ResolvedAccess")
     provenance = program_provenance(program)
     if access.provenance != provenance or access.target_index != active.next_index:
         raise ValueError("RULE access does not belong to program/source")
+    if old_prefix.next_index != active.next_index:
+        raise ValueError("RULE emitter prefix does not match source")
+    for demand in access.demands:
+        if old_prefix.value_at(demand.address) != demand.handle.value:
+            raise ValueError("RULE emitter demand handle does not match old prefix")
     value = evaluate_resolved(access.resolved_expression)
     if value <= 0:
         return RuleFailure(
             provenance,
             active,
+            old_prefix,
             access,
             ResultOutsideCarrier(active.next_index, value),
         )
@@ -822,6 +858,7 @@ def evaluate_recurrence_rule(
         return AccessFailure(
             provenance,
             active.next_index,
+            old_prefix,
             tuple(demands),
             failure.reason,
         )
@@ -836,6 +873,7 @@ def evaluate_recurrence_rule(
         return RuleFailure(
             provenance,
             active,
+            old_prefix,
             access,
             ResultOutsideCarrier(active.next_index, value),
         )
@@ -1577,7 +1615,7 @@ def audit_complete_prefix_rule_factorization() -> tuple[int, int, int, int, int,
         resolved = resolve_rule_expression(program, reads, active)
         if type(resolved) is AccessFailure:
             return StepResult((), ErrorOutcome(resolved.reason), None, resolved)
-        write = emit_endpoint_replacement(program, active, resolved)
+        write = emit_endpoint_replacement(program, active, reads, resolved)
         if type(write) is RuleFailure:
             return StepResult((), ErrorOutcome(write.reason), None, write)
         after_word = apply_endpoint_splice(before_word, position, write)
@@ -2326,6 +2364,16 @@ def audit_hostile_validation() -> int:
 
     event = generic_step(program, NumericPrefix(1, (1, 1))).event
     assert verify_append_event(program, event)
+    rejected += must_raise(
+        ValueError,
+        lambda: RuleFailure(
+            event.provenance,
+            event.active,
+            event.before,
+            event.access,
+            ResultOutsideCarrier(event.active.next_index, 0),
+        ),
+    )
     bad_after = NumericPrefix(1, event.after.terms[:-1] + (99,))
     rejected += must_raise(ValueError, lambda: replace(event, after=bad_after))
     forged_after = object.__new__(AppendEvent)
@@ -2452,7 +2500,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "86d8d41247c64cb15b0820ac4c69a192990951ab48c289e4ba33e092854af34a"
+EXPECTED_DIGEST = "85da6b7528bd2975727daab8b7eedc5c18a9e521b9064bf2a1afc2e83acf494c"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
