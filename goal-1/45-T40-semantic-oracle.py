@@ -25,6 +25,7 @@ standard library, is silent on import, and fails closed under ``python -O``.
 
 from __future__ import annotations
 
+import json
 import sys
 from dataclasses import dataclass, fields, is_dataclass, replace
 from fractions import Fraction
@@ -48,6 +49,7 @@ PREFIX_OF_INFINITE = "prefix_of_infinite"
 UNKNOWN_TERMINATION = "unknown_termination"
 EXACT_METHOD = "closed_exact"
 MACHIN_METHOD = "machin_rational_interval"
+REPORTED_METHOD = "reported_non_authoritative"
 BOOK_INTEGER_SQRT = "book_literal_r_gt_s_integer_safe"
 REPAIRED_RATIONAL_SQRT = "labeled_rational_r_ge_s_plus_one"
 
@@ -79,7 +81,7 @@ ARCHITECTURE_CLASSIFICATION = (
 GOAL2_DELTA = (
     "Generalize the shared closed mathematical-definition schema to arity zero; do not add ConstantState.",
     "Keep representation, base, canonical convention, selection, method, and resource budget outside constant identity.",
-    "Add pure positional/simple-CF query and typed exact/certified/partial/resource result records.",
+    "Add pure positional/simple-CF queries and keep exact, certified, partial, resource, unsupported, unknown, approximate, probable, and failure results distinct.",
     "Use exact rationals, arbitrary-precision integers, algebraic nodes, and certified rational enclosures; never float digits.",
     "Canonical positional rationals use the terminating zero tail rather than an eventual all-(base-1) dual.",
     "Canonical finite simple continued fractions use a final coefficient greater than one except for a singleton.",
@@ -118,6 +120,12 @@ SQRT_RATIONAL_SOURCE_GUARD = (
     "failed_invariants=nonnegative_remainder_and_exact_prefix_enclosure",
     "labeled_repair=r_ge_s_plus_1",
 )
+
+
+EXPECTED_TEXTUAL_REPLAY_JSON_SHA256 = (
+    "6fd8578623171650e57a405f2d3e9740b895724609fceb38132ceb202055c1fa"
+)
+EXPECTED_TEXTUAL_REPLAY_METRICS = (8_255, 96, 3)
 
 
 def exact_int(value: object, name: str) -> int:
@@ -376,11 +384,11 @@ class EvaluationContext:
 
     def __post_init__(self) -> None:
         method = exact_str(self.method, "evaluation method")
-        if method not in (EXACT_METHOD, MACHIN_METHOD):
+        if method not in (EXACT_METHOD, MACHIN_METHOD, REPORTED_METHOD):
             raise ValueError("unknown evaluation method")
         budget = checked_nonnegative(self.term_budget, "term budget")
-        if method == EXACT_METHOD and budget != 0:
-            raise ValueError("closed exact evaluation has no approximation term budget")
+        if method in (EXACT_METHOD, REPORTED_METHOD) and budget != 0:
+            raise ValueError("this evaluation method has no approximation term budget")
         object.__setattr__(self, "method", method)
         object.__setattr__(self, "term_budget", budget)
 
@@ -684,7 +692,7 @@ class ExpansionResult:
             base = self.query.representation.base
             checked_digit_tuple(coefficients, base, "result coefficients")
             checked_digit_tuple(integers, base, "result integer digits")
-            if type(self.outcome) is not ResourceLimit and not integers:
+            if type(self.outcome) in (CompleteExact, CompleteCertified, Partial) and not integers:
                 raise ValueError("completed positional results require integer digits")
         else:
             if integers:
@@ -717,9 +725,39 @@ class ExpansionResult:
                 raise ValueError("partial outcome count does not match payload")
             if target != self.outcome.requested_count:
                 raise ValueError("partial requested count does not match query")
-        else:
+        elif type(self.outcome) in (
+            ResourceLimit,
+            Unsupported,
+            Unknown,
+            Approximate,
+            Probable,
+            Failure,
+        ):
             if coefficients or integers:
-                raise ValueError("resource-limited result cannot invent coefficients")
+                raise ValueError("non-authoritative result cannot invent authoritative coefficients")
+            if type(self.outcome) in (Unsupported, Unknown, Approximate, Probable, Failure):
+                if termination != UNKNOWN_TERMINATION:
+                    raise ValueError("non-authoritative result must not assert representation termination")
+        if type(self.outcome) is Probable:
+            candidates = self.outcome.candidate_coefficients
+            if type(self.query.representation) is PositionalDigits:
+                checked_digit_tuple(
+                    candidates,
+                    self.query.representation.base,
+                    "probable positional candidates",
+                )
+            else:
+                candidate_start = (
+                    0
+                    if type(self.query.selection) is Prefix
+                    else self.query.selection.index
+                )
+                for offset, candidate in enumerate(candidates):
+                    if candidate < 0 or (candidate_start + offset > 0 and candidate < 1):
+                        raise ValueError("invalid probable simple-CF candidate")
+            expected_candidates = target
+            if len(candidates) != expected_candidates:
+                raise ValueError("probable candidates must cover exactly the requested finite query")
         if type(self.outcome) in (CompleteCertified, Partial):
             certificate = self.outcome.certificate
             if type(self.query.denotation.expression) is not PiConstant:
@@ -757,6 +795,9 @@ class ExpansionResult:
                 raise ValueError("resource outcome is scoped to bounded Pi certification")
             if self.outcome.limit != self.context.term_budget or self.outcome.requested_count != selection_target(self.query.selection):
                 raise ValueError("resource outcome does not match evaluation context")
+        if type(self.outcome) is Unsupported:
+            if self.outcome.requested_profile != unsupported_profile_key(self.query, self.context):
+                raise ValueError("unsupported outcome does not identify the requested profile")
         object.__setattr__(self, "start_index", start)
         object.__setattr__(self, "coefficients", coefficients)
         object.__setattr__(self, "integer_digits", integers)
@@ -1411,11 +1452,87 @@ def evaluate_pi_query(
     )
 
 
+def unsupported_profile_key(
+    query: object,
+    context: object,
+) -> tuple[object, ...]:
+    if type(query) is not RepresentationQuery:
+        raise TypeError("unsupported profile requires exact RepresentationQuery")
+    if type(context) is not EvaluationContext:
+        raise TypeError("unsupported profile requires exact EvaluationContext")
+    return (
+        "UnsupportedRepresentationProfile/v1",
+        expression_key(query.denotation.expression),
+        representation_key(query.representation),
+        context_key(context),
+    )
+
+
+def profile_is_supported(query: RepresentationQuery, context: EvaluationContext) -> bool:
+    expression = query.denotation.expression
+    representation = query.representation
+    if type(expression) is PiConstant:
+        return context.method == MACHIN_METHOD
+    if context.method != EXACT_METHOD:
+        return False
+    if type(expression) is RationalLiteral:
+        return True
+    if type(expression) is SquareRoot:
+        return type(representation) is SimpleContinuedFraction or (
+            type(representation) is PositionalDigits
+            and representation.base == 2
+            and expression.radicand in (2, 3)
+        )
+    if type(expression) is EulerConstant:
+        return type(representation) is SimpleContinuedFraction
+    return False
+
+
+def non_authoritative_result(
+    query: object,
+    context: object,
+    outcome: object,
+) -> ExpansionResult:
+    if type(query) is not RepresentationQuery:
+        raise TypeError("result query must be exact RepresentationQuery")
+    if type(context) is not EvaluationContext:
+        raise TypeError("result context must be exact EvaluationContext")
+    if type(outcome) not in (Unsupported, Unknown, Approximate, Probable, Failure):
+        raise TypeError("non-authoritative factory requires a non-authoritative outcome")
+    start = 0 if type(query.selection) is Prefix else query.selection.index
+    return ExpansionResult(
+        query,
+        context,
+        query_provenance(query, context),
+        start,
+        (),
+        (),
+        outcome,
+        UNKNOWN_TERMINATION,
+    )
+
+
+def unsupported_result(
+    query: RepresentationQuery,
+    context: EvaluationContext,
+) -> ExpansionResult:
+    return non_authoritative_result(
+        query,
+        context,
+        Unsupported(
+            unsupported_profile_key(query, context),
+            "no closed evaluator is registered for this denotation/representation/method profile",
+        ),
+    )
+
+
 def evaluate_query(query: object, context: object) -> ExpansionResult:
     if type(query) is not RepresentationQuery:
         raise TypeError("query must be exact RepresentationQuery")
     if type(context) is not EvaluationContext:
         raise TypeError("context must be exact EvaluationContext")
+    if not profile_is_supported(query, context):
+        return unsupported_result(query, context)
     if type(query.denotation.expression) is PiConstant:
         return evaluate_pi_query(query, context)
     return evaluate_exact_query(query, context)
@@ -1684,7 +1801,7 @@ def make_t42_coefficient_input(result: object) -> T42CoefficientInput:
     elif type(result.outcome) is CompleteCertified:
         strength = "complete_certified"
     else:
-        raise ValueError("T42 handoff rejects partial and resource-limited results")
+        raise ValueError("T42 handoff requires a complete exact or complete certified outcome")
     key = result_key(result)
     return T42CoefficientInput(
         result.provenance.query_id,
@@ -1730,6 +1847,109 @@ def forbidden_execution_role_symbols(
     return tuple(rows)
 
 
+def normalized_textual_replay_interface() -> dict[str, object]:
+    """Compute the semantic side of the asset oracle's small JSON interface."""
+
+    long_profiles: list[dict[str, object]] = []
+    for numerator, denominator, expected in (
+        (1, 3, "01" * 24),
+        (1, 7, "001" * 16),
+    ):
+        work = begin_long_division(RationalLiteral(numerator, denominator), 2)
+        for _ in range(len(expected)):
+            work = long_division_next(work)
+        digits = "".join(str(digit) for digit in work.emitted)
+        if digits != expected:
+            raise ArithmeticError("semantic long-division profile disagrees with its source anchor")
+        long_profiles.append({"p": numerator, "q": denominator, "digits": digits})
+
+    sqrt_profiles: list[dict[str, object]] = []
+    for radicand in (2, 3):
+        work = begin_sqrt_digit_work(Fraction(radicand, 1), BOOK_INTEGER_SQRT)
+        for _ in range(48):
+            work = sqrt_digit_next(work)
+        sqrt_profiles.append(
+            {
+                "n": radicand,
+                "bits": "".join(str(bit) for bit in work.visible_bits),
+            }
+        )
+
+    first = sqrt_digit_next(
+        begin_sqrt_digit_work(Fraction(11, 5), REPAIRED_RATIONAL_SQRT)
+    )
+    literal_r, literal_s = unsafe_literal_rational_sqrt_next(first.r, first.s)
+    if (first.r, first.s, literal_r, literal_s) != (
+        Fraction(24, 5),
+        4,
+        Fraction(-4, 5),
+        12,
+    ):
+        raise ArithmeticError("semantic rational square-root guard did not replay")
+
+    return {
+        "evidence": "source-text-and-independent-exact-arithmetic-not-pixels",
+        "long_division": {
+            "base": 2,
+            "formula": "digit=floor(2*r/q); next=2*r-digit*q",
+            "profiles": long_profiles,
+        },
+        "sqrt_strict_integer": {
+            "formula": "if r>s: (4*(r-s-1),2*(s+2)); else: (4*r,2*s)",
+            "events": 48,
+            "profiles": sqrt_profiles,
+            "source_extracted_sqrt2": "101101010000010011110011001100110111111",
+            "source_extracted_first_mismatch_zero_based": 32,
+        },
+        "sqrt_rational_extension_guard": {
+            "n": "11/5",
+            "literal_states": ["11/5,0", "24/5,4", "-4/5,12"],
+            "repair": "use r>=s+1 for the claimed arbitrary-rational extension",
+        },
+        "split_link_omissions": [1711, 1744],
+    }
+
+
+def audit_textual_replay_interface() -> tuple[int, int, int, int]:
+    interface = normalized_textual_replay_interface()
+    encoded = json.dumps(interface, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    digest = sha256(encoded).hexdigest()
+    assert digest == EXPECTED_TEXTUAL_REPLAY_JSON_SHA256
+
+    long_division_checks = 0
+    for denominator in range(2, 129):
+        for remainder in range(denominator):
+            work = begin_long_division(RationalLiteral(remainder, denominator), 2)
+            next_work = long_division_next(work)
+            digit, next_remainder = divmod(2 * remainder, denominator)
+            assert next_work.emitted == (digit,)
+            assert next_work.remainder == next_remainder
+            long_division_checks += 1
+
+    sqrt_checks = 0
+    for profile in interface["sqrt_strict_integer"]["profiles"]:
+        work = begin_sqrt_digit_work(
+            Fraction(profile["n"], 1),
+            BOOK_INTEGER_SQRT,
+        )
+        for _ in range(interface["sqrt_strict_integer"]["events"]):
+            work = sqrt_digit_next(work)
+            sqrt_checks += 1
+        assert "".join(str(bit) for bit in work.visible_bits) == profile["bits"]
+
+    extracted = interface["sqrt_strict_integer"]["source_extracted_sqrt2"]
+    generated = interface["sqrt_strict_integer"]["profiles"][0]["bits"][: len(extracted)]
+    mismatch_indices = tuple(
+        index
+        for index, (source, semantic) in enumerate(zip(extracted, generated))
+        if source != semantic
+    )
+    assert mismatch_indices == (32, 37, 38)
+    metrics = (long_division_checks, sqrt_checks, len(mismatch_indices))
+    assert metrics == EXPECTED_TEXTUAL_REPLAY_METRICS
+    return (*metrics, 1)
+
+
 def rational_spec(numerator: object, denominator: object) -> MathematicalDenotationSpec:
     return MathematicalDenotationSpec(RationalLiteral(numerator, denominator))
 
@@ -1752,6 +1972,10 @@ def exact_context() -> EvaluationContext:
 
 def machin_context(terms: object) -> EvaluationContext:
     return EvaluationContext(MACHIN_METHOD, terms)
+
+
+def reported_context() -> EvaluationContext:
+    return EvaluationContext(REPORTED_METHOD, 0)
 
 
 def audit_rational_positional_and_duals() -> tuple[int, int, int, int, int]:
@@ -2136,7 +2360,7 @@ def audit_finite_prefix_lossiness_and_cylinders() -> tuple[int, int, int, int, i
     )
 
 
-def audit_outcome_profiles() -> tuple[int, int, int, int, int, int]:
+def audit_outcome_profiles() -> tuple[int, int, int, int, int, int, int, int, int, int, int]:
     exact_query = RepresentationQuery(
         rational_spec(1, 7),
         PositionalDigits(10),
@@ -2182,13 +2406,76 @@ def audit_outcome_profiles() -> tuple[int, int, int, int, int, int]:
     assert type(finite_cf.outcome) is CompleteExact
     assert finite_cf.coefficients == (0, 2)
     assert finite_cf.termination == FINITE_TERMINATED
+
+    unsupported_results = (
+        evaluate_query(certified_query, exact_context()),
+        evaluate_query(
+            RepresentationQuery(e_spec(), PositionalDigits(10), Prefix(8)),
+            exact_context(),
+        ),
+        evaluate_query(exact_query, machin_context(10)),
+        evaluate_query(exact_query, reported_context()),
+    )
+    assert all(type(result.outcome) is Unsupported for result in unsupported_results)
+    assert all(verify_result(result) for result in unsupported_results)
+
+    unknown = non_authoritative_result(
+        certified_query,
+        reported_context(),
+        Unknown(
+            "bounded diagnostics do not establish a coefficient",
+            ("no containing representation cylinder",),
+        ),
+    )
+    approximate = non_authoritative_result(
+        certified_query,
+        reported_context(),
+        Approximate(
+            Fraction(314159, 100000),
+            Fraction(1, 100000),
+            "source_rounded_decimal",
+            ("error_estimate_is_not_a_certificate",),
+        ),
+    )
+    probable = non_authoritative_result(
+        RepresentationQuery(pi_spec(), PositionalDigits(10), Prefix(8)),
+        reported_context(),
+        Probable(
+            tuple(int(character) for character in PI_DECIMAL_60[:8]),
+            "independent_truncated_direct_formula_agreement",
+            Fraction(1, 2**64),
+            3,
+        ),
+    )
+    failure = non_authoritative_result(
+        certified_query,
+        reported_context(),
+        Failure(
+            "nonconvergence",
+            "candidate interval did not narrow monotonically",
+            ("diagnostic_only",),
+        ),
+    )
+    nonpromotable = (*unsupported_results, unknown, approximate, probable, failure)
+    assert all(result.coefficients == () and result.integer_digits == () for result in nonpromotable)
+    proof_rejections = 0
+    for result in nonpromotable:
+        proof_rejections += must_raise(
+            ValueError,
+            lambda result=result: make_t42_coefficient_input(result),
+        )
     return (
         1,
         1,
         1,
         2,
+        len(unsupported_results),
+        1,
+        1,
+        1,
+        1,
+        proof_rejections,
         len(partial.coefficients),
-        len(finite_cf.coefficients),
     )
 
 
@@ -2474,6 +2761,7 @@ EXPECTED_DIGEST = "TO_BE_COMPUTED"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
+    textual_replay = audit_textual_replay_interface()
     rational = audit_rational_positional_and_duals()
     long_division = audit_long_division_realization()
     pi_certification = audit_pi_certification()
@@ -2489,6 +2777,7 @@ def collect_audit_summary() -> tuple[tuple[str, object], ...]:
     surface = audit_no_native_execution_surface()
     hostile = audit_hostile_validation()
     return (
+        ("asset_semantic_textual_replay", textual_replay),
         ("rational_positional_periods_and_duals", rational),
         ("long_division_T35_T43_realization", long_division),
         ("Pi_Machin_certification", pi_certification),
@@ -2509,6 +2798,8 @@ def collect_audit_summary() -> tuple[tuple[str, object], ...]:
         ("T42_handoff_contract", T42_HANDOFF_CONTRACT),
         ("work_realization_relations", WORK_REALIZATION_RELATIONS),
         ("sqrt_rational_source_guard", SQRT_RATIONAL_SOURCE_GUARD),
+        ("expected_textual_replay_JSON_SHA256", EXPECTED_TEXTUAL_REPLAY_JSON_SHA256),
+        ("expected_textual_replay_metrics", EXPECTED_TEXTUAL_REPLAY_METRICS),
         ("Pi_decimal_60", PI_DECIMAL_60),
         ("Pi_binary_96", PI_BINARY_96),
         ("Pi_CF_30", PI_CF_30),
@@ -2525,6 +2816,7 @@ def main() -> None:
         return
     assert digest == EXPECTED_DIGEST
     metrics = dict(summary)
+    textual_replay = metrics["asset_semantic_textual_replay"]
     rational = metrics["rational_positional_periods_and_duals"]
     long_division = metrics["long_division_T35_T43_realization"]
     pi_certification = metrics["Pi_Machin_certification"]
@@ -2540,6 +2832,11 @@ def main() -> None:
     surface = metrics["native_execution_surface"]
 
     print("T40 semantic oracle: PASS")
+    print(
+        f"asset_semantic_replay=long_division:{textual_replay[0]}/"
+        f"sqrt_events:{textual_replay[1]}/guarded_mismatches:{textual_replay[2]}; "
+        f"JSON_digest_matches:{textual_replay[3]}"
+    )
     print(
         f"rational_cases={rational[0]}; roundtrips={rational[1]}; "
         f"prefix_cylinders={rational[2]}; total_period_digits={rational[3]}; "
@@ -2570,7 +2867,9 @@ def main() -> None:
     )
     print(
         f"outcomes=exact:{outcomes[0]}/certified:{outcomes[1]}/partial:{outcomes[2]}/"
-        f"resource:{outcomes[3]}; partial_coefficients={outcomes[4]}; "
+        f"resource:{outcomes[3]}/unsupported:{outcomes[4]}/unknown:{outcomes[5]}/"
+        f"approximate:{outcomes[6]}/probable:{outcomes[7]}/failure:{outcomes[8]}; "
+        f"proof_nonpromotion_rejections={outcomes[9]}; partial_coefficients={outcomes[10]}; "
         f"identity_structural_keys={identity[0]}/equivalence_certificates={identity[1]}"
     )
     print(

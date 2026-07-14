@@ -11,7 +11,7 @@ The audit must answer two different questions:
 1. What named constructions, presets, restrictions, seed/input classes, declarative systems, and materially distinct variants does the Book require the project to cover?
 2. What is the smaller set of genuinely distinct semantic families after aliases, presets, properties, representations, observers, applications, and lossless parameterizations are separated?
 
-Success is not a preferred count. Success is an evidence-complete census in which every part of the Book has been screened, every candidate has a source-grounded semantic fingerprint and final disposition, every relevant cross-reference and image has been accounted for, the existing 45 entries are independently rediscovered or diagnosed, and every proposed addition or close exclusion survives hostile review.
+Success is not a preferred count. Success is an evidence-complete census in which every part of the Book has been screened, every candidate has a source-grounded semantic fingerprint and orthogonal catalog/role/family classifications, every relevant cross-reference and image has been accounted for, the existing 45 entries are independently rediscovered or diagnosed, and every proposed addition or close exclusion survives hostile review.
 
 Goal 3 is a research, taxonomy, and architecture-pressure audit. It does not implement runtime changes, rewrite Goal 1, renumber T01–T45, or modify the Book sources or current catalog unless the user later authorizes a separate integration step.
 
@@ -31,7 +31,7 @@ Goal 3 is a research, taxonomy, and architecture-pressure audit. It does not imp
 3. **Sequential coverage precedes search saturation.** Keyword searches, headings, Index terms, and the Atlas can find omissions but cannot substitute for reading every source unit in order.
 4. **The monolith is canonical.** Use `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md` for completeness, order, and canonical provenance. Split Markdown is a secondary witness and image-location aid.
 5. **Main text and Notes are paired.** Review each chapter's main-text span together with its corresponding Notes span. Do not trust split directory names to identify semantic ownership.
-6. **Figures count as evidence.** Screen every image reference. Inspect construction-bearing figures and their surrounding caption/context; do not infer exact rules from pixels when the source does not establish them.
+6. **Figures count as evidence.** Visually screen every image at least once, using contact sheets or thumbnails where appropriate. Inspect construction-bearing, text-bearing, ambiguous, or caption-incomplete figures at original resolution with their surrounding context; do not infer exact rules from pixels when the source does not establish them.
 7. **No count target.** Do not protect 45, inflate the number of additions, or collapse candidates merely to preserve an elegant API.
 8. **Coverage catalog and semantic families remain separate.** A named preset can deserve a catalog row without a new executor. Conversely, two systems can fit the same five fields while remaining semantically distinct.
 9. **Names do not establish identity.** Different names may be aliases or presets; the same name may cover several constructions.
@@ -82,25 +82,43 @@ The traceable inventory of Book constructions and separately named coverage obli
 
 ### Semantic Family
 
-A group whose members have an explicit lossless structural/relational correspondence preserving complete native semantics. Similar behavior, a shared renderer, emulation, or a common top-level API shape is insufficient.
+A group whose members either have an explicit lossless structural/relational correspondence preserving complete native semantics or are proved instances/restrictions of the same explicit parameterized semantic schema with unchanged mechanics. Similar behavior, a shared renderer, emulation, or a common top-level API shape is insufficient.
 
-### Final Candidate Dispositions
+### Orthogonal Final Classification
 
-Every candidate must receive exactly one primary final disposition:
+Every candidate must receive three independent final fields so catalog coverage is never confused with semantic-family novelty.
 
-- `EXACT_EXISTING_COVERAGE`
+`catalog_action` has exactly one value:
+
+- `EXISTING_ENTRY_SUFFICIENT`
+- `EXISTING_ENTRY_NEEDS_CORRECTION`
+- `ADD_CATALOG_ENTRY`
+- `NO_SEPARATE_CATALOG_ENTRY`
+- `INSUFFICIENT_BOOK_EVIDENCE`
+
+`semantic_role` has exactly one primary value, with optional secondary tags:
+
+- `NATIVE_TRANSITION_OR_GENERATOR`
+- `STOCHASTIC_OR_BRANCHING_PROCESS`
+- `INPUT_PROCESSOR_OR_TRANSDUCER`
+- `RELATION_CONSTRAINT_OR_MODEL_SET`
+- `IMMUTABLE_DEFINITION_OR_QUERY`
 - `SPECIALIZATION_OR_PRESET`
 - `PROPERTY_OR_RESTRICTION`
 - `SEED_INPUT_OR_BOUNDARY_CLASS`
 - `COMPOSITION_OR_HYBRID`
 - `REPRESENTATION_CODEC_OR_OBSERVER`
 - `APPLICATION_OR_EMULATION`
-- `DECLARATIVE_NONTRANSITION_OBJECT`
 - `DUPLICATE_OR_ALIAS`
-- `INSUFFICIENT_BOOK_EVIDENCE`
-- `GENUINE_NEW_CONSTRUCTION`
+- `SOURCE_INSUFFICIENT_ROLE`
 
-Secondary tags may preserve relationships, but they cannot replace the primary disposition.
+`family_action` has exactly one value:
+
+- `EXISTING_SEMANTIC_FAMILY`
+- `NEW_SEMANTIC_FAMILY`
+- `SOURCE_INSUFFICIENT_FOR_FAMILY`
+
+A candidate may therefore justify a new catalog entry while remaining a preset, property, seed class, composition, declarative object, or other member of an existing semantic family. A new-family counterexample is required only for `NEW_SEMANTIC_FAMILY`, never merely because `catalog_action=ADD_CATALOG_ENTRY`.
 
 ## Authoritative Inputs
 
@@ -187,7 +205,7 @@ Execution of the stages will create, refine, and verify:
 - `goal-3/search-rounds.json`: reproducible query rounds, result digests, match dispositions, and fixed-point evidence.
 - `goal-3/cross-reference-ledger.csv`: relevant page/section/Notes/Index routes and their reviewed targets.
 - `goal-3/asset-ledger.csv`: image references, physical paths/hashes, source ownership, evidence role, inspection status, and uncertainty.
-- `goal-3/classification-ledger.csv`: final primary disposition and proof for every candidate.
+- `goal-3/classification-ledger.csv`: orthogonal `catalog_action`, `semantic_role`, and `family_action` fields plus proof for every candidate.
 - `goal-3/coverage-matrix.csv`: B candidates, existing T01–T45 obligations, proposed additions, and source coverage joins.
 - `goal-3/near-pair-matrix.md`: explicit comparisons among easily conflated candidates.
 - `goal-3/whole-book-catalog.md`: the final traceable coverage catalog.
@@ -202,10 +220,10 @@ Execution of the stages will create, refine, and verify:
 - All 19 Markdown files and all 1,444 physical images are present in the source manifest or explicitly diagnosed.
 - Every canonical logical line belongs to exactly one segment and every deterministic source unit has exactly one reading-ledger disposition.
 - Preface/bookends, 12/12 main chapters, General Notes, 12/12 chapter Notes spans, actual Index, and Colophon are screened.
-- Every image reference has an asset-ledger row; every construction-bearing image is inspected with its surrounding source context.
+- Every image reference has an asset-ledger row and every physical image is visually screened at least once; construction-bearing, text-bearing, ambiguous, and caption-incomplete images receive original-resolution review with surrounding context.
 - Every relevant cross-reference reaches a reviewed target or a documented missing target.
 - Sequential discovery and recursive search reach a declared fixed point with no undispositioned search hit.
-- Every candidate has complete provenance, a semantic fingerprint, and exactly one final disposition.
+- Every candidate has complete provenance, a semantic fingerprint, and exactly one value for each final classification axis.
 - Every T01–T45 entry is independently rediscovered or receives a source-backed diagnostic.
 - Every proposed new catalog entry and every close collapse/exclusion receives independent hostile review.
 - The final coverage-catalog count and semantic-family count are both reported and never conflated.
@@ -223,7 +241,7 @@ Execution of the stages will create, refine, and verify:
 - Re-run all search rounds and compare query/result digests.
 - Mutation-test deletion or corruption of a source unit, candidate link, search disposition, cross-reference, asset row, and classification; each mutation must fail verification.
 - Run validators from the repository root and a relocated copy, byte-compile/import silently where applicable, fail closed under optimized Python if assertions are used, and avoid working-directory assumptions.
-- Run `git diff --check -- goal-3` and inspect scope with `git status --short`.
+- Run direct trailing-whitespace, Markdown-fence, path, and schema checks over tracked and untracked `goal-3/**`; when files are intentionally staged, also run `git diff --cached --check -- goal-3`. Inspect scope with `git status --short`.
 - Confirm Goal 3 did not edit Book sources, `ref/notes`, Goal 1, Goal 2, runtime, tests, or root API documents without explicit authorization.
 
 ## Stages
@@ -239,7 +257,7 @@ Fix the audit's inclusion threshold, evidence model, candidate identity, disposi
 - Read `principles.md` and this scaffold in full.
 - Define construction-bearing eligibility broadly enough to include transitions, generators, input processors, stochastic laws, relations, constraints, functions/constants/equations, and structural replacement systems.
 - Define exclusion and secondary-role categories without pre-classifying known examples.
-- Freeze provisional B-ID allocation, source-evidence strength, semantic-fingerprint fields, and final disposition vocabulary.
+- Freeze provisional B-ID allocation, source-evidence strength, semantic-fingerprint fields, and the three final classification vocabularies.
 - Specify how isolated discovery workers receive only assigned Book ranges, Goal 3 guardrails, and ledger schemas.
 - Define the proof obligations for same-family, specialization, composition, new construction, and insufficient evidence.
 
@@ -559,18 +577,18 @@ Blindly audit Chapter 12 main text and Chapter 12 Notes.
 
 #### Big Picture Objective
 
-Use the Book's actual Index and then the Atlas to find names, aliases, and sections missed by sequential reading without treating either as primary construction evidence.
+Screen the complete actual Index and then use the Atlas to find names, aliases, and sections missed by sequential reading without treating either as primary construction evidence.
 
 #### Detailed Implementation Plan
 
-- Sequentially inspect relevant actual-Index headwords and subentries at canonical lines 20826–22457.
+- Sequentially inspect every actual-Index source unit/headword at canonical lines 20826–22457, assigning explicit no-construction dispositions where appropriate.
 - Follow every construction-relevant page route to an already reviewed source unit or reopen the owning chapter stage.
 - Compare the Atlas's section/term inventory against discovered candidates only after Index review.
 - Record Index-only and Atlas-only leads, false positives, and unresolved OCR routes.
 
 #### Completion Requirements
 
-- Every construction-relevant Index route is mapped, excluded with reason, or assigned a documented missing target.
+- Every actual-Index source unit/headword is screened; every construction-relevant route is mapped, excluded with reason, or assigned a documented missing target.
 - Every Atlas lead maps to reviewed Book evidence or a clear derivative-only exclusion.
 - Any missed construction reopens and re-closes its owning stage.
 - Index/Atlas text is never the sole mechanics evidence for an accepted candidate.
@@ -621,22 +639,25 @@ Reveal the existing catalog only after blind discovery, then test whether T01–
 
 #### Big Picture Objective
 
-Assign every B candidate one final primary disposition and identify proposed catalog additions without yet deduplicating semantic families.
+Assign every B candidate orthogonal catalog, semantic-role, and family actions and identify proposed catalog additions without conflating them with new semantic families.
 
 #### Detailed Implementation Plan
 
+- Assign one `catalog_action`, one primary `semantic_role`, and one `family_action` to every candidate.
 - Compare every candidate against its nearest existing and newly discovered neighbors.
 - Require explicit base construction and parameter/predicate for presets and restrictions.
-- Require absence of native mechanics for observer/application/emulation dispositions.
-- Require exact missing facts for insufficient-evidence dispositions.
-- Require a concrete non-preservation counterexample for genuine new constructions.
+- Require absence of native mechanics for observer/application/emulation roles.
+- Require exact missing facts for source-insufficient actions.
+- Require a concrete non-preservation counterexample only for `NEW_SEMANTIC_FAMILY`.
+- Permit `ADD_CATALOG_ENTRY` for source-important presets, restrictions, seed classes, compositions, declarative categories, or other coverage obligations that reuse an existing family.
 - Allocate proposed T46+ identifiers only after all earlier IDs remain stable.
 
 #### Completion Requirements
 
-- Every B candidate has exactly one primary disposition and evidence-backed rationale.
-- No `AMBIGUOUS`, `UNREVIEWED`, or silent catch-all row remains.
-- Every proposed T46+ entry has a complete Book evidence packet and nearest-family counterexample.
+- Every B candidate has exactly one value on all three classification axes with evidence-backed rationale.
+- No `AMBIGUOUS`, `UNREVIEWED`, or silent catch-all row remains on any axis.
+- Every proposed T46+ entry has a complete Book evidence packet and justified catalog-level identity.
+- Every `NEW_SEMANTIC_FAMILY` row has a nearest-family counterexample; existing-family T46+ rows name their reused family and exact role.
 - Every close exclusion/collapse is flagged for hostile review.
 
 ### 21-SEMANTIC-FAMILIES
@@ -647,7 +668,7 @@ Build the deduplicated semantic-family inventory and test newly discovered const
 
 #### Detailed Implementation Plan
 
-- Group catalog entries only when complete fingerprints and lossless native-result correspondences justify it.
+- Group catalog entries when either complete fingerprints and lossless native-result correspondences justify it, or both are proved instances/restrictions of the same explicit parameterized semantic schema with unchanged native mechanics.
 - Build near-pair comparisons for schedule, history, branching/probability, structural mutation, input consumption, completion, and witness differences.
 - Map each accepted construction to the minimal API fields and result semantics.
 - Record where the five-field design fits directly, needs clarification, or genuinely fails.
@@ -655,8 +676,8 @@ Build the deduplicated semantic-family inventory and test newly discovered const
 
 #### Completion Requirements
 
-- Every final catalog entry maps to exactly one semantic family or an explicitly irreducible declarative category.
-- Every same-family claim includes a lossless map and native-event/result preservation argument.
+- Every final catalog entry—including declarative entries—maps to exactly one semantic-family record.
+- Every same-family claim includes either a lossless native-result correspondence or a proof of membership in the same explicit parameterized schema with unchanged mechanics.
 - Every close non-equivalence includes a concrete counterexample.
 - Every accepted addition has an honest API-pressure disposition with no callback or opaque-packing escape hatch.
 
@@ -678,7 +699,7 @@ Independently challenge source coverage, every proposed addition, every close ex
 #### Completion Requirements
 
 - Every proposed addition and close classification has at least one independent review record.
-- Sampling covers every canonical segment and every final disposition class.
+- Sampling covers every canonical segment and every value used on all three final classification axes.
 - All validator mutation tests fail when required evidence is removed or corrupted.
 - Every hostile finding is resolved by re-opening/re-closing its owning stage.
 - `hostile-review.md` has zero unresolved blocking findings.

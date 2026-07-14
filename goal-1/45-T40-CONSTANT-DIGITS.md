@@ -236,6 +236,18 @@ The current `src/ca` package exposes names resembling the shared axes, but its e
 - No long-division remainder, Gauss residual, evaluator cache, precision state, or resource counter hidden outside a declared work configuration/context.
 - No T40-specific state, DOMAIN, FRONTIER, NEIGHBORHOOD, RULE-result wrapper, UPDATE, executor, family branch, or identity/no-op rollout.
 
+## Frozen Source Closure
+
+`45-T40-source-oracle.py` freezes 18 search lanes and a 144-line direct union at `99 pre-Index / 45 actual-Index`. The pre-Index query partition is `46 native / 41 relation / 7 control / 5 exclusion`; 113 governed continuations expand retained pre-Index evidence to `114 / 84 / 9 = 207`, and the actual Index routes as `16 / 29 / 0`. Thirty-seven semantic guards, 24 extraction/source-defect records, 32 source-model records, five exclusion hashes, and seven exact logic contracts are independently bound. The complete split disposition has 252 rows at `177 exact / 22 image-basename / 20 normalized / 3 summary / 30 omitted`, normalized minimum `0.999817`, with zero unresolved. Its audit digest is `9a38b298a811e9017ce7201490ee8571e63347f9b5a9b5a13dd771a698627ea9`; script SHA-256 is `6e9ab5a64e7e10935c38260ff1b4aa8938d59e26d04a266bb1f4eae9ec70ca5f`.
+
+The exact logic contract covers 2,079 long-division states, rational finite continued-fraction completion, finite-prefix loss, 96 strict square-root events, the extracted square-root bit divergence, and the `n=11/5` rational counterexample. Normal and JSON modes, silent import, compilation, relocation with the corpus, source mutation, optimized mode, malformed usage, and the source/asset interface all pass fail-closed.
+
+## Frozen Asset Closure
+
+`45-T40-asset-oracle.py` closes exactly 24 governed images at `11 native / 12 relation / 1 control`, 46 references at `24 monolith / 22 split`, 24 distinct physical files and hashes totaling 574,761 bytes, and four multi-file assemblies spanning 16 files. The page-154 and page-156 split-link omissions are explicit. Every asset is `HASH_BOUND`; none is pixel-replayed or used as executable program data. The structural, ordered, and normalized textual-replay digests are respectively `1cbfe8ffc3de77048a2d407c7ef63896dac86a8fc3ec83c7b00c1ea84e6f019e`, `ecf178d94b0b34226592d3b460a2a1e2f0cf6893e1521877f3ada6818898fad6`, and `6fd8578623171650e57a405f2d3e9740b895724609fceb38132ceb202055c1fa`; script SHA-256 is `e2a0cbe8277ee663c81d9bea832336251c022203233fdcb32fc225bff4097f35`.
+
+Its independent textual replay checks 8,255 long-division states and 96 strict-integer square-root events, guards all three mismatches between the extracted square-root bit string and the exact algorithm, and retains the rational source-claim counterexample. Source guards, semantic manifests, import, compilation, relocation, optimized mode, bad usage, hash mutation, and the real source-oracle interface pass.
+
 ## Completion Requirements
 
 - [ ] Every strict main, Notes, actual-Index, split, history, relation, control, exclusion, and extraction-defect candidate is dispositioned with zero unresolved mechanics.

@@ -16,7 +16,7 @@ This loop governs every stage in `goal-3/0-plan.md`. The plan is authoritative b
 
 - Freeze hashes of blind discovery artifacts before opening current taxonomy and architecture materials.
 - Reveal and reconcile T01–T45 without rewriting the blind evidence record.
-- Assign final dispositions before grouping semantic families.
+- Assign orthogonal catalog, semantic-role, and family actions before grouping semantic families.
 - Evaluate API pressure only after Book taxonomy has been decided.
 
 ### Hostile closure and reporting: Stages 22–23
@@ -66,7 +66,7 @@ Before any stage work:
 3. Verify canonical Book and asset hashes against `corpus-manifest.json` once that artifact exists.
 4. Run current Goal 3 validators before editing.
 5. Confirm the stage's allowed source inputs and phase boundary.
-6. Record the exact starting counts for source units, reviewed units, candidates, cross-reference queue, asset queue, search hits, final dispositions, and hostile findings as applicable.
+6. Record the exact starting counts for source units, reviewed units, candidates, cross-reference queue, asset queue, search hits, catalog/role/family classifications, and hostile findings as applicable.
 7. If source drift is detected, stop classification work and reopen `2-CORPUS-MAP` and `3-AUDIT-HARNESS`.
 
 ## Source-Unit Review Procedure
@@ -121,8 +121,9 @@ Short excerpts may be retained when necessary to pin exact mechanics, but do not
 
 - Map monolith image basenames to unique physical files and hashes; never trust broken monolith relative paths directly.
 - Give every reference an asset-ledger row even when the image is non-constructional.
+- Visually screen every physical image at least once; contact-sheet or thumbnail review is acceptable for initial screening.
 - Classify the image role as `NATIVE_EVIDENCE`, `RELATION`, `CONTROL`, `OBSERVER`, `DECORATIVE`, or `SOURCE_DEFECT`.
-- Record whether the image was visually inspected and whether limited transcription was required.
+- Record total `visually_screened` status. Inspect construction-bearing, text-bearing, ambiguous, or caption-incomplete images at original resolution and record whether limited transcription was required.
 - Do not derive hidden rule tables, exact colors, coordinates, or timings from pixels unless the image visibly and unambiguously establishes them and the transcription is independently checked.
 - Proximity to candidate prose does not make an image native evidence.
 
@@ -141,23 +142,41 @@ Short excerpts may be retained when necessary to pin exact mechanics, but do not
 6. Repeat until a full round adds no vocabulary, candidate, evidence, or unresolved route.
 7. Mutation-test removal of a hit disposition so the verifier proves there is no silent remainder.
 
-## Reconciliation Labels
+## Orthogonal Reconciliation Fields
 
-After Stage 18 freezes blind discovery, assign every candidate exactly one primary final disposition:
+After Stage 18 freezes blind discovery, assign every candidate one value on each axis.
 
-- `EXACT_EXISTING_COVERAGE`
+`catalog_action`:
+
+- `EXISTING_ENTRY_SUFFICIENT`
+- `EXISTING_ENTRY_NEEDS_CORRECTION`
+- `ADD_CATALOG_ENTRY`
+- `NO_SEPARATE_CATALOG_ENTRY`
+- `INSUFFICIENT_BOOK_EVIDENCE`
+
+`semantic_role`:
+
+- `NATIVE_TRANSITION_OR_GENERATOR`
+- `STOCHASTIC_OR_BRANCHING_PROCESS`
+- `INPUT_PROCESSOR_OR_TRANSDUCER`
+- `RELATION_CONSTRAINT_OR_MODEL_SET`
+- `IMMUTABLE_DEFINITION_OR_QUERY`
 - `SPECIALIZATION_OR_PRESET`
 - `PROPERTY_OR_RESTRICTION`
 - `SEED_INPUT_OR_BOUNDARY_CLASS`
 - `COMPOSITION_OR_HYBRID`
 - `REPRESENTATION_CODEC_OR_OBSERVER`
 - `APPLICATION_OR_EMULATION`
-- `DECLARATIVE_NONTRANSITION_OBJECT`
 - `DUPLICATE_OR_ALIAS`
-- `INSUFFICIENT_BOOK_EVIDENCE`
-- `GENUINE_NEW_CONSTRUCTION`
+- `SOURCE_INSUFFICIENT_ROLE`
 
-Do not retain `AMBIGUOUS` or `UNRESOLVED` at final closure. If the Book genuinely does not decide the mechanics after exhaustive search, `INSUFFICIENT_BOOK_EVIDENCE` is the honest resolved result and must state exactly what is missing.
+`family_action`:
+
+- `EXISTING_SEMANTIC_FAMILY`
+- `NEW_SEMANTIC_FAMILY`
+- `SOURCE_INSUFFICIENT_FOR_FAMILY`
+
+Do not retain `AMBIGUOUS` or `UNRESOLVED` on any axis at final closure. If the Book genuinely does not decide the mechanics after exhaustive search, the source-insufficient values are the honest resolved result and must state exactly what is missing. `ADD_CATALOG_ENTRY` does not imply `NEW_SEMANTIC_FAMILY`.
 
 ## Distinctness and Reuse Tests
 
@@ -165,12 +184,10 @@ Do not retain `AMBIGUOUS` or `UNRESOLVED` at final closure. If the Book genuinel
 
 Require:
 
-- complete source-grounded fingerprints for both sides;
-- an explicit total structural map on valid configurations/denotations;
-- an inverse on the mapped image;
-- preservation of immutable program data and invariants;
-- one-native-event/result commutation, including target selection, schedule, read snapshot, writes/replacement, branching/probability, failure/completion, and witnesses;
-- no hidden source interpreter or changed event granularity.
+- complete source-grounded fingerprints for both sides; and either:
+  - an explicit total structural map on valid configurations/denotations, an inverse on the mapped image, and one-native-event/result commutation; or
+  - proof that both are instances/restrictions of the same explicit parameterized semantic schema with unchanged native mechanics.
+- In both cases preserve immutable program data, invariants, target selection, schedule, read snapshot, writes/replacement, branching/probability, failure/completion, witnesses, and event granularity without a hidden source interpreter.
 
 ### Specialization, preset, property, or seed class
 
@@ -198,14 +215,24 @@ Require:
 - absence of a new native construction law, or an explicit map to the construction being observed/applied/emulated;
 - no promotion of rendering, measurement, solver, or decoding steps into native events.
 
-### Genuine new construction
+### New catalog entry
+
+Require:
+
+- sufficient Book identity and evidence to justify independent traceable coverage;
+- a stated semantic role and family action;
+- a source-grounded reason that folding the name into another catalog row would lose a Book obligation.
+
+A new catalog entry may reuse an existing semantic family. It does not need a family-novelty counterexample.
+
+### New semantic family
 
 Require:
 
 - sufficient Book evidence to instantiate the construction;
 - nearest existing candidate/family comparison;
 - a concrete event, result, or denotation whose state, schedule, reads, probability, structure, successor cardinality, completion, or witnesses cannot be preserved by the nearest family;
-- proof that the difference is not merely a parameter, property, seed, representation, composition, or observer;
+- proof that the difference is not merely a parameter, property, seed, representation, composition, observer, or another instance of one explicit parameterized schema;
 - independent hostile review.
 
 ## Re-Integration Questions
@@ -315,7 +342,7 @@ At the end of every stage, answer:
 
 ### Index and saturation
 
-- Every relevant Index/Atlas lead and cross-reference has a final route record.
+- Every Index source unit/headword is screened, and every relevant Index/Atlas lead and cross-reference has a final route record.
 - Search result sets reproduce from frozen queries.
 - Every hit is partitioned with no remainder.
 - The final iteration is a real fixed point.
@@ -323,15 +350,16 @@ At the end of every stage, answer:
 ### Reconciliation/disposition/family stages
 
 - Every T entry and B candidate participates in required joins.
-- Every candidate has exactly one final disposition.
-- Proposed additions have counterexamples and evidence packets.
-- Same-family claims carry lossless native-result proofs.
+- Every candidate has exactly one catalog action, semantic role, and family action.
+- Proposed catalog additions have evidence packets and catalog-identity arguments.
+- Proposed new families have nearest-family counterexamples.
+- Same-family claims carry lossless native-result proofs or explicit shared-parameterized-schema proofs.
 - Near-pair comparisons cover high-risk distinctions.
 
 ### Hostile/final stages
 
 - Independent reviewers cover every proposed addition and close exclusion/collapse.
-- Sampling spans every canonical segment and disposition class.
+- Sampling spans every canonical segment and every value used on the three classification axes.
 - All findings are resolved through owning-stage reclosure.
 - Reports and counts are generated from verified ledgers.
 - Scope, Markdown, diff, relocation, optimized-mode, and mutation gates pass.
@@ -342,12 +370,12 @@ At the end of every stage, answer:
 - Verify all 19 Markdown files, all canonical logical lines, all 1,444 physical images, and all monolith references are accounted for.
 - Verify all source units have reading dispositions.
 - Verify all search hits and relevant cross-references have final dispositions.
-- Verify all candidates have complete provenance, fingerprints, and one final classification.
+- Verify all candidates have complete provenance, fingerprints, and one value on each final classification axis.
 - Verify all T01–T45 entries are independently rediscovered or diagnosed.
-- Verify every proposed T46+ entry and close exclusion/collapse has hostile review.
+- Verify every proposed T46+ entry and close exclusion/collapse has hostile review; require nearest-family counterexamples only for new semantic families.
 - Verify catalog and semantic-family counts are separately derived from ledgers.
 - Verify no unsupported Book claim was silently repaired or inferred.
-- Run all Goal 3 validators, mutation cases, relocation checks, byte-compilation/import checks, `git diff --check -- goal-3`, and final scope inspection.
+- Run all Goal 3 validators, mutation cases, relocation checks, byte-compilation/import checks, direct whitespace/fence checks over tracked and untracked `goal-3/**`, staged-diff checks when intentionally staged, and final scope inspection.
 - Confirm only `goal-3/` changed unless the user separately authorized integration.
 
 ## Session Stop / Resume Contract
