@@ -3,7 +3,8 @@
 
 T33 is the static constraint construction obtained by conjoining an exact
 allowed-local-pattern relation with a global requirement that a designated
-allowed pattern occur at least once.  Its native visual record is the
+well-typed pattern occur at least once.  Membership in the allowed set is a
+denotational consistency question, not a syntax condition.  Its native visual record is the
 printed-page-216 gallery, the printed-page-218 search plate, the page-219
 forced nonperiodic example, and the paired page-220/page-221 rule-60/rule-30
 constructions.  The displayed search stages are evidence about the examples,

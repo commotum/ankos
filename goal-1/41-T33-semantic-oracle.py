@@ -2332,7 +2332,8 @@ def main() -> None:
         f"arbitrarily_far_witnesses={arbitrarily_far_occurrence_witnesses}; "
         f"finite_local_flag_counterexamples={no_local_flag_counterexamples}; "
         f"support_order_commutations={support_order_commutations}; "
-        f"generalized_profile=3x3/{larger_support_arity}-slots+{larger_alphabet}-colors; "
+        f"generalized_profiles=binary_3x3/{larger_support_arity}-slots"
+        f"+{larger_alphabet}-color_2x2/4-slots; "
         f"generalized_checks={generalized_profile_checks}"
     )
     print(
