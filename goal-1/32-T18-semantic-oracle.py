@@ -30,6 +30,16 @@ class BinaryCyclicProgram:
     trigger: Symbol
 
     def __post_init__(self) -> None:
+        if (
+            any(type(symbol) is not int for symbol in self.alphabet)
+            or type(self.trigger) is not int
+            or any(
+                type(symbol) is not int
+                for block in self.blocks
+                for symbol in block
+            )
+        ):
+            raise ValueError("strict binary symbols must be exact integers")
         if self.alphabet != (0, 1) or self.trigger != 1:
             raise ValueError("the strict Chapter 3 preset is binary with trigger 1")
         if not self.alphabet or len(set(self.alphabet)) != len(self.alphabet):
@@ -71,6 +81,10 @@ class DirectEvent:
 def check_direct_state(
     program: BinaryCyclicProgram, state: DirectState
 ) -> DirectState:
+    if type(state.phase) is not int or any(
+        type(symbol) is not int for symbol in state.word
+    ):
+        raise ValueError("state phase and symbols must be exact integers")
     if state.phase < 0 or state.phase >= len(program.blocks):
         raise ValueError("phase is outside the program cycle")
     if any(symbol not in program.alphabet for symbol in state.word):
@@ -214,11 +228,15 @@ def validate_tagged(
     first = configuration.tokens[0]
     if not isinstance(first, PhaseTag):
         raise ValueError("phase marker must be the unique left endpoint")
+    if type(first.slot) is not int:
+        raise ValueError("phase marker slot must be an exact integer")
     if first.slot < 0 or first.slot >= len(program.blocks):
         raise ValueError("phase marker is outside the program cycle")
     for token in configuration.tokens[1:]:
         if not isinstance(token, DataTag):
             raise ValueError("only data tokens may follow the phase marker")
+        if type(token.value) is not int:
+            raise ValueError("tagged data must use exact integer symbols")
         if token.value not in program.alphabet:
             raise ValueError("data token is outside the program alphabet")
 
@@ -1006,12 +1024,34 @@ def assert_adversaries() -> None:
         "out-of-range phase marker was accepted",
     )
     expect_value_error(
+        lambda: validate_tagged(
+            phase_program,
+            make_configuration((PhaseTag(True), DataTag(True))),
+        ),
+        "Boolean-coercible tagged state was accepted",
+    )
+    expect_value_error(
+        lambda: validate_tagged(
+            phase_program,
+            make_configuration((PhaseTag(0.0), DataTag(1.0))),
+        ),
+        "floating tagged state was accepted",
+    )
+    expect_value_error(
         lambda: BinaryCyclicProgram((0, 1), (), 1),
         "empty program cycle was accepted",
     )
     expect_value_error(
         lambda: BinaryCyclicProgram((0, 1, 2), ((1,),), 1),
         "nonbinary data was accepted by the strict preset",
+    )
+    expect_value_error(
+        lambda: BinaryCyclicProgram((False, True), ((True,),), True),
+        "Boolean-coercible program data was accepted",
+    )
+    expect_value_error(
+        lambda: direct_step(CANONICAL_PROGRAM, DirectState(False, (True,))),
+        "Boolean-coercible state data was accepted",
     )
     expect_value_error(
         lambda: MultiplicityProgram(((1, -1),)),

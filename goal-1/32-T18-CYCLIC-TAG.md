@@ -1,6 +1,6 @@
 # 32-T18-CYCLIC-TAG
 
-Status: **IN PROGRESS — SEMANTIC AUDIT CLOSED; SOURCE, ASSET, AND ARCHITECTURE AUDITS OPEN**
+Status: **COMPLETE — EVIDENCE, ASSETS, SEMANTICS, ARCHITECTURE, AND HOSTILE REVIEW CLOSED**
 
 ## Current Facts
 
@@ -277,14 +277,14 @@ The broad SimpleProgram responsibilities fit, while their current CA-shaped real
 | Concern | Fit | Finding |
 |---|---|---|
 | DOMAIN | DIRECT | T18 is discrete `t+1D`; DOMAIN does not mean the phase carrier or queue storage class. |
-| CONFIGURATION/support | REUSE + CURRENT GAP | T17/D027 already require finite variable-length ordered support; T18 composes it with one tagged left-end phase invariant. `simple_programs.md:87-169` has not implemented that generic support yet. |
+| CONFIGURATION/support | PRINCIPLED EXTENSION | T17/D027 already justify the shared finite variable-length ordered support; T18 only composes it with one tagged left-end phase invariant. `simple_programs.md:87-169` has not implemented that generic support yet. |
 | ALPHABET | PARAMETERIZATION | The value responsibility at `:200-233` generalizes to `Phase(slot) | Data(symbol)`; strict binary and natural-multiplicity data are validators/presets. |
-| FRONTIER | PARAMETERIZATION + CURRENT GAP | Parameterize T17's anchored prefix selector to the unique old phase/head occurrence pair, or zero data-head sources when empty. Absolute writable coordinates at `:1412-1510` do not yet realize structural loci. |
-| NEIGHBORHOOD | PARAMETERIZATION + CURRENT GAP | Reuse ordered endpoint/prefix access for `(phase,head)`; all reads still come from one old snapshot. Geometric offsets at `:360-731` do not yet implement that access type. |
-| RULE/write | PARAMETERIZATION + CURRENT GAP | A closed immutable cycle/trigger preset emits two D039 ordered span writes from `(phase,head)`. Scalar next-coordinate values at `:1767-1793` do not yet admit the generic result carrier. |
+| FRONTIER | PRINCIPLED EXTENSION | The shared T17 structural-selector extension parameterizes to the unique old phase/head occurrence pair, or zero data-head sources when empty. Absolute writable coordinates at `:1412-1510` do not yet realize structural loci. |
+| NEIGHBORHOOD | PRINCIPLED EXTENSION | Reuse the already-justified ordered endpoint/prefix access for `(phase,head)`; all reads still come from one old snapshot. Geometric offsets at `:360-731` do not yet implement that access type. |
+| RULE/write | PRINCIPLED EXTENSION | The already-justified shared structural-result carrier admits a closed immutable cycle/trigger preset emitting two D039 ordered span writes from `(phase,head)`. Scalar next-coordinate values at `:1767-1793` do not yet admit it. |
 | UPDATE | PARAMETERIZATION | D039 generic ordered multi-span commit already expresses phase/head prefix replacement plus old-end insertion; no cyclic update or executor is needed. |
 | outcome | PARAMETERIZATION | D024's construction-specific empty policy gains an evidenced identity event with frozen phase; T17 `InsufficientPrefix` remains unchanged. |
-| trace/encoding | REUSE + CURRENT GAP | Reuse T13/T17 ragged ordered snapshots and lineage, adding visible phase/witness fields. Dense copied slices at `:2124-2199` have not implemented that boundary. |
+| trace/encoding | PRINCIPLED EXTENSION | Reuse the shared T13/T17 ragged ordered snapshot/lineage extension, adding visible phase/witness fields. Dense copied slices at `:2124-2199` have not implemented that boundary. |
 
 ## Current Runtime Fit
 
@@ -411,14 +411,18 @@ One shared runner and generic ordered-span UPDATE execute T17 and T18 from typed
 
 ## Completion Requirements
 
-- [ ] Exhaustive source/split/Notes/Index/alias audit closes with zero unresolved candidates.
-- [ ] Source-bound asset fixed point closes and native rules/seeds/trajectories are decoded.
-- [ ] Direct and tagged semantics commute with complete visible phase and exact empty behavior.
-- [ ] Smallest reusable base is classified without a new family executor or unjustified UPDATE algebra.
-- [ ] Current API/runtime/principles audit and Goal 2 handoff are implementation-ready.
-- [ ] Independent hostile review and all oracle/test/Markdown/diff/scope/coverage gates pass.
-- [ ] `0-plan.md`, `evidence-index.md`, and `design-ledger.md` are integrated consistently.
+- [x] Exhaustive source/split/Notes/Index/alias audit closes with zero unresolved candidates.
+- [x] Source-bound asset fixed point closes and native rules/seeds/trajectories are decoded.
+- [x] Direct and tagged semantics commute with complete visible phase and exact empty behavior.
+- [x] Smallest reusable base is classified without a new family executor or unjustified UPDATE algebra.
+- [x] Current API/runtime/principles audit and Goal 2 handoff are implementation-ready.
+- [x] Independent hostile review and all oracle/test/Markdown/diff/scope/coverage gates pass.
+- [x] `0-plan.md`, `evidence-index.md`, and `design-ledger.md` are integrated consistently.
 
 ## Stage Results
 
-In progress.
+COMPLETE. The 19-query source audit closes a 305-line union at `259 pre-Index / 46 actual-Index`, retains 160 lines (`39 native / 84 relation / 37 control`), excludes 150 pre-Index false positives, reverse-joins the split corpus at `269 exact + 33 variants`, and leaves zero unresolved candidates. The source-bound fixed point closes 43 assets at `C/O/R/X=4/1/24/14`, 86 monolith/split references, and 43 unique hashes. Five direct page-96 rules from the one-black seed reproduce every `t0..t99` profile; page 95 independently fixes `{{1,1},{1,0}}` through `t24`.
+
+The occurrence-addressed `(phase,word) <-> Phase · Data*` representation commutes in 71,442 bounded cases, while the literal Notes rotated-value state is correctly recorded as a step-compatible quotient for rotationally periodic cycles. Empty activity still traverses FRONTIER/NEIGHBORHOOD/RULE/UPDATE; live extinction advances phase and the following empty identity freezes it. The same span combiner passes 1,806 T17 cases, the natural-multiplicity sibling passes 255 cases, and strict exact-integer, opaque-snapshot, source/result, serialization, and provenance adversaries pass.
+
+D126 composes T17 ordered support, D032 visible phase, a closed cycle/trigger RULE, D039 ordered spans, and D024 empty policy. It adds no state/control class, UPDATE algebra, executor, family branch, hidden rotation, callback, capacity, sentinel, or compiler fallback; no prior stage reopens. Independent hostile review is clean. All source/asset/semantic root, `/tmp`, and optimized-mode fail-closed gates, Markdown fences, diff/scope/status checks, and all 102 repository tests pass. Next: T21.
