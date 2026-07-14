@@ -14,7 +14,11 @@ The library target is Wolfram's finitely described transition/rewrite system, no
 
 ```text
 SimpleProgram:
-    CONFIGURATION  labeled support/topology within DOMAIN plus structural invariants
+    DOMAIN         dimensional task/program space and discrete/continuous status
+    ALPHABET_OR_VALUE_SCHEMA
+                   closed label/value roles referenced by the configuration schema
+    CONFIGURATION_SCHEMA
+                   labeled support/topology within DOMAIN plus structural invariants
     FRONTIER       rule-firing loci, occurrences, or matches
     NEIGHBORHOOD   information visible at each firing locus
     RULE           typed writes/replacements

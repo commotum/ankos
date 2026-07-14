@@ -610,7 +610,7 @@ T41 establishes a closed immutable unary function definition outside transition 
 
 All page-160/161/162/163 and supplementary profiles are pinned to exact formulas or explicit uncertainty. Independent checks verify two-sine periods/counts, the page-162 factorization/continued fractions, special-function anchors, and 60-decimal Riemann-Siegel values plus numerical zero totals. Pole segmentation, endpoint inclusion, the page-162 double tangent, zeta continuation/phase, the divergent `a=0` profile, and the inconsistent ODE initial derivative are explicit adversaries/source repairs.
 
-T20 tree/codecs, T27 compatible numeric expressions, T31 query/certificate discipline, and T34 exact numbers are reused only at their established responsibilities. T42 owns continued-fraction substitution state/trace; T43/T44/T45 remain distinct. Exact/declared-precision assertions, all twelve hashes, search controls, Markdown fences, `git diff --check`, and all 102 repository tests pass. No prior stage reopened. Next: T43.
+T20 tree/codecs, T27 compatible numeric expressions, T31 query/certificate discipline, and T34 exact numbers are reused only at their established responsibilities. T41 supplies only source definition/query data; T40 owns the exact continued-fraction query/result; T42 consumes only a complete replay-verified D139/T40 result or separately tagged closed schedule and contributes the finite schedule/preset semantics over shared T13/D019/D024 state/trace machinery. T43/T44/T45 remain distinct. Exact/declared-precision assertions, all twelve hashes, search controls, Markdown fences, `git diff --check`, and all 102 repository tests pass. No prior stage reopened. Next: T43.
 
 ### 18-T43-ITERATED-MAPS
 

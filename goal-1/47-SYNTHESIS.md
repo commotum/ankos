@@ -44,6 +44,7 @@ There is **one execution algebra** and **one non-execution declarative algebra**
 ```text
 SimpleProgram[C, L, R, W]:
     DOMAIN
+    ALPHABET_OR_VALUE_SCHEMA
     CONFIGURATION_SCHEMA
     FRONTIER
     NEIGHBORHOOD
@@ -147,8 +148,10 @@ Three different claims require three different proofs.
 1. **Configuration representation.** A map `e` must be injective with an explicit inverse on its invariant-valid image, preserve every semantic state component and outcome, require no hidden interpreter, and commute at native step granularity:
 
    ```text
-   map_successors(e, step_A(s)) = step_B(e(s))
+   map_step_result(e, step_A(s)) = step_B(e(s))
    ```
+
+   Here `map_step_result` maps successors and every representation-dependent event, witness, and provenance reference while preserving the outcome exactly; successor equality alone is insufficient.
 
 2. **Program/rule codec.** Encode/decode must round-trip structural program data, and the decoded RULE must be denotationally equal on every admitted input. A compact totalistic table is not a configuration encoding.
 3. **Implementation relation.** A compiler, numerical method, solver, finite realization, or multi-step simulation must keep source and target identities, scope, approximation/proof strength, and correspondence evidence. It is not native reuse unless the stronger one-step representation test also holds.
@@ -189,10 +192,11 @@ These are absences of canonical stepwise evolution, not evidence for four more e
 No unresolved contradiction remains, but implementation must preserve these honest boundaries:
 
 1. **Stochastic transition semantics:** T08 supplies event-zero laws only. Goal 2 must not infer probability-bearing transitions or hide RNG state. A later evidence stage may add a replayable draw-input/state construction or a probability-measure successor result.
-2. **T28 adaptive unequal subdivision:** the source establishes a warning but not enough carrier, incidence, matching, or commit semantics. The profile remains typed `Unsupported`, while the compatible rectangular profile is complete.
-3. **T29 sequential network evolution:** primary evidence does not fix selection order, projection anchor, or move timing. The parallel profile is complete; the sequential profile remains typed `Unsupported` rather than receiving an invented convention.
-4. **Exact-real backend:** named transcendental values, exact piecewise comparisons, and replayable invariant certificates require an explicit backend/profile choice. Unsupported exact requests must fail structurally; they must never fall back to machine floats.
-5. **Serialization and registry versioning:** construction-time decoding needs a closed versioned registry for axis descriptors and presets. That registry may parse data but must never become execution-time catalog dispatch.
+2. **First-class continuous-time flow:** the catalog closes discrete step systems and declarative continuous relations, but does not yet establish a common native flow/semigroup interface or continuous-time trace contract. A separately posed evolution may be supported only after its state, time parameter, solution law, and evidence are explicit; it must not be fabricated from a PDE relation or numerical integrator.
+3. **T28 adaptive unequal subdivision:** the source establishes a warning but not enough carrier, incidence, matching, or commit semantics. The profile remains typed `Unsupported`, while the compatible rectangular profile is complete.
+4. **T29 sequential network evolution:** primary evidence does not fix selection order, projection anchor, or move timing. The parallel profile is complete; the sequential profile remains typed `Unsupported` rather than receiving an invented convention.
+5. **Exact-real backend:** named transcendental values, exact piecewise comparisons, and replayable invariant certificates require an explicit backend/profile choice. Unsupported exact requests must fail structurally; they must never fall back to machine floats.
+6. **Serialization and registry versioning:** construction-time decoding needs a closed versioned registry for axis descriptors and presets. That registry may parse data but must never become execution-time catalog dispatch.
 
 ## Proposed Revision Strategy
 

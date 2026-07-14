@@ -73,7 +73,7 @@ The exact internal split may be refined without changing the semantic ownership 
 | G2-03 | G2-02 | Fixed-support snapshot assignment and finite-alphabet CA presets | 12 |
 | G2-04 | G2-03 | Visible tag/marker roles and atomic movement/keyed writes | 6 |
 | G2-05 | G2-02, G2-03 | Exact scalar/positional/map rules and continuous-valued fields | 5 |
-| G2-06 | G2-01 | Declarative model-set relation/query/certificate core | 3 |
+| G2-06 | G2-02 | Declarative model-set relation/query/certificate core | 3 |
 | G2-07 | G2-05, G2-06 | Closed function/constant/differential definitions and queries | 3 |
 | G2-08 | G2-02 | Multiplicity-preserving occurrence bags | 1 |
 | G2-09 | G2-04, G2-05, G2-07, G2-08 | Ordered generation/edit/mosaic substrate, sieve composition, and scheduled presets | 13 |
@@ -95,7 +95,7 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 | G2-06 | `C31 -> C32 -> C33` |
 | G2-07 | C41 first; C40 after C34, C36, C41, and C43; C45 after C31, C41, and C44 |
 | G2-08 | C27 |
-| G2-09 | `C13 -> {C14,C16,C17,C26}`; C15 after C14; C18 after C17; C20 and C37 after C16; C28 after C14, C21, and C26; C38 after C37; C39 after C37; C42 after C13 and C40 |
+| G2-09 | C14, C16, and C17 after C13; C26 after C13 and C27; C15 after C14; C18 after C17; C20 and C37 after C16; C28 after C14, C21, and C26; C38 after C37; C39 after C37; C42 after C13 and C40 |
 | G2-10 | C29 |
 | G2-11 | C30 after C16; its compressed/folded graph remains a trace/view relation rather than a T29 runtime dependency |
 
@@ -139,7 +139,7 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 
 **Tests/evidence:** product/tag round trips; bare `TapeSymbol | HeadState` information-loss adversary; exactly-one violations; signed/large bigint and rational round trips; sparse/default equivalence; key-kind separation; unknown/duplicate/shadowed codec mutations; digest-not-authority tests.
 
-**Complete when:** every carrier required by the architecture matrix can be represented without `object` arrays, callbacks, hidden control, or catalog-specific state classes.
+**Complete when:** every carrier required by the architecture matrix can be represented without opaque or unvalidated object cells, callbacks, hidden control, whole-interpreter payloads, or catalog-specific state classes. A validated product/tag value may use an object-array storage strategy without making that storage representation semantic.
 
 **Re-derive if:** a carrier cannot expose all next-step information, canonical equality depends on rendering/storage order, or one schema must contain a hidden interpreter.
 
@@ -183,7 +183,7 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 
 **Tests/evidence:** all T01-T08 and T21-T24 canonical tables, counts, codecs, asymmetric trajectories, aggregate counterexamples, frame permutations, old-snapshot adversaries, seed/configuration distinctions, arbitrary-precision codes, and recorded asset guards.
 
-**Complete when:** all twelve mapped obligations pass through the unmodified generic runner and no preset name occurs in execution code.
+**Complete when:** the nine evolving fixed-support obligations T01-T05 and T21-T24 pass through the unmodified generic runner; T06/T07 remain pure validated program properties/restrictions; T08 supplies typed event-zero run inputs to an unchanged program; and no preset name occurs in execution code.
 
 **Re-derive if:** a compact rule schema cannot denotationally round-trip, a boundary/shape becomes native semantics accidentally, or an initial-condition law affects per-step execution.
 
@@ -230,7 +230,7 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 
 ### G2-06 — Declarative Model Sets, Verification, and Certificates
 
-**Depends on:** G2-01.
+**Depends on:** G2-02.
 
 **Files:** `src/ca/relations.py`, `queries.py`, `outcomes.py`, `serialization.py`; `tests/conformance/test_t31_t33.py` and solver-adapter contract tests.
 
@@ -293,7 +293,7 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 
 **Depends on:** G2-04, G2-05, G2-07, and G2-08.
 
-**Files:** `src/ca/configurations.py`, `loci.py`, `frontiers.py`, `neighborhoods.py`, `rules.py`, `updates.py`, `traces.py`, `serialization.py`; `tests/conformance/test_t13_t18.py`, `test_t20.py`, `test_t26_t28.py`, `test_t37_t39.py`, `test_t42.py`.
+**Files:** `src/ca/configurations.py`, `loci.py`, `frontiers.py`, `neighborhoods.py`, `rules.py`, `updates.py`, `traces.py`, `expressions.py`, `queries.py`, `outcomes.py`, `serialization.py`; `tests/conformance/test_t13_t18.py`, `test_t20.py`, `test_t26_t28.py`, `test_t37_t39.py`, `test_t42.py`.
 
 **Implementation:**
 
@@ -310,7 +310,7 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 
 **Tests/evidence:** all strict T13-T18 histories, priorities, overlap/newborn, epsilon/extinction/terminal distinctions, Post/Wang widths, cyclic phase quotient, tree S/K/codec cases, T26 compatibility and T27 commutations, T28 context/mosaic/source-Blank rules, T37/T38 prefix/checkpoint/demand/failure cases, exact T39 rows retaining source `1`, composite-stage marker advancement, filter/query separation and Ulam composition, and the full frozen T42 source/asset/semantic oracle interfaces.
 
-**Complete when:** all thirteen mapped obligations use one runner and closed UPDATE policies; no padding, regex/host pattern engine, deque callback, hidden cursor, tree/substitution/sieve executor, raster program, or online coefficient stream exists.
+**Complete when:** every evolving member of the thirteen mapped obligations—including T39's consecutive sieve—uses the one runner and closed UPDATE policies; T39's direct filters, streams, and measurements remain pure query/observer objects over the shared declarative substrate; and no padding, regex/host pattern engine, deque callback, hidden cursor, tree/substitution/sieve executor, raster program, or online coefficient stream exists.
 
 **Re-derive if:** a structural edit cannot preserve complete order/lineage, a snapshot handle can be forged or reused across states, a representation needs hidden source data, or an unsupported adaptive/sequential convention is being guessed.
 
@@ -378,7 +378,7 @@ Each catalog row is one leaf obligation `C01` through `C45`, executed inside exa
 
 ## Exact 45-Row Coverage Matrix
 
-The `Coverage stage` column assigns each catalog row exactly once. Shared implementation is planned above and is not duplicated here. The named Goal 1 file is the authority for exact fixtures, source repairs, variants, and negative tests.
+The `Coverage stage` column assigns each catalog row exactly once. Leaf obligation `Cnn` is definitionally the conformance obligation for catalog row `Tnn`; there is no independent remapping. The normative leaf-order table above enumerates all 45 `Cnn` obligations exactly once and gives their direct proof dependencies, while the stage DAG supplies the shared-substrate dependencies. Shared implementation is planned above and is not duplicated here. The named Goal 1 file is the authority for exact fixtures, source repairs, variants, and negative tests.
 
 | ID | Exact catalog name | Coverage stage | Goal 1 authority | Required conformance focus |
 |---|---|---|---|---|
@@ -464,6 +464,7 @@ The `Coverage stage` column assigns each catalog row exactly once. Shared implem
 ## Explicitly Deferred Boundaries
 
 - Probability-bearing or stochastic transition semantics beyond event-zero T08 laws.
+- First-class native continuous-time flow/semigroup and continuous-time trace semantics; a PDE relation or numerical integrator does not supply them by itself.
 - T28 adaptive unequal subdivision without complete carrier/incidence/update evidence.
 - T29 sequential network schedule without decisive primary-source order/anchor/timing evidence.
 - Weak/distributional PDE solution concepts beyond the evidenced Classical v1 scope.
