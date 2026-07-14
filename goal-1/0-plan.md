@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 33 type stages are complete, T23 is in progress, no stage is reopened, and 11 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, and T22 are complete under D119-D128.
+- Execution status at this sync is Foundation complete, 34 type stages are complete, T24 is in progress, no stage is reopened, and 10 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, and T23 are complete under D119-D129.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -975,11 +975,11 @@ All T22 evidence is captured; no duplicate executor or rule family is introduced
 
 #### Stage Result
 
-COMPLETE. The 17-query source union closes 164 lines at `117 pre-Index / 47 actual-Index`, with 270 retained (`96 native / 102 relation / 72 control`), 24 exclusions, and retained split closure `192 exact + 78 variants`. The asset fixed point closes 95 candidates as `68 governed + 27 adjacency-only`, 190 references, 95 hashes, and `95 hash-bound / 28 transcribed / 0 pixel-replayed`. The semantic oracle closes 1,419 native/generic events, complete positional/outer/totalistic/growth schemas, C4/D4 orbit restrictions at 140/102, printed `3702` to canonical `630`, 262,144 WireWorld predicate-count contexts, and a concrete Dyadaxes-loss witness. D128 reuses T01/T02/T03/T08/T21 through audit categories 1–3 without a state/control class, UPDATE, executor, family branch, hidden center/boundary, Life/symmetry engine, or raster rule. Clean hostile review, all portability/format/scope gates, and 102 tests pass. No prior stage reopens. Next: T23.
+COMPLETE. The 17-query source union closes 164 lines at `117 pre-Index / 47 actual-Index`, with 270 retained (`96 native / 102 relation / 72 control`), 24 exclusions, and retained split closure `192 exact + 78 variants`. The asset fixed point closes 95 candidates as `68 governed + 27 adjacency-only`, 190 references, 95 hashes, and `95 hash-bound / 28 transcribed / 0 pixel-replayed`. The semantic oracle closes 1,419 native/generic events, complete positional/outer/totalistic/growth schemas, C4/D4 orbit restrictions at 140/102, printed `3702` to canonical `630`, 262,144 WireWorld predicate-count contexts, and a concrete Dyadaxes-loss witness. D128 reuses T01/T02/T03/T08/T21 through audit categories 1–3 without a state/control class, UPDATE, executor, family branch, hidden center/boundary, Life/symmetry engine, or raster rule. Clean hostile review, all portability/format/scope gates, and 102 tests pass. No prior stage reopens. T23 subsequently closes under D129. Next: T24.
 
 ### 35-T23-3D-CA
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN** in `goal-1/35-T23-3D-CA.md`.
+Status: **COMPLETE** in `goal-1/35-T23-3D-CA.md`.
 
 #### Big Picture Objective
 
@@ -993,7 +993,13 @@ Apply the common protocol, separating construction semantics from visualization 
 
 All T23 evidence is captured; 3D neighborhoods reuse general geometry where justified; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+COMPLETE. The nineteen-query source oracle closes 151 lines at `104 pre-Index / 47 actual-Index`; 138 retained evidence lines partition as `76 native / 16 relation / 46 control`, with 32 exclusions, zero unresolved candidates, and retained split closure `123 exact + 15 variants`. The declared one-hop radius-four asset universe closes 42 plates at `10 governed + 32 adjacency-only`, 84 references, 42 hashes, and `42 hash-bound / 9 transcribed / 0 pixel-replayed`. The semantic oracle closes 5,139 native/generic events, explicitly fires all 14/7 face and 54/27 full product/shell indices, proves positional/frame maps and quotient multiplicity, uses nonvacuous named and sum-sensitive ternary fixtures, and gives two Dyadaxes-loss witnesses. D129 reuses T01/T02/T03/T08/T21/T22 through categories 1–3 without a state/control class, UPDATE, executor, family branch, hidden Self/boundary, callback, or raster rule. Clean hostile review, all portability/format/scope gates, and 102 tests pass. No prior stage reopens. Next: T24.
+
 ### 36-T24-HIGHERDIM-CA
+
+Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN** in `goal-1/36-T24-HIGHERDIM-CA.md`.
 
 #### Big Picture Objective
 

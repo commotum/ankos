@@ -2793,7 +2793,7 @@ def main() -> None:
     print("T21_T22_T23_same_runner=PASS; new_UPDATE=NONE; family_executor=NONE")
     print("exact_type_and_opaque_snapshot_validation=PASS")
     print(
-        "proposed_D129=3D cubic dimension/access and schema-tagged RULE "
+        "audited_D129=3D cubic dimension/access and schema-tagged RULE "
         "parameterizations; audit_categories_1_to_3; no category_4 execution algebra"
     )
 
