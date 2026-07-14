@@ -1349,6 +1349,10 @@ class RunTrace:
         elif type(self.outcome) is ErrorOutcome:
             if len(events) >= requested or type(self.terminal_attempt) not in (AccessFailure, RuleFailure):
                 raise ValueError("error trace must stop before requested event count")
+            if self.terminal_attempt.provenance != self.provenance:
+                raise ValueError("trace terminal attempt provenance mismatch")
+            if self.terminal_attempt.old_prefix != states[-1]:
+                raise ValueError("trace terminal attempt must retain the final state")
             reason = self.terminal_attempt.reason
             if reason != self.outcome.reason:
                 raise ValueError("trace error reason/attempt mismatch")
@@ -2159,6 +2163,11 @@ def audit_compact_trace_reconstruction() -> tuple[int, int, int, int, int, int]:
         record_count += len(projection[3])
         full_prefix_cells += sum(len(state.terms) for state in trace.states)
         compact_value_cells += len(trace.initial.terms) + len(projection[3])
+        if projection[4] is not None:
+            # A terminal failure is a first-class witness and retains exactly
+            # one complete final prefix.  Count that snapshot explicitly; the
+            # compact form still omits every intermediate transition snapshot.
+            compact_value_cells += len(projection[4].old_prefix.terms)
         terminal_replays += projection[4] is not None
 
     assert record_count == 326
@@ -2462,6 +2471,31 @@ def audit_hostile_validation() -> int:
         ),
     )
 
+    # A terminal attempt is bound to the exact final configuration, not merely
+    # to an equal program/error reason.  This pair deliberately has the same
+    # ResultOutsideCarrier witness while retaining different old prefixes.
+    binding_program = RecurrenceProgram(Sub(lag(1), lag(1)))
+    binding_left = run(binding_program, NumericPrefix(1, (1,)), 1)
+    binding_right = run(binding_program, NumericPrefix(1, (2,)), 1)
+    assert type(binding_left.outcome) is ErrorOutcome
+    assert type(binding_right.outcome) is ErrorOutcome
+    assert type(binding_left.terminal_attempt) is RuleFailure
+    assert type(binding_right.terminal_attempt) is RuleFailure
+    assert binding_left.outcome == binding_right.outcome
+    assert binding_left.terminal_attempt.old_prefix != binding_right.terminal_attempt.old_prefix
+    rejected += must_raise(
+        ValueError,
+        lambda: RunTrace(
+            binding_left.provenance,
+            binding_left.initial,
+            binding_left.requested_events,
+            binding_left.states,
+            binding_left.events,
+            binding_left.outcome,
+            binding_right.terminal_attempt,
+        ),
+    )
+
     # Explicit semantic mutation sentinels.
     invalid = generic_step(RecurrenceProgram(at(C(-1))), NumericPrefix(1, (7, 11)))
     assert type(invalid.outcome) is ErrorOutcome
@@ -2500,7 +2534,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "85da6b7528bd2975727daab8b7eedc5c18a9e521b9064bf2a1afc2e83acf494c"
+EXPECTED_DIGEST = "3f56c8a84f473b5a7551f7a5cb91489cf96537426bb07536fa4d869e083f2f65"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
