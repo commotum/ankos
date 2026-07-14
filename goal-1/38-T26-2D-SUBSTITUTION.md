@@ -7,14 +7,14 @@ Status: **SOURCE, ASSET, SEMANTIC, AND CORRECTED ARCHITECTURE COMPLETE — FRESH
 - T26 is CSV physical line 27, `Two-Dimensional Substitution Systems`; `ref/notes/CA-Types.md` section 26 is a vocabulary guide, not primary mechanics.
 - The regenerated Q00-Q29 source protocol closes 94 unique query lines at `67 pre-Index / 27 actual-Index`. It retains 115 lines at `23 native / 67 relation / 25 control`, excludes 11 pre-Index false positives, and leaves zero unresolved candidates.
 - The retained source consists of 56 direct query hits plus 59 governed continuations. All 115 lines reverse-join to the 17-file split corpus as `77 exact + 38 mapped variants`; none is monolith-only.
-- The construction is a finite nonempty rectangular grid of finite tile labels in discrete `t+2D`. Every old tile fires exactly once from one immutable generation, reads only its own old label, and emits a nonempty rectangular patch from a total closed table. The uniform-patch profile is the core total-on-all-grids preset; `BOOK:13744` also gives a complete native mixed-patch table and seed.
-- UPDATE is the Notes' exact `Flatten2D` product-order assembly. Generic `RankedBlockMosaicAssemble(rank=2)` accepts a step exactly when all emitted patches within each old source row have equal heights and all resulting row slabs have equal widths. `RankedUniformBlockAssemble` is its always-compatible uniform restriction. Both preserve source/product order, consume the complete old generation, and defer every newborn tile until the next event.
+- The construction is a finite nonempty rectangular grid of finite tile labels in discrete `t+2D`. Every old tile fires exactly once from one immutable generation, reads only its own old label, and emits a nonempty rectangular patch from a total closed table. The uniform-patch profile is the core preset total on valid positive rectangular grids; `BOOK:13744` also gives a complete native mixed-patch table and seed.
+- UPDATE is the Notes' exact `Flatten2D` product-order assembly. Generic `RankedBlockMosaicAssemble(rank=2)` accepts a step exactly when all emitted patches within each old source row have equal heights and all resulting row slabs have equal widths. Patch widths need not agree down old source columns. `RankedUniformBlockAssemble` is the common-positive-shape restriction, total only on valid positive rectangular grids. Both rank-two profiles preserve source/product order, consume the complete old generation, and defer every newborn tile until the next event.
 - White is an ordinary label. The explicit non-white-background variant proves that a white tile may emit black descendants; there is no implicit white identity, blank-skip optimization, or ambient fill rule.
-- T26 is not merely a rank-two parameter value of D019's linear `OrderedGenerationConcat`: naive flattened concatenation loses rank-two placement. Generic `RankedBlockMosaicAssemble` extends that UPDATE pattern by rank and compatibility; rank-one is D019 variable-length concatenation, its uniform rank-one restriction overlaps fixed-block T13/D019, and rank two is T26 mosaic assembly.
+- T26 is not merely a rank-two parameter value of D019's linear `OrderedGenerationConcat`: naive flattened concatenation loses rank-two placement. Generic `RankedBlockMosaicAssemble` extends that UPDATE pattern by rank and compatibility. Its rank-one member is the D019 selected-source behavior: it accepts an ordered selected subset of old sources, concatenates only the selected outputs in source order, retains selected epsilon outputs, and consumes each unselected old source with a zero-width lineage region. Empty input and a nonempty input with no selected source both yield the empty successor. All-selected rank one is D019's full-coverage subset; the common-positive-shape restriction overlaps fixed-block T13/D019; rank two is T26 full-source mosaic assembly.
 - The same state has a category-3 lossless representation inside T27's posed occurrence bag exactly on the aligned, uniform, hole-free, overlap-free rectangular-tiling image. Arbitrary free geometry remains T27.
-- The `Other shapes` text supplies the complete encoded-label rule `0..3`, seed `{{3}}`, and enough `Flatten2D` semantics to execute its compatible mixed patches natively; its square side lengths begin `1,2,3,5,8,13,21`. What remains unspecified is the inverse map from labels to geometric shape/orientation roles, not the encoded grid evolution. Neighbor-dependent patch choice remains T28.
+- The `Other shapes` text supplies the complete encoded-label rule over operationally opaque labels `0..3`, seed `{{3}}`, and enough `Flatten2D` semantics to execute its compatible mixed patches natively; its square side lengths begin `1,2,3,5,8,13,21`. The extraction has one disclosed surplus-brace repair, and neither the source nor the oracle constructs a numeric-label-to-geometric-role assignment. Neighbor-dependent patch choice remains T28.
 - The source-governed asset universe closes 26 unique JPEGs at `3 native / 16 relation / 7 control`, 52 exact monolith/split references, 26 unique hashes, and 1,838,481 bytes. The honest boundary is `26 HASH_BOUND / 0 TRANSCRIBED / 0 PIXEL_REPLAYED`.
-- The semantic oracle closes 6,670 native/generic events and 14,799 commutations: 6,670 direct/generic, 6,659 prototype-keyed full-`StepResult` posed-bag, and 1,470 rank-one mosaic commutations, of which 600 are the fixed-uniform subset. It closes 71 hostile rejections.
+- The semantic oracle closes the unique partition `6,667 native/generic + 6,658 full-StepResult posed-bag + 16,709 selected-rank-one = 30,034` commuting proofs. Rank one partitions as 1,519 all-selected cases, including 1,470 positive-input cases and 49 empty-input cases, plus 15,190 cases that consume at least one unselected source. The 98 singleton/no-selected extinctions, 1,390 selected-epsilon cases, 1,519 right-neighbor-frontier cases, and 600 common-positive fixed-block cases are crossing, non-additive subsets. It closes 81 hostile rejections, including two typed incompatible/no-commit outcomes.
 - D132's corrected architecture result is rank-two compatible block-mosaic assembly with a lossless aligned posed-bag representation. Generic UPDATE-policy implementation is required, but no new execution algebra, T26 state or UPDATE class, executor, family branch, callback, padding scheme, hidden control, or raster-defined program follows.
 
 ## Final Semantic Conclusions
@@ -24,7 +24,7 @@ Status: **SOURCE, ASSET, SEMANTIC, AND CORRECTED ARCHITECTURE COMPLETE — FRESH
 - FRONTIER is `AllOldTiles`, with opaque old-snapshot handles. Canonical row/column order supports deterministic assembly and lineage, but a tile's product address—not incidental flat enumeration—determines its descendants' placement.
 - NEIGHBORHOOD is `SelfOnly`. Surrounding labels, coordinates, generation number, raster scale, finite-automaton digits, ancestry, and output geometry are not RULE inputs.
 - RULE returns a typed source-bound patch write. UPDATE validates exact full coverage, provenance, and rank-two mosaic compatibility, consumes every old tile, and constructs one successor using product coordinates.
-- A complete uniform table produces one deterministic successor on every valid rectangular grid. A mixed table produces one deterministic successor on compatible grids and a typed `Invalid(IncompatibleMosaic)` step otherwise. Missing rows and malformed/empty patches are invalid programs; they are not halts. A fixed point or a `1×1` identity row is still an applicable event.
+- A complete uniform table produces one deterministic successor on every valid positive rectangular grid. A mixed table produces one deterministic successor on compatible grids. An incompatible old snapshot returns exactly `PatchStepResult(Invalid(IncompatibleMosaic(...)), successors=(), step=None)` before commit: no successor is allocated, and the old configuration and opaque token remain unchanged. Missing rows and malformed/empty patches are invalid programs; they are not halts. A fixed point or a `1×1` identity row is still an applicable `Advanced(changed=false)` event.
 - The source gives no numeric T26 rule codec. The structural table is program identity. For the uniform subfamily with alphabet size `k` and fixed patch shape `(h,w)`, the derived rule-family count is `k^(k*h*w)`.
 - Display scale, raster colors, nestedness, fractal limits/dimensions, coordinate formulas, compression, constraints, and Walsh/Kronecker descriptions are observers, relations, or alternative generators. None may replace native stepping.
 - T26 shares the branch-free SimpleProgram runner:
@@ -33,10 +33,10 @@ Status: **SOURCE, ASSET, SEMANTIC, AND CORRECTED ARCHITECTURE COMPLETE — FRESH
 active = AllOldTiles.select(configuration)
 reads  = SelfOnly.read(configuration, active)
 writes = ClosedPatchTable.apply(active, reads)
-next   = RankedBlockMosaicAssemble(rank=2).apply(configuration, active, writes)
+result = RankedBlockMosaicAssemble(rank=2).apply(configuration, active, writes)
 ```
 
-`RankedUniformBlockAssemble(rank=2)` is the validated uniform preset of that same UPDATE policy.
+`RankedUniformBlockAssemble(rank=2)` is the common-positive-shape preset of that same UPDATE policy; its totality claim is restricted to positive rectangular old supports and positive block extents.
 
 ## Big Picture Objective
 
@@ -48,7 +48,7 @@ Reconstruct two-dimensional substitution systems from primary Book evidence, dis
 - Exact CSV name: Two-Dimensional Substitution Systems.
 - CSV physical line: 27.
 - Taxonomy section: 26.
-- Entry kind: deterministic rank-two preset of generic compatible block-mosaic assembly under the shared SimpleProgram algebra; uniform blocks are the total-on-all-grids restriction.
+- Entry kind: deterministic rank-two preset of generic compatible block-mosaic assembly under the shared SimpleProgram algebra; uniform blocks are the common-positive-shape restriction, total on valid positive rectangular grids.
 - Canonical source vocabulary: two-dimensional/2D substitution system, square subdivision, fixed block, `SS2DEvolve`, `Flatten2D`, `SSEvolve`, `FlattenArray`, non-white background, digit sequence, finite automaton, Sierpinski/Menger, other shapes, shape/orientation colors, Penrose tiling, recursive subdivision/quadtree, nested patterns, Kronecker product, neighbor-dependent substitution, and sequential higher-dimensional scanning.
 - Modern terms checked but absent as direct Book names include tile/block/array substitution systems, picture grammars, orientation policy, and scale-factor terminology.
 
@@ -80,7 +80,7 @@ Closure:
 - Split retained reverse join: 115 records = 77 exact + 38 mapped variants; 0 monolith-only.
 - Atlas: 2 summary-only hits. Catalog and taxonomy text remain vocabulary controls only.
 - Governed source-image interface: 26 lines, digest `9018acedd5ff638608aa2a79feb5059de5b8a671792ab0c8ec501437eea85ee7`.
-- Source-oracle SHA-256: `7fdb3d4bd15a374690ee5833f3dc88d64a6a239fed9f5125c055b95c158af833`.
+- Source-oracle SHA-256: `124b2be2c5ac1121946f7fe952d83ca93403782998992ffcd5974d9c8339b5f2`.
 - `unresolved_total=0`.
 
 ## Book Excerpts
@@ -192,16 +192,16 @@ Flatten2D[Partition[list, {2, 2}, 1, -1] /. rule]
 
 The local extraction says `IntegerDigits[{i, i}, ...]` while its enclosing loops use `i` and `j`; this route is retained as defective relation evidence, not repaired into a native evaluator.
 
-### E11 — `Other shapes` gives a native encoded-label mixed-patch preset
+### E11 — `Other shapes` gives a native opaque-label mixed-patch preset
 
 - Source: `BOOK:13740-13744`.
-- Establishes: the encoded equal-square grid evolution is completely specified by a four-label mixed-patch rule, seed `{{3}}`, and the source's `Flatten2D`; only the geometric decoding of the four labels remains unspecified.
+- Establishes: after the exact one-brace extraction repair disclosed below, the encoded equal-square grid evolution is completely specified by a four-label mixed-patch rule, seed `{{3}}`, and the source's `Flatten2D`. Labels `0..3` are sufficient as operationally opaque values; no label-to-shape/orientation assignment is constructed.
 
 > one can also set up substitution systems that are based on subdividing other geometrical figures
 >
 > Labelling each shape and orientation with a different color, the behavior of this system can be reproduced with equal-sized squares using the rule ...
 
-The text-owned rule data, with only Markdown/TeX delimiters normalized, is:
+The raw math span at `BOOK:13744` contains 11 escaped opening braces and 12 closing braces. The source oracle removes exactly the surplus final `\}` immediately before `\$`; this is a literal one-brace repair, not delimiter normalization. Four otherwise intact rule-row fragments plus the seed `{{3}}` disambiguate the repaired table:
 
 ```text
 3 -> ((1,0),(3,2))
@@ -211,7 +211,7 @@ The text-owned rule data, with only Markdown/TeX delimiters normalized, is:
 seed = ((3,),)
 ```
 
-The emitted shapes are `2×2`, `2×1`, `1×2`, and `1×1`. The source `Flatten2D` supplies their assembly law: within each old source row, patches must have the same height so corresponding local rows can be joined; the resulting row slabs must have equal widths so the successor remains rectangular. The source trajectory is compatible and has square side lengths `1,2,3,5,8,13,21` through six steps. The prose does not state which numeric label denotes which geometric shape/orientation, so geometric role decoding remains a relation with no guessed codec.
+The emitted patch shapes are `2×2`, `2×1`, `1×2`, and `1×1`. The source `Flatten2D` supplies their assembly law: within each old source row, patches must have the same height so corresponding local rows can be joined; the resulting row slabs must have equal widths so the successor remains rectangular. There is no requirement that patch widths agree down an old source column. The crossed-width witness with rule widths `0 -> 1`, `1 -> 2` and old grid `((0,1),(1,0))` produces two width-3 slabs and is valid even though both source columns see widths `{1,2}`. The source trajectory is compatible and has square side lengths `1,2,3,5,8,13,21` through six steps. The prose says colors label shapes and orientations but does not assign numeric labels to those roles; the oracle keeps `0..3` opaque and constructs no role codec.
 
 ### E12 — rule counts are structural, not raster codecs
 
@@ -241,11 +241,12 @@ The source oracle guards defects literally so later work cannot mistake a silent
 | `13726` | `ddimensional` | OCR joining retained. |
 | `13731-13733` | malformed `FlattenArray [list . d ]` typography | Rank relation retained; no literal runtime transcription. |
 | `13738` | `d-1hyperplane` | OCR spacing retained. |
+| `13744` | 11 escaped opening braces and 12 closing braces in the raw math span | Remove exactly the surplus final `\}` immediately before `\$`; four intact rule rows plus seed `{{3}}` disambiguate this single literal repair. No delimiter normalization or role assignment is inferred. |
 | `13752` | massively repeated/corrupted Penrose expression | Relation only; never executable T26 data. |
 | `14105` | malformed multi-kilobyte 16-color table row | Constraint relation only; no table recovery claimed. |
 | `19197` | tuple/bracket transcription in a relation rule | Literal relation retained; no strict fixture derived from it. |
 
-No raster, external formula, or guessed bracket repair is used to fill these gaps.
+No raster, external formula, or guessed broad bracket normalization is used to fill these gaps. The sole native repair is the guarded `BOOK:13744` surplus brace just disclosed.
 
 ## Asset Closure
 
@@ -261,7 +262,7 @@ No raster, external formula, or guessed bracket repair is used to fill these gap
 - Asset-oracle SHA-256: `e36e7ec66460c81cd5d78f0dbe39188c431961c135b7c76a87be68e369ffd438`.
 - Honest boundary: `HASH_BOUND=26`, `TRANSCRIBED=0`, `PIXEL_REPLAYED=0`.
 
-The exact page-187 rule/seed and the `Other shapes` encoded-label rule/seed come from `BOOK:13683` and `BOOK:13744`, not pixels. Page-188 displayed rules, all displayed intermediate arrays, panel seeds/traces, palettes, glyph meanings, and renderers remain unrecovered. A hash-bound raster cannot become an executable rule or conformance trace.
+The exact page-187 rule/seed and the `Other shapes` opaque-label rule/seed come from `BOOK:13683` and the explicitly repaired `BOOK:13744` math span, not pixels. Page-188 displayed rules, all displayed intermediate arrays, panel seeds/traces, palettes, glyph meanings, and renderers remain unrecovered. A hash-bound raster cannot become an executable rule or conformance trace.
 
 ## Construction Model
 
@@ -302,6 +303,17 @@ all width(slab[r]) are equal
 next = vertical_join(slab[0],...,slab[H-1])
 ```
 
+This is the complete rank-two compatibility law. It does **not** require widths of patches in the same old source column to agree. For the crossed witness
+
+```text
+width(delta(0)) = 1
+width(delta(1)) = 2
+old = ((0,1),
+       (1,0))
+```
+
+both old rows assemble to width 3, so the step succeeds, although each old source column contains patch widths `{1,2}`.
+
 Equivalently, child `(i,j)` of source `(r,c)` is placed at
 
 ```text
@@ -309,23 +321,33 @@ target_row = sum(row_height[r0] for r0 < r) + i
 target_col = sum(width(write[r,c0]) for c0 < c) + j
 ```
 
-only after compatibility and exact old-source coverage are validated. If a source row mixes patch heights, or assembled row slabs have unequal widths, UPDATE returns typed `Invalid(IncompatibleMosaic)` rather than padding, cropping, guessing a collision rule, or emitting a ragged configuration. Every compatible target address has exactly one parent/local-coordinate pair, so assembly has neither a collision policy nor an overlap policy.
+only after compatibility and exact old-source coverage are validated. If a source row mixes patch heights, or assembled row slabs have unequal widths, UPDATE returns
 
-`RankedUniformBlockAssemble(rank=2)` is the restriction where every write has `(p_h,p_w)`. It is compatible for every rectangular old grid and reduces the offsets to
+```text
+PatchStepResult(
+    outcome=Invalid(IncompatibleMosaic(...)),
+    successors=(),
+    step=None,
+)
+```
+
+before allocation or commit. The old configuration and its opaque snapshot token remain unchanged. UPDATE never pads, crops, guesses a collision rule, or emits a ragged configuration. Every compatible target address has exactly one parent/local-coordinate pair, so assembly has neither a collision policy nor an overlap policy.
+
+`RankedUniformBlockAssemble(rank=2)` is the restriction where every write has the same positive `(p_h,p_w)`. It is compatible for every positive rectangular old grid and reduces the offsets to
 
 ```text
 next[r*p_h+i, c*p_w+j] = write[r,c][i,j]
 next.shape = (H*p_h,W*p_w)
 ```
 
-Each event may return lineage rectangles:
+Each successful event returns exact lineage rectangles:
 
 ```text
 parent (r,c) -> rows [row_offset[r], row_offset[r] + height(write[r,c]))
                 cols [col_offset[r,c], col_offset[r,c] + width(write[r,c]))
 ```
 
-Lineage is event/witness data. RULE cannot read it, and semantic grid equality does not depend on occurrence IDs.
+Its `PatchStep` also enumerates every child occurrence with the exact source handle, parent-local row/column, successor target row/column, and label. Rectangle coverage is exactly once per old source, child coverage is exactly once per expected local slot, and the lineage children exactly cover the committed successor. Lineage is event/witness data: RULE cannot read it, and semantic grid equality does not depend on occurrence IDs.
 
 The page-187 text fixture is:
 
@@ -343,7 +365,7 @@ t2 = ((1,0,0,0),
 
 `t1` and `t2` are independently assembled from immutable old generations. They are not transcribed from a figure.
 
-Applying the text-owned `BOOK:13744` mixed table from seed `((3,),)` gives compatible square shapes `1,2,3,5,8,13,21`. This is native encoded-label evolution. Recovering the pictured square/GoldenRatio-rectangle geometry would additionally require the absent label-to-role codec and remains outside the native fixture.
+Applying the text-owned, single-brace-repaired `BOOK:13744` mixed table from seed `((3,),)` gives compatible square shapes `1,2,3,5,8,13,21`. This is native opaque-label evolution. The source does not assign labels `0..3` to the pictured square/GoldenRatio-rectangle roles, and the oracle constructs no such role codec.
 
 ### State, outcomes, and boundaries
 
@@ -351,24 +373,26 @@ Applying the text-owned `BOOK:13744` mixed table from seed `((3,),)` gives compa
 |---|---|
 | DOMAIN | Discrete `t+2D`. Time is event order; the spatial configuration is a finite rectangular product support. |
 | CONFIGURATION | Complete finite `H x W` grid of tile labels with an opaque snapshot identity. Shape may change each event. |
-| ALPHABET | Finite ordered tile labels; optional shape/orientation roles require an explicit finite lossless codec. |
+| ALPHABET | Finite ordered tile labels. The `BOOK:13744` labels `0..3` are operationally opaque; no shape/orientation role codec is part of this construction. |
 | SEED | Any valid finite nonempty rectangular grid; canonical source seeds include page-187 `{{1}}` and mixed-patch `{{3}}`. |
 | FRONTIER | Every old tile exactly once, using snapshot-scoped handles. |
 | NEIGHBORHOOD | Self label only. No boundary read is required. |
 | RULE | Total closed label-to-nonempty-rectangular-patch table. The core preset adds a table-wide uniform-shape invariant. |
 | RESULT | One typed source-bound ranked block write per old tile. |
-| UPDATE | Exact `RankedBlockMosaicAssemble(rank=2)`/`Flatten2D` assembly with row-height and slab-width compatibility, old-snapshot full coverage, parent consumption, and newborn deferral. Uniform assembly is its total-on-all-grids restriction. |
-| SUCCESSOR | Exactly one valid grid for a compatible step. A fixed point remains an `Advanced(changed=false)` event; incompatibility is typed invalidity. |
+| UPDATE | Exact `RankedBlockMosaicAssemble(rank=2)`/`Flatten2D` assembly with within-source-row equal heights and across-source-row equal slab widths, but no per-source-column width invariant; old-snapshot full coverage, parent consumption, and newborn deferral. Uniform assembly is its common-positive-shape restriction, total on positive rectangular inputs. |
+| SUCCESSOR | Exactly one valid grid for a compatible `Advanced` step. A fixed point remains `Advanced(changed=false)`. Incompatibility returns exact `PatchStepResult(Invalid(IncompatibleMosaic(...)), successors=(), step=None)` before commit. |
 | HALTING | No intrinsic halt for a compatible valid step; horizon/cancel/resource/invalidity remain external or typed outcomes. |
-| TRACE | Ragged rectangular snapshots plus optional parent-child rectangles; padding and raster coordinates are downstream representations. |
+| TRACE | Ragged rectangular snapshots plus exact parent rectangles and per-child source/local/target/label lineage for each successful event; padding and raster coordinates are downstream representations. |
 
 ## One-Step Reuse Proofs
 
 ### Ranked block-mosaic UPDATE and its D019 overlap
 
-D019's existing `OrderedGenerationConcat` is a linear UPDATE policy: in source order it concatenates each source symbol's possibly variable-length output word. T26 does not turn that combiner into rank two by changing one integer. It requires generic `RankedBlockMosaicAssemble` on the existing UPDATE axis. At rank one, mosaic assembly has no cross-row constraint and admits D019's existing variable-length outputs, including any erasing rows allowed by that profile; its semantics are exactly linear concatenation. T26's rank-two profile separately requires positive rectangular blocks. D019 keeps its existing policy and behavior; this shared rank-one semantics does not require rewriting that stage or replacing its named combiner.
+D019's `OrderedGenerationConcat` is a linear UPDATE policy over an explicit ordered selection of old source indices. A selected source emits its possibly empty output word; an unselected source is consumed rather than copied and receives an exact zero-width lineage region at the current output cursor. Selected-source order and child order are preserved. Empty input produces the empty successor, and a nonempty input with no selected sources also produces the empty successor. The all-selected specialization is D019's full-coverage subset and concatenates every source word.
 
-The uniform restriction `RankedUniformBlockAssemble` uses an old product shape `S=(s_0,...,s_(d-1))`, a common positive block shape `B=(b_0,...,b_(d-1))`, and one block per old product address. It places local coordinate `u` from source coordinate `x` at
+T26 does not turn that combiner into rank two by changing one integer. It requires generic `RankedBlockMosaicAssemble` on the existing UPDATE axis. At rank one, mosaic assembly has no cross-row constraint, accepts the ordered selected-source locus map, admits variable and zero-length selected outputs, records every selected and unselected source, and exactly matches the D019 contract above. T26's rank-two profile separately selects every old tile and requires positive rectangular blocks. D019 keeps its existing policy and behavior; this shared rank-one semantics does not require replacing its named combiner.
+
+The named uniform restriction `RankedUniformBlockAssemble` requires positive old extents `S=(s_0,...,s_(d-1))`, a common positive block shape `B=(b_0,...,b_(d-1))`, and one block per old product address. It places local coordinate `u` from source coordinate `x` at
 
 ```text
 target_axis[a] = x[a] * B[a] + u[a]
@@ -376,12 +400,15 @@ target_axis[a] = x[a] * B[a] + u[a]
 
 and produces shape `S*B` componentwise.
 
-- At rank one with common `B=(q)`, it is the fixed-block restriction/commuting overlap of T13/D019, with parent/child order preserved.
-- At rank one with label-dependent block lengths, `RankedBlockMosaicAssemble` coincides with general D019 `OrderedGenerationConcat`.
-- At rank two with common `B=(p_h,p_w)`, uniform assembly is the always-compatible core T26 `Flatten2D` preset.
-- At rank two with label-dependent rectangular blocks, mosaic assembly applies the row-height and slab-width compatibility law. `BOOK:13744` supplies a native compatible trajectory.
+- At rank one with common positive `B=(q)` and positive old extent, it is the fixed-block restriction/commuting overlap of T13/D019, with parent/child order preserved.
+- It does not cover D019's empty input, nonempty/no-selected extinction, selected epsilon output, or other zero-length rank-one cases; those remain in generic `RankedBlockMosaicAssemble`/`OrderedGenerationConcat`.
+- At rank one with an explicit ordered selected subset and label-dependent block lengths, including zero, `RankedBlockMosaicAssemble` coincides with general D019 `OrderedGenerationConcat`.
+- At rank two with common positive `B=(p_h,p_w)`, uniform assembly is the compatible core T26 `Flatten2D` preset for every positive rectangular grid.
+- At rank two with label-dependent positive rectangular blocks, mosaic assembly applies equal heights within each old source row and equal total slab widths across old source rows. It imposes no per-source-column width equality. `BOOK:13744` supplies a native compatible trajectory.
 
-The semantic oracle proves 1,470 rank-one mosaic commutations, including 600 fixed-uniform cases. A nonsymmetric two-source `2×2` adversary proves that flattening every patch and concatenating the flat streams gives the wrong grid: one parent's second local row is placed before the adjacent parent's first local row. Rank-two placement therefore requires product-aware mosaic assembly. This is a justified generic policy on the shared UPDATE axis, not a new execution algebra, family executor, or T26-named class.
+The semantic oracle exhausts 16,709 selected-rank-one commutations over input lengths 0 through 4, every ordered subset, and binary output words of lengths 0 through 2. The disjoint top-level partition is 1,519 all-selected cases plus 15,190 cases consuming at least one unselected source. The all-selected group contains 1,470 positive-input cases and 49 empty-input cases. Singleton/no-selected extinction (98), selected epsilon (1,390), right-neighbor frontier (1,519), and common-positive fixed block (600) are crossing, non-additive subsets and must not be summed into the total.
+
+A nonsymmetric two-source `2×2` adversary proves that flattening every patch and concatenating the flat streams gives the wrong grid: one parent's second local row is placed before the adjacent parent's first local row. The crossed-width `((0,1),(1,0))` witness separately proves that both width-3 row slabs are compatible even though each source column sees patch widths `{1,2}`. Rank-two placement therefore requires product-aware mosaic assembly without an invented per-column width invariant. This is a justified generic policy on the shared UPDATE axis, not a new execution algebra, family executor, or T26-named class.
 
 ### Category-3 addressed posed-bag representation
 
@@ -413,24 +440,30 @@ Decoding applies the inverse prototype-label bijection and the exact address rec
 encode(step_T26(grid)) = step_T27_bag(encode(grid))
 ```
 
-for one event. The oracle proves 6,659 such full-`StepResult` commutations—6,656 exhaustive binary `2×2` events, two page-187 events, and one rectangular `2×3` witness—using distinct prototype IDs, exact snapshot provenance, and typed lineage. It also proves bag-enumeration invariance and rejects bags outside the inverse image rather than coercing them into T26.
+for one event. The representation encoding maps and shares the source token. Grid UPDATE and bag UPDATE then mint their successor tokens independently; raw successor-token identity is neither expected nor used. An explicit reversible bijection between the two source/successor token pairs is applied consistently to the successor carrier and every typed lineage handle before equality is checked.
 
-The mixed-patch native preset is still losslessly encodable snapshot by snapshot through distinct prototype IDs, but its global equal-square mosaic reflow is not claimed to commute with the same parent-local T27 pose update. Such a claim would require the absent geometric role codec or a separately proved T27 representation.
+The comparison covers the complete result envelope, not merely successor labels: exact `Advanced.changed` (including the proved identity `changed=false` case), successor cardinality, step presence, successor carrier, grid child rectangles, every grid parent-local child occurrence and target, every bag parent patch, every local pose/prototype witness, and the condition that lineage children equal the successor occurrence bag exactly. The two typed incompatible controls separately prove the `Invalid` envelope has zero successors and no step.
+
+The oracle proves 6,658 unique full-`StepResult` commutations—6,656 exhaustive binary `2×2` events, one rectangular `2×3` witness, and one identity event. The two canonical page-187 bag events overlap the exhaustive set and are reported as non-additive fixture coverage. The proof uses distinct prototype IDs, independent successor tokens plus the explicit token bijection, exact snapshot provenance, complete typed lineage, bag-enumeration invariance, and rejection of bags outside the inverse image rather than coercion into T26.
+
+The mixed-patch native preset is still losslessly encodable snapshot by snapshot through distinct prototype IDs, but its global equal-square mosaic reflow is not claimed to commute with the same parent-local T27 pose update. Such a claim requires a separately proved T27 representation; it does not license inventing a geometric role codec for opaque labels `0..3`.
 
 ## Semantic and Conformance Closure
 
-`38-T26-semantic-oracle.py` closes the uniform core, native mixed-patch preset, ranked-mosaic/D019 relation, corrected prototype-keyed T27 representation, provenance, lineage, and hostile boundaries:
+`38-T26-semantic-oracle.py` closes the uniform core, native mixed-patch preset, selected-rank-one/D019 relation, corrected prototype-keyed T27 representation, exact result envelopes, opaque provenance, complete lineage, and hostile boundaries:
 
-- Native/generic events: 6,670 = 6,656 exhaustive binary `2×2` + 4 page-187 + 1 rectangular `2×3` + 6 `Other shapes` mosaic + 1 non-white-background + 2 newborn-deferral.
+- Unique native/generic events: 6,667 = 6,656 exhaustive binary `2×2` + 2 page-187 non-overlap + 1 rectangular `2×3` + 1 compatible crossed-column-width witness + 6 `Other shapes` mosaic + 1 identity `StepResult`.
 - Exhaustive uniform space: all 256 binary `2×2` tables across all 26 labeled grids of shapes `1×1`, `1×2`, `2×1`, and `2×2`; 20,992 old-tile firings.
-- Total commutations: 14,799 = 6,670 direct/generic + 6,659 prototype-keyed full-`StepResult` posed-bag + 1,470 rank-one mosaic.
-- Rank-one relation: 1,470 mosaic/D019 commutations, including the 600 fixed-uniform subset; naive flattened rank-two concatenation is rejected.
-- T27 relation: 6,659 commutations with carrier `(prototype_id, pose)`, one declared unit-square prototype per label, full snapshot provenance, typed lineage, inverse-image validation, and bag-permutation invariance.
-- Native mixed-patch fixture: six compatible events from `{{3}}`, producing side lengths `1,2,3,5,8,13,21`; geometric role decoding remains unspecified.
+- Named overlap coverage is non-additive: 2 page-187 native events and 2 page-187 bag events overlap the exhaustive binary set, as do 1 non-white-background event and 2 newborn-deferral events. They are checked as named fixtures but are not added again.
+- Unique proof partition: `6,667 native/generic + 6,658 full-StepResult posed-bag + 16,709 selected-rank-one = 30,034` commuting proofs.
+- Rank-one relation: 16,709 selected-source mosaic/D019 commutations partition exactly as 1,519 all-selected plus 15,190 consuming at least one unselected source. Within/crossing that partition are 1,470 positive all-selected, 49 empty-input, 98 singleton/no-selected extinction, 1,390 selected-epsilon, 1,519 right-neighbor-frontier, and 600 common-positive fixed-block cases; these nested/crossing counters are non-additive.
+- T27 relation: 6,658 unique full-`StepResult` commutations with carrier `(prototype_id, pose)`, one declared unit-square prototype per label, a shared/mapped source token, independently minted grid and bag successor tokens, an explicit reversible two-token bijection, exact outcome/changed/successor-count/step/carrier comparison, complete rectangle and per-child lineage, inverse-image validation, and bag-permutation invariance.
+- Native mixed-patch fixture: six compatible events from `{{3}}`, producing side lengths `1,2,3,5,8,13,21`; `BOOK:13744` uses the exact disclosed surplus-brace repair, labels `0..3` remain opaque, and no geometric role codec is constructed.
+- Compatibility controls: unequal patch heights within an old source row and unequal total slab widths across old source rows are rejected; the crossed-width case succeeds and proves no per-source-column width invariant exists.
 - Rule-count checks: 256, `3^27`, and `2^32`; no source numeric codec exists.
-- Hostile rejections: 71, covering invalid alphabets/grids/tables/blocks, callbacks and raster bytes, incompatible row heights or slab widths, stale/foreign/forged provenance and lineage, missing/reordered writes, rank and naive-flatten errors, malformed prototype catalogs/poses/bags, invalid observer parameters, and prohibited semantic shortcuts.
-- Semantic digest: `bfcf5b173fd6a1346b55251292389d1dd45181ed697ac6f6c99051631087c033`.
-- Semantic-oracle SHA-256: `cc0a17b6bd220b3f80194ed3930efeacb3f294ebcf1bc543cfec88afae2bf1bc`.
+- Hostile rejections: 81, covering invalid alphabets/grids/tables/blocks, callbacks and raster bytes, incompatible row heights or slab widths, stale/foreign/forged provenance and lineage, missing/reordered writes, selected-index/rank/naive-flatten errors, malformed prototype catalogs/token bijections/poses/bags, invalid observer parameters, and prohibited semantic shortcuts. Exactly two are typed incompatible-mosaic controls returning `Invalid` with zero successors, no step, and no commit.
+- Semantic digest: `e380704a0626ad7a578e0937007cfa6ea8cc0dd6cee1b8c2d24a7eab18b7c57c`.
+- Semantic-oracle SHA-256: `10395a02c1bd44514e610c98e1efc861513541a0b8b7046fedd557629e43a0f4`.
 
 The `2x3` table is deliberately an architecture witness for general rectangular ranked assembly, not a claim that a displayed Book raster supplied that rule.
 
@@ -440,11 +473,11 @@ The `2x3` table is deliberately an architecture witness for general rectangular 
 |---|---|
 | Page-187 binary `2×2` and page-188 ternary `3×3` square-grid systems | Native uniform T26 presets. |
 | Non-white backgrounds | Native table/seed variant; label 0 is ordinary. |
-| Any closed uniform positive rectangular patch shape | Native total-on-all-grids restriction of generic `RankedBlockMosaicAssemble`; source canonical fixtures remain square. |
+| Any closed uniform positive rectangular patch shape | Native common-positive-shape restriction of generic `RankedBlockMosaicAssemble`, total on valid positive rectangular grids; source canonical fixtures remain square. |
 | Higher-dimensional `SSEvolve`/`FlattenArray` | Ranked relation/generalization, not a T26 executor mode. |
-| `BOOK:13744` encoded-label rule `0..3` from seed `{{3}}` | Native mixed-patch T26 preset under source `Flatten2D`; compatible side lengths `1,2,3,5,8,13,21`. |
-| Shape/orientation meaning of labels `0..3` | Geometric representation relation only; source gives no role-to-label inverse codec. |
-| Other mixed-patch table/grid pair | Native only for a step satisfying row-height and slab-width compatibility; otherwise typed invalidity, never implicit padding/cropping. |
+| `BOOK:13744` opaque-label rule `0..3` from seed `{{3}}` | Native mixed-patch T26 preset under source `Flatten2D`, after the exact disclosed one-brace repair; compatible side lengths `1,2,3,5,8,13,21`. |
+| Shape/orientation interpretation of labels `0..3` | Unspecified relation only. The source gives no numeric role assignment, and this stage constructs no role codec. |
+| Other mixed-patch table/grid pair | Native only for a step satisfying within-source-row height equality and across-source-row total slab-width equality; no per-column width constraint exists. Otherwise return exact `PatchStepResult(Invalid(IncompatibleMosaic(...)), successors=(), step=None)` before commit. |
 | Off-grid oriented squares, overlap, Penrose geometry | T27 free-geometric construction or relation; not strict grid UPDATE. |
 | Neighbor-dependent patch choice / `Partition[...,{2,2},1,-1]` | T28; changes NEIGHBORHOOD and rule key. |
 | Higher-dimensional sequential scanning | Different frontier/schedule; not hidden T26 order. |
@@ -462,12 +495,12 @@ The governing architecture supersedes the CA-limited title and fixed-lattice ass
 |---|---|---|
 | DOMAIN | `:115-167` directly names `t+2D`. | `DIRECT` for dimensional role. |
 | CONFIGURATION/SHAPE | `:87-113,169-198` uses one persistent fixed finite tensor shape. | `PRINCIPLED EXTENSION` to generic per-generation rectangular configuration; shared changing-support semantics, not a new T26 state class. |
-| ALPHABET | `:200-215` permits finite/symbolic values. | `DIRECT` for finite tile labels; explicit role products/codecs are a `PARAMETERIZATION`. |
+| ALPHABET | `:200-215` permits finite/symbolic values. | `DIRECT` for finite opaque tile labels. No `OTHER_SHAPES` role codec is evidenced or required. |
 | SEED | `:235-291` separates initialization from rules. | `PARAMETERIZATION` by a valid rectangular tile grid. |
 | FRONTIER | `:396-454` provides shared selectors; `:1412-1510` currently frames frontier as writable next coordinates. | Selector responsibility is reusable, but old occurrence handles/full-source coverage need a generic `PRINCIPLED EXTENSION`. |
 | NEIGHBORHOOD | `:360-394` separates reads from frontier; `:1303-1328` gives current-self-only access. | `DIRECT`. |
 | RULE | `:1767-1791` returns one scalar next-site value. | `PRINCIPLED EXTENSION` to closed nonempty rectangular-block data/results, with uniform shape as a validated restriction; no callback. |
-| UPDATE | The root schema lists no explicit UPDATE axis and hardwires fixed-shape scalar copy/write at `:22-38,1767-1791`. | Generic `RankedBlockMosaicAssemble` is the smallest `PRINCIPLED EXTENSION` on the existing UPDATE axis. Rank one coincides with D019 variable concatenation; rank two plus compatibility is T26. `RankedUniformBlockAssemble` is the total-on-all-grids restriction, not a fresh algebra. |
+| UPDATE | The root schema lists no explicit UPDATE axis and hardwires fixed-shape scalar copy/write at `:22-38,1767-1791`. | Generic `RankedBlockMosaicAssemble` is the smallest `PRINCIPLED EXTENSION` on the existing UPDATE axis. Rank one is D019 selected-source concatenation; rank two plus compatibility is T26. `RankedUniformBlockAssemble` is the positive-old-shape/common-positive-block restriction, not a fresh algebra and not the carrier for D019 empty/no-selected/epsilon cases. |
 | TRACE | `:87-113,2124-2199` stores a rectangular persistent tensor. | `PRINCIPLED EXTENSION` to ragged structured snapshots plus lineage; padding stays downstream. |
 | BOUNDARY | `:292-359,697-703` governs out-of-support reads. | `NOT APPLICABLE` to strict self-only finite-grid reads. |
 
@@ -497,19 +530,18 @@ D132 uses only the audit's categories 2 and 3:
 |---|---:|---|---|---|
 | Discrete `t+2D` | 2 | Existing DOMAIN axis | Rank is task/program space, not value magnitude or family identity. | No. |
 | Rectangular tile configuration | 2 | Existing ranked DOMAIN/CONFIGURATION axes | Positive finite extents; complete alphabet-closed grid. | No. |
-| Finite labels | 1/2 | Existing finite ALPHABET | Deterministic order; optional explicit role codec. | No. |
+| Finite labels | 1/2 | Existing finite ALPHABET | Deterministic order; `BOOK:13744` labels `0..3` remain operationally opaque. | No. |
 | `AllOldTiles` | 2 | T13 `AllOccurrences` frontier | Every and only old tile once; opaque exact-snapshot provenance. | No. |
 | `SelfOnly` | 1 | Existing self projection | Only the selected old label is RULE-visible. | No. |
 | Closed rectangular patch table | 2 | D020 closed morphism data plus generic ranked result | Total canonical rows; positive rectangular outputs; alphabet closure; optional uniform-shape restriction. | No. |
 | Ranked patch write | 2 | Existing typed result axis plus D019 ordered-emission precedent | Source-bound block plus product-local order and exact provenance. | No. |
-| `RankedBlockMosaicAssemble` UPDATE | 2 plus shared-axis implementation gap | Existing UPDATE axis; rank-one D019 semantics are the commuting base | Rank-two row-height/slab-width compatibility, full old coverage, product-order assembly, parent consumption, newborn deferral. | Goal 2 adds a generic policy, not a new algebra or T26 class. |
-| `RankedUniformBlockAssemble` | 2 | Restriction of ranked mosaic assembly | One common positive shape; total on every rectangular grid; fixed-block D019 overlap at rank one. | No separate executor. |
-| Dense grid to posed bag | 3 | D041-D043 `(prototype_id, pose)` occurrence bag | Label/prototype bijection; shared declared unit-square geometry; inverse on aligned/no-hole/no-overlap image. Uniform-patch steps commute with parent-local pose composition; mixed mosaic is only snapshot-encoded absent a further proof. | No; T27 remains broader. |
-| Other-shape color roles | 3 where a complete finite codec is declared | Finite tagged/product ALPHABET | Lossless role round trip; no guessed assignment. | No. |
-| `BOOK:13744` mixed-size encoded table | 2 | Ranked mosaic assembly plus text-owned `Flatten2D` | Complete `0..3` table, seed `{{3}}`, compatible reachable trajectory. | Native T26 preset; geometric decoding remains unclaimed. |
+| `RankedBlockMosaicAssemble` UPDATE | 2 plus shared-axis implementation gap | Existing UPDATE axis; rank-one D019 semantics are the commuting base | Rank one: explicit ordered selection, selected epsilon retained, unselected sources consumed with zero-width lineage, empty/no-selected cases preserved. Rank two: equal heights within source rows, equal slab widths across source rows, no per-column width invariant, full old coverage, product-order assembly, parent consumption, newborn deferral. | Goal 2 adds a generic policy, not a new algebra or T26 class. |
+| `RankedUniformBlockAssemble` | 2 | Restriction of ranked mosaic assembly | Positive old extents and one common positive block shape; total on positive rectangular grids; fixed-block D019 overlap at rank one. It excludes empty/no-selected/zero-length D019 cases. | No separate executor. |
+| Dense grid to posed bag | 3 | D041-D043 `(prototype_id, pose)` occurrence bag | Label/prototype bijection; shared declared unit-square geometry; inverse on aligned/no-hole/no-overlap image. Uniform-patch full `StepResult`s commute after independently minted successor tokens are compared through an explicit reversible token bijection; complete lineage is preserved. Mixed mosaic is only snapshot-encoded absent a further proof. | No; T27 remains broader. |
+| `BOOK:13744` mixed-size opaque-label table | 2 | Ranked mosaic assembly plus text-owned `Flatten2D` | Complete `0..3` table after one guarded surplus-brace repair, seed `{{3}}`, compatible reachable trajectory; no numeric role assignment or role codec. | Native T26 preset; geometric interpretation remains unclaimed. |
 | Contextual patch choice | Separate T28 parameterization | T14-style contextual read plus T26 result shape | Neighbor reads and boundary must be explicit. | T28 remains pending. |
 
-No class-4 execution algebra is justified. D019's existing variable-length linear policy is preserved; its behavior is the rank-one member of mosaic assembly. D041-D043 remain unrestricted geometry, and Goal 2 implements the missing generic UPDATE policy without reopening T13 semantics.
+No class-4 execution algebra is justified. D019's existing selected-source, variable/epsilon-length linear policy is preserved; its behavior is the rank-one member of mosaic assembly. D041-D043 remain unrestricted geometry, and Goal 2 implements the missing generic UPDATE policy without reopening T13 semantics.
 
 ## Principles Audit
 

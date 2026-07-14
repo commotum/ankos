@@ -1000,7 +1000,7 @@ class BagSnapshotProvenance:
 
 @dataclass(frozen=True)
 class SnapshotTokenRenaming:
-    """Declared bijection from independently derived bag tokens to grid tokens."""
+    """Bijection for the mapped source and independently derived successors."""
 
     bag_source: SnapshotToken = field(repr=False)
     grid_source: SnapshotToken = field(repr=False)
