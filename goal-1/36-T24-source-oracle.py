@@ -48,8 +48,14 @@ EXPECTED_TAXONOMY_SHA256 = "4c30fe079b2fb8f69e4c8c0dde3d59065227d4224cbe4b7693a1
 # freezes actual-Index routes. Q16 follows geometry/isotropy references, Q17
 # closes the built-in function/time-dependent-rule control, and Q18--Q19
 # follow the lossless hexagonal-array implementation to both printed rules.
-# Q20 saturates the broad hexagonal/triangular aliases and exposes block-CA,
-# Turing-machine, random-walk, percolation, and biological false positives.
+# Q20 deliberately broadens the hexagonal/triangular vocabulary and exposes
+# block-CA, Turing-machine, random-walk, percolation, and biological false
+# positives; it is not a claim that every possible alias has been saturated.
+# Q21 closes the historical CA names and their actual-Index redirects. Q22--Q24
+# expose broad tessellation/honeycomb, slice, and embedding vocabulary so views
+# and lexical collisions remain visible. Q25 follows the fixed-network Cayley
+# cross-reference, and Q26 closes the random-Boolean-network variant/history
+# and its dense actual-Index routes.
 QUERIES = {
     "Q00": r"\bhigher[- ]dimensional cellular automata\b",
     "Q01": (
@@ -198,6 +204,20 @@ QUERIES = {
         r"\bhexagonal (?:grid|lattice|lattices)\b|"
         r"\btriangular lattice\b|\bpentagonal (?:example|cell|tiling)\b"
     ),
+    "Q21": (
+        r"\btessellation automata\b|\bcellular spaces\b|"
+        r"\biterative automata\b|\bhomogeneous structures\b|"
+        r"\buniversal spaces\b"
+    ),
+    "Q22": r"\bhoneycomb\b|\btessellations?\b",
+    "Q23": r"\bslices?\b",
+    "Q24": r"\bembedded\b|\bembeddings?\b",
+    "Q25": (
+        r"\bGiven a particular representation of a group or semigroup in terms of rules for a multiway system\b|"
+        r"\bsimilar Cayley graphs\b|"
+        r"\bdifferent choices of generators can yield Cayley graphs with different local subgraphs\b"
+    ),
+    "Q26": r"\bBoolean networks?\b",
 }
 
 EXPECTED_QUERY = {
@@ -222,6 +242,12 @@ EXPECTED_QUERY = {
     "Q18": (7, 7, 0, "0bffb17916facc44a53a086f117ef6db099957744f44e03f822f3746b99b5851"),
     "Q19": (2, 2, 0, "748b344c47308275c85e78147e066c7cdd86c39ae1a53cb5f10b7cee58fcfc10"),
     "Q20": (14, 12, 2, "26c82e76aab7eb8587dd01a3114a8c4196e0079aa2c7c17d650b0385d01fe0b6"),
+    "Q21": (6, 1, 5, "ac1f1acdbb0da3e0ea9b78e135a4e5704b65668fcfe9450191ff53a81a81caba"),
+    "Q22": (8, 6, 2, "27b8e41c5c3d636894a4997ddeba5fea82b9b64a32f80758fae705ec6dc8ddcd"),
+    "Q23": (40, 36, 4, "77823e5de2675ce66a760965dfbf8cdb0f82bf5f2dec0034d419be00fbd7bd81"),
+    "Q24": (10, 8, 2, "b203d92c67310e4e6fb75d9d19447a01518100285758a908fdd922f894c69761"),
+    "Q25": (3, 3, 0, "6c5b017ba141cb4fbe65c6f8ae39abd8faefe68e8da18a60a4660b4843737b4c"),
+    "Q26": (13, 3, 10, "2ab226cf54f54d1911a100c3e80f22d8912587e541ad5e723d6d28b1cb68b0e5"),
 }
 
 
@@ -250,6 +276,14 @@ EXCLUDED_CLASS = {
         "11289,14358,14490,14573,14617,16755,17429,17722"
     ),
     "other_geometry_or_physics": line_set("3856,3862,4440,15507,15865"),
+    "other_program_or_schedule_vocabulary": line_set(
+        "2600,2618,6190,6194,6196,6198,6200,6214,6240,6266,6268,"
+        "6270,6272,6280,6282,6286,6386,6388,6392,6456,6458,13347,"
+        "15378,15550,16556,16672"
+    ),
+    "unrelated_slice_embedding_or_honeycomb": line_set(
+        "3124,15881,15887,15944,15996,17109,18262"
+    ),
 }
 EXCLUDED = frozenset().union(*EXCLUDED_CLASS.values())
 
@@ -273,8 +307,8 @@ NATIVE_EVIDENCE = line_set(
 # and observer-level outcomes.  They do not silently define native coordinates,
 # rule identity, or an execution family.
 RELATION_EVIDENCE = line_set(
-    "4416,10261,13746,13748,13754,13756,15293,15467,15473-15475,"
-    "15485,15487,16253,16255,19588"
+    "4416,10261,11503,13746,13748,13754,13756,13994,13996,14000,"
+    "15293,15467,15473-15475,15485,15487,16253,16255,16808,19588"
 )
 
 # Controls make representation and execution boundaries explicit: finite/crop
@@ -282,10 +316,12 @@ RELATION_EVIDENCE = line_set(
 # values, topology rewriting, per-node random rules, sequential scheduling, and
 # alternating block updates are not smuggled into strict T24.
 CONTROL_EVIDENCE = line_set(
-    "2018,2372,2426,2464,11037,11063-11065,11077,11079-11087,11090,"
+    "2018,2202,2204,2206,2372,2426,2464,2910,2912,2918,2930,5334,"
+    "6376,11037,11063-11065,11077,11079-11087,11090,"
     "11092,11095-11100,11103,11106-11107,11110,11112,11114,11116,"
-    "11118,11120,11122,11124,13314,13464,13835,13889,13891,13893,"
-    "13895,13917-13919,15708,16446"
+    "11118,11120,11122,11124,11563,13314,13464,13575,13835,13889,"
+    "13891,13893,13895,13917-13919,14063,15708,16446,16717,16875,"
+    "18778,20118"
 )
 
 RETAINED = NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE
@@ -306,9 +342,15 @@ GOVERNED_IMAGE_LINES = (
 # The actual Index supplies search routes, not construction semantics.
 INDEX_CLASS = {
     "t24_geometry_and_topology_routes": line_set(
-        "20828,20836,20910,20918,20967,21054,21068,21102,21170,21181,"
-        "21243,21763,21934,22132,22150,22166,22352,22416,22434,22438"
+        "20828,20836,20910,20967,21054,21068,21102,21170,21181,"
+        "21243,21763,21934,22132,22166,22352,22416,22438"
     ),
+    "historical_ca_alias_routes": line_set("20970,21253,21362,22150,22390"),
+    "boolean_network_variant_routes": line_set(
+        "20918,21213,21283,21416,21495,21687,21689,21771,22134,22426"
+    ),
+    "observer_or_embedding_routes": line_set("20980,21132,22434"),
+    "other_slice_routes": line_set("20946,22114,22120"),
     "other_rule_restriction_routes": line_set("21233,21731"),
     "structural_or_sequential_network_routes": line_set("22096"),
     "continuous_or_stochastic_routes": line_set("21046,21434,21735,21815"),
@@ -317,28 +359,34 @@ INDEX_CLASS = {
 INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
 
 
-EXPECTED_SOURCE_COUNT = 145
-EXPECTED_SOURCE_DIGEST = "52c5ea5e4964df3ec11e3c2994691a4fb9eda6b0ee9ce61a5ea91f87d7df37fa"
+EXPECTED_SOURCE_COUNT = 166
+EXPECTED_SOURCE_DIGEST = "6df18eafb55416cb2cdfb0972da8bcaf958e1605df5e8e64785187212ff137f5"
 EXPECTED_SET = {
-    "union": (142, "23247daa90ba3ad9bf8892f02e9c010cdeff596c2f99652504405c8254fb7fee"),
-    "pre_index_union": (113, "ef9e88414b9d5843b9e77e9bbe5a0429d853fa220381278206289a4370447b87"),
-    "index": (29, "12b31e400df0dac3114d8153f4692b1cc7970bf9ffee0afa9b896daa3c1696ac"),
-    "matched_retained": (69, "dfc95e295b50dccb78dc459d1d433b7ab482ea9af57dd868fcca067121fbc985"),
-    "governed_continuations": (76, "3e50c1a4d9e20f37b104c4ebe8350f596fa525044cd19396861613aec5995d55"),
+    "union": (215, "2d006e03f71a78ee188a752a5fd613fd2102e832282fd77df3fde8f90404440f"),
+    "pre_index_union": (168, "b08f6b6fb0e7ef05e9ad9b52f35e6d29fd7fc5c5e371943fe34dd59707293f5d"),
+    "index": (47, "2e6957cd6bc8a02b7968bbae4de3e0df8f630b1ff7f980de68357514b10cdc59"),
+    "matched_retained": (91, "1f6edc49c8836e6b06631fbf8c4b05850b39230fd21d4a3fe8a05b48d4c7ef89"),
+    "governed_continuations": (75, "b595c685406b8df5bf1e5defeeed1baea4ad59822ef8a816020bd579fe3696a1"),
     "retained": (EXPECTED_SOURCE_COUNT, EXPECTED_SOURCE_DIGEST),
-    "excluded": (44, "fdfa685987fbc2e6f63b41a56e5ec8253df85afaceb1bcef500341afc755fa6a"),
+    "excluded": (77, "8a2d25876bd2e8f9997d8c7e7963ffc99d26904396af055ad8bcd600e546ae5f"),
     "native": (80, "1c7fa838bfa3e42073f8f8b7f8dfe2647a16a188f515063421892fb7255df2c3"),
-    "relation": (16, "d74e8224571c62fff7eb6ed75171a60a0be1a19c299dc9fe8a83bd9f4942585b"),
-    "control": (49, "eaaa54ac9aa56764b6b86260be2c0d978067d24db4c17884fad1632b784bff99"),
+    "relation": (21, "765f57ae96e7b9c673423056032c498f84be315d95d40821a1259e801753ca45"),
+    "control": (65, "b65f6092999ffd35c43394980ce559c35612378cb5efe26801c5e085b86a4ece"),
     "governed_images": (11, "07b740cf80d9e0caef2500ebb6882c4322a6969b9fc284e3e77af4b9a611b62d"),
 }
 EXPECTED_EXCLUDED_CLASS = {
     "other_ca_family_or_dimension": (31, "518bafbc6cfd250eff1dedd235d768aa786a7fcab576dce1d9da8df701b34234"),
     "broad_implementation_name_collision": (8, "1e1b1fd12fdbaf287f1f20611843ed5c22c8d5ad1a20b94b0fc66bbb46d561d7"),
     "other_geometry_or_physics": (5, "ba1d93bbb23d8cd72f1cf471b68d0cf1e3f7e99771703b79cb762fe4269f9e18"),
+    "other_program_or_schedule_vocabulary": (26, "d99b45eb1dd8f6f3fbe3fd1828da15a12a490c7cc6de90564138b5d558b47e2b"),
+    "unrelated_slice_embedding_or_honeycomb": (7, "eb213f4e64c2d1ee8aa82e6bd2a6c4dc7d2284e433d14b42f944942d763cb711"),
 }
 EXPECTED_INDEX_CLASS = {
-    "t24_geometry_and_topology_routes": (20, "2c49222d95d70fc15730c34490c2ed4ba9faad7355f8ba47b1aeab2bc453cafc"),
+    "t24_geometry_and_topology_routes": (17, "369e9c72274c8fd0e53e516c56404e30d5aa58c63909eadc507145a730c6023e"),
+    "historical_ca_alias_routes": (5, "f13cad09c327a9298b1a308ca0d8a8d7e1f7c0083ee4c70669f1e64722cb2ce0"),
+    "boolean_network_variant_routes": (10, "f0e050614be45ee3564cd2f8fe7cfadeecbf22464a6c3835feca700bb2a094af"),
+    "observer_or_embedding_routes": (3, "a1884b7791e4d28c59177abbcd43128ef6d9dcd4f16f07b836581ca8cc4d706e"),
+    "other_slice_routes": (3, "2b6a291df5f4f13a84796e1da2a57c77d64a3cb0e456d5bb613037322dae36af"),
     "other_rule_restriction_routes": (2, "633b53d4c3b49f1981130965b95e51e3c505945acafb9fe29b57949f19812fde"),
     "structural_or_sequential_network_routes": (1, "2754f6e1f004d4298d7ed6444c52385d98a70aee827877053ef7d43e519ac10f"),
     "continuous_or_stochastic_routes": (4, "c6db33d21c31050eaaa818770ba46e08cb74c0f434347d2559db6cae73a0e772"),
@@ -355,13 +403,13 @@ EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 # Filled from the deterministic reverse joins below; unlike raw source hashes,
 # these freeze both exact duplicates and normalized split-document variants.
-EXPECTED_SPLIT_QUERY = (142, "0a93de88f9453b6785c84f8d0f15775b36738e4489a0156ea7d9d562112d3772")
-EXPECTED_SPLIT_QUERY_EXACT = (134, "e9c485249c355f599b21bbb0df4ce3b9d2df421ad6f21ebec9d64eb601b74234")
-EXPECTED_SPLIT_QUERY_NONEXACT = (8, "0ea9f97b0c6a922ce8cd5c658b98df377028c850da9ca9c2f09a6a62617a1e7f")
-EXPECTED_SPLIT_QUERY_MAPPING_DIGEST = "b24fe046d8e5f32e13c3041259e68159679122e2fe1c25defe2608038c06f718"
-EXPECTED_SPLIT_RETAINED_EXACT = (131, "f0c8fef1a2df1001bbdddff11ca5803d4db41aece1cbb6aa845373cc7940c0b8")
-EXPECTED_SPLIT_RETAINED_NONEXACT = (14, "49f316230f83696c1aecc886fca3c7dd31dc5100cb17a3f8e5c54fa106c92e39")
-EXPECTED_SPLIT_RETAINED_MAPPING_DIGEST = "6e47011567c2f7a57449a9c32787798bd69f7c2a9421a63912837842fcf52f38"
+EXPECTED_SPLIT_QUERY = (215, "e98155183699f1622eb35a0cfd716f3be0b34d7359e3d8bc6f8a5f8a68b30312")
+EXPECTED_SPLIT_QUERY_EXACT = (205, "451f5f2c7f637ddd6a7c4c34114d69498f9902ede1174a7c30ff605dac7d55a2")
+EXPECTED_SPLIT_QUERY_NONEXACT = (10, "101d91b24328ba3ade771d965c618f065ca35a6c38ea0f3a49426e056260a891")
+EXPECTED_SPLIT_QUERY_MAPPING_DIGEST = "049eaeabdd9c88c46f4d1e225aea230dcee97e1b9ccfa2cc07aefb5e00406357"
+EXPECTED_SPLIT_RETAINED_EXACT = (150, "c6e1e03966eb6c7e191879895bf9a72f36aeaa165d29ad8ba7246e84c3e387be")
+EXPECTED_SPLIT_RETAINED_NONEXACT = (16, "ebe344dc2bebbbf661fc80f91ff5cafd1d760b496198da5d6955748e84e7d0cc")
+EXPECTED_SPLIT_RETAINED_MAPPING_DIGEST = "ace92ae9d4caebb974d026d1115ca8e0c3d7bfd8b95fd0e4135337aa949c465e"
 EXPECTED_MONOLITH_ONLY = (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
 EXPECTED_ATLAS_HITS = (1, "620c9c332101a5bae955c66ae72268fbcd3972766179522c8deede6a249addb7")
 
@@ -762,6 +810,75 @@ def main() -> int:
         "OK" if fixed_network_derivation_ok else "MISMATCH", *new_colors,
     )
 
+    historical_aliases = (
+        "tessellation automata",
+        "cellular spaces",
+        "iterative automata",
+        "homogeneous structures",
+        "universal spaces",
+    )
+    alias_index_lines = {20970, 21253, 21362, 22150, 22390}
+    boolean_index_lines = {
+        20918, 21213, 21283, 21416, 21495,
+        21687, 21689, 21771, 22134, 22426,
+    }
+    alias_variant_route_guards_ok = (
+        all(alias in at(11503).lower() for alias in historical_aliases)
+        and "cellular spaces see cellular automata" in at(20970).lower()
+        and "homogeneous structures see cellular automata" in at(21253).lower()
+        and "iterative automata" in at(21362).lower()
+        and "see cellular automata" in at(21362).lower()
+        and "tessellation automata" in at(22150).lower()
+        and "see cellular automata" in at(22150).lower()
+        and "universal spaces see cellular automata" in at(22390).lower()
+        and "given a particular representation of a group or semigroup" in at(13994).lower()
+        and "cayley graph is a 2d grid" in at(13994).lower()
+        and "similar cayley graphs" in at(13996).lower()
+        and "different choices of generators can yield cayley graphs" in at(14000).lower()
+        and "simulations of random boolean networks" in at(11563).lower()
+        and "each node has a rule that is randomly chosen" in at(13917).lower()
+        and "averages are in effect taken over possible configurations" in at(13919).lower()
+        and all("boolean networks" in at(line_no).lower() for line_no in boolean_index_lines)
+        and 11503 in RELATION_EVIDENCE
+        and {13994, 13996, 14000} <= RELATION_EVIDENCE
+        and {11563, 13917, 13919} <= CONTROL_EVIDENCE
+        and alias_index_lines == set(INDEX_CLASS["historical_ca_alias_routes"])
+        and boolean_index_lines == set(INDEX_CLASS["boolean_network_variant_routes"])
+    )
+    ok &= alias_variant_route_guards_ok
+    print(
+        "historical_alias_cayley_boolean_route_guards",
+        "OK" if alias_variant_route_guards_ok else "MISMATCH",
+        len(historical_aliases), len(alias_index_lines), len(boolean_index_lines),
+    )
+
+    ca_slice_controls = {
+        2202, 2204, 2206, 2910, 2912, 2918, 2930, 5334, 13575, 18778,
+    }
+    embedding_controls = {6376, 16717, 16875, 20118}
+    boundary_vocabulary_guards_ok = (
+        "one-dimensional slices through some of the two-dimensional cellular automata" in at(2202).lower()
+        and "looking at such slices cannot reveal much" in at(2206).lower()
+        and "code 942 slices" in at(13575).lower()
+        and "represented as tessellations of rectangles" in at(14063).lower()
+        and "any network can be laid out in 3d space" in at(16717).lower()
+        and "whitney embedding theorem" in at(16717).lower()
+        and "embeddings of networks" in at(21132).lower()
+        and "honeycomb moray" in at(15944).lower()
+        and ca_slice_controls <= CONTROL_EVIDENCE
+        and embedding_controls <= CONTROL_EVIDENCE
+        and {2600, 2618} <= EXCLUDED_CLASS["other_program_or_schedule_vocabulary"]
+        and {15944} <= EXCLUDED_CLASS["unrelated_slice_embedding_or_honeycomb"]
+        and {20980, 21132, 22434} == set(INDEX_CLASS["observer_or_embedding_routes"])
+        and {20946, 22114, 22120} == set(INDEX_CLASS["other_slice_routes"])
+    )
+    ok &= boundary_vocabulary_guards_ok
+    print(
+        "slice_embedding_tessellation_honeycomb_guards",
+        "OK" if boundary_vocabulary_guards_ok else "MISMATCH",
+        len(ca_slice_controls), len(embedding_controls),
+    )
+
     controls_ok = (
         "general function is used" in at(11077)
         and "step number" in at(11077)
@@ -921,6 +1038,8 @@ def main() -> int:
         and fixed_network_source_ok
         and structural_network_control_ok
         and fixed_network_derivation_ok
+        and alias_variant_route_guards_ok
+        and boundary_vocabulary_guards_ok
         and controls_ok
     )
     ok &= architecture_inference_ok
