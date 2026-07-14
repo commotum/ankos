@@ -46,7 +46,128 @@ Source and asset fixed-point oracles are in progress. No exhaustive count, diges
 
 ## Book Excerpts
 
-Pending frozen source closure and exact disposition table.
+### Excerpt 1: the rule schedule chooses the possible block
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:1134-1138`
+- Context: Chapter 3 introduction.
+- Establishes: the append-block choice is a cyclic schedule, while the old head symbol decides whether that already-selected block is appended.
+
+> The idea of a cyclic tag system is to make the underlying rule already specify exactly what block can be added at each step.
+>
+> In the simplest case there are two possible blocks, and the rule simply alternates on successive steps between these blocks, adding a block at a particular step when the first element in the sequence at that step is black.
+
+### Excerpt 2: one head is removed and a conditional block is appended
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:1140-1146`
+- Context: page-95 rule/trajectory caption.
+- Establishes: delete-one, tail append, and alternating phase form one native event; the circle is a visible phase observation, not movement direction.
+
+> There are two cases in the rule, and these cases are used on alternate steps, as indicated by the circle icons on the left. In each case a single element is removed from the beginning of the sequence, and then a new block is added at the end whenever the element removed is black.
+
+### Excerpt 3: the page-96 seed and observers are not state
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:1152-1158`
+- Context: five direct examples and their growth plots.
+- Establishes: each direct fixture begins with one black element; nested-form and growth-fluctuation claims are observations of full word/phase trajectories.
+
+> In each case the initial condition consists of a single black element.
+>
+> The fluctuations are shown with respect to growth at an average rate of half an element per step.
+
+### Excerpt 4: rearranged and rule-110 views are explicit relations
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:8172-8192`
+- Context: rule-110 universality construction.
+- Establishes: standard, stationary-position, skewed, and mechanism views all represent the same cyclic evolution; they do not replace its native configuration or executor.
+
+> Picture (a) shows an example of the evolution of a cyclic tag system in the standard representation from pages 95 and 96. Picture (b) then shows another version of this same evolution, but now rearranged so that each element stays in the same position, rather than always shifting to the left at each step.
+
+### Excerpt 5: the Notes keep phase in state and freeze it on empty
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:12317-12335`
+- Context: `CTEvolveList`/`CTStep` implementation.
+- Establishes: the program data and word are paired as instantaneous state; live steps rotate the rule list, while the explicit empty clause returns both components unchanged.
+
+> With the rules for the cyclic tag system on page 95 given as `{{1, 1}, {1, 0}}`, the evolution can be obtained from `CTEvolveList` and `CTStep`.
+
+The extraction damages the black-head clause, so no executable text is invented from it. The intact empty clause and independent main-text/raster trajectory determine the audited boundary.
+
+### Excerpt 6: longer cycles and natural multiplicity are rule presets
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:12337-12344`
+- Context: Notes generalizations.
+- Establishes: a nonempty cycle may have more than two slots; for natural-valued data, removing `n` repeats the scheduled block `n` times. Neither variation changes the firing/update algebra.
+
+> The implementation above immediately allows cyclic tag systems which cycle through a list of more than two blocks.
+
+### Excerpt 7: substitution and universality claims remain mappings
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:12350-12358,18514-18522`
+- Context: Notes properties and the ordinary-tag-to-cyclic compiler.
+- Establishes: substitution behavior follows only under stated block-length conditions, and ordinary tag/Turing/CA/rule-110 material is a compiler or emulation relation—not a native execution fallback.
+
+> If all blocks in a cyclic tag system with n blocks have lengths divisible by n, then one can tell in advance on which steps blocks will be added, and the overall behavior obtained must correspond to a neighbor-independent substitution system.
+
+## Asset Audit
+
+`32-T18-asset-oracle.py` derives a radius-four closure from the frozen source set and adds the complete four-raster page-93 ordinary-tag predecessor plate. The resulting universe has 27 assets: `C/O/R/X = 4/1/21/1`, where the 21 relation/control assets include five separately tracked ordinary-tag predecessor controls (`C/O/R/K/X = 4/1/16/5/1`). It closes 27 monolith references, 27 split references, 27 physical files, and 27 unique hashes. The complete universe digest is `9e95aed53f7aa329a9f82567a05031e51558c0e0b978ca5eb246fb758e454838`; its manifest digest is `b44c97f322587807deecf8de786e0d70a40d69acf527824815f5700a72c2be52`.
+
+The strict native/observer subledger is exactly five files (`C/O = 4/1`), with universe digest `95411e9d7c6de49bdd05049d5435bf0b935a6afdcde29619b5775b2205cfe82c` and manifest digest `bc91ba39ffb022ac91cdbbad2c7685523f8209de542d51a5f7d543c44f6fb488`:
+
+| BOOK line | Class | Dimensions | Bytes | SHA-256 | Disposition |
+|---:|:---:|---:|---:|---|---|
+| 1140 | C | 248x458 | 18,568 | `b91df18a471d1e3e02e27bcf3a7b95a3f01e295223cf5ff4bd8b8fb2cc592a75` | page-95 alternating phase and finite-word trajectory |
+| 1142 | C | 508x70 | 7,515 | `c8a203dc1ac1530065eb9372f5757991d22bc3c423b0c0c36041824f0acab222` | delete-head/black-trigger/tail-append schematic |
+| 1146 | C | 226x45 | 2,558 | `daea1bcb06cb9715295c25a16a0bf33bb3f1ce0188d03e183596479bb1ffa3bb` | page-95 two-block rule summary |
+| 1152 | C | 1185x547 | 106,271 | `26790ff2416466d111867c85794fd9b66aa18797cfd270f36e5631ccb7c41dee` | five page-96 rules, common seed, and 100-row traces |
+| 1156 | O | 1237x650 | 99,927 | `b25c6520aed62856eedb5c0f1abe96d3e13ec3d9fd72306e3cb271fe1d24746a` | derived length-fluctuation plots for cases d/e |
+
+Printed pages 95–96 correspond to physical filenames `_page_110_*` and `_page_111_*` because the extracted file numbering includes front matter. Literal `_page_95_*`/`_page_96_*` files are unrelated Turing-machine controls and are explicitly excluded.
+
+The page-95 direct fixture is
+
+```text
+blocks = [11, 10]
+seed   = 1 at phase 0
+t0..t24 =
+1
+11
+110
+1011
+01110
+1110
+11010
+101011
+0101110
+101110
+0111010
+111010
+1101010
+10101011
+010101110
+10101110
+010111010
+10111010
+011101010
+11101010
+110101010
+1010101011
+01010101110
+1010101110
+01010111010
+```
+
+The five page-96 fixtures all start from `1` at phase zero. Each full `t0..t99` word sequence is independently regenerated and digest-bound:
+
+| Case | Ordered blocks | Final `t99` word | Full trace SHA-256 |
+|:---:|---|---|---|
+| a | `[11,10]` | `10101010101110101010` | `c9d9199aacac4298a05c9810d19654aa45ff1193067e636c3361cf4f87e21e79` |
+| b | `[1,11]` | `11111111111111111111111111111111111111111111111111` | `d9a237a460cccbcd90bddc1b47a204b03f7a03941be3fc43388a0af9ae4966ef` |
+| c | `[10,11]` | `11101110111110111110111011111011111011101111101110111110111110` | `adadc131e58c22729fc2651a1989d2fd5fae618cb402807f93e1b7648cbfe019` |
+| d | `[1,101]` | `110110111011011110111011011101101111011110111011011` | `b7d44cb49a4fa6c6e84564e93ff29f85e12bce9eedc8ba1c6cb5324a4c29577a` |
+| e | `[111,0]` | `001110011101110111011100111001110111011111101111110111` | `024da84c4d9e88aa4af7c6e2ef7441b805af16708be7f2157ec4ffdfabd4cfc1` |
+
+The rule-110 relation plate at `BOOK:8180/8184` independently redraws case d through `t20`; it agrees exactly but remains class R. The Notes' mechanical paragraph refers to a picture that is absent from this extraction: `BOOK:12348` is an OCR placeholder, the nominal split Notes file contains one line, the actual T18 Notes are mispartitioned into `BACK-MATTER/Index/Index.md:220-267`, and no `_page_895_*` JPEG exists. The oracle freezes that absence rather than fabricating an asset.
 
 ## Semantic Audit
 
@@ -75,7 +196,7 @@ The adversarial cases establish:
 - missing, reordered, wrong-phase, wrong-anchor, and fake-append results reject before commit;
 - structured program/state serialization retains phase and duplicate slot positions.
 
-The canonical Notes rule `{{1,1},{1,0}}` from a one-black seed passes the frozen `t0..t12` trace. Asset closure must still confirm which direct raster(s) this exact fixture is entitled to reproduce.
+The canonical Notes rule `{{1,1},{1,0}}` from a one-black seed passes the hash-bound page-95 `t0..t24` trace. Both semantic paths also reproduce all five full page-96 `t0..t99` profiles, for 500 book-fixture states, including occurrence-distinct phase values and exact full-trace digests.
 
 ## Construction Model
 
