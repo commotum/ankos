@@ -185,7 +185,10 @@ def jpeg_size(data: bytes) -> tuple[int, int]:
     raise AssertionError("JPEG SOF marker not found")
 
 
-def ledger() -> tuple[str, str, int, int]:
+MISSING_SPLIT = {1711, 1744}
+
+
+def ledger() -> tuple[str, str, int, int, int]:
     base = ROOT / "ref/A-New-Kind-of-Science"
     markdown_files = sorted(
         path
@@ -212,7 +215,9 @@ def ledger() -> tuple[str, str, int, int]:
 
     rows: list[str] = []
     hashes: set[str] = set()
-    references = 0
+    monolith_references = 0
+    split_references = 0
+    missing_split: set[int] = set()
     for book_line in sorted(U):
         kind = "I" if book_line in I else "R" if book_line in R else "X"
         name = Path(images[book_line]).name
@@ -220,9 +225,10 @@ def ledger() -> tuple[str, str, int, int]:
         split_hits = split_by_name.get(name, [])
         paths = physical_by_name.get(name, [])
         assert monolith_hits == [book_line], (book_line, monolith_hits)
-        assert len(split_hits) == 1, (book_line, split_hits)
+        assert len(split_hits) <= 1, (book_line, split_hits)
         assert len(paths) == 1, (book_line, paths)
-        references += len(monolith_hits) + len(split_hits)
+        monolith_references += len(monolith_hits)
+        split_references += len(split_hits)
 
         path = paths[0]
         data = path.read_bytes()
@@ -230,29 +236,39 @@ def ledger() -> tuple[str, str, int, int]:
         assert digest not in hashes, (book_line, digest)
         hashes.add(digest)
         width, height = jpeg_size(data)
-        split, split_line = split_hits[0]
+        if split_hits:
+            split, split_line = split_hits[0]
+            split_path = split.relative_to(base).as_posix()
+            split_line_field = str(split_line)
+        else:
+            missing_split.add(book_line)
+            split_path = "<absent>"
+            split_line_field = "<absent>"
         rows.append(
             f"{book_line}|{kind}|{path.relative_to(base).as_posix()}|{len(data)}|"
-            f"{width}|{height}|{digest}|{split.relative_to(base).as_posix()}|{split_line}"
+            f"{width}|{height}|{digest}|{split_path}|{split_line_field}"
         )
 
+    assert missing_split == MISSING_SPLIT
     payload = "\n".join(rows) + "\n"
     digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
-    return payload, digest, references, len(hashes)
+    return payload, digest, monolith_references, split_references, len(hashes)
 
 
-EXPECTED_LEDGER_SHA256 = "PENDING"
+EXPECTED_LEDGER_SHA256 = "3f1ed79dfdff2283e47ad780c95a7c6ad19a30372bc4f98979bff5137867b23d"
 
 
 def main() -> None:
     assert (len(S), len(C4), len(P), len(Q), len(U)) == (701, 431, 8, 138, 577)
-    payload, digest, references, hashes = ledger()
+    payload, digest, monolith_references, split_references, hashes = ledger()
     assert len(payload.splitlines()) == 577
-    assert (len(I), len(R), len(X), references, hashes) == (363, 198, 16, 1154, 577)
+    assert (len(I), len(R), len(X), hashes) == (363, 198, 16, 577)
+    assert (monolith_references, split_references) == (577, 575)
     assert digest == EXPECTED_LEDGER_SHA256
     print(
         "T08 final asset oracle: PASS source=701; C4/P/Q=431/8/138; "
-        "assets=577; refs=1154; classes=363,198,16; unique_hashes=577; "
+        "assets=577; refs=1152(monolith=577,split=575); missing_split=1711,1744; "
+        "classes=363,198,16; unique_hashes=577; "
         f"ledger_sha256={digest}"
     )
 

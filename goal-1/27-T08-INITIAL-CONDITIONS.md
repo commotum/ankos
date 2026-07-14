@@ -1,6 +1,6 @@
 # 27-T08-INITIAL-CONDITIONS
 
-Status: **IN PROGRESS — SOURCE RECLOSED; ASSET HOSTILE RECLOSURE AND GLOBAL INTEGRATION ACTIVE**
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
 ## Current Facts
 
@@ -149,24 +149,24 @@ No retained source gives T08 a seed-dependent native transition rule, new firing
 
 ## Asset Ledger
 
-The asset audit is driven by the immutable 487-line source set, not by filenames or visual similarity:
+The asset audit is driven by the immutable 701-line retained source set, not by filenames or visual similarity:
 
-1. `C4` contains every exact JPEG reference within four physical monolith lines of a retained source line: 307 assets.
-2. `P` contains eight direction-sensitive explicit-pointer repairs `{4208,4210,4212,5086,5098,7866,7928,7942}`; five already lie in `C4`.
-3. Hostile review follows same-caption, facing-page, multi-panel, explicit-continuation, and governed run/plate companions to a pinned fixed point `Q` of 102 assets, disjoint from `C4 union P`.
-4. The final physical universe is therefore `U=C4 union P union Q`, with `307 + 3 + 102 = 412` assets.
+1. `C4` contains every exact JPEG reference within four physical monolith lines of a retained source line: 431 assets.
+2. `P` contains the eight direction-sensitive pointer repairs still outside `C4`, `{1487,1573,3578,3582,3596,7928,7942,12859}`.
+3. Hostile review follows same-caption, facing-page, multi-panel, explicit-continuation, and governed run/plate companions to a frozen fixed point `Q` of 138 assets, disjoint from `C4 union P`.
+4. The final physical universe is therefore the disjoint union `U=C4 union P union Q`, with `431 + 8 + 138 = 577` assets.
 
-`P` repairs directionality that pure distance misses. Its final three additions capture an explicitly pointed universal-macrocell detail, mobile-automaton composite-state emulation, and Turing run; `BOOK:7944,7946` are relation companions in `Q`. The companion closure includes complete rule-110, three-color, symbolic, shift-map, six-panel PDE, 2D/3D, Chapter 6 initial-condition, reversible, encryption, universal-encoding, rule-54, and Notes image runs. This is a frozen adjudicated semantic fixed point, not a claim that arbitrary image semantics can be regenerated from distance alone.
+`P` repairs directionality that pure distance misses. `Q` preserves the legacy complete rule-110, three-color, symbolic, shift-map, PDE, multidimensional, reversible, encryption, universal-encoding, rule-54, and Notes runs, and adds the newly governed word/number/graph/growth/periodic-orbit/cluster/refinement/aggregate plates. Hostile review removed merely nearby candidates and added omitted same-run companions, including the glitch-distance aggregate at `BOOK:18874`. This is a frozen manually adjudicated semantic fixed point, not a claim that arbitrary image semantics can be regenerated from distance alone.
 
 | Asset class | Count | Meaning |
 |---|---:|---|
-| `I` | 284 | directly presents/encodes an evidenced initial profile/class or a run beginning from it |
-| `R` | 120 | seed relation, later crop/continuation, aggregate, rule strip, emulation, IVP, or sibling comparison |
-| `X` | 8 | adjacency-only/nonseed control |
+| `I` | 363 | directly presents/encodes an evidenced initial profile/class or a run beginning from it |
+| `R` | 198 | seed relation, later crop/continuation, aggregate, rule strip, emulation, IVP, or sibling comparison |
+| `X` | 16 | adjacency-only/nonseed control |
 
-The exact exclusions are `BOOK:590,1034,1036,1044,1048,3458,4200,8608`. Later/transformed evidence remains relation-only rather than being discarded—for example the rule-110 continuations `522-532`, compressed/final views `4302,6642,8260`, and IVP panels `2048-2062`.
+The exact controls are `BOOK:590,1034,1036,1044,1048,3458,4200,6172,8574,8608,12836,12911,13090,13151,14756,17718`. Later, transformed, and aggregate evidence remains relation-only rather than being discarded—for example the rule-110 continuations `522-532`, compressed/final views `4302,6642,8260`, IVP panels `2048-2062`, sensitivity/count plots, and governed later stages in multi-image plates. `BOOK:420` is direct evidence, not a control: the raster visibly labels steps 1 through 10 and includes the single-center event-zero row.
 
-Every asset has exactly one physical JPEG, one monolith reference, and one split-file reference. The exact single-line row serialization is
+Every asset has exactly one physical JPEG and one monolith reference. Exactly 575 have one split-file reference and none has more than one. The split Markdown omits `BOOK:1711` (`_page_154_Figure_2.jpeg`) and `BOOK:1744` (`_page_156_Figure_1.jpeg`) even though both physical files and monolith links exist; their final two row fields are the explicit sentinel `<absent>`. The exact single-line row serialization is
 
 ```text
 BOOKline|class|physical-relative-path|byte-size|width|height|sha256|split-md-relative-path|split-line
@@ -181,9 +181,10 @@ python3 goal-1/27-T08-asset-oracle.py
 Recorded result:
 
 ```text
-T08 final asset oracle: PASS source=487; C4/P/Q=307/8/102; assets=412;
-refs=824; classes=284,120,8; unique_hashes=412;
-ledger_sha256=7a58eb6581ba740465608db6538b4d55305b52901932c670d764f846af34c44f
+T08 final asset oracle: PASS source=701; C4/P/Q=431/8/138; assets=577;
+refs=1152(monolith=577,split=575); missing_split=1711,1744;
+classes=363,198,16; unique_hashes=577;
+ledger_sha256=3f1ed79dfdff2283e47ad780c95a7c6ad19a30372bc4f98979bff5137867b23d
 ```
 
 The raster bytes can support only their declared visual/run relation. They do not prove probability independence, native infinite support, rule properties, exact transitions outside captions/code, or program identity. The extraction defects at the source locations listed above remain pointer/relation evidence; the JPEG hashes preserve what was actually inspected.
@@ -623,7 +624,7 @@ T01's current `seeds.point` handoff is direct only as a finite scalar materializ
 
 ### D121 — Initial-condition classes are validated configurations, constructors, or laws, not execution semantics
 
-- **Status:** decision candidate; activate after final hostile/source/asset/global gates.
+- **Status:** ACTIVE after hostile source, asset, architecture, and global reclosure.
 - **Basis:** the source reuses one point profile across unchanged CA rules (`BOOK:418-518,730-790`), contrasts it with random starts (`2706-2710,3060-3106`), exposes periodic, random-block, block-coded, nested, finite-defect, and explicit background/offset forms (`3126-3210,3388-3406,11077-11150`), distinguishes finite from infinite information/scope (`13265,19072`), and states support-family-specific availability of random initial data (`14275`). It supplies no seed-dependent native transition.
 - **Configuration boundary:** `ConfigurationSchema` declares a DomainSchema, admitted support/topology instances, typed ALPHABET/components, and invariants. One exact `X_0 in Conf(C_P)` is direct ordinary state. Fixed-field point/periodic/override/piecewise forms and structural codecs are optional lossless representations or presets, not a universal field interface.
 - **Class/law boundary:** an `InitialConditionClass` denotes a schema-scoped subset but does not promise decidable membership. A deterministic constructor, mathematical law, construction record, complete-configuration sample, finite-cylinder sample, algorithmic-field realization, denotational configuration, validation evidence, and any transform/derivation each retain separate identity. A cylinder is not a complete native configuration. Source-underdetermined “random” never silently becomes fair iid; structured laws must preserve configuration invariants.
@@ -632,12 +633,12 @@ T01's current `seeds.point` handoff is direct only as a finite scalar materializ
 
 ## Detailed Implementation Plan
 
-1. Close a reproducible source universe across direct terminology, concrete seed descriptions, captions, Notes, Index routes, aliases, and cross-references; disposition every candidate.
-2. Close the governed visual-asset universe with exact monolith/split references, dimensions, hashes, semantic classifications, and run/caption stop rules.
-3. Reconstruct deterministic, stochastic, finite-exception, periodic, and structured seed profiles from evidence; separate seed, realized configuration, realization, boundary, trace, and view.
-4. Audit `simple_programs.md`, `src/ca`, tests, datasets, and completed stages; identify exact reuse and mismatches without preserving incidental Phase 1 behavior.
-5. Specify Goal 2 schemas, identity/provenance, validation, serialization, transformations, acceptance tests, and no-cheating checks.
-6. Run all embedded oracles, independent hostile review, repository tests, Markdown/coverage/decision/diff gates, integrate the ledgers, and advance only after clean closure.
+1. **COMPLETE:** close a reproducible source universe across direct terminology, concrete seed descriptions, captions, Notes, Index routes, aliases, and cross-references; disposition every candidate.
+2. **COMPLETE:** close the governed visual-asset universe with exact monolith/split references or explicit absences, dimensions, hashes, semantic classifications, and run/caption stop rules.
+3. **COMPLETE:** reconstruct deterministic, stochastic, finite-exception, periodic, and structured seed profiles from evidence; separate seed, realized configuration, realization, boundary, trace, and view.
+4. **COMPLETE:** audit `simple_programs.md`, `src/ca`, tests, datasets, and completed stages; identify exact reuse and mismatches without preserving incidental Phase 1 behavior.
+5. **COMPLETE:** specify Goal 2 schemas, identity/provenance, validation, serialization, transformations, acceptance tests, and no-cheating checks.
+6. **COMPLETE:** run all embedded oracles, independent hostile review, repository tests, Markdown/coverage/decision/diff gates, integrate the ledgers, and advance only after clean closure.
 
 ## Goal 2 Implementation Stage
 
@@ -701,12 +702,14 @@ T01's current `seeds.point` handoff is direct only as a finite scalar materializ
 
 ## Completion Requirements
 
-- [ ] Every declared source candidate and governed asset is dispositioned under reproducible, honestly scoped protocols.
-- [ ] Every retained excerpt/asset has exact provenance and its construction fact is separated from behavior, boundary, and view claims.
-- [ ] The seed/profile model covers every evidenced deterministic and stochastic class, validation invariant, identity, transform, and realization distinction.
-- [ ] Current API/runtime fit and a concrete Goal 2 handoff are implementation-ready with adversarial conformance cases.
-- [ ] Global ledgers, independent review, all embedded checks, coverage/diff gates, and repository tests pass.
+- [x] Every declared source candidate and governed asset is dispositioned under reproducible, honestly scoped protocols.
+- [x] Every retained excerpt/asset has exact provenance and its construction fact is separated from behavior, boundary, and view claims.
+- [x] The seed/profile model covers every evidenced deterministic and stochastic class, validation invariant, identity, transform, and realization distinction.
+- [x] Current API/runtime fit and a concrete Goal 2 handoff are implementation-ready with adversarial conformance cases.
+- [x] Global ledgers, independent review, all embedded checks, coverage/diff gates, and repository tests pass.
 
 ## Stage Results
 
-IN PROGRESS.
+COMPLETE after hostile source, asset, and architecture reclosure. The 16-query source protocol closes 1,205 query-union lines plus five governed continuations in a 1,210-entry declared audit: 701 retained construction lines, 439 duplicate/control lines, and 70 actual-Index routes. All retained lines have split reverse coverage at `634 exact + 67 non-exact variants`. The asset fixed point closes 577 physical JPEGs at `363 direct / 198 relation / 16 control`, with 577 monolith references, 575 split references, two explicit split omissions, and 577 unique hashes.
+
+T08 is not an execution construction. It adds typed exact configurations, deterministic constructors, schema-scoped classes, probability laws, complete/cylinder/algorithmic realization records, validation, finite computation lowerings, transforms, traces, and observers over an unchanged resolved program. A native request always binds one validated complete `X_0`; finite cylinders cannot seed native infinite runs; algorithmic fields are not silently equated with ideal product-measure draws; derived work traces cannot masquerade as native traces; and any work phase is visible or explicitly nonautonomous rather than hidden executor state. D121 is ACTIVE. Source and asset oracles pass from the repository root and `/tmp`, the asset oracle fails closed under `-O`, the dependency-free semantic oracle and hostile architecture review pass, Markdown/diff/scope gates are clean, and all 102 repository tests pass. No prior stage reopens. T10 is next.
