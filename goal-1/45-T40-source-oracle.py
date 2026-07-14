@@ -124,7 +124,9 @@ QUERIES = {
     ),
     "Q15": r"_page_(?:151_Figure_7|154_Figure_2|156_Figure_1)\.jpeg",
     "Q16": (
-        r"_page_(?:150_Figure_[1-5]|575_Figure_5|576_Figure_4|"
+        r"_page_(?:98_Figure_2|99_(?:Figure_1|Picture_4)|132_Figure_10|"
+        r"150_Figure_[1-5]|575_Figure_5|576_Figure_4|609_Picture_2|"
+        r"776_Figure_2|"
         r"161_Figure_1|162_Figure_1|884_Figure_30|960_Figure_3|1099_Figure_1|"
         r"923_Figure_21|926_Figure_14|986_Picture_[4-8]|"
         r"1106_Picture_4|1108_Figure_13|1109_Picture_[56]|"
@@ -202,7 +204,8 @@ QUERY_NATIVE = line_set(
     "13086,13090"
 )
 QUERY_RELATION = line_set(
-    "654,1846,1850,1852,1854,1856,6768,6772,6776,"
+    "654,998,1008,1014,1449,1846,1850,1852,1854,1856,"
+    "6768,6772,6776,7116,"
     "11252,11260,11531,11532,11536,"
     "12503,12515,12524,12532,12536,12550,12552,12554,12555,12557,12569,"
     "12984,12986,12988,12990,"
@@ -213,7 +216,7 @@ QUERY_RELATION = line_set(
     "17236,17599,17762,17851,17876,17878,20507,20588,20592,20594,20596,20598"
 )
 QUERY_CONTROL = line_set(
-    "1619,1834,12846,13134,13146,17101,19058,19074,19076,19078,19080"
+    "1619,1834,9246,12846,13134,13146,17101,19058,19074,19076,19078,19080"
 )
 
 EXCLUDED_CLASS = {
@@ -632,13 +635,14 @@ NATIVE_IMAGE_LINES = line_set(
     "1677,1711,1744,12960,13040,13042,13044,13046,13048,13050,13090"
 )
 RELATION_IMAGE_LINES = line_set(
-    "1846,1854,6768,6776,11252,12524,12552,12557,12992,12996,13000,13020,"
+    "998,1008,1014,1449,1846,1854,6768,6776,7116,11252,"
+    "12524,12552,12557,12992,12996,13000,13020,"
     "13076,13094,13098,14176,14925,14927,14929,14931,14933,17762,"
     "17876,17878,"
     "20588,20594,20596,20598,"
     "13119,13121,13123,13125,13127,17167,17171"
 )
-CONTROL_IMAGE_LINES = line_set("13134")
+CONTROL_IMAGE_LINES = line_set("9246,13134")
 GOVERNED_IMAGE_LINES = (
     NATIVE_IMAGE_LINES | RELATION_IMAGE_LINES | CONTROL_IMAGE_LINES
 )
@@ -649,6 +653,10 @@ CANDIDATE_IMAGE_LINES = GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
 UNRESOLVED_IMAGE_LINES = frozenset()
 
 IMAGE_ROLE_RECORDS = (
+    "998:relation:page83 neighbor-independent substitution source observer",
+    "1008:relation:page84 substitution-tree source observer",
+    "1014:relation:page84 substitution-branch source observer",
+    "1449:relation:page117 nested binary-digit source observer",
     "1677:native:page151 pi base-two walk observer",
     "1711:native:page154 rational long-division work panels",
     "1744:native:page156 square-root product-state work panels",
@@ -661,6 +669,8 @@ IMAGE_ROLE_RECORDS = (
     "1854:relation:page162 continued-fraction-driven substitution observer",
     "6768:relation:page560 unary binary self-delimiting and Fibonacci representation observer",
     "6776:relation:page561 run-length application of page560 representation-e observer",
+    "7116:relation:page609 block-frequency composite observer invoked by page594 Sturmian span",
+    "9246:control:page776 Turing-complexity observer invoked by page761 resource boundary",
     "11252:relation:page884 cellular-automaton Cantor-map representation observer",
     "12524:relation:page916 Gray-code representation observer",
     "12552:relation:page917 negative-base representation observer",
@@ -708,6 +718,7 @@ IMAGE_ROLE_RECORDS = (
     "20598:relation:page1201 Thue-Morse minimal-CA observer",
 )
 IMAGE_ASSEMBLY_BOUNDARIES = (
+    "cross-page-substitution:998,1008,1014,1449 are explicitly invoked by retained digit-codec relations",
     "page560-561:6768,6776 form representation and downstream run-length application observers",
     "continuation-assets:1846,1854,11252,14176 are governed by retained adjacent relation spans",
     "excluded-asset:17593 is a least-squares sibling observer, not the later Sturmian span",
@@ -716,6 +727,7 @@ IMAGE_ASSEMBLY_BOUNDARIES = (
     "page1201:20588,20594,20596,20598 govern minimal-CA sequence context and three targets",
     "page1106:17762 is a composite transformation observer, not a T40 digit generator",
     "page1109:17876,17878 compare whole-prefix methods despite a one-digit query",
+    "cross-page-boundaries:7116 and 9246 are invoked Sturmian and resource-control observers",
     "page916-918:12524,12552,12557 are governed representation-relation assets",
     "page928:12992,12996,13000 form the concatenation-walk trilogy",
     "page929:13040,13042,13044,13046,13048,13050 form six residual panels",
@@ -723,7 +735,7 @@ IMAGE_ASSEMBLY_BOUNDARIES = (
     "page931:13119,13121,13123,13125,13127 form five digital-slope panels",
     "main:1711 and 1744 have physical files but no split Markdown references",
     "paths:monolith references omit Images while split references include it",
-    "boundary:all 35 assets are hash-bound and supply no pixel-derived mechanics",
+    "boundary:all 63 candidate assets are hash-bound and supply no pixel-derived mechanics",
 )
 
 
@@ -1026,6 +1038,7 @@ AUXILIARY_SEMANTIC_GUARDS = (
 )
 
 SOURCE_DEFECT_RECORDS = (
+    "BOOK654->656:pi-complexity sentence is interrupted by extraction whitespace",
     "BOOK1681:caption promises 4000 decimal digits but extraction contains only a prefix",
     "BOOK1683:caption promises 4000 binary digits but extraction is short and has extra separators",
     "BOOK1733:extracted sqrt-two binary row agrees for 32 zero-based bits then diverges from exact isqrt replay",
@@ -1034,6 +1047,7 @@ SOURCE_DEFECT_RECORDS = (
     "BOOK1750->1774:sentence is interrupted by page extraction and resumes later",
     "BOOK1782:base-two nested construction is runaway and truncated",
     "BOOK1798->1830:sentence is interrupted by table extraction and resumes later",
+    "BOOK1852->1858:continued-fraction sentence is interrupted by a raster and caption",
     "BOOK1821:e-squared label is corrupted to a euro glyph",
     "BOOK12935:missing newline joins two pi algorithms",
     "BOOK12946-12948:direct-digit code is split by an empty extraction row",
@@ -1046,6 +1060,10 @@ SOURCE_DEFECT_RECORDS = (
     "BOOK13070->13072:continued-fraction sentence is split across extraction rows",
     "BOOK13084:sentence ends at randomly and has no extracted completion",
     "BOOK13103->13105:nested-radical sentence is split across extraction rows",
+    "BOOK11256->11260:CA digit-map sentence is interrupted by an unrelated Page 26 note",
+    "BOOK17597->17599:Sturmian block-frequency sentence is split across extraction rows",
+    "BOOK19087->19089:constructible-real sentence is split across extraction rows",
+    "BOOK19526->19528:P-versus-NP sentence is split across extraction rows",
     "split-main:chapter file is an abridged summary and omits long-division and square-root mechanics",
     "image-paths:monolith omits Images directory while split corpus includes it",
     "split-routing:nominal BACK-MATTER/Index contains Notes rather than the actual flattened Index",
@@ -1063,7 +1081,8 @@ SOURCE_MODEL_RECORDS = (
     "positional:base at least two and digit coefficients bounded by base",
     "positional-source:whole and fractional encoders expose quotient or residual iteration and explicit inverses",
     "positional-canonical:terminating rational uses infinite zero tail not eventual base-minus-one tail",
-    "representation-relations:unary negative-base non-power Zeckendorff and multiplicative forms are scoped siblings not strict presets",
+    "representation-relations:unary length-prefixed binary-coded-base3 Fibonacci negative-base non-power Zeckendorff and multiplicative forms are scoped siblings not strict presets",
+    "representation-codec-properties:self-delimitation uniqueness length completeness and distribution are typed invariants or observers",
     "continued-fraction:integer coefficients are unbounded",
     "continued-fraction-canonical:finite tail has final coefficient greater than one when length exceeds one",
     "continued-fraction-seam:arbitrary irrational h exposes signed Floor[h] integer part and substitution rules from remaining coefficients",
@@ -1076,7 +1095,10 @@ SOURCE_MODEL_RECORDS = (
     "work-square-root:literal source profile is integer-safe; rational repair is a sibling",
     "work-continued-fraction:explicit exact scalar fractional-reciprocal iteration with finite completion",
     "direct-access:nth coefficient evaluator need not fabricate preceding append events",
+    "direct-access:some evaluator methods still require a whole prefix and return a typed resource outcome",
     "computability:exact definition alone does not guarantee executable coefficient access",
+    "computability:arbitrary real carriers primitives and oracle-like initial digits require explicit constructive authority",
+    "cardinality:infinite digit carriers are not finitely stored configurations without a constructive representation",
     "source-strength:finite-precision overwhelming probability is not exact certification",
     "architecture:no ConstantDigitsState T40 update executor runner branch family dispatch or callback",
     "architecture:optional work algorithms reuse existing SimplePrograms axes and branch-free runner",
@@ -1088,8 +1110,10 @@ SOURCE_MODEL_RECORDS = (
     "boundary:T41 supplies immutable closed-definition and query responsibilities",
     "boundary:T42 consumes coefficients but owns substitution evolution",
     "boundary:T43 scalar feedback maps can realize positional and continued-fraction queries",
+    "boundary:T42 substitution and Sturmian observers consume digit or continued-fraction results without becoming T40 execution",
     "domain-vocabulary:DOMAIN means t plus dimensional task support not CA family",
     "source-epistemic:catalog taxonomy and atlas supply vocabulary rather than primary mechanics",
+    "source-closure:Book-wide direct vocabulary and fixed Index rows are independently dispositioned",
 )
 
 
@@ -1124,6 +1148,10 @@ SPLIT_MAIN_SUMMARY_OWNERS = {
     1828: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:287",
     1830: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:289",
     1832: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:291",
+}
+SPLIT_RELATION_SUMMARY_OWNERS = {
+    654: "CHAPTERS/2-The-Crucial-Experiment/The-Crucial-Experiment.md:237",
+    656: "CHAPTERS/2-The-Crucial-Experiment/The-Crucial-Experiment.md:237",
 }
 SPLIT_OMISSION_GROUPS = {
     "abridged-repeating-digit-table": line_set("1702-1704"),
@@ -1201,6 +1229,41 @@ EXPECTED_EXCLUDED_CLASS = {
     "unrelated_representation_context": (1, "45113af9c39c6636107b96fcdc1037686173b60eec2b3f4561b2d7d7b6c1252f"),
     "generic_algorithm_cross_reference": (3, "0af5fb1f1971b936e8052cc34fe7605caf6f6916a28992ff9485914a39d55704"),
 }
+EXPECTED_BOOK_BROAD = {
+    "candidate": (309, "f8616458a4770352e42c8f8aeaa4d27033a6758e048885e88547ea044d3a90fc"),
+    "pre_index": (242, "119434cf29172056756ec9b395ad8626004b5f405697eb9a4f92b562b507001e"),
+    "index": (67, "cfbcf2b55bf813269371bcd9fc210c3f30600eb3e087ae127a128e191d16555b"),
+    "retained": (110, "47066b70839f1acb79870788aef8ac403186192bd900b5e11bb4e829f0f50058"),
+    "query_excluded": (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+    "broad_excluded": (132, "b829a526b8ff53a1f4f8d86bd0b515e5ff885e6fb2c1be74c829261b9e94d942"),
+}
+EXPECTED_BOOK_BROAD_PATTERN_DIGEST = (
+    "989b777b2985b7f3f604f439214479145fe87f2e8d2b3791b8298ee63b830815"
+)
+EXPECTED_BOOK_BROAD_EXCLUSION_CLASS = {
+    "chaos-physical-sampling-observers": (16, "3db508b06d1f1f938318bd3488d3615471e3066d6fa4cbf95e4b4710bbef0b07"),
+    "compression-crypto-computation-siblings": (28, "c0d5666d150ddc0598465616cf67de93f344c72c859a1fec01472ff514508833"),
+    "downstream-philosophical-compression-siblings": (8, "a8337d93180c92a8529217ca3041701463ff64c0e85f76444df777431bddcdac"),
+    "generic-complexity-cost-analogies": (2, "9153b98abebd3edccfca9c2be550748a98bba220bc57f63b576fa353b9bb6583"),
+    "other-simple-program-coordinate-encodings": (3, "cda34754ceb647e6a204884d98188a6b9fd64a36821b92be88fcb2dde6783f0e"),
+    "rule-machine-code-carriers": (7, "bb61d745deb05dc59c4822f4cc3f2c4d89fc79714ae559328f08c254dc4548e1"),
+    "sibling-type-notes-before-t40": (13, "4f0b383579ada8269eb8fa030fe576960b67422e977cf9590c243921690ccd87"),
+    "t36-t37-number-evolution-siblings": (19, "60cf2d6e7513e3ba54ff6c462e8d706a4d03d8e09ff6c6f5edacfba34b53927a"),
+    "t43-ca-sibling-notes": (19, "24ba31ee9a1b0b25770ced215099ee474313a754b021d7ca288d994c3047121d"),
+    "t43-iterated-map-work-siblings": (17, "16914fa3ace33bdb24bbced53ecd8e8fd85f27f0a8d75d3fa1511e7a0e5ee183"),
+}
+EXPECTED_BOOK_BROAD_DISPOSITIONS = (
+    309,
+    "8ce26c09fefa4c7815a12765f8b20f8511990b68d57999347ce61b786dcb8bef",
+)
+EXPECTED_BOOK_BROAD_EXCLUSION_RECORDS = (
+    132,
+    "47ecf4cab81624f99c2aaf7840f62cd59dfc56d7bfa9fc40ff272b4509cb8b97",
+)
+EXPECTED_SOURCE_SPAN_EXCLUSION_RECORDS = (
+    3,
+    "27f2208c664055bcb55380b1879a6679a020b7e76eda7e9ce97ad00a1f21a37d",
+)
 EXPECTED_INDEX_CLASS = {
     "native": (30, "3b16acd55987dcf28f7ed4b681251e34c2e0bc176b3cb6b255450b18f735f181"),
     "relation": (99, "b21507eb0f288c514f0ec949094228be53f17b5d936f96a79f6214ba99a0837c"),
@@ -1295,6 +1358,9 @@ EXPECTED_SOURCE_DEFECT_GUARDS = (
     "833c24e7f3c44bc2737a48dc6cbc4a3cb02caf3cfc1d62d372b9ce42973753b2",
 )
 EXPECTED_RECORDS = {
+    "book_broad_dispositions": EXPECTED_BOOK_BROAD_DISPOSITIONS,
+    "book_broad_exclusions": EXPECTED_BOOK_BROAD_EXCLUSION_RECORDS,
+    "source_span_exclusions": EXPECTED_SOURCE_SPAN_EXCLUSION_RECORDS,
     "excluded_line_hashes": (5, "d3b3134fe2e22ca121f65e3617dce002e45e1880600c264b4c5a100d9614efef"),
     "index_guards": (131, "f1c4bc047a578f6d75c530b5b9145a25e838b6ff76024ca3757d137d5575bf44"),
     "index_excluded_guards": (16, "473fe5dcba32ca177fe1913efb1879f35f72492ee7fd3b2f9fe231025c20382b"),
@@ -1389,15 +1455,74 @@ def crosswalk_evidence(monolith: str, split: str) -> tuple[str, float]:
 
 
 def split_owner_record(line_no: int) -> str:
+    if line_no in {998, 1008, 1014}:
+        return (
+            "CHAPTERS/3-The-World-of-Simple-Programs/"
+            f"The-World-of-Simple-Programs.md:{line_no - 683}"
+        )
+    if line_no == 1449:
+        return (
+            "CHAPTERS/4-Systems-Based-on-Numbers/"
+            "Systems-Based-on-Numbers.md:53"
+        )
     if line_no in SPLIT_MAIN_DIRECT_OWNERS:
         return SPLIT_MAIN_DIRECT_OWNERS[line_no]
     if line_no in SPLIT_MAIN_SUMMARY_OWNERS:
         return SPLIT_MAIN_SUMMARY_OWNERS[line_no]
+    if line_no in SPLIT_RELATION_SUMMARY_OWNERS:
+        return SPLIT_RELATION_SUMMARY_OWNERS[line_no]
+    if 1846 <= line_no <= 1858:
+        return (
+            "CHAPTERS/4-Systems-Based-on-Numbers/"
+            f"Systems-Based-on-Numbers.md:{line_no - 1541}"
+        )
+    if 6766 <= line_no <= 6782:
+        return (
+            "CHAPTERS/10-Processes-of-Perception-and-Analysis/"
+            f"Processes-of-Perception-and-Analysis.md:{line_no - 6587}"
+        )
+    if line_no == 7116:
+        return (
+            "CHAPTERS/10-Processes-of-Perception-and-Analysis/"
+            "Processes-of-Perception-and-Analysis.md:527"
+        )
+    if line_no == 9246:
+        return (
+            "CHAPTERS/12-The-Principle-of-Computational-Equivalence/"
+            "The-Principle-of-Computational-Equivalence.md:629"
+        )
+    if 11250 <= line_no <= 11260 or 11531 <= line_no <= 11536:
+        return (
+            "CHAPTERS/12-The-Principle-of-Computational-Equivalence/"
+            "The-Principle-of-Computational-Equivalence.md:"
+            f"{line_no - 8619}"
+        )
+    if 12194 <= line_no <= 12206:
+        return f"BACK-MATTER/Index/Index.md:{line_no - 12089}"
     if 12919 <= line_no <= 13146:
         return f"BACK-MATTER/Index/Index.md:{line_no - 12097}"
-    if line_no in {14172, 14468, 14923, 17101, 17236}:
+    if line_no == 13219:
+        return f"BACK-MATTER/Index/Index.md:{line_no - 12097}"
+    if line_no in {
+        14170,
+        14172,
+        14174,
+        14176,
+        14468,
+        14923,
+        14925,
+        14927,
+        14929,
+        14931,
+        14933,
+        15517,
+        17101,
+        17105,
+        17107,
+        17236,
+    } or 17130 <= line_no <= 17234:
         return f"BACK-MATTER/Index/Index.md:{line_no - 12099}"
-    if line_no in {17599, 17851, 19058, 20507, 20592} or line_no >= INDEX_FIRST_LINE:
+    if line_no >= 17597:
         return f"BACK-MATTER/Colophon/Colophon.md:{line_no - 17443}"
     chapter_12 = {11260: 2641, 11531: 2912}
     if line_no in chapter_12:
@@ -1839,6 +1964,144 @@ def main(argv: list[str] | None = None) -> int:
     )
     check("index_partition", index_ok, index_unresolved)
 
+    book_broad_candidates = {
+        number
+        for number, line in enumerate(lines, 1)
+        if re.search(BOOK_BROAD_VOCABULARY_PATTERN, line, re.IGNORECASE)
+    }
+    book_broad_pre_index = {
+        number for number in book_broad_candidates if number < INDEX_FIRST_LINE
+    }
+    book_broad_index = book_broad_candidates - book_broad_pre_index
+    book_broad_sets = {
+        "candidate": book_broad_candidates,
+        "pre_index": book_broad_pre_index,
+        "index": book_broad_index,
+        "retained": book_broad_candidates & set(RETAINED),
+        "query_excluded": book_broad_candidates & set(EXCLUDED),
+        "broad_excluded": book_broad_candidates & set(BOOK_BROAD_EXCLUDED),
+    }
+    book_broad_pre_partition = (
+        NATIVE_EVIDENCE,
+        RELATION_EVIDENCE,
+        CONTROL_EVIDENCE,
+        EXCLUDED,
+        BOOK_BROAD_EXCLUDED,
+    )
+    book_broad_pre_union = set().union(
+        *(set(values) & book_broad_pre_index for values in book_broad_pre_partition)
+    )
+    book_broad_pre_overlap = sum(
+        len(set(values) & book_broad_pre_index)
+        for values in book_broad_pre_partition
+    ) - len(book_broad_pre_union)
+    book_broad_unexplained = (
+        book_broad_pre_index - book_broad_pre_union
+    ) | (book_broad_index - set(INDEX_ROUTED))
+    book_broad_pattern_actual = digest_records({BOOK_BROAD_VOCABULARY_PATTERN})
+    book_broad_ok = (
+        set(book_broad_sets) == set(EXPECTED_BOOK_BROAD)
+        and book_broad_pattern_actual == EXPECTED_BOOK_BROAD_PATTERN_DIGEST
+        and set(BOOK_BROAD_EXCLUSION_CLASS)
+        == set(EXPECTED_BOOK_BROAD_EXCLUSION_CLASS)
+        and frozenset().union(*BOOK_BROAD_EXCLUSION_CLASS.values())
+        == BOOK_BROAD_EXCLUDED
+        and sum(map(len, BOOK_BROAD_EXCLUSION_CLASS.values()))
+        == len(BOOK_BROAD_EXCLUDED)
+        and book_broad_pre_union == book_broad_pre_index
+        and book_broad_pre_overlap == 0
+        and book_broad_index <= set(INDEX_ROUTED)
+        and not book_broad_unexplained
+        and not BOOK_BROAD_EXCLUDED & RETAINED
+        and not BOOK_BROAD_EXCLUDED & EXCLUDED
+    )
+    for name, values in book_broad_sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_BOOK_BROAD.get(name)
+        book_broad_ok &= good
+        check("book_broad_" + name, good, *actual)
+    for name, values in BOOK_BROAD_EXCLUSION_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_BOOK_BROAD_EXCLUSION_CLASS.get(name)
+        book_broad_ok &= good
+        check("book_broad_excluded_" + name, good, *actual)
+    check(
+        "book_broad_pattern",
+        book_broad_pattern_actual == EXPECTED_BOOK_BROAD_PATTERN_DIGEST,
+        book_broad_pattern_actual,
+    )
+
+    book_broad_roles: dict[int, str] = {}
+    for role, values in (
+        ("native", NATIVE_EVIDENCE),
+        ("relation", RELATION_EVIDENCE),
+        ("control", CONTROL_EVIDENCE),
+        ("query-excluded", EXCLUDED),
+        ("broad-excluded", BOOK_BROAD_EXCLUDED),
+    ):
+        for number in book_broad_pre_index & set(values):
+            book_broad_roles[number] = role
+    for role, values in index_disposition.items():
+        for number in book_broad_index & set(values):
+            book_broad_roles[number] = "index-" + role
+    book_broad_disposition_records = {
+        f"{book_broad_roles[number]}:{number}:"
+        f"{hashlib.sha256(at(number).encode('utf-8')).hexdigest()}"
+        for number in book_broad_candidates
+        if number in book_broad_roles
+    }
+    book_broad_disposition_actual = (
+        len(book_broad_disposition_records),
+        digest_records(book_broad_disposition_records),
+    )
+    book_broad_ok &= (
+        len(book_broad_roles) == len(book_broad_candidates)
+        and book_broad_disposition_actual == EXPECTED_BOOK_BROAD_DISPOSITIONS
+    )
+    check(
+        "book_broad_dispositions",
+        book_broad_disposition_actual == EXPECTED_BOOK_BROAD_DISPOSITIONS,
+        *book_broad_disposition_actual,
+    )
+    check("book_broad_closure", book_broad_ok, len(book_broad_unexplained))
+
+    book_broad_exclusion_records = {
+        f"{reason}:{number}:"
+        f"{hashlib.sha256(at(number).encode('utf-8')).hexdigest()}"
+        for reason, values in BOOK_BROAD_EXCLUSION_CLASS.items()
+        for number in values
+    }
+    source_span_exclusion_records = {
+        f"{reason}:{number}:"
+        f"{hashlib.sha256(at(number).encode('utf-8')).hexdigest()}"
+        for reason, values in SOURCE_SPAN_EXCLUSION_CLASS.items()
+        for number in values
+    }
+    source_span_ok = (
+        set(SOURCE_SPAN_EXCLUSION_GUARDS) == set(SOURCE_SPAN_EXCLUDED)
+        and frozenset().union(*SOURCE_SPAN_EXCLUSION_CLASS.values())
+        == SOURCE_SPAN_EXCLUDED
+        and sum(map(len, SOURCE_SPAN_EXCLUSION_CLASS.values()))
+        == len(SOURCE_SPAN_EXCLUDED)
+        and not SOURCE_SPAN_EXCLUDED & RETAINED
+        and not SOURCE_SPAN_EXCLUDED & EXCLUDED
+        and all(
+            all(needle in at(number) for needle in needles)
+            for number, needles in SOURCE_SPAN_EXCLUSION_GUARDS.items()
+        )
+        and (
+            len(book_broad_exclusion_records),
+            digest_records(book_broad_exclusion_records),
+        )
+        == EXPECTED_BOOK_BROAD_EXCLUSION_RECORDS
+        and (
+            len(source_span_exclusion_records),
+            digest_records(source_span_exclusion_records),
+        )
+        == EXPECTED_SOURCE_SPAN_EXCLUSION_RECORDS
+    )
+    check("source_span_exclusions", source_span_ok, len(SOURCE_SPAN_EXCLUDED))
+
     semantic_records = set(SOURCE_SEMANTIC_GUARD_RECORDS)
     semantic_actual = (len(semantic_records), digest_records(semantic_records))
     semantic_ok = (
@@ -1903,6 +2166,15 @@ def main(argv: list[str] | None = None) -> int:
         for number in values
     }
     record_actuals = {
+        "book_broad_dispositions": book_broad_disposition_actual,
+        "book_broad_exclusions": (
+            len(book_broad_exclusion_records),
+            digest_records(book_broad_exclusion_records),
+        ),
+        "source_span_exclusions": (
+            len(source_span_exclusion_records),
+            digest_records(source_span_exclusion_records),
+        ),
         "excluded_line_hashes": (len(excluded_hash_records), digest_records(excluded_hash_records)),
         "index_guards": (len(index_records), digest_records(index_records)),
         "index_excluded_guards": (
@@ -1939,6 +2211,8 @@ def main(argv: list[str] | None = None) -> int:
     record_ok &= (
         semantic_ok
         and auxiliary_ok
+        and book_broad_ok
+        and source_span_ok
         and SOURCE_DEFECT_GUARD_RECORDS == frozenset(SOURCE_DEFECT_RECORDS)
         and len(SOURCE_DEFECT_RECORDS) == len(SOURCE_DEFECT_GUARD_RECORDS)
         and len(SOURCE_MODEL_RECORDS) == len(set(SOURCE_MODEL_RECORDS))
@@ -1946,6 +2220,7 @@ def main(argv: list[str] | None = None) -> int:
         and len(omission_records) == len(SPLIT_OMISSION_LINES)
         and sum(map(len, SPLIT_OMISSION_GROUPS.values())) == len(SPLIT_OMISSION_LINES)
         and set(SPLIT_MAIN_SUMMARY_OWNERS) <= set(STRICT_MAIN_CONTENT)
+        and set(SPLIT_RELATION_SUMMARY_OWNERS) <= set(RETAINED)
         and SPLIT_OMISSION_LINES
         == STRICT_MAIN_CONTENT
         - set(SPLIT_MAIN_DIRECT_OWNERS)
@@ -2051,7 +2326,7 @@ def main(argv: list[str] | None = None) -> int:
             if owner not in split_text:
                 split_join_ok = False
                 continue
-            if number in SPLIT_MAIN_SUMMARY_OWNERS:
+            if number in SPLIT_MAIN_SUMMARY_OWNERS or number in SPLIT_RELATION_SUMMARY_OWNERS:
                 mode = "SUMMARY"
                 score = 1.0
             else:
@@ -2084,7 +2359,8 @@ def main(argv: list[str] | None = None) -> int:
         and set().union(*class_lines.values()) == set(crosswalk_lines)
         and sum(map(len, class_lines.values())) == len(crosswalk_lines)
         and SPLIT_OMISSION_LINES == class_lines["OMITTED"]
-        and set(SPLIT_MAIN_SUMMARY_OWNERS) == class_lines["SUMMARY"]
+        and set(SPLIT_MAIN_SUMMARY_OWNERS) | set(SPLIT_RELATION_SUMMARY_OWNERS)
+        == class_lines["SUMMARY"]
     )
     check("split_crosswalk", split_join_ok, *crosswalk_actual, f"normalized_min={normalized_minimum:.6f}")
     for name, actual in class_actual.items():
@@ -2097,6 +2373,8 @@ def main(argv: list[str] | None = None) -> int:
 
     unresolved_total = (
         len(pre_index ^ set().union(*query_partition))
+        + len(book_broad_unexplained)
+        + (len(book_broad_candidates) - len(book_broad_roles))
         + strict_unresolved
         + strict_notes_unresolved
         + index_unresolved
@@ -2110,6 +2388,12 @@ def main(argv: list[str] | None = None) -> int:
         f"query:{name}:{len(values)}:{digest(values)}" for name, values in hits.items()
     } | {
         f"set:{name}:{len(values)}:{digest(values)}" for name, values in sets.items()
+    } | {
+        f"book-broad:{name}:{len(values)}:{digest(values)}"
+        for name, values in book_broad_sets.items()
+    } | {
+        f"book-broad-excluded:{name}:{len(values)}:{digest(values)}"
+        for name, values in BOOK_BROAD_EXCLUSION_CLASS.items()
     } | {
         f"record:{name}:{count}:{record_digest}"
         for name, (count, record_digest) in record_actuals.items()
@@ -2136,6 +2420,9 @@ def main(argv: list[str] | None = None) -> int:
         f"index-audit-candidates:{index_audit_candidate_actual[0]}:{index_audit_candidate_actual[1]}",
         f"index-pattern:{index_pattern_actual}",
         f"index-candidate-unexplained:{len(index_candidate_unexplained)}",
+        f"book-broad-pattern:{book_broad_pattern_actual}",
+        f"book-broad-dispositions:{book_broad_disposition_actual[0]}:{book_broad_disposition_actual[1]}",
+        f"book-broad-unexplained:{len(book_broad_unexplained)}",
         f"strict-unresolved:{strict_unresolved}",
         f"strict-notes-unresolved:{strict_notes_unresolved}",
         f"index-unresolved:{index_unresolved}",
@@ -2160,6 +2447,14 @@ def main(argv: list[str] | None = None) -> int:
                 "native": len(NATIVE_IMAGE_LINES),
                 "relation": len(RELATION_IMAGE_LINES),
                 "unresolved": len(UNRESOLVED_IMAGE_LINES),
+            },
+            "book_broad": {
+                "candidate": len(book_broad_candidates),
+                "excluded": len(BOOK_BROAD_EXCLUDED),
+                "index": len(book_broad_index),
+                "pre_index": len(book_broad_pre_index),
+                "retained": len(book_broad_candidates & set(RETAINED)),
+                "unresolved": len(book_broad_unexplained),
             },
             "queries": len(QUERIES),
             "query_union": len(union),
@@ -2200,6 +2495,10 @@ def main(argv: list[str] | None = None) -> int:
             "PASS" if ok else "FAIL",
             f"audit={audit_digest}",
             f"queries={len(QUERIES)}/union={len(union)}",
+            f"book-broad={len(book_broad_candidates)}(pre/index="
+            f"{len(book_broad_pre_index)}/{len(book_broad_index)},"
+            f"retained/excluded={len(book_broad_candidates & set(RETAINED))}/"
+            f"{len(BOOK_BROAD_EXCLUDED)},closure={len(book_broad_unexplained)})",
             f"retained={len(RETAINED)}",
             f"strict-main={len(STRICT_MAIN_CONTENT)}(N/S="
             f"{len(STRICT_MAIN_NATIVE)}/{len(STRICT_MAIN_STRUCTURAL)},closure={strict_unresolved})",

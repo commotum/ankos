@@ -1,0 +1,148 @@
+{
+  "protocol_version": "1.0.0",
+  "status": "PROTOCOL_FROZEN_SAMPLE_IDS_PENDING_STAGE_2",
+  "frozen_on": "2026-07-14",
+  "frozen_before_author_text_repairs": true,
+  "purpose": "Blind, reproducible evidence that the repaired edition matches the authoritative edition-identical witness; this sample supplements and never replaces total sequential review.",
+  "universe": {
+    "source": "goal-4/structure-ledger.jsonl",
+    "materialization_stage": 2,
+    "eligible_roles": [
+      "CANONICAL_AUTHOR_TEXT"
+    ],
+    "eligible_units": "Every deterministic raw author-text block assigned exactly once to one of the 29 canonical documents.",
+    "excluded_units": [
+      "GENERATED_METADATA",
+      "DERIVED_AGGREGATE",
+      "EDITORIAL_SIDECAR",
+      "SEARCH_DERIVATIVE"
+    ],
+    "exclusion_rule": "No authorial or illegible unit may be excluded. Any excluded unit needs an enumerated non-authorial reason and independent review."
+  },
+  "seed": {
+    "algorithm": "SHA-256",
+    "domain_separator": "ANKOS-GOAL4-HOLDOUT-v1\\u0000",
+    "manifest_material": "Canonical JSON of the ordered Stage 2 raw allowlist rows, retaining relative_path, role, byte_size, logical_line_count, and sha256 and using UTF-8, sorted object keys, compact separators, and no terminal newline.",
+    "seed_derivation": "sha256(domain_separator || manifest_material_utf8)",
+    "rank_derivation": "sha256(seed_bytes || UTF8('\\u0000' || canonical_document_id || '\\u0000' || risk_stratum || '\\u0000' || raw_block_id))",
+    "ordering": "Ascending unsigned 256-bit rank, then raw_block_id as a collision tie-breaker.",
+    "stage_2_outputs": [
+      "manifest_material_sha256",
+      "seed_sha256",
+      "rank for every eligible raw_block_id",
+      "the complete pre-repair ordered ranking per canonical document and risk stratum"
+    ]
+  },
+  "risk_strata": [
+    {
+      "id": "INDEX_COLUMN_OR_ENTRY",
+      "priority": 1,
+      "rule": "Any block assigned to the Index or containing an Index entry/subentry/cross-reference region."
+    },
+    {
+      "id": "FORMULA_CODE_RULE_OR_DATA",
+      "priority": 2,
+      "rule": "Any formula, code, fence, rule table, exact sequence, operator-rich datum, or technical-symbol block."
+    },
+    {
+      "id": "FIGURE_CAPTION_OR_VISUAL",
+      "priority": 3,
+      "rule": "Any image reference, caption, printed figure group, or text whose ordering/meaning depends on a visual region."
+    },
+    {
+      "id": "HEADING_LIST_OR_LAYOUT",
+      "priority": 4,
+      "rule": "Any heading, page furniture, list/table boundary, paragraph join, column-sensitive, or other structure-bearing block."
+    },
+    {
+      "id": "PROSE",
+      "priority": 5,
+      "rule": "Any remaining author-text block."
+    }
+  ],
+  "stratum_assignment": "Assign every eligible block to the first matching risk stratum by ascending priority; record all secondary risk tags separately.",
+  "sample_size": {
+    "minimum_fraction_per_document": 0.05,
+    "minimum_blocks_per_document": 20,
+    "small_document_rule": "Select all eligible blocks when a document has fewer than 20.",
+    "rounding": "ceil",
+    "risk_allocation": "Within each document, allocate the minimum sample proportionally by risk-stratum population using largest remainders, with at least one block from each nonempty high-risk stratum before PROSE when the document quota permits.",
+    "changed_unchanged_rule": "Stage 2 freezes the full ranked lists before repairs. After a repair-overlay digest is sealed, label every ranked block CHANGED or UNCHANGED without altering ranks. Select from each label by the frozen ranks, targeting an even split when both pools permit; include all members of a smaller pool and fill the remainder from the other. Never substitute a lower-ranked block based on its observed answer.",
+    "all_changed_review": "Every changed author-text block is reviewed outside the holdout whether or not selected; the holdout remains an independent quality projection."
+  },
+  "blind_protocol": {
+    "witness_transcription_timing": "For selected blocks, record the witness transcription, structure, technical tokens, Index order, and figure/caption association before the adjudicator sees raw OCR or proposed repaired text.",
+    "separation": "The witness transcriber/adjudicator identity must differ from the repair creator for changed high-risk blocks.",
+    "blinding": "Do not disclose CHANGED/UNCHANGED label, candidate detector output, raw OCR, or proposed repair until the witness decision and evidence-view hash are sealed.",
+    "disagreement": "Any disagreement is recorded, independently adjudicated, and blocks closure until resolved from authoritative evidence.",
+    "human_claims": "Record HUMAN only when a human actually performed the review; otherwise record the exact agent or automated reviewer type."
+  },
+  "severity": [
+    {
+      "id": "S0_SOURCE_OR_COVERAGE_BLOCKER",
+      "definition": "Missing, illegible, untranscribed, unowned, or unreviewed authorial page region; unknown edition identity; or a gap/overlap in raw, witness, or repaired provenance.",
+      "full_release_blocker": true
+    },
+    {
+      "id": "S1_SEMANTIC_OR_ORDER_ERROR",
+      "definition": "A mismatch that can change meaning, including a formula/code/data token, Index order, figure/caption ownership, omitted content, duplicated content, or wrong structural boundary.",
+      "full_release_blocker": true
+    },
+    {
+      "id": "S2_TEXT_OR_LAYOUT_FIDELITY_ERROR",
+      "definition": "Any other author-text character, punctuation, typography, paragraph/list/heading, or source-significant layout mismatch.",
+      "full_release_blocker": true
+    },
+    {
+      "id": "S3_REQUIRED_RELEASE_MECHANICS_ERROR",
+      "definition": "Broken required navigation, provenance, reversibility, reproducibility, governed asset, role separation, or compatibility behavior without an author-text mismatch.",
+      "full_release_blocker": true
+    },
+    {
+      "id": "S4_OPTIONAL_EDITORIAL_ENHANCEMENT",
+      "definition": "Optional non-authorial enhancement such as additional editorial commentary or alt-text refinement that is explicitly outside canonical author text.",
+      "full_release_blocker": false
+    }
+  ],
+  "metrics": {
+    "author_text_character_projection_exactness": {
+      "definition": "Exact Unicode scalar sequence after removing only manifest-typed generated metadata; no normalization, case folding, or whitespace folding.",
+      "minimum": 1.0
+    },
+    "author_text_cer": {
+      "definition": "Levenshtein character errors divided by authoritative witness character count, reported in addition to exactness.",
+      "maximum": 0.0
+    },
+    "author_text_wer": {
+      "definition": "Whitespace-token Levenshtein errors divided by authoritative witness token count, reported in addition to exactness.",
+      "maximum": 0.0
+    },
+    "heading_paragraph_list_boundary_exactness": {
+      "minimum": 1.0
+    },
+    "technical_token_exactness": {
+      "minimum": 1.0
+    },
+    "index_entry_column_sequence_exactness": {
+      "minimum": 1.0
+    },
+    "figure_caption_association_exactness": {
+      "minimum": 1.0
+    },
+    "known_defect_and_seeded_mutation_recall": {
+      "minimum": 1.0
+    }
+  },
+  "fixed_point": {
+    "required_consecutive_full_rounds_without_new_defect_class": 2,
+    "open_queue_limit": 0,
+    "restart_rule": "Discovery of a new defect class resets the consecutive-round count after a detector/manual protocol for that class is added and rerun across all 29 documents."
+  },
+  "anti_post_hoc_rules": [
+    "Do not change the seed, rankings, quotas, severity definitions, metrics, or thresholds after inspecting repair results.",
+    "A protocol change reopens Stage 1 and invalidates all downstream sample claims until samples are rematerialized before further repair review.",
+    "Tests and detector success do not substitute for the blind authoritative-witness comparison."
+  ],
+  "materialized_sample": null,
+  "results": null
+}
