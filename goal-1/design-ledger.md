@@ -226,7 +226,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: ACTIVE after architecture correction.
 - Basis: each T09 table entry returns new active-cell value plus displacement, and `MAStep` returns the changed field and relocated control together (`BOOK:11960-11970`); T12 also changes control payload (`BOOK:12014-12023`).
-- Consequence: the compact T09/T12 tuples lower to ordinary typed label writes at source/destination and commit from one old snapshot. Atomicity is required; `TransitionControl` is not. Other block/span/tree/bag/graph/set-valued replacements remain closed RULE-result/UPDATE-axis variants inside the same runner.
+- Consequence: the compact T09/T12 tuples become typed source-assignment plus marker/head-movement writes. RULE sees only its native NEIGHBORHOOD; it does not acquire candidate-destination labels merely to manufacture complete patches. `UPDATE.apply(configuration,active,writes)` resolves the selected topology port, preserves the old destination label from that snapshot, applies the source write and tag movement atomically, and validates the successor invariant. A concrete source/destination label batch is an optional commuting lowering, not the native RULE contract. Atomicity is required; `TransitionControl` is not. Other block/span/tree/bag/graph/set-valued replacements remain closed RULE-result/UPDATE-axis variants inside the same runner.
 
 ### D012 — Ordered read codec is shared across T01 and T09
 

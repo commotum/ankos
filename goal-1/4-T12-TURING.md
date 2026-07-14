@@ -274,8 +274,8 @@ source = unique Head(q,symbol) locus selected by FRONTIER
 (next_state, write, move) = table[(q, symbol)]
 
 writes = {
-  source: Plain(write),
-  source+move: Head(next_state, old_symbol[source+move])
+  AssignSource(write),
+  MoveHead(next_state, move)
 }
 next = UPDATE.apply(configuration, source, writes)
 ```
@@ -286,7 +286,7 @@ next = UPDATE.apply(configuration, source, writes)
 | Alphabet roles | Independent finite `Sigma` symbol and `Q` head-state factors inside `Plain(sigma) \| Head(q,sigma)`. Blank is a distinguished seed/default symbol. |
 | Source/read | `UniqueTag("head")`; the compact rule gets only `q` and the symbol in the head label. Neighbor symbols cannot affect rule choice. |
 | Rule | Complete unique table over `Q x Sigma`; named output fields `(next_state,write,move)`; `move in {-1,+1}` for base family. |
-| Result/update | The native tuple lowers to two composite-label writes applied atomically; all other labels and the destination's underlying symbol are preserved. |
+| Result/update | RULE yields typed source-assignment and head-movement writes. UPDATE resolves the selected port, preserves the old destination symbol from the configuration, and applies both atomically; a concrete two-label assignment batch is an optional commuting lowering. |
 | Successor | Exactly one successor for a running base state. No missing-row fallback or branch. |
 | Seed | Tape default/overrides, initial head state, and initial head position are episode inputs. Canonical blank is `(default=0,state=1,position=0)`. |
 | Boundary | None on `Z`. Finite list guard is a realization error boundary only; read boundaries cannot make writes/head motion unbounded. |
@@ -345,13 +345,13 @@ t12 q=3 h= 4 ones={-1,0,2,4,5}
 
 ### Commuting representation
 
-For factored state `(tape,h,q)`, define `E(tape,h,q)[x] = Head(q,tape[x])` when `x=h` and `Plain(tape[x])` otherwise. On exactly-one-head configurations, `E` is bijective. If `delta(q,tape[h])=(q_next,b,d)`, the two writes above satisfy
+For factored state `(tape,h,q)`, define `E(tape,h,q)[x] = Head(q,tape[x])` when `x=h` and `Plain(tape[x])` otherwise. On exactly-one-head configurations, `E` is bijective. If `delta(q,tape[h])=(q_next,b,d)`, the typed assignment/movement writes above satisfy
 
 ```text
 E(step_native(tape,h,q)) = step_tagged(E(tape,h,q)).
 ```
 
-This proves category-3 lossless reuse while preserving the compact `sk`-row program and `(2sk)^(sk)` count. A bare `Sigma union Q` is lossy; an arbitrary table over the `k(s+1)` composite labels is a different program. The native `delta` decision consumes only the tagged source's `(q,symbol)`, but its transparent two-write lowering also reads the possible radius-one destinations so it can retain the symbol under the moved head. A full-slice target-local lowering likewise needs only radius one.
+This proves category-3 lossless reuse while preserving the compact `sk`-row program and `(2sk)^(sk)` count. A bare `Sigma union Q` is lossy; an arbitrary table over the `k(s+1)` composite labels is a different program. The native `delta` decision and NEIGHBORHOOD consume only the tagged source's `(q,symbol)`. RULE returns `AssignSource(write)` plus `MoveHead(q_next,direction)`; UPDATE alone resolves the destination and preserves its old symbol. A full-slice target-local representation may expose a radius-one stencil, but that is an optional lowering rather than the native RULE contract.
 
 ### Corrected axis fit
 
@@ -359,9 +359,9 @@ This proves category-3 lossless reuse while preserving the compact `sk`-row prog
 |---|---|
 | DOMAIN/configuration | Reuse fixed ordered 1D support; add total sparse/default composite-labeled tape and exactly-one-head invariant |
 | FRONTIER | Reuse the broad rule-firing role; add/reuse `UniqueTag(head)` |
-| NEIGHBORHOOD | Radius-one structural access: project `(q,symbol)` at the tagged source for `delta`, then retain the selected destination label in the typed lowering |
-| RULE | Complete compact `Q x Sigma -> Q x Sigma x {L,R}` table plus structural two-write lowering |
-| UPDATE | Reuse old-snapshot atomic label-write commit; it does not reread or interpret Turing semantics, and validates one successor head |
+| NEIGHBORHOOD | Self-only structural access projecting `(q,symbol)` at the tagged source; no destination label is rule-visible |
+| RULE | Complete compact `Q x Sigma -> Q x Sigma x {L,R}` table yielding typed source assignment plus head movement |
+| UPDATE | Reuse old-snapshot atomic application; resolve the semantic movement port, preserve the old destination symbol, and validate one successor head |
 | Outcomes | Base total continuation, explicit terminal-head variant, external stops, horizons, and errors remain distinct |
 | Runner/trace | Shared branch-free runner; complete tagged tape snapshots and outcomes round-trip |
 
@@ -370,7 +370,7 @@ This proves category-3 lossless reuse while preserving the compact `sk`-row prog
 - Reuse G2-T09's composite alphabet, unique-tag FRONTIER, atomic write UPDATE, trace, and commuting-map tests; parameterize the head tag with finite `Q`.
 - Add inspectable total sparse/default tape realization over the integer-line DOMAIN without finite-edge semantics.
 - Add complete product-key Turing tables, named tuple results, exact `(2sk)^(sk)` validation, repaired numeric codec, and known-code/trajectory guards.
-- Lower one compact result to `source -> Plain(write)` and `destination -> Head(q_next,old_destination_symbol)`; no `SingleControl` or `TransitionControl`.
+- Apply one compact result as `AssignSource(write)` plus `MoveHead(q_next,direction)`; UPDATE preserves the old destination symbol. A concrete two-label batch may be exposed as a verified lowering; no `SingleControl` or `TransitionControl`.
 - Add explicit terminal-tag policy and typed external stop/run outcomes; retain the last terminal snapshot exactly once.
 - Tests keep all table/count/code/trajectory/neighbor-independence/unbounded-tape/termination/trace oracles and add pack/unpack, commuting-square, exactly-one-head, underlying-symbol, and orientation-vs-direction adversaries.
 - Static completion check: no Turing branch, arbitrary composite-CA table, bare lossy union, hidden/factored second source of truth, callback, partial-table fallback, or implicit edge/horizon halt.
@@ -487,7 +487,7 @@ The historical analysis below is retained to show how the rejected separate-cont
 
 ## Architecture-Reclosed Stage Result
 
-**COMPLETE.** T12 uses `Plain(symbol) | Head(q,symbol)` with an exactly-one invariant. The native source decision and destination-preservation access produce two complete writes for atomic UPDATE in the common runner; the factored tape/head view is an optional commuting projection, not a required `SingleControl`/`TransitionControl` architecture.
+**COMPLETE.** T12 uses `Plain(symbol) | Head(q,symbol)` with an exactly-one invariant. The native self-only read produces typed source-assignment plus head-movement writes; atomic UPDATE resolves the destination and preserves its old symbol. The factored tape/head view is an optional commuting projection, not a required `SingleControl`/`TransitionControl` architecture.
 
 ## Historical Stage Results (Evidence Retained; Architecture Superseded)
 

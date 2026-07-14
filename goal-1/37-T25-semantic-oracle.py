@@ -10,9 +10,10 @@ transparent composite alphabet
 
 over a total default-plus-overrides field, with exactly one Head.  The compact
 transition table still depends only on ``(head_state, underlying_symbol)``;
-candidate destination reads exist solely to preserve the symbol beneath the
-moving head.  Each native event must commute with one generic event--there are
-no CA microsteps, callbacks, family switches, or hidden interpreter state.
+the typed rule result contains source assignment and head-movement intent,
+while ``UPDATE`` preserves the old destination symbol from the configuration.
+Each native event must commute with one generic event--there are no CA
+microsteps, callbacks, family switches, or hidden interpreter state.
 
 The strict main-text construction supplies a square grid and four raw-frame
 axis movements, but no named north/east/south/west ordering or numeric rule

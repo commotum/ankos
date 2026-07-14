@@ -270,8 +270,8 @@ reads  = projected bits at (source-1, source, source+1)
 (new_value, displacement) = table[reads]
 
 writes = {
-  source: Plain(new_value),
-  source+displacement: Active(old_bit[source+displacement])
+  AssignSource(new_value),
+  MoveActive(displacement)
 }
 next = UPDATE.apply(configuration, source, writes)
 ```
@@ -283,8 +283,8 @@ next = UPDATE.apply(configuration, source, writes)
 | Active/source frontier | `UniqueTag("active")`, exactly one source determined from the labeled configuration. It is where the rule fires, not the union of write targets. |
 | Read | Ordered physical `[left,self,right]` values around the source, from the pre-transition state. |
 | Rule | Arbitrary total 8-entry table. Each entry returns `(new binary value, displacement in {-1,+1})`. |
-| Result | Native `(new_bit,displacement)` plus a structural two-label-write lowering. |
-| Update | Atomically replace the source label with `Plain(new_bit)` and the destination label with `Active(old_destination_bit)`; preserve every other label and validate exactly one active tag. The destination's underlying bit is not changed. |
+| Result | Native typed `AssignSource(new_bit)` plus `MoveActive(displacement)` writes; an explicit two-label assignment batch is an optional lossless lowering. |
+| Update | Resolve the selected port from the active source, preserve the old destination bit from the same snapshot, atomically replace the source label and move the active tag, preserve every other label, and validate exactly one active tag. |
 | Successor/halting | One deterministic successor; exactly one firing per step; no stay, branch, split, disappearance, rejection, or intrinsic halt. |
 | Seed | Initial bit field and active-tag locus are independently supplied parts of one valid labeled configuration. Values may be explicit, uniform, periodic, or random; exactly one locus is tagged. |
 | Boundary/realization | No base wrap/reflect/exterior rule is stated. Notes guard a finite implementation away from edges. Exact canonical execution uses an integer line or an explicit realization whose relocation semantics are declared. |
@@ -348,7 +348,7 @@ Asymmetric ordering guards: physical `100` must move left (a self-first decoder 
 
 ### Commuting representation
 
-For factored state `(v,h)`, define `E(v,h)[x] = Active(v[x])` when `x=h` and `Plain(v[x])` otherwise. On exactly-one-active configurations, `E` is bijective. If the compact rule gives `mu(v[h-1],v[h],v[h+1])=(b,d)`, the two writes above satisfy
+For factored state `(v,h)`, define `E(v,h)[x] = Active(v[x])` when `x=h` and `Plain(v[x])` otherwise. On exactly-one-active configurations, `E` is bijective. If the compact rule gives `mu(v[h-1],v[h],v[h+1])=(b,d)`, the typed assignment/movement writes above satisfy
 
 ```text
 E(step_native(v,h)) = step_tagged(E(v,h)).
@@ -363,8 +363,8 @@ This proves category-3 lossless reuse. The eight-row/65,536-rule mobile program 
 | DOMAIN/configuration | Reuse fixed ordered 1D support; add composite finite labels and an exactly-one-tag invariant |
 | FRONTIER | Reuse the broad rule-firing role; add `UniqueTag(active)` over configuration labels |
 | NEIGHBORHOOD | Reuse ordered physical `[-1,0,+1]` access and T01 codec |
-| RULE | Add the closed eight-row `(bit,direction)` result schema and structural two-write lowering |
-| UPDATE | Reuse old-snapshot atomic label-write composition; validate distinct source/destination and exactly one successor tag |
+| RULE | Add the closed eight-row result schema yielding `AssignSource(bit)` plus `MoveActive(direction)`; keep any concrete two-label lowering explicit |
+| UPDATE | Reuse old-snapshot atomic application; resolve movement, preserve the destination bit, validate source/destination distinctions, and require exactly one successor tag |
 | Runner | Use the shared branch-free protocol; no mobile dispatch |
 | Trace | Store/encode the complete tagged configuration; optional factored active-position projection must round-trip |
 
@@ -373,8 +373,8 @@ This proves category-3 lossless reuse. The eight-row/65,536-rule mobile program 
 - `alphabets.py`: finite tagged/product values and codecs; `Plain(bit) | Active(bit)` preset.
 - `frontiers.py`/`loci.py`: state-dependent `UniqueTag` firing selector over native/infinite or explicit finite realization support.
 - `neighborhoods.py`: existing ordered radius-one read projected from composite labels.
-- `rules.py`: inspectable eight-row or `{color_code,move_code}` mobile table; typed result and two-write lowering, never a callback.
-- UPDATE axis: atomic old-snapshot label writes with collision/coverage/invariant validation; no `RelocateControl` class.
+- `rules.py`: inspectable eight-row or `{color_code,move_code}` mobile table; typed source-assignment and movement writes, never a callback.
+- UPDATE axis: atomic old-snapshot assignment/movement application with destination preservation and collision/coverage/invariant validation; no `RelocateControl` class.
 - `specs.py`/runner: structural axis decoding and branch-free execution; seed supplies one tagged configuration.
 - Tests retain all existing truth-table, asymmetric, trajectory, unbounded-movement, state-distinction, trace, observer, and 65,536-count oracles, and add pack/unpack plus commuting-square checks.
 - Static completion check: no family branch, hidden active position, opaque color code, arbitrary composite-CA table, boundary invention, or second control source.
@@ -506,7 +506,7 @@ The current full-state formula callback is not a valid fallback: T09 has a finit
 
 ## Architecture-Reclosed Stage Result
 
-**COMPLETE.** T09 uses `Plain(bit) | Active(bit)` with an exactly-one invariant, a firing-source frontier, the native radius-one read, exact source/destination writes, and atomic UPDATE in the common runner. The commuting map, compact rule identity, and revised Goal 2 handoff above replace the historical separate-control conclusion.
+**COMPLETE.** T09 uses `Plain(bit) | Active(bit)` with an exactly-one invariant, a firing-source frontier, the native radius-one read, typed source-assignment plus tag-movement writes, and atomic destination-preserving UPDATE in the common runner. The commuting map, compact rule identity, and revised Goal 2 handoff above replace the historical separate-control conclusion.
 
 ## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
