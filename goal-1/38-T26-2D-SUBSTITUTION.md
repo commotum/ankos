@@ -8,14 +8,14 @@ Status: **SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE COMPLETE — HOSTILE REVIEW 
 - The frozen Q00-Q29 source protocol closes 94 unique query lines at `67 pre-Index / 27 actual-Index`. It retains 115 lines at `26 native / 64 relation / 25 control`, excludes 11 pre-Index false positives, and leaves zero unresolved candidates.
 - The retained source consists of 56 direct query hits plus 59 governed continuations. All 115 lines reverse-join to the 17-file split corpus as `77 exact + 38 mapped variants`; none is monolith-only.
 - The strict construction is a finite nonempty rectangular grid of finite tile labels in discrete `t+2D`. Every old tile fires exactly once from one immutable generation, reads only its own old label, and emits a nonempty rectangular patch from a total closed table. Every row of one strict table has the same patch shape.
-- UPDATE is the Notes' exact `Flatten2D` product-order assembly. It joins corresponding local patch rows across old source columns, preserves old source-row order, consumes the complete old generation, and defers every newborn tile until the next event.
+- UPDATE is the Notes' exact `Flatten2D` product-order assembly. The required shared policy is generic `RankedUniformBlockAssemble(rank=2)`: it joins corresponding local patch rows across old source columns, preserves old source-row order, consumes the complete old generation, and defers every newborn tile until the next event.
 - White is an ordinary label. The explicit non-white-background variant proves that a white tile may emit black descendants; there is no implicit white identity, blank-skip optimization, or ambient fill rule.
-- The semantic construction is D019/D018 ordered generation parameterized from rank one to rank two. It is not a new UPDATE algebra. A flattened rank-one word is insufficient because it loses rank-two placement.
+- T26 is not merely a rank-two parameter value of D019's linear `OrderedGenerationConcat`: naive flattened concatenation loses rank-two placement. It requires a generic `RankedUniformBlockAssemble` policy on the existing UPDATE axis. Strict fixed-block T13/D019 is that policy's rank-one restriction and commuting overlap; general variable-length D019 retains its linear policy unchanged.
 - The same state has a category-3 lossless representation inside T27's posed occurrence bag exactly on the aligned, uniform, hole-free, overlap-free rectangular-tiling image. Arbitrary free geometry remains T27.
 - The printed `Other shapes` relation contains mixed right-hand-side shapes and does not state a complete role-to-color assignment or compatibility law. It is not executable strict T26 evidence. Neighbor-dependent patch choice remains T28.
 - The source-governed asset universe closes 26 unique JPEGs at `3 native / 16 relation / 7 control`, 52 exact monolith/split references, 26 unique hashes, and 1,838,481 bytes. The honest boundary is `26 HASH_BOUND / 0 TRANSCRIBED / 0 PIXEL_REPLAYED`.
 - The semantic oracle closes 6,664 native/generic events, 13,915 commuting proofs, 20,992 old-tile firings, 6,659 posed-bag commutations, 600 rank-one D019 commutations, and 53 hostile rejections.
-- D132 records the architecture result: two-dimensional substitution is rank-two ordered replacement with a lossless aligned posed-bag representation. No T26 state class, UPDATE algebra, executor, family branch, callback, padding scheme, hidden control, or raster-defined program follows.
+- D132 records the corrected architecture result: two-dimensional substitution is rank-two uniform-block assembly with a lossless aligned posed-bag representation. A generic UPDATE-policy implementation is required, but no new execution algebra, T26 state or UPDATE class, executor, family branch, callback, padding scheme, hidden control, or raster-defined program follows.
 
 ## Final Semantic Conclusions
 
@@ -33,12 +33,12 @@ Status: **SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE COMPLETE — HOSTILE REVIEW 
 active = AllOldTiles.select(configuration)
 reads  = SelfOnly.read(configuration, active)
 writes = ClosedPatchTable.apply(active, reads)
-next   = RankedGenerationAssemble(rank=2).apply(configuration, active, writes)
+next   = RankedUniformBlockAssemble(rank=2).apply(configuration, active, writes)
 ```
 
 ## Big Picture Objective
 
-Reconstruct two-dimensional substitution systems from primary Book evidence, distinguish the strict aligned uniform-patch construction from T27 geometry and T28 contextual choice, and identify the smallest faithful reuse of DOMAIN, CONFIGURATION, ALPHABET, FRONTIER, NEIGHBORHOOD, RULE result, UPDATE, trace, and representation machinery. Prove one native event at a time that T26 is a rank-two D019 parameterization and a checked category-3 restriction of T27, without inventing a family executor or using rasters as program data.
+Reconstruct two-dimensional substitution systems from primary Book evidence, distinguish the strict aligned uniform-patch construction from T27 geometry and T28 contextual choice, and identify the smallest faithful reuse of DOMAIN, CONFIGURATION, ALPHABET, FRONTIER, NEIGHBORHOOD, RULE result, UPDATE, trace, and representation machinery. Prove one native event at a time that T26 uses a generic rank-two uniform-block UPDATE policy, overlaps fixed-block D019 at rank one without subsuming general variable-length D019, and is a checked category-3 restriction of T27, without inventing a family executor or using rasters as program data.
 
 ## Catalog Identity
 
@@ -46,7 +46,7 @@ Reconstruct two-dimensional substitution systems from primary Book evidence, dis
 - Exact CSV name: Two-Dimensional Substitution Systems.
 - CSV physical line: 27.
 - Taxonomy section: 26.
-- Entry kind: deterministic rank-two ordered block-replacement parameterization under the shared SimpleProgram algebra.
+- Entry kind: deterministic rank-two preset of generic uniform-block assembly under the shared SimpleProgram algebra.
 - Canonical source vocabulary: two-dimensional/2D substitution system, square subdivision, fixed block, `SS2DEvolve`, `Flatten2D`, `SSEvolve`, `FlattenArray`, non-white background, digit sequence, finite automaton, Sierpinski/Menger, other shapes, shape/orientation colors, Penrose tiling, recursive subdivision/quadtree, nested patterns, Kronecker product, neighbor-dependent substitution, and sequential higher-dimensional scanning.
 - Modern terms checked but absent as direct Book names include tile/block/array substitution systems, picture grammars, orientation policy, and scale-factor terminology.
 
@@ -206,7 +206,7 @@ The source does not specify the role-to-color map or a complete assembly rule fo
 - Source: `BOOK:14099-14109`.
 - Establishes: the source's “4 billion or so” matches the derived four-color `2x2` family, and a 16-color relation uses only 51 possible local blocks.
 
-> searching all 4 billion or so possible such systems with 2x2 blocks and up to four colors
+> searching all 4 billion or so possible such systems with 2×2 blocks and up to four colors
 
 For a complete `k`-label, `h x w` table the derived count is `k^(k*h*w)`: binary `2x2` gives 256, ternary `3x3` gives `3^27 = 7,625,597,484,987`, and four-color `2x2` gives `4^16 = 2^32 = 4,294,967,296`.
 
@@ -215,7 +215,7 @@ For a complete `k`-label, `h x w` table the derived count is `k^(k*h*w)`: binary
 - Source: `BOOK:17297-17301`.
 - Establishes: a nested array can have an algebraically equivalent generator; that formula is not hidden native state.
 
-> it ... can be obtained ... from the evolution of a 2D substitution system, or equivalently from a Kronecker product
+> It ... can be obtained ... from the evolution of a 2D substitution system, or equivalently from a Kronecker product
 
 ## Source-Extraction Defects and Repair Boundary
 
