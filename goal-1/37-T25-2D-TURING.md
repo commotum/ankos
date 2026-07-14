@@ -15,13 +15,13 @@ Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN*
 
 ## Updated Assumptions
 
-- The strict main-text family is provisionally the T12 unique-head construction parameterized by discrete `t+2D` square-grid topology and `Move2D={north,east,south,west}`.
+- The strict main-text family is provisionally the T12 unique-head construction parameterized by discrete `t+2D` square-grid topology and four nonzero axis-adjacent movement ports. The Book does not name an ordered north/east/south/west codec, so the raw declared coordinate frame remains explicit.
 - A transparent configuration is a total `Z^2` field over `Plain(Sigma) | Head(Q,Sigma)` with exactly one head. The head-bearing cell must retain the underlying tape symbol.
 - The compact RULE reads the unique head's `(q,a)` only. Its structural lowering additionally preserves the old destination symbol while atomically emitting `source -> Plain(a_next)` and `destination -> Head(q_next,old_destination_symbol)`.
 - Absolute displacements and relative turns are distinct program schemas unless a visible orientation factor and a lossless one-event map are supplied. A display arrow must not be reused as motion control without source evidence.
 - A finite array used by `TM2DStep` is an implementation realization, not native tape capacity, edge behavior, or halt semantics.
 - The base family is provisionally total and non-halting. Missing rows, finite-array edge failures, horizons, path-window exits, and fixed/repetitive behavior are not halts.
-- Worms on a hexagonal grid may parameterize CONFIGURATION incidence and RULE/result data, but their state-as-direction coupling and exact rule count require independent source reconstruction.
+- Worms on a hexagonal grid may parameterize CONFIGURATION incidence and RULE/result data, but the local Book evidence does not specify the rule schema behind the stated count `1296`. That count and the state-as-direction fact are retained without inventing an executable worm preset or factorization.
 
 ## Big Picture Objective
 
@@ -125,7 +125,7 @@ writes = {
 next = AtomicLabelUpdate.apply(X, active, writes)
 ```
 
-The native table is provisionally `delta : Q x Sigma -> Q x Sigma x Move2D`, with `Move2D` a declared four-slot square-grid displacement schema. The representation proof must show a bijection with factored `(tape,head_position,head_state)` state and one-event commutation. It must separately test source/destination aliasing if any realization admits a zero move; the strict four-direction main family presently does not.
+The native table is provisionally `delta : Q x Sigma -> Q x Sigma x Move2D`, with `Move2D` a declared four-port square-grid displacement schema whose storage order is nonsemantic. The representation proof must show a bijection with factored `(tape,head_position,head_state)` state and one-event commutation. A nonzero native move can still alias its source, or another port, in a small periodic quotient. Any finite realization must therefore prove the required source/destination and port distinctions, provide a step-commuting virtual-coordinate adapter, or identify itself as a different quotient program.
 
 Turning-relative variants require a visible orientation/state role and a declared action from `(orientation,turn)` to `(orientation_next,absolute_move)`. A hexagonal worm requires a six-port topology and exact coupling evidence. Neither may be implemented by reading renderer arrows or incidental storage order.
 

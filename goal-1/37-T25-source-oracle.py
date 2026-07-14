@@ -57,7 +57,7 @@ EXPECTED_TAXONOMY_SHA256 = "4c30fe079b2fb8f69e4c8c0dde3d59065227d4224cbe4b7693a1
 # TMs redirect. Q25 closes all Turing section headings; Q26 closes experiment
 # randomness and repeated-position language without treating either as a
 # stochastic rule. Q27 independently closes the fixed-grid fact inherited from
-# the Chapter 3 construction.
+# the Chapter 3 construction. Q28 freezes absent spelling variants.
 QUERIES = {
     "Q00": r"\btwo-dimensional Turing machines?\b|\b2D Turing machines?\b",
     "Q01": (
@@ -137,7 +137,8 @@ QUERIES = {
         r"\blighter colors in the cellular automaton represent ordinary cells in the Turing machine\b|"
         r"\bdarker colors represent the cell under the head\b|"
         r"\bcellular automaton which emulates it can be constructed\b|"
-        r"\bcellular automaton has k\(s\+1\) colors\b"
+        r"\bcellular automaton has k\(s\+1\) colors\b|"
+        r"\bemulate each step in the evolution of a mobile automaton or a Turing machine with a single step\b"
     ),
     "Q15": (
         r"\bWith k possible colors for each cell and s possible states\b|"
@@ -184,6 +185,12 @@ QUERIES = {
         r"\bcellular automata, mobile automata and Turing machines all have in common\b|"
         r"\bunderlying number and organization of cells always stays the same\b"
     ),
+    "Q28": (
+        r"\btwo dimensional Turing machines?\b|"
+        r"\b2-dimensional Turing machines?\b|"
+        r"\b2-D Turing machines?\b|"
+        r"\bTuring machines? in two dimensions\b"
+    ),
 }
 
 
@@ -199,9 +206,39 @@ def line_set(spec: str) -> frozenset[int]:
     return frozenset(result)
 
 
-# Filled after the deterministic query protocol is fixed.  Each tuple is
-# (all physical lines, pre-Index lines, actual-Index lines, line-set digest).
-EXPECTED_QUERY: dict[str, tuple[int, int, int, str]] = {}
+# Each tuple is (all physical lines, pre-Index lines, actual-Index lines,
+# line-set digest). These values freeze the complete reproducible protocol.
+EXPECTED_QUERY = {
+    "Q00": (15, 7, 8, "85928fb476231db85e8fae575c8759d0d839b9870e887775c5552fce717e6d22"),
+    "Q01": (1, 1, 0, "e5481aa7df58a36f4d0a1fb99cb56e3cf20e1ea96329e414c81d0ce7ad2c1bfc"),
+    "Q02": (2, 2, 0, "6873df9115fb08f76e58897cf04b396f0fab326a50e2307826bccbb1a959c03f"),
+    "Q03": (1, 1, 0, "b0d590b1856a5932562a182ddba086ba705a26a6813eaac67a8529cd1994ed1d"),
+    "Q04": (1, 1, 0, "91b8107ca1d9412220d158442772f7ab53d3a648edf5368642363de43b9896d4"),
+    "Q05": (8, 2, 6, "94b29e0f5e4e8e7b443cf506b95a8d2c3b23003006439cd6ee29faa2876da64b"),
+    "Q06": (2, 2, 0, "73666a72eee27b6d8fa8a63c0f7670ca0d2501d65ec554b245560dcad826b9b5"),
+    "Q07": (2, 2, 0, "9f207cb008ead43ffbfd042820751b865446daf1986f08712aeed1c1179368f9"),
+    "Q08": (1, 1, 0, "dce1a79f6d2e8530d871495b38cb219277141dd8685661e25254c28f2b02f6f5"),
+    "Q09": (2, 2, 0, "1b47323493327539c8c6cb63c4f2fc33953304153d9b6ea28cba98e76331050a"),
+    "Q10": (2, 2, 0, "dcba1568e6e6fd926e94c7954d3832b4ba9110373f1c574002286be3f56af129"),
+    "Q11": (1, 1, 0, "68e1e435db6ab43fd38ae5df6c6a03b50a5c9c6290f4691e1b670a786c0ebe12"),
+    "Q12": (5, 5, 0, "665ba2fa608c32fa95f4916ad41b0e1ba5269a973dbaeaa73ea2bf259dd15dfa"),
+    "Q13": (4, 4, 0, "2c9466e2d348ff8b82821ba208b3e31f7eceda10da9a3b7855126c086f965b71"),
+    "Q14": (5, 5, 0, "PLACEHOLDER"),
+    "Q15": (2, 2, 0, "a71b8a7138378f80a86d813fbf25198ae17e2192db54495f726a856ab2f5688d"),
+    "Q16": (7, 4, 3, "9edd32a308bad5ff4e025ef3f0b7f28f887de8311bae7e654a7b76f03bd1bd07"),
+    "Q17": (4, 2, 2, "a3953178f88d931f2f5386b4394324ab4c3d6e3507ac44783b6bfc2f1f29e799"),
+    "Q18": (8, 5, 3, "26a4019877d27744b764b9e4222baa97e2cc0d4090f6ce7414b12a7edf2ee79b"),
+    "Q19": (6, 6, 0, "3fa0afa370940f10ed94b10577eec4a046ecbf317ee579a46a0017f2b2e4aeb4"),
+    "Q20": (4, 4, 0, "e55847563ab52d066668140948e6f5edba1d05e4b0e7f6d98ac4b7930ce58669"),
+    "Q21": (6, 0, 6, "22432869124663b0ff4c53130dd4c6d803e5580dd3e147ef32d4835066ecf967"),
+    "Q22": (4, 0, 4, "931f35533dd2e7db782551c3d06378920bbef8c50790a6457dc0cd4e4762d5bf"),
+    "Q23": (4, 0, 4, "bfd2983a29cd872a59598d73a88dddd616a8fc8eae3dc0cd23a78e2774879841"),
+    "Q24": (1, 0, 1, "e7c46013c81f7709dcba473bd51901ba3f2f54eac6810b7295f77f626bc41b6f"),
+    "Q25": (4, 4, 0, "11eac1eed640d74e413e32a1a8eda74deae28a4258a14a161d4c303efaed730c"),
+    "Q26": (3, 3, 0, "dc3e443df30429a659ad0bc09a71b1c3151aaca0632872ff81824ca2f560d892"),
+    "Q27": (1, 1, 0, "dff17949eb4f9ecd9361bb97c38a9404f3d034565e5d4395f073c0c367b5ea0b"),
+    "Q28": (0, 0, 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+}
 
 
 # Every broad-query collision stays visible.  No line is silently discarded.
@@ -233,7 +270,7 @@ NATIVE_EVIDENCE = line_set(
 RELATION_EVIDENCE = line_set(
     "936,956,2152,2156,2264,2272,2274,2276,2306,"
     "2298,2302,"
-    "7938,11566,12012,12028,12031,"
+    "7938,7948,11566,12012,12028,12031,"
     "13660,13672,13674,"
     "18363,18366-18369,18372"
 )
@@ -302,25 +339,53 @@ INDEX_ENTRY_GUARDS = {
 }
 
 
-# Frozen values are populated below after the source protocol is exercised.
-EXPECTED_SET: dict[str, tuple[int, str]] = {}
-EXPECTED_EXCLUDED_CLASS: dict[str, tuple[int, str]] = {}
-EXPECTED_INDEX_CLASS: dict[str, tuple[int, str]] = {}
-EXPECTED_INDEX_ENTRY_GUARDS: tuple[int, str] = (0, "")
-EXPECTED_IMAGE_PARTITION: dict[str, tuple[int, str]] = {}
+EXPECTED_SET = {
+    "union": (66, "1650cbd633fac701b517e91e5177f5489b9328bd42736341dcbc893c71f53997"),
+    "pre_index_union": (49, "f70a894855902a78f6ae2a30a79f89f2fd9bb75a6e0195c9c42079b105855589"),
+    "index": (17, "859d6201282e7c60382afc97dbb5fdb93ddc00403bff2f09125eeb781188392a"),
+    "matched_retained": (36, "35c74b3695684e04983e5a6fbeb95f6a7e3788816314c53881b47342bc9b9651"),
+    "governed_continuations": (23, "e1eae76d6385e7d0659b6af275a08b17134dbd0494a38ba1fc0fbdac36e8800e"),
+    "retained": (59, "d137996459d157fab40bee3a8b280463312bf64d207d3973b7eaa44248fbda39"),
+    "excluded": (13, "2653a26f21f1f90e6106650d78acfbb7d64416acdae85795b41862ca15224971"),
+    "native": (30, "c7f09f0a15878ddf9078e96baface0169302db3ada59bc76e8f723a2ca86a848"),
+    "relation": (25, "50928eebd506f726e14ff30664315186449a448b3cdffc2e501f277522650926"),
+    "control": (4, "8015743896a86aef3b04d12c93279f51c5f8eae5baf9fc7ed93545f6a16f268b"),
+    "governed_images": (9, "2afeffebf96c3e7d4077718d82465a7eb693789a1e6e45c340d6a082538c6f32"),
+}
+EXPECTED_EXCLUDED_CLASS = {
+    "unrelated_worms": (2, "c7263fd0d9d6f37673504814865ee8754faa349ac193057849cca0d0c740cac4"),
+    "unrelated_turning": (3, "65def06fa09ec4e0abb9ac607a04496b255195a321e99eaa4de6875b3cb47bd6"),
+    "other_hexagonal_grid_systems": (5, "7cb22225cca27f8fc9c313133cceae5c2c220adcdd80548e33cf25491e20c919"),
+    "other_two_dimensional_grid_systems": (2, "3ca52e85fd5c25b2d989821ec79d9a5c5684b93d6ec93e5a396e0321f4e69278"),
+    "other_emulation_construction": (1, "c4af1ccb5cb4559b05dea6639f91383a49c9d833c8caf3efae462c460818807e"),
+}
+EXPECTED_INDEX_CLASS = {
+    "named_people_routes": (6, "22432869124663b0ff4c53130dd4c6d803e5580dd3e147ef32d4835066ecf967"),
+    "logo_robotics_worm_routes": (4, "bfd2983a29cd872a59598d73a88dddd616a8fc8eae3dc0cd23a78e2774879841"),
+    "turing_entry_and_alias_routes": (5, "c40215af304020f024f40f59cb22c6f5e5cb3c11af4343287380d08e08d19613"),
+    "broad_turning_collision_routes": (2, "f46ced44e475e9f1681169c6860a9dc704067b49c3f2ba0c8ec4bdee0b252cdb"),
+}
+EXPECTED_INDEX_ENTRY_GUARDS = (
+    17, "580d1ca128a2f640c50ae35381e631132594a2adb574af5f3aca76d8b8a3d7fd"
+)
+EXPECTED_IMAGE_PARTITION = {
+    "native": (6, "6cb059a1eaf065c9f6fdceff4dd39db0adab35db77584c819004ad49cfd99617"),
+    "relation": (3, "731c6d60f49fe3f6d342784c6650be2e6a63a34e65672f768c19d4b700bde6b1"),
+    "control": (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+}
 
 EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
-EXPECTED_SPLIT_QUERY: tuple[int, str] = (0, "")
-EXPECTED_SPLIT_QUERY_EXACT: tuple[int, str] = (0, "")
-EXPECTED_SPLIT_QUERY_NONEXACT: tuple[int, str] = (0, "")
-EXPECTED_SPLIT_QUERY_MAPPING_DIGEST = ""
-EXPECTED_SPLIT_RETAINED_EXACT: tuple[int, str] = (0, "")
-EXPECTED_SPLIT_RETAINED_NONEXACT: tuple[int, str] = (0, "")
-EXPECTED_SPLIT_RETAINED_MAPPING_DIGEST = ""
-EXPECTED_MONOLITH_ONLY: tuple[int, str] = (0, "")
-EXPECTED_ATLAS_HITS: tuple[int, str] = (0, "")
+EXPECTED_SPLIT_QUERY = (65, "3104fde07f98c9e4d8076cfb987cd95d5ab806d1be8a655893fc49f7b1734672")
+EXPECTED_SPLIT_QUERY_EXACT = (58, "5e92cb57a200134a5d77c02e341e7ca5f1bc10ca0e802c55410e3de94794b369")
+EXPECTED_SPLIT_QUERY_NONEXACT = (7, "1b13fcf4341f6d2dce59b5b8835d9116bf064e26994c69d834ccd819ad479fa3")
+EXPECTED_SPLIT_QUERY_MAPPING_DIGEST = "48d46002d3bcdcf0bc560b0c4bfa24d0b4aada1fc74f5987e3e56c5d9e088b71"
+EXPECTED_SPLIT_RETAINED_EXACT = (46, "d4279eb74c05b67c655a0345ff3698d411de180dfe19eacd8d2a4f56e06d8157")
+EXPECTED_SPLIT_RETAINED_NONEXACT = (13, "43f78dc15795c016d884cee765babfaa583b096e914525a65f7b710a907b416f")
+EXPECTED_SPLIT_RETAINED_MAPPING_DIGEST = "1be42cac81e41996c61aa572865a51e8f9ef88d025e11885cfb4349c4c26905a"
+EXPECTED_MONOLITH_ONLY = (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+EXPECTED_ATLAS_HITS = (1, "3068430da9e4b7a674184035643d9e19af3dc7483e31cc03b35f75268401df77")
 
 
 def digest(values: set[int] | frozenset[int]) -> str:
@@ -452,14 +517,12 @@ def main() -> int:
         good = actual == EXPECTED_EXCLUDED_CLASS.get(name)
         excluded_ok &= good
         print(f"excluded_{name}", "OK" if good else "MISMATCH", *actual)
-    unexpected_pre_index = pre_index_union - set(RETAINED) - set(EXCLUDED)
-    missing_query_classification = matched_retained - set(RETAINED)
-    excluded_ok &= not unexpected_pre_index and not missing_query_classification
+    classification_delta = matched_retained ^ (set(RETAINED) & pre_index_union)
+    excluded_ok &= not classification_delta
     ok &= excluded_ok
     print(
         "unresolved_pre_index", "OK" if excluded_ok else "MISMATCH",
-        len(unexpected_pre_index) + len(missing_query_classification),
-        *sorted(unexpected_pre_index | missing_query_classification),
+        len(classification_delta), *sorted(classification_delta),
     )
 
     index_ok = (
@@ -572,6 +635,9 @@ def main() -> int:
         and "ordinary cells in the Turing machine" in at(7938)
         and "darker colors represent the cell under the head" in at(7938)
         and "specific darker color corresponding to each possible state of the head" in at(7938)
+        and "each step in the evolution of a mobile automaton or a Turing machine"
+        in at(7948)
+        and "with a single step of cellular automaton evolution" in at(7948)
         and "cellular automaton which emulates it" in at(18363)
         and "k(s+1) colors" in at(18372)
         and "single cell of color k" in at(18372)
@@ -596,6 +662,22 @@ def main() -> int:
     )
     ok &= variants_ok
     print("source_alias_turning_hex_variants", "OK" if variants_ok else "MISMATCH")
+
+    # The corpus gives the count and qualitative restriction, but no worm
+    # transition schema from which 1296 could honestly be reverse-engineered.
+    # The subsequent printed formula is explicitly the separate Langton rule.
+    hex_worm_source_limit_ok = (
+        "1296 possible worms with rules of the simplest type on a hexagonal grid"
+        in at(13666)
+        and at(13667) == ""
+        and "sp = s (2c - 1)i" in at(13668)
+        and "Langton's ant" in at(13670)
+    )
+    ok &= hex_worm_source_limit_ok
+    print(
+        "hex_worm_count_retained_without_invented_schema",
+        "OK" if hex_worm_source_limit_ok else "MISMATCH", 1296,
+    )
 
     experiment_controls_ok = (
         "million randomly chosen rules" in at(2278)
@@ -804,6 +886,7 @@ def main() -> int:
         and inherited_turing_ok
         and tagged_representation_ok
         and variants_ok
+        and hex_worm_source_limit_ok
         and experiment_controls_ok
         and square_rule_count_ok
         and langton_ok
@@ -816,8 +899,7 @@ def main() -> int:
     )
 
     unresolved_total = (
-        len(unexpected_pre_index)
-        + len(missing_query_classification)
+        len(classification_delta)
         + len(index - set(INDEX_ROUTED))
         + len(set(INDEX_ROUTED) - index)
         + len(monolith_only)
