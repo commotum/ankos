@@ -845,6 +845,14 @@ Exact `t0..t12`, outside-preservation, exactly-one-tag, fail-closed source/asset
 
 ### 29-T11-GENERALIZED-MOBILE
 
+Status: **IN PROGRESS** in `goal-1/29-T11-GENERALIZED-MOBILE.md`. Source, asset, and semantic closure are active; no candidate-universe or architecture-completion claim has been made.
+
+#### Current Facts
+
+- Direct main text establishes any number of old active cells, all-old-active rule application, movement, splitting, disappearance, proliferation, and CA-like behavior when almost all cells are active (`BOOK:916-934`).
+- The damaged Notes extraction nevertheless exposes `{list,nlist}` state and `GMAStep`: each old active source reads the old physical radius-one value triple, returns a new source value and relative next-active positions, writes only its distinct old source, and contributes destinations to exact `Union[Flatten[...]]` (`BOOK:12008-12010`).
+- The stage must test the taxonomy's speculative conflict-policy claim against this executable union semantics rather than inventing last-writer behavior. Strict result ranges, seed, empty-frontier outcome, rule identity/count, variants, and complete source/asset closure remain unresolved.
+
 #### Big Picture Objective
 
 Test multiple active loci, activity creation/deletion, simultaneous effects, and collisions.
