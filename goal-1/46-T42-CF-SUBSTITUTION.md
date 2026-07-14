@@ -265,15 +265,25 @@ Goal 2 should:
 
 ## Frozen Source Closure
 
-Pending the final source-oracle freeze and independent hostile review.
+`46-T42-source-oracle.py` freezes fourteen discovery lanes and their 48-row union, but completeness is independent of search recall. The Book-wide lane closes 39 candidates with ten explicit exclusions and zero unresolved. Total retained evidence is 54 rows at `10 native / 21 relation / 23 control`; the fixed strict-main and executable-Notes cores each close five construction-bearing rows. The complete 897-row actual Index is dispositioned as `3 native / 8 relation / 78 control / 808 unrelated`, including 70 relevant rows missed by the ordinary query union. The 951-row split crosswalk closes at `927 exact / 12 image-basename / 9 normalized / 3 explicit omissions`, normalized minimum `0.995885`.
+
+The source audit binds 21 semantic guards, twelve auxiliary guards, ten source-defect records, 25 source-model records, the complete Index disposition, every strict-core row, and the 12-image candidate interface. Its independent source-logic audit closes fifteen obligations, including signed `a0`, positive unbounded tail coefficients, reverse-rest orientation, the `m-1` event defect, strict seed, terminal horizon, observer offset, raster boundary, and under-specified sine sibling. Audit digest is `2726957389d256722469424e41ea2e92188ba5e30d7ab52c4df2598dd7250aa6`; script SHA-256 is `27dfafe8798ce65af8d282440c85f02ae7d8d591f0fec30350ad52e41a25270d`.
+
+Normal, JSON, explicit-Book, silent-import, compilation, relocation, catalog/split/Index mutation, optimized-mode, and malformed-usage gates pass or fail closed as required. No source or image disposition remains unresolved.
 
 ## Frozen Asset Closure
 
-Pending final source-interface binding, limited-transcription correction, semantic-interface binding, and hostile review.
+`46-T42-asset-oracle.py` closes the twelve governed images at `1 native / 11 relation / 0 control`, 24 source references (`12 monolith / 12 split`), twelve unique files/hashes, 285,055 bytes, and two five-file relation assemblies. All twelve are `HASH_BOUND`; page 162 is additionally `LIMITED_TRANSCRIBED`; none is pixel-replayed. Every file is baseline JFIF 1.01, three-component RGB with its exact dimensions, byte count, and SHA-256 bound. The structural asset manifest is `881c5c67fbf2aa6eb6bc6b8b0417b77df0057e24d657e72a08aac4f58d8cd2f5`; ledger digest is `42e6fcc06ad821257a3fdaa81a1ca2cb8c71a1449a44dd4250f7644bc0d16b29`.
+
+The limited-transcription interface carries four named page-162 fixture profiles, execution-order coefficient rows, ten rule-icon entries, and the black/gray convention. Independent text supplies `rho`; replay closes 25 events, 301 old-source firings, and 599 emitted children. The trace manifest, which now binds the `LIMITED_TRANSCRIBED` evidence label, is `df358b3c335e09333a1110b7d25f38bb4745dc6598b8095c7c4fa766d925ef12`; the semantic-interface manifest digest is `a29095461ff79de0d08ebd5d2347a5c0edd8ff3151363264ff2fe61892a88556`. Twelve byte mutations and ten manifest/interface mutations fail closed. Source and semantic interfaces pass; script SHA-256 is `116b1c7e95e71fb94921b85c303d0da70f79fa6d2d7c2653b7d1aaa02a34faeb`.
 
 ## Frozen Semantic Closure
 
-Pending replacement of detached provenance with the complete replay-verified T40 handoff and final hostile review.
+`46-T42-semantic-oracle.py` accepts three complete replay-verified T40 handoffs carrying 32 exact plus twelve certified coefficients, including one signed-`a0` case, and rejects rational completion and every detached/forged identity, coefficient, proof, termination, certificate, callback, and producer-state variant. Explicit schedules use a separate structural schema. Eight natural-prefix cases prove 36 source terms produce 28 events and seven longer horizons prepend rather than resume.
+
+The exact transition audit closes two terminal cases across six direct/tagged/product views, retaining three final symbols and rejecting two empty D019 commits. It replays four page-162 fixtures over 25 events/301 source firings/599 children; closes 630 active and 390 completion cases across thirteen bounded programs; proves all 630 canonical replicated-product T13 commutations with 5,145 children and exact lineage; and retains compact/tagged carriers only as lossless interfaces. Mechanical-word checks cover five positive and five signed-`a0` cases, two `d=1` alignments, and two guarded `d=0` mismatches. Rational dual forms, reversal, horizon, word/cursor loss, `m=1`, three quadratic tables/62 word cases, the two-event `sqrt(3)` macro, one false one-step rejection, 64 coefficient-table round trips, and 4,224 emitted codec symbols are independently guarded.
+
+The public audit sees 35 dataclasses, zero forbidden native roles, zero class-4 algebras, and 69 hostile rejections. Strict seed is absent from transition-program identity; uniform `PhaseIndex x Bit` is the canonical executable carrier; exhaustion retains the final word through the common terminal envelope without invoking D019. No evaluator, raster program, family executor, or new UPDATE exists. Semantic digest is `6bc8f95d07c32b5983c8b0890c7f9b8a07e511c25d77b12c7963ce9fc36b5c1d`; script SHA-256 is `e4794537b9d5d3820c4a0bb484b89f6e4dd1f9b489c132653d82b9815b721213`. Normal, relocation, silent-import, compilation, optimized-mode, and malformed-usage gates pass or fail closed as required.
 
 ## Completion Requirements
 

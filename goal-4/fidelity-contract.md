@@ -79,7 +79,7 @@ Every author-text change is per occurrence and needs:
 - independent authoritative-source review by a principal other than the creator;
 - a final workflow state and disposition.
 
-High-risk formula, code, data, structure, Index, caption, or visual changes additionally need a blind pre-proposal decision and the required specialist review. Repeated spelling or dehyphenation is never authorized as one global author-text operation.
+High risk is the union of repair class and operation/AST impact. Formula, code, data, every structure boundary or authorial hierarchy/Markdown/heading change, Index, caption, visual, and witness-only author-text insertion additionally need a blind pre-proposal decision and the required specialist review. Repeated spelling or dehyphenation is never authorized as one global author-text operation.
 
 ## Witness-only binary assets
 

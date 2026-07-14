@@ -1148,7 +1148,24 @@ class ScheduleCompletion:
     successors: tuple[()] = ()
 
     def __post_init__(self) -> None:
-        if self.reason != SCHEDULE_EXHAUSTED or self.successors != ():
+        program_id = exact_text(self.program_id, "completion program id")
+        source_identity = exact_text(
+            self.schedule_source_identity,
+            "completion schedule source identity",
+        )
+        if not is_sha256(program_id) or not is_sha256(source_identity):
+            raise ValueError("completion identities must be lowercase SHA-256 hex")
+        if type(self.configuration) is not DirectConfiguration:
+            raise TypeError("schedule completion needs an exact direct configuration")
+        canonical_configuration = DirectConfiguration(
+            self.configuration.cursor,
+            self.configuration.word,
+        )
+        if self.configuration != canonical_configuration:
+            raise ValueError("schedule completion configuration does not replay")
+        reason = exact_text(self.reason, "schedule completion reason")
+        successors = exact_tuple(self.successors, "schedule completion successors")
+        if reason != SCHEDULE_EXHAUSTED or successors != ():
             raise ValueError("schedule completion is a zero-successor terminal outcome")
 
 
@@ -1261,7 +1278,7 @@ class TaggedConfiguration:
 
     def __post_init__(self) -> None:
         raw = exact_tuple(self.tokens, "tagged tokens")
-        if self.schema != TAGGED_SCHEMA_VERSION:
+        if exact_text(self.schema, "tagged configuration schema") != TAGGED_SCHEMA_VERSION:
             raise ValueError("unknown tagged configuration schema")
         if len(raw) < 2 or type(raw[0]) is not CursorToken:
             raise ValueError("tagged configuration must be Cursor · Data+")
@@ -1310,6 +1327,20 @@ class TaggedScheduleCompletion:
     reason: str = SCHEDULE_EXHAUSTED
     successors: tuple[()] = ()
 
+    def __post_init__(self) -> None:
+        if type(self.configuration) is not TaggedConfiguration:
+            raise TypeError("tagged completion needs an exact tagged configuration")
+        canonical_configuration = TaggedConfiguration(
+            self.configuration.tokens,
+            self.configuration.schema,
+        )
+        if self.configuration != canonical_configuration:
+            raise ValueError("tagged completion configuration does not replay")
+        reason = exact_text(self.reason, "tagged completion reason")
+        successors = exact_tuple(self.successors, "tagged completion successors")
+        if reason != SCHEDULE_EXHAUSTED or successors != ():
+            raise ValueError("tagged completion is a zero-successor terminal outcome")
+
 
 TaggedOutcome: TypeAlias = TaggedAdvancedTransition | TaggedScheduleCompletion
 
@@ -1355,7 +1386,7 @@ class ReplicatedPhaseConfiguration:
 
     def __post_init__(self) -> None:
         raw = exact_tuple(self.cells, "replicated product cells")
-        if self.schema != REPLICATED_SCHEMA_VERSION:
+        if exact_text(self.schema, "replicated configuration schema") != REPLICATED_SCHEMA_VERSION:
             raise ValueError("unknown replicated product schema")
         if not raw:
             raise ValueError("replicated phase word must be nonempty")
@@ -1409,6 +1440,20 @@ class ReplicatedScheduleCompletion:
     configuration: ReplicatedPhaseConfiguration
     reason: str = SCHEDULE_EXHAUSTED
     successors: tuple[()] = ()
+
+    def __post_init__(self) -> None:
+        if type(self.configuration) is not ReplicatedPhaseConfiguration:
+            raise TypeError("replicated completion needs an exact replicated configuration")
+        canonical_configuration = ReplicatedPhaseConfiguration(
+            self.configuration.cells,
+            self.configuration.schema,
+        )
+        if self.configuration != canonical_configuration:
+            raise ValueError("replicated completion configuration does not replay")
+        reason = exact_text(self.reason, "replicated completion reason")
+        successors = exact_tuple(self.successors, "replicated completion successors")
+        if reason != SCHEDULE_EXHAUSTED or successors != ():
+            raise ValueError("replicated completion is a zero-successor terminal outcome")
 
 
 ReplicatedOutcome: TypeAlias = (
@@ -2464,10 +2509,188 @@ def audit_hostile_validation() -> int:
     assert completion.successors == ()
     rejected += 1
 
+    direct_args = (
+        completion.program_id,
+        completion.schedule_source_identity,
+        completion.configuration,
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: ScheduleCompletion(
+            1,
+            direct_args[1],
+            direct_args[2],
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ScheduleCompletion(
+            "0" * 63,
+            direct_args[1],
+            direct_args[2],
+        ),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: ScheduleCompletion(
+            HostileTextSubclass(direct_args[0]),
+            direct_args[1],
+            direct_args[2],
+        ),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: ScheduleCompletion(
+            direct_args[0],
+            1,
+            direct_args[2],
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ScheduleCompletion(
+            direct_args[0],
+            "0" * 63,
+            direct_args[2],
+        ),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: ScheduleCompletion(
+            direct_args[0],
+            HostileTextSubclass(direct_args[1]),
+            direct_args[2],
+        ),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: ScheduleCompletion(
+            direct_args[0],
+            direct_args[1],
+            object(),
+        ),
+    )
+    forged_direct_configuration = unsafe_hostile_forge(
+        direct_args[2],
+        word=(2,),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ScheduleCompletion(
+            direct_args[0],
+            direct_args[1],
+            forged_direct_configuration,
+        ),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: ScheduleCompletion(*direct_args, reason=1),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ScheduleCompletion(*direct_args, reason="fixed_point"),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: ScheduleCompletion(*direct_args, successors=[]),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ScheduleCompletion(*direct_args, successors=((),)),
+    )
+
+    tagged_configuration = encode_tagged(completion.configuration)
+    rejected += must_raise(
+        TypeError,
+        lambda: TaggedScheduleCompletion(object()),
+    )
+    forged_tagged_configuration = unsafe_hostile_forge(
+        tagged_configuration,
+        tokens=(DataToken(0),),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: TaggedScheduleCompletion(forged_tagged_configuration),
+    )
+    forged_tagged_schema = unsafe_hostile_forge(
+        tagged_configuration,
+        schema=HostileTextSubclass(TAGGED_SCHEMA_VERSION),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: TaggedScheduleCompletion(forged_tagged_schema),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: TaggedScheduleCompletion(tagged_configuration, reason=1),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: TaggedScheduleCompletion(
+            tagged_configuration,
+            reason="fixed_point",
+        ),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: TaggedScheduleCompletion(tagged_configuration, successors=[]),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: TaggedScheduleCompletion(tagged_configuration, successors=((),)),
+    )
+
+    replicated_configuration = encode_replicated(completion.configuration)
+    rejected += must_raise(
+        TypeError,
+        lambda: ReplicatedScheduleCompletion(object()),
+    )
+    forged_replicated_configuration = unsafe_hostile_forge(
+        replicated_configuration,
+        cells=(PhasedBit(0, 0), PhasedBit(1, 1)),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ReplicatedScheduleCompletion(forged_replicated_configuration),
+    )
+    forged_replicated_schema = unsafe_hostile_forge(
+        replicated_configuration,
+        schema=HostileTextSubclass(REPLICATED_SCHEMA_VERSION),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: ReplicatedScheduleCompletion(forged_replicated_schema),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: ReplicatedScheduleCompletion(replicated_configuration, reason=1),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ReplicatedScheduleCompletion(
+            replicated_configuration,
+            reason="fixed_point",
+        ),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: ReplicatedScheduleCompletion(
+            replicated_configuration,
+            successors=[],
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ReplicatedScheduleCompletion(
+            replicated_configuration,
+            successors=((),),
+        ),
+    )
+
     return rejected
 
 
-EXPECTED_DIGEST = "6bc8f95d07c32b5983c8b0890c7f9b8a07e511c25d77b12c7963ce9fc36b5c1d"
+EXPECTED_DIGEST = "6d0b83733fe0c45a983b1c0c7c289948ea6286e7b7a0e830d8e62f3aa2c8e09b"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:

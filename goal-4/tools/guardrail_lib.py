@@ -1025,6 +1025,18 @@ def validate_contract(
         require(review.get(flag) is True, f"review gate disabled: {flag}")
     require(review.get("unresolved_disagreement_may_close") is False, "unresolved review disagreement may close")
     require(review.get("blanket_document_review_allowed") is False, "blanket review enabled")
+    require(
+        contract.get("quality_policy")
+        == {
+            "path": "goal-4/quality-evaluation.json",
+            "status_required_for_stage_1": "PROTOCOL_FROZEN_SAMPLE_IDS_PENDING_STAGE_2",
+            "minimum_fraction_per_document": "1/20",
+            "minimum_blocks_per_document": 20,
+            "exact_authorial_metrics_required": True,
+            "post_hoc_reranking_allowed": False,
+        },
+        "quality policy binding drift",
+    )
     validate_quality(quality)
     require(licensing.get("contract_id") == "ANKOS-LICENSE-1", "licensing contract ID drift")
     license_rows = {row.get("artifact_class"): row for row in licensing.get("current_records", [])}
@@ -1033,13 +1045,51 @@ def validate_contract(
         license_rows.get("EXTERNAL_REPAIRED_EDITION_REDISTRIBUTION", {}).get("state") == "USE_NOT_AUTHORIZED",
         "external redistribution became implicitly authorized",
     )
+    require(len(license_rows) == len(licensing.get("current_records", [])), "duplicate licensing artifact class")
+    require(licensing.get("credentials_or_secrets_may_be_recorded") is False, "licensing contract permits secrets")
+    modes = contract.get("modes", {})
+    require(
+        modes
+        == {
+            "BUILD": {
+                "network_allowed": False,
+                "witness_mount_required": False,
+                "governed_unresolved_records_allowed": True,
+                "certification": "UNCERTIFIED_WHEN_AUTHORIAL_BLOCKERS_EXIST",
+            },
+            "AUDIT": {
+                "network_allowed": False,
+                "authorized_read_only_witness_required": True,
+                "witness_hashes_rechecked": True,
+                "authorial_blockers_allowed_for_full_certification": False,
+            },
+        },
+        "build/audit mode contract drift",
+    )
     publication = contract.get("publication", {})
+    require(publication.get("contract_id") == "ANKOS-PROMOTION-1", "publication contract ID drift")
+    require(
+        publication.get("target_must_be")
+        == [
+            "ABSENT",
+            "EMPTY",
+            "EXACTLY_OWNED_BY_TRUSTED_EXTERNAL_PRIOR_RELEASE_MANIFEST",
+        ],
+        "publication target-state policy drift",
+    )
     require(publication.get("target_local_manifest_alone_is_trusted") is False, "target-local manifest trusted")
     require(publication.get("unowned_paths_allowed") is False, "unowned release paths allowed")
     require(publication.get("symlinks_allowed") is False, "release symlinks allowed")
     require(publication.get("legacy_promotion_authorized") is False, "legacy promotion implicitly authorized")
     require(publication.get("consumer_migration_authorized") is False, "consumer migration implicitly authorized")
     require(publication.get("external_redistribution_authorized") is False, "external redistribution implicitly authorized")
+    for flag in (
+        "atomic_same_filesystem_rename_required",
+        "content_addressed_release_id_required",
+        "last_known_good_preserved",
+        "rollback_verified",
+    ):
+        require(publication.get(flag) is True, f"publication safety gate disabled: {flag}")
     required_blockers = {
         "RAW_ALLOWLIST_HASH_DRIFT",
         "WITNESS_IDENTITY_OR_REGION_GAP",
@@ -1058,17 +1108,110 @@ def validate_contract(
         "LEGACY_OR_UNRELATED_WORKTREE_MODIFICATION",
     }
     require(set(contract.get("release_blockers", [])) == required_blockers, "release blocker enum drift")
+    serialization = contract.get("serialization", {})
+    require(serialization.get("profile_id") == "ANKOS-MD-1", "Markdown profile drift")
+    require(serialization.get("ast_profile_id") == "ANKOS-AST-1", "AST profile drift")
+    require(serialization.get("canonical_json_profile_id") == "ANKOS-CJ-1", "generated JSON profile drift")
+    require(serialization.get("contract_json_profile_id") == "ANKOS-PJ-1", "contract JSON profile drift")
+    require(serialization.get("encoding") == "UTF-8" and serialization.get("bom") is False, "encoding profile drift")
+    require(serialization.get("line_ending") == "LF" and serialization.get("terminal_lf") == 1, "line ending profile drift")
+    require(serialization.get("unicode_normalization") == "NONE", "Unicode normalization enabled")
+    require(serialization.get("canonical_yaml_front_matter") is False, "canonical YAML front matter enabled")
+    require(serialization.get("generated_namespace") == "ankos-", "generated namespace drift")
+    require(serialization.get("generated_output_as_input") is False, "serialized output can become input")
+    require(serialization.get("fixture_validation_owner_stage") == 7, "style fixture owner drift")
+    require(
+        serialization.get("identifier_grammar")
+        == {
+            "canonical_document_id_regex": "^[A-Z0-9_]+$",
+            "canonical_anchor_slug_regex": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "raw_block_id_regex": "^[A-Z0-9][A-Z0-9_-]*$",
+            "repair_id_regex": "^[A-Z0-9][A-Z0-9_-]*$",
+            "generated_anchor_regex": "^ankos-[a-z0-9]+(?:-[a-z0-9]+)*$",
+        },
+        "identifier grammar drift",
+    )
     compatibility = contract.get("compatibility", {})
-    require(compatibility.get("goal_1_root_oracle_count") == 58, "Goal 1 oracle count drift")
-    require(compatibility.get("goal_1_recursive_affected_count") == 39, "affected oracle count drift")
-    require(compatibility.get("goal_1_recursive_image_or_basename_count") == 26, "image oracle count drift")
+    all_oracle_paths = _frozen_path_list(compatibility.get("all_oracle_paths"), "all oracle paths")
+    affected_paths = _frozen_path_list(compatibility.get("recursive_affected_paths"), "affected oracle paths")
+    image_paths = _frozen_path_list(
+        compatibility.get("recursive_image_or_basename_paths"), "image oracle paths"
+    )
+    _frozen_path_list(compatibility.get("additional_dependency_paths"), "additional dependency paths")
+    require(len(all_oracle_paths) == compatibility.get("goal_1_root_oracle_count"), "Goal 1 oracle count drift")
+    require(len(affected_paths) == compatibility.get("goal_1_recursive_affected_count"), "affected oracle count drift")
+    require(
+        compatibility.get("goal_1_recursive_markdown_count") == len(affected_paths),
+        "recursive Markdown count drift",
+    )
+    require(len(image_paths) == compatibility.get("goal_1_recursive_image_or_basename_count"), "image oracle count drift")
+    require(set(image_paths) <= set(affected_paths) <= set(all_oracle_paths), "oracle scope subset drift")
+    require(compatibility.get("goal_1_direct_legacy_semantic_count") == 2, "direct semantic count drift")
+    require(compatibility.get("goal_1_no_legacy_path_count") == 17, "no-path semantic count drift")
+    require(
+        filename_set_digest(path.removeprefix("goal-1/") for path in all_oracle_paths)
+        == compatibility.get("all_oracle_filename_digest"),
+        "all-oracle filename digest drift",
+    )
+    require(
+        filename_set_digest(path.removeprefix("goal-1/") for path in affected_paths)
+        == compatibility.get("recursive_affected_filename_digest"),
+        "affected-oracle filename digest drift",
+    )
+    require(compatibility.get("capture_all_oracle_classifications") is True, "all-oracle capture disabled")
+    require(compatibility.get("capture_recursive_affected_behaviors") is True, "affected behavior capture disabled")
     require(compatibility.get("book_override_allowed") is False, "unsafe BOOK override enabled")
     require(compatibility.get("repeat_runs_required") == 2, "oracle repeat count weakened")
     require(compatibility.get("empty_sibling_exact_match_required") is True, "empty sibling probe disabled")
     require(compatibility.get("empty_sibling_runs_required") == 1, "empty sibling run count drift")
-    require(compatibility.get("expected_behavior_count") == 39, "compatibility behavior scope drift")
+    require(compatibility.get("after_removal_runs_required") == 1, "post-removal run count drift")
+    require(compatibility.get("initial_sibling_absence_required") is True, "initial sibling absence disabled")
+    require(compatibility.get("final_sibling_absence_required") is True, "final sibling absence disabled")
+    require(compatibility.get("expected_behavior_count") == len(affected_paths), "compatibility behavior scope drift")
+    require(
+        compatibility.get("environment")
+        == {
+            "PATH": "/usr/bin:/bin",
+            "HOME": "/tmp",
+            "LC_ALL": "C.utf8",
+            "LANG": "C.utf8",
+            "TZ": "UTC",
+            "PYTHONHASHSEED": "0",
+            "PYTHONOPTIMIZE": "0",
+            "PYTHONUTF8": "1",
+            "PYTHONIOENCODING": "utf-8",
+            "PYTHONDONTWRITEBYTECODE": "1",
+        },
+        "compatibility environment contract drift",
+    )
+    require(compatibility.get("argv_template") == ["/usr/bin/python3", "-B", "goal-1/<oracle>"], "argv template drift")
+    contract_rows = contract.get("contracts", [])
+    require(isinstance(contract_rows, list) and len(contract_rows) == len(EXPECTED_CONTRACT_PATHS), "contract hash registry count drift")
+    require(
+        {row.get("path") for row in contract_rows} == EXPECTED_CONTRACT_PATHS
+        and len({row.get("path") for row in contract_rows}) == len(contract_rows),
+        "contract hash registry paths drift",
+    )
+    require(
+        all(isinstance(row.get("sha256"), str) and re.fullmatch(r"[0-9a-f]{64}", row["sha256"]) for row in contract_rows),
+        "contract hash registry contains an invalid hash",
+    )
     if check_files:
-        for row in contract.get("contracts", []):
+        require(
+            (repo_root / "goal-4/guardrails.json").read_bytes() == pretty_contract_json_bytes(contract),
+            "guardrails.json is not ANKOS-PJ-1",
+        )
+        require(
+            (repo_root / "goal-4/quality-evaluation.json").read_bytes()
+            == pretty_contract_json_bytes(quality),
+            "quality-evaluation.json is not ANKOS-PJ-1",
+        )
+        require(
+            (repo_root / "goal-4/licensing-contract.json").read_bytes()
+            == pretty_contract_json_bytes(licensing),
+            "licensing-contract.json is not ANKOS-PJ-1",
+        )
+        for row in contract_rows:
             path = repo_root / str(safe_relative_posix(row.get("path", "")))
             require(path.is_file(), f"contract file missing: {path}")
             require(sha256_file(path) == row.get("sha256"), f"frozen contract hash drift: {path}")

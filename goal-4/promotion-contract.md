@@ -14,7 +14,7 @@ The legacy root remains `ref/A-New-Kind-of-Science/`. The sibling is an intentio
 
 - Build from frozen raw inputs plus overlays in a fresh same-filesystem staging directory.
 - Resolve paths component-wise. Accept the prefix-named sibling; reject equality with the legacy root, a true descendant of it, `..` aliases, and any symlink alias into it.
-- The publication target must be absent, empty, or exactly owned by a trusted prior-release manifest stored under `goal-4/releases/`.
+- The publication target must be absent, empty, or exactly owned by a trusted prior-release manifest that is a direct, non-symlinked, non-hardlinked JSON child of the exact repository registry `goal-4/releases/`. Lexical `..`, a symlinked registry parent, another sibling directory, and a target-local or caller-supplied manifest object are never trust roots.
 - Never trust a target-local manifest by itself. For an owned target, every path, file type, mode, size, and hash must equal the externally trusted manifest; symlinks and unowned extras fail.
 - Compute a content-addressed release ID from frozen input, overlay, tool, contract, and output-manifest digests.
 - Validate disk capacity, witness audit certificate, all ledgers, two clean-build equality, inverse replay, compatibility behavior, and repository scope before publication.

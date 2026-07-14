@@ -383,19 +383,19 @@
   "contracts": [
     {
       "path": "goal-4/fidelity-contract.md",
-      "sha256": "e9b6c6cd89d89dc42d4d6f9094b0d9ea143ac10ccedc6000a630836ef3e57286"
+      "sha256": "beff27969f1a80528634265f47d6a9dc1fb1d02e5ffabf2b41f66496502faf80"
     },
     {
       "path": "goal-4/style-guide.md",
-      "sha256": "65035cf5a1352b836b1eacddd6eebf3b1d241b1bc1ba42c52fe86403dd84d1c7"
+      "sha256": "5384c43d599ae9e53c4c48ed3c4c9a0c2f86597b44ff20a4aef4e5ccce285356"
     },
     {
       "path": "goal-4/review-contract.md",
-      "sha256": "f35adcb08457e569783784a067e207a9aff96cadec77798657c4fe86ff2d8534"
+      "sha256": "e59970994624ae103832ce5f289a0729598be89a69401b704f6d4f684d3d546c"
     },
     {
       "path": "goal-4/quality-evaluation.json",
-      "sha256": "dc6d03f6f58213bad0bccb81bd3a23cad6b0e0cde96a13e32ad66a73587fa932"
+      "sha256": "486ed786d08327127569e17c6fcfe30752791866e4cd2ac99c528377d104081a"
     },
     {
       "path": "goal-4/licensing-contract.json",
@@ -403,7 +403,7 @@
     },
     {
       "path": "goal-4/promotion-contract.md",
-      "sha256": "8c48d883e26a07e30e839be06e97de2ca0b738a2b97b2d8c6fb295a9f48a2f1e"
+      "sha256": "d619f50ccce02a934434f7ec9a2f83a70ea735e974aee928bc8b7dbab76714b2"
     }
   ],
   "serialization": {
