@@ -39,6 +39,9 @@ NATIVE_RASTER = (
     / "CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_207_Figure_1.jpeg"
 )
 OFFICIAL_NOTE_SNAPSHOT = ROOT / "goal-1/39-T28-official-note-snapshot.txt"
+WOLFRAM_LANGUAGE_SEMANTICS_SNAPSHOT = (
+    ROOT / "goal-1/39-T28-wolfram-language-semantics-snapshot.txt"
+)
 
 INDEX_FIRST_LINE = 20826
 EXPECTED_BOOK_LINES = 22498
@@ -52,6 +55,27 @@ EXPECTED_OFFICIAL_NOTE_SNAPSHOT_SHA256 = (
 )
 EXPECTED_OFFICIAL_NOTE_DOCUMENT_SHA256 = (
     "f28a332211082048417abce950a75756a4bdae7c7d48f3f12ab87ffdab02328c"
+)
+EXPECTED_WOLFRAM_LANGUAGE_SEMANTICS_SNAPSHOT_SHA256 = (
+    "91f41ca0177ee30c79ba9e7528b1e1398c2912cef07b15e211676a065b4480f5"
+)
+EXPECTED_WOLFRAM_LANGUAGE_SEMANTICS_LINES = (
+    "Partition-Fetched-Document-SHA256: 8aa77bf72ab99e507767c443d4150d5f466627e73c5e221c56e15a12690867f1",
+    "Partition-Description: Partition[list,n,d,{kL,kR}] specifies that the first element of list should appear at position kL in the first sublist. If additional elements are needed, Partition fills them in by treating list as cyclic.",
+    "Partition-Anchor-11320: Partition[list,n,d,k] is equivalent to Partition[list,n,d,{k,k}].",
+    "Partition-Anchor-21074: {-1,-1} — allow maximal overhang at the beginning.",
+    "Partition-Anchor-4983: list — pad by treating list as cyclic (default).",
+    "Partition-Anchor-26746: Partition[list,{n1,n2,...},d] uses offset d at every level.",
+    "Partition-Anchor-10425: {kL,kR} is taken to be equivalent to {{kL,kL,...},{kR,kR,...}}.",
+    "Partition-Anchor-18775: Partition into 2x2 blocks with offset 1, taking the array to be cyclic in both dimensions.",
+    "Part-Fetched-Document-SHA256: 942ef91b5cb8275b1ef594e8802ad568ed88a8444b5138576380bd861c9fd470",
+    "Part-Meta-Description: expr[[-i]] counts from the end.",
+    "Blank-Fetched-Document-SHA256: 0e4fd687eee1e87dbe7b8d311718787e135b5736591ce0ff6aa18edba6ad2b3d",
+    "Blank-Meta-Description: _ or Blank[] is a pattern object that can stand for any Wolfram Language expression.",
+    "ReplaceAll-Fetched-Document-SHA256: e3e1e4e2f3a47c677b17c83e8541f9a355ce2c72d844b7fd9a366e4938626366",
+    "ReplaceAll-Anchor-3097: The first rule that applies to a particular part is used; no further rules are tried on that part or on any of its subparts.",
+    "ReplaceAll-Anchor-6000: expr/.rules returns expr if none of the rules apply.",
+    "ReplaceAll-Anchor-388185595: Only the first rule that matches is applied to each part.",
 )
 
 
@@ -231,7 +255,7 @@ RELATION_CONTINUATIONS = line_set("1020,1024,8022,8026,12111,12115")
 CONTROL_CONTINUATIONS = line_set(
     "2310,2314,2320,2322,2324,"
     "2326,2328,2330,2332,2340,2342,2344,2348,"
-    "2368,2374,2646,13685-13690,14029,14055"
+    "2358,2368,2374,2646,13685-13690,14029,14055"
 )
 
 NATIVE_EVIDENCE = NATIVE_MATCHED | NATIVE_CONTINUATIONS
@@ -338,12 +362,12 @@ EXPECTED_SET = {
     "pre_index_union": (52, "9d6995eaf237deca9959ba2d18547896fcfcf9e14cea07f1fd8e307714616a63"),
     "index": (15, "525d824e26d2830c26e171aeed650e5830a812ae3a251693d0cbd01aa5da85e7"),
     "matched_retained": (41, "38211f87eb2055900e25d896dbd0ab014f00ecfbc873e30a7b141a71cb8c28c7"),
-    "governed_continuations": (30, "df8df7d8c1934fb069d5048e6ee8f8fefef3c0b5a246f2c5616e55fc39759856"),
-    "retained": (71, "985faff919920a422eecde0ef283c86d49c4cea73be8bf33e86d29e96be99c18"),
+    "governed_continuations": (31, "66da462d687a8e10c6c2406808e8b82a2a9d64f236fd4d49de60ba6af0704580"),
+    "retained": (72, "0a869b2388bca1f74cef531c33990effa2e9c9ec97d6e757c53cba89e1a204b4"),
     "excluded": (11, "0d5619d01232a9f8e9fabb87027b847549465b9a4cb916944d4d2f497426c0ed"),
     "native": (6, "8fbba0be6bdf720fd223be421b5b0fdf4e547c8832230b08eb42aca320e9045e"),
     "relation": (13, "83fa916fb2b060dbe8896af54a58950776e900217bdf0da673b88c174c353150"),
-    "control": (52, "be292a32930d092e5bb886849f2cc0f1cc119e2fdf474bdecea8d8ad62f81182"),
+    "control": (53, "e3f511056be9e4e7916d42d4fa2660c4fec2546a1b4f0ec05eeb533e473f9bfd"),
     "governed_images": (10, "06e50ad4cf8480aed23443fd40147ac0fb35e0776e1883d025467943c4889411"),
     "excluded_images": (7, "8b6cbf265e37d7759d88fad5b1fa99c9814dc40293ea8a350f3a40b21bbd26f7"),
 }
@@ -376,7 +400,7 @@ EXPECTED_SPLIT_QUERY = (66, "72049c6d60dda71ba13b6bce1b76d2ea5afeb9bf6cf3f02dc9d
 EXPECTED_SPLIT_QUERY_EXACT = (53, "82102d417dcf8f0d73a18bdb4e797ad1d99218c485dc190319ad550f19da20ff")
 EXPECTED_SPLIT_QUERY_NONEXACT = (13, "d6bc73fd224b5466f28277cab27128a40c35037603b7c10ed4e1fe2ccfdd1ac9")
 EXPECTED_SPLIT_QUERY_MAPPING = (13, "53abbb27d237e52e94deb76a0fe5c949b4d7b55d3ff55593f3c031a7636f5d04")
-EXPECTED_SPLIT_RETAINED_EXACT = (48, "4ef4dbfec95bd1bb4d0b4f8606c29a61115e3dc8987d964f46cc131df16bd453")
+EXPECTED_SPLIT_RETAINED_EXACT = (49, "a90a5bbb2e2111a6921526d38b4dcf45831e8c5a0c659fe06dd5375bb793029e")
 EXPECTED_SPLIT_RETAINED_NONEXACT = (23, "e45d05c69921a8c9d47372b0d380ec9d216855744400a19a887e10d1d6f6a20e")
 EXPECTED_SPLIT_RETAINED_MAPPING = (23, "bf1528da95d3a92fa509f09e1062aed566f89ccf15ded67713baed7a5b279748")
 EXPECTED_MONOLITH_ONLY = (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
@@ -415,10 +439,10 @@ def best_witness(canonical: str, candidates: list[tuple[str, str]]) -> tuple[str
 def periodic_windows_2x2(
     grid: tuple[tuple[int, ...], ...],
 ) -> tuple[tuple[tuple[tuple[int, int], tuple[int, int]], ...], ...]:
-    """Derived reading of ``Partition[..., {2,2}, 1, -1]``.
+    """Explicit named ``((NW,N),(W,self))`` periodic product reader.
 
     Each locus is the southeast/self cell of ``((NW, N), (W, self))``;
-    indices wrap in both dimensions, as the hash-bound page-207 caption says.
+    indices wrap in both dimensions.
     """
 
     assert grid and all(grid) and len({len(row) for row in grid}) == 1
@@ -433,6 +457,51 @@ def periodic_windows_2x2(
         )
         for y in range(height)
     )
+
+
+def documented_partition_windows_2x2(
+    grid: tuple[tuple[int, ...], ...],
+) -> tuple[tuple[tuple[tuple[int, int], tuple[int, int]], ...], ...]:
+    """Derive the source expression from the frozen Wolfram semantics.
+
+    For a length-two block, documented scalar ``k=-1`` puts the first old
+    element in the last slot at every level.  Default overhang padding is the
+    old list treated cyclically, and scalar ``d=1`` applies at every level.
+    """
+
+    assert grid and all(grid) and len({len(row) for row in grid}) == 1
+    block_size = 2
+    scalar_k = -1
+    first_old_zero_based_slot = block_size + scalar_k
+    assert first_old_zero_based_slot == 1
+    start_delta = -first_old_zero_based_slot
+    height, width = len(grid), len(grid[0])
+    return tuple(
+        tuple(
+            tuple(
+                tuple(
+                    grid[(source_y + start_delta + local_y) % height][
+                        (source_x + start_delta + local_x) % width
+                    ]
+                    for local_x in range(block_size)
+                )
+                for local_y in range(block_size)
+            )
+            for source_x in range(width)
+        )
+        for source_y in range(height)
+    )
+
+
+def documented_replace_all_atom(
+    value: str, ordered_rules: tuple[tuple[str, str], ...]
+) -> str:
+    """Small witness for documented first-match and unchanged fallback laws."""
+
+    for pattern, replacement in ordered_rules:
+        if pattern == "_" or pattern == value:
+            return replacement
+    return value
 
 
 def flatten2d_uniform(
@@ -499,6 +568,24 @@ def main() -> int:
         )
         == 1
     )
+    language_semantics_raw = WOLFRAM_LANGUAGE_SEMANTICS_SNAPSHOT.read_bytes()
+    language_semantics_text = language_semantics_raw.decode("utf-8")
+    language_semantics_ok = (
+        hashlib.sha256(language_semantics_raw).hexdigest()
+        == EXPECTED_WOLFRAM_LANGUAGE_SEMANTICS_SNAPSHOT_SHA256
+        and all(
+            language_semantics_text.count(line) == 1
+            for line in EXPECTED_WOLFRAM_LANGUAGE_SEMANTICS_LINES
+        )
+        and language_semantics_text.count(
+            "Therefore the first window has the first old element at its lower-right slot"
+        )
+        == 1
+        and language_semantics_text.count(
+            "ReplaceAll preserves rule-list priority"
+        )
+        == 1
+    )
     source_ok = (
         len(lines) == EXPECTED_BOOK_LINES
         and hashlib.sha256(raw).hexdigest() == EXPECTED_BOOK_SHA256
@@ -507,6 +594,7 @@ def main() -> int:
         and sha256(TAXONOMY) == EXPECTED_TAXONOMY_SHA256
         and sha256(NATIVE_RASTER) == EXPECTED_NATIVE_RASTER_SHA256
         and official_snapshot_ok
+        and language_semantics_ok
     )
     ok = source_ok
     print("source", "OK" if source_ok else "MISMATCH")
@@ -690,6 +778,28 @@ def main() -> int:
         EXPECTED_OFFICIAL_NOTE_DOCUMENT_SHA256,
     )
 
+    documented_windows = documented_partition_windows_2x2(
+        ((0, 1, 2), (3, 4, 5))
+    )
+    named_windows = periodic_windows_2x2(((0, 1, 2), (3, 4, 5)))
+    language_model_ok = (
+        language_semantics_ok
+        and documented_windows == named_windows
+        and documented_windows[0][0] == ((5, 3), (2, 0))
+        and documented_windows[1][2] == ((1, 2), (4, 5))
+        and documented_replace_all_atom(
+            "x", (("_", "first"), ("x", "second"))
+        )
+        == "first"
+        and documented_replace_all_atom("x", (("y", "other"),)) == "x"
+    )
+    ok &= language_model_ok
+    print(
+        "source_hash_bound_Wolfram_Partition_Blank_ReplaceAll_semantics",
+        "OK" if language_model_ok else "MISMATCH",
+        EXPECTED_WOLFRAM_LANGUAGE_SEMANTICS_SNAPSHOT_SHA256,
+    )
+
     main_construction_ok = (
         "interaction between different elements" in at(2350)
         and "replacement for a particular element" in at(2350)
@@ -733,10 +843,12 @@ def main() -> int:
         "OK" if adaptive_extension_ok else "MISMATCH",
     )
 
-    windows = periodic_windows_2x2(((0, 1, 2), (3, 4, 5)))
+    windows = documented_windows
     example_window = ((9, 1), (0, 1))
     periodic_model_ok = (
-        windows[0][0] == ((5, 3), (2, 0))
+        language_model_ok
+        and windows == named_windows
+        and windows[0][0] == ((5, 3), (2, 0))
         and windows[1][2] == ((1, 2), (4, 5))
         and example_window[0][1] == 1
         and example_window[1] == (0, 1)
@@ -779,6 +891,9 @@ def main() -> int:
         and "highly uniform rules always yielding just one cell" in at(8028)
         and "squares produced to overlap" in at(2334)
         and "difficult to define an obvious notion of neighbors" in at(2352)
+        and "every element is replaced at each step" in at(2358)
+        and "just a single block of elements are replaced at each step" in at(2358)
+        and 2358 in CONTROL_EVIDENCE
         and "no immediate way to generalize sequential substitution systems" in at(2366)
         and "fixed underlying geometrical structure" in at(2372)
         and "network system is fundamentally just a collection of nodes" in at(2376)
@@ -938,6 +1053,7 @@ def main() -> int:
     architecture_inference_ok = (
         raster_ok
         and repair_ok
+        and language_model_ok
         and main_construction_ok
         and notes_ok
         and adaptive_extension_ok
