@@ -14,10 +14,10 @@ through the structural SimpleProgram path:
                   -> endpoint replacement -> T16 single splice
 
 It binds successful and partial ``StepResult`` envelopes, complete access
-witnesses, structural program identity, compact trace replay, the page-131 case
-(d) observers, and the lossless prefix/tagged-word commuting square.  It imports
-no project/runtime modules, is silent on import, and fails closed under
-``python -O``.
+witnesses, structural program identity, full validation traces plus compact
+D073 reconstruction projections, the page-131 case (d) observers, and the
+lossless prefix/tagged-word commuting square.  It imports no project/runtime
+modules, is silent on import, and fails closed under ``python -O``.
 """
 
 from __future__ import annotations
@@ -1123,7 +1123,7 @@ class RunTrace:
     requested_events: int
     states: tuple[NumericPrefix, ...]
     events: tuple[AppendEvent, ...]
-    outcome: Advanced | ErrorOutcome
+    outcome: Advanced | ErrorOutcome | None
     terminal_attempt: AccessFailure | ResultOutsideCarrier | None
 
     def __post_init__(self) -> None:
@@ -1145,8 +1145,11 @@ class RunTrace:
                 raise ValueError("trace event provenance mismatch")
             if event.before != states[index] or event.after != states[index + 1]:
                 raise ValueError("trace event/state continuity failure")
-        if type(self.outcome) is Advanced:
-            if len(events) != requested or self.terminal_attempt is not None:
+        if self.outcome is None:
+            if requested != 0 or events or self.terminal_attempt is not None:
+                raise ValueError("empty trace marker is valid only for a zero-event request")
+        elif type(self.outcome) is Advanced:
+            if requested == 0 or len(events) != requested or self.terminal_attempt is not None:
                 raise ValueError("completed trace must commit every requested event")
         elif type(self.outcome) is ErrorOutcome:
             if len(events) >= requested or type(self.terminal_attempt) not in (AccessFailure, ResultOutsideCarrier):
@@ -1155,7 +1158,7 @@ class RunTrace:
             if reason != self.outcome.reason:
                 raise ValueError("trace error reason/attempt mismatch")
         else:
-            raise TypeError("trace outcome must be Advanced or ErrorOutcome")
+            raise TypeError("trace outcome must be None, Advanced, or ErrorOutcome")
         object.__setattr__(self, "requested_events", requested)
         object.__setattr__(self, "states", states)
         object.__setattr__(self, "events", events)
@@ -1191,7 +1194,7 @@ def run(program: object, initial: object, requested_events: object) -> RunTrace:
         requested,
         tuple(states),
         tuple(events),
-        Advanced(True),
+        None if requested == 0 else Advanced(True),
         None,
     )
 
@@ -1203,6 +1206,97 @@ def verify_trace(program: object, trace: object) -> bool:
         return False
     replay = run(program, trace.initial, trace.requested_events)
     return replay == trace and all(verify_append_event(program, event) for event in trace.events)
+
+
+CompactAppendRecord: TypeAlias = tuple[int, ResolvedAccess]
+CompactTraceProjection: TypeAlias = tuple[
+    ProgramProvenance,
+    NumericPrefix,
+    int,
+    tuple[CompactAppendRecord, ...],
+    AccessFailure | ResultOutsideCarrier | None,
+]
+
+
+def compact_trace_projection(trace: object) -> CompactTraceProjection:
+    """Project a full validation trace to D073 seed-plus-append reconstruction data."""
+
+    if type(trace) is not RunTrace:
+        raise TypeError("compact projection requires exact RunTrace")
+    records = tuple((event.after.terms[-1], event.access) for event in trace.events)
+    return (
+        trace.provenance,
+        trace.initial,
+        trace.requested_events,
+        records,
+        trace.terminal_attempt,
+    )
+
+
+def replay_compact_trace(program: object, value: object) -> RunTrace:
+    """Losslessly rebuild every full prefix/event from a compact projection."""
+
+    if type(program) is not RecurrenceProgram:
+        raise TypeError("compact replay requires exact RecurrenceProgram")
+    projection = exact_tuple(value, "compact trace projection")
+    if len(projection) != 5:
+        raise ValueError("compact trace projection requires five fields")
+    provenance, initial, requested_raw, records_raw, terminal_attempt = projection
+    if type(provenance) is not ProgramProvenance or provenance != program_provenance(program):
+        raise ValueError("compact trace provenance mismatch")
+    if type(initial) is not NumericPrefix:
+        raise TypeError("compact trace initial state must be NumericPrefix")
+    requested = checked_nonnegative(requested_raw, "compact requested events")
+    records = exact_tuple(records_raw, "compact append records")
+    if terminal_attempt is not None and type(terminal_attempt) not in (AccessFailure, ResultOutsideCarrier):
+        raise TypeError("compact terminal attempt has an invalid type")
+    if len(records) > requested:
+        raise ValueError("compact trace contains more records than requested")
+    if terminal_attempt is None and len(records) != requested:
+        raise ValueError("completed compact trace must contain every requested record")
+    if terminal_attempt is not None and len(records) >= requested:
+        raise ValueError("partial compact trace must stop before its requested horizon")
+
+    states = [initial]
+    events: list[AppendEvent] = []
+    current = initial
+    for raw_record in records:
+        record = exact_tuple(raw_record, "compact append record")
+        if len(record) != 2:
+            raise ValueError("compact append record requires next value and access witness")
+        next_value = checked_positive(record[0], "compact append value")
+        access = record[1]
+        if type(access) is not ResolvedAccess:
+            raise TypeError("compact append access must be ResolvedAccess")
+        step = generic_step(program, current)
+        if type(step.outcome) is not Advanced or type(step.event) is not AppendEvent:
+            raise ValueError("compact append record claims advancement where evaluation fails")
+        if step.attempt != access or step.successors[0].terms[-1] != next_value:
+            raise ValueError("compact append record does not match deterministic replay")
+        events.append(step.event)
+        current = step.successors[0]
+        states.append(current)
+
+    if terminal_attempt is None:
+        outcome: Advanced | ErrorOutcome | None = None if requested == 0 else Advanced(True)
+    else:
+        failed = generic_step(program, current)
+        if type(failed.outcome) is not ErrorOutcome or failed.attempt != terminal_attempt:
+            raise ValueError("compact terminal attempt does not match deterministic replay")
+        outcome = failed.outcome
+
+    trace = RunTrace(
+        provenance,
+        initial,
+        requested,
+        tuple(states),
+        tuple(events),
+        outcome,
+        terminal_attempt,
+    )
+    if compact_trace_projection(trace) != projection:
+        raise ValueError("compact projection was not canonical")
+    return trace
 
 
 def binary_digits(value: object) -> tuple[int, ...]:
@@ -1408,16 +1502,18 @@ def audit_dependent_access_and_partiality() -> tuple[int, int, int, int, int, in
     nested_prefix = NumericPrefix(1, (2, 1))
     nested_result = generic_step(nested_program, nested_prefix)
     assert type(nested_result.outcome) is Advanced
-    assert nested_result.successors[0].terms == (2, 1, 2)
-    assert demand_addresses(nested_result.access) == (2, 1)
-    assert tuple(demand.path for demand in nested_result.access.demands) == ((0, 0), ())
+    assert nested_result.successors[0].terms == (2, 1, 1)
+    assert type(nested_result.attempt) is ResolvedAccess
+    assert demand_addresses(nested_result.attempt) == (2, 1, 2)
+    assert tuple(demand.path for demand in nested_result.attempt.demands) == ((0, 0), (0,), ())
     cases += 1
-    successful_demands += 2
+    successful_demands += 3
 
     repeated_program = RecurrenceProgram(plus(lag(1), lag(1)))
     repeated_result = generic_step(repeated_program, NumericPrefix(1, (1, 1)))
     assert type(repeated_result.outcome) is Advanced
-    repeated = repeated_result.access.demands
+    assert type(repeated_result.attempt) is ResolvedAccess
+    repeated = repeated_result.attempt.demands
     assert len(repeated) == 2
     assert repeated[0].address == repeated[1].address == 2
     assert repeated[0].handle == repeated[1].handle
@@ -1430,8 +1526,8 @@ def audit_dependent_access_and_partiality() -> tuple[int, int, int, int, int, in
     last = generic_step(RecurrenceProgram(lag(1)), equal_values)
     older = generic_step(RecurrenceProgram(lag(2)), equal_values)
     assert last.successors[0].terms[-1] == older.successors[0].terms[-1] == 1
-    assert last.access.demands[0].address == 2
-    assert older.access.demands[0].address == 1
+    assert type(last.attempt) is ResolvedAccess and last.attempt.demands[0].address == 2
+    assert type(older.attempt) is ResolvedAccess and older.attempt.demands[0].address == 1
     cases += 2
     successful_demands += 2
 
@@ -1540,15 +1636,17 @@ def audit_lossiness_and_fixed_lag_boundary() -> tuple[int, int, int, int, int]:
             result = generic_step(program, prefix)
             assert type(result.outcome) is Advanced
             assert result.successors[0].terms[-1] == prefix.value_at(prefix.next_index - distance)
-            assert demand_addresses(result.access) == (prefix.next_index - distance,)
+            assert type(result.attempt) is ResolvedAccess
+            assert demand_addresses(result.attempt) == (prefix.next_index - distance,)
             fixed_lag_commutations += 1
 
     row_a = dict(source_programs())["a"]
     prefix = NumericPrefix(1, (1,))
     for _ in range(32):
         result = generic_step(row_a, prefix)
-        first = result.access.demands[0]
-        second = result.access.demands[1]
+        assert type(result.attempt) is ResolvedAccess
+        first = result.attempt.demands[0]
+        second = result.attempt.demands[1]
         assert first.address == prefix.next_index - 1
         dynamic_lags.append(prefix.next_index - second.address)
         prefix = result.successors[0]
@@ -1664,8 +1762,10 @@ def audit_structural_identity_and_replay() -> tuple[int, int, int, int, int, int
 
     ordered_program_guards = 2
     assert expression_key(order_left.expression) != expression_key(order_right.expression)
-    assert demand_addresses(generic_step(order_left, NumericPrefix(1, (2, 3))).access) == (2, 1)
-    assert demand_addresses(generic_step(order_right, NumericPrefix(1, (2, 3))).access) == (1, 2)
+    left_attempt = generic_step(order_left, NumericPrefix(1, (2, 3))).attempt
+    right_attempt = generic_step(order_right, NumericPrefix(1, (2, 3))).attempt
+    assert type(left_attempt) is ResolvedAccess and demand_addresses(left_attempt) == (2, 1)
+    assert type(right_attempt) is ResolvedAccess and demand_addresses(right_attempt) == (1, 2)
     return len(keys), len(identifiers), cross_rejections, serialization_roundtrips, ordered_program_guards, len(trace.events)
 
 
@@ -1698,17 +1798,84 @@ def audit_trace_shape_and_error_retention() -> tuple[int, int, int, int, int, in
     assert failure.terminal_attempt.reason.address == 0
     assert verify_trace(partial, failure)
 
-    delayed = RecurrenceProgram(
-        at(minus(N(), at(minus(N(), C(1)))))
-    )
+    delayed = RecurrenceProgram(at(minus(lag(1), C(1))))
     delayed_failure = run(delayed, NumericPrefix(1, (1, 2)), 5)
     assert type(delayed_failure.outcome) is ErrorOutcome
-    assert len(delayed_failure.events) == 0
-    assert len(delayed_failure.states) == 1
+    assert len(delayed_failure.events) == 1
+    assert len(delayed_failure.states) == 2
+    assert delayed_failure.states[-1].terms == (1, 2, 1)
+    assert type(delayed_failure.terminal_attempt) is AccessFailure
+    assert delayed_failure.terminal_attempt.reason.address == 0
+    assert verify_trace(delayed, delayed_failure)
 
     no_partial_events = 2
     retained_last_states = 2
     return len(horizons), events, states, replays, no_partial_events, retained_last_states
+
+
+def audit_compact_trace_reconstruction() -> tuple[int, int, int, int, int, int]:
+    full_traces: list[tuple[RecurrenceProgram, RunTrace]] = []
+    for preset in source_presets():
+        requested = len(preset.visible_terms) - len(preset.seed.terms)
+        full_traces.append((preset.program, run(preset.program, preset.seed, requested)))
+
+    row_c = dict(source_programs())["c"]
+    zero = run(row_c, NumericPrefix(1, (1, 1)), 0)
+    assert zero.outcome is None
+    full_traces.append((row_c, zero))
+
+    partial_program = RecurrenceProgram(Sub(lag(1), C(1)))
+    partial = run(partial_program, NumericPrefix(1, (2,)), 5)
+    assert type(partial.outcome) is ErrorOutcome
+    assert type(partial.terminal_attempt) is ResultOutsideCarrier
+    assert len(partial.events) == 1
+    full_traces.append((partial_program, partial))
+
+    record_count = 0
+    full_prefix_cells = 0
+    compact_value_cells = 0
+    terminal_replays = 0
+    for program, trace in full_traces:
+        projection = compact_trace_projection(trace)
+        rebuilt = replay_compact_trace(program, projection)
+        assert rebuilt == trace
+        assert compact_trace_projection(rebuilt) == projection
+        record_count += len(projection[3])
+        full_prefix_cells += sum(len(state.terms) for state in trace.states)
+        compact_value_cells += len(trace.initial.terms) + len(projection[3])
+        terminal_replays += projection[4] is not None
+
+    assert record_count == 326
+    assert terminal_replays == 1
+    assert full_prefix_cells > 10 * compact_value_cells
+
+    mutations = 0
+    baseline_program, baseline_trace = full_traces[0]
+    baseline = compact_trace_projection(baseline_trace)
+    first_value, first_access = baseline[3][0]
+    wrong_value_records = ((first_value + 1, first_access), *baseline[3][1:])
+    wrong_value = (baseline[0], baseline[1], baseline[2], wrong_value_records, baseline[4])
+    mutations += must_raise(ValueError, lambda: replay_compact_trace(baseline_program, wrong_value))
+
+    other_access = compact_trace_projection(full_traces[1][1])[3][0][1]
+    wrong_access_records = ((first_value, other_access), *baseline[3][1:])
+    wrong_access = (baseline[0], baseline[1], baseline[2], wrong_access_records, baseline[4])
+    mutations += must_raise(ValueError, lambda: replay_compact_trace(baseline_program, wrong_access))
+
+    truncated = (baseline[0], baseline[1], baseline[2], baseline[3][:-1], None)
+    mutations += must_raise(ValueError, lambda: replay_compact_trace(baseline_program, truncated))
+    partial_projection = compact_trace_projection(partial)
+    missing_terminal = (
+        partial_projection[0],
+        partial_projection[1],
+        partial_projection[2],
+        partial_projection[3],
+        None,
+    )
+    mutations += must_raise(ValueError, lambda: replay_compact_trace(partial_program, missing_terminal))
+    assert mutations == 4
+
+    return len(full_traces), record_count, full_prefix_cells, compact_value_cells, terminal_replays, mutations
 
 
 FORBIDDEN_EXECUTION_ROLE_SUFFIXES = (
@@ -1847,7 +2014,11 @@ def audit_hostile_validation() -> int:
     program = dict(source_programs())["e"]
     event = generic_step(program, NumericPrefix(1, (1, 1))).event
     assert verify_append_event(program, event)
-    forged_after = replace(event, after=NumericPrefix(1, event.after.terms[:-1] + (99,)))
+    bad_after = NumericPrefix(1, event.after.terms[:-1] + (99,))
+    rejected += must_raise(ValueError, lambda: replace(event, after=bad_after))
+    forged_after = object.__new__(AppendEvent)
+    for field in fields(AppendEvent):
+        object.__setattr__(forged_after, field.name, bad_after if field.name == "after" else getattr(event, field.name))
     assert not verify_append_event(program, forged_after)
     rejected += 1
     forged_access = replace(
@@ -1969,7 +2140,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "TO_BE_COMPUTED"
+EXPECTED_DIGEST = "faee16f26234a7b90da40e8642ddef63224898ac217e436efd9091df7f3764b9"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
@@ -1981,6 +2152,7 @@ def collect_audit_summary() -> tuple[tuple[str, object], ...]:
     bigint = audit_arbitrary_precision()
     identity = audit_structural_identity_and_replay()
     trace_shape = audit_trace_shape_and_error_retention()
+    compact_trace = audit_compact_trace_reconstruction()
     surface = audit_no_new_execution_surface()
     hostile = audit_hostile_validation()
     return (
@@ -1992,6 +2164,7 @@ def collect_audit_summary() -> tuple[tuple[str, object], ...]:
         ("arbitrary_precision", bigint),
         ("structural_identity_replay", identity),
         ("trace_shape_error_retention", trace_shape),
+        ("compact_trace_reconstruction", compact_trace),
         ("execution_surface", surface),
         ("hostile_rejections", hostile),
         ("source_formulas", SOURCE_FORMULAS),
@@ -2024,6 +2197,7 @@ def main() -> None:
     bigint = metrics["arbitrary_precision"]
     identity = metrics["structural_identity_replay"]
     trace_shape = metrics["trace_shape_error_retention"]
+    compact_trace = metrics["compact_trace_reconstruction"]
     surface = metrics["execution_surface"]
 
     print(
@@ -2063,6 +2237,11 @@ def main() -> None:
         f"trace_horizons={trace_shape[0]}; trace_events={trace_shape[1]}; "
         f"trace_states={trace_shape[2]}; trace_replays={trace_shape[3]}; "
         f"no_partial_events={trace_shape[4]}; retained_last_states={trace_shape[5]}"
+    )
+    print(
+        f"compact_traces={compact_trace[0]}; compact_records={compact_trace[1]}; "
+        f"full_prefix_cells={compact_trace[2]}; compact_value_cells={compact_trace[3]}; "
+        f"compact_terminal_replays={compact_trace[4]}; compact_mutation_rejections={compact_trace[5]}"
     )
     print(
         f"surface=configuration{surface[0]}/state{surface[1]}/frontier{surface[2]}/"

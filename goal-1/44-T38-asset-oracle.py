@@ -44,6 +44,14 @@ def digest_records(values: set[str] | frozenset[str]) -> str:
     return sha256(bytes(payload))
 
 
+def digest_lines(values: set[int] | frozenset[int]) -> str:
+    return sha256(",".join(map(str, sorted(values))).encode("ascii"))
+
+
+def digest_source_records(values: set[str] | frozenset[str]) -> str:
+    return sha256("\n".join(sorted(values)).encode("utf-8"))
+
+
 book_bytes = BOOK.read_bytes()
 assert len(book_bytes.decode("utf-8").splitlines()) == EXPECTED_BOOK_LINES
 assert sha256(book_bytes) == EXPECTED_BOOK_SHA256
@@ -117,9 +125,28 @@ CONTROL_IMAGE_LINES = frozenset()
 GOVERNED_IMAGE_LINES = frozenset(ASSETS)
 EXCLUDED_IMAGE_LINES = frozenset(EXCLUDED_ASSETS)
 CANDIDATE_IMAGE_LINES = GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
+UNRESOLVED_IMAGE_LINES: frozenset[int] = frozenset()
 assert set(ASSETS) == set(NATIVE_IMAGE_LINES | RELATION_IMAGE_LINES)
 assert not (GOVERNED_IMAGE_LINES & EXCLUDED_IMAGE_LINES)
 assert len(CANDIDATE_IMAGE_LINES) == 15
+
+# These boundaries are nested capabilities, not mutually exclusive labels:
+# every governed raster is byte-hash-bound; two additionally have a limited
+# manual transcription; none is pixel-replayed.
+HASH_BOUND_IMAGE_LINES = GOVERNED_IMAGE_LINES
+LIMITED_TRANSCRIBED_IMAGE_LINES = frozenset(
+    line for line, asset in ASSETS.items()
+    if asset.boundary == "LIMITED_TRANSCRIBED"
+)
+PIXEL_REPLAYED_IMAGE_LINES: frozenset[int] = frozenset()
+assert LIMITED_TRANSCRIBED_IMAGE_LINES == frozenset({1573, 1599})
+assert PIXEL_REPLAYED_IMAGE_LINES <= LIMITED_TRANSCRIBED_IMAGE_LINES
+assert LIMITED_TRANSCRIBED_IMAGE_LINES <= HASH_BOUND_IMAGE_LINES
+assert (
+    len(HASH_BOUND_IMAGE_LINES),
+    len(LIMITED_TRANSCRIBED_IMAGE_LINES),
+    len(PIXEL_REPLAYED_IMAGE_LINES),
+) == (4, 2, 0)
 
 
 PROGRAM_TRANSCRIPT = frozenset({
@@ -197,6 +224,10 @@ EXPECTED_MANIFEST_DIGESTS = {
 }
 EXPECTED_GOVERNED_LEDGER_SHA256 = "3c452b9744ee59b3fcc73c51696a918afce5058b68ce2da3e297cbacf5402f29"
 EXPECTED_EXCLUDED_LEDGER_SHA256 = "d38473a634eb17c3af67427517ba5020d3b5cf5dd1e76139f1c4e8eadb204686"
+EXPECTED_SOURCE_SEMANTIC_GUARD_CONTRACT = (
+    25,
+    "e3fe7d2455039acbf875899046d67d96b0cd862724532b58407fabc5a071fa53",
+)
 
 
 def verify_semantic_manifests() -> None:
@@ -251,17 +282,66 @@ def verify_source_guards() -> None:
 
 
 def verify_source_interface() -> None:
+    assert SOURCE_ORACLE_PATH.is_file(), "T38 source oracle is not frozen"
     source = runpy.run_path(str(SOURCE_ORACLE_PATH), run_name="t38_source_for_asset")
     expected = {
-        "GOVERNED_IMAGE_LINES": GOVERNED_IMAGE_LINES,
-        "EXCLUDED_IMAGE_LINES": EXCLUDED_IMAGE_LINES,
         "NATIVE_IMAGE_LINES": NATIVE_IMAGE_LINES,
         "RELATION_IMAGE_LINES": RELATION_IMAGE_LINES,
         "CONTROL_IMAGE_LINES": CONTROL_IMAGE_LINES,
+        "GOVERNED_IMAGE_LINES": GOVERNED_IMAGE_LINES,
+        "EXCLUDED_IMAGE_LINES": EXCLUDED_IMAGE_LINES,
+        "CANDIDATE_IMAGE_LINES": CANDIDATE_IMAGE_LINES,
+        "UNRESOLVED_IMAGE_LINES": UNRESOLVED_IMAGE_LINES,
     }
     for name, values in expected.items():
-        assert frozenset(source[name]) == values, (name, source[name], values)
-    assert frozenset(source["SOURCE_SEMANTIC_GUARDS"])
+        actual = frozenset(source[name])
+        assert actual == values, (name, sorted(actual), sorted(values))
+
+    expected_partition = {
+        "native": (len(NATIVE_IMAGE_LINES), digest_lines(NATIVE_IMAGE_LINES)),
+        "relation": (
+            len(RELATION_IMAGE_LINES), digest_lines(RELATION_IMAGE_LINES)
+        ),
+        "control": (len(CONTROL_IMAGE_LINES), digest_lines(CONTROL_IMAGE_LINES)),
+    }
+    assert source["EXPECTED_IMAGE_ROLE_PARTITION"] == expected_partition
+    expected_ledger = {
+        "candidate_images": (
+            len(CANDIDATE_IMAGE_LINES), digest_lines(CANDIDATE_IMAGE_LINES)
+        ),
+        "governed_images": (
+            len(GOVERNED_IMAGE_LINES), digest_lines(GOVERNED_IMAGE_LINES)
+        ),
+        "excluded_images": (
+            len(EXCLUDED_IMAGE_LINES), digest_lines(EXCLUDED_IMAGE_LINES)
+        ),
+    }
+    assert source["EXPECTED_IMAGE_LEDGER"] == expected_ledger
+    expected_line_contracts = {
+        "EXPECTED_CANDIDATE_IMAGE_LINES": expected_ledger["candidate_images"],
+        "EXPECTED_GOVERNED_IMAGE_LINES": expected_ledger["governed_images"],
+        "EXPECTED_EXCLUDED_IMAGE_LINES": expected_ledger["excluded_images"],
+        "EXPECTED_UNRESOLVED_IMAGE_LINES": (
+            len(UNRESOLVED_IMAGE_LINES), digest_lines(UNRESOLVED_IMAGE_LINES)
+        ),
+    }
+    for name, contract in expected_line_contracts.items():
+        assert tuple(source[name]) == contract, (name, source[name], contract)
+
+    source_guard_records = frozenset(source["SOURCE_SEMANTIC_GUARD_RECORDS"])
+    assert source_guard_records
+    assert all(
+        isinstance(record, str) and record and "\n" not in record
+        for record in source_guard_records
+    )
+    source_guard_contract = (
+        len(source_guard_records), digest_source_records(source_guard_records)
+    )
+    assert source_guard_contract == EXPECTED_SOURCE_SEMANTIC_GUARD_CONTRACT
+    assert (
+        tuple(source["EXPECTED_SOURCE_SEMANTIC_GUARDS"])
+        == EXPECTED_SOURCE_SEMANTIC_GUARD_CONTRACT
+    )
 
 
 def split_and_physical_indices() -> tuple[
@@ -343,7 +423,9 @@ def main() -> None:
     assert gm == (4, 4, 4, 407_976, 3), gm
     assert xm == (11, 11, 11, 245_462, 6), xm
     assert {a.boundary for a in ASSETS.values()} == {"LIMITED_TRANSCRIBED", "HASH_BOUND"}
-    assert sum(a.boundary == "LIMITED_TRANSCRIBED" for a in ASSETS.values()) == 2
+    assert HASH_BOUND_IMAGE_LINES == GOVERNED_IMAGE_LINES
+    assert LIMITED_TRANSCRIBED_IMAGE_LINES == frozenset({1573, 1599})
+    assert not PIXEL_REPLAYED_IMAGE_LINES
     assert len(PROGRAM_TRANSCRIPT) == 8
     assert tuple(map(len, VISIBLE_TERM_ROWS.values())) == (48,44,40,40,40,42,41,45)
     print(
