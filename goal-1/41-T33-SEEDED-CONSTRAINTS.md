@@ -1,6 +1,6 @@
 # 41-T33-SEEDED-CONSTRAINTS
 
-Status: **IN PROGRESS — SOURCE, ASSET, AND SEMANTIC ORACLES CLOSED; RUNTIME-FIT, INTEGRATION, AND HOSTILE REVIEW PENDING**
+Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, RUNTIME-FIT, AND D135 INTEGRATION CLOSED; INDEPENDENT HOSTILE REVIEW PENDING**
 
 ## Current Facts
 
@@ -261,15 +261,15 @@ The checked-in runtime lacks the shared declarative relation/query layer already
 
 ## Completion Requirements
 
-- [ ] Every direct name, quantifier phrase, strict example, Notes extension, actual Index route, continuation, split witness, image link, and false seed match is dispositioned with zero unresolved mechanics.
-- [ ] The `32 * 2^32` count, printed numbering, required-template identity, and required-not-allowed boundary are reconciled exactly.
-- [ ] Centered display/search is proved to be witness-bearing translation gauge, not a semantic fixed anchor or initial condition.
-- [ ] The governed asset universe and honest transcription boundary are hash-bound.
-- [ ] Singleton and all-required denotations, scopes, witnesses, translations, symmetries, queries, and solver separation are reconstructed.
-- [ ] The T32 forgetful map, strict-subset witness, and nonlocal counterexample prove the exact reuse/extension boundary.
-- [ ] Direct/generic reports commute under adversarial periodic/window/alias/translation/malformed cases.
-- [ ] Runtime fit and smallest Goal 2 delta are implementation-ready without a seed/executor branch.
-- [ ] Stage, plan, evidence index, design ledger, and architecture audit are synchronized under the next decision.
+- [x] Every direct name, quantifier phrase, strict example, Notes extension, actual Index route, continuation, split witness, image link, and false seed match is dispositioned with zero unresolved mechanics.
+- [x] The `32 * 2^32` count, printed numbering, required-template identity, and required-not-allowed boundary are reconciled exactly.
+- [x] Centered display/search is proved to be witness-bearing translation gauge, not a semantic fixed anchor or initial condition.
+- [x] The governed asset universe and honest transcription boundary are hash-bound.
+- [x] Singleton and all-required denotations, scopes, witnesses, translations, symmetries, queries, and solver separation are reconstructed.
+- [x] The T32 forgetful map, strict-subset witness, and nonlocal counterexample prove the exact reuse/extension boundary.
+- [x] Direct/generic reports commute under adversarial periodic/window/alias/translation/malformed cases.
+- [x] Runtime fit and smallest Goal 2 delta are implementation-ready without a seed/executor branch.
+- [x] Stage, plan, evidence index, design ledger, and architecture audit are synchronized under the next decision.
 - [ ] Root/`/tmp`, optimized fail-closed, silent import, compile, repository tests, modes, Markdown, diff, scope, and fresh hostile review pass.
 
 ## Stage Results
@@ -278,4 +278,4 @@ Source, asset, and semantic reconstruction are closed. The 32-query source audit
 
 The semantic oracle closes 666 configurations, 256 strict constraints, 170,496 direct/generic complete-report commutations, 1,397,248 anchor checks, explicit translation/D4/color transforms, singleton/all-required/empty-identity behavior, occurrence-witness/base-conjunct separation, every scope distinction, two replayable global-emptiness certificate forms, the remote-defect nonlocal counterexample, a generalized nine-slot/16-color profile, and 62 hostile rejections. Oracle SHAs are source `f7266058575861d5aa358f4a031ea22a61be8251c0ac8c34027e66d6db5063ec`, asset `47781c12962ede4459c3b8ed63e46ef3af61107fb4970fc81440a155d9deb29e`, and semantic `2d0434a1f75195a6b4147c53b1c5646c4605c0c7406baa449d243bea8d667d3b`; the semantic digest is `54276cd1279b01e75ebe8495c528e5991f0b6c6387ec9744dc65db85539626e7`.
 
-T33 is a static discrete 2D declarative conjunction with no native `t`: T32 supplies the complete local relation, while one closed `RequiredPatternOccurrences(EACH_SOMEWHERE)` node supplies independent unanchored existentials. The `32 * 2^32` source count proves that requirement syntax is independent of membership in the allowed set; membership mismatch is valid empty denotation. Centering is witness/search gauge, every-template occurrence is a conjunction, and neither creates a seed, anchor policy, transition, UPDATE, category, or executor. Runtime-fit integration, global D135 synchronization, repository-wide gates, and fresh hostile review remain before final closure.
+T33 is a static discrete 2D declarative conjunction with no native `t`: T32 supplies the complete local relation, while one closed `RequiredPatternOccurrences(EACH_SOMEWHERE)` node supplies independent unanchored existentials. The `32 * 2^32` source count proves that requirement syntax is independent of membership in the allowed set; membership mismatch is valid empty denotation. Centering is witness/search gauge, every-template occurrence is a conjunction, and neither creates a seed, anchor policy, transition, UPDATE, category, or executor. Runtime-fit findings and global D135 synchronization are integrated; repository-wide gates and fresh hostile review remain before final closure.

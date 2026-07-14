@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 39 type stages are complete, no stage is reopened, T33 is in progress, and 5 type stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, and T32 are complete under D119-D134.
+- Execution status at this sync is Foundation complete, 39 type stages are complete, no stage is reopened, T33 is in progress under active D135, and 5 type stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, and T32 are complete under D119-D134.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -1099,7 +1099,7 @@ COMPLETE. The 39-query source audit closes 92 lines at `77 pre-Index / 15 actual
 
 ### 41-T33-SEEDED-CONSTRAINTS
 
-Status: **IN PROGRESS — FIRST-PRINCIPLES ARCHITECTURE RECONSTRUCTED; EVIDENCE ORACLES PENDING** in `goal-1/41-T33-SEEDED-CONSTRAINTS.md`.
+Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, RUNTIME-FIT, AND D135 INTEGRATION CLOSED; INDEPENDENT HOSTILE REVIEW PENDING** in `goal-1/41-T33-SEEDED-CONSTRAINTS.md`.
 
 #### Big Picture Objective
 
@@ -1112,6 +1112,14 @@ Apply the declarative non-rollout protocol. Compose T32 `AllowedLocalPatterns` w
 #### Completion Requirements
 
 All T33 evidence is captured; seed requirements are placed in the correct semantic layer; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+IN PROGRESS. The 32-query source audit closes 65 lines at `56 pre-Index / 9 actual-Index`, retains 191 at `33 native / 49 relation / 109 control`, reverse-closes retained evidence at `137 exact + 54 mapped`, and leaves zero unresolved. Forty-two governed assets partition `7 native / 11 relation / 24 control`, close 84 references, 42 hashes, 4,668,695 bytes, and nine assemblies/20 files, and remain `42 hash-bound / 0 limited-transcribed / 0 pixel-replayed`. The semantic oracle closes 666 configurations, 256 strict constraints, 170,496 direct/generic complete-report commutations, 1,397,248 anchor checks, explicit translation/D4/color transforms, singleton/all-required/empty-identity behavior, conjunct-local occurrence witnesses, all scope distinctions, replayable emptiness certificates, the remote-defect nonlocal counterexample, generalized nine-slot/16-color fixtures, and 62 hostile rejections.
+
+D135 reconstructs T33 as structural `AllOf(AllowedLocalPatterns, RequiredPatternOccurrences(EACH_SOMEWHERE))` inside D058/T31/T32. The source count `32 * 2^32` proves independent requirement syntax; required-not-allowed is valid empty denotation. Centering is witness/search gauge, and every-template mode is a conjunction of independent existentials. IDs are provenance rather than hidden lookups; static `loci.gather` adapters must validate `t=0`; occurrence-witness replay proves only its conjunct, while whole verification independently checks T32 locality. No seed, fixed anchor, state/category, transition axis, UPDATE, executor, callback, implicit symmetry, repair/search dynamics, combined source codec, or raster program is added.
+
+Oracle SHAs are source `f7266058575861d5aa358f4a031ea22a61be8251c0ac8c34027e66d6db5063ec`, asset `47781c12962ede4459c3b8ed63e46ef3af61107fb4970fc81440a155d9deb29e`, and semantic `2d0434a1f75195a6b4147c53b1c5646c4605c0c7406baa449d243bea8d667d3b`; semantic digest is `54276cd1279b01e75ebe8495c528e5991f0b6c6387ec9744dc65db85539626e7`. Root/relocated oracle runs, optimized fail-closed behavior, silent imports, compile, modes, and diff checks pass. Fresh independent hostile review and final repository gates remain.
 
 ### 42-T35-PIECEWISE-INTEGER
 
