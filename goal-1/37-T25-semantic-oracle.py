@@ -134,6 +134,13 @@ HEX_SCHEMA = MoveSchema(
     ),
 )
 
+# Explicit finite heading actions for relative-turn variants.  These are not
+# inferred from MoveSchema storage order and are not a numeric codec for the
+# unrestricted Turing-table family.  The square cycle is the source formula's
+# (1, i, -1, -i) action in the raw Book frame.
+SQUARE_C4_HEADING_PORTS = ("axis0+", "axis1+", "axis0-", "axis1-")
+HEX_C6_HEADING_PORTS = HEX_SCHEMA.labels
+
 
 @dataclass(frozen=True)
 class TotalTape:
@@ -490,7 +497,8 @@ def apply_writes(
         raise ValueError("write source does not match the old snapshot")
     if type(batch.source_write) is not Plain:
         raise TypeError("T25 RULE must return a Plain source assignment")
-    if batch.source_write.symbol < 0 or batch.source_write.symbol >= configuration.symbol_count:
+    written_symbol = exact_int(batch.source_write.symbol, "source write symbol")
+    if written_symbol < 0 or written_symbol >= configuration.symbol_count:
         raise ValueError("source write is outside Sigma")
     next_state = exact_int(batch.next_state, "head movement next state")
     if next_state < 0 or next_state >= configuration.state_count:
@@ -508,10 +516,10 @@ def apply_writes(
     # rule cannot inspect or branch on any candidate destination value.
     destination_write = Head(next_state, old_destination.symbol)
     data = dict(configuration.entries)
-    if batch.source_write.symbol == configuration.default_symbol:
+    if written_symbol == configuration.default_symbol:
         data.pop(batch.source, None)
     else:
-        data[batch.source] = batch.source_write
+        data[batch.source] = Plain(written_symbol)
     data[destination] = destination_write
     return TaggedConfiguration(
         configuration.state_count,
@@ -623,6 +631,7 @@ def assert_strict_square_commutation() -> dict[str, int]:
             transition = Transition(next_state, write, port)
             table = table_with_override(2, 2, SQUARE_SCHEMA, (q, symbol), transition)
             chosen_transitions: set[Transition] = set()
+            chosen_rule_intents: set[tuple[int, int, str]] = set()
             for neighbor_symbols in product(range(2), repeat=4):
                 for origin in origins:
                     values = {origin: symbol}
@@ -635,6 +644,16 @@ def assert_strict_square_commutation() -> dict[str, int]:
                     tape = tape_with_values(2, 0, values)
                     native = NativeState(2, SQUARE_SCHEMA, tape, q, origin)
                     chosen_transitions.add(table.at(q, tape.at(origin)))
+                    encoded = encode_native(native)
+                    rule_read = read_head(encoded, select_unique_head(encoded))
+                    rule_writes = make_writes(encoded, table, rule_read)
+                    chosen_rule_intents.add(
+                        (
+                            rule_writes.next_state,
+                            rule_writes.source_write.symbol,
+                            rule_writes.selected_port,
+                        )
+                    )
                     assert_commutes(table, native)
                     next_native = native_step(table, native)
                     old_destination_symbol = tape.at(next_native.head_position)
@@ -645,6 +664,7 @@ def assert_strict_square_commutation() -> dict[str, int]:
                     destination_one += int(old_destination_symbol == 1)
                     events += 1
             assert chosen_transitions == {transition}
+            assert chosen_rule_intents == {(next_state, write, port)}
             transition_independence += 1
     assert events == 2 * 2 * (2 * 2 * 4) * 16 * 2
     assert destination_one > 0
@@ -656,11 +676,33 @@ def assert_strict_square_commutation() -> dict[str, int]:
     }
 
 
-def orientation_port(index: int, schema: MoveSchema) -> str:
+def checked_heading_action(
+    schema: MoveSchema,
+    heading_ports: tuple[str, ...],
+) -> tuple[str, ...]:
+    if type(schema) is not MoveSchema:
+        raise TypeError("heading action requires an exact MoveSchema")
+    raw = exact_tuple(heading_ports, "heading action ports")
+    if len(raw) != len(schema.labels):
+        raise ValueError("heading action must contain one port per visible heading")
+    checked = tuple(exact_str(port, "heading action port") for port in raw)
+    if len(set(checked)) != len(checked) or set(checked) != set(schema.labels):
+        raise ValueError("heading action must permute the declared movement ports exactly")
+    for port in checked:
+        schema.displacement(port)
+    return checked
+
+
+def orientation_port(
+    index: int,
+    schema: MoveSchema,
+    heading_ports: tuple[str, ...],
+) -> str:
     q = exact_int(index, "orientation state")
-    if q < 0 or q >= len(schema.labels):
+    action = checked_heading_action(schema, heading_ports)
+    if q < 0 or q >= len(action):
         raise ValueError("orientation state is outside the movement action")
-    return schema.labels[q]
+    return action[q]
 
 
 def langton_transition(state: int, symbol: int) -> Transition:
@@ -672,7 +714,11 @@ def langton_transition(state: int, symbol: int) -> Transition:
         raise ValueError("Langton input is outside four headings x two colors")
     # Multiplication by +i is +1 quarter-turn; by -i is -1.
     next_state = (q + (1 if color == 1 else -1)) % 4
-    return Transition(next_state, 1 - color, orientation_port(next_state, SQUARE_SCHEMA))
+    return Transition(
+        next_state,
+        1 - color,
+        orientation_port(next_state, SQUARE_SCHEMA, SQUARE_C4_HEADING_PORTS),
+    )
 
 
 def langton_table() -> ClosedTMTable:
@@ -689,11 +735,13 @@ class RelativeTurnProgram:
     """Finite visible-heading restriction, never a runtime callback."""
 
     schema: MoveSchema
+    heading_ports: tuple[str, ...]
     rows: tuple[tuple[int, int, int], ...]  # symbol, signed quarter/port turn, write
 
     def __post_init__(self) -> None:
         if type(self.schema) is not MoveSchema:
             raise TypeError("relative-turn program requires an exact MoveSchema")
+        action = checked_heading_action(self.schema, self.heading_ports)
         raw = exact_tuple(self.rows, "relative-turn rows")
         if len(raw) < 2:
             raise ValueError("relative-turn program must cover a finite alphabet")
@@ -705,7 +753,7 @@ class RelativeTurnProgram:
             symbol = exact_int(triple[0], "relative input symbol")
             turn = exact_int(triple[1], "relative turn")
             write = exact_int(triple[2], "relative write")
-            if turn == 0 or abs(turn) >= len(self.schema.labels):
+            if turn == 0 or abs(turn) >= len(action):
                 raise ValueError("relative turn is outside the declared finite action")
             if write < 0 or write >= len(raw):
                 raise ValueError("relative write is outside Sigma")
@@ -715,7 +763,8 @@ class RelativeTurnProgram:
 
 
 def expand_relative(program: RelativeTurnProgram) -> ClosedTMTable:
-    states = len(program.schema.labels)
+    action = checked_heading_action(program.schema, program.heading_ports)
+    states = len(action)
     symbols = len(program.rows)
     rows: list[tuple[int, int, Transition]] = []
     for q, symbol in product(range(states), range(symbols)):
@@ -725,14 +774,22 @@ def expand_relative(program: RelativeTurnProgram) -> ClosedTMTable:
             (
                 q,
                 symbol,
-                Transition(next_state, write, orientation_port(next_state, program.schema)),
+                Transition(
+                    next_state,
+                    write,
+                    orientation_port(next_state, program.schema, action),
+                ),
             )
         )
     return ClosedTMTable(states, symbols, program.schema, tuple(rows))
 
 
-def compress_relative(table: ClosedTMTable) -> RelativeTurnProgram:
-    if table.state_count != len(table.schema.labels):
+def compress_relative(
+    table: ClosedTMTable,
+    heading_ports: tuple[str, ...],
+) -> RelativeTurnProgram:
+    action = checked_heading_action(table.schema, heading_ports)
+    if table.state_count != len(action):
         raise ValueError("relative-turn image requires one visible heading per movement port")
     relative_rows: list[tuple[int, int, int]] = []
     for symbol in range(table.symbol_count):
@@ -740,7 +797,11 @@ def compress_relative(table: ClosedTMTable) -> RelativeTurnProgram:
         writes: set[int] = set()
         for q in range(table.state_count):
             transition = table.at(q, symbol)
-            if transition.move_port != orientation_port(transition.next_state, table.schema):
+            if transition.move_port != orientation_port(
+                transition.next_state,
+                table.schema,
+                action,
+            ):
                 raise ValueError("absolute table does not move along its visible next heading")
             raw_turn = (transition.next_state - q) % table.state_count
             turn = raw_turn if raw_turn <= table.state_count // 2 else raw_turn - table.state_count
@@ -751,7 +812,7 @@ def compress_relative(table: ClosedTMTable) -> RelativeTurnProgram:
         if len(turns) != 1 or len(writes) != 1:
             raise ValueError("absolute table is not a state-equivariant relative-turn rule")
         relative_rows.append((symbol, next(iter(turns)), next(iter(writes))))
-    program = RelativeTurnProgram(table.schema, tuple(relative_rows))
+    program = RelativeTurnProgram(table.schema, action, tuple(relative_rows))
     if expand_relative(program) != table:
         raise RuntimeError("relative expansion round trip failed")
     return program
@@ -759,9 +820,13 @@ def compress_relative(table: ClosedTMTable) -> RelativeTurnProgram:
 
 def assert_langton_and_turning() -> dict[str, int]:
     table = langton_table()
-    relative = RelativeTurnProgram(SQUARE_SCHEMA, ((0, -1, 1), (1, 1, 0)))
+    relative = RelativeTurnProgram(
+        SQUARE_SCHEMA,
+        SQUARE_C4_HEADING_PORTS,
+        ((0, -1, 1), (1, 1, 0)),
+    )
     assert expand_relative(relative) == table
-    assert compress_relative(table) == relative
+    assert compress_relative(table, SQUARE_C4_HEADING_PORTS) == relative
 
     context_events = 0
     for q, symbol in product(range(4), range(2)):
@@ -799,12 +864,14 @@ def assert_langton_and_turning() -> dict[str, int]:
     # An ordinary absolute table need not couple next state to movement.
     nonimage_rows = list(table.rows)
     q, symbol, old = nonimage_rows[0]
-    wrong_port = SQUARE_SCHEMA.labels[(SQUARE_SCHEMA.labels.index(old.move_port) + 1) % 4]
+    wrong_port = SQUARE_C4_HEADING_PORTS[
+        (SQUARE_C4_HEADING_PORTS.index(old.move_port) + 1) % 4
+    ]
     nonimage_rows[0] = (q, symbol, replace(old, move_port=wrong_port))
     nonimage = ClosedTMTable(4, 2, SQUARE_SCHEMA, tuple(nonimage_rows))
     rejected_nonimage = 0
     try:
-        compress_relative(nonimage)
+        compress_relative(nonimage, SQUARE_C4_HEADING_PORTS)
     except ValueError:
         rejected_nonimage = 1
     assert rejected_nonimage == 1
@@ -813,7 +880,7 @@ def assert_langton_and_turning() -> dict[str, int]:
     three_state = ClosedTMTable(3, 2, SQUARE_SCHEMA, baseline_rows(3, 2, SQUARE_SCHEMA))
     rejected_cardinality = 0
     try:
-        compress_relative(three_state)
+        compress_relative(three_state, SQUARE_C4_HEADING_PORTS)
     except ValueError:
         rejected_cardinality = 1
     assert rejected_cardinality == 1
@@ -832,9 +899,13 @@ def assert_langton_and_turning() -> dict[str, int]:
 def assert_hex_topology_parameterization() -> dict[str, int]:
     # This is a semantic topology/heading witness only.  It is not asserted to
     # reconstruct the Book's underdescribed 1,296-worm historical family.
-    relative = RelativeTurnProgram(HEX_SCHEMA, ((0, -1, 1), (1, 1, 0)))
+    relative = RelativeTurnProgram(
+        HEX_SCHEMA,
+        HEX_C6_HEADING_PORTS,
+        ((0, -1, 1), (1, 1, 0)),
+    )
     table = expand_relative(relative)
-    assert compress_relative(table) == relative
+    assert compress_relative(table, HEX_C6_HEADING_PORTS) == relative
     events = 0
     for q, symbol in product(range(6), range(2)):
         for neighbor_symbols in product(range(2), repeat=6):
@@ -931,7 +1002,7 @@ def assert_atomicity_and_observer_separation() -> dict[str, int]:
     native = NativeState(2, SQUARE_SCHEMA, tape, 1, (0, 0))
     old = encode_native(native)
     source = select_unique_head(old)
-    reads = read_head_and_destinations(old, source)
+    reads = read_head(old, source)
     writes = make_writes(old, table, reads)
 
     # Exposing only the source write would create zero heads and is therefore
@@ -1052,39 +1123,37 @@ def assert_hostile_validation() -> dict[str, int]:
     table = ClosedTMTable(2, 2, SQUARE_SCHEMA, good_rows)
     config = encode_native(NativeState(2, SQUARE_SCHEMA, TotalTape(2, 0), 0, (0, 0)))
     source = select_unique_head(config)
-    read = read_head_and_destinations(config, source)
+    read = read_head(config, source)
     batch = make_writes(config, table, read)
+    assert tuple(HeadRead.__dataclass_fields__) == ("token", "source", "head")
+    assert "destination" not in TuringWrites.__dataclass_fields__
+    assert "destination_symbol" not in TuringWrites.__dataclass_fields__
     rejects(ValueError, lambda: make_writes(config, table, replace(read, token=SnapshotToken(0))))
     rejects(ValueError, lambda: make_writes(config, table, replace(read, source=(9, 9))))
-    forged_destinations = list(read.destinations)
-    port, coord, _plain = forged_destinations[0]
-    forged_destinations[0] = (port, coord, Plain(1))
-    rejects(
-        ValueError,
-        lambda: make_writes(config, table, replace(read, destinations=tuple(forged_destinations))),
-    )
-    rejects(ValueError, lambda: make_writes(config, table, replace(read, schema=HEX_SCHEMA)))
+    rejects(ValueError, lambda: make_writes(config, table, replace(read, head=Head(0, 1))))
+    hex_table = ClosedTMTable(2, 2, HEX_SCHEMA, baseline_rows(2, 2, HEX_SCHEMA))
+    rejects(ValueError, lambda: make_writes(config, hex_table, read))
     rejects(TypeError, lambda: make_writes(config, "callback", read))
     rejects(ValueError, lambda: apply_writes(config, replace(batch, token=SnapshotToken(0))))
-    rejects(ValueError, lambda: apply_writes(config, replace(batch, destination=batch.source)))
-    rejects(
-        ValueError,
-        lambda: apply_writes(
-            config,
-            replace(
-                batch,
-                destination_write=Head(batch.destination_write.state, 1 - batch.old_destination.symbol),
-            ),
-        ),
-    )
-    rejects(
-        ValueError,
-        lambda: apply_writes(config, replace(batch, selected_port="axis1+")),
-    )
+    rejects(ValueError, lambda: apply_writes(config, replace(batch, schema=HEX_SCHEMA)))
+    rejects(ValueError, lambda: apply_writes(config, replace(batch, source=(9, 9))))
+    rejects(ValueError, lambda: apply_writes(config, replace(batch, old_head=Head(1, 0))))
+    rejects(TypeError, lambda: apply_writes(config, replace(batch, source_write=Head(0, 0))))
+    rejects(TypeError, lambda: apply_writes(config, replace(batch, source_write=Plain(True))))
+    rejects(ValueError, lambda: apply_writes(config, replace(batch, source_write=Plain(2))))
+    rejects(ValueError, lambda: apply_writes(config, replace(batch, next_state=2)))
+    rejects(ValueError, lambda: apply_writes(config, replace(batch, selected_port="outside")))
     rejects(ValueError, lambda: quotient_locally_injective((0, 2), SQUARE_SCHEMA))
     rejects(ValueError, lambda: general_rule_count(0, 2, 4))
     rejects(ValueError, lambda: langton_transition(4, 0))
-    rejects(ValueError, lambda: RelativeTurnProgram(SQUARE_SCHEMA, ((0, 0, 1), (1, 1, 0))))
+    rejects(
+        ValueError,
+        lambda: RelativeTurnProgram(
+            SQUARE_SCHEMA,
+            SQUARE_C4_HEADING_PORTS,
+            ((0, 0, 1), (1, 1, 0)),
+        ),
+    )
 
     # A bare union cannot retain both head state and underlying symbol.
     bare_union = {("symbol", 0), ("symbol", 1), ("state", 0), ("state", 1)}
@@ -1104,7 +1173,7 @@ def semantic_digest(counts: dict[str, int]) -> str:
     return sha256(transcript.encode("utf-8")).hexdigest()
 
 
-EXPECTED_SEMANTIC_DIGEST = "TO_BE_FROZEN_AFTER_FIRST_PASS"
+EXPECTED_SEMANTIC_DIGEST = "54e28af252f5b926771061d9d9dc2ea6724dccbeb46ec988afb70efdfc5dbaca"
 
 
 def main() -> None:
@@ -1131,8 +1200,7 @@ def main() -> None:
     )
     counts["total.native_generic_events"] = native_generic_events
     digest = semantic_digest(counts)
-    if EXPECTED_SEMANTIC_DIGEST != "TO_BE_FROZEN_AFTER_FIRST_PASS":
-        assert digest == EXPECTED_SEMANTIC_DIGEST
+    assert digest == EXPECTED_SEMANTIC_DIGEST
 
     print("T25 semantic oracle: PASS")
     print(f"native_generic_events={native_generic_events}")
@@ -1151,7 +1219,7 @@ def main() -> None:
     print(
         "compact_rule=QxSigma->QxSigmaxMovePort;decision_reads_head_only;"
         f"neighbor_independence_checks={groups['square']['transition_neighbor_independence_checks']};"
-        "candidate_destination_reads_preserve_underlying_symbol"
+        "UPDATE_preserves_destination_symbol_without_RULE_visibility"
     )
     print(
         "rule_counts=derived_formula_(m*s*k)^(s*k);"

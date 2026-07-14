@@ -57,7 +57,9 @@ EXPECTED_TAXONOMY_SHA256 = "4c30fe079b2fb8f69e4c8c0dde3d59065227d4224cbe4b7693a1
 # TMs redirect. Q25 closes all Turing section headings; Q26 closes experiment
 # randomness and repeated-position language without treating either as a
 # stochastic rule. Q27 independently closes the fixed-grid fact inherited from
-# the Chapter 3 construction. Q28 freezes absent spelling variants.
+# the Chapter 3 construction. Q28 freezes absent spelling variants. Q29 closes
+# the remaining ant, lattice, and randomness routes found by a page-route sweep
+# of the actual Index rather than by name-only lookup.
 QUERIES = {
     "Q00": r"\btwo-dimensional Turing machines?\b|\b2D Turing machines?\b",
     "Q01": (
@@ -191,6 +193,12 @@ QUERIES = {
         r"\b2-D Turing machines?\b|"
         r"\bTuring machines? in two dimensions\b"
     ),
+    "Q29": (
+        r"\bAnts, artificial, 931\b|"
+        r"\bTuring machines on, 930\b|"
+        r"\bin Turing machines in 2D, 184\b|"
+        r"\bTMs on, 184\b"
+    ),
 }
 
 
@@ -238,6 +246,7 @@ EXPECTED_QUERY = {
     "Q26": (3, 3, 0, "dc3e443df30429a659ad0bc09a71b1c3151aaca0632872ff81824ca2f560d892"),
     "Q27": (1, 1, 0, "dff17949eb4f9ecd9361bb97c38a9404f3d034565e5d4395f073c0c367b5ea0b"),
     "Q28": (0, 0, 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+    "Q29": (4, 0, 4, "08760b879c5806754dfc4f5ac4319803327d7365b840a677012d2966e611341e"),
 }
 
 
@@ -298,6 +307,7 @@ GOVERNED_IMAGE_LINES = (
 # Actual Index supplies routes, never construction mechanics. Dense physical
 # rows are classified by the exact T25 entry guarded below.
 INDEX_CLASS = {
+    "ant_lattice_behavior_routes": line_set("20868,21243,21899,22136"),
     "named_people_routes": line_set("20910,20940,21050,21432,21761,21990"),
     "logo_robotics_worm_routes": line_set("21475,21521,21970,22434"),
     "turing_entry_and_alias_routes": line_set("22346,22362,22378,22380,22394"),
@@ -306,6 +316,12 @@ INDEX_CLASS = {
 INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
 
 INDEX_ENTRY_GUARDS = {
+    "ant_lattice_behavior_routes": {
+        20868: ("ants, artificial, 931",),
+        21243: ("hexagonal lattice", "turing machines on, 930"),
+        21899: ("randomness", "in turing machines in 2d, 184"),
+        22136: ("square lattices", "tms on, 184"),
+    },
     "named_people_routes": {
         20910: ("beeler, michael", "and 2d turing machines, 930"),
         20940: ("brady, allen", "and 2d turing machines, 930"),
@@ -340,9 +356,9 @@ INDEX_ENTRY_GUARDS = {
 
 
 EXPECTED_SET = {
-    "union": (67, "abd5cdab9df4668bfeef78ce987bba05556be2e8dd8e6b5481f0b9e3208a4eaa"),
+    "union": (71, "99d8130e0bdc5676ab50b37967752a2502f8d24ffcb692921fa8a0ba217272db"),
     "pre_index_union": (50, "f1e2fc20a63767458eb989b20bd3d63ee92b8e5b3e59cac69d4eea2285e3f09e"),
-    "index": (17, "859d6201282e7c60382afc97dbb5fdb93ddc00403bff2f09125eeb781188392a"),
+    "index": (21, "bf42af3b8e92eea8299221bec0005318851f85b5364f3e7f1848e6cc042dc6ac"),
     "matched_retained": (37, "134fd3b39d4bc29efbcc40d67529e252610e4cc29d7de29b13c0a62804b8ecc5"),
     "governed_continuations": (26, "c460bf9f54da12cfa085b564509d6413296177395327094c6d0f61057c5b9963"),
     "retained": (63, "d65c11e7f57b120a83e9c37cd0d789ee591312f9a1316b41fae7c9ee194010b4"),
@@ -360,13 +376,14 @@ EXPECTED_EXCLUDED_CLASS = {
     "other_emulation_construction": (1, "c4af1ccb5cb4559b05dea6639f91383a49c9d833c8caf3efae462c460818807e"),
 }
 EXPECTED_INDEX_CLASS = {
+    "ant_lattice_behavior_routes": (4, "08760b879c5806754dfc4f5ac4319803327d7365b840a677012d2966e611341e"),
     "named_people_routes": (6, "22432869124663b0ff4c53130dd4c6d803e5580dd3e147ef32d4835066ecf967"),
     "logo_robotics_worm_routes": (4, "bfd2983a29cd872a59598d73a88dddd616a8fc8eae3dc0cd23a78e2774879841"),
     "turing_entry_and_alias_routes": (5, "c40215af304020f024f40f59cb22c6f5e5cb3c11af4343287380d08e08d19613"),
     "broad_turning_collision_routes": (2, "f46ced44e475e9f1681169c6860a9dc704067b49c3f2ba0c8ec4bdee0b252cdb"),
 }
 EXPECTED_INDEX_ENTRY_GUARDS = (
-    17, "580d1ca128a2f640c50ae35381e631132594a2adb574af5f3aca76d8b8a3d7fd"
+    21, "138764607b770b97b5c563ad4ecbe66eee19eb7b797ddd3964693e2d826f86ec"
 )
 EXPECTED_IMAGE_PARTITION = {
     "native": (6, "6cb059a1eaf065c9f6fdceff4dd39db0adab35db77584c819004ad49cfd99617"),
@@ -377,8 +394,8 @@ EXPECTED_IMAGE_PARTITION = {
 EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
-EXPECTED_SPLIT_QUERY = (66, "0b2134c82f853268c438ef4a64136e89d53f9d507af1b734ab6570748ae1d3c4")
-EXPECTED_SPLIT_QUERY_EXACT = (59, "646c8c58bc41e383fa549ba40d5870e406bd0a13bc387ab1ff0c9a3314ffcdb1")
+EXPECTED_SPLIT_QUERY = (70, "3a83b3a73fd044a815eb6c4ac8ae6e51e8c7e5ac8811c628564458c900f7224c")
+EXPECTED_SPLIT_QUERY_EXACT = (63, "479099e9e653bc0fdcd78fbed4cb02b032f121f455870480dd20e20603544802")
 EXPECTED_SPLIT_QUERY_NONEXACT = (7, "1b13fcf4341f6d2dce59b5b8835d9116bf064e26994c69d834ccd819ad479fa3")
 EXPECTED_SPLIT_QUERY_MAPPING_DIGEST = "48d46002d3bcdcf0bc560b0c4bfa24d0b4aada1fc74f5987e3e56c5d9e088b71"
 EXPECTED_SPLIT_RETAINED_EXACT = (47, "95141e5dce2c995de51a95f4d6060c61afeb486a2c6ddc95e617e3dd7c772e42")
