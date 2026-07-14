@@ -616,7 +616,7 @@ Ordered-pair, self-pair, newborn-read, rescan, or fixed-lag interpretations fail
 - **Ulam:** T39 first-accepted candidate selection composed with T37 prefix append; not a sieve schedule or fixed-lag expression.
 - **Prime CA:** a 16-color spatial compiler/emulator; its stripe dynamics are not T39 equality.
 - **T31 square constraints:** may enumerate representation witnesses; T39 asks for their count `g(n)`, not constraint evolution.
-- **T40:** owns digit sequence generation and number representations. Prime leading-digit analysis is a T40 observer over a T39 source.
+- **T40:** owns immutable exact-value representation queries and coefficient results. Prime leading-digit analysis is a T40 observer over a finalized T39 stream/query result, not either construction's evolving state.
 - **Polynomial/Diophantine/register/fraction encodings:** alternative computations or emulations, not native filter data.
 
 ## Corrected Architecture and Goal 2 Handoff

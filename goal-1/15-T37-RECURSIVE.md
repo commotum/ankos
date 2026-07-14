@@ -416,7 +416,7 @@ Characteristic equations, generating functions, matrix powers, memoization, shif
 | T36 digit-reversal arithmetic | exact integer terms and digit observers | representation base/digit transformation feeds back into one scalar update |
 | T38 variable-index recursion | exact prefix, append result/update, term references | dependency addresses are computed from term values and can be invalid at runtime |
 | T39 numeric filtering | ordered candidate selection and the resolved Ulam composition | Ulam uses T39 closed first-accepted/pair-sum access, then T37's unique-`End` RULE and T16 splice; it is not a fixed-lag recurrence |
-| T40 constant digits | indexed exact output stream | digit-production/approximation semantics, not recurrence state by default |
+| T40 constant digits | indexed exact coefficient results | immutable denotation plus representation query; direct nth access and evaluator-specific residual state defeat a universal prefix-append identity |
 | T41 function combination | formulas and numeric samples | function/curve is native object; samples are observations |
 | T43 iterated maps | logistic can produce the same newest values | one scalar is iterated; prefix history is a trace, not native map state |
 | Linear feedback/RNG | fixed lag arithmetic can be shared | finite residue ring, shift register, stochastic-use metadata, and period observers are explicit |

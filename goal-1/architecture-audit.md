@@ -1,6 +1,6 @@
 # Goal 1 Representation and Execution Architecture Audit
 
-Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); SUBSEQUENT STAGES INTEGRATED THROUGH ACTIVE D138; 43/45 TYPES COMPLETE, 2 PENDING**
+Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); SUBSEQUENT STAGES INTEGRATED THROUGH ACTIVE D138; 43/45 TYPES COMPLETE, T40 IN PROGRESS, T42 PENDING**
 
 ## Trigger and Scope
 
@@ -188,7 +188,7 @@ The classification number in this matrix refers to the four categories above. A 
 | D084 | Point/zero/crossing/etc. queries | 2 | Generic tagged query/result envelope | Undefined/failure/completeness/multiplicity/poles explicit | Keep variants, not classes |
 | D085 | Structural identity/equivalence/observation | 3 | Explicit identity and certified-relation records | Ordered AST and numeric provenance preserved | Keep |
 | D086 | Finite sum versus infinite series | 3 | Tagged closed definition nodes plus convergence invariants | No hidden truncation/infinity sentinel | Rewrite separate-spec mandate as representation variants |
-| D087 | T41 query feeds T42 rewrite | 2 | Typed cross-category composition | Finalized result only; neither embeds other's state/callback | Keep |
+| D087 | T41 source query, T40 expansion query, and T42 rewrite compose | 2 | Typed cross-category composition | Only finalized exact/count/coefficient results cross boundaries; no category embeds another's state/evaluator callback | Keep; correct coefficient ownership without reopening T41/T42 semantics |
 
 ### T43 through totalistic reintegration (D088-D118)
 

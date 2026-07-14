@@ -532,9 +532,9 @@ The nested add-one digit picture is related to a substitution pattern, and some 
 | T37 recursive sequences | numeric values and fixed-lag formulas can reproduce powers | native state is a growing prefix/history and update appends a term |
 | T38 variable-index recursion | numeric sequence values | data-dependent earlier-term addressing requires a growing prefix and guarded computed indices |
 | T39 number-theoretic filters | integer arithmetic | filters/streams/sets of candidates, not one scalar successor |
-| T40 constant digits | number representations | expansion procedure has no repeated mutable scalar update in the base case |
+| T40 constant digits | exact values, arithmetic, and number representations | the base case is an immutable denotation plus pure expansion query; explicit long-division or residual algorithms are separately identified scalar/product work SimplePrograms |
 | T41 function combination | exact/approximate numeric expressions | native object is a function/curve; samples and crossings are observations |
-| T42 continued-fraction substitution | irrational parameters and symbolic observers | coefficient stream schedules changing substitution rules |
+| T42 continued-fraction substitution | irrational parameters and symbolic observers | a finalized T40 coefficient result or explicit schedule source drives changing substitution rules; T42 owns substitution state, not generic expansion |
 | T43 iterated maps | unary scalar source, exactness concerns, assignment | broader nonlinear/piecewise interval maps and infinite-information real states need their own closed map algebra |
 | T44 continuous CA | continuous values | fixed lattice, local aggregation, and parallel field update |
 | T45 PDE | numeric fields | continuous space/time derivative constraint plus solver/discretization category |

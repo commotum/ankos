@@ -681,11 +681,11 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 - Basis: Notes distinguish finite sums with explicit `k` from approximations to an infinite weighted lacunary sum (`BOOK:13174-13192`). The displayed `a=0` terms do not approach zero generically, so ordinary infinite convergence is impossible.
 - Consequence: strict expressions support exact bounded finite sums or expanded additions. Infinite series use a distinct tagged definition with convergence set, summation meaning, and evaluation context. No `infinity` sentinel in a finite binder, hidden truncation, raster width, or resource cap may masquerade as a mathematical infinite sum; the `a=0` picture is an explicitly truncated/otherwise specified approximation only.
 
-### D087 — Page 162 is a typed T41-query/T42-construction composition
+### D087 — Page 162 composes a T41 source query, a T40 representation query, and a T42 construction
 
-- Status: ACTIVE boundary across T41/T42.
+- Status: ACTIVE boundary across T40/T41/T42.
 - Basis: the main and Notes first derive two exact zero families and interval counts, then say the resulting word can be reproduced by a sequence of substitution rules whose choices come from continued-fraction terms (`BOOK:1850-1858`, `13170-13172`). The connection is explicitly absent for more than two sine terms.
-- Consequence: T41 owns source functions, zero/crossing/touch semantics, and exact interval-count query results. T42 owns continued-fraction expansion, coefficient stream, symbols, rule schedule, substitution state/update, and trace. A typed finalized T41 result may feed T42; neither category embeds the other's callbacks/state, and the page-162 bitmap is never executable source data.
+- Consequence: T41 owns source functions, zero/crossing/touch semantics, and exact interval-count query results. T40 owns the pure continued-fraction expansion/coefficient query over a finalized exact value. T42 consumes finalized coefficients or an explicit coefficient source and owns symbols, rule schedule, substitution state/update, and trace. No category embeds another's evaluator callback or work state, and the page-162 bitmap is never executable source data.
 
 ### D088 — T43 state is one real scalar in an explicit state interval under one immutable closed self-map
 
