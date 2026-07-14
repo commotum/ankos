@@ -451,7 +451,7 @@ B_n = 2*pi*(n+1/2)/(alpha-1), n >= 0.
 
 There are no family collisions or roots at 250 in the first three presets; all listed roots are simple. For the fourth row, an independent dense sign/critical-point search found last root approximately `248.0195005660`, minimum observed spacing `0.25134310`, and closest tested extremum to zero about `0.01224`; those are explicitly non-certified numerical observations.
 
-### Page 162 source/query bridge to T42
+### Page 162 source/query bridge through T40 to T42
 
 Top-to-bottom source functions are:
 
@@ -476,7 +476,7 @@ Only `x=0` overlaps for these irrational coefficients; it is a double tangent ze
 c_n = floor((n+1)*r) - floor(n*r) in {0,1}.
 ```
 
-T41 owns that exact count query. T42 owns interpreting `c_n` as a black/white word and generating it through substitutions. The sine-sum bridge uses the source-stated half-shift:
+T41 owns that exact count query. T40 owns the continued-fraction expansion/coefficient query for `r`. T42 consumes the finalized coefficients or an explicit coefficient source, interprets `c_n` as a black/white word, and generates it through substitutions. The sine-sum bridge uses the source-stated half-shift:
 
 ```text
 floor((n+1)*r - 1/2) - floor(n*r - 1/2).
@@ -590,7 +590,7 @@ Existing CA runtime behavior remains valid for its scope. A future viewer may ac
 3. Numerical context belongs to a query/result, not the function. The same spec supports exact symbolic, arbitrary-precision, certified interval, and approximate evaluation without changing identity.
 4. Zero finding is not sampling. Page-162's double zero and `Tan`/`Sec` poles are direct adversaries to sign-change-only logic.
 5. Structural equality must stay conservative. Exact factorization proves a relation without requiring a universal simplifier or making sample equality semantic; the inconsistent ODE Note proves alternate definitions also require independent verification.
-6. T42's bridge remains compositional: a pure T41 interval-count query can feed T42's closed initial/driver data, but T41 does not inherit substitution state.
+6. The bridge remains compositional: T41 supplies exact source/count queries, T40 supplies continued-fraction coefficients, and T42 consumes finalized results as closed initial/driver data. None inherits another category's evaluator work state or substitution state.
 7. Infinite series require convergence/summation semantics. The source's `a=0` approximation prevents a permissive infinity bound or silent truncation.
 8. Named special functions can be closed primitive tags even when algorithms are complex. The source explicitly separates accepted primitives from high-precision evaluation cost.
 9. The strict profiles require real/complex partiality and phase conventions. Dropping undefined/branch results to fit NumPy floats would erase mathematical distinctions.
@@ -606,7 +606,7 @@ Existing CA runtime behavior remains valid for its scope. A future viewer may ac
 6. Defining formulas and named analytic continuation stay in the spec; incidental sampling, root algorithms, and evaluator cost remain external. Infinite series include their convergence definition rather than an incidental truncation.
 7. The encoding preserves exact/declared coefficients, real/complex domains, partiality, branches, endpoints, multiplicity, completeness, and certification.
 8. No completed stage must reopen. T20/T27/T31/T34/T39 remain valid under responsibility-level reuse.
-9. Goal 2 gains shared numeric-value, mathematical-expression/function, numerical-context, query/result, function-evaluation, and curve-view work before T41 conformance; T42 consumes only a typed query result.
+9. Goal 2 gains shared numeric-value, mathematical-expression/function, numerical-context, query/result, function-evaluation, and curve-view work before T41 conformance; T40 and T42 consume only typed finalized results across this boundary.
 10. The API is more coherent because immutable definitions and pure queries no longer masquerade as CA episodes.
 
 ## Historical Detailed Implementation Plan (Superseded on architecture wording)
@@ -647,13 +647,13 @@ Paths are dependency targets for synthesis; later evidence may consolidate modul
 - Root results record endpoint policy, multiplicity/classification, certification, completeness, and diagnostics. Approximate sign scans cannot claim exact completeness.
 - Structural IDs are deterministic and independent of sampling, evaluator, plot resolution, platform float formatting, or mutable registry order.
 - Resource interruption returns the last complete certified subset or explicit partial result without altering the spec.
-- T42 adapters consume a finalized T41 zero/count result with declared convention; they cannot reach into evaluator callbacks or reinterpret raster pixels.
+- T40 adapters consume a finalized exact T41 value to query continued-fraction coefficients; T42 adapters consume finalized T41 zero/count and T40 coefficient results with declared conventions. Neither may reach into evaluator callbacks/work state or reinterpret raster pixels.
 
 ### Canonical conformance suites
 
 - Page 160: all six exact ASTs/windows/domains; endpoint anchors; `Tan`/`Sec` poles and segmentation; special-function declared precision.
 - Page 161: exact periods, factorizations, family counts, endpoint inclusion, simple crossings, three-sine approximate/non-certified status, and sample-independence adversaries.
-- Page 162: four exact source specs, factorization, `x=0` tangent, nonzero crossings, exact `r`/continued fractions/count words, and strict T41/T42 ownership.
+- Page 162: four exact source specs, factorization, `x=0` tangent, nonzero crossings, exact `r`/continued fractions/count words, and strict T41/T40/T42 ownership.
 - Page 163: analytic-continuation/phase spec, five high-precision values, independently numerical 108/269 zero counts, zero 269/270 locations, panel seam, certification labels, and no Dirichlet-series-on-critical-line shortcut.
 - Notes: five Lissajous vectors/closure horizons, complex-region query, reported spacing metadata, finite sum term counts, `a>0` convergence, and rejection of ordinary infinite `a=0`.
 - Equality/codec: factored versus expanded structural inequality plus certified equivalence; exact rational/algebraic round trips; declared decimal/complex/enclosure/undefined round trips; same-sample/different-function rejection.
@@ -669,7 +669,7 @@ Paths are dependency targets for synthesis; later evidence may consolidate modul
 - A uniform/adaptive sign scan cannot certify all roots without an independent proof/isolation contract; even roots and narrow crossings are adversarial cases.
 - Page-161 inclusive and interior counts must differ by exactly the declared endpoint event; a plotter cannot guess convention.
 - Page-162 `x=0` must be a double tangent zero, not a crossing or two duplicate simple events.
-- T42's substitution rules/steps/word cannot be embedded in T41 query state; T41's root/count result cannot be regenerated from the page-162 bitmap.
+- T40 coefficient evaluation and T42 substitution rules/steps/word cannot be embedded in T41 query state; T42 cannot reach into T40 evaluator work state; no root/count/coefficient result may be regenerated from the page-162 bitmap.
 - The zeta Dirichlet series cannot be evaluated ordinarily at `1/2+it`; analytic continuation and named continuous phase are mandatory.
 - A principal-`Arg` phase with jumps cannot pass `RiemannSiegelZ` conformance merely by matching isolated magnitudes.
 - Infinite series must declare convergence/summation. The `a=0` raster requires explicit approximation/truncation and cannot pass as an ordinarily convergent infinite preset.
@@ -686,8 +686,8 @@ Paths are dependency targets for synthesis; later evidence may consolidate modul
 - [x] All four strict and eight Notes rasters have identities, hashes, formulas, horizons or explicit uncertainty, source repairs, and independent anchors where possible.
 - [x] Function spec, definition/input sets, output schemas, exact/declared values, primitive/branch semantics, finite/infinite tagged definitions, identity, equivalence, and serialization are explicit.
 - [x] Point/sample/zero/crossing/extremum queries and exact/certified/approximate/undefined/failure outcomes are explicit.
-- [x] Page-160/161/162/163 presets, root conventions, T41/T42 seam, and Riemann-Siegel repairs are independently verified.
-- [x] T20/T27/T31/T34/T39/T42/T43/T44/T45, ODE, sampling, plotting, sound, spectrum, and solver boundaries are explicit.
+- [x] Page-160/161/162/163 presets, root conventions, T41/T40/T42 seam, and Riemann-Siegel repairs are independently verified.
+- [x] T20/T27/T31/T34/T39/T40/T42/T43/T44/T45, ODE, sampling, plotting, sound, spectrum, and solver boundaries are explicit.
 - [x] Current API/runtime fit and an implementation-ready Goal 2 file/dependency/test/no-cheating handoff are complete.
 - [x] Global ledgers, exact verification commands, hashes, fence checks, coverage consistency, diff checks, and repository tests pass.
 
@@ -701,7 +701,7 @@ Paths are dependency targets for synthesis; later evidence may consolidate modul
 - All four strict and eight supplementary rasters were inspected at original resolution. Their byte sizes, dimensions, formulas, parameters, windows or explicit uncertainty, and SHA-256 hashes are recorded. The broken monolith image links, 15-page filename offset, unspecified sampling, unlabeled observer conventions, and `a=0` approximation are explicit.
 - The design establishes a closed unary `MathematicalFunctionSpec` plus pure point/sample/real-zero/complex-zero/crossing/extremum queries. Exact/certified/approximate/undefined/failure values, multiplicity-aware zero events, completeness statuses, proofs/diagnostics, and rendering payloads stay separate from definitions and from transition execution.
 - Exact values, real/complex definition domains, scalar/fixed-vector codomains, primitive versions, partiality, analytic continuation, poles, branch conventions, ordered structural identity, certified equivalence, lossless codecs, bounded finite sums, and explicit infinite-series profiles are implementation-ready.
-- Page 161's first three exact inclusive root counts are `120/114/113` with interior counts one lower; the approximate three-sine observation is correctly non-certified. Page 162's four functions, factorizations, double tangent at zero, nonzero crossings, continued fractions, and interval-count bridge are pinned without absorbing T42 state.
+- Page 161's first three exact inclusive root counts are `120/114/113` with interior counts one lower; the approximate three-sine observation is correctly non-certified. Page 162's four functions, factorizations, double tangent at zero, nonzero crossings, continued fractions, and interval-count bridge are pinned without absorbing T40 evaluator work or T42 substitution state.
 - The ODE Note was independently falsified as printed: derivative `2` yields `Sin[x]+Sin[sqrt(2)x]/sqrt(2)`, while the stated target needs `1+sqrt(2)`. Zeta's critical-line continuation, named continuous Riemann-Siegel phase, five 60-decimal values, and numerical `108/269` zero totals are likewise explicitly repaired/qualified.
 - Independent arbitrary-precision verification reported `T41 exact/declared-precision oracle: PASS; three-sine observed roots inclusive=112` and `T41 ODE source-repair oracle: PASS`. Focused search controls reproduced `mathematical functions 56/48`, strict/Notes image links `4/4` and `8/8`, and the native no-update/no-sampling result.
 - SHA-256 verification reproduced all twelve recorded asset hashes. Markdown fence parity passed for this stage and all `goal-1/*.md`; `git diff --check -- goal-1` passed.

@@ -25,7 +25,7 @@ The Notes claim that the printed square-root rule works for every rational `1 <=
 (11/5,0) -> (24/5,4) -> (-4/5,12)
 ```
 
-The remainder invariant is lost on the second event. A rational extension can instead test `r>=s+1`, but that is a repaired sibling and must not be attributed silently to the printed `r>s` rule. Strict source conformance therefore qualifies the literal work machine to its integer-safe profile and records the broader Notes claim as falsified.
+The algebraic identity still propagates, but the nonnegative-remainder and approximation-bound invariants are lost on the second event. A rational extension can instead test `r>=s+1`, but that is a repaired sibling and must not be attributed silently to the printed `r>s` rule. Strict source conformance therefore qualifies the literal work machine to its integer-safe profile and records the broader Notes claim as falsified.
 
 ## Updated Assumptions
 
