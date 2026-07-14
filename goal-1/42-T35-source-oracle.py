@@ -226,6 +226,7 @@ QUERIES = {
         r"and register machines, 1114 as rule 60 initial condition|"
         r"longest halting times for, 1144"
     ),
+    "Q42": r"Iterated maps.*history of, 918.*of integers, 122",
 }
 
 
@@ -317,8 +318,8 @@ OUT_OF_SCOPE_RELATED_IMAGE_LINES = line_set("1884,1888")
 
 INDEX_CLASS = {
     "core_alias_and_observer_routes": line_set(
-        "20828,20836,20908,20946,20957,20980,21088,21090,21233,21329,21471,"
-        "21497,21695,21893,21933,22150,22287,22378,22382"
+        "20828,20836,20908,20946,20957,20980,21088,21090,21233,21329,21360,"
+        "21471,21497,21695,21893,21933,22150,22287,22378,22382"
     ),
     "arithmetic_and_emulation_routes": line_set(
         "20882,20894,21173,21223,21475,21521,21711,21813,21923,22390"
@@ -350,6 +351,13 @@ INDEX_ENTRY_GUARDS = {
             "IntegerExponent and 3n + 1 problem, 904",
             "and Turing machine 600720, 1145",
             "IntegerQ (integer test) and fraction systems, 1115",
+        ),
+        # Flattened columns place Join text between this entry's subentries.
+        21360: (
+            "Iterated maps, 149-155",
+            "history of, 918",
+            "of integers, 122",
+            "periodic points in, 955",
         ),
         21471: ("Localized structures and 3n + 1 problem, 904",),
         21497: ("Markov processes, 1084 and 3n + 1 problem, 904",),
@@ -425,6 +433,17 @@ INDEX_CLOSURE_QUERIES = {
         r"600720|longest halting times for, 1144"
     ),
     "strict_five_over_two_alias": r"5/2, multiplication system, 123",
+    "integer_iterated_map_alias": r"Iterated maps.*of integers, 122",
+}
+
+# These Index rows point to related primary blocks that are deliberately not
+# promoted into T35 mechanics: page 730 is general digit-level locality
+# context, while page 1114 is the upstream many-register-to-two-register
+# compiler rather than the later register-to-arithmetic construction.
+INDEX_ONLY_CONTEXT_ROUTES = line_set("20946,21695,21813")
+INDEX_ONLY_CONTEXT_TARGETS = {
+    "page730_general_digit_locality": line_set("8834,8838"),
+    "page1114_multiregister_compiler": line_set("18594-18617"),
 }
 
 
@@ -476,8 +495,10 @@ SOURCE_MODEL_RECORDS = (
     "source-defect:lines18635-18636 lose the ASEvolveList pattern punctuation",
     "source-defect:lines19456-19465 are not executable Turing-600720 formulas",
     "source-defect:BOOK20946 flattens multiple Index columns; in arithmetic 124 and non-locality 730 belong to Carry digits rather than Ceiling",
+    "source-defect:BOOK21360 flattens multiple Index columns; of integers 122 belongs to Iterated maps rather than the intervening Join text",
     "index-boundary:BOOK20846/21044/21068/21525 unbranched modular or cyclic multiplication references are T34 controls rather than new T35 routes",
     "index-boundary:generic assembler compiler linker multiregister and Turing-to-register references are controls unless they state the governed arithmetic prime-exponent or 600720 relation",
+    "index-context:BOOK20946/21695 page730 and BOOK21813 page1114 are routed aliases whose referenced general-locality and multiregister blocks remain explicit out-of-scope related controls",
     "codec:no finite alphabet or fixed-width integer representation is inferred",
     "architecture:no callback new state class update law executor or runner branch",
 )
@@ -526,12 +547,13 @@ EXPECTED_QUERY = {
     "Q39": (1, 0, 1, "d5b2f984bb5733c30680940aaf707f6cd58a91a8560a9df34272de0561f6d435"),
     "Q40": (6, 0, 6, "6f4f3eed8fd5b47ee2fa4987a951e5a779a05d611bf6db0e6998ec337aa2b507"),
     "Q41": (3, 0, 3, "2bfa3c820c7625d1eab1dc57fb27dbb1c67f56fe5e69cef92b567dd722dc51d9"),
+    "Q42": (1, 0, 1, "a99736df3ee61d6d9b78430f6aec1691da428e6022b185eac9bd20a260f1aad0"),
 }
 
 EXPECTED_SET = {
-    "union": (103, "43996b5051d773a5f843329caefed8ebed13726b7f74d5a6bb614cae0434cb71"),
+    "union": (104, "31424c34885a56cf53663472b2a0245e830a3557859ea6fab094c0b9fe3bfded"),
     "pre_index_union": (70, "a5ca5ad032a64d7d35bc6c3b84dee4c220b4c26e7a685884dea22381fd5ed6a7"),
-    "index": (33, "b8c3792ae477d1ccf919864e3966e0bf6914db2e8a72f8840f945bc6aa69cd3d"),
+    "index": (34, "99276f731053e0d157dcdec78c5321c9993f173da1effe14df2cfba77c4eb6da"),
     "matched_retained": (63, "abe81df93c1a1006c8e97df9cf4d2c707696b6cf6b4849435062e7e694d8e1cc"),
     "governed_continuations": (64, "48148cacf2f2518262f71062a660af61bcb837cad1e025b7b3c23ea06cdd7226"),
     "retained": (127, "cadafc18e0fd96939ba51443d152252363876b16c39ef5fed84293fee5dd6401"),
@@ -549,13 +571,13 @@ EXPECTED_EXCLUDED_CLASS = {
     "later_T36_caption": (1, "75abf1771c0d9038e45203aa603758410f2418fd29b3fe0c25534009c579bb8e"),
 }
 EXPECTED_INDEX_CLASS = {
-    "core_alias_and_observer_routes": (19, "22861c0fe9d4adcf351e3a1686bce32356ed771dde9afb1054162ca0c76a20cf"),
+    "core_alias_and_observer_routes": (20, "fa45a77b4e1a14bcf186b06b6e6358569805c8cf8b92501d0189bfb02ca73a8f"),
     "arithmetic_and_emulation_routes": (10, "f135101191c62700503b6061c31d8ca98076064951b4117464eaa197c61fb4ff"),
     "ordered_fraction_routes": (4, "ff2fcc59ff917f78bfd0e6c6a5cc76b742e5c64c82b31028ec225f979ef3a580"),
 }
 EXPECTED_INDEX_GUARDS = (
-    33,
-    "2dd8be8a1fc4c33c84f1ed2260e3a7e8aa477fa979b1010b2293563bf42e42cd",
+    34,
+    "4b8147d6a3ffdbc14935ce87d962cdd299066c1f8a1a663cb508621a43ff9920",
 )
 EXPECTED_INDEX_CLOSURE = {
     "collatz_aliases_and_observers": (15, "b4bd526174cfe296325ad88a5fd69a999a02f2f1612b5768ca349bb0ed6a90dc"),
@@ -564,10 +586,15 @@ EXPECTED_INDEX_CLOSURE = {
     "scalar_digit_locality": (4, "582a89d7cb8d2b69280516683cc6507a6211f5d587436c9d4c32e9def383c144"),
     "machine_600720_and_halting_observer": (6, "743d643de485756ec645f33e6f9ce1717efb344996db62b17ae75942146749ad"),
     "strict_five_over_two_alias": (1, "d5b2f984bb5733c30680940aaf707f6cd58a91a8560a9df34272de0561f6d435"),
+    "integer_iterated_map_alias": (1, "a99736df3ee61d6d9b78430f6aec1691da428e6022b185eac9bd20a260f1aad0"),
 }
 EXPECTED_INDEX_CLOSURE_UNION = (
-    33,
-    "b8c3792ae477d1ccf919864e3966e0bf6914db2e8a72f8840f945bc6aa69cd3d",
+    34,
+    "99276f731053e0d157dcdec78c5321c9993f173da1effe14df2cfba77c4eb6da",
+)
+EXPECTED_INDEX_ONLY_CONTEXT = (
+    (3, "14d0c19320692f89c791a531e22c7916aeedcaed6c966c44277956384ed8006d"),
+    (26, "3e51dddaa304781967587e8044b9419f688ef7aded34938c068d31ac4e283e37"),
 )
 EXPECTED_IMAGE_PARTITION = {
     "native": (5, "0c03146ee327f67d29869863e7180f135426d5a0d76003d5276678feb1c826b8"),
@@ -590,8 +617,8 @@ EXPECTED_VISUAL_ONLY_BOUNDARY = (
     "8c6eb95cb11cfd589c2183d0c1239e2c5b7172e50bafe0035ede5e794b1123b9",
 )
 EXPECTED_SOURCE_MODEL = (
-    37,
-    "69894d14f5ac675f34165705a543352d58138ce3762c16b74a1ebe2e92fb3c9d",
+    41,
+    "6cdc79d6a8e7b149afd4d45843fa8ecb212b8f769c72ffff4928255ce656b2bc",
 )
 
 
@@ -670,26 +697,26 @@ EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 EXPECTED_SPLIT_QUERY = (
-    103,
-    "651169e7547bfe292d5b585132d703bb59c3bea61f20285f83b4e1dbd5adf4e8",
+    104,
+    "888fe6f858374d23dc7fceddd84c3a8aa507f699fdcfc9db38557d59d9fdbd7e",
 )
 EXPECTED_SPLIT_QUERY_EXACT = (
-    84,
-    "be7a59b27492533dc1fdca1dde009cfa73b92d93f5eb3df1f33abbf0171dbe3e",
+    85,
+    "2fddf6bbf1b40eb3802eb240aa732a85005c72d4e35c844bab22c5b12daf95dc",
 )
 EXPECTED_SPLIT_QUERY_NONEXACT = (
     19,
     "a7fee72cc2042794f2483a804cd0443e5f79bbc847fb8a1222c44c258f2cfaa7",
 )
 EXPECTED_SPLIT_QUERY_MAPPING = (
-    103,
-    "48989b83cdbb088f2a74a41f68ab677ac5a1dc69a4293625b574cd6b0931b812",
+    104,
+    "e7dbe345b77287707f119fea3cefa2ac064aee1632415a462c7f2b40ce66d3b7",
 )
 EXPECTED_SPLIT_QUERY_CLASSES = {
     "EXACT": (
-        84,
-        "be7a59b27492533dc1fdca1dde009cfa73b92d93f5eb3df1f33abbf0171dbe3e",
-        "f408dfb93ce4fccf8d9f79aeb86ceb1028ac09428a96673b11d178ab08bf1111",
+        85,
+        "2fddf6bbf1b40eb3802eb240aa732a85005c72d4e35c844bab22c5b12daf95dc",
+        "a7d680cadd5345553fdbd5cbf4b41d92513c831dee76168565f48fc65a4e659f",
     ),
     "IMAGE_BASENAME": (
         10,
@@ -944,6 +971,26 @@ def main() -> int:
         *index_closure_actual,
         "delta",
         *sorted(index_closure_union ^ set(INDEX_ROUTED)),
+    )
+    index_context_targets = set().union(*INDEX_ONLY_CONTEXT_TARGETS.values())
+    index_context_actual = (
+        (len(INDEX_ONLY_CONTEXT_ROUTES), digest(INDEX_ONLY_CONTEXT_ROUTES)),
+        (len(index_context_targets), digest(index_context_targets)),
+    )
+    index_context_ok = (
+        index_context_actual == EXPECTED_INDEX_ONLY_CONTEXT
+        and INDEX_ONLY_CONTEXT_ROUTES <= INDEX_ROUTED
+        and not index_context_targets & RETAINED
+        and not index_context_targets & union
+        and sum(map(len, INDEX_ONLY_CONTEXT_TARGETS.values()))
+        == len(index_context_targets)
+        and all(line_no < INDEX_FIRST_LINE for line_no in index_context_targets)
+    )
+    ok &= index_context_ok
+    print(
+        "index_only_context_targets_not_promoted_to_T35_mechanics",
+        "OK" if index_context_ok else "MISMATCH",
+        *index_context_actual,
     )
 
     derived_images = {
