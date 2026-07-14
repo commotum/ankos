@@ -777,9 +777,19 @@ DECISION_MATRIX = (
         "T15 epsilon, zero-source, and post-extinction events are distinct one-successor transitions under the reconstructed Notes operator, not T16/T17 terminal outcomes.",
     ),
     DecisionDisposition(
+        "D028",
+        "CONFIRM_SIGMA_STAR_CARRIER",
+        "Direct T15 epsilon rows independently confirm a private Sigma* word/emission carrier while public T13/T14/T16 validators retain their construction-specific nonempty restrictions.",
+    ),
+    DecisionDisposition(
         "D124",
         "KEEP_T14_SIGMA_PLUS",
         "T14 remains HasRightNeighbor plus pair read plus Sigma+; T15 reuses its schedule with a different result refinement.",
+    ),
+    DecisionDisposition(
+        "D125",
+        "ADD_T15_PRESET",
+        "T15 adds the total Sigma^2 -> Sigma* preset over the same OrderedGenerationConcat UPDATE; no new execution algebra is required.",
     ),
     DecisionDisposition(
         "T16/D025",
@@ -840,24 +850,24 @@ def assert_empty_role_distinctions() -> None:
     # One selected source explicitly returns epsilon.  The event exists, its
     # result record exists, it creates no child, and the empty word is the one
     # valid successor rather than a terminal signal.
-    old_pair = encode_native((0, 0), BINARY, snapshot_key=7)
+    old_pair = encode_native((0, 0), BINARY, generation=7)
+    pair_h0, pair_h1 = all_occurrences(old_pair)
     explicit = t15_step(PAGE_101_RULE, old_pair)
     assert len(explicit.successors) == 1
     assert explicit.event.successor.values == ()
     assert explicit.event.emission_records == (
-        EmissionRecord(SourceHandle(7, 0), (), 0, 0, ()),
+        EmissionRecord(pair_h0, (), 0, 0, ()),
     )
-    assert explicit.event.dropped_sources == (SourceHandle(7, 1),)
+    assert explicit.event.dropped_sources == (pair_h1,)
 
     # A singleton has zero eligible right-context sources.  It reaches the
     # same empty value, but has no RULE result record at all.
-    singleton = t15_step(
-        PAGE_101_RULE, encode_native((0,), BINARY, snapshot_key=7)
-    )
+    singleton_old = encode_native((0,), BINARY, generation=7)
+    singleton = t15_step(PAGE_101_RULE, singleton_old)
     assert len(singleton.successors) == 1
     assert singleton.event.successor.values == ()
     assert singleton.event.emission_records == ()
-    assert singleton.event.dropped_sources == (SourceHandle(7, 0),)
+    assert singleton.event.dropped_sources == all_occurrences(singleton_old)
 
     # Applying the source Notes' generic Partition/Flatten operator to the
     # epsilon-capable table derives a vacuous empty successor after extinction.
@@ -885,23 +895,24 @@ def assert_order_newborn_and_right_edge() -> None:
     # Empty and nonempty emissions coexist in source order.  The zero-length
     # witness occupies [0,0); the following real children begin at 0.  No
     # epsilon symbol or zero-width child is manufactured.
-    mixed_old = encode_native((0, 0, 1), BINARY, snapshot_key=3)
+    mixed_old = encode_native((0, 0, 1), BINARY, generation=3)
+    mixed_h0, mixed_h1, mixed_h2 = all_occurrences(mixed_old)
     mixed = t15_step(PAGE_101_RULE, mixed_old)
     assert mixed.event.successor.values == (1, 0)
     assert mixed.event.emission_records == (
-        EmissionRecord(SourceHandle(3, 0), (), 0, 0, ()),
+        EmissionRecord(mixed_h0, (), 0, 0, ()),
         EmissionRecord(
-            SourceHandle(3, 1),
+            mixed_h1,
             (1, 0),
             0,
             2,
             (
-                ChildRecord(SourceHandle(3, 1), 0, 0, 1),
-                ChildRecord(SourceHandle(3, 1), 1, 1, 0),
+                ChildRecord(mixed_h1, 0, 0, 1),
+                ChildRecord(mixed_h1, 1, 1, 0),
             ),
         ),
     )
-    assert mixed.event.dropped_sources == (SourceHandle(3, 2),)
+    assert mixed.event.dropped_sources == (mixed_h2,)
 
     # The rightmost old occurrence participates in the preceding read but has
     # no emission of its own and is not copied forward.
@@ -909,7 +920,7 @@ def assert_order_newborn_and_right_edge() -> None:
     right = t15_step(PAGE_101_RULE, right_old)
     assert read_self_right(right_old, all_right_context_anchors(right_old)) == ((0, 1),)
     assert right.event.successor.values == (1, 0)
-    assert right.event.dropped_sources == (SourceHandle(0, 1),)
+    assert right.event.dropped_sources == (all_occurrences(right_old)[1],)
 
     # All reads are old-snapshot reads and newborns wait until the next event.
     newborn_table = dict(PAGE_101_RULE)
@@ -963,18 +974,33 @@ def assert_hostile_validation() -> None:
             "malformed T15 pair table was accepted",
         )
 
-    old = encode_native((0, 0, 1), BINARY, snapshot_key=9)
+    old = encode_native((0, 0, 1), BINARY, generation=9)
     h0, h1 = all_right_context_anchors(old)
     valid_writes = (
         OrderedEmission(h0, ()),
         OrderedEmission(h1, (1, 0)),
     )
-    foreign = SourceHandle(8, 0)
-    out_of_range = SourceHandle(9, 3)
+    # Same generation and index do not imply identity.  Each independently
+    # encoded configuration owns a fresh token.
+    same_generation_peer = encode_native((1, 1, 0), BINARY, generation=9)
+    foreign_same_generation = all_occurrences(same_generation_peer)[0]
+    assert foreign_same_generation.generation == h0.generation == 9
+    assert foreign_same_generation.snapshot_token is not old.snapshot_token
+
+    prior = encode_native((0, 0, 1), BINARY, generation=8)
+    stale_prior_generation = all_occurrences(prior)[0]
+    out_of_range = SourceHandle(old.snapshot_token, 3)
     invalid_results = (
         ((h0, h0), (valid_writes[0], valid_writes[0])),
         ((h1, h0), tuple(reversed(valid_writes))),
-        ((foreign,), (OrderedEmission(foreign, ()),)),
+        (
+            (foreign_same_generation,),
+            (OrderedEmission(foreign_same_generation, ()),),
+        ),
+        (
+            (stale_prior_generation,),
+            (OrderedEmission(stale_prior_generation, ()),),
+        ),
         ((out_of_range,), (OrderedEmission(out_of_range, ()),)),
         ((h0, h1), (valid_writes[0],)),
         ((h0, h1), tuple(reversed(valid_writes))),
@@ -1004,10 +1030,21 @@ def assert_hostile_validation() -> None:
     # A handle selected from the old generation cannot be reused against the
     # successor merely because its integer index still exists.
     successor = valid.successor
+    assert successor.snapshot_token is not old.snapshot_token
+    assert successor.generation == old.generation + 1
     expect_value_error(
         lambda: read_self_right(successor, (h0,)),
         "old-snapshot handle was accepted in a newborn generation",
     )
+    expect_value_error(
+        lambda: read_self(old, (foreign_same_generation,)),
+        "same-generation foreign handle was accepted for a read",
+    )
+
+    # Opaque address identity is not semantic configuration state.
+    semantic_peer = encode_native(old.values, old.alphabet, generation=old.generation)
+    assert semantic_peer == old
+    assert semantic_peer.snapshot_token is not old.snapshot_token
 
 
 def bounded_words(alphabet: Alphabet, lengths: Iterable[int]) -> tuple[Word, ...]:
@@ -1136,14 +1173,18 @@ def assert_architecture_decisions() -> None:
         "D019",
         "D020",
         "D024",
+        "D028",
         "D124",
+        "D125",
         "T16/D025",
     )
     assert tuple(row.action for row in DECISION_MATRIX) == (
         "CLARIFY_PRIVATE_BASE",
         "KEEP_T13_SIGMA_PLUS",
         "EXTEND_OUTCOME_CASES",
+        "CONFIRM_SIGMA_STAR_CARRIER",
         "KEEP_T14_SIGMA_PLUS",
+        "ADD_T15_PRESET",
         "KEEP_T16_RHS_NONEMPTY",
     )
     assert all("executor" not in row.reason.lower() for row in DECISION_MATRIX)
@@ -1172,7 +1213,7 @@ def main() -> None:
         "page101_t0_t11=PASS; page102_fixtures="
         f"{len(PAGE_102_FIXTURES)}; shared_ordered_UPDATE=PASS; "
         "epsilon_record_no_fake_children=PASS; newborn_deferral=PASS; "
-        "rightmost_drop=PASS; snapshot_handle_scope=PASS; "
+        "rightmost_drop=PASS; opaque_snapshot_identity=PASS; "
         "extinction_is_transition=PASS; no_match_is_zero_successor=PASS; "
         "hostile_validation=PASS; decision_matrix=PASS)"
     )

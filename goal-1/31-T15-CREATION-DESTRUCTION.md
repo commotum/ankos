@@ -5,13 +5,13 @@ Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS CLOSE
 ## Current Facts
 
 - T15 is CSV line 16, Creation-Destruction Substitution Systems. The catalog and `CA-Types.md` supply search vocabulary only; neither is primary construction evidence.
-- The frozen 22-query source audit closes 349 unique lines at 271 pre-Index and 78 actual-Index. It retains 32 matched hits plus eight governed continuations, excludes 239 pre-Index false positives, reverse-closes all 17 split documents, and leaves zero source candidate unresolved.
+- The repaired frozen 22-query source audit closes 351 unique lines at 273 pre-Index and 78 actual-Index. It retains 32 matched hits plus eight governed continuations, excludes 241 pre-Index false positives, reverse-closes all 17 split documents, and leaves zero source candidate unresolved.
 - The catalog name does not occur in the Book or Atlas. The actual Index has no dedicated T15 heading; eight broad 0L/1L/D1L/L-system/substitution routes lead to pages 82–87 and 70 Index candidates are excluded.
 - The direct Chapter 3 discussion begins at `BOOK:1028` immediately after the strict nonempty neighbor-dependent examples. It says elements may disappear, distinguishes excessive disappearance from rapid growth, and studies rules whose creation and destruction are nearly balanced (`BOOK:1028-1040`).
 - The direct figures use variable-cardinality ordered words. Equal-total-width and fixed-box rows are alternate views, and only sequence order remains semantic as insertions/deletions shift later displayed positions (`BOOK:1032-1048`).
 - The fixed-point asset audit closes 23 source-bound files at `C/O/R/X=3/1/13/6` with 23 monolith references, 23 split references, and 23 unique hashes. It directly decodes one binary, four ternary, and two quaternary total pair tables plus all seven seeds/`t0..t11` traces.
 - The page-101 table is `11->11, 10->0, 01->10, 00->epsilon`. Five of the six page-102 tables contain respectively `2,2,1,4,3` epsilon rows; page-102 (a) contains none. All use the same immediate-right contextual schedule.
-- No T15 rule table, seed, or operator is transcribed in the Notes. The prose contains no literal “empty replacement”, “epsilon”, or erasing terminology; the corpus's only explicit syntactic empty right-hand side is a T17 tag-system row at `BOOK:12298`, under a different consume-prefix/append-tail schedule.
+- No T15 rule table, seed, or operator is transcribed in the Notes. The prose contains no literal “empty replacement”, “epsilon”, or erasing terminology. Exhaustive arrow/empty-list/empty-string syntax finds T17 `10 -> {}` at `BOOK:12298`, a T20 bracket-observer `"e" -> {}` at `BOOK:12432`, and a T30 multiway `"AB" -> ""` at `BOOK:13953`; none is a native T15 row and their roles/schedules are distinct.
 - T14 established `OrderedGenerationConcat`: selected old anchors emit ordered words and UPDATE consumes the old generation, concatenating writes in source/child order. T15 proves that its private result carrier is `Sigma*` while strict T13/T14 validators remain `Sigma+`.
 - An empty RULE emission, zero selected sources, an empty successor, extinction, halt, and zero successors are distinct. T14's `[]->[]`/singleton-to-empty behavior comes from zero eligible pairs and cannot serve as evidence for a native epsilon-valued T15 row.
 - DOMAIN is discrete `t+1D`; the finite ordered word, including epsilon, and its occurrence topology belong to CONFIGURATION.
@@ -62,18 +62,18 @@ Reconstruct creation-destruction substitution directly from exhaustive primary e
 | Q15 rendering alternatives | 1 | 1 | 0 |
 | Q16 literal page 86/87 control | 0 | 0 | 0 |
 | Q17 0L/1L/L-system aliases | 9 | 4 | 5 |
-| Q18 syntactic empty RHS | 1 | 1 | 0 |
+| Q18 all arrow spellings with empty-list/string RHS | 3 | 3 | 0 |
 | Q19 T14 right-edge boundary | 1 | 1 | 0 |
 | Q20 T16 sequential boundary | 2 | 2 | 0 |
 | Q21 T17 short/extinction boundary | 2 | 2 | 0 |
 
 After union and deduplication:
 
-- query union: 349, digest `d5d15e7a4c2c9555440c64782dca47ad02c1550c01bde86e0cd4648d2d67813a`;
-- pre-Index: 271, digest `da7be8b67ea869d5ba3e4ceccd48b254ca01d0dbf90b1067e3f4db4d4d708fcb`;
+- query union: 351, digest `e0a877e8d80f232e52fbe579f4baa1d4a4da14e8d8573b58d997207e50a39ead`;
+- pre-Index: 273, digest `ca4b700251ed6fdb25ed5b5e9ecc70cff5e6ba94c02e341319dc68f0c57a8ea0`;
 - actual Index: 78, digest `e811eee57e862b90876a86bfa6096928dc6e122e2ac31bac663397c7314e576f`;
 - matched retained: 32; governed continuations: eight; final retained: 40, digest `03fc9177af658074d7a276757fcc742a1afb3e5fe976ec6b08d438c1a57f7e73`;
-- excluded pre-Index candidates: 239, digest `65d4ccb8d5d2c2f6d97db0d035d5c6e3f0c9193ef695325361ec9dfcf7926b24`;
+- excluded pre-Index candidates: 241, digest `7c3a93ce4cf56e72940e48578ffd3347d4ef3544a327d0b3edbb6f82b43114f3`;
 - eight relevant broad Index routes and 70 dispositioned Index false positives.
 
 Candidate disposition is closed:
@@ -91,9 +91,11 @@ Candidate disposition is closed:
 | `BOOK:12136` | extraction-truncated neighbor-dependent growth observation; no missing text invented |
 | `BOOK:12251` | 1L/T14 historical alias route |
 | `BOOK:12298-12300` | explicit T17 empty appendant and short-state totalizer; different schedule |
+| `BOOK:12432` | T20 bracket-string observer removes literal `e`; non-transition control |
+| `BOOK:13953` | T30 multiway empty-string rewrite; different match/branch successor schedule |
 | `BOOK:20828,21068,21422,21461,21652,21656,22114,22144` | all relevant actual-Index routes followed |
 
-All 17 split documents are hash-bound. The 348 split query records reverse-join as 319 exact and 29 mapped extraction variants; retained evidence reverse-joins as 30 exact and ten mapped variants with zero omission. Atlas has four broad summary hits and no executable or rule-table T15 evidence. Root and `/tmp` runs pass; optimized mode fails closed. Zero source candidate remains unresolved.
+All 17 split documents are hash-bound. The 350 split query records reverse-join as 321 exact and 29 mapped extraction variants; retained evidence reverse-joins as 30 exact and ten mapped variants with zero omission. Atlas has four broad summary hits and no executable or rule-table T15 evidence. Root and `/tmp` runs pass; optimized mode fails closed. Zero source candidate remains unresolved.
 
 ## Book Excerpts
 
@@ -407,7 +409,7 @@ These are roles/compositions, not a requirement for one runtime class per line. 
 
 - Generic ordered data module: make the private `Word[Symbol]` carrier alphabet-closed and epsilon-capable. Retain `NonEmptyWord[Symbol]` as the T13/T14 validator.
 - Typed result module: `OrderedEmission(source,word)` always exists for a selected source. Store `EmissionRecord(source,word,start,stop,children)`; epsilon requires `start == stop` and `children == ()`.
-- Ordered UPDATE: accept `Sigma*` emissions, require exactly one emission per unique monotone snapshot-bound selected handle, concatenate in source/child order, consume all old sources, report unselected sources, and never copy them. Reject stale same-index handles from foreign generations.
+- Ordered UPDATE: accept `Sigma*` emissions, require exactly one emission per unique monotone selected handle bound to an opaque identity for the exact immutable old snapshot, concatenate in source/child order, consume all old sources, report unselected sources, and never copy them. Generation is diagnostic only: reject both stale-generation and independent same-generation foreign handles. Serialize provenance with an explicit runner-owned run/branch/generation scope, or rebind and revalidate handles on load; never treat bare `(generation,index)` as identity.
 - Rule/spec layer: add a serializable total `Pair -> Word` validator/preset over any declared finite alphabet. Missing rows are invalid; epsilon is not a missing/default row.
 - Shared runner: invoke UPDATE even when FRONTIER selects zero sources. The selected program/preset supplies the outcome; no global empty-frontier shortcut is allowed.
 - Trace/encoding: support ragged empty/nonempty frames and zero-length lineage intervals without padding or fake children. Extinction is a derived trace query.
@@ -424,7 +426,7 @@ These are roles/compositions, not a requirement for one runtime class per line. 
 - explicit distinction from T16 `NoMatch` and T17 `InsufficientPrefix` zero-successor outcomes;
 - old-snapshot/newborn, source order, rightmost read-but-non-source, and no-copy-forward adversaries;
 - missing/duplicate/wrong-key/out-of-alphabet rows and emissions;
-- duplicate/unordered/out-of-range/stale/foreign-generation handles and incomplete/reordered result coverage;
+- duplicate/unordered/out-of-range/stale-generation/same-generation-foreign-snapshot handles and incomplete/reordered result coverage;
 - tampered zero-length intervals and fake epsilon child records;
 - serialization and ragged-trace round trips with no callback, `Any`, sentinel, capacity, family tag controlling execution, or renderer dependency.
 

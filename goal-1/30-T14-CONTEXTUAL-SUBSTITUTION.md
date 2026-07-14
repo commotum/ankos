@@ -380,7 +380,7 @@ The historical `simple_programs.md` is CA-shaped, while `architecture-audit.md` 
 - Principle 11: snapshot parallelism, source order, and right-edge ineligibility are defining semantics and stay in the declared axes.
 - Principles 12–16: ragged trace encoding remains downstream; no CA compiler, fixed capacity, callback, family branch, or sentinel is admitted.
 
-The one-step map `e(word)=OrderedConfiguration(word)` has an explicit inverse on the invariant-valid image. For every bounded binary table and every word through length six, the direct Notes operator and the generic pipeline select the same anchors, read the same old pairs, emit the same blocks, and concatenate them in the same order. `30-T14-semantic-oracle.py` proves this independently for 164,592 cases, including 3,888 short-word cases. It separately checks 4,080 singleton-output pair/finite-interior cases, the XOR/sheared-rule-90 fixture, both direct traces, false pair-as-splice conflicts, copy-forward, order reversal, and snapshot-bound stale/foreign/malformed handle and write rejection.
+The one-step map `e(word)=OrderedConfiguration(word)` has an explicit inverse on the invariant-valid image. For every bounded binary table and every word through length six, the direct Notes operator and the generic pipeline select the same anchors, read the same old pairs, emit the same blocks, and concatenate them in the same order. `30-T14-semantic-oracle.py` proves this independently for 164,592 cases, including 3,888 short-word cases. It separately checks 4,080 singleton-output pair/finite-interior cases, the XOR/sheared-rule-90 fixture, both direct traces, false pair-as-splice conflicts, copy-forward, order reversal, and exact-snapshot-bound stale/same-generation-foreign/malformed handle and write rejection.
 
 ### Decision audit
 
@@ -390,7 +390,7 @@ The one-step map `e(word)=OrderedConfiguration(word)` has an explicit inverse on
 | FRONTIER | BOOK:1022,12113 | parameterization/restriction | ordered occurrence selector | exactly anchors `0..n-2`; unique old handles | no stage |
 | NEIGHBORHOOD | BOOK:1018,12113 | parameterization | occurrence-relative ordered read | immutable `(self,right)`; overlap allowed | no stage |
 | RULE result | BOOK:1026,12111 | direct typed-product reuse | T13 ordered nonempty word emission | total `Sigma^2`, output in `Sigma+` | no stage |
-| UPDATE | BOOK:12113 plus commuting oracle | factored reuse | `OrderedGenerationConcat` | writes cover selected frontier exactly; source/child order; no copy-forward | D019 wording only |
+| UPDATE | BOOK:12113 plus commuting oracle | factored reuse | `OrderedGenerationConcat` | writes cover selected frontier exactly; opaque old-snapshot binding; source/child order; no copy-forward | D019 wording only |
 | empty frontier | unguarded BOOK:12113, BOOK:1022 | preset outcome | D024 construction-specific result | `[]->[]`, `[x]->[]`; no epsilon row/halt | D024 wording only |
 | CA relation | BOOK:8024-8028 plus asset | restriction/relation | singleton-output pair table | declared finite interior and encoder; never native fallback | no |
 | executor | all above | direct reuse | branch-free `select/read/rule/apply` | no family dispatch/callback/hidden state | no |
@@ -438,7 +438,7 @@ The names are design roles, not required one-class-per-line commitments. Goal 2 
 - `src/ca/loci.py` / `frontiers.py`: add or compose a topology-aware `HasRelative(+1)` selector over old occurrence handles. The selector is generic data, not `T14Frontier` or a family callback.
 - `src/ca/neighborhoods.py`: parameterize the T13 occurrence read as ordered relative offsets `(0,+1)` with strict availability; overlapping reads are valid.
 - `src/ca/rules.py`: reuse the total structured table with a pair/product key and `NonEmptyWord[Symbol]` output validator. Support any finite alphabet, including the evidenced three-symbol relation, without a binary branch or mandatory rule ID.
-- Typed result/update module: factor D019's base as `OrderedGenerationConcat(old,active,emissions)`. Validate snapshot-bound unique monotone old handles, reject same-index handles from a foreign generation, require exact selected-frontier result coverage, alphabet closure, source binding, and child order, and do not require `active` to equal every old occurrence. T13's preset retains that stronger invariant.
+- Typed result/update module: factor D019's base as `OrderedGenerationConcat(old,active,emissions)`. Validate unique monotone old handles against an opaque identity minted for the exact immutable snapshot; generation is diagnostic only, so reject same-index handles from both stale generations and independent same-generation snapshots. Serialized handles need an explicit runner-owned run/branch/generation scope or must be rebound on load. Require exact selected-frontier result coverage, alphabet closure, source binding, and child order, and do not require `active` to equal every old occurrence. T13's preset retains that stronger invariant.
 - `src/ca/specs.py` / catalog presets: `neighbor_dependent_substitution(alphabet,table)` resolves to ordinary shared components. Seed, trace horizon, renderer, and CA-emulation relation remain separate inputs/records.
 - Generic runner: always invoke the selected UPDATE even when `active` is empty; do not install a global empty-frontier shortcut or catalog-family dispatch.
 - Structured trace/encoding: reuse T13 ragged frames and child intervals. Record the unmatched rightmost old occurrence as having no descendants when provenance is requested; never copy it or synthesize an epsilon child.
@@ -452,7 +452,7 @@ The names are design roles, not required one-class-per-line commitments. Goal 2 
 - source-order and block-internal-order adversaries;
 - explicit `[a] -> []` and `[] -> []` behavior without halt/error invention;
 - rightmost context participates in the last read but emits no separate block;
-- rule totality, alphabet closure, pair arity, nonempty output, duplicate row, same-index stale/foreign snapshot handle, and malformed source-write rejection;
+- rule totality, alphabet closure, pair arity, nonempty output, duplicate row, same-index stale-generation and same-generation-foreign-snapshot handles, and malformed source-write rejection;
 - length-one-output restriction commuting with the corresponding one-sided local CA step on a declared finite interior, while proving that no CA compiler is used for native execution;
 - binary and three-symbol pair-table validation without converting the latter into an eight-row width-three CA table;
 - ragged trace and optional lineage round trips without padding as state;
@@ -494,7 +494,7 @@ The evidence, asset, and semantic audits are closed. The 308-line source union r
 
 T14 is not a new construction executor or UPDATE algebra. It reuses T13's finite ordered configuration, nonempty word result, lineage, and `OrderedGenerationConcat`; it parameterizes FRONTIER to `HasRightNeighbor`, NEIGHBORHOOD to immutable overlapping `(Self,Right)` reads, and the total table to `Sigma^2 -> Sigma+`. D019 moves full-old-source coverage into T13's preset, while D024 records T14's `[]->[]` and `[a]->[]` zero-emission successors. The 164,592-case commuting oracle, 4,080 singleton-pair interior cases, exact fixtures, and hostile validation close this classification.
 
-The independent hostile review's three findings are closed: all status/coverage records now agree; `SourceHandle(snapshot_key,index)` rejects a same-index handle from a foreign generation as well as malformed/out-of-range handles; and the raster-only second rule now claims independent reproduction only for the transcribed table's trajectory, not for the four visual rule rows. The reviewer found no semantic or architecture counterexample.
+The independent T14 hostile review's three findings are closed: all status/coverage records agree; malformed, out-of-range, and stale-generation handles are rejected; and the raster-only second rule claims independent reproduction only for the transcribed table's trajectory, not for the four visual rule rows. T15's later hostile review exposed one bounded defect in the shared proof model: a generation-only `snapshot_key` could accept a same-index handle from an independent same-generation configuration. The repaired T14 oracle now binds every handle to an opaque exact-snapshot identity and tests both collision modes. This strengthens D019's reusable provenance invariant without changing any T14 transition, public preset, architecture classification, or completion status.
 
 All source, asset, and semantic oracles pass from the repository root and `/tmp`; all fail closed under optimized mode. Markdown fences, `git diff --check`, Goal 1 scope, exact coverage counts, and all 102 repository tests pass. T14 is the 29th completed type, 16 remain pending, no stage is reopened, and no runtime code changed. Next: T15.
 
