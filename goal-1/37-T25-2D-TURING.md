@@ -6,8 +6,8 @@ Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, ARCHITECTURE, AND HOSTILE-REVIEW
 
 - T25 is CSV line 26, `Two-Dimensional Turing Machines`; the catalog and `ref/notes/CA-Types.md:687-710` are search guides, not primary mechanics.
 - The frozen 30-query source protocol closes 71 candidate lines (`50` pre-Index and `21` guarded actual-Index routes), retains 63 at `30 native / 29 relation / 4 control`, excludes 13, and leaves zero unresolved. All 63 retained lines reverse-join to the split corpus as `47 exact + 16 normalized variants`; none is monolith-only.
-- T12 supplies the lossless cell alphabet `Plain(symbol) | Head(state,symbol)` with exactly one head. D127/D130 supply discrete `t+2D`, square-grid support, explicit coordinate frames, and semantic topology ports. T25 composes those axes; it does not turn the existing `src/ca` SimpleProgram substrate into a different library.
-- The Chapter 5 construction places the head on a two-dimensional grid and gives four movements (`BOOK:2264-2270`). The displayed arrow orientation denotes head state and explicitly does not determine movement.
+- T12 supplies the lossless cell alphabet `Plain(symbol) | Head(state,symbol)` with exactly one head. D127/D130 supply discrete `t+2D`, square-grid support, explicit coordinate realizations, and semantic topology ports. T25 composes those axes; it does not turn the existing `src/ca` SimpleProgram substrate into a different library.
+- The Chapter 5 construction places the head on a two-dimensional grid and gives four movement choices (`BOOK:2264-2270`). The text fixes their arity but not exact coordinate vectors or a compass/storage order. The displayed arrow orientation denotes head state and explicitly does not determine movement.
 - The Notes use closed rows `{state,symbol} -> {next_state,next_symbol,{dx,dy}}`, read only `(state,symbol)` at the head, write the old head cell, and add the displacement to the old position (`BOOK:13660-13664`).
 - RULE therefore returns typed source assignment plus `MoveHead(next_state,port)`. UPDATE—not NEIGHBORHOOD or RULE—resolves the destination through visible topology, preserves its old symbol, and applies the move atomically.
 - The 12 source-governed images close at `12 hash-bound / 0 transcribed / 0 pixel-replayed`: nine main/path assets plus the indivisible three-file Turing-to-CA relation plate. No raster supplies an executable table, direction codec, seed, or trace fixture.
@@ -16,7 +16,7 @@ Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, ARCHITECTURE, AND HOSTILE-REVIEW
 
 ## Final Semantic Conclusions
 
-- The strict main-text family is the T12 unique-head construction parameterized by discrete `t+2D` square-grid topology and four nonzero axis-adjacent movement ports. The Book does not define a numeric direction codec or compass-name ordering, so the raw declared coordinate frame remains explicit.
+- The strict main-text family is the T12 unique-head construction parameterized by discrete `t+2D` square-grid topology and four semantic movement ports. Primary text fixes four choices but does not bind them to exact coordinate vectors, a compass-name ordering, storage order, or a numeric codec. The semantic oracle therefore declares a conventional unit-cardinal coordinate realization; it is a visible topology parameter and conformance representative, not a source transcription.
 - A transparent configuration is a total `Z^2` field over `Plain(Sigma) | Head(Q,Sigma)` with exactly one head. The head-bearing cell must retain the underlying tape symbol.
 - `NEIGHBORHOOD.read` exposes only the unique head's `(q,a)`. RULE emits `AssignSource(a_next)` plus `MoveHead(q_next,port)`. UPDATE resolves the port and preserves the old destination symbol from the immutable configuration; a concrete two-label assignment batch is only a lossless lowering.
 - Absolute displacements and relative turns are distinct program schemas unless a visible orientation factor and a lossless one-event map are supplied. A display arrow must not be reused as motion control without source evidence.
@@ -58,7 +58,7 @@ Closure:
 - Index: all 21 routed lines have exact entry guards, including artificial ants, hexagonal/square lattices, randomness, named people, Logo/robotics, worms, `TMs`, Turing aliases, vants, turmites, and turning machines.
 - Split corpus: 17 files; query reverse join `63 exact + 7 normalized variants`; retained reverse join `47 exact + 16 normalized variants`; 0 monolith-only.
 - Atlas: one taxonomy-summary hit only. Catalog/taxonomy are vocabulary controls.
-- Frozen source-oracle SHA-256: `8e20f958faac60cecc4a733282fdcb05a34e003d6bb1da5ec1dc924b49ae723d`.
+- Frozen source-oracle SHA-256: `4a1dab6f8f5158d84a5a879b0f18e5131e0ae11dbe26c8dc398bafb5e9dbb920`.
 - Root, relocated-cwd, optimized-mode rejection, silent import, explicit compile, diff, and mode-644 gates pass; `unresolved_total=0`.
 
 ## Book Excerpts
@@ -188,7 +188,7 @@ active      -> Plain(a_next)
 destination -> Head(q_next, X[destination].underlying_symbol)
 ```
 
-The native table is `delta : Q x Sigma -> Q x Sigma x Move2D`, with `Move2D` a declared four-port square-grid displacement schema whose storage order is nonsemantic. The tagged representation is bijective with factored `(tape,head_position,head_state)` state and commutes one event at a time. A nonzero native move can still alias its source, or another port, in a small periodic quotient. Any finite realization must therefore prove the required source/destination and port distinctions, provide a step-commuting virtual-coordinate adapter, or identify itself as a different quotient program.
+The native table is `delta : Q x Sigma -> Q x Sigma x Move2D`, with `Move2D` a declared four-port square-grid action schema whose storage order is nonsemantic. Source evidence fixes the four-port result arity; a topology declaration fixes how each port reaches a destination. The oracle's unit-cardinal coordinate action is one explicit conventional realization, not a recovered Book vector table. The tagged representation is bijective with factored `(tape,head_position,head_state)` state and commutes one event at a time. A nonzero realized move can still alias its source, or another port, in a small periodic quotient. Any finite realization must therefore prove the required source/destination and port distinctions, provide a step-commuting virtual-coordinate adapter, or identify itself as a different quotient program.
 
 Turning-relative variants require a visible orientation/state role and a declared action from `(orientation,turn)` to `(orientation_next,absolute_move)`. A hexagonal worm requires a six-port topology and exact coupling evidence. Neither may be implemented by reading renderer arrows or incidental storage order.
 
@@ -206,15 +206,15 @@ It proves `decode(generic_step(delta,encode(native))) = native_step(delta,native
 - 768 six-port visible-heading events on an explicit hex topology;
 - 20 unbounded-viewport events, 2 explicit coordinate-frame mapping events, and 24 immutable-table replay events.
 
-The strict exhaustive set proves that changing every candidate destination symbol never changes RULE output, while UPDATE preserves the selected old destination symbol. The exact Langton formula expands to eight closed rows and round-trips through the C4 relative-turn restriction. Two counterexamples prove that arbitrary absolute tables need not factor through relative turns. The hex witness proves topology/action reuse while explicitly leaving the source's `1296` worm schema underdetermined.
+The strict exhaustive set proves, for the declared cardinal realization, that changing every candidate destination symbol never changes RULE output, while UPDATE preserves the selected old destination symbol. This proof is structural in the four distinct semantic ports and does not claim the coordinate vectors were transcribed from the unparsed figure. The exact Langton formula independently supplies its own four unit-complex displacements, expands to eight closed rows, and round-trips through the C4 relative-turn restriction. Two counterexamples prove that arbitrary absolute tables need not factor through relative turns. The hex witness proves topology/action reuse while explicitly leaving the source's `1296` worm schema underdetermined.
 
 Additional guards cover total-default canonicalization, product-table completeness, exact types, stale snapshot tokens, foreign topology frames, invalid ports/states/symbols, zero/two heads, bare-union information loss, atomic zero-head intermediate rejection, size-1/size-2 quotient aliases, size-3 local injectivity, silent coordinate-frame divergence, immutable setup-table replay, observer noninterference, and 38 hostile failures. Semantic digest: `8eed091c1b3635661fb160ce76a49738f282ae1ec94a71fcb8a303a8735434e2`. Root/relocated outputs match, optimized mode fails closed, import is silent, compilation/diff gates pass, and mode is `644`.
 
 ## Current API Fit
 
-`src/ca` is the implementation home for the broader SimpleProgram abstraction; its name and current CA-shaped presets do not define its semantic ceiling. `ref/principles/simple_programs.md:15-57,71-87` already requires the branch-free axes, visible control, typed effects, and explicit representations used here.
+`src/ca` is the implementation home for the broader SimpleProgram abstraction; its name and current CA-shaped presets do not define its semantic ceiling. Root `principles.md:15-57,71-87` already requires the shared transition axes, visible control, typed effects, and explicit representations used here.
 
-The legacy `simple_programs.md` specification has reusable mathematical and geometric pieces: abstract alphabet `A` (`:200-215`) and self-only access (`:1303-1322`). Its current frontier-as-writable-target framing (`:1412-1430`), scalar rule result (`:1767-1791`), and absence of an explicit UPDATE axis (`:28-38`) are generic-axis gaps, not proof that T25 needs another library or executor.
+The root legacy `simple_programs.md` specification has reusable mathematical and geometric pieces: abstract alphabet `A` (`simple_programs.md:200-215`) and self-only access (`simple_programs.md:1303-1322`). Its current frontier-as-writable-target framing (`simple_programs.md:1412-1430`), scalar rule result (`simple_programs.md:1767-1791`), and absence of an explicit UPDATE axis (`simple_programs.md:28-38`) are generic-axis gaps, not proof that T25 needs another library or executor.
 
 | Axis | Smallest fit |
 |---|---|
@@ -261,7 +261,7 @@ Thus the runtime delta is generic and modest: new alphabet, frontier, support, t
 | D014 | 3 | Directly reuse `Plain(sigma) | Head(q,sigma)` and exactly-one-head invariance. |
 | D121 | 2/3 | Reuse validated blank/default configuration and seed separation. |
 | D122 | unaffected | T10 supplies every new block bit; it does not make T25 destinations RULE-visible. |
-| D127 | 1/2/3 | Reuse discrete `t+2D`, square `Z^2`, frame/coordinate machinery, and semantic cardinal ports—not T21's all-site frontier or five-cell read. |
+| D127 | 1/2/3 | Reuse discrete `t+2D`, square `Z^2`, frame/coordinate machinery, and a declared cardinal realization of T25's four semantic ports—not T21's all-site frontier or five-cell read. |
 | D130 | 1/2/3 | Reuse typed ports/fixed incidence for movement and six-port topology—not its all-site neighborhood preset. |
 
 No completed stage reopens. D011/T09/T12 wording is synchronized so the native read remains exact; their classifications and results are unchanged.
@@ -306,6 +306,6 @@ Canonical tests are the semantic-oracle partitions above plus static absence of 
 
 ## Stage Results
 
-**COMPLETE.** The frozen Q00-Q29 source audit closes 71 lines at `50 pre-Index / 21 actual-Index`, retains 63 at `30 native / 29 relation / 4 control`, excludes 13, reverse-joins every retained line to the split corpus, and leaves zero unresolved. The dependent 12-image universe closes at 24 exact references, 12 unique hashes, 562,275 bytes, and `12 hash-bound / 0 transcribed / 0 pixel-replayed`. The semantic oracle proves 3,118 native/generic one-event commutations and 38 hostile rejections, including self-only RULE visibility, destination-preserving UPDATE, factored/tagged equivalence, all strict local transitions, exact Langton C4 behavior, six-port topology reuse, relative-turn nonimage counterexamples, coordinate-frame commutation/divergence, quotient aliases, unbounded travel, atomicity, frozen setup provenance, and observer separation.
+**COMPLETE.** The frozen Q00-Q29 source audit closes 71 lines at `50 pre-Index / 21 actual-Index`, retains 63 at `30 native / 29 relation / 4 control`, excludes 13, reverse-joins every retained line to the split corpus, and leaves zero unresolved. The dependent 12-image universe closes at 24 exact references, 12 unique hashes, 562,275 bytes, and `12 hash-bound / 0 transcribed / 0 pixel-replayed`. The semantic oracle proves 3,118 native/generic one-event commutations and 38 hostile rejections, including self-only RULE visibility, destination-preserving UPDATE, factored/tagged equivalence, all strict local transitions, exact Langton C4 behavior, six-port topology reuse, relative-turn nonimage counterexamples, declared coordinate-frame commutation/divergence, quotient aliases, unbounded travel, atomicity, frozen setup provenance, and observer separation. The main text fixes four square-grid movement choices but not their exact coordinate-vector binding; the oracle's cardinal map is an explicit conventional realization, while the Langton formula independently fixes its own unit-complex displacements.
 
 D131 records a categories-1-to-3 composition of T12, D127, D130, and D011. `src/ca` remains the shared SimpleProgram substrate: T25 adds no state/control class, UPDATE algebra, executor, family branch, callback, hidden interpreter, arbitrary-CA identity, implicit boundary, or invented worm codec. No completed stage reopens. Source, asset, semantic, architecture, hostile-review, portability, fail-closed, import, compile, Markdown, diff, scope, mode, and repository-test gates pass. T26 is next.

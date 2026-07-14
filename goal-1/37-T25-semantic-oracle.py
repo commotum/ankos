@@ -15,9 +15,12 @@ while ``UPDATE`` preserves the old destination symbol from the configuration.
 Each native event must commute with one generic event--there are no CA
 microsteps, callbacks, family switches, or hidden interpreter state.
 
-The strict main-text construction supplies a square grid and four raw-frame
-axis movements, but no named north/east/south/west ordering or numeric rule
-codec.  ``NEIGHBORHOOD`` exposes only the old Head; ``RULE`` returns a typed
+The strict main-text construction supplies a square grid and four movement
+choices, but the text does not bind those choices to exact coordinate vectors,
+compass names, storage order, or a numeric rule codec.  This oracle therefore
+declares a conventional unit-cardinal realization of four semantic ports; it
+does not attribute that coordinate map to the source.  ``NEIGHBORHOOD`` exposes
+only the old Head; ``RULE`` returns a typed
 source assignment plus head-movement intent; atomic ``UPDATE`` preserves the
 old destination symbol without making it rule-visible.  Langton's ant is
 checked from the exact finite source formula.  A
@@ -72,7 +75,7 @@ def add_coord(left: Coord, right: Coord) -> Coord:
 
 @dataclass(frozen=True)
 class MoveSchema:
-    """Semantic movement ports plus raw Book-frame coordinate displacements."""
+    """Semantic movement ports plus one explicit coordinate realization."""
 
     name: str
     ports: tuple[tuple[str, Coord], ...]
@@ -111,10 +114,12 @@ class MoveSchema:
         return tuple(label for label, _delta in self.ports)
 
 
-# This tuple order is a declared structural spelling for this oracle, not a
-# source-defined numeric code or compass convention.
+# This unit-cardinal map and tuple order are a declared conventional realization
+# for this oracle, not source-recovered coordinates, a numeric code, or a
+# compass convention.  The primary evidence fixes four choices, while the
+# topology declaration fixes what each choice does.
 SQUARE_SCHEMA = MoveSchema(
-    "book-array-square-v1",
+    "declared-cardinal-square-realization-v1",
     (
         ("axis0+", (1, 0)),
         ("axis0-", (-1, 0)),
@@ -147,8 +152,8 @@ HEX_SCHEMA = MoveSchema(
 
 # Explicit finite heading actions for relative-turn variants.  These are not
 # inferred from MoveSchema storage order and are not a numeric codec for the
-# unrestricted Turing-table family.  The square cycle is the source formula's
-# (1, i, -1, -i) action in the raw Book frame.
+# unrestricted Turing-table family.  The square cycle realizes the exact
+# source formula's (1, i, -1, -i) Langton action in this declared frame.
 SQUARE_C4_HEADING_PORTS = ("axis0+", "axis1+", "axis0-", "axis1-")
 HEX_C6_HEADING_PORTS = HEX_SCHEMA.labels
 
@@ -1319,7 +1324,8 @@ def main() -> None:
         f"frozen_table_replay:{groups['provenance']['replay_native_generic_events']}"
     )
     print(
-        "strict_square=discrete_t+2D;raw_book_array_frame;four_semantic_axis_ports;"
+        "strict_square=discrete_t+2D;declared_cardinal_coordinate_realization;"
+        "source_fixes_four_semantic_ports_not_coordinate_vectors;"
         "port_tuple_order_is_not_a_numeric_codec;exactly_one_Head"
     )
     print(
