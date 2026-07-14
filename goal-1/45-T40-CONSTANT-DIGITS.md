@@ -9,7 +9,7 @@ Status: **IN PROGRESS — ARCHITECTURE RESOLVED; ORACLE AND HOSTILE-REVIEW CLOSU
 - The clean Chapter 4 split at lines 247-291 is materially abridged. It omits the page-154 long-division and page-156 square-root procedures and assets, so it cannot replace the monolith for semantic closure.
 - The Book distinguishes a simple exact definition of a number from its positional digits, the procedure used to compute them, and downstream walks/statistics/randomness claims (`BOOK:1667-1687`, `1796-1832`). These are different semantic roles even when one implementation calculates all of them together.
 - Positional representation is parameterized by a base and a normalization convention. A terminating rational has an infinite trailing-zero expansion under the strict source convention; suppressing those zeros is rendering, not native completion (`BOOK:1689-1707`).
-- The followed representation evidence includes whole/fractional positional encoders and inverses, arbitrary positive bases, Gray-code ordering, negative bases, non-power bases, multiplicative digit schemes, unary, and Zeckendorf representation (`BOOK:12503-12555`, `20507`, actual Index). Strict T40 v1 deliberately closes only positive-integer-radix positional digits and simple continued fractions. The other schemes are explicit relations or future representation-schema extensions, not proof of a new executor and not silently claimed by `Positional(base>=2)`.
+- The followed representation evidence includes whole/fractional positional encoders and inverses, arbitrary positive bases, Gray-code ordering, negative bases, non-power bases, multiplicative digit schemes, unary, self-delimiting length prefixes, binary-coded base 3, Fibonacci/Zeckendorf words, and their length/completeness properties (`BOOK:12503-12555`, `17130-17173`, `20507`, actual Index). Strict T40 v1 deliberately closes only positive-integer-radix positional digits and simple continued fractions. The other schemes are explicit relations or future representation-schema extensions, not proof of a new executor and not silently claimed by `Positional(base>=2)`.
 - The source gives an explicit base-2 long-division procedure with visible remainder `r`: compare `2r` with `q`, emit a digit, and replace `r` by `2r` or `2r-q` (`BOOK:1709-1715`). This is an ordinary exact `t+0D` SimpleProgram realization, not the identity of the rational number or of T40 as a whole.
 - The source gives an explicit square-root procedure over visible product state `(r,s)` (`BOOK:1738-1746`). Both components are read from one old snapshot and assigned atomically. This direct source representation is faithful, but not uniquely minimal: for a fixed declared radicand/profile, reachable normalized state is also losslessly represented by `s`, because phase, prefix, and `r` reconstruct from the invariant.
 - Positional digits and simple continued fractions are different representations of the same exact value. Continued-fraction coefficients are unbounded; rational continued fractions complete after finitely many terms, whereas irrational ones continue (`BOOK:1776-1794`, `13030-13038`).
@@ -163,7 +163,7 @@ These grouped passages are the construction-bearing core. The source oracle reta
 
 ### Excerpt 9 — positional inversion and non-positional representation boundaries
 
-- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:12503-12555`, `20507`
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:12503-12555`, `17130-17173`, `20507`
 - Context: Notes for pages 116–117 and the later discussion of mathematical notation.
 - Establishes: ordinary positive-radix digits have explicit forward/residual/inverse procedures, while negative-base, non-power-base, multiplicative, unary, Gray-code, and Zeckendorf schemes are genuinely different representation schemas. They widen representation data and validation where adopted; they do not by themselves require another transition runner.
 
@@ -172,6 +172,12 @@ These grouped passages are the construction-bearing core. The source oracle reta
 > Given a suitable list of digits from 0 to k-1 one can obtain any positive or negative number using From Digits[list, -k].
 >
 > - **Non-power bases.** One can consider representing numbers by  $Sum[a[n]f[n], \{n, 0, \infty\}]$  where the f[n] need not be  $k^n$ .
+>
+> (c) Length prefixed. Starting with an ordinary base 2 digit sequence, one prepends a unary specification of its length, then a specification of that length specification, and so on:
+>
+> (e) *Fibonacci encoding*. Instead of decomposing a number into a sum of powers of an integer base, one decomposes it into a sum of Fibonacci numbers (see page 902). This decomposition becomes unique when one requires that no pair of 1's appear together.
+>
+> If one successively reads 0's and 1's from an infinite sequence then the representations (c), (d) and (e) have the property that eventually one will always accumulate a valid representation for some number or another.
 >
 > But as pages 560 and 916 show, there are many other quite different ways to represent numbers, each with different levels of convenience for different purposes.
 
@@ -387,13 +393,15 @@ The current `src/ca` package exposes names resembling the shared axes, but its e
 
 ## Frozen Source Closure
 
-`45-T40-source-oracle.py` freezes 18 search lanes and their 144-line union, but completeness no longer depends on those searches. A fixed strict-main universe routes every one of the 117 nonblank `BOOK:1665-1832` rows as `102 native / 15 structural`, with zero closure residual. A separately derived actual-Index universe routes all 82 relevant rows as `25 native / 56 relation / 1 control`; 37 of those rows are deliberate search-lane misses, proving that the Index closure is not defined by the regex results. The retained governed evidence totals 262 rows at `169 native / 84 relation / 9 control`. Thirty-seven semantic guards, 24 extraction/source-defect records, 32 source-model records, five exclusion hashes, and seven exact-logic contracts are independently bound. The complete split disposition has 359 rows at `214 exact / 22 image-basename / 20 normalized / 14 summary / 89 omitted`, normalized minimum `0.999817`, with zero unresolved. Its audit digest is `a06531ed8bfcaf4a926ad4db4bc6eb32b2a2e77ed3171ee5f9be9e3c145f166e`; script SHA-256 is `a344c99af98756084344fa2f1a67d17c92091697dde1e743dc1c02b9e7125f8a`.
+`45-T40-source-oracle.py` freezes 20 search lanes and their 166-line union, but completeness no longer depends on those searches. A fixed strict-main universe routes every one of the 117 nonblank `BOOK:1665-1832` rows as `102 native / 15 structural`; a second fixed universe routes all 126 native-Notes rows as `58 native / 67 relation / 1 control`. The complete 897-row actual Index block is partitioned `30 native / 99 relation / 2 control / 16 excluded / 750 unrelated`, with a line-bound disposition record for every row. An independently reproduced 108-row broad vocabulary lane plus 65 hostile page/alias/continuation candidates yields 145 audit candidates and zero unexplained row; 76 routed rows deliberately miss the ordinary query union, proving that semantic closure is not defined by regex recall.
+
+The retained governed evidence totals 290 rows at `169 native / 112 relation / 9 control`. Fifty-eight semantic guards, eight auxiliary guards, 24 extraction/source-defect records, 36 source-model records, five exclusion hashes, and seven exact-logic contracts are independently bound. The complete split disposition has 1,202 rows at `1,049 exact / 25 image-basename / 25 normalized / 14 summary / 89 omitted`, normalized minimum `0.995885`, with zero unresolved. Its audit digest is `62f4005c9bf3c2441dccb7fe28e1d7ae3291c1ce60357fc4e8fa419e56608e80`; script SHA-256 is `16ab142d6929cf03acd89ab8230d60d271f0c8360894d5e9ff4747bc75a50c64`.
 
 The exact logic contract covers 2,079 long-division states, rational finite continued-fraction completion, finite-prefix loss, 96 strict square-root events, the extracted square-root bit divergence, and the `n=11/5` rational counterexample. Normal and JSON modes, silent import, compilation, relocation with the corpus, source mutation, optimized mode, malformed usage, and the source/asset interface all pass fail-closed.
 
 ## Frozen Asset Closure
 
-`45-T40-asset-oracle.py` closes exactly 24 governed images at `11 native / 12 relation / 1 control`, 46 references at `24 monolith / 22 split`, 24 distinct physical files and hashes totaling 574,761 bytes, and four multi-file assemblies spanning 16 files. The page-154 and page-156 split-link omissions are explicit. Every asset is `HASH_BOUND`; none is pixel-replayed or used as executable program data. The structural, ordered, and normalized textual-replay digests are respectively `1cbfe8ffc3de77048a2d407c7ef63896dac86a8fc3ec83c7b00c1ea84e6f019e`, `ecf178d94b0b34226592d3b460a2a1e2f0cf6893e1521877f3ada6818898fad6`, and `6fd8578623171650e57a405f2d3e9740b895724609fceb38132ceb202055c1fa`; script SHA-256 is `e2a0cbe8277ee663c81d9bea832336251c022203233fdcb32fc225bff4097f35`.
+`45-T40-asset-oracle.py` closes exactly 27 governed images at `11 native / 15 relation / 1 control`, 52 references at `27 monolith / 25 split`, 27 distinct physical files and hashes totaling 612,140 bytes, and four multi-file assemblies spanning 16 files. The followed Gray-code, negative-base, and multiplicative-digit figures are relation-only evidence; the page-154 and page-156 split-link omissions are explicit. Every asset is `HASH_BOUND`; none is pixel-replayed or used as executable program data. The structural, ordered, and normalized textual-replay digests are respectively `9fb44dd3086ff0c853d09a867ccdfdd60716037fc4f52d527f6ec1bc217d6ffc`, `3e6e66a5730caae3371b21706ea124e4f19480925efc01e98cb6ee530124c9b5`, and `6fd8578623171650e57a405f2d3e9740b895724609fceb38132ceb202055c1fa`; ledger digest is `02ea3bb0e6519b2fcc78172a8f97dfded0d4a96148e2398056441640c4a79824`, and script SHA-256 is `85bd9225b5c36c7d6f0cc9a77e7c16be386a18cfc0095625b26f9b7fe15657d7`.
 
 Its independent textual replay checks 8,255 long-division states and 96 strict-integer square-root events, guards all three mismatches between the extracted square-root bit string and the exact algorithm, and retains the rational source-claim counterexample. Source guards, semantic manifests, import, compilation, relocation, optimized mode, bad usage, hash mutation, and the real source-oracle interface pass.
 
@@ -406,7 +414,7 @@ The query audit checks 159 prefix/random-access agreements plus 36 certified ran
 ## Completion Requirements
 
 - [ ] Every strict main, Notes, actual-Index, split, history, relation, control, exclusion, and extraction-defect candidate is dispositioned with zero unresolved mechanics.
-- [ ] The complete 24-asset/46-reference universe is hash-bound with split omissions and source limitations explicit.
+- [ ] The complete 27-asset/52-reference universe is hash-bound with followed representation relations, split omissions, and source limitations explicit.
 - [ ] Positional and continued-fraction definitions, canonicalization, coefficient queries, exactness levels, completion, work realizations, and observers are independently verified.
 - [ ] Long division, square-root product/invariant and fixed-program quotient, positional/Gauss maps, direct nth access, and finite-prefix loss are adversarially tested.
 - [ ] T34/T36/T37/T39/T41/T42/T43 and current-runtime boundaries are synchronized.

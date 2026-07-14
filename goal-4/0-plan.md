@@ -29,9 +29,9 @@ Goal 4 must deliver all of the following:
 
 ## Non-Negotiable Constraints
 
-1. **Preserve the legacy corpus.** The existing `ref/A-New-Kind-of-Science/**` files are immutable evidence during Goal 4. Hash drift is a hard failure.
-2. **Build a repaired edition alongside the legacy files.** The proposed release root is `ref/A-New-Kind-of-Science/REPAIRED/`. Stage 1 must confirm the exact layout without breaking `ref/notes/context/REFACTOR_TARGET.md`.
-3. **Do not migrate consumers implicitly.** Goal 1/3 oracles, exact line citations, and source paths continue to target the legacy layer. Goal 4 produces a compatibility map but does not rewrite those consumers.
+1. **Preserve an explicit legacy-input allowlist.** The 19 existing Markdown files and 1,444 existing JPEGs under `ref/A-New-Kind-of-Science/` are immutable evidence during Goal 4. Hash drift is a hard failure. Future output is never discovered as raw input through an unconstrained recursive glob.
+2. **Use a new sibling folder.** Build the repaired edition at `ref/A-New-Kind-of-Science-Repaired/`, never inside the legacy root. This prevents repaired Markdown and copied assets from contaminating Goal 1's recursive file counts and basename checks.
+3. **Do not migrate consumers implicitly.** Goal 1/3 oracles, exact line citations, and source paths continue to target the legacy layer. Goal 4 produces a compatibility map and snapshots consumer behavior but does not rewrite those consumers.
 4. **Never use generated output as the next build's input.** Every build starts from the hash-pinned raw inputs and applies the declared transformation/repair overlay.
 5. **Do not edit the only copy.** Structural extraction, repair application, and rendering happen in a fresh build tree before validated output is published atomically.
 6. **Authoritative evidence is required for OCR correction.** Use an official/licensed page image, official edition text whose fidelity is established, or another edition-identical primary witness. Record edition, page, source, acquisition date, and hash.
@@ -39,33 +39,39 @@ Goal 4 must deliver all of the following:
 8. **The 1,444 JPEGs are illustrations/crops, not a complete page facsimile.** They cannot establish surrounding prose, column order, omitted figures, or unpictured symbols.
 9. **Model guesses are candidate generators only.** Language plausibility, mathematical plausibility, spell-checking, OCR confidence, and syntax success may flag a defect but never authorize a correction.
 10. **Do not silently correct the author.** Keep faithful transcription repair separate from source errata annotations and normalized search text. Apparent mathematical, factual, or historical errors remain author text unless the witness proves an OCR error.
-11. **Every repair is explicit and reversible.** Each repair has a stable ID, exact preimage, occurrence count, raw location/hash, before/after text, classification, evidence, reviewer state, and inverse.
+11. **Every repair is explicit and reversible.** Each replacement, deletion, move, or source-verified insertion has a stable ID, guarded preimage or two-sided insertion anchors, occurrence count, raw/witness location and hashes, before/after text, classification, evidence, reviewer state, and inverse.
 12. **Fail on preimage drift.** A repair must not apply if its expected raw text, count, source hash, or evidence hash changes.
-13. **Structural conservation is exact.** Every raw content span appears exactly once in repaired author text or receives an explicit typed exclusion. Generated metadata is separately labeled.
-14. **No unreviewed bulk replacement.** Mechanical rules need an allowlist, bounded contexts, exact expected counts, false-positive review, inverse operation, and mutation test.
-15. **Formula and code edits are high risk.** Every changed token needs authoritative visual/textual evidence and independent review. Parsing, rendering, or execution is necessary where useful but never proof of source fidelity.
+13. **Conservation is two-way.** Every monolith author-text span appears exactly once in the canonical repaired documents or receives an explicit typed exclusion; every authoritative page region maps to repaired output, `NOT_APPLICABLE`, or a release-blocking source gap; and every repaired author-text span maps to raw text or an authoritative-witness insertion record. Generated metadata is separately labeled.
+14. **No unreviewed bulk replacement.** Mechanical rules need an allowlist, bounded contexts, exact expected counts, false-positive review, inverse operation, and mutation test. `APPLIED_MECHANICALLY_PROVEN` is restricted to non-author-text structure/path/metadata or byte-preserving transformations; every author-text token change, including repeated dehyphenation, is `APPLIED_WITNESS_VERIFIED` per occurrence.
+15. **Formula and code edits are high risk.** Every changed token needs authoritative visual/textual evidence and independently recorded review by someone other than the change author. Parsing, rendering, or execution is necessary where useful but never proof of source fidelity.
 16. **Index reconstruction requires page-level column evidence.** Do not infer authorial Index order from the flattened OCR or regenerate the Index from body text.
 17. **Caption ownership requires evidence.** Filename page numbers and nearest-image proximity are hypotheses. Track printed figure groups because one printed figure may contain several extracted JPEGs.
-18. **Assets remain byte-identical.** Do not recompress or silently rename images. Any copy, link, or relocation must preserve SHA-256 and have a manifest mapping.
+18. **Legacy assets remain byte-identical.** Do not recompress or silently rename images. The sibling repaired folder may contain manifest-governed byte-identical copies and source-verified replacement/full-plate assets; distinct asset IDs must never be silently deduplicated merely because bytes match.
 19. **Accessibility text is editorial metadata.** Generated alt text, summaries, anchors, backlinks, and page markers must not be presented as author text.
 20. **Preserve source notation.** Do not rewrite formulas or code into an equivalent modern style. Preserve meaningful punctuation, Unicode, whitespace, and Wolfram Language syntax.
 21. **No green-check shortcut.** Link resolution, parser success, balanced fences, and clean rendering prove structural properties only, not transcription accuracy.
 22. **Do not claim human review unless a human performed it.** Agent review and automated checks must be labeled accurately.
-23. **External witnesses are pinned.** The final build cannot depend on mutable live web content. Record a permitted snapshot or immutable hash/provenance reference.
-24. **Respect licensing.** Do not commit external scans or copyrighted witness material unless permitted. Store only the evidence metadata or bounded review artifacts allowed by the source.
-25. **Preserve unrelated work.** Scope execution changes to `goal-4/**` and the agreed repaired-output subtree unless the user explicitly authorizes more.
+23. **Separate build and audit modes.** Reproducible build mode uses frozen raw inputs plus overlays without a network dependency. Audit mode mounts the authorized primary witness read-only and rechecks the content evidence. A bare witness hash proves identity, not content; an unavailable licensed witness permits rebuilding but blocks fresh fidelity certification.
+24. **Respect licensing.** Do not commit external scans or copyrighted witness material unless permitted. Store only permitted evidence metadata or bounded review artifacts; otherwise record the authorized witness-mount contract.
+25. **Preserve unrelated work.** Scope execution changes to `goal-4/**` and `ref/A-New-Kind-of-Science-Repaired/**` unless the user explicitly authorizes more.
 26. **Promotion is separate.** Replacing legacy files, deleting malformed splits, moving existing assets, or switching existing oracles requires explicit user authorization after the repaired release passes.
+27. **An unqualified full-repair claim has no authorial ambiguity.** Any `UNRESOLVED_SOURCE_NEEDED` item affecting author text, typography/layout, structure, formula/code/data, visual content/caption ownership, or Index order blocks “fully repaired.” Only optional editorial enhancements may remain unresolved.
 
 ## Evidence And Repair Model
 
 ### Source Roles
 
-- **Legacy raw:** the current 19 Markdown files and 1,444 JPEGs, held immutable.
+- **Legacy raw author text:** the current monolith, whose spans receive line/block provenance.
+- **Legacy routing witnesses:** the 17 current split/front/back Markdown derivatives, which remain hash-pinned and receive routing/difference dispositions but are not duplicated into author text.
+- **Interpretive metadata:** `ANKoS-Atlas.md`, preserved by hash but excluded from author-text conservation.
+- **Legacy assets:** the current 1,444 JPEGs, held immutable.
 - **Primary witness:** official/licensed edition-identical page evidence used to verify author text and layout.
 - **Secondary routing evidence:** current split Markdown, Atlas, source-oracle crosswalks, dictionaries, parsers, spell-checkers, and OCR tools.
 - **Repair overlay:** ordered, reversible records that transform raw blocks into repaired author text or typed metadata.
-- **Repaired edition:** deterministically generated output; never an independent historical source.
-- **Search normalization:** optional derivative for retrieval, kept separate from faithful book text.
+- **Canonical repaired documents:** the 29 author-text documents and the only domain for exactly-once author-text/reference accounting.
+- **Derived aggregate:** an assembled monolith generated from the 29 canonical documents and excluded from canonical exactly-once counts.
+- **Editorial sidecars:** errata, alt text, and review notes that never enter canonical author text by default.
+- **Search normalization:** an optional separate output target for retrieval, never applied to faithful author text.
 
 ### Repair Classes
 
@@ -95,17 +101,33 @@ Every candidate has exactly one disposition:
 
 `UNRESOLVED_SOURCE_NEEDED` is an honest result but blocks an unqualified “fully repaired” release when the ambiguity can affect author text, mathematics, code, structure, caption ownership, or Index order.
 
+Workflow state is separate from final disposition:
+
+- `CAPTURED`
+- `EVIDENCE_READY`
+- `PENDING_SPECIALIST_REVIEW`
+- `PENDING_INDEPENDENT_REVIEW`
+- `SOURCE_BLOCKED`
+- `CLOSED`
+
+A sequential batch may finish with a governed pending specialist/reviewer state only when the owning later stage is explicit. Release requires every authorial candidate to be `CLOSED` with a final disposition.
+
+In stage completion language below, “reviewed and dispositioned” means either `CLOSED` with a final disposition or routed to one explicit governed pending state; it never means falsely declaring queued specialist work final. Each raw block is assigned to one content batch and reviewed at least once by every required role. Pages that straddle boundaries are divided into nonoverlapping witness regions rather than assigned exclusively as whole pages.
+
 ### Minimum Repair Record
 
 Each record must contain:
 
 - stable repair ID;
+- operation type: replace, delete, move, split/merge, or anchored insert;
 - source file and immutable file hash;
 - raw byte/block identity and logical-line range;
-- exact preimage and expected occurrence count;
+- exact preimage and expected occurrence count, or stable left/right anchors and expected adjacency for text absent from raw OCR;
 - repaired text or typed metadata;
 - repair class and risk level;
-- authoritative witness edition, page/location, and hash;
+- class-conditional evidence:
+  - authoritative witness edition, page-region/location, and hash for author-text/layout changes;
+  - independently reproducible mechanical proof for non-author-text structure/path/generated metadata;
 - rationale and confidence;
 - creator and reviewer identity/type;
 - dependent repairs;
@@ -115,20 +137,37 @@ Each record must contain:
 
 ## Proposed Output Architecture
 
-Stage 1 must confirm this architecture against repository consumers. The legacy paths remain unchanged.
+Stage 1 must freeze all 29 canonical relative paths and their order. The legacy folder remains unchanged, and the repaired edition lives in a new sibling folder.
 
 ```text
-ref/A-New-Kind-of-Science/
-├── [legacy raw files and image directories, unchanged]
-└── REPAIRED/
+ref/
+├── A-New-Kind-of-Science/                 # immutable legacy corpus
+└── A-New-Kind-of-Science-Repaired/        # new generated edition
     ├── README.md
     ├── corpus-manifest.json
     ├── release-manifest.json
-    ├── A-New-Kind-of-Science.md
-    ├── FRONT-MATTER/
-    ├── CHAPTERS/
-    ├── NOTES/
-    ├── BACK-MATTER/
+    ├── CANONICAL/
+    │   ├── FRONT-MATTER/
+    │   │   ├── 00-Publication-and-Contents.md
+    │   │   └── 01-Preface.md
+    │   ├── CHAPTERS/
+    │   │   ├── 01-The-Foundations-for-a-New-Kind-of-Science.md
+    │   │   ├── ...
+    │   │   └── 12-The-Principle-of-Computational-Equivalence.md
+    │   └── BACK-MATTER/
+    │       ├── NOTES/
+    │       │   ├── 00-General-Notes.md
+    │       │   ├── ...
+    │       │   └── 12-The-Principle-of-Computational-Equivalence-Notes.md
+    │       ├── Index.md
+    │       └── Colophon.md
+    ├── DERIVED/
+    │   ├── A-New-Kind-of-Science.md
+    │   └── Contents.md
+    ├── EDITORIAL/
+    │   ├── Errata.md
+    │   └── Alt-Text.md
+    ├── SEARCH/
     └── ASSETS/
 ```
 
@@ -139,9 +178,11 @@ The repaired tree has 29 ordered author-text documents:
 - 13 Notes documents: General Notes plus Chapters 1–12;
 - 2 back-matter documents: Index and Colophon.
 
-`goal-4/` owns the repair overlays, ledgers, review records, tools, tests, and temporary build policy. Release-safe copies of relevant manifests may be generated into `REPAIRED/`.
+The manifest assigns `CANONICAL_AUTHOR_TEXT` to exactly 29 documents, `DERIVED_AGGREGATE` to the assembled monolith, and `GENERATED_METADATA`/`EDITORIAL_SIDECAR`/`SEARCH_DERIVATIVE` to the other outputs. Validators count by role, never by an unrestricted `rglob("*.md")`. The derived monolith has its own expected span/reference counts and is intentionally excluded from canonical exactly-once accounting.
 
-Asset materialization—byte-identical copies, generated links, or another portable method—must be chosen in Stage 1 and verified in Stage 6. The released Markdown must have resolving, portable links without changing the legacy binaries.
+`goal-4/` owns the repair overlays, ledgers, review records, tools, tests, and fresh staging builds. A validated release is published atomically to the empty or manifest-owned sibling folder; pre-existing unowned content is never overwritten.
+
+The portable repaired release uses manifest-governed asset files rather than hardlinks or fragile symlinks. Stage 6 preserves all 1,444 legacy asset identities and establishes the zero-repair reference baseline. Stage 38 separately determines the final witness-complete printed-figure/component inventory and any lawful source-verified replacements.
 
 ## Authoritative Inputs
 
@@ -157,7 +198,7 @@ Asset materialization—byte-identical copies, generated links, or another porta
 
 These scaffold-time facts must be independently reverified and hash-pinned in Stage 2:
 
-- The local corpus contains 19 Markdown files and 1,444 JPEGs and occupies about 113 MiB; images account for about 102.56 MiB.
+- The local corpus contains 19 Markdown files and 1,444 JPEGs: 115,037,515 logical bytes (about 109.71 MiB) and 118,206,464 allocated bytes (about 112.73 MiB). JPEG payload is about 102.56 MiB.
 - The complete monolith is 3,780,628 bytes, 22,498 logical lines, 22,497 newline bytes, and lacks a final newline.
 - Its scaffold-time SHA-256 is `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - Strict UTF-8 inspection found no U+FFFD replacement characters and no common UTF-8-as-Latin-1 mojibake signatures. The major defects are OCR, layout reconstruction, and Markdown structure rather than byte decoding.
@@ -168,16 +209,37 @@ These scaffold-time facts must be independently reverified and hash-pinned in St
 - `BACK-MATTER/Notes/Notes.md` is one stray Chapter 3 Notes sentence. The nominal `Index.md` contains later Notes. The nominal `Colophon.md` contains still later Notes, then the actual Index at split line 3383 and actual Colophon at split line 5015.
 - The actual Index is severely column-flattened. Its opening explanatory sentence and unrelated entries are interleaved; later lines merge many entries and include OCR confusions such as “Ouantum”.
 - The Colophon reports 1,280 pages, 583,313 words, 973 illustrations, 1,350 notes, 796 Mathematica programs, and 14,967 Index entries. These are reconciliation clues, not self-proving parser expectations.
-- The raw Markdown has 508 fence delimiter lines forming 254 balanced pairs, but some balanced blocks contain prose or corrupted code. Fence parity alone is insufficient.
+- The monolith has 508 fence delimiter lines forming 254 balanced pairs; all 19 Markdown files contain 1,012 fence delimiter lines because split derivatives duplicate content. Some balanced blocks contain prose or corrupted code. Fence parity alone is insufficient.
 - Known candidate defects include empty headings, page-furniture headings, split words across blank lines, false hyphen joins, malformed math delimiters, truncated formulas, corrupted logical operators, and damaged Wolfram Language definitions.
 - Some extracted JPEGs are only caption crops or partial plates; physical file existence does not prove complete visual evidence.
 - No local PDF, EPUB, complete page-scan set, general OCR cleanup script, or Markdown conversion pipeline was found at scaffold time.
 - The current split and monolith are correlated derivatives, not independent witnesses.
-- Goal 1 contains 57 `*-oracle.py` files at its root, with several hardcoding the current book paths and hashes; many stage documents cite exact monolith lines and malformed split paths.
+- Goal 1 currently contains 58 `*-oracle.py` files at its root. At scaffold review, at least 39 recursively enumerated legacy Markdown and at least 24 recursively enumerated images/basenames; many also hardcode current paths, hashes, line counts, or malformed split paths.
+
+## Known Defect Regression Sentinels
+
+Stage 2 must freeze an exact regression row for every already observed defect, including at least:
+
+- structural boundary drift: Chapter 12 split line 2004, the one-line nominal Notes file, Notes stored in nominal Index/Colophon, actual Index at Colophon split line 3383, and actual Colophon at split line 5015;
+- the three missing split image references at monolith lines 680, 1711, and 1744, preserving raw reference ordinals;
+- caption/prose interleaving at monolith lines 2130–2132;
+- prose/math splitting at 12891/12893;
+- prose accidentally fenced as code plus a hyphen split at 16433–16438;
+- empty headings at 12083, 12087, 18328, and 18810;
+- the complete observed page-furniture/false-heading inventory, including examples at 398, 1368, 2700, 6586, and 17444;
+- corrupted Boolean-rule formulas at 11711–11841;
+- truncated/mangled program and maxima material at 12377 and 12382;
+- truncated PDE material at 13453;
+- damaged Wolfram definitions at 17301 and 17442;
+- damaged mathematical delimiters/notation at 19567;
+- severe Index column flattening and merged entries at 21877;
+- known joined/split-word candidates such as 10631, 12079, 12891–12893, 13294, 14031, 16429, 17273, 17793, and 20109.
+
+These are regression sentinels, not preauthorized corrections. Each must be detected or manually routed and receive a source-backed final disposition in Stages 40/42.
 
 ## Canonical Raw Map
 
-Stage 2 must rederive this map independently:
+Stage 2 must rederive this provisional map independently and issue immutable segment IDs plus witness-backed start/end signatures. Downstream stages consume those IDs from the structure ledger, not copied line literals; the ranges below are scaffold routing hints and may include printed page-furniture lines at chapter edges.
 
 | Author-text segment | Raw monolith logical lines |
 |---|---:|
@@ -231,79 +293,111 @@ Stage 2 must rederive this map independently:
 Execution will create and maintain:
 
 - `goal-4/corpus-manifest.json`: raw file hashes, sizes, line counts, roles, image dimensions, and Git identity.
-- `goal-4/witness-manifest.json`: authoritative sources, edition/page coverage, acquisition metadata, hashes, permissions, and trust roles.
+- `goal-4/witness-manifest.json`: authoritative sources, edition fingerprint, complete physical-page/plate census, page-region coverage/legibility, acquisition metadata, hashes, permissions, mount contract, and trust roles.
+- `goal-4/witness-region-ledger.jsonl`: every authoritative page/column/figure/text region to canonical repaired output, `NOT_APPLICABLE`, or a release-blocking gap.
 - `goal-4/structure-ledger.jsonl`: the 29 documents, stable raw blocks, boundaries, headings, page associations, and ownership.
-- `goal-4/provenance-map.jsonl`: every raw span to repaired file/anchor and inverse mapping.
+- `goal-4/provenance-map.jsonl`: bidirectional raw/witness-region↔repaired-span mappings and inverse operations.
 - `goal-4/repair-ledger.jsonl`: all reversible repair candidates, evidence, dispositions, and application order.
 - `goal-4/unresolved-ledger.jsonl`: source gaps, ambiguities, missing plates, impacts, and unblock actions.
+- `goal-4/known-defect-regression.jsonl`: exact baseline sentinels, required routes, mutations, and final dispositions.
+- `goal-4/quality-evaluation.json`: pre-frozen sample frame, manifest-derived random seed, per-document/risk quotas, severity definitions, blind transcription/adjudication, projections, and thresholds.
 - `goal-4/formula-code-ledger.jsonl`: high-risk token evidence, parse/render status, and independent review.
 - `goal-4/figure-caption-asset-ledger.jsonl`: image hashes, printed groups, caption spans, ownership evidence, and alt-text role.
 - `goal-4/navigation-ledger.jsonl`: contents, headings, stable anchors, page mappings, Notes links, Index routes, and compatibility targets.
 - `goal-4/review-ledger.jsonl`: changed/unchanged review samples, reviewer type, disagreements, and closure.
+- `goal-4/compatibility-baseline.json`: affected Goal 1 oracle commands/output digests before the sibling repaired folder exists and after release.
 - `goal-4/release-manifest.json`: input/overlay/tool/output hashes, commands, versions, determinism checks, and rollback data.
 - `goal-4/style-guide.md`: the exact Markdown dialect and source/editorial separation rules.
 - `goal-4/tools/` and `goal-4/tests/`: deterministic builder, validators, render checks, detector suites, and mutation fixtures.
 - `goal-4/reports/`: per-batch coverage, residual-defect, hostile-review, compatibility, and final repair reports.
-- `ref/A-New-Kind-of-Science/REPAIRED/`: the validated repaired edition and release-safe manifests.
+- `ref/A-New-Kind-of-Science-Repaired/`: the validated repaired edition and release-safe manifests.
 
 ## Batch Repair Contract
 
 Stages 8–36 process author text. Each assigned batch must:
 
-1. Freeze its raw-block list and authoritative page coverage.
-2. Compare every author-text block sequentially against the primary witness.
+1. Freeze its unique raw-block assignments and nonoverlapping authoritative page-region coverage from the ledgers.
+2. Compare every author-text block and every assigned witness region sequentially; source-visible content missing from raw OCR becomes a guarded insertion candidate.
 3. Classify prose, layout, heading, list, formula, code, data, caption, furniture, and cross-reference candidates.
-4. Apply only mechanically proven or witness-verified changes through repair records.
+4. Apply mechanically proven changes only outside author text; apply every author-text token/layout change through a per-occurrence witness-verified repair record.
 5. Preserve literal source errors and add separate errata annotations only when justified.
 6. Render before/witness/after views for every changed block.
 7. Route formulas, code, rule tables, and figure/caption changes through their stricter ledgers.
-8. Give every candidate a final disposition; unresolved high-risk candidates remain release blockers.
+8. Give every candidate either a closed final disposition or a governed pending specialist/reviewer workflow state with an owning later stage. Any source-needed authorial item remains a release blocker.
 9. Rebuild from raw inputs and verify provenance, inverse replay, links, Markdown structure, and deterministic output.
-10. Record a changed-block review and a stratified unchanged-block sample.
+10. Record changed-block review and the pre-frozen held-out unchanged/changed sample without choosing samples after results are visible.
 
 ## Success Metrics
 
 - All 19 legacy Markdown files and 1,444 legacy JPEGs match the frozen hashes.
-- Every one of 22,498 raw logical lines and every deterministic raw block is mapped exactly once, with no silent gap, overlap, reorder, deletion, or duplication.
-- Exactly 29 ordered repaired author-text documents exist: 2 front matter, 12 chapters, 13 Notes, Index, and Colophon.
+- Every one of the monolith's 22,498 raw logical lines and every deterministic raw author-text block maps into the 29 `CANONICAL_AUTHOR_TEXT` documents exactly once, with no silent gap, overlap, reorder, deletion, or duplication; all 17 split derivatives have routing/difference dispositions and Atlas remains separate metadata.
+- Exactly 29 ordered `CANONICAL_AUTHOR_TEXT` documents exist: 2 front matter, 12 chapters, 13 Notes, Index, and Colophon. The `DERIVED_AGGREGATE` monolith is excluded from this count and separately reproduces canonical sequence/counts.
 - Chapter 12 contains only Chapter 12 main text; all 13 Notes documents have correct ownership; Index and Colophon begin at their actual boundaries.
-- Every physical page or authoritative witness unit is covered by the witness and review ledgers.
-- Every repair and every unresolved candidate has complete provenance and one final disposition.
-- Zero high-risk `UNRESOLVED_SOURCE_NEEDED` items remain in a release claimed as fully repaired.
-- All 1,444 image assets are uniquely hash-accounted, byte-identical, and referenced exactly once in canonical author-text order unless a source-proven figure grouping requires typed metadata.
-- All 1,444 repaired image references resolve; there are zero missing, orphaned, or silently swapped assets.
+- Every one of the expected 1,280 physical pages/plates is present in the witness census with edition identity and per-region legibility or an explicit `NOT_APPLICABLE` status; no blank, figure-only, or Index page disappears silently.
+- Every repair and candidate has complete provenance, workflow closure, and one final disposition.
+- Zero `UNRESOLVED_SOURCE_NEEDED` item affecting an authorial layer remains in a release claimed as fully repaired.
+- The Stage 6 zero-repair canonical baseline contains the monolith's 1,444 legacy image references in identical order and ownership totals of Preface 2, chapters 820, Notes 622, and zero elsewhere; the derived aggregate independently mirrors that count/order.
+- All 1,444 legacy assets retain distinct IDs and byte hashes. Final canonical visual references are governed by the Stage 38 printed-page/figure-component census, with every addition/replacement source-verified and no missing, orphaned, silently swapped, or incomplete authorial visual component in an unqualified full release.
 - The three split-reference omissions are restored at the correct Chapter 2/4 positions.
 - All 254 current fenced regions are classified; no prose remains accidentally fenced and no code is silently lost.
 - All formula, code, rule-table, and semantic-data changes have token-level authoritative evidence and independent review.
-- Every printed figure/caption group is reviewed with page context; generated alt text is labeled editorial.
+- Every printed figure/caption group and component is reviewed with page context; generated alt text is labeled editorial. Operational counts for illustrations, Notes, programs, and Index entries are reconciled with the Colophon's 973/1,350/796/14,967 clues and differences are explained rather than forced.
 - The reconstructed Index is page/column verified, alphabetically/order consistent, and reconciled to the official entry-count definition.
 - All headings, fences, HTML, math delimiters, local links, anchors, contents links, Notes backlinks, page routes, and Index cross-references pass structural validation.
-- Existing raw paths, raw hashes, Goal 1/3 citations, and source oracles remain valid.
+- Existing raw paths, raw hashes, Goal 1/3 citations, and affected Goal 1 source/asset-oracle output digests remain behaviorally identical after the sibling release is present.
 - A clean offline build run twice produces byte-identical repaired output.
 - Applying inverse repairs recovers the exact raw text/block hashes after generated metadata is stripped.
-- Mutation tests catch raw drift, unlogged edits, missing/reordered blocks, evidence tampering, symbol changes, broken fences, swapped images, caption misassociation, missing assets, and broken/duplicate anchors.
+- Mutation tests catch raw drift, unlogged replacement/insertion/deletion, missing/reordered blocks or witness regions, evidence tampering, symbol changes, broken fences, swapped or missing/witness-only images, caption misassociation, generated-view double counting, accidental raw-census contamination, and broken/duplicate anchors.
+- The pre-frozen independent gold set passes class-specific thresholds: exact author-text character projection, heading/paragraph/list boundary exactness, technical token exactness, Index entry/column sequence exactness, and figure/caption association exactness. Severity definitions and sample selection were fixed before repair results.
 - The final report accurately distinguishes faithful repair, source errata annotations, search normalization, generated metadata, and genuine remaining source limits.
 
 ## Verification Requirements
 
 - Independently hash and count raw inputs; do not validate a manifest solely with the code that generated it.
 - Independently parse the raw monolith and prove the 29 segment union covers it without gaps or overlaps.
+- Independently parse the witness page/region census and prove every authorial region maps to canonical output, `NOT_APPLICABLE`, or a release blocker; prove every canonical span maps back to raw text or witness-backed insertion evidence.
 - Build a zero-repair structural baseline first and prove reassembly/inverse equivalence before any OCR repair.
 - Run every build from raw inputs into a fresh directory; compare two clean output trees byte-for-byte.
 - Run the builder and validators from repository root, a relocated copy, offline, and under optimized Python if Python assertions exist.
-- Verify every repair preimage, expected occurrence count, raw hash, witness hash, dependency, and inverse.
-- Mutation-test deletion, duplication, reordering, unlogged replacement, witness drift, punctuation/symbol changes, and expected-count drift.
+- Verify every repair operation, guarded preimage/anchors, expected occurrence/adjacency count, raw hash, class-conditional evidence, witness hash where required, dependency, and inverse.
+- Mutation-test deletion, duplication, reordering, unlogged replacement/insertion, witness drift, punctuation/symbol changes, and expected-count/anchor drift.
 - Parse the repaired Markdown to an AST and render it; inspect unexpected AST/render differences instead of normalizing them away.
 - Treat syntax/parser/render checks as structural evidence only.
 - Visually review all changed blocks and 100% of formula, code, heading-boundary, figure/caption, image-reference, and Index changes.
-- Independently review every high-risk change and a stratified sample of unchanged blocks across all 29 documents.
-- Verify all 1,444 image basenames, paths, byte sizes, dimensions, hashes, reference ordinals, and printed-group associations.
+- Machine-enforce creator ID ≠ reviewer ID for high-risk records, evidence-view hashes, independent pre-proposal transcription/association decisions, and zero unresolved disagreement.
+- Independently review every high-risk change and the pre-frozen stratified unchanged/changed sample across all 29 documents.
+- Verify all 1,444 legacy image asset IDs, basenames, paths, byte sizes, dimensions, hashes, reference ordinals, and final printed-group/component associations without assuming byte-hash uniqueness.
 - Mutation-test same-page image swaps and incorrect caption associations, not only missing files.
 - Verify navigation graph reachability, unique/stable anchors, page mappings, Notes/main links, Index links, and legacy-to-repaired compatibility routes.
 - Re-run all residual OCR/layout detectors and require every hit to have a disposition.
+- Require detector recall over the known-defect registry and seeded defect mutations, then two consecutive full manual+detector rounds with no new defect class and empty queues after the last newly discovered class.
 - Compare release hashes, tool versions, ledger digests, and commands in `release-manifest.json`.
 - Run direct trailing-whitespace, fence, path, schema, and `git diff --check` checks over tracked and untracked Goal 4/repaired outputs.
 - Inspect `git status --short` and prove that legacy raw files, Goal 1, Goal 2, Goal 3, runtime, and unrelated references were not modified.
+- Re-run and compare all affected Goal 1 oracle output digests; in a temporary legacy fixture, add a sentinel nested Markdown file and duplicate-basename JPEG and prove the compatibility validator detects behavioral contamination.
+
+## Stage Dependencies And Status
+
+Keep one current status per stage and at most one `IN_PROGRESS` stage. `SOURCE_BLOCKED`/`REVIEW_BLOCKED` stages do not prevent dependency-independent work; select the lowest-numbered incomplete stage whose actual prerequisites are ready.
+
+| Stages | Initial status | Prerequisites |
+|---|---|---|
+| 1 | `NOT_STARTED` | none |
+| 2 | `NOT_STARTED` | 1 |
+| 3 | `NOT_STARTED` | 1–2 |
+| 4 | `NOT_STARTED` | 1–2; witness schema known, but full witness coverage may still be pending |
+| 5 | `NOT_STARTED` | 1–2, 4 |
+| 6 | `NOT_STARTED` | 1–2, 4–5 |
+| 7 | `NOT_STARTED` | 1, 4–6 |
+| 8–36 | `NOT_STARTED` | 2–7 plus complete witness-region coverage for the assigned batch; batches are otherwise independent |
+| 37 | `NOT_STARTED` | all relevant 8–36 technical queues |
+| 38 | `NOT_STARTED` | 6 plus all relevant 8–36 figure queues and page/plate evidence |
+| 39 | `NOT_STARTED` | 5–7 and all 8–36 canonical documents |
+| 40 | `NOT_STARTED` | 37–39 |
+| 41 | `NOT_STARTED` | 40 |
+| 42 | `NOT_STARTED` | 41 and zero release blocker |
+
+Line ranges printed in stage descriptions are scaffold routing hints. Each content stage must use the immutable segment ID and current boundaries emitted by Stage 2/5, and fail if the hint and structure ledger diverge.
 
 ## Stages
 
@@ -315,17 +409,21 @@ Freeze the fidelity contract, output architecture, evidence hierarchy, scope, an
 
 #### Detailed Implementation Plan
 
-- Audit all path consumers and reconcile the proposed `REPAIRED/` tree with repository layout requirements.
-- Define immutable/raw, repaired-author-text, errata, search-normalization, and generated-metadata layers.
-- Finalize repair classes, risk levels, reviewer requirements, witness policy, licensing limits, and release blockers.
-- Decide the portable, byte-preserving asset materialization strategy.
+- Audit recursive path consumers and confirm the sibling `ref/A-New-Kind-of-Science-Repaired/` root.
+- Freeze all 29 canonical filenames/order, output roles, separate faithful/derived/editorial/search targets, and refusal rules for a nonempty unowned release folder.
+- Finalize the Markdown dialect needed by the Stage 4 serializer, repair/workflow classes, severity definitions, reviewer-independence rules, class-conditional evidence, witness/build modes, licensing limits, and release blockers.
+- Freeze the held-out quality-evaluation sampling rule, manifest-derived seed, minimum per-document/risk quotas, blind adjudication protocol, and class-specific thresholds before repair results exist.
+- Choose portable byte-identical legacy-asset copying plus a governed path for lawful witness-supplied replacement/full-plate assets.
+- Snapshot commands and output digests for every affected Goal 1 recursive source/asset oracle.
 - Document what requires separate authorization: legacy promotion, deletion, relocation, and consumer migration.
 
 #### Completion Requirements
 
 - The architecture has one unambiguous source of build input and one repaired release location.
-- No current path/hash consumer is silently invalidated.
+- All 29 canonical paths/roles and every generated/sidecar role are frozen.
+- Baseline affected-oracle outputs are captured, and an empty sibling release leaves them behaviorally unchanged.
 - Evidence and waiver rules forbid unsupported OCR correction.
+- The serialization dialect, severity scale, sample plan, independent-review rules, and build/audit modes are testable.
 - Scope, rollback, promotion, and licensing rules are explicit and testable.
 - Stage 2 can inventory inputs without making content changes.
 
@@ -337,9 +435,11 @@ Create an independent, immutable census of the current corpus and all known stru
 
 #### Detailed Implementation Plan
 
-- Hash every Markdown/image file and record bytes, logical lines, encoding, dimensions, image basenames, Git blob identity, and role.
-- Re-derive the monolith hash/line map and all 29 raw segment boundaries.
-- Inventory split ownership, the three omitted references, broken monolith links, path consumers, and known defect candidates.
+- Hash the explicit allowlist of 19 Markdown/1,444 image inputs—never a future recursive root—and record logical/allocated bytes, lines, encoding, dimensions, basenames, Git blob identity, and role.
+- Re-derive the monolith hash/line map and all 29 raw segment boundaries using exact heading/start/end signatures; emit immutable segment IDs.
+- Inventory all 17 split routing derivatives, Atlas, the three omitted reference ordinals, broken monolith links, path consumers, and known defect candidates.
+- Freeze `known-defect-regression.jsonl` with every exact sentinel and expected route.
+- Materialize the predeclared held-out sample IDs from the raw-block universe without exposing repaired answers.
 - Establish raw block IDs and a baseline detector report without applying fixes.
 - Record current tool/environment versions and clean/dirty worktree scope.
 
@@ -349,6 +449,8 @@ Create an independent, immutable census of the current corpus and all known stru
 - Raw hashes and segment arithmetic are independently reproducible.
 - All 22,498 logical lines belong to one proposed segment exactly once.
 - Every known split/image anomaly has a baseline record.
+- Every known defect sentinel and held-out sample ID is frozen before correction.
+- The raw manifest explicitly excludes the sibling repaired tree.
 - Mutation of any raw input causes the baseline verifier to fail.
 
 ### 3-WITNESSES
@@ -360,18 +462,19 @@ Secure and validate authoritative, edition-identical page-level evidence suffici
 #### Detailed Implementation Plan
 
 - Locate official/licensed page images, PDF, print-assisted captures, or equivalent authoritative evidence.
-- Verify edition identity, page completeness, page-number mapping, resolution, color/symbol legibility, and Index column visibility.
+- Fingerprint the edition and enumerate all expected 1,280 physical pages/plates, including blank, figure-only, publication, and Index pages; detect missing/duplicate pages.
+- Partition pages into nonoverlapping authorial regions and record per-region legibility for prose/punctuation, formulas/code/data, figures/captions/color, and Index columns.
 - Record source URL/location, access date, permissions, file/page hashes, and immutable local review method.
-- Compare a stratified sample of prose, formulas, code, figures, Notes, and Index pages against raw OCR to validate witness usefulness.
+- Independently transcribe/adjudicate the pre-frozen held-out sample from the witness before reviewers see proposed repairs.
 - Pursue alternate authoritative sources for missing/illegible pages; never fill gaps with inference.
 
 #### Completion Requirements
 
-- Every physical page needed for author-text verification has a pinned, readable witness and deterministic page mapping.
-- Formula/code symbols and Index columns are legible in the relevant witness.
+- Every expected physical page/plate has a pinned mapping and each region has a legibility or `NOT_APPLICABLE` status; gaps become explicit downstream/release blockers rather than disappearing.
+- Formula/code/data symbols, figure components/captions, and Index columns are legible in the relevant witness.
 - Witness provenance and permitted storage/use are documented.
 - Tampered or missing witness pages fail verification.
-- If full coverage cannot be obtained, the stage records a decisive source blocker and downstream stages cannot claim a full repair.
+- If full coverage cannot be obtained, the manifest remains total, affected batches become `SOURCE_BLOCKED`, and dependency-independent Stages 4–7 or fully witnessed batches may proceed; Stage 42 cannot claim a full repair.
 
 ### 4-PIPELINE
 
@@ -381,16 +484,19 @@ Build the reversible overlay pipeline, ledgers, validators, and mutation suite b
 
 #### Detailed Implementation Plan
 
-- Define machine-readable schemas for structure, provenance, repair, unresolved, technical, figure, navigation, review, and release ledgers.
-- Implement stable raw block IDs, exact guarded patches, dependency ordering, forward build, inverse replay, and atomic output publication.
+- Define machine-readable schemas for raw and witness regions, structure, bidirectional provenance, repair workflow/final disposition, unresolved, technical, figure, navigation, review, compatibility, and release ledgers.
+- Implement replace/delete/move/split/merge and two-sided anchored insertion operations, exact guards, dependency ordering, target-specific overlays, forward build, inverse replay, and atomic output publication.
+- Implement the Stage 1 Markdown dialect and reject errata/search/editorial overlay classes from `CANONICAL_AUTHOR_TEXT`.
 - Build a zero-repair output and prove author-text conservation.
-- Add independent validators for coverage, joins, hashes, drift, dispositions, and generated-metadata separation.
+- Add independent validators for two-way raw+witness coverage, joins, hashes, drift, workflow/final dispositions, role counts, reviewer independence/disagreement, and generated/sidecar separation.
 - Add mutations for missing/reordered blocks, unlogged edits, source/evidence drift, symbol changes, fences, assets, captions, and anchors.
 
 #### Completion Requirements
 
 - A zero-repair build is deterministic and inverse-recoverable.
 - The pipeline refuses stale preimages, wrong occurrence counts, missing evidence, unresolved dependencies, and raw drift.
+- Anchored insertions require unique adjacent anchors and witness-region evidence; inverse replay removes them exactly.
+- Canonical, derived aggregate, editorial, and search targets cannot leak into one another.
 - Validators run from root and a relocated offline copy and fail closed under declared modes.
 - Every required mutation produces a specific failure.
 - No repair record has yet altered author text.
@@ -403,16 +509,17 @@ Create the correctly partitioned 29-document repaired skeleton while preserving 
 
 #### Detailed Implementation Plan
 
-- Extract the two front-matter, 12 chapter, 13 Notes, Index, and Colophon ranges from the raw monolith.
+- Extract the two front-matter, 12 chapter, 13 Notes, Index, and Colophon segments by Stage 2 IDs/signatures rather than copied line literals.
 - Correct ownership boundaries, including the Chapter 12/General Notes transition and malformed nominal back matter.
-- Establish heading/document identities, stable anchors, raw-span provenance, and deterministic assembly order.
+- Establish exact canonical paths/roles, heading/document identities, stable anchors, raw-span provenance, and deterministic assembly order using the Stage 1 dialect.
 - Compare existing split files and classify every difference without adopting unsupported content changes.
-- Generate a structurally repaired monolith and per-document tree through the zero-content-repair pipeline.
+- Generate the 29 canonical documents plus a separately typed aggregate monolith through the zero-content-repair pipeline.
 
 #### Completion Requirements
 
-- Exactly 29 documents cover the raw author-text sequence once.
+- Exactly 29 `CANONICAL_AUTHOR_TEXT` documents cover the monolith author-text sequence once; the aggregate is excluded from canonical counts.
 - Chapter 12, all Notes, Index, and Colophon begin/end at verified boundaries.
+- Every segment has source-backed start/end signatures, not only range arithmetic.
 - Reassembly differs from raw only by declared structural wrappers/path placeholders/final-newline policy.
 - Inverse replay recovers raw block bytes and order.
 - Existing split differences all have structural/routing dispositions.
@@ -425,17 +532,18 @@ Make all image assets portable, resolvable, byte-preserved, and correctly owned 
 
 #### Detailed Implementation Plan
 
-- Build the 1,444-row asset manifest with basename, current path, bytes, dimensions, hash, raw reference ordinal, and proposed repaired owner.
-- Implement the Stage 1 materialization strategy and deterministic link rewriting.
-- Restore the three omitted Chapter 2/4 references from raw order.
+- Build the 1,444-row legacy asset manifest with distinct asset ID, basename, current path, bytes, dimensions, hash, raw reference ordinal, and proposed repaired owner.
+- Materialize portable manifest-governed byte-identical copies in the sibling release and implement deterministic canonical/aggregate link rewriting.
+- Restore the three omitted Chapter 2/4 references by exact raw reference ordinal.
 - Detect duplicates, orphans, missing/cropped assets, same-page groups, and caption-association candidates.
 - Mutation-test missing assets, hash drift, swapped same-page images, wrong links, and silent recompression.
 
 #### Completion Requirements
 
 - All 1,444 governed assets retain their exact bytes/hashes.
-- Repaired documents have 1,444 resolving references in raw global order.
-- There are zero missing, orphaned, duplicate-identity, or ambiguous basename rows.
+- The zero-repair canonical documents have 1,444 resolving references in raw global order, with ownership totals Preface 2, chapters 820, Notes 622, and zero elsewhere; the derived aggregate separately mirrors them.
+- No Notes-owned reference is assigned to Chapter 12 merely because its physical legacy asset currently lives there.
+- There are zero missing, orphaned, duplicate-ID, or ambiguous basename rows; identical byte hashes do not collapse distinct IDs.
 - The three known omissions are restored at source-verified positions.
 - Figure grouping/caption uncertainty remains typed for Stage 38 rather than guessed.
 
@@ -443,15 +551,16 @@ Make all image assets portable, resolvable, byte-preserved, and correctly owned 
 
 #### Big Picture Objective
 
-Define and validate a Markdown dialect that improves readability without changing authorial meaning.
+Validate and freeze the Stage 1/4 Markdown dialect against real corpus fixtures before author-text batches begin.
 
 #### Detailed Implementation Plan
 
-- Specify heading hierarchy, paragraphs, lists, blockquotes, code fences, math delimiters, HTML, images, captions, tables, page markers, and editorial annotations.
+- Validate heading hierarchy, paragraphs, lists, blockquotes, code fences, math delimiters, HTML, images, captions, tables, page markers, and editorial annotations against representative corpus fixtures.
 - Separate mechanically safe formatting from witness-dependent text/symbol changes.
 - Create fixtures for prose reflow, legitimate/source hyphens, page furniture, nested math, Wolfram code, figure groups, and Index structures.
-- Select parser/render tools and define expected AST/render invariants.
+- Select/finalize parser/render tools and expected AST/render invariants.
 - Define guarded formatting rules with exact contexts, counts, inverses, and false-positive tests.
+- If the dialect changes, reopen and rebuild Stages 4–6 before any content batch starts.
 
 #### Completion Requirements
 
@@ -459,6 +568,7 @@ Define and validate a Markdown dialect that improves readability without changin
 - All representative fixtures parse and render as intended.
 - No style rule can alter formula/code/data tokens without high-risk evidence review.
 - Automated formatting is deterministic, reversible, and mutation-tested.
+- The Stage 4–6 zero-repair build conforms to the frozen style; no later style drift is accepted silently.
 - Content batches can apply one consistent contract.
 
 ### 8-BOOKENDS
@@ -479,7 +589,7 @@ Repair publication matter, printed contents, Preface, and Colophon against autho
 
 - Every assigned block/page is witness-reviewed and provenance-mapped.
 - Printed contents and generated navigation cannot be confused.
-- Every repair/candidate has a final disposition and high-risk review where required.
+- Every candidate is closed or routed to an explicit specialist/reviewer queue; all source-needed authorial items remain release blockers.
 - Colophon facts remain faithful to the witness, even when they are only reconciliation clues.
 - Batch build, inverse, render, link, and review checks pass.
 
@@ -498,8 +608,8 @@ Produce a witness-verified repaired Chapter 1, “The Foundations for a New Kind
 
 #### Completion Requirements
 
-- Every Chapter 1 raw block and witness page is reviewed exactly once.
-- Every candidate has a disposition; unresolved high-risk items remain release blockers.
+- Every Chapter 1 raw block and assigned nonoverlapping witness region is reviewed at least once by every required role.
+- Every candidate is closed or routed to an explicit specialist/reviewer queue; any unresolved source-needed authorial item remains a release blocker.
 - All applied changes are reversible and evidence-linked.
 - Chapter render, provenance, links, inverse, and unchanged-sample checks pass.
 
@@ -1068,6 +1178,7 @@ Verify every printed figure/caption group, all 1,444 extracted assets, and their
 
 #### Detailed Implementation Plan
 
+- Build an independent witness-page census of every printed illustration/group/component, rather than assuming the 1,444 extracted files are complete.
 - Visually compare page witness, caption text, repaired page context, and component images for every printed figure group.
 - Confirm image order, crop completeness, scaling/rotation assumptions, caption ownership, and multi-image grouping.
 - Identify missing/full-plate limitations separately from available caption crops.
@@ -1076,10 +1187,11 @@ Verify every printed figure/caption group, all 1,444 extracted assets, and their
 
 #### Completion Requirements
 
-- Every asset and printed figure group has page/context evidence and final association status.
-- All 1,444 bytes/hashes/references remain correct and resolving.
+- Every legacy asset and every witness-visible printed figure/group/component has page/context evidence and final association/completeness status.
+- All 1,444 legacy asset IDs/bytes/hashes remain correct; the Stage 6 baseline references remain reproducible, while the final canonical reference set is separately manifest-defined and source-verified.
 - Caption text is faithful author text; generated alt text is visibly separate.
-- Missing/cropped plate limitations are explicit and cannot masquerade as complete evidence.
+- The operational printed-illustration count is reconciled with the Colophon's 973 figure clue and any difference is explained.
+- Zero missing/cropped authorial visual component remains in an unqualified full release; a licensing/source gap blocks full visual completion rather than becoming a footnote.
 - Visual and mutation checks catch swapped images and wrong caption groups.
 
 ### 39-NAVIGATION
@@ -1112,17 +1224,19 @@ Reach a documented fixed point for residual OCR, layout, markup, and provenance 
 
 #### Detailed Implementation Plan
 
-- Re-run candidate detectors for blank/furniture headings, numeric-only lines, word splits, hyphens, OCR confusions, long Index lines, delimiters, brackets, fences, orphan continuations, and malformed links.
+- Re-run candidate detectors for blank/furniture headings, numeric-only lines, joined/split words, hyphens, OCR confusions, caption/prose or column interleaving, semantic block misclassification, long Index lines, delimiters, brackets, fences, orphan continuations, and malformed links.
 - Add new detector rounds from defects found during manual review and rerun them over all 29 documents.
 - Give every hit a confirmed/rejected/duplicate/unresolved disposition with exact scope.
-- Build a stratified prose gold set across front/back matter, all chapters, all Notes, and Index; measure character/word error after defining the baseline.
-- Reopen affected batches whenever the gold set or detector mutations reveal a material miss.
+- Evaluate the pre-frozen, manifest-seeded held-out sample: at least 5% of eligible blocks with a minimum 20 per canonical document (or all blocks for smaller documents), stratified by changed/unchanged and risk class, independently transcribed/adjudicated from the witness before comparison.
+- Measure exact author-text character projection/CER/WER, heading/paragraph/list boundary exactness, technical token exactness, Index entry/column sequence exactness, and figure/caption association exactness against thresholds frozen in Stage 1.
+- Measure detector recall against `known-defect-regression.jsonl` and seeded defect mutations.
+- After every newly discovered defect class, rerun the full manual+detector protocol until two consecutive complete rounds produce no new class and every queue is empty.
 
 #### Completion Requirements
 
-- Repeated detector/review rounds produce no new undispositioned defect class.
-- Every detector hit has a ledger disposition and zero severity-1/2 defect remains.
-- The gold-set methodology, coverage, and results are reproducible; zero material semantic error remains in it.
+- Two consecutive full rounds after the last new class produce no new defect class and zero open queue.
+- Every detector hit and every known regression sentinel has a final route/disposition; detector mutations prove recall for governed classes.
+- The held-out methodology, seed, quotas, blind adjudication, projections, and results are reproducible; exact class-specific full-release thresholds pass without post-hoc severity changes.
 - All ledgers join totally and every raw/output/evidence block is accounted for.
 - Any remaining source limitation is explicit and blocks an overbroad completeness claim.
 
@@ -1134,8 +1248,8 @@ Independently attempt to falsify the repaired edition's fidelity, completeness, 
 
 #### Detailed Implementation Plan
 
-- Review every high-risk repair plus stratified changed/unchanged samples across all 29 documents.
-- Attack boundary ownership, raw conservation, witness identity, repair inverses, formula/code tokens, Index columns, figures/captions, links, and compatibility routes.
+- Review every high-risk repair plus the pre-frozen changed/unchanged samples across all 29 documents, enforcing creator/reviewer separation and disagreement closure.
+- Attack boundary ownership, two-way raw+witness conservation, insertion anchors, output-role leakage, witness identity, repair inverses, formula/code tokens, Index columns, figures/captions, links, and compatibility routes.
 - Run the full mutation suite and add mutations for every newly discovered validator weakness.
 - Compare rendered raw/witness/repaired triptychs and investigate every unexpected difference.
 - Reopen prior stages and record closure for all hostile findings.
@@ -1145,7 +1259,7 @@ Independently attempt to falsify the repaired edition's fidelity, completeness, 
 - Every hostile finding is fixed, disproved with evidence, or remains an explicit release blocker.
 - All required mutations fail for the intended reason.
 - Independent review coverage and reviewer type are truthfully recorded.
-- A fresh hostile rerun finds no unclosed high-risk discrepancy.
+- A fresh hostile rerun finds no unclosed authorial discrepancy of any severity.
 - Legacy raw scope remains untouched.
 
 ### 42-RELEASE
@@ -1157,16 +1271,19 @@ Publish a deterministic, source-faithful repaired edition with complete provenan
 #### Detailed Implementation Plan
 
 - Build twice from frozen raw inputs and repair overlays in fresh offline/relocated environments.
+- Run audit mode against the authorized witness mount and prove the complete page/region evidence joins; build-mode reproducibility alone is insufficient for fidelity certification.
 - Compare output bytes, manifests, ledgers, navigation, rendered artifacts, and tool versions.
 - Run all structural, content, asset, review, mutation, whitespace, and Git-scope checks.
-- Publish atomically to the agreed `REPAIRED/` location and write the release manifest/final report.
-- Document exact rollback/rebuild commands, remaining source limitations, and optional future legacy-promotion/migration work.
+- Re-run every affected Goal 1 oracle and compare its output digest with the pre-release compatibility baseline.
+- Publish from a fresh validated staging tree to `ref/A-New-Kind-of-Science-Repaired/` only if the target is empty or manifest-owned; retain prior release manifests/snapshots under `goal-4/releases/` and never overwrite unowned work.
+- Document exact rollback/rebuild/previous-release-selection commands, remaining optional editorial work, and future legacy-promotion/migration work.
 
 #### Completion Requirements
 
 - Two clean builds are byte-identical and inverse replay recovers the frozen raw text/block hashes.
-- All 29 documents, 1,444 assets/references, ledgers, links, anchors, evidence joins, and review gates pass.
-- No high-risk unresolved item remains in a release called fully repaired.
-- Legacy raw hashes/paths and all unrelated repository files remain unchanged.
+- All 29 canonical documents, derived aggregate, 1,444 legacy assets/baseline references, final printed-figure component inventory, ledgers, links, anchors, two-way evidence joins, and review gates pass with role-specific counts.
+- No `UNRESOLVED_SOURCE_NEEDED` item affecting an authorial layer remains in a release called fully repaired.
+- All known defect sentinels are found and source-backed; Colophon illustration/Notes/program/Index counts are operationally reconciled.
+- Legacy raw hashes/paths, affected Goal 1 oracle behavior, and all unrelated repository files remain unchanged.
 - The final report clearly distinguishes repaired transcription, source errata, generated metadata, search normalization, and any residual limits.
 - Completion reflects the original full-repair objective rather than a structurally cleaner but unverified subset.

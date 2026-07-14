@@ -59,7 +59,7 @@ def line_set(spec: str) -> frozenset[int]:
 
 
 # Exactly twenty bounded lanes from the first-principles audit.  Q00 proves
-# that the catalog label is external vocabulary; Q15/Q16 close all 27 images.
+# that the catalog label is external vocabulary; Q15/Q16 close all 29 images.
 QUERIES = {
     "Q00": r"Mathematical-Constant Digit Systems?",
     "Q01": r"Mathematical Constants",
@@ -108,9 +108,13 @@ QUERIES = {
         r"continued fraction.{0,120}substitution"
     ),
     "Q13": (
-        r"noncomputable.{0,80}digit|Chaitin.{0,120}digit|"
+        r"non-?computable.{0,80}digit|Chaitin.{0,120}digit|"
         r"digits of.{0,40}sqrt.{0,120}cellular automata|"
-        r"digit sequence.{0,100}data compression"
+        r"digit sequence.{0,100}data compression|"
+        r"whose n<sup>th</sup> digit for any n|"
+        r"examples of non-computable reals that can readily be defined|"
+        r"number whose.{0,40}digit is 1 - f\[n, n\]|"
+        r"involve looking at real numbers in terms of digits"
     ),
     "Q14": (
         r"Mathematical constants, 136-144|Continued fractions, 143, 914|"
@@ -123,7 +127,8 @@ QUERIES = {
         r"_page_(?:916_Figure_12|917_Picture_11|918_Figure_2|"
         r"927_Figure_14|928_Figure_(?:9|11|13|22)|"
         r"929_Picture_1[1-6]|930_(?:Picture_(?:4|12|14)|Figure_10)|"
-        r"931_Figure_(?:9|10|11|12|13|17))\.jpeg"
+        r"931_Figure_(?:9|10|11|12|13|17)|"
+        r"1085_(?:Figure_16|Picture_18))\.jpeg"
     ),
     "Q17": (
         r"^#### (?:\*\*)?(?:The Sequence of Primes|Mathematical Functions)"
@@ -132,7 +137,12 @@ QUERIES = {
     "Q18": (
         r"Implementation of digit sequences|History of numbers|"
         r"History of digit sequences|Gray code ordering|Negative bases|Non-power bases|"
-        r"Multiplicative digit sequences|Greek and Roman number systems"
+        r"Multiplicative digit sequences|Greek and Roman number systems|"
+        r"Another early sign.{0,120}digit sequence of a number|"
+        r"digits of.{0,40}pi.{0,60}other transcendental numbers|"
+        r"John Venn.{0,80}digits|Carl Friedrich Gauss noted.{0,80}continued fractions|"
+        r"Repetition in numbers|Emile Borel had formulated.{0,80}normal numbers|"
+        r"Page 560.{0,40}Number representations"
     ),
     "Q19": (
         r"60 \(base\) of Babylonian numbers|Negative bases, 902|"
@@ -187,15 +197,17 @@ QUERY_NATIVE = line_set(
     "13086,13090"
 )
 QUERY_RELATION = line_set(
-    "1850,1852,1856,11260,11531,"
+    "654,1850,1852,1856,11260,11531,11532,11536,"
     "12503,12515,12524,12532,12536,12550,12552,12554,12555,12557,12569,"
     "12984,12986,12988,12990,"
     "12992,12996,13000,13004,13018,13020,13022,13023,13029,13062,"
     "13074,13076,13084,13092,13094,13096,13098,13102,13103,13111,"
-    "13119,13121,13123,13125,13127,14172,14468,14923,17236,17599,"
-    "17851,20507,20592"
+    "13119,13121,13123,13125,13127,13219,14172,14468,14923,15517,"
+    "17107,17130,17167,17171,17236,17599,17851,20507,20592"
 )
-QUERY_CONTROL = line_set("1619,1834,12846,13134,13146,17101,19058")
+QUERY_CONTROL = line_set(
+    "1619,1834,12846,13134,13146,17101,19058,19074,19076,19078,19080"
+)
 
 EXCLUDED_CLASS = {
     "name_collision": line_set("146"),
@@ -243,11 +255,15 @@ NATIVE_CONTINUATIONS = line_set(
     "13088,13100"
 )
 RELATION_CONTINUATIONS = line_set(
-    "12505,12507,12509,12511,12513,12517-12520,12522,12534,"
+    "656,12505,12507,12509,12511,12513,12517-12520,12522,"
+    "12526,12528,12530,12534,"
     "12587,12589,12591,12593,12595,"
     "12994,12998,13002,13006-13016,13025,13027,13064-13068,"
     "13078-13082,13105,13107,13109,13113,13115,13117,13129,13130,"
-    "13132,13136,13138-13144"
+    "13132,13136,13138-13144,17105,"
+    "17131-17133,17135-17137,17139,17141-17145,17147,17149-17151,"
+    "17153,17155-17159,17161,17163,17165,17169,17173,"
+    "19066,19068,19070,19072"
 )
 CONTROL_CONTINUATIONS = line_set("1663,12919")
 

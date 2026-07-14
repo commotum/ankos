@@ -2,13 +2,13 @@
 """Fail-closed asset/provenance audit for T40 constant representations.
 
 The closed T40 image universe contains three main-section JPEGs, twenty-one
-native-Notes JPEGs, and three explicitly followed representation-relation JPEGs.
+native-Notes JPEGs, and five explicitly followed representation-relation JPEGs.
 Every file is bound to its sole monolith reference, optional
 split-Markdown reference, physical path, byte length, JPEG dimensions, and
 SHA-256 digest.  The split omits exactly the page-154 long-division link and
 the page-156 square-root link even though both physical files exist.
 
-All twenty-seven assets are HASH_BOUND.  No formula, digit, remainder, seed,
+All twenty-nine assets are HASH_BOUND.  No formula, digit, remainder, seed,
 coefficient, curve sample, palette, or program is inferred from pixels.  The
 long-division and strict integer square-root checks below independently replay
 only formulas stated in source text; their JSON interface is deliberately
@@ -130,6 +130,8 @@ ASSET_ROWS = r"""
 13125|R-digital-slope-d|_page_931_Figure_12.jpeg|BACK-MATTER/Index/Images/_page_931_Figure_12.jpeg|BACK-MATTER/Index/Index.md|1028|6192|110|155|d4cd35ac79902f539674d4114bba8bd7a12a1674ef334903028ebcd9f1a260e8|p931-digital-slope-five|HASH_BOUND|digital-slope representation relation D; source formula supplies segments
 13127|R-digital-slope-e|_page_931_Figure_13.jpeg|BACK-MATTER/Index/Images/_page_931_Figure_13.jpeg|BACK-MATTER/Index/Index.md|1030|3562|75|155|66c9d76cf184c965d21af617adbf5c87b8a6d88632494eb5be39b46386dc5b95|p931-digital-slope-five|HASH_BOUND|digital-slope representation relation E; source formula supplies segments
 13134|C-operator-representation-boundary|_page_931_Figure_17.jpeg|BACK-MATTER/Index/Images/_page_931_Figure_17.jpeg|BACK-MATTER/Index/Index.md|1037|31696|576|254|50b5d23c00d10b064ed4c26b03944ba2e793bdf3dd30d367d9314b273e58ec07|-|HASH_BOUND|operator-representation complexity control; no coefficient evolution is defined by the raster
+17167|R-number-representation-lengths|_page_1085_Figure_16.jpeg|BACK-MATTER/Index/Images/_page_1085_Figure_16.jpeg|BACK-MATTER/Index/Index.md|5068|11809|570|114|23d4a862a4d99266f778a28c18acce5b8c10f828a3d517799542091a2ff5c9fd|p1085-number-representation-pair|HASH_BOUND|followed page-560 observer comparing unary, binary, self-delimiting, base-3-coded, and Fibonacci representation lengths
+17171|R-number-representation-completeness|_page_1085_Picture_18.jpeg|BACK-MATTER/Index/Images/_page_1085_Picture_18.jpeg|BACK-MATTER/Index/Index.md|5072|12491|573|134|93b9a5e9478a8757c6c8dc5ac9f0fa5974eeaad0e8bdd14ab89a29053cbb1317|p1085-number-representation-pair|HASH_BOUND|followed page-560 completeness observer for self-delimiting representation schemas; no pixel-derived codec
 """
 
 ASSETS = parse_assets(ASSET_ROWS)
@@ -141,7 +143,7 @@ NATIVE_IMAGE_LINES = frozenset({
 })
 RELATION_IMAGE_LINES = frozenset({
     12524, 12552, 12557, 12992, 12996, 13000, 13020, 13076, 13094, 13098,
-    13119, 13121, 13123, 13125, 13127,
+    13119, 13121, 13123, 13125, 13127, 17167, 17171,
 })
 CONTROL_IMAGE_LINES = frozenset({13134})
 GOVERNED_IMAGE_LINES = (
@@ -160,13 +162,13 @@ assert not (
 assert (
     len(NATIVE_IMAGE_LINES), len(RELATION_IMAGE_LINES),
     len(CONTROL_IMAGE_LINES), len(GOVERNED_IMAGE_LINES),
-) == (11, 15, 1, 27)
+) == (11, 17, 1, 29)
 
-EXPECTED_DISPOSITION_METRICS = (11, 15, 1, 27, 0)
-EXPECTED_REFERENCE_METRICS = (27, 25, 52)
-EXPECTED_PHYSICAL_METRICS = (27, 27, 612_140)
-EXPECTED_ASSEMBLY_METRICS = (4, 16)
-EXPECTED_BOUNDARY_METRICS = (27, 0, 0)
+EXPECTED_DISPOSITION_METRICS = (11, 17, 1, 29, 0)
+EXPECTED_REFERENCE_METRICS = (29, 27, 56)
+EXPECTED_PHYSICAL_METRICS = (29, 29, 636_440)
+EXPECTED_ASSEMBLY_METRICS = (5, 18)
+EXPECTED_BOUNDARY_METRICS = (29, 0, 0)
 
 HASH_BOUND_IMAGE_LINES = GOVERNED_IMAGE_LINES
 LIMITED_TRANSCRIBED_IMAGE_LINES: frozenset[int] = frozenset()
@@ -175,7 +177,7 @@ assert all(asset.boundary == "HASH_BOUND" for asset in ASSETS.values())
 
 SPLIT_OMISSION_IMAGE_LINES = frozenset({1711, 1744})
 SPLIT_REFERENCED_IMAGE_LINES = GOVERNED_IMAGE_LINES - SPLIT_OMISSION_IMAGE_LINES
-assert len(SPLIT_REFERENCED_IMAGE_LINES) == 25
+assert len(SPLIT_REFERENCED_IMAGE_LINES) == 27
 
 ASSEMBLIES = {
     "p928-concatenation-walk-trilogy": frozenset({12992, 12996, 13000}),
@@ -186,8 +188,9 @@ ASSEMBLIES = {
     "p931-digital-slope-five": frozenset({
         13119, 13121, 13123, 13125, 13127,
     }),
+    "p1085-number-representation-pair": frozenset({17167, 17171}),
 }
-assert sum(map(len, ASSEMBLIES.values())) == 16
+assert sum(map(len, ASSEMBLIES.values())) == 18
 assert all(
     frozenset(line for line, asset in ASSETS.items() if asset.assembly == name)
     == lines
@@ -221,6 +224,9 @@ SOURCE_GUARDS = frozenset({
     "13092|Euclid's algorithm|ContinuedFraction[a/b]",
     "13111|Digital slope representation|Floor[nh] - Floor[(n-1)h]",
     "13130|Operator representations|trees of operations|single constant",
+    "17130|Page 560|Number representations|sequence of 1's and 0's",
+    "17165|representations (b) through (e)|numbers 1 through 500|grow roughly linearly",
+    "17169|Completeness|representations (c), (d) and (e)|valid representation",
 })
 
 ROLE_RECORDS = frozenset(
@@ -234,15 +240,15 @@ ASSEMBLY_RECORDS = frozenset(
 )
 
 REFERENCE_RECORDS = frozenset({
-    "monolith|27|one-reference-per-file",
-    "split|25|one-reference-per-linked-file",
-    "total-source-references|52",
+    "monolith|29|one-reference-per-file",
+    "split|27|one-reference-per-linked-file",
+    "total-source-references|56",
     "split-omissions|1711,1744|physical-files-still-required",
-    "physical-files|27|unique-names-and-paths",
-    "unique-hashes|27",
-    "total-bytes|612140",
-    "boundary|27-HASH_BOUND|0-LIMITED_TRANSCRIBED|0-PIXEL_REPLAYED",
-    "roles|N=11|R=15|C=1",
+    "physical-files|29|unique-names-and-paths",
+    "unique-hashes|29",
+    "total-bytes|636440",
+    "boundary|29-HASH_BOUND|0-LIMITED_TRANSCRIBED|0-PIXEL_REPLAYED",
+    "roles|N=11|R=17|C=1",
 })
 
 TEXTUAL_MECHANICS_RECORDS = frozenset({
@@ -260,10 +266,10 @@ TEXTUAL_MECHANICS_RECORDS = frozenset({
 })
 
 EXPECTED_MANIFEST_DIGESTS = {
-    "source_guards": "ddcd2ed1e24e042fefce8bf3fb6d4fa8c3489847a45b03702fbe37b696c828ea",
-    "roles": "128bd0fd7e2fb5832b78b9822a4df720e1d98767dfb056127a68c3017aacc298",
-    "assemblies": "b14eb22a0379e2436b64c7516153877e6366643003b55c43fdac69c375914fb5",
-    "references": "73265599c0c19b856ef3485226d88ffac49cbf2eff4ee5cb12d66ea065ca56d9",
+    "source_guards": "b1a57a86341eeb7226da8bc2d7507022be1f7e82eb32069132e2b4fc4119fda3",
+    "roles": "846fc786f8998d93eb417b60c8cd27f7e4d0ddd478f03ebd458d70cb24550d9c",
+    "assemblies": "4c1672f121651214ac4cfd973f9661661f737ebc0fa2901ee90fee5c529fd239",
+    "references": "522cb95db5cfe278b32af6611afce83a57990618c3afcadb28fdcb54312cdfad",
     "textual_mechanics": "92fa66e92084ad11a2f364ac70237f616f5ba326595ddb1a85efa541448f0f59",
 }
 
@@ -315,12 +321,12 @@ EXPECTED_TEXTUAL_REPLAY_METRICS = (8_255, 96, 3)
 # the recent source/asset interfaces.  The auxiliary ordered digest instead
 # binds the literal `sha256sum`-style path-ordered manifest requested for T40.
 EXPECTED_IMAGE_ASSET_MANIFEST = (
-    27,
-    "9fb44dd3086ff0c853d09a867ccdfdd60716037fc4f52d527f6ec1bc217d6ffc",
+    29,
+    "1fc4c0e9d7829254d34493c43aa76ce5e91ff989dc545a764b265d4e6f405808",
 )
 EXPECTED_ORDERED_SHA256SUM_MANIFEST = (
-    27,
-    "3e6e66a5730caae3371b21706ea124e4f19480925efc01e98cb6ee530124c9b5",
+    29,
+    "b06ceb5e71f0e92a4d9ca33f110913669666e95beb6085f8a8164f5f5732f772",
 )
 
 
@@ -587,13 +593,13 @@ def ledger() -> tuple[str, tuple[int, int, int, int], str, str]:
     scoped_notes = {
         line for line in BOOK_IMAGES if 12921 < line < 13146
     }
-    scoped_followed_relations = {12524, 12552, 12557}
+    scoped_followed_relations = {12524, 12552, 12557, 17167, 17171}
     assert frozenset(
         scoped_main | scoped_notes | scoped_followed_relations
     ) == GOVERNED_IMAGE_LINES
     assert (
         len(scoped_main), len(scoped_notes), len(scoped_followed_relations)
-    ) == (3, 21, 3)
+    ) == (3, 21, 5)
 
     split_by_name, physical_by_name = split_and_physical_indices()
     rows: list[str] = []
@@ -653,8 +659,8 @@ def ledger() -> tuple[str, tuple[int, int, int, int], str, str]:
         root_relative = physical_path.relative_to(ROOT).as_posix()
         ordered_sha256sum_rows.append(f"{digest}  {root_relative}\n")
 
-    assert len(names) == len(physical_paths) == len(hashes) == 27
-    assert (monolith_references, split_references) == (27, 25)
+    assert len(names) == len(physical_paths) == len(hashes) == 29
+    assert (monolith_references, split_references) == (29, 27)
     payload = "\n".join(rows) + "\n"
     ordered_payload = "".join(ordered_sha256sum_rows)
     return (
@@ -666,7 +672,7 @@ def ledger() -> tuple[str, tuple[int, int, int, int], str, str]:
 
 
 EXPECTED_LEDGER_SHA256 = (
-    "02ea3bb0e6519b2fcc78172a8f97dfded0d4a96148e2398056441640c4a79824"
+    "c5c030aa35a158fe7797fbee2060200dc9e3f89fdac4066c73c978711943780f"
 )
 
 
@@ -683,8 +689,8 @@ def main() -> None:
     assert ledger_digest == EXPECTED_LEDGER_SHA256, (
         "ledger", ledger_digest, EXPECTED_LEDGER_SHA256,
     )
-    assert (27, structural_digest) == EXPECTED_IMAGE_ASSET_MANIFEST
-    assert (27, ordered_digest) == EXPECTED_ORDERED_SHA256SUM_MANIFEST
+    assert (29, structural_digest) == EXPECTED_IMAGE_ASSET_MANIFEST
+    assert (29, ordered_digest) == EXPECTED_ORDERED_SHA256SUM_MANIFEST
     assert (
         metrics[0], metrics[1], metrics[0] + metrics[1]
     ) == EXPECTED_REFERENCE_METRICS
@@ -704,19 +710,19 @@ def main() -> None:
         len(HASH_BOUND_IMAGE_LINES), len(LIMITED_TRANSCRIBED_IMAGE_LINES),
         len(PIXEL_REPLAYED_IMAGE_LINES),
     ) == EXPECTED_BOUNDARY_METRICS
-    assert len(ROLE_RECORDS) == 27 and len(SOURCE_GUARDS) == 25
+    assert len(ROLE_RECORDS) == 29 and len(SOURCE_GUARDS) == 28
 
     print(
-        "T40 asset oracle: PASS governed=27; classes N/R/C=11/15/1; "
-        "candidates=27; excluded=0; refs=52(monolith=27,split=25); "
-        "split_link_omissions=2(page154,page156); unique_hashes=27; "
-        "physical_files=27; bytes=612140; assemblies=4/16_files; "
-        "boundary=27_HASH_BOUND/0_LIMITED_TRANSCRIBED/0_PIXEL_REPLAYED; "
+        "T40 asset oracle: PASS governed=29; classes N/R/C=11/17/1; "
+        "candidates=29; excluded=0; refs=56(monolith=29,split=27); "
+        "split_link_omissions=2(page154,page156); unique_hashes=29; "
+        "physical_files=29; bytes=636440; assemblies=5/18_files; "
+        "boundary=29_HASH_BOUND/0_LIMITED_TRANSCRIBED/0_PIXEL_REPLAYED; "
         f"textual_replay=long_division_{long_checks}_states/"
         f"sqrt_{sqrt_events}_events; "
         f"sqrt2_extracted_bit_defect=guarded_{sqrt_source_mismatches}_mismatches; "
         "rational_sqrt_extension_counterexample=11/5_guarded; "
-        "ordered_manifest=3e6e66a5730caae3371b21706ea124e4f19480925efc01e98cb6ee530124c9b5; "
+        "ordered_manifest=b06ceb5e71f0e92a4d9ca33f110913669666e95beb6085f8a8164f5f5732f772; "
         "pixel_inference=0; unresolved_image_dispositions=0"
     )
 
