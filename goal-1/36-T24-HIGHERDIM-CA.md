@@ -288,7 +288,7 @@ No completed stage reopens on the architecture evidence. T21-T23 remain strict f
 
 ## Completion Requirements
 
-- [x] Exhaustive source/split/Notes/Index/alias audit closes with zero unresolved candidates.
+- [x] The frozen declared/bounded source/split/Notes/Index/alias protocol closes its 30-query union with zero unresolved candidates.
 - [x] The source-bound asset candidate universe closes with honest claim boundaries.
 - [x] Every strict dimensional/topological/access/RULE profile and required representation map is independently proven.
 - [x] Smallest reusable bases are classified with a concrete-counterexample gate for every claimed new algebra.
