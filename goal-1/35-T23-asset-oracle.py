@@ -397,7 +397,17 @@ def full_predicate(exact: int, count: int) -> int:
 
 
 def life3d_predicate(parameters: tuple[int, int, int], self_value: int, count: int) -> int:
-    """Book ``{p,q,r}``: survival interval ``p..q`` and birth count ``r``."""
+    """Literal Book ``{p,q,r}``: live-in-range or surrounding count ``r``."""
+
+    p, q, r = parameters
+    assert self_value in (0, 1) and 0 <= count <= 26 and 0 <= p <= q <= 26
+    return int((self_value == 1 and p <= count <= q) or count == r)
+
+
+def derived_birth_survival_predicate(
+    parameters: tuple[int, int, int], self_value: int, count: int
+) -> int:
+    """Derived B/S reading, equivalent to the literal form when ``r in [p,q]``."""
 
     p, q, r = parameters
     assert self_value in (0, 1) and 0 <= count <= 26 and 0 <= p <= q <= 26
@@ -408,6 +418,14 @@ assert tuple(face_predicate("any", count) for count in range(7)) == (0, 1, 1, 1,
 assert tuple(face_predicate("exact1", count) for count in range(7)) == (0, 1, 0, 0, 0, 0, 0)
 assert all(sum(full_predicate(exact, count) for count in range(27)) == 1 for exact in (1, 2, 3))
 SOURCE_LISTED_CLASS4_PARAMETERS = ((5, 7, 6), (4, 5, 5), (5, 6, 5))
+assert all(p <= r <= q for p, q, r in SOURCE_LISTED_CLASS4_PARAMETERS)
+assert all(
+    life3d_predicate(parameters, self_value, count)
+    == derived_birth_survival_predicate(parameters, self_value, count)
+    for parameters in SOURCE_LISTED_CLASS4_PARAMETERS
+    for self_value in (0, 1)
+    for count in range(27)
+)
 assert tuple(
     count
     for count in range(27)
@@ -420,7 +438,8 @@ assert tuple(
 ) == (4, 5)
 
 # This B/S notation is a derived canonical spelling of the source-listed
-# parameter tuple, not a label supplied by BOOK:14263--14271.
+# parameter tuple, justified here because r lies inside the survival interval;
+# it is not a label supplied by BOOK:14263--14271.
 DERIVED_CANONICAL_SPELLING = {(4, 5, 5): "B5/S45"}
 assert DERIVED_CANONICAL_SPELLING[(4, 5, 5)] == "B5/S45"
 

@@ -200,7 +200,7 @@ RETAINED = MATCHED_RETAINED | GOVERNED_CONTINUATIONS
 
 # Stable public interface consumed by the T23 asset oracle. The first four are
 # direct plates, the next four projection observers, 13648 a T24 topology
-# control, and 14273 the named B5/S45 moving-structure observer.
+# control, and 14273 the source-listed (4,5,5) moving-structure observer.
 IMAGE_RE = re.compile(r"^!\[[^\]]*\]\(([^)]+)\)$")
 GOVERNED_IMAGE_LINES = line_set(
     "2252,2254,2258,2260,13634,13636,13638,13640,13648,14273"
