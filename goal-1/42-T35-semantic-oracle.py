@@ -2646,8 +2646,7 @@ def main() -> None:
         ("observer_boundary", "digits_sizes_parity_cycles_growth_CA_register_real_maps_do_not_select_writes"),
     )
     digest = sha256(repr(facts).encode("utf-8")).hexdigest()
-    if EXPECTED_DIGEST != "TO_BE_FROZEN":
-        assert digest == EXPECTED_DIGEST
+    assert digest == EXPECTED_DIGEST
 
     print("T35 semantic oracle: PASS")
     print(

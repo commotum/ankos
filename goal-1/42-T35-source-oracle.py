@@ -152,7 +152,7 @@ QUERIES = {
         r"same rule as on the previous page, but now starting with the number 512"
     ),
     "Q25": (
-        r"#### \*\*Recursive Sequences\*\*|"
+        r"#### (?:\*\*)?Recursive Sequences(?:\*\*)?|"
         r"definite rule for getting the next number in the sequence from previous ones|"
         r"f\[n\] depends only on the number immediately before"
     ),
@@ -213,6 +213,14 @@ QUERIES = {
     "Q37": r"If\[EvenQ\[",
     "Q38": r"arithmetic systems?",
     "Q39": r"5/2, multiplication system, 123",
+    "Q40": (
+        r"Ceiling \(integer above\).*in arithmetic, 124|"
+        r"Conway, John H\..*and arithmetic recurrences, 1115|"
+        r"Digit sequences.*non-locality in, 124|"
+        r"Machine 600720.*properties of, 1145|"
+        r"Minsky, Marvin L\..*and register machines, 896, 1115|"
+        r"Number theory.*and Turing machine 600720, 1145"
+    ),
 }
 
 
@@ -304,13 +312,13 @@ OUT_OF_SCOPE_RELATED_IMAGE_LINES = line_set("1884,1888")
 
 INDEX_CLASS = {
     "core_alias_and_observer_routes": line_set(
-        "20828,20836,20908,20957,20980,21090,21233,21329,21471,21497,21893,"
-        "21933,22150,22287,22382"
+        "20828,20836,20908,20946,20957,20980,21088,21090,21233,21329,21471,"
+        "21497,21893,21933,22150,22287,22382"
     ),
     "arithmetic_and_emulation_routes": line_set(
-        "20882,20894,21173,21223,21923,22390"
+        "20882,20894,21173,21223,21475,21521,21711,21923,22390"
     ),
-    "ordered_fraction_routes": line_set("21195,21805,21807"),
+    "ordered_fraction_routes": line_set("21050,21195,21805,21807"),
 }
 INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
 INDEX_ENTRY_GUARDS = {
@@ -318,8 +326,10 @@ INDEX_ENTRY_GUARDS = {
         20828: ("3n + 1 problem, 904", "see also Arithmetic systems"),
         20836: ("5/2, multiplication system, 123",),
         20908: ("Backtracking in 3 n + 1 problem, 904",),
+        20946: ("Ceiling (integer above)", "in arithmetic, 124"),
         20957: ("for 3n+1 problem, 904",),
         20980: ("Collatz problem, 904",),
+        21088: ("Digit sequences, 116-127", "non-locality in, 124"),
         21090: ("Directional entropies and 3n + 1 problem, 904",),
         21233: ("Hasse's algorithm (3 n + 1 problem)",),
         21329: ("IntegerExponent and 3n + 1 problem, 904",),
@@ -336,10 +346,14 @@ INDEX_ENTRY_GUARDS = {
         20894: ("in systems based on numbers, 961",),
         21173: ("FactorInteger (integer factorization) and arithmetic system encoding, 1115",),
         21223: ("Gödel's Theorem, 1158 and arithmetic systems, 673",),
+        21475: ("Machine 600720", "properties of, 1145"),
+        21521: ("Minsky, Marvin L.", "and register machines, 896, 1115"),
+        21711: ("Number theory, 135", "and Turing machine 600720, 1145"),
         21923: ("Register machines, 97–102", "emulated by arithmetic systems, 673. 1114"),
         22390: ("of arithmetic systems, 673",),
     },
     "ordered_fraction_routes": {
+        21050: ("Conway, John H.", "and arithmetic recurrences, 1115"),
         21195: ("Fraction systems, 1115", "Fractran (universal fraction system). 1115"),
         21805: ("Primes and arithmetic systems, 1115",),
         21807: ("from fraction system, 1115",),
@@ -440,6 +454,7 @@ EXPECTED_QUERY = {
     "Q37": (13, 13, 0, "eb0599b3481bb207128d491751677db7d74176d607eeb10500a1d8b50984c696"),
     "Q38": (16, 9, 7, "4c2295155eb814d20b2cb239b3c05f7bbd529dabc47eeefd8cf996d3234a1849"),
     "Q39": (1, 0, 1, "d5b2f984bb5733c30680940aaf707f6cd58a91a8560a9df34272de0561f6d435"),
+    "Q40": (0, 0, 0, ""),
 }
 
 EXPECTED_SET = {
@@ -521,7 +536,15 @@ SPLIT_QUERY_WITNESSES = {
     "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:123": 1519,
     "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:127": 1523,
     "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:129": 1525,
+    "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:159": 1555,
     "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:163": 1559,
+}
+
+# This exact heading occurs twice in the monolith.  Structural ownership, not
+# global string membership, binds the split notes heading to the notes copy;
+# the Chapter-4 copy is the explicitly normalized witness above.
+SPLIT_QUERY_EXACT_DUPLICATE_OVERRIDES = {
+    "BACK-MATTER/Index/Index.md:591": (12688, frozenset({1555, 12688})),
 }
 
 def retained_owner_record(line_no: int) -> str:
@@ -564,21 +587,27 @@ EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 EXPECTED_SPLIT_QUERY = (
-    93,
-    "457c9f138e0b58efd275a4ded187457f9e39436d8f907b301adffc9550beca0e",
+    0,
+    "",
 )
 EXPECTED_SPLIT_QUERY_EXACT = (
-    75,
-    "920e4e08b308c5220eb12c4bb0bb6e8ffae04a896c8980dc1b701639dbc7cc2d",
+    0,
+    "",
 )
 EXPECTED_SPLIT_QUERY_NONEXACT = (
-    18,
-    "ea572f9cfd2e25b6190f7e9ee0c194e1caa3f3f3e89d6d85fe7fc3520d2628dd",
+    0,
+    "",
 )
 EXPECTED_SPLIT_QUERY_MAPPING = (
-    18,
-    "5c34cb454f3e69a4a847d737be3ed56325c021964efb8777e7eb31b252418ff4",
+    0,
+    "",
 )
+EXPECTED_SPLIT_QUERY_CLASSES = {
+    "EXACT": (0, "", ""),
+    "IMAGE_BASENAME": (0, "", ""),
+    "NORMALIZED": (0, "", ""),
+}
+EXPECTED_SPLIT_QUERY_NORMALIZED_MINIMUM = 0.0
 EXPECTED_SPLIT_RETAINED_CROSSWALK = (
     127,
     "6e239a562708726d0c301a271a788b29db8d73013909a8f7b42e3d28531429a7",
@@ -1204,10 +1233,10 @@ def main() -> int:
     )
 
     compiled = [re.compile(pattern, re.IGNORECASE) for pattern in QUERIES.values()]
-    monolith_query_text = {at(line_no) for line_no in union}
+    monolith_query_lines: dict[str, set[int]] = {}
+    for line_no in union:
+        monolith_query_lines.setdefault(at(line_no), set()).add(line_no)
     split_records: set[str] = set()
-    split_exact: set[str] = set()
-    split_nonexact: set[str] = set()
     split_record_text: dict[str, str] = {}
     for path, relative in zip(split_paths, relative_paths, strict=True):
         split_file_lines = path.read_text(encoding="utf-8").splitlines()
@@ -1217,31 +1246,94 @@ def main() -> int:
             if not any(rx.search(line) for rx in compiled):
                 continue
             split_records.add(record)
-            (split_exact if line in monolith_query_text else split_nonexact).add(record)
 
     query_mapping: set[str] = set()
-    query_mapping_ok = set(SPLIT_QUERY_WITNESSES) == split_nonexact
-    for record in sorted(split_nonexact):
-        witness = SPLIT_QUERY_WITNESSES.get(record)
-        if witness is None:
+    mapped_lines: set[int] = set()
+    query_class_records: dict[str, set[str]] = {
+        "EXACT": set(),
+        "IMAGE_BASENAME": set(),
+        "NORMALIZED": set(),
+    }
+    query_class_rows: dict[str, set[str]] = {
+        name: set() for name in query_class_records
+    }
+    query_normalized_scores: list[float] = []
+    declared_records = (
+        set(SPLIT_QUERY_WITNESSES) | set(SPLIT_QUERY_EXACT_DUPLICATE_OVERRIDES)
+    )
+    query_mapping_ok = (
+        not set(SPLIT_QUERY_WITNESSES) & set(SPLIT_QUERY_EXACT_DUPLICATE_OVERRIDES)
+        and declared_records <= split_records
+        and retained_owner_record(12688) == "BACK-MATTER/Index/Index.md:591"
+        and retained_owner_record(1555)
+        == "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:159"
+    )
+    for record in sorted(split_records):
+        candidates = monolith_query_lines.get(split_record_text[record], set())
+        if record in SPLIT_QUERY_WITNESSES:
+            witness = SPLIT_QUERY_WITNESSES[record]
+            query_mapping_ok &= not candidates
+        elif record in SPLIT_QUERY_EXACT_DUPLICATE_OVERRIDES:
+            witness, expected_candidates = SPLIT_QUERY_EXACT_DUPLICATE_OVERRIDES[record]
+            query_mapping_ok &= candidates == set(expected_candidates)
+        elif len(candidates) == 1:
+            witness = next(iter(candidates))
+        else:
             query_mapping_ok = False
             continue
-        dice, ordered = witness_similarity(split_record_text[record], at(witness))
-        query_mapping.add(f"{record}->{witness}")
-        query_mapping_ok &= (
-            witness in union
-            and dice >= 0.60
-            and ordered >= 0.80
+        if witness in mapped_lines or witness not in union:
+            query_mapping_ok = False
+            continue
+        mapped_lines.add(witness)
+        mode, score = retained_crosswalk_evidence(
+            at(witness), split_record_text[record]
         )
+        if mode not in query_class_records:
+            query_mapping_ok = False
+            continue
+        if mode == "NORMALIZED":
+            query_normalized_scores.append(score)
+            query_mapping_ok &= score >= 0.98
+        else:
+            query_mapping_ok &= score == 1.0
+        row = f"{record}->{witness}:{mode}:{score:.6f}"
+        query_mapping.add(row)
+        query_class_records[mode].add(record)
+        query_class_rows[mode].add(row)
+
+    split_exact = query_class_records["EXACT"]
+    split_nonexact = (
+        query_class_records["IMAGE_BASENAME"]
+        | query_class_records["NORMALIZED"]
+    )
+    query_mapping_ok &= (
+        set(SPLIT_QUERY_WITNESSES) == split_nonexact
+        and mapped_lines == set(union)
+        and len(mapped_lines) == len(split_records)
+        and set().union(*query_class_records.values()) == split_records
+        and sum(map(len, query_class_records.values())) == len(split_records)
+    )
     split_query_actual = (len(split_records), digest_records(split_records))
     split_exact_actual = (len(split_exact), digest_records(split_exact))
     split_nonexact_actual = (len(split_nonexact), digest_records(split_nonexact))
     query_mapping_actual = (len(query_mapping), digest_records(query_mapping))
+    query_class_actual = {
+        name: (
+            len(query_class_records[name]),
+            digest_records(query_class_records[name]),
+            digest_records(query_class_rows[name]),
+        )
+        for name in query_class_records
+    }
+    query_normalized_minimum = min(query_normalized_scores, default=0.0)
     split_query_ok = (
         split_query_actual == EXPECTED_SPLIT_QUERY
         and split_exact_actual == EXPECTED_SPLIT_QUERY_EXACT
         and split_nonexact_actual == EXPECTED_SPLIT_QUERY_NONEXACT
         and query_mapping_actual == EXPECTED_SPLIT_QUERY_MAPPING
+        and query_class_actual == EXPECTED_SPLIT_QUERY_CLASSES
+        and round(query_normalized_minimum, 6)
+        == EXPECTED_SPLIT_QUERY_NORMALIZED_MINIMUM
         and query_mapping_ok
     )
     ok &= split_query_ok
@@ -1252,7 +1344,10 @@ def main() -> int:
         *split_exact_actual,
         *split_nonexact_actual,
         *query_mapping_actual,
+        f"normalized_min={query_normalized_minimum:.6f}",
     )
+    for name, actual in query_class_actual.items():
+        print("split_query_class_" + name, *actual)
 
     retained_crosswalk: set[str] = set()
     retained_owner_records: set[str] = set()
