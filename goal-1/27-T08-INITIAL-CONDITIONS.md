@@ -378,7 +378,7 @@ for every 0 <= t <= h.
 
 One-step agreement is insufficient: a radius-one crop with one halo cell can pass at `t=1` and fail at `t=2`. Approximate/truncated lowerings instead carry an explicit error/scope claim. The event-zero background is not a boundary value that persists through time: a rule may change every background cell after the first step.
 
-After native construction or a validated exact lowering, the runner remains:
+Native execution after construction and validation remains:
 
 ```text
 active = FRONTIER.select(X_t)
@@ -388,6 +388,8 @@ X_t1   = UPDATE.apply(X_t, active, writes)
 ```
 
 No line below event zero inspects a T08 family tag. `P`, its FRONTIER, NEIGHBORHOOD, RULE, UPDATE, successor cardinality, and object identity are unchanged when `X_0` changes.
+
+An exact finite lowering may run a structurally derived work specification through the same generic runner, using the recorded valid-locus schedule or proof-irrelevant edge completion. That work specification and its trace are computation-realization data, not a mutation of `P` or a native trace; only the horizon-scoped decoded observations covered by the commuting proof are claimed equivalent.
 
 Keep the identities separate:
 
