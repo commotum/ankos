@@ -2754,6 +2754,8 @@ def assert_hostile_validation() -> dict[str, int]:
     assert "raster" not in PatchWrite.__dataclass_fields__
     assert "pose" not in PatchWrite.__dataclass_fields__
     assert len({read.label for read in reads}) == 2
+    assert rejections == 81
+    assert typed_invalid_outcomes == 2
 
     return {
         "hostile_rejections": rejections,
@@ -2770,7 +2772,7 @@ def semantic_digest(counts: dict[str, int]) -> str:
 
 
 EXPECTED_SEMANTIC_DIGEST = (
-    "a472758fad406246b9a3fccaf7b24a8b314986aaca7424206d936a987724a9eb"
+    "e380704a0626ad7a578e0937007cfa6ea8cc0dd6cee1b8c2d24a7eab18b7c57c"
 )
 
 
@@ -2823,6 +2825,10 @@ def main() -> None:
         + counts["total.bag_stepresult_commutations"]
         + counts["total.rank1_mosaic_commutations"]
     )
+    assert counts["total.native_generic_events"] == 6_667
+    assert counts["total.bag_stepresult_commutations"] == 6_658
+    assert counts["total.rank1_mosaic_commutations"] == 16_709
+    assert counts["total.commuting_proofs"] == 30_034
     digest = semantic_digest(counts)
     assert digest == EXPECTED_SEMANTIC_DIGEST, (digest, counts)
 
@@ -2907,6 +2913,10 @@ def main() -> None:
         "new_T26_UPDATE_algebra=NONE;new_executor=NONE;T28_contextual_choice=SEPARATE"
     )
     print(f"hostile_rejections={groups['hostile']['hostile_rejections']}")
+    print(
+        "typed_incompatible_no_commit_outcomes="
+        f"{groups['hostile']['typed_incompatible_no_commit_outcomes']}"
+    )
     print(f"semantic_digest={digest}")
 
 
