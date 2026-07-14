@@ -1,6 +1,6 @@
 # 44-T38-VARIABLE-RECURRENCE
 
-Status: **IN PROGRESS — FIRST-PRINCIPLES SOURCE, ACCESS, AND REPRESENTATION AUDIT ACTIVE**
+Status: **COMPLETE — EVIDENCE, ASSETS, SEMANTICS, ARCHITECTURE, AND HOSTILE REVIEW CLOSED**
 
 ## Current Facts
 
@@ -15,6 +15,7 @@ Status: **IN PROGRESS — FIRST-PRINCIPLES SOURCE, ACCESS, AND REPRESENTATION AU
 - The page-144 JPEG ends midway through its lower small-plot row: the eight formulas/seeds/term rows and panels (a)-(d) are present, but lower panels (e)-(h) are cropped. No missing curve samples or plot extents may be invented.
 - The eight strict rules share T37's unique endpoint source and one-term persistent append. T38 changes the old-prefix access expression, not configuration topology, write shape, UPDATE, runner, or executor.
 - The `invalid_index_policy` menu in the taxonomy note is not source authority. Primary-source conformance treats an actually demanded non-old-prefix reference as an undefined attempted step: the common no-commit error envelope retains the last complete prefix and commits no event.
+- D138 is classes 1–3 only. T38 reuses T37's configuration, endpoint FRONTIER, endpoint write, trace semantics, and T16 splice; it adds a closed, program-coupled computed-address selector/read witness within the existing NEIGHBORHOOD/loci responsibility. No new execution algebra is established.
 
 ## Updated Assumptions
 
@@ -44,7 +45,7 @@ Reconstruct T38 as a closed data-dependent old-prefix access profile over T37's 
 
 ## Primary Strict Profiles to Verify
 
-The page-144 plate visibly supplies the following eight rules and term-row horizons. These transcriptions remain provisional until the asset oracle independently binds every glyph, seed, visible row, and regenerated prefix.
+The page-144 plate supplies the following eight rules and term-row horizons. The asset oracle independently hash-binds and transcribes them, the semantic oracle regenerates every displayed term from a separate structural program, and the integration gate equates all eight formulas, seeds, horizons, and 340 visible values.
 
 | Row | Closed recurrence | Fresh seed | Visible terms |
 |---|---|---|---:|
@@ -77,11 +78,11 @@ next     = SingleSpliceUpdate.apply(configuration, active, writes)
 
 `ComputedPrefixAccess` evaluates only closed integer address nodes and returns a replayable ordered read DAG. Each syntactic `TermAt(address_expr)` occurrence is retained and records the target index, evaluated address, source term handle/value, expression path, demand order, and exact program provenance. Fixed T37 lag `k` is the restriction `TermAt(TargetIndex - Literal(k))`; T38 generalizes this responsibility rather than creating a family executor. D022 already permits a typed program-coupled selector/access component when one authoritative closed program supplies both applicability and the value used by RULE; this is not a callback loophole.
 
-On success, RULE receives the resolved read tree, computes only the exact value, and replaces `End(n)` with `Val(n,next_value) · End(n+1)`; T16's atomic single splice preserves every old value. If a demanded address is nonintegral, below the origin, current/future, or otherwise absent, access returns the common zero-successor `Error(UndefinedTermReference)` with the complete old prefix and ordered failure witness. No write or event exists, and UPDATE is not invoked. This follows T35/T43 partial-evaluation precedent. `Invalid` remains appropriate for malformed AST/type/seed inputs before execution; T26's `Invalid(IncompatibleMosaic)` is an UPDATE-composition failure and is not the T38 analogue.
+On success, RULE receives the resolved read tree, computes only the exact value, and replaces `End(n)` with `Val(n,next_value) · End(n+1)`; T16's atomic single splice preserves every old value. The strict integer AST cannot produce a nonintegral address: noninteger nodes are construction-invalid. If an evaluated exact address is below the origin, current/future, or otherwise absent, access returns the common zero-successor `Error(UndefinedTermReference)` with the complete old prefix and ordered failure witness. No write or event exists, and UPDATE is not invoked. This follows T35/T43 partial-evaluation precedent. `Invalid` remains appropriate for malformed AST/type/seed inputs before execution; T26's `Invalid(IncompatibleMosaic)` is an UPDATE-composition failure and is not the T38 analogue.
 
-## First-Principles Architecture Matrix
+## Final First-Principles Architecture Matrix
 
-| Responsibility | Provisional class | Smallest reusable construction | T38 delta to prove |
+| Responsibility | Class | Smallest reusable construction | Closed T38 delta |
 |---|---:|---|---|
 | DOMAIN/configuration | 1 | D070/T37 complete consecutive exact prefix in discrete `t+1D` | Strict origin-one positive-integer preset only |
 | FRONTIER | 1 | T37 unique tagged `End(n)` | No T38 selector |
@@ -102,27 +103,25 @@ The computed access cannot be replaced by one T37 fixed lag: row (a) demands lag
 | DOMAIN/support | Dense fixed shapes over canonical `[t,x,y,z]` | Add/reuse T37 dynamic ordered `t+1D` prefix support; term index is not stored rollout time |
 | ALPHABET/value | Finite enumerated `int/float/str` values | Reuse planned arbitrary-precision exact positive-integer values; no object-array packing |
 | FRONTIER | Fixed time-slice selection | Reuse the unique endpoint responsibility through a structural `End` selector |
-| NEIGHBORHOOD/loci | Static coordinate offsets and callable predicates | Add closed state-dependent address selectors/read DAGs; never use Python indexing or an unrestricted predicate |
+| NEIGHBORHOOD/loci | Static coordinate offsets and callable predicates | Generalize loci with closed state-dependent address selectors/read DAGs; never use Python indexing or an unrestricted predicate |
 | RULE | Family strings, finite tables, unrestricted `formulaic` callable | Use a closed recurrence/address AST with exact integer operations and structural identity |
 | UPDATE | Fixed-support assignment/copy-forward | Reuse T16 single-splice lowering proved by T37/D072 |
 | Runner | Named-family branches for current temporal families | Migrate through the shared structural runner; no `variable_recurrence` branch |
 | Seeds/traces | Packed scalar history pairs and fixed NumPy episodes | Use exact consecutive seeds/checkpoints and compact prefix+append events/read DAGs |
 
-## Evidence and Oracle Work Plan
+## Evidence and Oracle Closure
 
-1. Build redundant source-query lanes for the main prose, dynamic-reference formulae, meaningless-index boundary, exact asset names, Notes memoization/evaluation, cases (c)/(d)/(e)/(f), p/q address plots, evaluation trees, Conway/Hofstadter history, actual Index aliases, and broad recursive-function false positives.
-2. Partition every pre-Index and actual-Index hit into native, relation, control, or exclusion; reverse-close every governed line to a unique structural split owner with explicit OCR repairs and zero unresolved candidates.
-3. Bind `_page_144_Figure_3.jpeg`, `_page_145_Figure_1.jpeg`, `_page_922_Figure_2.jpeg`, every adjacent candidate, monolith/split reference, path, size, dimensions, SHA, role, assembly, and pixel-semantics boundary.
-4. Independently transcribe and regenerate all eight rules, seeds, visible prefixes, page-145 formulas, and any exact p/q/evaluation-tree data recoverable from the governed assets. Keep plotted/statistical claims qualified where pixels do not yield exact samples.
-5. Evaluate each program two ways: a direct mathematical recurrence and a generic structural access/read-DAG/RULE/splice path. Commute complete `StepResult`, prefix/tag state, reads, writes, lineage, and compact traces one event at a time.
-6. Exhaustively exercise every address-expression node, nested read, leftmost-innermost order, same-value/different-index occurrence, old-snapshot restriction, malformed/noninteger/current/future/nonpositive address, invalid demanded versus algebraically cancelable reference, and cross-program replay.
-7. Generate long exact traces for all eight source presets; check every address before access, positivity, one-term growth, source statements, arbitrary precision, page-131 exact formulae, and observer boundaries without strengthening empirical claims.
-8. Audit `simple_programs.md`, `src/ca`, T16/T37/T39/T43, the design ledger, architecture audit, plan, evidence index, and Goal 2 handoff before proposing any new public type.
+1. Seventeen frozen source-query lanes close 102 unique monolith hits at `83 pre-Index / 19 actual-Index`. The pre-Index query partition is `14 native / 13 relation / 24 control / 32 exclusion`; the complete governed evidence partition is `20 / 36 / 44` with 49 explicit continuations. Actual Index closes at `3 / 9 / 6 / 1`, with the last row a guarded nested-sequence collision.
+2. The complete retained/routed/guarded-image crosswalk closes 124 unique split owners at `98 exact / 15 image-basename / 11 normalized`, normalized minimum `0.999817`. Twenty-five Book semantic guards, five auxiliary guards, seven defect/limitation records, 22 source-model records, 15 image dispositions, and every query/partition/Index contract are digest-bound; unresolved count is zero.
+3. Four governed rasters at `3 native / 1 relation / 0 control` and eleven exclusions bind 30 monolith/split references, 15 unique hashes, 653,438 bytes, and nine semantic assemblies. All four governed files are hash-bound; two are additionally limited-transcribed; none is pixel-replayed. Five semantic manifests freeze 51 records, including all eight rules/seeds/rows and the page-144 crop boundary.
+4. The semantic oracle independently closes 325 visible append events and 1,122 ordered demands, 2,033 longer events and 7,114 demands, 325 prefix/tag/splice commutations, 97 fixed-lag restriction commutations, 64 bounded-window counterexamples, ten partiality/error cases within 14 hostile scenarios, 4,096 page-131 observer checks, 64 arbitrary-precision events up to 4,103 bits, ten compact lossless trace reconstructions, and 42 hostile rejections.
+5. Direct literal equations and the generic `FRONTIER.select -> NEIGHBORHOOD.read -> RULE -> UPDATE.apply` path agree event by event. The asset/semantic integration gate equates eight formulas, eight seeds, eight horizons, and all 340 visible terms. The full witness trace is distinguished from D073's compact seed-plus-append projection, including zero-event and terminal-attempt replay.
+6. Current-runtime inspection confirms the implementation delta belongs under closed loci/NEIGHBORHOOD selection and exact value/program schemas. Existing fixed tensor selectors and callable predicates do not yet encode dependent old-prefix addresses safely; this is a bounded generalization of an axis, not a T38 branch, state class, UPDATE, or executor.
 
-## Provisional Corrected Goal 2 Handoff
+## Corrected Goal 2 Handoff
 
 - Reuse D070's `NumericPrefix`, origin/index/value invariants, exact seeds/checkpoints, tagged `Val* · End`, unique endpoint FRONTIER, append event, compact trace, and D072/T16 one-splice lowering.
-- Generalize T37 fixed-lag access into closed `TermAt(AddressExpr)` nodes over exact `Literal`, `TargetIndex`, ordered `Add/Sub/Mul`, and nested old-prefix term reads. T37 fixed lag remains a named restriction.
+- Generalize the existing loci/NEIGHBORHOOD access responsibility from T37 fixed lags into closed `TermAt(AddressExpr)` selectors over exact `Literal`, `TargetIndex`, ordered `Add/Sub/Mul`, and nested old-prefix term reads. T37 fixed lag remains a named restriction.
 - Return ordered replayable access DAGs with stable old-prefix term handles, expression paths, exact address values, demanded order, and structural program provenance.
 - Preserve source leftmost-innermost demand for partial expressions. Do not algebraically canonicalize across potentially failing reads or erase source order from structural identity.
 - Route an actually demanded invalid address through the common no-commit `Error(UndefinedTermReference)` envelope with zero successors and no event. Add no T38-specific terminal/outcome class or policy menu.
@@ -148,14 +147,18 @@ The computed access cannot be replaced by one T37 fixed lag: row (a) demands lag
 
 ## Completion Requirements
 
-- [ ] Every main, Notes, history, actual-Index, split, asset, alias, relation, control, and false-positive candidate is dispositioned with zero unresolved mechanics.
-- [ ] All eight raster rules/seeds/visible rows and every text-backed formula are independently transcribed, regenerated, and provenance-bound.
-- [ ] Complete prefix, origin/carrier, endpoint, computed access, ordered demand, RULE/write, UPDATE lowering, outcome, trace, and checkpoint semantics are exact.
-- [ ] Successful generic events commute one step at a time with direct recurrences and the T16 tagged-prefix representation.
-- [ ] Invalid addresses, evaluation order, partiality, source safety claims, observer/evaluator boundaries, and empirical qualifications are explicit and adversarially tested.
-- [ ] Source, asset, semantic, runtime-fit, hostile, portability, fail-closed, mode, Markdown, diff, scope, and repository-test gates pass.
-- [ ] D138, plan, evidence index, design ledger, architecture audit, and Goal 2 handoff are synchronized without a T38 state/update/executor.
+- [x] Every main, Notes, history, actual-Index, split, asset, alias, relation, control, and false-positive candidate is dispositioned with zero unresolved mechanics.
+- [x] All eight raster rules/seeds/visible rows and every text-backed formula are independently transcribed, regenerated, and provenance-bound.
+- [x] Complete prefix, origin/carrier, endpoint, computed access, ordered demand, RULE/write, UPDATE lowering, outcome, trace, and checkpoint semantics are exact.
+- [x] Successful generic events commute one step at a time with direct recurrences and the T16 tagged-prefix representation.
+- [x] Invalid addresses, evaluation order, partiality, source safety claims, observer/evaluator boundaries, and empirical qualifications are explicit and adversarially tested.
+- [x] Source, asset, semantic, runtime-fit, hostile, portability, fail-closed, mode, Markdown, diff, scope, and repository-test gates pass.
+- [x] D138, plan, evidence index, design ledger, architecture audit, and Goal 2 handoff are synchronized without a T38 state/update/executor.
 
 ## Stage Results
 
-In progress. The primary semantic boundary and smallest reusable architecture are reconstructed; exhaustive source, asset, semantic, runtime, integration, and hostile-review closure remain pending.
+D138 closes T38 as a class-2 computed old-prefix access specialization over classes 1 and 3 reuse. Strict configuration is T37's complete positive origin-one `NumericPrefix` in discrete `t+1D`; FRONTIER is its unique `End(n)`; RULE emits its existing `End(n) -> Val(n,value) · End(n+1)` replacement; UPDATE is D072's lossless lowering to T16 exactly-one splice. The only new named responsibility is a closed dependent address selector/read DAG inside loci/NEIGHBORHOOD, with exact structural identity and leftmost-innermost occurrence witnesses. Fixed lag is a restriction of the same expression algebra.
+
+An actually demanded address outside `[1,n)` returns the common zero-successor no-commit `Error(UndefinedTermReference)` and retains the last complete prefix; malformed programs and seeds remain construction-invalid. The strict AST admits only exact integers. Memoization is an implementation of visible prefix state, while digit formulae, fluctuation plots, p/q graphs, evaluation trees, sounds, and primitive-recursive classifications remain observers or relations. The guarded BOOK12738 repair prepends exactly one missing initial `1`, corroborated independently by BOOK12742; cropped pixels and empirical randomness/totality claims are not invented.
+
+Oracle SHAs are source `1199125cd72abe8ba56a1d97534ee855a176acfc4fe510e5339912b45d3d1045`, asset `95a45d1d079309a0b56fff8411be3cae66aaf31fdd38d49411a62c50f5b887e2`, and semantic `8c18745fffe49d69e494ace35f2f44155cbf86f2c76c56d3a0a9bb340badfc80`; semantic digest is `faee16f26234a7b90da40e8642ddef63224898ac217e436efd9091df7f3764b9`. Root/relocated/import/compile/optimized/bad-usage, cross-interface, mutation, mode, Markdown, diff, scope, repository-test, and independent hostile-review gates pass. No prior stage reopens. Next: T40.

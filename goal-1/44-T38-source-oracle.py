@@ -923,7 +923,10 @@ def main(argv: list[str] | None = None) -> int:
         digest_records(auxiliary_records),
     )
 
-    defect_actual = (len(SOURCE_DEFECT_RECORDS), digest_records(SOURCE_DEFECT_RECORDS))
+    defect_actual = (
+        len(SOURCE_DEFECT_GUARD_RECORDS),
+        digest_records(SOURCE_DEFECT_GUARD_RECORDS),
+    )
     model_actual = (len(SOURCE_MODEL_RECORDS), digest_records(SOURCE_MODEL_RECORDS))
     role_actual = (len(IMAGE_ROLE_RECORDS), digest_records(IMAGE_ROLE_RECORDS))
     exclusion_reason_records = {
@@ -958,7 +961,8 @@ def main(argv: list[str] | None = None) -> int:
     record_contract_ok &= (
         semantic_ok
         and auxiliary_ok
-        and len(SOURCE_DEFECT_RECORDS) == len(set(SOURCE_DEFECT_RECORDS))
+        and SOURCE_DEFECT_GUARD_RECORDS == frozenset(SOURCE_DEFECT_RECORDS)
+        and len(SOURCE_DEFECT_RECORDS) == len(SOURCE_DEFECT_GUARD_RECORDS)
         and len(SOURCE_MODEL_RECORDS) == len(set(SOURCE_MODEL_RECORDS))
         and set(IMAGE_EXCLUSION_REASONS) == set(EXCLUDED_IMAGE_LINES)
     )
