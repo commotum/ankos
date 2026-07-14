@@ -13,7 +13,10 @@ The strict read is an explicit composition of SelfAccess and all eight Moore
 offsets.  Native square-lattice support, finite realizations, coordinate-frame
 adapters, and views remain separate.  Compact 18-case outer-totalistic and
 10-case equal-sum tables are schema-tagged representations of qualifying
-512-context maps, never executor modes.
+512-context maps, never executor modes.  The source's broader finite-k,
+dimension-d profile is separately represented by a complete table indexed as
+``Self + k*FullTotal`` with exactly
+``k*((3**d - 1)*(k - 1) + 1)`` entries.
 """
 
 from __future__ import annotations
@@ -365,6 +368,51 @@ class BinaryTotalistic:
         return (self.code >> (read.center + sum(read.neighbors))) & 1
 
 
+def full_total_product_case_count(dimension: int, alphabet_size: int) -> int:
+    """BOOK:13475-13481 count for Self + k*FullTotal profiles."""
+
+    checked_dimension = require_int(dimension, "profile dimension")
+    if checked_dimension <= 0:
+        raise ValueError("profile dimension must be positive")
+    alphabet = FiniteAlphabet(alphabet_size)
+    surrounding_slots = 3**checked_dimension - 1
+    full_total_values = surrounding_slots * (alphabet.size - 1) + 1
+    return alphabet.size * full_total_values
+
+
+@dataclass(frozen=True)
+class FullTotalProduct:
+    """Finite-k table indexed by Self + k*sum(surrounding values).
+
+    This is the source's dimension/alphabet generalization of the compact
+    Moore profile.  It is deliberately not the strict binary T22 code type.
+    """
+
+    dimension: int
+    alphabet_size: int
+    outputs: tuple[int, ...]
+    neighbor_slots: int = field(init=False)
+
+    def __post_init__(self) -> None:
+        dimension = require_int(self.dimension, "profile dimension")
+        if dimension <= 0:
+            raise ValueError("profile dimension must be positive")
+        alphabet = FiniteAlphabet(self.alphabet_size)
+        slots = 3**dimension - 1
+        raw = require_tuple(self.outputs, "full-total product outputs")
+        expected = alphabet.size * (slots * (alphabet.size - 1) + 1)
+        if len(raw) != expected:
+            raise ValueError("full-total product table is incomplete")
+        for value in raw:
+            alphabet.check(value, "full-total product output")
+        object.__setattr__(self, "neighbor_slots", slots)
+
+    def evaluate(self, read: LocalRead) -> int:
+        validate_read(read, self.alphabet_size, self.neighbor_slots)
+        index = read.center + self.alphabet_size * sum(read.neighbors)
+        return self.outputs[index]
+
+
 @dataclass(frozen=True)
 class GeneralLookup:
     """Complete positional table over center followed by ordered offsets."""
@@ -392,7 +440,7 @@ class GeneralLookup:
         return self.outputs[index]
 
 
-Rule = BinaryOuterTotalistic | BinaryTotalistic | GeneralLookup
+Rule = BinaryOuterTotalistic | BinaryTotalistic | FullTotalProduct | GeneralLookup
 
 
 def projection_rule(alphabet_size: int, slots: int, selected: int) -> GeneralLookup:
@@ -567,12 +615,22 @@ class CAProgram:
             raise TypeError("program alphabet must be FiniteAlphabet")
         if type(self.neighborhood) is not LocalAccess:
             raise TypeError("program neighborhood must be LocalAccess")
-        if type(self.rule) not in (BinaryOuterTotalistic, BinaryTotalistic, GeneralLookup):
+        if type(self.rule) not in (
+            BinaryOuterTotalistic,
+            BinaryTotalistic,
+            FullTotalProduct,
+            GeneralLookup,
+        ):
             raise TypeError("unsupported closed rule schema")
         if self.alphabet.size != self.rule.alphabet_size:
             raise ValueError("rule and alphabet disagree")
         if self.neighborhood.slots != self.rule.neighbor_slots:
             raise ValueError("rule and neighborhood arities disagree")
+        if (
+            type(self.rule) is FullTotalProduct
+            and self.neighborhood.dimension != self.rule.dimension
+        ):
+            raise ValueError("profile and neighborhood dimensions disagree")
 
 
 def strict_t22_program(rule: Rule) -> CAProgram:
@@ -873,6 +931,33 @@ def native_totalistic_step(code: int, old: Native2DState) -> Native2DState:
         for column in range(old.shape[1])
     )
     return Native2DState(2, old.shape, old.boundary, values)
+
+
+def native_full_total_product_step(
+    outputs: tuple[int, ...], old: Native2DState
+) -> Native2DState:
+    """Independent literal 2D evaluator for Self + k*FullTotal."""
+
+    raw = require_tuple(outputs, "native full-total product outputs")
+    alphabet = FiniteAlphabet(old.alphabet_size)
+    expected = alphabet.size * (8 * (alphabet.size - 1) + 1)
+    if len(raw) != expected:
+        raise ValueError("native full-total product table is incomplete")
+    for value in raw:
+        alphabet.check(value, "native full-total product output")
+    values: list[int] = []
+    for row in range(old.shape[0]):
+        for column in range(old.shape[1]):
+            context = native_book_context(old, row, column)
+            center = context[4]
+            full_total = sum(context[:4]) + sum(context[5:])
+            values.append(raw[center + alphabet.size * full_total])
+    return Native2DState(
+        alphabet.size,
+        old.shape,
+        old.boundary,
+        tuple(values),
+    )
 
 
 def native_projection_step(position: int, old: Native2DState) -> Native2DState:
@@ -1343,6 +1428,69 @@ def assert_basis_permutation() -> dict[str, int]:
     return {"context_cases": context_cases, "basis_cases": basis_cases}
 
 
+def assert_full_total_product_generalization() -> dict[str, int]:
+    """Certify BOOK:13475-13481 beyond the strict binary T22 schemas."""
+
+    expected_counts = {
+        (1, 2): 6,
+        (2, 2): 18,
+        (3, 2): 54,
+        (1, 3): 15,
+        (2, 3): 51,
+        (3, 3): 159,
+        (2, 4): 100,
+    }
+    for (dimension, alphabet_size), expected in expected_counts.items():
+        slots = 3**dimension - 1
+        full_total_values = slots * (alphabet_size - 1) + 1
+        assert full_total_product_case_count(dimension, alphabet_size) == expected
+        assert expected == alphabet_size * full_total_values
+
+    # All 3^9 ternary Moore contexts hit precisely the 51 source-defined
+    # Self x FullTotal cases.  The fiber counts are checked independently.
+    outputs = tuple(
+        ((index // 3) + 2 * (index % 3)) % 3
+        for index in range(full_total_product_case_count(2, 3))
+    )
+    rule = FullTotalProduct(2, 3, outputs)
+    fibers = [0] * len(outputs)
+    for book_context in product(range(3), repeat=9):
+        center = book_context[4]
+        neighbors = book_context[:4] + book_context[5:]
+        index = center + 3 * sum(neighbors)
+        assert rule.evaluate(LocalRead(center, neighbors)) == outputs[index]
+        fibers[index] += 1
+    neighbor_sum_counts = [0] * 17
+    for neighbors in product(range(3), repeat=8):
+        neighbor_sum_counts[sum(neighbors)] += 1
+    assert all(count > 0 for count in fibers)
+    assert sum(fibers) == 3**9
+    for full_total, multiplicity in enumerate(neighbor_sum_counts):
+        for center in range(3):
+            assert fibers[center + 3 * full_total] == multiplicity
+
+    # The generalized profile overlaps the binary outer-totalistic function
+    # space losslessly, but the strict T22 integer-code schema stays distinct.
+    binary_code = 174826
+    strict_binary = BinaryOuterTotalistic(binary_code, 8)
+    product_binary = FullTotalProduct(
+        2,
+        2,
+        tuple((binary_code >> index) & 1 for index in range(18)),
+    )
+    assert type(strict_binary) is BinaryOuterTotalistic
+    assert type(product_binary) is FullTotalProduct
+    for context in product((0, 1), repeat=9):
+        read = LocalRead(context[0], context[1:])
+        assert strict_binary.evaluate(read) == product_binary.evaluate(read)
+
+    return {
+        "formula_cases": len(expected_counts),
+        "ternary_table_cases": len(outputs),
+        "ternary_contexts": sum(fibers),
+    }
+
+
 def assert_native_generic_commutation() -> dict[str, int]:
     periodic = PeriodicBoundary()
     binary_states = tuple(product((0, 1), repeat=4))
@@ -1352,7 +1500,8 @@ def assert_native_generic_commutation() -> dict[str, int]:
         "general_basis": 0,
         "directional": 0,
         "named": 0,
-        "ternary": 0,
+        "ternary_projection": 0,
+        "ternary_full_total": 0,
     }
 
     # Each local result selects exactly one compact-table bit.  Zero, full,
@@ -1431,7 +1580,22 @@ def assert_native_generic_commutation() -> dict[str, int]:
         native = Native2DState(3, (2, 2), periodic, cells)
         direct = native_projection_step(8, native)
         assert decode_generic(generic_step(ternary_program, encode_native(native))) == direct
-        counts["ternary"] += 1
+        counts["ternary_projection"] += 1
+
+    ternary_outputs = tuple(
+        ((index // 3) + 2 * (index % 3)) % 3
+        for index in range(full_total_product_case_count(2, 3))
+    )
+    ternary_full_total = strict_t22_program(
+        FullTotalProduct(2, 3, ternary_outputs)
+    )
+    for cells in product(range(3), repeat=4):
+        native = Native2DState(3, (2, 2), periodic, cells)
+        direct = native_full_total_product_step(ternary_outputs, native)
+        assert decode_generic(
+            generic_step(ternary_full_total, encode_native(native))
+        ) == direct
+        counts["ternary_full_total"] += 1
 
     assert counts == {
         "outer_basis": 320,
@@ -1439,7 +1603,8 @@ def assert_native_generic_commutation() -> dict[str, int]:
         "general_basis": 514,
         "directional": 225,
         "named": 3,
-        "ternary": 81,
+        "ternary_projection": 81,
+        "ternary_full_total": 81,
     }
     return counts
 
@@ -1613,6 +1778,16 @@ def assert_hostile_validation() -> None:
     expect_raises(ValueError, lambda: BinaryOuterTotalistic(1 << 18, 8))
     expect_raises(TypeError, lambda: BinaryTotalistic(False, 8))
     expect_raises(ValueError, lambda: BinaryTotalistic(1 << 10, 8))
+    expect_raises(TypeError, lambda: full_total_product_case_count(True, 3))
+    expect_raises(ValueError, lambda: full_total_product_case_count(0, 3))
+    expect_raises(TypeError, lambda: FullTotalProduct(True, 3, (0,) * 51))
+    expect_raises(TypeError, lambda: FullTotalProduct(2, False, (0,) * 51))
+    expect_raises(TypeError, lambda: FullTotalProduct(2, 3, [0] * 51))
+    expect_raises(ValueError, lambda: FullTotalProduct(2, 3, (0,) * 50))
+    expect_raises(
+        TypeError,
+        lambda: FullTotalProduct(2, 3, (*((0,) * 50), False)),
+    )
     expect_raises(ValueError, lambda: GeneralLookup(2, 8, (0,) * 511))
     expect_raises(TypeError, lambda: GeneralLookup(2, 1, (0, 0, 0, False)))
     expect_raises(TypeError, lambda: strict_general_from_code(True))
@@ -1625,6 +1800,18 @@ def assert_hostile_validation() -> None:
 
     alphabet = FiniteAlphabet(2)
     topology = FiniteGrid((2, 2), FixedBoundary(0))
+    one_dimensional_eight_offsets = make_access(
+        ((-4,), (-3,), (-2,), (-1,), (1,), (2,), (3,), (4,)),
+        4,
+    )
+    expect_raises(
+        ValueError,
+        lambda: CAProgram(
+            FiniteAlphabet(3),
+            one_dimensional_eight_offsets,
+            FullTotalProduct(2, 3, (0,) * 51),
+        ),
+    )
     expect_raises(
         TypeError,
         lambda: GridConfiguration(alphabet, topology, [0, 0, 0, 0], SnapshotToken(0)),
@@ -1723,6 +1910,7 @@ def main() -> None:
     assert_named_rules()
     representation_counts = assert_rule_representations()
     permutation_counts = assert_basis_permutation()
+    generalized_counts = assert_full_total_product_generalization()
     commutation_counts = assert_native_generic_commutation()
     assert_aliasing_and_parallelism()
     assert_support_boundary_and_background()
@@ -1731,7 +1919,7 @@ def main() -> None:
     assert_decision_matrix()
 
     commutations = sum(commutation_counts.values())
-    assert commutations == 1_335
+    assert commutations == 1_416
     print("T22 semantic oracle: PASS")
     print(f"native_generic_commutations={commutations}")
     print(
@@ -1741,7 +1929,8 @@ def main() -> None:
         f"general_basis:{commutation_counts['general_basis']},"
         f"directional:{commutation_counts['directional']},"
         f"named:{commutation_counts['named']},"
-        f"ternary:{commutation_counts['ternary']}"
+        f"ternary_projection:{commutation_counts['ternary_projection']},"
+        f"ternary_full_total:{commutation_counts['ternary_full_total']}"
     )
     print(
         f"outer_18_case_tables={representation_counts['outer_tables']} "
@@ -1753,6 +1942,13 @@ def main() -> None:
     print(f"book_to_ENU_table_basis_cases={permutation_counts['basis_cases']}")
     print("named_codes=175850,746,174826 reconstructed_from_source_predicates=PASS")
     print("rule_counts=2^512_general,2^18_outer,2^10_equal_sum,2^9_growth")
+    print(
+        "generalized_profile=self+k*FullTotal; "
+        "table_length=k*((3^d-1)*(k-1)+1); "
+        f"formula_cases={generalized_counts['formula_cases']}; "
+        f"ternary_d2_cases={generalized_counts['ternary_table_cases']}; "
+        f"ternary_contexts={generalized_counts['ternary_contexts']}"
+    )
     print("complete_declared_access=Self+eight_Moore_offsets=PASS")
     print("projection_patterns=9x512_bits; nonaliasing_5x5_directional=PASS")
     print("row_column_to_ENU_full_permutation=PASS; naive_resort_counterexample=PASS")

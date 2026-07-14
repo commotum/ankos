@@ -244,6 +244,32 @@ Seed          = IndependentValidatedConfiguration
 
 This composition is a hypothesis to test, not a family API mandate. Public spelling remains a synthesis choice.
 
+### Candidate Goal 2 implementation delta
+
+1. Reuse the synthesis-selected T21 fixed square-lattice configuration, `AllSites`, complete old-snapshot reads, same-site label assignment, snapshot-parallel UPDATE, deterministic `StepResult`, support/realization separation, and coordinate-frame adapter unchanged.
+2. Express the Moore shell through ordinary explicit offsets or the existing `L_infinity` radius constructor. If a named preset is exposed, it must return that structural access specification and may not select execution.
+3. Reuse the complete ordered-context table for the nine-position general rule. Add only source-pinned case descriptors for `(SelfValue,NeighborValueSum)`, all-nine value sum, and the monotone-black growth restriction. Their expansion/factorization maps operate on closed table data.
+4. Make table schema part of program/code identity. A bare integer such as `224`, `746`, or `174826` is insufficient without alphabet, access order/frame, case schema, digit convention, and table length.
+5. Retain arbitrary-precision rule serialization and complete typed tables. Vectorized finite realizations may choose a different table storage, but `numpy.int64` cannot define the program range.
+6. Keep Life, HighLife, named class-4 codes, code-746 circle/roughness observations, and code-174826 growth structures as presets or analyzers at the exact evidence-backed boundary. None changes the runner.
+7. Permit sparse live-cell execution only as a separately proved lowering for a compatible background rule. The native configuration remains complete, and the sparse algorithm must commute with one native event.
+8. Reuse T08 seed/configuration records for single cells, finite rows/blocks, random fields, and periodic realizations. Do not put the displayed seed, horizon, crop, or boundary into the Moore program preset.
+
+### Required conformance areas
+
+1. Reconstruct codes `175850`, `746`, and `174826` from their prose predicates and the exact `2*n+s` convention; if source closure admits Life, also reconstruct code `224` from `B3/S23`.
+2. Compare a literal native evaluator with the generic SimpleProgram path on complete source-bound traces and on exhaustive local contexts.
+3. Prove all compact table/code round trips at their natural finite cardinalities, and prove the address/fiber maps independently where enumerating every table-context Cartesian pair would add no coverage.
+4. Reject compact factorization after changing one positional row inside an otherwise equal fiber; reject schema/code interchange even when two serialized integers happen to match.
+5. Prove the full Book-array-to-ENU access and 512-row table permutation using asymmetric projections and an explicit naive-re-sort failure.
+6. Test every one of the nine positional projections on a nonaliasing grid, including the declared center. Symmetric count rules cannot substitute for these cases.
+7. Test `1x1`, `1x2`, `2x1`, and `2x2` periodic realizations so coincident resolved cells retain separate offset occurrences and count multiplicity.
+8. Distinguish old-snapshot parallel commit from in-place scan order with a rule/seed that produces different successors.
+9. Separate native `Z^2`, finite causal work with exterior values, and periodic quotients; validate any sparse background lowering against the complete field.
+10. Validate the generalized `d,k` formula and a nonbinary valuation case, plus T21 cardinal and T23 three-dimensional same-runner controls.
+11. Reject missing/duplicate offsets, implicit or duplicate Self, wrong arity/order/dimension, incomplete tables, out-of-alphabet values, stale reads, wrong targets, duplicate source coverage, and invalid realization mappings before commit.
+12. Demonstrate that `dyadaxes_2d` has the same raw geometry but not the same RULE denotation by giving two neighborhoods with equal majority-gate outputs and different Moore counts/required results.
+
 ## No-Cheating Checks
 
 - No `moore`, `nine_neighbor`, Life, or T22 rollout branch or executor.
