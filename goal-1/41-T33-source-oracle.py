@@ -307,7 +307,7 @@ INDEX_ENTRY_GUARDS = {
         21689: ("non-computable patterns from constraints, 943",),
     },
     "rule30_rule60_forced_pattern_routes": {
-        21994: ("rule 30", "pattern forced by constraints, 221"),
+        21994: ("tiling generating pattern of, 221", "pattern forced by constraints, 221"),
         21998: ("rule 60", "pattern forced by constraints, 220"),
     },
     "sibling_constraint_family_routes": {
@@ -420,7 +420,7 @@ EXPECTED_INDEX_CLASS = {
     "rule30_rule60_forced_pattern_routes": (2, "14c3e7058a177043f01b50e3bbdb3bcb6409d6c160017cd1ab4c03e38e5dc2e5"),
     "sibling_constraint_family_routes": (2, "652197ba4bfd4fa73c7ef5895aa82ceb1223c7f6df5571458699602ace14ff71"),
 }
-EXPECTED_INDEX_GUARDS = (9, "fd34a85f29b0a4d23ccecbd98fe7ae37b2253b2c3a30e7f7100b220fcd92d64a")
+EXPECTED_INDEX_GUARDS = (9, "2e50f088a5eeae8957559956fb0d1431a7bc2ec0dec27915eebfc144142f143a")
 EXPECTED_IMAGE_PARTITION = {
     "native": (7, "bf5973e5ca2bde537bb80ccce7088f447f407f85751c4431becbf97a776c2728"),
     "relation": (11, "bf854a24144520fd1400d906459a8bf243dcfc24cc2b014c770bdf4c1c0e6823"),
@@ -441,13 +441,34 @@ EXPECTED_VISUAL_ONLY_BOUNDARY = (
 EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
-EXPECTED_SPLIT_QUERY = (0, "")
-EXPECTED_SPLIT_QUERY_EXACT = (0, "")
-EXPECTED_SPLIT_QUERY_NONEXACT = (0, "")
-EXPECTED_SPLIT_QUERY_MAPPING = (0, "")
-EXPECTED_SPLIT_RETAINED_EXACT = (0, "")
-EXPECTED_SPLIT_RETAINED_NONEXACT = (0, "")
-EXPECTED_SPLIT_RETAINED_MAPPING = (0, "")
+EXPECTED_SPLIT_QUERY = (
+    64,
+    "84cf62dba74afd494d7e89942ca0deca96cc0357566fcba388adb5113a22d94a",
+)
+EXPECTED_SPLIT_QUERY_EXACT = (
+    51,
+    "0b9bc30e6364ff894bf6572624039613e860a5c36df5f43f732302013313add0",
+)
+EXPECTED_SPLIT_QUERY_NONEXACT = (
+    13,
+    "9cc59d421e10d5c98a34f5eda48a45f31ec4e838bd03b0f1c0046b59961c4fff",
+)
+EXPECTED_SPLIT_QUERY_MAPPING = (
+    13,
+    "9b0d407d52838be4c50dbf81528774820791173b78b97697ba86c4632debe6fe",
+)
+EXPECTED_SPLIT_RETAINED_EXACT = (
+    137,
+    "9f1cf531d41722ad85588f45742253dc162ddb6deb35c4e2b5d6e88be2714e66",
+)
+EXPECTED_SPLIT_RETAINED_NONEXACT = (
+    54,
+    "113c37214feb395ddb7566e368b6605bea64ad4556c09a33dcd71364b99c51ad",
+)
+EXPECTED_SPLIT_RETAINED_MAPPING = (
+    54,
+    "5dab279a862541778c3eac2d6c97e19641a7a765e926b647d58ddc165c5f148e",
+)
 EXPECTED_MONOLITH_ONLY = (
     0,
     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -499,6 +520,7 @@ def main() -> int:
     book = Path(sys.argv[1]).resolve() if len(sys.argv) == 2 else DEFAULT_BOOK
     raw = book.read_bytes()
     lines = raw.decode("utf-8").splitlines()
+    at = lambda line_no: lines[line_no - 1]
     source_ok = (
         len(lines) == EXPECTED_BOOK_LINES
         and hashlib.sha256(raw).hexdigest() == EXPECTED_BOOK_SHA256
@@ -506,7 +528,9 @@ def main() -> int:
         and sha256(CATALOG) == EXPECTED_CATALOG_SHA256
         and sha256(TAXONOMY) == EXPECTED_TAXONOMY_SHA256
     )
+    ok = source_ok
     print("source", "OK" if source_ok else "MISMATCH")
+
     hits: dict[str, set[int]] = {}
     for name, pattern in QUERIES.items():
         found = {
@@ -515,21 +539,576 @@ def main() -> int:
             if re.search(pattern, line, re.IGNORECASE)
         }
         hits[name] = found
-        print(
-            name,
+        actual = (
             len(found),
             sum(n < INDEX_FIRST_LINE for n in found),
             sum(n >= INDEX_FIRST_LINE for n in found),
             digest(found),
-            ",".join(map(str, sorted(found))),
         )
+        good = actual == EXPECTED_QUERY[name]
+        ok &= good
+        print(
+            name,
+            "OK" if good else "MISMATCH",
+            *actual,
+        )
+
     union = set().union(*hits.values())
-    pre = {n for n in union if n < INDEX_FIRST_LINE}
-    index = union - pre
-    print("union", len(union), digest(union), ",".join(map(str, sorted(union))))
-    print("pre", len(pre), digest(pre), ",".join(map(str, sorted(pre))))
-    print("index", len(index), digest(index), ",".join(map(str, sorted(index))))
-    return 0 if source_ok else 1
+    pre_index_union = {n for n in union if n < INDEX_FIRST_LINE}
+    index = union - pre_index_union
+    matched_retained = pre_index_union - set(EXCLUDED)
+    governed = set(RETAINED) - union
+    sets = {
+        "union": union,
+        "pre_index_union": pre_index_union,
+        "index": index,
+        "matched_retained": matched_retained,
+        "governed_continuations": governed,
+        "retained": set(RETAINED),
+        "excluded": set(EXCLUDED),
+        "native": set(NATIVE_EVIDENCE),
+        "relation": set(RELATION_EVIDENCE),
+        "control": set(CONTROL_EVIDENCE),
+        "candidate_images": set(CANDIDATE_IMAGE_LINES),
+        "governed_images": set(GOVERNED_IMAGE_LINES),
+        "excluded_images": set(EXCLUDED_IMAGE_LINES),
+    }
+    for name, values in sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_SET[name]
+        ok &= good
+        print(name, "OK" if good else "MISMATCH", *actual)
+
+    classification_delta = matched_retained ^ set(MATCHED_RETAINED)
+    classification_ok = (
+        not EXCLUDED_CLASS
+        and not EXCLUDED
+        and not classification_delta
+        and MATCHED_RETAINED == RETAINED & pre_index_union
+        and GOVERNED_CONTINUATIONS == RETAINED - union
+    )
+    ok &= classification_ok
+    print(
+        "unresolved_pre_index",
+        "OK" if classification_ok else "MISMATCH",
+        len(classification_delta),
+        *sorted(classification_delta),
+    )
+
+    index_ok = (
+        set().union(*INDEX_CLASS.values()) == index
+        and sum(map(len, INDEX_CLASS.values())) == len(index)
+    )
+    for name, values in INDEX_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_INDEX_CLASS[name]
+        index_ok &= good
+        print(f"index_{name}", "OK" if good else "MISMATCH", *actual)
+    guard_records = {
+        f"{class_name}:{line_no}:{'|'.join(needles)}"
+        for class_name, entries in INDEX_ENTRY_GUARDS.items()
+        for line_no, needles in entries.items()
+    }
+    guards_ok = (
+        set(INDEX_ENTRY_GUARDS) == set(INDEX_CLASS)
+        and all(
+            set(INDEX_ENTRY_GUARDS[class_name]) == set(INDEX_CLASS[class_name])
+            for class_name in INDEX_CLASS
+        )
+        and all(
+            all(needle in at(line_no).lower() for needle in needles)
+            for entries in INDEX_ENTRY_GUARDS.values()
+            for line_no, needles in entries.items()
+        )
+        and (len(guard_records), digest_records(guard_records))
+        == EXPECTED_INDEX_GUARDS
+    )
+    index_ok &= guards_ok
+    ok &= index_ok
+    print(
+        "index_entry_occurrence_guards",
+        "OK" if guards_ok else "MISMATCH",
+        len(guard_records),
+        digest_records(guard_records),
+    )
+    print(
+        "unresolved_index",
+        "OK" if index_ok else "MISMATCH",
+        len(index ^ set(INDEX_ROUTED)),
+    )
+
+    derived_images = {
+        line_no for line_no in RETAINED if IMAGE_RE.fullmatch(at(line_no))
+    }
+    image_sets = {
+        "native": NATIVE_IMAGE_LINES,
+        "relation": RELATION_IMAGE_LINES,
+        "control": CONTROL_IMAGE_LINES,
+    }
+    image_paths_ok = True
+    for line_no in CANDIDATE_IMAGE_LINES:
+        match = IMAGE_RE.fullmatch(at(line_no))
+        image_paths_ok &= match is not None
+        if match is not None:
+            basename = Path(match.group(1)).name
+            image_paths_ok &= len(list(SOURCE_ROOT.rglob(basename))) == 1
+    images_ok = (
+        derived_images == set(GOVERNED_IMAGE_LINES)
+        and sum(map(len, image_sets.values())) == len(GOVERNED_IMAGE_LINES)
+        and set().union(*EXCLUDED_IMAGE_CLASS.values())
+        == set(EXCLUDED_IMAGE_LINES)
+        and sum(map(len, EXCLUDED_IMAGE_CLASS.values()))
+        == len(EXCLUDED_IMAGE_LINES)
+        and CANDIDATE_IMAGE_LINES == GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
+        and not GOVERNED_IMAGE_LINES & EXCLUDED_IMAGE_LINES
+        and not EXCLUDED_IMAGE_LINES & RETAINED
+        and image_paths_ok
+    )
+    for name, values in image_sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_IMAGE_PARTITION[name]
+        images_ok &= good
+        print(f"images_{name}", "OK" if good else "MISMATCH", *actual)
+    for name, values in EXCLUDED_IMAGE_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_EXCLUDED_IMAGE_CLASS[name]
+        images_ok &= good
+        print(f"excluded_images_{name}", "OK" if good else "MISMATCH", *actual)
+    image_ownership_ok = (
+        images_ok
+        and "template that must occur is shown at the center" in at(2640)
+        and "presence of a particular template at the center" in at(2664)
+        and "pair of stacked black cells" in at(2674)
+        and "first template must appear at least somewhere" in at(2684)
+        and "first template appearing at least once" in at(2694)
+        and "two-dimensional substitution system" in at(2316).lower()
+        and "geometrical rule" in at(2326)
+        and "The Problem of Satisfying Constraints" in at(3980)
+        and all(n in CONTROL_IMAGE_LINES for n in (4000, 4002, 4018, 4022, 4030, 4040, 4042, 4044, 4058))
+        and all(n in RELATION_IMAGE_LINES for n in (4074, 4076, 4080))
+        and "Examples of networks determined by constraints" in at(5788)
+        and "presence of pure repetition" in at(6976)
+        and "only 2×2 arrangements" in at(14109)
+        and "Relation to 1D cellular automata" in at(14115)
+        and "Polyominoes" in at(14134)
+        and "successively adding a constant" in at(1457)
+        and "successively multiplying" in at(1467)
+        and "successive powers of 3/2" in at(1489).lower()
+        and "fractional parts of successive powers" in at(1495)
+        and "piecewise" not in at(1495).lower()
+        and "if the number at a particular step is even" in at(1499)
+        and "multiway system" in at(2566)
+        and "Diophantine equations" in at(14158)
+        and "moving structure" in at(14271)
+    )
+    images_ok &= image_ownership_ok
+    visual_actual = (len(VISUAL_ONLY_BOUNDARY), digest_records(VISUAL_ONLY_BOUNDARY))
+    visual_ok = (
+        visual_actual == EXPECTED_VISUAL_ONLY_BOUNDARY
+        and not any("transcribed" in record for record in VISUAL_ONLY_BOUNDARY)
+        and images_ok
+    )
+    ok &= visual_ok
+    print(
+        "governed_image_interface_asset_hash_routed_no_pixel_replay",
+        "OK" if visual_ok else "MISMATCH",
+        len(derived_images),
+        digest(derived_images),
+        "candidates",
+        len(CANDIDATE_IMAGE_LINES),
+        digest(CANDIDATE_IMAGE_LINES),
+        "excluded",
+        len(EXCLUDED_IMAGE_LINES),
+        digest(EXCLUDED_IMAGE_LINES),
+    )
+    print(
+        "image_exact_caption_facing_and_sibling_ownership",
+        "OK" if image_ownership_ok else "MISMATCH",
+        len(EXCLUDED_IMAGE_CLASS),
+    )
+
+    base_ok = (
+        "local arrangement of colors around every cell" in at(2614)
+        and "fixed set of possible templates" in at(2614)
+        and "templates apply to every cell" in at(2618)
+        and "templates of neighboring cells overlapping" in at(2618)
+        and "4,294,967,296 possible sets" in at(2620)
+        and "total of 32 possible" in at(14048)
+        and "Position[IntegerDigits[n, 2, 32], 1]" in at(14050)
+    )
+    ok &= base_ok
+    print("source_T32_exact_local_base_reused", "OK" if base_ok else "MISMATCH")
+
+    occurrence_ok = (
+        "particular template from this set must appear at least somewhere" in at(2634)
+        and "certain template from this set must occur at least once" in at(2640)
+        and "arrangement of colors in each neighborhood match one of a fixed set" in at(2640)
+        and "first template must appear at least somewhere" in at(2684)
+        and "first template appearing at least once" in at(2694)
+        and "every template in the set, must occur somewhere" in at(14097)
+    )
+    ok &= occurrence_ok
+    print(
+        "source_global_existential_required_occurrence_conjoined_with_local_base",
+        "OK" if occurrence_ok else "MISMATCH",
+    )
+
+    source_count = 137_438_953_472
+    allowed_mask_count = 1 << 32
+    oriented_requirement_count = 32
+    independent_pair_count = oriented_requirement_count * allowed_mask_count
+    membership_restricted_count = oriented_requirement_count * (1 << 31)
+    count_seam_ok = (
+        "137,438,953,472 constraints" in at(2678)
+        and source_count == independent_pair_count == 1 << 37
+        and membership_restricted_count == 1 << 36
+        and source_count == 2 * membership_restricted_count
+        and "constraints are numbered as before" in at(2640).lower()
+        and "template that must occur is shown at the center" in at(2640)
+        and "constraint is number 18762389" in at(2674)
+        and "particular template from this set" in at(2634)
+    )
+    # If all observed local patterns lie in A and some observed pattern equals
+    # r, then r must lie in A.  Thus an independently well-formed pair with
+    # r outside A denotes the empty model set without constructor rejection.
+    proof_allowed = frozenset({"white-cross"})
+    proof_required = "black-center-cross"
+    required_not_allowed_unsat = (
+        proof_required not in proof_allowed
+        and not any(
+            observed in proof_allowed and observed == proof_required
+            for observed in ("white-cross", "black-center-cross")
+        )
+    )
+    count_seam_ok &= required_not_allowed_unsat
+    ok &= count_seam_ok
+    print(
+        "derived_full_mask_times_independent_required_template_syntax_not_subset_validation",
+        "OK" if count_seam_ok else "MISMATCH",
+        independent_pair_count,
+        membership_restricted_count,
+    )
+    print(
+        "source_number_is_prior_allowed_mask_required_template_separate_no_combined_codec",
+        "OK" if count_seam_ok else "MISMATCH",
+    )
+
+    unanchored_ok = (
+        occurrence_ok
+        and at(2634).count("somewhere") == 1
+        and "at least once in the pattern" in at(2640)
+        and "shown at the center" in at(2640)
+        and "presence of a particular template at the center" in at(2664)
+        and "except for trivial translations" in at(2674)
+        and "origin of the x,y coordinates is the only freedom" in at(14095)
+        and not any("anchor" in at(n).lower() for n in range(2632, 2699))
+    )
+    ok &= unanchored_ok
+    print(
+        "source_somewhere_translation_invariant_center_is_display_search_gauge",
+        "OK" if unanchored_ok else "MISMATCH",
+    )
+
+    examples_ok = (
+        "separate regions" in at(2636)
+        and "repeats in 98 × 98 blocks" in at(2640)
+        and "repeating every 56 cells on the diagonal" in at(2640)
+        and "no repetitive pattern is possible" in at(2666)
+        and "tens of billions of candidate patterns" in at(2668)
+        and "pair of stacked black cells" in at(2674)
+        and "unique" in at(2674)
+        and "33 templates" in at(2684)
+        and "512 possible ones" in at(2684)
+        and "rule 60" in at(2684)
+        and "56 allowed templates" in at(2688)
+        and "rule 30" in at(2688)
+        and "shifted version" in at(2694)
+    )
+    ok &= examples_ok
+    print(
+        "source_repetitive_nonrepetitive_larger_support_and_CA_derived_examples",
+        "OK" if examples_ok else "MISMATCH",
+    )
+
+    search_ok = (
+        "no such direct procedure" in at(2646)
+        and "go outside of the system" in at(2646)
+        and "enumerate every single possible pattern" in at(2648)
+        and "build up patterns iteratively" in at(2650)
+        and "backtracking" in at(2650)
+        and "no pattern that satisfies the constraint in a limited region" in at(2654)
+        and "regions containing thousands of cells" in at(2656)
+        and "not for the whole grid" in at(2656)
+        and "automatic procedure fails to find a repetitive pattern" in at(2664)
+        and "repetitive pattern does in fact exist" in at(2664)
+        and "Gray is used to indicate cells whose colors have not yet been determined" in at(2664)
+        and "extend patterns along a square spiral" in at(14080)
+        and "formally undecidable" in at(14082)
+        and "finite region is NPcomplete" in at(14083)
+        and "Systems based on constraints do not have initial conditions" in at(14275)
+        and not any(re.search(r"\bseed(?:ed|ing)?\b", at(n), re.IGNORECASE) for n in range(2632, 2699))
+    )
+    ok &= search_ok
+    print(
+        "source_external_search_partial_gray_backtracking_and_no_initial_condition",
+        "OK" if search_ok else "MISMATCH",
+    )
+
+    formula_lines = "\n".join(at(n) for n in range(14087, 14094))
+    formula_ok = (
+        "Page 219 · Non-periodic pattern" in at(14085)
+        and formula_lines.count(RAW_OPAQUE_FORMULA_PATTERN) == 4
+        and "Mod[Floor" in formula_lines
+        and "the only freedom in this pattern" in at(14095)
+        and "generating the pattern shown here is straightforward" in at(14095)
+        and "a[x_, y_]" not in formula_lines
+    )
+    ok &= formula_ok
+    print(
+        "source_page219_formula_hash_bound_as_opaque_witness_not_executable_rule",
+        "OK" if formula_ok else "MISMATCH",
+        formula_lines.count(RAW_OPAQUE_FORMULA_PATTERN),
+    )
+
+    split_chapter = (
+        SOURCE_ROOT
+        / "CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md"
+    ).read_text(encoding="utf-8")
+    source_defects_ok = (
+        at(2694).count(RAW_CORRUPT_RULE30_TEMPLATE_TEXT) == 1
+        and at(2694).count("56.3") == 1
+        and split_chapter.count(SPLIT_RULE30_TEMPLATE_TEXT) == 1
+        and "56 allowed templates" in at(2688)
+        and formula_ok
+    )
+    ok &= source_defects_ok
+    print(
+        "source_defects_guarded_rule30_56_by_3x3_and_opaque_Blank_formula",
+        "OK" if source_defects_ok else "MISMATCH",
+    )
+
+    all_required_ok = (
+        "not just a single template, but every template in the set" in at(14097)
+        and "must occur somewhere in the pattern" in at(14097)
+        and "Searches of such systems" in at(14097)
+        and "at least once" not in at(14097)
+    )
+    ok &= all_required_ok
+    print(
+        "source_notes_every_template_is_finite_EACH_SOMEWHERE_conjunction",
+        "OK" if all_required_ok else "MISMATCH",
+    )
+
+    relation_boundary_ok = (
+        "2D substitution systems" in at(14099)
+        and "51 of the 65,536 possible 2×2 blocks" in at(14109)
+        and "Relation to 1D cellular automata" in at(14115)
+        and "specify in advance a whole line" in at(14119)
+        and "specifies no cells in advance, or at most a few cells" in at(14121)
+        and "Non-computable patterns" in at(14123)
+        and "constraints like those on page 220" in at(19274)
+        and "cellular automaton patterns to be generated, as on page 221" in at(20754)
+        and "systems based on constraints in Chapter 5" in at(19816)
+    )
+    ok &= relation_boundary_ok
+    print(
+        "source_substitution_CA_tiling_selfassembly_and_solver_relations_not_native_step",
+        "OK" if relation_boundary_ok else "MISMATCH",
+    )
+
+    structural = (
+        not NATIVE_EVIDENCE & RELATION_EVIDENCE
+        and not NATIVE_EVIDENCE & CONTROL_EVIDENCE
+        and not RELATION_EVIDENCE & CONTROL_EVIDENCE
+        and NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE == RETAINED
+        and MATCHED_RETAINED == RETAINED & pre_index_union
+        and GOVERNED_CONTINUATIONS == RETAINED - union
+        and not RETAINED & index
+    )
+    ok &= structural
+    print("structural", "OK" if structural else "MISMATCH")
+
+    split_paths = sorted(
+        path
+        for path in SOURCE_ROOT.rglob("*.md")
+        if path.resolve() not in {DEFAULT_BOOK.resolve(), ATLAS.resolve()}
+    )
+    relative_paths = [path.relative_to(SOURCE_ROOT).as_posix() for path in split_paths]
+    manifest = [
+        f"{relative}\0{len(path.read_bytes())}\0{sha256(path)}"
+        for path, relative in zip(split_paths, relative_paths, strict=True)
+    ]
+    split_manifest_ok = (
+        len(split_paths) == EXPECTED_SPLIT_FILE_COUNT
+        and digest_records(relative_paths) == EXPECTED_SPLIT_PATHS_DIGEST
+        and digest_records(manifest) == EXPECTED_SPLIT_MANIFEST_DIGEST
+    )
+    ok &= split_manifest_ok
+    print(
+        "split_manifest",
+        "OK" if split_manifest_ok else "MISMATCH",
+        len(split_paths),
+        digest_records(relative_paths),
+        digest_records(manifest),
+    )
+
+    compiled = [re.compile(pattern, re.IGNORECASE) for pattern in QUERIES.values()]
+    monolith_query_text = {at(line_no) for line_no in union}
+    split_records: set[str] = set()
+    split_exact: set[str] = set()
+    split_nonexact: set[str] = set()
+    split_lines: list[tuple[str, str]] = []
+    split_texts: set[str] = set()
+    split_record_text: dict[str, str] = {}
+    for path, relative in zip(split_paths, relative_paths, strict=True):
+        split_file_lines = path.read_text(encoding="utf-8").splitlines()
+        for line_no, line in enumerate(split_file_lines, 1):
+            record = f"{relative}:{line_no}"
+            split_lines.append((record, normalized_line(line)))
+            split_texts.add(line)
+            split_record_text[record] = line
+            if not any(rx.search(line) for rx in compiled):
+                continue
+            split_records.add(record)
+            (split_exact if line in monolith_query_text else split_nonexact).add(record)
+
+    monolith_witnesses = [
+        (str(line_no), normalized_line(at(line_no))) for line_no in sorted(union)
+    ]
+    query_mapping: set[str] = set()
+    query_mapping_ok = True
+    for record in sorted(split_nonexact):
+        witness, score = best_witness(split_record_text[record], monolith_witnesses)
+        query_mapping.add(f"{record}->{witness}:{score:.6f}")
+        query_mapping_ok &= score >= 0.50 and int(witness) in union
+    split_query_actual = (len(split_records), digest_records(split_records))
+    split_exact_actual = (len(split_exact), digest_records(split_exact))
+    split_nonexact_actual = (len(split_nonexact), digest_records(split_nonexact))
+    query_mapping_actual = (len(query_mapping), digest_records(query_mapping))
+    split_query_ok = (
+        split_query_actual == EXPECTED_SPLIT_QUERY
+        and split_exact_actual == EXPECTED_SPLIT_QUERY_EXACT
+        and split_nonexact_actual == EXPECTED_SPLIT_QUERY_NONEXACT
+        and query_mapping_actual == EXPECTED_SPLIT_QUERY_MAPPING
+        and query_mapping_ok
+    )
+    ok &= split_query_ok
+    print(
+        "split_query_reverse_join",
+        "OK" if split_query_ok else "MISMATCH",
+        *split_query_actual,
+        *split_exact_actual,
+        *split_nonexact_actual,
+        *query_mapping_actual,
+    )
+
+    exact_retained = {line_no for line_no in RETAINED if at(line_no) in split_texts}
+    nonexact_retained = set(RETAINED) - exact_retained
+    retained_mapping: set[str] = set()
+    monolith_only: set[int] = set()
+    for line_no in sorted(nonexact_retained):
+        witness, score = best_witness(at(line_no), split_lines)
+        if score >= 0.50:
+            retained_mapping.add(f"{line_no}->{witness}:{score:.6f}")
+        else:
+            monolith_only.add(line_no)
+    exact_retained_actual = (len(exact_retained), digest(exact_retained))
+    nonexact_retained_actual = (len(nonexact_retained), digest(nonexact_retained))
+    retained_mapping_actual = (len(retained_mapping), digest_records(retained_mapping))
+    monolith_only_actual = (len(monolith_only), digest(monolith_only))
+    split_retained_ok = (
+        exact_retained_actual == EXPECTED_SPLIT_RETAINED_EXACT
+        and nonexact_retained_actual == EXPECTED_SPLIT_RETAINED_NONEXACT
+        and retained_mapping_actual == EXPECTED_SPLIT_RETAINED_MAPPING
+        and monolith_only_actual == EXPECTED_MONOLITH_ONLY
+        and len(retained_mapping) + len(monolith_only) == len(nonexact_retained)
+    )
+    ok &= split_retained_ok
+    print(
+        "split_retained_reverse_join",
+        "OK" if split_retained_ok else "MISMATCH",
+        *exact_retained_actual,
+        *nonexact_retained_actual,
+        *retained_mapping_actual,
+        *monolith_only_actual,
+    )
+
+    atlas_lines = ATLAS.read_text(encoding="utf-8").splitlines()
+    atlas_patterns = (
+        re.compile(r"^### Systems Based on Constraints$", re.I),
+        re.compile(r"defined by what configurations are allowed", re.I),
+    )
+    atlas_hits = {
+        line_no
+        for line_no, line in enumerate(atlas_lines, 1)
+        if any(rx.search(line) for rx in atlas_patterns)
+    }
+    atlas_actual = (len(atlas_hits), digest(atlas_hits))
+    atlas_ok = (
+        len(atlas_lines) == 542
+        and atlas_actual == EXPECTED_ATLAS_HITS
+        and "Systems Based on Constraints" in atlas_lines[192]
+        and "defined by what configurations are allowed" in atlas_lines[194]
+    )
+    ok &= atlas_ok
+    print("atlas_summary_only", "OK" if atlas_ok else "MISMATCH", *atlas_actual)
+
+    catalog_lines = CATALOG.read_text(encoding="utf-8").splitlines()
+    taxonomy_text = TAXONOMY.read_text(encoding="utf-8")
+    catalog_ok = (
+        len(catalog_lines) == 46
+        and catalog_lines[32] == "Template Constraint Systems,"
+        and catalog_lines[33] == "Seeded Template Constraint Systems,"
+        and catalog_lines[34] == "Arithmetic Iteration Systems,"
+        and len(set(catalog_lines[1:])) == 45
+        and "## 33. Seeded Template Constraint Systems" in taxonomy_text
+        and "required global occurrence" in taxonomy_text
+        and "at least one required global occurrence" in taxonomy_text
+        and "anchor_policy" in taxonomy_text
+        and not hits["Q17"]
+    )
+    ok &= catalog_ok
+    print(
+        "catalog_taxonomy_seeded_anchor_vocabulary_only_absent_from_primary_Book",
+        "OK" if catalog_ok else "MISMATCH",
+    )
+
+    model_actual = (len(SOURCE_MODEL_RECORDS), digest_records(SOURCE_MODEL_RECORDS))
+    architecture_ok = (
+        model_actual == EXPECTED_SOURCE_MODEL
+        and base_ok
+        and occurrence_ok
+        and count_seam_ok
+        and unanchored_ok
+        and examples_ok
+        and search_ok
+        and formula_ok
+        and source_defects_ok
+        and all_required_ok
+        and relation_boundary_ok
+    )
+    ok &= architecture_ok
+    print(
+        "source_fit_T32_plus_closed_global_existential_not_seed_or_runner",
+        "OK" if architecture_ok else "MISMATCH",
+        *model_actual,
+    )
+    print(
+        "unrecovered_raster_and_formula_execution_semantics_fail_closed",
+        "OK" if visual_ok and formula_ok else "MISMATCH",
+        len(VISUAL_ONLY_BOUNDARY),
+        1,
+    )
+
+    unresolved_total = (
+        len(classification_delta)
+        + len(index ^ set(INDEX_ROUTED))
+        + len(monolith_only)
+    )
+    unresolved_ok = unresolved_total == 0
+    ok &= unresolved_ok
+    print("unresolved_total", "OK" if unresolved_ok else "MISMATCH", unresolved_total)
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":

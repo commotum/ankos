@@ -1660,7 +1660,7 @@ def audit_translation_gauge() -> tuple[int, int, int, int, int]:
     return len(models), len(shifts), commutations, anchor_maps, 1
 
 
-def audit_symmetry_commutation() -> tuple[int, int, int, int, int, int]:
+def audit_symmetry_commutation() -> tuple[int, int, int, int, int, int, int]:
     full = book_cross_local(BINARY_CROSS_TEMPLATES)
     requirements = (
         (0, 0, 0, 0, 0),
@@ -1704,28 +1704,48 @@ def audit_symmetry_commutation() -> tuple[int, int, int, int, int, int]:
     )
     assert not periodic_equal(asymmetric, reflected)
     assert same_explicit_transform_orbit(asymmetric, reflected)
+    exchanged = transform_periodic(asymmetric, transforms[2])
+    assert not periodic_equal(asymmetric, exchanged)
+    assert same_explicit_transform_orbit(asymmetric, exchanged)
 
-    required = (1, 0, 0, 0, 0)
-    relation = strict_t33(full, required)
-    rotation = transforms[0]
-    rotated_relation = transform_relation(relation, rotation)
-    original_window = FiniteWindow(2, ((0, 0),), word_patch(full, required))
-    assert verify_window(original_window, relation).requirements_verified
-    assert not verify_window(original_window, rotated_relation).requirements_verified
-    rotated_values = tuple(
-        sorted(
-            (
-                apply_matrix(rotation.matrix, coordinate),
-                rotation.label_permutation[label],
-            )
-            for coordinate, label in original_window.values
-        )
+    # Each evidenced transform is explicit: the old patch does not silently
+    # match the transformed requirement, while transforming patch and relation
+    # together restores the finite-scope witness.
+    rejection_fixtures = (
+        ((1, 0, 0, 0, 0), transforms[0]),  # quarter turn
+        ((0, 1, 0, 0, 0), transforms[1]),  # determinant-negative reflection
+        ((0, 0, 0, 0, 0), transforms[2]),  # black/white exchange
     )
-    assert verify_window(
-        FiniteWindow(2, ((0, 0),), rotated_values),
-        rotated_relation,
-    ).requirements_verified
-    return len(models), len(relations), len(transforms), commutations, anchor_checks, 2
+    implicit_rejections = 0
+    for required, transform in rejection_fixtures:
+        relation = strict_t33(full, required)
+        mapped_relation = transform_relation(relation, transform)
+        original_window = FiniteWindow(2, ((0, 0),), word_patch(full, required))
+        assert verify_window(original_window, relation).requirements_verified
+        assert not verify_window(original_window, mapped_relation).requirements_verified
+        mapped_values = tuple(
+            sorted(
+                (
+                    apply_matrix(transform.matrix, coordinate),
+                    transform.label_permutation[label],
+                )
+                for coordinate, label in original_window.values
+            )
+        )
+        assert verify_window(
+            FiniteWindow(2, ((0, 0),), mapped_values),
+            mapped_relation,
+        ).requirements_verified
+        implicit_rejections += 1
+    return (
+        len(models),
+        len(relations),
+        len(transforms),
+        commutations,
+        anchor_checks,
+        implicit_rejections,
+        2,
+    )
 
 
 def audit_multiple_requirements_and_aliases() -> tuple[int, int, int, int, int, int]:
@@ -1833,6 +1853,33 @@ def audit_support_order_separation() -> tuple[int, int, int]:
         verify_periodic(model, reordered_relation)
     )
     return len(source_offsets), len(source_words), 1
+
+
+def audit_larger_support_and_alphabet() -> tuple[int, int, int]:
+    """Exercise the BOOK:2680-2694 support generalization without raster data."""
+
+    offsets_3x3 = tuple(
+        (delta_row, delta_column)
+        for delta_row in (-1, 0, 1)
+        for delta_column in (-1, 0, 1)
+    )
+    zero_3x3 = (0,) * 9
+    local_3x3 = AllowedLocalPatterns(2, offsets_3x3, (zero_3x3,))
+    relation_3x3 = strict_t33(local_3x3, zero_3x3)
+    assert verify_periodic(
+        PeriodicPresentation(2, ((0,),)),
+        relation_3x3,
+    ).proves_global_model
+
+    offsets_2x2 = ((0, 0), (0, 1), (1, 0), (1, 1))
+    zero_2x2 = (0,) * 4
+    local_16 = AllowedLocalPatterns(16, offsets_2x2, (zero_2x2,))
+    relation_16 = strict_t33(local_16, zero_2x2)
+    assert verify_periodic(
+        PeriodicPresentation(16, ((0,),)),
+        relation_16,
+    ).proves_global_model
+    return len(offsets_3x3), local_16.alphabet_size, 2
 
 
 def audit_queries_and_certificates() -> tuple[int, int, int, int, int, int, int]:
@@ -2026,3 +2073,260 @@ def audit_no_transition_surface() -> tuple[int, int, int, int]:
         "proves_global_model",
     }
     return len(local_fields), len(requirement_fields), len(conjunction_fields), len(report_fields)
+
+
+EXPECTED_DIGEST = "7df6b4f5d1badbba170a8c8abc2fc34af7c5b1fd38dea8e3a233e74d85475366"
+
+
+def main() -> None:
+    source_claims = audit_source_claims()
+    (
+        source_family_records,
+        subset_conditioned_records,
+        incompatible_syntax_records,
+        incompatible_certificate_cases,
+    ) = audit_strict_family_count()
+    (
+        configurations,
+        strict_constraints,
+        direct_generic_commutations,
+        direct_generic_anchor_checks,
+        representation_round_trips,
+    ) = audit_exhaustive_periodic_commutation()
+    (
+        toy_constraints,
+        toy_models,
+        toy_singleton_checks,
+        toy_all_required_checks,
+    ) = audit_complete_toy_constraint_space()
+    (
+        projection_models,
+        strict_subset_witnesses,
+        compatible_empty_relations,
+        outside_allowed_empty_relations,
+        projection_noninjectivity_witnesses,
+    ) = audit_projection_and_empty_models()
+    (
+        periodic_scope_cases,
+        finite_window_cases,
+        open_patch_cases,
+        anywhere_not_anchor_cases,
+        positive_window_witnesses,
+        finite_nonobservation_cases,
+    ) = audit_scopes_and_anchor_distinction()
+    (
+        translation_models,
+        translation_shifts,
+        translation_commutations,
+        translated_anchor_witnesses,
+        pointwise_orbit_separations,
+    ) = audit_translation_gauge()
+    (
+        symmetry_models,
+        symmetry_relations,
+        explicit_transforms,
+        symmetry_commutations,
+        symmetry_anchor_checks,
+        implicit_matching_rejections,
+        explicit_orbit_witnesses,
+    ) = audit_symmetry_commutation()
+    (
+        all_required_templates,
+        separate_requirement_witnesses,
+        duplicate_canonicalizations,
+        vacuous_conjunction_normalizations,
+        alias_cases,
+        forged_witness_rejections,
+    ) = audit_multiple_requirements_and_aliases()
+    (
+        nonlocal_radii,
+        fixed_origin_local_equalities,
+        arbitrarily_far_occurrence_witnesses,
+        no_local_flag_counterexamples,
+    ) = audit_nonlocality_counterexample()
+    (
+        reordered_support_slots,
+        reordered_words,
+        support_order_commutations,
+    ) = audit_support_order_separation()
+    larger_support_arity, larger_alphabet, generalized_profile_checks = (
+        audit_larger_support_and_alphabet()
+    )
+    (
+        sat_candidates,
+        unknown_candidates,
+        resource_candidates,
+        outside_unsat_certificates,
+        center_unsat_certificates,
+        forged_certificates,
+        multi_requirement_witnesses,
+    ) = audit_queries_and_certificates()
+    hostile_rejections = audit_hostile_validation()
+    (
+        local_field_count,
+        requirement_field_count,
+        conjunction_field_count,
+        report_field_count,
+    ) = audit_no_transition_surface()
+
+    facts = (
+        ("source_claims", source_claims),
+        ("strict_cross_templates", len(BINARY_CROSS_TEMPLATES)),
+        ("source_family_records", source_family_records),
+        ("subset_conditioned_records", subset_conditioned_records),
+        ("incompatible_syntax_records", incompatible_syntax_records),
+        ("incompatible_certificate_cases", incompatible_certificate_cases),
+        ("configurations", configurations),
+        ("strict_constraints", strict_constraints),
+        ("direct_generic_commutations", direct_generic_commutations),
+        ("direct_generic_anchor_checks", direct_generic_anchor_checks),
+        ("representation_round_trips", representation_round_trips),
+        ("toy_constraints", toy_constraints),
+        ("toy_models", toy_models),
+        ("toy_singleton_checks", toy_singleton_checks),
+        ("toy_all_required_checks", toy_all_required_checks),
+        ("projection_models", projection_models),
+        ("strict_subset_witnesses", strict_subset_witnesses),
+        ("compatible_empty_relations", compatible_empty_relations),
+        ("outside_allowed_empty_relations", outside_allowed_empty_relations),
+        ("projection_noninjectivity_witnesses", projection_noninjectivity_witnesses),
+        ("periodic_scope_cases", periodic_scope_cases),
+        ("finite_window_cases", finite_window_cases),
+        ("open_patch_cases", open_patch_cases),
+        ("anywhere_not_anchor_cases", anywhere_not_anchor_cases),
+        ("positive_window_witnesses", positive_window_witnesses),
+        ("finite_nonobservation_cases", finite_nonobservation_cases),
+        ("translation_models", translation_models),
+        ("translation_shifts", translation_shifts),
+        ("translation_commutations", translation_commutations),
+        ("translated_anchor_witnesses", translated_anchor_witnesses),
+        ("pointwise_orbit_separations", pointwise_orbit_separations),
+        ("symmetry_models", symmetry_models),
+        ("symmetry_relations", symmetry_relations),
+        ("explicit_transforms", explicit_transforms),
+        ("symmetry_commutations", symmetry_commutations),
+        ("symmetry_anchor_checks", symmetry_anchor_checks),
+        ("implicit_matching_rejections", implicit_matching_rejections),
+        ("explicit_orbit_witnesses", explicit_orbit_witnesses),
+        ("all_required_templates", all_required_templates),
+        ("separate_requirement_witnesses", separate_requirement_witnesses),
+        ("duplicate_canonicalizations", duplicate_canonicalizations),
+        ("vacuous_conjunction_normalizations", vacuous_conjunction_normalizations),
+        ("alias_cases", alias_cases),
+        ("forged_witness_rejections", forged_witness_rejections),
+        ("nonlocal_radii", nonlocal_radii),
+        ("fixed_origin_local_equalities", fixed_origin_local_equalities),
+        ("arbitrarily_far_occurrence_witnesses", arbitrarily_far_occurrence_witnesses),
+        ("no_local_flag_counterexamples", no_local_flag_counterexamples),
+        ("reordered_support_slots", reordered_support_slots),
+        ("reordered_words", reordered_words),
+        ("support_order_commutations", support_order_commutations),
+        ("larger_support_arity", larger_support_arity),
+        ("larger_alphabet", larger_alphabet),
+        ("generalized_profile_checks", generalized_profile_checks),
+        ("sat_candidates", sat_candidates),
+        ("unknown_candidates", unknown_candidates),
+        ("resource_candidates", resource_candidates),
+        ("outside_unsat_certificates", outside_unsat_certificates),
+        ("center_unsat_certificates", center_unsat_certificates),
+        ("forged_certificates", forged_certificates),
+        ("multi_requirement_witnesses", multi_requirement_witnesses),
+        ("hostile_rejections", hostile_rejections),
+        ("local_field_count", local_field_count),
+        ("requirement_field_count", requirement_field_count),
+        ("conjunction_field_count", conjunction_field_count),
+        ("report_field_count", report_field_count),
+        ("source_claims_table", SOURCE_CLAIMS),
+        ("architecture_classification", ARCHITECTURE_CLASSIFICATION),
+        ("goal2_delta", GOAL2_DELTA),
+        ("strict_denotation", "AllowedLocalPatterns_AND_exists_anchor_exact_required_word"),
+        ("all_required_denotation", "finite_conjunction_of_independent_exists_anchor_relations"),
+        ("empty_requirement_identity", "generic_conjunction_identity_normalizes_behaviorally_to_T32_not_strict_T33"),
+        ("counting_seam", "32_times_2^32_accepts_required_outside_allowed_as_well_formed_empty_syntax"),
+        ("anchor_boundary", "witness_and_translation_gauge_not_relation_data_or_initial_state"),
+        ("scope_boundary", "periodic_global_vs_finite_not_observed_vs_open_unresolved"),
+        ("projection_boundary", "forget_requirements_is_sound_noninjective_and_strict_on_models"),
+        ("nonlocal_boundary", "global_existential_cannot_be_a_finite_local_matching_flag"),
+        ("solver_boundary", "rechecked_SAT_replayed_UNSAT_bounded_Unknown_typed_ResourceLimit"),
+        ("transition_surface", "absent"),
+    )
+    digest = sha256(repr(facts).encode("utf-8")).hexdigest()
+    if EXPECTED_DIGEST != "TO_BE_FILLED":
+        assert digest == EXPECTED_DIGEST
+
+    print("T33 semantic oracle: PASS")
+    print(
+        f"source_claims={source_claims}; strict_templates={len(BINARY_CROSS_TEMPLATES)}; "
+        f"source_family_records={source_family_records}; "
+        f"subset_conditioned_records={subset_conditioned_records}; "
+        f"well_formed_required_outside_allowed={incompatible_syntax_records}"
+    )
+    print(
+        f"configurations={configurations}; strict_constraints={strict_constraints}; "
+        f"direct_generic_full_report_commutations={direct_generic_commutations}; "
+        f"anchor_checks={direct_generic_anchor_checks}; "
+        f"representation_round_trips={representation_round_trips}"
+    )
+    print(
+        f"complete_self_support_constraints={toy_constraints}; toy_models={toy_models}; "
+        f"singleton_checks={toy_singleton_checks}; "
+        f"all_required_checks={toy_all_required_checks}"
+    )
+    print(
+        f"translation_models={translation_models}; shifts={translation_shifts}; "
+        f"translation_report_commutations={translation_commutations}; "
+        f"translated_occurrence_anchors={translated_anchor_witnesses}; "
+        f"pointwise_vs_translation_orbit={pointwise_orbit_separations}"
+    )
+    print(
+        f"symmetry_models={symmetry_models}; symmetry_relations={symmetry_relations}; "
+        f"D4_color_transforms={explicit_transforms}; "
+        f"symmetry_report_commutations={symmetry_commutations}; "
+        f"symmetry_anchor_checks={symmetry_anchor_checks}; "
+        f"implicit_matching_rejections={implicit_matching_rejections}; "
+        f"explicit_orbit_witnesses={explicit_orbit_witnesses}"
+    )
+    print(
+        f"periodic_scope={periodic_scope_cases}; finite_window_scope={finite_window_cases}; "
+        f"open_patch_scope={open_patch_cases}; anywhere_not_anchor={anywhere_not_anchor_cases}; "
+        f"finite_positive={positive_window_witnesses}; "
+        f"finite_not_observed={finite_nonobservation_cases}"
+    )
+    print(
+        f"projection_models={projection_models}; strict_subset={strict_subset_witnesses}; "
+        f"compatible_but_empty={compatible_empty_relations}; "
+        f"required_outside_allowed_empty={outside_allowed_empty_relations}; "
+        f"projection_noninjective={projection_noninjectivity_witnesses}"
+    )
+    print(
+        f"all_required_templates={all_required_templates}; "
+        f"separate_witnesses={separate_requirement_witnesses}; "
+        f"duplicate_canonicalizations={duplicate_canonicalizations}; "
+        f"empty_conjunction_T32_identity={vacuous_conjunction_normalizations}; "
+        f"alias_cases={alias_cases}; forged_witness_rejections={forged_witness_rejections}"
+    )
+    print(
+        f"nonlocal_radii={nonlocal_radii}; fixed_origin_equalities={fixed_origin_local_equalities}; "
+        f"arbitrarily_far_witnesses={arbitrarily_far_occurrence_witnesses}; "
+        f"finite_local_flag_counterexamples={no_local_flag_counterexamples}; "
+        f"support_order_commutations={support_order_commutations}; "
+        f"generalized_profile=3x3/{larger_support_arity}-slots+{larger_alphabet}-colors; "
+        f"generalized_checks={generalized_profile_checks}"
+    )
+    print(
+        f"solver_sat_candidates={sat_candidates}; bounded_unknown_candidates={unknown_candidates}; "
+        f"resource_candidates={resource_candidates}; "
+        f"global_unsat_certificates={outside_unsat_certificates + center_unsat_certificates}; "
+        f"forged_certificate_rejections={forged_certificates}; "
+        f"multi_requirement_witnesses={multi_requirement_witnesses}"
+    )
+    print(
+        f"hostile_rejections={hostile_rejections}; transition_surface=absent; "
+        "architecture=D058_T31_T32_declarative_category_reused; "
+        "incremental_T33_delta=classes_1_2_3_only"
+    )
+    print(f"semantic_digest={digest}")
+
+
+if __name__ == "__main__":
+    main()

@@ -414,6 +414,23 @@ def verify_source_interface() -> None:
         actual = frozenset(source[attribute])
         assert actual == expected, (attribute, sorted(actual), sorted(expected))
 
+    expected_partition = {
+        "native": (len(NATIVE_IMAGE_LINES), digest_lines(NATIVE_IMAGE_LINES)),
+        "relation": (len(RELATION_IMAGE_LINES), digest_lines(RELATION_IMAGE_LINES)),
+        "control": (len(CONTROL_IMAGE_LINES), digest_lines(CONTROL_IMAGE_LINES)),
+    }
+    assert source["EXPECTED_IMAGE_PARTITION"] == expected_partition
+    expected_set = source["EXPECTED_SET"]
+    assert expected_set["candidate_images"] == (
+        len(CANDIDATE_IMAGE_LINES), digest_lines(CANDIDATE_IMAGE_LINES),
+    )
+    assert expected_set["governed_images"] == (
+        len(GOVERNED_IMAGE_LINES), digest_lines(GOVERNED_IMAGE_LINES),
+    )
+    assert expected_set["excluded_images"] == (
+        len(EXCLUDED_IMAGE_LINES), digest_lines(EXCLUDED_IMAGE_LINES),
+    )
+
 
 def ledger() -> tuple[str, str, int, int, int, int, int, int, int, int]:
     """Verify governed and excluded assets; return two canonical ledgers."""
@@ -453,6 +470,7 @@ def ledger() -> tuple[str, str, int, int, int, int, int, int, int, int]:
     for book_line, asset in sorted(ASSETS.items()):
         kind = CLASSIFICATION[book_line]
         assert kind in {"N", "R", "C"}
+        assert asset.role.startswith(f"{kind}-")
         assert BOOK_LINES[book_line - 1] == f"![]({asset.name})"
         assert monolith_by_name.get(asset.name) == [book_line]
 
@@ -497,6 +515,7 @@ def ledger() -> tuple[str, str, int, int, int, int, int, int, int, int]:
     excluded_split_references = 0
     for book_line, asset in sorted(EXCLUDED_ASSETS.items()):
         assert CLASSIFICATION[book_line] == "X"
+        assert asset.role.startswith("X-")
         assert BOOK_LINES[book_line - 1] == f"![]({asset.name})"
         assert monolith_by_name.get(asset.name) == [book_line]
 
@@ -539,10 +558,12 @@ def ledger() -> tuple[str, str, int, int, int, int, int, int, int, int]:
     )
 
 
-# Frozen after independent reconciliation; deliberately impossible until the
-# first full verifier run reports the recomputed value.
-EXPECTED_LEDGER_SHA256 = "TO_BE_FROZEN"
-EXPECTED_EXCLUDED_LEDGER_SHA256 = "TO_BE_FROZEN"
+EXPECTED_LEDGER_SHA256 = (
+    "4b4fddde132a4fa158d1e00139e3dc597004bf5e6e46badfc3d354a2a8c4d7fd"
+)
+EXPECTED_EXCLUDED_LEDGER_SHA256 = (
+    "93406a8a288d5ee27cfe9e1cc90f86c814da4e0354a2b29e24822d459aea4166"
+)
 
 
 def main() -> None:
