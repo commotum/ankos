@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 40 type stages are complete, no stage is reopened, and 5 type stages remain pending; T35 is next. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, T32, and T33 are complete under D119-D135.
+- Execution status at this sync is Foundation complete, 40 type stages are complete, no stage is reopened, T35 is in progress, and 4 type stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, T32, and T33 are complete under D119-D135.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -1123,13 +1123,15 @@ Oracle SHAs are source `f7266058575861d5aa358f4a031ea22a61be8251c0ac8c34027e66d6
 
 ### 42-T35-PIECEWISE-INTEGER
 
+Status: **IN PROGRESS — FIRST-PRINCIPLES ARCHITECTURE RECONSTRUCTED; EVIDENCE ORACLES PENDING** in `goal-1/42-T35-PIECEWISE-INTEGER.md`.
+
 #### Big Picture Objective
 
 Test predicate-selected arithmetic branches and exact integer closure.
 
 #### Detailed Implementation Plan
 
-Apply the common protocol, emphasizing ordered predicates, formulas, residues, invalid outputs, and observables.
+Apply the common protocol. Reuse T34's `t+0D` unary scalar event and T43's closed-expression responsibility; represent strict programs as complete direct residue lookup with exact integer-closure validation and branch witnesses. Keep Conway ordered first-applicable fractions separately tagged, preserve their partial no-applicable boundary, and distinguish observer/analysis/compiler relations from native execution. Add no T35 state, UPDATE, executor, callback, hidden history, or branch-set successor.
 
 #### Completion Requirements
 
