@@ -5,6 +5,9 @@ Retrieved-UTC-Date: 2026-07-14
 Fetched-Document-SHA256: 9d11a2fa1f1bce6b40a7cf896303749c7fe562b4b68244b860226e91b0348bfb
 Fetched-HTML-Line: 937
 
+Exact-Raw-HTML-Allowed-Pattern:
+<span class="inlinecode clipboard-inline" data-copy="\!\(\*SubscriptBox[\(t\),\(1\)]\)|\!\(\*SubscriptBox[\(t\),\(2\)]\)|\!\(\*SubscriptBox[\(t\),\(3\)]\)">t<sub>1</sub> | t<sub>2</sub> | t<sub>3</sub></span>
+
 Exact-Raw-HTML-Template:
 <span class="inlinecode clipboard-inline">{{_, 1, _}, {0, 0, 1}, {_, 0, _}}</span>
 
@@ -14,7 +17,10 @@ Exact-Raw-HTML-Checker:
 Decoded-Template:
 {{_, 1, _}, {0, 0, 1}, {_, 0, _}}
 
+Decoded-Allowed-Pattern:
+t1 | t2 | t3
+
 Decoded-Checker:
 SatisfiedQ[list_, allowed_] := Apply[And, Map[MatchQ[#, allowed] &, Partition[list, {3, 3}, {1, 1}], {2}], {0, 1}]
 
-Normalization-Scope: HTML spacer spans are removed and &amp; is decoded to & only in Decoded-Checker. The four Mathematica Blank underscores are copied exactly in both raw and decoded template evidence. No other source text is normalized.
+Normalization-Scope: Typeset subscripts are rendered as ASCII digits only in Decoded-Allowed-Pattern. HTML spacer spans are removed and &amp; is decoded to & only in Decoded-Checker. The alternative bars and four Mathematica Blank underscores are copied exactly. No other source text is normalized.
