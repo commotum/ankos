@@ -229,6 +229,8 @@ CONTROL_MATCHED = line_set(
 
 NATIVE_CONTINUATIONS = line_set("2632,2698,14087-14093")
 RELATION_CONTINUATIONS = line_set(
+    "2322,"
+    "4068,4070,4072,4074,4076,4078,4080,4082,4084,"
     "5772,5776,5778,5780,5782,5784,5786,5790,5792,5794,6974,"
     "14111,14113,14117,14124,14126,14128,14132,14134,14136,14138,"
     "14140,14142,14144"
@@ -238,7 +240,10 @@ CONTROL_CONTINUATIONS = line_set(
     "2570,2572,2574,2576,2578,2580,2582,2584,2586,2588,2592,2596,"
     "2598,2600,2602,2604,2606,2608,2610,2612,2616,2620,2626,2628,2630,"
     "2644,2648,2652,2654,2656,2658,2660,"
-    "4030,4032,4040,4042,4044,"
+    "3980,3982,3984,3986,3988,3990,3992,3996,3998,"
+    "4000,4002,4004,4006,4008,4010,4012,4014,4016,4018,4020,4022,4024,"
+    "4026,4028,4030,4032,4034,4036,4038,4040,4042,4044,4048,4050,"
+    "4052,4054,4056,4058,4060,4062,4064,4066,"
     "14048,14050,14052,14054,14084"
 )
 
@@ -259,11 +264,13 @@ EXCLUDED = frozenset()
 
 IMAGE_RE = re.compile(r"^!\[[^\]]*\]\(([^)]+)\)$")
 NATIVE_IMAGE_LINES = line_set("2638,2662,2670,2682,2686,2690,2692")
-RELATION_IMAGE_LINES = line_set("5786,6974,14111,14117,14136,14138,14142")
+RELATION_IMAGE_LINES = line_set(
+    "2322,4074,4076,4080,5786,6974,14111,14117,14136,14138,14142"
+)
 CONTROL_IMAGE_LINES = line_set(
     "1449,1455,1463,1465,1481,1487,1493,"
     "2576,2584,2598,2606,2616,2626,2628,"
-    "4030,4040,4042,4044,14052"
+    "4000,4002,4018,4022,4030,4040,4042,4044,4058,14052"
 )
 GOVERNED_IMAGE_LINES = (
     NATIVE_IMAGE_LINES | RELATION_IMAGE_LINES | CONTROL_IMAGE_LINES
@@ -272,9 +279,11 @@ GOVERNED_IMAGE_LINES = (
 # piecewise-number plate, and unrelated neighboring Notes plates are visible
 # candidates but do not belong to T33 evidence.
 EXCLUDED_IMAGE_CLASS = {
+    "substitution_and_geometric_neighbors": line_set("2314,2328,2330"),
     "preceding_multiway": line_set("2564"),
     "following_piecewise_integer_map": line_set("1505"),
-    "nearby_notes_non_T33": line_set("14162"),
+    "nearby_notes_Diophantine_assembly": line_set("14162,14164,14166,14168"),
+    "preceding_CA_motion_plate": line_set("14273"),
 }
 EXCLUDED_IMAGE_LINES = frozenset().union(*EXCLUDED_IMAGE_CLASS.values())
 CANDIDATE_IMAGE_LINES = GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
@@ -351,6 +360,108 @@ SOURCE_MODEL_RECORDS = (
 )
 
 
+EXPECTED_QUERY = {
+    "Q00": (5, 5, 0, "0e36502fa4c8671867ed8af6085913368ab9f8c9bd28c05cd11504b55fd0a694"),
+    "Q01": (3, 3, 0, "6c37539f92bb477ac63100d3f4af3f61b1ba63492e5ccfaa0e4d35caf3b2e2c2"),
+    "Q02": (3, 3, 0, "deaa52c5cd737947f9c4ce688d9b03f7a6b9fa22890c10e7a9d4122f04534db9"),
+    "Q03": (4, 4, 0, "f7d07ccb288daafbd9e49ef8d1c7bd6c6287064dcd226e3e06337a51fa1587cb"),
+    "Q04": (3, 3, 0, "c6660008caac46df11c9e92711a0296c848aca4c27f961ed0e4495b6da6fbdcf"),
+    "Q05": (3, 3, 0, "95e3201d510661f8e12ea8ff778cce1956c142ef1af1852390502c2287615a41"),
+    "Q06": (4, 4, 0, "eead4a1f256c8e516952abbdc9894db4de5a63a2bd3ad82853b320d51314458e"),
+    "Q07": (3, 3, 0, "073913f6e855aabe72651166f01b145f56b71b5f3cd60748823d77e3976d47d0"),
+    "Q08": (3, 3, 0, "09cf2a88fb23d249af42e3a002c2ed058906ceba22e1d523ffc600f91dd4e4c4"),
+    "Q09": (3, 3, 0, "f942967307787bfd5feab25bbb1188901498ddfae7191079eab1c7d8d0da3ade"),
+    "Q10": (3, 3, 0, "364b9d13feff5ffbc2982cc0f8fe2938ada08bd6edf6324f87449465be83e28a"),
+    "Q11": (2, 2, 0, "12bf04affa84ca3101acd19f3acd6abd49c36665ef1c7c818edc82c157a58013"),
+    "Q12": (1, 1, 0, "0d89b2b31f97c14550cbb4dce99493abcd983962abddc28ee00e42b5b19556d7"),
+    "Q13": (3, 3, 0, "09cf2a88fb23d249af42e3a002c2ed058906ceba22e1d523ffc600f91dd4e4c4"),
+    "Q14": (2, 2, 0, "9c43001d95b59467d6b9a70dd8cbf5b744ef267ce316cc4b22dc58dda1765186"),
+    "Q15": (7, 7, 0, "bf5973e5ca2bde537bb80ccce7088f447f407f85751c4431becbf97a776c2728"),
+    "Q16": (4, 0, 4, "a742ef8103137f5514aa06d23fba28ebf47524b2f5e476847e3757263691d469"),
+    "Q17": (0, 0, 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+    "Q18": (2, 2, 0, "5e79db636932b55301454d3c228753b23c9cc69cc915d48537f2f6ffa5e1c7c4"),
+    "Q19": (12, 10, 2, "58194e38da461c0bd205eb2e407b21b5747601a1df0a0ddbeef8c582c14d6953"),
+    "Q20": (1, 1, 0, "48edac0718a29c1157a2e5f12944c2b7205e6b7be4d80cb5b731255a756f8df4"),
+    "Q21": (1, 1, 0, "965fb140d7e15df5f1364a8631a6a2c8c8b5bddeb28f009013c9713b0d249d0f"),
+    "Q22": (5, 5, 0, "1104b248a89d7eb11e493b98d254e34d87e1ce9496042c213bf98faae2675fd7"),
+    "Q23": (5, 5, 0, "b49e599b49d1e8df8dda2ebcb54c3ecda8b873c6da9a91c2513771856093d2a5"),
+    "Q24": (3, 3, 0, "8e9b01140689aa3268da68461e9fda65f6f8cc57566b9d5519da6c696510ef8e"),
+    "Q25": (2, 2, 0, "895ba8bf29d93b3fbf882ad2af4deb1a0271d3c62bd8a0834b8477c36e24937c"),
+    "Q26": (2, 2, 0, "6f3e0be72ef9d4fdc586324b9e90417694415aa82ce2ee0bbdb859c21343057c"),
+    "Q27": (17, 15, 2, "e20f31a102695f2d3dae11df65b55d215b9d7721f6e3fc321e80facb1a4f8fb0"),
+    "Q28": (2, 0, 2, "1fff8533eb5204a9d93624dba929a7378fbf2debad46e17b59ac6eb88b530f91"),
+    "Q29": (2, 2, 0, "9cccb3003ef0f8381345059a3b23d4102d6b8c8b9962e23b454dc9f60186ba4b"),
+    "Q30": (3, 2, 1, "f3e685c72a0ded3e07a1683c14320859d6697e8b07b4a658da14a3c0abf3a7cb"),
+    "Q31": (2, 0, 2, "af5e23967232ae99e866d3ecb87075e6f9c72fc100f6191c86ece39c0b9b9ff4"),
+}
+
+
+# Set and reverse-provenance expectations are frozen below.  Split values are
+# initially populated by the same independently recomputed joins and then
+# asserted on every run.
+EXPECTED_SET = {
+    "union": (65, "dd8d78b91013455349b559208a61518c70a8f5655d586b10c0c980830fb379d7"),
+    "pre_index_union": (56, "c9375acb70efa7f27d3e7b377d5dd61b256cc90befc099644145afdf4ed803df"),
+    "index": (9, "0962f5c2dec055c54558ca3867eb311568fc00f655793238cd34e52625793ad1"),
+    "matched_retained": (56, "c9375acb70efa7f27d3e7b377d5dd61b256cc90befc099644145afdf4ed803df"),
+    "governed_continuations": (135, "214b1a02c96518655b49788c4e2d6c74d8f82afc60a7094cc73ba3695507eea5"),
+    "retained": (191, "4ab65fc37aec80cf9a9d3653a2c157b62d1be73f6b5d89c9ac111ac6678c0349"),
+    "excluded": (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+    "native": (33, "0d1238f4e90f680efd5248b597714121fb4b2af758b3210e54102a36b8e77c85"),
+    "relation": (49, "31bd61311f7019d478febfc9ebd85784e0274bf62a96b0f75fb3af210081821b"),
+    "control": (109, "b3b2d5755dbbeaf16667dc322d21c4455b90ee4f52bef6874a6dc1e235413e80"),
+    "candidate_images": (52, "67101b858031d5cfcb3c0532588f11732ad9d5bccd6db5f942a84268c8521bd5"),
+    "governed_images": (42, "fd6f90fc2c6f07a8e8c56e62eaa268545cbfc5d1024169c95c972cd97f9dcd97"),
+    "excluded_images": (10, "79ae511b0f04d2ac136061d8ff6e97d30cc5c135091cac2ca5b6afcf8250bbb5"),
+}
+EXPECTED_INDEX_CLASS = {
+    "constraint_and_solver_routes": (3, "2f6ab7d02ca4c2c6c54e28f1f3ff804919d837a55b4e563aa8ccf0ba3cfb9a95"),
+    "forcing_and_noncomputability_routes": (2, "af5e23967232ae99e866d3ecb87075e6f9c72fc100f6191c86ece39c0b9b9ff4"),
+    "rule30_rule60_forced_pattern_routes": (2, "14c3e7058a177043f01b50e3bbdb3bcb6409d6c160017cd1ab4c03e38e5dc2e5"),
+    "sibling_constraint_family_routes": (2, "652197ba4bfd4fa73c7ef5895aa82ceb1223c7f6df5571458699602ace14ff71"),
+}
+EXPECTED_INDEX_GUARDS = (9, "fd34a85f29b0a4d23ccecbd98fe7ae37b2253b2c3a30e7f7100b220fcd92d64a")
+EXPECTED_IMAGE_PARTITION = {
+    "native": (7, "bf5973e5ca2bde537bb80ccce7088f447f407f85751c4431becbf97a776c2728"),
+    "relation": (11, "bf854a24144520fd1400d906459a8bf243dcfc24cc2b014c770bdf4c1c0e6823"),
+    "control": (24, "b6f5545069072356892c7bd2249f4e4ca7387109ded74dc44196f819a85c5fee"),
+}
+EXPECTED_EXCLUDED_IMAGE_CLASS = {
+    "substitution_and_geometric_neighbors": (3, "4127f8c8599df6e70a62c277c0a6aad51e4cc8828e231cdd0714e5c459a8a21c"),
+    "preceding_multiway": (1, "d0c9e369bee256f4b0182a503babb685ee7b00419c985fb423a47bfb0eb89f56"),
+    "following_piecewise_integer_map": (1, "755917ecbc61091ffa6b605d7f82bdaa4e4cbdc309124807b0fb63228d0696df"),
+    "nearby_notes_Diophantine_assembly": (4, "bed722234648c726993140640203cb9d5e6a9c16fc1427316c37dc27ce33642e"),
+    "preceding_CA_motion_plate": (1, "214ed1d843bba0884f63f3d4b9ab9e7ec2f3d6f635f7522fff4c0e70c37d6ec0"),
+}
+EXPECTED_VISUAL_ONLY_BOUNDARY = (
+    6,
+    "a89a615c48474935708dc424eda0354e327933309470f97e7cd3fc3cf2dfe230",
+)
+
+EXPECTED_SPLIT_FILE_COUNT = 17
+EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
+EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
+EXPECTED_SPLIT_QUERY = (0, "")
+EXPECTED_SPLIT_QUERY_EXACT = (0, "")
+EXPECTED_SPLIT_QUERY_NONEXACT = (0, "")
+EXPECTED_SPLIT_QUERY_MAPPING = (0, "")
+EXPECTED_SPLIT_RETAINED_EXACT = (0, "")
+EXPECTED_SPLIT_RETAINED_NONEXACT = (0, "")
+EXPECTED_SPLIT_RETAINED_MAPPING = (0, "")
+EXPECTED_MONOLITH_ONLY = (
+    0,
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+)
+EXPECTED_ATLAS_HITS = (
+    2,
+    "dd39606da577b951d544e3e059f492e5932d034f4cd462fcb22e29b1a77f93ed",
+)
+EXPECTED_SOURCE_MODEL = (
+    24,
+    "c00fee3f69f5d7ec669ec7a4eb1d3b636680f10e42056735b2798708be6aa0b1",
+)
+
+
 def digest(values: set[int] | frozenset[int]) -> str:
     payload = ",".join(map(str, sorted(values))).encode("ascii")
     return hashlib.sha256(payload).hexdigest()
@@ -368,6 +479,18 @@ def sha256(path: Path) -> str:
 def normalized_line(line: str) -> str:
     text = unicodedata.normalize("NFKD", line).lower().replace("\\", "")
     return " ".join(re.findall(r"[a-z0-9]+", text))
+
+
+def best_witness(canonical: str, candidates: list[tuple[str, str]]) -> tuple[str, float]:
+    canonical_tokens = set(normalized_line(canonical).split())
+    scored: list[tuple[float, str]] = []
+    for record, normalized in candidates:
+        candidate_tokens = set(normalized.split())
+        denominator = min(len(canonical_tokens), len(candidate_tokens))
+        score = len(canonical_tokens & candidate_tokens) / denominator if denominator else 0.0
+        scored.append((score, record))
+    score, record = max(scored, key=lambda item: (item[0], item[1]))
+    return record, score
 
 
 def main() -> int:

@@ -9,7 +9,7 @@ Status: **IN PROGRESS — FIRST-PRINCIPLES ARCHITECTURE RECONSTRUCTED; EVIDENCE 
 - The native strict profile remains a static discrete 2D binary square-lattice relation with no native `t` axis. A model is one total field, not a trajectory, and an occurrence witness is not transition state.
 - The required occurrence is unanchored. Figures put a witness at the center and the search procedure begins there because translation symmetry permits a convenient representative; the nonperiodic example is unique only up to translations (`BOOK:2640`, `2664`, `2674`, `14086-14095`).
 - The local allowed-pattern relation remains unchanged everywhere. T33 adds a global existential conjunct; it does not add a distinguished firing locus, boundary condition, fixed center, seed state, or repair update.
-- The strict syntax has `32 * 2^32 = 137,438,953,472` source-counted constraint pairs (`BOOK:2678`). This count ranges over each 32-bit T32 allowed mask and each one of the 32 possible required cross templates. It therefore provisionally indicates that `required not-in allowed` is well-formed but immediately inconsistent rather than constructor-invalid; the source audit must close the apparent tension with the prose “from this set.”
+- The strict syntax has `32 * 2^32 = 137,438,953,472` source-counted constraint pairs (`BOOK:2678`). Together with T32's independently fixed 32 templates and `2^32` masks, this forces independent `(allowed mask, required template)` syntax. Thus `required not-in allowed` is well-formed but immediately inconsistent rather than constructor-invalid; “from this set” describes satisfiable examples, not a smaller syntactic family.
 - Printed constraint numbers remain the T32 allowed-set numbers “as before,” while the required template is displayed separately at the center (`BOOK:2640`). No source-defined combined 37-bit integer codec has yet been established.
 - The strict examples can still be repetitive, including periods `98 x 98` and 56 cells on the diagonal (`BOOK:2640`). T33 does not mean nonperiodic, unique, satisfiable, or computationally complex.
 - A finite search can extend thousands of cells and still fail globally. Gray partial assignments and a centered witness are solver state/provenance, not model labels or native state (`BOOK:2642-2666`).
@@ -22,7 +22,7 @@ Status: **IN PROGRESS — FIRST-PRINCIPLES ARCHITECTURE RECONSTRUCTED; EVIDENCE 
 ## Updated Assumptions
 
 - **Retained:** T32 `AllowedLocalPatterns` is the smallest local base; T33 is a declarative conjunction with `RequiredPatternOccurrences`.
-- **Retained:** required templates are total maps over exactly the base relation's support/alphabet. Shape or alphabet mismatch is invalid syntax; failure to belong to the allowed set is provisionally semantic inconsistency, not malformed data.
+- **Retained:** required templates are total maps over exactly the base relation's support/alphabet. Shape or alphabet mismatch is invalid syntax; failure to belong to the allowed set is semantic inconsistency, not malformed data.
 - **Retained:** strict T33 requires one template at least once. A principled finite-set closure requires each distinct listed template somewhere; the Notes' “every template” profile is `required = allowed`.
 - **Retained:** a witness anchor belongs to a verification/certificate record. It is not part of the denoted model, and translating a model translates its witnesses.
 - **Retained:** periodic presentations can decide occurrence by scanning one full fundamental domain while preserving named support-slot aliases. Finite windows can positively witness occurrence with complete support but absence from a bounded window is not global absence.
@@ -121,7 +121,7 @@ Models(base, required) = {
 
 The strict source profile has one required template. The Notes extension uses every template in the allowed set. A generic finite nonempty set is the principled conjunction closure between those profiles; an empty required set canonicalizes to plain T32 rather than naming a T33 program.
 
-Every required template must be total over the base support and alphabet. Duplicate requirements canonicalize because “at least once” is idempotent. Whether `required` must be a subset of `base.allowed` is not imposed as validation: the source's full `32 * 2^32` count provisionally admits all pairs, and any required template disallowed locally yields an immediate semantic UNSAT certificate.
+Every required template must be total over the base support and alphabet. Duplicate requirements canonicalize because “at least once” is idempotent. `required` is not constrained to be a subset of `base.allowed`: the source's full `32 * 2^32` count admits all independent pairs, and any required template disallowed locally yields an immediate semantic UNSAT certificate.
 
 There is no seed, event-zero configuration, preferred origin, time, FRONTIER, transition NEIGHBORHOOD, RULE result, write, UPDATE, successor, halt, or trace.
 
@@ -249,7 +249,7 @@ The checked-in runtime lacks the shared declarative relation/query layer already
 - No fixed center, preferred origin, distinguished model cell, or initial configuration inferred from centered figures/search.
 - No witness anchor stored in the mathematical model or used as pointwise model identity.
 - No required template hidden in T32 matching flags, callbacks, or alphabet markers.
-- No constructor rejection of `required not-in allowed` unless the source count is first reconciled by stronger evidence.
+- No constructor rejection of `required not-in allowed`; the exact source family count admits that well-formed inconsistent case.
 - No occurrence absence inferred from a bounded/open window.
 - No partial gray assignment, search cursor, backtracking tree, periodicity heuristic, or SAT state treated as a model or transition trace.
 - No multiplicity, exactly-once, first/nearest occurrence, common anchor, or fixed-anchor menu invented from “at least once.”

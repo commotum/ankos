@@ -104,33 +104,26 @@ ASSET_ROWS = r"""
 2686|N-T33-RULE60-PART-B|_page_235_Picture_6.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_235_Picture_6.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md|509|133681|576|572|717a2b642c45c185720ab26ae877f8396b487c7dd344960736a43607146f4cd0|t33_rule60|native rule-60 construction companion; field pixels untranscribed
 2690|N-T33-RULE30-PART-A|_page_236_Picture_1.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_236_Picture_1.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md|513|193879|1192|635|8657ab025bb0e8aaccecf078f0ea5949d177c2eb49dcef65e39febdac7201c3c|t33_rule30|native 56-template/rule-30 construction part; table untranscribed
 2692|N-T33-RULE30-PART-B|_page_236_Picture_2.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_236_Picture_2.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md|515|31242|576|178|9010ea53f9ecf7f45ff84a106e6959f1d30d73045e7de4c3e199acdb7a98acb1|t33_rule30|native rule-30 construction companion; pixels untranscribed
+4000|C-SOLVER-RANDOM-SAMPLING-A|_page_358_Figure_4.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_358_Figure_4.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|571|10310|429|299|916d7338bc30d0715f28bdc702eb8b892ac1a5af8a70ebc14ed75386596b243f|solver_random_sampling|random-sampling constraint violation distribution A; external solver control
+4002|C-SOLVER-RANDOM-SAMPLING-B|_page_358_Figure_5.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_358_Figure_5.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|573|10632|440|288|e14364085b16bdd661b0669c078ad073270c194d010cbbde7d6e15dfd0283046|solver_random_sampling|random-sampling constraint violation distribution B; external solver control
+4018|C-SOLVER-ITERATIVE-REPAIR-A|_page_359_Figure_5.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_359_Figure_5.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|589|49791|1192|609|ad1a1ad5693087a5793271a4d0beb7e14d851d1983f38858417cd7590a26753b|solver_iterative_repair|iterative approximate repair trace A; not T33 model evolution
+4022|C-SOLVER-ITERATIVE-REPAIR-B|_page_360_Figure_2.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_360_Figure_2.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|593|201913|1055|693|5a833dc9f810ff7781cd1a76b01d3114572368fe97284d79c90a058945d11b2d|solver_iterative_repair|iterative approximate repair trace B; not T33 model evolution
+4030|C-SOLVER-STUCK-LOCAL-REPAIR|_page_361_Picture_2.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_361_Picture_2.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|601|68246|884|293|4ee0031733c3b9a5a4cadf3ca3aabeba99347386157c32dad8a374d307ca4bc5|-|iterative local-repair attempts get stuck; solver state is external
 4040|C-SOLVER-LANDSCAPE-A|_page_361_Figure_7.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_361_Figure_7.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|611|5370|277|172|0202c6b41b0c506de64b3f9c71c7177114d8fc681ff56720a37fc443663f9efa|solver_landscape|optimization analogy A; search is outside T33 denotation
 4042|C-SOLVER-LANDSCAPE-B|_page_361_Figure_8.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_361_Figure_8.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|613|6202|272|187|e329e90008163ba261920c5ee4f486e6647b661d12b8a2cd4bc980f337d84587|solver_landscape|optimization analogy B; local minima are solver behavior
 4044|C-SOLVER-LANDSCAPE-C|_page_361_Figure_9.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_361_Figure_9.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|615|5736|284|177|fe01dc70f470ff7724d641f2dc7faaca8fe95c0a3153952196d94d944fca9303|solver_landscape|optimization analogy C; not model data or a proof
-4074|C-ELEMENTARY-INVARIANT-CA-A|_page_363_Picture_7.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_363_Picture_7.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|645|6991|220|142|4b7812c66ba736164526457f476a999582bc8ffb37aa5cb9b3a1699eff29b31c|elementary_invariant_pair|CA evolution/invariant control; no required occurrence
-4076|C-ELEMENTARY-INVARIANT-CA-B|_page_363_Picture_9.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_363_Picture_9.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|647|15637|228|159|d87280d6d085c7284ee5f6b8870c39a6f96f35a53e2798801d59dd306a639d33|elementary_invariant_pair|CA evolution/invariant control; not T33 satisfaction
+4058|C-SOLVER-RANDOM-PLATEAU-MOVE|_page_362_Picture_7.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_362_Picture_7.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|629|87533|472|571|c227e0328d77f8e1e0dee9981f4a852215ec0348f7fa2dd042acac13c9a1ab09|-|randomized plateau moves eventually visit solutions; external solver process
+4074|R-ELEMENTARY-INVARIANT-CA-A|_page_363_Picture_7.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_363_Picture_7.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|645|6991|220|142|4b7812c66ba736164526457f476a999582bc8ffb37aa5cb9b3a1699eff29b31c|elementary_invariant_pair|CA evolution/invariant relation A; no required occurrence
+4076|R-ELEMENTARY-INVARIANT-CA-B|_page_363_Picture_9.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_363_Picture_9.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|647|15637|228|159|d87280d6d085c7284ee5f6b8870c39a6f96f35a53e2798801d59dd306a639d33|elementary_invariant_pair|CA evolution/invariant relation B; no required occurrence
 4080|R-2D-CA-FIXED-POINT|_page_364_Figure_2.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Images/_page_364_Figure_2.jpeg|CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md|651|116597|989|397|81bf29a27913353b89e4e32d4b9ccf8a8af86c863077527b912a773c58c968d2|-|CA trajectories whose invariant fields obey local constraints; relation only
 5786|R-NETWORK-CONSTRAINT-ANALOG|_page_498_Picture_1.jpeg|CHAPTERS/9-Fundamental-Physics/Images/_page_498_Picture_1.jpeg|CHAPTERS/9-Fundamental-Physics/Fundamental-Physics.md|621|151593|1200|1134|093b64cd96ee2dc310aac0ed471e881f4bf63705b4d0f2ddf53ac849c6b5ad30|-|network-template analog on a graph carrier; distinct occurrence geometry
-6940|C-FEATURE-MATCHING-A|_page_594_Picture_5.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_594_Picture_5.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Processes-of-Perception-and-Analysis.md|353|28460|263|247|a45e5167bdcb769d5c8fac3d2598515f45c88a7f8f9873bb0d8e7bae12a84e14|feature_matching|template detector A; observation is not existential satisfaction
-6942|C-FEATURE-MATCHING-B|_page_594_Picture_6.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_594_Picture_6.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Processes-of-Perception-and-Analysis.md|355|27326|269|259|42d56967b498077397ef788fd3919d4b1b448cd44cffffd0366270ee5db25af0|feature_matching|template detector output; not a T33 model
-6944|C-FEATURE-MATCHING-C|_page_594_Picture_7.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_594_Picture_7.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Processes-of-Perception-and-Analysis.md|357|28041|272|261|af08e1c6ec6f8a1192dc68ffa9a0aee9fed1c0400b2a514e8b845db0773930d1|feature_matching|second feature detector A; observer control
-6946|C-FEATURE-MATCHING-D|_page_594_Picture_8.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_594_Picture_8.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Processes-of-Perception-and-Analysis.md|359|26618|261|264|8bfc57a4dcab2c648754f7dfc014777bd7b3dc830b2535ffe3c2701164d407c9|feature_matching|second feature detector B; observer control
 6974|R-REPETITIVE-BLOCK-OBSERVER|_page_597_Picture_4.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Images/_page_597_Picture_4.jpeg|CHAPTERS/10-Processes-of-Perception-and-Analysis/Processes-of-Perception-and-Analysis.md|387|117732|1176|288|af141871d07013cbc96cc7668acf1f54d903ae3f2f1f87f2933435b165780cc6|-|observer gallery cross-referencing T32 periodic models
-14042|R-1D-ALLOWED-BLOCK-DEBRUIJN|_page_956_Picture_2.jpeg|BACK-MATTER/Index/Images/_page_956_Picture_2.jpeg|BACK-MATTER/Index/Index.md|1943|31826|575|293|f593e5c3b7438d4bf47428ed3474451c436c5e1572d009c4ad201b4687961ad6|-|1D allowed-block relation; different carrier and occurrence scope
 14052|C-T32-ORDERED-32-TEMPLATE-KEY|_page_956_Picture_8.jpeg|BACK-MATTER/Index/Images/_page_956_Picture_8.jpeg|BACK-MATTER/Index/Index.md|1953|16014|573|80|c869c2839aee8d0f4319646140de881e57eef5165df901ca0de079b9e4510e4e|-|T32 Notes key; raster order remains untranscribed here
 14111|R-16-COLOR-LOCAL-BLOCK-FORCING|_page_957_Picture_14.jpeg|BACK-MATTER/Index/Images/_page_957_Picture_14.jpeg|BACK-MATTER/Index/Index.md|2012|11244|560|84|957c224462a36129efb03f2413788e4bc4a4f0606372f27dc67ca1df05b87b35|-|16-color local blocks force nesting without supplying T33 native data
 14117|R-CA-SPACETIME-TEMPLATE|_page_958_Picture_4.jpeg|BACK-MATTER/Index/Images/_page_958_Picture_4.jpeg|BACK-MATTER/Index/Index.md|2018|6294|561|36|245be117b883ed09e8f5fa56750351c77686dbebe6acf67943249afe7d47f009|-|rule-30 spacetime allowed-template relation; encoding, not evolution here
 14136|R-POLYOMINO-SET-A|_page_958_Picture_14.jpeg|BACK-MATTER/Index/Images/_page_958_Picture_14.jpeg|BACK-MATTER/Index/Index.md|2037|6209|235|113|6e2b1cf80ec33ace8df4fa467421ac5a125d8ddf75152868c73f50d21068ec10|polyomino_tiling|nonperiodic tiling relation A; distinct matching carrier
 14138|R-POLYOMINO-SET-B|_page_958_Picture_15.jpeg|BACK-MATTER/Index/Images/_page_958_Picture_15.jpeg|BACK-MATTER/Index/Index.md|2039|6339|326|109|a7f419934ce41465427c5daa4a8536234bb95f4d5a83ed30909378301e78cd77|polyomino_tiling|nonperiodic tiling relation B; distinct matching carrier
 14142|R-POLYOMINO-CONSTRUCTION|_page_958_Picture_17.jpeg|BACK-MATTER/Index/Images/_page_958_Picture_17.jpeg|BACK-MATTER/Index/Index.md|2043|71912|595|356|1b61b17be3fc38d6494849ed1a67be69d9658afd61d0be3549743f8a3357fc64|polyomino_tiling|polyomino construction companion; not a T33 field witness
-15211|C-AGGREGATION-TEMPLATE-DYNAMIC-A|_page_994_Picture_3.jpeg|BACK-MATTER/Index/Images/_page_994_Picture_3.jpeg|BACK-MATTER/Index/Index.md|3112|3818|119|109|bbae1064a5c23d5e9638c8587d33c804de3eb0f7cd907b7d5065d89693831c4d|aggregation_template_gallery|template-conditioned stochastic growth A; dynamic control
-15213|C-AGGREGATION-TEMPLATE-DYNAMIC-B|_page_994_Picture_4.jpeg|BACK-MATTER/Index/Images/_page_994_Picture_4.jpeg|BACK-MATTER/Index/Index.md|3114|3789|107|112|b1430c29bed143b063fbc07a34f1b5232d87fc479d90b2beca1afd87df5abd6f|aggregation_template_gallery|template-conditioned stochastic growth B; dynamic control
-15215|C-AGGREGATION-TEMPLATE-DYNAMIC-C|_page_994_Picture_5.jpeg|BACK-MATTER/Index/Images/_page_994_Picture_5.jpeg|BACK-MATTER/Index/Index.md|3116|3379|110|119|7d47e459b95d2f9765ab732968f40db589be265d0691f06b267b75aa487962a9|aggregation_template_gallery|template-conditioned stochastic growth C; dynamic control
-15217|C-AGGREGATION-TEMPLATE-DYNAMIC-D|_page_994_Picture_6.jpeg|BACK-MATTER/Index/Images/_page_994_Picture_6.jpeg|BACK-MATTER/Index/Index.md|3118|2430|107|115|c7214b5edb00142fdf7b117089a2fa8fe763aafbeac051c0575e9d1a1eb76d5a|aggregation_template_gallery|template-conditioned stochastic growth D; dynamic control
-15219|C-AGGREGATION-TEMPLATE-DYNAMIC-E|_page_994_Picture_7.jpeg|BACK-MATTER/Index/Images/_page_994_Picture_7.jpeg|BACK-MATTER/Index/Index.md|3120|2528|100|136|301f9a8a252bfc39f65c0fe450c17ca5a9cd6a961bb020b590f40d4e40c08e31|aggregation_template_gallery|template-conditioned stochastic growth E; dynamic control
-16375|R-SYMMETRIC-GRAPH-TEMPLATE|_page_1047_Picture_11.jpeg|BACK-MATTER/Index/Images/_page_1047_Picture_11.jpeg|BACK-MATTER/Index/Index.md|4276|24424|532|168|6741bdbfbc784f0428517083d681feec8b0abbee46151676b051584211d91c73|-|whole-graph template relation; distinct global object semantics
-17433|C-CA-FEATURE-EXTRACTION|_page_1092_Picture_6.jpeg|BACK-MATTER/Index/Images/_page_1092_Picture_6.jpeg|BACK-MATTER/Index/Index.md|5336|21682|583|141|b13e50f8bb2f7e905b8580ea94d93c7295e5967125aa8042defe76936bdb1dd6|-|single-step CA feature extraction; observer/update control
-17465|R-TEXTURE-MINIMAL-PATTERNS|_page_1093_Picture_6.jpeg|BACK-MATTER/Colophon/Images/_page_1093_Picture_6.jpeg|BACK-MATTER/Colophon/Colophon.md|22|14942|555|98|b1b2a6ab123cc672995f0c53bf9207a5606a7d8043d3135756c6b173b83e1a79|-|texture generated from minimal local patterns; relation raster untranscribed
 """.strip()
 
 
@@ -153,8 +146,8 @@ ASSETS = parse_assets(ASSET_ROWS)
 
 NATIVE_IMAGE_LINES = frozenset({2638, 2662, 2670, 2682, 2686, 2690, 2692})
 RELATION_IMAGE_LINES = frozenset(
-    {2322, 4080, 5786, 6974, 14042, 14111, 14117, 14136, 14138, 14142,
-     16375, 17465}
+    {2322, 4074, 4076, 4080, 5786, 6974, 14111, 14117, 14136, 14138,
+     14142}
 )
 CONTROL_IMAGE_LINES = frozenset(ASSETS) - NATIVE_IMAGE_LINES - RELATION_IMAGE_LINES
 GOVERNED_IMAGE_LINES = (
@@ -169,7 +162,19 @@ assert not (
 assert (
     len(NATIVE_IMAGE_LINES), len(RELATION_IMAGE_LINES),
     len(CONTROL_IMAGE_LINES), len(GOVERNED_IMAGE_LINES),
-) == (7, 12, 30, 49)
+) == (7, 11, 24, 42)
+assert digest_lines(NATIVE_IMAGE_LINES) == (
+    "bf5973e5ca2bde537bb80ccce7088f447f407f85751c4431becbf97a776c2728"
+)
+assert digest_lines(RELATION_IMAGE_LINES) == (
+    "bf854a24144520fd1400d906459a8bf243dcfc24cc2b014c770bdf4c1c0e6823"
+)
+assert digest_lines(CONTROL_IMAGE_LINES) == (
+    "b6f5545069072356892c7bd2249f4e4ca7387109ded74dc44196f819a85c5fee"
+)
+assert digest_lines(GOVERNED_IMAGE_LINES) == (
+    "fd6f90fc2c6f07a8e8c56e62eaa268545cbfc5d1024169c95c972cd97f9dcd97"
+)
 
 
 ASSEMBLIES = {
@@ -183,15 +188,13 @@ assert ASSEMBLIES == {
     "catalog_171": frozenset({2626, 2628}),
     "t33_rule60": frozenset({2682, 2686}),
     "t33_rule30": frozenset({2690, 2692}),
+    "solver_random_sampling": frozenset({4000, 4002}),
+    "solver_iterative_repair": frozenset({4018, 4022}),
     "solver_landscape": frozenset({4040, 4042, 4044}),
     "elementary_invariant_pair": frozenset({4074, 4076}),
-    "feature_matching": frozenset({6940, 6942, 6944, 6946}),
     "polyomino_tiling": frozenset({14136, 14138, 14142}),
-    "aggregation_template_gallery": frozenset(
-        {15211, 15213, 15215, 15217, 15219}
-    ),
 }
-assert sum(map(len, ASSEMBLIES.values())) == 25
+assert sum(map(len, ASSEMBLIES.values())) == 20
 
 
 # Every nearby/source-routed raster that is not governed is named and
@@ -203,25 +206,47 @@ ADJACENCY_EXCLUSIONS = {
     2328: ("_page_204_Picture_4.jpeg", "T27 geometric-substitution result companion"),
     2330: ("_page_204_Picture_5.jpeg", "T27 geometric-substitution rule companion"),
     2564: ("_page_224_Picture_6.jpeg", "multiway network before the constraint section"),
-    5804: ("_page_500_Figure_3.jpeg", "reversible-CA evolution after network constraints"),
-    6926: ("_page_593_Picture_1.jpeg", "source texture mosaic, not constraint data"),
-    6952: ("_page_595_Picture_1.jpeg", "perception filter bank"),
-    6954: ("_page_595_Picture_2.jpeg", "perception filter-bank companion"),
-    6964: ("_page_596_Figure_2.jpeg", "feature-density observer"),
-    6982: ("_page_598_Figure_2.jpeg", "T26 nested-substitution observer"),
+    14162: ("_page_959_Picture_12.jpeg", "Diophantine relation assembly, not T33"),
+    14164: ("_page_959_Picture_13.jpeg", "Diophantine relation assembly, not T33"),
+    14166: ("_page_959_Picture_14.jpeg", "Diophantine relation assembly, not T33"),
+    14168: ("_page_959_Picture_15.jpeg", "Diophantine relation assembly, not T33"),
     14273: ("_page_964_Picture_11.jpeg", "3D CA motion owned by preceding passage"),
-    17113: ("_page_1083_Figure_4.jpeg", "Ramsey run figure; comparison route only"),
-    17457: ("_page_1093_Picture_2.jpeg", "dithering predecessor"),
-    17461: ("_page_1093_Picture_4.jpeg", "nested-pattern gray observer"),
-    17469: ("_page_1093_Picture_8.jpeg", "CA-generated texture successor"),
-    17475: ("_page_1093_Picture_11.jpeg", "Moire-pattern successor"),
-    17479: ("_page_1093_Picture_13.jpeg", "Moire continuation"),
-    17483: ("_page_1093_Picture_15.jpeg", "Moire proximity-join continuation"),
 }
 EXCLUDED_IMAGE_LINES = frozenset(ADJACENCY_EXCLUSIONS)
 assert GOVERNED_IMAGE_LINES.isdisjoint(EXCLUDED_IMAGE_LINES)
 for excluded_line, (excluded_name, _reason) in ADJACENCY_EXCLUSIONS.items():
     assert BOOK_LINES[excluded_line - 1] == f"![]({excluded_name})"
+
+# Exclusions are provenance-bound too; classification X means out of T33
+# evidence, not unchecked or missing.  They are not counted in governed-byte
+# totals or the governed evidence boundary.
+EXCLUDED_ASSET_ROWS = r"""
+1505|X-T35-PIECEWISE-BOUNDARY|_page_137_Picture_7.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_137_Picture_7.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|109|94903|445|735|959a39064c320d7b1b67d38394446622a11faba14b767526cdaa6c52b767c4e7|-|first predicate-branched arithmetic picture
+2314|X-T26-PAGE187|_page_202_Picture_4.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_202_Picture_4.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md|171|108556|1064|578|ec903a3a52824f3a1e97766dca0eebea857e37e42e6ebc1f0525f19e29f2ca5e|-|page-187 substitution example, not cited page-188 gallery
+2328|X-T27-GEOMETRIC-RESULT|_page_204_Picture_4.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_204_Picture_4.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md|183|87284|1140|532|dcf7ff457a600fb1d0f1bcf98a427e4eb54ca8cab5ed9aaf2c3fcdc35220a471|t27_geometric_pair|geometric-substitution result, not constraint evidence
+2330|X-T27-GEOMETRIC-RULE|_page_204_Picture_5.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_204_Picture_5.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md|185|3127|221|80|7e04c2b7277c015f960e2d42176562a4d6f79ce0643a360a37cc8cc6ac24d29d|t27_geometric_pair|geometric-substitution rule, not constraint evidence
+2564|X-T30-MULTIWAY|_page_224_Picture_6.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Images/_page_224_Picture_6.jpeg|CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md|393|69499|1157|454|30514015fe7cd07b92512c9f1c42e11ec2655fef8a0635ac1c6edb445af7849e|-|multiway network preceding the constraint section
+14162|X-DIOPHANTINE-A|_page_959_Picture_12.jpeg|BACK-MATTER/Index/Images/_page_959_Picture_12.jpeg|BACK-MATTER/Index/Index.md|2063|8353|145|142|2aee3488149768312332b452413b0e30047c8ccd703543fec6552753f851a715|diophantine_assembly|linear Diophantine relation A, not T33
+14164|X-DIOPHANTINE-B|_page_959_Picture_13.jpeg|BACK-MATTER/Index/Images/_page_959_Picture_13.jpeg|BACK-MATTER/Index/Index.md|2065|7775|123|134|4a3bdf0a5086835d46c97d866a1838d22a9fea275c9ec98a8bd528c57ff5fbce|diophantine_assembly|linear Diophantine relation B, not T33
+14166|X-DIOPHANTINE-C|_page_959_Picture_14.jpeg|BACK-MATTER/Index/Images/_page_959_Picture_14.jpeg|BACK-MATTER/Index/Index.md|2067|7518|142|150|42f5298711893e8e2663ba8ff152f78e871c5d0679d800ed948e70a88f437144|diophantine_assembly|linear Diophantine relation C, not T33
+14168|X-DIOPHANTINE-D|_page_959_Picture_15.jpeg|BACK-MATTER/Index/Images/_page_959_Picture_15.jpeg|BACK-MATTER/Index/Index.md|2069|7429|138|152|2c2c97b716240824aeb6542c4870f327f1246240e09395a5bc792f2c95f08d27|diophantine_assembly|linear Diophantine relation D, not T33
+14273|X-3D-CA-MOTION|_page_964_Picture_11.jpeg|BACK-MATTER/Index/Images/_page_964_Picture_11.jpeg|BACK-MATTER/Index/Index.md|2174|15018|578|84|b293416f5b629568040e1608747fb496c1773579ce50d0ef87dffdcd13ef5363|-|preceding 3D cellular-automaton motion plate
+""".strip()
+EXCLUDED_ASSETS = parse_assets(EXCLUDED_ASSET_ROWS)
+assert frozenset(EXCLUDED_ASSETS) == EXCLUDED_IMAGE_LINES
+for line, asset in EXCLUDED_ASSETS.items():
+    assert asset.name == ADJACENCY_EXCLUSIONS[line][0]
+EXCLUDED_ASSEMBLIES = {
+    assembly: frozenset(
+        line for line, asset in EXCLUDED_ASSETS.items()
+        if asset.assembly == assembly
+    )
+    for assembly in {asset.assembly for asset in EXCLUDED_ASSETS.values()} - {"-"}
+}
+assert EXCLUDED_ASSEMBLIES == {
+    "t27_geometric_pair": frozenset({2328, 2330}),
+    "diophantine_assembly": frozenset({14162, 14164, 14166, 14168}),
+}
 
 
 SOURCE_DERIVED_CANDIDATE_GROUPS = {
@@ -233,24 +258,17 @@ SOURCE_DERIVED_CANDIDATE_GROUPS = {
         {2564, 2576, 2584, 2598, 2606, 2616, 2626, 2628, 2638, 2662,
          2670, 2682, 2686, 2690, 2692}
     ),
-    "solver_landscape": frozenset({4040, 4042, 4044}),
+    "solver_passage": frozenset(
+        {4000, 4002, 4018, 4022, 4030, 4040, 4042, 4044, 4058}
+    ),
     "invariant_relation": frozenset({4074, 4076, 4080}),
-    "network_analogy": frozenset({5786, 5804}),
-    "observer_caption_chain": frozenset(
-        {6926, 6940, 6942, 6944, 6946, 6952, 6954, 6964, 6974, 6982}
-    ),
+    "network_analogy": frozenset({5786}),
+    "observer_cross_reference": frozenset({6974}),
     "notes_template_chain": frozenset(
-        {14042, 14052, 14111, 14117, 14136, 14138, 14142}
+        {14052, 14111, 14117, 14136, 14138, 14142}
     ),
+    "nearby_Diophantine_assembly": frozenset({14162, 14164, 14166, 14168}),
     "no_initial_conditions_adjacency": frozenset({14273}),
-    "aggregation_template_dynamics": frozenset(
-        {15211, 15213, 15215, 15217, 15219}
-    ),
-    "network_notes": frozenset({16375}),
-    "pattern_avoidance_cross_reference": frozenset({17113}),
-    "feature_extraction_and_texture": frozenset(
-        {17433, 17457, 17461, 17465, 17469, 17475, 17479, 17483}
-    ),
 }
 CANDIDATE_IMAGE_LINES = frozenset().union(*SOURCE_DERIVED_CANDIDATE_GROUPS.values())
 assert sum(map(len, SOURCE_DERIVED_CANDIDATE_GROUPS.values())) == len(
@@ -259,7 +277,13 @@ assert sum(map(len, SOURCE_DERIVED_CANDIDATE_GROUPS.values())) == len(
 assert all(line in BOOK_IMAGES for line in CANDIDATE_IMAGE_LINES)
 UNRESOLVED_IMAGE_LINES: frozenset[int] = frozenset()
 assert CANDIDATE_IMAGE_LINES == GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
-assert len(CANDIDATE_IMAGE_LINES) == 68
+assert len(CANDIDATE_IMAGE_LINES) == 52
+assert digest_lines(EXCLUDED_IMAGE_LINES) == (
+    "79ae511b0f04d2ac136061d8ff6e97d30cc5c135091cac2ca5b6afcf8250bbb5"
+)
+assert digest_lines(CANDIDATE_IMAGE_LINES) == (
+    "67101b858031d5cfcb3c0532588f11732ad9d5bccd6db5f942a84268c8521bd5"
+)
 
 
 CLASSIFICATION = {
@@ -270,9 +294,9 @@ CLASSIFICATION = {
 }
 assert frozenset(CLASSIFICATION) == CANDIDATE_IMAGE_LINES
 assert tuple(CLASSIFICATION.values()).count("N") == 7
-assert tuple(CLASSIFICATION.values()).count("R") == 12
-assert tuple(CLASSIFICATION.values()).count("C") == 30
-assert tuple(CLASSIFICATION.values()).count("X") == 19
+assert tuple(CLASSIFICATION.values()).count("R") == 11
+assert tuple(CLASSIFICATION.values()).count("C") == 24
+assert tuple(CLASSIFICATION.values()).count("X") == 10
 
 
 HASH_BOUND = GOVERNED_IMAGE_LINES
@@ -281,7 +305,7 @@ PIXEL_REPLAYED: frozenset[int] = frozenset()
 assert LIMITED_TRANSCRIBED <= HASH_BOUND
 assert PIXEL_REPLAYED <= LIMITED_TRANSCRIBED
 assert (len(HASH_BOUND), len(LIMITED_TRANSCRIBED), len(PIXEL_REPLAYED)) == (
-    49, 0, 0,
+    42, 0, 0,
 )
 
 
@@ -313,8 +337,8 @@ assert len(SOURCE_DERIVED_NOT_PIXEL_TRANSCRIBED) == 5
 
 
 SOURCE_GUARDS = {
-    1439: "the very simplest possible type of arithmetic rule",
-    1497: "different operations depending on whether the number obtained at each step",
+    1441: "operations of elementary arithmetic are so simple",
+    1499: "if the number at a particular step is even",
     2318: "next page gives some more examples of two-dimensional substitution systems",
     2634: "particular template from this set must appear at least somewhere",
     2640: "certain template from this set must occur at least once",
@@ -331,7 +355,7 @@ SOURCE_GUARDS = {
     14115: "represented in terms of a set of allowed templates",
     14134: "force non-periodic patterns",
     14275: "Systems based on constraints do not have initial conditions",
-    20769: "force, say, cellular automaton patterns to be generated, as on page 221",
+    20754: "force, say, cellular automaton patterns to be generated, as on page 221",
 }
 for source_line, fragment in SOURCE_GUARDS.items():
     assert fragment in BOOK_LINES[source_line - 1], (source_line, fragment)
@@ -391,8 +415,8 @@ def verify_source_interface() -> None:
         assert actual == expected, (attribute, sorted(actual), sorted(expected))
 
 
-def ledger() -> tuple[str, int, int, int, int]:
-    """Verify every governed asset and return the canonical provenance ledger."""
+def ledger() -> tuple[str, str, int, int, int, int, int, int, int, int]:
+    """Verify governed and excluded assets; return two canonical ledgers."""
 
     split_markdown = sorted(
         path
@@ -465,29 +489,94 @@ def ledger() -> tuple[str, int, int, int, int]:
         )
 
     payload = "\n".join(rows) + "\n"
-    return payload, monolith_references, split_references, len(hashes), total_bytes
+
+    excluded_rows: list[str] = []
+    excluded_hashes: set[str] = set()
+    excluded_bytes = 0
+    excluded_monolith_references = 0
+    excluded_split_references = 0
+    for book_line, asset in sorted(EXCLUDED_ASSETS.items()):
+        assert CLASSIFICATION[book_line] == "X"
+        assert BOOK_LINES[book_line - 1] == f"![]({asset.name})"
+        assert monolith_by_name.get(asset.name) == [book_line]
+
+        expected_split = SOURCE_ROOT / asset.split_markdown
+        split_hits = split_by_name.get(asset.name, [])
+        assert split_hits == [(expected_split, asset.split_line)], (
+            book_line, split_hits,
+        )
+        expected_physical = SOURCE_ROOT / asset.physical
+        physical_hits = physical_by_name.get(asset.name, [])
+        assert physical_hits == [expected_physical], (book_line, physical_hits)
+
+        data = expected_physical.read_bytes()
+        digest = sha256(data)
+        assert len(data) == asset.byte_length
+        assert jpeg_size(data) == (asset.width, asset.height)
+        assert digest == asset.digest
+        assert digest not in hashes and digest not in excluded_hashes
+        excluded_hashes.add(digest)
+        excluded_bytes += len(data)
+        excluded_monolith_references += 1
+        excluded_split_references += 1
+        excluded_rows.append(
+            "|".join(
+                (
+                    str(book_line), "X", asset.role, asset.physical,
+                    str(asset.byte_length), str(asset.width), str(asset.height),
+                    asset.digest, asset.split_markdown, str(asset.split_line),
+                    asset.assembly, asset.boundary,
+                )
+            )
+        )
+
+    excluded_payload = "\n".join(excluded_rows) + "\n"
+    return (
+        payload, excluded_payload,
+        monolith_references, split_references, len(hashes), total_bytes,
+        excluded_monolith_references, excluded_split_references,
+        len(excluded_hashes), excluded_bytes,
+    )
 
 
 # Frozen after independent reconciliation; deliberately impossible until the
 # first full verifier run reports the recomputed value.
 EXPECTED_LEDGER_SHA256 = "TO_BE_FROZEN"
+EXPECTED_EXCLUDED_LEDGER_SHA256 = "TO_BE_FROZEN"
 
 
 def main() -> None:
     verify_source_interface()
-    payload, monolith_refs, split_refs, hashes, total_bytes = ledger()
+    (
+        payload, excluded_payload,
+        monolith_refs, split_refs, hashes, total_bytes,
+        excluded_monolith_refs, excluded_split_refs,
+        excluded_hashes, excluded_bytes,
+    ) = ledger()
     ledger_digest = sha256(payload.encode("utf-8"))
+    excluded_ledger_digest = sha256(excluded_payload.encode("utf-8"))
     assert ledger_digest == EXPECTED_LEDGER_SHA256, (
         "ledger", ledger_digest, EXPECTED_LEDGER_SHA256,
     )
+    assert excluded_ledger_digest == EXPECTED_EXCLUDED_LEDGER_SHA256, (
+        "excluded ledger", excluded_ledger_digest,
+        EXPECTED_EXCLUDED_LEDGER_SHA256,
+    )
     assert (monolith_refs, split_refs, hashes, total_bytes) == (
-        49, 49, 49, 4_579_533,
+        42, 42, 42, 4_668_695,
+    )
+    assert (
+        excluded_monolith_refs, excluded_split_refs,
+        excluded_hashes, excluded_bytes,
+    ) == (
+        10, 10, 10, 409_462,
     )
     print(
-        "T33 asset oracle: PASS governed=49; classes N/R/C=7/12/30; "
-        "candidates=68; excluded=19; refs=98(monolith=49,split=49); "
-        "unique_hashes=49; bytes=4579533; assemblies=9/25_files; "
-        "boundary=49_HASH_BOUND/0_LIMITED_TRANSCRIBED/0_PIXEL_REPLAYED; "
+        "T33 asset oracle: PASS governed=42; classes N/R/C=7/11/24; "
+        "candidates=52; excluded=10; refs=84(monolith=42,split=42); "
+        "unique_hashes=42; bytes=4668695; assemblies=9/20_files; "
+        "excluded_bound=10/20_refs/10_hashes/409462_bytes/2_assemblies; "
+        "boundary=42_HASH_BOUND/0_LIMITED_TRANSCRIBED/0_PIXEL_REPLAYED; "
         "required_patterns/tables/search_trace=unrecovered; "
         "unresolved_image_dispositions=0"
     )

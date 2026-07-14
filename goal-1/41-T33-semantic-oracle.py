@@ -635,6 +635,13 @@ class OccurrenceWitness:
     template: Template
     anchor: Coord2
 
+    def __post_init__(self) -> None:
+        template = exact_tuple(self.template, "witness template")
+        if any(type(item) is not int for item in template):
+            raise TypeError("witness template entries must be exact ints")
+        object.__setattr__(self, "template", template)
+        object.__setattr__(self, "anchor", checked_coord(self.anchor, "witness anchor"))
+
 
 def replay_occurrence_witness(
     relation: OccurrenceConstrainedPatterns,
@@ -1150,3 +1157,872 @@ def same_explicit_transform_orbit(
         for matrix in D4_MATRICES
         for labels in label_maps
     )
+
+
+def report_signature(report: Verification) -> tuple[object, ...]:
+    if type(report) is not Verification:
+        raise TypeError("report signature requires Verification")
+    return (
+        report.scope,
+        report.checked_anchors,
+        report.occurrence_search_complete,
+        tuple((item.anchor, item.observed) for item in report.local_violations),
+        tuple((item.template, item.anchors) for item in report.occurrence_hits),
+        report.absent_required,
+        report.not_observed_required,
+        report.unresolved_required,
+        report.proves_global_model,
+        report.status,
+    )
+
+
+def transformed_report_signature(
+    report: Verification,
+    relation: OccurrenceConstrainedPatterns,
+    presentation: PeriodicPresentation,
+    transform: ExactTransform,
+) -> tuple[object, ...]:
+    """Map every coordinate/template payload in a periodic report."""
+
+    if type(report) is not Verification:
+        raise TypeError("report transform requires Verification")
+    target_model = transform_periodic(presentation, transform)
+    target_periods = target_model.periods
+
+    def mapped_anchor(anchor: Coord2) -> Coord2:
+        row, column = apply_matrix(transform.matrix, anchor)
+        return row % target_periods[0], column % target_periods[1]
+
+    def mapped_word(word: Template) -> Template:
+        return transform_word(relation.local.offsets, word, transform)[1]
+
+    violations = tuple(
+        sorted(
+            (mapped_anchor(item.anchor), mapped_word(item.observed))
+            for item in report.local_violations
+        )
+    )
+    hits = tuple(
+        sorted(
+            (
+                mapped_word(item.template),
+                tuple(sorted(mapped_anchor(anchor) for anchor in item.anchors)),
+            )
+            for item in report.occurrence_hits
+        )
+    )
+    return (
+        report.scope,
+        report.checked_anchors,
+        report.occurrence_search_complete,
+        violations,
+        hits,
+        tuple(sorted(mapped_word(item) for item in report.absent_required)),
+        tuple(sorted(mapped_word(item) for item in report.not_observed_required)),
+        tuple(sorted(mapped_word(item) for item in report.unresolved_required)),
+        report.proves_global_model,
+        report.status,
+    )
+
+
+def translated_report_signature(
+    report: Verification,
+    presentation: PeriodicPresentation,
+    shift: object,
+) -> tuple[object, ...]:
+    if type(report) is not Verification:
+        raise TypeError("report translation requires Verification")
+    delta_row, delta_column = checked_coord(shift, "translation shift")
+    height, width = presentation.periods
+
+    def moved(anchor: Coord2) -> Coord2:
+        return (anchor[0] + delta_row) % height, (anchor[1] + delta_column) % width
+
+    return (
+        report.scope,
+        report.checked_anchors,
+        report.occurrence_search_complete,
+        tuple(
+            sorted((moved(item.anchor), item.observed) for item in report.local_violations)
+        ),
+        tuple(
+            sorted(
+                (item.template, tuple(sorted(moved(anchor) for anchor in item.anchors)))
+                for item in report.occurrence_hits
+            )
+        ),
+        report.absent_required,
+        report.not_observed_required,
+        report.unresolved_required,
+        report.proves_global_model,
+        report.status,
+    )
+
+
+@dataclass(frozen=True)
+class PointDefectField:
+    alphabet_size: int
+    background: int
+    defect_coordinate: Coord2
+    defect_label: int
+
+    def __post_init__(self) -> None:
+        size = checked_alphabet_size(self.alphabet_size)
+        checked_label(self.background, size, "background")
+        checked_coord(self.defect_coordinate, "defect coordinate")
+        checked_label(self.defect_label, size, "defect label")
+        if self.background == self.defect_label:
+            raise ValueError("point defect must differ from its background")
+
+    def value_at(self, coordinate: object) -> int:
+        point = checked_coord(coordinate, "point-defect coordinate")
+        return self.defect_label if point == self.defect_coordinate else self.background
+
+
+def read_point_defect(
+    field: PointDefectField,
+    local: AllowedLocalPatterns,
+    anchor: object,
+) -> Template:
+    if type(field) is not PointDefectField:
+        raise TypeError("point-defect reader requires PointDefectField")
+    if field.alphabet_size != local.alphabet_size:
+        raise ValueError("field and local relation alphabets differ")
+    row, column = checked_coord(anchor, "point-defect anchor")
+    return tuple(
+        field.value_at((row + delta_row, column + delta_column))
+        for delta_row, delta_column in local.offsets
+    )
+
+
+def native_tiles(height: int, width: int) -> tuple[NativeBinaryTorus, ...]:
+    checked_height = exact_int(height, "tile height")
+    checked_width = exact_int(width, "tile width")
+    if checked_height <= 0 or checked_width <= 0:
+        raise ValueError("tile periods must be positive")
+    return tuple(
+        NativeBinaryTorus(
+            tuple(
+                tuple(flat[row * checked_width : (row + 1) * checked_width])
+                for row in range(checked_height)
+            )
+        )
+        for flat in product((0, 1), repeat=checked_height * checked_width)
+    )
+
+
+def direct_allowed_profiles() -> tuple[frozenset[Template], ...]:
+    return (
+        frozenset(BINARY_CROSS_TEMPLATES),
+        frozenset(),
+        frozenset(word for word in BINARY_CROSS_TEMPLATES if word[2] == 0),
+        frozenset(word for word in BINARY_CROSS_TEMPLATES if word[0] == word[3]),
+        frozenset(word for word in BINARY_CROSS_TEMPLATES if sum(word) % 2 == 0),
+        frozenset({(1, 0, 0, 1, 0)}),
+        frozenset({(0, 0, 0, 0, 0), (1, 0, 0, 0, 0)}),
+        frozenset(
+            word
+            for word in BINARY_CROSS_TEMPLATES
+            if (word[0], word[1]) in ((0, 1), (1, 0))
+        ),
+    )
+
+
+def audit_source_claims() -> int:
+    assert len(SOURCE_CLAIMS) == 12
+    assert SOURCE_CLAIMS[0][0] == "BOOK:2634"
+    assert any(reference == "BOOK:2678" for reference, _ in SOURCE_CLAIMS)
+    assert any(reference == "BOOK:14097" for reference, _ in SOURCE_CLAIMS)
+    assert not any("initial condition" in fact for _, fact in SOURCE_CLAIMS)
+    return len(SOURCE_CLAIMS)
+
+
+def audit_strict_family_count() -> tuple[int, int, int, int]:
+    local_words = 2**5
+    allowed_masks = 2**local_words
+    source_total = local_words * allowed_masks
+    membership_conditioned = sum(
+        comb(local_words, size) * size for size in range(local_words + 1)
+    )
+    incompatible_records = local_words * (2 ** (local_words - 1))
+    assert local_words == 32
+    assert allowed_masks == 4_294_967_296
+    assert source_total == 137_438_953_472
+    assert membership_conditioned == 68_719_476_736
+    assert source_total == 2 * membership_conditioned
+    assert incompatible_records == membership_conditioned
+
+    empty_local = book_cross_local(())
+    incompatible = strict_t33(empty_local, (0, 0, 0, 0, 0))
+    certificate = find_structural_emptiness_certificate(incompatible)
+    assert type(certificate) is RequiredOutsideAllowedCertificate
+    assert replay_emptiness_certificate(incompatible, certificate)
+    return source_total, membership_conditioned, incompatible_records, 1
+
+
+def audit_exhaustive_periodic_commutation() -> tuple[int, int, int, int, int]:
+    carriers = tuple(
+        native
+        for height, width in ((1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 2), (3, 3))
+        for native in native_tiles(height, width)
+    )
+    profiles = direct_allowed_profiles()
+    constraints = tuple(
+        DirectStrictConstraint(allowed, required)
+        for allowed in profiles
+        for required in BINARY_CROSS_TEMPLATES
+    )
+    encoded_constraints = tuple(encode_direct_constraint(item) for item in constraints)
+    commutations = 0
+    anchor_checks = 0
+    model_implications = 0
+    representation_round_trips = 0
+    for native in carriers:
+        presentation = encode_native(native)
+        assert decode_native(presentation) == native
+        representation_round_trips += 1
+        for direct_constraint, generic_relation in zip(constraints, encoded_constraints):
+            direct = direct_verify_periodic(native, direct_constraint)
+            generic = verify_periodic(presentation, generic_relation)
+            assert normalized_direct(direct) == normalized_generic(generic)
+            assert generic.proves_global_model == (
+                generic.locally_consistent and generic.requirements_verified
+            )
+            if generic.proves_global_model:
+                model_implications += 1
+                local_only = OccurrenceConstrainedPatterns(
+                    generic_relation.local,
+                    RequireEachPatternSomewhere(()),
+                )
+                assert verify_periodic(presentation, local_only).proves_global_model
+            commutations += 1
+            anchor_checks += generic.checked_anchors
+    assert len(carriers) == 666
+    assert len(constraints) == 256
+    assert commutations == len(carriers) * len(constraints)
+    return (
+        len(carriers),
+        len(constraints),
+        commutations,
+        anchor_checks,
+        representation_round_trips,
+    )
+
+
+def audit_complete_toy_constraint_space() -> tuple[int, int, int, int]:
+    offsets = ((0, 0),)
+    words = ((0,), (1,))
+    masks = tuple(
+        tuple(word for index, word in enumerate(words) if mask & (1 << index))
+        for mask in range(4)
+    )
+    constraints = tuple(
+        strict_t33(AllowedLocalPatterns(2, offsets, allowed), required)
+        for allowed in masks
+        for required in words
+    )
+    models = tuple(
+        encode_native(native)
+        for height, width in ((1, 1), (1, 2), (2, 1), (2, 2))
+        for native in native_tiles(height, width)
+    )
+    checks = 0
+    for relation in constraints:
+        for model in models:
+            report = verify_periodic(model, relation)
+            observed = tuple(
+                model.value_at((row, column))
+                for row in range(model.periods[0])
+                for column in range(model.periods[1])
+            )
+            direct_local = all((label,) in relation.local.allowed for label in observed)
+            direct_required = all(
+                required[0] in observed for required in relation.requirements.templates
+            )
+            assert report.proves_global_model == (direct_local and direct_required)
+            checks += 1
+
+    all_required_checks = 0
+    anchors_by_model = tuple(
+        tuple(
+            (row, column)
+            for row in range(model.periods[0])
+            for column in range(model.periods[1])
+        )
+        for model in models
+    )
+    for allowed in masks:
+        relation = require_every_allowed(AllowedLocalPatterns(2, offsets, allowed))
+        for model, anchors in zip(models, anchors_by_model):
+            observed_words = tuple((model.value_at(anchor),) for anchor in anchors)
+            report = verify_periodic(model, relation)
+            expected_violations = tuple(
+                (anchor, word)
+                for anchor, word in zip(anchors, observed_words)
+                if word not in allowed
+            )
+            expected_hits = tuple(
+                (required, tuple(
+                    anchor
+                    for anchor, word in zip(anchors, observed_words)
+                    if word == required
+                ))
+                for required in tuple(sorted(allowed))
+            )
+            expected_absent = tuple(
+                required for required, hits in expected_hits if not hits
+            )
+            assert tuple(
+                (item.anchor, item.observed) for item in report.local_violations
+            ) == expected_violations
+            assert tuple(
+                (item.template, item.anchors) for item in report.occurrence_hits
+            ) == expected_hits
+            assert report.absent_required == expected_absent
+            assert report.proves_global_model == (
+                not expected_violations and not expected_absent
+            )
+            all_required_checks += 1
+    assert len(models) == 26
+    return len(constraints), len(models), checks, all_required_checks
+
+
+def same_translation_orbit(
+    left: PeriodicPresentation,
+    right: PeriodicPresentation,
+) -> bool:
+    """Explicit observer; pointwise equality remains ``periodic_equal``."""
+
+    if type(left) is not PeriodicPresentation or type(right) is not PeriodicPresentation:
+        raise TypeError("translation-orbit observer requires periodic presentations")
+    if left.alphabet_size != right.alphabet_size:
+        return False
+    height = lcm(left.periods[0], right.periods[0])
+    width = lcm(left.periods[1], right.periods[1])
+    return any(
+        periodic_equal(left, translate_periodic(right, (row, column)))
+        for row in range(height)
+        for column in range(width)
+    )
+
+
+def word_patch(
+    local: AllowedLocalPatterns,
+    word: object,
+    anchor: object = (0, 0),
+) -> ValueTable:
+    template = checked_template(
+        word,
+        local.alphabet_size,
+        len(local.offsets),
+        name="patch word",
+    )
+    row, column = checked_coord(anchor, "patch anchor")
+    assignments: dict[Coord2, int] = {}
+    for (delta_row, delta_column), label in zip(local.offsets, template):
+        coordinate = (row + delta_row, column + delta_column)
+        previous = assignments.get(coordinate)
+        if previous is not None and previous != label:
+            raise ValueError("word aliases one coordinate with inconsistent labels")
+        assignments[coordinate] = label
+    return tuple(sorted(assignments.items()))
+
+
+def audit_projection_and_empty_models() -> tuple[int, int, int, int, int]:
+    full = book_cross_local(BINARY_CROSS_TEMPLATES)
+    required_one = (1, 1, 1, 1, 1)
+    relation = strict_t33(full, required_one)
+    zeros = PeriodicPresentation(2, ((0,),))
+    ones = PeriodicPresentation(2, ((1,),))
+
+    local_only = OccurrenceConstrainedPatterns(
+        forget_occurrences(relation),
+        RequireEachPatternSomewhere(()),
+    )
+    assert verify_periodic(zeros, local_only).proves_global_model
+    assert not verify_periodic(zeros, relation).proves_global_model
+    assert verify_periodic(ones, relation).proves_global_model
+    assert forget_occurrences(strict_t33(full, (0, 0, 0, 0, 0))) == full
+    assert relation != strict_t33(full, (0, 0, 0, 0, 0))
+
+    # Compatible-but-empty T33: the local base admits the all-zero field and
+    # contains the required word, but that word creates a north cell labelled
+    # 1 while every allowed word requires center 0 at that neighboring anchor.
+    all_zero = (0, 0, 0, 0, 0)
+    north_one = (1, 0, 0, 0, 0)
+    compatible_local = book_cross_local((all_zero, north_one))
+    compatible_empty = strict_t33(compatible_local, north_one)
+    assert verify_periodic(zeros, OccurrenceConstrainedPatterns(
+        compatible_local, RequireEachPatternSomewhere(())
+    )).proves_global_model
+    assert north_one in compatible_local.allowed
+    certificate = find_structural_emptiness_certificate(compatible_empty)
+    assert type(certificate) is CenterLabelObstructionCertificate
+    assert replay_emptiness_certificate(compatible_empty, certificate)
+
+    outside = strict_t33(book_cross_local((all_zero,)), north_one)
+    outside_certificate = find_structural_emptiness_certificate(outside)
+    assert type(outside_certificate) is RequiredOutsideAllowedCertificate
+    assert replay_emptiness_certificate(outside, outside_certificate)
+    return 2, 1, 1, 1, 1
+
+
+def audit_scopes_and_anchor_distinction() -> tuple[int, int, int, int, int, int]:
+    full = book_cross_local(BINARY_CROSS_TEMPLATES)
+    zero = (0, 0, 0, 0, 0)
+    one = (1, 1, 1, 1, 1)
+    zero_relation = strict_t33(full, zero)
+    one_relation = strict_t33(full, one)
+    values = word_patch(full, zero)
+
+    positive_window = verify_window(
+        FiniteWindow(2, ((0, 0),), values),
+        zero_relation,
+    )
+    assert positive_window.status == "verified-finite-scope"
+    assert positive_window.requirements_verified
+    assert not positive_window.proves_global_model
+
+    missing_window = verify_window(
+        FiniteWindow(2, ((0, 0),), values),
+        one_relation,
+    )
+    assert missing_window.status == "not-observed-in-finite-scope"
+    assert missing_window.not_observed_required == (one,)
+    assert not missing_window.absent_required
+    assert not missing_window.refuted
+
+    positive_open = verify_open(OpenPatch(2, values), zero_relation)
+    assert positive_open.status == "undetermined"
+    assert positive_open.requirements_verified
+    assert not positive_open.proves_global_model
+
+    missing_open = verify_open(OpenPatch(2, values), one_relation)
+    assert missing_open.status == "undetermined"
+    assert missing_open.unresolved_required == (one,)
+    assert not missing_open.absent_required
+
+    global_positive = verify_periodic(PeriodicPresentation(2, ((0,),)), zero_relation)
+    global_negative = verify_periodic(PeriodicPresentation(2, ((0,),)), one_relation)
+    assert global_positive.status == "verified-global-model"
+    assert global_negative.status == "refuted"
+    assert global_negative.absent_required == (one,)
+
+    alternating = PeriodicPresentation(2, ((0, 1),))
+    origin_word = read_periodic(alternating, full, (0, 0))
+    other_word = read_periodic(alternating, full, (0, 1))
+    assert origin_word != other_word
+    anywhere = strict_t33(full, other_word)
+    anywhere_report = verify_periodic(alternating, anywhere)
+    assert anywhere_report.proves_global_model
+    assert not replay_occurrence_witness(
+        anywhere,
+        alternating,
+        OccurrenceWitness(other_word, (0, 0)),
+    )
+    assert replay_occurrence_witness(
+        anywhere,
+        alternating,
+        OccurrenceWitness(other_word, (0, 1)),
+    )
+    return 2, 2, 2, 1, 1, 1
+
+
+def audit_translation_gauge() -> tuple[int, int, int, int, int]:
+    full = book_cross_local(BINARY_CROSS_TEMPLATES)
+    models = tuple(native.tile for native in native_tiles(2, 3))
+    shifts = ((0, 0), (0, 1), (1, 0), (1, 2), (-1, -1))
+    commutations = 0
+    anchor_maps = 0
+    for tile in models:
+        model = PeriodicPresentation(2, tile)
+        required = read_periodic(model, full, (0, 0))
+        relation = strict_t33(full, required)
+        report = verify_periodic(model, relation)
+        for shift in shifts:
+            moved_model = translate_periodic(model, shift)
+            moved_report = verify_periodic(moved_model, relation)
+            assert report_signature(moved_report) == translated_report_signature(
+                report,
+                model,
+                shift,
+            )
+            assert moved_report.proves_global_model == report.proves_global_model
+            commutations += 1
+            anchor_maps += sum(len(hit.anchors) for hit in moved_report.occurrence_hits)
+
+    asymmetric = PeriodicPresentation(2, ((0, 0, 1), (1, 0, 1)))
+    translated = translate_periodic(asymmetric, (0, 1))
+    assert not periodic_equal(asymmetric, translated)
+    assert same_translation_orbit(asymmetric, translated)
+    relation_fields = {item.name for item in fields(OccurrenceConstrainedPatterns)}
+    assert "anchor" not in relation_fields and "origin" not in relation_fields
+    return len(models), len(shifts), commutations, anchor_maps, 1
+
+
+def audit_symmetry_commutation() -> tuple[int, int, int, int, int, int]:
+    full = book_cross_local(BINARY_CROSS_TEMPLATES)
+    requirements = (
+        (0, 0, 0, 0, 0),
+        (1, 0, 0, 0, 0),
+        (0, 1, 0, 1, 0),
+        (1, 1, 0, 0, 1),
+    )
+    relations = tuple(strict_t33(full, word) for word in requirements)
+    transforms = (
+        ExactTransform(((0, -1), (1, 0)), (0, 1)),
+        ExactTransform(((1, 0), (0, -1)), (0, 1)),
+        ExactTransform(((1, 0), (0, 1)), (1, 0)),
+    )
+    models = tuple(
+        encode_native(item)
+        for height, width in ((2, 2), (2, 3))
+        for item in native_tiles(height, width)
+    )
+    commutations = 0
+    anchor_checks = 0
+    for model in models:
+        for relation in relations:
+            original = verify_periodic(model, relation)
+            for transform in transforms:
+                mapped_model = transform_periodic(model, transform)
+                mapped_relation = transform_relation(relation, transform)
+                mapped = verify_periodic(mapped_model, mapped_relation)
+                assert report_signature(mapped) == transformed_report_signature(
+                    original,
+                    relation,
+                    model,
+                    transform,
+                )
+                commutations += 1
+                anchor_checks += mapped.checked_anchors
+
+    asymmetric = PeriodicPresentation(2, ((0, 0, 1), (0, 1, 1)))
+    reflected = transform_periodic(
+        asymmetric,
+        ExactTransform(((1, 0), (0, -1)), (0, 1)),
+    )
+    assert not periodic_equal(asymmetric, reflected)
+    assert same_explicit_transform_orbit(asymmetric, reflected)
+
+    required = (1, 0, 0, 0, 0)
+    relation = strict_t33(full, required)
+    rotation = transforms[0]
+    rotated_relation = transform_relation(relation, rotation)
+    original_window = FiniteWindow(2, ((0, 0),), word_patch(full, required))
+    assert verify_window(original_window, relation).requirements_verified
+    assert not verify_window(original_window, rotated_relation).requirements_verified
+    rotated_values = tuple(
+        sorted(
+            (
+                apply_matrix(rotation.matrix, coordinate),
+                rotation.label_permutation[label],
+            )
+            for coordinate, label in original_window.values
+        )
+    )
+    assert verify_window(
+        FiniteWindow(2, ((0, 0),), rotated_values),
+        rotated_relation,
+    ).requirements_verified
+    return len(models), len(relations), len(transforms), commutations, anchor_checks, 2
+
+
+def audit_multiple_requirements_and_aliases() -> tuple[int, int, int, int, int, int]:
+    self_local = AllowedLocalPatterns(2, ((0, 0),), ((0,), (1,)))
+    all_required = require_every_allowed(self_local)
+    alternating = PeriodicPresentation(2, ((0, 1),))
+    report = verify_periodic(alternating, all_required)
+    assert report.proves_global_model
+    assert len(report.occurrence_hits) == 2
+    assert report.occurrence_hits[0].anchors != report.occurrence_hits[1].anchors
+
+    duplicated = OccurrenceConstrainedPatterns(
+        self_local,
+        RequireEachPatternSomewhere(((0,), (0,), (1,), (1,))),
+    )
+    assert duplicated == all_required
+
+    vacuous = require_every_allowed(AllowedLocalPatterns(2, ((0, 0),), ()))
+    assert not vacuous.requirements.templates
+    assert vacuous != strict_t33(self_local, (0,))
+    assert len(strict_t33(self_local, (0,)).requirements.templates) == 1
+
+    full = book_cross_local(BINARY_CROSS_TEMPLATES)
+    period_one = PeriodicPresentation(2, ((0,),))
+    alias_impossible = (0, 1, 0, 1, 0)
+    alias_relation = strict_t33(full, alias_impossible)
+    alias_report = verify_periodic(period_one, alias_relation)
+    assert alias_report.locally_consistent
+    assert alias_report.absent_required == (alias_impossible,)
+    assert not alias_report.proves_global_model
+
+    period_two = PeriodicPresentation(2, ((0, 1),))
+    words = tuple(read_periodic(period_two, full, (0, column)) for column in range(2))
+    multi = OccurrenceConstrainedPatterns(
+        full,
+        RequireEachPatternSomewhere(words),
+    )
+    multi_report = verify_periodic(period_two, multi)
+    assert multi_report.proves_global_model
+    assert len(multi_report.occurrence_hits) == 2
+    forged = OccurrenceWitness(words[1], (0, 0))
+    assert not replay_occurrence_witness(multi, period_two, forged)
+    return 2, 2, 1, 1, 2, 1
+
+
+def audit_nonlocality_counterexample() -> tuple[int, int, int, int]:
+    """Show why the existential cannot be a finite local T32 matching flag.
+
+    A local relation accepting a single-defect field necessarily observes and
+    accepts the all-background word at anchors far from the defect.  It must
+    therefore also accept the all-background field.  Yet the occurrence
+    conjunct distinguishes those fields.  Moving the defect arbitrarily far
+    additionally defeats any fixed-origin finite observation.
+    """
+
+    full = book_cross_local(BINARY_CROSS_TEMPLATES)
+    required = (0, 0, 1, 0, 0)
+    relation = strict_t33(full, required)
+    background_word = (0, 0, 0, 0, 0)
+    radii = tuple(range(13))
+    local_equalities = 0
+    occurrence_witnesses = 0
+    for radius in radii:
+        defect = (3 * radius + 5, 0)
+        field = PointDefectField(2, 0, defect, 1)
+        for row in range(-radius, radius + 1):
+            for column in range(-radius, radius + 1):
+                assert read_point_defect(field, full, (row, column)) == background_word
+                local_equalities += 1
+        assert read_point_defect(field, full, defect) == required
+        occurrence_witnesses += 1
+    assert required in relation.requirements.templates
+    assert background_word in relation.local.allowed
+    assert required in relation.local.allowed
+    # The all-zero periodic model is locally valid but fails the existential.
+    zeros = PeriodicPresentation(2, ((0,),))
+    assert verify_periodic(
+        zeros,
+        OccurrenceConstrainedPatterns(full, RequireEachPatternSomewhere(())),
+    ).proves_global_model
+    assert not verify_periodic(zeros, relation).proves_global_model
+    return len(radii), local_equalities, occurrence_witnesses, 1
+
+
+def audit_support_order_separation() -> tuple[int, int, int]:
+    canonical_words = (
+        (1, 0, 0, 1, 0),
+        (0, 1, 1, 0, 1),
+    )
+    canonical = book_cross_local(canonical_words)
+    source_offsets = tuple(reversed(BOOK_CROSS_OFFSETS))
+    canonical_index = {offset: index for index, offset in enumerate(BOOK_CROSS_OFFSETS)}
+    source_words = tuple(
+        tuple(word[canonical_index[offset]] for offset in source_offsets)
+        for word in canonical_words
+    )
+    reordered = AllowedLocalPatterns(2, source_offsets, source_words)
+    assert reordered == canonical
+    relation = strict_t33(canonical, canonical_words[0])
+    reordered_relation = strict_t33(reordered, canonical_words[0])
+    assert relation == reordered_relation
+
+    model = PeriodicPresentation(2, ((0, 1), (1, 0)))
+    assert report_signature(verify_periodic(model, relation)) == report_signature(
+        verify_periodic(model, reordered_relation)
+    )
+    return len(source_offsets), len(source_words), 1
+
+
+def audit_queries_and_certificates() -> tuple[int, int, int, int, int, int, int]:
+    full = book_cross_local(BINARY_CROSS_TEMPLATES)
+    zero = (0, 0, 0, 0, 0)
+    one = (1, 1, 1, 1, 1)
+
+    sat = bounded_period_search(strict_t33(full, zero), PeriodicSearchQuery((1, 1)))
+    assert type(sat) is Satisfiable
+    assert sat.explored_candidates == 1
+    assert sat.verification.proves_global_model
+    assert len(sat.occurrence_witnesses) == 1
+    assert replay_occurrence_witness(
+        strict_t33(full, zero),
+        sat.witness,
+        sat.occurrence_witnesses[0],
+    )
+
+    alias_word = (0, 1, 0, 1, 0)
+    unknown = bounded_period_search(
+        strict_t33(full, alias_word),
+        PeriodicSearchQuery((1, 1)),
+    )
+    assert type(unknown) is Unknown
+    assert unknown.explored_candidates == 2
+
+    limited = bounded_period_search(
+        strict_t33(full, one),
+        PeriodicSearchQuery((1, 1), candidate_limit=1),
+    )
+    assert type(limited) is ResourceLimit
+    assert limited.explored_candidates == 1
+
+    outside = strict_t33(book_cross_local((zero,)), one)
+    unsat_outside = bounded_period_search(outside, PeriodicSearchQuery((2, 2)))
+    assert type(unsat_outside) is Unsatisfiable
+    assert type(unsat_outside.certificate) is RequiredOutsideAllowedCertificate
+    assert unsat_outside.explored_candidates == 0
+    assert replay_emptiness_certificate(outside, unsat_outside.certificate)
+
+    north_one = (1, 0, 0, 0, 0)
+    center_obstructed = strict_t33(book_cross_local((zero, north_one)), north_one)
+    unsat_center = bounded_period_search(
+        center_obstructed,
+        PeriodicSearchQuery((2, 2)),
+    )
+    assert type(unsat_center) is Unsatisfiable
+    assert type(unsat_center.certificate) is CenterLabelObstructionCertificate
+    assert replay_emptiness_certificate(center_obstructed, unsat_center.certificate)
+
+    forged = CenterLabelObstructionCertificate(north_one, (0, 0), 0)
+    assert not replay_emptiness_certificate(center_obstructed, forged)
+
+    self_local = AllowedLocalPatterns(2, ((0, 0),), ((0,), (1,)))
+    all_required = require_every_allowed(self_local)
+    multi_sat = bounded_period_search(all_required, PeriodicSearchQuery((1, 2)))
+    assert type(multi_sat) is Satisfiable
+    assert len(multi_sat.occurrence_witnesses) == 2
+    return 1, 2, 1, 2, 2, 1, 2
+
+
+def expect_raises(exception: type[BaseException], function: object) -> None:
+    if not callable(function):
+        raise TypeError("hostile test body must be callable")
+    try:
+        function()
+    except exception:
+        return
+    except Exception as error:
+        raise AssertionError(
+            f"expected {exception.__name__}, got {type(error).__name__}"
+        ) from error
+    raise AssertionError(f"expected {exception.__name__}")
+
+
+def audit_hostile_validation() -> int:
+    zero = (0, 0, 0, 0, 0)
+    full = book_cross_local(BINARY_CROSS_TEMPLATES)
+    relation = strict_t33(full, zero)
+    hostile: tuple[tuple[type[BaseException], object], ...] = (
+        (TypeError, lambda: AllowedLocalPatterns(True, BOOK_CROSS_OFFSETS, ())),
+        (ValueError, lambda: AllowedLocalPatterns(0, BOOK_CROSS_OFFSETS, ())),
+        (TypeError, lambda: AllowedLocalPatterns(2, list(BOOK_CROSS_OFFSETS), ())),
+        (ValueError, lambda: AllowedLocalPatterns(2, (), ())),
+        (ValueError, lambda: AllowedLocalPatterns(2, ((1, 0),), ((0,),))),
+        (ValueError, lambda: AllowedLocalPatterns(2, ((0, 0), (0, 0)), ((0, 0),))),
+        (ValueError, lambda: AllowedLocalPatterns(2, ((0, 0, 0),), ((0,),))),
+        (TypeError, lambda: AllowedLocalPatterns(2, ((0, True), (0, 0)), ((0, 0),))),
+        (TypeError, lambda: AllowedLocalPatterns(2, BOOK_CROSS_OFFSETS, [])),
+        (ValueError, lambda: book_cross_local(((0, 0),))),
+        (ValueError, lambda: book_cross_local(((0, 0, 0, 0, 2),))),
+        (TypeError, lambda: book_cross_local(((0, 0, 0, 0, False),))),
+        (ValueError, lambda: book_cross_local((zero, zero))),
+        (TypeError, lambda: book_cross_local((lambda item: item,))),
+        (TypeError, lambda: RequireEachPatternSomewhere([zero])),
+        (TypeError, lambda: RequireEachPatternSomewhere((lambda item: item,))),
+        (TypeError, lambda: OccurrenceConstrainedPatterns(object(), RequireEachPatternSomewhere(()))),
+        (TypeError, lambda: OccurrenceConstrainedPatterns(full, object())),
+        (ValueError, lambda: strict_t33(full, (0, 0))),
+        (ValueError, lambda: strict_t33(full, (0, 0, 0, 0, 2))),
+        (TypeError, lambda: strict_t33(full, (0, 0, 0, 0, False))),
+        (TypeError, lambda: strict_t33(full, zero, anchor=(0, 0))),
+        (TypeError, lambda: forget_occurrences(full)),
+        (TypeError, lambda: require_every_allowed(object())),
+        (TypeError, lambda: PeriodicPresentation(2, [[0]])),
+        (ValueError, lambda: PeriodicPresentation(2, ())),
+        (ValueError, lambda: PeriodicPresentation(2, ((),))),
+        (ValueError, lambda: PeriodicPresentation(2, ((0,), (0, 1)))),
+        (ValueError, lambda: PeriodicPresentation(2, ((2,),))),
+        (TypeError, lambda: PeriodicPresentation(2, ((False,),))),
+        (TypeError, lambda: OpenPatch(2, [((0, 0), 0)])),
+        (ValueError, lambda: OpenPatch(2, (((0, 0), 0), ((0, 0), 1)))),
+        (ValueError, lambda: OpenPatch(2, (((0,), 0),))),
+        (ValueError, lambda: OpenPatch(2, (((0, 0), 2),))),
+        (ValueError, lambda: FiniteWindow(2, ((0, 0), (0, 0)), (((0, 0), 0),))),
+        (ValueError, lambda: verify_window(FiniteWindow(2, ((0, 0),), (((0, 0), 0),)), relation)),
+        (ValueError, lambda: verify_periodic(PeriodicPresentation(1, ((0,),)), relation)),
+        (TypeError, lambda: verify_periodic(object(), relation)),
+        (TypeError, lambda: verify_periodic(PeriodicPresentation(2, ((0,),)), full)),
+        (TypeError, lambda: OccurrenceWitness(list(zero), (0, 0))),
+        (TypeError, lambda: replay_occurrence_witness(relation, PeriodicPresentation(2, ((0,),)), object())),
+        (TypeError, lambda: PeriodicSearchQuery([1, 1])),
+        (ValueError, lambda: PeriodicSearchQuery((0, 1))),
+        (TypeError, lambda: PeriodicSearchQuery((True, 1))),
+        (ValueError, lambda: PeriodicSearchQuery((1,))),
+        (TypeError, lambda: PeriodicSearchQuery((1, 1), candidate_limit=True)),
+        (ValueError, lambda: PeriodicSearchQuery((1, 1), candidate_limit=0)),
+        (TypeError, lambda: bounded_period_search(relation, object())),
+        (TypeError, lambda: replay_emptiness_certificate(relation, object())),
+        (ValueError, lambda: ExactTransform(((1, 1), (0, 1)), (0, 1))),
+        (TypeError, lambda: ExactTransform([[1, 0], [0, 1]], (0, 1))),
+        (ValueError, lambda: ExactTransform(((1, 0), (0, 1)), (0, 0))),
+        (TypeError, lambda: ExactTransform(((1, 0), (0, 1)), [0, 1])),
+        (ValueError, lambda: transform_relation(relation, ExactTransform(((1, 0), (0, 1)), (0, 1, 2)))),
+        (TypeError, lambda: translate_periodic(PeriodicPresentation(2, ((0,),)), (0, True))),
+        (TypeError, lambda: periodic_equal(PeriodicPresentation(2, ((0,),)), object())),
+        (ValueError, lambda: PointDefectField(2, 0, (0, 0), 0)),
+        (TypeError, lambda: PointDefectField(2, False, (0, 0), 1)),
+        (ValueError, lambda: word_patch(full, (0, 0))),
+        (TypeError, lambda: DirectStrictConstraint(set(BINARY_CROSS_TEMPLATES), zero)),
+        (TypeError, lambda: direct_verify_periodic(NativeBinaryTorus(((0,),)), object())),
+        (ValueError, lambda: decode_native(PeriodicPresentation(3, ((0,),)))),
+    )
+    for exception, function in hostile:
+        expect_raises(exception, function)
+
+    # This is semantically inconsistent but explicitly valid syntax.
+    incompatible = strict_t33(book_cross_local((zero,)), (1, 1, 1, 1, 1))
+    assert type(find_structural_emptiness_certificate(incompatible)) is RequiredOutsideAllowedCertificate
+    return len(hostile)
+
+
+def audit_no_transition_surface() -> tuple[int, int, int, int]:
+    local_fields = {item.name for item in fields(AllowedLocalPatterns)}
+    requirement_fields = {item.name for item in fields(RequireEachPatternSomewhere)}
+    conjunction_fields = {item.name for item in fields(OccurrenceConstrainedPatterns)}
+    report_fields = {item.name for item in fields(Verification)}
+    forbidden = {
+        "seed",
+        "initial_state",
+        "time",
+        "frontier",
+        "active",
+        "neighborhood",
+        "rule",
+        "writes",
+        "update",
+        "successor",
+        "schedule",
+        "executor",
+        "solver",
+        "anchor",
+        "origin",
+    }
+    assert local_fields.isdisjoint(forbidden)
+    assert requirement_fields.isdisjoint(forbidden)
+    assert conjunction_fields.isdisjoint(forbidden)
+    assert report_fields.isdisjoint(forbidden)
+    assert local_fields == {"alphabet_size", "offsets", "allowed"}
+    assert requirement_fields == {"templates"}
+    assert conjunction_fields == {"local", "requirements"}
+    assert report_fields == {
+        "scope",
+        "checked_anchors",
+        "occurrence_search_complete",
+        "local_violations",
+        "occurrence_hits",
+        "absent_required",
+        "not_observed_required",
+        "unresolved_required",
+        "proves_global_model",
+    }
+    return len(local_fields), len(requirement_fields), len(conjunction_fields), len(report_fields)
