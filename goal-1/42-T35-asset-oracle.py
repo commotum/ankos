@@ -5,7 +5,7 @@ T35 has one exact integer state and selects a closed arithmetic arm from the
 old state by an explicit predicate.  Its native visual record consists of the
 printed-page-122 parity example, the printed-page-123 seed gallery, the
 printed-page-124 long seed-six run, and the two Notes plates for 3n+1-style
-halting-time and reversible variants.
+stopping-time/reach-1 queries and reversible variants.
 
 This audit also retains source-routed relations to the page-100 register
 machine, universal arithmetic encodings of register machines, Conway's
@@ -89,7 +89,7 @@ ASSET_ROWS = r"""
 1543|C-T36-REVERSAL-SEED-16|_page_140_Picture_5.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_140_Picture_5.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|147|140714|607|922|4adb983dd8fa5ec5a8904cca51dec2d6fef50b3f28924784ee832e4f2d8b5d6c|-|first T36 digit-reversal plate; digit representation is rule-visible
 8098|R-T35-UNIVERSAL-ARITHMETIC-TRACE|_page_688_Figure_4.jpeg|CHAPTERS/11-The-Notion-of-Computation/Images/_page_688_Figure_4.jpeg|CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md|391|115324|773|743|68fade069ee73569e798de272d65f52b585002fef79a286e89d68f058206ec68|universal_arithmetic_pair|residue-selected arithmetic system emulating a register machine
 8100|R-T35-UNIVERSAL-ARITHMETIC-RULE|_page_688_Picture_5.jpeg|CHAPTERS/11-The-Notion-of-Computation/Images/_page_688_Picture_5.jpeg|CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md|393|4133|177|110|666d4850858d260b59bbcf972761c5dc08dcd1abeb4575adb8cd8dae816476f3|universal_arithmetic_pair|rule companion; raster formulas are not transcribed
-12611|N-T35-THREE-N-PLUS-ONE|_page_919_Figure_10.jpeg|BACK-MATTER/Index/Images/_page_919_Figure_10.jpeg|BACK-MATTER/Index/Index.md|514|37752|546|413|54a3e611eebc4f35590c6265304589ea84fe3e8e04bb935379bf530df6760e4c|-|native Notes comparison of halting times for three residue-selected maps
+12611|N-T35-THREE-N-PLUS-ONE|_page_919_Figure_10.jpeg|BACK-MATTER/Index/Images/_page_919_Figure_10.jpeg|BACK-MATTER/Index/Index.md|514|37752|546|413|54a3e611eebc4f35590c6265304589ea84fe3e8e04bb935379bf530df6760e4c|-|native Notes stopping-time/reach-1 observer comparison for three residue-selected maps
 12633|N-T35-REVERSIBLE-VARIANT|_page_920_Figure_8.jpeg|BACK-MATTER/Index/Images/_page_920_Figure_8.jpeg|BACK-MATTER/Index/Index.md|536|8897|593|100|99b72bc69f8a8badf8665097268dc8e021fbb53f8ae9c94de7eaeb4071179e71|-|native Notes forward/backward length view for a stated reversible map
 12641|C-T36-REGULAR-REGION-LENGTHS|_page_920_Figure_12.jpeg|BACK-MATTER/Index/Images/_page_920_Figure_12.jpeg|BACK-MATTER/Index/Index.md|544|13166|559|107|806545c68cad4830840650728e14b07bbab6a6de84eca6c95e83e1422f0d768a|-|first T36 Notes plate after the T35 reversible variant
 18662|R-CONWAY-FRACTION-SYSTEM|_page_1130_Figure_11.jpeg|BACK-MATTER/Colophon/Images/_page_1130_Figure_11.jpeg|BACK-MATTER/Colophon/Colophon.md|1219|11011|557|123|68930b0c9134e18b02d6a41f1eb23fe258918d551a109da169ff5d8da5ec1335|-|Conway fraction-system relation; ordered applicable fractions are prose/code evidence
@@ -278,7 +278,7 @@ UNRECOVERED_RASTER_SEMANTICS = frozenset(
         "complete native integer traces and exact seed-gallery row identities",
         "formula constants, division exactness, signed-domain policy, and invalid arms",
         "binary and decimal palette maps, alignment, padding, crop, and width rules",
-        "halting-time values, cycle proofs, reversibility proofs, and growth claims",
+        "stopping-time/reach-1 values, cycle proofs, reversibility proofs, and growth claims",
         "register/arithmetic encoders, decoder states, scheduling, and stutter steps",
         "Conway fraction order, selected fractions, prime filter, and generated values",
         "any callback, hidden interpreter, family dispatch, or executor inferred from pixels",
@@ -520,7 +520,7 @@ def ledger() -> tuple[str, str, int, int, int, int, int, int, int, int]:
 
 
 EXPECTED_LEDGER_SHA256 = (
-    "cf3b29ef1c891c3ffa48cb57cc1b85c988c13ae485f11c9cd1b352428378b1c2"
+    "0d7fd98dea61d513b7d4a0c795e4fef7958e7e24f13f844bfada294eadae288a"
 )
 EXPECTED_EXCLUDED_LEDGER_SHA256 = (
     "3c8501aa32306e4134a0197d4d359c30ada6752cbf6b1dbacb73817e9111c206"

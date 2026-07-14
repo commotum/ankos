@@ -50,9 +50,9 @@ Final query counts, retained N/R/C partition, exclusions, reverse provenance, so
 
 ## Asset Audit
 
-`42-T35-asset-oracle.py` will bind the exact native/relation/control/excluded raster universe, monolith/split references, hashes, bytes, dimensions, assemblies, and evidence boundary. Expected native candidates include the page-122 digit evolution, page-123 multi-seed profiles, page-124 seed-6 trajectory, and Notes stopping-time/reversible plates. Register-machine, general arithmetic, Conway, T34, and T36 plates require explicit relation/control/exclusion disposition.
+`42-T35-asset-oracle.py` binds an exact 24-image candidate universe: 13 governed assets partition `5 native / 5 relation / 3 control`, and 11 adjacency assets are physically bound exclusions. The governed ledger closes 26 references (13 monolith plus 13 split), 13 distinct hashes, 832,651 bytes, and two assemblies/four files; the excluded ledger independently closes 22 references, 11 hashes, 1,994,355 bytes, and two assemblies. The governed ledger SHA is `0d7fd98dea61d513b7d4a0c795e4fef7958e7e24f13f844bfada294eadae288a`; the excluded-ledger SHA is `3c8501aa32306e4134a0197d4d359c30ada6752cbf6b1dbacb73817e9111c206`; the oracle SHA is `c618c25202a496fc9f3cdac94fe748dbf2183c72932a72e10dd7b9dab249fb23`.
 
-No raster may supply an untranscribed formula, rule row, seed, trace, palette, cycle, stopping-time result, branch order, or numeric codec. Final governed counts, ledger/oracle SHAs, transcription boundary, assemblies, and unrecovered visual facts are pending the independent asset audit.
+All 13 governed assets are `HASH_BOUND`; none is `LIMITED_TRANSCRIBED` or `PIXEL_REPLAYED`. No raster supplies an untranscribed formula, rule row, seed, trace, palette, cycle, stopping-time result, branch order, or numeric codec. Page-122/123 formulas, printed sequence values, Notes rules, register correspondence, and Conway order remain source-text evidence rather than pixel transcriptions. The source/asset image interface matches exactly and leaves zero unresolved image dispositions.
 
 ## Construction Model
 
@@ -156,7 +156,9 @@ Parity sequences, digit renderings, logarithmic size, digit length, stopping tim
 - generalized modulus/alphabet/invariant validation; and
 - absence of T35-specific state, frontier, neighborhood, UPDATE, or executor fields.
 
-Final commutation counts, trace/check totals, semantic digest, hostile controls, and oracle SHA are pending the independent semantic audit.
+The frozen semantic oracle closes 65,588 Euclidean-remainder checks and 6,150 complete direct/generic A/B/standard-`3n+1` event commutations with 6,150 replayed residue witnesses. It covers 24 arbitrary-precision profiles up to 6,648 bits/2,002 decimal digits; all six row serializations of a three-residue table; the exact A and seed-6 B prefixes; 65 register-relation checks; seven exact source cycles; 200 fixed-point `Advanced` events; 65 `h+1` trace checks; and three history-merging witnesses.
+
+Ordered fractions close 100 branch witnesses, an order discriminator, six explicit no-applicable partial results, a two-event-then-undefined trace, 1,004 lazy Conway residue/value checks, and the exact 8,068-event prime-prefix run. Conway's denominator LCM is 6,469,693,230 while the oracle materializes zero rows. A shadowed-row pair proves bare fraction lowering noninjective; the ordered source AST/provenance remains required. The oracle also closes 4,101 exact integer-locus cosine/A relations, separates the modulus-30 reachable invariant from positivity, rejects 370 forged witnesses and 49 hostile constructions, and finds no T35 frontier, neighborhood, UPDATE, or executor fields. Its semantic digest is `fc825e82318de933dae8426d21218a50cb5f54dd6016102bd9913038c0e233cb`; its file SHA is `2c43cac6eba28be0589e900e5e6546258bb0056f63d26654f9aa36526dc48e81`.
 
 ## Architecture Classification
 
@@ -216,4 +218,4 @@ The checked-in selectors already demonstrate the reusable geometry: `frontiers.t
 
 ## Stage Results
 
-Pending source, asset, semantic, runtime-fit, integration, and independent hostile-review closure.
+Asset and semantic closure pass. Source reverse provenance, global D136 integration, repository-wide gates, and fresh hostile review remain pending.

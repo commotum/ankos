@@ -20,6 +20,7 @@ import hashlib
 import re
 import sys
 import unicodedata
+from fractions import Fraction
 from pathlib import Path
 
 
@@ -254,7 +255,7 @@ EXCLUDED = frozenset().union(*EXCLUDED_CLASS.values())
 # regex hit.  Blank lines are intentionally absent.
 NATIVE_CONTINUATIONS = line_set(
     "1501,1511,1515,1521,1531,1533,1535,1537,1539,"
-    "8104-8110,12607,12623,12631"
+    "8104,8106-8110,12607,12623,12631"
 )
 RELATION_CONTINUATIONS = line_set(
     "1200,1202,1204,8096,"
@@ -332,7 +333,7 @@ INDEX_ENTRY_GUARDS = {
         20894: ("in systems based on numbers, 961",),
         21173: ("FactorInteger (integer factorization) and arithmetic system encoding, 1115",),
         21223: ("Gödel's Theorem, 1158 and arithmetic systems, 673",),
-        21923: ("Arithmetic recurrences, 123 and register machines, 100",),
+        21923: ("Register machines, 97–102", "emulated by arithmetic systems, 673. 1114"),
         22390: ("of arithmetic systems, 673",),
     },
     "ordered_fraction_routes": {
@@ -383,7 +384,7 @@ SOURCE_MODEL_RECORDS = (
     "image-boundary:page165-page166 iterated-map plates belong to T43 despite a page122 comparison",
     "Conway-sibling:ordered first applicable exact fraction is semantically order-sensitive",
     "Conway-sibling:reduced denominator divisibility lowers to ordered integer predicates",
-    "Conway-sibling:no applicable fraction is a typed NoMatch, not invented identity",
+    "Conway-sibling:no applicable fraction is source-undefined partial evolution; no halt identity or error is invented",
     "source-defect:line1501 extraction is not the chronological parity prefix",
     "source-defect:line8102 loses multiplication and contains nthat and stens OCR damage",
     "source-defect:line12623 reconstruction code has missing punctuation and stays opaque",
@@ -442,10 +443,10 @@ EXPECTED_SET = {
     "pre_index_union": (70, "a5ca5ad032a64d7d35bc6c3b84dee4c220b4c26e7a685884dea22381fd5ed6a7"),
     "index": (23, "382ea160348f5429a8e0c999d0d74a0179c75f536903f6583e716c8f55b7948e"),
     "matched_retained": (63, "abe81df93c1a1006c8e97df9cf4d2c707696b6cf6b4849435062e7e694d8e1cc"),
-    "governed_continuations": (66, "0531a2096a9f1218d17a7e301e267767cd3739547cd025087784a4a57be0cc85"),
-    "retained": (129, "fad6c6c8a546c77685f5c7029b61f9f38c78ef21f149a8272c989a802f5e41bb"),
+    "governed_continuations": (65, "d71d4c46f610feae93defe56b9abb3ac81dfebc2d3428f42fdc9e20a54882f54"),
+    "retained": (128, "014989b13a238d181d8039684eb508e3840df2d7d41cbbca0cff7e2d5b7f252b"),
     "excluded": (7, "d217cebdd1081002deb8a75cd08fd46ab4842822d96a9dc81f04fbf75cb8be61"),
-    "native": (47, "d59c3358de1e04e3121b2ab32216c8b7ffa2e72c677119b7f2a93775896cda33"),
+    "native": (46, "90e59083b9fed98bcf868e74b70b721bf25025dd832cc54ac62478b8ab1b8c89"),
     "relation": (64, "ba05d4cac4e856b8b42ded72b132b3ac9449a25a7f7af5a94ba64b6eec88e044"),
     "control": (18, "46d2af20cd2dd9e4b9bbab77c5bcfa7083617b55cf9d4ebc820b4e3e8ff105e9"),
     "candidate_images": (24, "310fe3a307edd50f320ff21fde967fe8f403e211b297406ec4118b5f252f8703"),
@@ -464,7 +465,7 @@ EXPECTED_INDEX_CLASS = {
 }
 EXPECTED_INDEX_GUARDS = (
     23,
-    "d279216b27b8189ff7cbda27c19bc6dac8bcce3d632a32a3323c7e965173663d",
+    "bf020508d3063deb0782398e75606fe0eede3e1c856ba86ff5aaef5dd070e376",
 )
 EXPECTED_IMAGE_PARTITION = {
     "native": (5, "0c03146ee327f67d29869863e7180f135426d5a0d76003d5276678feb1c826b8"),
@@ -488,19 +489,783 @@ EXPECTED_VISUAL_ONLY_BOUNDARY = (
 )
 EXPECTED_SOURCE_MODEL = (
     36,
-    "30ba160c2dddd61ebb738166f5f230c66f84bdf2c3fa95e1c75ea21cfdc2c4b9",
+    "a9c6a61dbcaf1a959dbaf75ca512414879840ac091bc30d3bbfc7fa640bd1247",
 )
 
 # Split-corpus values are frozen after the reverse provenance pass below.
 EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
-EXPECTED_SPLIT_QUERY = (0, "")
-EXPECTED_SPLIT_QUERY_EXACT = (0, "")
-EXPECTED_SPLIT_QUERY_NONEXACT = (0, "")
-EXPECTED_SPLIT_QUERY_MAPPING = (0, "")
-EXPECTED_SPLIT_RETAINED_EXACT = (0, "")
-EXPECTED_SPLIT_RETAINED_NONEXACT = (0, "")
-EXPECTED_SPLIT_RETAINED_MAPPING = (0, "")
-EXPECTED_MONOLITH_ONLY = (0, "")
-EXPECTED_ATLAS_HITS = (0, "")
+EXPECTED_SPLIT_QUERY = (
+    92,
+    "2bef8550a09a2c32b7cf59aa025b828094efb4d7be024e160b0c214e405b3114",
+)
+EXPECTED_SPLIT_QUERY_EXACT = (
+    74,
+    "940f357b5f6ee2419babbb044ce44f126ec971a5feeba15ba73e75419d01d272",
+)
+EXPECTED_SPLIT_QUERY_NONEXACT = (
+    18,
+    "ea572f9cfd2e25b6190f7e9ee0c194e1caa3f3f3e89d6d85fe7fc3520d2628dd",
+)
+EXPECTED_SPLIT_QUERY_MAPPING = (
+    18,
+    "3bfc618322bcfd96e7ed7f200452d6e238cc566f3d2aa5858988023cdfcc4f15",
+)
+EXPECTED_SPLIT_RETAINED_EXACT = (
+    100,
+    "934cd8c249df0dd47fab8079a9574832ecd8d464b2e6a3f54bbe74c10a8ed008",
+)
+EXPECTED_SPLIT_RETAINED_NONEXACT = (
+    28,
+    "0de29e75eebf9f4b859952171c6bc48a2105f9006067ce5a26173e319dd52ee4",
+)
+EXPECTED_SPLIT_RETAINED_MAPPING = (
+    28,
+    "1477e98ae2b38ecf0603f3e55595e99d8bed3d0ca2c9463101bf123364d36000",
+)
+EXPECTED_MONOLITH_ONLY = (
+    0,
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+)
+EXPECTED_ATLAS_HITS = (
+    5,
+    "bc2d3922561b25c21574253966619ebf550e76c0c42a04c6f4074133ad845c32",
+)
+
+
+def digest(values: set[int] | frozenset[int]) -> str:
+    payload = ",".join(map(str, sorted(values))).encode("ascii")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def digest_records(records: set[str] | list[str] | tuple[str, ...]) -> str:
+    payload = "\n".join(sorted(records)).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def normalized_line(line: str) -> str:
+    text = unicodedata.normalize("NFKD", line).lower().replace("\\", "")
+    return " ".join(re.findall(r"[a-z0-9]+", text))
+
+
+def best_witness(canonical: str, candidates: list[tuple[str, str]]) -> tuple[str, float]:
+    canonical_tokens = set(normalized_line(canonical).split())
+    scored: list[tuple[float, str]] = []
+    for record, normalized in candidates:
+        candidate_tokens = set(normalized.split())
+        denominator = min(len(canonical_tokens), len(candidate_tokens))
+        score = len(canonical_tokens & candidate_tokens) / denominator if denominator else 0.0
+        scored.append((score, record))
+    score, record = max(scored, key=lambda item: (item[0], item[1]))
+    return record, score
+
+
+def main() -> int:
+    if len(sys.argv) > 2:
+        raise SystemExit("usage: 42-T35-source-oracle.py [BOOK]")
+    book = Path(sys.argv[1]).resolve() if len(sys.argv) == 2 else DEFAULT_BOOK
+    raw = book.read_bytes()
+    lines = raw.decode("utf-8").splitlines()
+    at = lambda line_no: lines[line_no - 1]
+    source_ok = (
+        len(lines) == EXPECTED_BOOK_LINES
+        and hashlib.sha256(raw).hexdigest() == EXPECTED_BOOK_SHA256
+        and sha256(ATLAS) == EXPECTED_ATLAS_SHA256
+        and sha256(CATALOG) == EXPECTED_CATALOG_SHA256
+        and sha256(TAXONOMY) == EXPECTED_TAXONOMY_SHA256
+    )
+    ok = source_ok
+    print("source", "OK" if source_ok else "MISMATCH")
+
+    hits: dict[str, set[int]] = {}
+    for name, pattern in QUERIES.items():
+        found = {
+            line_no
+            for line_no, line in enumerate(lines, 1)
+            if re.search(pattern, line, re.IGNORECASE)
+        }
+        hits[name] = found
+        actual = (
+            len(found),
+            sum(n < INDEX_FIRST_LINE for n in found),
+            sum(n >= INDEX_FIRST_LINE for n in found),
+            digest(found),
+        )
+        good = actual == EXPECTED_QUERY[name]
+        ok &= good
+        print(name, "OK" if good else "MISMATCH", *actual)
+
+    union = set().union(*hits.values())
+    pre_index_union = {n for n in union if n < INDEX_FIRST_LINE}
+    index = union - pre_index_union
+    matched_retained = pre_index_union - set(EXCLUDED)
+    governed = set(RETAINED) - union
+    sets = {
+        "union": union,
+        "pre_index_union": pre_index_union,
+        "index": index,
+        "matched_retained": matched_retained,
+        "governed_continuations": governed,
+        "retained": set(RETAINED),
+        "excluded": set(EXCLUDED),
+        "native": set(NATIVE_EVIDENCE),
+        "relation": set(RELATION_EVIDENCE),
+        "control": set(CONTROL_EVIDENCE),
+        "candidate_images": set(CANDIDATE_IMAGE_LINES),
+        "governed_images": set(GOVERNED_IMAGE_LINES),
+        "excluded_images": set(EXCLUDED_IMAGE_LINES),
+    }
+    for name, values in sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_SET[name]
+        ok &= good
+        print(name, "OK" if good else "MISMATCH", *actual)
+
+    exclusion_ok = set().union(*EXCLUDED_CLASS.values()) == set(EXCLUDED)
+    for name, values in EXCLUDED_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_EXCLUDED_CLASS[name]
+        exclusion_ok &= good
+        print(f"excluded_{name}", "OK" if good else "MISMATCH", *actual)
+    classification_delta = matched_retained ^ set(MATCHED_RETAINED)
+    classification_ok = (
+        exclusion_ok
+        and not classification_delta
+        and MATCHED_RETAINED == RETAINED & pre_index_union
+        and GOVERNED_CONTINUATIONS == RETAINED - union
+        and not EXCLUDED & RETAINED
+    )
+    ok &= classification_ok
+    print(
+        "unresolved_pre_index",
+        "OK" if classification_ok else "MISMATCH",
+        len(classification_delta),
+        *sorted(classification_delta),
+    )
+
+    index_ok = (
+        set().union(*INDEX_CLASS.values()) == index
+        and sum(map(len, INDEX_CLASS.values())) == len(index)
+    )
+    for name, values in INDEX_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_INDEX_CLASS[name]
+        index_ok &= good
+        print(f"index_{name}", "OK" if good else "MISMATCH", *actual)
+    guard_records = {
+        f"{class_name}:{line_no}:{'|'.join(needles)}"
+        for class_name, entries in INDEX_ENTRY_GUARDS.items()
+        for line_no, needles in entries.items()
+    }
+    guards_ok = (
+        set(INDEX_ENTRY_GUARDS) == set(INDEX_CLASS)
+        and all(
+            set(INDEX_ENTRY_GUARDS[class_name]) == set(INDEX_CLASS[class_name])
+            for class_name in INDEX_CLASS
+        )
+        and all(
+            all(needle in at(line_no) for needle in needles)
+            for entries in INDEX_ENTRY_GUARDS.values()
+            for line_no, needles in entries.items()
+        )
+        and (len(guard_records), digest_records(guard_records))
+        == EXPECTED_INDEX_GUARDS
+    )
+    index_ok &= guards_ok
+    ok &= index_ok
+    print(
+        "index_entry_occurrence_guards",
+        "OK" if guards_ok else "MISMATCH",
+        len(guard_records),
+        digest_records(guard_records),
+    )
+    print(
+        "unresolved_index",
+        "OK" if index_ok else "MISMATCH",
+        len(index ^ set(INDEX_ROUTED)),
+    )
+
+    derived_images = {
+        line_no for line_no in RETAINED if IMAGE_RE.fullmatch(at(line_no))
+    }
+    image_sets = {
+        "native": NATIVE_IMAGE_LINES,
+        "relation": RELATION_IMAGE_LINES,
+        "control": CONTROL_IMAGE_LINES,
+    }
+    image_paths_ok = True
+    for line_no in CANDIDATE_IMAGE_LINES | OUT_OF_SCOPE_RELATED_IMAGE_LINES:
+        match = IMAGE_RE.fullmatch(at(line_no))
+        image_paths_ok &= match is not None
+        if match is not None:
+            basename = Path(match.group(1)).name
+            image_paths_ok &= len(list(SOURCE_ROOT.rglob(basename))) == 1
+    images_ok = (
+        derived_images == set(GOVERNED_IMAGE_LINES)
+        and sum(map(len, image_sets.values())) == len(GOVERNED_IMAGE_LINES)
+        and set().union(*EXCLUDED_IMAGE_CLASS.values())
+        == set(EXCLUDED_IMAGE_LINES)
+        and sum(map(len, EXCLUDED_IMAGE_CLASS.values()))
+        == len(EXCLUDED_IMAGE_LINES)
+        and CANDIDATE_IMAGE_LINES == GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
+        and not GOVERNED_IMAGE_LINES & EXCLUDED_IMAGE_LINES
+        and not EXCLUDED_IMAGE_LINES & RETAINED
+        and not OUT_OF_SCOPE_RELATED_IMAGE_LINES & CANDIDATE_IMAGE_LINES
+        and image_paths_ok
+    )
+    for name, values in image_sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_IMAGE_PARTITION[name]
+        images_ok &= good
+        print(f"images_{name}", "OK" if good else "MISMATCH", *actual)
+    for name, values in EXCLUDED_IMAGE_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_EXCLUDED_IMAGE_CLASS[name]
+        images_ok &= good
+        print(f"excluded_images_{name}", "OK" if good else "MISMATCH", *actual)
+    outside_actual = (
+        len(OUT_OF_SCOPE_RELATED_IMAGE_LINES),
+        digest(OUT_OF_SCOPE_RELATED_IMAGE_LINES),
+    )
+    outside_ok = (
+        outside_actual == EXPECTED_OUT_OF_SCOPE_RELATED_IMAGES
+        and "Examples of iterated maps" in at(1886)
+        and "compare page 122" in at(1886)
+        and "number x between 0 and 1" in at(1886)
+    )
+    images_ok &= outside_ok
+    image_ownership_ok = (
+        images_ok
+        and "succession of whole numbers" in at(1503)
+        and "applying the rule" in at(1519)
+        and "logarithmic scale" in at(1525)
+        and "register machine" in at(1198)
+        and "simple arithmetic system can emulate a register machine" in at(8102)
+        and "exactly the primes" in at(18660)
+        and "Longest halting times" in at(19439)
+        and "number theory systems of page 122" in at(19460)
+        and "fractional parts of successive powers of 3/2" in at(1495)
+        and "write its base 2 digits in reverse order" in at(1545)
+        and "Page 125 · Reversal-addition systems" in at(12635)
+        and "nested rather than strictly repetitive" in at(1192)
+        and "register machine set up to emulate a Turing machine" in at(8090)
+        and "Examples of some simple recursive sequences" in at(1567)
+        and "Digit reversal" in at(12646)
+    )
+    images_ok &= image_ownership_ok
+    visual_actual = (len(VISUAL_ONLY_BOUNDARY), digest_records(VISUAL_ONLY_BOUNDARY))
+    visual_ok = (
+        visual_actual == EXPECTED_VISUAL_ONLY_BOUNDARY
+        and not any("transcribed" in record for record in VISUAL_ONLY_BOUNDARY)
+        and images_ok
+    )
+    ok &= visual_ok
+    print(
+        "governed_image_interface_asset_hash_routed_no_pixel_replay",
+        "OK" if visual_ok else "MISMATCH",
+        len(derived_images),
+        digest(derived_images),
+        "candidates",
+        len(CANDIDATE_IMAGE_LINES),
+        digest(CANDIDATE_IMAGE_LINES),
+        "excluded",
+        len(EXCLUDED_IMAGE_LINES),
+        digest(EXCLUDED_IMAGE_LINES),
+    )
+    print(
+        "out_of_candidate_T43_page165_page166_relation",
+        "OK" if outside_ok else "MISMATCH",
+        *outside_actual,
+    )
+    print(
+        "image_exact_caption_facing_and_sibling_ownership",
+        "OK" if image_ownership_ok else "MISMATCH",
+        len(EXCLUDED_IMAGE_CLASS),
+    )
+
+    # Strict source presets and exact main-text anchors.
+    def step_a(n: int) -> int:
+        return 3 * n // 2 if n % 2 == 0 else 3 * (n + 1) // 2
+
+    def step_b(n: int) -> int:
+        return 5 * n // 2 if n % 2 == 0 else (n + 1) // 2
+
+    expected_a = [
+        1, 3, 6, 9, 15, 24, 36, 54, 81, 123, 186, 279, 420, 630,
+        945, 1419, 2130, 3195, 4794,
+    ]
+    trace_a = [1]
+    for _ in range(len(expected_a) - 1):
+        trace_a.append(step_a(trace_a[-1]))
+    trace_b6 = [6]
+    for _ in range(100):
+        trace_b6.append(step_b(trace_b6[-1]))
+    strict_ok = (
+        "if the number at a particular step is even" in at(1499)
+        and "multiply that number by 3/2" in at(1499)
+        and "if the number is odd" in at(1499)
+        and "first add 1" in at(1499)
+        and "otherwise, add 1, then multiply by 3/2" in at(1503)
+        and "always guaranteed to give a whole number" in at(1507)
+        and all(step_a(n) > 0 and isinstance(step_a(n), int) for n in range(1, 1001))
+        and all(step_b(n) > 0 and isinstance(step_b(n), int) for n in range(1, 1001))
+        and trace_a == expected_a
+        and ", ".join(map(str, expected_a)) in at(1507)
+        and "multiply this number by 5/2" in at(1513)
+        and "multiply the result by 1/2" in at(1513)
+        and step_b(1) == 1
+        and trace_b6[:6] == [6, 15, 8, 20, 50, 125]
+    )
+    ok &= strict_ok
+    print(
+        "source_two_strict_parity_presets_exact_positive_integer_branches",
+        "OK" if strict_ok else "MISMATCH",
+        len(trace_a),
+        trace_a[-1],
+        trace_b6[:6],
+    )
+
+    extracted_bits = at(1501).strip()
+    n = 1
+    parity_values: list[str] = []
+    for _ in range(len(extracted_bits)):
+        parity_values.append(str(n % 2))
+        n = step_a(n)
+    parity_prefix = "".join(parity_values)
+    parity_observer_ok = (
+        extracted_bits == "1011010001101001101010101010101010100000"
+        and len(extracted_bits) == 40
+        and parity_prefix != extracted_bits
+        and parity_prefix[::-1] != extracted_bits
+        and "rightmost digits obtained at each step are shown above" in at(1503)
+        and "digit is 0 when the number is even and 1 when it is odd" in at(1503)
+        and "seems to be completely random" in at(1509)
+    )
+    ok &= parity_observer_ok
+    print(
+        "source_line1501_opaque_display_not_chronological_parity_oracle",
+        "OK" if parity_observer_ok else "MISMATCH",
+        len(extracted_bits),
+        hashlib.sha256(extracted_bits.encode("ascii")).hexdigest(),
+        hashlib.sha256(parity_prefix.encode("ascii")).hexdigest(),
+    )
+
+    observer_ok = (
+        "generally increasing trend" in at(1521)
+        and "first thousand steps" in at(1525)
+        and "logarithmic scale" in at(1525)
+        and "48,554 (base 10) digits" in at(1527)
+        and "system eventually evolves to 1" in at(12599)
+        and "no general proof" in at(12599)
+        and "sequence produced repeats if n ever reaches 2, 4 or 40" in at(12603)
+        and "randomly even and odd with equal probability" in at(12605)
+        and "no fundamental basis for the randomness approximation" in at(12607)
+        and "how many steps are needed to reach value 1" in at(12609)
+    )
+    ok &= observer_ok
+    print(
+        "source_parity_size_cycle_stopping_and_random_walk_are_observers",
+        "OK" if observer_ok else "MISMATCH",
+    )
+
+    # Residue-dispatch generalization and its complete 30-row source table.
+    residue_rows = [8106, 8108, 8110]
+    residues = [int(token) for line_no in residue_rows for token in re.findall(r"\d+", at(line_no))]
+    formula_rows = [8104, 8107, 8109]
+    formula_cells = [
+        cell.strip()
+        for line_no in formula_rows
+        for cell in at(line_no).strip().strip("|").split("|")
+    ]
+    residue_ok = (
+        "remainder after dividing by a constant" in at(8086)
+        and "based on the value of this remainder" in at(8086)
+        and "specified arithmetic operation" in at(8086)
+        and "computes Mod[n, 30]" in at(8102)
+        and "depending on the result applies to n one of" in at(8102)
+        and residues == list(range(30))
+        and len(formula_cells) == 30
+        and all(formula_cells)
+    )
+    ok &= residue_ok
+    print(
+        "source_complete_residue_dispatch_generalization",
+        "OK" if residue_ok else "MISMATCH",
+        len(residues),
+        len(formula_cells),
+    )
+
+    locality_ok = (
+        "digit sequences" in at(1531)
+        and "cellular automata are always local" in at(1533)
+        and "systems based on numbers there is usually no such locality" in at(1533)
+        and "carry" in at(1535)
+        and "digits that were originally far away" in at(1535)
+        and "fundamental differences" in at(1537)
+        and "details of underlying rules" in at(1539)
+    )
+    ok &= locality_ok
+    print(
+        "source_digit_locality_contrast_is_alphabet_access_not_runner_split",
+        "OK" if locality_ok else "MISMATCH",
+    )
+
+    notes_ok = (
+        "NestList[If[EvenQ[#], 3#/2, 3(# + 1)/2] &, 1, t]" in at(12598)
+        and "If[EvenQ[n], n/2, (3n+1)/2]" in at(12599)
+        and "FixedPoint" in at(12601)
+        and "If[EvenQ[n], 3n/2, Round[3n/4]]" in at(12627)
+        and "If[Mod[n, 3] == 0, 2n/3, Round[4n/3]]" in at(12629)
+        and "always possible to go backwards" in at(12629)
+    )
+    ok &= notes_ok
+    print(
+        "source_3n_plus_1_and_reversible_piecewise_siblings",
+        "OK" if notes_ok else "MISMATCH",
+    )
+
+    reconstruction_ok = (
+        "Reconstructing initial conditions" in at(12619)
+        and "list of 0's and 1's" in at(12619)
+        and "rightmost t digits" in at(12621)
+        and "IntegerDigits[First[Fold" in at(12623)
+        and "Last[#1]] 2 Last[#1]" in at(12623)
+        and "Last[#1]], 2 Last[#1]" not in at(12623)
+    )
+    ok &= reconstruction_ok
+    print(
+        "source_reconstruction_formula_hash_bound_opaque_missing_punctuation",
+        "OK" if reconstruction_ok else "MISMATCH",
+    )
+
+    ca_relation_ok = (
+        "3*n*+1 **problem as cellular automaton" in at(12613)
+        and "7 possible colors" in at(12613)
+        and "color 6 works as an end marker" in at(12613)
+        and "existence of persistent structure" in at(12617)
+        and "register machine" in at(1198)
+        and "compressed form" in at(1198)
+        and "3n/2 if n is even" in at(1198)
+        and "(3n+1)/2 if n is odd" in at(1198)
+    )
+    ok &= ca_relation_ok
+    print(
+        "source_CA_and_register_relations_add_representation_or_stroboscopic_state",
+        "OK" if ca_relation_ok else "MISMATCH",
+    )
+
+    compiler_ok = (
+        "RMToAS[prog_, nr_]" in at(18629)
+        and "system from page 122 becomes" in at(18632)
+        and "{2, \\{0 \\mapsto" in at(18632)
+        and "ASEvolveList" in at(18635)
+        and "NestList[(Mod[#, n]/. rules)[#] &, init, t]" in at(18636)
+        and "state of the register machine" in at(18639)
+        and "FactorInteger" in at(18642)
+        and "only multiplication, with no addition" in at(18646)
+    )
+    ok &= compiler_ok
+    print(
+        "source_residue_program_representation_and_register_compiler_relation",
+        "OK" if compiler_ok else "MISMATCH",
+    )
+
+    source_defects_ok = (
+        at(8102).count("nthat") == 1
+        and at(8102).count("stens") == 1
+        and "i + 5,  $2^a$ ,  $3^b$" in at(8102)
+        and "i + 5 2^a 3^b" not in at(8102)
+        and "n + Table[Prime[i]^reg[[i]]" in at(18632)
+        and "Product[Prime[i]^reg[[i]]" not in at(18632)
+        and "Product[Prime[i]" in at(18643)
+        and "ASEvolveList[{n . rules }. init . t ]" in at(18635)
+        and "ASEvolveList[{n_, rules_}, init_, t_]" not in at(18635)
+        and reconstruction_ok
+        and "u = Nest[(13 + (6 \\# + 8)(5/2)^{4})]" in at(19456)
+        and "\\{13/6 + 13/6\\}" in at(19463)
+        and "16321 - 7860 i" in at(19465)
+    )
+    ok &= source_defects_ok
+    print(
+        "source_OCR_defects_guarded_no_executable_repair_invented",
+        "OK" if source_defects_ok else "MISMATCH",
+        6,
+    )
+
+    # Conway's exact ordered-fraction sibling: source order is observable.
+    fractions = (
+        Fraction(17, 91), Fraction(78, 85), Fraction(19, 51),
+        Fraction(23, 38), Fraction(29, 33), Fraction(77, 29),
+        Fraction(95, 23), Fraction(77, 19), Fraction(1, 17),
+        Fraction(11, 13), Fraction(13, 11), Fraction(15, 14),
+        Fraction(15, 2), Fraction(55, 1),
+    )
+
+    def fraction_successors(n: int) -> list[int]:
+        products = [fraction * n for fraction in fractions]
+        return [int(value) for value in products if value.denominator == 1]
+
+    fraction_trace = [2]
+    for _ in range(30):
+        applicable = fraction_successors(fraction_trace[-1])
+        if not applicable:
+            break
+        fraction_trace.append(applicable[0])
+    conway_ok = (
+        "Conway considered fraction systems" in at(18648)
+        and "NestList[First[Select[fracs #, IntegerQ, 1]] &, init, t]" in at(18652)
+        and "17/91" in at(18656)
+        and "55/1" in at(18657)
+        and len(fractions) == 14
+        and fraction_successors(2) == [15, 110]
+        and fraction_trace[:6] == [2, 15, 825, 725, 1925, 2275]
+        and "exactly the primes" in at(18660)
+    )
+    ok &= conway_ok
+    print(
+        "source_Conway_ordered_first_applicable_fraction_sibling",
+        "OK" if conway_ok else "MISMATCH",
+        len(fractions),
+        fraction_successors(2),
+        len(fraction_trace),
+    )
+
+    turing_relation_ok = (
+        "Longest halting times" in at(19439)
+        and "Machine 600720" in at(19444)
+        and "Nest[If[EvenQ[#], 5#/2, # + 21] &, 14, m]" in at(19460)
+        and "number theory systems of page 122" in at(19460)
+        and "halting time" in at(19460)
+        and source_defects_ok
+    )
+    ok &= turing_relation_ok
+    print(
+        "source_Turing600720_connection_relation_opaque_not_native_rule",
+        "OK" if turing_relation_ok else "MISMATCH",
+    )
+
+    boundaries_ok = (
+        "fractional parts of successive powers of 3/2" in at(1495)
+        and "independent of what base" in at(1495)
+        and "write its base 2 digits in reverse order" in at(1545)
+        and "Recursive Sequences" in at(1555)
+        and "next number in the sequence from previous ones" in at(1559)
+        and "f[n] depends" in at(1561)
+        and "Page 125 · Reversal-addition systems" in at(12635)
+        and "continuous iterated" in at(19102)
+        and "3 + 6x - 3\\cos" in at(19102)
+        and outside_ok
+    )
+    ok &= boundaries_ok
+    print(
+        "source_T34_T36_T37_T43_boundaries_explicit",
+        "OK" if boundaries_ok else "MISMATCH",
+    )
+
+    structural = (
+        not NATIVE_EVIDENCE & RELATION_EVIDENCE
+        and not NATIVE_EVIDENCE & CONTROL_EVIDENCE
+        and not RELATION_EVIDENCE & CONTROL_EVIDENCE
+        and NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE == RETAINED
+        and MATCHED_RETAINED == RETAINED & pre_index_union
+        and GOVERNED_CONTINUATIONS == RETAINED - union
+        and not RETAINED & index
+    )
+    ok &= structural
+    print("structural", "OK" if structural else "MISMATCH")
+
+    split_paths = sorted(
+        path
+        for path in SOURCE_ROOT.rglob("*.md")
+        if path.resolve() not in {DEFAULT_BOOK.resolve(), ATLAS.resolve()}
+    )
+    relative_paths = [path.relative_to(SOURCE_ROOT).as_posix() for path in split_paths]
+    manifest = [
+        f"{relative}\0{len(path.read_bytes())}\0{sha256(path)}"
+        for path, relative in zip(split_paths, relative_paths, strict=True)
+    ]
+    split_manifest_ok = (
+        len(split_paths) == EXPECTED_SPLIT_FILE_COUNT
+        and digest_records(relative_paths) == EXPECTED_SPLIT_PATHS_DIGEST
+        and digest_records(manifest) == EXPECTED_SPLIT_MANIFEST_DIGEST
+    )
+    ok &= split_manifest_ok
+    print(
+        "split_manifest",
+        "OK" if split_manifest_ok else "MISMATCH",
+        len(split_paths),
+        digest_records(relative_paths),
+        digest_records(manifest),
+    )
+
+    compiled = [re.compile(pattern, re.IGNORECASE) for pattern in QUERIES.values()]
+    monolith_query_text = {at(line_no) for line_no in union}
+    split_records: set[str] = set()
+    split_exact: set[str] = set()
+    split_nonexact: set[str] = set()
+    split_lines: list[tuple[str, str]] = []
+    split_texts: set[str] = set()
+    split_record_text: dict[str, str] = {}
+    for path, relative in zip(split_paths, relative_paths, strict=True):
+        split_file_lines = path.read_text(encoding="utf-8").splitlines()
+        for line_no, line in enumerate(split_file_lines, 1):
+            record = f"{relative}:{line_no}"
+            split_lines.append((record, normalized_line(line)))
+            split_texts.add(line)
+            split_record_text[record] = line
+            if not any(rx.search(line) for rx in compiled):
+                continue
+            split_records.add(record)
+            (split_exact if line in monolith_query_text else split_nonexact).add(record)
+
+    monolith_witnesses = [
+        (str(line_no), normalized_line(at(line_no))) for line_no in sorted(union)
+    ]
+    query_mapping: set[str] = set()
+    query_mapping_ok = True
+    for record in sorted(split_nonexact):
+        witness, score = best_witness(split_record_text[record], monolith_witnesses)
+        query_mapping.add(f"{record}->{witness}:{score:.6f}")
+        query_mapping_ok &= score >= 0.50 and int(witness) in union
+    split_query_actual = (len(split_records), digest_records(split_records))
+    split_exact_actual = (len(split_exact), digest_records(split_exact))
+    split_nonexact_actual = (len(split_nonexact), digest_records(split_nonexact))
+    query_mapping_actual = (len(query_mapping), digest_records(query_mapping))
+    split_query_ok = (
+        split_query_actual == EXPECTED_SPLIT_QUERY
+        and split_exact_actual == EXPECTED_SPLIT_QUERY_EXACT
+        and split_nonexact_actual == EXPECTED_SPLIT_QUERY_NONEXACT
+        and query_mapping_actual == EXPECTED_SPLIT_QUERY_MAPPING
+        and query_mapping_ok
+    )
+    ok &= split_query_ok
+    print(
+        "split_query_reverse_join",
+        "OK" if split_query_ok else "MISMATCH",
+        *split_query_actual,
+        *split_exact_actual,
+        *split_nonexact_actual,
+        *query_mapping_actual,
+    )
+
+    exact_retained = {line_no for line_no in RETAINED if at(line_no) in split_texts}
+    nonexact_retained = set(RETAINED) - exact_retained
+    retained_mapping: set[str] = set()
+    monolith_only: set[int] = set()
+    for line_no in sorted(nonexact_retained):
+        witness, score = best_witness(at(line_no), split_lines)
+        if score >= 0.50:
+            retained_mapping.add(f"{line_no}->{witness}:{score:.6f}")
+        else:
+            monolith_only.add(line_no)
+    exact_retained_actual = (len(exact_retained), digest(exact_retained))
+    nonexact_retained_actual = (len(nonexact_retained), digest(nonexact_retained))
+    retained_mapping_actual = (len(retained_mapping), digest_records(retained_mapping))
+    monolith_only_actual = (len(monolith_only), digest(monolith_only))
+    split_retained_ok = (
+        exact_retained_actual == EXPECTED_SPLIT_RETAINED_EXACT
+        and nonexact_retained_actual == EXPECTED_SPLIT_RETAINED_NONEXACT
+        and retained_mapping_actual == EXPECTED_SPLIT_RETAINED_MAPPING
+        and monolith_only_actual == EXPECTED_MONOLITH_ONLY
+        and len(retained_mapping) + len(monolith_only) == len(nonexact_retained)
+    )
+    ok &= split_retained_ok
+    print(
+        "split_retained_reverse_join",
+        "OK" if split_retained_ok else "MISMATCH",
+        *exact_retained_actual,
+        *nonexact_retained_actual,
+        *retained_mapping_actual,
+        *monolith_only_actual,
+    )
+
+    atlas_lines = ATLAS.read_text(encoding="utf-8").splitlines()
+    atlas_patterns = (
+        re.compile(r"^## 4\. Systems Based on Numbers$", re.I),
+        re.compile(r"number-based systems", re.I),
+        re.compile(r"^### Elementary Arithmetic$", re.I),
+        re.compile(r"Simple operations like repeated addition or multiplication", re.I),
+    )
+    atlas_hits = {
+        line_no
+        for line_no, line in enumerate(atlas_lines, 1)
+        if any(rx.search(line) for rx in atlas_patterns)
+    }
+    atlas_actual = (len(atlas_hits), digest(atlas_hits))
+    atlas_ok = (
+        len(atlas_lines) == 542
+        and atlas_actual == EXPECTED_ATLAS_HITS
+        and "Systems Based on Numbers" in atlas_lines[122]
+        and "Elementary Arithmetic" in atlas_lines[128]
+    )
+    ok &= atlas_ok
+    print("atlas_summary_only", "OK" if atlas_ok else "MISMATCH", *atlas_actual)
+
+    catalog_lines = CATALOG.read_text(encoding="utf-8").splitlines()
+    taxonomy_text = TAXONOMY.read_text(encoding="utf-8")
+    catalog_ok = (
+        len(catalog_lines) == 46
+        and catalog_lines[34] == "Arithmetic Iteration Systems,"
+        and catalog_lines[35] == "Piecewise Integer Maps,"
+        and catalog_lines[36] == "Digit-Reversal Arithmetic Systems,"
+        and len(set(catalog_lines[1:])) == 45
+        and "## 35. Piecewise Integer Maps" in taxonomy_text
+        and "predicate may be parity, divisibility, residue class" in taxonomy_text
+        and "branching arithmetic program over one integer" in taxonomy_text
+        and "`branches`: ordered predicate/update cases" in taxonomy_text
+        and not hits["Q00"]
+    )
+    ok &= catalog_ok
+    print(
+        "catalog_taxonomy_piecewise_vocabulary_only_absent_from_primary_Book",
+        "OK" if catalog_ok else "MISMATCH",
+    )
+
+    model_actual = (len(SOURCE_MODEL_RECORDS), digest_records(SOURCE_MODEL_RECORDS))
+    architecture_ok = (
+        model_actual == EXPECTED_SOURCE_MODEL
+        and strict_ok
+        and parity_observer_ok
+        and observer_ok
+        and residue_ok
+        and locality_ok
+        and notes_ok
+        and reconstruction_ok
+        and ca_relation_ok
+        and compiler_ok
+        and source_defects_ok
+        and conway_ok
+        and turing_relation_ok
+        and boundaries_ok
+    )
+    ok &= architecture_ok
+    print(
+        "source_fit_T34_scalar_reuse_plus_closed_residue_dispatch_no_new_executor",
+        "OK" if architecture_ok else "MISMATCH",
+        *model_actual,
+    )
+    print(
+        "unrecovered_raster_and_corrupt_formula_execution_semantics_fail_closed",
+        "OK" if visual_ok and source_defects_ok else "MISMATCH",
+        len(VISUAL_ONLY_BOUNDARY),
+        4,
+    )
+
+    unresolved_total = (
+        len(classification_delta)
+        + len(index ^ set(INDEX_ROUTED))
+        + len(monolith_only)
+    )
+    unresolved_ok = unresolved_total == 0
+    ok &= unresolved_ok
+    print("unresolved_total", "OK" if unresolved_ok else "MISMATCH", unresolved_total)
+    return 0 if ok else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

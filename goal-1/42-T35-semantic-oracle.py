@@ -486,7 +486,12 @@ class FractionBranchWitness:
 
 @dataclass(frozen=True)
 class NoApplicableFraction:
-    """Typed zero-successor result; the retained scalar is not advanced."""
+    """Typed partial/undefined result; the retained scalar is not advanced.
+
+    The source expression has no value when no product is integral.  This
+    record is therefore not a halt instruction, identity transition, error,
+    or fabricated terminal state; it reports why no successor was committed.
+    """
 
     retained: ScalarConfiguration
     tested_integral: tuple[bool, ...]
@@ -597,12 +602,12 @@ class Advanced:
 
 
 @dataclass(frozen=True)
-class Terminal:
+class NoSuccessor:
     configuration: ScalarConfiguration
     outcome: NoApplicableFraction
 
 
-StepResult: TypeAlias = Advanced | Terminal
+StepResult: TypeAlias = Advanced | NoSuccessor
 
 
 def advance(program: object, configuration: object) -> StepResult:
@@ -616,7 +621,7 @@ def advance(program: object, configuration: object) -> StepResult:
     old_value = read_self(configuration, active[0])
     proposal = evaluate_closed_rule(program, configuration, old_value)
     if type(proposal) is NoApplicableFraction:
-        return Terminal(configuration, proposal)
+        return NoSuccessor(configuration, proposal)
     if type(proposal) is not ProposedScalarWrite:
         raise TypeError("closed RULE returned an unknown result")
     next_configuration = apply_scalar_assignment(configuration, proposal.assignment)
@@ -635,7 +640,7 @@ class ScalarTrace:
     requested_horizon: int
     states: tuple[ScalarConfiguration, ...]
     events: tuple[TransitionEvent, ...]
-    terminal: NoApplicableFraction | None
+    undefined_step: NoApplicableFraction | None
 
     def __post_init__(self) -> None:
         horizon = checked_horizon(self.requested_horizon)
@@ -656,16 +661,16 @@ class ScalarTrace:
         for index, event in enumerate(events):
             if event.before != states[index] or event.after != states[index + 1]:
                 raise ValueError("trace event endpoints do not align with snapshots")
-        if self.terminal is None:
+        if self.undefined_step is None:
             if len(events) != horizon:
-                raise ValueError("unterminated trace must reach its horizon")
+                raise ValueError("a trace without an undefined step must reach its horizon")
         else:
-            if type(self.terminal) is not NoApplicableFraction:
-                raise TypeError("terminal must be exact NoApplicableFraction")
-            if self.terminal.retained != states[-1]:
-                raise ValueError("terminal result must retain the last snapshot")
+            if type(self.undefined_step) is not NoApplicableFraction:
+                raise TypeError("undefined step must be exact NoApplicableFraction")
+            if self.undefined_step.retained != states[-1]:
+                raise ValueError("undefined result must report the last snapshot")
             if len(events) >= horizon:
-                raise ValueError("terminal trace must stop before its horizon")
+                raise ValueError("a partial-rule failure must occur before the horizon")
         object.__setattr__(self, "requested_horizon", horizon)
         object.__setattr__(self, "states", tuple(states))
         object.__setattr__(self, "events", tuple(events))
@@ -677,17 +682,17 @@ def run(program: object, seed: object, horizon: object) -> ScalarTrace:
     steps = checked_horizon(horizon)
     states = [seed]
     events: list[TransitionEvent] = []
-    terminal: NoApplicableFraction | None = None
+    undefined_step: NoApplicableFraction | None = None
     for _ in range(steps):
         result = advance(program, states[-1])
-        if type(result) is Terminal:
-            terminal = result.outcome
+        if type(result) is NoSuccessor:
+            undefined_step = result.outcome
             break
         if type(result) is not Advanced:
             raise TypeError("executor returned an unknown StepResult")
         states.append(result.configuration)
         events.append(result.event)
-    return ScalarTrace(steps, tuple(states), tuple(events), terminal)
+    return ScalarTrace(steps, tuple(states), tuple(events), undefined_step)
 
 
 def verify_residue_witness(
@@ -1184,7 +1189,7 @@ def audit_cycles_fixed_points_and_trace_shape() -> tuple[int, int, int, int, int
     for trace in fixed_runs:
         assert len(trace.events) == 40
         assert len(trace.states) == 41
-        assert trace.terminal is None
+        assert trace.undefined_step is None
         assert len(set(trace_values(trace))) == 1
         assert first_cycle(trace) is not None
         fixed_point_events += len(trace.events)
@@ -1194,7 +1199,7 @@ def audit_cycles_fixed_points_and_trace_shape() -> tuple[int, int, int, int, int
         trace = run(parity_program_a(), ScalarConfiguration(POSITIVE, 1), horizon)
         assert len(trace.events) == horizon
         assert len(trace.states) == horizon + 1
-        assert trace.terminal is None
+        assert trace.undefined_step is None
         trace_shape_checks += 1
     return (
         source_cycles,
@@ -1309,19 +1314,19 @@ def audit_ordered_fraction_partiality() -> tuple[int, int, int, int, int]:
         (PositiveFraction(3, 2), PositiveFraction(5, 3))
     )
     no_applicable_values = (1, 5, 7, 11, 13, 17)
-    terminal_outcomes = 0
+    undefined_outcomes = 0
     retained_states = 0
     for value in no_applicable_values:
         result = advance(partial, ScalarConfiguration(POSITIVE, value))
-        assert type(result) is Terminal
+        assert type(result) is NoSuccessor
         assert result.configuration == ScalarConfiguration(POSITIVE, value)
         assert result.outcome.tested_integral == (False, False)
         assert verify_no_applicable(partial, result.outcome)
         trace = run(partial, ScalarConfiguration(POSITIVE, value), 10)
         assert trace_values(trace) == (value,)
         assert len(trace.events) == 0
-        assert trace.terminal == result.outcome
-        terminal_outcomes += 1
+        assert trace.undefined_step == result.outcome
+        undefined_outcomes += 1
         retained_states += 1
 
     # A partial program may advance before reaching an unapplied state.
@@ -1329,9 +1334,9 @@ def audit_ordered_fraction_partiality() -> tuple[int, int, int, int, int]:
     delayed_trace = run(delayed, ScalarConfiguration(POSITIVE, 4), 10)
     assert trace_values(delayed_trace) == (4, 6, 9)
     assert len(delayed_trace.events) == 2
-    assert delayed_trace.terminal is not None
-    assert verify_no_applicable(delayed, delayed_trace.terminal)
-    return 1, terminal_outcomes, retained_states, len(delayed_trace.events), 1
+    assert delayed_trace.undefined_step is not None
+    assert verify_no_applicable(delayed, delayed_trace.undefined_step)
+    return 1, undefined_outcomes, retained_states, len(delayed_trace.events), 1
 
 
 def audit_lazy_fraction_residue_view() -> tuple[int, int, int, int, int, int]:
@@ -1482,7 +1487,7 @@ def audit_integer_relation_and_reachable_boundary() -> tuple[int, int, int]:
 def audit_conway_source_program() -> tuple[int, int, int, int]:
     program = OrderedFractionProgram(CONWAY_FRACTIONS)
     trace = run(program, ScalarConfiguration(POSITIVE, 2), 8068)
-    assert trace.terminal is None
+    assert trace.undefined_step is None
     assert len(trace.events) == 8068
     assert len(trace.states) == 8069
     assert all(
@@ -1761,7 +1766,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "95f4efd8620b4e7fed76ba2976dd3bd44cf71ae25112c073aa31359d9925cf74"
+EXPECTED_DIGEST = "fc825e82318de933dae8426d21218a50cb5f54dd6016102bd9913038c0e233cb"
 
 
 def main() -> None:
@@ -1804,7 +1809,7 @@ def main() -> None:
         no_applicable_outcomes,
         no_applicable_retained_states,
         delayed_fraction_events,
-        delayed_fraction_terminals,
+        delayed_fraction_undefined_steps,
     ) = audit_ordered_fraction_partiality()
     (
         small_fraction_residues,
@@ -1889,7 +1894,7 @@ def main() -> None:
         ("no_applicable_outcomes", no_applicable_outcomes),
         ("no_applicable_retained_states", no_applicable_retained_states),
         ("delayed_fraction_events", delayed_fraction_events),
-        ("delayed_fraction_terminals", delayed_fraction_terminals),
+        ("delayed_fraction_undefined_steps", delayed_fraction_undefined_steps),
         ("small_fraction_residues", small_fraction_residues),
         ("conway_residue_value_checks", conway_residue_value_checks),
         ("conway_lcm_residues", conway_lcm_residues),
@@ -1925,6 +1930,7 @@ def main() -> None:
         ("strict_rule", "complete_Euclidean_residue_indexed_closed_unary_integer_map"),
         ("table_precedence", "absent_disjoint_total_residue_partition"),
         ("fraction_sibling", "ordered_first_applicable_positive_fraction_partial_rule"),
+        ("no_applicable_semantics", "typed_undefined_no_successor_not_halt_identity_error_or_terminal_state"),
         ("fraction_compilation", "lazy_LCM_residue_relation_with_order_source_AST_provenance_and_witness_retained"),
         ("bare_fraction_lowering", "behavior_preserving_but_not_injective_due_to_shadowed_duplicate_or_redundant_rows"),
         ("general_table_carrier", "integer_closure_is_distinct_from_positive_and_encoded_reachable_subset_invariants"),
@@ -1973,7 +1979,8 @@ def main() -> None:
     )
     print(
         f"NoApplicableFraction={no_applicable_outcomes}; retained_states={no_applicable_retained_states}; "
-        f"delayed_partial_trace={delayed_fraction_events}-events_then-{delayed_fraction_terminals}-terminal"
+        f"delayed_partial_trace={delayed_fraction_events}-events_then-"
+        f"{delayed_fraction_undefined_steps}-undefined-step; native_halt=absent"
     )
     print(
         f"fraction_lazy_residue_checks=small:{small_fraction_residues}/Conway:{conway_residue_value_checks}; "
