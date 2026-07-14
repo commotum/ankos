@@ -553,53 +553,57 @@ class SelfCountRule:
 
 
 @dataclass(frozen=True)
-class NeighborCountRule:
-    """Table indexed by the exact sum of neighbor occurrences, without Self."""
+class LocalValueSumRule:
+    """Table indexed by exact ``Self + sum(connection occurrences)``.
+
+    Unlike ``SelfCountRule``, this quotient does not preserve Self as a
+    separate coordinate and does not retain a value histogram.
+    """
 
     alphabet_size: int
     cases: tuple[CountCase, ...]
 
     def __post_init__(self) -> None:
-        k = require_int(self.alphabet_size, "neighbor-count alphabet size")
-        raw = require_tuple(self.cases, "neighbor-count cases")
+        k = require_int(self.alphabet_size, "local-sum alphabet size")
+        raw = require_tuple(self.cases, "local-sum cases")
         if k < 2 or not raw:
-            raise ValueError("neighbor-count rule schema is invalid")
+            raise ValueError("local-sum rule schema is invalid")
         seen: set[str] = set()
         for case in raw:
             if type(case) is not CountCase:
-                raise TypeError("neighbor-count cases must be exact CountCase values")
+                raise TypeError("local-sum cases must be exact CountCase values")
             if case.site_type in seen:
-                raise ValueError("neighbor-count site types must be unique")
+                raise ValueError("local-sum site types must be unique")
             seen.add(case.site_type)
-            rows = case.degree * (k - 1) + 1
+            rows = (case.degree + 1) * (k - 1) + 1
             validate_closed_table(case.table, k, rows)
 
     def case_for(self, site_type: str) -> CountCase:
         matches = tuple(case for case in self.cases if case.site_type == site_type)
         if len(matches) != 1:
-            raise ValueError("neighbor-count rule has no unique case for the site type")
+            raise ValueError("local-sum rule has no unique case for the site type")
         return matches[0]
 
     def validate(self, alphabet: FiniteAlphabet, support: FixedSupport, read: RelationNeighborhood) -> None:
         if alphabet.size != self.alphabet_size:
-            raise ValueError("neighbor-count rule and configuration alphabets differ")
-        if read.include_self:
-            raise ValueError("NeighborCountRule forbids an implicit Self read")
+            raise ValueError("local-sum rule and configuration alphabets differ")
+        if not read.include_self:
+            raise ValueError("LocalValueSumRule requires one explicit Self read")
         relation = support.relation(read.relation_name)
         for site_index, site_type in enumerate(support.site_types):
             case = self.case_for(site_type)
             if len(relation.rows[site_index]) != case.degree:
-                raise ValueError("neighbor-count degree does not match typed incidence")
+                raise ValueError("local-sum degree does not match typed incidence")
         if set(support.site_types) != {case.site_type for case in self.cases}:
-            raise ValueError("neighbor-count cases must exactly cover support site types")
+            raise ValueError("local-sum cases must exactly cover support site types")
 
     def evaluate(self, read: LocalRead) -> int:
-        if read.center is not None:
-            raise ValueError("neighbor-count rule received an implicit Self value")
+        if read.center is None:
+            raise ValueError("local-sum rule received no Self value")
         case = self.case_for(read.site_type)
         if len(read.neighbors) != case.degree:
-            raise ValueError("neighbor-count read has the wrong degree")
-        return case.table.at(sum(read.neighbors))
+            raise ValueError("local-sum read has the wrong degree")
+        return case.table.at(read.center + sum(read.neighbors))
 
 
 @dataclass(frozen=True)
@@ -683,7 +687,7 @@ class PositionalRule:
         return case.table.at(context_index(canonical, self.alphabet_size))
 
 
-Rule = SelfCountRule | NeighborCountRule | PositionalRule
+Rule = SelfCountRule | LocalValueSumRule | PositionalRule
 
 
 @dataclass(frozen=True)
@@ -700,7 +704,7 @@ class SimpleProgram:
             raise TypeError("T24 strict programs use AllSites")
         if type(self.neighborhood) is not RelationNeighborhood:
             raise TypeError("program neighborhood must be RelationNeighborhood")
-        if type(self.rule) not in (SelfCountRule, NeighborCountRule, PositionalRule):
+        if type(self.rule) not in (SelfCountRule, LocalValueSumRule, PositionalRule):
             raise TypeError("program rule must be a closed typed rule")
 
 
@@ -951,12 +955,12 @@ def self_count_case_count(degree: int, alphabet_size: int) -> int:
     return k * (s * (k - 1) + 1)
 
 
-def neighbor_count_case_count(degree: int, alphabet_size: int) -> int:
-    s = require_int(degree, "neighbor degree")
+def local_value_sum_case_count(degree: int, alphabet_size: int) -> int:
+    s = require_int(degree, "connection degree")
     k = require_int(alphabet_size, "alphabet size")
     if s < 0 or k < 2:
-        raise ValueError("neighbor-count dimensions are invalid")
-    return s * (k - 1) + 1
+        raise ValueError("local-sum dimensions are invalid")
+    return (s + 1) * (k - 1) + 1
 
 
 def self_sum_sensitive_table(alphabet_size: int, degree: int, salt: int) -> DenseTable:
@@ -979,16 +983,16 @@ def self_sum_sensitive_table(alphabet_size: int, degree: int, salt: int) -> Dens
     return table
 
 
-def neighbor_sum_sensitive_table(alphabet_size: int, degree: int, salt: int) -> DenseTable:
-    """Closed neighbor-only exact-sum table sensitive to every adjacent sum."""
+def local_sum_sensitive_table(alphabet_size: int, degree: int, salt: int) -> DenseTable:
+    """Closed inclusive local-sum table sensitive to every adjacent total."""
 
     k = require_int(alphabet_size, "alphabet size")
-    s = require_int(degree, "neighbor degree")
+    s = require_int(degree, "connection degree")
     shift = require_int(salt, "table salt")
-    rows = neighbor_count_case_count(s, k)
-    table = DenseTable(k, rows, tuple((neighbor_sum + shift) % k for neighbor_sum in range(rows)))
-    for neighbor_sum in range(rows - 1):
-        assert table.at(neighbor_sum) != table.at(neighbor_sum + 1)
+    rows = local_value_sum_case_count(s, k)
+    table = DenseTable(k, rows, tuple((local_sum + shift) % k for local_sum in range(rows)))
+    for local_sum in range(rows - 1):
+        assert table.at(local_sum) != table.at(local_sum + 1)
     return table
 
 
@@ -1439,20 +1443,20 @@ def native_count_step(old: NativeIncidenceState, cases: tuple[CountCase, ...]) -
     )
 
 
-def native_neighbor_count_step(
+def native_local_value_sum_step(
     old: NativeIncidenceState,
     cases: tuple[CountCase, ...],
 ) -> NativeIncidenceState:
     case_by_type = {case.site_type: case for case in cases}
     if set(case_by_type) != set(old.site_types):
-        raise ValueError("native neighbor-count cases do not cover site types")
+        raise ValueError("native local-sum cases do not cover site types")
     next_cells: list[int] = []
     for site_type, row in zip(old.site_types, old.rows, strict=True):
         case = case_by_type[site_type]
         if len(row) != case.degree:
-            raise ValueError("native neighbor-count degree mismatch")
-        neighbor_sum = sum(old.cells[target] for target in row)
-        next_cells.append(case.table.at(neighbor_sum))
+            raise ValueError("native local-sum degree mismatch")
+        local_sum = old.cells[len(next_cells)] + sum(old.cells[target] for target in row)
+        next_cells.append(case.table.at(local_sum))
     return NativeIncidenceState(
         old.keys,
         old.site_types,
@@ -1511,7 +1515,7 @@ def typed_count_program(
     )
 
 
-def typed_neighbor_count_program(
+def typed_local_value_sum_program(
     alphabet_size: int,
     cases: tuple[CountCase, ...],
     relation: str = "local",
@@ -1519,8 +1523,8 @@ def typed_neighbor_count_program(
     return SimpleProgram(
         FiniteAlphabet(alphabet_size),
         AllSites(),
-        RelationNeighborhood(relation, False),
-        NeighborCountRule(alphabet_size, cases),
+        RelationNeighborhood(relation, True),
+        LocalValueSumRule(alphabet_size, cases),
     )
 
 
@@ -1668,23 +1672,69 @@ def native_hex_center_count_step(
     )
 
 
+def rotate_hex_displacement(delta: Offset) -> Offset:
+    """Rotate a scaled physical center displacement by +60 degrees."""
+
+    horizontal, vertical = checked_coord(delta, 2, "hex displacement")
+    if (horizontal - vertical) % 2 or (3 * horizontal + vertical) % 2:
+        raise ValueError("hex displacement is outside the scaled rotation image")
+    return ((horizontal - vertical) // 2, (3 * horizontal + vertical) // 2)
+
+
+def reflect_hex_displacement(delta: Offset) -> Offset:
+    horizontal, vertical = checked_coord(delta, 2, "hex displacement")
+    return (horizontal, -vertical)
+
+
+def displacement_slot_map(transform: object) -> tuple[int, ...]:
+    if not callable(transform):
+        raise TypeError("displacement transform must be callable")
+    index = {delta: slot for slot, delta in enumerate(HEX_CENTER_DISPLACEMENTS)}
+    mapped = tuple(index[transform(delta)] for delta in HEX_CENTER_DISPLACEMENTS)
+    if tuple(sorted(mapped)) != tuple(range(6)):
+        raise AssertionError("hex displacement transform is not a slot permutation")
+    return mapped
+
+
+HEX_ROTATION_SLOT_MAP = displacement_slot_map(rotate_hex_displacement)
+HEX_REFLECTION_SLOT_MAP = displacement_slot_map(reflect_hex_displacement)
+
+
+def permute_hex_ring(ring: tuple[int, ...], slot_map: tuple[int, ...]) -> tuple[int, ...]:
+    raw = require_tuple(ring, "hex ring")
+    if len(raw) != 6 or tuple(sorted(slot_map)) != tuple(range(6)):
+        raise ValueError("hex ring permutation has the wrong shape")
+    out = [0] * 6
+    for old_slot, new_slot in enumerate(slot_map):
+        out[new_slot] = raw[old_slot]
+    return tuple(out)
+
+
 def hex_context_rotations(context: tuple[int, ...]) -> tuple[tuple[int, ...], ...]:
     raw = require_tuple(context, "hex context")
     if len(raw) != 7:
         raise ValueError("hex context must contain Self and six neighbors")
     center = raw[0]
     ring = raw[1:]
-    return tuple((center, *(ring[shift:] + ring[:shift])) for shift in range(6))
+    rotations: list[tuple[int, ...]] = []
+    current = ring
+    for _ in range(6):
+        rotations.append((center, *current))
+        current = permute_hex_ring(current, HEX_ROTATION_SLOT_MAP)
+    assert current == ring
+    return tuple(rotations)
 
 
 def hex_context_dihedral(context: tuple[int, ...]) -> tuple[tuple[int, ...], ...]:
     rotations = hex_context_rotations(context)
     center = context[0]
-    reflected_ring = tuple(reversed(context[1:]))
-    reflected = tuple(
-        (center, *(reflected_ring[shift:] + reflected_ring[:shift]))
-        for shift in range(6)
-    )
+    reflected_ring = permute_hex_ring(context[1:], HEX_REFLECTION_SLOT_MAP)
+    reflected: list[tuple[int, ...]] = []
+    current = reflected_ring
+    for _ in range(6):
+        reflected.append((center, *current))
+        current = permute_hex_ring(current, HEX_ROTATION_SLOT_MAP)
+    assert current == reflected_ring
     return (*rotations, *reflected)
 
 
@@ -2006,17 +2056,21 @@ def assert_translation_commutation() -> dict[str, int]:
     count_events = 0
     positional_events = 0
     large_positional_events = 0
+    count_sensitivity_profiles = 0
+    positional_slot_witnesses = 0
+    positional_asymmetry_witnesses = 0
 
     for dimension, shape in shapes.items():
         for profile_offsets in (axis_offsets(dimension), full_shell_offsets(dimension)):
             for alphabet_size in (2, 3):
-                table = deterministic_table(
+                table = self_sum_sensitive_table(
                     alphabet_size,
-                    self_count_case_count(len(profile_offsets), alphabet_size),
+                    len(profile_offsets),
                     dimension + len(profile_offsets),
                 )
+                count_sensitivity_profiles += 1
                 program = count_program(alphabet_size, len(profile_offsets), table)
-                for variant in range(4):
+                for variant in range(1, 5):
                     native = NativeTranslationState(
                         shape,
                         alphabet_size,
@@ -2030,8 +2084,12 @@ def assert_translation_commutation() -> dict[str, int]:
                     count_events += 1
 
         positions = axis_positions(dimension)
-        positional_table = deterministic_table(2, 2 ** len(positions), dimension)
-        positional = positional_program(2, len(positions), positional_table)
+        slots = offset_slot_schema(positions)
+        positional_table = slot_sensitive_table(2, slots, dimension)
+        sensitive, asymmetric = assert_slot_sensitivity(positional_table, slots)
+        positional_slot_witnesses += sensitive
+        positional_asymmetry_witnesses += asymmetric
+        positional = positional_program(2, slots, positional_table)
         for variant in range(3):
             native = NativeTranslationState(
                 shape,
@@ -2056,22 +2114,11 @@ def assert_translation_commutation() -> dict[str, int]:
             cells_pattern(prod(shape), 2, variant),
             generation=4,
         )
-        reached = sorted(
-            {
-                context_index(
-                    tuple(native.value_at(add_coord(coord, offset)) for offset in positions),
-                    2,
-                )
-                for coord in all_coords(shape)
-            }
-        )
-        table = DefaultOverridesTable(
-            2,
-            2 ** len(positions),
-            0,
-            tuple((index, 1) for index in reached),
-        )
-        program = positional_program(2, len(positions), table)
+        slots = offset_slot_schema(positions)
+        table = sparse_slot_witness_table(slots)
+        positional_slot_witnesses += len(slots)
+        positional_asymmetry_witnesses += 1
+        program = positional_program(2, slots, table)
         expected = native_translation_positional_step(native, positions, table)
         actual = decode_translation(
             generic_step(program, encode_translation(native, positions)),
@@ -2134,14 +2181,42 @@ def assert_translation_commutation() -> dict[str, int]:
     assert len(fcc.offsets) == 12 and len(bcc.offsets) == 14
     assert bareiss_determinant(fcc.basis) != 0
     assert bareiss_determinant(bcc.basis) != 0
-    embedded = 0
+    inverse_roundtrips = 0
+    image_rejections = 0
     basis_access_events = 0
+    basis_physical_incidence_events = 0
+    basis_sum_sensitivity_witnesses = 0
     for descriptor in (fcc, bcc):
-        images = {descriptor.embed(coord) for coord in product(range(-1, 2), repeat=3)}
-        assert len(images) == 27
-        embedded += len(images)
-        table = deterministic_table(2, self_count_case_count(len(descriptor.offsets), 2), len(descriptor.offsets))
+        images: set[Coord] = set()
+        for coord in product(range(-3, 4), repeat=3):
+            physical = descriptor.embed(coord)
+            assert descriptor.decode(physical) == coord
+            assert descriptor.embed(descriptor.decode(physical)) == physical
+            images.add(physical)
+            inverse_roundtrips += 1
+        assert len(images) == 7**3
+        expect_raises(ValueError, lambda descriptor=descriptor: descriptor.decode((1, 0, 0)))
+        image_rejections += 1
+        table = self_sum_sensitive_table(2, len(descriptor.offsets), len(descriptor.offsets))
+        basis_sum_sensitivity_witnesses += 1
         program = count_program(2, len(descriptor.offsets), table)
+        coefficient_keys = all_coords((3, 3, 3))
+        key_to_index = {coord: index for index, coord in enumerate(coefficient_keys)}
+        incidence_rows = tuple(
+            tuple(
+                key_to_index[
+                    tuple(
+                        (component + delta) % 3
+                        for component, delta in zip(coord, offset, strict=True)
+                    )
+                ]
+                for offset in descriptor.offsets
+            )
+            for coord in coefficient_keys
+        )
+        physical_keys = tuple(descriptor.embed(coord) for coord in coefficient_keys)
+        assert tuple(descriptor.decode(key) for key in physical_keys) == coefficient_keys
+        incidence_case = CountCase("cell", len(descriptor.offsets), table)
         for variant in (1, 3):
             native = NativeTranslationState(
                 (3, 3, 3),
@@ -2156,18 +2231,60 @@ def assert_translation_commutation() -> dict[str, int]:
             )
             assert actual == expected
             basis_access_events += 1
+            physical = NativeIncidenceState(
+                physical_keys,
+                ("cell",) * len(physical_keys),
+                incidence_rows,
+                False,
+                2,
+                native.cells,
+                native.generation,
+            )
+            physical_expected = native_count_step(physical, (incidence_case,))
+            physical_actual = decode_incidence(
+                generic_step(
+                    typed_count_program(2, (incidence_case,)),
+                    encode_incidence(physical),
+                ),
+                physical,
+            )
+            assert physical_actual == physical_expected
+            assert physical_expected.cells == expected.cells
+            basis_physical_incidence_events += 1
 
     return {
         "translation_count_events": count_events,
         "translation_positional_events": positional_events,
         "large_closed_positional_events": large_positional_events,
+        "count_sum_sensitivity_profiles": count_sensitivity_profiles,
+        "positional_slot_witnesses": positional_slot_witnesses,
+        "positional_asymmetry_witnesses": positional_asymmetry_witnesses,
         "coordinate_roundtrips": coordinate_roundtrips,
-        "basis_embedding_witnesses": embedded,
+        "basis_inverse_roundtrips": inverse_roundtrips,
+        "basis_image_rejections": image_rejections,
         "basis_access_events": basis_access_events,
+        "basis_physical_incidence_events": basis_physical_incidence_events,
+        "basis_sum_sensitivity_witnesses": basis_sum_sensitivity_witnesses,
     }
 
 
 def assert_hexagonal_semantics() -> dict[str, int]:
+    assert HEX_ROTATION_SLOT_MAP == (2, 0, 4, 1, 5, 3)
+    assert HEX_REFLECTION_SLOT_MAP == (1, 0, 3, 2, 5, 4)
+    rotation_cycle = [0]
+    for _ in range(5):
+        rotation_cycle.append(HEX_ROTATION_SLOT_MAP[rotation_cycle[-1]])
+    assert tuple(rotation_cycle) == (0, 2, 4, 5, 3, 1)
+    assert all(
+        HEX_CENTER_DISPLACEMENTS[HEX_ROTATION_SLOT_MAP[index]]
+        == rotate_hex_displacement(delta)
+        for index, delta in enumerate(HEX_CENTER_DISPLACEMENTS)
+    )
+    assert all(
+        HEX_CENTER_DISPLACEMENTS[HEX_REFLECTION_SLOT_MAP[index]]
+        == reflect_hex_displacement(delta)
+        for index, delta in enumerate(HEX_CENTER_DISPLACEMENTS)
+    )
     contexts = tuple(product((0, 1), repeat=7))
     rotations = orbit_partition(contexts, "rotation")
     dihedral = orbit_partition(contexts, "dihedral")
@@ -2226,11 +2343,13 @@ def assert_hexagonal_semantics() -> dict[str, int]:
         codec_roundtrips += 1
     assert len(centers) == codec_roundtrips
     displacements = tuple(HEX_CODEC.encode(offset) for offset in HEX_SQUARE_OFFSETS)
+    assert displacements == HEX_CENTER_DISPLACEMENTS
     assert len(set(displacements)) == 6
     assert all(HEX_CODEC.squared_scaled_distance(delta) == 4 for delta in displacements)
     expect_raises(ValueError, lambda: HEX_CODEC.decode((0, 1)))
 
     global_events = 0
+    physical_codec_commutations = 0
     shape = (3, 3)
     for code in (16382, 10926):
         table = binary_table_from_code(code, 14)
@@ -2245,6 +2364,12 @@ def assert_hexagonal_semantics() -> dict[str, int]:
             )
             assert actual == expected
             global_events += 1
+            physical_old = encode_hex_centers(native)
+            physical_next = native_hex_center_count_step(physical_old, table)
+            assert physical_next.centers == physical_old.centers
+            assert physical_next.cells == expected.cells
+            assert physical_next.generation == expected.generation
+            physical_codec_commutations += 1
 
     return {
         "hex_rotation_orbits": len(rotations),
@@ -2253,6 +2378,7 @@ def assert_hexagonal_semantics() -> dict[str, int]:
         "hex_totalistic_contexts": sum(totalistic_fibers.values()),
         "hex_codec_roundtrips": codec_roundtrips,
         "hex_native_generic_events": global_events,
+        "hex_physical_codec_commutations": physical_codec_commutations,
         "hex_noninvariant_rejections": 1,
     }
 
@@ -2260,6 +2386,7 @@ def assert_hexagonal_semantics() -> dict[str, int]:
 def assert_fixed_incidence_semantics() -> dict[str, int]:
     degree_profile_events = 0
     named_degree_profiles = 0
+    degree_sum_sensitivity_witnesses = 0
     for _name, dimension, degree in SOURCE_NEAREST_DEGREES:
         assert dimension in (2, 3, 4)
         assert degree in (4, 6, 8, 12, 14, 16, 24)
@@ -2267,10 +2394,11 @@ def assert_fixed_incidence_semantics() -> dict[str, int]:
         rows = circulant_rows(size, degree)
         assert all(len(row) == degree for row in rows)
         for salt in (1, 4):
-            table = deterministic_table(2, self_count_case_count(degree, 2), salt)
+            table = self_sum_sensitive_table(2, degree, salt)
+            degree_sum_sensitivity_witnesses += 1
             cases = (CountCase("cell", degree, table),)
             program = typed_count_program(2, cases)
-            for variant in range(4):
+            for variant in range(1, 5):
                 native = NativeIncidenceState(
                     tuple((index,) for index in range(size)),
                     ("cell",) * size,
@@ -2369,17 +2497,74 @@ def assert_fixed_incidence_semantics() -> dict[str, int]:
     assert required_from_down == (3, 2, 0)
     assert wrong_from_global_up != required_from_down
 
+    # Turn that address inequality into an event counterexample.  The motif is
+    # nonaliasing on a 5x5 quotient: only the required down-orientation row
+    # neighbor is black.  Broadcasting the up offsets reads three zeros at the
+    # marked down site, while typed incidence reads a one.  Both presentations
+    # still commute independently through the same closed-rule runner.
+    motif_shape = (5, 5)
+    empty_motif = triangular_tile_state(motif_shape, (0,) * 50)
+    motif_index = {key: index for index, key in enumerate(empty_motif.keys)}
+    motif_cells = [0] * len(empty_motif.keys)
+    motif_cells[motif_index[required_from_down]] = 1
+    typed_motif = triangular_tile_state(motif_shape, tuple(motif_cells))
+    broadcast_rows = tuple(
+        tuple(
+            motif_index[
+                (
+                    (key[0] + offset[0]) % motif_shape[0],
+                    (key[1] + offset[1]) % motif_shape[1],
+                    (key[2] + offset[2]) % 2,
+                )
+            ]
+            for offset in up_offsets
+        )
+        for key in typed_motif.keys
+    )
+    broadcast_motif = NativeIncidenceState(
+        typed_motif.keys,
+        typed_motif.site_types,
+        broadcast_rows,
+        False,
+        2,
+        typed_motif.cells,
+    )
+    marked_down = motif_index[down_site]
+    typed_labels = tuple(typed_motif.cells[target] for target in typed_motif.rows[marked_down])
+    broadcast_labels = tuple(
+        broadcast_motif.cells[target]
+        for target in broadcast_motif.rows[marked_down]
+    )
+    assert typed_labels == (0, 1, 0)
+    assert broadcast_labels == (0, 0, 0)
+    typed_motif_expected = native_count_step(typed_motif, alternating_cases)
+    typed_motif_actual = decode_incidence(
+        generic_step(alternating_program, encode_incidence(typed_motif)),
+        typed_motif,
+    )
+    assert typed_motif_actual == typed_motif_expected
+    broadcast_expected = native_count_step(broadcast_motif, alternating_cases)
+    broadcast_actual = decode_incidence(
+        generic_step(alternating_program, encode_incidence(broadcast_motif)),
+        broadcast_motif,
+    )
+    assert broadcast_actual == broadcast_expected
+    assert typed_motif_expected.cells[marked_down] == 1
+    assert broadcast_expected.cells[marked_down] == 0
+    assert typed_motif_expected.cells != broadcast_expected.cells
+    alternating_offset_counterexample_events = 2
+
     # A fixed finite-type network may give each type its own incidence degree
     # and complete count table while using the same runner and UPDATE.
     finite_type_events = 0
     finite_type_rows = complete_bipartite_rows(2, 3)
-    high_table = deterministic_table(2, 8, 1)  # degree 3
-    low_table = deterministic_table(2, 6, 0)  # degree 2
+    high_table = local_sum_sensitive_table(2, 3, 1)
+    low_table = local_sum_sensitive_table(2, 2, 0)
     finite_type_cases = (
         CountCase("degree-3", 3, high_table),
         CountCase("degree-2", 2, low_table),
     )
-    finite_type_program = typed_count_program(2, finite_type_cases)
+    finite_type_program = typed_local_value_sum_program(2, finite_type_cases)
     for mask in range(32):
         cells = tuple((mask >> index) & 1 for index in range(5))
         native = NativeIncidenceState(
@@ -2390,7 +2575,7 @@ def assert_fixed_incidence_semantics() -> dict[str, int]:
             2,
             cells,
         )
-        expected = native_count_step(native, finite_type_cases)
+        expected = native_local_value_sum_step(native, finite_type_cases)
         actual = decode_incidence(generic_step(finite_type_program, encode_incidence(native)), native)
         assert actual == expected
         finite_type_events += 1
@@ -2398,20 +2583,59 @@ def assert_fixed_incidence_semantics() -> dict[str, int]:
     # Unlabelled ports may be stored in any row order, but only a
     # permutation-invariant rule can consume them.
     local_permutation_checks = 0
-    degree3_case = CountCase("cell", 3, code254)
-    degree3_rule = SelfCountRule(2, (degree3_case,))
-    for context in product((0, 1), repeat=4):
-        center, neighbors = context[0], context[1:]
-        expected = degree3_rule.evaluate(LocalRead(0, "cell", center, neighbors, False, None))
+    network_table = local_sum_sensitive_table(2, 3, 0)
+    degree3_case = CountCase("cell", 3, network_table)
+    degree3_rule = LocalValueSumRule(2, (degree3_case,))
+    permutation_relation = IncidenceRelation(
+        "permutation",
+        ((1, 2, 3), (0, 2, 3), (0, 1, 3), (0, 1, 2)),
+        False,
+    )
+    permutation_support = FixedSupport(
+        ((0,), (1,), (2,), (3,)),
+        ("cell",) * 4,
+        (permutation_relation,),
+    )
+    permutation_schema = RelationNeighborhood("permutation", True)
+    permutation_token = SnapshotToken(0)
+    for center, *neighbor_values in product((0, 1), repeat=4):
+        neighbors = tuple(neighbor_values)
+        expected = degree3_rule.evaluate(
+            LocalRead(
+                permutation_token,
+                permutation_support,
+                permutation_relation,
+                permutation_schema,
+                0,
+                "cell",
+                center,
+                neighbors,
+                False,
+                None,
+            )
+        )
         for permuted in permutations(neighbors):
-            actual = degree3_rule.evaluate(LocalRead(0, "cell", center, permuted, False, None))
+            actual = degree3_rule.evaluate(
+                LocalRead(
+                    permutation_token,
+                    permutation_support,
+                    permutation_relation,
+                    permutation_schema,
+                    0,
+                    "cell",
+                    center,
+                    permuted,
+                    False,
+                    None,
+                )
+            )
             assert actual == expected
             local_permutation_checks += 1
 
     unlabelled_global_events = 0
     k4_rows = tuple(tuple(target for target in range(4) if target != site) for site in range(4))
     reversed_rows = tuple(tuple(reversed(row)) for row in k4_rows)
-    unlabelled_program = typed_count_program(2, (degree3_case,))
+    unlabelled_program = typed_local_value_sum_program(2, (degree3_case,))
     for mask in range(16):
         cells = tuple((mask >> index) & 1 for index in range(4))
         first = NativeIncidenceState(
@@ -2432,13 +2656,99 @@ def assert_fixed_incidence_semantics() -> dict[str, int]:
         )
         next_first = generic_step(unlabelled_program, encode_incidence(first))
         next_second = generic_step(unlabelled_program, encode_incidence(second))
-        assert decode_incidence(next_first, first) == native_count_step(first, (degree3_case,))
-        assert decode_incidence(next_second, second) == native_count_step(second, (degree3_case,))
+        assert decode_incidence(next_first, first) == native_local_value_sum_step(first, (degree3_case,))
+        assert decode_incidence(next_second, second) == native_local_value_sum_step(second, (degree3_case,))
         assert next_first.cells == next_second.cells
         unlabelled_global_events += 2
 
+    # The Notes executable NetCAStep uses the explicit positional triple
+    # ``(Above, Self, Below)``.  Its inclusive-total quotient is the same
+    # one-step construction when the positional table factors through the
+    # exact sum.  Check native incidence, generic unlabelled local-sum, native
+    # labelled positional, and generic labelled positional successors together.
+    netca_size = 5
+    netca_keys = tuple((index,) for index in range(netca_size))
+    netca_connection_rows = tuple(
+        ((site - 1) % netca_size, (site + 1) % netca_size)
+        for site in range(netca_size)
+    )
+    netca_triple_rows = tuple(
+        ((site - 1) % netca_size, site, (site + 1) % netca_size)
+        for site in range(netca_size)
+    )
+    netca_labels = tuple(("Above", "Self", "Below") for _ in range(netca_size))
+    netca_total_table = local_sum_sensitive_table(2, 2, 0)
+    netca_total_case = CountCase("node", 2, netca_total_table)
+    netca_total_program = typed_local_value_sum_program(2, (netca_total_case,))
+    netca_slots = ("Above", "Self", "Below")
+    netca_positional_table = DenseTable(
+        2,
+        8,
+        tuple(netca_total_table.at(sum(context)) for context in product((0, 1), repeat=3)),
+    )
+    netca_positional_case = PositionalCase("node", netca_slots, netca_positional_table)
+    netca_positional_program = typed_positional_program(2, (netca_positional_case,))
+    netca_local_sum_events = 0
+    netca_labelled_events = 0
+    netca_triple_commutations = 0
+    for mask in range(1 << netca_size):
+        cells = tuple((mask >> index) & 1 for index in range(netca_size))
+        total_native = NativeIncidenceState(
+            netca_keys,
+            ("node",) * netca_size,
+            netca_connection_rows,
+            False,
+            2,
+            cells,
+        )
+        positional_native = NativeIncidenceState(
+            netca_keys,
+            ("node",) * netca_size,
+            netca_triple_rows,
+            True,
+            2,
+            cells,
+            port_labels=netca_labels,
+        )
+        total_expected = native_local_value_sum_step(total_native, (netca_total_case,))
+        total_actual = decode_incidence(
+            generic_step(netca_total_program, encode_incidence(total_native)),
+            total_native,
+        )
+        positional_expected = native_positional_step(positional_native, (netca_positional_case,))
+        positional_actual = decode_incidence(
+            generic_step(netca_positional_program, encode_incidence(positional_native)),
+            positional_native,
+        )
+        assert total_actual == total_expected
+        assert positional_actual == positional_expected
+        assert total_expected.cells == positional_expected.cells
+        netca_local_sum_events += 1
+        netca_labelled_events += 1
+        netca_triple_commutations += 1
+
+    # LocalValueSum deliberately identifies these semantically distinct local
+    # decompositions.  Equal totals, not a hidden histogram or separate Self,
+    # are the source profile's rule addresses.
+    ternary_total = local_sum_sensitive_table(3, 2, 0)
+    histogram_left = (0, (0, 2))
+    histogram_right = (0, (1, 1))
+    assert Counter((histogram_left[0], *histogram_left[1])) != Counter(
+        (histogram_right[0], *histogram_right[1])
+    )
+    assert histogram_left[0] + sum(histogram_left[1]) == histogram_right[0] + sum(histogram_right[1])
+    assert ternary_total.at(histogram_left[0] + sum(histogram_left[1])) == ternary_total.at(
+        histogram_right[0] + sum(histogram_right[1])
+    )
+    self_trade_left = (1, (0, 0))
+    self_trade_right = (0, (1, 0))
+    assert self_trade_left[0] + sum(self_trade_left[1]) == self_trade_right[0] + sum(self_trade_right[1])
+    assert netca_total_table.at(self_trade_left[0] + sum(self_trade_left[1])) == netca_total_table.at(
+        self_trade_right[0] + sum(self_trade_right[1])
+    )
+
     projection_table = DenseTable(2, 8, tuple(context[0] for context in product((0, 1), repeat=3)))
-    positional_case = PositionalCase("cell", 3, projection_table)
+    positional_case = PositionalCase("cell", ("slot-0", "slot-1", "slot-2"), projection_table)
     positional_on_unlabelled = typed_positional_program(2, (positional_case,))
     unlabelled_fixture = NativeIncidenceState(
         tuple((index,) for index in range(4)),
@@ -2453,17 +2763,21 @@ def assert_fixed_incidence_semantics() -> dict[str, int]:
         lambda: generic_step(positional_on_unlabelled, encode_incidence(unlabelled_fixture)),
     )
 
-    # Labelled ports make ordered positional data meaningful.  A closed table
-    # projects the left port; reversing the rows without permuting the rule is
-    # observably different, as it should be.
+    # Labelled ports make ordered positional data meaningful.  Storage order is
+    # irrelevant when target/label pairs move together; changing which target
+    # owns a label is a semantic change.  The closed map is sensitive to both
+    # slots and asymmetric under their exchange.
     labelled_events = 0
+    labelled_storage_reorder_checks = 0
     cycle_size = 5
     labelled_rows = tuple(((site - 1) % cycle_size, (site + 1) % cycle_size) for site in range(cycle_size))
     labelled_port_rows = tuple(("left", "right") for _ in range(cycle_size))
-    left_projection = DenseTable(2, 4, (0, 0, 1, 1))
-    labelled_case = PositionalCase("cell", 2, left_projection)
+    labelled_slots = ("left", "right")
+    labelled_table = slot_sensitive_table(2, labelled_slots, 0)
+    assert assert_slot_sensitivity(labelled_table, labelled_slots) == (2, 1)
+    labelled_case = PositionalCase("cell", labelled_slots, labelled_table)
     labelled_program = typed_positional_program(2, (labelled_case,))
-    labelled_witness_outputs: tuple[Cells, Cells] | None = None
+    semantic_retarget_witness: tuple[Cells, Cells] | None = None
     for mask in range(32):
         cells = tuple((mask >> index) & 1 for index in range(cycle_size))
         native = NativeIncidenceState(
@@ -2488,21 +2802,49 @@ def assert_fixed_incidence_semantics() -> dict[str, int]:
             cells,
             port_labels=tuple(("right", "left") for _ in range(cycle_size)),
         )
-        reversed_output = native_positional_step(reversed_native, (labelled_case,)).cells
-        if expected.cells != reversed_output and labelled_witness_outputs is None:
-            labelled_witness_outputs = (expected.cells, reversed_output)
-    assert labelled_witness_outputs is not None
+        reversed_expected = native_positional_step(reversed_native, (labelled_case,))
+        reversed_actual = decode_incidence(
+            generic_step(labelled_program, encode_incidence(reversed_native)),
+            reversed_native,
+        )
+        assert reversed_actual == reversed_expected
+        assert reversed_expected.cells == expected.cells
+        labelled_events += 1
+        labelled_storage_reorder_checks += 1
+        semantic_retarget = NativeIncidenceState(
+            native.keys,
+            native.site_types,
+            tuple(tuple(reversed(row)) for row in native.rows),
+            True,
+            2,
+            cells,
+            port_labels=labelled_port_rows,
+        )
+        semantic_output = native_positional_step(semantic_retarget, (labelled_case,)).cells
+        if expected.cells != semantic_output and semantic_retarget_witness is None:
+            semantic_retarget_witness = (expected.cells, semantic_output)
+    assert semantic_retarget_witness is not None
 
     return {
         "source_degree_profiles": named_degree_profiles,
         "degree_profile_events": degree_profile_events,
+        "degree_sum_sensitivity_witnesses": degree_sum_sensitivity_witnesses,
         "pentagonal_code4094_events": pentagonal_events,
         "two_shape_code254_events": two_shape_events,
         "alternating_orientation_events": alternating_events,
+        "alternating_offset_counterexample_events": alternating_offset_counterexample_events,
         "finite_type_network_events": finite_type_events,
+        "inclusive_local_sum_witnesses": 3,
         "unlabelled_local_permutation_checks": local_permutation_checks,
         "unlabelled_global_events": unlabelled_global_events,
+        "netca_local_sum_events": netca_local_sum_events,
+        "netca_labelled_positional_events": netca_labelled_events,
+        "netca_triple_commutations": netca_triple_commutations,
+        "local_sum_histogram_collisions": 1,
+        "local_sum_self_neighbor_collisions": 1,
         "labelled_positional_events": labelled_events,
+        "labelled_storage_reorder_checks": labelled_storage_reorder_checks,
+        "labelled_semantic_retarget_witnesses": 1,
         "unlabelled_positional_rejections": 1,
         "static_offset_failure_witnesses": 1,
     }
@@ -2532,7 +2874,7 @@ def assert_alias_multiplicity_and_parallel_update() -> dict[str, int]:
     square_generic = encode_translation(square, full2)
     first_row_counts = sorted(Counter(square_generic.support.relation("local").rows[0]).values())
     assert first_row_counts == [2, 2, 4]
-    square_table = deterministic_table(2, self_count_case_count(8, 2), 1)
+    square_table = self_sum_sensitive_table(2, 8, 1)
     assert decode_translation(
         generic_step(count_program(2, 8, square_table), square_generic),
         square.shape,
@@ -2570,7 +2912,7 @@ def assert_alias_multiplicity_and_parallel_update() -> dict[str, int]:
         port_labels=labels,
     )
     identity = DenseTable(2, 2, (0, 1))
-    case = PositionalCase("cell", 1, identity)
+    case = PositionalCase("cell", ("predecessor",), identity)
     expected = native_positional_step(old, (case,))
     old_generic = encode_incidence(old)
     actual_generic = generic_step(typed_positional_program(2, (case,)), old_generic)
@@ -2722,7 +3064,7 @@ def assert_architecture_and_structural_control() -> dict[str, int]:
         2,
         (1, 0, 0),
     )
-    table = deterministic_table(2, self_count_case_count(2, 2), 1)
+    table = self_sum_sensitive_table(2, 2, 1)
     case = CountCase("cell", 2, table)
     label_successor = generic_step(typed_count_program(2, (case,)), encode_incidence(old))
     assert label_successor.support.keys == old.keys

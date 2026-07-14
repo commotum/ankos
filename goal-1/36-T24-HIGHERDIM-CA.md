@@ -193,7 +193,7 @@ The common runner indexes these declarations by the visible finite tag. It never
 - **ALPHABET:** T24 itself needs only a finite scalar color alphabet. Tagged/product alphabets remain the broader SimplePrograms extension for stages whose dynamic labels have named factors; static T24 site kinds belong to topology unless a proved representation deliberately carries and preserves them as a label factor.
 - **Control:** none. Neither lattice identity, dimension, basis, site kind, nor port order is step control.
 - **FRONTIER:** `AllSites(V)`, with topology-generic site enumeration. A finite work region is a realization of this native selection, not a distinct frontier law.
-- **NEIGHBORHOOD:** finite old-snapshot incidence occurrences. A Bravais/hypercubic profile uses declared semantic offset slots. A finite-motif tiling uses kind-indexed port/offset data. A nonperiodic tiling or abstract network uses explicit immutable incidence. Labeled incidence is canonicalized against a declared finite slot schema before exposing a positional tuple; storage row order is never semantic. The strict fixed-network source preset exposes only the exact numeric total of connected-neighbor values and does not implicitly read Self. Parallel edges and quotient aliases remain separate read occurrences before aggregation.
+- **NEIGHBORHOOD:** finite old-snapshot incidence occurrences. A Bravais/hypercubic profile uses declared semantic offset slots. A finite-motif tiling uses kind-indexed port/offset data. A nonperiodic tiling or abstract network uses explicit immutable incidence. Labeled incidence is canonicalized against a declared finite slot schema before exposing a positional tuple; storage row order is never semantic. The strict unlabeled fixed-network restriction exposes only the exact numeric total across the declared local positions, including one explicit Self. The executable Notes profile separately declares positional `(Above, Self, Below)` slots. Parallel edges and quotient aliases remain separate read occurrences before aggregation.
 - **RULE:** a closed total finite table over the declared local-read schema. Positional, totalistic, outer-totalistic, and certified symmetry-orbit tables remain distinct schema-tagged representations. A finite dependent sum over `site_kind` is closed table data, not a callback or construction branch.
 - **Writes:** exactly one compatible `AssignLabel(source, value)` per active old site.
 - **UPDATE:** the existing fixed-support same-site snapshot-parallel assignment. Topology and site kinds are unchanged; every read is from the old label snapshot.
@@ -203,11 +203,12 @@ The common runner indexes these declarations by the visible finite tag. It never
 The candidate closed local-read carrier is a finite dependent sum:
 
 ```text
-OrderedLocalRead = Sum[k in K](SiteKind[k] x Self[A] x Product[p in SlotSchema[k]] A)
-UnlabeledNetworkTotalRead = Sum[k in K](SiteKind[k] x NeighborValueSum[k,nu])
+PositionalLocalRead = Sum[k in K](SiteKind[k] x Product[p in SlotSchema[k]] A)
+UnlabeledTotalisticRead = Sum[k in K](SiteKind[k] x LocalValueSum[Self + Incidence[k],nu])
+OuterTotalisticRead = Sum[k in K](SiteKind[k] x Self[A] x NeighborValueSum[k,nu])
 ```
 
-Here `nu : A -> Z` is the explicit numeric valuation used by the source rule code. This neighbor-only network carrier remains distinct from lattice schemas that explicitly include Self. Permutation invariance is necessary but not sufficient for this totalistic quotient: a histogram or arbitrary multiset rule is broader and needs separate evidence. The Book's “limited number of types” evidence permits finite local schemas; it does not by itself require distinct rule tables for each type. A type-indexed bank is therefore a conservative generic capability, while any strict preset must share tables exactly as its source states.
+Here `nu : A -> Z` is the explicit numeric valuation used by the source rule code. The inclusive totalistic carrier remains distinct from an outer-totalistic `Self x NeighborValueSum` schema and from the Notes' labeled positional triple. Permutation invariance is necessary but not sufficient for the totalistic quotient: a histogram or arbitrary multiset rule is broader and needs separate evidence. The Book's “limited number of types” evidence permits finite local schemas; it does not by itself require distinct rule tables for each type. A type-indexed bank is therefore a conservative generic capability, while any strict preset must share tables exactly as its source states.
 
 ## Current API and Runtime Fit
 
@@ -238,7 +239,7 @@ These examples expose representation and parameter gaps, not category-4 executio
 1. **Fourth-axis copy.** A binary `Z^4` CA that copies the old `+e_4` label is rejected by current rank validators, although generic dimension plus one declared offset uses the unchanged snapshot-parallel assignment.
 2. **Alternating triangular motif.** In `Z^2 x {Up,Down}`, the two site kinds have different neighbor incidences. One globally broadcast offset tuple gives a wrong successor; finite kind-indexed access gives the native event without changing UPDATE.
 3. **Nonperiodic fixed incidence.** A degree-three fixed graph with “black iff exactly one incident neighbor was black” cannot derive its reads from tensor proximity. Explicit visible incidence fixes NEIGHBORHOOD while preserving the runner.
-4. **Unlabeled ports.** “Copy slot zero” changes under an automorphic edge permutation when ports are unlabeled. Positional access is invalid there. The strict neighbor-only source preset factors through the exact numeric sum: for a three-color valuation, `{0,2}` and `{1,1}` must remain indistinguishable even though their histograms differ, and changing only Self must not change the read.
+4. **Unlabeled ports.** “Copy slot zero” changes under an automorphic edge permutation when ports are unlabeled. Positional access is invalid there. The strict source restriction factors through the inclusive exact numeric sum: three-color local contexts `(Self, n1, n2)=(0,0,2)` and `(1,0,1)` must remain indistinguishable even though their positionwise values and histograms differ. The Notes profile can distinguish slots only because it explicitly declares `(Above, Self, Below)`.
 5. **Quotient aliases.** If two declared neighbor ports reach the same quotient site, set deduplication changes a totalistic count. Incidence occurrences, not unique destination IDs, form the read carrier.
 
 By contrast, a native event that creates/deletes sites or edges would defeat fixed-support assignment. That concrete counterexample is already owned by T29's structural graph UPDATE; none of the T24 evidence found so far performs it.
@@ -251,7 +252,7 @@ The smallest implementation set is:
 2. Generic typed site references/coordinate tuples with explicit lossless codecs.
 3. Immutable fixed-topology data containing site enumeration, incidence occurrences, optional finite site kinds, and optional declared semantic slot schemas; storage order is nonsemantic.
 4. Topology-aware `AllSites` and closed finite access schemas indexed by site kind.
-5. Closed positional, neighbor-only exact numeric-total, explicit-Self aggregate, symmetry-orbit, and finite dependent-sum RULE representations; histogram/multiset aggregation is not attributed to the unlabeled-network source restriction.
+5. Closed positional, inclusive exact-totalistic, outer-totalistic `Self x NeighborValueSum`, symmetry-orbit, and finite dependent-sum RULE representations; histogram/multiset aggregation is not attributed to the unlabeled-network source restriction.
 6. The existing typed same-site label write and snapshot-parallel UPDATE unchanged.
 7. Arbitrary-width exact table keys and codecs.
 8. Separate finite realization, basis/motif, embedding, and view adapters with explicit inverses or stated one-way observer status.
@@ -277,7 +278,7 @@ No completed stage reopens on the architecture evidence. T21-T23 remain strict f
 - No finite tensor, crop, slice, projection, density, shape, palette, or raster promoted into native program identity without source evidence.
 - No fixed-incidence label evolution conflated with T29 structural graph rewriting, and no graph spelling rejected merely because it is not a dense tensor.
 - No compact count or symmetry table accepted as a complete positional rule without a validated constant-fiber proof.
-- No histogram, arbitrary permutation-invariant multiset rule, or implicit Self presented as the source's stricter neighbor-only unlabeled totalistic quotient.
+- No histogram or arbitrary permutation-invariant multiset rule presented as the source's stricter inclusive unlabeled totalistic quotient; Self is an explicit local position, never an executor-added read.
 - No positional meaning inferred from incidence-row order; semantic offsets or a declared canonical port-slot schema must carry every slot identity.
 - No arbitrary CA encodability substituted for native one-event reuse.
 

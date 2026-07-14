@@ -56,7 +56,9 @@ EXPECTED_TAXONOMY_SHA256 = "4c30fe079b2fb8f69e4c8c0dde3d59065227d4224cbe4b7693a1
 # and lexical collisions remain visible. Q25 follows the fixed-network Cayley
 # cross-reference, and Q26 closes the random-Boolean-network variant/history
 # and its dense actual-Index routes. Q27 independently guards the Bravais and
-# Brillouin-zone actual-Index route used by the basis-coordinate handoff.
+# Brillouin-zone actual-Index route used by the basis-coordinate handoff. Q28
+# gives every dense mixed line an independent T24 occurrence, and Q29 closes
+# the Graphs/Networks index entries for fixed-incidence cellular automata.
 QUERIES = {
     "Q00": r"\bhigher[- ]dimensional cellular automata\b",
     "Q01": (
@@ -223,6 +225,16 @@ QUERIES = {
         r"\bBravais lattices, 929\b|"
         r"\bBrillouin zones, 987 and CA lattices, 929\b"
     ),
+    "Q28": (
+        r"\bBody-centered cubic \(bcc\), 930\b|"
+        r"\bCayley graphs, 938\b|"
+        r"\bmultidimensional CAs, 927\b|"
+        r"\bSO\(8\) lattice, isotropy of, 980\b|"
+        r"\bSpace groups, 929\b|"
+        r"\bTetradecahedron, 930, 987, 988\b|"
+        r"\bWigner-Seitz cells\b"
+    ),
+    "Q29": r"\bcellular automata on, 930, 936\b",
 }
 
 EXPECTED_QUERY = {
@@ -253,7 +265,9 @@ EXPECTED_QUERY = {
     "Q24": (10, 8, 2, "b203d92c67310e4e6fb75d9d19447a01518100285758a908fdd922f894c69761"),
     "Q25": (3, 3, 0, "6c5b017ba141cb4fbe65c6f8ae39abd8faefe68e8da18a60a4660b4843737b4c"),
     "Q26": (13, 3, 10, "2ab226cf54f54d1911a100c3e80f22d8912587e541ad5e723d6d28b1cb68b0e5"),
-    "Q27": (0, 0, 0, ""),
+    "Q27": (1, 0, 1, "f2472c5ec828ce28052b6ac9b556c251a00e2722dec5c411cb75b47ba44a55f0"),
+    "Q28": (7, 0, 7, "6c326b0f0c9c42b8a98f86336f7c8b0a5cbd9cc7fbd47d314839ee6b429b3fc7"),
+    "Q29": (2, 0, 2, "717073c9f930df73ba41e6a72a55f8905fe0013ecdf6b5ff9700af5a62ba87e9"),
 }
 
 
@@ -349,28 +363,103 @@ GOVERNED_IMAGE_LINES = (
 INDEX_CLASS = {
     "t24_geometry_and_topology_routes": line_set(
         "20828,20836,20910,20940,20967,21054,21068,21102,21170,21181,"
-        "21243,21763,21934,22132,22166,22352,22416,22438"
+        "21231,21243,21683,21763,21934,22132,22166,22352,22416,22438"
     ),
-    "historical_ca_alias_routes": line_set("20970,21253,21362,22150,22390"),
+    "historical_ca_alias_routes": line_set("20970,21253,21362,22390"),
     "boolean_network_variant_routes": line_set(
-        "20918,21213,21283,21416,21495,21687,21689,21771,22134,22426"
+        "21213,21283,21416,21495,21687,21689,21771,22134,22426"
     ),
-    "observer_or_embedding_routes": line_set("20980,21132,22434"),
-    "other_slice_routes": line_set("20946,22114,22120"),
-    "other_rule_restriction_routes": line_set("21233,21731"),
+    "observer_or_embedding_routes": line_set("20980,21132"),
+    "mixed_t24_alias_variant_or_observer_routes": line_set(
+        "20918,20946,21471,22114,22120,22150,22434"
+    ),
+    "t24_rule_restriction_routes": line_set("21233,21731"),
     "structural_or_sequential_network_routes": line_set("22096"),
     "continuous_or_stochastic_routes": line_set("21046,21434,21735,21815"),
-    "broad_implementation_name_routes": line_set("21050,21471"),
+    "broad_implementation_name_routes": line_set("21050"),
 }
 INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
+
+# Dense Index rows interleave columns. Every routed physical line therefore
+# freezes the exact entry (or entries) that justify its line-exclusive class;
+# an unrelated match elsewhere on the same row cannot stand in for T24.
+INDEX_ENTRY_GUARDS = {
+    "t24_geometry_and_topology_routes": {
+        20828: ("24 dimensions isotropy of lattices in, 980",),
+        20836: ("5-fold symmetry ca patterns with", "8 dimensions isotropy of lattices in, 980"),
+        20910: ("bcc (body-centered cubic), 930",),
+        20940: ("bravais lattices, 929", "brillouin zones, 987 and ca lattices, 929"),
+        20967: ("cellular automata on networks, 930, 936",),
+        21054: ("crystal lattices", "systems on, 169, 929"),
+        21068: ("cubic lattices cellular automata on, 182",),
+        21102: ("rhombo-hexagonal, 930",),
+        21170: ("face-centered cubic (fcc) lattice, 930",),
+        21181: ("fcc (face-centered cubic) lattice, 930",),
+        21231: ("graphs", "cellular automata on, 930, 936", "see also networks"),
+        21243: ("hexagonal cellular automata", "implementation of cas on 992", "hexagonal prism, 929"),
+        21683: ("networks", "cayley graphs, 1032", "cellular automata on, 930, 936"),
+        21763: ("penrose tilings, 932 cellular automata on, 930, 1028",),
+        21934: ("rhombic dodecahedron, 929, 987", "rhombo-hexagonal dodecahedron, 930"),
+        22132: ("sphere packing, 986", "isotropy of lattices, 980", "and lattices, 930"),
+        22166: ("see tetradecahedron",),
+        22352: ("triangular lattice", "cellular automata on, 930", "truncated octahedron", "3d lattices, 930"),
+        22416: ("voronoi region and ca lattices, 929",),
+        22438: ("wulff shapes in ca growth, 929", "ca lattices, 929"),
+    },
+    "historical_ca_alias_routes": {
+        20970: ("cellular spaces see cellular automata",),
+        21253: ("homogeneous structures see cellular automata",),
+        21362: ("iterative automata", "see cellular automata"),
+        22390: ("universal spaces see cellular automata",),
+    },
+    "boolean_network_variant_routes": {
+        21213: ("boolean networks",), 21283: ("boolean networks",),
+        21416: ("boolean networks",), 21495: ("boolean networks",),
+        21687: ("boolean networks",), 21689: ("boolean networks",),
+        21771: ("boolean networks",), 22134: ("boolean networks",),
+        22426: ("boolean networks",),
+    },
+    "observer_or_embedding_routes": {
+        20980: ("communications systems slices through, 928",),
+        21132: ("embeddings of networks, 193, 476, 1031",),
+    },
+    "mixed_t24_alias_variant_or_observer_routes": {
+        20918: ("body-centered cubic (bcc), 930", "boolean networks, 936"),
+        20946: ("cayley graphs, 938", "cellular automata on 930"),
+        21471: ("listconvolve", "multidimensional cas, 927", "listcorrelate"),
+        22114: ("so(8) lattice, isotropy of, 980", "spacelike slices"),
+        22120: ("space groups, 929", "spacelike slices, 1041"),
+        22150: ("tessellation automata", "tetradecahedron, 930, 987, 988"),
+        22434: ("wigner-seitz cells", "ca lattices, 929", "whitney embedding theorem"),
+    },
+    "t24_rule_restriction_routes": {
+        21233: ("growth totalistic rules, 928",),
+        21731: ("outer totalistic rules",),
+    },
+    "structural_or_sequential_network_routes": {
+        22096: ("sequential network systems, 936",),
+    },
+    "continuous_or_stochastic_routes": {
+        21046: ("continuous cellular automata",),
+        21434: ("continuous cellular automata",),
+        21735: ("noisy cellular automata",),
+        21815: ("probabilistic cellular automata",),
+    },
+    "broad_implementation_name_routes": {
+        21050: ("listcorrelate",),
+    },
+}
+EXPECTED_INDEX_ENTRY_GUARDS = (
+    50, "21864ccce511d0563103361b1784eff377fe16bc686c0910760330bca47c9c58"
+)
 
 
 EXPECTED_SOURCE_COUNT = 166
 EXPECTED_SOURCE_DIGEST = "6df18eafb55416cb2cdfb0972da8bcaf958e1605df5e8e64785187212ff137f5"
 EXPECTED_SET = {
-    "union": (215, "2d006e03f71a78ee188a752a5fd613fd2102e832282fd77df3fde8f90404440f"),
+    "union": (218, "962900aed133abc4c2df18dccc4c85f3729388b2e9f589c5dbc8fefcb1e474c9"),
     "pre_index_union": (168, "b08f6b6fb0e7ef05e9ad9b52f35e6d29fd7fc5c5e371943fe34dd59707293f5d"),
-    "index": (47, "2e6957cd6bc8a02b7968bbae4de3e0df8f630b1ff7f980de68357514b10cdc59"),
+    "index": (50, "da2b55cc285ac5a347972772610fe0b017c3d0752bf244b9903202432b4d8ff6"),
     "matched_retained": (91, "1f6edc49c8836e6b06631fbf8c4b05850b39230fd21d4a3fe8a05b48d4c7ef89"),
     "governed_continuations": (75, "b595c685406b8df5bf1e5defeeed1baea4ad59822ef8a816020bd579fe3696a1"),
     "retained": (EXPECTED_SOURCE_COUNT, EXPECTED_SOURCE_DIGEST),
@@ -388,15 +477,15 @@ EXPECTED_EXCLUDED_CLASS = {
     "unrelated_slice_embedding_or_honeycomb": (7, "eb213f4e64c2d1ee8aa82e6bd2a6c4dc7d2284e433d14b42f944942d763cb711"),
 }
 EXPECTED_INDEX_CLASS = {
-    "t24_geometry_and_topology_routes": (17, "369e9c72274c8fd0e53e516c56404e30d5aa58c63909eadc507145a730c6023e"),
-    "historical_ca_alias_routes": (5, "f13cad09c327a9298b1a308ca0d8a8d7e1f7c0083ee4c70669f1e64722cb2ce0"),
-    "boolean_network_variant_routes": (10, "f0e050614be45ee3564cd2f8fe7cfadeecbf22464a6c3835feca700bb2a094af"),
-    "observer_or_embedding_routes": (3, "a1884b7791e4d28c59177abbcd43128ef6d9dcd4f16f07b836581ca8cc4d706e"),
-    "other_slice_routes": (3, "2b6a291df5f4f13a84796e1da2a57c77d64a3cb0e456d5bb613037322dae36af"),
-    "other_rule_restriction_routes": (2, "633b53d4c3b49f1981130965b95e51e3c505945acafb9fe29b57949f19812fde"),
+    "t24_geometry_and_topology_routes": (20, "33cb39114836c9d79b84f777c0e52a59a4d05fe9cf50585e0c01b6d9017c3a24"),
+    "historical_ca_alias_routes": (4, "2049afd38c1c49e2c5b1f0d87a3187a9cf023ebfb8748fc950cc259d7cb94172"),
+    "boolean_network_variant_routes": (9, "a4217032d8bb25cdc44d7df67553f654f2837a87313d0ab5b2f02294f8e0e8b8"),
+    "observer_or_embedding_routes": (2, "41142e6d10049d6279a02badfde7fd780eb3befdade8d370d06cc466607371f1"),
+    "mixed_t24_alias_variant_or_observer_routes": (7, "6c326b0f0c9c42b8a98f86336f7c8b0a5cbd9cc7fbd47d314839ee6b429b3fc7"),
+    "t24_rule_restriction_routes": (2, "633b53d4c3b49f1981130965b95e51e3c505945acafb9fe29b57949f19812fde"),
     "structural_or_sequential_network_routes": (1, "2754f6e1f004d4298d7ed6444c52385d98a70aee827877053ef7d43e519ac10f"),
     "continuous_or_stochastic_routes": (4, "c6db33d21c31050eaaa818770ba46e08cb74c0f434347d2559db6cae73a0e772"),
-    "broad_implementation_name_routes": (2, "5eed2a6567b8caf8645117fb1956b63eafe9819a2286932a9a0aa26ca88f561b"),
+    "broad_implementation_name_routes": (1, "9c8f3bc73a25f8227f7d939c8134e388e68a5d50f5629d9b62023cc699fa1e0f"),
 }
 EXPECTED_IMAGE_PARTITION = {
     "native": (6, "e6b89d89fdb76ba4bb76560fcbcd6dd0f22169301ab98bc8017e8bf0571b085f"),
@@ -409,8 +498,8 @@ EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 # Filled from the deterministic reverse joins below; unlike raw source hashes,
 # these freeze both exact duplicates and normalized split-document variants.
-EXPECTED_SPLIT_QUERY = (215, "e98155183699f1622eb35a0cfd716f3be0b34d7359e3d8bc6f8a5f8a68b30312")
-EXPECTED_SPLIT_QUERY_EXACT = (205, "451f5f2c7f637ddd6a7c4c34114d69498f9902ede1174a7c30ff605dac7d55a2")
+EXPECTED_SPLIT_QUERY = (218, "a8a19d0bc6317edc4ad4986da865bd2726eec003eabbcc4b7438c5e5fad5cdd7")
+EXPECTED_SPLIT_QUERY_EXACT = (208, "4fa8013fc5109242e3b74f9634fb5c53db88c9b09c9a06ada542b331ad9627e3")
 EXPECTED_SPLIT_QUERY_NONEXACT = (10, "101d91b24328ba3ade771d965c618f065ca35a6c38ea0f3a49426e056260a891")
 EXPECTED_SPLIT_QUERY_MAPPING_DIGEST = "049eaeabdd9c88c46f4d1e225aea230dcee97e1b9ccfa2cc07aefb5e00406357"
 EXPECTED_SPLIT_RETAINED_EXACT = (150, "c6e1e03966eb6c7e191879895bf9a72f36aeaa165d29ad8ba7246e84c3e387be")
@@ -557,6 +646,31 @@ def main() -> int:
         good = actual == EXPECTED_INDEX_CLASS.get(name)
         index_ok &= good
         print(f"index_{name}", "OK" if good else "MISMATCH", *actual)
+    guard_records = {
+        f"{class_name}:{line_no}:{'|'.join(needles)}"
+        for class_name, entries in INDEX_ENTRY_GUARDS.items()
+        for line_no, needles in entries.items()
+    }
+    index_entry_guards_ok = (
+        set(INDEX_ENTRY_GUARDS) == set(INDEX_CLASS)
+        and all(
+            set(INDEX_ENTRY_GUARDS[class_name]) == set(INDEX_CLASS[class_name])
+            for class_name in INDEX_CLASS
+        )
+        and all(
+            all(needle in at(line_no).lower() for needle in needles)
+            for entries in INDEX_ENTRY_GUARDS.values()
+            for line_no, needles in entries.items()
+        )
+        and (len(guard_records), digest_records(guard_records))
+        == EXPECTED_INDEX_ENTRY_GUARDS
+    )
+    index_ok &= index_entry_guards_ok
+    print(
+        "index_entry_occurrence_guards",
+        "OK" if index_entry_guards_ok else "MISMATCH",
+        len(guard_records), digest_records(guard_records),
+    )
     ok &= index_ok
     print("unresolved_index", "OK" if index_ok else "MISMATCH", 0)
 
@@ -786,8 +900,12 @@ def main() -> int:
         and "only totalistic cellular automaton rules" in at(13658)
         and "assign a color to each node" in at(13909)
         and "update this color at each step" in at(13909)
+        and "element i is  $\\{a, i, b\\}$" in at(13910)
         and "NetCAStep" in at(13913)
         and "list[[net]]" in at(13914)
+        and "Totalistic rules depend only on the total number of black cells in a neighborhood" in at(13536)
+        and "outer totalistic rules" in at(13536)
+        and "also depend on the color of the center cell" in at(13536)
     )
     structural_network_control_ok = (
         "fixed underlying geometrical structure which remains unchanged" in at(2372)
@@ -799,20 +917,31 @@ def main() -> int:
         and "randomly chosen" in at(13917)
         and "each node has a rule" in at(13917)
     )
-    fixed_net = ((1, 2), (2, 0), (0, 1))
-    old_colors = (0, 1, 0)
-    new_colors = tuple(
-        int(sum(old_colors[neighbor] for neighbor in neighbors) >= 1)
-        for neighbors in fixed_net
+    # The executable Notes row is explicitly {above, Self, below}; it does not
+    # support a neighbor-only/no-Self interpretation of the main-text word
+    # "totalistic". This closed exact-one totalistic witness preserves Self.
+    fixed_net = ((1, 0, 2), (2, 1, 3), (3, 2, 0), (0, 3, 1))
+    old_colors = (1, 0, 1, 0)
+    read_colors = tuple(
+        tuple(old_colors[node] for node in incidence)
+        for incidence in fixed_net
     )
-    fixed_network_derivation_ok = fixed_net == ((1, 2), (2, 0), (0, 1)) and new_colors == (1, 0, 1)
+    new_colors = tuple(
+        int(sum(reads) == 1)
+        for reads in read_colors
+    )
+    fixed_network_derivation_ok = (
+        all(incidence[1] == site for site, incidence in enumerate(fixed_net))
+        and read_colors == ((0, 1, 1), (1, 0, 0), (0, 1, 1), (1, 0, 0))
+        and new_colors == (0, 1, 0, 1)
+    )
     ok &= fixed_network_source_ok and structural_network_control_ok and fixed_network_derivation_ok
     print(
         "fixed_network_ca_vs_structural_t29_boundary",
         "OK" if fixed_network_source_ok and structural_network_control_ok else "MISMATCH",
     )
     print(
-        "derived_fixed_incidence_snapshot_event",
+        "derived_notes_fixed_incidence_snapshot_event_with_self",
         "OK" if fixed_network_derivation_ok else "MISMATCH", *new_colors,
     )
 
@@ -848,8 +977,12 @@ def main() -> int:
         and 11503 in RELATION_EVIDENCE
         and {13994, 13996, 14000} <= RELATION_EVIDENCE
         and {11563, 13917, 13919} <= CONTROL_EVIDENCE
-        and alias_index_lines == set(INDEX_CLASS["historical_ca_alias_routes"])
-        and boolean_index_lines == set(INDEX_CLASS["boolean_network_variant_routes"])
+        and alias_index_lines == (
+            set(INDEX_CLASS["historical_ca_alias_routes"]) | {22150}
+        )
+        and boolean_index_lines == (
+            set(INDEX_CLASS["boolean_network_variant_routes"]) | {20918}
+        )
     )
     ok &= alias_variant_route_guards_ok
     print(
@@ -878,8 +1011,9 @@ def main() -> int:
         and embedding_controls <= CONTROL_EVIDENCE
         and {2600, 2618} <= EXCLUDED_CLASS["other_program_or_schedule_vocabulary"]
         and {15944} <= EXCLUDED_CLASS["unrelated_slice_embedding_or_honeycomb"]
-        and {20980, 21132, 22434} == set(INDEX_CLASS["observer_or_embedding_routes"])
-        and {20946, 22114, 22120} == set(INDEX_CLASS["other_slice_routes"])
+        and {20980, 21132} == set(INDEX_CLASS["observer_or_embedding_routes"])
+        and {20918, 20946, 21471, 22114, 22120, 22150, 22434}
+        == set(INDEX_CLASS["mixed_t24_alias_variant_or_observer_routes"])
     )
     ok &= boundary_vocabulary_guards_ok
     print(
