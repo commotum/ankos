@@ -717,6 +717,20 @@ def verify_source_interface() -> None:
         actual = frozenset(getattr(source, attribute))
         assert actual == expected, (attribute, sorted(actual), sorted(expected))
 
+    catalog = tuple(source.source_template_catalog())
+    assert len(catalog) == len(set(catalog)) == 32
+    assert all(len(template) == 5 and set(template) <= {0, 1} for template in catalog)
+    example_numbers = (1_384_774, 328_778_790)
+    example_allowed = tuple(
+        frozenset(source.allowed_from_constraint_number(number))
+        for number in example_numbers
+    )
+    assert tuple(map(len, example_allowed)) == (8, 12)
+    assert tuple(
+        source.constraint_number_from_allowed(allowed)
+        for allowed in example_allowed
+    ) == example_numbers
+
 
 def ledger() -> tuple[str, int, int, int, int]:
     """Verify every asset and return the canonical provenance ledger."""

@@ -50,10 +50,14 @@ portable outside the repository root, silent on import, and fails closed under
 
 BOOK:13513-13520 textually fixes the sorted five-neighbor slot order and its
 descending binary catalog, so BOOK:14050's 32-bit numeric constraint codec is
-reconstructed and guarded below without reading pixels.  Deliberately open
-source matters remain rather than being guessed: the complete displayed rows
-for the numbered main-text examples and the 171-pattern raster catalog are not
-reconstructed by this semantic oracle.
+reconstructed and guarded below without reading pixels.  BOOK:13513's first
+offset nevertheless uses the malformed delimiter ``(-1,0)`` where the rest use
+list braces; the exact one-token delimiter repair is pinned and never presented
+as pristine executable Mathematica.  Determinant-negative reflection, binary
+label exchange, and representation-only slot permutation are separately
+commuted below.  Deliberately open source matters remain rather than being
+guessed: the complete displayed rows for the numbered main-text examples and
+the 171-pattern raster catalog are not reconstructed by this semantic oracle.
 """
 
 from __future__ import annotations
@@ -98,6 +102,16 @@ ENU_CROSS_OFFSETS: tuple[Offset2, ...] = (
     (0, -1),
 )
 ADAPTER_DERIVED_DIRECTION_NAMES = ("North", "West", "Self", "East", "South")
+RAW_BOOK_OFFSET_FRAGMENT = (
+    r"$\{(-1, 0), \{0, -1\}, \{0, 0\}, \{0, 1\}, \{1, 0\}\}$"
+)
+REPAIRED_BOOK_OFFSET_FRAGMENT = (
+    r"$\{\{-1, 0\}, \{0, -1\}, \{0, 0\}, \{0, 1\}, \{1, 0\}\}$"
+)
+SOURCE_REPAIRS: tuple[str, ...] = (
+    "BOOK:13513 first raw offset delimiter (-1,0) -> {-1,0}; guarded by exact full-fragment equality and prose/context, not executed as pristine Mathematica",
+)
+GENERIC_SLOT_PERMUTATION: tuple[int, ...] = (2, 4, 0, 3, 1)
 SOURCE_BINARY_CATALOG: tuple[Template, ...] = tuple(
     tuple((value >> shift) & 1 for shift in range(4, -1, -1))
     for value in range(31, -1, -1)
@@ -187,6 +201,19 @@ def enu_to_book_row_column(value: object) -> Coord2:
     east = exact_int(raw[0], "ENU east offset")
     north = exact_int(raw[1], "ENU north offset")
     return (-north, east)
+
+
+def guarded_book_offset_repair(raw_fragment: object) -> tuple[tuple[Offset2, ...], str]:
+    """Accept exactly the malformed source fragment and repair one delimiter."""
+
+    if type(raw_fragment) is not str:
+        raise TypeError("raw source fragment must be an exact string")
+    if raw_fragment != RAW_BOOK_OFFSET_FRAGMENT:
+        raise ValueError("raw source fragment differs from the pinned BOOK:13513 text")
+    repaired = raw_fragment.replace("(-1, 0)", r"\{-1, 0\}", 1)
+    if repaired != REPAIRED_BOOK_OFFSET_FRAGMENT:
+        raise RuntimeError("guarded source repair produced unexpected text")
+    return BOOK_CROSS_OFFSETS, repaired
 
 
 def checked_alphabet_size(value: object) -> int:
@@ -950,6 +977,232 @@ def same_rotation_orbit(
     return any(periodic_equal(rotate_periodic(left, turns), right) for turns in range(4))
 
 
+def reflect_coordinate(value: object) -> Coord2:
+    """Determinant-negative reflection of raw (row,column) across column zero."""
+
+    row, column = checked_coord(value, "reflection coordinate")
+    return (row, -column)
+
+
+def reflect_cross_template(template: object) -> Template:
+    checked = checked_template(template, 2, 5, name="cross template")
+    values_by_reflected_offset = {
+        reflect_coordinate(offset): label
+        for offset, label in zip(BOOK_CROSS_OFFSETS, checked)
+    }
+    assert set(values_by_reflected_offset) == set(BOOK_CROSS_OFFSETS)
+    return tuple(values_by_reflected_offset[offset] for offset in BOOK_CROSS_OFFSETS)
+
+
+def reflect_cross_relation(
+    relation: AllowedOrientedTemplates,
+) -> AllowedOrientedTemplates:
+    if type(relation) is not AllowedOrientedTemplates:
+        raise TypeError("relation reflection requires AllowedOrientedTemplates")
+    if relation.alphabet_size != 2 or relation.offsets != BOOK_CROSS_OFFSETS:
+        raise ValueError("strict cross reflection requires the binary Book cross profile")
+    return book_cross_relation(
+        tuple(reflect_cross_template(template) for template in relation.allowed)
+    )
+
+
+def reflect_periodic(presentation: PeriodicPresentation) -> PeriodicPresentation:
+    """Reflect the exact total field: Y[q] = X[F q], with F = F^-1."""
+
+    if type(presentation) is not PeriodicPresentation:
+        raise TypeError("model reflection requires PeriodicPresentation")
+    height, width = presentation.periods
+    tile = tuple(
+        tuple(
+            presentation.value_at(reflect_coordinate((row, column)))
+            for column in range(width)
+        )
+        for row in range(height)
+    )
+    return PeriodicPresentation(presentation.alphabet_size, tile)
+
+
+def reflected_report_signature(
+    report: Verification,
+    target_periods: object,
+) -> tuple[tuple[Coord2, Template], ...]:
+    if type(report) is not Verification:
+        raise TypeError("report reflection requires Verification")
+    raw_periods = exact_tuple(target_periods, "target periods")
+    if len(raw_periods) != 2:
+        raise ValueError("target periods must contain height and width")
+    height = exact_int(raw_periods[0], "target period height")
+    width = exact_int(raw_periods[1], "target period width")
+    if height <= 0 or width <= 0:
+        raise ValueError("target periods must be positive")
+    entries = []
+    for violation in report.violations:
+        row, column = reflect_coordinate(violation.anchor)
+        entries.append(
+            (
+                (row % height, column % width),
+                reflect_cross_template(violation.observed),
+            )
+        )
+    return tuple(sorted(entries))
+
+
+def same_reflection_orbit(
+    left: PeriodicPresentation,
+    right: PeriodicPresentation,
+) -> bool:
+    """Explicit two-element observer orbit; not pointwise equality."""
+
+    if type(left) is not PeriodicPresentation or type(right) is not PeriodicPresentation:
+        raise TypeError("reflection-orbit comparison requires periodic presentations")
+    return periodic_equal(left, right) or periodic_equal(reflect_periodic(left), right)
+
+
+def exchange_binary_template(template: object) -> Template:
+    checked = checked_template(template, 2, 5, name="binary cross template")
+    return tuple(1 - label for label in checked)
+
+
+def exchange_binary_support(offsets: object) -> tuple[Offset2, ...]:
+    """Label exchange acts explicitly as identity on geometric support."""
+
+    return checked_offsets(offsets)
+
+
+def exchange_binary_anchor(anchor: object) -> Coord2:
+    """Label exchange acts explicitly as identity on anchor coordinates."""
+
+    return checked_coord(anchor, "label-exchange anchor")
+
+
+def exchange_binary_relation(
+    relation: AllowedOrientedTemplates,
+) -> AllowedOrientedTemplates:
+    if type(relation) is not AllowedOrientedTemplates:
+        raise TypeError("label exchange requires AllowedOrientedTemplates")
+    if relation.alphabet_size != 2 or relation.offsets != BOOK_CROSS_OFFSETS:
+        raise ValueError("label exchange requires the strict binary Book cross")
+    return AllowedOrientedTemplates(
+        2,
+        exchange_binary_support(relation.offsets),
+        tuple(exchange_binary_template(template) for template in relation.allowed),
+    )
+
+
+def exchange_binary_periodic(
+    presentation: PeriodicPresentation,
+) -> PeriodicPresentation:
+    if type(presentation) is not PeriodicPresentation:
+        raise TypeError("label exchange requires PeriodicPresentation")
+    if presentation.alphabet_size != 2:
+        raise ValueError("label exchange requires a binary model")
+    return PeriodicPresentation(
+        2,
+        tuple(tuple(1 - label for label in row) for row in presentation.tile),
+    )
+
+
+def exchanged_report_signature(
+    report: Verification,
+) -> tuple[tuple[Coord2, Template], ...]:
+    if type(report) is not Verification:
+        raise TypeError("report label exchange requires Verification")
+    return tuple(
+        sorted(
+            (
+                exchange_binary_anchor(violation.anchor),
+                exchange_binary_template(violation.observed),
+            )
+            for violation in report.violations
+        )
+    )
+
+
+def same_binary_exchange_orbit(
+    left: PeriodicPresentation,
+    right: PeriodicPresentation,
+) -> bool:
+    """Explicit identity/complement observer orbit; not pointwise equality."""
+
+    if type(left) is not PeriodicPresentation or type(right) is not PeriodicPresentation:
+        raise TypeError("label-exchange orbit comparison requires periodic presentations")
+    if left.alphabet_size != 2 or right.alphabet_size != 2:
+        raise ValueError("label-exchange orbit comparison requires binary models")
+    return periodic_equal(left, right) or periodic_equal(
+        exchange_binary_periodic(left), right
+    )
+
+
+def checked_slot_permutation(value: object, arity: int) -> tuple[int, ...]:
+    raw = exact_tuple(value, "slot permutation")
+    checked_arity = exact_int(arity, "slot arity")
+    if len(raw) != checked_arity:
+        raise ValueError("slot permutation length differs from relation arity")
+    permutation = tuple(exact_int(item, "slot permutation index") for item in raw)
+    if set(permutation) != set(range(checked_arity)):
+        raise ValueError("slot permutation must contain every slot index exactly once")
+    return permutation
+
+
+def permute_word_slots(
+    word: object,
+    permutation: object,
+    alphabet_size: int,
+) -> Template:
+    raw_word = exact_tuple(word, "word")
+    checked = checked_template(raw_word, alphabet_size, len(raw_word), name="word")
+    order = checked_slot_permutation(permutation, len(checked))
+    return tuple(checked[index] for index in order)
+
+
+def inverse_slot_permutation(permutation: object) -> tuple[int, ...]:
+    raw = exact_tuple(permutation, "slot permutation")
+    order = checked_slot_permutation(raw, len(raw))
+    inverse = [0] * len(order)
+    for new_index, old_index in enumerate(order):
+        inverse[old_index] = new_index
+    return tuple(inverse)
+
+
+def permute_relation_slots(
+    relation: AllowedOrientedTemplates,
+    permutation: object,
+) -> AllowedOrientedTemplates:
+    if type(relation) is not AllowedOrientedTemplates:
+        raise TypeError("slot permutation requires AllowedOrientedTemplates")
+    order = checked_slot_permutation(permutation, len(relation.offsets))
+    return AllowedOrientedTemplates(
+        relation.alphabet_size,
+        tuple(relation.offsets[index] for index in order),
+        tuple(
+            permute_word_slots(template, order, relation.alphabet_size)
+            for template in relation.allowed
+        ),
+    )
+
+
+def permuted_report_signature(
+    report: Verification,
+    permutation: object,
+    alphabet_size: int,
+) -> tuple[tuple[Coord2, Template], ...]:
+    if type(report) is not Verification:
+        raise TypeError("report slot permutation requires Verification")
+    return tuple(
+        sorted(
+            (
+                violation.anchor,
+                permute_word_slots(
+                    violation.observed,
+                    permutation,
+                    alphabet_size,
+                ),
+            )
+            for violation in report.violations
+        )
+    )
+
+
 @dataclass(frozen=True)
 class ClaimedOccurrence:
     anchor: Coord2
@@ -1250,6 +1503,20 @@ def audit_source_claims() -> int:
     return len(SOURCE_CLAIMS)
 
 
+def audit_guarded_source_repair() -> int:
+    root = Path(__file__).resolve().parents[1]
+    book = root / "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md"
+    source_line = book.read_text(encoding="utf-8").splitlines()[13513 - 1]
+    assert RAW_BOOK_OFFSET_FRAGMENT in source_line
+    assert r"\{(-1, 0)" in RAW_BOOK_OFFSET_FRAGMENT
+    assert r"\{\{-1, 0\}" in REPAIRED_BOOK_OFFSET_FRAGMENT
+    offsets, repaired = guarded_book_offset_repair(RAW_BOOK_OFFSET_FRAGMENT)
+    assert offsets == BOOK_CROSS_OFFSETS
+    assert repaired == REPAIRED_BOOK_OFFSET_FRAGMENT
+    assert len(SOURCE_REPAIRS) == 1
+    return len(SOURCE_REPAIRS)
+
+
 def audit_book_enu_adapter() -> int:
     mapped = tuple(book_row_column_to_enu(offset) for offset in BOOK_CROSS_OFFSETS)
     assert mapped == ENU_CROSS_OFFSETS
@@ -1471,6 +1738,169 @@ def audit_rotation_commutation_and_orbits() -> tuple[int, int, int, int, int]:
     )
 
 
+def audit_reflection_and_label_exchange() -> tuple[int, int, int, int, int, int, int, int, int, int]:
+    """Commute one det-negative support symmetry and binary label exchange."""
+
+    profiles = direct_allowed_profiles()
+    reflected_support = tuple(reflect_coordinate(offset) for offset in BOOK_CROSS_OFFSETS)
+    assert set(reflected_support) == set(BOOK_CROSS_OFFSETS)
+    assert tuple(reflect_coordinate(offset) for offset in reflected_support) == BOOK_CROSS_OFFSETS
+    determinant_negative_support_transforms = 1
+    assert exchange_binary_support(BOOK_CROSS_OFFSETS) == BOOK_CROSS_OFFSETS
+    assert exchange_binary_anchor((7, -3)) == (7, -3)
+    label_support_identity_transforms = 1
+    reflection_commutations = 0
+    reflection_local_checks = 0
+    label_commutations = 0
+    label_local_checks = 0
+
+    for height, width in ((1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 2), (3, 3)):
+        for native in native_tiles(height, width):
+            model = encode_native(native)
+            for allowed in profiles:
+                relation = book_cross_relation(tuple(allowed))
+                original = generic_verify_periodic(model, relation)
+
+                reflected_model = reflect_periodic(model)
+                reflected_relation = reflect_cross_relation(relation)
+                reflected = generic_verify_periodic(
+                    reflected_model,
+                    reflected_relation,
+                )
+                assert reflected.checked_anchors == original.checked_anchors
+                assert reflected.satisfied == original.satisfied
+                assert reflected.proves_global_model == original.proves_global_model
+                assert report_signature(reflected) == reflected_report_signature(
+                    original,
+                    reflected_model.periods,
+                )
+                assert reflect_periodic(reflected_model) == model
+                assert reflect_cross_relation(reflected_relation) == relation
+                reflection_commutations += 1
+                reflection_local_checks += reflected.checked_anchors
+
+                exchanged_model = exchange_binary_periodic(model)
+                exchanged_relation = exchange_binary_relation(relation)
+                exchanged = generic_verify_periodic(
+                    exchanged_model,
+                    exchanged_relation,
+                )
+                assert exchanged.checked_anchors == original.checked_anchors
+                assert exchanged.satisfied == original.satisfied
+                assert exchanged.proves_global_model == original.proves_global_model
+                assert report_signature(exchanged) == exchanged_report_signature(original)
+                assert exchange_binary_periodic(exchanged_model) == model
+                assert exchange_binary_relation(exchanged_relation) == relation
+                label_commutations += 1
+                label_local_checks += exchanged.checked_anchors
+
+    oriented = (1, 0, 0, 1, 0)
+    relation = book_cross_relation((oriented,))
+    reflected_template = reflect_cross_template(oriented)
+    assert reflected_template != oriented
+    assert not verify_open(patch_for_cross(reflected_template), relation).satisfied
+    assert verify_open(
+        patch_for_cross(reflected_template), reflect_cross_relation(relation)
+    ).satisfied
+    implicit_reflection_rejections = 1
+
+    exchanged_template = exchange_binary_template(oriented)
+    assert exchanged_template != oriented
+    assert not verify_open(patch_for_cross(exchanged_template), relation).satisfied
+    assert verify_open(
+        patch_for_cross(exchanged_template), exchange_binary_relation(relation)
+    ).satisfied
+    implicit_label_exchange_rejections = 1
+
+    reflection_model = PeriodicPresentation(
+        2,
+        (
+            (1, 1, 0),
+            (0, 0, 0),
+        ),
+    )
+    reflected_model = reflect_periodic(reflection_model)
+    assert not periodic_equal(reflection_model, reflected_model)
+    assert same_reflection_orbit(reflection_model, reflected_model)
+    reflection_orbit_witnesses = 1
+
+    exchanged_model = exchange_binary_periodic(reflection_model)
+    assert not periodic_equal(reflection_model, exchanged_model)
+    assert same_binary_exchange_orbit(reflection_model, exchanged_model)
+    label_exchange_orbit_witnesses = 1
+
+    assert reflection_commutations == 5_328
+    assert reflection_local_checks == 43_664
+    assert label_commutations == 5_328
+    assert label_local_checks == 43_664
+    return (
+        determinant_negative_support_transforms,
+        label_support_identity_transforms,
+        reflection_commutations,
+        reflection_local_checks,
+        label_commutations,
+        label_local_checks,
+        implicit_reflection_rejections,
+        implicit_label_exchange_rejections,
+        reflection_orbit_witnesses,
+        label_exchange_orbit_witnesses,
+    )
+
+
+def audit_generic_slot_order_separation() -> tuple[int, int, int, int]:
+    """Simultaneous offset/word permutation preserves denotation, not source IDs."""
+
+    order = checked_slot_permutation(GENERIC_SLOT_PERMUTATION, 5)
+    inverse = inverse_slot_permutation(order)
+    assert order != tuple(range(5))
+    assert tuple(order[index] for index in inverse) == tuple(range(5))
+
+    profiles = direct_allowed_profiles()
+    relation_round_trips = 0
+    for allowed in profiles:
+        relation = book_cross_relation(tuple(allowed))
+        permuted = permute_relation_slots(relation, order)
+        assert permuted.offsets != relation.offsets
+        assert set(permuted.offsets) == set(relation.offsets)
+        assert permute_relation_slots(permuted, inverse) == relation
+        relation_round_trips += 1
+
+    commutations = 0
+    local_checks = 0
+    for height, width in ((1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 2), (3, 3)):
+        for native in native_tiles(height, width):
+            model = encode_native(native)
+            for allowed in profiles:
+                relation = book_cross_relation(tuple(allowed))
+                permuted = permute_relation_slots(relation, order)
+                original = generic_verify_periodic(model, relation)
+                reordered = generic_verify_periodic(model, permuted)
+                assert reordered.checked_anchors == original.checked_anchors
+                assert reordered.satisfied == original.satisfied
+                assert reordered.proves_global_model == original.proves_global_model
+                assert report_signature(reordered) == permuted_report_signature(
+                    original,
+                    order,
+                    relation.alphabet_size,
+                )
+                commutations += 1
+                local_checks += reordered.checked_anchors
+
+    source_relation = decode_constraint_number(1_384_774)
+    representation_equivalent = permute_relation_slots(source_relation, order)
+    assert representation_equivalent.offsets != BOOK_CROSS_OFFSETS
+    expect_raises(
+        ValueError,
+        lambda: encode_constraint_number(representation_equivalent),
+    )
+    source_metadata_guards = 1
+
+    assert relation_round_trips == len(profiles)
+    assert commutations == 5_328
+    assert local_checks == 43_664
+    return relation_round_trips, commutations, local_checks, source_metadata_guards
+
+
 def audit_alias_and_overlap() -> tuple[int, int, int, int]:
     one = NativeBinaryTorus(((1,),))
     assert direct_cross_at(one, (0, 0)) == (1, 1, 1, 1, 1)
@@ -1678,6 +2108,13 @@ def audit_hostile_validation() -> int:
         (ValueError, lambda: encode_constraint_number(AllowedOrientedTemplates(2, ((0, 0),), ((0,),)))),
         (TypeError, lambda: book_row_column_to_enu((0, True))),
         (ValueError, lambda: enu_to_book_row_column((0,))),
+        (TypeError, lambda: guarded_book_offset_repair(13513)),
+        (ValueError, lambda: guarded_book_offset_repair(RAW_BOOK_OFFSET_FRAGMENT.replace("(-1, 0)", "{-1, 0}"))),
+        (ValueError, lambda: reflect_cross_relation(AllowedOrientedTemplates(2, ((0, 0),), ((0,),)))),
+        (ValueError, lambda: exchange_binary_periodic(PeriodicPresentation(3, ((0,),)))),
+        (TypeError, lambda: checked_slot_permutation([0, 1], 2)),
+        (ValueError, lambda: checked_slot_permutation((0, 0), 2)),
+        (ValueError, lambda: checked_slot_permutation((0, 1), 3)),
     )
     for exception, function in hostile:
         expect_raises(exception, function)
@@ -1718,11 +2155,12 @@ def audit_no_transition_surface() -> tuple[int, int, int]:
     return len(relation_fields), len(histogram_fields), len(verification_fields)
 
 
-EXPECTED_DIGEST = "4f884619510f0c94a9bb26f1ba4006495dbd57f01f145a88050b188f6607a016"
+EXPECTED_DIGEST = "72b671c04ac5e5a27ab1c2c2e86612b4ac1e493ab5722e89dc187b4d0939cbd5"
 
 
 def main() -> None:
     source_claims = audit_source_claims()
+    guarded_source_repairs = audit_guarded_source_repair()
     book_enu_adapter_round_trips = audit_book_enu_adapter()
     codec_round_trips = audit_cross_codec()
     (
@@ -1751,6 +2189,24 @@ def main() -> None:
         implicit_rotation_rejections,
         explicit_orbit_witnesses,
     ) = audit_rotation_commutation_and_orbits()
+    (
+        reflection_support_transforms,
+        label_support_identity_transforms,
+        reflection_commutations,
+        reflection_local_checks,
+        label_exchange_commutations,
+        label_exchange_local_checks,
+        implicit_reflection_rejections,
+        implicit_label_exchange_rejections,
+        reflection_orbit_witnesses,
+        label_exchange_orbit_witnesses,
+    ) = audit_reflection_and_label_exchange()
+    (
+        slot_permutation_round_trips,
+        slot_permutation_commutations,
+        slot_permutation_local_checks,
+        source_order_metadata_guards,
+    ) = audit_generic_slot_order_separation()
     alias_cases, extracted, overlap_conflicts, alias_conflicts = audit_alias_and_overlap()
     scope_cases, identity_cases, sat_explored, unknown_explored, t33_boundaries = (
         audit_scopes_identity_and_solver()
@@ -1763,6 +2219,7 @@ def main() -> None:
 
     facts = (
         ("source_claims", source_claims),
+        ("guarded_source_repairs", guarded_source_repairs),
         ("book_enu_adapter_round_trips", book_enu_adapter_round_trips),
         ("open_source_matters", len(OPEN_SOURCE_MATTERS)),
         ("strict_templates", len(BINARY_TEMPLATES)),
@@ -1789,6 +2246,20 @@ def main() -> None:
         ("symmetry_local_checks", symmetry_local_checks),
         ("implicit_rotation_rejections", implicit_rotation_rejections),
         ("explicit_orbit_witnesses", explicit_orbit_witnesses),
+        ("reflection_support_transforms", reflection_support_transforms),
+        ("label_support_identity_transforms", label_support_identity_transforms),
+        ("reflection_commutations", reflection_commutations),
+        ("reflection_local_checks", reflection_local_checks),
+        ("label_exchange_commutations", label_exchange_commutations),
+        ("label_exchange_local_checks", label_exchange_local_checks),
+        ("implicit_reflection_rejections", implicit_reflection_rejections),
+        ("implicit_label_exchange_rejections", implicit_label_exchange_rejections),
+        ("reflection_orbit_witnesses", reflection_orbit_witnesses),
+        ("label_exchange_orbit_witnesses", label_exchange_orbit_witnesses),
+        ("slot_permutation_round_trips", slot_permutation_round_trips),
+        ("slot_permutation_commutations", slot_permutation_commutations),
+        ("slot_permutation_local_checks", slot_permutation_local_checks),
+        ("source_order_metadata_guards", source_order_metadata_guards),
         ("alias_cases", alias_cases),
         ("extracted_occurrences", extracted),
         ("overlap_conflicts", overlap_conflicts),
@@ -1808,9 +2279,12 @@ def main() -> None:
         ("strict_relation", "AllowedOrientedTemplates(raw_sorted_Book_row_column_cross)"),
         ("direction_names", "derived_only_by_(row,column)_to_(east=column,north=-row)_adapter"),
         ("numeric_codec", "source_descending_binary_catalog_plus_fixed_32_bit_positional_subset"),
+        ("source_repair", SOURCE_REPAIRS),
         ("proof_envelope", "native_cross_to_generic_offsets_full_violation_report"),
         ("histogram_lowering", "T31_center_conditioned_histograms_losslessly_compile_to_T32_exact_words"),
         ("square_symmetry", "explicit_C4_support_template_model_report_commutation_without_implicit_matching"),
+        ("extended_symmetry", "det_negative_reflection_and_binary_label_exchange_are_explicit_not_implicit"),
+        ("order_separation", "generic_offset_word_permutation_preserves_denotation_but_not_NKS_numeric_metadata"),
         ("model_identity", "pointwise_equality_distinct_from_explicit_rotation_orbit_observer"),
         ("overlap_semantics", "one_pointwise_field_not_independent_template_tiles"),
         ("scope_semantics", "periodic_global_proof_open_local_finite_window"),
@@ -1829,7 +2303,8 @@ def main() -> None:
     print(
         f"source_claims={source_claims}; open_source_matters={len(OPEN_SOURCE_MATTERS)}; "
         f"strict_templates={len(BINARY_TEMPLATES)}; allowed_sets={2 ** len(BINARY_TEMPLATES)}; "
-        f"book_ENU_adapter_round_trips={book_enu_adapter_round_trips}"
+        f"book_ENU_adapter_round_trips={book_enu_adapter_round_trips}; "
+        f"guarded_source_repairs={guarded_source_repairs}"
     )
     print(
         f"exhaustive_configurations={configurations}; commutations={commutations}; "
@@ -1855,6 +2330,26 @@ def main() -> None:
         f"symmetry_local_checks={symmetry_local_checks}; "
         f"implicit_rotation_rejections={implicit_rotation_rejections}; "
         f"explicit_rotation_orbit_witnesses={explicit_orbit_witnesses}"
+    )
+    print(
+        f"reflection_support_transforms={reflection_support_transforms}; "
+        f"reflection_commutations={reflection_commutations}; "
+        f"reflection_local_checks={reflection_local_checks}; "
+        f"implicit_reflection_rejections={implicit_reflection_rejections}; "
+        f"reflection_orbit_witnesses={reflection_orbit_witnesses}"
+    )
+    print(
+        f"label_support_identity_transforms={label_support_identity_transforms}; "
+        f"label_exchange_commutations={label_exchange_commutations}; "
+        f"label_exchange_local_checks={label_exchange_local_checks}; "
+        f"implicit_label_exchange_rejections={implicit_label_exchange_rejections}; "
+        f"label_exchange_orbit_witnesses={label_exchange_orbit_witnesses}"
+    )
+    print(
+        f"slot_permutation_round_trips={slot_permutation_round_trips}; "
+        f"slot_permutation_commutations={slot_permutation_commutations}; "
+        f"slot_permutation_local_checks={slot_permutation_local_checks}; "
+        f"source_order_metadata_guards={source_order_metadata_guards}"
     )
     print(
         f"alias_cases={alias_cases}; extracted_occurrences={extracted}; "

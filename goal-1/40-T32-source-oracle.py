@@ -5,7 +5,9 @@ This is an evidence oracle, not a constraint solver.  It freezes redundant
 query lanes over the canonical monolithic Book, classifies every returned
 line and governed continuation, routes the actual Index, and reverse-joins
 the split corpus.  It also binds the official Wolfram Science repair for four
-Blank characters corrupted in the local extraction.
+Blank characters corrupted in the local extraction, the official three-
+argument Wolfram Language Partition boundary semantics, and the guarded
+one-delimiter repair for the Book's sorted five-neighbor offset expression.
 
 The smallest strict construction recovered here is a declarative model set:
 every site of a binary two-dimensional total field exposes the exact ordered
@@ -511,19 +513,19 @@ EXPECTED_QUERY = {
 }
 
 EXPECTED_SET = {
-    "union": (81, "ef727403fc33960d3c5d157d13d38e2164305db8379448ccd0eb3d0a42f2d37c"),
-    "pre_index_union": (69, "2e2215ea2a34075fd617ddac4086f7636b9141da6fd152f207748dc32efacea3"),
-    "index": (12, "ec6480c4f94ddff516e90bdea8f03616ab88c04172b91c3f171e6941aff40865"),
-    "matched_retained": (67, "009ead3e814474d4fb5a3b8b0a6d2986d8e7a1d36203cdeff162fdd132bdd4ce"),
-    "governed_continuations": (72, "8d05a92368b89ef22ae35d8bb68bc4e22d67ed91d81513c6eaaa503ad72d90c0"),
-    "retained": (139, "7da00714ad1cfe85053a88c355d0bd57122fb349473e21774cdf0c145d7fc920"),
+    "union": (92, "9ed9b07d70ca24e0e36d0dcf094f37f574ae189421f95c00d7c4946b341d273a"),
+    "pre_index_union": (77, "af0a7009a3b8b57628f5d280873e35f7fd2a81828df70a3212204103bbf0eed9"),
+    "index": (15, "c43f52f8791c873ed01ab9e4e81a0bba6abc2d19575a937cafeac496b168ee91"),
+    "matched_retained": (75, "9f61356b1d641744d805601adda007148a37e19771ec35703355539d2d11ea6d"),
+    "governed_continuations": (94, "69e01df926ac02cfef2f99d3aa0eb7dd9a63124acc8aca0639664a51da0dc17d"),
+    "retained": (169, "8522d1df6beaac0a0f01c26edc6f16f15657f519b0ca635fd8d88b1f32ffc1de"),
     "excluded": (2, "0b8c44fbe9cc6024183a91950d93293221a00ae51b16e139156854a4228c0a77"),
     "native": (18, "7594896d68d77de7b8f37f988848a98790dc98c247aff9ab3f493805c1c33858"),
-    "relation": (59, "9ed35b1ebf068735c52af6be3a8248b97eb8dfd3e19cf3513c5fbdb6e074efd2"),
-    "control": (62, "bbf6518c64905b5bb18d297d896b392b6ddedcfb0b5b470eb087cd49753cf618"),
-    "candidate_images": (44, "1b8c95f829ccff1bf5d5695a063d3961e5cf408748fc3a7bf3913179e5bc2991"),
-    "governed_images": (25, "743d34a350e9769ac23e71deb35b8bdb6540c9489e72e614f9ebed2fc38be137"),
-    "excluded_images": (19, "644fa7352dc6ce543692370a8e8381d1aa6cbbc6d29482bbdc685f75b869ef8b"),
+    "relation": (67, "f7df5ca838b8761e12959175305c5b8c787fdb1d4b9f0dc69cd7cf4d5964a186"),
+    "control": (84, "d54ad4c12d1794815cc5ce8177fd5ee7cf14734061d95ca0a2884ccae07ade13"),
+    "candidate_images": (60, "5035af79590acbc957ba6d9d49aac97b29bd39ad5a7505968f4c5b09d0d95321"),
+    "governed_images": (42, "1c06663f8fd6c6d760ed5cbb6e004e65544c40e1acf72080e06fb6ba6f7902df"),
+    "excluded_images": (18, "c50b84ca950cd076ddc8a53ea0528e1aad2ecbc83bedeee51d70054115756edc"),
 }
 
 EXPECTED_EXCLUDED_CLASS = {
@@ -549,10 +551,14 @@ EXPECTED_INDEX_CLASS = {
         2,
         "652197ba4bfd4fa73c7ef5895aa82ceb1223c7f6df5571458699602ace14ff71",
     ),
+    "pattern_avoidance_routes": (
+        3,
+        "43dbd5d64edf0e05f146af0e928d48e3299d9f14191aaf1b5041d87bf3870db7",
+    ),
 }
 EXPECTED_INDEX_GUARDS = (
-    12,
-    "7d34b8d5bd4408e99bbc91f5331a6f0e86346cce55c36db521a639ddda340000",
+    15,
+    "e3c0f203e360f3192de796ff435de36db4676cd52df6844fb857ef10a056770d",
 )
 EXPECTED_INDEX_CONTINUATIONS = (
     14,
@@ -564,12 +570,12 @@ EXPECTED_IMAGE_PARTITION = {
         "116eddcbd978b9193b877cb54568c69f3a139585f90caf4445c1f81dcd91c322",
     ),
     "relation": (
-        10,
-        "cdbd2bf11dc7e9213616c88d549f75c1292c4ec8d8f09a8017a72a3833ce8794",
+        12,
+        "f950133f7c777867e778109e1e636054a5ce806579e43ea3cd2ee52bea48a806",
     ),
     "control": (
-        11,
-        "5c7facca1e5a926412a17acea675e58032a5680629a9008e094e56237b3b0c8e",
+        26,
+        "6ae50cda27274b79ac14af3f95ca5c23b7b7dd9a8b953679760c64180dc34861",
     ),
 }
 EXPECTED_VISUAL_ONLY_BOUNDARY = (
@@ -588,12 +594,12 @@ EXPECTED_SPLIT_MANIFEST_DIGEST = (
 # Filled from the independently recomputed reverse joins below.  These values
 # bind both exact duplication and normalized one-to-one provenance witnesses.
 EXPECTED_SPLIT_QUERY = (
-    81,
-    "c2f4dbcfef108d45b5713ce6295b45b3e7adfabc64c57d8e74a13fc837bbb145",
+    92,
+    "3cb39b9bd1c1fcc9ba56cb4110c7d1c5a9466ba302ecdea12a36e2709121b087",
 )
 EXPECTED_SPLIT_QUERY_EXACT = (
-    72,
-    "7e940e324929ebddac50095dddfc1d9bc9efdac8746d5d1aecc35779a83fd580",
+    83,
+    "c4c511f0ba4125e2a897c7a96c1767f7f4a9e0ca864812a9fef3491b91c4f5b5",
 )
 EXPECTED_SPLIT_QUERY_NONEXACT = (
     9,
@@ -604,16 +610,16 @@ EXPECTED_SPLIT_QUERY_MAPPING = (
     "74462d069019f277540e2695bff55714c5ebe95667e75a971f21327db856cf2a",
 )
 EXPECTED_SPLIT_RETAINED_EXACT = (
-    107,
-    "9f54eba108226aa196fcab88ab5625e40157611efc962e0736a152284b994fd8",
+    119,
+    "9bf2da824ce4df6859207a2ba07d03ad4b49e93a0e4ab18bd7f795385645b3f4",
 )
 EXPECTED_SPLIT_RETAINED_NONEXACT = (
-    32,
-    "855c4ddc2779f4e79f9e62e365a28748cee630356da9b8f90cdde0f2ebe5fd7f",
+    50,
+    "95b800353f97e642aed96d8bb9cd7bf99fc454a23234448cd7117859297e6609",
 )
 EXPECTED_SPLIT_RETAINED_MAPPING = (
-    32,
-    "166dcd0f2f2b3d55d2161f901a1620e78168aa50c6494b91809faee8622c7ae1",
+    50,
+    "0f52d1d7c960f3c952dd8488f8c54667ac33306e1a86eece3d660c6cc4423d89",
 )
 EXPECTED_MONOLITH_ONLY = (
     0,
@@ -650,8 +656,8 @@ SOURCE_MODEL_RECORDS = (
     "execution:no seed/frontier/write/update/successor/runner branch",
 )
 EXPECTED_SOURCE_MODEL = (
-    18,
-    "23a617037c8f508dc2e16b21eb4d12dd0c5cdda10bb9d26e32709bacccd964a1",
+    23,
+    "555b4ec53ee776efd1ff1361980c7e772a9c3592faf71e56594e3d6912cf9f0c",
 )
 
 
@@ -798,6 +804,8 @@ def project_cross_from_3x3(
 
 
 def neighbor_count_signature(template: tuple[int, ...]) -> tuple[int, int]:
+    """Count only after the explicit Book row/column to ENU basis proof."""
+
     north, west, center, east, south = template
     return center, north + west + east + south
 
@@ -1072,7 +1080,8 @@ def main() -> int:
         print(f"images_{name}", "OK" if good else "MISMATCH", *actual)
     image_ownership_ok = (
         images_ok
-        and all("substitution system" in at(line_no).lower() for line_no in (2316, 2332))
+        and "substitution system" in at(2316).lower()
+        and "replacing each black cell" in at(2332)
         and "geometrical rule" in at(2332)
         and "orientation of that square" in at(2332)
         and "moving structure" in at(14271)
@@ -1102,7 +1111,7 @@ def main() -> int:
     )
     ok &= visual_ok
     print(
-        "governed_image_interface_hash_bound_no_transcription_no_replay",
+        "governed_image_interface_asset_hash_routed_no_transcription_no_replay",
         "OK" if visual_ok else "MISMATCH",
         len(derived_images),
         digest(derived_images),

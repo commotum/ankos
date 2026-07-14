@@ -141,6 +141,8 @@ Models(C) = {
 }
 ```
 
+Arbitrary positive `dimension` is a principled closure of the same finite translated-pattern relation, not a claim that the strict T32 source profile itself is higher-dimensional; that profile remains static discrete 2D.
+
 The native strict preset is:
 
 ```text
@@ -251,7 +253,7 @@ Final event counts, hostile controls, semantic digest, oracle SHA, and guarded n
 | Verification/violations | 1/2 | T31 pure verifier/report envelope | observe exact offset-label map instead of histogram |
 | Solver outcomes/witnesses/certificates | 1 | T31 query infrastructure | optional strict analyzer remains separate |
 | Symmetry/views | 1 | explicit relations/observers | transform exact templates; never implicit matching |
-| T33 required occurrence | separate relation node | generic declarative conjunction | deferred to T33; no T32 flag |
+| T33 required occurrence | 3 (deferred) | generic declarative conjunction with a separately tagged global existential relation | deferred to T33; no T32 flag |
 | FRONTIER/RULE result/UPDATE/executor | not applicable | no transition algebra | add nothing |
 
 Relative to D058's already justified declarative category, every T32 delta is categories 1–3. Relative to SimpleProgram rollout, T32 remains the same existing class-4 nonfit because it has no canonical successor; it does not justify another semantic category, an execution algebra, or reopening any transition stage.
