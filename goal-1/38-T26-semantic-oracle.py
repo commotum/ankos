@@ -2180,7 +2180,8 @@ def main() -> None:
         "source_numeric_codec=NONE"
     )
     print(
-        "rank_relation=D019_variable_block_is_rank1;T26_is_rank2_parameterization_of_D019;"
+        "rank_relation=generic_ranked_mosaic_extends_D019;D019_is_rank1_member;"
+        "T26_is_rank2_member;"
         f"rank1_commutations={groups['rank']['t13_rank1_mosaic_events']};"
         f"fixed_block_subset={groups['rank']['t13_fixed_block_rank1_subset']};"
         "plain_row_major_T13_concatenation_for_rank2=REJECTED"
@@ -2211,7 +2212,8 @@ def main() -> None:
         "family_dispatch+fixed_shape_arrays+callbacks_are_not_semantics"
     )
     print(
-        "classification=T13_D019_rank2_parameterization+T27_category3_restricted_representation;"
+        "classification=UPDATE_axis_ranked_mosaic_generalization+"
+        "T27_category3_restricted_representation;"
         "new_T26_UPDATE_algebra=NONE;new_executor=NONE;T28_contextual_choice=SEPARATE"
     )
     print(f"hostile_rejections={groups['hostile']['hostile_rejections']}")
