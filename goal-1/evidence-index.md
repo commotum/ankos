@@ -82,8 +82,8 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 - Type stages evidence-closed / architecture-reopened: 0.
 - Type stages asset-reopened: 0.
 - Type stages unresolved: 0 pending; 0 in progress; 0 reopened.
-- Synthesis: in progress — D141 and `47-SYNTHESIS.md` drafted; final hostile/global gates pending.
-- Goal 2 handoff: in progress — dependency DAG and exact 45-row coverage matrix drafted; final hostile/global gates pending.
+- Synthesis: complete — D141 and `47-SYNTHESIS.md` close the catalog-wide transition/declarative algebra boundary; hostile and global gates pass.
+- Goal 2 handoff: complete — G2-00 through G2-12, the exact 45-row coverage join, and the normative 45-leaf dependency matrix are implementation-ready; future Goal 2 execution gates remain open.
 
 ## Reopened-Stage Log
 

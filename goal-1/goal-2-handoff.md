@@ -1,6 +1,6 @@
 # Goal 2 Implementation and Conformance Handoff
 
-Status: **IN PROGRESS — DEPENDENCY PLAN AND 45-ROW COVERAGE MATRIX DRAFTED; FINAL HOSTILE REVIEW AND GLOBAL GATES REMAIN**.
+Status: **COMPLETE — IMPLEMENTATION-READY DEPENDENCY PLAN, EXACT 45-ROW COVERAGE, AND 45-LEAF CONFORMANCE DEPENDENCIES GLOBALLY VERIFIED**.
 
 ## Objective
 
@@ -540,4 +540,6 @@ Goal 2 is complete only when:
 
 ## Handoff Result
 
-Pending independent hostile review, mechanical coverage verification, and final Goal 1 synchronization.
+COMPLETE as a Goal 1 handoff. G2-00 through G2-12 form an acyclic dependency plan; every stage names target files, implementation work, tests/evidence, completion criteria, and re-derivation triggers. The coverage matrix matches all 45 CSV IDs and names exactly once, every Goal 1 authority exists, and the normative `Cnn = Tnn` matrix records every leaf and its direct dependencies without cycles.
+
+The plan migrates `src/ca` in place, implements shared substrates once, keeps the generic runner private until a single atomic public cutover, and removes the family executor. An optional deprecated constructor is allowed only as a total lossless façade returning the ordinary `SimpleProgram`; it owns neither semantics nor execution. Hostile review, DAG/detail consistency, table/fence checks, scope checks, `git diff --check`, the frozen T42 oracles, and all 141 current repository tests pass. The unchecked Goal 2 completion gate above intentionally remains future implementation work.

@@ -1,6 +1,6 @@
 # Goal 1 Representation and Execution Architecture Audit
 
-Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); ALL SUBSEQUENT STAGES AND SYNTHESIS INTEGRATED THROUGH ACTIVE D141; 45/45 TYPES COMPLETE; FINAL HANDOFF REVIEW IN PROGRESS**
+Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); ALL SUBSEQUENT STAGES, D141 SYNTHESIS, AND THE GOAL 2 HANDOFF GLOBALLY VERIFIED; 45/45 TYPES COMPLETE**
 
 ## Trigger and Scope
 
@@ -41,7 +41,7 @@ The runner is branch-free over the transition protocol. SEED remains a first-cla
 A lossless representation map `e` establishes reuse when it preserves the complete configuration, has an explicit inverse on its invariant-valid image, requires no hidden interpreter, preserves one native step rather than simulating it with several hidden steps, and commutes one step at a time:
 
 ```text
-e(step_A(state)) = step_B(e(state))
+map_step_result(e, step_A(state)) = step_B(e(state))
 ```
 
 That commuting square concerns configurations and steps. A rule/program codec such as T03's compact totalistic table instead requires denotational equality of the local function, an explicit round trip on the represented program data, and retained source identity/provenance; it is not falsely presented as a configuration map.
@@ -399,4 +399,4 @@ The current audit does **not** yet admit stochastic/probabilistic execution mere
 - [x] Fresh independent review, Markdown-fence checks, `git diff --check`, and scope checks pass.
 - [x] The original audit gates passed before T06 and the bounded asset repairs resumed.
 - [x] The final stage-disposition table contains every T01-T45 exactly once, including the previously omitted T06/T07/T11/T14/T15/T36 summary rows.
-- [ ] D141, `47-SYNTHESIS.md`, and `goal-2-handoff.md` pass final hostile review and global verification.
+- [x] D141, `47-SYNTHESIS.md`, and `goal-2-handoff.md` pass final hostile review and global verification.

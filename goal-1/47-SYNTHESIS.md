@@ -1,6 +1,6 @@
 # 47-SYNTHESIS
 
-Status: **IN PROGRESS — 45/45 TYPE EVIDENCE CLOSED; FINAL INTEGRATION AND GLOBAL GATES REMAIN**.
+Status: **COMPLETE — 45/45 TYPE EVIDENCE, D141 INTEGRATION, GOAL 2 HANDOFF, HOSTILE REVIEW, AND GLOBAL GATES CLOSED**.
 
 ## Current Facts
 
@@ -222,13 +222,15 @@ No unresolved contradiction remains, but implementation must preserve these hone
 
 Before this stage becomes complete:
 
-- [ ] `goal-1/goal-2-handoff.md` defines dependencies, target files, tests, completion evidence, and re-derivation triggers for every Goal 2 stage.
-- [ ] Its coverage matrix contains every CSV row exactly once and no duplicate T-ID.
-- [ ] D141 records this synthesis in `design-ledger.md`; `architecture-audit.md`, `evidence-index.md`, and `0-plan.md` agree.
-- [ ] T42's completion checklist and Stage Results are closed against the final frozen oracles.
-- [ ] All three T42 oracles pass normally and under their documented portability/fail-closed modes.
-- [ ] Repository tests, Markdown fence checks, Goal-1-only scope checks, and `git diff --check` pass.
+- [x] `goal-1/goal-2-handoff.md` defines dependencies, target files, tests, completion evidence, and re-derivation triggers for every Goal 2 stage.
+- [x] Its coverage matrix contains every CSV row exactly once and no duplicate T-ID.
+- [x] D141 records this synthesis in `design-ledger.md`; `architecture-audit.md`, `evidence-index.md`, and `0-plan.md` agree.
+- [x] T42's completion checklist and Stage Results are closed against the final frozen oracles.
+- [x] All three T42 oracles pass normally and under their documented portability/fail-closed modes.
+- [x] Repository tests, Markdown fence checks, Goal-1-only scope checks, and `git diff --check` pass.
 
 ## Stage Results
 
-Pending Goal 2 handoff, global synchronization, and final verification.
+COMPLETE. D141 closes the 45-row catalog with one branch-free transition/rewrite algebra and one sibling declarative definition/relation/query/certificate algebra. DOMAIN, ALPHABET/value schema, CONFIGURATION, FRONTIER, NEIGHBORHOOD, RULE, UPDATE, result/trace, and representation remain explicit typed responsibilities; concrete seeds, realizations, horizons, and external stops live in `RunSpec`. UPDATE's keyed, ordered/ranked, bag, graph, and finite-successor forms are sealed policy implementations of one axis, not family executors.
+
+The six strict-layer non-rollout rows are T31-T33, T40-T41, and T45; T40 is the arity-zero definition/query specialization, while any separately evidenced coefficient or solution work program returns to the common runner. The architecture and Goal 2 matrices each cover T01-T45 exactly once, all 45 authority files exist, and the Goal 2 DAG plus normative leaf dependencies are acyclic. Frozen T42 source/asset/semantic oracles, compilation, hostile review, Markdown/table/fence/scope/diff checks, and all 141 repository tests pass. No runtime code changed and no completed evidence stage reopened.

@@ -49,10 +49,10 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete and all 45 type stages complete, with no stage reopened or unresolved; D141 synthesis and the Goal 2 handoff are in final hostile/global review. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, T32, T33, T35, T36, T38, T40, and T42 are complete under D119-D140, and D141 integrates the catalog-wide result.
+- Execution status at this sync is Goal 1 complete: Foundation, all 45 type stages, D141 synthesis, and the dependency-aware Goal 2 handoff are closed with no stage reopened or unresolved. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, T32, T33, T35, T36, T38, T40, and T42 are complete under D119-D140, and D141 integrates the catalog-wide result.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. SEED is a first-class library/run responsibility that supplies one complete valid event-zero configuration, but concrete seed/constructor, realization, horizon, and external stop are RunSpec/preset identity rather than transition-program identity. Cellular automata are one preset of the transition axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
-- Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
+- Representation reuse is accepted only with a lossless map `e` satisfying `map_step_result(e, step_A(s)) = step_B(e(s))` one step for one step, preserving complete state, outcome, successors/branching, events, witnesses, and provenance while requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
 - The three evidenced rollout nonfits remain T31 constraint/model sets, T41 uniterated function definitions, and T45 general PDE relations without a specified evolution problem. T40's exact-denotation/representation-query layer is an arity-zero classes-1–3 specialization of D082/T41 and likewise remains outside rollout; its explicit coefficient algorithms are separately identified work SimplePrograms. Multiway rewriting remains a SimpleProgram whose structured UPDATE result contains a finite successor set plus complete branch witnesses.
 - T37 establishes a consecutive exact numeric prefix with an explicit value-carrier profile as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, and old-prefix term references. Its bijective `Val* · End(next_index)` encoding turns append into the RULE `End(n) -> Val(n,next) · End(n+1)` and reuses T16 exactly-one ordered splice. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
 - T38 keeps that complete prefix, unique endpoint, complete-prefix NEIGHBORHOOD context, endpoint replacement, splice, trace, `StepResult`, and branch-free runner. Its only class-2 responsibility is closed `TermAt(AddressExpr)` syntax and leftmost-innermost demand/failure witnesses inside RULE. Fixed lag is a restriction; resolver-plus-emitter splitting is only a lossless compiled factorization. Undefined demanded addresses and results outside the declared carrier use the common no-commit error protocol; malformed programs remain invalid. D138 adds no T38 selector, NEIGHBORHOOD type, state, FRONTIER, UPDATE, executor, or family branch.
@@ -1254,7 +1254,7 @@ Source audit digest is `2726957389d256722469424e41ea2e92188ba5e30d7ab52c4df2598d
 
 ### 47-SYNTHESIS
 
-Status: **IN PROGRESS**.
+Status: **COMPLETE** in `goal-1/47-SYNTHESIS.md` under D141.
 
 #### Big Picture Objective
 
@@ -1274,9 +1274,13 @@ Re-derive the complete architecture from all 45 evidence records and determine t
 - Irreducible execution algebras are named and justified; apparent unity is not purchased through callbacks or `Any`.
 - No unresolved contradiction remains in `0-plan.md` or `design-ledger.md`.
 
+#### Stage Result
+
+COMPLETE. D141 reduces every catalog construction with canonical evolution to one branch-free `FRONTIER.select -> NEIGHBORHOOD.read -> RULE.apply -> UPDATE.apply` algebra with closed typed axis values and a uniform `StepResult`. T31-T33, T40-T41, and T45 use one sibling immutable definition/relation/query/certificate algebra where the catalog object supplies no canonical next state; separately evidenced work evolutions still use the common runner. The architecture matrix contains T01-T45 exactly once, preserves seed/run identity separately from transition identity, and records the honest stochastic, continuous-time, adaptive-subdivision, sequential-network, and exact-real boundaries. Independent hostile review and all final global gates pass.
+
 ### 48-GOAL2-HANDOFF
 
-Status: **PENDING — DEPENDS ON SYNTHESIS**.
+Status: **COMPLETE** in `goal-1/goal-2-handoff.md`.
 
 #### Big Picture Objective
 
@@ -1296,3 +1300,7 @@ Turn the evidence-grounded architecture into a complete, dependency-aware Goal 2
 - Every implementation stage has dependencies, files, tests, completion evidence, and rollback/re-derivation triggers.
 - Shared work is planned once; no family-specific rollout or second semantic/execution compatibility path is proposed.
 - The handoff is sufficient to scaffold and execute Goal 2 without repeating Goal 1 research.
+
+#### Stage Result
+
+COMPLETE. G2-00 through G2-12 form an acyclic in-place migration plan with explicit files, dependencies, tests, completion criteria, and re-derivation triggers. The exact CSV coverage matrix maps all 45 catalog names once; the normative `Cnn = Tnn` matrix supplies 45 direct leaf-dependency records and every authority file exists. The plan implements shared substrates once, keeps the new runner private until one atomic public cutover, permits only a lossless executor-free construction façade, and authorizes neither family rollout nor a second semantic execution path. The future Goal 2 implementation gates remain deliberately open.
