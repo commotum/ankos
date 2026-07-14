@@ -48,7 +48,7 @@ Freeze an executable fidelity contract: immutable input and output boundaries, e
 - Keep the sibling output outside the legacy root and reject path containment or symlink aliasing back into it.
 - Do not create a repair record or alter author text in this stage.
 - Reject author-text correction based on the monolith, split derivatives, local crops, model judgment, syntax, rendering, or mathematical plausibility alone.
-- Require creator/reviewer identity inequality and authoritative evidence for every later high-risk author-text change.
+- Require an independent authoritative-source review for every later author-text change; high-risk changes additionally require a blind pre-proposal decision and specialist review where applicable.
 - Treat the aggregate, navigation, editorial, and search outputs as noncanonical roles and exclude them from exactly-once author-text counts.
 - Refuse publication into any nonempty target that is not already manifest-owned.
 - Treat legacy promotion, deletion, relocation, and consumer migration as separate user-authorized work.

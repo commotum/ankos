@@ -37,37 +37,38 @@
     {
       "id": "INDEX_COLUMN_OR_ENTRY",
       "priority": 1,
-      "rule": "Any block assigned to the Index or containing an Index entry/subentry/cross-reference region."
+      "rule": "canonical_document_id == 'INDEX'."
     },
     {
       "id": "FORMULA_CODE_RULE_OR_DATA",
       "priority": 2,
-      "rule": "Any formula, code, fence, rule table, exact sequence, operator-rich datum, or technical-symbol block."
+      "rule": "block_kind is one of MATH_INLINE, MATH_BLOCK, CODE_BLOCK, RULE_TABLE, DATA_TABLE, or EXACT_SEQUENCE."
     },
     {
       "id": "FIGURE_CAPTION_OR_VISUAL",
       "priority": 3,
-      "rule": "Any image reference, caption, printed figure group, or text whose ordering/meaning depends on a visual region."
+      "rule": "block_kind is one of IMAGE_REFERENCE, FIGURE_GROUP, FIGURE_COMPONENT, or CAPTION."
     },
     {
       "id": "HEADING_LIST_OR_LAYOUT",
       "priority": 4,
-      "rule": "Any heading, page furniture, list/table boundary, paragraph join, column-sensitive, or other structure-bearing block."
+      "rule": "block_kind is one of HEADING, LIST, LIST_ITEM, BLOCKQUOTE, LAYOUT_TABLE, PAGE_FURNITURE, PAGE_BREAK, or STRUCTURE_BOUNDARY."
     },
     {
       "id": "PROSE",
       "priority": 5,
-      "rule": "Any remaining author-text block."
+      "rule": "Any remaining eligible block_kind; Stage 2 must reject an unknown block_kind rather than route it here silently."
     }
   ],
-  "stratum_assignment": "Assign every eligible block to the first matching risk stratum by ascending priority; record all secondary risk tags separately.",
+  "stratum_assignment": "Assign every eligible block to the first matching risk stratum by ascending priority; record all secondary risk tags separately. Stage 2 freezes the closed block_kind enum and classifier implementation hash before producing ranks.",
   "sample_size": {
     "minimum_fraction_per_document": 0.05,
     "minimum_blocks_per_document": 20,
     "small_document_rule": "Select all eligible blocks when a document has fewer than 20.",
-    "rounding": "ceil",
-    "risk_allocation": "Within each document, allocate the minimum sample proportionally by risk-stratum population using largest remainders, with at least one block from each nonempty high-risk stratum before PROSE when the document quota permits.",
-    "changed_unchanged_rule": "Stage 2 freezes the full ranked lists before repairs. After a repair-overlay digest is sealed, label every ranked block CHANGED or UNCHANGED without altering ranks. Select from each label by the frozen ranks, targeting an even split when both pools permit; include all members of a smaller pool and fill the remainder from the other. Never substitute a lower-ranked block based on its observed answer.",
+    "document_quota": "q = min(N, max(ceil(0.05 * N), 20)), where N is the document's eligible-block count.",
+    "rounding": "ceil for document quota; floor for initial proportional allocations.",
+    "risk_allocation": "For each document, reserve one slot for each nonempty non-PROSE stratum in priority order while slots remain. Allocate remaining slots across each stratum's unselected population by the Hamilton largest-remainder method. Ties are resolved by ascending risk priority, then risk-stratum ID. Never select more than the stratum population; redistribute overflow by the same rule.",
+    "changed_unchanged_rule": "Stage 2 freezes the full ranked lists before repairs. After a repair-overlay digest is sealed, label every ranked block CHANGED or UNCHANGED without altering ranks. Within each document/risk quota q_s, target ceil(q_s/2) CHANGED and floor(q_s/2) UNCHANGED (the odd slot goes to CHANGED). If one pool is too small, select it completely and transfer its shortfall to the other pool. Select lowest frozen ranks only. Never substitute a lower-ranked block based on its observed answer.",
     "all_changed_review": "Every changed author-text block is reviewed outside the holdout whether or not selected; the holdout remains an independent quality projection."
   },
   "blind_protocol": {

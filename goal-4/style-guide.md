@@ -29,6 +29,32 @@ No visual or textual styling convention is allowed to blur those types.
 - Do not trim or reflow author text as an incidental serializer behavior.
 - Trailing whitespace is forbidden in generated syntax. Source-significant trailing whitespace, if the witness establishes any, must use an explicit lossless representation approved through a witness-backed repair record rather than invisible trailing bytes.
 
+Machine-readable JSON and JSONL use profile `ANKOS-CJ-1`: UTF-8 without BOM, LF, one terminal LF, object keys sorted by Unicode code-point order, array order preserved, `,` and `:` compact separators, unescaped non-ASCII text, and no floating-point values. Deterministic artifacts contain no wall-clock build time, host path, username, locale-derived value, filesystem mtime, or random UUID. A source date, when required, comes from a manifest field or declared `SOURCE_DATE_EPOCH` and is not sampled from the build host.
+
+## Typed intermediate model
+
+Stage 4 implements a closed, versioned intermediate model. Every node has `node_id`, `node_type`, ordered `raw_span_ids`, ordered `witness_region_ids`, `content_role`, and an exact `author_text_projection`. Unknown node types fail closed.
+
+The `ANKOS-AST-1` node types are:
+
+- `DOCUMENT(children)`;
+- `PARAGRAPH(inlines)`;
+- `TEXT(text)` and `SOURCE_LINE_BREAK(kind)`;
+- `EMPHASIS(children)` and `STRONG(children)` only when witness-verified;
+- `HEADING(level, children)`;
+- `LIST(ordered, start, items)` and `LIST_ITEM(children)`;
+- `BLOCKQUOTE(children)`;
+- `INLINE_CODE(payload)` and `CODE_BLOCK(language, payload, fence_length)`;
+- `MATH_INLINE(payload)` and `MATH_BLOCK(payload)`;
+- `TABLE(rows)` and `TABLE_CELL(children, row_span, column_span)` for verified tables;
+- `IMAGE_REFERENCE(asset_id, source_alt_projection)`;
+- `FIGURE_GROUP(component_asset_ids, caption_children)`;
+- `INDEX_ENTRY(term_children, subentries, page_references, see_targets)`;
+- `RAW_HTML(payload)` for source material that must remain literal;
+- `GENERATED_ANCHOR(anchor_id)` and `PAGE_MARKER(witness_page_id)` with empty author-text projection.
+
+Serialized Markdown is a view of this model, not the semantic source of truth. Parse/serialize/parse must preserve the full typed model and author-text projection. Formulas, code, Index entries, and figures must not be packed into opaque `TEXT` or `RAW_HTML` merely to bypass their invariants.
+
 ## Canonical document envelope
 
 Canonical files contain no YAML front matter. Role, order, source spans, hashes, page mappings, and review state live in manifests and ledgers.
@@ -41,6 +67,8 @@ Generated anchors or page markers may appear only through the reserved forms bel
 ```
 
 Reserved generated identifiers begin with `ankos-`. Author HTML using the same lexical form must be escaped from the generated namespace in metadata, not rewritten in author text.
+
+Stable anchors are `ankos-` plus the lower-case canonical document ID, a hyphen, and the lower-case immutable raw block ID. A witness-only insertion appends `-ins-` plus the lower-case repair ID. IDs use only ASCII `a-z`, `0-9`, and `-`; collisions fail rather than gaining an order-dependent suffix.
 
 ## Headings
 
@@ -87,7 +115,9 @@ Reserved generated identifiers begin with `ankos-`. Author HTML using the same l
 
 ## Images, figures, and captions
 
-- Canonical image links use repository-relative POSIX paths to manifest-governed assets under `ASSETS/`.
+- Legacy assets are copied to `ASSETS/LEGACY/<legacy-relative-path>`, retaining the complete relative identity below `ref/A-New-Kind-of-Science/`; they are not flattened by basename or deduplicated by hash.
+- Lawfully redistributable witness-only replacement/full-plate assets use `ASSETS/WITNESS/<asset-id>/<source-basename>` and never overwrite a legacy asset identity.
+- Canonical image links use repository-relative POSIX paths to those manifest-governed assets. Compute the lexical path from the Markdown file's manifest-declared parent to the asset's manifest-declared release path, normalize `.` segments, reject any escape from the repaired root, and emit `/` separators on every platform. Do not resolve through symlinks.
 - The link target is generated path metadata; asset reference order and the source caption are authorial evidence.
 - Do not invent authorial alt text. If the printed source supplies no equivalent text, canonical Markdown uses empty alt syntax and `EDITORIAL/Alt-Text.md` carries generated accessibility text with review status.
 - One printed figure may contain multiple governed assets. Figure grouping and component order live in `figure-caption-asset-ledger.jsonl` and require page evidence.
@@ -143,7 +173,9 @@ The serializer refuses:
 - editorial/search overlays aimed at canonical author text;
 - use of an existing repaired tree as input;
 - a nonempty unowned publication target;
-- unresolved source or independent-review requirements.
+- an unresolved item missing a governed unresolved-ledger record and owning unblock action.
+
+Build mode may reproduce a zero-repair or partially reviewed tree when every unresolved item is explicitly governed; it labels the tree `UNCERTIFIED` and never silently omits the blocker. Audit certification, publication as a validated release, and any “fully repaired” claim refuse every unresolved authorial source or review item.
 
 Parser success and attractive rendering establish only structural properties. Fidelity remains a page-witness and provenance claim.
 

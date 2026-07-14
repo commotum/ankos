@@ -148,6 +148,7 @@ QUERIES = {
         r"Another early sign.{0,120}digit sequence of a number|"
         r"digits of.{0,40}pi.{0,60}other transcendental numbers|"
         r"John Venn.{0,80}digits|Carl Friedrich Gauss noted.{0,80}continued fractions|"
+        r"continued fractions.{0,80}Carl Friedrich Gauss noted|"
         r"Repetition in numbers|Emile Borel had formulated.{0,80}normal numbers|"
         r"Page 560.{0,40}Number representations"
     ),
@@ -653,10 +654,10 @@ CANDIDATE_IMAGE_LINES = GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
 UNRESOLVED_IMAGE_LINES = frozenset()
 
 IMAGE_ROLE_RECORDS = (
-    "998:relation:page83 neighbor-independent substitution source observer",
-    "1008:relation:page84 substitution-tree source observer",
-    "1014:relation:page84 substitution-branch source observer",
-    "1449:relation:page117 nested binary-digit source observer",
+    "998:relation:physical page98 neighbor-independent substitution observer invoked by page83",
+    "1008:relation:physical page99 substitution-tree observer invoked by page84",
+    "1014:relation:physical page99 substitution-branch observer invoked by page84",
+    "1449:relation:physical page132 nested binary-digit observer invoked by page117",
     "1677:native:page151 pi base-two walk observer",
     "1711:native:page154 rational long-division work panels",
     "1744:native:page156 square-root product-state work panels",
@@ -667,8 +668,8 @@ IMAGE_ROLE_RECORDS = (
     "1657:excluded:page150 sequence-property sibling observer e",
     "1846:relation:page161 trigonometric crossing-family source observer",
     "1854:relation:page162 continued-fraction-driven substitution observer",
-    "6768:relation:page560 unary binary self-delimiting and Fibonacci representation observer",
-    "6776:relation:page561 run-length application of page560 representation-e observer",
+    "6768:relation:physical page575 unary binary self-delimiting and Fibonacci observer invoked by page560",
+    "6776:relation:physical page576 run-length observer invoked by page561 and page560 representation-e",
     "7116:relation:page609 block-frequency composite observer invoked by page594 Sturmian span",
     "9246:control:page776 Turing-complexity observer invoked by page761 resource boundary",
     "11252:relation:page884 cellular-automaton Cantor-map representation observer",
@@ -704,8 +705,8 @@ IMAGE_ROLE_RECORDS = (
     "14929:relation:page986 billiard continued-fraction slope observer c",
     "14931:relation:page986 billiard continued-fraction slope observer d",
     "14933:relation:page986 billiard continued-fraction slope observer e",
-    "17167:relation:page560 representation-length observer",
-    "17171:relation:page560 self-delimiting-completeness observer",
+    "17167:relation:physical page1085 representation-length observer invoked by page560 notes",
+    "17171:relation:physical page1085 self-delimiting-completeness observer invoked by page560 notes",
     "17593:excluded:page1099 least-squares model-fit sibling observer",
     "17762:relation:page1106 rule-60 difference-table observer including pi digits",
     "17876:relation:page1109 base-two power-tree computation observer",
@@ -1197,37 +1198,37 @@ EXPECTED_QUERY = {
     "Q10": (6, 4, 2, "d3951c5d658e62018a2c4cca367c16401025d13d792c3603f45fdeedee6f9d17"),
     "Q11": (23, 12, 11, "a1c38c2e18294e7f54c19022087466d05cb13a1530c4ba5c003108023fb3d514"),
     "Q12": (9, 5, 4, "c64a5b61c066aba945485b199125e1b0732aa5ec8e935a25e28b912c3734f285"),
-    "Q13": (2, 2, 0, "6a8ea11b4ec5fdca405e59703e8853736502a0daffd3cd153c166cead6e74577"),
+    "Q13": (6, 6, 0, "0e8859ae1a47583384c73a09041cd08017b6dda9e7380a7746cae06dfa814ec3"),
     "Q14": (12, 0, 12, "7b99c1393251c1d6e507801a46576a77d9b33a78557f42bd2e29ffc26c5ff277"),
     "Q15": (3, 3, 0, "29e023f7db02bec1f2a16113a10f2ad22d45f9741ac3563d630c38b4ae641240"),
-    "Q16": (24, 24, 0, "9a61ea933ad33af301fc5bcb85590ebdd6d010282b79d440e3acde5a926608ec"),
+    "Q16": (60, 60, 0, "166c98e3619923d10930515737765f6b29301b597ac8b3688877ead3bdde96a8"),
     "Q17": (4, 4, 0, "8a4e0a5a0bdb3f5e00e29d2c34e66980cec3634c02ac67dbee9b0c5d2bc8c8fd"),
-    "Q18": (18, 9, 9, "daf82880161836bececa0947adf26627fa19027a039194069ea0c6db95155450"),
+    "Q18": (26, 17, 9, "b63742f587b4fd1f241d17f717fa66ce7964997b2d5dd4136ba8629aac69aa88"),
     "Q19": (5, 0, 5, "dfd6b9bb5fb0d37bb9dec4176afc40f7273b06a1b7b2d732a66ffea2d3b5f71f"),
 }
 EXPECTED_QUERY_PATTERNS = (
     20,
-    "aa82c1623fbe5efda23e94ae79a80383e373516e0b9f9467ee1d5d91db24cacb",
+    "4e6a271f92cfb7a83deb91a1791e0eada0d57c78b7c4a62f304bc7df5d91e2c5",
 )
 EXPECTED_SET = {
-    "union": (166, "45923b5f5f09804961668838532a9a905d503bacb7473349eedad24c145aa228"),
-    "pre_index": (111, "511153c482b0893320a0d1e929615f600e63515343162cf4dfc9c12fc4f39120"),
+    "union": (213, "632a414af1ed9ee8fea00da0020def00f439d6b2b41853e537e7148b637754a3"),
+    "pre_index": (158, "3ebdbc3027ab657e5ee2f70cdb709b74f6f6edae432226ab10634c84b770b7a5"),
     "index_candidates": (55, "f42d657863bef3a638029d7994ba498468a7bfb857f99a3249a08df1a6b2f3ae"),
     "query_native": (46, "90c5667940c7b23109fec16cce632cd493d64aa5bf3c6eeda290417cee80093d"),
-    "query_relation": (53, "0ea85c90b9f0e905df3a1dd6358a23b014851f0287fc2b7aa748895768efef1c"),
-    "query_control": (7, "aa826f1310f068dd0ba264d1a4155fcd46ae2fe1f318c5dd5e159ac7eef21c2e"),
-    "excluded": (5, "01c97a261db7b3a9cc557d83e011e5aa7a280433144e5df6d2b22bedd051f8f8"),
+    "query_relation": (86, "e34233b994c79cfa0d82a8a36d0d2b3d3f3d4da43987e937957b6600e203d96d"),
+    "query_control": (12, "c3063ea0a806932d6d79c9fc345941c1eb947d4e7b94e08c265a05af639dcb3a"),
+    "excluded": (14, "8513c01e9157208b3f8a2db0957813529069c650e41fdc469087c6a5000ff4d5"),
     "native": (169, "eba1f729ab1ed14b6809c181e74ac86b64a363c0bcecb684f7cdbdad8f76ca2b"),
-    "relation": (112, "5af6adef4121efe338e89e295406761baef00f2488b1254c4cd7ed1000e864f5"),
-    "control": (9, "350e9aec3d0ce5466da723cf905a398bcb183fcafee5963145a2e8d8149a564e"),
-    "retained": (290, "bb53336eff27df45a8772dd4e38d57ad17232a13540fc0fb89e6a69dbb35edf1"),
-    "retained_query": (106, "fbb6850d5bad62e4b36a2e41a22a208de8f62b195fc46ab21114d0888e138d21"),
-    "continuations": (184, "9c835f4e8074b9dd34d7f07cb987de8f2efd25e0f6ba33ba19b2cf0d38857c5b"),
+    "relation": (238, "a52c2e003b4c93224dc5d4304863422ae9185c92a9262a7f80f1ad402e151aed"),
+    "control": (40, "c3c30e3389017ed41fa713013e72ed3e1cf08e09bfe43d77f896757593e0facb"),
+    "retained": (447, "e4816e3cb8dda0717df150d8f512879e5b2ae5b9c0ac6e4330dc681a10be9caf"),
+    "retained_query": (144, "5e548024db44e16cade35bc4b2ce14d881f5919a1d18770eed633abd91efbb55"),
+    "continuations": (303, "8fcedc50130861ee4cfd626e009df451ba6d30763e59fb2262b88e013945ddd5"),
 }
 EXPECTED_EXCLUDED_CLASS = {
     "name_collision": (1, "0a5b046d07f6f971b7776de682f57c5b9cdc8fa060db7ef59de82e721c8098f4"),
-    "unrelated_representation_context": (1, "45113af9c39c6636107b96fcdc1037686173b60eec2b3f4561b2d7d7b6c1252f"),
     "generic_algorithm_cross_reference": (3, "0af5fb1f1971b936e8052cc34fe7605caf6f6916a28992ff9485914a39d55704"),
+    "sibling_asset_observer": (10, "d85a02abfd4febbc284b9e74bc18a42b8ef2c5f929f107d0db2e24fea6cc5659"),
 }
 EXPECTED_BOOK_BROAD = {
     "candidate": (309, "f8616458a4770352e42c8f8aeaa4d27033a6758e048885e88547ea044d3a90fc"),
@@ -1254,7 +1255,7 @@ EXPECTED_BOOK_BROAD_EXCLUSION_CLASS = {
 }
 EXPECTED_BOOK_BROAD_DISPOSITIONS = (
     309,
-    "8ce26c09fefa4c7815a12765f8b20f8511990b68d57999347ce61b786dcb8bef",
+    "2e8dcd55c14c61f241089816969a4f96a280b7c380a8403d46d7331a15424865",
 )
 EXPECTED_BOOK_BROAD_EXCLUSION_RECORDS = (
     132,
@@ -1266,8 +1267,8 @@ EXPECTED_SOURCE_SPAN_EXCLUSION_RECORDS = (
 )
 EXPECTED_INDEX_CLASS = {
     "native": (30, "3b16acd55987dcf28f7ed4b681251e34c2e0bc176b3cb6b255450b18f735f181"),
-    "relation": (99, "b21507eb0f288c514f0ec949094228be53f17b5d936f96a79f6214ba99a0837c"),
-    "control": (2, "b218edfa8ee128a727a7add20c49c3ab3ecfd99c0ab39a4505d587b637ac9f4f"),
+    "relation": (102, "e0626897cab06433d60501dedd65eda889262fe2f0527c2e3359e063648cb88d"),
+    "control": (4, "3c1e78895b082a66f1240b6708a78c9b6847b7a3f0f26a9cff0ed0b37603f863"),
 }
 EXPECTED_INDEX_CONTENT = (
     897,
@@ -1276,34 +1277,34 @@ EXPECTED_INDEX_CONTENT = (
 EXPECTED_INDEX_BOUNDS = (20826, 20828, 22456, 22458)
 EXPECTED_INDEX_BOUNDARY_TEXT = ("#### Index", "#### Colophon")
 EXPECTED_INDEX_SEMANTIC_UNIVERSE = (
-    131,
-    "4d6efab64c29295d8de92f5dc74f0ce313c1ac653a7fc4043d6c3a747bb5c092",
+    136,
+    "87390448e04cd950b9841b8ee761af9d467d7c67882266dacde1964e6e72be68",
 )
 EXPECTED_INDEX_QUERY_MISSES = (
-    76,
-    "42cb4863e86aa5cc1b0947cb264f04a78a1375fe08cd15ddbb908be26b8c9683",
+    81,
+    "c0c0d5c752cc8d8d00b46839f7e0737a34374868f5c80a28a6012d22782d916d",
 )
 EXPECTED_INDEX_BROAD_VOCABULARY = (
-    108,
-    "9703e5dd0c89395b317f2ac703cdd233cc21aec85f8f819371365b1776d7d784",
+    114,
+    "8406f1b9b58f72983c438d2e62a438c58d0305f13884c19e45c2df706e113949",
 )
 EXPECTED_INDEX_HOSTILE_AUDIT_CANDIDATES = (
-    65,
-    "49d69946889aa1cbe5545b8918e55e8a572ceec0a0ff635442c352e9a6955783",
+    70,
+    "a3d65822945b0a32facb4e88d24f0ad7372e1a4ba1a62cc8594881f101316607",
 )
 EXPECTED_INDEX_AUDIT_CANDIDATES = (
-    145,
-    "a791c662d2d37fbd157cc7b3169119b911abde141f88cfb0e7aae32415d5d69e",
+    150,
+    "3b82a6d1c983df5264648ec31b608cb3bcc9160ee8c56c84e153aadf532bdc2d",
 )
 EXPECTED_INDEX_BROAD_PATTERN_DIGEST = (
-    "f7fb322c04a30e46bc41f360d2ff0663d15d16c3637e02d3603e1377a945dd89"
+    "7cecd1128c1cc938a264fa54fff531e757381528f63885c86fdc7e80ac8bece7"
 )
 EXPECTED_INDEX_DISPOSITION = {
     "native": EXPECTED_INDEX_CLASS["native"],
     "relation": EXPECTED_INDEX_CLASS["relation"],
     "control": EXPECTED_INDEX_CLASS["control"],
     "excluded": (16, "0cba561e4c20a6bac1b7ed2d58c255b8250b6fc5bb4da0449c382b50247b0411"),
-    "unrelated": (750, "6be5c64df048eae2acac7c6f7939a848c1f2dd697408ad27e7a97bc7500cd095"),
+    "unrelated": (745, "bd65cb29b27591d90e36016b12bdd8deb29be86d261e3beb80e4986a40c9985c"),
 }
 EXPECTED_STRICT_MAIN_PARTITION = {
     "native": (102, "bd76954762c925f2ecf6bf0fa97d9c15db19d598a297a9c56d74e12d1dc41d59"),
@@ -1322,11 +1323,11 @@ EXPECTED_STRICT_NOTES_PARTITION = {
 }
 EXPECTED_IMAGE_PARTITION = {
     "native": (11, "45fe870caa33fa2cc0b702a8158564f987fb186a1742f1bbafc940cf8c738894"),
-    "relation": (15, "f922813319fbb841d89b09209a82ef8269e18764c641bac6b75972ba45958d5a"),
-    "control": (1, "71887428c764ac67b3bd6ce9f4212ff7e7fe6803e507b5b11345d7c6a6c95a1e"),
-    "governed": (27, "826a9447681a048169747d57b7cf9b1c067c7357199d3cf92bf408961ac23999"),
-    "excluded": (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
-    "candidate": (27, "826a9447681a048169747d57b7cf9b1c067c7357199d3cf92bf408961ac23999"),
+    "relation": (40, "02c92a8293eff7a00d1c4585a714fbbd07f7c2faa7a572b250b84437a4b90c63"),
+    "control": (2, "b93adf13ddfe98860b89db8d689a2003e724ccb0eacac6e941e2155ad73e3bf8"),
+    "governed": (53, "08c383d1c08ad614b047e1084f806d2807a159266a62555a55915e1ba33b53f5"),
+    "excluded": (10, "d85a02abfd4febbc284b9e74bc18a42b8ef2c5f929f107d0db2e24fea6cc5659"),
+    "candidate": (63, "e4094d8d30489b7029c902e9b69df6403915cfb776faa5723ebfe97d3d1b94b5"),
 }
 EXPECTED_IMAGE_ROLE_PARTITION = {
     "native": EXPECTED_IMAGE_PARTITION["native"],
@@ -1346,34 +1347,34 @@ EXPECTED_UNRESOLVED_IMAGE_LINES = (
     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
 )
 EXPECTED_IMAGE_ASSET_MANIFEST = (
-    27,
-    "9fb44dd3086ff0c853d09a867ccdfdd60716037fc4f52d527f6ec1bc217d6ffc",
+    63,
+    "4685ebad9a58b1cc8082b4a03118ad1bcd1780706bceba2bf29184cd8df05b10",
 )
 EXPECTED_SOURCE_SEMANTIC_GUARDS = (
-    58,
-    "f647547a7d1c19982b659df6112d6408992129768ff1ca38ab9eb61da5d58205",
+    139,
+    "53d520ca9e8891eb17387fcfb24ffcaa5b0065f65789c3bf3d333147699ae478",
 )
 EXPECTED_SOURCE_DEFECT_GUARDS = (
-    24,
-    "833c24e7f3c44bc2737a48dc6cbc4a3cb02caf3cfc1d62d372b9ce42973753b2",
+    30,
+    "9e1ecf0bd292fcbbde1a85814c65e9a7d505553db0343c4a4254262ab6d2c630",
 )
 EXPECTED_RECORDS = {
     "book_broad_dispositions": EXPECTED_BOOK_BROAD_DISPOSITIONS,
     "book_broad_exclusions": EXPECTED_BOOK_BROAD_EXCLUSION_RECORDS,
     "source_span_exclusions": EXPECTED_SOURCE_SPAN_EXCLUSION_RECORDS,
-    "excluded_line_hashes": (5, "d3b3134fe2e22ca121f65e3617dce002e45e1880600c264b4c5a100d9614efef"),
-    "index_guards": (131, "f1c4bc047a578f6d75c530b5b9145a25e838b6ff76024ca3757d137d5575bf44"),
+    "excluded_line_hashes": (14, "a18d47a88517e8ce233668933985276805f8e67824cee99512dcfceaa4bda69e"),
+    "index_guards": (136, "5f323a3ad491e43ecaef6ffdd43648a9693d73fbd866be8cb56801139874b3df"),
     "index_excluded_guards": (16, "473fe5dcba32ca177fe1913efb1879f35f72492ee7fd3b2f9fe231025c20382b"),
-    "index_dispositions": (897, "074ed3b22f74c03a671476dab976205566a2808559605cfdd0387f49e62966a0"),
+    "index_dispositions": (897, "70d3496248542a9dcd3e02b6b6f9d472925993e292993b754a69a30053d30d2d"),
     "index_sentinels": (8, "129bc6a4ef7cc76b5020676e603a2b5621ef56354b8ca2cd2fb4361938791710"),
     "strict_main_dispositions": (117, "94bed33e54122c19903a478a562a10d69491890aef04978d417bb53b3b13db91"),
     "strict_notes_dispositions": (126, "3d4cb793dae2cfa4df4d14bb4070efeb32ccba45ebfc221234700c2734f645aa"),
     "semantic_guards": EXPECTED_SOURCE_SEMANTIC_GUARDS,
     "auxiliary_guards": (8, "bb1c06175c4a5856879b75936917159d7125f734ad6350cc26f618cb2da23b18"),
     "source_defects": EXPECTED_SOURCE_DEFECT_GUARDS,
-    "source_model": (36, "2f4276973762eeb1ec30411e091c262fa7cf36cdaba90f7a6a8697c47a915ea3"),
-    "image_roles": (27, "cf05077adb83b35b0d22b54d35270cc229042e60cdddc413aceaa92d7775a811"),
-    "image_assembly_boundaries": (8, "4c1a07019ffc1eede0c5eeb651f0c752216a8b451fe44b6c561a4eaf4f6995bd"),
+    "source_model": (42, "1db5560d5effa43a81fcb3c35069ce514a34ee0041061ea8923b0a8c861c680f"),
+    "image_roles": (63, "56e983f339a2df1d808ac56a43243ba1151756c845babae4a546472034d02ce7"),
+    "image_assembly_boundaries": (18, "4c39bfee02a703db49afba0d7e75c8a63989e86aa3013cb9271052438318d2c7"),
     "split_omissions": (89, "0c3dc82ba4879e60782fa0459e4e12768e8e48f4b950474bdc731f382fab6c8f"),
     "split_boundary_witnesses": (7, "c32f23773dbe2707c96bde64ea3fd95445e3ff6efd2bb809718c22d28b9a9884"),
 }
@@ -1381,29 +1382,29 @@ EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 EXPECTED_SPLIT_CROSSWALK = (
-    1202,
-    "a239d56b412a32c46953f5b3043344e865c7adaf1db13bd7f390de9ec84510a6",
+    1359,
+    "ec95b7239b33d91e630888ed9fd428917ebcbe1354b1a326ff2887fbc2a74c9e",
 )
 EXPECTED_SPLIT_CLASSES = {
     "EXACT": (
-        1049,
-        "7d5e69d7aad89564947400e4605a9fce5edcf9d19bfea559b360737d78eefd9f",
-        "13d6900b6c69f322fbbd9fc544be58cf5f40967413f10defa0ed34862bd963db",
+        1175,
+        "788095e3a5f2088f3bf9dbd85f90c40352966d44814463b9bcfa598408c493c5",
+        "84af9621105e1fa7b2ce96ce25dc96693a5e291aa156f7e1863501f4c095c9d3",
     ),
     "IMAGE_BASENAME": (
-        25,
-        "181db30e3c6d7359eff4288ba5941fdddd0223b928bb9f19fda43c23c751df58",
-        "ee32725fff6455434802d7c4eed69040abb26e56e6365181ff1dc60679b5e67d",
+        51,
+        "fd395075505951a4bbdd0fa5bcc4b5c41b572f099df4807479a5413dfe79b242",
+        "eef42970c64c5f758a6124a2b4a5273c060bdd4215ac424f0ab106ab08f1c4f1",
     ),
     "NORMALIZED": (
-        25,
-        "d6660096a957a05dc6d601c43769a6b7cfd5194074cd54ba5f2c3ce85ff5c359",
-        "b0b61fb98c619aac14c38aae885039ad9877d31ea5937d98ab0f43efe516e82e",
+        28,
+        "196009b2427d2d2b8d10096203710f1aa99fd36078ac2432bfdb29b0880810ae",
+        "84aafc89781759d2d49c621657a831a8fff50b0316a8aed6fda6d17f98b6d672",
     ),
     "SUMMARY": (
-        14,
-        "8ef33877220036f2939337015de6307a13ddb1a8a28f735d274e4be07239cd1e",
-        "9d4863d9a7a0c61fda8f26e054e0a9ea3a1912dd9d9b8c9a79cd8b0afe5a100f",
+        16,
+        "9e5d9bc769625a2ebf160fdd1e83a4453c9e1e4865c12a11775ac227a5cfd4f8",
+        "e6e3b8242849932c3170bc4b7da916d26933483d72e2ce69e2142b2b39c6a79e",
     ),
     "OMITTED": (
         89,
@@ -1416,7 +1417,7 @@ EXPECTED_LOGIC_RECORDS = (
     7,
     "d525310251895f506ca06d964ba736dd53ab659e07fed14d7fbe5422b1648754",
 )
-EXPECTED_AUDIT_DIGEST = "62f4005c9bf3c2441dccb7fe28e1d7ae3291c1ce60357fc4e8fa419e56608e80"
+EXPECTED_AUDIT_DIGEST = "7bd67422250b13fa3077614e4e0637eb6bc2237627140dc8192961900b31ae9c"
 
 
 IMAGE_PARTITION = {
