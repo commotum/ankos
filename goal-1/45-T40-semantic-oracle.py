@@ -46,6 +46,7 @@ POSITIONAL_CANONICAL_TAIL = "terminating_zero_tail"
 POSITIONAL_SIGN_CONVENTION = "leading_minus_magnitude"
 CF_CANONICAL_TERMINAL = "last_coefficient_gt_one_unless_singleton"
 FINITE_TERMINATED = "finite_terminated"
+EVENTUALLY_ZERO_INFINITE = "eventually_zero_infinite"
 PREFIX_OF_INFINITE = "prefix_of_infinite"
 UNKNOWN_TERMINATION = "unknown_termination"
 EXACT_METHOD = "closed_exact"
@@ -713,13 +714,20 @@ class ExpansionResult:
         if type(self.outcome) not in OUTCOME_TYPES:
             raise TypeError("unknown query outcome")
         termination = exact_str(self.termination, "termination")
-        if termination not in (FINITE_TERMINATED, PREFIX_OF_INFINITE, UNKNOWN_TERMINATION):
+        if termination not in (
+            FINITE_TERMINATED,
+            EVENTUALLY_ZERO_INFINITE,
+            PREFIX_OF_INFINITE,
+            UNKNOWN_TERMINATION,
+        ):
             raise ValueError("unknown representation termination status")
         if type(self.query.selection) is Prefix and start != 0:
             raise ValueError("prefix results must start at coefficient zero")
         if type(self.query.selection) is CoefficientAt and start != self.query.selection.index:
             raise ValueError("random-access result start does not match requested index")
         if type(self.query.representation) is PositionalDigits:
+            if termination == FINITE_TERMINATED:
+                raise ValueError("canonical positional representations are infinite even when eventually zero")
             base = self.query.representation.base
             checked_digit_tuple(coefficients, base, "result coefficients")
             checked_digit_tuple(integers, base, "result integer digits")
@@ -734,6 +742,8 @@ class ExpansionResult:
                     raise ValueError("non-authoritative positional results cannot assert a sign")
                 sign = None
         else:
+            if termination == EVENTUALLY_ZERO_INFINITE:
+                raise ValueError("eventually-zero termination is specific to positional representations")
             if integers:
                 raise ValueError("continued-fraction results have no positional integer field")
             if self.sign is not None:
@@ -1367,7 +1377,7 @@ def expected_exact_components(
         full = expansion.prefix(target)
         integers = expansion.integer_digits
         sign: int | None = expansion.sign
-        termination = FINITE_TERMINATED if not expansion.period else PREFIX_OF_INFINITE
+        termination = EVENTUALLY_ZERO_INFINITE if not expansion.period else PREFIX_OF_INFINITE
         derivation = "exact_signed_magnitude_long_division_denotation"
     elif type(expression) is RationalLiteral and type(representation) is SimpleContinuedFraction:
         expansion = rational_continued_fraction(expression.value)
@@ -1449,7 +1459,7 @@ def evaluate_exact_query(
             expansion.prefix(target),
             expansion.integer_digits,
             expansion.sign,
-            FINITE_TERMINATED if not expansion.period else PREFIX_OF_INFINITE,
+            EVENTUALLY_ZERO_INFINITE if not expansion.period else PREFIX_OF_INFINITE,
             "exact_signed_magnitude_long_division_denotation",
         )
     if type(expression) is RationalLiteral and type(representation) is SimpleContinuedFraction:
@@ -2691,6 +2701,7 @@ def audit_identity_equivalence_and_query_separation() -> tuple[int, int, int, in
 
     half_prefix = evaluate_query(base_ten, exact_context())
     assert half_prefix.coefficients == (5, 0, 0, 0, 0, 0, 0, 0)
+    assert half_prefix.termination == EVENTUALLY_ZERO_INFINITE
     assert denotation_provenance(one_half).structural_id not in (
         half_prefix.provenance.query_id,
         half_prefix.provenance.context_id,
@@ -2989,6 +3000,27 @@ def audit_hostile_validation() -> int:
         ),
     )
 
+    terminating_positional = evaluate_query(
+        RepresentationQuery(rational_spec(1, 2), PositionalDigits(10), Prefix(8)),
+        exact_context(),
+    )
+    assert terminating_positional.coefficients == (5, 0, 0, 0, 0, 0, 0, 0)
+    assert terminating_positional.termination == EVENTUALLY_ZERO_INFINITE
+    rejected += must_raise(
+        ValueError,
+        lambda: ExpansionResult(
+            terminating_positional.query,
+            terminating_positional.context,
+            terminating_positional.provenance,
+            terminating_positional.start_index,
+            terminating_positional.coefficients,
+            terminating_positional.integer_digits,
+            terminating_positional.sign,
+            terminating_positional.outcome,
+            FINITE_TERMINATED,
+        ),
+    )
+
     negative_exact = evaluate_query(
         RepresentationQuery(rational_spec(-7, 3), PositionalDigits(10), Prefix(8)),
         exact_context(),
@@ -3067,7 +3099,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "be2ef7cd52e66fefe134c74886f55499aceabbcbcdba66b0a7c4fd82bc6d89a2"
+EXPECTED_DIGEST = "504ff639c122f74e969f43a86e3105b2b1c861c72c75297adec2f70dc9223126"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
