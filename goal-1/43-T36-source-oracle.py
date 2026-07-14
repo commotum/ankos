@@ -2,7 +2,7 @@
 """Fail-closed primary-source audit for T36 digit-reversal arithmetic.
 
 The oracle treats ``src/ca`` as the shared SimplePrograms substrate.  The
-strict construction is a t+0D exact positive integer whose closed unary rule
+strict construction is a t+0D exact nonnegative integer whose closed unary rule
 encodes canonical base-2 digits, reverses that finite word, decodes it, and
 adds the result.  Fixed-width and growing-width Notes variants are explicitly
 tagged profiles; FFT, Walsh, and quasi-Monte-Carlo digit permutations are
@@ -142,7 +142,7 @@ def line_set(spec: str) -> frozenset[int]:
 # closed deliberately.  The partitions are semantic dispositions, not storage
 # classes or requests for family-specific runtime types.
 NATIVE_EVIDENCE = line_set(
-    "1531,1533,1535,1537,1539,1541,1543,1545,1547,1549,1551,1553,"
+    "1497,1531,1533,1535,1537,1539,1541,1543,1545,1547,1549,1551,1553,"
     "12635,12637,12639,12641,12643,12645"
 )
 RELATION_EVIDENCE = line_set(
@@ -265,7 +265,7 @@ INDEX_CLOSURE_QUERIES = {
 
 SOURCE_MODEL_RECORDS = (
     "category:deterministic discrete singleton t+0D transition system",
-    "strict-state:one arbitrary-precision positive integer",
+    "strict-state:one arbitrary-precision nonnegative integer",
     "strict-program:base two and canonical no-leading-zero digit codec",
     "frontier:reuse T34 UniqueScalar selector",
     "neighborhood:reuse complete self read at the unique scalar locus",
@@ -273,15 +273,15 @@ SOURCE_MODEL_RECORDS = (
     "rule-data:closed positional expression nodes rather than callbacks",
     "intermediate:reversed word may have leading zero and need not be canonical",
     "update:reuse same-locus typed assignment and atomic UPDATE",
-    "successor:one deterministic successor for every strict positive state",
-    "growth:reverse contribution is positive so strict state is strictly increasing",
-    "termination:no strict fixed point cycle palindrome halt or visual-period halt",
+    "successor:one deterministic successor for every strict nonnegative state",
+    "growth:zero is fixed and every positive strict state is strictly increasing",
+    "termination:zero fixed point still advances; no palindrome visual-period or positive-state cycle halts",
     "observer:digit rows localized structures crops and widths do not feed back",
     "empirical:effective period four describes visible organization not state equality",
     "empirical:seed512 has no reported repetition through one million steps only",
     "empirical:the million-step value has 568418 base-two digits",
     "generalization:base b at least two changes program identity and must be explicit",
-    "zero-extension:zero requires a declared canonical single-zero convention",
+    "zero:canonical single-zero word is native and reversal-add maps zero to zero",
     "negative-extension:negative values require a declared sign codec and are not strict",
     "fixed-width:width m is immutable program data and left carry is dropped",
     "fixed-width:successor is addition modulo b to the power m",
@@ -309,29 +309,128 @@ SOURCE_MODEL_RECORDS = (
 
 # Filled with immutable observed counts and digests below.  These values bind
 # the result sets rather than merely asserting that searches returned something.
-EXPECTED_QUERY: dict[str, tuple[int, int, int, str]] = {}
-EXPECTED_SET: dict[str, tuple[int, str]] = {}
-EXPECTED_EXCLUDED_CLASS: dict[str, tuple[int, str]] = {}
-EXPECTED_EXCLUDED_LINE_GUARDS: tuple[int, str] = (0, "")
-EXPECTED_INDEX_CLASS: dict[str, tuple[int, str]] = {}
-EXPECTED_INDEX_EXCLUDED_CLASS: dict[str, tuple[int, str]] = {}
-EXPECTED_INDEX_EXCLUDED_GUARDS: tuple[int, str] = (0, "")
-EXPECTED_INDEX_CLOSURE: dict[str, tuple[int, str]] = {}
-EXPECTED_INDEX_CLOSURE_UNION: tuple[int, str] = (0, "")
-EXPECTED_INDEX_GUARDS: tuple[int, str] = (0, "")
-EXPECTED_IMAGE_PARTITION: dict[str, tuple[int, str]] = {}
-EXPECTED_IMAGE_LEDGER: dict[str, tuple[int, str]] = {}
-EXPECTED_IMAGE_ASSET_MANIFEST: tuple[int, str] = (0, "")
-EXPECTED_SOURCE_MODEL: tuple[int, str] = (0, "")
+EXPECTED_QUERY = {
+    "Q00": (0, 0, 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+    "Q01": (3, 3, 0, "08635997ab76f4e35b72b21204a2a13819dada66dc392c0e42036d7f85189948"),
+    "Q02": (5, 5, 0, "c5696196ab3cbd008ad1721b7e9799d83550fb6db87d6c341d3b4c864fc05d85"),
+    "Q03": (5, 5, 0, "6e94494e775dc6de5e6f80d8c913c65bf27b86856aa267e5f39a677711e4ca24"),
+    "Q04": (5, 5, 0, "37969fd28f3527ceb2e0fb3427ea22d903982008920b16b3c8db200c9f4075fb"),
+    "Q05": (7, 7, 0, "cc95a793f6b1137436119dd78e15f68598326d85c0aff16e9870ec4ac2c67a5e"),
+    "Q06": (12, 12, 0, "ac17870d545c255d8f16577260b416bfe2e333d4f774a447422a96b6ce10581e"),
+    "Q07": (2, 2, 0, "062380f8985a37dfde47722d3cba4b3089579dca732b82fe200cf774d7822cf1"),
+    "Q08": (4, 4, 0, "2d7cd9d5c7c3feeac5ed77248d4be27045c3ef71e860a704967688f88c6a0f17"),
+    "Q09": (3, 3, 0, "5e58a32e23e3a9181af5a92e1f644effaf523325dacd73b6b920a82e598c7630"),
+    "Q10": (2, 2, 0, "36f2c919f4aa643e3199a628f354f4f40da6a818d3d7a06a344d505d94a33092"),
+    "Q11": (3, 3, 0, "a51beef587a9032007d252e319f216fb334ab1999d9b2d727acb5a6295d1c436"),
+    "Q12": (25, 10, 15, "0817c58bc380109493f97f38681c478a5535e056f9e7649d07fa4ec27b6d1342"),
+    "Q13": (8, 8, 0, "bc978be5e02e56a91500e8227ec7fda232daa8e9330f6f9bdbbbf70fa14572af"),
+    "Q14": (2, 2, 0, "31b9d54f7b3cf97c5d18e7b42a2f26ef25c42d0f83940e007ca68d4ca6b7e43f"),
+    "Q15": (12, 0, 12, "03f65b7fe356e8639c81c8b3126adea70558c4907fcd09535b40639da7f289ae"),
+    "Q16": (9, 2, 7, "a981824e8619fa467bc1b9abded5903af72d6c63da1300e92e3ca6338ea8214c"),
+    "Q17": (48, 48, 0, "d3e2ac1abedefa903ee8238ff9776ff9ffaacea3dd4b44f36b516afc18176027"),
+}
+EXPECTED_SET = {
+    "union": (124, "cba77ff46ec1aee8eaf91ab28a2a62e7a7e2f3f5a6e5a387598fce56cd22d091"),
+    "pre_index_union": (98, "7035010b90bcfac0d785986543507b90f3e44151e83eb0d5c7b0098a7055f5a4"),
+    "index_candidates": (26, "65b258164a9b12a28f16f029dc057cf265fa7e0b4192bea957251795361d49cb"),
+    "index": (12, "03f65b7fe356e8639c81c8b3126adea70558c4907fcd09535b40639da7f289ae"),
+    "index_excluded": (14, "ac87631a755acf79e4dc36898d557e2b45ff6aa999110f1112abd02fe0add1e7"),
+    "native": (19, "5593d970e131366ac30082624db558c22281ca5496a81231b8a48cfbc3f098d4"),
+    "relation": (19, "42d36affd4f4ff85aee6c153275d85194c5adc36875809c783dabef73dc3263d"),
+    "control": (29, "3f2b64c120a851c7d5dd640ebd12e174654c4c5e0608f29399a1ef593fe62c3f"),
+    "retained": (67, "eb56d21cae4f87ee7e5d6e6201a219930fa4249d8a6602fb27536109e5d57f90"),
+    "excluded": (48, "41c681e4b91c82c9c5fe96848ced1c37530dc206a5f837834c18733ec3380d1c"),
+    "retained_query_hits": (53, "3cab584c09a1ca3cd7febc2cae23f7d39d82a4dce601c926db907bd8c6e71f69"),
+    "governed_continuations": (14, "af77ade209acaa0bd2e0dfe9ecadf11c0dace137d769a7e56025c30c468efab9"),
+}
+EXPECTED_EXCLUDED_CLASS = {
+    "unrelated_positional_code": (9, "d106124c1b13b5b406900cc41cb6a9f51be8cb8c837d9dbc600b9f34b7ac57eb"),
+    "other_machine_or_encoding_code": (13, "9f87c1d7a277eed213dc14e0bf7a5f1ddbcec7d0b1d6b4e605888f33f744331b"),
+    "broad_reverse_or_sequence_syntax_collisions": (26, "b314a4efae203a4b84d6f435afca3312e15a5aea791eed453fe2343fe5c38b9c"),
+}
+EXPECTED_EXCLUDED_LINE_GUARDS = (
+    48,
+    "afed30051c14544ffac4ec8f67c46dd7a2abc7e00bea505216cd1ebb31e8ede6",
+)
+EXPECTED_INDEX_CLASS = {
+    "native_alias_routes": (4, "cf0a5f7afa57841d3230a947cd16cc8acce4451dc32e98ff2be4705db9d98425"),
+    "algorithm_and_history_routes": (8, "68d05383faaf5e20b659bc710032d3f019d147490acb7283ba812438801579f7"),
+}
+EXPECTED_INDEX_EXCLUDED_CLASS = {
+    "recursive_sequence_and_neighbor_column_collisions": (
+        14,
+        "ac87631a755acf79e4dc36898d557e2b45ff6aa999110f1112abd02fe0add1e7",
+    ),
+}
+EXPECTED_INDEX_EXCLUDED_GUARDS = (
+    14,
+    "1b23721c80eb0abf3f7a8fda9a2bbc8bca3ea69ef07bbaa8f4297022f82b2d3e",
+)
+EXPECTED_INDEX_CLOSURE = {
+    "core_system_aliases": (4, "cf0a5f7afa57841d3230a947cd16cc8acce4451dc32e98ff2be4705db9d98425"),
+    "algorithm_aliases": (8, "68d05383faaf5e20b659bc710032d3f019d147490acb7283ba812438801579f7"),
+    "literal_digit_reversal": (7, "2363fb16a70d4ad6039b905e6cc341cde6c7210e277d1955ca29ec6ab2d9a192"),
+    "page905_named_networks": (2, "1622f922824b49aa8f54ff6997542a8b43eec615c2145a4654d1855ff8d8886c"),
+}
+EXPECTED_INDEX_CLOSURE_UNION = (
+    12,
+    "03f65b7fe356e8639c81c8b3126adea70558c4907fcd09535b40639da7f289ae",
+)
+EXPECTED_INDEX_GUARDS = (
+    12,
+    "0357b948bc2a0a795b9a4f2b44660704557b0ac43b1d06c3b12b4ef1ab3da024",
+)
+EXPECTED_IMAGE_PARTITION = {
+    "native": (4, "03d88e9c3761fdc27d9d2c0890650bacd7f5184d62020c04cad2563354b081f4"),
+    "relation": (3, "a988c242ab8946f7a30e9aafdb304b4557702ad8c1193bd6222f07ee5b19f734"),
+    "control": (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+}
+EXPECTED_IMAGE_LEDGER = {
+    "candidate_images": (16, "908f2831353adf6c52b599bd62f8de7971b2f99637c66a041a232a2ca1faa7c0"),
+    "governed_images": (7, "cc95a793f6b1137436119dd78e15f68598326d85c0aff16e9870ec4ac2c67a5e"),
+    "excluded_images": (9, "72aa6b7545f1896ba5ee090fcb050c5d378e2c90898d49c6b3373811ded93689"),
+}
+EXPECTED_IMAGE_ASSET_MANIFEST = (
+    16,
+    "1d1ed2164e5dfb401a7dc1624d06d97cfc546016407029e853db1e4c10b27042",
+)
+EXPECTED_SOURCE_MODEL = (
+    40,
+    "f467eaf992cf3a9ef7f72bc692b739a39e4f104e7d1494d3a707cc8114fbac65",
+)
 
 
 # The split corpus is independently hash-bound before any provenance join.
 EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
-EXPECTED_SPLIT_CROSSWALK: tuple[int, str] = (0, "")
-EXPECTED_SPLIT_CLASSES: dict[str, tuple[int, str, str]] = {}
-EXPECTED_SPLIT_NORMALIZED_MINIMUM = 0.0
+EXPECTED_SPLIT_CROSSWALK = (
+    93,
+    "d898f1518a7ce493e8d4de80f8a07ac4d58289da3171fa82119dc27d3b48414f",
+)
+EXPECTED_SPLIT_CLASSES = {
+    "EXACT": (
+        70,
+        "a40f42973cf86201343553fbc449918bd2f8755a38d8a5d0c9ca59bc155d8248",
+        "9ec89c4b7d0e1b8565b4cc472a52bdfcefc4c22e2259450634a1d185b1eb68bd",
+    ),
+    "IMAGE_BASENAME": (
+        15,
+        "2078c06f5268d09eba452a4de1953238fcbdf68dbc6287d2bd691935c87b0040",
+        "ebc0f90bb8ca8d98975c01200697d0b33c50a0acbca51393e9ad03cedf55f201",
+    ),
+    "NORMALIZED": (
+        4,
+        "57d09fc7507ee4c06f734c6ec8dc4c35c5921590ee2bbed20365fb4553dbcfbd",
+        "2880d34f8c894d078a4391182ce146b610fca85e006b297aa5d554b8ab1c3a9f",
+    ),
+    "STRUCTURAL_REPAIR": (
+        4,
+        "9817851ec26b218860d3f7420fac84780a6f98e88e4932b3589b117e8e5dc98f",
+        "5c686c3bf0635734f8748c07b40991becaa7b5e83b0552a8c59f8429abd78e0e",
+    ),
+}
+EXPECTED_SPLIT_NORMALIZED_MINIMUM = 0.996587
 
 
 EXPECTED_TRACE_16 = (
@@ -482,8 +581,8 @@ def decode_digits(digits: tuple[int, ...], base: int) -> int:
 
 
 def strict_step(n: int, base: int = 2) -> int:
-    if n <= 0:
-        raise ValueError("strict T36 state is positive")
+    if n < 0:
+        raise ValueError("strict T36 state is nonnegative")
     word = encode_digits(n, base)
     return n + decode_digits(tuple(reversed(word)), base)
 
@@ -779,7 +878,8 @@ def main() -> int:
 
     # Primary formula, empirical qualifications, and explicit profile variants.
     main_ok = (
-        "write its base 2 digits in reverse order" in at(1545)
+        "systems that involve only whole numbers" in at(1497)
+        and "write its base 2 digits in reverse order" in at(1545)
         and "add the resulting number to the original one" in at(1545)
         and "starts with the number 16" in at(1545)
         and "After 180 steps" in at(1545)
@@ -815,6 +915,7 @@ def main() -> int:
         encode_digits(0, 2) == (0,)
         and encode_digits(2, 2) == (1, 0)
         and decode_digits((0, 1), 2) == 1
+        and strict_step(0) == 0
         and strict_step(2) == 3
         and strict_step(12, 2) == 15
         and strict_step(12, 10) == 33

@@ -5,7 +5,7 @@ Status: **IN PROGRESS — FIRST-PRINCIPLES CONSTRUCTION RECONSTRUCTED; SOURCE/AS
 ## Current Facts
 
 - T36 is CSV physical line 37, `Digit-Reversal Arithmetic Systems`; `ref/notes/CA-Types.md` section 36 is search vocabulary, not primary evidence.
-- The strict main rule keeps one positive integer: write its canonical base-2 digits in reverse order, interpret that reversed word as an integer, and add it to the old integer (`BOOK:1543-1553`). Seed 16 yields the page-125 pattern; seed 512 yields the page-126 million-step nonrepeating observation.
+- The strict main rule keeps one nonnegative integer: write its canonical base-2 digits in reverse order, interpret that reversed word as an integer, and add it to the old integer (`BOOK:1497`, `BOOK:12503`, `BOOK:1543-1553`, `BOOK:12635-12643`). Seed 16 yields the page-125 pattern; seed 512 yields the page-126 million-step nonrepeating observation. The showcased positive seeds do not impose a positive-only carrier.
 - The Notes state the operation as `n -> n + FromDigits[Reverse[IntegerDigits[n,2]],2]`, despite extraction damage that inserts spaces into `FromDigits` and `IntegerDigits` (`BOOK:12635-12643`).
 - Strict T36 therefore has a discrete `t+0D` exact-integer configuration. The canonical digit word is a lossless, rule-visible presentation of that integer, not automatically a second native state or a `t+1D` lattice.
 - Base choice is semantically required because digit reversal depends on positional representation. The strict source fixes base 2; the History note mentions similar base-10 systems, while arbitrary `b >= 2` remains an explicit validated generalization. Base is program data, not DOMAIN, configuration topology, or hidden executor dispatch.
@@ -15,12 +15,12 @@ Status: **IN PROGRESS — FIRST-PRINCIPLES CONSTRUCTION RECONSTRUCTED; SOURCE/AS
 - T34 already owns the arbitrary-precision exact integer carrier, positional codecs, discrete `t+0D` singleton, `UniqueScalar` frontier, self read, same-locus assignment, atomic UPDATE, traces, and common outcomes.
 - T35 confirms that a closed rule schema over that scalar event does not justify a construction-named state, assignment, UPDATE, executor, or rollout branch. T36 adds closed positional codec/transform expression nodes and explicit width policies.
 - T43's former statement that “digits are the evolving finite word” overstates the strict source. A finite word is a lossless canonical representation of strict state; only profiles whose width or leading zeros affect later events require the word or an equivalent `(value,width)` product in complete configuration.
-- Strict positive evolution is strictly increasing, so it has no scalar fixed points or cycles. The Notes' “effective period of 4” describes visible digit-pattern organization, not native configuration equality or halting.
+- Zero is the native canonical word `[0]` and performs the ordinary event `0 -> 0`; it is a fixed point, not a halt. Every positive strict state is strictly increasing, so the positive subset has no fixed points or cycles. The Notes' “effective period of 4” describes visible digit-pattern organization, not native configuration equality or halting.
 
 ## Updated Assumptions
 
-- **Retained:** strict state is a positive arbitrary-precision integer and strict base is 2. Zero, arbitrary `b >= 2`, and any broader carrier are explicit extensions requiring separate validation and identity.
-- **Retained:** strict encoding uses the unique canonical base-2 word with no leading zeros. A generalized codec declares `b >= 2` and an explicit `[0]` convention for an admitted zero extension.
+- **Retained:** strict state is a nonnegative arbitrary-precision integer and strict base is 2. Arbitrary `b >= 2`, signed values, and any broader carrier are explicit extensions requiring separate validation and identity.
+- **Retained:** strict encoding uses the unique canonical base-2 word: `[0]` for zero and otherwise no leading zeros. A generalized codec declares `b >= 2` and retains the same explicit zero convention.
 - **Retained:** `ReverseDigits` is a closed structural RULE node composed with exact `EncodeDigits`, `DecodeDigits`, and `Add`, never an unrestricted callback.
 - **Retained:** every claimed scalar/word equivalence must preserve the complete old state, exact successor, event count, outcomes, and trace one event at a time.
 - **Retained:** fixed width can remain immutable program data when it never changes; growing width must be visible in configuration or in a lossless word representation because equal integers with different widths can have different successors.
@@ -44,7 +44,7 @@ Reconstruct T36 from primary evidence as a closed positional-representation unar
 
 ## Initial Construction Model
 
-The reusable generalized profile below declares `b >= 2`; strict T36 instantiates `b=2` and a positive carrier:
+The reusable generalized profile below declares `b >= 2`; strict T36 instantiates `b=2` and the nonnegative carrier:
 
 ```text
 CanonicalDigits_b : NonnegativeInteger <-> CanonicalDigitWord_b
@@ -57,7 +57,7 @@ writes = Assign(active, F_b(n))
 next   = AtomicAssign.apply(configuration, active, writes)
 ```
 
-The generalized codec is bijective between nonnegative integers and canonical words (`[0]` for zero; otherwise first digit nonzero). `Reverse` need not remain inside the canonical-word image, so decoding accepts a finite base-valid word with leading zeros. The composite still denotes a total exact scalar map; strict conformance exercises its positive base-2 restriction.
+The generalized codec is bijective between nonnegative integers and canonical words (`[0]` for zero; otherwise first digit nonzero). `Reverse` need not remain inside the canonical-word image, so decoding accepts a finite base-valid word with leading zeros. The composite still denotes a total exact scalar map; strict conformance exercises its nonnegative base-2 restriction.
 
 On canonical words, `H_b(w) = EncodeCanonical_b(Decode_b(w) + Decode_b(Reverse(w)))` gives the exact one-step commuting square `H_b(EncodeCanonical_b(n)) = EncodeCanonical_b(F_b(n))`. Thus canonical scalar and word configurations are class-3 lossless representations on the invariant-valid image, not different constructions.
 
@@ -82,7 +82,7 @@ Erasing width is not lossless: base-2 words `1` and `01` both decode to numeric 
 
 | Responsibility | Provisional class | Smallest reusable construction | T36 delta to test |
 |---|---:|---|---|
-| DOMAIN/configuration | 1/2/3 | T34 exact discrete `t+0D` singleton | Strict positive carrier/base 2; zero/general-base siblings explicit; optional width product only where width is semantic |
+| DOMAIN/configuration | 1/2/3 | T34 exact discrete `t+0D` singleton | Strict nonnegative carrier/base 2; general-base and signed siblings explicit; optional width product only where width is semantic |
 | FRONTIER/read | 1 | T34 `UniqueScalar` plus self read | No T36 selector or neighborhood |
 | RULE syntax | 2 | D069 closed unary RULE algebra | Typed positional encode/reverse/decode/add nodes and explicit base/width policy |
 | Write/UPDATE | 1 | T34 same-locus assignment and atomic UPDATE | No T36 assignment or UPDATE |
@@ -96,7 +96,7 @@ No current evidence requires a genuinely different execution algebra. The likely
 
 1. Build a redundant source-query union covering reversal-add, reverse/digit/base/leading-zero/carry terms, main captions, Notes, Index, history, positional codecs, FFT/digit-reversal sequences, and false-positive mathematical digit reversal.
 2. Reverse-close every monolith hit and retained continuation to structural split owners; bind every referenced image by exact path/size/SHA and disposition it as native, relation, control, or exclusion.
-3. Reproduce source-pinned prefixes for seeds 16 and 512, digit lengths, canonical encoding, and any exact checkpoints recoverable from text or governed rasters without inventing pixel semantics.
+3. Independently compute frozen prefixes for the source-pinned seeds 16 and 512, verify the stated digit-length and growth claims, and admit no raster-derived numeric checkpoint without an explicit transcription boundary.
 4. Exhaustively commute direct scalar events with the generic unary runner across bases, leading/trailing-zero cases, arbitrary-precision values, fixed-width/drop-carry cases, and growing-width product/word representations.
 5. Prove the information-loss counterexample for erasing semantic width: two configurations with equal numeric value but different preserved widths can reverse to different decoded values.
 6. Reject malformed digits, base below two, negative values without a declared sign codec, overflow/truncation outside the fixed-width profile, forged witnesses, cross-program events, callbacks, implicit host-width behavior, and digest-only identity.
