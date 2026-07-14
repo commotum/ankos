@@ -117,7 +117,7 @@ Final frozen counts, digests, snapshot hashes, source-oracle SHA, and unresolved
 
 ## Asset Audit
 
-`40-T32-asset-oracle.py` will bind the exact native/relation/control raster universe, monolith and split references, physical paths, byte sizes, dimensions, SHA-256 values, paired assemblies, and evidence boundaries. The page-215 pattern plate, pages 216–217 171-family catalog, and page-941 32-template catalog are expected native candidates; T31 and T33 plates are relations/controls. Complete semantic transcription is not assumed.
+`40-T32-asset-oracle.py` will bind the exact native/relation/control raster universe, monolith and split references, physical paths, byte sizes, dimensions, SHA-256 values, paired assemblies, and evidence boundaries. The printed-page-213 example plate, pages 214–215 171-family catalog, and page-941 32-template catalog are expected native candidates; T31 and T33 plates are relations/controls. Complete semantic transcription is not assumed.
 
 Final governed counts, manifest SHA, limited-transcription boundary, and unresolved visual facts are pending the independent asset audit.
 

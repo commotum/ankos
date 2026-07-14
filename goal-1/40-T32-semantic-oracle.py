@@ -34,8 +34,14 @@ independent native-cross and generic-offset verifiers; exhaustive bounded
 commutation; a reversible cross-matrix codec; exact overlap checks; wrapped
 alias-occurrence tests; orientation-versus-histogram counterexamples; explicit
 scope and pointwise-model identity checks; verifier/solver separation; and
-hostile validation.  It is dependency-free, deterministic, portable outside
-the repository root, silent on import, and fails closed under ``python -O``.
+hostile validation.  It additionally exhausts the complete 1,024-member
+binary cardinal T31 relation space, proves a checked compact-histogram / exact-
+template round trip and direct-verifier commutation, and proves simultaneous
+C4 rotation of support, templates, models, and violation reports.  Rotation is
+an explicit observer/transform: it is neither implicit template matching nor
+pointwise model equality.  The oracle is dependency-free, deterministic,
+portable outside the repository root, silent on import, and fails closed under
+``python -O``.
 
 Deliberately open source matters are recorded below rather than guessed: the
 raster-only order behind BOOK:14050's numeric constraint codec, the complete
@@ -59,6 +65,7 @@ if not __debug__:
 Coord2 = tuple[int, int]
 Offset2 = tuple[int, int]
 Template = tuple[int, ...]
+Histogram = tuple[int, ...]
 Tile = tuple[tuple[int, ...], ...]
 ValueTable = tuple[tuple[Coord2, int], ...]
 
@@ -205,6 +212,155 @@ class AllowedOrientedTemplates:
         return checked in self.allowed
 
 
+def checked_neighbor_offsets(value: object) -> tuple[Offset2, ...]:
+    raw = exact_tuple(value, "neighbor footprint")
+    if not raw:
+        raise ValueError("neighbor footprint must be nonempty")
+    offsets = tuple(checked_coord(item, "neighbor offset") for item in raw)
+    if (0, 0) in offsets:
+        raise ValueError("center is conditioned separately and cannot be a neighbor offset")
+    if len(set(offsets)) != len(offsets):
+        raise ValueError("neighbor footprint contains a duplicate offset")
+    return offsets
+
+
+def checked_histogram(
+    value: object,
+    alphabet_size: int,
+    degree: int,
+    *,
+    name: str = "histogram",
+) -> Histogram:
+    raw = exact_tuple(value, name)
+    if len(raw) != alphabet_size:
+        raise ValueError(f"{name} must contain one count per alphabet value")
+    counts = tuple(exact_int(item, f"{name} count") for item in raw)
+    if any(count < 0 for count in counts):
+        raise ValueError(f"{name} counts must be nonnegative")
+    if sum(counts) != degree:
+        raise ValueError(f"{name} counts must sum to neighbor degree {degree}")
+    return counts
+
+
+def all_histograms(alphabet_size: int, degree: int) -> tuple[Histogram, ...]:
+    size = checked_alphabet_size(alphabet_size)
+    checked_degree = exact_int(degree, "neighbor degree")
+    if checked_degree <= 0:
+        raise ValueError("neighbor degree must be positive")
+    return tuple(
+        counts
+        for counts in product(range(checked_degree + 1), repeat=size)
+        if sum(counts) == checked_degree
+    )
+
+
+@dataclass(frozen=True)
+class CenterConditionedHistogram:
+    """Closed T31 relation: center label selects allowed neighbor histograms."""
+
+    alphabet_size: int
+    neighbor_offsets: tuple[Offset2, ...]
+    allowed_by_center: tuple[tuple[Histogram, ...], ...]
+
+    def __post_init__(self) -> None:
+        size = checked_alphabet_size(self.alphabet_size)
+        offsets = checked_neighbor_offsets(self.neighbor_offsets)
+        raw_rows = exact_tuple(self.allowed_by_center, "center-conditioned rows")
+        if len(raw_rows) != size:
+            raise ValueError("there must be exactly one allowed row per center label")
+        rows: list[tuple[Histogram, ...]] = []
+        for center, raw_row in enumerate(raw_rows):
+            row = exact_tuple(raw_row, f"allowed row for center {center}")
+            checked = tuple(
+                checked_histogram(
+                    item,
+                    size,
+                    len(offsets),
+                    name=f"allowed histogram for center {center}",
+                )
+                for item in row
+            )
+            if len(set(checked)) != len(checked):
+                raise ValueError("center-conditioned row contains a duplicate histogram")
+            rows.append(tuple(sorted(checked)))
+        object.__setattr__(self, "neighbor_offsets", offsets)
+        object.__setattr__(self, "allowed_by_center", tuple(rows))
+
+    def contains(self, center: object, histogram: object) -> bool:
+        checked_center = checked_label(center, self.alphabet_size, "center label")
+        checked = checked_histogram(
+            histogram,
+            self.alphabet_size,
+            len(self.neighbor_offsets),
+            name="observed histogram",
+        )
+        return checked in self.allowed_by_center[checked_center]
+
+
+def histogram_of(values: object, alphabet_size: int) -> Histogram:
+    raw = exact_tuple(values, "neighbor values")
+    size = checked_alphabet_size(alphabet_size)
+    labels = tuple(
+        checked_label(item, size, f"neighbor value {index}")
+        for index, item in enumerate(raw)
+    )
+    return tuple(labels.count(label) for label in range(size))
+
+
+def compile_histogram_relation(
+    compact: CenterConditionedHistogram,
+) -> AllowedOrientedTemplates:
+    """Exhaustively lower T31 data; center is the final compiled slot."""
+
+    if type(compact) is not CenterConditionedHistogram:
+        raise TypeError("histogram compiler requires CenterConditionedHistogram")
+    offsets = compact.neighbor_offsets + ((0, 0),)
+    allowed: list[Template] = []
+    for word in all_words(compact.alphabet_size, len(offsets)):
+        neighbor_values = word[:-1]
+        center = word[-1]
+        if compact.contains(center, histogram_of(neighbor_values, compact.alphabet_size)):
+            allowed.append(word)
+    return AllowedOrientedTemplates(compact.alphabet_size, offsets, tuple(allowed))
+
+
+def recover_histogram_relation(
+    compiled: AllowedOrientedTemplates,
+) -> CenterConditionedHistogram:
+    """Checked inverse on the histogram-invariant image of the compiler."""
+
+    if type(compiled) is not AllowedOrientedTemplates:
+        raise TypeError("histogram recovery requires AllowedOrientedTemplates")
+    if compiled.offsets[-1] != (0, 0) or (0, 0) in compiled.offsets[:-1]:
+        raise ValueError("compiled histogram form requires one final center slot")
+    neighbor_offsets = compiled.offsets[:-1]
+    rows: list[tuple[Histogram, ...]] = []
+    words = all_words(compiled.alphabet_size, len(compiled.offsets))
+    allowed = set(compiled.allowed)
+    for center in range(compiled.alphabet_size):
+        accepted_histograms: list[Histogram] = []
+        for histogram in all_histograms(compiled.alphabet_size, len(neighbor_offsets)):
+            group = tuple(
+                word
+                for word in words
+                if word[-1] == center
+                and histogram_of(word[:-1], compiled.alphabet_size) == histogram
+            )
+            membership = {word in allowed for word in group}
+            if len(membership) != 1:
+                raise ValueError(
+                    "oriented membership is not invariant under neighbor permutations"
+                )
+            if True in membership:
+                accepted_histograms.append(histogram)
+        rows.append(tuple(accepted_histograms))
+    return CenterConditionedHistogram(
+        compiled.alphabet_size,
+        neighbor_offsets,
+        tuple(rows),
+    )
+
+
 def book_cross_relation(allowed: object) -> AllowedOrientedTemplates:
     return AllowedOrientedTemplates(2, BOOK_CROSS_OFFSETS, exact_tuple(allowed, "allowed"))
 
@@ -334,6 +490,56 @@ def direct_verify_periodic(native: NativeBinaryTorus, allowed: frozenset[Templat
         for column in range(width):
             observed = direct_cross_at(native, (row, column))
             if observed not in allowed:
+                violations.append(DirectViolation((row, column), observed))
+    return DirectReport(height * width, tuple(violations))
+
+
+def direct_count_word_at(native: NativeBinaryTorus, anchor: object) -> Template:
+    """Independent T31 read in compiled order: N, W, E, S, then center."""
+
+    if type(native) is not NativeBinaryTorus:
+        raise TypeError("direct count verifier requires NativeBinaryTorus")
+    row, column = checked_coord(anchor, "count anchor")
+    height, width = native.shape
+    rows = native.rows
+    return (
+        rows[(row - 1) % height][column % width],
+        rows[row % height][(column - 1) % width],
+        rows[row % height][(column + 1) % width],
+        rows[(row + 1) % height][column % width],
+        rows[row % height][column % width],
+    )
+
+
+def direct_verify_count_periodic(
+    native: NativeBinaryTorus,
+    compact: CenterConditionedHistogram,
+) -> DirectReport:
+    """Direct count semantics; it never calls the template compiler/verifier."""
+
+    if type(native) is not NativeBinaryTorus:
+        raise TypeError("direct count verifier requires NativeBinaryTorus")
+    if type(compact) is not CenterConditionedHistogram:
+        raise TypeError("direct count verifier requires CenterConditionedHistogram")
+    if compact.alphabet_size != 2:
+        raise ValueError("native binary direct count verifier requires alphabet size two")
+    if compact.neighbor_offsets != (
+        (-1, 0),
+        (0, -1),
+        (0, 1),
+        (1, 0),
+    ):
+        raise ValueError("native direct count verifier requires the four cardinal slots")
+    height, width = native.shape
+    violations: list[DirectViolation] = []
+    for row in range(height):
+        for column in range(width):
+            observed = direct_count_word_at(native, (row, column))
+            histogram = (
+                observed[:-1].count(0),
+                observed[:-1].count(1),
+            )
+            if not compact.contains(observed[-1], histogram):
                 violations.append(DirectViolation((row, column), observed))
     return DirectReport(height * width, tuple(violations))
 
@@ -530,6 +736,120 @@ def periodic_equal(left: PeriodicPresentation, right: PeriodicPresentation) -> b
         for row in range(height)
         for column in range(width)
     )
+
+
+def checked_quarter_turns(value: object) -> int:
+    turns = exact_int(value, "quarter turns")
+    if turns < 0 or turns > 3:
+        raise ValueError("quarter turns must be one of 0, 1, 2, 3")
+    return turns
+
+
+def rotate_coordinate(value: object, quarter_turns: object) -> Coord2:
+    """Apply an orientation-preserving determinant-+1 square rotation."""
+
+    row, column = checked_coord(value, "rotation coordinate")
+    turns = checked_quarter_turns(quarter_turns)
+    for _ in range(turns):
+        row, column = -column, row
+    return (row, column)
+
+
+def rotate_cross_template(template: object, quarter_turns: object) -> Template:
+    checked = checked_template(template, 2, 5, name="cross template")
+    turns = checked_quarter_turns(quarter_turns)
+    values_by_rotated_offset = {
+        rotate_coordinate(offset, turns): label
+        for offset, label in zip(BOOK_CROSS_OFFSETS, checked)
+    }
+    assert set(values_by_rotated_offset) == set(BOOK_CROSS_OFFSETS)
+    return tuple(values_by_rotated_offset[offset] for offset in BOOK_CROSS_OFFSETS)
+
+
+def rotate_cross_relation(
+    relation: AllowedOrientedTemplates,
+    quarter_turns: object,
+) -> AllowedOrientedTemplates:
+    if type(relation) is not AllowedOrientedTemplates:
+        raise TypeError("relation rotation requires AllowedOrientedTemplates")
+    if relation.alphabet_size != 2 or relation.offsets != BOOK_CROSS_OFFSETS:
+        raise ValueError("strict cross rotation requires the binary Book cross profile")
+    turns = checked_quarter_turns(quarter_turns)
+    return book_cross_relation(
+        tuple(rotate_cross_template(template, turns) for template in relation.allowed)
+    )
+
+
+def rotate_periodic(
+    presentation: PeriodicPresentation,
+    quarter_turns: object,
+) -> PeriodicPresentation:
+    """Rotate the exact total field: Y[q] = X[R^-1 q]."""
+
+    if type(presentation) is not PeriodicPresentation:
+        raise TypeError("model rotation requires PeriodicPresentation")
+    turns = checked_quarter_turns(quarter_turns)
+    source_height, source_width = presentation.periods
+    target_height, target_width = (
+        (source_height, source_width)
+        if turns % 2 == 0
+        else (source_width, source_height)
+    )
+    inverse_turns = (-turns) % 4
+    tile = tuple(
+        tuple(
+            presentation.value_at(
+                rotate_coordinate((row, column), inverse_turns)
+            )
+            for column in range(target_width)
+        )
+        for row in range(target_height)
+    )
+    return PeriodicPresentation(presentation.alphabet_size, tile)
+
+
+def rotated_report_signature(
+    report: Verification,
+    quarter_turns: object,
+    target_periods: object,
+) -> tuple[tuple[Coord2, Template], ...]:
+    if type(report) is not Verification:
+        raise TypeError("report rotation requires Verification")
+    turns = checked_quarter_turns(quarter_turns)
+    raw_periods = exact_tuple(target_periods, "target periods")
+    if len(raw_periods) != 2:
+        raise ValueError("target periods must contain height and width")
+    height = exact_int(raw_periods[0], "target period height")
+    width = exact_int(raw_periods[1], "target period width")
+    if height <= 0 or width <= 0:
+        raise ValueError("target periods must be positive")
+    entries = []
+    for violation in report.violations:
+        row, column = rotate_coordinate(violation.anchor, turns)
+        entries.append(
+            (
+                (row % height, column % width),
+                rotate_cross_template(violation.observed, turns),
+            )
+        )
+    return tuple(sorted(entries))
+
+
+def report_signature(report: Verification) -> tuple[tuple[Coord2, Template], ...]:
+    if type(report) is not Verification:
+        raise TypeError("report signature requires Verification")
+    return tuple(sorted((item.anchor, item.observed) for item in report.violations))
+
+
+def same_rotation_orbit(
+    left: PeriodicPresentation,
+    right: PeriodicPresentation,
+) -> bool:
+    """Explicit observer; this does not alter pointwise model equality."""
+
+    if type(left) is not PeriodicPresentation or type(right) is not PeriodicPresentation:
+        raise TypeError("rotation-orbit comparison requires periodic presentations")
+    return any(periodic_equal(rotate_periodic(left, turns), right) for turns in range(4))
 
 
 @dataclass(frozen=True)
@@ -730,6 +1050,98 @@ def direct_allowed_profiles() -> tuple[frozenset[Template], ...]:
     )
 
 
+CARDINAL_NEIGHBOR_OFFSETS: tuple[Offset2, ...] = (
+    (-1, 0),
+    (0, -1),
+    (0, 1),
+    (1, 0),
+)
+BINARY_DEGREE4_HISTOGRAMS: tuple[Histogram, ...] = all_histograms(2, 4)
+
+
+def binary_count_relation(row_zero_mask: object, row_one_mask: object) -> CenterConditionedHistogram:
+    masks = (
+        exact_int(row_zero_mask, "center-zero mask"),
+        exact_int(row_one_mask, "center-one mask"),
+    )
+    if any(mask < 0 or mask >= 2 ** len(BINARY_DEGREE4_HISTOGRAMS) for mask in masks):
+        raise ValueError("binary degree-four histogram mask is outside 0..31")
+    rows = tuple(
+        tuple(
+            histogram
+            for index, histogram in enumerate(BINARY_DEGREE4_HISTOGRAMS)
+            if mask & (1 << index)
+        )
+        for mask in masks
+    )
+    return CenterConditionedHistogram(2, CARDINAL_NEIGHBOR_OFFSETS, rows)
+
+
+def audit_histogram_compilation() -> tuple[int, int, int, int, int]:
+    """Prove T31 direct-count semantics commute with the lossless T32 lowering."""
+
+    exhaustive_relations = 0
+    recovery_round_trips = 0
+    commutations = 0
+    local_checks = 0
+    two_by_two_models = native_tiles(2, 2)
+    for row_zero_mask in range(32):
+        for row_one_mask in range(32):
+            compact = binary_count_relation(row_zero_mask, row_one_mask)
+            compiled = compile_histogram_relation(compact)
+            recovered = recover_histogram_relation(compiled)
+            assert recovered == compact
+            assert compile_histogram_relation(recovered) == compiled
+            exhaustive_relations += 1
+            recovery_round_trips += 1
+            for native in two_by_two_models:
+                direct = direct_verify_count_periodic(native, compact)
+                generic = generic_verify_periodic(encode_native(native), compiled)
+                assert normalized_direct(direct) == normalized_generic(generic)
+                commutations += 1
+                local_checks += direct.checked_anchors
+
+    adversarial_masks = (
+        (0, 0),
+        (31, 31),
+        (1, 16),
+        (4, 4),
+        (10, 21),
+        (31, 0),
+        (0, 31),
+        (5, 18),
+    )
+    for height, width in ((1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 2), (3, 3)):
+        for native in native_tiles(height, width):
+            for row_zero_mask, row_one_mask in adversarial_masks:
+                compact = binary_count_relation(row_zero_mask, row_one_mask)
+                compiled = compile_histogram_relation(compact)
+                direct = direct_verify_count_periodic(native, compact)
+                generic = generic_verify_periodic(encode_native(native), compiled)
+                assert normalized_direct(direct) == normalized_generic(generic)
+                commutations += 1
+                local_checks += direct.checked_anchors
+
+    oriented = AllowedOrientedTemplates(
+        2,
+        CARDINAL_NEIGHBOR_OFFSETS + ((0, 0),),
+        ((1, 0, 1, 0, 0),),
+    )
+    expect_raises(ValueError, lambda: recover_histogram_relation(oriented))
+
+    assert exhaustive_relations == 1_024
+    assert recovery_round_trips == 1_024
+    assert commutations == 21_712
+    assert local_checks == 109_200
+    return (
+        exhaustive_relations,
+        recovery_round_trips,
+        commutations,
+        local_checks,
+        1,
+    )
+
+
 def audit_source_claims() -> int:
     root = Path(__file__).resolve().parents[1]
     book = root / "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md"
@@ -821,6 +1233,91 @@ def audit_exact_coverage_and_orientation() -> tuple[int, int, int]:
         assert not generic_verify_periodic(encode_native(native), empty).satisfied
 
     return singleton_accepts, singleton_rejects, 1
+
+
+def audit_rotation_commutation_and_orbits() -> tuple[int, int, int, int, int]:
+    """Rotate support, exact templates, models, and full violation reports together."""
+
+    profiles = direct_allowed_profiles()
+    symmetry_commutations = 0
+    symmetry_local_checks = 0
+    support_transforms = 0
+    for turns in (1, 2, 3):
+        transformed = tuple(
+            rotate_coordinate(offset, turns) for offset in BOOK_CROSS_OFFSETS
+        )
+        assert set(transformed) == set(BOOK_CROSS_OFFSETS)
+        assert len(set(transformed)) == 5
+        support_transforms += 1
+
+    for height, width in ((1, 1), (1, 2), (2, 1), (2, 2), (2, 3), (3, 2), (3, 3)):
+        for native in native_tiles(height, width):
+            model = encode_native(native)
+            for allowed in profiles:
+                relation = book_cross_relation(tuple(allowed))
+                original = generic_verify_periodic(model, relation)
+                for turns in (1, 2, 3):
+                    rotated_model = rotate_periodic(model, turns)
+                    rotated_relation = rotate_cross_relation(relation, turns)
+                    rotated = generic_verify_periodic(rotated_model, rotated_relation)
+                    assert rotated.checked_anchors == original.checked_anchors
+                    assert rotated.satisfied == original.satisfied
+                    assert rotated.proves_global_model == original.proves_global_model
+                    assert report_signature(rotated) == rotated_report_signature(
+                        original,
+                        turns,
+                        rotated_model.periods,
+                    )
+                    assert rotate_periodic(rotated_model, (4 - turns) % 4) == model
+                    assert rotate_cross_relation(
+                        rotated_relation, (4 - turns) % 4
+                    ) == relation
+                    symmetry_commutations += 1
+                    symmetry_local_checks += rotated.checked_anchors
+
+    oriented = (1, 0, 0, 1, 0)
+    rotated_oriented = rotate_cross_template(oriented, 1)
+    assert rotated_oriented != oriented
+    original_relation = book_cross_relation((oriented,))
+    rotated_relation = rotate_cross_relation(original_relation, 1)
+    assert verify_open(patch_for_cross(oriented), original_relation).satisfied
+    assert not verify_open(
+        patch_for_cross(rotated_oriented), original_relation
+    ).satisfied
+    assert verify_open(
+        patch_for_cross(rotated_oriented), rotated_relation
+    ).satisfied
+    implicit_rotation_rejections = 1
+
+    asymmetric = PeriodicPresentation(
+        2,
+        (
+            (1, 0, 0),
+            (0, 0, 0),
+        ),
+    )
+    quarter_rotated = rotate_periodic(asymmetric, 1)
+    assert asymmetric.periods == (2, 3)
+    assert quarter_rotated.periods == (3, 2)
+    assert not periodic_equal(asymmetric, quarter_rotated)
+    assert same_rotation_orbit(asymmetric, quarter_rotated)
+    assert generic_verify_periodic(
+        asymmetric, book_cross_relation(BINARY_TEMPLATES)
+    ).satisfied
+    assert generic_verify_periodic(
+        quarter_rotated, book_cross_relation(BINARY_TEMPLATES)
+    ).satisfied
+    explicit_orbit_witnesses = 1
+
+    assert symmetry_commutations == 15_984
+    assert symmetry_local_checks == 130_992
+    return (
+        support_transforms,
+        symmetry_commutations,
+        symmetry_local_checks,
+        implicit_rotation_rejections,
+        explicit_orbit_witnesses,
+    )
 
 
 def audit_alias_and_overlap() -> tuple[int, int, int, int]:
@@ -1004,14 +1501,33 @@ def audit_hostile_validation() -> int:
         (ValueError, lambda: matrix_to_cross(((1, 0, None), (0, 0, 1), (None, 0, None)))),
         (TypeError, lambda: occurrences_overlap_consistent([], book_cross_relation(BINARY_TEMPLATES), (1, 1))),
         (ValueError, lambda: occurrence_assignment(ClaimedOccurrence((0, 0), (0,) * 5), book_cross_relation(BINARY_TEMPLATES), (0, 1))),
+        (TypeError, lambda: CenterConditionedHistogram(True, CARDINAL_NEIGHBOR_OFFSETS, ())),
+        (ValueError, lambda: CenterConditionedHistogram(0, CARDINAL_NEIGHBOR_OFFSETS, ())),
+        (TypeError, lambda: CenterConditionedHistogram(2, list(CARDINAL_NEIGHBOR_OFFSETS), ((), ()))),
+        (ValueError, lambda: CenterConditionedHistogram(2, (), ((), ()))),
+        (ValueError, lambda: CenterConditionedHistogram(2, ((0, 0),), ((), ()))),
+        (ValueError, lambda: CenterConditionedHistogram(2, ((1, 0), (1, 0)), ((), ()))),
+        (TypeError, lambda: CenterConditionedHistogram(2, CARDINAL_NEIGHBOR_OFFSETS, [(), ()])),
+        (ValueError, lambda: CenterConditionedHistogram(2, CARDINAL_NEIGHBOR_OFFSETS, ((),))),
+        (ValueError, lambda: CenterConditionedHistogram(2, CARDINAL_NEIGHBOR_OFFSETS, ((((4,),)), ()))),
+        (ValueError, lambda: CenterConditionedHistogram(2, CARDINAL_NEIGHBOR_OFFSETS, ((((5, -1),)), ()))),
+        (ValueError, lambda: CenterConditionedHistogram(2, CARDINAL_NEIGHBOR_OFFSETS, ((((3, 0),)), ()))),
+        (ValueError, lambda: CenterConditionedHistogram(2, CARDINAL_NEIGHBOR_OFFSETS, ((((4, 0), (4, 0))), ()) )),
+        (TypeError, lambda: compile_histogram_relation(book_cross_relation(()))),
+        (ValueError, lambda: recover_histogram_relation(book_cross_relation(((1, 0, 0, 1, 0),)))),
+        (TypeError, lambda: rotate_coordinate((0, 0), True)),
+        (ValueError, lambda: rotate_coordinate((0, 0), 4)),
+        (ValueError, lambda: rotate_cross_relation(AllowedOrientedTemplates(2, ((0, 0),), ((0,),)), 1)),
+        (TypeError, lambda: same_rotation_orbit(PeriodicPresentation(2, ((0,),)), object())),
     )
     for exception, function in hostile:
         expect_raises(exception, function)
     return len(hostile)
 
 
-def audit_no_transition_surface() -> tuple[int, int]:
+def audit_no_transition_surface() -> tuple[int, int, int]:
     relation_fields = {item.name for item in fields(AllowedOrientedTemplates)}
+    histogram_fields = {item.name for item in fields(CenterConditionedHistogram)}
     verification_fields = {item.name for item in fields(Verification)}
     forbidden = {
         "seed",
@@ -1026,18 +1542,24 @@ def audit_no_transition_surface() -> tuple[int, int]:
         "control",
     }
     assert relation_fields.isdisjoint(forbidden)
+    assert histogram_fields.isdisjoint(forbidden)
     assert verification_fields.isdisjoint(forbidden)
     assert relation_fields == {"alphabet_size", "offsets", "allowed"}
+    assert histogram_fields == {
+        "alphabet_size",
+        "neighbor_offsets",
+        "allowed_by_center",
+    }
     assert verification_fields == {
         "scope",
         "checked_anchors",
         "violations",
         "proves_global_model",
     }
-    return len(relation_fields), len(verification_fields)
+    return len(relation_fields), len(histogram_fields), len(verification_fields)
 
 
-EXPECTED_DIGEST = "4a8f3e8c2ecc2ba85fab1aebc59e64aebd608428ca999e2050dc2bb7e56a7260"
+EXPECTED_DIGEST = "8ab537fee80030d4c5a86c7ddbc7197094b8f915ad788405d959c5447e31669a"
 
 
 def main() -> None:
@@ -1046,16 +1568,32 @@ def main() -> None:
     configurations, commutations, local_checks, representation_round_trips = (
         audit_exhaustive_commutation()
     )
+    (
+        histogram_relations,
+        histogram_round_trips,
+        histogram_commutations,
+        histogram_local_checks,
+        oriented_recovery_rejections,
+    ) = audit_histogram_compilation()
     singleton_accepts, singleton_rejects, orientation_counterexamples = (
         audit_exact_coverage_and_orientation()
     )
+    (
+        support_transforms,
+        symmetry_commutations,
+        symmetry_local_checks,
+        implicit_rotation_rejections,
+        explicit_orbit_witnesses,
+    ) = audit_rotation_commutation_and_orbits()
     alias_cases, extracted, overlap_conflicts, alias_conflicts = audit_alias_and_overlap()
     scope_cases, identity_cases, sat_explored, unknown_explored, t33_boundaries = (
         audit_scopes_identity_and_solver()
     )
     larger_arity, larger_alphabet = audit_general_footprint_parameterization()
     hostile = audit_hostile_validation()
-    relation_field_count, verification_field_count = audit_no_transition_surface()
+    relation_field_count, histogram_field_count, verification_field_count = (
+        audit_no_transition_surface()
+    )
 
     facts = (
         ("source_claims", source_claims),
@@ -1067,9 +1605,19 @@ def main() -> None:
         ("commutations", commutations),
         ("local_checks", local_checks),
         ("representation_round_trips", representation_round_trips),
+        ("histogram_relations", histogram_relations),
+        ("histogram_round_trips", histogram_round_trips),
+        ("histogram_commutations", histogram_commutations),
+        ("histogram_local_checks", histogram_local_checks),
+        ("oriented_recovery_rejections", oriented_recovery_rejections),
         ("singleton_accepts", singleton_accepts),
         ("singleton_rejects", singleton_rejects),
         ("orientation_counterexamples", orientation_counterexamples),
+        ("support_transforms", support_transforms),
+        ("symmetry_commutations", symmetry_commutations),
+        ("symmetry_local_checks", symmetry_local_checks),
+        ("implicit_rotation_rejections", implicit_rotation_rejections),
+        ("explicit_orbit_witnesses", explicit_orbit_witnesses),
         ("alias_cases", alias_cases),
         ("extracted_occurrences", extracted),
         ("overlap_conflicts", overlap_conflicts),
@@ -1083,10 +1631,14 @@ def main() -> None:
         ("larger_alphabet", larger_alphabet),
         ("hostile_rejections", hostile),
         ("relation_field_count", relation_field_count),
+        ("histogram_field_count", histogram_field_count),
         ("verification_field_count", verification_field_count),
         ("architecture_classes", len(ARCHITECTURE_CLASSIFICATION)),
         ("strict_relation", "AllowedOrientedTemplates(N,W,Self,E,S)"),
         ("proof_envelope", "native_cross_to_generic_offsets_full_violation_report"),
+        ("histogram_lowering", "T31_center_conditioned_histograms_losslessly_compile_to_T32_exact_words"),
+        ("square_symmetry", "explicit_C4_support_template_model_report_commutation_without_implicit_matching"),
+        ("model_identity", "pointwise_equality_distinct_from_explicit_rotation_orbit_observer"),
         ("overlap_semantics", "one_pointwise_field_not_independent_template_tiles"),
         ("scope_semantics", "periodic_global_proof_open_local_finite_window"),
         ("solver_boundary", "verified_periodic_SAT_bounded_failure_Unknown"),
@@ -1110,8 +1662,19 @@ def main() -> None:
         f"local_checks={local_checks}; representation_round_trips={representation_round_trips}"
     )
     print(
+        f"histogram_relations={histogram_relations}; histogram_round_trips={histogram_round_trips}; "
+        f"histogram_commutations={histogram_commutations}; histogram_local_checks={histogram_local_checks}; "
+        f"oriented_recovery_rejections={oriented_recovery_rejections}"
+    )
+    print(
         f"cross_codec_round_trips={codec_round_trips}; singleton_accepts={singleton_accepts}; "
         f"singleton_rejects={singleton_rejects}; orientation_counterexamples={orientation_counterexamples}"
+    )
+    print(
+        f"support_rotations={support_transforms}; symmetry_commutations={symmetry_commutations}; "
+        f"symmetry_local_checks={symmetry_local_checks}; "
+        f"implicit_rotation_rejections={implicit_rotation_rejections}; "
+        f"explicit_rotation_orbit_witnesses={explicit_orbit_witnesses}"
     )
     print(
         f"alias_cases={alias_cases}; extracted_occurrences={extracted}; "

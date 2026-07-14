@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Fail-closed raster/provenance audit for T32 template constraints.
 
-The native T32 visual record consists of the page-215 two-example plate, the
-two-file catalog of 171 periodic witnesses, and the Notes plate that displays
-the 32 possible oriented five-cell templates.  Relation assets cover the 1D
+The native T32 visual record consists of the printed-page-213 two-example
+plate, the printed-page-214/215 two-file catalog of 171 periodic witnesses,
+and the printed-page-941 Notes plate that displays the 32 possible oriented
+five-cell templates.  Relation assets cover the 1D
 allowed-block predecessor, a 2D-substitution source, a 16-color local-block
 construction, a CA-spacetime encoding, tiling/network relatives, and two
 observer/application views.  T31 neighbor-count plates and all main-text T33
