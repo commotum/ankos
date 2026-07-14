@@ -346,6 +346,17 @@ def assert_page_91_asset_and_rule() -> None:
     # the center output cell is not active.
     assert PAGE_91_RULE[(0, 0, 0)] == (1, frozenset({-1, 1}))
 
+    # Optional derived bit planes under i = 4L + 2C + R.  These are a guarded
+    # transcription aid, not a source-defined generalized-mobile codec.
+    planes = [0, 0, 0, 0]
+    for index in range(8):
+        context = ((index >> 2) & 1, (index >> 1) & 1, index & 1)
+        new_bit, activity = PAGE_91_RULE[context]
+        flags = (new_bit, -1 in activity, 0 in activity, 1 in activity)
+        for plane, flag in enumerate(flags):
+            planes[plane] |= int(flag) << index
+    assert tuple(planes) == (63, 15, 16, 245)
+
 
 def assert_table_validation() -> None:
     rule = constant_rule(0, ())
@@ -414,6 +425,17 @@ def assert_notes_split_and_newborn_schedule() -> None:
         0: (PLAIN, 1),
         1: (ACTIVE, 0),
     }
+
+
+def assert_notes_wider_finite_offsets() -> None:
+    # BOOK:12008 types the result as relative positions without stating a
+    # radius-one limit.  The page-76 glyph profile is stricter than this
+    # executable carrier, so a wider finite literal set must still commute.
+    rule = constant_rule(1, (-7, 0, 9))
+    successor, events = tagged_step(rule, encode({}, {4}))
+    assert len(events) == 1
+    assert events[0].relative_activity == frozenset({-7, 0, 9})
+    assert decode(successor) == ({4: 1}, frozenset({-3, 4, 13}))
 
 
 def assert_activity_collision_is_union() -> None:
@@ -545,6 +567,7 @@ def main() -> None:
     assert_table_validation()
     cases = assert_exhaustive_composition_commutation()
     assert_notes_split_and_newborn_schedule()
+    assert_notes_wider_finite_offsets()
     assert_activity_collision_is_union()
     assert_source_destination_overlap()
     assert_disappearance_and_empty_outcome_obligation()
@@ -559,6 +582,7 @@ def main() -> None:
         f"contexts={len(CONTEXTS)}; row_results={len(ROW_RESULTS)}; "
         f"derived_rule_space={len(ROW_RESULTS) ** len(CONTEXTS)}; "
         "old_snapshot=PASS; activity_union=PASS; split/disappear/offset0=PASS; "
+        "wider_finite_offsets=PASS; derived_planes=PASS; "
         "collision/source-overlap=PASS; source_order=PASS; "
         "radius2_CA_witness=PASS; page91_hash/rule/t0_t12=PASS; "
         "empty_frontier_outcome=UNSPECIFIED)"
