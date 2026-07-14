@@ -12,8 +12,8 @@ Status: **IN PROGRESS — ARCHITECTURE RESOLVED; ORACLE AND HOSTILE-REVIEW CLOSU
 - The followed representation evidence includes whole/fractional positional encoders and inverses, arbitrary positive bases, Gray-code ordering, negative bases, non-power bases, multiplicative digit schemes, unary, self-delimiting length prefixes, binary-coded base 3, Fibonacci/Zeckendorf words, and their length/completeness/distribution properties (`BOOK:12503-12555`, `17130-17178`, `20507`, actual Index). Strict T40 v1 deliberately closes only positive-integer-radix positional digits and simple continued fractions. The other schemes are explicit relations or future representation-schema extensions, not proof of a new executor and not silently claimed by `Positional(base>=2)`.
 - The source gives an explicit base-2 long-division procedure with visible remainder `r`: compare `2r` with `q`, emit a digit, and replace `r` by `2r` or `2r-q` (`BOOK:1709-1715`). This is an ordinary exact `t+0D` SimpleProgram realization, not the identity of the rational number or of T40 as a whole.
 - The source gives an explicit square-root procedure over visible product state `(r,s)` (`BOOK:1738-1746`). Both components are read from one old snapshot and assigned atomically. This direct source representation is faithful, but not uniquely minimal: for a fixed declared radicand/profile, reachable normalized state is also losslessly represented by `s`, because phase, prefix, and `r` reconstruct from the invariant.
-- Positional digits and simple continued fractions are different representations of the same exact value. Continued-fraction coefficients are unbounded; rational continued fractions complete after finitely many terms, whereas irrational ones continue (`BOOK:1776-1794`, `13030-13038`).
-- A simple continued fraction has signed integer `a0=floor(x)` and positive tail coefficients. The page-903 relation is stated for any irrational `h`; page 162's positive ratios do not justify a globally nonnegative coefficient schema (`BOOK:12587-12589`).
+- Positional digits and simple continued fractions are different representations of the same exact value. Continued-fraction coefficients are unbounded; rational continued fractions complete after finitely many terms, whereas irrational ones continue (`BOOK:1776-1794`, `13030-13074`).
+- A simple continued fraction has signed integer `a0=floor(x)` and positive tail coefficients. The page-903 relation is stated for any irrational `h`; page 162's positive ratios do not justify a globally nonnegative coefficient schema (`BOOK:12587-12591`).
 - The Notes explicitly describe direct nth-digit methods that need not generate preceding digits (`BOOK:12943-12958`). Therefore a T37-style append trace is one possible evaluator realization, not T40's universal native state or event.
 - Exact, certified, approximate, probable, unknown, unsupported, and resource-limited coefficient results must remain distinct. The direct-digit example is described only as overwhelmingly probable under finite precision; it is not silently exact.
 - Digit rows, walks, histograms, term-size plots, rational approximants, regularity, randomness, and normality claims are observers. Finite data do not prove randomness or normality, and normality depends on the base (`BOOK:12972-12976`).
@@ -71,7 +71,7 @@ Search recall is not used as the completeness proof. Four independent closure me
 1. every 117 nonblank row in the strict main section `BOOK:1665-1832`;
 2. every 126 nonblank row in native Notes `BOOK:12921-13144`, plus the complete `BOOK:12587-12595` T40↔T42 seam and every followed relation/control continuation;
 3. every 897 nonblank physical row in the actual flattened Index block `BOOK:20828-22456`, ending before the Colophon at `BOOK:22458`;
-4. an independently defined Book-wide digit/base/representation/continued-fraction/computability/randomness/resource lane with 309 direct vocabulary matches (`242 pre-Index / 67 Index`), each retained or assigned to one of ten line-hash-bound sibling-exclusion groups.
+4. an independently defined Book-wide digit/base/representation/continued-fraction/computability/randomness/resource lane with 309 direct vocabulary matches (`242 pre-Index / 67 Index`): the 242 pre-Index matches partition into 110 retained rows and 132 line-hash-bound sibling exclusions, while all 67 Index matches enter the complete Index disposition.
 
 Every row is classified as native, relation, control, structural, exclusion, or unrelated. The independently reproduced Index vocabulary, hostile page/alias/continuation set, and Book-wide lane must all be subsets of those explicit dispositions. This prevents regex misses, flattened-column wrapping, and cherry-picked cross-references from disappearing. The nominal Chapter 4 split is reverse-joined against the monolith, including its page-154/page-156 omissions. Retained captions govern their rasters; invoked pages and physical asset pages are recorded separately. Name collisions, unrelated representation prose, generic algorithm references, and adjacency-only material remain explicit exclusions rather than silent misses. The final frozen counts and digests appear under **Frozen Source Closure**; completion requires zero residual in every universe.
 
@@ -111,7 +111,7 @@ These grouped passages are the construction-bearing core. The source oracle reta
 
 ### Excerpt 4 — positional and continued-fraction representations
 
-- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:1776-1798`
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:1776-1796`
 - Context: Chapter 4 representation discussion.
 - Establishes: representation is a construction procedure; rational continued fractions are finite, irrational ones infinite; symbolic definition and evaluation effort remain distinct.
 
@@ -166,7 +166,7 @@ These grouped passages are the construction-bearing core. The source oracle reta
 ### Excerpt 9 — positional inversion and non-positional representation boundaries
 
 - Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:12503-12555`, `17130-17178`, `20507`
-- Context: Notes for pages 116–117 and the later discussion of mathematical notation.
+- Context: Notes for pages 116–117 and 560–561, plus the later discussion of mathematical notation.
 - Establishes: ordinary positive-radix digits have explicit forward/residual/inverse procedures, while negative-base, non-power-base, multiplicative, unary, Gray-code, and Zeckendorf schemes are genuinely different representation schemas. They widen representation data and validation where adopted; they do not by themselves require another transition runner.
 
 > For a number x between 0 and 1, the first m digits in its digit sequence in base k are given by RealDigits[x, k, m] or Floor[k NestList[Mod[k#, 1] &, x, m-1]].
@@ -195,7 +195,7 @@ These grouped passages are the construction-bearing core. The source oracle reta
 
 ### Excerpt 11 — exact real definitions, computation, and oracle boundaries
 
-- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:19066-19087`
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:19066-19086`
 - Context: Notes for page 729, **Computable reals**, **Diagonal arguments**, **Continuous computation**, and **Initial conditions**.
 - Establishes: nth-coefficient computability is a finite-step property, not a consequence of exact denotation; continuous carriers do not erase finite program description or discrete choices; arbitrary real initial data can hide an oracle unless its construction is supplied.
 
@@ -222,23 +222,36 @@ Representation =
                canonical_terminating_zero_tail)
   | SimpleContinuedFraction(canonical_finite_tail)
 
-ExpansionQuery =
-    ExactDenotationRef
+RepresentationQuery =
+    MathematicalDenotationSpec
     x Representation
     x (Prefix(count) | CoefficientAt(index))
-    x EvaluationContext
+
+EvaluationRequest =
+    RepresentationQuery x EvaluationContext
 
 ExpansionResult =
-    ExactCoefficients
-  | CertifiedCoefficients
-  | ApproximateOrProbableCoefficients
-  | FiniteCompletion
-  | Unsupported | Unknown | ResourceLimit | Failure
+    RepresentationQuery
+    x EvaluationContext
+    x QueryProvenance
+    x start_index
+    x coefficient_payload
+    x positional_integer_digits_and_sign
+    x QueryOutcome
+    x TerminationStatus
+
+QueryOutcome =
+    CompleteExact | CompleteCertified | Partial | ResourceLimit
+  | Unsupported | Unknown | Approximate | Probable | Failure
+
+TerminationStatus =
+    finite_terminated | eventually_zero_infinite
+  | prefix_of_infinite | unknown_termination
 ```
 
 `Positional(base>=2)` is the strict v1 positive-integer-radix schema. It does not pretend that base 1, negative radix, mixed/non-power weights, Gray-code order, multiplicative prime-exponent words, or Zeckendorf words are parameters of that exact codec. Those followed relations would require their own closed representation tags, inverse/normalization rules, and ambiguity invariants, while continuing to use pure queries or ordinary existing work-program axes as appropriate.
 
-`EvaluationContext` identifies the method/realization, numeric backend, precision or enclosure policy, resource budget, and certificate requirements. It does not enter the exact denotation's identity. The requested index/count belongs to query identity and horizon, not configuration, control, or the constant.
+`RepresentationQuery` carries the complete immutable denotation specification, not a forgeable detached identifier. `EvaluationContext` is a separate input that identifies the method/realization, numeric backend, precision or enclosure policy, resource budget, and certificate requirements; result provenance binds both query and context without making context part of denotation or representation-query identity. The requested index/count belongs to query identity and horizon, not configuration, control, or the constant. Coefficients are payload validated against `QueryOutcome`; finite/infinite/unknown completion is an independent typed status rather than a proof-strength outcome.
 
 For positional representations, the canonical convention chooses the expansion that is not eventually all `base-1`; terminating rationals therefore continue with zeros. Thus `0.5000...`, not `0.4999...`, is canonical in base 10. A renderer may suppress the trailing zeros without changing the representation denotation.
 
@@ -325,7 +338,7 @@ For exact `y`, emit `a=floor(y)`. If `y-a` is nonzero, write
 y' = 1 / (y-a).
 ```
 
-This is a T43 unary-map realization of the continued-fraction query. If `y` is an exact integer, the query emits the final coefficient and returns `FiniteCompletion`; it does not invent another term or mislabel exact completion as a pole. A raw partial-map request may retain its ordinary undefined reciprocal outcome, but the expansion query has the stronger representation context needed to classify the boundary correctly.
+This is a T43 unary-map realization of the continued-fraction query. If `y` is an exact integer, the query emits the final coefficient and returns `CompleteExact` with `finite_terminated`; it does not invent another term or mislabel exact completion as a pole. A raw partial-map request may retain its ordinary undefined reciprocal outcome, but the expansion query has the stronger representation context needed to classify the boundary correctly.
 
 ### Direct coefficient evaluation
 
@@ -376,14 +389,15 @@ The smallest honest model is therefore an immutable exact denotation plus a type
 
 ## Current Runtime Fit
 
-`src/ca` is the current implementation location of the intended SimplePrograms library, not a claim that every catalog construction is semantically a cellular automaton. Its executable realization nevertheless remains CA-shaped and family-dispatched today. T40 therefore exercises shared migrations and declarative modules, not a `constant_digits` rollout branch.
+`src/ca` is the current implementation location of the intended SimplePrograms library, not a claim that every catalog construction is semantically a cellular automaton. The checked-in executable surface still defaults in places to finite arrays, time slices, positive-step trajectories, and named-family rollout dispatch; those are Phase 1 implementation limits, not the architecture or a reason to add `constant_digits` dispatch. T40 therefore exercises shared representation/value migrations and declarative modules, while each requested work realization reuses the common program axes.
 
 | Responsibility | Current mechanism | Goal 2 disposition |
 |---|---|---|
 | Declarative definition/query | `Dynamics` requires domain, shape, rule, neighborhoods, and frontier (`specs.py:23-55`) | Reuse/generalize the T41 closed denotation and query/result modules outside rollout; do not fabricate missing transition axes |
 | Values/coefficients | finite `int|float|str` alphabets; NumPy episode arrays | Add tagged exact integers/rationals/algebraics/named constants/enclosures and unbounded coefficient codecs outside fixed arrays |
-| FRONTIER/NEIGHBORHOOD | only `time_slice` construction and coordinate-array access | Reuse singleton/self access only for explicit work SimplePrograms; add no T40 selector |
-| RULE | six hard-coded families plus unrestricted `formulaic` callable | Add closed expression/representation/evaluator schemas; callbacks and host CAS objects are invalid semantic identity |
+| FRONTIER | only `time_slice` construction | Reuse its rank-zero singleton member for explicit work SimplePrograms; add no T40 selector |
+| NEIGHBORHOOD/loci | `self_at`, literal/metric/axis/directional/history/composed selectors and coordinate-array gathering | Reuse self access for scalar work and extend shared typed access where later programs require it; do not misdescribe existing selector breadth or add a T40 neighborhood |
+| RULE | exhaustive, totalistic, gate, lookup, compose, named presets, and unrestricted `formulaic`; rollout still dispatches named families | Add closed expression/representation/evaluator schemas and generic rule-node execution; callbacks and host CAS objects are invalid semantic identity |
 | UPDATE/runner | positive-step ndarray trajectories and named-family dispatch (`rollout.py:40-213`) | Realizations use the shared structural runner after Goal 2 migration; pure queries bypass rollout by category, not by a family special case |
 | Rule/value identity | rule IDs normalized to signed `int64` | Use structural tagged IDs and arbitrary-precision codecs; base/representation belong to query identity, not a numeric family ID |
 | Seeds | `seeds.constant` fills an integer array | Do not confuse this spatial fill preset with a mathematical constant definition |
@@ -426,7 +440,9 @@ The exact logic contract covers 2,079 long-division states, rational finite cont
 
 ## Frozen Asset Closure
 
-`45-T40-asset-oracle.py` closes exactly 27 governed images at `11 native / 15 relation / 1 control`, 52 references at `27 monolith / 25 split`, 27 distinct physical files and hashes totaling 612,140 bytes, and four multi-file assemblies spanning 16 files. The followed Gray-code, negative-base, and multiplicative-digit figures are relation-only evidence; the page-154 and page-156 split-link omissions are explicit. Every asset is `HASH_BOUND`; none is pixel-replayed or used as executable program data. The structural, ordered, and normalized textual-replay digests are respectively `9fb44dd3086ff0c853d09a867ccdfdd60716037fc4f52d527f6ec1bc217d6ffc`, `3e6e66a5730caae3371b21706ea124e4f19480925efc01e98cb6ee530124c9b5`, and `6fd8578623171650e57a405f2d3e9740b895724609fceb38132ceb202055c1fa`; ledger digest is `02ea3bb0e6519b2fcc78172a8f97dfded0d4a96148e2398056441640c4a79824`, and script SHA-256 is `85bd9225b5c36c7d6f0cc9a77e7c16be386a18cfc0095625b26f9b7fe15657d7`.
+`45-T40-asset-oracle.py` closes 53 governed images at `11 native / 40 relation / 2 control` plus ten explicit sibling exclusions. The governed ledger binds 104 references at `53 monolith / 51 split` and 1,905,596 bytes; the excluded ledger binds 20 references and 261,881 bytes. Together they cover 63 distinct physical files and hashes, 2,167,477 bytes, twelve governed multi-file assemblies spanning 40 files, and one excluded multi-file assembly spanning five files. The page-154 and page-156 split-link omissions remain explicit; every other candidate has exactly one split reference. All 63 candidates are `HASH_BOUND`; none is pixel-transcribed, pixel-replayed, or used as executable program data.
+
+The 63-candidate structural and ordered manifests are respectively `4685ebad9a58b1cc8082b4a03118ad1bcd1780706bceba2bf29184cd8df05b10` and `b46991f5872d58e462716822da8d499a2cde638ffefe5b8920febfd1c69e4601`; normalized textual-replay digest remains `6fd8578623171650e57a405f2d3e9740b895724609fceb38132ceb202055c1fa`. Governed and excluded ledger digests are `fc2a90430e488e07c55b8451a06b268ac6301531295a1f8485fc1c465c6751b3` and `0d20ce40ce927edd5d032d6d763d52cf257b8e8957718219db216a2911ad26fe`; script SHA-256 is `7eb5afb0f072557603d1ce7a08aa9f1a6b4c872e51d8b7d7cbf66b056388cced`.
 
 Its independent textual replay checks 8,255 long-division states and 96 strict-integer square-root events, guards all three mismatches between the extracted square-root bit string and the exact algorithm, and retains the rational source-claim counterexample. Source guards, semantic manifests, import, compilation, relocation, optimized mode, bad usage, hash mutation, and the real source-oracle interface pass.
 
@@ -434,12 +450,12 @@ Its independent textual replay checks 8,255 long-division states and 96 strict-i
 
 `45-T40-semantic-oracle.py` independently reproduces the asset interface at 8,255 long-division states, 96 strict square-root events, and three guarded extraction mismatches. It closes nine signed and unsigned exact rational positional cases, nine canonical round trips, 225 signed-prefix cylinders, 60 certified decimal and 96 certified binary digits of pi, 30 certified pi continued-fraction coefficients, five quadratic-surd periods/400 coefficients, a 120-term exact continued fraction for `e`, and an 80-term exact negative-surd prefix. Explicit work checks cover 255 long-division events, 390 square-root commutations/780 invariant checks, 390 inverse/step commutations for the fixed-program `s` quotient, and 24 Gauss-map commutations across six signed and unsigned sources. The `(5,4)` versus `(4,4)` witness is correctly scoped to loss of program identity; the surviving algebraic identity under the literal `11/5` misuse and both failed nonnegative/enclosure obligations remain executable guards.
 
-The query audit checks 159 prefix/random-access agreements plus 36 certified random-access agreements, separate positional and continued-fraction prefix-loss cylinders, exact/certified/partial/resource outcomes at `1/1/1/2`, unsupported/unknown/approximate/probable/failure outcomes at `4/1/1/1/1`, and eight proof-nonpromotion rejections. Three strict T42 handoffs carry 32 exact and 12 certified finalized coefficients without an evaluator callback; one exercises signed `a0` with an otherwise positive irrational continued-fraction tail, while a signed rational-complete prefix is explicitly rejected without losing its typed completion status. The interface carries the complete immutable replay-verified result, so source/result identity, proof strength, source kind, orientation, and requested count cannot be replaced by opaque forged IDs. Exact rational-equivalence certificates likewise carry and replay both complete denotation specifications rather than trusting detached provenance IDs or an asserted common value. Positional sign is a separate `leading_minus_magnitude` convention/result component rather than a negative digit, and simple continued fractions admit any signed integer `a0` while rejecting nonpositive tail coefficients. Canonical terminating positional values are classified `eventually_zero_infinite`, never finite completion; genuine `finite_terminated` remains confined to rational continued fractions, and every certified/partial/resource Pi result is forced to retain `prefix_of_infinite`. The public surface contains 35 declarative/work dataclasses, three optional work-record types, and zero native T40 execution roles. The no-class-4 result is a reviewed architecture classification supported by the commuting realizations, not a circular executable cardinality. Seventy-two hostile rejections close invalid carriers, forged certificates, hidden roles, floats, sign/termination mistakes, silent source repairs, untyped boundary tags, and noncanonical strings nested inside recursive provenance keys. Semantic digest is `024c75c38de22ee74c41f54fd3b4be957e0c0fb6dec44c4c7cfc8b0f658b5608`; script SHA-256 is `016a0afff8469d96387bd5e9e97df61d6cb1f5e37ef0c9321e711ed33e0635d7`.
+The query audit checks 159 prefix/random-access agreements plus 36 certified random-access agreements, separate positional and continued-fraction prefix-loss cylinders, exact/certified/partial/resource outcomes at `1/1/1/2`, unsupported/unknown/approximate/probable/failure outcomes at `4/1/1/1/1`, and eight proof-nonpromotion rejections. Three strict T42 handoffs carry 32 exact and 12 certified finalized coefficients without an evaluator callback; one exercises signed `a0` with an otherwise positive irrational continued-fraction tail, while a signed rational-complete prefix is explicitly rejected without losing its typed completion status. The interface carries the complete immutable replay-verified result, so source/result identity, proof strength, source kind, orientation, and requested count cannot be replaced by opaque forged IDs. Exact rational-equivalence certificates likewise carry and replay both complete denotation specifications rather than trusting detached provenance IDs or an asserted common value. Positional sign is a separate `leading_minus_magnitude` convention/result component rather than a negative digit, and simple continued fractions admit any signed integer `a0` while rejecting nonpositive tail coefficients. Canonical terminating positional values are classified `eventually_zero_infinite`, never finite completion; genuine `finite_terminated` remains confined to rational continued fractions, and every certified/partial/resource Pi result is forced to retain `prefix_of_infinite`. The public surface contains 35 declarative/work dataclasses, three optional work-record types, and zero native T40 execution roles. The no-class-4 result is a reviewed architecture classification supported by the commuting realizations, not a circular executable cardinality. Seventy-two hostile rejections close invalid carriers, forged certificates, hidden roles, floats, sign/termination mistakes, silent source repairs, untyped boundary tags, and noncanonical strings nested inside recursive provenance keys. Semantic digest is `f5bd58e930032f69aae6fd2a613a267d9ca8a3c9742e41de1d193cdcdfe97716`; script SHA-256 is `a3b8b01d32db2a5198c564ee453beb23a1e3acd1f23b7e639bd9ec30b2671cc7`.
 
 ## Completion Requirements
 
 - [ ] Every strict main, Notes, actual-Index, split, history, relation, control, exclusion, and extraction-defect candidate is dispositioned with zero unresolved mechanics.
-- [ ] The complete 27-asset/52-reference universe is hash-bound with followed representation relations, split omissions, and source limitations explicit.
+- [ ] The complete 63-candidate/124-reference universe is hash-bound with followed representation relations, sibling exclusions, split omissions, and source limitations explicit.
 - [ ] Positional and continued-fraction definitions, canonicalization, coefficient queries, exactness levels, completion, work realizations, and observers are independently verified.
 - [ ] Long division, square-root product/invariant and fixed-program quotient, positional/Gauss maps, direct nth access, and finite-prefix loss are adversarially tested.
 - [ ] T34/T36/T37/T39/T41/T42/T43 and current-runtime boundaries are synchronized.

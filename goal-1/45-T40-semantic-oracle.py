@@ -68,7 +68,7 @@ SOURCE_CLAIMS = (
     ("BOOK:12972-12976", "finite digit evidence does not prove randomness or base-specific normality"),
     ("BOOK:13030-13060", "continued-fraction coefficients arise from reciprocal fractional-part iteration"),
     ("BOOK:13052-13074", "continued-fraction coefficients are unbounded"),
-    ("BOOK:12587-12589", "simple-CF a0 is floor(h), hence signed, while every tail coefficient is positive"),
+    ("BOOK:12587-12591", "simple-CF a0 is floor(h), hence signed, while every tail coefficient is positive"),
 )
 
 
@@ -3392,7 +3392,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "024c75c38de22ee74c41f54fd3b4be957e0c0fb6dec44c4c7cfc8b0f658b5608"
+EXPECTED_DIGEST = "f5bd58e930032f69aae6fd2a613a267d9ca8a3c9742e41de1d193cdcdfe97716"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:

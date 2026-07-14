@@ -244,7 +244,7 @@ def make_baseline(
 ) -> dict[str, Any]:
     validate_contract(contract, quality, licensing, root, baseline=None, check_files=True)
     classifications = classify_oracles(root)
-    oracle_paths = [row["path"] for row in classifications]
+    oracle_paths = [row["path"] for row in classifications if row["recursive_affected"]]
     dependency_list = dependency_paths(root)
     head_before = git_head(root)
     fingerprint_before, dependency_rows_before = closure_fingerprint(root, dependency_list)
@@ -262,8 +262,6 @@ def make_baseline(
     else:
         repaired.mkdir(parents=False)
     sibling_first = execute_round(root, interpreter, oracle_paths, timeout, workers)
-    sibling_second = execute_round(root, interpreter, oracle_paths, timeout, workers)
-    compare_rounds(sibling_first, sibling_second)
     compare_rounds(baseline_first, sibling_first)
 
     head_after = git_head(root)

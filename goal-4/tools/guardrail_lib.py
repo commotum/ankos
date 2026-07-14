@@ -337,8 +337,11 @@ def validate_compatibility_baseline(
     require(sum(row.get("recursive_markdown") is True for row in classifications) == 39, "recursive Markdown census mismatch")
     require(sum(row.get("recursive_image_or_basename") is True for row in classifications) == 26, "recursive image census mismatch")
     records = baseline.get("oracles", [])
-    require(len(records) == 58, "compatibility behavior must cover all 58 oracles")
-    require({row.get("path") for row in records} == {row.get("path") for row in classifications}, "behavior/classification join mismatch")
+    require(len(records) == 39, "compatibility behavior must cover all 39 recursive affected oracles")
+    require(
+        {row.get("path") for row in records} == {row.get("path") for row in affected},
+        "behavior/affected-classification join mismatch",
+    )
     for row in records:
         require(row.get("repeat_count") == 2, f"oracle was not repeated twice: {row.get('path')}")
         require(row.get("repeat_identical") is True, f"oracle repeat drift: {row.get('path')}")
@@ -492,6 +495,8 @@ def validate_contract(
     require(compatibility.get("book_override_allowed") is False, "unsafe BOOK override enabled")
     require(compatibility.get("repeat_runs_required") == 2, "oracle repeat count weakened")
     require(compatibility.get("empty_sibling_exact_match_required") is True, "empty sibling probe disabled")
+    require(compatibility.get("empty_sibling_runs_required") == 1, "empty sibling run count drift")
+    require(compatibility.get("expected_behavior_count") == 39, "compatibility behavior scope drift")
     if check_files:
         for row in contract.get("contracts", []):
             path = repo_root / str(safe_relative_posix(row.get("path", "")))

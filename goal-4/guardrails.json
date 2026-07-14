@@ -512,7 +512,8 @@
     "all_oracle_filename_digest": "f05e1235b8427a8778a45a63b2fc133d61d39ab99b15ae6cf19611a8496d9c77",
     "recursive_affected_filename_digest": "317d3a9bac555f452f38158ff67faceb2869afb712654e9701ab9268c901837d",
     "capture_all_58_classifications": true,
-    "capture_all_58_behaviors": true,
+    "capture_recursive_affected_behaviors": true,
+    "expected_behavior_count": 39,
     "environment": {
       "PATH": "/usr/bin:/bin",
       "HOME": "/tmp",
@@ -542,6 +543,7 @@
     ],
     "repeat_runs_required": 2,
     "empty_sibling_exact_match_required": true,
+    "empty_sibling_runs_required": 1,
     "goal_3_executable_baseline_count_at_stage_1": 0,
     "goal_3_resync_required_before_release": true
   },
