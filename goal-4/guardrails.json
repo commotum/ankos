@@ -387,7 +387,7 @@
     },
     {
       "path": "goal-4/style-guide.md",
-      "sha256": "ccde6a70f13b5287cade04d81513500b24b24963c54820b61e3a14bfa975e6a1"
+      "sha256": "6c83429f93fa7ae4884abdcaa8cff603d7764cb867f52ee758c1b0da9d1b4f1a"
     },
     {
       "path": "goal-4/review-contract.md",
@@ -395,7 +395,7 @@
     },
     {
       "path": "goal-4/quality-evaluation.json",
-      "sha256": "486ed786d08327127569e17c6fcfe30752791866e4cd2ac99c528377d104081a"
+      "sha256": "27fa1951b03515d78f8b523c6b777e6be615c941cd49addc2a35dab75d90999b"
     },
     {
       "path": "goal-4/licensing-contract.json",
@@ -422,8 +422,8 @@
     "identifier_grammar": {
       "canonical_document_id_regex": "^[A-Z0-9_]+$",
       "canonical_anchor_slug_regex": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-      "raw_block_id_regex": "^[A-Z0-9][A-Z0-9_-]*$",
-      "repair_id_regex": "^[A-Z0-9][A-Z0-9_-]*$",
+      "raw_block_id_regex": "^[A-Z0-9]+(?:[_-][A-Z0-9]+)*$",
+      "repair_id_regex": "^[A-Z0-9]+(?:[_-][A-Z0-9]+)*$",
       "generated_anchor_regex": "^ankos-[a-z0-9]+(?:-[a-z0-9]+)*$"
     },
     "generated_output_as_input": false,

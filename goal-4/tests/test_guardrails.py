@@ -18,6 +18,7 @@ from guardrail_lib import (  # noqa: E402
     GuardrailError,
     canonical_json_bytes,
     legacy_recursive_signature,
+    load_canonical_json,
     load_json,
     sha256_bytes,
     sha256_file,
@@ -201,17 +202,14 @@ class PathAndPublicationTests(unittest.TestCase):
         name: str = "release.json",
     ) -> Path:
         path = releases / name
-        path.write_text(
-            json.dumps(
+        path.write_bytes(
+            canonical_json_bytes(
                 {
                     "schema_version": "1.0.0",
                     "target": "ref/A-New-Kind-of-Science-Repaired",
                     "files": rows,
-                },
-                indent=2,
+                }
             )
-            + "\n",
-            encoding="utf-8",
         )
         return path
 
@@ -393,6 +391,36 @@ class PathAndPublicationTests(unittest.TestCase):
             outside.write_bytes(trusted.read_bytes())
             with self.assertRaisesRegex(GuardrailError, "outside the exact"):
                 validate_publication_target(target, legacy, outside)
+
+    def test_pretty_reformatted_trusted_manifest_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            legacy, target, releases = self.make_publication_layout(temporary)
+            target.mkdir()
+            payload = target / "release.txt"
+            payload.write_bytes(b"v1")
+            trusted = self.write_trusted_manifest(
+                releases,
+                [
+                    {
+                        "path": "release.txt",
+                        "entry_type": "FILE",
+                        "sha256": sha256_file(payload),
+                        "byte_size": 2,
+                        "mode": format(payload.stat().st_mode & 0o7777, "04o"),
+                    }
+                ],
+            )
+            parsed = load_json(trusted)
+            trusted.write_text(json.dumps(parsed, indent=2) + "\n", encoding="utf-8")
+            with self.assertRaisesRegex(GuardrailError, "ANKOS-CJ-1"):
+                validate_publication_target(target, legacy, trusted)
+
+    def test_pretty_reformatted_generic_cj1_file_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "data.json"
+            path.write_text(json.dumps({"b": 1, "a": 2}, indent=2) + "\n", encoding="utf-8")
+            with self.assertRaisesRegex(GuardrailError, "ANKOS-CJ-1"):
+                load_canonical_json(path)
 
 
 class EmptySiblingLifecycleTests(unittest.TestCase):

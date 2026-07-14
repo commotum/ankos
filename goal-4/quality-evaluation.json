@@ -28,7 +28,11 @@
     "rank_derivation": "sha256(seed_bytes || 0x00 || UTF8(canonical_document_id) || 0x00 || UTF8(risk_stratum) || 0x00 || UTF8(raw_block_id))",
     "known_vector": {
       "manifest_material_utf8_hex": "5b5d",
-      "seed_sha256": "6f465b7812c361d1e39bad12c6908a7fa70482b2218f73d941235e5c3dcff833"
+      "seed_sha256": "6f465b7812c361d1e39bad12c6908a7fa70482b2218f73d941235e5c3dcff833",
+      "rank_canonical_document_id": "CH01",
+      "rank_risk_stratum": "PROSE",
+      "rank_raw_block_id": "RAW-0001",
+      "rank_sha256": "79ed3eaac5f6dd62512e32da9014f8d5156917d0a866551f19bbcf16652ba817"
     },
     "ordering": "Ascending unsigned 256-bit rank, then raw_block_id as a collision tie-breaker.",
     "stage_2_outputs": [
@@ -79,7 +83,7 @@
     "risk_allocation": "For each document with quota q, let N_s be each stratum population. In ascending risk priority, reserve r_s=1 for each nonempty non-PROSE stratum while slots remain; all other r_s=0. Let R=q-sum(r_s), c_s=N_s-r_s, and C=sum(c_s). If R=0, stop. Otherwise compute each exact ideal extra share a_s=R*c_s/C, assign floor(a_s), then assign the remaining slots in descending order of the exact integer remainder (R*c_s) mod C, breaking ties by ascending risk priority and then stratum ID. Select the lowest frozen ranks in each stratum. Because R<=C, no allocation exceeds c_s; any implementation that needs overflow redistribution is invalid.",
     "held_out_selection": "Stage 2 selects and freezes all q held-out raw_block_ids from the risk allocations and frozen ranks before any author-text repair or repair proposal exists. Future repair status, detector output, witness answer, and CHANGED/UNCHANGED labels never alter membership or order.",
     "post_repair_labels": "After the repair-overlay digest is sealed, label each already-selected held-out block CHANGED or UNCHANGED only for reporting; do not balance, substitute, rerank, or expand the held-out sample based on that label.",
-    "block_change_definition": "A raw block is CHANGED exactly when its canonical author-text projection or source-significant structural boundary after applying the sealed repair overlay differs byte-for-byte or boundary-for-boundary from the zero-repair projection. Generated metadata alone does not make a block CHANGED.",
+    "block_change_definition": "A raw block is CHANGED exactly when, after applying the sealed repair overlay, its canonical author-text projection differs byte-for-byte or any source-significant structural boundary, figure/caption/asset association, component order, Index order, or other semantic-layout relation differs from the zero-repair projection. Generated metadata alone does not make a block CHANGED.",
     "all_changed_review": "Every changed author-text block is reviewed outside the holdout whether or not selected; the holdout remains an independent quality projection."
   },
   "blind_protocol": {

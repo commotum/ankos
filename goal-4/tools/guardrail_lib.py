@@ -68,6 +68,12 @@ def canonical_json_bytes(value: Any) -> bytes:
     return (text + "\n").encode("utf-8")
 
 
+def load_canonical_json(path: Path) -> dict[str, Any]:
+    value = load_json(path)
+    require(path.read_bytes() == canonical_json_bytes(value), f"JSON file is not ANKOS-CJ-1: {path}")
+    return value
+
+
 def pretty_contract_json_bytes(value: Any) -> bytes:
     """ANKOS-PJ-1 bytes for hand-authored frozen policy JSON."""
 
@@ -218,7 +224,7 @@ def validate_publication_target(
     require(trusted_manifest_path.suffix == ".json", "trusted manifest must be JSON")
     require(trusted_manifest_path.is_file(), "trusted manifest is not a regular file")
     require(trusted_manifest_path.stat().st_nlink == 1, "trusted manifest may not be hardlinked")
-    trusted_manifest = load_json(trusted_manifest_path)
+    trusted_manifest = load_canonical_json(trusted_manifest_path)
     require(trusted_manifest.get("schema_version") == "1.0.0", "trusted manifest schema drift")
     require(
         trusted_manifest.get("target") == "ref/A-New-Kind-of-Science-Repaired",
@@ -592,6 +598,20 @@ def validate_quality(quality: dict[str, Any]) -> None:
     known_seed = sha256_bytes(bytes.fromhex(domain_hex) + bytes.fromhex("5b5d"))
     require(known.get("seed_sha256") == known_seed, "quality seed known vector fails")
     require(
+        (
+            known.get("rank_canonical_document_id"),
+            known.get("rank_risk_stratum"),
+            known.get("rank_raw_block_id"),
+        )
+        == ("CH01", "PROSE", "RAW-0001"),
+        "quality rank known-vector fields drift",
+    )
+    known_rank = sha256_bytes(
+        bytes.fromhex(known_seed)
+        + b"\0CH01\0PROSE\0RAW-0001"
+    )
+    require(known.get("rank_sha256") == known_rank, "quality rank known vector fails")
+    require(
         "0x00" in seed.get("rank_derivation", "") and "\\u0000" not in seed.get("rank_derivation", ""),
         "quality rank framing is ambiguous",
     )
@@ -621,7 +641,9 @@ def validate_quality(quality: dict[str, Any]) -> None:
         "only for reporting" in sample.get("post_repair_labels", ""),
         "post-repair labels can influence held-out selection",
     )
-    require("Generated metadata alone" in sample.get("block_change_definition", ""), "block change semantics drift")
+    change_definition = sample.get("block_change_definition", "")
+    for term in ("figure/caption/asset association", "Index order", "Generated metadata alone"):
+        require(term in change_definition, f"block change semantics drift: {term}")
     risk_ids = [row.get("id") for row in quality.get("risk_strata", [])]
     require(
         risk_ids
@@ -1141,8 +1163,8 @@ def validate_contract(
         == {
             "canonical_document_id_regex": "^[A-Z0-9_]+$",
             "canonical_anchor_slug_regex": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-            "raw_block_id_regex": "^[A-Z0-9][A-Z0-9_-]*$",
-            "repair_id_regex": "^[A-Z0-9][A-Z0-9_-]*$",
+            "raw_block_id_regex": "^[A-Z0-9]+(?:[_-][A-Z0-9]+)*$",
+            "repair_id_regex": "^[A-Z0-9]+(?:[_-][A-Z0-9]+)*$",
             "generated_anchor_regex": "^ankos-[a-z0-9]+(?:-[a-z0-9]+)*$",
         },
         "identifier grammar drift",
@@ -1235,6 +1257,13 @@ def validate_contract(
             (repo_root / "goal-4/licensing-contract.json").read_bytes()
             == pretty_contract_json_bytes(licensing),
             "licensing-contract.json is not ANKOS-PJ-1",
+        )
+        baseline_path = repo_root / str(safe_relative_posix(compatibility["baseline_path"]))
+        require(baseline_path.is_file(), "frozen compatibility baseline is missing")
+        stored_baseline = load_canonical_json(baseline_path)
+        require(
+            sha256_file(baseline_path) == compatibility["baseline_sha256"],
+            "frozen compatibility baseline file hash drift",
         )
         for row in contract_rows:
             path = repo_root / str(safe_relative_posix(row.get("path", "")))
