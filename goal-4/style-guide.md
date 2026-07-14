@@ -52,8 +52,8 @@ The `ANKOS-AST-1` node types are:
 - `SOURCE_LINK(label_children, destination_text, title_text, source_syntax_projection)` when the authoritative source itself contains link semantics;
 - `GENERATED_LINK(label_children, destination, link_kind)` for navigation, Notes backlinks, and Index augmentation; its label projection is author text and its destination/delimiters have empty author-text projection;
 - `IMAGE_REFERENCE(asset_id, source_alt_projection)`;
-- `FIGURE_GROUP(component_asset_ids, caption_children)`;
-- `INDEX_ENTRY(term_children, subentries, page_references, see_targets)`;
+- `FIGURE_GROUP(component_asset_ids, ordered_source_children, caption_range)`; semantic grouping annotates, but never regenerates or reorders, the protected source children;
+- `INDEX_ENTRY(ordered_source_children, term_ranges, subentry_ranges, page_reference_ranges, see_target_ranges)`; semantic fields are ranges into one exact ordered source projection, so punctuation/spacing is never synthesized from a lossy decomposition;
 - `RAW_HTML(payload)` for source material that must remain literal;
 - `GENERATED_ANCHOR(anchor_id)` and `PAGE_MARKER(witness_page_id)` with empty author-text projection.
 
@@ -71,6 +71,12 @@ The Stage 4 writer is total before Stage 7 chooses parser/render tooling. Stage 
 - Before Stage 7 approves an unambiguous dollar spelling, `MATH_INLINE` uses `<span data-ankos-generated="math-inline">...</span>` and `MATH_BLOCK` uses `<pre data-ankos-generated="math-block">...</pre>` with the exact HTML fallback escaping above. These wrappers are generated; the payload remains a typed mathematical token sequence.
 - A simple table may use pipe syntax only after Stage 7 proves a typed round trip. The total fallback serializes `TABLE`/`TABLE_CELL` as lowercase generated HTML `table`, `tr`, `td`, with positive decimal `rowspan`/`colspan` only when greater than one. Child nodes remain typed and ordered; no cell is flattened into opaque text.
 - `INDEX_ENTRY`, `FIGURE_GROUP`, and every other structural node use their closed field order and generated wrapper syntax declared by their Stage 4 schema. If a schema lacks a deterministic wrapper for one of its fields, serialization fails; `TEXT` or `RAW_HTML` is never a fallback for a structured semantic node.
+- `DOCUMENT` serializes children in order with exactly one generated blank line between adjacent block children and exactly one terminal LF. `PARAGRAPH` concatenates inline children without an inserted scalar. `HEADING` emits its validated level (1–6) as that many `#` bytes plus one generated space before its children. `EMPHASIS` and `STRONG` emit generated `*` and `**` delimiters only after their semantic role is witness-verified.
+- The total list fallback is generated HTML: `LIST(ordered=false)` emits `<ul data-ankos-generated="list">`, `LIST(ordered=true,start=n)` emits `<ol data-ankos-generated="list" start="n">`, and each item emits `<li data-ankos-generated="list-item">`; children retain order and block separation. Stage 7 may approve `-`/`1.` Markdown only for fixtures whose typed round trip is identical. `BLOCKQUOTE` prefixes every physical serialized line with generated `> ` and must reverse that prefix exactly.
+- `CODE_BLOCK` uses a backtick fence whose length is `max(3, 1 + longest payload backtick run)`. It emits the closed lowercase language token on the opening line, then LF, the payload unchanged, one generated LF only when the payload lacks one, and the same fence plus LF. The inverse removes only declared delimiters and the declared wrapper LF.
+- `IMAGE_REFERENCE` emits `![alt](destination)`. The brackets, parentheses, and canonical manifest-derived destination are generated syntax. `source_alt_projection`, when nonempty, is protected source text serialized with the inline escaping rule; otherwise alt is empty and accessibility prose stays in the editorial sidecar.
+- `FIGURE_GROUP` serializes its `ordered_source_children` unchanged in their typed order and adds no authorial caption text; grouping, component IDs, and `caption_range` remain ledger/AST metadata. `INDEX_ENTRY` likewise serializes `ordered_source_children` and uses its range annotations only for validation and generated navigation. Neither node reconstructs text from semantic fields.
+- `RAW_HTML` emits its protected payload byte-for-byte in canonical Markdown and is never used for generated fallback. Renderers consume a separate inert/sanitized view. `GENERATED_ANCHOR` and `PAGE_MARKER` emit only their reserved exact forms and have empty author-text projection.
 
 ## Canonical document envelope
 

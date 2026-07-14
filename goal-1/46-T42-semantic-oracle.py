@@ -76,7 +76,7 @@ SOURCE_CLAIMS = (
     ("BOOK:12587-12589", "the executable rule schedule is Reverse[Rest[ContinuedFraction[h,m]]]"),
     ("BOOK:12589", "coefficient a emits 0^(a-1)1 for 0 and 0^(a-1)10 for 1"),
     ("BOOK:12591", "the seed is {0}, each rule applies in parallel, and Floor[h] is an observer offset"),
-    ("BOOK:12593-12595", "quadratic profiles collapse periodic coefficient blocks to fixed neighbor-independent morphisms"),
+    ("BOOK:12593-12595", "periodic coefficient blocks compose to fixed neighbor-independent morphism macros while retaining the finite T42 horizon and event scale"),
     ("BOOK:13030-13034", "ContinuedFraction[h,m] returns m terms, so Rest supplies m-1 rule coefficients"),
     ("BOOK:13170-13172", "cosine interval counts use the mechanical word; the sine sibling is underspecified"),
 )
@@ -900,6 +900,20 @@ def program_from_t40_result(result: object) -> ScheduledMorphismProgram:
     )
 
 
+def replay_checked_program(value: object) -> ScheduledMorphismProgram:
+    if type(value) is not ScheduledMorphismProgram:
+        raise TypeError("expected an exact scheduled morphism program")
+    canonical = ScheduledMorphismProgram(
+        value.schedule,
+        value.rule_codec,
+        value.schema,
+        value.program_id,
+    )
+    if value != canonical:
+        raise ValueError("scheduled morphism program does not replay")
+    return value
+
+
 @dataclass(frozen=True)
 class DirectConfiguration:
     cursor: int
@@ -1141,20 +1155,13 @@ class AdvancedTransition:
 
 @dataclass(frozen=True)
 class ScheduleCompletion:
-    program_id: str
-    schedule_source_identity: str
+    program: ScheduledMorphismProgram
     configuration: DirectConfiguration
     reason: str = SCHEDULE_EXHAUSTED
     successors: tuple[()] = ()
 
     def __post_init__(self) -> None:
-        program_id = exact_text(self.program_id, "completion program id")
-        source_identity = exact_text(
-            self.schedule_source_identity,
-            "completion schedule source identity",
-        )
-        if not is_sha256(program_id) or not is_sha256(source_identity):
-            raise ValueError("completion identities must be lowercase SHA-256 hex")
+        program = replay_checked_program(self.program)
         if type(self.configuration) is not DirectConfiguration:
             raise TypeError("schedule completion needs an exact direct configuration")
         canonical_configuration = DirectConfiguration(
@@ -1163,10 +1170,20 @@ class ScheduleCompletion:
         )
         if self.configuration != canonical_configuration:
             raise ValueError("schedule completion configuration does not replay")
+        if canonical_configuration.cursor != len(program.schedule.coefficients):
+            raise ValueError("schedule completion requires the exhausted terminal cursor")
         reason = exact_text(self.reason, "schedule completion reason")
         successors = exact_tuple(self.successors, "schedule completion successors")
         if reason != SCHEDULE_EXHAUSTED or successors != ():
             raise ValueError("schedule completion is a zero-successor terminal outcome")
+
+    @property
+    def program_id(self) -> str:
+        return self.program.program_id
+
+    @property
+    def schedule_source_identity(self) -> str:
+        return self.program.schedule.source_identity
 
 
 StepOutcome: TypeAlias = AdvancedTransition | ScheduleCompletion
@@ -1239,8 +1256,7 @@ def direct_step(program: object, snapshot: object) -> StepOutcome:
     checked = check_snapshot(program, snapshot)
     if checked.configuration.cursor == len(program.schedule.coefficients):
         return ScheduleCompletion(
-            program.program_id,
-            program.schedule.source_identity,
+            program,
             checked.configuration,
         )
     handles = select_all_occurrences(program, checked)
@@ -1323,11 +1339,13 @@ class TaggedAdvancedTransition:
 
 @dataclass(frozen=True)
 class TaggedScheduleCompletion:
+    program: ScheduledMorphismProgram
     configuration: TaggedConfiguration
     reason: str = SCHEDULE_EXHAUSTED
     successors: tuple[()] = ()
 
     def __post_init__(self) -> None:
+        program = replay_checked_program(self.program)
         if type(self.configuration) is not TaggedConfiguration:
             raise TypeError("tagged completion needs an exact tagged configuration")
         canonical_configuration = TaggedConfiguration(
@@ -1336,6 +1354,9 @@ class TaggedScheduleCompletion:
         )
         if self.configuration != canonical_configuration:
             raise ValueError("tagged completion configuration does not replay")
+        decoded = decode_tagged(program, canonical_configuration)
+        if decoded.cursor != len(program.schedule.coefficients):
+            raise ValueError("tagged completion requires the exhausted terminal cursor")
         reason = exact_text(self.reason, "tagged completion reason")
         successors = exact_tuple(self.successors, "tagged completion successors")
         if reason != SCHEDULE_EXHAUSTED or successors != ():
@@ -1348,7 +1369,7 @@ TaggedOutcome: TypeAlias = TaggedAdvancedTransition | TaggedScheduleCompletion
 def tagged_step(program: object, tagged: object) -> TaggedOutcome:
     configuration = decode_tagged(program, tagged)
     if configuration.cursor == len(program.schedule.coefficients):
-        return TaggedScheduleCompletion(tagged)
+        return TaggedScheduleCompletion(program, tagged)
     coefficient = program.schedule.coefficients[configuration.cursor]
     emitted: list[tuple[Token, ...]] = [
         (CursorToken(configuration.cursor + 1),)
@@ -1437,11 +1458,13 @@ class ReplicatedAdvancedTransition:
 
 @dataclass(frozen=True)
 class ReplicatedScheduleCompletion:
+    program: ScheduledMorphismProgram
     configuration: ReplicatedPhaseConfiguration
     reason: str = SCHEDULE_EXHAUSTED
     successors: tuple[()] = ()
 
     def __post_init__(self) -> None:
+        program = replay_checked_program(self.program)
         if type(self.configuration) is not ReplicatedPhaseConfiguration:
             raise TypeError("replicated completion needs an exact replicated configuration")
         canonical_configuration = ReplicatedPhaseConfiguration(
@@ -1450,6 +1473,9 @@ class ReplicatedScheduleCompletion:
         )
         if self.configuration != canonical_configuration:
             raise ValueError("replicated completion configuration does not replay")
+        decoded = decode_replicated(program, canonical_configuration)
+        if decoded.cursor != len(program.schedule.coefficients):
+            raise ValueError("replicated completion requires the exhausted terminal phase")
         reason = exact_text(self.reason, "replicated completion reason")
         successors = exact_tuple(self.successors, "replicated completion successors")
         if reason != SCHEDULE_EXHAUSTED or successors != ():
@@ -1475,7 +1501,7 @@ def replicated_step(
 
     configuration = decode_replicated(program, replicated)
     if configuration.cursor == len(program.schedule.coefficients):
-        return ReplicatedScheduleCompletion(replicated)
+        return ReplicatedScheduleCompletion(program, replicated)
     coefficient = program.schedule.coefficients[configuration.cursor]
     emitted = tuple(
         tuple(
@@ -2509,78 +2535,41 @@ def audit_hostile_validation() -> int:
     assert completion.successors == ()
     rejected += 1
 
-    direct_args = (
-        completion.program_id,
-        completion.schedule_source_identity,
-        completion.configuration,
+    assert completion.program == completion_program
+    assert completion.program_id == completion_program.program_id
+    assert completion.schedule_source_identity == completion_program.schedule.source_identity
+    direct_args = (completion_program, completion.configuration)
+    forged_terminal_program = unsafe_hostile_forge(
+        completion_program,
+        program_id="0" * 64,
     )
     rejected += must_raise(
         TypeError,
-        lambda: ScheduleCompletion(
-            1,
-            direct_args[1],
-            direct_args[2],
-        ),
+        lambda: ScheduleCompletion(object(), direct_args[1]),
     )
     rejected += must_raise(
         ValueError,
-        lambda: ScheduleCompletion(
-            "0" * 63,
-            direct_args[1],
-            direct_args[2],
-        ),
+        lambda: ScheduleCompletion(forged_terminal_program, direct_args[1]),
     )
     rejected += must_raise(
         TypeError,
-        lambda: ScheduleCompletion(
-            HostileTextSubclass(direct_args[0]),
-            direct_args[1],
-            direct_args[2],
-        ),
-    )
-    rejected += must_raise(
-        TypeError,
-        lambda: ScheduleCompletion(
-            direct_args[0],
-            1,
-            direct_args[2],
-        ),
-    )
-    rejected += must_raise(
-        ValueError,
-        lambda: ScheduleCompletion(
-            direct_args[0],
-            "0" * 63,
-            direct_args[2],
-        ),
-    )
-    rejected += must_raise(
-        TypeError,
-        lambda: ScheduleCompletion(
-            direct_args[0],
-            HostileTextSubclass(direct_args[1]),
-            direct_args[2],
-        ),
-    )
-    rejected += must_raise(
-        TypeError,
-        lambda: ScheduleCompletion(
-            direct_args[0],
-            direct_args[1],
-            object(),
-        ),
+        lambda: ScheduleCompletion(direct_args[0], object()),
     )
     forged_direct_configuration = unsafe_hostile_forge(
-        direct_args[2],
+        direct_args[1],
         word=(2,),
     )
     rejected += must_raise(
         ValueError,
         lambda: ScheduleCompletion(
             direct_args[0],
-            direct_args[1],
             forged_direct_configuration,
         ),
+    )
+    live_configuration = initial_snapshot(completion_program).configuration
+    rejected += must_raise(
+        ValueError,
+        lambda: ScheduleCompletion(completion_program, live_configuration),
     )
     rejected += must_raise(
         TypeError,
@@ -2600,9 +2589,24 @@ def audit_hostile_validation() -> int:
     )
 
     tagged_configuration = encode_tagged(completion.configuration)
+    assert TaggedScheduleCompletion(
+        completion_program,
+        tagged_configuration,
+    ).configuration == tagged_configuration
     rejected += must_raise(
         TypeError,
-        lambda: TaggedScheduleCompletion(object()),
+        lambda: TaggedScheduleCompletion(object(), tagged_configuration),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: TaggedScheduleCompletion(
+            forged_terminal_program,
+            tagged_configuration,
+        ),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: TaggedScheduleCompletion(completion_program, object()),
     )
     forged_tagged_configuration = unsafe_hostile_forge(
         tagged_configuration,
@@ -2610,7 +2614,10 @@ def audit_hostile_validation() -> int:
     )
     rejected += must_raise(
         ValueError,
-        lambda: TaggedScheduleCompletion(forged_tagged_configuration),
+        lambda: TaggedScheduleCompletion(
+            completion_program,
+            forged_tagged_configuration,
+        ),
     )
     forged_tagged_schema = unsafe_hostile_forge(
         tagged_configuration,
@@ -2618,32 +2625,71 @@ def audit_hostile_validation() -> int:
     )
     rejected += must_raise(
         TypeError,
-        lambda: TaggedScheduleCompletion(forged_tagged_schema),
+        lambda: TaggedScheduleCompletion(
+            completion_program,
+            forged_tagged_schema,
+        ),
+    )
+    live_tagged_configuration = encode_tagged(live_configuration)
+    rejected += must_raise(
+        ValueError,
+        lambda: TaggedScheduleCompletion(
+            completion_program,
+            live_tagged_configuration,
+        ),
     )
     rejected += must_raise(
         TypeError,
-        lambda: TaggedScheduleCompletion(tagged_configuration, reason=1),
+        lambda: TaggedScheduleCompletion(
+            completion_program,
+            tagged_configuration,
+            reason=1,
+        ),
     )
     rejected += must_raise(
         ValueError,
         lambda: TaggedScheduleCompletion(
+            completion_program,
             tagged_configuration,
             reason="fixed_point",
         ),
     )
     rejected += must_raise(
         TypeError,
-        lambda: TaggedScheduleCompletion(tagged_configuration, successors=[]),
+        lambda: TaggedScheduleCompletion(
+            completion_program,
+            tagged_configuration,
+            successors=[],
+        ),
     )
     rejected += must_raise(
         ValueError,
-        lambda: TaggedScheduleCompletion(tagged_configuration, successors=((),)),
+        lambda: TaggedScheduleCompletion(
+            completion_program,
+            tagged_configuration,
+            successors=((),),
+        ),
     )
 
     replicated_configuration = encode_replicated(completion.configuration)
+    assert ReplicatedScheduleCompletion(
+        completion_program,
+        replicated_configuration,
+    ).configuration == replicated_configuration
     rejected += must_raise(
         TypeError,
-        lambda: ReplicatedScheduleCompletion(object()),
+        lambda: ReplicatedScheduleCompletion(object(), replicated_configuration),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ReplicatedScheduleCompletion(
+            forged_terminal_program,
+            replicated_configuration,
+        ),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: ReplicatedScheduleCompletion(completion_program, object()),
     )
     forged_replicated_configuration = unsafe_hostile_forge(
         replicated_configuration,
@@ -2651,7 +2697,10 @@ def audit_hostile_validation() -> int:
     )
     rejected += must_raise(
         ValueError,
-        lambda: ReplicatedScheduleCompletion(forged_replicated_configuration),
+        lambda: ReplicatedScheduleCompletion(
+            completion_program,
+            forged_replicated_configuration,
+        ),
     )
     forged_replicated_schema = unsafe_hostile_forge(
         replicated_configuration,
@@ -2659,15 +2708,31 @@ def audit_hostile_validation() -> int:
     )
     rejected += must_raise(
         TypeError,
-        lambda: ReplicatedScheduleCompletion(forged_replicated_schema),
+        lambda: ReplicatedScheduleCompletion(
+            completion_program,
+            forged_replicated_schema,
+        ),
+    )
+    live_replicated_configuration = encode_replicated(live_configuration)
+    rejected += must_raise(
+        ValueError,
+        lambda: ReplicatedScheduleCompletion(
+            completion_program,
+            live_replicated_configuration,
+        ),
     )
     rejected += must_raise(
         TypeError,
-        lambda: ReplicatedScheduleCompletion(replicated_configuration, reason=1),
+        lambda: ReplicatedScheduleCompletion(
+            completion_program,
+            replicated_configuration,
+            reason=1,
+        ),
     )
     rejected += must_raise(
         ValueError,
         lambda: ReplicatedScheduleCompletion(
+            completion_program,
             replicated_configuration,
             reason="fixed_point",
         ),
@@ -2675,6 +2740,7 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(
         TypeError,
         lambda: ReplicatedScheduleCompletion(
+            completion_program,
             replicated_configuration,
             successors=[],
         ),
@@ -2682,6 +2748,7 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(
         ValueError,
         lambda: ReplicatedScheduleCompletion(
+            completion_program,
             replicated_configuration,
             successors=((),),
         ),
@@ -2690,7 +2757,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "6d0b83733fe0c45a983b1c0c7c289948ea6286e7b7a0e830d8e62f3aa2c8e09b"
+EXPECTED_DIGEST = "c7e02485cb444cfeff14680d214a164f48e2f9bdf12e8021f5f28205ca9a789d"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:

@@ -164,6 +164,18 @@ class GuardrailContractTests(unittest.TestCase):
         with self.assertRaisesRegex(GuardrailError, "high-risk operation"):
             self.validate_mutation(contract=contract)
 
+    def test_whole_contract_digest_freezes_canonical_paths_and_role_meanings(self) -> None:
+        contract = copy.deepcopy(self.contract)
+        contract["canonical_documents"][0]["path"] = (
+            "CANONICAL/FRONT-MATTER/00-Different.md"
+        )
+        with self.assertRaisesRegex(GuardrailError, "whole guardrail contract digest"):
+            self.validate_mutation(contract=contract)
+        contract = copy.deepcopy(self.contract)
+        contract["role_definitions"]["CANONICAL_AUTHOR_TEXT"] = "weakened"
+        with self.assertRaisesRegex(GuardrailError, "whole guardrail contract digest"):
+            self.validate_mutation(contract=contract)
+
     def test_holdout_membership_cannot_become_outcome_aware(self) -> None:
         quality = copy.deepcopy(self.quality)
         quality["sample_size"]["changed_unchanged_rule"] = "select after repairs"
@@ -214,6 +226,7 @@ class PathAndPublicationTests(unittest.TestCase):
             Path("ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md"),
             Path("goal-1/compatibility-baseline.json"),
             Path("goal-4/../goal-1/compatibility-baseline.json"),
+            Path("goal-4/../goal-4/compatibility-baseline.json"),
         ):
             with self.assertRaises(GuardrailError):
                 validate_exact_goal_output(

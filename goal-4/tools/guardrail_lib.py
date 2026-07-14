@@ -162,8 +162,12 @@ def validate_exact_goal_output(
     expected_rel = safe_relative_posix(expected_relative)
     require(expected_rel.parts[0] == "goal-4", "owned generated output must be under goal-4")
     expected = repo_root / Path(*expected_rel.parts)
+    require(".." not in output.parts, "generated output path contains '..'")
     candidate = output if output.is_absolute() else repo_root / output
-    require(not candidate.is_symlink(), "generated output path may not be a symlink")
+    require(
+        not _absolute_path_has_symlink_component(candidate),
+        "generated output path has a symlink component",
+    )
     require(candidate.parent.resolve(strict=True) == expected.parent.resolve(strict=True), "generated output parent drift")
     require(candidate.name == expected.name, "generated output must use the exact owned filename")
     require(candidate.resolve(strict=False) == expected.resolve(strict=False), "generated output path alias drift")
@@ -377,6 +381,7 @@ def derive_oracle_classifications(root: Path, contract: dict[str, Any]) -> list[
             marker in text
             for marker in (
                 ".rglob(basename)",
+                ".rglob(spec.name)",
                 ".rglob(Path(match.group(1)).name)",
             )
         )
@@ -564,6 +569,10 @@ EXPECTED_SEPARATE_AUTHORIZATION = {
     "CITATION_REWRITE",
     "COMMIT_PUSH_HOST_OR_EXTERNAL_REDISTRIBUTION",
 }
+
+EXPECTED_GUARDRAILS_CANONICAL_SHA256 = (
+    "0614b605aa16bc98733049ed372eaded6f7841c60ff91481eec1e2f4e530bb73"
+)
 
 
 def validate_quality(quality: dict[str, Any]) -> None:
@@ -1046,7 +1055,10 @@ def validate_contract(
         "external redistribution became implicitly authorized",
     )
     require(len(license_rows) == len(licensing.get("current_records", [])), "duplicate licensing artifact class")
-    require(licensing.get("credentials_or_secrets_may_be_recorded") is False, "licensing contract permits secrets")
+    require(
+        contract.get("licensing", {}).get("credentials_or_secrets_may_be_recorded") is False,
+        "licensing contract permits secrets",
+    )
     modes = contract.get("modes", {})
     require(
         modes
@@ -1195,6 +1207,10 @@ def validate_contract(
     require(
         all(isinstance(row.get("sha256"), str) and re.fullmatch(r"[0-9a-f]{64}", row["sha256"]) for row in contract_rows),
         "contract hash registry contains an invalid hash",
+    )
+    require(
+        sha256_bytes(canonical_json_bytes(contract)) == EXPECTED_GUARDRAILS_CANONICAL_SHA256,
+        "whole guardrail contract digest drift",
     )
     if check_files:
         require(

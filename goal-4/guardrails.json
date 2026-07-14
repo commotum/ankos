@@ -387,7 +387,7 @@
     },
     {
       "path": "goal-4/style-guide.md",
-      "sha256": "5384c43d599ae9e53c4c48ed3c4c9a0c2f86597b44ff20a4aef4e5ccce285356"
+      "sha256": "ccde6a70f13b5287cade04d81513500b24b24963c54820b61e3a14bfa975e6a1"
     },
     {
       "path": "goal-4/review-contract.md",
@@ -690,13 +690,13 @@
       "goal-1/46-T42-source-oracle.py"
     ],
     "additional_dependency_paths": [
-      "ref/notes/CA-Types.csv",
-      "ref/notes/CA-Types.md",
       "goal-1/39-T28-official-note-snapshot.txt",
       "goal-1/39-T28-wolfram-language-semantics-snapshot.txt",
       "goal-1/40-T32-official-checking-note-snapshot.txt",
       "goal-1/40-T32-official-partition-semantics-snapshot.txt",
-      "goal-1/46-T42-semantic-oracle.py"
+      "goal-1/46-T42-semantic-oracle.py",
+      "ref/notes/CA-Types.csv",
+      "ref/notes/CA-Types.md"
     ],
     "capture_all_oracle_classifications": true,
     "capture_recursive_affected_behaviors": true,

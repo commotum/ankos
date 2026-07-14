@@ -544,22 +544,51 @@ def replay_native_traces(
 ) -> tuple[str, tuple[int, int, int, int, int]]:
     """Replay exact source/semantic fixtures without decoding JPEG pixels."""
 
+    assert type(manifest) is tuple
+    assert all(
+        type(field) is tuple
+        and len(field) == 2
+        and type(field[0]) is str
+        for field in manifest
+    )
+    keys = tuple(field[0] for field in manifest)
+    assert len(keys) == len(set(keys))
+    assert frozenset(keys) == frozenset({
+        "schema",
+        "asset",
+        "gray_value",
+        "black_value",
+        "rule_icon_coefficients",
+        "smallest_execution_lowering",
+        "fixtures",
+        "fixture_coefficient_evidence",
+        "pixel_replayed",
+        "pixel_program_forbidden",
+    })
     fields = dict(manifest)
+    assert type(fields["schema"]) is str
     assert fields["schema"] == "T42-page162-semantic-interface/v1"
     native = ASSETS[1854]
+    assert type(fields["asset"]) is tuple
     assert fields["asset"] == (
         native.name, native.byte_length, native.width, native.height,
         native.digest,
     )
-    assert fields["gray_value"] == 0 and fields["black_value"] == 1
+    assert type(fields["gray_value"]) is int and fields["gray_value"] == 0
+    assert type(fields["black_value"]) is int and fields["black_value"] == 1
+    assert type(fields["fixture_coefficient_evidence"]) is str
     assert fields["fixture_coefficient_evidence"] == "LIMITED_TRANSCRIBED"
+    assert type(fields["pixel_replayed"]) is bool
     assert fields["pixel_replayed"] is False
+    assert type(fields["pixel_program_forbidden"]) is bool
     assert fields["pixel_program_forbidden"] is True
+    assert type(fields["smallest_execution_lowering"]) is str
     assert fields["smallest_execution_lowering"] == (
         "uniform_PhaseIndex_times_Bit_word"
     )
 
-    icon_coefficients = tuple(fields["rule_icon_coefficients"])
+    assert type(fields["rule_icon_coefficients"]) is tuple
+    icon_coefficients = fields["rule_icon_coefficients"]
     assert icon_coefficients == (1, 2, 3, 4, 5)
     icon_entries = 0
     icon_children = 0
@@ -573,22 +602,33 @@ def replay_native_traces(
             icon_children += len(block)
 
     trace_rows: list[str] = []
-    fixtures = tuple(fields["fixtures"])
+    assert type(fields["fixtures"]) is tuple
+    fixtures = fields["fixtures"]
     fixture_count = 0
     event_count = 0
     source_firings = 0
     emitted_children = 0
     for fixture in fixtures:
+        assert type(fixture) is tuple and len(fixture) == 6
         (
             name, coefficients, expected_schedule, expected_lengths,
             final_digest, evidence_mode,
         ) = fixture
+        assert type(name) is str and name
+        assert type(coefficients) is tuple
+        assert type(expected_schedule) is tuple
+        assert type(expected_lengths) is tuple
+        assert type(final_digest) is str and re.fullmatch(
+            r"[0-9a-f]{64}", final_digest
+        )
+        assert type(evidence_mode) is str
         assert evidence_mode == "LIMITED_TRANSCRIBED"
-        coefficients = tuple(coefficients)
-        schedule = tuple(expected_schedule)
-        lengths = tuple(expected_lengths)
+        schedule = expected_schedule
+        lengths = expected_lengths
         assert coefficients and type(coefficients[0]) is int
         assert all(type(value) is int and value > 0 for value in coefficients[1:])
+        assert all(type(value) is int and value > 0 for value in schedule)
+        assert all(type(value) is int and value > 0 for value in lengths)
         assert schedule == tuple(reversed(coefficients[1:]))
         assert len(lengths) == len(schedule) + 1 and lengths[0] == 1
 
@@ -785,6 +825,24 @@ def verify_hostile_mutation_gates() -> tuple[int, int]:
     expect_assertion(lambda: replay_native_traces(tuple(trace_mutant)))
     manifest_rejections += 1
 
+    unknown_field_mutant = EXPECTED_ASSET_SEMANTIC_MANIFEST + (
+        ("unknown_field", True),
+    )
+    expect_assertion(lambda: replay_native_traces(unknown_field_mutant))
+    manifest_rejections += 1
+
+    duplicate_field_mutant = EXPECTED_ASSET_SEMANTIC_MANIFEST + (
+        EXPECTED_ASSET_SEMANTIC_MANIFEST[0],
+    )
+    expect_assertion(lambda: replay_native_traces(duplicate_field_mutant))
+    manifest_rejections += 1
+
+    shadowed_field_mutant = (
+        ("pixel_replayed", True),
+    ) + EXPECTED_ASSET_SEMANTIC_MANIFEST
+    expect_assertion(lambda: replay_native_traces(shadowed_field_mutant))
+    manifest_rejections += 1
+
     partition_mutant = NATIVE_IMAGE_LINES | frozenset({12583})
     assert partition_mutant != NATIVE_IMAGE_LINES
     assert digest_lines(partition_mutant) != (
@@ -814,7 +872,7 @@ EXPECTED_REFERENCE_METRICS = (12, 12, 24)
 EXPECTED_PHYSICAL_METRICS = (12, 12, 285_055)
 EXPECTED_PROFILE_METRICS = (12, 12)
 EXPECTED_DISPOSITION_METRICS = (1, 11, 0, 12, 0, 0)
-EXPECTED_HOSTILE_MUTATION_METRICS = (12, 10)
+EXPECTED_HOSTILE_MUTATION_METRICS = (12, 13)
 
 
 IMAGE_ASSET_INTERFACE = (

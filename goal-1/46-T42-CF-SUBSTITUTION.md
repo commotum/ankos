@@ -160,13 +160,14 @@ Define
 e(i,(b0,...,bn)) = ((i,b0),...,(i,bn))
 ```
 
-on the invariant image of nonempty words whose phase components are all equal. The inverse reads the shared phase and strips it from each data label. The compiled closed morphism is
+on the invariant image of nonempty words whose phase components are all equal. The inverse reads the shared phase and strips it from each data label. For a schedule of length `L`, let `A_L = PhaseIndex[0..L] x Bit`. The compiled closed total T13 morphism is
 
 ```text
-(i,b) -> [(i+1,c) for c in rho_schedule[i](b)]
+(i,b) -> [(i+1,c) for c in rho_schedule[i](b)]   when i < L
+(L,b) -> [(L,b)]                                  schema-totalization only
 ```
 
-for active phases. Thus, for every live phase `i < len(schedule)`:
+The generic closed applicability restriction `phase < L` composes with T13 `AllOccurrences`, so terminal rows are never selected and are not T42 events. Thus, for every live phase `i < L`:
 
 ```text
 e(step_direct(program,state)) = step_T13(compiled(program),e(state))
@@ -212,9 +213,9 @@ The executable invariants are: a finite immutable schedule of exact positive coe
 |---|---|---|
 | DOMAIN/configuration | rank-0..3 NumPy arrays with fixed shape | Implement the already-required T13 finite ordered variable-support configuration and ragged trace |
 | ALPHABET | flat finite `int | float | str` values | Implement the generic product/tagged schemas already required across SimplePrograms; T42 uses `PhaseIndex x Bit` plus a uniform-phase invariant |
-| FRONTIER | executable `time_slice` only | Implement T13 `AllOccurrences`, optionally restricted by the generic live-phase predicate; no T42 selector class |
+| FRONTIER | executable `time_slice` only; `loci.py` already composes selector, predicate, and mask descriptions | Generalize that composition to typed occurrences, then compose T13 `AllOccurrences` with the required closed applicability restriction `phase < L`; at `L`, common D024 outcome handling returns `ScheduleExhausted`; no T42 selector class |
 | NEIGHBORHOOD | `self_at` already exists, but only for array loci | Generalize the existing self projection to typed word occurrences; no T42 access class |
-| RULE | scalar-return families and callbacks | Implement the already-required closed nonempty word-emission table and compile the finite schedule into structural phase-indexed morphism data |
+| RULE | structural channel/lookup/compose descriptions already exist, while executable rollout remains scalar/family-specific | Implement the word-valued closed T13 table already required by T13 and compile the schedule into phase-indexed rows, including unselected terminal totalization rows |
 | UPDATE | fixed next-array writes/family rollout | Implement/reuse D019 source-ordered old-snapshot generation concatenation for live phases and the common terminal envelope at exhaustion |
 | identity/serialization | family names, integer IDs, fixed arrays | Retain complete source result, schedule orientation/horizon, codec, phase, ragged word, and lineage structurally |
 
@@ -275,7 +276,7 @@ Normal, JSON, explicit-Book, silent-import, compilation, relocation, catalog/spl
 
 `46-T42-asset-oracle.py` closes the twelve governed images at `1 native / 11 relation / 0 control`, 24 source references (`12 monolith / 12 split`), twelve unique files/hashes, 285,055 bytes, and two five-file relation assemblies. All twelve are `HASH_BOUND`; page 162 is additionally `LIMITED_TRANSCRIBED`; none is pixel-replayed. Every file is baseline JFIF 1.01, three-component RGB with its exact dimensions, byte count, and SHA-256 bound. The structural asset manifest is `881c5c67fbf2aa6eb6bc6b8b0417b77df0057e24d657e72a08aac4f58d8cd2f5`; ledger digest is `42e6fcc06ad821257a3fdaa81a1ca2cb8c71a1449a44dd4250f7644bc0d16b29`.
 
-The limited-transcription interface carries four named page-162 fixture profiles, execution-order coefficient rows, ten rule-icon entries, and the black/gray convention. Independent text supplies `rho`; replay closes 25 events, 301 old-source firings, and 599 emitted children. The trace manifest, which now binds the `LIMITED_TRANSCRIBED` evidence label, is `df358b3c335e09333a1110b7d25f38bb4745dc6598b8095c7c4fa766d925ef12`; the semantic-interface manifest digest is `a29095461ff79de0d08ebd5d2347a5c0edd8ff3151363264ff2fe61892a88556`. Twelve byte mutations and ten manifest/interface mutations fail closed. Source and semantic interfaces pass; script SHA-256 is `116b1c7e95e71fb94921b85c303d0da70f79fa6d2d7c2653b7d1aaa02a34faeb`.
+The limited-transcription interface carries four named page-162 fixture profiles, execution-order coefficient rows, ten rule-icon entries, and the black/gray convention. Independent text supplies `rho`; replay closes 25 events, 301 old-source firings, and 599 emitted children. The trace manifest, which now binds the `LIMITED_TRANSCRIBED` evidence label, is `df358b3c335e09333a1110b7d25f38bb4745dc6598b8095c7c4fa766d925ef12`; the semantic-interface manifest digest is `a29095461ff79de0d08ebd5d2347a5c0edd8ff3151363264ff2fe61892a88556`. Twelve byte mutations and ten manifest/interface mutations fail closed. Source and semantic interfaces pass; script SHA-256 is `380c54beb50728f3c681691dc0beaae9ee6dac11ff95972b7a41c34fccd5c155`.
 
 ## Frozen Semantic Closure
 
@@ -283,14 +284,14 @@ The limited-transcription interface carries four named page-162 fixture profiles
 
 The exact transition audit closes two terminal cases across six direct/tagged/product views, retaining three final symbols and rejecting two empty D019 commits. It replays four page-162 fixtures over 25 events/301 source firings/599 children; closes 630 active and 390 completion cases across thirteen bounded programs; proves all 630 canonical replicated-product T13 commutations with 5,145 children and exact lineage; and retains compact/tagged carriers only as lossless interfaces. Mechanical-word checks cover five positive and five signed-`a0` cases, two `d=1` alignments, and two guarded `d=0` mismatches. Rational dual forms, reversal, horizon, word/cursor loss, `m=1`, three quadratic tables/62 word cases, the two-event `sqrt(3)` macro, one false one-step rejection, 64 coefficient-table round trips, and 4,224 emitted codec symbols are independently guarded.
 
-The public audit sees 35 dataclasses, zero forbidden native roles, zero class-4 algebras, and 69 hostile rejections. Strict seed is absent from transition-program identity; uniform `PhaseIndex x Bit` is the canonical executable carrier; exhaustion retains the final word through the common terminal envelope without invoking D019. No evaluator, raster program, family executor, or new UPDATE exists. Semantic digest is `6bc8f95d07c32b5983c8b0890c7f9b8a07e511c25d77b12c7963ce9fc36b5c1d`; script SHA-256 is `e4794537b9d5d3820c4a0bb484b89f6e4dd1f9b489c132653d82b9815b721213`. Normal, relocation, silent-import, compilation, optimized-mode, and malformed-usage gates pass or fail closed as required.
+The public audit sees 35 dataclasses, zero forbidden native roles, zero class-4 algebras, and 91 hostile rejections, including complete payload validation for direct, tagged, and replicated terminal results. Strict seed is absent from transition-program identity; uniform `PhaseIndex x Bit` is the canonical executable carrier; exhaustion retains the final word through the common terminal envelope without invoking D019. No evaluator, raster program, family executor, or new UPDATE exists. Semantic digest is `6d0b83733fe0c45a983b1c0c7c289948ea6286e7b7a0e830d8e62f3aa2c8e09b`; script SHA-256 is `cd7daf5c293fa55a3a4972c1ebcaae4b9eccbc0ff704a1e4f45fe2ca2936ffcb`. Normal, relocation, silent-import, compilation, optimized-mode, and malformed-usage gates pass or fail closed as required.
 
 ## Completion Requirements
 
 - [ ] Every strict-main, native-Notes, actual-Index, split, relation, control, continuation, exclusion, and source-defect candidate is dispositioned with zero unresolved mechanics.
 - [ ] Every governed or excluded raster candidate is hash-bound; the page-162 manual transcription and all nonauthority limits are explicit.
 - [ ] Natural-prefix orientation, signed `a0`, positive unbounded tail, `m-1` event count, fixed seed, horizon identity, and exhaustion are independently verified.
-- [ ] Direct compact, tagged, and uniform-phase T13 representations commute one event at a time with complete outcomes and lineage.
+- [ ] The compact and tagged interface encodings and the canonical uniform-phase T13 lowering commute one live event at a time with complete outcomes and lineage; all views retain the final word under the common terminal envelope.
 - [ ] T40 handoffs replay complete results and reject forged IDs, coefficients, outcomes, termination, callbacks, and producer state; explicit schedules use a separate schema.
 - [ ] Quadratic macros, rational dual forms, mechanical-word observers, page-162 fixtures, and sine/digital-slope/billiard boundaries are adversarially tested.
 - [ ] Source, asset, semantic, cross-interface, mutation, portability, fail-closed, mode, Markdown, diff, scope, repository-test, and independent hostile-review gates pass.
