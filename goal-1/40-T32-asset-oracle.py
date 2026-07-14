@@ -4,21 +4,22 @@
 The native T32 visual record consists of the printed-page-213 two-example
 plate, the printed-page-214/215 two-file catalog of 171 periodic witnesses,
 and the printed-page-941 Notes plate that displays the 32 possible oriented
-five-cell templates.  Relation assets cover the 1D
-allowed-block predecessor, a 2D-substitution source, a 16-color local-block
-construction, a CA-spacetime encoding, tiling/network relatives, and two
-observer/application views.  T31 neighbor-count plates and all main-text T33
-required-occurrence plates are retained only as controls; they are never
-classified as T32 native evidence.
+five-cell templates.  Relation assets cover the 1D allowed-block predecessor,
+a 2D-substitution source, CA fixed-point/spacetime encodings, local-block
+forcing, tiling/network relatives, and observer/application views.  Controls
+cover T31/T33, solver landscapes, evolution-versus-invariance, exact-template
+feature extraction, stochastic aggregation conditioned on templates, and a
+CA feature extractor.  None is promoted to T32 native evidence.
 
 Every governed JPEG is bound to one unique physical file, its exact monolith
 and split-Markdown references, byte length, dimensions, SHA-256, assembly,
 and evidence boundary.  No pixels are used to reconstruct a template table,
-template order, seed, configuration, trace, palette, or solver result.  Thus
-all 25 assets are HASH_BOUND, LIMITED_TRANSCRIBED is empty, and none is
-PIXEL_REPLAYED.  The source prose owns such facts as the two printed
-constraint numbers, the total of 32 possible templates, and the 171-pattern
-catalog count; this oracle merely guards those source lines.
+seed, configuration, trace, palette, or solver result.  The exact five-cell
+template order is independently source-derived at BOOK:13513-13520; it is not
+a transcription of the page-941 raster.  Thus all 42 assets are HASH_BOUND,
+LIMITED_TRANSCRIBED is empty, and none is PIXEL_REPLAYED.  The source prose
+also owns such facts as the two printed constraint numbers, the total of 32
+possible templates, and the 171-pattern catalog count.
 
 The public image-line sets below are standalone and stable.  This verifier
 does not import or depend on an unfinished T32 source oracle.
@@ -79,6 +80,7 @@ class AssetSpec(NamedTuple):
 
 
 CHAPTER5 = "CHAPTERS/5-Two-Dimensions-and-Beyond"
+CHAPTER7 = "CHAPTERS/7-Mechanisms-in-Programs-and-Nature"
 CHAPTER9 = "CHAPTERS/9-Fundamental-Physics"
 CHAPTER10 = "CHAPTERS/10-Processes-of-Perception-and-Analysis"
 INDEX = "BACK-MATTER/Index"

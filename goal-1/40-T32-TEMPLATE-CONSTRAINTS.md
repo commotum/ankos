@@ -9,7 +9,7 @@ Status: **IN PROGRESS — ARCHITECTURE RECONSTRUCTED; EVIDENCE ORACLES AND HOSTI
 - The strict main-text profile is binary on the square lattice. Its local support is the oriented five-site cross, so there are `2^5 = 32` possible local templates and `2^32 = 4,294,967,296` allowed-template sets. The Book fixes raw sorted `(row,column)` offsets `((-1,0),(0,-1),(0,0),(0,1),(1,0))`; compass names arise only through the explicit T21 Book-frame-to-ENU adapter `(row,column) -> (x=column,y=-row)`.
 - Templates apply at every cell and neighboring anchored occurrences overlap. Overlap is pointwise equality in one candidate field, not a write collision or UPDATE policy (`BOOK:2614-2620`).
 - The strict family is unusually completely classified in the source: `766,979,044` allowed sets have no model and the remaining `3,527,988,252` have a periodic model represented by one of 171 displayed pattern families (`BOOK:2620-2630`). This source theorem does not by itself supply a machine-readable 171-pattern solver table.
-- The Notes define the 32-bit numbering scheme and check finite arrays with alternatives of `3 x 3` Mathematica patterns whose four corners are Blank. The general-rule Notes independently fix the raw sorted five-offset order and descending binary neighborhood catalog used by the page-941 plate (`BOOK:13513-13520`), so the numeric codec need not be inferred from pixels. The Blank corners are outside the five-site cross support; they are not wildcard-valued semantic slots (`BOOK:14048-14060`).
+- The Notes define the 32-bit numbering scheme and check finite arrays with alternatives of `3 x 3` Mathematica patterns whose four corners are Blank. The general-rule Notes independently fix the raw sorted five-offset order and descending binary neighborhood catalog used by the page-941 plate (`BOOK:13513-13520`), so the numeric codec need not be inferred from pixels. Its first offset is locally malformed as `(-1, 0)` while the remaining entries use Mathematica braces; a guarded one-tuple delimiter repair, consistent with T21's raw-tuple interpretation, is disambiguated by five-neighbor arity, `Sort` order, the other four tuples, and the page-941 cross-reference. The Blank corners are outside the five-site cross support; they are not wildcard-valued semantic slots (`BOOK:14048-14060`).
 - The local extraction corrupts two executable tokens: it renders the four Blank corners `_` as `-` and Mathematica `Alternatives` bars `t1 | t2 | t3` as slashes `t1/t2/t3`. The official Wolfram Science note supplies both forms; both repairs must be frozen and fail-closed before the adapter is executable.
 - Allowed sets are exact and oriented. Overall rotation, reflection, and black/white exchange omit equivalent gallery representatives; they are relations between constraints/models, not implicit matching modes (`BOOK:14048`).
 - T31 already owns the generic declarative model-set, exact periodic/open/window scopes, verifier reports, solver-query outcomes, witnesses, certificates, `Unknown`, pointwise model identity, and no-evolution boundary.
@@ -17,7 +17,7 @@ Status: **IN PROGRESS — ARCHITECTURE RECONSTRUCTED; EVIDENCE ORACLES AND HOSTI
 - T31 count relations lower losslessly to allowed oriented templates by enumerating every assignment with an allowed center-conditioned histogram. T32 is strictly more expressive than histograms because it can distinguish two patterns with the same center and neighbor counts but different orientations.
 - T33 begins when one allowed template is also required to occur at least somewhere (`BOOK:2632-2640`). That existential global conjunct is not a T32 flag, seed, initial condition, or distinguished firing locus.
 - Enlarged `3 x 3`, `2 x 2` multicolor, CA-fixed-point/spacetime, subshift, and tiling constructions are variants or explicit relations. They do not retroactively change the strict five-site profile or add evolution.
-- `src/ca` remains the intended shared SimplePrograms library, not a CA-only package. Its checked-in realization currently lacks the declarative relation/model-set layer that T31 and T32 require; existing alphabet, loci, and coordinate-access machinery remains reusable, while rollout is simply inapplicable because the source supplies no native step.
+- `src/ca` remains the intended shared SimplePrograms library, not a CA-only package. Its checked-in realization currently lacks the declarative relation/model-set layer that T31 and T32 require; existing alphabet, loci, and coordinate-access machinery remains reusable, while rollout is simply inapplicable because the source supplies no native step. Static 2D reuse must pass an explicit `CoordinateSpace(shape=(nx,ny), steps=None)` to `loci.gather`; otherwise its fallback interprets the leading array axis as time.
 
 ## Updated Assumptions
 
@@ -83,7 +83,7 @@ Final frozen counts, digests, snapshot hashes, source-oracle SHA, and unresolved
 ### E06 — strict numbering and template catalog
 
 - Source: `BOOK:13513-13520`, `14048-14052`.
-- Establishes: there are 32 oriented cross templates; the raw Book offsets are sorted as `((-1,0),(0,-1),(0,0),(0,1),(1,0))`; `Reverse[Table[IntegerDigits[...]]]` fixes the descending binary catalog displayed on page 941; and the 32-bit integer selects catalog positions. This makes the numeric codec textually derivable and independently checkable without raster transcription. Compass labels require the explicit T21 frame adapter.
+- Establishes: after the single guarded delimiter repair, the raw Book offsets are sorted as `((-1,0),(0,-1),(0,0),(0,1),(1,0))`; `Reverse[Table[IntegerDigits[...]]]` fixes the 32 descending binary templates displayed on page 941; and the 32-bit integer selects catalog positions. This makes the numeric codec textually derivable and independently checkable without raster transcription. Compass labels require the explicit T21 frame adapter.
 
 ### E07 — exact finite-array adapter
 
@@ -150,7 +150,7 @@ support   = {Self, North, East, South, West}
 allowed   = any subset of alphabet^support
 ```
 
-For source identity, the strict support is stored in the raw Book `(row,column)` frame and order above. A declared adapter may expose the equivalent ENU names; neither storage array axes nor compass labels are implicit.
+Semantically, strict support is the unordered set of five raw Book `(row,column)` offsets and every template is an offset-to-label map. The ordered raw tuple belongs only to the NKS codec/source AST and decodes catalog words into those maps. A declared adapter may expose equivalent ENU names; neither storage array axes, compass labels, nor codec order enters relation satisfaction or extensional equality.
 
 The empty allowed set is valid syntax with no models. Duplicate offsets, a missing zero anchor, mixed-dimensional offsets, undeclared labels, partial templates, duplicate templates, and callbacks are invalid syntax. Whether a valid relation has a model is a semantic/query question, not constructor validation.
 
@@ -178,7 +178,7 @@ The Notes' semantic support is the five-site cross. The repaired outer expressio
 
 It must not install a host `MatchQ` callback, preserve Blank as an alphabet value, add wildcard slots to the semantic footprint, or infer rotations/reflections.
 
-The Notes' finite `Partition[list,{3,3},{1,1}]` checker visits only complete array windows. It is an open-patch verifier fixture, not evidence that native infinite support has dropped boundaries. Exact periodic presentations reuse T31's modulo point query and check one complete fundamental domain.
+The Notes' finite `Partition[list,{3,3},{1,1}]` checker visits only complete array windows. An array smaller than `3 x 3` therefore reports `checked_anchors=0` and at most vacuous local consistency, never global `Satisfiable`. This is an open-patch verifier fixture, not evidence that native infinite support has dropped boundaries. Exact periodic presentations reuse T31's modulo point query and check one complete fundamental domain.
 
 ### T31 lowering and the orientation counterexample
 
@@ -217,7 +217,7 @@ T32 directly reuses T31's:
 - witness reverification and certificate replay; and
 - pointwise model identity with separate symmetry/orbit observers.
 
-The strict 171-family theorem permits a specialized complete analyzer only if the exact catalog and witnesses are recovered. Generic bounded periodic search remains incomplete, and broader undecidability prevents a total solver API. Neither fact changes relation semantics.
+The strict 171-family theorem permits a specialized complete analyzer only if the exact 171 witness families and their matching table are recovered; the 32-template catalog codec alone is insufficient. Generic bounded periodic search remains incomplete, and broader undecidability prevents a total solver API. Neither fact changes relation semantics.
 
 ## Semantic Proof Requirements
 
@@ -237,7 +237,7 @@ The strict 171-family theorem permits a specialized complete analyzer only if th
 - T33 existential occurrence excluded from T32; and
 - static absence of frontier/write/update/seed/time semantics.
 
-Final event counts, hostile controls, semantic digest, oracle SHA, and any underdetermined source codec are pending the independent semantic audit.
+Final event counts, hostile controls, semantic digest, oracle SHA, and guarded numeric-codec results are pending the independent semantic audit.
 
 ## Architecture Classification
 
@@ -261,13 +261,13 @@ Relative to D058's already justified declarative category, every T32 delta is ca
 The checked-in `src/ca` realization has no declarative constraint modules, scoped model/query records, or exact local-relation verifier yet. T31 already requires those shared pieces inside the broader SimplePrograms library. T32 should extend that planned implementation rather than create a parallel family API:
 
 1. Add generic immutable `AllowedLocalPatterns` as one tagged relation node with finite named support, total templates, canonical serialization, and no callback.
-2. Generalize the T31 verifier dispatch structurally over closed relation-node tags, keeping one shared report/scope/query API rather than relation-specific solver classes.
-3. Add pure exact-template observation and violation construction atop the same coordinate/presentation layer.
-4. Add a lossless T31 count-to-template compiler with retained compact source AST/provenance and conformance checks.
+2. Normalize T31's compact histogram AST losslessly into `AllowedLocalPatterns` and use one exact-pattern evaluator and report envelope. Retain compact T31 AST/provenance for program identity; any direct histogram evaluator is only a certified commuting optimization, not relation-tag family dispatch.
+3. Add pure exact-template observation and violation construction atop the shared coordinate/presentation layer. For a static array, construct `CoordinateSpace(shape=(nx,ny), steps=None)` explicitly and pass it to `loci.gather`; canonical zero `t` coordinates are an encoding column, not native time.
+4. Add the T31 count-to-template inverse/image check and conformance proofs so arbitrary oriented relations cannot masquerade as histograms.
 5. Add the strict binary-cross constructor, guarded Notes adapter, and source-derived NKS numeric constructor using the exact sorted-offset/descending-binary catalog, with exhaustive positional conformance.
 6. Keep search/analyzer algorithms in the solver layer. A future recovered 171-witness table is data for a strict analyzer, not core semantics.
 7. Add explicit symmetry transforms/orbit observers; require enumeration for symmetry-invariant matching.
-8. Add no rollout branch, T32 state class, template predicate, matching flag, repair update, hidden boundary, T33 requirement, or trusted raster table.
+8. Add no rollout branch, T32 state class, template predicate, matching flag, relation-family verifier dispatch, repair update, hidden boundary, T33 requirement, or trusted raster table.
 
 ## No-Cheating Checks
 

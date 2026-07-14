@@ -275,7 +275,7 @@ RELATION_MATCHED = line_set(
     "4068,4072,4082,5776,5788,6976,13513,13520,13551,"
     "14040,14044,14047,14063,14099,"
     "14113,14115,14124,14134,"
-    "16022,16367,16369,16373"
+    "16022,16367,16369,16373,17115,20681"
 )
 CONTROL_MATCHED = line_set(
     "2568,2590,2596,2600,2608,2610,"
@@ -291,13 +291,16 @@ RELATION_CONTINUATIONS = line_set(
     "14065-14067,14069,14071-14078,"
     "14109,14111,14117,14119,14121,14123,"
     "14126,14128,14130,14132,14136,14138,14140,14142,"
-    "16371,17463,17465"
+    "16371,16375,17463,17465"
 )
 CONTROL_CONTINUATIONS = line_set(
-    "2576,2584,2598,2606,2632,2636,2638,4074,4076,4078,"
+    "2576,2584,2598,2606,2632,2636,2638,"
     "2642,2644,2648,2652,2656,2658,2660,2662,2664,2666,2668,"
     "2670,2674,2676,2678,2682,2686,2690,2692,2694,2698,"
-    "14084,14144,14149,14153"
+    "4040,4042,4044,4074,4076,4078,"
+    "6940,6942,6944,6946,"
+    "14084,14144,14149,14153,"
+    "15209,15211,15213,15215,15217,15219,17433"
 )
 
 NATIVE_EVIDENCE = NATIVE_MATCHED | NATIVE_CONTINUATIONS
@@ -318,18 +321,32 @@ EXCLUDED = frozenset().union(*EXCLUDED_CLASS.values())
 IMAGE_RE = re.compile(r"^!\[[^\]]*\]\(([^)]+)\)$")
 NATIVE_IMAGE_LINES = line_set("2616,2626,2628,14052")
 RELATION_IMAGE_LINES = line_set(
-    "2322,4080,5786,6974,14042,14111,14117,14136,14138,14142,17465"
+    "2322,4080,5786,6974,14042,14111,14117,14136,14138,14142,16375,17465"
 )
 CONTROL_IMAGE_LINES = line_set(
-    "2576,2584,2598,2606,2638,2662,2670,2682,2686,2690,2692,4074,4076"
+    "2576,2584,2598,2606,2638,2662,2670,2682,2686,2690,2692,"
+    "4040,4042,4044,4074,4076,6940,6942,6944,6946,"
+    "15211,15213,15215,15217,15219,17433"
 )
 GOVERNED_IMAGE_LINES = (
     NATIVE_IMAGE_LINES | RELATION_IMAGE_LINES | CONTROL_IMAGE_LINES
 )
-EXCLUDED_IMAGE_LINES = line_set(
-    "2314,2328,2564,5804,6926,6940,6942,6944,6946,"
-    "6952,6954,6964,6982,17457,17461,17469,17475,17479,17483"
-)
+# Candidate scope follows exact caption/facing-page ownership, not an arbitrary
+# line radius.  These image groups are explicitly nearby but owned by another
+# family/passage; in particular 2328 and 2330 are the paired rule/result plate
+# for T27 geometrical substitution, while 14273 and 17113 belong to the
+# preceding CA-motion and Ramsey-theory passages.
+EXCLUDED_IMAGE_CLASS = {
+    "other_simple_program_plates": line_set("2314,2328,2330,2564,5804"),
+    "observer_context_without_retained_caption": line_set(
+        "6926,6952,6954,6964,6982"
+    ),
+    "preceding_CA_and_Ramsey_passages": line_set("14273,17113"),
+    "texture_and_moire_context": line_set(
+        "17457,17461,17469,17475,17479,17483"
+    ),
+}
+EXCLUDED_IMAGE_LINES = frozenset().union(*EXCLUDED_IMAGE_CLASS.values())
 CANDIDATE_IMAGE_LINES = GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
 
 
@@ -338,6 +355,7 @@ INDEX_CLASS = {
     "one_dimensional_language_routes": line_set("21189,22144"),
     "T32_template_tiling_routes": line_set("21050,22150,22291,22380"),
     "sibling_spin_and_substitution_routes": line_set("22134,22146"),
+    "pattern_avoidance_routes": line_set("21074,21683,21761"),
 }
 INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
 INDEX_ENTRY_GUARDS = {
@@ -360,6 +378,15 @@ INDEX_ENTRY_GUARDS = {
     "sibling_spin_and_substitution_routes": {
         22134: ("spin systems", "as systems based on constraints, 944"),
         22146: ("substitution systems", "systems based on constraints, 942"),
+    },
+    "pattern_avoidance_routes": {
+        21074: ("deletecases", "pattern-avoiding sequences"),
+        21683: ("network systems", "in pattern-avoiding sequences"),
+        21761: (
+            "pattern-avoiding sequences, 944",
+            "as extraterrestrial signals, 1190",
+            "vs. ramsey theory, 1068",
+        ),
     },
 }
 INDEX_CONTINUATIONS = line_set(
@@ -385,7 +412,36 @@ LOCAL_CORRUPT_ALLOWED_PATTERN = r"$t_1/t_2/t_3$"
 LOCAL_CORRUPT_TEMPLATE = (
     r"\{\{-, 1, -\}, \{0, 0, 1\}, \{-, 0, -\}\}"
 )
-BOOK_CARDINAL_OFFSETS = ((-1, 0), (0, -1), (0, 0), (0, 1), (1, 0))
+RAW_BOOK_CARDINAL_OFFSET_EXPRESSION = (
+    r"\{(-1, 0), \{0, -1\}, \{0, 0\}, \{0, 1\}, \{1, 0\}\}"
+)
+REPAIRED_BOOK_CARDINAL_OFFSET_EXPRESSION = (
+    r"\{\{-1, 0\}, \{0, -1\}, \{0, 0\}, \{0, 1\}, \{1, 0\}\}"
+)
+
+
+def guarded_repair_book_5_neighbor_offsets(raw: str) -> tuple[tuple[int, int], ...]:
+    """Repair BOOK:13513's single tuple delimiter; reject every other edit."""
+
+    if raw != RAW_BOOK_CARDINAL_OFFSET_EXPRESSION:
+        raise ValueError("BOOK:13513 raw five-neighbor expression changed")
+    if raw.count("(-1, 0)") != 1:
+        raise ValueError("BOOK:13513 repair requires one parenthesized pair")
+    repaired = raw.replace("(-1, 0)", r"\{-1, 0\}", 1)
+    if repaired != REPAIRED_BOOK_CARDINAL_OFFSET_EXPRESSION:
+        raise ValueError("BOOK:13513 repair changed more than one delimiter pair")
+    pairs = tuple(
+        (int(first), int(second))
+        for first, second in re.findall(r"\{(-?\d+), (-?\d+)\}", repaired)
+    )
+    if len(pairs) != 5 or pairs != tuple(sorted(pairs)):
+        raise ValueError("BOOK:13513 repaired offsets violate arity or Sort order")
+    return pairs
+
+
+BOOK_CARDINAL_OFFSETS = guarded_repair_book_5_neighbor_offsets(
+    RAW_BOOK_CARDINAL_OFFSET_EXPRESSION
+)
 EXPECTED_ENU_OFFSETS = ((0, 1), (-1, 0), (0, 0), (1, 0), (0, -1))
 EXPECTED_ENU_NAMES = ("N", "W", "C", "E", "S")
 
@@ -1022,14 +1078,31 @@ def main() -> int:
         "OK" if notes_ok else "MISMATCH",
     )
 
-    offsets_ok = (
+    offset_repair_ok = (
         "for 2D 5-neighbor rules" in at(13513)
-        and r"\{(-1, 0), \{0, -1\}, \{0, 0\}, \{0, 1\}, \{1, 0\}\}" in at(13513)
+        and at(13513).count(RAW_BOOK_CARDINAL_OFFSET_EXPRESSION) == 1
+        and REPAIRED_BOOK_CARDINAL_OFFSET_EXPRESSION not in at(13513)
+        and RAW_BOOK_CARDINAL_OFFSET_EXPRESSION.count("(-1, 0)") == 1
+        and RAW_BOOK_CARDINAL_OFFSET_EXPRESSION.count(r"\{0, -1\}") == 1
+        and RAW_BOOK_CARDINAL_OFFSET_EXPRESSION.count(r"\{0, 0\}") == 1
+        and RAW_BOOK_CARDINAL_OFFSET_EXPRESSION.count(r"\{0, 1\}") == 1
+        and RAW_BOOK_CARDINAL_OFFSET_EXPRESSION.count(r"\{1, 0\}") == 1
+        and len(BOOK_CARDINAL_OFFSETS) == 5
+        and BOOK_CARDINAL_OFFSETS == tuple(sorted(BOOK_CARDINAL_OFFSETS))
         and "offset lists are always taken to be in the order given by *Sort*" in at(13513)
+        and "page 941 for 5-neighbor rules" in at(13520)
+    )
+    ok &= offset_repair_ok
+    print(
+        "source_defect_guarded_T21_one_tuple_delimiter_repair",
+        "OK" if offset_repair_ok else "MISMATCH",
+    )
+
+    offsets_ok = (
+        offset_repair_ok
         and "possible neighborhood configurations are" in at(13513)
         and "Reverse[Table[IntegerDigits[i - 1," in at(13516)
         and "k, Length[os]], {i, k^Length[os]}]]" in at(13517)
-        and "page 941 for 5-neighbor rules" in at(13520)
         and tuple(map(book_row_column_to_enu, BOOK_CARDINAL_OFFSETS))
         == EXPECTED_ENU_OFFSETS
         and tuple(
@@ -1209,6 +1282,7 @@ def main() -> int:
 
     source_defects_ok = (
         repair_ok
+        and offset_repair_ok
         and " $56.3 \\times 3$  templates" in at(2694)
         and "56 allowed templates" in at(2688)
         and len(at(14105)) == 4254
@@ -1378,6 +1452,7 @@ def main() -> int:
         model_actual == EXPECTED_SOURCE_MODEL
         and main_ok
         and notes_ok
+        and offset_repair_ok
         and offsets_ok
         and codec_ok
         and adapter_ok
