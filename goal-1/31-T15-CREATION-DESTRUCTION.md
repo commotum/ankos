@@ -1,6 +1,6 @@
 # 31-T15-CREATION-DESTRUCTION
 
-Status: **IN PROGRESS — SOURCE CLOSED; ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN**
+Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS CLOSED; HOSTILE REVIEW OPEN**
 
 ## Current Facts
 
@@ -9,20 +9,21 @@ Status: **IN PROGRESS — SOURCE CLOSED; ASSET, SEMANTIC, AND ARCHITECTURE AUDIT
 - The catalog name does not occur in the Book or Atlas. The actual Index has no dedicated T15 heading; eight broad 0L/1L/D1L/L-system/substitution routes lead to pages 82–87 and 70 Index candidates are excluded.
 - The direct Chapter 3 discussion begins at `BOOK:1028` immediately after the strict nonempty neighbor-dependent examples. It says elements may disappear, distinguishes excessive disappearance from rapid growth, and studies rules whose creation and destruction are nearly balanced (`BOOK:1028-1040`).
 - The direct figures use variable-cardinality ordered words. Equal-total-width and fixed-box rows are alternate views, and only sequence order remains semantic as insertions/deletions shift later displayed positions (`BOOK:1032-1048`).
-- The facing-page three- and four-color examples retain the same creation/destruction theme; one has a CA-like regular region away from the right edge and the others create and destroy elements throughout (`BOOK:1044-1052`). Exact table arity, empty rows, seeds, and boundary behavior must be decoded and independently bound before this becomes a construction claim.
+- The fixed-point asset audit closes 23 source-bound files at `C/O/R/X=3/1/13/6` with 23 monolith references, 23 split references, and 23 unique hashes. It directly decodes one binary, four ternary, and two quaternary total pair tables plus all seven seeds/`t0..t11` traces.
+- The page-101 table is `11->11, 10->0, 01->10, 00->epsilon`. Five of the six page-102 tables contain respectively `2,2,1,4,3` epsilon rows; page-102 (a) contains none. All use the same immediate-right contextual schedule.
 - No T15 rule table, seed, or operator is transcribed in the Notes. The prose contains no literal “empty replacement”, “epsilon”, or erasing terminology; the corpus's only explicit syntactic empty right-hand side is a T17 tag-system row at `BOOK:12298`, under a different consume-prefix/append-tail schedule.
-- T14 established `OrderedGenerationConcat`: selected old anchors emit ordered words and UPDATE consumes the old generation, concatenating writes in source/child order. T13 and strict T14 currently validate `Sigma+`; T15 must determine whether the reusable base is actually `Sigma*` with nonempty output only a preset invariant.
+- T14 established `OrderedGenerationConcat`: selected old anchors emit ordered words and UPDATE consumes the old generation, concatenating writes in source/child order. T15 proves that its private result carrier is `Sigma*` while strict T13/T14 validators remain `Sigma+`.
 - An empty RULE emission, zero selected sources, an empty successor, extinction, halt, and zero successors are distinct. T14's `[]->[]`/singleton-to-empty behavior comes from zero eligible pairs and cannot serve as evidence for a native epsilon-valued T15 row.
-- DOMAIN is expected to remain discrete `t+1D`; the finite ordered word and its occurrence topology belong to CONFIGURATION. This remains a hypothesis until the direct rule plates and Notes/Index routes close.
+- DOMAIN is discrete `t+1D`; the finite ordered word, including epsilon, and its occurrence topology belong to CONFIGURATION.
 - Goal 1 changes only `goal-1/`. Runtime implementation and tests remain Goal 2 work.
 
 ## Updated Assumptions
 
-- Leading reuse hypothesis: T15 keeps the T14 finite-word/frontier/read schedule and widens the pair-table output from `Sigma+` to `Sigma*`; the shared UPDATE then needs no new algebra. This is not accepted until a direct empty-output row and one-step commuting reconstruction are proved.
+- Closed reuse result: T15 keeps the T14 finite-word/frontier/read schedule and widens only the pair-table output validator from `Sigma+` to `Sigma*`; the shared UPDATE needs no new algebra.
 - If the source instead mixes self-only and contextual profiles, they should be named presets over the same ordered-generation base, not one family switch or a table that accepts ambiguous key shapes.
 - Empty emissions must remain explicit typed writes/events bound to their old sources even though they create no children. Lineage must not invent epsilon symbols, zero-width child objects, or sentinels.
-- Extinction to the valid empty word is a successor. Whether the empty word subsequently stutters, terminates, or has another source-defined outcome must follow the exact native operator rather than a global empty-frontier rule.
-- Balanced/slow growth is initially an observer or rule/trajectory property, not a `growth_policy`, update mode, or hidden selection criterion.
+- Extinction to the valid empty word is a successor. Under the accepted `Partition/Flatten` operator, the empty word has the derived successor empty word; this is construction-specific, not a global empty-frontier rule.
+- Balanced/slow growth is an observer or rule/trajectory property, not a `growth_policy`, update mode, or hidden selection criterion.
 
 ## Big Picture Objective
 
@@ -34,7 +35,7 @@ Reconstruct creation-destruction substitution directly from exhaustive primary e
 - CSV line: 16.
 - Catalog name: Creation-Destruction Substitution Systems.
 - Taxonomy section: 15.
-- Provisional construction kind: deterministic parallel transition system over a dynamically sized ordered symbol configuration.
+- Construction kind: deterministic contextual ordered-generation preset over a dynamically sized finite word.
 - Search vocabulary: creation/destruction, disappear/disappearance, die out/extinction, slow/balanced/fixed growth, empty replacement, page 86/page 87, substitution rule plates, Notes/Index routes, multicolor variants, and adjacent contextual relations.
 
 ## Search Log
@@ -233,74 +234,230 @@ Rule glyphs, seeds, and those displayed rows are direct hash-bound transcription
 
 ## Construction Model
 
-Open evidence questions:
-
-- Does the strict direct profile use ordered pair contexts exactly as T14, and which old anchors are eligible?
-- Which exact rows emit zero, one, or multiple symbols, over which alphabets?
-- Does the rightmost old occurrence remain source-ineligible, and what happens after the word becomes empty?
-- Are the displayed seeds/tables/textual rules recoverable from Notes, raster, or both?
-- Does one shared `OrderedGenerationConcat[Word]` commute with the native operator when `Word` permits epsilon?
-- How should an empty source-bound emission be represented in event/lineage data without creating a child or alphabet symbol?
-
-The provisional candidate, subject to those answers, is:
+T15 is a preset/refinement of the contextual ordered-generation construction, not a new executor or top-level state class.
 
 ```text
-active = FRONTIER.select(configuration)
-reads  = NEIGHBORHOOD.read(configuration, active)
-writes = RULE(active, reads)                  # source-bound words in Sigma*
-next   = UPDATE.apply(configuration, active, writes)
+DOMAIN        = discrete t+1D
+CONFIGURATION = FiniteWord[Symbol]             # includes epsilon
+ALPHABET      = finite ordered Sigma
+SEED          = any validated finite word
+FRONTIER      = OccurrencesWhere(HasRightNeighbor)
+NEIGHBORHOOD  = OccurrenceOffsets((Self, Right))
+RULE          = TotalTable[Sigma^2, Word[Sigma]]
+UPDATE        = OrderedGenerationConcat
 ```
+
+For `w = w_0...w_(n-1)` and total table `h : Sigma^2 -> Sigma*`:
+
+```text
+active(w) = snapshot-scoped occurrences 0..n-2
+read(i)   = (w_i, w_(i+1))
+emit(i)   = h(read(i))
+step(w)   = emit(0) ++ ... ++ emit(n-2)
+```
+
+Every read is taken from the same immutable old word. Adjacent sources may overlap in what they read, but the returned words are not replacement spans and therefore do not collide. UPDATE consumes the complete old generation, concatenates one emission per selected source in source/child order, and never copies the unselected rightmost occurrence.
+
+The reusable emission/result carrier is `Word[Sigma] = Sigma*`. T13's `Sigma -> Sigma+` and T14's `Sigma^2 -> Sigma+` remain strict public validators. T15 supplies the distinct total `Sigma^2 -> Sigma*` validator; this is a typed schema refinement, not an `allow_empty` execution flag.
+
+An epsilon row still produces one inspectable `OrderedEmission(source,())` and one zero-length lineage interval `[c,c)`. It produces no child occurrence, epsilon symbol, placeholder, or sentinel. Exact selected-frontier coverage counts that record.
+
+The outcome distinctions are:
+
+| Old word/event | Selected sources | RULE writes | Successor | Meaning |
+|---|---:|---|---|---|
+| `00` under page-101 row | 1 | one explicit epsilon emission | `[]` | active-source extinction |
+| `001` under page-101 table | 2 | epsilon, then `10` | `10` | deletion without extinction |
+| `[x]` | 0 | none | `[]` | derived zero-source pair commit; unmatched old source is dropped |
+| `[]` | 0 | none | `[]` | derived post-extinction continuation |
+| T16 no match | 0 applicable matches | none | zero successors, retained final word | `Terminal(NoMatch)` |
+| T17 short prefix | disabled queue source | none | zero successors, retained residue | `Terminal(InsufficientPrefix)` |
+
+The singleton and empty cases are not direct displayed traces. They follow from applying the accepted Notes `Partition/Flatten` operator to a T15 table. This is a construction-specific UPDATE outcome; it does not establish a universal empty-frontier policy.
+
+The exact structural table is primary. If one explicitly bounds output length by `r`, the number of total `k`-symbol pair tables is
+
+```text
+(sum(j=0..r, k^j))^(k^2).
+```
+
+Thus the binary `r=2` audit space has `7^4 = 2401` tables; its nonempty T14 subset has `6^4 = 1296`. These are labelled bounded derivations, not source-defined rule numbers or a public codec. The unbounded finite-word family has no evidenced integer numbering.
+
+The lossless map `e(w)=OrderedConfiguration(w)` has an obvious inverse on alphabet-valid words. `31-T15-semantic-oracle.py` proves
+
+```text
+e(native_step_h(w)) = generic_step_(e(h))(e(w))
+```
+
+for all 2,401 bounded binary tables and all 127 binary words through length six: 304,927 cases. It separately counts 1,105 epsilon-containing tables, 7,203 zero-source cases, 102,388 cases containing explicit epsilon records, 176,988 such records, 12,979 empty successors, and 5,776 active-source extinctions. Strict T14 replays 164,592 cases and strict T13 replays 4,572 cases unchanged. Exact page-101 and all six page-102 `t0..t11` fixtures also commute.
+
+### Variants, properties, and relations
+
+| Item | Disposition |
+|---|---|
+| Binary, ternary, quaternary alphabets | finite-alphabet parameterization |
+| Tables with no epsilon row, including page-102 (a) | valid restriction of T15 schema and strict T14 when every row is nonempty |
+| Different epsilon-row counts | ordinary RULE data |
+| Output words longer than two | supported by the unbounded finite-word schema; no source count/codec inferred |
+| Extinction | first transition from nonempty to empty; trajectory property, not halt |
+| Slow/fixed/balanced growth | rule/trajectory observation, never UPDATE policy |
+| Repetition, nesting, randomness, CA-like patches | behavior claims or relations |
+| Equal-width and fixed-cell layouts | observers of one native word trace |
+| Sequential erasing rule | T16 evidence question; not inferred from contextual T15 |
+| Tag-system epsilon appendant | T17's different prefix-consume/tail-append preset |
+| CA emulation | downstream encoding relation, generally not one-step commuting |
 
 ## Current API Fit
 
-Pending exact reconstruction. The reuse target is the generic finite ordered configuration, occurrence frontier predicates, occurrence-relative reads, total structured lookup, source-bound word writes, and `OrderedGenerationConcat`. Any new semantic class or UPDATE requires a direct counterexample to that composition.
+The current `simple_programs.md` describes one fixed-support CA-shaped realization: writable next coordinates, same-site scalar results, copy-forward, and parallel snapshot writes (`:22`, `:1510`, `:1769`, `:2180`). Those defaults are not the SimpleProgram abstraction boundary. `architecture-audit.md` supplies the governing axes used here.
+
+| Construction element | Fit | Audit class | Smallest reusable base and invariant |
+|---|---|---:|---|
+| DOMAIN | `DIRECT` | 1 | discrete `t+1D`; ordered support belongs to CONFIGURATION |
+| Finite ordered alphabet | `DIRECT` / `PARAMETERIZATION` | 1/2 | generic finite alphabet; no epsilon alphabet member |
+| Finite ordered configuration, including empty | `DIRECT` | 1 | T13/T14 finite word with alphabet closure |
+| Seed | `DIRECT` | 1 | validated complete word; exact raster seeds are fixtures |
+| FRONTIER | `DIRECT` | 1 | T14 `HasRightNeighbor`; unique monotone old-snapshot handles |
+| NEIGHBORHOOD | `DIRECT` | 1 | T14 immutable overlapping `(Self,Right)` occurrence read |
+| RULE table | `PARAMETERIZATION` | 2 | total pair table whose output validator is `Word` rather than `NonEmptyWord` |
+| RULE result | `PARAMETERIZATION` / lossless tagged product | 2/3 | `OrderedEmission(source,word)`; epsilon retains a source-bound record |
+| UPDATE | `DIRECT` | 1 | `OrderedGenerationConcat` over `Sigma*`; exact coverage includes zero-length writes |
+| Lineage | `PARAMETERIZATION` | 2 | zero-length interval and zero children; no fake occurrence |
+| Empty successor | `PARAMETERIZATION` | 2 | D024 construction-specific one-successor result |
+| Growth/layout/CA relation | `NOT APPLICABLE` to execution | 1 as observers/relations | trace queries, views, or explicit encoders |
+
+No row is class 4: the exhaustive commuting square supplies no counterexample requiring a genuinely different execution algebra.
 
 ## Current Runtime Fit
 
-`src/ca` is the runtime namespace for the broader SimplePrograms library, not a cellular-automata library. Its currently implemented fixed-shape components and family-dispatched rollout do not yet realize the full intended axes. T15 is expected to stress ragged empty/nonempty word frames and epsilon-capable typed writes; Goal 2 must complete those generic axes rather than add a T15 rollout branch, sentinel, fixed capacity, callback, or family dispatch.
+`src/ca` is the current runtime namespace of the broader SimplePrograms library. The name and its Phase-1 CA-shaped implementation do not turn cellular automata into the top-level semantic abstraction.
+
+- `src/ca/alphabets.py` supplies finite scalar alphabets but not the generic word-result validator split `Word`/`NonEmptyWord`. Epsilon belongs to the word carrier, not an alphabet.
+- `src/ca/loci.py` provides composable dense rank-0..3 coordinate selectors. Goal 2 must preserve its selector responsibility while adding topology-aware ordered-occurrence handles; integer x coordinates cannot replace occurrence identity across length changes.
+- `src/ca/frontiers.py` exposes only the dense `time_slice` preset. `HasRightNeighbor` is a generic occurrence predicate, not a T15 frontier class.
+- `src/ca/neighborhoods.py` owns read access but currently uses geometric offsets on fixed tensors. `(Self,Right)` must be an ordered-occurrence access pattern over the old snapshot.
+- `src/ca/rules.py` currently centers scalar outputs, family strings, and optional `Any` callables. T15 needs a closed serializable total product-key table returning typed finite words.
+- `src/ca/specs.py` requires one fixed `shape` and `RawEpisode`/`RawBatch` stackable arrays. Dynamic words require native ragged frames and structured events before any optional packing.
+- `src/ca/rollout.py` currently branches on rule-family names and assumes fixed-shape writes. Goal 2 must replace that limitation with the common data-composed runner; it must not add a T15 branch.
+- Existing tensor boundary policies are not applicable to the open-right word operator. The absence of a right-neighbor source is already expressed by FRONTIER.
+
+These are modest generalizations of the intended axes—alphabet/result schemas, occurrence selectors, access patterns, structural writes, and ragged results—not evidence for a parallel “non-CA” library or one executor per catalog family.
 
 ## Principles Audit
 
-- DOMAIN/configuration/topology must remain separated: dynamic ordered support is not a new dimensional DOMAIN.
-- Empty output is a value of a typed word-result schema, not an empty alphabet symbol or hidden delete callback.
-- If T15 commutes with the same ordered-generation commit, nonempty output belongs to T13/T14 preset validation rather than the reusable UPDATE base.
-- Extinction and subsequent evolution must remain source-defined outcomes; the runner has no universal empty-frontier behavior.
-- Slow growth, balance, eventual repetition, CA-like patches, and display scaling remain claims/observers/relations unless evidence makes one transition-defining.
+- Principle 0 requires correcting D019's private carrier rather than protecting T14 oracle wording that mistakenly rejected epsilon at UPDATE.
+- Principles 1–3 favor the smallest structural reuse: T15 changes one total table/result validator; it does not create a construction class or runner branch.
+- Principle 4 requires an inspectable typed empty word and source-bound record, not `Any`, a callback, or a delete side channel.
+- Principles 5–8 keep the complete ordered word as state and row positions/scales as representation.
+- Principles 9–10 keep `Sigma*` in the reusable carrier and `Sigma+` in strict T13/T14 validators; no `allow_empty` flag changes hidden behavior.
+- Principle 11 preserves one old snapshot, right-edge eligibility, source order, and complete old-generation consumption.
+- Principles 12–16 reject padding, epsilon sentinels, fixed capacity, CA compilation, rendering-fed execution, and family dispatch.
+
+### Decision audit
+
+| Decision | Evidence | Classification | Action |
+|---|---|---|---|
+| D018 UPDATE is semantic | BOOK:1028-1052,12113 | direct reuse | keep; no new UPDATE |
+| D019 ordered generation | exact epsilon plates + 304,927 cases | narrow base clarification | private carrier is `Sigma*`; exact coverage counts epsilon records and permits empty child intervals |
+| D020 T13 morphism | no T13 epsilon evidence; strict regression | restriction/preset | keep `Sigma -> Sigma+`; close T15 deferral |
+| D024 empty selection/outcomes | active epsilon, singleton, empty, T16/T17 controls | parameterization | add three distinct T15 one-successor witnesses; no global policy |
+| D025 T16 clauses | no direct T16 empty RHS | restriction/preset | keep `Sigma+ -> Sigma+`; close T15 deferral |
+| D028 private word carrier | T17 plus direct T15 epsilon rows | direct confirmation | retain `Sigma*`; add T15 basis |
+| D124 strict contextual substitution | all T14 outputs nonempty; strict regression | restriction/preset | keep `Sigma^2 -> Sigma+` and all T14 behavior |
+| D125 T15 | direct plates + commuting proof | parameterization | add `Sigma^2 -> Sigma*` preset over the same runner |
+
+No completed semantic stage reopens. D019, D024, D028, and historical audit wording receive narrow clarifications; D020, D025, and D124 retain their public contracts.
 
 ## Detailed Implementation Plan
 
-1. Freeze the exhaustive monolith/split/Notes/Index source union and every disposition in `31-T15-source-oracle.py`.
-2. Close the source-bound asset universe, hashes, rule/seed/trajectory decoding, and observer classifications in `31-T15-asset-oracle.py`.
-3. Build an independent native/generic semantic oracle covering epsilon rows, deletion, creation, source order, snapshot/newborn behavior, extinction, and malformed writes.
-4. Audit D019, D020, D024, and D124 from first principles; factor only the smallest reusable base and reopen any contradicted preset wording.
-5. Complete the API/runtime comparison, Goal 2 handoff, no-cheating checks, hostile review, global integration, and all root/`/tmp`/optimized-mode/Markdown/diff/scope/coverage/test gates.
+1. Freeze the exhaustive monolith/split/Notes/Index source universe in `31-T15-source-oracle.py`.
+2. Freeze the 23-asset fixed point and every direct table/seed/trace in `31-T15-asset-oracle.py`.
+3. Prove native/generic commutation, strict T13/T14 regressions, explicit epsilon lineage, outcome distinctions, and hostile validation in `31-T15-semantic-oracle.py`.
+4. Generalize only D019's private carrier, preserve public validators, and integrate D125 plus dependent wording.
+5. Run independent hostile review and every source/asset/semantic, `/tmp`, optimized-mode, Markdown, diff, scope, coverage, and repository-test gate.
 
 ## Goal 2 Implementation Stage
 
-Pending evidence closure. The provisional obligation is to make the ordered-generation result carrier honestly epsilon-capable while keeping strict T13/T14 constructors nonempty, preserving explicit source-bound empty-emission witnesses, and executing through the same branch-free runner.
+### G2-T15 objective
+
+Add the creation/destruction contextual preset by allowing epsilon in one generic ordered-emission carrier while preserving T13/T14's stricter constructors and executing all three through the same branch-free runner.
+
+### Dependencies
+
+- broad `SimpleProgram` component runner and typed `StepResult`;
+- T13 finite ordered configuration, ragged trace, occurrence identity, and lineage;
+- T14 `HasRightNeighbor` frontier, `(Self,Right)` read, pair-table schema, and open-right behavior;
+- D019 `OrderedGenerationConcat` and D024 construction-specific empty-selection outcomes;
+- D028 epsilon-capable private `Word` carrier.
+
+### Proposed public composition
+
+```text
+Configuration = FiniteWord[Symbol]
+Frontier      = OccurrencesWhere(HasRelative(+1))
+Neighborhood  = OccurrenceOffsets((0,+1))
+Rule          = TotalTable[Pair[Symbol,Symbol], Word[Symbol]]
+Update        = OrderedGenerationConcat
+Seed          = FiniteWordSeed
+```
+
+These are roles/compositions, not a requirement for one runtime class per line. `Word` and `NonEmptyWord` should be explicit schemas or validators, never a boolean `allow_empty` mode.
+
+### Implementation areas
+
+- Generic ordered data module: make the private `Word[Symbol]` carrier alphabet-closed and epsilon-capable. Retain `NonEmptyWord[Symbol]` as the T13/T14 validator.
+- Typed result module: `OrderedEmission(source,word)` always exists for a selected source. Store `EmissionRecord(source,word,start,stop,children)`; epsilon requires `start == stop` and `children == ()`.
+- Ordered UPDATE: accept `Sigma*` emissions, require exactly one emission per unique monotone snapshot-bound selected handle, concatenate in source/child order, consume all old sources, report unselected sources, and never copy them. Reject stale same-index handles from foreign generations.
+- Rule/spec layer: add a serializable total `Pair -> Word` validator/preset over any declared finite alphabet. Missing rows are invalid; epsilon is not a missing/default row.
+- Shared runner: invoke UPDATE even when FRONTIER selects zero sources. The selected program/preset supplies the outcome; no global empty-frontier shortcut is allowed.
+- Trace/encoding: support ragged empty/nonempty frames and zero-length lineage intervals without padding or fake children. Extinction is a derived trace query.
+- Observers: growth increments/rates, balance, repetition/nesting, equal-width/fixed-cell views, and CA relations consume native traces without controlling execution.
+- Tests: add shared ordered-update tests plus T15 conformance tests; run T13/T14/T15 through the identical runner.
+
+### Required conformance tests
+
+- exact page-101 total table, seed, and `t0..t11` trace;
+- all six page-102 complete tables, seeds, `t0..t11` traces, and epsilon-row counts `(0,2,2,1,4,3)`;
+- exhaustive `7^4` binary tables x all words through length six commuting with the direct pair-concatenation oracle;
+- strict `6^4` T14 and bounded T13 regressions proving their public validators still reject epsilon;
+- `00 -> []` with one emission record/zero children, `001 -> 10` with epsilon preceding a nonempty block, `[x] -> []` with no emission, and `[] -> []` after extinction;
+- explicit distinction from T16 `NoMatch` and T17 `InsufficientPrefix` zero-successor outcomes;
+- old-snapshot/newborn, source order, rightmost read-but-non-source, and no-copy-forward adversaries;
+- missing/duplicate/wrong-key/out-of-alphabet rows and emissions;
+- duplicate/unordered/out-of-range/stale/foreign-generation handles and incomplete/reordered result coverage;
+- tampered zero-length intervals and fake epsilon child records;
+- serialization and ragged-trace round trips with no callback, `Any`, sentinel, capacity, family tag controlling execution, or renderer dependency.
+
+### Completion evidence
+
+One shared runner and one `OrderedGenerationConcat` execute strict T13, strict T14, and T15. Their only relevant difference is validated FRONTIER/read/table/result data. Exact plates and the exhaustive commuting square pass, every selected epsilon remains inspectable, and no T15 executor/update/state class exists.
 
 ## No-Cheating Checks
 
 - Reject treating T14's zero eligible pairs as proof of a T15 epsilon rule row.
-- Reject an empty string/sentinel/padding cell standing for deletion.
+- Reject representing epsilon by an alphabet symbol, empty-string sentinel, padding cell, tombstone, or missing row.
 - Reject removing old sources in place before all reads are taken from the old snapshot.
-- Reject copying unmatched or non-emitting old sources forward unless the source explicitly does so.
+- Reject filtering epsilon writes before exact selected-source coverage/provenance validation.
+- Reject copying the rightmost or an epsilon-emitting old source forward.
 - Reject treating extinction as halt, error, no successor, or automatic episode termination without evidence.
+- Reject a global empty-frontier halt/stutter/drop rule; invoke the declared UPDATE/outcome policy.
 - Reject a `growth_policy` that changes execution or filters native successors.
 - Reject T15-specific state, UPDATE, rollout, callback, family switch, CA compiler, fixed capacity, or rendering-fed execution.
-- Require source/asset/semantic oracles to pass from the repository and `/tmp` and fail closed under `python -O`.
+- Reject weakening T13/T14/T16 public validators merely because the private carrier admits epsilon.
+- Reject a T16 single splice or T17 prefix queue: each produces a different step on the page-101 seed.
+- Require source/asset/semantic oracles to pass from the repository and `/tmp` and fail closed under `python3 -O`.
 
 ## Completion Requirements
 
-- [ ] Exhaustive source/split/Notes/Index/alias audit closes with zero unresolved candidates.
-- [ ] Source-bound asset fixed point closes with all rule/seed/trajectory and observer facts independently decoded.
-- [ ] Native empty outputs, zero-source cases, extinction, and subsequent evolution are distinguished exactly.
-- [ ] Semantic oracle proves or refutes reuse of the shared ordered-generation UPDATE with adversarial cases.
-- [ ] API/runtime/principles audits identify the smallest reusable base and any narrowly reopened decisions.
-- [ ] Goal 2 handoff is implementation-ready and contains canonical conformance/no-cheating tests.
+- [x] Exhaustive source/split/Notes/Index/alias audit closes with zero unresolved candidates.
+- [x] Source-bound asset fixed point closes with all rule/seed/trajectory and observer facts independently decoded.
+- [x] Native empty outputs, zero-source cases, extinction, and subsequent evolution are distinguished exactly.
+- [x] Semantic oracle proves reuse of the shared ordered-generation UPDATE with adversarial cases.
+- [x] API/runtime/principles audits identify the smallest reusable base and narrow decision clarifications.
+- [x] Goal 2 handoff is implementation-ready and contains canonical conformance/no-cheating tests.
 - [ ] Independent hostile review is clean and every oracle/test/Markdown/diff/scope/coverage gate passes.
 - [ ] `0-plan.md`, `evidence-index.md`, and `design-ledger.md` are integrated consistently.
 
 ## Stage Results
 
-In progress. Direct prose establishes native disappearance pressure, balanced-growth observations, dynamic ordered support, and multiple renderings, but the exact rule/seed/operator semantics remain open pending exhaustive source and asset closure. No runtime code has changed and no new UPDATE algebra has been accepted.
+Evidence, assets, semantics, and architecture are closed; independent hostile review and final global gates remain. The exact plates prove `Sigma^2 -> Sigma*` under T14's old-snapshot adjacent-pair schedule. The exhaustive oracle finds no class-4 counterexample: T15 widens only the typed word-result carrier and retains zero-length source witnesses. Strict T13/T14/T16 contracts remain nonempty, no prior semantic stage reopens, no runtime code changed, and no new UPDATE algebra or executor was accepted.

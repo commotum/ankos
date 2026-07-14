@@ -108,14 +108,16 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T12 requires an inspectable total/default-symbol tape over `Z`; finite read boundaries cannot supply writes or control movement beyond capacity. Numeric rule decoding uses a documented repair of an OCR-lost `k`, guarded by known machine 3024.
 - T13 validates source-first generic orchestration but splits update semantics: fixed-locus assignment preserves support, while `ParallelReplaceConcat` consumes every old ordered occurrence and creates children from typed nonempty words.
 - T13 state is an explicit discrete ordered sequence with finite canonical and documented infinite-support variants. Snapshot indices, occurrence lineage, finite observation, ragged trace, padding, and rendering are separate.
-- T13 uses a total alphabet-closed `Sigma -> Sigma+` table. T17 later proves epsilon for a private word/edit carrier and its own appendants without weakening T13; T15 still owns creation/destruction and other scheduled/probabilistic variants remain separate.
+- T13 uses a total alphabet-closed `Sigma -> Sigma+` table. T17 and T15 independently prove epsilon for private word/edit/emission carriers without weakening T13; other scheduled/probabilistic variants remain separate.
 - T14 reuses T13's finite ordered configuration, nonempty word emission, lineage, and ordered-generation concatenation. It parameterizes FRONTIER to old anchors with a right neighbor, NEIGHBORHOOD to immutable overlapping `(self,right)` reads, and the total table to `Sigma^2 -> Sigma+`; it adds no UPDATE algebra, state class, executor, or family branch.
-- T14 factors D019 correctly: the shared `OrderedGenerationConcat` base requires exactly one source-bound emission for every selected anchor and derives the whole successor in source/child order, while T13's `AllOccurrences` preset alone requires every old occurrence to be selected. T14's unmatched rightmost occurrence is read but not copied forward.
+- T14 factors D019 correctly: shared `OrderedGenerationConcat` requires exactly one source-bound emission for every selected anchor and derives the whole successor in source/child order, while T13's `AllOccurrences` preset alone requires every old occurrence to be selected. T15 later proves the private carrier is `Sigma*`; strict T14 still validates `Sigma+`. T14's unmatched rightmost occurrence is read but not copied forward.
 - T14's unguarded Notes operator defines `[]->[]` and `[x]->[]` as zero-emission successors, not halts, errors, copy-forward stutters, or epsilon table rows. The page-85 raster fixes both `0110` seeds/tables/traces; page 681 contains four binary and nine three-color pair rows with singleton outputs, not a native eight-row width-three table.
+- T15 is the `Sigma^2 -> Sigma*` result-validator parameterization of T14's finite-word, `HasRightNeighbor`, `(self,right)`, and `OrderedGenerationConcat` composition. Seven hash-bound binary/ternary/quaternary tables and exact `t0..t11` traces directly establish epsilon rows under the same schedule; 304,927 bounded cases commute without a new UPDATE or executor.
+- T15 retains one source-bound record and a zero-length lineage interval for an explicit epsilon emission. Active `00->[]`, zero-source `[x]->[]`, and post-extinction `[]->[]` have equal successor values but distinct witnesses; T16 `NoMatch` and T17 `InsufficientPrefix` remain zero-successor terminals. Slow/balanced growth, extinction, repetition, and CA-like patches are trace properties/relations.
 - T16 reuses finite ordered-word support but not T13 source coverage or commit. An immutable ordered literal program selects the lexicographic first `(clause_index,start_position)` match, returns one typed interval replacement, and commits one atomic splice.
 - T16 refines the source-first shell: match applicability is intrinsically coupled to the program's left sides, so `FirstApplicableMatch` and result lookup share one validated program object. This is explicit coupling, not a duplicated matcher callback.
 - T16 has zero successors with `NoMatch` when no clause applies. The final state is retained once; an applicable identity rule remains an event/self-loop, and external stop, horizon, invalidity, and error stay distinct.
-- T16 supplies no canonical rule numbering and directly evidences only nonempty literal clause sides. Empty RHS/deletion remains an explicit T15 re-audit boundary rather than a flag or inferred base feature.
+- T16 supplies no canonical rule numbering and directly evidences only nonempty literal clause sides. T15's contextual epsilon evidence does not broaden T16; its public RHS remains nonempty rather than gaining a flag or inferred deletion feature.
 - T17 reuses finite ordered support but requires a distinct queue event: read an exact leading `q`, consume a leading `d`, preserve the old suffix, and append a table-selected word at the remote tail. Wolfram ordinary tags pin `q=d`; Post and Wang variants prove the roles are independently meaningful.
 - T17 tables are total `Sigma^q -> Sigma*` maps, so empty appendants are native while missing/duplicate rows are errors. This broadens only private word/edit capability; T13/T16 public nonempty laws remain unchanged.
 - T17 has zero successors with a retained `InsufficientPrefix` residue when required spans are unavailable. Wolfram's supplied history maps that residue to `{}` on the next requested sample; this is an explicit reference projection, not a fabricated semantic transition.
@@ -895,7 +897,7 @@ COMPLETE. The 308-line source audit, 22-asset fixed point, direct page-85 rules/
 
 ### 31-T15-CREATION-DESTRUCTION
 
-Status: **IN PROGRESS — SOURCE CLOSED; ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN** in `goal-1/31-T15-CREATION-DESTRUCTION.md`.
+Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS CLOSED; HOSTILE REVIEW OPEN** in `goal-1/31-T15-CREATION-DESTRUCTION.md`.
 
 #### Big Picture Objective
 
@@ -903,11 +905,15 @@ Test empty and multi-element replacements, extinction, and balanced growth as na
 
 #### Detailed Implementation Plan
 
-Apply the common protocol, emphasizing deletion, creation, ancestry, growth observables, and zero-length state.
+The 22-query source closure, 23-asset fixed point, seven exact tables/seeds/traces, and 304,927-case commuting oracle are complete. Finish independent hostile review and global gates, then close D125 and proceed to T18.
 
 #### Completion Requirements
 
 All T15 evidence is captured; dynamic support handles creation/destruction without sentinels; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+Evidence, assets, semantics, and architecture are closed pending hostile review. T15 widens only the private ordered-emission carrier to `Sigma*`; strict T13/T14/T16 validators remain nonempty, explicit epsilon events retain zero-length lineage witnesses, and no new state class, UPDATE algebra, executor, family branch, sentinel, or growth policy is justified.
 
 ### 32-T18-CYCLIC-TAG
 
