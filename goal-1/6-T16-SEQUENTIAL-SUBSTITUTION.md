@@ -14,7 +14,7 @@ The evidence/search closure and conformance fixtures remain valid. Rule-major/le
 - Exactly one matched interval is replaced per logical step. Search restarts from the first clause and the left edge on the next step; no persistent cursor is part of state.
 - If no clause applies, evolution intrinsically terminates. This is distinct from an applicable identity rewrite, a repeated snapshot, an external stop condition, a horizon, an invalid clause, or an execution error.
 - The match interval is an old-snapshot source. Prefix and suffix occurrences persist; matched occurrences are consumed; replacement occurrences are created in right-hand-side order. This is a single structural splice, not T13's all-occurrence replacement and not fixed-support assignment.
-- The direct T16 corpus establishes nonempty literal left sides but gives no deletion example and does not explicitly settle an empty right side. This stage keeps the evidence-strict T16 conformance surface at nonempty right sides and records deletion for T15 re-audit rather than silently broadening the family.
+- The direct T16 corpus establishes nonempty literal sides and gives no deletion example. T15 later proves epsilon only for contextual pair emissions, so the evidence-strict T16 conformance surface remains nonempty rather than silently broadening the family.
 - There is no canonical integer rule code or finite rule count. Arbitrary finite block lengths and ordered clause-list lengths make the unbounded program space countably infinite.
 
 ## Updated Assumptions
@@ -104,10 +104,10 @@ Representative commands were `rg -n -i -e '<term>' BOOK`, followed by exact cont
 3. `Flat` supplies associative contiguous-subsequence matching, not commutativity. Word order is preserved; clauses and positions are ordered.
 4. A no-match expression and an identity rewrite can have equal values but different event/termination semantics. Only absence of an applicable clause is terminal.
 5. Every evidenced left side is nonempty, and an empty left side would have unsupported ubiquitous match positions. T16 rejects it.
-6. No direct T16 passage or example settles an empty right side. General multiway examples do delete, but they do not prove the T16 variant. The base T16 handoff therefore validates nonempty replacement words and requires T15 to re-audit deletion rather than inferring it from host syntax or external terminology.
+6. No direct T16 passage or example settles an empty right side. General multiway, tag, and later T15 contextual examples do delete, but none proves the T16 variant. The base T16 handoff therefore validates nonempty replacement words rather than inferring deletion from sibling constructions, host syntax, or external terminology.
 7. Index column interleaving makes `enumeration of, 805` visually adjacent to T16, but page 805 concerns operator/string-concatenation material. No T16 rule-number convention or finite count was found.
 
-**Search closure:** independent canonical and Notes/Index audits agree. All direct-name lines, aliases, captions, implementation symbols, Index/split routes, priorities, stop cases, initial-condition limits, generalized/multiway boundaries, causal traces, adaptive extensions, and emulations are included or explicitly excluded. Zero evidence candidates remain unresolved; the right-side emptiness question is a documented evidence boundary assigned to T15, not a hidden assumption.
+**Search closure:** independent canonical and Notes/Index audits agree. All direct-name lines, aliases, captions, implementation symbols, Index/split routes, priorities, stop cases, initial-condition limits, generalized/multiway boundaries, causal traces, adaptive extensions, and emulations are included or explicitly excluded. Zero evidence candidates remain unresolved; T15 later closes the shared-carrier question without supplying T16 empty-RHS evidence.
 
 ## Book Excerpts
 
@@ -345,7 +345,7 @@ Let `Sigma` be a finite declared alphabet, `w in Sigma*` a finite word, and the 
 ```text
 P = [RewriteClause(lhs_i, rhs_i) for i in 0..m-1]
 lhs_i in Sigma+                 # directly required
-rhs_i in Sigma+                 # evidence-strict T16 base; T15 must re-audit deletion
+rhs_i in Sigma+                 # evidence-strict T16 base; T15 did not broaden it
 ```
 
 The first applicable source is
@@ -502,7 +502,7 @@ Clause 0 matches later at position 1 and must beat clause 1 at position 0. A pos
 | Different literal block sizes | Native parameter (`BOOK:19164`). |
 | Right-to-left, persistent cursor, or wraparound scan | No T16 evidence; excluded from base. |
 | Empty left side | Unsupported/ambiguous infinite-position matching; rejected. |
-| Empty right side/deletion | Not established directly for T16; evidence-strict base rejects pending T15 re-audit. |
+| Empty right side/deletion | Not established directly for T16; evidence-strict base rejects it. T15 contextual epsilon is a sibling preset, not T16 evidence. |
 | Identity clause | Native applicable event; never conflated with no match. |
 | Generalized all-fitting replacement | Different source coverage/update (`BOOK:5944-5954`). |
 | Multiway all-possible replacement | Different branching successor algebra (`BOOK:2508-2510`). |
@@ -609,7 +609,7 @@ T01/T09/T12 use program-independent fixed/control source policies; T13 uses prog
 - `specs.py`/preset index: strict `sequential_substitution(alphabet, clauses)` returning the ordinary literal-rewrite spec. Initial word, horizon, and observers are episode choices.
 - Structured raw trace: ragged words, step outcomes, selected clause/interval, and optional consumed/produced IDs. Downstream lowering can emit row-local `(t,x,0,0,symbol)` plus event tables; record-high frames and causal networks are observers.
 - New `tests/test_t16_sequential_substitution.py` plus shared matcher/splice/outcome/trace conformance tests.
-- T15 dependency note: separately re-audit deletion. If T15 establishes `rhs in Sigma*`, generalize the shared word/result/update type deliberately and re-run T13/T16 validators; do not preinstall an `allow_empty` flag.
+- T15 closure note: T15 establishes `Sigma*` for the private word/emission carrier and re-runs strict validators; T16 remains `Sigma+ -> Sigma+`. No `allow_empty` flag is introduced.
 
 **Canonical and adversarial tests:**
 
@@ -643,7 +643,7 @@ T01/T09/T12 use program-independent fixed/control source policies; T13 uses prog
 - No scalar `Assign`, next-target inversion, in-place shifting, fixed-capacity array, pad symbol, mask, truncation, or maximum-length buffer as word semantics.
 - No same-valued successor or host-expression stutter treated as `NoMatch`; applicability and events decide termination.
 - No missing/invalid clause or out-of-range match treated as skip, identity, fallback, or halt.
-- No empty RHS claimed as native T16 before T15 supplies direct evidence and re-integration.
+- No empty RHS claimed as native T16 from T15's contextual evidence or any other sibling construction.
 - No CA/multiway/operator compiler used to claim native support.
 - No row-local coordinate treated as persistent identity; no required event provenance discarded before observer lowering.
 - No record-length compression, causal rendering, or dots fed back into evolution.
@@ -656,7 +656,7 @@ T01/T09/T12 use program-independent fixed/control source policies; T13 uses prog
 - [x] Finite word, ordered clauses, match source, rule/position priority, read, one-splice update, seed, successor, termination, and observables are reconstructed.
 - [x] Canonical trajectories and adversarial priority/overlap/no-op/no-match/provenance invariants have independent conformance oracles.
 - [x] Current API/runtime/test fit and T13 reuse/divergence are explicit under Principle 0.
-- [x] Goal 2 implementation/conformance handoff is implementation-ready, including the T15 deletion re-audit boundary.
+- [x] Goal 2 implementation/conformance handoff is implementation-ready; T15 later confirms the private carrier while leaving T16 nonempty.
 - [x] Global ledgers and plan are reintegrated and all verification checks pass.
 
 ## Architecture-Reclosed Stage Result
@@ -665,4 +665,4 @@ T01/T09/T12 use program-independent fixed/control source policies; T13 uses prog
 
 ## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
-T16 is complete with zero unresolved evidence candidates. The nested scan is exactly rule-major then leftmost position, returns at most one snapshot-scoped interval, and restarts from clause 0 and the left edge after one splice. `FirstApplicableMatch` forces an honest refinement of the source-first shell because applicability and the ordered program are intrinsically coupled; one authoritative program supplies both matching left sides and the selected right side. `ReplaceInterval` plus `SingleSpliceUpdate` is distinct from T13's full-generation replacement, though both can reuse ordered support, provenance, and a policy-guarded private span-edit kernel. `NoMatch` is a typed zero-successor terminal outcome, while identity events, external stops, horizons, invalidity, and errors remain separate. Empty RHS is explicitly deferred to T15 evidence. The plan, evidence index, and design ledger are reintegrated; no prior stage is reopened. Focused source-reference, coverage, whitespace, and 102-test baseline verification passed. Next: T17 Tag Systems.
+T16 is complete with zero unresolved evidence candidates. The nested scan is exactly rule-major then leftmost position, returns at most one snapshot-scoped interval, and restarts from clause 0 and the left edge after one splice. `FirstApplicableMatch` forces an honest refinement of the source-first shell because applicability and the ordered program are intrinsically coupled; one authoritative program supplies both matching left sides and the selected right side. `ReplaceInterval` plus `SingleSpliceUpdate` is distinct from T13's full-generation replacement, though both can reuse ordered support, provenance, and a policy-guarded private span-edit kernel. `NoMatch` is a typed zero-successor terminal outcome, while identity events, external stops, horizons, invalidity, and errors remain separate. T15 later supplies contextual epsilon rows but no T16 deletion evidence, so the public T16 contract remains unchanged and does not reopen. The plan, evidence index, and design ledger are reintegrated. Focused source-reference, coverage, whitespace, and 102-test baseline verification passed. Next: T17 Tag Systems.

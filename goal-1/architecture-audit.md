@@ -110,16 +110,16 @@ The classification number in this matrix refers to the four categories above. A 
 | D016 | Base/nonhalting/Busy-Beaver/stop evidence | 2 | Typed run outcomes around runner | Terminal, external stop, horizon, invalidity, error distinct | Keep |
 | D017 | OCR-damaged codec plus code 3024 guards | 2 | Evidence/provenance policy | Repair explicit and independently replayed | Keep |
 | D018 | T13 length-changing `1 -> 10` defeats scalar same-locus writes | 2 | UPDATE axis supporting typed structural replacement | One branch-free runner; update policy owns composition/schedule | Rewrite: real axis extension, not executor split |
-| D019 | All parents replace in order; lineage evidence | 2 | Ordered parallel-replacement UPDATE | Full old-source coverage, source/child order, newborn deferral | Keep semantics; demote construction-specific class |
-| D020 | Total `Sigma -> Sigma+` evidence | 2 | Closed RULE table validator | Complete, alphabet-closed, nonempty rows | Keep |
+| D019 | T13 all-parent order plus T14 selected-anchor and T15 epsilon evidence | 2 | `OrderedGenerationConcat` UPDATE | Exact selected-source coverage including zero-length records, `Sigma*` carrier, source/child order, newborn deferral; T13 alone requires all old sources | Keep; narrowed by D124 and D125 without new UPDATE |
+| D020 | Total `Sigma -> Sigma+` evidence | 2 | Closed T13 RULE table validator | Complete, alphabet-closed, nonempty rows; private carrier may be `Sigma*` | Keep; T15 does not broaden T13 |
 | D021 | Dynamic order/trace/view evidence | 2 | Discrete `t+1D` with variable ordered support plus trace mapping | Sequence order explicit; realization/cut/padding/view separate | Keep; normalize DOMAIN/support vocabulary |
 | D022 | T16 rule-major/leftmost matching | 2 | Program-coupled FRONTIER implementation | One authoritative clause list; deterministic priority; no matcher callback | Keep; remove new-class implication |
 | D023 | One old span replaced per event | 2 | Ordered replacement UPDATE with `exactly_one` schedule | One snapshot, one selected span, prefix/suffix order | Rewrite as restriction, not separate executor |
-| D024 | T16 no-match versus T13/T12 outcomes | 2 | Shared typed outcome envelope | Empty frontier interpreted by program/update policy | Keep |
-| D025 | Ordered nonempty literal clauses | 2 | RULE/FRONTIER preset and validator | Clause order/duplicates retained; no invented integer code | Keep |
+| D024 | T16 no-match versus T13/T12/T14/T15 outcomes | 2 | Shared typed outcome envelope | Empty frontier interpreted by program/update policy; T15 active-epsilon, zero-source, and post-extinction witnesses remain distinct | Keep; extended by D125 |
+| D025 | Ordered nonempty literal clauses | 2 | T16 RULE/FRONTIER preset and validator | Clause order/duplicates retained; no invented integer code; T15 contextual epsilon is not T16 evidence | Keep |
 | D026 | Tag/Post/Wang q/d evidence | 3 | Product of named read-width/delete-width roles | Positive widths; strict tag preset pins equality | Keep roles; no separate semantic classes |
 | D027 | Prefix delete plus old-tail append | 2 | Ordered structural UPDATE with two anchored replacements | Delete `[0,d)` and append at old endpoint atomically | Rewrite as UPDATE policy/preset, not queue executor |
-| D028 | Epsilon in T17, nonempty T13/T16 | 2 | Shared word ALPHABET with validator refinements | `Sigma*` carrier; construction-specific nonempty invariants | Keep |
+| D028 | Epsilon in T17 and T15; nonempty T13/T14/T16 | 2 | Shared word/result carrier with validator refinements | `Sigma*` carrier; construction-specific nonempty invariants | Keep; independently confirmed by D125 |
 | D029 | Short residue versus reference `{}` history | 2 | Outcome plus labeled trace projection | Native residue retained; projection never feeds execution | Keep |
 | D030 | Complete bounded prefix table count | 2 | Closed RULE table serialization | Every key present; epsilon allowed; no default/code invention | Keep |
 

@@ -34,7 +34,7 @@ The evidence/search closure and conformance fixtures remain valid. Pose products
 - The prototype shape and ambient coordinate space are explicit program data. They are not scalar alphabet values or pixel masks.
 - The canonical exact profile uses rationals; algebraic coefficients and explicit finite-precision decimals are separate scalar profiles. Approximate values carry precision/rounding provenance and never participate in tolerance-based semantic equality.
 - A rule row has stable child slots and may retain authored order for a reference enumeration, but geometric state and evolution are invariant under permutation. Duplicate transforms remain duplicate slots and create multiplicity.
-- The strict fractal profile validates one nonempty seed and at least two contractive child placements. Empty output/deletion is not inferred; T15 remains responsible for creation-destruction semantics.
+- The strict fractal profile validates one nonempty seed and at least two contractive child placements. Empty output/deletion is not inferred; T15 later resolves creation/destruction only for contextual word emission and does not broaden T27.
 - The affine profile and nonlinear branched-point profile share only typed all-occurrence expansion and bag union. A generic transform callback would erase their distinct value/evaluation algebras.
 - The Notes center recurrence is a differential oracle for canonical snapshots up to reference ordering/path reversal. It is not the production state contract.
 - Overlap, intersection area, union, occlusion, antialiasing, viewport, and crop are observations. No overlap query is needed to advance.

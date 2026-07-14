@@ -21,7 +21,7 @@ Status: **COMPLETE — EVIDENCE, ASSETS, SEMANTICS, ARCHITECTURE, AND HOSTILE RE
 
 ## Updated Assumptions
 
-- The strict base profile is a total, alphabet-closed table `h : Sigma^2 -> Sigma+`. Empty replacement words remain T15's separate evidence question.
+- The strict T14 profile is a total, alphabet-closed table `h : Sigma^2 -> Sigma+`. Empty replacement words were reserved for T15, which later generalized only the private carrier; T14 remains nonempty.
 - Source order is semantic. For old word `w[0:n]`, eligible anchors are exactly `0, ..., n-2`; result blocks are concatenated in that order.
 - The right boundary is an eligibility condition evidenced by the construction, not a generic menu containing padding, wrapping, reflection, a blank symbol, or a hidden sentinel.
 - There is no left-boundary read in the displayed base system. Wider or two-sided L-system contexts must remain variants until primary evidence establishes their exact schedule and boundary laws.

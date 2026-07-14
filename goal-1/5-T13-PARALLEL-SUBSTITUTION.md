@@ -91,7 +91,7 @@ Chapter 3 split lines 297-369 and Chapter 5 split lines 165-217 duplicate the co
 ### Ambiguities resolved
 
 1. `Flatten[# /. rule]` would leave an unmatched Mathematica atom unchanged. Prose says each kind is replaced, and later steps otherwise leave the declared system. T13 therefore requires one unique row for every declared symbol and rejects missing rows rather than inventing an identity fallback.
-2. Mathematica can flatten an empty right-hand side, but `BOOK:1026-1028` explicitly introduces disappearance after examples whose every source yields at least one element, and the catalog separates T15. T13 uses `Sigma+`; T15 will test `Sigma*` with deletion.
+2. Mathematica can flatten an empty right-hand side, but `BOOK:1026-1028` explicitly introduces disappearance after examples whose every source yields at least one element, and the catalog separates T15. T13 uses `Sigma+`; T15 later confirms `Sigma*` only for its contextual preset and the shared private carrier.
 3. The list implementation does not state parallelism by itself. `BOOK:1060` explicitly says all existing elements are operated on in parallel, and one `NestList` generation rewrites only the old list before flattening. New children never fire in the same step.
 4. The implementation's output order is not arbitrary: list replacement preserves old occurrence order and `Flatten` concatenates each replacement word left-to-right. The string implementation independently corroborates the same order.
 5. A finite list is not the only native support. `BOOK:14275` explicitly admits infinite random sequences; this is recorded as a support/realization variant rather than silently contradicted by the canonical finite API path.
@@ -456,7 +456,7 @@ The finite reference executor may be delivered first, but the public semantic mo
 | Probabilistic replacement word | Stochastic distribution-over-words variant; defer until a typed stochastic result/update is evidenced |
 | Equal-size row, width-normalized subdivision, tree, turn path, wrapped 2D display | Observers/renderers over sequence and optional lineage |
 | Constant versus variable nonempty block length | Same T13 table/result/update with different validated word lengths |
-| Empty replacement/disappearance | T15 extension from `Sigma+` to `Sigma*`; same update candidate to be re-audited there |
+| Empty replacement/disappearance | T15 extension from `Sigma+` to `Sigma*`; later proved to reuse the same private ordered-generation UPDATE |
 | Neighbor-dependent replacement/rightmost drop | T14 changes reads, eligibility, and boundary; structural update reuse remains provisional |
 | Sequential substitution | T16 first-match source and one splice per step; not parallel commit |
 | Ordinary/cyclic tag correspondence | T17/T18 queue schedule and time-scaled emulation |
@@ -591,7 +591,7 @@ This is not empty interface unification: assignment update preserves old loci; p
 - No sequential/in-place rewriting and no rewriting newborns in the same generation.
 - No whole-state/string callback hidden behind `formula`, `Any`, or a preset.
 - No family-name rollout or substitution-only executor.
-- No missing-row identity fallback and no empty output admitted before T15 re-audits deletion.
+- No missing-row identity fallback and no empty output admitted by strict T13; T15 later broadens only the private carrier.
 - No CA/TM/tag compilation used to claim native support.
 - No display scale, `[t,x,0,0]`, array slot, or path coordinate treated as persistent topology/identity.
 - No ancestry hidden in state when it is only an observation, and no ancestry discarded before a requested tree trace can be formed.
@@ -612,6 +612,8 @@ This is not empty interface unification: assignment update preserves old loci; p
 ## Architecture-Reclosed Stage Result
 
 **COMPLETE.** T13 requires an ordered block-replacement UPDATE policy because native rules such as `a -> aa` change support in one event. That is a typed UPDATE-axis extension inside the common runner, not a substitution executor or a separate top-level algebra; the corrected handoff above governs.
+
+T15 later proves that the private ordered-emission carrier admits `Sigma*` while T13's public morphism remains `Sigma -> Sigma+`. The strict T13 regression passes unchanged, so T13 does not reopen.
 
 ## Historical Stage Results (Evidence Retained; Architecture Superseded)
 

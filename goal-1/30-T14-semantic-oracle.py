@@ -121,7 +121,7 @@ class OverlappingReplacementSpans(ValueError):
 def checked_word(values: Iterable[int], *, allow_empty: bool = True) -> Word:
     word = tuple(values)
     if not allow_empty and not word:
-        raise ValueError("T14 base rule results must be nonempty")
+        raise ValueError("strict rule results must be nonempty")
     if any(value not in BITS for value in word):
         raise ValueError("word is outside the declared binary alphabet")
     return word
