@@ -444,6 +444,39 @@ BOOK_IMAGES = {
 }
 assert set(BOOK_IMAGES) & RETAINED == GOVERNED
 
+# Fixed-radius saturation catches split assemblies without re-governing every
+# inherited or merely adjacent picture.  The three inherited Chapter 3
+# substitution plates are deliberately left to T13, just as preceding Turing
+# plates remain outside T26.  Every non-governed image within ten physical
+# lines of retained T26 evidence is named exactly once here.
+NEARBY_EXCLUDED_CLASS = {
+    "preceding_turing": {972, 974, 976},
+    "inherited_1d_substitution": {988, 990, 998},
+    "preceding_t25": {2298, 2302, 13674},
+    "unrelated_encoding": {6830, 6846, 6852},
+    "other_perception_observers": {6974, 6994},
+    "fractal_dimension_observer": {13780},
+    "julia_mandelbrot_observers": {13790, 13794, 13800, 13802, 13804},
+    "constraint_ca_control": {14117},
+    "walsh_basis_controls": {17287, 17289, 17291},
+}
+NEARBY_EXCLUDED = set().union(*NEARBY_EXCLUDED_CLASS.values())
+assert sum(map(len, NEARBY_EXCLUDED_CLASS.values())) == len(NEARBY_EXCLUDED) == 24
+assert not NEARBY_EXCLUDED & GOVERNED
+NEARBY_CANDIDATES = {
+    image_line
+    for image_line in BOOK_IMAGES
+    if min(abs(image_line - source_line) for source_line in RETAINED) <= 10
+}
+assert NEARBY_CANDIDATES == GOVERNED | NEARBY_EXCLUDED
+assert len(NEARBY_CANDIDATES) == 50
+assert digest_lines(NEARBY_CANDIDATES) == (
+    "3a53ccedfffc5567db32e08b22727f9a11f97a1bc257d9eb62f11d674d39b74b"
+)
+assert digest_lines(NEARBY_EXCLUDED) == (
+    "e1473927d57185611743238182c78fcb9ad89f2eb2eda1c5329505fe71fb53bc"
+)
+
 
 def jpeg_size(data: bytes) -> tuple[int, int]:
     """Read JPEG dimensions without adding an image-library dependency."""
@@ -588,10 +621,10 @@ UNRECOVERED_NATIVE_RASTER_FACTS = {
 assert set(UNRECOVERED_NATIVE_RASTER_FACTS) == NATIVE
 
 
-EXPECTED_TOTAL_BYTES = 0  # frozen below after independent ledger construction
+EXPECTED_TOTAL_BYTES = 1_838_481
 EXPECTED_REFERENCE_COUNT = 52
 EXPECTED_UNIQUE_HASHES = 26
-EXPECTED_LEDGER_SHA256 = "TO_BE_FROZEN"
+EXPECTED_LEDGER_SHA256 = "6efdf22fdacd0bc9c9b5f59ef61e56c29cdbb9d76624dad5c088c8aed0e17beb"
 
 
 def main() -> None:
@@ -607,6 +640,7 @@ def main() -> None:
     print(
         "T26 asset oracle: PASS governed=26; source native/relation/control=3/16/7; "
         "strict_native=2; nonwhite_native=1; assemblies=5/14_files; "
+        "fixed_radius_candidates=50; nearby_excluded=24; "
         "refs=52; unique_files=26; unique_hashes=26; "
         f"bytes={total_bytes}; HASH_BOUND=26; TRANSCRIBED=0; PIXEL_REPLAYED=0; "
         "source_contract/monolith/split/hash/dimensions/classification=PASS; "
