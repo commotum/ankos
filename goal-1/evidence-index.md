@@ -25,7 +25,7 @@ Each type stage must make the following auditable:
 
 ## Catalog Coverage
 
-Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07/T08/T10/T11 are subsequently complete under active D119-D123. T14's exhaustive evidence, semantics, D124 architecture result, and global integration are closed; hostile review and final gates remain before T15.
+Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07/T08/T10/T11/T14 are subsequently complete under active D119-D124. T15 is next.
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
@@ -42,7 +42,7 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 | T11 | 12 | Generalized Mobile Automata | 11 | `29-T11-GENERALIZED-MOBILE.md` | COMPLETE | Exact 16-query/130-line union at `108 pre-Index / 22 actual-Index`; 20 retained query hits +6 governed continuations, 88 exclusions, split closure `123 exact + 7 variants`; source-bound 16-asset ledger at `C/O/R/X=2/1/10/3`, 32 references, 16 hashes; `Bit^3 -> Bit x FiniteOffsetSet`, local `Bit x P({-1,0,+1})`, exact union composition, corrected page-91 rule/trace, 157,184 commuting cases, D123, clean hostile review, and 102 tests; 0 unresolved |
 | T12 | 13 | Turing Machines | 12 | `4-T12-TURING.md` | COMPLETE | Evidence and architecture reclosed: `Plain(symbol) \| Head(q,symbol)`, exactly-one invariant, source decision plus destination-preservation access, typed two-write lowering, atomic UPDATE, compact `(2sk)^(sk)` rules, and explicit outcomes; no control class or family executor |
 | T13 | 14 | Neighbor-Independent Substitution Systems | 13 | `5-T13-PARALLEL-SUBSTITUTION.md` | COMPLETE | 288 direct-name lines plus definition/replacement/alias/Notes/Index/split/rendering/growth/infinite/stochastic/emulation candidates dispositioned; 26 excerpt groups; 0 unresolved |
-| T14 | 15 | Neighbor-Dependent Substitution Systems | 14 | `30-T14-CONTEXTUAL-SUBSTITUTION.md` | IN PROGRESS | Exact 13-query/308-line union at `231 pre-Index / 77 actual-Index`; 27 retained hits +13 governed continuations, 204 exclusions, split closure `276 exact + 30 variants`; 22-asset ledger at `C/O/R/X=1/0/16/5`, 44 references, 22 hashes; `HasRightNeighbor`, snapshot `(Self,Right)`, `Sigma^2->Sigma+`, shared ordered-generation concatenation, direct traces, 164,592 commuting cases, 4,080 singleton-output relation cases, and D124 integrated; hostile review/final gates remain |
+| T14 | 15 | Neighbor-Dependent Substitution Systems | 14 | `30-T14-CONTEXTUAL-SUBSTITUTION.md` | COMPLETE | Exact 13-query/308-line union at `231 pre-Index / 77 actual-Index`; 27 retained hits +13 governed continuations, 204 exclusions, split closure `276 exact + 30 variants`; 22-asset ledger at `C/O/R/X=1/0/16/5`, 44 references, 22 hashes; `HasRightNeighbor`, snapshot `(Self,Right)`, `Sigma^2->Sigma+`, shared ordered-generation concatenation, direct traces, 164,592 commuting cases, 4,080 singleton-output relation cases, snapshot-bound handle validation, D124, clean hostile review, and 102 tests; 0 unresolved |
 | T15 | 16 | Creation-Destruction Substitution Systems | 15 | `31-T15-CREATION-DESTRUCTION.md` | PENDING | Not started |
 | T16 | 17 | Sequential Substitution Systems | 16 | `6-T16-SEQUENTIAL-SUBSTITUTION.md` | COMPLETE | 51 direct-name lines plus rule/position order, captions, Notes, aliases/history, Index/splits, stopping, overlap/confluence, finite-input, causal, generalized/multiway, and emulation routes dispositioned; 21 excerpt groups; 0 unresolved |
 | T17 | 18 | Tag Systems | 17 | `7-T17-TAG.md` | COMPLETE | 175 direct occurrences on 111 unique lines plus full-prefix/deletion/tail-order, captions/figure, Notes, Index/splits, Post/Wang/cyclic/multiway boundaries, halt/extinction, count, finite-input, and emulation routes dispositioned; 21 excerpt groups; 0 unresolved |
@@ -78,10 +78,10 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages globally complete: 28 / 45.
+- Type stages globally complete: 29 / 45.
 - Type stages evidence-closed / architecture-reopened: 0.
 - Type stages asset-reopened: 0.
-- Type stages unresolved: 17 pending; 0 in progress; 0 reopened.
+- Type stages unresolved: 16 pending; 0 in progress; 0 reopened.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 

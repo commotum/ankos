@@ -11,7 +11,7 @@ epsilon-valued rule row.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from itertools import product
 from typing import Iterable
 
@@ -73,16 +73,28 @@ EXPECTED_PAGE_85_RULE_2_TRACE: tuple[Word, ...] = (
 
 @dataclass(frozen=True)
 class OrderedConfiguration:
-    """Transparent generic representation of a finite ordered word."""
+    """Transparent word plus nonsemantic address scope for old-source handles."""
 
     values: Word
+    # The key scopes occurrence handles to one old snapshot.  It is explicit
+    # verifier/address metadata, not rule-visible configuration state, so it is
+    # deliberately excluded from semantic configuration equality.
+    snapshot_key: int = field(default=0, compare=False, repr=False)
+
+
+@dataclass(frozen=True, order=True)
+class SourceHandle:
+    """One occurrence bound to the snapshot from which it was selected."""
+
+    snapshot_key: int
+    index: int
 
 
 @dataclass(frozen=True)
 class OrderedEmission:
     """One source occurrence's ordered contribution to the next generation."""
 
-    source: int
+    source: SourceHandle
     word: Word
 
 
@@ -90,7 +102,7 @@ class OrderedEmission:
 class ChildInterval:
     """Inspectable parent/emission provenance; it is not future rule state."""
 
-    source: int
+    source: SourceHandle
     start: int
     stop: int
 
@@ -99,7 +111,7 @@ class ChildInterval:
 class OrderedGenerationStep:
     successor: OrderedConfiguration
     child_intervals: tuple[ChildInterval, ...]
-    dropped_sources: tuple[int, ...]
+    dropped_sources: tuple[SourceHandle, ...]
 
 
 class OverlappingReplacementSpans(ValueError):
@@ -131,9 +143,11 @@ def validate_rule_rows(rows: Iterable[tuple[Pair, Word]]) -> RuleTable:
     return table
 
 
-def encode_native(word: Word) -> OrderedConfiguration:
+def encode_native(word: Word, *, snapshot_key: int = 0) -> OrderedConfiguration:
     """Lossless native-word to generic-configuration map e."""
-    return OrderedConfiguration(checked_word(word))
+    if snapshot_key < 0:
+        raise ValueError("snapshot key must be nonnegative")
+    return OrderedConfiguration(checked_word(word), snapshot_key=snapshot_key)
 
 
 def decode_generic(configuration: OrderedConfiguration) -> Word:
@@ -141,38 +155,54 @@ def decode_generic(configuration: OrderedConfiguration) -> Word:
     return checked_word(configuration.values)
 
 
-def all_occurrences(configuration: OrderedConfiguration) -> tuple[int, ...]:
+def all_occurrences(
+    configuration: OrderedConfiguration,
+) -> tuple[SourceHandle, ...]:
     """T13 FRONTIER: every old occurrence emits once."""
-    return tuple(range(len(configuration.values)))
+    return tuple(
+        SourceHandle(configuration.snapshot_key, index)
+        for index in range(len(configuration.values))
+    )
 
 
 def all_right_context_anchors(
     configuration: OrderedConfiguration,
-) -> tuple[int, ...]:
+) -> tuple[SourceHandle, ...]:
     """T14 FRONTIER: every old occurrence having an immediate right neighbor."""
-    return tuple(range(max(0, len(configuration.values) - 1)))
+    return tuple(
+        SourceHandle(configuration.snapshot_key, index)
+        for index in range(max(0, len(configuration.values) - 1))
+    )
 
 
 def read_self(
-    configuration: OrderedConfiguration, active: tuple[int, ...]
+    configuration: OrderedConfiguration, active: tuple[SourceHandle, ...]
 ) -> tuple[Bit, ...]:
     values = configuration.values
-    assert all(0 <= source < len(values) for source in active)
-    return tuple(values[source] for source in active)
+    if any(source.snapshot_key != configuration.snapshot_key for source in active):
+        raise ValueError("stale or foreign source handle")
+    if any(source.index < 0 or source.index >= len(values) for source in active):
+        raise ValueError("source handle is outside the old snapshot")
+    return tuple(values[source.index] for source in active)
 
 
 def read_self_right(
-    configuration: OrderedConfiguration, active: tuple[int, ...]
+    configuration: OrderedConfiguration, active: tuple[SourceHandle, ...]
 ) -> tuple[Pair, ...]:
     """Ordered, overlapping reads from one immutable old snapshot."""
     values = configuration.values
-    assert all(0 <= source < len(values) - 1 for source in active)
-    return tuple((values[source], values[source + 1]) for source in active)
+    if any(source.snapshot_key != configuration.snapshot_key for source in active):
+        raise ValueError("stale or foreign source handle")
+    if any(source.index < 0 or source.index >= len(values) - 1 for source in active):
+        raise ValueError("right-context source is outside the old snapshot")
+    return tuple(
+        (values[source.index], values[source.index + 1]) for source in active
+    )
 
 
 def pair_rule_emissions(
     table: RuleTable,
-    active: tuple[int, ...],
+    active: tuple[SourceHandle, ...],
     reads: tuple[Pair, ...],
 ) -> tuple[OrderedEmission, ...]:
     assert len(active) == len(reads)
@@ -185,7 +215,7 @@ def pair_rule_emissions(
 
 def self_rule_emissions(
     morphism: dict[Bit, Word],
-    active: tuple[int, ...],
+    active: tuple[SourceHandle, ...],
     reads: tuple[Bit, ...],
 ) -> tuple[OrderedEmission, ...]:
     """T13 uses the same result and UPDATE with a self-only table."""
@@ -199,7 +229,7 @@ def self_rule_emissions(
 
 def apply_ordered_generation(
     old: OrderedConfiguration,
-    active: tuple[int, ...],
+    active: tuple[SourceHandle, ...],
     emissions: tuple[OrderedEmission, ...],
 ) -> OrderedGenerationStep:
     """Shared T13/T14 UPDATE: rebuild one generation from ordered emissions.
@@ -209,10 +239,12 @@ def apply_ordered_generation(
     order, and any old occurrences outside the selected emission frontier are
     reported as dropped rather than silently copied forward.
     """
-    if tuple(sorted(set(active))) != active:
+    if tuple(sorted(set(active), key=lambda handle: handle.index)) != active:
         raise ValueError("active source handles must be unique and ordered")
-    if any(source < 0 or source >= len(old.values) for source in active):
+    if any(source.snapshot_key != old.snapshot_key for source in active):
         raise ValueError("stale or foreign source handle")
+    if any(source.index < 0 or source.index >= len(old.values) for source in active):
+        raise ValueError("source handle is outside the old snapshot")
     if tuple(emission.source for emission in emissions) != active:
         raise ValueError("emissions must cover the selected frontier exactly in order")
 
@@ -224,10 +256,16 @@ def apply_ordered_generation(
         next_values.extend(word)
         intervals.append(ChildInterval(emission.source, start, len(next_values)))
 
-    active_set = set(active)
-    dropped = tuple(source for source in range(len(old.values)) if source not in active_set)
+    active_indices = {source.index for source in active}
+    dropped = tuple(
+        SourceHandle(old.snapshot_key, index)
+        for index in range(len(old.values))
+        if index not in active_indices
+    )
     return OrderedGenerationStep(
-        successor=OrderedConfiguration(tuple(next_values)),
+        successor=OrderedConfiguration(
+            tuple(next_values), snapshot_key=old.snapshot_key + 1
+        ),
         child_intervals=tuple(intervals),
         dropped_sources=dropped,
     )
@@ -316,10 +354,10 @@ def assert_update_reuse_and_counterexamples() -> None:
 
     t14 = shared_t14_notes_step(PAGE_85_RULE_1, old)
     assert t14.successor.values == (0, 1, 0)
-    assert t14.dropped_sources == (2,)
+    assert t14.dropped_sources == (SourceHandle(0, 2),)
     assert t14.child_intervals == (
-        ChildInterval(0, 0, 1),
-        ChildInterval(1, 1, 3),
+        ChildInterval(SourceHandle(0, 0), 0, 1),
+        ChildInterval(SourceHandle(0, 1), 1, 3),
     )
 
     # A self-only T13 morphism cannot express T14: the same source symbol 0
@@ -353,23 +391,38 @@ def assert_update_reuse_and_counterexamples() -> None:
 
 def assert_update_result_validation() -> None:
     """Reject malformed handles/results before ordered-generation commit."""
-    old = encode_native((0, 1, 0))
-    emission_0 = OrderedEmission(0, (0,))
-    emission_1 = OrderedEmission(1, (1,))
+    old = encode_native((0, 1, 0), snapshot_key=7)
+    handle_0 = SourceHandle(7, 0)
+    handle_1 = SourceHandle(7, 1)
+    handle_2 = SourceHandle(7, 2)
+    emission_0 = OrderedEmission(handle_0, (0,))
+    emission_1 = OrderedEmission(handle_1, (1,))
+    foreign_same_index = SourceHandle(6, 0)
+    out_of_range = SourceHandle(7, 3)
 
     invalid_inputs = (
         # Duplicate and unordered source handles are ambiguous orderings.
-        ((0, 0), (emission_0, emission_0)),
-        ((1, 0), (emission_1, emission_0)),
-        # A handle outside this old generation cannot be committed.
-        ((0, 3), (emission_0, OrderedEmission(3, (1,)))),
+        ((handle_0, handle_0), (emission_0, emission_0)),
+        ((handle_1, handle_0), (emission_1, emission_0)),
+        # Same-index foreign-generation and out-of-range handles both fail.
+        (
+            (foreign_same_index,),
+            (OrderedEmission(foreign_same_index, (0,)),),
+        ),
+        (
+            (handle_0, out_of_range),
+            (emission_0, OrderedEmission(out_of_range, (1,))),
+        ),
         # Results must cover the selected handles exactly, once, and in order.
-        ((0, 1), (emission_0,)),
-        ((0, 1), (emission_0, emission_1, OrderedEmission(2, (0,)))),
-        ((0, 1), (emission_1, emission_0)),
+        ((handle_0, handle_1), (emission_0,)),
+        (
+            (handle_0, handle_1),
+            (emission_0, emission_1, OrderedEmission(handle_2, (0,))),
+        ),
+        ((handle_0, handle_1), (emission_1, emission_0)),
         # T14's strict base table emits Sigma+, closed over the alphabet.
-        ((0,), (OrderedEmission(0, ()),)),
-        ((0,), (OrderedEmission(0, (2,)),)),
+        ((handle_0,), (OrderedEmission(handle_0, ()),)),
+        ((handle_0,), (OrderedEmission(handle_0, (2,)),)),
     )
     for active, emissions in invalid_inputs:
         try:
@@ -387,7 +440,9 @@ def assert_short_word_semantics() -> None:
         assert native_step(PAGE_85_RULE_1, word) == ()
         notes_shared = shared_t14_notes_step(PAGE_85_RULE_1, encode_native(word))
         assert notes_shared.successor == OrderedConfiguration(())
-        assert notes_shared.dropped_sources == tuple(range(len(word)))
+        assert notes_shared.dropped_sources == tuple(
+            SourceHandle(0, index) for index in range(len(word))
+        )
 
         # No RULE row returned epsilon: there simply were zero eligible anchors.
         assert all(PAGE_85_RULE_1[context] for context in PAIR_CONTEXTS)
@@ -482,7 +537,9 @@ def assert_exhaustive_bounded_commutation(max_input_length: int = 6) -> tuple[in
                 ) == len(notes_next)
 
                 if length >= 2:
-                    assert generic_step.dropped_sources == (length - 1,)
+                    assert generic_step.dropped_sources == (
+                        SourceHandle(0, length - 1),
+                    )
                 else:
                     assert notes_next == ()
                     short_cases += 1
@@ -509,7 +566,7 @@ def main() -> None:
         f"singleton_pair_CA_cases={pair_ca_cases}; "
         "page85_rule1_t0_t3=PASS; page85_rule2_raster_t0_t3=PASS; "
         "shared_ordered_UPDATE=PASS; overlap_is_read_only=PASS; "
-        "hostile_result_validation=PASS; "
+        "hostile_result_validation=PASS; snapshot_handle_scope=PASS; "
         "rightmost_drop=PASS; pair_XOR_sheared_rule90=PASS; "
         "short_native_profile=empty_successor; "
         "zero_eligible_is_not_epsilon=PASS)"
