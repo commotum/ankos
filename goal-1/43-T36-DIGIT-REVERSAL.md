@@ -46,7 +46,7 @@ Reconstruct T36 from primary evidence as a closed positional-representation unar
 
 The fail-closed source oracle uses 18 independent query lanes. Their union contains 125 monolith rows: 99 before the physical Index and 26 actual-Index candidates. The Index boundary is exact: 12 rows are routed T36 aliases/relations and 14 are guarded flattened-column or recursive-sequence collisions. The complete governed partition is 19 native, 19 relation, and 32 control rows (70 retained), with 48 explicit exclusions and zero unresolved rows. Thirty-four frozen Book-semantic guards across six classes and four auxiliary catalog/taxonomy guards bind the meanings used below rather than merely their row counts.
 
-The retained evidence reverse-joins to 96 unique split-corpus owners:
+The complete retained/routed/guarded-Index crosswalk reverse-joins to 96 unique split-corpus owners:
 
 | Join class | Rows | Boundary |
 |---|---:|---|
@@ -224,7 +224,7 @@ D137 therefore classifies every T36 delta as direct reuse, parameterization/rest
 
 COMPLETE. Eighteen frozen query lanes close a 125-row source union at `99 pre-Index / 26 actual-Index`; the Index partitions `12 routed / 14 guarded exclusions`. The governed source partition is `19 native / 19 relation / 32 control = 70 retained`, with 48 exclusions and zero unresolved. Ninety-six unique split owners close at `71 exact / 16 image-basename / 4 normalized / 5 structural repair`; 34 Book-semantic guards across six classes and four auxiliary guards bind the evidence content. The source-oracle SHA is `7a4cf99382aab7a6a6867798a06f3f0ce5d07887fce3217d1e6a6ae0a5326733`.
 
-Seven governed assets at `4 native / 3 relation / 0 control` plus nine exclusions close 32 monolith/split references, 16 hashes, and 1,232,875 bytes. All seven governed files are hash-bound; none supplies pixel-transcribed or pixel-replayed semantics. Five independent semantic manifests bind 41 exact source-role, adjacency, candidate-group, and source-derived/nonpixel records. The asset-oracle SHA is `972450eb675396bb352c2cac0bf4a7a4dc878c17b3f364e466ca2a0577bfd33a`.
+Seven governed assets at `4 native / 3 relation / 0 control` plus nine exclusions close 32 monolith/split references, 16 hashes, and 1,232,875 bytes. All seven governed files are hash-bound; none supplies pixel-transcribed or pixel-replayed semantics. Five independent semantic manifests bind 41 exact records: 16 source guards, eight unrecovered-raster-semantics boundaries, five source-derived/nonpixel claims, nine adjacency dispositions, and three candidate-group dispositions. The asset-oracle SHA is `972450eb675396bb352c2cac0bf4a7a4dc878c17b3f364e466ca2a0577bfd33a`.
 
 The semantic oracle closes 1,180 source events and independent word replays, 22,036 scalar/word commutations (`11,275 canonical / 5,022 fixed / 5,739 grow`), 1,881 fixed-reversal entries, five arbitrary-precision profiles up to 6,644 bits/2,001 digits, 260 horizons/8,320 trace-event replays, one executable two-state width-loss counterexample, seven exact structural keys, three cross-program rejections, and 68 hostile rejections. Its SHA is `cbbe63f4f4ad8f517df7532719c423e9ff796bbf3b1cfeae3e150540554e4791`; semantic digest is `30539868a2202ffdae0e4574e0ceefb68e5715d6d3a7a543efd63bd730a5ccc8`.
 

@@ -78,10 +78,10 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages globally complete: 41 / 45.
+- Type stages globally complete: 42 / 45.
 - Type stages evidence-closed / architecture-reopened: 0.
 - Type stages asset-reopened: 0.
-- Type stages unresolved: 3 pending; 1 in progress; 0 reopened.
+- Type stages unresolved: 3 pending; 0 in progress; 0 reopened.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
