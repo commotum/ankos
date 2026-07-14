@@ -366,7 +366,7 @@
     },
     {
       "path": "goal-4/quality-evaluation.json",
-      "sha256": "abdfabc0f667fb4153511595944bcd39f1272f3c92087cd81267127ba5472c00"
+      "sha256": "dc6d03f6f58213bad0bccb81bd3a23cad6b0e0cde96a13e32ad66a73587fa932"
     },
     {
       "path": "goal-4/licensing-contract.json",
@@ -484,7 +484,7 @@
   "quality_policy": {
     "path": "goal-4/quality-evaluation.json",
     "status_required_for_stage_1": "PROTOCOL_FROZEN_SAMPLE_IDS_PENDING_STAGE_2",
-    "minimum_fraction_per_document": 0.05,
+    "minimum_fraction_per_document": "1/20",
     "minimum_blocks_per_document": 20,
     "exact_authorial_metrics_required": true,
     "post_hoc_reranking_allowed": false

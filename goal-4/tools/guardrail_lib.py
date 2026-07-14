@@ -269,10 +269,13 @@ def validate_quality(quality: dict[str, Any]) -> None:
     require(quality.get("materialized_sample") is None, "Stage 1 must not materialize outcome-aware samples")
     require(quality.get("results") is None, "Stage 1 quality results must be empty")
     sample = quality.get("sample_size", {})
-    require(sample.get("minimum_fraction_per_document") == 0.05, "quality sample fraction drift")
+    require(
+        sample.get("minimum_fraction_per_document") == {"numerator": 1, "denominator": 20},
+        "quality sample fraction drift",
+    )
     require(sample.get("minimum_blocks_per_document") == 20, "quality per-document minimum drift")
     require(
-        sample.get("document_quota") == "q = min(N, max(ceil(0.05 * N), 20)), where N is the document's eligible-block count.",
+        sample.get("document_quota") == "q = min(N, max(ceil(N / 20), 20)), where N is the document's eligible-block count.",
         "quality document quota is not exact",
     )
     require("Hamilton" in sample.get("risk_allocation", ""), "quality risk allocation is underspecified")
@@ -290,9 +293,14 @@ def validate_quality(quality: dict[str, Any]) -> None:
         "quality risk strata/order drift",
     )
     metrics = quality.get("metrics", {})
-    require(metrics.get("author_text_character_projection_exactness", {}).get("minimum") == 1.0, "author text threshold weakened")
-    require(metrics.get("author_text_cer", {}).get("maximum") == 0.0, "CER threshold weakened")
-    require(metrics.get("author_text_wer", {}).get("maximum") == 0.0, "WER threshold weakened")
+    exact_ratio = {"numerator": 1, "denominator": 1}
+    zero_ratio = {"numerator": 0, "denominator": 1}
+    require(
+        metrics.get("author_text_character_projection_exactness", {}).get("minimum_ratio") == exact_ratio,
+        "author text threshold weakened",
+    )
+    require(metrics.get("author_text_cer", {}).get("maximum_ratio") == zero_ratio, "CER threshold weakened")
+    require(metrics.get("author_text_wer", {}).get("maximum_ratio") == zero_ratio, "WER threshold weakened")
     for name in (
         "heading_paragraph_list_boundary_exactness",
         "technical_token_exactness",
@@ -300,7 +308,7 @@ def validate_quality(quality: dict[str, Any]) -> None:
         "figure_caption_association_exactness",
         "known_defect_and_seeded_mutation_recall",
     ):
-        require(metrics.get(name, {}).get("minimum") == 1.0, f"quality threshold weakened: {name}")
+        require(metrics.get(name, {}).get("minimum_ratio") == exact_ratio, f"quality threshold weakened: {name}")
     require(
         quality.get("fixed_point", {}).get("required_consecutive_full_rounds_without_new_defect_class") == 2,
         "fixed-point round count drift",

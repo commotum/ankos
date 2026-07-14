@@ -62,10 +62,13 @@
   ],
   "stratum_assignment": "Assign every eligible block to the first matching risk stratum by ascending priority; record all secondary risk tags separately. Stage 2 freezes the closed block_kind enum and classifier implementation hash before producing ranks.",
   "sample_size": {
-    "minimum_fraction_per_document": 0.05,
+    "minimum_fraction_per_document": {
+      "numerator": 1,
+      "denominator": 20
+    },
     "minimum_blocks_per_document": 20,
     "small_document_rule": "Select all eligible blocks when a document has fewer than 20.",
-    "document_quota": "q = min(N, max(ceil(0.05 * N), 20)), where N is the document's eligible-block count.",
+    "document_quota": "q = min(N, max(ceil(N / 20), 20)), where N is the document's eligible-block count.",
     "rounding": "ceil for document quota; floor for initial proportional allocations.",
     "risk_allocation": "For each document, reserve one slot for each nonempty non-PROSE stratum in priority order while slots remain. Allocate remaining slots across each stratum's unselected population by the Hamilton largest-remainder method. Ties are resolved by ascending risk priority, then risk-stratum ID. Never select more than the stratum population; redistribute overflow by the same rule.",
     "changed_unchanged_rule": "Stage 2 freezes the full ranked lists before repairs. After a repair-overlay digest is sealed, label every ranked block CHANGED or UNCHANGED without altering ranks. Within each document/risk quota q_s, target ceil(q_s/2) CHANGED and floor(q_s/2) UNCHANGED (the odd slot goes to CHANGED). If one pool is too small, select it completely and transfer its shortfall to the other pool. Select lowest frozen ranks only. Never substitute a lower-ranked block based on its observed answer.",
@@ -108,30 +111,54 @@
   "metrics": {
     "author_text_character_projection_exactness": {
       "definition": "Exact Unicode scalar sequence after removing only manifest-typed generated metadata; no normalization, case folding, or whitespace folding.",
-      "minimum": 1.0
+      "minimum_ratio": {
+        "numerator": 1,
+        "denominator": 1
+      }
     },
     "author_text_cer": {
       "definition": "Levenshtein character errors divided by authoritative witness character count, reported in addition to exactness.",
-      "maximum": 0.0
+      "maximum_ratio": {
+        "numerator": 0,
+        "denominator": 1
+      }
     },
     "author_text_wer": {
       "definition": "Whitespace-token Levenshtein errors divided by authoritative witness token count, reported in addition to exactness.",
-      "maximum": 0.0
+      "maximum_ratio": {
+        "numerator": 0,
+        "denominator": 1
+      }
     },
     "heading_paragraph_list_boundary_exactness": {
-      "minimum": 1.0
+      "minimum_ratio": {
+        "numerator": 1,
+        "denominator": 1
+      }
     },
     "technical_token_exactness": {
-      "minimum": 1.0
+      "minimum_ratio": {
+        "numerator": 1,
+        "denominator": 1
+      }
     },
     "index_entry_column_sequence_exactness": {
-      "minimum": 1.0
+      "minimum_ratio": {
+        "numerator": 1,
+        "denominator": 1
+      }
     },
     "figure_caption_association_exactness": {
-      "minimum": 1.0
+      "minimum_ratio": {
+        "numerator": 1,
+        "denominator": 1
+      }
     },
     "known_defect_and_seeded_mutation_recall": {
-      "minimum": 1.0
+      "minimum_ratio": {
+        "numerator": 1,
+        "denominator": 1
+      }
     }
   },
   "fixed_point": {

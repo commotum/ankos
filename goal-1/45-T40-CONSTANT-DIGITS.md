@@ -1,6 +1,6 @@
 # 45-T40-CONSTANT-DIGITS
 
-Status: **IN PROGRESS — ARCHITECTURE RESOLVED; ORACLE AND HOSTILE-REVIEW CLOSURE PENDING**
+Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, ARCHITECTURE, AND HOSTILE-REVIEW CLOSED UNDER D139**
 
 ## Current Facts
 
@@ -360,7 +360,7 @@ A certified random-access evaluator implements `CoefficientAt(index)` without fa
 | Direct nth coefficient | 2 | Pure evaluator query | No fabricated prefix history or hidden callback |
 | Digit/coefficient prefix | 2 | Typed finite query result | Not T37 canonical state; finite prefix is lossy |
 | Walks/statistics/randomness | 1/2 | Observer/analyzer records | Never feed evaluation or strengthen empirical claims |
-| New execution algebra | Not established | Existing declarative category plus branch-free SimpleProgram runner for realizations | No T40 state/frontier/neighborhood/update/executor/family branch |
+| New execution algebra | Not established | Existing declarative category plus branch-free SimpleProgram runner for realizations | No umbrella-native T40 transition CONFIGURATION/DOMAIN/frontier/neighborhood/update/executor/family branch; work programs retain visible generic state and axes |
 
 This is not an exception to the SimpleProgram architecture. The exact iterative procedures are SimplePrograms and use the same runner. The umbrella catalog entry also names an immutable denotation/query relation, just as T41 contains uniterated function definitions without inventing argument-as-time evolution. That declarative boundary was already established by D082/T41, so D139 uses classes 1–3 relative to the current architecture and adds no new class-4 category or execution algebra.
 
@@ -428,7 +428,7 @@ The smallest honest model is therefore an immutable exact denotation plus a type
 - No sequential prefix events fabricated for a direct nth-digit evaluator; no approximate/probable result promoted to exact.
 - No square-root residual hidden: use direct `(r,s)` or the proved invariant-valid fixed-program `(n,profile,s)` quotient with explicit inverse. Do not use bare `s` across programs, and do not silently accept the false arbitrary-rational source claim.
 - No long-division remainder, Gauss residual, evaluator cache, precision state, or resource counter hidden outside a declared work configuration/context.
-- No T40-specific state, DOMAIN, FRONTIER, NEIGHBORHOOD, RULE-result wrapper, UPDATE, executor, family branch, or identity/no-op rollout.
+- No umbrella-native T40 transition CONFIGURATION or DOMAIN, T40 FRONTIER, NEIGHBORHOOD, RULE-result wrapper, UPDATE, executor, family branch, or identity/no-op rollout; explicit work programs retain visible generic state and axes.
 
 ## Frozen Source Closure
 
@@ -454,14 +454,18 @@ The query audit checks 159 prefix/random-access agreements plus 36 certified ran
 
 ## Completion Requirements
 
-- [ ] Every strict main, Notes, actual-Index, split, history, relation, control, exclusion, and extraction-defect candidate is dispositioned with zero unresolved mechanics.
-- [ ] The complete 63-candidate/124-reference universe is hash-bound with followed representation relations, sibling exclusions, split omissions, and source limitations explicit.
-- [ ] Positional and continued-fraction definitions, canonicalization, coefficient queries, exactness levels, completion, work realizations, and observers are independently verified.
-- [ ] Long division, square-root product/invariant and fixed-program quotient, positional/Gauss maps, direct nth access, and finite-prefix loss are adversarially tested.
-- [ ] T34/T36/T37/T39/T41/T42/T43 and current-runtime boundaries are synchronized.
-- [ ] Source, asset, semantic, cross-interface, mutation, portability, fail-closed, mode, Markdown, diff, scope, repository-test, and independent hostile-review gates pass.
-- [ ] D139, plan, evidence index, design ledger, architecture audit, and Goal 2 handoffs are synchronized with no new execution algebra.
+- [x] Every strict main, Notes, actual-Index, split, history, relation, control, exclusion, and extraction-defect candidate is dispositioned with zero unresolved mechanics.
+- [x] The complete 63-candidate/124-reference universe is hash-bound with followed representation relations, sibling exclusions, split omissions, and source limitations explicit.
+- [x] Positional and continued-fraction definitions, canonicalization, coefficient queries, exactness levels, completion, work realizations, and observers are independently verified.
+- [x] Long division, square-root product/invariant and fixed-program quotient, positional/Gauss maps, direct nth access, and finite-prefix loss are adversarially tested.
+- [x] T34/T36/T37/T39/T41/T42/T43 and current-runtime boundaries are synchronized.
+- [x] Source, asset, semantic, cross-interface, mutation, portability, fail-closed, mode, Markdown, diff, scope, repository-test, and independent hostile-review gates pass.
+- [x] D139, plan, evidence index, design ledger, architecture audit, and Goal 2 handoffs are synchronized with no new execution algebra.
 
 ## Stage Results
 
-Pending oracle and hostile-review closure.
+COMPLETE. The source oracle closes the complete strict-main, native-Notes, actual-Index, independent Book-wide, split, relation, control, exclusion, and extraction-defect universes with zero unresolved rows. Its audit digest is `5eeb98409dc44e07284e142355054d9dde66e7566fde4c9f36e35c0642840623`; source SHA-256 is `9209966474b1da250949cf74dbd2d4f844fb4b87f994be0806d4b8b79c87859c`. The asset oracle independently closes all 63 governed-or-excluded candidates and 124 references under SHA-256 `7eb5afb0f072557603d1ce7a08aa9f1a6b4c872e51d8b7d7cbf66b056388cced`.
+
+The semantic oracle proves the exact denotation/query/result model, canonical positional and simple-continued-fraction representations, optional work-program commutations, direct-access boundary, proof-strength and termination distinctions, and replay-verified T42 interface. Its digest is `f5bd58e930032f69aae6fd2a613a267d9ca8a3c9742e41de1d193cdcdfe97716`; script SHA-256 is `a3b8b01d32db2a5198c564ee453beb23a1e3acd1f23b7e639bd9ec30b2671cc7`. D139 classifies T40 as classes 1–3 reuse: the umbrella denotation/query layer has no native transition CONFIGURATION or DOMAIN, while explicit coefficient algorithms are ordinary visible discrete `t+0D` work SimplePrograms over existing axes.
+
+All normal/JSON, import, compilation, relocation, optimized-mode rejection, malformed-usage, mutation, fail-closed, cross-interface, Markdown, diff, scope, repository-test, and independent hostile-review gates pass. No runtime code changed and no completed stage reopened. Next: T42.

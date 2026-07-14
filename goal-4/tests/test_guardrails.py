@@ -90,7 +90,10 @@ class GuardrailContractTests(unittest.TestCase):
 
     def test_author_text_quality_threshold_cannot_be_weakened(self) -> None:
         quality = copy.deepcopy(self.quality)
-        quality["metrics"]["author_text_character_projection_exactness"]["minimum"] = 0.999
+        quality["metrics"]["author_text_character_projection_exactness"]["minimum_ratio"] = {
+            "numerator": 999,
+            "denominator": 1000,
+        }
         with self.assertRaisesRegex(GuardrailError, "threshold weakened"):
             self.validate_mutation(quality=quality)
 
