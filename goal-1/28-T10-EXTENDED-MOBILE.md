@@ -389,7 +389,7 @@ No current behavior can execute T10 faithfully by selecting another family strin
 - Principles 9-10 justify a strict named preset that returns an ordinary generic specification. The block/direction result is intrinsically coupled to the binary radius-one table and is validated as one closed product, not decomposed into freely incompatible flags.
 - Principle 11 keeps atomic synchronous commit as defining semantics. It may not be sequentialized merely because the event has one source.
 - Principle 12 keeps compression, motion plots, causal networks, batches, and images downstream of the native trace.
-- Principles 13-15 are covered by the `000 -> 111,+1` adversary, exhaustive commuting square, radius-two CA-lowering counterexample, invalid-head cases, finite-edge failures, exact table/trajectory, and cross-runner tests.
+- Principles 13-15 are covered in Goal 1 by the `000 -> 111,+1` adversary, exhaustive commuting square, lowering inverse, radius-two CA-lowering counterexample, and exact table/trajectory. The Goal 2 acceptance groups require the still-prospective invalid-tag, finite-edge, and cross-runner tests; the current 102-test suite is regression evidence, not T10 runtime conformance.
 - Principle 16 treats the block/direction-to-label-write map as an explicit total mapping between layers, not a fallback. There is one runner and no T10 switch.
 
 The smallest honest classification is:

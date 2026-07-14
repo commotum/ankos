@@ -7,7 +7,7 @@ This is the evolving architecture record for Goal 1. It inventories observed sem
 1. Principle 0 governs every entry: a prior plan or abstraction is revisable when construction evidence does not compose naturally.
 2. Book evidence precedes semantic reuse or extension. Catalog names and `CA-Types.md` sections provide search vocabulary, not construction proof.
 3. A mechanism is shared only when state, reads, rule result, commit, and successor semantics are genuinely the same.
-4. Configuration must expose its DOMAIN/support/topology, ALPHABET/value labels, structural invariants, and every control role needed to advance. Control may be a lossless tagged/product/marker role inside those labels or structures; executor-local control and opaque whole-state packing remain invalid.
+4. Configuration must expose its dimensional DOMAIN, native support/topology, ALPHABET/value labels, structural invariants, and every control role needed to advance. Control may be a lossless tagged/product/marker role inside those labels or structures; executor-local control and opaque whole-state packing remain invalid.
 5. Program state, trace, ANKoS encoding, batching, visualization, solvers, and numerical approximations stay distinct unless evidence proves coupling is defining.
 6. A new primitive remains `PROVISIONAL` until a completed type stage supplies direct evidence, invariants, and at least one conformance case.
 
@@ -31,7 +31,7 @@ writes = RULE(active, reads)
 next   = UPDATE.apply(configuration, active, writes)
 ```
 
-DOMAIN/support/topology, ALPHABET/value schema, FRONTIER, NEIGHBORHOOD, RULE result, UPDATE composition/schedule, seed, and invariants are typed axes of that protocol. Cellular automata are one fixed-lattice/all-sites/local-stencil/scalar-write/parallel-update preset. Catalog types and axis implementations never select a family executor.
+Dimensional DOMAIN, configuration support/topology, ALPHABET/value schema, FRONTIER, NEIGHBORHOOD, RULE result, UPDATE composition/schedule, seed, and invariants are typed axes of that protocol. Cellular automata are one fixed-lattice/all-sites/local-stencil/scalar-write/parallel-update preset. Catalog types and axis implementations never select a family executor.
 
 The audit retires required top-level `SingleControl`, `TransitionControl`, `ArithmeticAssignment`, `MapAssignment`, and construction-named executor/state classes. Visible heads, active markers, counters, and cursors remain semantic roles, represented losslessly by tags, products, markers, or structural fields. Constraint/model sets, uniterated functions, and general PDE relations without a specified evolution problem remain declarative nonfits; multiway rewriting stays inside the runner through a `StepResult` whose successor component is set-valued and whose event component retains witnesses.
 
@@ -41,7 +41,7 @@ The decision text and construction rows below retain their evidence bases and hi
 
 Every completed type will update the relevant rows below and record:
 
-- configuration = DOMAIN/support/topology + ALPHABET/value labels + structural invariants, with control as an explicit role rather than a mandated storage class;
+- configuration = DOMAIN + support/topology + ALPHABET/value labels + structural invariants, with control as an explicit role rather than a mandated storage class;
 - active loci or frontier;
 - reads/access pattern and rule inputs;
 - explicit result type;
@@ -572,7 +572,7 @@ No row below is a committed universal primitive at Foundation. Type stages must 
 
 - Status: REVISED: neighboring scalar catalogs share the unary-rule axis as well as the runner where their closed syntax fits.
 - Basis: parity branching begins T35 at `BOOK:1497`, digit feedback begins T36, recursive-history and real interval maps have different state/access invariants, and continuous fields/PDEs add spatial or derivative semantics.
-- Consequence: T34/T35/T36/T43 can use one closed tagged unary RULE algebra over explicit value carriers and invariants; their predicates/digit transforms/self-map contracts remain typed nodes, not operation flags or callbacks. T37/T38 have growing sequence DOMAIN/support, T44 has a spatial field, and T45 is declarative unless a flow is derived.
+- Consequence: T34/T35/T36/T43 can use one closed tagged unary RULE algebra over explicit value carriers and invariants; their predicates/digit transforms/self-map contracts remain typed nodes, not operation flags or callbacks. T37/T38 use discrete `t+1D` with growing ordered support, T44 has a spatial field, and T45 is declarative unless a flow is derived.
 
 ### D070 — Recursive-sequence state is the complete indexed numeric prefix
 

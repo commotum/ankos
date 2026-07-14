@@ -14,7 +14,7 @@ The library target is Wolfram's finitely described transition/rewrite system, no
 
 ```text
 SimpleProgram:
-    CONFIGURATION  labeled DOMAIN/support/topology plus structural invariants
+    CONFIGURATION  labeled support/topology within DOMAIN plus structural invariants
     SEED           one valid initial configuration
     FRONTIER       rule-firing loci, occurrences, or matches
     NEIGHBORHOOD   information visible at each firing locus
@@ -96,7 +96,7 @@ The classification number in this matrix refers to the four categories above. A 
 | D002 | Current family dispatch in `rollout.py`; Principles 2,14 | 1 | One runner calling typed axes | No `if family`, hidden state, callback, or duplicated rollout | Keep |
 | D003 | Exact CSV join | 2 | Provenance/conformance IDs | Catalog ID never chooses runtime class | Keep and clarify |
 | D004 | T01 old-snapshot step; `BOOK:418-430,10984-10992` | 2 | `SimpleProgram` CA preset | Fixed lattice/all sites/table are axis values, not the executor algebra | Rewritten; T01 handoff reclosed |
-| D005 | T01 infinite line, finite realization, trace evidence | 3 | DOMAIN/support declaration plus explicit realization and trace mapping | Lowering is inspectable and lossless at declared scope | Keep; normalize DOMAIN vocabulary |
+| D005 | T01 infinite line, finite realization, trace evidence | 3 | Discrete `t+1D` declaration, fixed-line support, explicit realization, and trace mapping | Lowering is inspectable and lossless at declared scope | Keep; normalize DOMAIN vocabulary |
 | D006 | `BOOK:10988`; asymmetric runtime defect | 2 | Ordered NEIGHBORHOOD plus explicit table codec | Read order and serialization significance commute | Keep |
 | D007 | T01 center replacement | 2 | Generic typed write/replacement result | Same-site scalar assignment is one RULE-result preset | Rewrite class wording; no assignment subclass per family |
 | D008 | Binary radius-one evidence | 2 | CA preset over generic axes | Preset fixes values only; no executor/seed/boundary | Keep |
@@ -106,13 +106,13 @@ The classification number in this matrix refers to the four categories above. A 
 | D012 | Physical `[left,self,right]` Notes code | 1 | Shared ordered NEIGHBORHOOD/codec | No family permutation; asymmetric oracle | Keep |
 | D013 | Mobile trace/observer evidence | 2 | Full configuration trace | Composite tags round-trip; compression remains observer | Keep with representation-neutral wording |
 | D014 | Turing head-state evidence plus composite-alphabet note | 3 | `Plain(sigma) \| Head(q,sigma)` | Exactly one head; underlying symbol retained; optional factored view commutes | `SingleControl` mandate removed; T12/T19 dependencies reclosed |
-| D015 | Sparse blank tape Notes | 3 | Fixed-line DOMAIN with default/override labeled field | Total inspectable value at every integer; finite realization separate | Keep |
+| D015 | Sparse blank tape Notes | 3 | Discrete `t+1D` with fixed-line default/override labeled support | Total inspectable value at every integer; finite realization separate | Keep |
 | D016 | Base/nonhalting/Busy-Beaver/stop evidence | 2 | Typed run outcomes around runner | Terminal, external stop, horizon, invalidity, error distinct | Keep |
 | D017 | OCR-damaged codec plus code 3024 guards | 2 | Evidence/provenance policy | Repair explicit and independently replayed | Keep |
 | D018 | T13 length-changing `1 -> 10` defeats scalar same-locus writes | 2 | UPDATE axis supporting typed structural replacement | One branch-free runner; update policy owns composition/schedule | Rewrite: real axis extension, not executor split |
 | D019 | All parents replace in order; lineage evidence | 2 | Ordered parallel-replacement UPDATE | Full old-source coverage, source/child order, newborn deferral | Keep semantics; demote construction-specific class |
 | D020 | Total `Sigma -> Sigma+` evidence | 2 | Closed RULE table validator | Complete, alphabet-closed, nonempty rows | Keep |
-| D021 | Dynamic order/trace/view evidence | 2 | Variable-support ordered DOMAIN plus trace mapping | Sequence order explicit; realization/cut/padding/view separate | Keep; normalize DOMAIN/support vocabulary |
+| D021 | Dynamic order/trace/view evidence | 2 | Discrete `t+1D` with variable ordered support plus trace mapping | Sequence order explicit; realization/cut/padding/view separate | Keep; normalize DOMAIN/support vocabulary |
 | D022 | T16 rule-major/leftmost matching | 2 | Program-coupled FRONTIER implementation | One authoritative clause list; deterministic priority; no matcher callback | Keep; remove new-class implication |
 | D023 | One old span replaced per event | 2 | Ordered replacement UPDATE with `exactly_one` schedule | One snapshot, one selected span, prefix/suffix order | Rewrite as restriction, not separate executor |
 | D024 | T16 no-match versus T13/T12 outcomes | 2 | Shared typed outcome envelope | Empty frontier interpreted by program/update policy | Keep |
@@ -137,7 +137,7 @@ The classification number in this matrix refers to the four categories above. A 
 | D038 | One-pass outermost prefix-free matching | 2 | Program-coupled FRONTIER/schedule | Old snapshot, preorder/priority, ancestor suppression, newborn deferral | Keep |
 | D039 | Multiple disjoint subtree replacements | 3 | Lossless balanced/prefix token encoding plus generic ordered multi-span replacement | Tree/token pack-unpack bijective on well-formed image; every subtree is one contiguous span; prefix-free paths map to disjoint spans; one-step commuting square | Rewrite/reclose as representation and schedule preset; no tree-specific UPDATE implementation |
 | D040 | No-match/fixed form/representations | 2 | Shared outcomes plus observers/codecs | Applicable identity remains eventful; views never feed back | Keep |
-| D041 | Fully posed multiplicity-preserving geometry | 3 | Geometric DOMAIN/support with product labels and bag occurrence identity | Full pose retained, multiplicity material, order nonsemantic | Keep; normalize scalar-carrier terminology |
+| D041 | Fully posed multiplicity-preserving geometry | 3 | Continuous-coordinate `t+2D` with geometric support, product labels, and bag occurrence identity | Full pose retained, multiplicity material, order nonsemantic | Keep; normalize scalar-carrier terminology |
 | D042 | Parent-local affine composition | 2 | Closed geometric NEIGHBORHOOD/RULE data | `P o C` order; exact/declared numeric profile explicit | Keep; rename scalar DOMAIN to carrier/profile |
 | D043 | Every old occurrence expands to bag children | 2 | Parallel replacement UPDATE with commutative bag combiner | Complete old coverage, consume parents, retain duplicate children/lineage | Keep as UPDATE-axis implementation, not geometric executor |
 | D044 | Overlap/order/limit/render evidence | 2 | Observer/run policy | Overlap inert; identity event advances; views separate | Keep |
@@ -184,7 +184,7 @@ The classification number in this matrix refers to the four categories above. A 
 | D080 | Measurement conventions | 2 | Generic pure measurement/query records | Tuple/sign/zero/repetition conventions explicit | Keep |
 | D081 | Ulam first-accepted selection plus append | 2 | Named selection/access/RULE composition feeding T37's unique-`End` RULE and T16 exactly-one splice | Complete prefix read; distinct unordered indices; accepted witness explicit | Keep as a preset/composition; no endpoint UPDATE or numbered ninth law |
 | D082 | Mathematical function definition has no step | 4 | Closed-function declarative category | Argument definition set, output schema, partiality, branches explicit | Keep nonfit; generalize record beyond T41 |
-| D083 | Definition set versus numerical query scope | 3 | Tagged function/query scopes | View/evaluator/mesh absent from identity | Keep; reserve DOMAIN for task space/support topology |
+| D083 | Definition set versus numerical query scope | 3 | Tagged function/query scopes | View/evaluator/mesh absent from identity | Keep; reserve DOMAIN for dimensional task space; definition/query sets remain scopes |
 | D084 | Point/zero/crossing/etc. queries | 2 | Generic tagged query/result envelope | Undefined/failure/completeness/multiplicity/poles explicit | Keep variants, not classes |
 | D085 | Structural identity/equivalence/observation | 3 | Explicit identity and certified-relation records | Ordered AST and numeric provenance preserved | Keep |
 | D086 | Finite sum versus infinite series | 3 | Tagged closed definition nodes plus convergence invariants | No hidden truncation/infinity sentinel | Rewrite separate-spec mandate as representation variants |
@@ -205,7 +205,7 @@ The classification number in this matrix refers to the four categories above. A 
 | D096 | Continuous-valued cells on a fixed 1D lattice | 2 | Discrete `t+1D` DOMAIN with real-interval ALPHABET | Support and value continuity separated; total field inspectable | Rewrite `ContinuousFieldState` as generic field specialization |
 | D097 | Affine aggregate then scalar map | 3 | Factorized closed local RULE representation | Ordered coefficients/divisor/map and range proof explicit | Keep as RULETYPE variant, not construction class |
 | D098 | All sites assign from old local reads | 1 | CA preset of shared runner | Snapshot parallelism; no partial/in-place commit | Keep; remove ten-law inventory |
-| D099 | Native support/ring/work/crop | 3 | DOMAIN/support/realization/view records | Boundary and finite work never masquerade as native support | Keep |
+| D099 | Native support/ring/work/crop | 3 | Separate DOMAIN, configuration-support, realization, and view records | Boundary and finite work never masquerade as native support | Keep |
 | D100 | Whole-field numeric realization | 3 | Tagged representation/realization profile | Rounding locations and feedback semantics complete | Keep |
 | D101 | Initial-inclusive fields and observers | 2 | Shared trace/observer policy | Background/difference/gallery/view never feed rule | Keep |
 | D102 | Relations among deterministic, stochastic, block, and PDE cases | 2 | Explicit typed boundaries; only evidenced deterministic forms enter the current runner handoff | No hidden RNG or unweighted loss of probabilities; block schedule needs evidence; no discretization identity; D103 owns the PDE nonfit | Keep stochastic/probabilistic and unsupported block execution unresolved until probability-kernel or replayable-draw semantics are evidenced |
@@ -215,7 +215,7 @@ The classification number in this matrix refers to the four categories above. A 
 | D106 | Derived IVP flow/admissibility | 3 | Certified relation from PDE problem to SimpleProgram | Time order/data/locus/well-posed scope explicit | Keep |
 | D107 | Proof-strength results | 1 | Generic query/result/certificate envelope | Existence/nonuniqueness/no-solution/unknown not conflated | Keep |
 | D108 | Numerical discretization | 3 | Explicit representation/approximation relation | Mesh/stencil/integrator/arithmetic/proof claims serialized | Keep |
-| D109 | Mathematical/numerical/sample/view scopes | 3 | DOMAIN/support plus tagged realization/query/view scopes | Continuous region never replaced by grid/raster | Keep |
+| D109 | Mathematical/numerical/sample/view scopes | 3 | Dimensional DOMAIN plus separate support and tagged realization/query/view scopes | Continuous region never replaced by grid/raster | Keep |
 | D110 | Solver work/diagnostics/views | 2 | Observer/work records | No hidden mathematical feedback or false certification | Keep |
 | D111 | T02 only changes finite alphabet/table data | 2 | CA preset with arbitrary finite composite ALPHABET | Complete table; same DOMAIN/frontier/neighborhood/update | Keep; explicitly admit tagged/product cells |
 | D112 | Table, rank, codec identities | 3 | One semantic local function with explicit serialization maps | Complete keys; rank/code round-trip; no fixed-width coercion | Rewrite table denotation versus code identity wording |
@@ -244,7 +244,7 @@ Two tempting collapses also fail the losslessness gate without justifying new ex
 
 ### Matrix Result
 
-- All canonical step/rewrite stages audited so far fit the same `SimpleProgram` runner. Differences live in DOMAIN/support/topology, ALPHABET/value schema, FRONTIER, NEIGHBORHOOD, RULE result, UPDATE composition/schedule, seed, and validation.
+- All canonical step/rewrite stages audited so far fit the same `SimpleProgram` runner. Differences live in dimensional DOMAIN, configuration support/topology, ALPHABET/value schema, FRONTIER, NEIGHBORHOOD, RULE result, UPDATE composition/schedule, seed, and validation.
 - D058 (constraint/model sets), D082 (uniterated function definitions), and D103 (general PDE relations without a specified evolution problem) are genuine class-4 nonfits because none supplies a canonical successor. Their commonality is declarative relation/query infrastructure, not rollout.
 - Multiway rewriting is not a nonfit: its UPDATE returns a finite set of successor configurations and the same runner can iterate or layer that relation.
 - No completed transition stage supplies a counterexample requiring a family executor or top-level `SingleControl`, `TransitionControl`, `ArithmeticAssignment`, `MapAssignment`, or construction-named state class.
