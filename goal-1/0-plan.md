@@ -1155,7 +1155,7 @@ Test rules whose semantics explicitly depend on positional number representation
 
 #### Detailed Implementation Plan
 
-Apply the common protocol, emphasizing base, digit transform, leading zeros, reinterpretation, and arithmetic combination.
+Apply the common protocol. Reuse T34's exact discrete `t+0D` singleton event and extend the closed unary RULE algebra with typed positional encode/reverse/decode/add nodes. Strict source conformance is positive integers in base 2; zero and arbitrary bases are explicit extensions. Prove the canonical scalar/word commuting square, keep fixed width as program data, retain growing width in a transparent `(value,width)` product or lossless word, and close leading-zero/carry policies without callbacks or host-width behavior. Add no T36 state class, FRONTIER, NEIGHBORHOOD, UPDATE, executor, transform menu, or digit-CA fallback.
 
 #### Completion Requirements
 
