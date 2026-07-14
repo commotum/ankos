@@ -1024,6 +1024,10 @@ class SnapshotTokenRenaming:
             raise ValueError("renamed source tokens must have equal generations")
         if self.bag_successor.generation != self.grid_successor.generation:
             raise ValueError("renamed successor tokens must have equal generations")
+        if self.bag_source is self.bag_successor:
+            raise ValueError("bag token image must distinguish source and successor")
+        if self.grid_source is self.grid_successor:
+            raise ValueError("grid token image must distinguish source and successor")
         if self.bag_successor is self.grid_successor:
             raise ValueError("successor tokens must be independently derived before renaming")
 
@@ -1035,6 +1039,15 @@ class SnapshotTokenRenaming:
         if token is self.bag_successor:
             return self.grid_successor
         raise ValueError("token lies outside the declared two-token bijection")
+
+    def grid_to_bag(self, token: SnapshotToken) -> SnapshotToken:
+        if type(token) is not SnapshotToken:
+            raise TypeError("token renaming requires an exact SnapshotToken")
+        if token is self.grid_source:
+            return self.bag_source
+        if token is self.grid_successor:
+            return self.bag_successor
+        raise ValueError("token lies outside the inverse two-token bijection")
 
 
 @dataclass(frozen=True)
@@ -1406,6 +1419,32 @@ def rename_bag_step_tokens(
     return BagStep(source_provenance, successor, tuple(patches))
 
 
+def rename_patch_step_result_tokens(
+    result: PatchStepResult,
+    renaming: SnapshotTokenRenaming,
+) -> PatchStepResult:
+    if type(result) is not PatchStepResult:
+        raise TypeError("patch-result renaming requires an exact PatchStepResult")
+    if type(result.outcome) is Invalid:
+        return result
+    assert type(result.step) is PatchStep
+    step = rename_patch_step_tokens(result.step, renaming)
+    return PatchStepResult(result.outcome, (step.successor,), step)
+
+
+def rename_bag_step_result_tokens(
+    result: BagStepResult,
+    renaming: SnapshotTokenRenaming,
+) -> BagStepResult:
+    if type(result) is not BagStepResult:
+        raise TypeError("bag-result renaming requires an exact BagStepResult")
+    if type(result.outcome) is Invalid:
+        return result
+    assert type(result.step) is BagStep
+    step = rename_bag_step_tokens(result.step, renaming)
+    return BagStepResult(result.outcome, (step.successor,), step)
+
+
 def assert_patch_steps_operationally_equal(left: PatchStep, right: PatchStep) -> None:
     assert type(left) is type(right) is PatchStep
     assert left.source_token is right.source_token
@@ -1430,7 +1469,37 @@ def encode_patch_step_as_bag_step(
     successor_bag = encode_grid_as_bag(step.successor)
     _height, _width, source_image = bag_grid_image(source_bag)
     source_coordinates = {occurrence: coordinate for coordinate, occurrence in source_image.items()}
+    expected_grid_sources = tuple(
+        TileHandle(configuration.token, row, column)
+        for row in range(_height)
+        for column in range(_width)
+    )
+    if any(type(rectangle) is not ChildRectangle for rectangle in step.child_rectangles):
+        raise TypeError("patch-step rectangle lineage must be exact")
+    actual_rectangle_sources = tuple(
+        rectangle.source for rectangle in step.child_rectangles
+    )
+    if actual_rectangle_sources != expected_grid_sources:
+        raise ValueError(
+            "patch-step rectangle lineage must cover each source exactly once in order"
+        )
     rectangle_by_source = {rectangle.source: rectangle for rectangle in step.child_rectangles}
+    expected_child_keys = tuple(
+        (source, local_row, local_column)
+        for source in expected_grid_sources
+        for local_row in range(patch_height)
+        for local_column in range(patch_width)
+    )
+    if any(type(child) is not GridChildOccurrence for child in step.child_occurrences):
+        raise TypeError("patch-step child lineage must be exact")
+    actual_child_keys = tuple(
+        (child.source, child.local_row, child.local_column)
+        for child in step.child_occurrences
+    )
+    if actual_child_keys != expected_child_keys:
+        raise ValueError(
+            "patch-step child lineage must cover every expected local slot exactly once in order"
+        )
     child_by_key = {
         (
             child.source,
@@ -1439,8 +1508,7 @@ def encode_patch_step_as_bag_step(
         ): child
         for child in step.child_occurrences
     }
-    if len(rectangle_by_source) != len(source_bag.occurrences):
-        raise ValueError("patch-step rectangle lineage does not cover every source")
+    assert len(rectangle_by_source) == len(source_bag.occurrences)
     patches: list[BagChildPatch] = []
     for parent in source_bag.occurrences:
         row, column = source_coordinates[parent]
@@ -1498,8 +1566,7 @@ def encode_patch_step_as_bag_step(
                 tuple(witnesses),
             )
         )
-    if len(child_by_key) != len(step.child_occurrences):
-        raise ValueError("patch-step child lineage contains duplicate keys")
+    assert len(child_by_key) == len(step.child_occurrences)
     return BagStep(source_bag.provenance, successor_bag, tuple(patches))
 
 
@@ -1624,6 +1691,55 @@ def decode_bag_step_as_patch_step(
     )
 
 
+def encode_patch_step_result_as_bag_step_result(
+    table: ClosedPatchTable,
+    configuration: RectGrid,
+    result: PatchStepResult,
+) -> BagStepResult:
+    if type(result) is not PatchStepResult:
+        raise TypeError("result encoding requires an exact PatchStepResult")
+    if type(result.outcome) is Invalid:
+        return BagStepResult(result.outcome, (), None)
+    assert type(result.step) is PatchStep
+    step = encode_patch_step_as_bag_step(table, configuration, result.step)
+    return BagStepResult(result.outcome, (step.successor,), step)
+
+
+def decode_bag_step_result_as_patch_step_result(
+    table: ClosedPatchTable,
+    configuration: RectGrid,
+    result: BagStepResult,
+) -> PatchStepResult:
+    if type(result) is not BagStepResult:
+        raise TypeError("result decoding requires an exact BagStepResult")
+    if type(result.outcome) is Invalid:
+        return PatchStepResult(result.outcome, (), None)
+    assert type(result.step) is BagStep
+    step = decode_bag_step_as_patch_step(table, configuration, result.step)
+    changed = step.successor.cells != configuration.cells
+    if result.outcome != Advanced(changed):
+        raise ValueError("bag Advanced.changed disagrees with the semantic grid carrier")
+    return PatchStepResult(result.outcome, (step.successor,), step)
+
+
+def assert_patch_step_results_operationally_equal(
+    left: PatchStepResult,
+    right: PatchStepResult,
+) -> None:
+    assert type(left) is type(right) is PatchStepResult
+    assert left.outcome == right.outcome
+    assert len(left.successors) == len(right.successors)
+    if type(left.outcome) is Invalid:
+        assert left.successors == right.successors == ()
+        assert left.step is right.step is None
+        return
+    assert type(left.step) is type(right.step) is PatchStep
+    assert len(left.successors) == len(right.successors) == 1
+    assert left.successors[0] is left.step.successor
+    assert right.successors[0] is right.step.successor
+    assert_patch_steps_operationally_equal(left.step, right.step)
+
+
 def assert_bag_commutes(table: ClosedPatchTable, configuration: RectGrid) -> None:
     encoded = encode_grid_as_bag(configuration)
     decoded = decode_bag_as_grid(encoded, configuration.token)
@@ -1631,31 +1747,49 @@ def assert_bag_commutes(table: ClosedPatchTable, configuration: RectGrid) -> Non
     assert decoded.cells == configuration.cells
     assert encode_grid_as_bag(decoded) == encoded
 
-    generic_result = generic_step(table, configuration)
-    geometric_result = bag_step(table, encoded)
-    assert geometric_result.successor.provenance.grid_token is not generic_result.successor.token
-    renaming = SnapshotTokenRenaming(
-        geometric_result.source_provenance.grid_token,
-        generic_result.source_token,
-        geometric_result.successor.provenance.grid_token,
-        generic_result.successor.token,
+    generic_result = generic_step_result(table, configuration)
+    assert type(generic_result.outcome) is Advanced
+    assert type(generic_result.step) is PatchStep
+    geometric_result = bag_step_result(table, encoded)
+    assert type(geometric_result.outcome) is Advanced
+    assert type(geometric_result.step) is BagStep
+    assert (
+        geometric_result.step.successor.provenance.grid_token
+        is not generic_result.step.successor.token
     )
-    independently_mapped = decode_bag_step_as_patch_step(
+    renaming = SnapshotTokenRenaming(
+        geometric_result.step.source_provenance.grid_token,
+        generic_result.step.source_token,
+        geometric_result.step.successor.provenance.grid_token,
+        generic_result.step.successor.token,
+    )
+    for bag_token in (renaming.bag_source, renaming.bag_successor):
+        assert renaming.grid_to_bag(renaming.bag_to_grid(bag_token)) is bag_token
+    for grid_token in (renaming.grid_source, renaming.grid_successor):
+        assert renaming.bag_to_grid(renaming.grid_to_bag(grid_token)) is grid_token
+    independently_mapped = decode_bag_step_result_as_patch_step_result(
         table,
         configuration,
         geometric_result,
     )
-    mapped_result = rename_patch_step_tokens(independently_mapped, renaming)
-    assert_patch_steps_operationally_equal(mapped_result, generic_result)
-    encoded_result = encode_patch_step_as_bag_step(
+    mapped_result = rename_patch_step_result_tokens(independently_mapped, renaming)
+    assert_patch_step_results_operationally_equal(mapped_result, generic_result)
+    encoded_result = encode_patch_step_result_as_bag_step_result(
         table,
         configuration,
         generic_result,
     )
-    renamed_geometric_result = rename_bag_step_tokens(geometric_result, renaming)
+    renamed_geometric_result = rename_bag_step_result_tokens(
+        geometric_result,
+        renaming,
+    )
     assert renamed_geometric_result == encoded_result
     assert (
-        encode_patch_step_as_bag_step(table, configuration, mapped_result)
+        encode_patch_step_result_as_bag_step_result(
+            table,
+            configuration,
+            mapped_result,
+        )
         == renamed_geometric_result
     )
 
@@ -1691,64 +1825,6 @@ NONWHITE_BACKGROUND_TABLE = ClosedPatchTable(
     ),
 )
 
-
-@dataclass(frozen=True)
-class ShapeOrientationRole:
-    shape_id: str
-    orientation_id: str
-
-    def __post_init__(self) -> None:
-        exact_str(self.shape_id, "shape role")
-        exact_str(self.orientation_id, "orientation role")
-
-
-@dataclass(frozen=True)
-class FiniteRoleCodec:
-    rows: tuple[tuple[int, ShapeOrientationRole], ...]
-
-    def __post_init__(self) -> None:
-        raw = exact_tuple(self.rows, "role-codec rows")
-        labels: list[int] = []
-        roles: list[ShapeOrientationRole] = []
-        for raw_row in raw:
-            row = exact_tuple(raw_row, "role-codec row")
-            if len(row) != 2:
-                raise ValueError("role-codec rows must be label/role pairs")
-            label = exact_int(row[0], "role-codec label")
-            role = row[1]
-            if type(role) is not ShapeOrientationRole:
-                raise TypeError("role-codec values must be exact ShapeOrientationRoles")
-            labels.append(label)
-            roles.append(role)
-        if tuple(labels) != tuple(range(len(raw))):
-            raise ValueError("role-codec labels must be canonical and complete")
-        if len(set(roles)) != len(roles):
-            raise ValueError("role-codec roles must be unique")
-
-    def encode(self, role: ShapeOrientationRole) -> int:
-        if type(role) is not ShapeOrientationRole:
-            raise TypeError("role encoding requires an exact ShapeOrientationRole")
-        matches = tuple(label for label, candidate in self.rows if candidate == role)
-        if len(matches) != 1:
-            raise ValueError("role is outside the declared finite codec")
-        return matches[0]
-
-    def decode(self, label: int) -> ShapeOrientationRole:
-        key = exact_int(label, "role-codec label")
-        if key < 0 or key >= len(self.rows):
-            raise ValueError("role-codec label is outside the declared range")
-        return self.rows[key][1]
-
-
-OTHER_SHAPES_CODEC = FiniteRoleCodec(
-    tuple(
-        (
-            label,
-            ShapeOrientationRole("source-declared-shape-role", f"source-role-{label}"),
-        )
-        for label in range(4)
-    )
-)
 
 # Exact BOOK:13744 encoded-label table.  Geometry-role decoding is unspecified,
 # but the label table and seed are complete and Notes ``Flatten2D`` executes it.
@@ -1947,6 +2023,7 @@ def assert_rank_parameterization() -> dict[str, int]:
     events = 0
     fixed_events = 0
     all_selected_events = 0
+    original_positive_all_selected_events = 0
     right_neighbor_frontier_events = 0
     unselected_consumption_events = 0
     empty_input_events = 0
@@ -2010,6 +2087,8 @@ def assert_rank_parameterization() -> dict[str, int]:
                     all_selected = selected_indices == tuple(range(length))
                     if all_selected:
                         all_selected_events += 1
+                        if length >= 1:
+                            original_positive_all_selected_events += 1
                     else:
                         unselected_consumption_events += 1
                     if selected_indices == tuple(range(max(0, length - 1))):
@@ -2036,6 +2115,7 @@ def assert_rank_parameterization() -> dict[str, int]:
                         fixed_events += 1
     assert events == 16_709
     assert all_selected_events == 1_519
+    assert original_positive_all_selected_events == 1_470
     assert right_neighbor_frontier_events == 1_519
     assert unselected_consumption_events == 15_190
     assert empty_input_events == 49
@@ -2060,6 +2140,9 @@ def assert_rank_parameterization() -> dict[str, int]:
     return {
         "rank1_selected_mosaic_events": events,
         "rank1_all_selected_events": all_selected_events,
+        "rank1_original_positive_all_selected_subset": (
+            original_positive_all_selected_events
+        ),
         "rank1_right_neighbor_frontier_events": right_neighbor_frontier_events,
         "rank1_unselected_consumption_events": unselected_consumption_events,
         "rank1_empty_input_events": empty_input_events,
@@ -2086,9 +2169,23 @@ def assert_boundaries_and_observers() -> dict[str, int]:
     assert generic_step(PAGE_187_TABLE, page).successor == semantic_next
     assert len(small) == len(large) == prod(page.shape)
 
-    for label, role in OTHER_SHAPES_CODEC.rows:
-        assert OTHER_SHAPES_CODEC.encode(role) == label
-        assert OTHER_SHAPES_CODEC.decode(label) == role
+    identity_table = ClosedPatchTable(
+        2,
+        (
+            (0, ((0,),)),
+            (1, ((1,),)),
+        ),
+    )
+    identity_grid = make_grid(((0,),), 2)
+    identity_grid_result = generic_step_result(identity_table, identity_grid)
+    identity_bag_result = bag_step_result(
+        identity_table,
+        encode_grid_as_bag(identity_grid),
+    )
+    assert identity_grid_result.outcome == Advanced(False)
+    assert identity_bag_result.outcome == Advanced(False)
+    assert_bag_commutes(identity_table, identity_grid)
+
     mixed_shapes = {
         (len(patch), len(patch[0]))
         for _label, patch in OTHER_SHAPES_MIXED_RELATION
@@ -2155,7 +2252,8 @@ def assert_boundaries_and_observers() -> dict[str, int]:
         "implicit_white_identity_divergences": 1,
         "render_scale_variants": 2,
         "render_inputs_to_rule": 0,
-        "shape_orientation_role_roundtrips": len(OTHER_SHAPES_CODEC.rows),
+        "identity_stepresult_events": 1,
+        "identity_bag_stepresult_commutations": 1,
         "other_shapes_relation_rows": len(OTHER_SHAPES_MIXED_RELATION),
         "other_shapes_strict_executions": len(OTHER_SHAPES_CHECKPOINTS) - 1,
         "newborn_deferral_events": 2,
@@ -2354,7 +2452,7 @@ def assert_hostile_validation() -> dict[str, int]:
         ),
     )
     rejects(
-        ValueError,
+        IncompatibleMosaicError,
         lambda: apply_flatten2d(
             configuration,
             active,
@@ -2362,7 +2460,7 @@ def assert_hostile_validation() -> dict[str, int]:
         ),
     )
     rejects(
-        ValueError,
+        IncompatibleMosaicError,
         lambda: apply_flatten2d(
             configuration,
             active,
@@ -2451,25 +2549,53 @@ def assert_hostile_validation() -> dict[str, int]:
     cross_bag = replace(bag, provenance=BagSnapshotProvenance(foreign.token))
     rejects(ValueError, lambda: decode_bag_as_grid(cross_bag, configuration.token))
     native_result = generic_step(PAGE_187_TABLE, configuration)
-    good_bag_result = bag_step(
-        PAGE_187_TABLE,
-        bag,
-        BagSnapshotProvenance(native_result.successor.token),
-    )
+    good_bag_result = bag_step(PAGE_187_TABLE, bag)
+    assert good_bag_result.successor.provenance.grid_token is not native_result.successor.token
     stale_successor = BagSnapshotProvenance(
         SnapshotToken(configuration.generation + 1)
     )
     rejects(
-        ValueError,
-        lambda: bag_step(PAGE_187_TABLE, bag, stale_successor),
+        TypeError,
+        lambda: bag_step(PAGE_187_TABLE, bag, stale_successor),  # type: ignore[call-arg]
     )
     cross_successor = BagSnapshotProvenance(
         SnapshotToken(foreign.generation + 1, foreign.token)
     )
     rejects(
-        ValueError,
-        lambda: bag_step(PAGE_187_TABLE, bag, cross_successor),
+        TypeError,
+        lambda: SnapshotTokenRenaming(
+            "bag-source",  # type: ignore[arg-type]
+            configuration.token,
+            good_bag_result.successor.provenance.grid_token,
+            native_result.successor.token,
+        ),
     )
+    rejects(
+        ValueError,
+        lambda: SnapshotTokenRenaming(
+            configuration.token,
+            configuration.token,
+            stale_successor.grid_token,
+            native_result.successor.token,
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: SnapshotTokenRenaming(
+            configuration.token,
+            configuration.token,
+            good_bag_result.successor.provenance.grid_token,
+            good_bag_result.successor.provenance.grid_token,
+        ),
+    )
+    good_renaming = SnapshotTokenRenaming(
+        configuration.token,
+        configuration.token,
+        good_bag_result.successor.provenance.grid_token,
+        native_result.successor.token,
+    )
+    rejects(ValueError, lambda: good_renaming.bag_to_grid(foreign.token))
+    rejects(ValueError, lambda: good_renaming.grid_to_bag(foreign.token))
     foreign_provenance = BagSnapshotProvenance(foreign.token)
     rejects(
         ValueError,
@@ -2561,25 +2687,40 @@ def assert_hostile_validation() -> dict[str, int]:
             replace(native_result, source_token=foreign.token),
         ),
     )
+    rejects(
+        ValueError,
+        lambda: encode_patch_step_as_bag_step(
+            PAGE_187_TABLE,
+            configuration,
+            replace(
+                native_result,
+                child_rectangles=(
+                    native_result.child_rectangles[0],
+                    *native_result.child_rectangles,
+                ),
+            ),
+        ),
+    )
+    extra_child = replace(
+        native_result.child_occurrences[-1],
+        local_row=99,
+        target_row=99,
+    )
+    rejects(
+        ValueError,
+        lambda: encode_patch_step_as_bag_step(
+            PAGE_187_TABLE,
+            configuration,
+            replace(
+                native_result,
+                child_occurrences=(
+                    *native_result.child_occurrences,
+                    extra_child,
+                ),
+            ),
+        ),
+    )
 
-    rejects(
-        ValueError,
-        lambda: FiniteRoleCodec(
-            (
-                (0, ShapeOrientationRole("s", "o0")),
-                (0, ShapeOrientationRole("s", "o1")),
-            )
-        ),
-    )
-    rejects(
-        ValueError,
-        lambda: FiniteRoleCodec(
-            (
-                (0, ShapeOrientationRole("s", "o")),
-                (1, ShapeOrientationRole("s", "o")),
-            )
-        ),
-    )
     rejects(ValueError, lambda: render_rectangles(((0,),), 0))
     rejects(ValueError, lambda: table_count(2, (2, 0)))
 
