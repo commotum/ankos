@@ -196,11 +196,11 @@ SOURCE_GUARDS = frozenset({
     "1707|Digit sequences for various rational numbers|period of at most q-1 steps",
     "1709|successive steps|base 2 digit sequence|rational numbers p/q",
     "1713|column on the right|box on the left|remainder",
-    "1715|standard long division|compares the values of 2r and q|2r - q",
+    "1715|standard long division|compares the values of 2r and q|If 2r is less than q|2r - q",
     "1733|\\sqrt{2} = 1.01101010000010011110011001100110111111",
     "1738|procedure for generating the base 2 digit sequence|square root",
     "1740|two numbers r and s|4(r-s-1)|2(s+2)",
-    "1746|starts by setting r=n and s=0|digits of s in base 2",
+    "1746|starts by setting r=n and s=0|r>s|digits of s in base 2",
     "12943|Computing  $n^{th}$  digits directly|without explicitly finding previous ones",
     "12951|finite-precision arithmetic|probability exists|incorrect results",
     "12962|Page 139|base 2 digit sequences|m/n",
@@ -252,7 +252,7 @@ TEXTUAL_MECHANICS_RECORDS = frozenset({
 })
 
 EXPECTED_MANIFEST_DIGESTS = {
-    "source_guards": "d3eb1f1db117073ad594537fce3e55428158ffcf314d88fdd809d8e817da4eda",
+    "source_guards": "9bd90dcadde17a07fca7e0163668020ce3fdc01f149c74379723a28c5b9f6183",
     "roles": "513ead87baf3942ef63674cefaf0b4c7a126e14f53e90a0aee8c6e2f7673e107",
     "assemblies": "b14eb22a0379e2436b64c7516153877e6366643003b55c43fdac69c375914fb5",
     "references": "2b148cbb3354ed1f1f1a9c8a8d02f7c653d0cb8b4b6537f127626e60a72c80ef",
@@ -503,6 +503,11 @@ def verify_textual_replays() -> tuple[int, int, int]:
         assert long_division_digits(
             profile["p"], profile["q"], len(expected)
         ) == expected
+
+    # Bind the source's strict comparison at the only integer boundary where
+    # `>` and `>=` differ, plus the immediately adjacent true branch.
+    assert sqrt_integer_step(4, 4) == (0, 16, 8)
+    assert sqrt_integer_step(5, 4) == (1, 0, 12)
 
     sqrt_profiles = TEXTUAL_REPLAY_INTERFACE["sqrt_strict_integer"]["profiles"]
     sqrt_events = TEXTUAL_REPLAY_INTERFACE["sqrt_strict_integer"]["events"]

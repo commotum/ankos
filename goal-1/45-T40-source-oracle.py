@@ -492,34 +492,146 @@ SPLIT_BOUNDARY_WITNESSES = (
 )
 
 
-# Filled with frozen values below after the human-readable contracts above.
-EXPECTED_QUERY: dict[str, tuple[int, int, int, str]] = {}
-EXPECTED_QUERY_PATTERNS: tuple[int, str] = (0, "")
-EXPECTED_SET: dict[str, tuple[int, str]] = {}
-EXPECTED_EXCLUDED_CLASS: dict[str, tuple[int, str]] = {}
-EXPECTED_INDEX_CLASS: dict[str, tuple[int, str]] = {}
-EXPECTED_IMAGE_PARTITION: dict[str, tuple[int, str]] = {}
-EXPECTED_IMAGE_ROLE_PARTITION: dict[str, tuple[int, str]] = {}
-EXPECTED_IMAGE_LEDGER: dict[str, tuple[int, str]] = {}
-EXPECTED_CANDIDATE_IMAGE_LINES: tuple[int, str] = (0, "")
-EXPECTED_GOVERNED_IMAGE_LINES: tuple[int, str] = (0, "")
-EXPECTED_EXCLUDED_IMAGE_LINES: tuple[int, str] = (0, "")
-EXPECTED_UNRESOLVED_IMAGE_LINES: tuple[int, str] = (0, "")
+# Frozen expectations follow their independently readable records above.
+EXPECTED_QUERY = {
+    "Q00": (0, 0, 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+    "Q01": (5, 4, 1, "51039fbadd85a4f95f0ea91871a10142216e19412fbdf4bc5cf049614befb91b"),
+    "Q02": (5, 5, 0, "ce913f4b8301f1e04917916df893d9dbfb7e720ca7129525030c14b66957b75a"),
+    "Q03": (3, 3, 0, "6ce776ad724dc65726ef90211965a1454a033809dee578ecc1685bd8c9d92bcc"),
+    "Q04": (4, 4, 0, "e4651f7d50217f898c5d83ca64799f93d312e6b481f99967d68d41d092fd3fb0"),
+    "Q05": (4, 4, 0, "5b0e2fd166aa3184dfb0b6f4d02bb156168a4b0950ae2a6cb060d938c3dcd237"),
+    "Q06": (14, 14, 0, "afccf448b8f881a1529546fcb634e850ecd954aa9aacbb8bb79e90766c6dcabc"),
+    "Q07": (4, 4, 0, "2bf68dda703268006c7634a33cc21e7c836cf5f66fde1dc1987ed4bc6a5cb076"),
+    "Q08": (3, 2, 1, "4eea9f92991dee3a43ba186da7280a69bfaceffccde6ec4c12d215d5ee3f1951"),
+    "Q09": (34, 14, 20, "b9b9e01d30fc7b89eb7e845a1753c8aa2bed6f791a1ce6deff7a58b52c0790d1"),
+    "Q10": (6, 4, 2, "d3951c5d658e62018a2c4cca367c16401025d13d792c3603f45fdeedee6f9d17"),
+    "Q11": (23, 12, 11, "a1c38c2e18294e7f54c19022087466d05cb13a1530c4ba5c003108023fb3d514"),
+    "Q12": (9, 5, 4, "c64a5b61c066aba945485b199125e1b0732aa5ec8e935a25e28b912c3734f285"),
+    "Q13": (2, 2, 0, "6a8ea11b4ec5fdca405e59703e8853736502a0daffd3cd153c166cead6e74577"),
+    "Q14": (12, 0, 12, "7b99c1393251c1d6e507801a46576a77d9b33a78557f42bd2e29ffc26c5ff277"),
+    "Q15": (3, 3, 0, "29e023f7db02bec1f2a16113a10f2ad22d45f9741ac3563d630c38b4ae641240"),
+    "Q16": (21, 21, 0, "2780612ef55f979f24f756be9a8532494bb13c4ecb6029715a649a89ba1274c4"),
+    "Q17": (4, 4, 0, "8a4e0a5a0bdb3f5e00e29d2c34e66980cec3634c02ac67dbee9b0c5d2bc8c8fd"),
+}
+EXPECTED_QUERY_PATTERNS = (
+    18,
+    "8e2ca87c4588620a2f8d67128cb85ec633822fd3e1bde143bba74be8abadd7a9",
+)
+EXPECTED_SET = {
+    "union": (144, "6dabdf0a8cb82dc2344bf3e0feed786a105af6cdbf6d182ff5d4c4eafd69c935"),
+    "pre_index": (99, "39e469b9638ca0458a66f3e312e7bcaac5d61e5d6501b8781fd1d4ce1eb5e303"),
+    "index_candidates": (45, "a352580c74fff6a60081acceaed2937c024e89c9cec5948b002f7c70504f79ba"),
+    "query_native": (46, "90c5667940c7b23109fec16cce632cd493d64aa5bf3c6eeda290417cee80093d"),
+    "query_relation": (41, "aaa1d5ac0262e3910c7d48c3428d1550dbaa488888807ad83b38f64e865b9f88"),
+    "query_control": (7, "aa826f1310f068dd0ba264d1a4155fcd46ae2fe1f318c5dd5e159ac7eef21c2e"),
+    "excluded": (5, "01c97a261db7b3a9cc557d83e011e5aa7a280433144e5df6d2b22bedd051f8f8"),
+    "native": (114, "85df9c4361717de3f9dbb1eb7b4dba98a71601cabcb7912e98dbf8967afdd1d1"),
+    "relation": (84, "5a092550392b0923fe58837ef403cf294d8e8de6fe92d976117a44bdf5e618cd"),
+    "control": (9, "350e9aec3d0ce5466da723cf905a398bcb183fcafee5963145a2e8d8149a564e"),
+    "retained": (207, "2b287fe93c97c8047128b83475f2774e80d92ebab74c4d7fb51bae656041187c"),
+    "retained_query": (94, "165209df95c945a005adeb119f6282d55c64b89f663beecee826dc08f7eecb52"),
+    "continuations": (113, "5351e10b3a99f6462ead8abf87cc9db9b722a558015f8c318c9e054f0ba3cd32"),
+}
+EXPECTED_EXCLUDED_CLASS = {
+    "name_collision": (1, "0a5b046d07f6f971b7776de682f57c5b9cdc8fa060db7ef59de82e721c8098f4"),
+    "unrelated_representation_context": (1, "45113af9c39c6636107b96fcdc1037686173b60eec2b3f4561b2d7d7b6c1252f"),
+    "generic_algorithm_cross_reference": (3, "0af5fb1f1971b936e8052cc34fe7605caf6f6916a28992ff9485914a39d55704"),
+}
+EXPECTED_INDEX_CLASS = {
+    "native": (16, "a34ca6c64b76d09a0eda34abda3422b575e53b29d375404d1b000d92901a7d4a"),
+    "relation": (29, "47ab3033ad4727954e71da4d543b3a78ac400473db9d6433382a3dbc8054418b"),
+    "control": (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+}
+EXPECTED_IMAGE_PARTITION = {
+    "native": (11, "45fe870caa33fa2cc0b702a8158564f987fb186a1742f1bbafc940cf8c738894"),
+    "relation": (12, "1733851c97444c9a966ea16d19b86a37310e23f393ee8ba1f8089e3a522c49a2"),
+    "control": (1, "71887428c764ac67b3bd6ce9f4212ff7e7fe6803e507b5b11345d7c6a6c95a1e"),
+    "governed": (24, "2dcad870ac6f500bf924a74b60c04093ae591911c688ef4f3bfb81b8130103ca"),
+    "excluded": (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+    "candidate": (24, "2dcad870ac6f500bf924a74b60c04093ae591911c688ef4f3bfb81b8130103ca"),
+}
+EXPECTED_IMAGE_ROLE_PARTITION = {
+    "native": EXPECTED_IMAGE_PARTITION["native"],
+    "relation": EXPECTED_IMAGE_PARTITION["relation"],
+    "control": EXPECTED_IMAGE_PARTITION["control"],
+}
+EXPECTED_IMAGE_LEDGER = {
+    "candidate_images": EXPECTED_IMAGE_PARTITION["candidate"],
+    "governed_images": EXPECTED_IMAGE_PARTITION["governed"],
+    "excluded_images": EXPECTED_IMAGE_PARTITION["excluded"],
+}
+EXPECTED_CANDIDATE_IMAGE_LINES = EXPECTED_IMAGE_PARTITION["candidate"]
+EXPECTED_GOVERNED_IMAGE_LINES = EXPECTED_IMAGE_PARTITION["governed"]
+EXPECTED_EXCLUDED_IMAGE_LINES = EXPECTED_IMAGE_PARTITION["excluded"]
+EXPECTED_UNRESOLVED_IMAGE_LINES = (
+    0,
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+)
 EXPECTED_IMAGE_ASSET_MANIFEST = (
     24,
     "1cbfe8ffc3de77048a2d407c7ef63896dac86a8fc3ec83c7b00c1ea84e6f019e",
 )
-EXPECTED_SOURCE_SEMANTIC_GUARDS: tuple[int, str] = (0, "")
-EXPECTED_SOURCE_DEFECT_GUARDS: tuple[int, str] = (0, "")
-EXPECTED_RECORDS: dict[str, tuple[int, str]] = {}
+EXPECTED_SOURCE_SEMANTIC_GUARDS = (
+    37,
+    "7c09ef685b2770dc98b0b5d7b1ac8b6c8cb347ad8a5cd939e19af6d4663c8f74",
+)
+EXPECTED_SOURCE_DEFECT_GUARDS = (
+    24,
+    "833c24e7f3c44bc2737a48dc6cbc4a3cb02caf3cfc1d62d372b9ce42973753b2",
+)
+EXPECTED_RECORDS = {
+    "excluded_line_hashes": (5, "d3b3134fe2e22ca121f65e3617dce002e45e1880600c264b4c5a100d9614efef"),
+    "index_guards": (45, "9cb961cab74171846f989263c918f9a0e233c35ca05ed470cec67435aeec8cae"),
+    "index_sentinels": (5, "53057b09ef0129f633ab1604132f2a8cf25cfb20e04975eaa6208742d7a1ed33"),
+    "semantic_guards": EXPECTED_SOURCE_SEMANTIC_GUARDS,
+    "auxiliary_guards": (8, "bb1c06175c4a5856879b75936917159d7125f734ad6350cc26f618cb2da23b18"),
+    "source_defects": EXPECTED_SOURCE_DEFECT_GUARDS,
+    "source_model": (32, "8ba5c526bd482ac86447e79c616bd3da5f678cc0c60fe4943a01d70cc71e6be0"),
+    "image_roles": (24, "9f4b951e3444c26c6a256ef3461ec3132175efb2601f3b89c3073cb6d9f9689f"),
+    "image_assembly_boundaries": (7, "60395054223bb245396b3936dda4349e63a68a6b6306efaf34c5f4484e51132b"),
+    "split_omissions": (30, "fe4eb72a61d4ca7cd6ee62cf0d82792ad3808d4f75418676cabc41acd5ecc497"),
+    "split_boundary_witnesses": (7, "c32f23773dbe2707c96bde64ea3fd95445e3ff6efd2bb809718c22d28b9a9884"),
+}
 EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
-EXPECTED_SPLIT_CROSSWALK: tuple[int, str] = (0, "")
-EXPECTED_SPLIT_CLASSES: dict[str, tuple[int, str, str]] = {}
-EXPECTED_SPLIT_NORMALIZED_MINIMUM = 0.0
-EXPECTED_LOGIC_RECORDS: tuple[int, str] = (0, "")
-EXPECTED_AUDIT_DIGEST = ""
+EXPECTED_SPLIT_CROSSWALK = (
+    252,
+    "31062224eb14ca3e7e4703f3aaa9c4388a200cd0b2d00f669c45eba112c5e5ca",
+)
+EXPECTED_SPLIT_CLASSES = {
+    "EXACT": (
+        177,
+        "5044a3b093b161e1f38d7feb535d7e2da4217022e1fad961584a04ac6470e53d",
+        "0b2280cae5f9f75552ba8afe343d95bfc00a14c57e73d1dec4c3e557b1af405e",
+    ),
+    "IMAGE_BASENAME": (
+        22,
+        "f1c7069e4d51217045092da88b101b8c34b9c6d60af4080ce6e64d870245e061",
+        "0b8db2d77d1426451dbdebffda4c817e79cbd2aa136773144314bf6a0ba1f56f",
+    ),
+    "NORMALIZED": (
+        20,
+        "8053cc358d079fdb7d26b173a13293be9795b12b09661319d1d6a7ce0914a80b",
+        "7e405c6235eb29bfda60f31c47cc13fe670cf76a40d5e73dcdcabd111a231936",
+    ),
+    "SUMMARY": (
+        3,
+        "3836a0bd75f2ef17cfc684ddcef07d060921303b3275a5b5824672ff4c85ecac",
+        "1db59488a2538d764430b87e7ff2feb5fad9dce91f24c7cca4668f8f61f8a7fe",
+    ),
+    "OMITTED": (
+        30,
+        "28306fbb1320afe19dfc892b6660a22a93dbcd39c4646b3f180925f93e552d91",
+        "988f69aee5f845f3c6b635df727cba6cd0bcb31c15449470008ad24b0eb8b018",
+    ),
+}
+EXPECTED_SPLIT_NORMALIZED_MINIMUM = 0.999817
+EXPECTED_LOGIC_RECORDS = (
+    7,
+    "d525310251895f506ca06d964ba736dd53ab659e07fed14d7fbe5422b1648754",
+)
+EXPECTED_AUDIT_DIGEST = "9a38b298a811e9017ce7201490ee8571e63347f9b5a9b5a13dd771a698627ea9"
 
 
 IMAGE_PARTITION = {

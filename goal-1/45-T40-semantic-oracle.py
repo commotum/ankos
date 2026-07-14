@@ -101,6 +101,25 @@ T42_HANDOFF_CONTRACT = (
 )
 
 
+WORK_REALIZATION_RELATIONS = (
+    "long_division=T35_complete_remainder_branch_plus_T43_iterated_remainder_map_with_emitted_digit_witness",
+    "square_root=existing_product_value_and_closed_branch_realization_with_visible_r_s_and_exact_invariant",
+    "Gauss_map=T43_exact_rational_reciprocal_fractional_part_realization_with_finite_completion",
+    "all_work_traces=optional_algorithm_records_not_T40_denotation_or_representation_result_identity",
+)
+
+
+SQRT_RATIONAL_SOURCE_GUARD = (
+    "literal_source_branch=r_gt_s",
+    "safe_native_scope=integer_r_integer_s",
+    "counterexample=n_11_over_5_after_one_step_r_24_over_5_s_4",
+    "literal_next_r=-4_over_5_and_s=12",
+    "algebraic_identity=s_squared_plus_4r_still_scales_by_4",
+    "failed_invariants=nonnegative_remainder_and_exact_prefix_enclosure",
+    "labeled_repair=r_ge_s_plus_1",
+)
+
+
 def exact_int(value: object, name: str) -> int:
     if type(value) is not int:
         raise TypeError(f"{name} must be an exact int")
@@ -515,8 +534,110 @@ class ResourceLimit:
         checked_nonnegative(self.requested_count, "resource requested count")
 
 
-QueryOutcome: TypeAlias = CompleteExact | CompleteCertified | Partial | ResourceLimit
-OUTCOME_TYPES = (CompleteExact, CompleteCertified, Partial, ResourceLimit)
+@dataclass(frozen=True)
+class Unsupported:
+    requested_profile: tuple[object, ...]
+    reason: str
+
+    def __post_init__(self) -> None:
+        profile = exact_tuple(self.requested_profile, "unsupported requested profile")
+        if not profile:
+            raise ValueError("unsupported profile key cannot be empty")
+        if not exact_str(self.reason, "unsupported reason"):
+            raise ValueError("unsupported reason cannot be empty")
+
+
+@dataclass(frozen=True)
+class Unknown:
+    reason: str
+    diagnostics: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if not exact_str(self.reason, "unknown reason"):
+            raise ValueError("unknown reason cannot be empty")
+        diagnostics = exact_tuple(self.diagnostics, "unknown diagnostics")
+        for diagnostic in diagnostics:
+            if not exact_str(diagnostic, "unknown diagnostic"):
+                raise ValueError("unknown diagnostics cannot contain empty strings")
+
+
+@dataclass(frozen=True)
+class Approximate:
+    approximation: Fraction
+    error_estimate: Fraction
+    method: str
+    context: tuple[object, ...]
+
+    def __post_init__(self) -> None:
+        exact_fraction(self.approximation, "approximate value")
+        error = exact_fraction(self.error_estimate, "approximate error estimate")
+        if error <= 0:
+            raise ValueError("approximate error estimate must be positive")
+        if not exact_str(self.method, "approximate method"):
+            raise ValueError("approximate method cannot be empty")
+        exact_tuple(self.context, "approximate context")
+
+
+@dataclass(frozen=True)
+class Probable:
+    candidate_coefficients: tuple[int, ...]
+    confidence_basis: str
+    failure_probability_bound: Fraction
+    trials: int
+
+    def __post_init__(self) -> None:
+        candidates = exact_tuple(self.candidate_coefficients, "probable candidates")
+        if not candidates:
+            raise ValueError("probable result requires candidate coefficients")
+        for candidate in candidates:
+            checked_nonnegative(candidate, "probable candidate coefficient")
+        if not exact_str(self.confidence_basis, "probable confidence basis"):
+            raise ValueError("probable confidence basis cannot be empty")
+        probability = exact_fraction(
+            self.failure_probability_bound,
+            "probable failure probability bound",
+        )
+        if not 0 < probability < 1:
+            raise ValueError("probable failure probability bound must lie strictly between zero and one")
+        checked_positive(self.trials, "probable trials")
+
+
+@dataclass(frozen=True)
+class Failure:
+    code: str
+    diagnostic: str
+    context: tuple[object, ...]
+
+    def __post_init__(self) -> None:
+        if not exact_str(self.code, "failure code"):
+            raise ValueError("failure code cannot be empty")
+        if not exact_str(self.diagnostic, "failure diagnostic"):
+            raise ValueError("failure diagnostic cannot be empty")
+        exact_tuple(self.context, "failure context")
+
+
+QueryOutcome: TypeAlias = (
+    CompleteExact
+    | CompleteCertified
+    | Partial
+    | ResourceLimit
+    | Unsupported
+    | Unknown
+    | Approximate
+    | Probable
+    | Failure
+)
+OUTCOME_TYPES = (
+    CompleteExact,
+    CompleteCertified,
+    Partial,
+    ResourceLimit,
+    Unsupported,
+    Unknown,
+    Approximate,
+    Probable,
+    Failure,
+)
 
 
 def checked_digit_tuple(values: object, base: int, name: str) -> tuple[int, ...]:
@@ -605,6 +726,8 @@ class ExpansionResult:
                 raise ValueError("Machin certificates are scoped to the Pi denotation")
             if certificate.representation_key != representation_key(self.query.representation):
                 raise ValueError("certificate representation does not match the query")
+            if self.context.method != MACHIN_METHOD or certificate.terms != self.context.term_budget:
+                raise ValueError("certificate evaluator context does not match the result")
             if not verify_machin_certificate(certificate):
                 raise ValueError("Machin certificate does not independently verify")
             if type(self.query.selection) is Prefix:
@@ -618,6 +741,22 @@ class ExpansionResult:
                     raise ValueError("certificate does not cover random-access coefficient")
             if integers != certificate.integer_digits:
                 raise ValueError("certificate integer digits do not match the result")
+        if type(self.outcome) is CompleteExact:
+            expected = expected_exact_components(self.query, self.context)
+            actual = (
+                start,
+                coefficients,
+                integers,
+                termination,
+                self.outcome.derivation,
+            )
+            if actual != expected:
+                raise ValueError("exact result payload does not match its closed derivation")
+        if type(self.outcome) is ResourceLimit:
+            if type(self.query.denotation.expression) is not PiConstant or self.context.method != MACHIN_METHOD:
+                raise ValueError("resource outcome is scoped to bounded Pi certification")
+            if self.outcome.limit != self.context.term_budget or self.outcome.requested_count != selection_target(self.query.selection):
+                raise ValueError("resource outcome does not match evaluation context")
         object.__setattr__(self, "start_index", start)
         object.__setattr__(self, "coefficients", coefficients)
         object.__setattr__(self, "integer_digits", integers)
@@ -1069,6 +1208,53 @@ def select_coefficients(full_prefix: tuple[int, ...], selection: Selection) -> t
     if selection.index < len(full_prefix):
         return selection.index, (full_prefix[selection.index],)
     return selection.index, ()
+
+
+def expected_exact_components(
+    query: object,
+    context: object,
+) -> tuple[int, tuple[int, ...], tuple[int, ...], str, str]:
+    if type(query) is not RepresentationQuery or type(context) is not EvaluationContext:
+        raise TypeError("exact component validation requires a query and context")
+    if context.method != EXACT_METHOD:
+        raise ValueError("exact payload requires closed_exact context")
+    expression = query.denotation.expression
+    representation = query.representation
+    target = selection_target(query.selection)
+    if type(expression) is RationalLiteral and type(representation) is PositionalDigits:
+        expansion = rational_positional_expansion(expression.value, representation.base)
+        full = expansion.prefix(target)
+        integers = expansion.integer_digits
+        termination = FINITE_TERMINATED if not expansion.period else PREFIX_OF_INFINITE
+        derivation = "exact_long_division_denotation"
+    elif type(expression) is RationalLiteral and type(representation) is SimpleContinuedFraction:
+        expansion = rational_continued_fraction(expression.value)
+        full = expansion.coefficients[:target]
+        integers = ()
+        termination = FINITE_TERMINATED
+        derivation = "exact_euclidean_continued_fraction"
+    elif type(expression) is SquareRoot and type(representation) is SimpleContinuedFraction:
+        full = sqrt_cf_prefix(expression.radicand, target)
+        integers = ()
+        termination = PREFIX_OF_INFINITE
+        derivation = "exact_quadratic_surd_period"
+    elif type(expression) is SquareRoot and type(representation) is PositionalDigits:
+        if representation.base != 2 or expression.radicand not in (2, 3):
+            raise ValueError("direct exact square-root positional preset is normalized base two")
+        all_bits = direct_sqrt_bits(Fraction(expression.radicand, 1), target + 1)
+        full = all_bits[1:]
+        integers = (1,)
+        termination = PREFIX_OF_INFINITE
+        derivation = "exact_integer_square_comparison"
+    elif type(expression) is EulerConstant and type(representation) is SimpleContinuedFraction:
+        full = e_cf_prefix(target)
+        integers = ()
+        termination = PREFIX_OF_INFINITE
+        derivation = "Euler_simple_CF_pattern"
+    else:
+        raise ValueError("unsupported exact result profile")
+    start, selected = select_coefficients(full, query.selection)
+    return start, selected, integers, termination, derivation
 
 
 def exact_result(
@@ -1869,3 +2055,538 @@ def audit_gauss_map_realization() -> tuple[int, int, int, int]:
         completions += 1
         assert continued_fraction_value(work.coefficients) == source.value
     return len(sources), coefficients, one_step_commutations, completions + maximum_coefficient_bits
+
+
+def audit_prefix_random_access_consistency() -> tuple[int, int, int, int]:
+    profiles = (
+        (rational_spec(1, 7), PositionalDigits(10), exact_context(), 24),
+        (sqrt_spec(2), PositionalDigits(2), exact_context(), 24),
+        (sqrt_spec(23), SimpleContinuedFraction(), exact_context(), 24),
+        (e_spec(), SimpleContinuedFraction(), exact_context(), 24),
+        (pi_spec(), PositionalDigits(10), machin_context(50), 20),
+        (pi_spec(), SimpleContinuedFraction(), machin_context(50), 16),
+    )
+    coefficient_checks = 0
+    independent_query_ids = 0
+    direct_without_prefix_payload = 0
+    certified_checks = 0
+    for denotation, representation, context, count in profiles:
+        prefix_query = RepresentationQuery(denotation, representation, Prefix(count))
+        prefix_result = evaluate_query(prefix_query, context)
+        assert verify_result(prefix_result)
+        assert len(prefix_result.coefficients) == count
+        for index, expected in enumerate(prefix_result.coefficients):
+            direct_query = RepresentationQuery(
+                denotation,
+                representation,
+                CoefficientAt(index),
+            )
+            direct_result = evaluate_query(direct_query, context)
+            assert verify_result(direct_result)
+            assert direct_result.start_index == index
+            assert direct_result.coefficients == (expected,)
+            assert direct_result.provenance.query_id != prefix_result.provenance.query_id
+            coefficient_checks += 1
+            independent_query_ids += 1
+            direct_without_prefix_payload += len(direct_result.coefficients) == 1
+            certified_checks += type(direct_result.outcome) is CompleteCertified
+    return coefficient_checks, independent_query_ids, direct_without_prefix_payload, certified_checks
+
+
+def audit_finite_prefix_lossiness_and_cylinders() -> tuple[int, int, int, int, int]:
+    half = Fraction(1, 2)
+    fifty_five_hundredths = Fraction(11, 20)
+    cylinder = positional_cylinder((0,), (5,), 10)
+    assert cylinder.contains(half)
+    assert cylinder.contains(fifty_five_hundredths)
+    assert half != fifty_five_hundredths
+    positional_witnesses = 1
+
+    left = continued_fraction_value((3, 7, 15))
+    right = continued_fraction_value((3, 7, 16))
+    cf_cylinder = continued_fraction_cylinder((3, 7))
+    assert cf_cylinder.contains_interior(left)
+    assert cf_cylinder.contains_interior(right)
+    assert left != right
+    cf_witnesses = 1
+
+    left_spec = rational_spec(1, 2)
+    right_spec = rational_spec(11, 20)
+    left_query = RepresentationQuery(left_spec, PositionalDigits(10), Prefix(1))
+    right_query = RepresentationQuery(right_spec, PositionalDigits(10), Prefix(1))
+    left_result = evaluate_query(left_query, exact_context())
+    right_result = evaluate_query(right_query, exact_context())
+    assert left_result.coefficients == right_result.coefficients == (5,)
+    assert denotation_key(left_spec) != denotation_key(right_spec)
+    assert certify_rational_equivalence(left_spec, right_spec) is None
+    observation_not_equivalence = 1
+
+    half_exact = rational_positional_expansion(half, 10)
+    assert half_exact.prefix(40) == (5,) + (0,) * 39
+    assert raw_positional_value((0,), (4,), (9,), 10) == half
+    canonical_dual_resolution = 1
+    assert continued_fraction_value((0, 2)) == continued_fraction_value((0, 1, 1))
+    cf_dual_resolution = 1
+    return (
+        positional_witnesses,
+        cf_witnesses,
+        observation_not_equivalence,
+        canonical_dual_resolution,
+        cf_dual_resolution,
+    )
+
+
+def audit_outcome_profiles() -> tuple[int, int, int, int, int, int]:
+    exact_query = RepresentationQuery(
+        rational_spec(1, 7),
+        PositionalDigits(10),
+        Prefix(20),
+    )
+    exact = evaluate_query(exact_query, exact_context())
+    assert type(exact.outcome) is CompleteExact and verify_result(exact)
+
+    certified_query = RepresentationQuery(
+        pi_spec(),
+        PositionalDigits(10),
+        Prefix(20),
+    )
+    certified = evaluate_query(certified_query, machin_context(20))
+    assert type(certified.outcome) is CompleteCertified and verify_result(certified)
+
+    partial = evaluate_query(certified_query, machin_context(3))
+    assert type(partial.outcome) is Partial
+    assert 0 < len(partial.coefficients) < 20
+    assert partial.outcome.completed_count == len(partial.coefficients)
+    assert verify_result(partial)
+
+    resource = evaluate_query(certified_query, machin_context(0))
+    assert type(resource.outcome) is ResourceLimit
+    assert resource.coefficients == () and resource.integer_digits == ()
+    assert verify_result(resource)
+
+    direct_resource_query = RepresentationQuery(
+        pi_spec(),
+        SimpleContinuedFraction(),
+        CoefficientAt(10),
+    )
+    direct_resource = evaluate_query(direct_resource_query, machin_context(2))
+    assert type(direct_resource.outcome) is ResourceLimit
+    assert verify_result(direct_resource)
+
+    finite_cf_query = RepresentationQuery(
+        rational_spec(1, 2),
+        SimpleContinuedFraction(),
+        Prefix(12),
+    )
+    finite_cf = evaluate_query(finite_cf_query, exact_context())
+    assert type(finite_cf.outcome) is CompleteExact
+    assert finite_cf.coefficients == (0, 2)
+    assert finite_cf.termination == FINITE_TERMINATED
+    return (
+        1,
+        1,
+        1,
+        2,
+        len(partial.coefficients),
+        len(finite_cf.coefficients),
+    )
+
+
+def audit_identity_equivalence_and_query_separation() -> tuple[int, int, int, int, int, int]:
+    one_half = rational_spec(1, 2)
+    two_fourths = rational_spec(2, 4)
+    assert one_half != two_fourths
+    assert denotation_key(one_half) != denotation_key(two_fourths)
+    equivalence = certify_rational_equivalence(one_half, two_fourths)
+    assert equivalence is not None
+    assert equivalence.common_rational == Fraction(1, 2)
+
+    base_ten = RepresentationQuery(one_half, PositionalDigits(10), Prefix(8))
+    base_two = RepresentationQuery(one_half, PositionalDigits(2), Prefix(8))
+    random_access = RepresentationQuery(one_half, PositionalDigits(10), CoefficientAt(7))
+    assert query_key(base_ten) != query_key(base_two)
+    assert query_key(base_ten) != query_key(random_access)
+    assert denotation_provenance(base_ten.denotation) == denotation_provenance(base_two.denotation)
+
+    same_query_low_budget = query_provenance(
+        RepresentationQuery(pi_spec(), PositionalDigits(10), Prefix(8)),
+        machin_context(5),
+    )
+    same_query_high_budget = query_provenance(
+        RepresentationQuery(pi_spec(), PositionalDigits(10), Prefix(8)),
+        machin_context(20),
+    )
+    assert same_query_low_budget.query_id == same_query_high_budget.query_id
+    assert same_query_low_budget.context_id != same_query_high_budget.context_id
+
+    half_prefix = evaluate_query(base_ten, exact_context())
+    assert half_prefix.coefficients == (5, 0, 0, 0, 0, 0, 0, 0)
+    assert denotation_provenance(one_half).structural_id not in (
+        half_prefix.provenance.query_id,
+        half_prefix.provenance.context_id,
+    )
+    return 2, 1, 3, 2, 1, 1
+
+
+def audit_t42_handoff() -> tuple[int, int, int, int, int]:
+    exact_query = RepresentationQuery(
+        sqrt_spec(23),
+        SimpleContinuedFraction(),
+        Prefix(20),
+    )
+    exact_result_value = evaluate_query(exact_query, exact_context())
+    exact_handoff = make_t42_coefficient_input(exact_result_value)
+    assert exact_handoff.coefficients == exact_result_value.coefficients
+    assert exact_handoff.proof_strength == "complete_exact"
+
+    certified_query = RepresentationQuery(
+        pi_spec(),
+        SimpleContinuedFraction(),
+        Prefix(12),
+    )
+    certified_result_value = evaluate_query(certified_query, machin_context(20))
+    certified_handoff = make_t42_coefficient_input(certified_result_value)
+    assert certified_handoff.coefficients == PI_CF_30[:12]
+    assert certified_handoff.proof_strength == "complete_certified"
+    assert exact_handoff.source_result_id != certified_handoff.source_result_id
+    return 2, len(exact_handoff.coefficients), len(certified_handoff.coefficients), 1, 1
+
+
+def has_binary_float(value: object, seen: set[int] | None = None) -> bool:
+    if type(value) is float:
+        return True
+    if value is None or type(value) in (int, str, bool, Fraction):
+        return False
+    if seen is None:
+        seen = set()
+    identity = id(value)
+    if identity in seen:
+        return False
+    seen.add(identity)
+    if is_dataclass(value) and not isinstance(value, type):
+        return any(has_binary_float(getattr(value, field.name), seen) for field in fields(value))
+    if type(value) in (tuple, list, set):
+        return any(has_binary_float(item, seen) for item in value)
+    if type(value) is dict:
+        return any(has_binary_float(key, seen) or has_binary_float(item, seen) for key, item in value.items())
+    return False
+
+
+def audit_no_float_digit_invention() -> tuple[int, int, int, int]:
+    interval = RationalInterval(Fraction(499, 1000), Fraction(501, 1000))
+    integers, digits = certified_positional_prefix(interval, 10, 1)
+    assert integers == (0,) and digits == ()
+    boundary_refusals = 1
+
+    results = (
+        evaluate_query(
+            RepresentationQuery(pi_spec(), PositionalDigits(10), Prefix(40)),
+            machin_context(40),
+        ),
+        evaluate_query(
+            RepresentationQuery(sqrt_spec(2), PositionalDigits(2), Prefix(40)),
+            exact_context(),
+        ),
+        evaluate_query(
+            RepresentationQuery(e_spec(), SimpleContinuedFraction(), Prefix(40)),
+            exact_context(),
+        ),
+    )
+    assert not any(has_binary_float(result) for result in results)
+    result_float_checks = len(results)
+    interval_checks = sum(
+        type(result.outcome) is not CompleteCertified
+        or type(result.outcome.certificate.interval.lower) is Fraction
+        for result in results
+    )
+    exact_carrier_checks = sum(
+        type(coefficient) is int
+        for result in results
+        for coefficient in result.coefficients
+    )
+    return boundary_refusals, result_float_checks, interval_checks, exact_carrier_checks
+
+
+def audit_no_native_execution_surface() -> tuple[int, int, int, int, int]:
+    forbidden = forbidden_execution_role_symbols(dict(globals()))
+    assert dict(forbidden) == {
+        "State": (),
+        "Frontier": (),
+        "Neighborhood": (),
+        "Rule": (),
+        "Update": (),
+        "StepResult": (),
+        "Executor": (),
+    }
+    manifest = dataclass_manifest(dict(globals()))
+    names = {name for name, _ in manifest}
+    assert "MathematicalDenotationSpec" in names
+    assert "RepresentationQuery" in names
+    assert "ExpansionResult" in names
+    assert {"LongDivisionWork", "SqrtDigitWork", "GaussMapWork"} <= names
+    forbidden_fields = {
+        "state",
+        "frontier",
+        "neighborhood",
+        "rule",
+        "update",
+        "executor",
+        "successors",
+    }
+    assert not any(forbidden_fields.intersection(field_names) for _, field_names in manifest)
+    work_types = sum(name.endswith("Work") for name in names)
+    return len(manifest), work_types, len(forbidden), 0, 0
+
+
+def audit_hostile_validation() -> int:
+    rejected = 0
+    rejected += must_raise(TypeError, lambda: RationalLiteral(True, 2))
+    rejected += must_raise(TypeError, lambda: RationalLiteral(1, 2.0))
+    rejected += must_raise(ValueError, lambda: RationalLiteral(1, 0))
+    rejected += must_raise(ValueError, lambda: RationalLiteral(-1, 2))
+    rejected += must_raise(ValueError, lambda: SquareRoot(4))
+    rejected += must_raise(TypeError, lambda: SquareRoot(2.0))
+    rejected += must_raise(TypeError, lambda: MathematicalDenotationSpec(lambda: 3))
+    rejected += must_raise(ValueError, lambda: MathematicalDenotationSpec(PiConstant(), (1,)))
+    rejected += must_raise(ValueError, lambda: MathematicalDenotationSpec(PiConstant(), value_schema="float64"))
+    rejected += must_raise(TypeError, lambda: PositionalDigits(True))
+    rejected += must_raise(ValueError, lambda: PositionalDigits(1))
+    rejected += must_raise(ValueError, lambda: PositionalDigits(10, canonical_tail="repeat_nines"))
+    rejected += must_raise(ValueError, lambda: SimpleContinuedFraction("allow_terminal_one"))
+    rejected += must_raise(TypeError, lambda: Prefix(1.0))
+    rejected += must_raise(ValueError, lambda: Prefix(-1))
+    rejected += must_raise(TypeError, lambda: CoefficientAt(False))
+    rejected += must_raise(TypeError, lambda: EvaluationContext(EXACT_METHOD, False))
+    rejected += must_raise(ValueError, lambda: EvaluationContext(EXACT_METHOD, 1))
+    rejected += must_raise(ValueError, lambda: EvaluationContext("host_callback", 0))
+    rejected += must_raise(
+        TypeError,
+        lambda: RepresentationQuery(pi_spec(), PositionalDigits(10), lambda: 5),
+    )
+    rejected += must_raise(TypeError, lambda: decode_digits([1, 2], 10))
+    rejected += must_raise(ValueError, lambda: decode_digits((), 10))
+    rejected += must_raise(TypeError, lambda: decode_digits((1, 2.0), 10))
+    rejected += must_raise(ValueError, lambda: decode_digits((1, 10), 10))
+    rejected += must_raise(
+        ValueError,
+        lambda: RationalPositionalExpansion(10, (0,), (5, 0), ()),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: RationalPositionalExpansion(10, (0,), (4,), (9,)),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: RationalPositionalExpansion(10, (0,), (), (1, 2, 1, 2)),
+    )
+    rejected += must_raise(ValueError, lambda: CanonicalContinuedFraction((0, 1, 1), True))
+    rejected += must_raise(ValueError, lambda: continued_fraction_value((0, 0)))
+    rejected += must_raise(TypeError, lambda: rational_positional_expansion(0.5, 10))
+    rejected += must_raise(TypeError, lambda: atan_inverse_interval(5.0, 10))
+    rejected += must_raise(TypeError, lambda: direct_sqrt_bits(Fraction(2), 2.0))
+    rejected += must_raise(
+        ValueError,
+        lambda: begin_sqrt_digit_work(Fraction(9, 4), BOOK_INTEGER_SQRT),
+    )
+    rejected += must_raise(TypeError, lambda: begin_long_division(RationalLiteral(1, 2), 10.0))
+    rejected += must_raise(ValueError, lambda: gauss_map_next(gauss_map_next(gauss_map_next(begin_gauss_map(RationalLiteral(1, 2))))))
+
+    query = RepresentationQuery(pi_spec(), PositionalDigits(10), Prefix(20))
+    result = evaluate_query(query, machin_context(20))
+    assert type(result.outcome) is CompleteCertified
+    certificate = result.outcome.certificate
+    forged_interval = RationalInterval(
+        certificate.interval.lower,
+        certificate.interval.upper + Fraction(1, 10),
+    )
+    forged_certificate = replace(certificate, interval=forged_interval)
+    assert not verify_machin_certificate(forged_certificate)
+    rejected += must_raise(
+        ValueError,
+        lambda: ExpansionResult(
+            result.query,
+            result.context,
+            result.provenance,
+            result.start_index,
+            result.coefficients,
+            result.integer_digits,
+            CompleteCertified(forged_certificate),
+            result.termination,
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: QueryProvenance(
+            result.provenance.query_key,
+            "0" * 64,
+            result.provenance.context_key,
+            result.provenance.context_id,
+        ),
+    )
+
+    exact = evaluate_query(
+        RepresentationQuery(rational_spec(1, 7), PositionalDigits(10), Prefix(8)),
+        exact_context(),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ExpansionResult(
+            exact.query,
+            exact.context,
+            exact.provenance,
+            exact.start_index,
+            (9,) + exact.coefficients[1:],
+            exact.integer_digits,
+            exact.outcome,
+            exact.termination,
+        ),
+    )
+
+    partial = evaluate_query(query, machin_context(3))
+    rejected += must_raise(ValueError, lambda: make_t42_coefficient_input(partial))
+    positional = evaluate_query(query, machin_context(20))
+    rejected += must_raise(ValueError, lambda: make_t42_coefficient_input(positional))
+    random_cf = evaluate_query(
+        RepresentationQuery(pi_spec(), SimpleContinuedFraction(), CoefficientAt(3)),
+        machin_context(20),
+    )
+    rejected += must_raise(ValueError, lambda: make_t42_coefficient_input(random_cf))
+
+    mutated_namespace = dict(globals())
+    mutated_namespace["ConstantState"] = object
+    assert dict(forbidden_execution_role_symbols(mutated_namespace))["State"] == ("ConstantState",)
+    rejected += 1
+    mutated_namespace = dict(globals())
+    mutated_namespace["DigitExecutor"] = lambda: None
+    assert dict(forbidden_execution_role_symbols(mutated_namespace))["Executor"] == ("DigitExecutor",)
+    rejected += 1
+
+    literal_work = sqrt_digit_next(
+        begin_sqrt_digit_work(Fraction(11, 5), REPAIRED_RATIONAL_SQRT)
+    )
+    literal_r, literal_s = unsafe_literal_rational_sqrt_next(literal_work.r, literal_work.s)
+    assert literal_r < 0 and literal_s == 12
+    rejected += 1
+    return rejected
+
+
+EXPECTED_DIGEST = "TO_BE_COMPUTED"
+
+
+def collect_audit_summary() -> tuple[tuple[str, object], ...]:
+    rational = audit_rational_positional_and_duals()
+    long_division = audit_long_division_realization()
+    pi_certification = audit_pi_certification()
+    exact_cf = audit_exact_cf_families()
+    sqrt_realization = audit_sqrt_digit_realization()
+    gauss = audit_gauss_map_realization()
+    random_access = audit_prefix_random_access_consistency()
+    lossiness = audit_finite_prefix_lossiness_and_cylinders()
+    outcomes = audit_outcome_profiles()
+    identity = audit_identity_equivalence_and_query_separation()
+    handoff = audit_t42_handoff()
+    no_float = audit_no_float_digit_invention()
+    surface = audit_no_native_execution_surface()
+    hostile = audit_hostile_validation()
+    return (
+        ("rational_positional_periods_and_duals", rational),
+        ("long_division_T35_T43_realization", long_division),
+        ("Pi_Machin_certification", pi_certification),
+        ("exact_quadratic_surd_and_e_CF", exact_cf),
+        ("sqrt_r_s_product_realization", sqrt_realization),
+        ("Gauss_T43_realization", gauss),
+        ("prefix_random_access_consistency", random_access),
+        ("finite_prefix_lossiness_cylinders", lossiness),
+        ("query_outcomes", outcomes),
+        ("identity_equivalence_query_separation", identity),
+        ("T42_coefficient_handoff", handoff),
+        ("no_float_digit_invention", no_float),
+        ("native_execution_surface", surface),
+        ("hostile_rejections", hostile),
+        ("source_claims", SOURCE_CLAIMS),
+        ("architecture_classification", ARCHITECTURE_CLASSIFICATION),
+        ("goal2_delta", GOAL2_DELTA),
+        ("T42_handoff_contract", T42_HANDOFF_CONTRACT),
+        ("work_realization_relations", WORK_REALIZATION_RELATIONS),
+        ("sqrt_rational_source_guard", SQRT_RATIONAL_SOURCE_GUARD),
+        ("Pi_decimal_60", PI_DECIMAL_60),
+        ("Pi_binary_96", PI_BINARY_96),
+        ("Pi_CF_30", PI_CF_30),
+        ("dataclass_manifest", dataclass_manifest(dict(globals()))),
+        ("forbidden_execution_role_suffixes", FORBIDDEN_EXECUTION_ROLE_SUFFIXES),
+    )
+
+
+def main() -> None:
+    summary = collect_audit_summary()
+    digest = sha256(repr(summary).encode("utf-8")).hexdigest()
+    if EXPECTED_DIGEST == "TO_BE_COMPUTED":
+        print(f"computed_semantic_digest={digest}")
+        return
+    assert digest == EXPECTED_DIGEST
+    metrics = dict(summary)
+    rational = metrics["rational_positional_periods_and_duals"]
+    long_division = metrics["long_division_T35_T43_realization"]
+    pi_certification = metrics["Pi_Machin_certification"]
+    exact_cf = metrics["exact_quadratic_surd_and_e_CF"]
+    sqrt_realization = metrics["sqrt_r_s_product_realization"]
+    gauss = metrics["Gauss_T43_realization"]
+    random_access = metrics["prefix_random_access_consistency"]
+    lossiness = metrics["finite_prefix_lossiness_cylinders"]
+    outcomes = metrics["query_outcomes"]
+    identity = metrics["identity_equivalence_query_separation"]
+    handoff = metrics["T42_coefficient_handoff"]
+    no_float = metrics["no_float_digit_invention"]
+    surface = metrics["native_execution_surface"]
+
+    print("T40 semantic oracle: PASS")
+    print(
+        f"rational_cases={rational[0]}; roundtrips={rational[1]}; "
+        f"prefix_cylinders={rational[2]}; total_period_digits={rational[3]}; "
+        f"terminating_and_dual_checks={rational[4]}"
+    )
+    print(
+        f"Pi_certified=decimal:{pi_certification[0]}/binary:{pi_certification[1]}/"
+        f"CF:{pi_certification[2]}; Machin_terms_total={pi_certification[3]}; "
+        f"certificate_replays={pi_certification[4]}; interval_denominator_digits={pi_certification[5]}"
+    )
+    print(
+        f"exact_CF=surd_periods:{exact_cf[0]}/surd_coefficients:{exact_cf[1]}/"
+        f"max_period:{exact_cf[2]}/e_anchor:{exact_cf[3]}/e_prefix:{exact_cf[4]}"
+    )
+    print(
+        f"work_realizations=long_division_steps:{long_division[0]}/"
+        f"remainder_commutations:{long_division[1]}/max_bits:{long_division[2]}; "
+        f"sqrt_commutations:{sqrt_realization[0]}/invariants:{sqrt_realization[1]}/"
+        f"prefix_loss_5_4_vs_4_4:{sqrt_realization[4]}; "
+        f"sqrt_literal_identity_survives:{sqrt_realization[5]}/"
+        f"nonnegative_bound_failures:{sqrt_realization[6]}; "
+        f"Gauss_sources:{gauss[0]}/steps:{gauss[1]}/commutations:{gauss[2]}"
+    )
+    print(
+        f"prefix_random_access={random_access[0]}; distinct_query_ids={random_access[1]}; "
+        f"one_coefficient_payloads={random_access[2]}; certified_random_access={random_access[3]}; "
+        f"lossiness_witnesses=positional:{lossiness[0]}/CF:{lossiness[1]}"
+    )
+    print(
+        f"outcomes=exact:{outcomes[0]}/certified:{outcomes[1]}/partial:{outcomes[2]}/"
+        f"resource:{outcomes[3]}; partial_coefficients={outcomes[4]}; "
+        f"identity_structural_keys={identity[0]}/equivalence_certificates={identity[1]}"
+    )
+    print(
+        f"T42_handoffs={handoff[0]}; exact_coefficients={handoff[1]}; "
+        f"certified_coefficients={handoff[2]}; hidden_evaluator=absent; "
+        f"float_boundary_refusals={no_float[0]}; exact_coefficient_checks={no_float[3]}"
+    )
+    print(
+        f"surface=dataclasses:{surface[0]}/optional_work_records:{surface[1]}/"
+        f"forbidden_role_groups:{surface[2]}/native_execution_roles:{surface[3]}/"
+        f"class4_algebras:{surface[4]}; hostile_rejections={metrics['hostile_rejections']}"
+    )
+    print(f"semantic_digest={digest}")
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 1:
+        raise SystemExit("usage: 45-T40-semantic-oracle.py")
+    main()
