@@ -11,6 +11,8 @@ Status: **IN PROGRESS — FIRST-PRINCIPLES SOURCE, ACCESS, AND REPRESENTATION AU
 - The source explicitly warns that computed addresses may yield meaningless `f[0]`, `f[-1]`, or `f[-2]`, while stating that the eight displayed rules avoid this problem (`BOOK:1571-1575`). This is a runtime read-validity boundary, not evidence for wrap, clamp, padding, default values, or a catalog-specific halt.
 - The Notes give the memoized definition for displayed case (e) and fix leftmost-innermost evaluation as the ordinary demand order (`BOOK:12720-12726`). An algebraic cancellation such as `f[-1]-f[-1]` does not license skipping those demanded reads under that evaluator.
 - The Notes distinguish native recurrence from derived descriptions: exact formulae for case (d), binary-digit descriptions for cases (c)/(d), fluctuation statistics, address plots, and evaluation trees consume or analyze the sequence but do not select a different native UPDATE (`BOOK:12728-12767`).
+- The Notes multiplicity list for case (d) at `BOOK:12738` omits the extra initial `1`; the main figure and the Notes' own largest-index formula at `BOOK:12742` independently contradict that extraction/source defect. Any repair must be explicit and guarded.
+- The page-144 JPEG ends midway through its lower small-plot row: the eight formulas/seeds/term rows and panels (a)-(d) are present, but lower panels (e)-(h) are cropped. No missing curve samples or plot extents may be invented.
 - The eight strict rules share T37's unique endpoint source and one-term persistent append. T38 changes the old-prefix access expression, not configuration topology, write shape, UPDATE, runner, or executor.
 - The `invalid_index_policy` menu in the taxonomy note is not source authority. Primary-source conformance treats an actually demanded non-old-prefix reference as an undefined attempted step: the common no-commit error envelope retains the last complete prefix and commits no event.
 
@@ -42,18 +44,18 @@ Reconstruct T38 as a closed data-dependent old-prefix access profile over T37's 
 
 ## Primary Strict Profiles to Verify
 
-The page-144 plate visibly supplies the following eight rules. These transcriptions remain provisional until the asset oracle independently binds every glyph, seed, visible row, and regenerated prefix.
+The page-144 plate visibly supplies the following eight rules and term-row horizons. These transcriptions remain provisional until the asset oracle independently binds every glyph, seed, visible row, and regenerated prefix.
 
-| Row | Closed recurrence | Fresh seed |
-|---|---|---|
-| (a) | `f[n] = 1 + f[n - f[n-1]]` | `f[1]=1` |
-| (b) | `f[n] = 2 + f[n - f[n-1]]` | `f[1]=f[2]=1` |
-| (c) | `f[n] = f[f[n-1]] + f[n - f[n-1]]` | `f[1]=f[2]=1` |
-| (d) | `f[n] = f[n - f[n-1]] + f[n - f[n-2] - 1]` | `f[1]=f[2]=1` |
-| (e) | `f[n] = f[n - f[n-1]] + f[n - f[n-2]]` | `f[1]=f[2]=1` |
-| (f) | `f[n] = f[n - f[n-1] - 1] + f[n - f[n-2] - 1]` | `f[1]=f[2]=1` |
-| (g) | `f[n] = f[f[n-1]] + f[n - f[n-2] - 1]` | `f[1]=f[2]=1` |
-| (h) | `f[n] = f[f[n-1]] + f[n - 2 f[n-1] + 1]` | `f[1]=f[2]=1` |
+| Row | Closed recurrence | Fresh seed | Visible terms |
+|---|---|---|---:|
+| (a) | `f[n] = 1 + f[n - f[n-1]]` | `f[1]=1` | 48 |
+| (b) | `f[n] = 2 + f[n - f[n-1]]` | `f[1]=f[2]=1` | 44 |
+| (c) | `f[n] = f[f[n-1]] + f[n - f[n-1]]` | `f[1]=f[2]=1` | 40 |
+| (d) | `f[n] = f[n - f[n-1]] + f[n - f[n-2] - 1]` | `f[1]=f[2]=1` | 40 |
+| (e) | `f[n] = f[n - f[n-1]] + f[n - f[n-2]]` | `f[1]=f[2]=1` | 40 |
+| (f) | `f[n] = f[n - f[n-1] - 1] + f[n - f[n-2] - 1]` | `f[1]=f[2]=1` | 42 |
+| (g) | `f[n] = f[f[n-1]] + f[n - f[n-2] - 1]` | `f[1]=f[2]=1` | 41 |
+| (h) | `f[n] = f[f[n-1]] + f[n - 2 f[n-1] + 1]` | `f[1]=f[2]=1` | 45 |
 
 Case (e) is independently text-backed at `BOOK:12722-12724`. Cases (c) through (h), rather than (a)/(b), are the six fluctuation profiles on page 145; its caption's shared two-term seed must not be misapplied to row (a).
 
@@ -73,9 +75,9 @@ writes   = ClosedRecurrenceRule(program.value_tree).emit(active, reads)
 next     = SingleSpliceUpdate.apply(configuration, active, writes)
 ```
 
-`ComputedPrefixAccess` evaluates only closed integer address nodes and returns a replayable ordered read DAG. Each `TermAt(address_expr)` records the target index, evaluated address, source term handle/value, expression path, and exact program provenance. Fixed T37 lag `k` is the restriction `TermAt(TargetIndex - Literal(k))`; T38 generalizes this responsibility rather than creating a family executor.
+`ComputedPrefixAccess` evaluates only closed integer address nodes and returns a replayable ordered read DAG. Each syntactic `TermAt(address_expr)` occurrence is retained and records the target index, evaluated address, source term handle/value, expression path, demand order, and exact program provenance. Fixed T37 lag `k` is the restriction `TermAt(TargetIndex - Literal(k))`; T38 generalizes this responsibility rather than creating a family executor. D022 already permits a typed program-coupled selector/access component when one authoritative closed program supplies both applicability and the value used by RULE; this is not a callback loophole.
 
-On success, RULE replaces `End(n)` with `Val(n,next_value) · End(n+1)`, and T16's atomic single splice preserves every old value. If a demanded address is nonintegral, below the origin, current/future, or otherwise absent, access returns the common zero-successor `Error(UndefinedTermReference)` with the complete old prefix and ordered failure witness. No write or event exists, and UPDATE is not invoked.
+On success, RULE receives the resolved read tree, computes only the exact value, and replaces `End(n)` with `Val(n,next_value) · End(n+1)`; T16's atomic single splice preserves every old value. If a demanded address is nonintegral, below the origin, current/future, or otherwise absent, access returns the common zero-successor `Error(UndefinedTermReference)` with the complete old prefix and ordered failure witness. No write or event exists, and UPDATE is not invoked. This follows T35/T43 partial-evaluation precedent. `Invalid` remains appropriate for malformed AST/type/seed inputs before execution; T26's `Invalid(IncompatibleMosaic)` is an UPDATE-composition failure and is not the T38 analogue.
 
 ## First-Principles Architecture Matrix
 
