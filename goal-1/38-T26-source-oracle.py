@@ -402,13 +402,13 @@ EXPECTED_SET = {
     "pre_index_union": (67, "5c462cd7613d5355e8448cd63508f1541d5c87543debb3252e73e28296e4ef9a"),
     "index": (27, "45f49612482d7bd4b8e168d19aa59674bfc7760b0d844be1966a8006dadd864c"),
     "matched_retained": (56, "5f543b779cbaa44df53149d856dbad95d96c6c43eb770f27365c8023bc65138f"),
-    "governed_continuations": (58, "c427b4bc7f5a8560e727cc38c4ba6d5a6620e95c7de9553e2be19d2ea73b85d4"),
-    "retained": (114, "1f94939d26300363e42e01045b15f989e80d4bd8129dd15a0fea031d75053fb3"),
+    "governed_continuations": (59, "d57df06258e56b5ce592330eec7f9f9b49eea14f27f2d6a80c5886f9d828e012"),
+    "retained": (115, "962eef0254ab18a40c72b64e8127f6356977fc3ff4dd15e29cf9094f502e7413"),
     "excluded": (11, "69a5794057817d20463c17a61395d9bd7f54aad527d9747c3f9635b30c50bfe8"),
     "native": (26, "6e1fe6cad7bba3a647abfb578fb1069e1428c0681a53a35aeab368b207486e20"),
-    "relation": (63, "ab1b2a95be93968c61107d64c655821582ca830f309a36b273495a2616d008c4"),
+    "relation": (64, "e97b0eaa2f71e6d2ce8abee067e3cb66bb8c0dad0555ee3429bff48a585c8637"),
     "control": (25, "34ce5350d22b028c7dbd345bd4655eb971b8be7c0a89581ed95981fe1f9177f7"),
-    "governed_images": (25, "d207fe39e54aaae6d97870605c20d039fe5d81edac1fe9a5d75fb4879b7ebcdc"),
+    "governed_images": (26, "9018acedd5ff638608aa2a79feb5059de5b8a671792ab0c8ec501437eea85ee7"),
 }
 EXPECTED_EXCLUDED_CLASS = {
     "one_dimensional_sequences_represented_in_2d": (
@@ -449,7 +449,7 @@ EXPECTED_INDEX_ENTRY_GUARDS = (
 )
 EXPECTED_IMAGE_PARTITION = {
     "native": (3, "88c77dedfd94731adae1c3913a93edfea3ad631c7afc976b012c7024d169e83a"),
-    "relation": (15, "f457b0b14ec36a31d42dff2789129944d00760a81dd4f27c5f1733ac49e15dcb"),
+    "relation": (16, "33b72d4db3c3e99d04583d7a7e716ac8d2de973ae8786198a79958812453adf6"),
     "control": (7, "25d33c19678ec52a86b371190a08ac42abf01a63ae9831182ba8b006bf108bcd"),
 }
 
@@ -476,10 +476,10 @@ EXPECTED_SPLIT_RETAINED_EXACT = (
     77, "b7b403d3e42c844094acb12f3942613e09c9124ccd476298704c10c412938492"
 )
 EXPECTED_SPLIT_RETAINED_NONEXACT = (
-    37, "e0678a10290b29fca08657221a3e0ee946e83068bbd9ac2c60df6a7b64335b0e"
+    38, "19ba3b7a0bc107deb4e9918496515eb8240e3d78c36bb9baf15cb4c057ef3378"
 )
 EXPECTED_SPLIT_RETAINED_MAPPING = (
-    37, "2c18d1cdd46c69268e5c436a4addd4156965494643669800cb74cea3bfcae9ec"
+    38, "85e236d948b6ce58743f7f326feb2cb3d9bc610537fd5e9c64ffd1d217c0352f"
 )
 EXPECTED_MONOLITH_ONLY = (
     0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
