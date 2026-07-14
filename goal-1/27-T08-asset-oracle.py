@@ -1,106 +1,261 @@
+#!/usr/bin/env python3
+"""Frozen T08 raster-asset closure and classification oracle."""
+
+from __future__ import annotations
+
+import hashlib
+import importlib.util
+import re
 from pathlib import Path
-import re, hashlib, struct
+
 
 if not __debug__:
     raise RuntimeError("T08 asset verification requires assertions; do not run with -O")
 
-ROOT=Path(__file__).resolve().parents[1]
-BOOK=ROOT/'ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md'
+ROOT = Path(__file__).resolve().parents[1]
+BOOK = ROOT / "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md"
+SOURCE_ORACLE_PATH = ROOT / "goal-1/27-T08-source-oracle.py"
 
-def nums(s): return {int(x) for x in re.findall(r'\d+', s)}
 
-A=nums('''432,440,450,460,472,476,478,500,518,550,566,592,622,730,742,746,754,790,846,960,970,978,1040,1154,1198,1238,1246,1302,1346,1348,1350,
-1886,1898,1906,1908,1920,1924,1926,1928,1930,1932,1936,1938,1940,1944,1946,1956,1982,2066,2180,2184,2194,2216,2226,2230,2250,2256,2262,2332,2460,2538,
-2706,2708,2710,2712,2714,2720,2722,2726,2728,2730,2734,2736,2750,2758,2760,2764,2772,2776,2790,2794,2822,2890,2908,2922,2926,2942,2944,2950,2954,2966,2968,2970,2978,3046,3050,3054,3056,3058,3060,3066,3068,3070,3072,3076,3078,3082,3084,3086,3090,3092,3094,3096,3098,3104,3106,3108,3110,3112,3114,3122,3124,3126,3132,3134,3140,3144,3146,3148,3150,3152,3156,3158,3160,3162,3166,3168,3204,3206,3210,3212,3216,3218,3222,3226,3228,3236,3240,3244,3250,3258,3280,3284,3290,3294,3298,3302,3304,3306,3310,3312,3330,3332,3336,3348,3352,3354,3356,3358,3360,3366,3370,3372,3374,3382,3384,3388,3406''')
-B=nums('''3464,3680,3704,3718,3720,3762,3780,3822,3892,3930,3936,3946,3958,4070,4072,4082,4176,4214,4264,4274,4286,4300,4408,5064,5088,5212,5216,5222,5238,5242,5278,5288,5384,5508,5512,5552,5638,5806,5810,5916,5938,6066,6636,6644,6684,7146,7156,7188,7204,7226,7232,7236,7252,7708,7722,7828,7842,7856,7874,7880,7908,7936,7986,8158,8258,8264,8266,8268,8298,8332,8350,8356,8360,8372,8374,8378,8380,8386,8394,8396,8400,8412,8416,8420,8430,8436,8460,8500,8532,8534,8544,8550,8554,8606,8664,8668,8670,8712,8714,8740,8742,8744,8746,8748,8750,8754,8756,8950,8960,8988,8990''')
-C={4206,5084,5094}
-D=nums('''9002,9010,9044,9176,9178,9180,9248,9268,9326,9332,9334,9336,9356,9362,9372,9604,9651,9811,10261,10647,10648,10883,10899,11041,11077,11103,11124,11128,11136,11140,11150,11217,11244,11277,11509,11569,11579,11583,11585,11625,11866,11867,11944,12034,12055,12065,12103,12105,12115,12288,12313,12352,12374,12380,12382,12446,12456,12457,12462,12619,12639,13223,13225,13227,13235,13245,13251,13255,13265,13268,13272,13296,13300,13304,13320,13469,14031,14121,14203,14213,14220,14275,14285,14287,14331,14340,14341,14345,14349,14386,14429,14433,14439,14445,14464,14468,14474,14536,14537,14542,14702,14748,14787,14825,14835,14903,14985,15035,15065,15191,15207,15386,15546,15550,15570,15637,15641,15661,15766,15959,15963,16052,16053,16054,16060,16061,16117,16173,16177,16195,16198,16241,16427,16534,17103,17533,17646,17700,17710,17731,18229,18235,18243,18330,18361,18372,18394,18422,18430,18445,18463,18474,18486,18498,18508,18523,18549,18568,18582,18617,18619,18674,18749,18764,18766,18780,18794,18814,18833,18841,18855,18900,19026,19050,19052,19059,19060,19072,19076,19086,19240,19264,19272,19335,19380,19507,19584,19588,20118,20126,20128,20525,20577,20582,20586''')
-S=A|B|C|D
-assert [len(A),len(B),len(C),len(D),len(S)]==[178,111,3,195,487]
-SOURCE_DIGEST='42733f504fa41a98a9f01f88ebeb43b7c8d3e24e0e620229fa9cae3ef62d6ace'
+def nums(text: str) -> set[int]:
+    return {int(value) for value in re.findall(r"\d+", text)}
 
-lines=BOOK.read_text(encoding='utf-8').splitlines()
-img_re=re.compile(r'^!\[\]\(([^)]*?\.jpeg)\)$')
-imgs={i: img_re.fullmatch(x).group(1) for i,x in enumerate(lines,1) if img_re.fullmatch(x)}
-C4={i for i in imgs if min(abs(i-s) for s in S)<=4}
-P={4208,4210,4212,5086,5098,7866,7928,7942}
-Q=nums('''524,526,528,530,532,760,764,798,802,818,820,822,826,830,836,1034,1048,1230,1232,1914,1972,2048,2050,2054,2056,2060,2200,2240,2242,2244,2744,2782,2784,2800,2804,2828,2832,2836,2844,2846,2848,2850,2866,2896,2900,2932,2934,2936,2960,3174,3176,3318,3322,3458,4200,4280,4292,5248,5500,5502,7194,7196,7834,7848,7850,7944,7946,8338,8340,8366,11936,11938,12071,12073,12075,14378,14380,14548,14740,14742,14817,14819,14841,14843,15183,15185,15213,15215,15217,15219,15628,15630,15632,16183,16185,16187,16540,17652,17654,17656,17658,17694''')
-U=C4|P|Q
-assert len(P)==8 and len(P&C4)==5 and Q.isdisjoint(C4|P)
 
-# I: raster directly presents/encodes an evidenced initial profile/class or a
-# run beginning from it. R: seed relation, later crop/continuation, aggregate,
-# rule strip, IVP/sibling relation. X: adjacency-only/non-seed control.
-I=nums('''436,446,456,468,514,732,734,748,756,760,764,792,794,798,802,818,820,822,826,830,836,844,968,972,1152,1196,1244,1884,1910,1912,1914,1972,2176,2182,2200,2220,2232,2240,2242,2244,2246,2248,2252,2258,2328,2456,2458,2534,
-2718,2724,2732,2738,2744,2746,2748,2752,2762,2782,2784,2786,2788,2796,2800,2804,2824,2828,2832,2836,2844,2846,2848,2850,2866,2888,2892,2896,2900,2920,2928,2932,2934,2936,2938,2940,2948,2956,2958,2960,2980,2982,3062,3064,3074,3080,3088,3102,3116,3118,3120,3136,3138,3142,3154,3172,3174,3176,3208,3214,3220,3232,3242,3292,3314,3318,3322,3328,3334,3350,3368,3376,3380,3404,3408,3460,3462,3682,3934,3944,3954,4074,4076,4080,4174,4208,4210,4212,4266,4268,4270,4272,4278,4280,4288,4290,4292,4412,5062,5086,5220,5240,5244,5246,5248,5276,5286,5382,5500,5502,5504,5506,5636,5804,5914,5934,7154,7192,7194,7196,7228,7250,7724,7832,7840,7844,7846,7848,7850,7854,7860,7870,7872,7876,7878,7882,7910,7984,7988,8156,8352,8366,8368,8376,8398,8408,8414,8422,8424,8426,8428,8440,8456,8458,8496,8528,8540,8552,8604,8958,
-9008,9246,9266,9328,9360,10259,10652,11134,11142,11148,11152,11279,11281,11627,11629,12057,12061,12067,12069,12071,12073,12075,13270,13302,14211,14273,14334,14343,14347,14378,14380,14382,14384,14390,14437,14441,14447,14539,14544,14546,14548,14740,14742,14744,14746,14750,14752,14789,14817,14819,14821,14823,14829,14831,14833,14837,14839,14841,14843,15033,16179,16181,16183,16185,16187,17694,17696,17702,17704,17706,17708,17712,18225,18227,18245,18247,18746,18753,18768,19062,20584,20588''')
-R=nums('''438,516,522,524,526,528,530,532,758,974,976,1156,1230,1232,1234,1236,1888,1916,1918,1942,1958,2048,2050,2054,2056,2060,2062,2188,2192,2196,2224,2228,2254,2260,2330,2536,
-2716,2740,2766,2924,3044,3200,3256,3286,3362,4302,5092,5098,5214,5510,5550,6062,6064,6642,7202,7726,7834,7838,7932,7934,8260,8334,8336,8338,8340,8358,8370,8538,8542,8608,8752,
-11936,11938,11940,12454,12460,12464,12641,13243,13249,14117,14705,15183,15185,15187,15189,15211,15213,15215,15217,15219,15548,15552,15572,15628,15630,15632,15634,16536,16538,16540,17650,17652,17654,17656,17658,18896,19236,19238''')
-CORE={n for n in U if 2700<=n<9000}
-core_i=nums('''2718,2724,2732,2738,2746,2748,2752,2762,2786,2788,2796,2824,2888,2892,2920,3062,3064,3074,3080,3088,3102,3116,3118,3120,3136,3138,3142,3154,3172,3208,3214,3220,3232,3242,3286,3314,3328,3334,3350,3362,3368,3376,3380,3404,3460,3462,3682,3934,3944,3954,4074,4076,4174,4208,4210,4212,4266,4268,4270,4272,4288,4412,5062,5086,5098,5214,5220,5240,5244,5246,5276,5286,5382,5504,5506,5550,5636,5804,7192,7228,7724,7832,7840,7846,7870,7872,7876,7878,7882,7910,7984,7988,8156,8334,8336,8352,8358,8376,8398,8408,8414,8422,8424,8426,8428,8440,8456,8496,8528,8538,8552,8604,8958,
-2744,2782,2784,2800,2804,2828,2832,2836,2844,2846,2848,2850,2866,2896,2900,2932,2934,2936,2960,3174,3176,3318,3322,4280,4292,5248,5500,5502,7194,7196,7834,7848,7850,7866,7928,7942,8338,8340,8366''')
-core_r=nums('''2716,2740,2766,2924,2928,2938,2940,2948,2956,2958,2980,2982,3044,3200,3256,3292,3408,4080,4202,4278,4290,4302,5092,5510,5914,5934,6062,6064,6642,7154,7202,7250,7726,7838,7844,7854,7860,7932,7934,8260,8368,8370,8458,8540,8542,8752,7944,7946''')
-core_x={3458,4200,8608}
-assert core_i|core_r|core_x==CORE and not (core_i&core_r or core_i&core_x or core_r&core_x)
-I=(I-CORE)|core_i
-R=(R-CORE)|core_r
-X=U-I-R
-assert I<=U and R<=U and I.isdisjoint(R)
-assert I|R|X==U
+def load_source_oracle():
+    spec = importlib.util.spec_from_file_location("t08_source_oracle", SOURCE_ORACLE_PATH)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
-def context(lo,hi,candidates=C4,rad=4):
-    for i in sorted(candidates):
-        if lo<=i<=hi:
-            near=sorted(S,key=lambda x:abs(x-i))[:3]
-            print(f'\n### IMAGE {i} {imgs[i]} nearest={near}')
-            for j in range(max(1,i-rad),min(len(lines),i+rad)+1):
-                if lines[j-1].strip(): print(f'{j}: {lines[j-1][:500]}')
 
-def jpeg_size(data):
-    assert data[:2]==b'\xff\xd8'
-    sof={0xc0,0xc1,0xc2,0xc3,0xc5,0xc6,0xc7,0xc9,0xca,0xcb,0xcd,0xce,0xcf}; i=2
-    while i<len(data):
-        while i<len(data) and data[i]!=0xff: i+=1
-        while i<len(data) and data[i]==0xff: i+=1
-        assert i<len(data); marker=data[i]; i+=1
-        if marker in {0x00,0x01} or 0xd0<=marker<=0xd9: continue
-        size=int.from_bytes(data[i:i+2],'big')
+SOURCE = load_source_oracle()
+S = set(SOURCE.RETAINED)
+SOURCE_DIGEST = "a8b0f8a0d68aa4af1b36175f95ddd0a0955d71717de1168110d55f4ede80f48a"
+assert len(S) == 701 and SOURCE.digest(S) == SOURCE_DIGEST
+
+book_bytes = BOOK.read_bytes()
+assert len(book_bytes.decode("utf-8").splitlines()) == SOURCE.EXPECTED_BOOK_LINES
+assert hashlib.sha256(book_bytes).hexdigest() == SOURCE.EXPECTED_BOOK_SHA256
+lines = book_bytes.decode("utf-8").splitlines()
+
+image_re = re.compile(r"^!\[\]\(([^)]*?\.jpeg)\)$")
+images = {
+    line_number: match.group(1)
+    for line_number, line in enumerate(lines, 1)
+    if (match := image_re.fullmatch(line))
+}
+
+# The mechanical source closure.
+C4 = {line for line in images if min(abs(line - source) for source in S) <= 4}
+
+# Direction-sensitive pointers that remain outside C4. P and Q are deliberately
+# disjoint deltas, so U's cardinality is the sum of the three cardinalities.
+P = nums("""
+1487 1573 3578 3582 3596 7928 7942 12859
+""")
+
+# Frozen semantic fixed point: legacy companions plus new same-caption,
+# facing-page, multi-panel, explicit-continuation, and run/plate companions.
+Q = nums("""
+524 526 528 530 532 760 764 798 802 818 820 822 826 830 836 1034 1048 1080 1100 1102 1104 1174 1230 1232 1449
+1493 1914 1972 2048 2050 2054 2056 2060 2200 2240 2242 2244 2280 2284 2286 2302 2744 2782 2784 2800 2804 2828
+2832 2836 2844 2846 2848 2850 2866 2896 2900 2932 2934 2936 3174 3176 3318 3322 3458 3648 3964 3966 4200 4280
+5230 5248 7194 7196 7834 7848 7850 7944 7946 8338 8340 8366 11936 11938 12071 12073 12075 13569 13571 13573
+13603 13605 13607 13974 13976 13978 13980 14378 14380 14548 14740 14742 14817 14819 14841 14843 14951 14953
+14955 15177 15183 15185 15213 15215 15217 15219 15223 15225 15227 15239 15241 15243 15628 15630 15632 16183
+16540 16798 16800 16802 17652 17654 17656 17658 17694 18874 19806 19808 19810
+""")
+
+assert C4.isdisjoint(P) and C4.isdisjoint(Q) and P.isdisjoint(Q)
+U = C4 | P | Q
+
+# The previously audited 412-asset partition is immutable. The larger source
+# set adds assets but does not retroactively change the meaning of old rasters.
+I_OLD = nums("""
+436 446 456 468 514 732 734 748 756 760 764 792 794 798 802 818 820 822 826 830 836 844 968 972 1152 1196 1244
+1884 1910 1912 1914 1972 2176 2182 2200 2220 2232 2240 2242 2244 2246 2248 2252 2258 2328 2456 2458 2534 2718
+2724 2732 2738 2744 2746 2748 2752 2762 2782 2784 2786 2788 2796 2800 2804 2824 2828 2832 2836 2844 2846 2848
+2850 2866 2888 2892 2896 2900 2920 2932 2934 2936 2960 3062 3064 3074 3080 3088 3102 3116 3118 3120 3136 3138
+3142 3154 3172 3174 3176 3208 3214 3220 3232 3242 3286 3314 3318 3322 3328 3334 3350 3362 3368 3376 3380 3404
+3460 3462 3682 3934 3944 3954 4074 4076 4174 4208 4210 4212 4266 4268 4270 4272 4280 4288 4292 4412 5062 5086
+5098 5214 5220 5240 5244 5246 5248 5276 5286 5382 5500 5502 5504 5506 5550 5636 5804 7192 7194 7196 7228 7724
+7832 7834 7840 7846 7848 7850 7866 7870 7872 7876 7878 7882 7910 7928 7942 7984 7988 8156 8334 8336 8338 8340
+8352 8358 8366 8376 8398 8408 8414 8422 8424 8426 8428 8440 8456 8496 8528 8538 8552 8604 8958 9008 9246 9266
+9328 9360 10259 10652 11134 11142 11148 11152 11279 11281 11627 11629 12057 12061 12067 12069 12071 12073
+12075 13270 13302 14211 14273 14334 14343 14347 14378 14380 14382 14384 14390 14437 14441 14447 14539 14544
+14546 14548 14740 14742 14744 14746 14750 14752 14789 14817 14819 14821 14823 14829 14831 14833 14837 14839
+14841 14843 15033 16179 16181 16183 16185 16187 17694 17696 17702 17704 17706 17708 17712 18225 18227 18245
+18247 18746 18753 18768 19062 20584 20588
+""")
+R_OLD = nums("""
+438 516 522 524 526 528 530 532 758 974 976 1156 1230 1232 1234 1236 1888 1916 1918 1942 1958 2048 2050 2054
+2056 2060 2062 2188 2192 2196 2224 2228 2254 2260 2330 2536 2716 2740 2766 2924 2928 2938 2940 2948 2956 2958
+2980 2982 3044 3200 3256 3292 3408 4080 4202 4278 4290 4302 5092 5510 5914 5934 6062 6064 6642 7154 7202 7250
+7726 7838 7844 7854 7860 7932 7934 7944 7946 8260 8368 8370 8458 8540 8542 8752 11936 11938 11940 12454 12460
+12464 12641 13243 13249 14117 14705 15183 15185 15187 15189 15211 15213 15215 15217 15219 15548 15552 15572
+15628 15630 15632 15634 16536 16538 16540 17650 17652 17654 17656 17658 18896 19236 19238
+""")
+X_OLD = nums("590 1034 1036 1044 1048 3458 4200 8608")
+LEGACY_U = I_OLD | R_OLD | X_OLD
+assert (len(I_OLD), len(R_OLD), len(X_OLD), len(LEGACY_U)) == (282, 122, 8, 412)
+assert not (I_OLD & R_OLD or I_OLD & X_OLD or R_OLD & X_OLD)
+assert LEGACY_U <= U
+
+# Strict classification of the 117 mechanical additions. I means that the
+# raster itself exposes an initial profile/class or a run beginning at t0; R
+# means relation/later/crop/aggregate/rule/emulation evidence; X is a genuine
+# adjacency-only non-seed control.
+RAW_NEW = C4 - LEGACY_U
+EARLY_R = nums("1076 1096 1551 1599 1631 2290 2292 2298 3342 3632 4018 4022 5228")
+EARLY_X = nums("6172 8574")
+LATE_I = nums("""
+9078 9474 9480 9482 9530 12220 12224 13094 13098 13312 13334 13336 13338 13615 13742 13748 14965 15974 16515
+16517 16794 17006 18738 18870 19119
+""")
+LATE_R = nums("""
+12134 12611 12844 12917 13565 13567 13609 13611 13984 14683 14762 14809 14813 14957 14959 14973 15173 15175
+15229 15231 15235 15237 15376 15380 16796 18772 19812
+""")
+LATE_X = nums("12836 12911 13090 13151 14756 17718")
+RAW_EARLY = {line for line in RAW_NEW if line < 9000}
+RAW_LATE = RAW_NEW - RAW_EARLY
+I_RAW = (RAW_EARLY - EARLY_R - EARLY_X) | LATE_I
+R_RAW = EARLY_R | LATE_R
+X_RAW = EARLY_X | LATE_X
+assert RAW_LATE == LATE_I | LATE_R | LATE_X
+assert not (LATE_I & LATE_R or LATE_I & LATE_X or LATE_R & LATE_X)
+assert I_RAW | R_RAW | X_RAW == RAW_NEW
+assert not (I_RAW & R_RAW or I_RAW & X_RAW or R_RAW & X_RAW)
+assert (len(RAW_NEW), len(I_RAW), len(R_RAW), len(X_RAW)) == (117, 69, 40, 8)
+
+# The 48 semantic/pointer additions beyond raw C4. Borderline artifacts are
+# conservatively R. This exact I set comprises only visible t0/profile/run
+# plates; every other new closure member is relation-only.
+NEW_CLOSURE = U - LEGACY_U - RAW_NEW
+I_CLOSURE = nums("""
+1080 1174 1449 1487 1573 3578 3582 3596 3648 3964 3966 12859
+""")
+R_CLOSURE = NEW_CLOSURE - I_CLOSURE
+assert I_CLOSURE <= NEW_CLOSURE
+assert (len(NEW_CLOSURE), len(I_CLOSURE), len(R_CLOSURE)) == (48, 12, 36)
+
+I = I_OLD | I_RAW | I_CLOSURE
+R = R_OLD | R_RAW | R_CLOSURE
+X = X_OLD | X_RAW
+assert I | R | X == U
+assert not (I & R or I & X or R & X)
+assert (len(I), len(R), len(X)) == (363, 198, 16)
+
+# Every newly added asset has a directly inspectable classification reason.
+NEW_REASON: dict[int, tuple[str, str]] = {}
+for line in sorted(I_RAW):
+    NEW_REASON[line] = ("I", "C4 raster visibly exposes its initial profile/class or a run beginning at t0")
+for line in sorted(R_RAW):
+    NEW_REASON[line] = ("R", "C4 raster is a later, aggregate, rule, emulation, or other relation-only artifact")
+for line in sorted(X_RAW):
+    NEW_REASON[line] = ("X", "C4 admitted an adjacency-only non-seed control")
+for line in sorted(I_CLOSURE):
+    NEW_REASON[line] = ("I", "pointer/plate companion visibly exposes t0, a starting profile, or its run")
+for line in sorted(R_CLOSURE):
+    NEW_REASON[line] = ("R", "semantic companion is later, aggregate, rule, crop, emulation, or sibling evidence")
+assert set(NEW_REASON) == U - LEGACY_U and len(NEW_REASON) == 165
+
+
+def jpeg_size(data: bytes) -> tuple[int, int]:
+    assert data[:2] == b"\xff\xd8"
+    sof = {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF}
+    offset = 2
+    while offset < len(data):
+        while offset < len(data) and data[offset] != 0xFF:
+            offset += 1
+        while offset < len(data) and data[offset] == 0xFF:
+            offset += 1
+        assert offset < len(data)
+        marker = data[offset]
+        offset += 1
+        if marker in {0x00, 0x01} or 0xD0 <= marker <= 0xD9:
+            continue
+        size = int.from_bytes(data[offset : offset + 2], "big")
         if marker in sof:
-            return int.from_bytes(data[i+5:i+7],'big'),int.from_bytes(data[i+3:i+5],'big')
-        i+=size
-    raise AssertionError('JPEG SOF marker not found')
+            width = int.from_bytes(data[offset + 5 : offset + 7], "big")
+            height = int.from_bytes(data[offset + 3 : offset + 5], "big")
+            return width, height
+        offset += size
+    raise AssertionError("JPEG SOF marker not found")
 
-def ledger():
-    base=ROOT/'ref/A-New-Kind-of-Science'
-    md_files=sorted(p for p in base.rglob('*.md')
-                    if p.resolve()!=BOOK.resolve() and p.name!='ANKoS-Atlas.md')
-    assert len(md_files)==17
-    rows=[]; hashes=set(); refs=0
-    for n in sorted(U):
-        kind='I' if n in I else 'R' if n in R else 'X'
-        name=Path(imgs[n]).name
-        monolith_hits=[j for j,ref in imgs.items() if Path(ref).name==name]
-        assert monolith_hits==[n],(n,monolith_hits)
-        paths=[p for p in base.rglob(name) if p.is_file()]; assert len(paths)==1,(n,paths)
-        p=paths[0]; data=p.read_bytes(); digest=hashlib.sha256(data).hexdigest(); assert digest not in hashes; hashes.add(digest)
-        hits=[]
-        for md in md_files:
-            for j,line in enumerate(md.read_text(encoding='utf-8').splitlines(),1):
-                if re.fullmatch(r'!\[\]\((?:Images/)?'+re.escape(name)+r'\)',line): hits.append((md,j))
-        assert len(hits)==1,(n,hits); refs+=len(monolith_hits)+len(hits)
-        split,j=hits[0]; w,h=jpeg_size(data)
-        rows.append(f'{n}|{kind}|{p.relative_to(base).as_posix()}|{len(data)}|{w}|{h}|{digest}|{split.relative_to(base).as_posix()}|{j}')
-    payload='\n'.join(rows)+'\n'
-    return payload,hashlib.sha256(payload.encode()).hexdigest(),refs,len(hashes)
 
-if __name__=='__main__':
-    source_payload=','.join(map(str,sorted(S))).encode('ascii')
-    assert hashlib.sha256(source_payload).hexdigest()==SOURCE_DIGEST
-    payload,digest,refs,hashes=ledger()
-    assert (len(S),len(C4),len(P),len(C4&P),len(Q),len(U))==(487,307,8,5,102,412)
-    assert (len(I),len(R),len(X),refs,hashes)==(282,122,8,824,412)
-    assert digest=='001ee2e179a46633be2904424b8e6d99d2da8b9ce8ed134c2089f1bfc170299e'
-    print('T08 final asset oracle: PASS source=487; C4/P/Q=307/8/102; '
-          'assets=412; refs=824; classes=282,122,8; unique_hashes=412; '
-          f'ledger_sha256={digest}')
+def ledger() -> tuple[str, str, int, int]:
+    base = ROOT / "ref/A-New-Kind-of-Science"
+    markdown_files = sorted(
+        path
+        for path in base.rglob("*.md")
+        if path.resolve() != BOOK.resolve() and path.name != "ANKoS-Atlas.md"
+    )
+    assert len(markdown_files) == 17
+
+    monolith_by_name: dict[str, list[int]] = {}
+    for line_number, reference in images.items():
+        monolith_by_name.setdefault(Path(reference).name, []).append(line_number)
+
+    split_by_name: dict[str, list[tuple[Path, int]]] = {}
+    split_re = re.compile(r"^!\[\]\((?:Images/)?([^/()]+\.jpeg)\)$")
+    for markdown in markdown_files:
+        for line_number, line in enumerate(markdown.read_text(encoding="utf-8").splitlines(), 1):
+            if match := split_re.fullmatch(line):
+                split_by_name.setdefault(match.group(1), []).append((markdown, line_number))
+
+    physical_by_name: dict[str, list[Path]] = {}
+    for path in base.rglob("*.jpeg"):
+        if path.is_file():
+            physical_by_name.setdefault(path.name, []).append(path)
+
+    rows: list[str] = []
+    hashes: set[str] = set()
+    references = 0
+    for book_line in sorted(U):
+        kind = "I" if book_line in I else "R" if book_line in R else "X"
+        name = Path(images[book_line]).name
+        monolith_hits = monolith_by_name.get(name, [])
+        split_hits = split_by_name.get(name, [])
+        paths = physical_by_name.get(name, [])
+        assert monolith_hits == [book_line], (book_line, monolith_hits)
+        assert len(split_hits) == 1, (book_line, split_hits)
+        assert len(paths) == 1, (book_line, paths)
+        references += len(monolith_hits) + len(split_hits)
+
+        path = paths[0]
+        data = path.read_bytes()
+        digest = hashlib.sha256(data).hexdigest()
+        assert digest not in hashes, (book_line, digest)
+        hashes.add(digest)
+        width, height = jpeg_size(data)
+        split, split_line = split_hits[0]
+        rows.append(
+            f"{book_line}|{kind}|{path.relative_to(base).as_posix()}|{len(data)}|"
+            f"{width}|{height}|{digest}|{split.relative_to(base).as_posix()}|{split_line}"
+        )
+
+    payload = "\n".join(rows) + "\n"
+    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    return payload, digest, references, len(hashes)
+
+
+EXPECTED_LEDGER_SHA256 = "PENDING"
+
+
+def main() -> None:
+    assert (len(S), len(C4), len(P), len(Q), len(U)) == (701, 431, 8, 138, 577)
+    payload, digest, references, hashes = ledger()
+    assert len(payload.splitlines()) == 577
+    assert (len(I), len(R), len(X), references, hashes) == (363, 198, 16, 1154, 577)
+    assert digest == EXPECTED_LEDGER_SHA256
+    print(
+        "T08 final asset oracle: PASS source=701; C4/P/Q=431/8/138; "
+        "assets=577; refs=1154; classes=363,198,16; unique_hashes=577; "
+        f"ledger_sha256={digest}"
+    )
+
+
+if __name__ == "__main__":
+    main()
