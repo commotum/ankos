@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """Independent semantic and architecture oracle for T26.
 
-The strict source construction is a finite rectangular grid of tile labels in
+The source construction is a finite rectangular grid of tile labels in
 discrete ``t+2D``.  Every old tile fires once, reads only its own old label,
-and emits one nonempty rectangular patch from a total closed table.  All
-patches in the strict profile have the same shape.  ``UPDATE`` performs the
-Notes' ``Flatten2D`` block assembly: source rows remain source rows, local
-patch rows are interleaved within them, and local patch columns are joined
-within source columns.  New tiles do not fire until the following event.
+and emits one nonempty rectangular patch from a total closed table.  ``UPDATE``
+performs the Notes' ``Flatten2D`` mosaic assembly: patches selected within one
+source row have equal heights, and the assembled slabs for all source rows
+have equal widths.  The familiar uniform-patch profile is a restriction of
+that law.  Source rows remain source rows, local patch rows are interleaved
+within them, and local patch columns are joined within source columns.  New
+tiles do not fire until the following event.
 
 The generic evaluator below is one rank-parameterized ordered-block update.
 Its rank-one restriction is fixed-block T13 concatenation; rank two is T26.
@@ -17,12 +19,11 @@ bag of fully posed tile occurrences.  The embedding is lossless only under a
 rectangular-tiling invariant; arbitrary free geometry remains T27, and
 neighbor-dependent patch choice remains T28.
 
-The Book's ``Other shapes`` note is deliberately not promoted into the strict
-evaluator.  It gives a finite shape/orientation-as-color relation, but its
-printed right-hand sides have mixed sizes.  Without a source-closed general
-compatibility law, those four rows remain relation evidence and are rejected
-by the uniform-patch T26 validator.  Rasters, display scale, coordinate
-formulae, and limiting fractals likewise never become programs or state.
+The Book's ``Other shapes`` encoded-label table is executed natively under
+that compatibility law.  From seed ``{{3}}`` it has exact Fibonacci side
+lengths 1, 2, 3, 5, 8, 13, and 21.  Incompatible mosaics are rejected before
+assembly.  Rasters, display scale, coordinate formulae, and limiting fractals
+likewise never become programs or state.
 """
 
 from __future__ import annotations
@@ -1750,6 +1751,8 @@ def assert_hostile_validation() -> dict[str, int]:
     rejects(ValueError, lambda: make_grid(((2,),), 2))
     rejects(TypeError, lambda: make_grid(((True,),), 2))
     rejects(TypeError, lambda: RectGrid(2, ((0,),), "token"))
+    rejects(TypeError, lambda: SnapshotToken(1, "parent"))
+    rejects(ValueError, lambda: SnapshotToken(0, SnapshotToken(0)))
 
     good_rows = PAGE_187_TABLE.rows
     rejects(ValueError, lambda: ClosedPatchTable(2, good_rows[:-1]))
@@ -1765,23 +1768,36 @@ def assert_hostile_validation() -> dict[str, int]:
     )
     rejects(
         ValueError,
-        lambda: ClosedPatchTable(2, ((0, ((0,),)), (1, ((1, 0),)))),
-    )
-    rejects(
-        ValueError,
         lambda: ClosedPatchTable(2, ((0, ((0, 2),)), (1, ((1, 0),)))),
     )
     rejects(
-        ValueError,
-        lambda: ClosedPatchTable(2, ((0, ((0,),)), (1, ((1,), (0,))))),
-    )
-    # Canonicalize the source rows so rejection proves mixed patch shapes are
-    # the boundary, not merely the source note's descending presentation.
-    mixed_shape_rows = tuple(sorted(OTHER_SHAPES_MIXED_RELATION))
-    rejects(ValueError, lambda: ClosedPatchTable(4, mixed_shape_rows))
-    rejects(
         TypeError,
         lambda: ClosedPatchTable(2, (((0, 1), ((0,),)), (1, ((1,),)))),
+    )
+
+    unequal_heights = ClosedPatchTable(
+        2,
+        ((0, ((0,),)), (1, ((1,), (0,)))),
+    )
+    unequal_slab_widths = ClosedPatchTable(
+        2,
+        ((0, ((0,),)), (1, ((1, 0),))),
+    )
+    rejects(
+        ValueError,
+        lambda: generic_step(unequal_heights, make_grid(((0, 1),), 2)),
+    )
+    rejects(
+        ValueError,
+        lambda: generic_step(unequal_slab_widths, make_grid(((0,), (1,)), 2)),
+    )
+    rejects(
+        ValueError,
+        lambda: notes_flatten2d((((((0,),), ((1,), (0,)))),)),
+    )
+    rejects(
+        ValueError,
+        lambda: notes_flatten2d(((((0,),),), (((1, 0),),))),
     )
 
     configuration = make_grid(((0, 1), (1, 0)), 2)
@@ -1891,13 +1907,13 @@ def assert_hostile_validation() -> dict[str, int]:
 
     bag = encode_grid_as_bag(configuration)
     duplicate = PlacedTileBag(
-        2,
+        bag.prototypes,
         (bag.occurrences[0], bag.occurrences[0], *bag.occurrences[2:]),
-        0,
+        bag.provenance,
     )
     rejects(ValueError, lambda: decode_bag_as_grid(duplicate))
     rotated = PlacedTileBag(
-        2,
+        bag.prototypes,
         (
             PlacedTile(
                 0,
@@ -1907,11 +1923,151 @@ def assert_hostile_validation() -> dict[str, int]:
                 ),
             ),
         ),
-        0,
+        bag.provenance,
     )
     rejects(ValueError, lambda: decode_bag_as_grid(rotated))
     rejects(TypeError, lambda: bag_step("callback", bag))
     rejects(ValueError, lambda: bag_step(ClosedPatchTable(3, ((0, ((0,),)), (1, ((1,),)), (2, ((2,),)))), bag))
+    rejects(ValueError, lambda: bag_step(OTHER_SHAPES_TABLE, encode_grid_as_bag(make_grid(OTHER_SHAPES_SEED, 4))))
+
+    rejects(TypeError, lambda: BagSnapshotProvenance("token"))
+    rejects(ValueError, lambda: BagSnapshotProvenance(configuration.token, "forged"))
+    rejects(
+        ValueError,
+        lambda: PlacedTileBag(
+            bag.prototypes,
+            (PlacedTile(99, bag.occurrences[0].pose),),
+            bag.provenance,
+        ),
+    )
+    triangle = PrototypeGeometry(
+        "triangle",
+        (
+            (Fraction(0), Fraction(0)),
+            (Fraction(1), Fraction(0)),
+            (Fraction(0), Fraction(1)),
+        ),
+    )
+    wrong_geometry = PlacedTileBag(
+        (TilePrototype(0, triangle), *bag.prototypes[1:]),
+        bag.occurrences,
+        bag.provenance,
+    )
+    rejects(ValueError, lambda: decode_bag_as_grid(wrong_geometry))
+
+    cross_bag = replace(bag, provenance=BagSnapshotProvenance(foreign.token))
+    rejects(ValueError, lambda: decode_bag_as_grid(cross_bag, configuration.token))
+    native_result = generic_step(PAGE_187_TABLE, configuration)
+    good_bag_result = bag_step(
+        PAGE_187_TABLE,
+        bag,
+        BagSnapshotProvenance(native_result.successor.token),
+    )
+    stale_successor = BagSnapshotProvenance(
+        SnapshotToken(configuration.generation + 1)
+    )
+    rejects(
+        ValueError,
+        lambda: bag_step(PAGE_187_TABLE, bag, stale_successor),
+    )
+    cross_successor = BagSnapshotProvenance(
+        SnapshotToken(foreign.generation + 1, foreign.token)
+    )
+    rejects(
+        ValueError,
+        lambda: bag_step(PAGE_187_TABLE, bag, cross_successor),
+    )
+    foreign_provenance = BagSnapshotProvenance(foreign.token)
+    rejects(
+        ValueError,
+        lambda: decode_bag_step_as_patch_step(
+            PAGE_187_TABLE,
+            configuration,
+            replace(good_bag_result, source_provenance=foreign_provenance),
+        ),
+    )
+    first_patch = good_bag_result.child_patches[0]
+    forged_parent = BagParentHandle(
+        foreign_provenance,
+        first_patch.source.occurrence,
+    )
+    rejects(
+        ValueError,
+        lambda: decode_bag_step_as_patch_step(
+            PAGE_187_TABLE,
+            configuration,
+            replace(
+                good_bag_result,
+                child_patches=(
+                    replace(first_patch, source=forged_parent),
+                    *good_bag_result.child_patches[1:],
+                ),
+            ),
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: decode_bag_step_as_patch_step(
+            PAGE_187_TABLE,
+            configuration,
+            replace(
+                good_bag_result,
+                child_patches=good_bag_result.child_patches[:-1],
+            ),
+        ),
+    )
+    forged_witness = replace(first_patch.children[0], local_row=99)
+    rejects(
+        ValueError,
+        lambda: decode_bag_step_as_patch_step(
+            PAGE_187_TABLE,
+            configuration,
+            replace(
+                good_bag_result,
+                child_patches=(
+                    replace(
+                        first_patch,
+                        children=(forged_witness, *first_patch.children[1:]),
+                    ),
+                    *good_bag_result.child_patches[1:],
+                ),
+            ),
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: decode_bag_step_as_patch_step(
+            PAGE_187_TABLE,
+            configuration,
+            replace(
+                good_bag_result,
+                child_patches=(
+                    replace(first_patch, children=first_patch.children[:-1]),
+                    *good_bag_result.child_patches[1:],
+                ),
+            ),
+        ),
+    )
+    forged_successor_bag = replace(
+        good_bag_result.successor,
+        provenance=cross_successor,
+    )
+    rejects(
+        ValueError,
+        lambda: decode_bag_step_as_patch_step(
+            PAGE_187_TABLE,
+            configuration,
+            replace(good_bag_result, successor=forged_successor_bag),
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: encode_patch_step_as_bag_step(
+            PAGE_187_TABLE,
+            configuration,
+            replace(native_result, source_token=foreign.token),
+        ),
+    )
 
     rejects(
         ValueError,
@@ -1956,7 +2112,7 @@ def semantic_digest(counts: dict[str, int]) -> str:
 
 
 EXPECTED_SEMANTIC_DIGEST = (
-    "b4fdbf272ff544cb824c0244e07240b8bb7b43967efd89ed70ef0637f9488a2a"
+    "bfcf5b173fd6a1346b55251292389d1dd45181ed697ac6f6c99051631087c033"
 )
 
 
@@ -1977,18 +2133,25 @@ def main() -> None:
         groups["exhaustive"]["native_generic_events"]
         + groups["source"]["page187_generic_events"]
         + groups["source"]["rectangular_2x3_events"]
+        + groups["source"]["other_shapes_mosaic_events"]
         + groups["boundaries"]["nonwhite_background_events"]
         + groups["boundaries"]["newborn_deferral_events"]
     )
-    counts["total.commuting_proofs"] = (
-        groups["exhaustive"]["native_generic_events"]
-        + groups["exhaustive"]["t27_bag_commuting_events"]
+    counts["total.bag_stepresult_commutations"] = (
+        groups["exhaustive"]["t27_bag_commuting_events"]
         + groups["source"]["page187_bag_commuting_events"]
         + groups["source"]["rectangular_2x3_events"]
-        + groups["rank"]["t13_fixed_block_rank1_events"]
+    )
+    counts["total.rank1_mosaic_commutations"] = groups["rank"][
+        "t13_rank1_mosaic_events"
+    ]
+    counts["total.commuting_proofs"] = (
+        counts["total.native_generic_events"]
+        + counts["total.bag_stepresult_commutations"]
+        + counts["total.rank1_mosaic_commutations"]
     )
     digest = semantic_digest(counts)
-    assert digest == EXPECTED_SEMANTIC_DIGEST
+    assert digest == EXPECTED_SEMANTIC_DIGEST, (digest, counts)
 
     print("T26 semantic oracle: PASS")
     print(f"native_generic_events={counts['total.native_generic_events']}")
@@ -1998,6 +2161,7 @@ def main() -> None:
         f"binary_2x2:{groups['exhaustive']['native_generic_events']},"
         f"page187:{groups['source']['page187_generic_events']},"
         f"rectangular_2x3:{groups['source']['rectangular_2x3_events']},"
+        f"other_shapes_mosaic:{groups['source']['other_shapes_mosaic_events']},"
         f"nonwhite_background:{groups['boundaries']['nonwhite_background_events']},"
         f"newborn_deferral:{groups['boundaries']['newborn_deferral_events']}"
     )
@@ -2006,8 +2170,8 @@ def main() -> None:
         "alphabet=finite_tile_labels;frontier=AllOldTiles;neighborhood=SelfOnly"
     )
     print(
-        "rule=total_closed_TileLabel_to_uniform_nonempty_rectangular_patch;"
-        "UPDATE=exact_Flatten2D_block_assembly;old_snapshot=YES;newborn_deferral=YES;"
+        "rule=total_closed_TileLabel_to_nonempty_rectangular_patch;"
+        "UPDATE=exact_rank2_compatible_Flatten2D_mosaic;old_snapshot=YES;newborn_deferral=YES;"
         "overlap_policy=NOT_APPLICABLE"
     )
     print(
@@ -2016,20 +2180,24 @@ def main() -> None:
         "source_numeric_codec=NONE"
     )
     print(
-        "rank_relation=T13_fixed_block_is_rank1;T26_is_rank2_parameterization_of_D019;"
-        f"rank1_commutations={groups['rank']['t13_fixed_block_rank1_events']};"
+        "rank_relation=D019_variable_block_is_rank1;T26_is_rank2_parameterization_of_D019;"
+        f"rank1_commutations={groups['rank']['t13_rank1_mosaic_events']};"
+        f"fixed_block_subset={groups['rank']['t13_fixed_block_rank1_subset']};"
         "plain_row_major_T13_concatenation_for_rank2=REJECTED"
     )
     print(
         "bag_relation=lossless_restriction_of_T27_addressed_pose_bag;"
-        f"bag_commutations={groups['exhaustive']['t27_bag_commuting_events'] + groups['source']['page187_bag_commuting_events'] + groups['source']['rectangular_2x3_events']};"
+        f"bag_commutations={counts['total.bag_stepresult_commutations']};"
+        "carrier=(prototype_id,pose);prototype_catalog=one_declared_unit_square_per_label;"
+        "proof=full_StepResult_snapshot_provenance_and_typed_lineage;"
         "required_invariant=aligned_uniform_no_hole_no_overlap_rectangular_tiling;"
         "arbitrary_free_geometry=T27"
     )
     print(
         "other_shapes=finite_shape_orientation_roles_may_be_color_encoded;"
-        "printed_mixed_patch_rule=RELATION_CONTROL;strict_executions=0;"
-        "source_role_to_color_assignment=UNSPECIFIED;invented_compatibility_law=NONE"
+        f"printed_mixed_patch_rule=NATIVE_T26;strict_executions={groups['source']['other_shapes_mosaic_events']};"
+        "exact_sides=1,2,3,5,8,13,21;source_role_to_color_assignment=UNSPECIFIED;"
+        "compatibility=row_equal_heights+equal_slab_widths"
     )
     print(
         "boundaries=white_is_ordinary_label_not_implicit_identity;"
