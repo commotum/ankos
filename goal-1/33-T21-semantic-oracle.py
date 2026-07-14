@@ -796,3 +796,594 @@ def cells_with_one(shape: tuple[int, ...], coord: Coord, alphabet_size: int = 2)
     FiniteAlphabet(alphabet_size)
     return tuple(result)
 
+
+def nonzero_coords(state: GridConfiguration) -> tuple[Coord, ...]:
+    return tuple(
+        coord
+        for coord in all_coords(state.topology.shape)
+        if state.cells[flat_index(state.topology.shape, coord)] != 0
+    )
+
+
+def assert_book_codes_and_counts() -> None:
+    """Freeze the exact Chapter 5/Notes counts and two direct rule codes."""
+
+    # BOOK:2174-2190 and BOOK:13536-13549.  With four surrounding cells,
+    # outer totalism has 2*(4+1)=10 binary rows and ordinary totalism over
+    # center plus neighbors has 6 possible sums.
+    assert 1 << 10 == 1024
+    assert 1 << 6 == 64
+    assert 1 << 32 == 4_294_967_296
+    assert 1 << 12 == 4096
+
+    # The T22 Moore boundary has eight surrounding cells.  BOOK:13542-13549
+    # gives the corresponding 9-neighbor counts.
+    assert 1 << 18 == 262_144
+    assert 1 << 10 == 1024
+    assert (1 << 512).bit_length() == 513
+
+    code_1022 = outer_code(4, lambda center, count: 1 if center == 1 or count > 0 else 0)
+    code_942 = outer_code(
+        4, lambda center, count: 1 if count in (1, 4) else center
+    )
+    assert code_1022 == 1022
+    assert code_942 == 942
+
+    rule_1022 = BinaryOuterTotalistic(1022, 4)
+    rule_942 = BinaryOuterTotalistic(942, 4)
+    for center in (0, 1):
+        for count in range(5):
+            neighbors = (1,) * count + (0,) * (4 - count)
+            assert rule_1022.evaluate(LocalRead(center, neighbors)) == (
+                1 if center == 1 or count > 0 else 0
+            )
+            assert rule_942.evaluate(LocalRead(center, neighbors)) == (
+                1 if count in (1, 4) else center
+            )
+
+
+def assert_exhaustive_native_commutation() -> dict[str, int]:
+    """Prove e(step_native(x)) = step_generic(e(x)) on bounded universes."""
+
+    binary_states = tuple(product((0, 1), repeat=4))
+    periodic = PeriodicBoundary()
+    outer_cases = 0
+    totalistic_cases = 0
+    positional_cases = 0
+    ternary_cases = 0
+
+    # All 1024 four-neighbor binary outer-totalistic tables and every binary
+    # 2x2 torus.  A 2x2 torus is intentionally adversarial: opposite offsets
+    # resolve to the same cell but remain separate read slots.
+    for code in range(1 << 10):
+        program = strict_t21_program(BinaryOuterTotalistic(code, 4))
+        for cells in binary_states:
+            native = Native2DState(2, (2, 2), periodic, cells)
+            encoded = encode_native(native, generation=7)
+            direct = native_2d_step(program, native)
+            generic = generic_ca_step(program, encoded)
+            assert decode_generic(generic) == direct
+            assert generic.snapshot_token is not encoded.snapshot_token
+            assert generic.generation == 8
+            assert decode_generic(encode_native(decode_generic(encoded))) == native
+            outer_cases += 1
+
+    # All 64 equal-weight five-cell totalistic tables on the same state space.
+    for code in range(1 << 6):
+        program = strict_t21_program(BinaryTotalistic(code, 4))
+        for cells in binary_states:
+            native = Native2DState(2, (2, 2), periodic, cells)
+            direct = native_2d_step(program, native)
+            generic = generic_ca_step(program, encode_native(native))
+            assert decode_generic(generic) == direct
+            totalistic_cases += 1
+
+    # Totalistic tests cannot catch an offset-order reversal.  Each center or
+    # directional projection is therefore checked against every 2x2 state.
+    for selected in (-1, 0, 1, 2, 3):
+        program = strict_t21_program(projection_rule(2, 4, selected))
+        for cells in binary_states:
+            native = Native2DState(2, (2, 2), periodic, cells)
+            direct = native_2d_step(program, native)
+            generic = generic_ca_step(program, encode_native(native))
+            assert decode_generic(generic) == direct
+            positional_cases += 1
+
+    # Finite alphabet is an axis, not a binary/T21 executor assumption.
+    ternary_program = strict_t21_program(projection_rule(3, 4, 2))
+    for cells in product(range(3), repeat=4):
+        native = Native2DState(3, (2, 2), periodic, cells)
+        direct = native_2d_step(ternary_program, native)
+        generic = generic_ca_step(ternary_program, encode_native(native))
+        assert decode_generic(generic) == direct
+        ternary_cases += 1
+
+    assert outer_cases == 16_384
+    assert totalistic_cases == 1_024
+    assert positional_cases == 80
+    assert ternary_cases == 81
+    return {
+        "outer": outer_cases,
+        "totalistic": totalistic_cases,
+        "positional": positional_cases,
+        "ternary": ternary_cases,
+    }
+
+
+def assert_wrapped_slot_multiplicity() -> None:
+    """Periodic aliasing must not deduplicate neighborhood occurrences."""
+
+    topology = FiniteGrid((2, 2), PeriodicBoundary())
+    old = GridConfiguration(
+        FiniteAlphabet(2),
+        topology,
+        cells_with_one((2, 2), (1, 0)),
+        SnapshotToken(0),
+    )
+    handle = SiteHandle(old.snapshot_token, (0, 0))
+    neighborhood = OffsetNeighborhood(ORTHOGONAL_2D)
+    read = read_local(old, (handle,), neighborhood)[0]
+    assert read == LocalRead(0, (1, 0, 0, 1))
+
+    resolved = tuple(
+        tuple(
+            component % extent
+            for component, extent in zip(
+                add_coord(handle.coord, offset), topology.shape, strict=True
+            )
+        )
+        for offset in ORTHOGONAL_2D
+    )
+    assert len(resolved) == 4 and len(set(resolved)) == 2
+
+    # Code 4 accepts exactly total sum 2.  Retaining N and S as separate slots
+    # yields 1; a wrong resolved-coordinate deduplication would yield sum 1.
+    program = strict_t21_program(BinaryTotalistic(1 << 2, 4))
+    successor = generic_ca_step(program, old)
+    assert successor.value_at((0, 0)) == 1
+    wrong_deduplicated_sum = old.value_at((0, 0)) + sum(
+        old.value_at(coord) for coord in set(resolved)
+    )
+    assert wrong_deduplicated_sum == 1
+    assert ((1 << 2) >> wrong_deduplicated_sum) & 1 == 0
+
+
+def assert_asymmetric_orientation_and_parallelism() -> None:
+    fixed = FixedBoundary(0)
+    shape = (5, 5)
+    seed = (2, 2)
+    old = GridConfiguration(
+        FiniteAlphabet(2), FiniteGrid(shape, fixed), cells_with_one(shape, seed), SnapshotToken(0)
+    )
+
+    for slot, offset in enumerate(ORTHOGONAL_2D):
+        program = strict_t21_program(projection_rule(2, 4, slot))
+        successor = generic_ca_step(program, old)
+        expected = subtract_coord(seed, offset)
+        assert nonzero_coords(successor) == (expected,)
+
+    west_program = strict_t21_program(projection_rule(2, 4, 1))
+    east_program = strict_t21_program(projection_rule(2, 4, 2))
+    assert nonzero_coords(generic_ca_step(west_program, old)) == ((2, 3),)
+    assert nonzero_coords(generic_ca_step(east_program, old)) == ((2, 1),)
+
+    # A left-to-right in-place update loses the old black value before the
+    # next site reads it.  The generic old-snapshot commit correctly shifts it.
+    line_shape = (1, 4)
+    line_old = GridConfiguration(
+        FiniteAlphabet(2),
+        FiniteGrid(line_shape, fixed),
+        cells_with_one(line_shape, (0, 0)),
+        SnapshotToken(4),
+    )
+    parallel = generic_ca_step(west_program, line_old)
+    assert parallel.cells == (0, 1, 0, 0)
+
+    in_place = list(line_old.cells)
+    for column in range(4):
+        west = 0 if column == 0 else in_place[column - 1]
+        # The projection table ignores all fields except the west slot.
+        in_place[column] = west_program.rule.evaluate(
+            LocalRead(in_place[column], (0, west, 0, 0))
+        )
+    assert tuple(in_place) == (0, 0, 0, 0)
+    assert tuple(in_place) != parallel.cells
+
+
+def assert_boundary_and_support_separation() -> None:
+    """Finite edge policies are realization data, not native Z^2 semantics."""
+
+    program = strict_t21_program(projection_rule(2, 4, 1))  # read west
+    shape = (3, 3)
+    edge_seed = cells_with_one(shape, (1, 2))
+    periodic = GridConfiguration(
+        FiniteAlphabet(2), FiniteGrid(shape, PeriodicBoundary()), edge_seed, SnapshotToken(0)
+    )
+    fixed = GridConfiguration(
+        FiniteAlphabet(2), FiniteGrid(shape, FixedBoundary(0)), edge_seed, SnapshotToken(0)
+    )
+    assert nonzero_coords(generic_ca_step(program, periodic)) == ((1, 0),)
+    assert nonzero_coords(generic_ca_step(program, fixed)) == ()
+
+    interior_seed = cells_with_one(shape, (1, 1))
+    periodic_interior = GridConfiguration(
+        FiniteAlphabet(2),
+        FiniteGrid(shape, PeriodicBoundary()),
+        interior_seed,
+        SnapshotToken(0),
+    )
+    fixed_interior = GridConfiguration(
+        FiniteAlphabet(2),
+        FiniteGrid(shape, FixedBoundary(0)),
+        interior_seed,
+        SnapshotToken(0),
+    )
+    assert nonzero_coords(generic_ca_step(program, periodic_interior)) == ((1, 2),)
+    assert nonzero_coords(generic_ca_step(program, fixed_interior)) == ((1, 2),)
+
+
+def axis_offsets(dimension: int) -> tuple[Offset, ...]:
+    dimension = require_exact_int(dimension, "dimension")
+    if dimension <= 0:
+        raise ValueError("dimension must be positive")
+    offsets: list[Offset] = []
+    for axis in range(dimension):
+        negative = [0] * dimension
+        positive = [0] * dimension
+        negative[axis] = -1
+        positive[axis] = 1
+        offsets.extend((tuple(negative), tuple(positive)))
+    return tuple(offsets)
+
+
+def assert_dimension_agnostic_kernel() -> None:
+    """One runner executes t+1D, t+2D, and t+3D parameterizations."""
+
+    for dimension in (1, 2, 3):
+        offsets = axis_offsets(dimension)
+        program = CAProgram(
+            FiniteAlphabet(2),
+            OffsetNeighborhood(offsets),
+            projection_rule(2, len(offsets), 0),
+        )
+        shape = (3,) * dimension
+        seed = (1,) * dimension
+        old = GridConfiguration(
+            FiniteAlphabet(2),
+            FiniteGrid(shape, FixedBoundary(0)),
+            cells_with_one(shape, seed),
+            SnapshotToken(0),
+        )
+        successor = generic_ca_step(program, old)
+        expected = subtract_coord(seed, offsets[0])
+        assert nonzero_coords(successor) == (expected,)
+
+
+def assert_exact_infinite_support() -> None:
+    """Check native Z^2 evolution without inventing a finite boundary."""
+
+    growth = strict_t21_program(BinaryOuterTotalistic(1022, 4))
+    state = make_sparse_field(2, 2, 0, (((0, 0), 1),))
+    expected_counts = (1, 5, 13, 25, 41, 61, 85)
+    for time, expected_count in enumerate(expected_counts):
+        expected_support = {
+            (row, column)
+            for row in range(-time, time + 1)
+            for column in range(-time, time + 1)
+            if abs(row) + abs(column) <= time
+        }
+        assert state.background == 0
+        assert {coord for coord, value in state.entries if value == 1} == expected_support
+        assert len(state.entries) == expected_count == 1 + 2 * time * (time + 1)
+        state = sparse_lattice_step(growth, state)
+
+    # A non-quiescent uniform background is still a valid complete Z^2 state.
+    # The transparent background field changes value; no finite edge or giant
+    # explicit array is needed.
+    nonquiescent = strict_t21_program(BinaryOuterTotalistic(1, 4))
+    uniform_white = make_sparse_field(2, 2, 0, ())
+    uniform_black = sparse_lattice_step(nonquiescent, uniform_white)
+    assert uniform_black.background == 1 and uniform_black.entries == ()
+    back_to_white = sparse_lattice_step(nonquiescent, uniform_black)
+    assert back_to_white.background == 0 and back_to_white.entries == ()
+
+    # Exact finite-horizon dependency: with west projection, a source two
+    # cells west reaches the origin in two steps; one three cells west does not.
+    west = strict_t21_program(projection_rule(2, 4, 1))
+    empty = make_sparse_field(2, 2, 0, ())
+    outside_halo = make_sparse_field(2, 2, 0, (((0, -3), 1),))
+    on_halo = make_sparse_field(2, 2, 0, (((0, -2), 1),))
+    for _ in range(2):
+        empty = sparse_lattice_step(west, empty)
+        outside_halo = sparse_lattice_step(west, outside_halo)
+        on_halo = sparse_lattice_step(west, on_halo)
+    assert empty.value_at((0, 0)) == outside_halo.value_at((0, 0)) == 0
+    assert on_halo.value_at((0, 0)) == 1
+
+    # Translation covariance is a support/topology property, not a renderer.
+    shift = (7, -4)
+    original = make_sparse_field(2, 2, 0, (((0, 0), 1), ((1, 0), 1)))
+    translated = make_sparse_field(
+        2,
+        2,
+        0,
+        tuple((add_coord(coord, shift), value) for coord, value in original.entries),
+    )
+    original_next = sparse_lattice_step(growth, original)
+    translated_next = sparse_lattice_step(growth, translated)
+    assert translated_next.background == original_next.background
+    assert translated_next.entries == tuple(
+        (add_coord(coord, shift), value) for coord, value in original_next.entries
+    )
+
+
+def assert_t22_moore_boundary() -> None:
+    """Diagonal access changes the preset, not the execution algebra."""
+
+    shape = (3, 3)
+    old = GridConfiguration(
+        FiniteAlphabet(2),
+        FiniteGrid(shape, FixedBoundary(0)),
+        cells_with_one(shape, (0, 0)),
+        SnapshotToken(0),
+    )
+    moore = strict_t22_program(projection_rule(2, 8, 0))  # northwest
+    orthogonal = strict_t21_program(projection_rule(2, 4, 0))  # north
+    assert generic_ca_step(moore, old).value_at((1, 1)) == 1
+    assert generic_ca_step(orthogonal, old).value_at((1, 1)) == 0
+    assert moore.neighborhood.offsets == MOORE_2D
+    assert orthogonal.neighborhood.offsets == ORTHOGONAL_2D
+
+    # Both use precisely the same all-sites/read/rule/parallel-update runner.
+    assert type(generic_ca_step(moore, old)) is GridConfiguration
+    assert type(generic_ca_step(orthogonal, old)) is GridConfiguration
+
+
+def assert_hostile_validation() -> None:
+    """Reject coercion, malformed schemas, stale scope, and tampered plans."""
+
+    expect_raises(TypeError, lambda: FiniteAlphabet(True))
+    expect_raises(ValueError, lambda: FiniteAlphabet(1))
+    expect_raises(TypeError, lambda: FixedBoundary(False))
+    expect_raises(TypeError, lambda: FiniteGrid([2, 2], PeriodicBoundary()))
+    expect_raises(TypeError, lambda: FiniteGrid((2, True), PeriodicBoundary()))
+    expect_raises(ValueError, lambda: FiniteGrid((2, 0), PeriodicBoundary()))
+    expect_raises(TypeError, lambda: FiniteGrid((2, 2), object()))
+    expect_raises(TypeError, lambda: SnapshotToken(True))
+    expect_raises(ValueError, lambda: SnapshotToken(-1))
+
+    alphabet = FiniteAlphabet(2)
+    topology = FiniteGrid((2, 2), FixedBoundary(0))
+    expect_raises(
+        TypeError,
+        lambda: GridConfiguration(alphabet, topology, [0, 0, 0, 0], SnapshotToken(0)),
+    )
+    expect_raises(
+        ValueError,
+        lambda: GridConfiguration(alphabet, topology, (0, 0, 0), SnapshotToken(0)),
+    )
+    expect_raises(
+        TypeError,
+        lambda: GridConfiguration(alphabet, topology, (0, 0, False, 0), SnapshotToken(0)),
+    )
+    expect_raises(
+        ValueError,
+        lambda: GridConfiguration(alphabet, topology, (0, 0, 2, 0), SnapshotToken(0)),
+    )
+
+    expect_raises(TypeError, lambda: OffsetNeighborhood([NORTH, SOUTH]))
+    expect_raises(ValueError, lambda: OffsetNeighborhood(((0, 0), NORTH)))
+    expect_raises(ValueError, lambda: OffsetNeighborhood((NORTH, NORTH)))
+    expect_raises(ValueError, lambda: OffsetNeighborhood(((-1,), SOUTH)))
+    expect_raises(TypeError, lambda: OffsetNeighborhood(((-1, False), SOUTH)))
+    expect_raises(TypeError, lambda: BinaryOuterTotalistic(True, 4))
+    expect_raises(ValueError, lambda: BinaryOuterTotalistic(1024, 4))
+    expect_raises(TypeError, lambda: BinaryTotalistic(False, 4))
+    expect_raises(ValueError, lambda: BinaryTotalistic(64, 4))
+    expect_raises(TypeError, lambda: GeneralLookup(2, 1, [0, 1, 0, 1]))
+    expect_raises(ValueError, lambda: GeneralLookup(2, 1, (0, 1)))
+    expect_raises(TypeError, lambda: GeneralLookup(2, 1, (0, 1, 0, False)))
+    expect_raises(TypeError, lambda: projection_rule(2, 4, True))
+    expect_raises(ValueError, lambda: projection_rule(2, 4, 4))
+
+    expect_raises(
+        ValueError,
+        lambda: CAProgram(alphabet, OffsetNeighborhood(ORTHOGONAL_2D), projection_rule(3, 4, 0)),
+    )
+    expect_raises(
+        ValueError,
+        lambda: CAProgram(alphabet, OffsetNeighborhood(ORTHOGONAL_2D), projection_rule(2, 3, 0)),
+    )
+
+    program = strict_t21_program(projection_rule(2, 4, 1))
+    old = GridConfiguration(alphabet, topology, (1, 0, 0, 0), SnapshotToken(9))
+    active = select_all_sites(old)
+    reads = read_local(old, active, program.neighborhood)
+    writes = rule_assignments(program, active, reads)
+    validate_rule_plan(old, program, active, reads, writes)
+
+    peer = GridConfiguration(alphabet, topology, old.cells, SnapshotToken(9))
+    foreign = (SiteHandle(peer.snapshot_token, active[0].coord), *active[1:])
+    assert peer.snapshot_token is not old.snapshot_token
+    expect_raises(ValueError, lambda: read_local(old, foreign, program.neighborhood))
+    expect_raises(
+        ValueError,
+        lambda: read_local(
+            old, (SiteHandle(old.snapshot_token, (2, 0)),), program.neighborhood
+        ),
+    )
+    expect_raises(ValueError, lambda: read_local(old, (active[0], active[0]), program.neighborhood))
+
+    tampered_reads = (LocalRead(1 - reads[0].center, reads[0].neighbors), *reads[1:])
+    expect_raises(
+        ValueError,
+        lambda: validate_rule_plan(old, program, active, tampered_reads, writes),
+    )
+    tampered_value = (
+        SiteAssignment(writes[0].source, writes[0].target, 1 - writes[0].value),
+        *writes[1:],
+    )
+    expect_raises(
+        ValueError,
+        lambda: validate_rule_plan(old, program, active, reads, tampered_value),
+    )
+    wrong_target = (
+        SiteAssignment(writes[0].source, (1, 1), writes[0].value),
+        *writes[1:],
+    )
+    expect_raises(
+        ValueError,
+        lambda: validate_rule_plan(old, program, active, reads, wrong_target),
+    )
+    expect_raises(
+        ValueError,
+        lambda: validate_rule_plan(old, program, active, reads, writes[:-1]),
+    )
+    expect_raises(TypeError, lambda: rule_assignments(program, active, list(reads)))
+
+    successor = apply_parallel(old, active, writes)
+    assert successor.snapshot_token is not old.snapshot_token
+    expect_raises(ValueError, lambda: read_local(successor, active, program.neighborhood))
+    expect_raises(
+        ValueError,
+        lambda: generic_ca_step(
+            program,
+            GridConfiguration(
+                alphabet,
+                FiniteGrid((4,), FixedBoundary(0)),
+                (0, 0, 0, 0),
+                SnapshotToken(0),
+            ),
+        ),
+    )
+
+    expect_raises(
+        TypeError,
+        lambda: Native2DState(2, [2, 2], PeriodicBoundary(), (0, 0, 0, 0)),
+    )
+    expect_raises(
+        ValueError,
+        lambda: Native2DState(2, (2, 2, 2), PeriodicBoundary(), (0,) * 8),
+    )
+    expect_raises(
+        TypeError,
+        lambda: make_sparse_field(2, True, 0, ()),
+    )
+    expect_raises(
+        ValueError,
+        lambda: make_sparse_field(2, 2, 0, (((0, 0), 1), ((0, 0), 1))),
+    )
+    expect_raises(
+        ValueError,
+        lambda: make_sparse_field(2, 2, 0, (((0, 0), 0),)),
+    )
+    expect_raises(
+        TypeError,
+        lambda: make_sparse_field(2, 2, 0, (((0, False), 1),)),
+    )
+    expect_raises(
+        TypeError,
+        lambda: make_sparse_field(2, 2, 0, (), generation=True),
+    )
+
+
+DECISION_MATRIX: tuple[tuple[str, str, str, str], ...] = (
+    (
+        "DOMAIN",
+        "parameterization",
+        "DiscreteLattice(d=2)",
+        "square Z^2 support; finite boxes are explicit realizations",
+    ),
+    (
+        "ALPHABET",
+        "direct reuse",
+        "FiniteAlphabet(k)",
+        "closed exact values 0..k-1",
+    ),
+    (
+        "FRONTIER",
+        "direct reuse",
+        "AllSites",
+        "every semantic lattice site fires once per step",
+    ),
+    (
+        "NEIGHBORHOOD",
+        "parameterization",
+        "OrderedOffsets",
+        "four unique orthogonal offsets; center remains a RULE input role",
+    ),
+    (
+        "RULE",
+        "preset/restriction",
+        "ClosedLocalMap",
+        "general, totalistic, and outer-totalistic tables share one schema",
+    ),
+    (
+        "UPDATE",
+        "direct reuse",
+        "ParallelSameSiteAssign",
+        "all reads use one old snapshot; exactly one write per active site",
+    ),
+    (
+        "BOUNDARY",
+        "realization parameter",
+        "PeriodicOrFixedFiniteGrid",
+        "never inferred as native Z^2 semantics",
+    ),
+)
+
+
+def assert_decision_matrix() -> None:
+    assert len(DECISION_MATRIX) == 7
+    assert tuple(row[0] for row in DECISION_MATRIX) == (
+        "DOMAIN",
+        "ALPHABET",
+        "FRONTIER",
+        "NEIGHBORHOOD",
+        "RULE",
+        "UPDATE",
+        "BOUNDARY",
+    )
+    assert DECISION_MATRIX[0][1] == "parameterization"
+    assert DECISION_MATRIX[5][1] == "direct reuse"
+    assert all("executor" not in row[2].lower() for row in DECISION_MATRIX)
+
+
+def main() -> None:
+    assert ORTHOGONAL_2D == tuple(sorted(ORTHOGONAL_2D))
+    assert MOORE_2D == tuple(sorted(MOORE_2D))
+    assert (0, 0) not in ORTHOGONAL_2D and (0, 0) not in MOORE_2D
+    assert_book_codes_and_counts()
+    counts = assert_exhaustive_native_commutation()
+    assert_wrapped_slot_multiplicity()
+    assert_asymmetric_orientation_and_parallelism()
+    assert_boundary_and_support_separation()
+    assert_dimension_agnostic_kernel()
+    assert_exact_infinite_support()
+    assert_t22_moore_boundary()
+    assert_hostile_validation()
+    assert_decision_matrix()
+
+    total_cases = sum(counts.values())
+    assert total_cases == 17_569
+    print("T21 semantic oracle: PASS")
+    print(f"commutation_cases={total_cases}")
+    print(f"outer_totalistic_cases={counts['outer']}")
+    print(f"totalistic_cases={counts['totalistic']}")
+    print(f"positional_cases={counts['positional']}")
+    print(f"ternary_alphabet_cases={counts['ternary']}")
+    print("book_codes=1022,942; rule_counts=2^32,2^12,2^10,2^6")
+    print("code_1022_t0_t6=PASS; exact_Z2_sparse_support=PASS")
+    print("four_orthogonal_offsets=PASS; center_in_rule_schema=PASS")
+    print("all_sites=PASS; old_snapshot_parallel_same_site=PASS")
+    print("asymmetric_orientation=PASS; wrapped_slot_multiplicity=PASS")
+    print("finite_realization_boundary_separation=PASS")
+    print("dimension_agnostic_t1D_t2D_t3D=PASS")
+    print("T22_moore_boundary=PASS; no_family_executor=PASS")
+    print("exact_type_validation=PASS; opaque_snapshot_identity=PASS")
+    print("proposed_D127=dimension/neighborhood parameterization of generic CA preset")
+    print("counterexample=NONE; new_shared_axis=NONE")
+
+
+if __name__ == "__main__":
+    main()
