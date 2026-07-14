@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 26 type stages are complete, T10 is in progress, no stage is reopened, and 18 later stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, and T08 subsequently close under active D119-D121.
+- Execution status at this sync is Foundation complete, 27 type stages are complete, no stage is in progress or reopened, and 18 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, and T10 subsequently close under active D119-D122.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures a DOMAIN/support/topology subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program space with its dimensional character, support, and topology; ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -102,6 +102,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T09 directly requires visible active-position information, exactly one active marker, atomic old-snapshot update, and full-state traces. It does not establish that these roles require a separate `SingleControl` runtime object: `Plain(bit) | Active(bit)` is a transparent lossless composite field representation.
 - The canonical mobile code pair `{35,57}` consumes physical `[left,self,right]`, sharing T01's corrected MSB-first context codec. The Notes finite-list guard is not a boundary or halt policy.
 - T12 combines a head-state role with the symbol under the head. Architecture reclosure withdraws the former payload-bearing `SingleControl`/`TransitionControl` requirement: the canonical transparent state may be `Plain(symbol) | Head(head_state,symbol)` (equivalently `TapeSymbol x Option[HeadState]`) with exactly one head, while a factored `(field,position,payload)` form is a lossless view only when explicitly related and validated.
+- T10 keeps T09's discrete `t+1D` fixed line, transparent `Plain(bit) | Active(bit)` exactly-one state, unique firing source, and physical left/self/right read. Its exact table returns a three-bit replacement block plus `-1/+1`; a lossless lowering emits three complete labels and reuses D011 atomic finite-write UPDATE. The destination receives its new block bit. There are `16^8=2^32` rules, no source-defined integer codec, no new update law/executor, and no evidence for T11 collisions.
 - T12 base machines are total and non-halting, with `(2sk)^(sk)` rules. Special terminal head states, external head/tape stop observations, horizons, and errors are distinct outcomes/protocols.
 - T12 requires an inspectable total/default-symbol tape over `Z`; finite read boundaries cannot supply writes or control movement beyond capacity. Numeric rule decoding uses a documented repair of an OCR-lost `k`, guarded by known machine 3024.
 - T13 validates source-first generic orchestration but splits update semantics: fixed-locus assignment preserves support, while `ParallelReplaceConcat` consumes every old ordered occurrence and creates children from typed nonempty words.
@@ -820,7 +821,7 @@ T08 adds no construction-specific DOMAIN, state family, FRONTIER, NEIGHBORHOOD, 
 
 ### 28-T10-EXTENDED-MOBILE
 
-Status: **IN PROGRESS — SOURCE/ASSET/ARCHITECTURE AUDIT ACTIVE** in `goal-1/28-T10-EXTENDED-MOBILE.md`.
+Status: **COMPLETE — EVIDENCE, ASSETS, AND ARCHITECTURE RECLOSED** in `goal-1/28-T10-EXTENDED-MOBILE.md`; D122 is active.
 
 #### Big Picture Objective
 
@@ -833,6 +834,14 @@ Apply the common protocol, emphasizing source-relative multi-target writes, atom
 #### Completion Requirements
 
 All T10 evidence is captured; wider writes reuse principled effects rather than a special rollout; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+The exact 18-query oracle closes a 183-line union at `161 pre-Index / 22 actual-Index`, partitions the pre-Index set as `66 retained / 95 excluded`, and adds 22 governed continuations for 88 retained lines. All 17 physical split documents reverse-close at `171 exact + 12 mapped query variants` and `83 exact + 5 mapped retained variants`; the Atlas and catalog are pinned, the catalog name is absent from the book, malformed Notes extraction is explicit, and zero source candidate remains unresolved. The governed asset fixed point separately records the strict 14-file subledger and every wider source-neighborhood relation/control candidate with exact physical identities, reverse references, and hashes.
+
+T10 is exactly the T09 one-active binary line with a wider native table `Bit^3 -> Bit^3 x {-1,+1}`. The result lowers to three distinct complete tagged labels; the unique destination carries its new block bit, and generic D011 atomic finite-write UPDATE commits all three from one snapshot. The Notes row `000 -> 111,+1` proves strict T09's center-only result is insufficient while the exhaustive 2,048-case factored/tagged oracle proves no new execution algebra is needed. The rule count is `16^8=2^32`; the structural table is primary and optional planes `(115,37,103,196)` are explicitly inferred rather than source identity.
+
+Exact `t0..t12`, outside-preservation, exactly-one-tag, fail-closed source/asset, target-radius-two CA-compiler, Markdown, diff, scope, independent-review, and repository-test gates pass. D122 adds no state class, control payload, UPDATE law, executor, family branch, boundary, halt, or collision policy. No prior stage reopens. Next: T11.
 
 ### 29-T11-GENERALIZED-MOBILE
 

@@ -1,6 +1,6 @@
 # Goal 1 Representation and Execution Architecture Audit
 
-Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); T06/T07/T08 SUBSEQUENTLY COMPLETED UNDER ACTIVE D119-D121**
+Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); T06/T07/T08/T10 SUBSEQUENTLY COMPLETED UNDER ACTIVE D119-D122**
 
 ## Trigger and Scope
 
@@ -248,6 +248,7 @@ Two tempting collapses also fail the losslessness gate without justifying new ex
 - D058 (constraint/model sets), D082 (uniterated function definitions), and D103 (general PDE relations without a specified evolution problem) are genuine class-4 nonfits because none supplies a canonical successor. Their commonality is declarative relation/query infrastructure, not rollout.
 - Multiway rewriting is not a nonfit: its UPDATE returns a finite set of successor configurations and the same runner can iterate or layer that relation.
 - No completed transition stage supplies a counterexample requiring a family executor or top-level `SingleControl`, `TransitionControl`, `ArithmeticAssignment`, `MapAssignment`, or construction-named state class.
+- T10 subsequently supplies an exact proper extension of the strict T09 RULE-result preset, from a center bit plus movement to a three-bit block plus movement. Its 2,048-case commuting oracle lowers every result to D011 finite writes, so it adds D122 but no UPDATE law or executor.
 
 ## Stage Disposition and Revised Goal 2 Handoffs
 
@@ -263,6 +264,7 @@ This table is the authoritative architecture replacement for the reopened stages
 | T05 | Exact finite `k>=4,r=1` canonical T03 data | T03 reuse | T03 reuse | Strict preset only |
 | T08 | No construction-specific DOMAIN: one event-zero configuration admitted by the unchanged program's `DomainSchema`, ALPHABET/components, and invariants; constructors/classes/laws and optional lossless presentations remain separate | Reuses the resolved native program unchanged | Produces no native firing locus, read, write, UPDATE, successor, or per-step RNG; only a complete validated `X_0` may enter the unchanged native program and identify a `NativeTrace`. A derived finite-work specification may use the generic runner only as a separately identified computation realization | Add typed configuration schemas, deterministic constructors, complete-configuration samples, finite-cylinder samples, algorithmic total-field realizations, invariant validation, and explicit finite-lowering relations; no seed family executor or universal lattice mask |
 | T09 | Discrete `t+1D` line; `Plain(bit) \| Active(bit)`; exactly one active tag | Unique active tag; physical left/self/right | Native `(new_bit,direction)` lowers to source value write plus tag movement; atomic UPDATE | Add composite alphabet, tag-selecting frontier, typed two-write result/lowering, invariant checks; no control class/mobile executor |
+| T10 | T09's discrete `t+1D` fixed line and `Plain(bit) \| Active(bit)` exactly-one configuration unchanged | T09's unique active source and physical left/self/right read unchanged | Native `((new_left,new_center,new_right),direction)` lowers to three distinct complete label writes; D011 atomic finite-write UPDATE unchanged | Add one closed fixed-block result/table preset and lowering over shared axes; no T10 state, control, UPDATE law, executor, integer-code mandate, or collision policy |
 | T12 | Discrete `t+1D` unbounded tape; `Plain(sigma) \| Head(q,sigma)`; exactly one head | Unique head tag; source `(q,sigma)` for the native decision plus destination label for lossless structural lowering | Native `(q_next,sigma_next,direction)` writes symbol and moves tag while preserving destination symbol; atomic UPDATE | Reuse T09 axes with payload tag, total sparse field, terminal outcome; no `SingleControl`/Turing executor |
 | T13 | Discrete variable-support `t+1D` word; finite symbol labels | Every old occurrence; self symbol | Block replacement per occurrence; ordered snapshot-parallel concatenate UPDATE | Add ordered replacement UPDATE policy within runner; no substitution executor |
 | T16 | T13 word configuration | Rule-major/leftmost match; exact matched span | One replacement block; exactly-one splice UPDATE | Add program-coupled frontier and schedule restriction over ordered replacement |

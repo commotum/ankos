@@ -52,6 +52,10 @@ guards = {
     898: "compressed form below corresponds to 50,000 steps",
     904: "example shown on the facing page",
     912: "Each column above shows 400 steps",
+    5872: "pictures on the next two pages",
+    5880: "Examples of mobile automata from Chapter 3",
+    5896: "causal networks for rules (e) and (f) from the previous page",
+    5902: "Causal networks corresponding to rules (e) and (f) from page 493",
     11982: "mobile automaton on page 73",
     11993: "Join[Take[list, {1, n-2}], #1, Take[list, {n+2, -1}]]",
     11996: "65,318 mobile automata of the type described here",
@@ -62,66 +66,85 @@ guards = {
 for line_number, fragment in guards.items():
     assert fragment in lines[line_number - 1], (line_number, fragment)
 
-# The semantic closure starts from the construction/caption/Notes/variant roots
-# rather than every generic mobile-automaton boundary retained by the source
-# audit. This prevents page-71 T09, T11/T12, causal-network, emulation, 2D, and
-# network-mobile material from entering merely by proximity.
+# The strict semantic subledger starts from construction/caption/Notes/variant
+# roots rather than every generic mobile-automaton boundary retained by the
+# source audit. Q_STRICT adds the explicitly pointed page-75 plate.
 ROOT_ANCHORS = {882, 890, 898, 11982, 11993, 12002, 16066, 16068}
-C4 = {
+STRICT_C4 = {
     line_number
     for line_number in images
     if min(abs(line_number - source) for source in ROOT_ANCHORS) <= 4
 }
-Q = {906, 908, 910}
-assert C4 == {
+Q_STRICT = {906, 908, 910}
+assert STRICT_C4 == {
     886, 888, 892, 896, 900, 902, 11998, 12000, 12004, 12006, 16070,
 }
-assert Q.isdisjoint(C4)
-U = C4 | Q
+assert Q_STRICT.isdisjoint(STRICT_C4)
+STRICT_U = STRICT_C4 | Q_STRICT
 
-# A second diagnostic applies the same radius to all 88 retained source lines.
-# Its 21 extra files are frozen below but excluded from U: each is generic T09,
-# a sibling construction, a derived/emulation view without an exact T10 run
-# identity, or an adjacency-only control. This accounts for the source oracle
-# without inflating the T10 asset universe.
-SOURCE_C4 = {
+# The zero-remainder audit ledger applies the radius to all 88 retained source
+# lines. Its broad relation/control members are not T10-native evidence. Q
+# completes the explicitly governed two-page causal plate and its exact
+# same-rule numbered view: BOOK:5872 says "next two pages", BOOK:5880 governs
+# all seven cases, and BOOK:5896 points to the facing-page views of the same
+# rules (e) and (f).
+C4 = {
     line_number
     for line_number in images
     if min(abs(line_number - source) for source in S) <= 4
 }
-OUTER_REJECTED = SOURCE_C4 - U
-assert len(SOURCE_C4) == 35
-assert OUTER_REJECTED == {
-    858, 860, 866, 876, 922, 926, 932, 944, 946, 5834, 5878,
-    5932, 5934, 7928, 7932, 7934, 8006, 8018, 14273, 16650, 16658,
+Q = {5882, 5886, 5900}
+assert C4 == {
+    858, 860, 866, 876, 886, 888, 892, 896, 900, 902, 906, 908, 910,
+    922, 926, 932, 944, 946, 5834, 5878, 5932, 5934, 7928, 7932,
+    7934, 8006, 8018, 11998, 12000, 12004, 12006, 14273, 16070,
+    16650, 16658,
 }
+assert Q.isdisjoint(C4)
+U = C4 | Q
+OUTER = U - STRICT_U
+assert len(OUTER) == 24
+assert hashlib.sha256(",".join(map(str, sorted(OUTER))).encode("ascii")).hexdigest() == (
+    "dc4b3c6685d88b90309af88c99bebc72a240fca1320fa284859e14adc563a8d5"
+)
 
 # C: direct construction evidence: a strict T10 rule table or the independently
 # evidenced reversible three-cell-write variant. O: direct observer evidence:
-# an evolution or compressed run. R: the later mixed active-motion/rule plate
-# explicitly tied to pages 73-75. X: three inspected Notes controls. C/O
-# classify evidence role only; raster layout is never native configuration,
-# RULE, UPDATE, or trace representation.
+# an evolution or compressed run. R: typed contrast, sibling, observer, or
+# representation relations. X: mechanical adjacency-only controls. C/O
+# classify direct evidence role only; raster layout is never native
+# configuration, RULE, UPDATE, or trace representation.
 C = {888, 896, 910, 16070}
 O = {886, 892, 900, 902, 906, 908}
-R = {12004}
-X = {11998, 12000, 12006}
+R_T09_CONTRAST = {858, 860, 866, 876, 5834}
+R_SIBLING_BOUNDARY = {922, 926, 932, 944, 946}
+R_OBSERVER = {5878, 5882, 5886, 5900, 12004}
+R_REPRESENTATION = {5932, 5934, 7928, 7932, 7934, 8006, 16650}
+R = R_T09_CONTRAST | R_SIBLING_BOUNDARY | R_OBSERVER | R_REPRESENTATION
+X = {8018, 11998, 12000, 12006, 14273, 16658}
 groups = (C, O, R, X)
 assert all(groups[a].isdisjoint(groups[b]) for a in range(4) for b in range(a))
 assert C | O | R | X == U
 assert (len(C4), len(Q), len(U), len(C), len(O), len(R), len(X)) == (
-    11, 3, 14, 4, 6, 1, 3
+    35, 3, 38, 4, 6, 22, 6
 )
+assert C | O == STRICT_U - {11998, 12000, 12004, 12006}
 
 REASON: dict[int, str] = {}
 for line_number in C:
     REASON[line_number] = "strict T10 rule diagram or reversible triple-write rule"
 for line_number in O:
     REASON[line_number] = "strict T10 evolution/compressed observer; not native state"
-for line_number in R:
-    REASON[line_number] = "later mixed active-motion/rule relation for pages 73-75"
+for line_number in R_T09_CONTRAST:
+    REASON[line_number] = "ordinary one-cell-write mobile contrast"
+for line_number in R_SIBLING_BOUNDARY:
+    REASON[line_number] = "generalized-mobile or Turing sibling boundary"
+for line_number in R_OBSERVER:
+    REASON[line_number] = "derived causal/motion observer relation"
+for line_number in R_REPRESENTATION:
+    REASON[line_number] = "substitution/CA/network representation or topology relation"
 for line_number in X:
-    REASON[line_number] = "adjacency-only T09 distribution or cropped T11 heading control"
+    REASON[line_number] = "adjacency-only Turing, T09, T11, network, or 3D control"
 assert set(REASON) == U
 
 
@@ -217,21 +240,32 @@ def ledger() -> tuple[str, int, int, int]:
     return payload, monolith_references, split_references, len(hashes)
 
 
-EXPECTED_UNIVERSE_SHA256 = "8914fda71f91933f3de2785ed01470291443a3fe75ee709e0d0621f306353354"
-EXPECTED_LEDGER_SHA256 = "25bda40f87de92226bbe1ed6b6461987429814aec3e7574efc637fdd3590304a"
+EXPECTED_STRICT_UNIVERSE_SHA256 = "8914fda71f91933f3de2785ed01470291443a3fe75ee709e0d0621f306353354"
+EXPECTED_STRICT_LEDGER_SHA256 = "25bda40f87de92226bbe1ed6b6461987429814aec3e7574efc637fdd3590304a"
+EXPECTED_UNIVERSE_SHA256 = "c65ce970d643cda4cc441d0ec5e8567beee3cfd5a0fe42a3146c6311e6bb95ed"
+EXPECTED_LEDGER_SHA256 = "e569e03f4bd1830789a40ee29ce5928165446c2d741125828608a61123e9ae29"
 
 
 def main() -> None:
     universe_payload = ",".join(map(str, sorted(U))).encode("ascii")
     assert hashlib.sha256(universe_payload).hexdigest() == EXPECTED_UNIVERSE_SHA256
+    strict_universe_payload = ",".join(map(str, sorted(STRICT_U))).encode("ascii")
+    assert hashlib.sha256(strict_universe_payload).hexdigest() == EXPECTED_STRICT_UNIVERSE_SHA256
     payload, monolith_references, split_references, hashes = ledger()
-    assert len(payload.splitlines()) == 14
+    assert len(payload.splitlines()) == 38
     assert hashlib.sha256(payload.encode("utf-8")).hexdigest() == EXPECTED_LEDGER_SHA256
-    assert (monolith_references, split_references, hashes) == (14, 14, 14)
+    strict_rows = [
+        row for row in payload.splitlines()
+        if int(row.split("|", 1)[0]) in STRICT_U
+    ]
+    strict_payload = "\n".join(strict_rows) + "\n"
+    assert len(strict_rows) == 14
+    assert hashlib.sha256(strict_payload.encode("utf-8")).hexdigest() == EXPECTED_STRICT_LEDGER_SHA256
+    assert (monolith_references, split_references, hashes) == (38, 38, 38)
     print(
-        "T10 asset oracle: PASS source=88; C4/Q=11/3; source_C4/rejected=35/21; "
-        "assets=14; classes C/O/R/X=4/6/1/3(direct=10); "
-        "refs=28(monolith=14,split=14); unique_hashes=14"
+        "T10 asset oracle: PASS source=88; C4/Q=35/3; assets=38; "
+        "strict=14; classes C/O/R/X=4/6/22/6(direct=10); "
+        "refs=76(monolith=38,split=38); unique_hashes=38"
     )
 
 

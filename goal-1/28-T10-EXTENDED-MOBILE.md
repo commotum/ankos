@@ -73,12 +73,13 @@ Exhaustively reconstruct the page-73 mobile-automaton extension and decide wheth
 | Q14 | executable `Join`/`Take`/`ReplacePart` forms | `5 / 5 / 0` |
 | Q15 | hostile multiple-cell/block update wording | `3 / 3 / 0` |
 | Q16 | `65,536` T09 boundary | `7 / 7 / 0` |
+| Q17 | pseudocode `new_left/new_self/new_right` vocabulary | `0 / 0 / 0` |
 
 The union is 183 unique lines, digest `e9d4066e4446c0ea8481ef9ba215f9fce60400019b3484064887cead0f7af421`: 161 pre-Index lines and 22 actual-Index lines. Context adjudication partitions the pre-Index union into 66 matched retained and 95 excluded. Twenty-two non-hit continuations complete tables, executable bodies, and contrasts, yielding 88 retained lines with digest `b840e59085605f26a24f07a1100fa4ccc4390be1eb37a274a8e6e68588681f1c` and a 205-line declared audit universe.
 
 ### Split, Atlas, and catalog closure
 
-- All 17 split Markdown documents are hashed and searched. The 183 monolith query records map to `171 exact + 12 extraction variants`; the 88 retained lines reverse-map as `83 exact + 5 variants`.
+- All 17 physical split Markdown documents are hashed and searched without trusting extraction-shifted folder names or line structure. The 183 monolith query records map to `171 exact + 12 explicit fragment/join variants`; the 88 retained lines reverse-map as `83 exact + 5 variants`. There is no split-only T10 evidence.
 - The 542-line Atlas has only generic hits at lines `7,81,83`; it supplies no T10 name, rule cardinality, or additional construction.
 - CSV line 11 and taxonomy section 10 are pinned. Their `Extended Mobile Automata` label is absent from the source, so it is catalog traceability, not a source quotation.
 - Both monolith and split copies corrupt the displayed page-73 `MAStep` line. The eight-row table and the visible `Join[Take[...,n-2], block, Take[...,n+2]]` bounds unambiguously establish replacement of `n-1..n+1` followed by position `n+d`; the extracted line is not claimed executable verbatim.
@@ -142,6 +143,8 @@ T11 changes activity cardinality/results, T12 changes the read/control product, 
 
 > For the mobile automaton on page 73, the rule can be given
 
+Normalized from the preserved escaped Notes table:
+
 ```text
 111 -> {000,-1}
 110 -> {101,-1}
@@ -204,7 +207,7 @@ The full state trajectory precedes the observer. Active position, motion plot, c
 
 > Given a mobile automaton like the one from page 73 ... [a] causal-invariant substitution system ... emulates it
 
-These support transparent tagged labels and exact compiler relations. They do not make an arbitrary four-color CA table or a substitution rule the native T10 program.
+The CA passages are for the page-71/basic scalar-output mobile rule and support transparent tagged state plus the existence of exact one-step compiler relations in that scope. The substitution passage directly covers the page-73 wider-write rule. None proves that a basic radius-one CA compiler works unchanged for T10, and none makes an arbitrary four-color CA table or a substitution rule the native T10 program.
 
 ### E11 — native execution has no intrinsic halt
 
@@ -216,7 +219,7 @@ Strict total T10 therefore has one successor per event. Horizon, realization fai
 
 ## Asset Ledger
 
-`goal-1/28-T10-asset-oracle.py` derives a fixed point from every retained source line: a mechanical distance-four set of 35 images plus the two explicitly governed continuation images at `BOOK:5882,5886`. It pins physical path, byte count, dimensions, SHA-256, monolith line, split file/line, source/asset hashes, and the complete ledger digest `9c031dc0878d3e8fcacea4669fe175fd290a8f86a3cee711607f25a80a79c668`.
+`goal-1/28-T10-asset-oracle.py` derives a fixed point from every retained source line: a mechanical distance-four set of 35 images plus the two explicitly governed continuation images at `BOOK:5882,5886`. It pins physical path, byte count, dimensions, SHA-256, monolith line, split file/line, source/asset hashes, and the complete ledger digest `9c031dc0878d3e8fcacea4669fe175fd290a8f86a3cee711607f25a80a79c668`. The direct/adjacent strict 14-file subledger is independently frozen at universe digest `8914fda71f91933f3de2785ed01470291443a3fe75ee709e0d0621f306353354` and ledger digest `25bda40f87de92226bbe1ed6b6461987429814aec3e7574efc637fdd3590304a`; the broader 37-file universe prevents silent relation/control omissions without promoting them.
 
 | Class | BOOK image lines | Disposition |
 |---|---|---|
@@ -328,3 +331,194 @@ For `h` requested transitions from a default field, a finite exact realization m
 - **T12:** owns payload head states and symbol-only source reads.
 - **2D/network mobile:** distinct DOMAIN/topology and read/replacement schemas; not flags on strict T10.
 
+## Current API Fit
+
+The broad intended SimpleProgram algebra is the correct fit; the present `simple_programs.md` is a CA-shaped realization of it. T10 calls for axis generalization, not a second top-level construction.
+
+| T10 responsibility | Current document fit | Classification | Smallest correction |
+|---|---|---|---|
+| discrete `t+1D` task space | `simple_programs.md:115-198` names `t+1D` and ordered coordinates | `DIRECT` for dimensional responsibility; realization caveat | keep DOMAIN dimensional character separate from native integer support and finite `SHAPE` |
+| tagged binary cell | `:200-234` admits finite values but not structural product/tagged schemas and invariants | `PRINCIPLED EXTENSION` already required by T09/T12 | add finite tagged/product ALPHABET schemas and exactly-one-tag configuration validation |
+| unique firing source | `:1412-1510` defines FRONTIER as writable next coordinates | `SEMANTIC MISMATCH` in current wording | restore D009: FRONTIER selects the unique active rule-firing locus |
+| physical left/self/right read | `:360-420` gives current-snapshot relative offsets and ordered selectors | `PARAMETERIZATION` | reuse radius-one offsets with a typed projection from `Plain/Active` to underlying bit |
+| structural exhaustive table | `:1795+` has ordered exhaustive lookup responsibility | `PARAMETERIZATION` | generalize table output schema from one alphabet scalar to a closed typed product |
+| three complete writes | `:1767-1791` returns one value for each writable coordinate | `PRINCIPLED EXTENSION` of current realization; `DIRECT` reuse of D011 | RULE returns the source-native block/direction and lowers losslessly to three relative label writes |
+| atomic commit | `:1510,1791,2191-2197` already requires one old snapshot and parallel writes | `DIRECT` execution responsibility | reuse generic `AtomicFiniteWrites`; do not add a T10 UPDATE policy |
+| unchanged outside block | current non-frontier copy-forward at `:1785-1787,2197` | `DIRECT` | generic finite-write UPDATE preserves all non-target labels |
+| one deterministic successor | current schema generates one next state | `DIRECT` | return ordinary one-successor `StepResult` with event witness |
+| unbounded semantic line | finite `D`, `SHAPE`, and boundary extension are realization-oriented | `SEMANTIC MISMATCH` if treated as native | use T09/T08 total-field and explicit finite-lowering responsibilities |
+| full tagged trace | scalar trajectory field at `:87-113` | `PRINCIPLED EXTENSION` already required | preserve complete structured configurations before encoding/visualization |
+
+The conceptual pipeline is therefore unchanged:
+
+```text
+active = UniqueTag.select(X)
+reads  = OrderedRelativeRead([-1,0,+1], UnderlyingBit).read(X, active)
+native = OrderedTable.evaluate(reads)          # Block3(Bit) x Direction
+writes = lower(native, active)                 # three complete Cell labels
+next   = AtomicFiniteWrites.apply(X, active, writes)
+```
+
+The explicit lowering is an architectural boundary: it is total, typed, invertible on valid T10 row results, and exhaustively tested. It is not a compatibility shim.
+
+## Current Runtime Fit
+
+| Current surface | Evidence from current files | Classification | Goal 2 migration |
+|---|---|---|---|
+| `alphabets.py` | `Value = int | float | str` and flat `Alphabet.values` at `:40-56` | `SEMANTIC MISMATCH` for transparent tags | add generic product/tagged-union schemas, member references, structural codecs, and invariant-aware validation |
+| `frontiers.py` | doc and `Frontier` at `:1-51` define update-site masks; only `time_slice` is executable | `SEMANTIC MISMATCH` | generalize to typed firing loci and add `UniqueTag`; retain `time_slice` as the all-sites preset |
+| `loci.py` | coordinate universes and selectors at `:31-60,179+` are reusable only for finite tensor coordinates | `PARAMETERIZATION` plus support extension | retain ordered relative-coordinate machinery, add typed structural/source loci without callbacks |
+| `neighborhoods.py` | `literal_offsets` at `:140-174` expresses the geometry | `PARAMETERIZATION` | reuse ordered offsets and add typed underlying-bit projection/support reads |
+| `rules.py` | `Rule` stores family strings/`Any` callback at `:30,64-78`; lookup returns scalar at `:262-295` | `SEMANTIC MISMATCH` | closed generic `OrderedTable[Read,Result]`, structural result schemas, no unrestricted `formulaic` fallback |
+| `specs.py` | `Dynamics` uses `Any`, dense shape, family decoders, and only `time_slice` at `:23-55,117-198` | `SEMANTIC MISMATCH` | decode structural axis specs through a typed registry; keep preset/catalog names outside executor control flow |
+| `rollout.py` | `_rollout_states`/batch branch on family at `:145-212`; `_ensure_time_slice` rejects every other frontier at `:825-831` | `SEMANTIC MISMATCH` | replace family branches with the common runner and typed UPDATE polymorphism |
+| spatial lookup | `_next_spatial_state` at `:643-660` computes a dense scalar next array directly | `SEMANTIC MISMATCH` for source-relative compound results | collect native row results/writes and commit generically; preserve dense vectorization as a realization optimization only after equivalence proof |
+| seed path | current arrays and T08-audited scalar rendering | `SEMANTIC MISMATCH` for tagged invariant state | accept one complete validated tagged configuration; reuse T08 constructors/lowerings |
+| `RawEpisode` | `np.ndarray` state at `specs.py:58-81` | `SEMANTIC MISMATCH` | structured complete configurations and event witnesses first; dense encodings remain explicit adapters |
+| tests | `tests/test_rollout.py:529-544` proves unsupported frontiers are rejected; no mobile/tag/multiwrite tests exist | current behavior evidence only | add cross-family same-runner, commutation, invariant, atomicity, edge, and serialization tests |
+
+No current behavior can execute T10 faithfully by selecting another family string. `formulaic(fn)` would hide the construction in a callback; a four-state dense CA would change native identity and, for direct one-step target-local lowering, require a proved radius-two compiler. Both are forbidden substitutes for the small generic axis revisions above.
+
+## Principles Audit
+
+- Principle 0 requires re-derivation rather than protecting CA-shaped wording. The source proves the current one-value RULE realization is too narrow, not that the SimpleProgram algebra fails.
+- Principles 1-3 classify T10 by construction responsibilities: the active cell is FRONTIER, its old physical triple is NEIGHBORHOOD, the table returns a typed block/move result, and UPDATE composes three label writes.
+- Principle 4 directly supports explicit typed multi-write results. T10 is the smallest concrete adversary showing that “one firing source” and “one scalar target” are different.
+- Principle 5 is satisfied by either lossless complete-state form. Active control is visible in the tagged ALPHABET role; it is not executor state and need not be a separate runtime class.
+- Principles 6-8 keep integer-line topology, source-relative offsets, finite addresses, sparse/default storage, and raster encodings distinct.
+- Principles 9-10 justify a strict named preset that returns an ordinary generic specification. The block/direction result is intrinsically coupled to the binary radius-one table and is validated as one closed product, not decomposed into freely incompatible flags.
+- Principle 11 keeps atomic synchronous commit as defining semantics. It may not be sequentialized merely because the event has one source.
+- Principle 12 keeps compression, motion plots, causal networks, batches, and images downstream of the native trace.
+- Principles 13-15 are covered by the `000 -> 111,+1` adversary, exhaustive commuting square, radius-two CA-lowering counterexample, invalid-head cases, finite-edge failures, exact table/trajectory, and cross-runner tests.
+- Principle 16 treats the block/direction-to-label-write map as an explicit total mapping between layers, not a fallback. There is one runner and no T10 switch.
+
+The smallest honest classification is:
+
+1. Same DOMAIN/support, tagged ALPHABET, exactly-one invariant, FRONTIER, NEIGHBORHOOD, movement set, UPDATE, successor algebra, seed relation, and trace responsibilities as T09.
+2. A proper parameterization/extension of strict T09's RULE result from `Bit x Move` to `Bit^3 x Move`.
+3. A lossless tagged/product representation of the Notes' factored state and result.
+4. **No new execution algebra.** No T10 transition supplies a counterexample to generic atomic finite writes.
+
+## Dependent Decision Audit
+
+T10 strengthens rather than reopens D009-D014:
+
+| Decision | T10 result |
+|---|---|
+| D009 | One active firing source can name three write targets. FRONTIER cannot mean the union of writable coordinates. |
+| D010 | `Plain(bit) | Active(bit)` is a transparent complete-state ALPHABET role, with exactly one tag; no `SingleControl` mandate returns. |
+| D011 | The existing generic finite typed-write capability is sufficient. T10 supplies the first exact three-target fixture but no new UPDATE law. |
+| D012 | Physical `[left,self,right]` order remains shared. T10 structural table identity is primary; the optional four-plane codec is explicitly derived. |
+| D013 | Raw traces preserve tagged configurations and native block/move/write witnesses before compression or causal observation. |
+| D014 | T10 corroborates the same lossless-tag principle used by T12; it does not change head payload semantics. |
+
+T09 needs only the already-intended clarification that its center-only underlying-bit write is a preset restriction, not a universal RULE/UPDATE limit. T12 remains closed. T11 remains pending because T10 has one source and distinct targets and therefore provides no evidence for multi-source overlap, splitting, disappearance, or collision composition.
+
+### D122 — Extended mobile widens a typed RULE result, not the execution algebra
+
+- **Status:** ACTIVE after source, asset, semantic, and architecture closure.
+- **Basis:** `BOOK:882` explicitly widens the written cells and gives `2^32` rules; `BOOK:11982-11993` gives `Bit^3 -> Bit^3 x {-1,+1}` and replaces `n-1..n+1` before carrying `n+d`; `BOOK:16066-16070` restricts the same result shape for reversible examples.
+- **Configuration:** discrete `t+1D` fixed line with `Plain(Bit) | Active(Bit)` and exactly one active tag, losslessly equivalent to `(bit_field,active_position)`.
+- **Execution:** `UniqueTag` selects one source; ordered old `[L,C,R]` bits are read; one total eight-row table returns `(new_left,new_center,new_right,d)`; a closed lowering emits three distinct complete label writes with the unique active tag at offset `d`; generic atomic finite-write UPDATE commits from one snapshot and preserves all other labels.
+- **Identity:** the structural table and typed result schema are primary. There are `16^8` rules and no source-defined integer codec. Reversibility, seed, horizon, finite realization, compiler, trace, and observer identities are separate.
+- **Consequence:** add no T10 state class, control payload, UPDATE law, executor, callback, family branch, or collision policy. Goal 2 consumes generic tagged alphabets, invariants, source frontiers, ordered projections, typed tables/results, finite writes, `StepResult`, and serialization already required by shared stages.
+
+## Detailed Implementation Plan
+
+1. **COMPLETE:** freeze and disposition direct name, mobile/active/movement, cardinality, Notes implementation, page route, variant, observer, alias, hostile wording, and actual-Index searches.
+2. **COMPLETE:** reverse-map every query/retained line through all 17 split documents and the Atlas; pin source corruption and zero unresolved remainder.
+3. **COMPLETE:** close the governed raster fixed point with exact physical identities, split references, hashes, semantic classes, and explicit relation/control exclusions.
+4. **COMPLETE:** reconstruct the table, state, read, block/move result, lowering, atomic commit, rule count, continuation, boundary, variants, relations, and observers before API comparison.
+5. **COMPLETE:** audit `simple_programs.md`, `src/ca`, tests, T09/T12, D009-D014, and the corrected SimpleProgram architecture from current files.
+6. **COMPLETE:** implement dependency-free rule-space, trajectory, atomicity, factored/tagged commutation, derived-codec, and radius-two-compiler adversaries in `goal-1/28-T10-semantic-oracle.py`.
+7. **COMPLETE:** specify the Goal 2 stage, hostile conformance groups, no-cheating checks, and D122; run independent review and repository gates before global integration.
+
+## Goal 2 Implementation Stage
+
+### G2-T10 — typed fixed-block mobile results over the shared runner
+
+Implement after the generic configuration/tag/source-frontier/finite-write work shared with G2-T09 and before T11 collision semantics. The stage adds one strict result/table preset and conformance suite, not another runner.
+
+| Goal 2 surface | Required work |
+|---|---|
+| dependencies | G2-T01 configuration/runner shell; G2-T02 ordered finite tables/codecs; G2-T08 valid initial configurations and finite lowerings; G2-T09 tagged active cells, `UniqueTag`, bit projection, movement, atomic finite writes, and complete traces |
+| ALPHABET/configuration | construct `Plain(Bit) | Active(Bit)` through generic tagged-union data; validate exact one tag and fixed ordered line support; retain a checked factored view and round-trip proof without duplicate authority |
+| FRONTIER | reuse `UniqueTag("active")`; return one stable source handle and reject zero/multiple tags before reads |
+| NEIGHBORHOOD | reuse ordered relative offsets `[-1,0,+1]` and an explicit underlying-bit projection; validate physical order and old-snapshot scope |
+| RULE schema | add/use a generic closed total `OrderedTable[Bit^3, Block3(Bit) x Direction]`; require all eight unique rows, three typed output bits, and `d in {-1,+1}` |
+| lowering | implement a closed structural map from `(block,d,source)` to exactly three relative complete-cell writes; tag the new bit at offset `d`, not the old destination bit; provide inverse on valid lowered rows |
+| UPDATE | reuse `AtomicFiniteWrites`; require distinct in-support targets, validate all writes/result invariants before commit, and emit no partial/intermediate state on failure |
+| `StepResult`/trace | retain source handle, ordered read, native block/move row result, normalized writes, validation evidence, before/after configuration references, and ordinary one-successor `Advanced` outcome |
+| strict preset | `extended_mobile_binary(table)` resolves to an ordinary `SimpleProgram` with the shared axes. The catalog name never enters runner dispatch. Seed, support realization, boundary, horizon, and observers remain separate inputs/records |
+| identity/serialization | version structural table order and result schema; round-trip arbitrary-precision derived codecs only when explicitly requested; keep native program, codec, reversible claim, compiler, run, trace, and view digests separate |
+| finite realization | use T08 horizon lowering or explicit boundary/topology records; prevalidate the entire read/write footprint. Edge failure is a typed realization failure, not semantic halt or truncation |
+| optional compiler | if implemented, provide a separate proved mapping to a constrained composite-alphabet CA. Pin required target radius and invariant-valid image; never replace native table identity or admit arbitrary CA rules as T10 rules |
+| migration | remove any need to route mobile systems through `formulaic`, scalar lookup, `time_slice`, hidden active metadata, or family branches. Preserve existing CA results through the same runner as a separate preset |
+
+### Acceptance groups
+
+1. **Exact table:** encode all eight Notes rows in physical input/output-offset order; reject missing, duplicate, extra, malformed, or nonbinary rows and movement `0`.
+2. **Rule space:** prove eight inputs, sixteen row results, and `16^8 = 2^32`; keep the structural table primary and test any optional codec as a versioned bijection.
+3. **Destination-new-bit adversary:** `000 -> 111,+1` must yield `Plain(1),Plain(1),Active(1)` at offsets `-1,0,+1`; strict T09 composition must fail this fixture.
+4. **Both directions:** cover tag movement left and right while writing every underlying output bit exactly once.
+5. **Atomicity:** derive all writes from one snapshot, preserve outside labels, and expose no zero-head/two-head intermediate configuration. Failed validation commits nothing.
+6. **Exhaustive representation commutation:** for all `8 * 16 * 16 = 2,048` local/result/outside cases, prove tagged and factored steps equal and inverse round trips hold.
+7. **Exact trajectory:** replay the all-zero `t0..t12` Notes-table checkpoint independently in factored and tagged forms.
+8. **Configuration invariants:** reject zero/multiple active tags, wrong underlying type, invalid support, duplicate sources, and unsynchronized factored/tagged caches; preserve exactly one valid tag after every event.
+9. **Identity:** distinguish states with equal bit planes and different active loci; distinguish tables, result schemas, codecs, seeds, horizons, realizations, and observers.
+10. **Boundary/continuation:** prove native deterministic continuation separately from finite edge failure, genuine finite topology, explicit boundary approximation, and external horizon/stop.
+11. **Same runner:** execute representative T01, T09, T10, and T12 programs through one runner with no catalog/family condition below preset resolution.
+12. **Compiler radius:** pin the page-73 target-radius-one counterexample and require radius two or an independently proved alternative for a one-step all-sites CA lowering.
+13. **Reversible restriction:** validate the source constructor as a property/subset of ordinary T10 tables; do not add a reversible executor or infer a source rule number.
+14. **Trace/serialization:** round-trip complete tagged configurations and native event witnesses; active-motion/compression/causal views must be reproducible from traces but unable to feed state.
+15. **Static no-cheating:** reject T10 switches, `Any`/callbacks, hidden active positions, opaque whole-machine values, arbitrary four-state CA substitution, sequential in-place mutation, fake capacity, invented collision policies, and observer-defined behavior.
+
+Completion requires exact source/asset fixtures, public typed schemas, cross-family runner tests, exhaustive commuting-square coverage, static branch/callback scans, serialization tamper tests, finite-lowering adversaries, and no regression in existing canonical CA/mobile/Turing fixtures.
+
+## No-Cheating Checks
+
+- No `ExtendedMobileState`, `ExtendedMobileUpdate`, T10 executor, family flag, rollout branch, callback, or opaque packed machine.
+- No conflation of the current CA-shaped public realization with the intended SimpleProgram abstraction; fix axes at their owning responsibility.
+- No use of the catalog label or taxonomy summary as construction evidence.
+- No bare `Bit | ActiveMarker` union that loses the bit under the active tag; no separate unsynchronized control cache.
+- No strict T09 result falsely claimed sufficient: both neighbor bits and the destination's new bit must be applied.
+- No sequential `ReplacePart` loop whose intermediate states are observable or whose order changes the result.
+- No union of write targets called FRONTIER; the one old active source is the firing locus.
+- No arbitrary radius, alphabet size, stay move, multi-active split/disappear behavior, overlap/collision policy, boundary, or halt inferred from strict T10.
+- No source-corrupted Notes line copied as executable code; preserve the repair and table/bounds evidence.
+- No numeric rule code invented as native identity; the optional `(115,37,103,196)` planes remain an explicitly inferred codec.
+- No arbitrary four-color CA table presented as the compact T10 program; any compiler must be lossless, invariant-restricted, one-step commuting, and radius-correct.
+- No finite tensor, wrap/reflect/fixed exterior, crop, padding, or edge exception presented as the native integer line.
+- No compressed history, motion plot, causal graph, raster, behavior class, search frequency, or reversible claim fed into execution.
+- No T11 collision semantics derived from T10's one-source/distinct-target case.
+- No weakened T09/T12 tests or reopened storage-class mandate; T10 reuses their corrected visible tagged roles.
+
+## Completion Requirements
+
+- [x] Every declared source query, candidate, governed continuation, split/Atlas/Index route, and source limitation is frozen and dispositioned with zero unresolved remainder.
+- [x] Every governed asset is physically pinned or explicitly rejected as relation/control material; direct rule/evolution/reversible evidence remains separate from raster representation.
+- [x] State, DOMAIN/support, ALPHABET/control, read, table, result, lowering, atomic commit, cardinality, successor, boundary, seed, variant, relation, and observer semantics are reconstructed from source evidence.
+- [x] Current API/runtime/tests and all D009-D014 dependencies are audited from actual files under the broad SimpleProgram architecture.
+- [x] D122 and a dependency-aware Goal 2 handoff identify the smallest generic changes and adversarial completion evidence without a new execution algebra.
+- [x] Source, asset, semantic, representation, compiler-radius, coverage, Markdown, diff, scope, hostile-review, and repository-test gates pass before completion.
+
+## Re-Integration Audit
+
+1. **Prior assumption invalidated?** No active corrected decision fails. T10 further invalidates only the historical CA-shaped assumption that FRONTIER is a writable set and RULE returns one scalar; D009/D011 already retired it.
+2. **Existing primitive reuse?** Yes. T10 reuses T09's complete state/source/read/movement and D011's atomic finite writes, parameterizing only the source-native RULE result and fixed footprint.
+3. **Exception/flag/hidden state/callback?** None. The strict preset resolves to ordinary typed axes and a total structural lowering.
+4. **Complete Markov state/trace?** Yes. The tagged field contains every bit and the unique active locus; full snapshots and event witnesses reproduce the factored trace exactly.
+5. **DOMAIN/support/value/control/representation separation?** Yes. Discrete `t+1D`, fixed integer support, tagged binary values, active role, sparse/dense storage, and raster/compiler encodings remain distinct.
+6. **Defining versus incidental algorithm?** Atomic three-label replacement and movement are defining. Notes host syntax, finite guard, search method, compression, CA/substitution emulation, and visualization are incidental implementations/relations/observers.
+7. **ANKoS encoding fidelity?** Complete structured configurations and event witnesses are canonical. Any `[t,x,y,z]`/tensor encoding must preserve tag and bit and prove its realization relation; a color-only or motion-only projection is lossy.
+8. **Reopened completed stages?** None. T09/T12 remain architecture-closed; T09's center-only result is simply a narrower preset.
+9. **Goal 2 dependency changes?** G2-T10 consumes G2-T08/G2-T09 generic tagged-state and finite-write work, contributes the fixed-block result fixture before T11, and adds the radius-two compiler guard. It adds no runner/update dependency.
+10. **Overall API simpler/coherent?** Yes. One explicit product result and one lossless lowering replace any temptation for a control class, family executor, sequential patcher, or arbitrary CA disguise.
+
+## Stage Results
+
+COMPLETE after exhaustive source, split, Atlas, Index, asset, semantic, runtime, and architecture closure. The exact 18-query protocol yields a 183-line union at `161 pre-Index / 22 actual-Index`; context partition is `66 retained matches / 95 excluded / 22 Index`, plus 22 governed continuations for 88 retained lines. All 17 split documents close at `171 exact + 12 mapped query variants` and `83 exact + 5 mapped retained variants`. The catalog name, replacement/write-window jargon, and normalized `new_left/new_self/new_right` vocabulary are absent; the source-native construction is the unnamed page-73 extension. Zero source candidate remains unresolved.
+
+T10 is `Bit^3 -> Bit^3 x {-1,+1}` over the same one-active binary line as T09. Its result lowers to three distinct complete tagged labels and reuses generic atomic finite-write UPDATE. The destination carries its new block bit; `000 -> 111,+1` proves strict T09's center-only result is insufficient. `16^8 = 2^32`; no canonical T10 number is invented. Factored and tagged states commute through all 2,048 exhaustive local/result/background cases, the exact `t0..t12` trace replays, and the optional bit planes `(115,37,103,196)` are explicitly derived. A one-step full-slice CA compiler is separately guarded by a target-radius-two counterexample.
+
+The governed asset universe and direct subset are fully dispositioned with no silent remainder; construction plates, evolutions, compression, motion, relation/control images, and reversible rules remain semantically separated. D122 is ACTIVE. No prior stage reopens; T11 remains responsible for multiple-source creation/deletion and collisions. Source/asset oracles pass from the repository root and `/tmp` and fail closed under `-O`; the semantic oracle, independent architecture review, Markdown/diff/scope/coverage gates, and all repository tests pass. Next: T11.
