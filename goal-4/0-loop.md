@@ -267,7 +267,7 @@ Every build must prove:
 
 - all raw inputs match frozen hashes;
 - every monolith author-text block maps exactly once into `CANONICAL_AUTHOR_TEXT`;
-- every authoritative authorial page region maps to canonical output, `NOT_APPLICABLE`, or a release blocker;
+- every authoritative authorial page region maps to canonical output or a release blocker, and every `NOT_APPLICABLE` region is demonstrably non-authorial;
 - every canonical author-text span maps to raw content or witness-backed insertion evidence;
 - all exclusions are typed and justified;
 - output author text contains no unlogged change;

@@ -294,7 +294,7 @@ Execution will create and maintain:
 
 - `goal-4/corpus-manifest.json`: raw file hashes, sizes, line counts, roles, image dimensions, and Git identity.
 - `goal-4/witness-manifest.json`: authoritative sources, edition fingerprint, complete physical-page/plate census, page-region coverage/legibility, acquisition metadata, hashes, permissions, mount contract, and trust roles.
-- `goal-4/witness-region-ledger.jsonl`: every authoritative page/column/figure/text region to canonical repaired output, `NOT_APPLICABLE`, or a release-blocking gap.
+- `goal-4/witness-region-ledger.jsonl`: every authoritative page/column/figure/text region to canonical repaired output, an evidenced/independently reviewed non-authorial `NOT_APPLICABLE` reason, or a release-blocking gap.
 - `goal-4/structure-ledger.jsonl`: the 29 documents, stable raw blocks, boundaries, headings, page associations, and ownership.
 - `goal-4/provenance-map.jsonl`: bidirectional raw/witness-region↔repaired-span mappings and inverse operations.
 - `goal-4/repair-ledger.jsonl`: all reversible repair candidates, evidence, dispositions, and application order.
@@ -355,7 +355,7 @@ Stages 8–36 process author text. Each assigned batch must:
 
 - Independently hash and count raw inputs; do not validate a manifest solely with the code that generated it.
 - Independently parse the raw monolith and prove the 29 segment union covers it without gaps or overlaps.
-- Independently parse the witness page/region census and prove every authorial region maps to canonical output, `NOT_APPLICABLE`, or a release blocker; prove every canonical span maps back to raw text or witness-backed insertion evidence.
+- Independently parse the witness page/region census and prove every authorial region maps to canonical output or a release blocker, every `NOT_APPLICABLE` region is demonstrably non-authorial, and every canonical span maps back to raw text or witness-backed insertion evidence.
 - Build a zero-repair structural baseline first and prove reassembly/inverse equivalence before any OCR repair.
 - Run every build from raw inputs into a fresh directory; compare two clean output trees byte-for-byte.
 - Run the builder and validators from repository root, a relocated copy, offline, and under optimized Python if Python assertions exist.

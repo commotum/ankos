@@ -191,6 +191,124 @@ def checked_digest(value: object, key: tuple[object, ...], name: str) -> str:
     return digest
 
 
+def checked_integer_text(
+    value: object,
+    name: str,
+    *,
+    minimum: int | None = None,
+) -> int:
+    text = exact_str(value, name)
+    try:
+        integer = int(text)
+    except ValueError as error:
+        raise ValueError(f"{name} must encode an integer") from error
+    if str(integer) != text:
+        raise ValueError(f"{name} must use canonical integer text")
+    if minimum is not None and integer < minimum:
+        raise ValueError(f"{name} is below its minimum")
+    return integer
+
+
+def checked_expression_key(value: object) -> tuple[object, ...]:
+    key = exact_tuple(value, "expression key")
+    if not key:
+        raise ValueError("expression key cannot be empty")
+    tag = exact_str(key[0], "expression key tag")
+    if tag == "RationalLiteral/v2":
+        if len(key) != 3:
+            raise ValueError("malformed rational expression key")
+        checked_integer_text(key[1], "rational numerator key")
+        checked_integer_text(key[2], "rational denominator key", minimum=1)
+    elif tag in ("PiConstant/v1", "EulerConstant/v1"):
+        if len(key) != 1:
+            raise ValueError("malformed named-constant expression key")
+    elif tag in ("SquareRoot/v1", "NegatedSquareRoot/v1"):
+        if len(key) != 2:
+            raise ValueError("malformed square-root expression key")
+        radicand = checked_integer_text(key[1], "square-root radicand key", minimum=1)
+        if isqrt(radicand) ** 2 == radicand:
+            raise ValueError("square-root expression key requires a nonsquare radicand")
+    else:
+        raise ValueError("unknown expression key tag")
+    return key
+
+
+def checked_denotation_key(value: object) -> tuple[object, ...]:
+    key = exact_tuple(value, "denotation structural key")
+    if len(key) != 6 or exact_str(key[0], "denotation key tag") != "MathematicalDenotationSpec/v1":
+        raise ValueError("malformed denotation structural key")
+    checked_expression_key(key[1])
+    parameters = exact_tuple(key[2], "denotation parameter key")
+    if parameters:
+        raise ValueError("T40 denotation key must be arity zero")
+    if exact_str(key[3], "denotation value-schema key") != VALUE_SCHEMA:
+        raise ValueError("unknown denotation value-schema key")
+    if exact_str(key[4], "denotation registry key") != REGISTRY_VERSION:
+        raise ValueError("unknown denotation registry key")
+    if exact_str(key[5], "denotation branch key") != BRANCH_CONVENTIONS:
+        raise ValueError("unknown denotation branch key")
+    return key
+
+
+def checked_representation_key(value: object) -> tuple[object, ...]:
+    key = exact_tuple(value, "representation key")
+    if not key:
+        raise ValueError("representation key cannot be empty")
+    tag = exact_str(key[0], "representation key tag")
+    if tag == "PositionalDigits/v2":
+        if len(key) != 5:
+            raise ValueError("malformed positional representation key")
+        checked_integer_text(key[1], "positional base key", minimum=2)
+        if exact_str(key[2], "positional scope key") != POSITIONAL_SCOPE:
+            raise ValueError("unknown positional scope key")
+        if exact_str(key[3], "positional tail key") != POSITIONAL_CANONICAL_TAIL:
+            raise ValueError("unknown positional tail key")
+        if exact_str(key[4], "positional sign key") != POSITIONAL_SIGN_CONVENTION:
+            raise ValueError("unknown positional sign key")
+    elif tag == "SimpleContinuedFraction/v1":
+        if len(key) != 2:
+            raise ValueError("malformed continued-fraction representation key")
+        if exact_str(key[1], "continued-fraction terminal key") != CF_CANONICAL_TERMINAL:
+            raise ValueError("unknown continued-fraction terminal key")
+    else:
+        raise ValueError("unknown representation key tag")
+    return key
+
+
+def checked_selection_key(value: object) -> tuple[object, ...]:
+    key = exact_tuple(value, "selection key")
+    if len(key) != 2:
+        raise ValueError("malformed selection key")
+    tag = exact_str(key[0], "selection key tag")
+    if tag not in ("Prefix/v1", "CoefficientAt/v1"):
+        raise ValueError("unknown selection key tag")
+    checked_integer_text(key[1], "selection index key", minimum=0)
+    return key
+
+
+def checked_query_key(value: object) -> tuple[object, ...]:
+    key = exact_tuple(value, "query key")
+    if len(key) != 4 or exact_str(key[0], "query key tag") != "RepresentationQuery/v1":
+        raise ValueError("malformed query key")
+    checked_denotation_key(key[1])
+    checked_representation_key(key[2])
+    checked_selection_key(key[3])
+    return key
+
+
+def checked_context_key(value: object) -> tuple[object, ...]:
+    key = exact_tuple(value, "evaluation context key")
+    if len(key) != 3 or exact_str(key[0], "context key tag") != "EvaluationContext/v1":
+        raise ValueError("malformed evaluation context key")
+    method = exact_str(key[1], "context method key")
+    if method not in (EXACT_METHOD, MACHIN_METHOD, REPORTED_METHOD):
+        raise ValueError("unknown context method key")
+    budget = checked_integer_text(key[2], "context budget key", minimum=0)
+    if method in (EXACT_METHOD, REPORTED_METHOD) and budget != 0:
+        raise ValueError("context key method has no term budget")
+    return key
+
+
 def must_raise(error: type[BaseException], thunk: object) -> int:
     if not callable(thunk):
         raise TypeError("thunk must be callable")
@@ -326,9 +444,7 @@ class DenotationProvenance:
     structural_id: str
 
     def __post_init__(self) -> None:
-        key = exact_tuple(self.structural_key, "denotation structural key")
-        if not key or key[0] != "MathematicalDenotationSpec/v1":
-            raise ValueError("malformed denotation structural key")
+        key = checked_denotation_key(self.structural_key)
         object.__setattr__(
             self,
             "structural_id",
@@ -473,12 +589,8 @@ class QueryProvenance:
     context_id: str
 
     def __post_init__(self) -> None:
-        query = exact_tuple(self.query_key, "query key")
-        context = exact_tuple(self.context_key, "context key")
-        if not query or query[0] != "RepresentationQuery/v1":
-            raise ValueError("malformed query key")
-        if not context or context[0] != "EvaluationContext/v1":
-            raise ValueError("malformed evaluation context key")
+        query = checked_query_key(self.query_key)
+        context = checked_context_key(self.context_key)
         object.__setattr__(self, "query_id", checked_digest(self.query_id, query, "query id"))
         object.__setattr__(self, "context_id", checked_digest(self.context_id, context, "context id"))
 
@@ -518,9 +630,7 @@ class MachinCertificate:
         terms = checked_positive(self.terms, "Machin terms")
         if type(self.interval) is not RationalInterval:
             raise TypeError("Machin certificate requires a rational interval")
-        key = exact_tuple(self.representation_key, "certificate representation key")
-        if not key or key[0] not in ("PositionalDigits/v2", "SimpleContinuedFraction/v1"):
-            raise ValueError("malformed certificate representation key")
+        checked_representation_key(self.representation_key)
         integers = exact_tuple(self.integer_digits, "certificate integer digits")
         coefficients = exact_tuple(self.certified_coefficients, "certified coefficients")
         for value in integers + coefficients:
@@ -3028,6 +3138,64 @@ def audit_hostile_validation() -> int:
     result = evaluate_query(query, machin_context(20))
     assert type(result.outcome) is CompleteCertified
     certificate = result.outcome.certificate
+    denotation_structural_key = denotation_key(pi_spec())
+    forged_denotation_structural_key = (
+        StringSubclass(denotation_structural_key[0]),
+        *denotation_structural_key[1:],
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: DenotationProvenance(
+            forged_denotation_structural_key,
+            sha256(repr(forged_denotation_structural_key).encode("utf-8")).hexdigest(),
+        ),
+    )
+    nested_representation_key = result.provenance.query_key[2]
+    assert type(nested_representation_key) is tuple
+    forged_nested_representation_key = (
+        StringSubclass(nested_representation_key[0]),
+        *nested_representation_key[1:],
+    )
+    forged_query_key = (
+        result.provenance.query_key[0],
+        result.provenance.query_key[1],
+        forged_nested_representation_key,
+        result.provenance.query_key[3],
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: QueryProvenance(
+            forged_query_key,
+            sha256(repr(forged_query_key).encode("utf-8")).hexdigest(),
+            result.provenance.context_key,
+            result.provenance.context_id,
+        ),
+    )
+    forged_context_key = (
+        result.provenance.context_key[0],
+        StringSubclass(result.provenance.context_key[1]),
+        result.provenance.context_key[2],
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: QueryProvenance(
+            result.provenance.query_key,
+            result.provenance.query_id,
+            forged_context_key,
+            sha256(repr(forged_context_key).encode("utf-8")).hexdigest(),
+        ),
+    )
+    forged_certificate_representation_key = (
+        StringSubclass(certificate.representation_key[0]),
+        *certificate.representation_key[1:],
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: replace(
+            certificate,
+            representation_key=forged_certificate_representation_key,
+        ),
+    )
     forged_interval = RationalInterval(
         certificate.interval.lower,
         certificate.interval.upper + Fraction(1, 10),
@@ -3224,7 +3392,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "f0b3f635928335fa3becb8a9660c5a724e20157bba98d01cc4eb4cd2643b2fc0"
+EXPECTED_DIGEST = "024c75c38de22ee74c41f54fd3b4be957e0c0fb6dec44c4c7cfc8b0f658b5608"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
