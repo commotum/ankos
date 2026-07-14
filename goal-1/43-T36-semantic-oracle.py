@@ -4,7 +4,7 @@
 The strict Book construction remains the T34/T35 discrete ``t+0D`` scalar
 event.  Its rule makes a positional representation visible, reverses that
 representation, decodes it, and adds it to the old exact integer.  Canonical
-digit words and positive integers are losslessly equivalent representations;
+digit words and nonnegative integers are losslessly equivalent representations;
 neither requires a new state, FRONTIER, NEIGHBORHOOD, UPDATE, or executor.
 
 Two Notes variants make leading-zero policy explicit.  Fixed-width evolution
@@ -23,7 +23,7 @@ import, and fails closed under ``python -O``.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, fields, replace
+from dataclasses import dataclass, fields, is_dataclass, replace
 from hashlib import sha256
 from typing import TypeAlias
 
@@ -811,15 +811,34 @@ def verify_trace_provenance(program: object, trace: object) -> bool:
         return False
     if trace.provenance != program_provenance(program):
         return False
+    if (
+        len(trace.states) != trace.requested_horizon + 1
+        or len(trace.events) != trace.requested_horizon
+        or not trace.states
+    ):
+        return False
     try:
         validate_program_configuration(program, trace.states[0])
     except (TypeError, ValueError):
         return False
-    return all(verify_transition_event(program, event) for event in trace.events)
+    for index, event in enumerate(trace.events):
+        if event.before != trace.states[index] or event.after != trace.states[index + 1]:
+            return False
+        if not verify_transition_event(program, event):
+            return False
+    return True
 
 
-def canonical_program(base: int = 2, carrier: str = POSITIVE) -> ReversalAddProgram:
-    return ReversalAddProgram(carrier, base, CanonicalDigits())
+def canonical_program(base: int = 2) -> ReversalAddProgram:
+    """Native/default canonical profile over nonnegative exact integers."""
+
+    return ReversalAddProgram(NONNEGATIVE, base, CanonicalDigits())
+
+
+def positive_canonical_program(base: int = 2) -> ReversalAddProgram:
+    """Named positive-only restriction of the native canonical profile."""
+
+    return ReversalAddProgram(POSITIVE, base, CanonicalDigits())
 
 
 def fixed_program(base: int, width: int) -> ReversalAddProgram:
@@ -830,7 +849,7 @@ def grow_program(base: int) -> ReversalAddProgram:
     return ReversalAddProgram(WIDTH_TAGGED, base, GrowWidth())
 
 
-SOURCE_16_PREFIX = (
+COMPUTED_SEED16_PREFIX = (
     16,
     17,
     34,
@@ -855,7 +874,7 @@ SOURCE_16_PREFIX = (
 )
 
 
-SOURCE_512_PREFIX = (
+COMPUTED_SEED512_PREFIX = (
     512,
     513,
     1026,
@@ -880,9 +899,9 @@ SOURCE_512_PREFIX = (
 )
 
 
-SOURCE_16_ENDPOINT_180 = 3987197239207620088799663177286543360
-SOURCE_16_TRACE_SHA = "3a6be7627a2e42a8f5f1b94e30d0ca7894bd3361ff9c187d3f124e8962db52ec"
-SOURCE_512_TRACE_SHA = "397c4cf26c075bc45a2a864b88322b99ec7af0fc773c5644174892328b8e9c5a"
+COMPUTED_SEED16_ENDPOINT_180 = 3987197239207620088799663177286543360
+COMPUTED_SEED16_TRACE_SHA = "3a6be7627a2e42a8f5f1b94e30d0ca7894bd3361ff9c187d3f124e8962db52ec"
+COMPUTED_SEED512_TRACE_SHA = "397c4cf26c075bc45a2a864b88322b99ec7af0fc773c5644174892328b8e9c5a"
 
 
 FIXED_REVERSAL_CSV_DIGESTS = {
@@ -922,24 +941,25 @@ def must_raise(error: type[BaseException], operation: object) -> int:
 
 def audit_source_traces() -> tuple[int, int, int, int, int, int]:
     program = canonical_program()
-    seed16 = run(program, ScalarConfiguration(POSITIVE, 16), 180)
+    seed16 = run(program, ScalarConfiguration(NONNEGATIVE, 16), 180)
     values16 = integer_trace_values(seed16)
-    assert values16[: len(SOURCE_16_PREFIX)] == SOURCE_16_PREFIX
-    assert values16[-1] == SOURCE_16_ENDPOINT_180
+    assert values16[: len(COMPUTED_SEED16_PREFIX)] == COMPUTED_SEED16_PREFIX
+    assert values16[-1] == COMPUTED_SEED16_ENDPOINT_180
     assert values16[-1].bit_length() == 122
-    assert trace_decimal_digest(seed16) == SOURCE_16_TRACE_SHA
+    assert trace_decimal_digest(seed16) == COMPUTED_SEED16_TRACE_SHA
     assert verify_trace_provenance(program, seed16)
 
-    seed512 = run(program, ScalarConfiguration(POSITIVE, 512), 1000)
+    seed512 = run(program, ScalarConfiguration(NONNEGATIVE, 512), 1000)
     values512 = integer_trace_values(seed512)
-    assert values512[: len(SOURCE_512_PREFIX)] == SOURCE_512_PREFIX
+    assert values512[: len(COMPUTED_SEED512_PREFIX)] == COMPUTED_SEED512_PREFIX
     assert values512[-1].bit_length() == 627
-    assert trace_decimal_digest(seed512) == SOURCE_512_TRACE_SHA
+    assert trace_decimal_digest(seed512) == COMPUTED_SEED512_TRACE_SHA
     assert verify_trace_provenance(program, seed512)
 
     growth_checks = 0
     direct_source_replays = 0
     for trace, values in ((seed16, values16), (seed512, values512)):
+        assert all(value > 0 for value in values)
         assert all(right > left for left, right in zip(values, values[1:]))
         for index in range(len(values) - 2):
             assert values[index + 2].bit_length() >= values[index].bit_length() + 1
@@ -991,7 +1011,7 @@ def assert_scalar_word_commutes(
 def audit_scalar_word_commutations() -> tuple[int, int, int, int]:
     canonical_checks = 0
     for base in range(2, 13):
-        program = canonical_program(base, NONNEGATIVE)
+        program = canonical_program(base)
         for value in range(0, 1025):
             canonical_checks += assert_scalar_word_commutes(
                 program,
@@ -1045,14 +1065,14 @@ def audit_fixed_reversal_tables() -> tuple[int, int, int, int]:
     return entries, involutions, digests, permutation_profiles
 
 
-def audit_width_and_leading_zero_boundaries() -> tuple[int, int, int, int, int]:
+def audit_width_and_leading_zero_boundaries() -> tuple[int, int, int, int, int, int]:
     checks = 0
 
     canonical_two = advance(
         canonical_program(2),
-        ScalarConfiguration(POSITIVE, 2),
+        ScalarConfiguration(NONNEGATIVE, 2),
     )
-    assert canonical_two.successors == (ScalarConfiguration(POSITIVE, 3),)
+    assert canonical_two.successors == (ScalarConfiguration(NONNEGATIVE, 3),)
     assert canonical_two.event.witness.digits == (1, 0)
     assert canonical_two.event.witness.reversed_digits == (0, 1)
     checks += 1
@@ -1075,8 +1095,8 @@ def audit_width_and_leading_zero_boundaries() -> tuple[int, int, int, int, int]:
     )
     checks += 1
 
-    power = advance(canonical_program(2), ScalarConfiguration(POSITIVE, 16))
-    assert power.successors == (ScalarConfiguration(POSITIVE, 17),)
+    power = advance(canonical_program(2), ScalarConfiguration(NONNEGATIVE, 16))
+    assert power.successors == (ScalarConfiguration(NONNEGATIVE, 17),)
     assert power.event.witness.reversed_digits == (0, 0, 0, 0, 1)
     checks += 1
 
@@ -1086,17 +1106,19 @@ def audit_width_and_leading_zero_boundaries() -> tuple[int, int, int, int, int]:
     assert carry.event.witness.dropped_carry == 1
     checks += 1
 
-    canonical_zero = advance(
-        canonical_program(2, NONNEGATIVE),
-        ScalarConfiguration(NONNEGATIVE, 0),
-    )
+    default_program = canonical_program()
+    assert default_program == ReversalAddProgram(NONNEGATIVE, 2, CanonicalDigits())
+    canonical_zero = advance(default_program, ScalarConfiguration(NONNEGATIVE, 0))
     fixed_zero = advance(fixed_program(2, 4), ScalarConfiguration(NONNEGATIVE, 0))
     grow_zero = run(
         grow_program(2),
         ScalarConfiguration(WIDTH_TAGGED, WidthTaggedInteger(0, 4)),
         3,
     )
+    assert canonical_zero.successors == (ScalarConfiguration(NONNEGATIVE, 0),)
     assert canonical_zero.outcome.changed is False
+    assert canonical_zero.event.before == canonical_zero.event.after
+    assert verify_transition_event(default_program, canonical_zero.event)
     assert fixed_zero.outcome.changed is False
     assert tuple(state.value for state in grow_zero.states) == (
         WidthTaggedInteger(0, 4),
@@ -1110,7 +1132,25 @@ def audit_width_and_leading_zero_boundaries() -> tuple[int, int, int, int, int]:
         for event in grow_zero.events
         if event.witness.old_width is not None
     )
-    width_loss_counterexamples = 1
+    zero_fixed_point_events = 1
+
+    narrow_seed = ScalarConfiguration(WIDTH_TAGGED, WidthTaggedInteger(1, 1))
+    padded_seed = ScalarConfiguration(WIDTH_TAGGED, WidthTaggedInteger(1, 2))
+    assert narrow_seed.value.value == padded_seed.value.value == 1
+    narrow_result = advance(grow_program(2), narrow_seed)
+    padded_result = advance(grow_program(2), padded_seed)
+    assert narrow_result.successors == (
+        ScalarConfiguration(WIDTH_TAGGED, WidthTaggedInteger(2, 2)),
+    )
+    assert padded_result.successors == (
+        ScalarConfiguration(WIDTH_TAGGED, WidthTaggedInteger(3, 3)),
+    )
+    assert encode_fixed(2, 2, 2) == (1, 0)
+    assert encode_fixed(3, 2, 3) == (0, 1, 1)
+    assert narrow_result.event.witness.digits == (1,)
+    assert padded_result.event.witness.digits == (0, 1)
+    assert narrow_result.successors[0] != padded_result.successors[0]
+    width_loss_counterexamples = 2
 
     fixed_cycle = run(
         fixed_program(2, 4),
@@ -1120,19 +1160,26 @@ def audit_width_and_leading_zero_boundaries() -> tuple[int, int, int, int, int]:
     assert integer_trace_values(fixed_cycle) == (15, 14, 5, 15, 14, 5, 15, 14, 5, 15)
     assert len(fixed_cycle.events) == 9 and len(fixed_cycle.states) == 10
     continuing_cycle_events = len(fixed_cycle.events)
-    return checks, width_loss_counterexamples, len(grow_zero.events), continuing_cycle_events, 3
+    return (
+        checks,
+        width_loss_counterexamples,
+        zero_fixed_point_events,
+        len(grow_zero.events),
+        continuing_cycle_events,
+        3,
+    )
 
 
 def audit_arbitrary_precision() -> tuple[int, int, int, int]:
     cases = (
-        (canonical_program(2), ScalarConfiguration(POSITIVE, 2**4096), 2**4096 + 1),
+        (positive_canonical_program(2), ScalarConfiguration(POSITIVE, 2**4096), 2**4096 + 1),
         (
-            canonical_program(2),
+            positive_canonical_program(2),
             ScalarConfiguration(POSITIVE, 2**4096 + 1),
             2**4097 + 2,
         ),
         (
-            canonical_program(10),
+            positive_canonical_program(10),
             ScalarConfiguration(POSITIVE, 10**2000),
             10**2000 + 1,
         ),
@@ -1166,9 +1213,9 @@ def audit_arbitrary_precision() -> tuple[int, int, int, int]:
 
 def audit_trace_shape_and_outcomes() -> tuple[int, int, int, int, int]:
     profiles = (
-        (canonical_program(2), ScalarConfiguration(POSITIVE, 16)),
+        (canonical_program(2), ScalarConfiguration(NONNEGATIVE, 16)),
         (
-            canonical_program(10, NONNEGATIVE),
+            canonical_program(10),
             ScalarConfiguration(NONNEGATIVE, 0),
         ),
         (fixed_program(2, 4), ScalarConfiguration(NONNEGATIVE, 15)),
@@ -1199,9 +1246,9 @@ def audit_trace_shape_and_outcomes() -> tuple[int, int, int, int, int]:
 
 def audit_structural_identity_and_replay() -> tuple[int, int, int, int, int, int]:
     programs = (
-        canonical_program(2, POSITIVE),
-        canonical_program(2, NONNEGATIVE),
-        canonical_program(10, POSITIVE),
+        positive_canonical_program(2),
+        canonical_program(2),
+        positive_canonical_program(10),
         fixed_program(2, 4),
         fixed_program(2, 5),
         grow_program(2),
@@ -1212,13 +1259,13 @@ def audit_structural_identity_and_replay() -> tuple[int, int, int, int, int, int
     assert len(keys) == len(programs)
     assert len(ids) == len(programs)
 
-    source = canonical_program(2, POSITIVE)
+    source = positive_canonical_program(2)
     event = advance(source, ScalarConfiguration(POSITIVE, 16)).event
     assert verify_transition_event(source, event)
     cross_program_rejections = 0
     for other in (
-        canonical_program(10, POSITIVE),
-        canonical_program(2, NONNEGATIVE),
+        positive_canonical_program(10),
+        canonical_program(2),
     ):
         assert not verify_transition_event(other, event)
         cross_program_rejections += 1
@@ -1227,20 +1274,20 @@ def audit_structural_identity_and_replay() -> tuple[int, int, int, int, int, int
     cross_program_rejections += 1
 
     zero_left = run(
-        canonical_program(2, NONNEGATIVE),
+        canonical_program(2),
         ScalarConfiguration(NONNEGATIVE, 0),
         0,
     )
     zero_right = run(
-        canonical_program(10, NONNEGATIVE),
+        canonical_program(10),
         ScalarConfiguration(NONNEGATIVE, 0),
         0,
     )
     assert zero_left.states == zero_right.states
     assert zero_left.events == zero_right.events == ()
     assert zero_left.provenance != zero_right.provenance
-    assert not verify_trace_provenance(canonical_program(10, NONNEGATIVE), zero_left)
-    assert not verify_trace_provenance(canonical_program(2, NONNEGATIVE), zero_right)
+    assert not verify_trace_provenance(canonical_program(10), zero_left)
+    assert not verify_trace_provenance(canonical_program(2), zero_right)
     zero_horizon_rejections = 2
 
     key_roundtrips = 0
@@ -1259,39 +1306,127 @@ def audit_structural_identity_and_replay() -> tuple[int, int, int, int, int, int
     )
 
 
-def audit_no_new_execution_surface() -> tuple[int, int, int, int, int, int, int, int]:
-    state_fields = tuple(field.name for field in fields(ScalarConfiguration))
-    assignment_fields = tuple(field.name for field in fields(ScalarAssignment))
-    program_fields = tuple(field.name for field in fields(ReversalAddProgram))
-    tagged_value_fields = tuple(field.name for field in fields(WidthTaggedInteger))
-    step_result_fields = tuple(field.name for field in fields(StepResult))
+EXPECTED_DATACLASS_ROLE_MANIFEST = (
+    ("Advanced", ("changed",)),
+    ("CanonicalDigits", ()),
+    ("FixedWidthDropCarry", ("width",)),
+    ("GrowWidth", ()),
+    ("ProgramProvenance", ("key", "display_id")),
+    ("ProposedScalarWrite", ("assignment", "witness")),
+    ("ReversalAddProgram", ("carrier", "base", "profile")),
+    (
+        "ReversalWitness",
+        (
+            "old_value",
+            "old_width",
+            "digits",
+            "reversed_digits",
+            "addend",
+            "untruncated_sum",
+            "dropped_carry",
+            "new_value",
+            "new_width",
+            "provenance",
+        ),
+    ),
+    ("ScalarAssignment", ("locus", "value")),
+    ("ScalarConfiguration", ("carrier", "value")),
+    ("ScalarTrace", ("provenance", "requested_horizon", "states", "events")),
+    ("StepResult", ("successors", "outcome", "event")),
+    ("TransitionEvent", ("before", "read_value", "assignment", "after", "witness")),
+    ("WidthTaggedInteger", ("value", "width")),
+)
+
+
+SHARED_EXECUTION_ROLE_MANIFEST = (
+    ("FRONTIER.select", "select_unique_scalar"),
+    ("NEIGHBORHOOD.read", "read_self"),
+    ("RULE.evaluate", "evaluate_closed_rule"),
+    ("RULE.direct_word_oracle", "evaluate_word_rule"),
+    ("UPDATE.apply", "apply_scalar_assignment"),
+    ("STEP", "advance"),
+    ("RUN", "run"),
+)
+
+
+FORBIDDEN_EXECUTION_ROLE_SUFFIXES = (
+    "Control",
+    "Executor",
+    "Frontier",
+    "Neighborhood",
+    "Runner",
+    "Schedule",
+    "State",
+    "Update",
+)
+
+
+def module_dataclass_role_manifest(namespace: object) -> tuple[tuple[str, tuple[str, ...]], ...]:
+    if type(namespace) is not dict:
+        raise TypeError("namespace must be an exact dict")
+    manifest = []
+    module_name = exact_str(namespace.get("__name__"), "module name")
+    for name, value in namespace.items():
+        if (
+            type(name) is str
+            and type(value) is type
+            and value.__module__ == module_name
+            and is_dataclass(value)
+        ):
+            manifest.append((name, tuple(field.name for field in fields(value))))
+    return tuple(sorted(manifest))
+
+
+def forbidden_execution_role_symbols(
+    namespace: object,
+) -> tuple[tuple[str, tuple[str, ...]], ...]:
+    if type(namespace) is not dict:
+        raise TypeError("namespace must be an exact dict")
+    return tuple(
+        (
+            suffix,
+            tuple(sorted(
+                name
+                for name in namespace
+                if type(name) is str and name.endswith(suffix)
+            )),
+        )
+        for suffix in FORBIDDEN_EXECUTION_ROLE_SUFFIXES
+    )
+
+
+def audit_no_new_execution_surface() -> tuple[int, int, int, int, int, int, int, int, int]:
+    actual_dataclasses = module_dataclass_role_manifest(globals())
+    assert actual_dataclasses == EXPECTED_DATACLASS_ROLE_MANIFEST
+    manifest_by_name = dict(actual_dataclasses)
+    state_fields = manifest_by_name["ScalarConfiguration"]
+    assignment_fields = manifest_by_name["ScalarAssignment"]
+    program_fields = manifest_by_name["ReversalAddProgram"]
+    tagged_value_fields = manifest_by_name["WidthTaggedInteger"]
+    step_result_fields = manifest_by_name["StepResult"]
     assert state_fields == ("carrier", "value")
     assert assignment_fields == ("locus", "value")
     assert program_fields == ("carrier", "base", "profile")
     assert tagged_value_fields == ("value", "width")
     assert step_result_fields == ("successors", "outcome", "event")
-    forbidden = {
-        "history",
-        "time",
-        "control",
-        "executor",
-        "callback",
-        "schedule",
-        "frontier",
-        "neighborhood",
-        "update",
-        "digits",
-    }
+    forbidden = {"history", "time", "control", "callback", "digits"}
     assert not (forbidden & set(state_fields))
     assert not (forbidden & set(assignment_fields))
     assert not (forbidden & set(program_fields))
-    seed = ScalarConfiguration(POSITIVE, 16)
+    for _role, symbol in SHARED_EXECUTION_ROLE_MANIFEST:
+        assert symbol in globals() and callable(globals()[symbol])
+    forbidden_symbols = forbidden_execution_role_symbols(globals())
+    assert tuple(names for _suffix, names in forbidden_symbols) == ((),) * len(
+        FORBIDDEN_EXECUTION_ROLE_SUFFIXES
+    )
+    seed = ScalarConfiguration(NONNEGATIVE, 16)
     assert select_unique_scalar(seed) == (SCALAR_LOCUS,)
     assert read_self(seed, SCALAR_LOCUS) == 16
-    frontier_fields = 0
-    neighborhood_fields = 0
-    update_fields = 0
-    executor_fields = 0
+    forbidden_by_suffix = dict(forbidden_symbols)
+    frontier_fields = len(forbidden_by_suffix["Frontier"])
+    neighborhood_fields = len(forbidden_by_suffix["Neighborhood"])
+    update_fields = len(forbidden_by_suffix["Update"])
+    executor_fields = len(forbidden_by_suffix["Executor"])
     return (
         len(state_fields),
         len(assignment_fields),
@@ -1301,6 +1436,7 @@ def audit_no_new_execution_surface() -> tuple[int, int, int, int, int, int, int,
         executor_fields,
         len(step_result_fields),
         len(tagged_value_fields),
+        len(actual_dataclasses),
     )
 
 
@@ -1380,7 +1516,7 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(
         ValueError,
         lambda: validate_program_configuration(
-            canonical_program(2, POSITIVE),
+            positive_canonical_program(2),
             ScalarConfiguration(NONNEGATIVE, 1),
         ),
     )
@@ -1388,7 +1524,7 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(TypeError, lambda: advance(canonical_program(), 1))
     rejected += must_raise(TypeError, lambda: run(canonical_program(), 1, 3))
 
-    valid_program = canonical_program(2, POSITIVE)
+    valid_program = positive_canonical_program(2)
     valid_result = advance(valid_program, ScalarConfiguration(POSITIVE, 16))
     valid_event = valid_result.event
     rejected += must_raise(
@@ -1459,7 +1595,7 @@ def audit_hostile_validation() -> int:
     assert not verify_transition_event(valid_program, forged_event)
     rejected += 1
 
-    other_program = canonical_program(10, POSITIVE)
+    other_program = positive_canonical_program(10)
     other_provenance = program_provenance(other_program)
     forged_provenance = replace(witness, provenance=other_provenance)
     forged_event = TransitionEvent(

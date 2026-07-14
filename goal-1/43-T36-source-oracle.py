@@ -152,7 +152,7 @@ RELATION_EVIDENCE = line_set(
 CONTROL_EVIDENCE = line_set(
     "1370,1439,1523,1529,1555,1567,12054,12505,12623,12631,12633,"
     "12660,12662,12664,12666,12668,12670,12672,12674,12676,12678,"
-    "12680,12682,12684,12686,12688,12692,12767,16072"
+    "12680,12682,12684,12686,12688,12692,12767,12974,16072"
 )
 RETAINED = NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE
 
@@ -281,7 +281,7 @@ SOURCE_MODEL_RECORDS = (
     "empirical:seed512 has no reported repetition through one million steps only",
     "empirical:the million-step value has 568418 base-two digits",
     "generalization:base b at least two changes program identity and must be explicit",
-    "zero:canonical single-zero word is native and reversal-add maps zero to zero",
+    "zero:BOOK1497 whole-number carrier and BOOK12974 except-zero usage make the canonical single-zero word native; reversal-add maps zero to zero",
     "negative-extension:negative values require a declared sign codec and are not strict",
     "fixed-width:width m is immutable program data and left carry is dropped",
     "fixed-width:successor is addition modulo b to the power m",
@@ -337,11 +337,11 @@ EXPECTED_SET = {
     "index_excluded": (14, "ac87631a755acf79e4dc36898d557e2b45ff6aa999110f1112abd02fe0add1e7"),
     "native": (19, "5593d970e131366ac30082624db558c22281ca5496a81231b8a48cfbc3f098d4"),
     "relation": (19, "42d36affd4f4ff85aee6c153275d85194c5adc36875809c783dabef73dc3263d"),
-    "control": (29, "3f2b64c120a851c7d5dd640ebd12e174654c4c5e0608f29399a1ef593fe62c3f"),
-    "retained": (67, "eb56d21cae4f87ee7e5d6e6201a219930fa4249d8a6602fb27536109e5d57f90"),
+    "control": (30, "990b369600b8899bd1303a8702595c5d4651e7c52dd4fb79c37fbef780ac97fc"),
+    "retained": (68, "dda066679ce8844051d2d6b785adf5f1624a82f0772bcd5d7c4129f8be9c00a7"),
     "excluded": (48, "41c681e4b91c82c9c5fe96848ced1c37530dc206a5f837834c18733ec3380d1c"),
     "retained_query_hits": (53, "3cab584c09a1ca3cd7febc2cae23f7d39d82a4dce601c926db907bd8c6e71f69"),
-    "governed_continuations": (14, "af77ade209acaa0bd2e0dfe9ecadf11c0dace137d769a7e56025c30c468efab9"),
+    "governed_continuations": (15, "1098aafe3b465503abce7dd46309859d8e252f5640473b90c69d860ee783c375"),
 }
 EXPECTED_EXCLUDED_CLASS = {
     "unrelated_positional_code": (9, "d106124c1b13b5b406900cc41cb6a9f51be8cb8c837d9dbc600b9f34b7ac57eb"),
@@ -380,6 +380,10 @@ EXPECTED_INDEX_GUARDS = (
     12,
     "0357b948bc2a0a795b9a4f2b44660704557b0ac43b1d06c3b12b4ef1ab3da024",
 )
+EXPECTED_INDEX_FLATTENING_SENTINELS = (
+    5,
+    "479661f8c5c43eb84c143c9f5221f3e61ece16cd1bdf16b3f91c769e4101b92e",
+)
 EXPECTED_IMAGE_PARTITION = {
     "native": (4, "03d88e9c3761fdc27d9d2c0890650bacd7f5184d62020c04cad2563354b081f4"),
     "relation": (3, "a988c242ab8946f7a30e9aafdb304b4557702ad8c1193bd6222f07ee5b19f734"),
@@ -396,7 +400,7 @@ EXPECTED_IMAGE_ASSET_MANIFEST = (
 )
 EXPECTED_SOURCE_MODEL = (
     40,
-    "f467eaf992cf3a9ef7f72bc692b739a39e4f104e7d1494d3a707cc8114fbac65",
+    "c30f90d60537af4fcbf406f2f32b524c427250be4022d3d46f89b82c022093ff",
 )
 
 
@@ -405,14 +409,14 @@ EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 EXPECTED_SPLIT_CROSSWALK = (
-    93,
-    "d898f1518a7ce493e8d4de80f8a07ac4d58289da3171fa82119dc27d3b48414f",
+    94,
+    "26c5342e3352bca84fdfa90ea4cd904141de22aafe31712ce6e853598b036726",
 )
 EXPECTED_SPLIT_CLASSES = {
     "EXACT": (
-        70,
-        "a40f42973cf86201343553fbc449918bd2f8755a38d8a5d0c9ca59bc155d8248",
-        "9ec89c4b7d0e1b8565b4cc472a52bdfcefc4c22e2259450634a1d185b1eb68bd",
+        71,
+        "2ce5f47bf87623f6559a7619fcfb0abd6932294da8e4f5fa31cbec7c2c4f2609",
+        "9f5b193ee8eb4042c57d8f007a90bca25d90b6b38784628ecd92019acae6d38e",
     ),
     "IMAGE_BASENAME": (
         15,
@@ -431,6 +435,10 @@ EXPECTED_SPLIT_CLASSES = {
     ),
 }
 EXPECTED_SPLIT_NORMALIZED_MINIMUM = 0.996587
+EXPECTED_SPLIT_REPAIR_WITNESSES = (
+    4,
+    "9ce86aadac14ff9379659295cd450ad0bcdf896de4af875b8ee55219b5ec8b0d",
+)
 
 
 EXPECTED_TRACE_16 = (
@@ -531,7 +539,7 @@ def split_owner_record(line_no: int) -> str:
             "CHAPTERS/12-The-Principle-of-Computational-Equivalence/"
             "The-Principle-of-Computational-Equivalence.md:3435"
         )
-    if 12505 <= line_no <= 12767:
+    if 12505 <= line_no <= 12974:
         candidates.append(f"BACK-MATTER/Index/Index.md:{line_no - 12097}")
     if line_no == 16072:
         candidates.append("BACK-MATTER/Index/Index.md:3973")
@@ -626,6 +634,14 @@ def main() -> int:
     print("source", "OK" if source_ok else "MISMATCH")
 
     hits: dict[str, set[int]] = {}
+    query_contract_ok = set(QUERIES) == set(EXPECTED_QUERY)
+    ok &= query_contract_ok
+    print(
+        "query_contract",
+        "OK" if query_contract_ok else "MISMATCH",
+        len(QUERIES),
+        len(EXPECTED_QUERY),
+    )
     for name, pattern in QUERIES.items():
         rx = re.compile(pattern, re.IGNORECASE)
         found = {
@@ -665,6 +681,9 @@ def main() -> int:
         "retained_query_hits": pre_index & set(RETAINED),
         "governed_continuations": retained_unmatched,
     }
+    set_contract_ok = set(sets) == set(EXPECTED_SET)
+    ok &= set_contract_ok
+    print("set_contract", "OK" if set_contract_ok else "MISMATCH", len(sets))
     for name, values in sets.items():
         actual = (len(values), digest(values))
         good = actual == EXPECTED_SET.get(name)
@@ -672,6 +691,8 @@ def main() -> int:
         print(name, "OK" if good else "MISMATCH", *actual)
 
     exclusion_ok = (
+        set(EXCLUDED_CLASS) == set(EXPECTED_EXCLUDED_CLASS)
+        and
         set().union(*EXCLUDED_CLASS.values()) == set(EXCLUDED)
         and sum(map(len, EXCLUDED_CLASS.values())) == len(EXCLUDED)
         and not EXCLUDED & RETAINED
@@ -715,7 +736,9 @@ def main() -> int:
     )
 
     index_ok = (
-        set().union(*INDEX_CLASS.values()) == index == set(INDEX_ROUTED)
+        set(INDEX_CLASS) == set(EXPECTED_INDEX_CLASS)
+        and set(INDEX_EXCLUDED_CLASS) == set(EXPECTED_INDEX_EXCLUDED_CLASS)
+        and set().union(*INDEX_CLASS.values()) == index == set(INDEX_ROUTED)
         and sum(map(len, INDEX_CLASS.values())) == len(index)
         and set().union(*INDEX_EXCLUDED_CLASS.values()) == set(INDEX_EXCLUDED)
         and sum(map(len, INDEX_EXCLUDED_CLASS.values())) == len(INDEX_EXCLUDED)
@@ -740,6 +763,11 @@ def main() -> int:
         f"{line_no}:{'|'.join(needles)}"
         for line_no, needles in INDEX_FLATTENING_SENTINELS.items()
     }
+    sentinels_actual = (len(sentinel_records), digest_records(sentinel_records))
+    sentinels_ok = (
+        sentinels_actual == EXPECTED_INDEX_FLATTENING_SENTINELS
+        and all(needles and all(needles) for needles in INDEX_FLATTENING_SENTINELS.values())
+    )
     excluded_index_guard_records = {
         f"{line_no}:{'|'.join(needles)}"
         for line_no, needles in INDEX_EXCLUDED_GUARDS.items()
@@ -761,6 +789,7 @@ def main() -> int:
             all(needle in at(line_no) for needle in needles)
             for line_no, needles in INDEX_FLATTENING_SENTINELS.items()
         )
+        and sentinels_ok
         and set(INDEX_EXCLUDED_GUARDS) == set(INDEX_EXCLUDED)
         and all(
             all(needle in at(line_no) for needle in needles)
@@ -776,8 +805,8 @@ def main() -> int:
         len(guard_records),
         digest_records(guard_records),
         "flattening_sentinels",
-        len(sentinel_records),
-        digest_records(sentinel_records),
+        "OK" if sentinels_ok else "MISMATCH",
+        *sentinels_actual,
     )
     print(
         "index_excluded_occurrence_guards",
@@ -787,7 +816,7 @@ def main() -> int:
     print("unresolved_index", "OK" if index_ok else "MISMATCH", len(index ^ set(INDEX_ROUTED)))
 
     closure_hits: dict[str, set[int]] = {}
-    closure_ok = True
+    closure_ok = set(INDEX_CLOSURE_QUERIES) == set(EXPECTED_INDEX_CLOSURE)
     for name, pattern in INDEX_CLOSURE_QUERIES.items():
         rx = re.compile(pattern, re.IGNORECASE)
         found = {
@@ -829,7 +858,9 @@ def main() -> int:
         "excluded_images": EXCLUDED_IMAGE_LINES,
     }
     images_ok = (
-        set().union(*image_sets.values()) == set(GOVERNED_IMAGE_LINES)
+        set(image_sets) == set(EXPECTED_IMAGE_PARTITION)
+        and set(image_ledger) == set(EXPECTED_IMAGE_LEDGER)
+        and set().union(*image_sets.values()) == set(GOVERNED_IMAGE_LINES)
         and sum(map(len, image_sets.values())) == len(GOVERNED_IMAGE_LINES)
         and CANDIDATE_IMAGE_LINES == GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
         and not GOVERNED_IMAGE_LINES & EXCLUDED_IMAGE_LINES
@@ -921,6 +952,7 @@ def main() -> int:
         and strict_step(12, 10) == 33
         and all(strict_step(n) > n for n in range(1, 4097))
         and all(decode_digits(encode_digits(n, b), b) == n for b in range(2, 17) for n in range(1024))
+        and "whole numbers n (except 0 and 1 respectively)" in at(12974)
     )
     ok &= codec_ok
     print("source_closed_canonical_codec_transform_exact_unbounded", "OK" if codec_ok else "MISMATCH")
@@ -1008,6 +1040,27 @@ def main() -> int:
         for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
             split_text[f"{relative}:{line_no}"] = line
 
+    repair_witness_records = {
+        f"{line_no}->{owner}:{monolith_guard}|{split_guard}"
+        for line_no, (owner, monolith_guard, split_guard) in SPLIT_STRUCTURAL_REPAIRS.items()
+    }
+    repair_witness_actual = (
+        len(repair_witness_records),
+        digest_records(repair_witness_records),
+    )
+    repair_witness_ok = (
+        repair_witness_actual == EXPECTED_SPLIT_REPAIR_WITNESSES
+        and all(
+            owner and monolith_guard and split_guard
+            for owner, monolith_guard, split_guard in SPLIT_STRUCTURAL_REPAIRS.values()
+        )
+    )
+    print(
+        "split_structural_repair_witness_contract",
+        "OK" if repair_witness_ok else "MISMATCH",
+        *repair_witness_actual,
+    )
+
     crosswalk_lines = RETAINED | INDEX_ROUTED | INDEX_EXCLUDED
     crosswalk_records: set[str] = set()
     owner_records: set[str] = set()
@@ -1019,7 +1072,7 @@ def main() -> int:
     }
     class_records: dict[str, set[str]] = {name: set() for name in class_lines}
     normalized_scores: list[float] = []
-    split_join_ok = True
+    split_join_ok = repair_witness_ok
     for line_no in sorted(crosswalk_lines):
         try:
             owner = split_owner_record(line_no)
@@ -1070,6 +1123,7 @@ def main() -> int:
     }
     split_join_ok &= (
         crosswalk_actual == EXPECTED_SPLIT_CROSSWALK
+        and set(class_actual) == set(EXPECTED_SPLIT_CLASSES)
         and class_actual == EXPECTED_SPLIT_CLASSES
         and round(normalized_minimum, 6) == EXPECTED_SPLIT_NORMALIZED_MINIMUM
         and len(crosswalk_records) == len(crosswalk_lines)
@@ -1111,6 +1165,7 @@ def main() -> int:
     model_actual = (len(SOURCE_MODEL_RECORDS), digest_records(SOURCE_MODEL_RECORDS))
     architecture_ok = (
         model_actual == EXPECTED_SOURCE_MODEL
+        and len(SOURCE_MODEL_RECORDS) == len(set(SOURCE_MODEL_RECORDS))
         and main_ok
         and notes_formula_ok
         and codec_ok
