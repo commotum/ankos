@@ -489,6 +489,36 @@ def main() -> int:
     print("declared_self_plus_eight_and_512_18_10_9_schemas",
           "OK" if rule_schemas_ok else "MISMATCH")
 
+    # The source evaluates totalistic sums from the right edge of a fixed-width
+    # IntegerDigits vector.  For the ten-case binary nine-position schema this
+    # makes the printed spelling 3702 denote its ten least-significant digits,
+    # whose canonical table code is 630.  The spelling remains provenance.
+    codec_width = 10
+    canonical_code = 3702 % (2**codec_width)
+    digits_most_significant_first = tuple(
+        (canonical_code >> place) & 1 for place in range(codec_width - 1, -1, -1)
+    )
+    outputs_low_sum_first = tuple(reversed(digits_most_significant_first))
+    totalistic_codec_ok = (
+        TOTALISTIC_CODEC_EVIDENCE
+        == line_set("11902,11904,11906,11908,11910,11912")
+        and TOTALISTIC_CODEC_EVIDENCE <= GOVERNED_CONTINUATIONS
+        and TOTALISTIC_CODEC_EVIDENCE <= NATIVE_EVIDENCE
+        and "Implementation of totalistic cellular automata" in at(11902)
+        and "rule[[-1 - (RotateLeft[a] + a + RotateRight[a])]]" in at(11904)
+        and "more general case of r neighbors" in at(11906)
+        and "rule[[-1 - Sum[RotateLeft[a, i], {i, -r, r}]]]" in at(11908)
+        and "representation of totalistic rules" in at(11910)
+        and "code numbers" in at(11910)
+        and "IntegerDigits[num, k, 1 + (k - 1)(2r + 1)]" in at(11912)
+        and canonical_code == 630
+        and digits_most_significant_first == (1, 0, 0, 1, 1, 1, 0, 1, 1, 0)
+        and outputs_low_sum_first == (0, 1, 1, 0, 1, 1, 1, 0, 0, 1)
+    )
+    ok &= totalistic_codec_ok
+    print("fixed_width_totalistic_code_3702", "OK" if totalistic_codec_ok else "MISMATCH",
+          canonical_code, digits_most_significant_first, outputs_low_sum_first)
+
     update_seed_ok = (
         "updated in parallel at every step" in at(850)
         and "old values of neighbors" in at(10984)
@@ -531,6 +561,8 @@ def main() -> int:
         and digest(RETAINED) == EXPECTED_SOURCE_DIGEST
         and MATCHED_RETAINED == matched_retained
         and GOVERNED_CONTINUATIONS == governed
+        and TOTALISTIC_CODEC_EVIDENCE <= GOVERNED_CONTINUATIONS
+        and TOTALISTIC_CODEC_EVIDENCE <= NATIVE_EVIDENCE
         and not NATIVE_EVIDENCE & CONTROL_EVIDENCE
         and not NATIVE_EVIDENCE & RELATION_EVIDENCE
         and not CONTROL_EVIDENCE & RELATION_EVIDENCE

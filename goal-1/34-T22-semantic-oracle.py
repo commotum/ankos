@@ -1710,6 +1710,21 @@ def assert_wireworld_predicate_count() -> dict[str, int]:
 def assert_dyadaxes_lossy_summary() -> dict[str, int]:
     """Exhibit a Moore distinction erased by the current channel summary."""
 
+    cardinal_offsets = tuple(
+        offset
+        for offset in MOORE_OFFSETS
+        if abs(offset[0]) + abs(offset[1]) == 1
+    )
+    diagonal_offsets = tuple(
+        offset
+        for offset in MOORE_OFFSETS
+        if abs(offset[0]) + abs(offset[1]) == 2
+    )
+    assert cardinal_offsets == CARDINAL_2D
+    assert len(diagonal_offsets) == 4
+    assert set(cardinal_offsets).isdisjoint(diagonal_offsets)
+    assert set(cardinal_offsets).union(diagonal_offsets) == set(MOORE_OFFSETS)
+
     empty = LocalRead(0, (0,) * 8)
     three_neighbors = LocalRead(0, (1, 1, 0, 1, 0, 0, 0, 0))
     assert len(empty.neighbors) == len(three_neighbors.neighbors) == len(MOORE_OFFSETS)
@@ -2673,6 +2688,8 @@ def main() -> None:
 
     assert_named_rules()
     printed_code_counts = assert_printed_code_provenance()
+    wireworld_counts = assert_wireworld_predicate_count()
+    dyadaxes_counts = assert_dyadaxes_lossy_summary()
     representation_counts = assert_rule_representations()
     symmetry_counts = assert_symmetry_restrictions()
     permutation_counts = assert_basis_permutation()
@@ -2685,7 +2702,7 @@ def main() -> None:
     assert_decision_matrix()
 
     commutations = sum(commutation_counts.values())
-    assert commutations == 1_418
+    assert commutations == 1_419
     print("T22 semantic oracle: PASS")
     print(f"native_generic_commutations={commutations}")
     print(
@@ -2695,6 +2712,7 @@ def main() -> None:
         f"general_basis:{commutation_counts['general_basis']},"
         f"directional:{commutation_counts['directional']},"
         f"named:{commutation_counts['named']},"
+        f"wireworld:{commutation_counts['wireworld']},"
         f"ternary_projection:{commutation_counts['ternary_projection']},"
         f"ternary_full_total:{commutation_counts['ternary_full_total']}"
     )
@@ -2719,6 +2737,24 @@ def main() -> None:
         f"canonical:{printed_code_counts['canonical']},"
         f"high_quotient:{printed_code_counts['high_quotient']}; "
         "strict_out_of_range_rejection=PASS; native_generic_as_630=PASS"
+    )
+    print(
+        "wireworld_predicate_count="
+        f"local_contexts:{wireworld_counts['local_contexts']},"
+        f"predicate_fibers:{wireworld_counts['predicate_fibers']},"
+        f"equal_numeric_sum_collisions:{wireworld_counts['numeric_sum_collisions']},"
+        f"native_generic_steps:{commutation_counts['wireworld']}; "
+        "predicate=neighbor_label_equals_1; alphabet=4; table=0->0,1->2,2->3,"
+        "3->1_if_count_1_or_2_else_3"
+    )
+    print(
+        "dyadaxes_lossy_summary="
+        f"counterexamples:{dyadaxes_counts['counterexamples']},"
+        f"moore_counts:{dyadaxes_counts['first_moore_count']}_vs_"
+        f"{dyadaxes_counts['second_moore_count']},"
+        f"distinct_required_outputs:{dyadaxes_counts['distinct_required_outputs']}; "
+        "raw_geometry=Self+8_Moore_offsets; "
+        "summary=(self,cardinal_count>2,diagonal_count>2); new_commutations=0"
     )
     print(
         "symmetry_restrictions="
