@@ -214,7 +214,7 @@ QUERIES = {
     "Q38": r"arithmetic systems?",
     "Q39": r"5/2, multiplication system, 123",
     "Q40": (
-        r"Ceiling \(integer above\).*in arithmetic, 124|"
+        r"Carry digits.*in arithmetic, 124|"
         r"Conway, John H\..*and arithmetic recurrences, 1115|"
         r"Digit sequences.*non-locality in, 124|"
         r"Machine 600720.*properties of, 1145|"
@@ -328,44 +328,103 @@ INDEX_CLASS = {
 INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
 INDEX_ENTRY_GUARDS = {
     "core_alias_and_observer_routes": {
-        20828: ("3n + 1 problem, 904", "see also Arithmetic systems"),
+        20828: (
+            "3/2, powers of, 121, 903",
+            "3n + 1 problem, 904",
+            "and Turing machine 600720, 1145",
+            "see also Arithmetic systems",
+        ),
         20836: ("5/2, multiplication system, 123",),
         20908: ("Backtracking in 3 n + 1 problem, 904",),
-        20946: ("Ceiling (integer above)", "in arithmetic, 124"),
+        20946: ("Carry digits", "in arithmetic, 124", "non-locality of, 730"),
         20957: ("for 3n+1 problem, 904",),
         20980: ("Collatz problem, 904",),
         21088: ("Digit sequences, 116-127", "non-locality in, 124"),
         21090: ("Directional entropies and 3n + 1 problem, 904",),
-        21233: ("Hasse's algorithm (3 n + 1 problem)",),
-        21329: ("IntegerExponent and 3n + 1 problem, 904",),
+        21233: (
+            "Hasse's algorithm (3 n + 1 problem)",
+            "Hailstone numbers (3 n + 1",
+            "longest times for, 1144",
+        ),
+        21329: (
+            "IntegerExponent and 3n + 1 problem, 904",
+            "and Turing machine 600720, 1145",
+            "IntegerQ (integer test) and fraction systems, 1115",
+        ),
         21471: ("Localized structures and 3n + 1 problem, 904",),
         21497: ("Markov processes, 1084 and 3n + 1 problem, 904",),
-        21695: ("Non-locality", "in digit sequences, 730"),
+        21695: (
+            "Non-locality and Bell's inequalities, 1064",
+            "in digit sequences, 730",
+        ),
         21893: ("Random walks and 3n+1 problem, 904",),
-        21933: ("Reversible 3 n + 1 problem, 905",),
+        21933: (
+            "Reversible 3 n + 1 problem, 905",
+            "in systems based on numbers, 1018",
+        ),
         22150: ("Syracuse problem (3 n+1 problem)",),
         22287: ("Thwaites conjecture (3 n + 1 problem), 904",),
-        22378: ("Turing machines", "longest halting times for, 1144"),
+        # The official entry is Turing machines; its heading is displaced by
+        # the flattened multi-column extraction, so guard the owned subentry.
+        22378: ("longest halting times for, 1144",),
         22382: ("Ulam's problem (3 n + 1 problem)",),
     },
     "arithmetic_and_emulation_routes": {
-        20882: ("Arithmetic systems, 122-124", "and Turing machine 600720, 1145"),
+        20882: (
+            "non-locality of, 124, 731",
+            "Arithmetic systems, 122-124",
+            "emulating register machines, 673",
+            "and Turing machine 600720, 1145",
+        ),
         20894: ("in systems based on numbers, 961",),
         21173: ("FactorInteger (integer factorization) and arithmetic system encoding, 1115",),
         21223: ("Gödel's Theorem, 1158 and arithmetic systems, 673",),
         21475: ("Machine 600720", "properties of, 1145"),
         21521: ("Minsky, Marvin L.", "and register machines, 896, 1115"),
         21711: ("Number theory, 135", "and Turing machine 600720, 1145"),
-        21813: ("Primes", "and register machines, 1114"),
+        21813: (
+            "and quadratic congruential generators, 975",
+            "and register machines, 1114",
+        ),
         21923: ("Register machines, 97–102", "emulated by arithmetic systems, 673. 1114"),
         22390: ("of arithmetic systems, 673",),
     },
     "ordered_fraction_routes": {
         21050: ("Conway, John H.", "and arithmetic recurrences, 1115"),
         21195: ("Fraction systems, 1115", "Fractran (universal fraction system). 1115"),
-        21805: ("Primes and arithmetic systems, 1115",),
+        21805: (
+            "Primes and arithmetic systems, 1115",
+            "fractional parts of, 121, 903",
+            "Powers of 3/2",
+        ),
         21807: ("from fraction system, 1115",),
     },
+}
+
+# Independent broad lanes close the declared Index boundary.  Their union is
+# required to equal the routed rows exactly; this prevents a hand-tailored
+# main-query partition from declaring itself exhaustive merely because every
+# row it happened to find was classified.
+INDEX_CLOSURE_QUERIES = {
+    "collatz_aliases_and_observers": (
+        r"3n\s*\+\s*1|3 n\s*\+\s*1|Collatz|Syracuse|Thwaites|"
+        r"Ulam.?s problem|Hasse.?s algorithm|Hailstone numbers"
+    ),
+    "arithmetic_register_relations": (
+        r"arithmetic systems?|Minsky, Marvin L\..*register machines|"
+        r"and register machines, 1114 as rule 60 initial condition|"
+        r"in systems based on numbers, 961"
+    ),
+    "fraction_and_conway_relations": (
+        r"Conway, John H\..*arithmetic recurrences|Fraction systems|Fractran|"
+        r"IntegerQ \(integer test\).*fraction systems|"
+        r"Primes and arithmetic systems|from fraction system"
+    ),
+    "scalar_digit_locality": r"non-locality",
+    "machine_600720_and_halting_observer": (
+        r"600720|longest halting times for, 1144"
+    ),
+    "strict_five_over_two_alias": r"5/2, multiplication system, 123",
 }
 
 
@@ -416,6 +475,9 @@ SOURCE_MODEL_RECORDS = (
     "source-defect:line18632 says Table where a scalar prime-power Product is required",
     "source-defect:lines18635-18636 lose the ASEvolveList pattern punctuation",
     "source-defect:lines19456-19465 are not executable Turing-600720 formulas",
+    "source-defect:BOOK20946 flattens multiple Index columns; in arithmetic 124 and non-locality 730 belong to Carry digits rather than Ceiling",
+    "index-boundary:BOOK20846/21044/21068/21525 unbranched modular or cyclic multiplication references are T34 controls rather than new T35 routes",
+    "index-boundary:generic assembler compiler linker multiregister and Turing-to-register references are controls unless they state the governed arithmetic prime-exponent or 600720 relation",
     "codec:no finite alphabet or fixed-width integer representation is inferred",
     "architecture:no callback new state class update law executor or runner branch",
 )
@@ -462,14 +524,14 @@ EXPECTED_QUERY = {
     "Q37": (13, 13, 0, "eb0599b3481bb207128d491751677db7d74176d607eeb10500a1d8b50984c696"),
     "Q38": (16, 9, 7, "4c2295155eb814d20b2cb239b3c05f7bbd529dabc47eeefd8cf996d3234a1849"),
     "Q39": (1, 0, 1, "d5b2f984bb5733c30680940aaf707f6cd58a91a8560a9df34272de0561f6d435"),
-    "Q40": (0, 0, 0, ""),
-    "Q41": (0, 0, 0, ""),
+    "Q40": (6, 0, 6, "6f4f3eed8fd5b47ee2fa4987a951e5a779a05d611bf6db0e6998ec337aa2b507"),
+    "Q41": (3, 0, 3, "2bfa3c820c7625d1eab1dc57fb27dbb1c67f56fe5e69cef92b567dd722dc51d9"),
 }
 
 EXPECTED_SET = {
-    "union": (94, "40b81c785336df789c3ce317fe9c92fc4be0754069790c50324e5c12277713a1"),
+    "union": (103, "43996b5051d773a5f843329caefed8ebed13726b7f74d5a6bb614cae0434cb71"),
     "pre_index_union": (70, "a5ca5ad032a64d7d35bc6c3b84dee4c220b4c26e7a685884dea22381fd5ed6a7"),
-    "index": (24, "d18e13eff7bc43436cadd01fa13dfe4ca2fb6ff7a650fd2b91f1252eb2698cd5"),
+    "index": (33, "b8c3792ae477d1ccf919864e3966e0bf6914db2e8a72f8840f945bc6aa69cd3d"),
     "matched_retained": (63, "abe81df93c1a1006c8e97df9cf4d2c707696b6cf6b4849435062e7e694d8e1cc"),
     "governed_continuations": (64, "48148cacf2f2518262f71062a660af61bcb837cad1e025b7b3c23ea06cdd7226"),
     "retained": (127, "cadafc18e0fd96939ba51443d152252363876b16c39ef5fed84293fee5dd6401"),
@@ -487,13 +549,25 @@ EXPECTED_EXCLUDED_CLASS = {
     "later_T36_caption": (1, "75abf1771c0d9038e45203aa603758410f2418fd29b3fe0c25534009c579bb8e"),
 }
 EXPECTED_INDEX_CLASS = {
-    "core_alias_and_observer_routes": (15, "54556fc5a7a309b8ab9668bc778df368153063775460cb728faabffb47fc67d9"),
-    "arithmetic_and_emulation_routes": (6, "2150118212314c3de41c2c6b6811b35879d4651d01999735891fc1283dfcf6e7"),
-    "ordered_fraction_routes": (3, "9a44ad617d7439ee0c7608b0a917e31d962759bb52c235d99cd10f89fffa3322"),
+    "core_alias_and_observer_routes": (19, "22861c0fe9d4adcf351e3a1686bce32356ed771dde9afb1054162ca0c76a20cf"),
+    "arithmetic_and_emulation_routes": (10, "f135101191c62700503b6061c31d8ca98076064951b4117464eaa197c61fb4ff"),
+    "ordered_fraction_routes": (4, "ff2fcc59ff917f78bfd0e6c6a5cc76b742e5c64c82b31028ec225f979ef3a580"),
 }
 EXPECTED_INDEX_GUARDS = (
-    24,
-    "2d0d85b43107591528edc7eab044721f8f5cada44c3f6bc2438380d0ca604180",
+    33,
+    "2dd8be8a1fc4c33c84f1ed2260e3a7e8aa477fa979b1010b2293563bf42e42cd",
+)
+EXPECTED_INDEX_CLOSURE = {
+    "collatz_aliases_and_observers": (15, "b4bd526174cfe296325ad88a5fd69a999a02f2f1612b5768ca349bb0ed6a90dc"),
+    "arithmetic_register_relations": (10, "46a8be180b20fad824fe292d7c59973a47940b62b93cc27b6c296f458a7fa57c"),
+    "fraction_and_conway_relations": (5, "7fb48df45618964ce4cfa5ab947d2cb86379854767041951450c69606234c569"),
+    "scalar_digit_locality": (4, "582a89d7cb8d2b69280516683cc6507a6211f5d587436c9d4c32e9def383c144"),
+    "machine_600720_and_halting_observer": (6, "743d643de485756ec645f33e6f9ce1717efb344996db62b17ae75942146749ad"),
+    "strict_five_over_two_alias": (1, "d5b2f984bb5733c30680940aaf707f6cd58a91a8560a9df34272de0561f6d435"),
+}
+EXPECTED_INDEX_CLOSURE_UNION = (
+    33,
+    "b8c3792ae477d1ccf919864e3966e0bf6914db2e8a72f8840f945bc6aa69cd3d",
 )
 EXPECTED_IMAGE_PARTITION = {
     "native": (5, "0c03146ee327f67d29869863e7180f135426d5a0d76003d5276678feb1c826b8"),
@@ -516,8 +590,8 @@ EXPECTED_VISUAL_ONLY_BOUNDARY = (
     "8c6eb95cb11cfd589c2183d0c1239e2c5b7172e50bafe0035ede5e794b1123b9",
 )
 EXPECTED_SOURCE_MODEL = (
-    36,
-    "4433f52ca18cd1a2ad37b5055df398de716f83e184bd46ed7820df445a1d4fef",
+    37,
+    "69894d14f5ac675f34165705a543352d58138ce3762c16b74a1ebe2e92fb3c9d",
 )
 
 
@@ -596,27 +670,39 @@ EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 EXPECTED_SPLIT_QUERY = (
-    0,
-    "",
+    103,
+    "651169e7547bfe292d5b585132d703bb59c3bea61f20285f83b4e1dbd5adf4e8",
 )
 EXPECTED_SPLIT_QUERY_EXACT = (
-    0,
-    "",
+    84,
+    "be7a59b27492533dc1fdca1dde009cfa73b92d93f5eb3df1f33abbf0171dbe3e",
 )
 EXPECTED_SPLIT_QUERY_NONEXACT = (
-    0,
-    "",
+    19,
+    "a7fee72cc2042794f2483a804cd0443e5f79bbc847fb8a1222c44c258f2cfaa7",
 )
 EXPECTED_SPLIT_QUERY_MAPPING = (
-    0,
-    "",
+    103,
+    "48989b83cdbb088f2a74a41f68ab677ac5a1dc69a4293625b574cd6b0931b812",
 )
 EXPECTED_SPLIT_QUERY_CLASSES = {
-    "EXACT": (0, "", ""),
-    "IMAGE_BASENAME": (0, "", ""),
-    "NORMALIZED": (0, "", ""),
+    "EXACT": (
+        84,
+        "be7a59b27492533dc1fdca1dde009cfa73b92d93f5eb3df1f33abbf0171dbe3e",
+        "f408dfb93ce4fccf8d9f79aeb86ceb1028ac09428a96673b11d178ab08bf1111",
+    ),
+    "IMAGE_BASENAME": (
+        10,
+        "2a0e19ad9cbe33f86f4f9a64f91a62359bb922e58e0cd131ef4c763414a45f3c",
+        "902228c88badfbbf1a959987b21543e3e1aee7e800792e9fe212a80296304c2d",
+    ),
+    "NORMALIZED": (
+        9,
+        "8a1d41d034c3c04634dd1e195dac899e1603acdbb374848e8ef8f8210c0b5b42",
+        "dfc86f45a447c53f22f5f1feb43515390fc690e520295ff0e8eb5287e6817fbb",
+    ),
 }
-EXPECTED_SPLIT_QUERY_NORMALIZED_MINIMUM = 0.0
+EXPECTED_SPLIT_QUERY_NORMALIZED_MINIMUM = 0.991511
 EXPECTED_SPLIT_RETAINED_CROSSWALK = (
     127,
     "6e239a562708726d0c301a271a788b29db8d73013909a8f7b42e3d28531429a7",
@@ -826,6 +912,38 @@ def main() -> int:
         "unresolved_index",
         "OK" if index_ok else "MISMATCH",
         len(index ^ set(INDEX_ROUTED)),
+    )
+
+    index_closure_hits: dict[str, set[int]] = {}
+    index_closure_ok = True
+    for name, pattern in INDEX_CLOSURE_QUERIES.items():
+        rx = re.compile(pattern, re.IGNORECASE)
+        found = {
+            line_no
+            for line_no in range(INDEX_FIRST_LINE, len(lines) + 1)
+            if rx.search(at(line_no))
+        }
+        index_closure_hits[name] = found
+        actual = (len(found), digest(found))
+        good = actual == EXPECTED_INDEX_CLOSURE[name]
+        index_closure_ok &= good
+        print("index_closure_" + name, "OK" if good else "MISMATCH", *actual)
+    index_closure_union = set().union(*index_closure_hits.values())
+    index_closure_actual = (
+        len(index_closure_union),
+        digest(index_closure_union),
+    )
+    index_closure_ok &= (
+        index_closure_actual == EXPECTED_INDEX_CLOSURE_UNION
+        and index_closure_union == set(INDEX_ROUTED)
+    )
+    ok &= index_closure_ok
+    print(
+        "index_closure_union_equals_routed_boundary",
+        "OK" if index_closure_ok else "MISMATCH",
+        *index_closure_actual,
+        "delta",
+        *sorted(index_closure_union ^ set(INDEX_ROUTED)),
     )
 
     derived_images = {
