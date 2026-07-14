@@ -78,7 +78,7 @@ A 28-record transcription ledger binds every declared code, seed, displayed chec
 
 The audit also freezes the fifteen-page physical-file offset for printed pages 177–181 and the unusual Notes/split-Index reverse join. Random asset `3912` and the five stochastic-relation plates remain unreplayable because the Book does not serialize a complete initial configuration or RNG/distribution/seed; no crop, boundary, palette, or renderer is invented.
 
-## Initial Book Excerpts
+## Primary Book Excerpts
 
 ### Excerpt 1 — eight surrounding neighbors including diagonals
 

@@ -442,6 +442,53 @@ class GeneralLookup:
 
 Rule = BinaryOuterTotalistic | BinaryTotalistic | FullTotalProduct | GeneralLookup
 
+CASE_ZERO_IS_LEAST_SIGNIFICANT = "case-0-is-least-significant"
+
+
+@dataclass(frozen=True)
+class PrintedCodeProvenance:
+    """Source spelling adapter; never a canonical rule identifier.
+
+    Notes/T03 defines declared-width outputs by
+    U_s = floor(printed / radix**s) mod radix, so case zero is the least
+    significant digit.  The original spelling remains inspectable even when
+    digits above the declared table width have no denotation.
+    """
+
+    printed: int
+    radix: int
+    width: int
+    digit_direction: str
+
+    def __post_init__(self) -> None:
+        printed = require_int(self.printed, "printed code")
+        radix = require_int(self.radix, "printed code radix")
+        width = require_int(self.width, "printed code width")
+        if printed < 0:
+            raise ValueError("printed code must be nonnegative")
+        if radix < 2:
+            raise ValueError("printed code radix must be at least two")
+        if width <= 0:
+            raise ValueError("printed code width must be positive")
+        if type(self.digit_direction) is not str:
+            raise TypeError("digit direction must be an exact str")
+        if self.digit_direction != CASE_ZERO_IS_LEAST_SIGNIFICANT:
+            raise ValueError("unsupported printed-code digit direction")
+
+    @property
+    def canonical_table(self) -> tuple[int, ...]:
+        return tuple(
+            (self.printed // self.radix**case_index) % self.radix
+            for case_index in range(self.width)
+        )
+
+    @property
+    def canonical_code(self) -> int:
+        return sum(
+            output * self.radix**case_index
+            for case_index, output in enumerate(self.canonical_table)
+        )
+
 
 def projection_rule(alphabet_size: int, slots: int, selected: int) -> GeneralLookup:
     alphabet = FiniteAlphabet(alphabet_size)
@@ -1446,6 +1493,47 @@ def assert_named_rules() -> None:
             assert alive == ((4, 5), (5, 5), (6, 5))
 
 
+def assert_printed_code_provenance() -> dict[str, int]:
+    """Keep Notes code 3702 distinct from its ten-case denotation."""
+
+    spelling = PrintedCodeProvenance(
+        printed=3702,
+        radix=2,
+        width=10,
+        digit_direction=CASE_ZERO_IS_LEAST_SIGNIFICANT,
+    )
+    assert spelling.printed == 3702
+    assert spelling.radix == 2 and spelling.width == 10
+    assert spelling.digit_direction == CASE_ZERO_IS_LEAST_SIGNIFICANT
+    assert spelling.canonical_table == (0, 1, 1, 0, 1, 1, 1, 0, 0, 1)
+    assert spelling.canonical_table != tuple(reversed(spelling.canonical_table))
+    assert spelling.canonical_code == 630
+    assert spelling.canonical_code == spelling.printed % (2**10)
+    assert spelling.printed == 3 * (2**10) + spelling.canonical_code
+
+    canonical = BinaryTotalistic(spelling.canonical_code, 8)
+    for total, expected in enumerate(spelling.canonical_table):
+        if total <= 8:
+            read = LocalRead(0, (1,) * total + (0,) * (8 - total))
+        else:
+            read = LocalRead(1, (1,) * 8)
+        assert canonical.evaluate(read) == expected
+    assert factor_totalistic(expand_totalistic(canonical)) == canonical
+
+    # The canonical schema never silently normalizes an out-of-range integer.
+    expect_raises(
+        ValueError,
+        lambda: BinaryTotalistic(spelling.printed, 8),
+    )
+    return {
+        "printed": spelling.printed,
+        "canonical": spelling.canonical_code,
+        "width": spelling.width,
+        "radix": spelling.radix,
+        "high_quotient": spelling.printed // (spelling.radix**spelling.width),
+    }
+
+
 def assert_rule_representations() -> dict[str, int]:
     """Close codecs/factors without a wasteful 2^18 x 512 product.
 
@@ -1895,6 +1983,30 @@ def assert_native_generic_commutation() -> dict[str, int]:
         ) == native_outer_step(code, native)
         counts["named"] += 1
 
+    printed_totalistic = PrintedCodeProvenance(
+        3702,
+        2,
+        10,
+        CASE_ZERO_IS_LEAST_SIGNIFICANT,
+    )
+    native = Native2DState(
+        2,
+        (7, 7),
+        FixedBoundary(0),
+        cells_with_one((7, 7), (3, 3)),
+    )
+    direct = native_totalistic_step(printed_totalistic.canonical_code, native)
+    assert sum(direct.cells) == 9
+    assert decode_generic(
+        generic_step(
+            strict_t22_program(
+                BinaryTotalistic(printed_totalistic.canonical_code, 8)
+            ),
+            encode_native(native),
+        )
+    ) == direct
+    counts["named"] += 1
+
     ternary_program = strict_t22_program(book_position_projection(8, alphabet_size=3))
     for cells in product(range(3), repeat=4):
         native = Native2DState(3, (2, 2), periodic, cells)
@@ -1922,7 +2034,7 @@ def assert_native_generic_commutation() -> dict[str, int]:
         "totalistic_basis": 192,
         "general_basis": 514,
         "directional": 225,
-        "named": 4,
+        "named": 5,
         "ternary_projection": 81,
         "ternary_full_total": 81,
     }
@@ -2100,6 +2212,36 @@ def assert_hostile_validation() -> None:
     expect_raises(TypeError, lambda: outer_code(lambda _center, _count: True))
     expect_raises(TypeError, lambda: BinaryTotalistic(False, 8))
     expect_raises(ValueError, lambda: BinaryTotalistic(1 << 10, 8))
+    expect_raises(ValueError, lambda: BinaryTotalistic(3702, 8))
+    expect_raises(
+        TypeError,
+        lambda: PrintedCodeProvenance(
+            True, 2, 10, CASE_ZERO_IS_LEAST_SIGNIFICANT
+        ),
+    )
+    expect_raises(
+        ValueError,
+        lambda: PrintedCodeProvenance(
+            -1, 2, 10, CASE_ZERO_IS_LEAST_SIGNIFICANT
+        ),
+    )
+    expect_raises(
+        ValueError,
+        lambda: PrintedCodeProvenance(
+            3702, 1, 10, CASE_ZERO_IS_LEAST_SIGNIFICANT
+        ),
+    )
+    expect_raises(
+        ValueError,
+        lambda: PrintedCodeProvenance(
+            3702, 2, 0, CASE_ZERO_IS_LEAST_SIGNIFICANT
+        ),
+    )
+    expect_raises(TypeError, lambda: PrintedCodeProvenance(3702, 2, 10, 0))
+    expect_raises(
+        ValueError,
+        lambda: PrintedCodeProvenance(3702, 2, 10, "most-significant-first"),
+    )
     expect_raises(TypeError, lambda: full_total_product_case_count(True, 3))
     expect_raises(ValueError, lambda: full_total_product_case_count(0, 3))
     expect_raises(TypeError, lambda: FullTotalProduct(True, 3, (0,) * 51))
@@ -2116,6 +2258,37 @@ def assert_hostile_validation() -> None:
     expect_raises(ValueError, lambda: strict_general_from_code(1 << 512))
     expect_raises(TypeError, lambda: factor_outer(BinaryTotalistic(0, 8)))
     expect_raises(TypeError, lambda: factor_totalistic(BinaryOuterTotalistic(0, 8)))
+    expect_raises(TypeError, lambda: square_position_permutation(True))
+    expect_raises(ValueError, lambda: square_position_permutation(4))
+    expect_raises(TypeError, lambda: square_position_permutation(0, reflected=1))
+    expect_raises(TypeError, lambda: book_context_from_index(False))
+    expect_raises(ValueError, lambda: book_context_from_index(512))
+    expect_raises(
+        TypeError,
+        lambda: permute_book_context_by_positions(
+            [0] * 9, c4_square_permutations()[0]
+        ),
+    )
+    expect_raises(
+        ValueError,
+        lambda: permute_book_context_by_positions(
+            (0,) * 9, (0, 1, 2, 3, 4, 5, 6, 7, 7)
+        ),
+    )
+    expect_raises(ValueError, lambda: derive_book_context_orbits(()))
+    c4_orbits = derive_book_context_orbits(c4_square_permutations())
+    expect_raises(
+        ValueError,
+        lambda: expand_symmetry_restriction((0,) * 139, c4_orbits),
+    )
+    expect_raises(
+        TypeError,
+        lambda: expand_symmetry_restriction((*((0,) * 139), False), c4_orbits),
+    )
+    expect_raises(
+        TypeError,
+        lambda: factor_symmetry_restriction(BinaryOuterTotalistic(0, 8), c4_orbits),
+    )
     expect_raises(TypeError, lambda: book_row_column_to_enu([-1, 0]))
     expect_raises(TypeError, lambda: permute_book_code_to_runtime(True))
     expect_raises(ValueError, lambda: permute_book_code_to_runtime(1 << 512))
@@ -2230,6 +2403,7 @@ def main() -> None:
     assert access.self_position == 4 and access.offsets == MOORE_OFFSETS
 
     assert_named_rules()
+    printed_code_counts = assert_printed_code_provenance()
     representation_counts = assert_rule_representations()
     symmetry_counts = assert_symmetry_restrictions()
     permutation_counts = assert_basis_permutation()
@@ -2242,7 +2416,7 @@ def main() -> None:
     assert_decision_matrix()
 
     commutations = sum(commutation_counts.values())
-    assert commutations == 1_417
+    assert commutations == 1_418
     print("T22 semantic oracle: PASS")
     print(f"native_generic_commutations={commutations}")
     print(
@@ -2266,6 +2440,16 @@ def main() -> None:
     print(
         "named_codes=175850,746,174826,224 "
         "reconstructed_from_source_predicates=PASS; life_224=B3/S23"
+    )
+    print(
+        "printed_code_adapter="
+        f"radix:{printed_code_counts['radix']},"
+        f"width:{printed_code_counts['width']},"
+        f"direction:{CASE_ZERO_IS_LEAST_SIGNIFICANT},"
+        f"printed:{printed_code_counts['printed']},"
+        f"canonical:{printed_code_counts['canonical']},"
+        f"high_quotient:{printed_code_counts['high_quotient']}; "
+        "strict_out_of_range_rejection=PASS"
     )
     print(
         "symmetry_restrictions="
