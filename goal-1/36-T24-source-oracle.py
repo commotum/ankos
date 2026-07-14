@@ -50,23 +50,24 @@ QUERIES = {
     "Q00": r"\bhigher[- ]dimensional cellular automata\b",
     "Q01": (
         r"\bIn d dimensions with k colors\b|"
-        r"\bd-dimensional rule with\b|"
+        r"d\\text\{-dimensional rule with|"
         r"\bvalues in d dimensions with d-dimensional padding\b|"
         r"\bIn any number of dimensions, aspec\b|"
         r"\bneighborhood for any rule in any dimension\b|"
         r"\brange r rules in d dimensions\b"
     ),
     "Q02": (
-        r"\b(?:AxesTotal|FullTotal)\b|\bIdentityMatrix\[d\]\b|"
-        r"\bTable\[3, \{d\}\]\b|"
-        r"\bk \(2 d \(k - 1\) \+ 1\)\b|"
-        r"\b\(3<sup>d</sup> - 1\) \(k - 1\) \+ 1\b"
+        r"\b(?:AxesTotal|FullTotal)\b|IdentityMatrix\[d\]|"
+        r"Table\[3, \{d\}\]|"
+        r"k \(2 d \(k - 1\) \+ 1\)|"
+        r"\(3<sup>d</sup> - 1\) \(k - 1\) \+ 1|"
+        r"9-neighbor rules generalize to 3<sup>d</sup> -neighbor rules"
     ),
     "Q03": (
         r"\boffset lists are always taken to be in the order\b|"
         r"\bpossible neighborhood configurations are\b|"
-        r"\bIntegerDigits\[i - 1\b|\bFromDigits\[Reverse\[u\], k\]\b|"
-        r"\bIntegerDigits\[num, k, k\^Length\[os\]\]\b|"
+        r"\bIntegerDigits\[i - 1\b|FromDigits\[Reverse\[u\], k\]|"
+        r"IntegerDigits\[num, k, k\^Length\[os\]\]|"
         r"\bListCorrelate\b|\brule with neighbors at specified offsets\b"
     ),
     "Q04": (
@@ -109,7 +110,9 @@ QUERIES = {
         r"\baround each node the network must have the same structure\b|"
         r"\bFor nearest-neighbor rules, it suffices that each node has the same number of connections\b|"
         r"\bCayley graphs of groups always have the necessary homogeneity\b|"
-        r"\bconnections at each node are not labelled, then only totalistic cellular automaton rules\b"
+        r"\bconnections at each node are not labelled, then only totalistic cellular automaton rules\b|"
+        r"\bCellular automata on networks\b|\bnodes in arbitrary networks\b|"
+        r"\bNetCAStep\b"
     ),
     "Q10": (
         r"\bupdated in parallel at every step\b|\bold values of neighbors\b|"
@@ -133,6 +136,7 @@ QUERIES = {
         r"\bfixed underlying geometrical structure which remains unchanged\b|"
         r"\brules that specify how the connections coming out of each node should be rerouted\b|"
         r"\bdifferent operations are performed at different nodes, depending on the local structure\b|"
+        r"\bnew node should be inserted in the above connection\b|"
         r"\bSequential network systems\b|\bevery node is updated in parallel at each step\b"
     ),
     "Q14": (
@@ -143,6 +147,7 @@ QUERIES = {
     "Q15": (
         r"\bCrystal lattices[^.]{0,80}\bsystems on, 169, 929\b|"
         r"\bCubic lattices cellular automata on, 182\b|"
+        r"\bcellular automata on networks, 930, 936\b|"
         r"\bPenrose tilings, 932 cellular automata on, 930, 1028\b|"
         r"\bTriangular lattice[^.]{0,100}\bcellular automata on, 930\b|"
         r"\bTruncated octahedron[^.]{0,80}\band 3D lattices, 930\b|"
@@ -167,8 +172,9 @@ QUERIES = {
     ),
     "Q17": (
         r"\brule in which neighbor i is assigned weight\b|"
-        r"\bapplies the function fun to each list of neighbors\b|"
-        r"\bsecond argument of the step number\b|"
+        r"\bapplies the function fun to each list of\b|"
+        r"\bneighbors, with a second argument of the step\b|"
+        r"\bsecond argument passed to fun is the step number\b|"
         r"\bwhen a general function is used\b"
     ),
 }
