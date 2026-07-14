@@ -8,12 +8,14 @@ mandatory append-prefix transition.  The Book also gives explicit algorithms
 whose visible work states may be represented by ordinary SimplePrograms; those
 are realizations of the denotation, not hidden executor state or T40's identity.
 
-The Book does not use the catalog label.  Eighteen bounded, redundant query
+The Book does not use the catalog label.  Twenty bounded, redundant query
 lanes freeze discovery witnesses, while independent fixed universes close all
-117 nonblank rows in the strict main section and all audited relevant rows in
-the actual flattened Index.  The chapter split is intentionally treated as an
-abridged summary: compressed tables and omitted mechanics are explicit split
-dispositions rather than silently invented matches.
+117 nonblank rows in the strict main section and all 897 nonblank rows in the
+canonical physical Index block.  A separate 103-row vocabulary scan and a
+59-row hostile page/vocabulary/continuation review must have no unexplained
+match.  The chapter split is intentionally treated as an abridged summary:
+compressed tables and omitted mechanics are explicit split dispositions
+rather than silently invented matches.
 """
 
 from __future__ import annotations
@@ -56,7 +58,7 @@ def line_set(spec: str) -> frozenset[int]:
     return frozenset(result)
 
 
-# Exactly eighteen bounded lanes from the first-principles audit.  Q00 proves
+# Exactly twenty bounded lanes from the first-principles audit.  Q00 proves
 # that the catalog label is external vocabulary; Q15/Q16 close all 24 images.
 QUERIES = {
     "Q00": r"Mathematical-Constant Digit Systems?",
@@ -125,6 +127,16 @@ QUERIES = {
     "Q17": (
         r"^#### (?:\*\*)?(?:The Sequence of Primes|Mathematical Functions)"
         r"(?:\*\*)?$"
+    ),
+    "Q18": (
+        r"Implementation of digit sequences|History of numbers|"
+        r"History of digit sequences|Negative bases|Non-power bases|"
+        r"Multiplicative digit sequences|Greek and Roman number systems"
+    ),
+    "Q19": (
+        r"60 \(base\) of Babylonian numbers|Negative bases, 902|"
+        r"representation of, 902, 942|Unary representation of numbers|"
+        r"Zeckendorff representation"
     ),
 }
 
@@ -434,7 +446,7 @@ INDEX_EXCLUDED_GUARDS = {
     21338: ("Irreducible representations (of groups)",),
     21362: ("IUPAC chemical nomenclature",),
     21471: ("Littlewood, John E.", "and numbers of primes, 910"),
-    21515: ("Planck's constant",),
+    21515: ("Melting points of alkanes, 1194",),
     21545: ("generating Euclidean spaces, 1036",),
     21783: ("Planck's constant, 1061",),
     21881: ("Racah coefficients, see 6 j symbols",),
@@ -755,11 +767,11 @@ EXPECTED_SET = {
     "query_control": (7, "aa826f1310f068dd0ba264d1a4155fcd46ae2fe1f318c5dd5e159ac7eef21c2e"),
     "excluded": (5, "01c97a261db7b3a9cc557d83e011e5aa7a280433144e5df6d2b22bedd051f8f8"),
     "native": (169, "eba1f729ab1ed14b6809c181e74ac86b64a363c0bcecb684f7cdbdad8f76ca2b"),
-    "relation": (84, "5a092550392b0923fe58837ef403cf294d8e8de6fe92d976117a44bdf5e618cd"),
+    "relation": (89, "1f267ef9ef0d8d5d114a36c6c207e6bc06cdf756fc6edf2a37b7a442746f2c37"),
     "control": (9, "350e9aec3d0ce5466da723cf905a398bcb183fcafee5963145a2e8d8149a564e"),
-    "retained": (262, "0d7320af1896c9c5d27547dea20e8fb231f0f1f43a759158b98ca08c5e70cb86"),
+    "retained": (267, "9356ac2126f4ccdc10fc268fbda0394a56a0b704f2beb4f31f6657075e23a8b8"),
     "retained_query": (94, "165209df95c945a005adeb119f6282d55c64b89f663beecee826dc08f7eecb52"),
-    "continuations": (168, "f24f83df5825469c5512ab94efbe6a264731bd44fd1ef820449f76eaa70beb09"),
+    "continuations": (173, "523a1246c70c3c114465c0f2ee0b2f3156e408e4de8d4f7b8f72ca4be5a4b08b"),
 }
 EXPECTED_EXCLUDED_CLASS = {
     "name_collision": (1, "0a5b046d07f6f971b7776de682f57c5b9cdc8fa060db7ef59de82e721c8098f4"),
@@ -767,23 +779,45 @@ EXPECTED_EXCLUDED_CLASS = {
     "generic_algorithm_cross_reference": (3, "0af5fb1f1971b936e8052cc34fe7605caf6f6916a28992ff9485914a39d55704"),
 }
 EXPECTED_INDEX_CLASS = {
-    "native": (0, ""),
-    "relation": (0, ""),
-    "control": (0, ""),
+    "native": (30, "3b16acd55987dcf28f7ed4b681251e34c2e0bc176b3cb6b255450b18f735f181"),
+    "relation": (93, "dd169f9790b6b51b45ceb874cfa5a5dc039ec79e8f77ef8721141b94f5c97735"),
+    "control": (2, "b218edfa8ee128a727a7add20c49c3ab3ecfd99c0ab39a4505d587b637ac9f4f"),
 }
-EXPECTED_INDEX_CONTENT = (0, "")
-EXPECTED_INDEX_SEMANTIC_UNIVERSE = (0, "")
-EXPECTED_INDEX_QUERY_MISSES = (0, "")
-EXPECTED_INDEX_BROAD_VOCABULARY = (0, "")
-EXPECTED_INDEX_HOSTILE_AUDIT_CANDIDATES = (0, "")
-EXPECTED_INDEX_AUDIT_CANDIDATES = (0, "")
-EXPECTED_INDEX_BROAD_PATTERN_DIGEST = ""
+EXPECTED_INDEX_CONTENT = (
+    897,
+    "cfd508d5257c960ee983107dbf36edb3956358cbf26a3f480ee2ecf28aca75fe",
+)
+EXPECTED_INDEX_BOUNDS = (20826, 20828, 22456, 22458)
+EXPECTED_INDEX_BOUNDARY_TEXT = ("#### Index", "#### Colophon")
+EXPECTED_INDEX_SEMANTIC_UNIVERSE = (
+    125,
+    "6506671a99f5a07bbe522dad9b0abd36c7d613d18184874a32b458051bdb8d0b",
+)
+EXPECTED_INDEX_QUERY_MISSES = (
+    80,
+    "03102ba3d460def2f5dd062308b9e91059f926947eec495739eda29b1c0a2226",
+)
+EXPECTED_INDEX_BROAD_VOCABULARY = (
+    103,
+    "a033f5dcb776e11b95335497d9aa5374aa92ad36e94f45586cafc65f2647d1c0",
+)
+EXPECTED_INDEX_HOSTILE_AUDIT_CANDIDATES = (
+    59,
+    "e28eced6406a843e574b61a41c54671ae58e87e92786ffe9fed10c57c065a684",
+)
+EXPECTED_INDEX_AUDIT_CANDIDATES = (
+    139,
+    "3d77faddd09611f6fc6ca70ae718729825a0742d98039f4024ba46525b11220a",
+)
+EXPECTED_INDEX_BROAD_PATTERN_DIGEST = (
+    "d0a0e1b4b615d15ea3a2cf503738fa66c3ececf631b08da5aba653ac534097e8"
+)
 EXPECTED_INDEX_DISPOSITION = {
-    "native": (0, ""),
-    "relation": (0, ""),
-    "control": (0, ""),
-    "excluded": (0, ""),
-    "unrelated": (0, ""),
+    "native": EXPECTED_INDEX_CLASS["native"],
+    "relation": EXPECTED_INDEX_CLASS["relation"],
+    "control": EXPECTED_INDEX_CLASS["control"],
+    "excluded": (16, "0cba561e4c20a6bac1b7ed2d58c255b8250b6fc5bb4da0449c382b50247b0411"),
+    "unrelated": (756, "fb18d8f3599294848f313e46d34e2dd1aca435d803a79e3a1f761b33767e322c"),
 }
 EXPECTED_STRICT_MAIN_PARTITION = {
     "native": (102, "bd76954762c925f2ecf6bf0fa97d9c15db19d598a297a9c56d74e12d1dc41d59"),
@@ -823,8 +857,8 @@ EXPECTED_IMAGE_ASSET_MANIFEST = (
     "1cbfe8ffc3de77048a2d407c7ef63896dac86a8fc3ec83c7b00c1ea84e6f019e",
 )
 EXPECTED_SOURCE_SEMANTIC_GUARDS = (
-    37,
-    "7c09ef685b2770dc98b0b5d7b1ac8b6c8cb347ad8a5cd939e19af6d4663c8f74",
+    42,
+    "76ba47d0a82d2fae8d2dea007939b1f1937360ed64a1de643e80182da40dd9bb",
 )
 EXPECTED_SOURCE_DEFECT_GUARDS = (
     24,
@@ -832,9 +866,9 @@ EXPECTED_SOURCE_DEFECT_GUARDS = (
 )
 EXPECTED_RECORDS = {
     "excluded_line_hashes": (5, "d3b3134fe2e22ca121f65e3617dce002e45e1880600c264b4c5a100d9614efef"),
-    "index_guards": (0, ""),
-    "index_excluded_guards": (0, ""),
-    "index_dispositions": (0, ""),
+    "index_guards": (125, "13fb445170aa1abee369537b9046621307fbbd47d72e73712aa69155da16137a"),
+    "index_excluded_guards": (16, "473fe5dcba32ca177fe1913efb1879f35f72492ee7fd3b2f9fe231025c20382b"),
+    "index_dispositions": (897, "7fb3b037b55446f768f6975a1ac62e78caa6fd4a3525036b25b9451b75aa9ca2"),
     "index_sentinels": (8, "129bc6a4ef7cc76b5020676e603a2b5621ef56354b8ca2cd2fb4361938791710"),
     "strict_main_dispositions": (117, "94bed33e54122c19903a478a562a10d69491890aef04978d417bb53b3b13db91"),
     "semantic_guards": EXPECTED_SOURCE_SEMANTIC_GUARDS,
@@ -850,14 +884,14 @@ EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 EXPECTED_SPLIT_CROSSWALK = (
-    359,
-    "66f52a83007eb6c0a3fbf52165b07d1929b63a0ccc42c6512ba27a8874e81081",
+    1179,
+    "b150e9f3e3d58c0642a5a733503c83494bf3f7ddcc34887e7d35467ddc63872e",
 )
 EXPECTED_SPLIT_CLASSES = {
     "EXACT": (
-        214,
-        "7629cc72e9648e45f6b978aede0942792336e0d2d1ce715ae5586b988734f887",
-        "6a65aabc68562dfb756654af3e0700ec1418f5f05342078bafd6855080d9bc0b",
+        1031,
+        "3294b656e03a72f58eda7c47792797c84cb7439db2010393b68cdc17b6741533",
+        "a34c480fcb6e6b46319cb21bd7211235360e3a36589e3ea4415fb1eff8287f12",
     ),
     "IMAGE_BASENAME": (
         22,
@@ -865,9 +899,9 @@ EXPECTED_SPLIT_CLASSES = {
         "0b8db2d77d1426451dbdebffda4c817e79cbd2aa136773144314bf6a0ba1f56f",
     ),
     "NORMALIZED": (
-        20,
-        "8053cc358d079fdb7d26b173a13293be9795b12b09661319d1d6a7ce0914a80b",
-        "7e405c6235eb29bfda60f31c47cc13fe670cf76a40d5e73dcdcabd111a231936",
+        23,
+        "132e0cb06870878ee5240224268c617441996f59480dcfd8e0f5c0a9510d0fb0",
+        "7e931352aee66d0ab07c4625f2e68a4a11e48235e707ed3352ccc79c66354019",
     ),
     "SUMMARY": (
         14,
@@ -880,12 +914,12 @@ EXPECTED_SPLIT_CLASSES = {
         "0251161e7ee25fcf11bab72f0f7a389ac4bed5b2daceefb63a78b541b1e60748",
     ),
 }
-EXPECTED_SPLIT_NORMALIZED_MINIMUM = 0.999817
+EXPECTED_SPLIT_NORMALIZED_MINIMUM = 0.995885
 EXPECTED_LOGIC_RECORDS = (
     7,
     "d525310251895f506ca06d964ba736dd53ab659e07fed14d7fbe5422b1648754",
 )
-EXPECTED_AUDIT_DIGEST = "a06531ed8bfcaf4a926ad4db4bc6eb32b2a2e77ed3171ee5f9be9e3c145f166e"
+EXPECTED_AUDIT_DIGEST = "acbea84b531d016a53fa0b0d81da18362b0e008898050e9d895f0a74136611ae"
 
 
 IMAGE_PARTITION = {
@@ -1252,6 +1286,13 @@ def main(argv: list[str] | None = None) -> int:
         + len(index_candidate_unexplained)
     )
     index_content_actual = (len(index_actual_content), digest(index_actual_content))
+    index_bounds_actual = (
+        INDEX_FIRST_LINE,
+        INDEX_CONTENT_FIRST_LINE,
+        INDEX_CONTENT_LAST_LINE,
+        22458,
+    )
+    index_boundary_text_actual = (at(INDEX_FIRST_LINE), at(22458))
     index_universe_actual = (
         len(INDEX_SEMANTIC_UNIVERSE),
         digest(INDEX_SEMANTIC_UNIVERSE),
@@ -1280,6 +1321,8 @@ def main(argv: list[str] | None = None) -> int:
         and index_actual_content == index_disposition_union
         and index_disposition_overlap == 0
         and not index_candidate_unexplained
+        and index_bounds_actual == EXPECTED_INDEX_BOUNDS
+        and index_boundary_text_actual == EXPECTED_INDEX_BOUNDARY_TEXT
         and index_content_actual == EXPECTED_INDEX_CONTENT
         and index_universe_actual == EXPECTED_INDEX_SEMANTIC_UNIVERSE
         and index_miss_actual == EXPECTED_INDEX_QUERY_MISSES
@@ -1287,6 +1330,12 @@ def main(argv: list[str] | None = None) -> int:
         and index_hostile_actual == EXPECTED_INDEX_HOSTILE_AUDIT_CANDIDATES
         and index_audit_candidate_actual == EXPECTED_INDEX_AUDIT_CANDIDATES
         and index_pattern_actual == EXPECTED_INDEX_BROAD_PATTERN_DIGEST
+    )
+    check("index_bounds", index_bounds_actual == EXPECTED_INDEX_BOUNDS, *index_bounds_actual)
+    check(
+        "index_boundary_text",
+        index_boundary_text_actual == EXPECTED_INDEX_BOUNDARY_TEXT,
+        *index_boundary_text_actual,
     )
     check("index_content", index_content_actual == EXPECTED_INDEX_CONTENT, *index_content_actual)
     check("index_semantic_universe", index_universe_actual == EXPECTED_INDEX_SEMANTIC_UNIVERSE, *index_universe_actual)
@@ -1596,8 +1645,19 @@ def main(argv: list[str] | None = None) -> int:
         f"index-class:{name}:{len(values)}:{digest(values)}"
         for name, values in INDEX_CLASS.items()
     } | {
-        f"index-universe:{index_universe_actual[0]}:{index_universe_actual[1]}",
+        f"index-disposition:{name}:{len(values)}:{digest(values)}"
+        for name, values in index_disposition.items()
+    } | {
+        f"index-bounds:{':'.join(map(str, index_bounds_actual))}",
+        f"index-boundary-text:{index_boundary_text_actual[0]}:{index_boundary_text_actual[1]}",
+        f"index-content:{index_content_actual[0]}:{index_content_actual[1]}",
+        f"index-semantic:{index_universe_actual[0]}:{index_universe_actual[1]}",
         f"index-query-misses:{index_miss_actual[0]}:{index_miss_actual[1]}",
+        f"index-broad:{index_broad_actual[0]}:{index_broad_actual[1]}",
+        f"index-hostile:{index_hostile_actual[0]}:{index_hostile_actual[1]}",
+        f"index-audit-candidates:{index_audit_candidate_actual[0]}:{index_audit_candidate_actual[1]}",
+        f"index-pattern:{index_pattern_actual}",
+        f"index-candidate-unexplained:{len(index_candidate_unexplained)}",
         f"strict-unresolved:{strict_unresolved}",
         f"index-unresolved:{index_unresolved}",
     } | {
@@ -1633,9 +1693,14 @@ def main(argv: list[str] | None = None) -> int:
                 "unresolved": strict_unresolved,
             },
             "index": {
-                "digest": digest(INDEX_RELEVANT_UNIVERSE),
+                "audit_candidates": len(index_audit_candidates),
+                "broad_candidates": len(index_broad_candidates),
+                "content": len(index_actual_content),
+                "digest": digest(index_actual_content),
+                "excluded": len(INDEX_EXCLUDED),
                 "query_misses": len(index_query_misses),
-                "relevant": len(INDEX_RELEVANT_UNIVERSE),
+                "relevant": len(INDEX_SEMANTIC_UNIVERSE),
+                "unrelated": len(index_unrelated),
                 "unresolved": index_unresolved,
             },
             "split_crosswalk": len(crosswalk_records),
@@ -1654,8 +1719,11 @@ def main(argv: list[str] | None = None) -> int:
             f"retained={len(RETAINED)}",
             f"strict-main={len(STRICT_MAIN_CONTENT)}(N/S="
             f"{len(STRICT_MAIN_NATIVE)}/{len(STRICT_MAIN_STRUCTURAL)},closure={strict_unresolved})",
-            f"index={len(INDEX_ROUTED)}/query-misses={len(index_query_misses)}"
-            f"/closure={index_unresolved}",
+            f"index={len(index_actual_content)}(N/R/C/X/U="
+            f"{len(INDEX_CLASS['native'])}/{len(INDEX_CLASS['relation'])}/"
+            f"{len(INDEX_CLASS['control'])}/{len(INDEX_EXCLUDED)}/"
+            f"{len(index_unrelated)},query-misses={len(index_query_misses)},"
+            f"closure={index_unresolved})",
             f"images={len(GOVERNED_IMAGE_LINES)}(N/R/C="
             f"{len(NATIVE_IMAGE_LINES)}/{len(RELATION_IMAGE_LINES)}/{len(CONTROL_IMAGE_LINES)})",
             f"split={len(crosswalk_records)}",

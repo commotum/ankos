@@ -10,7 +10,7 @@ Status: **IN PROGRESS — ARCHITECTURE RESOLVED; ORACLE AND HOSTILE-REVIEW CLOSU
 - The Book distinguishes a simple exact definition of a number from its positional digits, the procedure used to compute them, and downstream walks/statistics/randomness claims (`BOOK:1667-1687`, `1796-1832`). These are different semantic roles even when one implementation calculates all of them together.
 - Positional representation is parameterized by a base and a normalization convention. A terminating rational has an infinite trailing-zero expansion under the strict source convention; suppressing those zeros is rendering, not native completion (`BOOK:1689-1707`).
 - The source gives an explicit base-2 long-division procedure with visible remainder `r`: compare `2r` with `q`, emit a digit, and replace `r` by `2r` or `2r-q` (`BOOK:1709-1715`). This is an ordinary exact `t+0D` SimpleProgram realization, not the identity of the rational number or of T40 as a whole.
-- The source gives an explicit square-root procedure over visible product state `(r,s)` (`BOOK:1738-1746`). Both components are read from one old snapshot and assigned atomically. The coefficient prefix alone is not complete work state.
+- The source gives an explicit square-root procedure over visible product state `(r,s)` (`BOOK:1738-1746`). Both components are read from one old snapshot and assigned atomically. This direct source representation is faithful, but not uniquely minimal: for a fixed declared radicand/profile, reachable normalized state is also losslessly represented by `s`, because phase, prefix, and `r` reconstruct from the invariant.
 - Positional digits and simple continued fractions are different representations of the same exact value. Continued-fraction coefficients are unbounded; rational continued fractions complete after finitely many terms, whereas irrational ones continue (`BOOK:1776-1794`, `13030-13038`).
 - A simple continued fraction has signed integer `a0=floor(x)` and positive tail coefficients. The page-903 relation is stated for any irrational `h`; page 162's positive ratios do not justify a globally nonnegative coefficient schema (`BOOK:12587-12589`).
 - The Notes explicitly describe direct nth-digit methods that need not generate preceding digits (`BOOK:12943-12958`). Therefore a T37-style append trace is one possible evaluator realization, not T40's universal native state or event.
@@ -52,6 +52,112 @@ Reconstruct T40 as exact mathematical denotations with explicit positional and s
 - Native Notes core: `BOOK:12921-13144`.
 - Entry kind: immutable exact numeric denotation plus typed representation query; explicit generation procedures are optional work SimplePrograms.
 - Native transition DOMAIN: not applicable to the denotation/query. Iterative realizations shown here use discrete `t+0D` work configurations.
+
+## Search Log
+
+The frozen source audit records the exact regex text, line set, digest, partition, and misses for eighteen bounded lanes:
+
+- `Q00` tests the external catalog label and deliberately finds no Book occurrence.
+- `Q01-Q06` cover mathematical constants, displayed digit histories, rational repetition/long division, the `(r,s)` square-root procedure, other algebraic/transcendental digit profiles, and positional/continued-fraction representations.
+- `Q07-Q08` cover direct nth-digit methods, exactness qualifications, randomness tests, normality, and named constructive normal numbers.
+- `Q09-Q13` follow nested/concatenated/leading-digit relations, continued fractions, Euclidean and Gauss-map algorithms, Egyptian-fraction/nested-radical/digital-slope relations, substitution seams, noncomputable definitions, compression, and CA relations.
+- `Q14` searches the actual Index vocabulary and page routes; `Q15-Q16` close all governed strict/Notes image names; `Q17` guards the T39/T41 section boundaries.
+
+Search recall is not used as the completeness proof. Three fixed content universes are independently routed:
+
+1. every 117 nonblank row in the strict main section `BOOK:1665-1832`;
+2. every 126 nonblank row in native Notes `BOOK:12921-13144`, plus the complete `BOOK:12587-12595` T40↔T42 seam and every followed relation/control continuation;
+3. every 897 nonblank physical row in the actual flattened Index block `BOOK:20828-22456`, ending before the Colophon at `BOOK:22458`.
+
+Every row is classified as native, relation, control, structural, exclusion, or unrelated; a separately frozen broad digit/base/representation/continued-fraction vocabulary and page/continuation expansion must be a subset of those explicit dispositions. This prevents regex misses and flattened-column wrapping from disappearing. The nominal Chapter 4 split is reverse-joined against the monolith, including its page-154/page-156 omissions. Candidate images are independently extracted and joined to the asset oracle. Name collisions, unrelated representation prose, generic algorithm references, Gray-code/other page-number spill, and adjacency-only material remain explicit exclusions rather than silent misses. The final frozen counts and digests appear under **Frozen Source Closure**; completion requires zero residual in every fixed universe.
+
+## Book Excerpts
+
+These grouped passages are the construction-bearing core. The source oracle retains and guards the complete surrounding rows, tables, captions, Notes, Index routes, continuations, and exclusions.
+
+### Excerpt 1 — definition, representation, and terminating-zero convention
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:1673-1689`
+- Context: Chapter 4, **Mathematical Constants**.
+- Establishes: a simple exact definition is not its digit sequence; base is representation data; a terminating rational still has an infinite canonical zero tail.
+
+> One might suppose that at some level it must be quite simple and regular. For the value of π is specified by the simple definition of being the ratio of the circumference of any circle to its diameter.
+>
+> But it turns out that even though this definition is simple, the digit sequence of π is not simple at all.
+>
+> There are some numbers whose digit sequences effectively have limited length. Thus, for example, the digit sequence of 3/8 in base 10 is 0.375. (Strictly, the digit sequence is 0.3750000000..., but the 0's do not affect the value of the number, so are normally suppressed.)
+
+### Excerpt 2 — exact long-division work state
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:1707-1715`
+- Context: Chapter 4 rational-digit construction and page-154 caption.
+- Establishes: the emitted digit and visible remainder transition are one exact scalar work SimpleProgram.
+
+> The method is essentially standard long division, although it is somewhat simpler in base 2 than in the usual case of base 10. The idea is to have a number r which essentially keeps track of the remainder at each step in the division. One starts by setting r equal to p. Then at each step, one compares the values of 2r and q. If 2r is less than q, the digit generated at that step is 0, and r is replaced by 2r. Otherwise, r is replaced by 2r - q. With this procedure, the value of r is always less than q.
+
+### Excerpt 3 — square-root product transition
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:1738-1746`
+- Context: Chapter 4 procedure and page-156 caption.
+- Establishes: the literal source uses simultaneous visible `(r,s)` updates; it supplies a faithful direct product representation, not proof that every lossless implementation must store both factors.
+
+> It involves two numbers r and s, which are initially set to be n and 0, respectively. At each step it compares the values of r and s, and if r is larger than s it replaces r and s by 4(r-s-1) and 2(s+2) respectively; otherwise it replaces them just by 4r and 2s.
+>
+> To find √n one starts by setting r=n and s=0. Then at each step one applies the rule `{r,s} -> If{r>s, {4(r-s-1), 2(s+2)}, {4r,2s}}`.
+
+### Excerpt 4 — positional and continued-fraction representations
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:1776-1798`
+- Context: Chapter 4 representation discussion.
+- Establishes: representation is a construction procedure; rational continued fractions are finite, irrational ones infinite; symbolic definition and evaluation effort remain distinct.
+
+> Any representation for a number can in a sense be thought of as specifying a procedure for constructing that number.
+>
+> A common example are so-called continued fraction representations, in which the operations of addition and division are used.
+>
+> In the case of rational numbers, the results are always of limited length. But for other numbers, they go on forever.
+>
+> At some level, one can always use symbolic expressions like √2 + e^√3 to represent numbers. And almost by definition, numbers that can be obtained by simple mathematical operations will correspond to simple such expressions. But the problem is that there is no telling how difficult it may be to compute the actual value of a number from the symbolic expression that is used to represent it.
+
+### Excerpt 5 — direct access and proof strength
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:12943-12958`
+- Context: Notes for page 137, **Computing nth digits directly**.
+- Establishes: prefix generation is not T40's universal state/trace, and finite-precision agreement is probable rather than exact.
+
+> Most methods for computing mathematical constants progressively generate each additional digit. But ... it is sometimes possible to generate, at least with overwhelming probability, the nth digit without explicitly finding previous ones.
+>
+> Note that with finite-precision arithmetic, some exponentially small probability exists that truncation of numbers will lead to incorrect results.
+
+### Excerpt 6 — empirical claims and the square-root source defect
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:12972-12982`
+- Context: Notes for pages 139 and 141.
+- Establishes: finite randomness/normality evidence has bounded proof strength; the Notes state the invariant and the overbroad rational claim that the executable counterexample below falsifies.
+
+> Empirical evidence for the randomness of the digit sequences of √n, π, etc. ... is based on applying various standard statistical tests of randomness, and remains somewhat haphazard.
+>
+> Note that the fact that a number is normal in one base does not imply anything about its normality in another base.
+>
+> The basic idea is at every step t to maintain the relation s² + 4r = 4^t n, keeping r as small as possible so as to make s ≤ 2^t √n < s + 4. Note that the method works not only for integers, but for any rational number n for which 1 ≤ n < 4.
+
+### Excerpt 7 — finalized continued fractions feed T42
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:12587-12595`
+- Context: Notes for page 122, **Relation to substitution systems**.
+- Establishes: strict T42 accepts irrational `h`, reverses the positive continued-fraction tail once to form a finite schedule, applies substitutions from seed `{0}`, and uses `Floor[h]` only as an output offset.
+
+> The first m rules ... are obtained for any h that is not a rational number from the continued fraction form of h by `Reverse[Rest[ContinuedFraction[h,m]]]`.
+>
+> Given these rules, the original sequence is given by `Floor[h] + Fold[Flatten[#1 /. #2] &, {0}, rules]`.
+
+### Excerpt 8 — an exact definition need not be computable as digits
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:17101`
+- Context: Notes on algorithmic randomness and Chaitin's Ω.
+- Establishes: formal exact denotation does not authorize an executable coefficient callback.
+
+> Even though one can never expect to construct them explicitly, one can still give formal descriptions of sequences that are algorithmically random. An example due to Gregory Chaitin is the digits of the fraction Ω of initial conditions for which a universal system halts.
 
 ## Final Semantic Model
 
@@ -152,7 +258,16 @@ s_t^2 + 4 r_t = 4^(t+1) n
 s_t <= 2^(t+1) sqrt(n) < s_t + 4.
 ```
 
-For integer-safe runs, `s` is divisible by four. Writing `a=s/4` and `beta=[r>s]` gives `a'=2a+beta`, so each event exposes one more binary digit while retaining the residual needed for future events. Erasing `r` is lossy: reachable states `(5,4)` from seed `9/4` and `(4,4)` from seed `2` have the same `s`/prefix but successors with `s'=12` and `s'=8`. Consequently neither a bare prefix nor `s` alone is complete work state.
+For integer-safe runs, `s` is divisible by four. Writing `a=s/4` and `beta=[r>s]` gives `a'=2a+beta`, so each event exposes one more binary digit. The direct `(r,s)` product is source-faithful. On reachable normalized states of one fixed declared program, however, the smaller representation `(n,profile,s)` is lossless:
+
+```text
+t = 0                              if s = 0
+t = bit_length(s/4)                otherwise
+r = (4^(t+1)n - s^2) / 4
+bits = base2(s/4) at width t.
+```
+
+The oracle proves this inverse and one-step commutation for all 390 audited states. The states `(5,4)` for `n=9/4` and `(4,4)` for `n=2` still prove that bare `s` without immutable program identity is lossy, but they do not prove that `r` is necessary within a fixed program. Thus product state and the invariant-valid quotient are alternative transparent representations; neither licenses a universal T40 prefix state for direct nth-digit or unrelated evaluator methods.
 
 ### Simple continued-fraction residual map
 
@@ -178,7 +293,7 @@ A certified random-access evaluator implements `CoefficientAt(index)` without fa
 | Positional codecs | 1/2 | T36 exact positional codecs | Query use only; T36's feedback RULE state is not imported |
 | Positional residual iteration | 2 | T43 exact unary self-map preset | Visible residual state and certified digit witness |
 | Rational long division | 2/3 | T34/T35/T43 exact scalar unary event | Fixed `(b,q)`, exact remainder invariant, ordinary assignment/update |
-| Square-root procedure | 3 | Product ALPHABET plus T35/T43 closed piecewise tuple map | Atomic `(r,s)` assignment and guarded source profile; no T40 UPDATE |
+| Square-root procedure | 3 | Product ALPHABET plus T35/T43 closed piecewise tuple map | Atomic direct-source `(r,s)` assignment; lossless reachable `(n,profile,s)` quotient with explicit inverse; guarded source profile; no T40 UPDATE |
 | Continued-fraction iteration | 2 | T43 fractional-reciprocal map preset | Exact integer-tail completion belongs to query context |
 | Direct nth coefficient | 2 | Pure evaluator query | No fabricated prefix history or hidden callback |
 | Digit/coefficient prefix | 2 | Typed finite query result | Not T37 canonical state; finite prefix is lossy |
@@ -186,6 +301,17 @@ A certified random-access evaluator implements `CoefficientAt(index)` without fa
 | New execution algebra | Not established | Existing declarative category plus branch-free SimpleProgram runner for realizations | No T40 state/frontier/neighborhood/update/executor/family branch |
 
 This is not an exception to the SimpleProgram architecture. The exact iterative procedures are SimplePrograms and use the same runner. The umbrella catalog entry also names an immutable denotation/query relation, just as T41 contains uniterated function definitions without inventing argument-as-time evolution. That declarative boundary was already established by D082/T41, so D139 uses classes 1–3 relative to the current architecture and adds no new class-4 category or execution algebra.
+
+## Principles Audit
+
+- **Principles 0–1 — re-derive and preserve the construction.** T40 is not assumed to be a digit-append automaton merely because its figures show successive prefixes. The source separates exact denotation, representation, an optional computation procedure, queried coefficients, and observers. Explicit long-division, square-root, positional-residual, and continued-fraction procedures remain ordinary SimplePrograms; the immutable denotation/query layer is the already established declarative category (`principles.md:3-13`).
+- **Principles 2–4 — closed visible responsibilities.** Every iterative realization uses the shared `FRONTIER.select -> NEIGHBORHOOD.read -> RULE -> UPDATE.apply` protocol with visible scalar or product work state and atomic assignment. Representation schemas, evaluator identity, proof strength, completion, and event witnesses are typed data. No host CAS callback, hidden remainder, fabricated prefix history, or T40 family switch supplies semantics (`principles.md:15-45`).
+- **Principles 5–7 — state, invariants, and intrinsic coupling.** Exact denotation, immutable program data, work configuration, coefficient result, and rendering are kept distinct. Long division couples `(base, denominator)` to the remainder invariant; the strict square-root preset couples its declared radicand/profile to either direct `(r,s)` or the proved lossless reachable-state quotient; a continued-fraction tail couples signed `a0`, positive later terms, and its finite/infinite status. Query horizon and resource budget do not become state or native control (`principles.md:47-69`).
+- **Principles 8–10 — lossless mappings before new classes.** T36 codecs, T34/T35 exact values, T41 definitions/query envelopes, and T43 scalar/product maps are reused directly or by restriction. The long-division/residual and fixed-program square-root commuting relations establish representation equivalence; finite prefixes are explicitly non-injective and therefore cannot replace exact values. These results justify classes 1–3 only and no new semantic class or executor (`principles.md:71-87`).
+- **Principles 11–12 — execution and observation remain downstream.** One branch-free runner can execute each declared work program. Direct nth-coefficient evaluation is a typed pure query, not a fake rollout. Walks, histograms, statistical tests, normality claims, crops, palettes, and suppressed trailing zeros neither feed evaluation nor strengthen proof status (`principles.md:89-103`).
+- **Principles 13–16 — adversarial fidelity is the closure gate.** Signed values, unbounded continued-fraction terms, terminating positional zero tails, rational continued-fraction completion, direct-access methods, source-defect counterexamples, prefix collisions, fixed-program quotient inversion, unsupported exact definitions, and the T42 rational rejection exercise the abstraction. Any opaque packing, float/CAS fallback, callback, family dispatch, hidden state, fixed-capacity simulation, or invented event is a hard failure rather than a compatibility route (`principles.md:105-127`).
+
+The smallest honest model is therefore an immutable exact denotation plus a typed representation query/result, with optional closed evaluator realizations expressed through existing SimpleProgram axes. The direct source representations may remain named presets, but source vocabulary alone does not prove a new runtime class; only a concrete failure of every lossless parameterization, restriction, or tagged/product representation would do so, and T40 supplies no such counterexample.
 
 ## Cross-Type Boundaries
 
@@ -235,7 +361,7 @@ The current `src/ca` package exposes names resembling the shared axes, but its e
 - No unbounded continued-fraction coefficient forced through finite alphabet ranks, `uint16`, signed `int64`, or palette codes.
 - No finite prefix claimed lossless, random, normal, or sufficient work state.
 - No sequential prefix events fabricated for a direct nth-digit evaluator; no approximate/probable result promoted to exact.
-- No square-root `(r,s)` residual hidden, no `s`/digit prefix called complete work state, and no false arbitrary-rational source claim silently accepted.
+- No square-root residual hidden: use direct `(r,s)` or the proved invariant-valid fixed-program `(n,profile,s)` quotient with explicit inverse. Do not use bare `s` across programs, and do not silently accept the false arbitrary-rational source claim.
 - No long-division remainder, Gauss residual, evaluator cache, precision state, or resource counter hidden outside a declared work configuration/context.
 - No T40-specific state, DOMAIN, FRONTIER, NEIGHBORHOOD, RULE-result wrapper, UPDATE, executor, family branch, or identity/no-op rollout.
 
@@ -253,16 +379,16 @@ Its independent textual replay checks 8,255 long-division states and 96 strict-i
 
 ## Frozen Semantic Closure
 
-`45-T40-semantic-oracle.py` independently reproduces the asset interface at 8,255 long-division states, 96 strict square-root events, and three guarded extraction mismatches. It closes nine signed and unsigned exact rational positional cases, nine canonical round trips, 225 signed-prefix cylinders, 60 certified decimal and 96 certified binary digits of pi, 30 certified pi continued-fraction coefficients, five quadratic-surd periods/400 coefficients, a 120-term exact continued fraction for `e`, and an 80-term exact negative-surd prefix. Explicit work checks cover 255 long-division events, 390 square-root commutations/780 invariant checks, and 24 Gauss-map commutations across six signed and unsigned sources. The `(5,4)` versus `(4,4)` loss witness, the surviving algebraic identity under the literal `11/5` misuse, and both failed nonnegative/enclosure obligations are executable guards.
+`45-T40-semantic-oracle.py` independently reproduces the asset interface at 8,255 long-division states, 96 strict square-root events, and three guarded extraction mismatches. It closes nine signed and unsigned exact rational positional cases, nine canonical round trips, 225 signed-prefix cylinders, 60 certified decimal and 96 certified binary digits of pi, 30 certified pi continued-fraction coefficients, five quadratic-surd periods/400 coefficients, a 120-term exact continued fraction for `e`, and an 80-term exact negative-surd prefix. Explicit work checks cover 255 long-division events, 390 square-root commutations/780 invariant checks, 390 inverse/step commutations for the fixed-program `s` quotient, and 24 Gauss-map commutations across six signed and unsigned sources. The `(5,4)` versus `(4,4)` witness is correctly scoped to loss of program identity; the surviving algebraic identity under the literal `11/5` misuse and both failed nonnegative/enclosure obligations remain executable guards.
 
-The query audit checks 159 prefix/random-access agreements plus 36 certified random-access agreements, separate positional and continued-fraction prefix-loss cylinders, exact/certified/partial/resource outcomes at `1/1/1/2`, unsupported/unknown/approximate/probable/failure outcomes at `4/1/1/1/1`, and eight proof-nonpromotion rejections. Three strict T42 handoffs carry 32 exact and 12 certified finalized coefficients without an evaluator callback; one exercises signed `a0` with an otherwise positive irrational continued-fraction tail, while a signed rational-complete prefix is explicitly rejected without losing its typed completion status. The interface carries the complete immutable replay-verified result, so source/result identity, proof strength, source kind, orientation, and requested count cannot be replaced by opaque forged IDs. Positional sign is a separate `leading_minus_magnitude` convention/result component rather than a negative digit, and simple continued fractions admit any signed integer `a0` while rejecting nonpositive tail coefficients. Canonical terminating positional values are classified `eventually_zero_infinite`, never finite completion; genuine `finite_terminated` remains confined to rational continued fractions. The public surface contains 35 declarative/work dataclasses, three optional work-record types, zero native T40 execution roles, and zero new class-4 algebras; 62 hostile rejections close invalid carriers, forged certificates, hidden roles, floats, sign/termination mistakes, and silent source repairs. Semantic digest is `b78dc3ff77018ee1aa57585621da14ef588e94554116517917986642f09a7e50`; script SHA-256 is `69a0d6a4722c9d97e4473610ce1acd002de30263ad94f5a90b15d9df2f63610a`.
+The query audit checks 159 prefix/random-access agreements plus 36 certified random-access agreements, separate positional and continued-fraction prefix-loss cylinders, exact/certified/partial/resource outcomes at `1/1/1/2`, unsupported/unknown/approximate/probable/failure outcomes at `4/1/1/1/1`, and eight proof-nonpromotion rejections. Three strict T42 handoffs carry 32 exact and 12 certified finalized coefficients without an evaluator callback; one exercises signed `a0` with an otherwise positive irrational continued-fraction tail, while a signed rational-complete prefix is explicitly rejected without losing its typed completion status. The interface carries the complete immutable replay-verified result, so source/result identity, proof strength, source kind, orientation, and requested count cannot be replaced by opaque forged IDs. Positional sign is a separate `leading_minus_magnitude` convention/result component rather than a negative digit, and simple continued fractions admit any signed integer `a0` while rejecting nonpositive tail coefficients. Canonical terminating positional values are classified `eventually_zero_infinite`, never finite completion; genuine `finite_terminated` remains confined to rational continued fractions. The public surface contains 35 declarative/work dataclasses, three optional work-record types, zero native T40 execution roles, and zero new class-4 algebras; 62 hostile rejections close invalid carriers, forged certificates, hidden roles, floats, sign/termination mistakes, and silent source repairs. Semantic digest is `1b24a9d0da60631d08adfdb5bd6e44139bebd31991f5d146e8e6197a616ee02e`; script SHA-256 is `4cdfb2774584feb2e1a3f1fec7539705076e530c1a0bac940fa02b2379e83f6c`.
 
 ## Completion Requirements
 
 - [ ] Every strict main, Notes, actual-Index, split, history, relation, control, exclusion, and extraction-defect candidate is dispositioned with zero unresolved mechanics.
 - [ ] The complete 24-asset/46-reference universe is hash-bound with split omissions and source limitations explicit.
 - [ ] Positional and continued-fraction definitions, canonicalization, coefficient queries, exactness levels, completion, work realizations, and observers are independently verified.
-- [ ] Long division, square-root product state/invariant/loss witness, positional/Gauss maps, direct nth access, and finite-prefix loss are adversarially tested.
+- [ ] Long division, square-root product/invariant and fixed-program quotient, positional/Gauss maps, direct nth access, and finite-prefix loss are adversarially tested.
 - [ ] T34/T36/T37/T39/T41/T42/T43 and current-runtime boundaries are synchronized.
 - [ ] Source, asset, semantic, cross-interface, mutation, portability, fail-closed, mode, Markdown, diff, scope, repository-test, and independent hostile-review gates pass.
 - [ ] D139, plan, evidence index, design ledger, architecture audit, and Goal 2 handoffs are synchronized with no new execution algebra.
