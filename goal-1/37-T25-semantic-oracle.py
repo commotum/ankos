@@ -1370,7 +1370,8 @@ def main() -> None:
         "typed_assignment_and_movement_writes,structured_traces;family_dispatch_is_not_semantics"
     )
     print(
-        "classification=T12+T21+T24_categories1_to_3;new_T25_UPDATE=NONE;"
+        "classification=T12+T21+T24_categories1_to_3;"
+        "new_T25_UPDATE_algebra=NONE;D011_topology_port_parameterization=YES;"
         "new_executor=NONE;relative_turn_and_hex_are_closed_visible_data"
     )
     print(f"hostile_rejections={groups['hostile']['hostile_rejections']}")
