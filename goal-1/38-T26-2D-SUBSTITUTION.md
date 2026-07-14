@@ -1,6 +1,6 @@
 # 38-T26-2D-SUBSTITUTION
 
-Status: **SOURCE, ASSET, SEMANTIC, AND CORRECTED ARCHITECTURE COMPLETE — FRESH HOSTILE REVIEW PENDING**
+Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, ARCHITECTURE, AND HOSTILE-REVIEW GATES PASS**
 
 ## Current Facts
 
@@ -632,8 +632,8 @@ T28 will compose contextual reads and its own boundary evidence with the ranked 
 - [x] Current API/runtime/tests are inspected and the smallest generic Goal 2 delta is implementation-ready.
 - [x] The semantic oracle proves the repaired `BOOK:13744` trajectory, crossed-width compatibility, incompatible no-successor outcomes, selected-rank-one/D019 contract, exact lineage/provenance, corrected full-result prototype-keyed bag representation, and final totals/digests.
 - [x] Source, asset, semantic, architecture, portability, fail-closed, silent-import, compile, repository-test, file-mode, Markdown, and local-scope gates pass.
-- [ ] Independent hostile review of this stage document has run and all findings are resolved.
-- [ ] Root integration into `0-plan.md`, `evidence-index.md`, `design-ledger.md`, and the eventual consolidated Goal 2 handoff is confirmed. Those global files are intentionally outside this stage-file-only task.
+- [x] Independent hostile review of this stage document has run and all findings are resolved.
+- [x] Root integration into `0-plan.md`, `evidence-index.md`, `design-ledger.md`, and `architecture-audit.md` is confirmed; the eventual consolidated Goal 2 handoff remains the goal-level synthesis deliverable.
 
 ## Gate Results
 
@@ -647,11 +647,12 @@ T28 will compose contextual reads and its own boundary evidence with the ranked 
 | Silent `runpy.run_path(..., run_name='audit_import')` for all three | PASS; exit 0 and no output. |
 | Explicit in-memory compilation of all three oracles | PASS. |
 | `uv run pytest -q` | PASS; 102 tests in 1.29 seconds. |
+| Independent hostile re-review | PASS; no blockers after a clean review of the final stage, global decisions, proofs, and oracles. |
 | File mode, `git diff --check`, and Markdown/scope checks | PASS; stage mode is `0644`, no whitespace errors, Markdown fences are balanced, and this assigned edit touched only the stage file. |
 
 ## Stage Results
 
-**SOURCE, ASSET, SEMANTIC, AND CORRECTED ARCHITECTURE WORK COMPLETE; FRESH HOSTILE REVIEW PENDING.** The regenerated 30-query source audit closes 94 lines at `67 pre-Index / 27 actual-Index`, retains 115 at `23 native / 67 relation / 25 control`, excludes 11, reverse-covers every retained line as `77 exact + 38 mapped`, and leaves zero unresolved. The dependent asset audit closes 26 unique JPEGs at `3/16/7`, 52 references, 26 hashes, 1,838,481 bytes, five complete assemblies, and `26 hash-bound / 0 transcribed / 0 pixel-replayed`.
+**COMPLETE.** The regenerated 30-query source audit closes 94 lines at `67 pre-Index / 27 actual-Index`, retains 115 at `23 native / 67 relation / 25 control`, excludes 11, reverse-covers every retained line as `77 exact + 38 mapped`, and leaves zero unresolved. The dependent asset audit closes 26 unique JPEGs at `3/16/7`, 52 references, 26 hashes, 1,838,481 bytes, five complete assemblies, and `26 hash-bound / 0 transcribed / 0 pixel-replayed`.
 
 The corrected construction requires generic `RankedBlockMosaicAssemble` on the shared UPDATE axis. D019's ordered selected-source behavior is its rank-one member: selected epsilon is retained, every unselected source is consumed with zero-width lineage, and empty/no-selected cases yield the empty successor. `RankedUniformBlockAssemble` is only the positive-old-shape/common-positive-block restriction and overlaps the 600 common-positive T13/D019 cases; T26 uses positive full-source rank two. Rank-two compatibility requires equal patch heights within each source row and equal total slab widths across source rows, with no per-column width invariant. The exact crossed-width witness succeeds. Incompatibility returns `PatchStepResult(Invalid(IncompatibleMosaic(...)), successors=(), step=None)` before allocation or commit.
 
@@ -659,4 +660,4 @@ The complete `BOOK:13744` mixed table is native after the explicitly guarded rem
 
 The semantic oracle closes the unique partition `6,667 native/generic + 6,658 prototype-keyed full-StepResult posed-bag + 16,709 selected-rank-one = 30,034` commuting proofs and 81 hostile rejections, including 2 typed incompatible/no-commit outcomes. Rank one partitions as 1,519 all-selected plus 15,190 consuming an unselected source; its 1,470 positive all-selected, 49 empty-input, 98 singleton/no-selected, 1,390 selected-epsilon, 1,519 right-neighbor-frontier, and 600 common-positive counters are nested/crossing and non-additive. Named page/native/bag, non-white, and newborn fixtures that overlap exhaustive cases are likewise not double-counted.
 
-T27 state encoding uses `(prototype_id, pose)`: each T26 label maps bijectively to a distinct prototype ID while all prototypes share declared unit-square geometry. Encoding maps/shares the source token; grid and bag UPDATE independently mint their successor tokens, then compare the two source/successor pairs through an explicit reversible token bijection. The proof covers outcome/changed, successor cardinality, step presence, successor carrier, every parent rectangle, every local child/target/prototype/pose witness, and exact equality between lineage children and the successor. Uniform steps have the parent-local pose commuting proof; mixed mosaics are not given that one-step T27 claim without further evidence. No T26 class, UPDATE algebra, executor, family branch, callback, hidden control, fixed canvas, implicit white behavior, or raster program is introduced. Root must still conduct a fresh hostile review and integrate the accepted result before declaring the stage fully complete.
+T27 state encoding uses `(prototype_id, pose)`: each T26 label maps bijectively to a distinct prototype ID while all prototypes share declared unit-square geometry. Encoding maps/shares the source token; grid and bag UPDATE independently mint their successor tokens, then compare the two source/successor pairs through an explicit reversible token bijection. The proof covers outcome/changed, successor cardinality, step presence, successor carrier, every parent rectangle, every local child/target/prototype/pose witness, and exact equality between lineage children and the successor. Uniform steps have the parent-local pose commuting proof; mixed mosaics are not given that one-step T27 claim without further evidence. No T26 class, UPDATE algebra, executor, family branch, callback, hidden control, fixed canvas, implicit white behavior, or raster program is introduced. Independent hostile re-review found no blockers, and the accepted result is root-integrated into the Goal 1 architecture, plan, ledger, and evidence index.
