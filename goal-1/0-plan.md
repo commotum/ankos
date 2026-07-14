@@ -49,12 +49,13 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 42 type stages are complete, no stage is reopened, T38 is in progress, and 2 type stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, T32, T33, T35, and T36 are complete under D119-D137.
+- Execution status at this sync is Foundation complete, 43 type stages are complete, no stage is reopened or in progress, and 2 type stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, T32, T33, T35, T36, and T38 are complete under D119-D138.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
 - Pure constraint/model sets, uniterated function definitions, and general PDE relations without a specified evolution problem are the three evidenced nonfits. Multiway rewriting remains a SimpleProgram whose structured UPDATE result contains a finite successor set plus complete branch witnesses.
 - T37 establishes a consecutive exact numeric prefix with an explicit value-carrier profile as state, normalized affine fixed-lag programs, minimal seeds and replay-verified checkpoints, and old-prefix term references. Its bijective `Val* · End(next_index)` encoding turns append into the RULE `End(n) -> Val(n,next) · End(n+1)` and reuses T16 exactly-one ordered splice. Compact seed-plus-event traces reconstruct every nested prefix; a lag window is only a non-injective evaluator quotient. The six page-143 rows, source erratum, factorial/Lucas/Perrin, and AR2/T38/T43 boundaries are exact. T37 left Ulam for T39; the T39 result below now resolves it compositionally.
+- T38 keeps that complete prefix, unique endpoint, endpoint replacement, splice, trace, `StepResult`, and branch-free runner. Its only new responsibility is a closed program-coupled `TermAt(AddressExpr)` selector/read DAG within loci/NEIGHBORHOOD, evaluated leftmost-innermost against one immutable old prefix. Fixed lag is a restriction. Undefined demanded addresses use the common no-commit `Error(UndefinedTermReference)`; malformed programs remain invalid. D138 adds no T38 state, FRONTIER, UPDATE, executor, or family branch.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` marker and distinguishes every proper-multiple hit from newly removed candidates. Composite rows advance even when membership does not change. On finite ordered support, a Boolean membership field plus marker is bijective with the ordered-survivor pack; RULE emits ordinary candidate false-writes plus the marker write and generic old-snapshot UPDATE commits them. Infinite membership is intensional. No subset-removal class is required.
 - The literal page-147 profile really retains `1`: all 1,200 stage cells match the stated update and the final black set is `{1} union primes<=100`, while bottom labels omit `1`. The mathematical preset therefore starts at 2 explicitly. Finite certification after divisor 10, requested rows through 13, and infinite noncompletion remain distinct.
@@ -1171,7 +1172,7 @@ Oracle SHAs are source `7a4cf99382aab7a6a6867798a06f3f0ce5d07887fce3217d1e6a6ae0
 
 ### 44-T38-VARIABLE-RECURRENCE
 
-Status: **IN PROGRESS — FIRST-PRINCIPLES SOURCE, ACCESS, AND REPRESENTATION AUDIT ACTIVE** in `goal-1/44-T38-VARIABLE-RECURRENCE.md`.
+Status: **COMPLETE — EVIDENCE, ASSETS, SEMANTICS, ARCHITECTURE, AND HOSTILE REVIEW CLOSED** in `goal-1/44-T38-VARIABLE-RECURRENCE.md`; D138 is active.
 
 #### Big Picture Objective
 
@@ -1179,11 +1180,21 @@ Test data-dependent historical addresses and invalid-index semantics in growing 
 
 #### Detailed Implementation Plan
 
-Apply the common protocol, emphasizing computed dependencies, guards, history availability, and halting or invalidity.
+Apply the common protocol. Reuse T37's complete `NumericPrefix`, unique `End` FRONTIER, endpoint write, compact trace, and D072/T16 one-splice lowering. Generalize only the closed loci/NEIGHBORHOOD access algebra with ordered nested `TermAt(AddressExpr)` reads over exact integer syntax. Preserve complete old-prefix state, leftmost-innermost demand occurrences, exact structural provenance, common no-commit errors, and observer separation. Add no T38 state, FRONTIER, UPDATE, executor, callback, family branch, hidden memo state, or invalid-index policy menu.
 
 #### Completion Requirements
 
 All T38 evidence is captured; dynamic reads are direct and validated; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+COMPLETE. Seventeen frozen query lanes close 102 unique source hits at `83 pre-Index / 19 actual-Index`; the pre query partition is `14 native / 13 relation / 24 control / 32 exclusion`, complete governed evidence is `20 / 36 / 44` plus 49 continuations, Index closes at `3 / 9 / 6 / 1`, and 124 unique split owners close at `98 exact / 15 image-basename / 11 normalized`. Twenty-five Book semantic guards, five auxiliary guards, seven source-defect records, 22 source-model records, and all 15 image dispositions are frozen with zero unresolved.
+
+Four governed rasters at `3/1/0` plus eleven exclusions bind 30 references, 15 hashes, 653,438 bytes, and five semantic manifests/51 records. All four are hash-bound, two are additionally limited-transcribed, and none is pixel-replayed. The asset/semantic integration gate equates all eight formulas, seeds, horizons, and 340 visible values; the cropped lower page-144 plots remain explicitly unavailable.
+
+The semantic oracle closes 325 displayed events/1,122 demands, 2,033 longer events/7,114 demands, 325 prefix/tag/splice commutations, 97 fixed-lag restrictions, 64 bounded-window loss counterexamples, 14 dependent-access cases with ten errors, 4,096 page-131 observer checks, 64 arbitrary-precision events up to 4,103 bits, ten compact lossless trace reconstructions, and 42 hostile rejections. D138 adds only a closed computed old-prefix selector/read witness inside loci/NEIGHBORHOOD; RULE and UPDATE remain T37/T16. No prior stage reopens.
+
+Oracle SHAs are source `1eff08e35e0bd341bc6e2fec5f1980ec100dc0e926f08cf4b191f6a931b72a19`, asset `95a45d1d079309a0b56fff8411be3cae66aaf31fdd38d49411a62c50f5b887e2`, and semantic `8c18745fffe49d69e494ace35f2f44155cbf86f2c76c56d3a0a9bb340badfc80`; semantic digest is `faee16f26234a7b90da40e8642ddef63224898ac217e436efd9091df7f3764b9`. Root/relocated/import/compile/optimized/bad-usage, cross-interface, mutation, mode, Markdown, diff, scope, 102-test, and independent hostile-review gates pass. Next: T40.
 
 ### 45-T40-CONSTANT-DIGITS
 
