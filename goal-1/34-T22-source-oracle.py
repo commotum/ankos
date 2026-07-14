@@ -204,14 +204,20 @@ GOVERNED_IMAGE_LINES = line_set(
 
 # Native is the smallest same-runner construction: declared Self plus the
 # eight offsets, typed tables, shared seeds/realizations, and snapshot commit.
+# Life's code-224/B3-S23 mechanics are a named outer-totalistic preset over
+# that same construction; its history, structures, and universality stay in
+# RELATION_EVIDENCE.
+LIFE_PRESET_EVIDENCE = line_set(
+    "14239,14241,14243,14245-14249,14251,14253-14259,14261"
+)
 NATIVE_EVIDENCE = (
     line_set(
         "850,2212,2226,2230,2234,10984,10986,10992,11068,11136,11178,11180,"
         "13469,13475,13477,13479,13481,13513,13515-13518,13520,13522-13526,"
-        "13528,13530,13531,13534,13536,13538,13540,13542-13549,14239,14241,"
-        "14243,14245-14249,14251,14253-14259,14261,16446"
+        "13528,13530,13531,13534,13536,13538,13540,13542-13549,16446"
     )
     | SEED_REALIZATION_CONTINUATIONS
+    | LIFE_PRESET_EVIDENCE
 )
 
 T21_CONTROL = line_set(

@@ -57,6 +57,14 @@ def load_source_oracle():
 
 SOURCE = load_source_oracle()
 S = set(SOURCE.RETAINED)
+EXPECTED_SOURCE_COUNT = 264
+EXPECTED_SOURCE_DIGEST = "e54447c5ecdd87f896d65e5f05bbcd809de6908a357f35762a44aedb194c39e6"
+EXPECTED_GOVERNED_IMAGE_COUNT = 68
+EXPECTED_GOVERNED_IMAGE_DIGEST = "d596854fe15fafe293038296ec2e5872612edda3033c08d6d2d314134ac3dd43"
+assert len(S) == EXPECTED_SOURCE_COUNT
+assert SOURCE.digest(S) == EXPECTED_SOURCE_DIGEST
+assert len(SOURCE.GOVERNED_IMAGE_LINES) == EXPECTED_GOVERNED_IMAGE_COUNT
+assert SOURCE.digest(SOURCE.GOVERNED_IMAGE_LINES) == EXPECTED_GOVERNED_IMAGE_DIGEST
 
 
 def near(source_lines: set[int], radius: int = 4) -> set[int]:
@@ -368,6 +376,8 @@ P = {
 S_STOCHASTIC = {15223, 15225, 15227, 15229, 15231}
 XCONSTRAINT = {2682}
 U = STRICT_U | R | P | S_STOCHASTIC | X21 | X23 | X24 | XCONSTRAINT
+assert set(SOURCE.GOVERNED_IMAGE_LINES) == U
+assert set(images) & S == U
 
 classes = (C18, C512, O, R, P, S_STOCHASTIC, X21, X23, X24, XCONSTRAINT)
 assert all(not (left & right) for i, left in enumerate(classes) for right in classes[i + 1 :])
@@ -437,6 +447,121 @@ REASON.update(
     }
 )
 assert set(REASON) == U
+
+
+# Radius four is an independent proximity candidate audit, not semantic
+# ownership.  The 27 unentitled rasters remain fully ledgered rather than being
+# discarded because their captions, neighboring examples, or physical pages
+# happen to lie near retained T22 evidence.
+C4 = near(S)
+ADJACENCY_ONLY = C4 - U
+assert U <= C4
+assert len(C4) == 95
+assert len(ADJACENCY_ONLY) == 27
+assert hashlib.sha256(
+    ",".join(map(str, sorted(C4))).encode("ascii")
+).hexdigest() == "fd5999e41e82738f1c6fe3ef16713d0e6c7534c21f3714a9c059cc530e6df175"
+assert hashlib.sha256(
+    ",".join(map(str, sorted(ADJACENCY_ONLY))).encode("ascii")
+).hexdigest() == "7b95fd5481303cc5ebcb3f5e942f8c10a160562ed83bff429fa0028dcc868602"
+
+ADJ_RELATED = {
+    2172,
+    2176,
+    2598,
+    2686,
+    2924,
+    4074,
+    4076,
+    13565,
+    13567,
+    13577,
+    13615,
+    14111,
+    14117,
+    15217,
+    15219,
+    15235,
+    15263,
+}
+ADJ_OTHER = ADJACENCY_ONLY - ADJ_RELATED
+assert not (ADJ_RELATED & ADJ_OTHER)
+assert ADJ_RELATED | ADJ_OTHER == ADJACENCY_ONLY
+assert (len(ADJ_RELATED), len(ADJ_OTHER)) == (17, 10)
+
+ADJACENCY_REASON = {
+    line_number: "typed relation/control reached only by radius-four proximity"
+    for line_number in ADJ_RELATED
+}
+ADJACENCY_REASON.update(
+    {
+        line_number: "other-construction or false-proximity raster"
+        for line_number in ADJ_OTHER
+    }
+)
+ADJACENCY_REASON.update(
+    {
+        2172: "T21 four-cardinal access diagram reached by proximity",
+        2176: "T21 four-cardinal code-1022 trace reached by proximity",
+        2598: "static four-neighbor constraint plate",
+        2686: "continuation of a pure 3x3-template constraint model set",
+        2924: "T21 four-cardinal equal-sum random-gallery continuation",
+        4074: "constraint/invariant-state relation",
+        4076: "constraint/invariant-state relation",
+        4418: "hexagonal snowflake image before the retained lattice model",
+        11134: "one-dimensional rule-30 output",
+        11176: "preceding function-rule output, not one of code 3702's five panels",
+        13565: "T21 five-position growth-count panel",
+        13567: "T21 five-position growth-count panel",
+        13577: "T21 code-942 slice observer",
+        13615: "T21 historical outer-count-code-12 plate",
+        14111: "constraint/model-set relation",
+        14117: "constraint relation to a one-dimensional CA history",
+        15217: "preceding stochastic four-neighbor aggregation plate",
+        15219: "preceding stochastic four-neighbor aggregation plate",
+        15235: "later stochastic eight-neighbor aggregation continuation",
+        15263: "diffusion-limited aggregation plate before code-746 evidence",
+        16450: "sequential-update cellular-automaton control",
+        16456: "one-dimensional sequential additive-rule plate",
+        16458: "one-dimensional sequential additive-rule plate",
+        16462: "one-dimensional sequential additive-rule plate",
+        16464: "one-dimensional sequential additive-rule plate",
+        17433: "single-step image-processing relation",
+        18746: "preceding two-neighbor rule plate",
+    }
+)
+assert set(ADJACENCY_REASON) == ADJACENCY_ONLY
+
+
+def governed_kind(book_line: int) -> str:
+    return (
+        "C18" if book_line in C18 else
+        "C512" if book_line in C512 else
+        "O" if book_line in O else
+        "R" if book_line in R else
+        "P-LIFE" if book_line in P else
+        "S-STOCHASTIC" if book_line in S_STOCHASTIC else
+        "X21" if book_line in X21 else
+        "X23" if book_line in X23 else
+        "X24" if book_line in X24 else
+        "X-CONSTRAINT"
+    )
+
+
+def adjacency_kind(book_line: int) -> str:
+    return "A-RELATED" if book_line in ADJ_RELATED else "A-OTHER"
+
+
+def ledger() -> tuple[str, int, int, int]:
+    """Exact governed-universe manifest (68 rows)."""
+
+    return _ledger(U, governed_kind, REASON)
+
+
+def adjacency_ledger() -> tuple[str, int, int, int]:
+    """Exact radius-four-only exclusion manifest (27 rows)."""
+
+    return _ledger(ADJACENCY_ONLY, adjacency_kind, ADJACENCY_REASON)
 
 
 CODE_746_REPRISE_LABELS = tuple(range(1, 17)) + (50, 100, 200, 300, 400)
@@ -559,9 +684,59 @@ PAGE_NUMBER_FALSE_FRIENDS = {
     2104: "_page_181_Picture_2.jpeg",
 }
 assert {line: Path(images[line]).name for line in PAGE_NUMBER_FALSE_FRIENDS} == PAGE_NUMBER_FALSE_FRIENDS
+assert set(PAGE_NUMBER_FALSE_FRIENDS).isdisjoint(C4)
+
+
+guards = {
+    2212: "exactly three of its eight neighbors—including diagonals",
+    2226: "code number 175850",
+    2230: "code number 746",
+    2234: "code number 174826",
+    2250: "row of 11 black cells",
+    13475: "For the 9-neighbor rules introduced on page 177",
+    13479: "ListConvolve[{{2, 2, 2}, {2, 1, 2}, {2, 2, 2}}",
+    13481: "IntegerDigits[code, 2, 18]",
+    13544: "$2^{512}",
+    13547: "$2^{18}",
+    13548: "$2^{10}",
+    13549: "$2^9",
+    14241: "outer totalistic rules there are examples with codes 224 (Game of Life)",
+    14243: "Life 2D cellular automaton",
+    14247: "#1 == 1 && #2 == 4 || #2 == 3",
+    15221: "with 8 neighbors",
+    18755: "4-color WireWorld cellular automaton",
+}
+for line_number, fragment in guards.items():
+    assert line_number in S
+    assert fragment in lines[line_number - 1], (line_number, fragment)
+
+
+# T22 Notes are physically stored in split Index, while nominal split Notes is
+# empty.  Freeze representative reverse joins across mechanics, schema counts,
+# the named Life preset, and long-run code-746 evidence.
+notes_split = ASSET_ROOT / "BACK-MATTER/Index/Index.md"
+notes_split_lines = notes_split.read_text(encoding="utf-8").splitlines()
+nominal_notes = ASSET_ROOT / "BACK-MATTER/Notes/Notes.md"
+assert len(nominal_notes.read_text(encoding="utf-8").splitlines()) == 1
+for book_line, split_line in {
+    13475: 1376,
+    13544: 1445,
+    13620: 1521,
+    14239: 2140,
+    14243: 2144,
+    15267: 3168,
+}.items():
+    assert lines[book_line - 1] == notes_split_lines[split_line - 1]
 
 
 TRANSCRIPT_SPECS = STRICT_TRANSCRIPT_SPECS + RELATION_TRANSCRIPT_SPECS
+HASH_BOUND_ASSETS = set(C4)
+TRANSCRIBED_ASSETS = {asset_line for _, asset_line, _, _ in TRANSCRIPT_SPECS}
+PIXEL_REPLAYED_ASSETS: set[int] = set()
+assert len(HASH_BOUND_ASSETS) == 95
+assert len(TRANSCRIBED_ASSETS) == 28
+assert TRANSCRIBED_ASSETS <= U
+assert not PIXEL_REPLAYED_ASSETS
 
 
 def transcript_payload() -> str:
@@ -595,3 +770,71 @@ TRANSCRIPT_SHA256 = hashlib.sha256(TRANSCRIPT_PAYLOAD.encode("utf-8")).hexdigest
 # configuration that the Book does not serialize here.
 UNREPLAYABLE_RANDOM_ASSETS = {3912} | S_STOCHASTIC
 assert UNREPLAYABLE_RANDOM_ASSETS <= U
+
+
+EXPECTED_TRANSCRIPT_SHA256 = "981e0e0391310b9f3b86cd0f8863589bbf7423ddd1da87525da10d2ae704c4e3"
+EXPECTED_STRICT_UNIVERSE_SHA256 = "9be14d56b98ad3cf701533768d12c5b98cb05a85c599d73cb029f213bcc6efa4"
+EXPECTED_STRICT_LEDGER_SHA256 = "a8dfd2a91350fefe29f1e7f205182daa932335f555fb44be05fc256d1dbfa730"
+EXPECTED_GOVERNED_UNIVERSE_SHA256 = "d596854fe15fafe293038296ec2e5872612edda3033c08d6d2d314134ac3dd43"
+EXPECTED_GOVERNED_LEDGER_SHA256 = "0e88ca4aa91ea5599f71dbee0347ac7ea8bfa16d865a9bb4a6ac34f5cb317c13"
+EXPECTED_ADJACENCY_UNIVERSE_SHA256 = "7b95fd5481303cc5ebcb3f5e942f8c10a160562ed83bff429fa0028dcc868602"
+EXPECTED_ADJACENCY_LEDGER_SHA256 = "55e369f47d4108febd80b8e6b09f2ab5a7b50ff09bb5da8644a63909c079191d"
+EXPECTED_LIFE_UNIVERSE_SHA256 = "d43e2ef92df4c54ee10d3e491907851dc544389ad3a69ec38506a1c1726cbced"
+EXPECTED_LIFE_LEDGER_SHA256 = "ababa435e3e54af24ce60c8e9e32455087fb0bdae5865884a419cd4123878a76"
+assert TRANSCRIPT_SHA256 == EXPECTED_TRANSCRIPT_SHA256
+
+
+def universe_digest(values: set[int]) -> str:
+    return hashlib.sha256(",".join(map(str, sorted(values))).encode("ascii")).hexdigest()
+
+
+def selected_payload(payload: str, selected: set[int]) -> str:
+    rows = [
+        row
+        for row in payload.splitlines()
+        if int(row.split("|", 1)[0]) in selected
+    ]
+    assert len(rows) == len(selected)
+    return "\n".join(rows) + "\n"
+
+
+def main() -> None:
+    payload, monolith_refs, split_refs, hashes = ledger()
+    adjacency_payload, adjacency_monolith_refs, adjacency_split_refs, adjacency_hashes = (
+        adjacency_ledger()
+    )
+    strict_payload = selected_payload(payload, STRICT_U)
+    life_payload = selected_payload(payload, P)
+
+    assert universe_digest(STRICT_U) == EXPECTED_STRICT_UNIVERSE_SHA256
+    assert hashlib.sha256(strict_payload.encode("utf-8")).hexdigest() == EXPECTED_STRICT_LEDGER_SHA256
+    assert universe_digest(U) == EXPECTED_GOVERNED_UNIVERSE_SHA256
+    assert hashlib.sha256(payload.encode("utf-8")).hexdigest() == EXPECTED_GOVERNED_LEDGER_SHA256
+    assert universe_digest(ADJACENCY_ONLY) == EXPECTED_ADJACENCY_UNIVERSE_SHA256
+    assert hashlib.sha256(adjacency_payload.encode("utf-8")).hexdigest() == EXPECTED_ADJACENCY_LEDGER_SHA256
+    assert universe_digest(P) == EXPECTED_LIFE_UNIVERSE_SHA256
+    assert hashlib.sha256(life_payload.encode("utf-8")).hexdigest() == EXPECTED_LIFE_LEDGER_SHA256
+
+    assert len(payload.splitlines()) == 68
+    assert len(adjacency_payload.splitlines()) == 27
+    assert (monolith_refs, split_refs, hashes) == (68, 68, 68)
+    assert (adjacency_monolith_refs, adjacency_split_refs, adjacency_hashes) == (27, 27, 27)
+    all_rows = payload.splitlines() + adjacency_payload.splitlines()
+    assert len({row.split("|")[7] for row in all_rows}) == 95
+
+    print(
+        f"T22 asset oracle: PASS source={len(S)}; C4=95; governed=68; adjacency_only=27; "
+        "governed C18/C512/O/R/P-Life/S-stochastic/X21/X23/X24/X-constraint="
+        "4/0/8/17/19/5/1/9/4/1; adjacency related/other=17/10; "
+        "refs=190; unique_hashes=95; "
+        f"transcript_records={len(TRANSCRIPT_SPECS)}; transcript_sha256={TRANSCRIPT_SHA256}; "
+        "HASH_BOUND=95; TRANSCRIBED=28; PIXEL_REPLAYED=0; "
+        "named_outer_codes_175850/746/174826/224_all_18_cases=PASS; "
+        "Life=B3/S23_same_T22_algebra; C512_rasters=0(source_text_only); "
+        "random/stochastic_replay=UNAVAILABLE(no_serialized_RNG/distribution/seed); "
+        "page_offset=PASS; Notes_reverse_join=PASS"
+    )
+
+
+if __name__ == "__main__":
+    main()

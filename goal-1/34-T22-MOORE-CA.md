@@ -1,6 +1,6 @@
 # 34-T22-MOORE-CA
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN**
+Status: **IN PROGRESS — SOURCE, ASSET, AND SEMANTIC EVIDENCE CLOSED; ARCHITECTURE INTEGRATION AND HOSTILE REVIEW OPEN**
 
 ## Current Facts
 
@@ -27,7 +27,7 @@ Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN*
 - Strict Moore access is a declared composition containing exactly one `SelfAt` and the eight unique offsets in `{-1,0,1}^2 \ {(0,0)}`. No center read is implicit, and equal resolved cells on a small torus remain distinct read occurrences.
 - Raw Book row/column tuples plus their coordinate-frame tag are authoritative. Mapping to ENU must preserve order or permute every positional table; symmetric count rules cannot validate orientation.
 - The 18-case center-conditioned count table is not the same schema as the ten-case equal sum of all nine values, and neither is the arbitrary 512-context positional table.
-- Game of Life, other outer-totalistic presets, weighted/partitioned diagonal rules, block rules, stochastic rules, properties, growth shapes, and biological analogies remain typed presets/relations/observers unless strict T22 evidence imports them.
+- Game of Life is source-confirmed as the ordinary `B3/S23` nine-neighbor outer-totalistic code-`224` preset over T22's same construction (`BOOK:14239-14249`). Its structures, sparse algorithm, history, behavior class, and universality claims remain relations/implementations/observers. Other weighted/partitioned diagonal rules, block rules, stochastic rules, properties, growth shapes, and biological analogies remain separately typed at their evidence-backed boundaries.
 - A pattern that stops growing may still update to an unchanged successor. No fixed point or bounded picture silently becomes native halt.
 
 ## Big Picture Objective
@@ -45,7 +45,38 @@ Reconstruct Moore-neighborhood cellular automata from primary evidence and prove
 
 ## Search Log
 
-The exhaustive source and asset fixed-point oracles are in progress. No final count, digest, or zero-remainder claim is made yet.
+`34-T22-source-oracle.py` freezes 17 overlapping queries. Their union contains 164 lines: 117 pre-Index candidates and 47 actual-Index routes. All 117 construction candidates are dispositioned as 93 retained matches plus 24 explicit broad-query exclusions; no pre-Index or Index candidate remains unresolved.
+
+The 93 retained matches plus 171 governed continuations produce 264 source lines with digest `e54447c5ecdd87f896d65e5f05bbcd809de6908a357f35762a44aedb194c39e6`. The exact semantic partition is `90 native / 102 relation / 72 control`. Native evidence includes the Chapter 5 named codes, the nine-position implementation/counts/codecs, parallel update/realization evidence, and Life code `224` mechanics as a named preset. Life structures/history/universality remain relations; T21/T23/T24 and nonstep constraints remain controls.
+
+The 24 exclusions partition as `12 generic 1D code/update collisions / 7 physical-or-aggregation background collisions / 5 other constructions`. The 47 actual-Index lines route as `9 T22 geometry/code / 28 Life / 5 T23 / 2 T24 / 3 numeric false collisions`; the Index supplies navigation only.
+
+All 17 split Markdown sources are hash-bound. The query reverse join closes 162 records as `151 exact + 11 mapped variants`. Retained evidence closes as `186 exact + 78 mapped variants`, with no monolith-only retained line. The stable asset interface exposes 68 governed source-image lines, digest `d596854fe15fafe293038296ec2e5872612edda3033c08d6d2d314134ac3dd43`.
+
+## Source-Bound Asset Audit
+
+`34-T22-asset-oracle.py` derives a radius-four source-neighborhood candidate closure of 95 physical plates. The source oracle entitles 68 governed assets; 27 additional nearby plates are separately ledgered as adjacency-only rather than silently imported. The governed partition is:
+
+```text
+strict 18-case rule/access plates       4
+strict 512-context raster plates        0
+strict code-174826 continuation views    8
+deterministic relations/observers       17
+Life B3/S23 preset/relations            19
+stochastic eight-neighbor controls       5
+T21 cardinal control                     1
+T23 three-dimensional controls           9
+T24 other-lattice controls                4
+constraint/model-set control              1
+```
+
+The empty 512-context raster class is a positive finding: the source defines that schema textually but supplies no governed positional-rule plate. Count-symmetric images cannot prove positional order. Life is not put in a distinct family/control class; its 19 assets form a named-preset/relation subledger over the same T22 algebra. Stochastic aggregation is separately marked as canonical evolution whose RNG/distribution semantics belong to its owning stage, while the pure constraint plate is the actual nonstep control.
+
+All 95 candidates have one monolith and one split reference, for 190 references and 95 distinct physical hashes. The governed ledger digest is `0e88ca4aa91ea5599f71dbee0347ac7ea8bfa16d865a9bb4a6ac34f5cb317c13`; the adjacency-only universe/ledger digests are `7b95fd5481303cc5ebcb3f5e942f8c10a160562ed83bff429fa0028dcc868602` and `55e369f47d4108febd80b8e6b09f2ab5a7b50ff09bb5da8644a63909c079191d`.
+
+A 28-record transcription ledger binds every declared code, seed, displayed checkpoint, continuation label, shape observation, and relation tuple to both the physical asset hash and governing source-line hash. Its digest is `981e0e0391310b9f3b86cd0f8863589bbf7423ddd1da87525da10d2ae704c4e3`. It is explicitly `HASH_BOUND_NOT_PIXEL_REPLAYED`. The code predicates independently reconstruct `175850`, `746`, `174826`, and Life `224` across all 18 cases, but no raster is claimed as decoded execution evidence.
+
+The audit also freezes the fifteen-page physical-file offset for printed pages 177–181 and the unusual Notes/split-Index reverse join. Random and stochastic plates remain unreplayable because the Book does not serialize a complete initial configuration or RNG/distribution/seed; no crop, boundary, palette, or renderer is invented.
 
 ## Initial Book Excerpts
 
@@ -75,6 +106,26 @@ IntegerDigits[code, 2, 18]
 
 - Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:13534-13549`
 - Establishes: general positional, outer-totalistic, equal-sum totalistic, symmetry-reduced, and growth rules are distinct restrictions/representations over the same nine declared positions.
+
+### Excerpt 5 — dimension/alphabet generalization
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:13475-13503`
+- Establishes: `FullTotal` reads every surrounding position in the `3^d` cube, while self remains a separate radix-`k` factor. The rule table has `k*((3^d-1)*(k-1)+1)` cases. This is direct evidence that dimension, alphabet valuation, access, and compact RULE data are parameters of the same runner.
+
+### Excerpt 6 — growth restriction
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:13542-13563`
+- Establishes: growth-totalistic rules keep every black cell black, leaving nine birth-count choices for an eight-neighbor binary shell and therefore `2^9` rules. Code `174826` is the exactly-three-birth member, not another update law.
+
+### Excerpt 7 — Game of Life is an ordinary T22 preset
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:14239-14249`
+- Establishes: the Book explicitly lists Life as 9-neighbor outer-totalistic code `224` and implements each event from the old center plus the sum over the full `3x3` square. `#2==3` births a white center with three neighbors and preserves a black center with two; `#1==1 && #2==4` preserves a black center with three. This is `B3/S23` over the same 18 cases.
+
+### Excerpt 8 — sparse Life is a realization, not different semantics
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:14243-14261`
+- Establishes: the complete-array Life step and the more efficient list-of-black-positions step are alternate implementations of the same event. Sparse execution is admissible only with a proved commuting relation and compatible background; it does not replace the complete configuration or create a Life executor.
 
 ## Construction Model
 
@@ -118,6 +169,7 @@ This makes the prose/code relation inspectable rather than a family convention:
 - The rule “stay unchanged except become black at neighbor counts 3 or 5” sets every odd bit `j=2*n+1` and also bits `6` and `10`: `174762 + 64 + 1024 = 175850`.
 - The rule “stay unchanged except become black at count 3” sets every odd bit and bit `6`: `174762 + 64 = 174826`.
 - Code `746` sets both count-3 bits `6,7` and the old-black bits for counts `0,1,2,4`, namely `1,3,5,9`: `64+128+2+8+32+512 = 746`. Thus count 3 becomes black, counts 0/1/2/4 retain self, and counts 5 through 8 become white.
+- Life `B3/S23` sets the white-center birth bit `6` and the black-center survival bits `5,7`: `64+32+128 = 224`. The named Life program is therefore an ordinary value in the same 18-case schema.
 
 The semantic oracle must derive these values independently and reject swapped center/count significance, digit reversal, a hidden-center convention, and accidental agreement on symmetric fixtures.
 
@@ -129,6 +181,19 @@ The semantic oracle must derive these values independently and reject swapped ce
 - The Book's arbitrary positional rule orders its nine offsets lexicographically and treats the first position as the most-significant context digit (`BOOK:13491-13531`). The current exhaustive channel assigns its first gathered value the least-significant weight (`src/ca/rollout.py:750-759`). Goal 2 needs one explicit order/codec correction or table permutation, shared with T01/T21, not a T22 reversal shim.
 - Scalar Python integers can hold a 512-bit general-rule code, but the batch path normalizes rule IDs to `numpy.int64` (`src/ca/rollout.py:264-274`). Complete typed tables or arbitrary-precision tagged codecs are the semantic representation; machine-width batch IDs are a realization limit, not a reason to shrink the rule family.
 - Current fixed `shape`, boundary, dense arrays, canonical coordinates, and rasters are finite computation/trace realizations. They do not replace native square-grid support, the chosen exterior/background law, or the complete mathematical configuration.
+
+| Current area | Audited fit | Goal 2 disposition |
+|---|---|---|
+| `simple_programs.md` | DIRECT/PARAMETERIZATION for its documented fixed dense scope: it already describes `t+2D`, old boundary-extended snapshots, ordered local offsets, exhaustive/aggregate rules, and synchronous assignments. Its hard-coded writable next slice and scalar same-site result are one preset, not the SimpleProgram boundary. | Retain the evidenced fixed-lattice preset while moving support/topology, realization/boundary, RULE-result schema, and UPDATE into their owning broad axes. |
+| `loci.py` | DIRECT finite-realization mechanics: coordinate spaces and `gather` handle rank-two centered coordinates and fixed/periodic/reflective reads. | Reuse as a lowering. Do not identify array coordinates/order or finite shape with native square `Z^2` semantics. |
+| `frontiers.py` | DIRECT for a finite all-sites realization: `time_slice(shape)` enumerates the full old spatial slice. | Expose semantic `AllSites`; do not create `MooreFrontier` or retain writable-target terminology as the abstraction. |
+| `neighborhoods.py` | DIRECT/PARAMETERIZATION: `moore()` is the exact eight-cell `L_infinity` shell; `self_at()` and `compose()` preserve the center role. `dyadaxes_2d()` exposes the same raw nine positions under a different grouping. | Reuse ordinary selectors/components. A named Moore preset may return structural data only. |
+| `rules.py` | PARTIAL: finite channels, totalistic aggregation, and lookup metadata exist. Dyadaxes majority gates are lossy for T22, and current metadata does not establish the three complete T22 case schemas or arbitrary-precision identities. | Add closed complete tables, factor descriptors, schema-tagged codecs, and strict validators; no rule-family executor. |
+| `rollout.py` | MECHANICAL reuse behind an architectural mismatch: spatial gathering and fresh-array assignment already operate rank-generically from one snapshot, but family strings choose entry, only `time_slice` is admitted, general positional significance is reversed, and batch codes are `int64`. | Lower the branch-free typed runner through the vectorized kernel after fixing the shared codec and validation. No `moore`/Life branch. |
+| `specs.py` | PARTIAL: `Dynamics` carries dimension, finite shape, rule, neighborhoods, frontier, and boundary, but JSON resolution accepts only named Phase 1 families. | Decode structural typed axes/presets and stable program identity rather than catalog/family strings. |
+| `seeds.py` | DIRECT finite constructors/realizations, governed by D121. | Keep seeds, laws, horizons, crops, and backgrounds independent from the T22 program. |
+| `datasets.py` | CONTROL only: `2d-dyadaxes` fixes an `11x11` tensor, majority-gated rule, selected seeds, and fixed-zero boundary. | Preserve its experiment identity; do not rename it T22 or use it as conformance evidence. |
+| Current tests | PARTIAL: neighborhood tests pin the eight lexicographic offsets, while rollout tests exercise only Dyadaxes rule `0` and batch parity with rule `91`. | Add source predicates/codes/traces, general orientation, factor rejection, alias multiplicity, snapshot, boundary/support, arbitrary-precision, Life, and T21/T23 same-runner conformance. |
 
 ## Provisional Axis Classification
 
@@ -209,14 +274,14 @@ An outer-totalistic table expands to a general table only when every positional 
 
 `34-T22-semantic-oracle.py` implements two separate paths. The literal native reference reads Book row/column positions and evaluates general, outer-totalistic, equal-sum, and generalized finite-`k` formulas directly. The generic path constructs opaque snapshot-scoped source handles, explicit Self-plus-offset access, typed closed rules, one same-site write per source, and atomic old-snapshot parallel commit. Neither path calls the other evaluator.
 
-The closed oracle reports 1,416 native/generic commutations:
+The closed oracle reports 1,417 native/generic commutations:
 
 ```text
 outer compact bases          320
 equal-sum compact bases      192
 general positional bases     514
 nonaliasing directional      225
-named codes                    3
+named codes                    4
 ternary positional projection 81
 ternary FullTotal             81
 ```
@@ -225,7 +290,7 @@ Its representation proof covers all 262,144 18-bit outer signatures and independ
 
 The coordinate proof covers all `9 * 512 = 4,608` projection/context cases and all 512 table unit bases. It derives `runtime_to_book=(6,3,0,7,4,1,8,5,2)` and its inverse, then demonstrates that naive ENU re-sorting moves the projected source in a complete asymmetric step while certified table permutation commutes.
 
-The generalized Notes profile is checked for seven `(dimension,k)` pairs. For `d=2,k=3`, all `3^9 = 19,683` positional contexts hit exactly 51 `SelfValue x NeighborValueSum` cases with independently counted fibers, and 81 ternary native/generic steps commute. Binary overlap with the strict 18-case function is denotationally exact while the two schema types remain distinct.
+The generalized Notes profile is checked for seven `(dimension,k)` pairs. For `d=2,k=3`, all `3^9 = 19,683` positional contexts hit exactly 51 `SelfValue x NeighborValueSum` cases with independently counted fibers, and 81 ternary native/generic steps commute. Binary overlap with the strict 18-case function is denotationally exact while the two schema types remain distinct. The named-rule partition reconstructs `175850`, `746`, `174826`, and Life `224`; the latter also reproduces a horizontal-three to vertical-three blinker through both native and generic routes.
 
 Further adversaries preserve access-slot multiplicity on small periodic tori, separate fixed from periodic boundaries and native `Z^2` from finite realization, reject fixed-background sparse lowering without a quiescence proof, distinguish snapshot-parallel from in-place traversal, require exactly one explicit Self and eight unique offsets, reject malformed/stale/foreign source data and writes before commit, and execute T21/T22/T23 through one generic step function.
 

@@ -1217,7 +1217,7 @@ def outer_code(predicate: object) -> int:
 
 
 def assert_named_rules() -> None:
-    """Reconstruct BOOK:2226-2234 under the 18-case code convention."""
+    """Reconstruct BOOK:2226-2234 and BOOK:14239-14249 predicates."""
 
     code_175850 = outer_code(
         lambda center, count: 1 if count in (3, 5) else center
@@ -1228,12 +1228,25 @@ def assert_named_rules() -> None:
     code_174826 = outer_code(
         lambda center, count: 1 if count == 3 else center
     )
-    assert (code_175850, code_746, code_174826) == (175850, 746, 174826)
+    code_224 = outer_code(
+        lambda center, count: 1
+        if count == 3 or (center == 1 and count == 2)
+        else 0
+    )
+    assert (code_175850, code_746, code_174826, code_224) == (
+        175850,
+        746,
+        174826,
+        224,
+    )
 
     expected = {
         175850: lambda center, count: 1 if count in (3, 5) else center,
         746: lambda center, count: 1 if count == 3 else 0 if count >= 5 else center,
         174826: lambda center, count: 1 if count == 3 else center,
+        224: lambda center, count: 1
+        if count == 3 or (center == 1 and count == 2)
+        else 0,
     }
     for code, predicate in expected.items():
         rule = BinaryOuterTotalistic(code, 8)
@@ -1244,13 +1257,13 @@ def assert_named_rules() -> None:
 
     shape = (11, 11)
     seeds: list[Cells] = []
-    for length in (7, 7, 5):
+    for length in (7, 7, 5, 3):
         values = [0] * 121
         start = (11 - length) // 2
         for column in range(start, start + length):
             values[flat_index(shape, (5, column))] = 1
         seeds.append(tuple(values))
-    for code, cells in zip((175850, 746, 174826), seeds, strict=True):
+    for code, cells in zip((175850, 746, 174826, 224), seeds, strict=True):
         native = Native2DState(2, shape, FixedBoundary(0), cells)
         direct = native_outer_step(code, native)
         generic = generic_step(
@@ -1258,6 +1271,14 @@ def assert_named_rules() -> None:
             encode_native(native),
         )
         assert decode_generic(generic) == direct
+        if code == 224:
+            alive = tuple(
+                (row, column)
+                for row in range(shape[0])
+                for column in range(shape[1])
+                if direct.value_at(row, column) == 1
+            )
+            assert alive == ((4, 5), (5, 5), (6, 5))
 
 
 def assert_rule_representations() -> dict[str, int]:
@@ -1560,7 +1581,7 @@ def assert_native_generic_commutation() -> dict[str, int]:
             assert decode_generic(generic_step(program, encode_native(native))) == direct
             counts["directional"] += 1
 
-    for code in (175850, 746, 174826):
+    for code in (175850, 746, 174826, 224):
         native = Native2DState(
             2,
             (7, 7),
@@ -1602,7 +1623,7 @@ def assert_native_generic_commutation() -> dict[str, int]:
         "totalistic_basis": 192,
         "general_basis": 514,
         "directional": 225,
-        "named": 3,
+        "named": 4,
         "ternary_projection": 81,
         "ternary_full_total": 81,
     }
@@ -1776,6 +1797,8 @@ def assert_hostile_validation() -> None:
     expect_raises(TypeError, lambda: LocalAccess((SelfAccess(), object())))
     expect_raises(TypeError, lambda: BinaryOuterTotalistic(True, 8))
     expect_raises(ValueError, lambda: BinaryOuterTotalistic(1 << 18, 8))
+    expect_raises(TypeError, lambda: outer_code(object()))
+    expect_raises(TypeError, lambda: outer_code(lambda _center, _count: True))
     expect_raises(TypeError, lambda: BinaryTotalistic(False, 8))
     expect_raises(ValueError, lambda: BinaryTotalistic(1 << 10, 8))
     expect_raises(TypeError, lambda: full_total_product_case_count(True, 3))
@@ -1919,7 +1942,7 @@ def main() -> None:
     assert_decision_matrix()
 
     commutations = sum(commutation_counts.values())
-    assert commutations == 1_416
+    assert commutations == 1_417
     print("T22 semantic oracle: PASS")
     print(f"native_generic_commutations={commutations}")
     print(
@@ -1940,7 +1963,10 @@ def main() -> None:
     print(f"general_512_context_codec_basis={representation_counts['general_basis']}")
     print(f"book_to_ENU_context_cases={permutation_counts['context_cases']}")
     print(f"book_to_ENU_table_basis_cases={permutation_counts['basis_cases']}")
-    print("named_codes=175850,746,174826 reconstructed_from_source_predicates=PASS")
+    print(
+        "named_codes=175850,746,174826,224 "
+        "reconstructed_from_source_predicates=PASS; life_224=B3/S23"
+    )
     print("rule_counts=2^512_general,2^18_outer,2^10_equal_sum,2^9_growth")
     print(
         "generalized_profile=self+k*FullTotal; "
