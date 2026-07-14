@@ -1208,13 +1208,11 @@ def main() -> int:
     split_records: set[str] = set()
     split_exact: set[str] = set()
     split_nonexact: set[str] = set()
-    split_texts: set[str] = set()
     split_record_text: dict[str, str] = {}
     for path, relative in zip(split_paths, relative_paths, strict=True):
         split_file_lines = path.read_text(encoding="utf-8").splitlines()
         for line_no, line in enumerate(split_file_lines, 1):
             record = f"{relative}:{line_no}"
-            split_texts.add(line)
             split_record_text[record] = line
             if not any(rx.search(line) for rx in compiled):
                 continue
@@ -1256,47 +1254,73 @@ def main() -> int:
         *query_mapping_actual,
     )
 
-    exact_retained = {line_no for line_no in RETAINED if at(line_no) in split_texts}
-    nonexact_retained = set(RETAINED) - exact_retained
-    retained_mapping: set[str] = set()
-    monolith_only: set[int] = set()
-    retained_mapping_ok = (
-        set(SPLIT_RETAINED_WITNESSES) == nonexact_retained
-        and len(set(SPLIT_RETAINED_WITNESSES.values()))
-        == len(SPLIT_RETAINED_WITNESSES)
-    )
-    for line_no in sorted(nonexact_retained):
-        witness = SPLIT_RETAINED_WITNESSES.get(line_no)
-        if witness is None or witness not in split_record_text:
-            retained_mapping_ok = False
-            monolith_only.add(line_no)
+    retained_crosswalk: set[str] = set()
+    retained_owner_records: set[str] = set()
+    retained_class_lines: dict[str, set[int]] = {
+        "EXACT": set(),
+        "IMAGE_BASENAME": set(),
+        "NORMALIZED": set(),
+    }
+    retained_class_records: dict[str, set[str]] = {
+        name: set() for name in retained_class_lines
+    }
+    normalized_scores: list[float] = []
+    split_retained_ok = True
+    for line_no in sorted(RETAINED):
+        try:
+            witness = retained_owner_record(line_no)
+        except ValueError:
+            split_retained_ok = False
             continue
-        dice, ordered = witness_similarity(at(line_no), split_record_text[witness])
-        if dice < 0.60 or ordered < 0.80:
-            retained_mapping_ok = False
-            monolith_only.add(line_no)
+        if witness in retained_owner_records or witness not in split_record_text:
+            split_retained_ok = False
             continue
-        retained_mapping.add(f"{line_no}->{witness}")
-    exact_retained_actual = (len(exact_retained), digest(exact_retained))
-    nonexact_retained_actual = (len(nonexact_retained), digest(nonexact_retained))
-    retained_mapping_actual = (len(retained_mapping), digest_records(retained_mapping))
-    monolith_only_actual = (len(monolith_only), digest(monolith_only))
-    split_retained_ok = (
-        exact_retained_actual == EXPECTED_SPLIT_RETAINED_EXACT
-        and nonexact_retained_actual == EXPECTED_SPLIT_RETAINED_NONEXACT
-        and retained_mapping_actual == EXPECTED_SPLIT_RETAINED_MAPPING
-        and monolith_only_actual == EXPECTED_MONOLITH_ONLY
-        and len(retained_mapping) + len(monolith_only) == len(nonexact_retained)
-        and retained_mapping_ok
+        retained_owner_records.add(witness)
+        mode, score = retained_crosswalk_evidence(at(line_no), split_record_text[witness])
+        if mode not in retained_class_lines:
+            split_retained_ok = False
+            continue
+        if mode == "NORMALIZED":
+            normalized_scores.append(score)
+            if score < 0.98:
+                split_retained_ok = False
+                continue
+        elif score != 1.0:
+            split_retained_ok = False
+            continue
+        record = f"{line_no}->{witness}:{mode}:{score:.6f}"
+        retained_crosswalk.add(record)
+        retained_class_lines[mode].add(line_no)
+        retained_class_records[mode].add(record)
+
+    retained_crosswalk_actual = (
+        len(retained_crosswalk),
+        digest_records(retained_crosswalk),
     )
+    split_retained_ok &= (
+        retained_crosswalk_actual == EXPECTED_SPLIT_RETAINED_CROSSWALK
+        and len(retained_owner_records) == len(RETAINED)
+        and set().union(*retained_class_lines.values()) == set(RETAINED)
+        and sum(map(len, retained_class_lines.values())) == len(RETAINED)
+    )
+    retained_class_actual: dict[str, tuple[int, str, str]] = {}
+    for name in retained_class_lines:
+        actual = (
+            len(retained_class_lines[name]),
+            digest(retained_class_lines[name]),
+            digest_records(retained_class_records[name]),
+        )
+        retained_class_actual[name] = actual
+        split_retained_ok &= actual == EXPECTED_SPLIT_RETAINED_CLASSES[name]
+    normalized_minimum = min(normalized_scores, default=0.0)
+    split_retained_ok &= round(normalized_minimum, 6) == EXPECTED_NORMALIZED_MINIMUM
     ok &= split_retained_ok
     print(
-        "split_retained_reverse_join",
+        "split_retained_owner_crosswalk",
         "OK" if split_retained_ok else "MISMATCH",
-        *exact_retained_actual,
-        *nonexact_retained_actual,
-        *retained_mapping_actual,
-        *monolith_only_actual,
+        *retained_crosswalk_actual,
+        *(f"{name}:{retained_class_actual[name]}" for name in retained_class_actual),
+        f"normalized_min={normalized_minimum:.6f}",
     )
 
     atlas_lines = ATLAS.read_text(encoding="utf-8").splitlines()
@@ -1374,7 +1398,7 @@ def main() -> int:
     unresolved_total = (
         len(classification_delta)
         + len(index ^ set(INDEX_ROUTED))
-        + len(monolith_only)
+        + (len(RETAINED) - len(retained_crosswalk))
     )
     unresolved_ok = unresolved_total == 0
     ok &= unresolved_ok

@@ -391,6 +391,26 @@ def complete_residue_map_from_rows(
     )
 
 
+ProgramKey: TypeAlias = tuple[object, ...]
+
+
+@dataclass(frozen=True)
+class ProgramProvenance:
+    """Exact canonical program key plus its derived display/cache digest."""
+
+    structural_key: ProgramKey
+    display_sha256: str
+
+    def __post_init__(self) -> None:
+        key = exact_tuple(self.structural_key, "structural program key")
+        display = checked_program_id(self.display_sha256)
+        expected = sha256(repr(key).encode("utf-8")).hexdigest()
+        if display != expected:
+            raise ValueError("display SHA-256 must be derived from the exact structural key")
+        object.__setattr__(self, "structural_key", key)
+        object.__setattr__(self, "display_sha256", display)
+
+
 @dataclass(frozen=True)
 class ResidueBranchWitness:
     modulus: int
@@ -398,7 +418,7 @@ class ResidueBranchWitness:
     formula: AffineQuotient
     old_value: int
     new_value: int
-    program_id: str
+    provenance: ProgramProvenance
 
     def __post_init__(self) -> None:
         modulus = checked_modulus(self.modulus)
@@ -409,7 +429,14 @@ class ResidueBranchWitness:
             raise TypeError("witness formula must be exact AffineQuotient")
         object.__setattr__(self, "old_value", exact_int(self.old_value, "old value"))
         object.__setattr__(self, "new_value", exact_int(self.new_value, "new value"))
-        object.__setattr__(self, "program_id", checked_program_id(self.program_id))
+        if type(self.provenance) is not ProgramProvenance:
+            raise TypeError("residue witness must retain exact program provenance")
+
+    @property
+    def program_id(self) -> str:
+        """Derived display/cache ID; exact replay compares ``program`` itself."""
+
+        return self.provenance.display_sha256
 
 
 @dataclass(frozen=True)
@@ -464,11 +491,11 @@ def checked_program_id(value: object) -> str:
     return program_id
 
 
-def structural_program_id(program: object) -> str:
-    """Content-derived identity of the normalized closed source AST."""
+def structural_program_key(program: object) -> ProgramKey:
+    """Exact canonical identity of the normalized closed source AST."""
 
     if type(program) is CompleteResidueIntegerMap:
-        payload = (
+        return (
             "CompleteResidueIntegerMap/v1",
             program.carrier,
             program.modulus,
@@ -477,17 +504,27 @@ def structural_program_id(program: object) -> str:
                 for formula in program.formulas
             ),
         )
-    elif type(program) is OrderedFractionProgram:
-        payload = (
+    if type(program) is OrderedFractionProgram:
+        return (
             "OrderedFractionProgram/v1",
             tuple(
                 (fraction.numerator, fraction.denominator)
                 for fraction in program.fractions
             ),
         )
-    else:
-        raise TypeError("program identity requires a closed T35 rule node")
-    return sha256(repr(payload).encode("utf-8")).hexdigest()
+    raise TypeError("program identity requires a closed T35 rule node")
+
+
+def structural_program_id(program: object) -> str:
+    """Derived display/cache ID; semantic replay compares the exact key."""
+
+    key = structural_program_key(program)
+    return sha256(repr(key).encode("utf-8")).hexdigest()
+
+
+def program_provenance(program: object) -> ProgramProvenance:
+    key = structural_program_key(program)
+    return ProgramProvenance(key, sha256(repr(key).encode("utf-8")).hexdigest())
 
 
 def validate_program_configuration(
@@ -514,7 +551,7 @@ class FractionBranchWitness:
     tested_integral: tuple[bool, ...]
     old_value: int
     new_value: int
-    program_id: str
+    provenance: ProgramProvenance
 
     def __post_init__(self) -> None:
         selected_index = exact_int(self.selected_index, "selected index")
@@ -535,7 +572,12 @@ class FractionBranchWitness:
         object.__setattr__(self, "tested_integral", tuple(flags))
         object.__setattr__(self, "old_value", checked_integer_value(self.old_value, POSITIVE, "old value"))
         object.__setattr__(self, "new_value", checked_integer_value(self.new_value, POSITIVE, "new value"))
-        object.__setattr__(self, "program_id", checked_program_id(self.program_id))
+        if type(self.provenance) is not ProgramProvenance:
+            raise TypeError("fraction witness must retain exact program provenance")
+
+    @property
+    def program_id(self) -> str:
+        return self.provenance.display_sha256
 
 
 @dataclass(frozen=True)
@@ -549,7 +591,7 @@ class MissingBranch:
 
     old_value: int
     tested_integral: tuple[bool, ...]
-    program_id: str
+    provenance: ProgramProvenance
 
     def __post_init__(self) -> None:
         old_value = checked_integer_value(self.old_value, POSITIVE, "old value")
@@ -561,7 +603,12 @@ class MissingBranch:
                 raise ValueError("MissingBranch cannot contain an applicable row")
         object.__setattr__(self, "old_value", old_value)
         object.__setattr__(self, "tested_integral", tuple(raw))
-        object.__setattr__(self, "program_id", checked_program_id(self.program_id))
+        if type(self.provenance) is not ProgramProvenance:
+            raise TypeError("MissingBranch must retain exact program provenance")
+
+    @property
+    def program_id(self) -> str:
+        return self.provenance.display_sha256
 
 
 BranchWitness: TypeAlias = ResidueBranchWitness | FractionBranchWitness
@@ -590,7 +637,6 @@ def evaluate_closed_rule(
     if type(program) is CompleteResidueIntegerMap:
         if configuration.carrier != program.carrier:
             raise ValueError("program and configuration carriers differ")
-        program_id = structural_program_id(program)
         residue, formula = program.formula_for(old_value)
         new_value = formula.apply(old_value)
         witness = ResidueBranchWitness(
@@ -599,7 +645,7 @@ def evaluate_closed_rule(
             formula,
             old_value,
             new_value,
-            program_id,
+            program_provenance(program),
         )
         return ProposedScalarWrite(
             ScalarAssignment(SCALAR_LOCUS, new_value),
@@ -608,7 +654,6 @@ def evaluate_closed_rule(
     if type(program) is OrderedFractionProgram:
         if configuration.carrier != POSITIVE:
             raise ValueError("ordered fraction programs require positive integers")
-        program_id = structural_program_id(program)
         flags: list[bool] = []
         for index, fraction in enumerate(program.fractions):
             result = fraction.integral_product(old_value)
@@ -620,13 +665,13 @@ def evaluate_closed_rule(
                     tuple(flags),
                     old_value,
                     result,
-                    program_id,
+                    program_provenance(program),
                 )
                 return ProposedScalarWrite(
                     ScalarAssignment(SCALAR_LOCUS, result),
                     witness,
                 )
-        return MissingBranch(old_value, tuple(flags), program_id)
+        return MissingBranch(old_value, tuple(flags), program_provenance(program))
     raise TypeError("program must be a closed T35 rule node")
 
 
@@ -758,14 +803,15 @@ def advance(program: object, configuration: object) -> StepResult:
 
 @dataclass(frozen=True)
 class ScalarTrace:
-    program_id: str
+    provenance: ProgramProvenance
     requested_horizon: int
     states: tuple[ScalarConfiguration, ...]
     events: tuple[TransitionEvent, ...]
     stopped_result: StepResult | None
 
     def __post_init__(self) -> None:
-        program_id = checked_program_id(self.program_id)
+        if type(self.provenance) is not ProgramProvenance:
+            raise TypeError("trace must retain exact program provenance")
         horizon = checked_horizon(self.requested_horizon)
         states = exact_tuple(self.states, "trace states")
         events = exact_tuple(self.events, "trace events")
@@ -796,17 +842,20 @@ class ScalarTrace:
                 raise ValueError("stopped Error must have no successor or event")
             if self.stopped_result.outcome.reason.old_value != states[-1].value:
                 raise ValueError("Error reason must report the last complete scalar")
-            if self.stopped_result.outcome.reason.program_id != program_id:
+            if self.stopped_result.outcome.reason.provenance != self.provenance:
                 raise ValueError("Error reason and trace program provenance differ")
             if len(events) >= horizon:
                 raise ValueError("a partial-rule failure must occur before the horizon")
         for event in events:
-            if event.witness.program_id != program_id:
+            if event.witness.provenance != self.provenance:
                 raise ValueError("event witness and trace program provenance differ")
-        object.__setattr__(self, "program_id", program_id)
         object.__setattr__(self, "requested_horizon", horizon)
         object.__setattr__(self, "states", tuple(states))
         object.__setattr__(self, "events", tuple(events))
+
+    @property
+    def program_id(self) -> str:
+        return self.provenance.display_sha256
 
 
 def run(program: object, seed: object, horizon: object) -> ScalarTrace:
@@ -817,7 +866,6 @@ def run(program: object, seed: object, horizon: object) -> ScalarTrace:
     states = [seed]
     events: list[TransitionEvent] = []
     stopped_result: StepResult | None = None
-    program_id = structural_program_id(program)
     for _ in range(steps):
         result = advance(program, states[-1])
         if type(result.outcome) is Error:
@@ -829,7 +877,13 @@ def run(program: object, seed: object, horizon: object) -> ScalarTrace:
         if result.event is None:
             raise AssertionError("Advanced result lost its event")
         events.append(result.event)
-    return ScalarTrace(program_id, steps, tuple(states), tuple(events), stopped_result)
+    return ScalarTrace(
+        program_provenance(program),
+        steps,
+        tuple(states),
+        tuple(events),
+        stopped_result,
+    )
 
 
 def verify_residue_witness(
@@ -843,7 +897,7 @@ def verify_residue_witness(
     try:
         residue, formula = program.formula_for(witness.old_value)
         return (
-            witness.program_id == structural_program_id(program)
+            witness.provenance.structural_key == structural_program_key(program)
             and
             witness.modulus == program.modulus
             and witness.residue == residue
@@ -875,7 +929,7 @@ def verify_fraction_witness(
                 return False
             break
     return (
-        witness.program_id == structural_program_id(program)
+        witness.provenance.structural_key == structural_program_key(program)
         and tuple(flags) == witness.tested_integral
         and program.fractions[witness.selected_index] == witness.selected_fraction
         and result == witness.new_value
@@ -900,7 +954,7 @@ def verify_missing_branch(
         for fraction in program.fractions
     )
     return (
-        reason.program_id == structural_program_id(program)
+        reason.provenance.structural_key == structural_program_key(program)
         and flags == reason.tested_integral
         and not any(flags)
     )
@@ -941,7 +995,7 @@ def verify_trace_provenance(program: object, trace: object) -> bool:
     if type(trace) is not ScalarTrace:
         return False
     try:
-        if trace.program_id != structural_program_id(program):
+        if trace.provenance.structural_key != structural_program_key(program):
             return False
         if any(validate_program_configuration(program, state) != state for state in trace.states):
             return False
@@ -1467,7 +1521,7 @@ def audit_branch_witnesses() -> tuple[int, int, int, int]:
                 witness.formula,
                 witness.old_value,
                 witness.new_value,
-                witness.program_id,
+                witness.provenance,
             )
             assert not verify_residue_witness(program, forged_residue)
             forged_rejections += 1
@@ -1499,7 +1553,7 @@ def audit_branch_witnesses() -> tuple[int, int, int, int]:
                 (False,) * (witness.selected_index + 1) + (True,),
                 witness.old_value,
                 witness.new_value,
-                witness.program_id,
+                witness.provenance,
             )
             assert not verify_fraction_witness(fractions, forged)
             forged_rejections += 1
@@ -1532,7 +1586,7 @@ def audit_cross_program_event_rejections() -> tuple[int, int, int, int, int]:
         (True,),
         2,
         5,
-        structural_program_id(shadow_source),
+        program_provenance(shadow_source),
     )
     internally_valid_shadowed_event = TransitionEvent(
         ScalarConfiguration(POSITIVE, 2),
@@ -1563,14 +1617,14 @@ def audit_cross_program_event_rejections() -> tuple[int, int, int, int, int]:
     assert verify_trace_provenance(shadowed_right, right_zero)
     assert not verify_trace_provenance(shadowed_left, right_zero)
     assert not verify_trace_provenance(shadowed_right, left_zero)
-    program_ids = {
-        structural_program_id(parity_program_a()),
-        structural_program_id(parity_program_b()),
-        structural_program_id(shadowed_left),
-        structural_program_id(shadowed_right),
+    program_keys = {
+        structural_program_key(parity_program_a()),
+        structural_program_key(parity_program_b()),
+        structural_program_key(shadowed_left),
+        structural_program_key(shadowed_right),
     }
-    assert len(program_ids) == 4
-    return 2, 2, 3, 3, len(program_ids)
+    assert len(program_keys) == 4
+    return 2, 2, 3, 3, len(program_keys)
 
 
 def audit_ordered_fraction_partiality() -> tuple[int, int, int, int, int]:
@@ -2014,7 +2068,7 @@ def audit_hostile_validation() -> int:
         AffineQuotient(3, 3, 2),
         1,
         3,
-        structural_program_id(parity_program_a()),
+        program_provenance(parity_program_a()),
     )
     rejected += must_raise(
         ValueError,
@@ -2039,7 +2093,7 @@ def audit_hostile_validation() -> int:
                 AffineQuotient(3, 0, 2),
                 2,
                 3,
-                structural_program_id(parity_program_a()),
+                program_provenance(parity_program_a()),
             ),
         ),
     )
@@ -2056,7 +2110,7 @@ def audit_hostile_validation() -> int:
                 AffineQuotient(3, 3, 2),
                 1,
                 4,
-                structural_program_id(parity_program_a()),
+                program_provenance(parity_program_a()),
             ),
         ),
     )
@@ -2093,7 +2147,7 @@ def audit_hostile_validation() -> int:
                 AffineQuotient(3, 3, 2),
                 1,
                 3,
-                structural_program_id(parity_program_a()),
+                program_provenance(parity_program_a()),
             ),
         ),
     )
@@ -2110,7 +2164,7 @@ def audit_hostile_validation() -> int:
                 AffineQuotient(1, 0, 1),
                 1,
                 3,
-                structural_program_id(parity_program_a()),
+                program_provenance(parity_program_a()),
             ),
         ),
     )
@@ -2127,7 +2181,7 @@ def audit_hostile_validation() -> int:
                 (True,),
                 2,
                 5,
-                structural_program_id(
+                program_provenance(
                     OrderedFractionProgram((PositiveFraction(3, 2),))
                 ),
             ),
@@ -2147,7 +2201,7 @@ def audit_hostile_validation() -> int:
     missing_reason = MissingBranch(
         1,
         (False,),
-        structural_program_id(missing_program),
+        program_provenance(missing_program),
     )
     rejected += must_raise(
         ValueError,
@@ -2166,7 +2220,7 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(
         ValueError,
         lambda: ScalarTrace(
-            structural_program_id(parity_program_a()),
+            program_provenance(parity_program_a()),
             1,
             (
                 fixed_result.event.before,
@@ -2230,7 +2284,7 @@ def audit_hostile_validation() -> int:
             (True, True),
             2,
             3,
-            structural_program_id(
+            program_provenance(
                 OrderedFractionProgram((PositiveFraction(3, 2),))
             ),
         ),
@@ -2243,7 +2297,7 @@ def audit_hostile_validation() -> int:
             (False,),
             2,
             3,
-            structural_program_id(
+            program_provenance(
                 OrderedFractionProgram((PositiveFraction(3, 2),))
             ),
         ),
@@ -2253,7 +2307,7 @@ def audit_hostile_validation() -> int:
         lambda: MissingBranch(
             1,
             (False, True),
-            structural_program_id(
+            program_provenance(
                 OrderedFractionProgram((PositiveFraction(3, 2),))
             ),
         ),
