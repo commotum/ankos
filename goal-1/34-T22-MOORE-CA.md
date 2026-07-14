@@ -63,7 +63,7 @@ strict 512-context raster plates        0
 strict code-174826 continuation views    8
 deterministic relations/observers       17
 Life B3/S23 preset/relations            19
-stochastic eight-neighbor controls       5
+stochastic eight-neighbor relations      5
 T21 cardinal control                     1
 T23 three-dimensional controls           9
 T24 other-lattice controls                4
@@ -72,11 +72,11 @@ constraint/model-set control              1
 
 The empty 512-context raster class is a positive finding: the source defines that schema textually but supplies no governed positional-rule plate. Count-symmetric images cannot prove positional order. Life is not put in a distinct family/control class; its 19 assets form a named-preset/relation subledger over the same T22 algebra. Stochastic aggregation is separately marked as canonical evolution whose RNG/distribution semantics belong to its owning stage, while the pure constraint plate is the actual nonstep control.
 
-All 95 candidates have one monolith and one split reference, for 190 references and 95 distinct physical hashes. The governed ledger digest is `0e88ca4aa91ea5599f71dbee0347ac7ea8bfa16d865a9bb4a6ac34f5cb317c13`; the adjacency-only universe/ledger digests are `7b95fd5481303cc5ebcb3f5e942f8c10a160562ed83bff429fa0028dcc868602` and `55e369f47d4108febd80b8e6b09f2ab5a7b50ff09bb5da8644a63909c079191d`.
+All 95 candidates have one monolith and one split reference, for 190 references and 95 distinct physical hashes. The radius-four membership digest is `fd5999e41e82738f1c6fe3ef16713d0e6c7534c21f3714a9c059cc530e6df175`; the adjacency-only set partitions as `17 related / 10 other`. The strict, governed, adjacency-only, and Life-subledger digests are respectively `a8dfd2a91350fefe29f1e7f205182daa932335f555fb44be05fc256d1dbfa730`, `0e88ca4aa91ea5599f71dbee0347ac7ea8bfa16d865a9bb4a6ac34f5cb317c13`, `55e369f47d4108febd80b8e6b09f2ab5a7b50ff09bb5da8644a63909c079191d`, and `ababa435e3e54af24ce60c8e9e32455087fb0bdae5865884a419cd4123878a76`; the adjacency-only universe digest is `7b95fd5481303cc5ebcb3f5e942f8c10a160562ed83bff429fa0028dcc868602`.
 
-A 28-record transcription ledger binds every declared code, seed, displayed checkpoint, continuation label, shape observation, and relation tuple to both the physical asset hash and governing source-line hash. Its digest is `981e0e0391310b9f3b86cd0f8863589bbf7423ddd1da87525da10d2ae704c4e3`. It is explicitly `HASH_BOUND_NOT_PIXEL_REPLAYED`. The code predicates independently reconstruct `175850`, `746`, `174826`, and Life `224` across all 18 cases, but no raster is claimed as decoded execution evidence.
+A 28-record transcription ledger binds every declared code, seed, displayed checkpoint, continuation label, shape observation, and relation tuple to both the physical asset hash and governing source-line hash. Its digest is `981e0e0391310b9f3b86cd0f8863589bbf7423ddd1da87525da10d2ae704c4e3`. The frozen claim boundary is `HASH_BOUND=95; TRANSCRIBED=28; PIXEL_REPLAYED=0`. The code predicates independently reconstruct `175850`, `746`, `174826`, and Life `224` across all 18 cases, but no raster is claimed as decoded execution evidence.
 
-The audit also freezes the fifteen-page physical-file offset for printed pages 177–181 and the unusual Notes/split-Index reverse join. Random and stochastic plates remain unreplayable because the Book does not serialize a complete initial configuration or RNG/distribution/seed; no crop, boundary, palette, or renderer is invented.
+The audit also freezes the fifteen-page physical-file offset for printed pages 177–181 and the unusual Notes/split-Index reverse join. Random asset `3912` and the five stochastic-relation plates remain unreplayable because the Book does not serialize a complete initial configuration or RNG/distribution/seed; no crop, boundary, palette, or renderer is invented.
 
 ## Initial Book Excerpts
 
@@ -195,7 +195,7 @@ The semantic oracle must derive these values independently and reject swapped ce
 | `datasets.py` | CONTROL only: `2d-dyadaxes` fixes an `11x11` tensor, majority-gated rule, selected seeds, and fixed-zero boundary. | Preserve its experiment identity; do not rename it T22 or use it as conformance evidence. |
 | Current tests | PARTIAL: neighborhood tests pin the eight lexicographic offsets, while rollout tests exercise only Dyadaxes rule `0` and batch parity with rule `91`. | Add source predicates/codes/traces, general orientation, factor rejection, alias multiplicity, snapshot, boundary/support, arbitrary-precision, Life, and T21/T23 same-runner conformance. |
 
-## Provisional Axis Classification
+## Evidence-Backed Axis Classification
 
 | Concern | Fit | Smallest reusable base | T22-specific obligation |
 |---|---|---|---|
@@ -286,7 +286,7 @@ ternary positional projection 81
 ternary FullTotal             81
 ```
 
-Its representation proof covers all 262,144 18-bit outer signatures and independently proves the complete 512-context fiber map plus its 20 affine bit bases. It expands and factors all 1,024 equal-sum tables. The arbitrary 512-row schema is covered by zero, one, and all 512 unit table bases for 514 exact code round trips. This factorization avoids claiming a wasteful `2^18 * 512` Cartesian run while proving every independent table bit and every context fiber.
+Its representation proof covers all 262,144 18-bit outer signatures and independently proves the complete 512-context fiber map plus 20 expansion bases. It expands and factors all 1,024 equal-sum tables. The arbitrary 512-row schema is covered by zero, one, and all 512 unit table bases for 514 exact code round trips. This factorization avoids claiming a wasteful `2^18 * 512` Cartesian run while proving every independent table bit and every context fiber.
 
 The coordinate proof covers all `9 * 512 = 4,608` projection/context cases and all 512 table unit bases. It derives `runtime_to_book=(6,3,0,7,4,1,8,5,2)` and its inverse, then demonstrates that naive ENU re-sorting moves the projected source in a complete asymmetric step while certified table permutation commutes.
 
@@ -309,7 +309,7 @@ Root and relocated `/tmp` execution produce identical evidence; silent import, b
 
 ## Detailed Implementation Plan
 
-1. Freeze direct/alias/mechanics/Notes/actual-Index/split source closure with explicit T21/T23/T24/Life controls and zero unresolved candidates.
+1. Freeze direct/alias/mechanics/Notes/actual-Index/split source closure with explicit T21/T23/T24 controls, Life preset/relations, and zero unresolved candidates.
 2. Derive the complete source-bound asset candidate set, classify every governed/adjacent plate, bind metadata, and replay only source-determined fixtures.
 3. Build an independent semantic oracle for direct 18-case codes, ten-case sums, positional order/basis permutation, and the generic Self-plus-eight access.
 4. Audit current documents/modules/tests and D004-D008, D111-D121, and D127 from first principles.
@@ -342,7 +342,7 @@ This composition is a hypothesis to test, not a family API mandate. Public spell
 3. Reuse the complete ordered-context table for the nine-position general rule. Add only source-pinned case descriptors for `(SelfValue,NeighborValueSum)`, all-nine value sum, and the monotone-black growth restriction. Their expansion/factorization maps operate on closed table data.
 4. Make table schema part of program/code identity. A bare integer such as `224`, `746`, or `174826` is insufficient without alphabet, access order/frame, case schema, digit convention, and table length.
 5. Retain arbitrary-precision rule serialization and complete typed tables. Vectorized finite realizations may choose a different table storage, but `numpy.int64` cannot define the program range.
-6. Keep Life, HighLife, named class-4 codes, code-746 circle/roughness observations, and code-174826 growth structures as presets or analyzers at the exact evidence-backed boundary. None changes the runner.
+6. Keep Life, HighLife, named class-4 codes, code-175850 roughness observations, code-746 circularity observations, and code-174826 growth structures as presets or analyzers at the exact evidence-backed boundary. None changes the runner.
 7. Permit sparse live-cell execution only as a separately proved lowering for a compatible background rule. The native configuration remains complete, and the sparse algorithm must commute with one native event.
 8. Reuse T08 seed/configuration records for single cells, finite rows/blocks, random fields, and periodic realizations. Do not put the displayed seed, horizon, crop, or boundary into the Moore program preset.
 
@@ -360,6 +360,34 @@ This composition is a hypothesis to test, not a family API mandate. Public spell
 10. Validate the generalized `d,k` formula and a nonbinary valuation case, plus T21 cardinal and T23 three-dimensional same-runner controls.
 11. Reject missing/duplicate offsets, implicit or duplicate Self, wrong arity/order/dimension, incomplete tables, out-of-alphabet values, stale reads, wrong targets, duplicate source coverage, and invalid realization mappings before commit.
 12. Demonstrate that `dyadaxes_2d` has the same raw geometry but not the same RULE denotation by giving two neighborhoods with equal majority-gate outputs and different Moore counts/required results.
+
+## Principles Audit and Proposed D128
+
+The evidence supplies no counterexample to the common SimpleProgram algebra. T22 is not a construction that happens to be simulable by a CA-shaped engine: it natively instantiates the existing fixed-lattice axes at the same event granularity. The only class-3 work is explicit structural representation of ordered positions and compact rule tables.
+
+### D128 — Moore-neighborhood cellular automata parameterize access and RULE schemas; Life is a named preset
+
+- **Basis:** Chapter 5 supplies one fixed square grid, all-site old-snapshot update, the old center, eight surrounding positions including diagonals, and codes `175850`, `746`, and `174826` (`BOOK:2212-2234`). The Notes pin the `Self + k*FullTotal` implementation, general positional order, `2^512/2^18/2^10/2^9` binary counts, and Life code `224`/`B3/S23` as an ordinary nine-neighbor outer-totalistic rule (`BOOK:13475-13563,14239-14249`). The closed evidence is 264 source lines, 95 asset candidates, and 1,417 independent native/generic commutations.
+- **DOMAIN/configuration:** reuse D127 discrete `t+2D` and a total finite-alphabet field on fixed square `Z^2` support. Periodic quotients, finite fixed-exterior work regions, sparse background representations, coordinate frames, crops, and rasters remain explicit realizations or views.
+- **FRONTIER/read:** reuse `AllSites`. The access declares exactly one Self and the eight unique surrounding offsets in raw Book order. The Book-array-to-ENU map either preserves that order or permutes the entire table with `runtime_to_book=(6,3,0,7,4,1,8,5,2)`; coincident cells on small quotients retain separate read-slot multiplicity.
+- **RULE/representation:** strict binary schemas are the 512-context positional table, 18-case `(SelfValue,MooreCount)` table at index `2*count+self`, ten-case all-nine sum table, and the growth restriction fixing every old-black result. Their counts are `2^512`, `2^18`, `2^10`, and `2^9`. The generalized source profile uses table index `self+k*sum(neighbors)` and length `k*((3^d-1)*(k-1)+1)`. Compact tables factor only complete constant fibers and retain schema-tagged identity. Life `224` is a preset value of the 18-case schema, never a family executor.
+- **RULE result/UPDATE/outcome:** every old site returns one complete same-site label write. D004/D117/D127 validates full old-snapshot source coverage and atomic parallel commit to one fixed-support successor. An unchanged successor is not an inferred halt. T08/D121 owns independent seeds, constructors, and laws; shape, anisotropy, structures, growth stop, class, universality, and rendering remain observers/relations.
+- **Consequence:** Goal 2 adds Moore access data, closed rule schemas/factor maps/codecs, named presets, and conformance fixtures only. It reuses T01/T02/T03/T08/T21 and the branch-free runner. No `MooreState`, semantic control class, new UPDATE algebra, executor, rollout branch, hidden center/boundary, Dyadaxes substitution, Life engine, or raster rule is added. D127 is clarified—Life is now proved to be a same-construction preset—but no completed stage reopens.
+
+This is a class-3 decision because the coordinate and compact-table isomorphisms require explicit lossless mappings. DOMAIN, configuration kind, firing frontier, write type, UPDATE, successor cardinality, and runner are direct reuse.
+
+## Re-Integration Audit
+
+1. **Prior assumption invalidated?** No active decision fails. D127's deferred Life boundary is resolved more specifically as an outer-totalistic named preset over T22.
+2. **Smallest reuse?** D127 square support/access machinery, T02 complete tables, D115-D118 aggregate/factor representations, D121 configurations, and D004/D117 UPDATE suffice.
+3. **Exception, flag, hidden state, duplicate path, or callback?** None. Named codes and `moore()` are ordinary closed data/presets.
+4. **Complete Markov state?** Yes. The complete labeled square-grid configuration determines the next configuration; seed, trace, renderer, and sparse work records are not hidden inputs.
+5. **Support/topology/value/control separation?** Yes. `t+2D` is DOMAIN, square `Z^2` is configuration topology, labels are ALPHABET values, and T22 has no separate control factor.
+6. **Defining versus incidental algorithm?** Snapshot-parallel update and all nine reads are defining. Dense convolution, sparse Life stepping, vectorization, batching, and rasterization are implementations/relations.
+7. **Encoding fidelity?** Structural tables are primary. Every integer code is bound to alphabet, access order/frame, case schema, and digit convention; Book/ENU table permutation is complete.
+8. **Stages to reopen?** None. T21 remains strict cardinal access; T23 remains the dimension/access generalization; T24 owns other lattices.
+9. **Goal 2 change?** Add D128 presets/maps and T22 conformance after the shared T21 geometry/table work. Do not schedule a Moore or Life executor.
+10. **Cohesion improved?** Yes. The same runner now covers cardinal, Moore, Life, binary/finite-`k`, compact/general, dense/sparse-realized, and 2D/3D control cases without catalog dispatch.
 
 ## No-Cheating Checks
 
