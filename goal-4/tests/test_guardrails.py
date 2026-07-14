@@ -17,6 +17,7 @@ sys.path.insert(0, str(TOOLS))
 from guardrail_lib import (  # noqa: E402
     GuardrailError,
     canonical_json_bytes,
+    encode_anchor_component,
     legacy_recursive_signature,
     load_canonical_json,
     load_json,
@@ -24,6 +25,7 @@ from guardrail_lib import (  # noqa: E402
     sha256_file,
     validate_contract,
     validate_exact_goal_output,
+    validate_generated_link_destination,
     validate_publication_target,
     validate_root_relationship,
 )
@@ -164,6 +166,29 @@ class GuardrailContractTests(unittest.TestCase):
         contract["repair_policy"]["mandatory_high_risk_operations"] = []
         with self.assertRaisesRegex(GuardrailError, "high-risk operation"):
             self.validate_mutation(contract=contract)
+
+    def test_anchor_component_encoding_is_injective_on_frozen_grammar(self) -> None:
+        self.assertEqual(encode_anchor_component("RAW_BLOCK-01"), "raw-u-block-h-01")
+        self.assertNotEqual(encode_anchor_component("A_B"), encode_anchor_component("A-B"))
+        for invalid in ("A__B", "A--B", "A-", "_A", "a_B"):
+            with self.assertRaisesRegex(GuardrailError, "invalid raw/repair"):
+                encode_anchor_component(invalid)
+
+    def test_generated_cross_document_links_allow_only_safe_parent_steps(self) -> None:
+        source = "CANONICAL/BACK-MATTER/NOTES/01-Chapter-Notes.md"
+        target = "CANONICAL/CHAPTERS/01-Chapter.md"
+        destination = "../../CHAPTERS/01-Chapter.md#ankos-ch01-raw-h-0001"
+        self.assertEqual(
+            validate_generated_link_destination(source, target, destination), destination
+        )
+        for unsafe in (
+            "../../../outside.md",
+            "../../CHAPTERS/02-Other.md",
+            "../../CHAPTERS/01-Chapter.md#bad_fragment",
+            "..\\..\\CHAPTERS\\01-Chapter.md",
+        ):
+            with self.assertRaises(GuardrailError):
+                validate_generated_link_destination(source, target, unsafe)
 
     def test_whole_contract_digest_freezes_canonical_paths_and_role_meanings(self) -> None:
         contract = copy.deepcopy(self.contract)

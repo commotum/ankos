@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import base64
 import json
+import posixpath
 import re
 import stat
 import subprocess
@@ -103,6 +104,53 @@ def safe_relative_posix(path_text: str, *, placeholders: bool = False) -> PurePo
     if not placeholders:
         require("<" not in path_text and ">" not in path_text, f"placeholder not allowed: {path_text}")
     return path
+
+
+def encode_anchor_component(identifier: str) -> str:
+    require(
+        re.fullmatch(r"[A-Z0-9]+(?:[_-][A-Z0-9]+)*", identifier) is not None,
+        f"invalid raw/repair anchor identifier: {identifier}",
+    )
+    encoded = "".join(
+        "-u-" if character == "_" else "-h-" if character == "-" else character.lower()
+        for character in identifier
+    )
+    require(
+        re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", encoded) is not None,
+        "encoded anchor component violates generated grammar",
+    )
+    return encoded
+
+
+def validate_generated_link_destination(
+    source_document: str,
+    declared_target: str,
+    destination: str,
+) -> str:
+    """Validate a manifest-derived relative link inside the repaired root."""
+
+    source = safe_relative_posix(source_document)
+    target = safe_relative_posix(declared_target)
+    require(source.parts[0] == "CANONICAL", "generated link source is outside CANONICAL")
+    require(target.parts[0] in {"CANONICAL", "ASSETS", "DERIVED", "EDITORIAL"}, "generated link target role is not linkable")
+    require("\\" not in destination and "%" not in destination, "generated link uses forbidden encoding")
+    require(not any(ord(character) < 0x20 for character in destination), "generated link contains a control character")
+    require(destination.count("#") <= 1, "generated link has multiple fragments")
+    path_text, separator, fragment = destination.partition("#")
+    require(path_text != "", "generated link path is empty")
+    if separator:
+        require(re.fullmatch(r"ankos-[a-z0-9]+(?:-[a-z0-9]+)*", fragment) is not None, "generated link fragment drift")
+    expected = posixpath.relpath(str(target), str(source.parent))
+    require(path_text == expected, "generated link is not the canonical path to its declared target")
+    stack = list(source.parent.parts)
+    for component in PurePosixPath(path_text).parts:
+        if component == "..":
+            require(stack, "generated link escapes repaired root")
+            stack.pop()
+        elif component != ".":
+            stack.append(component)
+    require(tuple(stack) == target.parts, "generated link does not resolve to its declared target")
+    return destination
 
 
 def is_component_descendant(path: Path, parent: Path) -> bool:
@@ -577,7 +625,10 @@ EXPECTED_SEPARATE_AUTHORIZATION = {
 }
 
 EXPECTED_GUARDRAILS_CANONICAL_SHA256 = (
-    "c446da937b7c174328364ca6e442781ed0270cd777cb0a86ef3a6917ae8a4a33"
+    "6270a5b17ad4b93b9e12eafe04aff24cea236b84ac0ebd563a3d220832bb3a29"
+)
+EXPECTED_GUARDRAILS_FILE_SHA256 = (
+    "ba5357b6172c5740ed799bf53d65aa401c53750b0f5dc6ccc901d4149e5225cb"
 )
 
 
@@ -1244,6 +1295,11 @@ def validate_contract(
         "whole guardrail contract digest drift",
     )
     if check_files:
+        require(
+            sha256_file(repo_root / "goal-4/guardrails.json")
+            == EXPECTED_GUARDRAILS_FILE_SHA256,
+            "guardrails.json raw-byte hash drift",
+        )
         require(
             (repo_root / "goal-4/guardrails.json").read_bytes() == pretty_contract_json_bytes(contract),
             "guardrails.json is not ANKOS-PJ-1",
