@@ -25,7 +25,7 @@ Each type stage must make the following auditable:
 
 ## Catalog Coverage
 
-Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07/T08/T10 are subsequently complete under active D119-D122. T11 is next.
+Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supplies corrected stage/Goal 2 handoffs, and re-closes every evidence-complete architecture at audit time. The bounded T03/T04 asset repairs and T06/T07/T08/T10/T11 are subsequently complete under active D119-D123. T14 is next.
 
 | ID | CSV line | Catalog type | Taxonomy section | Execution stage and file | Status | Searches / excerpts / unresolved candidates |
 |---|---:|---|---:|---|---|---|
@@ -39,7 +39,7 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 | T08 | 9 | Initial-Condition Classes | 8 | `27-T08-INITIAL-CONDITIONS.md` | COMPLETE | Exact 16-query protocol: 1,205 query-union lines plus five governed continuations; declared audit 1,210 at 701 retained/439 duplicate-control/70 actual-Index, with split reverse coverage `634 exact + 67 variants`; 577 assets at 363 direct/198 relation/16 control, 1,152 references (`577 monolith + 575 split`), two explicit split omissions, and 577 hashes; typed configuration/constructor/class/law/realization/validation/lowering/observer separation over unchanged program and native runner; D121, source/asset/semantic oracles, hostile review, and 102 tests; 0 unresolved |
 | T09 | 10 | Mobile Automata | 9 | `3-T09-MOBILE.md` | COMPLETE | Evidence and architecture reclosed: `Plain(bit) \| Active(bit)`, exactly-one invariant, firing-source frontier, radius-one native read, typed two-write lowering, atomic UPDATE, and compact 65,536-rule identity; no control class or family executor |
 | T10 | 11 | Extended Mobile Automata | 10 | `28-T10-EXTENDED-MOBILE.md` | COMPLETE | Exact 18-query/183-line union plus 22 governed continuations: `66 retained matches / 95 excluded / 22 actual-Index`, 88 retained total, split closure `171+12` query and `83+5` retained; strict 14-asset subledger plus 38-file zero-remainder source-neighborhood universe at `4/6/22/6`, 76 reverse references, and 38 hashes; exact `Bit^3 -> Bit^3 x Move`, `16^8=2^32`, three-label lowering, 2,048-case tagged/factored commutation, target-radius-two compiler adversary, D122, hostile review, and repository tests; 0 unresolved |
-| T11 | 12 | Generalized Mobile Automata | 11 | `29-T11-GENERALIZED-MOBILE.md` | IN PROGRESS | Source, asset, and semantic closure active; initial direct evidence at `BOOK:916-934,12008-12010`; no completion claim |
+| T11 | 12 | Generalized Mobile Automata | 11 | `29-T11-GENERALIZED-MOBILE.md` | COMPLETE | Exact 16-query/130-line union at `108 pre-Index / 22 actual-Index`; 20 retained query hits +6 governed continuations, 88 exclusions, split closure `123 exact + 7 variants`; source-bound 16-asset ledger at `C/O/R/X=2/1/10/3`, 32 references, 16 hashes; `Bit^3 -> Bit x FiniteOffsetSet`, local `Bit x P({-1,0,+1})`, exact union composition, corrected page-91 rule/trace, 157,184 commuting cases, D123, clean hostile review, and 102 tests; 0 unresolved |
 | T12 | 13 | Turing Machines | 12 | `4-T12-TURING.md` | COMPLETE | Evidence and architecture reclosed: `Plain(symbol) \| Head(q,symbol)`, exactly-one invariant, source decision plus destination-preservation access, typed two-write lowering, atomic UPDATE, compact `(2sk)^(sk)` rules, and explicit outcomes; no control class or family executor |
 | T13 | 14 | Neighbor-Independent Substitution Systems | 13 | `5-T13-PARALLEL-SUBSTITUTION.md` | COMPLETE | 288 direct-name lines plus definition/replacement/alias/Notes/Index/split/rendering/growth/infinite/stochastic/emulation candidates dispositioned; 26 excerpt groups; 0 unresolved |
 | T14 | 15 | Neighbor-Dependent Substitution Systems | 14 | `30-T14-CONTEXTUAL-SUBSTITUTION.md` | PENDING | Not started |
@@ -78,10 +78,10 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages globally complete: 27 / 45.
+- Type stages globally complete: 28 / 45.
 - Type stages evidence-closed / architecture-reopened: 0.
 - Type stages asset-reopened: 0.
-- Type stages unresolved: 18 pending; 0 in progress; 0 reopened.
+- Type stages unresolved: 17 pending; 0 in progress; 0 reopened.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 

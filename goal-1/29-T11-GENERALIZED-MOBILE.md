@@ -1,6 +1,6 @@
 # 29-T11-GENERALIZED-MOBILE
 
-Status: **IN PROGRESS — HOSTILE REVIEW AND FINAL GATES PENDING**
+Status: **COMPLETE — EVIDENCE, ASSETS, SEMANTICS, AND ARCHITECTURE CLOSED**
 
 ## Current Facts
 
@@ -467,7 +467,7 @@ The current 102 tests are regression evidence only. No family string, formulaic 
 | NEIGHBORHOOD | immediate neighbors | 1 direct reuse | T09 ordered radius-one read | physical L/C/R, old snapshot | no |
 | RULE input/table | Bit^3 total table | 1/2 direct table parameterization | generic OrderedTable | eight unique rows for strict binary profile | no |
 | RULE result | new source bit plus relative positions | 2 typed result parameterization | generic product result | finite normalized offset set | D011 strengthened |
-| UPDATE composition | source assignments plus proposal union | 2 reusable named preset | generic component reducers + atomic commit | distinct source targets; activity set replaced by proposal union | add D123 |
+| UPDATE composition | source assignments plus proposal union | 2 reusable named preset | generic component reducers + atomic commit | distinct source targets; activity set replaced by proposal union | D123 active |
 | tagged lowering | complete writes at A union A-prime | 3 lossless representation | D011 AtomicFiniteWrites | one complete write per distinct target | no |
 | executor/runner | one deterministic successor | 1 direct reuse | common SimpleProgram runner | no family dispatch | no |
 | empty outcome | GMAStep gap | explicit evidence boundary | D024 typed outcome | no invented successor | no |
@@ -504,9 +504,9 @@ This is the requested distinction: typed roles and one new reusable UPDATE-axis 
 | D122/T10 | T10 remains one-source, three-value-write; T11 remains multi-source, center-value-write |
 | T01/T09/T13 | all-sites assignment, exactly-one mobile, and ordered substitution remain strict presets/siblings; none reopens |
 
-### D123 candidate — generalized mobile uses typed factor composition, not a family executor
+### D123 — generalized mobile uses typed factor composition, not a family executor
 
-- Status: proposed for activation after hostile review and final gates.
+- Status: ACTIVE after exhaustive source, asset, semantic, architecture, and hostile-review closure.
 - Basis: BOOK:918-924 supplies a finite set of simultaneous firing sources; BOOK:12008 gives one source value plus relative activity positions; BOOK:12010 evaluates all old reads, writes distinct old sources, and replaces next activity by exact Union.
 - Configuration: discrete t+1D fixed line labeled by Plain(Bit) | Active(Bit), with a canonical finite active set, losslessly equivalent to (bit field, active set).
 - Execution: AllTags selects all old sources; physical old [L,C,R] bits are read; a total table returns (new_source_bit,finite_offsets); UPDATE applies distinct bit assignments and ReplaceWithUnion activity composition atomically.
@@ -523,8 +523,8 @@ This is the requested distinction: typed roles and one new reusable UPDATE-axis 
 4. **COMPLETE:** reconstruct state, frontier, read, result, schedule, union composition, lowering, outcomes, support, seed, variants, relations, and observers.
 5. **COMPLETE:** implement exhaustive representation/composition, page-91, old-snapshot, collision, overlap, disappearance, order, empty-outcome, and compiler-radius oracles.
 6. **COMPLETE:** audit simple_programs.md, src/ca, tests, principles, D009-D014/D024/D043/D054/D122, and dependent stages from current files.
-7. **IN PROGRESS:** hostile-review D123, the Goal 2 handoff, exact fixture, source/asset closure, and no-cheating claims.
-8. **PENDING:** run all root/tmp/-O/oracle/test/Markdown/diff/scope/coverage gates, activate D123, and reintegrate the plan/evidence/ledger.
+7. **COMPLETE:** hostile-review D123, the Goal 2 handoff, exact fixture, source/asset closure, and no-cheating claims.
+8. **COMPLETE:** run all root/tmp/-O/oracle/test/Markdown/diff/scope/coverage gates, activate D123, and reintegrate the plan/evidence/ledger.
 
 ## Goal 2 Implementation Stage
 
@@ -603,7 +603,7 @@ Completion requires public typed schemas, exact fixtures, cross-family runner te
 - [x] Exact page-91, split, disappear, offset-0, collision, source-overlap, old-snapshot, ordering, empty-frontier, and compiler-radius adversaries are executable.
 - [x] Current API/runtime/tests and all dependent decisions are audited from actual files.
 - [x] The Goal 2 handoff identifies generic shared surfaces, public types, migration, serialization, outcomes, and adversarial acceptance without a T11 executor.
-- [ ] Independent hostile review is clean and every oracle/test/Markdown/diff/scope/coverage gate passes after final integration.
+- [x] Independent hostile review is clean and every oracle/test/Markdown/diff/scope/coverage gate passes after final integration.
 
 ## Re-Integration Audit
 
@@ -620,7 +620,7 @@ Completion requires public typed schemas, exact fixtures, cross-family runner te
 
 ## Stage Results
 
-IN PROGRESS pending independent hostile review and final integration gates.
+COMPLETE after exhaustive source, split, Atlas, Index, asset, semantic, runtime, architecture, and hostile-review closure.
 
 The evidence result is otherwise closed. The 16-query source oracle yields a 130-line union at 108 pre-Index and 22 actual-Index, retains 26 lines including six governed continuations, excludes 88 false positives, reverse-closes all 17 split documents at 123 exact plus seven extraction-variant query records, and leaves zero unresolved source candidate. The 16-asset physical fixed point closes at C/O/R/X = 2/1/10/3 with 32 monolith/split references, 16 unique hashes, and no missing native raster.
 
@@ -628,4 +628,6 @@ T11 is a binary fixed line with a finite active-source set. Every old source rea
 
 The page-76 local profile has result type Bit × P({-1,0,+1}) and a derived 16^8 = 2^32 rule space, but no source-defined number. The corrected BOOK:922 table has 000 -> (1,{-1,+1}), optional inferred planes (63,15,16,245), and an exact t0..t12 replay. The semantic oracle covers 157,184 exhaustive composition/representation cases plus schedule, collision, overlap, disappearance, ordering, empty-outcome, and radius-two compiler adversaries.
 
-The smallest architecture change is a generic ParallelFactorCompose preset with DistinctAssign and ReplaceWithUnion, followed by ordinary atomic commit in the same branch-free runner. D123 remains to be activated after review. Post-extinction continuation, a native finite boundary, a general seed law, a universal offset bound, and a T11 codec remain explicitly source-underdetermined.
+The smallest architecture change is a generic ParallelFactorCompose preset with DistinctAssign and ReplaceWithUnion, followed by ordinary atomic commit in the same branch-free runner. D123 is ACTIVE. Post-extinction continuation, a native finite boundary, a general seed law, a universal offset bound, and a T11 codec remain explicitly source-underdetermined.
+
+The independent hostile review found no blocker, major, or minor issue. Source, asset, and semantic oracles pass from the repository root and from /tmp; all three fail closed under optimized mode. Markdown fences, diff, scope, status/coverage, and the 102-test runtime regression suite pass. No prior stage reopens. Next: T14.
