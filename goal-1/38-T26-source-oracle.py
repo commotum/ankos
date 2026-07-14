@@ -353,6 +353,23 @@ OTHER_SHAPES_EXPECTED_SHAPES = (
     (21, 21),
 )
 
+# BOOK:13744's extracted display math has eleven escaped opening braces but
+# twelve escaped closing braces.  The surplus closing brace is the final
+# ``\}`` immediately before ``\$``.  These exact literals bind the defect and
+# its only minimal repair; this is not a generic delimiter-normalization rule.
+OTHER_SHAPES_RAW_RULE_MATH = (
+    r"$\{3 \rightarrow \{\{1, 0\}, \{3, 2\}\}, "
+    r"2 \rightarrow \{\{1\}, \{3\}\}, "
+    r"1 \rightarrow \{\{3, 2\}\}, "
+    r"0 \rightarrow \{\{3\}\}\}\}\$"
+)
+OTHER_SHAPES_REPAIRED_RULE_MATH = (
+    r"$\{3 \rightarrow \{\{1, 0\}, \{3, 2\}\}, "
+    r"2 \rightarrow \{\{1\}, \{3\}\}, "
+    r"1 \rightarrow \{\{3, 2\}\}, "
+    r"0 \rightarrow \{\{3\}\}\}\$"
+)
+
 
 # Actual Index rows are dense physical lines, so exact occurrence guards below
 # prevent unrelated material on the same row from satisfying a route.
@@ -577,10 +594,11 @@ def expand_compatible_mosaic(
 ) -> tuple[tuple[int, ...], ...]:
     """Replay one source-style mixed-patch ``Flatten2D`` event.
 
-    A source row must emit blocks with one common height, and a source column
-    must emit blocks with one common width.  Those are exactly the compatibility
-    conditions that make the variable rectangles a hole-free rectangular
-    mosaic while preserving both product axes.
+    Blocks within one source row must have a common height so their corresponding
+    local rows can be concatenated.  The resulting source-row slabs must then
+    have one common width so they can be joined vertically.  Patch widths need
+    not agree by source column; that stronger condition is not part of
+    ``Flatten2D``.
     """
 
     assert grid and all(grid) and len({len(row) for row in grid}) == 1
@@ -598,40 +616,26 @@ def expand_compatible_mosaic(
         for patch_row in patches
         for patch in patch_row
     )
-    row_heights = tuple(
-        next(iter(row_sizes))
-        for source_row in patches
-        for row_sizes in ({len(patch) for patch in source_row},)
-        if len(row_sizes) == 1
-    )
-    column_widths = tuple(
-        next(iter(column_sizes))
-        for source_column in range(width)
-        for column_sizes in (
-            {len(patches[source_row][source_column][0]) for source_row in range(height)},
+    slabs: list[tuple[tuple[int, ...], ...]] = []
+    for source_row in patches:
+        row_sizes = {len(patch) for patch in source_row}
+        assert len(row_sizes) == 1
+        row_height = next(iter(row_sizes))
+        slab = tuple(
+            tuple(
+                value
+                for patch in source_row
+                for value in patch[local_row]
+            )
+            for local_row in range(row_height)
         )
-        if len(column_sizes) == 1
-    )
-    assert len(row_heights) == height
-    assert len(column_widths) == width
-    assert all(
-        len(patches[source_row][source_column]) == row_heights[source_row]
-        and all(
-            len(patch_row) == column_widths[source_column]
-            for patch_row in patches[source_row][source_column]
-        )
-        for source_row in range(height)
-        for source_column in range(width)
-    )
-    return tuple(
-        tuple(
-            patches[source_row][source_column][local_row][local_column]
-            for source_column in range(width)
-            for local_column in range(column_widths[source_column])
-        )
-        for source_row in range(height)
-        for local_row in range(row_heights[source_row])
-    )
+        assert slab and all(slab) and len({len(row) for row in slab}) == 1
+        slabs.append(slab)
+
+    result = tuple(row for slab in slabs for row in slab)
+    assert len(slabs) == height and result
+    assert len({len(row) for row in result}) == 1
+    return result
 
 
 def main() -> int:
@@ -830,6 +834,33 @@ def main() -> int:
         "OK" if source_repairs_ok else "MISMATCH",
     )
 
+    repaired_other_shapes_line = at(13744).replace(
+        OTHER_SHAPES_RAW_RULE_MATH,
+        OTHER_SHAPES_REPAIRED_RULE_MATH,
+        1,
+    )
+    other_shapes_literal_repair_ok = (
+        at(13744).count(OTHER_SHAPES_RAW_RULE_MATH) == 1
+        and OTHER_SHAPES_RAW_RULE_MATH.count(r"\{") == 11
+        and OTHER_SHAPES_RAW_RULE_MATH.count(r"\}") == 12
+        and OTHER_SHAPES_RAW_RULE_MATH.endswith(r"\}\$")
+        and len(OTHER_SHAPES_RAW_RULE_MATH)
+        == len(OTHER_SHAPES_REPAIRED_RULE_MATH) + 2
+        and OTHER_SHAPES_RAW_RULE_MATH[:-4] + r"\$"
+        == OTHER_SHAPES_REPAIRED_RULE_MATH
+        and OTHER_SHAPES_REPAIRED_RULE_MATH.count(r"\{") == 11
+        and OTHER_SHAPES_REPAIRED_RULE_MATH.count(r"\}") == 11
+        and repaired_other_shapes_line.count(OTHER_SHAPES_REPAIRED_RULE_MATH) == 1
+        and OTHER_SHAPES_RAW_RULE_MATH not in repaired_other_shapes_line
+    )
+    ok &= other_shapes_literal_repair_ok
+    print(
+        "source_other_shapes_exact_surplus_brace_repair",
+        "OK" if other_shapes_literal_repair_ok else "MISMATCH",
+        "raw=11/12",
+        "repaired=11/11",
+    )
+
     coordinate_relation_ok = (
         "finite automaton from the digit sequences" in at(13692)
         and "At step *n*, the complete array of cells is" in at(13692)
@@ -877,7 +908,8 @@ def main() -> int:
     for _ in range(len(OTHER_SHAPES_EXPECTED_SHAPES) - 1):
         mixed_trace.append(expand_compatible_mosaic(mixed_trace[-1], mixed_rule))
     mixed_native_ok = (
-        all(fragment in at(13744) for fragment in mixed_rule_fragments)
+        other_shapes_literal_repair_ok
+        and all(fragment in repaired_other_shapes_line for fragment in mixed_rule_fragments)
         and set(mixed_rule) == {0, 1, 2, 3}
         and tuple((len(grid), len(grid[0])) for grid in mixed_trace)
         == OTHER_SHAPES_EXPECTED_SHAPES

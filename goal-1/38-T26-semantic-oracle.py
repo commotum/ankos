@@ -11,13 +11,19 @@ that law.  Source rows remain source rows, local patch rows are interleaved
 within them, and local patch columns are joined within source columns.  New
 tiles do not fire until the following event.
 
-The generic evaluator below is one rank-parameterized ordered-block update.
-Its rank-one restriction is fixed-block T13 concatenation; rank two is T26.
-The direct Notes evaluator and generic evaluator commute one event at a time.
+The generic evaluator below is one ranked ordered-block UPDATE policy.  Its
+rank-one member accepts explicit selected old-source indices, consumes every
+unselected source, preserves selected-source/child order, and retains epsilon;
+its named uniform restriction requires a positive common block shape.  Rank
+two is T26.  The direct Notes evaluator and generic evaluator commute one
+event at a time.  State-dependent rank-two incompatibility returns the exact
+typed no-successor outcome ``Invalid(IncompatibleMosaic)`` before commit.
 A second exact commuting map embeds a rectangular grid as a restricted T27
-bag of fully posed tile occurrences.  The embedding is lossless only under a
-rectangular-tiling invariant; arbitrary free geometry remains T27, and
-neighbor-dependent patch choice remains T28.
+bag of fully posed tile occurrences.  Its successor provenance is derived
+independently on each side; an explicit two-token bijection proves equality
+modulo opaque-token renaming while preserving typed lineage.  The embedding
+is lossless only under a rectangular-tiling invariant; arbitrary free geometry
+remains T27, and neighbor-dependent patch choice remains T28.
 
 The Book's ``Other shapes`` encoded-label table is executed natively under
 that compatibility law.  From seed ``{{3}}`` it has exact Fibonacci side
@@ -249,6 +255,77 @@ class PatchStep:
     child_occurrences: tuple[GridChildOccurrence, ...]
 
 
+@dataclass(frozen=True)
+class IncompatibleMosaic:
+    """Typed state-dependent reason for a rank-two no-commit outcome."""
+
+    code: str
+    source_row: int | None
+    observed_extents: tuple[int, ...]
+
+    def __post_init__(self) -> None:
+        code = exact_str(self.code, "mosaic incompatibility code")
+        if code not in {"row_patch_heights", "row_slab_widths"}:
+            raise ValueError("unknown mosaic incompatibility code")
+        if self.source_row is not None:
+            row = exact_int(self.source_row, "incompatible source row")
+            if row < 0:
+                raise ValueError("incompatible source row must be nonnegative")
+        extents = exact_tuple(self.observed_extents, "observed mosaic extents")
+        if not extents or any(exact_int(value, "observed extent") <= 0 for value in extents):
+            raise ValueError("observed mosaic extents must be positive")
+
+
+class IncompatibleMosaicError(Exception):
+    """Strict-convenience unwrap of ``Invalid(IncompatibleMosaic)``."""
+
+    def __init__(self, reason: IncompatibleMosaic) -> None:
+        if type(reason) is not IncompatibleMosaic:
+            raise TypeError("mosaic error requires an exact IncompatibleMosaic reason")
+        self.reason = reason
+        super().__init__(f"{reason.code}: {reason.observed_extents}")
+
+
+@dataclass(frozen=True)
+class Advanced:
+    changed: bool
+
+    def __post_init__(self) -> None:
+        if type(self.changed) is not bool:
+            raise TypeError("Advanced.changed must be an exact bool")
+
+
+@dataclass(frozen=True)
+class Invalid:
+    reason: IncompatibleMosaic
+
+    def __post_init__(self) -> None:
+        if type(self.reason) is not IncompatibleMosaic:
+            raise TypeError("Invalid requires an exact IncompatibleMosaic reason")
+
+
+@dataclass(frozen=True)
+class PatchStepResult:
+    """Exact deterministic UPDATE envelope used for advance or invalidity."""
+
+    outcome: Advanced | Invalid
+    successors: tuple[RectGrid, ...]
+    step: PatchStep | None
+
+    def __post_init__(self) -> None:
+        successors = exact_tuple(self.successors, "step-result successors")
+        if type(self.outcome) is Advanced:
+            if type(self.step) is not PatchStep:
+                raise TypeError("Advanced result requires an exact PatchStep")
+            if len(successors) != 1 or successors[0] is not self.step.successor:
+                raise ValueError("Advanced result must expose exactly its committed successor")
+        elif type(self.outcome) is Invalid:
+            if self.step is not None or successors:
+                raise ValueError("Invalid(IncompatibleMosaic) must not commit a successor")
+        else:
+            raise TypeError("step result requires exact Advanced or Invalid outcome")
+
+
 def all_old_tiles(configuration: RectGrid) -> tuple[TileHandle, ...]:
     if type(configuration) is not RectGrid:
         raise TypeError("FRONTIER requires an exact RectGrid")
@@ -340,6 +417,7 @@ def flat_index(coordinate: tuple[int, ...], shape: tuple[int, ...]) -> int:
 @dataclass(frozen=True)
 class RankedSourceRegion:
     source_index: int
+    selected: bool
     starts: tuple[int, ...]
     stops: tuple[int, ...]
 
@@ -355,8 +433,10 @@ def ranked_block_mosaic_assemble(
     old_shape: tuple[int, ...],
     block_shapes: tuple[tuple[int, ...], ...],
     blocks: tuple[tuple[int, ...], ...],
+    *,
+    selected_source_indices: tuple[int, ...] | None = None,
 ) -> RankedMosaicAssembly:
-    """D019 ranked mosaic: variable words at rank one, mosaics at rank two."""
+    """Ranked mosaic with explicit rank-one locus selection and consumption."""
 
     old = exact_tuple(old_shape, "old mosaic shape")
     shapes = exact_tuple(block_shapes, "mosaic block shapes")
@@ -364,11 +444,25 @@ def ranked_block_mosaic_assemble(
     if len(old) not in (1, 2):
         raise ValueError("the evidenced ranked mosaic kernel supports rank one or two")
     old_extents = tuple(exact_int(value, "old mosaic extent") for value in old)
-    if any(value <= 0 for value in old_extents):
-        raise ValueError("old mosaic extents must be positive")
+    if len(old_extents) == 1:
+        if old_extents[0] < 0:
+            raise ValueError("rank-one old extent must be nonnegative")
+    elif any(value <= 0 for value in old_extents):
+        raise ValueError("rank-two old mosaic extents must be positive")
     source_count = prod(old_extents)
-    if len(shapes) != source_count or len(emitted) != source_count:
-        raise ValueError("mosaic shapes and blocks must cover every old source exactly")
+    if selected_source_indices is None:
+        selected = tuple(range(source_count))
+    else:
+        raw_selected = exact_tuple(selected_source_indices, "selected source indices")
+        selected = tuple(exact_int(value, "selected source index") for value in raw_selected)
+        if selected != tuple(sorted(set(selected))):
+            raise ValueError("selected source indices must be unique and in source order")
+        if any(value < 0 or value >= source_count for value in selected):
+            raise ValueError("selected source index is outside the old support")
+    if len(old_extents) == 2 and selected != tuple(range(source_count)):
+        raise ValueError("rank-two T26 mosaic requires every old source exactly once")
+    if len(shapes) != len(selected) or len(emitted) != len(selected):
+        raise ValueError("mosaic blocks must cover every selected source exactly")
 
     checked_shapes: list[tuple[int, ...]] = []
     checked_blocks: list[tuple[int, ...]] = []
@@ -394,13 +488,27 @@ def ranked_block_mosaic_assemble(
         cursor = 0
         values: list[int] = []
         regions: list[RankedSourceRegion] = []
-        for source_index, (shape, block) in enumerate(
-            zip(checked_shapes, checked_blocks, strict=True)
-        ):
-            stop = cursor + shape[0]
-            regions.append(RankedSourceRegion(source_index, (cursor,), (stop,)))
-            values.extend(block)
-            cursor = stop
+        selected_position = 0
+        for source_index in range(source_count):
+            is_selected = (
+                selected_position < len(selected)
+                and selected[selected_position] == source_index
+            )
+            if is_selected:
+                shape = checked_shapes[selected_position]
+                block = checked_blocks[selected_position]
+                stop = cursor + shape[0]
+                regions.append(
+                    RankedSourceRegion(source_index, True, (cursor,), (stop,))
+                )
+                values.extend(block)
+                cursor = stop
+                selected_position += 1
+            else:
+                regions.append(
+                    RankedSourceRegion(source_index, False, (cursor,), (cursor,))
+                )
+        assert selected_position == len(selected)
         return RankedMosaicAssembly((cursor,), tuple(values), tuple(regions))
 
     old_height, old_width = old_extents
@@ -412,11 +520,23 @@ def ranked_block_mosaic_assemble(
         ]
         heights = {shape[0] for shape in row_shapes}
         if len(heights) != 1:
-            raise ValueError("patches within one source row must have equal heights")
+            raise IncompatibleMosaicError(
+                IncompatibleMosaic(
+                    "row_patch_heights",
+                    source_row,
+                    tuple(sorted(heights)),
+                )
+            )
         row_heights.append(next(iter(heights)))
         row_widths.append(sum(shape[1] for shape in row_shapes))
     if len(set(row_widths)) != 1:
-        raise ValueError("assembled source-row slabs must have equal total widths")
+        raise IncompatibleMosaicError(
+            IncompatibleMosaic(
+                "row_slab_widths",
+                None,
+                tuple(row_widths),
+            )
+        )
 
     next_height = sum(row_heights)
     next_width = row_widths[0]
@@ -432,6 +552,7 @@ def ranked_block_mosaic_assemble(
             regions.append(
                 RankedSourceRegion(
                     source_index,
+                    True,
                     (row_start, column_start),
                     (row_start + patch_height, column_start + patch_width),
                 )
@@ -474,14 +595,17 @@ def ranked_block_assemble(
     old_extents = tuple(exact_int(value, "old extent") for value in old)
     if any(value <= 0 for value in old_extents):
         raise ValueError("old ranked extents must be positive")
+    block_extents = tuple(exact_int(value, "uniform block extent") for value in block)
+    if any(value <= 0 for value in block_extents):
+        raise ValueError("uniform block extents must be positive")
     assembly = ranked_block_mosaic_assemble(
         old_extents,
-        tuple(block for _ in range(prod(old_extents))),
+        tuple(block_extents for _ in range(prod(old_extents))),
         emitted,
     )
     expected_shape = tuple(
-        old_extent * exact_int(block_extent, "uniform block extent")
-        for old_extent, block_extent in zip(old_extents, block, strict=True)
+        old_extent * block_extent
+        for old_extent, block_extent in zip(old_extents, block_extents, strict=True)
     )
     if assembly.shape != expected_shape:
         raise RuntimeError("uniform mosaic wrapper produced the wrong ranked shape")
