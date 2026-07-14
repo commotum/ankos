@@ -6,8 +6,9 @@ from __future__ import annotations
 import hashlib
 import base64
 import json
-import os
+import re
 import stat
+import subprocess
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
@@ -96,6 +97,22 @@ def _existing_components_have_symlink(repo_root: Path, relative: PurePosixPath) 
     return False
 
 
+def _absolute_path_has_symlink_component(path: Path) -> bool:
+    """Check lexical absolute path components without resolving aliases away."""
+
+    require(path.is_absolute(), f"path must be absolute: {path}")
+    current = Path(path.anchor)
+    for part in path.parts[1:]:
+        current = current / part
+        try:
+            mode = current.lstat().st_mode
+        except FileNotFoundError:
+            continue
+        if stat.S_ISLNK(mode):
+            return True
+    return False
+
+
 def validate_root_relationship(
     repo_root: Path,
     legacy_relative: str,
@@ -140,22 +157,49 @@ def _file_mode(path: Path) -> str:
 def validate_publication_target(
     target: Path,
     legacy: Path,
-    trusted_manifest: dict[str, Any] | None = None,
+    trusted_manifest_path: Path | None = None,
 ) -> str:
+    require(target.is_absolute() and legacy.is_absolute(), "publication paths must be absolute")
+    require(".." not in target.parts and ".." not in legacy.parts, "publication path contains '..'")
+    require(not _absolute_path_has_symlink_component(legacy), "legacy publication path has a symlink component")
+    require(not _absolute_path_has_symlink_component(target), "publication target has a symlink component")
     legacy = legacy.resolve(strict=True)
-    target_parent = target.parent.resolve(strict=True)
-    target_lexical = target_parent / target.name
-    require(target_lexical != legacy, "publication target equals legacy root")
-    require(not is_component_descendant(target_lexical, legacy), "publication target is beneath legacy root")
-    require(target_parent == legacy.parent, "publication target is not the required sibling")
-    require(not target.is_symlink(), "publication target may not be a symlink")
+    require(legacy.name == "A-New-Kind-of-Science", "unexpected legacy publication root")
+    require(legacy.parent.name == "ref", "legacy publication root must be under ref")
+    expected_target = legacy.parent / "A-New-Kind-of-Science-Repaired"
+    require(target == expected_target, "publication target is not the exact repaired sibling")
     if not target.exists():
         return "ABSENT"
     require(target.is_dir(), "publication target must be a directory")
     entries = sorted(target.iterdir(), key=lambda item: item.name)
     if not entries:
         return "EMPTY"
-    require(trusted_manifest is not None, "nonempty publication target lacks a trusted external manifest")
+    require(trusted_manifest_path is not None, "nonempty publication target lacks a trusted external manifest")
+    require(trusted_manifest_path.is_absolute(), "trusted manifest path must be absolute")
+    require(".." not in trusted_manifest_path.parts, "trusted manifest path contains '..'")
+    require(
+        not _absolute_path_has_symlink_component(trusted_manifest_path),
+        "trusted manifest path has a symlink component",
+    )
+    trusted_root = legacy.parent.parent / "goal-4/releases"
+    require(trusted_root.is_dir(), "trusted release-manifest registry is missing")
+    require(
+        not _absolute_path_has_symlink_component(trusted_root),
+        "trusted release-manifest registry has a symlink component",
+    )
+    require(
+        trusted_manifest_path.parent == trusted_root,
+        "trusted manifest is outside the exact goal-4/releases registry",
+    )
+    require(trusted_manifest_path.suffix == ".json", "trusted manifest must be JSON")
+    require(trusted_manifest_path.is_file(), "trusted manifest is not a regular file")
+    require(trusted_manifest_path.stat().st_nlink == 1, "trusted manifest may not be hardlinked")
+    trusted_manifest = load_json(trusted_manifest_path)
+    require(trusted_manifest.get("schema_version") == "1.0.0", "trusted manifest schema drift")
+    require(
+        trusted_manifest.get("target") == "ref/A-New-Kind-of-Science-Repaired",
+        "trusted manifest target drift",
+    )
     rows = trusted_manifest.get("files")
     require(isinstance(rows, list), "trusted manifest files must be an array")
     expected: dict[str, dict[str, Any]] = {}
@@ -248,6 +292,179 @@ def legacy_recursive_signature(root: Path) -> dict[str, Any]:
     }
 
 
+def _frozen_path_list(value: Any, label: str) -> list[str]:
+    require(isinstance(value, list) and value, f"{label} must be a nonempty array")
+    paths: list[str] = []
+    for item in value:
+        require(isinstance(item, str), f"{label} contains a non-string path")
+        normalized = str(safe_relative_posix(item))
+        require(normalized == item, f"{label} path is not canonical: {item}")
+        paths.append(item)
+    require(len(paths) == len(set(paths)), f"{label} contains duplicate paths")
+    require(paths == sorted(paths), f"{label} must be sorted")
+    return paths
+
+
+def derive_oracle_classifications(root: Path, contract: dict[str, Any]) -> list[dict[str, Any]]:
+    """Re-derive the complete Goal 1 oracle census from frozen explicit scope."""
+
+    compatibility = contract.get("compatibility", {})
+    all_paths = _frozen_path_list(compatibility.get("all_oracle_paths"), "all oracle paths")
+    affected_paths = _frozen_path_list(
+        compatibility.get("recursive_affected_paths"), "recursive affected paths"
+    )
+    image_paths = _frozen_path_list(
+        compatibility.get("recursive_image_or_basename_paths"),
+        "recursive image/basename paths",
+    )
+    actual_paths = sorted(
+        path.relative_to(root).as_posix()
+        for path in (root / "goal-1").glob("*-oracle.py")
+        if path.is_file() and not path.is_symlink()
+    )
+    require(actual_paths == all_paths, "current Goal 1 oracle path set differs from frozen explicit scope")
+    require(set(affected_paths) <= set(all_paths), "affected oracle scope is not a subset of all oracles")
+    require(set(image_paths) <= set(affected_paths), "image oracle scope is not a subset of affected oracles")
+    require(len(all_paths) == compatibility.get("goal_1_root_oracle_count"), "all-oracle count drift")
+    require(
+        len(affected_paths) == compatibility.get("goal_1_recursive_affected_count"),
+        "affected-oracle count drift",
+    )
+    require(
+        len(image_paths) == compatibility.get("goal_1_recursive_image_or_basename_count"),
+        "image-oracle count drift",
+    )
+    require(
+        filename_set_digest(path.removeprefix("goal-1/") for path in all_paths)
+        == compatibility.get("all_oracle_filename_digest"),
+        "all-oracle frozen digest drift",
+    )
+    require(
+        filename_set_digest(path.removeprefix("goal-1/") for path in affected_paths)
+        == compatibility.get("recursive_affected_filename_digest"),
+        "affected-oracle frozen digest drift",
+    )
+
+    affected_set = set(affected_paths)
+    image_set = set(image_paths)
+    rows: list[dict[str, Any]] = []
+    for relative in all_paths:
+        path = root / relative
+        require(path.is_file() and not path.is_symlink(), f"oracle path is not a regular file: {relative}")
+        text = path.read_text(encoding="utf-8")
+        recursive_markdown = bool(re.search(r"\.rglob\(\s*['\"]\*\.md['\"]\s*\)", text))
+        recursive_image = bool(re.search(r"\.rglob\(\s*['\"]\*\.jpeg['\"]\s*\)", text)) or any(
+            marker in text
+            for marker in (
+                ".rglob(basename)",
+                ".rglob(Path(match.group(1)).name)",
+            )
+        )
+        recursive_affected = relative in affected_set
+        require(
+            recursive_markdown is recursive_affected,
+            f"frozen affected classification disagrees with recursive Markdown evidence: {relative}",
+        )
+        require(
+            recursive_image is (relative in image_set),
+            f"frozen image classification disagrees with recursive image evidence: {relative}",
+        )
+        direct_legacy = "A-New-Kind-of-Science" in text and not recursive_affected
+        rows.append(
+            {
+                "path": relative,
+                "kind": (
+                    "RECURSIVE_SOURCE_OR_ASSET"
+                    if recursive_affected
+                    else "DIRECT_LEGACY_SEMANTIC"
+                    if direct_legacy
+                    else "NO_LEGACY_PATH"
+                ),
+                "recursive_affected": recursive_affected,
+                "recursive_markdown": recursive_markdown,
+                "recursive_image_or_basename": recursive_image,
+                "direct_legacy_path": direct_legacy,
+                "script_sha256": sha256_file(path),
+            }
+        )
+    require(
+        sum(row["direct_legacy_path"] for row in rows)
+        == compatibility.get("goal_1_direct_legacy_semantic_count"),
+        "direct legacy semantic census drift",
+    )
+    require(
+        sum(row["kind"] == "NO_LEGACY_PATH" for row in rows)
+        == compatibility.get("goal_1_no_legacy_path_count"),
+        "no-legacy-path semantic census drift",
+    )
+    return rows
+
+
+def governed_dependency_paths(root: Path, contract: dict[str, Any]) -> list[Path]:
+    """Return the exact compatibility dependency closure declared by Stage 1."""
+
+    compatibility = contract.get("compatibility", {})
+    legacy = root / contract["architecture"]["legacy_root"]
+    require(legacy.is_dir(), "legacy dependency root is missing")
+    candidates: set[Path] = set()
+    for path in sorted(legacy.rglob("*"), key=lambda item: item.as_posix()):
+        require(not path.is_symlink(), f"legacy dependency scope contains a symlink: {path}")
+        if path.is_file():
+            candidates.add(path)
+    require(
+        len(candidates) == contract["legacy_input"]["expected_counts"]["all_regular_files"],
+        "legacy dependency file count drift",
+    )
+    governed_relatives = _frozen_path_list(
+        compatibility.get("recursive_affected_paths"), "recursive affected paths"
+    ) + _frozen_path_list(
+        compatibility.get("additional_dependency_paths"), "additional dependency paths"
+    )
+    require(len(governed_relatives) == len(set(governed_relatives)), "dependency scopes overlap")
+    for relative in governed_relatives:
+        path = root / relative
+        require(path.is_file() and not path.is_symlink(), f"governed dependency is missing: {relative}")
+        candidates.add(path)
+    return sorted(candidates, key=lambda path: path.relative_to(root).as_posix())
+
+
+def dependency_rows_and_fingerprint(
+    root: Path, paths: Iterable[Path]
+) -> tuple[list[dict[str, Any]], str]:
+    rows: list[dict[str, Any]] = []
+    for path in paths:
+        require(path.is_file() and not path.is_symlink(), f"dependency disappeared: {path}")
+        rows.append(
+            {
+                "path": path.relative_to(root).as_posix(),
+                "byte_size": path.stat().st_size,
+                "sha256": sha256_file(path),
+            }
+        )
+    rows.sort(key=lambda row: row["path"])
+    require(len(rows) == len({row["path"] for row in rows}), "duplicate dependency path")
+    return rows, sha256_bytes(canonical_json_bytes(rows))
+
+
+def row_subset_fingerprint(rows: list[dict[str, Any]], prefix: str) -> str:
+    subset = [row for row in rows if row.get("path", "").startswith(prefix)]
+    return sha256_bytes(canonical_json_bytes(subset))
+
+
+def git_tree_identity(root: Path, revision: str, relative: str) -> str:
+    safe_relative_posix(relative)
+    result = subprocess.run(
+        ["git", "rev-parse", f"{revision}:{relative}"],
+        cwd=root,
+        env={"PATH": "/usr/bin:/bin", "LC_ALL": "C", "LANG": "C"},
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    require(result.returncode == 0, f"cannot read Git tree {revision}:{relative}")
+    return result.stdout.decode("ascii").strip()
+
+
 EXPECTED_REPAIR_CLASSES = {
     "STRUCTURE_BOUNDARY",
     "MARKDOWN_STRUCTURE",
@@ -291,6 +508,8 @@ EXPECTED_NOT_APPLICABLE = {
 
 EXPECTED_HIGH_RISK = {
     "STRUCTURE_BOUNDARY",
+    "MARKDOWN_STRUCTURE",
+    "HEADING_OR_FURNITURE",
     "FORMULA_OR_SYMBOL",
     "WOLFRAM_CODE",
     "RULE_TABLE_OR_DATA",
@@ -308,6 +527,17 @@ def validate_quality(quality: dict[str, Any]) -> None:
     require(quality.get("frozen_before_author_text_repairs") is True, "quality protocol was not pre-frozen")
     require(quality.get("materialized_sample") is None, "Stage 1 must not materialize outcome-aware samples")
     require(quality.get("results") is None, "Stage 1 quality results must be empty")
+    seed = quality.get("seed", {})
+    domain_hex = "414e4b4f532d474f414c342d484f4c444f55542d763100"
+    require(seed.get("domain_separator_hex") == domain_hex, "quality domain separator bytes drift")
+    known = seed.get("known_vector", {})
+    require(known.get("manifest_material_utf8_hex") == "5b5d", "quality known-vector input drift")
+    known_seed = sha256_bytes(bytes.fromhex(domain_hex) + bytes.fromhex("5b5d"))
+    require(known.get("seed_sha256") == known_seed, "quality seed known vector fails")
+    require(
+        "0x00" in seed.get("rank_derivation", "") and "\\u0000" not in seed.get("rank_derivation", ""),
+        "quality rank framing is ambiguous",
+    )
     sample = quality.get("sample_size", {})
     require(
         sample.get("minimum_fraction_per_document") == {"numerator": 1, "denominator": 20},
@@ -318,8 +548,23 @@ def validate_quality(quality: dict[str, Any]) -> None:
         sample.get("document_quota") == "q = min(N, max(ceil(N / 20), 20)), where N is the document's eligible-block count.",
         "quality document quota is not exact",
     )
-    require("Hamilton" in sample.get("risk_allocation", ""), "quality risk allocation is underspecified")
-    require("odd slot goes to CHANGED" in sample.get("changed_unchanged_rule", ""), "changed/unchanged tie is underspecified")
+    allocation = sample.get("risk_allocation", "")
+    for term in ("a_s=R*c_s/C", "floor(a_s)", "(R*c_s) mod C"):
+        require(term in allocation, f"quality risk allocation is underspecified: {term}")
+    require(
+        "before any author-text repair" in sample.get("held_out_selection", ""),
+        "held-out membership is not frozen before repair",
+    )
+    require(
+        "never alter membership" in sample.get("held_out_selection", ""),
+        "held-out membership can change post hoc",
+    )
+    require("changed_unchanged_rule" not in sample, "outcome-aware held-out selection remains enabled")
+    require(
+        "only for reporting" in sample.get("post_repair_labels", ""),
+        "post-repair labels can influence held-out selection",
+    )
+    require("Generated metadata alone" in sample.get("block_change_definition", ""), "block change semantics drift")
     risk_ids = [row.get("id") for row in quality.get("risk_strata", [])]
     require(
         risk_ids

@@ -488,6 +488,9 @@ def verify_source_interface() -> None:
         "EXCLUDED_IMAGE_LINES": EXCLUDED_IMAGE_LINES,
         "CANDIDATE_IMAGE_LINES": CANDIDATE_IMAGE_LINES,
         "UNRESOLVED_IMAGE_LINES": UNRESOLVED_IMAGE_LINES,
+        "HASH_BOUND_IMAGE_LINES": HASH_BOUND_IMAGE_LINES,
+        "LIMITED_TRANSCRIBED_IMAGE_LINES": LIMITED_TRANSCRIBED_IMAGE_LINES,
+        "PIXEL_REPLAYED_IMAGE_LINES": PIXEL_REPLAYED_IMAGE_LINES,
     }
     for name, expected in required.items():
         actual = frozenset(source[name])

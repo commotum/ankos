@@ -15,7 +15,7 @@ Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, ARCHITECTURE, AND HOSTILE-REV
 - Explicit execution-ordered schedules are useful closed program data, but they require a separately tagged source schema. They must not fabricate T40 query provenance, `a0`, requested counts, or proof strength.
 - The finite horizon is program identity. Extending a natural prefix prepends a rule after reversal, so an `m`-term run is not generally a resumable prefix of an `(m+1)`-term run.
 - The Markov configuration is a nonempty finite binary word plus a visible schedule cursor. The cursor is configuration state, not DOMAIN, trace time, executor memory, or producer state.
-- A lossless executable representation labels every word occurrence by the same phase: `(cursor,(b0,...,bn)) <-> ((cursor,b0),...,(cursor,bn))`. On its uniform-phase invariant image, one event is exactly an ordinary T13 all-occurrence/self-read/nonempty-word replacement followed by source-ordered concatenation.
+- A lossless executable representation labels every word occurrence by the same phase: `(cursor,(b0,...,bn)) <-> ((cursor,b0),...,(cursor,bn))`. On its uniform-phase invariant image, each live event with `cursor < len(schedule)` is exactly an ordinary T13 all-occurrence/self-read/nonempty-word replacement followed by source-ordered concatenation. Exhaustion is the shared terminal envelope, not a T13 morphism event.
 - T42 therefore has discrete `t+1D` DOMAIN. Its changing finite ordered support is CONFIGURATION structure; binary data and finite phase are ALPHABET factors.
 - Schedule exhaustion is a typed terminal result. It is not an empty word, fixed point, quiescence, failure, external horizon, or resource limit. Strict morphisms are nonempty, so native evolution never extinguishes the word.
 - `Floor[h]` is an observer offset that maps binary symbols to the two mechanical-sequence values `Floor[h]` and `Floor[h]+1`. It is not substitution state and does not alter the rule.
@@ -147,7 +147,7 @@ writes = RULE(active, reads)
 next   = UPDATE.apply(configuration, active, writes)
 ```
 
-For `cursor < len(schedule)`, every old word occurrence fires once. Its read is its old binary value plus the visible current phase (directly or through the lossless replicated-phase representation). RULE emits the nonempty `rho_schedule[cursor](bit)` block with child ordinals. UPDATE consumes the old generation, concatenates blocks in source order, and advances the phase atomically. Newborns never fire in the same event. When `cursor == len(schedule)`, FRONTIER selects no rule-firing data occurrences and the common result reports `ScheduleExhausted` without an invented self-step.
+For `cursor < len(schedule)`, every old word occurrence fires once. Its read is its old binary value plus the visible current phase (directly or through the lossless replicated-phase representation). RULE emits the nonempty `rho_schedule[cursor](bit)` block with child ordinals. UPDATE consumes the old generation, concatenates blocks in source order, and advances the phase atomically. Newborns never fire in the same event. When `cursor == len(schedule)`, the shared terminal-result path reports `ScheduleExhausted` without invoking the T13 morphism/update path, inventing a self-step, or changing the final word. In particular, an empty selected set must not be passed to D019: its no-selected generation case consumes the old word, which would be the wrong terminal semantics here.
 
 ## Lossless T13 Representation
 
@@ -163,13 +163,13 @@ on the invariant image of nonempty words whose phase components are all equal. T
 (i,b) -> [(i+1,c) for c in rho_schedule[i](b)]
 ```
 
-for active phases. Thus:
+for active phases. Thus, for every live phase `i < len(schedule)`:
 
 ```text
 e(step_direct(program,state)) = step_T13(compiled(program),e(state))
 ```
 
-one event for one event, preserving the complete word, phase, source-order children, lineage, outcome, and schedule exhaustion. The representation uses T13 `AllOccurrences`, a self read, nonempty block emission, and D019 `OrderedGenerationConcat`; it does not pack the word into a scalar or delegate to a hidden interpreter.
+one event for one event, preserving the complete word, phase, source-order children, lineage, and `Advanced` outcome. At `i == len(schedule)`, the direct and represented configurations instead enter the same generic zero-successor `ScheduleExhausted` envelope with the complete final word retained and no D019 commit. The representation uses T13 `AllOccurrences`, a self read, nonempty block emission, and D019 `OrderedGenerationConcat` only for live phases; it does not pack the word into a scalar or delegate to a hidden interpreter.
 
 The compact `(cursor,word)` form and a tagged `Cursor(cursor) · Data*` form are also lossless interfaces when their exact inverse and atomic two-factor commit are retained. The uniform phase-product word is the smallest direct T13 lowering because every firing occurrence can read all rule-relevant state locally.
 
@@ -185,7 +185,7 @@ The compact `(cursor,word)` form and a tagged `Cursor(cursor) · Data*` form are
 ## Outcomes and Trace
 
 - `Advanced`: one schedule coefficient was selected, every old occurrence fired exactly once, one nonempty successor word was committed, and cursor advanced by one.
-- `ScheduleExhausted`: no coefficient remains; zero successors/events are produced with the last complete configuration and source result intact.
+- `ScheduleExhausted`: no coefficient remains; the shared terminal envelope produces zero successors/events with the last complete configuration and source result intact, without calling D019 on an empty frontier.
 - `Invalid`: malformed program/configuration, nonuniform phase representation, nonbinary word, nonpositive coefficient, wrong seed, cursor out of range, rational-complete strict source, or nonreplaying handoff.
 - `Error`: a generic infrastructure/provenance failure before commit. No partial word or cursor update is committed.
 - External horizon/resource cancellation is not native completion. A fixed or repeated word does not halt while a coefficient remains.
@@ -227,7 +227,7 @@ No runtime code is changed in Goal 1.
 | Compact versus replicated phase | 3 | `(cursor,word) <-> (PhaseIndex x Bit)+` | All phase labels equal; one-event commuting square |
 | T40 coefficient source | 1/2 | D139 replay-verified result/handoff | Complete result replay; exact/certified prefix-of-infinite only |
 | Explicit schedule source | 2 | Closed ordered positive tuple | Separate tag; no fabricated query provenance |
-| Schedule exhaustion | 1/2 | Common zero-successor terminal outcome | Distinct from empty/fixed/quiescent/horizon/error |
+| Schedule exhaustion | 1/2 | Common zero-successor terminal outcome | Retains the final nonempty word; does not lower through D019's no-selected generation case; distinct from empty/fixed/quiescent/horizon/error |
 | New execution algebra | Not established | T13/D019 plus D032 and D139 | No T42 UPDATE, executor, family branch, callback, or class-4 category |
 
 ## Goal 2 Handoff
@@ -238,7 +238,7 @@ Goal 2 should:
 2. Accept either a complete replay-verified D139/T40 coefficient handoff or a separately tagged explicit schedule. Never accept detached provenance IDs, a callback, generator, iterator, CAS object, or arbitrary host expression.
 3. Normalize accepted natural simple-CF coefficients by dropping signed `a0` and reversing the positive tail exactly once. Preserve original result, requested count, source kind, proof strength, termination, and orientation.
 4. Fix strict seed `(0,)`; model cursor visibly; report the valid zero-event `m=1` program and `m-1` event count.
-5. Compile to the lossless uniform `PhaseIndex x Bit` T13 representation, or implement the isomorphic compact representation with an explicit inverse and full-result commuting conformance.
+5. Compile each live phase to the lossless uniform `PhaseIndex x Bit` T13 representation, or implement the isomorphic compact representation with an explicit inverse and full-result commuting conformance. At exhaustion use the shared terminal envelope and retain the final word; never route an empty active set through D019.
 6. Reuse `AllOccurrences`, self reads, nonempty word emissions, D019 old-snapshot source-order concatenation, ragged traces, lineage, and common outcomes without T42 dispatch.
 7. Preserve `ScheduleExhausted`, external horizon, invalid source, error, and resource cancellation as distinct results. Do not wrap, repeat, infer phase from time, or resume a longer reversed-prefix program from a shorter one.
 8. Keep `Floor[h]`, digital slopes, axis crossings, quadratic macros, coefficient statistics, and billiards as observers/relations with exact step-scale and proof labels.

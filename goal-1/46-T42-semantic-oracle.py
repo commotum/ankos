@@ -66,6 +66,7 @@ T40_RESULT_SCHEMA = "t40.expansion-result/v1"
 T40_HANDOFF_SCHEMA = "t40-to-t42.complete-replay-verified/v1"
 EXPLICIT_SOURCE_SCHEMA = "t42.explicit-execution-schedule/v1"
 LIMITED_TRANSCRIBED = "LIMITED_TRANSCRIBED"
+EXPLICIT_EVIDENCE_MODES = ("DECLARED_EXPLICIT", LIMITED_TRANSCRIBED)
 SCHEDULE_EXHAUSTED = "schedule_exhausted"
 
 
@@ -88,6 +89,7 @@ ARCHITECTURE_CLASSIFICATION = (
     "3: smallest execution base is the lossless uniform PhaseIndex×Bit word; every old occurrence then self-reads and emits through exact T13",
     "3: compact (cursor,word) and Cursor(cursor)·Data(word) views are lossless interfaces; the tagged view needs a shared cursor read",
     "3: compose cursor assignment and ordered-generation replacement atomically; D039 is an optional tagged/span lowering",
+    "2: T13/D019 commutation is live-event-only for cursor<L; the cursor=L terminal envelope retains the final nonempty word and performs no D019 commit",
     "1-3 only: no T42 UPDATE algebra, executor, family dispatcher, callback, evaluator, raster program, or class-4 category",
 )
 
@@ -101,6 +103,7 @@ GOAL2_CONFORMANCE = (
     "Use the uniform PhaseIndex×Bit product-word lowering when exact T13 AllOccurrences/Self/OrderedGenerationConcat execution is desired.",
     "Use complete old-snapshot occurrence coverage and source-order child concatenation with no newborn firing.",
     "Report finite schedule completion distinctly from empty word, fixed point, external horizon, error, or resource failure.",
+    "At schedule exhaustion retain the final nonempty word and return a zero-successor terminal envelope; never pass the empty terminal frontier to D019.",
     "Do not wrap, repeat the last rule, infer the cursor from generation, or continue a shorter horizon as a longer one.",
     "Keep T41 curve/count queries and T40 coefficient evaluation outside T42 transition state.",
 )
@@ -624,7 +627,21 @@ def verify_t40_expansion_result(value: object) -> bool:
     if type(value) is not T40ExpansionResult:
         return False
     try:
-        return value == evaluate_t40_cf_query(value.query, value.context)
+        rebuilt = T40ExpansionResult(
+            value.query,
+            value.context,
+            value.provenance,
+            value.start_index,
+            value.coefficients,
+            value.integer_digits,
+            value.sign,
+            value.outcome,
+            value.termination,
+            value.schema,
+            value.result_id,
+        )
+        canonical = evaluate_t40_cf_query(value.query, value.context)
+        return rebuilt.key() == canonical.key() == value.key()
     except (TypeError, ValueError, ArithmeticError, ZeroDivisionError):
         return False
 
@@ -685,6 +702,8 @@ class ExplicitScheduleSource:
         checked = tuple(exact_positive(value, "explicit execution coefficient") for value in raw)
         label = exact_text(self.source_label, "explicit schedule source label")
         mode = exact_text(self.evidence_mode, "explicit schedule evidence mode")
+        if mode not in EXPLICIT_EVIDENCE_MODES:
+            raise ValueError("unknown explicit schedule evidence mode")
         if self.schema != EXPLICIT_SOURCE_SCHEMA:
             raise ValueError("unknown explicit schedule schema")
         key = (self.schema, checked, label, mode)
@@ -1614,9 +1633,114 @@ SOURCE_SEMANTIC_MANIFEST = (
     ("a0_domain", "signed_integer"),
     ("tail_domain", "positive_integer"),
     ("rational_source", "rejected"),
+    ("terminal_boundary", "cursor_equals_L_retains_nonempty_word_without_D019_commit"),
     ("sine_half_shift_rule_generator", "source_underspecified"),
     ("page162_alpha_and_coefficient_fixtures", LIMITED_TRANSCRIBED),
 )
+
+
+def audit_t40_replay_verified_handoffs() -> tuple[int, int, int, int, int, int]:
+    exact = t40_exact_result(T40SquareRootDenotation(23), 20)
+    negative = t40_exact_result(T40NegatedSquareRootDenotation(2), 12)
+    certified = t40_certified_pi_result(12, 20)
+    results = (exact, negative, certified)
+    full_bindings = 0
+    for result in results:
+        assert verify_t40_expansion_result(result)
+        handoff = make_t40_coefficient_handoff(result)
+        program = program_from_t40_result(result)
+        assert type(program.schedule.source) is T40CoefficientHandoff
+        assert program.schedule.source.key()[1] == result.key()
+        assert program.schedule.source_identity == result.result_id
+        assert program.schedule.coefficients == tuple(reversed(result.coefficients[1:]))
+        full_bindings += 1
+    assert type(exact.outcome) is T40CompleteExact
+    assert type(negative.outcome) is T40CompleteExact
+    assert type(certified.outcome) is T40CompleteCertified
+    assert negative.coefficients[0] < 0
+    assert all(value > 0 for value in negative.coefficients[1:])
+    rational = t40_exact_result(T40RationalDenotation(3, 2), 4)
+    rational_rejection = must_raise(
+        ValueError,
+        lambda: make_t40_coefficient_handoff(rational),
+    )
+    return 3, len(exact.coefficients) + len(negative.coefficients), len(certified.coefficients), 1, rational_rejection, full_bindings
+
+
+def audit_m_term_source_defect() -> tuple[int, int, int, int]:
+    cases = 0
+    natural_terms = 0
+    execution_events = 0
+    prepend_relations = 0
+    previous_schedule: tuple[int, ...] | None = None
+    for m in range(1, 9):
+        result = t40_exact_result(T40EulerDenotation(), m)
+        schedule = reverse_natural_cf_tail_once(
+            make_t40_coefficient_handoff(result)
+        ).coefficients
+        assert len(result.coefficients) == m
+        assert len(schedule) == m - 1
+        if previous_schedule is not None:
+            assert schedule[1:] == previous_schedule
+            prepend_relations += 1
+        previous_schedule = schedule
+        cases += 1
+        natural_terms += m
+        execution_events += len(schedule)
+    assert (cases, natural_terms, execution_events, prepend_relations) == (8, 36, 28, 7)
+    return cases, natural_terms, execution_events, prepend_relations
+
+
+def audit_terminal_retention_boundary() -> tuple[int, int, int, int]:
+    programs = (
+        ScheduledMorphismProgram(
+            explicit_execution_schedule((2,), source_label="terminal-retention-live")
+        ),
+        program_from_t40_result(t40_exact_result(T40EulerDenotation(), 1)),
+    )
+    retained_views = 0
+    retained_symbols = 0
+    blocked_empty_commits = 0
+    for program in programs:
+        current = initial_snapshot(program)
+        while current.configuration.cursor < len(program.schedule.coefficients):
+            advanced = direct_step(program, current)
+            assert type(advanced) is AdvancedTransition
+            current = advanced.successor
+        assert current.configuration.word
+        assert select_all_occurrences(program, current) == ()
+        direct_terminal = direct_step(program, current)
+        assert type(direct_terminal) is ScheduleCompletion
+        assert direct_terminal.configuration == current.configuration
+        assert direct_terminal.successors == ()
+        retained_views += 1
+
+        tagged_before = encode_tagged(current.configuration)
+        tagged_terminal = tagged_step(program, tagged_before)
+        assert type(tagged_terminal) is TaggedScheduleCompletion
+        assert tagged_terminal.configuration == tagged_before
+        assert decode_tagged(program, tagged_terminal.configuration) == current.configuration
+        retained_views += 1
+
+        replicated_before = encode_replicated(current.configuration)
+        replicated_terminal = replicated_step(program, replicated_before)
+        assert type(replicated_terminal) is ReplicatedScheduleCompletion
+        assert replicated_terminal.configuration == replicated_before
+        assert decode_replicated(program, replicated_terminal.configuration) == current.configuration
+        retained_views += 1
+
+        blocked_empty_commits += must_raise(
+            ValueError,
+            lambda program=program, current=current: ordered_generation_commit(
+                program,
+                current,
+                (),
+                (),
+            ),
+        )
+        retained_symbols += len(current.configuration.word)
+    assert (len(programs), retained_views, retained_symbols, blocked_empty_commits) == (2, 6, 3, 2)
+    return len(programs), retained_views, retained_symbols, blocked_empty_commits
 
 
 def audit_page_fixtures() -> tuple[int, int, int, int, int, int]:
@@ -2050,36 +2174,125 @@ def audit_no_hidden_surface() -> tuple[int, int, int, int]:
     return len(manifest), len(violations), 0, 2
 
 
+def unsafe_hostile_forge(instance: object, **changes: object) -> object:
+    """Bypass a frozen dataclass constructor solely to test consumer revalidation."""
+
+    if not is_dataclass(instance) or isinstance(instance, type):
+        raise TypeError("hostile forge helper needs a dataclass instance")
+    clone = object.__new__(type(instance))
+    for field in fields(instance):
+        object.__setattr__(
+            clone,
+            field.name,
+            changes.get(field.name, getattr(instance, field.name)),
+        )
+    return clone
+
+
 def audit_hostile_validation() -> int:
     rejected = 0
-    good_provenance = fixture_provenance("hostile", 3)
-    rejected += must_raise(TypeError, lambda: QueryProvenance(1, good_provenance.result_id, COMPLETE_EXACT, 0, 3))
-    rejected += must_raise(ValueError, lambda: QueryProvenance("0" * 63, good_provenance.result_id, COMPLETE_EXACT, 0, 3))
-    rejected += must_raise(ValueError, lambda: QueryProvenance(good_provenance.query_id, good_provenance.result_id, "partial", 0, 3))
-    rejected += must_raise(ValueError, lambda: QueryProvenance(good_provenance.query_id, good_provenance.result_id, COMPLETE_EXACT, 1, 3))
-    rejected += must_raise(TypeError, lambda: QueryProvenance(good_provenance.query_id, good_provenance.result_id, COMPLETE_EXACT, 0, 3.0))
-    rejected += must_raise(ValueError, lambda: FinalizedNaturalCFPrefix(good_provenance, (), IRRATIONAL_PREFIX))
-    rejected += must_raise(ValueError, lambda: FinalizedNaturalCFPrefix(good_provenance, (0, 1), IRRATIONAL_PREFIX))
-    rejected += must_raise(TypeError, lambda: FinalizedNaturalCFPrefix(good_provenance, (0, 1.0, 2), IRRATIONAL_PREFIX))
-    rejected += must_raise(ValueError, lambda: FinalizedNaturalCFPrefix(good_provenance, (0, 0, 2), IRRATIONAL_PREFIX))
-    rejected += must_raise(ValueError, lambda: FinalizedNaturalCFPrefix(good_provenance, (0, -1, 2), IRRATIONAL_PREFIX))
-    rejected += must_raise(ValueError, lambda: FinalizedNaturalCFPrefix(good_provenance, (0, 1, 2), "unknown"))
-    good_prefix = FinalizedNaturalCFPrefix(good_provenance, (-7, 1, 2), IRRATIONAL_PREFIX)
-    rejected += must_raise(TypeError, lambda: reverse_natural_cf_tail_once(reverse_natural_cf_tail_once(good_prefix)))
-    rejected += must_raise(TypeError, lambda: explicit_execution_schedule([1, 2], a0=0, provenance=good_provenance))
-    rejected += must_raise(ValueError, lambda: explicit_execution_schedule((1, 0), a0=0, provenance=good_provenance))
-    rejected += must_raise(TypeError, lambda: explicit_execution_schedule((1, 2), a0=0.0, provenance=good_provenance))
+    rejected += must_raise(TypeError, lambda: T40RepresentationQuery(lambda: 1, 3))
+    rejected += must_raise(TypeError, lambda: T40RepresentationQuery(T40EulerDenotation(), 3.0))
+    rejected += must_raise(ValueError, lambda: T40RepresentationQuery(T40EulerDenotation(), 0))
+    rejected += must_raise(ValueError, lambda: T40RepresentationQuery(T40EulerDenotation(), 3, selection="CoefficientAt/v1"))
+    rejected += must_raise(TypeError, lambda: T40EvaluationContext(lambda: None))
+    rejected += must_raise(ValueError, lambda: T40EvaluationContext(T40_EXACT_METHOD, 1))
+    rejected += must_raise(ValueError, lambda: T40EvaluationContext(T40_MACHIN_METHOD, 0))
 
-    rational_prefix = FinalizedNaturalCFPrefix(
-        fixture_provenance("hostile-rational", 2),
-        (1, 2),
-        RATIONAL_COMPLETE,
+    good_result = t40_exact_result(T40NegatedSquareRootDenotation(2), 3)
+    assert good_result.coefficients == (-2, 1, 1)
+    assert good_result == t40_exact_result(T40NegatedSquareRootDenotation(2), 3)
+    assert good_result.result_id == t40_exact_result(T40NegatedSquareRootDenotation(2), 3).result_id
+    different_result = t40_exact_result(T40NegatedSquareRootDenotation(2), 4)
+    assert good_result.result_id != different_result.result_id
+    good_handoff = make_t40_coefficient_handoff(good_result)
+    assert good_handoff.a0 == -2 and good_handoff.natural_tail == (1, 1)
+
+    rejected += must_raise(TypeError, lambda: make_t40_coefficient_handoff(good_result.provenance))
+    rejected += must_raise(TypeError, lambda: reverse_natural_cf_tail_once(good_result))
+    rejected += must_raise(TypeError, lambda: reverse_natural_cf_tail_once(reverse_natural_cf_tail_once(good_handoff)))
+    rejected += must_raise(
+        ValueError,
+        lambda: T40QueryProvenance(
+            good_result.provenance.query_key,
+            "0" * 64,
+            good_result.provenance.context_key,
+            good_result.provenance.context_id,
+        ),
     )
-    rejected += must_raise(ValueError, lambda: program_from_natural_prefix(rational_prefix))
-    program = program_from_natural_prefix(good_prefix)
+
+    forged_coefficients = unsafe_hostile_forge(good_result, coefficients=(2, 1, 1))
+    forged_result_id = unsafe_hostile_forge(good_result, result_id="f" * 64)
+    forged_termination = unsafe_hostile_forge(good_result, termination=FINITE_TERMINATED)
+    forged_provenance = unsafe_hostile_forge(good_result.provenance, query_id="e" * 64)
+    forged_provenance_result = unsafe_hostile_forge(good_result, provenance=forged_provenance)
+    for forged in (
+        forged_coefficients,
+        forged_result_id,
+        forged_termination,
+        forged_provenance_result,
+    ):
+        assert type(forged) is T40ExpansionResult
+        assert not verify_t40_expansion_result(forged)
+        rejected += must_raise(ValueError, lambda forged=forged: make_t40_coefficient_handoff(forged))
+
+    for forged_outcome in (PARTIAL, RESOURCE_LIMIT, PROBABLE, APPROXIMATE):
+        forged = unsafe_hostile_forge(good_result, outcome=forged_outcome)
+        assert not verify_t40_expansion_result(forged)
+        rejected += must_raise(ValueError, lambda forged=forged: make_t40_coefficient_handoff(forged))
+
+    certified_result = t40_certified_pi_result(12, 20)
+    assert type(certified_result.outcome) is T40CompleteCertified
+    certificate = certified_result.outcome.certificate
+    tampered_certificate = T40MachinCertificate(
+        certificate.terms,
+        certificate.interval,
+        certificate.certified_coefficients[:-1] + (certificate.certified_coefficients[-1] + 1,),
+    )
+    forged_certified = unsafe_hostile_forge(
+        certified_result,
+        outcome=T40CompleteCertified(tampered_certificate),
+    )
+    assert not verify_t40_expansion_result(forged_certified)
+    rejected += must_raise(ValueError, lambda: make_t40_coefficient_handoff(forged_certified))
+
+    rational_result = t40_exact_result(T40RationalDenotation(3, 2), 2)
+    rejected += must_raise(ValueError, lambda: program_from_t40_result(rational_result))
+    rejected += must_raise(TypeError, lambda: explicit_execution_schedule([1, 2], source_label="bad-list"))
+    rejected += must_raise(ValueError, lambda: explicit_execution_schedule((1, 0), source_label="bad-zero"))
+    rejected += must_raise(TypeError, lambda: explicit_execution_schedule((1, 2), source_label=lambda: None))
+    rejected += must_raise(ValueError, lambda: explicit_execution_schedule((1, 2), source_label="bad-mode", evidence_mode="UNBOUND"))
+    rejected += must_raise(
+        TypeError,
+        lambda: explicit_execution_schedule((1, 2), source_label="fake-T40", provenance=good_result.provenance),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: explicit_execution_schedule((1, 2), source_label="fake-a0", a0=0),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: explicit_execution_schedule((1, 2), source_label="fake-count", requested_count=3),
+    )
+    explicit_source = ExplicitScheduleSource((1, 2), "hostile-explicit")
+    rejected += must_raise(ValueError, lambda: ExplicitScheduleSource((1, 2), "hostile-explicit", source_id="f" * 64))
+    forged_explicit = unsafe_hostile_forge(explicit_source, coefficients=(2, 2))
+    rejected += must_raise(ValueError, lambda: FinalizedExecutionSchedule(forged_explicit))
+
+    forged_handoff = unsafe_hostile_forge(good_handoff, source_result=forged_coefficients)
+    rejected += must_raise(ValueError, lambda: FinalizedExecutionSchedule(forged_handoff))
+
+    program = program_from_t40_result(good_result)
+    assert type(program.schedule.source) is T40CoefficientHandoff
+    assert program.schedule.source.key()[1] == good_result.key()
+    assert program.schedule.source_identity == good_result.result_id
     rejected += must_raise(ValueError, lambda: ScheduledMorphismProgram(program.schedule, program_id="f" * 64))
     rejected += must_raise(ValueError, lambda: ScheduledMorphismProgram(program.schedule, seed=(1,)))
+    rejected += must_raise(ValueError, lambda: ScheduledMorphismProgram(program.schedule, seed=(0, 0)))
     rejected += must_raise(FrozenInstanceError, lambda: setattr(program, "program_id", "0" * 64))
+    rejected += must_raise(FrozenInstanceError, lambda: setattr(good_result, "coefficients", (2, 1, 1)))
+    forged_schedule = unsafe_hostile_forge(program.schedule, schedule_id="f" * 64)
+    rejected += must_raise(ValueError, lambda: ScheduledMorphismProgram(forged_schedule))
     rejected += must_raise(ValueError, lambda: DirectConfiguration(0, ()))
     rejected += must_raise(TypeError, lambda: DirectConfiguration(False, (0,)))
     rejected += must_raise(ValueError, lambda: DirectConfiguration(0, (2,)))
@@ -2119,14 +2332,13 @@ def audit_hostile_validation() -> int:
             program,
             snapshot,
             handles,
-            (replace(emissions[0], output=(1,)), emissions[1]),
+            (replace(emissions[0], output=(0, 1)), emissions[1]),
         ),
     )
     other_program = ScheduledMorphismProgram(
         explicit_execution_schedule(
             (3,),
-            a0=0,
-            provenance=fixture_provenance("other-program", 2),
+            source_label="other-program",
         )
     )
     rejected += must_raise(ValueError, lambda: direct_step(other_program, snapshot))
@@ -2151,12 +2363,8 @@ def audit_hostile_validation() -> int:
         ),
     )
 
-    empty_schedule_program = program_from_natural_prefix(
-        FinalizedNaturalCFPrefix(
-            fixture_provenance("hostile-m1", 1),
-            (0,),
-            IRRATIONAL_PREFIX,
-        )
+    empty_schedule_program = program_from_t40_result(
+        t40_exact_result(T40EulerDenotation(), 1)
     )
     terminal_snapshot = initial_snapshot(empty_schedule_program)
     rejected += must_raise(
@@ -2177,8 +2385,7 @@ def audit_hostile_validation() -> int:
     resume_program = ScheduledMorphismProgram(
         explicit_execution_schedule(
             (1, 2, 3),
-            a0=0,
-            provenance=fixture_provenance("generation-cursor-mutation", 4),
+            source_label="generation-cursor-mutation",
         )
     )
     resumed = arbitrary_snapshot(
@@ -2206,8 +2413,7 @@ def audit_hostile_validation() -> int:
     completion_program = ScheduledMorphismProgram(
         explicit_execution_schedule(
             (1,),
-            a0=0,
-            provenance=fixture_provenance("terminal-wrap-mutation", 2),
+            source_label="terminal-wrap-mutation",
         )
     )
     first = direct_step(completion_program, initial_snapshot(completion_program))
@@ -2222,10 +2428,13 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "cbb1f9b5fbfdfa8272431e425f906f549ad870645bb96dbec5446bba9700d7ff"
+EXPECTED_DIGEST = "149353e1a5c4d535b5e01327c989270a197d47b1760392e77ad235eab379c226"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
+    handoffs = audit_t40_replay_verified_handoffs()
+    source_defect = audit_m_term_source_defect()
+    terminal = audit_terminal_retention_boundary()
     page = audit_page_fixtures()
     bounded = audit_bounded_direct_tagged_commutation()
     mechanical = audit_mechanical_word_alignment()
@@ -2236,6 +2445,9 @@ def collect_audit_summary() -> tuple[tuple[str, object], ...]:
     surface = audit_no_hidden_surface()
     hostile = audit_hostile_validation()
     return (
+        ("T40_replay_verified_handoffs", handoffs),
+        ("m_term_source_defect", source_defect),
+        ("terminal_retention_boundary", terminal),
         ("page162_fixtures", page),
         ("bounded_direct_tagged_commutation", bounded),
         ("mechanical_word_d1_alignment", mechanical),
@@ -2264,6 +2476,9 @@ def main() -> None:
         return
     assert digest == EXPECTED_DIGEST
     metrics = dict(summary)
+    handoffs = metrics["T40_replay_verified_handoffs"]
+    source_defect = metrics["m_term_source_defect"]
+    terminal = metrics["terminal_retention_boundary"]
     page = metrics["page162_fixtures"]
     bounded = metrics["bounded_direct_tagged_commutation"]
     mechanical = metrics["mechanical_word_d1_alignment"]
@@ -2274,9 +2489,26 @@ def main() -> None:
     surface = metrics["no_hidden_surface"]
     print("T42 semantic oracle: PASS")
     print(
+        f"T40_handoffs={handoffs[0]}/exact_coefficients:{handoffs[1]}/"
+        f"certified_coefficients:{handoffs[2]}/signed_a0:{handoffs[3]}/"
+        f"rational_rejections:{handoffs[4]}/full_result_bindings:{handoffs[5]}; "
+        "replay_verified=PASS; detached_ids=REJECTED"
+    )
+    print(
+        f"source_m_terms=cases:{source_defect[0]}/natural_terms:{source_defect[1]}/"
+        f"execution_events:{source_defect[2]}/horizon_prepend_relations:{source_defect[3]}; "
+        "Rest_makes_m_minus_1_events=PASS"
+    )
+    print(
+        f"terminal_retention=cases:{terminal[0]}/views:{terminal[1]}/"
+        f"retained_symbols:{terminal[2]}/blocked_empty_D019_commits:{terminal[3]}; "
+        "cursor_equals_L_no_commit=PASS"
+    )
+    print(
         f"page162=fixtures:{page[0]}/events:{page[1]}/source_firings:{page[2]}/"
         f"children:{page[3]}/compact_tagged_commutations:{page[4]}/"
-        f"replicated_product_commutations:{page[5]}; asset_hash=PASS"
+        f"replicated_product_commutations:{page[5]}; asset_hash=PASS; "
+        "fixture_coefficients=LIMITED_TRANSCRIBED; pixel_replay=NO"
     )
     print(
         f"bounded=programs:{bounded[0]}/active_cases:{bounded[1]}/"
