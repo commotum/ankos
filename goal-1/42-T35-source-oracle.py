@@ -446,6 +446,15 @@ INDEX_ONLY_CONTEXT_ROUTE_CLASSES = {
     "page730_general_digit_locality": line_set("20946,21695"),
     "page1114_multiregister_compiler": line_set("21813"),
 }
+INDEX_ONLY_CONTEXT_ROUTE_GUARDS = {
+    "page730_general_digit_locality": {
+        20946: "non-locality of, 730",
+        21695: "in digit sequences, 730",
+    },
+    "page1114_multiregister_compiler": {
+        21813: "and register machines, 1114",
+    },
+}
 INDEX_ONLY_CONTEXT_ROUTES = frozenset().union(
     *INDEX_ONLY_CONTEXT_ROUTE_CLASSES.values()
 )
@@ -617,6 +626,10 @@ EXPECTED_INDEX_ONLY_CONTEXT_CLASSES = {
 EXPECTED_INDEX_ONLY_CONTEXT_ROUTE_MAPPING = (
     3,
     "c4505d4cf5f8fa7b811c3f5e9ae03435c471954cc5658904b7f5a4f86863152e",
+)
+EXPECTED_INDEX_ONLY_CONTEXT_ROUTE_GUARDS = (
+    3,
+    "3ceb1c33c12d203c87b0edeee64f9ad07636d3ee1276f51edaab45ff6319f74f",
 )
 EXPECTED_IMAGE_ASSET_MANIFEST = (
     26,
@@ -1062,8 +1075,57 @@ def main() -> int:
         (len(INDEX_ONLY_CONTEXT_ROUTES), digest(INDEX_ONLY_CONTEXT_ROUTES)),
         (len(index_context_targets), digest(index_context_targets)),
     )
+    index_context_class_actual = {
+        name: (
+            (
+                len(INDEX_ONLY_CONTEXT_ROUTE_CLASSES[name]),
+                digest(INDEX_ONLY_CONTEXT_ROUTE_CLASSES[name]),
+            ),
+            (len(targets), digest(targets)),
+        )
+        for name, targets in INDEX_ONLY_CONTEXT_TARGETS.items()
+    }
+    index_context_route_mapping = {
+        f"{line_no}->{name}"
+        for name, values in INDEX_ONLY_CONTEXT_ROUTE_CLASSES.items()
+        for line_no in values
+    }
+    index_context_route_mapping_actual = (
+        len(index_context_route_mapping),
+        digest_records(index_context_route_mapping),
+    )
+    index_context_route_guard_records = {
+        f"{name}:{line_no}:{needle}"
+        for name, guards in INDEX_ONLY_CONTEXT_ROUTE_GUARDS.items()
+        for line_no, needle in guards.items()
+    }
+    index_context_route_guards_actual = (
+        len(index_context_route_guard_records),
+        digest_records(index_context_route_guard_records),
+    )
     index_context_ok = (
         index_context_actual == EXPECTED_INDEX_ONLY_CONTEXT
+        and set(INDEX_ONLY_CONTEXT_ROUTE_CLASSES)
+        == set(INDEX_ONLY_CONTEXT_TARGETS)
+        == set(INDEX_ONLY_CONTEXT_ROUTE_GUARDS)
+        == set(EXPECTED_INDEX_ONLY_CONTEXT_CLASSES)
+        and index_context_class_actual == EXPECTED_INDEX_ONLY_CONTEXT_CLASSES
+        and index_context_route_mapping_actual
+        == EXPECTED_INDEX_ONLY_CONTEXT_ROUTE_MAPPING
+        and index_context_route_guards_actual
+        == EXPECTED_INDEX_ONLY_CONTEXT_ROUTE_GUARDS
+        and all(
+            set(INDEX_ONLY_CONTEXT_ROUTE_GUARDS[name])
+            == set(INDEX_ONLY_CONTEXT_ROUTE_CLASSES[name])
+            for name in INDEX_ONLY_CONTEXT_ROUTE_CLASSES
+        )
+        and all(
+            needle in at(line_no)
+            for guards in INDEX_ONLY_CONTEXT_ROUTE_GUARDS.values()
+            for line_no, needle in guards.items()
+        )
+        and sum(map(len, INDEX_ONLY_CONTEXT_ROUTE_CLASSES.values()))
+        == len(INDEX_ONLY_CONTEXT_ROUTES)
         and INDEX_ONLY_CONTEXT_ROUTES <= INDEX_ROUTED
         and not index_context_targets & RETAINED
         and not index_context_targets & union
@@ -1076,7 +1138,11 @@ def main() -> int:
         "index_only_context_targets_not_promoted_to_T35_mechanics",
         "OK" if index_context_ok else "MISMATCH",
         *index_context_actual,
+        *index_context_route_mapping_actual,
+        *index_context_route_guards_actual,
     )
+    for name, actual in index_context_class_actual.items():
+        print("index_only_context_class_" + name, *actual)
 
     derived_images = {
         line_no for line_no in RETAINED if IMAGE_RE.fullmatch(at(line_no))
@@ -1705,6 +1771,8 @@ def main() -> int:
 
     context_crosswalk: set[str] = set()
     context_owner_records: set[str] = set()
+    context_owner_by_line: dict[int, str] = {}
+    context_crosswalk_by_line: dict[int, str] = {}
     context_class_lines: dict[str, set[int]] = {
         "EXACT": set(),
         "IMAGE_BASENAME": set(),
@@ -1736,6 +1804,8 @@ def main() -> int:
             split_context_ok &= score == 1.0
         record = f"{line_no}->{witness}:{mode}:{score:.6f}"
         context_crosswalk.add(record)
+        context_owner_by_line[line_no] = witness
+        context_crosswalk_by_line[line_no] = record
         context_class_lines[mode].add(line_no)
         context_class_records[mode].add(record)
 
@@ -1768,6 +1838,24 @@ def main() -> int:
         split_context_ok &= (
             actual == EXPECTED_SPLIT_INDEX_CONTEXT_CLASSES[name]
         )
+    context_target_class_actual: dict[str, tuple[int, str, str, str]] = {}
+    for name, target_lines in INDEX_ONLY_CONTEXT_TARGETS.items():
+        present = set(target_lines) & set(context_owner_by_line)
+        owners = {context_owner_by_line[line_no] for line_no in present}
+        records = {context_crosswalk_by_line[line_no] for line_no in present}
+        actual = (
+            len(present),
+            digest(present),
+            digest_records(owners),
+            digest_records(records),
+        )
+        context_target_class_actual[name] = actual
+    split_context_ok &= (
+        set(context_target_class_actual)
+        == set(EXPECTED_SPLIT_INDEX_CONTEXT_TARGET_CLASSES)
+        and context_target_class_actual
+        == EXPECTED_SPLIT_INDEX_CONTEXT_TARGET_CLASSES
+    )
     ok &= split_context_ok
     print(
         "split_index_context_owner_crosswalk",
@@ -1776,6 +1864,8 @@ def main() -> int:
         *context_owners_actual,
         *(f"{name}:{context_class_actual[name]}" for name in context_class_actual),
     )
+    for name, actual in context_target_class_actual.items():
+        print("split_index_context_target_class_" + name, *actual)
 
     atlas_lines = ATLAS.read_text(encoding="utf-8").splitlines()
     atlas_patterns = (
