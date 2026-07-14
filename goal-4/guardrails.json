@@ -549,6 +549,7 @@
   },
   "compatibility": {
     "baseline_path": "goal-4/compatibility-baseline.json",
+    "baseline_sha256": "51f0635f2c278854d11c5ee4391419e736929b1953570af6071348765a6f3a78",
     "goal_1_root_oracle_count": 59,
     "goal_1_recursive_affected_count": 40,
     "goal_1_recursive_markdown_count": 40,

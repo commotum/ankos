@@ -525,6 +525,15 @@ class BaselineTests(unittest.TestCase):
         with self.assertRaisesRegex(GuardrailError, "restore absence"):
             self.validate_baseline(baseline)
 
+    def test_unchecked_extra_baseline_data_is_still_rejected_by_whole_digest(self) -> None:
+        baseline_path = ROOT / "goal-4/compatibility-baseline.json"
+        if not baseline_path.exists():
+            self.skipTest("compatibility baseline is materialized after the contract tests")
+        baseline = load_json(baseline_path)
+        baseline["forged_but_otherwise_self_consistent"] = True
+        with self.assertRaisesRegex(GuardrailError, "whole compatibility baseline digest"):
+            self.validate_baseline(baseline)
+
 
 if __name__ == "__main__":
     unittest.main()

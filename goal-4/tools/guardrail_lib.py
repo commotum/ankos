@@ -571,7 +571,7 @@ EXPECTED_SEPARATE_AUTHORIZATION = {
 }
 
 EXPECTED_GUARDRAILS_CANONICAL_SHA256 = (
-    "0614b605aa16bc98733049ed372eaded6f7841c60ff91481eec1e2f4e530bb73"
+    "c446da937b7c174328364ca6e442781ed0270cd777cb0a86ef3a6917ae8a4a33"
 )
 
 
@@ -898,6 +898,10 @@ def validate_compatibility_baseline(
             if path.is_file() and not path.is_symlink()
         )
         require(goal3.get("planning_files") == current_goal3_files, "current Goal 3 planning scope drift")
+    require(
+        sha256_bytes(canonical_json_bytes(baseline)) == compatibility.get("baseline_sha256"),
+        "whole compatibility baseline digest drift",
+    )
 
 
 def validate_contract(
@@ -1144,6 +1148,11 @@ def validate_contract(
         "identifier grammar drift",
     )
     compatibility = contract.get("compatibility", {})
+    require(
+        isinstance(compatibility.get("baseline_sha256"), str)
+        and re.fullmatch(r"[0-9a-f]{64}", compatibility["baseline_sha256"]),
+        "compatibility baseline hash binding is missing",
+    )
     all_oracle_paths = _frozen_path_list(compatibility.get("all_oracle_paths"), "all oracle paths")
     affected_paths = _frozen_path_list(compatibility.get("recursive_affected_paths"), "affected oracle paths")
     image_paths = _frozen_path_list(

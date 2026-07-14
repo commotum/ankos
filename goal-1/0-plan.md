@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 44 type stages are complete, no stage is in progress or reopened, and T42 remains pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, T32, T33, T35, T36, T38, and T40 are complete under D119-D139.
+- Execution status at this sync is Foundation complete and all 45 type stages complete, with no stage reopened or unresolved; synthesis is now in progress. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, T32, T33, T35, T36, T38, T40, and T42 are complete under D119-D140.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -59,6 +59,8 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - T40 is an immutable arity-zero exact denotation plus a pure typed positional/simple-continued-fraction representation query. The complete denotation specification and selection form query identity; evaluation context remains separate, while provenance binds both. Coefficient payload, proof-strength outcome, and termination are independent. Terminating positional values retain an infinite zero tail; finite simple continued fractions complete canonically; `a0` is signed and only its tail is positive.
 - Long division, strict integer-safe square-root extraction, its proved fixed-program reachable-state quotient, and Gauss residual iteration are optional discrete `t+0D` work SimplePrograms over existing axes, not T40 state or a new executor. Direct nth-coefficient access supplies a concrete counterexample to mandatory prefix rollout. Alternative unary/Gray/negative-radix/non-power/multiplicative/self-delimiting/Fibonacci codecs require closed representation tags and invariants, not family execution.
 - D139 closes T40 through classes 1–3 with 447 retained source rows, the complete 897-row actual Index, 63 hash-bound raster candidates, exact/certified/partial/resource/unsupported/unknown/approximate/probable/failure results, replay-verified T42 handoffs, and 72 hostile rejections. No umbrella-native T40 transition CONFIGURATION or DOMAIN, T40 FRONTIER, NEIGHBORHOOD, UPDATE, executor, family branch, hidden callback/CAS object, or float coefficient is added; explicit work programs retain their own visible state and axes.
+- T42 is a finite visibly scheduled binary-substitution preset, not an online coefficient stream or new construction family. Its canonical executable carrier is a nonempty uniform word over `PhaseIndex[0..L] x Bit`; a required generic `phase<L` applicability restriction composes with T13 `AllOccurrences`, `Self`, closed nonempty word emission, and D019 ordered concatenation. Phase `L` returns common `ScheduleExhausted` with the final word retained and no D019 commit.
+- D140 closes T42 through classes 1–3. A T40 source must be a complete replay-verified result; natural coefficients drop signed `a0` and reverse the positive tail exactly once, so `m` terms yield `m-1` events and longer horizons prepend rather than resume. Explicit schedules use a separate closed tag. Compact/tagged words are lossless interfaces; the uniform product word is the sole plain-`Self` T13 lowering. Strict seed `(0,)` is initial preset/run configuration, not transition-program identity. No T42 state/axis kind, selector class, UPDATE, executor, family branch, callback, raster program, or class-4 algebra is added.
 - T39 evidence splits one actual transition construction from two pure categories: the consecutive-divisor sieve owns survivor-removal events, while structural integer filters/streams and pointwise arithmetic measurements have no update law.
 - The strict sieve uses a visible `next_divisor` marker and distinguishes every proper-multiple hit from newly removed candidates. Composite rows advance even when membership does not change. On finite ordered support, a Boolean membership field plus marker is bijective with the ordered-survivor pack; RULE emits ordinary candidate false-writes plus the marker write and generic old-snapshot UPDATE commits them. Infinite membership is intensional. No subset-removal class is required.
 - The literal page-147 profile really retains `1`: all 1,200 stage cells match the stated update and the final black set is `{1} union primes<=100`, while bottom labels omit `1`. The mathematical preset therefore starts at 2 explicitly. Finite certification after divisor 10, requested rows through 13, and infinite noncompletion remain distinct.
@@ -1225,19 +1227,31 @@ D139 reuses D082/T41 declarative definitions and T34/T36/T43 work/value responsi
 
 ### 46-T42-CF-SUBSTITUTION
 
+Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, RUNTIME-FIT, D140 ARCHITECTURE, AND INDEPENDENT HOSTILE REVIEW CLOSED** in `goal-1/46-T42-CF-SUBSTITUTION.md`.
+
 #### Big Picture Objective
 
-Test substitution whose rule schedule is driven by an external continued-fraction coefficient stream.
+Reconstruct T42 as a finite visibly scheduled binary-substitution preset whose immutable execution-order schedule comes from a complete replay-verified T40 result or a separately tagged explicit schedule.
 
 #### Detailed Implementation Plan
 
-Apply the common protocol, emphasizing coefficient-source state, generated rules, schedule, provenance from functions, and composition with substitution primitives.
+Normalize natural simple-CF coefficients by retaining signed `a0` as provenance/observer data, dropping it from execution, and reversing the positive tail exactly once. Use the canonical nonempty uniform `PhaseIndex[0..L] x Bit` word, generic `phase<L` applicability restriction, T13 all-occurrence/self-read/nonempty emissions, D019 ordered old-generation concatenation, and the common terminal envelope. Keep the strict `(0,)` seed in preset/run configuration; preserve full source result, schedule horizon/orientation, lineage, and terminal word. Keep compact/tagged encodings, quadratic macros, mechanical words, plots, digital slopes, crossings, and billiards in their correct interface/relation roles. Add no T42 axis, state class, UPDATE, executor, callback, or family branch.
 
 #### Completion Requirements
 
 All T42 evidence is captured; rule scheduling is explicit state or input rather than hidden control; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+COMPLETE. Fourteen search lanes close a 48-row union, the independent Book-wide lane closes 39 candidates, and 54 retained rows partition as `10 native / 21 relation / 23 control`; fixed closure covers the five-row strict main, five-row executable Notes, all 897 Index rows, and 951 split rows with zero unresolved. Twelve governed rasters at `1/11/0` bind 24 references, twelve hashes, and 285,055 bytes; all are hash-bound, page 162 is additionally limited-transcribed, and none is pixel-replayed.
+
+The semantic oracle closes three full replay-verified T40 handoffs, the `m-1` source defect, 630 live and 390 completion cases over thirteen programs, 630 exact canonical product-T13 commutations/5,145 children, exact terminal retention across six views, four page-162 fixtures/25 events/301 firings/599 children, coefficient/rational/horizon/macro boundaries, and 98 hostile rejections. Terminal carriers retain and replay the full program and reject live-phase exhaustion. D140 classifies T42 as classes 1–3 T13/D019/D024 reuse with a closed schedule constructor and provenance validation only.
+
+Source audit digest is `2726957389d256722469424e41ea2e92188ba5e30d7ab52c4df2598dd7250aa6`; source/asset/semantic SHAs are `27dfafe8798ce65af8d282440c85f02ae7d8d591f0fec30350ad52e41a25270d`, `a13a0fb85bae143a2ec53f2e4f77458777c980739e13ed522e85d3a42f21d4c6`, and `f283f02069b6a2cc46d49d3d4f34c61532bb5684167cf69db9562f1ba273bae5`; semantic digest is `c7e02485cb444cfeff14680d214a164f48e2f9bdf12e8021f5f28205ca9a789d`. All oracle/interface, relocation, mutation, fail-closed, architecture, and independent hostile-review gates pass. No runtime code changed and no prior stage reopened. Next: synthesis.
+
 ### 47-SYNTHESIS
+
+Status: **IN PROGRESS**.
 
 #### Big Picture Objective
 
@@ -1258,6 +1272,8 @@ Re-derive the complete architecture from all 45 evidence records and determine t
 - No unresolved contradiction remains in `0-plan.md` or `design-ledger.md`.
 
 ### 48-GOAL2-HANDOFF
+
+Status: **PENDING — DEPENDS ON SYNTHESIS**.
 
 #### Big Picture Objective
 

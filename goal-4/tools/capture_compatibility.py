@@ -378,6 +378,11 @@ def main() -> int:
             args.workers,
         )
         payload = canonical_json_bytes(baseline)
+        candidate_sha256 = sha256_bytes(payload)
+        require(
+            candidate_sha256 == contract["compatibility"]["baseline_sha256"],
+            "candidate baseline differs from the frozen Stage 1 hash; reopen and review the contract before replacement",
+        )
         temporary_path: Path | None = None
         try:
             with tempfile.NamedTemporaryFile(
