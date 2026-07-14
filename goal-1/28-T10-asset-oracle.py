@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import re
 from pathlib import Path
 
@@ -14,6 +15,7 @@ if not __debug__:
 ROOT = Path(__file__).resolve().parents[1]
 ASSET_ROOT = ROOT / "ref/A-New-Kind-of-Science"
 BOOK = ASSET_ROOT / "A-New-Kind-of-Science.md"
+SOURCE_ORACLE_PATH = ROOT / "goal-1/28-T10-source-oracle.py"
 
 EXPECTED_BOOK_LINES = 22_498
 EXPECTED_BOOK_SHA256 = "55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20"
@@ -30,42 +32,75 @@ images = {
     if (match := image_re.fullmatch(line))
 }
 
-# Core construction/caption/Notes/variant anchors. This is deliberately not
-# every generic occurrence of "mobile automaton": T10 requires the evidenced
-# three-cell replacement result, its governed Chapter 3 run, or a typed
-# relation/control boundary. BOOK:12002 is retained because its mixed motion
-# plate explicitly maps cases (a)-(c) to pages 73-75.
-SOURCE_ANCHORS = {882, 890, 898, 11982, 11993, 12002, 16066, 16068}
-for line_number in SOURCE_ANCHORS:
-    assert lines[line_number - 1].strip(), line_number
 
-# Mechanical bounded candidates. The three page-75 rasters are outside this
-# set and enter only because BOOK:904 explicitly says "shown on the facing
-# page"; the caption at BOOK:912 governs the complete three-file plate.
+def load_source_oracle():
+    spec = importlib.util.spec_from_file_location("t10_source_oracle", SOURCE_ORACLE_PATH)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+SOURCE = load_source_oracle()
+S = set(SOURCE.RETAINED)
+assert len(S) == 88
+assert SOURCE.digest(S) == "b840e59085605f26a24f07a1100fa4ccc4390be1eb37a274a8e6e68588681f1c"
+
+guards = {
+    882: "colors of its immediate neighbors to be updated at each step",
+    890: "based on a total of 8000 steps",
+    898: "compressed form below corresponds to 50,000 steps",
+    904: "example shown on the facing page",
+    912: "Each column above shows 400 steps",
+    11982: "mobile automaton on page 73",
+    11993: "Join[Take[list, {1, n-2}], #1, Take[list, {n+2, -1}]]",
+    11996: "65,318 mobile automata of the type described here",
+    12002: "correspond respectively to the rules on pages 73, 74 and 75",
+    16068: "{Reverse[#], 1}",
+    16442: "mobile automaton like the one from page 73",
+}
+for line_number, fragment in guards.items():
+    assert fragment in lines[line_number - 1], (line_number, fragment)
+
+# Mechanical bounded candidates from every retained source line. They include
+# typed relation and false-positive controls so no source-neighborhood raster
+# disappears silently. Q completes the only still-open explicit multi-page
+# plate: BOOK:5872 says the examples occupy the next two pages, and BOOK:5880
+# governs all seven cases and their causal-network views.
 C4 = {
     line_number
     for line_number in images
-    if min(abs(line_number - source) for source in SOURCE_ANCHORS) <= 4
+    if min(abs(line_number - source) for source in S) <= 4
 }
-Q = {906, 908, 910}
-assert C4 == {886, 888, 892, 896, 900, 902, 11998, 12000, 12004, 12006, 16070}
+Q = {5882, 5886}
+assert C4 == {
+    858, 860, 866, 876, 886, 888, 892, 896, 900, 902, 906, 908, 910,
+    922, 926, 932, 944, 946, 5834, 5878, 5932, 5934, 7928, 7932,
+    7934, 8006, 8018, 11998, 12000, 12004, 12006, 14273, 16070,
+    16650, 16658,
+}
 assert Q.isdisjoint(C4)
 U = C4 | Q
 
 # C: direct construction evidence: a strict T10 rule table or the independently
 # evidenced reversible three-cell-write variant. O: direct observer evidence:
-# an evolution or compressed run. R: a later mixed rule/motion relation plate
-# whose caption maps panels (a)-(c) to pages 73-75. X: inspected adjacency
-# controls that belong to T09 or T11. C/O classify evidence role only; raster
+# an evolution or compressed run. R: typed contrast, sibling, observer, or
+# emulation relations whose source was retained for the T10 boundary. X:
+# mechanical adjacency-only controls. C/O classify evidence role only; raster
 # layout is never native configuration, RULE, UPDATE, or trace representation.
 C = {888, 896, 910, 16070}
 O = {886, 892, 900, 902, 906, 908}
-R = {12004}
-X = {11998, 12000, 12006}
+R = {
+    858, 860, 866, 876, 922, 926, 932, 944, 946, 5834, 5878, 5882,
+    5886, 5932, 5934, 7928, 7932, 7934, 8006, 12004, 16650,
+}
+X = {8018, 11998, 12000, 12006, 14273, 16658}
 groups = (C, O, R, X)
 assert all(groups[a].isdisjoint(groups[b]) for a in range(4) for b in range(a))
 assert C | O | R | X == U
-assert (len(C4), len(Q), len(U), len(C), len(O), len(R), len(X)) == (11, 3, 14, 4, 6, 1, 3)
+assert (len(C4), len(Q), len(U), len(C), len(O), len(R), len(X)) == (
+    35, 2, 37, 4, 6, 21, 6
+)
 
 
 def jpeg_size(data: bytes) -> tuple[int, int]:
@@ -160,21 +195,21 @@ def ledger() -> tuple[str, int, int, int]:
     return payload, monolith_references, split_references, len(hashes)
 
 
-EXPECTED_UNIVERSE_SHA256 = "8914fda71f91933f3de2785ed01470291443a3fe75ee709e0d0621f306353354"
-EXPECTED_LEDGER_SHA256 = "25bda40f87de92226bbe1ed6b6461987429814aec3e7574efc637fdd3590304a"
+EXPECTED_UNIVERSE_SHA256 = "3ca91480bf20305d505a68f6d6752cacfd3b8a6c6859a64a77873326bc027315"
+EXPECTED_LEDGER_SHA256 = "9c031dc0878d3e8fcacea4669fe175fd290a8f86a3cee711607f25a80a79c668"
 
 
 def main() -> None:
     universe_payload = ",".join(map(str, sorted(U))).encode("ascii")
     assert hashlib.sha256(universe_payload).hexdigest() == EXPECTED_UNIVERSE_SHA256
     payload, monolith_references, split_references, hashes = ledger()
-    assert len(payload.splitlines()) == 14
+    assert len(payload.splitlines()) == 37
     assert hashlib.sha256(payload.encode("utf-8")).hexdigest() == EXPECTED_LEDGER_SHA256
-    assert (monolith_references, split_references, hashes) == (14, 14, 14)
+    assert (monolith_references, split_references, hashes) == (37, 37, 37)
     print(
-        "T10 asset oracle: PASS C4/Q=11/3; assets=14; "
-        "classes C/O/R/X=4/6/1/3(direct=10); refs=28(monolith=14,split=14); "
-        "unique_hashes=14"
+        "T10 asset oracle: PASS source=88; C4/Q=35/2; assets=37; "
+        "classes C/O/R/X=4/6/21/6(direct=10); "
+        "refs=74(monolith=37,split=37); unique_hashes=37"
     )
 
 

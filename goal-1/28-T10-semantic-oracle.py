@@ -119,6 +119,19 @@ def assert_rule_space() -> None:
     assert set(PAGE_73_RULE) == set(CONTEXTS)
 
 
+def derived_plane_codes(
+    rule: dict[tuple[int, int, int], tuple[tuple[int, int, int], int]],
+) -> tuple[int, int, int, int]:
+    """Optional inferred codec: i=4L+2C+R and direction bit 1 means left."""
+    codes = [0, 0, 0, 0]
+    for context, (replacement, move) in rule.items():
+        index = 4 * context[0] + 2 * context[1] + context[2]
+        for output_offset, value in enumerate(replacement):
+            codes[output_offset] |= value << index
+        codes[3] |= (move == -1) << index
+    return tuple(codes)  # type: ignore[return-value]
+
+
 def assert_exhaustive_commutation() -> int:
     cases = 0
     for context in CONTEXTS:
@@ -163,6 +176,20 @@ def assert_destination_uses_new_value() -> None:
     assert successor[0] == (PLAIN, 1)
 
 
+def assert_target_local_ca_needs_radius_two() -> None:
+    # Target 0 is immediately left of the active source at 1.  These states
+    # agree on the target's complete radius-one tagged neighborhood (-1,0,1)
+    # but differ at 2, the active source's opposite neighbor.  The page-73 rows
+    # 110 -> 101 and 111 -> 000 therefore give different next bits at target 0.
+    low = encode({0: 1, 1: 1}, 1)
+    high = encode({0: 1, 1: 1, 2: 1}, 1)
+    assert tuple(low.get(x, (PLAIN, 0)) for x in (-1, 0, 1)) == tuple(
+        high.get(x, (PLAIN, 0)) for x in (-1, 0, 1)
+    )
+    assert tagged_step(PAGE_73_RULE, low).get(0, (PLAIN, 0))[1] == 1
+    assert tagged_step(PAGE_73_RULE, high).get(0, (PLAIN, 0))[1] == 0
+
+
 def page_73_trace(steps: int) -> tuple[tuple[tuple[int, ...], int], ...]:
     state: tuple[dict[int, int], int] = ({}, 0)
     trace = []
@@ -175,8 +202,10 @@ def page_73_trace(steps: int) -> tuple[tuple[tuple[int, ...], int], ...]:
 
 def main() -> None:
     assert_rule_space()
+    assert derived_plane_codes(PAGE_73_RULE) == (115, 37, 103, 196)
     cases = assert_exhaustive_commutation()
     assert_destination_uses_new_value()
+    assert_target_local_ca_needs_radius_two()
     trace = page_73_trace(12)
     # A replayable checkpoint rather than an image-derived assertion.
     assert trace[:5] == (
@@ -189,7 +218,8 @@ def main() -> None:
     print(
         "T10 semantic oracle: PASS "
         f"({cases} exhaustive commutation cases; rule_space={16**8}; "
-        f"page73_checkpoint={trace[:5]})"
+        f"derived_planes={derived_plane_codes(PAGE_73_RULE)}; "
+        f"page73_checkpoint={trace[:5]}; radius2_CA_witness=PASS)"
     )
 
 
