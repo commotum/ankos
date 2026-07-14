@@ -1,6 +1,6 @@
 # 41-T33-SEEDED-CONSTRAINTS
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, RUNTIME-FIT, AND D135 INTEGRATION CLOSED; INDEPENDENT HOSTILE REVIEW PENDING**
+Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, RUNTIME-FIT, ARCHITECTURE, AND INDEPENDENT HOSTILE REVIEW CLOSED**
 
 ## Current Facts
 
@@ -270,7 +270,7 @@ The checked-in runtime lacks the shared declarative relation/query layer already
 - [x] Direct/generic reports commute under adversarial periodic/window/alias/translation/malformed cases.
 - [x] Runtime fit and smallest Goal 2 delta are implementation-ready without a seed/executor branch.
 - [x] Stage, plan, evidence index, design ledger, and architecture audit are synchronized under the next decision.
-- [ ] Root/`/tmp`, optimized fail-closed, silent import, compile, repository tests, modes, Markdown, diff, scope, and fresh hostile review pass.
+- [x] Root/`/tmp`, optimized fail-closed, silent import, compile, repository tests, modes, Markdown, diff, scope, and fresh hostile review pass.
 
 ## Stage Results
 
@@ -278,4 +278,4 @@ Source, asset, and semantic reconstruction are closed. The 32-query source audit
 
 The semantic oracle closes 666 configurations, 256 strict constraints, 170,496 direct/generic complete-report commutations, 1,397,248 anchor checks, explicit translation/D4/color transforms, singleton/all-required/empty-identity behavior, occurrence-witness/base-conjunct separation, every scope distinction, two replayable global-emptiness certificate forms, the remote-defect nonlocal counterexample, separate binary nine-slot and 16-color four-slot generalization fixtures, and 62 hostile rejections. Oracle SHAs are source `f7266058575861d5aa358f4a031ea22a61be8251c0ac8c34027e66d6db5063ec`, asset `d3d506796c43881e6da8dd2ac0dcd514a5def4ecd9531d868c4b897d15ea6cc6`, and semantic `9ccf511f4d4a1192c6b62ff9863e0630b5811240bdfaf5b3b9651d03a29485ba`; the semantic digest is `54276cd1279b01e75ebe8495c528e5991f0b6c6387ec9744dc65db85539626e7`.
 
-T33 is a static discrete 2D declarative conjunction with no native `t`: T32 supplies the complete local relation, while one closed `RequiredPatternOccurrences(EACH_SOMEWHERE)` node supplies independent unanchored existentials. The `32 * 2^32` source count proves that requirement syntax is independent of membership in the allowed set; membership mismatch is valid empty denotation. Centering is witness/search gauge, every-template occurrence is a conjunction, and neither creates a seed, anchor policy, transition, UPDATE, category, or executor. Runtime-fit findings and global D135 synchronization are integrated; repository-wide gates and fresh hostile review remain before final closure.
+T33 is a static discrete 2D declarative conjunction with no native `t`: T32 supplies the complete local relation, while one closed `RequiredPatternOccurrences(EACH_SOMEWHERE)` node supplies independent unanchored existentials. The `32 * 2^32` source count proves that requirement syntax is independent of membership in the allowed set; membership mismatch is valid empty denotation. Centering is witness/search gauge, every-template occurrence is a conjunction, and neither creates a seed, anchor policy, transition, UPDATE, category, or executor. Runtime-fit findings and global D135 synchronization are integrated. Root and relocated oracles pass; optimized mode fails closed; imports are silent; compile, modes, Markdown, diff, scope, and all 102 repository tests pass; fresh hostile re-review is clean. No prior stage reopens. Forty of 45 type stages are complete; next: T35.
