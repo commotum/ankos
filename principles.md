@@ -78,7 +78,7 @@ For evolving systems, the strongest reuse evidence is a lossless map `e` with an
 e(step_A(state)) = step_B(e(state))
 ```
 
-The mapping must preserve the complete state, require no hidden interpreter, and use one native step on each side. Encodability establishes a representation; it does not make two differently factored rule tables identical.
+The mapping must preserve the complete state and typed step result—including successor cardinality, schedule/terminal meaning, and derivation witnesses—require no hidden interpreter or phase clock, and use one native step on each side. Encodability establishes a representation; it does not make two differently factored rule tables identical.
 
 Lossy projections are acceptable only when loss is the declared purpose, as in visualization or a chosen observable. They are not valid substitutes for the underlying state.
 
