@@ -153,8 +153,9 @@ page_100_files = {
 }
 assert page_100_files == {"_page_100_Picture_3.jpeg"}
 
-DIRECT_SHA256 = {
-    1020: "25df45fbfcb5f0f57d18779b2b8af7cb31c9a9400d81b69779663c448882d183"
+HASH_BOUND_VISUAL_SHA256 = {
+    1020: "25df45fbfcb5f0f57d18779b2b8af7cb31c9a9400d81b69779663c448882d183",
+    8026: "66295968a40bcb9140d67e3fba6ec15420849d298afac6ddf6583b5108f9c51a",
 }
 VISUAL_FACTS = {
     "seed": "both displayed evolutions begin 0110 (light,dark,dark,light)",
@@ -164,6 +165,20 @@ VISUAL_FACTS = {
     "boundary": "rightmost old element has no source result; no pad/wrap/sentinel is shown",
 }
 assert set(VISUAL_FACTS) == {"seed", "rule_1", "rule_2", "observer", "boundary"}
+
+# Page 681 is classified R because the displayed cellular automata are target
+# systems in an emulation comparison.  Its hash-bound native substitution
+# tables nevertheless establish useful restrictions: the left table exhausts
+# the four ordered binary pairs, the right table exhausts the nine ordered
+# three-color pairs, and every rule emits exactly one cell.  They are pair-read
+# substitution tables, not the usual eight-row width-three elementary-CA table.
+PAGE_681_VISUAL_FACTS = {
+    "binary": "four ordered binary pair-input glyphs",
+    "three_color": "nine ordered three-color pair-input glyphs",
+    "output": "every glyph emits exactly one cell",
+    "scope": "target cellular automata are an emulation relation, not the native rule-table shape",
+}
+assert set(PAGE_681_VISUAL_FACTS) == {"binary", "three_color", "output", "scope"}
 
 Rule = dict[tuple[int, int], tuple[int, ...]]
 Word = tuple[int, ...]
@@ -228,11 +243,12 @@ guards = {
     5936: "Examples of sequential substitution systems",
     5944: "pictures on the next page",
     5952: "Examples of general substitution systems and the causal networks",
-    5960: "three different ways that replacements can be made",
+    5960: "when replacements are performed at random",
+    5962: "three different ways that replacements can be made",
     8024: "neighbor-dependent substitution systems",
     8028: "highly uniform rules always yielding just one cell",
     12109: "first one on page 85",
-    12111: "{1, 1}",
+    12111: "\\{1, 1\\}",
     12113: "Partition[#, 2, 1]",
     12115: "initial condition for the first example on page 85 is",
     13806: "Page 192 · Neighbor-dependent substitution systems",
@@ -308,8 +324,8 @@ def ledger() -> tuple[str, int, int, int]:
         data = path.read_bytes()
         digest = hashlib.sha256(data).hexdigest()
         assert digest not in hashes, (book_line, digest)
-        if book_line in DIRECT_SHA256:
-            assert digest == DIRECT_SHA256[book_line], (book_line, digest)
+        if book_line in HASH_BOUND_VISUAL_SHA256:
+            assert digest == HASH_BOUND_VISUAL_SHA256[book_line], (book_line, digest)
         hashes.add(digest)
         width, height = jpeg_size(data)
         split_path, split_line = split_hits[0]
@@ -323,10 +339,10 @@ def ledger() -> tuple[str, int, int, int]:
     return payload, monolith_references, split_references, len(hashes)
 
 
-EXPECTED_STRICT_UNIVERSE_SHA256 = "TODO"
-EXPECTED_STRICT_LEDGER_SHA256 = "TODO"
-EXPECTED_UNIVERSE_SHA256 = "TODO"
-EXPECTED_LEDGER_SHA256 = "TODO"
+EXPECTED_STRICT_UNIVERSE_SHA256 = "f296867839c8befafed32b55a7c11ab4ad14387d2434b970a55237d537bc9353"
+EXPECTED_STRICT_LEDGER_SHA256 = "40c2178d7353f36f16ff37d5c2f70b74cbbe6707dd0ca01cb3fc3b0ba7b9f54c"
+EXPECTED_UNIVERSE_SHA256 = "1811099e5169b328d8ea60789acc84104069a71fd5ecee9278628d46bd90f8ab"
+EXPECTED_LEDGER_SHA256 = "723881f59dd4b41da523b825c3c777c0532804ee5cc75b15576820070bec9ae4"
 
 
 def main() -> None:
@@ -341,17 +357,6 @@ def main() -> None:
         ",".join(map(str, sorted(STRICT_U))).encode("ascii")
     ).hexdigest()
     strict_ledger_digest = hashlib.sha256(strict_payload.encode("utf-8")).hexdigest()
-    if "TODO" in {
-        EXPECTED_STRICT_UNIVERSE_SHA256,
-        EXPECTED_STRICT_LEDGER_SHA256,
-        EXPECTED_UNIVERSE_SHA256,
-        EXPECTED_LEDGER_SHA256,
-    }:
-        print("strict universe", strict_universe_digest)
-        print("strict ledger", strict_ledger_digest)
-        print("universe", universe_digest)
-        print("ledger", ledger_digest)
-        raise AssertionError("freeze T14 asset digests")
     assert strict_universe_digest == EXPECTED_STRICT_UNIVERSE_SHA256
     assert strict_ledger_digest == EXPECTED_STRICT_LEDGER_SHA256
     assert universe_digest == EXPECTED_UNIVERSE_SHA256

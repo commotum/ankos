@@ -351,6 +351,35 @@ def assert_update_reuse_and_counterexamples() -> None:
     assert len(native_step(PAGE_85_RULE_1, (0, 1))) < 2
 
 
+def assert_update_result_validation() -> None:
+    """Reject malformed handles/results before ordered-generation commit."""
+    old = encode_native((0, 1, 0))
+    emission_0 = OrderedEmission(0, (0,))
+    emission_1 = OrderedEmission(1, (1,))
+
+    invalid_inputs = (
+        # Duplicate and unordered source handles are ambiguous orderings.
+        ((0, 0), (emission_0, emission_0)),
+        ((1, 0), (emission_1, emission_0)),
+        # A handle outside this old generation cannot be committed.
+        ((0, 3), (emission_0, OrderedEmission(3, (1,)))),
+        # Results must cover the selected handles exactly, once, and in order.
+        ((0, 1), (emission_0,)),
+        ((0, 1), (emission_0, emission_1, OrderedEmission(2, (0,)))),
+        ((0, 1), (emission_1, emission_0)),
+        # T14's strict base table emits Sigma+, closed over the alphabet.
+        ((0,), (OrderedEmission(0, ()),)),
+        ((0,), (OrderedEmission(0, (2,)),)),
+    )
+    for active, emissions in invalid_inputs:
+        try:
+            apply_ordered_generation(old, active, emissions)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("malformed ordered-generation result was accepted")
+
+
 def assert_short_word_semantics() -> None:
     for word in ((), (0,), (1,)):
         # The unguarded Partition/Flatten operator evaluates exactly this way.
@@ -364,64 +393,57 @@ def assert_short_word_semantics() -> None:
         assert all(PAGE_85_RULE_1[context] for context in PAIR_CONTEXTS)
 
 
-def assert_singleton_output_ca_relation(max_input_length: int = 7) -> tuple[int, int]:
+def one_sided_interior_pair_step(table: RuleTable, word: Word) -> Word:
+    """Apply a singleton-output pair table on every open-right pair."""
+    return tuple(
+        table[(word[index], word[index + 1])][0]
+        for index in range(len(word) - 1)
+    )
+
+
+def assert_singleton_output_ca_relation(max_input_length: int = 7) -> int:
     """Exhaust source-defined singleton-output interior-local restrictions.
 
     BOOK:8024-8028 says such highly uniform neighbor-dependent systems
     correspond directly to cellular automata.  This is an explicit cropped
     local-rule relation; native execution still uses ordered emissions.
-    BOOK:8026's rule-30 plate has eight width-three contexts, so context width is
-    a NEIGHBORHOOD/table parameter rather than a pair-only family boundary.
+    The source plate's binary four-row table is the XOR pair map (a sheared
+    presentation of rule 90).  This bounded proof deliberately stays on the
+    canonical page-85 ordered-pair profile; broader raster variants are outside
+    its claim.
     """
     pair_cases = 0
     for raw_outputs in product(BITS, repeat=len(PAIR_CONTEXTS)):
-        pair_table: ContextRuleTable = {
+        pair_table: RuleTable = {
             context: (output,)
             for context, output in zip(PAIR_CONTEXTS, raw_outputs, strict=True)
         }
         for length in range(max_input_length + 1):
             for raw_word in product(BITS, repeat=length):
                 word: Word = tuple(raw_word)
-                direct = interior_local_step(pair_table, (0, 1), word)
-                shared = shared_context_step(pair_table, (0, 1), encode_native(word))
+                direct = one_sided_interior_pair_step(pair_table, word)
+                shared = shared_t14_notes_step(pair_table, encode_native(word))
                 assert shared.successor.values == direct
-                assert shared_t14_notes_step(pair_table, encode_native(word)) == shared
+                assert all(
+                    interval.stop - interval.start == 1
+                    for interval in shared.child_intervals
+                )
                 pair_cases += 1
 
-    triples: tuple[Context, ...] = tuple(product(BITS, repeat=3))
-    triple_cases = 0
-    for raw_outputs in product(BITS, repeat=len(triples)):
-        triple_table: ContextRuleTable = {
-            context: (output,)
-            for context, output in zip(triples, raw_outputs, strict=True)
-        }
-        for length in range(max_input_length + 1):
-            for raw_word in product(BITS, repeat=length):
-                word = tuple(raw_word)
-                direct = interior_local_step(triple_table, (-1, 0, 1), word)
-                shared = shared_context_step(
-                    triple_table, (-1, 0, 1), encode_native(word)
-                )
-                assert shared.successor.values == direct
-                if length >= 3:
-                    assert shared.dropped_sources == (0, length - 1)
-                triple_cases += 1
-
-    # Standard rule 30 is a concrete width-three singleton-output fixture.
-    rule_30: ContextRuleTable = {
-        context: ((30 >> (4 * context[0] + 2 * context[1] + context[2])) & 1,)
-        for context in triples
+    xor_pair: RuleTable = {
+        (0, 0): (0,),
+        (0, 1): (1,),
+        (1, 0): (1,),
+        (1, 1): (0,),
     }
-    assert interior_local_step(rule_30, (-1, 0, 1), (0, 0, 0, 1, 0, 0, 0)) == (
-        0,
-        1,
-        1,
-        1,
-        0,
+    assert one_sided_interior_pair_step(xor_pair, (0, 0, 0, 1, 0, 0, 0)) == (
+        0, 0, 1, 1, 0, 0
     )
+    assert shared_t14_notes_step(
+        xor_pair, encode_native((0, 0, 0, 1, 0, 0, 0))
+    ).successor.values == (0, 0, 1, 1, 0, 0)
     assert pair_cases == 4_080
-    assert triple_cases == 65_280
-    return pair_cases, triple_cases
+    return pair_cases
 
 
 def assert_exhaustive_bounded_commutation(max_input_length: int = 6) -> tuple[int, int]:
@@ -445,7 +467,6 @@ def assert_exhaustive_bounded_commutation(max_input_length: int = 6) -> tuple[in
                 notes_next = notes_partition_step(table, word)
                 generic_step = shared_t14_notes_step(table, encoded)
                 generic_next = generic_step.successor
-                assert shared_context_step(table, (0, 1), encoded) == generic_step
 
                 # The explicit one-step commuting square on every finite word.
                 assert encode_native(notes_next) == generic_next
@@ -474,8 +495,9 @@ def main() -> None:
     assert_table_validation()
     assert_page_85_fixtures()
     assert_update_reuse_and_counterexamples()
+    assert_update_result_validation()
     assert_short_word_semantics()
-    pair_ca_cases, triple_ca_cases = assert_singleton_output_ca_relation()
+    pair_ca_cases = assert_singleton_output_ca_relation()
     commutation_cases, short_cases = assert_exhaustive_bounded_commutation()
     assert commutation_cases == 164_592
     assert short_cases == 3_888
@@ -484,10 +506,11 @@ def main() -> None:
         f"(bounded_tables={len(BOUNDED_OUTPUT_WORDS) ** len(PAIR_CONTEXTS)}; "
         f"commutation_cases={commutation_cases}; "
         f"short_word_cases={short_cases}; "
-        f"singleton_CA_cases={pair_ca_cases + triple_ca_cases}; "
+        f"singleton_pair_CA_cases={pair_ca_cases}; "
         "page85_rule1_t0_t3=PASS; page85_rule2_raster_t0_t3=PASS; "
         "shared_ordered_UPDATE=PASS; overlap_is_read_only=PASS; "
-        "rightmost_drop=PASS; width3_context_CA_relation=PASS; "
+        "hostile_result_validation=PASS; "
+        "rightmost_drop=PASS; pair_XOR_sheared_rule90=PASS; "
         "short_native_profile=empty_successor; "
         "zero_eligible_is_not_epsilon=PASS)"
     )
