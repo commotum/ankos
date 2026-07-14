@@ -232,12 +232,14 @@ def apply_ordered_generation(
     active: tuple[SourceHandle, ...],
     emissions: tuple[OrderedEmission, ...],
 ) -> OrderedGenerationStep:
-    """Shared T13/T14 UPDATE: rebuild one generation from ordered emissions.
+    """Shared ordered-generation UPDATE: rebuild from ``Sigma*`` emissions.
 
     It never interprets a read neighborhood as a replacement span.  The old
     generation is consumed atomically, emissions are concatenated in source
     order, and any old occurrences outside the selected emission frontier are
-    reported as dropped rather than silently copied forward.
+    reported as dropped rather than silently copied forward.  T13 and T14
+    constrain their RULE results to ``Sigma+`` before this private base is
+    called; T15 independently proves why the reusable carrier admits epsilon.
     """
     if tuple(sorted(set(active), key=lambda handle: handle.index)) != active:
         raise ValueError("active source handles must be unique and ordered")
@@ -251,7 +253,7 @@ def apply_ordered_generation(
     next_values: list[Bit] = []
     intervals: list[ChildInterval] = []
     for emission in emissions:
-        word = checked_word(emission.word, allow_empty=False)
+        word = checked_word(emission.word)
         start = len(next_values)
         next_values.extend(word)
         intervals.append(ChildInterval(emission.source, start, len(next_values)))
@@ -420,8 +422,7 @@ def assert_update_result_validation() -> None:
             (emission_0, emission_1, OrderedEmission(handle_2, (0,))),
         ),
         ((handle_0, handle_1), (emission_1, emission_0)),
-        # T14's strict base table emits Sigma+, closed over the alphabet.
-        ((handle_0,), (OrderedEmission(handle_0, ()),)),
+        # The shared carrier is Sigma*, but it remains alphabet-closed.
         ((handle_0,), (OrderedEmission(handle_0, (2,)),)),
     )
     for active, emissions in invalid_inputs:
@@ -431,6 +432,27 @@ def assert_update_result_validation() -> None:
             pass
         else:
             raise AssertionError("malformed ordered-generation result was accepted")
+
+    # T15 later proves that epsilon belongs to the private carrier.  Retaining
+    # its zero-length interval here does not weaken T14's public table validator.
+    epsilon_base = apply_ordered_generation(
+        old,
+        (handle_0,),
+        (OrderedEmission(handle_0, ()),),
+    )
+    assert epsilon_base.successor.values == ()
+    assert epsilon_base.child_intervals == (ChildInterval(handle_0, 0, 0),)
+
+    epsilon_t14_rows = tuple(
+        (context, () if context == (0, 0) else word)
+        for context, word in PAGE_85_RULE_1.items()
+    )
+    try:
+        validate_rule_rows(epsilon_t14_rows)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("strict T14 table validator accepted epsilon")
 
 
 def assert_short_word_semantics() -> None:
@@ -568,6 +590,7 @@ def main() -> None:
         "shared_ordered_UPDATE=PASS; overlap_is_read_only=PASS; "
         "hostile_result_validation=PASS; snapshot_handle_scope=PASS; "
         "rightmost_drop=PASS; pair_XOR_sheared_rule90=PASS; "
+        "shared_word_carrier=SigmaStar; T14_validator=SigmaPlus; "
         "short_native_profile=empty_successor; "
         "zero_eligible_is_not_epsilon=PASS)"
     )

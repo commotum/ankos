@@ -122,6 +122,115 @@ All 17 split documents are hash-bound. The 348 split query records reverse-join 
 
 > Note that on each line in each picture, only the order of elements is ever significant: as the insets show, a particular element may change its position as a result of the addition or subtraction of elements to its left.
 
+### Excerpt 4: multicolor rules preserve the same contextual profile
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:1044-1052`
+- Context: facing-page caption and discussion.
+- Establishes: three- and four-symbol variants retain dynamic ordered words and immediate-right dependence; CA-like patches are behavior/relations, not an alternate executor.
+
+> Examples of substitution systems that have three and four possible colors for each element. The particular rules shown are ones that lead to slow growth in the total number of elements.
+>
+> As it turns out, the first substitution system shown works almost exactly like a cellular automaton. Indeed, away from the right-hand edge, all the elements effectively behave as if they were lying on a regular grid, with the color of each element depending only on the previous color of that element and the element immediately to its right.
+>
+> The second substitution system shown again has patches that exhibit a regular grid structure. But between these patches, there are regions in which elements are created and destroyed. And in the other substitution systems shown, elements are created and destroyed throughout, leaving no trace of any simple grid structure.
+
+### Excerpt 5: old-generation parallelism is the schedule boundary
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:1054-1062`
+- Context: transition into sequential substitution systems.
+- Establishes: the preceding T13–T15 systems operate in parallel on the old word; T16's first-match scan is a different preset, not a deletion fallback.
+
+> The substitution systems that we discussed in the previous section work by replacing each element in such a string by a new sequence of elements—so that in a sense these systems operate in parallel on all the elements that exist in the string at each step.
+>
+> But it is also possible to consider sequential substitution systems, in which the idea is instead to scan the string from left to right, looking for a particular sequence of elements, and then to perform a replacement for the first such sequence that is found.
+
+### Excerpt 6: the accepted contextual operator
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:12109-12115`
+- Context: Notes, Substitution Systems implementation.
+- Establishes: adjacent overlapping old pairs are replaced and flattened under one `NestList` operator; applying this already accepted operator to epsilon-capable rows determines the derived short/empty-word cases.
+
+> For a neighbor-dependent substitution system such as the first one on page 85 the rule can be given as
+>
+> `SS2EvolveList[rule_, init_List, t_Integer] := NestList[Flatten[Partition[#, 2, 1] /. rule] &, init, t]`
+
+### Excerpt 7: CA encoding is a relation, not native execution
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:7940-7950`
+- Context: Chapter 11 emulation discussion.
+- Establishes: substitution systems can be encoded by CA, but in general not one native step per one CA step; the encoding cannot justify a CA execution fallback.
+
+> The pictures on the facing page demonstrate that in fact these can also be emulated by cellular automata. But while one can emulate each step in the evolution of a mobile automaton or a Turing machine with a single step of cellular automaton evolution, this is no longer in general true for substitution systems.
+>
+> That this must ultimately be the case one can see from the fact that the total number of elements in a substitution system can be multiplied by a factor from one step to the next, while in a cellular automaton the size of a pattern can only ever increase by a fixed amount at each step.
+
+## Asset Audit
+
+`31-T15-asset-oracle.py` derives a radius-four asset closure from the frozen 40-line source set and then closes four governed caption companions. The fixed point contains 23 assets: `C/O/R/X = 3/1/13/6`, 23 monolith references, 23 split-document references, 23 physical files, and 23 unique hashes. Its manifest digest is `5ecf88946cd1a840d0a2444a562ee83592306b1693ddb3d31bbb057a31c3b38a`.
+
+| BOOK line | Class | Dimensions | Bytes | SHA-256 | Disposition |
+|---:|:---:|---:|---:|---|---|
+| 1034 | O | 366x370 | 33,265 | `669c209eabf0a35d9095bf553b1c959946f72da0b0584de566a3a9032240a50e` | equal-total-width observer of the page-101 trace |
+| 1036 | C | 348x360 | 26,355 | `9390efdb915dfdf78e870f85b0f2964791a00714f8619525e256098b98919c4e` | binary table, seed, and fixed-cell trace |
+| 1044 | C | 1120x1263 | 300,371 | `cc6b3fdffceecf66543d9f6dbfc1628913eec7356e11e5716473a112b5b728a4` | six multicolor fixed-cell traces and connector insets |
+| 1048 | C | 458x175 | 22,030 | `77c261cf4c9b83d08aead4601916dbc6ac96f371b00a30549c96586295d18585` | six complete multicolor pair tables |
+
+The page-101 fixed-cell raster directly transcribes, in displayed input order,
+
+```text
+11 -> 11
+10 -> 0
+01 -> 10
+00 -> epsilon
+seed = 0110
+t0..t11 =
+0110
+10110
+010110
+10010110
+010010110
+10010010110
+010010010110
+10010010010110
+010010010010110
+10010010010010110
+010010010010010110
+10010010010010010110
+```
+
+The page-102 rule strip directly gives four ternary and two quaternary tables. Inputs below retain the raster's descending ordered-pair presentation; epsilon is a zero-symbol word, not a color.
+
+| Case | k | Seed | Complete table | Epsilon rows |
+|---|---:|---|---|---:|
+| a | 3 | `0110` | `22:0, 21:0, 20:2, 12:00, 11:01, 10:11, 02:2, 01:2, 00:0` | 0 |
+| b | 3 | `0121` | `22:2, 21:01, 20:0, 12:epsilon, 11:epsilon, 10:2, 02:0, 01:01, 00:2` | 2 |
+| c | 3 | `0110` | `22:1, 21:epsilon, 20:01, 12:21, 11:02, 10:22, 02:epsilon, 01:12, 00:0` | 2 |
+| d | 3 | `0120` | `22:20, 21:11, 20:20, 12:2, 11:1, 10:epsilon, 02:0, 01:0, 00:21` | 1 |
+| e | 4 | `0100` | `33:12, 32:23, 31:0, 30:10, 23:epsilon, 22:2, 21:13, 20:epsilon, 13:20, 12:epsilon, 11:1, 10:30, 03:epsilon, 02:20, 01:33, 00:22` | 4 |
+| f | 4 | `0100` | `33:13, 32:03, 31:2, 30:epsilon, 23:02, 22:epsilon, 21:01, 20:3, 13:03, 12:0, 11:21, 10:22, 03:epsilon, 02:3, 01:10, 00:13` | 3 |
+
+The directly sampled `t0..t11` rows, independently reproduced by the transcribed tables, are:
+
+```text
+a: 0110 | 20111 | 220101 | 022112 | 2000100 | 2002110 |
+   20200111 | 222020101 | 002222112 | 0200000100 | 2200002110 | 02000200111
+b: 0121 | 0101 | 01201 | 01001 | 012201 | 012001 |
+   010201 | 0120001 | 0102201 | 01202001 | 01000201 | 012220001
+c: 0110 | 120222 | 210111 | 22120202 | 1210101 | 2122122212 |
+   211211121 | 0221020221 | 122011 | 211011202 | 022212022101 | 11210112212
+d: 0120 | 0220 | 02020 | 020020 | 02021020 | 020011020 |
+   0202101020 | 0200110020 | 020210121020 | 0200110211020 |
+   02021010111020 | 0200110011020
+e: 0100 | 333022 | 121210202 | 1313302020 | 2002012102020 |
+   22203313302020 | 221202012102020 | 213203313302020 |
+   1320231202012102020 | 2023200203313302020 |
+   202322201202012102020 | 20232233203313302020
+f: 0100 | 102213 | 2230103 | 021022 | 301223 | 10002 |
+   2213133 | 010320313 | 1022033203 | 223313033 | 021320313 | 30103033203
+```
+
+Rule glyphs, seeds, and those displayed rows are direct hash-bound transcriptions. Table replay, `00 -> []` extinction, and the empty/singleton continuations are derived semantic checks. None of the six displayed multicolor seeds extinguishes through `t11`. Equal-width scaling, fixed-cell x positions, connector polygons, growth plots, repetition, nesting, and CA-like patches remain observers or behavior claims.
+
 ## Construction Model
 
 Open evidence questions:
