@@ -1,6 +1,6 @@
 # 41-T33-SEEDED-CONSTRAINTS
 
-Status: **IN PROGRESS — FIRST-PRINCIPLES ARCHITECTURE RECONSTRUCTED; EVIDENCE ORACLES PENDING**
+Status: **IN PROGRESS — SOURCE, ASSET, AND SEMANTIC ORACLES CLOSED; RUNTIME-FIT, INTEGRATION, AND HOSTILE REVIEW PENDING**
 
 ## Current Facts
 
@@ -10,7 +10,7 @@ Status: **IN PROGRESS — FIRST-PRINCIPLES ARCHITECTURE RECONSTRUCTED; EVIDENCE 
 - The required occurrence is unanchored. Figures put a witness at the center and the search procedure begins there because translation symmetry permits a convenient representative; the nonperiodic example is unique only up to translations (`BOOK:2640`, `2664`, `2674`, `14086-14095`).
 - The local allowed-pattern relation remains unchanged everywhere. T33 adds a global existential conjunct; it does not add a distinguished firing locus, boundary condition, fixed center, seed state, or repair update.
 - The strict syntax has `32 * 2^32 = 137,438,953,472` source-counted constraint pairs (`BOOK:2678`). Together with T32's independently fixed 32 templates and `2^32` masks, this forces independent `(allowed mask, required template)` syntax. Thus `required not-in allowed` is well-formed but immediately inconsistent rather than constructor-invalid; “from this set” describes satisfiable examples, not a smaller syntactic family.
-- Printed constraint numbers remain the T32 allowed-set numbers “as before,” while the required template is displayed separately at the center (`BOOK:2640`). No source-defined combined 37-bit integer codec has yet been established.
+- Printed constraint numbers remain the T32 allowed-set numbers “as before,” while the required template is displayed separately at the center (`BOOK:2640`). No source-defined combined 37-bit integer codec exists in the audited source.
 - The strict examples can still be repetitive, including periods `98 x 98` and 56 cells on the diagonal (`BOOK:2640`). T33 does not mean nonperiodic, unique, satisfiable, or computationally complex.
 - A finite search can extend thousands of cells and still fail globally. Gray partial assignments and a centered witness are solver state/provenance, not model labels or native state (`BOOK:2642-2666`).
 - Constraint `18762389` forces a nonrepetitive nested pattern unique up to translation when a stacked-black template must occur; the Notes display a mathematical pattern formula, but its local extraction is syntactically corrupt (`x_{-}` and related forms), so it remains opaque witness/formula evidence rather than executable code or a transition trace (`BOOK:2668-2674`, `14086-14095`).
@@ -46,9 +46,9 @@ Reconstruct T33 as a finite closed global-existential relation composed with T32
 
 ## Source Audit
 
-`41-T33-source-oracle.py` will be the fail-closed textual evidence record. It must close the direct construction, “at least somewhere/once” quantifier, source count and numbering, centered display/search witness, translations, repetitive examples, search/UNSAT limitations, constraint `18762389`, Notes formula, all-required extension, larger supports, rule-60/rule-30 relations, lack of initial conditions, actual Index routes, splits, images, and false seed/initial-condition matches.
+`41-T33-source-oracle.py` is the fail-closed textual evidence record. Its 32 query lanes close 65 unique lines at `56 pre-Index / 9 actual-Index`. It retains 191 lines at `33 native / 49 relation / 109 control`, including 135 governed continuations, with no textual exclusions. Retained split provenance closes at `137 exact + 54 mapped`; the query reverse join closes at `51 exact + 13 mapped`; zero retained lines are monolith-only and zero mechanics are unresolved.
 
-Final query counts, N/R/C partition, exclusions, split reverse provenance, source-model digest, image interface, oracle SHA, and unresolved total are pending the independent source audit.
+The frozen 24-record source model digest is `c00fee3f69f5d7ec669ec7a4eb1d3b636680f10e42056735b2798708be6aa0b1`. The source-side image interface has 52 candidates, 42 governed at `7 native / 11 relation / 24 control`, and ten exclusions, exactly matching the asset oracle. Source oracle SHA is `f7266058575861d5aa358f4a031ea22a61be8251c0ac8c34027e66d6db5063ec`.
 
 ## Book Evidence Map
 
@@ -89,11 +89,9 @@ Final query counts, N/R/C partition, exclusions, split reverse provenance, sourc
 
 ## Asset Audit
 
-`41-T33-asset-oracle.py` will bind the exact native/relation/control/excluded raster universe, monolith/split references, physical hashes, bytes, dimensions, paired assemblies, and evidence boundary. Expected native candidates include the printed-page-216 required-occurrence gallery, page-218 search stages, page-219 nonperiodic witness, and pages 220–221 larger-template/rule-60/rule-30 examples. T31/T32 plates and solver/tiling/CA companions require explicit relation/control disposition.
+`41-T33-asset-oracle.py` binds the exact native/relation/control/excluded raster universe, monolith/split references, physical hashes, bytes, dimensions, paired assemblies, and evidence boundary. The 42 governed assets partition at `7 native / 11 relation / 24 control`, close 84 references, 42 physical hashes, 4,668,695 bytes, and nine assemblies/20 member files. Ten excluded candidates are independently bound by 20 references, ten hashes, 409,462 bytes, and two assemblies. The governed ledger SHA is `4b4fddde132a4fa158d1e00139e3dc597004bf5e6e46badfc3d354a2a8c4d7fd`; the excluded ledger SHA is `93406a8a288d5ee27cfe9e1cc90f86c814da4e0354a2b29e24822d459aea4166`; asset oracle SHA is `47781c12962ede4459c3b8ed63e46ef3af61107fb4970fc81440a155d9deb29e`.
 
-No raster may supply an untranscribed required-template word, allowed mask, witness table, search trace, palette mapping, uniqueness proof, or numeric codec.
-
-Final governed counts, ledger SHA, oracle SHA, transcription boundary, assemblies, and unrecovered visual facts are pending the independent asset audit.
+No raster supplies an untranscribed required-template word, allowed mask, witness table, search trace, palette mapping, uniqueness proof, or numeric codec. The boundary remains `42 hash-bound / 0 limited-transcribed / 0 pixel-replayed`. Unrecovered visual facts include the complete required gallery glyphs/fields and allowed sets, gray search decisions/backtracking, raster proofs of existence/uniqueness/periodicity, full 33-/56-row `3 x 3` tables, their first required templates/anchors, palettes, crops, domains, and any solver or UPDATE semantics.
 
 ## Construction Model
 
@@ -196,7 +194,7 @@ Starting with a required template at the center, propagating consequences, choos
 
 ## Semantic Proof Requirements
 
-`41-T33-semantic-oracle.py` must independently compare direct singleton/all-required occurrence verification with a generic declarative conjunction evaluator over complete reports. Required coverage includes:
+`41-T33-semantic-oracle.py` independently compares direct singleton/all-required occurrence verification with a generic declarative conjunction evaluator over complete reports. It covers:
 
 - exhaustive strict binary periodic carriers and every singleton required template;
 - `32 * 2^32` structural counting without enumerating the mask space;
@@ -213,7 +211,9 @@ Starting with a required template at the center, propagating consequences, choos
 - no finite local T32 flag for the global existential; and
 - static absence of seed/time/frontier/write/update/successor semantics.
 
-Final event counts, semantic digest, oracle SHA, and hostile controls are pending the independent semantic audit.
+The oracle closes 666 periodic configurations against 256 strict constraints for 170,496 direct/generic complete-report commutations, 1,397,248 anchor checks, and 666 representation round trips. A complete one-site-support relation space adds 208 singleton and 104 all-required checks. Translation closes 320 report commutations and 480 translated occurrence anchors; three explicit D4/color transforms close 960 report commutations and 5,376 checks, with three implicit-match rejections and two explicit orbit witnesses.
+
+It also closes the full count seam; periodic/window/open scopes; projection strictness and noninjectivity; compatible-but-empty and required-outside-allowed emptiness; independent multiple witnesses, duplicate canonicalization, and the empty generic conjunction identity; aliases; occurrence-witness replay independent of base-local consistency; 13 remote-defect radii with 2,925 fixed-origin equalities; a generalized nine-slot/16-color profile; query outcomes and two replayable global-UNSAT certificate forms; 62 hostile validation rejections; and the complete absence of transition fields. Its semantic digest is `54276cd1279b01e75ebe8495c528e5991f0b6c6387ec9744dc65db85539626e7`; semantic oracle SHA is `2d0434a1f75195a6b4147c53b1c5646c4605c0c7406baa449d243bea8d667d3b`.
 
 ## Architecture Classification
 
@@ -235,9 +235,9 @@ Relative to SimpleProgram rollout, T33 inherits D058/T31/T32's existing class-4 
 
 The checked-in runtime lacks the shared declarative relation/query layer already required by T31/T32. T33 should extend that planned layer:
 
-1. Add immutable `RequiredPatternOccurrences(base_relation_id, required, quantifier=EACH_SOMEWHERE)` as closed data; strict validation shares T32 support/alphabet schemas.
-2. Compose it with the normalized T32 exact-pattern evaluator and T31 scope/report/query envelopes. Do not dispatch on catalog family.
-3. Add exact occurrence witnesses, per-requirement status, and finite-scope `NotObservedInScope`; absence becomes a global violation only in a complete presentation/analyzer scope.
+1. Add immutable structural `AllOf(AllowedLocalPatterns(...), RequiredPatternOccurrences(required, quantifier=EACH_SOMEWHERE))` data, or embed the complete base relation in the conjunction. A base ID may be explicit content-addressed provenance, never a hidden registry lookup.
+2. Compose the closed nodes with the normalized T32 exact-pattern evaluator and T31 scope/report/query envelopes. Do not dispatch on catalog family. The current static-array adapter must construct `loci.coordinate_space((nx, ny), steps=None)`, validate canonical `t = 0`, and then call `loci.gather`; `steps=None` itself ignores the time column.
+3. Add exact occurrence witnesses, per-requirement status, and finite-scope `NotObservedInScope`. Absence in a complete presentation refutes that presented total model's existential conjunct; it does not prove the relation has no other models. Only a replayable global emptiness certificate supports `Unsatisfiable`. Replaying an occurrence witness proves its existential conjunct independently; whole-relation verification separately checks T32 locality.
 4. Add translation and other explicit transform conformance for requirements and witnesses. A centered solver representation must retain its chosen witness and translation.
 5. Add the strict singleton constructor, the Notes all-required preset, and source-bound example records without inventing raster templates or a combined numeric code.
 6. Let solvers consume the closed conjunction and return the existing typed outcomes/certificates; no solver callback or gray/search state enters relation data.
@@ -274,4 +274,8 @@ The checked-in runtime lacks the shared declarative relation/query layer already
 
 ## Stage Results
 
-Pending source, asset, semantic, integration, and independent hostile-review closure.
+Source, asset, and semantic reconstruction are closed. The 32-query source audit closes 65 lines at `56 pre-Index / 9 actual-Index`, retains 191 at `33 native / 49 relation / 109 control`, reverse-closes all retained evidence at `137 exact + 54 mapped`, and leaves zero unresolved. Forty-two governed assets partition `7 native / 11 relation / 24 control`, close 84 references, 42 hashes, 4,668,695 bytes, and nine assemblies/20 files, and remain `42 hash-bound / 0 limited-transcribed / 0 pixel-replayed`.
+
+The semantic oracle closes 666 configurations, 256 strict constraints, 170,496 direct/generic complete-report commutations, 1,397,248 anchor checks, explicit translation/D4/color transforms, singleton/all-required/empty-identity behavior, occurrence-witness/base-conjunct separation, every scope distinction, two replayable global-emptiness certificate forms, the remote-defect nonlocal counterexample, a generalized nine-slot/16-color profile, and 62 hostile rejections. Oracle SHAs are source `f7266058575861d5aa358f4a031ea22a61be8251c0ac8c34027e66d6db5063ec`, asset `47781c12962ede4459c3b8ed63e46ef3af61107fb4970fc81440a155d9deb29e`, and semantic `2d0434a1f75195a6b4147c53b1c5646c4605c0c7406baa449d243bea8d667d3b`; the semantic digest is `54276cd1279b01e75ebe8495c528e5991f0b6c6387ec9744dc65db85539626e7`.
+
+T33 is a static discrete 2D declarative conjunction with no native `t`: T32 supplies the complete local relation, while one closed `RequiredPatternOccurrences(EACH_SOMEWHERE)` node supplies independent unanchored existentials. The `32 * 2^32` source count proves that requirement syntax is independent of membership in the allowed set; membership mismatch is valid empty denotation. Centering is witness/search gauge, every-template occurrence is a conjunction, and neither creates a seed, anchor policy, transition, UPDATE, category, or executor. Runtime-fit integration, global D135 synchronization, repository-wide gates, and fresh hostile review remain before final closure.

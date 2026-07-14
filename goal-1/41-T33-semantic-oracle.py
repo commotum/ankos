@@ -663,7 +663,6 @@ def replay_occurrence_witness(
     anchor = checked_coord(witness.anchor, "witness anchor")
     return bool(
         template in relation.requirements.templates
-        and template in relation.local.allowed
         and read_periodic(presentation, relation.local, anchor) == template
     )
 
@@ -1748,7 +1747,7 @@ def audit_symmetry_commutation() -> tuple[int, int, int, int, int, int, int]:
     )
 
 
-def audit_multiple_requirements_and_aliases() -> tuple[int, int, int, int, int, int]:
+def audit_multiple_requirements_and_aliases() -> tuple[int, int, int, int, int, int, int]:
     self_local = AllowedLocalPatterns(2, ((0, 0),), ((0,), (1,)))
     all_required = require_every_allowed(self_local)
     alternating = PeriodicPresentation(2, ((0, 1),))
@@ -1788,7 +1787,27 @@ def audit_multiple_requirements_and_aliases() -> tuple[int, int, int, int, int, 
     assert len(multi_report.occurrence_hits) == 2
     forged = OccurrenceWitness(words[1], (0, 0))
     assert not replay_occurrence_witness(multi, period_two, forged)
-    return 2, 2, 1, 1, 2, 1
+
+    # An occurrence witness proves only its existential conjunct.  It must
+    # remain replayable even when the same candidate violates the independent
+    # T32 base relation; full verification composes those two facts.  Requiring
+    # membership in local.allowed here would silently collapse valid
+    # required-not-allowed syntax back to the rejected subset interpretation.
+    zero = (0, 0, 0, 0, 0)
+    one = (1, 1, 1, 1, 1)
+    outside_relation = strict_t33(book_cross_local((zero,)), one)
+    all_ones = PeriodicPresentation(2, ((1,),))
+    assert one not in outside_relation.local.allowed
+    assert replay_occurrence_witness(
+        outside_relation,
+        all_ones,
+        OccurrenceWitness(one, (0, 0)),
+    )
+    outside_report = verify_periodic(all_ones, outside_relation)
+    assert outside_report.requirements_verified
+    assert not outside_report.locally_consistent
+    assert not outside_report.proves_global_model
+    return 2, 2, 1, 1, 2, 1, 1
 
 
 def audit_nonlocality_counterexample() -> tuple[int, int, int, int]:
@@ -2075,7 +2094,7 @@ def audit_no_transition_surface() -> tuple[int, int, int, int]:
     return len(local_fields), len(requirement_fields), len(conjunction_fields), len(report_fields)
 
 
-EXPECTED_DIGEST = "7df6b4f5d1badbba170a8c8abc2fc34af7c5b1fd38dea8e3a233e74d85475366"
+EXPECTED_DIGEST = "54276cd1279b01e75ebe8495c528e5991f0b6c6387ec9744dc65db85539626e7"
 
 
 def main() -> None:
@@ -2137,6 +2156,7 @@ def main() -> None:
         vacuous_conjunction_normalizations,
         alias_cases,
         forged_witness_rejections,
+        conjunct_local_witnesses,
     ) = audit_multiple_requirements_and_aliases()
     (
         nonlocal_radii,
@@ -2214,6 +2234,7 @@ def main() -> None:
         ("vacuous_conjunction_normalizations", vacuous_conjunction_normalizations),
         ("alias_cases", alias_cases),
         ("forged_witness_rejections", forged_witness_rejections),
+        ("conjunct_local_witnesses", conjunct_local_witnesses),
         ("nonlocal_radii", nonlocal_radii),
         ("fixed_origin_local_equalities", fixed_origin_local_equalities),
         ("arbitrarily_far_occurrence_witnesses", arbitrarily_far_occurrence_witnesses),
@@ -2303,7 +2324,8 @@ def main() -> None:
         f"separate_witnesses={separate_requirement_witnesses}; "
         f"duplicate_canonicalizations={duplicate_canonicalizations}; "
         f"empty_conjunction_T32_identity={vacuous_conjunction_normalizations}; "
-        f"alias_cases={alias_cases}; forged_witness_rejections={forged_witness_rejections}"
+        f"alias_cases={alias_cases}; forged_witness_rejections={forged_witness_rejections}; "
+        f"conjunct_local_witnesses={conjunct_local_witnesses}"
     )
     print(
         f"nonlocal_radii={nonlocal_radii}; fixed_origin_equalities={fixed_origin_local_equalities}; "
