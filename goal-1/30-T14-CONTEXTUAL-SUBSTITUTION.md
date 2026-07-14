@@ -264,16 +264,16 @@ active  = FRONTIER.select(W)
 reads_i = NEIGHBORHOOD.read(W, Occurrence(i))
         = (w_i, w_{i+1})
 
-result_i = RULE(Occurrence(i), reads_i)
-         = EmitWord(source=i, word=h(w_i, w_{i+1}))
+write_i = RULE(Occurrence(i), reads_i)
+        = EmitWord(source=i, word=h(w_i, w_{i+1}))
 
-next = UPDATE.apply(W, active, results)
-     = result_0.word ++ ... ++ result_(n-2).word
+next = UPDATE.apply(W, active, writes)
+     = write_0.word ++ ... ++ write_(n-2).word
 ```
 
-All reads use the immutable old word. Results are ordered source emissions, not assignments into an old or preallocated target coordinate set. The old rightmost occurrence participates in `reads_(n-2)` but has no source result of its own. The complete next support is derived from the concatenated emissions; no old occurrence is copied forward implicitly.
+All reads use the immutable old word. Writes are ordered source emissions, not assignments into an old or preallocated target coordinate set. The old rightmost occurrence participates in `reads_(n-2)` but has no source write of its own. The complete next support is derived from the concatenated emissions; no old occurrence is copied forward implicitly.
 
-For `n < 2`, `active` and `results` are empty and the Notes expression yields the empty concatenation. Thus `[] -> []` and `[a] -> []`. This is a defined vacuous structural event, not a missing rule and not evidence that a pair-table row may emit epsilon.
+For `n < 2`, `active` and `writes` are empty and the Notes expression yields the empty concatenation. Thus `[] -> []` and `[a] -> []`. This is a defined vacuous structural event, not a missing rule and not evidence that a pair-table row may emit epsilon.
 
 ### Exact first example
 
@@ -390,7 +390,7 @@ The one-step map `e(word)=OrderedConfiguration(word)` has an explicit inverse on
 | FRONTIER | BOOK:1022,12113 | parameterization/restriction | ordered occurrence selector | exactly anchors `0..n-2`; unique old handles | no stage |
 | NEIGHBORHOOD | BOOK:1018,12113 | parameterization | occurrence-relative ordered read | immutable `(self,right)`; overlap allowed | no stage |
 | RULE result | BOOK:1026,12111 | direct typed-product reuse | T13 ordered nonempty word emission | total `Sigma^2`, output in `Sigma+` | no stage |
-| UPDATE | BOOK:12113 plus commuting oracle | factored reuse | `OrderedGenerationConcat` | results cover selected frontier exactly; source/child order; no copy-forward | D019 wording only |
+| UPDATE | BOOK:12113 plus commuting oracle | factored reuse | `OrderedGenerationConcat` | writes cover selected frontier exactly; source/child order; no copy-forward | D019 wording only |
 | empty frontier | unguarded BOOK:12113, BOOK:1022 | preset outcome | D024 construction-specific result | `[]->[]`, `[x]->[]`; no epsilon row/halt | D024 wording only |
 | CA relation | BOOK:8024-8028 plus asset | restriction/relation | singleton-output pair table | declared finite interior and encoder; never native fallback | no |
 | executor | all above | direct reuse | branch-free `select/read/rule/apply` | no family dispatch/callback/hidden state | no |
