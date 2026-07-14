@@ -21,6 +21,7 @@ Changing a role label, session ID, or display name does not create independence.
 
 - Every author-text or source-significant layout change receives one independent `SOURCE_REVIEWER` decision from the authoritative witness.
 - Formula, code, rule/data, structural hierarchy, Index order/entry, caption association, visual replacement/insertion, and witness-only text insertion receive a blind source/specialist decision before the reviewer sees the proposed repair.
+- High risk is the union of repair-class tags and operation/AST-impact tags. `STRUCTURE_BOUNDARY`, `MARKDOWN_STRUCTURE`, `HEADING_OR_FURNITURE`, `FORMULA_OR_SYMBOL`, `WOLFRAM_CODE`, `RULE_TABLE_OR_DATA`, `FIGURE_OR_CAPTION`, and `INDEX_ENTRY` are always high risk. Every witness-only author-text insertion and every authorial structure/hierarchy change is high risk regardless of its primary class.
 - Every changed technical token, Index entry/column decision, and figure/caption association receives specialist coverage even when a source reviewer also reviewed it.
 - Every disagreement receives third-principal adjudication; no disagreeing principal may self-adjudicate.
 - Every unchanged ordinary block participates in total sequential review, with the pre-frozen quality sample receiving blind independent adjudication.

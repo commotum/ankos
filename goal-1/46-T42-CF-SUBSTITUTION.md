@@ -19,7 +19,7 @@ Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, ARCHITECTURE, AND HOSTILE-REV
 - T42 therefore has discrete `t+1D` DOMAIN. Its changing finite ordered support is CONFIGURATION structure; binary data and finite phase are ALPHABET factors.
 - Schedule exhaustion is a typed terminal result. It is not an empty word, fixed point, quiescence, failure, external horizon, or resource limit. Strict morphisms are nonempty, so native evolution never extinguishes the word.
 - `Floor[h]` is an observer offset that maps binary symbols to the two mechanical-sequence values `Floor[h]` and `Floor[h]+1`. It is not substitution state and does not alter the rule.
-- Quadratic-irrational coefficient repetition may collapse to ordinary fixed morphisms or fixed period-block macros. A multi-coefficient macro represents several T42 events and cannot be called a one-step T42 representation without an explicit step-scale relation.
+- A constant or periodic quadratic-irrational schedule has a fixed-morphism-equivalent live prefix, and a period block may be represented by a fixed macro. The finite T42 horizon and terminal outcome remain part of the construction: even a constant schedule does not globally become a nonhalting T13 program. A multi-coefficient macro represents several T42 events and cannot be called a one-step T42 representation without an explicit step-scale relation.
 - The digital-slope, cosine-axis-crossing, and billiard constructions are exact or source-stated relations/observers. The sine half-shift sibling is under-specified at `BOOK:13170-13172`; it does not authorize an invented rule generator.
 - The page-162 raster is hash-bound and additionally limited-transcribed: the four displayed functions, visible execution-order coefficients, black/gray convention, and rule icons come from the plate. The prose supplies the general relation and the page-903 Notes supply the executable rule formula. Raster geometry never supplies a hidden program, window, coefficient evaluator, or pixel-derived transition.
 - T42 adds no new execution algebra. It composes finalized program data, a product/tagged ALPHABET invariant, visible phase, T13 `AllOccurrences`/`Self`, a closed scheduled morphism table, and D019 `OrderedGenerationConcat` through the branch-free runner.
@@ -136,7 +136,10 @@ ScheduledMorphismProgram =
     source
   + execution_order_coefficients
   + rho_codec_version
-  + strict_seed=(0,)
+
+StrictSourcePreset =
+    ScheduledMorphismProgram
+  + initial_configuration=(phase=0, word=(0,))
 
 Configuration = (cursor, nonempty_binary_word)
 Invariant     = 0 <= cursor <= len(schedule)
@@ -171,14 +174,16 @@ e(step_direct(program,state)) = step_T13(compiled(program),e(state))
 
 one event for one event, preserving the complete word, phase, source-order children, lineage, and `Advanced` outcome. At `i == len(schedule)`, the direct and represented configurations instead enter the same generic zero-successor `ScheduleExhausted` envelope with the complete final word retained and no D019 commit. The representation uses T13 `AllOccurrences`, a self read, nonempty block emission, and D019 `OrderedGenerationConcat` only for live phases; it does not pack the word into a scalar or delegate to a hidden interpreter.
 
-The compact `(cursor,word)` form and a tagged `Cursor(cursor) · Data*` form are also lossless interfaces when their exact inverse and atomic two-factor commit are retained. The uniform phase-product word is the smallest direct T13 lowering because every firing occurrence can read all rule-relevant state locally.
+The compact `(cursor,word)` form and a tagged `Cursor(cursor) · Data+` form are also lossless interfaces when their exact inverse and atomic two-factor commit are retained. They are not plain-self-read T13 execution carriers: direct execution would require generic shared-factor access and a compound phase/data commit. The uniform phase-product word is therefore the canonical executable lowering and the smallest direct T13 reuse because every firing occurrence can read all rule-relevant state locally.
+
+The executable invariants are: a finite immutable schedule of exact positive coefficients; a nonempty word; one phase in `0..L` replicated uniformly across all labels; a total alphabet-closed nonempty emission table for every live phase; exact old-snapshot occurrence coverage; no newborn firing; stable source/child ordering and lineage; and deliberately nonfiring terminal-phase labels whose complete final word is retained.
 
 ## Identity, Provenance, and Handoffs
 
 - T40-sourced program identity retains the complete accepted T40 result/handoff and replays its query, context, representation, coefficient payload, proof outcome, termination, source kind, and orientation. A SHA is derived display/cache metadata, never authority.
 - Explicit schedules carry their complete ordered positive coefficients and a distinct structural source tag. They do not carry fake T40 IDs or claims.
 - Natural coefficient order, reversed execution order, and already-execution-ordered explicit data are different tagged roles. Reversal is neither implicit nor repeatable.
-- The strict seed, schedule horizon, codec version, and source schema are program identity. Cursor and complete word are configuration identity.
+- Schedule horizon, codec version, and source schema are transition-program identity. The strict seed `(0,)` is the initial configuration fixed by the source preset and belongs to preset/run identity, not the morphism transition key. Cursor and complete word are configuration identity.
 - Occurrence IDs, child ordinals, source spans, and snapshot scope are replayable lineage/provenance. They do not change semantic word equality.
 - T41 may produce the exact ratio `(alpha-1)/(alpha+1)` as definition/query data; T40 may expand it; T42 consumes only the finalized verified coefficient result. Producer work state, evaluator callbacks, curve samples, and root-finder state never enter T42.
 
@@ -193,7 +198,7 @@ The compact `(cursor,word)` form and a tagged `Cursor(cursor) · Data*` form are
 
 ## Quadratic and Observer Boundaries
 
-- Golden ratio tail coefficient `1` and `sqrt(2)` tail coefficient `2` reduce to repeated ordinary fixed `rho_1` and `rho_2` T13 programs.
+- Golden ratio tail coefficient `1` and `sqrt(2)` tail coefficient `2` give live prefixes equivalent to repeated ordinary fixed `rho_1` and `rho_2` T13 events; their declared finite horizons still end in `ScheduleExhausted`.
 - `sqrt(3)` has a period requiring a composition of coefficient rules. Its listed fixed substitution is a period macro: one macro event corresponds to more than one T42 event. The macro is valid only with an explicit step-scale/observation relation.
 - The mechanical word plus `Floor[h]` reconstructs values in `{Floor[h],Floor[h]+1}`. This is an observer map.
 - Digital slopes, axis crossings, nested plots, paths, rational approximants, coefficient statistics, and billiard itineraries are relation/query/rendering records. They do not alter native state, stopping, or rule selection.
@@ -201,16 +206,16 @@ The compact `(cursor,word)` form and a tagged `Cursor(cursor) · Data*` form are
 
 ## Current Runtime Fit
 
-`src/ca` is the intended SimplePrograms namespace, but its current executable surface remains limited to array-shaped fixed-support presets:
+`src/ca` is the intended SimplePrograms namespace; CA is one preset. The Phase 1 implementation currently exposes array-shaped fixed-support presets, while the T13/D019 work below is already required shared SimplePrograms infrastructure rather than evidence that T42 falls outside the library:
 
 | Axis | Current surface | Smallest Goal 2 treatment |
 |---|---|---|
-| DOMAIN/configuration | rank-0..3 NumPy arrays with fixed shape | Reuse the already-required T13 finite ordered variable-support configuration and ragged trace |
-| ALPHABET | flat finite `int | float | str` values | Add/reuse finite product/tagged schemas for `PhaseIndex x Bit` with a uniform-phase invariant |
-| FRONTIER | executable `time_slice` only | Reuse T13 `AllOccurrences`, parameterized to select all data occurrences only while phase is active |
-| NEIGHBORHOOD | `self_at` already exists, but only for array loci | Reuse self projection on typed word occurrences; no T42 access class |
-| RULE | scalar-return families and callbacks | Add/reuse closed nonempty word-emission tables; compile the finite schedule into structural phase-indexed morphism data |
-| UPDATE | fixed next-array writes/family rollout | Reuse D019 source-ordered old-snapshot generation concatenation and common terminal result |
+| DOMAIN/configuration | rank-0..3 NumPy arrays with fixed shape | Implement the already-required T13 finite ordered variable-support configuration and ragged trace |
+| ALPHABET | flat finite `int | float | str` values | Implement the generic product/tagged schemas already required across SimplePrograms; T42 uses `PhaseIndex x Bit` plus a uniform-phase invariant |
+| FRONTIER | executable `time_slice` only | Implement T13 `AllOccurrences`, optionally restricted by the generic live-phase predicate; no T42 selector class |
+| NEIGHBORHOOD | `self_at` already exists, but only for array loci | Generalize the existing self projection to typed word occurrences; no T42 access class |
+| RULE | scalar-return families and callbacks | Implement the already-required closed nonempty word-emission table and compile the finite schedule into structural phase-indexed morphism data |
+| UPDATE | fixed next-array writes/family rollout | Implement/reuse D019 source-ordered old-snapshot generation concatenation for live phases and the common terminal envelope at exhaustion |
 | identity/serialization | family names, integer IDs, fixed arrays | Retain complete source result, schedule orientation/horizon, codec, phase, ragged word, and lineage structurally |
 
 No runtime code is changed in Goal 1.
@@ -234,10 +239,10 @@ No runtime code is changed in Goal 1.
 
 Goal 2 should:
 
-1. Add or reuse a closed `ScheduledMorphism` preset over a finite immutable execution-order schedule of total nonempty binary morphisms.
+1. Add a closed constructor/preset over T13 for a finite immutable execution-order schedule of total nonempty binary morphisms; do not add a new `ScheduledMorphism` semantic class.
 2. Accept either a complete replay-verified D139/T40 coefficient handoff or a separately tagged explicit schedule. Never accept detached provenance IDs, a callback, generator, iterator, CAS object, or arbitrary host expression.
 3. Normalize accepted natural simple-CF coefficients by dropping signed `a0` and reversing the positive tail exactly once. Preserve original result, requested count, source kind, proof strength, termination, and orientation.
-4. Fix strict seed `(0,)`; model cursor visibly; report the valid zero-event `m=1` program and `m-1` event count.
+4. Fix strict seed `(0,)` in the source preset/run request, separately from transition-program identity; model cursor visibly; report the valid zero-event `m=1` construction and `m-1` event count.
 5. Compile each live phase to the lossless uniform `PhaseIndex x Bit` T13 representation, or implement the isomorphic compact representation with an explicit inverse and full-result commuting conformance. At exhaustion use the shared terminal envelope and retain the final word; never route an empty active set through D019.
 6. Reuse `AllOccurrences`, self reads, nonempty word emissions, D019 old-snapshot source-order concatenation, ragged traces, lineage, and common outcomes without T42 dispatch.
 7. Preserve `ScheduleExhausted`, external horizon, invalid source, error, and resource cancellation as distinct results. Do not wrap, repeat, infer phase from time, or resume a longer reversed-prefix program from a shorter one.

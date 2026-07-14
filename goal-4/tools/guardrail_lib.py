@@ -68,6 +68,26 @@ def canonical_json_bytes(value: Any) -> bytes:
     return (text + "\n").encode("utf-8")
 
 
+def pretty_contract_json_bytes(value: Any) -> bytes:
+    """ANKOS-PJ-1 bytes for hand-authored frozen policy JSON."""
+
+    def reject_float(item: Any) -> None:
+        if isinstance(item, float):
+            raise GuardrailError("ANKOS-PJ-1 forbids floating-point values")
+        if isinstance(item, dict):
+            for key, child in item.items():
+                require(isinstance(key, str), "ANKOS-PJ-1 object keys must be strings")
+                reject_float(child)
+        elif isinstance(item, list):
+            for child in item:
+                reject_float(child)
+
+    reject_float(value)
+    return (
+        json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
+    ).encode("utf-8")
+
+
 def safe_relative_posix(path_text: str, *, placeholders: bool = False) -> PurePosixPath:
     require("\\" not in path_text, f"path must use POSIX separators: {path_text}")
     path = PurePosixPath(path_text)
@@ -517,6 +537,34 @@ EXPECTED_HIGH_RISK = {
     "INDEX_ENTRY",
 }
 
+EXPECTED_ROLE_KEYS = {
+    "CANONICAL_AUTHOR_TEXT",
+    "DERIVED_AGGREGATE",
+    "GENERATED_METADATA",
+    "EDITORIAL_SIDECAR",
+    "SEARCH_DERIVATIVE",
+    "GOVERNED_LEGACY_ASSET",
+    "GOVERNED_WITNESS_ASSET",
+    "RELEASE_METADATA",
+}
+
+EXPECTED_CONTRACT_PATHS = {
+    "goal-4/fidelity-contract.md",
+    "goal-4/style-guide.md",
+    "goal-4/review-contract.md",
+    "goal-4/quality-evaluation.json",
+    "goal-4/licensing-contract.json",
+    "goal-4/promotion-contract.md",
+}
+
+EXPECTED_SEPARATE_AUTHORIZATION = {
+    "LEGACY_PROMOTION",
+    "LEGACY_FILE_DELETION_RELOCATION_OR_RENAME",
+    "GOAL_1_OR_GOAL_3_CONSUMER_MIGRATION",
+    "CITATION_REWRITE",
+    "COMMIT_PUSH_HOST_OR_EXTERNAL_REDISTRIBUTION",
+}
+
 
 def validate_quality(quality: dict[str, Any]) -> None:
     require(quality.get("protocol_version") == "1.0.0", "unexpected quality protocol version")
@@ -606,6 +654,27 @@ def validate_quality(quality: dict[str, Any]) -> None:
     require(severity[4].get("full_release_blocker") is False, "optional editorial severity must remain non-authorial")
 
 
+def oracle_classification_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    names = [row["path"].removeprefix("goal-1/") for row in rows]
+    affected_names = [
+        row["path"].removeprefix("goal-1/")
+        for row in rows
+        if row["recursive_affected"]
+    ]
+    return {
+        "all_count": len(rows),
+        "all_filename_digest": filename_set_digest(names),
+        "recursive_affected_count": len(affected_names),
+        "recursive_affected_filename_digest": filename_set_digest(affected_names),
+        "recursive_markdown_count": sum(row["recursive_markdown"] for row in rows),
+        "recursive_image_or_basename_count": sum(
+            row["recursive_image_or_basename"] for row in rows
+        ),
+        "direct_legacy_semantic_count": sum(row["direct_legacy_path"] for row in rows),
+        "no_legacy_path_count": sum(row["kind"] == "NO_LEGACY_PATH" for row in rows),
+    }
+
+
 def validate_compatibility_baseline(
     baseline: dict[str, Any],
     contract: dict[str, Any],
@@ -613,36 +682,140 @@ def validate_compatibility_baseline(
     *,
     check_current_scripts: bool,
 ) -> None:
-    require(baseline.get("schema_version") == "1.0.0", "unsupported compatibility baseline schema")
+    require(baseline.get("schema_version") == "1.1.0", "unsupported compatibility baseline schema")
+    require(baseline.get("contract_id") == contract.get("contract_id"), "baseline contract binding drift")
     compatibility = contract["compatibility"]
+    execution = baseline.get("execution", {})
+    require(execution.get("cwd") == ".", "compatibility cwd drift")
+    require(execution.get("environment") == compatibility.get("environment"), "compatibility environment drift")
+    require(execution.get("duration_excluded_from_behavior") is True, "duration entered behavior identity")
+    require(execution.get("book_override_used") is False, "compatibility capture used a book override")
+    require(
+        execution.get("interpreter", {}).get("executable") == compatibility["argv_template"][0],
+        "compatibility interpreter drift",
+    )
+
     classifications = baseline.get("classifications", [])
-    require(len(classifications) == compatibility["goal_1_root_oracle_count"], "oracle classification count mismatch")
-    names = [row.get("path", "").removeprefix("goal-1/") for row in classifications]
-    require(len(names) == len(set(names)), "duplicate oracle classification")
-    require(filename_set_digest(names) == compatibility["all_oracle_filename_digest"], "all-oracle name digest mismatch")
-    affected = [row for row in classifications if row.get("recursive_affected") is True]
-    require(len(affected) == compatibility["goal_1_recursive_affected_count"], "affected oracle count mismatch")
-    affected_names = [row["path"].removeprefix("goal-1/") for row in affected]
+    require(isinstance(classifications, list), "oracle classifications must be an array")
     require(
-        filename_set_digest(affected_names) == compatibility["recursive_affected_filename_digest"],
-        "affected oracle name digest mismatch",
+        [row.get("path") for row in classifications] == compatibility.get("all_oracle_paths"),
+        "oracle classification paths differ from frozen explicit scope",
     )
-    require(sum(row.get("recursive_markdown") is True for row in classifications) == 39, "recursive Markdown census mismatch")
-    require(sum(row.get("recursive_image_or_basename") is True for row in classifications) == 26, "recursive image census mismatch")
-    require(sum(row.get("direct_legacy_path") is True for row in classifications) == 2, "direct legacy semantic census mismatch")
-    require(sum(row.get("kind") == "NO_LEGACY_PATH" for row in classifications) == 17, "no-path semantic census mismatch")
-    records = baseline.get("oracles", [])
-    require(len(records) == 39, "compatibility behavior must cover all 39 recursive affected oracles")
+    affected_paths = set(compatibility["recursive_affected_paths"])
+    image_paths = set(compatibility["recursive_image_or_basename_paths"])
+    for row in classifications:
+        relative = row.get("path")
+        require(row.get("recursive_affected") is (relative in affected_paths), f"affected flag drift: {relative}")
+        require(row.get("recursive_markdown") is (relative in affected_paths), f"Markdown flag drift: {relative}")
+        require(
+            row.get("recursive_image_or_basename") is (relative in image_paths),
+            f"image flag drift: {relative}",
+        )
+        require(isinstance(row.get("script_sha256"), str) and len(row["script_sha256"]) == 64, f"script hash missing: {relative}")
+        expected_kind = (
+            "RECURSIVE_SOURCE_OR_ASSET"
+            if relative in affected_paths
+            else "DIRECT_LEGACY_SEMANTIC"
+            if row.get("direct_legacy_path") is True
+            else "NO_LEGACY_PATH"
+        )
+        require(row.get("kind") == expected_kind, f"oracle kind drift: {relative}")
+    summary = oracle_classification_summary(classifications)
+    require(baseline.get("classification_summary") == summary, "classification summary drift")
+    require(summary["all_count"] == compatibility["goal_1_root_oracle_count"], "oracle count mismatch")
+    require(summary["recursive_affected_count"] == compatibility["goal_1_recursive_affected_count"], "affected count mismatch")
+    require(summary["recursive_markdown_count"] == compatibility["goal_1_recursive_markdown_count"], "Markdown census mismatch")
     require(
-        {row.get("path") for row in records} == {row.get("path") for row in affected},
-        "behavior/affected-classification join mismatch",
+        summary["recursive_image_or_basename_count"]
+        == compatibility["goal_1_recursive_image_or_basename_count"],
+        "image census mismatch",
     )
+    require(
+        summary["direct_legacy_semantic_count"] == compatibility["goal_1_direct_legacy_semantic_count"],
+        "direct legacy semantic census mismatch",
+    )
+    require(
+        summary["no_legacy_path_count"] == compatibility["goal_1_no_legacy_path_count"],
+        "no-path semantic census mismatch",
+    )
+
     context = baseline.get("closure", {})
+    dependency_rows = context.get("dependency_rows")
+    require(isinstance(dependency_rows, list), "baseline dependency rows are missing")
+    require(
+        [row.get("path") for row in dependency_rows]
+        == sorted(row.get("path") for row in dependency_rows),
+        "dependency rows are not sorted",
+    )
+    require(len(dependency_rows) == len({row.get("path") for row in dependency_rows}), "duplicate dependency row")
+    for row in dependency_rows:
+        safe_relative_posix(row.get("path", ""))
+        require(isinstance(row.get("byte_size"), int) and row["byte_size"] >= 0, "invalid dependency size")
+        require(isinstance(row.get("sha256"), str) and len(row["sha256"]) == 64, "invalid dependency hash")
+    stored_dependency_fingerprint = sha256_bytes(canonical_json_bytes(dependency_rows))
+    require(context.get("dependency_file_count") == len(dependency_rows), "dependency file count drift")
+    require(
+        context.get("dependency_fingerprint_before") == stored_dependency_fingerprint
+        and context.get("dependency_fingerprint_after") == stored_dependency_fingerprint,
+        "dependency closure fingerprint drift",
+    )
+    legacy_prefix = contract["architecture"]["legacy_root"] + "/"
+    stored_legacy_fingerprint = row_subset_fingerprint(dependency_rows, legacy_prefix)
+    require(
+        context.get("legacy_content_fingerprint_before") == stored_legacy_fingerprint
+        and context.get("legacy_content_fingerprint_after") == stored_legacy_fingerprint,
+        "legacy content fingerprint drift",
+    )
+    require(
+        context.get("legacy_regular_file_count")
+        == contract["legacy_input"]["expected_counts"]["all_regular_files"],
+        "legacy regular-file count drift",
+    )
+    require(context.get("git_head_before") == context.get("git_head_after"), "git HEAD moved during capture")
+    require(context.get("legacy_git_tree_before") == context.get("legacy_git_tree_after"), "legacy Git tree moved during capture")
+    require(context.get("legacy_tree_digest_before") == context.get("legacy_tree_digest_after"), "legacy recursive signature moved during capture")
+
+    if check_current_scripts:
+        current_classifications = derive_oracle_classifications(repo_root, contract)
+        require(current_classifications == classifications, "current all-oracle classification or script bytes drift")
+        current_paths = governed_dependency_paths(repo_root, contract)
+        current_rows, current_fingerprint = dependency_rows_and_fingerprint(repo_root, current_paths)
+        require(current_rows == dependency_rows, "current dependency closure rows drift")
+        require(current_fingerprint == stored_dependency_fingerprint, "current dependency closure fingerprint drift")
+        legacy_root = repo_root / contract["architecture"]["legacy_root"]
+        current_signature = legacy_recursive_signature(legacy_root)
+        require(
+            current_signature["signature_sha256"] == context.get("legacy_tree_digest_before"),
+            "current legacy recursive signature drift",
+        )
+        require(
+            git_tree_identity(repo_root, "HEAD", contract["architecture"]["legacy_root"])
+            == context.get("legacy_git_tree_before"),
+            "current legacy Git tree drift",
+        )
+
+    records = baseline.get("oracles", [])
+    require(len(records) == compatibility["expected_behavior_count"], "compatibility behavior count mismatch")
+    require(
+        [row.get("path") for row in records] == compatibility["recursive_affected_paths"],
+        "behavior paths differ from frozen affected scope",
+    )
     classification_by_path = {row["path"]: row for row in classifications}
     aggregate_rows: list[dict[str, Any]] = []
     for row in records:
-        require(row.get("repeat_count") == 2, f"oracle was not repeated twice: {row.get('path')}")
-        require(row.get("repeat_identical") is True, f"oracle repeat drift: {row.get('path')}")
+        relative = row.get("path")
+        require(row.get("repeat_count") == compatibility["repeat_runs_required"], f"oracle repeat count drift: {relative}")
+        require(row.get("repeat_identical") is True, f"oracle repeat drift: {relative}")
+        require(row.get("empty_sibling_identical") is True, f"empty sibling row drift: {relative}")
+        require(row.get("post_removal_identical") is True, f"post-removal row drift: {relative}")
+        require(row.get("argv") == [compatibility["argv_template"][0], "-B", relative], f"oracle argv drift: {relative}")
+        require(isinstance(row.get("exit_code"), int), f"oracle exit code missing: {relative}")
+        if row.get("status_kind") == "EXITED":
+            require(row["exit_code"] >= 0, f"EXITED oracle has negative code: {relative}")
+        elif row.get("status_kind") == "SIGNALED":
+            require(row["exit_code"] < 0, f"SIGNALED oracle has nonnegative code: {relative}")
+        else:
+            require(row.get("status_kind") == "TIMED_OUT" and row["exit_code"] == 124, f"invalid status kind: {relative}")
         stdout = row.get("stdout", {})
         stderr = row.get("stderr", {})
         require(isinstance(stdout.get("base64"), str) and isinstance(stderr.get("base64"), str), "raw output bytes not captured")
@@ -650,31 +823,28 @@ def validate_compatibility_baseline(
             stdout_bytes = base64.b64decode(stdout["base64"], validate=True)
             stderr_bytes = base64.b64decode(stderr["base64"], validate=True)
         except (ValueError, TypeError) as error:
-            raise GuardrailError(f"invalid raw output base64: {row.get('path')}") from error
-        require(stdout.get("byte_count") == len(stdout_bytes), f"stdout byte count drift: {row.get('path')}")
-        require(stderr.get("byte_count") == len(stderr_bytes), f"stderr byte count drift: {row.get('path')}")
-        require(stdout.get("sha256") == sha256_bytes(stdout_bytes), f"stdout hash drift: {row.get('path')}")
-        require(stderr.get("sha256") == sha256_bytes(stderr_bytes), f"stderr hash drift: {row.get('path')}")
+            raise GuardrailError(f"invalid raw output base64: {relative}") from error
+        require(stdout.get("byte_count") == len(stdout_bytes), f"stdout byte count drift: {relative}")
+        require(stderr.get("byte_count") == len(stderr_bytes), f"stderr byte count drift: {relative}")
+        require(stdout.get("sha256") == sha256_bytes(stdout_bytes), f"stdout hash drift: {relative}")
+        require(stderr.get("sha256") == sha256_bytes(stderr_bytes), f"stderr hash drift: {relative}")
         require(
             row.get("framed_behavior_sha256")
-            == framed_behavior_digest(row.get("exit_code"), stdout_bytes, stderr_bytes),
-            f"framed behavior drift: {row.get('path')}",
+            == framed_behavior_digest(row["exit_code"], stdout_bytes, stderr_bytes),
+            f"framed behavior drift: {relative}",
+        )
+        require(row.get("kind") == classification_by_path[relative]["kind"], f"oracle kind join drift: {relative}")
+        require(
+            row.get("script_sha256") == classification_by_path[relative]["script_sha256"],
+            f"classification/behavior script hash drift: {relative}",
         )
         require(
-            row.get("script_sha256") == classification_by_path[row["path"]].get("script_sha256"),
-            f"classification/behavior script hash drift: {row.get('path')}",
+            row.get("transitive_dependency_fingerprint") == stored_dependency_fingerprint,
+            f"oracle dependency fingerprint drift: {relative}",
         )
-        require(
-            row.get("transitive_dependency_fingerprint") == context.get("dependency_fingerprint_before"),
-            f"oracle dependency fingerprint missing/drifted: {row.get('path')}",
-        )
-        if check_current_scripts:
-            script = repo_root / row["path"]
-            require(script.is_file(), f"oracle script missing: {row['path']}")
-            require(sha256_file(script) == row.get("script_sha256"), f"oracle script drift: {row['path']}")
         aggregate_rows.append(
             {
-                "path": row["path"],
+                "path": relative,
                 "status_kind": row["status_kind"],
                 "exit_code": row["exit_code"],
                 "stdout_sha256": stdout["sha256"],
@@ -684,22 +854,41 @@ def validate_compatibility_baseline(
         )
     recomputed_behavior = aggregate_behavior_digest(aggregate_rows)
     require(baseline.get("behavior_digest") == recomputed_behavior, "aggregate behavior digest drift")
-    require(context.get("git_head_before") == context.get("git_head_after"), "git HEAD moved during capture")
-    require(context.get("dependency_fingerprint_before") == context.get("dependency_fingerprint_after"), "dependency closure moved during capture")
-    require(context.get("legacy_tree_digest_before") == context.get("legacy_tree_digest_after"), "legacy tree moved during capture")
-    require(
-        context.get("legacy_content_fingerprint_before") == context.get("legacy_content_fingerprint_after"),
-        "legacy content bytes moved during capture",
-    )
+
     probe = baseline.get("empty_sibling_probe", {})
-    require(probe.get("target_state") == "EMPTY", "empty sibling probe did not use an empty target")
-    require(probe.get("all_behavior_identical") is True, "empty sibling changed oracle behavior")
-    require(probe.get("baseline_behavior_digest") == probe.get("empty_sibling_behavior_digest"), "empty sibling aggregate mismatch")
-    require(probe.get("baseline_behavior_digest") == recomputed_behavior, "empty sibling probe is not bound to baseline")
+    require(probe.get("target") == contract["architecture"]["repaired_root"], "empty sibling target drift")
+    require(probe.get("initial_state") == "ABSENT", "sibling probe did not start absent")
+    require(probe.get("target_state") == "EMPTY", "sibling probe did not use an empty target")
+    require(probe.get("final_state") == "ABSENT", "sibling probe did not restore absence")
+    require(probe.get("cleanup_succeeded") is True, "sibling probe cleanup failed")
+    require(probe.get("all_behavior_identical") is True, "sibling lifecycle changed oracle behavior")
+    for field in (
+        "baseline_behavior_digest",
+        "empty_sibling_behavior_digest",
+        "post_removal_behavior_digest",
+    ):
+        require(probe.get(field) == recomputed_behavior, f"sibling probe digest drift: {field}")
+
     health = baseline.get("health_summary", {})
-    require(health.get("exit_zero") == sum(row.get("exit_code") == 0 for row in records), "health zero count drift")
-    require(health.get("exit_nonzero") == sum(row.get("exit_code") != 0 for row in records), "health nonzero count drift")
-    require(baseline.get("goal_3", {}).get("executable_validator_count") == 0, "Stage 1 Goal 3 executable census drift")
+    nonzero = [row["path"] for row in records if row["exit_code"] != 0]
+    require(health.get("exit_zero") == len(records) - len(nonzero), "health zero count drift")
+    require(health.get("exit_nonzero") == len(nonzero), "health nonzero count drift")
+    require(health.get("nonzero_paths") == nonzero, "health nonzero paths drift")
+    require(health.get("health_is_not_behavioral_identity") is True, "health/identity distinction drift")
+
+    goal3 = baseline.get("goal_3", {})
+    require(goal3.get("executable_validator_count") == 0, "Stage 1 Goal 3 executable census drift")
+    require(
+        goal3.get("planning_filename_digest") == filename_set_digest(goal3.get("planning_files", [])),
+        "Goal 3 planning digest drift",
+    )
+    if check_current_scripts:
+        current_goal3_files = sorted(
+            path.relative_to(repo_root).as_posix()
+            for path in (repo_root / "goal-3").rglob("*")
+            if path.is_file() and not path.is_symlink()
+        )
+        require(goal3.get("planning_files") == current_goal3_files, "current Goal 3 planning scope drift")
 
 
 def validate_contract(
@@ -714,6 +903,8 @@ def validate_contract(
 ) -> None:
     require(contract.get("contract_id") == "ANKOS-GUARDRAILS-1", "unexpected guardrail contract ID")
     require(contract.get("version") == "1.0.0", "unexpected guardrail contract version")
+    require(contract.get("status") == "FROZEN_STAGE_1", "guardrail contract is not frozen")
+    require(contract.get("frozen_on") == "2026-07-14", "guardrail freeze date drift")
     architecture = contract.get("architecture", {})
     legacy, repaired = validate_root_relationship(
         repo_root,
@@ -721,8 +912,14 @@ def validate_contract(
         architecture.get("repaired_root", ""),
     )
     require(legacy.is_dir(), "legacy root is missing")
+    require(architecture.get("repository_root") == ".", "repository root drift")
+    require(architecture.get("goal_root") == "goal-4", "goal root drift")
     require(architecture.get("allowed_write_roots") == ["goal-4", "ref/A-New-Kind-of-Science-Repaired"], "write scope drift")
-    require("ref/A-New-Kind-of-Science" in architecture.get("forbidden_write_roots", []), "legacy root is not write-protected")
+    require(
+        architecture.get("forbidden_write_roots")
+        == ["ref/A-New-Kind-of-Science", "goal-1", "goal-2", "goal-3", "src", "tests"],
+        "forbidden write scope drift",
+    )
     paths = architecture.get("path_rules", {})
     for flag in (
         "component_aware_containment_required",
@@ -733,6 +930,15 @@ def validate_contract(
         "symlink_alias_forbidden",
     ):
         require(paths.get(flag) is True, f"path guard disabled: {flag}")
+    require(
+        paths.get("prefix_named_sibling_required_to_pass")
+        == "ref/A-New-Kind-of-Science-Repaired",
+        "prefix-named sibling path rule drift",
+    )
+    require(
+        set(contract.get("separate_authorization_required", [])) == EXPECTED_SEPARATE_AUTHORIZATION,
+        "separate-authorization scope drift",
+    )
     raw = contract.get("legacy_input", {})
     require(raw.get("discovery") == "EXPLICIT_MANIFEST_ROWS_ONLY", "raw input is not explicit-manifest-only")
     require(raw.get("recursive_build_input_discovery_allowed") is False, "recursive raw build discovery enabled")
@@ -742,8 +948,18 @@ def validate_contract(
     require(len(documents) == 29, "canonical document count must be 29")
     require([row.get("order") for row in documents] == list(range(29)), "canonical order is not contiguous")
     ids = [row.get("id") for row in documents]
+    anchor_slugs = [row.get("anchor_slug") for row in documents]
     doc_paths = [row.get("path") for row in documents]
     require(len(set(ids)) == 29 and len(set(doc_paths)) == 29, "canonical IDs/paths must be unique")
+    require(len(set(anchor_slugs)) == 29, "canonical anchor slugs must be unique")
+    require(all(isinstance(value, str) and re.fullmatch(r"[A-Z0-9_]+", value) for value in ids), "canonical ID grammar drift")
+    require(
+        all(
+            isinstance(value, str) and re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", value)
+            for value in anchor_slugs
+        ),
+        "canonical anchor-slug grammar drift",
+    )
     require(all(row.get("role") == "CANONICAL_AUTHOR_TEXT" for row in documents), "noncanonical role in document list")
     for path in doc_paths:
         safe_relative_posix(path)
@@ -754,6 +970,8 @@ def validate_contract(
         f"canonical kind counts drift: {kind_counts}",
     )
     outputs = contract.get("declared_outputs", [])
+    require(len(outputs) == 10, "declared output count drift")
+    require(all(set(row) == {"path", "role"} for row in outputs), "declared output row shape drift")
     output_pairs = {(row.get("path"), row.get("role")) for row in outputs}
     required_outputs = {
         ("README.md", "GENERATED_METADATA"),
@@ -768,10 +986,17 @@ def validate_contract(
         ("ASSETS/WITNESS/<asset-id>/<source-basename>", "GOVERNED_WITNESS_ASSET"),
     }
     require(output_pairs == required_outputs, "declared output paths/roles drift")
+    require(set(contract.get("role_definitions", {})) == EXPECTED_ROLE_KEYS, "output role definitions drift")
     asset = contract.get("asset_policy", {})
     require(asset.get("legacy_materialization") == "INDEPENDENT_BYTE_IDENTICAL_COPY", "legacy asset copy policy drift")
     require(asset.get("hardlinks_allowed") is False and asset.get("symlinks_allowed") is False, "fragile asset links enabled")
     require(asset.get("deduplicate_by_hash_allowed") is False, "hash deduplication enabled")
+    require(asset.get("preserve_distinct_asset_ids") is True, "distinct asset identities may collapse")
+    require(asset.get("witness_binary_insertions_require_inverse") is True, "binary insertion inverse disabled")
+    require(
+        asset.get("witness_binary_insertions_require_redistribution_permission") is True,
+        "binary insertion licensing gate disabled",
+    )
     evidence = contract.get("evidence_policy", {})
     require(set(evidence.get("not_applicable_reasons", [])) == EXPECTED_NOT_APPLICABLE, "NOT_APPLICABLE enum drift")
     require(evidence.get("not_applicable_for_authorial_or_illegible_content") is False, "NOT_APPLICABLE can hide authorial content")
@@ -781,6 +1006,12 @@ def validate_contract(
     require(set(repair.get("workflow_states", [])) == EXPECTED_WORKFLOW_STATES, "workflow state enum drift")
     require(set(repair.get("final_dispositions", [])) == EXPECTED_DISPOSITIONS, "disposition enum drift")
     require(set(repair.get("high_risk_classes", [])) == EXPECTED_HIGH_RISK, "high-risk class enum drift")
+    require(
+        set(repair.get("mandatory_high_risk_operations", []))
+        == {"WITNESS_ONLY_AUTHOR_TEXT_INSERTION", "AUTHORIAL_STRUCTURE_OR_HIERARCHY_CHANGE"},
+        "mandatory high-risk operation tags drift",
+    )
+    require(repair.get("risk_is_union_of_class_and_operation_tags") is True, "operation-based risk tags disabled")
     require(repair.get("mechanically_proven_author_text_token_changes_allowed") is False, "mechanical author-text edits enabled")
     require(repair.get("all_author_text_changes_per_occurrence") is True, "author-text occurrence records disabled")
     review = contract.get("review_policy", {})

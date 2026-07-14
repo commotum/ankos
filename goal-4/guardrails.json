@@ -67,6 +67,7 @@
     {
       "order": 0,
       "id": "PUBLICATION_AND_CONTENTS",
+      "anchor_slug": "publication-and-contents",
       "kind": "FRONT_MATTER",
       "title": "Publication and Printed Contents",
       "path": "CANONICAL/FRONT-MATTER/00-Publication-and-Contents.md",
@@ -75,6 +76,7 @@
     {
       "order": 1,
       "id": "PREFACE",
+      "anchor_slug": "preface",
       "kind": "FRONT_MATTER",
       "title": "Preface",
       "path": "CANONICAL/FRONT-MATTER/01-Preface.md",
@@ -83,6 +85,7 @@
     {
       "order": 2,
       "id": "CH01",
+      "anchor_slug": "ch01",
       "kind": "CHAPTER",
       "title": "The Foundations for a New Kind of Science",
       "path": "CANONICAL/CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
@@ -91,6 +94,7 @@
     {
       "order": 3,
       "id": "CH02",
+      "anchor_slug": "ch02",
       "kind": "CHAPTER",
       "title": "The Crucial Experiment",
       "path": "CANONICAL/CHAPTERS/02-The-Crucial-Experiment.md",
@@ -99,6 +103,7 @@
     {
       "order": 4,
       "id": "CH03",
+      "anchor_slug": "ch03",
       "kind": "CHAPTER",
       "title": "The World of Simple Programs",
       "path": "CANONICAL/CHAPTERS/03-The-World-of-Simple-Programs.md",
@@ -107,6 +112,7 @@
     {
       "order": 5,
       "id": "CH04",
+      "anchor_slug": "ch04",
       "kind": "CHAPTER",
       "title": "Systems Based on Numbers",
       "path": "CANONICAL/CHAPTERS/04-Systems-Based-on-Numbers.md",
@@ -115,6 +121,7 @@
     {
       "order": 6,
       "id": "CH05",
+      "anchor_slug": "ch05",
       "kind": "CHAPTER",
       "title": "Two Dimensions and Beyond",
       "path": "CANONICAL/CHAPTERS/05-Two-Dimensions-and-Beyond.md",
@@ -123,6 +130,7 @@
     {
       "order": 7,
       "id": "CH06",
+      "anchor_slug": "ch06",
       "kind": "CHAPTER",
       "title": "Starting from Randomness",
       "path": "CANONICAL/CHAPTERS/06-Starting-from-Randomness.md",
@@ -131,6 +139,7 @@
     {
       "order": 8,
       "id": "CH07",
+      "anchor_slug": "ch07",
       "kind": "CHAPTER",
       "title": "Mechanisms in Programs and Nature",
       "path": "CANONICAL/CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md",
@@ -139,6 +148,7 @@
     {
       "order": 9,
       "id": "CH08",
+      "anchor_slug": "ch08",
       "kind": "CHAPTER",
       "title": "Implications for Everyday Systems",
       "path": "CANONICAL/CHAPTERS/08-Implications-for-Everyday-Systems.md",
@@ -147,6 +157,7 @@
     {
       "order": 10,
       "id": "CH09",
+      "anchor_slug": "ch09",
       "kind": "CHAPTER",
       "title": "Fundamental Physics",
       "path": "CANONICAL/CHAPTERS/09-Fundamental-Physics.md",
@@ -155,6 +166,7 @@
     {
       "order": 11,
       "id": "CH10",
+      "anchor_slug": "ch10",
       "kind": "CHAPTER",
       "title": "Processes of Perception and Analysis",
       "path": "CANONICAL/CHAPTERS/10-Processes-of-Perception-and-Analysis.md",
@@ -163,6 +175,7 @@
     {
       "order": 12,
       "id": "CH11",
+      "anchor_slug": "ch11",
       "kind": "CHAPTER",
       "title": "The Notion of Computation",
       "path": "CANONICAL/CHAPTERS/11-The-Notion-of-Computation.md",
@@ -171,6 +184,7 @@
     {
       "order": 13,
       "id": "CH12",
+      "anchor_slug": "ch12",
       "kind": "CHAPTER",
       "title": "The Principle of Computational Equivalence",
       "path": "CANONICAL/CHAPTERS/12-The-Principle-of-Computational-Equivalence.md",
@@ -179,6 +193,7 @@
     {
       "order": 14,
       "id": "GENERAL_NOTES",
+      "anchor_slug": "general-notes",
       "kind": "NOTES",
       "title": "General Notes",
       "path": "CANONICAL/BACK-MATTER/NOTES/00-General-Notes.md",
@@ -187,6 +202,7 @@
     {
       "order": 15,
       "id": "N01",
+      "anchor_slug": "n01",
       "kind": "NOTES",
       "title": "Notes for Chapter 1: The Foundations for a New Kind of Science",
       "path": "CANONICAL/BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md",
@@ -195,6 +211,7 @@
     {
       "order": 16,
       "id": "N02",
+      "anchor_slug": "n02",
       "kind": "NOTES",
       "title": "Notes for Chapter 2: The Crucial Experiment",
       "path": "CANONICAL/BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md",
@@ -203,6 +220,7 @@
     {
       "order": 17,
       "id": "N03",
+      "anchor_slug": "n03",
       "kind": "NOTES",
       "title": "Notes for Chapter 3: The World of Simple Programs",
       "path": "CANONICAL/BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md",
@@ -211,6 +229,7 @@
     {
       "order": 18,
       "id": "N04",
+      "anchor_slug": "n04",
       "kind": "NOTES",
       "title": "Notes for Chapter 4: Systems Based on Numbers",
       "path": "CANONICAL/BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md",
@@ -219,6 +238,7 @@
     {
       "order": 19,
       "id": "N05",
+      "anchor_slug": "n05",
       "kind": "NOTES",
       "title": "Notes for Chapter 5: Two Dimensions and Beyond",
       "path": "CANONICAL/BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md",
@@ -227,6 +247,7 @@
     {
       "order": 20,
       "id": "N06",
+      "anchor_slug": "n06",
       "kind": "NOTES",
       "title": "Notes for Chapter 6: Starting from Randomness",
       "path": "CANONICAL/BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md",
@@ -235,6 +256,7 @@
     {
       "order": 21,
       "id": "N07",
+      "anchor_slug": "n07",
       "kind": "NOTES",
       "title": "Notes for Chapter 7: Mechanisms in Programs and Nature",
       "path": "CANONICAL/BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md",
@@ -243,6 +265,7 @@
     {
       "order": 22,
       "id": "N08",
+      "anchor_slug": "n08",
       "kind": "NOTES",
       "title": "Notes for Chapter 8: Implications for Everyday Systems",
       "path": "CANONICAL/BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md",
@@ -251,6 +274,7 @@
     {
       "order": 23,
       "id": "N09",
+      "anchor_slug": "n09",
       "kind": "NOTES",
       "title": "Notes for Chapter 9: Fundamental Physics",
       "path": "CANONICAL/BACK-MATTER/NOTES/09-Fundamental-Physics-Notes.md",
@@ -259,6 +283,7 @@
     {
       "order": 24,
       "id": "N10",
+      "anchor_slug": "n10",
       "kind": "NOTES",
       "title": "Notes for Chapter 10: Processes of Perception and Analysis",
       "path": "CANONICAL/BACK-MATTER/NOTES/10-Processes-of-Perception-and-Analysis-Notes.md",
@@ -267,6 +292,7 @@
     {
       "order": 25,
       "id": "N11",
+      "anchor_slug": "n11",
       "kind": "NOTES",
       "title": "Notes for Chapter 11: The Notion of Computation",
       "path": "CANONICAL/BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes.md",
@@ -275,6 +301,7 @@
     {
       "order": 26,
       "id": "N12",
+      "anchor_slug": "n12",
       "kind": "NOTES",
       "title": "Notes for Chapter 12: The Principle of Computational Equivalence",
       "path": "CANONICAL/BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes.md",
@@ -283,6 +310,7 @@
     {
       "order": 27,
       "id": "INDEX",
+      "anchor_slug": "index",
       "kind": "INDEX",
       "title": "Index",
       "path": "CANONICAL/BACK-MATTER/Index.md",
@@ -291,6 +319,7 @@
     {
       "order": 28,
       "id": "COLOPHON",
+      "anchor_slug": "colophon",
       "kind": "COLOPHON",
       "title": "Colophon",
       "path": "CANONICAL/BACK-MATTER/Colophon.md",
@@ -381,6 +410,7 @@
     "profile_id": "ANKOS-MD-1",
     "ast_profile_id": "ANKOS-AST-1",
     "canonical_json_profile_id": "ANKOS-CJ-1",
+    "contract_json_profile_id": "ANKOS-PJ-1",
     "encoding": "UTF-8",
     "bom": false,
     "line_ending": "LF",
@@ -389,6 +419,13 @@
     "canonical_yaml_front_matter": false,
     "generated_namespace": "ankos-",
     "generated_page_marker": "<!-- ankos-page: edition-id/page-id -->",
+    "identifier_grammar": {
+      "canonical_document_id_regex": "^[A-Z0-9_]+$",
+      "canonical_anchor_slug_regex": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "raw_block_id_regex": "^[A-Z0-9][A-Z0-9_-]*$",
+      "repair_id_regex": "^[A-Z0-9][A-Z0-9_-]*$",
+      "generated_anchor_regex": "^ankos-[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
     "generated_output_as_input": false,
     "fixture_validation_owner_stage": 7
   },
@@ -459,12 +496,19 @@
     "forward_and_inverse_required": true,
     "high_risk_classes": [
       "STRUCTURE_BOUNDARY",
+      "MARKDOWN_STRUCTURE",
+      "HEADING_OR_FURNITURE",
       "FORMULA_OR_SYMBOL",
       "WOLFRAM_CODE",
       "RULE_TABLE_OR_DATA",
       "FIGURE_OR_CAPTION",
       "INDEX_ENTRY"
-    ]
+    ],
+    "mandatory_high_risk_operations": [
+      "WITNESS_ONLY_AUTHOR_TEXT_INSERTION",
+      "AUTHORIAL_STRUCTURE_OR_HIERARCHY_CHANGE"
+    ],
+    "risk_is_union_of_class_and_operation_tags": true
   },
   "review_policy": {
     "contract_id": "ANKOS-REVIEW-1",
@@ -505,12 +549,75 @@
   },
   "compatibility": {
     "baseline_path": "goal-4/compatibility-baseline.json",
-    "goal_1_root_oracle_count": 58,
-    "goal_1_recursive_affected_count": 39,
-    "goal_1_recursive_markdown_count": 39,
-    "goal_1_recursive_image_or_basename_count": 26,
-    "all_oracle_filename_digest": "f05e1235b8427a8778a45a63b2fc133d61d39ab99b15ae6cf19611a8496d9c77",
-    "recursive_affected_filename_digest": "317d3a9bac555f452f38158ff67faceb2869afb712654e9701ab9268c901837d",
+    "goal_1_root_oracle_count": 59,
+    "goal_1_recursive_affected_count": 40,
+    "goal_1_recursive_markdown_count": 40,
+    "goal_1_recursive_image_or_basename_count": 27,
+    "goal_1_direct_legacy_semantic_count": 2,
+    "goal_1_no_legacy_path_count": 17,
+    "all_oracle_filename_digest": "4ba177a48c6b27ccad01a571c16551afcfa5cf21953fc43835c606e9376cc663",
+    "recursive_affected_filename_digest": "6eb1fe0ec7603112077e23cdd22bef3432ff3d3a7441676f8fd1abe23e9e4455",
+    "all_oracle_paths": [
+      "goal-1/27-T08-asset-oracle.py",
+      "goal-1/27-T08-source-oracle.py",
+      "goal-1/28-T10-asset-oracle.py",
+      "goal-1/28-T10-semantic-oracle.py",
+      "goal-1/28-T10-source-oracle.py",
+      "goal-1/29-T11-asset-oracle.py",
+      "goal-1/29-T11-semantic-oracle.py",
+      "goal-1/29-T11-source-oracle.py",
+      "goal-1/30-T14-asset-oracle.py",
+      "goal-1/30-T14-semantic-oracle.py",
+      "goal-1/30-T14-source-oracle.py",
+      "goal-1/31-T15-asset-oracle.py",
+      "goal-1/31-T15-semantic-oracle.py",
+      "goal-1/31-T15-source-oracle.py",
+      "goal-1/32-T18-asset-oracle.py",
+      "goal-1/32-T18-semantic-oracle.py",
+      "goal-1/32-T18-source-oracle.py",
+      "goal-1/33-T21-asset-oracle.py",
+      "goal-1/33-T21-semantic-oracle.py",
+      "goal-1/33-T21-source-oracle.py",
+      "goal-1/34-T22-asset-oracle.py",
+      "goal-1/34-T22-semantic-oracle.py",
+      "goal-1/34-T22-source-oracle.py",
+      "goal-1/35-T23-asset-oracle.py",
+      "goal-1/35-T23-semantic-oracle.py",
+      "goal-1/35-T23-source-oracle.py",
+      "goal-1/36-T24-asset-oracle.py",
+      "goal-1/36-T24-semantic-oracle.py",
+      "goal-1/36-T24-source-oracle.py",
+      "goal-1/37-T25-asset-oracle.py",
+      "goal-1/37-T25-semantic-oracle.py",
+      "goal-1/37-T25-source-oracle.py",
+      "goal-1/38-T26-asset-oracle.py",
+      "goal-1/38-T26-semantic-oracle.py",
+      "goal-1/38-T26-source-oracle.py",
+      "goal-1/39-T28-asset-oracle.py",
+      "goal-1/39-T28-semantic-oracle.py",
+      "goal-1/39-T28-source-oracle.py",
+      "goal-1/40-T32-asset-oracle.py",
+      "goal-1/40-T32-semantic-oracle.py",
+      "goal-1/40-T32-source-oracle.py",
+      "goal-1/41-T33-asset-oracle.py",
+      "goal-1/41-T33-semantic-oracle.py",
+      "goal-1/41-T33-source-oracle.py",
+      "goal-1/42-T35-asset-oracle.py",
+      "goal-1/42-T35-semantic-oracle.py",
+      "goal-1/42-T35-source-oracle.py",
+      "goal-1/43-T36-asset-oracle.py",
+      "goal-1/43-T36-semantic-oracle.py",
+      "goal-1/43-T36-source-oracle.py",
+      "goal-1/44-T38-asset-oracle.py",
+      "goal-1/44-T38-semantic-oracle.py",
+      "goal-1/44-T38-source-oracle.py",
+      "goal-1/45-T40-asset-oracle.py",
+      "goal-1/45-T40-semantic-oracle.py",
+      "goal-1/45-T40-source-oracle.py",
+      "goal-1/46-T42-asset-oracle.py",
+      "goal-1/46-T42-semantic-oracle.py",
+      "goal-1/46-T42-source-oracle.py"
+    ],
     "recursive_affected_paths": [
       "goal-1/27-T08-asset-oracle.py",
       "goal-1/27-T08-source-oracle.py",
@@ -550,7 +657,8 @@
       "goal-1/44-T38-source-oracle.py",
       "goal-1/45-T40-asset-oracle.py",
       "goal-1/45-T40-source-oracle.py",
-      "goal-1/46-T42-asset-oracle.py"
+      "goal-1/46-T42-asset-oracle.py",
+      "goal-1/46-T42-source-oracle.py"
     ],
     "recursive_image_or_basename_paths": [
       "goal-1/27-T08-asset-oracle.py",
@@ -578,7 +686,8 @@
       "goal-1/44-T38-source-oracle.py",
       "goal-1/45-T40-asset-oracle.py",
       "goal-1/45-T40-source-oracle.py",
-      "goal-1/46-T42-asset-oracle.py"
+      "goal-1/46-T42-asset-oracle.py",
+      "goal-1/46-T42-source-oracle.py"
     ],
     "additional_dependency_paths": [
       "ref/notes/CA-Types.csv",
@@ -589,9 +698,9 @@
       "goal-1/40-T32-official-partition-semantics-snapshot.txt",
       "goal-1/46-T42-semantic-oracle.py"
     ],
-    "capture_all_58_classifications": true,
+    "capture_all_oracle_classifications": true,
     "capture_recursive_affected_behaviors": true,
-    "expected_behavior_count": 39,
+    "expected_behavior_count": 40,
     "environment": {
       "PATH": "/usr/bin:/bin",
       "HOME": "/tmp",
@@ -622,6 +731,9 @@
     "repeat_runs_required": 2,
     "empty_sibling_exact_match_required": true,
     "empty_sibling_runs_required": 1,
+    "after_removal_runs_required": 1,
+    "initial_sibling_absence_required": true,
+    "final_sibling_absence_required": true,
     "goal_3_executable_baseline_count_at_stage_1": 0,
     "goal_3_resync_required_before_release": true
   },

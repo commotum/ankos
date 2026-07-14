@@ -14,11 +14,11 @@ model and replay it from its denotation, query, context, outcome, and
 certificate before T42 may derive a schedule.  Explicit execution-ordered
 schedules use a separate tagged schema; they cannot masquerade as T40 query
 provenance.  This file is proof/audit code, not runtime implementation.  It
-models the direct product ``(cursor, word)``, a lossless
-``Cursor · Data+`` tagged lowering, exact occurrence lineage, finite schedule
-completion, page-162 fixtures, and hostile counterexamples.  It uses only the
-standard library, is silent on import, has no filesystem dependency, and
-fails closed under ``python -O``.
+models compact ``(cursor, word)`` and lossless ``Cursor · Data+`` interfaces,
+the canonical uniform ``PhaseIndex × Bit`` T13 executable carrier, exact
+occurrence lineage, finite schedule completion, page-162 fixtures, and
+hostile counterexamples.  It uses only the standard library, is silent on
+import, has no filesystem dependency, and fails closed under ``python -O``.
 """
 
 from __future__ import annotations
@@ -39,6 +39,7 @@ if not __debug__:
 
 Bit: TypeAlias = int
 Word: TypeAlias = tuple[Bit, ...]
+STRICT_BOOK_SEED: Word = (0,)
 
 RULE_CODEC_VERSION = "t42.rho-simple-cf/v1"
 PROGRAM_SCHEMA_VERSION = "scheduled-ordered-morphism/v1"
@@ -100,7 +101,8 @@ GOAL2_CONFORMANCE = (
     "Retain signed a0, full query/result provenance, coefficient orientation, term count, outcome, termination, and rule-codec version for T40-derived schedules.",
     "Reverse a natural CF tail exactly once before execution; never lazily pull natural-order coefficients per event.",
     "Keep the cursor in visible configuration and update it atomically with the dynamic ordered word.",
-    "Use the uniform PhaseIndex×Bit product-word lowering when exact T13 AllOccurrences/Self/OrderedGenerationConcat execution is desired.",
+    "Keep the strict Book seed (0,) in the initial-configuration preset; it is not part of transition-program identity.",
+    "Use the uniform PhaseIndex×Bit product word as the canonical exact T13 AllOccurrences/Self/OrderedGenerationConcat executable carrier; compact and Cursor·Data+ forms are interfaces.",
     "Use complete old-snapshot occurrence coverage and source-order child concatenation with no newborn firing.",
     "Report finite schedule completion distinctly from empty word, fixed point, external horizon, error, or resource failure.",
     "At schedule exhaustion retain the final nonempty word and return a zero-successor terminal envelope; never pass the empty terminal frontier to D019.",
@@ -250,11 +252,11 @@ class T40RepresentationQuery:
         if type(self.denotation) not in T40_DENOTATION_TYPES:
             raise TypeError("T40 query needs a closed exact denotation")
         object.__setattr__(self, "requested_count", exact_positive(self.requested_count, "T40 requested count"))
-        if self.representation != "SimpleContinuedFraction/v1":
+        if exact_text(self.representation, "T40 representation") != "SimpleContinuedFraction/v1":
             raise ValueError("T42 handoffs require the T40 simple-CF representation")
-        if self.selection != "Prefix/v1":
+        if exact_text(self.selection, "T40 selection") != "Prefix/v1":
             raise ValueError("T42 handoffs require a prefix selection")
-        if self.schema != T40_QUERY_SCHEMA:
+        if exact_text(self.schema, "T40 query schema") != T40_QUERY_SCHEMA:
             raise ValueError("unknown T40 query schema")
 
     def key(self) -> tuple[object, ...]:
@@ -299,7 +301,10 @@ class T40QueryProvenance:
         context_key_value = exact_tuple(self.context_key, "T40 context structural key")
         expected_query = sha256(repr(query_key_value).encode("utf-8")).hexdigest()
         expected_context = sha256(repr(context_key_value).encode("utf-8")).hexdigest()
-        if self.query_id != expected_query or self.context_id != expected_context:
+        if (
+            exact_text(self.query_id, "T40 query id") != expected_query
+            or exact_text(self.context_id, "T40 context id") != expected_context
+        ):
             raise ValueError("T40 provenance ids must match their complete structural keys")
 
 
@@ -552,7 +557,8 @@ class T40ExpansionResult:
             raise ValueError("simple CF results carry neither positional integer digits nor a separate sign")
         if type(self.outcome) not in (T40CompleteExact, T40CompleteCertified):
             raise TypeError("T42 source requires a complete T40 outcome")
-        if self.schema != T40_RESULT_SCHEMA:
+        exact_text(self.termination, "T40 result termination")
+        if exact_text(self.schema, "T40 result schema") != T40_RESULT_SCHEMA:
             raise ValueError("unknown T40 result schema")
         expected_coefficients, expected_outcome, expected_termination = canonical_t40_evaluation(
             self.query, self.context
@@ -577,6 +583,8 @@ class T40ExpansionResult:
             self.termination,
         )
         computed = sha256(repr(key).encode("utf-8")).hexdigest()
+        if type(self.result_id) is not str:
+            raise TypeError("T40 result id must be exact text")
         if self.result_id not in ("", computed):
             raise ValueError("forged T40 result identity")
         object.__setattr__(self, "coefficients", coefficients)
@@ -660,7 +668,7 @@ class T40CoefficientHandoff:
             raise ValueError("strict T42 excludes rational-complete continued fractions")
         if not self.source_result.coefficients:
             raise ValueError("T40 handoff must include a0")
-        if self.schema != T40_HANDOFF_SCHEMA:
+        if exact_text(self.schema, "T40 handoff schema") != T40_HANDOFF_SCHEMA:
             raise ValueError("unknown T40-to-T42 handoff schema")
 
     @property
@@ -704,10 +712,12 @@ class ExplicitScheduleSource:
         mode = exact_text(self.evidence_mode, "explicit schedule evidence mode")
         if mode not in EXPLICIT_EVIDENCE_MODES:
             raise ValueError("unknown explicit schedule evidence mode")
-        if self.schema != EXPLICIT_SOURCE_SCHEMA:
+        if exact_text(self.schema, "explicit schedule schema") != EXPLICIT_SOURCE_SCHEMA:
             raise ValueError("unknown explicit schedule schema")
         key = (self.schema, checked, label, mode)
         computed = sha256(repr(key).encode("utf-8")).hexdigest()
+        if type(self.source_id) is not str:
+            raise TypeError("explicit source id must be exact text")
         if self.source_id not in ("", computed):
             raise ValueError("forged explicit schedule identity")
         object.__setattr__(self, "coefficients", checked)
@@ -752,6 +762,8 @@ class FinalizedExecutionSchedule:
                 raise ValueError("execution schedule source is not canonical explicit data")
         key = ("FinalizedExecutionSchedule/v2", self.source.key())
         computed = sha256(repr(key).encode("utf-8")).hexdigest()
+        if type(self.schedule_id) is not str:
+            raise TypeError("schedule id must be exact text")
         if self.schedule_id not in ("", computed):
             raise ValueError("forged finalized schedule identity")
         object.__setattr__(self, "schedule_id", computed)
@@ -844,7 +856,6 @@ def coefficient_from_table(table: object) -> int:
 @dataclass(frozen=True)
 class ScheduledMorphismProgram:
     schedule: FinalizedExecutionSchedule
-    seed: Word = (0,)
     rule_codec: str = RULE_CODEC_VERSION
     schema: str = PROGRAM_SCHEMA_VERSION
     program_id: str = ""
@@ -856,30 +867,29 @@ class ScheduledMorphismProgram:
             self.schedule.source, self.schedule.schedule_id
         ):
             raise ValueError("program schedule does not replay from its complete tagged source")
-        seed = checked_word(self.seed, "program seed")
-        if seed != (0,):
-            raise ValueError("the strict Book construction fixes the seed to (0,)")
-        if self.rule_codec != RULE_CODEC_VERSION or self.schema != PROGRAM_SCHEMA_VERSION:
+        if (
+            exact_text(self.rule_codec, "program rule codec") != RULE_CODEC_VERSION
+            or exact_text(self.schema, "program schema") != PROGRAM_SCHEMA_VERSION
+        ):
             raise ValueError("unknown scheduled-morphism schema or rho codec")
         payload = {
             "schema": self.schema,
             "rule_codec": self.rule_codec,
             "schedule": self.schedule.key(),
-            "seed": seed,
         }
         computed = sha256(canonical_json(payload).encode("utf-8")).hexdigest()
+        if type(self.program_id) is not str:
+            raise TypeError("program id must be exact text")
         if self.program_id not in ("", computed):
             raise ValueError("forged program id")
-        object.__setattr__(self, "seed", seed)
         object.__setattr__(self, "program_id", computed)
 
     def key(self) -> tuple[object, ...]:
         return (
-            "ScheduledMorphismProgram/v1",
+            "ScheduledMorphismProgram/v2",
             self.schema,
             self.rule_codec,
             self.schedule.key(),
-            self.seed,
             self.program_id,
         )
 
@@ -959,6 +969,14 @@ class RuntimeSnapshot:
         object.__setattr__(self, "occurrence_ids", checked_ids)
 
 
+def strict_book_initial_configuration(
+    program: object,
+) -> DirectConfiguration:
+    if type(program) is not ScheduledMorphismProgram:
+        raise TypeError("strict initial configuration needs an exact program")
+    return DirectConfiguration(0, STRICT_BOOK_SEED)
+
+
 def initial_snapshot(
     program: object,
     *,
@@ -966,12 +984,13 @@ def initial_snapshot(
 ) -> RuntimeSnapshot:
     if type(program) is not ScheduledMorphismProgram:
         raise TypeError("initial snapshot needs an exact program")
+    initial_configuration = strict_book_initial_configuration(program)
     label = exact_text(branch_label, "branch label")
     scope = stable_id(f"{program.program_id}|{label}|generation:0")
-    ids = tuple(range(len(program.seed)))
+    ids = tuple(range(len(initial_configuration.word)))
     return RuntimeSnapshot(
         program.program_id,
-        DirectConfiguration(0, program.seed),
+        initial_configuration,
         scope,
         0,
         ids,
@@ -1628,7 +1647,7 @@ SOURCE_SEMANTIC_MANIFEST = (
     ("rho_1", "0^(a-1)10"),
     ("exact_T13_lowering", "(i,bit)->[(i+1,child) for child in rho_Si(bit)]"),
     ("replicated_invariant", "nonempty_and_all_phase_indices_equal"),
-    ("seed", (0,)),
+    ("strict_initial_configuration_preset", STRICT_BOOK_SEED),
     ("mechanical_word_index_start", 1),
     ("a0_domain", "signed_integer"),
     ("tail_domain", "positive_integer"),
@@ -2165,6 +2184,7 @@ def audit_no_hidden_surface() -> tuple[int, int, int, int]:
     assert any("1-3 only" in line for line in ARCHITECTURE_CLASSIFICATION)
     public_program_fields = dict(manifest)["ScheduledMorphismProgram"]
     assert not (set(public_program_fields) & FORBIDDEN_FIELD_NAMES)
+    assert "seed" not in public_program_fields
     mutated = dict(globals())
     mutated["T42Executor"] = type("T42Executor", (), {})
     assert forbidden_surface(mutated) == (("T42Executor", ("Executor",)),)
@@ -2172,6 +2192,10 @@ def audit_no_hidden_surface() -> tuple[int, int, int, int]:
     mutated["CurveRasterProgram"] = type("CurveRasterProgram", (), {})
     assert forbidden_surface(mutated) == (("CurveRasterProgram", ("RasterProgram",)),)
     return len(manifest), len(violations), 0, 2
+
+
+class HostileTextSubclass(str):
+    pass
 
 
 def unsafe_hostile_forge(instance: object, **changes: object) -> object:
@@ -2195,6 +2219,14 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(TypeError, lambda: T40RepresentationQuery(T40EulerDenotation(), 3.0))
     rejected += must_raise(ValueError, lambda: T40RepresentationQuery(T40EulerDenotation(), 0))
     rejected += must_raise(ValueError, lambda: T40RepresentationQuery(T40EulerDenotation(), 3, selection="CoefficientAt/v1"))
+    rejected += must_raise(
+        TypeError,
+        lambda: T40RepresentationQuery(
+            T40EulerDenotation(),
+            3,
+            representation=HostileTextSubclass("SimpleContinuedFraction/v1"),
+        ),
+    )
     rejected += must_raise(TypeError, lambda: T40EvaluationContext(lambda: None))
     rejected += must_raise(ValueError, lambda: T40EvaluationContext(T40_EXACT_METHOD, 1))
     rejected += must_raise(ValueError, lambda: T40EvaluationContext(T40_MACHIN_METHOD, 0))
@@ -2223,12 +2255,17 @@ def audit_hostile_validation() -> int:
 
     forged_coefficients = unsafe_hostile_forge(good_result, coefficients=(2, 1, 1))
     forged_result_id = unsafe_hostile_forge(good_result, result_id="f" * 64)
+    forged_result_id_type = unsafe_hostile_forge(
+        good_result,
+        result_id=HostileTextSubclass(good_result.result_id),
+    )
     forged_termination = unsafe_hostile_forge(good_result, termination=FINITE_TERMINATED)
     forged_provenance = unsafe_hostile_forge(good_result.provenance, query_id="e" * 64)
     forged_provenance_result = unsafe_hostile_forge(good_result, provenance=forged_provenance)
     for forged in (
         forged_coefficients,
         forged_result_id,
+        forged_result_id_type,
         forged_termination,
         forged_provenance_result,
     ):
@@ -2286,9 +2323,11 @@ def audit_hostile_validation() -> int:
     assert type(program.schedule.source) is T40CoefficientHandoff
     assert program.schedule.source.key()[1] == good_result.key()
     assert program.schedule.source_identity == good_result.result_id
+    assert "seed" not in dict(dataclass_manifest(dict(globals())))["ScheduledMorphismProgram"]
+    assert strict_book_initial_configuration(program) == DirectConfiguration(0, (0,))
     rejected += must_raise(ValueError, lambda: ScheduledMorphismProgram(program.schedule, program_id="f" * 64))
-    rejected += must_raise(ValueError, lambda: ScheduledMorphismProgram(program.schedule, seed=(1,)))
-    rejected += must_raise(ValueError, lambda: ScheduledMorphismProgram(program.schedule, seed=(0, 0)))
+    rejected += must_raise(TypeError, lambda: ScheduledMorphismProgram(program.schedule, seed=(1,)))
+    rejected += must_raise(TypeError, lambda: initial_snapshot(program, seed=(1,)))
     rejected += must_raise(FrozenInstanceError, lambda: setattr(program, "program_id", "0" * 64))
     rejected += must_raise(FrozenInstanceError, lambda: setattr(good_result, "coefficients", (2, 1, 1)))
     forged_schedule = unsafe_hostile_forge(program.schedule, schedule_id="f" * 64)
@@ -2428,7 +2467,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "149353e1a5c4d535b5e01327c989270a197d47b1760392e77ad235eab379c226"
+EXPECTED_DIGEST = "6bc8f95d07c32b5983c8b0890c7f9b8a07e511c25d77b12c7963ce9fc36b5c1d"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:

@@ -29,7 +29,9 @@ No visual or textual styling convention is allowed to blur those types.
 - Do not trim or reflow author text as an incidental serializer behavior.
 - Trailing whitespace is forbidden in generated syntax. Source-significant trailing whitespace, if the witness establishes any, must use an explicit lossless representation approved through a witness-backed repair record rather than invisible trailing bytes.
 
-Machine-readable JSON and JSONL use profile `ANKOS-CJ-1`: UTF-8 without BOM, LF, one terminal LF, object keys sorted by Unicode code-point order, array order preserved, `,` and `:` compact separators, unescaped non-ASCII text, and no floating-point values. Deterministic artifacts contain no wall-clock build time, host path, username, locale-derived value, filesystem mtime, or random UUID. A source date, when required, comes from a manifest field or declared `SOURCE_DATE_EPOCH` and is not sampled from the build host.
+Generated release manifests, ledgers, JSON, and JSONL use profile `ANKOS-CJ-1`: UTF-8 without BOM, LF, one terminal LF, object keys sorted by Unicode code-point order, array order preserved, `,` and `:` compact separators, unescaped non-ASCII text, and no floating-point values. Deterministic release artifacts contain no wall-clock build time, host path, username, locale-derived value, filesystem mtime, or random UUID. A source date, when required, comes from a manifest field or declared `SOURCE_DATE_EPOCH` and is not sampled from the build host.
+
+The hand-authored, hash-pinned policy files `guardrails.json`, `quality-evaluation.json`, and `licensing-contract.json` use profile `ANKOS-PJ-1`: UTF-8 without BOM, LF, one terminal LF, two-space indentation, no trailing whitespace, and no floating-point values. Object insertion order is editorial and is protected by the frozen whole-file hash; these files are not falsely claimed to have `ANKOS-CJ-1` compact bytes. The generated compatibility baseline uses `ANKOS-CJ-1`, but it is audit evidence rather than a release artifact: its explicitly pinned interpreter path and opaque captured stdout/stderr may contain host paths. Those bytes are preserved and hashed rather than sanitized, so a path change becomes compatibility drift instead of silent normalization.
 
 ## Typed intermediate model
 
@@ -47,6 +49,8 @@ The `ANKOS-AST-1` node types are:
 - `INLINE_CODE(payload)` and `CODE_BLOCK(language, payload, fence_length)`;
 - `MATH_INLINE(payload)` and `MATH_BLOCK(payload)`;
 - `TABLE(rows)` and `TABLE_CELL(children, row_span, column_span)` for verified tables;
+- `SOURCE_LINK(label_children, destination_text, title_text, source_syntax_projection)` when the authoritative source itself contains link semantics;
+- `GENERATED_LINK(label_children, destination, link_kind)` for navigation, Notes backlinks, and Index augmentation; its label projection is author text and its destination/delimiters have empty author-text projection;
 - `IMAGE_REFERENCE(asset_id, source_alt_projection)`;
 - `FIGURE_GROUP(component_asset_ids, caption_children)`;
 - `INDEX_ENTRY(term_children, subentries, page_references, see_targets)`;
@@ -54,6 +58,19 @@ The `ANKOS-AST-1` node types are:
 - `GENERATED_ANCHOR(anchor_id)` and `PAGE_MARKER(witness_page_id)` with empty author-text projection.
 
 Serialized Markdown is a view of this model, not the semantic source of truth. Parse/serialize/parse must preserve the full typed model and author-text projection. Formulas, code, Index entries, and figures must not be packed into opaque `TEXT` or `RAW_HTML` merely to bypass their invariants.
+
+### Total writer rules
+
+The Stage 4 writer is total before Stage 7 chooses parser/render tooling. Stage 7 may approve a more readable specialized spelling only after proving identical typed parse and projection; the lossless spelling below remains the fail-closed fallback.
+
+- `TEXT` contains no line break or C0 control other than a source-tab explicitly allowed by its parent. In Markdown text context, prefix U+005C to every ASCII punctuation scalar in U+0021–U+002F, U+003A–U+0040, U+005B–U+0060, and U+007B–U+007E. Thus a source backslash emits two backslashes. The inserted prefix is generated syntax, and inverse projection removes exactly one prefix before exactly one punctuation scalar. Non-ASCII scalars and ordinary spaces are emitted unchanged.
+- `SOURCE_LINE_BREAK(SOFT)` emits one LF; `SOURCE_LINE_BREAK(HARD)` emits generated U+005C followed by LF. Any other kind fails. The node projection records the source break independently of the generated hard-break marker.
+- `INLINE_CODE` rejects CR/LF. Its backtick fence length is one greater than the longest payload backtick run, with a minimum of one. Add one generated ASCII space immediately inside both fences exactly when the payload begins or ends with a backtick, or when it begins and ends with spaces but is not entirely spaces; the CommonMark code-span parse removes that padding and must reproduce the payload exactly. A failed round trip refuses output and uses no guessed substitute.
+- `GENERATED_LINK` destinations must already be canonical repository-relative POSIX paths or reserved `ankos-` fragments containing only ASCII letters, digits, `/`, `.`, `_`, `~`, `-`, and at most one `#`; `..`, backslash, percent escapes, control characters, and repaired-root escape are rejected. Emit `[label](destination)` with delimiters/destination typed generated. `SOURCE_LINK` emits only from its protected `source_syntax_projection`; the parsed label, destination, and title must rejoin that projection exactly.
+- HTML fallback text escapes `&`, `<`, and `>` as `&amp;`, `&lt;`, and `&gt;` in that order. The entities are generated syntax and inverse projection restores the original scalar. Attributes use lowercase names, double quotes, lexicographic attribute order, and additionally escape `"` as `&quot;`; only closed profile attributes are allowed.
+- Before Stage 7 approves an unambiguous dollar spelling, `MATH_INLINE` uses `<span data-ankos-generated="math-inline">...</span>` and `MATH_BLOCK` uses `<pre data-ankos-generated="math-block">...</pre>` with the exact HTML fallback escaping above. These wrappers are generated; the payload remains a typed mathematical token sequence.
+- A simple table may use pipe syntax only after Stage 7 proves a typed round trip. The total fallback serializes `TABLE`/`TABLE_CELL` as lowercase generated HTML `table`, `tr`, `td`, with positive decimal `rowspan`/`colspan` only when greater than one. Child nodes remain typed and ordered; no cell is flattened into opaque text.
+- `INDEX_ENTRY`, `FIGURE_GROUP`, and every other structural node use their closed field order and generated wrapper syntax declared by their Stage 4 schema. If a schema lacks a deterministic wrapper for one of its fields, serialization fails; `TEXT` or `RAW_HTML` is never a fallback for a structured semantic node.
 
 ## Canonical document envelope
 
@@ -68,7 +85,7 @@ Generated anchors or page markers may appear only through the reserved forms bel
 
 Reserved generated identifiers begin with `ankos-`. Author HTML using the same lexical form must be escaped from the generated namespace in metadata, not rewritten in author text.
 
-Stable anchors are `ankos-` plus the lower-case canonical document ID, a hyphen, and the lower-case immutable raw block ID. A witness-only insertion appends `-ins-` plus the lower-case repair ID. IDs use only ASCII `a-z`, `0-9`, and `-`; collisions fail rather than gaining an order-dependent suffix.
+Every canonical document has an explicit unique `anchor_slug` in `guardrails.json` matching `^[a-z0-9]+(?:-[a-z0-9]+)*$`; no implicit lowercasing or underscore rewrite is allowed. Raw block IDs and repair IDs match `^[A-Z0-9][A-Z0-9_-]*$`. Their anchor components are encoded injectively by lowercasing ASCII letters, replacing `_` with `-u-`, and replacing an existing `-` with `-h-`; digits pass through. Stable anchors are `ankos-` plus the document `anchor_slug`, a hyphen, and the encoded immutable raw block ID. A witness-only insertion appends `-ins-` plus the encoded repair ID. The final anchor must match the frozen generated-anchor grammar; collisions fail rather than gaining an order-dependent suffix.
 
 ## Headings
 
@@ -101,8 +118,8 @@ Stable anchors are `ankos-` plus the lower-case canonical document ID, a hyphen,
 ## Mathematics, rules, and exact data
 
 - Preserve the printed notation rather than converting it to an equivalent modern notation.
-- Inline math uses `$...$` and display math uses `$$...$$` only when Stage 7 proves the representation is unambiguous and lossless for the source region.
-- When dollar delimiters would be ambiguous or the source uses layout not expressible losslessly, retain a typed raw/HTML math block selected by Stage 7; never guess a formula to satisfy a parser.
+- Inline math uses `$...$` and display math uses `$$...$$` only when Stage 7 proves the representation is unambiguous and lossless for the source region; otherwise the total generated-HTML fallback above is mandatory.
+- When dollar delimiters would be ambiguous or the source uses layout not expressible losslessly, retain the typed math node with the total fallback; never guess a formula to satisfy a parser.
 - Delimiters are generated structure only when provenance maps the enclosed token sequence exactly to the witness.
 - Rule tables, state tables, sequences, coordinates, colors, seeds, and numeric values are protected semantic data. Every changed token is high risk.
 

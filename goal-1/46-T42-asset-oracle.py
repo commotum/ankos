@@ -41,7 +41,7 @@ SEMANTIC_ORACLE_PATH = ROOT / "goal-1/46-T42-semantic-oracle.py"
 EXPECTED_BOOK_LINES = 22_498
 EXPECTED_BOOK_SHA256 = "55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20"
 EXPECTED_SEMANTIC_ORACLE_SHA256 = (
-    "1d96578760d83d9213330997b363dc5edd0c5d6ceff5ca2c2a54daf578f1fcf5"
+    "e4794537b9d5d3820c4a0bb484b89f6e4dd1f9b489c132653d82b9815b721213"
 )
 
 
@@ -329,6 +329,7 @@ EXPECTED_ASSET_SEMANTIC_MANIFEST = (
                 (2, 2, 2, 2, 2),
                 (1, 2, 5, 12, 29, 70),
                 "8ba86691662b9853053af6dd5b5e3dfc17caf43a640b2bbb45c01e323c30bff7",
+                "LIMITED_TRANSCRIBED",
             ),
             (
                 "page162-alpha-2-plus-sqrt5",
@@ -336,6 +337,7 @@ EXPECTED_ASSET_SEMANTIC_MANIFEST = (
                 (1, 1, 1, 1, 1, 1, 1, 1, 1),
                 (1, 1, 2, 3, 5, 8, 13, 21, 34, 55),
                 "fa947b9859783d29be2ba4015183fa85b52cb6181e04eab41658ab55f6761e36",
+                "LIMITED_TRANSCRIBED",
             ),
             (
                 "page162-alpha-2-plus-cuberoot5",
@@ -343,6 +345,7 @@ EXPECTED_ASSET_SEMANTIC_MANIFEST = (
                 (2, 4, 1, 2, 1, 1),
                 (1, 2, 9, 11, 31, 42, 73),
                 "f851acd68816def8a87c81de3358a129a1a735b2a42399485966261962eb6aa5",
+                "LIMITED_TRANSCRIBED",
             ),
             (
                 "page162-alpha-1-plus-sqrt-e",
@@ -350,15 +353,18 @@ EXPECTED_ASSET_SEMANTIC_MANIFEST = (
                 (3, 2, 1, 4, 2),
                 (1, 3, 7, 10, 47, 104),
                 "961704a7ac5de6ac75aff0bee33c2a0d8406c9db80ed91043595d453cb4f76b6",
+                "LIMITED_TRANSCRIBED",
             ),
         ),
     ),
+    ("fixture_coefficient_evidence", "LIMITED_TRANSCRIBED"),
+    ("pixel_replayed", False),
     ("pixel_program_forbidden", True),
 )
 
 
 EXPECTED_ASSET_SEMANTIC_MANIFEST_SHA256 = (
-    "ba5a42abd69e9b61914633bee808128fb5a81cb42c7d10b794e8fe6e934b23a5"
+    "a29095461ff79de0d08ebd5d2347a5c0edd8ff3151363264ff2fe61892a88556"
 )
 
 
@@ -546,6 +552,8 @@ def replay_native_traces(
         native.digest,
     )
     assert fields["gray_value"] == 0 and fields["black_value"] == 1
+    assert fields["fixture_coefficient_evidence"] == "LIMITED_TRANSCRIBED"
+    assert fields["pixel_replayed"] is False
     assert fields["pixel_program_forbidden"] is True
     assert fields["smallest_execution_lowering"] == (
         "uniform_PhaseIndex_times_Bit_word"
@@ -571,7 +579,11 @@ def replay_native_traces(
     source_firings = 0
     emitted_children = 0
     for fixture in fixtures:
-        name, coefficients, expected_schedule, expected_lengths, final_digest = fixture
+        (
+            name, coefficients, expected_schedule, expected_lengths,
+            final_digest, evidence_mode,
+        ) = fixture
+        assert evidence_mode == "LIMITED_TRANSCRIBED"
         coefficients = tuple(coefficients)
         schedule = tuple(expected_schedule)
         lengths = tuple(expected_lengths)
@@ -589,7 +601,7 @@ def replay_native_traces(
             new_digest = sha256("".join(map(str, word)).encode("ascii"))
             actual_lengths.append(len(word))
             trace_rows.append(
-                f"{name}|{event}|{coefficient}|{len(old)}|{old_digest}|"
+                f"{name}|{evidence_mode}|{event}|{coefficient}|{len(old)}|{old_digest}|"
                 f"{len(word)}|{new_digest}"
             )
             event_count += 1
@@ -833,7 +845,9 @@ def main() -> None:
     )
     assert (12, structural_digest) == EXPECTED_IMAGE_ASSET_MANIFEST
     assert (12, ordered_digest) == EXPECTED_ORDERED_SHA256SUM_MANIFEST
-    assert trace_digest == EXPECTED_TRACE_LEDGER_SHA256
+    assert trace_digest == EXPECTED_TRACE_LEDGER_SHA256, (
+        trace_digest, EXPECTED_TRACE_LEDGER_SHA256,
+    )
     assert trace_metrics == EXPECTED_TRACE_METRICS
     assert (metrics[0], metrics[1], metrics[0] + metrics[1]) == (
         EXPECTED_REFERENCE_METRICS
