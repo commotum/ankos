@@ -1,6 +1,6 @@
 # Goal 1 Representation and Execution Architecture Audit
 
-Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); T06/T07/T08/T10 SUBSEQUENTLY COMPLETED UNDER ACTIVE D119-D122**
+Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); SUBSEQUENT STAGES INTEGRATED THROUGH D125; T18 CLOSING UNDER PROVISIONAL D126**
 
 ## Trigger and Scope
 
@@ -115,12 +115,12 @@ The classification number in this matrix refers to the four categories above. A 
 | D021 | Dynamic order/trace/view evidence | 2 | Discrete `t+1D` with variable ordered support plus trace mapping | Sequence order explicit; realization/cut/padding/view separate | Keep; normalize DOMAIN/support vocabulary |
 | D022 | T16 rule-major/leftmost matching | 2 | Program-coupled FRONTIER implementation | One authoritative clause list; deterministic priority; no matcher callback | Keep; remove new-class implication |
 | D023 | One old span replaced per event | 2 | Ordered replacement UPDATE with `exactly_one` schedule | One snapshot, one selected span, prefix/suffix order | Rewrite as restriction, not separate executor |
-| D024 | T16 no-match versus T13/T12/T14/T15 outcomes | 2 | Shared typed outcome envelope | Empty frontier interpreted by program/update policy; T15 active-epsilon, zero-source, and post-extinction witnesses remain distinct | Keep; extended by D125 |
+| D024 | T16 no-match versus T13/T12/T14/T15/T18 outcomes | 2 | Shared typed outcome envelope | Empty frontier interpreted by program/update policy; T15's three empty-producing witnesses remain distinct; T18 live extinction advances phase and subsequent empty identity freezes it | Keep; extended by D125/D126 |
 | D025 | Ordered nonempty literal clauses | 2 | T16 RULE/FRONTIER preset and validator | Clause order/duplicates retained; no invented integer code; T15 contextual epsilon is not T16 evidence | Keep |
 | D026 | Tag/Post/Wang q/d evidence | 3 | Product of named read-width/delete-width roles | Positive widths; strict tag preset pins equality | Keep roles; no separate semantic classes |
-| D027 | Prefix delete plus old-tail append | 2 | Ordered structural UPDATE with two anchored replacements | Delete `[0,d)` and append at old endpoint atomically | Rewrite as UPDATE policy/preset, not queue executor |
-| D028 | Epsilon in T17 and T15; nonempty T13/T14/T16 | 2 | Shared word/result carrier with validator refinements | `Sigma*` carrier; construction-specific nonempty invariants | Keep; independently confirmed by D125 |
-| D029 | Short residue versus reference `{}` history | 2 | Outcome plus labeled trace projection | Native residue retained; projection never feeds execution | Keep |
+| D027 | Prefix delete plus old-tail append; T18 phase/head replacement plus old-end insertion | 2 | Anchored ordered spans | T17 deletes `[0,d)`; T18 replaces `[Phase,Head)` and inserts at the old endpoint atomically | Rewrite as UPDATE policy/preset, not queue/cyclic executor |
+| D028 | Epsilon in T17/T15/T18; nonempty T13/T14/T16 | 2 | Shared word/result carrier with validator refinements | `Sigma*` carrier; T18 scheduled block, trigger verdict, and actual appendant remain distinct; construction-specific nonempty invariants | Keep; confirmed by D125/D126 |
+| D029 | T17 short residue versus reference `{}` history and T18 empty identity | 2 | Outcome plus labeled trace projection | Native T17 residue retained; T18 policy does not broaden it; projection never feeds execution | Keep |
 | D030 | Complete bounded prefix table count | 2 | Closed RULE table serialization | Every key present; epsilon allowed; no default/code invention | Keep |
 
 ### T19 through T30 (D031-D057)
@@ -128,14 +128,14 @@ The classification number in this matrix refers to the four categories above. A 
 | Decision | Basis / audit evidence | Class | Smallest reusable base | Required invariants or mapping | Disposition / reopen |
 |---|---|---:|---|---|---|
 | D031 | Arbitrary-size registers and finite bank | 3 | Structured ALPHABET/configuration over register-key support | Natural values exact; keys explicit; no fake capacity | Keep semantics; rename value DOMAIN terminology |
-| D032 | Visible program counter selects instruction | 3 | Marker/tag or explicit product factor in CONFIGURATION; active-instruction FRONTIER | One counter, valid address/exit profile, immutable program separate | Rewrite; retire required generalized `SingleControl` |
+| D032 | Visible program counter or cyclic schedule selects immutable program data | 3 | Marker/tag, explicit product factor, or declared lossless/quotient schedule representation in CONFIGURATION | One visible in-range focus; named T18 phase or equal-rotation Notes quotient; immutable program separate; never trace-time state | Rewrite; retire required generalized `SingleControl` |
 | D033 | Increment/decrement branch effects | 2 | Tagged RULE writes through shared atomic UPDATE | Reads and all register/marker writes use one snapshot | Rewrite result names as roles; retire `TransitionControl` requirement |
 | D034 | Past-end reference versus explicit exit | 2 | Shared outcome envelope | Quiescent, terminal interpretation, wrap, stop distinct | Keep |
 | D035 | Program counts, exits, seeds | 2 | Structured program/seed/profile records | Seed independent; target profile explicit; no invented code | Keep |
 | D036 | Tree/head-path evidence; `alphabets.md:84-103` | 3 | Recursive tagged ALPHABET with typed occurrence paths/topology | Well-founded tree; equal occurrences distinct; path round-trip | Rewrite prohibition on transparent structured values |
 | D037 | Structural pattern/template evidence | 3 | Closed RULE AST | Binding scope, duplication/deletion, literal validity | Keep as data, not executor class |
 | D038 | One-pass outermost prefix-free matching | 2 | Program-coupled FRONTIER/schedule | Old snapshot, preorder/priority, ancestor suppression, newborn deferral | Keep |
-| D039 | Multiple disjoint subtree replacements | 3 | Lossless balanced/prefix token encoding plus generic ordered multi-span replacement | Tree/token pack-unpack bijective on well-formed image; every subtree is one contiguous span; prefix-free paths map to disjoint spans; one-step commuting square | Rewrite/reclose as representation and schedule preset; no tree-specific UPDATE implementation |
+| D039 | Multiple disjoint subtree replacements and T18's phase/head plus endpoint spans | 3 | Tagged/token representations plus generic ordered multi-span replacement | T20 tree codec is bijective; T18 named phase uses `Phase · Data*` while the Notes value-state is its declared equal-rotation quotient; spans are disjoint old coordinates; construction wrappers validate source/result; one-step squares commute | Rewrite/reclose as representation and schedule preset; no tree/cyclic UPDATE implementation |
 | D040 | No-match/fixed form/representations | 2 | Shared outcomes plus observers/codecs | Applicable identity remains eventful; views never feed back | Keep |
 | D041 | Fully posed multiplicity-preserving geometry | 3 | Continuous-coordinate `t+2D` with geometric support, product labels, and bag occurrence identity | Full pose retained, multiplicity material, order nonsemantic | Keep; normalize scalar-carrier terminology |
 | D042 | Parent-local affine composition | 2 | Closed geometric NEIGHBORHOOD/RULE data | `P o C` order; exact/declared numeric profile explicit | Keep; rename scalar DOMAIN to carrier/profile |
@@ -226,6 +226,14 @@ The classification number in this matrix refers to the four categories above. A 
 | D117 | Same lattice/frontier/read/commit | 1 | Shared CA preset/runner | General radius only parameterizes NEIGHBORHOOD/RULE validation | Keep |
 | D118 | T04/T05/T06/T07 and related reducers | 2 | Presets, predicates, properties, dimensional-DOMAIN/NEIGHBORHOOD/RULETYPE variants | No executor flags; every representation/restriction validated | Keep preset ownership; rewrite claim that weighted/histogram/dimension/continuous values imply new construction classes |
 
+### Post-audit type integration (D119-D126)
+
+D119-D125 are recorded in `design-ledger.md` by their completed stages. T18 adds the following audited row:
+
+| Decision | Basis / audit evidence | Class | Smallest reusable base | Required invariants or mapping | Disposition / reopen |
+|---|---|---:|---|---|---|
+| D126 / T18 | direct Chapter 3 queue/schedule mechanics, explicit Notes empty clause/generalizations, 160-line source closure, 43-asset closure, five `t0..t99` fixtures, and 71,442 direct/tagged commuting cases | 3 | T17 finite ordered support and endpoint geometry + D032 visible phase + closed cycle/trigger RULE + D039 ordered spans + D024 empty policy | Named `(phase,word) <-> Phase · Data*` bijection; literal rotated-value Notes state is the declared quotient under equal complete rotations; empty reads/writes still reach UPDATE; live extinction advances phase and empty identity freezes it | Add one composition/preset only; no stage reopens and no state class, UPDATE algebra, executor, or family branch is added |
+
 ### Concrete Counterexample Gate
 
 The class-4 labels and each UPDATE/result-axis extension that is not an explicit lossless representation or restriction of the ordered-replacement/finite-write bases are justified by behavior that the smaller candidate cannot express faithfully. T20, T37, and T39 are omitted from this table because D039, D072, and D078 now give concrete one-step commuting representation lowerings rather than new UPDATE implementations.
@@ -249,6 +257,7 @@ Two tempting collapses also fail the losslessness gate without justifying new ex
 - Multiway rewriting is not a nonfit: its UPDATE returns a finite set of successor configurations and the same runner can iterate or layer that relation.
 - No completed transition stage supplies a counterexample requiring a family executor or top-level `SingleControl`, `TransitionControl`, `ArithmeticAssignment`, `MapAssignment`, or construction-named state class.
 - T10 subsequently supplies an exact proper extension of the strict T09 RULE-result preset, from a center bit plus movement to a three-bit block plus movement. Its 2,048-case commuting oracle lowers every result to D011 finite writes, so it adds D122 but no UPDATE law or executor.
+- T18 subsequently composes a visible cyclic schedule with T17 ordered support and D039 spans. Its named-slot tagged cover is bijective, its Notes rotated-value projection explicitly handles periodic-cycle quotienting, and empty activity still traverses all four runner axes. D126 adds no UPDATE law or executor.
 
 ## Stage Disposition and Revised Goal 2 Handoffs
 
@@ -269,6 +278,7 @@ This table is the authoritative architecture replacement for the reopened stages
 | T13 | Discrete variable-support `t+1D` word; finite symbol labels | Every old occurrence; self symbol | Block replacement per occurrence; ordered snapshot-parallel concatenate UPDATE | Add ordered replacement UPDATE policy within runner; no substitution executor |
 | T16 | T13 word configuration | Rule-major/leftmost match; exact matched span | One replacement block; exactly-one splice UPDATE | Add program-coupled frontier and schedule restriction over ordered replacement |
 | T17 | Discrete variable-support `t+1D` word | Applicable prefix; required prefix access with separate read/delete widths | Appendant plus consume extent; atomic prefix-delete/old-tail-append UPDATE | Add prefix selector/access and anchored ordered update preset; no tag executor |
+| T18 | Discrete variable-support `t+1D`; finite word plus visible cyclic focus, represented as `Phase(slot) · Data*` or the declared equal-rotation Notes quotient | Unique phase/head pair when live; structural phase/head and old-end access; empty activity yields empty reads/writes | Replace phase/head prefix by next phase and conditionally insert the scheduled block at the old endpoint through generic ordered multi-span UPDATE; empty identity freezes phase | Compose T17 ordered support, D032 visible control, closed cycle/trigger RULE, D039 spans, and D024 empty policy; no cyclic state/control class, UPDATE, or executor |
 | T19 | Discrete `t+0D` task with explicit register/instruction topology; natural values plus visible program marker/product factor | Marked active instruction; referenced registers | Tagged register and marker writes; atomic UPDATE | Add named-key/marker labels, instruction frontier, reference access; no generalized control or register executor |
 | T20 | Discrete `t+0D`; recursive-tree configuration support/topology with tagged expression labels; lossless balanced/prefix token-word representation | Ordered maximal prefix-free matches; matched subtrees/bindings; paths map to contiguous token spans | Replacement trees lower to disjoint token blocks; generic ordered multi-span UPDATE | Add tree/path/pattern schemas, token pack/unpack codec, and prefix-free schedule preset over ordered replacement; no tree UPDATE or symbolic executor |
 | T27 | Canonical continuous-coordinate `t+2D` geometric support; prototype/pose products in a multiplicity-preserving bag | Every old occurrence; self prototype/full pose | Parent-local child occurrences; parallel bag-replacement UPDATE | Add geometric support/value schemas and bag combiner policy; no geometric executor |

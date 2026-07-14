@@ -262,7 +262,7 @@ The canonical Notes rule `{{1,1},{1,0}}` from a one-black seed passes the hash-b
 - DOMAIN: discrete `t+1D`.
 - Configuration/support: a finite ordered word together with one visible focus in a finite cyclic program schedule; equivalently an invariant-valid tagged word beginning with exactly one phase marker.
 - ALPHABET: strict binary data plus a finite phase-slot tag; generalized data may use an explicit nonnegative multiplicity carrier.
-- Program: immutable nonempty ordered cycle of alphabet-closed finite append words; duplicate slots remain occurrence-distinct.
+- Program: immutable nonempty ordered cycle of alphabet-closed finite append words; the named-slot profile preserves occurrence positions, while the literal Notes-value profile may quotient exactly equal complete rotations.
 - FRONTIER: the unique phase/head occurrence pair when data are present; an explicit empty-word policy otherwise.
 - NEIGHBORHOOD: old-snapshot read of the phase slot and removed first data value.
 - RULE: choose the block by phase alone; the removed value determines whether/how many copies are appended; compute the next phase.
@@ -380,8 +380,8 @@ These are component roles and validators, not a requirement for one class per li
 
 ### Required conformance tests
 
-1. Reproduce every source-bound direct page-95/page-96 program, seed, and audited trajectory checkpoint once asset closure freezes them.
-2. Reproduce `{{1,1},{1,0}}` from `Phase(0) · Data(1)` through `t12` and compare direct, tagged, and serialized runs.
+1. Reproduce all five source-bound direct page-95/page-96 programs, their one-black seed, the page-95 `t0..t24` trace, and every page-96 `t0..t99` digest/checkpoint.
+2. Reproduce `{{1,1},{1,0}}` from `Phase(0) · Data(1)` through `t24` and compare direct, tagged, and serialized runs.
 3. Phase discriminator: blocks `{1}` and `{0}` map the same word `{1}` to different data successors at slots zero and one.
 4. Assert true-trigger append, false-trigger no-append, empty scheduled block, and nonempty block after an old suffix, retaining scheduled-versus-appended witnesses.
 5. Assert phase advances on every nonempty event even when nothing is appended; it wraps exactly modulo the number of slot occurrences.
@@ -393,7 +393,7 @@ These are component roles and validators, not a requirement for one class per li
 11. Run T17 prefix-delete/tail-append cases through the same ordered-span committer and prove T17 `InsufficientPrefix` and public program schema do not admit cyclic phase.
 12. Reject missing/duplicate/out-of-range markers, phase outside the cycle, empty program cycles, out-of-alphabet blocks/seeds, stale/same-generation-foreign sources, wrong old endpoints, wrong phase successors, incomplete/reordered/colliding writes, reused removed IDs, and fake/freshness-violating children.
 13. Verify one event exposes no intermediate headless/old-phase/partially-appended configuration.
-14. Round-trip program/state/event data without callbacks, `Any`, mutable iterators, trace-time dependencies, family tags controlling execution, padding, capacity, or renderer state.
+14. Round-trip program, tagged state/configuration, writes, event, snapshot scope, and ragged trace data without coercion, callbacks, `Any`, mutable iterators, trace-time dependencies, family tags controlling execution, padding, capacity, or renderer state.
 15. Verify substitution and ordinary-tag equivalences only through declared encoders/step groupings, and rule-110/Turing/CA material only through explicit realization relations.
 
 ### Completion evidence
