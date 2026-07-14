@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 25 type stages are complete, T08 is in progress, no stage is reopened, and 19 later stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06 and T07 subsequently close under active D119 and D120.
+- Execution status at this sync is Foundation complete, 26 type stages are complete, no stage is in progress or reopened, and 19 later stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, and T08 subsequently close under active D119-D121. T10 is next.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures a DOMAIN/support/topology subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program space with its dimensional character, support, and topology; ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -772,7 +772,7 @@ All T06 evidence is captured; the invariant is placed once in the generic proper
 
 COMPLETE: the exact evidence union reconciles the retained nine-family diagnostic, the 19-family/280-line core, and five governed continuations into 329 unique canonical lines with the disjoint partition `4 direct / 30 CA property relations / 129 CA seed-background-profile controls / 76 sibling SimpleProgram controls / 21 general controls / 69 actual-Index routes`. The physical-asset ledger closes 47 files at `5 included / 29 relation-only / 13 excluded`, with 94 monolith/split references, exact metadata, and zero unresolved remainder.
 
-T06 resolves to the class-2 restriction `evaluate_P(exact_uniform_read_P(b)) = b` over a strictly eligible resolved CA program. Exact elementary/totalistic counts, a nonzero-blank codec adversary, the page-262 `64 total / 32 preserving / 30 displayed` source repair, hostile-boundary separation, finite-cone qualification, and identity preservation pass. D119 adds only generic claim/evidence/selection records; the 15-group Goal 2 handoff covers membership collisions, unsupported shapes, stale/tampered evidence, serialization, and no-cheating checks. No construction, runner branch, update law, outcome, halt, alphabet role, or sparse-background optimization is added, and no prior stage reopens. All six embedded checks, independent review, Markdown/diff gates, and 102 repository tests pass. T07 subsequently completes under D120; next: T08.
+T06 resolves to the class-2 restriction `evaluate_P(exact_uniform_read_P(b)) = b` over a strictly eligible resolved CA program. Exact elementary/totalistic counts, a nonzero-blank codec adversary, the page-262 `64 total / 32 preserving / 30 displayed` source repair, hostile-boundary separation, finite-cone qualification, and identity preservation pass. D119 adds only generic claim/evidence/selection records; the 15-group Goal 2 handoff covers membership collisions, unsupported shapes, stale/tampered evidence, serialization, and no-cheating checks. No construction, runner branch, update law, outcome, halt, alphabet role, or sparse-background optimization is added, and no prior stage reopens. All six embedded checks, independent review, Markdown/diff gates, and 102 repository tests pass. T07 and T08 subsequently complete under D120-D121; next: T10.
 
 ### 26-T07-SYMMETRIC
 
@@ -794,11 +794,11 @@ All T07 evidence is captured; symmetry is not duplicated as family behavior; Goa
 
 COMPLETE after hostile reclosure. The original 357-line/22-asset manifest remains an explicitly superseded bounded diagnostic. The authoritative protocol closes 650 monolith lines at `15/190/25/167/179/74`; its manually adjudicated 162-line supplement is pinned rather than presented as mechanically regenerated. All 114 retained saturation additions have split reverse coverage at `103 exact + 11 variants`. The fixed-point asset universe closes 271 JPEGs/542 references at `4/38/229` with 271 unique hashes.
 
-T07 adds no construction or execution branch: local displacement reflection is a class-2 property over one exact admissible typed read space and a single diagonal action; reflected programs are separate transforms; orbit tables are optional class-3 RULE representations. The repair separates typed positions, component/value/output actions, admissible-space closure `rho_alpha(V_P)=V_P`, and support-point from displacement reflection. D120 is active. All six embedded blocks, independent hostile review, Markdown/diff gates, and 102 repository tests pass. Next: T08.
+T07 adds no construction or execution branch: local displacement reflection is a class-2 property over one exact admissible typed read space and a single diagonal action; reflected programs are separate transforms; orbit tables are optional class-3 RULE representations. The repair separates typed positions, component/value/output actions, admissible-space closure `rho_alpha(V_P)=V_P`, and support-point from displacement reflection. D120 is active. All six embedded blocks, independent hostile review, Markdown/diff gates, and 102 repository tests pass. T08 subsequently completes under D121; next: T10.
 
 ### 27-T08-INITIAL-CONDITIONS
 
-Status: **IN PROGRESS — SOURCE/ASSET/ARCHITECTURE AUDIT ACTIVE** in `goal-1/27-T08-INITIAL-CONDITIONS.md`.
+Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED** in `goal-1/27-T08-INITIAL-CONDITIONS.md`. T08 is an event-zero configuration/class/law axis over an unchanged resolved program; D121 is active.
 
 #### Big Picture Objective
 
@@ -806,11 +806,17 @@ Separate initial-condition experiment classes from program types while preservin
 
 #### Detailed Implementation Plan
 
-Apply the common protocol, emphasizing single-cell, single-gray, random, finite, and other book seed conventions.
+Apply the common protocol, emphasizing exact configurations, deterministic constructors, configuration classes, stochastic laws, complete/cylinder/algorithmic realizations, native support, invariants, finite lowering, boundary, trace, and view distinctions.
 
 #### Completion Requirements
 
 All T08 evidence is captured; seeds remain independent where semantics permit; Goal 2 and global integration are updated.
+
+#### Stage Result
+
+COMPLETE after hostile source, asset, and architecture reclosure. The 16-query source protocol closes 1,205 query-union lines plus five governed continuations, with 701 retained construction lines, 439 duplicate/control lines, and 70 actual-Index routes in a 1,210-entry declared audit. All 701 retained lines have split reverse coverage at `634 exact + 67 non-exact variants`. The frozen asset universe closes 577 JPEGs/1,154 references at `366 direct / 196 relation / 15 control` with 577 unique hashes.
+
+T08 adds no construction-specific DOMAIN, state family, FRONTIER, NEIGHBORHOOD, RULE result, UPDATE policy, successor algebra, executor, outcome, halt, or transition-time RNG. It supplies typed complete configurations, constructors, classes, probability laws, capability-scoped realizations, validation, finite lowering relations, and observers over the unchanged program. Finite cylinders are not complete infinite states; algorithmic fields are not silently equated with ideal product-measure draws; complete native traces remain distinct from proved horizon-scoped decoded lowering observations. D121 is active. The source, asset, semantic, Markdown, diff, independent-review, and 102-test gates pass. Next: T10.
 
 ### 28-T10-EXTENDED-MOBILE
 
