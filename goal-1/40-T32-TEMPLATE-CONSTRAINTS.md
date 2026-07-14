@@ -6,11 +6,11 @@ Status: **IN PROGRESS — ARCHITECTURE RECONSTRUCTED; EVIDENCE ORACLES AND HOSTI
 
 - T32 is CSV physical line 33, `Template Constraint Systems`; `ref/notes/CA-Types.md` section 32 is search vocabulary, not primary mechanics.
 - This is a static declarative construction, not a transition system. A finite relation denotes the set of complete labeled planes whose local pattern at every anchor belongs to an allowed set.
-- The strict main-text profile is binary on the square lattice. Its local support is the oriented five-site cross `Self/North/East/South/West`, so there are `2^5 = 32` possible local templates and `2^32 = 4,294,967,296` allowed-template sets.
+- The strict main-text profile is binary on the square lattice. Its local support is the oriented five-site cross, so there are `2^5 = 32` possible local templates and `2^32 = 4,294,967,296` allowed-template sets. The Book fixes raw sorted `(row,column)` offsets `((-1,0),(0,-1),(0,0),(0,1),(1,0))`; compass names arise only through the explicit T21 Book-frame-to-ENU adapter `(row,column) -> (x=column,y=-row)`.
 - Templates apply at every cell and neighboring anchored occurrences overlap. Overlap is pointwise equality in one candidate field, not a write collision or UPDATE policy (`BOOK:2614-2620`).
 - The strict family is unusually completely classified in the source: `766,979,044` allowed sets have no model and the remaining `3,527,988,252` have a periodic model represented by one of 171 displayed pattern families (`BOOK:2620-2630`). This source theorem does not by itself supply a machine-readable 171-pattern solver table.
-- The Notes define the 32-bit numbering scheme and check finite arrays with alternatives of `3 x 3` Mathematica patterns whose four corners are Blank. The general-rule Notes independently fix the sorted five-offset order and descending binary neighborhood catalog used by the page-941 plate (`BOOK:13513-13520`), so the numeric codec need not be inferred from pixels. The Blank corners are outside the five-site cross support; they are not wildcard-valued semantic slots (`BOOK:14048-14060`).
-- The local extraction renders the four Blank corners as `-`. The official Wolfram Science note gives `_`; this repair must be frozen and fail-closed before the adapter is executable.
+- The Notes define the 32-bit numbering scheme and check finite arrays with alternatives of `3 x 3` Mathematica patterns whose four corners are Blank. The general-rule Notes independently fix the raw sorted five-offset order and descending binary neighborhood catalog used by the page-941 plate (`BOOK:13513-13520`), so the numeric codec need not be inferred from pixels. The Blank corners are outside the five-site cross support; they are not wildcard-valued semantic slots (`BOOK:14048-14060`).
+- The local extraction corrupts two executable tokens: it renders the four Blank corners `_` as `-` and Mathematica `Alternatives` bars `t1 | t2 | t3` as slashes `t1/t2/t3`. The official Wolfram Science note supplies both forms; both repairs must be frozen and fail-closed before the adapter is executable.
 - Allowed sets are exact and oriented. Overall rotation, reflection, and black/white exchange omit equivalent gallery representatives; they are relations between constraints/models, not implicit matching modes (`BOOK:14048`).
 - T31 already owns the generic declarative model-set, exact periodic/open/window scopes, verifier reports, solver-query outcomes, witnesses, certificates, `Unknown`, pointwise model identity, and no-evolution boundary.
 - T32 adds a closed allowed-local-pattern relation node inside that same declarative algebra. It does not add a state class, solver class, executor, frontier, rule result, UPDATE law, seed, or trajectory.
@@ -24,7 +24,7 @@ Status: **IN PROGRESS — ARCHITECTURE RECONSTRUCTED; EVIDENCE ORACLES AND HOSTI
 - **Retained:** T31's generic declarative category is the smallest semantic base. T32 is a tagged closed local-relation schema, not a second top-level constraint system.
 - **Retained:** native models are total fields on a static discrete plane. Exact periodic tiles and finite windows are representations/query scopes, not finite native grids or initial states.
 - **Retained:** every template is a total label map on one declared finite anchored support containing the zero offset; the allowed set may be empty and still denotes a valid, inconsistent relation.
-- **Retained:** support offsets are geometrically named. Generic serialization order is representational; the NKS-numbered strict preset uses the independently source-fixed sorted order `(North,West,Self,East,South)` and descending binary catalog.
+- **Retained:** support offsets are geometrically named only inside a declared coordinate frame. Generic serialization order is representational; the NKS-numbered strict preset uses the independently source-fixed raw sorted `(row,column)` order and descending binary catalog, with compass names supplied by an explicit frame adapter.
 - **Retained:** exact orientation is semantic. Rotation/reflection/color exchange must transform explicit data or be enumerated in the allowed set.
 - **Retained:** distinct support offsets remain distinct occurrences even when a tiny periodic presentation maps them to the same residue cell.
 - **Retained:** model verification and solving remain separate. Pairwise template compatibility, propagation, square-spiral extension, backtracking, memoization, symmetry pruning, and a recovered 171-pattern decision table are solver/analyzer concerns.
@@ -49,7 +49,7 @@ Reconstruct T32 as exact finite allowed-pattern relation data over static labele
 
 ## Source Audit
 
-`40-T32-source-oracle.py` will be the fail-closed textual evidence record. It must close direct names, allowed/fixed templates, overlap, exact counts, the 171-pattern result, the source-derived sorted-offset/template order and constraint numbering, Notes implementation, Blank repair, finite/open checking, solver/search boundaries, T31/T33 boundaries, later template sizes/colors, CA/tiling/subshift relations, actual Index routes, governed image links, split reverse provenance, and false positives such as unrelated CA rule counts.
+`40-T32-source-oracle.py` will be the fail-closed textual evidence record. It must close direct names, allowed/fixed templates, overlap, exact counts, the 171-pattern result, the source-derived sorted-offset/template order and constraint numbering, Notes implementation, Blank-and-Alternatives repair, finite/open checking, solver/search boundaries, T31/T33 boundaries, later template sizes/colors, CA/tiling/subshift relations, actual Index routes, governed image links, split reverse provenance, and false positives such as unrelated CA rule counts.
 
 Final frozen counts, digests, snapshot hashes, source-oracle SHA, and unresolved total are pending the independent source audit.
 
@@ -83,12 +83,12 @@ Final frozen counts, digests, snapshot hashes, source-oracle SHA, and unresolved
 ### E06 — strict numbering and template catalog
 
 - Source: `BOOK:13513-13520`, `14048-14052`.
-- Establishes: there are 32 oriented cross templates; sorted offsets are `(North,West,Self,East,South)`; `Reverse[Table[IntegerDigits[...]]]` fixes the descending binary catalog displayed on page 941; and the 32-bit integer selects catalog positions. This makes the numeric codec textually derivable and independently checkable without raster transcription.
+- Establishes: there are 32 oriented cross templates; the raw Book offsets are sorted as `((-1,0),(0,-1),(0,0),(0,1),(1,0))`; `Reverse[Table[IntegerDigits[...]]]` fixes the descending binary catalog displayed on page 941; and the 32-bit integer selects catalog positions. This makes the numeric codec textually derivable and independently checkable without raster transcription. Compass labels require the explicit T21 frame adapter.
 
 ### E07 — exact finite-array adapter
 
 - Source: `BOOK:14055-14060` plus the hash-bound official repair.
-- Establishes: alternatives of cross-shaped `3 x 3` patterns are matched on every complete finite-array window. Blank corners project away; this finite checker does not create a global boundary policy.
+- Establishes: the official `t1 | t2 | t3` is Mathematica `Alternatives`, and alternatives of cross-shaped `3 x 3` patterns are matched on every complete finite-array window. Blank corners project away; this finite checker does not create a global boundary policy.
 
 ### E08 — 171-pattern identification is solver work
 
@@ -150,6 +150,8 @@ support   = {Self, North, East, South, West}
 allowed   = any subset of alphabet^support
 ```
 
+For source identity, the strict support is stored in the raw Book `(row,column)` frame and order above. A declared adapter may expose the equivalent ENU names; neither storage array axes nor compass labels are implicit.
+
 The empty allowed set is valid syntax with no models. Duplicate offsets, a missing zero anchor, mixed-dimensional offsets, undeclared labels, partial templates, duplicate templates, and callbacks are invalid syntax. Whether a valid relation has a model is a semantic/query question, not constructor validation.
 
 For candidate model `X` and anchor `p`:
@@ -166,9 +168,9 @@ violation_at(C,X,p) =
 
 ### Strict Notes adapter
 
-The Notes' semantic support is the five-site cross. Each repaired `3 x 3` Mathematica alternative has `_` at all four corners and literal `0/1` on the cross. A closed importer must:
+The Notes' semantic support is the five-site cross. The repaired outer expression is an explicit `Alternatives` tree, and each repaired `3 x 3` alternative has `_` at all four corners and literal `0/1` on the cross. A closed importer must:
 
-1. verify exactly that fixed shape and Blank-corner schema;
+1. verify the repaired `Alternatives` syntax and exactly that fixed shape and Blank-corner schema;
 2. project the four corners away;
 3. map the five named positions to an `Offset -> Label` template;
 4. collect alternatives as an unordered allowed set; and
@@ -201,7 +203,7 @@ Every anchor observes the same candidate field. If two anchored occurrences over
 
 Allowed templates are exact oriented data. Rotation/reflection/color exchange acts by an explicit bijection on support and labels, inducing a mapped relation and mapped models. It is not semantic equality, automatic closure, or matching policy. Gallery orbit reduction is observer metadata.
 
-The NKS integer is a codec over an ordered catalog of 32 templates. `BOOK:13513-13520` fixes sorted offsets `(N,W,Self,E,S)` and the catalog as descending five-bit words; `BOOK:14050` selects positions whose 32-bit mask digit is `1`. Generic relation execution still uses explicit templates, while the strict numeric constructor is a guarded source-derived codec with exhaustive singleton-bit and representative round-trip conformance.
+The NKS integer is a codec over an ordered catalog of 32 templates. `BOOK:13513-13520` fixes the raw sorted `(row,column)` offsets and the catalog as descending five-bit words; `BOOK:14050` selects positions whose 32-bit mask digit is `1`. Generic relation execution still uses explicit templates, while the strict numeric constructor is a guarded source-derived codec with exhaustive singleton-bit and representative round-trip conformance. Direction names are adapter metadata, not part of the raw codec.
 
 ### Scope, verification, and queries
 
@@ -287,7 +289,7 @@ The checked-in `src/ca` realization has no declarative constraint modules, scope
 ## Completion Requirements
 
 - [ ] Every direct name, alias, strict line, variant, Notes item, actual Index route, continuation, split witness, image link, and false positive is dispositioned with zero unresolved strict mechanics.
-- [ ] The official Blank repair and finite Notes adapter are frozen fail-closed.
+- [ ] The official Blank-and-Alternatives repair and finite Notes adapter are frozen fail-closed.
 - [ ] The governed asset universe and transcription boundary are exact and hash-bound.
 - [ ] Static support, alphabet, templates, overlap, denotation, scopes, verification, query outcomes, symmetries, numbering, and T31/T33 boundaries are reconstructed.
 - [ ] T31 lowering and the orientation counterexample prove the exact reuse boundary.

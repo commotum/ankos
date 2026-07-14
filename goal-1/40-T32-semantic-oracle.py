@@ -3,10 +3,13 @@
 
 T32 is a declarative model-set construction, not a transition construction.
 Its strict Book profile is a binary field on ``Z^2`` whose oriented
-``(North, West, Self, East, South)`` word at every lattice point belongs to a
-fixed allowed set.  The five slots are the non-corner entries of the displayed
-3 by 3 cross.  Adjacent occurrences overlap because all words are views of one
-pointwise field; they are not independently placeable tiles.
+word in the raw sorted ``(row, column)`` offset order
+``((-1,0),(0,-1),(0,0),(0,1),(1,0))`` belongs to a fixed allowed set.  Only
+after the explicit adapter ``(row,column) -> (x=column,y=-row)`` may these
+slots be called ``(North, West, Self, East, South)``.  The five slots are the
+non-corner entries of the displayed 3 by 3 cross.  Adjacent occurrences
+overlap because all words are views of one pointwise field; they are not
+independently placeable tiles.
 
 The source boundary is local and explicit:
 
@@ -15,6 +18,8 @@ The source boundary is local and explicit:
   overlap;
 * BOOK:2620 and BOOK:14048 establish 32 binary five-slot templates and 2^32
   possible allowed sets for the strict profile;
+* BOOK:13513-13520 fixes raw sorted row/column offsets and the descending
+  binary configuration catalog; compass names are adapter-derived, not source;
 * BOOK:2634 begins T33 by additionally requiring a particular allowed
   template to occur somewhere;
 * BOOK:2646 says a constraint supplies no direct pattern-production procedure;
@@ -72,13 +77,27 @@ Tile = tuple[tuple[int, ...], ...]
 ValueTable = tuple[tuple[Coord2, int], ...]
 
 BOOK_CROSS_OFFSETS: tuple[Offset2, ...] = (
-    (-1, 0),  # North
-    (0, -1),  # West
-    (0, 0),   # Self
-    (0, 1),   # East
-    (1, 0),   # South
+    (-1, 0),  # previous row, same column
+    (0, -1),  # same row, previous column
+    (0, 0),   # anchor row and column
+    (0, 1),   # same row, next column
+    (1, 0),   # next row, same column
 )
-BOOK_CROSS_SLOT_NAMES = ("North", "West", "Self", "East", "South")
+BOOK_CROSS_SLOT_NAMES = (
+    "row-1,column",
+    "row,column-1",
+    "row,column",
+    "row,column+1",
+    "row+1,column",
+)
+ENU_CROSS_OFFSETS: tuple[Offset2, ...] = (
+    (0, 1),
+    (-1, 0),
+    (0, 0),
+    (1, 0),
+    (0, -1),
+)
+ADAPTER_DERIVED_DIRECTION_NAMES = ("North", "West", "Self", "East", "South")
 SOURCE_BINARY_CATALOG: tuple[Template, ...] = tuple(
     tuple((value >> shift) & 1 for shift in range(4, -1, -1))
     for value in range(31, -1, -1)
@@ -92,7 +111,7 @@ SOURCE_CLAIMS: tuple[tuple[int, str], ...] = (
     (2634, "a particular template from this set must appear at least somewhere"),
     (2646, "there is no such direct procedure"),
     (2654, "no pattern that satisfies the constraint in a limited region"),
-    (13513, "for 2D 5-neighbor rules it is"),
+    (13513, r"for 2D 5-neighbor rules it is  $\{(-1, 0), \{0, -1\}, \{0, 0\}, \{0, 1\}, \{1, 0\}\}$"),
     (13513, "offset lists are always taken to be in the order given by *Sort*"),
     (13516, "Reverse[Table[IntegerDigits[i - 1,"),
     (13517, "k, Length[os]], {i, k^Length[os]}]]"),
@@ -128,7 +147,8 @@ GOAL2_DELTA = (
     "certificate infrastructure and add no rollout, frontier, rule-result, or "
     "update branch.  AllowedOrientedTemplates in this oracle is a proof model, "
     "not a prescribed Goal 2 API name.  Include the guarded source-derived "
-    "32-bit numeric codec only for the strict binary N,W,Self,E,S cross preset."
+    "32-bit numeric codec only for the strict binary raw Book row/column cross "
+    "preset, with compass names available solely through the checked Book/ENU adapter."
 )
 
 
@@ -149,6 +169,24 @@ def checked_coord(value: object, name: str) -> Coord2:
     if len(raw) != 2:
         raise ValueError(f"{name} must be a row/column pair")
     return (exact_int(raw[0], f"{name}.row"), exact_int(raw[1], f"{name}.column"))
+
+
+def book_row_column_to_enu(value: object) -> Coord2:
+    """Explicit semantic adapter: raw Book (row,column) to (east,north)."""
+
+    row, column = checked_coord(value, "Book row/column offset")
+    return (column, -row)
+
+
+def enu_to_book_row_column(value: object) -> Coord2:
+    """Inverse adapter from (east,north) back to raw Book (row,column)."""
+
+    raw = exact_tuple(value, "ENU offset")
+    if len(raw) != 2:
+        raise ValueError("ENU offset must be an east/north pair")
+    east = exact_int(raw[0], "ENU east offset")
+    north = exact_int(raw[1], "ENU north offset")
+    return (-north, east)
 
 
 def checked_alphabet_size(value: object) -> int:
@@ -378,6 +416,50 @@ def book_cross_relation(allowed: object) -> AllowedOrientedTemplates:
     return AllowedOrientedTemplates(2, BOOK_CROSS_OFFSETS, exact_tuple(allowed, "allowed"))
 
 
+def fixed_binary_digits(value: object, width: object) -> tuple[int, ...]:
+    number = exact_int(value, "binary number")
+    checked_width = exact_int(width, "binary width")
+    if checked_width <= 0:
+        raise ValueError("binary width must be positive")
+    if number < 0 or number >= 2**checked_width:
+        raise ValueError("binary number does not fit the declared width")
+    return tuple(
+        (number >> shift) & 1 for shift in range(checked_width - 1, -1, -1)
+    )
+
+
+def selected_catalog_templates(constraint_number: object) -> tuple[Template, ...]:
+    """BOOK:14050: select 1-indexed catalog positions whose fixed digit is one."""
+
+    digits = fixed_binary_digits(constraint_number, len(SOURCE_BINARY_CATALOG))
+    return tuple(
+        template
+        for template, digit in zip(SOURCE_BINARY_CATALOG, digits)
+        if digit == 1
+    )
+
+
+def decode_constraint_number(constraint_number: object) -> AllowedOrientedTemplates:
+    return book_cross_relation(selected_catalog_templates(constraint_number))
+
+
+def encode_constraint_number(relation: AllowedOrientedTemplates) -> int:
+    """Checked inverse for the strict binary cross relation only."""
+
+    if type(relation) is not AllowedOrientedTemplates:
+        raise TypeError("constraint-number encoding requires AllowedOrientedTemplates")
+    if relation.alphabet_size != 2 or relation.offsets != BOOK_CROSS_OFFSETS:
+        raise ValueError("constraint-number encoding is defined only for the strict binary cross")
+    allowed = set(relation.allowed)
+    digits = tuple(
+        1 if template in allowed else 0 for template in SOURCE_BINARY_CATALOG
+    )
+    number = 0
+    for digit in digits:
+        number = 2 * number + digit
+    return number
+
+
 def all_words(alphabet_size: int, arity: int) -> tuple[Template, ...]:
     size = checked_alphabet_size(alphabet_size)
     checked_arity = exact_int(arity, "template arity")
@@ -508,7 +590,10 @@ def direct_verify_periodic(native: NativeBinaryTorus, allowed: frozenset[Templat
 
 
 def direct_count_word_at(native: NativeBinaryTorus, anchor: object) -> Template:
-    """Independent T31 read in compiled order: N, W, E, S, then center."""
+    """Independent T31 read in raw Book cardinal-offset order, then center.
+
+    The direction aliases here are justified only by ``book_row_column_to_enu``.
+    """
 
     if type(native) is not NativeBinaryTorus:
         raise TypeError("direct count verifier requires NativeBinaryTorus")
@@ -1165,11 +1250,64 @@ def audit_source_claims() -> int:
     return len(SOURCE_CLAIMS)
 
 
+def audit_book_enu_adapter() -> int:
+    mapped = tuple(book_row_column_to_enu(offset) for offset in BOOK_CROSS_OFFSETS)
+    assert mapped == ENU_CROSS_OFFSETS
+    assert ADAPTER_DERIVED_DIRECTION_NAMES == (
+        "North",
+        "West",
+        "Self",
+        "East",
+        "South",
+    )
+    for book_offset, enu_offset in zip(BOOK_CROSS_OFFSETS, ENU_CROSS_OFFSETS):
+        assert enu_to_book_row_column(enu_offset) == book_offset
+        assert book_row_column_to_enu(enu_to_book_row_column(enu_offset)) == enu_offset
+    return len(BOOK_CROSS_OFFSETS)
+
+
 def audit_cross_codec() -> int:
     for template in BINARY_TEMPLATES:
         matrix = cross_to_matrix(template)
         assert matrix_to_cross(matrix) == template
     return len(BINARY_TEMPLATES)
+
+
+def audit_source_numeric_codec() -> tuple[int, int, int, tuple[int, ...]]:
+    assert len(SOURCE_BINARY_CATALOG) == 32
+    assert len(set(SOURCE_BINARY_CATALOG)) == 32
+    assert SOURCE_BINARY_CATALOG[0] == (1, 1, 1, 1, 1)
+    assert SOURCE_BINARY_CATALOG[-1] == (0, 0, 0, 0, 0)
+    assert SOURCE_BINARY_CATALOG == tuple(
+        fixed_binary_digits(value, 5) for value in range(31, -1, -1)
+    )
+
+    singleton_round_trips = 0
+    for position in range(32):
+        number = 1 << (31 - position)
+        selected = selected_catalog_templates(number)
+        assert selected == (SOURCE_BINARY_CATALOG[position],)
+        relation = decode_constraint_number(number)
+        assert relation.allowed == tuple(sorted(selected))
+        assert encode_constraint_number(relation) == number
+        singleton_round_trips += 1
+
+    representatives = (0, 2**32 - 1, 1_384_774, 328_778_790)
+    representative_counts: list[int] = []
+    for number in representatives:
+        selected = selected_catalog_templates(number)
+        relation = decode_constraint_number(number)
+        assert set(relation.allowed) == set(selected)
+        assert encode_constraint_number(relation) == number
+        assert decode_constraint_number(encode_constraint_number(relation)) == relation
+        representative_counts.append(len(selected))
+    assert tuple(representative_counts) == (0, 32, 8, 12)
+    return (
+        len(SOURCE_BINARY_CATALOG),
+        singleton_round_trips,
+        len(representatives),
+        tuple(representative_counts),
+    )
 
 
 def audit_exhaustive_commutation() -> tuple[int, int, int, int]:
@@ -1532,6 +1670,14 @@ def audit_hostile_validation() -> int:
         (ValueError, lambda: rotate_coordinate((0, 0), 4)),
         (ValueError, lambda: rotate_cross_relation(AllowedOrientedTemplates(2, ((0, 0),), ((0,),)), 1)),
         (TypeError, lambda: same_rotation_orbit(PeriodicPresentation(2, ((0,),)), object())),
+        (TypeError, lambda: decode_constraint_number(True)),
+        (ValueError, lambda: decode_constraint_number(-1)),
+        (ValueError, lambda: decode_constraint_number(2**32)),
+        (TypeError, lambda: encode_constraint_number(object())),
+        (ValueError, lambda: encode_constraint_number(AllowedOrientedTemplates(3, BOOK_CROSS_OFFSETS, ()))),
+        (ValueError, lambda: encode_constraint_number(AllowedOrientedTemplates(2, ((0, 0),), ((0,),)))),
+        (TypeError, lambda: book_row_column_to_enu((0, True))),
+        (ValueError, lambda: enu_to_book_row_column((0,))),
     )
     for exception, function in hostile:
         expect_raises(exception, function)
@@ -1572,12 +1718,19 @@ def audit_no_transition_surface() -> tuple[int, int, int]:
     return len(relation_fields), len(histogram_fields), len(verification_fields)
 
 
-EXPECTED_DIGEST = "f6e2d1206adc62ab31a660ff533c57522fdbc832cfcbd94e01bb290cc11399db"
+EXPECTED_DIGEST = "4f884619510f0c94a9bb26f1ba4006495dbd57f01f145a88050b188f6607a016"
 
 
 def main() -> None:
     source_claims = audit_source_claims()
+    book_enu_adapter_round_trips = audit_book_enu_adapter()
     codec_round_trips = audit_cross_codec()
+    (
+        source_catalog_templates,
+        numeric_singleton_round_trips,
+        numeric_representative_round_trips,
+        numeric_representative_counts,
+    ) = audit_source_numeric_codec()
     configurations, commutations, local_checks, representation_round_trips = (
         audit_exhaustive_commutation()
     )
@@ -1610,10 +1763,15 @@ def main() -> None:
 
     facts = (
         ("source_claims", source_claims),
+        ("book_enu_adapter_round_trips", book_enu_adapter_round_trips),
         ("open_source_matters", len(OPEN_SOURCE_MATTERS)),
         ("strict_templates", len(BINARY_TEMPLATES)),
         ("strict_allowed_sets", 2 ** len(BINARY_TEMPLATES)),
         ("codec_round_trips", codec_round_trips),
+        ("source_catalog_templates", source_catalog_templates),
+        ("numeric_singleton_round_trips", numeric_singleton_round_trips),
+        ("numeric_representative_round_trips", numeric_representative_round_trips),
+        ("numeric_representative_counts", numeric_representative_counts),
         ("configurations", configurations),
         ("commutations", commutations),
         ("local_checks", local_checks),
@@ -1647,7 +1805,9 @@ def main() -> None:
         ("histogram_field_count", histogram_field_count),
         ("verification_field_count", verification_field_count),
         ("architecture_classes", len(ARCHITECTURE_CLASSIFICATION)),
-        ("strict_relation", "AllowedOrientedTemplates(N,W,Self,E,S)"),
+        ("strict_relation", "AllowedOrientedTemplates(raw_sorted_Book_row_column_cross)"),
+        ("direction_names", "derived_only_by_(row,column)_to_(east=column,north=-row)_adapter"),
+        ("numeric_codec", "source_descending_binary_catalog_plus_fixed_32_bit_positional_subset"),
         ("proof_envelope", "native_cross_to_generic_offsets_full_violation_report"),
         ("histogram_lowering", "T31_center_conditioned_histograms_losslessly_compile_to_T32_exact_words"),
         ("square_symmetry", "explicit_C4_support_template_model_report_commutation_without_implicit_matching"),
@@ -1668,7 +1828,8 @@ def main() -> None:
     print("T32 semantic oracle: PASS")
     print(
         f"source_claims={source_claims}; open_source_matters={len(OPEN_SOURCE_MATTERS)}; "
-        f"strict_templates={len(BINARY_TEMPLATES)}; allowed_sets={2 ** len(BINARY_TEMPLATES)}"
+        f"strict_templates={len(BINARY_TEMPLATES)}; allowed_sets={2 ** len(BINARY_TEMPLATES)}; "
+        f"book_ENU_adapter_round_trips={book_enu_adapter_round_trips}"
     )
     print(
         f"exhaustive_configurations={configurations}; commutations={commutations}; "
@@ -1682,6 +1843,12 @@ def main() -> None:
     print(
         f"cross_codec_round_trips={codec_round_trips}; singleton_accepts={singleton_accepts}; "
         f"singleton_rejects={singleton_rejects}; orientation_counterexamples={orientation_counterexamples}"
+    )
+    print(
+        f"source_catalog_templates={source_catalog_templates}; "
+        f"numeric_singleton_round_trips={numeric_singleton_round_trips}; "
+        f"numeric_representative_round_trips={numeric_representative_round_trips}; "
+        f"representative_allowed_counts={numeric_representative_counts}"
     )
     print(
         f"support_rotations={support_transforms}; symmetry_commutations={symmetry_commutations}; "

@@ -237,6 +237,17 @@ QUERIES = {
         r"\bpossible neighborhood configurations are\b|"
         r"\bshown on page 53 for elementary rules and page 941 for 5-neighbor rules\b"
     ),
+    "Q37": (
+        r"\bnotion of constraints is often introduced[^.]{0,180}\bevolution rules\b|"
+        r"\btwo-dimensional patterns that arise from the constraints[^.]{0,220}\binvariant states\b|"
+        r"\bTypical behavior of two-dimensional cellular automata[^.]{0,160}\binvariant\b"
+    ),
+    "Q38": (
+        r"\bPattern-avoiding sequences\b|"
+        r"\bno pair of identical blocks ever appear together\b|"
+        r"\bno triple of identical blocks appear together\b|"
+        r"\bpatterns of blocks can be avoided\b"
+    ),
 }
 
 
@@ -261,7 +272,7 @@ NATIVE_MATCHED = line_set(
     "14048,14050,14052,14054,14055,14058-14060,14097"
 )
 RELATION_MATCHED = line_set(
-    "5776,5788,6976,13513,13520,13551,"
+    "4068,4072,4082,5776,5788,6976,13513,13520,13551,"
     "14040,14044,14047,14063,14099,"
     "14113,14115,14124,14134,"
     "16022,16367,16369,16373"
@@ -270,12 +281,12 @@ CONTROL_MATCHED = line_set(
     "2568,2590,2596,2600,2608,2610,"
     "2634,2640,2646,2650,2654,2672,2680,2684,2688,2696,"
     "4046,4244,4324,6948,14027,14080,14082,14083,"
-    "14145,14146,14275,15207,15930,17431,19816,20769"
+    "14145,14146,14147,14151,14155,14275,15207,15930,17431,19816,20769"
 )
 
 NATIVE_CONTINUATIONS = line_set("14057,14061")
 RELATION_CONTINUATIONS = line_set(
-    "2322,5778,5780,5786,6974,"
+    "2322,4080,4084,5778,5780,5786,6974,"
     "13515-13518,14042,14046,"
     "14065-14067,14069,14071-14078,"
     "14109,14111,14117,14119,14121,14123,"
@@ -283,10 +294,10 @@ RELATION_CONTINUATIONS = line_set(
     "16371,17463,17465"
 )
 CONTROL_CONTINUATIONS = line_set(
-    "2576,2584,2598,2606,2632,2636,2638,"
+    "2576,2584,2598,2606,2632,2636,2638,4074,4076,4078,"
     "2642,2644,2648,2652,2656,2658,2660,2662,2664,2666,2668,"
     "2670,2674,2676,2678,2682,2686,2690,2692,2694,2698,"
-    "14084,14144"
+    "14084,14144,14149,14153"
 )
 
 NATIVE_EVIDENCE = NATIVE_MATCHED | NATIVE_CONTINUATIONS
@@ -307,10 +318,10 @@ EXCLUDED = frozenset().union(*EXCLUDED_CLASS.values())
 IMAGE_RE = re.compile(r"^!\[[^\]]*\]\(([^)]+)\)$")
 NATIVE_IMAGE_LINES = line_set("2616,2626,2628,14052")
 RELATION_IMAGE_LINES = line_set(
-    "2322,5786,6974,14042,14111,14117,14136,14138,14142,17465"
+    "2322,4080,5786,6974,14042,14111,14117,14136,14138,14142,17465"
 )
 CONTROL_IMAGE_LINES = line_set(
-    "2576,2584,2598,2606,2638,2662,2670,2682,2686,2690,2692"
+    "2576,2584,2598,2606,2638,2662,2670,2682,2686,2690,2692,4074,4076"
 )
 GOVERNED_IMAGE_LINES = (
     NATIVE_IMAGE_LINES | RELATION_IMAGE_LINES | CONTROL_IMAGE_LINES
@@ -374,7 +385,9 @@ LOCAL_CORRUPT_ALLOWED_PATTERN = r"$t_1/t_2/t_3$"
 LOCAL_CORRUPT_TEMPLATE = (
     r"\{\{-, 1, -\}, \{0, 0, 1\}, \{-, 0, -\}\}"
 )
-CARDINAL_OFFSETS = ((-1, 0), (0, -1), (0, 0), (0, 1), (1, 0))
+BOOK_CARDINAL_OFFSETS = ((-1, 0), (0, -1), (0, 0), (0, 1), (1, 0))
+EXPECTED_ENU_OFFSETS = ((0, 1), (-1, 0), (0, 0), (1, 0), (0, -1))
+EXPECTED_ENU_NAMES = ("N", "W", "C", "E", "S")
 
 
 EXPECTED_QUERY = {
@@ -494,21 +507,48 @@ EXPECTED_SPLIT_MANIFEST_DIGEST = (
 
 # Filled from the independently recomputed reverse joins below.  These values
 # bind both exact duplication and normalized one-to-one provenance witnesses.
-EXPECTED_SPLIT_QUERY = (0, "")
-EXPECTED_SPLIT_QUERY_EXACT = (0, "")
-EXPECTED_SPLIT_QUERY_NONEXACT = (0, "")
-EXPECTED_SPLIT_QUERY_MAPPING = (0, "")
-EXPECTED_SPLIT_RETAINED_EXACT = (0, "")
-EXPECTED_SPLIT_RETAINED_NONEXACT = (0, "")
-EXPECTED_SPLIT_RETAINED_MAPPING = (0, "")
-EXPECTED_MONOLITH_ONLY = (0, "")
-EXPECTED_ATLAS_HITS = (0, "")
+EXPECTED_SPLIT_QUERY = (
+    81,
+    "c2f4dbcfef108d45b5713ce6295b45b3e7adfabc64c57d8e74a13fc837bbb145",
+)
+EXPECTED_SPLIT_QUERY_EXACT = (
+    72,
+    "7e940e324929ebddac50095dddfc1d9bc9efdac8746d5d1aecc35779a83fd580",
+)
+EXPECTED_SPLIT_QUERY_NONEXACT = (
+    9,
+    "bec8940b39c59c8891c7f9ab9bbda6df120ced4a5885fd6eebb2dbb9ebed1c32",
+)
+EXPECTED_SPLIT_QUERY_MAPPING = (
+    9,
+    "74462d069019f277540e2695bff55714c5ebe95667e75a971f21327db856cf2a",
+)
+EXPECTED_SPLIT_RETAINED_EXACT = (
+    107,
+    "9f54eba108226aa196fcab88ab5625e40157611efc962e0736a152284b994fd8",
+)
+EXPECTED_SPLIT_RETAINED_NONEXACT = (
+    32,
+    "855c4ddc2779f4e79f9e62e365a28748cee630356da9b8f90cdde0f2ebe5fd7f",
+)
+EXPECTED_SPLIT_RETAINED_MAPPING = (
+    32,
+    "166dcd0f2f2b3d55d2161f901a1620e78168aa50c6494b91809faee8622c7ae1",
+)
+EXPECTED_MONOLITH_ONLY = (
+    0,
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+)
+EXPECTED_ATLAS_HITS = (
+    2,
+    "dd39606da577b951d544e3e059f492e5932d034f4cd462fcb22e29b1a77f93ed",
+)
 
 SOURCE_MODEL_RECORDS = (
     "category:declarative model-set relation, not transition evolution",
     "strict-domain:static discrete 2D total field with no time axis",
     "strict-alphabet:binary ordered symbols 0,1",
-    "strict-footprint:source-derived serialized (N,W,C,E,S) cardinal cross",
+    "strict-footprint:raw sorted Book row,column cross plus explicit ENU basis codec",
     "strict-clause:exact oriented five-symbol assignment",
     "strict-allowed:finite set drawn from all 32 assignments",
     "satisfaction:every translated footprint assignment is allowed",
@@ -519,12 +559,16 @@ SOURCE_MODEL_RECORDS = (
     "periodic:presentation/witness property, not finite boundary policy",
     "checker:external finite MatchQ verification over overlapping 3x3 windows",
     "search:external square-spiral/backtracking/query algorithm",
+    "compatibility-screen:eight-position test is enumeration pruning, not model data",
     "T31-boundary:center-conditioned neighbor counts lose orientation",
     "T33-boundary:global required occurrence is an additional relation",
     "extension:larger complete templates and more finite colors are source-backed",
     "execution:no seed/frontier/write/update/successor/runner branch",
 )
-EXPECTED_SOURCE_MODEL = (0, "")
+EXPECTED_SOURCE_MODEL = (
+    18,
+    "23a617037c8f508dc2e16b21eb4d12dd0c5cdda10bb9d26e32709bacccd964a1",
+)
 
 
 def digest(values: set[int] | frozenset[int]) -> str:
@@ -567,13 +611,13 @@ def fixed_binary_digits(number: int, width: int) -> tuple[int, ...]:
 def proof_template_universe() -> frozenset[tuple[int, ...]]:
     """All strict assignments, independent of the unrecovered raster order."""
 
-    return frozenset(itertools.product((0, 1), repeat=len(CARDINAL_OFFSETS)))
+    return frozenset(itertools.product((0, 1), repeat=len(BOOK_CARDINAL_OFFSETS)))
 
 
 def source_template_catalog() -> tuple[tuple[int, ...], ...]:
     """BOOK:13513-20 order, independently cross-referenced to page 941."""
 
-    ascending = tuple(itertools.product((0, 1), repeat=len(CARDINAL_OFFSETS)))
+    ascending = tuple(itertools.product((0, 1), repeat=len(BOOK_CARDINAL_OFFSETS)))
     return tuple(reversed(ascending))
 
 
@@ -607,6 +651,13 @@ def constraint_number_from_allowed(allowed: frozenset[tuple[int, ...]]) -> int:
     return constraint_number_from_positions(positions)
 
 
+def book_row_column_to_enu(offset: tuple[int, int]) -> tuple[int, int]:
+    """Explicit basis map: Book array (row,column) to ENU (x,y)."""
+
+    row, column = offset
+    return column, -row
+
+
 def periodic_cross_read(
     fundamental: tuple[tuple[int, ...], ...], row: int, column: int
 ) -> tuple[int, ...]:
@@ -620,7 +671,7 @@ def periodic_cross_read(
     height, width = len(fundamental), len(fundamental[0])
     return tuple(
         fundamental[(row + drow) % height][(column + dcolumn) % width]
-        for drow, dcolumn in CARDINAL_OFFSETS
+        for drow, dcolumn in BOOK_CARDINAL_OFFSETS
     )
 
 
@@ -632,7 +683,7 @@ def periodic_cross_handles(
         raise ValueError("periods must be positive")
     return tuple(
         ((row + drow) % height, (column + dcolumn) % width)
-        for drow, dcolumn in CARDINAL_OFFSETS
+        for drow, dcolumn in BOOK_CARDINAL_OFFSETS
     )
 
 
@@ -979,10 +1030,23 @@ def main() -> int:
         and "Reverse[Table[IntegerDigits[i - 1," in at(13516)
         and "k, Length[os]], {i, k^Length[os]}]]" in at(13517)
         and "page 941 for 5-neighbor rules" in at(13520)
+        and tuple(map(book_row_column_to_enu, BOOK_CARDINAL_OFFSETS))
+        == EXPECTED_ENU_OFFSETS
+        and tuple(
+            {
+                (0, 1): "N",
+                (-1, 0): "W",
+                (0, 0): "C",
+                (1, 0): "E",
+                (0, -1): "S",
+            }[offset]
+            for offset in EXPECTED_ENU_OFFSETS
+        )
+        == EXPECTED_ENU_NAMES
     )
     ok &= offsets_ok
     print(
-        "source_exact_sorted_N_W_C_E_S_offsets_and_page941_catalog_order",
+        "source_raw_sorted_row_column_offsets_explicit_ENU_codec_page941_order",
         "OK" if offsets_ok else "MISMATCH",
     )
 
@@ -1034,7 +1098,7 @@ def main() -> int:
         and tuple(source_pattern[row][column] for row, column in ((0, 0), (0, 2), (2, 0), (2, 2)))
         == ("_", "_", "_", "_")
         and all(value != "_" for value in projected)
-        and len(CARDINAL_OFFSETS) == 5
+        and len(BOOK_CARDINAL_OFFSETS) == 5
     )
     ok &= adapter_ok
     print(
@@ -1043,14 +1107,19 @@ def main() -> int:
         projected,
     )
 
-    fundamental = ((0, 1, 0), (1, 0, 1))
+    fundamental = (
+        (0, 1, 0, 1),
+        (1, 0, 1, 0),
+        (0, 1, 0, 1),
+        (1, 0, 1, 0),
+    )
     periodic_allowed = frozenset(
         periodic_cross_read(fundamental, row, column)
         for row in range(len(fundamental))
         for column in range(len(fundamental[0]))
     )
-    handles_here = periodic_cross_handles((2, 3), 0, 0)
-    handles_east = periodic_cross_handles((2, 3), 0, 1)
+    handles_here = periodic_cross_handles((4, 4), 0, 0)
+    handles_east = periodic_cross_handles((4, 4), 0, 1)
     overlap_ok = (
         periodic_model_satisfies(fundamental, periodic_allowed)
         and len(periodic_allowed) == 2
