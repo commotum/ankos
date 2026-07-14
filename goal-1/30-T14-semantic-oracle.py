@@ -4,8 +4,9 @@
 This is research evidence, not runtime code.  It proves that Wolfram's finite
 neighbor-dependent substitution step is a restriction of the same ordered
 generation-emission UPDATE used by T13 once FRONTIER and NEIGHBORHOOD select
-overlapping right-context reads.  It also keeps the Notes behavior on words of
-length below two separate from the source-defined native input profile.
+overlapping right-context reads.  It also proves the unguarded Notes behavior
+on empty and singleton words without confusing zero eligible emissions with an
+epsilon-valued rule row.
 """
 
 from __future__ import annotations
@@ -99,10 +100,6 @@ class OrderedGenerationStep:
     successor: OrderedConfiguration
     child_intervals: tuple[ChildInterval, ...]
     dropped_sources: tuple[int, ...]
-
-
-class SourceUndefined(ValueError):
-    """The book does not establish the native short-word input profile."""
 
 
 class OverlappingReplacementSpans(ValueError):
@@ -248,12 +245,7 @@ def shared_t13_step(
 def shared_t14_notes_step(
     table: RuleTable, configuration: OrderedConfiguration
 ) -> OrderedGenerationStep:
-    """Branch-free pipeline matching the finite Notes expression.
-
-    For words of length zero or one this is an implementation-derived
-    totalization only; ``native_defined_step`` deliberately leaves that source
-    profile undefined.
-    """
+    """Branch-free pipeline matching the unguarded finite Notes expression."""
     active = all_right_context_anchors(configuration)
     reads = read_self_right(configuration, active)
     emissions = pair_rule_emissions(table, active, reads)
@@ -267,14 +259,8 @@ def notes_partition_step(table: RuleTable, word: Word) -> Word:
     return tuple(value for pair in pairs for value in table[pair])
 
 
-def native_defined_step(table: RuleTable, word: Word) -> Word:
-    """Source-defined profile: defer validity/outcome for words below length 2."""
-    word = checked_word(word)
-    if len(word) < 2:
-        raise SourceUndefined(
-            "T14 source does not establish whether short words are native states, "
-            "terminal outcomes, or continued Notes-extension states"
-        )
+def native_step(table: RuleTable, word: Word) -> Word:
+    """Exact finite native step, including zero eligible emissions for n < 2."""
     return notes_partition_step(table, word)
 
 
@@ -339,8 +325,8 @@ def assert_update_reuse_and_counterexamples() -> None:
     # A self-only T13 morphism cannot express T14: the same source symbol 0
     # must emit 01 in context 00 but 0 in context 01.
     assert PAGE_85_RULE_1[(0, 0)] != PAGE_85_RULE_1[(0, 1)]
-    assert native_defined_step(PAGE_85_RULE_1, (0, 0)) == (0, 1)
-    assert native_defined_step(PAGE_85_RULE_1, (0, 1)) == (0,)
+    assert native_step(PAGE_85_RULE_1, (0, 0)) == (0, 1)
+    assert native_step(PAGE_85_RULE_1, (0, 1)) == (0,)
 
     # Overlap belongs only to reads.  Treating [0,2) and [1,3) as replacement
     # spans creates a false collision that the native ordered emissions lack.
@@ -352,8 +338,8 @@ def assert_update_reuse_and_counterexamples() -> None:
         raise AssertionError("overlapping pair reads were accepted as disjoint splices")
 
     # A CA-style copy-forward for the inactive rightmost source is incorrect.
-    assert native_defined_step(PAGE_85_RULE_1, (0, 1)) == (0,)
-    assert native_defined_step(PAGE_85_RULE_1, (0, 1)) + (1,) == (0, 1)
+    assert native_step(PAGE_85_RULE_1, (0, 1)) == (0,)
+    assert native_step(PAGE_85_RULE_1, (0, 1)) + (1,) == (0, 1)
 
     # Source order is semantic; reversing the two ordered emissions changes 010.
     forward = PAGE_85_RULE_1[(0, 1)] + PAGE_85_RULE_1[(1, 0)]
@@ -362,25 +348,80 @@ def assert_update_reuse_and_counterexamples() -> None:
 
     # BOOK:1026 describes the displayed trajectories, not all seeds of the
     # table: even with nonempty row outputs the open-right drop can shrink 01.
-    assert len(native_defined_step(PAGE_85_RULE_1, (0, 1))) < 2
+    assert len(native_step(PAGE_85_RULE_1, (0, 1))) < 2
 
 
-def assert_short_word_uncertainty() -> None:
+def assert_short_word_semantics() -> None:
     for word in ((), (0,), (1,)):
-        # Mathematica's Partition/Flatten expression has this natural result.
+        # The unguarded Partition/Flatten operator evaluates exactly this way.
         assert notes_partition_step(PAGE_85_RULE_1, word) == ()
+        assert native_step(PAGE_85_RULE_1, word) == ()
         notes_shared = shared_t14_notes_step(PAGE_85_RULE_1, encode_native(word))
         assert notes_shared.successor == OrderedConfiguration(())
         assert notes_shared.dropped_sources == tuple(range(len(word)))
 
-        # But native validity and terminal-vs-successor interpretation are not
-        # promoted from host behavior into source semantics.
-        try:
-            native_defined_step(PAGE_85_RULE_1, word)
-        except SourceUndefined:
-            pass
-        else:
-            raise AssertionError("short-word source uncertainty was erased")
+        # No RULE row returned epsilon: there simply were zero eligible anchors.
+        assert all(PAGE_85_RULE_1[context] for context in PAIR_CONTEXTS)
+
+
+def assert_singleton_output_ca_relation(max_input_length: int = 7) -> tuple[int, int]:
+    """Exhaust source-defined singleton-output interior-local restrictions.
+
+    BOOK:8024-8028 says such highly uniform neighbor-dependent systems
+    correspond directly to cellular automata.  This is an explicit cropped
+    local-rule relation; native execution still uses ordered emissions.
+    BOOK:8026's rule-30 plate has eight width-three contexts, so context width is
+    a NEIGHBORHOOD/table parameter rather than a pair-only family boundary.
+    """
+    pair_cases = 0
+    for raw_outputs in product(BITS, repeat=len(PAIR_CONTEXTS)):
+        pair_table: ContextRuleTable = {
+            context: (output,)
+            for context, output in zip(PAIR_CONTEXTS, raw_outputs, strict=True)
+        }
+        for length in range(max_input_length + 1):
+            for raw_word in product(BITS, repeat=length):
+                word: Word = tuple(raw_word)
+                direct = interior_local_step(pair_table, (0, 1), word)
+                shared = shared_context_step(pair_table, (0, 1), encode_native(word))
+                assert shared.successor.values == direct
+                assert shared_t14_notes_step(pair_table, encode_native(word)) == shared
+                pair_cases += 1
+
+    triples: tuple[Context, ...] = tuple(product(BITS, repeat=3))
+    triple_cases = 0
+    for raw_outputs in product(BITS, repeat=len(triples)):
+        triple_table: ContextRuleTable = {
+            context: (output,)
+            for context, output in zip(triples, raw_outputs, strict=True)
+        }
+        for length in range(max_input_length + 1):
+            for raw_word in product(BITS, repeat=length):
+                word = tuple(raw_word)
+                direct = interior_local_step(triple_table, (-1, 0, 1), word)
+                shared = shared_context_step(
+                    triple_table, (-1, 0, 1), encode_native(word)
+                )
+                assert shared.successor.values == direct
+                if length >= 3:
+                    assert shared.dropped_sources == (0, length - 1)
+                triple_cases += 1
+
+    # Standard rule 30 is a concrete width-three singleton-output fixture.
+    rule_30: ContextRuleTable = {
+        context: ((30 >> (4 * context[0] + 2 * context[1] + context[2])) & 1,)
+        for context in triples
+    }
+    assert interior_local_step(rule_30, (-1, 0, 1), (0, 0, 0, 1, 0, 0, 0)) == (
+        0,
+        1,
+        1,
+        1,
+        0,
+    )
+    assert pair_cases == 4_080
+    assert triple_cases == 65_280
+    return pair_cases, triple_cases
 
 
 def assert_exhaustive_bounded_commutation(max_input_length: int = 6) -> tuple[int, int]:
@@ -389,8 +430,8 @@ def assert_exhaustive_bounded_commutation(max_input_length: int = 6) -> tuple[in
     assert len(BOUNDED_OUTPUT_WORDS) == 6
     assert len(BOUNDED_OUTPUT_WORDS) ** len(PAIR_CONTEXTS) == 1_296
 
-    defined_cases = 0
-    short_extension_cases = 0
+    commutation_cases = 0
+    short_cases = 0
     for outputs in product(BOUNDED_OUTPUT_WORDS, repeat=len(PAIR_CONTEXTS)):
         table = dict(zip(PAIR_CONTEXTS, outputs, strict=True))
         assert validate_rule_rows(table.items()) == table
@@ -404,11 +445,12 @@ def assert_exhaustive_bounded_commutation(max_input_length: int = 6) -> tuple[in
                 notes_next = notes_partition_step(table, word)
                 generic_step = shared_t14_notes_step(table, encoded)
                 generic_next = generic_step.successor
+                assert shared_context_step(table, (0, 1), encoded) == generic_step
 
-                # The explicit one-step commuting square on the supported
-                # profile, plus the separately-labelled Notes totalization.
+                # The explicit one-step commuting square on every finite word.
                 assert encode_native(notes_next) == generic_next
                 assert decode_generic(generic_next) == notes_next
+                assert encode_native(native_step(table, word)) == generic_next
                 assert tuple(
                     notes_next[interval.start : interval.stop]
                     for interval in generic_step.child_intervals
@@ -419,32 +461,35 @@ def assert_exhaustive_bounded_commutation(max_input_length: int = 6) -> tuple[in
                 ) == len(notes_next)
 
                 if length >= 2:
-                    assert encode_native(native_defined_step(table, word)) == generic_next
                     assert generic_step.dropped_sources == (length - 1,)
-                    defined_cases += 1
                 else:
                     assert notes_next == ()
-                    short_extension_cases += 1
+                    short_cases += 1
+                commutation_cases += 1
 
-    return defined_cases, short_extension_cases
+    return commutation_cases, short_cases
 
 
 def main() -> None:
     assert_table_validation()
     assert_page_85_fixtures()
     assert_update_reuse_and_counterexamples()
-    assert_short_word_uncertainty()
-    defined_cases, short_cases = assert_exhaustive_bounded_commutation()
-    assert defined_cases == 160_704
+    assert_short_word_semantics()
+    pair_ca_cases, triple_ca_cases = assert_singleton_output_ca_relation()
+    commutation_cases, short_cases = assert_exhaustive_bounded_commutation()
+    assert commutation_cases == 164_592
     assert short_cases == 3_888
     print(
         "T14 semantic oracle: PASS "
         f"(bounded_tables={len(BOUNDED_OUTPUT_WORDS) ** len(PAIR_CONTEXTS)}; "
-        f"defined_commutation_cases={defined_cases}; "
-        f"short_notes_extension_cases={short_cases}; "
-        "page85_rule1_t0_t3=PASS; page85_rule2_raster_t0_t4=PASS; "
+        f"commutation_cases={commutation_cases}; "
+        f"short_word_cases={short_cases}; "
+        f"singleton_CA_cases={pair_ca_cases + triple_ca_cases}; "
+        "page85_rule1_t0_t3=PASS; page85_rule2_raster_t0_t3=PASS; "
         "shared_ordered_UPDATE=PASS; overlap_is_read_only=PASS; "
-        "rightmost_drop=PASS; short_native_profile=UNSPECIFIED)"
+        "rightmost_drop=PASS; width3_context_CA_relation=PASS; "
+        "short_native_profile=empty_successor; "
+        "zero_eligible_is_not_epsilon=PASS)"
     )
 
 
