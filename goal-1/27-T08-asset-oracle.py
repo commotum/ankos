@@ -70,8 +70,11 @@ Q = nums("""
 assert C4.isdisjoint(P) and C4.isdisjoint(Q) and P.isdisjoint(Q)
 U = C4 | P | Q
 
-# The previously audited 412-asset partition is immutable. The larger source
-# set adds assets but does not retroactively change the meaning of old rasters.
+# The latest superseded executable oracle (commit c6873a8) applied its CORE
+# override and asserted the effective 412-asset partition 282/122/8. Its stage
+# prose still printed the stale pre-closure counts 284/120/8; no row-level
+# 284/120/8 ledger was frozen. Preserve the executable row sets exactly rather
+# than inventing or silently reconstructing the stale prose partition.
 I_OLD = nums("""
 436 446 456 468 514 732 734 748 756 760 764 792 794 798 802 818 820 822 826 830 836 844 968 972 1152 1196 1244
 1884 1910 1912 1914 1972 2176 2182 2200 2220 2232 2240 2242 2244 2246 2248 2252 2258 2328 2456 2458 2534 2718
@@ -101,6 +104,13 @@ LEGACY_U = I_OLD | R_OLD | X_OLD
 assert (len(I_OLD), len(R_OLD), len(X_OLD), len(LEGACY_U)) == (282, 122, 8, 412)
 assert not (I_OLD & R_OLD or I_OLD & X_OLD or R_OLD & X_OLD)
 assert LEGACY_U <= U
+legacy_partition_payload = "\n".join(
+    f"{kind}:" + ",".join(map(str, sorted(values)))
+    for kind, values in (("I", I_OLD), ("R", R_OLD), ("X", X_OLD))
+).encode("ascii")
+assert hashlib.sha256(legacy_partition_payload).hexdigest() == (
+    "b3b4aef8bb7e3a6ef9b7d8dc7aed16268bfac07683736f11384c1ee636e69d5d"
+)
 
 # Strict classification of the 117 mechanical additions. I means that the
 # raster itself exposes an initial profile/class or a run beginning at t0; R

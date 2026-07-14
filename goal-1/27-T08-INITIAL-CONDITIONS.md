@@ -164,6 +164,8 @@ The asset audit is driven by the immutable 701-line retained source set, not by 
 | `R` | 198 | seed relation, later crop/continuation, aggregate, rule strip, emulation, IVP, or sibling comparison |
 | `X` | 16 | adjacency-only/nonseed control |
 
+The superseded stage prose printed `284/120/8` for its 412-asset ledger, but its latest executable oracle (commit `c6873a8`) had already applied the frozen core override and asserted `282/122/8`; no row-level `284/120/8` ledger existed. This reclosure preserves the executable 412-row partition exactly, pinned by class-partition digest `b3b4aef8bb7e3a6ef9b7d8dc7aed16268bfac07683736f11384c1ee636e69d5d`. It then classifies all 165 additions disjointly: 117 mechanical additions at `69/40/8` and 48 pointer/semantic companions at `12/36/0`, yielding final `363/198/16`. Thus the correction is disclosed rather than hidden as an old-row reclassification.
+
 The exact controls are `BOOK:590,1034,1036,1044,1048,3458,4200,6172,8574,8608,12836,12911,13090,13151,14756,17718`. Later, transformed, and aggregate evidence remains relation-only rather than being discarded—for example the rule-110 continuations `522-532`, compressed/final views `4302,6642,8260`, IVP panels `2048-2062`, sensitivity/count plots, and governed later stages in multi-image plates. `BOOK:420` is direct evidence, not a control: the raster visibly labels steps 1 through 10 and includes the single-center event-zero row.
 
 Every asset has exactly one physical JPEG and one monolith reference. Exactly 575 have one split-file reference and none has more than one. The split Markdown omits `BOOK:1711` (`_page_154_Figure_2.jpeg`) and `BOOK:1744` (`_page_156_Figure_1.jpeg`) even though both physical files and monolith links exist; their final two row fields are the explicit sentinel `<absent>`. The exact single-line row serialization is
@@ -250,8 +252,14 @@ ValidatedInitialConfiguration
 ComputationRealization / LoweringRecord
     optional native-to-work-state relation for a declared horizon
 
-RunRequest / NativeTrace / ExperimentRecipe / Observer
-    separate semantic execution, result, orchestration, and view records
+RunRequest / NativeTrace
+    native program plus validated complete X_0, and its native result
+
+ComputationRequest / ComputationTrace
+    separately identified lowering/work execution and its scoped result
+
+ExperimentRecipe / Observer
+    separate orchestration and view records
 ```
 
 A source phrase can identify only a class without determining a probability law. “Random arrangements with exactly equal numbers” denotes a different support constraint/class from unconstrained independent fair choices; the cited passage does not specify conditioning or uniformity. More generally, “random” without probabilities, finite scope, conditioning, or a generative rule is underdetermined and cannot silently become Bernoulli `p=1/2`.
