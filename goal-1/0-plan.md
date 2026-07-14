@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 34 type stages are complete, T24 is in progress, no stage is reopened, and 10 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, and T23 are complete under D119-D129.
+- Execution status at this sync is Foundation complete, 34 type stages are complete, T24 is in progress with only hostile review/final synchronization open, no stage is reopened, and 10 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, and T23 are complete under D119-D129, and T24 evidence/architecture are closed under active D130.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -999,7 +999,7 @@ COMPLETE. The nineteen-query source oracle closes 151 lines at `104 pre-Index / 
 
 ### 36-T24-HIGHERDIM-CA
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN** in `goal-1/36-T24-HIGHERDIM-CA.md`.
+Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS CLOSED; HOSTILE REVIEW OPEN** in `goal-1/36-T24-HIGHERDIM-CA.md`.
 
 #### Big Picture Objective
 
@@ -1012,6 +1012,10 @@ Apply the common protocol, evaluating native rank, flattening, graph adjacency, 
 #### Completion Requirements
 
 All T24 evidence is captured; any coordinate limitation or schema change is stated honestly; Goal 2 and global integration are updated.
+
+#### Current Result
+
+The 21-query source oracle closes 142 lines at `113 pre-Index / 29 actual-Index`; 145 retained evidence lines partition as `80 native / 16 relation / 49 control`, with 44 exclusions, retained split closure `131 exact + 14 variants`, and zero unresolved candidates. The bounded nonrecursive radius-four asset universe closes 22 plates at `11 governed + 11 adjacency-only`, 44 references, 22 hashes, and `22 hash-bound / 6 transcribed / 0 pixel-replayed`. The semantic oracle closes 1,689 native/generic events, arbitrary-`d` formulas and wide tables, coefficient-basis access, exact hex `C6/D6` orbit counts and source codes, typed alternating/two-shape/finite-network incidence, labeled/unlabeled ports, occurrence multiplicity, and snapshot parallelism. D130 reuses the fixed-lattice event through categories 1–3, adds typed fixed-incidence/configuration/access data, and adds no UPDATE or executor. Root/relocated/optimized/import/compile/format/scope gates and 102 tests pass. Hostile review and final status synchronization remain open.
 
 ### 37-T25-2D-TURING
 

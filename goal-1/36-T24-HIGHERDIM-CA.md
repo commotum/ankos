@@ -1,6 +1,6 @@
 # 36-T24-HIGHERDIM-CA
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS OPEN**
+Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS CLOSED; HOSTILE REVIEW OPEN**
 
 ## Current Facts
 
@@ -278,14 +278,14 @@ No completed stage reopens on the architecture evidence. T21-T23 remain strict f
 
 ## Completion Requirements
 
-- [ ] Exhaustive source/split/Notes/Index/alias audit closes with zero unresolved candidates.
-- [ ] The source-bound asset candidate universe closes with honest claim boundaries.
-- [ ] Every strict dimensional/topological/access/RULE profile and required representation map is independently proven.
-- [ ] Smallest reusable bases are classified with a concrete-counterexample gate for every claimed new algebra.
-- [ ] Current API/runtime/principles audit and Goal 2 handoff are implementation-ready.
+- [x] Exhaustive source/split/Notes/Index/alias audit closes with zero unresolved candidates.
+- [x] The source-bound asset candidate universe closes with honest claim boundaries.
+- [x] Every strict dimensional/topological/access/RULE profile and required representation map is independently proven.
+- [x] Smallest reusable bases are classified with a concrete-counterexample gate for every claimed new algebra.
+- [x] Current API/runtime/principles audit and Goal 2 handoff are implementation-ready.
 - [ ] Independent hostile review and all oracle/test/Markdown/diff/scope/coverage gates pass.
 - [ ] `0-plan.md`, `evidence-index.md`, `design-ledger.md`, and `architecture-audit.md` agree.
 
 ## Stage Results
 
-In progress.
+Source, asset, semantic, and architecture audits are closed under D130. Root and relocated oracle runs, optimized fail-closed guards, silent imports, explicit compilation, Markdown fence parity, `git diff --check`, Goal-1 scope, and 102 repository tests pass. Independent hostile review and final global status synchronization remain open.
