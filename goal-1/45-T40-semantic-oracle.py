@@ -2159,7 +2159,20 @@ def audit_rational_positional_and_duals() -> tuple[int, int, int, int, int]:
     canonical_cf = rational_continued_fraction(Fraction(1, 2))
     assert canonical_cf.coefficients == (0, 2)
     assert continued_fraction_value((0, 2)) == continued_fraction_value((0, 1, 1))
-    dual_checks = 4
+    negative_cf = rational_continued_fraction(Fraction(-7, 3))
+    assert negative_cf.coefficients == (-3, 1, 2)
+    assert continued_fraction_value(negative_cf.coefficients) == Fraction(-7, 3)
+    negative_result = evaluate_query(
+        RepresentationQuery(rational_spec(-7, 3), PositionalDigits(10), Prefix(12)),
+        exact_context(),
+    )
+    assert negative_result.sign == -1
+    assert negative_result.integer_digits == (2,)
+    assert negative_result.coefficients == (3,) * 12
+    assert verify_result(negative_result)
+    zero_negative_cylinder = positional_cylinder((0,), (), 10, -1)
+    assert not zero_negative_cylinder.contains(Fraction(0, 1))
+    dual_checks = 9
     return len(cases), roundtrips, prefix_checks, total_period, terminating + dual_checks
 
 
@@ -2422,6 +2435,7 @@ def audit_gauss_map_realization() -> tuple[int, int, int, int]:
         RationalLiteral(22, 7),
         RationalLiteral(415, 93),
         RationalLiteral(355, 113),
+        RationalLiteral(-7, 3),
         RationalLiteral(2**140 + 1, 2**73 + 19),
     )
     coefficients = 0
@@ -2437,7 +2451,10 @@ def audit_gauss_map_realization() -> tuple[int, int, int, int]:
             assert work.coefficients[-1] == coefficient
             coefficients += 1
             one_step_commutations += 1
-            maximum_coefficient_bits = max(maximum_coefficient_bits, coefficient.bit_length())
+            maximum_coefficient_bits = max(
+                maximum_coefficient_bits,
+                abs(coefficient).bit_length(),
+            )
         assert work.current is None
         assert work.coefficients == expected
         completions += 1
@@ -2450,6 +2467,8 @@ def audit_prefix_random_access_consistency() -> tuple[int, int, int, int]:
         (rational_spec(1, 7), PositionalDigits(10), exact_context(), 24),
         (sqrt_spec(2), PositionalDigits(2), exact_context(), 24),
         (sqrt_spec(23), SimpleContinuedFraction(), exact_context(), 24),
+        (rational_spec(-7, 3), SimpleContinuedFraction(), exact_context(), 3),
+        (negated_sqrt_spec(2), SimpleContinuedFraction(), exact_context(), 24),
         (e_spec(), SimpleContinuedFraction(), exact_context(), 24),
         (pi_spec(), PositionalDigits(10), machin_context(50), 20),
         (pi_spec(), SimpleContinuedFraction(), machin_context(50), 16),
@@ -2700,7 +2719,42 @@ def audit_t42_handoff() -> tuple[int, int, int, int, int]:
     assert certified_handoff.coefficients == PI_CF_30[:12]
     assert certified_handoff.proof_strength == "complete_certified"
     assert exact_handoff.source_result_id != certified_handoff.source_result_id
-    return 2, len(exact_handoff.coefficients), len(certified_handoff.coefficients), 1, 1
+
+    negative_rational_result = evaluate_query(
+        RepresentationQuery(
+            rational_spec(-7, 3),
+            SimpleContinuedFraction(),
+            Prefix(3),
+        ),
+        exact_context(),
+    )
+    negative_rational_handoff = make_t42_coefficient_input(negative_rational_result)
+    assert negative_rational_handoff.coefficients == (-3, 1, 2)
+
+    negative_irrational_result = evaluate_query(
+        RepresentationQuery(
+            negated_sqrt_spec(2),
+            SimpleContinuedFraction(),
+            Prefix(12),
+        ),
+        exact_context(),
+    )
+    negative_irrational_handoff = make_t42_coefficient_input(negative_irrational_result)
+    assert negative_irrational_handoff.coefficients == (-2, 1, 1) + (2,) * 9
+    assert all(
+        handoff.coefficients[0] < 0
+        and all(coefficient > 0 for coefficient in handoff.coefficients[1:])
+        for handoff in (negative_rational_handoff, negative_irrational_handoff)
+    )
+    exact_coefficient_count = sum(
+        len(handoff.coefficients)
+        for handoff in (
+            exact_handoff,
+            negative_rational_handoff,
+            negative_irrational_handoff,
+        )
+    )
+    return 4, exact_coefficient_count, len(certified_handoff.coefficients), 2, 1
 
 
 def has_binary_float(value: object, seen: set[int] | None = None) -> bool:
@@ -2794,15 +2848,21 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(TypeError, lambda: RationalLiteral(True, 2))
     rejected += must_raise(TypeError, lambda: RationalLiteral(1, 2.0))
     rejected += must_raise(ValueError, lambda: RationalLiteral(1, 0))
-    rejected += must_raise(ValueError, lambda: RationalLiteral(-1, 2))
+    assert RationalLiteral(-1, 2).value == Fraction(-1, 2)
     rejected += must_raise(ValueError, lambda: SquareRoot(4))
     rejected += must_raise(TypeError, lambda: SquareRoot(2.0))
+    rejected += must_raise(ValueError, lambda: NegatedSquareRoot(4))
+    rejected += must_raise(TypeError, lambda: NegatedSquareRoot(2.0))
     rejected += must_raise(TypeError, lambda: MathematicalDenotationSpec(lambda: 3))
     rejected += must_raise(ValueError, lambda: MathematicalDenotationSpec(PiConstant(), (1,)))
     rejected += must_raise(ValueError, lambda: MathematicalDenotationSpec(PiConstant(), value_schema="float64"))
     rejected += must_raise(TypeError, lambda: PositionalDigits(True))
     rejected += must_raise(ValueError, lambda: PositionalDigits(1))
     rejected += must_raise(ValueError, lambda: PositionalDigits(10, canonical_tail="repeat_nines"))
+    rejected += must_raise(
+        ValueError,
+        lambda: PositionalDigits(10, sign_convention="signed_digit"),
+    )
     rejected += must_raise(ValueError, lambda: SimpleContinuedFraction("allow_terminal_one"))
     rejected += must_raise(TypeError, lambda: Prefix(1.0))
     rejected += must_raise(ValueError, lambda: Prefix(-1))
@@ -2831,8 +2891,18 @@ def audit_hostile_validation() -> int:
         ValueError,
         lambda: RationalPositionalExpansion(10, (0,), (), (1, 2, 1, 2)),
     )
+    rejected += must_raise(
+        ValueError,
+        lambda: RationalPositionalExpansion(10, (0,), (), (), -1),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: raw_positional_value((0,), (), (), 10, -1),
+    )
     rejected += must_raise(ValueError, lambda: CanonicalContinuedFraction((0, 1, 1), True))
     rejected += must_raise(ValueError, lambda: continued_fraction_value((0, 0)))
+    rejected += must_raise(ValueError, lambda: continued_fraction_value((-3, -1)))
+    assert continued_fraction_value((-3, 1, 2)) == Fraction(-7, 3)
     rejected += must_raise(TypeError, lambda: rational_positional_expansion(0.5, 10))
     rejected += must_raise(TypeError, lambda: atan_inverse_interval(5.0, 10))
     rejected += must_raise(TypeError, lambda: direct_sqrt_bits(Fraction(2), 2.0))
@@ -2869,6 +2939,7 @@ def audit_hostile_validation() -> int:
             result.start_index,
             result.coefficients,
             result.integer_digits,
+            result.sign,
             CompleteCertified(forged_certificate),
             result.termination,
         ),
@@ -2884,6 +2955,7 @@ def audit_hostile_validation() -> int:
             unsupported.start_index,
             (),
             (),
+            None,
             Unsupported(("wrong-profile",), "forged"),
             UNKNOWN_TERMINATION,
         ),
@@ -2911,8 +2983,59 @@ def audit_hostile_validation() -> int:
             exact.start_index,
             (9,) + exact.coefficients[1:],
             exact.integer_digits,
+            exact.sign,
             exact.outcome,
             exact.termination,
+        ),
+    )
+
+    negative_exact = evaluate_query(
+        RepresentationQuery(rational_spec(-7, 3), PositionalDigits(10), Prefix(8)),
+        exact_context(),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ExpansionResult(
+            negative_exact.query,
+            negative_exact.context,
+            negative_exact.provenance,
+            negative_exact.start_index,
+            negative_exact.coefficients,
+            negative_exact.integer_digits,
+            1,
+            negative_exact.outcome,
+            negative_exact.termination,
+        ),
+    )
+    negative_cf = evaluate_query(
+        RepresentationQuery(
+            negated_sqrt_spec(2),
+            SimpleContinuedFraction(),
+            Prefix(8),
+        ),
+        exact_context(),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ExpansionResult(
+            negative_cf.query,
+            negative_cf.context,
+            negative_cf.provenance,
+            negative_cf.start_index,
+            negative_cf.coefficients,
+            (),
+            -1,
+            negative_cf.outcome,
+            negative_cf.termination,
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: T42CoefficientInput(
+            "0" * 64,
+            "1" * 64,
+            (-2, 0),
+            "complete_exact",
         ),
     )
 
@@ -2944,7 +3067,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "e8bbb5e383e78e50ff7bcb7f1897b8fcd525147d694e215f3112761fc2ea011a"
+EXPECTED_DIGEST = "be2ef7cd52e66fefe134c74886f55499aceabbcbcdba66b0a7c4fd82bc6d89a2"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
@@ -2983,6 +3106,7 @@ def collect_audit_summary() -> tuple[tuple[str, object], ...]:
         ("architecture_classification", ARCHITECTURE_CLASSIFICATION),
         ("goal2_delta", GOAL2_DELTA),
         ("T42_handoff_contract", T42_HANDOFF_CONTRACT),
+        ("positional_sign_convention", POSITIONAL_SIGN_CONVENTION),
         ("work_realization_relations", WORK_REALIZATION_RELATIONS),
         ("sqrt_rational_source_guard", SQRT_RATIONAL_SOURCE_GUARD),
         ("expected_textual_replay_JSON_SHA256", EXPECTED_TEXTUAL_REPLAY_JSON_SHA256),
@@ -3036,7 +3160,8 @@ def main() -> None:
     )
     print(
         f"exact_CF=surd_periods:{exact_cf[0]}/surd_coefficients:{exact_cf[1]}/"
-        f"max_period:{exact_cf[2]}/e_anchor:{exact_cf[3]}/e_prefix:{exact_cf[4]}"
+        f"max_period:{exact_cf[2]}/e_anchor:{exact_cf[3]}/e_prefix:{exact_cf[4]}/"
+        f"negative_surd_prefix:{exact_cf[5]}"
     )
     print(
         f"work_realizations=long_division_steps:{long_division[0]}/"
@@ -3061,7 +3186,8 @@ def main() -> None:
     )
     print(
         f"T42_handoffs={handoff[0]}; exact_coefficients={handoff[1]}; "
-        f"certified_coefficients={handoff[2]}; hidden_evaluator=absent; "
+        f"certified_coefficients={handoff[2]}; signed_a0_handoffs={handoff[3]}; "
+        f"hidden_evaluator=absent; "
         f"float_boundary_refusals={no_float[0]}; exact_coefficient_checks={no_float[3]}"
     )
     print(

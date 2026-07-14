@@ -9,10 +9,11 @@ whose visible work states may be represented by ordinary SimplePrograms; those
 are realizations of the denotation, not hidden executor state or T40's identity.
 
 The Book does not use the catalog label.  Eighteen bounded, redundant query
-lanes therefore freeze the strict section, Notes, relations, actual flattened
-Index, boundary controls, image interface, and false positives.  The chapter
-split is intentionally treated as an abridged summary: two linked plates and
-most mechanics are explicit omissions rather than silently invented matches.
+lanes freeze discovery witnesses, while independent fixed universes close all
+117 nonblank rows in the strict main section and all audited relevant rows in
+the actual flattened Index.  The chapter split is intentionally treated as an
+abridged summary: compressed tables and omitted mechanics are explicit split
+dispositions rather than silently invented matches.
 """
 
 from __future__ import annotations
@@ -180,11 +181,39 @@ EXCLUDED_CLASS = {
 EXCLUDED = frozenset().union(*EXCLUDED_CLASS.values())
 
 
+# Query recall is not the closure proof.  Independently enumerate every
+# nonblank/content row in the strict BOOK1665--1832 main section, including
+# all table payloads and extraction artifacts.  N/R/C/X are semantic roles;
+# STRUCTURAL rows carry only Markdown/table/page-extraction structure.
+STRICT_MAIN_NATIVE = line_set(
+    "1665,1667,1669,1671,1673,1675,1677,1679,1681,1683,1685,1687,"
+    "1689,1691,1693,1695-1698,1700-1704,1707,1709,1711,1713,1715,"
+    "1717,1719,1721,1723-1729,1733,1736,1738,1740,1742,1744,1746,"
+    "1748,1750,1754,1756-1770,1772,1774,1776,1778,1780,1782,1784,"
+    "1786,1789,1792,1794,1796,1798,1804,1806-1826,1828,1830,1832"
+)
+STRICT_MAIN_RELATION = frozenset()
+STRICT_MAIN_CONTROL = frozenset()
+STRICT_MAIN_EXCLUDED = frozenset()
+STRICT_MAIN_STRUCTURAL = line_set(
+    "1694,1699,1705,1722,1730,1732,1734,1752,1755,1788,1790,"
+    "1800-1802,1805"
+)
+STRICT_MAIN_DISPOSITION = {
+    "native": STRICT_MAIN_NATIVE,
+    "relation": STRICT_MAIN_RELATION,
+    "control": STRICT_MAIN_CONTROL,
+    "excluded": STRICT_MAIN_EXCLUDED,
+    "structural": STRICT_MAIN_STRUCTURAL,
+}
+STRICT_MAIN_CONTENT = frozenset().union(*STRICT_MAIN_DISPOSITION.values())
+
+
 # Structural continuations preserve the mechanics and their epistemic
 # qualifications even when no query regexp lands on the row itself.
 NATIVE_CONTINUATIONS = line_set(
     "1667,1669,1671,1681,1683,1691,1709,1717,1719,1733,1736,1738,"
-    "1774,1776,1780,1782,1788,1789,1796,1798,1830,1832,"
+    "1774,1776,1780,1782,1789,1796,1798,1830,1832,"
     "12923,12925-12941,12945-12956,12962,12964,12966,12968,12970,"
     "12974,12978,12980,13036,13038,13054,13056,13058,13070,13072,"
     "13088,13100"
@@ -196,7 +225,7 @@ RELATION_CONTINUATIONS = line_set(
 )
 CONTROL_CONTINUATIONS = line_set("1663,12919")
 
-NATIVE_EVIDENCE = QUERY_NATIVE | NATIVE_CONTINUATIONS
+NATIVE_EVIDENCE = QUERY_NATIVE | NATIVE_CONTINUATIONS | STRICT_MAIN_NATIVE
 RELATION_EVIDENCE = QUERY_RELATION | RELATION_CONTINUATIONS
 CONTROL_EVIDENCE = QUERY_CONTROL | CONTROL_CONTINUATIONS
 RETAINED = NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE
@@ -204,64 +233,121 @@ RETAINED = NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE
 
 INDEX_CLASS = {
     "native": line_set(
-        "20828,20910,20918,21044,21088,21255,21360,21416,21473,21501,"
-        "21683,21705,21711,21793,21907,22136"
+        "20828,20910,20916,20918,20946,21044,21054,21088,21255,"
+        "21337,21360,21416,21473,21475,21501,21683,21705,21711,"
+        "21735,21779,21793,21801,21891,21907,22136"
     ),
     "relation": line_set(
-        "20850,20914,20972,21038,21050,21114,21132,21150,21162,21168,"
-        "21172,21185,21197,21213,21223,21231,21450,21675,21687,21813,"
-        "21819,21845,21915,21929,22080,22148,22150,22352,22394"
+        "20840,20850,20914,20967,20972,21014,21038,21050,21114,"
+        "21132,21134,21150,21162,21168,21172,21173,21185,21187,"
+        "21193,21195,21197,21203,21207,21213,21223,21231,21264,"
+        "21432,21450,21497,21525,21675,21687,21689,21695,21805,"
+        "21813,21819,21845,21893,21915,21927,21929,21933,21982,"
+        "21990,21994,22030,22080,22110,22144,22148,22150,22352,"
+        "22380,22394"
     ),
-    "control": frozenset(),
+    "control": line_set("22096"),
 }
 INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
 INDEX_EXCLUDED = frozenset()
+INDEX_RELEVANT_UNIVERSE = line_set(
+    "20828,20840,20850,20910,20914,20916,20918,20946,20967,20972,"
+    "21014,21038,21044,21050,21054,21088,21114,21132,21134,21150,"
+    "21162,21168,21172,21173,21185,21187,21193,21195,21197,21203,"
+    "21207,21213,21223,21231,21255,21264,21337,21360,21416,21432,"
+    "21450,21473,21475,21497,21501,21525,21675,21683,21687,21689,"
+    "21695,21705,21711,21735,21779,21793,21801,21805,21813,21819,"
+    "21845,21891,21893,21907,21915,21927,21929,21933,21982,21990,"
+    "21994,22030,22080,22096,22110,22136,22144,22148,22150,22352,"
+    "22380,22394"
+)
 
 INDEX_ENTRY_GUARDS = {
     20828: ("continued fraction for, 144", "digits of, 142"),
+    20840: ("Addition cellular automata based on", "in digit sequences, 118"),
     20850: ("nested digit sequences",),
     20910: ("Base 16 (hex)", "normal numbers, 912"),
     20914: ("leading digits", "Egyptian fractions"),
+    20916: ("Bits in numbers, 116", "see also Digit sequences"),
     20918: ("Blocks", "normal numbers, 912"),
+    20946: ("Catalan (Catalan's constant)", "and digit sequences, 902"),
+    20967: ("states vs. digit sequences, 950",),
     20972: ("Champernowne number", "normal numbers, 912"),
+    21014: ("of number representations, 1070",),
     21038: ("Concatenation sequences", "continued fractions for, 915"),
     21044: ("Continued fraction map", "Continued fractions, 143, 914"),
     21050: ("Corollaries", "nested radicals"),
+    21054: ("Cryptanalysis continued fraction for, 914", "digits of, 141"),
     21088: ("Digit sequences, 116-127, 136-142",),
     21114: ("Dynamic programming", "Egyptian fractions"),
     21132: ("runs of digits",),
+    21134: ("ENIAC (computer)", "and digits of  $\\pi$ , 911"),
     21150: ("Equidistribution", "concatenation sequences"),
     21162: ("Exact solutions", "Euclid's algorithm"),
     21168: ("ExpIntegralEi", "Egyptian fractions"),
     21172: ("leading digits", "Factorial2"),
+    21173: ("multiplicative digit sequences, 902",),
     21185: ("Feynman diagrams", "leading digits"),
+    21187: ("Fibonacci number representation. 560, 1070",),
+    21193: ("and digital slopes, 916",),
+    21195: ("Fractional linear transformations and continued fractions, 914",),
     21197: ("Fraenkel", "leading digits"),
+    21203: ("applied to digit sequences, 731",),
+    21207: ("and quadratic continued fractions, 915",),
     21213: ("Generalization", "Euclid's algorithm"),
     21223: ("Gibbs phenomenon", "Euclid's algorithm"),
     21231: ("Graphics3D", "concatenation sequences"),
     21255: ("Human thinking", "Hurwitz numbers"),
+    21264: ("and continued fractions, 914<br>",),
+    21337: ("Irrational numbers", "iterated multiplication by, 903"),
     21360: ("Iterated division", "continued fractions, 143"),
     21416: ("Khinchin", "Khinchin's constant"),
+    21432: ("and continued fractions, 915", "Lagrange points"),
     21450: ("LatticeReduce", "Leading digits"),
     21473: ("Log (logarithm)", "computation of  $n^{th}$  digits"),
+    21475: ("Long division, 139",),
+    21497: ("Markov partitions and digit sequences, 901",),
     21501: ("Mathematical constants, 136-144",),
+    21525: ("Multiplicative digit sequences, 902", "and continued fractions, 914"),
     21675: ("Nested radicals, 915",),
     21683: ("NestWhileList", "concatenation sequences"),
     21687: ("leading digits",),
+    21689: ("for computing square roots, 913",),
+    21695: ("Non-locality and Bell's inequalities", "in digit sequences, 730"),
     21705: ("Normal numbers, 912", "concatenation sequences"),
     21711: ("Number representations, 142",),
+    21735: ("Partial quotients", "in continued fractions, 914"),
+    21779: (
+        "computation of nth digits in, 912",
+        "continued fraction for, 143, 914",
+        "digit sequence of, 136",
+    ),
     21793: ("Plouffe, Simon", "computation of  $\\pi$"),
+    21801: ("PolyLog (polylogarithms)", "and computing  $n^{th}$  digits, 912"),
+    21805: ("PowerMod", "digit sequences of, 119, 614, 749"),
     21813: ("leading digits in, 914",),
     21819: ("ProductLog", "concatenation sequences"),
     21845: ("Pythagoreans", "continued fraction map"),
+    21891: ("Radicals continued fractions for, 144", "digit sequences for, 139"),
+    21893: ("from digits of  $\\pi$ , 136, 912", "in digit of square roots, 139"),
     21907: ("Rational numbers approximation by",),
     21915: ("Reciprocals", "Egyptian fractions"),
+    21927: ("in digit sequences, 138",),
     21929: ("Repetitive sequences", "Egyptian fractions"),
+    21933: ("Reversal, of digit sequences, 905",),
+    21982: ("and continued fractions, 914",),
+    21990: ("Roth, Klaus F.", "and rational approximations, 915"),
+    21994: ("square root of, 956",),
+    22030: ("Run-length encoding, 560", "as number representation, 914"),
     22080: ("Russian peasant method", "concatenation sequences"),
+    22096: ("see also Digit sequences", "Semi-Thue systems"),
+    22110: ("Shallit, Jeffrey O.", "and continued fractions, 914"),
     22136: ("Stoneham", "normal numbers, 912"),
+    22144: ("Substitution systems, 82-87", "and continued fractions, 914"),
     22148: ("Superstrings", "runs of digits"),
     22150: ("Symbolic programming", "leading digits"),
     22352: ("Toffoli, Tommaso", "Egyptian fractions"),
+    22380: ("Two's complement number representation, 902, 942",),
     22394: ("Valuation functions", "nested digit sequences"),
 }
 
@@ -271,7 +357,10 @@ INDEX_FLATTENING_SENTINELS = {
     21050: ("Corollaries",),
     21114: ("Dynamic programming",),
     21416: ("Karnaugh maps",),
+    21779: ("computation of nth digits in, 912",),
     21793: ("Pluperfect numbers",),
+    21891: ("Radicals continued fractions for, 144",),
+    22110: ("Shallit, Jeffrey O.",),
     22352: ("Transmutation, in alchemy",),
 }
 
@@ -465,20 +554,37 @@ SPLIT_MAIN_DIRECT_OWNERS = {
     1856: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:315",
 }
 SPLIT_MAIN_SUMMARY_OWNERS = {
+    1693: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:277",
+    1695: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:277",
+    1696: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:277",
+    1697: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:277",
+    1698: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:277",
+    1700: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:278",
+    1701: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:278",
+    1823: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:282",
+    1824: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:283",
+    1825: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:284",
+    1826: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:285",
     1828: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:287",
     1830: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:289",
     1832: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:291",
 }
 SPLIT_OMISSION_GROUPS = {
+    "abridged-repeating-digit-table": line_set("1702-1704"),
     "rational-and-long-division-mechanics": line_set(
         "1707,1709,1711,1713,1715,1717,1719"
+    ),
+    "square-root-and-higher-root-data-tables": line_set(
+        "1721,1723-1729,1754,1756-1770"
     ),
     "square-root-and-positional-mechanics": line_set(
         "1733,1736,1738,1740,1742,1744,1746,1748,1750,1772,1774"
     ),
     "representation-and-continued-fraction-mechanics": line_set(
-        "1776,1778,1780,1782,1784,1786,1788,1789,1792,1794,1796,1798"
+        "1776,1778,1780,1782,1784,1786,1789,1792,1794,1796,1798"
     ),
+    "abridged-continued-fraction-data-table": line_set("1804,1806-1822"),
+    "strict-structural-extraction-rows": STRICT_MAIN_STRUCTURAL,
 }
 SPLIT_OMISSION_LINES = frozenset().union(*SPLIT_OMISSION_GROUPS.values())
 SPLIT_BOUNDARY_WITNESSES = (
@@ -525,12 +631,12 @@ EXPECTED_SET = {
     "query_relation": (41, "aaa1d5ac0262e3910c7d48c3428d1550dbaa488888807ad83b38f64e865b9f88"),
     "query_control": (7, "aa826f1310f068dd0ba264d1a4155fcd46ae2fe1f318c5dd5e159ac7eef21c2e"),
     "excluded": (5, "01c97a261db7b3a9cc557d83e011e5aa7a280433144e5df6d2b22bedd051f8f8"),
-    "native": (114, "85df9c4361717de3f9dbb1eb7b4dba98a71601cabcb7912e98dbf8967afdd1d1"),
+    "native": (169, "eba1f729ab1ed14b6809c181e74ac86b64a363c0bcecb684f7cdbdad8f76ca2b"),
     "relation": (84, "5a092550392b0923fe58837ef403cf294d8e8de6fe92d976117a44bdf5e618cd"),
     "control": (9, "350e9aec3d0ce5466da723cf905a398bcb183fcafee5963145a2e8d8149a564e"),
-    "retained": (207, "2b287fe93c97c8047128b83475f2774e80d92ebab74c4d7fb51bae656041187c"),
+    "retained": (262, "0d7320af1896c9c5d27547dea20e8fb231f0f1f43a759158b98ca08c5e70cb86"),
     "retained_query": (94, "165209df95c945a005adeb119f6282d55c64b89f663beecee826dc08f7eecb52"),
-    "continuations": (113, "5351e10b3a99f6462ead8abf87cc9db9b722a558015f8c318c9e054f0ba3cd32"),
+    "continuations": (168, "f24f83df5825469c5512ab94efbe6a264731bd44fd1ef820449f76eaa70beb09"),
 }
 EXPECTED_EXCLUDED_CLASS = {
     "name_collision": (1, "0a5b046d07f6f971b7776de682f57c5b9cdc8fa060db7ef59de82e721c8098f4"),
@@ -538,9 +644,25 @@ EXPECTED_EXCLUDED_CLASS = {
     "generic_algorithm_cross_reference": (3, "0af5fb1f1971b936e8052cc34fe7605caf6f6916a28992ff9485914a39d55704"),
 }
 EXPECTED_INDEX_CLASS = {
-    "native": (16, "a34ca6c64b76d09a0eda34abda3422b575e53b29d375404d1b000d92901a7d4a"),
-    "relation": (29, "47ab3033ad4727954e71da4d543b3a78ac400473db9d6433382a3dbc8054418b"),
+    "native": (25, "46e883d59f112ae1427bfd09299e7f457c5a2328d0f9326ebbc62421220cd3b3"),
+    "relation": (56, "3d107040293822a0baf0c3be1a0f5aad69262921910f7c1b90a8824135ac0931"),
+    "control": (1, "2754f6e1f004d4298d7ed6444c52385d98a70aee827877053ef7d43e519ac10f"),
+}
+EXPECTED_INDEX_RELEVANT_UNIVERSE = (
+    82,
+    "5e23e53aff0b8ea8b53ba588e44496d31ea600b8ebde0c5e36a8183b1eedae3d",
+)
+EXPECTED_INDEX_QUERY_MISSES = (
+    37,
+    "6aa6edc52301504475891b295fd59cd706295e90f9c2503d5ccdb22f629ae3f9",
+)
+EXPECTED_STRICT_MAIN_PARTITION = {
+    "native": (102, "bd76954762c925f2ecf6bf0fa97d9c15db19d598a297a9c56d74e12d1dc41d59"),
+    "relation": (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
     "control": (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+    "excluded": (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+    "structural": (15, "8b83af3e32debd18eab8f148b46b187ff2ca50001b037a5d5cd71f81989c5e54"),
+    "content": (117, "6c39a18a84e5186f11f8082c2bc5380846269c7f67b62d759b9fea0bea0ea2a9"),
 }
 EXPECTED_IMAGE_PARTITION = {
     "native": (11, "45fe870caa33fa2cc0b702a8158564f987fb186a1742f1bbafc940cf8c738894"),
@@ -581,29 +703,30 @@ EXPECTED_SOURCE_DEFECT_GUARDS = (
 )
 EXPECTED_RECORDS = {
     "excluded_line_hashes": (5, "d3b3134fe2e22ca121f65e3617dce002e45e1880600c264b4c5a100d9614efef"),
-    "index_guards": (45, "9cb961cab74171846f989263c918f9a0e233c35ca05ed470cec67435aeec8cae"),
-    "index_sentinels": (5, "53057b09ef0129f633ab1604132f2a8cf25cfb20e04975eaa6208742d7a1ed33"),
+    "index_guards": (82, "8b5c9ce6a3cc644d42fc142e8f78e2b33f964671a9afb7883289fb8e7e33edfc"),
+    "index_sentinels": (8, "129bc6a4ef7cc76b5020676e603a2b5621ef56354b8ca2cd2fb4361938791710"),
+    "strict_main_dispositions": (117, "94bed33e54122c19903a478a562a10d69491890aef04978d417bb53b3b13db91"),
     "semantic_guards": EXPECTED_SOURCE_SEMANTIC_GUARDS,
     "auxiliary_guards": (8, "bb1c06175c4a5856879b75936917159d7125f734ad6350cc26f618cb2da23b18"),
     "source_defects": EXPECTED_SOURCE_DEFECT_GUARDS,
     "source_model": (32, "8ba5c526bd482ac86447e79c616bd3da5f678cc0c60fe4943a01d70cc71e6be0"),
     "image_roles": (24, "9f4b951e3444c26c6a256ef3461ec3132175efb2601f3b89c3073cb6d9f9689f"),
     "image_assembly_boundaries": (7, "60395054223bb245396b3936dda4349e63a68a6b6306efaf34c5f4484e51132b"),
-    "split_omissions": (30, "fe4eb72a61d4ca7cd6ee62cf0d82792ad3808d4f75418676cabc41acd5ecc497"),
+    "split_omissions": (89, "0c3dc82ba4879e60782fa0459e4e12768e8e48f4b950474bdc731f382fab6c8f"),
     "split_boundary_witnesses": (7, "c32f23773dbe2707c96bde64ea3fd95445e3ff6efd2bb809718c22d28b9a9884"),
 }
 EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 EXPECTED_SPLIT_CROSSWALK = (
-    252,
-    "31062224eb14ca3e7e4703f3aaa9c4388a200cd0b2d00f669c45eba112c5e5ca",
+    359,
+    "66f52a83007eb6c0a3fbf52165b07d1929b63a0ccc42c6512ba27a8874e81081",
 )
 EXPECTED_SPLIT_CLASSES = {
     "EXACT": (
-        177,
-        "5044a3b093b161e1f38d7feb535d7e2da4217022e1fad961584a04ac6470e53d",
-        "0b2280cae5f9f75552ba8afe343d95bfc00a14c57e73d1dec4c3e557b1af405e",
+        214,
+        "7629cc72e9648e45f6b978aede0942792336e0d2d1ce715ae5586b988734f887",
+        "6a65aabc68562dfb756654af3e0700ec1418f5f05342078bafd6855080d9bc0b",
     ),
     "IMAGE_BASENAME": (
         22,
@@ -616,14 +739,14 @@ EXPECTED_SPLIT_CLASSES = {
         "7e405c6235eb29bfda60f31c47cc13fe670cf76a40d5e73dcdcabd111a231936",
     ),
     "SUMMARY": (
-        3,
-        "3836a0bd75f2ef17cfc684ddcef07d060921303b3275a5b5824672ff4c85ecac",
-        "1db59488a2538d764430b87e7ff2feb5fad9dce91f24c7cca4668f8f61f8a7fe",
+        14,
+        "8ef33877220036f2939337015de6307a13ddb1a8a28f735d274e4be07239cd1e",
+        "9d4863d9a7a0c61fda8f26e054e0a9ea3a1912dd9d9b8c9a79cd8b0afe5a100f",
     ),
     "OMITTED": (
-        30,
-        "28306fbb1320afe19dfc892b6660a22a93dbcd39c4646b3f180925f93e552d91",
-        "988f69aee5f845f3c6b635df727cba6cd0bcb31c15449470008ad24b0eb8b018",
+        89,
+        "a2e7ef27e19c1dd7ca657f20b806754966e3a6d396a2dcbf864aa2a491d399b1",
+        "0251161e7ee25fcf11bab72f0f7a389ac4bed5b2daceefb63a78b541b1e60748",
     ),
 }
 EXPECTED_SPLIT_NORMALIZED_MINIMUM = 0.999817
@@ -631,7 +754,7 @@ EXPECTED_LOGIC_RECORDS = (
     7,
     "d525310251895f506ca06d964ba736dd53ab659e07fed14d7fbe5422b1648754",
 )
-EXPECTED_AUDIT_DIGEST = "9a38b298a811e9017ce7201490ee8571e63347f9b5a9b5a13dd771a698627ea9"
+EXPECTED_AUDIT_DIGEST = "a06531ed8bfcaf4a926ad4db4bc6eb32b2a2e77ed3171ee5f9be9e3c145f166e"
 
 
 IMAGE_PARTITION = {
@@ -943,13 +1066,50 @@ def main(argv: list[str] | None = None) -> int:
     )
     check("pre_index_partition", set_contract_ok and classification_ok, len(pre_index ^ set().union(*query_partition)))
 
+    strict_actual_content = {
+        number for number in range(1665, 1833) if at(number).strip()
+    }
+    strict_union = set().union(*STRICT_MAIN_DISPOSITION.values())
+    strict_overlap = sum(map(len, STRICT_MAIN_DISPOSITION.values())) - len(strict_union)
+    strict_unresolved = len(strict_actual_content ^ strict_union) + strict_overlap
+    strict_sets = {**STRICT_MAIN_DISPOSITION, "content": STRICT_MAIN_CONTENT}
+    strict_ok = (
+        set(strict_sets) == set(EXPECTED_STRICT_MAIN_PARTITION)
+        and strict_union == set(STRICT_MAIN_CONTENT)
+        and strict_actual_content == set(STRICT_MAIN_CONTENT)
+        and strict_overlap == 0
+        and STRICT_MAIN_NATIVE <= NATIVE_EVIDENCE
+        and not STRICT_MAIN_STRUCTURAL & RETAINED
+    )
+    for name, values in strict_sets.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_STRICT_MAIN_PARTITION.get(name)
+        strict_ok &= good
+        check("strict_main_" + name, good, *actual)
+    check("strict_main_partition", strict_ok, strict_unresolved)
+
+    index_query_misses = set(INDEX_RELEVANT_UNIVERSE) - index_candidates
+    index_unresolved = (
+        len(set(INDEX_RELEVANT_UNIVERSE) ^ set(INDEX_ROUTED))
+        + len(index_candidates - set(INDEX_RELEVANT_UNIVERSE))
+    )
+    index_universe_actual = (
+        len(INDEX_RELEVANT_UNIVERSE),
+        digest(INDEX_RELEVANT_UNIVERSE),
+    )
+    index_miss_actual = (len(index_query_misses), digest(index_query_misses))
     index_ok = (
         set(INDEX_CLASS) == set(EXPECTED_INDEX_CLASS)
         and frozenset().union(*INDEX_CLASS.values()) == INDEX_ROUTED
         and sum(map(len, INDEX_CLASS.values())) == len(INDEX_ROUTED)
         and not INDEX_ROUTED & INDEX_EXCLUDED
-        and index_candidates == set(INDEX_ROUTED | INDEX_EXCLUDED)
+        and INDEX_RELEVANT_UNIVERSE == INDEX_ROUTED
+        and index_candidates <= set(INDEX_RELEVANT_UNIVERSE)
+        and index_universe_actual == EXPECTED_INDEX_RELEVANT_UNIVERSE
+        and index_miss_actual == EXPECTED_INDEX_QUERY_MISSES
     )
+    check("index_relevant_universe", index_universe_actual == EXPECTED_INDEX_RELEVANT_UNIVERSE, *index_universe_actual)
+    check("index_query_misses", index_miss_actual == EXPECTED_INDEX_QUERY_MISSES, *index_miss_actual)
     for name, values in INDEX_CLASS.items():
         actual = (len(values), digest(values))
         good = actual == EXPECTED_INDEX_CLASS.get(name)
@@ -963,7 +1123,7 @@ def main(argv: list[str] | None = None) -> int:
         and index_guards_ok
         and sentinels_ok
     )
-    check("index_partition", index_ok, len(index_candidates ^ set(INDEX_ROUTED)))
+    check("index_partition", index_ok, index_unresolved)
 
     semantic_records = set(SOURCE_SEMANTIC_GUARD_RECORDS)
     semantic_actual = (len(semantic_records), digest_records(semantic_records))
@@ -1008,6 +1168,11 @@ def main(argv: list[str] | None = None) -> int:
         f"{number}:{hashlib.sha256(at(number).encode('utf-8')).hexdigest()}"
         for number in EXCLUDED
     }
+    strict_disposition_records = {
+        f"{role}:{number}:{hashlib.sha256(at(number).encode('utf-8')).hexdigest()}"
+        for role, values in STRICT_MAIN_DISPOSITION.items()
+        for number in values
+    }
     omission_records = {
         f"{number}:{reason}"
         for reason, values in SPLIT_OMISSION_GROUPS.items()
@@ -1017,6 +1182,10 @@ def main(argv: list[str] | None = None) -> int:
         "excluded_line_hashes": (len(excluded_hash_records), digest_records(excluded_hash_records)),
         "index_guards": (len(index_records), digest_records(index_records)),
         "index_sentinels": (len(sentinel_records), digest_records(sentinel_records)),
+        "strict_main_dispositions": (
+            len(strict_disposition_records),
+            digest_records(strict_disposition_records),
+        ),
         "semantic_guards": semantic_actual,
         "auxiliary_guards": (len(auxiliary_records), digest_records(auxiliary_records)),
         "source_defects": (len(SOURCE_DEFECT_GUARD_RECORDS), digest_records(SOURCE_DEFECT_GUARD_RECORDS)),
@@ -1037,8 +1206,14 @@ def main(argv: list[str] | None = None) -> int:
         and SOURCE_DEFECT_GUARD_RECORDS == frozenset(SOURCE_DEFECT_RECORDS)
         and len(SOURCE_DEFECT_RECORDS) == len(SOURCE_DEFECT_GUARD_RECORDS)
         and len(SOURCE_MODEL_RECORDS) == len(set(SOURCE_MODEL_RECORDS))
-        and SPLIT_OMISSION_LINES <= RETAINED
+        and SPLIT_OMISSION_LINES <= (RETAINED | STRICT_MAIN_CONTENT)
         and len(omission_records) == len(SPLIT_OMISSION_LINES)
+        and sum(map(len, SPLIT_OMISSION_GROUPS.values())) == len(SPLIT_OMISSION_LINES)
+        and set(SPLIT_MAIN_SUMMARY_OWNERS) <= set(STRICT_MAIN_CONTENT)
+        and SPLIT_OMISSION_LINES
+        == STRICT_MAIN_CONTENT
+        - set(SPLIT_MAIN_DIRECT_OWNERS)
+        - set(SPLIT_MAIN_SUMMARY_OWNERS)
     )
     check("semantic_and_record_contracts", record_ok)
 
@@ -1111,7 +1286,10 @@ def main(argv: list[str] | None = None) -> int:
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
             split_text[f"{relative}:{number}"] = line
 
-    crosswalk_lines = RETAINED | INDEX_ROUTED
+    # Split closure is driven by the independent strict-main and actual-Index
+    # universes, not merely by rows reached through discovery regexes.
+    independent_crosswalk_universe = STRICT_MAIN_CONTENT | INDEX_RELEVANT_UNIVERSE
+    crosswalk_lines = RETAINED | independent_crosswalk_universe
     crosswalk_records: set[str] = set()
     class_lines: dict[str, set[int]] = {
         name: set() for name in ("EXACT", "IMAGE_BASENAME", "NORMALIZED", "SUMMARY", "OMITTED")
@@ -1183,7 +1361,8 @@ def main(argv: list[str] | None = None) -> int:
 
     unresolved_total = (
         len(pre_index ^ set().union(*query_partition))
-        + len(index_candidates ^ set(INDEX_ROUTED))
+        + strict_unresolved
+        + index_unresolved
         + (len(crosswalk_lines) - len(crosswalk_records))
         + len(UNRESOLVED_IMAGE_LINES)
         + (len(CANDIDATE_IMAGE_LINES) - len(image_manifest))
@@ -1197,6 +1376,17 @@ def main(argv: list[str] | None = None) -> int:
     } | {
         f"record:{name}:{count}:{record_digest}"
         for name, (count, record_digest) in record_actuals.items()
+    } | {
+        f"strict:{name}:{len(values)}:{digest(values)}"
+        for name, values in strict_sets.items()
+    } | {
+        f"index-class:{name}:{len(values)}:{digest(values)}"
+        for name, values in INDEX_CLASS.items()
+    } | {
+        f"index-universe:{index_universe_actual[0]}:{index_universe_actual[1]}",
+        f"index-query-misses:{index_miss_actual[0]}:{index_miss_actual[1]}",
+        f"strict-unresolved:{strict_unresolved}",
+        f"index-unresolved:{index_unresolved}",
     } | {
         f"split:{name}:{count}:{line_digest}:{record_digest}"
         for name, (count, line_digest, record_digest) in class_actual.items()
@@ -1222,6 +1412,19 @@ def main(argv: list[str] | None = None) -> int:
             "queries": len(QUERIES),
             "query_union": len(union),
             "retained": len(RETAINED),
+            "strict_main": {
+                "content": len(STRICT_MAIN_CONTENT),
+                "digest": digest(STRICT_MAIN_CONTENT),
+                "native": len(STRICT_MAIN_NATIVE),
+                "structural": len(STRICT_MAIN_STRUCTURAL),
+                "unresolved": strict_unresolved,
+            },
+            "index": {
+                "digest": digest(INDEX_RELEVANT_UNIVERSE),
+                "query_misses": len(index_query_misses),
+                "relevant": len(INDEX_RELEVANT_UNIVERSE),
+                "unresolved": index_unresolved,
+            },
             "split_crosswalk": len(crosswalk_records),
             "status": "PASS" if ok else "FAIL",
             "unresolved_total": unresolved_total,
@@ -1236,7 +1439,10 @@ def main(argv: list[str] | None = None) -> int:
             f"audit={audit_digest}",
             f"queries={len(QUERIES)}/union={len(union)}",
             f"retained={len(RETAINED)}",
-            f"index={len(INDEX_ROUTED)}",
+            f"strict-main={len(STRICT_MAIN_CONTENT)}(N/S="
+            f"{len(STRICT_MAIN_NATIVE)}/{len(STRICT_MAIN_STRUCTURAL)},closure={strict_unresolved})",
+            f"index={len(INDEX_ROUTED)}/query-misses={len(index_query_misses)}"
+            f"/closure={index_unresolved}",
             f"images={len(GOVERNED_IMAGE_LINES)}(N/R/C="
             f"{len(NATIVE_IMAGE_LINES)}/{len(RELATION_IMAGE_LINES)}/{len(CONTROL_IMAGE_LINES)})",
             f"split={len(crosswalk_records)}",
