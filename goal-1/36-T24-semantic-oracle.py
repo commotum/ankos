@@ -1663,10 +1663,27 @@ def assert_translation_commutation() -> dict[str, int]:
     assert bareiss_determinant(fcc.basis) != 0
     assert bareiss_determinant(bcc.basis) != 0
     embedded = 0
+    basis_access_events = 0
     for descriptor in (fcc, bcc):
         images = {descriptor.embed(coord) for coord in product(range(-1, 2), repeat=3)}
         assert len(images) == 27
         embedded += len(images)
+        table = deterministic_table(2, self_count_case_count(len(descriptor.offsets), 2), len(descriptor.offsets))
+        program = count_program(2, len(descriptor.offsets), table)
+        for variant in (1, 3):
+            native = NativeTranslationState(
+                (3, 3, 3),
+                2,
+                cells_pattern(27, 2, variant),
+                generation=variant,
+            )
+            expected = native_translation_count_step(native, descriptor.offsets, table)
+            actual = decode_translation(
+                generic_step(program, encode_translation(native, descriptor.offsets)),
+                native.shape,
+            )
+            assert actual == expected
+            basis_access_events += 1
 
     return {
         "translation_count_events": count_events,
@@ -1674,6 +1691,7 @@ def assert_translation_commutation() -> dict[str, int]:
         "large_closed_positional_events": large_positional_events,
         "coordinate_roundtrips": coordinate_roundtrips,
         "basis_embedding_witnesses": embedded,
+        "basis_access_events": basis_access_events,
     }
 
 
@@ -2346,7 +2364,7 @@ def semantic_digest(counts: dict[str, int]) -> str:
     return sha256(transcript.encode("utf-8")).hexdigest()
 
 
-EXPECTED_SEMANTIC_DIGEST = "5911d160e338f2f1e81bcde4985081f933580712e9b3804715b3a361b9c8daf9"
+EXPECTED_SEMANTIC_DIGEST = "df6481886ae13040679ea00f005ce58b5382452bfc3ed72e7b59dcc25b8aa2f4"
 
 
 def main() -> None:
@@ -2381,6 +2399,7 @@ def main() -> None:
         f"translation_count:{groups['translation']['translation_count_events']},"
         f"translation_positional:{groups['translation']['translation_positional_events']},"
         f"large_closed_positional:{groups['translation']['large_closed_positional_events']},"
+        f"basis_access:{groups['translation']['basis_access_events']},"
         f"hex:{groups['hex']['hex_native_generic_events']},"
         f"declared_degree:{groups['incidence']['degree_profile_events']},"
         f"pentagonal:{groups['incidence']['pentagonal_code4094_events']},"

@@ -41,6 +41,98 @@ Reconstruct higher-dimensional and alternative-lattice cellular automata from pr
 - Entry kind: source audit open; fixed-support label evolution with dimensional/topological/access parameterization is the initial hypothesis.
 - Initial vocabulary: higher-dimensional, arbitrary-dimensional, `d` dimensions, lattice cellular automata, crystal lattice, cubic, tetrahedral, rhombic, close-packed, honeycomb, triangular, hexagonal, face-centered, body-centered, neighbors, tilings, tessellations, Notes implementations, captions, actual Index, projections, slices, and embeddings.
 
+## Search Log
+
+`36-T24-source-oracle.py` freezes 21 overlapping direct-name, arbitrary-dimension, formula, ordered-offset, chapter-introduction, alternative-lattice, tiling, Penrose, network, update, realization, rule-restriction, structural-network, alternate-schedule, actual-Index, isotropy, function-rule, crystal-growth, distorted-hexagonal, and broad geometry queries. Their union contains 142 unique monolith lines: 113 before the actual Index and 29 actual-Index routes. The union digest is `23247daa90ba3ad9bf8892f02e9c010cdeff596c2f99652504405c8254fb7fee`.
+
+The 113 pre-Index candidates partition exactly as 69 matched retained lines plus 44 exclusions; 76 governed continuations produce 145 retained evidence lines. Their semantic partition is `80 native / 16 relation / 49 control`, with digest `52c5ea5e4964df3ec11e3c2994691a4fb9eda6b0ee9ce61a5ea91f87d7df37fa`. The exclusions are `31 other CA family or dimension / 8 broad implementation-name collisions / 5 other geometry or physics`. No pre-Index candidate remains unresolved.
+
+The 29 actual-Index routes partition as `20 T24 geometry/topology / 2 other rule restrictions / 1 structural or sequential network / 4 continuous or stochastic / 2 broad implementation-name` routes. They supply navigation vocabulary only. All seventeen split Markdown files are hash-bound. The query reverse join closes as `134 exact + 8 mapped variants`; the full retained reverse join closes as `131 exact + 14 mapped variants + 0 monolith-only`. One Atlas record is summary/navigation only. The catalog and taxonomy are checked for stable identity and vocabulary but never promoted into Book semantics. The stable asset interface contains eleven governed image lines at `6 native / 2 relation / 3 control`.
+
+The source oracle independently guards the arbitrary-dimensional formulas and positional codec; the six-neighbor hexagonal rule-space counts; the exact source wording and derived decodings for codes `4094`, `254`, `16382`, and `10926`; the distorted-square/hexagonal access map; the fixed-incidence one-step event; the fixed-network-versus-T29 boundary; and function, stochastic, continuous-value, structural, and schedule controls. Root and relocated-cwd runs pass, optimized mode fails closed, import is silent, explicit compilation passes, and `unresolved_total=0`.
+
+## Source-Bound Asset Audit
+
+`36-T24-asset-oracle.py` applies one nonrecursive radius-four source-proximity pass to the full retained evidence set. This produces a bounded 22-plate candidate universe, not an iterative fixed point. It partitions without remainder into eleven governed and eleven separately ledgered adjacency-only plates.
+
+The governed set contains six native plates—dimensional arrangements, hexagonal any-neighbor growth, the hexagonal exact-one snowflake rule, the alternative-lattice/Voronoi-neighbor plate, pentagonal code `4094`, and Penrose code `254`—plus two relation plates for Penrose construction and Voronoi geometry, and three structural/sequential-network controls. The adjacency-only set partitions as `2 structural-network / 1 natural observer / 4 other CA / 1 substitution / 1 network observer / 1 static geometry / 1 sequential CA` plates.
+
+Every candidate has one monolith and one split reference, giving 44 references, 22 physical files, and 22 unique hashes. Six source-bound transcript records retain only nearby textual claims and code labels. The transcript digest is `c8dea3a540c8bf6dca319bc1d8387daf33b45a7d830cba1a7facc3150f7e3ba3`. The honest boundary is `HASH_BOUND=22 / TRANSCRIBED=6 / PIXEL_REPLAYED=0`. The fixed-network CA evidence is text-only. No plate supplies a complete Penrose, pentagonal, crystal, or network topology; no missing seed, horizon, boundary, renderer, or trace is reconstructed from pixels. Root and relocated runs/imports pass, optimized mode fails closed, explicit compilation passes, and no candidate remains unresolved.
+
+## Primary Book Evidence
+
+### Dimension, offset, and update mechanics
+
+- `BOOK:2148-2156` introduces arrangements in one, two, and three dimensions and explicitly names triangular, hexagonal, crystal-like, and nonrepetitive alternatives.
+- `BOOK:850,10984-10992` establishes old-value reads, two-snapshot implementation, parallel update, and finite/cyclic realizations.
+- `BOOK:13483-13507` gives the arbitrary-`d`, `k`-color axis-total and full-total forms. Their neighborhood position counts are `2d+1` and `3^d`, with compact case counts `k*(2d*(k-1)+1)` and `k*((3^d-1)*(k-1)+1)`.
+- `BOOK:13513-13531` permits any finite offset list in any dimension, fixes sorted positional order, enumerates complete contexts, and defines the arbitrary-precision rule-number map. This is closed positional RULE data, not a formula callback.
+
+### Hexagonal rule schemas and lossless coordinate representation
+
+- `BOOK:13534-13549` gives the seven-position binary hexagonal rule spaces: `2^128` general, `2^28` rotational, `2^26` completely symmetric, `2^14` outer-totalistic, `2^8` totalistic, and `2^7` growth-totalistic. These are native T24 evidence, not controls inherited from the square-grid columns of the same table.
+- `BOOK:4408-4430` gives fixed-lattice crystal growth and the hexagonal exact-one-neighbor snowflake CA. The displayed shapes and resemblance to snowflakes are outcomes/relations, not additional rule state.
+- `BOOK:15608-15612` explicitly treats the hexagonal lattice as a distorted square array with a six-offset convolution, gives source codes `16382` and `10926`, and separately supplies display centers. The array access is a lossless execution representation; the geometric centers are view data.
+
+### Alternative fixed incidence
+
+- `BOOK:13642-13646` permits any geometry with finitely many cell types and similar neighborhoods. For nearest-neighbor rules, adjacency rather than detailed geometry is decisive. It lists square/hexagonal, cubic/hexagonal-prism, FCC/rhombic-dodecahedral, elongated-dodecahedral, BCC/truncated-octahedral, and higher-dimensional neighbor counts.
+- `BOOK:13650-13656` removes common orientation and periodicity assumptions. Congruent pentagonal cells use outer-totalistic code `4094`; a two-shape nested Penrose tiling treats both shapes alike and uses code `254`. Exact global topology and seeds are not serialized by those captions.
+- `BOOK:13909-13915` gives fixed-network cellular automata as node-label evolution over an unchanged network and a direct `NetCAStep` implementation.
+- `BOOK:13658` requires homogeneous or finitely many local network structures. Unlabeled connections permit only totalistic rules; positional rules therefore require explicit semantic port labels rather than an order invented from storage IDs.
+
+### Relations and controls
+
+- `BOOK:13746-13756` relates Penrose support to substitution/projection from five dimensions; it does not replace the native fixed tiling by a five-dimensional CA step.
+- `BOOK:15293,15467-15487` supplies lattice-isotropy and Voronoi geometry relations. Neither defines a RULE or a mandatory geometry solver.
+- `BOOK:13835-13919` separates topology-changing network systems and per-node random Boolean rules from fixed-network label evolution. `BOOK:16446` separates sequential update from the strict snapshot-parallel schedule.
+- `BOOK:11063-11065` describes unrestricted function/time-dependent built-in forms. They are controls, not authorization for callbacks in the closed SimpleProgram RULE algebra.
+
+## Independent Semantic Oracle
+
+`36-T24-semantic-oracle.py` defines independent native translation-lattice and fixed-incidence evaluators plus a generic four-axis SimpleProgram evaluator. The generic side uses immutable support/incidence, exact site handles tied to one snapshot, closed `DenseTable | DefaultOverridesTable` RULE data, one same-site assignment per active site, and atomic parallel commit. It contains no callback, family field, catalog switch, microstep encoding, or eager exhaustive-table requirement.
+
+The oracle closes 1,689 native/generic one-event commutations:
+
+```text
+translation count                80
+translation positional           15
+large closed positional           2
+basis/access codec                 4
+hexagonal                       1024
+declared source degree            80
+pentagonal                        64
+two-shape fixed incidence         64
+alternating orientation          256
+finite-type fixed network         32
+unlabelled global count           32
+labelled-port positional          32
+alias/parallel-port multiplicity   3
+old-snapshot adversary             1
+                                  ----
+                                  1689
+```
+
+Fifty-one formula/profile checks cover arbitrary `d` axis/full aggregate sizes, complete positional row counts, and exact context codecs. A binary four-dimensional full neighborhood has width 81 and `2^81` positional rows; `DefaultOverridesTable` proves that a complete bounded closed function need not be eagerly materialized or replaced by a callback. Translation-count fixtures span dimensions and alphabets, while asymmetric positional fixtures prevent a count rule or silent reordering from passing.
+
+The hexagonal audit independently enumerates the `C6` and `D6` actions on the six neighbor positions. With the center fixed separately, it obtains exactly 28 rotational and 26 complete-symmetry context orbits, checks 256 compact-table fiber rows, and proves the source exponents `128/28/26/14/8/7`. The exact staggered-array codec
+
+```text
+(row, column) -> (row, 2*column - row)
+```
+
+round-trips, maps all six source access offsets to equal scaled distance, and commutes for all 512 configurations of a `3x3` quotient under both codes `16382` and `10926`, giving 1,024 hex events. The `sqrt(3)` center placement remains view-only.
+
+The code oracle proves—not merely assumes—that degree-three `254`, degree-five `4094`, and degree-six `16382` are the complete outer-totalistic growth tables: an old black Self persists at count zero, and a white cell is born when at least one neighbor is black. Degree-six `10926` preserves every old black Self and births a white cell exactly at neighbor count one. Source wording and these derived canonical tables remain separately labeled.
+
+Ten source-declared lattice degree profiles execute through arbitrary validated fixed incidence without inventing global FCC, BCC, Penrose, or pentagonal topology. Separate fixtures prove kind-conditioned access for alternating orientations, a two-shape shared-rule support, and a finite-type fixed network. Across 96 edge permutations, unlabeled count rules remain invariant and positional rules fail validation; explicitly labeled ports admit positional tables.
+
+The alternating-orientation adversary gives a concrete current-runtime failure: at a down-oriented site, one broadcast “up” offset reaches a different site from the native typed incidence. Kind-indexed access repairs the event with the same UPDATE. A `1^4` quotient retains eight axial occurrences rather than one unique destination; a `2x2` full quotient retains multiplicities `[2,2,4]`; three parallel ports remain three reads. An in-place adversary diverges from the old-snapshot result, while the generic parallel commit matches the native event.
+
+Four additional coefficient-basis commutations prove that derived FCC/BCC basis access and its explicit coordinate codec preserve the complete native event; the Book's degree statements still do not authorize an invented global crystal topology.
+
+The semantic digest is `df6481886ae13040679ea00f005ce58b5382452bfc3ed72e7b59dcc25b8aa2f4`. Root and relocated runs pass, optimized mode fails closed, import is silent, and explicit compilation passes. Every strict T24 profile lands in audit categories 1-3. Structural node creation is the concrete fixed-support nonfit already routed to T29's graph-write UPDATE; T24 adds neither an UPDATE nor an executor.
+
 ## First-Principles Fit Standard
 
 The `src/ca` namespace and its rank-three tensor realization are not the semantic boundary. Every T24 finding must be classified as:
