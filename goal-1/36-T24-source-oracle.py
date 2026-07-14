@@ -14,6 +14,7 @@ a T24 executor from the catalog name.
 from __future__ import annotations
 
 import hashlib
+import itertools
 import re
 import sys
 import unicodedata
@@ -199,6 +200,30 @@ QUERIES = {
     ),
 }
 
+EXPECTED_QUERY = {
+    "Q00": (1, 1, 0, "690c4db056e43ca1024e4878a222d0851fd0784206d10f5107ac6553e434066f"),
+    "Q01": (5, 5, 0, "df1b395debca55f9676069f65c41dec29f0535edc45726c67f32455ec4620da4"),
+    "Q02": (11, 11, 0, "f70bf9e3e81120144d25bfa54322d58252b2401f5240e630a1e478bcbe730756"),
+    "Q03": (13, 11, 2, "83fa2727e4fa717149a36b228cbf46c92829c6b71ecceaf2076f92a1265d2967"),
+    "Q04": (3, 3, 0, "033e5a900cf397c304cbb8988666503159eaf538b9cc18924504c9c783e154b0"),
+    "Q05": (3, 3, 0, "426d1e9ae1d4e062b42e11f273eccf13dc54b8ab62e22499ba6857407975b41f"),
+    "Q06": (15, 5, 10, "8472ca1c543b44bb7bf6679942f3c3adcd72b7502a6bed493eb164f8d1c844c2"),
+    "Q07": (2, 2, 0, "91db60877c50db77528fcb86829c44a573344ffa314e5f0f83dad0fe06202961"),
+    "Q08": (4, 2, 2, "cedd849cf095fe3ad6fc5468aea38522a4dbb3b3340328c4c9e40daf8df77242"),
+    "Q09": (7, 6, 1, "ebfc6ada0b89ac0f5a4d72b84704c261c606c289f378124005ac0117c496ee07"),
+    "Q10": (4, 4, 0, "09f0ced54248f816de461539fe9f4703b92b7a353b413328816e1f3a94e4346b"),
+    "Q11": (5, 5, 0, "e938101e6472fb355452b7a93951bf5575b11a430a084f6e0ed79d710b4072d2"),
+    "Q12": (12, 10, 2, "42db202eee8b0a3e6d45e03d2a5bc3ff3ad88094d8ca4f9ee027e8e3c67711e7"),
+    "Q13": (6, 5, 1, "76e6c49ffdd32e1f99c554baaa05920cf809171d2e80225399e43fe67153ded9"),
+    "Q14": (31, 27, 4, "f7ba64517fae4ad6c993b7d319fa9b9bb665e5aabdc6f719e2f4a9aced76beab"),
+    "Q15": (13, 0, 13, "ec47e680e4e6cd26af3cd5eb8e846a4086ad55576060ca31f43e036cf4b944a8"),
+    "Q16": (2, 2, 0, "c51ecba43eadb73dfdeeca54f8b691b91c5d6b27f91310d2abc3aae9a5a3d7f4"),
+    "Q17": (4, 4, 0, "a42512c7dafb47a47226f2b2452bdee8a1c210e7404bbe41f12b6a2faaa59d71"),
+    "Q18": (7, 7, 0, "0bffb17916facc44a53a086f117ef6db099957744f44e03f822f3746b99b5851"),
+    "Q19": (2, 2, 0, "748b344c47308275c85e78147e066c7cdd86c39ae1a53cb5f10b7cee58fcfc10"),
+    "Q20": (14, 12, 2, "26c82e76aab7eb8587dd01a3114a8c4196e0079aa2c7c17d650b0385d01fe0b6"),
+}
+
 
 def line_set(spec: str) -> frozenset[int]:
     """Parse comma-separated line numbers and inclusive ranges."""
@@ -239,7 +264,8 @@ NATIVE_EVIDENCE = line_set(
     "10984,10986,10992,11050-11056,11060-11062,"
     "13483,13485-13486,13488,13490,13492,13494-13495,13497,13499,"
     "13501,13503,13505,13507,13513,13515-13518,13520,13522-13525,"
-    "13528,13530-13531,13642,13644,13646,13648,13650,13652,13654,"
+    "13528,13530-13531,13534,13536,13538,13540,13542-13549,"
+    "13642,13644,13646,13648,13650,13652,13654,"
     "13656,13658,13909-13910,13913-13915,15608,15610,15612"
 )
 
@@ -258,8 +284,8 @@ RELATION_EVIDENCE = line_set(
 CONTROL_EVIDENCE = line_set(
     "2018,2372,2426,2464,11037,11063-11065,11077,11079-11087,11090,"
     "11092,11095-11100,11103,11106-11107,11110,11112,11114,11116,"
-    "11118,11120,11122,11124,13314,13464,13534,13536,13538,13540,"
-    "13542-13549,13835,13889,13891,13893,13917-13919,15708,16446"
+    "11118,11120,11122,11124,13314,13464,13835,13889,13891,13893,"
+    "13895,13917-13919,15708,16446"
 )
 
 RETAINED = NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE
@@ -271,7 +297,7 @@ RETAINED = NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE
 IMAGE_RE = re.compile(r"^!\[[^\]]*\]\(([^)]+)\)$")
 NATIVE_IMAGE_LINES = line_set("2154,4412,4428,13648,13652,13656")
 RELATION_IMAGE_LINES = line_set("13748,15487")
-CONTROL_IMAGE_LINES = line_set("13891,13893")
+CONTROL_IMAGE_LINES = line_set("13891,13893,13895")
 GOVERNED_IMAGE_LINES = (
     NATIVE_IMAGE_LINES | RELATION_IMAGE_LINES | CONTROL_IMAGE_LINES
 )
@@ -289,6 +315,55 @@ INDEX_CLASS = {
     "broad_implementation_name_routes": line_set("21050,21471"),
 }
 INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
+
+
+EXPECTED_SOURCE_COUNT = 145
+EXPECTED_SOURCE_DIGEST = "52c5ea5e4964df3ec11e3c2994691a4fb9eda6b0ee9ce61a5ea91f87d7df37fa"
+EXPECTED_SET = {
+    "union": (142, "23247daa90ba3ad9bf8892f02e9c010cdeff596c2f99652504405c8254fb7fee"),
+    "pre_index_union": (113, "ef9e88414b9d5843b9e77e9bbe5a0429d853fa220381278206289a4370447b87"),
+    "index": (29, "12b31e400df0dac3114d8153f4692b1cc7970bf9ffee0afa9b896daa3c1696ac"),
+    "matched_retained": (69, "dfc95e295b50dccb78dc459d1d433b7ab482ea9af57dd868fcca067121fbc985"),
+    "governed_continuations": (76, "3e50c1a4d9e20f37b104c4ebe8350f596fa525044cd19396861613aec5995d55"),
+    "retained": (EXPECTED_SOURCE_COUNT, EXPECTED_SOURCE_DIGEST),
+    "excluded": (44, "fdfa685987fbc2e6f63b41a56e5ec8253df85afaceb1bcef500341afc755fa6a"),
+    "native": (80, "1c7fa838bfa3e42073f8f8b7f8dfe2647a16a188f515063421892fb7255df2c3"),
+    "relation": (16, "d74e8224571c62fff7eb6ed75171a60a0be1a19c299dc9fe8a83bd9f4942585b"),
+    "control": (49, "eaaa54ac9aa56764b6b86260be2c0d978067d24db4c17884fad1632b784bff99"),
+    "governed_images": (11, "07b740cf80d9e0caef2500ebb6882c4322a6969b9fc284e3e77af4b9a611b62d"),
+}
+EXPECTED_EXCLUDED_CLASS = {
+    "other_ca_family_or_dimension": (31, "518bafbc6cfd250eff1dedd235d768aa786a7fcab576dce1d9da8df701b34234"),
+    "broad_implementation_name_collision": (8, "1e1b1fd12fdbaf287f1f20611843ed5c22c8d5ad1a20b94b0fc66bbb46d561d7"),
+    "other_geometry_or_physics": (5, "ba1d93bbb23d8cd72f1cf471b68d0cf1e3f7e99771703b79cb762fe4269f9e18"),
+}
+EXPECTED_INDEX_CLASS = {
+    "t24_geometry_and_topology_routes": (20, "2c49222d95d70fc15730c34490c2ed4ba9faad7355f8ba47b1aeab2bc453cafc"),
+    "other_rule_restriction_routes": (2, "633b53d4c3b49f1981130965b95e51e3c505945acafb9fe29b57949f19812fde"),
+    "structural_or_sequential_network_routes": (1, "2754f6e1f004d4298d7ed6444c52385d98a70aee827877053ef7d43e519ac10f"),
+    "continuous_or_stochastic_routes": (4, "c6db33d21c31050eaaa818770ba46e08cb74c0f434347d2559db6cae73a0e772"),
+    "broad_implementation_name_routes": (2, "5eed2a6567b8caf8645117fb1956b63eafe9819a2286932a9a0aa26ca88f561b"),
+}
+EXPECTED_IMAGE_PARTITION = {
+    "native": (6, "e6b89d89fdb76ba4bb76560fcbcd6dd0f22169301ab98bc8017e8bf0571b085f"),
+    "relation": (2, "97cdd4f0b5c022cd17993d343b86304469fd691b53f5e5d6d3d8dad5b003b5c8"),
+    "control": (3, "4c1ead45e337c9c578d9a72d3e1095924b382013c19f58f95bf21391ef6b6d6c"),
+}
+
+EXPECTED_SPLIT_FILE_COUNT = 17
+EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
+EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
+# Filled from the deterministic reverse joins below; unlike raw source hashes,
+# these freeze both exact duplicates and normalized split-document variants.
+EXPECTED_SPLIT_QUERY = (0, "")
+EXPECTED_SPLIT_QUERY_EXACT = (0, "")
+EXPECTED_SPLIT_QUERY_NONEXACT = (0, "")
+EXPECTED_SPLIT_QUERY_MAPPING_DIGEST = ""
+EXPECTED_SPLIT_RETAINED_EXACT = (0, "")
+EXPECTED_SPLIT_RETAINED_NONEXACT = (0, "")
+EXPECTED_SPLIT_RETAINED_MAPPING_DIGEST = ""
+EXPECTED_MONOLITH_ONLY = (0, "")
+EXPECTED_ATLAS_HITS = (0, "")
 
 
 def digest(values: set[int] | frozenset[int]) -> str:
