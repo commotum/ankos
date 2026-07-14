@@ -962,9 +962,9 @@ def native_count_step(
     for layer in range(old.shape[0]):
         for row in range(old.shape[1]):
             for column in range(old.shape[2]):
-                center = old.value_at(layer, row, column)
                 neighbors = native_neighbor_values(old, layer, row, column, rule.profile)
                 if type(rule) is CountProductRule:
+                    center = old.value_at(layer, row, column)
                     index = center + rule.alphabet_size * sum(neighbors)
                 else:
                     index = sum(neighbors)
