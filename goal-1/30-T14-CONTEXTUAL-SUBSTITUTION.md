@@ -1,6 +1,6 @@
 # 30-T14-CONTEXTUAL-SUBSTITUTION
 
-Status: **IN PROGRESS — EVIDENCE, ASSETS, AND SEMANTICS CLOSED; INTEGRATION AND HOSTILE REVIEW OPEN**
+Status: **IN PROGRESS — EVIDENCE, ASSETS, SEMANTICS, AND INTEGRATION CLOSED; HOSTILE REVIEW AND FINAL GATES OPEN**
 
 ## Current Facts
 
@@ -402,7 +402,7 @@ D018 remains active. D019 reopens only to factor full old-source coverage out of
 1. Freeze the exhaustive monolith/split source union, retained/governed/excluded dispositions, actual Index boundary, aliases, cross-references, and content hashes in `30-T14-source-oracle.py`.
 2. Freeze the source-bound asset fixed point, reference closure, hashes, C/O/R/X classification, and exact page-100 rule/seed/trajectory facts in `30-T14-asset-oracle.py`.
 3. Freeze direct and generic one-step semantics, snapshot/newborn deferral, source order, boundary, zero-source behavior, and adversarial non-reuse checks in `30-T14-semantic-oracle.py`.
-4. Resolve whether D019 should name a generic `OrderedEmissionConcat` base with T13/T14 presets, or whether a concrete counterexample requires a distinct schedule. Do not add a new algebra without that counterexample.
+4. Resolve D019 by naming the generic `OrderedGenerationConcat` base with T13/T14 presets; the exhaustive commuting and hostile cases supply no counterexample requiring a distinct schedule.
 5. Complete the API/runtime fit, Goal 2 handoff, no-cheating tests, source/asset/semantic root and `/tmp` checks, optimized-mode fail-closed checks, Markdown/diff/scope gates, and independent hostile review.
 6. Integrate only closed findings into `0-plan.md`, `evidence-index.md`, and `design-ledger.md`; reopen any contradicted prior stage before advancing.
 
@@ -486,7 +486,7 @@ One shared runner executes T13 and T14 through data-selected generic components;
 - [x] API/runtime fit and implementation-ready Goal 2 handoff cite actual definitions and tests.
 - [ ] Independent hostile review has no unresolved blocker, major, or minor finding.
 - [ ] Source, asset, semantic, Markdown, diff, scope, status/coverage, and repository-test gates pass.
-- [ ] `0-plan.md`, `evidence-index.md`, and `design-ledger.md` are integrated consistently.
+- [x] `0-plan.md`, `evidence-index.md`, and `design-ledger.md` are integrated consistently.
 
 ## Stage Results
 
@@ -494,4 +494,4 @@ The evidence, asset, and semantic audits are closed. The 308-line source union r
 
 T14 is not a new construction executor or UPDATE algebra. It reuses T13's finite ordered configuration, nonempty word result, lineage, and `OrderedGenerationConcat`; it parameterizes FRONTIER to `HasRightNeighbor`, NEIGHBORHOOD to immutable overlapping `(Self,Right)` reads, and the total table to `Sigma^2 -> Sigma+`. D019 moves full-old-source coverage into T13's preset, while D024 records T14's `[]->[]` and `[a]->[]` zero-emission successors. The 164,592-case commuting oracle, 4,080 singleton-pair interior cases, exact fixtures, and hostile validation close this classification.
 
-No prior type stage reopens and no runtime code changed. Design-ledger/plan/evidence integration, independent hostile review, Markdown/diff/scope/status gates, and the repository regression suite remain before the status can become COMPLETE.
+No prior type stage reopens and no runtime code changed. Independent hostile review, Markdown/diff/scope/status gates, and the repository regression suite remain before the status can become COMPLETE.
