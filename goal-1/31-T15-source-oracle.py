@@ -57,8 +57,8 @@ EXPECTED_TAXONOMY_SHA256 = (
 # extinction, and broad lexical false positives.  Q08--Q10 and Q16 freeze
 # terminology absences rather than silently converting prose into notation.
 # Q11--Q15 cover shared generation, nonempty predecessor, parallel schedule,
-# order, and rendering.  Q17 follows L-system aliases.  Q18 covers all source
-# arrow spellings plus list/string empty RHS notation.  It separates a T17
+# order, and rendering.  Q17 follows L-system aliases.  Q18 covers every
+# observed source arrow spelling plus list/string empty RHS notation.  It separates a T17
 # empty appendant, a T20 observer's removal of literal ``e`` during bracket
 # encoding, and a T30 multiway transition with an empty replacement string.
 # Q19--Q21 close the adjacent T14, T16, and T17 schedule/outcome boundaries.
@@ -119,7 +119,7 @@ QUERIES = {
     ),
     "Q16": r"\bpages? 8[67]\b",
     "Q17": r"\b(?:D?0L|D?1L|L) systems?\b|\bLindenmayer\b",
-    "Q18": r'(?:\\rightarrow|\\to|->)\s*(?:\\?\{\s*\\?\}|"")',
+    "Q18": r'(?:\\longrightarrow|\\rightarrow|\\mapsto|\\to|->|:>)\s*(?:\\?\{\s*\\?\}|"")',
     "Q19": (
         r"\brightmost element is always dropped\b|"
         r"\bno rule is given for how to replace it\b"

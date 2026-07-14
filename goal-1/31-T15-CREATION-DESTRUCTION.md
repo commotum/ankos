@@ -1,6 +1,6 @@
 # 31-T15-CREATION-DESTRUCTION
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS CLOSED; HOSTILE REVIEW OPEN**
+Status: **COMPLETE — EVIDENCE, ASSETS, SEMANTICS, ARCHITECTURE, AND HOSTILE REVIEW CLOSED**
 
 ## Current Facts
 
@@ -62,7 +62,7 @@ Reconstruct creation-destruction substitution directly from exhaustive primary e
 | Q15 rendering alternatives | 1 | 1 | 0 |
 | Q16 literal page 86/87 control | 0 | 0 | 0 |
 | Q17 0L/1L/L-system aliases | 9 | 4 | 5 |
-| Q18 all arrow spellings with empty-list/string RHS | 3 | 3 | 0 |
+| Q18 all observed arrow spellings with empty-list/string RHS | 3 | 3 | 0 |
 | Q19 T14 right-edge boundary | 1 | 1 | 0 |
 | Q20 T16 sequential boundary | 2 | 2 | 0 |
 | Q21 T17 short/extinction boundary | 2 | 2 | 0 |
@@ -457,9 +457,13 @@ One shared runner and one `OrderedGenerationConcat` execute strict T13, strict T
 - [x] Semantic oracle proves reuse of the shared ordered-generation UPDATE with adversarial cases.
 - [x] API/runtime/principles audits identify the smallest reusable base and narrow decision clarifications.
 - [x] Goal 2 handoff is implementation-ready and contains canonical conformance/no-cheating tests.
-- [ ] Independent hostile review is clean and every oracle/test/Markdown/diff/scope/coverage gate passes.
-- [ ] `0-plan.md`, `evidence-index.md`, and `design-ledger.md` are integrated consistently.
+- [x] Independent hostile review is clean and every oracle/test/Markdown/diff/scope/coverage gate passes.
+- [x] `0-plan.md`, `evidence-index.md`, and `design-ledger.md` are integrated consistently.
 
 ## Stage Results
 
-Evidence, assets, semantics, and architecture are closed; independent hostile review and final global gates remain. The exact plates prove `Sigma^2 -> Sigma*` under T14's old-snapshot adjacent-pair schedule. The exhaustive oracle finds no class-4 counterexample: T15 widens only the typed word-result carrier and retains zero-length source witnesses. Strict T13/T14/T16 contracts remain nonempty, no prior semantic stage reopens, no runtime code changed, and no new UPDATE algebra or executor was accepted.
+T15 is complete after exhaustive source, asset, semantic, architecture, hostile-review, and global closure. The repaired 22-query source union closes 351 lines at `273 pre-Index / 78 actual-Index`, retains 32 matches plus eight governed continuations, excludes 241 pre-Index candidates, and reverse-closes all 17 split documents at `321 exact + 29 variants`. Q18 now covers every observed arrow spelling with a literal empty-list/string RHS; its three candidates include the retained T17 control and correctly excluded T20 observer/T30 multiway rows, so no sibling empty output is misattributed to T15. The 23-asset fixed point closes at `C/O/R/X=3/1/13/6` with 46 references and 23 hashes. Seven exact binary/ternary/quaternary tables, seeds, and `t0..t11` traces prove `Sigma^2 -> Sigma*` under T14's old-snapshot adjacent-pair schedule.
+
+The 304,927-case oracle finds no class-4 counterexample: T15 widens only the typed word-result carrier and retains zero-length source witnesses. It separately preserves strict T13/T14 validators, distinguishes active epsilon, zero-source, and post-extinction events, and rejects malformed lineage and result coverage. The hostile review exposed a reusable proof-model defect—generation-only source identity allowed independent same-generation configurations to alias. Both T14 and T15 now use opaque exact-snapshot identity, treat generation only as diagnostic metadata, and test same-generation/same-index foreign handles. This strengthens D019 without changing any transition semantics or reopening T14.
+
+All source, asset, and semantic oracles pass from the repository root and `/tmp` and fail closed under optimized mode. Markdown fences, `git diff --check`, Goal 1 scope, coverage arithmetic, and all 102 repository tests pass. Strict T13/T14/T16 contracts remain nonempty, no prior semantic stage reopens, no runtime code changed, and no new state class, UPDATE algebra, executor, family branch, sentinel, or growth policy was accepted. T15 is the 30th completed type; 15 remain pending. Next: T18.
