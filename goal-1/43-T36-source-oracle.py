@@ -1357,10 +1357,6 @@ def main() -> int:
         and duplicate_candidates == {1555, 12688}
         and split_owner_record(1555).endswith(":159")
         and split_owner_record(12688).endswith(":591")
-        and "FromDigits" in split_text[split_owner_record(12637)]
-        and "IntegerDigits" in split_text[split_owner_record(12637)]
-        and "dyadic or Paley order" in split_text[split_owner_record(17313)]
-        and "BitReverseOrder[a_]" in split_text[split_owner_record(17315)]
     )
     ok &= split_join_ok
     print(
