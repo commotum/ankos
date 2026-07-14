@@ -442,7 +442,13 @@ INDEX_CLOSURE_QUERIES = {
 # promoted into T35 mechanics: page 730 is general digit-level locality
 # context, while page 1114 is the upstream many-register-to-two-register
 # compiler rather than the later register-to-arithmetic construction.
-INDEX_ONLY_CONTEXT_ROUTES = line_set("20946,21695,21813")
+INDEX_ONLY_CONTEXT_ROUTE_CLASSES = {
+    "page730_general_digit_locality": line_set("20946,21695"),
+    "page1114_multiregister_compiler": line_set("21813"),
+}
+INDEX_ONLY_CONTEXT_ROUTES = frozenset().union(
+    *INDEX_ONLY_CONTEXT_ROUTE_CLASSES.values()
+)
 INDEX_ONLY_CONTEXT_TARGETS = {
     "page730_general_digit_locality": line_set("8834,8838"),
     "page1114_multiregister_compiler": line_set("18594-18617"),
@@ -597,6 +603,20 @@ EXPECTED_INDEX_CLOSURE_UNION = (
 EXPECTED_INDEX_ONLY_CONTEXT = (
     (3, "14d0c19320692f89c791a531e22c7916aeedcaed6c966c44277956384ed8006d"),
     (26, "3e51dddaa304781967587e8044b9419f688ef7aded34938c068d31ac4e283e37"),
+)
+EXPECTED_INDEX_ONLY_CONTEXT_CLASSES = {
+    "page730_general_digit_locality": (
+        (2, "01aab27c79e3a2af1db17d7d549d39c9328aa5a0bad9ce69d60505b6f25acf90"),
+        (2, "8091ecb35867132aa73084c5788e480dffc86c7b2f646c80b7a1289effc2617c"),
+    ),
+    "page1114_multiregister_compiler": (
+        (1, "8f458a6b455b54b6304af15bc9bd91cf72c31c9360dff4b77886d41d5114fb3f"),
+        (24, "b8feaf641576dfe0788876bd73b80ff9cd615db8458f2adcbb38d9b746ab7dfe"),
+    ),
+}
+EXPECTED_INDEX_ONLY_CONTEXT_ROUTE_MAPPING = (
+    3,
+    "c4505d4cf5f8fa7b811c3f5e9ae03435c471954cc5658904b7f5a4f86863152e",
 )
 EXPECTED_IMAGE_ASSET_MANIFEST = (
     26,
@@ -801,6 +821,20 @@ EXPECTED_SPLIT_INDEX_CONTEXT_CLASSES = {
         0,
         "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ),
+}
+EXPECTED_SPLIT_INDEX_CONTEXT_TARGET_CLASSES = {
+    "page730_general_digit_locality": (
+        2,
+        "8091ecb35867132aa73084c5788e480dffc86c7b2f646c80b7a1289effc2617c",
+        "402891c90d084f2fc1a26bd0e6b0a1b057381b610bf3df302d5fbfe2a52adc23",
+        "ceea6c38d1ffd3c0e1051d28f88c3ed76b03adb792283d0cc375b391a771e5fe",
+    ),
+    "page1114_multiregister_compiler": (
+        24,
+        "b8feaf641576dfe0788876bd73b80ff9cd615db8458f2adcbb38d9b746ab7dfe",
+        "7a76497b11402ad4bdee55daf75272b7ef19ea4b3da3a99de1f4db7b118f0338",
+        "ccb1e07570e20b55bcdff419754655a94f6e80670a4660187d6dccfc18165e1b",
     ),
 }
 EXPECTED_ATLAS_HITS = (
