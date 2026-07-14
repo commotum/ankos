@@ -62,7 +62,8 @@ ResidueIntegerMap = {
     modulus: PositiveInteger,
     rows: TotalMap[{0,...,modulus-1}, ClosedIntegerExpr],
     state_invariant: IntegerSubset,
-    closure_evidence: ReplayableValidation,
+    integer_closure_evidence: ReplayableValidation,
+    carrier_invariance_evidence: ReplayableValidation,
 }
 ```
 
@@ -93,7 +94,7 @@ Collatz = modulus 2:
     1 -> (3*n + 1) / 2
 ```
 
-For an affine quotient row `(a*n+b)/d` declared on `n = r mod m`, exact closure over the full residue class follows from `d | a*m` and `d | a*r+b`. More general closed expressions require their own complete validator/certificate; a host callback is not a substitute.
+For an affine quotient row `(a*n+b)/d` declared on `n = r mod m`, exact integer closure over the full residue class follows from `d | a*m` and `d | a*r+b`. This does not by itself prove preservation of a positive, natural, or otherwise restricted state carrier; carrier invariance is a separate obligation. More general closed expressions require their own complete validator/certificate for both obligations; a host callback or bounded sample is not a substitute.
 
 The strict main seed profile is positive integers. A natural profile must decide and record zero explicitly; a signed profile must declare Euclidean remainder semantics and validate its invariant. Program identity, seed identity, and trace identity remain separate.
 
@@ -129,7 +130,7 @@ The scalar state does not contain its history. `A(1)=A(2)=3` is a concrete infor
 
 A complete residue table computes one canonical key and performs direct lookup. Its row order is serialization provenance only; there is no overlap or priority.
 
-An ordered fraction system instead selects the first fraction `p/q` for which `q` divides the old integer. Order is behaviorally material. A finite ordered list can be compiled intensionally to a first-applicable decision over residues modulo the LCM of reduced denominators while retaining the selected-fraction witness, but materializing billions of rows is neither required nor desirable. Any such compilation must commute exactly and preserve the partial no-applicable outcome. The Book's implementation does not define that generic outcome, so Goal 2 must not invent halt, identity, or error as native source semantics.
+An ordered fraction system instead selects the first fraction `p/q` for which the reduced denominator `q` divides the old integer. Order is behaviorally material. A finite ordered list can be compiled intensionally to a first-applicable decision over residues modulo the LCM of reduced denominators while retaining the selected-list-index witness, but materializing billions of rows is neither required nor desirable. The lowering is behavior-preserving, not generally injective: shadowed, duplicate, or otherwise redundant source entries can denote the same transition, so the ordered source AST/provenance must remain attached whenever structural program identity is claimed. Any such compilation must commute exactly and preserve the partial no-applicable outcome. The Book's implementation does not define that generic outcome, so Goal 2 must not invent halt, identity, or error as native source semantics.
 
 ### Observers and relations
 
@@ -174,11 +175,11 @@ Every native strict T35 delta is categories 1–3. No concrete counterexample re
 
 ## Current Runtime Fit and Smallest Goal 2 Delta
 
-The checked-in runtime recognizes `t+0d` mechanically but remains finite-alphabet, `numpy.int64`, rectangular-array, callback-adjacent, and family-dispatched. Those are implementation gaps in the current realization, not evidence for a T35 family:
+The checked-in selectors already demonstrate the reusable geometry: `frontiers.time_slice(())` and `neighborhoods.self_at()` each select exactly `[0,0,0,0]`. `UniqueScalar` is therefore a named rank-zero role/preset, not a new FRONTIER or NEIGHBORHOOD type. The checked-in execution path nevertheless remains finite-alphabet, `numpy.int64`, rectangular-array, callback-adjacent, and family-dispatched. Those are implementation gaps in the current realization, not evidence for a T35 family:
 
 1. Generalize the shared exact scalar carrier/serialization to arbitrary-precision integers without `numpy.int64` coercion.
 2. Add closed integer AST nodes such as constants, state reference, exact affine quotient, Euclidean modulo/residue equality, and validated total residue lookup. Reuse compatible T43 expression syntax; do not accept host callbacks.
-3. Add construction-time totality, unique-residue, invariant, and integer-closure validation with replayable evidence.
+3. Add construction-time totality, unique-residue, exact integer-closure, and separately checked carrier-invariance validation with replayable evidence.
 4. Reuse T34 `UniqueScalar`, self access, assignment, atomic UPDATE, event result, and `h+1` trace; attach branch witnesses to events.
 5. Add named A/B/Collatz presets, source examples, and conformance fixtures separately from seeds and observers.
 6. Represent ordered fraction systems as an order-preserving closed RULE schema or certified intensional compilation on the same event. Keep no-applicable behavior explicitly partial until evidence resolves it.
