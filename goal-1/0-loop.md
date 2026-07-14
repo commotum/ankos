@@ -13,6 +13,8 @@ writes = RULE(active, reads)
 next   = UPDATE.apply(configuration, active, writes)  # StepResult[Configuration]
 ```
 
+`src/ca` is the current namespace and Phase 1 realization of this SimplePrograms library, not a claim that cellular automata delimit the architecture. Its present fixed-lattice shapes and family branches are implementation facts to audit. A catalog construction does not earn a new top-level class or executor merely because it departs from those defaults; first attempt the smallest explicit ALPHABET, CONFIGURATION/invariant, FRONTIER, NEIGHBORHOOD, RULE-result, UPDATE, or loci-selector extension inside the common algebra.
+
 DOMAIN is the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares the native support/topology that inhabits that DOMAIN plus structural invariants. ALPHABET is its label/value schema and may be a product or tagged union. FRONTIER selects rule-firing loci/occurrences/matches, RULE returns typed writes/replacements, and UPDATE returns one structured result containing zero, one, or many successor configurations plus typed outcome/event/witness data. These are axes of one branch-free runner, not family executors.
 
 Distinct source names or semantic roles do not imply distinct runtime classes. Prefer parameterizations, named roles, invariants, and lossless structural representations. For a claimed equivalence, require a complete-state map `e` with an explicit inverse on its invariant-valid image, one-step-granularity commuting successor sets, and no hidden source interpreter. Reject opaque whole-state packing, callbacks, lossy quotients, family dispatch, invented behavior, and altered schedules.
