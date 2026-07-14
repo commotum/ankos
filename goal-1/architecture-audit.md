@@ -1,6 +1,6 @@
 # Goal 1 Representation and Execution Architecture Audit
 
-Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); T06/T07 SUBSEQUENTLY COMPLETED UNDER ACTIVE D119/D120**
+Status: **COMPLETE — ARCHITECTURE RECLOSED (D000-D118); T06/T07/T08 SUBSEQUENTLY COMPLETED UNDER ACTIVE D119-D121**
 
 ## Trigger and Scope
 
@@ -261,6 +261,7 @@ This table is the authoritative architecture replacement for the reopened stages
 | T03 | T01 DOMAIN; finite alphabet plus explicit numeric valuation | Radius/offset parameter; exact equal-weight sum view | Compact sum table and exhaustive expansion denote the same local RULE; T01 UPDATE | Add a factorized RULETYPE/codec mapping, not a T03 engine or identity split |
 | T04 | Exact `k=3,r=1` T03 data | T03 reuse | T03 reuse | Strict preset only; bounded independent asset repair complete |
 | T05 | Exact finite `k>=4,r=1` canonical T03 data | T03 reuse | T03 reuse | Strict preset only |
+| T08 | No construction-specific DOMAIN: one event-zero configuration admitted by the unchanged program's `DomainSchema`, ALPHABET/components, and invariants; constructors/classes/laws and optional lossless presentations remain separate | Reuses the resolved program unchanged | Produces no firing locus, read, write, UPDATE, successor, or per-step RNG; only a complete validated `X_0` may enter the runner | Add typed configuration schemas, deterministic constructors, complete/cylinder/algorithmic stochastic realization records, invariant validation, and explicit finite-lowering relations; no seed family executor or universal lattice mask |
 | T09 | Discrete `t+1D` line; `Plain(bit) \| Active(bit)`; exactly one active tag | Unique active tag; physical left/self/right | Native `(new_bit,direction)` lowers to source value write plus tag movement; atomic UPDATE | Add composite alphabet, tag-selecting frontier, typed two-write result/lowering, invariant checks; no control class/mobile executor |
 | T12 | Discrete `t+1D` unbounded tape; `Plain(sigma) \| Head(q,sigma)`; exactly one head | Unique head tag; source `(q,sigma)` for the native decision plus destination label for lossless structural lowering | Native `(q_next,sigma_next,direction)` writes symbol and moves tag while preserving destination symbol; atomic UPDATE | Reuse T09 axes with payload tag, total sparse field, terminal outcome; no `SingleControl`/Turing executor |
 | T13 | Discrete variable-support `t+1D` word; finite symbol labels | Every old occurrence; self symbol | Block replacement per occurrence; ordered snapshot-parallel concatenate UPDATE | Add ordered replacement UPDATE policy within runner; no substitution executor |
@@ -306,6 +307,7 @@ The current audit does **not** yet admit stochastic/probabilistic execution mere
 | `frontiers.py` | Restore rule-firing semantics and add all-occurrence, unique-tag, match, prefix, endpoint, graph, and candidate selectors as typed implementations |
 | `neighborhoods.py` | Generalize offsets to typed access patterns: spans, prefixes, keys, tree paths, graph paths, and self/product projections |
 | `rules.py` | Return closed typed writes/replacements; add composite-table, structural-rewrite, unary-map, and factorized local-rule forms without callbacks |
+| `seeds.py` | Replace scalar mask/family dispatch with schema-targeted exact configurations, constructors, classes, and laws. Keep complete-configuration samples, finite cylinders, algorithmic total fields, validation, boundary/approximation, finite lowering, trace, and view identities separate; no T08 branch reaches rollout |
 | UPDATE specification | Introduce one typed UPDATE axis for snapshot finite writes, ordered replacement, graph replacement, bag combination, and successor-set lift. T20 tree replacement, T37 endpoint growth, and T39 survivor-list removal lower through explicit commuting maps rather than become family laws |
 | `specs.py` | Replace string-family construction branches with structural decoders/registries for the typed axes; seeds and run requests remain separate |
 | `rollout.py` | Replace family branches with the branch-free runner; batching/realization adapts configurations and traces without changing semantics |

@@ -1,6 +1,6 @@
 # 27-T08-INITIAL-CONDITIONS
 
-Status: **IN PROGRESS — SOURCE/ASSET CLOSED; HOSTILE ARCHITECTURE AND GLOBAL INTEGRATION ACTIVE**
+Status: **IN PROGRESS — SOURCE RECLOSED; ASSET HOSTILE RECLOSURE AND GLOBAL INTEGRATION ACTIVE**
 
 ## Current Facts
 
@@ -43,18 +43,20 @@ Determine exactly which initial-condition classes the source uses, reconstruct t
 
 ## Search Log
 
-`BOOK` means the canonical monolith `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. Its body and Notes occupy physical lines `1-20825`; the actual Index begins at `20826`. Twelve frozen regex families produce 1,022 unique candidates: 952 pre-Index lines and 70 actual-Index routes. Exact adjudication retains 482 matched pre-Index lines, rejects 470 pre-Index controls, and treats all 70 Index lines as navigation. Five governed continuations at `BOOK:978,1346,2216,12034,13304` produce the authoritative 487-line retained set.
+`BOOK` means the canonical monolith `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`. Its body and Notes occupy physical lines `1-20825`; the actual Index begins at `20826`. Sixteen frozen regex families produce 1,205 unique candidates: 1,135 pre-Index lines and 70 actual-Index routes. Exact adjudication retains 696 matched pre-Index lines, places 439 pre-Index duplicates/controls outside the retained evidence, and treats all 70 Index lines as navigation. Five governed continuations at `BOOK:1346,12034,13304,18442,19169` produce the authoritative 701-line retained set. The hostile expansion added bounded direct `start with/from`, modifier, `initially`, first-step, and explicit-law vocabulary, then re-adjudicated the complete old exclusion set rather than preserving its false negatives.
 
 | Frozen set | Count | SHA-256 of sorted physical line numbers |
 |---|---:|---|
-| Twelve-query union `U` | 1,022 | `d075e4ebfb5972df0d9047f3c6e8d2271bd8b928b440c666906f0c46b282f362` |
-| Matched retained | 482 | `9f7276348fc17b183091f36fa21cc561d4e87f2ff827fd64841648d0e843ed92` |
+| Sixteen-query union `U` | 1,205 | `6811275c3e4e32bef688b4e667cafd175b10b9d8da187fe2525121dce8ac4d0a` |
+| Matched retained | 696 | `f5ac626606316e055449e2ab6401600c606ae1dabe382a5a90fec05632e35d43` |
 | Governed continuations | 5 | exact set above |
-| Authoritative retained `S` | 487 | `42733f504fa41a98a9f01f88ebeb43b7c8d3e24e0e620229fa9cae3ef62d6ace` |
-| Excluded/control pre-Index `X` | 470 | `9914e686142328cece65c6336a5e2797ee2dcbb2090de702139cf826e172840b` |
+| Authoritative retained `S` | 701 | `a8b0f8a0d68aa4af1b36175f95ddd0a0955d71717de1168110d55f4ede80f48a` |
+| Duplicate/control pre-Index `X` | 439 | `c0e2446fa75ad9de955349710ade9862a779cdf56533ca4cd7f03b904659d5b9` |
 | Actual-Index routes | 70 | `4e2da3563269b9fa8aa5fc698d2873d6d052a2cb89f2a9d3354d14600582fa13` |
 
-Thus the full declared audit is `1,027 = 487 retained + 470 excluded + 70 Index`, with zero unclassified lines. The 70 Index lines supply navigation only. The split reverse-check finds 442/487 complete-line exact-text occurrences after UTF-8 decoding and line-terminator removal only. The remaining 45 form the pinned non-exact complement; no normalization, cause, or monolith-to-split span mapping is asserted. The exact-occurrence set digest is `b85d35a696969b27e517923985d35c4dbfe73eb0213bae774e48d8d81b8a0961`. The monolith remains authoritative rather than pretending the split material is independent evidence.
+Thus the full declared audit is `1,210 = 701 retained + 439 duplicate/control + 70 Index`, equivalently the 1,205-line query union plus five governed continuations, with zero unclassified lines. The 70 Index lines supply navigation only. The split reverse-check finds 634/701 complete-line exact-text occurrences after UTF-8 decoding and line-terminator removal only. The remaining 67 form the pinned non-exact complement; no normalization, cause, or monolith-to-split span mapping is asserted. The exact-occurrence set digest is `a3d60896f4b9727b35220d8b05d25150b5ea9b98c8282272826f81a46f7c25da`; the non-exact-complement digest is `0d53d266d4516eab9694f627a7bb4609df7af79be7120c3a7b231835124be2dd`. The monolith remains authoritative rather than pretending the split material is independent evidence.
+
+The hostile expansion adds 183 query-union lines (`e4058d13421487a280b0766d2895d51548ba45c776b9e1b58cbcbcf5efab62c5`): 86 retained (`30be632a324482441962585f697d9d89debb8e3cab3c97c9e07e122f91a02a20`) and 97 duplicate/control (`33fbcc41224d988328b8ec3a99d90e8f7b78a86983bda6e4d6cbc0cd113d3450`). Independently re-reading every old control moves 128 false negatives (`26bd5ddfbdf982ddbd8bb53b1b1a546e2e34c08c1676ddd884ba400fd0501898`) covering concrete cross-family starts, stochastic/profile laws, admissibility/support constraints, deterministic/lossless constructors, provenance/boundary/observer distinctions, and temporal prefixes. Together with two required code continuations, the exact 214-line addition over the superseded 487-line diagnostic has digest `0f9b73c185fc3d0e3c766e9adc31851daa262452f882662ebcf819d5f0fbd1b1`. Generic methodology/history, behavior-only duplicates, internal emulation work, uniterated inputs, and nonstep controls remain outside `S`.
 
 Known extraction defects are retained as evidence controls, not silently repaired: lost figure glyphs at `BOOK:10647,11277,14341,18764`; a truncated initial condition at `5552`; OCR corruption at `18394,18814`; damaged `CellularAutomaton` syntax near `11077`; and truncated final concrete condition expressions at `20128`. Only the intact opening sentences at `20128` support its row below. None changes the prose-level seed/configuration distinctions. The executable line-set/query/split oracle below freezes the exact protocol.
 
@@ -72,8 +74,12 @@ Known extraction defects are retained as evidence controls, not silently repaire
 | 10 | seed word forms | 19 / 10 / 9 |
 | 11 | nested/structured near seed/initial/configuration vocabulary | 136 / 125 / 11 |
 | 12 | quantified/described `initial condition(s)` | 128 / 125 / 3 |
+| 13 | direct `start`/`begin` with or from | 299 / 299 / 0 |
+| 14 | first-step colored-cell and explicit equal-sequence/independent-`p` law forms | 4 / 4 / 0 |
+| 15 | bounded `start`/`begin` modifiers: out/off/for example/as/on/by | 34 / 34 / 0 |
+| 16 | exact `initially` | 32 / 32 / 0 |
 
-The exact regex strings, per-query digests, complete retained/governed/excluded/Index line sets, source hash, and the exact 45-line non-exact complement are versioned in `goal-1/27-T08-source-oracle.py`. Every line-set digest hashes ascending decimal physical line numbers, comma-joined as ASCII with no trailing LF. Split equality means complete-line Unicode equality after UTF-8 decoding and `splitlines()` removal of line terminators only; no whitespace, case, punctuation, OCR, Markdown, or Unicode normalization is performed. An identical line may occur anywhere among the split files, so this is occurrence coverage rather than a claimed one-to-one position map.
+The exact regex strings, per-query digests, complete retained/governed/duplicate-control/Index line sets, source hash, and the exact 67-line non-exact complement are versioned in `goal-1/27-T08-source-oracle.py`. Every line-set digest hashes ascending decimal physical line numbers, comma-joined as ASCII with no trailing LF. Split equality means complete-line Unicode equality after UTF-8 decoding and `splitlines()` removal of line terminators only; no whitespace, case, punctuation, OCR, Markdown, or Unicode normalization is performed. An identical line may occur anywhere among the split files, so this is occurrence coverage rather than a claimed one-to-one position map.
 
 ```bash
 python3 goal-1/27-T08-source-oracle.py
@@ -95,10 +101,14 @@ Q09 OK (32, 31, 1)
 Q10 OK (19, 10, 9)
 Q11 OK (136, 125, 11)
 Q12 OK (128, 125, 3)
-union/pre_index_union/index OK 1022/952/70
-matched_retained/retained/excluded OK 482/487/470
+Q13 OK (299, 299, 0)
+Q14 OK (4, 4, 0)
+Q15 OK (34, 34, 0)
+Q16 OK (32, 32, 0)
+union/pre_index_union/index OK 1205/1135/70
+matched_retained/retained/excluded OK 696/701/439
 structural OK
-split_exact_mirror OK 17 442 b85d35a696969b27e517923985d35c4dbfe73eb0213bae774e48d8d81b8a0961
+split_exact_mirror OK 17 634 a3d60896f4b9727b35220d8b05d25150b5ea9b98c8282272826f81a46f7c25da
 ```
 
 ## Book Excerpts
@@ -110,6 +120,8 @@ Short fragments below are provenance anchors; the construction fact, behavior ob
 | `BOOK:418-432` | first CA example | “cell in the center is black and all other cells are white” | single distinguished label over an explicit uniform background |
 | `BOOK:746` | all 256 ECAs | “starting from a single black cell” | one profile can be reused across many unchanged programs |
 | `BOOK:790,846` | three-color totalistic gallery | “initial condition used contains a single gray cell” | gray is a typed source value/role, not a palette guess |
+| `BOOK:996-1182` | substitution, tag, and register starts | trunk/tree, literal finite strings, a pair of elements, first instruction, and zero registers | event-zero configuration shape and invariants are program-schema specific, not fixed-lattice masks |
+| `BOOK:1443-1876` | scalar, recurrence, and map starts | exact numbers, multi-value recurrence prefixes, and distinct `1/2` versus `pi/4` map starts | exact scalar values and complete temporal Markov prefixes are ordinary typed configurations |
 | `BOOK:2706-2710` | Starting from Randomness | “usually started with just a single black cell”; “every cell is chosen ... at random” | simple point and per-cell-random classes are distinct; this passage does **not** specify independence or equal probability |
 | `BOOK:3060-3098` | rule 30/22/90 comparisons | random versus single/limited-region starts | the same RULE has different runs/behavior; seed is not program identity |
 | `BOOK:3126-3140` | Special Initial Conditions | “fixed block ... repeated forever”; “random sequence of ... blocks” | native periodic field and block-process class are distinct |
@@ -117,6 +129,8 @@ Short fragments below are provenance anchors; the construction fact, behavior ob
 | `BOOK:3204-3210` | rule 184 nested start | “nested initial conditions ... from substitution systems” | generated start requires an explicit derivation to a frozen target configuration |
 | `BOOK:3216,4294` | rule-184 random starts | “exactly equal numbers of black and white cells” | an exact-composition constraint differs from a marginal-density or independent-choice law; conditioning and uniformity are unstated |
 | `BOOK:3388,3406` | rule-110 structures | “block of length 41 inserted between blocks of the background” | periodic background plus finite defect is native seed data |
+| `BOOK:2294,6084` | 2D Turing and network starts | all cells initially white; tetrahedral initial network | blank composite fields and finite graph topologies use the same schema-validation responsibility without sharing storage shape |
+| `BOOK:5294-5306,5370-5374` | preparation and observation | backward-derived starts versus describable/constructible starts; different states with indistinguishable aggregate behavior | denotational configuration, construction provenance, experimental admissibility, and observer equivalence are distinct |
 | `BOOK:5242` | reversible CA | “equal probability on the two successive first steps” | a program may need multiple temporal slices; equality is explicit here but independence is not |
 | `BOOK:7052,7058` | statistical models | “all possible sequences ... equal probability”; “fixed independent probability p” | explicit finite equal-sequence and iid-`p` laws are available, but cannot be retrofitted as the unstated law at `2708` |
 | `BOOK:8400` | rule 73 | “no run of an even number of black squares” | constrained initial-condition class differs from unrestricted random starts |
@@ -126,6 +140,7 @@ Short fragments below are provenance anchors; the construction fact, behavior ob
 | `BOOK:14031` | differential problems | initial-value versus boundary-value specifications | T45 side data is not automatically a T08 event-zero configuration |
 | `BOOK:14213` | randomness each step | random changes during evolution | transition-time draws are not initial-condition sampling |
 | `BOOK:14275` | random starts in other systems | random tape colors with definite active cell; finite word/tag limits; random graphs; constraints have no starts | seed/profile schema is support-family-specific and does not force nonstep categories into rollout |
+| `BOOK:12218-12222,13954-14008` | explicit symbolic/grammar starts | literal list and string starts for substitution, multiway, and grammar rules | variable-support word configurations are first-class; a source literal is not a padded lattice seed |
 | `BOOK:18674` | rule-110 cyclic-tag emulation | infinite left repetition, finite middle, infinite right repetition | ultimately periodic piecewise field is target-run data in an explicit emulation relation |
 | `BOOK:19072` | continuum/cardinality | finite-on-white arrangements versus infinite configurations | finite descriptors/materializations cannot stand in for arbitrary infinite configurations |
 | `BOOK:20128,20577` | proof/search boundaries | run-specific occurrence; rule cases unvisited by an initial condition | a seed/run cannot certify a rule property or erase unsampled table rows; the `20128` claim uses only its intact opening sentences |
@@ -151,14 +166,13 @@ The asset audit is driven by the immutable 487-line source set, not by filenames
 
 The exact exclusions are `BOOK:590,1034,1036,1044,1048,3458,4200,8608`. Later/transformed evidence remains relation-only rather than being discarded—for example the rule-110 continuations `522-532`, compressed/final views `4302,6642,8260`, and IVP panels `2048-2062`.
 
-Every asset has exactly one physical JPEG, one monolith reference, and one split-file reference. The closure has 412 distinct byte hashes and 824 exact references. Its LF-terminated ledger row is
+Every asset has exactly one physical JPEG, one monolith reference, and one split-file reference. The exact single-line row serialization is
 
 ```text
-BOOK-line | I/R/X | physical-relative-path | byte-size | width | height |
-sha256 | split-md-relative-path | split-line
+BOOKline|class|physical-relative-path|byte-size|width|height|sha256|split-md-relative-path|split-line
 ```
 
-and the complete sorted ledger SHA-256 is `7a58eb6581ba740465608db6538b4d55305b52901932c670d764f846af34c44f`. The exact `S`, `C4`, `P`, `Q`, `I/R/X`, paths, dimensions, sizes, hashes, reverse joins, and ledger digest are versioned in `goal-1/27-T08-asset-oracle.py`.
+Rows are sorted by ascending `BOOKline`, joined with LF, and terminated by one final LF; there are no spaces around separators. The exact source sets, frozen manually adjudicated `P`/`Q` and `I/R/X` literals, paths, dimensions, sizes, hashes, reverse joins, and ledger digest are versioned in `goal-1/27-T08-asset-oracle.py`. The oracle recomputes membership arithmetic and physical/reference/hash facts; it does not pretend to regenerate the semantic companion or class adjudications from image bytes.
 
 ```bash
 python3 goal-1/27-T08-asset-oracle.py
@@ -172,7 +186,7 @@ refs=824; classes=284,120,8; unique_hashes=412;
 ledger_sha256=7a58eb6581ba740465608db6538b4d55305b52901932c670d764f846af34c44f
 ```
 
-The raster bytes can support only their declared visual/run relation. They do not prove probability independence, native infinite support, rule properties, exact transitions outside captions/code, or program identity. OCR defects at the seven source locations above remain pointer/relation evidence; the JPEG hashes preserve what was actually inspected.
+The raster bytes can support only their declared visual/run relation. They do not prove probability independence, native infinite support, rule properties, exact transitions outside captions/code, or program identity. The extraction defects at the source locations listed above remain pointer/relation evidence; the JPEG hashes preserve what was actually inspected.
 
 ## Construction Model
 
