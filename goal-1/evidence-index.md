@@ -49,7 +49,7 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 | T18 | 19 | Cyclic Tag Systems | 18 | `32-T18-CYCLIC-TAG.md` | COMPLETE | Exact 19-query/305-line union at `259 pre-Index / 46 actual-Index`; 160 retained (`39 native / 84 relation / 37 control`), 150 exclusions, split closure `269 exact + 33 variants`; 43 assets at `C/O/R/X=4/1/24/14` with 86 references/43 hashes; five page-96 `t0..t99` fixtures and page-95 `t0..t24`; visible named phase plus explicit Notes equal-rotation quotient, 71,442 commuting cases, branch-free empty-axis flow, 1,806 T17 span cases, 255 multiplicity cases, exact-type/snapshot/provenance adversaries, D126, clean hostile review, and 102 tests; 0 unresolved |
 | T19 | 20 | Register Machines | 19 | `8-T19-REGISTER.md` | COMPLETE | 129 direct occurrences on 94 lines and 135 direct/alias occurrences on 95 lines plus mechanics, figures, Notes/official OCR repairs, Index/splits/history, count/control/end/halting, seeds, observers, variants, and emulations dispositioned; 25 excerpt groups; 0 unresolved |
 | T20 | 21 | Symbolic Systems | 20 | `9-T20-SYMBOLIC.md` | COMPLETE | 73 exact-name occurrences on 60 lines; conservative combined direct/alias search 272 occurrences on 166 lines; 24 excerpt groups; all mechanics, figures, Notes/actual Index/splits, patterns/order/overlap, fixed points, seeds, representations, combinator/operator variants, observers, and emulations dispositioned; 0 unresolved |
-| T21 | 22 | Two-Dimensional Cellular Automata | 21 | `33-T21-2D-CA.md` | PENDING | Not started |
+| T21 | 22 | Two-Dimensional Cellular Automata | 21 | `33-T21-2D-CA.md` | IN PROGRESS | Source, asset, semantic, and architecture audits opened; zero unresolved status not yet claimed |
 | T22 | 23 | Moore-Neighborhood Cellular Automata | 22 | `34-T22-MOORE-CA.md` | PENDING | Not started |
 | T23 | 24 | Three-Dimensional Cellular Automata | 23 | `35-T23-3D-CA.md` | PENDING | Not started |
 | T24 | 25 | Higher-Dimensional Lattice Cellular Automata | 24 | `36-T24-HIGHERDIM-CA.md` | PENDING | Not started |
@@ -78,10 +78,10 @@ Architecture audit closure: `architecture-audit.md` reclassifies D000-D118, supp
 ## Coverage Summary
 
 - Foundation: complete in `1-FOUNDATION.md`.
-- Type stages globally complete: 30 / 45.
+- Type stages globally complete: 31 / 45.
 - Type stages evidence-closed / architecture-reopened: 0.
 - Type stages asset-reopened: 0.
-- Type stages unresolved: 14 pending; 1 in progress; 0 reopened.
+- Type stages unresolved: 13 pending; 1 in progress; 0 reopened.
 - Synthesis: pending.
 - Goal 2 handoff: pending.
 
