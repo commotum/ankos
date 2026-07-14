@@ -1,6 +1,6 @@
 # 36-T24-HIGHERDIM-CA
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS CLOSED; FINAL HOSTILE REVIEW OPEN**
+Status: **COMPLETE — EVIDENCE, ASSETS, SEMANTICS, ARCHITECTURE, AND HOSTILE REVIEW CLOSED**
 
 ## Current Facts
 
@@ -38,7 +38,7 @@ Reconstruct higher-dimensional and alternative-lattice cellular automata from pr
 - Exact catalog name: Higher-Dimensional Lattice Cellular Automata.
 - CSV line: 25.
 - Taxonomy section: 24.
-- Entry kind: repaired source/asset/semantic/architecture audit closed; fixed-support label evolution with dimensional/topological/access/RULE parameterization is the provisional D130 conclusion pending final hostile review.
+- Entry kind: fixed-support label evolution with dimensional/topological/access/RULE parameterization, closed under active D130 after repaired source, asset, semantic, architecture, and hostile review.
 - Initial vocabulary: higher-dimensional, arbitrary-dimensional, `d` dimensions, lattice cellular automata, crystal lattice, cubic, tetrahedral, rhombic, close-packed, honeycomb, triangular, hexagonal, face-centered, body-centered, neighbors, tilings, tessellations, Notes implementations, captions, actual Index, projections, slices, and embeddings.
 
 ## Search Log
@@ -248,7 +248,7 @@ These examples expose representation and parameter gaps, not category-4 executio
 
 By contrast, a native event that creates/deletes sites or edges would defeat fixed-support assignment. That concrete counterexample is already owned by T29's structural graph UPDATE; none of the T24 evidence found so far performs it.
 
-## Provisional Goal 2 Architecture Handoff
+## Goal 2 Architecture Handoff
 
 The smallest implementation set is:
 
@@ -293,9 +293,9 @@ No completed stage reopens on the architecture evidence. T21-T23 remain strict f
 - [x] Every strict dimensional/topological/access/RULE profile and required representation map is independently proven.
 - [x] Smallest reusable bases are classified with a concrete-counterexample gate for every claimed new algebra.
 - [x] Current API/runtime/principles audit and Goal 2 handoff are implementation-ready.
-- [ ] Independent hostile review and all oracle/test/Markdown/diff/scope/coverage gates pass.
-- [x] `0-plan.md`, `evidence-index.md`, `design-ledger.md`, and `architecture-audit.md` agree on the repaired provisional result.
+- [x] Independent hostile review and all oracle/test/Markdown/diff/scope/coverage gates pass.
+- [x] `0-plan.md`, `evidence-index.md`, `design-ledger.md`, and `architecture-audit.md` agree on the repaired active result.
 
 ## Stage Results
 
-The repaired 30-query source audit closes 218 lines at `168 pre-Index / 50 actual-Index`, retains 166 at `80 native / 21 relation / 65 control`, excludes 77, guards every dense Index entry independently, and leaves zero unresolved. The dependent radius-four asset universe closes 36 plates at `11 governed + 25 adjacency-only`, 72 references, 36 hashes, and `36 hash-bound / 6 transcribed / 0 pixel-replayed`. The strengthened semantic oracle closes 1,791 non-vacuous native/generic events and 46 hostile rejections, including exact coordinate inverses, physical event commutations, correct hex actions, inclusive-total and canonical-slot network views, storage-order invariance, read provenance, multiplicity, and snapshot parallelism. Source, asset, semantic, architecture, root/relocated/optimized/import/compile/diff/mode, and all 102 repository-test gates pass. D130 and final status remain provisional only until the fresh independent hostile review closes.
+COMPLETE. The repaired 30-query source audit closes 218 lines at `168 pre-Index / 50 actual-Index`, retains 166 at `80 native / 21 relation / 65 control`, excludes 77, guards every dense Index entry independently, and leaves zero unresolved. The dependent radius-four asset universe closes 36 plates at `11 governed + 25 adjacency-only`, 72 references, 36 hashes, and `36 hash-bound / 6 transcribed / 0 pixel-replayed`. The strengthened semantic oracle closes 1,791 non-vacuous native/generic events and 46 hostile rejections, including exact coordinate inverses, physical event commutations, correct hex actions, inclusive-total and canonical-slot network views, storage-order invariance, read provenance, multiplicity, and snapshot parallelism. The clean independent hostile review records and closes nine repaired defect groups without finding a T24 category-4 algebra. Source, asset, semantic, architecture, root/relocated/optimized/import/compile/Markdown/diff/scope/mode, and all 102 repository-test gates pass. D130 is active, no prior stage reopens, and T25 is next.

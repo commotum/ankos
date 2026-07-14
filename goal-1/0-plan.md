@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 34 type stages are complete, T24 is in progress with only hostile review/final synchronization open, no stage is reopened, and 10 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, and T23 are complete under D119-D129, and T24 evidence/architecture are closed under active D130.
+- Execution status at this sync is Foundation complete, 35 type stages are complete, no type stage is in progress or reopened, and 10 stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, and T24 are complete under D119-D130. T25 is next.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -999,7 +999,7 @@ COMPLETE. The nineteen-query source oracle closes 151 lines at `104 pre-Index / 
 
 ### 36-T24-HIGHERDIM-CA
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS CLOSED; HOSTILE REVIEW OPEN** in `goal-1/36-T24-HIGHERDIM-CA.md`.
+Status: **COMPLETE — EVIDENCE, ASSETS, SEMANTICS, ARCHITECTURE, AND HOSTILE REVIEW CLOSED** in `goal-1/36-T24-HIGHERDIM-CA.md`; D130 is active.
 
 #### Big Picture Objective
 
@@ -1013,9 +1013,9 @@ Apply the common protocol, evaluating native rank, flattening, graph adjacency, 
 
 All T24 evidence is captured; any coordinate limitation or schema change is stated honestly; Goal 2 and global integration are updated.
 
-#### Current Result
+#### Stage Result
 
-The repaired 30-query source oracle closes 218 lines at `168 pre-Index / 50 actual-Index`; 166 retained evidence lines partition as `80 native / 21 relation / 65 control`, with 77 exclusions, retained split closure `150 exact + 16 variants`, entry-specific guards for every dense Index line, and zero unresolved candidates. The dependent radius-four asset universe closes 36 plates at `11 governed + 25 adjacency-only`, 72 references, 36 hashes, and `36 hash-bound / 6 transcribed / 0 pixel-replayed`. The strengthened semantic oracle closes 1,791 non-vacuous native/generic events plus 46 hostile rejections, with exact basis inverses/physical commutations, physically derived hex actions and 1,024 codec/event commutations, inclusive-total and canonical-slot network views, sampled visible rule-bank reuse, concrete typed-offset divergence, read provenance, occurrence multiplicity, and snapshot parallelism. D130 uses categories 1–3 and adds no T24 UPDATE or executor. All oracle portability/fail-closed/import/compile/diff/mode gates and 102 tests pass; final hostile review remains open.
+COMPLETE. The repaired 30-query source oracle closes 218 lines at `168 pre-Index / 50 actual-Index`; 166 retained evidence lines partition as `80 native / 21 relation / 65 control`, with 77 exclusions, retained split closure `150 exact + 16 variants`, entry-specific guards for every dense Index line, and zero unresolved candidates. The dependent radius-four asset universe closes 36 plates at `11 governed + 25 adjacency-only`, 72 references, 36 hashes, and `36 hash-bound / 6 transcribed / 0 pixel-replayed`. The strengthened semantic oracle closes 1,791 non-vacuous native/generic events plus 46 hostile rejections, with exact basis inverses/physical commutations, physically derived hex actions and 1,024 codec/event commutations, inclusive-total and canonical-slot network views, sampled visible rule-bank reuse, concrete typed-offset divergence, read provenance, occurrence multiplicity, and snapshot parallelism. D130 uses categories 1–3 and adds no T24 UPDATE or executor. The independent hostile review is clean; all oracle portability/fail-closed/import/compile/Markdown/diff/scope/mode gates and 102 tests pass. No prior stage reopens. Next: T25.
 
 ### 37-T25-2D-TURING
 
