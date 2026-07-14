@@ -287,9 +287,23 @@ T28 therefore uses audit categories 1–3 and introduces no category-4 execution
 
 Objective: add no T28 executor. Compose a finite periodic changing-grid configuration, `AllOldTiles`, an exact ordered cyclic contextual access schema, a closed finite context-to-patch table, T26 source-bound patch writes, and D132 ranked mosaic UPDATE in the shared branch-free runner.
 
-Provisional dependencies: D011 old-snapshot atomicity; D019/D124 source-bound contextual reads and exact-snapshot provenance; D127/D130 topology-aware offsets/ports; D132 ranked mosaic assembly, compatibility, invalidity, and lineage.
+Dependencies: D011 old-snapshot atomicity; D019/D124 source-bound contextual reads and exact-snapshot provenance; D037 closed structural pattern data at the responsibility level; D127/D130 topology-aware offsets/ports and coordinate codecs; D132 ranked mosaic assembly, compatibility, invalidity, and lineage.
 
-Required conformance will include the source's exact Notes row, synthetic exhaustive tables over all finite contexts, strict periodic edge/corner witnesses, direct/generic one-step commutation, declared uniform patches, synthetic D132-compatible mixed patches as a composition stress test rather than a native plate claim, incompatible no-commit outcomes, and static absence of T28 dispatch, callbacks, padding, hidden raster data, flat assembly, in-place reads, or sequential scans. The adaptive unequal-subdivision profile is explicitly unavailable.
+Implementation-ready delta:
+
+1. Reuse the generic finite-alphabet schema. Add no T28 alphabet; validate every patch label against the declared alphabet.
+2. Reuse D132's finite positive rectangular configuration and per-successor extent validation, with explicit periodic incidence on both axes. Declare the semantic `(row,column) <-> (x=column,y=row)` codec and corresponding dense-storage transpose when using current arrays.
+3. Reuse `AllOldTiles`, upgraded to return opaque source handles bound to the exact old snapshot and Cartesian addresses. Do not depend on the current rollout's implicit coordinate enumeration.
+4. Add or name a generic ordered product access schema with semantic slots `NW,N,W,Self`, offsets `(-1,-1),(-1,0),(0,-1),(0,0)`, lower-right source alignment, periodic mapping, and preserved occurrence multiplicity after aliases. Current `literal_offsets`/`gather(periodic)` can realize the value read after the slot/axis/provenance wrapper is explicit.
+5. Add a closed ordered fixed-product pattern schema with `Literal(value)` and `AnonymousAny`. Parse the repaired source `_` only through the guarded source adapter. Validate first-match rows, output patch closure, and finite total coverage at construction.
+6. Compile valid clauses to the canonical exhaustive context table for execution, but retain the ordered source AST and provenance. If a source importer promises Wolfram `ReplaceAll` nonmatch semantics, make every fallback row/template explicit during import.
+7. Reuse T26 source-bound positive rectangular patch writes. Bind each patch only to the selected `Self` source; context participants stay read witnesses, not parents.
+8. Reuse `RankedBlockMosaicAssemble(rank=2)` unchanged. It validates Cartesian coverage and row-height/slab-width compatibility before allocation, commits exact product placement atomically, consumes parents, defers newborns, and returns D132 typed invalid/no-commit results.
+9. Extend structured ragged traces only as already required by D132: preserve periodic topology, every named-slot read, chosen clause/source form, compiled row, write, patch rectangle, child witness, lineage, and opaque token scope. Do not store raster or host matcher state.
+10. Offer an optional T28 preset that assembles these ordinary axes. It must be data construction only—no state class, UPDATE class, executor, rollout branch, callback, or hidden boundary menu.
+11. Mark adaptive unequal subdivision unavailable. Do not implement it until its dynamic carrier, incidence, neighborhood matching, and update mechanics are separately specified and proved.
+
+Required conformance includes the exact Notes row, synthetic exhaustive tables over all finite contexts, strict periodic edge/corner and degenerate-axis witnesses, direct/generic full-result commutation through explicit token renaming, declared uniform patches, synthetic D132-compatible mixed patches as a composition stress test rather than a native plate claim, incompatible no-commit outcomes, and static absence of T28 dispatch, callbacks, padding, hidden raster data, flat assembly, in-place reads, or sequential scans.
 
 ## No-Cheating Checks
 

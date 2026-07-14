@@ -1504,7 +1504,7 @@ def audit_schedule_boundary_and_assembly() -> dict[str, int]:
     # Unequal patch heights inside one source row produce a typed no-commit
     # result.  This is also the smallest adjacent coarse/fine subdivision
     # counterexample against claiming the strict rectangular assembler is total.
-    tall_patch: Patch = ((1,), (0,))
+    tall_patch: Patch = ((1, 0), (0, 1))
     incompatible_height_table = table_from_function(
         lambda context: patch_a if context == context_a else tall_patch
     )
