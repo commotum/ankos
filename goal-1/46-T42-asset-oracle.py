@@ -7,12 +7,14 @@ page-916 digital-slope panels, and five page-971 billiards panels.  Every
 asset is bound to its monolith and split-Markdown references, unique physical
 file, byte length, baseline-JFIF/RGB profile, dimensions, and SHA-256 digest.
 
-All twelve assets are HASH_BOUND.  No coefficient, formula, symbol, word,
-trace, palette, curve sample, line slope, billiard itinerary, or executable
-program is inferred from JPEG pixels.  The exact page-162 trace replay below
-combines the source-text rule with the independently frozen semantic-oracle
-manifest; it never decodes raster content.  Relation images remain observers,
-not transition state or rule tables.
+All twelve assets are HASH_BOUND.  The native page-162 plate is additionally
+LIMITED_TRANSCRIBED: its four displayed function labels, visible execution-
+order coefficient rows, rule-icon labels, and black/gray convention are manual
+fixture evidence.  The page-903 text independently supplies the executable
+rho formula, so no geometry, window, coefficient evaluator, or hidden program
+is inferred from pixels.  The exact trace replay combines that formula with
+the frozen transcription manifest.  Relation images remain observers, not
+transition state or rule tables.
 """
 
 from __future__ import annotations
@@ -107,7 +109,7 @@ def parse_assets(rows: str) -> dict[int, AssetSpec]:
 
 
 ASSET_ROWS = r"""
-1854|N-page162-cf-driven-substitution|_page_162_Figure_1.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_162_Figure_1.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|313|206693|1050|1155|RGB|3|ab5e7bbab2a14b3d4fb832dad43842ceb4f206653810d7dfcd23238095741cfe|-|HASH_BOUND|native four-profile substitution and axis-crossing plate; exact rules and trace fixtures come from frozen text and semantic manifests, never pixels
+1854|N-page162-cf-driven-substitution|_page_162_Figure_1.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Images/_page_162_Figure_1.jpeg|CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md|313|206693|1050|1155|RGB|3|ab5e7bbab2a14b3d4fb832dad43842ceb4f206653810d7dfcd23238095741cfe|-|LIMITED_TRANSCRIBED|native four-profile substitution and axis-crossing plate; displayed functions, coefficient rows, icon labels, and black/gray convention are manual fixture transcription, while executable rho mechanics come from text
 12583|R-page903-fractional-orbit-observer|_page_918_Figure_16.jpeg|BACK-MATTER/Index/Images/_page_918_Figure_16.jpeg|BACK-MATTER/Index/Index.md|486|29780|565|165|RGB|3|063be8f26ae1d13f7c97292b30d845cc67552027aef4964c99f4e44d9254fae6|-|HASH_BOUND|related Mod[h n,1] observer immediately preceding the exact mechanical-word substitution construction
 13119|R-page916-digital-slope-a|_page_931_Figure_9.jpeg|BACK-MATTER/Index/Images/_page_931_Figure_9.jpeg|BACK-MATTER/Index/Index.md|1022|6165|120|158|RGB|3|bb11803238dda52fd8f63a292f7f2d96a4d7a75cfdbfe159cb190ff64916d0ca|page916-digital-slope-five|HASH_BOUND|digital-slope relation A; source text supplies the mechanical differences and CF relation
 13121|R-page916-digital-slope-b|_page_931_Figure_10.jpeg|BACK-MATTER/Index/Images/_page_931_Figure_10.jpeg|BACK-MATTER/Index/Index.md|1024|6840|122|147|RGB|3|2282818d058f61cf1e511c3a87d944bdabdd49c95a76a82e158f5dcc9007338c|page916-digital-slope-five|HASH_BOUND|digital-slope relation B; source text supplies the mechanical differences and CF relation
@@ -210,13 +212,21 @@ assert sum(map(len, ASSEMBLIES.values())) == 10
 
 
 HASH_BOUND_IMAGE_LINES = GOVERNED_IMAGE_LINES
-LIMITED_TRANSCRIBED_IMAGE_LINES: frozenset[int] = frozenset()
+LIMITED_TRANSCRIBED_IMAGE_LINES = frozenset(
+    line for line, asset in ASSETS.items()
+    if asset.boundary == "LIMITED_TRANSCRIBED"
+)
 PIXEL_REPLAYED_IMAGE_LINES: frozenset[int] = frozenset()
-assert all(asset.boundary == "HASH_BOUND" for asset in ASSETS.values())
+assert {asset.boundary for asset in ASSETS.values()} == {
+    "HASH_BOUND", "LIMITED_TRANSCRIBED",
+}
+assert LIMITED_TRANSCRIBED_IMAGE_LINES == frozenset({1854})
+assert PIXEL_REPLAYED_IMAGE_LINES <= LIMITED_TRANSCRIBED_IMAGE_LINES
+assert LIMITED_TRANSCRIBED_IMAGE_LINES <= HASH_BOUND_IMAGE_LINES
 assert (
     len(HASH_BOUND_IMAGE_LINES), len(LIMITED_TRANSCRIBED_IMAGE_LINES),
     len(PIXEL_REPLAYED_IMAGE_LINES),
-) == (12, 0, 0)
+) == (12, 1, 0)
 
 
 SOURCE_GUARDS = frozenset({
@@ -248,9 +258,10 @@ CANDIDATE_SCOPE_RECORDS = frozenset(
 
 
 RASTER_BOUNDARY_RECORDS = frozenset({
-    "boundary|12-HASH_BOUND|0-LIMITED_TRANSCRIBED|0-PIXEL_REPLAYED",
-    "raster-nonauthority|no coefficient formula symbol word trace palette curve sample line slope or itinerary comes from pixels",
-    "native-replay-authority|BOOK12587-12591 rule text plus frozen T42 semantic manifest",
+    "boundary|12-HASH_BOUND|1-LIMITED_TRANSCRIBED|0-PIXEL_REPLAYED",
+    "raster-limited-transcription|BOOK1854 supplies four displayed function labels execution-order coefficient rows rule-icon labels and black-gray convention only",
+    "raster-nonauthority|no executable rho formula geometry window coefficient evaluator hidden program curve sample line slope or billiard itinerary comes from pixels",
+    "native-replay-authority|BOOK12587-12591 rho rule text plus frozen limited-transcription semantic manifest",
     "page918|fractional-orbit observer relation not T42 configuration",
     "page916|digital-slope renderings are observer relations not rule tables",
     "page971|billiard trajectories are relation renderings not substitution state",
@@ -279,17 +290,17 @@ TRACE_MECHANICS_RECORDS = frozenset({
     "event|all old occurrences fire from one snapshot and child blocks concatenate in source order",
     "completion|m-term irrational prefix yields m-1 coefficient events",
     "offset|Floor[h] is observer output and not substitution state",
-    "fixture-authority|independent frozen semantic manifest associated with the hash-bound native asset",
+    "fixture-authority|frozen limited transcription of BOOK1854 labels and schedules combined with independent BOOK12587-12591 rho mechanics",
 })
 
 
 EXPECTED_MANIFEST_DIGESTS = {
     "source_guards": "3af61ce1ed64445420d669e1e6c0b64d974ff3e68efc1ece419e653dfefdd95b",
-    "roles": "054a636e6b668d406578b0e86f2dd9515b06807a3f3d283c49d265272e883207",
+    "roles": "f92ff60ec74cb037d48e95382b95297d875b3073461a1460f3de25eacef872dc",
     "candidate_scopes": "c49cb99f7d8ccd9f620c8e8dcaa08692ac488222f8a2ca4d6e42222f89cb2253",
-    "raster_boundary": "a9d9a02e0434e64667e3ba17ba701a1f6e65db7e895b7fa3da5061d71ca22fe4",
+    "raster_boundary": "76ab1731b97b0869281b1f04c48a002de1044d20f36c1efd33d094e16ae44ca6",
     "references": "9c6e64eee50e68fe0e6b4cab8951a3ac682a48b9872958c74ddc79e851f186dc",
-    "trace_mechanics": "5ca5c1a07b863451331ab26ca2e6f228dfcc4606d49cbfa7cb279435b326bfb8",
+    "trace_mechanics": "65e392445d70f18836da277e9e12017aa90b93255de34286d51e48b818ff39ab",
 }
 
 
@@ -778,7 +789,7 @@ EXPECTED_ORDERED_SHA256SUM_MANIFEST = (
     "95a30c1661e88bcca18c33dbe9e841e04ae568785144ab16767c5ab803bdb3ef",
 )
 EXPECTED_LEDGER_SHA256 = (
-    "c7ad7c012433fd1ebe3adc62571a4c5532d2280889218868d147e8aa8eeff1dd"
+    "42e6fcc06ad821257a3fdaa81a1ca2cb8c71a1449a44dd4250f7644bc0d16b29"
 )
 EXPECTED_TRACE_LEDGER_SHA256 = (
     "1a5665d34cf4f6184262844257c5bbe226eaf75d09ef34d3dab656d3d0357d1b"
@@ -796,7 +807,7 @@ IMAGE_ASSET_INTERFACE = (
     ("role_partition", EXPECTED_IMAGE_ROLE_PARTITION),
     ("ledger", EXPECTED_IMAGE_LEDGER),
     ("asset_manifest", EXPECTED_IMAGE_ASSET_MANIFEST),
-    ("boundary", (12, 0, 0)),
+    ("boundary", (12, 1, 0)),
     ("pixel_inference", 0),
 )
 
@@ -836,14 +847,14 @@ def main() -> None:
     assert (
         len(HASH_BOUND_IMAGE_LINES), len(LIMITED_TRANSCRIBED_IMAGE_LINES),
         len(PIXEL_REPLAYED_IMAGE_LINES),
-    ) == (12, 0, 0)
+    ) == (12, 1, 0)
 
     print(
         "T42 asset oracle: PASS governed=12; classes N/R/C=1/11/0; "
         "candidates=12; excluded=0; refs=24(monolith=12,split=12); "
         "unique_hashes=12; physical_files=12; bytes=285055; "
         "assemblies=2/10_files; profiles=12_RGB/12_baseline_JFIF_1.01; "
-        "boundary=12_HASH_BOUND/0_LIMITED_TRANSCRIBED/0_PIXEL_REPLAYED; "
+        "boundary=12_HASH_BOUND/1_LIMITED_TRANSCRIBED/0_PIXEL_REPLAYED; "
         f"native_trace=fixtures_{trace_metrics[0]}/events_{trace_metrics[1]}/"
         f"source_firings_{trace_metrics[2]}/children_{trace_metrics[3]}/"
         f"rule_icon_entries_{trace_metrics[4]}; "

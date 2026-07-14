@@ -376,13 +376,21 @@ Stages 8–36 process author text. Each assigned batch must:
 - Inspect `git status --short` and prove that legacy raw files, Goal 1, Goal 2, Goal 3, runtime, and unrelated references were not modified.
 - Re-run and compare all affected Goal 1 oracle output digests; in a temporary legacy fixture, add a sentinel nested Markdown file and duplicate-basename JPEG and prove the compatibility validator detects behavioral contamination.
 
+## Current Execution State
+
+- Synced: 2026-07-14 (America/Los_Angeles).
+- Active stage: `1-GUARDRAILS` (`IN_PROGRESS`).
+- The sibling release root `ref/A-New-Kind-of-Science-Repaired/` does not yet exist.
+- Protected unrelated work present at stage start: `goal-1/45-T40-CONSTANT-DIGITS.md`, `goal-1/45-T40-semantic-oracle.py`, and `goal-1/45-T40-source-oracle.py`.
+- Goal 4 execution writes remain restricted to `goal-4/**` and, only in later owning stages, `ref/A-New-Kind-of-Science-Repaired/**`.
+
 ## Stage Dependencies And Status
 
 Keep one current status per stage and at most one `IN_PROGRESS` stage. `SOURCE_BLOCKED`/`REVIEW_BLOCKED` stages do not prevent dependency-independent work; select the lowest-numbered incomplete stage whose actual prerequisites are ready.
 
-| Stages | Initial status | Prerequisites |
+| Stages | Current status | Prerequisites |
 |---|---|---|
-| 1 | `NOT_STARTED` | none |
+| 1 | `IN_PROGRESS` | none |
 | 2 | `NOT_STARTED` | 1 |
 | 3 | `NOT_STARTED` | 1–2 |
 | 4 | `NOT_STARTED` | 1–2; witness schema known, but full witness coverage may still be pending |

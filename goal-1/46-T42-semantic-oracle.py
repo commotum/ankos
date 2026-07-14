@@ -9,12 +9,16 @@ per event; every old data occurrence is then replaced from the same snapshot
 and the blocks are concatenated in source order.  Cursor advancement and word
 replacement are atomic.
 
-This file is proof/audit code, not runtime implementation.  It models the
-direct product ``(cursor, word)``, a lossless ``Cursor · Data+`` tagged
-lowering, exact occurrence lineage, finite schedule completion, page-162
-fixtures, and hostile counterexamples.  It uses only the standard library,
-is silent on import, has no filesystem dependency, and fails closed under
-``python -O``.
+T40-derived schedules retain a complete immutable T40 ``ExpansionResult``
+model and replay it from its denotation, query, context, outcome, and
+certificate before T42 may derive a schedule.  Explicit execution-ordered
+schedules use a separate tagged schema; they cannot masquerade as T40 query
+provenance.  This file is proof/audit code, not runtime implementation.  It
+models the direct product ``(cursor, word)``, a lossless
+``Cursor · Data+`` tagged lowering, exact occurrence lineage, finite schedule
+completion, page-162 fixtures, and hostile counterexamples.  It uses only the
+standard library, is silent on import, has no filesystem dependency, and
+fails closed under ``python -O``.
 """
 
 from __future__ import annotations
@@ -49,6 +53,19 @@ RATIONAL_COMPLETE = "rational_complete"
 EXPLICIT_SOURCE = "explicit_schedule"
 COMPLETE_EXACT = "complete_exact"
 COMPLETE_CERTIFIED = "complete_certified"
+PARTIAL = "partial"
+RESOURCE_LIMIT = "resource_limit"
+PROBABLE = "probable"
+APPROXIMATE = "approximate"
+PREFIX_OF_INFINITE = "prefix_of_infinite"
+FINITE_TERMINATED = "finite_terminated"
+T40_EXACT_METHOD = "exact_closed_form"
+T40_MACHIN_METHOD = "machin_rational_interval"
+T40_QUERY_SCHEMA = "t40.representation-query/simple-cf-prefix/v1"
+T40_RESULT_SCHEMA = "t40.expansion-result/v1"
+T40_HANDOFF_SCHEMA = "t40-to-t42.complete-replay-verified/v1"
+EXPLICIT_SOURCE_SCHEMA = "t42.explicit-execution-schedule/v1"
+LIMITED_TRANSCRIBED = "LIMITED_TRANSCRIBED"
 SCHEDULE_EXHAUSTED = "schedule_exhausted"
 
 
@@ -76,8 +93,9 @@ ARCHITECTURE_CLASSIFICATION = (
 
 
 GOAL2_CONFORMANCE = (
-    "Accept only finalized exact/certified simple-CF prefixes or explicitly execution-ordered positive schedules.",
-    "Retain signed a0, query/result provenance, coefficient orientation, term count, and rule-codec version.",
+    "Accept T40 input only as a complete immutable replay-verified ExpansionResult handoff; detached ids and coefficient tuples are insufficient.",
+    "Keep explicitly execution-ordered positive schedules in a separate closed tagged schema with no fake T40 provenance, a0, or requested count.",
+    "Retain signed a0, full query/result provenance, coefficient orientation, term count, outcome, termination, and rule-codec version for T40-derived schedules.",
     "Reverse a natural CF tail exactly once before execution; never lazily pull natural-order coefficients per event.",
     "Keep the cursor in visible configuration and update it atomically with the dynamic ordered word.",
     "Use the uniform PhaseIndex×Bit product-word lowering when exact T13 AllOccurrences/Self/OrderedGenerationConcat execution is desired.",
@@ -146,58 +164,491 @@ def canonical_json(payload: object) -> str:
 
 
 @dataclass(frozen=True)
-class QueryProvenance:
-    query_id: str
-    result_id: str
-    proof_strength: str
-    coefficient_start: int
-    requested_count: int
+class T40RationalDenotation:
+    numerator: int
+    denominator: int
 
     def __post_init__(self) -> None:
-        query_id = exact_text(self.query_id, "query id")
-        result_id = exact_text(self.result_id, "result id")
-        if not is_sha256(query_id) or not is_sha256(result_id):
-            raise ValueError("query and result ids must be lowercase SHA-256 hex")
-        if self.proof_strength not in (COMPLETE_EXACT, COMPLETE_CERTIFIED):
-            raise ValueError("T42 accepts only complete exact/certified coefficient results")
-        if exact_nonnegative(self.coefficient_start, "coefficient start") != 0:
-            raise ValueError("T42 natural CF handoff must begin at coefficient zero")
-        exact_positive(self.requested_count, "requested coefficient count")
+        object.__setattr__(self, "numerator", exact_int(self.numerator, "rational numerator"))
+        object.__setattr__(self, "denominator", exact_positive(self.denominator, "rational denominator"))
+
+
+@dataclass(frozen=True)
+class T40SquareRootDenotation:
+    radicand: int
+
+    def __post_init__(self) -> None:
+        radicand = exact_positive(self.radicand, "square-root radicand")
+        if isqrt(radicand) ** 2 == radicand:
+            raise ValueError("quadratic-surd denotation requires a nonsquare radicand")
+        object.__setattr__(self, "radicand", radicand)
+
+
+@dataclass(frozen=True)
+class T40NegatedSquareRootDenotation:
+    radicand: int
+
+    def __post_init__(self) -> None:
+        radicand = exact_positive(self.radicand, "negated square-root radicand")
+        if isqrt(radicand) ** 2 == radicand:
+            raise ValueError("negated quadratic-surd denotation requires a nonsquare radicand")
+        object.__setattr__(self, "radicand", radicand)
+
+
+@dataclass(frozen=True)
+class T40EulerDenotation:
+    pass
+
+
+@dataclass(frozen=True)
+class T40PiDenotation:
+    pass
+
+
+T40Denotation: TypeAlias = (
+    T40RationalDenotation
+    | T40SquareRootDenotation
+    | T40NegatedSquareRootDenotation
+    | T40EulerDenotation
+    | T40PiDenotation
+)
+T40_DENOTATION_TYPES = (
+    T40RationalDenotation,
+    T40SquareRootDenotation,
+    T40NegatedSquareRootDenotation,
+    T40EulerDenotation,
+    T40PiDenotation,
+)
+
+
+def t40_denotation_key(value: object) -> tuple[object, ...]:
+    if type(value) is T40RationalDenotation:
+        return ("RationalLiteral/v2", str(value.numerator), str(value.denominator))
+    if type(value) is T40SquareRootDenotation:
+        return ("SquareRoot/v1", str(value.radicand))
+    if type(value) is T40NegatedSquareRootDenotation:
+        return ("NegatedSquareRoot/v1", str(value.radicand))
+    if type(value) is T40EulerDenotation:
+        return ("EulerConstant/v1",)
+    if type(value) is T40PiDenotation:
+        return ("PiConstant/v1",)
+    raise TypeError("unknown T40 closed denotation")
+
+
+@dataclass(frozen=True)
+class T40RepresentationQuery:
+    denotation: T40Denotation
+    requested_count: int
+    representation: str = "SimpleContinuedFraction/v1"
+    selection: str = "Prefix/v1"
+    schema: str = T40_QUERY_SCHEMA
+
+    def __post_init__(self) -> None:
+        if type(self.denotation) not in T40_DENOTATION_TYPES:
+            raise TypeError("T40 query needs a closed exact denotation")
+        object.__setattr__(self, "requested_count", exact_positive(self.requested_count, "T40 requested count"))
+        if self.representation != "SimpleContinuedFraction/v1":
+            raise ValueError("T42 handoffs require the T40 simple-CF representation")
+        if self.selection != "Prefix/v1":
+            raise ValueError("T42 handoffs require a prefix selection")
+        if self.schema != T40_QUERY_SCHEMA:
+            raise ValueError("unknown T40 query schema")
 
     def key(self) -> tuple[object, ...]:
         return (
-            "QueryProvenance/v1",
-            self.query_id,
-            self.result_id,
-            self.proof_strength,
-            self.coefficient_start,
-            self.requested_count,
+            "RepresentationQuery/v1",
+            ("MathematicalDenotationSpec/v1", t40_denotation_key(self.denotation), (), "closed_numeric_value/v1", "closed-constants/v1", "principal-real/v1"),
+            (self.representation, "finite_simple_cf_with_last_gt_one/v1"),
+            (self.selection, str(self.requested_count)),
         )
 
 
 @dataclass(frozen=True)
-class FinalizedNaturalCFPrefix:
-    provenance: QueryProvenance
-    coefficients: tuple[int, ...]
-    source_kind: str
-    orientation: str = NATURAL_CF_ORIENTATION
+class T40EvaluationContext:
+    method: str
+    term_budget: int = 0
 
     def __post_init__(self) -> None:
-        if type(self.provenance) is not QueryProvenance:
-            raise TypeError("natural CF prefix needs exact query provenance")
-        raw = exact_tuple(self.coefficients, "continued-fraction coefficients")
-        if not raw:
-            raise ValueError("continued-fraction prefix must contain a0")
-        checked = tuple(exact_int(value, "continued-fraction coefficient") for value in raw)
-        if any(value <= 0 for value in checked[1:]):
-            raise ValueError("simple-CF tail coefficients must be positive")
-        if len(checked) != self.provenance.requested_count:
-            raise ValueError("coefficient payload length must equal the finalized query count")
-        if self.source_kind not in (IRRATIONAL_PREFIX, RATIONAL_COMPLETE):
-            raise ValueError("unknown natural CF source kind")
-        if self.orientation != NATURAL_CF_ORIENTATION:
-            raise ValueError("natural CF prefix orientation is fixed")
-        object.__setattr__(self, "coefficients", checked)
+        method = exact_text(self.method, "T40 evaluation method")
+        if method not in (T40_EXACT_METHOD, T40_MACHIN_METHOD):
+            raise ValueError("unknown T40 evaluation method")
+        budget = exact_nonnegative(self.term_budget, "T40 term budget")
+        if method == T40_EXACT_METHOD and budget != 0:
+            raise ValueError("exact T40 evaluation has no term budget")
+        if method == T40_MACHIN_METHOD and budget == 0:
+            raise ValueError("Machin certification requires a positive term budget")
+        object.__setattr__(self, "method", method)
+        object.__setattr__(self, "term_budget", budget)
+
+    def key(self) -> tuple[object, ...]:
+        return ("EvaluationContext/v1", self.method, str(self.term_budget))
+
+
+@dataclass(frozen=True)
+class T40QueryProvenance:
+    query_key: tuple[object, ...]
+    query_id: str
+    context_key: tuple[object, ...]
+    context_id: str
+
+    def __post_init__(self) -> None:
+        query_key_value = exact_tuple(self.query_key, "T40 query structural key")
+        context_key_value = exact_tuple(self.context_key, "T40 context structural key")
+        expected_query = sha256(repr(query_key_value).encode("utf-8")).hexdigest()
+        expected_context = sha256(repr(context_key_value).encode("utf-8")).hexdigest()
+        if self.query_id != expected_query or self.context_id != expected_context:
+            raise ValueError("T40 provenance ids must match their complete structural keys")
+
+
+def t40_query_provenance(
+    query: object, context: object
+) -> T40QueryProvenance:
+    if type(query) is not T40RepresentationQuery:
+        raise TypeError("T40 provenance requires an exact query")
+    if type(context) is not T40EvaluationContext:
+        raise TypeError("T40 provenance requires an exact context")
+    query_key_value = query.key()
+    context_key_value = context.key()
+    return T40QueryProvenance(
+        query_key_value,
+        sha256(repr(query_key_value).encode("utf-8")).hexdigest(),
+        context_key_value,
+        sha256(repr(context_key_value).encode("utf-8")).hexdigest(),
+    )
+
+
+@dataclass(frozen=True)
+class T40RationalInterval:
+    lower: Fraction
+    upper: Fraction
+
+    def __post_init__(self) -> None:
+        if type(self.lower) is not Fraction or type(self.upper) is not Fraction:
+            raise TypeError("T40 certificate interval endpoints must be exact Fractions")
+        if not self.lower < self.upper:
+            raise ValueError("T40 certificate interval must have positive width")
+
+
+@dataclass(frozen=True)
+class T40MachinCertificate:
+    terms: int
+    interval: T40RationalInterval
+    certified_coefficients: tuple[int, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "terms", exact_positive(self.terms, "Machin terms"))
+        if type(self.interval) is not T40RationalInterval:
+            raise TypeError("Machin certificate needs an exact rational interval")
+        raw = exact_tuple(self.certified_coefficients, "certified coefficients")
+        checked = tuple(exact_int(value, "certified coefficient") for value in raw)
+        if any(value < 1 for value in checked[1:]):
+            raise ValueError("invalid certified simple-CF coefficient")
+        object.__setattr__(self, "certified_coefficients", checked)
+
+
+@dataclass(frozen=True)
+class T40CompleteExact:
+    derivation: str
+
+    def __post_init__(self) -> None:
+        exact_text(self.derivation, "T40 exact derivation")
+
+
+@dataclass(frozen=True)
+class T40CompleteCertified:
+    certificate: T40MachinCertificate
+
+    def __post_init__(self) -> None:
+        if type(self.certificate) is not T40MachinCertificate:
+            raise TypeError("T40 certified outcome requires a Machin certificate")
+
+
+T40CompleteOutcome: TypeAlias = T40CompleteExact | T40CompleteCertified
+
+
+def t40_sqrt_cf_prefix(radicand: int, count: int) -> tuple[int, ...]:
+    requested = exact_positive(count, "square-root CF count")
+    value = exact_positive(radicand, "square-root radicand")
+    a0 = isqrt(value)
+    if a0 * a0 == value:
+        raise ValueError("square-root CF recurrence requires a nonsquare radicand")
+    m, denominator, coefficient = 0, 1, a0
+    period: list[int] = []
+    while True:
+        m = denominator * coefficient - m
+        numerator = value - m * m
+        if numerator <= 0 or numerator % denominator:
+            raise ArithmeticError("invalid exact quadratic-surd recurrence")
+        denominator = numerator // denominator
+        coefficient = (a0 + m) // denominator
+        period.append(coefficient)
+        if coefficient == 2 * a0:
+            break
+    return (a0,) + tuple(period[(index - 1) % len(period)] for index in range(1, requested))
+
+
+def t40_negated_sqrt_cf_prefix(radicand: int, count: int) -> tuple[int, ...]:
+    requested = exact_positive(count, "negated square-root CF count")
+    positive = t40_sqrt_cf_prefix(radicand, requested + 2)
+    leading = -positive[0] - 1
+    if requested == 1:
+        return (leading,)
+    if positive[1] == 1:
+        transformed = (leading, positive[2] + 1) + positive[3:]
+    else:
+        transformed = (leading, 1, positive[1] - 1) + positive[2:]
+    return transformed[:requested]
+
+
+def t40_rational_cf_prefix(value: Fraction, count: int) -> tuple[int, ...]:
+    current = value
+    coefficients: list[int] = []
+    while len(coefficients) < count:
+        coefficient = current.numerator // current.denominator
+        coefficients.append(coefficient)
+        remainder = current - coefficient
+        if remainder == 0:
+            break
+        current = Fraction(1, remainder)
+    return tuple(coefficients)
+
+
+def t40_atan_inverse_interval(denominator: int, terms: int) -> T40RationalInterval:
+    q = exact_positive(denominator, "arctangent denominator")
+    count = exact_positive(terms, "arctangent terms")
+    total = Fraction(0, 1)
+    for index in range(count):
+        term = Fraction(1, (2 * index + 1) * q ** (2 * index + 1))
+        total = total + term if index % 2 == 0 else total - term
+    next_term = Fraction(1, (2 * count + 1) * q ** (2 * count + 1))
+    if count % 2 == 1:
+        return T40RationalInterval(total - next_term, total)
+    return T40RationalInterval(total, total + next_term)
+
+
+def t40_machin_pi_interval(terms: int) -> T40RationalInterval:
+    count = exact_positive(terms, "Machin terms")
+    atan_five = t40_atan_inverse_interval(5, count)
+    atan_239 = t40_atan_inverse_interval(239, count)
+    return T40RationalInterval(
+        16 * atan_five.lower - 4 * atan_239.upper,
+        16 * atan_five.upper - 4 * atan_239.lower,
+    )
+
+
+def t40_certified_cf_prefix(
+    interval: T40RationalInterval, requested: int
+) -> tuple[int, ...]:
+    if type(interval) is not T40RationalInterval:
+        raise TypeError("CF certification needs an exact interval")
+    target = exact_positive(requested, "certified CF count")
+    lower, upper = interval.lower, interval.upper
+    coefficients: list[int] = []
+    for _ in range(target):
+        lower_floor = lower.numerator // lower.denominator
+        upper_floor = upper.numerator // upper.denominator
+        if lower_floor != upper_floor or upper >= lower_floor + 1:
+            break
+        coefficients.append(lower_floor)
+        lower_remainder = lower - lower_floor
+        upper_remainder = upper - upper_floor
+        if lower_remainder <= 0:
+            break
+        lower, upper = Fraction(1, upper_remainder), Fraction(1, lower_remainder)
+    return tuple(coefficients)
+
+
+def canonical_t40_evaluation(
+    query: T40RepresentationQuery,
+    context: T40EvaluationContext,
+) -> tuple[tuple[int, ...], T40CompleteOutcome, str]:
+    if type(query.denotation) is T40PiDenotation:
+        if context.method != T40_MACHIN_METHOD:
+            raise ValueError("Pi simple-CF handoff requires a Machin certificate")
+        interval = t40_machin_pi_interval(context.term_budget)
+        coefficients = t40_certified_cf_prefix(interval, query.requested_count)
+        if len(coefficients) != query.requested_count:
+            raise ValueError("Machin budget does not certify the complete requested prefix")
+        certificate = T40MachinCertificate(context.term_budget, interval, coefficients)
+        return coefficients, T40CompleteCertified(certificate), PREFIX_OF_INFINITE
+    if context.method != T40_EXACT_METHOD:
+        raise ValueError("closed exact denotation requires the exact T40 method")
+    if type(query.denotation) is T40SquareRootDenotation:
+        coefficients = t40_sqrt_cf_prefix(query.denotation.radicand, query.requested_count)
+        derivation = "exact quadratic-surd recurrence"
+        termination = PREFIX_OF_INFINITE
+    elif type(query.denotation) is T40NegatedSquareRootDenotation:
+        coefficients = t40_negated_sqrt_cf_prefix(query.denotation.radicand, query.requested_count)
+        derivation = "exact signed quadratic-surd recurrence"
+        termination = PREFIX_OF_INFINITE
+    elif type(query.denotation) is T40EulerDenotation:
+        coefficients = tuple(
+            2 if index == 0 else 2 * ((index + 1) // 3) if index % 3 == 2 else 1
+            for index in range(query.requested_count)
+        )
+        derivation = "exact Euler simple-CF formula"
+        termination = PREFIX_OF_INFINITE
+    elif type(query.denotation) is T40RationalDenotation:
+        coefficients = t40_rational_cf_prefix(
+            Fraction(query.denotation.numerator, query.denotation.denominator),
+            query.requested_count,
+        )
+        derivation = "exact Euclidean continued fraction"
+        termination = FINITE_TERMINATED
+    else:  # pragma: no cover - exact type guard above makes this unreachable
+        raise TypeError("unknown T40 denotation")
+    return coefficients, T40CompleteExact(derivation), termination
+
+
+def t40_outcome_key(outcome: object) -> tuple[object, ...]:
+    if type(outcome) is T40CompleteExact:
+        return ("CompleteExact/v1", outcome.derivation)
+    if type(outcome) is T40CompleteCertified:
+        certificate = outcome.certificate
+        return (
+            "CompleteCertified/v1",
+            certificate.terms,
+            (str(certificate.interval.lower), str(certificate.interval.upper)),
+            certificate.certified_coefficients,
+        )
+    raise TypeError("unknown T40 complete outcome")
+
+
+@dataclass(frozen=True)
+class T40ExpansionResult:
+    query: T40RepresentationQuery
+    context: T40EvaluationContext
+    provenance: T40QueryProvenance
+    start_index: int
+    coefficients: tuple[int, ...]
+    integer_digits: tuple[int, ...]
+    sign: None
+    outcome: T40CompleteOutcome
+    termination: str
+    schema: str = T40_RESULT_SCHEMA
+    result_id: str = ""
+
+    def __post_init__(self) -> None:
+        if type(self.query) is not T40RepresentationQuery:
+            raise TypeError("T40 result needs its complete exact query")
+        if type(self.context) is not T40EvaluationContext:
+            raise TypeError("T40 result needs its complete exact context")
+        if type(self.provenance) is not T40QueryProvenance:
+            raise TypeError("T40 result needs structural query/context provenance")
+        if self.provenance != t40_query_provenance(self.query, self.context):
+            raise ValueError("T40 result provenance does not match query and context")
+        if exact_nonnegative(self.start_index, "T40 result start") != 0:
+            raise ValueError("T42 source results must begin at a0")
+        coefficients = tuple(
+            exact_int(value, "T40 result coefficient")
+            for value in exact_tuple(self.coefficients, "T40 result coefficients")
+        )
+        if any(value < 1 for value in coefficients[1:]):
+            raise ValueError("invalid T40 simple-CF tail coefficient")
+        if exact_tuple(self.integer_digits, "T40 integer digits") != () or self.sign is not None:
+            raise ValueError("simple CF results carry neither positional integer digits nor a separate sign")
+        if type(self.outcome) not in (T40CompleteExact, T40CompleteCertified):
+            raise TypeError("T42 source requires a complete T40 outcome")
+        if self.schema != T40_RESULT_SCHEMA:
+            raise ValueError("unknown T40 result schema")
+        expected_coefficients, expected_outcome, expected_termination = canonical_t40_evaluation(
+            self.query, self.context
+        )
+        if (coefficients, self.outcome, self.termination) != (
+            expected_coefficients,
+            expected_outcome,
+            expected_termination,
+        ):
+            raise ValueError("T40 ExpansionResult does not replay from its complete query and context")
+        key = (
+            self.schema,
+            self.query.key(),
+            self.context.key(),
+            self.provenance.query_id,
+            self.provenance.context_id,
+            0,
+            coefficients,
+            (),
+            None,
+            t40_outcome_key(self.outcome),
+            self.termination,
+        )
+        computed = sha256(repr(key).encode("utf-8")).hexdigest()
+        if self.result_id not in ("", computed):
+            raise ValueError("forged T40 result identity")
+        object.__setattr__(self, "coefficients", coefficients)
+        object.__setattr__(self, "result_id", computed)
+
+    def key(self) -> tuple[object, ...]:
+        return (
+            "T40ExpansionResult/full/v1",
+            self.query.key(),
+            self.context.key(),
+            self.provenance.query_key,
+            self.provenance.query_id,
+            self.provenance.context_key,
+            self.provenance.context_id,
+            self.start_index,
+            self.coefficients,
+            self.integer_digits,
+            self.sign,
+            t40_outcome_key(self.outcome),
+            self.termination,
+            self.schema,
+            self.result_id,
+        )
+
+
+def evaluate_t40_cf_query(
+    query: object, context: object
+) -> T40ExpansionResult:
+    if type(query) is not T40RepresentationQuery:
+        raise TypeError("T40 evaluation requires an exact representation query")
+    if type(context) is not T40EvaluationContext:
+        raise TypeError("T40 evaluation requires an exact context")
+    coefficients, outcome, termination = canonical_t40_evaluation(query, context)
+    return T40ExpansionResult(
+        query,
+        context,
+        t40_query_provenance(query, context),
+        0,
+        coefficients,
+        (),
+        None,
+        outcome,
+        termination,
+    )
+
+
+def verify_t40_expansion_result(value: object) -> bool:
+    if type(value) is not T40ExpansionResult:
+        return False
+    try:
+        return value == evaluate_t40_cf_query(value.query, value.context)
+    except (TypeError, ValueError, ArithmeticError, ZeroDivisionError):
+        return False
+
+
+@dataclass(frozen=True)
+class T40CoefficientHandoff:
+    source_result: T40ExpansionResult
+    schema: str = T40_HANDOFF_SCHEMA
+
+    def __post_init__(self) -> None:
+        if type(self.source_result) is not T40ExpansionResult:
+            raise TypeError("T40 handoff must carry the complete ExpansionResult")
+        if not verify_t40_expansion_result(self.source_result):
+            raise ValueError("T40 handoff source result does not replay")
+        if self.source_result.termination != PREFIX_OF_INFINITE:
+            raise ValueError("strict T42 excludes rational-complete continued fractions")
+        if not self.source_result.coefficients:
+            raise ValueError("T40 handoff must include a0")
+        if self.schema != T40_HANDOFF_SCHEMA:
+            raise ValueError("unknown T40-to-T42 handoff schema")
+
+    @property
+    def coefficients(self) -> tuple[int, ...]:
+        return self.source_result.coefficients
 
     @property
     def a0(self) -> int:
@@ -207,85 +658,132 @@ class FinalizedNaturalCFPrefix:
     def natural_tail(self) -> tuple[int, ...]:
         return self.coefficients[1:]
 
+    @property
+    def proof_strength(self) -> str:
+        return COMPLETE_EXACT if type(self.source_result.outcome) is T40CompleteExact else COMPLETE_CERTIFIED
+
+    def key(self) -> tuple[object, ...]:
+        return ("T40CoefficientHandoff/full/v1", self.source_result.key(), self.schema)
+
+
+def make_t40_coefficient_handoff(result: object) -> T40CoefficientHandoff:
+    if type(result) is not T40ExpansionResult:
+        raise TypeError("T42 requires an exact complete T40 ExpansionResult")
+    return T40CoefficientHandoff(result)
+
+
+@dataclass(frozen=True)
+class ExplicitScheduleSource:
+    coefficients: tuple[int, ...]
+    source_label: str
+    evidence_mode: str = "DECLARED_EXPLICIT"
+    schema: str = EXPLICIT_SOURCE_SCHEMA
+    source_id: str = ""
+
+    def __post_init__(self) -> None:
+        raw = exact_tuple(self.coefficients, "explicit execution coefficients")
+        checked = tuple(exact_positive(value, "explicit execution coefficient") for value in raw)
+        label = exact_text(self.source_label, "explicit schedule source label")
+        mode = exact_text(self.evidence_mode, "explicit schedule evidence mode")
+        if self.schema != EXPLICIT_SOURCE_SCHEMA:
+            raise ValueError("unknown explicit schedule schema")
+        key = (self.schema, checked, label, mode)
+        computed = sha256(repr(key).encode("utf-8")).hexdigest()
+        if self.source_id not in ("", computed):
+            raise ValueError("forged explicit schedule identity")
+        object.__setattr__(self, "coefficients", checked)
+        object.__setattr__(self, "source_label", label)
+        object.__setattr__(self, "evidence_mode", mode)
+        object.__setattr__(self, "source_id", computed)
+
     def key(self) -> tuple[object, ...]:
         return (
-            "FinalizedNaturalCFPrefix/v1",
-            self.provenance.key(),
+            "ExplicitScheduleSource/v1",
             self.coefficients,
-            self.source_kind,
-            self.orientation,
+            self.source_label,
+            self.evidence_mode,
+            self.schema,
+            self.source_id,
         )
+
+
+ScheduleSource: TypeAlias = T40CoefficientHandoff | ExplicitScheduleSource
 
 
 @dataclass(frozen=True)
 class FinalizedExecutionSchedule:
-    provenance: QueryProvenance
-    coefficients: tuple[int, ...]
-    a0: int
-    natural_term_count: int
-    source_kind: str
-    orientation: str
+    source: ScheduleSource
+    schedule_id: str = ""
 
     def __post_init__(self) -> None:
-        if type(self.provenance) is not QueryProvenance:
-            raise TypeError("execution schedule needs exact query provenance")
-        raw = exact_tuple(self.coefficients, "execution coefficients")
-        checked = tuple(exact_positive(value, "execution coefficient") for value in raw)
-        a0 = exact_int(self.a0, "a0")
-        count = exact_positive(self.natural_term_count, "natural term count")
-        if count != len(checked) + 1:
-            raise ValueError("one a0 plus the execution schedule must equal the term count")
-        if self.source_kind not in (IRRATIONAL_PREFIX, RATIONAL_COMPLETE, EXPLICIT_SOURCE):
-            raise ValueError("unknown execution schedule source kind")
-        if self.orientation not in (
-            REVERSED_TAIL_ORIENTATION,
-            EXPLICIT_EXECUTION_ORIENTATION,
-        ):
-            raise ValueError("execution schedule orientation must be explicit")
-        object.__setattr__(self, "coefficients", checked)
-        object.__setattr__(self, "a0", a0)
+        if type(self.source) not in (T40CoefficientHandoff, ExplicitScheduleSource):
+            raise TypeError("execution schedule needs an exact tagged source")
+        if type(self.source) is T40CoefficientHandoff:
+            if self.source != T40CoefficientHandoff(self.source.source_result):
+                raise ValueError("execution schedule source is not a canonical verified T40 handoff")
+        else:
+            canonical_explicit = ExplicitScheduleSource(
+                self.source.coefficients,
+                self.source.source_label,
+                self.source.evidence_mode,
+                self.source.schema,
+                self.source.source_id,
+            )
+            if self.source != canonical_explicit:
+                raise ValueError("execution schedule source is not canonical explicit data")
+        key = ("FinalizedExecutionSchedule/v2", self.source.key())
+        computed = sha256(repr(key).encode("utf-8")).hexdigest()
+        if self.schedule_id not in ("", computed):
+            raise ValueError("forged finalized schedule identity")
+        object.__setattr__(self, "schedule_id", computed)
+
+    @property
+    def coefficients(self) -> tuple[int, ...]:
+        if type(self.source) is T40CoefficientHandoff:
+            return tuple(reversed(self.source.natural_tail))
+        return self.source.coefficients
+
+    @property
+    def orientation(self) -> str:
+        return REVERSED_TAIL_ORIENTATION if type(self.source) is T40CoefficientHandoff else EXPLICIT_EXECUTION_ORIENTATION
+
+    @property
+    def source_kind(self) -> str:
+        return IRRATIONAL_PREFIX if type(self.source) is T40CoefficientHandoff else EXPLICIT_SOURCE
+
+    @property
+    def source_identity(self) -> str:
+        return self.source.source_result.result_id if type(self.source) is T40CoefficientHandoff else self.source.source_id
 
     def key(self) -> tuple[object, ...]:
         return (
-            "FinalizedExecutionSchedule/v1",
-            self.provenance.key(),
+            "FinalizedExecutionSchedule/v2",
+            self.source.key(),
             self.coefficients,
-            self.a0,
-            self.natural_term_count,
-            self.source_kind,
             self.orientation,
+            self.source_kind,
+            self.schedule_id,
         )
 
 
-def reverse_natural_cf_tail_once(prefix: object) -> FinalizedExecutionSchedule:
-    if type(prefix) is not FinalizedNaturalCFPrefix:
-        raise TypeError("reverse-once construction requires a finalized natural CF prefix")
-    return FinalizedExecutionSchedule(
-        prefix.provenance,
-        tuple(reversed(prefix.natural_tail)),
-        prefix.a0,
-        len(prefix.coefficients),
-        prefix.source_kind,
-        REVERSED_TAIL_ORIENTATION,
-    )
+def reverse_natural_cf_tail_once(handoff: object) -> FinalizedExecutionSchedule:
+    if type(handoff) is not T40CoefficientHandoff:
+        raise TypeError("reverse-once construction requires a replay-verified T40 handoff")
+    return FinalizedExecutionSchedule(handoff)
 
 
 def explicit_execution_schedule(
     coefficients: object,
     *,
-    a0: object,
-    provenance: object,
+    source_label: str,
+    evidence_mode: str = "DECLARED_EXPLICIT",
 ) -> FinalizedExecutionSchedule:
-    if type(provenance) is not QueryProvenance:
-        raise TypeError("explicit schedule needs exact provenance")
-    raw = exact_tuple(coefficients, "explicit execution coefficients")
     return FinalizedExecutionSchedule(
-        provenance,
-        tuple(exact_positive(value, "explicit coefficient") for value in raw),
-        exact_int(a0, "explicit a0"),
-        len(raw) + 1,
-        EXPLICIT_SOURCE,
-        EXPLICIT_EXECUTION_ORIENTATION,
+        ExplicitScheduleSource(
+            exact_tuple(coefficients, "explicit execution coefficients"),
+            source_label,
+            evidence_mode,
+        )
     )
 
 
@@ -335,8 +833,10 @@ class ScheduledMorphismProgram:
     def __post_init__(self) -> None:
         if type(self.schedule) is not FinalizedExecutionSchedule:
             raise TypeError("program needs a finalized execution schedule")
-        if self.schedule.source_kind == RATIONAL_COMPLETE:
-            raise ValueError("the strict Book construction excludes rational h")
+        if self.schedule != FinalizedExecutionSchedule(
+            self.schedule.source, self.schedule.schedule_id
+        ):
+            raise ValueError("program schedule does not replay from its complete tagged source")
         seed = checked_word(self.seed, "program seed")
         if seed != (0,):
             raise ValueError("the strict Book construction fixes the seed to (0,)")
@@ -365,8 +865,10 @@ class ScheduledMorphismProgram:
         )
 
 
-def program_from_natural_prefix(prefix: object) -> ScheduledMorphismProgram:
-    return ScheduledMorphismProgram(reverse_natural_cf_tail_once(prefix))
+def program_from_t40_result(result: object) -> ScheduledMorphismProgram:
+    return ScheduledMorphismProgram(
+        reverse_natural_cf_tail_once(make_t40_coefficient_handoff(result))
+    )
 
 
 @dataclass(frozen=True)
@@ -589,7 +1091,7 @@ class LineageRecord:
 @dataclass(frozen=True)
 class AdvancedTransition:
     program_id: str
-    provenance_result_id: str
+    schedule_source_identity: str
     cursor_before: int
     cursor_after: int
     coefficient: int
@@ -602,7 +1104,7 @@ class AdvancedTransition:
 @dataclass(frozen=True)
 class ScheduleCompletion:
     program_id: str
-    provenance_result_id: str
+    schedule_source_identity: str
     configuration: DirectConfiguration
     reason: str = SCHEDULE_EXHAUSTED
     successors: tuple[()] = ()
@@ -667,7 +1169,7 @@ def ordered_generation_commit(
     )
     return AdvancedTransition(
         program.program_id,
-        program.schedule.provenance.result_id,
+        program.schedule.source_identity,
         cursor,
         cursor + 1,
         coefficient,
@@ -683,7 +1185,7 @@ def direct_step(program: object, snapshot: object) -> StepOutcome:
     if checked.configuration.cursor == len(program.schedule.coefficients):
         return ScheduleCompletion(
             program.program_id,
-            program.schedule.provenance.result_id,
+            program.schedule.source_identity,
             checked.configuration,
         )
     handles = select_all_occurrences(program, checked)
@@ -983,13 +1485,19 @@ def sqrt2_mechanical_differences(sign: int, count: int) -> tuple[int, ...]:
     )
 
 
-def fixture_provenance(label: str, count: int, strength: str = COMPLETE_EXACT) -> QueryProvenance:
-    return QueryProvenance(
-        stable_id(f"T42 query {label}"),
-        stable_id(f"T42 result {label}"),
-        strength,
-        0,
-        count,
+def t40_exact_result(
+    denotation: T40Denotation, count: int
+) -> T40ExpansionResult:
+    return evaluate_t40_cf_query(
+        T40RepresentationQuery(denotation, count),
+        T40EvaluationContext(T40_EXACT_METHOD),
+    )
+
+
+def t40_certified_pi_result(count: int, terms: int) -> T40ExpansionResult:
+    return evaluate_t40_cf_query(
+        T40RepresentationQuery(T40PiDenotation(), count),
+        T40EvaluationContext(T40_MACHIN_METHOD, terms),
     )
 
 
@@ -1000,7 +1508,7 @@ class PageFixture:
     expected_schedule: tuple[int, ...]
     expected_lengths: tuple[int, ...]
     expected_final_sha256: str
-    proof_strength: str
+    evidence_mode: str = LIMITED_TRANSCRIBED
 
     def __post_init__(self) -> None:
         exact_text(self.name, "fixture name")
@@ -1017,8 +1525,8 @@ class PageFixture:
             raise ValueError("fixture lengths must include the one-symbol seed")
         if not is_sha256(exact_text(self.expected_final_sha256, "fixture word SHA")):
             raise ValueError("fixture word SHA must be lowercase SHA-256")
-        if self.proof_strength not in (COMPLETE_EXACT, COMPLETE_CERTIFIED):
-            raise ValueError("fixture proof strength must be complete")
+        if self.evidence_mode != LIMITED_TRANSCRIBED:
+            raise ValueError("page-162 coefficient fixtures are limited raster transcriptions")
 
 
 PAGE_FIXTURES = (
@@ -1028,7 +1536,7 @@ PAGE_FIXTURES = (
         (2, 2, 2, 2, 2),
         (1, 2, 5, 12, 29, 70),
         "8ba86691662b9853053af6dd5b5e3dfc17caf43a640b2bbb45c01e323c30bff7",
-        COMPLETE_EXACT,
+        LIMITED_TRANSCRIBED,
     ),
     PageFixture(
         "page162-alpha-2-plus-sqrt5",
@@ -1036,7 +1544,7 @@ PAGE_FIXTURES = (
         (1, 1, 1, 1, 1, 1, 1, 1, 1),
         (1, 1, 2, 3, 5, 8, 13, 21, 34, 55),
         "fa947b9859783d29be2ba4015183fa85b52cb6181e04eab41658ab55f6761e36",
-        COMPLETE_EXACT,
+        LIMITED_TRANSCRIBED,
     ),
     PageFixture(
         "page162-alpha-2-plus-cuberoot5",
@@ -1044,7 +1552,7 @@ PAGE_FIXTURES = (
         (2, 4, 1, 2, 1, 1),
         (1, 2, 9, 11, 31, 42, 73),
         "f851acd68816def8a87c81de3358a129a1a735b2a42399485966261962eb6aa5",
-        COMPLETE_EXACT,
+        LIMITED_TRANSCRIBED,
     ),
     PageFixture(
         "page162-alpha-1-plus-sqrt-e",
@@ -1052,7 +1560,7 @@ PAGE_FIXTURES = (
         (3, 2, 1, 4, 2),
         (1, 3, 7, 10, 47, 104),
         "961704a7ac5de6ac75aff0bee33c2a0d8406c9db80ed91043595d453cb4f76b6",
-        COMPLETE_CERTIFIED,
+        LIMITED_TRANSCRIBED,
     ),
 )
 
@@ -1082,10 +1590,13 @@ ASSET_SEMANTIC_MANIFEST = (
                 fixture.expected_schedule,
                 fixture.expected_lengths,
                 fixture.expected_final_sha256,
+                fixture.evidence_mode,
             )
             for fixture in PAGE_FIXTURES
         ),
     ),
+    ("fixture_coefficient_evidence", LIMITED_TRANSCRIBED),
+    ("pixel_replayed", False),
     ("pixel_program_forbidden", True),
 )
 
@@ -1104,6 +1615,7 @@ SOURCE_SEMANTIC_MANIFEST = (
     ("tail_domain", "positive_integer"),
     ("rational_source", "rejected"),
     ("sine_half_shift_rule_generator", "source_underspecified"),
+    ("page162_alpha_and_coefficient_fixtures", LIMITED_TRANSCRIBED),
 )
 
 
@@ -1115,17 +1627,12 @@ def audit_page_fixtures() -> tuple[int, int, int, int, int, int]:
     compact_commutations = 0
     replicated_commutations = 0
     for fixture in PAGE_FIXTURES:
-        provenance = fixture_provenance(
-            fixture.name,
-            len(fixture.coefficients),
-            fixture.proof_strength,
+        schedule = explicit_execution_schedule(
+            fixture.expected_schedule,
+            source_label=fixture.name,
+            evidence_mode=fixture.evidence_mode,
         )
-        prefix = FinalizedNaturalCFPrefix(
-            provenance,
-            fixture.coefficients,
-            IRRATIONAL_PREFIX,
-        )
-        schedule = reverse_natural_cf_tail_once(prefix)
+        assert tuple(reversed(fixture.coefficients[1:])) == fixture.expected_schedule
         assert schedule.coefficients == fixture.expected_schedule
         program = ScheduledMorphismProgram(schedule)
         configurations, trace, completion = run_to_completion(program)
@@ -1203,14 +1710,9 @@ def audit_bounded_direct_tagged_commutation() -> tuple[int, int, int, int, int]:
         for bits in product((0, 1), repeat=length)
     )
     for schedule_values in schedules:
-        provenance = fixture_provenance(
-            f"bounded-{schedule_values}",
-            len(schedule_values) + 1,
-        )
         schedule = explicit_execution_schedule(
             schedule_values,
-            a0=0,
-            provenance=provenance,
+            source_label=f"bounded-{schedule_values}",
         )
         program = ScheduledMorphismProgram(schedule)
         programs += 1
@@ -1257,14 +1759,11 @@ def audit_bounded_direct_tagged_commutation() -> tuple[int, int, int, int, int]:
 
 
 def audit_mechanical_word_alignment() -> tuple[int, int, int, int]:
-    positive_prefix = FinalizedNaturalCFPrefix(
-        fixture_provenance("sqrt2-m3", 3),
-        (1, 2, 2),
-        IRRATIONAL_PREFIX,
-    )
-    positive_program = program_from_natural_prefix(positive_prefix)
+    positive_result = t40_exact_result(T40SquareRootDenotation(2), 3)
+    positive_handoff = make_t40_coefficient_handoff(positive_result)
+    positive_program = program_from_t40_result(positive_result)
     positive_configs, _, _ = run_to_completion(positive_program)
-    positive_output = offset_word(positive_prefix.a0, positive_configs[-1].word)
+    positive_output = offset_word(positive_handoff.a0, positive_configs[-1].word)
     positive_expected = sqrt2_mechanical_differences(1, len(positive_output))
     assert positive_configs[-1].word == (0, 1, 0, 1, 0)
     assert positive_output == (1, 2, 1, 2, 1) == positive_expected
@@ -1274,14 +1773,11 @@ def audit_mechanical_word_alignment() -> tuple[int, int, int, int]:
     )
     assert positive_output != d0_positive
 
-    negative_prefix = FinalizedNaturalCFPrefix(
-        fixture_provenance("negative-sqrt2-m4", 4),
-        (-2, 1, 1, 2),
-        IRRATIONAL_PREFIX,
-    )
-    negative_program = program_from_natural_prefix(negative_prefix)
+    negative_result = t40_exact_result(T40NegatedSquareRootDenotation(2), 4)
+    negative_handoff = make_t40_coefficient_handoff(negative_result)
+    negative_program = program_from_t40_result(negative_result)
     negative_configs, _, _ = run_to_completion(negative_program)
-    negative_output = offset_word(negative_prefix.a0, negative_configs[-1].word)
+    negative_output = offset_word(negative_handoff.a0, negative_configs[-1].word)
     negative_expected = sqrt2_mechanical_differences(-1, len(negative_output))
     assert negative_program.schedule.coefficients == (2, 1, 1)
     assert tuple(configuration.word for configuration in negative_configs) == (
@@ -1316,14 +1812,12 @@ def audit_rational_exclusion_and_dual() -> tuple[int, int, int]:
     )
     assert actual == (2, 1)
     assert offset_word(1, canonical_word) != actual
-    rational_prefix = FinalizedNaturalCFPrefix(
-        fixture_provenance("rational-three-halves", 2),
-        canonical,
-        RATIONAL_COMPLETE,
-    )
+    rational_result = t40_exact_result(T40RationalDenotation(3, 2), 2)
+    assert rational_result.coefficients == canonical
+    assert rational_result.termination == FINITE_TERMINATED
     rejected = 0
     try:
-        program_from_natural_prefix(rational_prefix)
+        program_from_t40_result(rational_result)
     except ValueError:
         rejected += 1
     else:
@@ -1338,18 +1832,10 @@ def audit_direction_horizon_and_loss() -> tuple[int, int, int, int, int]:
     assert natural_word == (0, 1, 0)
     assert reversed_word != natural_word
 
-    short_prefix = FinalizedNaturalCFPrefix(
-        fixture_provenance("horizon-short", 2),
-        (0, 1),
-        IRRATIONAL_PREFIX,
-    )
-    long_prefix = FinalizedNaturalCFPrefix(
-        fixture_provenance("horizon-long", 3),
-        (0, 1, 2),
-        IRRATIONAL_PREFIX,
-    )
-    short_program = program_from_natural_prefix(short_prefix)
-    long_program = program_from_natural_prefix(long_prefix)
+    short_result = t40_exact_result(T40EulerDenotation(), 2)
+    long_result = t40_exact_result(T40EulerDenotation(), 3)
+    short_program = program_from_t40_result(short_result)
+    long_program = program_from_t40_result(long_result)
     short_first = direct_step(short_program, initial_snapshot(short_program))
     long_first = direct_step(long_program, initial_snapshot(long_program))
     assert type(short_first) is AdvancedTransition
@@ -1362,12 +1848,12 @@ def audit_direction_horizon_and_loss() -> tuple[int, int, int, int, int]:
 
     word_only_a = ScheduledMorphismProgram(
         explicit_execution_schedule(
-            (1,), a0=0, provenance=fixture_provenance("word-loss-a", 2)
+            (1,), source_label="word-loss-a"
         )
     )
     word_only_b = ScheduledMorphismProgram(
         explicit_execution_schedule(
-            (2,), a0=0, provenance=fixture_provenance("word-loss-b", 2)
+            (2,), source_label="word-loss-b"
         )
     )
     step_a = direct_step(word_only_a, initial_snapshot(word_only_a))
@@ -1378,8 +1864,7 @@ def audit_direction_horizon_and_loss() -> tuple[int, int, int, int, int]:
     repeated = ScheduledMorphismProgram(
         explicit_execution_schedule(
             (2, 1, 2, 3),
-            a0=0,
-            provenance=fixture_provenance("cursor-loss", 5),
+            source_label="cursor-loss",
         )
     )
     at_zero = arbitrary_snapshot(
@@ -1404,12 +1889,8 @@ def audit_direction_horizon_and_loss() -> tuple[int, int, int, int, int]:
     assert repeated.schedule.coefficients[1] == 1
     assert repeated.schedule.coefficients[3] == 3
 
-    m1 = FinalizedNaturalCFPrefix(
-        fixture_provenance("m1-zero-events", 1),
-        (0,),
-        IRRATIONAL_PREFIX,
-    )
-    m1_program = program_from_natural_prefix(m1)
+    m1_result = t40_exact_result(T40EulerDenotation(), 1)
+    m1_program = program_from_t40_result(m1_result)
     configurations, events, completion = run_to_completion(m1_program)
     assert m1_program.schedule.coefficients == ()
     assert configurations == (DirectConfiguration(0, (0,)),)
