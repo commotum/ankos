@@ -1,6 +1,6 @@
 # 42-T35-PIECEWISE-INTEGER
 
-Status: **IN PROGRESS — SOURCE/ASSET/SEMANTIC/RUNTIME-FIT CLOSED; GLOBAL D136 INTEGRATION AND FINAL GATES PENDING**
+Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, RUNTIME-FIT, D136 ARCHITECTURE, AND INDEPENDENT HOSTILE REVIEW CLOSED**
 
 ## Current Facts
 
@@ -206,16 +206,22 @@ The checked-in selectors already demonstrate the reusable geometry: `frontiers.t
 
 ## Completion Requirements
 
-- [ ] Every direct/alias/mechanics search, Notes item, actual Index route, continuation, split witness, image link, and false positive is dispositioned with zero unresolved mechanics.
-- [ ] A/B/Collatz formulas, seeds, exact prefixes, cycles, event counts, source claims, and empirical qualifications are closed.
-- [ ] General residue maps and ordered fraction systems have distinct exact selection/partiality semantics.
-- [ ] Source defects and the raster transcription boundary fail closed.
-- [ ] The governed asset universe is exact and hash-bound.
-- [ ] Direct/generic events, arbitrary precision, closure, invariants, traces, witnesses, cycles, order, and hostile cases commute.
-- [ ] T34/T43 reuse and the smallest Goal 2 delta are implementation-ready without a T35 state/update/executor branch.
-- [ ] Stage, plan, evidence index, design ledger, and architecture audit are synchronized under the next decision.
-- [ ] Root/`/tmp`, optimized fail-closed, silent import, compile, tests, modes, Markdown, diff, scope, and fresh hostile review pass.
+- [x] Every direct/alias/mechanics search, Notes item, actual Index route, continuation, split witness, image link, and false positive is dispositioned with zero unresolved mechanics.
+- [x] A/B/Collatz formulas, seeds, exact prefixes, cycles, event counts, source claims, and empirical qualifications are closed.
+- [x] General residue maps and ordered fraction systems have distinct exact selection/partiality semantics.
+- [x] Source defects and the raster transcription boundary fail closed.
+- [x] The governed asset universe is exact and hash-bound.
+- [x] Direct/generic events, arbitrary precision, closure, invariants, traces, witnesses, cycles, order, and hostile cases commute.
+- [x] T34/T43 reuse and the smallest Goal 2 delta are implementation-ready without a T35 state/update/executor branch.
+- [x] Stage, plan, evidence index, design ledger, and architecture audit are synchronized under D136.
+- [x] Root/`/tmp`, optimized fail-closed, silent import, compile, tests, modes, Markdown, diff, scope, and fresh hostile review pass.
 
 ## Stage Results
 
-Source, asset, semantic, and runtime-fit closure pass. Global D136 integration, repository-wide gates, and fresh hostile review remain pending.
+COMPLETE. The 43-query source audit closes 104 lines at `70 pre-Index / 34 actual-Index`, retains 127 at `46 native / 63 relation / 18 control`, excludes seven, reproduces all 34 Index routes at `20 core/observer / 10 arithmetic-emulation / 4 ordered-fraction`, reverse-closes query evidence at `85 exact + 10 image-basename + 9 normalized` and retained evidence at `98 exact + 13 image-basename + 16 normalized`, and leaves zero unresolved. Twenty-six Index-only context targets reverse-close to exact structural split owners; their page-730/page-1114 classes, three route mappings, and exact guard needles are independently frozen. All 26 referenced image files are path/size/SHA-bound. The source-model digest is `6cdc79d6a8e7b149afd4d45843fa8ecb212b8f769c72ffff4928255ce656b2bc`; source oracle SHA is `af06b40b5e35fe97a97b58ad148336c7e9884029d2785a4186f4456e39de6108`.
+
+The asset oracle closes 13 governed assets at `5 native / 5 relation / 3 control` plus 11 exclusions, 26 governed references, 13 hashes, 832,651 bytes, two assemblies/four files, and `13 hash-bound / 0 limited-transcribed / 0 pixel-replayed`; its SHA is `c618c25202a496fc9f3cdac94fe748dbf2183c72932a72e10dd7b9dab249fb23`. The semantic oracle closes 65,588 Euclidean-modulo checks, 6,150 direct/generic commutations, 24 arbitrary-precision profiles up to 6,648 bits, 14,621 exact-program-bound event replays, exact source prefixes/cycles/fixed events, six generic missing-branch results, lazy ordered-fraction evaluation, the exact 8,068-event Conway run, 4,101 integer/cosine relation checks, and 68 hostile rejections. Its SHA is `0c7f7c5875ad54edc504ddc5f9e88b240db8463622ff91080c9aa1dd42e332c1`; digest is `7424aae85ed4dc8ee7d2a53d2d93aba32c4b951f8265c6b3a5b9f9846dfc8ba9`.
+
+D136 classifies every strict T35 delta as categories 1-3: complete Euclidean-residue maps and separately tagged ordered first-applicable fraction lists are closed unary RULE schemas over T34's exact discrete `t+0D` singleton event. Integer closure, carrier invariance, reachable-subset invariance, and exact structural provenance remain distinct. Successful rows emit an ordinary same-locus assignment; missing fraction selection uses the common zero-successor `Error(MissingBranch)` envelope with no committed event. D064-D069/T34/T43 are clarified, no completed stage reopens, and no T35 state, FRONTIER, NEIGHBORHOOD, UPDATE, outcome class, executor, family branch, callback, hidden history, digit packing, or native cycle halt is added.
+
+Canonical, explicit-book, and relocated oracle runs pass; optimized execution and bad usage fail closed; silent imports, in-memory compile, mode 644, Markdown, diff, scope, and all 102 repository tests pass. Independent hostile review is clean after proving that JPEG mutation, context-target reassignment, route-class reassignment, and weakened route needles each fail at the intended gate. Next: T36.

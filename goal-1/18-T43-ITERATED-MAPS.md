@@ -694,7 +694,7 @@ This method intentionally supplies no page-166 pixel claim because the plate is 
 
 - **T34:** shares one scalar slot, complete read, same-locus write, and atomic UPDATE. T34's closed integer arithmetic is not an exact-real backend.
 - **T35:** the strict parity maps use positive exact-integer state with natural/signed profiles explicit, complete residue-indexed closed rows, and separately checked integer-closure/carrier-invariance evidence. T43 does not absorb them through a numeric union.
-- **T36:** digits are the evolving finite word in reversal systems; T43 digits are an observer of a real scalar.
+- **T36:** strict reversal-add state is one exact integer, and its canonical base-`b` digit word is a lossless rule-visible representation. Only width/leading-zero-sensitive variants require a word or equivalent `(value,width)` product in complete configuration. T43 digits remain an observer of a real scalar unless its own program explicitly feeds them back.
 - **T37:** recurrence systems preserve an indexed prefix and append one term. A logistic recurrence can expose the same values, but T43 state is only the current scalar and reuses a same-locus write.
 - **T41:** shares exact numeric/expression/primitive responsibilities. T41 evaluation is a pure query; T43 feeds each result into the next committed event and makes fixed rounding transition-semantic.
 - **T42:** continued-fraction coefficient streams and substitution traces are separate constructions. A Gauss-map orbit may relate to coefficients but does not store a T42 word.

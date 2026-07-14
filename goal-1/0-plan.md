@@ -49,7 +49,7 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - The canonical monolithic book file has numbered content through line 22,498 (`wc -l` reports 22,497 because the final line has no terminating newline) and includes chapter text, captions, notes, index, and colophon material.
 - There are no pre-existing `goal-*` folders at scaffold creation time; this is `goal-1`.
 - At Foundation start, the `types` worktree was clean and `goal-1/` contained only `0-plan.md`, `0-loop.md`, and `0-prompt.md`; no stage, evidence index, design ledger, or Goal 2 handoff existed.
-- Execution status at this sync is Foundation complete, 40 type stages are complete, no stage is reopened, T35 is in progress, and 4 type stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, T32, and T33 are complete under D119-D135.
+- Execution status at this sync is Foundation complete, 41 type stages are complete, no stage is reopened, T36 is in progress, and 3 type stages remain pending. `architecture-audit.md` remains authoritative for D000-D118; T06, T07, T08, T10, T11, T14, T15, T18, T21, T22, T23, T24, T25, T26, T28, T32, T33, and T35 are complete under D119-D136.
 - The governing abstraction is a finitely described `SimpleProgram`, not a cellular-automaton library: CONFIGURATION labels or structures support/topology within a dimensional DOMAIN subject to invariants; SEED, rule-firing FRONTIER, access-pattern NEIGHBORHOOD, typed RULE writes/replacements, and UPDATE composition/schedule run through one branch-free runner. Cellular automata are one preset of these axes.
 - DOMAIN names the task/program's dimensional space (`t+0D`, `t+1D`, and so on), with discreteness or continuity explicit. CONFIGURATION declares its native support/topology and invariants. ALPHABET names its value schema, including products/tagged unions. Numeric carriers, head-state sets, address sets, and function definition sets are not separate DOMAINs.
 - Representation reuse is accepted only with a lossless map `e` satisfying `e(step_A(s)) = step_B(e(s))` one step for one step, preserving complete state/outcomes/branching and requiring no hidden source interpreter. Opaque singleton packing and callbacks remain invalid.
@@ -1119,11 +1119,11 @@ COMPLETE. The 32-query source audit closes 65 lines at `56 pre-Index / 9 actual-
 
 D135 reconstructs T33 as structural `AllOf(AllowedLocalPatterns, RequiredPatternOccurrences(EACH_SOMEWHERE))` inside D058/T31/T32. The source count `32 * 2^32` proves independent requirement syntax; required-not-allowed is valid empty denotation. Centering is witness/search gauge, and every-template mode is a conjunction of independent existentials. IDs are provenance rather than hidden lookups; static `loci.gather` adapters must validate `t=0`; occurrence-witness replay proves only its conjunct, while whole verification independently checks T32 locality. No seed, fixed anchor, state/category, transition axis, UPDATE, executor, callback, implicit symmetry, repair/search dynamics, combined source codec, or raster program is added.
 
-Oracle SHAs are source `f7266058575861d5aa358f4a031ea22a61be8251c0ac8c34027e66d6db5063ec`, asset `d3d506796c43881e6da8dd2ac0dcd514a5def4ecd9531d868c4b897d15ea6cc6`, and semantic `9ccf511f4d4a1192c6b62ff9863e0630b5811240bdfaf5b3b9651d03a29485ba`; semantic digest is `54276cd1279b01e75ebe8495c528e5991f0b6c6387ec9744dc65db85539626e7`. Root/relocated oracle runs, optimized fail-closed behavior, silent imports, compile, modes, Markdown, diff, and scope gates pass; all 102 repository tests pass; fresh hostile re-review is clean. No prior stage reopens. Next: T35.
+Oracle SHAs are source `f7266058575861d5aa358f4a031ea22a61be8251c0ac8c34027e66d6db5063ec`, asset `d3d506796c43881e6da8dd2ac0dcd514a5def4ecd9531d868c4b897d15ea6cc6`, and semantic `9ccf511f4d4a1192c6b62ff9863e0630b5811240bdfaf5b3b9651d03a29485ba`; semantic digest is `54276cd1279b01e75ebe8495c528e5991f0b6c6387ec9744dc65db85539626e7`. Root/relocated oracle runs, optimized fail-closed behavior, silent imports, compile, modes, Markdown, diff, and scope gates pass; all 102 repository tests pass; fresh hostile re-review is clean. No prior stage reopens. T35 is now complete under D136; next: T36.
 
 ### 42-T35-PIECEWISE-INTEGER
 
-Status: **IN PROGRESS — FIRST-PRINCIPLES ARCHITECTURE RECONSTRUCTED; EVIDENCE ORACLES PENDING** in `goal-1/42-T35-PIECEWISE-INTEGER.md`.
+Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, RUNTIME-FIT, D136 ARCHITECTURE, AND INDEPENDENT HOSTILE REVIEW CLOSED** in `goal-1/42-T35-PIECEWISE-INTEGER.md`.
 
 #### Big Picture Objective
 
@@ -1137,7 +1137,17 @@ Apply the common protocol. Reuse T34's `t+0D` unary scalar event and T43's close
 
 All T35 evidence is captured; branching reuses explicit rule choice without hiding arithmetic; Goal 2 and global integration are updated.
 
+#### Stage Result
+
+COMPLETE. The 43-query source audit closes 104 lines at `70 pre-Index / 34 actual-Index`, retains 127 at `46 native / 63 relation / 18 control`, excludes seven, reverse-closes query evidence at `85 exact + 10 image-basename + 9 normalized` and retained evidence at `98 exact + 13 image-basename + 16 normalized`, and leaves zero unresolved. Twenty-six Index-only context targets have exact split owners plus frozen semantic-class, route, and guard records; all 26 referenced image files are path/size/SHA-bound. Thirteen governed assets at `5/5/3` plus 11 exclusions close the raster boundary. The semantic oracle closes 65,588 modulo checks, 6,150 direct/generic commutations, 24 arbitrary-precision profiles, 14,621 exact-program-bound event replays, ordered-fraction partiality, the 8,068-event Conway run, and 68 hostile rejections.
+
+D136 keeps complete residue maps and separately tagged ordered fraction lists as closed unary RULE schemas over T34's discrete `t+0D` exact scalar event. Complete residue rows have no precedence; fraction order, duplicates, and shadowed rows remain structural identity; exact keys rather than digests govern replay; and missing selection uses the common zero-successor `Error(MissingBranch)` result with no event. No T35 state, frontier, neighborhood, UPDATE, outcome class, executor, family branch, callback, hidden history, digit packing, or native cycle halt is added; no prior stage reopens.
+
+Oracle SHAs are source `af06b40b5e35fe97a97b58ad148336c7e9884029d2785a4186f4456e39de6108`, asset `c618c25202a496fc9f3cdac94fe748dbf2183c72932a72e10dd7b9dab249fb23`, and semantic `0c7f7c5875ad54edc504ddc5f9e88b240db8463622ff91080c9aa1dd42e332c1`; semantic digest is `7424aae85ed4dc8ee7d2a53d2d93aba32c4b951f8265c6b3a5b9f9846dfc8ba9`. Root/relocated/explicit-book runs, optimized and bad-usage rejection, silent imports, compile, modes, Markdown, diff, scope, 102 tests, and independent hostile mutation review pass. Next: T36.
+
 ### 43-T36-DIGIT-REVERSAL
+
+Status: **IN PROGRESS — FIRST-PRINCIPLES CONSTRUCTION RECONSTRUCTED; SOURCE/ASSET/SEMANTIC ORACLES PENDING** in `goal-1/43-T36-DIGIT-REVERSAL.md`.
 
 #### Big Picture Objective
 
