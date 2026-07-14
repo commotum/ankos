@@ -329,7 +329,7 @@ For `h` requested transitions from a default field, a finite exact realization m
 - **Substitution compiler/causal network:** exact relations or observers only.
 - **T11:** owns multiple sources, split/disappear results, overlaps, and any evidenced collision semantics.
 - **T12:** owns payload head states and symbol-only source reads.
-- **2D/network mobile:** distinct DOMAIN/topology and read/replacement schemas; not flags on strict T10.
+- **2D/network mobile:** 2D mobile changes the dimensional DOMAIN and geometry; network mobile changes configuration support/topology and access/replacement schemas. Neither is a flag on strict T10.
 
 ## Current API Fit
 

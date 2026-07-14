@@ -447,7 +447,7 @@ The historical API/handoff below remains evidence provenance; this section gover
 | Episode | rectangular `RawEpisode(states: ndarray,rule_id,steps)` | `SEMANTIC MISMATCH`; it lacks nested prefix/event semantics, exact big values, origins, structural program identity, and append counts |
 | Memory convention | `simple_programs.md:386-392,703-731` says memory belongs in current state | `DIRECT` principle-level support for visible prefix state; current negative-temporal code violates it |
 | Visualization | t+0D scalar rows/plots | usable only as downstream term-stream observers after typed exact export |
-| Exact values | T34's planned domain-tagged integer/rational codecs | `DIRECT` design reuse; T37 adds prefix/index/program/update, not another numeric tower |
+| Exact values | T34's planned dimension-independent integer/rational codecs | `DIRECT` design reuse; T37 adds prefix/index/program/update, not another numeric tower |
 
 The documented source/read/rule/update responsibilities remain useful. The dense next-slice schema and unrestricted `FORMULAIC` escape hatch do not implement the construction.
 
@@ -607,7 +607,7 @@ Suggested responsibility files are a shared exact-value module, `numeric_sequenc
 
 T37 is complete. The direct union found 48 occurrences on 42 lines, fixed-lag tokens 23/13, focused mechanics 32/20, literal recurrence programs 20/20, alias/control forms 10/10, and named saturation 160/118. Nineteen excerpt groups disposition the strict main/raster, full recursive-sequence Notes cluster, actual Index/splits, programs/history, fixed/nonlinear/modular/global-history variants, analyzers, observers, and neighboring constructions. Strict mechanics have zero unresolved search candidates.
 
-The reconstruction is a consecutive domain-tagged exact `NumericPrefix` plus a normalized `AffineFixedLag` program. Minimal fresh seeds and replay-verified checkpoints make recurrence start unambiguous. `NextSequenceTerm -> FixedLagRead -> AppendTerm -> AppendOnlySequenceUpdate` preserves every old indexed term and adds exactly one endpoint, establishing the ninth update law. The factorial-capable expression extension is closed; runtime invalid indices, callbacks, fixed widths, modulus, and hidden trajectory history stay out of the strict profile.
+The reconstruction is a consecutive exact `NumericPrefix` configuration in discrete `t+1D` plus a normalized `AffineFixedLag` program. Minimal fresh seeds and replay-verified checkpoints make recurrence start unambiguous. `NextSequenceTerm -> FixedLagRead -> AppendTerm -> AppendOnlySequenceUpdate` preserves every old indexed term and adds exactly one endpoint, establishing the ninth update law. The factorial-capable expression extension is closed; runtime invalid indices, callbacks, fixed widths, modulus, and hidden trajectory history stay out of the strict profile.
 
 Exact Python oracles regenerated all six raster rows at horizons `38/48/22/26/44/27`, their endpoints, `Fibonacci[93]`, Lucas, Perrin, factorial, the exact logistic relation, append/state/term cardinalities, checkpoint replay, lag-window non-injectivity/commutation, and the raster SHA-256. They passed. Markdown fences are balanced, `git diff --check -- goal-1` passed, and `uv run pytest -q` passed all 102 tests in 1.17 seconds.
 

@@ -633,7 +633,7 @@ and mark `sequential_network_system` unavailable with a precise source-gap asser
 
 ## Corrected Architecture and Goal 2 Handoff
 
-T29 is a SimpleProgram over rooted two-port graph DOMAIN/topology. FRONTIER selects old vertices, NEIGHBORHOOD evaluates declared port paths/reach views on the frozen graph, RULE returns direct/fresh reroute replacements, and a graph-capable UPDATE allocates vertices, rewires ports, and applies directed-root projection atomically. Fresh support proves fixed-label assignment alone is insufficient, but it justifies an UPDATE-axis implementation—not a network executor.
+T29 is a discrete `t+0D` SimpleProgram whose configuration has rooted two-port graph support/topology. FRONTIER selects old vertices, NEIGHBORHOOD evaluates declared port paths/reach views on the frozen graph, RULE returns direct/fresh reroute replacements, and a graph-capable UPDATE allocates vertices, rewires ports, and applies directed-root projection atomically. Fresh support proves fixed-label assignment alone is insufficient, but it justifies an UPDATE-axis implementation—not a network executor.
 
 Revised G2-T29 adds graph configuration/codec schemas, vertex loci, port-path access, typed direct/fresh replacements, and graph create/rewire/project UPDATE inside the branch-free runner. It removes seventh-law/executor and whole-graph-value prohibition framing while retaining root/port identity, cycles/sharing, freshness, projection order, alpha-equivalence, provenance, and the explicit sequential evidence boundary.
 
@@ -765,7 +765,7 @@ Completion requires:
 
 ## Architecture-Reclosed Stage Result
 
-**COMPLETE.** T29 uses a discrete graph DOMAIN/topology, vertex firing loci, port-path/reach access, typed fresh/direct graph writes, and graph UPDATE in the common runner. Fresh identity and incidence justify the UPDATE policy, not a network executor; only the unresolved sequential schedule/profile remains deferred.
+**COMPLETE.** T29 uses a discrete `t+0D` DOMAIN with rooted graph configuration support/topology, vertex firing loci, port-path/reach access, typed fresh/direct graph writes, and graph UPDATE in the common runner. Fresh identity and incidence justify the UPDATE policy, not a network executor; only the unresolved sequential schedule/profile remains deferred.
 
 ## Historical Stage Results (Evidence Retained; Architecture Superseded)
 

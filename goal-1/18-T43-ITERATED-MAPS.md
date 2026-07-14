@@ -2,7 +2,7 @@
 
 Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
-Architecture authority: the T43 row and runner contract in `architecture-audit.md` supersede scalar-domain/executor and family-specific assignment names below.
+Architecture authority: the T43 row and runner contract in `architecture-audit.md` supersede scalar-state/executor and family-specific assignment names below.
 
 The evidence/search closure and conformance fixtures remain valid. T43 and T34 share one `t+0D` closed unary-map/assignment construction; real/fixed representations and self-map validation are tagged carriers and invariants.
 
@@ -722,7 +722,7 @@ This method intentionally supplies no page-166 pixel claim because the plate is 
 
 T43 is the T34 `t+0D` unary SimpleProgram with a tagged real/represented value carrier, closed map RULE, self-map/partiality invariant, and explicit numeric realization profile. A continuous state interval does not make DOMAIN continuous. The singleton locus and same-locus write are generic roles; fixed values are tagged feedback representations, while certified/tracked records are evaluator relations rather than map executors or state classes.
 
-Revised G2-T43 reuses the singleton frontier/self-read/same-locus update, adds closed map syntax/invariance certificates and exact/represented feedback profiles, and retains all orbit/precision/cycle/raster/source-repair oracles. It removes scalar-domain, iterated-map executor, family-specific assignment, callback, and hidden-backend designs.
+Revised G2-T43 reuses the singleton frontier/self-read/same-locus update, adds closed map syntax/invariance certificates and exact/represented feedback profiles, and retains all orbit/precision/cycle/raster/source-repair oracles. It removes scalar-state, iterated-map executor, family-specific assignment, callback, and hidden-backend designs.
 
 ## Historical Current API Fit (Superseded on DOMAIN/class wording)
 

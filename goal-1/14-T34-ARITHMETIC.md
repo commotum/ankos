@@ -2,7 +2,7 @@
 
 Status: **COMPLETE — EVIDENCE AND ARCHITECTURE RECLOSED**
 
-Architecture authority: the T34 row and runner contract in `architecture-audit.md` supersede scalar-domain/executor and family-specific assignment names below.
+Architecture authority: the T34 row and runner contract in `architecture-audit.md` supersede scalar-state/executor and family-specific assignment names below.
 
 The evidence/search closure and conformance fixtures remain valid. T34 is a `t+0D` closed unary-map preset over an exact numeric value carrier and generic assignment, not a separate scalar executor.
 
@@ -546,7 +546,7 @@ T34 is consequently neither “all formulaic 0D rules” nor “anything whose p
 
 T34 is a discrete `t+0D` SimpleProgram with one exact numeric value, singleton FRONTIER, self NEIGHBORHOOD, a closed unary RULE (`AddConstant | MultiplyConstant`), and ordinary same-locus UPDATE. Integers/rationals are value carriers, not DOMAINs. T43 shares this core; `UniqueScalar` and `ArithmeticAssignment` are named roles/presets, not classes.
 
-Revised G2-T34 adds exact numeric carriers/codecs and closed unary RULE nodes through the generic runner, retaining all digit/fraction/size observers and exact oracles. It removes scalar-domain, arithmetic-executor, family-specific assignment, callback, capacity, and hidden-history designs.
+Revised G2-T34 adds exact numeric carriers/codecs and closed unary RULE nodes through the generic runner, retaining all digit/fraction/size observers and exact oracles. It removes scalar-state, arithmetic-executor, family-specific assignment, callback, capacity, and hidden-history designs.
 
 ## Historical Current API Fit (Superseded on DOMAIN/class wording)
 
@@ -689,7 +689,7 @@ Tests decode rows back to exact values, compare iterative and closed-form traces
 
 T34 is complete. The direct-name union found 65 occurrences on 55 lines, conservative mechanics 27/26, focused native forms 13/12, and exact code/observer forms 6/6. Thirty excerpt groups cover the scoped main core, all seven canonical main figures, Notes figures, Notes/programs/history, actual Index/splits, exact and approximate domain boundaries, nonlocality, representations, suffix quotients, CA/substitution/counter relations, reversibility, and fast evaluation. Every candidate is classified and strict mechanics have zero unresolved gaps.
 
-The reconstruction is one domain-tagged exact scalar plus a closed `AddConstant | MultiplyConstant` program. It uses `UniqueScalar`, a complete current read, `ArithmeticAssignment`, and the existing atomic typed assignment update. Every valid event has one successor, including identity events; no halt, boundary, modulus, capacity, digit base, or cycle stop is native. Exact integers/rationals, decimal-string codecs, structural program identity, typed trace/outcomes, and explicit exact/declared numerical profiles close the value model.
+The reconstruction is one discrete `t+0D` singleton configuration with an exact scalar plus a closed `AddConstant | MultiplyConstant` program. It uses `UniqueScalar`, a complete current read, `ArithmeticAssignment`, and the existing atomic typed assignment update. Every valid event has one successor, including identity events; no halt, boundary, modulus, capacity, digit base, or cycle stop is native. Exact integers/rationals, decimal-string codecs, structural program identity, typed trace/outcomes, and explicit exact/declared numerical profiles close the value model.
 
 The page-117 through page-122 oracles pin 63 add-one rows, 84 rows for each addend `1..8`, 64 short power rows, 500 complete powers of three behind a left crop, 256 exact `3/2` rows, and 201 exact fractional samples. Independent `python3` integer/`Fraction` checks passed for all listed sequences/endpoints, 791-bit `3^499` crop guards, `3^255` bit length, exact `f_200`, and the 64-period eight-bit suffix. `git diff --check -- goal-1` passed, Markdown fences are balanced, and `uv run pytest -q` passed all 102 tests in 1.18 seconds.
 

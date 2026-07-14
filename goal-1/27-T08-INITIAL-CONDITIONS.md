@@ -198,10 +198,11 @@ The raster bytes can support only their declared visual/run relation. They do no
 Let a resolved program `P` expose a configuration schema
 
 ```text
-C_P = (DomainSchema_P, AlphabetSchema_P, component schema, structural invariants).
+C_P = (DimensionalDomain_P, SupportSchema_P, AlphabetSchema_P,
+       component schema, structural invariants).
 ```
 
-Each configuration carries one support/topology instance admitted by `DomainSchema_P` plus its labels/components. A fixed lattice has one fixed support form; a word, tree, graph, or finite occurrence bag may have a different support/topology instance at each event. Write `Conf(C_P)` for all complete configurations valid under that schema. T08 does not change `P`; it describes elements, subsets, and probability laws over `Conf(C_P)` and the records by which one such element is supplied at event zero.
+`DimensionalDomain_P` declares the task/program space (`t+0D`, `t+1D`, and so on, discrete or continuous). Each configuration separately carries one support/topology instance admitted by `SupportSchema_P` plus its labels/components. A fixed lattice has one fixed support form; a word, tree, graph, or finite occurrence bag may have a different support/topology instance at each event. Write `Conf(C_P)` for all complete configurations valid under that schema. T08 does not change `P`; it describes elements, subsets, and probability laws over `Conf(C_P)` and the records by which one such element is supplied at event zero.
 
 | T08-related object | Audit class | Smallest reusable base | Consequence |
 |---|---:|---|---|
@@ -504,7 +505,7 @@ finite_cyclic=tuple(tile[x%3] for x in range(12))
 assert infinite_window==finite_cyclic
 assert ('Z-periodic',tile)!=('cycle-3',tile)
 
-# One DomainSchema can admit variable-support words; fields are not universal.
+# One SupportSchema can admit variable-support words; fields are not universal.
 def valid_word(x): return x[0]=='word' and all(v in (0,1) for v in x[1])
 assert valid_word(('word',(1,))) and valid_word(('word',(1,0,1,1)))
 
@@ -577,7 +578,7 @@ Current runtime reuse is real but narrower than the catalog abstraction:
 |---|---|---|
 | `SHAPE` and “complete generator” (`simple_programs.md:169-196,2156-2180`) | realization responsibility plus identity mismatch | keep finite shape in computation realization; do not fold seed/profile into structural program/generator identity |
 | `Seed` fields (`src/ca/seeds.py:39-55`) | partial finite scalar presentation | replace `family: str`, `distribution: Any`, and untyped params with closed tagged schemas; bind to configuration schema and typed values |
-| `Dynamics` (`src/ca/specs.py:23-55,84-114`) | useful program/episode separation | retain exclusion of per-episode seed/steps, add configuration DomainSchema and structural decoders, and move finite boundary/shape into explicit realization where appropriate |
+| `Dynamics` (`src/ca/specs.py:23-55,84-114`) | useful program/episode separation | retain exclusion of per-episode seed/steps, add a dimensional-DOMAIN declaration plus configuration support schema and structural decoders, and move finite boundary/shape into explicit realization where appropriate |
 | concrete `initial_state` input (`src/ca/rollout.py:40-67`) | direct responsibility | keep accepting an already valid event-zero configuration separately; stop family paths from reinterpreting its storage or hiding state |
 | scalar alphabet values (`src/ca/alphabets.py:40-56`) | insufficient representation | add typed product/tagged/structural schemas and invariant-aware codecs without mandating one decomposition |
 | Selector-backed factories | reusable finite support descriptions | preserve loci selection, but do not equate a selected finite mask with native infinite support or a full configuration |
@@ -585,7 +586,7 @@ Current runtime reuse is real but narrower than the catalog abstraction:
 | `rng=None` (`seeds.py:58-63`) | convenience only | reject or explicitly record nondeterministic entropy for semantic runs; retain algorithm/version/key/sample provenance |
 | Bernoulli renderer (`seeds.py:930-935`) | a different hierarchical law than its name suggests | it draws one global `p` uniformly in `[p_low,p_high]`, then cells conditionally; add an actual fixed-`p` product law, validate bounds, and name the mixture honestly |
 | `fractal`/`spiral` predicate params (`seeds.py:733-780`) | opaque callback shim | replace with a supported closed support/expression or a frozen exact configuration plus relation; never execute arbitrary predicates/source programs as seed semantics |
-| `compound`/structured factories | useful presentation vocabulary | preserve component values, laws, conflicts, DomainSchema/support instance, invariant proof, and provenance instead of reducing to one scalar mask/union |
+| `compound`/structured factories | useful presentation vocabulary | preserve component values, laws, conflicts, dimensional DOMAIN, support schema/instance, invariant proof, and provenance instead of reducing to one scalar mask/union |
 | `DatasetSpec`/`EpisodePlan` (`src/ca/datasets.py:57-128`) | downstream experiment recipes | keep shape, split, held-out stream, transforms, boundary, batching, and RNG planning outside program and mathematical law identity |
 | Raw episode records (`src/ca/specs.py:58-81`) | trace carrier | add exact initial-configuration/profile/sample references so temporal history and realization provenance are recoverable |
 | SplitMix helpers (`src/ca/rng.py:20-70`) | reusable deterministic key derivation | bind algorithm/version/counter and draw mapping to sample provenance; a stable integer key alone does not define the mathematical law |
@@ -634,7 +635,7 @@ T01's current `seeds.point` handoff is direct only as a finite scalar materializ
 
 - **Status:** ACTIVE after hostile source, asset, architecture, and global reclosure.
 - **Basis:** the source reuses one point profile across unchanged CA rules (`BOOK:418-518,730-790`), contrasts it with random starts (`2706-2710,3060-3106`), exposes periodic, random-block, block-coded, nested, finite-defect, and explicit background/offset forms (`3126-3210,3388-3406,11077-11150`), distinguishes finite from infinite information/scope (`13265,19072`), and states support-family-specific availability of random initial data (`14275`). It supplies no seed-dependent native transition.
-- **Configuration boundary:** `ConfigurationSchema` declares a DomainSchema, admitted support/topology instances, typed ALPHABET/components, and invariants. One exact `X_0 in Conf(C_P)` is direct ordinary state. Fixed-field point/periodic/override/piecewise forms and structural codecs are optional lossless representations or presets, not a universal field interface.
+- **Configuration boundary:** `ConfigurationSchema` declares a dimensional DOMAIN, a support schema with admitted support/topology instances, typed ALPHABET/components, and invariants. One exact `X_0 in Conf(C_P)` is direct ordinary state. Fixed-field point/periodic/override/piecewise forms and structural codecs are optional lossless representations or presets, not a universal field interface.
 - **Class/law boundary:** an `InitialConditionClass` denotes a schema-scoped subset but does not promise decidable membership. A deterministic constructor, mathematical law, construction record, complete-configuration sample, finite-cylinder sample, algorithmic-field realization, denotational configuration, validation evidence, and any transform/derivation each retain separate identity. A cylinder is not a complete native configuration. Source-underdetermined “random” never silently becomes fair iid; structured laws must preserve configuration invariants.
 - **Realization boundary:** native configuration, genuine finite topology, causal work lowering, approximation/boundary, storage padding, crop, trace, experiment, and view remain distinct. A claimed exact finite lowering commutes through every requested event/observation in its horizon, not only one step.
 - **Execution consequence:** after validation, the unchanged native program executes `X_0` through the exact same branch-free FRONTIER/NEIGHBORHOOD/RULE/UPDATE runner and yields a `NativeTrace`. T08 adds no native state family, firing locus, read, write, update policy, executor, successor, outcome, halt, rule property, or per-step RNG. A separately identified autonomous work specification may use the generic runner only as a computation realization; a nonautonomous work plan is explicit and cannot masquerade as the native program or trace. Nonstep constraint, function, and PDE “initial conditions” remain their native relation/query/side-data roles unless an explicit relation derives a SimpleProgram.
@@ -654,8 +655,8 @@ T01's current `seeds.point` handoff is direct only as a finite scalar materializ
 
 | Goal 2 surface | Required work |
 |---|---|
-| configuration schema | Expose a native DomainSchema, admitted support/topology instances, typed ALPHABET/components, complete-configuration validation, and structural invariants. Validate initial configurations through the same schema used for later states, including variable-support words/trees/graphs. |
-| exact configurations and specialized presentations | Accept ordinary structural configurations directly. For fixed lattices, add finite explicit, constant, periodic, finite override, and closed piecewise codecs with capability-specific evaluation/materialization, validation, identity, and round trip on claimed images. Do not impose field APIs on other DOMAIN schemas. |
+| configuration schema | Expose a dimensional DOMAIN plus a native support schema with admitted support/topology instances, typed ALPHABET/components, complete-configuration validation, and structural invariants. Validate initial configurations through the same schema used for later states, including variable-support words/trees/graphs. |
+| exact configurations and specialized presentations | Accept ordinary structural configurations directly. For fixed lattices, add finite explicit, constant, periodic, finite override, and closed piecewise codecs with capability-specific evaluation/materialization, validation, identity, and round trip on claimed images. Do not impose field APIs on other support schemas. |
 | configuration-class layer | Add schema-scoped declarative descriptors for evidenced constant, finite perturbation, periodic, block image, finite exact composition, and supported local-language images. Membership returns invalid/unsupported/unknown/certified results; closed syntax does not promise decidability. |
 | stochastic-law layer | Add fixed categorical/product laws, explicit parameter-mixture laws, fixed-composition laws, macroblock laws, and supported structured composition/overlay/pushforward laws. Validate scope, probabilities, conditioning, normalization, invariant preservation, and advertised capabilities. |
 | sampling realization | Split complete-configuration samples, finite-cylinder samples, and algorithmic total-field realizations. Only the first and third may reference an exact complete `X_0`, and the algorithmic field retains a qualified relation—not equality—to an ideal infinite product-law draw. Record law/relation, sampler/evaluator version, exact scope or structural map, key/entropy provenance, and result reference. Keep complete-configuration identity independent of provenance; never give a cylinder a global configuration digest or native-run authority. |
@@ -670,10 +671,10 @@ T01's current `seeds.point` handoff is direct only as a finite scalar materializ
 ### Twenty acceptance groups
 
 1. **Program/profile/configuration identity:** pair one exact program object with point, uniform, periodic, and random profiles; assert unchanged program digest/object and identical runner axes. Two constructors and two laws that produce the same `X_0` share its configuration digest but retain distinct construction/sample provenance.
-2. **DomainSchema, variable support, and alphabet validation:** accept changing-length words and alpha-renamed graphs as admitted support/topology instances, plus typed ALPHABET/components. Reject palette-derived gray, rank/value collisions, wrong value types, missing components, invalid topology, and support outside the schema; never demand a rectangular point/window API.
+2. **Dimensional DOMAIN, support schema, variable support, and alphabet validation:** accept changing-length words and alpha-renamed graphs as admitted support/topology instances within their declared discrete `t+0D`/`t+1D` task spaces, plus typed ALPHABET/components. Reject palette-derived gray, rank/value collisions, wrong value types, missing components, invalid topology, and support outside the schema; never demand a rectangular point/window API.
 3. **Global invariants and structured randomness:** sample tape symbols, overlay one explicit head while retaining its symbol, and validate exactly one tag. Reject zero/two heads and show that iid whole composite cells are not equivalent. Apply the generic invariant mechanism rather than adding a Turing seed class.
 4. **Constant and point profiles:** resolve source white-background/single-black and white-background/single-gray forms using explicit member references and origin; evaluate them on native support without requiring a finite tensor.
-5. **Finite configuration versus lowering:** distinguish an explicit list on a finite segment, the same list on a finite cycle, and a crop/work state lowered from an infinite field. Array equality cannot merge DOMAIN/topology identities, infer a boundary, or prove horizon sufficiency.
+5. **Finite configuration versus lowering:** distinguish an explicit list on a finite segment, the same list on a finite cycle, and a crop/work state lowered from an infinite field. Array equality cannot merge dimensional-DOMAIN or support/topology identities, infer a boundary, or prove horizon sufficiency.
 6. **Periodic configurations:** validate nonempty tile, period lattice, phase, and typed values; test negative coordinates and translation. Relate—not identify—an infinite periodic field and its compatible finite cyclic quotient.
 7. **Overrides and piecewise tails:** round-trip constant/periodic bases plus finite defects and ultimately periodic left/middle/right forms. Reject conflicting overrides, overlap, gaps, invalid region syntax, and phase ambiguity.
 8. **Block and frozen derived images:** encode/decode paired-cell and macroblock classes losslessly; verify a substitution-derived nested target through immutable source/trace-or-certificate/transform/target references. Reject partial decoders, dangling provenance, lazy source execution, and hidden callbacks.
@@ -686,13 +687,13 @@ T01's current `seeds.point` handoff is direct only as a finite scalar materializ
 15. **Horizon lowering, fill, and boundary:** rule 1 turns an event-zero all-zero field to ones; a zero fill is not permanent exterior. Prove causal-halo commutation for every `t<=h`, including a radius-one one-halo counterexample that fails at `t=2`; distinguish native infinite execution, genuinely finite topology, and explicit boundary approximation.
 16. **Centering and translation:** pin the source's finite even/odd centering convention where requested, while proving that native point origin, finite placement, translated profile, materialization window, and display crop have separate identities.
 17. **Transforms and relations:** translation/reflection/value permutation preserve class or law only when proved; block decoding, frozen derivation, quotienting, and lowering emit relation records. A symmetric distribution does not imply each sample is symmetric, and graph relabeling is not a new configuration.
-18. **Serialization and trust:** canonical round trips preserve typed values, DomainSchema/support instance, class, presentation, constructor/construction, law/sample, denotational configuration, validation, lowering, and provenance separately. Reject stale versions, duplicate/conflicting assignments, NaN/invalid probabilities, and trusted “valid” flags.
+18. **Serialization and trust:** canonical round trips preserve typed values, dimensional DOMAIN, support schema/instance, class, presentation, constructor/construction, law/sample, denotational configuration, validation, lowering, and provenance separately. Reject stale versions, duplicate/conflicting assignments, NaN/invalid probabilities, and trusted “valid” flags.
 19. **Dataset/observer separation:** held-out streams, batch shapes, token budgets, padding, augmentations, palettes, rasters, behavior labels, density estimates, and crops cannot alter program, class, or mathematical-law identity.
 20. **No-cheating/static and cross-category scope:** no T08 branch below event-zero resolution, hidden temporal pre-state, `Any`/string family dispatch, opaque predicate/interpreter, implicit RNG, scalar-only coercion, implicit fixed lattice, or callback fallback. PDE side data, constraint seeds, and function arguments remain their native nonstep roles unless an explicit relation derives a SimpleProgram.
 
 ## No-Cheating Checks
 
-- No T08/seed-family rollout branch, seed-aware RULE, implicit boundary, forced finite tensor DOMAIN, or preferred seed stored in program identity.
+- No T08/seed-family rollout branch, seed-aware RULE, implicit boundary, forced finite tensor support/realization, or preferred seed stored in program identity.
 - No opaque predicate/callback or whole-configuration integer accepted as a semantic seed merely because it can render an array.
 - No RNG cursor hidden in executor state for a one-time seed draw; no stochastic seed distribution conflated with stochastic transition semantics.
 - No centered array, crop, padding, batch shape, held-out split, palette, or raster treated as the native initial configuration.

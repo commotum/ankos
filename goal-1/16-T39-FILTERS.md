@@ -637,7 +637,7 @@ The historical API/handoff below remains evidence provenance; this section gover
 | Lexicographic order | `simple_programs.md:421-452` | `PARAMETERIZATION` | Generalize to exact integer increasing order; do not reinterpret four-coordinate lexicographic tensors. |
 | Fixed-support parallel assignment | `simple_programs.md:1767-1791,2156-2198` | `SEMANTIC MISMATCH` | It can realize a Boolean raster but not native noncontiguous candidate deletion or intensional scope. |
 | Typed outcomes/trace responsibilities | completed Goal 1 design | `DIRECT` conceptually | Reuse generic outcome/record separation, adding sieve-specific result/event witnesses. |
-| Exact integer carrier/codecs | T34/T37 design | `DIRECT` dependency | Reuse exact domain-tagged integers and string serialization. |
+| Exact integer carrier/codecs | T34/T37 design | `DIRECT` dependency | Reuse exact dimension-independent integers and string serialization. |
 | Filter/measurement categories | no current document component | `PRINCIPLED EXTENSION` | Add pure specs/results outside the transition executor. |
 | `MonotoneFilterUpdate` | no current update member | `PRINCIPLED EXTENSION` | Add the tenth sibling with its own validator; no `sieve` rollout family branch. |
 

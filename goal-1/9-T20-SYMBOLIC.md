@@ -599,7 +599,7 @@ Completion requires:
 
 ## Architecture-Reclosed Stage Result
 
-**COMPLETE.** T20 uses a discrete recursive-tree DOMAIN/topology, typed match loci and structural access, and closed pattern/template RULE data. Its balanced/prefix token encoding is bijective, maps subtrees to contiguous spans, and lowers prefix-free replacements to the existing ordered multi-span UPDATE one step for one step. No tree UPDATE class or symbolic executor is required.
+**COMPLETE.** T20 uses a discrete `t+0D` DOMAIN with recursive-tree configuration support/topology, typed match loci and structural access, and closed pattern/template RULE data. Its balanced/prefix token encoding is bijective, maps subtrees to contiguous spans, and lowers prefix-free replacements to the existing ordered multi-span UPDATE one step for one step. No tree UPDATE class or symbolic executor is required.
 
 ## Historical Stage Results (Evidence Retained; Architecture Superseded)
 
