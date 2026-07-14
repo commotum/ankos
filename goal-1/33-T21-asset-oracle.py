@@ -187,6 +187,50 @@ for line_number in X24:
     REASON[line_number] = "T24 alternative-lattice/higher-dimensional control"
 assert set(REASON) == U
 
+# Radius four is retained as an independent *candidate* audit, not as semantic
+# ownership.  Broad retained prose (for example implementation, history, and
+# Index routes) mechanically reaches another 60 rasters.  Every one is
+# metadata-ledgered below, but none is promoted into U without an explicit
+# retained image-reference line.
+C4 = near(S)
+ADJACENCY_ONLY = C4 - U
+assert len(C4) == 113
+assert len(ADJACENCY_ONLY) == 60
+assert U <= C4
+assert hashlib.sha256(
+    ",".join(map(str, sorted(C4))).encode("ascii")
+).hexdigest() == "061c3319d4bfffd4db3a51fb220dbe090c141fe22c34632d8b4c1e930f8c7a5d"
+assert hashlib.sha256(
+    ",".join(map(str, sorted(ADJACENCY_ONLY))).encode("ascii")
+).hexdigest() == "85a5f38b8668147c53a88079a931f77199793487eb13a4c057444b5593f31ca2"
+
+ADJ_TYPED_BOUNDARY = {
+    2154, 2598, 2932, 2934, 3908, 3954, 4074, 4076, 4428, 4450,
+    5092, 5322, 6846, 6852, 11182, 11188, 11190, 14111, 14117,
+    14789, 14841, 14843, 15269, 15271, 15317, 15319, 15497, 15501,
+    17433, 18753,
+}
+ADJ_APPLICATION_PROPERTY = {4418, 11525, 15974, 17386, 17397}
+ADJ_OTHER_CONSTRUCTION = ADJACENCY_ONLY - ADJ_TYPED_BOUNDARY - ADJ_APPLICATION_PROPERTY
+assert not (ADJ_TYPED_BOUNDARY & ADJ_APPLICATION_PROPERTY)
+assert ADJ_TYPED_BOUNDARY | ADJ_APPLICATION_PROPERTY | ADJ_OTHER_CONSTRUCTION == ADJACENCY_ONLY
+assert (len(ADJ_TYPED_BOUNDARY), len(ADJ_APPLICATION_PROPERTY), len(ADJ_OTHER_CONSTRUCTION)) == (30, 5, 25)
+
+ADJACENCY_REASON: dict[int, str] = {}
+for line_number in ADJ_TYPED_BOUNDARY:
+    ADJACENCY_REASON[line_number] = (
+        "typed geometry/observer/relation candidate reached only by radius-four adjacency"
+    )
+for line_number in ADJ_APPLICATION_PROPERTY:
+    ADJACENCY_REASON[line_number] = (
+        "application/property raster reached only by radius-four adjacency"
+    )
+for line_number in ADJ_OTHER_CONSTRUCTION:
+    ADJACENCY_REASON[line_number] = (
+        "other-construction or false-proximity raster reached only by radius-four adjacency"
+    )
+assert set(ADJACENCY_REASON) == ADJACENCY_ONLY
+
 
 # Hash-bound direct plates.  Bytes and dimensions are checked again in the
 # complete source-derived ledger; these individual facts make the native
@@ -397,8 +441,14 @@ for book_line, (expected_bytes, expected_width, expected_height, expected_digest
     assert hashlib.sha256(data).hexdigest() == expected_digest
 
 
-def ledger() -> tuple[str, int, int, int]:
-    """Return the exact monolith/split/physical manifest for all 53 assets."""
+def _ledger(
+    asset_lines: set[int],
+    kind_for,
+    reasons: dict[int, str],
+) -> tuple[str, int, int, int]:
+    """Return an exact monolith/split/physical manifest for ``asset_lines``."""
+
+    assert asset_lines and set(reasons) == asset_lines
 
     split_markdown = sorted(
         path
@@ -427,16 +477,8 @@ def ledger() -> tuple[str, int, int, int]:
     hashes: set[str] = set()
     monolith_references = 0
     split_references = 0
-    for book_line in sorted(U):
-        kind = (
-            "C10" if book_line in C10 else
-            "C6" if book_line in C6 else
-            "O" if book_line in O else
-            "R" if book_line in R else
-            "X22" if book_line in X22 else
-            "X23" if book_line in X23 else
-            "X24"
-        )
+    for book_line in sorted(asset_lines):
+        kind = kind_for(book_line)
         name = Path(images[book_line]).name
         monolith_hits = monolith_by_name.get(name, [])
         split_hits = split_by_name.get(name, [])
@@ -455,12 +497,45 @@ def ledger() -> tuple[str, int, int, int]:
         width, height = jpeg_size(data)
         split_path, split_line = split_hits[0]
         rows.append(
-            f"{book_line}|{kind}|{path.relative_to(ASSET_ROOT).as_posix()}|{len(data)}|"
+            f"{book_line}|{kind}|{images[book_line]}|"
+            f"{path.relative_to(ASSET_ROOT).as_posix()}|{len(data)}|"
             f"{width}|{height}|{digest}|"
-            f"{split_path.relative_to(ASSET_ROOT).as_posix()}|{split_line}|{REASON[book_line]}"
+            f"{split_path.relative_to(ASSET_ROOT).as_posix()}|{split_line}|{reasons[book_line]}"
         )
 
     return "\n".join(rows) + "\n", monolith_references, split_references, len(hashes)
+
+
+def governed_kind(book_line: int) -> str:
+    return (
+        "C10" if book_line in C10 else
+        "C6" if book_line in C6 else
+        "O" if book_line in O else
+        "R" if book_line in R else
+        "X22" if book_line in X22 else
+        "X23" if book_line in X23 else
+        "X24"
+    )
+
+
+def adjacency_kind(book_line: int) -> str:
+    return (
+        "A-TYPED" if book_line in ADJ_TYPED_BOUNDARY else
+        "A-PROPERTY" if book_line in ADJ_APPLICATION_PROPERTY else
+        "A-OTHER"
+    )
+
+
+def ledger() -> tuple[str, int, int, int]:
+    """Exact governed-universe manifest (53 rows)."""
+
+    return _ledger(U, governed_kind, REASON)
+
+
+def adjacency_ledger() -> tuple[str, int, int, int]:
+    """Exact radius-four-only exclusion manifest (60 rows)."""
+
+    return _ledger(ADJACENCY_ONLY, adjacency_kind, ADJACENCY_REASON)
 
 
 # The chapter's printed pages 170--175 are physical JPEG pages 185--190: the

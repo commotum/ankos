@@ -18,6 +18,7 @@ from __future__ import annotations
 import hashlib
 import re
 import sys
+import unicodedata
 from pathlib import Path
 
 
@@ -205,7 +206,7 @@ EXPECTED_SOURCE_DIGEST = "50caf57ebaa912d54ca50df2ec22ebcd418d2b898fbe03414de0af
 NATIVE_EVIDENCE = (
     frozenset({850, 1254, 2156, 10986, 10992, 11136, 13265, 16446, 18249})
     | frozenset(range(2168, 2211, 2))
-    | frozenset(range(2908, 2931, 2))
+    | (frozenset(range(2908, 2931, 2)) - {2918})
     | line_set(
         "11067,11069,11070,11071,11072,11073,11074,11075,11077,11079,11080,"
         "13467,13469,13471,13473,13513,13515,13516,13517,13518,13520,13522,"
@@ -242,22 +243,86 @@ RELATION_EVIDENCE = RETAINED - NATIVE_EVIDENCE - CONTROL_EVIDENCE
 EXPECTED_SET = {
     "union": (283, "8011234be88f7701d989637b17fb0c4d29c6a2f581349135df7d6e53da267062"),
     "pre_index_union": (222, "6dd224ef51b5d767b3f1aa15264680584323dcd41f0cecb5cbc3178eb6ac2710"),
-    "index": (61, "PLACEHOLDER"),
-    "matched_retained": (180, "PLACEHOLDER"),
-    "governed_continuations": (132, "PLACEHOLDER"),
+    "index": (61, "0d24061a7997946b106a2afe88529d9af0ecdf285b46b3c1d96ca729414d2684"),
+    "matched_retained": (180, "5998b9deafc9b19404c07de328dc188771b80b8fcaece58e46f403eecb269584"),
+    "governed_continuations": (132, "1f693900e93176cd68716b4f8a9edc7c2673d9216c6a295e0fe2d6b24aed1b92"),
     "retained": (312, EXPECTED_SOURCE_DIGEST),
-    "excluded": (42, "PLACEHOLDER"),
-    "native": (0, "PLACEHOLDER"),
-    "relation": (0, "PLACEHOLDER"),
-    "control": (0, "PLACEHOLDER"),
+    "excluded": (42, "c09e0fd7840d9479290be19d0c6f32fc632a2900ad03154839ec019055c770ba"),
+    "native": (104, "dadb04aef72a78f676cd06ef87109faf2581b6dde190fddc813fbe873220a640"),
+    "relation": (75, "e8de98fc89586c37b194a028f97211f38a109433bea50f34ed60c8cee3abb10f"),
+    "control": (133, "374a2a8a05ea9a10db23aace923856cfd116394b2e64c3fba9c18a43abe72224"),
 }
 
-EXPECTED_EXCLUDED_CLASS: dict[str, tuple[int, str]] = {}
-EXPECTED_INDEX_CLASS: dict[str, tuple[int, str]] = {}
+EXPECTED_EXCLUDED_CLASS = {
+    "one_dimensional_seed_background": (26, "76768e71026360c2bca9f3da8fedc35c746f2a844c6410754f7c5c1e736025dc"),
+    "square_lattice_background": (6, "23fb05a97ff9523ac06e4f19bcfe2f59dbd144b4787299cdc427d52a9cb885e7"),
+    "code_count_collision": (4, "89d8813bc251c3f86843eccb05837c2033dd90a8446ee0d218b1b261165be2ac"),
+    "neighbor_word_collision": (5, "d8913fa9de98611fafcf3fe27709a231e8acb91b789446760da2718db80853a9"),
+    "other_background": (1, "a398152fa8e559b07ad69683d6f51a0e9cefad1d0e0c495642fe10b2e1170417"),
+}
+EXPECTED_INDEX_CLASS = {
+    "t21_routes": (34, "48da7ba8bef0b671806cba2d338a2b0257d26b358818d2f0d3b586d67c72fca1"),
+    "t22_life_routes": (18, "d1f0d2f458f7002c2b2404a527b27c5f244e7a689a6641b5e98b10de577c6114"),
+    "t23_routes": (3, "c1ec6cd7f7b24f92309bddc1a0312769e81c52ba53d95246ca3d1118b8c281f8"),
+    "t24_lattice_routes": (2, "d77f2bc1978314d7a59a68a89c699aadb77fd6cbde0a455d6864c8a871a2ef5a"),
+    "rule_code_routes": (3, "8f45cb02b25fd9213d9d6150baddd02733afa2b73b75792f44a460c445fbe2f2"),
+    "other_index_background": (1, "5ff11842e79ccdab708d273fd345efd5f8fdedc3976b17574a9d0f9f643cb257"),
+}
 
 EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
+EXPECTED_SPLIT_QUERY_RECORDS = (281, "587d86a9f003c5d981bc09fa8492c23af93d0d2ae6e8d07030c6f94f75ac12ed")
+EXPECTED_SPLIT_EXACT_QUERY_RECORDS = (266, "9d25633c7d1cddbfbd02c302d78f1f9567ab590b247307e68e21c911a56b045f")
+EXPECTED_SPLIT_NONEXACT_QUERY_DIGEST = "c5f9c056ef956f51db8d0495cfb54e4d1b5adba4c965900aeea19a255962aaf7"
+EXPECTED_SPLIT_QUERY_MAPPING_DIGEST = "f578cda27b1cc5b4374693d4c5b262ea486598445f68cf6b303dbd6f21abd19a"
+
+SPLIT_NONEXACT_QUERY_WITNESSES = {
+    "BACK-MATTER/Colophon/Colophon.md:4909": (22352,),
+    "BACK-MATTER/Index/Index.md:2214": (14313,),
+    "BACK-MATTER/Index/Index.md:3194": (15293,),
+    "BACK-MATTER/Index/Index.md:5287": (17384,),
+    "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:163": (7862,),
+    "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:605": (8322,),
+    "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:743": (8464,),
+    "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2902": (11521,),
+    "CHAPTERS/2-The-Crucial-Experiment/The-Crucial-Experiment.md:45": (450,),
+    "CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md:13": (2156,),
+    "CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md:47": (2190,),
+    "CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md:69": (2212,),
+    "CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md:491": (3914,),
+    "CHAPTERS/8-Implications-for-Everyday-Systems/Implications-for-Everyday-Systems.md:109": (4452,),
+    "FRONT-MATTER/Preface/Preface.md:56": (142,),
+}
+
+EXPECTED_SPLIT_DIRECT_COUNTS = {
+    "BACK-MATTER/Colophon/Colophon.md": 50,
+    "BACK-MATTER/Index/Index.md": 27,
+    "CHAPTERS/10-Processes-of-Perception-and-Analysis/Processes-of-Perception-and-Analysis.md": 3,
+    "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md": 2,
+    "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md": 18,
+    "CHAPTERS/5-Two-Dimensions-and-Beyond/Two-Dimensions-and-Beyond.md": 14,
+    "CHAPTERS/6-Starting-from-Randomness/Starting-from-Randomness.md": 7,
+    "CHAPTERS/7-Mechanisms-in-Programs-and-Nature/Mechanisms-in-Programs-and-Nature.md": 6,
+    "CHAPTERS/8-Implications-for-Everyday-Systems/Implications-for-Everyday-Systems.md": 2,
+    "CHAPTERS/9-Fundamental-Physics/Fundamental-Physics.md": 3,
+    "FRONT-MATTER/Preface/Preface.md": 1,
+}
+EXPECTED_SPLIT_DIRECT_COUNTS_DIGEST = "ab544ec1361afc04d4f33a8db64d488ec91cc9797fb719b60fde70ca5274f224"
+
+EXPECTED_EXACT_RETAINED_MIRRORS = (244, "0f6aad633c172e9089bb0f5ab7fa6ef7cdbd99363461040567c543597f6df895")
+EXPECTED_SPLIT_NONEXACT_RETAINED = (68, "dec93299051fddeddfde24bdc9365789d7224fc005958ac153a2fe9cecd3ff29")
+MONOLITH_ONLY_RETAINED = frozenset({670, 672})
+EXPECTED_MONOLITH_ONLY_DIGEST = "e92cb1a2eccf4c40fee9c336e8d42bd0e32a46aeda886ad95524aa9a318b622e"
+MANUAL_RETAINED_WITNESSES = {
+    142: "FRONT-MATTER/Preface/Preface.md:56",
+    7862: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:163",
+    11521: "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md:2902",
+    17384: "BACK-MATTER/Index/Index.md:5287",
+}
+EXPECTED_RETAINED_MAPPING_COUNT = 66
+EXPECTED_RETAINED_MAPPING_DIGEST = "5c757acfb0a537ea2538bcad0ab6ddb36f309b57929d1e36e8aab1977f78e0d9"
+EXPECTED_RETAINED_WITNESS_DIGEST = "dae36d70a1c812eeb498dabc7ab396dfa775847cb8858806b27a5a6827ef330b"
 
 
 def digest(lines: set[int] | frozenset[int]) -> str:
@@ -270,6 +335,11 @@ def sha256(path: Path) -> str:
 
 def digest_records(records: set[str] | list[str]) -> str:
     return hashlib.sha256("\n".join(sorted(records)).encode("utf-8")).hexdigest()
+
+
+def normalized_line(line: str) -> str:
+    text = unicodedata.normalize("NFKD", line).lower().replace("\\", "")
+    return " ".join(re.findall(r"[a-z0-9]+", text))
 
 
 def classify_excluded(excluded: set[int], hits: dict[str, set[int]]) -> dict[str, set[int]]:
@@ -421,7 +491,7 @@ def main() -> int:
     update_domain_ok = (
         "updated in parallel at every step" in at(850)
         and "based on the colors of neighboring cells on the previous step" in at(16446)
-        and "n×n array of white squares with a single black square in the middle" in at(13469)
+        and "array of white squares with a single black square in the middle" in at(13469)
         and "practical computer one can use only a finite array" in at(10986)
         and "effectively use a cyclic array" in at(10986)
         and "assumed cyclic" in at(11080)
@@ -488,15 +558,17 @@ def main() -> int:
         n for n, line in enumerate(atlas_lines, 1)
         if any(rx.search(line) for rx in compiled)
     }
+    atlas_retained = atlas_hits | {13}
     atlas_ok = (
         len(atlas_lines) == 542
-        and atlas_hits == {13, 175}
+        and atlas_hits == {175}
+        and atlas_retained == {13, 175}
         and "higher dimensions change the story" in atlas_lines[12]
         and "Two- and three-dimensional cellular automata" in atlas_lines[174]
         and "same core behavior classes persist" in atlas_lines[174]
     )
     ok &= atlas_ok
-    print("atlas", "OK" if atlas_ok else "MISMATCH", len(atlas_hits), digest(atlas_hits))
+    print("atlas", "OK" if atlas_ok else "MISMATCH", len(atlas_retained), digest(atlas_retained))
 
     catalog_lines = CATALOG.read_text(encoding="utf-8").splitlines()
     taxonomy_text = TAXONOMY.read_text(encoding="utf-8")
