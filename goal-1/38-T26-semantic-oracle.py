@@ -706,6 +706,34 @@ def apply_flatten2d(
 
 
 def generic_step(table: ClosedPatchTable, configuration: RectGrid) -> PatchStep:
+    """Strict convenience that unwraps the typed UPDATE result."""
+
+    result = generic_step_result(table, configuration)
+    if type(result.outcome) is Invalid:
+        raise IncompatibleMosaicError(result.outcome.reason)
+    assert type(result.step) is PatchStep
+    return result.step
+
+
+def apply_flatten2d_result(
+    configuration: RectGrid,
+    active: tuple[TileHandle, ...],
+    writes: tuple[PatchWrite, ...],
+) -> PatchStepResult:
+    """Return ``Invalid(IncompatibleMosaic)`` without a successor or commit."""
+
+    try:
+        step = apply_flatten2d(configuration, active, writes)
+    except IncompatibleMosaicError as error:
+        return PatchStepResult(Invalid(error.reason), (), None)
+    changed = step.successor.cells != configuration.cells
+    return PatchStepResult(Advanced(changed), (step.successor,), step)
+
+
+def generic_step_result(
+    table: ClosedPatchTable,
+    configuration: RectGrid,
+) -> PatchStepResult:
     if type(table) is not ClosedPatchTable:
         raise TypeError("generic step requires an exact ClosedPatchTable")
     if type(configuration) is not RectGrid:
@@ -713,7 +741,7 @@ def generic_step(table: ClosedPatchTable, configuration: RectGrid) -> PatchStep:
     active = all_old_tiles(configuration)
     reads = read_self(configuration, active)
     writes = make_patch_writes(configuration, table, active, reads)
-    return apply_flatten2d(configuration, active, writes)
+    return apply_flatten2d_result(configuration, active, writes)
 
 
 def notes_flatten2d(block_grid: tuple[tuple[Patch, ...], ...]) -> Grid:
@@ -725,7 +753,7 @@ def notes_flatten2d(block_grid: tuple[tuple[Patch, ...], ...]) -> Grid:
     old_width: int | None = None
     result: list[tuple[int, ...]] = []
     result_width: int | None = None
-    for raw_source_row in source_rows:
+    for source_row_index, raw_source_row in enumerate(source_rows):
         source_row = exact_tuple(raw_source_row, "nested replacement block row")
         if not source_row:
             raise ValueError("Flatten2D source rows must be nonempty")
@@ -751,8 +779,12 @@ def notes_flatten2d(block_grid: tuple[tuple[Patch, ...], ...]) -> Grid:
             if row_patch_height is None:
                 row_patch_height = len(checked)
             elif len(checked) != row_patch_height:
-                raise ValueError(
-                    "Flatten2D patches in one source row must have equal heights"
+                raise IncompatibleMosaicError(
+                    IncompatibleMosaic(
+                        "row_patch_heights",
+                        source_row_index,
+                        (row_patch_height, len(checked)),
+                    )
                 )
             checked_blocks.append(checked)
         assert row_patch_height is not None
@@ -768,7 +800,13 @@ def notes_flatten2d(block_grid: tuple[tuple[Patch, ...], ...]) -> Grid:
         if result_width is None:
             result_width = slab_width
         elif slab_width != result_width:
-            raise ValueError("Flatten2D source-row slabs must have equal total widths")
+            raise IncompatibleMosaicError(
+                IncompatibleMosaic(
+                    "row_slab_widths",
+                    None,
+                    (result_width, slab_width),
+                )
+            )
         result.extend(slab)
     return tuple(result)
 
@@ -961,6 +999,45 @@ class BagSnapshotProvenance:
 
 
 @dataclass(frozen=True)
+class SnapshotTokenRenaming:
+    """Declared bijection from independently derived bag tokens to grid tokens."""
+
+    bag_source: SnapshotToken = field(repr=False)
+    grid_source: SnapshotToken = field(repr=False)
+    bag_successor: SnapshotToken = field(repr=False)
+    grid_successor: SnapshotToken = field(repr=False)
+
+    def __post_init__(self) -> None:
+        tokens = (
+            self.bag_source,
+            self.grid_source,
+            self.bag_successor,
+            self.grid_successor,
+        )
+        if any(type(token) is not SnapshotToken for token in tokens):
+            raise TypeError("token renaming requires exact SnapshotTokens")
+        if self.bag_successor.parent is not self.bag_source:
+            raise ValueError("bag successor is not derived from the bag source")
+        if self.grid_successor.parent is not self.grid_source:
+            raise ValueError("grid successor is not derived from the grid source")
+        if self.bag_source.generation != self.grid_source.generation:
+            raise ValueError("renamed source tokens must have equal generations")
+        if self.bag_successor.generation != self.grid_successor.generation:
+            raise ValueError("renamed successor tokens must have equal generations")
+        if self.bag_successor is self.grid_successor:
+            raise ValueError("successor tokens must be independently derived before renaming")
+
+    def bag_to_grid(self, token: SnapshotToken) -> SnapshotToken:
+        if type(token) is not SnapshotToken:
+            raise TypeError("token renaming requires an exact SnapshotToken")
+        if token is self.bag_source:
+            return self.grid_source
+        if token is self.bag_successor:
+            return self.grid_successor
+        raise ValueError("token lies outside the declared two-token bijection")
+
+
+@dataclass(frozen=True)
 class PlacedTileBag:
     prototypes: tuple[TilePrototype, ...]
     occurrences: tuple[PlacedTile, ...]
@@ -1124,10 +1201,29 @@ class BagStep:
     child_patches: tuple[BagChildPatch, ...]
 
 
+@dataclass(frozen=True)
+class BagStepResult:
+    outcome: Advanced | Invalid
+    successors: tuple[PlacedTileBag, ...]
+    step: BagStep | None
+
+    def __post_init__(self) -> None:
+        successors = exact_tuple(self.successors, "bag-step-result successors")
+        if type(self.outcome) is Advanced:
+            if type(self.step) is not BagStep:
+                raise TypeError("Advanced bag result requires an exact BagStep")
+            if len(successors) != 1 or successors[0] is not self.step.successor:
+                raise ValueError("Advanced bag result must expose its committed successor")
+        elif type(self.outcome) is Invalid:
+            if self.step is not None or successors:
+                raise ValueError("Invalid bag result must not commit a successor")
+        else:
+            raise TypeError("bag result requires exact Advanced or Invalid outcome")
+
+
 def bag_step(
     table: ClosedPatchTable,
     bag: PlacedTileBag,
-    successor_provenance: BagSnapshotProvenance | None = None,
 ) -> BagStep:
     if type(table) is not ClosedPatchTable:
         raise TypeError("bag step requires exact closed patch-table data")
@@ -1138,17 +1234,12 @@ def bag_step(
     strict_prototype_labels(bag)
     decode_bag_as_grid(bag, bag.provenance.grid_token)
     patch_height, patch_width = table.patch_shape
-    if successor_provenance is None:
-        successor_provenance = BagSnapshotProvenance(
-            SnapshotToken(bag.generation + 1, bag.provenance.grid_token)
-        )
-    elif type(successor_provenance) is not BagSnapshotProvenance:
-        raise TypeError("bag step successor provenance must be exact")
+    successor_provenance = BagSnapshotProvenance(
+        SnapshotToken(bag.generation + 1, bag.provenance.grid_token)
+    )
     successor_token = successor_provenance.grid_token
-    if successor_token.parent is not bag.provenance.grid_token:
-        raise ValueError("bag successor provenance is stale or cross-snapshot")
-    if successor_token.generation != bag.generation + 1:
-        raise ValueError("bag successor provenance must advance exactly once")
+    assert successor_token.parent is bag.provenance.grid_token
+    assert successor_token.generation == bag.generation + 1
     children: list[PlacedTile] = []
     child_patches: list[BagChildPatch] = []
     for parent in bag.occurrences:
@@ -1191,6 +1282,128 @@ def bag_step(
         successor_provenance,
     )
     return BagStep(bag.provenance, successor, tuple(child_patches))
+
+
+def bag_step_result(
+    table: ClosedPatchTable,
+    bag: PlacedTileBag,
+) -> BagStepResult:
+    """Full successful runner envelope for the uniform T27 restriction."""
+
+    old_grid = decode_bag_as_grid(bag, bag.provenance.grid_token)
+    step = bag_step(table, bag)
+    successor_grid = decode_bag_as_grid(
+        step.successor,
+        step.successor.provenance.grid_token,
+    )
+    changed = (
+        successor_grid.cells != old_grid.cells
+        or successor_grid.shape != old_grid.shape
+    )
+    return BagStepResult(Advanced(changed), (step.successor,), step)
+
+
+def rename_patch_step_tokens(
+    step: PatchStep,
+    renaming: SnapshotTokenRenaming,
+) -> PatchStep:
+    """Apply the declared bag-to-grid token bijection to typed grid lineage."""
+
+    if type(step) is not PatchStep or type(renaming) is not SnapshotTokenRenaming:
+        raise TypeError("patch-step renaming requires exact typed values")
+    source_token = renaming.bag_to_grid(step.source_token)
+    successor_token = renaming.bag_to_grid(step.successor.token)
+
+    def rename_source(source: TileHandle) -> TileHandle:
+        if type(source) is not TileHandle:
+            raise TypeError("renamed patch lineage requires exact TileHandles")
+        return TileHandle(
+            renaming.bag_to_grid(source.token),
+            source.row,
+            source.column,
+        )
+
+    rectangles = tuple(
+        ChildRectangle(
+            rename_source(rectangle.source),
+            rectangle.row_start,
+            rectangle.row_stop,
+            rectangle.column_start,
+            rectangle.column_stop,
+        )
+        for rectangle in step.child_rectangles
+    )
+    children = tuple(
+        GridChildOccurrence(
+            rename_source(child.source),
+            child.local_row,
+            child.local_column,
+            child.target_row,
+            child.target_column,
+            child.label,
+        )
+        for child in step.child_occurrences
+    )
+    return PatchStep(
+        source_token,
+        RectGrid(step.successor.alphabet_size, step.successor.cells, successor_token),
+        rectangles,
+        children,
+    )
+
+
+def rename_bag_step_tokens(
+    step: BagStep,
+    renaming: SnapshotTokenRenaming,
+) -> BagStep:
+    """Apply the same bijection to bag provenance and every typed parent handle."""
+
+    if type(step) is not BagStep or type(renaming) is not SnapshotTokenRenaming:
+        raise TypeError("bag-step renaming requires exact typed values")
+    source_token = renaming.bag_to_grid(step.source_provenance.grid_token)
+    successor_token = renaming.bag_to_grid(step.successor.provenance.grid_token)
+    source_provenance = BagSnapshotProvenance(
+        source_token,
+        step.source_provenance.representation,
+    )
+    successor_provenance = BagSnapshotProvenance(
+        successor_token,
+        step.successor.provenance.representation,
+    )
+    patches: list[BagChildPatch] = []
+    for patch in step.child_patches:
+        if type(patch) is not BagChildPatch:
+            raise TypeError("renamed bag lineage requires exact BagChildPatches")
+        if patch.source.provenance is not step.source_provenance:
+            raise ValueError("bag patch source lies outside the renamed provenance")
+        source = BagParentHandle(source_provenance, patch.source.occurrence)
+        witnesses: list[BagChildOccurrence] = []
+        for witness in patch.children:
+            if type(witness) is not BagChildOccurrence or witness.source != patch.source:
+                raise ValueError("bag child witness lies outside its renamed parent")
+            witnesses.append(
+                BagChildOccurrence(
+                    source,
+                    witness.local_row,
+                    witness.local_column,
+                    witness.local_pose,
+                    witness.child,
+                )
+            )
+        patches.append(
+            BagChildPatch(
+                source,
+                patch.patch_height,
+                patch.patch_width,
+                tuple(witnesses),
+            )
+        )
+    successor = PlacedTileBag(
+        step.successor.prototypes,
+        step.successor.occurrences,
+        successor_provenance,
+    )
+    return BagStep(source_provenance, successor, tuple(patches))
 
 
 def assert_patch_steps_operationally_equal(left: PatchStep, right: PatchStep) -> None:
@@ -1419,23 +1632,31 @@ def assert_bag_commutes(table: ClosedPatchTable, configuration: RectGrid) -> Non
     assert encode_grid_as_bag(decoded) == encoded
 
     generic_result = generic_step(table, configuration)
-    successor_provenance = BagSnapshotProvenance(generic_result.successor.token)
-    geometric_result = bag_step(table, encoded, successor_provenance)
-    mapped_result = decode_bag_step_as_patch_step(
+    geometric_result = bag_step(table, encoded)
+    assert geometric_result.successor.provenance.grid_token is not generic_result.successor.token
+    renaming = SnapshotTokenRenaming(
+        geometric_result.source_provenance.grid_token,
+        generic_result.source_token,
+        geometric_result.successor.provenance.grid_token,
+        generic_result.successor.token,
+    )
+    independently_mapped = decode_bag_step_as_patch_step(
         table,
         configuration,
         geometric_result,
     )
+    mapped_result = rename_patch_step_tokens(independently_mapped, renaming)
     assert_patch_steps_operationally_equal(mapped_result, generic_result)
     encoded_result = encode_patch_step_as_bag_step(
         table,
         configuration,
         generic_result,
     )
-    assert geometric_result == encoded_result
+    renamed_geometric_result = rename_bag_step_tokens(geometric_result, renaming)
+    assert renamed_geometric_result == encoded_result
     assert (
         encode_patch_step_as_bag_step(table, configuration, mapped_result)
-        == geometric_result
+        == renamed_geometric_result
     )
 
 
@@ -1672,6 +1893,25 @@ def assert_source_fixture_and_rectangles() -> dict[str, int]:
     result = generic_step(rectangular, rectangular_grid).successor
     assert result.shape == (4, 6)
 
+    # Compatibility is row-slab based, not an invented source-column width
+    # constraint.  Each column sees widths 1 and 2 in opposite order, while
+    # both assembled source-row slabs have width three and must advance.
+    cross_column_widths = ClosedPatchTable(
+        2,
+        (
+            (0, ((0,),)),
+            (1, ((1, 0),)),
+        ),
+    )
+    cross_column_grid = make_grid(((0, 1), (1, 0)), 2)
+    cross_column_expected = ((0, 1, 0), (1, 0, 0))
+    assert native_step(cross_column_widths, cross_column_grid.cells) == cross_column_expected
+    cross_column_result = generic_step_result(cross_column_widths, cross_column_grid)
+    assert cross_column_result.outcome == Advanced(True)
+    assert len(cross_column_result.successors) == 1
+    assert cross_column_result.successors[0].cells == cross_column_expected
+    assert type(cross_column_result.step) is PatchStep
+
     # BOOK:13744 is a complete encoded-label table, not merely a geometric
     # relation.  Exact Notes Flatten2D execution yields Fibonacci side lengths.
     mixed = make_grid(OTHER_SHAPES_SEED, 4)
@@ -1691,6 +1931,7 @@ def assert_source_fixture_and_rectangles() -> dict[str, int]:
         "page187_trace_digest_words": len(trace_digest),
         "page187_trace_digest_int": int(trace_digest[:12], 16),
         "rectangular_2x3_events": 1,
+        "compatible_cross_column_width_events": 1,
         "other_shapes_mosaic_events": len(OTHER_SHAPES_CHECKPOINTS) - 1,
         "other_shapes_exact_checkpoints": len(OTHER_SHAPES_CHECKPOINTS),
         "derived_rule_count_checks": 3,
@@ -1699,39 +1940,106 @@ def assert_source_fixture_and_rectangles() -> dict[str, int]:
 
 
 def assert_rank_parameterization() -> dict[str, int]:
-    # RankedBlockMosaicAssemble has full variable-length D019 concatenation at
-    # rank one.  The former 600 equal-length cases remain an explicit subset.
+    # Explicit selected-source indices are the rank-one locus map.  Every old
+    # source receives one lineage record: selected sources emit their ordered
+    # block (possibly epsilon), while unselected sources are consumed with a
+    # typed zero-width region.  Exhaust all subsets through old length four.
     events = 0
     fixed_events = 0
+    all_selected_events = 0
+    right_neighbor_frontier_events = 0
+    unselected_consumption_events = 0
+    empty_input_events = 0
+    singleton_to_empty_events = 0
+    selected_epsilon_events = 0
     words = tuple(
         word
         for block_length in range(3)
         for word in product((0, 1), repeat=block_length)
     )
     for zero_word, one_word in product(words, repeat=2):
-        for length in range(1, 5):
+        for length in range(5):
             for word in product((0, 1), repeat=length):
-                selected = tuple(zero_word if label == 0 else one_word for label in word)
-                direct = tuple(child for block in selected for child in block)
-                assembly = ranked_block_mosaic_assemble(
-                    (len(word),),
-                    tuple((len(block),) for block in selected),
-                    selected,
-                )
-                assert assembly.shape == (len(direct),)
-                assert assembly.values == direct
-                assert tuple(
-                    (region.starts[0], region.stops[0])
-                    for region in assembly.source_regions
-                ) == tuple(
-                    (sum(len(block) for block in selected[:index]),
-                     sum(len(block) for block in selected[: index + 1]))
-                    for index in range(len(selected))
-                )
-                events += 1
-                if len(zero_word) == len(one_word) and len(zero_word) in (1, 2):
-                    fixed_events += 1
-    assert events == 1_470
+                for selection_mask in product((False, True), repeat=length):
+                    selected_indices = tuple(
+                        index for index, selected in enumerate(selection_mask) if selected
+                    )
+                    selected_blocks = tuple(
+                        zero_word if word[index] == 0 else one_word
+                        for index in selected_indices
+                    )
+                    direct = tuple(
+                        child for block in selected_blocks for child in block
+                    )
+                    assembly = ranked_block_mosaic_assemble(
+                        (length,),
+                        tuple((len(block),) for block in selected_blocks),
+                        selected_blocks,
+                        selected_source_indices=selected_indices,
+                    )
+                    assert assembly.shape == (len(direct),)
+                    assert assembly.values == direct
+
+                    selected_blocks_by_source = dict(
+                        zip(selected_indices, selected_blocks, strict=True)
+                    )
+                    expected_regions: list[
+                        tuple[int, bool, tuple[int, ...], tuple[int, ...]]
+                    ] = []
+                    cursor = 0
+                    for source_index in range(length):
+                        selected = source_index in selected_blocks_by_source
+                        start = cursor
+                        if selected:
+                            cursor += len(selected_blocks_by_source[source_index])
+                        expected_regions.append(
+                            (source_index, selected, (start,), (cursor,))
+                        )
+                    assert tuple(
+                        (
+                            region.source_index,
+                            region.selected,
+                            region.starts,
+                            region.stops,
+                        )
+                        for region in assembly.source_regions
+                    ) == tuple(expected_regions)
+                    assert cursor == len(direct)
+
+                    events += 1
+                    all_selected = selected_indices == tuple(range(length))
+                    if all_selected:
+                        all_selected_events += 1
+                    else:
+                        unselected_consumption_events += 1
+                    if selected_indices == tuple(range(max(0, length - 1))):
+                        right_neighbor_frontier_events += 1
+                    if length == 0:
+                        assert selected_indices == () and assembly == RankedMosaicAssembly(
+                            (0,), (), ()
+                        )
+                        empty_input_events += 1
+                    if length == 1 and not selected_indices:
+                        assert assembly.shape == (0,) and assembly.values == ()
+                        assert assembly.source_regions == (
+                            RankedSourceRegion(0, False, (0,), (0,)),
+                        )
+                        singleton_to_empty_events += 1
+                    if selected_indices and not direct:
+                        selected_epsilon_events += 1
+                    if (
+                        all_selected
+                        and length >= 1
+                        and len(zero_word) == len(one_word)
+                        and len(zero_word) in (1, 2)
+                    ):
+                        fixed_events += 1
+    assert events == 16_709
+    assert all_selected_events == 1_519
+    assert right_neighbor_frontier_events == 1_519
+    assert unselected_consumption_events == 15_190
+    assert empty_input_events == 49
+    assert singleton_to_empty_events == 98
     assert fixed_events == 600
 
     adversarial = ClosedPatchTable(
@@ -1750,7 +2058,13 @@ def assert_rank_parameterization() -> dict[str, int]:
     )
 
     return {
-        "t13_rank1_mosaic_events": events,
+        "rank1_selected_mosaic_events": events,
+        "rank1_all_selected_events": all_selected_events,
+        "rank1_right_neighbor_frontier_events": right_neighbor_frontier_events,
+        "rank1_unselected_consumption_events": unselected_consumption_events,
+        "rank1_empty_input_events": empty_input_events,
+        "rank1_singleton_to_empty_events": singleton_to_empty_events,
+        "rank1_selected_epsilon_events": selected_epsilon_events,
         "t13_fixed_block_rank1_subset": fixed_events,
         "rank2_block_assembly_events": 1,
         "naive_row_major_divergences": 1,
@@ -1801,14 +2115,18 @@ def assert_boundaries_and_observers() -> dict[str, int]:
         encoded.provenance,
     )
     assert reversed_bag == encoded
-    shared_successor = BagSnapshotProvenance(
-        SnapshotToken(page.generation + 1, page.token)
+    reversed_result = bag_step(PAGE_187_TABLE, reversed_bag)
+    encoded_result = bag_step(PAGE_187_TABLE, encoded)
+    permutation_renaming = SnapshotTokenRenaming(
+        reversed_result.source_provenance.grid_token,
+        encoded_result.source_provenance.grid_token,
+        reversed_result.successor.provenance.grid_token,
+        encoded_result.successor.provenance.grid_token,
     )
-    assert bag_step(PAGE_187_TABLE, reversed_bag, shared_successor) == bag_step(
-        PAGE_187_TABLE,
-        encoded,
-        shared_successor,
-    )
+    assert rename_bag_step_tokens(
+        reversed_result,
+        permutation_renaming,
+    ) == encoded_result
 
     # The same selected old label yields the same write in unlike surrounding
     # contexts.  This is the operational proof that T26 reads self only; it is
@@ -1860,11 +2178,31 @@ def expect_rejection(expected: type[BaseException], operation: Callable[[], obje
 
 def assert_hostile_validation() -> dict[str, int]:
     rejections = 0
+    typed_invalid_outcomes = 0
 
     def rejects(expected: type[BaseException], operation: Callable[[], object]) -> None:
         nonlocal rejections
         expect_rejection(expected, operation)
         rejections += 1
+
+    def rejects_incompatible(
+        table: ClosedPatchTable,
+        configuration: RectGrid,
+        expected_code: str,
+    ) -> None:
+        nonlocal rejections, typed_invalid_outcomes
+        old_cells = configuration.cells
+        old_token = configuration.token
+        result = generic_step_result(table, configuration)
+        assert type(result.outcome) is Invalid
+        assert type(result.outcome.reason) is IncompatibleMosaic
+        assert result.outcome.reason.code == expected_code
+        assert result.successors == ()
+        assert result.step is None
+        assert configuration.cells is old_cells
+        assert configuration.token is old_token
+        rejections += 1
+        typed_invalid_outcomes += 1
 
     rejects(TypeError, lambda: checked_alphabet_size(True))
     rejects(ValueError, lambda: checked_alphabet_size(1))
@@ -1907,20 +2245,32 @@ def assert_hostile_validation() -> dict[str, int]:
         2,
         ((0, ((0,),)), (1, ((1, 0),))),
     )
-    rejects(
-        ValueError,
-        lambda: generic_step(unequal_heights, make_grid(((0, 1),), 2)),
+    unequal_heights_grid = make_grid(((0, 1),), 2)
+    unequal_slab_widths_grid = make_grid(((0,), (1,)), 2)
+    rejects_incompatible(
+        unequal_heights,
+        unequal_heights_grid,
+        "row_patch_heights",
+    )
+    rejects_incompatible(
+        unequal_slab_widths,
+        unequal_slab_widths_grid,
+        "row_slab_widths",
     )
     rejects(
-        ValueError,
-        lambda: generic_step(unequal_slab_widths, make_grid(((0,), (1,)), 2)),
+        IncompatibleMosaicError,
+        lambda: generic_step(unequal_heights, unequal_heights_grid),
     )
     rejects(
-        ValueError,
+        IncompatibleMosaicError,
+        lambda: generic_step(unequal_slab_widths, unequal_slab_widths_grid),
+    )
+    rejects(
+        IncompatibleMosaicError,
         lambda: notes_flatten2d((((((0,),), ((1,), (0,)))),)),
     )
     rejects(
-        ValueError,
+        IncompatibleMosaicError,
         lambda: notes_flatten2d(((((0,),),), (((1, 0),),))),
     )
 
@@ -2025,8 +2375,27 @@ def assert_hostile_validation() -> dict[str, int]:
     rejects(ValueError, lambda: ranked_block_assemble((), (), ()))
     rejects(ValueError, lambda: ranked_block_assemble((1, 1), (2,), (((0, 1),),)))
     rejects(ValueError, lambda: ranked_block_assemble((1,), (0,), ((0,),)))
+    rejects(ValueError, lambda: ranked_block_assemble((1,), (0,), ((),)))
     rejects(ValueError, lambda: ranked_block_assemble((2,), (2,), ((0, 1),)))
     rejects(ValueError, lambda: ranked_block_assemble((1,), (2,), ((0,),)))
+    rejects(
+        ValueError,
+        lambda: ranked_block_mosaic_assemble(
+            (2,), ((1,),), ((0,),), selected_source_indices=(1, 1)
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: ranked_block_mosaic_assemble(
+            (2,), ((1,),), ((0,),), selected_source_indices=(2,)
+        ),
+    )
+    rejects(
+        ValueError,
+        lambda: ranked_block_mosaic_assemble(
+            (1, 1), (), (), selected_source_indices=()
+        ),
+    )
     rejects(ValueError, lambda: notes_flatten2d(()))
 
     bag = encode_grid_as_bag(configuration)
@@ -2224,6 +2593,7 @@ def assert_hostile_validation() -> dict[str, int]:
 
     return {
         "hostile_rejections": rejections,
+        "typed_incompatible_no_commit_outcomes": typed_invalid_outcomes,
         "context_fields_exposed": 0,
         "raster_program_fields": 0,
         "free_geometry_rule_fields": 0,
