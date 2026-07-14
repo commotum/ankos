@@ -18,6 +18,7 @@ Status: **IN PROGRESS — ARCHITECTURE RESOLVED; ORACLE AND HOSTILE-REVIEW CLOSU
 - Exact, certified, approximate, probable, unknown, unsupported, and resource-limited coefficient results must remain distinct. The direct-digit example is described only as overwhelmingly probable under finite precision; it is not silently exact.
 - Digit rows, walks, histograms, term-size plots, rational approximants, regularity, randomness, and normality claims are observers. Finite data do not prove randomness or normality, and normality depends on the base (`BOOK:12972-12976`).
 - T40 adds no new execution algebra. Its semantic umbrella is an immutable exact denotation plus a pure representation query/result. Any explicit generation algorithm is a separately identified SimpleProgram using the already shared DOMAIN/ALPHABET/FRONTIER/NEIGHBORHOOD/RULE/UPDATE axes.
+- In this audit, DOMAIN retains the project meaning of dimensional task/program space (`t+0D`, `t+1D`, and so on), whether discrete or continuous. It is not renamed to mean support or topology: the declarative T40 query has no transition DOMAIN, while each iterative coefficient realization shown here is discrete `t+0D`.
 
 ## Source Defect That Must Remain Visible
 
@@ -180,6 +181,28 @@ These grouped passages are the construction-bearing core. The source oracle reta
 > If one successively reads 0's and 1's from an infinite sequence then the representations (c), (d) and (e) have the property that eventually one will always accumulate a valid representation for some number or another.
 >
 > But as pages 560 and 916 show, there are many other quite different ways to represent numbers, each with different levels of convenience for different purposes.
+
+### Excerpt 10 — representation schemas are chosen for downstream access
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:6766-6782`
+- Context: Chapter 10, page 560–561 run-length encoding discussion followed from the page-1201 representation route.
+- Establishes: unary, ordinary binary, length-prefixed, binary-coded-ternary, and Fibonacci encodings are distinct finite schemas; self-delimitation is a representation invariant needed by a consumer, not a reason to invent another execution algebra.
+
+> Various representations of numbers from 1 to 30. (a) is unary ... (b) is ordinary binary or base 2 representation. (c), (d) and (e) are set up to be self-delimiting, so that the end of a number can be recognized purely by looking at the cells within it.
+>
+> Indeed, any digit sequence can be thought of as providing a short representation for a number. But for run-length encoding it turns out that ordinary base 2 digit sequences do not quite work. For if the numbers corresponding to the lengths of successive runs are given one after another then there is no way to tell where the digits of one number end and the next begin.
+
+### Excerpt 11 — exact real definitions, computation, and oracle boundaries
+
+- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:19066-19087`
+- Context: Notes for page 729, **Computable reals**, **Diagonal arguments**, **Continuous computation**, and **Initial conditions**.
+- Establishes: nth-coefficient computability is a finite-step property, not a consequence of exact denotation; continuous carriers do not erase finite program description or discrete choices; arbitrary real initial data can hide an oracle unless its construction is supplied.
+
+> The stated purpose of Alan Turing's original 1936 paper on computation was to introduce the notion of computable real numbers, whose nth digit for any n could be found by a Turing machine in a finite number of steps. ... the overwhelming majority of all possible real numbers are not computable.
+>
+> Most of the types of programs that I have discussed in this book can be generalized to allow continuous data ... But the programs themselves normally remain discrete, typically involving discrete choices made at discrete steps.
+>
+> Traditional mathematics tends to assume that real numbers with absolutely any digit sequence can be set up. And if this were the case, then the digits of an initial condition could for example be the table for an oracle ... any reasonably complete theory must address how such an initial condition could have been constructed.
 
 ## Final Semantic Model
 

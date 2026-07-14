@@ -59,7 +59,7 @@ def line_set(spec: str) -> frozenset[int]:
 
 
 # Exactly twenty bounded lanes from the first-principles audit.  Q00 proves
-# that the catalog label is external vocabulary; Q15/Q16 close all 45 image candidates.
+# that the catalog label is external vocabulary; Q15/Q16 close every image candidate.
 QUERIES = {
     "Q00": r"Mathematical-Constant Digit Systems?",
     "Q01": r"Mathematical Constants",
@@ -124,10 +124,11 @@ QUERIES = {
     ),
     "Q15": r"_page_(?:151_Figure_7|154_Figure_2|156_Figure_1)\.jpeg",
     "Q16": (
-        r"_page_(?:575_Figure_5|576_Figure_4|"
+        r"_page_(?:150_Figure_[1-5]|575_Figure_5|576_Figure_4|"
         r"161_Figure_1|162_Figure_1|884_Figure_30|960_Figure_3|1099_Figure_1|"
-        r"986_Picture_[4-8]|1106_Picture_4|1109_Picture_[56]|"
-        r"1201_Picture_(?:6|9|10|11)|"
+        r"923_Figure_21|926_Figure_14|986_Picture_[4-8]|"
+        r"1106_Picture_4|1108_Figure_13|1109_Picture_[56]|"
+        r"1201_Picture_(?:4|6|9|10|11)|"
         r"916_Figure_12|917_Picture_11|918_Figure_2|"
         r"927_Figure_14|928_Figure_(?:9|11|13|22)|"
         r"929_Picture_1[1-6]|930_(?:Picture_(?:4|12|14)|Figure_10)|"
@@ -218,9 +219,82 @@ QUERY_CONTROL = line_set(
 EXCLUDED_CLASS = {
     "name_collision": line_set("146"),
     "generic_algorithm_cross_reference": line_set("17845,19345,19563"),
-    "sibling_asset_observer": line_set("17593"),
+    "sibling_asset_observer": line_set(
+        "1649,1651,1653,1655,1657,12844,12917,17593,17847,20584"
+    ),
 }
 EXCLUDED = frozenset().union(*EXCLUDED_CLASS.values())
+
+
+# This independent hostile-review lane scans the complete Book, not merely
+# the hand-built query windows or the fixed strict/Index universes.  Its
+# vocabulary is deliberately broader than T40: every pre-Index match is
+# either retained as native/relation/control evidence or frozen below as a
+# bounded sibling construction.  Index matches inherit the exhaustive
+# physical-row disposition proved later.
+BOOK_BROAD_VOCABULARY_PATTERN = (
+    r"digit sequences?|"
+    r"n(?:<sup>|\^\{?)?th(?:</sup>|\}?)?[^\n]{0,24}digit|"
+    r"continued fractions?|normal numbers?|non-?computable reals?|"
+    r"computable real numbers?|number representations?|"
+    r"positional (?:notation|representations?)|negative bases?|"
+    r"unary representation|zeckendorff representation|"
+    r"(?:(?:binary|decimal|hexadecimal|base (?:2|10|16|60))"
+    r"[^\n]{0,80}(?:digit|number|representation)|"
+    r"(?:digit|number|representation)[^\n]{0,80}"
+    r"(?:binary|decimal|hexadecimal|base (?:2|10|16|60)))"
+)
+BOOK_BROAD_EXCLUSION_CLASS = {
+    "rule-machine-code-carriers": line_set(
+        "720,1198,1204,2194,2922,3330,3336"
+    ),
+    "t36-t37-number-evolution-siblings": line_set(
+        "1392,1394,1447,1451,1457,1461,1467,1475,1485,1489,1503,"
+        "1525,1527,1531,1545,1601,1611,1613,1645"
+    ),
+    "t43-iterated-map-work-siblings": line_set(
+        "1874,1876,1880,1882,1886,1898,1900,1908,1920,1924,1928,"
+        "1932,1940,1944,1946,1950,2008"
+    ),
+    "other-simple-program-coordinate-encodings": line_set(
+        "2484,2548,2674"
+    ),
+    "chaos-physical-sampling-observers": line_set(
+        "3584,3594,3598,3600,3612,3614,3628,3636,3646,3652,3672,"
+        "3724,3736,3744,4260,5916"
+    ),
+    "compression-crypto-computation-siblings": line_set(
+        "7120,7272,7274,7312,7322,7388,7390,7406,7410,7424,7974,"
+        "7990,8078,8834,8838,9002,9004,9010,9020,9058,9080,9216,"
+        "9220,9268,9378,9651,10461,10988"
+    ),
+    "sibling-type-notes-before-t40": line_set(
+        "11272,12054,12120,12255,12257,12609,12613,12631,12639,"
+        "12643,12676,12751,12915"
+    ),
+    "t43-ca-sibling-notes": line_set(
+        "13186,13231,13233,13235,13261,13263,13266,13268,13692,"
+        "13764,14095,14237,14275,14299,14340,14857,14971,15002,15006"
+    ),
+    "downstream-philosophical-compression-siblings": line_set(
+        "16246,17199,17202,17726,17758,17766,17772,17924"
+    ),
+    "generic-complexity-cost-analogies": line_set("19386,19401"),
+}
+BOOK_BROAD_EXCLUDED = frozenset().union(*BOOK_BROAD_EXCLUSION_CLASS.values())
+
+# These rows are not broad-vocabulary hits; they are frozen because retained
+# interrupted spans or control boundaries touch them directly.
+SOURCE_SPAN_EXCLUSION_CLASS = {
+    "interleaved-page26-sibling": line_set("11258"),
+    "adjacent-history-siblings": line_set("11533,11535"),
+}
+SOURCE_SPAN_EXCLUDED = frozenset().union(*SOURCE_SPAN_EXCLUSION_CLASS.values())
+SOURCE_SPAN_EXCLUSION_GUARDS = {
+    11258: ("Page 26", "Pascal's triangle and rule 90"),
+    11533: ("distribution of primes", "regularities"),
+    11535: ("three-body problem",),
+}
 
 
 # Query recall is not the closure proof.  Independently enumerate every
@@ -263,6 +337,7 @@ NATIVE_CONTINUATIONS = line_set(
 RELATION_CONTINUATIONS = line_set(
     "656,1848,1858,6766,6770,6774,6778,6780,6782,"
     "11250,11254,11256,"
+    "12194,12196,12198,12200,12202,12204,12206,12540,12542,"
     "12505,12507,12509,12511,12513,12517-12520,12522,"
     "12526,12528,12530,12534,"
     "12587,12589,12591,12593,12595,"
@@ -271,12 +346,14 @@ RELATION_CONTINUATIONS = line_set(
     "13132,13136,13138-13144,14170,14174,17105,"
     "17131-17133,17135-17137,17139,17141-17145,17147,17149-17151,"
     "17153,17155-17159,17161,17163,17165,17169,17173,17175,17176,17178,"
-    "17234,17597,17760,17849,17853,17863,17865,17867-17872,17874,"
-    "19066,19068,19070,19072,"
+    "17234,17597,17760,17849,17853,17855,17857,17859,17861,"
+    "17863,17865,17867-17872,17874,"
+    "18211,18339,18341-18346,18348,19066,19068,19070,19072,19194,20117,"
     "20505,20586,20590"
 )
 CONTROL_CONTINUATIONS = line_set(
-    "1663,12919,19082,19084,19086,19087,19185,19187"
+    "1663,12919,19082,19084,19086,19087,19089,19185,19187,"
+    "19190,19244,19494-19507,19509,19526,19528"
 )
 
 NATIVE_EVIDENCE = QUERY_NATIVE | NATIVE_CONTINUATIONS | STRICT_MAIN_NATIVE
@@ -559,13 +636,15 @@ RELATION_IMAGE_LINES = line_set(
     "13076,13094,13098,14176,14925,14927,14929,14931,14933,17762,"
     "17876,17878,"
     "20588,20594,20596,20598,"
-    "13119,13121,13123,13125,13127"
+    "13119,13121,13123,13125,13127,17167,17171"
 )
 CONTROL_IMAGE_LINES = line_set("13134")
 GOVERNED_IMAGE_LINES = (
     NATIVE_IMAGE_LINES | RELATION_IMAGE_LINES | CONTROL_IMAGE_LINES
 )
-EXCLUDED_IMAGE_LINES = line_set("17593")
+EXCLUDED_IMAGE_LINES = line_set(
+    "1649,1651,1653,1655,1657,12844,12917,17593,17847,20584"
+)
 CANDIDATE_IMAGE_LINES = GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
 UNRESOLVED_IMAGE_LINES = frozenset()
 
@@ -573,6 +652,11 @@ IMAGE_ROLE_RECORDS = (
     "1677:native:page151 pi base-two walk observer",
     "1711:native:page154 rational long-division work panels",
     "1744:native:page156 square-root product-state work panels",
+    "1649:excluded:page150 sequence-property sibling observer a",
+    "1651:excluded:page150 sequence-property sibling observer b",
+    "1653:excluded:page150 sequence-property sibling observer c",
+    "1655:excluded:page150 sequence-property sibling observer d",
+    "1657:excluded:page150 sequence-property sibling observer e",
     "1846:relation:page161 trigonometric crossing-family source observer",
     "1854:relation:page162 continued-fraction-driven substitution observer",
     "6768:relation:page560 unary binary self-delimiting and Fibonacci representation observer",
@@ -581,6 +665,8 @@ IMAGE_ROLE_RECORDS = (
     "12524:relation:page916 Gray-code representation observer",
     "12552:relation:page917 negative-base representation observer",
     "12557:relation:page918 multiplicative-digit representation observer",
+    "12844:excluded:page923 pre-T40 prime-section sibling observer",
+    "12917:excluded:page926 aliquot-sum sibling observer",
     "12960:native:page927 rational digit panels",
     "12992:relation:page928 concatenation digits",
     "12996:relation:page928 concatenation walk",
@@ -608,10 +694,14 @@ IMAGE_ROLE_RECORDS = (
     "14929:relation:page986 billiard continued-fraction slope observer c",
     "14931:relation:page986 billiard continued-fraction slope observer d",
     "14933:relation:page986 billiard continued-fraction slope observer e",
+    "17167:relation:page560 representation-length observer",
+    "17171:relation:page560 self-delimiting-completeness observer",
     "17593:excluded:page1099 least-squares model-fit sibling observer",
     "17762:relation:page1106 rule-60 difference-table observer including pi digits",
     "17876:relation:page1109 base-two power-tree computation observer",
     "17878:relation:page1109 base-three conversion computation observer",
+    "17847:excluded:page1108 visible-lattice-point sibling observer",
+    "20584:excluded:page1201 preceding doubling-rule sibling observer",
     "20588:relation:page1201 minimal-CA repetitive-sequence context observer",
     "20594:relation:page1201 powers-of-two minimal-CA observer",
     "20596:relation:page1201 squares minimal-CA observer",
@@ -621,6 +711,7 @@ IMAGE_ASSEMBLY_BOUNDARIES = (
     "page560-561:6768,6776 form representation and downstream run-length application observers",
     "continuation-assets:1846,1854,11252,14176 are governed by retained adjacent relation spans",
     "excluded-asset:17593 is a least-squares sibling observer, not the later Sturmian span",
+    "excluded-boundaries:1649,1651,1653,1655,1657,12844,12917,17847,20584 belong to adjacent sibling spans",
     "page986:14925,14927,14929,14931,14933 form the billiard continued-fraction assembly",
     "page1201:20588,20594,20596,20598 govern minimal-CA sequence context and three targets",
     "page1106:17762 is a composite transformation observer, not a T40 digit generator",
@@ -757,8 +848,13 @@ SOURCE_SEMANTIC_GUARDS = (
         ("digit sequence picture", "BitXor[i, Floor[i/2]]", "rule 60 cellular automaton"),
         (),
     ),
+    ("substitution_digit_automaton", 12194, ("Connections with digit sequences", "substitution system", "successive digits"), ()),
+    ("substitution_digit_automaton_rule", 12198, ("finite automaton", "digit sequences in base k", "nested structure"), ()),
+    ("fibonacci_position_codec", 12204, ("generalize the notion of digit sequences", "base k", "Fibonacci"), ()),
+    ("fibonacci_position_uniqueness", 12206, ("representation is unique", "adjacent 1's", "substitution system"), ()),
     ("symbolic_dynamics_boundary", 12528, ("symbolic dynamics approach", "digit sequence approach", "digit expansions"), ()),
     ("symbolic_dynamics_scope", 12530, ("only shifts", "simple operations", "not been seen"), ()),
+    ("page117_substitution_relation", 12540, ("Substitution systems", "connections between digit sequences"), ()),
     (
         "number_history_scope",
         12532,
@@ -863,6 +959,10 @@ SOURCE_SEMANTIC_GUARDS = (
     ("particular_power_digit_cost", 17863, ("particular digit", "t Log[t]^2", "base k"), ()),
     ("base_conversion_cost", 17865, ("particular base k digit", "converting to base k", "takes about t divisions"), ()),
     ("single_power_digit_boundary", 17874, ("single digit", "no way", "all the other digits"), ()),
+    ("power_algorithm_context", 17855, ("Computing powers", "repeated squaring", "IntegerDigits"), ()),
+    ("bit_carrier_pluralism", 18211, ("bits of data", "represent information of absolutely any kind", "Numbers"), ()),
+    ("multicolor_encoding_context", 18339, ("More colors", "three colors", "two colors"), ()),
+    ("fibonacci_block_encoding", 18348, ("coding theory", "digit sequences", "Fibonacci number system"), ()),
     ("number_classification", 13136, ("Number classification", "undecidable", "same number"), ()),
     ("noncomputable_definition", 17101, ("formal descriptions", "algorithmically random", "Chaitin"), ()),
     ("noncomputable_coefficients", 19058, ("nth digit", "far from being computable", "halting problem"), ()),
@@ -878,8 +978,17 @@ SOURCE_SEMANTIC_GUARDS = (
     ("continuous_program_boundary", 19084, ("continuous data", "programs themselves normally remain discrete", "finite formula"), ()),
     ("oracle_initial_condition_boundary", 19086, ("absolutely any digit sequence", "table for an oracle", "must address"), ()),
     ("constructible_real_boundary", 19087, ("Constructible reals", "successive digits", "mechanical processes"), ()),
+    ("constructible_real_completion", 19089, ("robotics", "algebraic numbers", "degree 4"), ()),
     ("precision_resource_boundary", 19185, ("n-digit numbers", "pi", "n-digit precision", "bit operations"), ()),
     ("iterative_precision_resource", 19187, ("iterative procedure", "Log[n] steps", "n digits", "NIntegrate"), ()),
+    ("bit_extraction_evaluator", 19194, ("extracts the digit", "base 2 digit sequence"), ()),
+    ("short_computation_context", 19190, ("Short computations", "Some properties include"), ()),
+    ("undecidability_digit_analogy", 19244, ("most numbers cannot be computable", "digit sequence of a real number"), ()),
+    ("np_representation_context", 19494, ("NP completeness", "problems known to be NP-complete"), ()),
+    ("complexity_representation_boundary", 19509, ("base 2 digit sequences", "not", "unary"), ()),
+    ("resource_representation_boundary", 19526, ("appropriate number representations", "asymptotic growth rates", "polynomial time"), ()),
+    ("resource_representation_completion", 19528, ("halting times", "undecidable", "P = NP"), ()),
+    ("number_generalization_history", 20117, ("Generalization in mathematics", "positive integers", "decimals", "complex numbers"), ()),
     (
         "representation_pluralism",
         20507,
