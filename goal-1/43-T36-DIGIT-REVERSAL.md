@@ -55,7 +55,7 @@ The complete retained/routed/guarded-Index crosswalk reverse-joins to 96 unique 
 | Normalized text | 4 | Minimum score `0.996587`; no low-score fuzzy acceptance |
 | Structural OCR repair | 5 | Exact owner plus frozen damaged and repaired needles |
 
-The five structural repairs cover the extracted `FromDigits`/`IntegerDigits` spacing damage, the shared whole-number digit codec at `BOOK:12503`, and the `dyadic`/`Paley`/`BitReverseOrder` corruption. Actual-Index routes, neighboring-column sentinels, exclusions, query contracts, and repair witnesses have separately frozen records; clearing or weakening them fails the oracle. The corrected T37 boundary explicitly owns `_page_143_Figure_6.jpeg`; it is not a T36 asset.
+The five structural repairs are the shared `IntegerDigits` codec at `BOOK:12503`, `FromDigits`/`IntegerDigits` spacing at `BOOK:12637`, `dyadic`/`Paley` spelling at `BOOK:17313`, the `BitReverseOrder` signature at `BOOK:17315`, and Walsh-array shape `2^{s,s} -> {2^s,2^s}` at `BOOK:17319`. Actual-Index routes, neighboring-column sentinels, exclusions, query contracts, and repair witnesses have separately frozen records; clearing or weakening them fails the oracle. The corrected T37 boundary explicitly owns `_page_143_Figure_6.jpeg`; it is not a T36 asset.
 
 The evidence roles are:
 
