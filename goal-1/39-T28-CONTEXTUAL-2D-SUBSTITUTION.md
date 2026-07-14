@@ -19,8 +19,8 @@ Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS ACTIV
 - **Retained:** T28 has canonical parallel stepwise evolution and belongs in the common `SimpleProgram` runner.
 - **Retained:** context selection belongs to NEIGHBORHOOD/RULE, while patch compatibility and assembly belong to UPDATE.
 - **Retained:** periodic boundary behavior is part of the strict source profile and must be explicit in CONFIGURATION/topology or its declared realization.
-- **Under test:** every strict source row can be represented faithfully as a finite closed ordered literal/wildcard contextual table, or compiled to an exhaustive table while separately preserving source spelling/provenance, plus a positive rectangular patch. `ReplaceAll` establishes first-match priority; the audit must not reorder overlapping rows.
-- **Retained:** any finite source-defined compatible patch table uses D132 directly; a declared common positive `2 x 2` shape uses D132's uniform restriction. The complete raster plate is not replayable, so its full shape table is unclaimed.
+- **Retained:** every recovered source row can be represented faithfully as a finite closed ordered literal/anonymous-wildcard contextual table, or compiled behaviorally to an exhaustive table while separately preserving source spelling/provenance, plus a positive rectangular patch. `ReplaceAll` establishes first-match priority; the audit must not reorder overlapping rows.
+- **Retained:** any finite aligned rectangular product-grid profile whose emitted patches satisfy D132 compatibility uses D132 directly; a declared common positive `2 x 2` shape uses D132's uniform restriction. The complete raster plate is not replayable, so its full shape table is unclaimed, and this result does not cover the adaptive unequal-subdivision profile.
 - **Rejected unless evidenced:** open, padded, reflected, dropped, infinite-background, or user-callback boundary menus; free geometric neighbors; sequential scans; hidden raster decoding; and a T28 executor.
 
 ## Big Picture Objective
@@ -33,7 +33,7 @@ Reconstruct the exact two-dimensional contextual substitution construction and e
 - Exact CSV name: `Neighbor-Dependent Two-Dimensional Substitution Systems`.
 - CSV physical line: 29.
 - Taxonomy section: 28.
-- Provisional entry kind: contextual rank-two grid-replacement preset in discrete `t+2D`.
+- Entry kind: contextual rank-two grid-replacement preset in discrete `t+2D`; the adaptive unequal-subdivision generalization remains an open profile.
 - Initial vocabulary: neighbor-dependent/contextual two-dimensional/2D substitution, neighboring elements, grid replacement, subdivision, `Partition[list,{2,2},1,-1]`, `Flatten2D`, cyclic/wraparound grid, northwest context, compact pattern rules, page 192/935, non-nested behavior, unequal subdivision, sequential higher-dimensional scanning, cellular-automaton relation, L-system relation, and Index aliases.
 
 ## Source Audit
@@ -150,10 +150,10 @@ The evidence boundary is `10 HASH_BOUND / 1 LIMITED_TRANSCRIBED / 0 PIXEL_REPLAY
 - **SEED:** the plate begins from a displayed finite grid; no exact raster seed is claimed.
 - **FRONTIER:** every old tile exactly once, with row/column product order used for assembly and source-bound lineage.
 - **NEIGHBORHOOD:** an ordered cyclic `2 x 2` old-snapshot block aligned so `Self` is the lower-right member. The one exact Notes row ignores its northwest slot; no global factorization of the unrecovered plate table is claimed.
-- **RULE:** a finite closed ordered contextual product-pattern table over typed `Literal(label) | Blank` slots, or a behavior-equivalent exhaustive expansion with source form retained separately, returning one positive rectangular patch over the same alphabet for each selected old source. Ordered overlap uses first match; validation proves every finite context has a match. A desired fallback must be an explicit final row, never host `ReplaceAll` behavior.
+- **RULE:** a finite closed ordered contextual product-pattern table over typed `Literal(label) | AnonymousAny` slots, with source `_` parsed as `AnonymousAny`, or a behavior-equivalent exhaustive expansion with source form retained separately. Each selected source returns one positive rectangular patch over the same alphabet. Ordered overlap is valid and uses first match; construction validation proves every finite context has a match after any explicit source-import totalization. A desired fallback must be explicit data, never latent host behavior.
 - **UPDATE:** T26 `RankedBlockMosaicAssemble(rank=2)`; a declared uniform positive `2 x 2` rule set uses `RankedUniformBlockAssemble(rank=2)`. UPDATE validates complete source/write coverage and mosaic compatibility before allocating and committing one successor. No exact execution of the unrecovered plate table is claimed.
 - **SCHEDULE:** all reads and rule choices use one immutable old toroidal snapshot; all patches commit atomically; newborn tiles wait until the next event.
-- **OUTCOME:** a valid complete strict table advances one deterministic generation even for an identity result. Invalid/missing/ambiguous pattern coverage or incompatible patches produce typed no-commit invalidity, not a halt or partial successor.
+- **OUTCOME:** a valid complete strict table advances one deterministic generation even for an identity result. Malformed patterns and missing finite coverage reject the program at construction time; ordered overlap is resolved by priority and is not ambiguous. Only state-dependent failure such as D132 mosaic incompatibility yields a typed step-level `Invalid` with no successor or partial commit.
 - **LINEAGE:** every old tile owns its emitted patch rectangle and exact parent-local children. Context cells influence rule choice without becoming additional parents.
 - **OBSERVERS:** raster scale, grayscale antialiasing, nestedness/complexity descriptions, and display crops do not enter program state.
 
@@ -184,7 +184,7 @@ No context slot is itself a write target. Each patch is owned by the selected `S
 The repaired Notes row means exactly
 
 ```text
-((Blank, Literal(1)), (Literal(0), Literal(1)))
+((AnonymousAny, Literal(1)), (Literal(0), Literal(1)))
     -> ((1,0), (1,1))
 ```
 
@@ -196,7 +196,7 @@ The complete native plate table, native seed, and native trace are raster-only a
 
 `BOOK:13810` explicitly permits replacements where only some elements subdivide, then warns that the two-dimensional neighborhood configurations around a cell are generally arbitrarily numerous. This is native evidence for a broader adaptive construction, but not enough evidence to freeze its carrier, adjacency update, matching schema, compatibility conditions, or exact trace. A fixed four-slot rectangular-grid rule table cannot claim that variant merely by accepting differently sized arrays.
 
-The honest result is an open profile inside the same SimpleProgram architecture: it may require a dynamic hierarchical/cell-complex CONFIGURATION and a topology-derived NEIGHBORHOOD, while still using the same branch-free select/read/write/apply runner. Goal 2 must not add a callback, unbounded opaque pattern object, family executor, or padded rectangular approximation. The strict finite periodic profile can be implemented independently; the adaptive profile remains unavailable until primary evidence or an explicit separately sourced specification closes those mechanics.
+The honest result is an open profile that may require a dynamic hierarchical/cell-complex CONFIGURATION and topology-derived NEIGHBORHOOD. If its canonical step is later recovered, the shared branch-free select/read/write/apply runner is the first candidate, but the missing carrier/incidence/matching/update mechanics prevent claiming that fit now. Goal 2 must not add a callback, unbounded opaque pattern object, family executor, or padded rectangular approximation. The strict finite periodic product-grid profile can be implemented independently; the adaptive profile remains unavailable until primary evidence or an explicit separately sourced specification closes those mechanics.
 
 ## Semantic Proof
 
@@ -207,7 +207,7 @@ The honest result is an open profile inside the same SimpleProgram architecture:
 
 The comparison is over complete typed results rather than successor pixels alone. Each evaluator independently mints source/successor tokens; an explicit reversible token relation compares them while preserving outcome, successor cardinality, `changed`, step presence, grid/topology, every source/read/write record, patch rectangle, local child ordinal/coordinate, parent ownership, and complete lineage. The test never makes raw token equality semantic.
 
-The bounded proof includes a binary order-four de Bruijn torus containing all sixteen ordered contexts exactly once, exhaustive small periodic rectangles including degenerate `1 x 1`, `1 x 2`, `2 x 1`, and larger asymmetric shapes, multiple complete uniform tables, compatible mixed patches, identity advancement, and a one-cell-output fixed-support restriction. The repaired source row is tested for both northwest values.
+The bounded proof includes a `4 x 4` binary de Bruijn torus for `2 x 2` contexts containing all sixteen ordered contexts exactly once, exhaustive small periodic rectangles including degenerate `1 x 1`, `1 x 2`, `2 x 1`, and larger asymmetric shapes, multiple complete uniform tables, synthetic D132-compatible aligned mixed patches used only as a composition stress test, identity advancement, and a one-cell-output fixed-support restriction. The repaired source row is tested for both northwest values.
 
 The hostile set independently forces divergences or typed rejection for:
 
@@ -234,27 +234,29 @@ The mixed-size boundary is constructive: adjacent sources emitting `1 x 1` and `
 | Periodic changing grid | 1/2, direct composition | D127 periodic incidence + D132 rectangular changing configuration | finite nonempty rectangle, both axes cyclic, successor revalidated; no fixed NumPy-shape assumption |
 | FRONTIER | 1, direct reuse | T26 `AllOldTiles` | every old tile exactly once with an opaque exact-snapshot handle |
 | Context read | 2, parameterization/new schema on an existing axis | generic ordered product access, with T14 contextual responsibility and D127 periodic slots | declared `(NW,N,W,Self)` order, lower-right alignment, periodic slot multiplicity, old-snapshot provenance |
-| Pattern table | 2 plus behavior realization | generic closed finite RULE data | immutable ordered `Literal | Blank` rows, first-match priority, finite total coverage, explicit defaults only; exhaustive compilation retains source rows/provenance because compilation is not injective |
+| Pattern table | 2 plus behavior realization | D037-style closed structural pattern data restricted to a fixed product, or generic finite RULE data | immutable ordered `Literal | AnonymousAny` rows, first-match priority, finite total coverage, explicit defaults only; exhaustive compilation retains source rows/provenance because compilation is not injective |
 | Patch write | 1, direct reuse | T26 source-bound positive rectangular patch | owner is `Self`; context participants are influences, not parents |
-| UPDATE | 1, direct reuse | D132 `RankedBlockMosaicAssemble(rank=2)`; uniform plate restriction uses its named uniform wrapper | complete coverage, mosaic compatibility, exact product placement, atomic no-commit invalidity, parent consumption, newborn deferral, lineage |
+| UPDATE | 1, direct reuse for the finite aligned profile | D132 `RankedBlockMosaicAssemble(rank=2)`; a separately declared common-shape restriction uses its named uniform wrapper | Cartesian source-address coverage, aligned rectangular mosaic compatibility, exact product placement, atomic no-commit invalidity, parent consumption, newborn deferral, lineage; no claim over the unresolved adaptive profile |
 | Result/trace | 2, parameterization | D132 structured `PatchStepResult` | dynamic shapes, periodic topology, full read/write witnesses, opaque token relation, typed invalidity |
 
 T28 therefore uses audit categories 1–3 and introduces no category-4 execution algebra. The only Goal 2 implementation additions specifically exposed by T28 are reusable access and RULE schemas. D132 already owns the required UPDATE implementation.
 
 ## Current Runtime Fit
 
-- `src/ca/loci.py` supplies reusable selector composition and finite coordinate ordering, but its fixed `[t,x,y,z]` dense realization is not the native changing-grid configuration.
-- `src/ca/neighborhoods.py` supplies ordered offset-selection ideas, but reads are currently dense-array coordinate gathers rather than topology-bound source projections with exact snapshot provenance.
-- `src/ca/frontiers.py` exposes only dense current-slice selection for executable rollout, not source-bound old-tile occurrences.
+- `src/ca/loci.py:531-614` already maps periodic axes independently and preserves repeated query occurrences after quotient aliasing. Its fixed `[t,x,y,z]` dense realization and lack of snapshot-bound source handles remain gaps. Goal 2 must declare a bijection such as semantic `(row,column) <-> (x=column,y=row)` and apply the corresponding storage transpose/offset map; it may not derive meaning from array order.
+- `src/ca/neighborhoods.py:140-174` already provides an ordered four-offset stencil mechanism, and a direct `1 x 2` periodic probe retains all four aliased occurrences. T28 is therefore a named-slot/provenance parameterization of existing geometric gathering, not a new neighborhood execution algebra. `loci.py:22,257-280` exposes only incidental `none|lex` ordering, so semantic slot names and the axis codec must wrap it explicitly.
+- `src/ca/frontiers.py:54-80` has the all-current-site responsibility needed by `AllOldTiles`, but executable rollout does not expose typed source-bound old-tile occurrences.
 - `src/ca/rules.py` returns scalar same-site values and has family-specific finite codecs; it lacks typed rectangular patch results and closed contextual pattern expansion.
 - `src/ca/rollout.py` assumes same-shape dense outputs and branches on family names. T28 must not add another branch.
 - `src/ca/specs.py` and raw trace records require fixed shapes/dense homogeneous arrays; changing grids and structured lineage require Goal 2 trace/result work already motivated by T13/T26.
+- `src/ca/specs.py:23-55` has no ALPHABET or UPDATE field, so it cannot validate finite-context totality or patch-label closure; `:117-198` cannot declare literal offsets or a closed ordered pattern table structurally.
+- `src/ca/rollout.py:155,190,825-831` family-checks the frontier but does not execute its selector, instead re-enumerating coordinates at `:691-702`. Existing tests pin only a one-dimensional periodic gather and fixed dense two-dimensional rollout, not torus corners, degenerate-axis occurrence multiplicity, pattern priority/totalization, patches, provenance, or lineage.
 
 ## Principles Audit
 
 - Principles 0-3: test composition before naming a construction class. T28 currently changes access and rule data while reusing T26 UPDATE.
 - Principle 4: RULE returns a typed source-bound patch, not a scalar, callback, whole-grid replacement, or raster.
-- Principles 5-8: the periodic topology and complete old grid remain visible; an exhaustive compact-table lowering must be lossless and one-step, with no hidden pattern interpreter.
+- Principles 5-8: the periodic topology and complete old grid remain visible. Compact-to-exhaustive lowering is behavior-preserving but not injective; lossless program identity retains the ordered closed source AST and provenance alongside compiled behavior, with no hidden host interpreter.
 - Principles 9-10: contextual offsets, compact independence restrictions, periodicity, and uniform block shape are declarative schema/preset choices with strict validation.
 - Principle 11: snapshot-parallel rule choice and rank-two product assembly are defining semantics, not incidental algorithms.
 - Principles 13-16: adversaries must cover alignment, wraparound, overlapping reads, wildcard overlap/order, missing rows, incompatible patches, in-place newborn reads, flat concatenation, raster dependence, and family dispatch.
@@ -276,7 +278,7 @@ Objective: add no T28 executor. Compose a finite periodic changing-grid configur
 
 Provisional dependencies: D011 old-snapshot atomicity; D019/D124 source-bound contextual reads and exact-snapshot provenance; D127/D130 topology-aware offsets/ports; D132 ranked mosaic assembly, compatibility, invalidity, and lineage.
 
-Required conformance will include the source's exact Notes row, synthetic exhaustive tables over all finite contexts, strict periodic edge/corner witnesses, direct/generic one-step commutation, uniform and compatible-mixed patches where evidenced, incompatible no-commit outcomes, and static absence of T28 dispatch, callbacks, padding, hidden raster data, flat assembly, in-place reads, or sequential scans.
+Required conformance will include the source's exact Notes row, synthetic exhaustive tables over all finite contexts, strict periodic edge/corner witnesses, direct/generic one-step commutation, declared uniform patches, synthetic D132-compatible mixed patches as a composition stress test rather than a native plate claim, incompatible no-commit outcomes, and static absence of T28 dispatch, callbacks, padding, hidden raster data, flat assembly, in-place reads, or sequential scans. The adaptive unequal-subdivision profile is explicitly unavailable.
 
 ## No-Cheating Checks
 
@@ -288,7 +290,7 @@ Required conformance will include the source's exact Notes row, synthetic exhaus
 - No flat concatenation substituted for rank-two product assembly.
 - No context cell assigned parenthood merely because it influenced a source's patch.
 - No newborn tile read during its producing event.
-- No compact pattern reordered or treated as an unordered map; the source's ordered first-match behavior is preserved, and missing coverage is rejected rather than delegated to host `ReplaceAll` fallback.
+- No compact pattern reordered or treated as an unordered map; the source's ordered first-match behavior is preserved. Missing coverage is rejected during program construction unless an explicit source importer has materialized the promised `ReplaceAll` nonmatch behavior as closed total data.
 - No unequal-subdivision profile declared finite/total without closing its potentially unbounded neighborhood configurations.
 
 ## Completion Requirements
