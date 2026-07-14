@@ -1,6 +1,6 @@
 # 36-T24-HIGHERDIM-CA
 
-Status: **IN PROGRESS — REPAIRED SOURCE CLOSED; ASSET/SEMANTIC GATES AND FINAL HOSTILE REVIEW OPEN**
+Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, AND ARCHITECTURE AUDITS CLOSED; FINAL HOSTILE REVIEW OPEN**
 
 ## Current Facts
 
@@ -38,7 +38,7 @@ Reconstruct higher-dimensional and alternative-lattice cellular automata from pr
 - Exact catalog name: Higher-Dimensional Lattice Cellular Automata.
 - CSV line: 25.
 - Taxonomy section: 24.
-- Entry kind: source audit open; fixed-support label evolution with dimensional/topological/access parameterization is the initial hypothesis.
+- Entry kind: repaired source/asset/semantic/architecture audit closed; fixed-support label evolution with dimensional/topological/access/RULE parameterization is the provisional D130 conclusion pending final hostile review.
 - Initial vocabulary: higher-dimensional, arbitrary-dimensional, `d` dimensions, lattice cellular automata, crystal lattice, cubic, tetrahedral, rhombic, close-packed, honeycomb, triangular, hexagonal, face-centered, body-centered, neighbors, tilings, tessellations, Notes implementations, captions, actual Index, projections, slices, and embeddings.
 
 ## Search Log
@@ -57,7 +57,7 @@ The source oracle independently guards the arbitrary-dimensional formulas and po
 
 The governed set contains six native plates—dimensional arrangements, hexagonal any-neighbor growth, the hexagonal exact-one snowflake rule, the alternative-lattice/Voronoi-neighbor plate, pentagonal code `4094`, and Penrose code `254`—plus two relation plates for Penrose construction and Voronoi geometry, and three structural/sequential-network controls. The adjacency-only set partitions as `2 structural-network / 1 natural observer / 9 other CA / 1 substitution / 1 network observer / 1 static geometry / 1 sequential CA / 3 slice view / 3 physics observer / 3 static-network geometry` plates.
 
-Every candidate has one monolith and one split reference, giving 72 references, 36 physical files, and 36 unique hashes. Six source-bound transcript records keep nearby source-stated claims and code labels separate from explicitly marked code-semantic derivations. The transcript digest is `883f86d4ec52345e1dc0be35b7e4a33abd91d49d29b179c84057657b2021a23a`. The honest boundary is `HASH_BOUND=36 / TRANSCRIBED=6 / PIXEL_REPLAYED=0`. The fixed-network CA evidence is text-only. No plate supplies a complete Penrose, pentagonal, crystal, or network topology; no missing seed, horizon, boundary, renderer, or trace is reconstructed from pixels. The root oracle passes; portability/fail-closed/import/compile gates are being finalized, and no candidate remains unresolved.
+Every candidate has one monolith and one split reference, giving 72 references, 36 physical files, and 36 unique hashes. Six source-bound transcript records keep nearby source-stated claims and code labels separate from explicitly marked code-semantic derivations. The transcript digest is `883f86d4ec52345e1dc0be35b7e4a33abd91d49d29b179c84057657b2021a23a`. The honest boundary is `HASH_BOUND=36 / TRANSCRIBED=6 / PIXEL_REPLAYED=0`. The fixed-network CA evidence is text-only. No plate supplies a complete Penrose, pentagonal, crystal, or network topology; no missing seed, horizon, boundary, renderer, or trace is reconstructed from pixels. Root and relocated runs are identical, optimized mode fails closed, import is silent, explicit compilation and diff checks pass, mode is `644`, and no candidate remains unresolved.
 
 ## Primary Book Evidence
 
@@ -90,7 +90,7 @@ Every candidate has one monolith and one split reference, giving 72 references, 
 
 ## Independent Semantic Oracle
 
-`36-T24-semantic-oracle.py` defines independent native translation-lattice and fixed-incidence evaluators plus a generic four-axis SimpleProgram evaluator. The generic side uses immutable support/incidence, exact site handles tied to one snapshot, closed `DenseTable | DefaultOverridesTable` RULE data, one same-site assignment per active site, and atomic parallel commit. It contains no callback, family field, catalog switch, microstep encoding, or eager exhaustive-table requirement.
+`36-T24-semantic-oracle.py` defines independent native translation-lattice and fixed-incidence evaluators plus a generic branch-free SimpleProgram evaluator. The generic side uses immutable support/incidence, exact site handles tied to one snapshot, closed `DenseTable | DefaultOverridesTable` RULE data, one same-site assignment per active site, and atomic parallel commit. It contains no callback, family field, catalog switch, microstep encoding, or eager exhaustive-table requirement.
 
 The repaired oracle closes 1,791 native/generic one-event commutations:
 
@@ -135,7 +135,7 @@ The alternating-orientation adversary gives a concrete current-runtime event fai
 
 Four coefficient-access commutations plus four independent physical-incidence commutations prove that derived FCC/BCC basis access and its exact coordinate codec preserve the complete event. The inverse closes 686 coefficient/physical round trips and rejects two off-image points; the Book's degree statements still do not authorize an invented global crystal topology.
 
-Every `LocalRead` is bound to its exact snapshot token, support, relation, and neighborhood schema; forged, stale, foreign, value-changed, type-changed, and port-reordered reads fail before RULE evaluation. Forty-six hostile rejection cases close those boundaries. The semantic digest is `71ad5808fbd6ebeb2be9c0a7e5801e47dbc4507aab31b531b632eaa477f25842`. Root passes; relocated, optimized fail-closed, silent-import, and explicit-compilation gates are being finalized. Every strict T24 profile lands in audit categories 1-3. Structural node creation is the concrete fixed-support nonfit already routed to T29's graph-write UPDATE; T24 adds neither an UPDATE nor an executor.
+Every `LocalRead` is bound to its exact snapshot token, support, relation, and neighborhood schema; forged, stale, foreign, value-changed, type-changed, and port-reordered reads fail before RULE evaluation. Forty-six hostile rejection cases close those boundaries. The semantic digest is `71ad5808fbd6ebeb2be9c0a7e5801e47dbc4507aab31b531b632eaa477f25842`. Root and relocated outputs are identical, optimized mode fails closed, import is silent, explicit compilation and diff checks pass, and mode is `644`. Every strict T24 profile lands in audit categories 1-3. Structural node creation is the concrete fixed-support nonfit already routed to T29's graph-write UPDATE; T24 adds neither an UPDATE nor an executor.
 
 ## First-Principles Fit Standard
 
@@ -220,7 +220,7 @@ The broad semantics already appear in `simple_programs.md`: finite alphabets (`:
 
 | Current area | Fit | Goal 2 obligation |
 |---|---|---|
-| `simple_programs.md` fixed-lattice event | DIRECT for same-site label evolution | generalize addresses/support/access without changing the four-axis event |
+| `simple_programs.md` fixed-lattice event | DIRECT for same-site label evolution | generalize addresses/support/access without changing the shared branch-free event |
 | `src/ca/alphabets.py:59-79,129-143` finite integer/Boolean scalar alphabets | DIRECT | reuse for strict T24 colors |
 | `src/ca/alphabets.py:40-53` scalar-only `Value`/`Alphabet` carrier | SEMANTIC MISMATCH for broader SimplePrograms products/tags, not for strict T24 | add generic lossless finite product/tagged carriers only where another stage's dynamic ALPHABET requires them |
 | `src/ca/loci.py:31-60,257-375` | DIRECT selector/order machinery; SEMANTIC MISMATCH for hard-coded `t/x/y/z` and rank `<=3` at `:19-28,62-103` | generic typed `SiteRef`, discrete dimension, and incidence-occurrence selection |
@@ -294,8 +294,8 @@ No completed stage reopens on the architecture evidence. T21-T23 remain strict f
 - [x] Smallest reusable bases are classified with a concrete-counterexample gate for every claimed new algebra.
 - [x] Current API/runtime/principles audit and Goal 2 handoff are implementation-ready.
 - [ ] Independent hostile review and all oracle/test/Markdown/diff/scope/coverage gates pass.
-- [ ] `0-plan.md`, `evidence-index.md`, `design-ledger.md`, and `architecture-audit.md` agree.
+- [x] `0-plan.md`, `evidence-index.md`, `design-ledger.md`, and `architecture-audit.md` agree on the repaired provisional result.
 
 ## Stage Results
 
-The repaired source audit is closed. The expanded asset universe and strengthened semantic oracle are at green local checkpoints but still need their portability/fail-closed/import/compile gates and a fresh final hostile pass. D130 and global status synchronization therefore remain provisional.
+The repaired 30-query source audit closes 218 lines at `168 pre-Index / 50 actual-Index`, retains 166 at `80 native / 21 relation / 65 control`, excludes 77, guards every dense Index entry independently, and leaves zero unresolved. The dependent radius-four asset universe closes 36 plates at `11 governed + 25 adjacency-only`, 72 references, 36 hashes, and `36 hash-bound / 6 transcribed / 0 pixel-replayed`. The strengthened semantic oracle closes 1,791 non-vacuous native/generic events and 46 hostile rejections, including exact coordinate inverses, physical event commutations, correct hex actions, inclusive-total and canonical-slot network views, storage-order invariance, read provenance, multiplicity, and snapshot parallelism. Source, asset, semantic, architecture, root/relocated/optimized/import/compile/diff/mode, and all 102 repository-test gates pass. D130 and final status remain provisional only until the fresh independent hostile review closes.
