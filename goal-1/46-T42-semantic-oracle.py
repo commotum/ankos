@@ -794,6 +794,122 @@ def tagged_step(program: object, tagged: object) -> TaggedOutcome:
     )
 
 
+@dataclass(frozen=True)
+class PhasedBit:
+    phase: int
+    value: int
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "phase", exact_nonnegative(self.phase, "replicated phase"))
+        value = exact_int(self.value, "replicated bit")
+        if value not in (0, 1):
+            raise ValueError("replicated product value must be binary")
+
+
+@dataclass(frozen=True)
+class ReplicatedPhaseConfiguration:
+    cells: tuple[PhasedBit, ...]
+    schema: str = REPLICATED_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        raw = exact_tuple(self.cells, "replicated product cells")
+        if self.schema != REPLICATED_SCHEMA_VERSION:
+            raise ValueError("unknown replicated product schema")
+        if not raw:
+            raise ValueError("replicated phase word must be nonempty")
+        if any(type(cell) is not PhasedBit for cell in raw):
+            raise TypeError("replicated phase word requires exact PhasedBit cells")
+        phases = {cell.phase for cell in raw}
+        if len(phases) != 1:
+            raise ValueError("replicated phase word must satisfy the uniform-phase invariant")
+
+    @property
+    def phase(self) -> int:
+        return self.cells[0].phase
+
+
+def encode_replicated(configuration: object) -> ReplicatedPhaseConfiguration:
+    if type(configuration) is not DirectConfiguration:
+        raise TypeError("replicated encoding requires an exact direct configuration")
+    return ReplicatedPhaseConfiguration(
+        tuple(PhasedBit(configuration.cursor, value) for value in configuration.word)
+    )
+
+
+def decode_replicated(
+    program: object, replicated: object
+) -> DirectConfiguration:
+    if type(program) is not ScheduledMorphismProgram:
+        raise TypeError("replicated decoding needs an exact program")
+    if type(replicated) is not ReplicatedPhaseConfiguration:
+        raise TypeError("expected an exact replicated phase configuration")
+    return check_configuration(
+        program,
+        DirectConfiguration(
+            replicated.phase,
+            tuple(cell.value for cell in replicated.cells),
+        ),
+    )
+
+
+@dataclass(frozen=True)
+class ReplicatedAdvancedTransition:
+    phase_before: int
+    phase_after: int
+    coefficient: int
+    source_cells: tuple[PhasedBit, ...]
+    emitted_blocks: tuple[tuple[PhasedBit, ...], ...]
+    successor: ReplicatedPhaseConfiguration
+
+
+@dataclass(frozen=True)
+class ReplicatedScheduleCompletion:
+    configuration: ReplicatedPhaseConfiguration
+    reason: str = SCHEDULE_EXHAUSTED
+    successors: tuple[()] = ()
+
+
+ReplicatedOutcome: TypeAlias = (
+    ReplicatedAdvancedTransition | ReplicatedScheduleCompletion
+)
+
+
+def replicated_step(
+    program: object, replicated: object
+) -> ReplicatedOutcome:
+    """Exact T13 lowering over the uniform ``PhaseIndex x Bit`` alphabet.
+
+    Every old occurrence self-reads its own ``(phase, bit)`` pair.  For live
+    phase ``i`` it emits the nonempty block
+    ``((i+1,child) for child in rho_(S[i])(bit))``.  Source-order flattening is
+    therefore literally T13 AllOccurrences/Self/OrderedGenerationConcat; no
+    shared cursor neighborhood or separate live-event control write remains.
+    """
+
+    configuration = decode_replicated(program, replicated)
+    if configuration.cursor == len(program.schedule.coefficients):
+        return ReplicatedScheduleCompletion(replicated)
+    coefficient = program.schedule.coefficients[configuration.cursor]
+    emitted = tuple(
+        tuple(
+            PhasedBit(configuration.cursor + 1, child)
+            for child in rho_block(coefficient, cell.value)
+        )
+        for cell in replicated.cells
+    )
+    successor = ReplicatedPhaseConfiguration(
+        tuple(child for block in emitted for child in block)
+    )
+    return ReplicatedAdvancedTransition(
+        configuration.cursor,
+        configuration.cursor + 1,
+        coefficient,
+        replicated.cells,
+        emitted,
+        successor,
+    )
+
+
 def run_to_completion(
     program: object,
     snapshot: object | None = None,
@@ -954,6 +1070,7 @@ ASSET_SEMANTIC_MANIFEST = (
     ("gray_value", 0),
     ("black_value", 1),
     ("rule_icon_coefficients", (1, 2, 3, 4, 5)),
+    ("smallest_execution_lowering", "uniform_PhaseIndex_times_Bit_word"),
     (
         "fixtures",
         tuple(
@@ -977,6 +1094,8 @@ SOURCE_SEMANTIC_MANIFEST = (
     ("events_for_irrational_m_term_prefix", "m-1"),
     ("rho_0", "0^(a-1)1"),
     ("rho_1", "0^(a-1)10"),
+    ("exact_T13_lowering", "(i,bit)->[(i+1,child) for child in rho_Si(bit)]"),
+    ("replicated_invariant", "nonempty_and_all_phase_indices_equal"),
     ("seed", (0,)),
     ("mechanical_word_index_start", 1),
     ("a0_domain", "signed_integer"),
@@ -986,12 +1105,13 @@ SOURCE_SEMANTIC_MANIFEST = (
 )
 
 
-def audit_page_fixtures() -> tuple[int, int, int, int, int]:
+def audit_page_fixtures() -> tuple[int, int, int, int, int, int]:
     fixture_count = 0
     events = 0
     source_firings = 0
     children = 0
-    commutations = 0
+    compact_commutations = 0
+    replicated_commutations = 0
     for fixture in PAGE_FIXTURES:
         provenance = fixture_provenance(
             fixture.name,
@@ -1017,6 +1137,11 @@ def audit_page_fixtures() -> tuple[int, int, int, int, int]:
             tagged_outcome = tagged_step(program, tagged_before)
             assert type(tagged_outcome) is TaggedAdvancedTransition
             assert decode_tagged(program, tagged_outcome.successor) == event.successor.configuration
+            replicated_before = encode_replicated(configuration)
+            replicated_outcome = replicated_step(program, replicated_before)
+            assert type(replicated_outcome) is ReplicatedAdvancedTransition
+            assert decode_replicated(program, replicated_outcome.successor) == event.successor.configuration
+            assert len(replicated_outcome.emitted_blocks) == len(configuration.word)
             assert event.cursor_after == event.cursor_before + 1
             assert len(event.reads) == len(configuration.word)
             assert len(event.emissions) == len(configuration.word)
@@ -1024,27 +1149,49 @@ def audit_page_fixtures() -> tuple[int, int, int, int, int]:
             assert sum(len(row.child_occurrence_ids) for row in event.lineage) == len(event.successor.configuration.word)
             source_firings += len(configuration.word)
             children += len(event.successor.configuration.word)
-            commutations += 1
+            compact_commutations += 1
+            replicated_commutations += 1
         tagged_completion = tagged_step(program, encode_tagged(configurations[-1]))
         assert type(tagged_completion) is TaggedScheduleCompletion
         assert tagged_completion.successors == ()
+        replicated_completion = replicated_step(
+            program, encode_replicated(configurations[-1])
+        )
+        assert type(replicated_completion) is ReplicatedScheduleCompletion
+        assert replicated_completion.successors == ()
         fixture_count += 1
         events += len(trace)
-    assert (fixture_count, events, source_firings, children, commutations) == (
+    assert (
+        fixture_count,
+        events,
+        source_firings,
+        children,
+        compact_commutations,
+        replicated_commutations,
+    ) == (
         4,
         25,
         301,
         599,
         25,
+        25,
     )
-    return fixture_count, events, source_firings, children, commutations
+    return (
+        fixture_count,
+        events,
+        source_firings,
+        children,
+        compact_commutations,
+        replicated_commutations,
+    )
 
 
-def audit_bounded_direct_tagged_commutation() -> tuple[int, int, int, int]:
+def audit_bounded_direct_tagged_commutation() -> tuple[int, int, int, int, int]:
     programs = 0
     active_cases = 0
     completion_cases = 0
     total_children = 0
+    replicated_cases = 0
     schedules = ((),) + tuple((a,) for a in range(1, 4)) + tuple(
         pair for pair in product(range(1, 4), repeat=2)
     )
@@ -1076,14 +1223,20 @@ def audit_bounded_direct_tagged_commutation() -> tuple[int, int, int, int]:
                 )
                 direct = direct_step(program, snapshot)
                 tagged = tagged_step(program, encode_tagged(configuration))
+                replicated = replicated_step(
+                    program, encode_replicated(configuration)
+                )
                 if cursor == len(schedule_values):
                     assert type(direct) is ScheduleCompletion
                     assert type(tagged) is TaggedScheduleCompletion
+                    assert type(replicated) is ReplicatedScheduleCompletion
                     completion_cases += 1
                 else:
                     assert type(direct) is AdvancedTransition
                     assert type(tagged) is TaggedAdvancedTransition
+                    assert type(replicated) is ReplicatedAdvancedTransition
                     assert decode_tagged(program, tagged.successor) == direct.successor.configuration
+                    assert decode_replicated(program, replicated.successor) == direct.successor.configuration
                     expected = rho_word(schedule_values[cursor], word)
                     assert direct.successor.configuration == DirectConfiguration(cursor + 1, expected)
                     assert tuple(
@@ -1092,11 +1245,13 @@ def audit_bounded_direct_tagged_commutation() -> tuple[int, int, int, int]:
                         for child in emission.output
                     ) == expected
                     active_cases += 1
+                    replicated_cases += 1
                     total_children += len(expected)
     assert programs == 13
     assert active_cases == 630
+    assert replicated_cases == 630
     assert completion_cases == 390
-    return programs, active_cases, completion_cases, total_children
+    return programs, active_cases, completion_cases, replicated_cases, total_children
 
 
 def audit_mechanical_word_alignment() -> tuple[int, int, int, int]:
@@ -1399,7 +1554,7 @@ def audit_no_hidden_surface() -> tuple[int, int, int, int]:
     manifest = dataclass_manifest(dict(globals()))
     violations = forbidden_surface(dict(globals()))
     assert violations == ()
-    assert all("class-4" not in line.lower() for line in ARCHITECTURE_CLASSIFICATION)
+    assert all(not line.lstrip().startswith("4:") for line in ARCHITECTURE_CLASSIFICATION)
     assert any("1-3 only" in line for line in ARCHITECTURE_CLASSIFICATION)
     public_program_fields = dict(manifest)["ScheduledMorphismProgram"]
     assert not (set(public_program_fields) & FORBIDDEN_FIELD_NAMES)
@@ -1451,7 +1606,12 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(ValueError, lambda: coefficient_from_table(((0, (1,)), (1, (0, 1)))))
     rejected += must_raise(ValueError, lambda: macro_table(()))
 
-    snapshot = initial_snapshot(program)
+    snapshot = arbitrary_snapshot(
+        program,
+        DirectConfiguration(0, (0, 1)),
+        generation=0,
+        branch_label="hostile-two-sources",
+    )
     handles = select_all_occurrences(program, snapshot)
     reads = read_self_symbols(program, snapshot, handles)
     coefficient = program.schedule.coefficients[0]
@@ -1466,7 +1626,7 @@ def audit_hostile_validation() -> int:
             program,
             snapshot,
             handles,
-            (replace(emissions[0], source=stale),),
+            (replace(emissions[0], source=stale), emissions[1]),
         ),
     )
     rejected += must_raise(
@@ -1475,7 +1635,7 @@ def audit_hostile_validation() -> int:
             program,
             snapshot,
             handles,
-            (replace(emissions[0], output=(1,)),),
+            (replace(emissions[0], output=(1,)), emissions[1]),
         ),
     )
     other_program = ScheduledMorphismProgram(
@@ -1492,6 +1652,20 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(ValueError, lambda: TaggedConfiguration((CursorToken(0), DataToken(0), CursorToken(1))))
     rejected += must_raise(TypeError, lambda: TaggedConfiguration((CursorToken(0), DataToken(0), 1)))
     rejected += must_raise(ValueError, lambda: decode_tagged(program, TaggedConfiguration((CursorToken(4), DataToken(0)))))
+    rejected += must_raise(ValueError, lambda: ReplicatedPhaseConfiguration(()))
+    rejected += must_raise(TypeError, lambda: ReplicatedPhaseConfiguration((PhasedBit(0, 0), 1)))
+    rejected += must_raise(
+        ValueError,
+        lambda: ReplicatedPhaseConfiguration((PhasedBit(0, 0), PhasedBit(1, 1))),
+    )
+    rejected += must_raise(ValueError, lambda: PhasedBit(0, 2))
+    rejected += must_raise(
+        ValueError,
+        lambda: decode_replicated(
+            program,
+            ReplicatedPhaseConfiguration((PhasedBit(4, 0),)),
+        ),
+    )
 
     empty_schedule_program = program_from_natural_prefix(
         FinalizedNaturalCFPrefix(
@@ -1545,17 +1719,26 @@ def audit_hostile_validation() -> int:
     assert decode_tagged(other_program, stale_cursor_mutant) != decode_tagged(other_program, tagged_after.successor)
     rejected += 1
 
-    completion = direct_step(empty_schedule_program, terminal_snapshot)
+    completion_program = ScheduledMorphismProgram(
+        explicit_execution_schedule(
+            (1,),
+            a0=0,
+            provenance=fixture_provenance("terminal-wrap-mutation", 2),
+        )
+    )
+    first = direct_step(completion_program, initial_snapshot(completion_program))
+    assert type(first) is AdvancedTransition
+    completion = direct_step(completion_program, first.successor)
     assert type(completion) is ScheduleCompletion
     wrapped_mutant = DirectConfiguration(0, completion.configuration.word)
-    assert wrapped_mutant == completion.configuration
+    assert wrapped_mutant != completion.configuration
     assert completion.successors == ()
     rejected += 1
 
     return rejected
 
 
-EXPECTED_DIGEST = "TO_BE_COMPUTED"
+EXPECTED_DIGEST = "017d2557aa15e403d6e91991b98f55124cf91c63273e726af57547427531a47e"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
@@ -1608,12 +1791,13 @@ def main() -> None:
     print("T42 semantic oracle: PASS")
     print(
         f"page162=fixtures:{page[0]}/events:{page[1]}/source_firings:{page[2]}/"
-        f"children:{page[3]}/tagged_commutations:{page[4]}; asset_hash=PASS"
+        f"children:{page[3]}/compact_tagged_commutations:{page[4]}/"
+        f"replicated_product_commutations:{page[5]}; asset_hash=PASS"
     )
     print(
         f"bounded=programs:{bounded[0]}/active_cases:{bounded[1]}/"
-        f"completion_cases:{bounded[2]}/children:{bounded[3]}; "
-        "old_snapshot_ordered_concat=PASS; lineage=PASS"
+        f"completion_cases:{bounded[2]}/replicated_T13_cases:{bounded[3]}/"
+        f"children:{bounded[4]}; old_snapshot_ordered_concat=PASS; lineage=PASS"
     )
     print(
         f"mechanical_alignment=sqrt2:{mechanical[0]}/negative_sqrt2:{mechanical[1]}/"
