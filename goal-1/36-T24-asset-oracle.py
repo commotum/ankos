@@ -9,10 +9,11 @@ different schedule and structural update.  None of these rasters is a native
 serialization of coordinates, incidence, a seed, a rule table, or a trace.
 
 Every candidate raster is hash-bound through its monolith reference, its split
-corpus reference, and its unique physical JPEG.  Human transcriptions are
-limited to metadata stated by nearby retained source text.  In particular, a
-visible tiling or graph never authorizes reconstruction of complete topology,
-and no displayed evolution is replayed from pixels.
+corpus reference, and its unique physical JPEG.  Human transcriptions keep
+metadata stated by nearby retained source text separate from explicitly
+labelled rule-code derivations.  In particular, a visible tiling or graph never
+authorizes reconstruction of complete topology, and no displayed evolution is
+replayed from pixels.
 """
 
 from __future__ import annotations

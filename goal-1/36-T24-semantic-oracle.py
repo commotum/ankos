@@ -38,7 +38,7 @@ source transcriptions.
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from hashlib import sha256
 from itertools import permutations, product
 from math import comb, prod
@@ -207,7 +207,13 @@ class DenseTable:
 
 @dataclass(frozen=True)
 class DefaultOverridesTable:
-    """Complete bounded table encoded by a default and sorted finite overrides."""
+    """Canonical sparse complete table with distinguished zero default.
+
+    The zero-default policy and the ban on redundant overrides give every map
+    in this carrier's declared image one unique structural representation.
+    Other defaults are not alternate spellings: a dense table remains
+    available when zero is not a useful sparse default.
+    """
 
     alphabet_size: int
     row_count: int
@@ -221,6 +227,8 @@ class DefaultOverridesTable:
             raise ValueError("table dimensions are invalid")
         alphabet = FiniteAlphabet(k)
         alphabet.check(self.default, "default output")
+        if self.default != 0:
+            raise ValueError("sparse tables use the canonical zero default")
         raw = require_tuple(self.overrides, "table overrides")
         previous = -1
         for entry in raw:
@@ -228,9 +236,11 @@ class DefaultOverridesTable:
             if len(pair) != 2:
                 raise ValueError("table override must be an index/output pair")
             index = require_int(pair[0], "override index")
-            alphabet.check(pair[1], "override output")
+            output = alphabet.check(pair[1], "override output")
             if index <= previous or index >= rows:
                 raise ValueError("override indices must be unique, sorted, and in range")
+            if output == self.default:
+                raise ValueError("sparse overrides equal to the default are noncanonical")
             previous = index
 
     def at(self, index: int) -> int:
@@ -257,11 +267,20 @@ def validate_closed_table(table: object, alphabet_size: int, row_count: int) -> 
     return table
 
 
-def deterministic_table(alphabet_size: int, row_count: int, salt: int) -> DenseTable:
-    k = require_int(alphabet_size, "alphabet size")
-    rows = require_int(row_count, "row count")
-    shift = require_int(salt, "table salt")
-    return DenseTable(k, rows, tuple((index * 7 + shift) % k for index in range(rows)))
+def extensional_table_identity(table: TableCarrier) -> tuple[int, int, tuple[tuple[int, int], ...]]:
+    """Canonical identity for a complete table, independent of its carrier."""
+
+    if type(table) is DenseTable:
+        nonzero = tuple(
+            (index, output)
+            for index, output in enumerate(table.outputs)
+            if output != 0
+        )
+    elif type(table) is DefaultOverridesTable:
+        nonzero = table.overrides
+    else:
+        raise TypeError("table identity requires a closed immutable carrier")
+    return (table.alphabet_size, table.row_count, nonzero)
 
 
 def binary_table_from_code(code: int, row_count: int) -> DenseTable:
@@ -424,6 +443,10 @@ class RelationNeighborhood:
 
 @dataclass(frozen=True)
 class LocalRead:
+    snapshot_token: SnapshotToken
+    support: FixedSupport
+    relation: IncidenceRelation
+    schema: RelationNeighborhood
     site_index: int
     site_type: str
     center: int | None
@@ -432,6 +455,14 @@ class LocalRead:
     port_labels: tuple[str, ...] | None
 
     def __post_init__(self) -> None:
+        if type(self.snapshot_token) is not SnapshotToken:
+            raise TypeError("read token must be exact SnapshotToken")
+        if type(self.support) is not FixedSupport:
+            raise TypeError("read support must be exact FixedSupport")
+        if type(self.relation) is not IncidenceRelation:
+            raise TypeError("read relation must be exact IncidenceRelation")
+        if type(self.schema) is not RelationNeighborhood:
+            raise TypeError("read schema must be exact RelationNeighborhood")
         index = require_int(self.site_index, "read site index")
         if index < 0:
             raise ValueError("read site index must be nonnegative")
@@ -522,6 +553,56 @@ class SelfCountRule:
 
 
 @dataclass(frozen=True)
+class NeighborCountRule:
+    """Table indexed by the exact sum of neighbor occurrences, without Self."""
+
+    alphabet_size: int
+    cases: tuple[CountCase, ...]
+
+    def __post_init__(self) -> None:
+        k = require_int(self.alphabet_size, "neighbor-count alphabet size")
+        raw = require_tuple(self.cases, "neighbor-count cases")
+        if k < 2 or not raw:
+            raise ValueError("neighbor-count rule schema is invalid")
+        seen: set[str] = set()
+        for case in raw:
+            if type(case) is not CountCase:
+                raise TypeError("neighbor-count cases must be exact CountCase values")
+            if case.site_type in seen:
+                raise ValueError("neighbor-count site types must be unique")
+            seen.add(case.site_type)
+            rows = case.degree * (k - 1) + 1
+            validate_closed_table(case.table, k, rows)
+
+    def case_for(self, site_type: str) -> CountCase:
+        matches = tuple(case for case in self.cases if case.site_type == site_type)
+        if len(matches) != 1:
+            raise ValueError("neighbor-count rule has no unique case for the site type")
+        return matches[0]
+
+    def validate(self, alphabet: FiniteAlphabet, support: FixedSupport, read: RelationNeighborhood) -> None:
+        if alphabet.size != self.alphabet_size:
+            raise ValueError("neighbor-count rule and configuration alphabets differ")
+        if read.include_self:
+            raise ValueError("NeighborCountRule forbids an implicit Self read")
+        relation = support.relation(read.relation_name)
+        for site_index, site_type in enumerate(support.site_types):
+            case = self.case_for(site_type)
+            if len(relation.rows[site_index]) != case.degree:
+                raise ValueError("neighbor-count degree does not match typed incidence")
+        if set(support.site_types) != {case.site_type for case in self.cases}:
+            raise ValueError("neighbor-count cases must exactly cover support site types")
+
+    def evaluate(self, read: LocalRead) -> int:
+        if read.center is not None:
+            raise ValueError("neighbor-count rule received an implicit Self value")
+        case = self.case_for(read.site_type)
+        if len(read.neighbors) != case.degree:
+            raise ValueError("neighbor-count read has the wrong degree")
+        return case.table.at(sum(read.neighbors))
+
+
+@dataclass(frozen=True)
 class PositionalCase:
     site_type: str
     slots: tuple[str, ...]
@@ -602,7 +683,7 @@ class PositionalRule:
         return case.table.at(context_index(canonical, self.alphabet_size))
 
 
-Rule = SelfCountRule | PositionalRule
+Rule = SelfCountRule | NeighborCountRule | PositionalRule
 
 
 @dataclass(frozen=True)
@@ -619,7 +700,7 @@ class SimpleProgram:
             raise TypeError("T24 strict programs use AllSites")
         if type(self.neighborhood) is not RelationNeighborhood:
             raise TypeError("program neighborhood must be RelationNeighborhood")
-        if type(self.rule) not in (SelfCountRule, PositionalRule):
+        if type(self.rule) not in (SelfCountRule, NeighborCountRule, PositionalRule):
             raise TypeError("program rule must be a closed typed rule")
 
 
@@ -686,6 +767,10 @@ def read_neighborhood(
         labels = None if relation.port_labels is None else relation.port_labels[index]
         reads.append(
             LocalRead(
+                old.snapshot_token,
+                old.support,
+                relation,
+                neighborhood,
                 index,
                 old.support.site_types[index],
                 old.cells[index] if neighborhood.include_self else None,
@@ -695,6 +780,51 @@ def read_neighborhood(
             )
         )
     return tuple(reads)
+
+
+def validate_local_read(
+    old: Configuration,
+    program: SimpleProgram,
+    handle: SiteHandle,
+    read: LocalRead,
+) -> None:
+    """Authenticate a read as the exact view derived from this old snapshot."""
+
+    if type(read) is not LocalRead:
+        raise TypeError("reads must be exact LocalRead values")
+    relation = old.support.relation(program.neighborhood.relation_name)
+    if read.snapshot_token is not old.snapshot_token:
+        raise ValueError("read is foreign or stale")
+    if read.support is not old.support:
+        raise ValueError("read came from a foreign support")
+    if read.relation is not relation:
+        raise ValueError("read came from a foreign relation")
+    if read.schema is not program.neighborhood:
+        raise ValueError("read came from a foreign or reordered schema")
+    index = handle.site_index
+    if read.site_index != index:
+        raise ValueError("read order does not match active order")
+    expected_labels = (
+        None
+        if relation.port_labels is None
+        else relation.port_labels[index]
+    )
+    expected = (
+        old.support.site_types[index],
+        old.cells[index] if program.neighborhood.include_self else None,
+        tuple(old.cells[target] for target in relation.rows[index]),
+        relation.ordered,
+        expected_labels,
+    )
+    actual = (
+        read.site_type,
+        read.center,
+        read.neighbors,
+        read.ordered,
+        read.port_labels,
+    )
+    if actual != expected:
+        raise ValueError("read values or typed schema do not match the old snapshot")
 
 
 def make_assignments(
@@ -709,8 +839,7 @@ def make_assignments(
         raise ValueError("read count does not match active count")
     out: list[SiteAssignment] = []
     for handle, read in zip(active, reads, strict=True):
-        if read.site_index != handle.site_index:
-            raise ValueError("read order does not match active order")
+        validate_local_read(old, program, handle, read)
         value = program.rule.evaluate(read)
         program.alphabet.check(value, "rule output")
         out.append(SiteAssignment(handle, handle.site_index, value))
@@ -820,6 +949,139 @@ def self_count_case_count(degree: int, alphabet_size: int) -> int:
     if s < 0 or k < 2:
         raise ValueError("count-profile dimensions are invalid")
     return k * (s * (k - 1) + 1)
+
+
+def neighbor_count_case_count(degree: int, alphabet_size: int) -> int:
+    s = require_int(degree, "neighbor degree")
+    k = require_int(alphabet_size, "alphabet size")
+    if s < 0 or k < 2:
+        raise ValueError("neighbor-count dimensions are invalid")
+    return s * (k - 1) + 1
+
+
+def self_sum_sensitive_table(alphabet_size: int, degree: int, salt: int) -> DenseTable:
+    """Closed Self+sum table whose output changes for every adjacent sum."""
+
+    k = require_int(alphabet_size, "alphabet size")
+    s = require_int(degree, "neighbor degree")
+    shift = require_int(salt, "table salt")
+    rows = self_count_case_count(s, k)
+    table = DenseTable(
+        k,
+        rows,
+        tuple(((index % k) + (index // k) + shift) % k for index in range(rows)),
+    )
+    for center in range(k):
+        for neighbor_sum in range(s * (k - 1)):
+            assert table.at(center + k * neighbor_sum) != table.at(
+                center + k * (neighbor_sum + 1)
+            )
+    return table
+
+
+def neighbor_sum_sensitive_table(alphabet_size: int, degree: int, salt: int) -> DenseTable:
+    """Closed neighbor-only exact-sum table sensitive to every adjacent sum."""
+
+    k = require_int(alphabet_size, "alphabet size")
+    s = require_int(degree, "neighbor degree")
+    shift = require_int(salt, "table salt")
+    rows = neighbor_count_case_count(s, k)
+    table = DenseTable(k, rows, tuple((neighbor_sum + shift) % k for neighbor_sum in range(rows)))
+    for neighbor_sum in range(rows - 1):
+        assert table.at(neighbor_sum) != table.at(neighbor_sum + 1)
+    return table
+
+
+def slot_sensitive_table(alphabet_size: int, slots: tuple[str, ...], salt: int) -> DenseTable:
+    """Complete positional map with witnessed dependence on every named slot."""
+
+    k = require_int(alphabet_size, "alphabet size")
+    schema = require_tuple(slots, "slot-sensitive schema")
+    shift = require_int(salt, "table salt")
+    if k < 2 or not schema:
+        raise ValueError("slot-sensitive table dimensions are invalid")
+    for slot in schema:
+        require_str(slot, "slot-sensitive slot")
+    if len(set(schema)) != len(schema):
+        raise ValueError("slot-sensitive schema must be unique")
+    outputs: list[int] = []
+    for context in product(range(k), repeat=len(schema)):
+        if k == 2:
+            asymmetric = context[0] * (1 - context[1]) if len(schema) >= 2 else 0
+            output = (sum(context) + asymmetric + shift) % 2
+        else:
+            output = (
+                sum((1 + position % (k - 1)) * value for position, value in enumerate(context))
+                + shift
+            ) % k
+        outputs.append(output)
+    return DenseTable(k, k ** len(schema), tuple(outputs))
+
+
+def assert_slot_sensitivity(table: TableCarrier, slots: tuple[str, ...]) -> tuple[int, int]:
+    """Return per-slot and asymmetric-order witness counts."""
+
+    schema = require_tuple(slots, "slot-sensitivity schema")
+    k = table.alphabet_size
+    validate_closed_table(table, k, k ** len(schema))
+    contexts = tuple(product(range(k), repeat=len(schema)))
+    sensitive = 0
+    for slot_index in range(len(schema)):
+        witnessed = False
+        for context in contexts:
+            if context[slot_index] == k - 1:
+                continue
+            changed = list(context)
+            changed[slot_index] += 1
+            if table.at(context_index(context, k)) != table.at(context_index(tuple(changed), k)):
+                witnessed = True
+                break
+        assert witnessed
+        sensitive += 1
+    asymmetric = 0
+    if len(schema) >= 2:
+        for context in contexts:
+            swapped = (context[1], context[0], *context[2:])
+            if table.at(context_index(context, k)) != table.at(context_index(swapped, k)):
+                asymmetric = 1
+                break
+        assert asymmetric == 1
+    return sensitive, asymmetric
+
+
+def sparse_slot_witness_table(slots: tuple[str, ...]) -> DefaultOverridesTable:
+    """Sparse binary table with explicit dependence on all slots and order."""
+
+    schema = require_tuple(slots, "sparse slot schema")
+    if len(schema) < 3:
+        raise ValueError("sparse slot witness requires at least three slots")
+    width = len(schema)
+    override_indices: list[int] = []
+    for slot_index in range(width):
+        if slot_index == 1:
+            continue
+        context = tuple(int(index == slot_index) for index in range(width))
+        override_indices.append(context_index(context, 2))
+    table = DefaultOverridesTable(
+        2,
+        2**width,
+        0,
+        tuple((index, 1) for index in sorted(override_indices)),
+    )
+    zero = (0,) * width
+    assert table.at(context_index(zero, 2)) == 0
+    for slot_index in range(width):
+        if slot_index == 1:
+            baseline = tuple(int(index == 2) for index in range(width))
+            changed = tuple(int(index in (1, 2)) for index in range(width))
+        else:
+            baseline = zero
+            changed = tuple(int(index == slot_index) for index in range(width))
+        assert table.at(context_index(baseline, 2)) != table.at(context_index(changed, 2))
+    first = tuple(int(index == 0) for index in range(width))
+    second = tuple(int(index == 1) for index in range(width))
+    assert table.at(context_index(first, 2)) != table.at(context_index(second, 2))
+    return table
 
 
 def bareiss_determinant(matrix: tuple[tuple[int, ...], ...]) -> int:
@@ -1177,18 +1439,52 @@ def native_count_step(old: NativeIncidenceState, cases: tuple[CountCase, ...]) -
     )
 
 
+def native_neighbor_count_step(
+    old: NativeIncidenceState,
+    cases: tuple[CountCase, ...],
+) -> NativeIncidenceState:
+    case_by_type = {case.site_type: case for case in cases}
+    if set(case_by_type) != set(old.site_types):
+        raise ValueError("native neighbor-count cases do not cover site types")
+    next_cells: list[int] = []
+    for site_type, row in zip(old.site_types, old.rows, strict=True):
+        case = case_by_type[site_type]
+        if len(row) != case.degree:
+            raise ValueError("native neighbor-count degree mismatch")
+        neighbor_sum = sum(old.cells[target] for target in row)
+        next_cells.append(case.table.at(neighbor_sum))
+    return NativeIncidenceState(
+        old.keys,
+        old.site_types,
+        old.rows,
+        old.ordered,
+        old.alphabet_size,
+        tuple(next_cells),
+        old.generation + 1,
+        old.port_labels,
+    )
+
+
 def native_positional_step(old: NativeIncidenceState, cases: tuple[PositionalCase, ...]) -> NativeIncidenceState:
-    if not old.ordered:
+    if not old.ordered or old.port_labels is None:
         raise ValueError("native positional rule requires labelled/ordered incidence")
     case_by_type = {case.site_type: case for case in cases}
     if set(case_by_type) != set(old.site_types):
         raise ValueError("native positional cases do not cover site types")
     next_cells: list[int] = []
-    for site_type, row in zip(old.site_types, old.rows, strict=True):
+    for site_type, row, labels in zip(
+        old.site_types,
+        old.rows,
+        old.port_labels,
+        strict=True,
+    ):
         case = case_by_type[site_type]
         if len(row) != case.width:
             raise ValueError("native positional width mismatch")
-        context = tuple(old.cells[target] for target in row)
+        if len(labels) != case.width or set(labels) != set(case.slots):
+            raise ValueError("native positional labels do not match the slot schema")
+        by_slot = dict(zip(labels, (old.cells[target] for target in row), strict=True))
+        context = tuple(by_slot[slot] for slot in case.slots)
         next_cells.append(case.table.at(context_index(context, old.alphabet_size)))
     return NativeIncidenceState(
         old.keys,
@@ -1212,6 +1508,19 @@ def typed_count_program(
         AllSites(),
         RelationNeighborhood(relation, True),
         SelfCountRule(alphabet_size, cases),
+    )
+
+
+def typed_neighbor_count_program(
+    alphabet_size: int,
+    cases: tuple[CountCase, ...],
+    relation: str = "local",
+) -> SimpleProgram:
+    return SimpleProgram(
+        FiniteAlphabet(alphabet_size),
+        AllSites(),
+        RelationNeighborhood(relation, False),
+        NeighborCountRule(alphabet_size, cases),
     )
 
 
@@ -1271,6 +1580,92 @@ class HexDistortionCodec:
 
 
 HEX_CODEC = HexDistortionCodec()
+
+
+# Literal physical-center displacements corresponding, in order, to
+# ``HEX_SQUARE_OFFSETS``.  The physical evaluator below consumes these values
+# directly; it does not ask the coefficient evaluator or codec for neighbors.
+HEX_CENTER_DISPLACEMENTS: tuple[Offset, ...] = (
+    (-1, -1),
+    (-1, 1),
+    (0, -2),
+    (0, 2),
+    (1, -1),
+    (1, 1),
+)
+
+
+@dataclass(frozen=True)
+class NativeHexCenterState:
+    coefficient_shape: tuple[int, int]
+    centers: tuple[Coord, ...]
+    alphabet_size: int
+    cells: Cells
+    generation: int = 0
+
+    def __post_init__(self) -> None:
+        rows, columns = checked_shape(self.coefficient_shape)
+        expected = tuple(
+            (row, 2 * column - row)
+            for row in range(rows)
+            for column in range(columns)
+        )
+        if require_tuple(self.centers, "hex physical centers") != expected:
+            raise ValueError("hex physical centers are not the canonical quotient image")
+        alphabet = FiniteAlphabet(self.alphabet_size)
+        raw = require_tuple(self.cells, "hex physical cells")
+        if len(raw) != len(expected):
+            raise ValueError("hex physical cells do not match the center quotient")
+        for value in raw:
+            alphabet.check(value)
+        generation = require_int(self.generation, "hex physical generation")
+        if generation < 0:
+            raise ValueError("hex physical generation must be nonnegative")
+
+    def resolve_center(self, raw_center: object) -> Coord:
+        """Reduce by physical period vectors ``(R,-R)`` and ``(0,2C)``."""
+
+        row, vertical = checked_coord(raw_center, 2, "hex physical center")
+        rows, columns = self.coefficient_shape
+        reduced_row = row % rows
+        row_periods = (row - reduced_row) // rows
+        adjusted_vertical = vertical + row_periods * rows
+        numerator = adjusted_vertical + reduced_row
+        if numerator % 2:
+            raise ValueError("hex physical access left the staggered center image")
+        column = (numerator // 2) % columns
+        return (reduced_row, 2 * column - reduced_row)
+
+    def value_at(self, raw_center: object) -> int:
+        center = self.resolve_center(raw_center)
+        index = {key: position for position, key in enumerate(self.centers)}[center]
+        return self.cells[index]
+
+
+def encode_hex_centers(old: NativeTranslationState) -> NativeHexCenterState:
+    if len(old.shape) != 2:
+        raise ValueError("hex center encoding requires a two-dimensional coefficient state")
+    centers = tuple(HEX_CODEC.encode(coord) for coord in all_coords(old.shape))
+    return NativeHexCenterState(old.shape, centers, old.alphabet_size, old.cells, old.generation)
+
+
+def native_hex_center_count_step(
+    old: NativeHexCenterState,
+    table: TableCarrier,
+) -> NativeHexCenterState:
+    validate_closed_table(table, old.alphabet_size, self_count_case_count(6, old.alphabet_size))
+    next_cells: list[int] = []
+    for center in old.centers:
+        neighbor_sum = sum(old.value_at(add_coord(center, delta)) for delta in HEX_CENTER_DISPLACEMENTS)
+        index = old.value_at(center) + old.alphabet_size * neighbor_sum
+        next_cells.append(table.at(index))
+    return NativeHexCenterState(
+        old.coefficient_shape,
+        old.centers,
+        old.alphabet_size,
+        tuple(next_cells),
+        old.generation + 1,
+    )
 
 
 def hex_context_rotations(context: tuple[int, ...]) -> tuple[tuple[int, ...], ...]:

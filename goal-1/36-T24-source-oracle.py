@@ -55,7 +55,8 @@ EXPECTED_TAXONOMY_SHA256 = "4c30fe079b2fb8f69e4c8c0dde3d59065227d4224cbe4b7693a1
 # expose broad tessellation/honeycomb, slice, and embedding vocabulary so views
 # and lexical collisions remain visible. Q25 follows the fixed-network Cayley
 # cross-reference, and Q26 closes the random-Boolean-network variant/history
-# and its dense actual-Index routes.
+# and its dense actual-Index routes. Q27 independently guards the Bravais and
+# Brillouin-zone actual-Index route used by the basis-coordinate handoff.
 QUERIES = {
     "Q00": r"\bhigher[- ]dimensional cellular automata\b",
     "Q01": (
@@ -218,6 +219,10 @@ QUERIES = {
         r"\bdifferent choices of generators can yield Cayley graphs with different local subgraphs\b"
     ),
     "Q26": r"\bBoolean networks?\b",
+    "Q27": (
+        r"\bBravais lattices, 929\b|"
+        r"\bBrillouin zones, 987 and CA lattices, 929\b"
+    ),
 }
 
 EXPECTED_QUERY = {
@@ -248,6 +253,7 @@ EXPECTED_QUERY = {
     "Q24": (10, 8, 2, "b203d92c67310e4e6fb75d9d19447a01518100285758a908fdd922f894c69761"),
     "Q25": (3, 3, 0, "6c5b017ba141cb4fbe65c6f8ae39abd8faefe68e8da18a60a4660b4843737b4c"),
     "Q26": (13, 3, 10, "2ab226cf54f54d1911a100c3e80f22d8912587e541ad5e723d6d28b1cb68b0e5"),
+    "Q27": (0, 0, 0, ""),
 }
 
 
@@ -342,7 +348,7 @@ GOVERNED_IMAGE_LINES = (
 # The actual Index supplies search routes, not construction semantics.
 INDEX_CLASS = {
     "t24_geometry_and_topology_routes": line_set(
-        "20828,20836,20910,20967,21054,21068,21102,21170,21181,"
+        "20828,20836,20910,20940,20967,21054,21068,21102,21170,21181,"
         "21243,21763,21934,22132,22166,22352,22416,22438"
     ),
     "historical_ca_alias_routes": line_set("20970,21253,21362,22150,22390"),
@@ -864,6 +870,9 @@ def main() -> int:
         and "any network can be laid out in 3d space" in at(16717).lower()
         and "whitney embedding theorem" in at(16717).lower()
         and "embeddings of networks" in at(21132).lower()
+        and "bravais lattices, 929" in at(20940).lower()
+        and "brillouin zones, 987 and ca lattices, 929" in at(20940).lower()
+        and 20940 in INDEX_CLASS["t24_geometry_and_topology_routes"]
         and "honeycomb moray" in at(15944).lower()
         and ca_slice_controls <= CONTROL_EVIDENCE
         and embedding_controls <= CONTROL_EVIDENCE
