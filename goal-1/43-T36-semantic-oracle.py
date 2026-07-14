@@ -675,7 +675,13 @@ class TransitionEvent:
             raise TypeError("event witness must be exact ReversalWitness")
         old_value, old_width = numeric_parts(self.before)
         new_value, new_width = numeric_parts(self.after)
-        if (self.witness.old_value, self.witness.old_width) != (old_value, old_width):
+        expected_old_width = old_width
+        if old_width is None and self.witness.old_width is not None:
+            expected_old_width = self.witness.old_width
+        if (self.witness.old_value, self.witness.old_width) != (
+            old_value,
+            expected_old_width,
+        ):
             raise ValueError("event witness does not describe the before value")
         expected_new_width = new_width
         if new_width is None and self.witness.old_width is not None:
@@ -932,16 +938,23 @@ def audit_source_traces() -> tuple[int, int, int, int, int, int]:
     assert verify_trace_provenance(program, seed512)
 
     growth_checks = 0
-    for values in (values16, values512):
+    direct_source_replays = 0
+    for trace, values in ((seed16, values16), (seed512, values512)):
         assert all(right > left for left, right in zip(values, values[1:]))
         for index in range(len(values) - 2):
             assert values[index + 2].bit_length() >= values[index].bit_length() + 1
             growth_checks += 1
+        for event in trace.events:
+            direct = evaluate_word_rule(program, event.before)
+            assert direct.assignment == event.assignment
+            assert direct.witness == event.witness
+            direct_source_replays += 1
+    assert direct_source_replays == len(seed16.events) + len(seed512.events)
     return (
         len(seed16.events),
         len(seed512.events),
         len(seed16.states) + len(seed512.states),
-        len(seed16.events) + len(seed512.events),
+        direct_source_replays,
         growth_checks,
         values512[-1].bit_length(),
     )
@@ -1149,3 +1162,445 @@ def audit_arbitrary_precision() -> tuple[int, int, int, int]:
         checks += 1
         word_commutations += 1
     return checks, max_bits, max_decimal_digits, word_commutations
+
+
+def audit_trace_shape_and_outcomes() -> tuple[int, int, int, int, int]:
+    profiles = (
+        (canonical_program(2), ScalarConfiguration(POSITIVE, 16)),
+        (
+            canonical_program(10, NONNEGATIVE),
+            ScalarConfiguration(NONNEGATIVE, 0),
+        ),
+        (fixed_program(2, 4), ScalarConfiguration(NONNEGATIVE, 15)),
+        (
+            grow_program(2),
+            ScalarConfiguration(WIDTH_TAGGED, WidthTaggedInteger(0, 4)),
+        ),
+    )
+    horizon_checks = 0
+    total_events = 0
+    total_states = 0
+    changed_false = 0
+    event_replays = 0
+    for program, seed in profiles:
+        for horizon in range(0, 65):
+            trace = run(program, seed, horizon)
+            assert len(trace.events) == horizon
+            assert len(trace.states) == horizon + 1
+            assert verify_trace_provenance(program, trace)
+            horizon_checks += 1
+            total_events += len(trace.events)
+            total_states += len(trace.states)
+            event_replays += len(trace.events)
+            changed_false += sum(event.before == event.after for event in trace.events)
+    assert changed_false > 0
+    return horizon_checks, total_events, total_states, changed_false, event_replays
+
+
+def audit_structural_identity_and_replay() -> tuple[int, int, int, int, int, int]:
+    programs = (
+        canonical_program(2, POSITIVE),
+        canonical_program(2, NONNEGATIVE),
+        canonical_program(10, POSITIVE),
+        fixed_program(2, 4),
+        fixed_program(2, 5),
+        grow_program(2),
+        grow_program(3),
+    )
+    keys = {structural_program_key(program) for program in programs}
+    ids = {structural_program_id(program) for program in programs}
+    assert len(keys) == len(programs)
+    assert len(ids) == len(programs)
+
+    source = canonical_program(2, POSITIVE)
+    event = advance(source, ScalarConfiguration(POSITIVE, 16)).event
+    assert verify_transition_event(source, event)
+    cross_program_rejections = 0
+    for other in (
+        canonical_program(10, POSITIVE),
+        canonical_program(2, NONNEGATIVE),
+    ):
+        assert not verify_transition_event(other, event)
+        cross_program_rejections += 1
+    fixed_event = advance(fixed_program(2, 4), ScalarConfiguration(NONNEGATIVE, 2)).event
+    assert not verify_transition_event(fixed_program(2, 5), fixed_event)
+    cross_program_rejections += 1
+
+    zero_left = run(
+        canonical_program(2, NONNEGATIVE),
+        ScalarConfiguration(NONNEGATIVE, 0),
+        0,
+    )
+    zero_right = run(
+        canonical_program(10, NONNEGATIVE),
+        ScalarConfiguration(NONNEGATIVE, 0),
+        0,
+    )
+    assert zero_left.states == zero_right.states
+    assert zero_left.events == zero_right.events == ()
+    assert zero_left.provenance != zero_right.provenance
+    assert not verify_trace_provenance(canonical_program(10, NONNEGATIVE), zero_left)
+    assert not verify_trace_provenance(canonical_program(2, NONNEGATIVE), zero_right)
+    zero_horizon_rejections = 2
+
+    key_roundtrips = 0
+    for program in programs:
+        key = structural_program_key(program)
+        assert checked_program_key(key) == key
+        assert program_provenance(program).key == key
+        key_roundtrips += 1
+    return (
+        len(keys),
+        len(ids),
+        key_roundtrips,
+        cross_program_rejections,
+        zero_horizon_rejections,
+        len(programs),
+    )
+
+
+def audit_no_new_execution_surface() -> tuple[int, int, int, int, int, int, int, int]:
+    state_fields = tuple(field.name for field in fields(ScalarConfiguration))
+    assignment_fields = tuple(field.name for field in fields(ScalarAssignment))
+    program_fields = tuple(field.name for field in fields(ReversalAddProgram))
+    tagged_value_fields = tuple(field.name for field in fields(WidthTaggedInteger))
+    step_result_fields = tuple(field.name for field in fields(StepResult))
+    assert state_fields == ("carrier", "value")
+    assert assignment_fields == ("locus", "value")
+    assert program_fields == ("carrier", "base", "profile")
+    assert tagged_value_fields == ("value", "width")
+    assert step_result_fields == ("successors", "outcome", "event")
+    forbidden = {
+        "history",
+        "time",
+        "control",
+        "executor",
+        "callback",
+        "schedule",
+        "frontier",
+        "neighborhood",
+        "update",
+        "digits",
+    }
+    assert not (forbidden & set(state_fields))
+    assert not (forbidden & set(assignment_fields))
+    assert not (forbidden & set(program_fields))
+    seed = ScalarConfiguration(POSITIVE, 16)
+    assert select_unique_scalar(seed) == (SCALAR_LOCUS,)
+    assert read_self(seed, SCALAR_LOCUS) == 16
+    frontier_fields = 0
+    neighborhood_fields = 0
+    update_fields = 0
+    executor_fields = 0
+    return (
+        len(state_fields),
+        len(assignment_fields),
+        frontier_fields,
+        neighborhood_fields,
+        update_fields,
+        executor_fields,
+        len(step_result_fields),
+        len(tagged_value_fields),
+    )
+
+
+def audit_hostile_validation() -> int:
+    rejected = 0
+    rejected += must_raise(TypeError, lambda: checked_base(True))
+    rejected += must_raise(TypeError, lambda: checked_base(2.0))
+    rejected += must_raise(TypeError, lambda: checked_base("2"))
+    rejected += must_raise(ValueError, lambda: checked_base(1))
+    rejected += must_raise(ValueError, lambda: checked_base(0))
+    rejected += must_raise(TypeError, lambda: checked_width(True))
+    rejected += must_raise(TypeError, lambda: checked_width(4.0))
+    rejected += must_raise(ValueError, lambda: checked_width(0))
+    rejected += must_raise(ValueError, lambda: checked_width(-1))
+    rejected += must_raise(TypeError, lambda: checked_horizon(True))
+    rejected += must_raise(TypeError, lambda: checked_horizon(1.0))
+    rejected += must_raise(ValueError, lambda: checked_horizon(-1))
+
+    rejected += must_raise(TypeError, lambda: ScalarConfiguration(POSITIVE, True))
+    rejected += must_raise(TypeError, lambda: ScalarConfiguration(POSITIVE, 1.0))
+    rejected += must_raise(TypeError, lambda: ScalarConfiguration(POSITIVE, "1"))
+    rejected += must_raise(ValueError, lambda: ScalarConfiguration(POSITIVE, 0))
+    rejected += must_raise(ValueError, lambda: ScalarConfiguration(POSITIVE, -1))
+    rejected += must_raise(ValueError, lambda: ScalarConfiguration(NONNEGATIVE, -1))
+    rejected += must_raise(TypeError, lambda: ScalarConfiguration(WIDTH_TAGGED, 1))
+    rejected += must_raise(ValueError, lambda: ScalarConfiguration("integer", 1))
+    rejected += must_raise(TypeError, lambda: WidthTaggedInteger(True, 2))
+    rejected += must_raise(TypeError, lambda: WidthTaggedInteger(1, False))
+    rejected += must_raise(ValueError, lambda: WidthTaggedInteger(-1, 2))
+    rejected += must_raise(ValueError, lambda: WidthTaggedInteger(1, 0))
+
+    rejected += must_raise(
+        TypeError,
+        lambda: ReversalAddProgram(POSITIVE, 2, lambda digits: tuple(reversed(digits))),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ReversalAddProgram(WIDTH_TAGGED, 2, CanonicalDigits()),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ReversalAddProgram(POSITIVE, 2, FixedWidthDropCarry(4)),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ReversalAddProgram(NONNEGATIVE, 2, GrowWidth()),
+    )
+    rejected += must_raise(TypeError, lambda: ReversalAddProgram(POSITIVE, True, CanonicalDigits()))
+
+    rejected += must_raise(TypeError, lambda: encode_canonical(True, 2))
+    rejected += must_raise(ValueError, lambda: encode_canonical(-1, 2))
+    rejected += must_raise(ValueError, lambda: encode_fixed(16, 2, 4))
+    rejected += must_raise(TypeError, lambda: encode_fixed(1, 2, True))
+    rejected += must_raise(TypeError, lambda: decode_digits([1, 0], 2))
+    rejected += must_raise(ValueError, lambda: decode_digits((), 2))
+    rejected += must_raise(TypeError, lambda: decode_digits((1, True), 2))
+    rejected += must_raise(ValueError, lambda: decode_digits((1, 2), 2))
+    rejected += must_raise(ValueError, lambda: decode_digits((1, -1), 2))
+    rejected += must_raise(ValueError, lambda: add_digit_words_full((1,), (1, 0), 2))
+
+    rejected += must_raise(ValueError, lambda: ScalarAssignment("head", 1))
+    rejected += must_raise(TypeError, lambda: ScalarAssignment(SCALAR_LOCUS, True))
+    rejected += must_raise(
+        ValueError,
+        lambda: validate_program_configuration(
+            fixed_program(2, 4),
+            ScalarConfiguration(NONNEGATIVE, 16),
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: validate_program_configuration(
+            grow_program(2),
+            ScalarConfiguration(WIDTH_TAGGED, WidthTaggedInteger(16, 4)),
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: validate_program_configuration(
+            canonical_program(2, POSITIVE),
+            ScalarConfiguration(NONNEGATIVE, 1),
+        ),
+    )
+    rejected += must_raise(TypeError, lambda: evaluate_closed_rule(lambda n: n, ScalarConfiguration(POSITIVE, 1)))
+    rejected += must_raise(TypeError, lambda: advance(canonical_program(), 1))
+    rejected += must_raise(TypeError, lambda: run(canonical_program(), 1, 3))
+
+    valid_program = canonical_program(2, POSITIVE)
+    valid_result = advance(valid_program, ScalarConfiguration(POSITIVE, 16))
+    valid_event = valid_result.event
+    rejected += must_raise(
+        ValueError,
+        lambda: TransitionEvent(
+            valid_event.before,
+            17,
+            valid_event.assignment,
+            valid_event.after,
+            valid_event.witness,
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: TransitionEvent(
+            valid_event.before,
+            valid_event.read_value,
+            ScalarAssignment(SCALAR_LOCUS, 18),
+            valid_event.after,
+            valid_event.witness,
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: StepResult(
+            valid_result.successors,
+            Advanced(False),
+            valid_event,
+        ),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: StepResult((), Advanced(True), valid_event),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: ScalarTrace(
+            program_provenance(valid_program),
+            2,
+            (valid_event.before, valid_event.after),
+            (valid_event,),
+        ),
+    )
+
+    witness = valid_event.witness
+    forged_digits = replace(witness, digits=(1, 1, 1, 1, 1), reversed_digits=(1, 1, 1, 1, 1))
+    forged_event = TransitionEvent(
+        valid_event.before,
+        valid_event.read_value,
+        valid_event.assignment,
+        valid_event.after,
+        forged_digits,
+    )
+    assert not verify_transition_event(valid_program, forged_event)
+    rejected += 1
+    forged_addend = replace(
+        witness,
+        addend=witness.addend + 1,
+        untruncated_sum=witness.untruncated_sum + 1,
+    )
+    forged_event = TransitionEvent(
+        valid_event.before,
+        valid_event.read_value,
+        valid_event.assignment,
+        valid_event.after,
+        forged_addend,
+    )
+    assert not verify_transition_event(valid_program, forged_event)
+    rejected += 1
+
+    other_program = canonical_program(10, POSITIVE)
+    other_provenance = program_provenance(other_program)
+    forged_provenance = replace(witness, provenance=other_provenance)
+    forged_event = TransitionEvent(
+        valid_event.before,
+        valid_event.read_value,
+        valid_event.assignment,
+        valid_event.after,
+        forged_provenance,
+    )
+    assert not verify_transition_event(valid_program, forged_event)
+    rejected += 1
+
+    key = structural_program_key(valid_program)
+    rejected += must_raise(
+        ValueError,
+        lambda: ProgramProvenance(key, "0" * 64),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: ProgramProvenance([*key], structural_program_id(valid_program)),
+    )
+    rejected += must_raise(
+        TypeError,
+        lambda: checked_program_key(("ReversalAddProgram/v1", POSITIVE, True, ("CanonicalDigits/v1",))),
+    )
+    rejected += must_raise(
+        ValueError,
+        lambda: checked_program_key(("ReversalAddProgram/v1", POSITIVE, 2, ("Callback/v1",))),
+    )
+
+    fixed = fixed_program(2, 4)
+    fixed_event = advance(fixed, ScalarConfiguration(NONNEGATIVE, 15)).event
+    forged_carry_witness = replace(fixed_event.witness, dropped_carry=0)
+    forged_carry_event = TransitionEvent(
+        fixed_event.before,
+        fixed_event.read_value,
+        fixed_event.assignment,
+        fixed_event.after,
+        forged_carry_witness,
+    )
+    assert not verify_transition_event(fixed, forged_carry_event)
+    rejected += 1
+
+    grow = grow_program(2)
+    grow_event = advance(
+        grow,
+        ScalarConfiguration(WIDTH_TAGGED, WidthTaggedInteger(0, 4)),
+    ).event
+    forged_width_witness = replace(grow_event.witness, new_width=6)
+    rejected += must_raise(
+        ValueError,
+        lambda: TransitionEvent(
+            grow_event.before,
+            grow_event.read_value,
+            grow_event.assignment,
+            grow_event.after,
+            forged_width_witness,
+        ),
+    )
+
+    # Concrete mutation sentinels for the most tempting lossy implementations.
+    assert int(str(16)[::-1]) + 16 == 77  # decimal-string reversal is not binary reversal
+    assert advance(valid_program, ScalarConfiguration(POSITIVE, 16)).successors[0].value == 17
+    rejected += 1
+    assert decode_digits(tuple(reversed(encode_canonical(2, 2))), 2) + 2 == 3
+    assert advance(fixed_program(2, 4), ScalarConfiguration(NONNEGATIVE, 2)).successors[0].value == 6
+    rejected += 1
+    assert advance(grow_program(2), ScalarConfiguration(WIDTH_TAGGED, WidthTaggedInteger(2, 4))).successors[0].value == WidthTaggedInteger(6, 5)
+    assert decode_digits(tuple(reversed(encode_fixed(2, 2, 5))), 2) + 2 == 10
+    rejected += 1
+    return rejected
+
+
+EXPECTED_DIGEST = "872840cc4d6d6ece66c0842b4f3216442b18aa481c02c935d1b2eb69d2aa9c94"
+
+
+def main() -> None:
+    source_metrics = audit_source_traces()
+    commutation_metrics = audit_scalar_word_commutations()
+    table_metrics = audit_fixed_reversal_tables()
+    width_metrics = audit_width_and_leading_zero_boundaries()
+    bigint_metrics = audit_arbitrary_precision()
+    trace_metrics = audit_trace_shape_and_outcomes()
+    identity_metrics = audit_structural_identity_and_replay()
+    surface_metrics = audit_no_new_execution_surface()
+    hostile_rejections = audit_hostile_validation()
+
+    summary = (
+        ("source", source_metrics),
+        ("commutations", commutation_metrics),
+        ("fixed_tables", table_metrics),
+        ("width_boundaries", width_metrics),
+        ("arbitrary_precision", bigint_metrics),
+        ("trace_shape", trace_metrics),
+        ("structural_identity", identity_metrics),
+        ("execution_surface", surface_metrics),
+        ("hostile_rejections", hostile_rejections),
+        ("source_claims", len(SOURCE_CLAIMS)),
+        ("architecture_classes", len(ARCHITECTURE_CLASSIFICATION)),
+        ("goal2_delta", len(GOAL2_DELTA)),
+    )
+    digest = sha256(repr(summary).encode("utf-8")).hexdigest()
+    assert digest == EXPECTED_DIGEST
+
+    print(
+        "source_events="
+        f"{source_metrics[0] + source_metrics[1]}; "
+        f"source_event_replays={source_metrics[3]}; "
+        f"growth_checks={source_metrics[4]}; seed512_bits={source_metrics[5]}"
+    )
+    print(
+        "scalar_word_commutations="
+        f"{commutation_metrics[3]} "
+        f"({commutation_metrics[0]}/{commutation_metrics[1]}/{commutation_metrics[2]}); "
+        f"fixed_relation_entries={table_metrics[0]}"
+    )
+    print(
+        "bigint_cases="
+        f"{bigint_metrics[0]}; max_bits={bigint_metrics[1]}; "
+        f"max_decimal_digits={bigint_metrics[2]}; "
+        f"width_loss_counterexamples={width_metrics[1]}"
+    )
+    print(
+        "trace_horizons="
+        f"{trace_metrics[0]}; trace_events={trace_metrics[1]}; "
+        f"event_replays={trace_metrics[4]}; changed_false={trace_metrics[3]}"
+    )
+    print(
+        "structural_keys="
+        f"{identity_metrics[0]}; cross_rejections={identity_metrics[3]}; "
+        f"hostile_rejections={hostile_rejections}"
+    )
+    print(
+        "surface="
+        f"state{surface_metrics[0]}/assignment{surface_metrics[1]}/"
+        f"frontier{surface_metrics[2]}/neighborhood{surface_metrics[3]}/"
+        f"update{surface_metrics[4]}/executor{surface_metrics[5]}/"
+        f"StepResult{surface_metrics[6]}/tagged_value{surface_metrics[7]}"
+    )
+    print(f"semantic_digest={digest}")
+
+
+if __name__ == "__main__":
+    main()

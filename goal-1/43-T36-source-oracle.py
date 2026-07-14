@@ -147,12 +147,12 @@ NATIVE_EVIDENCE = line_set(
 )
 RELATION_EVIDENCE = line_set(
     "8838,12646,12648,12650,12652,12654,12656,12658,"
-    "17313,17315,17317,17319,17350,17352,17354,17356,17611,20738"
+    "17313,17315,17317,17319,17329,17350,17352,17354,17356,17611,20738"
 )
 CONTROL_EVIDENCE = line_set(
-    "1370,1439,1529,1555,12054,12631,12633,12660,12662,12664,"
-    "12666,12668,12670,12672,12674,12676,12678,12680,12682,"
-    "12684,12686,12688,16072"
+    "1370,1439,1523,1529,1555,1567,12054,12505,12623,12631,12633,"
+    "12660,12662,12664,12666,12668,12670,12672,12674,12676,12678,"
+    "12680,12682,12684,12686,12688,12692,12767,16072"
 )
 RETAINED = NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE
 
@@ -163,6 +163,11 @@ EXCLUDED_CLASS = {
     "other_machine_or_encoding_code": line_set(
         "16018,16068,17136,18910,18914,18918,19006,19169,19397,"
         "19416,19998,20190,20192"
+    ),
+    "broad_reverse_or_sequence_syntax_collisions": line_set(
+        "10930,10982,12226,12424,12513,12519,13036,13058,13511,"
+        "13709,13733,13766,14021,14077,14994,15824,16391,16851,"
+        "17518,17539,17648,18572,18799,18904,18935,19369"
     ),
 }
 EXCLUDED = frozenset().union(*EXCLUDED_CLASS.values())
@@ -192,16 +197,51 @@ INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
 INDEX_ENTRY_GUARDS = {
     20914: ("Bit reversal", "systems based on, 125"),
     20942: ("Butterfly network, 905",),
-    21088: ("Digit reversal systems, 125–127, 905", "Digit sequences"),
+    21088: ("Digit reversal systems, 125–127, 905",),
     21185: ("FFT (fast Fourier transform)", "digit reversal sequences in, 905"),
     21233: ("Halton (digit reversal) sequences",),
-    21525: ("Monte Carlo methods", "and digit reversal, 905", "MoebiusMu"),
+    21525: ("Monte Carlo methods", "and digit reversal, 905"),
     21731: ("Palindrome systems, 125-127",),
     21877: ("Quasi-Monte Carlo methods", "and digit reversal, 905"),
-    21933: ("Reversal-addition systems, 125–127, 905", "Reversible 3 n + 1 problem, 905"),
+    21933: ("Reversal-addition systems, 125–127, 905",),
     22114: ("Shuffle-exchange process, 905",),
     22394: ("van der Corput", "and digit reversal sequences, 905"),
-    22434: ("Wozniakowski (digit reversal) sequences, 905", "Will"),
+    22434: ("Wozniakowski (digit reversal) sequences, 905",),
+}
+
+# These neighboring tokens are negative structural sentinels for flattened
+# multi-column extraction.  They prove occurrence ownership hazards; they are
+# expressly not claimed as T36 content.
+INDEX_FLATTENING_SENTINELS = {
+    20914: ("randomness generation in, 968",),
+    21088: ("Digit count sequences, 905",),
+    21525: ("MoebiusMu",),
+    21933: ("Reversible 3 n + 1 problem, 905",),
+    22434: ("Will Wozniakowski",),
+}
+
+INDEX_EXCLUDED_CLASS = {
+    "recursive_sequence_and_neighbor_column_collisions": line_set(
+        "21050,21090,21114,21162,21193,21253,21275,21338,21360,"
+        "21683,21899,21923,21998,22144"
+    ),
+}
+INDEX_EXCLUDED = frozenset().union(*INDEX_EXCLUDED_CLASS.values())
+INDEX_EXCLUDED_GUARDS = {
+    21050: ("and recursive sequences, 907", "iterated run-length encoding"),
+    21090: ("and recursive sequences, 131, 906",),
+    21114: ("and recursive sequences, 906",),
+    21162: ("and recursive sequences, 906",),
+    21193: ("in recursive sequences, 130",),
+    21253: ("and recursive sequences, 880, 907",),
+    21275: ("and recursive sequences, 907",),
+    21338: ("Iterated bitwise operations, 906",),
+    21360: ("Iterated run-length encoding, 905",),
+    21683: ("in recursive sequences, 130", "in digit count sequences, 905"),
+    21899: ("in recursive sequences, 130",),
+    21923: ("Recursive sequences, 128–131",),
+    21998: ("from iterated bitwise operations",),
+    22144: ("in iterated run-length encoding, 905",),
 }
 
 # Independent Index-only closure lanes.  The union must equal all twelve
@@ -247,7 +287,6 @@ SOURCE_MODEL_RECORDS = (
     "fixed-width:successor is addition modulo b to the power m",
     "growing-width:configuration retains both numeric value and semantic width",
     "growing-width:one left digit is added every event even when that digit is zero",
-    "information-loss:equal values at widths one and two can have different successors",
     "representation:canonical integer and canonical digit word commute one event at a time",
     "representation:width word and value-width product commute without hidden event time",
     "relation:fixed-width Table enumerates a digit-reversal permutation not a temporal run",
@@ -273,7 +312,10 @@ SOURCE_MODEL_RECORDS = (
 EXPECTED_QUERY: dict[str, tuple[int, int, int, str]] = {}
 EXPECTED_SET: dict[str, tuple[int, str]] = {}
 EXPECTED_EXCLUDED_CLASS: dict[str, tuple[int, str]] = {}
+EXPECTED_EXCLUDED_LINE_GUARDS: tuple[int, str] = (0, "")
 EXPECTED_INDEX_CLASS: dict[str, tuple[int, str]] = {}
+EXPECTED_INDEX_EXCLUDED_CLASS: dict[str, tuple[int, str]] = {}
+EXPECTED_INDEX_EXCLUDED_GUARDS: tuple[int, str] = (0, "")
 EXPECTED_INDEX_CLOSURE: dict[str, tuple[int, str]] = {}
 EXPECTED_INDEX_CLOSURE_UNION: tuple[int, str] = (0, "")
 EXPECTED_INDEX_GUARDS: tuple[int, str] = (0, "")
@@ -300,6 +342,33 @@ EXPECTED_TRACE_512 = (
     512, 513, 1026, 1539, 3078, 4617, 9234, 13851, 27702, 41553,
     76950, 130815, 261630, 392445, 784122, 1175031, 3138792,
 )
+
+
+# Explicit repair witnesses prevent a low fuzzy-text score from masquerading
+# as provenance.  Each pair is structurally located first, then guarded by the
+# damaged monolith fragment and the independently repaired split fragment.
+SPLIT_STRUCTURAL_REPAIRS = {
+    12637: (
+        "BACK-MATTER/Index/Index.md:540",
+        "From Digits[Reverse[Integer Digits",
+        "FromDigits[Reverse[IntegerDigits",
+    ),
+    17313: (
+        "BACK-MATTER/Index/Index.md:5214",
+        "dvadic or Palev order",
+        "dyadic or Paley order",
+    ),
+    17315: (
+        "BACK-MATTER/Index/Index.md:5216",
+        "RitReverseOrder[a 1",
+        "BitReverseOrder[a_]",
+    ),
+    17319: (
+        "BACK-MATTER/Index/Index.md:5220",
+        "2^{s, s}",
+        "{2^s, 2^s}",
+    ),
+}
 
 
 def digest(values: set[int] | frozenset[int]) -> str:
@@ -345,10 +414,10 @@ def split_owner_record(line_no: int) -> str:
     candidates: list[str] = []
     if line_no == 1370:
         candidates.append(
-            "CHAPTERS/3-The-World-of-Simple-Programs/"
-            f"The-World-of-Simple-Programs.md:{line_no - 683}"
+            "CHAPTERS/4-Systems-Based-on-Numbers/"
+            "Systems-Based-on-Numbers.md:1"
         )
-    if 1439 <= line_no <= 1555:
+    if 1439 <= line_no <= 1567:
         candidates.append(
             "CHAPTERS/4-Systems-Based-on-Numbers/"
             f"Systems-Based-on-Numbers.md:{line_no - 1396}"
@@ -363,19 +432,19 @@ def split_owner_record(line_no: int) -> str:
             "CHAPTERS/12-The-Principle-of-Computational-Equivalence/"
             "The-Principle-of-Computational-Equivalence.md:3435"
         )
-    if 12631 <= line_no <= 12688:
+    if 12505 <= line_no <= 12767:
         candidates.append(f"BACK-MATTER/Index/Index.md:{line_no - 12097}")
     if line_no == 16072:
         candidates.append("BACK-MATTER/Index/Index.md:3973")
     if line_no in {17313, 17315, 17317, 17319}:
         candidates.append(f"BACK-MATTER/Index/Index.md:{line_no - 12099}")
-    if line_no in {17350, 17352, 17354, 17356}:
+    if line_no in {17329, 17350, 17352, 17354, 17356}:
         candidates.append(f"BACK-MATTER/Index/Index.md:{line_no - 12097}")
     if line_no == 17611:
         candidates.append("BACK-MATTER/Colophon/Colophon.md:168")
     if line_no == 20738:
         candidates.append("BACK-MATTER/Colophon/Colophon.md:3295")
-    if line_no in INDEX_ROUTED:
+    if line_no in INDEX_ROUTED | INDEX_EXCLUDED:
         candidates.append(
             f"BACK-MATTER/Colophon/Colophon.md:{line_no - 17443}"
         )
@@ -478,14 +547,17 @@ def main() -> int:
 
     union = set().union(*hits.values())
     pre_index = {line_no for line_no in union if line_no < INDEX_FIRST_LINE}
-    index = union - pre_index
+    index_candidates = union - pre_index
+    index = index_candidates - set(INDEX_EXCLUDED)
     declared_pre_index = set(RETAINED | EXCLUDED)
     unresolved_pre = pre_index - declared_pre_index
     retained_unmatched = set(RETAINED) - pre_index
     sets = {
         "union": union,
         "pre_index_union": pre_index,
+        "index_candidates": index_candidates,
         "index": index,
+        "index_excluded": set(INDEX_EXCLUDED),
         "native": set(NATIVE_EVIDENCE),
         "relation": set(RELATION_EVIDENCE),
         "control": set(CONTROL_EVIDENCE),
@@ -510,6 +582,23 @@ def main() -> int:
         good = actual == EXPECTED_EXCLUDED_CLASS.get(name)
         exclusion_ok &= good
         print("excluded_" + name, "OK" if good else "MISMATCH", *actual)
+    excluded_line_guard_records = {
+        f"{line_no}:{hashlib.sha256(at(line_no).encode('utf-8')).hexdigest()}"
+        for line_no in EXCLUDED
+    }
+    excluded_line_guards_actual = (
+        len(excluded_line_guard_records),
+        digest_records(excluded_line_guard_records),
+    )
+    exclusion_ok &= (
+        excluded_line_guards_actual == EXPECTED_EXCLUDED_LINE_GUARDS
+        and all(line_no < INDEX_FIRST_LINE for line_no in EXCLUDED)
+    )
+    print(
+        "excluded_line_occurrence_guards",
+        "OK" if excluded_line_guards_actual == EXPECTED_EXCLUDED_LINE_GUARDS else "MISMATCH",
+        *excluded_line_guards_actual,
+    )
     classification_ok = (
         exclusion_ok
         and not unresolved_pre
@@ -529,16 +618,37 @@ def main() -> int:
     index_ok = (
         set().union(*INDEX_CLASS.values()) == index == set(INDEX_ROUTED)
         and sum(map(len, INDEX_CLASS.values())) == len(index)
+        and set().union(*INDEX_EXCLUDED_CLASS.values()) == set(INDEX_EXCLUDED)
+        and sum(map(len, INDEX_EXCLUDED_CLASS.values())) == len(INDEX_EXCLUDED)
+        and not INDEX_EXCLUDED & INDEX_ROUTED
+        and index_candidates == set(INDEX_ROUTED | INDEX_EXCLUDED)
     )
     for name, values in INDEX_CLASS.items():
         actual = (len(values), digest(values))
         good = actual == EXPECTED_INDEX_CLASS.get(name)
         index_ok &= good
         print("index_" + name, "OK" if good else "MISMATCH", *actual)
+    for name, values in INDEX_EXCLUDED_CLASS.items():
+        actual = (len(values), digest(values))
+        good = actual == EXPECTED_INDEX_EXCLUDED_CLASS.get(name)
+        index_ok &= good
+        print("index_excluded_" + name, "OK" if good else "MISMATCH", *actual)
     guard_records = {
         f"{line_no}:{'|'.join(needles)}"
         for line_no, needles in INDEX_ENTRY_GUARDS.items()
     }
+    sentinel_records = {
+        f"{line_no}:{'|'.join(needles)}"
+        for line_no, needles in INDEX_FLATTENING_SENTINELS.items()
+    }
+    excluded_index_guard_records = {
+        f"{line_no}:{'|'.join(needles)}"
+        for line_no, needles in INDEX_EXCLUDED_GUARDS.items()
+    }
+    excluded_index_guards_actual = (
+        len(excluded_index_guard_records),
+        digest_records(excluded_index_guard_records),
+    )
     guards_ok = (
         set(INDEX_ENTRY_GUARDS) == set(INDEX_ROUTED)
         and all(
@@ -547,6 +657,17 @@ def main() -> int:
         )
         and (len(guard_records), digest_records(guard_records))
         == EXPECTED_INDEX_GUARDS
+        and set(INDEX_FLATTENING_SENTINELS) <= set(INDEX_ROUTED)
+        and all(
+            all(needle in at(line_no) for needle in needles)
+            for line_no, needles in INDEX_FLATTENING_SENTINELS.items()
+        )
+        and set(INDEX_EXCLUDED_GUARDS) == set(INDEX_EXCLUDED)
+        and all(
+            all(needle in at(line_no) for needle in needles)
+            for line_no, needles in INDEX_EXCLUDED_GUARDS.items()
+        )
+        and excluded_index_guards_actual == EXPECTED_INDEX_EXCLUDED_GUARDS
     )
     index_ok &= guards_ok
     ok &= index_ok
@@ -555,6 +676,14 @@ def main() -> int:
         "OK" if guards_ok else "MISMATCH",
         len(guard_records),
         digest_records(guard_records),
+        "flattening_sentinels",
+        len(sentinel_records),
+        digest_records(sentinel_records),
+    )
+    print(
+        "index_excluded_occurrence_guards",
+        "OK" if excluded_index_guards_actual == EXPECTED_INDEX_EXCLUDED_GUARDS else "MISMATCH",
+        *excluded_index_guards_actual,
     )
     print("unresolved_index", "OK" if index_ok else "MISMATCH", len(index ^ set(INDEX_ROUTED)))
 
@@ -778,18 +907,18 @@ def main() -> int:
         for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
             split_text[f"{relative}:{line_no}"] = line
 
-    crosswalk_lines = RETAINED | INDEX_ROUTED
+    crosswalk_lines = RETAINED | INDEX_ROUTED | INDEX_EXCLUDED
     crosswalk_records: set[str] = set()
     owner_records: set[str] = set()
     class_lines: dict[str, set[int]] = {
         "EXACT": set(),
         "IMAGE_BASENAME": set(),
         "NORMALIZED": set(),
+        "STRUCTURAL_REPAIR": set(),
     }
     class_records: dict[str, set[str]] = {name: set() for name in class_lines}
     normalized_scores: list[float] = []
     split_join_ok = True
-    repair_lines = {12637, 17313, 17315, 17319}
     for line_no in sorted(crosswalk_lines):
         try:
             owner = split_owner_record(line_no)
@@ -801,14 +930,22 @@ def main() -> int:
             continue
         owner_records.add(owner)
         mode, score = crosswalk_evidence(at(line_no), split_text[owner])
+        if line_no in SPLIT_STRUCTURAL_REPAIRS:
+            expected_owner, monolith_guard, split_guard = SPLIT_STRUCTURAL_REPAIRS[line_no]
+            split_join_ok &= (
+                owner == expected_owner
+                and monolith_guard in at(line_no)
+                and split_guard in split_text[owner]
+                and mode == "NORMALIZED"
+            )
+            mode = "STRUCTURAL_REPAIR"
         if mode not in class_lines:
             split_join_ok = False
             continue
         if mode == "NORMALIZED":
             normalized_scores.append(score)
-            threshold = 0.85 if line_no in repair_lines else 0.98
-            split_join_ok &= score >= threshold
-        else:
+            split_join_ok &= score >= 0.98
+        elif mode != "STRUCTURAL_REPAIR":
             split_join_ok &= score == 1.0
         record = f"{line_no}->{owner}:{mode}:{score:.6f}"
         crosswalk_records.add(record)
