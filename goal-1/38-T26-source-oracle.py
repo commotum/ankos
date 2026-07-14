@@ -210,6 +210,7 @@ QUERIES = {
     "Q29": (
         r"\b2D representations\b|"
         r"\bsequences from 1D substitution systems can be displayed in 2D\b|"
+        r"\b2D paths consisting of sequences of left and right turns\b|"
         r"\barranged in two dimensions\b"
     ),
 }
@@ -259,7 +260,7 @@ EXPECTED_QUERY = {
     "Q26": (3, 0, 3, "28de60283e32b0cded087a9564a4a8924c16ea7298a1bd6aa60d37574b1b6aab"),
     "Q27": (2, 2, 0, "8001eee54b360ef1cfc6836c07224b7029c41cbf853cd4cd58e9f1bd5af51ba6"),
     "Q28": (0, 0, 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
-    "Q29": (2, 2, 0, "f71a7f01c25f66bd178930ec98105495294ac57becb109bae1baf192054cdb14"),
+    "Q29": (3, 3, 0, "3db3d56a8c3a80a286d384a6766b96eca1dc5132c736f9634690bf4cd4454c82"),
 }
 
 
@@ -287,12 +288,12 @@ NATIVE_CONTINUATIONS = line_set(
     "982,2310,2314,2322,13689,13695,13696,13724"
 )
 RELATION_CONTINUATIONS = line_set(
-    "6668,6840,6982,7306,7316,7318,7320,"
+    "6666,6668,6670,6840,6982,7284,7306,7316,7318,7320,"
     "13710,13712,13714-13720,13732,13733,13742,13748,13750,13752,"
     "13756,14102-14106,14111,17303,17305,17307,17309,17311"
 )
 CONTROL_CONTINUATIONS = line_set(
-    "2328,2330,2340,2342,2344,2346,2352,2354,"
+    "2328,2330,2340,2342,2344,2346,2352,2354,2362,"
     "13758,13760,13762,13770,13772"
 )
 
@@ -307,7 +308,7 @@ RETAINED = NATIVE_EVIDENCE | RELATION_EVIDENCE | CONTROL_EVIDENCE
 
 
 EXCLUDED_CLASS = {
-    "one_dimensional_sequences_displayed_in_2d": line_set("7118,12230"),
+    "one_dimensional_sequences_represented_in_2d": line_set("7118,12210,12230"),
     "one_dimensional_contextual_or_lsystem_routes": line_set(
         "8024,8028,12251,18788"
     ),
@@ -320,10 +321,10 @@ EXCLUDED = frozenset().union(*EXCLUDED_CLASS.values())
 IMAGE_RE = re.compile(r"^!\[[^\]]*\]\(([^)]+)\)$")
 NATIVE_IMAGE_LINES = line_set("2314,2322,13724")
 RELATION_IMAGE_LINES = line_set(
-    "6668,6840,6982,7306,7320,13742,13748,14111,"
+    "6666,6668,6670,6840,6982,7284,7306,7320,13742,13748,14111,"
     "17303,17305,17307,17309,17311"
 )
-CONTROL_IMAGE_LINES = line_set("2328,2330,2340,2344,2354,13772")
+CONTROL_IMAGE_LINES = line_set("2328,2330,2340,2344,2354,2362,13772")
 GOVERNED_IMAGE_LINES = (
     NATIVE_IMAGE_LINES | RELATION_IMAGE_LINES | CONTROL_IMAGE_LINES
 )
@@ -397,21 +398,21 @@ INDEX_ENTRY_GUARDS = {
 
 
 EXPECTED_SET = {
-    "union": (93, "9d6d6ff88a8d9e71dfc416e5946c60d786b9c0bd901a3326a0d65a38593d3fa8"),
-    "pre_index_union": (66, "441ea2cf41ce38a9e868e3a56bf6f8446a5e3ffc71bd29c690ce02ba64ffe713"),
+    "union": (94, "b95ed5fa4a7bba75b914a49f53dc327d4b67ccb1d8b2120f86434b40dbc7575f"),
+    "pre_index_union": (67, "5c462cd7613d5355e8448cd63508f1541d5c87543debb3252e73e28296e4ef9a"),
     "index": (27, "45f49612482d7bd4b8e168d19aa59674bfc7760b0d844be1966a8006dadd864c"),
     "matched_retained": (56, "5f543b779cbaa44df53149d856dbad95d96c6c43eb770f27365c8023bc65138f"),
-    "governed_continuations": (55, "a73fc1767b97ae801fe3761d12a88a5c950b68c60866c86e1618ee6cc678540f"),
-    "retained": (111, "30d5a9f4883150e22b30871e8d819c5c5617e1aaf0edbe00ca8deda6370cbc5c"),
-    "excluded": (10, "6491ec40a274c829a77d3d6575dfbf1fe4964199506fba6e84c125c3d209b2c8"),
+    "governed_continuations": (58, "c427b4bc7f5a8560e727cc38c4ba6d5a6620e95c7de9553e2be19d2ea73b85d4"),
+    "retained": (114, "1f94939d26300363e42e01045b15f989e80d4bd8129dd15a0fea031d75053fb3"),
+    "excluded": (11, "69a5794057817d20463c17a61395d9bd7f54aad527d9747c3f9635b30c50bfe8"),
     "native": (26, "6e1fe6cad7bba3a647abfb578fb1069e1428c0681a53a35aeab368b207486e20"),
-    "relation": (61, "d0ac2838289bd0ca4601092e8aa49715f02b920632b64c199d473c8d25060ccb"),
-    "control": (24, "229b2d34e579a83e9a7ffeb4ef69354601fc766a200381734d112fe70e3a2348"),
-    "governed_images": (22, "abb638e415af1ae4c09e8348d72c1df81c5cc599cd4e1846ea992160fe1fbebf"),
+    "relation": (63, "ab1b2a95be93968c61107d64c655821582ca830f309a36b273495a2616d008c4"),
+    "control": (25, "34ce5350d22b028c7dbd345bd4655eb971b8be7c0a89581ed95981fe1f9177f7"),
+    "governed_images": (25, "d207fe39e54aaae6d97870605c20d039fe5d81edac1fe9a5d75fb4879b7ebcdc"),
 }
 EXPECTED_EXCLUDED_CLASS = {
-    "one_dimensional_sequences_displayed_in_2d": (
-        2, "f71a7f01c25f66bd178930ec98105495294ac57becb109bae1baf192054cdb14"
+    "one_dimensional_sequences_represented_in_2d": (
+        3, "3db3d56a8c3a80a286d384a6766b96eca1dc5132c736f9634690bf4cd4454c82"
     ),
     "one_dimensional_contextual_or_lsystem_routes": (
         4, "006550027143fe8557c458468a38d2d7cad67465513dd3ad9b00f7cc72e305e4"
@@ -448,8 +449,8 @@ EXPECTED_INDEX_ENTRY_GUARDS = (
 )
 EXPECTED_IMAGE_PARTITION = {
     "native": (3, "88c77dedfd94731adae1c3913a93edfea3ad631c7afc976b012c7024d169e83a"),
-    "relation": (13, "477608a48338c626512a9ce01b6fa3c65e93700a4c8c67e6c21a769218ce3c91"),
-    "control": (6, "c01d2da1809b7371770766da477a0290ee261809969d8668fb238cee19f2f775"),
+    "relation": (15, "f457b0b14ec36a31d42dff2789129944d00760a81dd4f27c5f1733ac49e15dcb"),
+    "control": (7, "25d33c19678ec52a86b371190a08ac42abf01a63ae9831182ba8b006bf108bcd"),
 }
 
 
@@ -460,10 +461,10 @@ EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
 EXPECTED_SPLIT_QUERY = (
-    91, "e4270e6f329e1d7577a7b977c7bf1adbef523002e821e5863fb661e3a343499e"
+    92, "25252ec80f67eb13a2243ec575d6a44e633c7f373e04c75a430330654df797cc"
 )
 EXPECTED_SPLIT_QUERY_EXACT = (
-    79, "1ec62b5ac576ad92ab682559f7493ee70519da790800b0318e4ffdf2b6753409"
+    80, "b2f157190602f4f9bedd8a47859566450c783e2dec3a70fa40833d49bd269391"
 )
 EXPECTED_SPLIT_QUERY_NONEXACT = (
     12, "10abd9e89f9e571d2679ed835449e98fc9a0e73ba4976412f04fb14915785503"
@@ -475,10 +476,10 @@ EXPECTED_SPLIT_RETAINED_EXACT = (
     77, "b7b403d3e42c844094acb12f3942613e09c9124ccd476298704c10c412938492"
 )
 EXPECTED_SPLIT_RETAINED_NONEXACT = (
-    34, "0f8b0f5e406c224e9163046f94e14a0b0968231d431819bf9e5722505694b496"
+    37, "e0678a10290b29fca08657221a3e0ee946e83068bbd9ac2c60df6a7b64335b0e"
 )
 EXPECTED_SPLIT_RETAINED_MAPPING = (
-    34, "17b1157d3537e671e01a6895cd938ac46455e697ba1f29b132a4eeb59f1a3e2b"
+    37, "2c18d1cdd46c69268e5c436a4addd4156965494643669800cb74cea3bfcae9ec"
 )
 EXPECTED_MONOLITH_ONLY = (
     0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
