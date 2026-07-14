@@ -141,8 +141,8 @@ IntegerDigits[code, 2, 18]
 
 ### Excerpt 11 — printed code spelling can exceed its compact table range
 
-- Source: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:11178-11190`
-- Establishes: the Book runs a binary nine-position totalistic program printed as code `3702` for 25 steps and displays the last five. Since the semantic table has ten binary cases, the printed integer spelling and canonical ten-digit table identity must be represented separately; the exact normalization convention is tested rather than inferred.
+- Sources: `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md:11060,11068,11178-11190,11904-11912,13548`
+- Establishes: the Book runs the binary nine-position totalistic signature with printed code `3702` for 25 steps and displays the last five. The source fixes ten binary sum cases and materializes a fixed-width digit vector whose rightmost digit is sum zero. Therefore `U_s=floor(3702/2^s) mod 2` for `s=0..9`: the low-sum-first table is `(0,1,1,0,1,1,1,0,0,1)` and its canonical code is `3702 mod 2^10 = 630`. Raw `3702` remains source provenance; it is not a 12-case table or an outer-totalistic identity, and the strict ten-case codec still rejects integers outside `0..1023`.
 
 ### Excerpt 12 — old-snapshot update and a nonstep control
 
@@ -197,6 +197,7 @@ This makes the prose/code relation inspectable rather than a family convention:
 - The rule “stay unchanged except become black at count 3” sets every odd bit and bit `6`: `174762 + 64 = 174826`.
 - Code `746` sets both count-3 bits `6,7` and the old-black bits for counts `0,1,2,4`, namely `1,3,5,9`: `64+128+2+8+32+512 = 746`. Thus count 3 becomes black, counts 0/1/2/4 retain self, and counts 5 through 8 become white.
 - Life `B3/S23` sets the white-center birth bit `6` and the black-center survival bits `5,7`: `64+32+128 = 224`. The named Life program is therefore an ordinary value in the same 18-case schema.
+- Printed totalistic code `3702` uses the fixed ten-digit source width, so the three high radix blocks are noncanonical spelling only: `3702 = 3*1024 + 630`. Canonical code `630` has black outputs at all-nine sums `1,2,4,5,6,9`; its complete table, not the raw printed integer, is program identity.
 
 The semantic oracle derives these values independently and rejects swapped center/count significance, digit reversal, a hidden-center convention, and accidental agreement on symmetric fixtures.
 
@@ -313,23 +314,23 @@ These labels name case domains and predicates on the existing complete-map abstr
 
 `34-T22-semantic-oracle.py` implements two separate paths. The literal native reference reads Book row/column positions and evaluates general, outer-totalistic, equal-sum, and generalized finite-`k` formulas directly. The generic path constructs opaque snapshot-scoped source handles, explicit Self-plus-offset access, typed closed rules, one same-site write per source, and atomic old-snapshot parallel commit. Neither path calls the other evaluator.
 
-The closed oracle reports 1,417 native/generic commutations:
+The closed oracle reports 1,418 native/generic commutations:
 
 ```text
 outer compact bases          320
 equal-sum compact bases      192
 general positional bases     514
 nonaliasing directional      225
-named codes                    4
+named/source-spelled fixtures  5
 ternary positional projection 81
 ternary FullTotal             81
 ```
 
-Its representation proof covers all 262,144 18-bit outer signatures and independently proves the complete 512-context fiber map plus 20 expansion bases. It expands and factors all 1,024 equal-sum tables. The arbitrary 512-row schema is covered by zero, one, and all 512 unit table bases for 514 exact code round trips. This factorization avoids claiming a wasteful `2^18 * 512` Cartesian run while proving every independent table bit and every context fiber.
+Its representation proof covers all 262,144 18-bit outer signatures and independently proves the complete 512-context fiber map plus 20 expansion bases. It expands and factors all 1,024 equal-sum tables. The arbitrary 512-row schema is covered by zero, one, and all 512 unit table bases for 514 exact code round trips. It also derives the C4 and D4 group actions, their 140 and 102 context orbits, 142 and 104 zero/full/unit expansion-factor bases, 6,144 group/context checks, 1,024 orbit memberships, and two one-row disagreement rejections. These fiber proofs avoid wasteful table-space Cartesian runs while covering every independent compact bit and every general-table row.
 
 The coordinate proof covers all `9 * 512 = 4,608` projection/context cases and all 512 table unit bases. It derives `runtime_to_book=(6,3,0,7,4,1,8,5,2)` and its inverse, then demonstrates that naive ENU re-sorting moves the projected source in a complete asymmetric step while certified table permutation commutes.
 
-The generalized Notes profile is checked for seven `(dimension,k)` pairs. For `d=2,k=3`, all `3^9 = 19,683` positional contexts hit exactly 51 `SelfValue x NeighborValueSum` cases with independently counted fibers, and 81 ternary native/generic steps commute. Binary overlap with the strict 18-case function is denotationally exact while the two schema types remain distinct. The named-rule partition reconstructs `175850`, `746`, `174826`, and Life `224`; the latter also reproduces a horizontal-three to vertical-three blinker through both native and generic routes.
+The generalized Notes profile is checked for seven `(dimension,k)` pairs. For `d=2,k=3`, all `3^9 = 19,683` positional contexts hit exactly 51 `SelfValue x NeighborValueSum` cases with independently counted fibers, and 81 ternary native/generic steps commute. Binary overlap with the strict 18-case function is denotationally exact while the two schema types remain distinct. The named-rule partition reconstructs `175850`, `746`, `174826`, and Life `224`; the latter also reproduces a horizontal-three to vertical-three blinker. A fifth source-spelled fixture proves that printed totalistic `3702` and canonical table `630` commute through the same native/generic event while the strict codec rejects raw `3702`.
 
 Further adversaries preserve access-slot multiplicity on small periodic tori, separate fixed from periodic boundaries and native `Z^2` from finite realization, reject fixed-background sparse lowering without a quiescence proof, distinguish snapshot-parallel from in-place traversal, require exactly one explicit Self and eight unique offsets, reject malformed/stale/foreign source data and writes before commit, and execute T21/T22/T23 through one generic step function.
 
@@ -380,7 +381,7 @@ This is the smallest evidence-backed composition, not a family API mandate. Publ
 1. Reuse the synthesis-selected T21 fixed square-lattice configuration, `AllSites`, complete old-snapshot reads, same-site label assignment, snapshot-parallel UPDATE, deterministic `StepResult`, support/realization separation, and coordinate-frame adapter unchanged.
 2. Express the Moore shell through ordinary explicit offsets or the existing `L_infinity` radius constructor. If a named preset is exposed, it must return that structural access specification and may not select execution.
 3. Reuse the complete ordered-context table for the nine-position general rule. Add only source-pinned case descriptors for `(SelfValue,NeighborValueSum)`, all-nine value sum, label-predicate count, and validated C4/D4-orbit or monotone-black restrictions. Their expansion/factorization maps operate on closed table data.
-4. Make table schema part of program/code identity. A bare integer such as `224`, `746`, or `174826` is insufficient without alphabet, access order/frame, case schema, digit convention, and table length. Preserve a noncanonical printed spelling such as `3702` as provenance while canonical table identity uses its declared-width digit vector.
+4. Make table schema part of program/code identity. A bare integer such as `224`, `746`, or `174826` is insufficient without alphabet, access order/frame, case schema, digit convention, and table length. The source-provenance adapter maps printed `3702` at radix two/width ten/rightmost-sum-zero to canonical table code `630`; the strict structural codec remains range-checked.
 5. Retain arbitrary-precision rule serialization and complete typed tables. Vectorized finite realizations may choose a different table storage, but `numpy.int64` cannot define the program range.
 6. Keep Life, HighLife, named class-4 codes `226/5344/6248/6752/6754/8416`, totalistic codes `976/3702`, outer-totalistic `196623`, code-175850 roughness observations, code-746 circularity observations, and code-174826 growth structures as presets, provenance-bearing spellings, or analyzers at the exact evidence-backed boundary. None changes the runner.
 7. Permit sparse live-cell execution only as a separately proved lowering for a compatible background rule. The native configuration remains complete, and the sparse algorithm must commute with one native event.
@@ -400,7 +401,7 @@ This is the smallest evidence-backed composition, not a family API mandate. Publ
 10. Validate the generalized `d,k` formula and a nonbinary valuation case, plus T21 cardinal and T23 three-dimensional same-runner controls.
 11. Reject missing/duplicate offsets, implicit or duplicate Self, wrong arity/order/dimension, incomplete tables, out-of-alphabet values, stale reads, wrong targets, duplicate source coverage, and invalid realization mappings before commit.
 12. Derive the 140 C4 and 102 D4 context orbits, commute their complete-map expansion/factorization, and reject one-row orbit violations without adding symmetry rule classes.
-13. Separate code `3702`'s printed spelling from the canonical ten-case table vector and verify the exact source normalization convention.
+13. Prove from the fixed-width/rightmost-sum-zero source codec that printed `3702` denotes canonical ten-case code `630`; commute the same evaluation/trajectory while rejecting raw `3702` as strict table identity.
 14. Show that WireWorld's count of neighbors satisfying `label == 1` is a typed predicate aggregate, not numeric neighbor-value sum, while using the same runner.
 15. Demonstrate that `dyadaxes_2d` has the same raw geometry but not the same RULE denotation by giving two neighborhoods with equal majority-gate outputs and different Moore counts/required results.
 
@@ -410,10 +411,10 @@ The evidence supplies no counterexample to the common SimpleProgram algebra. T22
 
 ### D128 — Moore-neighborhood cellular automata parameterize access and RULE schemas; Life is a named preset
 
-- **Basis:** Chapter 5 supplies one fixed square grid, all-site old-snapshot update, the old center, eight surrounding positions including diagonals, and codes `175850`, `746`, and `174826` (`BOOK:2212-2234`). The Notes pin the `Self + k*FullTotal` implementation, general positional order, `2^512/2^140/2^102/2^18/2^10/2^9` general/symmetry/compact/restricted counts, a width-ten totalistic code spelling, predicate-count variants, and Life code `224`/`B3/S23` as an ordinary nine-neighbor outer-totalistic rule (`BOOK:11178-11190,13475-13549,14239-14249,18749-18757`). The closed evidence is 264 source lines, 95 asset candidates, and 1,417 independent native/generic commutations.
+- **Basis:** Chapter 5 supplies one fixed square grid, all-site old-snapshot update, the old center, eight surrounding positions including diagonals, and codes `175850`, `746`, and `174826` (`BOOK:2212-2234`). The Notes pin the `Self + k*FullTotal` implementation, general positional order, `2^512/2^140/2^102/2^18/2^10/2^9` general/symmetry/compact/restricted counts, a width-ten totalistic code spelling, predicate-count variants, and Life code `224`/`B3/S23` as an ordinary nine-neighbor outer-totalistic rule (`BOOK:11178-11190,13475-13549,14239-14249,18749-18757`). The closed evidence is 264 source lines, 95 asset candidates, and 1,418 independent native/generic commutations.
 - **DOMAIN/configuration:** reuse D127 discrete `t+2D` and a total finite-alphabet field on fixed square `Z^2` support. Periodic quotients, finite fixed-exterior work regions, sparse background representations, coordinate frames, crops, and rasters remain explicit realizations or views.
 - **FRONTIER/read:** reuse `AllSites`. The access declares exactly one Self and the eight unique surrounding offsets in raw Book order. The Book-array-to-ENU map either preserves that order or permutes the entire table with `runtime_to_book=(6,3,0,7,4,1,8,5,2)`; coincident cells on small quotients retain separate read-slot multiplicity.
-- **RULE/representation:** strict binary case domains are the 512-context positional table, 18-case `(SelfValue,MooreCount)` table at index `2*count+self`, and ten-case all-nine sum table. C4 rotation and D4 square symmetry require constancy on respectively 140 and 102 context orbits; growth fixes every old-black result and leaves nine free birth bits. Their counts are `2^512`, `2^140`, `2^102`, `2^18`, `2^10`, and `2^9`. The generalized source profile uses table index `self+k*sum(neighbors)` and length `k*((3^d-1)*(k-1)+1)`; label-predicate count is a separately typed aggregate, not numeric sum. Compact/orbit tables factor only complete constant fibers, retain schema-tagged identity, and keep noncanonical printed spellings as provenance. Life `224` is a preset value of the 18-case schema, never a family executor.
+- **RULE/representation:** strict binary case domains are the 512-context positional table, 18-case `(SelfValue,MooreCount)` table at index `2*count+self`, and ten-case all-nine sum table. C4 rotation and D4 square symmetry require constancy on respectively 140 and 102 context orbits; growth fixes every old-black result and leaves nine free birth bits. Their counts are `2^512`, `2^140`, `2^102`, `2^18`, `2^10`, and `2^9`. The generalized source profile uses table index `self+k*sum(neighbors)` and length `k*((3^d-1)*(k-1)+1)`; label-predicate count is a separately typed aggregate, not numeric sum. Compact/orbit tables factor only complete constant fibers and retain schema-tagged identity. Fixed-width source spelling `3702` denotes canonical ten-case code `630`; raw spelling remains provenance while the strict codec rejects it as out of range. Life `224` is a preset value of the 18-case schema, never a family executor.
 - **RULE result/UPDATE/outcome:** every old site returns one complete same-site label write. D004/D117/D127 validates full old-snapshot source coverage and atomic parallel commit to one fixed-support successor. An unchanged successor is not an inferred halt. T08/D121 owns independent seeds, constructors, and laws; shape, anisotropy, structures, growth stop, class, universality, and rendering remain observers/relations.
 - **Consequence:** Goal 2 adds Moore access data, closed case/restriction descriptors, factor/orbit maps, codecs/provenance, named presets, and conformance fixtures only. It reuses T01/T02/T03/T08/T21 and the branch-free runner. No `MooreState`, semantic control class, new UPDATE algebra, executor, rollout branch, hidden center/boundary, Dyadaxes substitution, Life engine, symmetry engine, or raster rule is added. D127 is clarified—Life is now proved to be a same-construction preset—but no completed stage reopens.
 

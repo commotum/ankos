@@ -739,7 +739,8 @@ def factor_symmetry_restriction(
 # Canonical identity is the orbit-output tuple ordered by least Book context.
 # It intentionally has no integer codec.  A printed compact spelling needs a
 # separate, source-bound adapter carrying radix, width, digit direction, and
-# orbit order; the pending code-3702 convention must not redefine table identity.
+# orbit order.  Notes code 3702 is handled by PrintedCodeProvenance and its
+# declared-width normalization cannot redefine canonical table identity.
 
 
 def expand_outer(rule: BinaryOuterTotalistic) -> GeneralLookup:
@@ -2449,7 +2450,7 @@ def main() -> None:
         f"printed:{printed_code_counts['printed']},"
         f"canonical:{printed_code_counts['canonical']},"
         f"high_quotient:{printed_code_counts['high_quotient']}; "
-        "strict_out_of_range_rejection=PASS"
+        "strict_out_of_range_rejection=PASS; native_generic_as_630=PASS"
     )
     print(
         "symmetry_restrictions="
