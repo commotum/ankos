@@ -93,6 +93,8 @@ For finite simple continued fractions, require the final coefficient to exceed o
 [a0,...,a_n] = [a0,...,a_(n-1), a_n-1, 1]  when a_n > 1.
 ```
 
+The leading simple-continued-fraction coefficient is a signed integer; only coefficients after `a0` must be positive. This matters at the T42 seam: the page-903 Notes construction is stated for any irrational `h`, uses `a0=floor(h)` only as an output offset, and derives its substitution schedule from the positive tail. Page 162's positive ratios are a restriction, not the generic coefficient schema.
+
 The exact value and its full canonical representation are connected losslessly at the denotational level when the required exact expansion exists. A finite queried prefix is never claimed to be a lossless encoding of the value.
 
 ## Explicit Work SimplePrograms and Commuting Relations
@@ -192,7 +194,7 @@ This is not an exception to the SimpleProgram architecture. The exact iterative 
 - **T38:** computed prefix addresses remain recurrence RULE semantics. They are not a general mechanism for querying arbitrary constant coefficients.
 - **T39:** a prime stream can be a source to a leading-digit observer; that observation neither changes the prime construction nor becomes T40 state.
 - **T41:** supplies immutable closed expression and pure query/certificate responsibilities. T40 specializes arity-zero exact values and representation coefficients; it does not repeatedly evaluate a function argument.
-- **T42:** consumes a finalized T40 continued-fraction coefficient result or explicit coefficient source as schedule input, then owns symbols, rule selection, substitution configuration, events, and trace. It does not own generic continued-fraction expansion.
+- **T42:** consumes a finalized T40 continued-fraction coefficient result or explicit coefficient source as input, separates signed `a0` from the positive tail, and owns schedule derivation, symbols, rule selection, substitution configuration, events, and trace. It does not own generic continued-fraction expansion.
 - **T43:** owns explicit residual-map work configurations and feedback semantics. A Gauss/positional orbit can realize a T40 query but is not the exact constant or coefficient result itself.
 - **Noncomputable exact definitions:** an exact symbolic definition alone does not imply executable coefficient access. Chaitin-type digit definitions require `Unsupported` unless a closed admitted evaluator/certificate exists.
 
@@ -219,7 +221,7 @@ The current `src/ca` package exposes names resembling the shared axes, but its e
 - Represent unsupported/certified/approximate/probable/unknown/resource/failure outcomes without silent float or CAS fallback. A coefficient is exact only when its floor or equivalent separation is certified.
 - Model long division, positional residual iteration, strict integer-safe square-root extraction, and continued-fraction residual iteration as named closed work SimplePrograms over existing singleton/product map axes. Bind each to the query by an explicit realization certificate and event-witness replay.
 - Preserve evaluator work configuration, exact denotation, generated coefficients, finite queried prefix, full representation denotation, trace, and rendering as distinct records.
-- Give T40 ownership of generic positional/continued-fraction expansion and coefficient queries. T42 consumes finalized coefficients or a declared schedule source and owns only the substitution-side state/update/trace.
+- Give T40 ownership of generic positional/continued-fraction expansion and coefficient queries, including signed `a0` with positive tail coefficients. T42 consumes finalized coefficients or a declared coefficient source and owns schedule derivation plus the substitution-side state/update/trace.
 - Add no `ConstantDigitsState`, expansion FRONTIER/NEIGHBORHOOD, coefficient-append UPDATE, executor, rollout family, arbitrary callback, hidden prefix/remainder, host CAS object, float coercion, or object-array escape hatch.
 
 ## No-Cheating Checks
@@ -247,6 +249,12 @@ The exact logic contract covers 2,079 long-division states, rational finite cont
 `45-T40-asset-oracle.py` closes exactly 24 governed images at `11 native / 12 relation / 1 control`, 46 references at `24 monolith / 22 split`, 24 distinct physical files and hashes totaling 574,761 bytes, and four multi-file assemblies spanning 16 files. The page-154 and page-156 split-link omissions are explicit. Every asset is `HASH_BOUND`; none is pixel-replayed or used as executable program data. The structural, ordered, and normalized textual-replay digests are respectively `1cbfe8ffc3de77048a2d407c7ef63896dac86a8fc3ec83c7b00c1ea84e6f019e`, `ecf178d94b0b34226592d3b460a2a1e2f0cf6893e1521877f3ada6818898fad6`, and `6fd8578623171650e57a405f2d3e9740b895724609fceb38132ceb202055c1fa`; script SHA-256 is `e2a0cbe8277ee663c81d9bea832336251c022203233fdcb32fc225bff4097f35`.
 
 Its independent textual replay checks 8,255 long-division states and 96 strict-integer square-root events, guards all three mismatches between the extracted square-root bit string and the exact algorithm, and retains the rational source-claim counterexample. Source guards, semantic manifests, import, compilation, relocation, optimized mode, bad usage, hash mutation, and the real source-oracle interface pass.
+
+## Frozen Semantic Closure
+
+`45-T40-semantic-oracle.py` independently reproduces the asset interface at 8,255 long-division states, 96 strict square-root events, and three guarded extraction mismatches. It closes eight exact rational positional cases, 200 prefix cylinders, 60 certified decimal and 96 certified binary digits of pi, 30 certified pi continued-fraction coefficients, five quadratic-surd periods/400 coefficients, and a 120-term exact continued fraction for `e`. Explicit work checks cover 220 long-division events, 390 square-root commutations/780 invariant checks, and 21 Gauss-map commutations. The `(5,4)` versus `(4,4)` loss witness, the surviving algebraic identity under the literal `11/5` misuse, and both failed nonnegative/enclosure obligations are executable guards.
+
+The query audit checks 132 prefix/random-access agreements, separate positional and continued-fraction prefix-loss cylinders, exact/certified/partial/resource outcomes at `1/1/1/2`, unsupported/unknown/approximate/probable/failure outcomes at `4/1/1/1/1`, and eight proof-nonpromotion rejections. Two T42 handoffs carry respectively 20 exact and 12 certified finalized coefficients without an evaluator callback. The public surface contains 34 declarative/work dataclasses, three optional work-record types, zero native T40 execution roles, and zero new class-4 algebras; 53 hostile rejections close invalid carriers, forged certificates, hidden roles, floats, and source repairs. Semantic digest is `e8bbb5e383e78e50ff7bcb7f1897b8fcd525147d694e215f3112761fc2ea011a`; script SHA-256 is `7e737d85bc798fdb0f33ddfa83b430fce206440a07f2458219bcd08b675f7fe3`.
 
 ## Completion Requirements
 

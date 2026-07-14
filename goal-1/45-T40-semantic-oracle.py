@@ -2645,6 +2645,7 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(TypeError, lambda: CoefficientAt(False))
     rejected += must_raise(TypeError, lambda: EvaluationContext(EXACT_METHOD, False))
     rejected += must_raise(ValueError, lambda: EvaluationContext(EXACT_METHOD, 1))
+    rejected += must_raise(ValueError, lambda: EvaluationContext(REPORTED_METHOD, 1))
     rejected += must_raise(ValueError, lambda: EvaluationContext("host_callback", 0))
     rejected += must_raise(
         TypeError,
@@ -2671,6 +2672,13 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(TypeError, lambda: rational_positional_expansion(0.5, 10))
     rejected += must_raise(TypeError, lambda: atan_inverse_interval(5.0, 10))
     rejected += must_raise(TypeError, lambda: direct_sqrt_bits(Fraction(2), 2.0))
+    rejected += must_raise(ValueError, lambda: Unsupported((), "missing"))
+    rejected += must_raise(TypeError, lambda: Unknown("unknown", ["mutable"]))
+    rejected += must_raise(TypeError, lambda: Approximate(3.14, Fraction(1, 100), "float", ()))
+    rejected += must_raise(ValueError, lambda: Approximate(Fraction(3), Fraction(0), "none", ()))
+    rejected += must_raise(TypeError, lambda: Probable((True,), "bad", Fraction(1, 2), 1))
+    rejected += must_raise(ValueError, lambda: Probable((1,), "bad", Fraction(1), 1))
+    rejected += must_raise(ValueError, lambda: Failure("", "diagnostic", ()))
     rejected += must_raise(
         ValueError,
         lambda: begin_sqrt_digit_work(Fraction(9, 4), BOOK_INTEGER_SQRT),
@@ -2699,6 +2707,21 @@ def audit_hostile_validation() -> int:
             result.integer_digits,
             CompleteCertified(forged_certificate),
             result.termination,
+        ),
+    )
+    unsupported = evaluate_query(query, exact_context())
+    assert type(unsupported.outcome) is Unsupported and verify_result(unsupported)
+    rejected += must_raise(
+        ValueError,
+        lambda: ExpansionResult(
+            unsupported.query,
+            unsupported.context,
+            unsupported.provenance,
+            unsupported.start_index,
+            (),
+            (),
+            Unsupported(("wrong-profile",), "forged"),
+            UNKNOWN_TERMINATION,
         ),
     )
     rejected += must_raise(
@@ -2757,7 +2780,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "TO_BE_COMPUTED"
+EXPECTED_DIGEST = "e8bbb5e383e78e50ff7bcb7f1897b8fcd525147d694e215f3112761fc2ea011a"
 
 
 def collect_audit_summary() -> tuple[tuple[str, object], ...]:
