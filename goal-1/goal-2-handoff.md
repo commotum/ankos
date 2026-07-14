@@ -70,18 +70,34 @@ The exact internal split may be refined without changing the semantic ownership 
 | G2-00 | Goal 1 complete | Baseline, migration contract, canonical fixture manifest | None |
 | G2-01 | G2-00 | Structural DOMAIN/value/configuration/codec kernel | None |
 | G2-02 | G2-01 | Branch-free axes, runner, results, traces, failures | None |
-| G2-03 | G2-02 | Fixed-support snapshot assignment and CA-shaped presets | 13 |
+| G2-03 | G2-02 | Fixed-support snapshot assignment and finite-alphabet CA presets | 12 |
 | G2-04 | G2-03 | Visible tag/marker roles and atomic movement/keyed writes | 6 |
-| G2-05 | G2-02 | Exact scalar/map/sieve rules and representations | 5 |
+| G2-05 | G2-02, G2-03 | Exact scalar/positional/map rules and continuous-valued fields | 5 |
 | G2-06 | G2-01 | Declarative model-set relation/query/certificate core | 3 |
 | G2-07 | G2-05, G2-06 | Closed function/constant/differential definitions and queries | 3 |
 | G2-08 | G2-02 | Multiplicity-preserving occurrence bags | 1 |
-| G2-09 | G2-04, G2-07, G2-08 | Ordered generation/edit/mosaic substrate and scheduled presets | 12 |
+| G2-09 | G2-04, G2-05, G2-07, G2-08 | Ordered generation/edit/mosaic substrate, sieve composition, and scheduled presets | 13 |
 | G2-10 | G2-02 | Rooted port-graph access and structural commit | 1 |
-| G2-11 | G2-09 | Finite successor-set lift and branch-witness merge | 1 |
+| G2-11 | G2-09, G2-10 | Finite successor-set lift and branch-witness merge | 1 |
 | G2-12 | G2-03..G2-11 | Registry, migration, datasets/viz, all-catalog verification | None; verifies all 45 |
 
 The ordering is semantic, not a family hierarchy. For example, G2-09 depends on G2-07 only because the T42 preset consumes a complete T40 result, and on G2-08 only to verify T26's restricted posed-bag representation.
+
+### Leaf conformance order inside shared stages
+
+Each catalog row is one leaf obligation `C01` through `C45`, executed inside exactly one shared implementation stage. These dependencies order proofs and reuse; they never select runtime behavior.
+
+| Shared stage | Required leaf order |
+|---|---|
+| G2-03 | `C01 -> C02 -> C03 -> {C04,C05,C06,C21}`; `C07` after C02; C08 independent; `C21 -> C22 -> C23 -> C24` |
+| G2-04 | `C09 -> {C10,C11,C12}`; C19 independent; C25 after C12, C21, and C24 |
+| G2-05 | `C34 -> {C35,C36,C43}`; C44 after C01 and C43 |
+| G2-06 | `C31 -> C32 -> C33` |
+| G2-07 | C41 first; C40 after C34, C36, C41, and C43; C45 after C31, C41, and C44 |
+| G2-08 | C27 |
+| G2-09 | `C13 -> {C14,C16,C17,C26}`; C15 after C14; C18 after C17; C20 and C37 after C16; C28 after C14, C21, and C26; C38 after C37; C39 after C37; C42 after C13 and C40 |
+| G2-10 | C29 |
+| G2-11 | C30 after C16 and C29 |
 
 ## Detailed Goal 2 Stages
 
@@ -151,11 +167,11 @@ The ordering is semantic, not a family hierarchy. For example, G2-09 depends on 
 
 **Re-derive if:** a type needs runner-visible family information, failure requires an ad hoc early-return branch, or result data cannot distinguish outcome from successor cardinality.
 
-### G2-03 — Fixed-Support Assignment and CA-Preset Conformance
+### G2-03 — Fixed-Support Assignment and Finite-Alphabet CA-Preset Conformance
 
 **Depends on:** G2-02.
 
-**Files:** `src/ca/configurations.py`, `loci.py`, `frontiers.py`, `neighborhoods.py`, `rules.py`, `updates.py`, `seeds.py`, `specs.py`; fixed-field preset constructors; `tests/conformance/test_t01_t08.py`, `test_t21_t24.py`, `test_t44.py`.
+**Files:** `src/ca/configurations.py`, `loci.py`, `frontiers.py`, `neighborhoods.py`, `rules.py`, `updates.py`, `seeds.py`, `specs.py`; fixed-field preset constructors; `tests/conformance/test_t01_t08.py`, `test_t21_t24.py`.
 
 **Implementation:**
 
@@ -163,12 +179,11 @@ The ordering is semantic, not a family hierarchy. For example, G2-09 depends on 
 - Implement complete positional tables, exact fixed-arity sum quotients, predicate counts, orbit/property restrictions, factor maps, arbitrary-precision codes, and explicit frame/table permutations as closed RULE data.
 - Implement T04/T05 as strict presets, T06/T07 as validated program restrictions/properties, and T08 as independent event-zero configuration constructors/laws/realizations over an unchanged program.
 - Support generic square/cubic/higher-dimensional fixed incidence and schema-tagged site/kind rule banks without eager impossible tables or runtime RNG.
-- Add continuous-valued field carriers and closed affine-aggregate/scalar-map RULE profiles while keeping exact, certified, tracked, and represented feedback distinct.
 - Preserve native support versus finite work/crop/rendering distinctions.
 
-**Tests/evidence:** all T01-T08 and T21-T24/T44 canonical tables, counts, codecs, asymmetric trajectories, aggregate counterexamples, frame permutations, old-snapshot adversaries, seed/configuration distinctions, arbitrary-precision codes, continuous-field exact profiles, and recorded asset guards.
+**Tests/evidence:** all T01-T08 and T21-T24 canonical tables, counts, codecs, asymmetric trajectories, aggregate counterexamples, frame permutations, old-snapshot adversaries, seed/configuration distinctions, arbitrary-precision codes, and recorded asset guards.
 
-**Complete when:** all 13 mapped obligations pass through the unmodified generic runner and no preset name occurs in execution code.
+**Complete when:** all twelve mapped obligations pass through the unmodified generic runner and no preset name occurs in execution code.
 
 **Re-derive if:** a compact rule schema cannot denotationally round-trip, a boundary/shape becomes native semantics accidentally, or an initial-condition law affects per-step execution.
 
@@ -193,24 +208,23 @@ The ordering is semantic, not a family hierarchy. For example, G2-09 depends on 
 
 **Re-derive if:** complete state cannot be recovered from a representation, movement needs undeclared destination reads in RULE, or collision semantics are selected by catalog identity.
 
-### G2-05 — Exact Scalar, Positional, Sieve, and Iterated-Map Programs
+### G2-05 — Exact Scalar, Positional, Iterated-Map, and Continuous-Field Programs
 
-**Depends on:** G2-02.
+**Depends on:** G2-02 and G2-03.
 
-**Files:** `src/ca/values.py`, `expressions.py`, `configurations.py`, `frontiers.py`, `neighborhoods.py`, `rules.py`, `updates.py`, `traces.py`; `tests/conformance/test_t34_t36.py`, `test_t39.py`, `test_t43.py`.
+**Files:** `src/ca/values.py`, `expressions.py`, `configurations.py`, `frontiers.py`, `neighborhoods.py`, `rules.py`, `updates.py`, `traces.py`; `tests/conformance/test_t34_t36.py`, `test_t43.py`, `test_t44.py`.
 
 **Implementation:**
 
 - Implement the exact discrete `t+0D` singleton event with unique locus, self read, closed unary RULE AST, same-site assignment, and ordinary atomic UPDATE.
 - Add add/multiply, complete Euclidean-residue, ordered-fraction partial, positional encode/reverse/decode/add, and closed exact/piecewise map nodes with structural program identity.
 - Preserve canonical versus fixed/growing-width positional representations and prove only valid lossless commutations.
-- Implement the consecutive-divisor sieve with visible stage marker, proper-multiple witnesses, finite Boolean field/ordered-survivor bijection, and intensional infinite presentation.
-- Keep direct filters/streams/measurements as pure queries; implement Ulam's construction by visible complete-prefix search plus the later ordered append substrate.
 - Separate ideal exact, certified enclosure, tracked significance, fixed binary, and fixed decimal feedback for iterated maps.
+- Add continuous-valued fixed-field carriers plus closed affine-aggregate/scalar-map RULE profiles over G2-03 while keeping exact, certified, tracked, and represented feedback distinct.
 
-**Tests/evidence:** arbitrary-precision scalar events; missing-branch no-commit; ordered-fraction priority; canonical/fixed/grow width-loss adversary; exact sieve rows retaining source `1`; marker advancement on composite stages; filter/query separation; exact rational maps; declared-precision fixtures; discontinuity/partiality and fixed-point event semantics.
+**Tests/evidence:** arbitrary-precision scalar events; missing-branch no-commit; ordered-fraction priority; canonical/fixed/grow width-loss adversary; exact rational maps; declared-precision fixtures; discontinuity/partiality and fixed-point event semantics; T44 exact field profiles, old-snapshot updates, aggregate/map factoring, and represented-feedback boundaries.
 
-**Complete when:** all five mapped obligations use the generic runner and exact value schemas without scalar/map/sieve state or executor classes.
+**Complete when:** all five mapped obligations use the generic runner and exact value schemas without scalar/map/continuous-CA state or executor classes.
 
 **Re-derive if:** equality needs tolerance, exact requests fall back to float, a representation hides width/state needed for the next event, or a pure measurement is being evolved.
 
@@ -275,11 +289,11 @@ The ordering is semantic, not a family hierarchy. For example, G2-09 depends on 
 
 **Re-derive if:** state equality erases multiplicity/frame identity, geometry leaks from visualization, or child creation requires runner special cases.
 
-### G2-09 — Ordered Generation, Structural Edit, Mosaic, and Scheduled Presets
+### G2-09 — Ordered Generation, Structural Edit, Mosaic, Sieve Composition, and Scheduled Presets
 
 **Depends on:** G2-04, G2-07, and G2-08.
 
-**Files:** `src/ca/configurations.py`, `loci.py`, `frontiers.py`, `neighborhoods.py`, `rules.py`, `updates.py`, `traces.py`, `serialization.py`; `tests/conformance/test_t13_t18.py`, `test_t20.py`, `test_t26_t28.py`, `test_t37_t38.py`, `test_t42.py`.
+**Files:** `src/ca/configurations.py`, `loci.py`, `frontiers.py`, `neighborhoods.py`, `rules.py`, `updates.py`, `traces.py`, `serialization.py`; `tests/conformance/test_t13_t18.py`, `test_t20.py`, `test_t26_t28.py`, `test_t37_t39.py`, `test_t42.py`.
 
 **Implementation:**
 
@@ -290,12 +304,13 @@ The ordering is semantic, not a family hierarchy. For example, G2-09 depends on 
 - Implement ordered generation and generic single/multi-span edit policies, including prefix-consume/tail-append, exact endpoint append, and ranked block mosaic assembly. Preserve newborn deferral, source/child order, zero-length witnesses, compatibility validation, and no-commit invalidity.
 - Implement tree steps through a bijective balanced/prefix token representation and disjoint ordered spans; do not add a tree UPDATE.
 - Implement finite rectangular rank-two substitution and contextual lower-right periodic reads; retain adaptive unequal subdivision as typed `Unsupported`.
+- Implement the consecutive-divisor sieve with a visible stage marker, proper-multiple witnesses, finite Boolean field/ordered-survivor bijection, and intensional infinite presentation. Keep direct filters/streams/measurements as pure queries; implement Ulam's construction by visible complete-prefix search followed by the ordinary append substrate.
 - Implement T42 as a finite phase-indexed T13 preset consuming only a complete replay-verified T40 result/handoff or separately tagged closed execution-order schedule. Live phases use T13/D019; exhausted phase retains the final word through the common terminal envelope without D019.
 - Verify the restricted uniform-aligned T26/T27 representation and reject broader mixed-mosaic claims.
 
-**Tests/evidence:** all strict T13-T18 histories, priorities, overlap/newborn, epsilon/extinction/terminal distinctions, Post/Wang widths, cyclic phase quotient, tree S/K/codec cases, T26 compatibility and T27 commutations, T28 context/mosaic/source-Blank rules, T37/T38 prefix/checkpoint/demand/failure cases, and the full frozen T42 source/asset/semantic oracle interfaces.
+**Tests/evidence:** all strict T13-T18 histories, priorities, overlap/newborn, epsilon/extinction/terminal distinctions, Post/Wang widths, cyclic phase quotient, tree S/K/codec cases, T26 compatibility and T27 commutations, T28 context/mosaic/source-Blank rules, T37/T38 prefix/checkpoint/demand/failure cases, exact T39 rows retaining source `1`, composite-stage marker advancement, filter/query separation and Ulam composition, and the full frozen T42 source/asset/semantic oracle interfaces.
 
-**Complete when:** all twelve mapped obligations use one runner and closed ordered UPDATE policies; no padding, regex/host pattern engine, deque callback, hidden cursor, tree/substitution executor, raster program, or online coefficient stream exists.
+**Complete when:** all thirteen mapped obligations use one runner and closed UPDATE policies; no padding, regex/host pattern engine, deque callback, hidden cursor, tree/substitution/sieve executor, raster program, or online coefficient stream exists.
 
 **Re-derive if:** a structural edit cannot preserve complete order/lineage, a snapshot handle can be forged or reused across states, a representation needs hidden source data, or an unsupported adaptive/sequential convention is being guessed.
 
@@ -405,12 +420,12 @@ The `Coverage stage` column assigns each catalog row exactly once. Shared implem
 | T36 | Digit-Reversal Arithmetic Systems | G2-05 | `43-T36-DIGIT-REVERSAL.md` | Closed positional rule, canonical commutation, fixed/grow width distinction |
 | T37 | Recursive Sequences | G2-09 | `15-T37-RECURSIVE.md` | Complete prefix, unique endpoint, fixed-lag read, exact append/replay |
 | T38 | Variable-Index Recursive Sequences | G2-09 | `44-T38-VARIABLE-RECURRENCE.md` | Dependent term-address AST, ordered demands/failures, unchanged append |
-| T39 | Number-Theoretic Filtering Systems | G2-05 | `16-T39-FILTERS.md` | Consecutive sieve events/marker plus pure filter/measurement separation |
+| T39 | Number-Theoretic Filtering Systems | G2-09 | `16-T39-FILTERS.md` | Consecutive sieve events/marker plus pure filter/measurement separation |
 | T40 | Mathematical-Constant Digit Systems | G2-07 | `45-T40-CONSTANT-DIGITS.md` | Pure representations, proof/termination taxonomy, work programs, T42 handoffs |
 | T41 | Function-Combination Systems | G2-07 | `17-T41-FUNCTIONS.md` | Closed definitions/domains/branches and scoped exact/certified queries |
 | T42 | Continued-Fraction-Driven Substitution Systems | G2-09 | `46-T42-CF-SUBSTITUTION.md` | Replay-verified finite schedule, phased T13 lowering, exact exhaustion |
 | T43 | Iterated Maps | G2-05 | `18-T43-ITERATED-MAPS.md` | Exact/represented scalar feedback, closed maps, event and analyzer separation |
-| T44 | Continuous Cellular Automata | G2-03 | `19-T44-CONTINUOUS-CA.md` | Continuous value carrier, affine aggregate/map, old-snapshot field update |
+| T44 | Continuous Cellular Automata | G2-05 | `19-T44-CONTINUOUS-CA.md` | Continuous value carrier, affine aggregate/map, old-snapshot field update |
 | T45 | Partial Differential Equation Systems | G2-07 | `20-T45-PDE.md` | Differential problem/solution/query/certificate and numerical-relation boundary |
 
 ## Cross-Stage No-Cheating Verification

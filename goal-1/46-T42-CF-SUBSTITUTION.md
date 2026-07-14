@@ -1,6 +1,6 @@
 # 46-T42-CF-SUBSTITUTION
 
-Status: **IN PROGRESS — SOURCE, ASSET, SEMANTIC, ARCHITECTURE, AND HOSTILE-REVIEW CLOSURE PENDING**
+Status: **COMPLETE — SOURCE, ASSET, SEMANTIC, RUNTIME-FIT, D140 ARCHITECTURE, AND INDEPENDENT HOSTILE REVIEW CLOSED**
 
 ## Current Facts
 
@@ -288,15 +288,15 @@ The public audit sees 35 dataclasses, zero forbidden native roles, zero class-4 
 
 ## Completion Requirements
 
-- [ ] Every strict-main, native-Notes, actual-Index, split, relation, control, continuation, exclusion, and source-defect candidate is dispositioned with zero unresolved mechanics.
-- [ ] Every governed or excluded raster candidate is hash-bound; the page-162 manual transcription and all nonauthority limits are explicit.
-- [ ] Natural-prefix orientation, signed `a0`, positive unbounded tail, `m-1` event count, fixed seed, horizon identity, and exhaustion are independently verified.
-- [ ] The compact and tagged interface encodings and the canonical uniform-phase T13 lowering commute one live event at a time with complete outcomes and lineage; all views retain the final word under the common terminal envelope.
-- [ ] T40 handoffs replay complete results and reject forged IDs, coefficients, outcomes, termination, callbacks, and producer state; explicit schedules use a separate schema.
-- [ ] Quadratic macros, rational dual forms, mechanical-word observers, page-162 fixtures, and sine/digital-slope/billiard boundaries are adversarially tested.
-- [ ] Source, asset, semantic, cross-interface, mutation, portability, fail-closed, mode, Markdown, diff, scope, repository-test, and independent hostile-review gates pass.
-- [ ] D140, plan, evidence index, design ledger, architecture audit, and Goal 2 handoffs are synchronized with no new execution algebra.
+- [x] Every strict-main, native-Notes, actual-Index, split, relation, control, continuation, exclusion, and source-defect candidate is dispositioned with zero unresolved mechanics.
+- [x] Every governed or excluded raster candidate is hash-bound; the page-162 manual transcription and all nonauthority limits are explicit.
+- [x] Natural-prefix orientation, signed `a0`, positive unbounded tail, `m-1` event count, fixed seed, horizon identity, and exhaustion are independently verified.
+- [x] The compact and tagged interface encodings and the canonical uniform-phase T13 lowering commute one live event at a time with complete outcomes and lineage; all views retain the final word under the common terminal envelope.
+- [x] T40 handoffs replay complete results and reject forged IDs, coefficients, outcomes, termination, callbacks, and producer state; explicit schedules use a separate schema.
+- [x] Quadratic macros, rational dual forms, mechanical-word observers, page-162 fixtures, and sine/digital-slope/billiard boundaries are adversarially tested.
+- [x] Source, asset, semantic, cross-interface, mutation, portability, fail-closed, mode, Markdown, diff, scope, repository-test, and independent hostile-review gates pass.
+- [x] D140, plan, evidence index, design ledger, architecture audit, and Goal 2 handoffs are synchronized with no new execution algebra.
 
 ## Stage Results
 
-Pending oracle, architecture, integration, and hostile-review closure.
+COMPLETE. All source, asset, semantic, cross-interface, mutation, portability, fail-closed, runtime-fit, architecture, integration, and independent hostile-review gates pass. D140 classifies T42 as classes 1–3 reuse over T13/D019/D024 with closed schedule construction and provenance validation only; no runtime code changed, no new execution algebra was added, and no prior stage reopened. Next: synthesis.

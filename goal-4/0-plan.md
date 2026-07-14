@@ -379,9 +379,10 @@ Stages 8–36 process author text. Each assigned batch must:
 ## Current Execution State
 
 - Synced: 2026-07-14 (America/Los_Angeles).
-- Active stage: `1-GUARDRAILS` (`IN_PROGRESS`).
+- Active stage: `2-BASELINE` (`IN_PROGRESS`).
 - The sibling release root `ref/A-New-Kind-of-Science-Repaired/` does not yet exist.
-- Protected unrelated work present at stage start: `goal-1/45-T40-CONSTANT-DIGITS.md`, `goal-1/45-T40-semantic-oracle.py`, and `goal-1/45-T40-source-oracle.py`.
+- Stage 1 completed with 59 Goal 1 root oracles classified, all 40 affected oracles behaviorally frozen, 1,510 governed dependency rows re-derived, 39 mutation tests passing, and three independent hostile reviews passing.
+- Protected unrelated Goal 1 work remains outside Goal 4's write scope.
 - Goal 4 execution writes remain restricted to `goal-4/**` and, only in later owning stages, `ref/A-New-Kind-of-Science-Repaired/**`.
 
 ## Stage Dependencies And Status
@@ -390,8 +391,8 @@ Keep one current status per stage and at most one `IN_PROGRESS` stage. `SOURCE_B
 
 | Stages | Current status | Prerequisites |
 |---|---|---|
-| 1 | `IN_PROGRESS` | none |
-| 2 | `NOT_STARTED` | 1 |
+| 1 | `COMPLETE` | none |
+| 2 | `IN_PROGRESS` | 1 |
 | 3 | `NOT_STARTED` | 1–2 |
 | 4 | `NOT_STARTED` | 1–2; witness schema known, but full witness coverage may still be pending |
 | 5 | `NOT_STARTED` | 1–2, 4 |
