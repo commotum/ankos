@@ -169,7 +169,7 @@ EXPECTED_QUERY = {
     "Q01": (1, 0, 1, "51493d0e1042577adde32e82b51d1ce32eee5d1903b81fe72f4cb791c11ac6b2"),
     "Q02": (2, 2, 0, "99cc0441a49e6cb1bf773c82cc27a06e0923e447dadef1a8453805ff6f8ac19c"),
     "Q03": (3, 3, 0, "97ad5a256e556b9ac4e431f1dd8a9d2b233c76352ba9fbd01bedd4baebc44701"),
-    "Q04": (0, 0, 0, "e3b0c44298fc1c149afbf4cd8996fb92427ae41e4649b934ca495991b7852b855"),
+    "Q04": (0, 0, 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
     "Q05": (4, 2, 2, "67ac7d563f560e9f2d22f30b5bb27ab7d20819025435385e22d2e373ae8ddf2c"),
     "Q06": (5, 5, 0, "24169a59e11dd2bdec245a477d181c83e8624b486250f595c8364fe17acc0954"),
     "Q07": (23, 13, 10, "b946fac1940f142a257a962e200195c404c5992d222216104af1f9aebfec9035"),
@@ -177,18 +177,18 @@ EXPECTED_QUERY = {
     "Q09": (2, 2, 0, "f81e470d92b3fbd2fbdcd0fdf76a13de4fb423dde7c3b25fb437665c921e79f1"),
     "Q10": (4, 4, 0, "e09ce51fdd294991012e28f7a4de6cea1b6c5d66d374fbca07bdfbe82ed0ef45"),
     "Q11": (2, 2, 0, "8f29f394e6d0403d3c3e0ba58cdfc2f49a14d831cc43244c1f1e7e1a2f558f6a"),
-    "Q12": (0, 0, 0, "e3b0c44298fc1c149afbf4cd8996fb92427ae41e4649b934ca495991b7852b855"),
-    "Q13": (0, 0, 0, "e3b0c44298fc1c149afbf4cd8996fb92427ae41e4649b934ca495991b7852b855"),
+    "Q12": (0, 0, 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+    "Q13": (0, 0, 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
     "Q14": (2, 2, 0, "2b38c0a5431171f2d39496c0bec159ed30c56fed81014b631db34fc5614547c1"),
     "Q15": (2, 0, 2, "d036a1ece9a499652236e864811f066808f46b6755a3c0aca2ed09c7369468a3"),
     "Q16": (2, 2, 0, "1c3f52bf3553a603d9408f3ba60f4f01df9d044b5cd5738cfbfde32af92bdd0f"),
     "Q17": (1, 1, 0, "337f683f86185141f92ef0a68c76b2cc254dcdfcca9f6ab1e513c14e9248e0e7"),
     "Q18": (2, 0, 2, "154cff02563829d70fa5bbf0637554554a894d903e16e5af8ce0b32c97ff570c"),
-    "Q19": (0, 0, 0, "e3b0c44298fc1c149afbf4cd8996fb92427ae41e4649b934ca495991b7852b855"),
+    "Q19": (0, 0, 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
     "Q20": (2, 2, 0, "df0811e5f702c0ba50307e135c77ae6dc031128fd9f47223e57be5dd4f69c212"),
     "Q21": (3, 3, 0, "aca5f673c27b0ffa5674a95ea2bc09f392492aec71a182270788a10582cfee57"),
     "Q22": (3, 3, 0, "de7a93a3ec621266b299d66d258294215044970ec0d17d9b9a8023ecfa88cd78"),
-    "Q23": (0, 0, 0, "e3b0c44298fc1c149afbf4cd8996fb92427ae41e4649b934ca495991b7852b855"),
+    "Q23": (0, 0, 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
     "Q24": (3, 3, 0, "dd130125682c7f05623ebc777bf2e79002de980b669334726af560a93bceb7b7"),
 }
 
@@ -312,29 +312,61 @@ RAW_EXAMPLE_ROW = (
 REPAIRED_EXAMPLE_ROW = (
     r"\{\{_, 1\}, \{0, 1\}\} \rightarrow \{\{1, 0\}, \{1, 1\}\}"
 )
+OFFICIAL_NOTE_URL = (
+    "https://www.wolframscience.com/nks/"
+    "notes-5-4--neighbor-dependent-2d-substitution-systems/"
+)
 
 
-# Filled after the discovery vocabulary and classifications were reviewed.
-EXPECTED_SET: dict[str, tuple[int, str]] = {}
-EXPECTED_EXCLUDED_CLASS: dict[str, tuple[int, str]] = {}
-EXPECTED_INDEX_CLASS: dict[str, tuple[int, str]] = {}
-EXPECTED_IMAGE_PARTITION: dict[str, tuple[int, str]] = {}
-EXPECTED_EXCLUDED_IMAGE_CLASS: dict[str, tuple[int, str]] = {}
-EXPECTED_INDEX_GUARDS: tuple[int, str] | None = None
-EXPECTED_RASTER_TRANSCRIPTION: tuple[int, str] | None = None
+# Frozen after every discovery hit and governed continuation was inspected.
+EXPECTED_SET = {
+    "union": (67, "11bb91d9a96cd9b82089c1f45a8bb8473c91eb6ebec3ba04f78404fe0a5f9e2c"),
+    "pre_index_union": (52, "9d6995eaf237deca9959ba2d18547896fcfcf9e14cea07f1fd8e307714616a63"),
+    "index": (15, "525d824e26d2830c26e171aeed650e5830a812ae3a251693d0cbd01aa5da85e7"),
+    "matched_retained": (41, "38211f87eb2055900e25d896dbd0ab014f00ecfbc873e30a7b141a71cb8c28c7"),
+    "governed_continuations": (30, "df8df7d8c1934fb069d5048e6ee8f8fefef3c0b5a246f2c5616e55fc39759856"),
+    "retained": (71, "985faff919920a422eecde0ef283c86d49c4cea73be8bf33e86d29e96be99c18"),
+    "excluded": (11, "0d5619d01232a9f8e9fabb87027b847549465b9a4cb916944d4d2f497426c0ed"),
+    "native": (6, "8fbba0be6bdf720fd223be421b5b0fdf4e547c8832230b08eb42aca320e9045e"),
+    "relation": (13, "83fa916fb2b060dbe8896af54a58950776e900217bdf0da673b88c174c353150"),
+    "control": (52, "be292a32930d092e5bb886849f2cc0f1cc119e2fdf474bdecea8d8ad62f81182"),
+    "governed_images": (10, "06e50ad4cf8480aed23443fd40147ac0fb35e0776e1883d025467943c4889411"),
+    "excluded_images": (7, "8b6cbf265e37d7759d88fad5b1fa99c9814dc40293ea8a350f3a40b21bbd26f7"),
+}
+EXPECTED_EXCLUDED_CLASS = {
+    "ordinary_T26_downstream_only": (9, "3e1e2dec1734f75bf57c79911bc12d66e4e6d91ebf26cab9f50ac0a3f0b0de10"),
+    "unrelated_CA_cryptanalysis": (1, "ed12f17149c7e7b586c76a949fed6e85c2f1bf57e820427eac00c1eeb3926f3d"),
+    "generic_encoding_function": (1, "77a8197f477be9bace08ae8afa8959a2ca59bfbe351d767d7ba9ea60008383d4"),
+}
+EXPECTED_INDEX_CLASS = {
+    "native_T28_routes": (2, "d036a1ece9a499652236e864811f066808f46b6755a3c0aca2ed09c7369468a3"),
+    "T14_alias_controls": (3, "6ece6fe889c2a32a9152d22aa19342a55b799c56a2e5ab8fecb48f56924f1c65"),
+    "T26_sibling_routes": (10, "89f71cc6c580d01bd25fe1c5e94b3dbfafa0aa5353a922f43194024d26f27222"),
+}
+EXPECTED_IMAGE_PARTITION = {
+    "native": (1, "9bf42f4b66fe462d800a8b659ec866dca7f23597393f9cb25456d41f5458b590"),
+    "relation": (2, "ac31f08d2eaed3c8cfd457f9d4922b7fab79508739676c57158d156356528eb2"),
+    "control": (7, "6159ae09901c63d9c720102232de4bbc096433209203024d3750c10068f2f0e9"),
+}
+EXPECTED_EXCLUDED_IMAGE_CLASS = {
+    "adjacent_T25_or_post_relation_families": (4, "7aa56d7cb437421ee86b85981746d758cd8adc86c8057f4cb918128bc994b84c"),
+    "notes_page_Mandelbrot_noise": (3, "fe656793d838867fcb52027854d8ffb11168eef2d923f4194b4e1cb0f5661446"),
+}
+EXPECTED_INDEX_GUARDS = (15, "dfcc4b6eff8a0df684f9938f42aee8695628bc2dfe604011228b6f0f10c9259c")
+EXPECTED_RASTER_TRANSCRIPTION = (6, "6a4016f19a5bb71a3dcd20f3973e4b109a54dfe5dfe73e5d89fe1b167d8f0a9b")
 
 EXPECTED_SPLIT_FILE_COUNT = 17
 EXPECTED_SPLIT_PATHS_DIGEST = "409ee97767cd31136d0d647ac9f1d4555fa6154e20a3cd620baaa915d1bf6692"
 EXPECTED_SPLIT_MANIFEST_DIGEST = "55a03f55f7c609afc197dc37f38bc25081b90502e720ed7210335deee15a9a84"
-EXPECTED_SPLIT_QUERY: tuple[int, str] | None = None
-EXPECTED_SPLIT_QUERY_EXACT: tuple[int, str] | None = None
-EXPECTED_SPLIT_QUERY_NONEXACT: tuple[int, str] | None = None
-EXPECTED_SPLIT_QUERY_MAPPING: tuple[int, str] | None = None
-EXPECTED_SPLIT_RETAINED_EXACT: tuple[int, str] | None = None
-EXPECTED_SPLIT_RETAINED_NONEXACT: tuple[int, str] | None = None
-EXPECTED_SPLIT_RETAINED_MAPPING: tuple[int, str] | None = None
-EXPECTED_MONOLITH_ONLY: tuple[int, str] | None = None
-EXPECTED_ATLAS_HITS: tuple[int, str] | None = None
+EXPECTED_SPLIT_QUERY = (66, "72049c6d60dda71ba13b6bce1b76d2ea5afeb9bf6cf3f02dc9d27076ba716d14")
+EXPECTED_SPLIT_QUERY_EXACT = (53, "82102d417dcf8f0d73a18bdb4e797ad1d99218c485dc190319ad550f19da20ff")
+EXPECTED_SPLIT_QUERY_NONEXACT = (13, "d6bc73fd224b5466f28277cab27128a40c35037603b7c10ed4e1fe2ccfdd1ac9")
+EXPECTED_SPLIT_QUERY_MAPPING = (13, "53abbb27d237e52e94deb76a0fe5c949b4d7b55d3ff55593f3c031a7636f5d04")
+EXPECTED_SPLIT_RETAINED_EXACT = (48, "4ef4dbfec95bd1bb4d0b4f8606c29a61115e3dc8987d964f46cc131df16bd453")
+EXPECTED_SPLIT_RETAINED_NONEXACT = (23, "e45d05c69921a8c9d47372b0d380ec9d216855744400a19a887e10d1d6f6a20e")
+EXPECTED_SPLIT_RETAINED_MAPPING = (23, "bf1528da95d3a92fa509f09e1062aed566f89ccf15ded67713baed7a5b279748")
+EXPECTED_MONOLITH_ONLY = (0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+EXPECTED_ATLAS_HITS = (2, "d6ef54ffa4ed4062c4cce2ec86050f137de9e2b75fdeea0b6e2cf6a9de0ae307")
 
 
 def digest(values: set[int] | frozenset[int]) -> str:
@@ -549,6 +581,10 @@ def main() -> int:
         and all(IMAGE_RE.fullmatch(at(line_no)) for line_no in GOVERNED_IMAGE_LINES)
         and not set(EXCLUDED_IMAGE_LINES) & set(RETAINED)
         and all(IMAGE_RE.fullmatch(at(line_no)) for line_no in EXCLUDED_IMAGE_LINES)
+        and CANDIDATE_IMAGE_LINES == GOVERNED_IMAGE_LINES | EXCLUDED_IMAGE_LINES
+        and not GOVERNED_IMAGE_LINES & EXCLUDED_IMAGE_LINES
+        and len(CANDIDATE_IMAGE_LINES) == 17
+        and not UNRESOLVED_IMAGE_LINES
     )
     for name, values in image_sets.items():
         actual = (len(values), digest(values))
@@ -592,13 +628,16 @@ def main() -> int:
         and RAW_EXAMPLE_ROW.replace("-", "_") == REPAIRED_EXAMPLE_ROW
         and repaired_line.count(REPAIRED_EXAMPLE_ROW) == 1
         and RAW_EXAMPLE_ROW not in repaired_line
+        and OFFICIAL_NOTE_URL.endswith(
+            "notes-5-4--neighbor-dependent-2d-substitution-systems/"
+        )
         and "Mathematica pattern of the form" in at(14055)
         and at(14055).count("-") >= 4
         and 14055 in CONTROL_EVIDENCE
     )
     ok &= repair_ok
     print(
-        "source_exact_blank_OCR_repair_one_example_row_only",
+        "source_official_exact_blank_OCR_repair_one_example_row_only",
         "OK" if repair_ok else "MISMATCH",
     )
 
@@ -631,6 +670,18 @@ def main() -> int:
     print(
         "source_notes_one_row_periodic_2x2_context_flatten2d",
         "OK" if notes_ok else "MISMATCH",
+    )
+
+    adaptive_extension_ok = (
+        "some replacements lead to subdivision of elements but others do not" in at(13810)
+        and "unlike for the 1D case" in at(13810)
+        and "arbitrarily large set of different possible neighborhood configurations" in at(13810)
+        and 13810 in NATIVE_EVIDENCE
+    )
+    ok &= adaptive_extension_ok
+    print(
+        "source_adaptive_mixed_subdivision_is_dynamic_context_caveat",
+        "OK" if adaptive_extension_ok else "MISMATCH",
     )
 
     windows = periodic_windows_2x2(((0, 1, 2), (3, 4, 5)))
@@ -840,6 +891,7 @@ def main() -> int:
         and repair_ok
         and main_construction_ok
         and notes_ok
+        and adaptive_extension_ok
         and periodic_model_ok
         and assembly_ok
         and analog_and_boundary_ok

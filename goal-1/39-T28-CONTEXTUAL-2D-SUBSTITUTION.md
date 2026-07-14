@@ -36,9 +36,13 @@ Reconstruct the exact two-dimensional contextual substitution construction and e
 - Provisional entry kind: contextual rank-two grid-replacement preset in discrete `t+2D`.
 - Initial vocabulary: neighbor-dependent/contextual two-dimensional/2D substitution, neighboring elements, grid replacement, subdivision, `Partition[list,{2,2},1,-1]`, `Flatten2D`, cyclic/wraparound grid, northwest context, compact pattern rules, page 192/935, non-nested behavior, unequal subdivision, sequential higher-dimensional scanning, cellular-automaton relation, L-system relation, and Index aliases.
 
-## Search Log
+## Source Audit
 
-The frozen source oracle will replace this provisional log with a query-by-query disjoint manifest. Searches already inspected include:
+`39-T28-source-oracle.py` is the fail-closed evidence record. Its 25 frozen query lanes cover the direct construction name, contextual mechanics, the exact Notes expression, wrap/cyclic aliases, page routes, the T14 one-dimensional analog, the T26 aligned base, the T27 free-geometric contrast, the higher-dimensional sequential-scan boundary, the CA singleton-output relation, network and constraint controls, actual Index entries, native/cross-reference image links, and explicit absence of common modern aliases and padding language.
+
+The query union contains 67 canonical monolith lines: 52 before the actual Index and 15 actual-Index routes. The pre-Index hits close as 41 retained plus 11 excluded. Thirty semantically governed continuation lines make 71 retained lines in total, partitioned as `6 native / 13 relation / 52 control`. All 15 Index routes are guarded by exact entry fragments and partition as `2 native T28 / 3 T14 alias controls / 10 T26 sibling routes`. The split-corpus reverse join closes 66 query records as `53 exact + 13 mapped` and all 71 retained lines as `48 exact + 23 mapped`, with zero monolith-only retained evidence and zero unresolved candidates.
+
+The frozen searches can be reproduced directly:
 
 ```bash
 rg -n -i 'neighbor[- ]dependent (two[- ]dimensional|2D)|two[- ]dimensional.*neighbor[- ]dependent|neighbor[- ]dependent.*substitution' \
@@ -47,9 +51,10 @@ rg -n -i 'replacement for a particular element|sets up elements on a grid|depend
   ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md
 rg -n 'Flatten2D|Partition\[list, \{2, 2\}, 1, -1\]' \
   ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md
+python3 goal-1/39-T28-source-oracle.py
 ```
 
-Known high-signal candidates are `BOOK:2312-2356`, `BOOK:2358-2366`, `BOOK:8024-8028`, `BOOK:12109-12115`, `BOOK:12249-12251`, `BOOK:13806-13810`, and the actual Index route at `BOOK:22144`. Their native/relation/control dispositions remain to be frozen.
+The oracle deliberately returns no direct hits for modern phrases such as `contextual two-dimensional substitution`, `tile substitution`, or padding/boundary-symbol menus. It does not treat those absences as proof that the construction is missing; they prevent modern terminology from silently becoming source semantics. Its eleven exclusions are nine ordinary-T26 downstream references, one unrelated CA-cryptanalysis occurrence, and one generic encoding-function occurrence.
 
 ## Book Excerpts
 
@@ -99,11 +104,45 @@ Flatten2D[Partition[list, {2, 2}, 1, -1] /. rule]
 
 > as soon as one defines any particular order for elements ... this in effect reduces one to dealing with a one-dimensional system.
 
-Additional direct, caption, Notes, history, Index, emulation, constraint, and false-positive excerpts remain under audit.
+### E06 — the one-dimensional contextual analog changes reads and eligibility
+
+- Source: `BOOK:1018-1024`, exact Notes at `BOOK:12109-12115`, and relation plate `BOOK:1020`.
+- Establishes: T14 reads an old element and its immediate right neighbor; the final old element is excluded because it has no complete open-boundary context. This is a responsibility-level precedent for contextual rule choice, not T28's frontier or boundary preset.
+
+### E07 — singleton outputs recover fixed-support CA behavior
+
+- Source: `BOOK:8022-8028` and relation plate `BOOK:8026`.
+- Establishes: highly uniform neighbor-dependent substitution rules whose every replacement contains one cell correspond directly to cellular automata. This is a restriction/representation relation, not evidence that CA is the enclosing abstraction and not evidence for a separate executor.
+
+### E08 — the actual Index fixes the native route
+
+- Source: `BOOK:22144`.
+- Establishes: the Book indexes `Substitution systems ... neighbor-dependent 2D, 192, 935`. The ordinary 2D, one-dimensional neighbor-dependent, and CA-emulation entries are separately dispositioned rather than silently merged.
+
+### E09 — networks and constraints are semantic controls
+
+- Source: `BOOK:2368-2376`, `2464`, and `2568-2600`.
+- Establishes: loss of fixed underlying support motivates network systems, while constraint systems replace explicit evolution with model conditions. Neither distinction applies to T28's explicit periodic grid step, but both prevent overclaiming that every later Book construction is this same preset.
+
+### Exact source-repair boundary
+
+The local monolith's `BOOK:13806` renders the first pattern slot as `-`, which is not executable as the intended Mathematica blank. The official Wolfram Science note, `notes-5-4--neighbor-dependent-2d-substitution-systems`, gives `_`. The audit permits exactly this one substitution in exactly this one example row. It does not repair any raster glyph, infer a complete table, or establish a general OCR-normalization policy.
+
+## Asset Audit
+
+`39-T28-asset-oracle.py` binds the exact source-governed universe of ten JPEGs to unique physical paths, monolith references, split references, byte lengths, dimensions, SHA-256 values, evidence roles, and assembly membership. It partitions them as `1 native / 2 relation / 7 control`, closes `20 references = 10 monolith + 10 split`, ten unique hashes, 1,112,143 bytes, and two paired assemblies covering four files. The other six assets are standalone.
+
+| Role | `BOOK` image lines | Evidence boundary |
+|---|---|---|
+| Native | `2362` | Exact T28 plate; caption and panel counts only |
+| Relation | `1020`, `8026` | T14 contextual analog and singleton-output CA relation |
+| Control | `2314`, `2322`, `2328`, `2330`, `2340`, `2344`, `2354` | T26 aligned replacement and T27 free-geometry contrasts |
+
+The mechanical adjacency closure contains seventeen candidates. Seven are explicitly excluded and not hash-bound: `2302`, `8018`, `8036`, `8038`, `13800`, `13802`, and `13804`. They are, respectively, the preceding T25 path observer, adjacent Turing/sequential CA-emulation plates, and unrelated Mandelbrot images near the Notes heading.
+
+The evidence boundary is `10 HASH_BOUND / 1 LIMITED_TRANSCRIBED / 0 PIXEL_REPLAYED`. For `BOOK:2362`, the limited manual transcription records only the printed construction name, the statement that the grid wraps in both dimensions, displayed labels `step 1` through `step 7`, five top rule panels, eight gallery panels `(a)` through `(h)`, and the gallery's eight-step caption. Exact glyph contents, complete rule table, seed, intermediate arrays, trace, palette map, and gallery cell arrays remain unrecovered.
 
 ## Construction Model
-
-The following is provisional until source and semantic oracles close.
 
 - **DOMAIN:** discrete `t+2D`.
 - **CONFIGURATION:** finite nonempty rectangular grid with periodic incidence in both spatial axes; dimensions may change after replacement.
@@ -111,12 +150,53 @@ The following is provisional until source and semantic oracles close.
 - **SEED:** the plate begins from a displayed finite grid; exact raster transcription is not yet claimed.
 - **FRONTIER:** every old tile exactly once, with row/column product order used for assembly and source-bound lineage.
 - **NEIGHBORHOOD:** an ordered cyclic `2 x 2` old-snapshot block aligned so `Self` is the lower-right member; the compact plate appears to ignore/factor at least one slot, but the exact factorization remains to be proved.
-- **RULE:** a finite closed ordered contextual pattern table over typed `Literal(label) | Any` slots, or a behavior-equivalent exhaustive expansion with source form retained separately, returning one positive rectangular patch over the same alphabet for each selected old source. Ordered overlap uses first match; validation proves every finite context has a match.
+- **RULE:** a finite closed ordered contextual product-pattern table over typed `Literal(label) | Blank` slots, or a behavior-equivalent exhaustive expansion with source form retained separately, returning one positive rectangular patch over the same alphabet for each selected old source. Ordered overlap uses first match; validation proves every finite context has a match. A desired fallback must be an explicit final row, never host `ReplaceAll` behavior.
 - **UPDATE:** T26 `RankedBlockMosaicAssemble(rank=2)`; the strict uniform `2 x 2` plate uses `RankedUniformBlockAssemble(rank=2)`. UPDATE validates complete source/write coverage and mosaic compatibility before allocating and committing one successor.
 - **SCHEDULE:** all reads and rule choices use one immutable old toroidal snapshot; all patches commit atomically; newborn tiles wait until the next event.
 - **OUTCOME:** a valid complete strict table advances one deterministic generation even for an identity result. Invalid/missing/ambiguous pattern coverage or incompatible patches produce typed no-commit invalidity, not a halt or partial successor.
 - **LINEAGE:** every old tile owns its emitted patch rectangle and exact parent-local children. Context cells influence rule choice without becoming additional parents.
 - **OBSERVERS:** raster scale, grayscale antialiasing, nestedness/complexity descriptions, and display crops do not enter program state.
+
+### Exact one-step factorization
+
+For an old grid `G` of shape `H x W`, let source `(y,x)` read
+
+```text
+C_G(y,x) = ((G[y-1,x-1], G[y-1,x]),
+            (G[y,  x-1], G[y,  x]))
+```
+
+with both indices reduced modulo `(H,W)`. This is the derived lower-right/self alignment of `Partition[..., {2,2}, 1, -1]`. It deliberately retains four ordered slot occurrences even when periodic aliasing makes several slots name the same physical tile on `1 x 1`, `1 x W`, or `H x 1` grids. Incidence multiplicity is part of the read; deduplicating coordinates changes the rule input.
+
+The ordered table selects one patch `P[y,x]` from `C_G(y,x)`. UPDATE receives exactly one source-bound patch for every old tile and applies D132:
+
+```text
+active = AllOldTiles.select(G)
+reads  = PeriodicProductWindow(NW,N,W,Self).read(G, active)
+writes = OrderedProductPatternTable(rows).apply(active, reads)
+next   = RankedBlockMosaicAssemble(rank=2).apply(G, active, writes)
+```
+
+No context slot is itself a write target. Each patch is owned by the selected `Self` source; the other three old occurrences influence choice only. UPDATE first validates source-token provenance, exactly-once source coverage, positive rectangular patches, and D132 mosaic compatibility, then assembles one successor in old-source/product order. This makes overlapping reads harmless: there is no overlapping write ownership to resolve.
+
+### Pattern language and executable-profile boundary
+
+The repaired Notes row means exactly
+
+```text
+((Blank, Literal(1)), (Literal(0), Literal(1)))
+    -> ((1,0), (1,1))
+```
+
+and therefore matches both values of the northwest slot in the binary profile. Rows are immutable ordered data. First-match priority is observable when two patterns overlap, so an unordered map or row sorting is not equivalent. Because the finite alphabet and four slots make the strict context space finite, validation can expand rows to a complete literal table and reject any missing context before execution. Expansion is a behavior realization, not by itself a lossless encoding of source syntax: shadowed rows, different factorizations, and different orderings can denote the same literal function. Retaining the normalized source rows and provenance alongside the compiled table preserves program identity without a hidden host-pattern interpreter.
+
+The complete native plate table, native seed, and native trace are raster-only and deliberately unavailable. The executable oracle therefore uses the one exact repaired row as a matching fixture and independently declared synthetic complete tables to prove the construction. It never claims to replay the page-192 example.
+
+### Unequal-subdivision boundary
+
+`BOOK:13810` explicitly permits replacements where only some elements subdivide, then warns that the two-dimensional neighborhood configurations around a cell are generally arbitrarily numerous. This is native evidence for a broader adaptive construction, but not enough evidence to freeze its carrier, adjacency update, matching schema, compatibility conditions, or exact trace. A fixed four-slot rectangular-grid rule table cannot claim that variant merely by accepting differently sized arrays.
+
+The honest result is an open profile inside the same SimpleProgram architecture: it may require a dynamic hierarchical/cell-complex CONFIGURATION and a topology-derived NEIGHBORHOOD, while still using the same branch-free select/read/write/apply runner. Goal 2 must not add a callback, unbounded opaque pattern object, family executor, or padded rectangular approximation. The strict finite periodic profile can be implemented independently; the adaptive profile remains unavailable until primary evidence or an explicit separately sourced specification closes those mechanics.
 
 ## Current API Fit
 
