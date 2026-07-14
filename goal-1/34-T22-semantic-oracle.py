@@ -530,6 +530,171 @@ def expected_projection_hex() -> tuple[str, ...]:
     )
 
 
+def square_position_permutation(
+    quarter_turns: int, reflected: bool = False
+) -> tuple[int, ...]:
+    """Target-to-source permutation in canonical Book row/column order."""
+
+    turns = require_int(quarter_turns, "quarter turns")
+    if turns < 0 or turns >= 4:
+        raise ValueError("quarter turns must be in range(4)")
+    if type(reflected) is not bool:
+        raise TypeError("reflected must be an exact bool")
+    position_index = {
+        position: index for index, position in enumerate(BOOK_NINE_POSITIONS)
+    }
+    permutation: list[int] = []
+    for row, column in BOOK_NINE_POSITIONS:
+        if reflected:
+            column = -column
+        for _ in range(turns):
+            row, column = column, -row
+        permutation.append(position_index[(row, column)])
+    return tuple(permutation)
+
+
+def c4_square_permutations() -> tuple[tuple[int, ...], ...]:
+    return tuple(square_position_permutation(turns) for turns in range(4))
+
+
+def d4_square_permutations() -> tuple[tuple[int, ...], ...]:
+    return c4_square_permutations() + tuple(
+        square_position_permutation(turns, reflected=True)
+        for turns in range(4)
+    )
+
+
+def book_context_from_index(index: int) -> tuple[int, ...]:
+    checked = require_int(index, "Book context index")
+    if checked < 0 or checked >= 512:
+        raise ValueError("Book context index is outside the nine-bit schema")
+    return tuple((checked >> shift) & 1 for shift in range(8, -1, -1))
+
+
+def permute_book_context_by_positions(
+    context: tuple[int, ...], permutation: tuple[int, ...]
+) -> tuple[int, ...]:
+    raw_context = require_tuple(context, "Book context")
+    if len(raw_context) != 9:
+        raise ValueError("Book context must have nine positions")
+    for value in raw_context:
+        if type(value) is not int or value not in (0, 1):
+            raise TypeError("Book context must contain exact bits")
+    raw_permutation = require_tuple(permutation, "position permutation")
+    if (
+        len(raw_permutation) != 9
+        or any(type(index) is not int for index in raw_permutation)
+        or set(raw_permutation) != set(range(9))
+    ):
+        raise ValueError("position permutation must contain range(9) exactly")
+    return tuple(raw_context[index] for index in raw_permutation)
+
+
+def derive_book_context_orbits(
+    permutations: tuple[tuple[int, ...], ...]
+) -> tuple[tuple[int, ...], ...]:
+    """Derive a partition of all 512 contexts from a finite group action."""
+
+    raw = require_tuple(permutations, "symmetry permutations")
+    if not raw:
+        raise ValueError("symmetry group cannot be empty")
+    seen: set[int] = set()
+    result: list[tuple[int, ...]] = []
+    for index in range(512):
+        if index in seen:
+            continue
+        context = book_context_from_index(index)
+        orbit = tuple(
+            sorted(
+                {
+                    binary_index(
+                        permute_book_context_by_positions(context, permutation)
+                    )
+                    for permutation in raw
+                }
+            )
+        )
+        if seen.intersection(orbit):
+            raise ValueError("permutations do not induce disjoint complete orbits")
+        seen.update(orbit)
+        result.append(orbit)
+    if seen != set(range(512)):
+        raise AssertionError("symmetry orbits do not cover all contexts")
+    return tuple(result)
+
+
+def validate_context_orbits(orbits: tuple[tuple[int, ...], ...]) -> None:
+    raw = require_tuple(orbits, "context orbits")
+    if not raw:
+        raise ValueError("context orbit partition cannot be empty")
+    seen: set[int] = set()
+    previous_minimum = -1
+    for raw_orbit in raw:
+        orbit = require_tuple(raw_orbit, "context orbit")
+        if not orbit:
+            raise ValueError("context orbit cannot be empty")
+        if any(type(index) is not int for index in orbit):
+            raise TypeError("context orbit indices must be exact ints")
+        if tuple(sorted(orbit)) != orbit or len(set(orbit)) != len(orbit):
+            raise ValueError("context orbit must be sorted and unique")
+        if orbit[0] <= previous_minimum:
+            raise ValueError("context orbits must use canonical minimum order")
+        if orbit[0] < 0 or orbit[-1] >= 512 or seen.intersection(orbit):
+            raise ValueError("context orbit partition overlaps or is out of range")
+        seen.update(orbit)
+        previous_minimum = orbit[0]
+    if seen != set(range(512)):
+        raise ValueError("context orbit partition must cover range(512)")
+
+
+def expand_symmetry_restriction(
+    outputs: tuple[int, ...], orbits: tuple[tuple[int, ...], ...]
+) -> GeneralLookup:
+    """Expand orbit outputs to the existing complete 512-context map."""
+
+    validate_context_orbits(orbits)
+    raw_outputs = require_tuple(outputs, "symmetry outputs")
+    if len(raw_outputs) != len(orbits):
+        raise ValueError("symmetry output table is incomplete")
+    code = 0
+    for output, orbit in zip(raw_outputs, orbits, strict=True):
+        if type(output) is not int or output not in (0, 1):
+            raise TypeError("symmetry output must be an exact bit")
+        if output:
+            for context_index in orbit:
+                code |= 1 << context_index
+    return strict_general_from_code(code)
+
+
+def factor_symmetry_restriction(
+    table: GeneralLookup, orbits: tuple[tuple[int, ...], ...]
+) -> tuple[int, ...]:
+    """Factor a complete map iff every symmetry orbit has one output."""
+
+    if type(table) is not GeneralLookup:
+        raise TypeError("symmetry factorization requires GeneralLookup")
+    if table.alphabet_size != 2 or table.neighbor_slots != 8:
+        raise ValueError("symmetry factorization requires a strict T22 table")
+    validate_context_orbits(orbits)
+    code = strict_general_to_code(table)
+    outputs: list[int] = []
+    for orbit in orbits:
+        output = (code >> orbit[0]) & 1
+        if any(((code >> index) & 1) != output for index in orbit[1:]):
+            raise ValueError("complete map disagrees within a symmetry orbit")
+        outputs.append(output)
+    result = tuple(outputs)
+    if expand_symmetry_restriction(result, orbits) != table:
+        raise AssertionError("symmetry factorization lost information")
+    return result
+
+
+# Canonical identity is the orbit-output tuple ordered by least Book context.
+# It intentionally has no integer codec.  A printed compact spelling needs a
+# separate, source-bound adapter carrying radix, width, digit direction, and
+# orbit order; the pending code-3702 convention must not redefine table identity.
+
+
 def expand_outer(rule: BinaryOuterTotalistic) -> GeneralLookup:
     if type(rule) is not BinaryOuterTotalistic or rule.neighbor_slots != 8:
         raise TypeError("strict T22 outer-totalistic rule required")
@@ -1363,6 +1528,140 @@ def assert_rule_representations() -> dict[str, int]:
     }
 
 
+def assert_symmetry_restrictions() -> dict[str, int]:
+    """Derive the source's 2^140 C4 and 2^102 D4 restrictions."""
+
+    c4_permutations = c4_square_permutations()
+    d4_permutations = d4_square_permutations()
+    assert c4_permutations == (
+        (0, 1, 2, 3, 4, 5, 6, 7, 8),
+        (2, 5, 8, 1, 4, 7, 0, 3, 6),
+        (8, 7, 6, 5, 4, 3, 2, 1, 0),
+        (6, 3, 0, 7, 4, 1, 8, 5, 2),
+    )
+    assert len(set(d4_permutations)) == 8
+    for group in (c4_permutations, d4_permutations):
+        group_set = set(group)
+        for left, right in product(group, repeat=2):
+            composition = tuple(left[right[index]] for index in range(9))
+            assert composition in group_set
+
+    contexts = tuple(book_context_from_index(index) for index in range(512))
+    c4_fixed = tuple(
+        sum(
+            permute_book_context_by_positions(context, permutation) == context
+            for context in contexts
+        )
+        for permutation in c4_permutations
+    )
+    d4_fixed = tuple(
+        sum(
+            permute_book_context_by_positions(context, permutation) == context
+            for context in contexts
+        )
+        for permutation in d4_permutations
+    )
+    assert c4_fixed == (512, 8, 32, 8)
+    assert d4_fixed == (512, 8, 32, 8, 64, 64, 64, 64)
+    assert sum(c4_fixed) // len(c4_permutations) == 140
+    assert sum(d4_fixed) // len(d4_permutations) == 102
+
+    c4_orbits = derive_book_context_orbits(c4_permutations)
+    d4_orbits = derive_book_context_orbits(d4_permutations)
+    assert len(c4_orbits) == 140
+    assert len(d4_orbits) == 102
+    assert tuple(
+        (size, sum(len(orbit) == size for orbit in c4_orbits))
+        for size in (1, 2, 4)
+    ) == ((1, 8), (2, 12), (4, 120))
+    assert tuple(
+        (size, sum(len(orbit) == size for orbit in d4_orbits))
+        for size in (1, 2, 4, 8)
+    ) == ((1, 8), (2, 8), (4, 50), (8, 36))
+
+    for permutations, orbits in (
+        (c4_permutations, c4_orbits),
+        (d4_permutations, d4_orbits),
+    ):
+        for orbit in orbits:
+            representative = book_context_from_index(orbit[0])
+            derived = tuple(
+                sorted(
+                    binary_index(
+                        permute_book_context_by_positions(
+                            representative, permutation
+                        )
+                    )
+                    for permutation in permutations
+                )
+            )
+            assert tuple(sorted(set(derived))) == orbit
+
+    # D4 adds reflections, so every C4 fiber lies wholly within one D4 fiber.
+    d4_owner: dict[int, int] = {}
+    for orbit_index, orbit in enumerate(d4_orbits):
+        for context_index in orbit:
+            d4_owner[context_index] = orbit_index
+    assert len(d4_owner) == 512
+    assert all(
+        len({d4_owner[context_index] for context_index in orbit}) == 1
+        for orbit in c4_orbits
+    )
+
+    basis_counts: dict[str, int] = {}
+    disagreement_rejections = 0
+    for name, orbits in (("c4", c4_orbits), ("d4", d4_orbits)):
+        basis_cases = 0
+        zero = (0,) * len(orbits)
+        full = (1,) * len(orbits)
+        for outputs, expected_code in (
+            (zero, 0),
+            (full, (1 << 512) - 1),
+        ):
+            expanded = expand_symmetry_restriction(outputs, orbits)
+            assert strict_general_to_code(expanded) == expected_code
+            assert factor_symmetry_restriction(expanded, orbits) == outputs
+            basis_cases += 1
+        for selected, orbit in enumerate(orbits):
+            outputs = tuple(
+                int(index == selected) for index in range(len(orbits))
+            )
+            expanded = expand_symmetry_restriction(outputs, orbits)
+            expected_code = sum(1 << context_index for context_index in orbit)
+            assert strict_general_to_code(expanded) == expected_code
+            assert factor_symmetry_restriction(expanded, orbits) == outputs
+            basis_cases += 1
+
+        # Since the fibers are disjoint and every complete-map row selects one
+        # compact bit, zero/full plus every one-bit basis certifies the entire
+        # 2^140 or 2^102 table space without a Cartesian enumeration.
+        assert basis_cases == len(orbits) + 2
+        basis_counts[name] = basis_cases
+        nontrivial = next(orbit for orbit in orbits if len(orbit) > 1)
+        broken = strict_general_from_code(1 << nontrivial[0])
+        expect_raises(
+            ValueError,
+            lambda broken=broken, orbits=orbits: factor_symmetry_restriction(
+                broken, orbits
+            ),
+        )
+        disagreement_rejections += 1
+
+    assert basis_counts == {"c4": 142, "d4": 104}
+    assert disagreement_rejections == 2
+    return {
+        "c4_orbits": len(c4_orbits),
+        "d4_orbits": len(d4_orbits),
+        "c4_basis": basis_counts["c4"],
+        "d4_basis": basis_counts["d4"],
+        "group_context_cases": len(contexts)
+        * (len(c4_permutations) + len(d4_permutations)),
+        "orbit_memberships": sum(map(len, c4_orbits))
+        + sum(map(len, d4_orbits)),
+        "disagreement_rejections": disagreement_rejections,
+    }
+
+
 def assert_basis_permutation() -> dict[str, int]:
     transformed, runtime_sorted, runtime_to_book, book_to_runtime = basis_permutations()
     assert transformed == (
@@ -1932,6 +2231,7 @@ def main() -> None:
 
     assert_named_rules()
     representation_counts = assert_rule_representations()
+    symmetry_counts = assert_symmetry_restrictions()
     permutation_counts = assert_basis_permutation()
     generalized_counts = assert_full_total_product_generalization()
     commutation_counts = assert_native_generic_commutation()
@@ -1967,7 +2267,20 @@ def main() -> None:
         "named_codes=175850,746,174826,224 "
         "reconstructed_from_source_predicates=PASS; life_224=B3/S23"
     )
-    print("rule_counts=2^512_general,2^18_outer,2^10_equal_sum,2^9_growth")
+    print(
+        "symmetry_restrictions="
+        f"C4_orbits:{symmetry_counts['c4_orbits']},"
+        f"D4_orbits:{symmetry_counts['d4_orbits']}; "
+        f"expansion_factor_basis:C4:{symmetry_counts['c4_basis']},"
+        f"D4:{symmetry_counts['d4_basis']}; "
+        f"group_context_cases:{symmetry_counts['group_context_cases']},"
+        f"orbit_memberships:{symmetry_counts['orbit_memberships']},"
+        f"one_row_disagreements_rejected:{symmetry_counts['disagreement_rejections']}"
+    )
+    print(
+        "rule_counts=2^512_general,2^140_C4,2^102_D4,"
+        "2^18_outer,2^10_equal_sum,2^9_growth"
+    )
     print(
         "generalized_profile=self+k*FullTotal; "
         "table_length=k*((3^d-1)*(k-1)+1); "
