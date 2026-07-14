@@ -49,9 +49,9 @@ Reconstruct T32 as exact finite allowed-pattern relation data over static labele
 
 ## Source Audit
 
-`40-T32-source-oracle.py` will be the fail-closed textual evidence record. It must close direct names, allowed/fixed templates, overlap, exact counts, the 171-pattern result, the source-derived sorted-offset/template order and constraint numbering, Notes implementation, Blank-and-Alternatives repair, finite/open checking, solver/search boundaries, T31/T33 boundaries, later template sizes/colors, CA/tiling/subshift relations, actual Index routes, governed image links, split reverse provenance, and false positives such as unrelated CA rule counts.
+`40-T32-source-oracle.py` is the fail-closed textual evidence record. Its 39 query lanes close a 92-line union at `77 pre-Index / 15 actual-Index`; 75 matched retained lines plus 94 governed continuations yield 169 retained lines at `18 native / 67 relation / 84 control`, with two source exclusions and zero unresolved. Retained split provenance closes at `119 exact + 50 mapped`, with zero monolith-only evidence. The 60-image candidate interface partitions exactly into 42 governed images at `4 native / 12 relation / 26 control` plus 18 explicit exclusions and agrees with the asset oracle.
 
-Final frozen counts, digests, snapshot hashes, source-oracle SHA, and unresolved total are pending the independent source audit.
+The checking-note snapshot SHA is `15e06813de186756952e5ec1d465ed4cec7931fc388b68e08437af1cd0c6678f` (official fetched document `9d11a2fa1f1bce6b40a7cf896303749c7fe562b4b68244b860226e91b0348bfb`); the independent `Partition` snapshot SHA is `716958949c69e2c6ade2e196a412c7baa8391c31eaa20119a97712275617edf9` (official fetched document `8aa77bf72ab99e507767c443d4150d5f466627e73c5e221c56e15a12690867f1`). The 23-record source-model digest is `555b4ec53ee776efd1ff1361980c7e772a9c3592faf71e56594e3d6912cf9f0c`; the source-oracle SHA is `7ac7b234fe272bd2992f5e83594f4333f05b433d96abfac7f4f3b1f68e5f5881`. Root and relocated stdout are identical under SHA `54cf5240dfdcb032fe877ca13fd5074b757148c3874d02f810473b10a7d87e20`.
 
 ## Book Evidence Map
 
@@ -117,9 +117,9 @@ Final frozen counts, digests, snapshot hashes, source-oracle SHA, and unresolved
 
 ## Asset Audit
 
-`40-T32-asset-oracle.py` will bind the exact native/relation/control raster universe, monolith and split references, physical paths, byte sizes, dimensions, SHA-256 values, paired assemblies, and evidence boundaries. The printed-page-213 example plate, pages 214–215 171-family catalog, and page-941 32-template catalog are expected native candidates; T31 and T33 plates are relations/controls. The asset oracle does not pixel-transcribe the catalog, even though its ordering is independently recovered from `BOOK:13513-13520`.
+`40-T32-asset-oracle.py` binds 42 governed images at `4 native / 12 relation / 26 control` out of 60 candidates, with 18 explicit exclusions, 84 monolith/split references, 42 unique hashes, 3,571,461 bytes, and eight assemblies spanning 23 files. The evidence boundary is `42 HASH_BOUND / 0 LIMITED_TRANSCRIBED / 0 PIXEL_REPLAYED`; the 171 witness families/labels and proof, 51-block table, raster example rows/seeds/traces, detailed palettes, and solver transitions remain explicitly unrecovered. The page-941 catalog order and numbered allowed sets are source-derived rather than pixel-transcribed.
 
-Final governed counts, manifest SHA, limited-transcription boundary, and unresolved visual facts are pending the independent asset audit.
+The asset-ledger SHA is `a8c3becaa4ebf8926130421eee5b43fe2c3756e74121e59ae5d291b18bd11ba0`, root/relocated stdout SHA is `8b06492758f3ed5e5a0e4fb64dbbb8d8a2ea4c4fc4b1f20930754e90435cee75`, and asset-oracle SHA is `1ba29a655bde67ac853e3160bbb92c901f79ae784adcd6c7c2cfc381998ba18f`. Every candidate is dispositioned and the source/asset image interface agrees exactly.
 
 ## Construction Model
 
@@ -223,7 +223,7 @@ The strict 171-family theorem permits a specialized complete analyzer only if th
 
 ## Semantic Proof Requirements
 
-`40-T32-semantic-oracle.py` must independently compare direct allowed-pattern verification with the generic declarative relation evaluator over complete typed reports. Required witnesses include:
+`40-T32-semantic-oracle.py` independently compares direct allowed-pattern verification with the generic declarative relation evaluator over complete typed reports. It closes:
 
 - exhaustive strict binary cross constraints/models on bounded periodic carriers;
 - an orientation-sensitive north/east counterexample against histogram collapse;
@@ -239,7 +239,9 @@ The strict 171-family theorem permits a specialized complete analyzer only if th
 - T33 existential occurrence excluded from T32; and
 - static absence of frontier/write/update/seed/time semantics.
 
-Final event counts, hostile controls, semantic digest, oracle SHA, and guarded numeric-codec results are pending the independent semantic audit.
+The exhaustive carrier audit covers 666 binary periodic configurations, 5,328 native/generic full-report commutations, 43,664 local checks, and 666 representation round trips. All 1,024 binary center-conditioned histogram relations compile and recover losslessly, with 21,712 histogram/template report commutations, 109,200 checks, and one oriented inverse-image rejection. C4 rotation closes 15,984 commutations/130,992 checks; one determinant-negative reflection, binary label exchange, and a nontrivial generic slot permutation each close another 5,328 full-report commutations/43,664 checks. Their explicit pointwise-versus-orbit witnesses and implicit-match rejections keep transforms separate from matching, while the slot-order guard proves that semantic support order is irrelevant even though the NKS codec metadata is ordered.
+
+The source-derived codec closes 32 catalog round trips, 32 singleton mask round trips, and four representative numeric round trips with allowed counts `(0,32,8,12)`. The oracle also covers overlap and periodic aliasing, scope/query boundaries, T33 separation, a generalized nine-slot/16-color profile, 68 hostile rejections, and complete absence of transition fields. Its frozen semantic digest is `72b671c04ac5e5a27ab1c2c2e86612b4ac1e493ab5722e89dc187b4d0939cbd5`; oracle SHA is `055e54f4bf2bac09fe0b2ed2290cdb950472ef04f467b277b32537d655c768db`.
 
 ## Architecture Classification
 
