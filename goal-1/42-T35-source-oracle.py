@@ -20,6 +20,7 @@ import hashlib
 import re
 import sys
 import unicodedata
+from difflib import SequenceMatcher
 from fractions import Fraction
 from pathlib import Path
 
@@ -211,6 +212,7 @@ QUERIES = {
     ),
     "Q37": r"If\[EvenQ\[",
     "Q38": r"arithmetic systems?",
+    "Q39": r"5/2, multiplication system, 123",
 }
 
 
@@ -302,7 +304,7 @@ OUT_OF_SCOPE_RELATED_IMAGE_LINES = line_set("1884,1888")
 
 INDEX_CLASS = {
     "core_alias_and_observer_routes": line_set(
-        "20828,20908,20957,20980,21090,21233,21329,21471,21497,21893,"
+        "20828,20836,20908,20957,20980,21090,21233,21329,21471,21497,21893,"
         "21933,22150,22287,22382"
     ),
     "arithmetic_and_emulation_routes": line_set(
@@ -314,6 +316,7 @@ INDEX_ROUTED = frozenset().union(*INDEX_CLASS.values())
 INDEX_ENTRY_GUARDS = {
     "core_alias_and_observer_routes": {
         20828: ("3n + 1 problem, 904", "see also Arithmetic systems"),
+        20836: ("5/2, multiplication system, 123",),
         20908: ("Backtracking in 3 n + 1 problem, 904",),
         20957: ("for 3n+1 problem, 904",),
         20980: ("Collatz problem, 904",),
@@ -384,7 +387,7 @@ SOURCE_MODEL_RECORDS = (
     "image-boundary:page165-page166 iterated-map plates belong to T43 despite a page122 comparison",
     "Conway-sibling:ordered first applicable exact fraction is semantically order-sensitive",
     "Conway-sibling:reduced denominator divisibility lowers to ordered integer predicates",
-    "Conway-sibling:no applicable fraction is source-undefined partial evolution; no halt identity or error is invented",
+    "Conway-sibling:no applicable fraction is source-undefined partial evolution; the evaluator uses the common zero-successor Error without inventing source-native halt or identity",
     "source-defect:line1501 extraction is not the chronological parity prefix",
     "source-defect:line8102 loses multiplication and contains nthat and stens OCR damage",
     "source-defect:line12623 reconstruction code has missing punctuation and stays opaque",
@@ -436,6 +439,7 @@ EXPECTED_QUERY = {
     "Q36": (2, 2, 0, "5597aaeb5815f2bbf49f31584f274c471410a8537812109777126b5a1ac446f2"),
     "Q37": (13, 13, 0, "eb0599b3481bb207128d491751677db7d74176d607eeb10500a1d8b50984c696"),
     "Q38": (16, 9, 7, "4c2295155eb814d20b2cb239b3c05f7bbd529dabc47eeefd8cf996d3234a1849"),
+    "Q39": (1, 0, 1, "TO_BE_FROZEN"),
 }
 
 EXPECTED_SET = {
@@ -491,6 +495,66 @@ EXPECTED_SOURCE_MODEL = (
     36,
     "a9c6a61dbcaf1a959dbaf75ca512414879840ac091bc30d3bbfc7fa640bd1247",
 )
+
+
+# Explicit content crosswalks replace unconstrained lexical nearest-neighbor
+# matching.  The monolith and split corpus are independently hash-bound above;
+# these records identify the intended split source location, while the replay
+# below requires strong symmetric-token and ordered-text agreement.  Thus a
+# tiny unrelated line cannot become a provenance witness merely by containing
+# every one of its own few tokens.
+SPLIT_QUERY_WITNESSES = {
+    "BACK-MATTER/Colophon/Colophon.md:1219": 18662,
+    "BACK-MATTER/Colophon/Colophon.md:1998": 19441,
+    "BACK-MATTER/Colophon/Colophon.md:4939": 22382,
+    "BACK-MATTER/Index/Index.md:514": 12611,
+    "BACK-MATTER/Index/Index.md:536": 12633,
+    "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:379": 8086,
+    "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:391": 8098,
+    "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:393": 8100,
+    "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:395": 8102,
+    "CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md:513": 1196,
+    "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:103": 1499,
+    "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:107": 1503,
+    "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:109": 1505,
+    "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:121": 1517,
+    "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:123": 1519,
+    "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:127": 1523,
+    "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:129": 1525,
+    "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:163": 1559,
+}
+
+SPLIT_RETAINED_WITNESSES = {
+    1196: "CHAPTERS/3-The-World-of-Simple-Programs/The-World-of-Simple-Programs.md:513",
+    1493: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:97",
+    1499: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:103",
+    1501: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:105",
+    1503: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:107",
+    1505: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:109",
+    1517: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:121",
+    1519: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:123",
+    1523: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:127",
+    1525: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:129",
+    1543: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:147",
+    1559: "CHAPTERS/4-Systems-Based-on-Numbers/Systems-Based-on-Numbers.md:163",
+    8086: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:379",
+    8098: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:391",
+    8100: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:393",
+    8102: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:395",
+    8104: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:397",
+    8106: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:399",
+    8107: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:400",
+    8108: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:401",
+    8109: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:402",
+    8110: "CHAPTERS/11-The-Notion-of-Computation/The-Notion-of-Computation.md:403",
+    12611: "BACK-MATTER/Index/Index.md:514",
+    12633: "BACK-MATTER/Index/Index.md:536",
+    12637: "BACK-MATTER/Index/Index.md:540",
+    12641: "BACK-MATTER/Index/Index.md:544",
+    18662: "BACK-MATTER/Colophon/Colophon.md:1219",
+    19441: "BACK-MATTER/Colophon/Colophon.md:1998",
+}
+
 
 # Split-corpus values are frozen after the reverse provenance pass below.
 EXPECTED_SPLIT_FILE_COUNT = 17
@@ -553,16 +617,21 @@ def normalized_line(line: str) -> str:
     return " ".join(re.findall(r"[a-z0-9]+", text))
 
 
-def best_witness(canonical: str, candidates: list[tuple[str, str]]) -> tuple[str, float]:
-    canonical_tokens = set(normalized_line(canonical).split())
-    scored: list[tuple[float, str]] = []
-    for record, normalized in candidates:
-        candidate_tokens = set(normalized.split())
-        denominator = min(len(canonical_tokens), len(candidate_tokens))
-        score = len(canonical_tokens & candidate_tokens) / denominator if denominator else 0.0
-        scored.append((score, record))
-    score, record = max(scored, key=lambda item: (item[0], item[1]))
-    return record, score
+def witness_similarity(canonical: str, candidate: str) -> tuple[float, float]:
+    """Return symmetric token and ordered-text agreement for one declared pair."""
+
+    left = normalized_line(canonical)
+    right = normalized_line(candidate)
+    left_tokens = set(left.split())
+    right_tokens = set(right.split())
+    denominator = len(left_tokens) + len(right_tokens)
+    dice = (
+        2 * len(left_tokens & right_tokens) / denominator
+        if denominator
+        else 0.0
+    )
+    ordered = SequenceMatcher(None, left, right).ratio()
+    return dice, ordered
 
 
 def main() -> int:
@@ -1123,15 +1192,20 @@ def main() -> int:
             split_records.add(record)
             (split_exact if line in monolith_query_text else split_nonexact).add(record)
 
-    monolith_witnesses = [
-        (str(line_no), normalized_line(at(line_no))) for line_no in sorted(union)
-    ]
     query_mapping: set[str] = set()
-    query_mapping_ok = True
+    query_mapping_ok = set(SPLIT_QUERY_WITNESSES) == split_nonexact
     for record in sorted(split_nonexact):
-        witness, score = best_witness(split_record_text[record], monolith_witnesses)
-        query_mapping.add(f"{record}->{witness}:{score:.6f}")
-        query_mapping_ok &= score >= 0.50 and int(witness) in union
+        witness = SPLIT_QUERY_WITNESSES.get(record)
+        if witness is None:
+            query_mapping_ok = False
+            continue
+        dice, ordered = witness_similarity(split_record_text[record], at(witness))
+        query_mapping.add(f"{record}->{witness}")
+        query_mapping_ok &= (
+            witness in union
+            and dice >= 0.60
+            and ordered >= 0.80
+        )
     split_query_actual = (len(split_records), digest_records(split_records))
     split_exact_actual = (len(split_exact), digest_records(split_exact))
     split_nonexact_actual = (len(split_nonexact), digest_records(split_nonexact))
@@ -1157,12 +1231,23 @@ def main() -> int:
     nonexact_retained = set(RETAINED) - exact_retained
     retained_mapping: set[str] = set()
     monolith_only: set[int] = set()
+    retained_mapping_ok = (
+        set(SPLIT_RETAINED_WITNESSES) == nonexact_retained
+        and len(set(SPLIT_RETAINED_WITNESSES.values()))
+        == len(SPLIT_RETAINED_WITNESSES)
+    )
     for line_no in sorted(nonexact_retained):
-        witness, score = best_witness(at(line_no), split_lines)
-        if score >= 0.50:
-            retained_mapping.add(f"{line_no}->{witness}:{score:.6f}")
-        else:
+        witness = SPLIT_RETAINED_WITNESSES.get(line_no)
+        if witness is None or witness not in split_record_text:
+            retained_mapping_ok = False
             monolith_only.add(line_no)
+            continue
+        dice, ordered = witness_similarity(at(line_no), split_record_text[witness])
+        if dice < 0.60 or ordered < 0.80:
+            retained_mapping_ok = False
+            monolith_only.add(line_no)
+            continue
+        retained_mapping.add(f"{line_no}->{witness}")
     exact_retained_actual = (len(exact_retained), digest(exact_retained))
     nonexact_retained_actual = (len(nonexact_retained), digest(nonexact_retained))
     retained_mapping_actual = (len(retained_mapping), digest_records(retained_mapping))
@@ -1173,6 +1258,7 @@ def main() -> int:
         and retained_mapping_actual == EXPECTED_SPLIT_RETAINED_MAPPING
         and monolith_only_actual == EXPECTED_MONOLITH_ONLY
         and len(retained_mapping) + len(monolith_only) == len(nonexact_retained)
+        and retained_mapping_ok
     )
     ok &= split_retained_ok
     print(

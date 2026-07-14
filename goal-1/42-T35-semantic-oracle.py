@@ -71,7 +71,7 @@ ARCHITECTURE_CLASSIFICATION = (
     "1: reuse T34 discrete t+0D singleton state, self read, scalar assignment, atomic UPDATE, trace, and outcomes",
     "2: parameterize T34's closed unary rule by a complete finite Euclidean-residue table and carrier invariant",
     "3: name parity presets and retain lossless branch witnesses; ordered fractions are a tagged partial rule sibling",
-    "4: no new execution algebra; first-applicable and no-applicable belong to closed RULE/result data",
+    "4: no new execution algebra or outcome envelope; source-undefined selection uses generic StepResult Error(MissingBranch)",
 )
 
 
@@ -83,7 +83,7 @@ GOAL2_DELTA = (
     "Keep strict positive, principled nonnegative, and signed-extension carriers explicit; never silently admit zero.",
     "Retain selected residue/formula/result as replayable event evidence without putting branch or history in state.",
     "Treat cycles and fixed points as ordinary Advanced events; h total events always yield h+1 snapshots.",
-    "Represent ordered positive-fraction programs as a tagged partial rule with first-applicable/no-applicable results.",
+    "Represent ordered positive-fraction programs as a tagged partial rule; no applicable row returns generic Error(MissingBranch).",
     "If exposing a residue relation for fractions, keep source order/index witnesses and use a lazy LCM view.",
     "A bare fraction decision table is behavior-preserving but not injective; retain the ordered source AST and provenance.",
     "Separate exact integer closure from positive/reachable invariants in general remainder tables such as register encodings.",
@@ -490,6 +490,23 @@ def structural_program_id(program: object) -> str:
     return sha256(repr(payload).encode("utf-8")).hexdigest()
 
 
+def validate_program_configuration(
+    program: object,
+    configuration: object,
+) -> ScalarConfiguration:
+    if type(configuration) is not ScalarConfiguration:
+        raise TypeError("configuration must be exact ScalarConfiguration")
+    if type(program) is CompleteResidueIntegerMap:
+        if configuration.carrier != program.carrier:
+            raise ValueError("program and configuration carriers differ")
+    elif type(program) is OrderedFractionProgram:
+        if configuration.carrier != POSITIVE:
+            raise ValueError("ordered fraction programs require positive integers")
+    else:
+        raise TypeError("program must be a closed T35 rule node")
+    return configuration
+
+
 @dataclass(frozen=True)
 class FractionBranchWitness:
     selected_index: int
@@ -769,7 +786,7 @@ class ScalarTrace:
                 raise ValueError("trace event endpoints do not align with snapshots")
         if self.stopped_result is None:
             if len(events) != horizon:
-                raise ValueError("a trace without an undefined step must reach its horizon")
+                raise ValueError("a trace without a stopped Error must reach its horizon")
         else:
             if type(self.stopped_result) is not StepResult:
                 raise TypeError("stopped result must be exact StepResult")
@@ -795,6 +812,7 @@ class ScalarTrace:
 def run(program: object, seed: object, horizon: object) -> ScalarTrace:
     if type(seed) is not ScalarConfiguration:
         raise TypeError("seed must be exact ScalarConfiguration")
+    validate_program_configuration(program, seed)
     steps = checked_horizon(horizon)
     states = [seed]
     events: list[TransitionEvent] = []
@@ -924,6 +942,8 @@ def verify_trace_provenance(program: object, trace: object) -> bool:
         return False
     try:
         if trace.program_id != structural_program_id(program):
+            return False
+        if any(validate_program_configuration(program, state) != state for state in trace.states):
             return False
         if any(not verify_transition_event(program, event) for event in trace.events):
             return False
@@ -1196,6 +1216,7 @@ def audit_direct_generic_commutation() -> tuple[int, int, int, int]:
                 witness = result.event.witness
                 assert type(witness) is ResidueBranchWitness
                 assert verify_residue_witness(program, witness)
+                assert verify_transition_event(program, result.event)
                 assert result.event.before == state
                 assert result.event.assignment == ScalarAssignment(
                     SCALAR_LOCUS,
@@ -1542,7 +1563,14 @@ def audit_cross_program_event_rejections() -> tuple[int, int, int, int, int]:
     assert verify_trace_provenance(shadowed_right, right_zero)
     assert not verify_trace_provenance(shadowed_left, right_zero)
     assert not verify_trace_provenance(shadowed_right, left_zero)
-    return 2, 2, 3, 3, 4
+    program_ids = {
+        structural_program_id(parity_program_a()),
+        structural_program_id(parity_program_b()),
+        structural_program_id(shadowed_left),
+        structural_program_id(shadowed_right),
+    }
+    assert len(program_ids) == 4
+    return 2, 2, 3, 3, len(program_ids)
 
 
 def audit_ordered_fraction_partiality() -> tuple[int, int, int, int, int]:
@@ -1572,7 +1600,7 @@ def audit_ordered_fraction_partiality() -> tuple[int, int, int, int, int]:
         (PositiveFraction(3, 2), PositiveFraction(5, 3))
     )
     no_applicable_values = (1, 5, 7, 11, 13, 17)
-    undefined_outcomes = 0
+    missing_branch_errors = 0
     retained_states = 0
     for value in no_applicable_values:
         result = advance(partial, ScalarConfiguration(POSITIVE, value))
@@ -1585,7 +1613,7 @@ def audit_ordered_fraction_partiality() -> tuple[int, int, int, int, int]:
         assert len(trace.events) == 0
         assert trace.stopped_result == result
         assert verify_trace_provenance(partial, trace)
-        undefined_outcomes += 1
+        missing_branch_errors += 1
         retained_states += 1
 
     # A partial program may advance before reaching an unapplied state.
@@ -1596,7 +1624,7 @@ def audit_ordered_fraction_partiality() -> tuple[int, int, int, int, int]:
     assert delayed_trace.stopped_result is not None
     assert verify_missing_branch(delayed, delayed_trace.stopped_result)
     assert verify_trace_provenance(delayed, delayed_trace)
-    return 1, undefined_outcomes, retained_states, len(delayed_trace.events), 1
+    return 1, missing_branch_errors, retained_states, len(delayed_trace.events), 1
 
 
 def audit_lazy_fraction_residue_view() -> tuple[int, int, int, int, int, int]:
@@ -1731,8 +1759,8 @@ def audit_fraction_lowering_noninjectivity() -> tuple[int, int, int]:
         assert not verify_transition_event(right, left_step.event)
         behavior_checks += 1
     source_hashes = {
-        sha256(repr(left).encode("utf-8")).hexdigest(),
-        sha256(repr(right).encode("utf-8")).hexdigest(),
+        structural_program_id(left),
+        structural_program_id(right),
     }
     assert len(source_hashes) == 2
     assert left_view.program == left and right_view.program == right
@@ -2138,7 +2166,7 @@ def audit_hostile_validation() -> int:
     rejected += must_raise(
         ValueError,
         lambda: ScalarTrace(
-            structural_program_id(parity_program_b()),
+            structural_program_id(parity_program_a()),
             1,
             (
                 fixed_result.event.before,
@@ -2161,6 +2189,10 @@ def audit_hostile_validation() -> int:
     )
     rejected += must_raise(TypeError, lambda: advance(lambda n: n, ScalarConfiguration(POSITIVE, 1)))
     rejected += must_raise(TypeError, lambda: run(parity_program_a(), 1, 3))
+    rejected += must_raise(
+        ValueError,
+        lambda: run(parity_program_a(POSITIVE), ScalarConfiguration(SIGNED, 1), 0),
+    )
     rejected += must_raise(TypeError, lambda: run(parity_program_a(), ScalarConfiguration(POSITIVE, 1), True))
     rejected += must_raise(ValueError, lambda: run(parity_program_a(), ScalarConfiguration(POSITIVE, 1), -1))
     rejected += must_raise(TypeError, lambda: PositiveFraction(True, 2))
@@ -2232,7 +2264,7 @@ def audit_hostile_validation() -> int:
     return rejected
 
 
-EXPECTED_DIGEST = "fc825e82318de933dae8426d21218a50cb5f54dd6016102bd9913038c0e233cb"
+EXPECTED_DIGEST = "6057452a9af19cf1f70587ccd640b88f47c4e9dd3b839add88153339262d586a"
 
 
 def main() -> None:
@@ -2332,6 +2364,9 @@ def main() -> None:
         step_result_field_count,
     ) = audit_no_new_execution_surface()
     hostile_rejections = audit_hostile_validation()
+    total_transition_event_replays = (
+        direct_generic_commutations + transition_event_replays + conway_events
+    )
 
     facts = (
         ("domain", DOMAIN),
@@ -2364,12 +2399,14 @@ def main() -> None:
         ("fixed_point_changed_false", fixed_point_changed_false),
         ("trace_shape_checks", trace_shape_checks),
         ("history_merges", history_merges),
+        ("exact_main_a_merge", (1, 2, 3)),
         ("distinct_merge_traces", distinct_merge_traces),
         ("retained_history_fields", retained_history_fields),
         ("residue_witnesses", residue_witnesses),
         ("fraction_witnesses", fraction_witnesses),
         ("forged_witness_rejections", forged_witness_rejections),
         ("transition_event_replays", transition_event_replays),
+        ("total_transition_event_replays", total_transition_event_replays),
         ("cross_program_event_rejections", cross_program_event_rejections),
         ("internally_coherent_adversaries", internally_coherent_adversaries),
         ("horizon_zero_provenance_traces", horizon_zero_provenance_traces),
@@ -2427,8 +2464,7 @@ def main() -> None:
         ("observer_boundary", "digits_sizes_parity_cycles_growth_CA_register_real_maps_do_not_select_writes"),
     )
     digest = sha256(repr(facts).encode("utf-8")).hexdigest()
-    if EXPECTED_DIGEST != "TO_BE_FROZEN":
-        assert digest == EXPECTED_DIGEST
+    assert digest == EXPECTED_DIGEST
 
     print("T35 semantic oracle: PASS")
     print(
@@ -2457,12 +2493,14 @@ def main() -> None:
         f"source_cycles={source_cycles}; cycle_events={source_cycle_events}; "
         f"fixed_point_advanced_events={fixed_point_events}; "
         f"fixed_point_changed_false={fixed_point_changed_false}; "
-        f"trace_h_plus_1_checks={trace_shape_checks}; noninjective_merges={history_merges}"
+        f"trace_h_plus_1_checks={trace_shape_checks}; noninjective_merges={history_merges}; "
+        "exact_A_merge=A(1)=A(2)=3"
     )
     print(
         f"branch_witnesses=residue:{residue_witnesses}/fraction:{fraction_witnesses}; "
         f"forged_witness_rejections={forged_witness_rejections}; "
         f"transition_event_replays={transition_event_replays}; "
+        f"total_event_replays={total_transition_event_replays}; "
         f"cross_program_event_rejections={cross_program_event_rejections}; "
         f"fraction_order_discriminators={fraction_order_discriminators}"
     )
