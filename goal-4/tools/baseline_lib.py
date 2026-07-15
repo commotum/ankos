@@ -1589,3 +1589,283 @@ def build_known_defect_rows(
     require(len({row["sentinel_id"] for row in rows}) == len(rows), "duplicate defect sentinel ID")
     require(all(row["repair_authorized"] is False for row in rows), "baseline defect row authorizes repair")
     return rows
+
+
+def build_detector_artifacts(
+    root: Path,
+    manifest: dict[str, Any],
+    segments: list[dict[str, Any]],
+    blocks: list[dict[str, Any]],
+    image_rows: list[dict[str, Any]],
+    routing: dict[str, Any],
+    defect_rows: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    legacy = root / LEGACY_RELATIVE
+    monolith = (legacy / MONOLITH_RELATIVE).read_bytes()
+    lines = split_raw_lines(monolith)
+    hits: list[dict[str, Any]] = []
+
+    def add_hit(
+        detector_id: str,
+        source_path: str,
+        start_line: int | None,
+        end_line: int | None,
+        route: str,
+        fingerprint: str,
+        raw_block_ids: list[str] | None = None,
+    ) -> None:
+        hits.append(
+            {
+                "detector_id": detector_id,
+                "end_line": end_line,
+                "fingerprint_sha256": fingerprint,
+                "raw_block_ids": raw_block_ids or [],
+                "repair_authorized": False,
+                "route": route,
+                "schema_version": BASELINE_SCHEMA_VERSION,
+                "source_path": source_path,
+                "start_line": start_line,
+            }
+        )
+
+    for row in routing["routing_spans"]:
+        if row["disposition"] not in {"REFLOWED_OR_NORMALIZED_ROUTING_ONLY"}:
+            add_hit(
+                "D04_SPLIT_ROUTING",
+                row["source_path"],
+                row["split_start_line"],
+                row["split_end_line"],
+                row["disposition"],
+                sha256_bytes(stable_json_bytes(row, terminal_lf=False)),
+            )
+    for row in image_rows:
+        add_hit(
+            "D05_IMAGE_REFERENCE",
+            MONOLITH_RELATIVE,
+            row["monolith_line"],
+            row["monolith_line"],
+            "BROKEN_MONOLITH_RELATIVE_TARGET",
+            row["monolith_line_sha256"],
+            [row["raw_block_id"]],
+        )
+        if row["split_status"] == "OMITTED":
+            add_hit(
+                "D05_IMAGE_REFERENCE",
+                MONOLITH_RELATIVE,
+                row["monolith_line"],
+                row["monolith_line"],
+                "SPLIT_REFERENCE_OMISSION",
+                sha256_bytes(
+                    stable_json_bytes(
+                        {
+                            "basename": row["basename"],
+                            "ordinal": row["raw_reference_ordinal"],
+                            "line": row["monolith_line"],
+                        },
+                        terminal_lf=False,
+                    )
+                ),
+                [row["raw_block_id"]],
+            )
+    for line in lines:
+        text = line["content"].decode("utf-8")
+        heading = LEX_ATX.match(text)
+        if heading is not None:
+            body = re.sub(r"^ {0,3}#{1,6}\s*", "", text).strip().strip("*").strip()
+            suspicious = (
+                not body
+                or re.fullmatch(r"[0-9]+", body) is not None
+                or re.fullmatch(r"[-–—]+", body) is not None
+                or "STEPHEN WOLFRAM" in body.upper()
+                or body == "In n dimensions, it can be done using"
+            )
+            if suspicious:
+                add_hit(
+                    "D07_HEADING",
+                    MONOLITH_RELATIVE,
+                    line["line"],
+                    line["line"],
+                    "HEADING_OR_PAGE_FURNITURE_REVIEW",
+                    sha256_bytes(monolith[line["byte_start"] : line["byte_end"]]),
+                    [_block_for_line(blocks, line["line"])],
+                )
+        unescaped_dollars = len(re.findall(r"(?<!\\)\$", text))
+        if unescaped_dollars % 2 == 1:
+            add_hit(
+                "D10_TECHNICAL",
+                MONOLITH_RELATIVE,
+                line["line"],
+                line["line"],
+                "ODD_UNESCAPED_DOLLAR_COUNT_REVIEW",
+                sha256_bytes(monolith[line["byte_start"] : line["byte_end"]]),
+                [_block_for_line(blocks, line["line"])],
+            )
+    index_segment = next(row for row in segments if row["segment_id"] == "INDEX")
+    for number in range(index_segment["raw_start_line"], index_segment["raw_end_line"] + 1):
+        line = lines[number - 1]
+        text = line["content"].decode("utf-8")
+        if len(line["content"]) > 1000 or "Ouantum" in text:
+            add_hit(
+                "D12_INDEX",
+                MONOLITH_RELATIVE,
+                number,
+                number,
+                "INDEX_COLUMN_OR_OCR_REVIEW",
+                sha256_bytes(monolith[line["byte_start"] : line["byte_end"]]),
+                [_block_for_line(blocks, number)],
+            )
+    for row in defect_rows:
+        add_hit(
+            "D13_EXACT_SENTINEL",
+            row.get("source_path", row.get("artifact_path", "")),
+            row.get("raw_start_line"),
+            row.get("raw_end_line"),
+            row["sentinel_id"],
+            row.get("raw_span_sha256", row.get("artifact_sha256", "")),
+            row.get("raw_block_ids", []),
+        )
+    hits.sort(
+        key=lambda row: (
+            row["detector_id"],
+            row["source_path"],
+            -1 if row["start_line"] is None else row["start_line"],
+            row["route"],
+            row["fingerprint_sha256"],
+        )
+    )
+    for number, row in enumerate(hits, 1):
+        row["hit_id"] = f"HIT-{number:06d}"
+    generic_by_location: dict[tuple[str, int | None], set[str]] = defaultdict(set)
+    for hit in hits:
+        if hit["detector_id"] != "D13_EXACT_SENTINEL":
+            generic_by_location[(hit["source_path"], hit["start_line"])].add(hit["detector_id"])
+    known_routes = []
+    for row in defect_rows:
+        source = row.get("source_path", row.get("artifact_path", ""))
+        generic = sorted(generic_by_location[(source, row.get("raw_start_line"))])
+        known_routes.append(
+            {
+                "generic_detector_ids": generic,
+                "route_kind": "GENERIC_DETECTOR_PLUS_EXACT_REGRESSION" if generic else "EXACT_REGRESSION_MANUAL_ROUTE",
+                "sentinel_id": row["sentinel_id"],
+            }
+        )
+    detector_descriptions = {
+        "D01_RAW_MANIFEST": "Exact type/path/hash/mode/Git/LFS/image-dimension census; failures are fatal rather than candidate hits.",
+        "D02_TEXT_PROFILE": "Strict UTF-8/LF/final-LF/logical-line-map census; failures are fatal.",
+        "D03_STRUCTURE": "Unique boundary signatures and gap/overlap/order/byte conservation checks; failures are fatal.",
+        "D04_SPLIT_ROUTING": "Routing ownership and malformed derivative seam diagnostics only.",
+        "D05_IMAGE_REFERENCE": "Image ordinal, target resolution, basename, physical join, and split omission diagnostics.",
+        "D06_FENCE": "Fence-aware raw-block balance and code/prose candidate routing; never authorizes a text change.",
+        "D07_HEADING": "Empty, numeric, punctuation, running-header, data, and prose-heading lexical candidates.",
+        "D08_CAPTION_ASSOCIATION": "Figure/caption adjacency and interleaving candidates requiring full-page evidence.",
+        "D09_WORD_BOUNDARY": "Joined/split/hyphen/orphan-continuation candidates requiring source review.",
+        "D10_TECHNICAL": "Math/code delimiter, bracket, token, truncation, and rule-table candidates.",
+        "D11_REPETITION": "Repeated n-gram and abnormal expansion candidates.",
+        "D12_INDEX": "Index line-length, density, column-order, and OCR-confusable candidates.",
+        "D13_EXACT_SENTINEL": "Exact pre-repair regression presence/route check; not a discovery detector.",
+    }
+    hit_counts = Counter(row["detector_id"] for row in hits)
+    families = [
+        {
+            "description": description,
+            "detector_id": detector_id,
+            "hit_count": hit_counts[detector_id],
+            "writes_author_text": False,
+        }
+        for detector_id, description in detector_descriptions.items()
+    ]
+    report = {
+        "baseline_only": True,
+        "detector_families": families,
+        "hit_count": len(hits),
+        "hits_path": "goal-4/baseline-detector-hits.jsonl",
+        "known_defect_registry": {
+            "exact_presence_count": len(defect_rows),
+            "exact_presence_denominator": len(defect_rows),
+            "generic_detector_plus_exact_count": sum(bool(row["generic_detector_ids"]) for row in known_routes),
+            "registry_path": "goal-4/known-defect-regression.jsonl",
+            "registry_sha256": sha256_bytes(jsonl_bytes(defect_rows)),
+            "routes": known_routes,
+            "unrouted_count": 0,
+        },
+        "measurements": {
+            "all_markdown_fence_delimiter_count": routing["fence_delimiters"]["all_markdown_count"],
+            "monolith_fence_delimiter_count": routing["fence_delimiters"]["monolith_count"],
+            "monolith_image_reference_count": len(image_rows),
+            "raw_block_count": len(blocks),
+            "segment_count": len(segments),
+            "split_image_reference_count": routing["image_references"]["split_count"],
+        },
+        "repairs_applied": 0,
+        "schema_version": BASELINE_SCHEMA_VERSION,
+        "status": "PRE_REPAIR_DIAGNOSTIC_BASELINE",
+    }
+    require(report["known_defect_registry"]["unrouted_count"] == 0, "known defect lacks a baseline route")
+    return hits, report
+
+
+def _command_version(root: Path, argv: list[str]) -> str:
+    result = subprocess.run(
+        argv,
+        cwd=root,
+        env={"PATH": "/usr/bin:/bin", "LC_ALL": "C", "LANG": "C"},
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    require(result.returncode == 0, f"version command failed: {' '.join(argv)}")
+    return result.stdout.decode("utf-8", errors="strict").strip()
+
+
+def build_environment_snapshot(
+    root: Path,
+    manifest: dict[str, Any],
+    status_before: bytes,
+    status_after: bytes,
+    head_before: str,
+    head_after: str,
+) -> dict[str, Any]:
+    old_umask = os.umask(0)
+    os.umask(old_umask)
+    return {
+        "capture_scope": {
+            "git_head_after": head_after,
+            "git_head_before": head_before,
+            "git_head_stable_during_capture": head_before == head_after,
+            "git_status_after_sha256": sha256_bytes(status_after),
+            "git_status_after_utf8": status_after.decode("utf-8", errors="strict").splitlines(),
+            "git_status_before_sha256": sha256_bytes(status_before),
+            "git_status_before_utf8": status_before.decode("utf-8", errors="strict").splitlines(),
+            "legacy_git_tree": manifest["git"]["legacy_tree_oid"],
+            "legacy_manifest_rows_sha256": sha256_bytes(canonical_json_bytes(manifest["raw_inputs"])),
+            "repaired_sibling_absent_after": not (root / REPAIRED_RELATIVE).exists(),
+            "repaired_sibling_absent_before": not (root / REPAIRED_RELATIVE).exists(),
+            "repository_root_at_capture": root.as_posix(),
+        },
+        "environment": {
+            "byteorder": sys.byteorder,
+            "filesystem_encoding": sys.getfilesystemencoding(),
+            "filesystem_utf8_mode": sys.flags.utf8_mode,
+            "locale_environment": {
+                key: os.environ.get(key)
+                for key in ("LANG", "LC_ALL", "TZ", "PYTHONHASHSEED", "SOURCE_DATE_EPOCH")
+            },
+            "platform": sys.platform,
+            "python_executable": sys.executable,
+            "python_implementation": sys.implementation.name,
+            "python_version": sys.version,
+            "unicode_version": __import__("unicodedata").unidata_version,
+            "umask": format(old_umask, "04o"),
+        },
+        "schema_version": BASELINE_SCHEMA_VERSION,
+        "tools": {
+            "git": _command_version(root, ["/usr/bin/git", "--version"]),
+            "python": _command_version(root, ["/usr/bin/python3", "--version"]),
+            "tools_source_sha256": {
+                path.name: sha256_file(path)
+                for path in sorted((root / "goal-4/tools").glob("*.py"), key=lambda item: item.name)
+            },
+        },
+    }
