@@ -1,6 +1,6 @@
 # 2-BASELINE
 
-Status: IN_PROGRESS
+Status: COMPLETE
 
 Dependencies:
 
@@ -12,18 +12,19 @@ Dependencies:
 - The immutable legacy root is `ref/A-New-Kind-of-Science/`; the repaired sibling `ref/A-New-Kind-of-Science-Repaired/` is absent and excluded from every raw-input discovery rule.
 - The Stage 1 census records exactly 1,463 regular legacy files: 19 Markdown inputs and 1,444 JPEG assets, with zero symlinks.
 - The frozen legacy Git tree is `52b84494ab310afd64762bf0983106414419655e`; the Stage 1 content fingerprint is `6da649210cbdb601caddae6e7fb230404565efb224cb0741dd595343f3a6632d`.
-- The source monolith is provisionally expected to contain 22,498 logical lines and 29 canonical author-text segments. Both facts must be independently re-derived rather than copied into the baseline.
+- The source monolith independently reproduces at SHA-256 `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`, 3,780,628 bytes, 22,498 logical lines, and 22,497 LF bytes with no terminal LF.
+- Exactly 29 ordered proposed canonical segments cover every monolith line and byte once. Their 58 frozen five-line boundary signatures are globally unique and resolve back to the expected focal lines. Their status remains `PROPOSED_RAW_BOUNDARY_PENDING_STAGE_3_5_WITNESS_VALIDATION`; Stage 2 does not falsely claim page-witness authority.
 - Current split files and the monolith are routing derivatives of one OCR lineage, not independent textual witnesses.
 - Stage 1 froze the 29 canonical output paths, ID/serialization rules, held-out sampling algorithm, evidence policy, and compatibility closure. Stage 2 must consume those contracts without changing them merely to make the census pass.
 - Goal 1, Goal 2, Goal 3, the legacy corpus, and unrelated repository work remain outside this stage's write scope.
 
 ## Updated Assumptions
 
-- Git object identity, filesystem metadata, decoded text facts, and image dimensions can be independently recomputed from the explicit frozen allowlist.
-- The 29 provisional segment ranges can be replaced by immutable segment IDs and exact boundary signatures with gap-free, overlap-free coverage.
-- A stable raw-block universe can be derived before any author-text correction and can therefore materialize the held-out sample without outcome leakage.
-- Known defects can be frozen as detection/routing sentinels without asserting a correction or treating correlated OCR as source evidence.
-- The three omitted split-reference ordinals, Atlas routing anomaly, broken monolith links, and split/monolith divergences need explicit baseline rows rather than prose-only notes.
+- Git object identity, filesystem metadata, strict UTF-8/LF facts, LFS pointer joins, full Pillow JPEG decoding, and image dimensions were independently recomputed for all 1,463 inputs.
+- The raw lexer emits 20,430 immutable blocks with exact line/byte coverage. All 45 pipe-table blocks are conservatively typed `DATA_TABLE` and routed to technical risk except where Index priority governs.
+- The pre-repair held-out set is materialized as a Stage 2 sidecar bound to the frozen Stage 1 quality-protocol hash. The lock root binds both artifacts without reopening or rewriting the Stage 1 protocol.
+- Known defects are frozen only as non-authorizing detection/routing sentinels. Exact presence/routing is 55/55; generic Stage 2 candidate coverage is deliberately reported as 31/55 with 24 manual exact routes. Reserved or limited detector families remain explicit Stage 37/38/40 obligations rather than being described as implemented.
+- The three omitted split-reference ordinals, Atlas role, all broken monolith links, split/monolith routing spans, and Contents anomalies now have hash-bound rows rather than prose-only notes.
 
 ## Big Picture Objective
 
@@ -69,4 +70,31 @@ Expected Stage 2 writes are restricted to `goal-4/**`, including baseline ledger
 
 ## Stage Results
 
-- In progress. No Stage 2 baseline artifact is final until the independent allowlist, structure, defect, sample, and mutation audits reconcile.
+- COMPLETE on 2026-07-14.
+
+### Frozen artifacts
+
+- `corpus-manifest.json` accounts for exactly 1,463 regular inputs: 19 Markdown and 1,444 JPEG. It records 115,037,515 logical bytes, 44,989 Markdown logical lines, capture-only allocation/mode/link diagnostics, path digests, Git/LFS identities, strict text profiles, and independently decoded JPEG metadata. The manifest SHA-256 is `ba11d6ddf71aea5fb6e47be88ab54d47e33e1b8118273fa835c1b788c2321b76`.
+- All 1,444 JPEG identities remain distinct even though one byte-identical payload occurs at three paths. All payloads decode completely; every HEAD image blob is a strict LFS pointer whose OID and size match the working payload.
+- `structure-ledger.jsonl` contains 29 segment rows plus 20,430 raw-block rows. Block kinds are: boundary 9,843; prose 6,050; list 1,279; inline math 1,075; image 1,444; heading 286; code 254; math block 135; data table 45; caption 11; blockquote 8. Risk counts are Index 1,468; technical/data 1,474; visual 1,455; layout 10,681; prose 5,352.
+- `image-reference-ledger.jsonl` joins all 1,444 monolith references to assets and 1,441 split references. The only split omissions are ordinals/lines 24/680, 134/1711, and 135/1744. Physical asset paths total Preface 2, chapters 899, back matter 543; semantic ownership totals Preface 2, chapters 820, Notes 622.
+- `routing-baseline.json` freezes 17 routing files, 32 dispositions (31 raw projections plus generated Contents), 16 Contents links with four semantic anomalies, five non-navigation formula/code link shapes, seven omitted transition spans, Atlas as non-authoritative interpretive metadata, and every relevant span hash.
+- `known-defect-regression.jsonl` freezes 52 exact raw spans and three aggregate guardrails. Every row has `repair_authorized: false`, exact regression detector `D13_EXACT_SENTINEL`, and explicit content/specialist/workflow/closure stages.
+- `held-out-sample.json` freezes seed `edb7d55b015326755574afbf5513e2bacefe04fbdad875fb8901555edf8e5f0d`, all 20,430 rankings, and 1,125 selected IDs across all 29 documents. The selected-order digest is `94e489a0ad2ecc85da9554478b417c771f5eeb5d901561ccf56781292f2ac9ad`; selected strata are Index 74, technical/data 92, visual 92, layout 580, prose 287.
+- `baseline-detector-hits.jsonl` contains 1,729 non-mutating hits. `baseline-detector-report.json` distinguishes fatal checks, implemented baseline candidate detectors, limited detectors, reserved later-stage detectors, and exact regression from discovery.
+- `baseline-environment.json` records Git 2.43.0, Python 3.12.3, Pillow 10.2.0, source hashes, stable capture inputs, and sibling absence.
+- `baseline-lock.json` binds nine artifacts, four source/test files including transitive `guardrail_lib.py`, Stage 1 contracts, and the legacy Git tree. Its externally pinned SHA-256 is `57224a1f1ba8333bbc900b23ff6127a189649feb01c279f30fac05a305658863`; the validator is deliberately outside the lock to avoid a circular self-hash.
+
+### Verification and hostile review
+
+- `validate_baseline.py` passed in normal and optimized Python with sibling absence required: `blocks=20430 defects=55 images=1444 sample=1125 segments=29`.
+- All 27 Stage 2 unit/mutation tests passed normally in 67.644 seconds and under `python -O` in 66.670 seconds. They cover raw drift, JPEG truncation/trailing data, dangling aliases, line/byte and lexical reclassification, complete sample rankings, Hamilton ties and NUL framing, strict lock schemas and replacement attacks, routing/Atlas mutations, image swaps/omissions/ownership, defect/workflow/authorization drift, D13 deletion, filesystem mode/link changes, and Git/LFS OID/size/mode changes.
+- Stage 1 validation and all 39 Stage 1 mutation tests passed again in normal and optimized modes.
+- A no-Git portable copy with all files `0444`, directories `0555`, and deliberately changed monolith allocation passed with full lock checking. A second run passed with the legacy tree relocated through `--legacy-root`; the default legacy path was absent, proving the override was used.
+- Three hostile audit tracks passed. They independently replayed all 58 boundary signatures, 20,430 block classifications/risks, 20,430 held-out ranking rows, all image/LFS/dimension joins, routing and sentinel mutations, and both ordinary and self-consistent lock replacement attacks.
+- `git diff --check`, scope inspection, sibling absence, legacy Git tree `52b84494ab310afd64762bf0983106414419655e`, and legacy shell digest `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4` passed. The legacy corpus, Goal 1/2/3, and the repaired sibling were not modified or created.
+
+### Forward obligations
+
+- Stage 3 must obtain and fingerprint edition-identical authoritative page evidence. Stage 5 must validate proposed raw segment boundaries against that witness before treating them as authoritative structure.
+- Stage 37/38/40 must implement the detector families explicitly marked limited/reserved and satisfy the final recall/saturation protocol; Stage 2 exact sentinel routing is not a final content-fidelity claim.

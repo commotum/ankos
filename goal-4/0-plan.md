@@ -379,9 +379,10 @@ Stages 8–36 process author text. Each assigned batch must:
 ## Current Execution State
 
 - Synced: 2026-07-14 (America/Los_Angeles).
-- Active stage: `2-BASELINE` (`IN_PROGRESS`).
+- Active stage: `3-WITNESSES` (`IN_PROGRESS`).
 - The sibling release root `ref/A-New-Kind-of-Science-Repaired/` does not yet exist.
 - Stage 1 completed with 59 Goal 1 root oracles classified, all 40 affected oracles behaviorally frozen, 1,510 governed dependency rows re-derived, 39 mutation tests passing, and three independent hostile reviews passing.
+- Stage 2 completed with all 1,463 raw inputs independently hash/Git/LFS/JPEG verified; 29 proposed segments and 20,430 raw blocks frozen; 1,444 image references, 32 routing dispositions, 55 defect sentinels, and 1,125 held-out IDs bound under externally pinned lock `57224a1f1ba8333bbc900b23ff6127a189649feb01c279f30fac05a305658863`; 27 Stage 2 mutation tests and three hostile reviews passed in normal, optimized, portable no-Git, and relocated modes.
 - Protected unrelated Goal 1 work remains outside Goal 4's write scope.
 - Goal 4 execution writes remain restricted to `goal-4/**` and, only in later owning stages, `ref/A-New-Kind-of-Science-Repaired/**`.
 
@@ -392,8 +393,8 @@ Keep one current status per stage and at most one `IN_PROGRESS` stage. `SOURCE_B
 | Stages | Current status | Prerequisites |
 |---|---|---|
 | 1 | `COMPLETE` | none |
-| 2 | `IN_PROGRESS` | 1 |
-| 3 | `NOT_STARTED` | 1–2 |
+| 2 | `COMPLETE` | 1 |
+| 3 | `IN_PROGRESS` | 1–2 |
 | 4 | `NOT_STARTED` | 1–2; witness schema known, but full witness coverage may still be pending |
 | 5 | `NOT_STARTED` | 1–2, 4 |
 | 6 | `NOT_STARTED` | 1–2, 4–5 |
