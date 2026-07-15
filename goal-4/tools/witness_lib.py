@@ -82,6 +82,12 @@ EXPECTED_BLOCKERS = [
     "WITNESS-EDITION-MATCH",
     "WITNESS-INDEPENDENT-REVIEW",
 ]
+EXPECTED_UNRESOLVED = [
+    "UNRESOLVED-WITNESS-0001",
+    "UNRESOLVED-WITNESS-0002",
+    "UNRESOLVED-WITNESS-0003",
+    "UNRESOLVED-WITNESS-0004",
+]
 ALLOWED_PUBLIC_HOSTS = {
     "files.wolframcdn.com",
     "www.wolfram-media.com",
@@ -181,6 +187,22 @@ def stable_json_sha256(value: Any) -> str:
         allow_nan=False,
     ).encode("utf-8")
     return sha256_bytes(payload)
+
+
+def canonical_json_bytes(value: Any, *, terminal_lf: bool = True) -> bytes:
+    _reject_floats(value)
+    payload = json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    return payload + (b"\n" if terminal_lf else b"")
+
+
+def canonical_jsonl_bytes(rows: list[dict[str, Any]]) -> bytes:
+    return b"".join(canonical_json_bytes(row) for row in rows)
 
 
 def lf_sequence_sha256(values: Iterable[str]) -> str:
@@ -382,6 +404,199 @@ def _load_structure_summary(root: Path) -> tuple[list[str], list[str]]:
     return segment_ids, block_ids
 
 
+def _structure_rows(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    rows = load_jsonl(root / "goal-4/structure-ledger.jsonl")
+    segments = sorted(
+        (row for row in rows if row.get("record_type") == "SEGMENT"),
+        key=lambda row: row.get("order"),
+    )
+    blocks = [row for row in rows if row.get("record_type") == "RAW_BLOCK"]
+    require([row.get("segment_id") for row in segments] == EXPECTED_SEGMENTS, "segment ledger order drift")
+    require(len(blocks) == 20430, "raw block ledger count drift")
+    return segments, blocks
+
+
+def _expected_dimensions(blocks: list[dict[str, Any]], segment_id: str) -> list[str]:
+    risks = {row.get("risk_stratum") for row in blocks}
+    dimensions: list[str] = []
+    if segment_id != "INDEX":
+        dimensions.append("PROSE_AND_PUNCTUATION")
+    if "FORMULA_CODE_RULE_OR_DATA" in risks:
+        dimensions.append("FORMULA_CODE_AND_DATA")
+    if "FIGURE_CAPTION_OR_VISUAL" in risks:
+        dimensions.append("FIGURE_CAPTION_AND_COLOR")
+    if segment_id == "INDEX" or "INDEX_COLUMN_OR_ENTRY" in risks:
+        dimensions.append("INDEX_ENTRY_AND_COLUMN")
+    return dimensions
+
+
+def validate_region_ledger(
+    root: Path,
+    rows: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    path = root / "goal-4/witness-region-ledger.jsonl"
+    if rows is None:
+        rows = load_jsonl(path)
+        require(path.read_bytes() == canonical_jsonl_bytes(rows), "witness region ledger serialization drift")
+    require(len(rows) == 29, "witness region ledger row count drift")
+    segments, blocks = _structure_rows(root)
+    expected_fields = {
+        "blocker_ids",
+        "canonical_document_id",
+        "canonical_path",
+        "coverage_id",
+        "coverage_status",
+        "order",
+        "raw_block_count",
+        "raw_block_ids_sha256",
+        "raw_segment_sha256",
+        "record_type",
+        "repair_authorized",
+        "required_risk_dimensions",
+        "schema_version",
+        "segment_id",
+        "unresolved_ids",
+        "witness_region_ids",
+        "witness_unit_ids",
+    }
+    all_block_ids: list[str] = []
+    for order, (row, segment) in enumerate(zip(rows, segments, strict=True)):
+        require(set(row) == expected_fields, f"witness gap row schema drift: {order}")
+        segment_id = segment["segment_id"]
+        segment_blocks = [item for item in blocks if item.get("segment_id") == segment_id]
+        block_ids = [item["raw_block_id"] for item in segment_blocks]
+        all_block_ids.extend(block_ids)
+        require(row.get("schema_version") == "1.0.0", f"witness gap schema version drift: {segment_id}")
+        require(row.get("record_type") == "SEGMENT_SOURCE_GAP", f"witness gap record type drift: {segment_id}")
+        require(row.get("coverage_id") == f"WITNESS-GAP-{order + 1:04d}", f"witness coverage ID drift: {segment_id}")
+        require(row.get("order") == order, f"witness gap order drift: {segment_id}")
+        require(row.get("segment_id") == segment_id, f"witness gap segment drift: {segment_id}")
+        require(row.get("canonical_document_id") == segment_id, f"witness canonical ID drift: {segment_id}")
+        require(row.get("canonical_path") == segment["canonical_path"], f"witness canonical path drift: {segment_id}")
+        require(row.get("raw_segment_sha256") == segment["raw_segment_sha256"], f"witness raw segment hash drift: {segment_id}")
+        require(row.get("raw_block_count") == len(block_ids), f"witness gap block count drift: {segment_id}")
+        require(row.get("raw_block_ids_sha256") == stable_json_sha256(block_ids), f"witness gap block hash drift: {segment_id}")
+        require(row.get("required_risk_dimensions") == _expected_dimensions(segment_blocks, segment_id), f"witness gap risk dimensions drift: {segment_id}")
+        require(row.get("witness_unit_ids") == [], f"phantom witness unit in source gap: {segment_id}")
+        require(row.get("witness_region_ids") == [], f"phantom witness region in source gap: {segment_id}")
+        require(row.get("coverage_status") == "SOURCE_BLOCKED", f"false witness coverage: {segment_id}")
+        expected_blockers = [
+            "WITNESS-PERMISSION",
+            "WITNESS-COMPLETE-CENSUS",
+            "WITNESS-EDITION-MATCH",
+            "WITNESS-INDEPENDENT-REVIEW",
+        ]
+        if segment_id == "INDEX":
+            expected_blockers.insert(2, "WITNESS-INDEX-LAYOUT")
+        require(row.get("blocker_ids") == expected_blockers, f"witness gap blockers drift: {segment_id}")
+        require(row.get("unresolved_ids") == EXPECTED_UNRESOLVED, f"witness gap unresolved links drift: {segment_id}")
+        require(row.get("repair_authorized") is False, f"unauthorized witness repair enabled: {segment_id}")
+    require(all_block_ids == [f"RAW-{index:06d}" for index in range(1, 20431)], "witness segment gaps do not cover raw blocks exactly once in order")
+    return rows
+
+
+def validate_unresolved_ledger(
+    root: Path,
+    rows: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    path = root / "goal-4/witness-unresolved.jsonl"
+    if rows is None:
+        rows = load_jsonl(path)
+        require(path.read_bytes() == canonical_jsonl_bytes(rows), "witness unresolved ledger serialization drift")
+    require(len(rows) == 4, "witness unresolved row count drift")
+    expected_kinds = [
+        "COMPLETE_PRIMARY_WITNESS_NOT_ACQUIRED",
+        "AUTHORIZED_AUTOMATED_USE_NOT_ESTABLISHED",
+        "RAW_EDITION_IDENTITY_NOT_ESTABLISHED",
+        "PHYSICAL_UNIT_REGION_CENSUS_NOT_DERIVED",
+    ]
+    forbidden_leak_fields = {
+        "answer",
+        "candidate_text",
+        "proposed_repair",
+        "repair_outcome",
+        "witness_transcription",
+    }
+    for index, row in enumerate(rows):
+        require(not forbidden_leak_fields.intersection(row), f"held-out proposal or answer leakage in unresolved row {index}")
+        require(row.get("schema_version") == "1.0.0", f"unresolved schema version drift: {index}")
+        require(row.get("unresolved_id") == EXPECTED_UNRESOLVED[index], f"unresolved ID/order drift: {index}")
+        require(row.get("kind") == expected_kinds[index], f"unresolved kind drift: {index}")
+        require(row.get("workflow_state") == "SOURCE_BLOCKED", f"unresolved workflow falsely advanced: {index}")
+        require(row.get("severity") == "RELEASE_BLOCKER", f"unresolved severity weakened: {index}")
+        require(row.get("owner_stage") == "3-WITNESSES", f"unresolved owner drift: {index}")
+        require(row.get("source_candidate_ids") == ["OFFICIAL_NKS_ONLINE"], f"unresolved source drift: {index}")
+        require(row.get("affected_segment_ids") == EXPECTED_SEGMENTS, f"unresolved segment scope drift: {index}")
+        require(row.get("affected_raw_block_count") == 20430, f"unresolved block count drift: {index}")
+        require(row.get("affected_raw_block_ids_lf_sha256") == EXPECTED_RAW_BLOCK_IDS_LF_SHA256, f"unresolved block hash drift: {index}")
+        require(row.get("affected_legacy_asset_count") == 1444, f"unresolved asset count drift: {index}")
+        require(row.get("affected_held_out_sample_count") == 1125, f"unresolved held-out count drift: {index}")
+        require(row.get("affected_held_out_sample_sha256") == EXPECTED_SELECTED_IDS_SHA256, f"unresolved held-out hash drift: {index}")
+        require(row.get("repair_authorized") is False, f"unresolved repair falsely authorized: {index}")
+        require(row.get("final_disposition") is None, f"source-blocked unresolved item has a disposition: {index}")
+        for key in ("impact", "attempted_alternatives", "unblock_actions", "release_blocker_codes"):
+            require(row.get(key), f"unresolved row lacks {key}: {index}")
+    return rows
+
+
+def validate_lock(root: Path, lock: dict[str, Any] | None = None) -> dict[str, Any]:
+    path = root / "goal-4/witness-lock.json"
+    if lock is None:
+        lock = load_json(path)
+        require(path.read_bytes() == canonical_json_bytes(lock), "witness lock serialization drift")
+    require(lock.get("schema_version") == "1.0.0", "witness lock schema drift")
+    require(lock.get("status") == "FROZEN_STAGE_3_SOURCE_BLOCKED", "witness lock status drift")
+    expected_artifacts = [
+        "goal-4/witness-contract.json",
+        "goal-4/witness-mount-contract.md",
+        "goal-4/witness-region-ledger.jsonl",
+        "goal-4/witness-source-registry.json",
+        "goal-4/witness-state.json",
+        "goal-4/witness-unresolved.jsonl",
+    ]
+    artifacts = lock.get("artifacts")
+    require(isinstance(artifacts, list), "witness lock artifacts must be an array")
+    require([row.get("path") for row in artifacts] == expected_artifacts, "witness lock artifact inventory/order drift")
+    for row in artifacts:
+        artifact = root / row["path"]
+        require(artifact.is_file() and not artifact.is_symlink(), f"locked witness artifact missing or unsafe: {artifact}")
+        require(row.get("byte_size") == artifact.stat().st_size, f"locked witness artifact size drift: {artifact}")
+        require(row.get("sha256") == sha256_file(artifact), f"locked witness artifact hash drift: {artifact}")
+    expected_sources = [
+        "goal-4/tests/test_witness.py",
+        "goal-4/tools/capture_witness.py",
+        "goal-4/tools/witness_lib.py",
+    ]
+    sources = lock.get("sources")
+    require(isinstance(sources, list), "witness lock sources must be an array")
+    require([row.get("path") for row in sources] == expected_sources, "witness lock source inventory/order drift")
+    for row in sources:
+        source = root / row["path"]
+        require(source.is_file() and not source.is_symlink(), f"locked witness source missing or unsafe: {source}")
+        require(row.get("byte_size") == source.stat().st_size, f"locked witness source size drift: {source}")
+        require(row.get("sha256") == sha256_file(source), f"locked witness source hash drift: {source}")
+    expected_bindings = {
+        "baseline_lock_sha256": sha256_file(root / "goal-4/baseline-lock.json"),
+        "corpus_manifest_sha256": sha256_file(root / "goal-4/corpus-manifest.json"),
+        "fidelity_contract_sha256": sha256_file(root / "goal-4/fidelity-contract.md"),
+        "guardrails_sha256": sha256_file(root / "goal-4/guardrails.json"),
+        "held_out_sample_sha256": EXPECTED_HELD_OUT_SHA256,
+        "licensing_contract_sha256": sha256_file(root / "goal-4/licensing-contract.json"),
+        "review_contract_sha256": sha256_file(root / "goal-4/review-contract.md"),
+        "structure_ledger_sha256": EXPECTED_STRUCTURE_SHA256,
+    }
+    require(lock.get("bindings") == expected_bindings, "witness lock prerequisite bindings drift")
+    return lock
+
+
+def validate_external_lock_root(root: Path, expected_sha256: str) -> None:
+    require(re.fullmatch(r"[0-9a-f]{64}", expected_sha256) is not None, "external witness lock pin is malformed")
+    require(
+        sha256_file(root / "goal-4/witness-lock.json") == expected_sha256,
+        "external witness lock root drift",
+    )
+
+
 def _validate_held_out(root: Path, block_ids: list[str]) -> None:
     held_out = load_json(root / "goal-4/held-out-sample.json")
     selected = held_out.get("selected_raw_block_ids")
@@ -485,6 +700,9 @@ def validate_all(
     validate_contract(contract, root)
     validate_registry(registry)
     validate_state(state, registry, root)
+    validate_region_ledger(root)
+    validate_unresolved_ledger(root)
+    validate_lock(root)
     if scan_payloads:
         scan_for_forbidden_witness_payloads(root / "goal-4")
     return {
@@ -494,5 +712,7 @@ def validate_all(
         "blocked_raw_blocks": 20430,
         "blocked_held_out_items": 1125,
         "forbidden_witness_payloads": 0,
+        "segment_source_gap_rows": 29,
+        "unresolved_witness_rows": 4,
         "stage_4_dependency_independent_work": "ALLOWED",
     }

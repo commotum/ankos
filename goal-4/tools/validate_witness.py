@@ -8,7 +8,10 @@ import json
 import sys
 from pathlib import Path
 
-from witness_lib import WitnessError, load_json, validate_all
+from witness_lib import WitnessError, load_json, validate_all, validate_external_lock_root
+
+
+EXPECTED_WITNESS_LOCK_SHA256 = "f348e4dd0ebf328c48066696eb70359d954e07cbdfd7b7fd827286e3268ba449"
 
 
 def main() -> int:
@@ -21,6 +24,7 @@ def main() -> int:
     args = parser.parse_args()
     root = args.repo_root.resolve(strict=True)
     try:
+        validate_external_lock_root(root, EXPECTED_WITNESS_LOCK_SHA256)
         result = validate_all(
             root,
             contract=load_json(args.contract) if args.contract else None,

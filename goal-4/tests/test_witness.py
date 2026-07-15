@@ -14,11 +14,16 @@ sys.path.insert(0, str(TOOLS))
 from witness_lib import (  # noqa: E402
     WitnessError,
     load_json,
+    load_jsonl,
     scan_for_forbidden_witness_payloads,
     validate_all,
     validate_contract,
+    validate_external_lock_root,
+    validate_lock,
     validate_registry,
+    validate_region_ledger,
     validate_state,
+    validate_unresolved_ledger,
 )
 
 
@@ -28,6 +33,9 @@ class WitnessContractTests(unittest.TestCase):
         cls.contract = load_json(ROOT / "goal-4/witness-contract.json")
         cls.registry = load_json(ROOT / "goal-4/witness-source-registry.json")
         cls.state = load_json(ROOT / "goal-4/witness-state.json")
+        cls.region_rows = load_jsonl(ROOT / "goal-4/witness-region-ledger.jsonl")
+        cls.unresolved_rows = load_jsonl(ROOT / "goal-4/witness-unresolved.jsonl")
+        cls.lock = load_json(ROOT / "goal-4/witness-lock.json")
 
     def test_current_source_blocked_state_validates(self) -> None:
         result = validate_all(ROOT)
@@ -146,6 +154,68 @@ class WitnessContractTests(unittest.TestCase):
         state["blockers"][0]["state"] = "CLOSED"
         with self.assertRaisesRegex(WitnessError, "falsely closed"):
             validate_state(state, self.registry, ROOT)
+
+    def test_segment_gap_ledger_covers_exactly_29_documents(self) -> None:
+        rows = copy.deepcopy(self.region_rows)
+        rows.pop()
+        with self.assertRaisesRegex(WitnessError, "row count"):
+            validate_region_ledger(ROOT, rows)
+
+    def test_index_layout_blocker_cannot_be_removed(self) -> None:
+        rows = copy.deepcopy(self.region_rows)
+        index = next(row for row in rows if row["segment_id"] == "INDEX")
+        index["blocker_ids"].remove("WITNESS-INDEX-LAYOUT")
+        with self.assertRaisesRegex(WitnessError, "blockers drift"):
+            validate_region_ledger(ROOT, rows)
+
+    def test_visual_gap_dimension_cannot_be_removed(self) -> None:
+        rows = copy.deepcopy(self.region_rows)
+        visual = next(row for row in rows if "FIGURE_CAPTION_AND_COLOR" in row["required_risk_dimensions"])
+        visual["required_risk_dimensions"].remove("FIGURE_CAPTION_AND_COLOR")
+        with self.assertRaisesRegex(WitnessError, "risk dimensions"):
+            validate_region_ledger(ROOT, rows)
+
+    def test_gap_cannot_claim_a_phantom_region_or_authorized_repair(self) -> None:
+        rows = copy.deepcopy(self.region_rows)
+        rows[0]["witness_region_ids"] = ["PHANTOM-REGION"]
+        with self.assertRaisesRegex(WitnessError, "phantom witness region"):
+            validate_region_ledger(ROOT, rows)
+        rows = copy.deepcopy(self.region_rows)
+        rows[0]["repair_authorized"] = True
+        with self.assertRaisesRegex(WitnessError, "unauthorized witness repair"):
+            validate_region_ledger(ROOT, rows)
+
+    def test_gap_row_cannot_leak_a_proposed_answer(self) -> None:
+        rows = copy.deepcopy(self.region_rows)
+        rows[0]["proposed_repair"] = "guess"
+        with self.assertRaisesRegex(WitnessError, "schema drift"):
+            validate_region_ledger(ROOT, rows)
+
+    def test_unresolved_source_item_cannot_receive_a_final_disposition(self) -> None:
+        rows = copy.deepcopy(self.unresolved_rows)
+        rows[0]["final_disposition"] = "APPLIED_WITNESS_VERIFIED"
+        with self.assertRaisesRegex(WitnessError, "has a disposition"):
+            validate_unresolved_ledger(ROOT, rows)
+
+    def test_unresolved_ledger_cannot_leak_held_out_answers(self) -> None:
+        rows = copy.deepcopy(self.unresolved_rows)
+        rows[0]["witness_transcription"] = "answer"
+        with self.assertRaisesRegex(WitnessError, "leakage"):
+            validate_unresolved_ledger(ROOT, rows)
+
+    def test_internal_lock_inventory_and_hashes_are_enforced(self) -> None:
+        lock = copy.deepcopy(self.lock)
+        lock["artifacts"].pop()
+        with self.assertRaisesRegex(WitnessError, "inventory"):
+            validate_lock(ROOT, lock)
+        lock = copy.deepcopy(self.lock)
+        lock["artifacts"][0]["sha256"] = "0" * 64
+        with self.assertRaisesRegex(WitnessError, "artifact hash drift"):
+            validate_lock(ROOT, lock)
+
+    def test_external_lock_root_rejects_a_self_consistent_repin(self) -> None:
+        with self.assertRaisesRegex(WitnessError, "external witness lock root"):
+            validate_external_lock_root(ROOT, "0" * 64)
 
     def test_stage_4_can_proceed_but_full_claim_stays_blocked(self) -> None:
         state = copy.deepcopy(self.state)
