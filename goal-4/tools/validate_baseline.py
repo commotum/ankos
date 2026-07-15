@@ -725,6 +725,47 @@ def _independent_rankings(
     return rankings
 
 
+def _validate_sample_artifact(
+    root: Path,
+    manifest: dict[str, Any],
+    structure_rows: list[dict[str, Any]],
+    blocks: list[dict[str, Any]],
+    contract: dict[str, Any],
+    quality: dict[str, Any],
+    sample: dict[str, Any],
+) -> list[str]:
+    _strict_keys(sample, {
+        "bindings", "classifier", "document_allocations", "manifest_material", "protocol_version", "rankings",
+        "risk_priority", "schema_version", "seed_sha256", "selected_count", "selected_raw_block_ids",
+        "selected_raw_block_ids_sha256", "selection_inputs", "selection_prohibited_inputs", "status",
+    }, "held-out sample")
+    independent_seed, independent_ids, independent_allocations = _independent_sample_ids(manifest, blocks, contract, quality)
+    require(independent_seed == sample["seed_sha256"], "independent held-out seed drift")
+    require(independent_ids == sample["selected_raw_block_ids"], "independent held-out membership/order drift")
+    require(independent_allocations == sample["document_allocations"], "independent held-out allocation drift")
+    independent_rankings = _independent_rankings(independent_seed, blocks, contract, independent_ids)
+    require(sample["rankings"] == independent_rankings, "independent held-out ranking rows/order drift")
+    require(len(sample["rankings"]) == len(blocks) and sum(row["selected"] for row in sample["rankings"]) == 1125, "held-out rank coverage drift")
+    selection_bytes = json.dumps(independent_ids, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    require(sample["selected_count"] == 1125 and sample["selected_raw_block_ids_sha256"] == sha256_bytes(selection_bytes), "held-out selected-set binding drift")
+    manifest_material = json.dumps(
+        [{key: row[key] for key in ("relative_path", "role", "byte_size", "logical_line_count", "sha256")} for row in manifest["raw_inputs"]],
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    require(sample["bindings"] == {
+        "guardrails_sha256": sha256_file(root / "goal-4/guardrails.json"),
+        "manifest_material_sha256": sha256_bytes(manifest_material),
+        "quality_protocol_sha256": sha256_file(root / "goal-4/quality-evaluation.json"),
+        "raw_manifest_sha256": sha256_bytes(canonical_json_bytes(manifest)),
+        "structure_ledger_sha256": sha256_bytes(jsonl_bytes(structure_rows)),
+    }, "held-out artifact bindings drift")
+    require(sample["manifest_material"] == {"byte_size": len(manifest_material), "path_base": LEGACY_RELATIVE, "sha256": sha256_bytes(manifest_material)}, "held-out manifest-material sidecar drift")
+    require(sample["classifier"]["block_kind_enum"] == list(BLOCK_KIND_ENUM) and sample["classifier"]["classifier_id"] == "ANKOS-RAW-LEXER-1", "held-out classifier binding drift")
+    return independent_ids
+
+
 I_IMAGE_REFERENCE = re.compile(r"!\[[^\]\n]*\]\((?:<)?([^)>\n]+?\.jpeg)(?:>)?(?:\s+[^)\n]+)?\)")
 I_CONTENT_LINK = re.compile(r"(?<!!)\[([^\]\n]+)\]\(([^)\n]+\.md)\)")
 
@@ -802,6 +843,8 @@ def _independent_image_checks(
         owner = _owner_for_line(segments, reference["line"])
         split_references = sorted(split_by_basename.get(reference["basename"], []), key=lambda item: (item["path"], item["line"]))
         require(len(split_references) <= 1, f"duplicate split reference: {reference['basename']}")
+        for split_number, split_row in enumerate(row["split_references"], 1):
+            _strict_keys(split_row, {"line", "line_sha256", "path", "resolved_asset_path", "target"}, f"image ledger split reference {ordinal}.{split_number}")
         direct = monolith_path.parent / Path(*PurePosixPath(reference["target"]).parts)
         expected = {
             "asset_byte_size": asset["byte_size"],
@@ -842,6 +885,50 @@ def _span_bytes(payload: bytes, start_line: int, end_line: int) -> bytes:
     return payload[lines[start_line - 1]["byte_start"] : lines[end_line - 1]["byte_end"]]
 
 
+def _independent_content_stages(document_id: str) -> list[str]:
+    if document_id in {"PUBLICATION_AND_CONTENTS", "PREFACE", "COLOPHON"}:
+        return ["8-BOOKENDS"]
+    if re.fullmatch(r"CH\d{2}", document_id):
+        return [f"{8 + int(document_id[2:])}-{document_id}"]
+    if document_id == "GENERAL_NOTES":
+        return ["21-GENERAL-NOTES"]
+    if re.fullmatch(r"N\d{2}", document_id):
+        return [f"{21 + int(document_id[1:])}-{document_id}"]
+    if document_id == "INDEX":
+        return ["34-INDEX-AF", "35-INDEX-GM", "36-INDEX-NZ"]
+    if document_id in {"INTERPRETIVE_METADATA", "GENERATED_METADATA"}:
+        return ["39-NAVIGATION"]
+    raise GuardrailError(f"unknown defect owner: {document_id}")
+
+
+def _independent_specialist_stages(classes: list[str]) -> list[str]:
+    values = set(classes)
+    stages: set[str] = set()
+    if values & {"FORMULA_OR_SYMBOL", "WOLFRAM_CODE", "RULE_TABLE_OR_DATA"}:
+        stages.add("37-MATH-CODE")
+    if "FIGURE_OR_CAPTION" in values:
+        stages.add("38-FIGURES")
+    if values & {"STRUCTURE_BOUNDARY", "MARKDOWN_STRUCTURE", "HEADING_OR_FURNITURE", "NAVIGATION_METADATA"}:
+        stages.add("39-NAVIGATION")
+    if "INDEX_ENTRY" in values:
+        stages.update({"34-INDEX-AF", "35-INDEX-GM", "36-INDEX-NZ"})
+    return sorted(stages)
+
+
+def _independent_workflow_stages(owner: str, classes: list[str]) -> list[str]:
+    values = set(classes)
+    stages = set(_independent_content_stages(owner))
+    if values & {"STRUCTURE_BOUNDARY", "MARKDOWN_STRUCTURE", "HEADING_OR_FURNITURE"}:
+        stages.add("5-STRUCTURE")
+    if values & {"MARKDOWN_STRUCTURE", "HEADING_OR_FURNITURE"}:
+        stages.add("7-STYLE")
+    if values & {"FIGURE_OR_CAPTION", "NAVIGATION_METADATA"}:
+        stages.add("6-MEDIA")
+    stages.update(_independent_specialist_stages(classes))
+    stages.update({"40-SATURATION", "42-RELEASE"})
+    return sorted(stages)
+
+
 def _independent_routing_checks(
     legacy: Path,
     manifest: dict[str, Any],
@@ -856,6 +943,10 @@ def _independent_routing_checks(
     }
     _strict_keys(routing, expected_top, "routing baseline")
     require(routing["schema_version"] == "1.0.0", "routing schema drift")
+    _strict_keys(routing["atlas"], {"byte_size", "image_reference_count", "logical_line_count", "path", "role", "sha256", "terminal_lf", "textual_witness_allowed"}, "routing Atlas")
+    _strict_keys(routing["fence_delimiters"], {"all_markdown_count", "by_path", "monolith_count"}, "routing fence summary")
+    _strict_keys(routing["image_references"], {"all_monolith_targets_broken_relative_to_monolith", "ledger_path", "monolith_count", "monolith_source_sha256", "physical_path_location_counts", "semantic_reference_owner_counts", "split_count", "split_omissions"}, "routing image summary")
+    _strict_keys(routing["nonrouting_link_shapes"], {"rows", "status"}, "routing nonrouting-link summary")
     inputs = {row["relative_path"]: row for row in manifest["raw_inputs"]}
     route_sources = [row for row in manifest["raw_inputs"] if row["role"] == "LEGACY_ROUTING_MARKDOWN"]
     require(len(route_sources) == 17, "routing source count drift")
@@ -872,6 +963,8 @@ def _independent_routing_checks(
                 "terminal_lf": payload.endswith(b"\n"),
             }
         )
+    for number, row in enumerate(routing["routing_files"], 1):
+        _strict_keys(row, {"byte_size", "image_reference_count", "logical_line_count", "path", "sha256", "terminal_lf"}, f"routing file {number}")
     require(routing["routing_files"] == expected_files, "independent routing-file ledger drift")
     atlas = inputs["ANKoS-Atlas.md"]
     require(routing["atlas"] == {
@@ -887,8 +980,11 @@ def _independent_routing_checks(
     monolith = (legacy / MONOLITH_RELATIVE).read_bytes()
     route_spans = routing["routing_spans"]
     require(len(route_spans) == 32 and [row["route_id"] for row in route_spans] == [f"ROUTE-{number:03d}" for number in range(1, 33)], "routing span identity drift")
+    route_projection = []
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in route_spans:
+        _strict_keys(row, {"disposition", "raw_end_line", "raw_span_byte_size", "raw_span_sha256", "raw_start_line", "route_id", "source_path", "source_sha256", "split_end_line", "split_span_byte_size", "split_span_sha256", "split_start_line", "target_document_id"}, f"routing span {row.get('route_id', '?')}")
+        route_projection.append({key: row[key] for key in ("source_path", "split_start_line", "split_end_line", "raw_start_line", "raw_end_line", "target_document_id", "disposition")})
         grouped[row["source_path"]].append(row)
         source = inputs[row["source_path"]]
         payload = (legacy / Path(*PurePosixPath(row["source_path"]).parts)).read_bytes()
@@ -909,6 +1005,17 @@ def _independent_routing_checks(
         require(spans and spans[0]["split_start_line"] == 1 and spans[-1]["split_end_line"] == source["logical_line_count"], f"routing split edge drift: {source['relative_path']}")
         require(all(left["split_end_line"] + 1 == right["split_start_line"] for left, right in zip(spans, spans[1:])), f"routing split gap/overlap: {source['relative_path']}")
     require(sum(row["raw_start_line"] is not None for row in route_spans) == 31, "raw routing span count drift")
+    require(Counter(row["disposition"] for row in route_spans) == Counter({
+        "REFLOWED_OR_NORMALIZED_ROUTING_ONLY": 13,
+        "MALFORMED_CROSS_DOCUMENT_ROUTE": 15,
+        "GENERATED_NAVIGATION_NO_AUTHOR_TEXT_PROJECTION": 1,
+        "ONE_LINE_STRAY_ROUTE": 1,
+        "ACTUAL_INDEX_INSIDE_NOMINAL_COLOPHON": 1,
+        "ACTUAL_COLOPHON_AT_FILE_TAIL": 1,
+    }), "routing disposition census drift")
+    projection_sha256 = sha256_bytes(json.dumps(route_projection, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+    if EXPECTED_ROUTING_PROJECTION_SHA256 is not None:
+        require(projection_sha256 == EXPECTED_ROUTING_PROJECTION_SHA256, "frozen routing projection drift")
     contents_relative = "FRONT-MATTER/Contents/Contents.md"
     contents_path = legacy / contents_relative
     expected_links: list[dict[str, Any]] = []
@@ -933,6 +1040,8 @@ def _independent_routing_checks(
                 "target": target,
                 "target_sha256": inputs[relative]["sha256"],
             })
+    for number, row in enumerate(routing["contents_links"], 1):
+        _strict_keys(row, {"label", "lexically_resolves", "line", "resolved_path", "semantic_route_status", "target", "target_sha256"}, f"Contents link {number}")
     require(routing["contents_links"] == expected_links and len(expected_links) == 16, "Contents link ledger drift")
     require(sum(row["semantic_route_status"] != "NOMINAL_TARGET_MATCHES_DOCUMENT" for row in expected_links) == 4, "Contents semantic anomaly count drift")
     fence_counts = {
@@ -960,14 +1069,33 @@ def _independent_routing_checks(
         if row["split_status"] == "OMITTED"
     ]
     image_summary = routing["image_references"]
+    for number, row in enumerate(image_summary["split_omissions"], 1):
+        _strict_keys(row, {"asset_sha256", "basename", "canonical_document_id", "monolith_line", "raw_reference_ordinal"}, f"routing image omission {number}")
     require(image_summary["split_omissions"] == omissions and image_summary["monolith_count"] == 1444 and image_summary["split_count"] == 1441, "routing image summary drift")
     require(image_summary["all_monolith_targets_broken_relative_to_monolith"] is True and image_summary["monolith_source_sha256"] == sha256_bytes(monolith), "routing monolith image claim drift")
+    physical_counts = Counter(
+        "PREFACE" if row["asset_relative_path"].startswith("FRONT-MATTER/Preface/")
+        else "CHAPTER_PATHS" if row["asset_relative_path"].startswith("CHAPTERS/")
+        else "BACK_MATTER_PATHS"
+        for row in image_rows
+    )
+    semantic_counts = Counter(
+        "PREFACE" if row["canonical_document_id"] == "PREFACE"
+        else "CHAPTERS" if row["canonical_document_id"].startswith("CH")
+        else "NOTES" if row["canonical_document_id"] == "GENERAL_NOTES" or row["canonical_document_id"].startswith("N")
+        else "OTHER"
+        for row in image_rows
+    )
+    require(image_summary["physical_path_location_counts"] == dict(sorted(physical_counts.items())) == {"BACK_MATTER_PATHS": 543, "CHAPTER_PATHS": 899, "PREFACE": 2}, "physical image path census drift")
+    require(image_summary["semantic_reference_owner_counts"] == dict(sorted(semantic_counts.items())) == {"CHAPTERS": 820, "NOTES": 622, "PREFACE": 2}, "semantic image owner census drift")
     for row in routing["nonrouting_link_shapes"]["rows"]:
+        _strict_keys(row, {"line", "line_sha256"}, "nonrouting link-shape row")
         require(row["line_sha256"] == sha256_bytes(_span_bytes(monolith, row["line"], row["line"])), "nonrouting link-shape hash drift")
     require([row["line"] for row in routing["nonrouting_link_shapes"]["rows"]] == [15347, 16774, 17356, 18922, 20385], "nonrouting link-shape line drift")
     expected_omitted = [(398, 399), (1368, 1369), (2700, 2701), (6586, 6587), (12083, 12084), (12086, 12088), (17443, 17443)]
     require([tuple(row["lines"]) for row in routing["omitted_transition_or_malformed_raw_lines"]] == expected_omitted, "omitted transition range drift")
     for row in routing["omitted_transition_or_malformed_raw_lines"]:
+        _strict_keys(row, {"lines", "raw_span_sha256", "reason"}, "omitted transition row")
         require(row["raw_span_sha256"] == sha256_bytes(_span_bytes(monolith, *row["lines"])), "omitted transition hash drift")
 
 
@@ -984,13 +1112,39 @@ def _independent_defect_checks(
     detector_report: dict[str, Any],
 ) -> None:
     require(len(defect_rows) == 55 and [row["sentinel_id"] for row in defect_rows] == [f"DEFECT-{number:04d}" for number in range(1, 56)], "known-defect identity drift")
+    require(len({row["label"] for row in defect_rows}) == 55, "known-defect label uniqueness drift")
+    require(Counter(row["sentinel_kind"] for row in defect_rows) == Counter({"EXACT_RAW_SPAN": 52, "AGGREGATE_GUARDRAIL": 3}), "known-defect kind census drift")
     inputs = {row["relative_path"]: row for row in manifest["raw_inputs"]}
     image_by_line = {row["monolith_line"]: row for row in image_rows}
+    detector_enum = {f"D{number:02d}_{name}" for number, name in (
+        (4, "SPLIT_ROUTING"), (5, "IMAGE_REFERENCE"), (6, "FENCE"), (7, "HEADING"),
+        (8, "CAPTION_ASSOCIATION"), (9, "WORD_BOUNDARY"), (10, "TECHNICAL"),
+        (11, "REPETITION"), (12, "INDEX"),
+    )}
     for row in defect_rows:
+        common_keys = {
+            "candidate_detector_routes", "closure_stages", "defect_classes", "exact_regression_detector", "label",
+            "owner_document_id", "primary_content_stages", "raw_block_ids", "repair_authorized", "schema_version",
+            "sentinel_id", "sentinel_kind", "specialist_stages", "status", "workflow_stages",
+        }
+        if row["sentinel_kind"] == "EXACT_RAW_SPAN":
+            expected_keys = common_keys | {
+                "end_line_prefix", "end_line_suffix", "raw_end_line", "raw_source_role", "raw_source_sha256",
+                "raw_span_byte_size", "raw_span_occurrence_count", "raw_span_sha256", "raw_start_line", "source_path",
+                "start_line_prefix", "start_line_suffix",
+            }
+            if "image_reference" in row:
+                expected_keys.add("image_reference")
+        else:
+            expected_keys = common_keys | {"artifact_path", "artifact_sha256"}
+        _strict_keys(row, expected_keys, f"known defect {row.get('sentinel_id', '?')}")
         require(row["schema_version"] == "1.0.0" and row["repair_authorized"] is False, f"known defect authorizes repair: {row['sentinel_id']}")
         require(row["exact_regression_detector"] == "D13_EXACT_SENTINEL" and row["candidate_detector_routes"], f"known defect detector route drift: {row['sentinel_id']}")
+        require(set(row["candidate_detector_routes"]) <= detector_enum, f"known defect candidate-detector enum drift: {row['sentinel_id']}")
         require(row["closure_stages"] == ["40-SATURATION", "42-RELEASE"], f"known defect closure route drift: {row['sentinel_id']}")
-        require(set(row["primary_content_stages"]) <= set(row["workflow_stages"]) and set(row["specialist_stages"]) <= set(row["workflow_stages"]), f"known defect workflow route drift: {row['sentinel_id']}")
+        require(row["primary_content_stages"] == _independent_content_stages(row["owner_document_id"]), f"known defect primary-content route drift: {row['sentinel_id']}")
+        require(row["specialist_stages"] == _independent_specialist_stages(row["defect_classes"]), f"known defect specialist route drift: {row['sentinel_id']}")
+        require(row["workflow_stages"] == _independent_workflow_stages(row["owner_document_id"], row["defect_classes"]), f"known defect workflow route drift: {row['sentinel_id']}")
         if row["sentinel_kind"] == "EXACT_RAW_SPAN":
             source = inputs[row["source_path"]]
             payload = (legacy / Path(*PurePosixPath(row["source_path"]).parts)).read_bytes()
@@ -1010,6 +1164,7 @@ def _independent_defect_checks(
                 matching_routes = [route for route in routing["routing_spans"] if route["source_path"] == row["source_path"] and route["split_start_line"] <= row["raw_start_line"] <= route["split_end_line"]]
                 require(len(matching_routes) == 1 and matching_routes[0]["target_document_id"] == row["owner_document_id"], f"known defect split owner drift: {row['sentinel_id']}")
             if "image_reference" in row:
+                _strict_keys(row["image_reference"], {"basename", "raw_reference_ordinal", "split_status"}, f"known defect image route {row['sentinel_id']}")
                 image = image_by_line[row["raw_start_line"]]
                 require(row["image_reference"] == {"basename": image["basename"], "raw_reference_ordinal": image["raw_reference_ordinal"], "split_status": image["split_status"]}, f"known defect image route drift: {row['sentinel_id']}")
         else:
@@ -1020,6 +1175,9 @@ def _independent_defect_checks(
             else:
                 expected_hash = sha256_file(artifact_root / PurePosixPath(artifact_path).name)
             require(row["artifact_sha256"] == expected_hash, f"aggregate defect artifact binding drift: {row['sentinel_id']}")
+    require(sum(row.get("source_path") == MONOLITH_RELATIVE for row in defect_rows) == 46, "monolith known-defect span census drift")
+    require(sum(row.get("source_path") not in {None, MONOLITH_RELATIVE} for row in defect_rows) == 6, "routing-file known-defect span census drift")
+    require(sum("image_reference" in row for row in defect_rows) == 3, "image known-defect route census drift")
     exact_hits = [row for row in detector_hits if row["detector_id"] == "D13_EXACT_SENTINEL"]
     require(len(exact_hits) == len(defect_rows), "exact sentinel detector coverage drift")
     by_route = {row["route"]: row for row in exact_hits}
@@ -1050,38 +1208,65 @@ def _independent_defect_checks(
     require(registry["generic_candidate_recall_numerator"] == generic_count and registry["generic_candidate_recall_denominator"] == 55 and registry["manual_exact_route_count"] == 55 - generic_count, "detector generic-recall accounting drift")
 
 
-def _validate_lock(root: Path, artifact_root: Path, lock: dict[str, Any]) -> None:
+def _validate_lock(
+    root: Path,
+    artifact_root: Path,
+    lock: dict[str, Any],
+    environment: dict[str, Any] | None = None,
+) -> None:
+    _strict_keys(lock, {"artifacts", "bindings", "schema_version", "sources", "status"}, "baseline lock")
     require(lock.get("schema_version") == "1.0.0" and lock.get("status") == "FROZEN_STAGE_2_BASELINE", "baseline lock state drift")
     expected_paths = [f"goal-4/{name}" for name in EXPECTED_ARTIFACTS]
     require([row["path"] for row in lock["artifacts"]] == expected_paths, "baseline lock artifact scope drift")
     for row in lock["artifacts"]:
+        _strict_keys(row, {"byte_size", "path", "sha256"}, f"baseline lock artifact {row.get('path', '?')}")
         path = artifact_root / Path(row["path"]).name
         require(path.is_file(), f"locked artifact missing: {row['path']}")
         require(path.stat().st_size == row["byte_size"] and sha256_file(path) == row["sha256"], f"locked artifact drift: {row['path']}")
+    expected_sources = [
+        "goal-4/tools/baseline_lib.py",
+        "goal-4/tools/capture_baseline.py",
+        "goal-4/tools/guardrail_lib.py",
+        "goal-4/tests/test_baseline.py",
+    ]
+    require([row["path"] for row in lock["sources"]] == expected_sources, "baseline lock source scope/order drift")
     for row in lock["sources"]:
+        _strict_keys(row, {"byte_size", "path", "sha256"}, f"baseline lock source {row.get('path', '?')}")
         path = root / row["path"]
         require(path.is_file(), f"locked source missing: {row['path']}")
         require(path.stat().st_size == row["byte_size"] and sha256_file(path) == row["sha256"], f"locked source drift: {row['path']}")
-    require(lock["bindings"] == {
+    expected_bindings = {
         "compatibility_baseline_sha256": sha256_file(root / "goal-4/compatibility-baseline.json"),
         "guardrails_sha256": sha256_file(root / "goal-4/guardrails.json"),
         "legacy_git_tree": LEGACY_GIT_TREE,
         "quality_protocol_sha256": sha256_file(root / "goal-4/quality-evaluation.json"),
-    }, "baseline lock binding drift")
+    }
+    _strict_keys(lock["bindings"], set(expected_bindings), "baseline lock bindings")
+    require(lock["bindings"] == expected_bindings, "baseline lock binding drift")
+    if environment is not None:
+        recorded = environment["tools"]["tools_source_sha256"]
+        source_hashes = {PurePosixPath(row["path"]).name: row["sha256"] for row in lock["sources"] if row["path"].startswith("goal-4/tools/")}
+        require(recorded == source_hashes, "environment/lock tool-source binding drift")
 
 
 def validate_baseline(
     root: Path,
     *,
     artifact_root: Path | None = None,
+    legacy_root: Path | None = None,
     raw_overrides: dict[str, Path] | None = None,
     check_lock: bool = True,
     require_sibling_absent: bool = False,
+    portable_content: bool = False,
 ) -> dict[str, Any]:
     root = root.resolve(strict=True)
     artifact_root = (artifact_root or root / "goal-4").resolve(strict=True)
+    legacy_candidate = legacy_root or root / LEGACY_RELATIVE
+    require(legacy_candidate.is_dir() and not legacy_candidate.is_symlink(), "legacy content root is missing or aliased")
+    legacy = legacy_candidate.resolve(strict=True)
     if require_sibling_absent:
-        require(not (root / REPAIRED_RELATIVE).exists(), "Stage 2 repaired sibling must remain absent")
+        repaired = root / REPAIRED_RELATIVE
+        require(not repaired.exists() and not repaired.is_symlink(), "Stage 2 repaired sibling must remain absent, including dangling aliases")
     paths = _artifact_paths(artifact_root)
     manifest = load_canonical_json(paths["corpus-manifest.json"])
     routing = load_canonical_json(paths["routing-baseline.json"])
@@ -1094,35 +1279,39 @@ def validate_baseline(
     detector_hits = load_jsonl(paths["baseline-detector-hits.jsonl"])
     contract = load_json(root / "goal-4/guardrails.json")
     quality = load_json(root / "goal-4/quality-evaluation.json")
-    _validate_raw_rows(root, manifest, raw_overrides)
-    require(git_tree_identity(root, "HEAD", LEGACY_RELATIVE) == LEGACY_GIT_TREE, "legacy Git tree drift")
-    segments, blocks = _independent_structure_checks(root, structure_rows)
-    independent_seed, independent_ids, independent_allocations = _independent_sample_ids(manifest, blocks, contract, quality)
-    require(independent_seed == sample["seed_sha256"], "independent held-out seed drift")
-    require(independent_ids == sample["selected_raw_block_ids"], "independent held-out membership/order drift")
-    require(independent_allocations == sample["document_allocations"], "independent held-out allocation drift")
-    require(len(sample["rankings"]) == len(blocks) and sum(row["selected"] for row in sample["rankings"]) == 1125, "held-out rank coverage drift")
-    require(len(image_rows) == 1444 and [row["raw_reference_ordinal"] for row in image_rows] == list(range(1, 1445)), "image reference ordinal drift")
-    require([(row["raw_reference_ordinal"], row["monolith_line"]) for row in image_rows if row["split_status"] == "OMITTED"] == [(24, 680), (134, 1711), (135, 1744)], "image omission drift")
-    require(len(defect_rows) == 55 and all(row["repair_authorized"] is False for row in defect_rows), "known-defect registry drift/authorization")
-    require([row["sentinel_id"] for row in defect_rows] == [f"DEFECT-{number:04d}" for number in range(1, 56)], "known-defect IDs drift")
-    require(detector_report["repairs_applied"] == 0 and detector_report["known_defect_registry"]["unrouted_count"] == 0, "baseline detector report claims repairs or leaves an unrouted sentinel")
-    require(sum(row["detector_id"] == "D13_EXACT_SENTINEL" for row in detector_hits) == 55, "exact sentinel detector coverage drift")
+    _validate_raw_rows(
+        root,
+        manifest,
+        raw_overrides,
+        legacy_root=legacy,
+        audit_capture_metadata=not portable_content,
+    )
+    if not portable_content:
+        require(legacy == (root / LEGACY_RELATIVE).resolve(strict=True), "audit validation requires the repository legacy path; use --portable-content for a relocated tree")
+        _independent_git_lfs_checks(root, manifest)
+        require(git_tree_identity(root, "HEAD", LEGACY_RELATIVE) == LEGACY_GIT_TREE, "legacy Git tree drift")
+    segments, blocks = _independent_structure_checks(root, structure_rows, legacy_root=legacy)
+    independent_ids = _validate_sample_artifact(root, manifest, structure_rows, blocks, contract, quality, sample)
+    _independent_image_checks(legacy, manifest, segments, blocks, image_rows)
+    _independent_routing_checks(legacy, manifest, segments, image_rows, routing)
+    _independent_defect_checks(legacy, artifact_root, manifest, segments, blocks, image_rows, routing, defect_rows, detector_hits, detector_report)
 
-    expected_manifest = build_corpus_manifest(root, contract)
-    expected_structure, expected_segments, expected_blocks = structure_ledger_rows(root, contract)
-    expected_images = build_image_reference_ledger(root, expected_manifest, expected_segments, expected_blocks)
-    expected_routing = build_routing_baseline(root, expected_manifest, expected_images)
-    expected_sample = build_held_out_sample(root, expected_manifest, expected_structure, expected_blocks, contract, quality)
-    expected_defects = build_known_defect_rows(root, expected_manifest, expected_segments, expected_blocks, expected_images, expected_routing)
-    expected_hits, expected_report = build_detector_artifacts(root, expected_manifest, expected_segments, expected_blocks, expected_images, expected_routing, expected_defects)
-    require(manifest == expected_manifest, "corpus manifest does not reproduce")
-    require(structure_rows == expected_structure, "structure ledger does not reproduce")
-    require(image_rows == expected_images, "image reference ledger does not reproduce")
-    require(routing == expected_routing, "routing baseline does not reproduce")
-    require(sample == expected_sample, "held-out sample does not reproduce")
-    require(defect_rows == expected_defects, "known-defect registry does not reproduce")
-    require(detector_hits == expected_hits and detector_report == expected_report, "detector baseline does not reproduce")
+    if not portable_content:
+        expected_manifest = build_corpus_manifest(root, contract)
+        expected_structure, expected_segments, expected_blocks = structure_ledger_rows(root, contract)
+        expected_images = build_image_reference_ledger(root, expected_manifest, expected_segments, expected_blocks)
+        expected_routing = build_routing_baseline(root, expected_manifest, expected_images)
+        expected_sample = build_held_out_sample(root, expected_manifest, expected_structure, expected_blocks, contract, quality)
+        expected_defects = build_known_defect_rows(root, expected_manifest, expected_segments, expected_blocks, expected_images, expected_routing)
+        expected_hits, expected_report = build_detector_artifacts(root, expected_manifest, expected_segments, expected_blocks, expected_images, expected_routing, expected_defects)
+        require(manifest == expected_manifest, "corpus manifest does not reproduce")
+        require(structure_rows == expected_structure, "structure ledger does not reproduce")
+        require(image_rows == expected_images, "image reference ledger does not reproduce")
+        require(routing == expected_routing, "routing baseline does not reproduce")
+        require(sample == expected_sample, "held-out sample does not reproduce")
+        require(defect_rows == expected_defects, "known-defect registry does not reproduce")
+        require(detector_hits == expected_hits and detector_report == expected_report, "detector baseline does not reproduce")
+    _strict_keys(environment, {"capture_scope", "environment", "schema_version", "tools"}, "baseline environment")
     require(environment.get("schema_version") == "1.0.0", "baseline environment schema drift")
     scope = environment.get("capture_scope", {})
     require(scope.get("git_head_stable_during_capture") is True, "Git HEAD moved during baseline capture")
@@ -1141,7 +1330,7 @@ def validate_baseline(
     if check_lock:
         lock_path = artifact_root / "baseline-lock.json"
         lock = load_canonical_json(lock_path)
-        _validate_lock(root, artifact_root, lock)
+        _validate_lock(root, artifact_root, lock, environment)
         if EXPECTED_BASELINE_LOCK_SHA256 is not None:
             require(sha256_file(lock_path) == EXPECTED_BASELINE_LOCK_SHA256, "frozen baseline lock digest drift")
     return {
@@ -1157,6 +1346,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--artifact-root", type=Path)
+    parser.add_argument("--legacy-root", type=Path)
+    parser.add_argument("--portable-content", action="store_true")
     parser.add_argument("--skip-lock", action="store_true")
     parser.add_argument("--require-sibling-absent", action="store_true")
     args = parser.parse_args()
@@ -1164,8 +1355,10 @@ def main() -> int:
         summary = validate_baseline(
             args.repo_root,
             artifact_root=args.artifact_root,
+            legacy_root=args.legacy_root,
             check_lock=not args.skip_lock,
             require_sibling_absent=args.require_sibling_absent,
+            portable_content=args.portable_content,
         )
     except (GuardrailError, UnicodeError, OSError, KeyError, TypeError, ValueError) as error:
         print(f"BASELINE FAIL: {error}", file=sys.stderr)
