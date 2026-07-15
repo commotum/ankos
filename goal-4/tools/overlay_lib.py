@@ -5,17 +5,19 @@ executable core used to prove operation guards, role separation, dependency
 ordering, and reversibility before any corpus repair is attempted.  It does
 not read the legacy tree, a witness mount, or a generated output tree.
 
-The public operations are immutable records.  Every record binds both the
-complete target pre-state and post-state hashes, plus operation-specific
-preimages/counts/hashes.  Canonical author-text changes are accepted only
-with edition-identical witness-region evidence and an independent approved
-source review.  Byte-conserving split/merge operations are the sole canonical
-operations that may be mechanically proven without source evidence.
+The public operations are immutable records.  Every record binds a specific
+document target, the complete target pre-state and post-state hashes, and
+operation-specific preimages/counts/hashes.  Canonical author-text changes
+are accepted only with edition-identical witness-region evidence, independent
+approved source and specialist reviews, and an application authority sealed
+by the higher-level registry validator.  With no authority the canonical gate
+is SOURCE_BLOCKED.  Raw byte partitioning belongs to the projection-tape
+compiler, not to this semantic overlay engine.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field, fields, is_dataclass, replace
 import hashlib
 import re
 from typing import Iterable, Mapping, Sequence, TypeAlias
@@ -109,6 +111,15 @@ FINAL_DISPOSITIONS = frozenset(
 PRINCIPAL_TYPES = frozenset({"HUMAN", "AGENT", "AUTOMATED"})
 ID_RE = re.compile(r"[A-Z0-9]+(?:[_-][A-Z0-9]+)*\Z")
 SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
+AUTHORITY_GATE_STATES = frozenset({"SOURCE_BLOCKED", "OPEN"})
+
+# These seals prevent accidental/direct construction and dataclasses.replace
+# fabrication at the API boundary.  They are process-local object identities,
+# not cryptographic secrets; the accompanying digests provide deterministic
+# integrity, not external authenticity.  The trust root remains the validator
+# which creates an ApplicationAuthority from its pinned registry.
+_AUTHORITY_SEAL = object()
+_REPLAY_SEAL = object()
 
 
 class OverlayError(ValueError):
@@ -171,6 +182,16 @@ def _require_nonempty_text(value: str, field: str) -> None:
         raise SchemaError(f"{field} must be nonempty text")
 
 
+def _require_positive_int(value: int, field: str) -> None:
+    if type(value) is not int or value < 1:
+        raise SchemaError(f"{field} must be a positive integer")
+
+
+def _require_exact_one(value: int, field: str) -> None:
+    if type(value) is not int or value != 1:
+        raise SchemaError(f"{field} must be the integer 1")
+
+
 def _feed_length_prefixed(digest: "hashlib._Hash", value: bytes) -> None:
     digest.update(len(value).to_bytes(8, "big"))
     digest.update(value)
@@ -195,13 +216,15 @@ class Block:
         return self.data.decode("utf-8")
 
 
-def target_sha256(role: str, blocks: Sequence[Block]) -> str:
-    """Hash a complete role target with unambiguous IDs, order, and bytes."""
+def target_sha256(target_id: str, role: str, blocks: Sequence[Block]) -> str:
+    """Hash one complete document/role target with IDs, order, and bytes."""
 
+    _require_id(target_id, "target_id")
     if role not in TARGET_ROLES:
         raise SchemaError(f"unknown target role: {role!r}")
     digest = hashlib.sha256()
-    _feed_length_prefixed(digest, b"ANKOS-OVERLAY-TARGET-1")
+    _feed_length_prefixed(digest, b"ANKOS-OVERLAY-TARGET-2")
+    _feed_length_prefixed(digest, target_id.encode("ascii"))
     _feed_length_prefixed(digest, role.encode("ascii"))
     digest.update(len(blocks).to_bytes(8, "big"))
     seen: set[str] = set()
@@ -218,59 +241,113 @@ def target_sha256(role: str, blocks: Sequence[Block]) -> str:
 
 @dataclass(frozen=True, slots=True)
 class OverlayState:
-    """Immutable target-role state with deterministic ordering and hashing."""
+    """Immutable document/role state with deterministic ordering and hashing.
 
-    _targets: tuple[tuple[str, tuple[Block, ...]], ...]
+    Direct construction defensively tuple-normalizes every container, so a
+    caller retaining a mutable input list cannot mutate the frozen state.
+    """
+
+    _targets: tuple[tuple[str, str, tuple[Block, ...]], ...]
 
     def __post_init__(self) -> None:
-        roles = [role for role, _ in self._targets]
-        if roles != sorted(roles):
-            raise SchemaError("state targets must be sorted by role")
-        if len(roles) != len(set(roles)):
-            raise SchemaError("state contains duplicate target roles")
-        for role, blocks in self._targets:
-            target_sha256(role, blocks)
+        try:
+            raw_targets = tuple(self._targets)
+        except TypeError as error:
+            raise SchemaError("state targets must be iterable") from error
+        closed: list[tuple[str, str, tuple[Block, ...]]] = []
+        for raw in raw_targets:
+            if not isinstance(raw, (tuple, list)) or len(raw) != 3:
+                raise SchemaError("each state target must be (target_id, role, blocks)")
+            target_id, role, raw_blocks = raw
+            try:
+                blocks = tuple(raw_blocks)
+            except TypeError as error:
+                raise SchemaError("state target blocks must be iterable") from error
+            _require_id(target_id, "target_id")
+            target_sha256(target_id, role, blocks)
+            closed.append((target_id, role, blocks))
+        keys = [(target_id, role) for target_id, role, _ in closed]
+        if keys != sorted(keys):
+            raise SchemaError("state targets must be sorted by target ID and role")
+        if len(keys) != len(set(keys)):
+            raise SchemaError("state contains duplicate document/role targets")
+        object.__setattr__(self, "_targets", tuple(closed))
 
     @classmethod
-    def from_mapping(cls, targets: Mapping[str, Iterable[Block]]) -> "OverlayState":
+    def from_mapping(
+        cls, targets: Mapping[tuple[str, str], Iterable[Block]]
+    ) -> "OverlayState":
         if not isinstance(targets, Mapping):
             raise SchemaError("targets must be a mapping")
-        closed = tuple(sorted((role, tuple(blocks)) for role, blocks in targets.items()))
+        closed_rows: list[tuple[str, str, tuple[Block, ...]]] = []
+        for key, blocks in targets.items():
+            if type(key) is not tuple or len(key) != 2:
+                raise SchemaError("state mapping keys must be (target_id, role) tuples")
+            target_id, role = key
+            closed_rows.append((target_id, role, tuple(blocks)))
+        closed = tuple(sorted(closed_rows))
         return cls(closed)
 
     @property
     def roles(self) -> tuple[str, ...]:
-        return tuple(role for role, _ in self._targets)
+        return tuple(sorted({role for _, role, _ in self._targets}))
 
-    def blocks(self, role: str) -> tuple[Block, ...]:
-        for candidate, blocks in self._targets:
-            if candidate == role:
+    @property
+    def target_keys(self) -> tuple[tuple[str, str], ...]:
+        return tuple((target_id, role) for target_id, role, _ in self._targets)
+
+    def _resolve_target_id(self, role: str, target_id: str | None) -> str:
+        if target_id is not None:
+            _require_id(target_id, "target_id")
+            return target_id
+        candidates = [candidate for candidate, candidate_role, _ in self._targets if candidate_role == role]
+        if len(candidates) != 1:
+            raise RoleError(
+                f"target_id is required for role {role}; found {len(candidates)} document targets"
+            )
+        return candidates[0]
+
+    def blocks(self, role: str, target_id: str | None = None) -> tuple[Block, ...]:
+        resolved = self._resolve_target_id(role, target_id)
+        for candidate, candidate_role, blocks in self._targets:
+            if candidate == resolved and candidate_role == role:
                 return blocks
-        raise RoleError(f"target role is absent from state: {role}")
+        raise RoleError(f"document/role target is absent from state: {resolved}/{role}")
 
-    def target_sha256(self, role: str) -> str:
-        return target_sha256(role, self.blocks(role))
+    def target_sha256(self, role: str, target_id: str | None = None) -> str:
+        resolved = self._resolve_target_id(role, target_id)
+        return target_sha256(resolved, role, self.blocks(role, resolved))
 
-    def with_blocks(self, role: str, blocks: Iterable[Block]) -> "OverlayState":
-        if role not in self.roles:
-            raise RoleError(f"target role is absent from state: {role}")
+    def with_blocks(
+        self, role: str, blocks: Iterable[Block], target_id: str | None = None
+    ) -> "OverlayState":
+        resolved = self._resolve_target_id(role, target_id)
+        if (resolved, role) not in self.target_keys:
+            raise RoleError(f"document/role target is absent from state: {resolved}/{role}")
         replacement = tuple(blocks)
-        target_sha256(role, replacement)
+        target_sha256(resolved, role, replacement)
         return OverlayState.from_mapping(
             {
-                candidate: replacement if candidate == role else existing
-                for candidate, existing in self._targets
+                (candidate, candidate_role): (
+                    replacement
+                    if candidate == resolved and candidate_role == role
+                    else existing
+                )
+                for candidate, candidate_role, existing in self._targets
             }
         )
 
     @property
     def sha256(self) -> str:
         digest = hashlib.sha256()
-        _feed_length_prefixed(digest, b"ANKOS-OVERLAY-STATE-1")
+        _feed_length_prefixed(digest, b"ANKOS-OVERLAY-STATE-2")
         digest.update(len(self._targets).to_bytes(8, "big"))
-        for role, blocks in self._targets:
+        for target_id, role, blocks in self._targets:
+            _feed_length_prefixed(digest, target_id.encode("ascii"))
             _feed_length_prefixed(digest, role.encode("ascii"))
-            _feed_length_prefixed(digest, target_sha256(role, blocks).encode("ascii"))
+            _feed_length_prefixed(
+                digest, target_sha256(target_id, role, blocks).encode("ascii")
+            )
         return digest.hexdigest()
 
 
@@ -292,6 +369,7 @@ class WitnessEvidence:
 class IndependentReview:
     """Independent source review, with optional high-risk specialist review."""
 
+    review_id: str
     creator_principal_id: str
     source_reviewer_principal_id: str
     source_reviewer_type: str
@@ -300,6 +378,7 @@ class IndependentReview:
     source_decision: str
     evidence_view_sha256: str
     blind_preproposal: bool
+    specialist_review_id: str | None = None
     specialist_principal_id: str | None = None
     specialist_type: str | None = None
     specialist_session_id: str | None = None
@@ -312,6 +391,7 @@ class OperationMeta:
     """Closed common metadata and complete target hash guards."""
 
     repair_id: str
+    target_id: str
     target_role: str
     repair_class: str
     expected_target_sha256: str
@@ -325,6 +405,7 @@ class OperationMeta:
 
     def __post_init__(self) -> None:
         _require_id(self.repair_id, "repair_id")
+        _require_id(self.target_id, "target_id")
         if self.target_role not in TARGET_ROLES:
             raise SchemaError(f"unknown target role: {self.target_role!r}")
         if self.repair_class not in CLASS_ALLOWED_ROLES:
@@ -336,12 +417,18 @@ class OperationMeta:
             raise SchemaError(f"unknown workflow state: {self.workflow_state!r}")
         if self.final_disposition not in FINAL_DISPOSITIONS:
             raise SchemaError(f"unknown final disposition: {self.final_disposition!r}")
+        if type(self.dependencies) is not tuple:
+            raise SchemaError("dependencies must be an immutable tuple")
         for dependency in self.dependencies:
             _require_id(dependency, "dependency repair ID")
         if len(self.dependencies) != len(set(self.dependencies)):
             raise SchemaError(f"duplicate dependencies in {self.repair_id}")
         if self.repair_id in self.dependencies:
             raise SchemaError(f"repair depends on itself: {self.repair_id}")
+        if self.witness is not None and not isinstance(self.witness, WitnessEvidence):
+            raise SchemaError("witness must be WitnessEvidence or None")
+        if self.review is not None and not isinstance(self.review, IndependentReview):
+            raise SchemaError("review must be IndependentReview or None")
 
 
 @dataclass(frozen=True, slots=True)
@@ -366,8 +453,7 @@ class Replace:
             raise SchemaError("replace replacement must be nonempty; use Delete")
         if self.preimage == self.replacement:
             raise SchemaError("replace operation is a no-op")
-        if not isinstance(self.expected_count, int) or isinstance(self.expected_count, bool) or self.expected_count < 1:
-            raise SchemaError("replace expected_count must be a positive integer")
+        _require_positive_int(self.expected_count, "replace expected_count")
 
 
 @dataclass(frozen=True, slots=True)
@@ -386,8 +472,7 @@ class Delete:
         object.__setattr__(self, "preimage", _bytes(self.preimage, "delete preimage"))
         if not self.preimage:
             raise SchemaError("delete preimage must be nonempty")
-        if not isinstance(self.expected_count, int) or isinstance(self.expected_count, bool) or self.expected_count < 1:
-            raise SchemaError("delete expected_count must be a positive integer")
+        _require_positive_int(self.expected_count, "delete expected_count")
 
 
 @dataclass(frozen=True, slots=True)
@@ -412,8 +497,10 @@ class AnchoredInsert:
             raise SchemaError("anchored insert requires two nonempty anchors")
         if not self.insertion:
             raise SchemaError("anchored insert payload must be nonempty")
-        if self.expected_adjacency_count != 1:
-            raise SchemaError("anchored insert requires exactly one adjacent anchor pair")
+        _require_exact_one(
+            self.expected_adjacency_count,
+            "anchored insert expected_adjacency_count",
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -447,10 +534,14 @@ class Move:
             raise SchemaError("move requires at least one source neighbor")
         if self.destination_left_id is None and self.destination_right_id is None:
             raise SchemaError("move requires at least one destination neighbor")
-        if self.expected_source_adjacency_count != 1:
-            raise SchemaError("move requires exactly one guarded source adjacency")
-        if self.expected_destination_adjacency_count != 1:
-            raise SchemaError("move requires exactly one guarded destination adjacency")
+        _require_exact_one(
+            self.expected_source_adjacency_count,
+            "move expected_source_adjacency_count",
+        )
+        _require_exact_one(
+            self.expected_destination_adjacency_count,
+            "move expected_destination_adjacency_count",
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -466,7 +557,8 @@ class Split:
     def __post_init__(self) -> None:
         _require_id(self.block_id, "block_id")
         _require_sha256(self.expected_block_sha256, "expected_block_sha256")
-        object.__setattr__(self, "parts", tuple(self.parts))
+        if type(self.parts) is not tuple:
+            raise SchemaError("split parts must be an immutable tuple")
         if len(self.parts) < 2:
             raise SchemaError("split requires at least two parts")
         if any(not isinstance(part, Block) for part in self.parts):
@@ -478,8 +570,7 @@ class Split:
             raise SchemaError("split part IDs must be unique")
         if self.block_id in ids:
             raise SchemaError("split part IDs must not reuse the source block ID")
-        if self.expected_block_count != 1:
-            raise SchemaError("split requires exact source block count 1")
+        _require_exact_one(self.expected_block_count, "split expected_block_count")
 
 
 @dataclass(frozen=True, slots=True)
@@ -493,8 +584,10 @@ class Merge:
     operation = "MERGE"
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "block_ids", tuple(self.block_ids))
-        object.__setattr__(self, "expected_block_sha256s", tuple(self.expected_block_sha256s))
+        if type(self.block_ids) is not tuple:
+            raise SchemaError("merge block_ids must be an immutable tuple")
+        if type(self.expected_block_sha256s) is not tuple:
+            raise SchemaError("merge expected_block_sha256s must be an immutable tuple")
         if len(self.block_ids) < 2:
             raise SchemaError("merge requires at least two source blocks")
         for block_id in self.block_ids:
@@ -509,35 +602,398 @@ class Merge:
             raise SchemaError("merged_block must be a Block")
         if self.merged_block.block_id in self.block_ids:
             raise SchemaError("merged block ID must not reuse a source block ID")
-        if self.expected_adjacency_count != 1:
-            raise SchemaError("merge requires exactly one guarded adjacency")
+        _require_exact_one(self.expected_adjacency_count, "merge expected_adjacency_count")
 
 
 Operation: TypeAlias = Replace | Delete | AnchoredInsert | Move | Split | Merge
 
 
+def _feed_projection_value(digest: "hashlib._Hash", value: object) -> None:
+    """Feed a closed Python value into a deterministic, typed hash stream."""
+
+    if value is None:
+        _feed_length_prefixed(digest, b"NONE")
+        return
+    if type(value) is bool:
+        _feed_length_prefixed(digest, b"BOOL")
+        _feed_length_prefixed(digest, b"1" if value else b"0")
+        return
+    if type(value) is int:
+        _feed_length_prefixed(digest, b"INT")
+        _feed_length_prefixed(digest, str(value).encode("ascii"))
+        return
+    if isinstance(value, str):
+        _feed_length_prefixed(digest, b"STR")
+        _feed_length_prefixed(digest, value.encode("utf-8"))
+        return
+    if isinstance(value, bytes):
+        _feed_length_prefixed(digest, b"BYTES")
+        _feed_length_prefixed(digest, value)
+        return
+    if type(value) is tuple:
+        _feed_length_prefixed(digest, b"TUPLE")
+        digest.update(len(value).to_bytes(8, "big"))
+        for item in value:
+            _feed_projection_value(digest, item)
+        return
+    if is_dataclass(value):
+        _feed_length_prefixed(digest, b"DATACLASS")
+        _feed_length_prefixed(digest, type(value).__name__.encode("ascii"))
+        projected_fields = tuple(item for item in fields(value) if not item.name.startswith("_"))
+        digest.update(len(projected_fields).to_bytes(8, "big"))
+        for item in projected_fields:
+            _feed_length_prefixed(digest, item.name.encode("ascii"))
+            _feed_projection_value(digest, getattr(value, item.name))
+        return
+    raise SchemaError(f"value has no closed projection encoding: {type(value).__name__}")
+
+
+def _projection_sha256(domain: bytes, value: object) -> str:
+    digest = hashlib.sha256()
+    _feed_length_prefixed(digest, domain)
+    _feed_projection_value(digest, value)
+    return digest.hexdigest()
+
+
+def operation_projection_sha256(record: Operation) -> str:
+    """Bind every declared field of one exact typed operation."""
+
+    if not isinstance(record, (Replace, Delete, AnchoredInsert, Move, Split, Merge)):
+        raise SchemaError("operation projection requires a known operation record")
+    return _projection_sha256(b"ANKOS-OVERLAY-OPERATION-2", record)
+
+
+def ordered_operations_sha256(records: Sequence[Operation]) -> str:
+    projections = tuple(operation_projection_sha256(record) for record in records)
+    return _projection_sha256(b"ANKOS-OVERLAY-ORDERED-BATCH-2", projections)
+
+
+@dataclass(frozen=True, slots=True)
+class AuthorityGrant:
+    """One validator-approved exact canonical operation/evidence join."""
+
+    repair_id: str
+    target_id: str
+    target_role: str
+    operation_projection_sha256: str
+    witness_id: str | None
+    witness_region_id: str | None
+    witness_region_sha256: str | None
+    review_id: str | None
+    specialist_review_id: str | None
+
+    def __post_init__(self) -> None:
+        _require_id(self.repair_id, "authority repair_id")
+        _require_id(self.target_id, "authority target_id")
+        if self.target_role != CANONICAL_AUTHOR_TEXT:
+            raise SchemaError("authority grants are only for canonical author text")
+        _require_sha256(
+            self.operation_projection_sha256,
+            "authority operation projection SHA-256",
+        )
+        for value, field_name in (
+            (self.witness_id, "authority witness_id"),
+            (self.witness_region_id, "authority witness_region_id"),
+            (self.review_id, "authority review_id"),
+            (self.specialist_review_id, "authority specialist_review_id"),
+        ):
+            if value is not None:
+                _require_id(value, field_name)
+        if self.witness_region_sha256 is not None:
+            _require_sha256(
+                self.witness_region_sha256,
+                "authority witness region SHA-256",
+            )
+
+
+def _authority_integrity_sha256(
+    *,
+    gate_state: str,
+    baseline_lock_sha256: str,
+    witness_lock_sha256: str,
+    registry_sha256: str,
+    validator_proof_sha256: str,
+    initial_state_sha256: str,
+    ordered_batch_sha256: str,
+    grants: tuple[AuthorityGrant, ...],
+    synthetic_test_only: bool,
+) -> str:
+    payload = (
+        gate_state,
+        baseline_lock_sha256,
+        witness_lock_sha256,
+        registry_sha256,
+        validator_proof_sha256,
+        initial_state_sha256,
+        ordered_batch_sha256,
+        grants,
+        synthetic_test_only,
+    )
+    return _projection_sha256(b"ANKOS-OVERLAY-AUTHORITY-2", payload)
+
+
+@dataclass(frozen=True, slots=True)
+class ApplicationAuthority:
+    """Sealed result of higher-level registry/gate validation.
+
+    The overlay primitive never reads the registry or filesystem.  Production
+    code must call ``_application_authority_from_validated_registry`` only
+    after its independent validator has authenticated the supplied lock,
+    registry, target identities, and grants.  The public default is blocked;
+    the sole public OPEN constructor is explicitly test-only.
+    """
+
+    gate_state: str
+    baseline_lock_sha256: str
+    witness_lock_sha256: str
+    registry_sha256: str
+    validator_proof_sha256: str
+    initial_state_sha256: str
+    ordered_batch_sha256: str
+    grants: tuple[AuthorityGrant, ...]
+    synthetic_test_only: bool
+    integrity_sha256: str
+    _seal: object = field(repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        if self._seal is not _AUTHORITY_SEAL:
+            raise SchemaError("ApplicationAuthority must be sealed by the registry validator")
+        if self.gate_state not in AUTHORITY_GATE_STATES:
+            raise SchemaError(f"unknown application authority gate: {self.gate_state!r}")
+        for value, field_name in (
+            (self.baseline_lock_sha256, "authority baseline lock SHA-256"),
+            (self.witness_lock_sha256, "authority witness lock SHA-256"),
+            (self.registry_sha256, "authority registry SHA-256"),
+            (self.validator_proof_sha256, "authority validator proof SHA-256"),
+            (self.initial_state_sha256, "authority initial-state SHA-256"),
+            (self.ordered_batch_sha256, "authority ordered-batch SHA-256"),
+            (self.integrity_sha256, "authority integrity SHA-256"),
+        ):
+            _require_sha256(value, field_name)
+        if type(self.grants) is not tuple:
+            raise SchemaError("authority grants must be an immutable tuple")
+        if any(not isinstance(grant, AuthorityGrant) for grant in self.grants):
+            raise SchemaError("authority grants contain a non-AuthorityGrant value")
+        repair_ids = [grant.repair_id for grant in self.grants]
+        if len(repair_ids) != len(set(repair_ids)):
+            raise SchemaError("authority contains duplicate repair grants")
+        if type(self.synthetic_test_only) is not bool:
+            raise SchemaError("synthetic_test_only must be a strict boolean")
+        expected = _authority_integrity_sha256(
+            gate_state=self.gate_state,
+            baseline_lock_sha256=self.baseline_lock_sha256,
+            witness_lock_sha256=self.witness_lock_sha256,
+            registry_sha256=self.registry_sha256,
+            validator_proof_sha256=self.validator_proof_sha256,
+            initial_state_sha256=self.initial_state_sha256,
+            ordered_batch_sha256=self.ordered_batch_sha256,
+            grants=self.grants,
+            synthetic_test_only=self.synthetic_test_only,
+        )
+        if self.integrity_sha256 != expected:
+            raise SchemaError("application authority integrity guard failed")
+
+
+def _application_authority_from_validated_registry(
+    *,
+    gate_state: str,
+    baseline_lock_sha256: str,
+    witness_lock_sha256: str,
+    registry_sha256: str,
+    validator_proof_sha256: str,
+    initial_state_sha256: str,
+    ordered_batch_sha256: str,
+    grants: tuple[AuthorityGrant, ...],
+    synthetic_test_only: bool = False,
+) -> ApplicationAuthority:
+    """Validator boundary: seal an already validated authoritative registry.
+
+    This leading-underscore factory is deliberately not a general public
+    authority mint.  Its caller is the higher-level validator responsible for
+    establishing the external trust root; this primitive verifies all joins.
+    """
+
+    if type(grants) is not tuple:
+        raise SchemaError("validated authority grants must be an immutable tuple")
+    integrity = _authority_integrity_sha256(
+        gate_state=gate_state,
+        baseline_lock_sha256=baseline_lock_sha256,
+        witness_lock_sha256=witness_lock_sha256,
+        registry_sha256=registry_sha256,
+        validator_proof_sha256=validator_proof_sha256,
+        initial_state_sha256=initial_state_sha256,
+        ordered_batch_sha256=ordered_batch_sha256,
+        grants=grants,
+        synthetic_test_only=synthetic_test_only,
+    )
+    return ApplicationAuthority(
+        gate_state=gate_state,
+        baseline_lock_sha256=baseline_lock_sha256,
+        witness_lock_sha256=witness_lock_sha256,
+        registry_sha256=registry_sha256,
+        validator_proof_sha256=validator_proof_sha256,
+        initial_state_sha256=initial_state_sha256,
+        ordered_batch_sha256=ordered_batch_sha256,
+        grants=grants,
+        synthetic_test_only=synthetic_test_only,
+        integrity_sha256=integrity,
+        _seal=_AUTHORITY_SEAL,
+    )
+
+
+def _authority_grant_for(record: Operation) -> AuthorityGrant:
+    meta = record.meta
+    witness = meta.witness
+    review = meta.review
+    return AuthorityGrant(
+        repair_id=meta.repair_id,
+        target_id=meta.target_id,
+        target_role=meta.target_role,
+        operation_projection_sha256=operation_projection_sha256(record),
+        witness_id=None if witness is None else witness.witness_id,
+        witness_region_id=None if witness is None else witness.region_id,
+        witness_region_sha256=None if witness is None else witness.region_sha256,
+        review_id=None if review is None else review.review_id,
+        specialist_review_id=None if review is None else review.specialist_review_id,
+    )
+
+
+def test_only_application_authority(
+    initial: OverlayState, records: Iterable[Operation]
+) -> ApplicationAuthority:
+    """Seal a synthetic OPEN authority for unit tests only.
+
+    Production validators must never call this function.  Its conspicuous name
+    and ``synthetic_test_only`` bit make accidental release use observable.
+    """
+
+    if not isinstance(initial, OverlayState):
+        raise SchemaError("test authority initial state must be OverlayState")
+    closed_records = tuple(records)
+    batch_sha256 = ordered_operations_sha256(closed_records)
+    grants = tuple(
+        _authority_grant_for(record)
+        for record in closed_records
+        if record.meta.target_role == CANONICAL_AUTHOR_TEXT
+    )
+    registry_sha256 = _projection_sha256(
+        b"ANKOS-OVERLAY-SYNTHETIC-REGISTRY-2", grants
+    )
+    return _application_authority_from_validated_registry(
+        gate_state="OPEN",
+        baseline_lock_sha256=sha256_bytes(b"TEST-ONLY-BASELINE-LOCK"),
+        witness_lock_sha256=sha256_bytes(b"TEST-ONLY-WITNESS-LOCK"),
+        registry_sha256=registry_sha256,
+        validator_proof_sha256=sha256_bytes(b"TEST-ONLY-VALIDATOR-PROOF"),
+        initial_state_sha256=initial.sha256,
+        ordered_batch_sha256=batch_sha256,
+        grants=grants,
+        synthetic_test_only=True,
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class OperationReceipt:
-    """Exact postimage guard plus the declared reverse operation payload."""
+    """Context-bound exact postimage and declared reverse payload."""
 
+    sequence_index: int
     repair_id: str
     operation: str
     inverse_operation: str
+    target_id: str
     target_role: str
+    operation_projection_sha256: str
+    authority_context_sha256: str
     before_target_sha256: str
     after_target_sha256: str
     before_blocks: tuple[Block, ...]
     after_blocks: tuple[Block, ...]
+    previous_receipt_sha256: str
+    receipt_sha256: str
+
+    def __post_init__(self) -> None:
+        if type(self.sequence_index) is not int or self.sequence_index < 0:
+            raise SchemaError("receipt sequence_index must be a nonnegative integer")
+        _require_id(self.repair_id, "receipt repair_id")
+        _require_id(self.target_id, "receipt target_id")
+        if self.target_role not in TARGET_ROLES:
+            raise SchemaError("receipt has an unknown target role")
+        if type(self.before_blocks) is not tuple or type(self.after_blocks) is not tuple:
+            raise SchemaError("receipt block snapshots must be immutable tuples")
+        for value, field_name in (
+            (self.operation_projection_sha256, "receipt operation projection SHA-256"),
+            (self.authority_context_sha256, "receipt authority context SHA-256"),
+            (self.before_target_sha256, "receipt before-target SHA-256"),
+            (self.after_target_sha256, "receipt after-target SHA-256"),
+            (self.previous_receipt_sha256, "receipt previous-link SHA-256"),
+            (self.receipt_sha256, "receipt SHA-256"),
+        ):
+            _require_sha256(value, field_name)
+
+
+def _receipt_integrity_sha256(receipt: OperationReceipt) -> str:
+    payload = tuple(
+        getattr(receipt, item.name)
+        for item in fields(receipt)
+        if item.name != "receipt_sha256"
+    )
+    return _projection_sha256(b"ANKOS-OVERLAY-RECEIPT-2", payload)
 
 
 @dataclass(frozen=True, slots=True)
 class ReplayResult:
-    """Immutable forward result and receipts required for inverse replay."""
+    """Sealed forward result and integrity-linked receipts for inverse replay."""
 
     state: OverlayState
     receipts: tuple[OperationReceipt, ...]
     initial_state_sha256: str
     final_state_sha256: str
+    authority_context_sha256: str
+    ordered_batch_sha256: str
+    receipt_chain_sha256: str
+    integrity_sha256: str
+    _seal: object = field(repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        if self._seal is not _REPLAY_SEAL:
+            raise SchemaError("ReplayResult must be created by apply_overlays")
+        if not isinstance(self.state, OverlayState):
+            raise SchemaError("replay state must be OverlayState")
+        if type(self.receipts) is not tuple:
+            raise SchemaError("replay receipts must be an immutable tuple")
+        if any(not isinstance(receipt, OperationReceipt) for receipt in self.receipts):
+            raise SchemaError("replay contains a non-OperationReceipt value")
+        for value, field_name in (
+            (self.initial_state_sha256, "replay initial-state SHA-256"),
+            (self.final_state_sha256, "replay final-state SHA-256"),
+            (self.authority_context_sha256, "replay authority-context SHA-256"),
+            (self.ordered_batch_sha256, "replay ordered-batch SHA-256"),
+            (self.receipt_chain_sha256, "replay receipt-chain SHA-256"),
+            (self.integrity_sha256, "replay integrity SHA-256"),
+        ):
+            _require_sha256(value, field_name)
+
+
+def _replay_integrity_sha256(
+    *,
+    state_sha256: str,
+    initial_state_sha256: str,
+    final_state_sha256: str,
+    authority_context_sha256: str,
+    ordered_batch_sha256: str,
+    receipt_chain_sha256: str,
+) -> str:
+    return _projection_sha256(
+        b"ANKOS-OVERLAY-REPLAY-2",
+        (
+            state_sha256,
+            initial_state_sha256,
+            final_state_sha256,
+            authority_context_sha256,
+            ordered_batch_sha256,
+            receipt_chain_sha256,
+        ),
+    )
 
 
 def _block_index(blocks: Sequence[Block], block_id: str) -> int:
@@ -727,7 +1183,7 @@ def _validate_application_workflow(record: Operation) -> None:
     if meta.workflow_state != "CLOSED":
         raise EvidenceError(f"{meta.repair_id}: applied overlay is not CLOSED; it must be CLOSED")
     if meta.target_role == CANONICAL_AUTHOR_TEXT:
-        allowed = {"APPLIED_MECHANICALLY_PROVEN", "APPLIED_WITNESS_VERIFIED"}
+        allowed = {"APPLIED_WITNESS_VERIFIED"}
     elif meta.target_role == GENERATED_METADATA:
         allowed = {"APPLIED_MECHANICALLY_PROVEN"}
     elif meta.target_role == EDITORIAL_SIDECAR:
@@ -761,6 +1217,7 @@ def _validate_review(
     meta: OperationMeta, review: IndependentReview, *, high_risk: bool
 ) -> None:
     repair_id = meta.repair_id
+    _require_id(review.review_id, "source review_id")
     if review.creator_principal_id != meta.creator_principal_id:
         raise EvidenceError(f"{repair_id}: review creator does not match repair creator")
     _require_nonempty_text(review.source_reviewer_principal_id, "source reviewer principal ID")
@@ -783,6 +1240,9 @@ def _validate_review(
     if high_risk:
         if review.blind_preproposal is not True:
             raise EvidenceError(f"{repair_id}: high-risk repair lacks blind preproposal review")
+        if review.specialist_review_id is None:
+            raise EvidenceError(f"{repair_id}: high-risk repair lacks specialist review ID")
+        _require_id(review.specialist_review_id, "specialist review_id")
         if not review.specialist_principal_id:
             raise EvidenceError(f"{repair_id}: high-risk repair lacks specialist review")
         if review.specialist_principal_id == meta.creator_principal_id:
@@ -796,23 +1256,33 @@ def _validate_review(
             raise EvidenceError(f"{repair_id}: specialist evidence-view hash mismatch")
 
 
-def _canonical_change_requires_evidence(
-    record: Operation, before: Sequence[Block], after: Sequence[Block]
-) -> bool:
-    if record.meta.target_role != CANONICAL_AUTHOR_TEXT:
-        return False
-    before_projection = b"".join(block.data for block in before)
-    after_projection = b"".join(block.data for block in after)
-    # A move is source-significant even in a degenerate equal-byte case.
-    return isinstance(record, Move) or before_projection != after_projection
+def _markdown_structure_signature(blocks: Sequence[Block]) -> tuple[tuple[str, int], ...]:
+    """Return byte-level Markdown marker locations without trusting repair class."""
+
+    markers: list[tuple[str, int]] = []
+    line_number = 0
+    for block in blocks:
+        for line in block.data.splitlines():
+            line_number += 1
+            stripped = line.lstrip()
+            if re.match(rb"#{1,6}(?:[ \t]|$)", stripped):
+                markers.append(("ATX_HEADING", line_number))
+            if stripped.startswith((b"```", b"~~~")):
+                markers.append(("FENCE", line_number))
+            if re.match(rb"(?:[-+*]|[0-9]+[.)])[ \t]+", stripped):
+                markers.append(("LIST", line_number))
+            if stripped.startswith(b">"):
+                markers.append(("QUOTE", line_number))
+            if b"|" in line:
+                markers.append(("TABLE_CANDIDATE", line_number))
+    return tuple(markers)
 
 
 def _validate_evidence(
     record: Operation, before: Sequence[Block], after: Sequence[Block]
 ) -> None:
     meta = record.meta
-    requires_evidence = _canonical_change_requires_evidence(record, before, after)
-    if requires_evidence:
+    if meta.target_role == CANONICAL_AUTHOR_TEXT:
         if isinstance(record, (Replace, Delete)) and record.expected_count != 1:
             raise EvidenceError(f"{meta.repair_id}: canonical author-text repairs are per occurrence")
         if meta.workflow_state != "CLOSED":
@@ -826,26 +1296,87 @@ def _validate_evidence(
         if meta.review is None:
             raise EvidenceError(f"{meta.repair_id}: author-text repair lacks independent review")
         _validate_witness(meta.witness, meta.repair_id)
-        high_risk = (
-            meta.repair_class in HIGH_RISK_CLASSES
-            or isinstance(record, (AnchoredInsert, Move))
+        # Classification is caller-controlled, so it cannot lower risk.  A
+        # Markdown marker change such as ``Title`` -> ``# Title`` is detected
+        # independently, and every canonical semantic overlay is conservatively
+        # specialist-reviewed even when its declared class is merely PROSE_OCR.
+        structure_changed = (
+            _markdown_structure_signature(before)
+            != _markdown_structure_signature(after)
         )
+        high_risk = structure_changed or meta.target_role == CANONICAL_AUTHOR_TEXT
         _validate_review(meta, meta.review, high_risk=high_risk)
         return
 
-    if meta.target_role == CANONICAL_AUTHOR_TEXT:
-        if not isinstance(record, (Split, Merge)):
-            raise EvidenceError(
-                f"{meta.repair_id}: only byte-conserving split/merge may be mechanical in canonical text"
-            )
-        if meta.repair_class not in {STRUCTURE_BOUNDARY, MARKDOWN_STRUCTURE}:
-            raise EvidenceError(
-                f"{meta.repair_id}: mechanical canonical split/merge needs a structure class"
-            )
-        if meta.workflow_state != "CLOSED" or meta.final_disposition != "APPLIED_MECHANICALLY_PROVEN":
-            raise EvidenceError(
-                f"{meta.repair_id}: mechanical canonical split/merge must be CLOSED and proven"
-            )
+
+def _validate_application_authority(
+    initial: OverlayState,
+    records: tuple[Operation, ...],
+    authority: ApplicationAuthority | None,
+) -> str:
+    """Verify the sealed gate and every exact canonical registry join."""
+
+    canonical = tuple(
+        record for record in records if record.meta.target_role == CANONICAL_AUTHOR_TEXT
+    )
+    if not canonical:
+        return _projection_sha256(b"ANKOS-OVERLAY-NO-CANONICAL-AUTHORITY-2", ())
+    if authority is None:
+        raise EvidenceError("canonical application gate is SOURCE_BLOCKED; authority is required")
+    if not isinstance(authority, ApplicationAuthority) or authority._seal is not _AUTHORITY_SEAL:
+        raise EvidenceError("canonical application authority is not validator-sealed")
+    expected_integrity = _authority_integrity_sha256(
+        gate_state=authority.gate_state,
+        baseline_lock_sha256=authority.baseline_lock_sha256,
+        witness_lock_sha256=authority.witness_lock_sha256,
+        registry_sha256=authority.registry_sha256,
+        validator_proof_sha256=authority.validator_proof_sha256,
+        initial_state_sha256=authority.initial_state_sha256,
+        ordered_batch_sha256=authority.ordered_batch_sha256,
+        grants=authority.grants,
+        synthetic_test_only=authority.synthetic_test_only,
+    )
+    if authority.integrity_sha256 != expected_integrity:
+        raise EvidenceError("canonical application authority integrity guard failed")
+    if authority.gate_state != "OPEN":
+        raise EvidenceError(f"canonical application gate is {authority.gate_state}")
+    if authority.initial_state_sha256 != initial.sha256:
+        raise EvidenceError("canonical authority initial-state binding mismatch")
+    actual_batch = ordered_operations_sha256(records)
+    if authority.ordered_batch_sha256 != actual_batch:
+        raise EvidenceError("canonical authority ordered-operation binding mismatch")
+
+    by_repair = {grant.repair_id: grant for grant in authority.grants}
+    if set(by_repair) != {record.meta.repair_id for record in canonical}:
+        raise EvidenceError("canonical authority grant set does not match the batch")
+    for record in canonical:
+        meta = record.meta
+        grant = by_repair[meta.repair_id]
+        witness = meta.witness
+        review = meta.review
+        expected_join = (
+            meta.target_id,
+            meta.target_role,
+            operation_projection_sha256(record),
+            None if witness is None else witness.witness_id,
+            None if witness is None else witness.region_id,
+            None if witness is None else witness.region_sha256,
+            None if review is None else review.review_id,
+            None if review is None else review.specialist_review_id,
+        )
+        actual_join = (
+            grant.target_id,
+            grant.target_role,
+            grant.operation_projection_sha256,
+            grant.witness_id,
+            grant.witness_region_id,
+            grant.witness_region_sha256,
+            grant.review_id,
+            grant.specialist_review_id,
+        )
+        if actual_join != expected_join:
+            raise EvidenceError(f"{meta.repair_id}: authoritative registry join mismatch")
+    return authority.integrity_sha256
 
 
 INVERSE_NAMES = {
@@ -858,7 +1389,12 @@ INVERSE_NAMES = {
 }
 
 
-def apply_overlays(initial: OverlayState, records: Iterable[Operation]) -> ReplayResult:
+def apply_overlays(
+    initial: OverlayState,
+    records: Iterable[Operation],
+    *,
+    authority: ApplicationAuthority | None = None,
+) -> ReplayResult:
     """Apply ordered overlays atomically to immutable state.
 
     Dependencies must name records in this exact batch and must already have
@@ -871,11 +1407,16 @@ def apply_overlays(initial: OverlayState, records: Iterable[Operation]) -> Repla
     closed_records = tuple(records)
     if any(not isinstance(record, (Replace, Delete, AnchoredInsert, Move, Split, Merge)) for record in closed_records):
         raise SchemaError("overlay batch contains an unknown operation record")
+    batch_sha256 = ordered_operations_sha256(closed_records)
+    authority_context_sha256 = _validate_application_authority(
+        initial, closed_records, authority
+    )
     repair_ids = [record.meta.repair_id for record in closed_records]
     if len(repair_ids) != len(set(repair_ids)):
         raise DependencyError("overlay batch contains duplicate repair IDs")
     batch_ids = set(repair_ids)
-    for record in closed_records:
+    previous_receipt_sha256 = sha256_bytes(b"ANKOS-OVERLAY-RECEIPT-CHAIN-START-2")
+    for sequence_index, record in enumerate(closed_records):
         missing = set(record.meta.dependencies).difference(batch_ids)
         if missing:
             raise DependencyError(
@@ -894,37 +1435,61 @@ def apply_overlays(initial: OverlayState, records: Iterable[Operation]) -> Repla
             )
         _validate_role(record)
         _validate_application_workflow(record)
-        before = state.blocks(meta.target_role)
-        actual_before_sha256 = target_sha256(meta.target_role, before)
+        before = state.blocks(meta.target_role, meta.target_id)
+        actual_before_sha256 = target_sha256(meta.target_id, meta.target_role, before)
         if actual_before_sha256 != meta.expected_target_sha256:
             raise GuardError(f"{meta.repair_id}: complete target pre-state hash guard failed")
 
         after = _apply_operation(record, before)
-        actual_after_sha256 = target_sha256(meta.target_role, after)
+        actual_after_sha256 = target_sha256(meta.target_id, meta.target_role, after)
         if actual_after_sha256 != meta.expected_result_sha256:
             raise GuardError(f"{meta.repair_id}: complete target post-state hash guard failed")
         _validate_evidence(record, before, after)
 
-        state = state.with_blocks(meta.target_role, after)
-        receipts.append(
-            OperationReceipt(
-                repair_id=meta.repair_id,
-                operation=record.operation,
-                inverse_operation=INVERSE_NAMES[record.operation],
-                target_role=meta.target_role,
-                before_target_sha256=actual_before_sha256,
-                after_target_sha256=actual_after_sha256,
-                before_blocks=before,
-                after_blocks=after,
-            )
+        state = state.with_blocks(meta.target_role, after, meta.target_id)
+        unsigned_receipt = OperationReceipt(
+            sequence_index=sequence_index,
+            repair_id=meta.repair_id,
+            operation=record.operation,
+            inverse_operation=INVERSE_NAMES[record.operation],
+            target_id=meta.target_id,
+            target_role=meta.target_role,
+            operation_projection_sha256=operation_projection_sha256(record),
+            authority_context_sha256=authority_context_sha256,
+            before_target_sha256=actual_before_sha256,
+            after_target_sha256=actual_after_sha256,
+            before_blocks=before,
+            after_blocks=after,
+            previous_receipt_sha256=previous_receipt_sha256,
+            receipt_sha256="0" * 64,
         )
+        receipt = replace(
+            unsigned_receipt,
+            receipt_sha256=_receipt_integrity_sha256(unsigned_receipt),
+        )
+        receipts.append(receipt)
+        previous_receipt_sha256 = receipt.receipt_sha256
         applied.add(meta.repair_id)
 
+    final_sha256 = state.sha256
+    replay_integrity = _replay_integrity_sha256(
+        state_sha256=final_sha256,
+        initial_state_sha256=initial.sha256,
+        final_state_sha256=final_sha256,
+        authority_context_sha256=authority_context_sha256,
+        ordered_batch_sha256=batch_sha256,
+        receipt_chain_sha256=previous_receipt_sha256,
+    )
     return ReplayResult(
         state=state,
         receipts=tuple(receipts),
         initial_state_sha256=initial.sha256,
-        final_state_sha256=state.sha256,
+        final_state_sha256=final_sha256,
+        authority_context_sha256=authority_context_sha256,
+        ordered_batch_sha256=batch_sha256,
+        receipt_chain_sha256=previous_receipt_sha256,
+        integrity_sha256=replay_integrity,
+        _seal=_REPLAY_SEAL,
     )
 
 
@@ -933,6 +1498,31 @@ def inverse_replay(result: ReplayResult, state: OverlayState | None = None) -> O
 
     if not isinstance(result, ReplayResult):
         raise SchemaError("inverse replay requires a ReplayResult")
+    if result._seal is not _REPLAY_SEAL:
+        raise InverseError("inverse replay result is not application-sealed")
+    expected_replay_integrity = _replay_integrity_sha256(
+        state_sha256=result.state.sha256,
+        initial_state_sha256=result.initial_state_sha256,
+        final_state_sha256=result.final_state_sha256,
+        authority_context_sha256=result.authority_context_sha256,
+        ordered_batch_sha256=result.ordered_batch_sha256,
+        receipt_chain_sha256=result.receipt_chain_sha256,
+    )
+    if result.integrity_sha256 != expected_replay_integrity:
+        raise InverseError("inverse replay authenticity/integrity digest failed")
+    previous_receipt_sha256 = sha256_bytes(b"ANKOS-OVERLAY-RECEIPT-CHAIN-START-2")
+    for expected_index, receipt in enumerate(result.receipts):
+        if receipt.sequence_index != expected_index:
+            raise InverseError("inverse replay receipt sequence is not contiguous")
+        if receipt.authority_context_sha256 != result.authority_context_sha256:
+            raise InverseError(f"{receipt.repair_id}: receipt authority context mismatch")
+        if receipt.previous_receipt_sha256 != previous_receipt_sha256:
+            raise InverseError(f"{receipt.repair_id}: receipt chain link mismatch")
+        if receipt.receipt_sha256 != _receipt_integrity_sha256(receipt):
+            raise InverseError(f"{receipt.repair_id}: receipt integrity digest failed")
+        previous_receipt_sha256 = receipt.receipt_sha256
+    if previous_receipt_sha256 != result.receipt_chain_sha256:
+        raise InverseError("inverse replay receipt-chain terminal digest failed")
     current = result.state if state is None else state
     if not isinstance(current, OverlayState):
         raise SchemaError("inverse state must be an OverlayState")
@@ -940,14 +1530,18 @@ def inverse_replay(result: ReplayResult, state: OverlayState | None = None) -> O
         raise InverseError("inverse replay final-state hash guard failed")
 
     for receipt in reversed(result.receipts):
-        actual = current.blocks(receipt.target_role)
+        actual = current.blocks(receipt.target_role, receipt.target_id)
         if actual != receipt.after_blocks:
             raise InverseError(f"{receipt.repair_id}: inverse exact postimage guard failed")
-        if target_sha256(receipt.target_role, actual) != receipt.after_target_sha256:
+        if target_sha256(receipt.target_id, receipt.target_role, actual) != receipt.after_target_sha256:
             raise InverseError(f"{receipt.repair_id}: inverse postimage hash guard failed")
-        if target_sha256(receipt.target_role, receipt.before_blocks) != receipt.before_target_sha256:
+        if target_sha256(
+            receipt.target_id, receipt.target_role, receipt.before_blocks
+        ) != receipt.before_target_sha256:
             raise InverseError(f"{receipt.repair_id}: stored inverse preimage hash guard failed")
-        current = current.with_blocks(receipt.target_role, receipt.before_blocks)
+        current = current.with_blocks(
+            receipt.target_role, receipt.before_blocks, receipt.target_id
+        )
 
     if current.sha256 != result.initial_state_sha256:
         raise InverseError("inverse replay did not recover the exact initial state")

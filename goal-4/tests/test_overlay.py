@@ -13,7 +13,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "goal-4" / "tools"))
 
 from overlay_lib import (  # noqa: E402
+    ApplicationAuthority,
     AnchoredInsert,
+    AuthorityGrant,
     Block,
     CANONICAL_AUTHOR_TEXT,
     DERIVED_AGGREGATE,
@@ -33,6 +35,7 @@ from overlay_lib import (  # noqa: E402
     OperationMeta,
     OverlayState,
     PROSE_OCR,
+    ReplayResult,
     Replace,
     RoleError,
     SEARCH_DERIVATIVE,
@@ -46,6 +49,7 @@ from overlay_lib import (  # noqa: E402
     inverse_replay,
     sha256_bytes,
     target_sha256,
+    test_only_application_authority,
 )
 
 
@@ -54,15 +58,17 @@ SOURCE_REVIEWER = "principal-source-reviewer"
 SPECIALIST = "principal-specialist"
 VIEW_SHA256 = sha256_bytes(b"sealed evidence view")
 REGION_SHA256 = sha256_bytes(b"edition-identical page region")
+TEST_TARGET = "CHAPTER-01"
 
 
 def state_for(
     blocks: tuple[Block, ...],
     role: str = CANONICAL_AUTHOR_TEXT,
+    target_id: str = TEST_TARGET,
     **extra_targets: tuple[Block, ...],
 ) -> OverlayState:
-    targets: dict[str, tuple[Block, ...]] = {role: blocks}
-    targets.update(extra_targets)
+    targets: dict[tuple[str, str], tuple[Block, ...]] = {(target_id, role): blocks}
+    targets.update({(target_id, extra_role): value for extra_role, value in extra_targets.items()})
     return OverlayState.from_mapping(targets)
 
 
@@ -83,6 +89,7 @@ def witness(**changes: object) -> WitnessEvidence:
 
 def review(*, high_risk: bool = False, **changes: object) -> IndependentReview:
     values: dict[str, object] = {
+        "review_id": "REVIEW-SOURCE-0001",
         "creator_principal_id": CREATOR,
         "source_reviewer_principal_id": SOURCE_REVIEWER,
         "source_reviewer_type": "AGENT",
@@ -91,6 +98,7 @@ def review(*, high_risk: bool = False, **changes: object) -> IndependentReview:
         "source_decision": "APPROVED",
         "evidence_view_sha256": VIEW_SHA256,
         "blind_preproposal": high_risk,
+        "specialist_review_id": "REVIEW-SPECIALIST-0001" if high_risk else None,
         "specialist_principal_id": SPECIALIST if high_risk else None,
         "specialist_type": "AGENT" if high_risk else None,
         "specialist_session_id": "specialist-session-1" if high_risk else None,
@@ -107,10 +115,11 @@ def meta_for(
     *,
     repair_id: str,
     role: str = CANONICAL_AUTHOR_TEXT,
+    target_id: str = TEST_TARGET,
     repair_class: str = PROSE_OCR,
     dependencies: tuple[str, ...] = (),
     author_evidence: bool = True,
-    high_risk_review: bool = False,
+    high_risk_review: bool = True,
     witness_value: WitnessEvidence | None = None,
     review_value: IndependentReview | None = None,
 ) -> OperationMeta:
@@ -122,16 +131,33 @@ def meta_for(
         disposition = "APPLIED_MECHANICALLY_PROVEN"
     return OperationMeta(
         repair_id=repair_id,
+        target_id=target_id,
         target_role=role,
         repair_class=repair_class,
-        expected_target_sha256=before.target_sha256(role),
-        expected_result_sha256=target_sha256(role, after),
+        expected_target_sha256=before.target_sha256(role, target_id),
+        expected_result_sha256=target_sha256(target_id, role, after),
         creator_principal_id=CREATOR,
         workflow_state="CLOSED",
         final_disposition=disposition,
         dependencies=dependencies,
         witness=witness_value,
         review=review_value,
+    )
+
+
+_raw_apply_overlays = apply_overlays
+
+
+def apply_overlays(
+    initial: OverlayState, records: object
+) -> ReplayResult:
+    """Unit-test convenience: use the conspicuous synthetic authority factory."""
+
+    closed = tuple(records)  # type: ignore[arg-type]
+    return _raw_apply_overlays(
+        initial,
+        closed,
+        authority=test_only_application_authority(initial, closed),
     )
 
 
