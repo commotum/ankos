@@ -78,6 +78,7 @@ def _artifact_rows() -> tuple[tuple[str, str], ...]:
         "goal-4/schemas/common.schema.json": "SCHEMA",
         "goal-4/schemas/compatibility-verification.schema.json": "SCHEMA",
         "goal-4/schemas/corpus-manifest.schema.json": "SCHEMA",
+        "goal-4/schemas/execution-receipt.schema.json": "SCHEMA",
         "goal-4/schemas/figure-record.schema.json": "SCHEMA",
         "goal-4/schemas/navigation-record.schema.json": "SCHEMA",
         "goal-4/schemas/provenance-record.schema.json": "SCHEMA",
@@ -93,6 +94,7 @@ def _artifact_rows() -> tuple[tuple[str, str], ...]:
         "goal-4/tools/capture_baseline.py": "UPSTREAM_TOOL",
         "goal-4/tools/capture_compatibility.py": "UPSTREAM_TOOL",
         "goal-4/tools/capture_witness.py": "UPSTREAM_TOOL",
+        "goal-4/tools/execution_receipt_runner.py": "TOOL",
         "goal-4/tools/guardrail_lib.py": "UPSTREAM_TOOL",
         "goal-4/tools/overlay_lib.py": "TOOL",
         "goal-4/tools/overlay_registry.py": "TOOL",
@@ -139,7 +141,7 @@ EXPECTED_VALIDATORS = (
         "Stage 4 pipeline schema validation: PASS ",
     ),
 )
-EXPECTED_TESTS = (
+REQUIRED_STAGE4_TESTS = (
     "goal-4/tests/test_overlay.py",
     "goal-4/tests/test_overlay_registry.py",
     "goal-4/tests/test_pipeline_schemas.py",
@@ -383,6 +385,11 @@ def expected_artifact_category(path: str) -> str | None:
         return "TEST"
     if parent == "goal-4/tools":
         return "TOOL"
+    name = PurePosixPath(path).name
+    if parent == "goal-4" and (name.endswith("-contract.json") or name.endswith("-contract.md")):
+        return "CONTRACT"
+    if parent == "goal-4" and name.endswith("-lock.json") and path != LOCK_RELATIVE.as_posix():
+        return "IMPLEMENTATION_LOCK"
     return None
 
 
@@ -390,6 +397,25 @@ def discover_accepted_artifact_paths(repo: Path) -> tuple[str, ...]:
     """Derive the exact closed artifact surface without recursive discovery."""
 
     discovered = set(REQUIRED_ARTIFACT_PATHS)
+    goal = repo / "goal-4"
+    _plain_directory(goal, "Goal 4 root")
+    with os.scandir(goal) as entries:
+        for entry in entries:
+            path = f"goal-4/{entry.name}"
+            if path == LOCK_RELATIVE.as_posix():
+                continue
+            candidate = (
+                entry.name.endswith("-contract.json")
+                or entry.name.endswith("-contract.md")
+                or entry.name.endswith("-lock.json")
+            )
+            if not candidate:
+                continue
+            _require(
+                entry.is_file(follow_symlinks=False) and not entry.is_symlink(),
+                f"Goal 4 root contains a non-regular contract/lock: {path}",
+            )
+            discovered.add(path)
     for relative, suffix in CLOSED_DIRECTORY_SUFFIXES.items():
         directory = _join(repo, safe_relative(relative, "closed package directory"))
         _plain_directory(directory, f"closed package directory {relative}")
@@ -491,7 +517,16 @@ def _validate_lock_metadata(lock: Mapping[str, Any]) -> None:
     )
     _require(tuple(matrix["modes"]) == EXPECTED_MATRIX_MODES, "outer-lock matrix modes drift")
     _require(tuple(matrix["cwd_profiles"]) == EXPECTED_MATRIX_CWDS, "outer-lock matrix CWD profiles drift")
-    _require(tuple(matrix["test_paths"]) == EXPECTED_TESTS, "outer-lock matrix tests drift")
+    accepted_tests = tuple(
+        row["path"]
+        for row in lock["artifacts"]
+        if row["category"] in {"TEST", "UPSTREAM_TEST"}
+    )
+    _require(tuple(matrix["test_paths"]) == accepted_tests, "outer-lock matrix tests drift")
+    _require(
+        set(REQUIRED_STAGE4_TESTS).issubset(accepted_tests),
+        "outer-lock matrix omits a required Stage 4 test",
+    )
     _require(
         tuple(matrix["relocation_evidence_tests"])
         == (
@@ -1229,7 +1264,7 @@ def run_full(repo: Path, expected_lock_sha256: str) -> Mapping[str, Any]:
                 for path, prefix in EXPECTED_VALIDATORS:
                     _run_validator(repo, artifacts, path, prefix, optimized=optimized, cwd=cwd)
                     matrix_runs += 1
-                for path in EXPECTED_TESTS:
+                for path in lock["matrix"]["test_paths"]:
                     _run_test(repo, artifacts, path, optimized=optimized, cwd=cwd)
                     matrix_runs += 1
         zero = _run_zero_builds(repo, artifacts, lock["stable_zero_repair_proof"], work)

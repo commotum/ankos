@@ -1,1 +1,116 @@
-{"contract_id":"ANKOS-PIPELINE-1","current_gates":{"audit_certification_allowed":false,"author_text_token_changes_allowed":false,"offline_zero_repair_build_allowed":true,"witness_asset_insertions_allowed":false,"witness_only_text_insertions_allowed":false,"witness_status":"SOURCE_BLOCKED"},"final_dispositions":["APPLIED_MECHANICALLY_PROVEN","APPLIED_WITNESS_VERIFIED","ANNOTATED_SOURCE_ERRATUM","REJECTED_VALID_SOURCE_TEXT","DUPLICATE_CANDIDATE","UNRESOLVED_SOURCE_NEEDED"],"json_schema_draft":"https://json-schema.org/draft/2020-12/schema","ledgers":[{"empty_allowed":true,"path":"goal-4/repair-ledger.jsonl","schema":"goal-4/schemas/repair-record.schema.json"},{"empty_allowed":false,"path":"goal-4/provenance-map.jsonl","schema":"goal-4/schemas/provenance-record.schema.json"},{"empty_allowed":true,"path":"goal-4/unresolved-ledger.jsonl","schema":"goal-4/schemas/unresolved-record.schema.json"},{"empty_allowed":true,"path":"goal-4/formula-code-ledger.jsonl","schema":"goal-4/schemas/technical-record.schema.json"},{"empty_allowed":true,"path":"goal-4/figure-caption-asset-ledger.jsonl","schema":"goal-4/schemas/figure-record.schema.json"},{"empty_allowed":true,"path":"goal-4/navigation-ledger.jsonl","schema":"goal-4/schemas/navigation-record.schema.json"},{"empty_allowed":true,"path":"goal-4/review-ledger.jsonl","schema":"goal-4/schemas/review-record.schema.json"}],"operation_types":["REPLACE","DELETE","MOVE","SPLIT","MERGE","ANCHORED_INSERT"],"release_roles":["CANONICAL_AUTHOR_TEXT","DERIVED_AGGREGATE","GENERATED_METADATA","EDITORIAL_SIDECAR","SEARCH_DERIVATIVE","GOVERNED_LEGACY_ASSET","GOVERNED_WITNESS_ASSET","RELEASE_METADATA"],"schema_files":["goal-4/schemas/common.schema.json","goal-4/schemas/workflow.schema.json","goal-4/schemas/ast-node.schema.json","goal-4/schemas/repair-record.schema.json","goal-4/schemas/provenance-record.schema.json","goal-4/schemas/unresolved-record.schema.json","goal-4/schemas/technical-record.schema.json","goal-4/schemas/figure-record.schema.json","goal-4/schemas/navigation-record.schema.json","goal-4/schemas/review-record.schema.json","goal-4/schemas/compatibility-verification.schema.json","goal-4/schemas/corpus-manifest.schema.json","goal-4/schemas/release-manifest.schema.json"],"schema_version":"1.0.0","serialization_profile":"ANKOS-CJ-1","status":"FROZEN_STAGE_4_SCHEMA_SOURCE_BLOCKED","upstream_bindings":{"baseline_lock_sha256":"57224a1f1ba8333bbc900b23ff6127a189649feb01c279f30fac05a305658863","compatibility_baseline_sha256":"51f0635f2c278854d11c5ee4391419e736929b1953570af6071348765a6f3a78","guardrails_sha256":"ba5357b6172c5740ed799bf53d65aa401c53750b0f5dc6ccc901d4149e5225cb","licensing_contract_sha256":"e946c7e3daf398597b42abef855432f4c304a1f3514d85e0aa0a1dde68ee03b1","review_contract_sha256":"e59970994624ae103832ce5f289a0729598be89a69401b704f6d4f684d3d546c","style_guide_sha256":"6c83429f93fa7ae4884abdcaa8cff603d7764cb867f52ee758c1b0da9d1b4f1a","witness_lock_sha256":"f348e4dd0ebf328c48066696eb70359d954e07cbdfd7b7fd827286e3268ba449"},"workflow_states":["CAPTURED","EVIDENCE_READY","PENDING_SPECIALIST_REVIEW","PENDING_INDEPENDENT_REVIEW","SOURCE_BLOCKED","CLOSED"]}
+{
+  "contract_id": "ANKOS-PIPELINE-1",
+  "current_gates": {
+    "audit_certification_allowed": false,
+    "author_text_token_changes_allowed": false,
+    "offline_zero_repair_build_allowed": true,
+    "witness_asset_insertions_allowed": false,
+    "witness_only_text_insertions_allowed": false,
+    "witness_status": "SOURCE_BLOCKED"
+  },
+  "final_dispositions": [
+    "APPLIED_MECHANICALLY_PROVEN",
+    "APPLIED_WITNESS_VERIFIED",
+    "ANNOTATED_SOURCE_ERRATUM",
+    "REJECTED_VALID_SOURCE_TEXT",
+    "DUPLICATE_CANDIDATE",
+    "UNRESOLVED_SOURCE_NEEDED"
+  ],
+  "json_schema_draft": "https://json-schema.org/draft/2020-12/schema",
+  "ledgers": [
+    {
+      "empty_allowed": false,
+      "path": "goal-4/ast-node-ledger.jsonl",
+      "schema": "goal-4/schemas/ast-node.schema.json"
+    },
+    {
+      "empty_allowed": true,
+      "path": "goal-4/repair-ledger.jsonl",
+      "schema": "goal-4/schemas/repair-record.schema.json"
+    },
+    {
+      "empty_allowed": false,
+      "path": "goal-4/provenance-map.jsonl",
+      "schema": "goal-4/schemas/provenance-record.schema.json"
+    },
+    {
+      "empty_allowed": true,
+      "path": "goal-4/unresolved-ledger.jsonl",
+      "schema": "goal-4/schemas/unresolved-record.schema.json"
+    },
+    {
+      "empty_allowed": true,
+      "path": "goal-4/formula-code-ledger.jsonl",
+      "schema": "goal-4/schemas/technical-record.schema.json"
+    },
+    {
+      "empty_allowed": true,
+      "path": "goal-4/figure-caption-asset-ledger.jsonl",
+      "schema": "goal-4/schemas/figure-record.schema.json"
+    },
+    {
+      "empty_allowed": true,
+      "path": "goal-4/navigation-ledger.jsonl",
+      "schema": "goal-4/schemas/navigation-record.schema.json"
+    },
+    {
+      "empty_allowed": true,
+      "path": "goal-4/review-ledger.jsonl",
+      "schema": "goal-4/schemas/review-record.schema.json"
+    }
+  ],
+  "operation_types": [
+    "REPLACE",
+    "DELETE",
+    "MOVE",
+    "SPLIT",
+    "MERGE",
+    "ANCHORED_INSERT"
+  ],
+  "release_roles": [
+    "CANONICAL_AUTHOR_TEXT",
+    "DERIVED_AGGREGATE",
+    "GENERATED_METADATA",
+    "EDITORIAL_SIDECAR",
+    "SEARCH_DERIVATIVE",
+    "GOVERNED_LEGACY_ASSET",
+    "GOVERNED_WITNESS_ASSET",
+    "RELEASE_METADATA"
+  ],
+  "schema_files": [
+    "goal-4/schemas/common.schema.json",
+    "goal-4/schemas/workflow.schema.json",
+    "goal-4/schemas/ast-node.schema.json",
+    "goal-4/schemas/repair-record.schema.json",
+    "goal-4/schemas/provenance-record.schema.json",
+    "goal-4/schemas/unresolved-record.schema.json",
+    "goal-4/schemas/technical-record.schema.json",
+    "goal-4/schemas/figure-record.schema.json",
+    "goal-4/schemas/navigation-record.schema.json",
+    "goal-4/schemas/review-record.schema.json",
+    "goal-4/schemas/compatibility-verification.schema.json",
+    "goal-4/schemas/corpus-manifest.schema.json",
+    "goal-4/schemas/release-manifest.schema.json"
+    ,"goal-4/schemas/execution-receipt.schema.json"
+  ],
+  "schema_version": "1.0.0",
+  "serialization_profile": "ANKOS-CJ-1",
+  "status": "FROZEN_STAGE_4_SCHEMA_SOURCE_BLOCKED",
+  "upstream_bindings": {
+    "baseline_lock_sha256": "57224a1f1ba8333bbc900b23ff6127a189649feb01c279f30fac05a305658863",
+    "compatibility_baseline_sha256": "51f0635f2c278854d11c5ee4391419e736929b1953570af6071348765a6f3a78",
+    "guardrails_sha256": "ba5357b6172c5740ed799bf53d65aa401c53750b0f5dc6ccc901d4149e5225cb",
+    "licensing_contract_sha256": "e946c7e3daf398597b42abef855432f4c304a1f3514d85e0aa0a1dde68ee03b1",
+    "review_contract_sha256": "e59970994624ae103832ce5f289a0729598be89a69401b704f6d4f684d3d546c",
+    "style_guide_sha256": "6c83429f93fa7ae4884abdcaa8cff603d7764cb867f52ee758c1b0da9d1b4f1a",
+    "witness_lock_sha256": "f348e4dd0ebf328c48066696eb70359d954e07cbdfd7b7fd827286e3268ba449"
+  },
+  "workflow_states": [
+    "CAPTURED",
+    "EVIDENCE_READY",
+    "PENDING_SPECIALIST_REVIEW",
+    "PENDING_INDEPENDENT_REVIEW",
+    "SOURCE_BLOCKED",
+    "CLOSED"
+  ]
+}

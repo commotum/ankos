@@ -487,19 +487,22 @@ def receipt_hash(row: dict[str, object]) -> str:
 def valid_compatibility_observation(record: dict[str, object]) -> dict[str, object]:
     oracle_receipts = []
     for evidence in record["oracle_results"]:
+        execution = valid_execution_receipt(
+            receipt_id=f"EXEC-{len(oracle_receipts):04d}",
+            command=[sys.executable, "goal-4/tools/capture_compatibility.py"],
+            tool_path="goal-4/tools/capture_compatibility.py",
+            status_kind=evidence["status_kind"],
+            exit_code=evidence["exit_code"],
+            stdout_sha256=evidence["stdout_sha256"],
+            stderr_sha256=evidence["stderr_sha256"],
+        )
         row = {
             "argv": evidence["argv"],
-            "exit_code": evidence["exit_code"],
-            "finished_at": "2026-07-14T12:00:01Z",
+            "execution_receipt": execution,
             "framed_behavior_sha256": evidence["current_framed_behavior_sha256"],
             "oracle_result_sha256": hashlib.sha256(lib.canonical_json_bytes(evidence)).hexdigest(),
             "path": evidence["path"],
             "receipt_sha256": ZERO,
-            "runner_command": ["python3", "goal-4/tools/capture_compatibility.py"],
-            "started_at": "2026-07-14T12:00:00Z",
-            "status_kind": evidence["status_kind"],
-            "stderr_sha256": evidence["stderr_sha256"],
-            "stdout_sha256": evidence["stdout_sha256"],
         }
         row["receipt_sha256"] = receipt_hash(row)
         oracle_receipts.append(row)
@@ -523,6 +526,43 @@ def valid_compatibility_observation(record: dict[str, object]) -> dict[str, obje
     }
     receipt["receipt_sha256"] = receipt_hash(receipt)
     return receipt
+
+
+def valid_execution_receipt(
+    *,
+    receipt_id: str = "EXECUTION-1",
+    command: list[str] | None = None,
+    tool_path: str = "goal-4/tools/capture_compatibility.py",
+    status_kind: str = "EXITED",
+    exit_code: int | None = 0,
+    stdout_sha256: str = EMPTY_SHA,
+    stderr_sha256: str = EMPTY_SHA,
+) -> dict[str, object]:
+    command = [sys.executable, tool_path] if command is None else command
+    row = {
+        "command": command,
+        "command_sha256": hashlib.sha256(lib.canonical_json_bytes(command)[:-1]).hexdigest(),
+        "contract_id": "ANKOS-EXECUTION-RECEIPT-1",
+        "executed_tool_path": tool_path,
+        "executed_tool_sha256": lib.sha256_file(ROOT / tool_path),
+        "execution_kind": "EXECUTED",
+        "exit_code": exit_code,
+        "finished_at": "2026-07-14T12:00:01Z",
+        "not_executed_reason": None,
+        "receipt_id": receipt_id,
+        "receipt_sha256": ZERO,
+        "runner_path": "goal-4/tools/execution_receipt_runner.py",
+        "runner_sha256": lib.sha256_file(ROOT / "goal-4/tools/execution_receipt_runner.py"),
+        "schema_version": "1.0.0",
+        "started_at": "2026-07-14T12:00:00Z",
+        "status_kind": status_kind,
+        "stderr_byte_size": 0,
+        "stderr_sha256": stderr_sha256,
+        "stdout_byte_size": 0,
+        "stdout_sha256": stdout_sha256,
+    }
+    row["receipt_sha256"] = receipt_hash(row)
+    return row
 
 
 def valid_corpus_manifest() -> dict[str, object]:
@@ -1275,6 +1315,9 @@ class PipelineSchemaTests(unittest.TestCase):
         row, operation_row = valid_overlay_binding(self.registry)
         review = closed_review("REVIEW-1", principal="independent")
         review["evidence_view_sha256"] = row["evidence"]["mechanical"][0]["evidence_sha256"]
+        review["decision_kind"] = "APPROVAL"
+        review["decision_payload"] = "APPROVED"
+        review["decision_sha256"] = projection("APPROVED")["sha256"]
         row["review_ids"] = [review["review_id"]]
         exact_review = overlay_lib.IndependentReview(
             review_id=review["review_id"],
