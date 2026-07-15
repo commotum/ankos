@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 import hashlib
 import json
 import os
@@ -1269,6 +1270,39 @@ class PipelineSchemaTests(unittest.TestCase):
         row["inverse_replay"]["passed"] = True
         row["rollback"]["verified"] = True
         self.expect_failure(lib.validate_release_manifest, row, self.registry)
+
+    def test_74_overlay_review_metadata_joins_every_exact_registry_field(self) -> None:
+        row, operation_row = valid_overlay_binding(self.registry)
+        review = closed_review("REVIEW-1", principal="independent")
+        review["evidence_view_sha256"] = row["evidence"]["mechanical"][0]["evidence_sha256"]
+        row["review_ids"] = [review["review_id"]]
+        exact_review = overlay_lib.IndependentReview(
+            review_id=review["review_id"],
+            creator_principal_id=row["creator"]["principal_id"],
+            source_reviewer_principal_id=review["principal_id"],
+            source_reviewer_type=review["reviewer_type"],
+            source_reviewer_session_id=review["session_id"],
+            source_reviewer_role=review["reviewer_role"],
+            source_decision="APPROVED",
+            evidence_view_sha256=review["evidence_view_sha256"],
+            review_row_sha256=hashlib.sha256(lib.canonical_json_bytes(review)).hexdigest(),
+            blind_preproposal=review["blind_preproposal"],
+        )
+        operation_row = replace(operation_row, meta=replace(operation_row.meta, review=exact_review))
+        row["operation_projection_sha256"] = overlay_lib.operation_projection_sha256(operation_row)
+        lib.validate_overlay_operation_binding(
+            row, self.registry, operation_row, [review]
+        )
+        altered = replace(exact_review, source_reviewer_session_id="different-session")
+        operation_row = replace(operation_row, meta=replace(operation_row.meta, review=altered))
+        row["operation_projection_sha256"] = overlay_lib.operation_projection_sha256(operation_row)
+        self.expect_failure(
+            lib.validate_overlay_operation_binding,
+            row,
+            self.registry,
+            operation_row,
+            [review],
+        )
 
 
 if __name__ == "__main__":

@@ -742,6 +742,11 @@ class AuthorityGrant:
     raw_source_row_sha256: str
     target_role: str
     operation_projection_sha256: str
+    repair_row_sha256: str
+    expected_target_sha256: str
+    expected_result_sha256: str
+    forward_payload_sha256: str
+    inverse_payload_sha256: str
     validated_risk_tags: tuple[str, ...]
     validated_ast_impact: tuple[str, ...]
     witness_id: str | None
@@ -769,6 +774,14 @@ class AuthorityGrant:
             self.operation_projection_sha256,
             "authority operation projection SHA-256",
         )
+        for value, field_name in (
+            (self.repair_row_sha256, "authority repair row SHA-256"),
+            (self.expected_target_sha256, "authority expected target SHA-256"),
+            (self.expected_result_sha256, "authority expected result SHA-256"),
+            (self.forward_payload_sha256, "authority forward payload SHA-256"),
+            (self.inverse_payload_sha256, "authority inverse payload SHA-256"),
+        ):
+            _require_sha256(value, field_name)
         for values, allowed, field_name in (
             (
                 self.validated_risk_tags,
@@ -809,6 +822,54 @@ class AuthorityGrant:
         ):
             if value is not None:
                 _require_sha256(value, field_name)
+
+
+def _production_validator_proof_sha256(
+    *,
+    initial_state_sha256: str,
+    registry_sha256: str,
+    operation_projection_sha256s: tuple[str, ...],
+    repair_row_sha256s: tuple[str, ...],
+    expected_target_sha256s: tuple[str, ...],
+    expected_result_sha256s: tuple[str, ...],
+    forward_payload_sha256s: tuple[str, ...],
+    inverse_payload_sha256s: tuple[str, ...],
+) -> str:
+    """Bind production authority to exact typed operations and repair rows."""
+
+    _require_sha256(initial_state_sha256, "validator proof initial-state SHA-256")
+    _require_sha256(registry_sha256, "validator proof registry SHA-256")
+    vectors = (
+        (operation_projection_sha256s, "operation projection"),
+        (repair_row_sha256s, "repair row"),
+        (expected_target_sha256s, "expected target"),
+        (expected_result_sha256s, "expected result"),
+        (forward_payload_sha256s, "forward payload"),
+        (inverse_payload_sha256s, "inverse payload"),
+    )
+    if any(type(values) is not tuple for values, _ in vectors):
+        raise SchemaError("validator proof hash vectors must be immutable tuples")
+    cardinalities = {len(values) for values, _ in vectors}
+    if cardinalities != {len(operation_projection_sha256s)}:
+        raise SchemaError("validator proof hash vector cardinality mismatch")
+    if not operation_projection_sha256s:
+        raise SchemaError("production validator proof cannot bind an empty batch")
+    for values, label in vectors:
+        for value in values:
+            _require_sha256(value, f"validator proof {label} SHA-256")
+    return _projection_sha256(
+        b"ANKOS-OVERLAY-PRODUCTION-VALIDATOR-PROOF-2",
+        (
+            initial_state_sha256,
+            registry_sha256,
+            operation_projection_sha256s,
+            repair_row_sha256s,
+            expected_target_sha256s,
+            expected_result_sha256s,
+            forward_payload_sha256s,
+            inverse_payload_sha256s,
+        ),
+    )
 
 
 def _authority_integrity_sha256(
@@ -885,6 +946,33 @@ class ApplicationAuthority:
             raise SchemaError("authority contains duplicate repair grants")
         if type(self.synthetic_test_only) is not bool:
             raise SchemaError("synthetic_test_only must be a strict boolean")
+        if not self.synthetic_test_only:
+            expected_proof = _production_validator_proof_sha256(
+                initial_state_sha256=self.initial_state_sha256,
+                registry_sha256=self.registry_sha256,
+                operation_projection_sha256s=tuple(
+                    grant.operation_projection_sha256 for grant in self.grants
+                ),
+                repair_row_sha256s=tuple(
+                    grant.repair_row_sha256 for grant in self.grants
+                ),
+                expected_target_sha256s=tuple(
+                    grant.expected_target_sha256 for grant in self.grants
+                ),
+                expected_result_sha256s=tuple(
+                    grant.expected_result_sha256 for grant in self.grants
+                ),
+                forward_payload_sha256s=tuple(
+                    grant.forward_payload_sha256 for grant in self.grants
+                ),
+                inverse_payload_sha256s=tuple(
+                    grant.inverse_payload_sha256 for grant in self.grants
+                ),
+            )
+            if self.validator_proof_sha256 != expected_proof:
+                raise SchemaError(
+                    "production validator proof does not bind exact repair rows"
+                )
         expected = _authority_integrity_sha256(
             gate_state=self.gate_state,
             baseline_lock_sha256=self.baseline_lock_sha256,
@@ -979,6 +1067,20 @@ def _authority_grant_for(record: Operation) -> AuthorityGrant:
         raw_source_row_sha256=meta.raw_source_row_sha256,
         target_role=meta.target_role,
         operation_projection_sha256=operation_projection_sha256(record),
+        repair_row_sha256=sha256_bytes(
+            b"TEST-ONLY-REPAIR-ROW\0"
+            + operation_projection_sha256(record).encode("ascii")
+        ),
+        expected_target_sha256=meta.expected_target_sha256,
+        expected_result_sha256=meta.expected_result_sha256,
+        forward_payload_sha256=sha256_bytes(
+            b"TEST-ONLY-FORWARD-PAYLOAD\0"
+            + operation_projection_sha256(record).encode("ascii")
+        ),
+        inverse_payload_sha256=sha256_bytes(
+            b"TEST-ONLY-INVERSE-PAYLOAD\0"
+            + operation_projection_sha256(record).encode("ascii")
+        ),
         validated_risk_tags=meta.validated_risk_tags,
         validated_ast_impact=meta.validated_ast_impact,
         witness_id=None if witness is None else witness.witness_id,
