@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import re
 import sys
 import unittest
@@ -213,6 +214,15 @@ class ChapterOneTests(unittest.TestCase):
         self.assertNotEqual(legacy_bytes, repaired_bytes)
         self.assertEqual(jpeg_dimensions(repaired_bytes), (154, 200))
         self.assertEqual(output.read_bytes(), repaired_bytes)
+
+        missing_evidence = copy.deepcopy(self.images)
+        missing_evidence[1].pop("repaired_reason")
+        with self.assertRaises(build.BuildError):
+            build.validate_images(self.raw, self.documents, missing_evidence)
+        changed_override = copy.deepcopy(self.images)
+        changed_override[1]["repaired_asset_sha256"] = "0" * 64
+        with self.assertRaises(build.BuildError):
+            build.validate_images(self.raw, self.documents, changed_override)
 
     def test_first_pass_coverage_is_recorded_without_claiming_a_second(self) -> None:
         rows = validate.validate_coverage(self.documents)
