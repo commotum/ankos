@@ -9,9 +9,9 @@ not sufficient to cross an evidence, review, role, or release gate.
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import dataclass
 import hashlib
 import json
-import os
 from pathlib import Path, PurePosixPath
 import re
 import stat
@@ -110,14 +110,41 @@ HIGH_RISK_CLASSES = frozenset(
         "INDEX_ENTRY",
     }
 )
-HIGH_RISK_OPERATION_TAGS = frozenset(
+GUARDRAIL_OPERATION_TAGS = frozenset(
     {"WITNESS_ONLY_AUTHOR_TEXT_INSERTION", "AUTHORIAL_STRUCTURE_OR_HIERARCHY_CHANGE"}
 )
-HIGH_RISK_AST_TAGS = frozenset(
+OVERLAY_OPERATION_TAGS = frozenset(
+    {
+        "LEXICAL_ONLY",
+        "STRUCTURAL",
+        "FORMULA_SYMBOL",
+        "CODE_SEMANTICS",
+        "DATA_SEMANTICS",
+        "FIGURE_SEMANTICS",
+        "INDEX_SEMANTICS",
+    }
+)
+HIGH_RISK_OPERATION_TAGS = frozenset(
+    GUARDRAIL_OPERATION_TAGS | (OVERLAY_OPERATION_TAGS - {"LEXICAL_ONLY"})
+)
+GUARDRAIL_AST_TAGS = frozenset(
     {"HEADING_CHANGE", "MARKDOWN_STRUCTURE_CHANGE", "BOUNDARY_CHANGE", "INDEX_ORDER_CHANGE"}
 )
-OPERATION_RISK_TAGS = frozenset(HIGH_RISK_OPERATION_TAGS)
-AST_IMPACT_TAGS = frozenset(HIGH_RISK_AST_TAGS)
+OVERLAY_AST_TAGS = frozenset(
+    {
+        "HEADING_DEPTH",
+        "PARAGRAPH_BOUNDARY",
+        "LIST_STRUCTURE",
+        "FENCE_STRUCTURE",
+        "TABLE_STRUCTURE",
+        "MATH_STRUCTURE",
+        "CODE_STRUCTURE",
+        "BLOCK_BOUNDARY",
+    }
+)
+HIGH_RISK_AST_TAGS = frozenset(GUARDRAIL_AST_TAGS | OVERLAY_AST_TAGS)
+OPERATION_RISK_TAGS = frozenset(GUARDRAIL_OPERATION_TAGS | OVERLAY_OPERATION_TAGS)
+AST_IMPACT_TAGS = frozenset(GUARDRAIL_AST_TAGS | OVERLAY_AST_TAGS)
 MECHANICAL_PROOF_IDS = frozenset({"IDENTITY_AUTHOR_PROJECTION_V1"})
 MECHANICAL_CHECK_IDS = (
     "RAW_GUARD_JOIN",
@@ -156,6 +183,16 @@ WORKFLOW_TRANSITIONS = frozenset(
 
 class PipelineSchemaError(ValueError):
     """A closed schema, record, binding, or gate was violated."""
+
+
+@dataclass(frozen=True, slots=True)
+class ValidatedRepairBinding:
+    """Hash bridge from one validated registry row to one overlay operation."""
+
+    repair_id: str
+    repair_row_sha256: str
+    operation_projection_sha256: str
+    overlay_operation_bound: bool
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -653,6 +690,13 @@ def mechanical_check_sha256(record: Mapping[str, Any], check_id: str) -> str:
     return sha256_bytes(canonical_json_bytes(projection)[:-1])
 
 
+def canonical_repair_row_sha256(record: Mapping[str, Any]) -> str:
+    """Hash exact ANKOS-CJ-1 bytes for authority/ledger row binding."""
+
+    _reject_floats(record, "repair row")
+    return sha256_bytes(canonical_json_bytes(record))
+
+
 def _validate_evidence(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
     evidence = record["evidence"]
     all_ids: list[str] = []
@@ -696,12 +740,16 @@ def _validate_evidence(record: Mapping[str, Any], registry: SchemaRegistry) -> N
             raise PipelineSchemaError(f"invalid/placeholder repair evidence-view digest: {field}")
 
 
-def validate_repair(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
+def validate_repair(
+    record: Mapping[str, Any], registry: SchemaRegistry
+) -> ValidatedRepairBinding:
     schema_path = "goal-4/schemas/repair-record.schema.json"
     registry.validate(schema_path, record)
     validate_workflow(record["workflow"])
     if record["baseline_lock_sha256"] != sha256_file(registry.repo_root / "goal-4/baseline-lock.json"):
         raise PipelineSchemaError("repair does not bind the frozen baseline lock")
+    if record["operation_projection_sha256"] == "0" * 64:
+        raise PipelineSchemaError("repair operation projection uses an all-zero placeholder")
     _safe_repo_path(record["target"]["path"], "repair target")
     _safe_repo_path(record["guard"]["raw_source_path"], "repair source")
     _projection_hash(record["before_projection"], "before")
@@ -845,6 +893,123 @@ def validate_repair(record: Mapping[str, Any], registry: SchemaRegistry) -> None
                 raise PipelineSchemaError("mechanical verification details digest is not recomputable")
     elif record["evidence"]["mechanical"]:
         raise PipelineSchemaError("non-mechanical disposition carries mechanical-proof evidence")
+    return ValidatedRepairBinding(
+        repair_id=record["repair_id"],
+        repair_row_sha256=canonical_repair_row_sha256(record),
+        operation_projection_sha256=record["operation_projection_sha256"],
+        overlay_operation_bound=False,
+    )
+
+
+def validate_overlay_operation_binding(
+    record: Mapping[str, Any],
+    registry: SchemaRegistry,
+    overlay_operation: Any,
+    review_records: Sequence[Mapping[str, Any]] = (),
+) -> ValidatedRepairBinding:
+    """Authenticate one JSON repair row against overlay_lib's exact operation hash.
+
+    This is the only schema/overlay bridge intended for authority minting.  A
+    bare row binding returned by :func:`validate_repair` is explicitly marked
+    unbound and must not be used as an authority grant.
+    """
+
+    binding = validate_repair(record, registry)
+    try:
+        import overlay_lib
+
+        operation_sha = overlay_lib.operation_projection_sha256(overlay_operation)
+    except (AttributeError, TypeError, ValueError) as exc:
+        raise PipelineSchemaError(f"invalid typed overlay operation: {exc}") from exc
+    if operation_sha != record["operation_projection_sha256"]:
+        raise PipelineSchemaError("repair row does not bind exact overlay operation projection")
+    meta = overlay_operation.meta
+    target = record["target"]
+    if target["role"] != "CANONICAL_AUTHOR_TEXT" or target["canonical_document_id"] is None:
+        raise PipelineSchemaError("authority bridge is restricted to canonical author-text operations")
+    expected_meta = {
+        "creator_principal_id": record["creator"]["principal_id"],
+        "dependencies": tuple(record["dependencies"]),
+        "final_disposition": record["workflow"]["final_disposition"],
+        "repair_class": record["repair_class"],
+        "repair_id": record["repair_id"],
+        "target_id": target["canonical_document_id"],
+        "target_path": target["path"],
+        "target_role": target["role"],
+        "validated_ast_impact": tuple(
+            sorted(set(record["risk"]["ast_impact_tags"]) & OVERLAY_AST_TAGS)
+        ),
+        "validated_risk_tags": tuple(
+            sorted(set(record["risk"]["operation_tags"]) & OVERLAY_OPERATION_TAGS)
+        ),
+        "workflow_state": record["workflow"]["state"],
+    }
+    for field, expected in expected_meta.items():
+        if getattr(meta, field) != expected:
+            raise PipelineSchemaError(f"overlay operation metadata differs from repair row: {field}")
+    if overlay_operation.operation != record["forward_operation"]["operation_type"]:
+        raise PipelineSchemaError("overlay operation type differs from repair forward operation")
+    guard = record["guard"]
+    raw_block_ids = (
+        guard["raw_block_ids"]
+        if guard["guard_kind"] == "PREIMAGE"
+        else [guard["left_anchor"]["raw_block_id"], guard["right_anchor"]["raw_block_id"]]
+    )
+    if meta.raw_source_id not in raw_block_ids:
+        raise PipelineSchemaError("overlay raw-source ID does not join repair guard blocks")
+    raw_row = _frozen_indexes(registry)["blocks_by_id"][meta.raw_source_id]
+    if meta.raw_source_row_sha256 != sha256_bytes(canonical_json_bytes(raw_row)):
+        raise PipelineSchemaError("overlay raw-source row hash does not bind Stage 2 ledger row")
+    expected_span_sha = (
+        guard["span"]["sha256"]
+        if guard["guard_kind"] == "PREIMAGE"
+        else sha256_bytes(
+            (
+                guard["left_anchor"]["text"] + guard["right_anchor"]["text"]
+            ).encode("utf-8")
+        )
+    )
+    if meta.raw_source_span_sha256 != expected_span_sha:
+        raise PipelineSchemaError("overlay raw-source span hash does not bind repair guard")
+    review_by_id = validate_review_set(review_records, registry)
+    if set(record["review_ids"]) != set(review_by_id).intersection(record["review_ids"]):
+        raise PipelineSchemaError("overlay authority review IDs do not join validated review rows")
+    if record["review_ids"]:
+        source_rows = [
+            review_by_id[review_id]
+            for review_id in record["review_ids"]
+            if review_by_id[review_id]["reviewer_role"] == "SOURCE_REVIEWER"
+        ]
+        specialist_rows = [
+            review_by_id[review_id]
+            for review_id in record["review_ids"]
+            if review_by_id[review_id]["reviewer_role"] == "SPECIALIST_REVIEWER"
+        ]
+        if len(source_rows) != 1:
+            raise PipelineSchemaError("overlay authority lacks exactly one source-review row")
+        source = source_rows[0]
+        if meta.review is None or meta.review.review_id != source["review_id"]:
+            raise PipelineSchemaError("overlay review identity differs from registry source review")
+        if meta.review.review_row_sha256 != sha256_bytes(canonical_json_bytes(source)):
+            raise PipelineSchemaError("overlay source-review row hash differs from registry row")
+        if specialist_rows:
+            if len(specialist_rows) != 1:
+                raise PipelineSchemaError("overlay authority has ambiguous specialist-review rows")
+            specialist = specialist_rows[0]
+            if (
+                meta.review.specialist_review_id != specialist["review_id"]
+                or meta.review.specialist_review_row_sha256
+                != sha256_bytes(canonical_json_bytes(specialist))
+            ):
+                raise PipelineSchemaError("overlay specialist-review binding differs from registry row")
+    elif meta.review is not None:
+        raise PipelineSchemaError("overlay operation carries a review absent from repair row")
+    return ValidatedRepairBinding(
+        repair_id=binding.repair_id,
+        repair_row_sha256=binding.repair_row_sha256,
+        operation_projection_sha256=operation_sha,
+        overlay_operation_bound=True,
+    )
 
 
 def _markdown_structure_signature(text: str) -> tuple[str, ...]:
@@ -1605,6 +1770,27 @@ def validate_release_manifest(
     )
     if any(value == "0" * 64 for value in scalar_digests):
         raise PipelineSchemaError("release manifest uses an all-zero placeholder digest")
+    if record["certification_state"] != "UNCERTIFIED" or record["audit_certificate"] is not None:
+        raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids audit certification")
+    if record["claim_scope"] == "FULL_REPAIR_CERTIFIED":
+        raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids full-repair claim")
+    if set(record["open_blocker_ids"]) != _frozen_indexes(registry)["open_unresolved_ids"]:
+        raise PipelineSchemaError("uncertified release does not enumerate every Stage 3 blocker")
+    publication = record["publication"]
+    rollback = record["rollback"]
+    if publication["target_state"] == "NOT_PUBLISHED":
+        if (
+            publication["atomic_same_filesystem_rename"] is not False
+            or rollback != {"command": [], "verified": False}
+            or record["prior_release"] is not None
+        ):
+            raise PipelineSchemaError("NOT_PUBLISHED release has incomplete/contradictory publication state")
+    elif (
+        publication["atomic_same_filesystem_rename"] is not True
+        or rollback["verified"] is not True
+        or not rollback["command"]
+    ):
+        raise PipelineSchemaError("published release lacks atomic promotion and verified rollback")
     contract_paths = {
         "goal-4/baseline-lock.json",
         "goal-4/guardrails.json",
@@ -1694,27 +1880,6 @@ def validate_release_manifest(
         raise PipelineSchemaError("release reproduction command list is empty/malformed")
     if len(set(record["two_clean_build_digests"])) != 1:
         raise PipelineSchemaError("two clean builds are not byte-identical")
-    if record["certification_state"] != "UNCERTIFIED" or record["audit_certificate"] is not None:
-        raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids audit certification")
-    if record["claim_scope"] == "FULL_REPAIR_CERTIFIED":
-        raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids full-repair claim")
-    if set(record["open_blocker_ids"]) != _frozen_indexes(registry)["open_unresolved_ids"]:
-        raise PipelineSchemaError("uncertified release does not enumerate every Stage 3 blocker")
-    publication = record["publication"]
-    rollback = record["rollback"]
-    if publication["target_state"] == "NOT_PUBLISHED":
-        if (
-            publication["atomic_same_filesystem_rename"] is not False
-            or rollback != {"command": [], "verified": False}
-            or record["prior_release"] is not None
-        ):
-            raise PipelineSchemaError("NOT_PUBLISHED release has incomplete/contradictory publication state")
-    elif (
-        publication["atomic_same_filesystem_rename"] is not True
-        or rollback["verified"] is not True
-        or not rollback["command"]
-    ):
-        raise PipelineSchemaError("published release lacks atomic promotion and verified rollback")
 
 
 def _require_exact_keys(value: Mapping[str, Any], expected: Iterable[str], where: str) -> None:

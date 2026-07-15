@@ -8,10 +8,10 @@ import json
 import sys
 from pathlib import Path
 
-from zero_repair_lib import ZeroRepairError, compare_zero_repair_trees
-from zero_repair_verify import (
-    IndependentVerificationError,
-    independently_validate_zero_repair,
+from zero_repair_lib import (
+    ZeroRepairError,
+    _load_exact_independent_verifier,
+    compare_zero_repair_trees,
 )
 
 
@@ -23,19 +23,27 @@ def main() -> int:
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--compare-root", type=Path)
     args = parser.parse_args()
+    goal = args.goal_root
+    if goal is None:
+        goal = args.repo_root / "goal-4"
+    elif not goal.is_absolute():
+        goal = args.repo_root / goal
     try:
-        result = independently_validate_zero_repair(
+        verifier, verifier_sha256 = _load_exact_independent_verifier(goal)
+        result = verifier.independently_validate_zero_repair(
             args.repo_root,
             args.output_root,
             goal_root=args.goal_root,
             legacy_root=args.legacy_root,
+            expected_runtime_sha256=verifier_sha256,
         )
         if args.compare_root is not None:
-            result["comparison_build"] = independently_validate_zero_repair(
+            result["comparison_build"] = verifier.independently_validate_zero_repair(
                 args.repo_root,
                 args.compare_root,
                 goal_root=args.goal_root,
                 legacy_root=args.legacy_root,
+                expected_runtime_sha256=verifier_sha256,
             )
             result["clean_build_equality"] = compare_zero_repair_trees(
                 args.output_root,
@@ -44,7 +52,7 @@ def main() -> int:
                 goal_root=args.goal_root,
                 legacy_root=args.legacy_root,
             )
-    except (OSError, ZeroRepairError, IndependentVerificationError) as error:
+    except (OSError, ZeroRepairError, RuntimeError, SyntaxError, ImportError) as error:
         print(f"ZERO-REPAIR VALIDATION FAIL: {error}", file=sys.stderr)
         return 1
     print("ZERO-REPAIR VALIDATION OK " + json.dumps(result, sort_keys=True, separators=(",", ":")))

@@ -7,6 +7,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import types
 import unittest
 from unittest import mock
 from pathlib import Path
@@ -26,6 +27,11 @@ from zero_repair_lib import (  # noqa: E402
     build_zero_repair,
     canonical_json_bytes,
     compare_zero_repair_trees,
+    _atomic_rename_noreplace,
+    _full_tree_records,
+    _load_exact_independent_verifier,
+    _make_tape_and_documents,
+    _recheck_verification_receipt,
     parse_jsonl_bytes,
     validate_zero_repair,
 )

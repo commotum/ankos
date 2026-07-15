@@ -431,7 +431,53 @@ def _load_source(
     }
 
 
-def _inventory(output: Path, documents: list[dict[str, Any]]) -> None:
+def _receipt_record(path: str, kind: str, status: os.stat_result, sha256: str | None = None) -> dict[str, Any]:
+    record: dict[str, Any] = {
+        "ctime_ns": status.st_ctime_ns,
+        "device": status.st_dev,
+        "inode": status.st_ino,
+        "mode": f"{stat.S_IMODE(status.st_mode):04o}",
+        "mtime_ns": status.st_mtime_ns,
+        "nlink": status.st_nlink,
+        "path": path,
+        "size": status.st_size,
+        "type": kind,
+    }
+    if sha256 is not None:
+        record["sha256"] = sha256
+    return record
+
+
+def _stable_file_receipt(path: Path, relative: str) -> dict[str, Any]:
+    before = os.lstat(path)
+    flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
+    if hasattr(os, "O_NOFOLLOW"):
+        flags |= os.O_NOFOLLOW
+    descriptor = os.open(path, flags)
+    try:
+        opened = os.fstat(descriptor)
+        _check(
+            (opened.st_dev, opened.st_ino) == (before.st_dev, before.st_ino),
+            f"output file changed while opening: {relative}",
+        )
+        digest = hashlib.sha256()
+        while True:
+            chunk = os.read(descriptor, 1024 * 1024)
+            if not chunk:
+                break
+            digest.update(chunk)
+        after = os.fstat(descriptor)
+    finally:
+        os.close(descriptor)
+    stable_fields = ("st_dev", "st_ino", "st_mode", "st_nlink", "st_size", "st_mtime_ns", "st_ctime_ns")
+    _check(
+        all(getattr(opened, field) == getattr(after, field) for field in stable_fields),
+        f"output file mutated while hashing: {relative}",
+    )
+    return _receipt_record(relative, "REGULAR_FILE", after, digest.hexdigest())
+
+
+def _inventory(output: Path, documents: list[dict[str, Any]]) -> dict[str, Any]:
     expected_files = {document["path"] for document in documents} | {TAPE_RELATIVE.as_posix(), MANIFEST_RELATIVE.as_posix()}
     expected_directories: set[str] = set()
     for name in expected_files:
@@ -442,6 +488,9 @@ def _inventory(output: Path, documents: list[dict[str, Any]]) -> None:
     files: set[str] = set()
     directories: set[str] = set()
     inodes: set[tuple[int, int]] = set()
+    records: list[dict[str, Any]] = []
+    root_before = os.lstat(output)
+    records.append(_receipt_record(".", "DIRECTORY", root_before))
 
     def walk(directory: Path) -> None:
         try:
@@ -457,6 +506,13 @@ def _inventory(output: Path, documents: list[dict[str, Any]]) -> None:
                 _check(stat.S_IMODE(status.st_mode) == DIRECTORY_MODE, f"output directory mode drift: {relative}")
                 directories.add(relative)
                 walk(path)
+                after = os.lstat(path)
+                _check(
+                    (after.st_dev, after.st_ino, after.st_mode, after.st_mtime_ns, after.st_ctime_ns)
+                    == (status.st_dev, status.st_ino, status.st_mode, status.st_mtime_ns, status.st_ctime_ns),
+                    f"output directory mutated during inventory: {relative}",
+                )
+                records.append(_receipt_record(relative, "DIRECTORY", after))
             elif stat.S_ISREG(status.st_mode):
                 _check(stat.S_IMODE(status.st_mode) == FILE_MODE, f"output file mode drift: {relative}")
                 _check(status.st_nlink == 1, f"output file has a hardlink: {relative}")
@@ -464,12 +520,31 @@ def _inventory(output: Path, documents: list[dict[str, Any]]) -> None:
                 _check(inode not in inodes, f"output files share an inode: {relative}")
                 inodes.add(inode)
                 files.add(relative)
+                record = _stable_file_receipt(path, relative)
+                _check(
+                    (record["device"], record["inode"], record["mode"], record["size"], record["mtime_ns"], record["ctime_ns"])
+                    == (status.st_dev, status.st_ino, f"{stat.S_IMODE(status.st_mode):04o}", status.st_size, status.st_mtime_ns, status.st_ctime_ns),
+                    f"output file changed during inventory: {relative}",
+                )
+                records.append(record)
             else:
                 raise IndependentVerificationError(f"output contains an unexpected filesystem type: {relative}")
 
     walk(output)
     _check(files == expected_files, "output file ownership drift")
     _check(directories == expected_directories, "output directory ownership drift")
+    root_after = os.lstat(output)
+    _check(
+        (root_after.st_dev, root_after.st_ino, root_after.st_mode, root_after.st_mtime_ns, root_after.st_ctime_ns)
+        == (root_before.st_dev, root_before.st_ino, root_before.st_mode, root_before.st_mtime_ns, root_before.st_ctime_ns),
+        "output root mutated during inventory",
+    )
+    records[0] = _receipt_record(".", "DIRECTORY", root_after)
+    records.sort(key=lambda row: (row["path"], row["type"]))
+    return {
+        "boundary": VERIFICATION_BOUNDARY,
+        "records": records,
+    }
 
 
 def _expected_projection(snapshot: dict[str, Any], output: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
@@ -596,6 +671,7 @@ def _manifest(snapshot: dict[str, Any], tape_raw: bytes, tape: list[dict[str, An
             "structure_ledger_sha256": contract["frozen_inputs"]["structure_ledger_sha256"],
             "tool_sources": snapshot["tool_sources"],
             "zero_repair_contract_sha256": CONTRACT_SHA256,
+            "zero_repair_implementation_lock_sha256": IMPLEMENTATION_LOCK_SHA256,
         },
         "inverse_proof": {"algorithm": "READ_OUTPUT_SPANS_IN_TAPE_ORDER_DROP_TYPED_GENERATED_METADATA", "recovered_byte_size": len(inverse), "recovered_sha256": _sha(inverse), "source_block_sequence_sha256": snapshot["source_sequence"]},
         "output_payload": {"file_count_excluding_manifest": len(payload_records), "files": sorted(payload_records, key=lambda item: item["path"]), "tree_sha256_excluding_manifest": _tree_digest(payload_records)},
@@ -610,6 +686,8 @@ def independently_validate_zero_repair(
     *,
     goal_root: Path | None = None,
     legacy_root: Path | None = None,
+    expected_runtime_sha256: str | None = None,
+    include_receipt: bool = False,
 ) -> dict[str, Any]:
     """Validate one complete tree without consulting compiler implementation."""
 
@@ -627,10 +705,15 @@ def independently_validate_zero_repair(
     if _within(output, repo):
         _check(_within(output, goal), "repository-local output is outside Goal 4")
     _plain_directory(output, "zero-repair output root", exact_mode=DIRECTORY_MODE)
-    snapshot = _load_source(repo, goal, legacy)
+    snapshot = _load_source(
+        repo,
+        goal,
+        legacy,
+        expected_runtime_sha256=expected_runtime_sha256,
+    )
     for source in snapshot["inputs"]:
         _check(not _within(source, output), "output contains a frozen input")
-    _inventory(output, snapshot["documents"])
+    initial_receipt = _inventory(output, snapshot["documents"])
 
     tape_raw = _join(output, TAPE_RELATIVE).read_bytes()
     manifest_raw = _join(output, MANIFEST_RELATIVE).read_bytes()
@@ -647,9 +730,13 @@ def independently_validate_zero_repair(
     payload_hash = expected_manifest["output_payload"]["tree_sha256_excluding_manifest"]
     _check(payload_hash == snapshot["contract"]["proof"]["payload_tree_sha256_excluding_manifest"], "payload tree contract hash drift")
     _check(_sha(inverse) == snapshot["contract"]["proof"]["inverse_sha256"], "inverse contract hash drift")
-    return {
+    final_receipt = _inventory(output, snapshot["documents"])
+    _check(initial_receipt == final_receipt, "output mutated during independent validation")
+    receipt_sha256 = _sha(_canonical(final_receipt, lf=False))
+    result = {
         "canonical_documents": 29,
         "contract_sha256": CONTRACT_SHA256,
+        "implementation_lock_sha256": IMPLEMENTATION_LOCK_SHA256,
         "generated_spans": 1,
         "independent_oracle": True,
         "inverse_byte_size": len(inverse),
@@ -659,4 +746,10 @@ def independently_validate_zero_repair(
         "projection_tape_rows": len(tape),
         "projection_tape_sha256": _sha(tape_raw),
         "source_blocks": 20430,
+        "verification_boundary": VERIFICATION_BOUNDARY,
+        "verification_receipt_sha256": receipt_sha256,
+        "verifier_sha256": snapshot["verifier_sha256"],
     }
+    if include_receipt:
+        result["verification_receipt"] = final_receipt
+    return result

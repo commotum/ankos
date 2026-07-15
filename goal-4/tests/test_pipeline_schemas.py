@@ -150,7 +150,7 @@ def valid_repair() -> dict[str, object]:
 
 
 def endpoint(kind: str, projection_sha: str, *, role: str | None, path: str | None) -> dict[str, object]:
-    span = None if kind == "GENERATED_NONE" else {"end_byte_exclusive": 1, "sha256": ZERO, "start_byte": 0}
+    span = None if kind in {"GENERATED_NONE", "TYPED_EXCLUSION"} else {"end_byte_exclusive": 1, "sha256": ZERO, "start_byte": 0}
     return {
         "author_text_projection_sha256": projection_sha,
         "canonical_document_id": None,
@@ -176,6 +176,63 @@ def valid_generated_provenance() -> dict[str, object]:
         "source": endpoint("GENERATED_NONE", EMPTY_SHA, role=None, path=None),
         "target": endpoint("GENERATED_SPAN", EMPTY_SHA, role="GENERATED_METADATA", path="DERIVED/Contents.md"),
     }
+
+
+def valid_raw_provenance() -> dict[str, object]:
+    source = {
+        "author_text_projection_sha256": GUARD_SHA,
+        "canonical_document_id": "PUBLICATION_AND_CONTENTS",
+        "endpoint_kind": "RAW_SPAN",
+        "path": "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md",
+        "raw_block_ids": ["RAW-000001"],
+        "role": "CANONICAL_AUTHOR_TEXT",
+        "span": {"end_byte_exclusive": len(GUARD_BYTES), "sha256": GUARD_SHA, "start_byte": 0},
+        "witness_region_ids": [],
+    }
+    target = {
+        "author_text_projection_sha256": GUARD_SHA,
+        "canonical_document_id": "PUBLICATION_AND_CONTENTS",
+        "endpoint_kind": "CANONICAL_SPAN",
+        "path": "CANONICAL/FRONT-MATTER/00-Publication-and-Contents.md",
+        "raw_block_ids": ["RAW-000001"],
+        "role": "CANONICAL_AUTHOR_TEXT",
+        "span": {"end_byte_exclusive": len(GUARD_BYTES), "sha256": GUARD_SHA, "start_byte": 0},
+        "witness_region_ids": [],
+    }
+    return {
+        "author_text_projection_sha256": GUARD_SHA,
+        "inverse": {"inverse_kind": "IDENTITY", "repair_ids": []},
+        "mapping_kind": "RAW_PRESERVED",
+        "node_ids": ["NODE-RAW-1"],
+        "provenance_id": "PROVENANCE-RAW-1",
+        "repair_ids": [],
+        "schema_version": "1.0.0",
+        "sequence": 0,
+        "source": source,
+        "target": target,
+    }
+
+
+def closed_review(
+    review_id: str,
+    *,
+    role: str = "SOURCE_REVIEWER",
+    principal: str = "reviewer",
+    subject_id: str = "REPAIR-TEST-0001",
+) -> dict[str, object]:
+    row = valid_review()
+    row.update(
+        {
+            "closure_state": "CLOSED",
+            "principal_id": principal,
+            "repair_id": subject_id,
+            "review_id": review_id,
+            "reviewer_role": role,
+            "subject_id": subject_id,
+            "subject_type": "REPAIR",
+        }
+    )
+    return row
 
 
 def valid_navigation() -> dict[str, object]:
@@ -629,13 +686,247 @@ class PipelineSchemaTests(unittest.TestCase):
 
     def test_40_certified_release_is_source_blocked(self) -> None:
         row = valid_release_manifest()
+        row["compatibility_verification_sha256"] = VIEW_SHA
+        row["output_manifest_sha256"] = VIEW_SHA
+        row["schema_lock_sha256"] = VIEW_SHA
+        row["inverse_replay"]["raw_projection_sha256"] = VIEW_SHA
+        row["two_clean_build_digests"] = [VIEW_SHA, VIEW_SHA]
         row["certification_state"] = "AUDIT_CERTIFIED"
-        row["audit_certificate"] = {"certificate_id": "CERTIFICATE-1", "witness_lock_sha256": ZERO}
+        row["audit_certificate"] = {"certificate_id": "CERTIFICATE-1", "witness_lock_sha256": VIEW_SHA}
         self.expect_failure(lib.validate_release_manifest, row, self.registry)
 
     def test_41_externally_pinned_package_lock_passes(self) -> None:
         result = lib.validate_package(ROOT, schema_cli.EXPECTED_PIPELINE_SCHEMA_LOCK_SHA256)
         self.assertEqual(result["schema_count"], 13)
+
+    def test_42_duplicate_key_json_fails_before_canonicalization(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "duplicate.json"
+            path.write_bytes(b'{"a":1,"a":2}\n')
+            with self.assertRaisesRegex(lib.PipelineSchemaError, "duplicate JSON object key"):
+                lib.load_json(path, require_cj1=False)
+
+    def test_43_duplicate_key_jsonl_fails_before_canonicalization(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "duplicate.jsonl"
+            path.write_bytes(b'{"outer":{"a":1,"a":2}}\n')
+            with self.assertRaisesRegex(lib.PipelineSchemaError, "duplicate JSON object key"):
+                lib.load_jsonl(path, require_cj1=False)
+
+    def test_44_raw_guard_path_must_join_stage2_manifest(self) -> None:
+        row = valid_repair()
+        row["guard"]["raw_source_path"] = "ref/A-New-Kind-of-Science/not-the-monolith.md"
+        self.expect_failure(lib.validate_repair, row, self.registry)
+
+    def test_45_raw_guard_span_and_blocks_must_join_stage2(self) -> None:
+        row = valid_repair()
+        row["guard"]["raw_block_ids"] = ["RAW-000002"]
+        self.expect_failure(lib.validate_repair, row, self.registry)
+        row = valid_repair()
+        row["guard"]["span"]["sha256"] = EMPTY_SHA
+        self.expect_failure(lib.validate_repair, row, self.registry)
+
+    def test_46_mechanical_disposition_needs_real_typed_proof_and_checks(self) -> None:
+        row = valid_repair()
+        row["evidence"]["mechanical"] = []
+        self.expect_failure(lib.validate_repair, row, self.registry)
+        row = valid_repair()
+        row["verification_results"] = []
+        self.expect_failure(lib.validate_repair, row, self.registry)
+        row = valid_repair()
+        row["verification_results"][0]["details_sha256"] = VIEW_SHA
+        self.expect_failure(lib.validate_repair, row, self.registry)
+
+    def test_47_risk_class_tag_union_cannot_omit_or_understate(self) -> None:
+        row = valid_repair()
+        row["risk"]["class_tags"] = []
+        self.expect_failure(lib.validate_repair, row, self.registry)
+        row = valid_repair()
+        row["repair_class"] = "PROSE_OCR"
+        row["risk"]["class_tags"] = ["PROSE_OCR", "FORMULA_OR_SYMBOL"]
+        row["target"] = {
+            "canonical_document_id": "PUBLICATION_AND_CONTENTS",
+            "node_ids": ["NODE-1"],
+            "path": "CANONICAL/FRONT-MATTER/00-Publication-and-Contents.md",
+            "role": "CANONICAL_AUTHOR_TEXT",
+        }
+        self.expect_failure(lib.validate_repair, row, self.registry)
+
+    def test_48_joined_review_rows_are_validated_and_independent(self) -> None:
+        repair = valid_repair()
+        repair["review_ids"] = ["REVIEW-1"]
+        review = closed_review("REVIEW-1", principal="creator")
+        review["evidence_view_sha256"] = repair["evidence"]["mechanical"][0]["evidence_sha256"]
+        self.expect_failure(lib.validate_repair_set, [repair], self.registry, [review])
+        review["principal_id"] = "independent"
+        review["decision_sha256"] = VIEW_SHA
+        self.expect_failure(lib.validate_repair_set, [repair], self.registry, [review])
+
+    def test_49_disagreement_needs_independent_joined_adjudication(self) -> None:
+        first = valid_review()
+        first.update(
+            {
+                "adjudicator_review_id": "REVIEW-ADJUDICATOR",
+                "agreement_state": "DISAGREES",
+                "closure_state": "CLOSED",
+                "disagrees_with_review_ids": ["REVIEW-2"],
+                "follow_up": "Independent adjudication completed.",
+                "review_id": "REVIEW-1",
+            }
+        )
+        second = valid_review()
+        second.update({"closure_state": "CLOSED", "principal_id": "second", "review_id": "REVIEW-2"})
+        adjudicator = valid_review()
+        adjudicator.update(
+            {
+                "agreement_state": "NOT_APPLICABLE",
+                "closure_state": "CLOSED",
+                "principal_id": "third",
+                "review_id": "REVIEW-ADJUDICATOR",
+                "reviewer_role": "ADJUDICATOR",
+                "specialty": "NOT_APPLICABLE",
+            }
+        )
+        result = lib.validate_review_set([first, second, adjudicator], self.registry)
+        self.assertEqual(set(result), {"REVIEW-1", "REVIEW-2", "REVIEW-ADJUDICATOR"})
+        adjudicator["principal_id"] = first["principal_id"]
+        self.expect_failure(lib.validate_review_set, [first, second, adjudicator], self.registry)
+
+    def test_50_fabricated_review_witness_region_fails_join(self) -> None:
+        row = valid_review()
+        row["witness_region_ids"] = ["WITNESS-FAKE"]
+        self.expect_failure(lib.validate_review, row, self.registry)
+
+    def test_51_raw_preserved_provenance_joins_frozen_span(self) -> None:
+        lib.validate_provenance(valid_raw_provenance(), self.registry)
+        row = valid_raw_provenance()
+        row["source"]["raw_block_ids"] = ["RAW-000002"]
+        self.expect_failure(lib.validate_provenance, row, self.registry)
+
+    def test_52_raw_exclusion_is_typed_but_source_blocked(self) -> None:
+        row = valid_raw_provenance()
+        row["author_text_projection_sha256"] = EMPTY_SHA
+        row["mapping_kind"] = "RAW_EXCLUDED"
+        row["target"] = endpoint("TYPED_EXCLUSION", EMPTY_SHA, role=None, path=None)
+        self.expect_failure(lib.validate_provenance, row, self.registry)
+
+    def test_53_valid_source_blocked_technical_span_passes(self) -> None:
+        lib.validate_technical(valid_technical(), self.registry)
+
+    def test_54_technical_token_semantics_fail_closed(self) -> None:
+        row = valid_technical()
+        row["tokens"][0]["raw_sha256"] = VIEW_SHA
+        self.expect_failure(lib.validate_technical, row, self.registry)
+        row = valid_technical()
+        row["tokens"][0]["changed"] = True
+        row["tokens"][0]["repaired_text"] = "changed"
+        row["changed_token_ids"] = ["TOKEN-1"]
+        self.expect_failure(lib.validate_technical, row, self.registry)
+
+    def test_55_figure_fake_witness_id_fails_join(self) -> None:
+        row = valid_figure()
+        row["witness_region_ids"] = ["WITNESS-FAKE"]
+        self.expect_failure(lib.validate_figure, row, self.registry)
+
+    def test_56_complete_compatibility_behavior_passes(self) -> None:
+        lib.validate_compatibility(valid_compatibility(), self.registry)
+
+    def test_57_empty_or_incomplete_compatibility_scope_fails(self) -> None:
+        row = valid_compatibility()
+        row["oracle_results"] = []
+        self.expect_failure(lib.validate_compatibility, row, self.registry)
+        row = valid_compatibility()
+        row["oracle_results"].pop()
+        self.expect_failure(lib.validate_compatibility, row, self.registry)
+
+    def test_58_compatibility_identical_flag_cannot_lie(self) -> None:
+        row = valid_compatibility()
+        row["oracle_results"][0]["current_framed_behavior_sha256"] = VIEW_SHA
+        self.expect_failure(lib.validate_compatibility, row, self.registry)
+
+    def test_59_corpus_canonical_path_role_mapping_is_exact(self) -> None:
+        row = valid_corpus_manifest()
+        row["files"][0]["path"] = "CANONICAL/fake.md"
+        guardrails = lib.load_json(ROOT / "goal-4/guardrails.json", require_cj1=False)
+        self.expect_failure(lib.validate_corpus_manifest, row, self.registry, guardrails)
+
+    def test_60_certified_corpus_checks_real_files_and_projections_first(self) -> None:
+        row = valid_corpus_manifest()
+        row["certification_state"] = "AUDIT_CERTIFIED"
+        row["author_text_projection_sha256"] = EMPTY_SHA
+        guardrails = lib.load_json(ROOT / "goal-4/guardrails.json", require_cj1=False)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "output"
+            projections: dict[str, bytes] = {}
+            for item in row["files"]:
+                path = output / item["path"]
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"")
+                os.chmod(path, 0o644)
+                item["author_text_projection_sha256"] = EMPTY_SHA
+                item["byte_size"] = 0
+                item["mode"] = "0644"
+                item["sha256"] = EMPTY_SHA
+                projections[item["path"]] = b""
+            with self.assertRaisesRegex(lib.PipelineSchemaError, "current SOURCE_BLOCKED"):
+                lib.validate_corpus_manifest(
+                    row,
+                    self.registry,
+                    guardrails,
+                    output_root=output,
+                    author_text_projections=projections,
+                )
+            row["files"][0]["byte_size"] = 1
+            with self.assertRaisesRegex(lib.PipelineSchemaError, "file/hash/size/mode drift"):
+                lib.validate_corpus_manifest(
+                    row,
+                    self.registry,
+                    guardrails,
+                    output_root=output,
+                    author_text_projections=projections,
+                )
+
+    def test_61_release_refuses_self_asserted_zero_digests(self) -> None:
+        with self.assertRaisesRegex(lib.PipelineSchemaError, "all-zero placeholder"):
+            lib.validate_release_manifest(valid_release_manifest(), self.registry)
+
+    def test_62_not_published_release_must_enumerate_all_blockers(self) -> None:
+        row = valid_release_manifest()
+        for field in (
+            "compatibility_verification_sha256",
+            "output_manifest_sha256",
+            "schema_lock_sha256",
+        ):
+            row[field] = VIEW_SHA
+        row["inverse_replay"]["raw_projection_sha256"] = VIEW_SHA
+        row["two_clean_build_digests"] = [VIEW_SHA, VIEW_SHA]
+        with self.assertRaisesRegex(lib.PipelineSchemaError, "enumerate every Stage 3 blocker"):
+            lib.validate_release_manifest(row, self.registry)
+
+    def test_63_not_published_state_cannot_claim_atomic_publication(self) -> None:
+        row = valid_release_manifest()
+        for field in (
+            "compatibility_verification_sha256",
+            "output_manifest_sha256",
+            "schema_lock_sha256",
+        ):
+            row[field] = VIEW_SHA
+        row["inverse_replay"]["raw_projection_sha256"] = VIEW_SHA
+        row["two_clean_build_digests"] = [VIEW_SHA, VIEW_SHA]
+        row["open_blocker_ids"] = sorted(lib._frozen_indexes(self.registry)["open_unresolved_ids"])
+        row["publication"]["atomic_same_filesystem_rename"] = True
+        with self.assertRaisesRegex(lib.PipelineSchemaError, "NOT_PUBLISHED"):
+            lib.validate_release_manifest(row, self.registry)
+
+    def test_64_package_validation_is_relocation_safe(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            relocated = Path(directory) / "relocated"
+            shutil.copytree(ROOT / "goal-4", relocated / "goal-4")
+            (relocated / "ref/A-New-Kind-of-Science-Repaired").mkdir(parents=True)
+            result = lib.validate_package(
+                relocated, schema_cli.EXPECTED_PIPELINE_SCHEMA_LOCK_SHA256
+            )
+            self.assertEqual(result["schema_count"], 13)
 
 
 if __name__ == "__main__":

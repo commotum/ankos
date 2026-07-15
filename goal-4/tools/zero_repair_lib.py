@@ -18,7 +18,6 @@ import os
 import secrets
 import shutil
 import stat
-import tempfile
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
@@ -530,6 +529,32 @@ def _file_record(path: str, role: str, payload: bytes) -> dict[str, Any]:
     }
 
 
+def _load_exact_independent_verifier(goal_root: Path) -> tuple[Any, str]:
+    """Load only the verifier declared by the active relocated Goal 4 root."""
+
+    verifier_path = goal_root / "tools/zero_repair_verify.py"
+    _assert_regular_input(verifier_path, label="declared independent verifier")
+    before = verifier_path.read_bytes()
+    before_sha256 = sha256_bytes(before)
+    module_name = f"_ankos_zero_repair_verify_{before_sha256}"
+    specification = importlib.util.spec_from_file_location(module_name, verifier_path)
+    require(
+        specification is not None and specification.loader is not None,
+        "cannot create exact independent-verifier import specification",
+    )
+    module = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(module)
+    declared_file = getattr(module, "__file__", None)
+    require(
+        isinstance(declared_file, str)
+        and _lexical_absolute(Path(declared_file)) == _lexical_absolute(verifier_path),
+        "executed verifier path differs from declared verifier",
+    )
+    after = verifier_path.read_bytes()
+    require(before == after, "declared verifier changed while importing")
+    return module, before_sha256
+
+
 def _make_tape_and_documents(snapshot: dict[str, Any], output: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     monolith: bytes = snapshot["monolith"]
     blocks: list[dict[str, Any]] = snapshot["blocks"]
@@ -734,18 +759,31 @@ def build_zero_repair(
 ) -> dict[str, Any]:
     snapshot = load_frozen_snapshot(repo_root, goal_root=goal_root, legacy_root=legacy_root)
     output = _validate_output_location(snapshot, output_root, must_be_absent=True)
-    parent_status = os.lstat(output.parent)
-    temporary = Path(
-        tempfile.mkdtemp(
-            prefix=f".{output.name}.zero-repair-private-",
-            dir=os.fspath(output.parent),
-        )
-    )
-    # mkdtemp creates 0700: keep the in-progress tree private until complete.
-    require(stat.S_IMODE(os.lstat(temporary).st_mode) == 0o700, "private build root mode drift")
+    parent_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_CLOEXEC", 0)
+    if hasattr(os, "O_NOFOLLOW"):
+        parent_flags |= os.O_NOFOLLOW
+    parent_fd = os.open(output.parent, parent_flags)
+    try:
+        parent_status = os.fstat(parent_fd)
+        _require_parent_path_identity(output.parent, parent_status)
+        temporary_name, temporary_status = _create_private_sibling(parent_fd, output.name, parent_status)
+    except BaseException:
+        os.close(parent_fd)
+        raise
+    temporary = output.parent / temporary_name
+    temporary_flags = parent_flags
+    temporary_fd: int | None = None
     promoted = False
     try:
+        temporary_fd = os.open(temporary_name, temporary_flags, dir_fd=parent_fd)
+        opened_temporary_status = os.fstat(temporary_fd)
+        require(
+            (opened_temporary_status.st_dev, opened_temporary_status.st_ino)
+            == (temporary_status.st_dev, temporary_status.st_ino),
+            "private build root changed while opening",
+        )
         tape_rows, document_records, file_records = _make_tape_and_documents(snapshot, temporary)
+        _require_parent_path_identity(output.parent, parent_status)
         tape_bytes = canonical_jsonl_bytes(tape_rows)
         _write_new_file(temporary, TAPE_RELATIVE, tape_bytes)
         inverse_payload = inverse_from_output(temporary, tape_rows, snapshot["documents"])
@@ -753,77 +791,269 @@ def build_zero_repair(
         manifest_bytes = canonical_json_bytes(manifest)
         _write_new_file(temporary, MANIFEST_RELATIVE, manifest_bytes)
         os.chmod(temporary, DIRECTORY_MODE)
-
-        # The oracle is intentionally implemented in a different module and
-        # imports none of this compiler.  Compiler self-consistency is not a
-        # sufficient condition for promotion.
-        from zero_repair_verify import (  # pylint: disable=import-outside-toplevel
-            IndependentVerificationError,
-            independently_validate_zero_repair,
-        )
-
+        _require_parent_path_identity(output.parent, parent_status)
+        verifier, verifier_sha256 = _load_exact_independent_verifier(snapshot["goal_root"])
         try:
-            result = independently_validate_zero_repair(
+            result = verifier.independently_validate_zero_repair(
                 repo_root,
                 temporary,
                 goal_root=goal_root,
                 legacy_root=legacy_root,
+                expected_runtime_sha256=verifier_sha256,
+                include_receipt=True,
             )
-        except IndependentVerificationError as error:
+        except verifier.IndependentVerificationError as error:
             raise ZeroRepairError(f"independent pre-promotion validation failed: {error}") from error
-
-        current_parent = os.lstat(output.parent)
-        require(
-            (current_parent.st_dev, current_parent.st_ino)
-            == (parent_status.st_dev, parent_status.st_ino),
-            "output parent changed during build",
+        receipt = result.pop("verification_receipt")
+        _require_parent_path_identity(output.parent, parent_status)
+        require(temporary_fd is not None, "private build descriptor is unavailable")
+        _recheck_verification_receipt(
+            temporary_fd,
+            temporary_status,
+            receipt,
         )
-        _assert_no_symlink_components(output.parent, label="output parent before promotion")
-        _atomic_rename_noreplace(temporary, output)
+        _require_parent_path_identity(output.parent, parent_status)
+        _atomic_rename_noreplace(parent_fd, temporary_name, output.name)
         promoted = True
         result["manifest_sha256"] = sha256_bytes(manifest_bytes)
         return result
     finally:
-        if not promoted and _path_exists(temporary):
-            status = os.lstat(temporary)
-            require(
-                stat.S_ISDIR(status.st_mode) and not stat.S_ISLNK(status.st_mode),
-                "refusing to clean an altered private build root",
-            )
-            shutil.rmtree(temporary)
+        try:
+            if not promoted:
+                _cleanup_original_private_tree(
+                    parent_fd,
+                    temporary_name,
+                    (temporary_status.st_dev, temporary_status.st_ino),
+                )
+        finally:
+            if temporary_fd is not None:
+                os.close(temporary_fd)
+            os.close(parent_fd)
 
 
-def _atomic_rename_noreplace(source: Path, target: Path) -> None:
-    """Atomically publish a complete directory without replacing a target.
+def _require_parent_path_identity(path: Path, expected: os.stat_result) -> None:
+    _assert_no_symlink_components(path, label="captured output parent")
+    current = os.lstat(path)
+    require(
+        stat.S_ISDIR(current.st_mode)
+        and (current.st_dev, current.st_ino) == (expected.st_dev, expected.st_ino),
+        "output parent path changed during build",
+    )
 
-    Linux ``renameat2(RENAME_NOREPLACE)`` closes the last target-creation race.
-    On platforms without that primitive, the explicit absence check plus
-    ``rename`` is the strongest stdlib fallback available.
-    """
 
-    require(_path_exists(source), "private build root disappeared before promotion")
-    require(not _path_exists(target), "output root appeared before promotion")
+def _create_private_sibling(
+    parent_fd: int,
+    target_name: str,
+    parent_status: os.stat_result,
+) -> tuple[str, os.stat_result]:
+    require(target_name not in {"", ".", ".."} and "/" not in target_name, "output basename is unsafe")
+    for _ in range(128):
+        name = f".{target_name}.zero-repair-private-{secrets.token_hex(12)}"
+        try:
+            os.mkdir(name, 0o700, dir_fd=parent_fd)
+        except FileExistsError:
+            continue
+        status = os.stat(name, dir_fd=parent_fd, follow_symlinks=False)
+        require(stat.S_ISDIR(status.st_mode), "private build root is not a directory")
+        require(stat.S_IMODE(status.st_mode) == 0o700, "private build root mode drift")
+        require(status.st_dev == parent_status.st_dev, "private build root is not on output filesystem")
+        return name, status
+    raise ZeroRepairError("could not allocate a fresh private build sibling")
+
+
+def _receipt_record_from_stat(
+    path: str,
+    kind: str,
+    status: os.stat_result,
+    sha256: str | None = None,
+) -> dict[str, Any]:
+    record: dict[str, Any] = {
+        "ctime_ns": status.st_ctime_ns,
+        "device": status.st_dev,
+        "inode": status.st_ino,
+        "mode": f"{stat.S_IMODE(status.st_mode):04o}",
+        "mtime_ns": status.st_mtime_ns,
+        "nlink": status.st_nlink,
+        "path": path,
+        "size": status.st_size,
+        "type": kind,
+    }
+    if sha256 is not None:
+        record["sha256"] = sha256
+    return record
+
+
+def _descriptor_inventory(root_fd: int, root_status: os.stat_result) -> dict[str, Any]:
+    records = [_receipt_record_from_stat(".", "DIRECTORY", os.fstat(root_fd))]
+    seen_inodes: set[tuple[int, int]] = set()
+    directory_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_CLOEXEC", 0)
+    file_flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
+    if hasattr(os, "O_NOFOLLOW"):
+        directory_flags |= os.O_NOFOLLOW
+        file_flags |= os.O_NOFOLLOW
+
+    def walk(directory_fd: int, prefix: str) -> None:
+        with os.scandir(directory_fd) as iterator:
+            names = sorted(entry.name for entry in iterator)
+        for name in names:
+            relative = f"{prefix}/{name}" if prefix else name
+            before = os.stat(name, dir_fd=directory_fd, follow_symlinks=False)
+            require(not stat.S_ISLNK(before.st_mode), f"pre-promotion tree contains a symlink: {relative}")
+            if stat.S_ISDIR(before.st_mode):
+                child_fd = os.open(name, directory_flags, dir_fd=directory_fd)
+                try:
+                    opened = os.fstat(child_fd)
+                    require(
+                        (opened.st_dev, opened.st_ino) == (before.st_dev, before.st_ino),
+                        f"pre-promotion directory changed while opening: {relative}",
+                    )
+                    walk(child_fd, relative)
+                    after = os.fstat(child_fd)
+                    require(
+                        _receipt_record_from_stat(relative, "DIRECTORY", opened)
+                        == _receipt_record_from_stat(relative, "DIRECTORY", after),
+                        f"pre-promotion directory mutated: {relative}",
+                    )
+                    records.append(_receipt_record_from_stat(relative, "DIRECTORY", after))
+                finally:
+                    os.close(child_fd)
+            elif stat.S_ISREG(before.st_mode):
+                require(before.st_nlink == 1, f"pre-promotion file has a hardlink: {relative}")
+                inode = (before.st_dev, before.st_ino)
+                require(inode not in seen_inodes, f"pre-promotion files share an inode: {relative}")
+                seen_inodes.add(inode)
+                file_fd = os.open(name, file_flags, dir_fd=directory_fd)
+                try:
+                    opened = os.fstat(file_fd)
+                    require(
+                        (opened.st_dev, opened.st_ino) == inode,
+                        f"pre-promotion file changed while opening: {relative}",
+                    )
+                    digest = hashlib.sha256()
+                    while True:
+                        chunk = os.read(file_fd, 1024 * 1024)
+                        if not chunk:
+                            break
+                        digest.update(chunk)
+                    after = os.fstat(file_fd)
+                    require(
+                        _receipt_record_from_stat(relative, "REGULAR_FILE", opened, digest.hexdigest())
+                        == _receipt_record_from_stat(relative, "REGULAR_FILE", after, digest.hexdigest()),
+                        f"pre-promotion file mutated: {relative}",
+                    )
+                    records.append(
+                        _receipt_record_from_stat(relative, "REGULAR_FILE", after, digest.hexdigest())
+                    )
+                finally:
+                    os.close(file_fd)
+            else:
+                raise ZeroRepairError(f"pre-promotion tree contains an unexpected filesystem type: {relative}")
+
+    walk(root_fd, "")
+    after_root = os.fstat(root_fd)
+    require(
+        (after_root.st_dev, after_root.st_ino) == (root_status.st_dev, root_status.st_ino),
+        "private build root identity changed before promotion",
+    )
+    records[0] = _receipt_record_from_stat(".", "DIRECTORY", after_root)
+    records.sort(key=lambda row: (row["path"], row["type"]))
+    return {
+        "boundary": "SAME_UID_NON_ADVERSARIAL_BETWEEN_FINAL_RECHECK_AND_RENAME",
+        "records": records,
+    }
+
+
+def _recheck_verification_receipt(
+    temporary_fd: int,
+    temporary_status: os.stat_result,
+    receipt: dict[str, Any],
+) -> None:
+    actual = _descriptor_inventory(temporary_fd, temporary_status)
+    require(actual == receipt, "pre-promotion tree differs from independent verification receipt")
+
+
+def _cleanup_original_private_tree(
+    parent_fd: int,
+    name: str,
+    expected_identity: tuple[int, int],
+) -> None:
+    try:
+        current = os.stat(name, dir_fd=parent_fd, follow_symlinks=False)
+    except FileNotFoundError:
+        return
+    require(
+        stat.S_ISDIR(current.st_mode)
+        and (current.st_dev, current.st_ino) == expected_identity,
+        "refusing to clean a substituted private build path",
+    )
+    directory_flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_CLOEXEC", 0)
+    if hasattr(os, "O_NOFOLLOW"):
+        directory_flags |= os.O_NOFOLLOW
+
+    def remove_contents(directory_fd: int) -> None:
+        with os.scandir(directory_fd) as iterator:
+            names = sorted(entry.name for entry in iterator)
+        for child_name in names:
+            child = os.stat(child_name, dir_fd=directory_fd, follow_symlinks=False)
+            if stat.S_ISDIR(child.st_mode) and not stat.S_ISLNK(child.st_mode):
+                child_fd = os.open(child_name, directory_flags, dir_fd=directory_fd)
+                try:
+                    opened = os.fstat(child_fd)
+                    require(
+                        (opened.st_dev, opened.st_ino) == (child.st_dev, child.st_ino),
+                        "cleanup child directory identity changed",
+                    )
+                    remove_contents(child_fd)
+                finally:
+                    os.close(child_fd)
+                again = os.stat(child_name, dir_fd=directory_fd, follow_symlinks=False)
+                require(
+                    (again.st_dev, again.st_ino) == (child.st_dev, child.st_ino),
+                    "cleanup child directory was substituted",
+                )
+                os.rmdir(child_name, dir_fd=directory_fd)
+            else:
+                os.unlink(child_name, dir_fd=directory_fd)
+
+    root_fd = os.open(name, directory_flags, dir_fd=parent_fd)
+    try:
+        opened_root = os.fstat(root_fd)
+        require(
+            (opened_root.st_dev, opened_root.st_ino) == expected_identity,
+            "cleanup root identity changed while opening",
+        )
+        remove_contents(root_fd)
+    finally:
+        os.close(root_fd)
+    current = os.stat(name, dir_fd=parent_fd, follow_symlinks=False)
+    require(
+        (current.st_dev, current.st_ino) == expected_identity,
+        "cleanup root was substituted",
+    )
+    os.rmdir(name, dir_fd=parent_fd)
+
+
+def _atomic_rename_noreplace(parent_fd: int, source_name: str, target_name: str) -> None:
+    """Rename relative to a captured parent FD, failing closed without renameat2."""
+
+    require(
+        all(name not in {"", ".", ".."} and "/" not in name for name in (source_name, target_name)),
+        "atomic-promotion basename is unsafe",
+    )
     libc = ctypes.CDLL(None, use_errno=True)
     renameat2 = getattr(libc, "renameat2", None)
-    if renameat2 is not None:
-        renameat2.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint]
-        renameat2.restype = ctypes.c_int
-        result = renameat2(
-            -100,
-            os.fsencode(source),
-            -100,
-            os.fsencode(target),
-            1,
-        )
-        if result == 0:
-            return
-        error_number = ctypes.get_errno()
-        if error_number not in {errno.ENOSYS, errno.EINVAL, errno.EOPNOTSUPP}:
-            if error_number in {errno.EEXIST, errno.ENOTEMPTY}:
-                raise ZeroRepairError("output root appeared before atomic promotion")
-            raise OSError(error_number, os.strerror(error_number), os.fspath(target))
-    require(not _path_exists(target), "output root appeared before fallback promotion")
-    os.rename(source, target)
+    require(renameat2 is not None, "renameat2(RENAME_NOREPLACE) is unavailable; refusing promotion")
+    renameat2.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint]
+    renameat2.restype = ctypes.c_int
+    result = renameat2(parent_fd, os.fsencode(source_name), parent_fd, os.fsencode(target_name), 1)
+    if result == 0:
+        return
+    error_number = ctypes.get_errno()
+    if error_number in {errno.EEXIST, errno.ENOTEMPTY}:
+        raise ZeroRepairError("output root appeared before atomic promotion")
+    if error_number in {errno.ENOSYS, errno.EINVAL, errno.EOPNOTSUPP}:
+        raise ZeroRepairError("renameat2(RENAME_NOREPLACE) is unavailable; refusing promotion")
+    raise OSError(error_number, os.strerror(error_number), target_name)
 
 
 def _expected_output_paths(snapshot: dict[str, Any]) -> tuple[set[str], set[str]]:
@@ -1027,37 +1257,45 @@ def _full_tree_records(root: Path) -> list[dict[str, Any]]:
         "comparison root is not a real directory",
     )
     require(stat.S_IMODE(root_status.st_mode) == DIRECTORY_MODE, "comparison root mode drift")
+    flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_CLOEXEC", 0)
+    if hasattr(os, "O_NOFOLLOW"):
+        flags |= os.O_NOFOLLOW
+    root_fd = os.open(root, flags)
+    try:
+        opened = os.fstat(root_fd)
+        require(
+            (opened.st_dev, opened.st_ino) == (root_status.st_dev, root_status.st_ino),
+            "comparison root changed while opening",
+        )
+        receipt = _descriptor_inventory(root_fd, opened)
+    finally:
+        os.close(root_fd)
     records: list[dict[str, Any]] = []
-    for directory, names, filenames in os.walk(root, topdown=True, followlinks=False):
-        names.sort()
-        filenames.sort()
-        directory_path = Path(directory)
-        if directory_path != root:
-            status = os.lstat(directory_path)
-            require(stat.S_ISDIR(status.st_mode) and not stat.S_ISLNK(status.st_mode), "comparison tree contains a non-directory")
-            require(stat.S_IMODE(status.st_mode) == DIRECTORY_MODE, "comparison directory mode drift")
+    for item in receipt["records"]:
+        if item["path"] == ".":
+            continue
+        if item["type"] == "DIRECTORY":
+            require(item["mode"] == "0755", "comparison directory mode drift")
             records.append(
                 {
-                    "mode": f"{stat.S_IMODE(status.st_mode):04o}",
-                    "path": directory_path.relative_to(root).as_posix(),
+                    "mode": item["mode"],
+                    "path": item["path"],
                     "type": "DIRECTORY",
                 }
             )
-        for filename in filenames:
-            path = directory_path / filename
-            status = os.lstat(path)
-            require(stat.S_ISREG(status.st_mode) and not stat.S_ISLNK(status.st_mode), "comparison tree contains an unexpected file type")
-            require(stat.S_IMODE(status.st_mode) == FILE_MODE, "comparison file mode drift")
-            require(status.st_nlink == 1, "comparison tree contains a hardlinked file")
+        elif item["type"] == "REGULAR_FILE":
+            require(item["mode"] == "0644", "comparison file mode drift")
             records.append(
                 {
-                    "byte_size": status.st_size,
-                    "mode": f"{stat.S_IMODE(status.st_mode):04o}",
-                    "path": path.relative_to(root).as_posix(),
-                    "sha256": sha256_file(path),
+                    "byte_size": item["size"],
+                    "mode": item["mode"],
+                    "path": item["path"],
+                    "sha256": item["sha256"],
                     "type": "REGULAR_FILE",
                 }
             )
+        else:
+            raise ZeroRepairError("comparison tree contains an unexpected filesystem type")
     require(records, "comparison root is empty")
     return sorted(records, key=lambda item: (item["path"], item["type"]))
 
@@ -1078,29 +1316,40 @@ def compare_zero_repair_trees(
         if repo_root is not None
         else _lexical_absolute(Path(__file__).parents[2])
     )
-    from zero_repair_verify import (  # pylint: disable=import-outside-toplevel
-        IndependentVerificationError,
-        independently_validate_zero_repair,
+    verification_goal = _resolve_override(
+        verification_repo,
+        goal_root,
+        PurePosixPath("goal-4"),
     )
-
+    verifier, verifier_sha256 = _load_exact_independent_verifier(verification_goal)
     try:
-        independently_validate_zero_repair(
+        verifier.independently_validate_zero_repair(
             verification_repo,
             first,
             goal_root=goal_root,
             legacy_root=legacy_root,
+            expected_runtime_sha256=verifier_sha256,
         )
-        independently_validate_zero_repair(
+        verifier.independently_validate_zero_repair(
             verification_repo,
             second,
             goal_root=goal_root,
             legacy_root=legacy_root,
+            expected_runtime_sha256=verifier_sha256,
         )
-    except IndependentVerificationError as error:
+    except verifier.IndependentVerificationError as error:
         raise ZeroRepairError(f"comparison root is not a validated zero-repair tree: {error}") from error
     first_records = _full_tree_records(first)
     second_records = _full_tree_records(second)
     require(first_records == second_records, "two clean zero-repair builds are not byte-identical")
+    # A second strict pass rejects entries or symlinks introduced after either
+    # independent validation or the first comparison scan.  The remaining
+    # boundary is a same-UID adversary racing after this final pass.
+    require(
+        _full_tree_records(first) == first_records
+        and _full_tree_records(second) == second_records,
+        "comparison tree changed during final strict scan",
+    )
     payload = canonical_json_bytes(first_records, terminal_lf=False)
     return {
         "file_and_directory_records": len(first_records),
