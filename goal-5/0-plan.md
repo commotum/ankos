@@ -166,6 +166,12 @@ and pinned fixed-layout source unless explicitly described as a review risk.
   after the closest complete paragraph beside it), without splitting printed
   prose. This is a documented canonical Markdown choice, not a claim that the
   two-dimensional page has one uniquely implied linear order.
+- When one or more full-page plates interrupt a prose paragraph in the raw
+  extraction, join the complete printed paragraph first, then serialize the
+  ordered plate group immediately after it. Preserve the source order and keep
+  each lead caption, continuation marker, image subgroup, and back caption with
+  the plate sequence it governs. This is likewise an explicit canonical
+  one-dimensional choice rather than an alteration of printed prose.
 - Four-chapter review batches are small enough to review carefully without
   losing continuity or skipping content.
 - A fresh second review plus targeted detectors can reach zero open OCR

@@ -41,6 +41,10 @@ Status: IN_PROGRESS
   adjacent paragraph when there is no reference. This preserves semantic
   association and uninterrupted prose; it is a canonical Markdown
   linearization of a two-dimensional float, not a uniquely printed order.
+- A full-page plate sequence that interrupts a raw-extracted sentence is
+  serialized after the complete printed prose paragraph. Ordered plates remain
+  together, with lead captions, continuation markers, component subgroups, and
+  back captions attached to the sequence they govern.
 - Title artwork, tables, formulas, code, captions, and text embedded in figures
   require direct visual inspection at sufficient zoom; `pdftotext` agreement
   cannot close them.

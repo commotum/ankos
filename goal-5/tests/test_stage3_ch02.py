@@ -29,10 +29,10 @@ class ChapterTwoTests(unittest.TestCase):
 
     def test_first_pass_corrections_are_exact_and_source_verified(self) -> None:
         relevant = [row for row in self.corrections if row["document_id"] == "CH02"]
-        self.assertEqual(len(relevant), 17)
+        self.assertEqual(len(relevant), 22)
         self.assertEqual(
             [row["id"] for row in relevant],
-            [f"G5-C-{number:04d}" for number in range(107, 124)],
+            [f"G5-C-{number:04d}" for number in range(107, 129)],
         )
         self.assertTrue(
             all(row["verification_status"] == "SOURCE_VERIFIED" for row in relevant)
@@ -89,6 +89,18 @@ class ChapterTwoTests(unittest.TestCase):
         self.assertNotIn("formula  $", self.rendered)
         self.assertNotIn("$ . In", self.rendered)
         self.assertIn(
+            "![](_page_40_Picture_6.jpeg)\n\n"
+            "![](_page_40_Rule_90.jpeg)\n\n"
+            "A cellular automaton",
+            self.rendered,
+        )
+        self.assertIn(
+            "![](_page_42_Figure_4.jpeg)\n\n"
+            "![](_page_42_Rule_30.jpeg)\n\n"
+            "A cellular automaton",
+            self.rendered,
+        )
+        self.assertIn(
             "cells a total of about 12 million times. <sup>▶</sup>\n\n"
             "![](_page_48_Picture_2.jpeg)",
             self.rendered,
@@ -96,20 +108,49 @@ class ChapterTwoTests(unittest.TestCase):
         self.assertEqual(self.rendered.count("<sup>▶</sup>"), 1)
         self.assertEqual(self.rendered.count("<sup>◀</sup>"), 1)
 
-    def test_source_added_opener_is_pinned_and_mutation_checked(self) -> None:
-        self.assertEqual(len(self.added_assets), 1)
+    def test_source_added_assets_are_pinned_and_mutation_checked(self) -> None:
+        self.assertEqual(len(self.added_assets), 3)
+        expected = {
+            "G5-A-0001": (
+                "pdf:0039; chapter opener panel",
+                "_page_38_Chapter_Opener.jpeg",
+                "0a78f582ac67a861dc64c70ea8905beebd95de3622e4e19949d7ec2002f51d79",
+                (154, 200),
+            ),
+            "G5-A-0002": (
+                "pdf:0041; rule-90 figure rule strip",
+                "_page_40_Rule_90.jpeg",
+                "fe3574d9b23b76d477752ab6aca234b3f9872d1f1f4f5f4eb96b973c52fe3b1e",
+                (376, 39),
+            ),
+            "G5-A-0003": (
+                "pdf:0043; rule-30 figure rule strip",
+                "_page_42_Rule_30.jpeg",
+                "e2b626682ac2c02fbff5eb5eb91e0ebd1f1f1e8b38eaf8b36ed572c45417f1b8",
+                (376, 39),
+            ),
+        }
+        self.assertEqual({row["id"] for row in self.added_assets}, set(expected))
+        for asset in self.added_assets:
+            location, name, digest, dimensions = expected[asset["id"]]
+            with self.subTest(asset=asset["id"]):
+                self.assertEqual(asset["document_id"], "CH02")
+                self.assertEqual(asset["authoritative_location"], location)
+                self.assertEqual(asset["asset_sha256"], digest)
+                self.assertEqual(
+                    (asset["width_px"], asset["height_px"]), dimensions
+                )
+                source = build.REPO_ROOT / Path(asset["asset_relative_path"])
+                output = build.OUTPUT_ROOT / Path(self.path).parent / source.name
+                payload = source.read_bytes()
+                self.assertEqual(source.name, name)
+                self.assertEqual(build.sha256(payload), digest)
+                self.assertEqual(build.jpeg_dimensions(payload), dimensions)
+                self.assertEqual(output.read_bytes(), payload)
+                self.assertEqual(self.rendered.count(f"![]({name})"), 1)
+
         opener = self.added_assets[0]
         self.assertEqual(opener["id"], "G5-A-0001")
-        self.assertEqual(opener["document_id"], "CH02")
-        self.assertEqual(opener["authoritative_location"], "pdf:0039; chapter opener panel")
-        self.assertEqual((opener["width_px"], opener["height_px"]), (154, 200))
-        source = build.REPO_ROOT / Path(opener["asset_relative_path"])
-        output = build.OUTPUT_ROOT / Path(self.path).parent / source.name
-        payload = source.read_bytes()
-        self.assertEqual(build.sha256(payload), opener["asset_sha256"])
-        self.assertEqual(build.jpeg_dimensions(payload), (154, 200))
-        self.assertEqual(output.read_bytes(), payload)
-        self.assertEqual(self.rendered.count(f"![]({source.name})"), 1)
 
         mutations = []
         missing_reason = copy.deepcopy(self.added_assets)
@@ -136,6 +177,52 @@ class ChapterTwoTests(unittest.TestCase):
             with self.subTest(index=index):
                 with self.assertRaises(build.BuildError):
                     build.validate_added_assets(self.documents, self.images, rows)
+
+    def test_full_page_plates_do_not_split_prose_and_keep_source_order(self) -> None:
+        rule_30_sentence = (
+            "For even though it may be impossible to predict what color will occur "
+            "at any specific step, one still knows for example that black and white "
+            "will on average always occur equally often."
+        )
+        rule_110_sentence = (
+            "The only sure way to answer these questions, it seems, is just to run "
+            "the cellular automaton for as many steps as are needed, and to watch "
+            "what happens."
+        )
+        self.assertIn(rule_30_sentence, self.rendered)
+        self.assertIn(rule_110_sentence, self.rendered)
+        self.assertNotIn("predict what\n\n![](_page_44", self.rendered)
+        self.assertNotIn("and to\n\n![](_page_47", self.rendered)
+
+        ordered_markers = (
+            rule_110_sentence,
+            "![](_page_47_Figure_1.jpeg)",
+            "![](_page_47_Figure_2.jpeg)",
+            "<sup>▶</sup>",
+            "![](_page_48_Picture_2.jpeg)",
+            "![](_page_49_Picture_1.jpeg)",
+            "![](_page_50_Picture_1.jpeg)",
+            "![](_page_51_Picture_1.jpeg)",
+            "![](_page_52_Picture_1.jpeg)",
+            "![](_page_53_Picture_2.jpeg)",
+            "<sup>◀</sup> A single picture of the behavior from the previous five pages.",
+            "However certain one might be",
+        )
+        positions = [self.rendered.index(marker) for marker in ordered_markers]
+        self.assertEqual(positions, sorted(positions))
+        for image in (
+            "_page_44_Picture_1.jpeg",
+            "_page_45_Picture_2.jpeg",
+            "_page_47_Figure_1.jpeg",
+            "_page_47_Figure_2.jpeg",
+            "_page_48_Picture_2.jpeg",
+            "_page_49_Picture_1.jpeg",
+            "_page_50_Picture_1.jpeg",
+            "_page_51_Picture_1.jpeg",
+            "_page_52_Picture_1.jpeg",
+            "_page_53_Picture_2.jpeg",
+        ):
+            self.assertEqual(self.rendered.count(f"![]({image})"), 1)
 
     def test_first_pass_coverage_is_recorded_without_claiming_a_second(self) -> None:
         rows = validate.validate_coverage(self.documents)
