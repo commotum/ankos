@@ -16,8 +16,9 @@ Status: IN_PROGRESS
   1 and Chapter 3 opener images and the textual Chapter 2 and Chapter 4 opener
   numbers belong to the chapters they introduce.
 - `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`, and `CH02` are two-pass
-  complete over PDF pages 1–66 with 132 guarded corrections. `CH03`–`CH04`
-  remain open.
+  complete over PDF pages 1–66 with 132 guarded corrections. `CH03` has a
+  complete first pass over PDF pages 67–130 with 61 more guarded corrections
+  and is undergoing its independent second pass. `CH04` remains open.
 - Source-review packs exist under `/tmp/ankos-stage3-publication/`,
   `/tmp/ankos-stage3-preface/`, `/tmp/ankos-stage3-ch02/`, and
   `/tmp/ankos-stage3-ch03/`. Page rasters are authoritative; native PDF text is
@@ -106,8 +107,8 @@ For each document:
 | 2 | `CH01` | 17–38 | final rebuilt document and assets | COMPLETE | all 27 verified; no new discrepancy | closed |
 | 1 | `CH02` | 39–66 | `79330 → 119521` | COMPLETE | `G5-C-0107`–`G5-C-0132` | closed |
 | 2 | `CH02` | 39–66 | final rebuilt document | COMPLETE | all 26 verified; no new discrepancy | closed |
-| 1 | `CH03` | 67–130 | `119521 → 199880` | IN_PROGRESS | pending first-pass ledger | `pdf:0067` |
-| 2 | `CH03` | 67–130 | final rebuilt document | NOT_STARTED | — | `pdf:0067` |
+| 1 | `CH03` | 67–130 | `119521 → 199880` | COMPLETE | `G5-C-0133`–`G5-C-0193` | closed |
+| 2 | `CH03` | 67–130 | final rebuilt document and assets | IN_PROGRESS | candidate SHA `f948d0c...` | `pdf:0067` |
 | 1 | `CH04` | 131–184 | `199880 → 355646` | NOT_STARTED | — | `pdf:0131` |
 | 2 | `CH04` | 131–184 | final rebuilt document | NOT_STARTED | — | `pdf:0131` |
 
@@ -253,5 +254,33 @@ Focused CommonMark/headless rendering, residual OCR and whitespace detectors,
 two byte-identical fresh normal builds, a strict zero-correction build, the
 complete 31-test suite, validation, legacy digest, and diff checks pass.
 
-Exact next action: begin the first sequential pass of `CH03` at `pdf:0067`, raw
-line 680 and byte 119521, continuing through `pdf:0130`.
+`CH03` received a complete forward first pass over all 64 PDF pages 67–130;
+PDF 130 is intentionally blank. Its 61 source-verified corrections
+`G5-C-0133`–`G5-C-0193` restore the logical heading hierarchy, source
+punctuation and emphasis, character-level technical notation, eleven false
+page/plate paragraph breaks, and canonical ordering for multipart figures and
+full-page plate sequences. The rules 100–139 plate omitted from the legacy
+extraction is restored as `G5-A-0004`. All 86 mapped visuals were inspected;
+two truncated/contaminated legacy crops use repaired-only overrides, and the
+page 118 symbolic-system figure now masks its raster-only caption while the
+exact caption appears once as searchable live Markdown.
+
+The rebuilt Chapter 3 document has SHA-256
+`f948d0c45b8bec06b78e72e8e8fa8f807c37f7a0fd29d4b4dc43550bc8768f`, 87
+unique image references, 12 logical subsection headings, 20 balanced math
+spans, and no unexplained OCR, Unicode, whitespace, Markdown, vocabulary, or
+manifest detector hit. Backward searches found no recurrence of the new
+defect patterns in the four closed documents. Seven focused Chapter 3 tests
+and all 38 cumulative tests pass. CommonMark/headless rendering produced an
+85-page artifact with all images loaded. Two fresh normal builds and the
+default output have the identical 1,479-file tree digest
+`7bfdb64de9ab3cbe8ba50db64a11d87f593ca8beb837882188b60bb7b4b2ef26`;
+the strict zero-correction build validates with 1,444 images. The immutable
+legacy tree remains
+`b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`
+over 1,463 files.
+
+Exact next action: finish the independent second sequential pass of `CH03`
+from `pdf:0067` through `pdf:0130` against the rebuilt SHA above. If it is
+clean, mark `CH03` `YES/YES`, rerun the closure gates, and begin `CH04` at
+`pdf:0131`, raw line 1,368 and byte 199880.

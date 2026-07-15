@@ -280,9 +280,10 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, all 1,444 legacy JPEGs plus three source-backed repaired-only
-  JPEGs, and generated README/Contents files. It now includes the first
-  source-verified corrections but is not a complete OCR-corrected edition.
+  documents, 1,444 mapped image positions (four using source-backed
+  repaired-only overrides), four source-added images, and generated
+  README/Contents files. It now includes 193 guarded source-verified
+  corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
   intentional historical cleanup references to Goal 4 and intentional repaired
@@ -324,8 +325,16 @@ Neither file is a generalized workflow database.
   full-page plate sequences plus the rule-90 figure group were canonically
   serialized after complete prose paragraphs. The final source/candidate
   sequence matched at 6,685 tokens with no punctuation, technical, visual, or
-  caption discrepancy. Stage 3 now continues with `CH03` at `pdf:0067`, raw
-  line 680 and byte 119521.
+  caption discrepancy.
+- `CH03` has completed its forward first pass over all 64 PDF pages 67–130,
+  including the intentional blank final page. Its 61 guarded corrections are
+  `G5-C-0133`–`G5-C-0193`; all 86 mapped visuals were checked, one omitted
+  rules plate was restored, and three damaged/raster-text images use pinned
+  repaired-only overrides. The rebuilt document has 87 unique image
+  references. Focused tests, residual detectors, rendering, deterministic
+  builds, and legacy checks pass; its independent second pass is in progress
+  against Markdown SHA-256
+  `f948d0c45b8bec06b78e72e8e8fa8f807c37f7a0fd29d4b4dc43550bc8768f`.
 
 ## Stage Status
 
