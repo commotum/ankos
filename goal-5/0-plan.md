@@ -316,13 +316,16 @@ Neither file is a generalized workflow database.
   Its 27 guarded corrections are `G5-C-0080`–`G5-C-0106`; the exact prose-token
   sequence, punctuation, hierarchy, emphasis, paragraph joins, three figures,
   captions, and source-faithful repaired-only opener were rechecked.
-- `CH02` has a complete forward first pass plus pre-closure residual review over
-  PDF pages 39–66. Its 26 guarded corrections are
+- `CH02` is complete after a forward first pass, pre-closure residual review,
+  and independent clean second pass over PDF pages 39–66. Its 26 guarded
+  corrections are
   `G5-C-0107`–`G5-C-0132`; all 19 inherited figures/captions
   were checked, three source-backed missing visuals were restored, and two
   full-page plate sequences plus the rule-90 figure group were canonically
-  serialized after complete prose paragraphs. Its independent second pass
-  begins next at `pdf:0039`.
+  serialized after complete prose paragraphs. The final source/candidate
+  sequence matched at 6,685 tokens with no punctuation, technical, visual, or
+  caption discrepancy. Stage 3 now continues with `CH03` at `pdf:0067`, raw
+  line 680 and byte 119521.
 
 ## Stage Status
 
