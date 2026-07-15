@@ -1882,6 +1882,15 @@ def validate_navigation(
             and asset["release_path"] != record["destination_path"]
         ):
             raise PipelineSchemaError("resolved destination asset does not join a figure asset row")
+    if (
+        state == "RESOLVED"
+        and record["destination_path"] is not None
+        and record["destination_anchor_id"] is None
+        and record["destination_asset_id"] is None
+        and record_type != "LEGACY_COMPATIBILITY_ROUTE"
+        and record["destination_path"] not in indexes["documents_by_path"]
+    ):
+        raise PipelineSchemaError("resolved navigation destination path does not join a canonical document")
 
 
 def validate_navigation_set(
@@ -2507,7 +2516,10 @@ def _validate_release_ledgers(
 
     by_path: dict[str, list[Mapping[str, Any]]] = {}
     for registration in contract["ledgers"]:
-        rows = load_jsonl(registry.repo_root / registration["path"], require_cj1=True)
+        ledger_path = registry.repo_root / registration["path"]
+        if not ledger_path.is_file() or ledger_path.is_symlink():
+            raise PipelineSchemaError(f"registered ledger is absent or non-regular: {registration['path']}")
+        rows = load_jsonl(ledger_path, require_cj1=True)
         if not rows and not registration["empty_allowed"]:
             raise PipelineSchemaError(f"registered ledger is empty but empty_allowed is false: {registration['path']}")
         for row in rows:

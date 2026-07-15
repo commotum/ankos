@@ -165,6 +165,47 @@ def valid_repair() -> dict[str, object]:
     return row
 
 
+def valid_overlay_binding(registry):
+    row = valid_repair()
+    row["repair_class"] = "PROSE_OCR"
+    row["risk"]["class_tags"] = ["PROSE_OCR"]
+    row["target"] = {
+        "canonical_document_id": "PUBLICATION_AND_CONTENTS",
+        "node_ids": ["NODE-1"],
+        "path": "CANONICAL/FRONT-MATTER/00-Publication-and-Contents.md",
+        "role": "CANONICAL_AUTHOR_TEXT",
+    }
+    raw_row = lib._frozen_indexes(registry)["blocks_by_id"]["RAW-000001"]
+    meta = overlay_lib.OperationMeta(
+        repair_id=row["repair_id"],
+        target_id="PUBLICATION_AND_CONTENTS",
+        target_path=row["target"]["path"],
+        raw_source_id="RAW-000001",
+        raw_source_span_sha256=GUARD_SHA,
+        raw_source_row_sha256=hashlib.sha256(lib.canonical_json_bytes(raw_row)).hexdigest(),
+        target_role="CANONICAL_AUTHOR_TEXT",
+        repair_class="PROSE_OCR",
+        expected_target_sha256=row["target_state_guards"]["before_sha256"],
+        expected_result_sha256=row["target_state_guards"]["after_sha256"],
+        creator_principal_id="creator",
+        workflow_state="CLOSED",
+        final_disposition="APPLIED_MECHANICALLY_PROVEN",
+    )
+    operation_row = overlay_lib.Move(
+        meta=meta,
+        block_id="RAW-000001",
+        expected_block_sha256=raw_row["raw_sha256"],
+        source_left_id=None,
+        source_right_id="RAW-000002",
+        destination_left_id=None,
+        destination_right_id="RAW-000003",
+        expected_source_adjacency_count=1,
+        expected_destination_adjacency_count=1,
+    )
+    row["operation_projection_sha256"] = overlay_lib.operation_projection_sha256(operation_row)
+    return row, operation_row
+
+
 def endpoint(kind: str, projection_sha: str, *, role: str | None, path: str | None) -> dict[str, object]:
     span = None if kind in {"GENERATED_NONE", "TYPED_EXCLUSION"} else {"end_byte_exclusive": 1, "sha256": ZERO, "start_byte": 0}
     return {
@@ -437,6 +478,52 @@ def valid_compatibility() -> dict[str, object]:
     }
 
 
+def receipt_hash(row: dict[str, object]) -> str:
+    payload = {key: value for key, value in row.items() if key != "receipt_sha256"}
+    return hashlib.sha256(lib.canonical_json_bytes(payload)[:-1]).hexdigest()
+
+
+def valid_compatibility_observation(record: dict[str, object]) -> dict[str, object]:
+    oracle_receipts = []
+    for evidence in record["oracle_results"]:
+        row = {
+            "argv": evidence["argv"],
+            "exit_code": evidence["exit_code"],
+            "finished_at": "2026-07-14T12:00:01Z",
+            "framed_behavior_sha256": evidence["current_framed_behavior_sha256"],
+            "oracle_result_sha256": hashlib.sha256(lib.canonical_json_bytes(evidence)).hexdigest(),
+            "path": evidence["path"],
+            "receipt_sha256": ZERO,
+            "runner_command": ["python3", "goal-4/tools/capture_compatibility.py"],
+            "started_at": "2026-07-14T12:00:00Z",
+            "status_kind": evidence["status_kind"],
+            "stderr_sha256": evidence["stderr_sha256"],
+            "stdout_sha256": evidence["stdout_sha256"],
+        }
+        row["receipt_sha256"] = receipt_hash(row)
+        oracle_receipts.append(row)
+    receipt = {
+        "aggregate_behavior_digest": record["aggregate_behavior_digest"],
+        "compatibility_record_sha256": hashlib.sha256(lib.canonical_json_bytes(record)).hexdigest(),
+        "contract_id": "ANKOS-COMPATIBILITY-OBSERVATION-1",
+        "dependency_fingerprint": record["dependency_fingerprint"],
+        "execution_environment_sha256": VIEW_SHA,
+        "legacy_tree_digest": record["legacy_tree_digest"],
+        "observation_id": "COMPATIBILITY-OBSERVATION-1",
+        "observed_at": "2026-07-14T12:00:02Z",
+        "oracle_receipts": oracle_receipts,
+        "receipt_sha256": ZERO,
+        "runner_principal_id": "runner",
+        "runner_session_id": "runner-session",
+        "schema_version": "1.0.0",
+        "sentinel_fixture_results_sha256": hashlib.sha256(
+            lib.canonical_json_bytes(record["sentinel_fixture_results"])[:-1]
+        ).hexdigest(),
+    }
+    receipt["receipt_sha256"] = receipt_hash(receipt)
+    return receipt
+
+
 def valid_corpus_manifest() -> dict[str, object]:
     guardrails = lib.load_json(ROOT / "goal-4/guardrails.json", require_cj1=False)
     files = []
@@ -609,8 +696,8 @@ class PipelineSchemaTests(unittest.TestCase):
         row["risk"]["class_tags"] = ["PROSE_OCR"]
         row["target"] = {"canonical_document_id": "CH01", "node_ids": ["NODE-1"], "path": "CANONICAL/CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md", "role": "CANONICAL_AUTHOR_TEXT"}
         row["after_projection"] = projection("y")
-        row["forward_operation"] = operation("REPLACE", "x", "y", "y")
-        row["inverse_operation"] = operation("REPLACE", "y", "x", "x")
+        row["forward_operation"]["expected_output_projection_sha256"] = projection("y")["sha256"]
+        row["inverse_operation"]["expected_input_projection_sha256"] = projection("y")["sha256"]
         row["workflow"] = closed_workflow("APPLIED_WITNESS_VERIFIED")
         self.expect_failure(lib.validate_repair, row, self.registry)
 
@@ -1054,54 +1141,134 @@ class PipelineSchemaTests(unittest.TestCase):
             self.assertIn("Stage 4 pipeline schema validation: PASS", completed.stdout)
 
     def test_65_repair_row_hash_and_overlay_projection_bridge_are_exact(self) -> None:
-        row = valid_repair()
-        row["repair_class"] = "PROSE_OCR"
-        row["risk"]["class_tags"] = ["PROSE_OCR"]
-        row["target"] = {
-            "canonical_document_id": "PUBLICATION_AND_CONTENTS",
-            "node_ids": ["NODE-1"],
-            "path": "CANONICAL/FRONT-MATTER/00-Publication-and-Contents.md",
-            "role": "CANONICAL_AUTHOR_TEXT",
-        }
-        raw_row = lib._frozen_indexes(self.registry)["blocks_by_id"]["RAW-000001"]
-        meta = overlay_lib.OperationMeta(
-            repair_id=row["repair_id"],
-            target_id="PUBLICATION_AND_CONTENTS",
-            target_path=row["target"]["path"],
-            raw_source_id="RAW-000001",
-            raw_source_span_sha256=GUARD_SHA,
-            raw_source_row_sha256=hashlib.sha256(lib.canonical_json_bytes(raw_row)).hexdigest(),
-            target_role="CANONICAL_AUTHOR_TEXT",
-            repair_class="PROSE_OCR",
-            expected_target_sha256=VIEW_SHA,
-            expected_result_sha256=VIEW_SHA,
-            creator_principal_id="creator",
-            workflow_state="CLOSED",
-            final_disposition="APPLIED_MECHANICALLY_PROVEN",
-        )
-        operation_row = overlay_lib.Move(
-            meta=meta,
-            block_id="RAW-000001",
-            expected_block_sha256=raw_row["raw_sha256"],
-            source_left_id=None,
-            source_right_id="RAW-000002",
-            destination_left_id=None,
-            destination_right_id="RAW-000003",
-            expected_source_adjacency_count=1,
-            expected_destination_adjacency_count=1,
-        )
-        row["operation_projection_sha256"] = overlay_lib.operation_projection_sha256(
-            operation_row
-        )
+        row, operation_row = valid_overlay_binding(self.registry)
         binding = lib.validate_overlay_operation_binding(
             row, self.registry, operation_row
         )
         self.assertTrue(binding.overlay_operation_bound)
         self.assertEqual(binding.repair_row_sha256, lib.canonical_repair_row_sha256(row))
+        self.assertEqual(binding.expected_target_sha256, row["target_state_guards"]["before_sha256"])
+        self.assertEqual(binding.expected_result_sha256, row["target_state_guards"]["after_sha256"])
+        self.assertEqual(binding.forward_payload_sha256, row["forward_operation"]["payload_sha256"])
+        self.assertEqual(binding.inverse_payload_sha256, row["inverse_operation"]["payload_sha256"])
         row["operation_projection_sha256"] = EMPTY_SHA
         self.expect_failure(
             lib.validate_overlay_operation_binding, row, self.registry, operation_row
         )
+
+    def test_66_raw_preserved_requires_concrete_output_and_ast_join(self) -> None:
+        row = valid_raw_provenance()
+        self.expect_failure(lib.validate_provenance, row, self.registry)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            path = output / row["target"]["path"]
+            path.parent.mkdir(parents=True)
+            path.write_bytes(b"X" + GUARD_BYTES)
+            self.expect_failure(
+                lib.validate_provenance,
+                row,
+                self.registry,
+                output_root=output,
+                ast_nodes=[valid_ast_node("NODE-RAW-1")],
+            )
+
+    def test_67_complete_provenance_is_bidirectional_not_source_only(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            row = valid_raw_provenance()
+            path = output / row["target"]["path"]
+            path.parent.mkdir(parents=True)
+            path.write_bytes(GUARD_BYTES)
+            with self.assertRaisesRegex(lib.PipelineSchemaError, "exact ordered raw-block coverage"):
+                lib.validate_provenance_set(
+                    [row],
+                    self.registry,
+                    require_complete_raw_coverage=True,
+                    output_root=output,
+                    ast_nodes=[valid_ast_node("NODE-RAW-1")],
+                )
+
+    def test_68_overlay_bridge_binds_target_guards_and_typed_fields(self) -> None:
+        row, operation_row = valid_overlay_binding(self.registry)
+        row["target_state_guards"]["before_sha256"] = EMPTY_SHA
+        row["evidence"]["mechanical"][0]["evidence_sha256"] = lib.mechanical_proof_sha256(row)
+        row["verification_results"] = [
+            {"check_id": check, "details_sha256": lib.mechanical_check_sha256(row, check), "passed": True}
+            for check in lib.MECHANICAL_CHECK_IDS
+        ]
+        self.expect_failure(
+            lib.validate_overlay_operation_binding, row, self.registry, operation_row
+        )
+        row, operation_row = valid_overlay_binding(self.registry)
+        row["forward_operation"]["payload"]["operation_fields"]["destination_right_id"] = "RAW-000004"
+        row["inverse_operation"]["payload"]["operation_fields"]["source_right_id"] = "RAW-000004"
+        for key in ("forward_operation", "inverse_operation"):
+            row[key]["payload_sha256"] = payload_hash(row[key]["payload"])
+        row["evidence"]["mechanical"][0]["evidence_sha256"] = lib.mechanical_proof_sha256(row)
+        row["verification_results"] = [
+            {"check_id": check, "details_sha256": lib.mechanical_check_sha256(row, check), "passed": True}
+            for check in lib.MECHANICAL_CHECK_IDS
+        ]
+        self.expect_failure(
+            lib.validate_overlay_operation_binding, row, self.registry, operation_row
+        )
+
+    def test_69_technical_output_span_cannot_be_absent_or_arbitrary(self) -> None:
+        row = valid_technical()
+        self.expect_failure(lib.validate_technical, row, self.registry)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            path = output / row["output_path"]
+            path.parent.mkdir(parents=True)
+            path.write_bytes(GUARD_BYTES)
+            row["output_span"]["start_byte"] = 1_000_000_000
+            row["output_span"]["end_byte_exclusive"] = 1_000_000_000 + len(GUARD_BYTES)
+            self.expect_failure(
+                lib.validate_technical,
+                row,
+                self.registry,
+                output_root=output,
+                ast_nodes=[valid_ast_node("NODE-TECHNICAL-1")],
+            )
+
+    def test_70_navigation_enforces_workflow_sequence_and_destination(self) -> None:
+        anchor = valid_navigation()
+        ast = [valid_ast_node("NODE-NAV-1", anchor_id=anchor["anchor_id"])]
+        anchor["workflow"]["events"][1]["sequence"] = 9
+        self.expect_failure(lib.validate_navigation, anchor, self.registry, ast_nodes=ast)
+        anchor = valid_navigation()
+        anchor["sequence"] = 2
+        self.expect_failure(lib.validate_navigation_set, [anchor], self.registry, ast_nodes=ast)
+        link = valid_navigation()
+        link.update({"anchor_id": None, "link_kind": "NEXT", "record_type": "LINK"})
+        self.expect_failure(lib.validate_navigation, link, self.registry, ast_nodes=ast)
+
+    def test_71_compatibility_needs_separate_observation_for_release_evidence(self) -> None:
+        record = valid_compatibility()
+        lib.validate_compatibility(record, self.registry)
+        receipt = valid_compatibility_observation(record)
+        lib.validate_compatibility_observation(record, receipt, self.registry)
+        receipt["oracle_receipts"][0]["stdout_sha256"] = VIEW_SHA
+        receipt["oracle_receipts"][0]["receipt_sha256"] = receipt_hash(receipt["oracle_receipts"][0])
+        receipt["receipt_sha256"] = receipt_hash(receipt)
+        self.expect_failure(
+            lib.validate_compatibility_observation, record, receipt, self.registry
+        )
+
+    def test_72_release_ledger_validation_fails_closed_on_absent_registry_files(self) -> None:
+        self.expect_failure(
+            lib._validate_release_ledgers,
+            self.registry,
+            self.contract,
+            output_root=None,
+            ast_nodes=[],
+        )
+
+    def test_73_release_schema_rejects_boolean_only_execution_claims(self) -> None:
+        row = valid_release_manifest()
+        row["inverse_replay"]["passed"] = True
+        row["rollback"]["verified"] = True
+        self.expect_failure(lib.validate_release_manifest, row, self.registry)
 
 
 if __name__ == "__main__":

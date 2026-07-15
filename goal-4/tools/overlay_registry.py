@@ -32,7 +32,7 @@ WITNESS_LOCK_SHA256 = "f348e4dd0ebf328c48066696eb70359d954e07cbdfd7b7fd827286e32
 GUARDRAILS_SHA256 = "ba5357b6172c5740ed799bf53d65aa401c53750b0f5dc6ccc901d4149e5225cb"
 STRUCTURE_LEDGER_SHA256 = "6f9891417f458ca1e40385082b4f230e780d72362a783f35e11648082a743d49"
 MONOLITH_SHA256 = "55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20"
-PIPELINE_SCHEMA_LOCK_SHA256 = "08500f6ba6a5f19328c9d3a3b90a43ab378964760a900f786300d539aa63847d"
+PIPELINE_SCHEMA_LOCK_SHA256 = "6be464a16529c5451ba2d8f15871804f32c79c5e217fc9f1c9a2b88dcaac6c37"
 
 LEGACY_ROOT = "ref/A-New-Kind-of-Science"
 MONOLITH_PATH = f"{LEGACY_ROOT}/A-New-Kind-of-Science.md"
@@ -529,13 +529,26 @@ def load_frozen_overlay_state(repo_root: Path | str) -> overlay_lib.OverlayState
 
 
 def _registry_digest(snapshot: _Snapshot, bindings: Sequence[pipeline.ValidatedRepairBinding]) -> str:
+    repair_bindings = [
+        {
+            "expected_result_sha256": binding.expected_result_sha256,
+            "expected_target_sha256": binding.expected_target_sha256,
+            "forward_payload_sha256": binding.forward_payload_sha256,
+            "inverse_payload_sha256": binding.inverse_payload_sha256,
+            "operation_projection_sha256": binding.operation_projection_sha256,
+            "overlay_operation_bound": binding.overlay_operation_bound,
+            "repair_id": binding.repair_id,
+            "repair_row_sha256": binding.repair_row_sha256,
+        }
+        for binding in bindings
+    ]
     payload = {
         "baseline_lock_sha256": snapshot.baseline_lock_sha256,
         "guardrails_sha256": snapshot.guardrails_sha256,
         "monolith_sha256": snapshot.monolith_sha256,
         "pipeline_schema_lock_sha256": snapshot.pipeline_schema_lock_sha256,
         "repair_ledger_sha256": snapshot.repair_ledger.file_sha256,
-        "repair_rows": [binding.repair_row_sha256 for binding in bindings],
+        "repair_bindings": repair_bindings,
         "review_ledger_sha256": snapshot.review_ledger.file_sha256,
         "review_rows": list(snapshot.review_ledger.row_sha256s),
         "structure_ledger_sha256": snapshot.structure_ledger_sha256,
@@ -674,7 +687,19 @@ def mint_production_authority(
 
     registry_sha256 = _registry_digest(snapshot, bindings)
     proof_payload = {
+        "expected_result_sha256s": [
+            binding.expected_result_sha256 for binding in bindings
+        ],
+        "expected_target_sha256s": [
+            binding.expected_target_sha256 for binding in bindings
+        ],
+        "forward_payload_sha256s": [
+            binding.forward_payload_sha256 for binding in bindings
+        ],
         "initial_state_sha256": initial.sha256,
+        "inverse_payload_sha256s": [
+            binding.inverse_payload_sha256 for binding in bindings
+        ],
         "operation_projections": [binding.operation_projection_sha256 for binding in bindings],
         "registry_sha256": registry_sha256,
         "repair_row_sha256s": [binding.repair_row_sha256 for binding in bindings],
