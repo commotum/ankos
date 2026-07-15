@@ -932,3 +932,660 @@ def structure_ledger_rows(
             }
         )
     return rows, segments, blocks
+
+
+def extract_image_references(payload: bytes) -> list[dict[str, Any]]:
+    lines = split_raw_lines(payload)
+    references: list[dict[str, Any]] = []
+    for line in lines:
+        text = line["content"].decode("utf-8", errors="strict")
+        for match in IMAGE_PATTERN.finditer(text):
+            target = match.group(1).strip()
+            basename = PurePosixPath(target).name
+            require(basename.endswith(".jpeg"), "image reference suffix drift")
+            references.append(
+                {
+                    "basename": basename,
+                    "line": line["line"],
+                    "line_sha256": sha256_bytes(payload[line["byte_start"] : line["byte_end"]]),
+                    "target": target,
+                }
+            )
+    return references
+
+
+def _block_for_line(blocks: list[dict[str, Any]], line: int) -> str:
+    # There are only 20,430 blocks; a monotone index is unnecessary for this
+    # small, frozen census and this direct search is intentionally independent.
+    for block in blocks:
+        if block["start_line"] <= line <= block["end_line"]:
+            return block["raw_block_id"]
+    raise GuardrailError(f"image/sentinel line has no raw block: {line}")
+
+
+def build_image_reference_ledger(
+    root: Path,
+    manifest: dict[str, Any],
+    segments: list[dict[str, Any]],
+    blocks: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    legacy = root / LEGACY_RELATIVE
+    asset_rows = [row for row in manifest["raw_inputs"] if row["kind"] == "JPEG"]
+    asset_by_basename = {row["basename"]: row for row in asset_rows}
+    require(len(asset_by_basename) == len(asset_rows) == 1444, "asset basename map drift")
+    split_by_basename: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    split_reference_count = 0
+    for relative in ROUTING_MARKDOWN_PATHS:
+        path = legacy / Path(*PurePosixPath(relative).parts)
+        for reference in extract_image_references(path.read_bytes()):
+            split_reference_count += 1
+            candidate = path.parent / Path(*PurePosixPath(reference["target"]).parts)
+            require(candidate.is_file() and not candidate.is_symlink(), f"split image target does not resolve: {relative}:{reference['line']}")
+            resolved_relative = candidate.relative_to(legacy).as_posix()
+            require(resolved_relative == asset_by_basename[reference["basename"]]["relative_path"], "split image target/basename join drift")
+            split_by_basename[reference["basename"]].append(
+                {
+                    "line": reference["line"],
+                    "line_sha256": reference["line_sha256"],
+                    "path": relative,
+                    "resolved_asset_path": resolved_relative,
+                    "target": reference["target"],
+                }
+            )
+    require(split_reference_count == 1441, "split image-reference count drift")
+    require(len(split_by_basename) == 1441, "split image basenames are duplicated")
+    monolith_path = legacy / MONOLITH_RELATIVE
+    monolith_references = extract_image_references(monolith_path.read_bytes())
+    require(len(monolith_references) == 1444, "monolith image-reference count drift")
+    require(len({row["basename"] for row in monolith_references}) == 1444, "monolith image basenames are duplicated")
+    rows: list[dict[str, Any]] = []
+    for ordinal, reference in enumerate(monolith_references, 1):
+        asset = asset_by_basename.get(reference["basename"])
+        require(asset is not None, f"monolith image has no physical asset: {reference['basename']}")
+        segment = segment_for_line(segments, reference["line"])
+        direct = monolith_path.parent / Path(*PurePosixPath(reference["target"]).parts)
+        split_references = sorted(
+            split_by_basename.get(reference["basename"], []),
+            key=lambda item: (item["path"], item["line"]),
+        )
+        require(len(split_references) <= 1, f"duplicate split image reference: {reference['basename']}")
+        rows.append(
+            {
+                "asset_byte_size": asset["byte_size"],
+                "asset_file_id": asset["file_id"],
+                "asset_height": asset["image"]["height"],
+                "asset_relative_path": asset["relative_path"],
+                "asset_sha256": asset["sha256"],
+                "asset_width": asset["image"]["width"],
+                "basename": reference["basename"],
+                "canonical_document_id": segment["segment_id"],
+                "monolith_direct_target_resolves": direct.is_file(),
+                "monolith_line": reference["line"],
+                "monolith_line_sha256": reference["line_sha256"],
+                "monolith_target": reference["target"],
+                "raw_block_id": _block_for_line(blocks, reference["line"]),
+                "raw_reference_ordinal": ordinal,
+                "record_type": "IMAGE_REFERENCE",
+                "schema_version": BASELINE_SCHEMA_VERSION,
+                "split_references": split_references,
+                "split_status": "PRESENT" if split_references else "OMITTED",
+            }
+        )
+    require(not any(row["monolith_direct_target_resolves"] for row in rows), "a bare monolith image target unexpectedly resolves")
+    omissions = [
+        (row["raw_reference_ordinal"], row["monolith_line"], row["basename"])
+        for row in rows
+        if row["split_status"] == "OMITTED"
+    ]
+    require(
+        omissions
+        == [
+            (24, 680, "_page_66_Picture_0.jpeg"),
+            (134, 1711, "_page_154_Figure_2.jpeg"),
+            (135, 1744, "_page_156_Figure_1.jpeg"),
+        ],
+        "split image omissions/ordinals drift",
+    )
+    require(Counter(row["canonical_document_id"] for row in rows) == Counter({
+        "PREFACE": 2,
+        "CH01": 2,
+        "CH02": 20,
+        "CH03": 85,
+        "CH04": 60,
+        "CH05": 76,
+        "CH06": 100,
+        "CH07": 92,
+        "CH08": 43,
+        "CH09": 109,
+        "CH10": 68,
+        "CH11": 107,
+        "CH12": 58,
+        "GENERAL_NOTES": 1,
+        "N02": 54,
+        "N03": 40,
+        "N04": 71,
+        "N05": 59,
+        "N06": 64,
+        "N07": 88,
+        "N08": 32,
+        "N09": 70,
+        "N10": 91,
+        "N11": 14,
+        "N12": 38,
+    }), "per-segment image-reference census drift")
+    return rows
+
+
+def _routing_span_rows(manifest: dict[str, Any]) -> list[dict[str, Any]]:
+    input_by_path = {row["relative_path"]: row for row in manifest["raw_inputs"]}
+    rows: list[dict[str, Any]] = []
+    route_number = 1
+    for path in ROUTING_MARKDOWN_PATHS:
+        source = input_by_path[path]
+        specs = ROUTING_SPAN_SPECS[path]
+        require(specs[0][0] == 1 and specs[-1][1] == source["logical_line_count"], f"routing split-line edge drift: {path}")
+        for left, right in zip(specs, specs[1:]):
+            require(left[1] + 1 == right[0], f"routing split-line gap/overlap: {path}")
+        for split_start, split_end, raw_start, raw_end, owner, disposition in specs:
+            rows.append(
+                {
+                    "disposition": disposition,
+                    "raw_end_line": raw_end,
+                    "raw_start_line": raw_start,
+                    "route_id": f"ROUTE-{route_number:03d}",
+                    "source_path": path,
+                    "source_sha256": source["sha256"],
+                    "split_end_line": split_end,
+                    "split_start_line": split_start,
+                    "target_document_id": owner,
+                }
+            )
+            route_number += 1
+    require(len(rows) == 32, "routing disposition count drift")
+    require(sum(row["raw_start_line"] is not None for row in rows) == 31, "raw routing span count drift")
+    return rows
+
+
+def build_routing_baseline(
+    root: Path,
+    manifest: dict[str, Any],
+    image_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    input_by_path = {row["relative_path"]: row for row in manifest["raw_inputs"]}
+    routes = _routing_span_rows(manifest)
+    legacy = root / LEGACY_RELATIVE
+    routing_files = []
+    for path in ROUTING_MARKDOWN_PATHS:
+        row = input_by_path[path]
+        routing_files.append(
+            {
+                "byte_size": row["byte_size"],
+                "image_reference_count": len(extract_image_references((legacy / path).read_bytes())),
+                "logical_line_count": row["logical_line_count"],
+                "path": path,
+                "sha256": row["sha256"],
+                "terminal_lf": row["text"]["terminal_lf"],
+            }
+        )
+    atlas = input_by_path[ATLAS_RELATIVE]
+    monolith = input_by_path[MONOLITH_RELATIVE]
+    fence_counts = {
+        row["relative_path"]: sum(
+            1
+            for line in split_raw_lines((legacy / row["relative_path"]).read_bytes())
+            if re.match(rb"^ {0,3}(`{3,}|~{3,})", line["content"]) is not None
+        )
+        for row in manifest["raw_inputs"]
+        if row["kind"] == "MARKDOWN"
+    }
+    omissions = [
+        {
+            "asset_sha256": row["asset_sha256"],
+            "basename": row["basename"],
+            "canonical_document_id": row["canonical_document_id"],
+            "monolith_line": row["monolith_line"],
+            "raw_reference_ordinal": row["raw_reference_ordinal"],
+        }
+        for row in image_rows
+        if row["split_status"] == "OMITTED"
+    ]
+    return {
+        "atlas": {
+            "byte_size": atlas["byte_size"],
+            "image_reference_count": 0,
+            "logical_line_count": atlas["logical_line_count"],
+            "path": ATLAS_RELATIVE,
+            "role": "INTERPRETIVE_METADATA",
+            "sha256": atlas["sha256"],
+            "terminal_lf": atlas["text"]["terminal_lf"],
+            "textual_witness_allowed": False,
+        },
+        "consumer_compatibility_baseline": "goal-4/compatibility-baseline.json",
+        "fence_delimiters": {
+            "all_markdown_count": sum(fence_counts.values()),
+            "by_path": dict(sorted(fence_counts.items())),
+            "monolith_count": fence_counts[MONOLITH_RELATIVE],
+        },
+        "image_references": {
+            "all_monolith_targets_broken_relative_to_monolith": True,
+            "ledger_path": "goal-4/image-reference-ledger.jsonl",
+            "monolith_count": len(image_rows),
+            "monolith_source_sha256": monolith["sha256"],
+            "split_count": sum(row["image_reference_count"] for row in routing_files),
+            "split_omissions": omissions,
+        },
+        "nonrouting_link_shapes": {
+            "monolith_lines": [15347, 16774, 17356, 18922, 20385],
+            "status": "FORMULA_OR_CODE_TEXT_NOT_NAVIGATION",
+        },
+        "omitted_transition_or_malformed_raw_lines": [
+            {"lines": [398, 399], "reason": "PRINTED_TRANSITION_FURNITURE_NOT_IN_SPLITS"},
+            {"lines": [1368, 1369], "reason": "PRINTED_TRANSITION_FURNITURE_NOT_IN_SPLITS"},
+            {"lines": [2700, 2701], "reason": "PRINTED_TRANSITION_FURNITURE_NOT_IN_SPLITS"},
+            {"lines": [6586, 6587], "reason": "PRINTED_TRANSITION_FURNITURE_NOT_IN_SPLITS"},
+            {"lines": [12083, 12084], "reason": "MALFORMED_EMPTY_HEADING_AND_BLANK_OMITTED"},
+            {"lines": [12086, 12088], "reason": "MALFORMED_BLANK_OR_EMPTY_HEADING_RUN_OMITTED"},
+            {"lines": [17443, 17443], "reason": "BLANK_AT_NOMINAL_FILE_SEAM_OMITTED"},
+        ],
+        "routing_files": routing_files,
+        "routing_spans": routes,
+        "schema_version": BASELINE_SCHEMA_VERSION,
+        "textual_evidence_limit": "CORRELATED_DERIVATIVES_FOR_ROUTING_ONLY_NOT_TRANSCRIPTION_PROOF",
+    }
+
+
+def _rank_sha256(seed_hex: str, document_id: str, stratum: str, raw_block_id: str) -> str:
+    payload = (
+        bytes.fromhex(seed_hex)
+        + b"\0"
+        + document_id.encode("utf-8")
+        + b"\0"
+        + stratum.encode("utf-8")
+        + b"\0"
+        + raw_block_id.encode("utf-8")
+    )
+    return sha256_bytes(payload)
+
+
+def _hamilton_allocation(populations: dict[str, int], quota: int) -> dict[str, int]:
+    require(set(populations) == set(RISK_PRIORITY), "risk population enum drift")
+    total = sum(populations.values())
+    require(0 <= quota <= total, "document quota is outside its population")
+    allocation = {stratum: 0 for stratum in RISK_PRIORITY}
+    slots = quota
+    for stratum in RISK_PRIORITY:
+        if stratum != "PROSE" and populations[stratum] > 0 and slots > 0:
+            allocation[stratum] = 1
+            slots -= 1
+    if slots == 0:
+        return allocation
+    capacities = {
+        stratum: populations[stratum] - allocation[stratum]
+        for stratum in RISK_PRIORITY
+    }
+    capacity_total = sum(capacities.values())
+    require(capacity_total >= slots > 0, "Hamilton residual capacity drift")
+    floors: dict[str, int] = {}
+    remainders: dict[str, int] = {}
+    for stratum in RISK_PRIORITY:
+        numerator = slots * capacities[stratum]
+        floors[stratum], remainders[stratum] = divmod(numerator, capacity_total)
+        allocation[stratum] += floors[stratum]
+    remaining = quota - sum(allocation.values())
+    order = sorted(
+        RISK_PRIORITY,
+        key=lambda stratum: (
+            -remainders[stratum],
+            RISK_PRIORITY.index(stratum),
+            stratum,
+        ),
+    )
+    for stratum in order[:remaining]:
+        allocation[stratum] += 1
+    require(sum(allocation.values()) == quota, "Hamilton allocation does not sum to quota")
+    for stratum in RISK_PRIORITY:
+        require(allocation[stratum] <= populations[stratum], "Hamilton allocation exceeds population")
+    return allocation
+
+
+def build_held_out_sample(
+    root: Path,
+    manifest: dict[str, Any],
+    structure_rows: list[dict[str, Any]],
+    blocks: list[dict[str, Any]],
+    contract: dict[str, Any],
+    quality: dict[str, Any],
+) -> dict[str, Any]:
+    material = quality_manifest_material(manifest["raw_inputs"])
+    domain = bytes.fromhex(quality["seed"]["domain_separator_hex"])
+    seed = sha256_bytes(domain + material)
+    require(seed == "edb7d55b015326755574afbf5513e2bacefe04fbdad875fb8901555edf8e5f0d", "held-out seed drift")
+    known = quality["seed"]["known_vector"]
+    require(
+        sha256_bytes(domain + bytes.fromhex(known["manifest_material_utf8_hex"]))
+        == known["seed_sha256"],
+        "quality seed known vector fails during materialization",
+    )
+    require(
+        _rank_sha256(
+            known["seed_sha256"],
+            known["rank_canonical_document_id"],
+            known["rank_risk_stratum"],
+            known["rank_raw_block_id"],
+        )
+        == known["rank_sha256"],
+        "quality rank known vector fails during materialization",
+    )
+    document_order = [row["id"] for row in contract["canonical_documents"]]
+    grouped: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for block in blocks:
+        rank = _rank_sha256(
+            seed,
+            block["canonical_document_id"],
+            block["risk_stratum"],
+            block["raw_block_id"],
+        )
+        grouped[(block["canonical_document_id"], block["risk_stratum"])].append(
+            {"rank_sha256": rank, "raw_block_id": block["raw_block_id"]}
+        )
+    allocations: list[dict[str, Any]] = []
+    selected: set[str] = set()
+    selected_ordered: list[str] = []
+    for document_id in document_order:
+        populations = {
+            stratum: len(grouped[(document_id, stratum)])
+            for stratum in RISK_PRIORITY
+        }
+        population = sum(populations.values())
+        require(population > 0, f"canonical document has no raw blocks: {document_id}")
+        quota = min(population, max((population + 19) // 20, 20))
+        allocation = _hamilton_allocation(populations, quota)
+        allocations.append(
+            {
+                "allocations": allocation,
+                "canonical_document_id": document_id,
+                "population": population,
+                "populations": populations,
+                "quota": quota,
+            }
+        )
+        for stratum in RISK_PRIORITY:
+            ranked = sorted(
+                grouped[(document_id, stratum)],
+                key=lambda item: (int(item["rank_sha256"], 16), item["raw_block_id"]),
+            )
+            chosen = ranked[: allocation[stratum]]
+            for item in chosen:
+                require(item["raw_block_id"] not in selected, "held-out block selected twice")
+                selected.add(item["raw_block_id"])
+                selected_ordered.append(item["raw_block_id"])
+    rankings: list[dict[str, Any]] = []
+    for document_id in document_order:
+        for stratum in RISK_PRIORITY:
+            ranked = sorted(
+                grouped[(document_id, stratum)],
+                key=lambda item: (int(item["rank_sha256"], 16), item["raw_block_id"]),
+            )
+            for position, item in enumerate(ranked, 1):
+                rankings.append(
+                    {
+                        "canonical_document_id": document_id,
+                        "position_in_stratum": position,
+                        "rank_sha256": item["rank_sha256"],
+                        "raw_block_id": item["raw_block_id"],
+                        "risk_stratum": stratum,
+                        "selected": item["raw_block_id"] in selected,
+                    }
+                )
+    require(len(rankings) == len(blocks) == 20430, "held-out ranking coverage drift")
+    require(len(selected) == len(selected_ordered) == 1125, "held-out selected count drift")
+    require(sum(row["quota"] for row in allocations) == 1125, "held-out document quota total drift")
+    structure_bytes = jsonl_bytes(structure_rows)
+    selection_bytes = stable_json_bytes(selected_ordered, terminal_lf=False)
+    return {
+        "bindings": {
+            "guardrails_sha256": sha256_file(root / "goal-4/guardrails.json"),
+            "manifest_material_sha256": sha256_bytes(material),
+            "quality_protocol_sha256": sha256_file(root / "goal-4/quality-evaluation.json"),
+            "raw_manifest_sha256": sha256_bytes(canonical_json_bytes(manifest)),
+            "structure_ledger_sha256": sha256_bytes(structure_bytes),
+        },
+        "classifier": {
+            "block_kind_enum": list(BLOCK_KIND_ENUM),
+            "classifier_id": "ANKOS-RAW-LEXER-1",
+            "inline_math_policy": "MATCH_VALID_LEXICAL_PAIR_INDEPENDENTLY_WITHIN_ONE_PHYSICAL_LINE",
+            "source_path": "goal-4/tools/baseline_lib.py",
+            "source_sha256": sha256_file(Path(__file__).resolve()),
+        },
+        "document_allocations": allocations,
+        "manifest_material": {
+            "byte_size": len(material),
+            "path_base": LEGACY_RELATIVE,
+            "sha256": sha256_bytes(material),
+        },
+        "protocol_version": quality["protocol_version"],
+        "rankings": rankings,
+        "risk_priority": list(RISK_PRIORITY),
+        "schema_version": BASELINE_SCHEMA_VERSION,
+        "seed_sha256": seed,
+        "selected_count": len(selected_ordered),
+        "selected_raw_block_ids": selected_ordered,
+        "selected_raw_block_ids_sha256": sha256_bytes(selection_bytes),
+        "selection_inputs": [
+            "raw manifest five-field projection",
+            "raw syntax classifier",
+            "canonical document assignment",
+            "risk stratum",
+            "raw block ID",
+        ],
+        "selection_prohibited_inputs": [
+            "detector output",
+            "known-defect status",
+            "witness answer",
+            "repair proposal",
+            "repair outcome",
+            "CHANGED_OR_UNCHANGED_LABEL",
+        ],
+        "status": "MATERIALIZED_AND_FROZEN_BEFORE_AUTHOR_TEXT_REPAIR",
+    }
+
+
+def _content_stage_for_document(document_id: str) -> str:
+    if document_id in {"PUBLICATION_AND_CONTENTS", "PREFACE", "COLOPHON"}:
+        return "8-BOOKENDS"
+    if re.fullmatch(r"CH\d{2}", document_id):
+        return f"{8 + int(document_id[2:]):d}-{document_id}"
+    if document_id == "GENERAL_NOTES":
+        return "21-GENERAL-NOTES"
+    if re.fullmatch(r"N\d{2}", document_id):
+        return f"{21 + int(document_id[1:]):d}-{document_id}"
+    if document_id == "INDEX":
+        return "34-36-INDEX"
+    if document_id in {"INTERPRETIVE_METADATA", "GENERATED_METADATA"}:
+        return "39-NAVIGATION"
+    raise GuardrailError(f"unknown defect owner document: {document_id}")
+
+
+def _specialist_stages(defect_classes: list[str]) -> list[str]:
+    stages: set[str] = set()
+    if set(defect_classes) & {"FORMULA_OR_SYMBOL", "WOLFRAM_CODE", "RULE_TABLE_OR_DATA"}:
+        stages.add("37-MATH-CODE")
+    if "FIGURE_OR_CAPTION" in defect_classes:
+        stages.add("38-FIGURES")
+    if set(defect_classes) & {"STRUCTURE_BOUNDARY", "MARKDOWN_STRUCTURE", "HEADING_OR_FURNITURE", "NAVIGATION_METADATA"}:
+        stages.add("39-NAVIGATION")
+    if "INDEX_ENTRY" in defect_classes:
+        stages.update({"34-INDEX-AF", "35-INDEX-GM", "36-INDEX-NZ"})
+    return sorted(stages)
+
+
+def _defect_span_specs() -> list[dict[str, Any]]:
+    monolith = MONOLITH_RELATIVE
+    ch12 = "CHAPTERS/12-The-Principle-of-Computational-Equivalence/The-Principle-of-Computational-Equivalence.md"
+    nominal_notes = "BACK-MATTER/Notes/Notes.md"
+    nominal_index = "BACK-MATTER/Index/Index.md"
+    nominal_colophon = "BACK-MATTER/Colophon/Colophon.md"
+    specs: list[dict[str, Any]] = [
+        {"label": "CH12_SPLIT_CROSSES_GENERAL_NOTES", "path": ch12, "start": 2004, "end": 2004, "owner": "GENERAL_NOTES", "classes": ["STRUCTURE_BOUNDARY"], "detectors": ["D04_SPLIT_ROUTING"]},
+        {"label": "NOMINAL_NOTES_IS_ONE_STRAY_N03_LINE", "path": nominal_notes, "start": 1, "end": 1, "owner": "N03", "classes": ["STRUCTURE_BOUNDARY"], "detectors": ["D04_SPLIT_ROUTING"]},
+        {"label": "NOMINAL_INDEX_STARTS_IN_N03_NOT_INDEX", "path": nominal_index, "start": 1, "end": 1, "owner": "N03", "classes": ["STRUCTURE_BOUNDARY"], "detectors": ["D04_SPLIT_ROUTING"]},
+        {"label": "NOMINAL_COLOPHON_STARTS_IN_N10_NOT_COLOPHON", "path": nominal_colophon, "start": 1, "end": 1, "owner": "N10", "classes": ["STRUCTURE_BOUNDARY", "HEADING_OR_FURNITURE"], "detectors": ["D04_SPLIT_ROUTING", "D07_HEADING"]},
+        {"label": "ACTUAL_INDEX_INSIDE_NOMINAL_COLOPHON", "path": nominal_colophon, "start": 3383, "end": 3383, "owner": "INDEX", "classes": ["STRUCTURE_BOUNDARY", "INDEX_ENTRY"], "detectors": ["D04_SPLIT_ROUTING", "D12_INDEX"]},
+        {"label": "ACTUAL_COLOPHON_AT_NOMINAL_COLOPHON_TAIL", "path": nominal_colophon, "start": 5015, "end": 5015, "owner": "COLOPHON", "classes": ["STRUCTURE_BOUNDARY"], "detectors": ["D04_SPLIT_ROUTING"]},
+        {"label": "SPLIT_IMAGE_OMISSION_PAGE_66", "path": monolith, "start": 680, "end": 680, "classes": ["FIGURE_OR_CAPTION", "NAVIGATION_METADATA"], "detectors": ["D05_IMAGE_REFERENCE"]},
+        {"label": "SPLIT_IMAGE_OMISSION_PAGE_154", "path": monolith, "start": 1711, "end": 1711, "classes": ["FIGURE_OR_CAPTION", "NAVIGATION_METADATA"], "detectors": ["D05_IMAGE_REFERENCE"]},
+        {"label": "SPLIT_IMAGE_OMISSION_PAGE_156", "path": monolith, "start": 1744, "end": 1744, "classes": ["FIGURE_OR_CAPTION", "NAVIGATION_METADATA"], "detectors": ["D05_IMAGE_REFERENCE"]},
+        {"label": "CAPTION_PROSE_INTERLEAVING", "path": monolith, "start": 2130, "end": 2132, "classes": ["FIGURE_OR_CAPTION", "PROSE_OCR"], "detectors": ["D08_CAPTION_ASSOCIATION"]},
+        {"label": "PROSE_MATH_SPLIT", "path": monolith, "start": 12891, "end": 12893, "classes": ["PROSE_OCR", "FORMULA_OR_SYMBOL"], "detectors": ["D09_WORD_BOUNDARY", "D10_TECHNICAL"]},
+        {"label": "PROSE_ACCIDENTALLY_FENCED_AND_HYPHEN_SPLIT", "path": monolith, "start": 16433, "end": 16438, "classes": ["MARKDOWN_STRUCTURE", "PROSE_OCR", "WOLFRAM_CODE"], "detectors": ["D06_FENCE", "D09_WORD_BOUNDARY"]},
+    ]
+    for line in (12083, 12087, 18328, 18810):
+        specs.append({"label": f"EMPTY_HEADING_LINE_{line}", "path": monolith, "start": line, "end": line, "classes": ["HEADING_OR_FURNITURE"], "detectors": ["D07_HEADING"]})
+    for line in (398, 412, 696, 1368, 1752, 2338, 2360, 2700, 2840, 3952, 6586, 10031, 17444):
+        specs.append({"label": f"PAGE_FURNITURE_OR_FALSE_HEADING_LINE_{line}", "path": monolith, "start": line, "end": line, "classes": ["HEADING_OR_FURNITURE"], "detectors": ["D07_HEADING"]})
+    specs.extend(
+        [
+            {"label": "CORRUPTED_BOOLEAN_RULE_FORMULAS", "path": monolith, "start": 11711, "end": 11841, "classes": ["FORMULA_OR_SYMBOL", "RULE_TABLE_OR_DATA"], "detectors": ["D10_TECHNICAL"]},
+            {"label": "TRUNCATED_PROGRAM_MATERIAL_LINE_12377", "path": monolith, "start": 12377, "end": 12377, "classes": ["WOLFRAM_CODE"], "detectors": ["D10_TECHNICAL"]},
+            {"label": "MANGLED_MAXIMA_MATERIAL_LINE_12382", "path": monolith, "start": 12382, "end": 12382, "classes": ["FORMULA_OR_SYMBOL", "WOLFRAM_CODE"], "detectors": ["D10_TECHNICAL"]},
+            {"label": "TRUNCATED_PDE_MATERIAL_LINE_13453", "path": monolith, "start": 13453, "end": 13453, "classes": ["FORMULA_OR_SYMBOL"], "detectors": ["D10_TECHNICAL"]},
+            {"label": "DAMAGED_WOLFRAM_DEFINITION_LINE_17301", "path": monolith, "start": 17301, "end": 17301, "classes": ["WOLFRAM_CODE"], "detectors": ["D10_TECHNICAL"]},
+            {"label": "DAMAGED_WOLFRAM_DEFINITION_LINE_17442", "path": monolith, "start": 17442, "end": 17442, "classes": ["WOLFRAM_CODE"], "detectors": ["D10_TECHNICAL"]},
+            {"label": "DAMAGED_MATH_DELIMITERS_LINE_19567", "path": monolith, "start": 19567, "end": 19567, "classes": ["FORMULA_OR_SYMBOL", "MARKDOWN_STRUCTURE"], "detectors": ["D10_TECHNICAL"]},
+            {"label": "SEVERE_INDEX_COLUMN_FLATTENING_LINE_21877", "path": monolith, "start": 21877, "end": 21877, "classes": ["INDEX_ENTRY", "STRUCTURE_BOUNDARY"], "detectors": ["D12_INDEX"]},
+        ]
+    )
+    for line in (10631, 12079, 13294, 14031, 16429, 17273, 17793, 20109):
+        specs.append({"label": f"JOINED_OR_SPLIT_WORD_CANDIDATE_LINE_{line}", "path": monolith, "start": line, "end": line, "classes": ["PROSE_OCR"], "detectors": ["D09_WORD_BOUNDARY"]})
+    specs.extend(
+        [
+            {"label": "REPEATED_OR_TRUNCATED_PHRASE_LINE_1740", "path": monolith, "start": 1740, "end": 1740, "classes": ["PROSE_OCR"], "detectors": ["D11_REPETITION"]},
+            {"label": "ZERO_DATA_FALSE_HEADING_LINE_12348", "path": monolith, "start": 12348, "end": 12348, "classes": ["HEADING_OR_FURNITURE", "RULE_TABLE_OR_DATA"], "detectors": ["D07_HEADING", "D10_TECHNICAL"]},
+            {"label": "OCR_CONFUSION_OUANTUM_LINE_16946", "path": monolith, "start": 16946, "end": 16946, "classes": ["PROSE_OCR", "FORMULA_OR_SYMBOL"], "detectors": ["D09_WORD_BOUNDARY", "D10_TECHNICAL"]},
+            {"label": "PROSE_PROMOTED_TO_HEADING_LINE_17259", "path": monolith, "start": 17259, "end": 17259, "classes": ["HEADING_OR_FURNITURE", "PROSE_OCR"], "detectors": ["D07_HEADING"]},
+            {"label": "REPEATED_CORRUPTED_RULE_BODY_A", "path": monolith, "start": 18231, "end": 18235, "classes": ["RULE_TABLE_OR_DATA", "WOLFRAM_CODE"], "detectors": ["D10_TECHNICAL", "D11_REPETITION"]},
+            {"label": "REPEATED_CORRUPTED_RULE_BODY_B", "path": monolith, "start": 18237, "end": 18241, "classes": ["RULE_TABLE_OR_DATA", "WOLFRAM_CODE"], "detectors": ["D10_TECHNICAL", "D11_REPETITION"]},
+            {"label": "INDEX_OPENING_COLUMN_INTERLEAVE", "path": monolith, "start": 20828, "end": 20834, "classes": ["INDEX_ENTRY", "STRUCTURE_BOUNDARY"], "detectors": ["D12_INDEX"]},
+        ]
+    )
+    return specs
+
+
+def build_known_defect_rows(
+    root: Path,
+    manifest: dict[str, Any],
+    segments: list[dict[str, Any]],
+    blocks: list[dict[str, Any]],
+    image_rows: list[dict[str, Any]],
+    routing: dict[str, Any],
+) -> list[dict[str, Any]]:
+    legacy = root / LEGACY_RELATIVE
+    input_by_path = {row["relative_path"]: row for row in manifest["raw_inputs"]}
+    image_by_line = {row["monolith_line"]: row for row in image_rows}
+    rows: list[dict[str, Any]] = []
+    for spec in _defect_span_specs():
+        source = input_by_path[spec["path"]]
+        payload = (legacy / spec["path"]).read_bytes()
+        lines = split_raw_lines(payload)
+        require(1 <= spec["start"] <= spec["end"] <= len(lines), f"defect span is out of range: {spec['label']}")
+        start_byte = lines[spec["start"] - 1]["byte_start"]
+        end_byte = lines[spec["end"] - 1]["byte_end"]
+        span = payload[start_byte:end_byte]
+        owner = spec.get("owner")
+        raw_block_ids: list[str] = []
+        if spec["path"] == MONOLITH_RELATIVE:
+            owner = segment_for_line(segments, spec["start"])["segment_id"]
+            require(segment_for_line(segments, spec["end"])["segment_id"] == owner, f"defect span crosses documents: {spec['label']}")
+            raw_block_ids = [
+                block["raw_block_id"]
+                for block in blocks
+                if block["start_line"] <= spec["end"] and block["end_line"] >= spec["start"]
+            ]
+            require(raw_block_ids, f"defect span has no raw blocks: {spec['label']}")
+        require(owner is not None, f"defect owner is missing: {spec['label']}")
+        start_text = lines[spec["start"] - 1]["content"].decode("utf-8")
+        end_text = lines[spec["end"] - 1]["content"].decode("utf-8")
+        row: dict[str, Any] = {
+            "closure_stages": ["40-SATURATION", "42-RELEASE"],
+            "defect_classes": sorted(spec["classes"]),
+            "expected_detector_classes": sorted(set(spec["detectors"] + ["D13_EXACT_SENTINEL"])),
+            "label": spec["label"],
+            "owner_document_id": owner,
+            "primary_content_stage": _content_stage_for_document(owner),
+            "raw_block_ids": raw_block_ids,
+            "raw_end_line": spec["end"],
+            "raw_source_role": source["role"],
+            "raw_source_sha256": source["sha256"],
+            "raw_span_byte_size": len(span),
+            "raw_span_occurrence_count": payload.count(span),
+            "raw_span_sha256": sha256_bytes(span),
+            "raw_start_line": spec["start"],
+            "repair_authorized": False,
+            "sentinel_kind": "EXACT_RAW_SPAN",
+            "source_path": spec["path"],
+            "specialist_stages": _specialist_stages(spec["classes"]),
+            "start_line_prefix": start_text[:160],
+            "start_line_suffix": start_text[-160:],
+            "end_line_prefix": end_text[:160],
+            "end_line_suffix": end_text[-160:],
+            "status": "BASELINE_OPEN_SOURCE_NEEDED",
+        }
+        if spec["start"] in image_by_line and "FIGURE_OR_CAPTION" in spec["classes"]:
+            image = image_by_line[spec["start"]]
+            row["image_reference"] = {
+                "basename": image["basename"],
+                "raw_reference_ordinal": image["raw_reference_ordinal"],
+                "split_status": image["split_status"],
+            }
+        rows.append(row)
+    aggregate_rows = [
+        {
+            "artifact_path": ATLAS_RELATIVE,
+            "artifact_sha256": input_by_path[ATLAS_RELATIVE]["sha256"],
+            "defect_classes": ["NAVIGATION_METADATA"],
+            "expected_detector_classes": ["D04_SPLIT_ROUTING", "D13_EXACT_SENTINEL"],
+            "label": "ATLAS_MUST_REMAIN_INTERPRETIVE_METADATA",
+            "owner_document_id": "INTERPRETIVE_METADATA",
+            "primary_content_stage": "39-NAVIGATION",
+            "repair_authorized": False,
+            "sentinel_kind": "AGGREGATE_GUARDRAIL",
+            "specialist_stages": ["39-NAVIGATION"],
+            "status": "BASELINE_ROLE_GUARDRAIL",
+        },
+        {
+            "artifact_path": "goal-4/image-reference-ledger.jsonl",
+            "artifact_sha256": sha256_bytes(jsonl_bytes(image_rows)),
+            "defect_classes": ["NAVIGATION_METADATA", "FIGURE_OR_CAPTION"],
+            "expected_detector_classes": ["D05_IMAGE_REFERENCE", "D13_EXACT_SENTINEL"],
+            "label": "ALL_1444_MONOLITH_IMAGE_TARGETS_BROKEN_RELATIVE_TO_MONOLITH",
+            "owner_document_id": "GENERATED_METADATA",
+            "primary_content_stage": "6-MEDIA",
+            "repair_authorized": False,
+            "sentinel_kind": "AGGREGATE_GUARDRAIL",
+            "specialist_stages": ["38-FIGURES", "39-NAVIGATION"],
+            "status": "BASELINE_MECHANICAL_ROUTE_OPEN",
+        },
+        {
+            "artifact_path": "goal-4/routing-baseline.json",
+            "artifact_sha256": sha256_bytes(canonical_json_bytes(routing)),
+            "defect_classes": ["NAVIGATION_METADATA", "STRUCTURE_BOUNDARY"],
+            "expected_detector_classes": ["D04_SPLIT_ROUTING", "D13_EXACT_SENTINEL"],
+            "label": "CONTENTS_LINKS_RESOLVE_LEXICALLY_BUT_FOUR_SEMANTIC_DESTINATIONS_ARE_MALFORMED",
+            "owner_document_id": "GENERATED_METADATA",
+            "primary_content_stage": "39-NAVIGATION",
+            "repair_authorized": False,
+            "sentinel_kind": "AGGREGATE_GUARDRAIL",
+            "specialist_stages": ["39-NAVIGATION"],
+            "status": "BASELINE_MECHANICAL_ROUTE_OPEN",
+        },
+    ]
+    rows.extend(aggregate_rows)
+    for number, row in enumerate(rows, 1):
+        row["schema_version"] = BASELINE_SCHEMA_VERSION
+        row["sentinel_id"] = f"DEFECT-{number:04d}"
+        row.setdefault("closure_stages", ["40-SATURATION", "42-RELEASE"])
+        row.setdefault("raw_block_ids", [])
+    require(len(rows) == 55, f"known-defect regression row count drift: {len(rows)}")
+    require(len({row["sentinel_id"] for row in rows}) == len(rows), "duplicate defect sentinel ID")
+    require(all(row["repair_authorized"] is False for row in rows), "baseline defect row authorizes repair")
+    return rows
