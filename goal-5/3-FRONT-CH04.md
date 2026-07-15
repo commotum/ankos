@@ -15,10 +15,9 @@ Status: IN_PROGRESS
 - All six document boundaries are source-confirmed. In particular, the Chapter
   1 and Chapter 3 opener images and the textual Chapter 2 and Chapter 4 opener
   numbers belong to the chapters they introduce.
-- `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`, and `CH02` are two-pass
-  complete over PDF pages 1–66 with 132 guarded corrections. `CH03` has a
-  complete first pass over PDF pages 67–130 with 61 more guarded corrections
-  and is undergoing its independent second pass. `CH04` remains open.
+- `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`, `CH02`, and `CH03` are
+  two-pass complete over PDF pages 1–130 with 193 guarded corrections. `CH04`
+  remains open.
 - Source-review packs exist under `/tmp/ankos-stage3-publication/`,
   `/tmp/ankos-stage3-preface/`, `/tmp/ankos-stage3-ch02/`, and
   `/tmp/ankos-stage3-ch03/`. Page rasters are authoritative; native PDF text is
@@ -108,7 +107,7 @@ For each document:
 | 1 | `CH02` | 39–66 | `79330 → 119521` | COMPLETE | `G5-C-0107`–`G5-C-0132` | closed |
 | 2 | `CH02` | 39–66 | final rebuilt document | COMPLETE | all 26 verified; no new discrepancy | closed |
 | 1 | `CH03` | 67–130 | `119521 → 199880` | COMPLETE | `G5-C-0133`–`G5-C-0193` | closed |
-| 2 | `CH03` | 67–130 | final rebuilt document and assets | IN_PROGRESS | candidate SHA `f948d0c...` | `pdf:0067` |
+| 2 | `CH03` | 67–130 | final rebuilt document and assets | COMPLETE | all 61 verified; no new discrepancy | closed |
 | 1 | `CH04` | 131–184 | `199880 → 355646` | NOT_STARTED | — | `pdf:0131` |
 | 2 | `CH04` | 131–184 | final rebuilt document | NOT_STARTED | — | `pdf:0131` |
 
@@ -266,7 +265,7 @@ page 118 symbolic-system figure now masks its raster-only caption while the
 exact caption appears once as searchable live Markdown.
 
 The rebuilt Chapter 3 document has SHA-256
-`f948d0c45b8bec06b78e72e8e8fa8f807c37f7a0fd29d4b4dc43550bc8768f`, 87
+`f948d0c45b8bec06b78e72e8e8fa8f807c37f7a0fd29d4b4dc43550bc8768f35`, 87
 unique image references, 12 logical subsection headings, 20 balanced math
 spans, and no unexplained OCR, Unicode, whitespace, Markdown, vocabulary, or
 manifest detector hit. Backward searches found no recurrence of the new
@@ -280,7 +279,19 @@ legacy tree remains
 `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`
 over 1,463 files.
 
-Exact next action: finish the independent second sequential pass of `CH03`
-from `pdf:0067` through `pdf:0130` against the rebuilt SHA above. If it is
-clean, mark `CH03` `YES/YES`, rerun the closure gates, and begin `CH04` at
-`pdf:0131`, raw line 1,368 and byte 199880.
+An independent second pass restarted at PDF page 67 and traversed all 64 pages
+through PDF page 130 in source order. It compared all 248 final live-text
+blocks (179 prose paragraphs, 13 headings, 52 captions, and four live
+figure-label blocks) and all 87 final images. Of the text blocks, 217 matched
+the normalized source directly; the remaining 31 were individually resolved
+as 12 page-turn joins, 11 math/emphasis/font-run cases, five printed
+arrow/marker cases, and three native-PDF text-layer artifacts. The pass also
+checked all source punctuation, emphasis, formulas, symbolic notation,
+captions, figure order, repaired assets, and the intentionally blank final
+page. It found no discrepancy or residual ambiguity, and the final document
+hash remained unchanged.
+
+Exact next action: review `CH04` forward from `pdf:0131`, raw line 1,368 and
+byte 199880 through `pdf:0184`, raw line 2,141 and byte 355646. Reconstruct the
+damaged numeric table and other technical/layout regions only from direct
+fixed-layout evidence, then encode guarded corrections and rebuild.

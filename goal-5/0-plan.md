@@ -326,15 +326,14 @@ Neither file is a generalized workflow database.
   serialized after complete prose paragraphs. The final source/candidate
   sequence matched at 6,685 tokens with no punctuation, technical, visual, or
   caption discrepancy.
-- `CH03` has completed its forward first pass over all 64 PDF pages 67–130,
-  including the intentional blank final page. Its 61 guarded corrections are
-  `G5-C-0133`–`G5-C-0193`; all 86 mapped visuals were checked, one omitted
+- `CH03` is complete after a forward first pass and an independent clean second
+  pass over all 64 PDF pages 67–130, including the intentional blank final
+  page. Its 61 guarded corrections are `G5-C-0133`–`G5-C-0193`; all 248 final
+  live-text blocks and 87 final images were independently verified, one omitted
   rules plate was restored, and three damaged/raster-text images use pinned
-  repaired-only overrides. The rebuilt document has 87 unique image
-  references. Focused tests, residual detectors, rendering, deterministic
-  builds, and legacy checks pass; its independent second pass is in progress
-  against Markdown SHA-256
-  `f948d0c45b8bec06b78e72e8e8fa8f807c37f7a0fd29d4b4dc43550bc8768f`.
+  repaired-only overrides. Focused tests, residual detectors, rendering,
+  deterministic builds, and legacy checks pass. The final Markdown SHA-256 is
+  `f948d0c45b8bec06b78e72e8e8fa8f807c37f7a0fd29d4b4dc43550bc8768f35`.
 
 ## Stage Status
 

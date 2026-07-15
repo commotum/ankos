@@ -361,11 +361,11 @@ class ChapterThreeTests(unittest.TestCase):
         with self.assertRaises(build.BuildError):
             build.validate_added_assets(self.documents, self.images, missing_reason)
 
-    def test_first_pass_coverage_is_recorded_and_second_pass_remains_open(self) -> None:
+    def test_two_pass_document_coverage_is_closed(self) -> None:
         rows = validate.validate_coverage(self.documents)
         chapter = next(row for row in rows if row["document_id"] == "CH03")
         self.assertEqual(
-            (chapter["first_pass"], chapter["second_pass"]), ("YES", "NO")
+            (chapter["first_pass"], chapter["second_pass"]), ("YES", "YES")
         )
         self.assertEqual(chapter["reviewer_type"], "agent")
 
