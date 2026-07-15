@@ -255,7 +255,7 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-14 (America/Los_Angeles).
-- Active stage: `2-FOUNDATION` (`IN_PROGRESS`).
+- Active stage: `2-FOUNDATION` (`BLOCKED`).
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
   and the empty `goal-4/` directory were removed by exact path. No commit
   range was reverted, and Goal 4 had corrected no book text.
@@ -285,15 +285,19 @@ Neither file is a generalized workflow database.
   authorized for this workflow/output or separate Wolfram permission.
 - Stage 2's dependency-independent foundation is implemented: the zero-build
   conserves all monolith bytes, two fresh builds match, the focused validator
-  passes, and `8` tests plus `19` mutation subtests pass. All 29 coverage
-  rows remain unreviewed and `corrections.jsonl` is empty.
+  protects the complete legacy-tree snapshot and independently reconstructs
+  corrected bytes, and `9` tests plus `19` mutation subtests pass. All 29
+  coverage rows remain unreviewed and `corrections.jsonl` is empty.
+- Three consecutive goal turns found no authorized independent source or
+  permission change. Stage 2 is formally blocked on
+  `FOUNDATION-SOURCE-001`; no later stage is eligible to start.
 
 ## Stage Status
 
 | Stage | Status | Prerequisites |
 |---|---|---|
 | 1-CLEANUP | `COMPLETE` | none |
-| 2-FOUNDATION | `IN_PROGRESS` | 1; complete lawful authoritative source for completion |
+| 2-FOUNDATION | `BLOCKED` | 1; complete lawful authoritative source for completion |
 | 3-FRONT-CH04 | `NOT_STARTED` | 2 |
 | 4-CH05-08 | `NOT_STARTED` | 2 |
 | 5-CH09-12 | `NOT_STARTED` | 2 |

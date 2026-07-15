@@ -1,6 +1,6 @@
 # 2-FOUNDATION
 
-Status: IN_PROGRESS
+Status: BLOCKED
 
 ## Current Facts
 
@@ -24,6 +24,9 @@ Status: IN_PROGRESS
 - The provisional 29-range layout is a suitable zero-correction baseline, but
   content-sensitive boundaries remain open until authoritative comparison.
 - The monolith, never repaired output, is the only build input.
+- The 1,444-row image map is a frozen legacy inventory, not proof that the
+  authoritative edition contains no omitted, replaced, or differently placed
+  visual. Source-confirmed visual changes must be recorded explicitly later.
 - A builder that slices 29 byte ranges, applies ordered exact-preimage
   corrections, and copies the mapped images is sufficient.
 - A validator needs only check the facts that can make this book build wrong:
@@ -67,6 +70,10 @@ while leaving the authoritative-source blocker explicit.
   validation.
 - The build can be called a baseline projection, not an OCR-corrected book.
 - Source absence remains an open blocker; tests cannot waive it.
+- Copying every legacy image does not prove figure order or caption association.
+- A document's second-pass coverage can close only after every correction and
+  technical/visual region in that document has been rechecked. Until a monotonic
+  authoritative location convention exists, all coverage rows remain `NO`.
 
 ## Completion Requirements
 
@@ -83,9 +90,14 @@ while leaving the authoritative-source blocker explicit.
 
 ## Stage Results
 
-IN_PROGRESS. The source-access requirement is the only unmet Stage 2
-completion requirement; no author text has been changed or reviewed against an
-authoritative source.
+BLOCKED on 2026-07-14 after three consecutive goal turns confirmed the same
+source-authority impasse. The source-access requirement is the only unmet
+Stage 2 completion requirement; no author text has been changed or reviewed
+against an authoritative source.
+
+All 29 boundary records still say
+`PROVISIONAL_REQUIRES_AUTHORITATIVE_CONFIRMATION`; a passing baseline
+validator is not evidence that their semantic ownership is frozen.
 
 - Added `build.py` and `validate.py`, using only the Python standard library.
   Corrections are tied to an absolute monolith byte offset and exact nonempty
