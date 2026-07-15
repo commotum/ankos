@@ -2,7 +2,7 @@
 
 There is no open Foundation source blocker or author-text ambiguity. Content
 review discrepancies are added here only when source comparison cannot resolve
-them; the first Stage 3 document closed without an unresolved item.
+them; the first three Stage 3 documents closed without an unresolved item.
 
 ## FOUNDATION-SOURCE-001 — complete authoritative source
 

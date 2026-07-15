@@ -301,7 +301,12 @@ Neither file is a generalized workflow database.
   an independent clean second pass against the rebuilt Markdown. Its 59 guarded
   corrections are `G5-C-0021`–`G5-C-0079`; exact text/emphasis comparison,
   detector scans, rendering, deterministic builds, and focused tests pass.
-  Stage 3 now continues with `CH01` at `pdf:0017`, raw line 166 and byte 30320.
+- `CH01` is complete after a sequential first pass over PDF pages 17–38 and an
+  independent clean second pass against the final rebuilt Markdown and assets.
+  Its 27 guarded corrections are `G5-C-0080`–`G5-C-0106`; the exact prose-token
+  sequence, punctuation, hierarchy, emphasis, paragraph joins, three figures,
+  captions, and source-faithful repaired-only opener were rechecked. Stage 3
+  now continues with `CH02` at `pdf:0039`, raw line 398 and byte 79330.
 
 ## Stage Status
 

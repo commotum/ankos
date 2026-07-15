@@ -15,9 +15,8 @@ Status: IN_PROGRESS
 - All six document boundaries are source-confirmed. In particular, the Chapter
   1 and Chapter 3 opener images and the textual Chapter 2 and Chapter 4 opener
   numbers belong to the chapters they introduce.
-- `PUBLICATION_AND_CONTENTS` and `PREFACE` are two-pass complete over PDF pages
-  1–16 with 79 guarded corrections. The remaining four Stage 3 coverage rows
-  remain `NO/NO`.
+- `PUBLICATION_AND_CONTENTS`, `PREFACE`, and `CH01` are two-pass complete over
+  PDF pages 1–38 with 106 guarded corrections. `CH02`–`CH04` remain open.
 - Source-review packs exist under `/tmp/ankos-stage3-publication/` and
   `/tmp/ankos-stage3-preface/`. Page rasters are authoritative; native PDF text
   is only a navigation/detection aid because its custom glyph and column
@@ -97,8 +96,8 @@ For each document:
 | 2 | `PUBLICATION_AND_CONTENTS` | 1–8 | final rebuilt document | COMPLETE | verified all 20 | closed |
 | 1 | `PREFACE` | 9–16 | `6480 → 30320` | COMPLETE | `G5-C-0021`–`G5-C-0079` | closed |
 | 2 | `PREFACE` | 9–16 | final rebuilt document | COMPLETE | all 59 verified; no new discrepancy | closed |
-| 1 | `CH01` | 17–38 | `30320 → 79330` | NOT_STARTED | — | `pdf:0017` |
-| 2 | `CH01` | 17–38 | final rebuilt document | NOT_STARTED | — | `pdf:0017` |
+| 1 | `CH01` | 17–38 | `30320 → 79330` | COMPLETE | `G5-C-0080`–`G5-C-0106` | closed |
+| 2 | `CH01` | 17–38 | final rebuilt document and assets | COMPLETE | all 27 verified; no new discrepancy | closed |
 | 1 | `CH02` | 39–66 | `79330 → 119521` | NOT_STARTED | — | `pdf:0039` |
 | 2 | `CH02` | 39–66 | final rebuilt document | NOT_STARTED | — | `pdf:0039` |
 | 1 | `CH03` | 67–130 | `119521 → 199880` | NOT_STARTED | — | `pdf:0067` |
@@ -199,6 +198,26 @@ exact match and found no remaining discrepancy or ambiguity. The cumulative
 suite now passes 19 tests; validation reports 29 documents, 1,444 images, 79
 corrections, and two second-pass-complete documents. `git diff --check` passes.
 
-Exact resume point: first pass of `CH01`, beginning at `pdf:0017`, raw line 166
-and byte 30320. Its 22-page raster review pack is prepared under
-`/tmp/ankos-stage3-ch01/`; no CH01 coverage claim has yet closed.
+`CH01` then received a complete forward first pass and a separate fresh pass
+over every one of PDF pages 17–38 against the final rebuilt Markdown. Its 27
+source-verified corrections restore logical heading levels, seven omitted bold
+field labels, source quotes/apostrophe and *Mathematica* emphasis, false
+page-turn paragraph breaks plus one spurious OCR glyph, and canonical
+linearization of two margin figures with their exact captions. A squashed
+legacy opener crop is preserved in the immutable tree while the repaired build
+uses a deterministic 154×200 source-faithful composite containing the printed
+chapter numeral. The second pass found no new discrepancy or ambiguity: its
+8,675-token diagnostic sequence matches exactly, all 25 bold labels and seven
+italic *Mathematica* occurrences agree, and all three figures/captions match
+visually. Running heads and folios were dispositioned as page furniture.
+
+The repaired-asset path now checks its basename, evidence fields, content hash,
+and decoded dimensions. Explicit zero-correction builds copy and validate all
+legacy image bytes rather than using repaired overrides; the normal build still
+uses the repaired opener. Mutation tests and an independent re-audit confirmed
+both modes. The margin-figure placement rule is documented as a canonical
+one-dimensional Markdown serialization rather than a uniquely printed order.
+
+Exact next document: first pass of `CH02`, beginning at `pdf:0039`, raw line
+398 and byte 79330. Its 28-page raster/native-text review pack is under
+`/tmp/ankos-stage3-ch02/`.

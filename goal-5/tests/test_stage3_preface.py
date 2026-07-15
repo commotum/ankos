@@ -118,7 +118,6 @@ class PrefaceTests(unittest.TestCase):
         preface = next(row for row in rows if row["document_id"] == "PREFACE")
         self.assertEqual((preface["first_pass"], preface["second_pass"]), ("YES", "YES"))
         self.assertEqual(preface["reviewer_type"], "agent")
-        self.assertTrue(all(row["second_pass"] == "NO" for row in rows[2:]))
 
 
 if __name__ == "__main__":
