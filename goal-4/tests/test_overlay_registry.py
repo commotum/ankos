@@ -316,6 +316,17 @@ class FrozenArtifactMutationTests(unittest.TestCase):
         ):
             overlay_registry.load_frozen_overlay_state(root)
 
+    def test_fake_repair_ledger_is_loaded_and_rejected(self) -> None:
+        temporary = clone_registry_root()
+        self.addCleanup(temporary.cleanup)
+        root = temporary.repo_root  # type: ignore[attr-defined]
+        path = root / overlay_registry.REPAIR_LEDGER_PATH
+        path.write_bytes(pipeline.canonical_json_bytes({"repair_id": "FAKE-REPAIR"}))
+        with self.assertRaisesRegex(
+            overlay_registry.RegistryError, "dynamic repair/review registry is invalid"
+        ):
+            overlay_registry.load_frozen_overlay_state(root)
+
 
 if __name__ == "__main__":
     unittest.main()

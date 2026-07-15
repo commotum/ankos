@@ -575,6 +575,7 @@ def mint_production_authority(
         raise RegistryError("authority requires a nonempty batch of typed overlay operations")
     if any(record.meta.target_role != overlay_lib.CANONICAL_AUTHOR_TEXT for record in closed):
         raise RegistryError("production canonical authority cannot include noncanonical roles")
+    validated_state = snapshot.state
     for record in closed:
         expected_path = snapshot.target_paths.get(record.meta.target_id)
         if expected_path is None or record.meta.target_path != expected_path:
@@ -583,7 +584,7 @@ def mint_production_authority(
             raise RegistryError(f"{record.meta.repair_id}: raw source block is outside the frozen 20,430-block registry")
         if record.meta.raw_source_row_sha256 != snapshot.block_row_sha256s[record.meta.raw_source_id]:
             raise RegistryError(f"{record.meta.repair_id}: raw source row hash drift")
-        before = snapshot.state.blocks(record.meta.target_role, record.meta.target_id)
+        before = validated_state.blocks(record.meta.target_role, record.meta.target_id)
         before_sha256 = overlay_lib.target_sha256(
             record.meta.target_id, record.meta.target_role, before
         )
@@ -603,6 +604,9 @@ def mint_production_authority(
         )
         if record.meta.expected_result_sha256 != after_sha256:
             raise RegistryError(f"{record.meta.repair_id}: exact target post-state guard drift")
+        validated_state = validated_state.with_blocks(
+            record.meta.target_role, after, record.meta.target_id
+        )
 
     # This is a categorical repository fact, checked only after all immutable
     # inputs and caller-controlled state/operation identities were validated.

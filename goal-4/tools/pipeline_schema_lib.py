@@ -787,6 +787,18 @@ def _operation_fields(operation: Mapping[str, Any], label: str) -> Mapping[str, 
     fields = operation["payload"]["operation_fields"]
     if fields["operation_type"] != operation["operation_type"]:
         raise PipelineSchemaError(f"{label} typed payload operation type differs from its envelope")
+    expected = {
+        "REPLACE": {"operation_type", "block_id", "expected_block_sha256", "preimage_hex", "replacement_hex", "expected_count"},
+        "DELETE": {"operation_type", "block_id", "expected_block_sha256", "preimage_hex", "expected_count"},
+        "ANCHORED_INSERT": {"operation_type", "block_id", "expected_block_sha256", "left_anchor_hex", "right_anchor_hex", "insertion_hex", "expected_adjacency_count"},
+        "MOVE": {"operation_type", "block_id", "expected_block_sha256", "source_left_id", "source_right_id", "destination_left_id", "destination_right_id", "expected_source_adjacency_count", "expected_destination_adjacency_count"},
+        "SPLIT": {"operation_type", "block_id", "expected_block_sha256", "parts", "expected_block_count"},
+        "MERGE": {"operation_type", "block_ids", "expected_block_sha256s", "merged_block", "expected_adjacency_count"},
+    }[operation["operation_type"]]
+    _require_exact_keys(fields, expected, f"{label} typed operation payload")
+    for field in ("preimage_hex", "replacement_hex", "left_anchor_hex", "right_anchor_hex", "insertion_hex"):
+        if field in fields:
+            _hex_bytes(fields[field], f"{label} {field}")
     return fields
 
 
@@ -1770,13 +1782,135 @@ def validate_provenance_set(
                 )
 
 
-def validate_navigation(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
+def validate_navigation(
+    record: Mapping[str, Any],
+    registry: SchemaRegistry,
+    *,
+    ast_nodes: Sequence[Mapping[str, Any]] = (),
+    navigation_by_anchor: Mapping[str, Mapping[str, Any]] | None = None,
+    figure_records: Sequence[Mapping[str, Any]] = (),
+    _ast_by_id: Mapping[str, Mapping[str, Any]] | None = None,
+) -> None:
     registry.validate("goal-4/schemas/navigation-record.schema.json", record)
+    validate_workflow(record["workflow"])
+    indexes = _frozen_indexes(registry)
     _safe_repo_path(record["source_path"], "navigation source")
+    document = indexes["documents_by_id"].get(record["source_document_id"])
+    if document is None or document["path"] != record["source_path"]:
+        raise PipelineSchemaError("navigation source document/path does not join guardrails")
     if record["destination_path"] is not None:
         _safe_repo_path(record["destination_path"], "navigation destination")
     if record["generated"] and record["author_text_projection_sha256"] != sha256_bytes(b""):
         raise PipelineSchemaError("generated navigation has nonempty author projection")
+    if set(record["unresolved_ids"]) != set(record["workflow"]["unresolved_ids"]):
+        raise PipelineSchemaError("navigation unresolved IDs differ from workflow blockers")
+    state = record["resolution_state"]
+    if state == "RESOLVED":
+        if record["workflow"]["state"] != "CLOSED" or record["unresolved_ids"]:
+            raise PipelineSchemaError("resolved navigation lacks a closed unblocked workflow")
+    elif state == "SOURCE_BLOCKED":
+        if record["workflow"]["state"] != "SOURCE_BLOCKED" or not record["unresolved_ids"]:
+            raise PipelineSchemaError("source-blocked navigation lacks an exact blocked workflow")
+    elif record["workflow"]["state"] == "CLOSED":
+        raise PipelineSchemaError("pending/broken navigation cannot have a closed workflow")
+
+    raw_block_id = record["raw_block_id"]
+    if raw_block_id is None:
+        if record["raw_line_span"] is not None:
+            raise PipelineSchemaError("navigation line span lacks a Stage 2 raw block")
+    else:
+        raw = indexes["blocks_by_id"].get(raw_block_id)
+        if raw is None or raw["canonical_document_id"] != record["source_document_id"]:
+            raise PipelineSchemaError("navigation raw block does not join its source document")
+        line_span = record["raw_line_span"]
+        if line_span is None or line_span != {
+            "start_line": raw["start_line"],
+            "end_line": raw["end_line"],
+        }:
+            raise PipelineSchemaError("navigation line span does not exactly join its raw block")
+
+    ast_by_id = _validated_ast_nodes(registry, ast_nodes) if _ast_by_id is None else _ast_by_id
+    source_node_id = record["source_node_id"]
+    if source_node_id is None or source_node_id not in ast_by_id:
+        raise PipelineSchemaError("navigation source node does not join the AST ledger")
+    node = ast_by_id[source_node_id]
+    if (
+        node["canonical_document_id"] != record["source_document_id"]
+        or node["output_path"] != record["source_path"]
+        or (raw_block_id is not None and raw_block_id not in node["raw_span_ids"])
+    ):
+        raise PipelineSchemaError("navigation source node/document/block join is inconsistent")
+
+    record_type = record["record_type"]
+    destinations = (
+        record["destination_path"],
+        record["destination_anchor_id"],
+        record["destination_asset_id"],
+    )
+    if record_type == "ANCHOR":
+        if (
+            record["anchor_id"] is None
+            or record["link_kind"] != "NONE"
+            or any(value is not None for value in destinations)
+            or node["fields"].get("anchor_id") != record["anchor_id"]
+        ):
+            raise PipelineSchemaError("ANCHOR navigation has inconsistent anchor/link fields")
+    elif record_type == "LINK":
+        if record["anchor_id"] is not None or record["link_kind"] == "NONE":
+            raise PipelineSchemaError("LINK navigation has inconsistent link fields")
+        if state == "RESOLVED" and all(value is None for value in destinations):
+            raise PipelineSchemaError("resolved LINK lacks a concrete destination")
+    elif record_type == "PAGE_ROUTE":
+        if record["printed_page_label"] is None or record["link_kind"] != "PAGE":
+            raise PipelineSchemaError("PAGE_ROUTE lacks exact page semantics")
+    elif record_type == "LEGACY_COMPATIBILITY_ROUTE":
+        if record["link_kind"] != "LEGACY_COMPATIBILITY" or record["destination_path"] is None:
+            raise PipelineSchemaError("legacy compatibility route lacks a concrete destination")
+
+    if state == "RESOLVED" and record["destination_anchor_id"] is not None:
+        destination = (navigation_by_anchor or {}).get(record["destination_anchor_id"])
+        if destination is None or (
+            record["destination_path"] is not None
+            and destination["source_path"] != record["destination_path"]
+        ):
+            raise PipelineSchemaError("resolved destination anchor does not join an exact ANCHOR row")
+    if state == "RESOLVED" and record["destination_asset_id"] is not None:
+        assets = {row["asset_id"]: row for row in figure_records if row["record_type"] == "ASSET_CANDIDATE"}
+        asset = assets.get(record["destination_asset_id"])
+        if asset is None or (
+            record["destination_path"] is not None
+            and asset["release_path"] != record["destination_path"]
+        ):
+            raise PipelineSchemaError("resolved destination asset does not join a figure asset row")
+
+
+def validate_navigation_set(
+    records: Sequence[Mapping[str, Any]],
+    registry: SchemaRegistry,
+    *,
+    ast_nodes: Sequence[Mapping[str, Any]] = (),
+    figure_records: Sequence[Mapping[str, Any]] = (),
+) -> None:
+    if [row["sequence"] for row in records] != list(range(len(records))):
+        raise PipelineSchemaError("navigation ledger sequence is not exact ledger order")
+    ids = [row["navigation_id"] for row in records]
+    if len(ids) != len(set(ids)):
+        raise PipelineSchemaError("duplicate navigation ID")
+    anchors = [row for row in records if row["record_type"] == "ANCHOR"]
+    anchor_ids = [row["anchor_id"] for row in anchors]
+    if len(anchor_ids) != len(set(anchor_ids)):
+        raise PipelineSchemaError("duplicate navigation anchor ID")
+    by_anchor = {row["anchor_id"]: row for row in anchors}
+    ast_by_id = _validated_ast_nodes(registry, ast_nodes)
+    for row in records:
+        validate_navigation(
+            row,
+            registry,
+            ast_nodes=ast_nodes,
+            navigation_by_anchor=by_anchor,
+            figure_records=figure_records,
+            _ast_by_id=ast_by_id,
+        )
 
 
 def validate_technical(
@@ -2080,6 +2214,7 @@ def validate_unresolved(record: Mapping[str, Any], registry: SchemaRegistry) -> 
 
 
 def validate_compatibility(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
+    """Validate a compatibility evidence record without claiming oracle execution."""
     registry.validate("goal-4/schemas/compatibility-verification.schema.json", record)
     baseline_path = registry.repo_root / "goal-4/compatibility-baseline.json"
     if record["baseline_sha256"] != sha256_file(baseline_path):
@@ -2134,6 +2269,109 @@ def validate_compatibility(record: Mapping[str, Any], registry: SchemaRegistry) 
     expected_all = all(row["identical"] for row in rows)
     if record["all_identical"] != expected_all:
         raise PipelineSchemaError("compatibility all_identical summary is dishonest")
+
+
+def _require_canonical_utc(value: Any, field: str) -> None:
+    if not isinstance(value, str) or re.fullmatch(
+        r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", value
+    ) is None:
+        raise PipelineSchemaError(f"{field} is not canonical UTC seconds")
+
+
+def _receipt_payload_sha256(receipt: Mapping[str, Any]) -> str:
+    payload = {key: value for key, value in receipt.items() if key != "receipt_sha256"}
+    return sha256_bytes(canonical_json_bytes(payload)[:-1])
+
+
+def _validate_self_hashing_receipt(receipt: Mapping[str, Any], field: str) -> None:
+    value = receipt.get("receipt_sha256")
+    if not isinstance(value, str) or value == "0" * 64 or value != _receipt_payload_sha256(receipt):
+        raise PipelineSchemaError(f"{field} receipt hash is absent, placeholder, or not recomputable")
+
+
+def validate_compatibility_observation(
+    record: Mapping[str, Any],
+    receipt: Mapping[str, Any],
+    registry: SchemaRegistry,
+) -> None:
+    """Join evidence to a separately supplied current oracle-execution receipt."""
+
+    validate_compatibility(record, registry)
+    _require_exact_keys(
+        receipt,
+        {
+            "aggregate_behavior_digest",
+            "compatibility_record_sha256",
+            "contract_id",
+            "dependency_fingerprint",
+            "execution_environment_sha256",
+            "legacy_tree_digest",
+            "observation_id",
+            "observed_at",
+            "oracle_receipts",
+            "receipt_sha256",
+            "runner_principal_id",
+            "runner_session_id",
+            "schema_version",
+            "sentinel_fixture_results_sha256",
+        },
+        "compatibility observation receipt",
+    )
+    if receipt["schema_version"] != "1.0.0" or receipt["contract_id"] != "ANKOS-COMPATIBILITY-OBSERVATION-1":
+        raise PipelineSchemaError("wrong compatibility observation receipt identity")
+    for field in ("observation_id", "runner_principal_id", "runner_session_id"):
+        if not isinstance(receipt[field], str) or not receipt[field]:
+            raise PipelineSchemaError(f"compatibility observation lacks {field}")
+    _require_canonical_utc(receipt["observed_at"], "compatibility observation timestamp")
+    if receipt["execution_environment_sha256"] == "0" * 64:
+        raise PipelineSchemaError("compatibility observation uses a placeholder environment digest")
+    if receipt["compatibility_record_sha256"] != sha256_bytes(canonical_json_bytes(record)):
+        raise PipelineSchemaError("compatibility observation does not bind the exact evidence row")
+    for field in ("aggregate_behavior_digest", "dependency_fingerprint", "legacy_tree_digest"):
+        if receipt[field] != record[field]:
+            raise PipelineSchemaError(f"compatibility observation differs from evidence: {field}")
+    sentinel_sha = sha256_bytes(canonical_json_bytes(record["sentinel_fixture_results"])[:-1])
+    if receipt["sentinel_fixture_results_sha256"] != sentinel_sha:
+        raise PipelineSchemaError("compatibility observation sentinel receipt does not join evidence")
+    rows = receipt["oracle_receipts"]
+    if not isinstance(rows, list) or len(rows) != len(record["oracle_results"]):
+        raise PipelineSchemaError("compatibility observation receipt scope is incomplete")
+    expected_keys = {
+        "argv",
+        "exit_code",
+        "finished_at",
+        "framed_behavior_sha256",
+        "oracle_result_sha256",
+        "path",
+        "receipt_sha256",
+        "runner_command",
+        "started_at",
+        "status_kind",
+        "stderr_sha256",
+        "stdout_sha256",
+    }
+    for observed, evidence in zip(rows, record["oracle_results"]):
+        _require_exact_keys(observed, expected_keys, "compatibility oracle execution receipt")
+        _require_canonical_utc(observed["started_at"], "oracle start timestamp")
+        _require_canonical_utc(observed["finished_at"], "oracle finish timestamp")
+        if not isinstance(observed["runner_command"], list) or not observed["runner_command"] or any(
+            not isinstance(part, str) or not part for part in observed["runner_command"]
+        ):
+            raise PipelineSchemaError("compatibility oracle receipt has no concrete runner command")
+        expected = {
+            "argv": evidence["argv"],
+            "exit_code": evidence["exit_code"],
+            "framed_behavior_sha256": evidence["current_framed_behavior_sha256"],
+            "oracle_result_sha256": sha256_bytes(canonical_json_bytes(evidence)),
+            "path": evidence["path"],
+            "status_kind": evidence["status_kind"],
+            "stderr_sha256": evidence["stderr_sha256"],
+            "stdout_sha256": evidence["stdout_sha256"],
+        }
+        if any(observed[field] != value for field, value in expected.items()):
+            raise PipelineSchemaError("compatibility oracle receipt differs from exact evidence row")
+        _validate_self_hashing_receipt(observed, "compatibility oracle execution")
+    _validate_self_hashing_receipt(receipt, "compatibility observation")
 
 
 def validate_corpus_manifest(
@@ -2258,19 +2496,183 @@ def _artifact_with_digest(
     return path
 
 
+def _validate_release_ledgers(
+    registry: SchemaRegistry,
+    contract: Mapping[str, Any],
+    *,
+    output_root: Path | None,
+    ast_nodes: Sequence[Mapping[str, Any]],
+) -> None:
+    """Parse every registered ledger and run its semantic/cross-ledger validator."""
+
+    by_path: dict[str, list[Mapping[str, Any]]] = {}
+    for registration in contract["ledgers"]:
+        rows = load_jsonl(registry.repo_root / registration["path"], require_cj1=True)
+        if not rows and not registration["empty_allowed"]:
+            raise PipelineSchemaError(f"registered ledger is empty but empty_allowed is false: {registration['path']}")
+        for row in rows:
+            if not isinstance(row, dict):
+                raise PipelineSchemaError(f"registered ledger contains a non-object row: {registration['path']}")
+            registry.validate(registration["schema"], row)
+        by_path[registration["path"]] = rows
+
+    reviews = by_path["goal-4/review-ledger.jsonl"]
+    unresolved = by_path["goal-4/unresolved-ledger.jsonl"]
+    repairs = by_path["goal-4/repair-ledger.jsonl"]
+    provenance = by_path["goal-4/provenance-map.jsonl"]
+    technical = by_path["goal-4/formula-code-ledger.jsonl"]
+    figures = by_path["goal-4/figure-caption-asset-ledger.jsonl"]
+    navigation = by_path["goal-4/navigation-ledger.jsonl"]
+    validate_review_set(reviews, registry)
+    unresolved_ids: set[str] = set()
+    for row in unresolved:
+        validate_unresolved(row, registry)
+        if row["unresolved_id"] in unresolved_ids:
+            raise PipelineSchemaError("duplicate unresolved-ledger ID")
+        unresolved_ids.add(row["unresolved_id"])
+    validate_repair_set(repairs, registry, reviews, unresolved)
+    for row in figures:
+        validate_figure(row, registry)
+    validate_provenance_set(
+        provenance,
+        registry,
+        repairs,
+        require_complete_raw_coverage=True,
+        output_root=output_root,
+        ast_nodes=ast_nodes,
+    )
+    for row in technical:
+        validate_technical(
+            row,
+            registry,
+            repairs,
+            reviews,
+            unresolved,
+            output_root=output_root,
+            ast_nodes=ast_nodes,
+        )
+    validate_navigation_set(
+        navigation,
+        registry,
+        ast_nodes=ast_nodes,
+        figure_records=figures,
+    )
+
+
+def _load_receipt(
+    maps: Sequence[Mapping[str, str]], digest: str, registry: SchemaRegistry, label: str
+) -> Mapping[str, Any]:
+    path = _artifact_with_digest(maps, digest, registry, label)
+    receipt = load_json(path, require_cj1=True)
+    if not isinstance(receipt, dict):
+        raise PipelineSchemaError(f"release {label} artifact is not an object receipt")
+    return receipt
+
+
+def _validate_inverse_replay_receipt(
+    receipt: Mapping[str, Any], release: Mapping[str, Any], monolith_sha256: str
+) -> None:
+    keys = {
+        "command", "contract_id", "execution_environment_sha256", "exit_code",
+        "finished_at", "input_state_sha256", "operation_batch_sha256", "receipt_chain_sha256",
+        "receipt_id", "receipt_sha256", "release_id", "schema_version", "started_at",
+        "status_kind", "stderr_sha256", "stdout_sha256", "output_raw_projection_sha256",
+    }
+    _require_exact_keys(receipt, keys, "inverse replay receipt")
+    if receipt["schema_version"] != "1.0.0" or receipt["contract_id"] != "ANKOS-INVERSE-REPLAY-RECEIPT-1":
+        raise PipelineSchemaError("wrong inverse replay receipt identity")
+    if receipt["release_id"] != release["release_id"] or receipt["output_raw_projection_sha256"] != monolith_sha256:
+        raise PipelineSchemaError("inverse replay receipt does not recover the release's frozen monolith")
+    if receipt["status_kind"] != "EXITED" or receipt["exit_code"] != 0:
+        raise PipelineSchemaError("inverse replay receipt is not a successful observed execution")
+    if not receipt["command"] or any(not isinstance(part, str) or not part for part in receipt["command"]):
+        raise PipelineSchemaError("inverse replay receipt lacks a concrete command")
+    for field in ("started_at", "finished_at"):
+        _require_canonical_utc(receipt[field], f"inverse replay {field}")
+    for field in ("execution_environment_sha256", "input_state_sha256", "operation_batch_sha256", "receipt_chain_sha256"):
+        if receipt[field] == "0" * 64:
+            raise PipelineSchemaError(f"inverse replay receipt has placeholder {field}")
+    _validate_self_hashing_receipt(receipt, "inverse replay")
+
+
+def _validate_reproducibility_receipt(
+    receipt: Mapping[str, Any], release: Mapping[str, Any]
+) -> None:
+    _require_exact_keys(
+        receipt,
+        {"build_receipts", "contract_id", "receipt_id", "receipt_sha256", "release_id", "schema_version"},
+        "reproducibility receipt",
+    )
+    if receipt["schema_version"] != "1.0.0" or receipt["contract_id"] != "ANKOS-REPRODUCIBILITY-RECEIPT-1" or receipt["release_id"] != release["release_id"]:
+        raise PipelineSchemaError("wrong reproducibility receipt identity")
+    builds = receipt["build_receipts"]
+    if not isinstance(builds, list) or len(builds) != 2:
+        raise PipelineSchemaError("reproducibility receipt does not contain exactly two builds")
+    build_keys = {
+        "build_id", "command", "execution_environment_sha256", "exit_code", "finished_at",
+        "output_manifest_sha256", "output_tree_sha256", "receipt_sha256", "started_at",
+        "status_kind", "stderr_sha256", "stdout_sha256",
+    }
+    for index, build in enumerate(builds):
+        _require_exact_keys(build, build_keys, "clean-build execution receipt")
+        if build["status_kind"] != "EXITED" or build["exit_code"] != 0:
+            raise PipelineSchemaError("clean-build receipt is not a successful observed execution")
+        if build["command"] not in release["commands"]:
+            raise PipelineSchemaError("clean-build receipt command is absent from release commands")
+        if build["output_manifest_sha256"] != release["output_manifest_sha256"] or build["output_tree_sha256"] != release["two_clean_build_digests"][index]:
+            raise PipelineSchemaError("clean-build receipt does not join release output digests")
+        if build["execution_environment_sha256"] == "0" * 64:
+            raise PipelineSchemaError("clean-build receipt has a placeholder environment digest")
+        _require_canonical_utc(build["started_at"], "clean-build start timestamp")
+        _require_canonical_utc(build["finished_at"], "clean-build finish timestamp")
+        _validate_self_hashing_receipt(build, "clean-build execution")
+    if builds[0]["output_tree_sha256"] != builds[1]["output_tree_sha256"]:
+        raise PipelineSchemaError("two independently receipted clean builds differ")
+    _validate_self_hashing_receipt(receipt, "reproducibility")
+
+
+def _validate_rollback_receipt(
+    receipt: Mapping[str, Any], release: Mapping[str, Any]
+) -> None:
+    keys = {
+        "command", "contract_id", "exit_code", "finished_at", "receipt_id", "receipt_sha256",
+        "release_id", "schema_version", "started_at", "status", "stderr_sha256", "stdout_sha256",
+    }
+    _require_exact_keys(receipt, keys, "rollback receipt")
+    if receipt["schema_version"] != "1.0.0" or receipt["contract_id"] != "ANKOS-ROLLBACK-RECEIPT-1" or receipt["release_id"] != release["release_id"]:
+        raise PipelineSchemaError("wrong rollback receipt identity")
+    not_published = release["publication"]["target_state"] == "NOT_PUBLISHED"
+    if not_published:
+        if receipt["status"] != "NOT_APPLICABLE_NOT_PUBLISHED" or receipt["command"] or any(
+            receipt[field] is not None for field in ("exit_code", "started_at", "finished_at", "stdout_sha256", "stderr_sha256")
+        ):
+            raise PipelineSchemaError("not-published rollback receipt is contradictory")
+    else:
+        if receipt["status"] != "VERIFIED" or receipt["command"] != release["rollback"]["command"] or receipt["exit_code"] != 0:
+            raise PipelineSchemaError("published rollback lacks a successful exact command receipt")
+        _require_canonical_utc(receipt["started_at"], "rollback start timestamp")
+        _require_canonical_utc(receipt["finished_at"], "rollback finish timestamp")
+    _validate_self_hashing_receipt(receipt, "rollback")
+
+
 def validate_release_manifest(
     record: Mapping[str, Any],
     registry: SchemaRegistry,
     *,
     output_root: Path | None = None,
     author_text_projections: Mapping[str, bytes] | None = None,
+    ast_nodes: Sequence[Mapping[str, Any]] = (),
 ) -> None:
     registry.validate("goal-4/schemas/release-manifest.schema.json", record)
     scalar_digests = (
+        record["compatibility_observation_receipt_sha256"],
         record["compatibility_verification_sha256"],
+        record["reproducibility_receipt_sha256"],
         record["output_manifest_sha256"],
         record["schema_lock_sha256"],
+        record["inverse_replay"]["receipt_sha256"],
         record["inverse_replay"]["raw_projection_sha256"],
+        record["rollback"]["receipt_sha256"],
         *record["two_clean_build_digests"],
     )
     if any(value == "0" * 64 for value in scalar_digests):
@@ -2286,13 +2688,12 @@ def validate_release_manifest(
     if publication["target_state"] == "NOT_PUBLISHED":
         if (
             publication["atomic_same_filesystem_rename"] is not False
-            or rollback != {"command": [], "verified": False}
+            or rollback["command"] != []
             or record["prior_release"] is not None
         ):
             raise PipelineSchemaError("NOT_PUBLISHED release has incomplete/contradictory publication state")
     elif (
         publication["atomic_same_filesystem_rename"] is not True
-        or rollback["verified"] is not True
         or not rollback["command"]
     ):
         raise PipelineSchemaError("published release lacks atomic promotion and verified rollback")
@@ -2354,6 +2755,19 @@ def validate_release_manifest(
     validate_compatibility(compatibility, registry)
     if compatibility["all_identical"] is not True:
         raise PipelineSchemaError("release compatibility verification is not fully identical")
+    observation = _load_receipt(
+        artifact_maps,
+        record["compatibility_observation_receipt_sha256"],
+        registry,
+        "compatibility observation",
+    )
+    validate_compatibility_observation(compatibility, observation, registry)
+    _validate_release_ledgers(
+        registry,
+        contract,
+        output_root=output_root,
+        ast_nodes=ast_nodes,
+    )
     corpus_path = _artifact_with_digest(
         artifact_maps, record["output_manifest_sha256"], registry, "output manifest"
     )
@@ -2373,10 +2787,7 @@ def validate_release_manifest(
     monolith = _frozen_indexes(registry)["input_by_path"][
         "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md"
     ]
-    if (
-        record["inverse_replay"]["passed"] is not True
-        or record["inverse_replay"]["raw_projection_sha256"] != monolith["sha256"]
-    ):
+    if record["inverse_replay"]["raw_projection_sha256"] != monolith["sha256"]:
         raise PipelineSchemaError("release inverse replay does not recover the frozen monolith")
     if not record["commands"] or any(
         not command or any(not isinstance(part, str) or not part for part in command)
@@ -2385,6 +2796,21 @@ def validate_release_manifest(
         raise PipelineSchemaError("release reproduction command list is empty/malformed")
     if len(set(record["two_clean_build_digests"])) != 1:
         raise PipelineSchemaError("two clean builds are not byte-identical")
+    inverse_receipt = _load_receipt(
+        artifact_maps, record["inverse_replay"]["receipt_sha256"], registry, "inverse replay"
+    )
+    _validate_inverse_replay_receipt(inverse_receipt, record, monolith["sha256"])
+    reproducibility_receipt = _load_receipt(
+        artifact_maps,
+        record["reproducibility_receipt_sha256"],
+        registry,
+        "reproducibility",
+    )
+    _validate_reproducibility_receipt(reproducibility_receipt, record)
+    rollback_receipt = _load_receipt(
+        artifact_maps, record["rollback"]["receipt_sha256"], registry, "rollback"
+    )
+    _validate_rollback_receipt(rollback_receipt, record)
 
 
 def _require_exact_keys(value: Mapping[str, Any], expected: Iterable[str], where: str) -> None:

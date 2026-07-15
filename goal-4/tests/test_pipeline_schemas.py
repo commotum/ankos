@@ -72,12 +72,24 @@ def blocked_workflow(unresolved: str = "UNRESOLVED-WITNESS-0001") -> dict[str, o
     }
 
 
-def operation(kind: str, before: str, after: str, text: str | None = None) -> dict[str, object]:
+def operation(kind: str, before: str, after: str, *, inverse: bool = False) -> dict[str, object]:
+    if kind != "MOVE":
+        raise ValueError("test fixture currently uses MOVE operations")
+    fields = {
+        "block_id": "RAW-000001",
+        "destination_left_id": None,
+        "destination_right_id": "RAW-000002" if inverse else "RAW-000003",
+        "expected_block_sha256": GUARD_SHA,
+        "expected_destination_adjacency_count": 1,
+        "expected_source_adjacency_count": 1,
+        "operation_type": "MOVE",
+        "source_left_id": None,
+        "source_right_id": "RAW-000003" if inverse else "RAW-000002",
+    }
     payload = {
-        "destination_anchor_id": None,
+        "operation_fields": fields,
         "source_node_ids": ["NODE-1"],
         "target_node_ids": ["NODE-1"],
-        "text": text,
     }
     return {
         "expected_input_projection_sha256": projection(before)["sha256"],
@@ -125,7 +137,7 @@ def valid_repair() -> dict[str, object]:
             "raw_source_sha256": hashlib.sha256(MONOLITH_BYTES).hexdigest(),
             "span": {"end_byte_exclusive": len(GUARD_BYTES), "sha256": GUARD_SHA, "start_byte": 0},
         },
-        "inverse_operation": operation("MOVE", "x", "x"),
+        "inverse_operation": operation("MOVE", "x", "x", inverse=True),
         "operation_projection_sha256": VIEW_SHA,
         "rationale": "Synthetic byte-preserving metadata operation.",
         "repair_class": "NAVIGATION_METADATA",
@@ -134,6 +146,7 @@ def valid_repair() -> dict[str, object]:
         "risk": {"ast_impact_tags": [], "class_tags": ["NAVIGATION_METADATA"], "high_risk": False, "operation_tags": [], "severity_id": "S3_REQUIRED_RELEASE_MECHANICS_ERROR"},
         "schema_version": "1.0.0",
         "target": {"canonical_document_id": None, "node_ids": ["NODE-1"], "path": "DERIVED/Contents.md", "role": "GENERATED_METADATA"},
+        "target_state_guards": {"after_sha256": VIEW_SHA, "before_sha256": VIEW_SHA},
         "unresolved_ids": [],
         "verification_results": [],
         "witness_projection": None,
@@ -178,6 +191,37 @@ def valid_generated_provenance() -> dict[str, object]:
         "sequence": 0,
         "source": endpoint("GENERATED_NONE", EMPTY_SHA, role=None, path=None),
         "target": endpoint("GENERATED_SPAN", EMPTY_SHA, role="GENERATED_METADATA", path="DERIVED/Contents.md"),
+    }
+
+
+def valid_ast_node(
+    node_id: str,
+    *,
+    document_id: str = "PUBLICATION_AND_CONTENTS",
+    output_path: str = "CANONICAL/FRONT-MATTER/00-Publication-and-Contents.md",
+    data: bytes = GUARD_BYTES,
+    raw_block_ids: list[str] | None = None,
+    anchor_id: str | None = None,
+) -> dict[str, object]:
+    text = data.decode("utf-8")
+    fields = {"text": text}
+    if anchor_id is not None:
+        fields["anchor_id"] = anchor_id
+    return {
+        "author_text_projection": text,
+        "author_text_projection_sha256": hashlib.sha256(data).hexdigest(),
+        "canonical_document_id": document_id,
+        "content_role": "CANONICAL_AUTHOR_TEXT",
+        "fields": fields,
+        "node_id": node_id,
+        "node_type": "GENERATED_ANCHOR" if anchor_id is not None else "TEXT",
+        "ordinal": 0,
+        "output_path": output_path,
+        "output_span": {"end_byte_exclusive": len(data), "sha256": hashlib.sha256(data).hexdigest(), "start_byte": 0},
+        "parent_node_id": None,
+        "raw_span_ids": ["RAW-000001"] if raw_block_ids is None else raw_block_ids,
+        "schema_version": "1.0.0",
+        "witness_region_ids": [],
     }
 
 
@@ -254,9 +298,10 @@ def valid_navigation() -> dict[str, object]:
         "record_type": "ANCHOR",
         "resolution_state": "RESOLVED",
         "schema_version": "1.0.0",
-        "source_document_id": "CH01",
-        "source_node_id": "NODE-1",
-        "source_path": "CANONICAL/CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md",
+        "sequence": 0,
+        "source_document_id": "PUBLICATION_AND_CONTENTS",
+        "source_node_id": "NODE-NAV-1",
+        "source_path": "CANONICAL/FRONT-MATTER/00-Publication-and-Contents.md",
         "unresolved_ids": [],
         "witness_unit_id": None,
         "workflow": closed_workflow("APPLIED_MECHANICALLY_PROVEN"),
@@ -416,11 +461,12 @@ def valid_release_manifest() -> dict[str, object]:
         "certification_state": "UNCERTIFIED",
         "claim_scope": "ZERO_REPAIR_STRUCTURAL_BUILD",
         "commands": [["python3", "build.py"]],
+        "compatibility_observation_receipt_sha256": ZERO,
         "compatibility_verification_sha256": ZERO,
         "contract_bindings": {"pipeline": ZERO},
         "contract_id": "ANKOS-RELEASE-1",
         "input_bindings": {"baseline": ZERO},
-        "inverse_replay": {"passed": True, "raw_projection_sha256": ZERO},
+        "inverse_replay": {"raw_projection_sha256": ZERO, "receipt_sha256": ZERO},
         "ledger_hashes": {},
         "open_blocker_ids": ["UNRESOLVED-WITNESS-0001"],
         "output_manifest_sha256": ZERO,
@@ -428,8 +474,9 @@ def valid_release_manifest() -> dict[str, object]:
         "prior_release": None,
         "publication": {"atomic_same_filesystem_rename": False, "target_state": "NOT_PUBLISHED"},
         "release_id": "RELEASE-TEST-1",
+        "reproducibility_receipt_sha256": ZERO,
         "role_counts": {"CANONICAL_AUTHOR_TEXT": 29},
-        "rollback": {"command": [], "verified": False},
+        "rollback": {"command": [], "receipt_sha256": ZERO},
         "schema_lock_sha256": ZERO,
         "schema_version": "1.0.0",
         "tool_hashes": {},
@@ -447,6 +494,7 @@ def valid_technical() -> dict[str, object]:
             "sha256": GUARD_SHA,
             "start_byte": 0,
         },
+        "output_path": "CANONICAL/FRONT-MATTER/00-Publication-and-Contents.md",
         "parse_check": "SOURCE_BLOCKED",
         "program_count_classification": "NOT_APPLICABLE",
         "raw_block_ids": ["RAW-000001"],
@@ -489,9 +537,9 @@ class PipelineSchemaTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.contract, cls.registry = lib.validate_pipeline_contract(ROOT)
 
-    def expect_failure(self, function, *args) -> None:
+    def expect_failure(self, function, *args, **kwargs) -> None:
         with self.assertRaises(lib.PipelineSchemaError):
-            function(*args)
+            function(*args, **kwargs)
 
     def test_01_package_contract_and_schemas_pass(self) -> None:
         self.assertEqual(len(self.registry.schemas), 13)
@@ -609,17 +657,32 @@ class PipelineSchemaTests(unittest.TestCase):
         self.expect_failure(lib.validate_provenance, row, self.registry)
 
     def test_23_valid_generated_navigation_passes(self) -> None:
-        lib.validate_navigation(valid_navigation(), self.registry)
+        row = valid_navigation()
+        lib.validate_navigation(
+            row,
+            self.registry,
+            ast_nodes=[valid_ast_node("NODE-NAV-1", anchor_id=row["anchor_id"])],
+        )
 
     def test_24_navigation_escape_fails(self) -> None:
         row = valid_navigation()
         row["destination_path"] = "../escape.md"
-        self.expect_failure(lib.validate_navigation, row, self.registry)
+        self.expect_failure(
+            lib.validate_navigation,
+            row,
+            self.registry,
+            ast_nodes=[valid_ast_node("NODE-NAV-1", anchor_id=row["anchor_id"])],
+        )
 
     def test_25_generated_navigation_projection_fails(self) -> None:
         row = valid_navigation()
         row["author_text_projection_sha256"] = projection("x")["sha256"]
-        self.expect_failure(lib.validate_navigation, row, self.registry)
+        self.expect_failure(
+            lib.validate_navigation,
+            row,
+            self.registry,
+            ast_nodes=[valid_ast_node("NODE-NAV-1", anchor_id=row["anchor_id"])],
+        )
 
     def test_26_valid_source_blocked_legacy_figure_passes(self) -> None:
         lib.validate_figure(valid_figure(), self.registry)
@@ -806,10 +869,24 @@ class PipelineSchemaTests(unittest.TestCase):
         self.expect_failure(lib.validate_review, row, self.registry)
 
     def test_51_raw_preserved_provenance_joins_frozen_span(self) -> None:
-        lib.validate_provenance(valid_raw_provenance(), self.registry)
-        row = valid_raw_provenance()
-        row["source"]["raw_block_ids"] = ["RAW-000002"]
-        self.expect_failure(lib.validate_provenance, row, self.registry)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            path = output / "CANONICAL/FRONT-MATTER/00-Publication-and-Contents.md"
+            path.parent.mkdir(parents=True)
+            path.write_bytes(GUARD_BYTES)
+            ast = [valid_ast_node("NODE-RAW-1")]
+            lib.validate_provenance(
+                valid_raw_provenance(), self.registry, output_root=output, ast_nodes=ast
+            )
+            row = valid_raw_provenance()
+            row["source"]["raw_block_ids"] = ["RAW-000002"]
+            self.expect_failure(
+                lib.validate_provenance,
+                row,
+                self.registry,
+                output_root=output,
+                ast_nodes=ast,
+            )
 
     def test_52_raw_exclusion_is_typed_but_source_blocked(self) -> None:
         row = valid_raw_provenance()
@@ -819,17 +896,33 @@ class PipelineSchemaTests(unittest.TestCase):
         self.expect_failure(lib.validate_provenance, row, self.registry)
 
     def test_53_valid_source_blocked_technical_span_passes(self) -> None:
-        lib.validate_technical(valid_technical(), self.registry)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            path = output / valid_technical()["output_path"]
+            path.parent.mkdir(parents=True)
+            path.write_bytes(GUARD_BYTES)
+            lib.validate_technical(
+                valid_technical(),
+                self.registry,
+                output_root=output,
+                ast_nodes=[valid_ast_node("NODE-TECHNICAL-1")],
+            )
 
     def test_54_technical_token_semantics_fail_closed(self) -> None:
-        row = valid_technical()
-        row["tokens"][0]["raw_sha256"] = VIEW_SHA
-        self.expect_failure(lib.validate_technical, row, self.registry)
-        row = valid_technical()
-        row["tokens"][0]["changed"] = True
-        row["tokens"][0]["repaired_text"] = "changed"
-        row["changed_token_ids"] = ["TOKEN-1"]
-        self.expect_failure(lib.validate_technical, row, self.registry)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            path = output / valid_technical()["output_path"]
+            path.parent.mkdir(parents=True)
+            path.write_bytes(GUARD_BYTES)
+            kwargs = {"output_root": output, "ast_nodes": [valid_ast_node("NODE-TECHNICAL-1")]}
+            row = valid_technical()
+            row["tokens"][0]["raw_sha256"] = VIEW_SHA
+            self.expect_failure(lib.validate_technical, row, self.registry, **kwargs)
+            row = valid_technical()
+            row["tokens"][0]["changed"] = True
+            row["tokens"][0]["repaired_text"] = "changed"
+            row["changed_token_ids"] = ["TOKEN-1"]
+            self.expect_failure(lib.validate_technical, row, self.registry, **kwargs)
 
     def test_55_figure_fake_witness_id_fails_join(self) -> None:
         row = valid_figure()
@@ -901,12 +994,16 @@ class PipelineSchemaTests(unittest.TestCase):
     def test_62_not_published_release_must_enumerate_all_blockers(self) -> None:
         row = valid_release_manifest()
         for field in (
+            "compatibility_observation_receipt_sha256",
             "compatibility_verification_sha256",
             "output_manifest_sha256",
+            "reproducibility_receipt_sha256",
             "schema_lock_sha256",
         ):
             row[field] = VIEW_SHA
         row["inverse_replay"]["raw_projection_sha256"] = VIEW_SHA
+        row["inverse_replay"]["receipt_sha256"] = VIEW_SHA
+        row["rollback"]["receipt_sha256"] = VIEW_SHA
         row["two_clean_build_digests"] = [VIEW_SHA, VIEW_SHA]
         with self.assertRaisesRegex(lib.PipelineSchemaError, "enumerate every Stage 3 blocker"):
             lib.validate_release_manifest(row, self.registry)
@@ -914,12 +1011,16 @@ class PipelineSchemaTests(unittest.TestCase):
     def test_63_not_published_state_cannot_claim_atomic_publication(self) -> None:
         row = valid_release_manifest()
         for field in (
+            "compatibility_observation_receipt_sha256",
             "compatibility_verification_sha256",
             "output_manifest_sha256",
+            "reproducibility_receipt_sha256",
             "schema_lock_sha256",
         ):
             row[field] = VIEW_SHA
         row["inverse_replay"]["raw_projection_sha256"] = VIEW_SHA
+        row["inverse_replay"]["receipt_sha256"] = VIEW_SHA
+        row["rollback"]["receipt_sha256"] = VIEW_SHA
         row["two_clean_build_digests"] = [VIEW_SHA, VIEW_SHA]
         row["open_blocker_ids"] = sorted(lib._frozen_indexes(self.registry)["open_unresolved_ids"])
         row["publication"]["atomic_same_filesystem_rename"] = True
