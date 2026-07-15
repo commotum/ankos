@@ -264,7 +264,9 @@ class SchemaRegistry:
         if isinstance(schema.get("additionalProperties"), dict):
             self._lint_schema(schema["additionalProperties"], current, f"{at}/additionalProperties")
         for key in ("oneOf",):
-            choices = schema.get(key, [])
+            if key not in schema:
+                continue
+            choices = schema[key]
             if not isinstance(choices, list) or not choices:
                 raise PipelineSchemaError(f"{key} must be a nonempty array at {current}:{at}")
             for index, subschema in enumerate(choices):
@@ -582,8 +584,25 @@ def validate_unresolved(record: Mapping[str, Any], registry: SchemaRegistry) -> 
     registry.validate("goal-4/schemas/unresolved-record.schema.json", record)
     if record["workflow_state"] == "SOURCE_BLOCKED" and record["repair_authorized"]:
         raise PipelineSchemaError("source-blocked item authorizes repair")
+    if record["workflow_state"] != "CLOSED" and record["final_disposition"] is not None:
+        raise PipelineSchemaError("open unresolved item has a final disposition")
+    if record["workflow_state"] == "CLOSED" and record["resolution"] is None:
+        raise PipelineSchemaError("closed unresolved item lacks a resolution")
     if record["resolution"] is None and not record["release_blocker_codes"] and record["severity_id"] != "S4_OPTIONAL_EDITORIAL_ENHANCEMENT":
         raise PipelineSchemaError("open nonoptional item lacks release blocker code")
+
+
+def validate_compatibility(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
+    registry.validate("goal-4/schemas/compatibility-verification.schema.json", record)
+    baseline_path = registry.repo_root / "goal-4/compatibility-baseline.json"
+    if record["baseline_sha256"] != sha256_file(baseline_path):
+        raise PipelineSchemaError("compatibility verification does not bind frozen baseline")
+    baseline = load_json(baseline_path, require_cj1=True)
+    if record["baseline_behavior_digest"] != baseline["behavior_digest"]:
+        raise PipelineSchemaError("compatibility behavior baseline drift")
+    expected_all = all(row["identical"] for row in record["oracle_results"])
+    if record["all_identical"] != expected_all:
+        raise PipelineSchemaError("compatibility all_identical summary is dishonest")
 
 
 def validate_corpus_manifest(record: Mapping[str, Any], registry: SchemaRegistry, guardrails: Mapping[str, Any]) -> None:
