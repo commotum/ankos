@@ -151,8 +151,12 @@ def validate_coverage(
 
 
 def expected_output_files(
-    documents: list[dict[str, object]], images: list[dict[str, object]]
+    documents: list[dict[str, object]],
+    images: list[dict[str, object]],
+    added_assets: list[dict[str, object]] | None = None,
 ) -> set[PurePosixPath]:
+    if added_assets is None:
+        added_assets = []
     document_paths = {
         str(document["id"]): build.safe_relative_path(
             document["output_path"], suffix=".md"
@@ -162,6 +166,9 @@ def expected_output_files(
     expected = set(document_paths.values())
     expected.update({PurePosixPath("README.md"), PurePosixPath("Contents.md")})
     for row in images:
+        source = build.safe_relative_path(row["asset_relative_path"], suffix=".jpeg")
+        expected.add(document_paths[str(row["document_id"])].parent / source.name)
+    for row in added_assets:
         source = build.safe_relative_path(row["asset_relative_path"], suffix=".jpeg")
         expected.add(document_paths[str(row["document_id"])].parent / source.name)
     return expected
@@ -175,7 +182,10 @@ def validate_output(
     images: list[dict[str, object]],
     *,
     zero_corrections: bool = False,
+    added_assets: list[dict[str, object]] | None = None,
 ) -> None:
+    if added_assets is None:
+        added_assets = []
     output = output_root.resolve()
     build._safe_output_root(output)
     if not output.is_dir():
@@ -209,6 +219,15 @@ def validate_output(
             raise build.BuildError(f"missing or changed output image: {relative}")
         expected_references.append((str(row["document_id"]), source.name))
 
+    expected_added_references: list[tuple[str, str]] = []
+    for row in added_assets:
+        source = build.safe_relative_path(row["asset_relative_path"], suffix=".jpeg")
+        relative = document_paths[str(row["document_id"])].parent / source.name
+        path = output / Path(relative)
+        if not path.is_file() or build.sha256(path.read_bytes()) != row["asset_sha256"]:
+            raise build.BuildError(f"missing or changed source-added image: {relative}")
+        expected_added_references.append((str(row["document_id"]), source.name))
+
     actual_references: list[tuple[str, str]] = []
     for document in documents:
         document_id = str(document["id"])
@@ -220,8 +239,13 @@ def validate_output(
             if not (output / Path(resolved)).is_file():
                 raise build.BuildError(f"{relative}: unresolved image target {target}")
             actual_references.append((document_id, target_path.name))
-    if actual_references != expected_references:
+    added_reference_set = set(expected_added_references)
+    actual_added = [row for row in actual_references if row in added_reference_set]
+    actual_legacy = [row for row in actual_references if row not in added_reference_set]
+    if actual_legacy != expected_references:
         raise build.BuildError("output image references differ from image-map.jsonl")
+    if sorted(actual_added) != sorted(expected_added_references):
+        raise build.BuildError("output source-added image references differ from manifest")
 
     if (output / "README.md").read_bytes() != build.readme_bytes():
         raise build.BuildError("README.md is missing or changed")
@@ -237,7 +261,7 @@ def validate_output(
         for path in output.rglob("*")
         if path.is_file()
     }
-    expected_files = expected_output_files(documents, images)
+    expected_files = expected_output_files(documents, images, added_assets)
     if actual_files != expected_files:
         missing = sorted(str(path) for path in expected_files - actual_files)
         extra = sorted(str(path) for path in actual_files - expected_files)
@@ -248,8 +272,10 @@ def validate(
     output_root: Path = build.OUTPUT_ROOT, *, zero_corrections: bool = False
 ) -> tuple[int, int, int, int]:
     raw, documents, corrections, images = build.load_inputs()
+    added_assets = build.load_added_assets(documents, images)
     if zero_corrections:
         corrections = []
+        added_assets = []
     facts = json.loads((build.GOAL_DIR / "legacy-facts.json").read_text(encoding="utf-8"))
     range_data = json.loads(build.RANGES_PATH.read_text(encoding="utf-8"))
     validate_authoritative_source(range_data)
@@ -268,9 +294,10 @@ def validate(
         corrections,
         images,
         zero_corrections=zero_corrections,
+        added_assets=added_assets,
     )
     reviewed = sum(row["second_pass"] == "YES" for row in coverage)
-    return len(documents), len(images), len(corrections), reviewed
+    return len(documents), len(images) + len(added_assets), len(corrections), reviewed
 
 
 def main() -> int:

@@ -20,6 +20,7 @@ MONOLITH_PATH = LEGACY_ROOT / "A-New-Kind-of-Science.md"
 OUTPUT_ROOT = REPO_ROOT / "ref/A-New-Kind-of-Science-Repaired"
 RANGES_PATH = GOAL_DIR / "source-ranges.json"
 IMAGES_PATH = GOAL_DIR / "image-map.jsonl"
+ADDED_ASSETS_PATH = GOAL_DIR / "added-assets.jsonl"
 CORRECTIONS_PATH = GOAL_DIR / "corrections.jsonl"
 SOURCE_STATUS = "USER_AUTHORIZED_LOCAL_SOURCE"
 BOUNDARY_STATUS = "SOURCE_CONFIRMED"
@@ -32,6 +33,18 @@ REPAIRED_IMAGE_FIELDS = {
     "repaired_reason",
     "repaired_width_px",
     "repaired_height_px",
+}
+ADDED_ASSET_FIELDS = {
+    "id",
+    "document_id",
+    "asset_relative_path",
+    "asset_sha256",
+    "authoritative_location",
+    "reason",
+    "width_px",
+    "height_px",
+    "reviewer_type",
+    "verification_status",
 }
 
 
@@ -474,6 +487,99 @@ def validate_images(
     return rows
 
 
+def validate_added_assets(
+    documents: list[dict[str, Any]],
+    images: list[dict[str, Any]],
+    rows: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Validate source-backed visuals absent from the legacy extraction."""
+
+    documents_by_id = {str(document["id"]): document for document in documents}
+    document_outputs = {
+        document_id: safe_relative_path(document["output_path"], suffix=".md")
+        for document_id, document in documents_by_id.items()
+    }
+    occupied_outputs = {
+        document_outputs[str(row["document_id"])].parent
+        / safe_relative_path(row["asset_relative_path"], suffix=".jpeg").name
+        for row in images
+    }
+    ids: set[str] = set()
+    source_paths: set[PurePosixPath] = set()
+    for index, row in enumerate(rows, 1):
+        missing = ADDED_ASSET_FIELDS - row.keys()
+        if missing:
+            raise BuildError(f"added asset {index}: missing {sorted(missing)}")
+        asset_id = row["id"]
+        if not isinstance(asset_id, str) or not asset_id or asset_id in ids:
+            raise BuildError(f"added asset {index}: duplicate or invalid id")
+        ids.add(asset_id)
+        document_id = row["document_id"]
+        if document_id not in documents_by_id:
+            raise BuildError(f"{asset_id}: unknown document id")
+        relative = safe_relative_path(row["asset_relative_path"], suffix=".jpeg")
+        if relative.parts[:2] != ("goal-5", "assets"):
+            raise BuildError(f"{asset_id}: added asset must be under goal-5/assets")
+        if relative in source_paths:
+            raise BuildError(f"{asset_id}: duplicate added asset path")
+        source_paths.add(relative)
+        output_path = document_outputs[document_id].parent / relative.name
+        if output_path in occupied_outputs:
+            raise BuildError(f"{asset_id}: duplicate output asset {output_path}")
+        occupied_outputs.add(output_path)
+
+        page_match = SOURCE_PAGE_IN_ASSET.search(relative.name)
+        location = row["authoritative_location"]
+        location_match = (
+            AUTHORITATIVE_LOCATION.match(location)
+            if isinstance(location, str)
+            else None
+        )
+        if page_match is None or location_match is None:
+            raise BuildError(f"{asset_id}: added asset lacks a canonical source page")
+        filename_page = int(page_match.group(1)) + 1
+        source_page = int(location_match.group(1))
+        owner = documents_by_id[document_id]
+        if filename_page != source_page or not (
+            owner["authoritative_pdf_start_page"]
+            <= source_page
+            <= owner["authoritative_pdf_end_page"]
+        ):
+            raise BuildError(f"{asset_id}: added asset source page or owner differs")
+        for field in ("reason", "reviewer_type"):
+            if not isinstance(row[field], str) or not row[field].strip():
+                raise BuildError(f"{asset_id}: {field} must be non-empty")
+        if row["verification_status"] != "SOURCE_VERIFIED":
+            raise BuildError(f"{asset_id}: added asset is not source verified")
+        for field in ("width_px", "height_px"):
+            if (
+                isinstance(row[field], bool)
+                or not isinstance(row[field], int)
+                or row[field] <= 0
+            ):
+                raise BuildError(f"{asset_id}: invalid {field}")
+
+        asset = REPO_ROOT / Path(relative)
+        digest = row["asset_sha256"]
+        if (
+            not asset.is_file()
+            or not isinstance(digest, str)
+            or sha256(asset.read_bytes()) != digest
+        ):
+            raise BuildError(f"{asset_id}: missing or changed added asset {relative}")
+        if jpeg_dimensions(asset.read_bytes()) != (row["width_px"], row["height_px"]):
+            raise BuildError(f"{asset_id}: added asset dimensions differ from manifest")
+    return rows
+
+
+def load_added_assets(
+    documents: list[dict[str, Any]], images: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    return validate_added_assets(
+        documents, images, read_jsonl(ADDED_ASSETS_PATH)
+    )
+
+
 def output_image_source(
     row: dict[str, Any], *, use_repaired_assets: bool = True
 ) -> Path:
@@ -517,8 +623,8 @@ def readme_bytes() -> bytes:
         "# A New Kind of Science — repair worktree\n\n"
         "This directory is generated by `goal-5/build.py` from the immutable legacy "
         "OCR monolith and mapped assets, with guarded source-verified text corrections "
-        "and explicit repaired-only asset overrides. It is not yet a completely "
-        "source-verified or OCR-corrected edition.\n"
+        "and explicit repaired-only overrides and source-added assets. It is not "
+        "yet a completely source-verified or OCR-corrected edition.\n"
     ).encode("utf-8")
 
 
@@ -548,8 +654,10 @@ def build(
     output_root: Path = OUTPUT_ROOT, *, zero_corrections: bool = False
 ) -> tuple[int, int, int]:
     raw, documents, corrections, images = load_inputs()
+    added_assets = load_added_assets(documents, images)
     if zero_corrections:
         corrections = []
+        added_assets = []
     rendered = document_bytes(raw, documents, corrections)
     output = _safe_output_root(output_root)
     if output != OUTPUT_ROOT.resolve() and output.exists():
@@ -575,6 +683,17 @@ def build(
             destination = temporary / Path(outputs[row["document_id"]].parent) / mapped.name
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, destination)
+        for row in added_assets:
+            source = REPO_ROOT / Path(
+                safe_relative_path(row["asset_relative_path"], suffix=".jpeg")
+            )
+            destination = (
+                temporary
+                / Path(outputs[row["document_id"]].parent)
+                / source.name
+            )
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, destination)
         (temporary / "README.md").write_bytes(readme_bytes())
         (temporary / "Contents.md").write_bytes(contents_bytes(documents))
         if output.exists():
@@ -584,7 +703,7 @@ def build(
         if temporary.exists():
             shutil.rmtree(temporary)
         raise
-    return len(documents), len(images), len(corrections)
+    return len(documents), len(images) + len(added_assets), len(corrections)
 
 
 def main() -> int:
