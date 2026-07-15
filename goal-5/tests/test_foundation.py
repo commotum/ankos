@@ -347,15 +347,40 @@ class FoundationTests(unittest.TestCase):
             )
             self.assertEqual(concatenated, self.raw)
             validate.validate_output(
-                first, self.raw, self.documents, [], self.images
+                first,
+                self.raw,
+                self.documents,
+                [],
+                self.images,
+                zero_corrections=True,
             )
+
+            document_paths = {
+                document["id"]: Path(document["output_path"])
+                for document in self.documents
+            }
+            for row in self.images:
+                image_path = (
+                    first
+                    / document_paths[row["document_id"]].parent
+                    / Path(row["asset_relative_path"]).name
+                )
+                self.assertEqual(build.sha256(image_path.read_bytes()), row["asset_sha256"])
+            opener = self.images[1]
+            self.assertIn("repaired_asset_sha256", opener)
+            self.assertNotEqual(opener["asset_sha256"], opener["repaired_asset_sha256"])
 
             document_path = first / self.documents[0]["output_path"]
             original_document = document_path.read_bytes()
             document_path.write_bytes(original_document + b"x")
             with self.assertRaises(build.BuildError):
                 validate.validate_output(
-                    first, self.raw, self.documents, [], self.images
+                    first,
+                    self.raw,
+                    self.documents,
+                    [],
+                    self.images,
+                    zero_corrections=True,
                 )
             document_path.write_bytes(original_document)
 
@@ -369,7 +394,12 @@ class FoundationTests(unittest.TestCase):
             image_path.write_bytes(original_image + b"x")
             with self.assertRaises(build.BuildError):
                 validate.validate_output(
-                    first, self.raw, self.documents, [], self.images
+                    first,
+                    self.raw,
+                    self.documents,
+                    [],
+                    self.images,
+                    zero_corrections=True,
                 )
             image_path.write_bytes(original_image)
 
@@ -377,7 +407,12 @@ class FoundationTests(unittest.TestCase):
             extra.write_text("unexpected", encoding="utf-8")
             with self.assertRaises(build.BuildError):
                 validate.validate_output(
-                    first, self.raw, self.documents, [], self.images
+                    first,
+                    self.raw,
+                    self.documents,
+                    [],
+                    self.images,
+                    zero_corrections=True,
                 )
 
             occupied = Path(directory) / "occupied"

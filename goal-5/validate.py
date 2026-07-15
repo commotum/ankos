@@ -173,6 +173,8 @@ def validate_output(
     documents: list[dict[str, object]],
     corrections: list[dict[str, object]],
     images: list[dict[str, object]],
+    *,
+    zero_corrections: bool = False,
 ) -> None:
     output = output_root.resolve()
     build._safe_output_root(output)
@@ -184,7 +186,7 @@ def validate_output(
         path = output / Path(relative)
         if not path.is_file() or path.read_bytes() != expected:
             raise build.BuildError(f"missing or changed output document: {relative}")
-    if not corrections and b"".join(rendered.values()) != raw:
+    if zero_corrections and b"".join(rendered.values()) != raw:
         raise build.BuildError("zero-correction documents do not reassemble to the monolith")
 
     document_paths = {
@@ -198,7 +200,11 @@ def validate_output(
         source = build.safe_relative_path(row["asset_relative_path"], suffix=".jpeg")
         relative = document_paths[str(row["document_id"])].parent / source.name
         path = output / Path(relative)
-        expected_hash = row.get("repaired_asset_sha256", row["asset_sha256"])
+        expected_hash = (
+            row["asset_sha256"]
+            if zero_corrections
+            else row.get("repaired_asset_sha256", row["asset_sha256"])
+        )
         if not path.is_file() or build.sha256(path.read_bytes()) != expected_hash:
             raise build.BuildError(f"missing or changed output image: {relative}")
         expected_references.append((str(row["document_id"]), source.name))
@@ -255,7 +261,14 @@ def validate(
             "complete legacy tree differs from the frozen path-and-file snapshot"
         )
     coverage = validate_coverage(documents)
-    validate_output(output_root, raw, documents, corrections, images)
+    validate_output(
+        output_root,
+        raw,
+        documents,
+        corrections,
+        images,
+        zero_corrections=zero_corrections,
+    )
     reviewed = sum(row["second_pass"] == "YES" for row in coverage)
     return len(documents), len(images), len(corrections), reviewed
 

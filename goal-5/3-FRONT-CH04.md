@@ -37,6 +37,11 @@ Status: IN_PROGRESS
   treated as author text. Paragraph, row, list, and table boundaries are.
 - A source table without a header row uses a small raw-HTML table rather than
   promoting its first data row to a Markdown header.
+- A margin figure and caption are serialized after the earliest complete
+  paragraph that explicitly refers to them, or after the closest complete
+  adjacent paragraph when there is no reference. This preserves semantic
+  association and uninterrupted prose; it is a canonical Markdown
+  linearization of a two-dimensional float, not a uniquely printed order.
 - Title artwork, tables, formulas, code, captions, and text embedded in figures
   require direct visual inspection at sufficient zoom; `pdftotext` agreement
   cannot close them.

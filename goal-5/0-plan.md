@@ -160,6 +160,12 @@ and pinned fixed-layout source unless explicitly described as a review risk.
   captions.
 - A CommonMark-oriented representation can preserve the relevant structure of
   formulas, code, tables, captions, and Index entries.
+- Fixed-layout margin figures require an explicit one-dimensional
+  serialization: place each image and caption after the earliest complete
+  paragraph that explicitly refers to it (or, when there is no reference,
+  after the closest complete paragraph beside it), without splitting printed
+  prose. This is a documented canonical Markdown choice, not a claim that the
+  two-dimensional page has one uniquely implied linear order.
 - Four-chapter review batches are small enough to review carefully without
   losing continuity or skipping content.
 - A fresh second review plus targeted detectors can reach zero open OCR

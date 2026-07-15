@@ -223,6 +223,17 @@ class ChapterOneTests(unittest.TestCase):
         changed_override[1]["repaired_asset_sha256"] = "0" * 64
         with self.assertRaises(build.BuildError):
             build.validate_images(self.raw, self.documents, changed_override)
+        wrong_dimensions = copy.deepcopy(self.images)
+        wrong_dimensions[1]["repaired_width_px"] = 1
+        wrong_dimensions[1]["repaired_height_px"] = 1
+        with self.assertRaisesRegex(build.BuildError, "dimensions"):
+            build.validate_images(self.raw, self.documents, wrong_dimensions)
+        wrong_basename = copy.deepcopy(self.images)
+        wrong_basename[1]["repaired_asset_relative_path"] = (
+            "goal-5/assets/CH01/renamed.jpeg"
+        )
+        with self.assertRaisesRegex(build.BuildError, "basename"):
+            build.validate_images(self.raw, self.documents, wrong_basename)
 
     def test_first_pass_coverage_is_recorded_without_claiming_a_second(self) -> None:
         rows = validate.validate_coverage(self.documents)

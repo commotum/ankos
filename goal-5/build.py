@@ -43,6 +43,55 @@ def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def jpeg_dimensions(data: bytes) -> tuple[int, int]:
+    """Read JPEG dimensions without adding an image-library dependency."""
+
+    if not data.startswith(b"\xff\xd8"):
+        raise BuildError("repaired asset is not a JPEG")
+    start_of_frame = {
+        0xC0,
+        0xC1,
+        0xC2,
+        0xC3,
+        0xC5,
+        0xC6,
+        0xC7,
+        0xC9,
+        0xCA,
+        0xCB,
+        0xCD,
+        0xCE,
+        0xCF,
+    }
+    index = 2
+    while index < len(data):
+        while index < len(data) and data[index] != 0xFF:
+            index += 1
+        while index < len(data) and data[index] == 0xFF:
+            index += 1
+        if index >= len(data):
+            break
+        marker = data[index]
+        index += 1
+        if marker in {0x01, 0xD8, 0xD9}:
+            continue
+        if index + 2 > len(data):
+            break
+        length = int.from_bytes(data[index : index + 2], "big")
+        if length < 2 or index + length > len(data):
+            break
+        if marker in start_of_frame:
+            if length < 7:
+                break
+            height = int.from_bytes(data[index + 3 : index + 5], "big")
+            width = int.from_bytes(data[index + 5 : index + 7], "big")
+            if width <= 0 or height <= 0:
+                break
+            return width, height
+        index += length
+    raise BuildError("repaired JPEG has no valid start-of-frame dimensions")
+
+
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -375,6 +424,10 @@ def validate_images(
                 raise BuildError(
                     f"image {ordinal}: repaired asset must be under goal-5/assets"
                 )
+            if repaired_relative.name != source_path.name:
+                raise BuildError(
+                    f"image {ordinal}: repaired asset basename must match mapped asset"
+                )
             repaired_location = row["repaired_authoritative_location"]
             if not isinstance(repaired_location, str):
                 raise BuildError(f"image {ordinal}: invalid repaired source location")
@@ -402,6 +455,15 @@ def validate_images(
                 raise BuildError(
                     f"image {ordinal}: missing or changed repaired asset {repaired_relative}"
                 )
+            actual_dimensions = jpeg_dimensions(repaired_asset.read_bytes())
+            declared_dimensions = (
+                row["repaired_width_px"],
+                row["repaired_height_px"],
+            )
+            if actual_dimensions != declared_dimensions:
+                raise BuildError(
+                    f"image {ordinal}: repaired asset dimensions differ from manifest"
+                )
 
     physical_assets = {
         PurePosixPath(path.relative_to(legacy_root).as_posix())
@@ -412,8 +474,10 @@ def validate_images(
     return rows
 
 
-def output_image_source(row: dict[str, Any]) -> Path:
-    repaired = row.get("repaired_asset_relative_path")
+def output_image_source(
+    row: dict[str, Any], *, use_repaired_assets: bool = True
+) -> Path:
+    repaired = row.get("repaired_asset_relative_path") if use_repaired_assets else None
     if repaired is not None:
         return REPO_ROOT / Path(safe_relative_path(repaired, suffix=".jpeg"))
     return LEGACY_ROOT / Path(
@@ -504,8 +568,11 @@ def build(
             for document in documents
         }
         for row in images:
-            source = output_image_source(row)
-            destination = temporary / Path(outputs[row["document_id"]].parent) / source.name
+            source = output_image_source(
+                row, use_repaired_assets=not zero_corrections
+            )
+            mapped = safe_relative_path(row["asset_relative_path"], suffix=".jpeg")
+            destination = temporary / Path(outputs[row["document_id"]].parent) / mapped.name
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, destination)
         (temporary / "README.md").write_bytes(readme_bytes())
