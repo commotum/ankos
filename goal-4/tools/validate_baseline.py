@@ -5,14 +5,18 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import json
 import re
 import stat
+import subprocess
 import sys
 from collections import Counter, defaultdict
 from fractions import Fraction
 from pathlib import Path, PurePosixPath
 from typing import Any
+
+from PIL import Image
 
 from baseline_lib import (
     BLOCK_KIND_ENUM,
@@ -66,6 +70,75 @@ EXPECTED_ARTIFACTS = (
 # this validator itself, avoiding a circular self-hash.
 EXPECTED_BASELINE_LOCK_SHA256: str | None = None
 
+MANIFEST_KEYS = {
+    "contract_id",
+    "counts",
+    "discovery_policy",
+    "duplicate_jpeg_payload_groups",
+    "git",
+    "legacy_root",
+    "ordering",
+    "path_digests",
+    "path_profile",
+    "quality_seed_material",
+    "raw_inputs",
+    "role_counts",
+    "schema_version",
+    "totals",
+}
+RAW_COMMON_KEYS = {
+    "allocated_byte_size_at_capture",
+    "basename",
+    "byte_size",
+    "file_id",
+    "filesystem_mode_at_capture",
+    "git_head_blob_oid",
+    "git_object_format",
+    "git_storage",
+    "git_tree_mode",
+    "image",
+    "kind",
+    "link_count_at_capture",
+    "logical_line_count",
+    "media_type",
+    "relative_path",
+    "role",
+    "sha256",
+    "text",
+}
+RAW_JPEG_EXTRA_KEYS = {"git_lfs_oid_sha256", "git_lfs_size"}
+JPEG_IMAGE_KEYS = {
+    "component_count",
+    "decoded_color_mode",
+    "height",
+    "sample_precision",
+    "sof_marker",
+    "width",
+}
+TEXT_PROFILE_KEYS = {
+    "cr_count",
+    "encoding",
+    "lf_count",
+    "mojibake_signature_count",
+    "replacement_character_count",
+    "terminal_lf",
+    "utf8_bom",
+}
+
+I_BLANK = lambda text: not text.strip()
+I_FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
+I_HEADING = re.compile(r"^ {0,3}#{1,6}(?:\s|$)")
+I_IMAGE = re.compile(r"^\s*!\[[^\]]*\]\([^)]*\)\s*$")
+I_TABLE = re.compile(r"^\s*\|.*\|\s*$")
+I_LIST = re.compile(r"^\s{0,3}(?:[-+*]|[•■])\s+")
+I_QUOTE = re.compile(r"^\s{0,3}>")
+I_MATH = re.compile(r"^\s*\${1,2}.*\${1,2}\s*$")
+I_CAPTION = re.compile(
+    r"^\s*(?:<sup>[^<]*(?:◆|■)[^<]*</sup>|(?:Figure|Figures|Picture|Pictures)\b)",
+    re.IGNORECASE,
+)
+I_INLINE = re.compile(r"(?<!\\)\$(?!\$).*?(?<!\\)\$")
+
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
     try:
@@ -88,6 +161,105 @@ def load_jsonl(path: Path) -> list[dict[str, Any]]:
 
 def _artifact_paths(artifact_root: Path) -> dict[str, Path]:
     return {name: artifact_root / name for name in EXPECTED_ARTIFACTS}
+
+
+def _independent_lexical_spans(lines: list[dict[str, Any]]) -> list[tuple[int, int, str, str | None]]:
+    texts = [row["content"].decode("utf-8", errors="strict") for row in lines]
+
+    def indented(text: str) -> bool:
+        return text.startswith("    ") or text.startswith("\t")
+
+    def any_match(text: str, patterns: tuple[re.Pattern[str], ...]) -> bool:
+        return any(pattern.match(text) is not None for pattern in patterns)
+
+    spans: list[tuple[int, int, str, str | None]] = []
+    position = 0
+    while position < len(texts):
+        begin = position
+        current = texts[position]
+        if I_BLANK(current):
+            position += 1
+            while position < len(texts) and I_BLANK(texts[position]):
+                position += 1
+            base = "STRUCTURE_BOUNDARY"
+        elif (opened := I_FENCE.match(current)) is not None:
+            token = opened.group(1)
+            closing = re.compile(r"^ {0,3}" + re.escape(token[0]) + "{" + str(len(token)) + r",}\s*$")
+            position += 1
+            while position < len(texts) and closing.match(texts[position]) is None:
+                position += 1
+            require(position < len(texts), f"independent lexer found an open fence at {begin + 1}")
+            position += 1
+            base = "CODE_BLOCK"
+        elif I_HEADING.match(current):
+            position += 1
+            base = "HEADING"
+        elif I_IMAGE.match(current):
+            position += 1
+            base = "IMAGE_REFERENCE"
+        elif I_TABLE.match(current):
+            position += 1
+            while position < len(texts) and I_TABLE.match(texts[position]):
+                position += 1
+            base = "DATA_TABLE"
+        elif I_LIST.match(current):
+            position += 1
+            terminators = (I_LIST, I_HEADING, I_IMAGE, I_FENCE, I_TABLE, I_QUOTE)
+            while position < len(texts) and not I_BLANK(texts[position]) and not any_match(texts[position], terminators):
+                position += 1
+            base = "LIST_ITEM"
+        elif I_QUOTE.match(current):
+            position += 1
+            while position < len(texts) and I_QUOTE.match(texts[position]):
+                position += 1
+            base = "BLOCKQUOTE"
+        elif I_MATH.match(current):
+            position += 1
+            base = "MATH_BLOCK"
+        elif I_CAPTION.match(current):
+            position += 1
+            terminators = (I_HEADING, I_IMAGE, I_FENCE, I_TABLE, I_LIST, I_QUOTE)
+            while position < len(texts) and not I_BLANK(texts[position]) and not any_match(texts[position], terminators):
+                position += 1
+            base = "CAPTION"
+        elif indented(current):
+            position += 1
+            while position < len(texts) and indented(texts[position]):
+                position += 1
+            base = "CODE_BLOCK"
+        else:
+            position += 1
+            terminators = (I_HEADING, I_IMAGE, I_FENCE, I_TABLE, I_LIST, I_QUOTE, I_MATH, I_CAPTION)
+            while (
+                position < len(texts)
+                and not I_BLANK(texts[position])
+                and not any_match(texts[position], terminators)
+                and not indented(texts[position])
+            ):
+                position += 1
+            base = "PROSE"
+        kind = base
+        container: str | None = None
+        if base in {"PROSE", "LIST_ITEM", "BLOCKQUOTE", "CAPTION"} and any(
+            I_INLINE.search(texts[number]) is not None for number in range(begin, position)
+        ):
+            kind = "MATH_INLINE"
+            container = base
+        spans.append((begin + 1, position, kind, container))
+    return spans
+
+
+def _independent_risk(document_id: str, kind: str) -> str:
+    if document_id == "INDEX":
+        return "INDEX_COLUMN_OR_ENTRY"
+    if kind in {"MATH_INLINE", "MATH_BLOCK", "CODE_BLOCK", "DATA_TABLE"}:
+        return "FORMULA_CODE_RULE_OR_DATA"
+    if kind in {"IMAGE_REFERENCE", "CAPTION"}:
+        return "FIGURE_CAPTION_OR_VISUAL"
+    if kind in {"HEADING", "LIST_ITEM", "BLOCKQUOTE", "STRUCTURE_BOUNDARY"}:
+        return "HEADING_LIST_OR_LAYOUT"
+    require(kind == "PROSE", f"independent classifier rejects unknown kind: {kind}")
+    return "PROSE"
 
 
 def _validate_raw_rows(
