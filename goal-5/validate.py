@@ -198,7 +198,8 @@ def validate_output(
         source = build.safe_relative_path(row["asset_relative_path"], suffix=".jpeg")
         relative = document_paths[str(row["document_id"])].parent / source.name
         path = output / Path(relative)
-        if not path.is_file() or build.sha256(path.read_bytes()) != row["asset_sha256"]:
+        expected_hash = row.get("repaired_asset_sha256", row["asset_sha256"])
+        if not path.is_file() or build.sha256(path.read_bytes()) != expected_hash:
             raise build.BuildError(f"missing or changed output image: {relative}")
         expected_references.append((str(row["document_id"]), source.name))
 

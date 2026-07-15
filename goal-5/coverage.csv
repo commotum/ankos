@@ -1,7 +1,7 @@
 document_id,raw_start_line,raw_end_line,first_pass,second_pass,authoritative_start,authoritative_end,reviewer_type,notes
 PUBLICATION_AND_CONTENTS,1,85,YES,YES,pdf:0001,pdf:0008,agent,First pass and fresh rebuilt second pass completed 2026-07-15 over all eight pages; 20 guarded corrections G5-C-0001 through G5-C-0020; pages 2 6 and 8 are intentional blanks; decorative title artwork dispositioned without extraction; focused render and tests passed
 PREFACE,86,165,YES,YES,pdf:0009,pdf:0016,agent,Sequential first pass and independent fresh rebuilt second pass completed 2026-07-15 over all eight pages; 59 guarded corrections G5-C-0021 through G5-C-0079; page 15 divider and page 16 intentional blank dispositioned; exact text emphasis render detectors and focused tests passed
-CH01,166,397,NO,NO,pdf:0017,pdf:0038,,Source range frozen; sequential review not started
+CH01,166,397,YES,NO,pdf:0017,pdf:0038,agent,Complete forward first pass finished 2026-07-15 over all 22 nonblank pages; 27 guarded corrections G5-C-0080 through G5-C-0106; three figures and captions dispositioned; source-faithful repaired-only opener composite recorded in the image map; focused verification complete and independent rebuilt second pass pending
 CH02,398,679,NO,NO,pdf:0039,pdf:0066,,Source range frozen; sequential review not started
 CH03,680,1367,NO,NO,pdf:0067,pdf:0130,,Source range frozen; sequential review not started
 CH04,1368,2141,NO,NO,pdf:0131,pdf:0184,,Source range frozen; sequential review not started

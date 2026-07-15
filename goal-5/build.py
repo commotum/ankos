@@ -25,6 +25,14 @@ SOURCE_STATUS = "USER_AUTHORIZED_LOCAL_SOURCE"
 BOUNDARY_STATUS = "SOURCE_CONFIRMED"
 SOURCE_PAGE_IN_ASSET = re.compile(r"_page_(\d+)_")
 AUTHORITATIVE_LOCATION = re.compile(r"^pdf:(\d{4})(?:$|[; ,])")
+REPAIRED_IMAGE_FIELDS = {
+    "repaired_asset_relative_path",
+    "repaired_asset_sha256",
+    "repaired_authoritative_location",
+    "repaired_reason",
+    "repaired_width_px",
+    "repaired_height_px",
+}
 
 
 class BuildError(ValueError):
@@ -355,6 +363,46 @@ def validate_images(
         if not asset.is_file() or sha256(asset.read_bytes()) != row.get("asset_sha256"):
             raise BuildError(f"image {ordinal}: missing or changed asset {source_path}")
 
+        repaired_fields = REPAIRED_IMAGE_FIELDS & row.keys()
+        if repaired_fields and repaired_fields != REPAIRED_IMAGE_FIELDS:
+            missing = sorted(REPAIRED_IMAGE_FIELDS - repaired_fields)
+            raise BuildError(f"image {ordinal}: incomplete repaired asset fields {missing}")
+        if repaired_fields:
+            repaired_relative = safe_relative_path(
+                row["repaired_asset_relative_path"], suffix=".jpeg"
+            )
+            if repaired_relative.parts[:2] != ("goal-5", "assets"):
+                raise BuildError(
+                    f"image {ordinal}: repaired asset must be under goal-5/assets"
+                )
+            repaired_location = row["repaired_authoritative_location"]
+            if not isinstance(repaired_location, str):
+                raise BuildError(f"image {ordinal}: invalid repaired source location")
+            repaired_page_match = AUTHORITATIVE_LOCATION.match(repaired_location)
+            if repaired_page_match is None or int(repaired_page_match.group(1)) != source_page:
+                raise BuildError(
+                    f"image {ordinal}: repaired source page does not match asset name"
+                )
+            if not isinstance(row["repaired_reason"], str) or not row["repaired_reason"].strip():
+                raise BuildError(f"image {ordinal}: repaired asset lacks a reason")
+            for field in ("repaired_width_px", "repaired_height_px"):
+                if (
+                    isinstance(row[field], bool)
+                    or not isinstance(row[field], int)
+                    or row[field] <= 0
+                ):
+                    raise BuildError(f"image {ordinal}: invalid {field}")
+            repaired_asset = REPO_ROOT / Path(repaired_relative)
+            repaired_hash = row["repaired_asset_sha256"]
+            if (
+                not repaired_asset.is_file()
+                or not isinstance(repaired_hash, str)
+                or sha256(repaired_asset.read_bytes()) != repaired_hash
+            ):
+                raise BuildError(
+                    f"image {ordinal}: missing or changed repaired asset {repaired_relative}"
+                )
+
     physical_assets = {
         PurePosixPath(path.relative_to(legacy_root).as_posix())
         for path in legacy_root.rglob("*.jpeg")
@@ -362,6 +410,15 @@ def validate_images(
     if physical_assets != source_paths:
         raise BuildError("image map and physical legacy JPEG inventory differ")
     return rows
+
+
+def output_image_source(row: dict[str, Any]) -> Path:
+    repaired = row.get("repaired_asset_relative_path")
+    if repaired is not None:
+        return REPO_ROOT / Path(safe_relative_path(repaired, suffix=".jpeg"))
+    return LEGACY_ROOT / Path(
+        safe_relative_path(row["asset_relative_path"], suffix=".jpeg")
+    )
 
 
 def load_inputs() -> tuple[bytes, list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
@@ -446,7 +503,7 @@ def build(
             for document in documents
         }
         for row in images:
-            source = LEGACY_ROOT / Path(safe_relative_path(row["asset_relative_path"], suffix=".jpeg"))
+            source = output_image_source(row)
             destination = temporary / Path(outputs[row["document_id"]].parent) / source.name
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, destination)
