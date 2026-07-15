@@ -28,6 +28,33 @@ COVERAGE_FIELDS = [
 IMAGE_REFERENCE = re.compile(r"!\[[^\]]*\]\(([^)\s]+)\)")
 
 
+def validate_authoritative_source(data: dict[str, object]) -> Path:
+    """Pin the local fixed-layout witness without making it a build input."""
+
+    source = data.get("authoritative_source")
+    if not isinstance(source, dict):
+        raise build.BuildError("source-ranges.json lacks authoritative_source")
+    relative = build.safe_relative_path(source.get("path"), suffix=".pdf")
+    path = (build.REPO_ROOT / Path(relative)).resolve()
+    repository = build.REPO_ROOT.resolve()
+    if not path.is_relative_to(repository):
+        raise build.BuildError("authoritative source resolves outside the repository")
+    if path.is_relative_to(build.LEGACY_ROOT.resolve()) or path.is_relative_to(
+        build.OUTPUT_ROOT.resolve()
+    ):
+        raise build.BuildError("authoritative source overlaps a protected corpus tree")
+    if not path.is_file():
+        raise build.BuildError(f"authoritative source is missing: {relative}")
+    payload = path.read_bytes()
+    if len(payload) != source.get("size_bytes"):
+        raise build.BuildError("authoritative source byte size differs from its manifest")
+    if build.sha256(payload) != source.get("sha256"):
+        raise build.BuildError("authoritative source hash differs from its manifest")
+    if not payload.startswith(b"%PDF-") or b"%%EOF" not in payload[-1024:]:
+        raise build.BuildError("authoritative source is not a complete PDF payload")
+    return path
+
+
 def legacy_tree_digest() -> tuple[str, int]:
     lines: list[bytes] = []
     paths = sorted(
@@ -209,6 +236,8 @@ def validate(
     if zero_corrections:
         corrections = []
     facts = json.loads((build.GOAL_DIR / "legacy-facts.json").read_text(encoding="utf-8"))
+    range_data = json.loads(build.RANGES_PATH.read_text(encoding="utf-8"))
+    validate_authoritative_source(range_data)
     expected_digest = facts["legacy_tree"]["snapshot_sha256"]
     expected_files = facts["legacy_tree"]["file_counts"]["regular_files"]
     actual_digest, actual_files = legacy_tree_digest()

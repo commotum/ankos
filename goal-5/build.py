@@ -19,6 +19,8 @@ OUTPUT_ROOT = REPO_ROOT / "ref/A-New-Kind-of-Science-Repaired"
 RANGES_PATH = GOAL_DIR / "source-ranges.json"
 IMAGES_PATH = GOAL_DIR / "image-map.jsonl"
 CORRECTIONS_PATH = GOAL_DIR / "corrections.jsonl"
+SOURCE_STATUS = "USER_AUTHORIZED_LOCAL_SOURCE"
+BOUNDARY_STATUS = "SOURCE_CONFIRMED"
 
 
 class BuildError(ValueError):
@@ -63,8 +65,58 @@ def validate_ranges(raw: bytes, data: dict[str, Any]) -> list[dict[str, Any]]:
     if sha256(raw) != expected_raw_hash:
         raise BuildError("raw monolith hash does not match source-ranges.json")
 
+    source = data.get("authoritative_source")
+    if not isinstance(source, dict):
+        raise BuildError("source-ranges.json lacks authoritative_source")
+    required_source_fields = {
+        "id",
+        "path",
+        "sha256",
+        "size_bytes",
+        "pdf_page_count",
+        "edition",
+        "printing",
+        "isbn_10",
+        "location_convention",
+        "authorization_date",
+        "authorization_scope",
+        "source_status",
+    }
+    missing_source_fields = required_source_fields - source.keys()
+    if missing_source_fields:
+        raise BuildError(
+            f"authoritative_source lacks {sorted(missing_source_fields)}"
+        )
+    safe_relative_path(source["path"], suffix=".pdf")
+    source_hash = source["sha256"]
+    if (
+        not isinstance(source_hash, str)
+        or len(source_hash) != 64
+        or any(character not in "0123456789abcdef" for character in source_hash)
+    ):
+        raise BuildError("authoritative_source has an invalid SHA-256")
+    if not isinstance(source["size_bytes"], int) or source["size_bytes"] <= 0:
+        raise BuildError("authoritative_source has an invalid byte size")
+    page_count = source["pdf_page_count"]
+    if not isinstance(page_count, int) or page_count <= 0:
+        raise BuildError("authoritative_source has an invalid PDF page count")
+    if source["source_status"] != SOURCE_STATUS:
+        raise BuildError("authoritative_source is not authorized for local review")
+    for field in (
+        "id",
+        "edition",
+        "printing",
+        "isbn_10",
+        "location_convention",
+        "authorization_date",
+        "authorization_scope",
+    ):
+        if not isinstance(source[field], str) or not source[field].strip():
+            raise BuildError(f"authoritative_source has an empty {field}")
+
     byte_cursor = 0
     line_cursor = 1
+    authoritative_page_cursor = 1
     ids: set[str] = set()
     outputs: set[PurePosixPath] = set()
     for order, document in enumerate(documents):
@@ -101,13 +153,32 @@ def validate_ranges(raw: bytes, data: dict[str, Any]) -> list[dict[str, Any]]:
             raise BuildError(f"{document_id}: declared line interval mismatch")
         if sha256(segment) != document.get("raw_segment_sha256"):
             raise BuildError(f"{document_id}: segment hash mismatch")
+        if document.get("boundary_status") != BOUNDARY_STATUS:
+            raise BuildError(f"{document_id}: boundary is not source confirmed")
+        source_start = document.get("authoritative_pdf_start_page")
+        source_end = document.get("authoritative_pdf_end_page")
+        if (
+            source_start != authoritative_page_cursor
+            or not isinstance(source_end, int)
+            or source_end < source_start
+            or source_end > page_count
+        ):
+            raise BuildError(
+                f"{document_id}: authoritative PDF page gap, overlap, or invalid range"
+            )
+        for field in ("authoritative_printed_start", "authoritative_printed_end"):
+            if not isinstance(document.get(field), str) or not document[field].strip():
+                raise BuildError(f"{document_id}: missing {field}")
         byte_cursor = end
         line_cursor = end_line + 1
+        authoritative_page_cursor = source_end + 1
 
     if byte_cursor != len(raw):
         raise BuildError("document ranges do not reach the end of the monolith")
     if line_cursor - 1 != len(raw.splitlines()):
         raise BuildError("document line ranges do not cover the monolith")
+    if authoritative_page_cursor != page_count + 1:
+        raise BuildError("document ranges do not cover the authoritative PDF")
     return documents
 
 
