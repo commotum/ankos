@@ -53,7 +53,15 @@ class CanonicalJsonTests(unittest.TestCase):
             stage4.safe_relative("goal-4/tools/a.py", "path").as_posix(),
             "goal-4/tools/a.py",
         )
-        for value in ("", "/tmp/a", "../a", "goal-4/../a", "goal-4\\a", "goal-4/%2e/a"):
+        for value in (
+            "",
+            "/tmp/a",
+            "../a",
+            "goal-4/../a",
+            "goal-4\\a",
+            "goal-4/%2e/a",
+            "goal-4/a\n",
+        ):
             with self.subTest(value=value), self.assertRaises(stage4.Stage4ValidationError):
                 stage4.safe_relative(value, "path")
 
@@ -109,6 +117,7 @@ class FilesystemTypeTests(unittest.TestCase):
             row = {
                 "byte_size": len(payload),
                 "category": "TEST",
+                "mode": "0600",
                 "path": "artifact",
                 "sha256": hashlib.sha256(payload).hexdigest(),
                 "type": "REGULAR_FILE",
@@ -200,7 +209,7 @@ class FrozenPackageTests(unittest.TestCase):
         self.assertEqual(result["regular_files"], 1463)
         self.assertEqual(result["directory_count"], 36)
 
-    def test_lock_only_validator_is_relocation_safe_no_git_and_read_only(self) -> None:
+    def test_lock_only_validator_is_relocation_safe_and_no_git(self) -> None:
         lock, artifacts, _ = stage4._load_outer_lock(ROOT, self.lock_digest)
         self.assertEqual(len(artifacts), len(stage4.EXPECTED_ARTIFACT_PATHS))
         with tempfile.TemporaryDirectory(dir="/tmp") as directory:
@@ -210,7 +219,7 @@ class FrozenPackageTests(unittest.TestCase):
                 target = relocated.joinpath(*Path(relative).parts)
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(source, target)
-                os.chmod(target, 0o444)
+                os.chmod(target, 0o644)
             command = [
                 sys.executable,
                 "-B",

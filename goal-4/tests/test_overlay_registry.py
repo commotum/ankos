@@ -225,6 +225,110 @@ class RealCorpusRegistryTests(unittest.TestCase):
                 self.state, (operation,), authority=synthetic
             )
 
+    def test_registry_digest_binds_every_validated_repair_vector(self) -> None:
+        operation = self.canonical_operation()
+        binding = pipeline.ValidatedRepairBinding(
+            repair_id=operation.meta.repair_id,
+            repair_row_sha256=sha256(b"repair row"),
+            operation_projection_sha256=overlay_lib.operation_projection_sha256(
+                operation
+            ),
+            expected_target_sha256=operation.meta.expected_target_sha256,
+            expected_result_sha256=operation.meta.expected_result_sha256,
+            forward_payload_sha256=sha256(b"forward payload"),
+            inverse_payload_sha256=sha256(b"inverse payload"),
+            overlay_operation_bound=True,
+        )
+        expected = overlay_registry._registry_digest(  # type: ignore[attr-defined]
+            self.snapshot, (binding,)
+        )
+        for field in (
+            "repair_row_sha256",
+            "operation_projection_sha256",
+            "expected_target_sha256",
+            "expected_result_sha256",
+            "forward_payload_sha256",
+            "inverse_payload_sha256",
+        ):
+            with self.subTest(field=field):
+                forged = replace(
+                    binding, **{field: sha256(f"forged {field}".encode())}
+                )
+                self.assertNotEqual(
+                    overlay_registry._registry_digest(  # type: ignore[attr-defined]
+                        self.snapshot, (forged,)
+                    ),
+                    expected,
+                )
+
+    def test_production_factory_receives_literal_validated_binding_fields(self) -> None:
+        operation = self.canonical_operation()
+        binding = pipeline.ValidatedRepairBinding(
+            repair_id=operation.meta.repair_id,
+            repair_row_sha256=sha256(b"exact repair ledger row"),
+            operation_projection_sha256=overlay_lib.operation_projection_sha256(
+                operation
+            ),
+            expected_target_sha256=operation.meta.expected_target_sha256,
+            expected_result_sha256=operation.meta.expected_result_sha256,
+            forward_payload_sha256=sha256(b"exact forward payload"),
+            inverse_payload_sha256=sha256(b"exact inverse payload"),
+            overlay_operation_bound=True,
+        )
+        present_repairs = overlay_registry._Ledger(  # type: ignore[attr-defined]
+            overlay_registry.REPAIR_LEDGER_PATH,
+            True,
+            sha256(b"repair ledger"),
+            ({"repair_id": operation.meta.repair_id},),
+            (binding.repair_row_sha256,),
+        )
+        present_reviews = overlay_registry._Ledger(  # type: ignore[attr-defined]
+            overlay_registry.REVIEW_LEDGER_PATH,
+            True,
+            sha256(b"review ledger"),
+            (),
+            (),
+        )
+        opened = replace(
+            self.snapshot,
+            witness_status="OPEN",
+            witness_region_ids=frozenset({"WITNESS-REGION-0001"}),
+            repair_ledger=present_repairs,
+            review_ledger=present_reviews,
+        )
+        sentinel = object()
+        with (
+            mock.patch.object(
+                overlay_registry, "_load_snapshot", return_value=opened
+            ),
+            mock.patch.object(
+                pipeline,
+                "validate_overlay_operation_binding",
+                return_value=binding,
+            ),
+            mock.patch.object(
+                pipeline,
+                "validate_overlay_witness_binding",
+                return_value=None,
+                create=True,
+            ),
+            mock.patch.object(
+                overlay_lib,
+                "_application_authority_from_validated_registry",
+                return_value=sentinel,
+            ) as factory,
+        ):
+            result = overlay_registry.mint_production_authority(
+                ROOT, self.state, (operation,)
+            )
+        self.assertIs(result, sentinel)
+        grant = factory.call_args.kwargs["grants"][0]
+        self.assertEqual(grant.repair_row_sha256, binding.repair_row_sha256)
+        self.assertEqual(grant.expected_target_sha256, binding.expected_target_sha256)
+        self.assertEqual(grant.expected_result_sha256, binding.expected_result_sha256)
+        self.assertEqual(grant.forward_payload_sha256, binding.forward_payload_sha256)
+        self.assertEqual(grant.inverse_payload_sha256, binding.inverse_payload_sha256)
+
 
 class FrozenArtifactMutationTests(unittest.TestCase):
     def test_target_path_drift_in_guardrails_is_rejected(self) -> None:

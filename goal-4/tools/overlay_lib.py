@@ -1635,6 +1635,31 @@ def _validate_application_authority(
     actual_batch = ordered_operations_sha256(records)
     if authority.ordered_batch_sha256 != actual_batch:
         raise EvidenceError("canonical authority ordered-operation binding mismatch")
+    if not authority.synthetic_test_only:
+        expected_proof = _production_validator_proof_sha256(
+            initial_state_sha256=initial.sha256,
+            registry_sha256=authority.registry_sha256,
+            operation_projection_sha256s=tuple(
+                grant.operation_projection_sha256 for grant in authority.grants
+            ),
+            repair_row_sha256s=tuple(
+                grant.repair_row_sha256 for grant in authority.grants
+            ),
+            expected_target_sha256s=tuple(
+                grant.expected_target_sha256 for grant in authority.grants
+            ),
+            expected_result_sha256s=tuple(
+                grant.expected_result_sha256 for grant in authority.grants
+            ),
+            forward_payload_sha256s=tuple(
+                grant.forward_payload_sha256 for grant in authority.grants
+            ),
+            inverse_payload_sha256s=tuple(
+                grant.inverse_payload_sha256 for grant in authority.grants
+            ),
+        )
+        if authority.validator_proof_sha256 != expected_proof:
+            raise EvidenceError("canonical authority repair-row proof mismatch")
 
     by_repair = {grant.repair_id: grant for grant in authority.grants}
     if set(by_repair) != {record.meta.repair_id for record in canonical}:
@@ -1652,6 +1677,8 @@ def _validate_application_authority(
             meta.raw_source_row_sha256,
             meta.target_role,
             operation_projection_sha256(record),
+            meta.expected_target_sha256,
+            meta.expected_result_sha256,
             meta.validated_risk_tags,
             meta.validated_ast_impact,
             None if witness is None else witness.witness_id,
@@ -1670,6 +1697,8 @@ def _validate_application_authority(
             grant.raw_source_row_sha256,
             grant.target_role,
             grant.operation_projection_sha256,
+            grant.expected_target_sha256,
+            grant.expected_result_sha256,
             grant.validated_risk_tags,
             grant.validated_ast_impact,
             grant.witness_id,

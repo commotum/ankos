@@ -88,7 +88,12 @@ def _artifact_rows() -> tuple[tuple[str, str], ...]:
         "goal-4/schemas/unresolved-record.schema.json": "SCHEMA",
         "goal-4/schemas/workflow.schema.json": "SCHEMA",
         # Stage 4 implementations and exact nested entry points.
+        "goal-4/tools/baseline_lib.py": "UPSTREAM_TOOL",
         "goal-4/tools/build_zero_repair.py": "TOOL",
+        "goal-4/tools/capture_baseline.py": "UPSTREAM_TOOL",
+        "goal-4/tools/capture_compatibility.py": "UPSTREAM_TOOL",
+        "goal-4/tools/capture_witness.py": "UPSTREAM_TOOL",
+        "goal-4/tools/guardrail_lib.py": "UPSTREAM_TOOL",
         "goal-4/tools/overlay_lib.py": "TOOL",
         "goal-4/tools/overlay_registry.py": "TOOL",
         "goal-4/tools/pipeline_schema_lib.py": "TOOL",
@@ -102,11 +107,15 @@ def _artifact_rows() -> tuple[tuple[str, str], ...]:
         "goal-4/tools/validate_baseline.py": "UPSTREAM_VALIDATOR",
         "goal-4/tools/validate_guardrails.py": "UPSTREAM_VALIDATOR",
         "goal-4/tools/validate_witness.py": "UPSTREAM_VALIDATOR",
+        "goal-4/tools/witness_lib.py": "UPSTREAM_TOOL",
         # The complete accepted Stage 4 test surface.
+        "goal-4/tests/test_baseline.py": "UPSTREAM_TEST",
+        "goal-4/tests/test_guardrails.py": "UPSTREAM_TEST",
         "goal-4/tests/test_overlay.py": "TEST",
         "goal-4/tests/test_overlay_registry.py": "TEST",
         "goal-4/tests/test_pipeline_schemas.py": "TEST",
         "goal-4/tests/test_stage4.py": "TEST",
+        "goal-4/tests/test_witness.py": "UPSTREAM_TEST",
         "goal-4/tests/test_zero_repair.py": "TEST",
     }
     return tuple(sorted(rows.items()))
@@ -115,6 +124,16 @@ def _artifact_rows() -> tuple[tuple[str, str], ...]:
 EXPECTED_ARTIFACT_ROWS = _artifact_rows()
 EXPECTED_ARTIFACT_PATHS = tuple(path for path, _ in EXPECTED_ARTIFACT_ROWS)
 EXPECTED_CATEGORY_BY_PATH = dict(EXPECTED_ARTIFACT_ROWS)
+EXPECTED_CLOSED_DIRECTORIES = {
+    directory: tuple(
+        sorted(
+            PurePosixPath(path).name
+            for path in EXPECTED_ARTIFACT_PATHS
+            if PurePosixPath(path).parent.as_posix() == directory
+        )
+    )
+    for directory in ("goal-4/schemas", "goal-4/tests", "goal-4/tools")
+}
 
 EXPECTED_VALIDATORS = (
     ("goal-4/tools/validate_guardrails.py", "GUARDRAILS OK"),
@@ -367,7 +386,7 @@ def _artifact_map(lock: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
     for index, candidate in enumerate(rows):
         row = _exact_keys(
             candidate,
-            {"byte_size", "category", "path", "sha256", "type"},
+            {"byte_size", "category", "mode", "path", "sha256", "type"},
             f"outer-lock artifact {index}",
         )
         relative = safe_relative(row["path"], f"outer-lock artifact {index} path")
@@ -375,6 +394,7 @@ def _artifact_map(lock: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
         _require(path.startswith("goal-4/"), f"outer-lock artifact escapes Goal 4: {path}")
         _require(path not in result, f"duplicate outer-lock artifact path: {path}")
         _require(row["type"] == REGULAR_FILE, f"outer-lock artifact type drift: {path}")
+        _require(row["mode"] == "0644", f"outer-lock artifact mode policy drift: {path}")
         _require(
             type(row["byte_size"]) is int and row["byte_size"] >= 0,
             f"outer-lock artifact byte-size drift: {path}",
@@ -463,12 +483,15 @@ def _validate_lock_metadata(lock: Mapping[str, Any]) -> None:
     _require(LOCK_RELATIVE.as_posix() not in EXPECTED_ARTIFACT_PATHS, "outer lock contains a circular self-hash")
 
 
-def _verify_artifact(repo: Path, row: Mapping[str, Any]) -> tuple[int, int, int, int, int, int, str]:
+def _verify_artifact(
+    repo: Path, row: Mapping[str, Any]
+) -> tuple[int, int, int, int, int, int, int, str]:
     relative = safe_relative(row["path"], "locked artifact path")
     payload, status = read_plain_file(_join(repo, relative), f"locked artifact {relative.as_posix()}")
     _require(len(payload) == row["byte_size"], f"locked artifact byte-size drift: {relative.as_posix()}")
     digest = _sha256(payload)
     _require(digest == row["sha256"], f"locked artifact digest drift: {relative.as_posix()}")
+    _require(stat.S_IMODE(status.st_mode) == int(row["mode"], 8), f"locked artifact mode drift: {relative.as_posix()}")
     return (
         status.st_dev,
         status.st_ino,
@@ -476,13 +499,14 @@ def _verify_artifact(repo: Path, row: Mapping[str, Any]) -> tuple[int, int, int,
         status.st_nlink,
         status.st_size,
         status.st_mtime_ns,
+        status.st_ctime_ns,
         digest,
     )
 
 
 def validate_locked_artifacts(
     repo: Path, artifacts: Mapping[str, Mapping[str, Any]]
-) -> dict[str, tuple[int, int, int, int, int, int, str]]:
+) -> dict[str, tuple[int, int, int, int, int, int, int, str]]:
     return {path: _verify_artifact(repo, artifacts[path]) for path in EXPECTED_ARTIFACT_PATHS}
 
 
@@ -611,9 +635,10 @@ def validate_legacy_allowlist(repo: Path, expected_digest: str) -> Mapping[str, 
     _require(actual == set(expected), "legacy filesystem path set differs from explicit allowlist")
 
     sequence = hashlib.sha256(b"ANKOS-STAGE4-LEGACY-CONTENT-1\0")
+    identities = hashlib.sha256(b"ANKOS-STAGE4-LEGACY-IDENTITIES-1\0")
     for path in sorted(expected):
         row = expected[path]
-        payload, _ = read_plain_file(_join(legacy, safe_relative(path, "legacy file path")), f"legacy file {path}")
+        payload, status = read_plain_file(_join(legacy, safe_relative(path, "legacy file path")), f"legacy file {path}")
         _require(len(payload) == row["byte_size"], f"legacy byte-size drift: {path}")
         digest = _sha256(payload)
         _require(digest == row["sha256"], f"legacy content digest drift: {path}")
@@ -621,10 +646,26 @@ def validate_legacy_allowlist(repo: Path, expected_digest: str) -> Mapping[str, 
         sequence.update(len(encoded_path).to_bytes(8, "big"))
         sequence.update(encoded_path)
         sequence.update(bytes.fromhex(digest))
+        identity = canonical_json_bytes(
+            {
+                "ctime_ns": status.st_ctime_ns,
+                "device": status.st_dev,
+                "inode": status.st_ino,
+                "mode": stat.S_IMODE(status.st_mode),
+                "mtime_ns": status.st_mtime_ns,
+                "nlink": status.st_nlink,
+                "path": path,
+                "size": status.st_size,
+            },
+            terminal_lf=False,
+        )
+        identities.update(len(identity).to_bytes(8, "big"))
+        identities.update(identity)
     return {
         "allowlist_sha256": allowlist_digest,
         "content_sequence_sha256": sequence.hexdigest(),
         "directory_count": directory_count,
+        "identity_sequence_sha256": identities.hexdigest(),
         "regular_files": len(actual),
     }
 
@@ -640,6 +681,7 @@ def validate_empty_sibling(repo: Path) -> Mapping[str, Any]:
         "inode": status.st_ino,
         "mode": stat.S_IMODE(status.st_mode),
         "mtime_ns": status.st_mtime_ns,
+        "ctime_ns": status.st_ctime_ns,
         "entries": (),
     }
 
@@ -1021,7 +1063,7 @@ def _static_validation(
     Mapping[str, Any],
     Mapping[str, Any],
     Mapping[str, Any],
-    dict[str, tuple[int, int, int, int, int, int, str]],
+    dict[str, tuple[int, int, int, int, int, int, int, str]],
 ]:
     _plain_directory(repo, "repository root")
     _runtime_path(repo)

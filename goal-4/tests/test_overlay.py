@@ -49,6 +49,10 @@ from overlay_lib import (  # noqa: E402
     inverse_replay,
     sha256_bytes,
     target_sha256,
+    operation_projection_sha256,
+    ordered_operations_sha256,
+    _application_authority_from_validated_registry,
+    _production_validator_proof_sha256,
     _test_only_application_authority,
     _test_only_apply_overlays,
 )
@@ -821,6 +825,55 @@ class OverlayMutationTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(EvidenceError, "ordered-operation binding mismatch"):
             _test_only_apply_overlays(initial, [fabricated_join], authority=authority)
+
+    def test_production_proof_binds_literal_repair_row_and_payload_hashes(self) -> None:
+        initial, record = self.replacement_fixture()
+        synthetic = _test_only_application_authority(initial, [record])
+        grant = synthetic.grants[0]
+        registry_sha256 = sha256_bytes(b"validated production registry")
+        proof = _production_validator_proof_sha256(
+            initial_state_sha256=initial.sha256,
+            registry_sha256=registry_sha256,
+            operation_projection_sha256s=(operation_projection_sha256(record),),
+            repair_row_sha256s=(grant.repair_row_sha256,),
+            expected_target_sha256s=(grant.expected_target_sha256,),
+            expected_result_sha256s=(grant.expected_result_sha256,),
+            forward_payload_sha256s=(grant.forward_payload_sha256,),
+            inverse_payload_sha256s=(grant.inverse_payload_sha256,),
+        )
+        authority = _application_authority_from_validated_registry(
+            gate_state="OPEN",
+            baseline_lock_sha256=sha256_bytes(b"baseline lock"),
+            witness_lock_sha256=sha256_bytes(b"witness lock"),
+            registry_sha256=registry_sha256,
+            validator_proof_sha256=proof,
+            initial_state_sha256=initial.sha256,
+            ordered_batch_sha256=ordered_operations_sha256((record,)),
+            grants=(grant,),
+        )
+        result = _raw_apply_overlays(initial, [record], authority=authority)
+        self.assertEqual(result.state.blocks(CANONICAL_AUTHOR_TEXT)[0].text(), "good value")
+
+        for field in (
+            "repair_row_sha256",
+            "expected_target_sha256",
+            "expected_result_sha256",
+            "forward_payload_sha256",
+            "inverse_payload_sha256",
+        ):
+            with self.subTest(field=field):
+                forged_grant = replace(grant, **{field: sha256_bytes(field.encode())})
+                with self.assertRaisesRegex(SchemaError, "exact repair rows"):
+                    _application_authority_from_validated_registry(
+                        gate_state="OPEN",
+                        baseline_lock_sha256=sha256_bytes(b"baseline lock"),
+                        witness_lock_sha256=sha256_bytes(b"witness lock"),
+                        registry_sha256=registry_sha256,
+                        validator_proof_sha256=proof,
+                        initial_state_sha256=initial.sha256,
+                        ordered_batch_sha256=ordered_operations_sha256((record,)),
+                        grants=(forged_grant,),
+                    )
 
     def test_low_risk_prose_needs_source_review_but_not_specialist(self) -> None:
         initial, record = self.replacement_fixture(high_risk_review=False)

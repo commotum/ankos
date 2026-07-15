@@ -672,6 +672,11 @@ def mint_production_authority(
                 raw_source_row_sha256=meta.raw_source_row_sha256,
                 target_role=meta.target_role,
                 operation_projection_sha256=binding.operation_projection_sha256,
+                repair_row_sha256=binding.repair_row_sha256,
+                expected_target_sha256=binding.expected_target_sha256,
+                expected_result_sha256=binding.expected_result_sha256,
+                forward_payload_sha256=binding.forward_payload_sha256,
+                inverse_payload_sha256=binding.inverse_payload_sha256,
                 validated_risk_tags=meta.validated_risk_tags,
                 validated_ast_impact=meta.validated_ast_impact,
                 witness_id=None if witness is None else witness.witness_id,
@@ -686,27 +691,32 @@ def mint_production_authority(
         bindings.append(binding)
 
     registry_sha256 = _registry_digest(snapshot, bindings)
-    proof_payload = {
-        "expected_result_sha256s": [
-            binding.expected_result_sha256 for binding in bindings
-        ],
-        "expected_target_sha256s": [
+    proof_builder = getattr(overlay_lib, "_production_validator_proof_sha256", None)
+    if proof_builder is None:
+        raise RegistryIntegrationError(
+            "overlay production validator-proof builder is unavailable"
+        )
+    validator_proof_sha256 = proof_builder(
+        initial_state_sha256=initial.sha256,
+        registry_sha256=registry_sha256,
+        operation_projection_sha256s=tuple(
+            binding.operation_projection_sha256 for binding in bindings
+        ),
+        repair_row_sha256s=tuple(
+            binding.repair_row_sha256 for binding in bindings
+        ),
+        expected_target_sha256s=tuple(
             binding.expected_target_sha256 for binding in bindings
-        ],
-        "forward_payload_sha256s": [
+        ),
+        expected_result_sha256s=tuple(
+            binding.expected_result_sha256 for binding in bindings
+        ),
+        forward_payload_sha256s=tuple(
             binding.forward_payload_sha256 for binding in bindings
-        ],
-        "initial_state_sha256": initial.sha256,
-        "inverse_payload_sha256s": [
+        ),
+        inverse_payload_sha256s=tuple(
             binding.inverse_payload_sha256 for binding in bindings
-        ],
-        "operation_projections": [binding.operation_projection_sha256 for binding in bindings],
-        "registry_sha256": registry_sha256,
-        "repair_row_sha256s": [binding.repair_row_sha256 for binding in bindings],
-    }
-    validator_proof_sha256 = _sha256(
-        b"ANKOS-OVERLAY-PRODUCTION-VALIDATOR-PROOF-1\0"
-        + _canonical_json_bytes(proof_payload)
+        ),
     )
     factory = getattr(overlay_lib, "_application_authority_from_validated_registry", None)
     if factory is None:
