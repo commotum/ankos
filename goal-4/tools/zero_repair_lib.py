@@ -14,6 +14,9 @@ import json
 import os
 import shutil
 import stat
+import tempfile
+import ctypes
+import errno
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
@@ -36,6 +39,7 @@ EXPECTED_GUARDRAILS_SHA256 = "ba5357b6172c5740ed799bf53d65aa401c53750b0f5dc6ccc9
 EXPECTED_BASELINE_LOCK_SHA256 = "57224a1f1ba8333bbc900b23ff6127a189649feb01c279f30fac05a305658863"
 EXPECTED_CORPUS_MANIFEST_SHA256 = "ba11d6ddf71aea5fb6e47be88ab54d47e33e1b8118273fa835c1b788c2321b76"
 EXPECTED_STRUCTURE_LEDGER_SHA256 = "6f9891417f458ca1e40385082b4f230e780d72362a783f35e11648082a743d49"
+EXPECTED_ZERO_REPAIR_CONTRACT_SHA256 = "3fd15222dfac4735640056e2ae786e36d5e96638454a4741ac1662ebfba3b964"
 EXPECTED_MONOLITH_SHA256 = "55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20"
 EXPECTED_MONOLITH_BYTES = 3_780_628
 EXPECTED_MONOLITH_LINES = 22_498
@@ -47,10 +51,12 @@ EXPECTED_MONOLITH_RELATIVE = PurePosixPath("A-New-Kind-of-Science.md")
 
 TAPE_RELATIVE = PurePosixPath("BUILD-METADATA/projection-tape.jsonl")
 MANIFEST_RELATIVE = PurePosixPath("BUILD-METADATA/zero-repair-manifest.json")
+CONTRACT_RELATIVE = PurePosixPath("zero-repair-contract.json")
 TOOL_RELATIVES = (
     PurePosixPath("tools/zero_repair_lib.py"),
     PurePosixPath("tools/build_zero_repair.py"),
     PurePosixPath("tools/validate_zero_repair.py"),
+    PurePosixPath("tools/zero_repair_verify.py"),
 )
 
 FILE_MODE = 0o644
@@ -253,16 +259,24 @@ def load_frozen_snapshot(
     lock_path = goal / "baseline-lock.json"
     manifest_path = goal / "corpus-manifest.json"
     ledger_path = goal / "structure-ledger.jsonl"
+    contract_path = _join_relative(goal, CONTRACT_RELATIVE)
     guardrails_raw = _read_frozen(guardrails_path, EXPECTED_GUARDRAILS_SHA256, label="guardrails")
     lock_raw = _read_frozen(lock_path, EXPECTED_BASELINE_LOCK_SHA256, label="baseline lock")
     manifest_raw = _read_frozen(manifest_path, EXPECTED_CORPUS_MANIFEST_SHA256, label="corpus manifest")
     ledger_raw = _read_frozen(ledger_path, EXPECTED_STRUCTURE_LEDGER_SHA256, label="structure ledger")
+    contract_raw = _read_frozen(
+        contract_path,
+        EXPECTED_ZERO_REPAIR_CONTRACT_SHA256,
+        label="zero-repair contract",
+    )
 
     guardrails = parse_json_bytes(guardrails_raw, label="guardrails")
     lock = parse_json_bytes(lock_raw, label="baseline lock", canonical=True)
     corpus = parse_json_bytes(manifest_raw, label="corpus manifest", canonical=True)
     ledger_rows = parse_jsonl_bytes(ledger_raw, label="structure ledger", canonical=True)
+    contract = parse_json_bytes(contract_raw, label="zero-repair contract", canonical=True)
     require(isinstance(guardrails, dict) and isinstance(lock, dict) and isinstance(corpus, dict), "frozen input root type drift")
+    require(isinstance(contract, dict) and contract.get("contract_id") == CONTRACT_ID, "zero-repair contract identity drift")
 
     artifact_map = {
         row.get("path"): row
@@ -397,12 +411,13 @@ def load_frozen_snapshot(
         "goal_root": goal,
         "legacy_root": legacy,
         "repaired_root": _join_relative(repo, EXPECTED_REPAIRED_RELATIVE),
-        "input_paths": [guardrails_path, lock_path, manifest_path, ledger_path, monolith_path, *tool_paths],
+        "input_paths": [guardrails_path, lock_path, manifest_path, ledger_path, contract_path, monolith_path, *tool_paths],
         "input_hashes": {
             "baseline_lock_sha256": EXPECTED_BASELINE_LOCK_SHA256,
             "corpus_manifest_sha256": EXPECTED_CORPUS_MANIFEST_SHA256,
             "guardrails_sha256": EXPECTED_GUARDRAILS_SHA256,
             "structure_ledger_sha256": EXPECTED_STRUCTURE_LEDGER_SHA256,
+            "zero_repair_contract_sha256": EXPECTED_ZERO_REPAIR_CONTRACT_SHA256,
         },
         "monolith_path": monolith_path,
         "monolith": monolith_raw,
@@ -693,24 +708,96 @@ def build_zero_repair(
 ) -> dict[str, Any]:
     snapshot = load_frozen_snapshot(repo_root, goal_root=goal_root, legacy_root=legacy_root)
     output = _validate_output_location(snapshot, output_root, must_be_absent=True)
-    os.mkdir(output, DIRECTORY_MODE)
-    os.chmod(output, DIRECTORY_MODE)
-
-    tape_rows, document_records, file_records = _make_tape_and_documents(snapshot, output)
-    tape_bytes = canonical_jsonl_bytes(tape_rows)
-    _write_new_file(output, TAPE_RELATIVE, tape_bytes)
-    inverse_payload = inverse_from_output(output, tape_rows, snapshot["documents"])
-    manifest = _build_manifest(snapshot, tape_bytes, tape_rows, document_records, file_records, inverse_payload)
-    manifest_bytes = canonical_json_bytes(manifest)
-    _write_new_file(output, MANIFEST_RELATIVE, manifest_bytes)
-    result = validate_zero_repair(
-        repo_root,
-        output,
-        goal_root=goal_root,
-        legacy_root=legacy_root,
+    parent_status = os.lstat(output.parent)
+    temporary = Path(
+        tempfile.mkdtemp(
+            prefix=f".{output.name}.zero-repair-private-",
+            dir=os.fspath(output.parent),
+        )
     )
-    result["manifest_sha256"] = sha256_bytes(manifest_bytes)
-    return result
+    # mkdtemp creates 0700: keep the in-progress tree private until complete.
+    require(stat.S_IMODE(os.lstat(temporary).st_mode) == 0o700, "private build root mode drift")
+    promoted = False
+    try:
+        tape_rows, document_records, file_records = _make_tape_and_documents(snapshot, temporary)
+        tape_bytes = canonical_jsonl_bytes(tape_rows)
+        _write_new_file(temporary, TAPE_RELATIVE, tape_bytes)
+        inverse_payload = inverse_from_output(temporary, tape_rows, snapshot["documents"])
+        manifest = _build_manifest(snapshot, tape_bytes, tape_rows, document_records, file_records, inverse_payload)
+        manifest_bytes = canonical_json_bytes(manifest)
+        _write_new_file(temporary, MANIFEST_RELATIVE, manifest_bytes)
+        os.chmod(temporary, DIRECTORY_MODE)
+
+        # The oracle is intentionally implemented in a different module and
+        # imports none of this compiler.  Compiler self-consistency is not a
+        # sufficient condition for promotion.
+        from zero_repair_verify import (  # pylint: disable=import-outside-toplevel
+            IndependentVerificationError,
+            independently_validate_zero_repair,
+        )
+
+        try:
+            result = independently_validate_zero_repair(
+                repo_root,
+                temporary,
+                goal_root=goal_root,
+                legacy_root=legacy_root,
+            )
+        except IndependentVerificationError as error:
+            raise ZeroRepairError(f"independent pre-promotion validation failed: {error}") from error
+
+        current_parent = os.lstat(output.parent)
+        require(
+            (current_parent.st_dev, current_parent.st_ino)
+            == (parent_status.st_dev, parent_status.st_ino),
+            "output parent changed during build",
+        )
+        _assert_no_symlink_components(output.parent, label="output parent before promotion")
+        _atomic_rename_noreplace(temporary, output)
+        promoted = True
+        result["manifest_sha256"] = sha256_bytes(manifest_bytes)
+        return result
+    finally:
+        if not promoted and _path_exists(temporary):
+            status = os.lstat(temporary)
+            require(
+                stat.S_ISDIR(status.st_mode) and not stat.S_ISLNK(status.st_mode),
+                "refusing to clean an altered private build root",
+            )
+            shutil.rmtree(temporary)
+
+
+def _atomic_rename_noreplace(source: Path, target: Path) -> None:
+    """Atomically publish a complete directory without replacing a target.
+
+    Linux ``renameat2(RENAME_NOREPLACE)`` closes the last target-creation race.
+    On platforms without that primitive, the explicit absence check plus
+    ``rename`` is the strongest stdlib fallback available.
+    """
+
+    require(_path_exists(source), "private build root disappeared before promotion")
+    require(not _path_exists(target), "output root appeared before promotion")
+    libc = ctypes.CDLL(None, use_errno=True)
+    renameat2 = getattr(libc, "renameat2", None)
+    if renameat2 is not None:
+        renameat2.argtypes = [ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint]
+        renameat2.restype = ctypes.c_int
+        result = renameat2(
+            -100,
+            os.fsencode(source),
+            -100,
+            os.fsencode(target),
+            1,
+        )
+        if result == 0:
+            return
+        error_number = ctypes.get_errno()
+        if error_number not in {errno.ENOSYS, errno.EINVAL, errno.EOPNOTSUPP}:
+            if error_number in {errno.EEXIST, errno.ENOTEMPTY}:
+                raise ZeroRepairError("output root appeared before atomic promotion")
+            raise OSError(error_number, os.strerror(error_number), os.fspath(target))
+    require(not _path_exists(target), "output root appeared before fallback promotion")
+    os.rename(source, target)
 
 
 def _expected_output_paths(snapshot: dict[str, Any]) -> tuple[set[str], set[str]]:
@@ -906,6 +993,14 @@ def validate_zero_repair(
 
 
 def _full_tree_records(root: Path) -> list[dict[str, Any]]:
+    _assert_no_symlink_components(root, label="comparison root")
+    require(_path_exists(root), "comparison root does not exist")
+    root_status = os.lstat(root)
+    require(
+        stat.S_ISDIR(root_status.st_mode) and not stat.S_ISLNK(root_status.st_mode),
+        "comparison root is not a real directory",
+    )
+    require(stat.S_IMODE(root_status.st_mode) == DIRECTORY_MODE, "comparison root mode drift")
     records: list[dict[str, Any]] = []
     for directory, names, filenames in os.walk(root, topdown=True, followlinks=False):
         names.sort()
@@ -913,6 +1008,8 @@ def _full_tree_records(root: Path) -> list[dict[str, Any]]:
         directory_path = Path(directory)
         if directory_path != root:
             status = os.lstat(directory_path)
+            require(stat.S_ISDIR(status.st_mode) and not stat.S_ISLNK(status.st_mode), "comparison tree contains a non-directory")
+            require(stat.S_IMODE(status.st_mode) == DIRECTORY_MODE, "comparison directory mode drift")
             records.append(
                 {
                     "mode": f"{stat.S_IMODE(status.st_mode):04o}",
@@ -923,6 +1020,9 @@ def _full_tree_records(root: Path) -> list[dict[str, Any]]:
         for filename in filenames:
             path = directory_path / filename
             status = os.lstat(path)
+            require(stat.S_ISREG(status.st_mode) and not stat.S_ISLNK(status.st_mode), "comparison tree contains an unexpected file type")
+            require(stat.S_IMODE(status.st_mode) == FILE_MODE, "comparison file mode drift")
+            require(status.st_nlink == 1, "comparison tree contains a hardlinked file")
             records.append(
                 {
                     "byte_size": status.st_size,
@@ -932,13 +1032,46 @@ def _full_tree_records(root: Path) -> list[dict[str, Any]]:
                     "type": "REGULAR_FILE",
                 }
             )
+    require(records, "comparison root is empty")
     return sorted(records, key=lambda item: (item["path"], item["type"]))
 
 
-def compare_zero_repair_trees(first_root: Path, second_root: Path) -> dict[str, Any]:
+def compare_zero_repair_trees(
+    first_root: Path,
+    second_root: Path,
+    *,
+    repo_root: Path | None = None,
+    goal_root: Path | None = None,
+    legacy_root: Path | None = None,
+) -> dict[str, Any]:
     first = _lexical_absolute(first_root)
     second = _lexical_absolute(second_root)
     require(first != second, "clean-build comparison roots are identical")
+    verification_repo = (
+        _lexical_absolute(repo_root)
+        if repo_root is not None
+        else _lexical_absolute(Path(__file__).parents[2])
+    )
+    from zero_repair_verify import (  # pylint: disable=import-outside-toplevel
+        IndependentVerificationError,
+        independently_validate_zero_repair,
+    )
+
+    try:
+        independently_validate_zero_repair(
+            verification_repo,
+            first,
+            goal_root=goal_root,
+            legacy_root=legacy_root,
+        )
+        independently_validate_zero_repair(
+            verification_repo,
+            second,
+            goal_root=goal_root,
+            legacy_root=legacy_root,
+        )
+    except IndependentVerificationError as error:
+        raise ZeroRepairError(f"comparison root is not a validated zero-repair tree: {error}") from error
     first_records = _full_tree_records(first)
     second_records = _full_tree_records(second)
     require(first_records == second_records, "two clean zero-repair builds are not byte-identical")

@@ -238,7 +238,7 @@ class OverlaySuccessTests(unittest.TestCase):
         )
         self.assertRoundTrip(initial, record, state_for(after))
 
-    def test_byte_conserving_split_needs_no_witness_and_inverts(self) -> None:
+    def test_byte_conserving_split_is_witness_gated_and_inverts(self) -> None:
         original = Block("RAW-000001", b"alphaomega")
         initial = state_for((original,))
         parts = (Block("RAW-000001-A", b"alpha"), Block("RAW-000001-B", b"omega"))
@@ -248,7 +248,6 @@ class OverlaySuccessTests(unittest.TestCase):
                 parts,
                 repair_id="REPAIR-0005",
                 repair_class=STRUCTURE_BOUNDARY,
-                author_evidence=False,
             ),
             original.block_id,
             original.sha256,
@@ -257,7 +256,7 @@ class OverlaySuccessTests(unittest.TestCase):
         )
         self.assertRoundTrip(initial, record, state_for(parts))
 
-    def test_byte_conserving_merge_needs_no_witness_and_inverts(self) -> None:
+    def test_byte_conserving_merge_is_witness_gated_and_inverts(self) -> None:
         sources = (Block("RAW-000001-A", b"alpha"), Block("RAW-000001-B", b"omega"))
         initial = state_for(sources)
         merged = Block("RAW-000001", b"alphaomega")
@@ -268,7 +267,6 @@ class OverlaySuccessTests(unittest.TestCase):
                 after,
                 repair_id="REPAIR-0006",
                 repair_class=STRUCTURE_BOUNDARY,
-                author_evidence=False,
             ),
             tuple(block.block_id for block in sources),
             tuple(block.sha256 for block in sources),
@@ -407,8 +405,12 @@ class OverlaySuccessTests(unittest.TestCase):
     def test_state_digest_is_independent_of_mapping_insertion_order(self) -> None:
         a = (Block("A", b"a"),)
         b = (Block("B", b"b"),)
-        first = OverlayState.from_mapping({SEARCH_DERIVATIVE: b, CANONICAL_AUTHOR_TEXT: a})
-        second = OverlayState.from_mapping({CANONICAL_AUTHOR_TEXT: a, SEARCH_DERIVATIVE: b})
+        first = OverlayState.from_mapping(
+            {(TEST_TARGET, SEARCH_DERIVATIVE): b, (TEST_TARGET, CANONICAL_AUTHOR_TEXT): a}
+        )
+        second = OverlayState.from_mapping(
+            {(TEST_TARGET, CANONICAL_AUTHOR_TEXT): a, (TEST_TARGET, SEARCH_DERIVATIVE): b}
+        )
         self.assertEqual(first, second)
         self.assertEqual(first.sha256, second.sha256)
 
@@ -420,7 +422,7 @@ class OverlayMutationTests(unittest.TestCase):
         repair_class: str = PROSE_OCR,
         role: str = CANONICAL_AUTHOR_TEXT,
         author_evidence: bool = True,
-        high_risk_review: bool = False,
+        high_risk_review: bool = True,
         witness_value: WitnessEvidence | None = None,
         review_value: IndependentReview | None = None,
     ) -> tuple[OverlayState, Replace]:
@@ -589,7 +591,7 @@ class OverlayMutationTests(unittest.TestCase):
             record,
             meta=replace(record.meta, final_disposition="APPLIED_MECHANICALLY_PROVEN"),
         )
-        with self.assertRaisesRegex(EvidenceError, "not APPLIED_WITNESS_VERIFIED"):
+        with self.assertRaisesRegex(EvidenceError, "not applicable"):
             apply_overlays(initial, [mechanical])
 
     def test_target_role_separation_refuses_cross_class_leaks(self) -> None:
@@ -626,7 +628,7 @@ class OverlayMutationTests(unittest.TestCase):
             apply_overlays(initial, [dependent, first])
 
         with self.assertRaisesRegex(DependencyError, "duplicate repair IDs"):
-            apply_overlays(initial, [first, first])
+            _raw_apply_overlays(initial, [first, first])
 
     def test_split_refuses_nonconservation_and_id_collision(self) -> None:
         original = Block("RAW-000001", b"alphabeta")
@@ -650,7 +652,6 @@ class OverlayMutationTests(unittest.TestCase):
                         declared_after,
                         repair_id="REPAIR-0300",
                         repair_class=STRUCTURE_BOUNDARY,
-                        author_evidence=False,
                     ),
                     original.block_id,
                     original.sha256,
@@ -670,7 +671,6 @@ class OverlayMutationTests(unittest.TestCase):
                     (Block("AB", b"ac"), b),
                     repair_id="REPAIR-0301",
                     repair_class=STRUCTURE_BOUNDARY,
-                    author_evidence=False,
                 ),
                 ("A", "C"),
                 (a.sha256, c.sha256),
@@ -683,7 +683,6 @@ class OverlayMutationTests(unittest.TestCase):
                     (Block("AB", b"ab"), c),
                     repair_id="REPAIR-0302",
                     repair_class=STRUCTURE_BOUNDARY,
-                    author_evidence=False,
                 ),
                 ("A", "B"),
                 ("0" * 64, b.sha256),
@@ -696,7 +695,6 @@ class OverlayMutationTests(unittest.TestCase):
                     (Block("AB", b"wrong"), c),
                     repair_id="REPAIR-0303",
                     repair_class=STRUCTURE_BOUNDARY,
-                    author_evidence=False,
                 ),
                 ("A", "B"),
                 (a.sha256, b.sha256),
@@ -767,6 +765,170 @@ class OverlayMutationTests(unittest.TestCase):
             apply_overlays(initial, [first, second])
         self.assertEqual(initial.sha256, original_hash)
         self.assertEqual(initial.blocks(CANONICAL_AUTHOR_TEXT)[0].text(), "one two")
+
+    def test_canonical_gate_defaults_to_current_source_blocked_state(self) -> None:
+        initial, record = self.replacement_fixture()
+        with self.assertRaisesRegex(EvidenceError, "SOURCE_BLOCKED"):
+            _raw_apply_overlays(initial, [record])
+
+    def test_authority_is_sealed_and_exact_operation_join_is_required(self) -> None:
+        initial, record = self.replacement_fixture()
+        authority = test_only_application_authority(initial, [record])
+        with self.assertRaisesRegex(SchemaError, "integrity guard"):
+            replace(authority, registry_sha256="0" * 64)
+        with self.assertRaisesRegex(SchemaError, "sealed by the registry validator"):
+            ApplicationAuthority(
+                gate_state="OPEN",
+                baseline_lock_sha256="0" * 64,
+                witness_lock_sha256="0" * 64,
+                registry_sha256="0" * 64,
+                validator_proof_sha256="0" * 64,
+                initial_state_sha256=initial.sha256,
+                ordered_batch_sha256="0" * 64,
+                grants=(),
+                synthetic_test_only=False,
+                integrity_sha256="0" * 64,
+                _seal=object(),
+            )
+
+        assert record.meta.witness is not None
+        fabricated_join = replace(
+            record,
+            meta=replace(
+                record.meta,
+                witness=replace(record.meta.witness, region_id="PAGE-9999-REGION-99"),
+            ),
+        )
+        with self.assertRaisesRegex(EvidenceError, "ordered-operation binding mismatch"):
+            _raw_apply_overlays(initial, [fabricated_join], authority=authority)
+
+    def test_prose_class_cannot_spoof_markdown_structure_risk(self) -> None:
+        initial = state_for((Block("RAW-000001", "Title\n"),))
+        after = (Block("RAW-000001", "# Title\n"),)
+        record = Replace(
+            meta_for(
+                initial,
+                after,
+                repair_id="REPAIR-0600",
+                repair_class=PROSE_OCR,
+                high_risk_review=False,
+            ),
+            "RAW-000001",
+            initial.blocks(CANONICAL_AUTHOR_TEXT)[0].sha256,
+            "Title",
+            "# Title",
+            1,
+        )
+        authority = test_only_application_authority(initial, [record])
+        with self.assertRaisesRegex(EvidenceError, "blind preproposal"):
+            _raw_apply_overlays(initial, [record], authority=authority)
+
+    def test_canonical_split_has_no_mechanical_bypass(self) -> None:
+        original = Block("RAW-000001", b"alphabeta")
+        initial = state_for((original,))
+        parts = (Block("PART-A", b"alpha"), Block("PART-B", b"beta"))
+        record = Split(
+            meta_for(
+                initial,
+                parts,
+                repair_id="REPAIR-0601",
+                repair_class=STRUCTURE_BOUNDARY,
+                author_evidence=False,
+            ),
+            original.block_id,
+            original.sha256,
+            parts,
+            1,
+        )
+        authority = test_only_application_authority(initial, [record])
+        with self.assertRaisesRegex(EvidenceError, "not applicable"):
+            _raw_apply_overlays(initial, [record], authority=authority)
+
+    def test_state_deep_normalizes_mutable_direct_inputs(self) -> None:
+        blocks = [Block("RAW-000001", b"stable")]
+        row = [TEST_TARGET, CANONICAL_AUTHOR_TEXT, blocks]
+        outer = [row]
+        state = OverlayState(outer)  # type: ignore[arg-type]
+        blocks.append(Block("RAW-000002", b"mutated"))
+        row[0] = "CHAPTER-99"
+        outer.clear()
+        self.assertEqual(state.target_keys, ((TEST_TARGET, CANONICAL_AUTHOR_TEXT),))
+        self.assertEqual(state.blocks(CANONICAL_AUTHOR_TEXT, TEST_TARGET), (Block("RAW-000001", b"stable"),))
+
+    def test_mutable_dependencies_and_non_strict_counts_are_rejected(self) -> None:
+        initial, record = self.replacement_fixture()
+        with self.assertRaisesRegex(SchemaError, "immutable tuple"):
+            replace(record.meta, dependencies=["REPAIR-0001"])  # type: ignore[arg-type]
+        for value in (True, 1.0):
+            with self.subTest(field="replace expected_count", value=value):
+                with self.assertRaisesRegex(SchemaError, "positive integer"):
+                    replace(record, expected_count=value)  # type: ignore[arg-type]
+
+        block = Block("RAW-000001", b"leftright")
+        anchored_initial = state_for((block,))
+        anchored_after = (Block("RAW-000001", b"leftmiddleright"),)
+        anchored_meta = meta_for(
+            anchored_initial,
+            anchored_after,
+            repair_id="REPAIR-0602",
+        )
+        for value in (True, 1.0):
+            with self.subTest(field="adjacency", value=value):
+                with self.assertRaisesRegex(SchemaError, "integer 1"):
+                    AnchoredInsert(
+                        anchored_meta,
+                        block.block_id,
+                        block.sha256,
+                        b"left",
+                        b"right",
+                        b"middle",
+                        value,  # type: ignore[arg-type]
+                    )
+
+    def test_document_target_scope_is_explicit_and_authority_bound(self) -> None:
+        first = (Block("RAW-000001", b"bad one"),)
+        second = (Block("RAW-000001", b"bad two"),)
+        initial = OverlayState.from_mapping(
+            {
+                ("CHAPTER-01", CANONICAL_AUTHOR_TEXT): first,
+                ("CHAPTER-02", CANONICAL_AUTHOR_TEXT): second,
+            }
+        )
+        after = (Block("RAW-000001", b"good one"),)
+        record = Replace(
+            meta_for(
+                initial,
+                after,
+                repair_id="REPAIR-0603",
+                target_id="CHAPTER-01",
+            ),
+            "RAW-000001",
+            first[0].sha256,
+            b"bad",
+            b"good",
+            1,
+        )
+        authority = test_only_application_authority(initial, [record])
+        result = _raw_apply_overlays(initial, [record], authority=authority)
+        self.assertEqual(
+            result.state.blocks(CANONICAL_AUTHOR_TEXT, "CHAPTER-02"), second
+        )
+        with self.assertRaisesRegex(RoleError, "target_id is required"):
+            initial.blocks(CANONICAL_AUTHOR_TEXT)
+        wrong_target = replace(record, meta=replace(record.meta, target_id="CHAPTER-02"))
+        with self.assertRaisesRegex(EvidenceError, "ordered-operation binding mismatch"):
+            _raw_apply_overlays(initial, [wrong_target], authority=authority)
+
+    def test_forged_receipt_and_replay_context_fail_integrity(self) -> None:
+        initial, record = self.replacement_fixture()
+        result = apply_overlays(initial, [record])
+        forged_receipt = replace(result.receipts[0], target_id="CHAPTER-02")
+        forged_result = replace(result, receipts=(forged_receipt,))
+        with self.assertRaisesRegex(InverseError, "receipt integrity digest"):
+            inverse_replay(forged_result)
+        forged_context = replace(result, authority_context_sha256="0" * 64)
+        with self.assertRaisesRegex(InverseError, "authenticity/integrity digest"):
+            inverse_replay(forged_context)
 
     def test_schema_rejects_empty_insert_anchors_and_invalid_hashes(self) -> None:
         initial = state_for((Block("RAW-000001", b"leftright"),))

@@ -1407,26 +1407,26 @@ def apply_overlays(
     closed_records = tuple(records)
     if any(not isinstance(record, (Replace, Delete, AnchoredInsert, Move, Split, Merge)) for record in closed_records):
         raise SchemaError("overlay batch contains an unknown operation record")
-    batch_sha256 = ordered_operations_sha256(closed_records)
-    authority_context_sha256 = _validate_application_authority(
-        initial, closed_records, authority
-    )
     repair_ids = [record.meta.repair_id for record in closed_records]
     if len(repair_ids) != len(set(repair_ids)):
         raise DependencyError("overlay batch contains duplicate repair IDs")
     batch_ids = set(repair_ids)
-    previous_receipt_sha256 = sha256_bytes(b"ANKOS-OVERLAY-RECEIPT-CHAIN-START-2")
-    for sequence_index, record in enumerate(closed_records):
+    for record in closed_records:
         missing = set(record.meta.dependencies).difference(batch_ids)
         if missing:
             raise DependencyError(
                 f"{record.meta.repair_id}: unresolved dependencies: {sorted(missing)!r}"
             )
+    batch_sha256 = ordered_operations_sha256(closed_records)
+    authority_context_sha256 = _validate_application_authority(
+        initial, closed_records, authority
+    )
 
     state = initial
     receipts: list[OperationReceipt] = []
     applied: set[str] = set()
-    for record in closed_records:
+    previous_receipt_sha256 = sha256_bytes(b"ANKOS-OVERLAY-RECEIPT-CHAIN-START-2")
+    for sequence_index, record in enumerate(closed_records):
         meta = record.meta
         pending = set(meta.dependencies).difference(applied)
         if pending:
@@ -1520,9 +1520,17 @@ def inverse_replay(result: ReplayResult, state: OverlayState | None = None) -> O
             raise InverseError(f"{receipt.repair_id}: receipt chain link mismatch")
         if receipt.receipt_sha256 != _receipt_integrity_sha256(receipt):
             raise InverseError(f"{receipt.repair_id}: receipt integrity digest failed")
+        if INVERSE_NAMES.get(receipt.operation) != receipt.inverse_operation:
+            raise InverseError(f"{receipt.repair_id}: receipt operation/inverse mismatch")
         previous_receipt_sha256 = receipt.receipt_sha256
     if previous_receipt_sha256 != result.receipt_chain_sha256:
         raise InverseError("inverse replay receipt-chain terminal digest failed")
+    receipt_batch_sha256 = _projection_sha256(
+        b"ANKOS-OVERLAY-ORDERED-BATCH-2",
+        tuple(receipt.operation_projection_sha256 for receipt in result.receipts),
+    )
+    if receipt_batch_sha256 != result.ordered_batch_sha256:
+        raise InverseError("inverse replay receipts do not bind the ordered forward batch")
     current = result.state if state is None else state
     if not isinstance(current, OverlayState):
         raise SchemaError("inverse state must be an OverlayState")
@@ -1549,7 +1557,9 @@ def inverse_replay(result: ReplayResult, state: OverlayState | None = None) -> O
 
 
 __all__ = [
+    "ApplicationAuthority",
     "AnchoredInsert",
+    "AuthorityGrant",
     "Block",
     "CANONICAL_AUTHOR_TEXT",
     "DERIVED_AGGREGATE",
@@ -1587,6 +1597,9 @@ __all__ = [
     "WitnessEvidence",
     "apply_overlays",
     "inverse_replay",
+    "operation_projection_sha256",
+    "ordered_operations_sha256",
     "sha256_bytes",
     "target_sha256",
+    "test_only_application_authority",
 ]

@@ -41,6 +41,9 @@ def main() -> int:
             result["clean_build_equality"] = compare_zero_repair_trees(
                 args.output_root,
                 args.comparison_output_root,
+                repo_root=args.repo_root,
+                goal_root=args.goal_root,
+                legacy_root=args.legacy_root,
             )
     except (OSError, ZeroRepairError) as error:
         print(f"ZERO-REPAIR BUILD FAIL: {error}", file=sys.stderr)

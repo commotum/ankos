@@ -8,10 +8,10 @@ import json
 import sys
 from pathlib import Path
 
-from zero_repair_lib import (
-    ZeroRepairError,
-    compare_zero_repair_trees,
-    validate_zero_repair,
+from zero_repair_lib import ZeroRepairError, compare_zero_repair_trees
+from zero_repair_verify import (
+    IndependentVerificationError,
+    independently_validate_zero_repair,
 )
 
 
@@ -24,14 +24,14 @@ def main() -> int:
     parser.add_argument("--compare-root", type=Path)
     args = parser.parse_args()
     try:
-        result = validate_zero_repair(
+        result = independently_validate_zero_repair(
             args.repo_root,
             args.output_root,
             goal_root=args.goal_root,
             legacy_root=args.legacy_root,
         )
         if args.compare_root is not None:
-            result["comparison_build"] = validate_zero_repair(
+            result["comparison_build"] = independently_validate_zero_repair(
                 args.repo_root,
                 args.compare_root,
                 goal_root=args.goal_root,
@@ -40,8 +40,11 @@ def main() -> int:
             result["clean_build_equality"] = compare_zero_repair_trees(
                 args.output_root,
                 args.compare_root,
+                repo_root=args.repo_root,
+                goal_root=args.goal_root,
+                legacy_root=args.legacy_root,
             )
-    except (OSError, ZeroRepairError) as error:
+    except (OSError, ZeroRepairError, IndependentVerificationError) as error:
         print(f"ZERO-REPAIR VALIDATION FAIL: {error}", file=sys.stderr)
         return 1
     print("ZERO-REPAIR VALIDATION OK " + json.dumps(result, sort_keys=True, separators=(",", ":")))
