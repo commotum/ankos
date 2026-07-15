@@ -87,10 +87,15 @@ def validate_ranges(raw: bytes, data: dict[str, Any]) -> list[dict[str, Any]]:
             raise BuildError(f"{document_id}: byte gap, overlap, or empty range")
         if start_line != line_cursor or not isinstance(end_line, int) or end_line < start_line:
             raise BuildError(f"{document_id}: line gap, overlap, or empty range")
+        if start != 0 and raw[start - 1 : start] != b"\n":
+            raise BuildError(f"{document_id}: byte range does not start after an LF")
+        if end != len(raw) and raw[end - 1 : end] != b"\n":
+            raise BuildError(f"{document_id}: byte range does not end at an LF")
         segment = raw[start:end]
         if len(segment) != document.get("raw_byte_count"):
             raise BuildError(f"{document_id}: byte count mismatch")
-        if len(segment.splitlines()) != document.get("raw_line_count"):
+        logical_lines = segment.count(b"\n") + (0 if segment.endswith(b"\n") else 1)
+        if logical_lines != document.get("raw_line_count"):
             raise BuildError(f"{document_id}: logical line count mismatch")
         if end_line - start_line + 1 != document.get("raw_line_count"):
             raise BuildError(f"{document_id}: declared line interval mismatch")
@@ -316,10 +321,16 @@ def _safe_output_root(output_root: Path) -> Path:
     return output
 
 
-def build(output_root: Path = OUTPUT_ROOT) -> tuple[int, int, int]:
+def build(
+    output_root: Path = OUTPUT_ROOT, *, zero_corrections: bool = False
+) -> tuple[int, int, int]:
     raw, documents, corrections, images = load_inputs()
+    if zero_corrections:
+        corrections = []
     rendered = document_bytes(raw, documents, corrections)
     output = _safe_output_root(output_root)
+    if output != OUTPUT_ROOT.resolve() and output.exists():
+        raise BuildError(f"temporary output already exists: {output}")
     temporary = output.with_name(f".{output.name}.building")
     if temporary.exists():
         shutil.rmtree(temporary)
@@ -353,8 +364,15 @@ def build(output_root: Path = OUTPUT_ROOT) -> tuple[int, int, int]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=OUTPUT_ROOT)
+    parser.add_argument(
+        "--zero-corrections",
+        action="store_true",
+        help="ignore the correction log and reproduce the raw 29-document projection",
+    )
     args = parser.parse_args()
-    documents, images, corrections = build(args.output)
+    documents, images, corrections = build(
+        args.output, zero_corrections=args.zero_corrections
+    )
     print(
         f"built baseline: documents={documents} images={images} "
         f"corrections={corrections} output={args.output.resolve()}"

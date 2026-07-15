@@ -99,13 +99,29 @@ authoritative source.
   3,780,628 monolith bytes, including the absent terminal newline.
 - The validator accepts exactly the expected 1,475 files, verifies every
   document and image byte, checks the ordered image-reference sequence and
-  generated Contents targets, and reports zero corrections and zero completed
-  second passes.
+  generated Contents targets, independently reconstructs corrected document
+  bytes, verifies the complete 1,463-file legacy-tree snapshot, and reports zero
+  corrections and zero completed second passes.
 - Two fresh temporary builds were byte-identical. Focused tests passed:
-  `8 passed, 19 subtests passed`.
+  `9 passed, 19 subtests passed`. Both scripts also support an explicit
+  `--zero-corrections` baseline mode, and temporary builds refuse to replace
+  an existing directory.
 - A repository scan found no PDF, EPUB, MOBI, DJVU, CBZ, archive, or relevant
   HTML source; the only HTML file is the unrelated visualization UI at
-  `src/ca/viz/static/index.html`.
-- The next action is not more pipeline code. It is to authorize or provide a
-  complete edition-identical source, including fixed-layout Index evidence,
-  then record its identity/location convention and begin sequential comparison.
+  `src/ca/viz/static/index.html`. Intentionally deleted source material is
+  excluded and was not restored or inspected.
+- A 2026-07-14 official-site audit confirmed that NKS Online identifies the
+  target as First edition, Fourth printing and exposes all major book divisions
+  plus fixed-layout views for main text and Notes. Its semantic Index is not
+  edition-static—the official site says it adds post-2002 death dates—and no
+  verified printed-layout Index source is exposed there. Wolfram Science's site
+  terms prohibit bulk reproduction/archiving without advance permission; the
+  current general terms also prohibit bulk extraction and AI-tool use without
+  a separate agreement. The book copyright page requires consent for broader
+  copying and illustrations. No official-site content payload was downloaded
+  or retained.
+- The exact unblock action is now recorded in `unresolved.md`: provide a
+  complete edition-identical source with explicit authorization for this
+  agent-assisted full-book comparison and repository output, or obtain separate
+  permission/licensing from Wolfram. Then confirm fixed-layout Index coverage,
+  record the source location convention, and begin sequential comparison.

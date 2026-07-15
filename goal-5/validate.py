@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
+import json
 import re
 from pathlib import Path, PurePosixPath
 
@@ -24,6 +26,50 @@ COVERAGE_FIELDS = [
     "notes",
 ]
 IMAGE_REFERENCE = re.compile(r"!\[[^\]]*\]\(([^)\s]+)\)")
+
+
+def legacy_tree_digest() -> tuple[str, int]:
+    lines: list[bytes] = []
+    paths = sorted(
+        (path for path in build.LEGACY_ROOT.rglob("*") if path.is_file()),
+        key=lambda path: path.relative_to(build.REPO_ROOT).as_posix().encode(),
+    )
+    for path in paths:
+        digest = build.sha256(path.read_bytes())
+        label = path.relative_to(build.REPO_ROOT).as_posix()
+        lines.append(f"{digest}  {label}\n".encode())
+    return hashlib.sha256(b"".join(lines)).hexdigest(), len(paths)
+
+
+def independent_document_bytes(
+    raw: bytes,
+    documents: list[dict[str, object]],
+    corrections: list[dict[str, object]],
+) -> dict[PurePosixPath, bytes]:
+    rendered: dict[PurePosixPath, bytes] = {}
+    for document in documents:
+        start = int(document["raw_start_byte"])
+        end = int(document["raw_end_byte_exclusive"])
+        cursor = start
+        pieces: list[bytes] = []
+        relevant = sorted(
+            (
+                correction
+                for correction in corrections
+                if correction["document_id"] == document["id"]
+            ),
+            key=lambda correction: int(correction["raw_start_byte"]),
+        )
+        for correction in relevant:
+            correction_start = int(correction["raw_start_byte"])
+            before = str(correction["before"]).encode("utf-8")
+            pieces.append(raw[cursor:correction_start])
+            pieces.append(str(correction["after"]).encode("utf-8"))
+            cursor = correction_start + len(before)
+        pieces.append(raw[cursor:end])
+        output = build.safe_relative_path(document["proposed_output_path"], suffix=".md")
+        rendered[output] = b"".join(pieces)
+    return rendered
 
 
 def validate_coverage(
@@ -98,7 +144,7 @@ def validate_output(
     if not output.is_dir():
         raise build.BuildError(f"output directory does not exist: {output}")
 
-    rendered = build.document_bytes(raw, documents, corrections)
+    rendered = independent_document_bytes(raw, documents, corrections)
     for relative, expected in rendered.items():
         path = output / Path(relative)
         if not path.is_file() or path.read_bytes() != expected:
@@ -156,8 +202,20 @@ def validate_output(
         raise build.BuildError(f"output file set differs; missing={missing} extra={extra}")
 
 
-def validate(output_root: Path = build.OUTPUT_ROOT) -> tuple[int, int, int, int]:
+def validate(
+    output_root: Path = build.OUTPUT_ROOT, *, zero_corrections: bool = False
+) -> tuple[int, int, int, int]:
     raw, documents, corrections, images = build.load_inputs()
+    if zero_corrections:
+        corrections = []
+    facts = json.loads((build.GOAL_DIR / "legacy-facts.json").read_text(encoding="utf-8"))
+    expected_digest = facts["legacy_tree"]["snapshot_sha256"]
+    expected_files = facts["legacy_tree"]["file_counts"]["regular_files"]
+    actual_digest, actual_files = legacy_tree_digest()
+    if (actual_digest, actual_files) != (expected_digest, expected_files):
+        raise build.BuildError(
+            "complete legacy tree differs from the frozen path-and-file snapshot"
+        )
     coverage = validate_coverage(documents)
     validate_output(output_root, raw, documents, corrections, images)
     reviewed = sum(row["second_pass"] == "YES" for row in coverage)
@@ -167,8 +225,15 @@ def validate(output_root: Path = build.OUTPUT_ROOT) -> tuple[int, int, int, int]
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=build.OUTPUT_ROOT)
+    parser.add_argument(
+        "--zero-corrections",
+        action="store_true",
+        help="validate the target as the raw 29-document projection",
+    )
     args = parser.parse_args()
-    documents, images, corrections, reviewed = validate(args.output)
+    documents, images, corrections, reviewed = validate(
+        args.output, zero_corrections=args.zero_corrections
+    )
     print(
         f"validated baseline: documents={documents} images={images} "
         f"corrections={corrections} second_pass_documents={reviewed}"

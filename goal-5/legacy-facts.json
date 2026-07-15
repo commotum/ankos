@@ -11,8 +11,28 @@
     "complete_source_mounted": false,
     "edition_equivalence_to_local_ocr_proven": false,
     "fixed_layout_index_source_identified": false,
-    "goal_5_action": "Re-evaluate narrower lawful access or use a user-provided/licensed edition-identical source before any transcription change.",
-    "previous_goal_4_result": "Observed 2026-07-14: the previously identified official online surface was not authorized for Goal 4's bulk AI-assisted audit. Re-evaluate permission for Goal 5's narrower workflow; no source payload was retained."
+    "goal_5_action": "Obtain a separately authorized edition-identical source, or have the user provide one and explicitly confirm authorization for this agent-assisted complete-book comparison and repository output, before any transcription change.",
+    "live_workspace_audit": {
+      "date": "2026-07-14",
+      "finding": "No independent complete book source is present outside the immutable OCR tree and its generated projection.",
+      "intentionally_deleted_material": "Excluded from inspection, restoration, hashing, and use."
+    },
+    "official_online_audit": {
+      "book_copyright_url": "https://www.wolframscience.com/nks/piv--copyright/",
+      "book_identity": "The official copyright page identifies First edition, Fourth printing, copyright 2002; the official book page identifies ISBN 1-57955-008-8.",
+      "content_surface": "The official table of contents exposes Preface, Chapters 1-12, Notes, Index, copyright page, and Colophon. Fixed-layout PDF/page-image evidence is advertised for main text and Notes, but the current Index interface exposes semantic HTML rather than a verified printed-layout Index source.",
+      "date": "2026-07-14",
+      "edition_exactness_warning": "The official online-version note says the semantic Index adds death dates learned after the printed book was finished in January 2002, so semantic HTML is not edition-static and cannot decide printed Index text.",
+      "outcome": "NOT_AUTHORIZED_FOR_GOAL_5",
+      "reason": "The Wolfram Science site terms prohibit mirroring, bulk reproduction, and archiving without advance written permission. The current general Wolfram Terms also prohibit scraping or bulk downloading and use with AI-powered tools without a separate licensing agreement. The book copyright page permits only limited plain-text quotation and requires prior written consent for broader copying and illustrations.",
+      "separate_license_contact": "ip@wolframscience.com",
+      "site_terms_last_updated": "2018-05-15",
+      "site_terms_url": "https://www.wolfram.com/legal/terms/wolfram-science.html",
+      "general_terms_effective": "2024-07-29",
+      "general_terms_url": "https://www.wolfram.com/legal/terms/wolfram/",
+      "online_index_version_note_url": "https://www.wolframscience.com/reference/note.html"
+    },
+    "source_payload_retained_from_official_site": false
   },
   "images": {
     "by_document": [

@@ -79,6 +79,7 @@ class FoundationTests(unittest.TestCase):
             "id": "CH01",
             "raw_start_byte": 0,
             "raw_end_byte_exclusive": len(raw),
+            "proposed_output_path": "CHAPTERS/01-Test.md",
         }
         valid = {
             "id": "C-0001",
@@ -95,6 +96,13 @@ class FoundationTests(unittest.TestCase):
         checked = build.validate_corrections([valid], raw, [document])
         self.assertEqual(
             build.apply_corrections(document, raw, checked), b"a good token"
+        )
+        independently_rendered = validate.independent_document_bytes(
+            raw, [document], checked
+        )
+        self.assertEqual(
+            independently_rendered[build.safe_relative_path("CHAPTERS/01-Test.md")],
+            b"a good token",
         )
 
         invalid = []
@@ -185,6 +193,15 @@ class FoundationTests(unittest.TestCase):
         self.assertEqual(self.images[-1]["document_id"], "N12")
         self.assertTrue(self.images[-1]["asset_relative_path"].startswith("BACK-MATTER/Colophon/"))
 
+    def test_complete_legacy_tree_matches_the_frozen_snapshot(self) -> None:
+        self.assertEqual(
+            validate.legacy_tree_digest(),
+            (
+                "b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4",
+                1463,
+            ),
+        )
+
     def test_image_map_mutations_are_rejected(self) -> None:
         mutations = {
             "ordinal": lambda rows: rows[0].__setitem__("ordinal", 2),
@@ -256,6 +273,11 @@ class FoundationTests(unittest.TestCase):
                 validate.validate_output(
                     first, self.raw, self.documents, [], self.images
                 )
+
+            occupied = Path(directory) / "occupied"
+            occupied.mkdir()
+            with self.assertRaisesRegex(build.BuildError, "already exists"):
+                build.build(occupied)
 
 
 if __name__ == "__main__":

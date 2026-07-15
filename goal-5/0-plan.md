@@ -277,8 +277,12 @@ Neither file is a generalized workflow database.
   spans, and assets were rechecked; content-sensitive facts remain provisional
   until authoritative comparison.
 - No lawful, complete, readable authoritative source is currently mounted in
-  the repository. Stage 2 remains source-acquisition blocked unless a suitable
-  source is authorized or provided.
+  the repository. A live scan found no independent book source, and intentionally
+  deleted source material remains excluded. The official NKS Online candidate
+  is edition-aligned and structurally broad, but Wolfram's current published
+  terms prohibit bulk extraction and use with AI tools without a separate
+  agreement. Stage 2 therefore requires a user-supplied source explicitly
+  authorized for this workflow/output or separate Wolfram permission.
 - Stage 2's dependency-independent foundation is implemented: the zero-build
   conserves all monolith bytes, two fresh builds match, the focused validator
   passes, and `8` tests plus `19` mutation subtests pass. All 29 coverage
