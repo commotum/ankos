@@ -13,7 +13,7 @@ from pipeline_schema_lib import PipelineSchemaError, validate_package
 # The lock deliberately excludes this validator, avoiding a circular digest.
 # Replaced only after schemas, library, and tests are final and independently
 # hashed.  Self-consistent lock/schema tampering therefore fails here.
-EXPECTED_PIPELINE_SCHEMA_LOCK_SHA256 = "923528eb64caf7a3d2df529da3a4608e11cced6852e62cd3ace269985d6b825c"
+EXPECTED_PIPELINE_SCHEMA_LOCK_SHA256 = "08500f6ba6a5f19328c9d3a3b90a43ab378964760a900f786300d539aa63847d"
 
 
 def repository_root() -> Path:

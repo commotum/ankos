@@ -532,6 +532,12 @@ def _file_record(path: str, role: str, payload: bytes) -> dict[str, Any]:
 def _load_exact_independent_verifier(goal_root: Path) -> tuple[Any, str]:
     """Load only the verifier declared by the active relocated Goal 4 root."""
 
+    declared_library = goal_root / "tools/zero_repair_lib.py"
+    _assert_regular_input(declared_library, label="declared zero-repair library")
+    require(
+        _lexical_absolute(Path(__file__)) == _lexical_absolute(declared_library),
+        "executed zero-repair library path differs from declared Goal 4 library",
+    )
     verifier_path = goal_root / "tools/zero_repair_verify.py"
     _assert_regular_input(verifier_path, label="declared independent verifier")
     before = verifier_path.read_bytes()

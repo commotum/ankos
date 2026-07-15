@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -29,6 +30,9 @@ def main() -> int:
     elif not goal.is_absolute():
         goal = args.repo_root / goal
     try:
+        declared_cli = Path(os.path.abspath(goal / "tools/validate_zero_repair.py"))
+        if Path(os.path.abspath(__file__)) != declared_cli:
+            raise ZeroRepairError("executed validation CLI path differs from declared Goal 4 validation CLI")
         verifier, verifier_sha256 = _load_exact_independent_verifier(goal)
         result = verifier.independently_validate_zero_repair(
             args.repo_root,

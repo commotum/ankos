@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -934,6 +935,22 @@ class PipelineSchemaTests(unittest.TestCase):
                 relocated, schema_cli.EXPECTED_PIPELINE_SCHEMA_LOCK_SHA256
             )
             self.assertEqual(result["schema_count"], 13)
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-O",
+                    str(relocated / "goal-4/tools/validate_pipeline_schemas.py"),
+                    "--repo-root",
+                    str(relocated),
+                ],
+                cwd=Path(directory),
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            self.assertIn("Stage 4 pipeline schema validation: PASS", completed.stdout)
 
     def test_65_repair_row_hash_and_overlay_projection_bridge_are_exact(self) -> None:
         row = valid_repair()

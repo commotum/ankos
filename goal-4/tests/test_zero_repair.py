@@ -234,13 +234,30 @@ class ZeroRepairBuildTests(unittest.TestCase):
         os.chmod(portable, 0o555)
         output = portable_parent / "relocated-output"
         try:
-            result = build_zero_repair(
-                portable,
-                output,
-                goal_root=Path("policy"),
-                legacy_root=Path("corpus"),
+            with self.assertRaisesRegex(ZeroRepairError, "executed zero-repair library path differs"):
+                _load_exact_independent_verifier(goal)
+            build_command = [
+                sys.executable,
+                os.fspath(tools / "build_zero_repair.py"),
+                "--repo-root",
+                os.fspath(portable),
+                "--goal-root",
+                "policy",
+                "--legacy-root",
+                "corpus",
+                "--output-root",
+                os.fspath(output),
+            ]
+            built = subprocess.run(
+                build_command,
+                cwd=self.temp_root,
+                env={**os.environ, "PYTHONPATH": ""},
+                check=False,
+                capture_output=True,
+                text=True,
             )
-            self.assertEqual(result["inverse_sha256"], EXPECTED_MONOLITH_SHA256)
+            self.assertEqual(built.returncode, 0, built.stderr)
+            self.assertIn(EXPECTED_MONOLITH_SHA256, built.stdout)
             self.assertFalse((portable / ".git").exists())
             command = [
                 sys.executable,

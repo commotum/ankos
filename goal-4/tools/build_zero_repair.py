@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -24,6 +25,14 @@ def main() -> int:
     parser.add_argument("--comparison-output-root", type=Path)
     args = parser.parse_args()
     try:
+        goal = args.goal_root
+        if goal is None:
+            goal = args.repo_root / "goal-4"
+        elif not goal.is_absolute():
+            goal = args.repo_root / goal
+        declared_cli = Path(os.path.abspath(goal / "tools/build_zero_repair.py"))
+        if Path(os.path.abspath(__file__)) != declared_cli:
+            raise ZeroRepairError("executed build CLI path differs from declared Goal 4 build CLI")
         result = build_zero_repair(
             args.repo_root,
             args.output_root,
