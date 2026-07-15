@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0.0",
+  "status": "CANDIDATES_RECORDED_NO_PRIMARY_WITNESS_ACQUIRED",
+  "inspected_on": "2026-07-14",
+  "sources": [
+    {
+      "source_id": "OFFICIAL_NKS_ONLINE",
+      "provider": "Stephen Wolfram, LLC",
+      "authority": "OFFICIAL_PROVIDER",
+      "root_url": "https://www.wolframscience.com/nks/",
+      "source_state": "REMOTE_INTERACTIVE_ONLY",
+      "automated_or_ai_use_state": "USE_NOT_AUTHORIZED",
+      "bulk_acquisition_state": "USE_NOT_AUTHORIZED",
+      "local_storage_state": "NOT_ACQUIRED",
+      "redistribution_allowed": false,
+      "edition_identity": {
+        "copyright_page_url": "https://www.wolframscience.com/nks/piv--copyright/",
+        "edition": "First edition",
+        "printing": "Fourth printing",
+        "copyright_year": 2002,
+        "hardcover_isbn_10": "1-57955-008-8",
+        "hardcover_isbn_13": "978-1-57955-008-0",
+        "local_ocr_equivalence_proven": false
+      },
+      "available_surfaces": [
+        "SEMANTIC_HTML",
+        "RESPONSIVE_PAGE_PNG",
+        "SECTION_PDF",
+        "CHAPTER_PDF",
+        "REFLOWED_INDEX_HTML"
+      ],
+      "verified_public_sentinels": [
+        "https://www.wolframscience.com/nks/pix--preface/",
+        "https://www.wolframscience.com/nks/p27--how-do-simple-programs-behave/",
+        "https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-preface.pdf",
+        "https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-ch1.pdf",
+        "https://files.wolframcdn.com/pub/www.wolframscience.com/nks/nks-notes.pdf",
+        "https://www.wolframscience.com/nks/index/0/",
+        "https://www.wolframscience.com/nks/colophon/"
+      ],
+      "known_limitations": [
+        "No official public whole-book PDF or EPUB was identified",
+        "Page assets are URL-addressed rather than content-addressed",
+        "Responsive page PNGs may be too low-resolution for fine technical symbols",
+        "Reflowed HTML does not preserve printed geometry",
+        "No public fixed-layout Index witness was identified",
+        "Covers, endpapers, blanks, plates, inserts, foldouts, bleed, and trim coverage are not proven complete",
+        "The local OCR has not yet been proven to match this exact printing"
+      ],
+      "permission_records": [
+        {
+          "permission_record_id": "NKS_BOOK_COPYRIGHT_2002",
+          "url": "https://www.wolframscience.com/nks/piv--copyright/",
+          "effective_or_observed": "2002 edition leaf, observed 2026-07-14",
+          "derived_finding": "Full-text and illustration reproduction remain reserved; bounded quotation and program provisions do not authorize a complete repaired edition or witness archive.",
+          "snapshot_sha256": null,
+          "snapshot_state": "NOT_RETAINED"
+        },
+        {
+          "permission_record_id": "WOLFRAM_SCIENCE_TERMS",
+          "url": "https://www.wolfram.com/legal/terms/wolfram-science.html",
+          "effective_or_observed": "observed 2026-07-14",
+          "derived_finding": "Personal use is described as unrestricted, but bulk reproduction, mirroring, and archiving require advance permission.",
+          "snapshot_sha256": null,
+          "snapshot_state": "NOT_RETAINED"
+        },
+        {
+          "permission_record_id": "WOLFRAM_GENERAL_TERMS_2024",
+          "url": "https://www.wolfram.com/legal/terms/wolfram/",
+          "effective_or_observed": "Effective 2024-07-29, observed 2026-07-14",
+          "derived_finding": "Scraping, bulk downloading, and use with AI-powered tools are prohibited absent a separate license.",
+          "snapshot_sha256": null,
+          "snapshot_state": "NOT_RETAINED"
+        }
+      ],
+      "unblock_action": "Obtain written permission at ip@wolframscience.com or provide a separately licensed complete edition-identical witness whose terms permit this private automated or AI-assisted audit."
+    }
+  ],
+  "official_count_claims": [
+    {
+      "claim_id": "PRODUCT_PAGE_COUNT",
+      "source_url": "https://www.wolfram-media.com/products/nks/",
+      "count": 1280,
+      "unit_label": "pages",
+      "scope_definition": "not specified on product page"
+    },
+    {
+      "claim_id": "COLOPHON_COUNT",
+      "source_url": "https://www.wolframscience.com/nks/colophon/",
+      "count": 1280,
+      "unit_label": "pages",
+      "scope_definition": "book data; physical/digital inclusion not defined"
+    },
+    {
+      "claim_id": "CITATION_PAGE_COUNT",
+      "source_url": "https://www.wolframscience.com/nks/citation/",
+      "count": 1197,
+      "unit_label": "pages",
+      "scope_definition": "citation metadata; relationship to front matter, Index, and physical surfaces not defined"
+    },
+    {
+      "claim_id": "COLOPHON_PRINTED_LOCATION",
+      "source_url": "https://www.wolframscience.com/nks/colophon/",
+      "count": 1264,
+      "unit_label": "printed page label",
+      "scope_definition": "start of Colophon"
+    }
+  ],
+  "count_reconciliation_state": "UNRESOLVED_DO_NOT_FORCE"
+}

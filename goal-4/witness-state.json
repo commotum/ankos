@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.0.0",
+  "contract_id": "ANKOS-WITNESS-1",
+  "status": "SOURCE_BLOCKED",
+  "recorded_on": "2026-07-14",
+  "baseline_bindings": {
+    "baseline_lock_sha256": "57224a1f1ba8333bbc900b23ff6127a189649feb01c279f30fac05a305658863",
+    "structure_ledger_sha256": "6f9891417f458ca1e40385082b4f230e780d72362a783f35e11648082a743d49",
+    "held_out_sample_sha256": "c09f32e0eefe580eddf6d250706795c4c784532dbbe502ac1a0bf04306541fb9"
+  },
+  "candidate_source_ids": [
+    "OFFICIAL_NKS_ONLINE"
+  ],
+  "acquisition": {
+    "primary_witness_acquired": false,
+    "witness_bytes_in_repository": false,
+    "witness_bytes_in_repaired_release": false,
+    "authorized_read_only_mount_configured": false,
+    "permission_or_license_id": null,
+    "unit_manifest_path": null,
+    "region_manifest_path": null
+  },
+  "coverage": {
+    "unit_universe_state": "UNKNOWN_SOURCE_BLOCKED",
+    "witness_unit_count": 0,
+    "witness_region_count": 0,
+    "covered_segment_count": 0,
+    "blocked_segment_count": 29,
+    "raw_block_count": 20430,
+    "raw_block_ids_lf_sha256": "46b5af25479de19aeca26f39b86c8e78c54b168d33365615ee9f3934f7a58779",
+    "held_out_selected_count": 1125,
+    "held_out_selected_raw_block_ids_sha256": "94e489a0ad2ecc85da9554478b417c771f5eeb5d901561ccf56781292f2ac9ad"
+  },
+  "blocked_segment_ids": [
+    "PUBLICATION_AND_CONTENTS",
+    "PREFACE",
+    "CH01",
+    "CH02",
+    "CH03",
+    "CH04",
+    "CH05",
+    "CH06",
+    "CH07",
+    "CH08",
+    "CH09",
+    "CH10",
+    "CH11",
+    "CH12",
+    "GENERAL_NOTES",
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07",
+    "N08",
+    "N09",
+    "N10",
+    "N11",
+    "N12",
+    "INDEX",
+    "COLOPHON"
+  ],
+  "blockers": [
+    {
+      "blocker_id": "WITNESS-PERMISSION",
+      "state": "OPEN",
+      "scope": "ALL_AUTHORIAL_REGIONS",
+      "reason": "The official service terms do not authorize bulk or AI-assisted acquisition and analysis.",
+      "unblock_action": "Record written permission or a separate license covering acquisition, storage, automated analysis, retention, and derivative boundaries.",
+      "release_impact": "Blocks witness acquisition, author-text correction, fidelity certification, and a full-repair claim."
+    },
+    {
+      "blocker_id": "WITNESS-COMPLETE-CENSUS",
+      "state": "OPEN",
+      "scope": "ALL_PHYSICAL_AND_DIGITAL_UNITS",
+      "reason": "No complete edition-identical fixed-layout object or physical-surface census is available.",
+      "unblock_action": "Acquire an authorized complete witness and independently enumerate covers, endpapers, leaves, blanks, pages, plates, inserts, and foldouts.",
+      "release_impact": "Blocks proof that every authorial region is present."
+    },
+    {
+      "blocker_id": "WITNESS-INDEX-LAYOUT",
+      "state": "OPEN",
+      "scope": "INDEX",
+      "reason": "The public Index is reflowed HTML and no fixed-layout Index witness was identified.",
+      "unblock_action": "Obtain authorized fixed-layout Index pages or manually inspect a matching physical edition.",
+      "release_impact": "Blocks reconstruction and certification of Index column order."
+    },
+    {
+      "blocker_id": "WITNESS-EDITION-MATCH",
+      "state": "OPEN",
+      "scope": "ALL_AUTHORIAL_REGIONS",
+      "reason": "The official online edition is identified, but equivalence to the local OCR lineage is not proven.",
+      "unblock_action": "Match copyright/publication fingerprints and sequential content against an authorized witness before accepting it as edition-identical.",
+      "release_impact": "Blocks source-backed corrections even if isolated online pages look plausible."
+    },
+    {
+      "blocker_id": "WITNESS-INDEPENDENT-REVIEW",
+      "state": "OPEN",
+      "scope": "ALL_AUTHORIAL_REGIONS",
+      "reason": "No human independent witness-review assignments or blind held-out adjudications exist.",
+      "unblock_action": "Assign distinct human transcriber, specialist, and independent reviewer identities after lawful witness access is established.",
+      "release_impact": "Blocks closing author-text repairs and final audit certification."
+    }
+  ],
+  "stage_gates": {
+    "stage_3": "SOURCE_BLOCKED",
+    "stage_4_dependency_independent_pipeline_work": "ALLOWED",
+    "stage_5_zero_repair_structure_work": "ALLOWED_AFTER_STAGE_4",
+    "author_text_correction": "BLOCKED",
+    "full_repair_claim": "BLOCKED"
+  }
+}
