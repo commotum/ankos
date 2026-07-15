@@ -69,7 +69,7 @@ EXPECTED_ARTIFACTS = (
 # Set only after the Stage 2 source/test surface is closed. The lock excludes
 # this validator itself, avoiding a circular self-hash.
 EXPECTED_BASELINE_LOCK_SHA256: str | None = None
-EXPECTED_ROUTING_PROJECTION_SHA256: str | None = None
+EXPECTED_ROUTING_PROJECTION_SHA256 = "5fdc26f3781956927824286ca1d9247a9002c5e2ad5682f433fdef7b267054e7"
 
 MANIFEST_KEYS = {
     "contract_id",
@@ -926,7 +926,7 @@ def _independent_workflow_stages(owner: str, classes: list[str]) -> list[str]:
         stages.add("6-MEDIA")
     stages.update(_independent_specialist_stages(classes))
     stages.update({"40-SATURATION", "42-RELEASE"})
-    return sorted(stages)
+    return sorted(stages, key=lambda stage: (int(stage.split("-", 1)[0]), stage))
 
 
 def _independent_routing_checks(
@@ -1142,7 +1142,12 @@ def _independent_defect_checks(
         require(row["exact_regression_detector"] == "D13_EXACT_SENTINEL" and row["candidate_detector_routes"], f"known defect detector route drift: {row['sentinel_id']}")
         require(set(row["candidate_detector_routes"]) <= detector_enum, f"known defect candidate-detector enum drift: {row['sentinel_id']}")
         require(row["closure_stages"] == ["40-SATURATION", "42-RELEASE"], f"known defect closure route drift: {row['sentinel_id']}")
-        require(row["primary_content_stages"] == _independent_content_stages(row["owner_document_id"]), f"known defect primary-content route drift: {row['sentinel_id']}")
+        expected_primary = (
+            ["6-MEDIA"]
+            if row.get("artifact_path") == "goal-4/image-reference-ledger.jsonl"
+            else _independent_content_stages(row["owner_document_id"])
+        )
+        require(row["primary_content_stages"] == expected_primary, f"known defect primary-content route drift: {row['sentinel_id']}")
         require(row["specialist_stages"] == _independent_specialist_stages(row["defect_classes"]), f"known defect specialist route drift: {row['sentinel_id']}")
         require(row["workflow_stages"] == _independent_workflow_stages(row["owner_document_id"], row["defect_classes"]), f"known defect workflow route drift: {row['sentinel_id']}")
         if row["sentinel_kind"] == "EXACT_RAW_SPAN":

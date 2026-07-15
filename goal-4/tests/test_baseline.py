@@ -22,12 +22,19 @@ from baseline_lib import (  # noqa: E402
     risk_stratum,
     stable_json_bytes,
 )
+from capture_baseline import path_is_absent  # noqa: E402
 from guardrail_lib import GuardrailError, canonical_json_bytes, load_canonical_json  # noqa: E402
 from validate_baseline import (  # noqa: E402
     EXPECTED_ARTIFACTS,
+    _independent_defect_checks,
+    _independent_image_checks,
+    _independent_jpeg_metadata,
+    _independent_routing_checks,
     _independent_sample_ids,
     _independent_structure_checks,
+    _validate_lock,
     _validate_raw_rows,
+    _validate_sample_artifact,
     load_jsonl,
     validate_baseline,
 )
@@ -42,6 +49,15 @@ class FrozenBaselineTests(unittest.TestCase):
         cls.structure = load_jsonl(cls.artifact_root / "structure-ledger.jsonl")
         cls.images = load_jsonl(cls.artifact_root / "image-reference-ledger.jsonl")
         cls.defects = load_jsonl(cls.artifact_root / "known-defect-regression.jsonl")
+        cls.routing = load_canonical_json(cls.artifact_root / "routing-baseline.json")
+        cls.detector_hits = load_jsonl(cls.artifact_root / "baseline-detector-hits.jsonl")
+        cls.detector_report = load_canonical_json(cls.artifact_root / "baseline-detector-report.json")
+        cls.lock = load_canonical_json(cls.artifact_root / "baseline-lock.json")
+        cls.contract = json.loads((cls.artifact_root / "guardrails.json").read_text())
+        cls.quality = json.loads((cls.artifact_root / "quality-evaluation.json").read_text())
+        cls.segments = [row for row in cls.structure if row["record_type"] == "SEGMENT"]
+        cls.blocks = [row for row in cls.structure if row["record_type"] == "RAW_BLOCK"]
+        cls.legacy = ROOT / LEGACY_RELATIVE
 
     def test_current_baseline_validates(self) -> None:
         self.assertEqual(
@@ -137,12 +153,50 @@ class FrozenBaselineTests(unittest.TestCase):
             with self.assertRaisesRegex(GuardrailError, "raw SHA-256 drift"):
                 _validate_raw_rows(ROOT, self.manifest, {relative: mutated})
 
+    def test_malformed_jpeg_is_rejected(self) -> None:
+        jpeg = next(row for row in self.manifest["raw_inputs"] if row["kind"] == "JPEG")
+        payload = (self.legacy / Path(jpeg["relative_path"])).read_bytes()
+        with self.assertRaisesRegex(GuardrailError, "bytes after EOI"):
+            _independent_jpeg_metadata(payload + b"trailing-garbage")
+
+    def test_dangling_repaired_sibling_alias_is_not_absent(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            absent = root / "absent"
+            dangling = root / "dangling"
+            dangling.symlink_to(root / "missing-target")
+            self.assertTrue(path_is_absent(absent))
+            self.assertFalse(dangling.exists())
+            self.assertTrue(dangling.is_symlink())
+            self.assertFalse(path_is_absent(dangling))
+
     def test_segment_gap_mutation_fails(self) -> None:
         mutated = copy.deepcopy(self.structure)
         first_block = next(row for row in mutated if row["record_type"] == "RAW_BLOCK")
         first_block["start_byte"] += 1
         with self.assertRaisesRegex(GuardrailError, "raw block gap/overlap"):
             _independent_structure_checks(ROOT, mutated)
+
+    def test_structure_line_byte_and_kind_risk_mutations_fail(self) -> None:
+        line_byte = copy.deepcopy(self.structure)
+        line_byte_blocks = [row for row in line_byte if row["record_type"] == "RAW_BLOCK"]
+        line_byte_blocks[0]["end_byte_exclusive"] += 1
+        line_byte_blocks[1]["start_byte"] += 1
+        with self.assertRaisesRegex(GuardrailError, "line/byte mismatch"):
+            _independent_structure_checks(ROOT, line_byte)
+
+        reclassified = copy.deepcopy(self.structure)
+        prose = next(
+            row
+            for row in reclassified
+            if row["record_type"] == "RAW_BLOCK"
+            and row["block_kind"] == "PROSE"
+            and row["canonical_document_id"] != "INDEX"
+        )
+        prose["block_kind"] = "CODE_BLOCK"
+        prose["risk_stratum"] = "FORMULA_CODE_RULE_OR_DATA"
+        with self.assertRaisesRegex(GuardrailError, "independent lexical classification drift"):
+            _independent_structure_checks(ROOT, reclassified)
 
     def test_detector_or_outcome_fields_cannot_change_sample(self) -> None:
         contract = json.loads((ROOT / "goal-4/guardrails.json").read_text())
@@ -155,6 +209,142 @@ class FrozenBaselineTests(unittest.TestCase):
             row["CHANGED"] = True
         seed_b, ids_b, allocations_b = _independent_sample_ids(self.manifest, polluted, contract, quality)
         self.assertEqual((seed_a, ids_a, allocations_a), (seed_b, ids_b, allocations_b))
+
+    def test_full_sample_ranking_swap_and_digest_mutations_fail(self) -> None:
+        mutations = {
+            "row_swap": lambda sample: sample["rankings"].__setitem__(
+                slice(0, 2),
+                [sample["rankings"][1], sample["rankings"][0]],
+            ),
+            "rank_digest": lambda sample: sample["rankings"][0].__setitem__("rank_sha256", "0" * 64),
+        }
+        for label, mutate in mutations.items():
+            with self.subTest(label=label):
+                sample = copy.deepcopy(self.sample)
+                mutate(sample)
+                with self.assertRaisesRegex(GuardrailError, "ranking rows/order drift"):
+                    _validate_sample_artifact(
+                        ROOT,
+                        self.manifest,
+                        self.structure,
+                        self.blocks,
+                        self.contract,
+                        self.quality,
+                        sample,
+                    )
+
+    def test_lock_extra_key_and_source_scope_mutations_fail(self) -> None:
+        extra_key = copy.deepcopy(self.lock)
+        extra_key["unexpected"] = True
+        with self.assertRaisesRegex(GuardrailError, "baseline lock field set drift"):
+            _validate_lock(ROOT, self.artifact_root, extra_key)
+
+        missing_source = copy.deepcopy(self.lock)
+        missing_source["sources"].pop()
+        with self.assertRaisesRegex(GuardrailError, "source scope/order drift"):
+            _validate_lock(ROOT, self.artifact_root, missing_source)
+
+    def test_routing_mutations_fail_independent_checks(self) -> None:
+        mutations = {
+            "route_deletion": (
+                lambda routing: routing["routing_spans"].pop(0),
+                "routing span identity drift",
+            ),
+            "wrong_target": (
+                lambda routing: routing["routing_spans"][0].__setitem__("target_document_id", "CH01"),
+                "routing raw owner drift",
+            ),
+            "wrong_disposition": (
+                lambda routing: routing["routing_spans"][0].__setitem__(
+                    "disposition", "REFLOWED_OR_NORMALIZED_ROUTING_ONLY"
+                ),
+                "routing disposition census drift",
+            ),
+            "split_span_hash": (
+                lambda routing: routing["routing_spans"][0].__setitem__("split_span_sha256", "0" * 64),
+                "routing split span drift",
+            ),
+            "atlas_retype": (
+                lambda routing: routing["atlas"].__setitem__("role", "RAW_AUTHOR_TEXT_MONOLITH"),
+                "Atlas role/identity drift",
+            ),
+        }
+        for label, (mutate, message) in mutations.items():
+            with self.subTest(label=label):
+                routing = copy.deepcopy(self.routing)
+                mutate(routing)
+                with self.assertRaisesRegex(GuardrailError, message):
+                    _independent_routing_checks(
+                        self.legacy,
+                        self.manifest,
+                        self.segments,
+                        self.images,
+                        routing,
+                    )
+
+    def test_image_ledger_mutations_fail_independent_checks(self) -> None:
+        omitted_index = next(index for index, row in enumerate(self.images) if row["split_status"] == "OMITTED")
+        mutations = {
+            "ordinal": lambda rows: rows[0].__setitem__("raw_reference_ordinal", 2),
+            "asset": lambda rows: rows[0].__setitem__("asset_sha256", "0" * 64),
+            "block": lambda rows: rows[0].__setitem__("raw_block_id", "RAW-999999"),
+            "omission": lambda rows: rows[omitted_index].__setitem__("split_status", "PRESENT"),
+        }
+        for label, mutate in mutations.items():
+            with self.subTest(label=label):
+                rows = copy.deepcopy(self.images)
+                mutate(rows)
+                with self.assertRaisesRegex(GuardrailError, "independent image ledger drift"):
+                    _independent_image_checks(
+                        self.legacy,
+                        self.manifest,
+                        self.segments,
+                        self.blocks,
+                        rows,
+                    )
+
+    def test_known_defect_and_d13_mutations_fail_independent_checks(self) -> None:
+        def delete_defect(rows: list[dict], hits: list[dict]) -> None:
+            rows.pop()
+
+        def alter_span_hash(rows: list[dict], hits: list[dict]) -> None:
+            next(row for row in rows if row["sentinel_kind"] == "EXACT_RAW_SPAN")["raw_span_sha256"] = "0" * 64
+
+        def alter_workflow(rows: list[dict], hits: list[dict]) -> None:
+            rows[0]["workflow_stages"] = []
+
+        def authorize_repair(rows: list[dict], hits: list[dict]) -> None:
+            rows[0]["repair_authorized"] = True
+
+        def delete_d13_hit(rows: list[dict], hits: list[dict]) -> None:
+            index = next(index for index, row in enumerate(hits) if row["detector_id"] == "D13_EXACT_SENTINEL")
+            hits.pop(index)
+
+        mutations = {
+            "defect_deletion": (delete_defect, "known-defect identity drift"),
+            "span_hash": (alter_span_hash, "known defect span drift"),
+            "workflow": (alter_workflow, "known defect workflow route drift"),
+            "authorization": (authorize_repair, "known defect authorizes repair"),
+            "D13_hit": (delete_d13_hit, "exact sentinel detector coverage drift"),
+        }
+        for label, (mutate, message) in mutations.items():
+            with self.subTest(label=label):
+                rows = copy.deepcopy(self.defects)
+                hits = copy.deepcopy(self.detector_hits)
+                mutate(rows, hits)
+                with self.assertRaisesRegex(GuardrailError, message):
+                    _independent_defect_checks(
+                        self.legacy,
+                        self.artifact_root,
+                        self.manifest,
+                        self.segments,
+                        self.blocks,
+                        self.images,
+                        self.routing,
+                        rows,
+                        hits,
+                        self.detector_report,
+                    )
 
     def test_noncanonical_jsonl_row_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

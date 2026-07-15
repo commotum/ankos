@@ -1665,7 +1665,7 @@ def _workflow_stages(owner: str, defect_classes: list[str]) -> list[str]:
         stages.add("6-MEDIA")
     stages.update(_specialist_stages(defect_classes))
     stages.update({"40-SATURATION", "42-RELEASE"})
-    return sorted(stages)
+    return sorted(stages, key=lambda stage: (int(stage.split("-", 1)[0]), stage))
 
 
 def _defect_span_specs() -> list[dict[str, Any]]:
@@ -1803,7 +1803,7 @@ def build_known_defect_rows(
             "sentinel_kind": "AGGREGATE_GUARDRAIL",
             "specialist_stages": ["39-NAVIGATION"],
             "status": "BASELINE_ROLE_GUARDRAIL",
-            "workflow_stages": ["39-NAVIGATION", "40-SATURATION", "42-RELEASE"],
+            "workflow_stages": ["6-MEDIA", "39-NAVIGATION", "40-SATURATION", "42-RELEASE"],
         },
         {
             "artifact_path": "goal-4/image-reference-ledger.jsonl",
@@ -1833,7 +1833,7 @@ def build_known_defect_rows(
             "sentinel_kind": "AGGREGATE_GUARDRAIL",
             "specialist_stages": ["39-NAVIGATION"],
             "status": "BASELINE_MECHANICAL_ROUTE_OPEN",
-            "workflow_stages": ["5-STRUCTURE", "39-NAVIGATION", "40-SATURATION", "42-RELEASE"],
+            "workflow_stages": ["5-STRUCTURE", "6-MEDIA", "39-NAVIGATION", "40-SATURATION", "42-RELEASE"],
         },
     ]
     rows.extend(aggregate_rows)
