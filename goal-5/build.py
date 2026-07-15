@@ -60,7 +60,7 @@ def jpeg_dimensions(data: bytes) -> tuple[int, int]:
     """Read JPEG dimensions without adding an image-library dependency."""
 
     if not data.startswith(b"\xff\xd8"):
-        raise BuildError("repaired asset is not a JPEG")
+        raise BuildError("asset is not a JPEG")
     start_of_frame = {
         0xC0,
         0xC1,
@@ -102,7 +102,7 @@ def jpeg_dimensions(data: bytes) -> tuple[int, int]:
                 break
             return width, height
         index += length
-    raise BuildError("repaired JPEG has no valid start-of-frame dimensions")
+    raise BuildError("JPEG has no valid start-of-frame dimensions")
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
