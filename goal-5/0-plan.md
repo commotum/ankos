@@ -290,7 +290,12 @@ Neither file is a generalized workflow database.
 - `PUBLICATION_AND_CONTENTS` is complete after two sequential agent passes over
   PDF pages 1–8 and a clean closing pass against the rebuilt Markdown. Its 20
   guarded corrections are `G5-C-0001`–`G5-C-0020`; focused render and tests
-  pass. Stage 3 now continues with `PREFACE` at `pdf:0009`, raw byte 6480.
+  pass.
+- `PREFACE` is complete after a sequential first pass over PDF pages 9–16 and
+  an independent clean second pass against the rebuilt Markdown. Its 59 guarded
+  corrections are `G5-C-0021`–`G5-C-0079`; exact text/emphasis comparison,
+  detector scans, rendering, deterministic builds, and focused tests pass.
+  Stage 3 now continues with `CH01` at `pdf:0017`, raw line 166 and byte 30320.
 
 ## Stage Status
 

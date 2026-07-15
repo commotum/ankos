@@ -10,6 +10,7 @@ GOAL_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(GOAL_DIR))
 
 import build  # noqa: E402
+import validate  # noqa: E402
 
 
 class PrefaceTests(unittest.TestCase):
@@ -111,6 +112,13 @@ class PrefaceTests(unittest.TestCase):
             (build.OUTPUT_ROOT / Path(self.path)).read_text(encoding="utf-8"),
             self.rendered,
         )
+
+    def test_two_pass_document_coverage_is_closed(self) -> None:
+        rows = validate.validate_coverage(self.documents)
+        preface = next(row for row in rows if row["document_id"] == "PREFACE")
+        self.assertEqual((preface["first_pass"], preface["second_pass"]), ("YES", "YES"))
+        self.assertEqual(preface["reviewer_type"], "agent")
+        self.assertTrue(all(row["second_pass"] == "NO" for row in rows[2:]))
 
 
 if __name__ == "__main__":

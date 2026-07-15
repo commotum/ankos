@@ -15,11 +15,12 @@ Status: IN_PROGRESS
 - All six document boundaries are source-confirmed. In particular, the Chapter
   1 and Chapter 3 opener images and the textual Chapter 2 and Chapter 4 opener
   numbers belong to the chapters they introduce.
-- `PUBLICATION_AND_CONTENTS` is two-pass complete over PDF pages 1–8 with 20
-  guarded corrections. The other five Stage 3 coverage rows remain `NO/NO`.
-- A source-review pack for the first canonical document exists under
-  `/tmp/ankos-stage3-publication/`. Page rasters are authoritative; native PDF
-  text is only a navigation/detection aid because its custom glyph and column
+- `PUBLICATION_AND_CONTENTS` and `PREFACE` are two-pass complete over PDF pages
+  1–16 with 79 guarded corrections. The remaining four Stage 3 coverage rows
+  remain `NO/NO`.
+- Source-review packs exist under `/tmp/ankos-stage3-publication/` and
+  `/tmp/ankos-stage3-preface/`. Page rasters are authoritative; native PDF text
+  is only a navigation/detection aid because its custom glyph and column
   extraction is unreliable.
 
 ## Updated Assumptions
@@ -89,8 +90,8 @@ For each document:
 |---|---|---:|---|---|---|---:|
 | 1 | `PUBLICATION_AND_CONTENTS` | 1–8 | `0 → 6480` | COMPLETE | `G5-C-0001`–`G5-C-0020` | closed |
 | 2 | `PUBLICATION_AND_CONTENTS` | 1–8 | final rebuilt document | COMPLETE | verified all 20 | closed |
-| 1 | `PREFACE` | 9–16 | `6480 → 30320` | IN_PROGRESS | pending | `pdf:0009` |
-| 2 | `PREFACE` | 9–16 | final rebuilt document | NOT_STARTED | — | `pdf:0009` |
+| 1 | `PREFACE` | 9–16 | `6480 → 30320` | COMPLETE | `G5-C-0021`–`G5-C-0079` | closed |
+| 2 | `PREFACE` | 9–16 | final rebuilt document | COMPLETE | all 59 verified; no new discrepancy | closed |
 | 1 | `CH01` | 17–38 | `30320 → 79330` | NOT_STARTED | — | `pdf:0017` |
 | 2 | `CH01` | 17–38 | final rebuilt document | NOT_STARTED | — | `pdf:0017` |
 | 1 | `CH02` | 39–66 | `79330 → 119521` | NOT_STARTED | — | `pdf:0039` |
@@ -171,7 +172,26 @@ A fresh closing pass against the rebuilt file found no remaining discrepancy.
 The corrected Markdown rendered successfully with CommonMark raw HTML enabled;
 the five software-name italics, raised registration sign, line structure,
 permanent-paper sign, heading hierarchy, and 12 row headers were visibly
-present. Three focused publication tests and all ten Foundation tests passed.
+present. Four focused publication tests and all ten Foundation tests passed.
 
-Exact resume point: first pass of `PREFACE`, beginning at `pdf:0009`, raw byte
-6480. No Preface discrepancy or coverage claim has yet closed.
+`PREFACE` received a complete forward first pass over PDF pages 9–16 and an
+independent fresh second pass against the final rebuilt Markdown. Pages 9–14
+contain the Preface and acknowledgments, page 15 is a captionless divider whose
+existing asset visually matches the source, and page 16 is intentionally blank.
+The 59 source-verified corrections `G5-C-0021`–`G5-C-0079` restore the logical
+heading, signature/date and paragraph boundaries, one omitted word and period,
+one surname OCR error, 31 date-range punctuation errors, nine software-name
+italics, source em/en dashes and curly apostrophes, and five false column/page
+breaks. Direct high-resolution inspection preserved the First printing's
+`Cvitanovič` spelling instead of applying a misleading native-text extraction.
+
+The final Preface text has 11 source-matching italic *Mathematica* spans and 37
+four-digit en-dash ranges. CommonMark parsing, headless rendering, backward
+defect-pattern scans over both closed documents, two byte-identical fresh
+builds, cumulative validation, and four focused Preface tests passed. The
+independent closing pass normalized 23,680 source and rebuilt characters to an
+exact match and found no remaining discrepancy or ambiguity.
+
+Exact resume point: first pass of `CH01`, beginning at `pdf:0017`, raw line 166
+and byte 30320. Its 22-page raster review pack is prepared under
+`/tmp/ankos-stage3-ch01/`; no CH01 coverage claim has yet closed.

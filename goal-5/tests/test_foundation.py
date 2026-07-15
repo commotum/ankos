@@ -234,10 +234,10 @@ class FoundationTests(unittest.TestCase):
         changed_source_bound[0]["authoritative_end"] = "pdf:9999"
         variants.append(changed_source_bound)
         reversed_passes = copy.deepcopy(clean)
-        reversed_passes[1]["second_pass"] = "YES"
+        reversed_passes[2]["second_pass"] = "YES"
         variants.append(reversed_passes)
         no_evidence = copy.deepcopy(clean)
-        no_evidence[1]["first_pass"] = "YES"
+        no_evidence[2]["first_pass"] = "YES"
         variants.append(no_evidence)
 
         with tempfile.TemporaryDirectory() as directory:

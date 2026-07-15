@@ -93,7 +93,7 @@ class PublicationAndContentsTests(unittest.TestCase):
             ("YES", "YES"),
         )
         self.assertEqual(publication["reviewer_type"], "agent")
-        self.assertTrue(all(row["second_pass"] == "NO" for row in rows[1:]))
+        self.assertTrue(all(row["second_pass"] == "NO" for row in rows[2:]))
 
 
 if __name__ == "__main__":
