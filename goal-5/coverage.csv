@@ -1,30 +1,30 @@
-"document_id","raw_start_line","raw_end_line","first_pass","second_pass","authoritative_start","authoritative_end","reviewer_type","notes"
-"PUBLICATION_AND_CONTENTS","1","85","NO","NO","","","","Awaiting complete authoritative source"
-"PREFACE","86","167","NO","NO","","","","Awaiting complete authoritative source"
-"CH01","168","399","NO","NO","","","","Awaiting complete authoritative source"
-"CH02","400","681","NO","NO","","","","Awaiting complete authoritative source"
-"CH03","682","1369","NO","NO","","","","Awaiting complete authoritative source"
-"CH04","1370","2143","NO","NO","","","","Awaiting complete authoritative source"
-"CH05","2144","2701","NO","NO","","","","Awaiting complete authoritative source"
-"CH06","2702","3421","NO","NO","","","","Awaiting complete authoritative source"
-"CH07","3422","4337","NO","NO","","","","Awaiting complete authoritative source"
-"CH08","4338","5165","NO","NO","","","","Awaiting complete authoritative source"
-"CH09","5166","6587","NO","NO","","","","Awaiting complete authoritative source"
-"CH10","6588","7693","NO","NO","","","","Awaiting complete authoritative source"
-"CH11","7694","8609","NO","NO","","","","Awaiting complete authoritative source"
-"CH12","8610","10622","NO","NO","","","","Awaiting complete authoritative source"
-"GENERAL_NOTES","10623","10817","NO","NO","","","","Awaiting complete authoritative source"
-"N01","10818","10894","NO","NO","","","","Awaiting complete authoritative source"
-"N02","10895","11630","NO","NO","","","","Awaiting complete authoritative source"
-"N03","11631","12498","NO","NO","","","","Awaiting complete authoritative source"
-"N04","12499","13459","NO","NO","","","","Awaiting complete authoritative source"
-"N05","13460","14198","NO","NO","","","","Awaiting complete authoritative source"
-"N06","14199","14847","NO","NO","","","","Awaiting complete authoritative source"
-"N07","14848","15582","NO","NO","","","","Awaiting complete authoritative source"
-"N08","15583","16011","NO","NO","","","","Awaiting complete authoritative source"
-"N09","16012","17086","NO","NO","","","","Awaiting complete authoritative source"
-"N10","17087","18194","NO","NO","","","","Awaiting complete authoritative source"
-"N11","18195","19027","NO","NO","","","","Awaiting complete authoritative source"
-"N12","19028","20825","NO","NO","","","","Awaiting complete authoritative source"
-"INDEX","20826","22457","NO","NO","","","","Awaiting complete authoritative source"
-"COLOPHON","22458","22498","NO","NO","","","","Awaiting complete authoritative source"
+document_id,raw_start_line,raw_end_line,first_pass,second_pass,authoritative_start,authoritative_end,reviewer_type,notes
+PUBLICATION_AND_CONTENTS,1,85,NO,NO,pdf:0001,pdf:0008,,Source range frozen; sequential review not started
+PREFACE,86,165,NO,NO,pdf:0009,pdf:0016,,Source range frozen; sequential review not started
+CH01,166,397,NO,NO,pdf:0017,pdf:0038,,Source range frozen; sequential review not started
+CH02,398,679,NO,NO,pdf:0039,pdf:0066,,Source range frozen; sequential review not started
+CH03,680,1367,NO,NO,pdf:0067,pdf:0130,,Source range frozen; sequential review not started
+CH04,1368,2141,NO,NO,pdf:0131,pdf:0184,,Source range frozen; sequential review not started
+CH05,2142,2699,NO,NO,pdf:0185,pdf:0238,,Source range frozen; sequential review not started
+CH06,2700,3419,NO,NO,pdf:0239,pdf:0312,,Source range frozen; sequential review not started
+CH07,3420,4335,NO,NO,pdf:0313,pdf:0378,,Source range frozen; sequential review not started
+CH08,4336,5163,NO,NO,pdf:0379,pdf:0448,,Source range frozen; sequential review not started
+CH09,5164,6585,NO,NO,pdf:0449,pdf:0562,,Source range frozen; sequential review not started
+CH10,6586,7691,NO,NO,pdf:0563,pdf:0652,,Source range frozen; sequential review not started
+CH11,7692,8607,NO,NO,pdf:0653,pdf:0730,,Source range frozen; sequential review not started
+CH12,8608,10622,NO,NO,pdf:0731,pdf:0864,,Source range frozen; sequential review not started
+GENERAL_NOTES,10623,10817,NO,NO,pdf:0865,pdf:0874,,Source range frozen; sequential review not started
+N01,10818,10894,NO,NO,pdf:0875,pdf:0880,,Source range frozen; sequential review not started
+N02,10895,11630,NO,NO,pdf:0881,pdf:0898,,Source range frozen; sequential review not started
+N03,11631,12498,NO,NO,pdf:0899,pdf:0916,,Source range frozen; sequential review not started
+N04,12499,13459,NO,NO,pdf:0917,pdf:0942,,Source range frozen; sequential review not started
+N05,13460,14198,NO,NO,pdf:0943,pdf:0962,,Source range frozen; sequential review not started
+N06,14199,14847,NO,NO,pdf:0963,pdf:0982,,Source range frozen; sequential review not started
+N07,14848,15582,NO,NO,pdf:0983,pdf:1006,,Source range frozen; sequential review not started
+N08,15583,16011,NO,NO,pdf:1007,pdf:1032,,Source range frozen; sequential review not started
+N09,16012,17086,NO,NO,pdf:1033,pdf:1082,,Source range frozen; sequential review not started
+N10,17087,18194,NO,NO,pdf:1083,pdf:1122,,Source range frozen; sequential review not started
+N11,18195,19027,NO,NO,pdf:1123,pdf:1140,,Source range frozen; sequential review not started
+N12,19028,20825,NO,NO,pdf:1141,pdf:1216,,Source range frozen; sequential review not started
+INDEX,20826,22457,NO,NO,pdf:1217,pdf:1279,,Source range frozen; sequential review not started
+COLOPHON,22458,22498,NO,NO,pdf:1280,pdf:1280,,Source range frozen; sequential review not started

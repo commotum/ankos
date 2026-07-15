@@ -1,3 +1,5 @@
+![](_page_652_Picture_0.jpeg)
+
 #### The Notion of Computation
 
 #### Computation as a Framework
@@ -911,6 +913,4 @@ And in fact wherever one looks, the threshold for universality seems to be much 
 ![](_page_729_Figure_1.jpeg)
 
 Emulating the rule 110 cellular automaton using combinators. The rule 110 combinator from the previous page is applied once for each step of rule 110 evolution. The initial state is taken to consist of a single black cell.
-
-![](_page_730_Picture_0.jpeg)
 

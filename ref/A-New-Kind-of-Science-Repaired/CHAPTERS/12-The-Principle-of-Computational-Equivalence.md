@@ -1,3 +1,5 @@
+![](_page_730_Picture_0.jpeg)
+
 ### The Principle of Computational Equivalence
 
 #### **Basic Framework**

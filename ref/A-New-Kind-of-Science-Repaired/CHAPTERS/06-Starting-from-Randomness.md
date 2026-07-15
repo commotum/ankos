@@ -1,3 +1,5 @@
+## 6
+
 #### Starting from Randomness
 
 #### The Emergence of Order
@@ -715,6 +717,4 @@ Collisions between structures (e) and (o) from page 292.
 ![](_page_311_Picture_1.jpeg)
 
 A collision between structures (I) and (i) from page 292. It takes more than 4000 steps for the final outcome involving 8 separate structures to become clear. The height of the picture corresponds to 2000 steps, and the third picture ends at step 4300.
-
-![](_page_312_Picture_0.jpeg)
 

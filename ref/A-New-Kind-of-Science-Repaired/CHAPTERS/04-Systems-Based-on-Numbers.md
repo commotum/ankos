@@ -1,3 +1,5 @@
+# 4
+
 #### Systems Based on Numbers
 
 #### **The Notion of Numbers**
@@ -769,6 +771,4 @@ But now, armed with the knowledge that this phenomenon exists, it is possible to
 And although there are significant technical difficulties, one finds as the last few sections have shown that the phenomenon of complexity can occur in continuous systems just as it does in discrete ones.
 
 It remains much easier to be sure of what is going on in a discrete system than in a continuous one. But I suspect that essentially all of the various phenomena that we have observed in discrete systems in the past several chapters can in fact also be found even in continuous systems with fairly simple rules.
-
-![](_page_184_Picture_0.jpeg)
 

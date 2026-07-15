@@ -78,5 +78,3 @@ To write this book has taken me more than ten years of almost continuous work, m
 
 ![](_page_14_Picture_0.jpeg)
 
-![](_page_16_Picture_0.jpeg)
-

@@ -1,3 +1,5 @@
+![](_page_448_Picture_0.jpeg)
+
 #### Fundamental Physics
 
 #### The Problems of Physics
@@ -1417,6 +1419,4 @@ It so happens that the standard formalism of quantum theory provides a rather si
 In its development since the early 1900s quantum theory has produced all sorts of elaborate results. And to try to derive them all from the kinds of models I have outlined here will certainly take an immense amount of work. But I consider it very encouraging that some of the most basic quantum phenomena seem to be connected to properties like causal invariance and the network structure of space that already arose in our discussion of quite different fundamental issues in physics.
 
 And all of this supports my strong belief that in the end it will turn out that every detail of our universe does indeed follow rules that can be represented by a very simple program—and that everything we see will ultimately emerge just from running this program.
-
-# 10
 

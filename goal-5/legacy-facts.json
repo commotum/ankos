@@ -1,70 +1,132 @@
 {
   "authoritative_source": {
-    "candidate_to_reverify": {
-      "copyright_year": 2002,
-      "edition": "First edition",
-      "hardcover_isbn_10": "1-57955-008-8",
-      "hardcover_isbn_13": "978-1-57955-008-0",
-      "printing": "Fourth printing",
-      "root_url": "https://www.wolframscience.com/nks/"
-    },
-    "complete_source_mounted": false,
-    "edition_equivalence_to_local_ocr_proven": false,
-    "fixed_layout_index_source_identified": false,
-    "goal_5_action": "Obtain a separately authorized edition-identical source, or have the user provide one and explicitly confirm authorization for this agent-assisted complete-book comparison and repository output, before any transcription change.",
-    "live_workspace_audit": {
-      "date": "2026-07-14",
-      "finding": "No independent complete book source is present outside the immutable OCR tree and its generated projection.",
-      "intentionally_deleted_material": "Excluded from inspection, restoration, hashing, and use."
-    },
-    "official_online_audit": {
-      "book_copyright_url": "https://www.wolframscience.com/nks/piv--copyright/",
-      "book_identity": "The official copyright page identifies First edition, Fourth printing, copyright 2002; the official book page identifies ISBN 1-57955-008-8.",
-      "content_surface": "The official table of contents exposes Preface, Chapters 1-12, Notes, Index, copyright page, and Colophon. Fixed-layout PDF/page-image evidence is advertised for main text and Notes, but the current Index interface exposes semantic HTML rather than a verified printed-layout Index source.",
-      "date": "2026-07-14",
-      "edition_exactness_warning": "The official online-version note says the semantic Index adds death dates learned after the printed book was finished in January 2002, so semantic HTML is not edition-static and cannot decide printed Index text.",
-      "outcome": "NOT_AUTHORIZED_FOR_GOAL_5",
-      "reason": "The Wolfram Science site terms prohibit mirroring, bulk reproduction, and archiving without advance written permission. The current general Wolfram Terms also prohibit scraping or bulk downloading and use with AI-powered tools without a separate licensing agreement. The book copyright page permits only limited plain-text quotation and requires prior written consent for broader copying and illustrations.",
-      "separate_license_contact": "ip@wolframscience.com",
-      "site_terms_last_updated": "2018-05-15",
-      "site_terms_url": "https://www.wolfram.com/legal/terms/wolfram-science.html",
-      "general_terms_effective": "2024-07-29",
-      "general_terms_url": "https://www.wolfram.com/legal/terms/wolfram/",
-      "online_index_version_note_url": "https://www.wolframscience.com/reference/note.html"
-    },
-    "source_payload_retained_from_official_site": false
+    "source_of_truth": "goal-5/source-ranges.json#authoritative_source",
+    "status": "ACTIVE_USER_AUTHORIZED_LOCAL_FIXED_LAYOUT_WITNESS",
+    "complete_source_mounted": true,
+    "edition_equivalence_to_local_ocr_proven": true,
+    "fixed_layout_index_source_identified": true,
+    "legacy_identity": "First edition, First printing, ISBN 1-57955-008-8",
+    "prior_online_candidate": "The official online surface describes a later Fourth printing and is not used as transcription evidence.",
+    "legacy_tree_effect": "None; the ignored PDF is outside the immutable legacy tree."
   },
   "images": {
     "by_document": [
-      {"document_id": "PUBLICATION_AND_CONTENTS", "references": 0},
-      {"document_id": "PREFACE", "references": 2},
-      {"document_id": "CH01", "references": 2},
-      {"document_id": "CH02", "references": 20},
-      {"document_id": "CH03", "references": 85},
-      {"document_id": "CH04", "references": 60},
-      {"document_id": "CH05", "references": 76},
-      {"document_id": "CH06", "references": 100},
-      {"document_id": "CH07", "references": 92},
-      {"document_id": "CH08", "references": 43},
-      {"document_id": "CH09", "references": 109},
-      {"document_id": "CH10", "references": 68},
-      {"document_id": "CH11", "references": 107},
-      {"document_id": "CH12", "references": 58},
-      {"document_id": "GENERAL_NOTES", "references": 1},
-      {"document_id": "N01", "references": 0},
-      {"document_id": "N02", "references": 54},
-      {"document_id": "N03", "references": 40},
-      {"document_id": "N04", "references": 71},
-      {"document_id": "N05", "references": 59},
-      {"document_id": "N06", "references": 64},
-      {"document_id": "N07", "references": 88},
-      {"document_id": "N08", "references": 32},
-      {"document_id": "N09", "references": 70},
-      {"document_id": "N10", "references": 91},
-      {"document_id": "N11", "references": 14},
-      {"document_id": "N12", "references": 38},
-      {"document_id": "INDEX", "references": 0},
-      {"document_id": "COLOPHON", "references": 0}
+      {
+        "document_id": "PUBLICATION_AND_CONTENTS",
+        "references": 0
+      },
+      {
+        "document_id": "PREFACE",
+        "references": 1
+      },
+      {
+        "document_id": "CH01",
+        "references": 3
+      },
+      {
+        "document_id": "CH02",
+        "references": 19
+      },
+      {
+        "document_id": "CH03",
+        "references": 86
+      },
+      {
+        "document_id": "CH04",
+        "references": 59
+      },
+      {
+        "document_id": "CH05",
+        "references": 77
+      },
+      {
+        "document_id": "CH06",
+        "references": 99
+      },
+      {
+        "document_id": "CH07",
+        "references": 92
+      },
+      {
+        "document_id": "CH08",
+        "references": 43
+      },
+      {
+        "document_id": "CH09",
+        "references": 110
+      },
+      {
+        "document_id": "CH10",
+        "references": 67
+      },
+      {
+        "document_id": "CH11",
+        "references": 107
+      },
+      {
+        "document_id": "CH12",
+        "references": 59
+      },
+      {
+        "document_id": "GENERAL_NOTES",
+        "references": 1
+      },
+      {
+        "document_id": "N01",
+        "references": 0
+      },
+      {
+        "document_id": "N02",
+        "references": 54
+      },
+      {
+        "document_id": "N03",
+        "references": 40
+      },
+      {
+        "document_id": "N04",
+        "references": 71
+      },
+      {
+        "document_id": "N05",
+        "references": 59
+      },
+      {
+        "document_id": "N06",
+        "references": 64
+      },
+      {
+        "document_id": "N07",
+        "references": 88
+      },
+      {
+        "document_id": "N08",
+        "references": 32
+      },
+      {
+        "document_id": "N09",
+        "references": 70
+      },
+      {
+        "document_id": "N10",
+        "references": 91
+      },
+      {
+        "document_id": "N11",
+        "references": 14
+      },
+      {
+        "document_id": "N12",
+        "references": 38
+      },
+      {
+        "document_id": "INDEX",
+        "references": 0
+      },
+      {
+        "document_id": "COLOPHON",
+        "references": 0
+      }
     ],
     "duplicate_payload_group_to_preserve_as_distinct_assets": {
       "paths": [
@@ -85,7 +147,7 @@
       {
         "asset_relative_path": "CHAPTERS/2-The-Crucial-Experiment/Images/_page_66_Picture_0.jpeg",
         "basename": "_page_66_Picture_0.jpeg",
-        "document_id": "CH02",
+        "document_id": "CH03",
         "monolith_line": 680,
         "raw_reference_ordinal": 24
       },
@@ -147,5 +209,12 @@
     "Four printed-contents destinations are semantically malformed despite lexical link resolution."
   ],
   "schema_version": 1,
-  "status": "PROVISIONAL_FACTS_TO_REVERIFY"
+  "status": "SOURCE_PINNED_BOUNDARIES_CONFIRMED_REMAINDER_PROVISIONAL",
+  "routing_facts_source_confirmed": [
+    "The canonical Chapter 12 range ends before General Notes.",
+    "All General and chapter Notes ranges follow the printed source order.",
+    "The Index begins at PDF page 1217 / printed page 1201.",
+    "The Colophon is the sole content on PDF page 1280.",
+    "Chapter opener numbers and extracted opener images belong to the chapter they introduce."
+  ]
 }

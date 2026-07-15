@@ -1,3 +1,5 @@
+# 2
+
 #### The Crucial Experiment
 
 #### **How Do Simple Programs Behave?**
@@ -277,6 +279,4 @@ But whatever the reasons, the fact remains that, despite many hints over the cou
 It is not uncommon in the history of science that once a general new phenomenon has been identified, one can see that there was already evidence of it much earlier. But the point is that without the framework that comes from knowing the general phenomenon, it is almost inevitable that such evidence will have been ignored.
 
 It is also one of the ironies of progress in science that results which at one time were so unexpected that they were missed despite many hints eventually come to seem almost obvious. And having lived with the results of this chapter for nearly two decades, it is now difficult for me to imagine that things could possibly work in any other way. But the history that I have outlined in this section—like the history of many other scientific discoveries—provides a sobering reminder of just how easy it is to miss what will later seem obvious.
-
-![](_page_66_Picture_0.jpeg)
 

@@ -126,7 +126,7 @@ def validate_ranges(raw: bytes, data: dict[str, Any]) -> list[dict[str, Any]]:
         if not isinstance(document_id, str) or not document_id or document_id in ids:
             raise BuildError(f"duplicate or invalid document id: {document_id!r}")
         ids.add(document_id)
-        output = safe_relative_path(document.get("proposed_output_path"), suffix=".md")
+        output = safe_relative_path(document.get("output_path"), suffix=".md")
         if output in outputs:
             raise BuildError(f"duplicate output path: {output}")
         outputs.add(output)
@@ -293,7 +293,7 @@ def validate_images(
         raise BuildError(f"image-map.jsonl must contain 1,444 rows, found {len(rows)}")
     documents_by_id = {str(document["id"]): document for document in documents}
     document_outputs = {
-        document_id: safe_relative_path(document["proposed_output_path"], suffix=".md")
+        document_id: safe_relative_path(document["output_path"], suffix=".md")
         for document_id, document in documents_by_id.items()
     }
     source_paths: set[PurePosixPath] = set()
@@ -356,7 +356,7 @@ def document_bytes(
     for document in documents:
         segment = raw[document["raw_start_byte"] : document["raw_end_byte_exclusive"]]
         segment = apply_corrections(document, segment, corrections)
-        output = safe_relative_path(document["proposed_output_path"], suffix=".md")
+        output = safe_relative_path(document["output_path"], suffix=".md")
         rendered[output] = segment
     return rendered
 
@@ -373,7 +373,7 @@ def readme_bytes() -> bytes:
 def contents_bytes(documents: list[dict[str, Any]]) -> bytes:
     lines = ["# Contents", ""]
     for document in documents:
-        path = safe_relative_path(document["proposed_output_path"], suffix=".md")
+        path = safe_relative_path(document["output_path"], suffix=".md")
         lines.append(f"- [{document['title']}]({path.as_posix()})")
     return ("\n".join(lines) + "\n").encode("utf-8")
 
@@ -412,7 +412,7 @@ def build(
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes(data)
         outputs = {
-            document["id"]: safe_relative_path(document["proposed_output_path"], suffix=".md")
+            document["id"]: safe_relative_path(document["output_path"], suffix=".md")
             for document in documents
         }
         for row in images:

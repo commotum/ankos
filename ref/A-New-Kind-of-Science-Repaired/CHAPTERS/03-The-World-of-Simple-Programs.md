@@ -1,3 +1,5 @@
+![](_page_66_Picture_0.jpeg)
+
 #### The World of Simple Programs
 
 #### The Search for General Features
@@ -683,6 +685,4 @@ Yet even after this, there were still many assumptions implicit in my search pro
 A somewhat similar pattern has been repeated for most of the other systems described in this chapter. The main challenge was always to avoid assumptions and set up experiments that were simple and direct enough that they did not miss important new phenomena.
 
 In many cases it took a large number of iterations to work out the right experiments to do. And had it not been for the ease with which I could set up new experiments using *Mathematica*, it is likely that I would never have gotten very far in investigating most of the systems discussed in this chapter. But in the end, after running programs for a total of several years of computer time—corresponding to more than a million billion logical operations—and creating the equivalent of tens of thousands of pages of pictures, I was finally able to find all of the various examples shown in this chapter and the ones that follow.
-
-# 4
 

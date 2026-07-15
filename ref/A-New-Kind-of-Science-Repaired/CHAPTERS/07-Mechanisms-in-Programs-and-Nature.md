@@ -1,3 +1,5 @@
+![](_page_312_Picture_0.jpeg)
+
 ## Mechanisms in Programs and Nature
 
 #### Universality of Behavior
@@ -911,6 +913,4 @@ Often one can identify features in common between the various mechanisms for any
 And so, for example, one might notice that most mechanisms for nesting can at some level be viewed as involving hierarchies in which higher components affect lower ones, but not the other way around. But in a sense this observation is nothing more than a restatement of a property of nesting itself.
 
 So in the end one can indeed view most of the mechanisms that I have discussed in this section as being in some sense genuinely different. Yet as we have seen all of them can be captured by quite simple programs. And in Chapter 12 I will discuss how this is related to the fact that so few fundamentally different types of overall behavior ultimately seem to occur.
-
-![](_page_378_Picture_0.jpeg)
 

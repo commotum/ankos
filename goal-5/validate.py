@@ -94,7 +94,7 @@ def independent_document_bytes(
             pieces.append(str(correction["after"]).encode("utf-8"))
             cursor = correction_start + len(before)
         pieces.append(raw[cursor:end])
-        output = build.safe_relative_path(document["proposed_output_path"], suffix=".md")
+        output = build.safe_relative_path(document["output_path"], suffix=".md")
         rendered[output] = b"".join(pieces)
     return rendered
 
@@ -129,16 +129,20 @@ def validate_coverage(
             raise build.BuildError(f"{path}: {document_id} start line drift")
         if row["raw_end_line"] != str(document["raw_end_line"]):
             raise build.BuildError(f"{path}: {document_id} end line drift")
+        expected_source_start = f"pdf:{int(document['authoritative_pdf_start_page']):04d}"
+        expected_source_end = f"pdf:{int(document['authoritative_pdf_end_page']):04d}"
+        if row["authoritative_start"] != expected_source_start:
+            raise build.BuildError(f"{path}: {document_id} authoritative start drift")
+        if row["authoritative_end"] != expected_source_end:
+            raise build.BuildError(f"{path}: {document_id} authoritative end drift")
         if row["first_pass"] not in {"NO", "YES"} or row["second_pass"] not in {"NO", "YES"}:
             raise build.BuildError(f"{path}: {document_id} pass values must be NO or YES")
         if row["second_pass"] == "YES" and row["first_pass"] != "YES":
             raise build.BuildError(f"{path}: {document_id} second pass precedes first pass")
-        if row["first_pass"] == "YES":
-            for field in ("authoritative_start", "authoritative_end", "reviewer_type"):
-                if not row[field].strip():
-                    raise build.BuildError(
-                        f"{path}: {document_id} reviewed row lacks {field}"
-                    )
+        if row["first_pass"] == "YES" and not row["reviewer_type"].strip():
+            raise build.BuildError(
+                f"{path}: {document_id} reviewed row lacks reviewer_type"
+            )
     return rows
 
 
@@ -147,7 +151,7 @@ def expected_output_files(
 ) -> set[PurePosixPath]:
     document_paths = {
         str(document["id"]): build.safe_relative_path(
-            document["proposed_output_path"], suffix=".md"
+            document["output_path"], suffix=".md"
         )
         for document in documents
     }
@@ -181,7 +185,7 @@ def validate_output(
 
     document_paths = {
         str(document["id"]): build.safe_relative_path(
-            document["proposed_output_path"], suffix=".md"
+            document["output_path"], suffix=".md"
         )
         for document in documents
     }

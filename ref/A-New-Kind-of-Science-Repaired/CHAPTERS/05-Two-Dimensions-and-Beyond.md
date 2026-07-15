@@ -1,3 +1,5 @@
+![](_page_184_Picture_0.jpeg)
+
 #### Two Dimensions and Beyond
 
 #### Introduction
@@ -553,6 +555,4 @@ A system based on a constraint, in which a complex and largely random pattern is
 So finally this shows that it is indeed possible to force complex behavior to occur in systems based on constraints. But from what we have seen in this section such behavior appears to be quite rare: unlike many of the simple rules that we have discussed in this book, it seems that almost all simple constraints lead only to fairly simple patterns.
 
 Any phenomenon based on rules can always ultimately also be described in terms of constraints. But the results of this section indicate that these descriptions can have to be fairly complicated for complex behavior to occur. So the fact that traditional science and mathematics tends to concentrate on equations that operate like constraints provides yet another reason for their failure to identify the fundamental phenomenon of complexity that I discuss in this book.
-
-## 6
 

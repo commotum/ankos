@@ -1,3 +1,5 @@
+# 10
+
 ## Processes of Perception and Analysis
 
 #### Introduction
@@ -1101,6 +1103,4 @@ Of course we have no direct information on this. But the very fact that we have 
 For as I will discuss in Chapter 12 it seems far from inconceivable that some of the extraterrestrial radio and other signals that we pick up and assume to be random noise could in fact be meaningful messages but just encoded in a way that can be recognized only by higher forms of perception and analysis than those we have so far applied to them.
 
 Yet whether or not this is so, the capabilities of extraterrestrial intelligence are not in the end directly relevant to an understanding of our own experience of the world. In the future we may well manage to use higher forms of perception and analysis, and as a result our experience of the world will change—no doubt along with certain aspects of our science and mathematics. But for now it is the kinds of methods of perception and analysis that we have discussed in most of this chapter that must form the basis for the conclusions we make about the world.
-
-![](_page_652_Picture_0.jpeg)
 

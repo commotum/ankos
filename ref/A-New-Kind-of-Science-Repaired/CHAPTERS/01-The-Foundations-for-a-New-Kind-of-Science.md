@@ -1,3 +1,5 @@
+![](_page_16_Picture_0.jpeg)
+
 ## The Foundations for a New Kind of Science
 
 #### An Outline of Basic Ideas
@@ -227,6 +229,4 @@ Doing this certainly required experience in all sorts of different areas of scie
 Often it seemed in retrospect almost bizarre that the conclusions I ended up reaching had never been reached before. But studying the history of each field I could in many cases see how it had been led astray by the lack of some crucial piece of methodology or intuition that had now emerged in the new kind of science I had developed.
 
 When I made my first discoveries about cellular automata in the early 1980s I suspected that I had seen the beginning of something important. But I had no idea just how important it would all ultimately turn out to be. And indeed over the past twenty years I have made more discoveries than I ever thought possible. And the new kind of science that I have spent so much effort building has seemed an ever more central and critical direction for future intellectual development.
-
-# 2
 

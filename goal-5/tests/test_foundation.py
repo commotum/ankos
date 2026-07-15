@@ -47,6 +47,61 @@ class FoundationTests(unittest.TestCase):
         with self.assertRaisesRegex(build.BuildError, "raw monolith hash"):
             build.validate_ranges(bytes(changed), self.range_data)
 
+    def test_authoritative_source_and_page_partition_are_pinned(self) -> None:
+        source = self.range_data["authoritative_source"]
+        self.assertEqual(source["edition"], "First edition")
+        self.assertEqual(source["printing"], "First printing")
+        self.assertEqual(source["pdf_page_count"], 1_280)
+        self.assertEqual(
+            source["sha256"],
+            "a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6",
+        )
+        self.assertEqual(
+            validate.validate_authoritative_source(self.range_data),
+            build.REPO_ROOT / "A New Kind of Science/A New Kind of Science.pdf",
+        )
+        self.assertEqual(
+            [
+                (
+                    document["authoritative_pdf_start_page"],
+                    document["authoritative_pdf_end_page"],
+                )
+                for document in self.documents[:3]
+            ],
+            [(1, 8), (9, 16), (17, 38)],
+        )
+        self.assertEqual(
+            (
+                self.documents[-2]["authoritative_pdf_start_page"],
+                self.documents[-2]["authoritative_pdf_end_page"],
+                self.documents[-1]["authoritative_pdf_start_page"],
+                self.documents[-1]["authoritative_pdf_end_page"],
+            ),
+            (1217, 1279, 1280, 1280),
+        )
+
+        invalid_hash = copy.deepcopy(self.range_data)
+        invalid_hash["authoritative_source"]["sha256"] = "0" * 64
+        with self.assertRaisesRegex(build.BuildError, "source hash"):
+            validate.validate_authoritative_source(invalid_hash)
+
+        for name, mutate in {
+            "source page gap": lambda data: data["documents"][1].__setitem__(
+                "authoritative_pdf_start_page", 10
+            ),
+            "unconfirmed boundary": lambda data: data["documents"][1].__setitem__(
+                "boundary_status", "PROVISIONAL"
+            ),
+            "incomplete source partition": lambda data: data["documents"][-1].__setitem__(
+                "authoritative_pdf_end_page", 1279
+            ),
+        }.items():
+            with self.subTest(name=name):
+                data = copy.deepcopy(self.range_data)
+                mutate(data)
+                with self.assertRaises(build.BuildError):
+                    build.validate_ranges(self.raw, data)
+
     def test_range_and_output_mutations_are_rejected(self) -> None:
         mutations = {
             "byte gap": lambda data: data["documents"][1].__setitem__(
@@ -60,10 +115,10 @@ class FoundationTests(unittest.TestCase):
                 "id", data["documents"][0]["id"]
             ),
             "duplicate output": lambda data: data["documents"][1].__setitem__(
-                "proposed_output_path", data["documents"][0]["proposed_output_path"]
+                "output_path", data["documents"][0]["output_path"]
             ),
             "unsafe output": lambda data: data["documents"][1].__setitem__(
-                "proposed_output_path", "../escaped.md"
+                "output_path", "../escaped.md"
             ),
         }
         for name, mutate in mutations.items():
@@ -79,7 +134,7 @@ class FoundationTests(unittest.TestCase):
             "id": "CH01",
             "raw_start_byte": 0,
             "raw_end_byte_exclusive": len(raw),
-            "proposed_output_path": "CHAPTERS/01-Test.md",
+            "output_path": "CHAPTERS/01-Test.md",
         }
         valid = {
             "id": "C-0001",
@@ -154,6 +209,9 @@ class FoundationTests(unittest.TestCase):
         changed_bound = copy.deepcopy(clean)
         changed_bound[0]["raw_end_line"] = "999"
         variants.append(changed_bound)
+        changed_source_bound = copy.deepcopy(clean)
+        changed_source_bound[0]["authoritative_end"] = "pdf:9999"
+        variants.append(changed_source_bound)
         reversed_passes = copy.deepcopy(clean)
         reversed_passes[0]["second_pass"] = "YES"
         variants.append(reversed_passes)
@@ -192,6 +250,24 @@ class FoundationTests(unittest.TestCase):
         )
         self.assertEqual(self.images[-1]["document_id"], "N12")
         self.assertTrue(self.images[-1]["asset_relative_path"].startswith("BACK-MATTER/Colophon/"))
+        moved_openers = {
+            row["ordinal"]: row["document_id"]
+            for row in self.images
+            if row["ordinal"] in {2, 24, 169, 345, 437, 480, 657, 764}
+        }
+        self.assertEqual(
+            moved_openers,
+            {
+                2: "CH01",
+                24: "CH03",
+                169: "CH05",
+                345: "CH07",
+                437: "CH08",
+                480: "CH09",
+                657: "CH11",
+                764: "CH12",
+            },
+        )
 
     def test_complete_legacy_tree_matches_the_frozen_snapshot(self) -> None:
         self.assertEqual(
@@ -236,7 +312,7 @@ class FoundationTests(unittest.TestCase):
             self.assertEqual(self._tree_manifest(first), self._tree_manifest(second))
 
             concatenated = b"".join(
-                (first / document["proposed_output_path"]).read_bytes()
+                (first / document["output_path"]).read_bytes()
                 for document in self.documents
             )
             self.assertEqual(concatenated, self.raw)
@@ -244,7 +320,7 @@ class FoundationTests(unittest.TestCase):
                 first, self.raw, self.documents, [], self.images
             )
 
-            document_path = first / self.documents[0]["proposed_output_path"]
+            document_path = first / self.documents[0]["output_path"]
             original_document = document_path.read_bytes()
             document_path.write_bytes(original_document + b"x")
             with self.assertRaises(build.BuildError):
@@ -256,7 +332,7 @@ class FoundationTests(unittest.TestCase):
             image = self.images[0]
             image_path = (
                 first
-                / Path(self.documents[1]["proposed_output_path"]).parent
+                / Path(self.documents[1]["output_path"]).parent
                 / Path(image["asset_relative_path"]).name
             )
             original_image = image_path.read_bytes()
