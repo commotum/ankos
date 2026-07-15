@@ -252,6 +252,52 @@ Neither file is a generalized workflow database.
 - Build twice in fresh directories, compare outputs, run focused tests and
   affected repository tests, and run `git diff --check` plus scope inspection.
 
+## Current Execution State
+
+- Synced: 2026-07-14 (America/Los_Angeles).
+- Active stage: `1-CLEANUP` (`IN_PROGRESS`).
+- The worktree was clean at commit `f02753e` when Stage 1 began; there were no
+  modified or untracked Goal 4 files left by concurrent agents. All Stage 4
+  agents were stopped before cleanup inventory began.
+- `goal-4/` currently contains 123 files totaling about 26 MiB: 36 root
+  artifacts, 14 generalized schemas, 19 tools, 9 source tests, and 45 ignored
+  bytecode-cache files. Its interrupted pipeline has not corrected or
+  published any book text.
+- The legacy tree currently contains exactly 1,463 files: 19 Markdown and 1,444
+  JPEG. A sorted path-and-file-digest snapshot hashes to
+  `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
+- The monolith remains 3,780,628 bytes with SHA-256
+  `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
+- `ref/A-New-Kind-of-Science-Repaired/` is empty.
+- A repository-wide scan found no live code or documentation outside Goal 4
+  that references Goal 4 artifacts; Goal 5 itself references only the repaired
+  sibling path.
+- Goal 4 contains three compact facts worth migrating before deletion: the 29
+  provisional raw document ranges, 55 known-defect/guardrail candidates, and a
+  concise legacy/image/routing summary. They remain provisional until Goal 5
+  independently rechecks them and authoritative source evidence confirms
+  content-sensitive boundaries.
+- No lawful, complete, readable authoritative source is currently mounted in
+  the repository. Stage 2 remains source-acquisition blocked unless a suitable
+  source is authorized or provided.
+
+## Stage Status
+
+| Stage | Status | Prerequisites |
+|---|---|---|
+| 1-CLEANUP | `IN_PROGRESS` | none |
+| 2-FOUNDATION | `NOT_STARTED` | 1; complete lawful authoritative source for completion |
+| 3-FRONT-CH04 | `NOT_STARTED` | 2 |
+| 4-CH05-08 | `NOT_STARTED` | 2 |
+| 5-CH09-12 | `NOT_STARTED` | 2 |
+| 6-NOTES-00-04 | `NOT_STARTED` | 2 |
+| 7-NOTES-05-08 | `NOT_STARTED` | 2 |
+| 8-NOTES-09-12 | `NOT_STARTED` | 2 |
+| 9-TECHNICAL | `NOT_STARTED` | 3–8 |
+| 10-FIGURES-INDEX | `NOT_STARTED` | 3–8 plus fixed-layout source evidence |
+| 11-SATURATION | `NOT_STARTED` | 3–10 |
+| 12-RELEASE | `NOT_STARTED` | 11; zero open source ambiguity |
+
 ## Stages
 
 ### 1-CLEANUP
