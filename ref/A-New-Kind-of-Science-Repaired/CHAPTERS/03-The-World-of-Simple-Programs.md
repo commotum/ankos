@@ -1,8 +1,8 @@
 ![](_page_66_Picture_0.jpeg)
 
-#### The World of Simple Programs
+## The World of Simple Programs
 
-#### The Search for General Features
+### The Search for General Features
 
 At the beginning of the last chapter we asked the basic question of what simple programs typically do. And as a first step towards answering this question we looked at several specific examples of a class of programs known as cellular automata.
 
@@ -12,15 +12,11 @@ In the third picture, however, one no longer sees such regularity, and instead t
 
 At the outset there was no indication that simple programs could ever produce behavior so diverse and often complex. But having now seen these examples, the question becomes how typical they are. Is it only cellular automata with very specific underlying rules that produce such behavior? Or is it in fact common in all sorts of simple programs?
 
-My purpose in this chapter is to answer this question by looking at a wide range of different kinds of programs. And in a sense my
-
-#### STEPHEN WOLFRAM | A NEW KIND OF SCIENCE
+My purpose in this chapter is to answer this question by looking at a wide range of different kinds of programs. And in a sense my approach is to work like a naturalist—exploring and studying the various forms that exist in the world of simple programs.
 
 ![](_page_67_Picture_1.jpeg)
 
 Four basic examples from the previous chapter of behavior produced by cellular automata with simple underlying rules. In each case, the most obvious features that are seen are different. Note that all the pictures are shown on the same scale; the last picture appears coarser because the structures it contains are larger.
-
-approach is to work like a naturalist—exploring and studying the various forms that exist in the world of simple programs.
 
 I start by considering more general cellular automata, and then I go on to consider a whole sequence of other kinds of programs—with underlying structures further and further away from the array of black and white cells in the cellular automata of the previous chapter.
 
@@ -28,7 +24,7 @@ And what I discover is that whatever kind of underlying rules one uses, the beha
 
 Throughout the world of simple programs, it seems, there is great universality in the types of overall behavior that can be produced. And in a sense it is ultimately this that makes it possible for me to construct the coherent new kind of science that I describe in this book—and to use it to elucidate a large number of phenomena, independent of the particular details of the systems in which they occur.
 
-#### More Cellular Automata
+### More Cellular Automata
 
 The pictures below show the rules used in the four cellular automata on the facing page. The overall structure of these rules is the same in each case; what differs is the specific choice of new colors for each possible combination of previous colors for a cell and its two neighbors.
 
@@ -38,15 +34,17 @@ The rules used for the four examples of cellular automata on the facing page. In
 
 There turn out to be a total of 256 possible sets of choices that can be made. And following my original work on cellular automata these choices can be numbered from 0 to 255, as in the picture below.
 
-The sequence of 256 possible cellular automaton rules of the kind shown above. As indicated, the rules can conveniently be numbered from 0 to 255. The number assigned is such that when written in base 2, it gives a sequence of 0's and 1's that correspond to the sequence of new colors chosen for each of the eight possible cases covered by the rule.
-
 ![](_page_68_Figure_7.jpeg)
+
+The sequence of 256 possible cellular automaton rules of the kind shown above. As indicated, the rules can conveniently be numbered from 0 to 255. The number assigned is such that when written in base 2, it gives a sequence of 0’s and 1’s that correspond to the sequence of new colors chosen for each of the eight possible cases covered by the rule.
 
 But so how do cellular automata with all these different rules behave? The next page shows a few examples in detail, while the following two pages show what happens in all 256 possible cases.
 
 At first, the diversity of what one sees is a little overwhelming. But on closer investigation, definite themes begin to emerge.
 
-In the very simplest cases, all the cells in the cellular automaton end up just having the same color after one step. Thus, for example, in
+In the very simplest cases, all the cells in the cellular automaton end up just having the same color after one step. Thus, for example, in rules 0 and 128 all the cells become white, while in rule 255 all of them become black. There are also rules such as 7 and 127 in which all cells alternate between black and white on successive steps.
+
+![](_page_69_Rules_100_139.jpeg)
 
 Evolution of cellular automata with a sequence of different possible rules, starting in all cases from a single black cell.
 
@@ -54,7 +52,7 @@ Evolution of cellular automata with a sequence of different possible rules, star
 
 ![](_page_71_Picture_2.jpeg)
 
-rules 0 and 128 all the cells become white, while in rule 255 all of them become black. There are also rules such as 7 and 127 in which all cells alternate between black and white on successive steps.
+<sup>◀</sup> The behavior of all 256 possible cellular automata with rules involving two colors and nearest neighbors. In each case, thirty steps of evolution are shown, starting from a single black cell. Note that some of the rules are related just by interchange of left and right or black and white (e.g. rules 2 and 16 or rules 126 and 129). There are 88 fundamentally inequivalent such elementary rules.
 
 But among the rules shown on the last few pages, the single most common kind of behavior is one in which a pattern consisting of a single cell or a small group of cells persists. Sometimes this pattern remains stationary, as in rules 4 and 123. But in other cases, such as rules 2 and 103, it moves to the left or right.
 
@@ -64,15 +62,13 @@ In about two-thirds of all the cellular automata shown on the last few pages, th
 
 The most common of these are nested patterns, like those on the next page. And it turns out that although 24 rules in all yield such nested patterns, there are only three fundamentally different forms that occur. The simplest and by far the most common is the one exemplified by rules 22 and 60. But as the pictures on the next page show, other nested forms are also possible. (In the case of rule 225, the width of the overall pattern does not grow at a fixed rate, but instead is on average proportional to the square root of the number of steps.)
 
-<sup>◆</sup> The behavior of all 256 possible cellular automata with rules involving two colors and nearest neighbors. In each case, thirty steps of evolution are shown, starting from a single black cell. Note that some of the rules are related just by interchange of left and right or black and white (e.g. rules 2 and 16 or rules 126 and 129). There are 88 fundamentally inequivalent such elementary rules.
-
 ![](_page_73_Figure_1.jpeg)
 
-Examples of cellular automata that produce nested or fractal patterns. Rule 22—like rule 90 from page 26—gives a pattern with fractal dimension  $Log[2, 3] \approx 1.59$ ; rule 150 gives one with fractal dimension  $Log[2, 1 + \sqrt{5} ] \approx 1.69$ . The width of the pattern obtained from rule 225 increases like the square root of the number of steps.
+Examples of cellular automata that produce nested or fractal patterns. Rule 22—like rule 90 from page 26—gives a pattern with fractal dimension $Log[2, 3] \approx 1.59$; rule 150 gives one with fractal dimension $Log[2, 1 + \sqrt{5}] \approx 1.69$. The width of the pattern obtained from rule 225 increases like the square root of the number of steps.
 
 Repetition and nesting are widespread themes in many cellular automata. But as we saw in the previous chapter, it is also possible for cellular automata to produce patterns that seem in many respects random. And out of the 256 rules discussed here, it turns out that 10 yield such apparent randomness. There are three basic forms, as illustrated on the facing page.
 
-Examples of cellular automata that produce patterns with many apparently random features. Three hundred steps of evolution are shown, starting in each case from a single black cell.
+Examples of cellular automata that produce patterns with many apparently random features. Three hundred steps of evolution are shown, starting in each case from a single black cell. <sup>▶</sup>
 
 ![](_page_74_Picture_1.jpeg)
 
@@ -80,37 +76,37 @@ Examples of cellular automata that produce patterns with many apparently random 
 
 ![](_page_74_Picture_3.jpeg)
 
-rule 45
+*rule 45*
 
 ![](_page_74_Picture_5.jpeg)
 
-rule 73
+*rule 73*
 
 Beyond randomness, the last example in the previous chapter was rule 110: a cellular automaton whose behavior becomes partitioned into a complex mixture of regular and irregular parts. This particular cellular automaton is essentially unique among the 256 rules considered here: of the four cases in which such behavior is seen, all are equivalent if one just interchanges the roles of left and right or black and white.
 
 So what about more complicated cellular automaton rules?
 
-The 256 "elementary" rules that we have discussed so far are by most measures the simplest possible—and were the first ones I studied. But one can for example also look at rules that involve three colors, rather than two, so that cells can not only be black and white, but also gray. The total number of possible rules of this kind turns out to be immense—7,625,597,484,987 in all—but by considering only so-called "totalistic" ones, the number becomes much more manageable.
+The 256 “elementary” rules that we have discussed so far are by most measures the simplest possible—and were the first ones I studied. But one can for example also look at rules that involve three colors, rather than two, so that cells can not only be black and white, but also gray. The total number of possible rules of this kind turns out to be immense—7,625,597,484,987 in all—but by considering only so-called “totalistic” ones, the number becomes much more manageable.
 
 The idea of a totalistic rule is to take the new color of each cell to depend only on the average color of neighboring cells, and not on their individual colors. The picture below shows one example of how this works. And with three possible colors for each cell, there are 2187 possible totalistic rules, each of which can conveniently be identified by a code number as illustrated in the picture. The facing page shows a representative sequence of such rules.
 
-Example of a totalistic cellular automaton with three possible colors for each cell. The rule is set up so that the new color of every cell is determined by the average of the previous colors of the cell and its immediate neighbors. With 0 representing white, 1 gray and 2 black, the rightmost element of the rule gives the result for average color 0, while the element immediately to its left gives the result for average color 1/3—and so on. Interpreting the sequence of new colors as a sequence of base 3 digits, one can assign a code number to each totalistic rule.
-
 ![](_page_75_Figure_6.jpeg)
 
-We might have expected that by allowing three colors rather than two we would immediately get noticeably more complicated behavior.
+Example of a totalistic cellular automaton with three possible colors for each cell. The rule is set up so that the new color of every cell is determined by the average of the previous colors of the cell and its immediate neighbors. With 0 representing white, 1 gray and 2 black, the rightmost element of the rule gives the result for average color 0, while the element immediately to its left gives the result for average color 1/3—and so on. Interpreting the sequence of new colors as a sequence of base 3 digits, one can assign a code number to each totalistic rule.
+
+We might have expected that by allowing three colors rather than two we would immediately get noticeably more complicated behavior. But in fact the behavior we see on the previous page is not unlike what we already saw in many elementary cellular automata a few pages back. Having more complicated underlying rules has not, it seems, led to much greater complexity in overall behavior.
 
 ![](_page_76_Figure_2.jpeg)
 
-A sequence of totalistic cellular automata with three possible colors for each cell. Although their basic rules are more complicated, the cellular automata shown here do not seem to have fundamentally more complicated behavior than the two-color cellular automata shown on previous pages. Note that in the sequence of rules shown here, those that change the white background are not included. The symmetry of all the patterns is a consequence of the basic structure of totalistic rules. But in fact the behavior we see on the previous page is not unlike what we already saw in many elementary cellular automata a few pages back. Having more complicated underlying rules has not, it seems, led to much greater complexity in overall behavior.
+A sequence of totalistic cellular automata with three possible colors for each cell. Although their basic rules are more complicated, the cellular automata shown here do not seem to have fundamentally more complicated behavior than the two-color cellular automata shown on previous pages. Note that in the sequence of rules shown here, those that change the white background are not included. The symmetry of all the patterns is a consequence of the basic structure of totalistic rules.
 
 And indeed, this is a first indication of an important general phenomenon: that at least beyond a certain point, adding complexity to the underlying rules for a system does not ultimately lead to more complex overall behavior. And so for example, in the case of cellular automata, it seems that all the essential ingredients needed to produce even the most complex behavior already exist in elementary rules.
 
 Using more complicated rules may be convenient if one wants, say, to reproduce the details of particular natural systems, but it does not add fundamentally new features. Indeed, looking at the pictures on the previous page one sees exactly the same basic themes as in elementary cellular automata. There are some patterns that attain a definite size, then repeat forever, as shown below, others that continue to grow, but have a repetitive form, as at the top of the facing page, and still others that produce nested or fractal patterns, as at the bottom of the page.
 
-Examples of three-color totalistic rules that yield patterns which attain a certain size, then repeat forever. The maximum repetition period is found to be 78 steps, and is achieved by the rule with code number 1329. In the pictures shown here and on the following pages, the initial condition used contains a single gray cell.
-
 ![](_page_77_Figure_6.jpeg)
+
+Examples of three-color totalistic rules that yield patterns which attain a certain size, then repeat forever. The maximum repetition period is found to be 78 steps, and is achieved by the rule with code number 1329. In the pictures shown here and on the following pages, the initial condition used contains a single gray cell.
 
 ![](_page_78_Figure_2.jpeg)
 
@@ -146,11 +142,13 @@ Examples of three-color totalistic rules with highly complex behavior showing a 
 
 ![](_page_82_Picture_1.jpeg)
 
-code 1635
+*code 1635*
 
 ![](_page_83_Picture_1.jpeg)
 
-code 2049
+*code 2049*
+
+<sup>◀</sup> Three thousand steps in the evolution of the last two cellular automata from page 66. Despite the simplicity of their underlying rules, the final patterns produced show immense complexity. In neither case is it clear what the final outcome will be—whether apparent randomness will take over, or whether a simple repetitive form will emerge.
 
 The pictures below show totalistic cellular automata whose overall patterns of growth seem, at least at first, quite complicated. But it turns out that after only about 100 steps, three out of four of these patterns have resolved into simple forms.
 
@@ -160,19 +158,17 @@ Examples of rules that yield patterns which seem to be on the edge between growt
 
 The one remaining pattern is, however, much more complicated. As shown on the next page, for several thousand steps it simply grows, albeit somewhat irregularly. But then its growth becomes slower. And inside the pattern parts begin to die out. Yet there continue to be occasional bursts of growth. But finally, after a total of 8282 steps, the pattern resolves into 31 simple repetitive structures.
 
-<sup>◀</sup> Three thousand steps in the evolution of the last two cellular automata from page 66. Despite the simplicity of their underlying rules, the final patterns produced show immense complexity. In neither case is it clear what the final outcome will be—whether apparent randomness will take over, or whether a simple repetitive form will emerge.
-
 ![](_page_85_Picture_2.jpeg)
 
 Nine thousand steps in the evolution of the three-color totalistic cellular automaton with code number 1599. Starting from a single gray cell, each column corresponds to 3000 steps. The outcome of the evolution finally becomes clear after 8282 steps, when the pattern resolves into 31 simple repetitive structures.
 
-#### **Mobile Automata**
+### Mobile Automata
 
 One of the basic features of a cellular automaton is that the colors of all the cells it contains are updated in parallel at every step in its evolution.
 
-But how important is this feature in determining the overall behavior that occurs? To address this question, I consider in this section a class of systems that I call "mobile automata".
+But how important is this feature in determining the overall behavior that occurs? To address this question, I consider in this section a class of systems that I call “mobile automata”.
 
-Mobile automata are similar to cellular automata except that instead of updating all cells in parallel, they have just a single "active cell" that gets updated at each step-and then they have rules that specify how this active cell should move from one step to the next.
+Mobile automata are similar to cellular automata except that instead of updating all cells in parallel, they have just a single “active cell” that gets updated at each step—and then they have rules that specify how this active cell should move from one step to the next.
 
 The picture below shows an example of a mobile automaton. The active cell is indicated by a black dot. The rule applies only to this active cell. It looks at the color of the active cell and its immediate neighbors, then specifies what the new color of the active cell should be, and whether the active cell should move left or right.
 
@@ -180,15 +176,13 @@ The picture below shows an example of a mobile automaton. The active cell is ind
 
 ![](_page_86_Picture_8.jpeg)
 
-An example of a mobile automaton, Like a cellular automaton, a mobile automaton consists of a line of cells, with each cell having two possible colors. But unlike a cellular automaton, a mobile automaton has only one "active cell" (indicated here by a black dot) at any particular step. The rule for the mobile automaton specifies both how the color of this active cell should be updated, and whether it should move to the left or right. The result of evolution for a larger number of steps with the particular rule shown here is given as example (f) on the next page.
+An example of a mobile automaton. Like a cellular automaton, a mobile automaton consists of a line of cells, with each cell having two possible colors. But unlike a cellular automaton, a mobile automaton has only one “active cell” (indicated here by a black dot) at any particular step. The rule for the mobile automaton specifies both how the color of this active cell should be updated, and whether it should move to the left or right. The result of evolution for a larger number of steps with the particular rule shown here is given as example (f) on the next page.
 
-Much as for cellular automata, one can enumerate all possible rules of this kind; it turns out that there are 65,536 of them. The pictures at the top of the next page show typical behavior obtained with such rules. In cases (a) and (b), the active cell remains localized to a small region, and the behavior is very simple and repetitive. Cases (c) through (f) are similar,
+Much as for cellular automata, one can enumerate all possible rules of this kind; it turns out that there are 65,536 of them. The pictures at the top of the next page show typical behavior obtained with such rules. In cases (a) and (b), the active cell remains localized to a small region, and the behavior is very simple and repetitive. Cases (c) through (f) are similar, except that the whole pattern shifts systematically to the right, and in cases (e) and (f) a sequence of stripes is left behind.
 
 ![](_page_87_Figure_2.jpeg)
 
-Examples of mobile automata with various rules. In cases (a) through (f) the motion of the active cell is purely repetitive. In cases (g) and (h) it is not. The width of the pattern in these cases after t steps grows roughly like  $\sqrt{2t}$ .
-
-except that the whole pattern shifts systematically to the right, and in cases (e) and (f) a sequence of stripes is left behind.
+Examples of mobile automata with various rules. In cases (a) through (f) the motion of the active cell is purely repetitive. In cases (g) and (h) it is not. The width of the pattern in these cases after $t$ steps grows roughly like $\sqrt{2t}$.
 
 But with a total of 218 out of the 65,536 possible rules, one gets somewhat different behavior, as cases (g) and (h) above show. The active cell in these cases does not move in a strictly repetitive way, but instead sweeps backwards and forwards, going progressively further every time.
 
@@ -208,19 +202,19 @@ If one samples these rules at random, one finds that more than 99% of them just 
 
 ![](_page_88_Picture_6.jpeg)
 
-A mobile automaton with slightly more complicated rules that yields a nested pattern. Each column on the left shows 200 steps in the mobile automaton evolution. The compressed form of the pattern is based on a total of 8000 steps.
-
 ![](_page_88_Picture_8.jpeg)
+
+A mobile automaton with slightly more complicated rules that yields a nested pattern. Each column on the left shows 200 steps in the mobile automaton evolution. The compressed form of the pattern is based on a total of 8000 steps.
 
 The overall pattern is nevertheless still very regular. But after searching through perhaps 50,000 rules, one finally comes across a rule of the kind shown below—in which the compressed pattern exhibits very much the same kind of apparent randomness that we saw in cellular automata like rule 30.
 
 ![](_page_89_Picture_3.jpeg)
 
-A mobile automaton that yields a pattern with seemingly random features. The motion of the active cell is still quite regular, as the picture on the right shows. But when viewed in compressed form, as below, the overall pattern of colors seems in many respects random. Each column on the right shows 200 steps of evolution; the compressed form below corresponds to 50,000 steps.
-
 ![](_page_89_Picture_5.jpeg)
 
 ![](_page_89_Picture_6.jpeg)
+
+A mobile automaton that yields a pattern with seemingly random features. The motion of the active cell is still quite regular, as the picture on the right shows. But when viewed in compressed form, as below, the overall pattern of colors seems in many respects random. Each column on the right shows 200 steps of evolution; the compressed form below corresponds to 50,000 steps.
 
 But even though the final pattern left behind by the active cell in the picture above seems in many respects random, the motion of the active cell itself is still quite regular. So are there mobile automata in which the motion of the active cell is also seemingly random? At first, I believed that there might not be. But after searching through a few million rules, I finally found the example shown on the facing page.
 
@@ -242,9 +236,9 @@ Thus in the picture below, for example, new active cells end up being created ev
 
 ![](_page_91_Figure_6.jpeg)
 
-A generalized mobile automaton in which any number of cells can be active at a time. The rule given above is applied to every cell that is active at a particular step. In many cases, the rule specifies just that the active cell should move to the left or right. But in some cases, it specifies that the active cell should split in two, thereby creating an additional active cell.
-
 ![](_page_91_Figure_8.jpeg)
+
+A generalized mobile automaton in which any number of cells can be active at a time. The rule given above is applied to every cell that is active at a particular step. In many cases, the rule specifies just that the active cell should move to the left or right. But in some cases, it specifies that the active cell should split in two, thereby creating an additional active cell.
 
 If one chooses generalized mobile automata at random, most of them will produce simple behavior, as shown in the first few pictures on the facing page. But in a few percent of all cases, the behavior is much more complicated. Often the arrangement of active cells is still quite regular, although sometimes it is not.
 
@@ -254,11 +248,11 @@ But looking at many examples, a certain theme emerges: complex behavior almost n
 
 Examples of generalized mobile automata with various rules. In case (a), only a limited number of cells ever become active. But in all the other cases shown active cells proliferate forever. In case (d), almost all cells are active, and the system operates essentially like a cellular automaton. In the remaining cases somewhat complicated patterns of cells are active. Note that unlike in ordinary mobile automata, examples of complex behavior like those shown here are comparatively easy to find.
 
-#### **Turing Machines**
+### Turing Machines
 
 In the history of computing, the first widely understood theoretical computer programs ever constructed were based on a class of systems now called Turing machines.
 
-Turing machines are similar to mobile automata in that they consist of a line of cells, known as the "tape", together with a single active cell, known as the "head". But unlike in a mobile automaton, the head in a Turing machine can have several possible states, represented by several possible arrow directions in the picture below.
+Turing machines are similar to mobile automata in that they consist of a line of cells, known as the “tape”, together with a single active cell, known as the “head”. But unlike in a mobile automaton, the head in a Turing machine can have several possible states, represented by several possible arrow directions in the picture below.
 
 And in addition, the rule for a Turing machine can depend on the state of the head, and on the color of the cell at the position of the head, but not on the colors of any neighboring cells.
 
@@ -266,7 +260,7 @@ And in addition, the rule for a Turing machine can depend on the state of the he
 
 ![](_page_93_Picture_6.jpeg)
 
-An example of a Turing machine. Like a mobile automaton, the Turing machine has one active cell or "head", but now the head has several possible states, indicated by the directions of the arrows in this picture.
+An example of a Turing machine. Like a mobile automaton, the Turing machine has one active cell or “head”, but now the head has several possible states, indicated by the directions of the arrows in this picture.
 
 Turing machines are still widely used in theoretical computer science. But in almost all cases, one imagines constructing examples to perform particular tasks, with a huge number of possible states and a huge number of possible colors for each cell.
 
@@ -298,7 +292,7 @@ Examples of Turing machines with three and four possible states. With three poss
 
 A Turing machine that exhibits behavior which seems in many respects random. The Turing machine has four possible states for its head, and two possible colors for each cell on its tape. It starts with all cells white, corresponding to a blank tape. Each column above shows 250 steps of evolution; the compressed form on the left corresponds to a total of 20,000 steps.
 
-#### **Substitution Systems**
+### Substitution Systems
 
 One of the features that cellular automata, mobile automata and Turing machines all have in common is that at the lowest level they consist of a fixed array of cells. And this means that while the colors of these cells can be updated according to a wide range of different possible rules, the underlying number and organization of cells always stays the same.
 
@@ -310,7 +304,7 @@ In the simple cases shown, the rules specify that each element of a particular c
 
 ![](_page_97_Picture_7.jpeg)
 
-Examples of substitution systems with two possible kinds of elements, in which at every step each kind of element is replaced by a fixed block of new elements. In the first case shown, the total number of elements obtained doubles at every step; in the second case, it follows a Fibonacci sequence, and increases by a factor of roughly  $(1 + \sqrt{5})/2 \approx 1.618$  at every step. The two substitution systems shown here correspond to the second and third examples in the pictures on the following two pages.
+Examples of substitution systems with two possible kinds of elements, in which at every step each kind of element is replaced by a fixed block of new elements. In the first case shown, the total number of elements obtained doubles at every step; in the second case, it follows a Fibonacci sequence, and increases by a factor of roughly $(1 + \sqrt{5})/2 \approx 1.618$ at every step. The two substitution systems shown here correspond to the second and third examples in the pictures on the following two pages.
 
 And with these kinds of rules, the total number of elements typically grows very rapidly, so that pictures like those above quickly become rather unwieldy. But at least for these kinds of rules, one can make clearer pictures by thinking of each step not as replacing every element by a sequence of elements that are drawn the same size, but rather of subdividing each element into several that are drawn smaller.
 
@@ -350,11 +344,11 @@ It is, however, also possible to consider substitution systems in which elements
 
 But there is always a small fraction of rules in which the creation and destruction of elements is almost perfectly balanced.
 
-Two views of a substitution system whose rules allow both creation and destruction of elements. In the view on the left, the boxes representing each element are scaled to keep the total width the same, whereas on the right each box has a fixed size, as in our original pictures of substitution systems on page 82. The right-hand view shows that the rates of creation and destruction of elements are balanced closely enough that the total number of elements grows by only a fixed amount at each step.
-
 ![](_page_101_Picture_4.jpeg)
 
 ![](_page_101_Picture_5.jpeg)
+
+Two views of a substitution system whose rules allow both creation and destruction of elements. In the view on the left, the boxes representing each element are scaled to keep the total width the same, whereas on the right each box has a fixed size, as in our original pictures of substitution systems on page 82. The right-hand view shows that the rates of creation and destruction of elements are balanced closely enough that the total number of elements grows by only a fixed amount at each step.
 
 The picture above shows one example. The number of elements does end up increasing in this particular example, but only by a fixed amount at each step. And with such slow growth, we can again represent each element by a box of the same size, just as in our original pictures of substitution systems on page 82.
 
@@ -364,19 +358,19 @@ Knowing this, we might conclude that somehow substitution systems just cannot pr
 
 ![](_page_102_Figure_2.jpeg)
 
-Examples of substitution systems that have three and four possible colors for each element. The particular rules shown are ones that lead to slow growth in the total number of elements. Note that on each line in each picture, only the order of elements is ever significant: as the insets show, a particular element may change its position as a result of the addition or subtraction of elements to its left. Note that the pattern in case (a) does eventually repeat, while the one in case (b) eventually shows a nested structure.
-
 ![](_page_102_Figure_4.jpeg)
+
+Examples of substitution systems that have three and four possible colors for each element. The particular rules shown are ones that lead to slow growth in the total number of elements. Note that on each line in each picture, only the order of elements is ever significant: as the insets show, a particular element may change its position as a result of the addition or subtraction of elements to its left. Note that the pattern in case (a) does eventually repeat, while the one in case (b) eventually shows a nested structure.
 
 As it turns out, the first substitution system shown works almost exactly like a cellular automaton. Indeed, away from the right-hand edge, all the elements effectively behave as if they were lying on a regular grid, with the color of each element depending only on the previous color of that element and the element immediately to its right.
 
 The second substitution system shown again has patches that exhibit a regular grid structure. But between these patches, there are regions in which elements are created and destroyed. And in the other substitution systems shown, elements are created and destroyed throughout, leaving no trace of any simple grid structure. So in the end the patterns we obtain can look just as random as what we have seen in systems like cellular automata.
 
-#### **Sequential Substitution Systems**
+### Sequential Substitution Systems
 
 None of the systems we have discussed so far in this chapter might at first seem much like computer programs of the kind we typically use in practice. But it turns out that there are for example variants of substitution systems that work essentially just like standard text editors.
 
-The first step in understanding this correspondence is to think of substitution systems as operating not on sequences of colored elements but rather on strings of elements or letters. Thus for example the state of a substitution system at a particular step can be represented by the string ABBBABA, where the A's correspond to white elements and the B's to black ones
+The first step in understanding this correspondence is to think of substitution systems as operating not on sequences of colored elements but rather on strings of elements or letters. Thus for example the state of a substitution system at a particular step can be represented by the string ABBBABA, where the A’s correspond to white elements and the B’s to black ones.
 
 The substitution systems that we discussed in the previous section work by replacing each element in such a string by a new sequence of elements—so that in a sense these systems operate in parallel on all the elements that exist in the string at each step.
 
@@ -386,21 +380,19 @@ The picture below shows an example of a sequential substitution system in which 
 
 ![](_page_104_Picture_3.jpeg)
 
-An example of a very simple sequential substitution system. The light squares can be thought of as corresponding to the element A, and the dark squares to the element B. At each step, the rule then specifies that the string which exists at that step should be scanned from left to right, and the first sequence BA that is found should be replaced by ABA. In the picture, the black dots indicate which elements are being replaced at each step. In the case shown, the initial string is BABA. At each step, the rule then has the effect of adding an A inside the string.
+An example of a very simple sequential substitution system. The light squares can be thought of as corresponding to the element *A*, and the dark squares to the element *B*. At each step, the rule then specifies that the string which exists at that step should be scanned from left to right, and the first sequence *BA* that is found should be replaced by *ABA*. In the picture, the black dots indicate which elements are being replaced at each step. In the case shown, the initial string is *BABA*. At each step, the rule then has the effect of adding an *A* inside the string.
 
 The behavior in this case is very simple, with longer and longer strings of the same form being produced at each step. But one can get more complicated behavior if one uses rules that involve more than just one possible replacement. The idea in this case is at each step to scan the string repeatedly, trying successive replacements on successive scans, and stopping as soon as a replacement that can be used is found.
 
-The picture on the next page shows a sequential substitution system with rule  $\{ABA \rightarrow AAB, A \rightarrow ABA\}$  involving two possible replacements. Since the sequence ABA occurs in the initial string that is given, the first replacement is used on the first step. But the string BAAB that is produced at the second step does not contain ABA, so now the first replacement cannot be used. Nevertheless, since the string does contain the single element A, the second replacement can still be used.
+The picture on the next page shows a sequential substitution system with rule $\{ABA \rightarrow AAB, A \rightarrow ABA\}$ involving two possible replacements. Since the sequence ABA occurs in the initial string that is given, the first replacement is used on the first step. But the string BAAB that is produced at the second step does not contain ABA, so now the first replacement cannot be used. Nevertheless, since the string does contain the single element A, the second replacement can still be used.
 
-Despite such alternation between different replacements, however, the final pattern that emerges is very regular. Indeed, if one allows only two possible replacements—and two possible elements—
+Despite such alternation between different replacements, however, the final pattern that emerges is very regular. Indeed, if one allows only two possible replacements—and two possible elements—then it seems that no rule ever gives behavior that is much more complicated than in the picture above.
 
 ![](_page_105_Picture_2.jpeg)
 
-A sequential substitution system whose rule involves two possible replacements. At each step, the whole string is scanned once to try to apply the first replacement, and is then scanned again if necessary to try to apply the second replacement.
-
 ![](_page_105_Figure_4.jpeg)
 
-then it seems that no rule ever gives behavior that is much more complicated than in the picture above.
+A sequential substitution system whose rule involves two possible replacements. At each step, the whole string is scanned once to try to apply the first replacement, and is then scanned again if necessary to try to apply the second replacement.
 
 And from this one might be led to conclude that sequential substitution systems could never produce behavior of any substantial complexity. But having now seen complexity in many other kinds of systems, one might suspect that it should also be possible in sequential substitution systems.
 
@@ -412,9 +404,9 @@ So this leads to the rather remarkable conclusion that just by using the simple 
 
 ![](_page_106_Figure_2.jpeg)
 
-Examples of sequential substitution systems whose rules involve three possible replacements. In all cases, the systems are started from the initial string BAB. The black dots indicate the elements that are replaced at each step.
-
 ![](_page_106_Figure_4.jpeg)
+
+Examples of sequential substitution systems whose rules involve three possible replacements. In all cases, the systems are started from the initial string *BAB*. The black dots indicate the elements that are replaced at each step.
 
 ![](_page_107_Picture_2.jpeg)
 
@@ -424,9 +416,9 @@ Examples of sequential substitution systems whose rules involve three possible r
 
 ![](_page_107_Picture_5.jpeg)
 
-An example of a sequential substitution system that yields apparently random behavior. Each column on the right-hand side shows the evolution of the system for 250 steps. The compressed picture on the left is made by evolving for a million steps, but showing only steps at which the string becomes longer than it has ever been before. (The rule is the same as (g) on the previous page.)
+An example of a sequential substitution system that yields apparently random behavior. Each column on the right-hand side shows the evolution of the system for 250 steps. The compressed picture on the left is made by evolving for a million steps, but showing only steps at which the string becomes longer than it has ever been before. (The rule is the same as *(g)* on the previous page.)
 
-#### Tag Systems
+### Tag Systems
 
 One of the goals of this chapter is to find out just how simple the underlying structure of a system can be while the system as a whole is still capable of producing complex behavior. And as one example of a class of systems with a particularly simple underlying structure, I consider here what are sometimes known as tag systems.
 
@@ -452,7 +444,7 @@ If two elements are removed at each step, however, then this is no longer true. 
 
 Examples of tag systems in which at each step two elements are removed from the beginning of the sequence and then, based on what these elements are, a specified block of new elements is added to the end of the sequence. (The three dots in the representation of each rule stand for the rest of the elements in the sequence.) The pictures at the top show the first hundred steps in evolution according to various rules starting from a pair of black elements. The plots show the total lengths of the sequences obtained in each case. Note that in case (c), all the elements are eventually removed from the sequence.
 
-#### Cyclic Tag Systems
+### Cyclic Tag Systems
 
 The basic operation of the tag systems that we discussed in the previous section is extremely simple. But it turns out that by using a slightly different setup one can construct systems whose operation is in some ways even simpler. In an ordinary tag system, one does not know in advance which of several possible blocks will be added at each step. But the idea of a cyclic tag system is to make the underlying rule already specify exactly what block can be added at each step.
 
@@ -462,9 +454,9 @@ In the simplest case there are two possible blocks, and the rule simply alternat
 
 ![](_page_110_Picture_5.jpeg)
 
-An example of a cyclic tag system. There are two cases in the rule, and these cases are used on alternate steps, as indicated by the circle icons on the left. In each case a single element is removed from the beginning of the sequence, and then a new block is added at the end whenever the element removed is black. The rule can be summarized just by giving the blocks to be used in each case, as shown below.
-
 ![](_page_110_Picture_7.jpeg)
+
+An example of a cyclic tag system. There are two cases in the rule, and these cases are used on alternate steps, as indicated by the circle icons on the left. In each case a single element is removed from the beginning of the sequence, and then a new block is added at the end whenever the element removed is black. The rule can be summarized just by giving the blocks to be used in each case, as shown below.
 
 The next page shows examples of several cyclic tag systems. In cases (a) and (b) simple behavior is obtained. In case (c) the behavior is slightly more complicated, but if the pattern is viewed in the appropriate way then it turns out to have the same nested form as the third neighbor-independent substitution system shown on page 83.
 
@@ -478,13 +470,13 @@ Examples of cyclic tag systems. In each case the initial condition consists of a
 
 Fluctuations in the growth of sequences for cyclic tag systems (d) and (e) above. The fluctuations are shown with respect to growth at an average rate of half an element per step.
 
-#### **Register Machines**
+### Register Machines
 
 All of the various kinds of systems that we have discussed so far in this chapter can readily be implemented on practical computers. But none of them at an underlying level actually work very much like typical computers. Register machines are however specifically designed to be very simple idealizations of present-day computers.
 
 Under most everyday circumstances, the hardware construction of the computers we use is hidden from us by many layers of software. But at the lowest level, the CPUs of all standard computers have registers that store numbers, and any program we write is ultimately converted into a sequence of simple instructions that specify operations to be performed on these registers.
 
-Most practical computers have quite a few registers, and support perhaps tens of different kinds of instructions. But as a simple idealization one can consider register machines with just two registers—each storing a number of any size—and just two kinds of instructions: "increments" and "decrement-jumps". The rules for such register machines are then idealizations of practical programs, and are taken to consist of fixed sequences of instructions, to be executed in turn.
+Most practical computers have quite a few registers, and support perhaps tens of different kinds of instructions. But as a simple idealization one can consider register machines with just two registers—each storing a number of any size—and just two kinds of instructions: “increments” and “decrement-jumps”. The rules for such register machines are then idealizations of practical programs, and are taken to consist of fixed sequences of instructions, to be executed in turn.
 
 Increment instructions are set up just to increase by one the number stored in a particular register. Decrement-jump instructions, on the other hand, do two things. First, they decrease by one the number in a particular register. But then, instead of just going on to execute the next instruction in the program, they jump to some specified other point in the program, and begin executing again from there.
 
@@ -500,9 +492,7 @@ And with this setup, the pictures above show three very simple examples of regis
 
 All the register machines shown start by executing the first instruction in their programs. And with the particular programs used here, the machines are then set up just to execute all the other instructions in their programs in turn, jumping back to the beginning of their programs whenever they reach the end.
 
-Both registers in each machine are initially zero. And in the first machine, the first register alternates between 0 and 1, while the second remains zero. In the second machine, however, the first register again
-
-alternates between 0 and 1, but the second register progressively grows. And finally, in the third machine both registers grow.
+Both registers in each machine are initially zero. And in the first machine, the first register alternates between 0 and 1, while the second remains zero. In the second machine, however, the first register again alternates between 0 and 1, but the second register progressively grows. And finally, in the third machine both registers grow.
 
 But in all these three examples, the overall behavior is essentially repetitive. And indeed it turns out that among the 10,552 possible register machines with programs that are four or fewer instructions long, not a single one exhibits more complicated behavior.
 
@@ -516,11 +506,9 @@ And it turns out that even with up to seven instructions, none of the 276,224,37
 
 ![](_page_115_Figure_1.jpeg)
 
-A register machine whose behavior seems in some ways random. The program for this register machine is eight instructions long. Testing all 11,019,960,576 possible programs of length eight revealed just this and 125 similar cases of complex behavior. Part (b) shows the evolution in compressed form, with only those steps included at which either of the registers has just decreased to zero. The values of the nonzero registers are shown using a logarithmic scale. Part (c) shows the instructions that are executed for the first 400 times that one of the registers is decreased to zero. Finally, part (d) gives the successive values attained by the second register at steps where the first register has just decreased to zero. These values are given here as binary digit sequences. As discussed on page 122, the values can in fact be obtained by a simple arithmetic rule, without explicitly following each step in the evolution of the register machine. If one value is n, then the next value is 3n/2 if n is even, and (3n+1)/2 if n is odd. The initial condition is n=1.
+A register machine whose behavior seems in some ways random. The program for this register machine is eight instructions long. Testing all 11,019,960,576 possible programs of length eight revealed just this and 125 similar cases of complex behavior. Part (b) shows the evolution in compressed form, with only those steps included at which either of the registers has just decreased to zero. The values of the nonzero registers are shown using a logarithmic scale. Part (c) shows the instructions that are executed for the first 400 times that one of the registers is decreased to zero. Finally, part (d) gives the successive values attained by the second register at steps where the first register has just decreased to zero. These values are given here as binary digit sequences. As discussed on page 122, the values can in fact be obtained by a simple arithmetic rule, without explicitly following each step in the evolution of the register machine. If one value is $n$, then the next value is $3n/2$ if $n$ is even, and $(3n + 1)/2$ if $n$ is odd. The initial condition is $n = 1$.
 
-Looking just at the ordinary evolution labelled (a), however, the system might still appear to have quite simple and regular behavior. But a closer examination turns out to reveal irregularities. Part (b) of the picture shows a version of the evolution compressed to include only
-
-those steps at which one of the two registers has just decreased to zero. And in this picture one immediately sees some apparently random variation in the instructions that are executed.
+Looking just at the ordinary evolution labelled (a), however, the system might still appear to have quite simple and regular behavior. But a closer examination turns out to reveal irregularities. Part (b) of the picture shows a version of the evolution compressed to include only those steps at which one of the two registers has just decreased to zero. And in this picture one immediately sees some apparently random variation in the instructions that are executed.
 
 Part (c) of the picture then shows which instructions are executed for the first 400 times one of the registers has just decreased to zero. And part (d) finally shows the base 2 digits of the successive values attained by the second register when the first register has just decreased to zero. The results appear to show considerable randomness.
 
@@ -538,13 +526,15 @@ In a typical case, each variable in such a program simply corresponds to one of 
 
 Practical details make it somewhat difficult to do systematic experiments on such programs. But the experiments I have carried out do suggest that, just as with simple register machines, searching through many millions of short programs typically yields at least a few that exhibit complex and seemingly random behavior.
 
-#### Symbolic Systems
+### Symbolic Systems
 
-Register machines provide simple idealizations of typical low-level computer languages. But what about *Mathematica*? How can one set up a simple idealization of the transformations on symbolic expressions that *Mathematica* does? One approach suggested by the idea of combinators from the 1920s is to consider expressions with forms such as e[e[e][e]][e][e] and then to make transformations on these by repeatedly applying rules such as  $e[x_{-}][y_{-}] \rightarrow x[x[y]]$ , where  $x_{-}$  and  $y_{-}$  stand for any expression.
+Register machines provide simple idealizations of typical low-level computer languages. But what about *Mathematica*? How can one set up a simple idealization of the transformations on symbolic expressions that *Mathematica* does? One approach suggested by the idea of combinators from the 1920s is to consider expressions with forms such as $e[e[e][e]][e][e]$ and then to make transformations on these by repeatedly applying rules such as $e[x\_][y\_] \rightarrow x[x[y]]$, where $x\_$ and $y\_$ stand for any expression.
 
 The picture below shows an example of this. At each step the transformation is done by scanning once from left to right, and applying the rule wherever possible without overlapping.
 
 ![](_page_117_Figure_5.jpeg)
+
+A sequence of steps in the evolution of a simple symbolic system. At each step each boxed region is transformed according to the rule shown. This transformation corresponds to applying the basic *Mathematica* operation *expression /. rule*.
 
 The structure of expressions like those on the facing page is determined just by their sequence of opening and closing brackets. And representing these brackets by dark and light squares respectively, the picture below shows the overall pattern of behavior generated.
 
@@ -556,7 +546,7 @@ The structure of expressions like those on the facing page is determined just by
 
 ![](_page_118_Picture_6.jpeg)
 
-More steps in the evolution on the previous page, with opening brackets represented by dark squares and closing brackets by light ones. In each case configurations wider than the picture are cut off on the right. For the initial condition from the previous page, the system evolves after 264 steps to a fixed configuration involving 256 opening brackets followed by 256 closing brackets. For the initial condition on the bottom right, the system again evolves to a fixed configuration, but now this takes 65,555 steps, and the configuration involves 65,536 opening and closing brackets. Note that the evolution rules are highly non-local, and are rather unlike those, say, in a cellular automaton. It turns out that this particular system always evolves to a fixed configuration, but for initial conditions of size n can take roughly n iterated powers of 2 (or  $2^{2^{2^{-}}}$ ) to do so.
+More steps in the evolution on the previous page, with opening brackets represented by dark squares and closing brackets by light ones. In each case configurations wider than the picture are cut off on the right. For the initial condition from the previous page, the system evolves after 264 steps to a fixed configuration involving 256 opening brackets followed by 256 closing brackets. For the initial condition on the bottom right, the system again evolves to a fixed configuration, but now this takes 65,555 steps, and the configuration involves 65,536 opening and closing brackets. Note that the evolution rules are highly non-local, and are rather unlike those, say, in a cellular automaton. It turns out that this particular system always evolves to a fixed configuration, but for initial conditions of size $n$ can take roughly $n$ iterated powers of 2 (or $2^{2^{2^{\cdots}}}$) to do so.
 
 With the particular rule shown, the behavior always eventually stabilizes—though sometimes only after an astronomically long time.
 
@@ -564,9 +554,9 @@ But it is quite possible to find symbolic systems where this does not happen, as
 
 ![](_page_119_Figure_3.jpeg)
 
-The behavior of various symbolic systems starting from the initial condition e[e[e][e]][e][e]. The plots at the bottom show the difference in size of the expressions obtained on successive steps.
+The behavior of various symbolic systems starting from the initial condition $e[e[e][e]][e][e]$. The plots at the bottom show the difference in size of the expressions obtained on successive steps.
 
-#### Some Conclusions
+### Some Conclusions
 
 In the chapter before this one, we discovered the remarkable fact that even though their underlying rules are extremely simple, certain cellular automata can nevertheless produce behavior of great complexity.
 
@@ -596,17 +586,15 @@ One observation that can be made from the examples in this chapter is that when 
 
 The details of the underlying rules for a specific system can certainly affect the details of the behavior it produces. But what we have seen in this chapter is that at an overall level the typical types of behavior that occur are quite universal, and are almost completely independent of the details of underlying rules.
 
-And this fact has been crucial in my efforts to develop a coherent science of the kind I describe in this book. For it is what implies that
+And this fact has been crucial in my efforts to develop a coherent science of the kind I describe in this book. For it is what implies that there are general principles that govern the behavior of a wide range of systems, independent of the precise details of each system.
 
 ![](_page_122_Figure_2.jpeg)
 
 Examples of cellular automata with rules of varying complexity. The rules used are of the so-called totalistic type described on page 60. With two possible colors, just 4 cases need to be specified in such rules, and there are 16 possible rules in all. But as the number of colors increases, the rules rapidly become more complex. With three colors, there are 7 cases to be specified, and 2187 possible rules; with five colors, there are 13 cases to be specified, and 1,220,703,125 possible rules. But even though the underlying rules increase rapidly in complexity, the overall forms of behavior that we see do not change much. With two colors, it turns out that no totalistic rules yield anything other than repetitive or nested behavior. But as soon as three colors are allowed, much more complex behavior is immediately possible. Allowing four or more colors, however, does not further increase the complexity of the behavior, and, as the picture shows, even with five colors, simple repetitive and nested behavior can still occur.
 
-there are general principles that govern the behavior of a wide range of systems, independent of the precise details of each system.
-
 And it is this that means that even if we do not know all the details of what is inside some specific system in nature, we can still potentially make fundamental statements about its overall behavior. Indeed, in most cases, the important features of this behavior will actually turn out to be ones that we have already seen with the various kinds of very simple rules that we have discussed in this chapter.
 
-#### How the Discoveries in This Chapter Were Made
+### How the Discoveries in This Chapter Were Made
 
 This chapter—and the last—have described a series of surprising discoveries that I have made about what simple programs typically do. And in making these discoveries I have ended up developing a somewhat new methodology—that I expect will be central to almost any fundamental investigation in the new kind of science that I describe in this book.
 
@@ -616,9 +604,7 @@ But what allowed me to discover much more was that I used instead a methodology 
 
 In a traditional scientific experiment, one sets up a system in nature and then watches to see how it behaves. And in much the same way, one can set up a program on a computer and then watch how it behaves. And the great advantage of such an experimental approach is that it does not require one to know in advance exactly what kinds of behavior can occur. And this is what makes it possible to discover genuinely new phenomena that one did not expect.
 
-Experience in the traditional experimental sciences might suggest, however, that experiments are somehow always fundamentally imprecise.
-
-For when one deals with systems in nature it is normally impossible to set up or measure them with perfect precision—and indeed it can be a challenge even to make a traditional experiment be at all repeatable.
+Experience in the traditional experimental sciences might suggest, however, that experiments are somehow always fundamentally imprecise. For when one deals with systems in nature it is normally impossible to set up or measure them with perfect precision—and indeed it can be a challenge even to make a traditional experiment be at all repeatable.
 
 But for the kinds of computer experiments I do in this book, there is no such issue. For in almost all cases they involve programs whose rules and initial conditions can be specified with perfect precision—so that they work exactly the same whenever and wherever they are run.
 
@@ -626,7 +612,7 @@ In many ways these kinds of computer experiments thus manage to combine the best
 
 Yet as with all types of experiments it requires considerable skill and judgement to know how to set up a computer experiment that will yield meaningful results. And indeed, over the past twenty years or so my own methodology for doing such experiments has become vastly better.
 
-Over and over again the single most important principle that I have learned is that the best computer experiments are ones that are as simple and straightforward as possible. And this principle applies both to the structure of the actual systems one studies-and to the procedures that one uses for studying them.
+Over and over again the single most important principle that I have learned is that the best computer experiments are ones that are as simple and straightforward as possible. And this principle applies both to the structure of the actual systems one studies—and to the procedures that one uses for studying them.
 
 At some level the principle of looking at systems with the simplest possible structure can be viewed as an abstract aesthetic one. But it turns out also to have some very concrete consequences.
 
@@ -648,23 +634,19 @@ Much later one may go back and look at the simpler system again. And this is oft
 
 So having seen this many times I now always try to follow the principle that one can never start with too simple a system. For at worst, one will just establish a lower limit on what is needed for interesting behavior to occur. But much more often, one will instead discover behavior that one never thought was possible.
 
-It should however be emphasized that even in an experiment it is never entirely straightforward to discover phenomena one did not expect. For in setting up the experiment, one inevitably has to make assumptions about the kinds of behavior that can occur. And if it turns
-
-out that there is behavior which does not happen to fit in with these assumptions, then typically the experiment will fail to notice it.
+It should however be emphasized that even in an experiment it is never entirely straightforward to discover phenomena one did not expect. For in setting up the experiment, one inevitably has to make assumptions about the kinds of behavior that can occur. And if it turns out that there is behavior which does not happen to fit in with these assumptions, then typically the experiment will fail to notice it.
 
 In my experience, however, the way to have the best chance of discovering new phenomena in a computer experiment is to make the design of the experiment as simple and direct as possible. It is usually much better, for example, to do a mindless search of a large number of possible cases than to do a carefully crafted search of a smaller number. For in narrowing the search one inevitably makes assumptions, and these assumptions may end up missing the cases of greatest interest.
 
 Along similar lines, I have always found it much better to look explicitly at the actual behavior of systems, than to work from some kind of summary. For in making a summary one inevitably has to pick out only certain features, and in doing this one can remove or obscure the most interesting effects.
 
-But one of the problems with very direct experiments is that they often generate huge amounts of raw data. Yet what I have typically found is that if one manages to present this data in the form of pictures then it effectively becomes possible to analyze very quickly just with one's eyes. And indeed, in my experience it is typically much easier to recognize unexpected phenomena in this way than by using any kind of automated procedure for data analysis.
+But one of the problems with very direct experiments is that they often generate huge amounts of raw data. Yet what I have typically found is that if one manages to present this data in the form of pictures then it effectively becomes possible to analyze very quickly just with one’s eyes. And indeed, in my experience it is typically much easier to recognize unexpected phenomena in this way than by using any kind of automated procedure for data analysis.
 
 It was in a certain sense lucky that one-dimensional cellular automata were the first examples of simple programs that I investigated. For it so happens that in these systems one can usually get a good idea of overall behavior just by looking at an array of perhaps 10,000 cells—which can easily be displayed in few square inches.
 
 And since several of the 256 elementary cellular automaton rules already generate great complexity, just studying a couple of pages of pictures like the ones at the beginning of this chapter should in principle have allowed one to discover the basic phenomenon of complexity in cellular automata.
 
-But in fact I did not make this discovery in such a straightforward way. I had the idea of looking at pictures of cellular automaton evolution at the very beginning. But the technological difficulty of producing these pictures made me want to reduce their number as
-
-much as possible. And so at first I looked only at the 32 rules which had left-right symmetry and made blank backgrounds stay unchanged.
+But in fact I did not make this discovery in such a straightforward way. I had the idea of looking at pictures of cellular automaton evolution at the very beginning. But the technological difficulty of producing these pictures made me want to reduce their number as much as possible. And so at first I looked only at the 32 rules which had left-right symmetry and made blank backgrounds stay unchanged.
 
 Among these rules I found examples of repetition and nesting. And with random initial conditions, I found more complicated behavior. But since I did not expect that any complicated behavior would be possible with simple initial conditions, I did not try looking at other rules in an attempt to find it. Nevertheless, as it happens, the first paper that I published about cellular automata—in 1983—did in fact include a picture of rule 30 from page 27, as an example of a non-symmetric rule. But the picture showed only 20 steps of evolution, and at the time I did not look carefully at it, and certainly did not appreciate its significance.
 
