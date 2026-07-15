@@ -485,12 +485,10 @@ def _load_snapshot(repo_root: Path | str) -> _Snapshot:
         raise RegistryError("witness state coverage contradicts the region ledger")
 
     try:
-        package_result = pipeline.validate_package(root, PIPELINE_SCHEMA_LOCK_SHA256)
         contract, schema_registry = pipeline.validate_pipeline_contract(root)
+        pipeline.validate_lock(root, PIPELINE_SCHEMA_LOCK_SHA256)
     except (OSError, pipeline.PipelineSchemaError) as exc:
         raise RegistryError(f"pipeline schema package is not independently valid: {exc}") from exc
-    if package_result.get("lock_sha256") != PIPELINE_SCHEMA_LOCK_SHA256:
-        raise RegistryError("pipeline schema lock result drift")
     ledger_registry = {row["path"]: row for row in contract["ledgers"]}
     if REPAIR_LEDGER_PATH not in ledger_registry or REVIEW_LEDGER_PATH not in ledger_registry:
         raise RegistryError("pipeline contract lacks repair/review ledger registrations")
@@ -585,6 +583,26 @@ def mint_production_authority(
             raise RegistryError(f"{record.meta.repair_id}: raw source block is outside the frozen 20,430-block registry")
         if record.meta.raw_source_row_sha256 != snapshot.block_row_sha256s[record.meta.raw_source_id]:
             raise RegistryError(f"{record.meta.repair_id}: raw source row hash drift")
+        before = snapshot.state.blocks(record.meta.target_role, record.meta.target_id)
+        before_sha256 = overlay_lib.target_sha256(
+            record.meta.target_id, record.meta.target_role, before
+        )
+        if record.meta.expected_target_sha256 != before_sha256:
+            raise RegistryError(f"{record.meta.repair_id}: exact target pre-state guard drift")
+        apply_one = getattr(overlay_lib, "_apply_operation", None)
+        if apply_one is None:
+            raise RegistryIntegrationError("overlay exact-operation validator is unavailable")
+        try:
+            after = apply_one(record, before)
+        except overlay_lib.OverlayError as exc:
+            raise RegistryError(
+                f"{record.meta.repair_id}: typed operation does not join the frozen target: {exc}"
+            ) from exc
+        after_sha256 = overlay_lib.target_sha256(
+            record.meta.target_id, record.meta.target_role, after
+        )
+        if record.meta.expected_result_sha256 != after_sha256:
+            raise RegistryError(f"{record.meta.repair_id}: exact target post-state guard drift")
 
     # This is a categorical repository fact, checked only after all immutable
     # inputs and caller-controlled state/operation identities were validated.

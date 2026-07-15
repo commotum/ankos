@@ -192,6 +192,10 @@ class ValidatedRepairBinding:
     repair_id: str
     repair_row_sha256: str
     operation_projection_sha256: str
+    expected_target_sha256: str
+    expected_result_sha256: str
+    forward_payload_sha256: str
+    inverse_payload_sha256: str
     overlay_operation_bound: bool
 
 
@@ -435,6 +439,132 @@ def _safe_repo_path(value: str, field: str) -> None:
         raise PipelineSchemaError(f"unsafe repository path in {field}: {value!r}")
 
 
+def _read_output_file(output_root: Path | None, relative: str, field: str) -> bytes:
+    """Read one declared output while rejecting absence, links, and root escape."""
+
+    _safe_repo_path(relative, field)
+    if output_root is None:
+        raise PipelineSchemaError(f"{field} lacks a concrete output root")
+    root = output_root.resolve()
+    if not output_root.is_dir() or output_root.is_symlink():
+        raise PipelineSchemaError(f"{field} output root is absent, non-directory, or symlinked")
+    candidate = output_root / relative
+    try:
+        candidate.resolve().relative_to(root)
+    except ValueError as exc:
+        raise PipelineSchemaError(f"{field} escapes its concrete output root") from exc
+    current = output_root
+    for part in PurePosixPath(relative).parts:
+        current = current / part
+        if current.is_symlink():
+            raise PipelineSchemaError(f"{field} traverses a symlinked output component")
+    if not candidate.is_file() or candidate.is_symlink():
+        raise PipelineSchemaError(f"{field} does not identify a concrete regular output file")
+    return candidate.read_bytes()
+
+
+def _validate_output_span(
+    *,
+    output_root: Path | None,
+    path: str,
+    span: Mapping[str, Any],
+    field: str,
+    expected_bytes: bytes | None = None,
+) -> bytes:
+    payload = _read_output_file(output_root, path, field)
+    start = span["start_byte"]
+    end = span["end_byte_exclusive"]
+    if start < 0 or end <= start or end > len(payload):
+        raise PipelineSchemaError(f"{field} span is empty, reversed, or outside the output file")
+    selected = payload[start:end]
+    if sha256_bytes(selected) != span["sha256"]:
+        raise PipelineSchemaError(f"{field} span hash does not join concrete output bytes")
+    if expected_bytes is not None and selected != expected_bytes:
+        raise PipelineSchemaError(f"{field} span bytes differ from the declared projection")
+    return selected
+
+
+def _validated_ast_nodes(
+    registry: SchemaRegistry, ast_nodes: Sequence[Mapping[str, Any]]
+) -> dict[str, Mapping[str, Any]]:
+    by_id: dict[str, Mapping[str, Any]] = {}
+    indexes = _frozen_indexes(registry)
+    for node in ast_nodes:
+        registry.validate("goal-4/schemas/ast-node.schema.json", node)
+        node_id = node["node_id"]
+        if node_id in by_id:
+            raise PipelineSchemaError("duplicate AST node ID")
+        by_id[node_id] = node
+        _safe_repo_path(node["output_path"], "AST node output path")
+        projected = node["author_text_projection"].encode("utf-8")
+        if sha256_bytes(projected) != node["author_text_projection_sha256"]:
+            raise PipelineSchemaError("AST node author projection hash mismatch")
+        span = node["output_span"]
+        if span["end_byte_exclusive"] - span["start_byte"] != len(projected):
+            raise PipelineSchemaError("AST node output span length differs from its projection")
+        if span["sha256"] != node["author_text_projection_sha256"]:
+            raise PipelineSchemaError("AST node output span hash differs from its projection")
+        _validate_raw_block_ids(registry, node["raw_span_ids"])
+        if node["content_role"] == "CANONICAL_AUTHOR_TEXT":
+            document = indexes["documents_by_id"].get(node["canonical_document_id"])
+            if document is None or node["output_path"] != document["path"]:
+                raise PipelineSchemaError("canonical AST node does not join guardrail document/path")
+            if any(
+                indexes["blocks_by_id"][block_id]["canonical_document_id"]
+                != node["canonical_document_id"]
+                for block_id in node["raw_span_ids"]
+            ):
+                raise PipelineSchemaError("AST node raw spans cross its canonical document")
+        elif node["canonical_document_id"] is not None:
+            raise PipelineSchemaError("noncanonical AST node claims a canonical document")
+    return by_id
+
+
+def _join_output_node_partition(
+    *,
+    node_ids: Sequence[str],
+    ast_by_id: Mapping[str, Mapping[str, Any]],
+    output_root: Path | None,
+    output_path: str,
+    canonical_document_id: str,
+    target_span: Mapping[str, Any],
+    raw_block_ids: Sequence[str],
+) -> None:
+    if not node_ids:
+        raise PipelineSchemaError("canonical output span lacks owning AST nodes")
+    try:
+        nodes = [ast_by_id[node_id] for node_id in node_ids]
+    except KeyError as exc:
+        raise PipelineSchemaError("canonical output span references an absent AST node") from exc
+    if len(node_ids) != len(set(node_ids)):
+        raise PipelineSchemaError("canonical output span repeats an AST node")
+    nodes = sorted(nodes, key=lambda row: row["output_span"]["start_byte"])
+    cursor = target_span["start_byte"]
+    joined_raw: list[str] = []
+    for node in nodes:
+        if (
+            node["content_role"] != "CANONICAL_AUTHOR_TEXT"
+            or node["canonical_document_id"] != canonical_document_id
+            or node["output_path"] != output_path
+            or node["output_span"]["start_byte"] != cursor
+        ):
+            raise PipelineSchemaError("AST node does not exactly partition its canonical output span")
+        node_bytes = node["author_text_projection"].encode("utf-8")
+        _validate_output_span(
+            output_root=output_root,
+            path=output_path,
+            span=node["output_span"],
+            field="AST node output",
+            expected_bytes=node_bytes,
+        )
+        cursor = node["output_span"]["end_byte_exclusive"]
+        joined_raw.extend(node["raw_span_ids"])
+    if cursor != target_span["end_byte_exclusive"]:
+        raise PipelineSchemaError("AST nodes do not reach the canonical output-span end")
+    if joined_raw != list(raw_block_ids):
+        raise PipelineSchemaError("AST-node raw spans do not exactly join provenance raw blocks")
+
+
 def _locked_artifact(repo_root: Path, lock: Mapping[str, Any], relative: str) -> Path:
     rows = [row for row in lock.get("artifacts", []) if row.get("path") == relative]
     if len(rows) != 1:
@@ -634,6 +764,183 @@ def _validate_raw_block_ids(registry: SchemaRegistry, raw_block_ids: Sequence[st
         raise PipelineSchemaError("raw block ID does not join Stage 2 structure ledger")
 
 
+_INVERSE_OPERATION_TYPES = {
+    "REPLACE": "REPLACE",
+    "DELETE": "ANCHORED_INSERT",
+    "ANCHORED_INSERT": "DELETE",
+    "MOVE": "MOVE",
+    "SPLIT": "MERGE",
+    "MERGE": "SPLIT",
+}
+
+
+def _hex_bytes(value: str, field: str, *, nonempty: bool = True) -> bytes:
+    if not isinstance(value, str) or re.fullmatch(r"(?:[0-9a-f]{2})*", value) is None:
+        raise PipelineSchemaError(f"{field} is not canonical lowercase byte hex")
+    data = bytes.fromhex(value)
+    if nonempty and not data:
+        raise PipelineSchemaError(f"{field} is empty")
+    return data
+
+
+def _operation_fields(operation: Mapping[str, Any], label: str) -> Mapping[str, Any]:
+    fields = operation["payload"]["operation_fields"]
+    if fields["operation_type"] != operation["operation_type"]:
+        raise PipelineSchemaError(f"{label} typed payload operation type differs from its envelope")
+    return fields
+
+
+def _validate_operation_inverse_pair(
+    forward: Mapping[str, Any], inverse: Mapping[str, Any]
+) -> None:
+    """Validate the declared exact inverse descriptor, not only its operation name."""
+
+    forward_type = forward["operation_type"]
+    inverse_type = inverse["operation_type"]
+    if _INVERSE_OPERATION_TYPES[forward_type] != inverse_type:
+        raise PipelineSchemaError("inverse operation type is not the exact forward inverse")
+    forward_payload = forward["payload"]
+    inverse_payload = inverse["payload"]
+    if inverse_payload["source_node_ids"] != forward_payload["target_node_ids"]:
+        raise PipelineSchemaError("inverse source-node set does not reverse forward targets")
+    if inverse_payload["target_node_ids"] != forward_payload["source_node_ids"]:
+        raise PipelineSchemaError("inverse target-node set does not reverse forward sources")
+    before = _operation_fields(forward, "forward")
+    after = _operation_fields(inverse, "inverse")
+
+    if forward_type == "MOVE":
+        pairs = (
+            ("block_id", "block_id"),
+            ("expected_block_sha256", "expected_block_sha256"),
+            ("source_left_id", "destination_left_id"),
+            ("source_right_id", "destination_right_id"),
+            ("destination_left_id", "source_left_id"),
+            ("destination_right_id", "source_right_id"),
+            ("expected_source_adjacency_count", "expected_destination_adjacency_count"),
+            ("expected_destination_adjacency_count", "expected_source_adjacency_count"),
+        )
+        if any(before[left] != after[right] for left, right in pairs):
+            raise PipelineSchemaError("MOVE inverse payload does not swap exact adjacencies")
+    elif forward_type == "REPLACE":
+        if (
+            before["block_id"] != after["block_id"]
+            or before["preimage_hex"] != after["replacement_hex"]
+            or before["replacement_hex"] != after["preimage_hex"]
+            or before["expected_count"] != after["expected_count"]
+        ):
+            raise PipelineSchemaError("REPLACE inverse payload does not swap exact byte strings")
+    elif forward_type == "DELETE":
+        if (
+            before["block_id"] != after["block_id"]
+            or before["preimage_hex"] != after["insertion_hex"]
+            or before["expected_count"] != after["expected_adjacency_count"]
+        ):
+            raise PipelineSchemaError("DELETE inverse payload does not restore the deleted bytes")
+    elif forward_type == "ANCHORED_INSERT":
+        if (
+            before["block_id"] != after["block_id"]
+            or before["insertion_hex"] != after["preimage_hex"]
+            or before["expected_adjacency_count"] != after["expected_count"]
+        ):
+            raise PipelineSchemaError("ANCHORED_INSERT inverse payload does not delete the insertion")
+    elif forward_type == "SPLIT":
+        parts = before["parts"]
+        part_ids = [part["block_id"] for part in parts]
+        part_bytes = [_hex_bytes(part["data_hex"], "split part data") for part in parts]
+        if (
+            after["block_ids"] != part_ids
+            or after["expected_block_sha256s"]
+            != [sha256_bytes(data) for data in part_bytes]
+            or after["merged_block"]["block_id"] != before["block_id"]
+            or _hex_bytes(after["merged_block"]["data_hex"], "inverse merged block data")
+            != b"".join(part_bytes)
+            or after["expected_adjacency_count"] != 1
+        ):
+            raise PipelineSchemaError("SPLIT inverse payload is not the exact part merge")
+    elif forward_type == "MERGE":
+        merged = _hex_bytes(before["merged_block"]["data_hex"], "merged block data")
+        parts = after["parts"]
+        part_ids = [part["block_id"] for part in parts]
+        part_bytes = [_hex_bytes(part["data_hex"], "inverse split part data") for part in parts]
+        if (
+            after["block_id"] != before["merged_block"]["block_id"]
+            or after["expected_block_sha256"] != sha256_bytes(merged)
+            or part_ids != before["block_ids"]
+            or [sha256_bytes(data) for data in part_bytes]
+            != before["expected_block_sha256s"]
+            or b"".join(part_bytes) != merged
+            or after["expected_block_count"] != 1
+        ):
+            raise PipelineSchemaError("MERGE inverse payload is not the exact source split")
+
+
+def _typed_overlay_operation_fields(operation: Any, overlay_lib: Any) -> Mapping[str, Any]:
+    """Project every operation-specific dataclass field to canonical JSON values."""
+
+    if isinstance(operation, overlay_lib.Replace):
+        return {
+            "block_id": operation.block_id,
+            "expected_block_sha256": operation.expected_block_sha256,
+            "expected_count": operation.expected_count,
+            "operation_type": "REPLACE",
+            "preimage_hex": operation.preimage.hex(),
+            "replacement_hex": operation.replacement.hex(),
+        }
+    if isinstance(operation, overlay_lib.Delete):
+        return {
+            "block_id": operation.block_id,
+            "expected_block_sha256": operation.expected_block_sha256,
+            "expected_count": operation.expected_count,
+            "operation_type": "DELETE",
+            "preimage_hex": operation.preimage.hex(),
+        }
+    if isinstance(operation, overlay_lib.AnchoredInsert):
+        return {
+            "block_id": operation.block_id,
+            "expected_adjacency_count": operation.expected_adjacency_count,
+            "expected_block_sha256": operation.expected_block_sha256,
+            "insertion_hex": operation.insertion.hex(),
+            "left_anchor_hex": operation.left_anchor.hex(),
+            "operation_type": "ANCHORED_INSERT",
+            "right_anchor_hex": operation.right_anchor.hex(),
+        }
+    if isinstance(operation, overlay_lib.Move):
+        return {
+            "block_id": operation.block_id,
+            "destination_left_id": operation.destination_left_id,
+            "destination_right_id": operation.destination_right_id,
+            "expected_block_sha256": operation.expected_block_sha256,
+            "expected_destination_adjacency_count": operation.expected_destination_adjacency_count,
+            "expected_source_adjacency_count": operation.expected_source_adjacency_count,
+            "operation_type": "MOVE",
+            "source_left_id": operation.source_left_id,
+            "source_right_id": operation.source_right_id,
+        }
+    if isinstance(operation, overlay_lib.Split):
+        return {
+            "block_id": operation.block_id,
+            "expected_block_count": operation.expected_block_count,
+            "expected_block_sha256": operation.expected_block_sha256,
+            "operation_type": "SPLIT",
+            "parts": [
+                {"block_id": part.block_id, "data_hex": part.data.hex()}
+                for part in operation.parts
+            ],
+        }
+    if isinstance(operation, overlay_lib.Merge):
+        return {
+            "block_ids": list(operation.block_ids),
+            "expected_adjacency_count": operation.expected_adjacency_count,
+            "expected_block_sha256s": list(operation.expected_block_sha256s),
+            "merged_block": {
+                "block_id": operation.merged_block.block_id,
+                "data_hex": operation.merged_block.data.hex(),
+            },
+            "operation_type": "MERGE",
+        }
+    raise PipelineSchemaError("overlay operation is not one of the six closed typed operations")
+
+
 def _projection_hash(projection: Mapping[str, Any], field: str) -> None:
     expected = sha256_bytes(projection["text"].encode("utf-8"))
     if projection["sha256"] != expected:
@@ -667,7 +974,9 @@ def validate_workflow(workflow: Mapping[str, Any]) -> None:
 def _mechanical_basis(record: Mapping[str, Any]) -> Mapping[str, Any]:
     return {
         "after_projection_sha256": record["after_projection"]["sha256"],
+        "after_target_sha256": record["target_state_guards"]["after_sha256"],
         "before_projection_sha256": record["before_projection"]["sha256"],
+        "before_target_sha256": record["target_state_guards"]["before_sha256"],
         "forward_payload_sha256": record["forward_operation"]["payload_sha256"],
         "guard_kind": record["guard"]["guard_kind"],
         "inverse_payload_sha256": record["inverse_operation"]["payload_sha256"],
@@ -750,6 +1059,11 @@ def validate_repair(
         raise PipelineSchemaError("repair does not bind the frozen baseline lock")
     if record["operation_projection_sha256"] == "0" * 64:
         raise PipelineSchemaError("repair operation projection uses an all-zero placeholder")
+    if any(
+        record["target_state_guards"][field] == "0" * 64
+        for field in ("before_sha256", "after_sha256")
+    ):
+        raise PipelineSchemaError("repair target-state guard uses an all-zero placeholder")
     _safe_repo_path(record["target"]["path"], "repair target")
     _safe_repo_path(record["guard"]["raw_source_path"], "repair source")
     _projection_hash(record["before_projection"], "before")
@@ -848,6 +1162,8 @@ def validate_repair(
     for label, operation in (("forward", forward), ("inverse", inverse)):
         if sha256_bytes(canonical_json_bytes(operation["payload"])[:-1]) != operation["payload_sha256"]:
             raise PipelineSchemaError(f"{label} operation payload hash mismatch")
+        _operation_fields(operation, label)
+    _validate_operation_inverse_pair(forward, inverse)
     if forward["expected_input_projection_sha256"] != record["before_projection"]["sha256"]:
         raise PipelineSchemaError("forward input does not bind before projection")
     if forward["expected_output_projection_sha256"] != record["after_projection"]["sha256"]:
@@ -897,6 +1213,10 @@ def validate_repair(
         repair_id=record["repair_id"],
         repair_row_sha256=canonical_repair_row_sha256(record),
         operation_projection_sha256=record["operation_projection_sha256"],
+        expected_target_sha256=record["target_state_guards"]["before_sha256"],
+        expected_result_sha256=record["target_state_guards"]["after_sha256"],
+        forward_payload_sha256=record["forward_operation"]["payload_sha256"],
+        inverse_payload_sha256=record["inverse_operation"]["payload_sha256"],
         overlay_operation_bound=False,
     )
 
@@ -930,6 +1250,8 @@ def validate_overlay_operation_binding(
     expected_meta = {
         "creator_principal_id": record["creator"]["principal_id"],
         "dependencies": tuple(record["dependencies"]),
+        "expected_result_sha256": record["target_state_guards"]["after_sha256"],
+        "expected_target_sha256": record["target_state_guards"]["before_sha256"],
         "final_disposition": record["workflow"]["final_disposition"],
         "repair_class": record["repair_class"],
         "repair_id": record["repair_id"],
@@ -949,6 +1271,9 @@ def validate_overlay_operation_binding(
             raise PipelineSchemaError(f"overlay operation metadata differs from repair row: {field}")
     if overlay_operation.operation != record["forward_operation"]["operation_type"]:
         raise PipelineSchemaError("overlay operation type differs from repair forward operation")
+    expected_operation_fields = _typed_overlay_operation_fields(overlay_operation, overlay_lib)
+    if record["forward_operation"]["payload"]["operation_fields"] != expected_operation_fields:
+        raise PipelineSchemaError("overlay typed operation fields differ from repair forward payload")
     guard = record["guard"]
     raw_block_ids = (
         guard["raw_block_ids"]
@@ -971,6 +1296,8 @@ def validate_overlay_operation_binding(
     )
     if meta.raw_source_span_sha256 != expected_span_sha:
         raise PipelineSchemaError("overlay raw-source span hash does not bind repair guard")
+    if meta.witness is not None or record["evidence"]["authoritative"]:
+        raise PipelineSchemaError("current SOURCE_BLOCKED authority cannot carry witness metadata")
     review_by_id = validate_review_set(review_records, registry)
     if set(record["review_ids"]) != set(review_by_id).intersection(record["review_ids"]):
         raise PipelineSchemaError("overlay authority review IDs do not join validated review rows")
@@ -988,26 +1315,75 @@ def validate_overlay_operation_binding(
         if len(source_rows) != 1:
             raise PipelineSchemaError("overlay authority lacks exactly one source-review row")
         source = source_rows[0]
-        if meta.review is None or meta.review.review_id != source["review_id"]:
-            raise PipelineSchemaError("overlay review identity differs from registry source review")
-        if meta.review.review_row_sha256 != sha256_bytes(canonical_json_bytes(source)):
-            raise PipelineSchemaError("overlay source-review row hash differs from registry row")
+        if source["agreement_state"] != "AGREES" or source["closure_state"] != "CLOSED":
+            raise PipelineSchemaError("overlay source review is not closed and approving")
+        if meta.review is None:
+            raise PipelineSchemaError("overlay metadata omits the registry source review")
+        expected_source_fields = {
+            "blind_preproposal": source["blind_preproposal"],
+            "creator_principal_id": record["creator"]["principal_id"],
+            "evidence_view_sha256": source["evidence_view_sha256"],
+            "review_id": source["review_id"],
+            "review_row_sha256": sha256_bytes(canonical_json_bytes(source)),
+            "source_decision": "APPROVED",
+            "source_reviewer_principal_id": source["principal_id"],
+            "source_reviewer_role": source["reviewer_role"],
+            "source_reviewer_session_id": source["session_id"],
+            "source_reviewer_type": source["reviewer_type"],
+        }
+        for field, expected in expected_source_fields.items():
+            if getattr(meta.review, field) != expected:
+                raise PipelineSchemaError(
+                    f"overlay source-review metadata differs from exact registry row: {field}"
+                )
         if specialist_rows:
             if len(specialist_rows) != 1:
                 raise PipelineSchemaError("overlay authority has ambiguous specialist-review rows")
             specialist = specialist_rows[0]
-            if (
-                meta.review.specialist_review_id != specialist["review_id"]
-                or meta.review.specialist_review_row_sha256
-                != sha256_bytes(canonical_json_bytes(specialist))
+            if specialist["agreement_state"] != "AGREES" or specialist["closure_state"] != "CLOSED":
+                raise PipelineSchemaError("overlay specialist review is not closed and approving")
+            expected_specialist_fields = {
+                "specialist_decision": "APPROVED",
+                "specialist_evidence_view_sha256": specialist["evidence_view_sha256"],
+                "specialist_principal_id": specialist["principal_id"],
+                "specialist_review_id": specialist["review_id"],
+                "specialist_review_row_sha256": sha256_bytes(canonical_json_bytes(specialist)),
+                "specialist_role": specialist["reviewer_role"],
+                "specialist_session_id": specialist["session_id"],
+                "specialist_specialty": specialist["specialty"],
+                "specialist_type": specialist["reviewer_type"],
+            }
+            for field, expected in expected_specialist_fields.items():
+                if getattr(meta.review, field) != expected:
+                    raise PipelineSchemaError(
+                        f"overlay specialist-review metadata differs from exact registry row: {field}"
+                    )
+        else:
+            for field in (
+                "specialist_decision",
+                "specialist_evidence_view_sha256",
+                "specialist_principal_id",
+                "specialist_review_id",
+                "specialist_review_row_sha256",
+                "specialist_role",
+                "specialist_session_id",
+                "specialist_specialty",
+                "specialist_type",
             ):
-                raise PipelineSchemaError("overlay specialist-review binding differs from registry row")
+                if getattr(meta.review, field) is not None:
+                    raise PipelineSchemaError(
+                        f"overlay carries unjoined specialist-review metadata: {field}"
+                    )
     elif meta.review is not None:
         raise PipelineSchemaError("overlay operation carries a review absent from repair row")
     return ValidatedRepairBinding(
         repair_id=binding.repair_id,
         repair_row_sha256=binding.repair_row_sha256,
         operation_projection_sha256=operation_sha,
+        expected_target_sha256=binding.expected_target_sha256,
+        expected_result_sha256=binding.expected_result_sha256,
+        forward_payload_sha256=binding.forward_payload_sha256,
+        inverse_payload_sha256=binding.inverse_payload_sha256,
         overlay_operation_bound=True,
     )
 
@@ -1148,7 +1524,14 @@ def _required_specialty(record: Mapping[str, Any]) -> str:
     return "GENERAL"
 
 
-def validate_provenance(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
+def validate_provenance(
+    record: Mapping[str, Any],
+    registry: SchemaRegistry,
+    *,
+    output_root: Path | None = None,
+    ast_nodes: Sequence[Mapping[str, Any]] = (),
+    _ast_by_id: Mapping[str, Mapping[str, Any]] | None = None,
+) -> None:
     registry.validate("goal-4/schemas/provenance-record.schema.json", record)
     kind = record["mapping_kind"]
     source = record["source"]
@@ -1216,12 +1599,38 @@ def validate_provenance(record: Mapping[str, Any], registry: SchemaRegistry) -> 
             or document is None
             or target["canonical_document_id"] != document_id
             or target["path"] != document["path"]
+            or target["span"] is None
+            or target["raw_block_ids"] != source["raw_block_ids"]
+            or target["witness_region_ids"]
             or source["author_text_projection_sha256"] != target["author_text_projection_sha256"]
             or record["author_text_projection_sha256"] != source["author_text_projection_sha256"]
             or record["repair_ids"]
             or record["inverse"] != {"inverse_kind": "IDENTITY", "repair_ids": []}
         ):
             raise PipelineSchemaError("RAW_PRESERVED projection changed")
+        output_bytes = _validate_output_span(
+            output_root=output_root,
+            path=target["path"],
+            span=target["span"],
+            field="RAW_PRESERVED target",
+            expected_bytes=raw_bytes,
+        )
+        if target["author_text_projection_sha256"] != sha256_bytes(output_bytes):
+            raise PipelineSchemaError("RAW_PRESERVED target projection does not equal output bytes")
+        ast_by_id = (
+            _validated_ast_nodes(registry, ast_nodes)
+            if _ast_by_id is None
+            else _ast_by_id
+        )
+        _join_output_node_partition(
+            node_ids=record["node_ids"],
+            ast_by_id=ast_by_id,
+            output_root=output_root,
+            output_path=target["path"],
+            canonical_document_id=document_id,
+            target_span=target["span"],
+            raw_block_ids=target["raw_block_ids"],
+        )
     elif kind == "RAW_REPAIRED":
         if target["endpoint_kind"] != "CANONICAL_SPAN" or not record["repair_ids"]:
             raise PipelineSchemaError("RAW_REPAIRED lacks canonical target/joined repair")
@@ -1265,14 +1674,26 @@ def validate_provenance_set(
     repair_records: Sequence[Mapping[str, Any]] = (),
     *,
     require_complete_raw_coverage: bool = False,
+    output_root: Path | None = None,
+    ast_nodes: Sequence[Mapping[str, Any]] = (),
 ) -> None:
     ids: set[str] = set()
     sequences: list[int] = []
     repair_ids = {row["repair_id"] for row in repair_records}
     covered_raw_blocks: list[str] = []
     covered_raw_spans: list[tuple[int, int]] = []
+    covered_target_blocks: list[str] = []
+    target_spans_by_path: dict[str, list[tuple[int, int]]] = {}
+    used_node_ids: list[str] = []
+    ast_by_id = _validated_ast_nodes(registry, ast_nodes)
     for record in records:
-        validate_provenance(record, registry)
+        validate_provenance(
+            record,
+            registry,
+            output_root=output_root,
+            ast_nodes=ast_nodes,
+            _ast_by_id=ast_by_id,
+        )
         if record["provenance_id"] in ids:
             raise PipelineSchemaError("duplicate provenance ID")
         ids.add(record["provenance_id"])
@@ -1285,6 +1706,14 @@ def validate_provenance_set(
             covered_raw_blocks.extend(record["source"]["raw_block_ids"])
             span = record["source"]["span"]
             covered_raw_spans.append((span["start_byte"], span["end_byte_exclusive"]))
+        if record["mapping_kind"] in {"RAW_PRESERVED", "RAW_REPAIRED"}:
+            target = record["target"]
+            covered_target_blocks.extend(target["raw_block_ids"])
+            used_node_ids.extend(record["node_ids"])
+            target_span = target["span"]
+            target_spans_by_path.setdefault(target["path"], []).append(
+                (target_span["start_byte"], target_span["end_byte_exclusive"])
+            )
     if sequences != list(range(len(records))):
         raise PipelineSchemaError("provenance sequence is not exact ledger order")
     if len(covered_raw_blocks) != len(set(covered_raw_blocks)):
@@ -1303,6 +1732,42 @@ def validate_provenance_set(
                 raise PipelineSchemaError("complete provenance raw spans have a gap/overlap")
         if covered_raw_spans[-1][1] != monolith["byte_size"]:
             raise PipelineSchemaError("complete provenance does not reach the raw monolith end")
+        if covered_target_blocks != expected:
+            raise PipelineSchemaError(
+                "complete provenance does not provide exact ordered canonical-output block coverage"
+            )
+        if len(used_node_ids) != len(set(used_node_ids)):
+            raise PipelineSchemaError("canonical AST node is owned by multiple provenance rows")
+        expected_ast_ids = {
+            node_id
+            for node_id, node in ast_by_id.items()
+            if node["content_role"] == "CANONICAL_AUTHOR_TEXT"
+        }
+        if set(used_node_ids) != expected_ast_ids:
+            raise PipelineSchemaError(
+                "complete provenance is not bidirectional over every canonical AST node"
+            )
+        documents = _frozen_indexes(registry)["documents"]
+        expected_paths = {document["path"] for document in documents}
+        if set(target_spans_by_path) != expected_paths:
+            raise PipelineSchemaError(
+                "complete provenance does not cover the exact canonical-output path universe"
+            )
+        for document in documents:
+            path = document["path"]
+            output = _read_output_file(output_root, path, "complete provenance output")
+            spans = sorted(target_spans_by_path[path])
+            if not spans or spans[0][0] != 0:
+                raise PipelineSchemaError("canonical output provenance does not begin at byte zero")
+            for left, right in zip(spans, spans[1:]):
+                if left[1] != right[0]:
+                    raise PipelineSchemaError(
+                        "canonical output provenance has a target gap or overlap"
+                    )
+            if spans[-1][1] != len(output):
+                raise PipelineSchemaError(
+                    "canonical output provenance does not reach the concrete file end"
+                )
 
 
 def validate_navigation(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
@@ -1320,12 +1785,18 @@ def validate_technical(
     repair_records: Sequence[Mapping[str, Any]] = (),
     review_records: Sequence[Mapping[str, Any]] = (),
     unresolved_records: Sequence[Mapping[str, Any]] = (),
+    *,
+    output_root: Path | None = None,
+    ast_nodes: Sequence[Mapping[str, Any]] = (),
 ) -> None:
     registry.validate("goal-4/schemas/technical-record.schema.json", record)
     validate_workflow(record["workflow"])
     indexes = _frozen_indexes(registry)
     if record["canonical_document_id"] not in indexes["documents_by_id"]:
         raise PipelineSchemaError("technical span document does not join guardrails")
+    document = indexes["documents_by_id"][record["canonical_document_id"]]
+    if record["output_path"] != document["path"]:
+        raise PipelineSchemaError("technical output path does not join its canonical document")
     _validate_raw_block_ids(registry, record["raw_block_ids"])
     block_rows = [indexes["blocks_by_id"][block_id] for block_id in record["raw_block_ids"]]
     if any(row["canonical_document_id"] != record["canonical_document_id"] for row in block_rows):
@@ -1348,12 +1819,25 @@ def validate_technical(
     if joined_source != source_bytes:
         raise PipelineSchemaError("technical source projection differs from exact raw span")
     output_span = record["output_span"]
-    if output_span["end_byte_exclusive"] <= output_span["start_byte"]:
-        raise PipelineSchemaError("technical output span is empty/reversed")
-    if output_span["end_byte_exclusive"] - output_span["start_byte"] != len(source_bytes):
-        raise PipelineSchemaError("unchanged technical output-span length differs from source projection")
-    if output_span["sha256"] != record["source_projection_sha256"]:
-        raise PipelineSchemaError("unchanged technical output-span hash differs from source projection")
+    output_bytes = _validate_output_span(
+        output_root=output_root,
+        path=record["output_path"],
+        span=output_span,
+        field="technical output",
+        expected_bytes=source_bytes,
+    )
+    if sha256_bytes(output_bytes) != record["source_projection_sha256"]:
+        raise PipelineSchemaError("unchanged technical output bytes differ from source projection")
+    ast_by_id = _validated_ast_nodes(registry, ast_nodes)
+    _join_output_node_partition(
+        node_ids=[record["node_id"]],
+        ast_by_id=ast_by_id,
+        output_root=output_root,
+        output_path=record["output_path"],
+        canonical_document_id=record["canonical_document_id"],
+        target_span=output_span,
+        raw_block_ids=record["raw_block_ids"],
+    )
     tokens = record["tokens"]
     if not tokens:
         raise PipelineSchemaError("technical span lacks enumerated tokens")

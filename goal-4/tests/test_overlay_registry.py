@@ -185,6 +185,17 @@ class RealCorpusRegistryTests(unittest.TestCase):
         ):
             self.mint(self.state, (forged,))
 
+    def test_target_hash_substitution_is_rejected_before_gate(self) -> None:
+        operation = self.canonical_operation()
+        forged = replace(
+            operation,
+            meta=replace(operation.meta, expected_target_sha256="0" * 64),
+        )
+        with self.assertRaisesRegex(
+            overlay_registry.RegistryError, "exact target pre-state guard drift"
+        ):
+            self.mint(self.state, (forged,))
+
     def test_noncanonical_operation_cannot_enter_canonical_authority(self) -> None:
         operation = self.canonical_operation()
         noncanonical = replace(
