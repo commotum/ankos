@@ -16,8 +16,9 @@ Status: IN_PROGRESS
   1 and Chapter 3 opener images and the textual Chapter 2 and Chapter 4 opener
   numbers belong to the chapters they introduce.
 - `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`, `CH02`, and `CH03` are
-  two-pass complete over PDF pages 1–130 with 193 guarded corrections. `CH04`
-  remains open.
+  two-pass complete over PDF pages 1–130. `CH04` has a complete forward first
+  pass over PDF pages 131–184, bringing Stage 3 to 302 guarded corrections;
+  its independent final-document pass remains open.
 - Source-review packs exist under `/tmp/ankos-stage3-publication/`,
   `/tmp/ankos-stage3-preface/`, `/tmp/ankos-stage3-ch02/`, and
   `/tmp/ankos-stage3-ch03/`. Page rasters are authoritative; native PDF text is
@@ -108,8 +109,8 @@ For each document:
 | 2 | `CH02` | 39–66 | final rebuilt document | COMPLETE | all 26 verified; no new discrepancy | closed |
 | 1 | `CH03` | 67–130 | `119521 → 199880` | COMPLETE | `G5-C-0133`–`G5-C-0193` | closed |
 | 2 | `CH03` | 67–130 | final rebuilt document and assets | COMPLETE | all 61 verified; no new discrepancy | closed |
-| 1 | `CH04` | 131–184 | `199880 → 355646` | NOT_STARTED | — | `pdf:0131` |
-| 2 | `CH04` | 131–184 | final rebuilt document | NOT_STARTED | — | `pdf:0131` |
+| 1 | `CH04` | 131–184 | `199880 → 355646` | COMPLETE | `G5-C-0194`–`G5-C-0302` | closed |
+| 2 | `CH04` | 131–184 | final rebuilt document and assets | IN_PROGRESS | independent review launched | `pdf:0131` |
 
 The first slice's exact page-to-raw map is:
 
@@ -146,7 +147,7 @@ The first slice's exact page-to-raw map is:
 
 ## Completion Requirements
 
-- [ ] Every source page from PDF 1 through 184 is accounted for in a complete
+- [x] Every source page from PDF 1 through 184 is accounted for in a complete
   forward first pass.
 - [ ] All six documents have a separate complete forward second pass against
   the final rebuilt Markdown.
@@ -291,7 +292,29 @@ captions, figure order, repaired assets, and the intentionally blank final
 page. It found no discrepancy or residual ambiguity, and the final document
 hash remained unchanged.
 
-Exact next action: review `CH04` forward from `pdf:0131`, raw line 1,368 and
-byte 199880 through `pdf:0184`, raw line 2,141 and byte 355646. Reconstruct the
-damaged numeric table and other technical/layout regions only from direct
-fixed-layout evidence, then encode guarded corrections and rebuild.
+`CH04` received a complete forward first pass over all 54 PDF pages 131–184.
+Its 109 source-verified corrections `G5-C-0194`–`G5-C-0302` restore the logical
+heading hierarchy, source punctuation and emphasis, technical notation,
+damaged numeric data, page-turn joins, compound figure captions, and canonical
+reading order. All 59 mapped visuals were checked in source order. Four
+source-added assets restore the chapter opener, a missing overview strip, a
+digit matrix, and the complete 4,000-digit pi plate; one damaged iterated-map
+asset uses a pinned repaired-only override. The final Markdown contains 63
+unique image references.
+
+Direct high-resolution source inspection reconstructed 11 headerless tables
+with 91 rows and 289 cells, including three exact 6×11 continuous-cellular-
+automaton matrices. Numeric sequences, base expansions, roots and logarithms,
+continued fractions, iterated maps, and partial differential equations received
+token-sensitive checks; continued-fraction values were independently
+recomputed at 500-digit precision. CommonMark/headless rendering of the full
+chapter and complex technical slices loaded every image and preserved the
+intended order. Residual OCR, Unicode, Markdown, formula, page-split, and
+backward defect-pattern scans found no unexplained hit. The rebuilt document's
+SHA-256 is
+`7fcf7d208707d94f03ff1b98b9ac7ed495b47fb1cea6428355e229d137fe2fdc`.
+
+Exact next action: complete the independent sequential second pass from
+`pdf:0131` through `pdf:0184` against the exact final document hash above and
+all 63 referenced assets. If it is clean, close Stage 3 and begin `CH05` at
+`pdf:0185`.

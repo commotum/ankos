@@ -280,9 +280,9 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions (four using source-backed
-  repaired-only overrides), four source-added images, and generated
-  README/Contents files. It now includes 193 guarded source-verified
+  documents, 1,444 mapped image positions (five using source-backed
+  repaired-only overrides), eight source-added images, and generated
+  README/Contents files. It now includes 302 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -334,6 +334,12 @@ Neither file is a generalized workflow database.
   repaired-only overrides. Focused tests, residual detectors, rendering,
   deterministic builds, and legacy checks pass. The final Markdown SHA-256 is
   `f948d0c45b8bec06b78e72e8e8fa8f807c37f7a0fd29d4b4dc43550bc8768f35`.
+- `CH04` has a complete forward first pass over all 54 PDF pages 131–184. Its
+  109 guarded corrections are `G5-C-0194`–`G5-C-0302`; all 59 mapped and four
+  source-added visuals were checked, one damaged figure uses a repaired-only
+  override, and 11 numeric tables were reconstructed from direct fixed-layout
+  evidence. The independent sequential pass against the final rebuilt
+  document and assets remains open.
 
 ## Stage Status
 

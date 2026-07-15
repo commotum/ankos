@@ -105,6 +105,19 @@ class ChapterFourTests(unittest.TestCase):
                 for row in relevant
             )
         )
+        self.assertEqual(
+            {
+                row["id"]: row["authoritative_location"]
+                for row in relevant
+                if row["id"] in {"G5-C-0195", "G5-C-0274", "G5-C-0293", "G5-C-0302"}
+            },
+            {
+                "G5-C-0195": "pdf:0132",
+                "G5-C-0274": "pdf:0169",
+                "G5-C-0293": "pdf:0180",
+                "G5-C-0302": "pdf:0183",
+            },
+        )
         self.assertTrue(
             all(
                 self.document["raw_start_byte"]
@@ -534,7 +547,7 @@ class ChapterFourTests(unittest.TestCase):
         rows = validate.validate_coverage(self.documents)
         chapter = next(row for row in rows if row["document_id"] == "CH04")
         self.assertEqual(
-            (chapter["first_pass"], chapter["second_pass"]), ("NO", "NO")
+            (chapter["first_pass"], chapter["second_pass"]), ("YES", "NO")
         )
 
 
