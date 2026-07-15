@@ -6,7 +6,9 @@ from __future__ import annotations
 from copy import deepcopy
 import hashlib
 import json
+import os
 from pathlib import Path
+import shutil
 import sys
 import tempfile
 import unittest
@@ -23,6 +25,12 @@ import validate_pipeline_schemas as schema_cli  # noqa: E402
 
 ZERO = "0" * 64
 EMPTY_SHA = hashlib.sha256(b"").hexdigest()
+VIEW_SHA = hashlib.sha256(b"independent-evidence-view").hexdigest()
+MONOLITH_PATH = ROOT / "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md"
+MONOLITH_BYTES = MONOLITH_PATH.read_bytes()
+GUARD_BYTES = MONOLITH_BYTES[:39]
+GUARD_TEXT = GUARD_BYTES.decode("utf-8")
+GUARD_SHA = hashlib.sha256(GUARD_BYTES).hexdigest()
 
 
 def projection(text: str) -> dict[str, str]:
@@ -79,7 +87,7 @@ def operation(kind: str, before: str, after: str, text: str | None = None) -> di
 
 
 def valid_repair() -> dict[str, object]:
-    return {
+    row: dict[str, object] = {
         "after_projection": projection("x"),
         "application_order": 0,
         "baseline_lock_sha256": lib.sha256_file(ROOT / "goal-4/baseline-lock.json"),
@@ -96,8 +104,8 @@ def valid_repair() -> dict[str, object]:
                 {
                     "evidence_id": "EVIDENCE-1",
                     "evidence_kind": "MECHANICAL_PROOF",
-                    "evidence_sha256": ZERO,
-                    "mechanical_proof_id": "proof",
+                    "evidence_sha256": EMPTY_SHA,
+                    "mechanical_proof_id": "IDENTITY_AUTHOR_PROJECTION_V1",
                     "permission_record_id": None,
                     "witness_region_ids": [],
                 }
@@ -108,12 +116,12 @@ def valid_repair() -> dict[str, object]:
         "guard": {
             "expected_occurrence_count": 1,
             "guard_kind": "PREIMAGE",
-            "preimage": "x",
-            "preimage_sha256": projection("x")["sha256"],
+            "preimage": GUARD_TEXT,
+            "preimage_sha256": GUARD_SHA,
             "raw_block_ids": ["RAW-000001"],
             "raw_source_path": "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md",
-            "raw_source_sha256": ZERO,
-            "span": {"end_byte_exclusive": 1, "sha256": projection("x")["sha256"], "start_byte": 0},
+            "raw_source_sha256": hashlib.sha256(MONOLITH_BYTES).hexdigest(),
+            "span": {"end_byte_exclusive": len(GUARD_BYTES), "sha256": GUARD_SHA, "start_byte": 0},
         },
         "inverse_operation": operation("MOVE", "x", "x"),
         "rationale": "Synthetic byte-preserving metadata operation.",
@@ -124,10 +132,21 @@ def valid_repair() -> dict[str, object]:
         "schema_version": "1.0.0",
         "target": {"canonical_document_id": None, "node_ids": ["NODE-1"], "path": "DERIVED/Contents.md", "role": "GENERATED_METADATA"},
         "unresolved_ids": [],
-        "verification_results": [{"check_id": "INVERSE", "details_sha256": ZERO, "passed": True}],
+        "verification_results": [],
         "witness_projection": None,
         "workflow": closed_workflow(),
     }
+    row["guard"]["expected_occurrence_count"] = MONOLITH_BYTES.count(GUARD_BYTES)
+    row["evidence"]["mechanical"][0]["evidence_sha256"] = lib.mechanical_proof_sha256(row)
+    row["verification_results"] = [
+        {
+            "check_id": check_id,
+            "details_sha256": lib.mechanical_check_sha256(row, check_id),
+            "passed": True,
+        }
+        for check_id in lib.MECHANICAL_CHECK_IDS
+    ]
+    return row
 
 
 def endpoint(kind: str, projection_sha: str, *, role: str | None, path: str | None) -> dict[str, object]:
@@ -185,32 +204,34 @@ def valid_navigation() -> dict[str, object]:
 
 
 def valid_figure() -> dict[str, object]:
+    baseline = lib.load_json(ROOT / "goal-4/corpus-manifest.json", require_cj1=True)
+    asset = next(row for row in baseline["raw_inputs"] if row["kind"] == "JPEG")
     return {
         "alt_text_sidecar_id": None,
         "asset_id": "ASSET-1",
         "asset_role": "GOVERNED_LEGACY_ASSET",
-        "asset_sha256": ZERO,
+        "asset_sha256": asset["sha256"],
         "association_state": "SOURCE_BLOCKED",
-        "byte_size": 1,
-        "canonical_document_id": "CH01",
+        "byte_size": asset["byte_size"],
+        "canonical_document_id": "COLOPHON",
         "caption_ownership_evidence_sha256": None,
         "caption_projection_sha256": None,
         "caption_span": None,
         "completeness_state": "UNKNOWN_SOURCE_BLOCKED",
         "component_order_evidence_sha256": None,
-        "dimensions": {"height": 1, "width": 1},
+        "dimensions": {"height": asset["image"]["height"], "width": asset["image"]["width"]},
         "figure_group_id": None,
         "grouping_evidence_sha256": None,
         "legacy_reference_ordinals": [1],
         "license_record_id": None,
-        "manifest_file_id": "RAW-FILE-0020",
+        "manifest_file_id": asset["file_id"],
         "ordered_component_asset_ids": [],
         "printed_group_ids": [],
         "raw_block_ids": ["RAW-000001"],
         "record_id": "FIGURE-1",
         "record_type": "ASSET_CANDIDATE",
         "redistribution_allowed": None,
-        "release_path": "ASSETS/LEGACY/example.jpeg",
+        "release_path": f"ASSETS/LEGACY/{asset['relative_path']}",
         "repair_ids": [],
         "review_ids": [],
         "scale_orientation_color_significance": None,
@@ -234,7 +255,7 @@ def valid_review() -> dict[str, object]:
         "decision_sha256": projection("synthetic")["sha256"],
         "disagrees_with_review_ids": [],
         "evidence_view_id": "EVIDENCE-1",
-        "evidence_view_sha256": ZERO,
+        "evidence_view_sha256": VIEW_SHA,
         "follow_up": None,
         "principal_id": "agent",
         "proposal_visible": False,
@@ -280,6 +301,20 @@ def valid_unresolved() -> dict[str, object]:
 
 def valid_compatibility() -> dict[str, object]:
     baseline = lib.load_json(ROOT / "goal-4/compatibility-baseline.json", require_cj1=True)
+    results = [
+        {
+            "argv": row["argv"],
+            "baseline_framed_behavior_sha256": row["framed_behavior_sha256"],
+            "current_framed_behavior_sha256": row["framed_behavior_sha256"],
+            "exit_code": row["exit_code"],
+            "identical": True,
+            "path": row["path"],
+            "status_kind": row["status_kind"],
+            "stderr_sha256": row["stderr"]["sha256"],
+            "stdout_sha256": row["stdout"]["sha256"],
+        }
+        for row in baseline["oracles"]
+    ]
     return {
         "aggregate_behavior_digest": baseline["behavior_digest"],
         "all_identical": True,
@@ -289,7 +324,7 @@ def valid_compatibility() -> dict[str, object]:
         "contract_id": "ANKOS-COMPATIBILITY-VERIFY-1",
         "dependency_fingerprint": baseline["closure"]["dependency_fingerprint_after"],
         "legacy_tree_digest": baseline["closure"]["legacy_tree_digest_after"],
-        "oracle_results": [],
+        "oracle_results": results,
         "phase": "ZERO_REPAIR_STAGING",
         "schema_version": "1.0.0",
         "sentinel_fixture_results": {"duplicate_basename_detected": True, "nested_markdown_detected": True},
@@ -339,6 +374,48 @@ def valid_release_manifest() -> dict[str, object]:
         "schema_version": "1.0.0",
         "tool_hashes": {},
         "two_clean_build_digests": [ZERO, ZERO],
+    }
+
+
+def valid_technical() -> dict[str, object]:
+    return {
+        "canonical_document_id": "PUBLICATION_AND_CONTENTS",
+        "changed_token_ids": [],
+        "node_id": "NODE-TECHNICAL-1",
+        "output_span": {
+            "end_byte_exclusive": len(GUARD_BYTES),
+            "sha256": GUARD_SHA,
+            "start_byte": 0,
+        },
+        "parse_check": "SOURCE_BLOCKED",
+        "program_count_classification": "NOT_APPLICABLE",
+        "raw_block_ids": ["RAW-000001"],
+        "render_check": "SOURCE_BLOCKED",
+        "repair_ids": [],
+        "schema_version": "1.0.0",
+        "source_projection": GUARD_TEXT,
+        "source_projection_sha256": GUARD_SHA,
+        "specialist_review_ids": [],
+        "technical_kind": "FORMULA",
+        "technical_span_id": "TECHNICAL-SPAN-1",
+        "tokens": [
+            {
+                "changed": False,
+                "evidence_ids": [],
+                "ordinal": 0,
+                "raw_sha256": GUARD_SHA,
+                "raw_text": GUARD_TEXT,
+                "repaired_text": None,
+                "review_ids": [],
+                "token_id": "TOKEN-1",
+                "token_kind": "RAW-TEXT",
+                "witness_text": None,
+            }
+        ],
+        "unresolved_ids": ["UNRESOLVED-WITNESS-0001"],
+        "witness_check": "SOURCE_BLOCKED",
+        "witness_region_ids": [],
+        "workflow": blocked_workflow(),
     }
 
 

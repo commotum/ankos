@@ -28,6 +28,8 @@ def _check(condition: bool, message: str) -> None:
 
 CONTRACT_SHA256 = "3fd15222dfac4735640056e2ae786e36d5e96638454a4741ac1662ebfba3b964"
 CONTRACT_FILE = "zero-repair-contract.json"
+IMPLEMENTATION_LOCK_FILE = "zero-repair-implementation-lock.json"
+IMPLEMENTATION_LOCK_SHA256 = "PENDING_IMPLEMENTATION_LOCK_SHA256"
 SCHEMA_VERSION = "1.0.0"
 CONTRACT_ID = "ANKOS-ZERO-REPAIR-1"
 LEGACY_RELATIVE = PurePosixPath("ref/A-New-Kind-of-Science")
@@ -41,8 +43,16 @@ TOOL_RELATIVES = (
     PurePosixPath("tools/validate_zero_repair.py"),
     PurePosixPath("tools/zero_repair_verify.py"),
 )
+LOCKED_RELATIVES = (
+    "zero-repair-contract.json",
+    "tools/build_zero_repair.py",
+    "tools/validate_zero_repair.py",
+    "tools/zero_repair_lib.py",
+    "tests/test_zero_repair.py",
+)
 FILE_MODE = 0o644
 DIRECTORY_MODE = 0o755
+VERIFICATION_BOUNDARY = "SAME_UID_NON_ADVERSARIAL_BETWEEN_FINAL_RECHECK_AND_RENAME"
 
 
 def _sha(payload: bytes) -> str:
@@ -162,6 +172,55 @@ def _plain_file(path: Path, label: str) -> bytes:
     return path.read_bytes()
 
 
+def _validate_runtime_and_implementation_lock(
+    goal: Path,
+    *,
+    expected_runtime_sha256: str | None,
+) -> tuple[str, dict[str, Any]]:
+    """Bind this running oracle to its declared path and one-way tool lock.
+
+    The implementation lock intentionally excludes this verifier.  The
+    verifier pins that lock; the enclosing Stage 4 proof pins the verifier.
+    This one-way chain avoids an impossible content-hash cycle.
+    """
+
+    declared = _join(goal, PurePosixPath("tools/zero_repair_verify.py"))
+    actual = _absolute(Path(__file__))
+    _check(actual == declared, "executed verifier path differs from declared Goal 4 verifier")
+    verifier_raw = _plain_file(declared, "declared independent verifier")
+    verifier_sha256 = _sha(verifier_raw)
+    if expected_runtime_sha256 is not None:
+        _check(
+            verifier_sha256 == expected_runtime_sha256,
+            "executed verifier hash differs from loader-declared verifier hash",
+        )
+
+    lock_path = goal / IMPLEMENTATION_LOCK_FILE
+    lock_raw = _plain_file(lock_path, "zero-repair implementation lock")
+    _check(_sha(lock_raw) == IMPLEMENTATION_LOCK_SHA256, "zero-repair implementation lock hash drift")
+    lock = _json(lock_raw, "zero-repair implementation lock", canonical=True)
+    _check(
+        isinstance(lock, dict)
+        and lock.get("lock_id") == "ANKOS-ZERO-REPAIR-IMPLEMENTATION-LOCK-1"
+        and lock.get("schema_version") == SCHEMA_VERSION,
+        "zero-repair implementation lock identity drift",
+    )
+    artifacts = lock.get("artifacts")
+    _check(isinstance(artifacts, list), "zero-repair implementation lock artifacts missing")
+    _check(
+        [row.get("path") for row in artifacts if isinstance(row, dict)] == list(LOCKED_RELATIVES),
+        "zero-repair implementation lock path set/order drift",
+    )
+    for row in artifacts:
+        _check(isinstance(row, dict), "zero-repair implementation lock artifact type drift")
+        relative = _relative(row.get("path"), "implementation-lock artifact path")
+        payload = _plain_file(_join(goal, relative), f"locked artifact {relative.as_posix()}")
+        _check(row.get("type") == "REGULAR_FILE", f"locked artifact type drift: {relative.as_posix()}")
+        _check(row.get("byte_size") == len(payload), f"locked artifact size drift: {relative.as_posix()}")
+        _check(row.get("sha256") == _sha(payload), f"locked artifact hash drift: {relative.as_posix()}")
+    return verifier_sha256, lock
+
+
 def _relative(value: Any, label: str) -> PurePosixPath:
     _check(isinstance(value, str) and bool(value), f"{label} is not a nonempty string")
     _check("\\" not in value and "\x00" not in value and "%" not in value, f"{label} spelling is unsafe")
@@ -215,7 +274,17 @@ def _file_record(path: str, role: str, raw: bytes) -> dict[str, Any]:
     }
 
 
-def _load_source(repo: Path, goal: Path, legacy: Path) -> dict[str, Any]:
+def _load_source(
+    repo: Path,
+    goal: Path,
+    legacy: Path,
+    *,
+    expected_runtime_sha256: str | None,
+) -> dict[str, Any]:
+    verifier_sha256, implementation_lock = _validate_runtime_and_implementation_lock(
+        goal,
+        expected_runtime_sha256=expected_runtime_sha256,
+    )
     contract_raw = _plain_file(goal / CONTRACT_FILE, "zero-repair contract")
     _check(_sha(contract_raw) == CONTRACT_SHA256, "zero-repair contract hash drift")
     contract = _json(contract_raw, "zero-repair contract", canonical=True)
@@ -349,13 +418,16 @@ def _load_source(repo: Path, goal: Path, legacy: Path) -> dict[str, Any]:
     return {
         "contract": contract,
         "contract_sha256": CONTRACT_SHA256,
+        "implementation_lock": implementation_lock,
+        "implementation_lock_sha256": IMPLEMENTATION_LOCK_SHA256,
         "documents": documents,
         "segments": segments,
         "blocks": blocks,
         "monolith": monolith,
         "source_sequence": _source_sequence(blocks),
         "tool_sources": tool_sources,
-        "inputs": [goal / CONTRACT_FILE, *sources.values(), *tool_paths],
+        "verifier_sha256": verifier_sha256,
+        "inputs": [goal / CONTRACT_FILE, goal / IMPLEMENTATION_LOCK_FILE, *sources.values(), *tool_paths],
     }
 
 

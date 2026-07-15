@@ -736,23 +736,57 @@ class AuthorityGrant:
 
     repair_id: str
     target_id: str
+    target_path: str
+    raw_source_id: str
+    raw_source_span_sha256: str
+    raw_source_row_sha256: str
     target_role: str
     operation_projection_sha256: str
+    validated_risk_tags: tuple[str, ...]
+    validated_ast_impact: tuple[str, ...]
     witness_id: str | None
     witness_region_id: str | None
     witness_region_sha256: str | None
     review_id: str | None
+    review_row_sha256: str | None
     specialist_review_id: str | None
+    specialist_review_row_sha256: str | None
 
     def __post_init__(self) -> None:
         _require_id(self.repair_id, "authority repair_id")
         _require_id(self.target_id, "authority target_id")
+        _require_relative_path(self.target_path, "authority target_path")
+        _require_id(self.raw_source_id, "authority raw_source_id")
+        _require_sha256(
+            self.raw_source_span_sha256, "authority raw source span SHA-256"
+        )
+        _require_sha256(
+            self.raw_source_row_sha256, "authority raw source row SHA-256"
+        )
         if self.target_role != CANONICAL_AUTHOR_TEXT:
             raise SchemaError("authority grants are only for canonical author text")
         _require_sha256(
             self.operation_projection_sha256,
             "authority operation projection SHA-256",
         )
+        for values, allowed, field_name in (
+            (
+                self.validated_risk_tags,
+                VALIDATED_OPERATION_TAGS,
+                "authority validated_risk_tags",
+            ),
+            (
+                self.validated_ast_impact,
+                VALIDATED_AST_IMPACTS,
+                "authority validated_ast_impact",
+            ),
+        ):
+            if type(values) is not tuple:
+                raise SchemaError(f"{field_name} must be an immutable tuple")
+            if len(values) != len(set(values)) or tuple(sorted(values)) != values:
+                raise SchemaError(f"{field_name} must be sorted and unique")
+            if set(values).difference(allowed):
+                raise SchemaError(f"{field_name} contains an unknown value")
         for value, field_name in (
             (self.witness_id, "authority witness_id"),
             (self.witness_region_id, "authority witness_region_id"),
@@ -766,6 +800,15 @@ class AuthorityGrant:
                 self.witness_region_sha256,
                 "authority witness region SHA-256",
             )
+        for value, field_name in (
+            (self.review_row_sha256, "authority review row SHA-256"),
+            (
+                self.specialist_review_row_sha256,
+                "authority specialist review row SHA-256",
+            ),
+        ):
+            if value is not None:
+                _require_sha256(value, field_name)
 
 
 def _authority_integrity_sha256(
@@ -801,8 +844,9 @@ class ApplicationAuthority:
     The overlay primitive never reads the registry or filesystem.  Production
     code must call ``_application_authority_from_validated_registry`` only
     after its independent validator has authenticated the supplied lock,
-    registry, target identities, and grants.  The public default is blocked;
-    the sole public OPEN constructor is explicitly test-only.
+    registry, target identities, and grants.  The production bridge cannot
+    mint synthetic authority; only the private test fixture can do so, and
+    public ``apply_overlays`` rejects that fixture unconditionally.
     """
 
     gate_state: str
@@ -856,7 +900,7 @@ class ApplicationAuthority:
             raise SchemaError("application authority integrity guard failed")
 
 
-def _application_authority_from_validated_registry(
+def _seal_application_authority(
     *,
     gate_state: str,
     baseline_lock_sha256: str,
@@ -866,15 +910,8 @@ def _application_authority_from_validated_registry(
     initial_state_sha256: str,
     ordered_batch_sha256: str,
     grants: tuple[AuthorityGrant, ...],
-    synthetic_test_only: bool = False,
+    synthetic_test_only: bool,
 ) -> ApplicationAuthority:
-    """Validator boundary: seal an already validated authoritative registry.
-
-    This leading-underscore factory is deliberately not a general public
-    authority mint.  Its caller is the higher-level validator responsible for
-    establishing the external trust root; this primitive verifies all joins.
-    """
-
     if type(grants) is not tuple:
         raise SchemaError("validated authority grants must be an immutable tuple")
     integrity = _authority_integrity_sha256(
@@ -903,6 +940,32 @@ def _application_authority_from_validated_registry(
     )
 
 
+def _application_authority_from_validated_registry(
+    *,
+    gate_state: str,
+    baseline_lock_sha256: str,
+    witness_lock_sha256: str,
+    registry_sha256: str,
+    validator_proof_sha256: str,
+    initial_state_sha256: str,
+    ordered_batch_sha256: str,
+    grants: tuple[AuthorityGrant, ...],
+) -> ApplicationAuthority:
+    """Production bridge for a higher-level, externally validated registry."""
+
+    return _seal_application_authority(
+        gate_state=gate_state,
+        baseline_lock_sha256=baseline_lock_sha256,
+        witness_lock_sha256=witness_lock_sha256,
+        registry_sha256=registry_sha256,
+        validator_proof_sha256=validator_proof_sha256,
+        initial_state_sha256=initial_state_sha256,
+        ordered_batch_sha256=ordered_batch_sha256,
+        grants=grants,
+        synthetic_test_only=False,
+    )
+
+
 def _authority_grant_for(record: Operation) -> AuthorityGrant:
     meta = record.meta
     witness = meta.witness
@@ -910,17 +973,27 @@ def _authority_grant_for(record: Operation) -> AuthorityGrant:
     return AuthorityGrant(
         repair_id=meta.repair_id,
         target_id=meta.target_id,
+        target_path=meta.target_path,
+        raw_source_id=meta.raw_source_id,
+        raw_source_span_sha256=meta.raw_source_span_sha256,
+        raw_source_row_sha256=meta.raw_source_row_sha256,
         target_role=meta.target_role,
         operation_projection_sha256=operation_projection_sha256(record),
+        validated_risk_tags=meta.validated_risk_tags,
+        validated_ast_impact=meta.validated_ast_impact,
         witness_id=None if witness is None else witness.witness_id,
         witness_region_id=None if witness is None else witness.region_id,
         witness_region_sha256=None if witness is None else witness.region_sha256,
         review_id=None if review is None else review.review_id,
+        review_row_sha256=None if review is None else review.review_row_sha256,
         specialist_review_id=None if review is None else review.specialist_review_id,
+        specialist_review_row_sha256=(
+            None if review is None else review.specialist_review_row_sha256
+        ),
     )
 
 
-def test_only_application_authority(
+def _test_only_application_authority(
     initial: OverlayState, records: Iterable[Operation]
 ) -> ApplicationAuthority:
     """Seal a synthetic OPEN authority for unit tests only.
@@ -941,7 +1014,7 @@ def test_only_application_authority(
     registry_sha256 = _projection_sha256(
         b"ANKOS-OVERLAY-SYNTHETIC-REGISTRY-2", grants
     )
-    return _application_authority_from_validated_registry(
+    return _seal_application_authority(
         gate_state="OPEN",
         baseline_lock_sha256=sha256_bytes(b"TEST-ONLY-BASELINE-LOCK"),
         witness_lock_sha256=sha256_bytes(b"TEST-ONLY-WITNESS-LOCK"),
@@ -1293,6 +1366,7 @@ def _validate_review(
     if review.source_decision != "APPROVED":
         raise EvidenceError(f"{repair_id}: source review is not approved")
     _require_sha256(review.evidence_view_sha256, "review evidence view SHA-256")
+    _require_sha256(review.review_row_sha256, "validated source review row SHA-256")
     witness = meta.witness
     if witness is None:
         raise EvidenceError(f"{repair_id}: review cannot bind an absent witness")
@@ -1305,38 +1379,86 @@ def _validate_review(
         if review.specialist_review_id is None:
             raise EvidenceError(f"{repair_id}: high-risk repair lacks specialist review ID")
         _require_id(review.specialist_review_id, "specialist review_id")
+        if review.specialist_review_id == review.review_id:
+            raise EvidenceError(f"{repair_id}: source and specialist review IDs must be distinct")
         if not review.specialist_principal_id:
             raise EvidenceError(f"{repair_id}: high-risk repair lacks specialist review")
         if review.specialist_principal_id == meta.creator_principal_id:
             raise EvidenceError(f"{repair_id}: creator cannot specialist-review the repair")
+        if review.specialist_principal_id == review.source_reviewer_principal_id:
+            raise EvidenceError(
+                f"{repair_id}: source reviewer and specialist reviewer must be distinct"
+            )
         if review.specialist_type not in PRINCIPAL_TYPES:
             raise EvidenceError(f"{repair_id}: unknown specialist reviewer type")
         _require_nonempty_text(review.specialist_session_id or "", "specialist session ID")
+        if review.specialist_role != "SPECIALIST_REVIEWER":
+            raise EvidenceError(f"{repair_id}: specialist role is not SPECIALIST_REVIEWER")
+        if not isinstance(review.specialist_specialty, str) or not review.specialist_specialty.strip():
+            raise EvidenceError(f"{repair_id}: high-risk repair lacks specialist specialty")
         if review.specialist_decision != "APPROVED":
             raise EvidenceError(f"{repair_id}: specialist review is not approved")
         if review.specialist_evidence_view_sha256 != witness.evidence_view_sha256:
             raise EvidenceError(f"{repair_id}: specialist evidence-view hash mismatch")
+        if review.specialist_review_row_sha256 is None:
+            raise EvidenceError(f"{repair_id}: high-risk repair lacks specialist review row")
+        _require_sha256(
+            review.specialist_review_row_sha256,
+            "validated specialist review row SHA-256",
+        )
 
 
-def _markdown_structure_signature(blocks: Sequence[Block]) -> tuple[tuple[str, int], ...]:
-    """Return byte-level Markdown marker locations without trusting repair class."""
+def _markdown_structure_signature(blocks: Sequence[Block]) -> tuple[tuple[object, ...], ...]:
+    """Return conservative byte-level structure independent of caller class."""
 
-    markers: list[tuple[str, int]] = []
+    markers: list[tuple[object, ...]] = []
     line_number = 0
-    for block in blocks:
+    previous_blank = True
+    for block_index, block in enumerate(blocks):
+        markers.append(("BLOCK_START", block_index, line_number + 1))
         for line in block.data.splitlines():
             line_number += 1
             stripped = line.lstrip()
-            if re.match(rb"#{1,6}(?:[ \t]|$)", stripped):
-                markers.append(("ATX_HEADING", line_number))
-            if stripped.startswith((b"```", b"~~~")):
-                markers.append(("FENCE", line_number))
-            if re.match(rb"(?:[-+*]|[0-9]+[.)])[ \t]+", stripped):
-                markers.append(("LIST", line_number))
+            if not stripped:
+                markers.append(("BLANK", line_number))
+                previous_blank = True
+                continue
+            if previous_blank:
+                markers.append(("PARAGRAPH_START", line_number))
+            previous_blank = False
+            heading = re.match(rb"(#{1,6})(?:[ \t]|$)", stripped)
+            if heading:
+                markers.append(("ATX_HEADING", line_number, len(heading.group(1))))
+            fence = re.match(rb"(`{3,}|~{3,})", stripped)
+            if fence:
+                markers.append(
+                    ("FENCE", line_number, fence.group(1)[:1], len(fence.group(1)))
+                )
+            list_marker = re.match(rb"((?:[-+*]|[0-9]+[.)]))[ \t]+", stripped)
+            if list_marker:
+                markers.append(
+                    ("LIST", line_number, len(line) - len(stripped), list_marker.group(1))
+                )
             if stripped.startswith(b">"):
                 markers.append(("QUOTE", line_number))
             if b"|" in line:
-                markers.append(("TABLE_CANDIDATE", line_number))
+                delimiter = bool(
+                    re.fullmatch(
+                        rb"[ \t]*\|?[ \t]*:?-{3,}:?[ \t]*(?:\|[ \t]*:?-{3,}:?[ \t]*)+\|?[ \t]*",
+                        line,
+                    )
+                )
+                markers.append(("TABLE", line_number, line.count(b"|"), delimiter))
+            if line.startswith((b"    ", b"\t")):
+                markers.append(("INDENTED_CODE", line_number))
+            backticks = line.count(b"`")
+            if backticks:
+                markers.append(("INLINE_CODE_DELIMITERS", line_number, backticks))
+            dollars = line.count(b"$")
+            math_delimiters = dollars + line.count(b"\\(") + line.count(b"\\)")
+            math_delimiters += line.count(b"\\[") + line.count(b"\\]")
+            if math_delimiters:
+                markers.append(("MATH_DELIMITERS", line_number, math_delimiters))
     return tuple(markers)
 
 
@@ -1358,15 +1480,19 @@ def _validate_evidence(
         if meta.review is None:
             raise EvidenceError(f"{meta.repair_id}: author-text repair lacks independent review")
         _validate_witness(meta.witness, meta.repair_id)
-        # Classification is caller-controlled, so it cannot lower risk.  A
-        # Markdown marker change such as ``Title`` -> ``# Title`` is detected
-        # independently, and every canonical semantic overlay is conservatively
-        # specialist-reviewed even when its declared class is merely PROSE_OCR.
+        # Risk is a frozen union of the declared class and validator-controlled
+        # operation/AST tags.  Conservative byte-level structure detection is
+        # an additional guard which caller-controlled PROSE_OCR cannot suppress.
         structure_changed = (
             _markdown_structure_signature(before)
             != _markdown_structure_signature(after)
         )
-        high_risk = structure_changed or meta.target_role == CANONICAL_AUTHOR_TEXT
+        high_risk = (
+            meta.repair_class in HIGH_RISK_CLASSES
+            or bool(set(meta.validated_risk_tags).intersection(HIGH_RISK_OPERATION_TAGS))
+            or bool(set(meta.validated_ast_impact).intersection(HIGH_RISK_AST_IMPACTS))
+            or structure_changed
+        )
         _validate_review(meta, meta.review, high_risk=high_risk)
         return
 
@@ -1418,23 +1544,39 @@ def _validate_application_authority(
         review = meta.review
         expected_join = (
             meta.target_id,
+            meta.target_path,
+            meta.raw_source_id,
+            meta.raw_source_span_sha256,
+            meta.raw_source_row_sha256,
             meta.target_role,
             operation_projection_sha256(record),
+            meta.validated_risk_tags,
+            meta.validated_ast_impact,
             None if witness is None else witness.witness_id,
             None if witness is None else witness.region_id,
             None if witness is None else witness.region_sha256,
             None if review is None else review.review_id,
+            None if review is None else review.review_row_sha256,
             None if review is None else review.specialist_review_id,
+            None if review is None else review.specialist_review_row_sha256,
         )
         actual_join = (
             grant.target_id,
+            grant.target_path,
+            grant.raw_source_id,
+            grant.raw_source_span_sha256,
+            grant.raw_source_row_sha256,
             grant.target_role,
             grant.operation_projection_sha256,
+            grant.validated_risk_tags,
+            grant.validated_ast_impact,
             grant.witness_id,
             grant.witness_region_id,
             grant.witness_region_sha256,
             grant.review_id,
+            grant.review_row_sha256,
             grant.specialist_review_id,
+            grant.specialist_review_row_sha256,
         )
         if actual_join != expected_join:
             raise EvidenceError(f"{meta.repair_id}: authoritative registry join mismatch")
@@ -1451,7 +1593,7 @@ INVERSE_NAMES = {
 }
 
 
-def apply_overlays(
+def _apply_overlays_core(
     initial: OverlayState,
     records: Iterable[Operation],
     *,
@@ -1553,6 +1695,38 @@ def apply_overlays(
         integrity_sha256=replay_integrity,
         _seal=_REPLAY_SEAL,
     )
+
+
+def apply_overlays(
+    initial: OverlayState,
+    records: Iterable[Operation],
+    *,
+    authority: ApplicationAuthority | None = None,
+) -> ReplayResult:
+    """Production overlay entrypoint; synthetic authorities always fail."""
+
+    if isinstance(authority, ApplicationAuthority) and authority.synthetic_test_only:
+        raise EvidenceError("production apply_overlays rejects synthetic test-only authority")
+    return _apply_overlays_core(initial, records, authority=authority)
+
+
+def _test_only_apply_overlays(
+    initial: OverlayState,
+    records: Iterable[Operation],
+    *,
+    authority: ApplicationAuthority | None = None,
+) -> ReplayResult:
+    """Private unit-test executor for explicitly synthetic authority only."""
+
+    closed_records = tuple(records)
+    synthetic = (
+        _test_only_application_authority(initial, closed_records)
+        if authority is None
+        else authority
+    )
+    if not isinstance(synthetic, ApplicationAuthority) or not synthetic.synthetic_test_only:
+        raise EvidenceError("test-only overlay executor requires synthetic authority")
+    return _apply_overlays_core(initial, closed_records, authority=synthetic)
 
 
 def inverse_replay(result: ReplayResult, state: OverlayState | None = None) -> OverlayState:
@@ -1663,5 +1837,4 @@ __all__ = [
     "ordered_operations_sha256",
     "sha256_bytes",
     "target_sha256",
-    "test_only_application_authority",
 ]

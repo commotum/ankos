@@ -49,7 +49,8 @@ from overlay_lib import (  # noqa: E402
     inverse_replay,
     sha256_bytes,
     target_sha256,
-    test_only_application_authority,
+    _test_only_application_authority,
+    _test_only_apply_overlays,
 )
 
 
@@ -58,6 +59,10 @@ SOURCE_REVIEWER = "principal-source-reviewer"
 SPECIALIST = "principal-specialist"
 VIEW_SHA256 = sha256_bytes(b"sealed evidence view")
 REGION_SHA256 = sha256_bytes(b"edition-identical page region")
+REVIEW_ROW_SHA256 = sha256_bytes(b"validated source review row")
+SPECIALIST_ROW_SHA256 = sha256_bytes(b"validated specialist review row")
+RAW_SPAN_SHA256 = sha256_bytes(b"raw source span")
+RAW_ROW_SHA256 = sha256_bytes(b"validated raw source row")
 TEST_TARGET = "CHAPTER-01"
 
 
@@ -97,13 +102,17 @@ def review(*, high_risk: bool = False, **changes: object) -> IndependentReview:
         "source_reviewer_role": "SOURCE_REVIEWER",
         "source_decision": "APPROVED",
         "evidence_view_sha256": VIEW_SHA256,
+        "review_row_sha256": REVIEW_ROW_SHA256,
         "blind_preproposal": high_risk,
         "specialist_review_id": "REVIEW-SPECIALIST-0001" if high_risk else None,
         "specialist_principal_id": SPECIALIST if high_risk else None,
         "specialist_type": "AGENT" if high_risk else None,
         "specialist_session_id": "specialist-session-1" if high_risk else None,
+        "specialist_role": "SPECIALIST_REVIEWER" if high_risk else None,
+        "specialist_specialty": "MARKDOWN_AND_TECHNICAL_TEXT" if high_risk else None,
         "specialist_decision": "APPROVED" if high_risk else None,
         "specialist_evidence_view_sha256": VIEW_SHA256 if high_risk else None,
+        "specialist_review_row_sha256": SPECIALIST_ROW_SHA256 if high_risk else None,
     }
     values.update(changes)
     return IndependentReview(**values)  # type: ignore[arg-type]
@@ -117,12 +126,20 @@ def meta_for(
     role: str = CANONICAL_AUTHOR_TEXT,
     target_id: str = TEST_TARGET,
     repair_class: str = PROSE_OCR,
+    validated_risk_tags: tuple[str, ...] = (),
+    validated_ast_impact: tuple[str, ...] = (),
     dependencies: tuple[str, ...] = (),
     author_evidence: bool = True,
-    high_risk_review: bool = True,
+    high_risk_review: bool | None = None,
     witness_value: WitnessEvidence | None = None,
     review_value: IndependentReview | None = None,
 ) -> OperationMeta:
+    if high_risk_review is None:
+        high_risk_review = repair_class in {
+            STRUCTURE_BOUNDARY,
+            MARKDOWN_STRUCTURE,
+            FORMULA_OR_SYMBOL,
+        } or bool(validated_risk_tags or validated_ast_impact)
     if author_evidence:
         witness_value = witness_value if witness_value is not None else witness()
         review_value = review_value if review_value is not None else review(high_risk=high_risk_review)
@@ -132,6 +149,10 @@ def meta_for(
     return OperationMeta(
         repair_id=repair_id,
         target_id=target_id,
+        target_path=f"book/{target_id}.md",
+        raw_source_id="RAW-SOURCE-0001",
+        raw_source_span_sha256=RAW_SPAN_SHA256,
+        raw_source_row_sha256=RAW_ROW_SHA256,
         target_role=role,
         repair_class=repair_class,
         expected_target_sha256=before.target_sha256(role, target_id),
@@ -139,6 +160,8 @@ def meta_for(
         creator_principal_id=CREATOR,
         workflow_state="CLOSED",
         final_disposition=disposition,
+        validated_risk_tags=validated_risk_tags,
+        validated_ast_impact=validated_ast_impact,
         dependencies=dependencies,
         witness=witness_value,
         review=review_value,
@@ -153,12 +176,7 @@ def apply_overlays(
 ) -> ReplayResult:
     """Unit-test convenience: use the conspicuous synthetic authority factory."""
 
-    closed = tuple(records)  # type: ignore[arg-type]
-    return _raw_apply_overlays(
-        initial,
-        closed,
-        authority=test_only_application_authority(initial, closed),
-    )
+    return _test_only_apply_overlays(initial, records)  # type: ignore[arg-type]
 
 
 class OverlaySuccessTests(unittest.TestCase):
@@ -422,7 +440,7 @@ class OverlayMutationTests(unittest.TestCase):
         repair_class: str = PROSE_OCR,
         role: str = CANONICAL_AUTHOR_TEXT,
         author_evidence: bool = True,
-        high_risk_review: bool = True,
+        high_risk_review: bool | None = None,
         witness_value: WitnessEvidence | None = None,
         review_value: IndependentReview | None = None,
     ) -> tuple[OverlayState, Replace]:
@@ -773,7 +791,9 @@ class OverlayMutationTests(unittest.TestCase):
 
     def test_authority_is_sealed_and_exact_operation_join_is_required(self) -> None:
         initial, record = self.replacement_fixture()
-        authority = test_only_application_authority(initial, [record])
+        authority = _test_only_application_authority(initial, [record])
+        with self.assertRaisesRegex(EvidenceError, "rejects synthetic test-only"):
+            _raw_apply_overlays(initial, [record], authority=authority)
         with self.assertRaisesRegex(SchemaError, "integrity guard"):
             replace(authority, registry_sha256="0" * 64)
         with self.assertRaisesRegex(SchemaError, "sealed by the registry validator"):
@@ -800,7 +820,97 @@ class OverlayMutationTests(unittest.TestCase):
             ),
         )
         with self.assertRaisesRegex(EvidenceError, "ordered-operation binding mismatch"):
-            _raw_apply_overlays(initial, [fabricated_join], authority=authority)
+            _test_only_apply_overlays(initial, [fabricated_join], authority=authority)
+
+    def test_low_risk_prose_needs_source_review_but_not_specialist(self) -> None:
+        initial, record = self.replacement_fixture(high_risk_review=False)
+        assert record.meta.review is not None
+        self.assertIsNone(record.meta.review.specialist_review_id)
+        result = apply_overlays(initial, [record])
+        self.assertEqual(result.state.blocks(CANONICAL_AUTHOR_TEXT)[0].text(), "good value")
+
+        no_source_review = replace(record, meta=replace(record.meta, review=None))
+        with self.assertRaisesRegex(EvidenceError, "lacks independent review"):
+            apply_overlays(initial, [no_source_review])
+
+    def test_frozen_risk_tags_and_ast_impact_require_specialist(self) -> None:
+        for field, value in (
+            ("validated_risk_tags", ("CODE_SEMANTICS",)),
+            ("validated_ast_impact", ("HEADING_DEPTH",)),
+        ):
+            with self.subTest(field=field):
+                initial = state_for((Block("RAW-000001", "bad value"),))
+                after = (Block("RAW-000001", "good value"),)
+                meta_kwargs = {field: value}
+                record = Replace(
+                    meta_for(
+                        initial,
+                        after,
+                        repair_id="REPAIR-0610",
+                        high_risk_review=False,
+                        **meta_kwargs,  # type: ignore[arg-type]
+                    ),
+                    "RAW-000001",
+                    initial.blocks(CANONICAL_AUTHOR_TEXT)[0].sha256,
+                    "bad",
+                    "good",
+                    1,
+                )
+                with self.assertRaisesRegex(EvidenceError, "blind preproposal"):
+                    apply_overlays(initial, [record])
+
+    def test_source_and_specialist_reviews_are_distinct_and_typed(self) -> None:
+        cases = (
+            (
+                {"specialist_principal_id": SOURCE_REVIEWER},
+                "source reviewer and specialist reviewer must be distinct",
+            ),
+            (
+                {"specialist_review_id": "REVIEW-SOURCE-0001"},
+                "review IDs must be distinct",
+            ),
+            ({"specialist_role": "SOURCE_REVIEWER"}, "specialist role"),
+            ({"specialist_specialty": ""}, "specialist specialty"),
+        )
+        for changes, message in cases:
+            with self.subTest(message=message):
+                initial, record = self.replacement_fixture(
+                    repair_class=FORMULA_OR_SYMBOL,
+                    review_value=review(high_risk=True, **changes),
+                )
+                with self.assertRaisesRegex(EvidenceError, message):
+                    apply_overlays(initial, [record])
+
+    def test_structural_impacts_cannot_hide_under_prose_class(self) -> None:
+        cases = (
+            ("# Title\n", "## Title\n", "heading-depth"),
+            ("first\nsecond\n", "first\n\nsecond\n", "paragraph"),
+            ("item\n", "- item\n", "list"),
+            ("code\n", "```\ncode\n```\n", "fence"),
+            ("a b\n", "| a | b |\n", "table"),
+            ("x\n", "$x$\n", "math"),
+            ("x\n", "`x`\n", "code"),
+        )
+        for index, (before_text, after_text, label) in enumerate(cases):
+            with self.subTest(label=label):
+                initial = state_for((Block("RAW-000001", before_text),))
+                after = (Block("RAW-000001", after_text),)
+                record = Replace(
+                    meta_for(
+                        initial,
+                        after,
+                        repair_id=f"REPAIR-07{index:02d}",
+                        repair_class=PROSE_OCR,
+                        high_risk_review=False,
+                    ),
+                    "RAW-000001",
+                    initial.blocks(CANONICAL_AUTHOR_TEXT)[0].sha256,
+                    before_text,
+                    after_text,
+                    1,
+                )
+                with self.assertRaisesRegex(EvidenceError, "blind preproposal"):
+                    apply_overlays(initial, [record])
 
     def test_prose_class_cannot_spoof_markdown_structure_risk(self) -> None:
         initial = state_for((Block("RAW-000001", "Title\n"),))
@@ -819,9 +929,9 @@ class OverlayMutationTests(unittest.TestCase):
             "# Title",
             1,
         )
-        authority = test_only_application_authority(initial, [record])
+        authority = _test_only_application_authority(initial, [record])
         with self.assertRaisesRegex(EvidenceError, "blind preproposal"):
-            _raw_apply_overlays(initial, [record], authority=authority)
+            _test_only_apply_overlays(initial, [record], authority=authority)
 
     def test_canonical_split_has_no_mechanical_bypass(self) -> None:
         original = Block("RAW-000001", b"alphabeta")
@@ -840,9 +950,9 @@ class OverlayMutationTests(unittest.TestCase):
             parts,
             1,
         )
-        authority = test_only_application_authority(initial, [record])
+        authority = _test_only_application_authority(initial, [record])
         with self.assertRaisesRegex(EvidenceError, "not applicable"):
-            _raw_apply_overlays(initial, [record], authority=authority)
+            _test_only_apply_overlays(initial, [record], authority=authority)
 
     def test_state_deep_normalizes_mutable_direct_inputs(self) -> None:
         blocks = [Block("RAW-000001", b"stable")]
@@ -908,8 +1018,8 @@ class OverlayMutationTests(unittest.TestCase):
             b"good",
             1,
         )
-        authority = test_only_application_authority(initial, [record])
-        result = _raw_apply_overlays(initial, [record], authority=authority)
+        authority = _test_only_application_authority(initial, [record])
+        result = _test_only_apply_overlays(initial, [record], authority=authority)
         self.assertEqual(
             result.state.blocks(CANONICAL_AUTHOR_TEXT, "CHAPTER-02"), second
         )
@@ -917,7 +1027,7 @@ class OverlayMutationTests(unittest.TestCase):
             initial.blocks(CANONICAL_AUTHOR_TEXT)
         wrong_target = replace(record, meta=replace(record.meta, target_id="CHAPTER-02"))
         with self.assertRaisesRegex(EvidenceError, "ordered-operation binding mismatch"):
-            _raw_apply_overlays(initial, [wrong_target], authority=authority)
+            _test_only_apply_overlays(initial, [wrong_target], authority=authority)
 
     def test_forged_receipt_and_replay_context_fail_integrity(self) -> None:
         initial, record = self.replacement_fixture()

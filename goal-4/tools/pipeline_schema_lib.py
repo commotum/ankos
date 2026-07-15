@@ -713,6 +713,14 @@ def validate_repair(record: Mapping[str, Any], registry: SchemaRegistry) -> None
     _validate_evidence(record, registry)
     if CLASS_ROLES[record["repair_class"]] != record["target"]["role"]:
         raise PipelineSchemaError("repair class crossed its frozen target role")
+    target = record["target"]
+    indexes = _frozen_indexes(registry)
+    if target["role"] == "CANONICAL_AUTHOR_TEXT":
+        document = indexes["documents_by_id"].get(target["canonical_document_id"])
+        if document is None or target["path"] != document["path"]:
+            raise PipelineSchemaError("canonical repair target does not join guardrail document/path")
+    elif target["canonical_document_id"] is not None:
+        raise PipelineSchemaError("noncanonical repair target claims a canonical document ID")
     class_tags = record["risk"]["class_tags"]
     if not class_tags or record["repair_class"] not in class_tags:
         raise PipelineSchemaError("risk class-tag union omits the primary repair class")
@@ -775,6 +783,18 @@ def validate_repair(record: Mapping[str, Any], registry: SchemaRegistry) -> None
         joined = guard["left_anchor"]["text"].encode("utf-8") + guard["right_anchor"]["text"].encode("utf-8")
         if raw_source.count(joined) != guard["expected_adjacency_count"]:
             raise PipelineSchemaError("two-sided expected-adjacency count differs from frozen source")
+    if target["role"] == "CANONICAL_AUTHOR_TEXT":
+        guard_block_ids = (
+            guard["raw_block_ids"]
+            if guard["guard_kind"] == "PREIMAGE"
+            else [guard["left_anchor"]["raw_block_id"], guard["right_anchor"]["raw_block_id"]]
+        )
+        if any(
+            indexes["blocks_by_id"][block_id]["canonical_document_id"]
+            != target["canonical_document_id"]
+            for block_id in guard_block_ids
+        ):
+            raise PipelineSchemaError("canonical repair target does not match guarded raw document")
     forward = record["forward_operation"]
     inverse = record["inverse_operation"]
     for label, operation in (("forward", forward), ("inverse", inverse)):
@@ -964,15 +984,145 @@ def _required_specialty(record: Mapping[str, Any]) -> str:
 def validate_provenance(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
     registry.validate("goal-4/schemas/provenance-record.schema.json", record)
     kind = record["mapping_kind"]
+    source = record["source"]
+    target = record["target"]
+    for label, endpoint in (("source", source), ("target", target)):
+        path = endpoint["path"]
+        if path is not None:
+            _safe_repo_path(path, f"provenance {label} path")
+        if endpoint["role"] is not None and endpoint["role"] not in RELEASE_ROLES:
+            raise PipelineSchemaError(f"provenance {label} has an unknown release role")
+        if not set(endpoint["witness_region_ids"]).issubset(
+            _frozen_indexes(registry)["witness_region_ids"]
+        ):
+            raise PipelineSchemaError(f"provenance {label} witness region does not join Stage 3")
+    if kind in {"RAW_PRESERVED", "RAW_REPAIRED", "RAW_EXCLUDED"}:
+        if source["endpoint_kind"] != "RAW_SPAN" or source["span"] is None or source["path"] is None:
+            raise PipelineSchemaError("raw provenance lacks a typed raw-span source")
+        raw_bytes = _validate_raw_span(
+            registry,
+            source_path=source["path"],
+            source_sha256=_frozen_indexes(registry)["input_by_path"].get(source["path"], {}).get("sha256", ""),
+            span=source["span"],
+            raw_block_ids=source["raw_block_ids"],
+        )
+        if source["author_text_projection_sha256"] != sha256_bytes(raw_bytes):
+            raise PipelineSchemaError("raw provenance source projection does not equal raw bytes")
+        block_rows = [
+            _frozen_indexes(registry)["blocks_by_id"][block_id]
+            for block_id in source["raw_block_ids"]
+        ]
+        document_id = block_rows[0]["canonical_document_id"]
+        if source["canonical_document_id"] != document_id:
+            raise PipelineSchemaError("raw provenance source document does not join Stage 2 blocks")
     if kind == "WITNESS_INSERTED":
+        if source["endpoint_kind"] != "WITNESS_REGION" or not source["witness_region_ids"]:
+            raise PipelineSchemaError("witness insertion lacks a typed witness-region source")
         raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids witness insertion provenance")
     if kind == "GENERATED_METADATA":
         empty = sha256_bytes(b"")
-        if record["author_text_projection_sha256"] != empty or record["inverse"]["inverse_kind"] != "REMOVE_GENERATED":
+        if (
+            record["author_text_projection_sha256"] != empty
+            or source["endpoint_kind"] != "GENERATED_NONE"
+            or source["path"] is not None
+            or source["role"] is not None
+            or source["span"] is not None
+            or source["raw_block_ids"]
+            or source["witness_region_ids"]
+            or source["author_text_projection_sha256"] != empty
+            or target["endpoint_kind"] != "GENERATED_SPAN"
+            or target["role"] != "GENERATED_METADATA"
+            or target["path"] is None
+            or target["author_text_projection_sha256"] != empty
+            or record["inverse"]["inverse_kind"] != "REMOVE_GENERATED"
+            or record["repair_ids"]
+            or record["inverse"]["repair_ids"]
+        ):
             raise PipelineSchemaError("generated metadata has nonempty projection or wrong inverse")
     if kind == "RAW_PRESERVED":
-        if record["source"]["author_text_projection_sha256"] != record["target"]["author_text_projection_sha256"]:
+        indexes = _frozen_indexes(registry)
+        document_id = source["canonical_document_id"]
+        document = indexes["documents_by_id"].get(document_id)
+        if (
+            target["endpoint_kind"] != "CANONICAL_SPAN"
+            or target["role"] != "CANONICAL_AUTHOR_TEXT"
+            or document is None
+            or target["canonical_document_id"] != document_id
+            or target["path"] != document["path"]
+            or source["author_text_projection_sha256"] != target["author_text_projection_sha256"]
+            or record["author_text_projection_sha256"] != source["author_text_projection_sha256"]
+            or record["repair_ids"]
+            or record["inverse"] != {"inverse_kind": "IDENTITY", "repair_ids": []}
+        ):
             raise PipelineSchemaError("RAW_PRESERVED projection changed")
+    elif kind == "RAW_REPAIRED":
+        if target["endpoint_kind"] != "CANONICAL_SPAN" or not record["repair_ids"]:
+            raise PipelineSchemaError("RAW_REPAIRED lacks canonical target/joined repair")
+        raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids repaired raw provenance")
+    elif kind == "RAW_EXCLUDED":
+        if (
+            target["endpoint_kind"] != "TYPED_EXCLUSION"
+            or target["path"] is not None
+            or target["span"] is not None
+            or target["role"] is not None
+            or target["author_text_projection_sha256"] != sha256_bytes(b"")
+        ):
+            raise PipelineSchemaError("RAW_EXCLUDED lacks a typed empty exclusion target")
+        raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids raw author-text exclusion")
+    elif kind in {
+        "CANONICAL_DERIVED",
+        "CANONICAL_EDITORIAL_REFERENCE",
+        "CANONICAL_SEARCH_DERIVATIVE",
+    }:
+        expected = {
+            "CANONICAL_DERIVED": ("DERIVED_SPAN", "DERIVED_AGGREGATE", "DROP_DERIVED_VIEW"),
+            "CANONICAL_EDITORIAL_REFERENCE": ("SIDECAR_SPAN", "EDITORIAL_SIDECAR", "DROP_DERIVED_VIEW"),
+            "CANONICAL_SEARCH_DERIVATIVE": ("SEARCH_SPAN", "SEARCH_DERIVATIVE", "DROP_DERIVED_VIEW"),
+        }[kind]
+        if (
+            source["endpoint_kind"] != "CANONICAL_SPAN"
+            or source["role"] != "CANONICAL_AUTHOR_TEXT"
+            or target["endpoint_kind"] != expected[0]
+            or target["role"] != expected[1]
+            or target["path"] is None
+            or source["author_text_projection_sha256"] != target["author_text_projection_sha256"]
+            or record["author_text_projection_sha256"] != source["author_text_projection_sha256"]
+            or record["inverse"]["inverse_kind"] != expected[2]
+        ):
+            raise PipelineSchemaError("derived provenance role/projection/inverse mismatch")
+
+
+def validate_provenance_set(
+    records: Sequence[Mapping[str, Any]],
+    registry: SchemaRegistry,
+    repair_records: Sequence[Mapping[str, Any]] = (),
+    *,
+    require_complete_raw_coverage: bool = False,
+) -> None:
+    ids: set[str] = set()
+    sequences: list[int] = []
+    repair_ids = {row["repair_id"] for row in repair_records}
+    covered_raw_blocks: list[str] = []
+    for record in records:
+        validate_provenance(record, registry)
+        if record["provenance_id"] in ids:
+            raise PipelineSchemaError("duplicate provenance ID")
+        ids.add(record["provenance_id"])
+        sequences.append(record["sequence"])
+        if not set(record["repair_ids"]).issubset(repair_ids):
+            raise PipelineSchemaError("provenance repair ID does not join repair ledger")
+        if set(record["inverse"]["repair_ids"]) != set(record["repair_ids"]):
+            raise PipelineSchemaError("provenance inverse repair set does not match forward repair set")
+        if record["mapping_kind"].startswith("RAW_"):
+            covered_raw_blocks.extend(record["source"]["raw_block_ids"])
+    if sequences != list(range(len(records))):
+        raise PipelineSchemaError("provenance sequence is not exact ledger order")
+    if len(covered_raw_blocks) != len(set(covered_raw_blocks)):
+        raise PipelineSchemaError("raw block is mapped by multiple provenance rows")
+    if require_complete_raw_coverage:
+        expected = [row["raw_block_id"] for row in _frozen_indexes(registry)["blocks"]]
+        if covered_raw_blocks != expected:
+            raise PipelineSchemaError("provenance does not provide exact ordered raw-block coverage")
 
 
 def validate_navigation(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
@@ -984,13 +1134,181 @@ def validate_navigation(record: Mapping[str, Any], registry: SchemaRegistry) -> 
         raise PipelineSchemaError("generated navigation has nonempty author projection")
 
 
+def validate_technical(
+    record: Mapping[str, Any],
+    registry: SchemaRegistry,
+    repair_records: Sequence[Mapping[str, Any]] = (),
+    review_records: Sequence[Mapping[str, Any]] = (),
+    unresolved_records: Sequence[Mapping[str, Any]] = (),
+) -> None:
+    registry.validate("goal-4/schemas/technical-record.schema.json", record)
+    validate_workflow(record["workflow"])
+    indexes = _frozen_indexes(registry)
+    if record["canonical_document_id"] not in indexes["documents_by_id"]:
+        raise PipelineSchemaError("technical span document does not join guardrails")
+    _validate_raw_block_ids(registry, record["raw_block_ids"])
+    block_rows = [indexes["blocks_by_id"][block_id] for block_id in record["raw_block_ids"]]
+    if any(row["canonical_document_id"] != record["canonical_document_id"] for row in block_rows):
+        raise PipelineSchemaError("technical span raw blocks cross its canonical document")
+    if [row["order"] for row in block_rows] != sorted(row["order"] for row in block_rows):
+        raise PipelineSchemaError("technical span raw blocks are not in frozen source order")
+    monolith_path = f"{indexes['legacy_root']}/A-New-Kind-of-Science.md"
+    monolith_sha = indexes["input_by_path"][monolith_path]["sha256"]
+    monolith, _ = _read_frozen_input(registry, monolith_path, monolith_sha)
+    raw_window = monolith[block_rows[0]["start_byte"] : block_rows[-1]["end_byte_exclusive"]]
+    source_bytes = record["source_projection"].encode("utf-8")
+    if sha256_bytes(source_bytes) != record["source_projection_sha256"]:
+        raise PipelineSchemaError("technical source-projection hash mismatch")
+    if source_bytes not in raw_window:
+        raise PipelineSchemaError("technical source projection is absent from joined raw blocks")
+    output_span = record["output_span"]
+    if output_span["end_byte_exclusive"] <= output_span["start_byte"]:
+        raise PipelineSchemaError("technical output span is empty/reversed")
+    if output_span["end_byte_exclusive"] - output_span["start_byte"] != len(source_bytes):
+        raise PipelineSchemaError("unchanged technical output-span length differs from source projection")
+    if output_span["sha256"] != record["source_projection_sha256"]:
+        raise PipelineSchemaError("unchanged technical output-span hash differs from source projection")
+    tokens = record["tokens"]
+    if not tokens:
+        raise PipelineSchemaError("technical span lacks enumerated tokens")
+    if [token["ordinal"] for token in tokens] != list(range(len(tokens))):
+        raise PipelineSchemaError("technical token ordinals are not contiguous")
+    token_ids = [token["token_id"] for token in tokens]
+    if len(token_ids) != len(set(token_ids)):
+        raise PipelineSchemaError("duplicate technical token ID")
+    if "".join(token["raw_text"] for token in tokens) != record["source_projection"]:
+        raise PipelineSchemaError("technical token stream does not exactly reconstruct source projection")
+    derived_changed: list[str] = []
+    for token in tokens:
+        if token["raw_sha256"] != sha256_bytes(token["raw_text"].encode("utf-8")):
+            raise PipelineSchemaError("technical token raw hash mismatch")
+        if token["changed"]:
+            derived_changed.append(token["token_id"])
+            if token["repaired_text"] is None or token["repaired_text"] == token["raw_text"]:
+                raise PipelineSchemaError("changed technical token lacks a distinct repaired value")
+            if not token["evidence_ids"] or not token["review_ids"]:
+                raise PipelineSchemaError("changed technical token lacks evidence/review joins")
+        else:
+            if token["repaired_text"] not in {None, token["raw_text"]}:
+                raise PipelineSchemaError("unchanged technical token carries a changed repaired value")
+            if token["evidence_ids"] or token["review_ids"]:
+                raise PipelineSchemaError("unchanged technical token claims change evidence/reviews")
+        if token["witness_text"] is not None:
+            raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids technical witness text")
+    if record["changed_token_ids"] != derived_changed:
+        raise PipelineSchemaError("changed-token summary differs from token rows")
+    if derived_changed or record["repair_ids"]:
+        raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids repaired technical tokens")
+    if not set(record["witness_region_ids"]).issubset(indexes["witness_region_ids"]):
+        raise PipelineSchemaError("technical witness-region ID does not join Stage 3")
+    if record["witness_region_ids"]:
+        raise PipelineSchemaError("current SOURCE_BLOCKED technical span unexpectedly has witness regions")
+    if record["witness_check"] not in {"SOURCE_BLOCKED", "NOT_APPLICABLE"}:
+        raise PipelineSchemaError("technical witness check exceeds current Stage 3 evidence")
+    unresolved_ids = set(indexes["open_unresolved_ids"])
+    unresolved_ids.update(row["unresolved_id"] for row in unresolved_records)
+    joined_unresolved = set(record["unresolved_ids"]) | set(record["workflow"]["unresolved_ids"])
+    if not joined_unresolved.issubset(unresolved_ids):
+        raise PipelineSchemaError("technical unresolved ID does not join federated ledger")
+    if record["workflow"]["state"] == "SOURCE_BLOCKED" and not joined_unresolved:
+        raise PipelineSchemaError("source-blocked technical span lacks a joined blocker")
+    if record["parse_check"] == "FAIL_DIAGNOSTIC" or record["render_check"] == "FAIL_DIAGNOSTIC":
+        if not joined_unresolved:
+            raise PipelineSchemaError("failed technical diagnostic lacks unresolved disposition")
+    if record["technical_kind"] == "WOLFRAM_PROGRAM" and record["program_count_classification"] == "NOT_APPLICABLE":
+        raise PipelineSchemaError("Wolfram program lacks a program-count classification")
+    if record["technical_kind"] != "WOLFRAM_PROGRAM" and record["program_count_classification"] == "COUNTED_PROGRAM":
+        raise PipelineSchemaError("non-program technical span is counted as a Wolfram program")
+    repair_ids = {row["repair_id"] for row in repair_records}
+    if not set(record["repair_ids"]).issubset(repair_ids):
+        raise PipelineSchemaError("technical repair ID does not join repair ledger")
+    review_by_id = validate_review_set(review_records, registry)
+    if not set(record["specialist_review_ids"]).issubset(review_by_id):
+        raise PipelineSchemaError("technical specialist review ID does not join review ledger")
+    for review_id in record["specialist_review_ids"]:
+        review = review_by_id[review_id]
+        if (
+            review["reviewer_role"] != "SPECIALIST_REVIEWER"
+            or review["specialty"] != "FORMULA_CODE_DATA"
+            or review["subject_type"] != "TECHNICAL_SPAN"
+            or review["subject_id"] != record["technical_span_id"]
+            or review["closure_state"] != "CLOSED"
+        ):
+            raise PipelineSchemaError("technical specialist review row has wrong role/subject/state")
+    if record["workflow"]["state"] == "CLOSED" and not record["specialist_review_ids"]:
+        raise PipelineSchemaError("closed technical span lacks owning specialist review")
+
+
 def validate_figure(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
     registry.validate("goal-4/schemas/figure-record.schema.json", record)
     validate_workflow(record["workflow"])
+    indexes = _frozen_indexes(registry)
+    _validate_raw_block_ids(registry, record["raw_block_ids"])
+    if record["canonical_document_id"] is not None and record["canonical_document_id"] not in indexes["documents_by_id"]:
+        raise PipelineSchemaError("figure canonical document does not join guardrails")
+    if not set(record["witness_region_ids"]).issubset(indexes["witness_region_ids"]):
+        raise PipelineSchemaError("figure witness-region ID does not join Stage 3")
+    if not (
+        set(record["unresolved_ids"]) | set(record["workflow"]["unresolved_ids"])
+    ).issubset(indexes["open_unresolved_ids"]):
+        raise PipelineSchemaError("figure unresolved ID does not join Stage 3 blocker ledger")
     if record["asset_role"] == "GOVERNED_WITNESS_ASSET" or record["redistribution_allowed"] is True:
         raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids witness asset release")
     if record["association_state"] == "VERIFIED" and not record["witness_region_ids"]:
         raise PipelineSchemaError("verified figure association lacks witness regions")
+    if record["association_state"] == "VERIFIED":
+        raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids verified figure association")
+    if record["record_type"] == "ASSET_CANDIDATE":
+        required = (
+            "asset_id",
+            "manifest_file_id",
+            "asset_role",
+            "asset_sha256",
+            "byte_size",
+            "dimensions",
+            "release_path",
+        )
+        if any(record[field] is None for field in required):
+            raise PipelineSchemaError("asset candidate lacks concrete Stage 2 asset identity")
+        manifest_row = indexes["input_by_id"].get(record["manifest_file_id"])
+        if manifest_row is None or manifest_row.get("role") != "LEGACY_ASSET":
+            raise PipelineSchemaError("figure asset does not join a Stage 2 legacy asset")
+        expected_path = f"ASSETS/LEGACY/{manifest_row['relative_path']}"
+        if (
+            record["asset_role"] != "GOVERNED_LEGACY_ASSET"
+            or record["asset_sha256"] != manifest_row["sha256"]
+            or record["byte_size"] != manifest_row["byte_size"]
+            or record["dimensions"]
+            != {
+                "height": manifest_row["image"]["height"],
+                "width": manifest_row["image"]["width"],
+            }
+            or record["release_path"] != expected_path
+        ):
+            raise PipelineSchemaError("figure asset metadata differs from Stage 2 manifest")
+        legacy_path = registry.repo_root / indexes["legacy_root"] / manifest_row["relative_path"]
+        if legacy_path.stat().st_size != record["byte_size"] or sha256_file(legacy_path) != record["asset_sha256"]:
+            raise PipelineSchemaError("figure asset file differs from frozen Stage 2 bytes")
+        if record["ordered_component_asset_ids"]:
+            raise PipelineSchemaError("asset candidate improperly owns ordered group components")
+    else:
+        for field in (
+            "asset_id",
+            "manifest_file_id",
+            "asset_role",
+            "asset_sha256",
+            "byte_size",
+            "dimensions",
+            "release_path",
+        ):
+            if record[field] is not None:
+                raise PipelineSchemaError("printed figure group carries single-asset fields")
+        if record["figure_group_id"] is None:
+            raise PipelineSchemaError("printed figure-group record lacks group ID")
+    if record["workflow"]["state"] == "SOURCE_BLOCKED" and not (
+        set(record["unresolved_ids"]) | set(record["workflow"]["unresolved_ids"])
+    ):
+        raise PipelineSchemaError("source-blocked figure record lacks a joined blocker")
 
 
 def validate_review(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
@@ -1099,12 +1417,63 @@ def validate_compatibility(record: Mapping[str, Any], registry: SchemaRegistry) 
     baseline = load_json(baseline_path, require_cj1=True)
     if record["baseline_behavior_digest"] != baseline["behavior_digest"]:
         raise PipelineSchemaError("compatibility behavior baseline drift")
-    expected_all = all(row["identical"] for row in record["oracle_results"])
+    expected_oracles = baseline["oracles"]
+    rows = record["oracle_results"]
+    if not rows or len(rows) != len(expected_oracles):
+        raise PipelineSchemaError("compatibility result set is empty or incomplete")
+    if [row["path"] for row in rows] != [row["path"] for row in expected_oracles]:
+        raise PipelineSchemaError("compatibility result paths/order differ from frozen oracle scope")
+    aggregate_rows: list[Mapping[str, Any]] = []
+    for row, expected in zip(rows, expected_oracles):
+        if row["argv"] != expected["argv"]:
+            raise PipelineSchemaError("compatibility oracle argv differs from frozen invocation")
+        if row["baseline_framed_behavior_sha256"] != expected["framed_behavior_sha256"]:
+            raise PipelineSchemaError("compatibility row does not bind frozen oracle behavior")
+        derived_identical = (
+            row["current_framed_behavior_sha256"] == expected["framed_behavior_sha256"]
+            and row["exit_code"] == expected["exit_code"]
+            and row["stdout_sha256"] == expected["stdout"]["sha256"]
+            and row["stderr_sha256"] == expected["stderr"]["sha256"]
+            and row["status_kind"] == expected["status_kind"]
+        )
+        if row["identical"] != derived_identical:
+            raise PipelineSchemaError("compatibility per-oracle identical flag is dishonest")
+        aggregate_rows.append(
+            {
+                "exit_code": row["exit_code"],
+                "framed_behavior_sha256": row["current_framed_behavior_sha256"],
+                "path": row["path"],
+                "status_kind": row["status_kind"],
+                "stderr_sha256": row["stderr_sha256"],
+                "stdout_sha256": row["stdout_sha256"],
+            }
+        )
+    aggregate_projection = sorted(aggregate_rows, key=lambda row: row["path"])
+    expected_aggregate = sha256_bytes(canonical_json_bytes(aggregate_projection))
+    if record["aggregate_behavior_digest"] != expected_aggregate:
+        raise PipelineSchemaError("compatibility aggregate behavior digest is not recomputable")
+    if record["dependency_fingerprint"] != baseline["closure"]["dependency_fingerprint_after"]:
+        raise PipelineSchemaError("compatibility dependency fingerprint drift")
+    if record["legacy_tree_digest"] != baseline["closure"]["legacy_tree_digest_after"]:
+        raise PipelineSchemaError("compatibility legacy-tree digest drift")
+    if record["sentinel_fixture_results"] != {
+        "duplicate_basename_detected": True,
+        "nested_markdown_detected": True,
+    }:
+        raise PipelineSchemaError("compatibility sentinel fixtures did not prove recursive behavior")
+    expected_all = all(row["identical"] for row in rows)
     if record["all_identical"] != expected_all:
         raise PipelineSchemaError("compatibility all_identical summary is dishonest")
 
 
-def validate_corpus_manifest(record: Mapping[str, Any], registry: SchemaRegistry, guardrails: Mapping[str, Any]) -> None:
+def validate_corpus_manifest(
+    record: Mapping[str, Any],
+    registry: SchemaRegistry,
+    guardrails: Mapping[str, Any],
+    *,
+    output_root: Path | None = None,
+    author_text_projections: Mapping[str, bytes] | None = None,
+) -> None:
     registry.validate("goal-4/schemas/corpus-manifest.schema.json", record)
     paths: set[str] = set()
     counts: dict[str, int] = {}
@@ -1119,25 +1488,233 @@ def validate_corpus_manifest(record: Mapping[str, Any], registry: SchemaRegistry
             if item["canonical_order"] is None or item["canonical_document_id"] is None:
                 raise PipelineSchemaError("canonical file lacks order/document ID")
             canonical.append((item["canonical_order"], item["canonical_document_id"]))
+        elif item["canonical_order"] is not None or item["canonical_document_id"] is not None:
+            raise PipelineSchemaError("noncanonical file claims canonical order/document identity")
+        if item["author_text_projection_sha256"] is not None and re.fullmatch(
+            r"[0-9a-f]{64}", item["author_text_projection_sha256"]
+        ) is None:
+            raise PipelineSchemaError("manifest file has malformed author projection digest")
     if counts != record["role_counts"]:
         raise PipelineSchemaError("manifest role counts do not match files")
-    expected = [(item["order"], item["id"]) for item in guardrails["canonical_documents"]]
+    documents = guardrails["canonical_documents"]
+    expected = [(item["order"], item["id"]) for item in documents]
+    expected_by_id = {item["id"]: item for item in documents}
     if sorted(canonical) != expected or record["canonical_document_order"] != [item[1] for item in expected]:
         raise PipelineSchemaError("canonical document count/path order drift")
+    canonical_files = [item for item in record["files"] if item["role"] == "CANONICAL_AUTHOR_TEXT"]
+    for item in canonical_files:
+        expected_document = expected_by_id[item["canonical_document_id"]]
+        if (
+            item["canonical_order"] != expected_document["order"]
+            or item["path"] != expected_document["path"]
+            or item["source_identity"] != expected_document["id"]
+            or item["media_type"] != "text/markdown"
+        ):
+            raise PipelineSchemaError("canonical manifest path/role/identity differs from guardrails")
+    expected_asset_counts = {
+        "governed_legacy": counts.get("GOVERNED_LEGACY_ASSET", 0),
+        "governed_witness": counts.get("GOVERNED_WITNESS_ASSET", 0),
+    }
+    if record["asset_counts"] != expected_asset_counts:
+        raise PipelineSchemaError("manifest asset counts differ from file roles")
     if record["certification_state"] != "UNCERTIFIED":
+        if output_root is None or author_text_projections is None:
+            raise PipelineSchemaError("certified corpus validation lacks output root/projection evidence")
+        output_root = output_root.resolve()
+        if not output_root.is_dir() or output_root.is_symlink():
+            raise PipelineSchemaError("certified corpus output root is absent, non-directory, or symlinked")
+        observed: set[str] = set()
+        for path in output_root.rglob("*"):
+            relative = path.relative_to(output_root).as_posix()
+            if path.is_symlink() or not path.is_file():
+                if path.is_dir() and not path.is_symlink():
+                    continue
+                raise PipelineSchemaError(f"certified output has non-regular entry: {relative}")
+            observed.add(relative)
+        if observed != paths:
+            raise PipelineSchemaError("certified output file set differs from its manifest")
+        for item in record["files"]:
+            path = output_root / item["path"]
+            mode = f"{stat.S_IMODE(path.stat().st_mode):04o}"
+            if (
+                path.stat().st_size != item["byte_size"]
+                or sha256_file(path) != item["sha256"]
+                or mode != item["mode"]
+            ):
+                raise PipelineSchemaError(f"certified output file/hash/size/mode drift: {item['path']}")
+        canonical_paths = [item["path"] for item in sorted(canonical_files, key=lambda row: row["canonical_order"])]
+        if set(author_text_projections) != set(canonical_paths):
+            raise PipelineSchemaError("certified projection evidence does not exactly cover canonical files")
+        aggregate = bytearray()
+        file_by_path = {item["path"]: item for item in canonical_files}
+        for path in canonical_paths:
+            projection = author_text_projections[path]
+            if not isinstance(projection, bytes):
+                raise PipelineSchemaError("certified author projection is not bytes")
+            if sha256_bytes(projection) != file_by_path[path]["author_text_projection_sha256"]:
+                raise PipelineSchemaError("certified per-file author projection digest mismatch")
+            aggregate.extend(projection)
+        if sha256_bytes(bytes(aggregate)) != record["author_text_projection_sha256"]:
+            raise PipelineSchemaError("certified aggregate author projection digest mismatch")
         raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids certified corpus")
 
 
-def validate_release_manifest(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
+def _validate_artifact_map(
+    values: Mapping[str, str],
+    registry: SchemaRegistry,
+    label: str,
+    *,
+    empty_allowed: bool,
+) -> None:
+    if not values and not empty_allowed:
+        raise PipelineSchemaError(f"release {label} artifact map is empty")
+    for relative, expected_sha in values.items():
+        _safe_repo_path(relative, f"release {label} artifact")
+        if expected_sha == "0" * 64:
+            raise PipelineSchemaError(f"release {label} uses an all-zero placeholder digest")
+        if sha256_file(registry.repo_root / relative) != expected_sha:
+            raise PipelineSchemaError(f"release {label} does not join a concrete artifact: {relative}")
+
+
+def _artifact_with_digest(
+    maps: Sequence[Mapping[str, str]], digest: str, registry: SchemaRegistry, label: str
+) -> Path:
+    matches = [relative for values in maps for relative, value in values.items() if value == digest]
+    if len(matches) != 1:
+        raise PipelineSchemaError(f"release {label} digest does not identify exactly one concrete artifact")
+    path = registry.repo_root / matches[0]
+    if sha256_file(path) != digest:
+        raise PipelineSchemaError(f"release {label} concrete artifact hash drift")
+    return path
+
+
+def validate_release_manifest(
+    record: Mapping[str, Any],
+    registry: SchemaRegistry,
+    *,
+    output_root: Path | None = None,
+    author_text_projections: Mapping[str, bytes] | None = None,
+) -> None:
     registry.validate("goal-4/schemas/release-manifest.schema.json", record)
+    scalar_digests = (
+        record["compatibility_verification_sha256"],
+        record["output_manifest_sha256"],
+        record["schema_lock_sha256"],
+        record["inverse_replay"]["raw_projection_sha256"],
+        *record["two_clean_build_digests"],
+    )
+    if any(value == "0" * 64 for value in scalar_digests):
+        raise PipelineSchemaError("release manifest uses an all-zero placeholder digest")
+    contract_paths = {
+        "goal-4/baseline-lock.json",
+        "goal-4/guardrails.json",
+        "goal-4/licensing-contract.json",
+        "goal-4/pipeline-contract.json",
+        "goal-4/promotion-contract.md",
+        "goal-4/review-contract.md",
+        "goal-4/style-guide.md",
+        "goal-4/witness-lock.json",
+        "goal-4/zero-repair-contract.json",
+    }
+    if set(record["contract_bindings"]) != contract_paths:
+        raise PipelineSchemaError("release contract bindings are not the exact frozen contract set")
+    required_inputs = {
+        "goal-4/corpus-manifest.json",
+        "goal-4/structure-ledger.jsonl",
+        "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md",
+    }
+    if not required_inputs.issubset(record["input_bindings"]):
+        raise PipelineSchemaError("release input bindings omit frozen Stage 2 source identities")
+    required_tools = {
+        "goal-4/tools/build_zero_repair.py",
+        "goal-4/tools/overlay_lib.py",
+        "goal-4/tools/zero_repair_lib.py",
+    }
+    if not required_tools.issubset(record["tool_hashes"]):
+        raise PipelineSchemaError("release tool hashes omit required build/overlay implementations")
+    contract = load_json(registry.repo_root / PIPELINE_CONTRACT_PATH, require_cj1=True)
+    expected_ledgers = {row["path"] for row in contract["ledgers"]}
+    if set(record["ledger_hashes"]) != expected_ledgers:
+        raise PipelineSchemaError("release ledger hashes do not cover the exact registered ledger set")
+    for label, values, empty_allowed in (
+        ("contract", record["contract_bindings"], False),
+        ("input", record["input_bindings"], False),
+        ("overlay", record["overlay_hashes"], record["claim_scope"] == "ZERO_REPAIR_STRUCTURAL_BUILD"),
+        ("tool", record["tool_hashes"], False),
+        ("ledger", record["ledger_hashes"], False),
+    ):
+        _validate_artifact_map(values, registry, label, empty_allowed=empty_allowed)
+    if record["schema_lock_sha256"] != sha256_file(registry.repo_root / PIPELINE_LOCK_PATH):
+        raise PipelineSchemaError("release schema-lock digest does not join the package lock")
+    artifact_maps = (
+        record["contract_bindings"],
+        record["input_bindings"],
+        record["overlay_hashes"],
+        record["tool_hashes"],
+        record["ledger_hashes"],
+    )
+    compatibility_path = _artifact_with_digest(
+        artifact_maps,
+        record["compatibility_verification_sha256"],
+        registry,
+        "compatibility verification",
+    )
+    compatibility = load_json(compatibility_path, require_cj1=True)
+    validate_compatibility(compatibility, registry)
+    if compatibility["all_identical"] is not True:
+        raise PipelineSchemaError("release compatibility verification is not fully identical")
+    corpus_path = _artifact_with_digest(
+        artifact_maps, record["output_manifest_sha256"], registry, "output manifest"
+    )
+    corpus_manifest = load_json(corpus_path, require_cj1=True)
+    guardrails = load_json(registry.repo_root / "goal-4/guardrails.json", require_cj1=False)
+    validate_corpus_manifest(
+        corpus_manifest,
+        registry,
+        guardrails,
+        output_root=output_root,
+        author_text_projections=author_text_projections,
+    )
+    if corpus_manifest["release_id"] != record["release_id"]:
+        raise PipelineSchemaError("release/output-manifest release IDs do not join")
+    if corpus_manifest["role_counts"] != record["role_counts"]:
+        raise PipelineSchemaError("release role counts do not join output manifest")
+    monolith = _frozen_indexes(registry)["input_by_path"][
+        "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md"
+    ]
+    if (
+        record["inverse_replay"]["passed"] is not True
+        or record["inverse_replay"]["raw_projection_sha256"] != monolith["sha256"]
+    ):
+        raise PipelineSchemaError("release inverse replay does not recover the frozen monolith")
+    if not record["commands"] or any(
+        not command or any(not isinstance(part, str) or not part for part in command)
+        for command in record["commands"]
+    ):
+        raise PipelineSchemaError("release reproduction command list is empty/malformed")
+    if len(set(record["two_clean_build_digests"])) != 1:
+        raise PipelineSchemaError("two clean builds are not byte-identical")
     if record["certification_state"] != "UNCERTIFIED" or record["audit_certificate"] is not None:
         raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids audit certification")
     if record["claim_scope"] == "FULL_REPAIR_CERTIFIED":
         raise PipelineSchemaError("current SOURCE_BLOCKED gate forbids full-repair claim")
-    if not record["open_blocker_ids"]:
-        raise PipelineSchemaError("uncertified source-blocked release omits blockers")
-    if len(set(record["two_clean_build_digests"])) != 1:
-        raise PipelineSchemaError("two clean builds are not byte-identical")
+    if set(record["open_blocker_ids"]) != _frozen_indexes(registry)["open_unresolved_ids"]:
+        raise PipelineSchemaError("uncertified release does not enumerate every Stage 3 blocker")
+    publication = record["publication"]
+    rollback = record["rollback"]
+    if publication["target_state"] == "NOT_PUBLISHED":
+        if (
+            publication["atomic_same_filesystem_rename"] is not False
+            or rollback != {"command": [], "verified": False}
+            or record["prior_release"] is not None
+        ):
+            raise PipelineSchemaError("NOT_PUBLISHED release has incomplete/contradictory publication state")
+    elif (
+        publication["atomic_same_filesystem_rename"] is not True
+        or rollback["verified"] is not True
+        or not rollback["command"]
+    ):
+        raise PipelineSchemaError("published release lacks atomic promotion and verified rollback")
 
 
 def _require_exact_keys(value: Mapping[str, Any], expected: Iterable[str], where: str) -> None:

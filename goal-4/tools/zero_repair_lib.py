@@ -9,14 +9,16 @@ Colophon.  Its projection is empty and its inverse is an exact drop.
 
 from __future__ import annotations
 
+import ctypes
+import errno
 import hashlib
+import importlib.util
 import json
 import os
+import secrets
 import shutil
 import stat
 import tempfile
-import ctypes
-import errno
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
@@ -52,6 +54,7 @@ EXPECTED_MONOLITH_RELATIVE = PurePosixPath("A-New-Kind-of-Science.md")
 TAPE_RELATIVE = PurePosixPath("BUILD-METADATA/projection-tape.jsonl")
 MANIFEST_RELATIVE = PurePosixPath("BUILD-METADATA/zero-repair-manifest.json")
 CONTRACT_RELATIVE = PurePosixPath("zero-repair-contract.json")
+IMPLEMENTATION_LOCK_RELATIVE = PurePosixPath("zero-repair-implementation-lock.json")
 TOOL_RELATIVES = (
     PurePosixPath("tools/zero_repair_lib.py"),
     PurePosixPath("tools/build_zero_repair.py"),
@@ -260,6 +263,7 @@ def load_frozen_snapshot(
     manifest_path = goal / "corpus-manifest.json"
     ledger_path = goal / "structure-ledger.jsonl"
     contract_path = _join_relative(goal, CONTRACT_RELATIVE)
+    implementation_lock_path = _join_relative(goal, IMPLEMENTATION_LOCK_RELATIVE)
     guardrails_raw = _read_frozen(guardrails_path, EXPECTED_GUARDRAILS_SHA256, label="guardrails")
     lock_raw = _read_frozen(lock_path, EXPECTED_BASELINE_LOCK_SHA256, label="baseline lock")
     manifest_raw = _read_frozen(manifest_path, EXPECTED_CORPUS_MANIFEST_SHA256, label="corpus manifest")
@@ -269,6 +273,13 @@ def load_frozen_snapshot(
         EXPECTED_ZERO_REPAIR_CONTRACT_SHA256,
         label="zero-repair contract",
     )
+    _assert_regular_input(implementation_lock_path, label="zero-repair implementation lock")
+    implementation_lock_raw = implementation_lock_path.read_bytes()
+    implementation_lock = parse_json_bytes(
+        implementation_lock_raw,
+        label="zero-repair implementation lock",
+        canonical=True,
+    )
 
     guardrails = parse_json_bytes(guardrails_raw, label="guardrails")
     lock = parse_json_bytes(lock_raw, label="baseline lock", canonical=True)
@@ -277,6 +288,11 @@ def load_frozen_snapshot(
     contract = parse_json_bytes(contract_raw, label="zero-repair contract", canonical=True)
     require(isinstance(guardrails, dict) and isinstance(lock, dict) and isinstance(corpus, dict), "frozen input root type drift")
     require(isinstance(contract, dict) and contract.get("contract_id") == CONTRACT_ID, "zero-repair contract identity drift")
+    require(
+        isinstance(implementation_lock, dict)
+        and implementation_lock.get("lock_id") == "ANKOS-ZERO-REPAIR-IMPLEMENTATION-LOCK-1",
+        "zero-repair implementation lock identity drift",
+    )
 
     artifact_map = {
         row.get("path"): row
@@ -411,13 +427,23 @@ def load_frozen_snapshot(
         "goal_root": goal,
         "legacy_root": legacy,
         "repaired_root": _join_relative(repo, EXPECTED_REPAIRED_RELATIVE),
-        "input_paths": [guardrails_path, lock_path, manifest_path, ledger_path, contract_path, monolith_path, *tool_paths],
+        "input_paths": [
+            guardrails_path,
+            lock_path,
+            manifest_path,
+            ledger_path,
+            contract_path,
+            implementation_lock_path,
+            monolith_path,
+            *tool_paths,
+        ],
         "input_hashes": {
             "baseline_lock_sha256": EXPECTED_BASELINE_LOCK_SHA256,
             "corpus_manifest_sha256": EXPECTED_CORPUS_MANIFEST_SHA256,
             "guardrails_sha256": EXPECTED_GUARDRAILS_SHA256,
             "structure_ledger_sha256": EXPECTED_STRUCTURE_LEDGER_SHA256,
             "zero_repair_contract_sha256": EXPECTED_ZERO_REPAIR_CONTRACT_SHA256,
+            "zero_repair_implementation_lock_sha256": sha256_bytes(implementation_lock_raw),
         },
         "monolith_path": monolith_path,
         "monolith": monolith_raw,
