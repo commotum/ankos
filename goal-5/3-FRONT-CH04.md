@@ -188,9 +188,11 @@ breaks. Direct high-resolution inspection preserved the First printing's
 The final Preface text has 11 source-matching italic *Mathematica* spans and 37
 four-digit en-dash ranges. CommonMark parsing, headless rendering, backward
 defect-pattern scans over both closed documents, two byte-identical fresh
-builds, cumulative validation, and four focused Preface tests passed. The
+builds, cumulative validation, and five focused Preface tests passed. The
 independent closing pass normalized 23,680 source and rebuilt characters to an
-exact match and found no remaining discrepancy or ambiguity.
+exact match and found no remaining discrepancy or ambiguity. The cumulative
+suite now passes 19 tests; validation reports 29 documents, 1,444 images, 79
+corrections, and two second-pass-complete documents. `git diff --check` passes.
 
 Exact resume point: first pass of `CH01`, beginning at `pdf:0017`, raw line 166
 and byte 30320. Its 22-page raster review pack is prepared under
