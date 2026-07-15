@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import shutil
+import tempfile
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
@@ -108,6 +109,7 @@ def validate_ranges(raw: bytes, data: dict[str, Any]) -> list[dict[str, Any]]:
 CORRECTION_FIELDS = {
     "id",
     "document_id",
+    "raw_start_byte",
     "before",
     "after",
     "expected_count",
@@ -119,8 +121,11 @@ CORRECTION_FIELDS = {
 
 
 def validate_corrections(
-    corrections: Iterable[dict[str, Any]], document_ids: set[str]
+    corrections: Iterable[dict[str, Any]],
+    raw: bytes,
+    documents: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
+    documents_by_id = {document["id"]: document for document in documents}
     checked: list[dict[str, Any]] = []
     correction_ids: set[str] = set()
     for index, correction in enumerate(corrections, 1):
@@ -131,8 +136,12 @@ def validate_corrections(
         if not isinstance(correction_id, str) or not correction_id or correction_id in correction_ids:
             raise BuildError(f"correction {index}: duplicate or invalid id")
         correction_ids.add(correction_id)
-        if correction["document_id"] not in document_ids:
+        document_id = correction["document_id"]
+        if document_id not in documents_by_id:
             raise BuildError(f"{correction_id}: unknown document id")
+        raw_start = correction["raw_start_byte"]
+        if isinstance(raw_start, bool) or not isinstance(raw_start, int) or raw_start < 0:
+            raise BuildError(f"{correction_id}: raw_start_byte must be a non-negative integer")
         before = correction["before"]
         after = correction["after"]
         if not isinstance(before, str) or not before or not isinstance(after, str) or before == after:
@@ -145,25 +154,56 @@ def validate_corrections(
                 raise BuildError(f"{correction_id}: {field} must be non-empty")
         if correction["verification_status"] != "SOURCE_VERIFIED":
             raise BuildError(f"{correction_id}: correction is not source verified")
+        before_bytes = before.encode("utf-8")
+        document = documents_by_id[document_id]
+        raw_end = raw_start + len(before_bytes)
+        if not (
+            document["raw_start_byte"] <= raw_start < raw_end <= document["raw_end_byte_exclusive"]
+        ):
+            raise BuildError(f"{correction_id}: raw span is outside its document")
+        if raw[raw_start:raw_end] != before_bytes:
+            raise BuildError(f"{correction_id}: exact raw preimage does not match")
+        segment = raw[document["raw_start_byte"] : document["raw_end_byte_exclusive"]]
+        actual_count = segment.count(before_bytes)
+        if actual_count != expected_count:
+            raise BuildError(
+                f"{correction_id}: expected {expected_count} raw occurrence(s), found {actual_count}"
+            )
         checked.append(correction)
+
+    for document_id in documents_by_id:
+        previous_end: int | None = None
+        for correction in sorted(
+            (row for row in checked if row["document_id"] == document_id),
+            key=lambda row: row["raw_start_byte"],
+        ):
+            start = correction["raw_start_byte"]
+            end = start + len(correction["before"].encode("utf-8"))
+            if previous_end is not None and start < previous_end:
+                raise BuildError(f"{correction['id']}: correction spans overlap")
+            previous_end = end
     return checked
 
 
 def apply_corrections(
-    document_id: str, text: str, corrections: Iterable[dict[str, Any]]
-) -> str:
-    for correction in corrections:
-        if correction["document_id"] != document_id:
-            continue
-        before = correction["before"]
-        expected = correction["expected_count"]
-        actual = text.count(before)
-        if actual != expected:
-            raise BuildError(
-                f"{correction['id']}: expected {expected} exact preimage occurrence(s), found {actual}"
-            )
-        text = text.replace(before, correction["after"], expected)
-    return text
+    document: dict[str, Any],
+    segment: bytes,
+    corrections: Iterable[dict[str, Any]],
+) -> bytes:
+    relevant = sorted(
+        (row for row in corrections if row["document_id"] == document["id"]),
+        key=lambda row: row["raw_start_byte"],
+        reverse=True,
+    )
+    for correction in relevant:
+        local_start = correction["raw_start_byte"] - document["raw_start_byte"]
+        before = correction["before"].encode("utf-8")
+        local_end = local_start + len(before)
+        if segment[local_start:local_end] != before:
+            raise BuildError(f"{correction['id']}: exact raw preimage no longer matches")
+        after = correction["after"].encode("utf-8")
+        segment = segment[:local_start] + after + segment[local_end:]
+    return segment
 
 
 def validate_images(
@@ -175,9 +215,10 @@ def validate_images(
 ) -> list[dict[str, Any]]:
     if len(rows) != 1444:
         raise BuildError(f"image-map.jsonl must contain 1,444 rows, found {len(rows)}")
+    documents_by_id = {str(document["id"]): document for document in documents}
     document_outputs = {
-        document["id"]: safe_relative_path(document["proposed_output_path"], suffix=".md")
-        for document in documents
+        document_id: safe_relative_path(document["proposed_output_path"], suffix=".md")
+        for document_id, document in documents_by_id.items()
     }
     source_paths: set[PurePosixPath] = set()
     output_paths: set[PurePosixPath] = set()
@@ -199,6 +240,9 @@ def validate_images(
         line_number = row.get("monolith_line")
         if not isinstance(line_number, int) or not 1 <= line_number <= len(lines):
             raise BuildError(f"image {ordinal}: invalid monolith line")
+        owner = documents_by_id[document_id]
+        if not owner["raw_start_line"] <= line_number <= owner["raw_end_line"]:
+            raise BuildError(f"image {ordinal}: monolith line is outside its owner range")
         if source_path.name not in lines[line_number - 1]:
             raise BuildError(f"image {ordinal}: basename absent from its monolith line")
         asset = legacy_root / Path(source_path)
@@ -222,9 +266,7 @@ def load_inputs() -> tuple[bytes, list[dict[str, Any]], list[dict[str, Any]], li
         raise BuildError("repaired output cannot be used as build input")
     raw = source_path.read_bytes()
     documents = validate_ranges(raw, range_data)
-    corrections = validate_corrections(
-        read_jsonl(CORRECTIONS_PATH), {document["id"] for document in documents}
-    )
+    corrections = validate_corrections(read_jsonl(CORRECTIONS_PATH), raw, documents)
     images = validate_images(raw, documents, read_jsonl(IMAGES_PATH))
     return raw, documents, corrections, images
 
@@ -237,13 +279,9 @@ def document_bytes(
     rendered: dict[PurePosixPath, bytes] = {}
     for document in documents:
         segment = raw[document["raw_start_byte"] : document["raw_end_byte_exclusive"]]
-        try:
-            text = segment.decode("utf-8")
-        except UnicodeDecodeError as exc:
-            raise BuildError(f"{document['id']}: segment is not UTF-8") from exc
-        text = apply_corrections(document["id"], text, corrections)
+        segment = apply_corrections(document, segment, corrections)
         output = safe_relative_path(document["proposed_output_path"], suffix=".md")
-        rendered[output] = text.encode("utf-8")
+        rendered[output] = segment
     return rendered
 
 
@@ -269,6 +307,12 @@ def _safe_output_root(output_root: Path) -> Path:
     forbidden = (REPO_ROOT.resolve(), GOAL_DIR.resolve(), LEGACY_ROOT.resolve())
     if output in forbidden or output.is_relative_to(LEGACY_ROOT.resolve()):
         raise BuildError(f"refusing unsafe output path: {output}")
+    default = OUTPUT_ROOT.resolve()
+    temporary_root = Path(tempfile.gettempdir()).resolve()
+    if output != default and (
+        output == temporary_root or not output.is_relative_to(temporary_root)
+    ):
+        raise BuildError("output must be the repaired sibling or a directory under /tmp")
     return output
 
 
