@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import shutil
 import tempfile
 from pathlib import Path, PurePosixPath
@@ -15,12 +16,15 @@ from typing import Any, Iterable
 GOAL_DIR = Path(__file__).resolve().parent
 REPO_ROOT = GOAL_DIR.parent
 LEGACY_ROOT = REPO_ROOT / "ref/A-New-Kind-of-Science"
+MONOLITH_PATH = LEGACY_ROOT / "A-New-Kind-of-Science.md"
 OUTPUT_ROOT = REPO_ROOT / "ref/A-New-Kind-of-Science-Repaired"
 RANGES_PATH = GOAL_DIR / "source-ranges.json"
 IMAGES_PATH = GOAL_DIR / "image-map.jsonl"
 CORRECTIONS_PATH = GOAL_DIR / "corrections.jsonl"
 SOURCE_STATUS = "USER_AUTHORIZED_LOCAL_SOURCE"
 BOUNDARY_STATUS = "SOURCE_CONFIRMED"
+SOURCE_PAGE_IN_ASSET = re.compile(r"_page_(\d+)_")
+AUTHORITATIVE_LOCATION = re.compile(r"^pdf:(\d{4})(?:$|[; ,])")
 
 
 class BuildError(ValueError):
@@ -232,6 +236,20 @@ def validate_corrections(
             raise BuildError(f"{correction_id}: correction is not source verified")
         before_bytes = before.encode("utf-8")
         document = documents_by_id[document_id]
+        source_match = AUTHORITATIVE_LOCATION.match(correction["authoritative_location"])
+        if source_match is None:
+            raise BuildError(
+                f"{correction_id}: authoritative_location must begin with pdf:NNNN"
+            )
+        source_page = int(source_match.group(1))
+        if not (
+            document["authoritative_pdf_start_page"]
+            <= source_page
+            <= document["authoritative_pdf_end_page"]
+        ):
+            raise BuildError(
+                f"{correction_id}: authoritative PDF page is outside its document"
+            )
         raw_end = raw_start + len(before_bytes)
         if not (
             document["raw_start_byte"] <= raw_start < raw_end <= document["raw_end_byte_exclusive"]
@@ -319,6 +337,18 @@ def validate_images(
         owner = documents_by_id[document_id]
         if not owner["raw_start_line"] <= line_number <= owner["raw_end_line"]:
             raise BuildError(f"image {ordinal}: monolith line is outside its owner range")
+        source_page_match = SOURCE_PAGE_IN_ASSET.search(source_path.name)
+        if source_page_match is None:
+            raise BuildError(f"image {ordinal}: asset name lacks a source page")
+        source_page = int(source_page_match.group(1)) + 1
+        if not (
+            owner["authoritative_pdf_start_page"]
+            <= source_page
+            <= owner["authoritative_pdf_end_page"]
+        ):
+            raise BuildError(
+                f"image {ordinal}: source page is outside its owner PDF range"
+            )
         if source_path.name not in lines[line_number - 1]:
             raise BuildError(f"image {ordinal}: basename absent from its monolith line")
         asset = legacy_root / Path(source_path)
@@ -338,8 +368,8 @@ def load_inputs() -> tuple[bytes, list[dict[str, Any]], list[dict[str, Any]], li
     range_data = json.loads(RANGES_PATH.read_text(encoding="utf-8"))
     source = safe_relative_path(range_data.get("legacy_source"), suffix=".md")
     source_path = REPO_ROOT / Path(source)
-    if source_path.resolve().is_relative_to(OUTPUT_ROOT.resolve()):
-        raise BuildError("repaired output cannot be used as build input")
+    if source_path.resolve() != MONOLITH_PATH.resolve():
+        raise BuildError("build input must be the immutable legacy monolith")
     raw = source_path.read_bytes()
     documents = validate_ranges(raw, range_data)
     corrections = validate_corrections(read_jsonl(CORRECTIONS_PATH), raw, documents)

@@ -1,6 +1,6 @@
 # 2-FOUNDATION
 
-Status: BLOCKED
+Status: COMPLETE
 
 ## Current Facts
 
@@ -8,21 +8,34 @@ Status: BLOCKED
   unchanged.
 - The raw monolith is 3,780,628 bytes and 22,498 logical lines with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
-- The 29 provisional ranges cover every monolith byte and line exactly once,
-  and every segment hash matches.
+- The 29 source-confirmed ranges cover every monolith byte and line exactly
+  once, and every segment hash matches.
 - The image map contains 1,444 ordered references to 1,444 physical JPEGs; each
   live asset hash and referenced monolith line matches.
 - `ref/A-New-Kind-of-Science-Repaired/` now contains the generated
   zero-correction baseline: 29 author-text documents, 1,444 JPEGs, and two
   clearly editorial navigation/readme files.
-- No complete lawful, readable, edition-identical source is mounted. The
-  official NKS Online site is a candidate to re-evaluate, but equivalence,
-  complete access, permitted use, and fixed-layout Index evidence are unproven.
+- The complete local fixed-layout witness is
+  `A New Kind of Science/A New Kind of Science.pdf`, SHA-256
+  `a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6`:
+  57,779,240 bytes, 1,280 pages, First edition, First printing, ISBN
+  `1-57955-008-8`. It matches the legacy monolith's stated edition and is
+  explicitly authorized by the user for local Goal 5 comparison and repaired
+  workspace output. It remains Git-ignored and is not authorized here for
+  redistribution.
+- Ghostscript rendered all 1,280 pages successfully. The source contains the
+  fixed-layout four-column Index and complete Colophon; representative prose,
+  technical, figure, Notes, Index, and Colophon regions are visually legible.
+  The PDF's embedded text is diagnostic only because custom glyphs and columns
+  extract incorrectly.
 
 ## Updated Assumptions
 
-- The provisional 29-range layout is a suitable zero-correction baseline, but
-  content-sensitive boundaries remain open until authoritative comparison.
+- The source-confirmed 29-range layout is frozen. PDF pages 1–1,280 form one
+  gapless partition, and Arabic printed page = one-based PDF page − 16.
+- Chapter opener numbers/images at raw lines 166, 398, 680, 1368, 2142, 2700,
+  3420, 4336, 5164, 6586, 7692, and 8608 belong to the chapter they introduce,
+  not the preceding document.
 - The monolith, never repaired output, is the only build input.
 - The 1,444-row image map is a frozen legacy inventory, not proof that the
   authoritative edition contains no omitted, replaced, or differently placed
@@ -36,7 +49,8 @@ Status: BLOCKED
 ## Big Picture Objective
 
 Create the smallest understandable 29-document build and validation workflow,
-while leaving the authoritative-source blocker explicit.
+pin its complete fixed-layout source, and freeze semantically correct document
+and image ownership before content correction begins.
 
 ## Detailed Implementation Plan
 
@@ -55,8 +69,9 @@ while leaving the authoritative-source blocker explicit.
    output mutation, and reproducibility.
 5. Produce and validate the zero-correction baseline without describing it as
    a corrected edition.
-6. Complete source identity/access/legibility work before marking this stage
-   complete or beginning content correction.
+6. Pin and validate the complete source identity, local-use boundary, page
+   partition, fixed-layout Index, and legibility before beginning content
+   correction.
 
 ## No-Cheating Checks
 
@@ -69,15 +84,21 @@ while leaving the authoritative-source blocker explicit.
   missing/changed images, skipped coverage rows, and unlisted output files fail
   validation.
 - The build can be called a baseline projection, not an OCR-corrected book.
-- Source absence remains an open blocker; tests cannot waive it.
+- A missing, changed, mislocated, or unpinned source PDF fails validation.
+- Every source PDF page and raw byte belongs to exactly one canonical document.
+- Every `_page_N_` legacy asset must map to PDF page `N + 1` inside its owning
+  document's authoritative page interval.
+- Every correction location must begin with canonical `pdf:NNNN` and lie inside
+  the correction's owning document range.
 - Copying every legacy image does not prove figure order or caption association.
 - A document's second-pass coverage can close only after every correction and
-  technical/visual region in that document has been rechecked. Until a monotonic
-  authoritative location convention exists, all coverage rows remain `NO`.
+  technical/visual region in that document has been rechecked. The monotonic
+  `pdf:NNNN` ranges are frozen, while all content-review rows remain `NO`.
 
 ## Completion Requirements
 
-- [ ] A lawful, edition-matched, complete, readable source is documented.
+- [x] A user-authorized, edition-matched, complete, readable source is
+  documented and pinned without committing the source payload.
 - [x] Exactly 29 ordered ranges cover the complete raw stream without gap,
   overlap, or duplication.
 - [x] A zero-correction build succeeds and reassembles to the raw stream.
@@ -90,22 +111,18 @@ while leaving the authoritative-source blocker explicit.
 
 ## Stage Results
 
-BLOCKED on 2026-07-14 after three consecutive goal turns confirmed the same
-source-authority impasse. The source-access requirement is the only unmet
-Stage 2 completion requirement; no author text has been changed or reviewed
-against an authoritative source.
-
-All 29 boundary records still say
-`PROVISIONAL_REQUIRES_AUTHORITATIVE_CONFIRMATION`; a passing baseline
-validator is not evidence that their semantic ownership is frozen.
+Completed on 2026-07-15 after the user authorized the complete local PDF and
+the source, page partition, semantic boundaries, and image ownership were
+verified. No author text has yet been corrected or claimed reviewed; all 29
+content first/second-pass values remain `NO` for Stage 3 onward.
 
 - Added `build.py` and `validate.py`, using only the Python standard library.
   Corrections are tied to an absolute monolith byte offset and exact nonempty
   preimage, checked against the original document, rejected on overlap, and
   applied from the end of each document backward.
-- Added an empty `corrections.jsonl`, a 29-row `coverage.csv` with both
-  passes explicitly `NO`, and `unresolved.md` with the source blocker and
-  next acquisition action.
+- Added an empty `corrections.jsonl`, a 29-row ordered `coverage.csv` with both
+  passes explicitly `NO`, canonical `pdf:NNNN` ranges, and `unresolved.md`
+  recording closure of the former source blocker.
 - The zero-correction build produced 29 author-text Markdown files and 1,444
   adjacent JPEGs. Concatenating the 29 files in range order reproduces all
   3,780,628 monolith bytes, including the absent terminal newline.
@@ -113,27 +130,23 @@ validator is not evidence that their semantic ownership is frozen.
   document and image byte, checks the ordered image-reference sequence and
   generated Contents targets, independently reconstructs corrected document
   bytes, verifies the complete 1,463-file legacy-tree snapshot, and reports zero
-  corrections and zero completed second passes.
+  corrections and zero completed second passes. It also pins the ignored PDF by
+  path, size, and hash, enforces the 1–1,280 page partition, and rejects any
+  image/correction source page outside its owning document.
 - Two fresh temporary builds were byte-identical. Focused tests passed:
-  `9 passed, 19 subtests passed`. Both scripts also support an explicit
+  `10 passed, 26 subtests passed`. Both scripts also support an explicit
   `--zero-corrections` baseline mode, and temporary builds refuse to replace
   an existing directory.
-- A repository scan found no PDF, EPUB, MOBI, DJVU, CBZ, archive, or relevant
-  HTML source; the only HTML file is the unrelated visualization UI at
-  `src/ca/viz/static/index.html`. Intentionally deleted source material is
-  excluded and was not restored or inspected.
-- A 2026-07-14 official-site audit confirmed that NKS Online identifies the
-  target as First edition, Fourth printing and exposes all major book divisions
-  plus fixed-layout views for main text and Notes. Its semantic Index is not
-  edition-static—the official site says it adds post-2002 death dates—and no
-  verified printed-layout Index source is exposed there. Wolfram Science's site
-  terms prohibit bulk reproduction/archiving without advance permission; the
-  current general terms also prohibit bulk extraction and AI-tool use without
-  a separate agreement. The book copyright page requires consent for broader
-  copying and illustrations. No official-site content payload was downloaded
-  or retained.
-- The exact unblock action is now recorded in `unresolved.md`: provide a
-  complete edition-identical source with explicit authorization for this
-  agent-assisted full-book comparison and repository output, or obtain separate
-  permission/licensing from Wolfram. Then confirm fixed-layout Index coverage,
-  record the source location convention, and begin sequential comparison.
+- Source comparison corrected twelve chapter-start raw boundaries and moved
+  eight extracted opener-image ownership records. The rebuilt 29 documents
+  still concatenate byte-for-byte to the immutable monolith. Every one of the
+  1,444 `_page_N_` assets now maps to PDF page `N + 1` inside its owner's source
+  interval.
+- The earlier official online candidate is a later Fourth printing and is not
+  used as transcription evidence. The active witness matches the legacy First
+  printing. Its pdftk/iText container is documented as reprocessed rather than
+  claimed to be an untouched publisher master.
+- Passing commands after the final Foundation changes:
+  `uv run pytest -q goal-5/tests/test_foundation.py`,
+  `uv run python goal-5/build.py`, and
+  `uv run python goal-5/validate.py`.

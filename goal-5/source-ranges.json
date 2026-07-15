@@ -17,8 +17,8 @@
       "title": "Publication and Printed Contents",
       "authoritative_pdf_start_page": 1,
       "authoritative_pdf_end_page": 8,
-      "authoritative_printed_start": "front matter i",
-      "authoritative_printed_end": "front matter viii"
+      "authoritative_printed_start": "unfoliated cover/title matter",
+      "authoritative_printed_end": "contents followed by an unfoliated blank"
     },
     {
       "boundary_status": "SOURCE_CONFIRMED",
@@ -38,7 +38,7 @@
       "authoritative_pdf_start_page": 9,
       "authoritative_pdf_end_page": 16,
       "authoritative_printed_start": "ix",
-      "authoritative_printed_end": "xvi"
+      "authoritative_printed_end": "xiv followed by an unfoliated divider and blank"
     },
     {
       "boundary_status": "SOURCE_CONFIRMED",
@@ -538,7 +538,7 @@
       "authoritative_pdf_start_page": 1141,
       "authoritative_pdf_end_page": 1216,
       "authoritative_printed_start": "1125",
-      "authoritative_printed_end": "1200"
+      "authoritative_printed_end": "1197 followed by an unfoliated blank, divider, and blank"
     },
     {
       "boundary_status": "SOURCE_CONFIRMED",
@@ -557,8 +557,8 @@
       "title": "Index",
       "authoritative_pdf_start_page": 1217,
       "authoritative_pdf_end_page": 1279,
-      "authoritative_printed_start": "1201",
-      "authoritative_printed_end": "1263"
+      "authoritative_printed_start": "logical 1201; Index leaves are unfoliated",
+      "authoritative_printed_end": "logical 1263 inferred from the fixed PDF offset"
     },
     {
       "boundary_status": "SOURCE_CONFIRMED",
@@ -599,6 +599,6 @@
     "authorization_scope": "The user instructed Codex to copy this local PDF into the ANKoS workspace and resume Goal 5. Use is limited to local agent-assisted source comparison and repaired workspace output; the source PDF remains git-ignored and this record does not authorize redistribution of the PDF.",
     "source_status": "USER_AUTHORIZED_LOCAL_SOURCE",
     "identity_evidence": "PDF copyright page states Copyright 2002, ISBN 1-57955-008-8, First edition, First printing; the legacy monolith transcribes the same identity.",
-    "completeness_evidence": "pdfinfo reports 1,280 pages. The fixed-layout file contains publication matter, Preface, Chapters 1-12, General and chapter Notes, the printed four-column Index, and the Colophon. Full-file pdftotext completed; sampled front matter, main text, Notes, Index, and Colophon render legibly."
+    "completeness_evidence": "pdfinfo reports 1,280 pages, matching the Colophon. Ghostscript rendered all 1,280 pages successfully at a uniform 465.12 x 619.2 point crop; all 26 pages without extractable text were accounted for as raster title/divider leaves or intentional blanks. The fixed-layout source contains publication matter, Preface, Chapters 1-12, General and chapter Notes, the four-column Index, and complete Colophon. Representative prose, technical, figure, Notes, Index, and Colophon regions are visually legible. Poppler reports 127 bad annotation destinations, which affect links rather than rendered page content."
   }
 }

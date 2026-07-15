@@ -135,6 +135,8 @@ class FoundationTests(unittest.TestCase):
             "raw_start_byte": 0,
             "raw_end_byte_exclusive": len(raw),
             "output_path": "CHAPTERS/01-Test.md",
+            "authoritative_pdf_start_page": 1,
+            "authoritative_pdf_end_page": 1,
         }
         valid = {
             "id": "C-0001",
@@ -143,7 +145,7 @@ class FoundationTests(unittest.TestCase):
             "before": "bad",
             "after": "good",
             "expected_count": 1,
-            "authoritative_location": "p. 1",
+            "authoritative_location": "pdf:0001",
             "reason": "OCR substitution",
             "reviewer_type": "agent",
             "verification_status": "SOURCE_VERIFIED",
@@ -167,6 +169,12 @@ class FoundationTests(unittest.TestCase):
         unverified = valid.copy()
         unverified["verification_status"] = "INFERRED"
         invalid.append(unverified)
+        unbound_source = valid.copy()
+        unbound_source["authoritative_location"] = "p. 1"
+        invalid.append(unbound_source)
+        wrong_source_page = valid.copy()
+        wrong_source_page["authoritative_location"] = "pdf:0002"
+        invalid.append(wrong_source_page)
         duplicate = valid.copy()
         invalid.append([valid, duplicate])
         for case in invalid:
@@ -203,6 +211,9 @@ class FoundationTests(unittest.TestCase):
 
         variants: list[list[dict[str, str]]] = []
         variants.append(copy.deepcopy(clean[:-1]))
+        reordered = copy.deepcopy(clean)
+        reordered[0], reordered[1] = reordered[1], reordered[0]
+        variants.append(reordered)
         duplicate = copy.deepcopy(clean)
         duplicate[-1]["document_id"] = duplicate[0]["document_id"]
         variants.append(duplicate)
@@ -290,6 +301,11 @@ class FoundationTests(unittest.TestCase):
                 mutate(rows)
                 with self.assertRaises(build.BuildError):
                     build.validate_images(self.raw, self.documents, rows)
+
+        wrong_source_span = copy.deepcopy(self.documents)
+        wrong_source_span[1]["authoritative_pdf_end_page"] = 14
+        with self.assertRaisesRegex(build.BuildError, "owner PDF range"):
+            build.validate_images(self.raw, wrong_source_span, self.images)
 
     @staticmethod
     def _tree_manifest(root: Path) -> list[tuple[str, str]]:

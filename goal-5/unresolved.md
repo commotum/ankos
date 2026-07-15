@@ -1,55 +1,40 @@
 # Unresolved items
 
+There is no open Foundation source blocker. Content-review discrepancies are
+added here only when source comparison cannot resolve them; none has yet been
+opened because sequential review begins in Stage 3.
+
 ## FOUNDATION-SOURCE-001 — complete authoritative source
 
-Status: OPEN; blocks Stage 2 completion and all content-review stages.
+Status: CLOSED on 2026-07-15.
 
-Goal 5 does not currently have a lawful, readable, edition-identical source
-authorized for complete agent review, including fixed-layout evidence for the
-Index. A live workspace scan found no independent book PDF, EPUB, archive, HTML
-export, or full-page image corpus. Intentionally deleted source material remains
-excluded and will not be restored or inspected.
+The user authorized the complete local PDF for resuming Goal 5's agent-assisted
+comparison and repaired workspace output. The source remains Git-ignored and
+outside both the immutable legacy tree and generated repaired tree; this local
+authorization does not authorize redistribution of the PDF.
 
-The official NKS Online surface was rechecked on 2026-07-14:
+Pinned source facts are in `source-ranges.json`:
 
-- Its copyright page identifies the target as First edition, Fourth printing,
-  copyright 2002; the official book page gives ISBN 1-57955-008-8.
-- Its table of contents exposes Preface, Chapters 1–12, Notes, Index, copyright,
-  and Colophon. Fixed-layout views exist for main text and Notes, but the
-  current Index interface does not expose a verified printed-layout Index
-  source.
-- Wolfram's own online-version note says the semantic Index adds death dates
-  learned after the printed book was completed in January 2002. It is therefore
-  not edition-static evidence for printed Index wording.
-- The Wolfram Science site terms prohibit mirroring, bulk reproduction, and
-  archiving without advance written permission. The current general Wolfram
-  Terms, effective 2024-07-29, also prohibit scraping or bulk downloading and
-  use with AI-powered tools without a separate licensing agreement.
-- The book copyright page allows limited scholarly quotation but requires prior
-  written consent for broader copying and for illustrations.
+- path: `A New Kind of Science/A New Kind of Science.pdf`
+- SHA-256:
+  `a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6`
+- size: 57,779,240 bytes
+- identity: First edition, First printing, ISBN `1-57955-008-8`, matching the
+  immutable OCR monolith
+- extent: 1,280 one-based PDF pages, covering publication matter, Preface,
+  Chapters 1–12, General and chapter Notes, fixed-layout four-column Index, and
+  Colophon
+- location rule: Arabic printed page = PDF page − 16; legacy `_page_N_` asset
+  names refer to one-based PDF page `N + 1`
 
-Relevant official pages:
+Ghostscript rendered all 1,280 pages successfully. Twenty-six pages without
+extractable text were accounted for as raster title/divider leaves or
+intentional blanks. Representative prose, technical, figure, Notes, Index, and
+Colophon regions are visually legible. Poppler's 127 bad-annotation-destination
+warnings affect PDF links, not rendered content.
 
-- <https://www.wolframscience.com/nks/piv--copyright/>
-- <https://www.wolframscience.com/nks/>
-- <https://www.wolfram.com/legal/terms/wolfram-science.html>
-- <https://www.wolfram.com/legal/terms/wolfram/>
-- <https://www.wolframscience.com/reference/note.html>
-
-The official surface therefore cannot be used for Goal 5 under its published
-general terms. No content payload was downloaded or retained from it.
-
-Unblock with either:
-
-1. a complete edition-identical source supplied by the user together with
-   explicit confirmation that it is authorized for this agent-assisted
-   complete-book comparison and resulting repository output; or
-2. separate written permission/licensing from Wolfram for this workflow
-   (the Wolfram Science terms direct permission requests to
-   `ip@wolframscience.com`).
-
-After authorization, record the source identity and location convention,
-confirm completeness and legibility across all 29 ranges and the fixed-layout
-Index, then begin sequential review. Do not infer corrections from the OCR,
-split derivatives, detectors, dictionaries, or model confidence while this
-item is open.
+The container was reprocessed with pdftk/iText and is not claimed to be an
+untouched publisher master. It is documented as a user-authorized,
+edition-identical fixed-layout witness. Its embedded text layer is diagnostic
+only because custom math glyphs and columns extract incorrectly; visual source
+comparison remains authoritative.

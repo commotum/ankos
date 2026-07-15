@@ -113,6 +113,10 @@ def validate_coverage(
         raise build.BuildError(
             f"{path}: expected one row per document ({len(documents)}), found {len(rows)}"
         )
+    expected_order = [str(document["id"]) for document in documents]
+    actual_order = [row["document_id"] for row in rows]
+    if actual_order != expected_order:
+        raise build.BuildError(f"{path}: coverage rows are not in canonical order")
     by_id: dict[str, dict[str, str]] = {}
     for row in rows:
         document_id = row["document_id"]
