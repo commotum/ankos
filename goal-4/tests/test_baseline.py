@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import shutil
 import sys
@@ -27,6 +28,7 @@ from guardrail_lib import GuardrailError, canonical_json_bytes, load_canonical_j
 from validate_baseline import (  # noqa: E402
     EXPECTED_ARTIFACTS,
     _independent_defect_checks,
+    _independent_git_lfs_checks,
     _independent_image_checks,
     _independent_jpeg_metadata,
     _independent_routing_checks,
@@ -128,6 +130,43 @@ class FrozenBaselineTests(unittest.TestCase):
         self.assertEqual(sum(allocation.values()), 7)
         self.assertTrue(all(allocation[key] <= population[key] for key in RISK_PRIORITY))
 
+    def test_hamilton_equal_remainder_tie_uses_risk_priority(self) -> None:
+        population = {
+            "INDEX_COLUMN_OR_ENTRY": 0,
+            "FORMULA_CODE_RULE_OR_DATA": 2,
+            "FIGURE_CAPTION_OR_VISUAL": 2,
+            "HEADING_LIST_OR_LAYOUT": 0,
+            "PROSE": 2,
+        }
+        self.assertEqual(
+            _hamilton_allocation(population, 4),
+            {
+                "INDEX_COLUMN_OR_ENTRY": 0,
+                "FORMULA_CODE_RULE_OR_DATA": 2,
+                "FIGURE_CAPTION_OR_VISUAL": 1,
+                "HEADING_LIST_OR_LAYOUT": 0,
+                "PROSE": 1,
+            },
+        )
+
+    def test_quality_seed_and_rank_known_vector_framing(self) -> None:
+        seed_spec = self.quality["seed"]
+        vector = seed_spec["known_vector"]
+        domain = bytes.fromhex(seed_spec["domain_separator_hex"])
+        self.assertEqual(domain[-1], 0)
+        seed = hashlib.sha256(domain + bytes.fromhex(vector["manifest_material_utf8_hex"])).hexdigest()
+        self.assertEqual(seed, vector["seed_sha256"])
+        rank_payload = (
+            bytes.fromhex(seed)
+            + b"\0"
+            + vector["rank_canonical_document_id"].encode("utf-8")
+            + b"\0"
+            + vector["rank_risk_stratum"].encode("utf-8")
+            + b"\0"
+            + vector["rank_raw_block_id"].encode("utf-8")
+        )
+        self.assertEqual(hashlib.sha256(rank_payload).hexdigest(), vector["rank_sha256"])
+
     def test_small_document_selects_all(self) -> None:
         population = {
             "INDEX_COLUMN_OR_ENTRY": 0,
@@ -152,6 +191,45 @@ class FrozenBaselineTests(unittest.TestCase):
             mutated.write_bytes(payload)
             with self.assertRaisesRegex(GuardrailError, "raw SHA-256 drift"):
                 _validate_raw_rows(ROOT, self.manifest, {relative: mutated})
+
+    def test_manifest_filesystem_mode_and_link_count_mutations_fail_audit(self) -> None:
+        mutations = {
+            "filesystem_mode": ("filesystem_mode_at_capture", "0600", "raw filesystem-mode drift"),
+            "link_count": ("link_count_at_capture", 2, "raw capture link-count claim drift"),
+        }
+        for label, (field, value, message) in mutations.items():
+            with self.subTest(label=label):
+                manifest = copy.deepcopy(self.manifest)
+                manifest["raw_inputs"][0][field] = value
+                with self.assertRaisesRegex(GuardrailError, message):
+                    _validate_raw_rows(ROOT, manifest, None, audit_capture_metadata=True)
+
+    def test_git_and_lfs_identity_mutations_fail_independent_checks(self) -> None:
+        def first_jpeg(manifest: dict) -> dict:
+            return next(row for row in manifest["raw_inputs"] if row["kind"] == "JPEG")
+
+        mutations = {
+            "tree_mode": (
+                lambda manifest: manifest["raw_inputs"][0].__setitem__("git_tree_mode", "100755"),
+                "Git entry drift",
+            ),
+            "lfs_oid": (
+                lambda manifest: first_jpeg(manifest).__setitem__("git_lfs_oid_sha256", "0" * 64),
+                "LFS OID drift",
+            ),
+            "lfs_size": (
+                lambda manifest: first_jpeg(manifest).__setitem__(
+                    "git_lfs_size", first_jpeg(manifest)["git_lfs_size"] + 1
+                ),
+                "LFS size drift",
+            ),
+        }
+        for label, (mutate, message) in mutations.items():
+            with self.subTest(label=label):
+                manifest = copy.deepcopy(self.manifest)
+                mutate(manifest)
+                with self.assertRaisesRegex(GuardrailError, message):
+                    _independent_git_lfs_checks(ROOT, manifest)
 
     def test_malformed_jpeg_is_rejected(self) -> None:
         jpeg = next(row for row in self.manifest["raw_inputs"] if row["kind"] == "JPEG")

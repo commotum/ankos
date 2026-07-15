@@ -68,7 +68,7 @@ EXPECTED_ARTIFACTS = (
 
 # Set only after the Stage 2 source/test surface is closed. The lock excludes
 # this validator itself, avoiding a circular self-hash.
-EXPECTED_BASELINE_LOCK_SHA256: str | None = None
+EXPECTED_BASELINE_LOCK_SHA256 = "57224a1f1ba8333bbc900b23ff6127a189649feb01c279f30fac05a305658863"
 EXPECTED_ROUTING_PROJECTION_SHA256 = "5fdc26f3781956927824286ca1d9247a9002c5e2ad5682f433fdef7b267054e7"
 
 MANIFEST_KEYS = {
@@ -174,6 +174,7 @@ def _independent_jpeg_metadata(payload: bytes) -> dict[str, Any]:
     require(payload[:2] == b"\xff\xd8", "JPEG is missing SOI")
     index = 2
     frame: dict[str, Any] | None = None
+    frame_component_ids: set[int] = set()
     saw_scan = False
     saw_eoi = False
     sof_markers = {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF}
@@ -205,6 +206,14 @@ def _independent_jpeg_metadata(payload: bytes) -> dict[str, Any]:
             components = payload[index + 7]
             require(components > 0 and length == 8 + 3 * components, "invalid JPEG SOF component table")
             require(width > 0 and height > 0, "invalid JPEG dimensions")
+            component_ids: list[int] = []
+            for component_offset in range(index + 8, index + length, 3):
+                component_id = payload[component_offset]
+                sampling = payload[component_offset + 1]
+                require(sampling >> 4 > 0 and sampling & 0x0F > 0, "invalid JPEG SOF sampling factor")
+                component_ids.append(component_id)
+            require(len(set(component_ids)) == components, "duplicate JPEG SOF component ID")
+            frame_component_ids = set(component_ids)
             frame = {
                 "component_count": components,
                 "height": height,
@@ -213,8 +222,11 @@ def _independent_jpeg_metadata(payload: bytes) -> dict[str, Any]:
                 "width": width,
             }
         if marker == 0xDA:
+            require(frame is not None, "JPEG SOS precedes SOF")
             components = payload[index + 2] if length >= 3 else 0
             require(components > 0 and length == 6 + 2 * components, "invalid JPEG SOS component table")
+            selectors = {payload[index + 3 + 2 * component] for component in range(components)}
+            require(len(selectors) == components and selectors <= frame_component_ids, "invalid JPEG SOS component selectors")
             saw_scan = True
             index += length
             while index < len(payload):
@@ -494,6 +506,16 @@ def _validate_raw_rows(
         "RAW_AUTHOR_TEXT_MONOLITH": 1,
     }, "manifest role census drift")
     require(manifest["counts"] == {"all_regular_files": 1463, "jpeg": 1444, "markdown": 19}, "manifest count summary drift")
+    require(manifest["contract_id"] == "ANKOS-GUARDRAILS-1", "manifest contract binding drift")
+    require(manifest["discovery_policy"] == {
+        "build_inputs": "EXPLICIT_MANIFEST_ROWS_ONLY",
+        "capture_census_root": LEGACY_RELATIVE,
+        "capture_census_root_component_exact": True,
+        "repaired_sibling_excluded": REPAIRED_RELATIVE,
+    }, "manifest discovery policy drift")
+    require(manifest["git"] == {"legacy_tree_oid": LEGACY_GIT_TREE, "object_format": "sha1"}, "manifest Git summary drift")
+    require(manifest["ordering"] == "relative_path ascending by raw UTF-8 bytes", "manifest ordering drift")
+    require(manifest["path_profile"] == {"ascii_only": True, "casefold_unique": True, "control_free": True, "nfc": True, "posix_relative": True}, "manifest path profile drift")
     expected_duplicates = [
         {"paths": paths, "sha256": digest}
         for digest, paths in sorted(duplicate_payloads.items())
@@ -525,6 +547,15 @@ def _validate_raw_rows(
     }, "quality seed material drift")
     require(manifest["totals"]["logical_bytes"] == sum(row["byte_size"] for row in manifest["raw_inputs"]), "manifest logical-byte total drift")
     require(manifest["totals"]["markdown_logical_lines"] == sum(row["logical_line_count"] or 0 for row in manifest["raw_inputs"]), "manifest logical-line total drift")
+    require(manifest["totals"]["regular_file_allocated_bytes_at_capture"] == sum(row["allocated_byte_size_at_capture"] for row in manifest["raw_inputs"]), "manifest captured file-allocation total drift")
+    require(manifest["totals"] == {
+        "directory_allocated_bytes_at_capture": 180224,
+        "directory_count_including_root": 36,
+        "logical_bytes": 115037515,
+        "markdown_logical_lines": 44989,
+        "regular_file_allocated_bytes_at_capture": 118026240,
+        "tree_allocated_bytes_at_capture": 118206464,
+    }, "manifest frozen totals drift")
 
 
 def _independent_structure_checks(
@@ -634,7 +665,24 @@ def _independent_sample_ids(
         for row in manifest["raw_inputs"]
     ]
     material = json.dumps(projection, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    seed_bytes = hashlib.sha256(bytes.fromhex(quality["seed"]["domain_separator_hex"]) + material).digest()
+    domain = bytes.fromhex(quality["seed"]["domain_separator_hex"])
+    known = quality["seed"]["known_vector"]
+    require(
+        hashlib.sha256(domain + bytes.fromhex(known["manifest_material_utf8_hex"])).hexdigest()
+        == known["seed_sha256"],
+        "independent held-out seed known-vector drift",
+    )
+    known_rank_payload = (
+        bytes.fromhex(known["seed_sha256"])
+        + b"\0"
+        + known["rank_canonical_document_id"].encode("utf-8")
+        + b"\0"
+        + known["rank_risk_stratum"].encode("utf-8")
+        + b"\0"
+        + known["rank_raw_block_id"].encode("utf-8")
+    )
+    require(hashlib.sha256(known_rank_payload).hexdigest() == known["rank_sha256"], "independent held-out rank known-vector drift")
+    seed_bytes = hashlib.sha256(domain + material).digest()
     seed = seed_bytes.hex()
     ranked: dict[tuple[str, str], list[tuple[int, str, str]]] = defaultdict(list)
     for block in blocks:
@@ -1184,6 +1232,9 @@ def _independent_defect_checks(
     require(sum(row.get("source_path") not in {None, MONOLITH_RELATIVE} for row in defect_rows) == 6, "routing-file known-defect span census drift")
     require(sum("image_reference" in row for row in defect_rows) == 3, "image known-defect route census drift")
     exact_hits = [row for row in detector_hits if row["detector_id"] == "D13_EXACT_SENTINEL"]
+    for number, hit in enumerate(detector_hits, 1):
+        _strict_keys(hit, {"detector_id", "end_line", "fingerprint_sha256", "hit_id", "raw_block_ids", "repair_authorized", "route", "schema_version", "source_path", "start_line"}, f"detector hit {number}")
+        require(hit["schema_version"] == "1.0.0" and re.fullmatch(r"[0-9a-f]{64}", hit["fingerprint_sha256"]) is not None, f"detector hit schema/fingerprint drift: {number}")
     require(len(exact_hits) == len(defect_rows), "exact sentinel detector coverage drift")
     by_route = {row["route"]: row for row in exact_hits}
     require(set(by_route) == {row["sentinel_id"] for row in defect_rows}, "exact sentinel detector route drift")
@@ -1193,8 +1244,11 @@ def _independent_defect_checks(
         require(hit["fingerprint_sha256"] == defect.get("raw_span_sha256", defect.get("artifact_sha256")) and hit["raw_block_ids"] == defect["raw_block_ids"], f"exact sentinel hit fingerprint drift: {defect['sentinel_id']}")
     require([row["hit_id"] for row in detector_hits] == [f"HIT-{number:06d}" for number in range(1, len(detector_hits) + 1)], "detector hit ID/order drift")
     require(all(row["repair_authorized"] is False for row in detector_hits), "baseline detector hit authorizes repair")
+    _strict_keys(detector_report, {"baseline_only", "detector_families", "hit_count", "hits_path", "known_defect_registry", "measurements", "repairs_applied", "schema_version", "stage_40_obligation", "status"}, "detector report")
     registry = detector_report["known_defect_registry"]
+    _strict_keys(registry, {"exact_presence_count", "exact_presence_denominator", "generic_candidate_recall_denominator", "generic_candidate_recall_numerator", "manual_exact_route_count", "registry_path", "registry_sha256", "routes", "unrouted_count"}, "detector registry report")
     require(detector_report["repairs_applied"] == 0 and detector_report["baseline_only"] is True and registry["unrouted_count"] == 0, "detector report repair/routing claim drift")
+    require(detector_report["hit_count"] == len(detector_hits) and detector_report["hits_path"] == "goal-4/baseline-detector-hits.jsonl", "detector report hit binding drift")
     require(registry["exact_presence_count"] == registry["exact_presence_denominator"] == 55 and registry["registry_sha256"] == sha256_bytes(jsonl_bytes(defect_rows)), "detector report exact-registry binding drift")
     generic_locations: dict[tuple[str, int | None], set[str]] = defaultdict(set)
     for hit in detector_hits:
@@ -1211,6 +1265,26 @@ def _independent_defect_checks(
     require(registry["routes"] == expected_routes, "detector report known-defect routes drift")
     generic_count = sum(bool(row["generic_detector_ids"]) for row in expected_routes)
     require(registry["generic_candidate_recall_numerator"] == generic_count and registry["generic_candidate_recall_denominator"] == 55 and registry["manual_exact_route_count"] == 55 - generic_count, "detector generic-recall accounting drift")
+    expected_statuses = {
+        "D01_RAW_MANIFEST": "FATAL_BASELINE_CHECK",
+        "D02_TEXT_PROFILE": "FATAL_BASELINE_CHECK",
+        "D03_STRUCTURE": "FATAL_BASELINE_CHECK",
+        "D04_SPLIT_ROUTING": "IMPLEMENTED_BASELINE_CANDIDATE_DETECTOR",
+        "D05_IMAGE_REFERENCE": "IMPLEMENTED_BASELINE_CANDIDATE_DETECTOR",
+        "D06_FENCE": "RESERVED_FOR_STAGE_40",
+        "D07_HEADING": "IMPLEMENTED_BASELINE_CANDIDATE_DETECTOR",
+        "D08_CAPTION_ASSOCIATION": "RESERVED_FOR_STAGE_38_40",
+        "D09_WORD_BOUNDARY": "RESERVED_FOR_STAGE_40",
+        "D10_TECHNICAL": "LIMITED_BASELINE_CANDIDATE_DETECTOR",
+        "D11_REPETITION": "RESERVED_FOR_STAGE_40",
+        "D12_INDEX": "LIMITED_BASELINE_CANDIDATE_DETECTOR",
+        "D13_EXACT_SENTINEL": "IMPLEMENTED_EXACT_REGRESSION_CHECK_NOT_DISCOVERY",
+    }
+    require([row["detector_id"] for row in detector_report["detector_families"]] == list(expected_statuses), "detector family order/scope drift")
+    hit_counts = Counter(hit["detector_id"] for hit in detector_hits)
+    for family in detector_report["detector_families"]:
+        _strict_keys(family, {"description", "detector_id", "hit_count", "implementation_status", "writes_author_text"}, f"detector family {family.get('detector_id', '?')}")
+        require(family["implementation_status"] == expected_statuses[family["detector_id"]] and family["hit_count"] == hit_counts[family["detector_id"]] and family["writes_author_text"] is False, f"detector implementation-status claim drift: {family['detector_id']}")
 
 
 def _validate_lock(
@@ -1319,6 +1393,16 @@ def validate_baseline(
     _strict_keys(environment, {"capture_scope", "environment", "schema_version", "tools"}, "baseline environment")
     require(environment.get("schema_version") == "1.0.0", "baseline environment schema drift")
     scope = environment.get("capture_scope", {})
+    _strict_keys(scope, {
+        "git_head_after", "git_head_before", "git_head_stable_during_capture", "git_status_after_sha256",
+        "git_status_after_utf8", "git_status_before_sha256", "git_status_before_utf8", "legacy_git_tree_after",
+        "legacy_git_tree_before", "legacy_manifest_rows_sha256_after", "legacy_manifest_rows_sha256_before",
+        "legacy_manifest_stable_during_capture", "repaired_sibling_absent_after", "repaired_sibling_absent_before",
+        "repository_root_at_capture",
+    }, "baseline capture scope")
+    _strict_keys(environment["tools"], {"git", "pillow", "python", "tools_source_sha256"}, "baseline tool environment")
+    _strict_keys(environment["environment"], {"byteorder", "filesystem_encoding", "filesystem_utf8_mode", "locale_environment", "platform", "python_executable", "python_implementation", "python_version", "unicode_version", "umask"}, "baseline runtime environment")
+    require(re.fullmatch(r"Pillow \d+(?:\.\d+)+", environment["tools"]["pillow"]) is not None, "captured Pillow version drift")
     require(scope.get("git_head_stable_during_capture") is True, "Git HEAD moved during baseline capture")
     require(
         scope.get("legacy_git_tree_before") == scope.get("legacy_git_tree_after") == LEGACY_GIT_TREE,
@@ -1336,8 +1420,7 @@ def validate_baseline(
         lock_path = artifact_root / "baseline-lock.json"
         lock = load_canonical_json(lock_path)
         _validate_lock(root, artifact_root, lock, environment)
-        if EXPECTED_BASELINE_LOCK_SHA256 is not None:
-            require(sha256_file(lock_path) == EXPECTED_BASELINE_LOCK_SHA256, "frozen baseline lock digest drift")
+        require(sha256_file(lock_path) == EXPECTED_BASELINE_LOCK_SHA256, "frozen baseline lock digest drift")
     return {
         "blocks": len(blocks),
         "defects": len(defect_rows),
