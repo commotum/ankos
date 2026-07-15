@@ -1,0 +1,17 @@
+{
+  "$defs": {
+    "byte_span": {"additionalProperties": false, "properties": {"end_byte_exclusive": {"minimum": 0, "type": "integer"}, "sha256": {"$ref": "#/$defs/sha256"}, "start_byte": {"minimum": 0, "type": "integer"}}, "required": ["start_byte", "end_byte_exclusive", "sha256"], "type": "object"},
+    "content_role": {"enum": ["CANONICAL_AUTHOR_TEXT", "DERIVED_AGGREGATE", "GENERATED_METADATA", "EDITORIAL_SIDECAR", "SEARCH_DERIVATIVE", "GOVERNED_LEGACY_ASSET", "GOVERNED_WITNESS_ASSET", "RELEASE_METADATA"]},
+    "final_disposition": {"enum": ["APPLIED_MECHANICALLY_PROVEN", "APPLIED_WITNESS_VERIFIED", "ANNOTATED_SOURCE_ERRATUM", "REJECTED_VALID_SOURCE_TEXT", "DUPLICATE_CANDIDATE", "UNRESOLVED_SOURCE_NEEDED"]},
+    "id": {"pattern": "^[A-Z0-9]+(?:[_-][A-Z0-9]+)*$", "type": "string"},
+    "principal": {"additionalProperties": false, "properties": {"principal_id": {"minLength": 1, "type": "string"}, "principal_type": {"enum": ["HUMAN", "AGENT", "AUTOMATED"]}, "session_id": {"minLength": 1, "type": "string"}}, "required": ["principal_id", "principal_type", "session_id"], "type": "object"},
+    "repair_class": {"enum": ["STRUCTURE_BOUNDARY", "MARKDOWN_STRUCTURE", "PROSE_OCR", "HEADING_OR_FURNITURE", "FORMULA_OR_SYMBOL", "WOLFRAM_CODE", "RULE_TABLE_OR_DATA", "FIGURE_OR_CAPTION", "INDEX_ENTRY", "NAVIGATION_METADATA", "SOURCE_ERRATUM_ANNOTATION", "SEARCH_NORMALIZATION"]},
+    "repo_path": {"minLength": 1, "pattern": "^[^/\\\\](?:[^\\\\]*[^/\\\\])?$", "type": "string"},
+    "review_role": {"enum": ["CREATOR", "SOURCE_REVIEWER", "SPECIALIST_REVIEWER", "ADJUDICATOR"]},
+    "severity_id": {"enum": ["S0_SOURCE_OR_COVERAGE_BLOCKER", "S1_SEMANTIC_OR_ORDER_ERROR", "S2_TEXT_OR_LAYOUT_FIDELITY_ERROR", "S3_REQUIRED_RELEASE_MECHANICS_ERROR", "S4_OPTIONAL_EDITORIAL_ENHANCEMENT"]},
+    "sha256": {"pattern": "^[0-9a-f]{64}$", "type": "string"},
+    "workflow_state": {"enum": ["CAPTURED", "EVIDENCE_READY", "PENDING_SPECIALIST_REVIEW", "PENDING_INDEPENDENT_REVIEW", "SOURCE_BLOCKED", "CLOSED"]}
+  },
+  "$id": "ankos://schemas/common.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

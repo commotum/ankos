@@ -1,0 +1,20 @@
+{
+  "$id": "ankos://schemas/ast-node.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "author_text_projection": {"type": "string"},
+    "author_text_projection_sha256": {"$ref": "common.schema.json#/$defs/sha256"},
+    "content_role": {"$ref": "common.schema.json#/$defs/content_role"},
+    "fields": {"additionalProperties": false, "properties": {"anchor_id": {"type": "string"}, "caption_range": {"$ref": "common.schema.json#/$defs/byte_span"}, "children": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array"}, "column_span": {"minimum": 1, "type": "integer"}, "component_asset_ids": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array"}, "destination": {"type": "string"}, "destination_text": {"type": "string"}, "fence_length": {"minimum": 1, "type": "integer"}, "inlines": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array"}, "items": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array"}, "kind": {"enum": ["SOFT", "HARD"]}, "label_children": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array"}, "language": {"type": ["string", "null"]}, "level": {"maximum": 6, "minimum": 1, "type": "integer"}, "link_kind": {"type": "string"}, "ordered": {"type": "boolean"}, "ordered_source_children": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array"}, "page_reference_ranges": {"items": {"$ref": "common.schema.json#/$defs/byte_span"}, "type": "array"}, "payload": {"type": "string"}, "row_span": {"minimum": 1, "type": "integer"}, "rows": {"items": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array"}, "type": "array"}, "see_target_ranges": {"items": {"$ref": "common.schema.json#/$defs/byte_span"}, "type": "array"}, "source_alt_projection": {"type": "string"}, "source_syntax_projection": {"type": "string"}, "start": {"minimum": 1, "type": "integer"}, "subentry_ranges": {"items": {"$ref": "common.schema.json#/$defs/byte_span"}, "type": "array"}, "term_ranges": {"items": {"$ref": "common.schema.json#/$defs/byte_span"}, "type": "array"}, "text": {"type": "string"}, "title_text": {"type": ["string", "null"]}, "witness_page_id": {"$ref": "common.schema.json#/$defs/id"}}, "type": "object"},
+    "node_id": {"$ref": "common.schema.json#/$defs/id"},
+    "node_type": {"enum": ["DOCUMENT", "PARAGRAPH", "TEXT", "SOURCE_LINE_BREAK", "EMPHASIS", "STRONG", "HEADING", "LIST", "LIST_ITEM", "BLOCKQUOTE", "INLINE_CODE", "CODE_BLOCK", "MATH_INLINE", "MATH_BLOCK", "TABLE", "TABLE_CELL", "SOURCE_LINK", "GENERATED_LINK", "IMAGE_REFERENCE", "FIGURE_GROUP", "INDEX_ENTRY", "RAW_HTML", "GENERATED_ANCHOR", "PAGE_MARKER"]},
+    "ordinal": {"minimum": 0, "type": "integer"},
+    "parent_node_id": {"type": ["string", "null"]},
+    "raw_span_ids": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array", "uniqueItems": true},
+    "schema_version": {"const": "1.0.0"},
+    "witness_region_ids": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array", "uniqueItems": true}
+  },
+  "required": ["schema_version", "node_id", "node_type", "parent_node_id", "ordinal", "raw_span_ids", "witness_region_ids", "content_role", "author_text_projection", "author_text_projection_sha256", "fields"],
+  "type": "object"
+}

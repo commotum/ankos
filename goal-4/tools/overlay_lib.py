@@ -751,8 +751,10 @@ def _validate_review(
     if review.source_decision != "APPROVED":
         raise EvidenceError(f"{repair_id}: source review is not approved")
     _require_sha256(review.evidence_view_sha256, "review evidence view SHA-256")
-    assert meta.witness is not None
-    if review.evidence_view_sha256 != meta.witness.evidence_view_sha256:
+    witness = meta.witness
+    if witness is None:
+        raise EvidenceError(f"{repair_id}: review cannot bind an absent witness")
+    if review.evidence_view_sha256 != witness.evidence_view_sha256:
         raise EvidenceError(f"{repair_id}: source review evidence-view hash mismatch")
 
     if high_risk:
@@ -767,7 +769,7 @@ def _validate_review(
         _require_nonempty_text(review.specialist_session_id or "", "specialist session ID")
         if review.specialist_decision != "APPROVED":
             raise EvidenceError(f"{repair_id}: specialist review is not approved")
-        if review.specialist_evidence_view_sha256 != meta.witness.evidence_view_sha256:
+        if review.specialist_evidence_view_sha256 != witness.evidence_view_sha256:
             raise EvidenceError(f"{repair_id}: specialist evidence-view hash mismatch")
 
 

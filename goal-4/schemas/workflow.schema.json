@@ -1,0 +1,15 @@
+{
+  "$id": "ankos://schemas/workflow.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "events": {"items": {"additionalProperties": false, "properties": {"evidence_ids": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array", "uniqueItems": true}, "from_state": {"type": ["string", "null"]}, "principal_id": {"minLength": 1, "type": "string"}, "reason_code": {"$ref": "common.schema.json#/$defs/id"}, "sequence": {"minimum": 0, "type": "integer"}, "session_id": {"minLength": 1, "type": "string"}, "to_state": {"$ref": "common.schema.json#/$defs/workflow_state"}}, "required": ["sequence", "from_state", "to_state", "principal_id", "session_id", "reason_code", "evidence_ids"], "type": "object"}, "minItems": 1, "type": "array"},
+    "final_disposition": {"type": ["string", "null"]},
+    "owner_stage": {"pattern": "^[0-9]+-[A-Z0-9-]+$", "type": "string"},
+    "required_review_roles": {"items": {"$ref": "common.schema.json#/$defs/review_role"}, "type": "array", "uniqueItems": true},
+    "state": {"$ref": "common.schema.json#/$defs/workflow_state"},
+    "unresolved_ids": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array", "uniqueItems": true}
+  },
+  "required": ["state", "owner_stage", "required_review_roles", "final_disposition", "events", "unresolved_ids"],
+  "type": "object"
+}
