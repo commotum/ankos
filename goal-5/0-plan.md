@@ -1,235 +1,256 @@
-# Goal 5: Practical ANKoS Corpus Repair
+# Goal 5: Reliable ANKoS Markdown Source
 
-Shorthand: `LEAN-BOOK-REPAIR`
+Shorthand: `BOOK-SOURCE`
 
 ## Big-Picture Objective
 
-Replace the overbuilt Goal 4 effort with a small, finishable workflow that makes
-the local *A New Kind of Science* corpus correctly partitioned, readable,
-navigable, and reproducible for use inside this repository.
+Create a reliable Markdown source of the complete *A New Kind of Science* book
+with the OCR errors corrected.
 
-Begin by removing Goal 4 machinery that does not contribute directly to that
-deliverable. Then build a repaired sibling corpus from the immutable legacy
-inputs, correct known structural and Markdown defects, make every local image
-reference resolve, add useful navigation, and document remaining OCR or source
-uncertainty honestly.
+The result must preserve the book's actual text and organization across front
+matter, all 12 chapters, General Notes, all 12 chapter Notes sections, formulas,
+Wolfram Language code, tables, captions, figures, Index, and Colophon. It must
+also be easy to navigate and reproducibly build from preserved inputs.
 
-This is a practical repository edition, not a publication-grade critical
-edition or a claim that every character has been checked against every printed
-page. Exhaustive witness certification can be pursued later as a separate goal
-if a properly licensed source and reviewers become available.
+Goal 5 keeps the fidelity objective that motivated Goal 4 while discarding the
+process machinery that does not help correct or verify the book. The first
+stage cleans up Goal 4's unnecessary schemas, locks, authority models, race
+defenses, generated ledgers, tests, caches, and unfinished pipeline work. It
+retains or migrates only source facts and tools that directly reduce the work
+of producing and checking the corrected book.
 
-## Scope
+Completion is not “best effort with disclosed OCR errors.” Completion means the
+entire corpus has been reviewed against an authoritative source, all discovered
+OCR errors have been corrected, all review coverage is accounted for, and no
+known transcription ambiguity remains open. Literal errors present in the book
+itself are preserved as source text rather than silently corrected.
 
-### In scope
+## What “Reliable” Means
 
-- Remove the superseded Goal 4 plans, generated ledgers, locks, schemas,
-  pipeline code, tests, bytecode, and empty/staged output that are not needed by
-  this lean workflow.
-- Preserve the current `ref/A-New-Kind-of-Science/` tree byte-for-byte.
-- Generate a repaired sibling at
-  `ref/A-New-Kind-of-Science-Repaired/`.
-- Partition the corpus into 29 plainly named author-text documents:
-  publication/contents, Preface, 12 chapters, General Notes, 12 chapter Notes
-  documents, Index, and Colophon.
-- Correct the known chapter/Notes/Index/Colophon boundary failures.
-- Preserve and resolve all 1,444 legacy image references without duplicating
-  image bytes unless portability is later made an explicit requirement.
-- Repair Markdown structure and source-backed transcription defects that
-  materially affect readability or meaning.
-- Add a contents page, stable headings/anchors, and useful main-text/Notes
-  navigation.
-- Record unresolved OCR, formula, code, caption, figure, and Index limitations
-  in a short human-readable document.
-- Provide a deterministic build and focused validation proportional to a local
-  reference corpus.
+The repaired corpus is reliable when:
 
-### Out of scope
+- every part of the book has received a sequential source comparison rather
+  than only detector-driven spot checking;
+- corrections are grounded in an authoritative edition-identical source, not
+  language-model plausibility or agreement between correlated OCR derivatives;
+- prose, punctuation, capitalization, spacing, headings, lists, formulas, code,
+  rule tables, captions, Index entries, and reading order are all in scope;
+- high-risk technical and multi-column material receives a dedicated second
+  pass;
+- automated searches are used to find residual defects but never treated as a
+  substitute for reading;
+- a separate verification pass confirms the corrected corpus and closes or
+  reopens every discrepancy;
+- the final Markdown builds deterministically, links and images resolve, and the
+  legacy corpus remains byte-for-byte unchanged.
 
-- Certifying every unchanged block against an edition-identical page witness.
-- A physical census of covers, leaves, blanks, endpapers, plates, trim, bleed,
-  or spread geometry.
-- Claiming a facsimile, scholarly critical edition, or ambiguity-free
-  transcription.
-- Independent specialist review of every formula, code token, caption, or
-  Index entry.
-- Security-hardening a local document build against malicious callers,
-  filesystem races, inode substitution, or forged authority records.
-- Recreating Goal 4's schema graph, proof locks, hostile mutation matrix,
-  reviewer-authority model, or per-block provenance database.
-- Replacing the legacy corpus, migrating Goal 1/3 consumers, or changing exact
-  legacy citations.
-- Duplicating approximately 100 MiB of JPEG assets merely to make the repaired
-  tree self-contained.
+This is source-fidelity work, but it does not require a forensic publication
+system. Reliability comes from complete comparison, careful correction, a
+simple coverage record, focused review, and reproducible output—not from a
+large schema graph or hostile-filesystem security model.
+
+## In Scope
+
+- Clean up Goal 4 artifacts that do not directly support book correction.
+- Preserve the legacy corpus as immutable raw evidence.
+- Establish a lawful, readable, edition-identical authoritative source for the
+  complete book.
+- Produce 29 correctly owned canonical Markdown documents: publication and
+  contents, Preface, 12 chapters, General Notes, 12 chapter Notes documents,
+  Index, and Colophon.
+- Correct all OCR transcription errors found through complete sequential
+  comparison and follow-up detector passes.
+- Correct document boundaries, paragraph/list/heading structure, reading order,
+  Markdown fences, formulas, code, captions, and Index column flattening where
+  the authoritative source establishes the answer.
+- Account for and correctly place every legacy image; add a missing visual only
+  when a lawful authoritative source establishes that it belongs in the book
+  and permits the chosen handling.
+- Add generated contents and navigation without presenting editorial material
+  as author text.
+- Build and validate the repaired sibling corpus reproducibly.
+
+## Out of Scope
+
+- Correcting factual, mathematical, historical, or typographical errors that
+  are actually present in the authoritative book. Those may be noted in a
+  separate errata file, but the canonical transcription preserves them.
+- Creating a generalized document compiler, workflow engine, evidence database,
+  reviewer-identity system, or security boundary.
+- A census of covers, endpapers, blank leaves, trim, bleed, file inodes, or
+  other publication/security details that do not affect the Markdown book.
+- Adversarial caller authorization, forged-ledger defense, atomic no-replace
+  race handling, implementation proof locks, or large mutation matrices.
+- Migrating Goal 1/3 consumers or replacing the immutable legacy corpus.
+- Claiming human review when work was performed by an agent.
 
 ## Non-Negotiable Constraints
 
-1. **Legacy input is immutable.** Goal 5 must not modify, rename, delete, or
-   reformat anything under `ref/A-New-Kind-of-Science/`.
-2. **Unrelated work is protected.** Cleanup may remove superseded Goal 4 work,
-   but it must not discard changes outside Goal 4 or the empty repaired-output
-   target. Inspect `git status` and relevant diffs before deletion.
-3. **Goal 4 cleanup is intentional and bounded.** Git history is the archive.
-   Transfer only compact, independently rechecked facts that Goal 5 genuinely
-   needs; do not retain machinery merely because it already exists.
-4. **Build beside the legacy corpus.** All repaired output belongs under
-   `ref/A-New-Kind-of-Science-Repaired/`, never inside the legacy root.
-5. **Always build from raw inputs.** A clean build starts from the legacy
-   monolith/assets plus a small explicit repair specification, never from a
-   previous repaired output.
-6. **Do not silently invent author text.** Textual changes require permitted,
-   inspectable evidence. When evidence is insufficient, preserve the raw text
-   and disclose the limitation.
-7. **Structure is not transcription proof.** Successful parsing, rendering,
-   syntax checking, or plausible wording does not establish what the book
-   printed.
-8. **Keep the implementation small.** Prefer one understandable builder, one
-   focused validator, a compact repair file, and targeted tests. Every new
-   abstraction must serve a current acceptance criterion.
-9. **No framework-first work.** Do not build generalized AST, workflow,
-   authority, review, provenance, or release frameworks before a concrete
-   corpus repair requires them.
-10. **No false completion claim.** The repaired edition must describe itself as
-    structurally repaired and practically reviewed, with any unresolved source
-    fidelity limitations visible.
+1. **Preserve the legacy corpus.** Do not modify, rename, delete, or reformat
+   `ref/A-New-Kind-of-Science/**`.
+2. **Protect unrelated work.** Inspect `git status` and diffs before cleanup or
+   bulk changes. Goal 4 files may be changing concurrently; never assume an old
+   inventory is current.
+3. **Clean up by utility.** Retain a Goal 4 artifact only if it is directly used
+   to locate, correct, build, or verify book content and is simpler to retain
+   than to replace. Git history is sufficient archival storage for discarded
+   process machinery.
+4. **Use an authoritative source.** A transcription-changing decision must be
+   checked against a lawful, edition-identical book source. The monolith, split
+   files, and extracted JPEGs are correlated or incomplete OCR evidence and
+   cannot alone prove corrected wording.
+5. **Respect source permissions.** Do not scrape, bulk-download, commit, or send
+   copyrighted source material to tools when the applicable license or user
+   authorization does not permit it. A user-provided or mounted source must
+   have a clear allowed-use boundary.
+6. **Do not guess.** Plausibility, spell-checking, parsers, execution, rendering,
+   and model consensus may identify candidates but cannot authorize a change.
+7. **Preserve authorial errors.** Distinguish OCR error from an error printed in
+   the book. Canonical Markdown transcribes the latter faithfully.
+8. **Review everything.** Every canonical source span and every authoritative
+   source region containing book content must belong to a completed review
+   batch. Detectors and samples do not replace this coverage requirement.
+9. **Use simple records.** Keep a compact correction log and coverage checklist.
+   Do not recreate Goal 4's per-block authority, workflow, provenance, lock, or
+   review schema system.
+10. **Build from preserved inputs.** Never use a previous repaired tree as the
+    source for the next build.
+11. **Keep editorial additions separate.** Generated anchors, page markers,
+    navigation, alternative text, and errata must not masquerade as book text.
+12. **Do not release with known ambiguity.** An unreadable or unavailable
+    authorial source region is a real blocker to the “without OCR errors” goal;
+    obtain better evidence or continue the review rather than weakening the
+    objective.
 
 ## Current Facts To Reverify
 
-These are planning facts, not trusted acceptance fixtures. Stage 2 must
-rederive the facts it uses after Stage 1 cleanup.
+These facts orient the scaffold. Execution must recheck them against the live
+worktree and corpus.
 
-- The legacy corpus currently contains 19 Markdown files and 1,444 JPEGs.
-- The monolith is approximately 3.78 MB and 22,498 logical lines.
-- The monolith contains 1,444 image references with unique basenames, while the
-  split corpus omits three references and has misleading back-matter splits.
-- Chapter 12 currently runs into General Notes; nominal Notes, Index, and
-  Colophon files contain displaced Notes and back matter.
-- The actual Index is column-flattened and cannot honestly be called a faithful
-  reconstruction without stronger layout evidence.
-- Goal 4 currently contains dozens of generated artifacts and roughly 21,000
-  lines of Python/schema/test machinery, while author-text repair remains
-  blocked.
-- At scaffold validation, Goal 4 has modifications in
-  `pipeline-contract.json`, `tools/pipeline_schema_lib.py`, and
-  `tools/validate_stage4.py`, plus untracked
-  `schemas/execution-receipt.schema.json` and
-  `tools/execution_receipt_runner.py`. Goal 4 may still be changing, so Stage 1
-  must resync rather than trust this snapshot. These paths are within the
-  user-authorized cleanup scope, but their diffs/content must be inspected
-  before deletion to confirm they contain no unrelated work.
-- `ref/A-New-Kind-of-Science-Repaired/` currently exists as an empty publication
-  target.
-- No licensed complete fixed-layout witness is presently available for an
-  exhaustive AI-assisted fidelity audit.
+- The legacy corpus has been observed to contain 19 Markdown files and 1,444
+  JPEGs.
+- The monolith has been observed at 3,780,628 bytes and 22,498 logical lines.
+- The monolith references 1,444 images; the split Markdown omits three image
+  references.
+- Chapter 12 runs into General Notes, and nominal Notes, Index, and Colophon
+  files contain displaced Notes and actual back matter.
+- The Index is flattened from multiple columns and requires layout-aware source
+  comparison.
+- Known defects include broken headings, word joins/splits, prose inside code
+  fences, malformed formulas, damaged Wolfram Language, caption interleaving,
+  OCR substitutions, and back-matter reading-order errors.
+- Goal 4 contains a large amount of generated planning, schema, lock, pipeline,
+  validation, and test machinery. Its current source-blocked pipeline has not
+  corrected the book text.
+- At the most recent scaffold sync, Goal 4 had modified and untracked pipeline
+  files. Stage 1 must inspect the then-current status before removing anything.
+- The sibling `ref/A-New-Kind-of-Science-Repaired/` exists but has not been
+  published as a verified repaired edition.
+- Goal 4 reported that the official online surface did not provide permission
+  for the bulk AI-assisted workflow it proposed. Goal 5 must re-evaluate the
+  actual narrower source access needed, seek authorization, or use a lawful
+  user-provided/licensed witness; it must not pretend the source problem away.
 
 ## Assumptions To Challenge
 
-- The monolith contains the complete author-text sequence needed for all 29
-  documents despite local OCR defects.
-- The known line boundaries remain correct when independently rederived.
-- Referencing immutable legacy JPEGs by relative path is acceptable for this
-  repository-local repaired edition.
-- A small explicit set of structural transforms can fix the major usability
-  defects without rewriting author text.
-- CommonMark-compatible output plus narrowly documented extensions is adequate
-  for the corpus.
-- The damaged Index can be made useful without pretending its printed column
-  order has been fully certified.
-- Existing Goal 1/3 consumers remain unaffected because the sibling output is
-  outside the legacy root.
+- A complete edition-identical source can be lawfully accessed for the full
+  comparison.
+- The raw monolith contains all author text even where its transcription or
+  layout is damaged.
+- The proposed 29-document organization accounts for all book content.
+- Existing JPEGs cover all printed figures and are associated with the correct
+  captions.
+- A CommonMark-oriented representation can preserve the relevant structure of
+  formulas, code, tables, captions, and Index entries.
+- Four-chapter review batches are small enough to review carefully without
+  losing continuity or skipping content.
+- A fresh second review plus targeted detectors can reach zero open OCR
+  discrepancies without requiring Goal 4's formal machinery.
 
-## Proposed Minimal Output
+## Minimal Working Architecture
 
-The exact filenames are frozen in Stage 2, but the intended shape is:
-
-```text
-ref/A-New-Kind-of-Science-Repaired/
-├── README.md
-├── Contents.md
-├── FRONT-MATTER/
-│   ├── Publication-and-Contents.md
-│   └── Preface.md
-├── CHAPTERS/
-│   ├── 01-The-Foundations-for-a-New-Kind-of-Science.md
-│   ├── ...
-│   └── 12-The-Principle-of-Computational-Equivalence.md
-└── BACK-MATTER/
-    ├── NOTES/
-    │   ├── 00-General-Notes.md
-    │   ├── ...
-    │   └── 12-The-Principle-of-Computational-Equivalence-Notes.md
-    ├── Index.md
-    └── Colophon.md
-```
-
-Goal-owned implementation should remain similarly small:
+The exact shape is frozen in Stage 2, but the intended system is small:
 
 ```text
 goal-5/
 ├── 0-plan.md
 ├── 0-loop.md
 ├── 0-prompt.md
-├── build.py                 # expected, not mandatory if a simpler form wins
-├── validate.py              # expected, focused acceptance checks
-├── repairs.jsonl            # text-changing repairs only
-├── known-limitations.md
-└── tests/                   # focused fixtures for real failure modes
+├── build.py
+├── validate.py
+├── corrections.jsonl
+├── coverage.csv
+├── unresolved.md
+└── tests/
+
+ref/A-New-Kind-of-Science-Repaired/
+├── README.md
+├── Contents.md
+├── FRONT-MATTER/
+├── CHAPTERS/
+└── BACK-MATTER/
+    ├── NOTES/
+    ├── Index.md
+    └── Colophon.md
 ```
 
-Generated metadata may be added only when a stage demonstrates why it is
-needed. There is no requirement to reproduce this sketch mechanically.
+`corrections.jsonl` records actual author-text changes with stable location,
+exact before/after text, source page/location, reason, and reviewer status.
+`coverage.csv` records sequential review ranges and second-pass completion.
+Neither file is a generalized workflow database.
 
 ## Success Metrics
 
-- Superseded Goal 4 machinery is removed after bounded diff inspection, with no
-  changes to the legacy corpus or unrelated work.
-- A clean command builds exactly 29 author-text documents plus clearly labeled
-  generated navigation/readme files in the repaired sibling.
-- The front matter, Chapters 1–12, General Notes, chapter Notes 1–12, Index, and
-  Colophon have correct ownership and ordering.
-- Every raw author-text span selected for the 29 documents is conserved exactly
-  once, except for changes listed in the compact repair file.
-- Every text-changing repair records its source location, before/after text,
-  reason, and evidence; structural path/heading generation does not require a
-  per-block provenance record.
-- All 1,444 legacy image references are accounted for, appear at the intended
-  corpus positions, and resolve from the repaired Markdown.
-- The three references missing from the old split corpus are present in the
-  repaired edition.
-- Known malformed boundaries, accidental prose fences, broken headings, and
-  other selected structural sentinels are fixed or explicitly documented.
-- Local links, image links, headings, anchors, fences, and expected document
-  counts pass focused validation.
-- Two builds from the same legacy inputs produce byte-identical text output.
-- The repaired README clearly distinguishes completed structural repair from
-  unresolved exhaustive OCR/layout certification.
-- Goal 1/3 behavior and the complete legacy tree remain unchanged.
+- Unnecessary Goal 4 machinery is removed without harming useful source facts,
+  the legacy corpus, or unrelated work.
+- A lawful edition-identical source covers the complete book text, technical
+  material, figures/captions, Index, and Colophon at readable quality.
+- Exactly 29 canonical author-text Markdown documents contain the complete book
+  in correct order and ownership.
+- Every canonical span is included in a sequential authoritative-source review
+  batch, and every batch is complete.
+- Every authoritative book-content region maps to the corrected Markdown; no
+  paragraph, heading, formula, code block, caption, table, Index entry, or
+  Colophon text is silently omitted.
+- Every applied transcription change has an exact preimage, source location,
+  rationale, and completed verification state.
+- Every high-risk formula, Wolfram Language block, rule table, caption, and
+  reconstructed Index region receives a dedicated second comparison.
+- All 1,444 legacy assets are accounted for, all repaired image references
+  resolve, and figure/caption placement agrees with the authoritative source.
+- Residual OCR detectors have no unexplained hits, and repeated full review
+  rounds produce no new discrepancies.
+- Zero known or unresolved transcription ambiguity remains at release.
+- The repaired Markdown parses/renders as intended, navigation resolves, and
+  two clean builds are byte-identical.
+- The complete legacy tree and existing Goal 1/3 consumers remain unchanged.
 
 ## Verification Requirements
 
-- Record pre-cleanup `git status`, inspect diffs under Goal 4, and compare the
-  post-cleanup diff against the explicit removal scope.
-- Hash the legacy tree before cleanup and after final release using an
-  independently understandable command or small validator.
-- Recompute corpus counts, monolith boundaries, image-reference counts, and
-  back-matter anomalies rather than importing Goal 4 locks as authority.
-- Verify the 29 source ranges are ordered, nonoverlapping, and cover the chosen
-  author-text stream exactly once.
-- Reassemble the 29 raw projections before repairs and compare them with the
-  selected monolith spans.
-- Validate every repair preimage and expected occurrence count before applying
-  it; fail when the raw input drifts.
-- Build twice into fresh temporary directories and recursively compare the text
-  outputs.
-- Check all relative Markdown and image links from their actual document
-  locations.
-- Parse headings and fence delimiters, check duplicate anchors, and test the
-  known boundary/image/fence regressions.
-- Run repository tests affected by the sibling corpus, plus direct
-  `git diff --check` and scope inspection.
-- Perform a human-readable spot check across front matter, every chapter,
-  General Notes, every chapter Notes document, Index, and Colophon. Record the
-  sampling method and findings without labeling it exhaustive review.
+- Hash the legacy corpus before cleanup and after release.
+- Inspect all modified/untracked Goal 4 content before deletion and record the
+  keep/delete/migrate decision.
+- Verify authoritative source identity, completeness, legibility, and allowed
+  use without constructing a physical-book forensics system.
+- Partition both raw and authoritative book content into simple, ordered review
+  ranges and prove no range is skipped or duplicated.
+- Build a zero-correction 29-document projection first and prove raw-content
+  conservation before applying corrections.
+- Guard every correction by exact preimage and expected occurrence count.
+- For every content batch, perform a complete forward source comparison, run
+  focused detectors, render changed material, and perform a separate second
+  pass before closing it.
+- Compare technical material character/token by character/token where ordinary
+  prose review is insufficient.
+- Compare the Index in printed column/entry order against fixed-layout evidence.
+- Verify image order, file identity, caption association, and link resolution.
+- Run corpus-wide searches for common OCR confusions, broken words,
+  punctuation/Unicode anomalies, malformed Markdown/math/code, and suspicious
+  vocabulary; disposition every hit.
+- Repeat the final review/detector pass after the last correction until a full
+  pass finds no new discrepancy.
+- Build twice in fresh directories, compare outputs, run focused tests and
+  affected repository tests, and run `git diff --check` plus scope inspection.
 
 ## Stages
 
@@ -237,211 +258,314 @@ needed. There is no requirement to reproduce this sketch mechanically.
 
 #### Big Picture Objective
 
-Remove the superseded Goal 4 implementation and leave a clean, understood base
-for the lean repair without harming legacy sources or unrelated work.
+Remove Goal 4 process overhead while preserving any compact source facts or
+content-oriented tools that genuinely help produce the reliable book.
 
 #### Detailed Implementation Plan
 
-- Sync `git status`, enumerate Goal 4 and repaired-output artifacts, measure
-  their size, and inspect all modified Goal 4 diffs.
-- Confirm that the modified Goal 4 files contain only superseded Goal 4 work.
-  If anything unrelated is found, preserve or relocate it before removal.
-- Extract into Goal 5 only compact facts that are still useful, and mark them
-  for independent Stage 2 reverification.
-- Remove `goal-4/**`, including plans, stage reports, generated JSON/JSONL,
-  schemas, locks, tools, tests, and bytecode caches.
-- Remove the repaired sibling only if it is still empty or contains only
-  unverified Goal 4 staging output; never delete an owned release without
-  inspecting it.
-- Check for Goal 4 references elsewhere and update only references that would
-  otherwise become broken or misleading. Do not migrate unrelated consumers.
-- Record the exact removal and preservation decisions in the stage report.
+- Sync the live worktree and inspect every modified/untracked Goal 4 file.
+- Inventory Goal 4 artifacts by purpose: source fact, content detector/builder,
+  or process machinery.
+- Keep or migrate only directly useful corpus manifests, boundary facts, known
+  defect locations, image mappings, or small content checks after independently
+  validating them.
+- Remove generalized schemas, proof/implementation locks, licensing/workflow
+  state machines, authority and reviewer models, synthetic overlay systems,
+  promotion-race defenses, redundant validators/tests, generated reports,
+  caches, and unfinished pipeline work.
+- Inspect the repaired sibling and remove only unverified Goal 4 output so Goal
+  5 starts from a clean build target.
+- Confirm no live documentation or consumer is left pointing at removed Goal 4
+  machinery.
 
 #### Completion Requirements
 
-- Pre-cleanup status and modified-file diffs are recorded in the stage report.
-- `goal-4/` and its superseded generated machinery are absent; Git history
-  remains the archive.
-- No file under the legacy corpus changed by path, mode, or bytes.
-- No unrelated worktree modification was deleted or overwritten.
-- No `__pycache__`, stale Goal 4 staging output, or broken live documentation
-  reference remains.
-- `git diff --check` and explicit scope inspection pass.
-- Stage 2 has a short list of facts to rederive, not a dependency on Goal 4
-  locks or validators.
+- The stage report records pre-cleanup status and a complete keep/delete/migrate
+  decision by artifact category.
+- No unrelated modification is lost and the legacy corpus hash is unchanged.
+- No retained artifact exists merely to validate another retained Goal 4
+  artifact; every retained item directly supports correction or verification.
+- Goal 4's generalized pipeline/security/workflow infrastructure and caches are
+  absent.
+- Goal 5 has a short, understandable starting dataset rather than a dependency
+  on Goal 4's trust chain.
+- `git diff --check`, broken-reference inspection, and explicit scope review
+  pass.
 
-### 2-BASELINE
+### 2-FOUNDATION
 
 #### Big Picture Objective
 
-Establish the smallest trustworthy corpus map and freeze the repaired document
-layout without recreating Goal 4's audit framework.
+Secure the complete authoritative source, freeze the 29-document layout, and
+implement the minimal reproducible build and coverage model.
 
 #### Detailed Implementation Plan
 
-- Independently enumerate and hash the explicit legacy Markdown/image inputs.
-- Recompute the monolith's line/byte properties, the 29 document boundaries,
-  image-reference sequence, and known split/back-matter anomalies.
-- Compare split files with the monolith only as routing evidence; do not treat
-  agreement between them as independent transcription proof.
-- Freeze the 29 repaired paths/order and define how their relative image links
-  reach immutable legacy assets.
-- Create a compact baseline artifact only if the builder or validator consumes
-  it directly; otherwise keep the values in readable code/data.
-- Write the repaired-edition fidelity statement and initial known-limitations
-  list before changing content.
-- Add focused tests for incorrect boundaries, missing image references, and raw
-  input drift.
+- Recompute the legacy corpus inventory, hashes, document boundaries, image
+  sequence, and known structural failures.
+- Establish a complete lawful edition-identical source and document its edition,
+  access boundary, page/location convention, completeness, and legibility.
+- Define ordered review ranges that cover all book content without requiring a
+  per-block evidence graph.
+- Freeze the 29 output paths and a minimal Markdown serialization policy.
+- Implement a straightforward builder that projects raw content into 29
+  documents and then applies guarded corrections.
+- Implement a focused validator for source range coverage, correction preimages,
+  document counts, image/link resolution, and deterministic output.
+- Create the initial `coverage.csv`, `corrections.jsonl`, and `unresolved.md`
+  formats with only fields used by the workflow.
 
 #### Completion Requirements
 
-- All legacy inputs used by the build are explicit and hash-checked.
-- Exactly 29 ordered, nonoverlapping source ranges are defined and independently
-  checked against the monolith.
-- Image counts and the three known split omissions are reproduced.
-- Actual Notes, Index, and Colophon boundaries are reproduced from local
-  evidence.
-- Output paths and asset-link policy are fixed and collision-free.
-- The limitations statement forbids claims of exhaustive transcription or
-  fixed-layout Index fidelity.
-- Baseline code/data remains compact and directly tied to acceptance criteria.
+- The complete authoritative source is lawful, edition-matched, readable, and
+  sufficient for all later batches; otherwise the stage stays blocked with an
+  exact acquisition action.
+- Exactly 29 ordered source/output ranges cover the complete raw book stream
+  without gap, overlap, or duplication.
+- A zero-correction build succeeds and reassembles to the selected raw stream.
+- All 1,444 raw image references and physical legacy assets are inventoried.
+- Builder, validator, correction record, and coverage record are small and
+  documented.
+- Focused raw-drift, boundary, skipped-range, duplicate-range, and correction-
+  preimage tests pass.
 
-### 3-STRUCTURE
+### 3-FRONT-CH04
 
 #### Big Picture Objective
 
-Build the 29-document repaired corpus with correct boundaries and byte-conserved
-raw author text before undertaking optional textual corrections.
+Correct and verify publication matter, Preface, and Chapters 1–4 against the
+authoritative source.
 
 #### Detailed Implementation Plan
 
-- Implement a straightforward clean builder from the frozen monolith ranges.
-- Emit the 29 documents in the frozen order with minimal generated envelopes.
-- Correct document ownership and boundary placement for Chapter 12, General
-  Notes, chapter Notes, Index, and Colophon.
-- Restore all monolith image references in source order and rewrite their paths
-  so they resolve to immutable legacy images.
-- Generate a small README and Contents page clearly labeled as editorial
-  navigation rather than author text.
-- Implement an independent-enough conservation check that reassembles raw
-  projections and detects gaps, overlaps, duplication, or reordering.
-- Test clean builds from repository root and one temporary output location.
+- Review every assigned range sequentially, including headings, page furniture,
+  prose, lists, formulas, code, captions, tables, and images.
+- Record and apply exact source-backed corrections.
+- Run prose, punctuation, word-split, fence, math, code, and image/caption
+  detectors over the batch.
+- Render changed and structurally complex regions.
+- Perform a separate second comparison of the complete batch and close all
+  discrepancies.
 
 #### Completion Requirements
 
-- A single documented command generates the complete repaired tree from legacy
-  inputs into a fresh destination.
-- Exactly 29 author-text documents exist with correct ownership/order.
-- Pre-repair reassembly matches the selected raw monolith stream exactly,
-  allowing only one explicitly documented terminal-newline serialization rule
-  if necessary.
-- All 1,444 image references occur in the expected order and resolve.
-- The legacy tree and existing consumer files are unchanged.
-- Focused boundary, conservation, path-safety, stale-output, and input-drift
-  tests pass.
+- Every assigned source range has first- and second-pass coverage.
+- All discovered OCR/layout discrepancies are corrected and verified.
+- Every correction is guarded and source-located.
+- No unresolved author-text item remains in the batch.
+- Focused detectors, rendering checks, builder, and validator pass.
 
-### 4-REPAIR
+### 4-CH05-08
 
 #### Big Picture Objective
 
-Improve practical Markdown readability and fix source-backed defects without
-turning uncertainty into invented text or attempting exhaustive certification.
+Correct and verify Chapters 5–8 against the authoritative source.
 
 #### Detailed Implementation Plan
 
-- Run simple detectors for empty headings, accidental prose fences, obvious
-  delimiter imbalance, broken local markup, split boundary artifacts, and
-  selected known defects.
-- Review detector hits in context and prioritize defects that materially affect
-  rendering, search, code/formula meaning, or comprehension.
-- Represent every author-text change in one compact repair file with guarded
-  preimage, expected count, location, rationale, and permitted evidence.
-- Treat purely generated navigation/path changes separately from author-text
-  repairs.
-- Preserve uncertain OCR literally and add a concise limitation/candidate entry
-  rather than guessing.
-- Give formulas, Wolfram Language, data tables, captions, and Index content
-  extra manual scrutiny when they are changed, but do not require a generalized
-  specialist workflow engine.
-- Render and inspect representative changed passages plus each high-risk change.
+- Apply the complete sequential comparison, correction, detector, rendering,
+  and separate second-pass procedure from Stage 3.
+- Pay extra attention to higher-dimensional layouts, formulas, rule diagrams,
+  scientific notation, captions, and application-specific vocabulary.
+- Fold newly discovered OCR patterns into corpus-wide detector queries without
+  treating matches as automatic corrections.
 
 #### Completion Requirements
 
-- Every applied author-text repair is explicit, preimage-guarded, reversible by
-  inspection, and supported by recorded evidence.
-- No unresolved candidate is silently changed merely because the result looks
-  plausible or parses.
-- Selected known structural/Markdown regression sentinels are fixed or listed
-  in `known-limitations.md` with their practical impact.
-- All changed high-risk formula/code/data/caption/Index passages receive an
-  explicit visual/manual review note.
-- Detector, builder, conservation, and focused rendering checks pass.
-- The repair mechanism stays corpus-specific and substantially simpler than the
-  removed Goal 4 framework.
+- Chapters 5–8 have complete first- and second-pass coverage.
+- All discovered discrepancies are corrected and source-verified.
+- New defect patterns are searched across already reviewed and future material.
+- No unresolved author-text item remains in the batch.
+- Focused and cumulative validation passes.
 
-### 5-NAVIGATION
+### 5-CH09-12
 
 #### Big Picture Objective
 
-Make the repaired corpus pleasant to browse inside the repository while keeping
-editorial navigation distinct from the book's author text.
+Correct and verify Chapters 9–12 against the authoritative source.
 
 #### Detailed Implementation Plan
 
-- Finalize Contents links to all 29 documents and useful internal section
-  headings.
-- Create deterministic, collision-free anchors using the chosen Markdown
-  renderer's actual behavior or explicit minimal anchors where necessary.
-- Add clearly editorial main-chapter to chapter-Notes links and backlinks.
-- Validate every Markdown link and image path relative to its containing file.
-- Improve Index usability only as supported by available evidence; preserve and
-  disclose column-order uncertainty instead of claiming print-faithful
-  reconstruction.
-- Perform a representative render/browse pass across all document classes.
+- Apply the complete batch procedure from Stage 3.
+- Give formulas, symbolic notation, networks, computation diagrams, code, and
+  Chapter 12's transition into General Notes explicit attention.
+- Recheck any corpus-wide patterns discovered in earlier chapter batches.
 
 #### Completion Requirements
 
-- Contents reaches all 29 author-text documents and every target exists.
-- Main/Notes navigation works for all 12 chapter pairs and General Notes is
-  reachable.
-- All local document/image links resolve with no duplicate explicit anchors.
-- Index limitations are visible where a reader encounters the Index.
-- Generated editorial material is distinguishable from author text.
-- Navigation remains deterministic across two clean builds.
+- Chapters 9–12 have complete first- and second-pass coverage.
+- All discovered discrepancies and the Chapter 12 ending boundary are correct.
+- No unresolved author-text item remains in the batch.
+- Focused and cumulative validation passes.
 
-### 6-RELEASE
+### 6-NOTES-00-04
 
 #### Big Picture Objective
 
-Publish the practical repaired sibling, prove the lean acceptance criteria, and
-leave an honest, maintainable handoff.
+Correct and verify General Notes and Chapter 1–4 Notes.
 
 #### Detailed Implementation Plan
 
-- Build twice from the immutable legacy corpus into fresh temporary directories
-  and compare outputs byte-for-byte.
-- Run focused Goal 5 tests, affected repository tests, link/Markdown checks,
-  `git diff --check`, and scope inspection.
-- Rehash the legacy tree and compare it with the pre-cleanup/pre-build state.
-- Spot-check front matter, all 12 chapters, General Notes, all 12 chapter Notes
-  documents, Index, and Colophon using a predeclared lightweight sample method.
-- Publish the validated output to the sibling directory using a simple staged
-  replacement appropriate to a local repository build; do not construct a
-  hostile-filesystem transaction protocol.
-- Write a concise final report in the repaired README or Goal 5 stage report:
-  what was repaired, commands used, known limitations, and how to rebuild.
-- Confirm no legacy consumer was silently migrated.
+- Review every Notes range sequentially with its printed page/source context.
+- Preserve Notes headings, page references, cross-references, formulas, code,
+  citations, captions, and image ownership accurately.
+- Apply detectors and a separate full second pass, including prior corpus-wide
+  defect patterns.
 
 #### Completion Requirements
 
-- Two fresh builds are byte-identical and the published sibling matches them.
-- All success metrics and verification requirements in this plan are checked
-  requirement-by-requirement.
-- The legacy corpus matches its initial hashes and unrelated work is intact.
-- Exactly 29 author-text documents are present, all required links/images
-  resolve, and known regressions pass.
-- The spot check covers every document class and records findings honestly.
-- The README states that the edition is structurally repaired and practically
-  reviewed, not exhaustively witness-certified.
-- Build, validation, known limitations, and future optional scholarly-audit
-  work are documented clearly enough for another session to continue.
+- General Notes and Chapter 1–4 Notes have complete two-pass coverage.
+- Note ownership and main-text boundaries are correct.
+- All discovered discrepancies are source-verified and corrected.
+- No unresolved author-text item remains in the batch.
+- Focused and cumulative validation passes.
+
+### 7-NOTES-05-08
+
+#### Big Picture Objective
+
+Correct and verify Chapter 5–8 Notes.
+
+#### Detailed Implementation Plan
+
+- Apply the complete Notes review procedure from Stage 6.
+- Recheck dense formulas, programs, references, and figure/caption associations
+  with surrounding source context.
+
+#### Completion Requirements
+
+- Chapter 5–8 Notes have complete first- and second-pass coverage.
+- All discovered discrepancies are corrected and source-verified.
+- No unresolved author-text item remains in the batch.
+- Focused and cumulative validation passes.
+
+### 8-NOTES-09-12
+
+#### Big Picture Objective
+
+Correct and verify Chapter 9–12 Notes.
+
+#### Detailed Implementation Plan
+
+- Apply the complete Notes review procedure from Stage 6.
+- Verify the displaced material currently found in nominal Index/Colophon files
+  is assigned to the correct Notes document and source order.
+
+#### Completion Requirements
+
+- Chapter 9–12 Notes have complete first- and second-pass coverage.
+- All displaced Notes boundaries and all discovered discrepancies are correct.
+- No unresolved author-text item remains in the batch.
+- Focused and cumulative validation passes.
+
+### 9-TECHNICAL
+
+#### Big Picture Objective
+
+Perform a corpus-wide specialist-style fidelity pass over formulas, Wolfram
+Language, rule tables, symbolic data, and other token-sensitive material.
+
+#### Detailed Implementation Plan
+
+- Enumerate technical regions from the corrected Markdown and compare each one
+  directly with the authoritative source.
+- Check symbols, delimiters, superscripts/subscripts, whitespace where
+  meaningful, row/column order, code identifiers, operators, and line wrapping.
+- Parse, render, or execute material where useful for defect discovery, while
+  keeping the source comparison authoritative.
+- Reopen owning content batches for any newly discovered discrepancy.
+
+#### Completion Requirements
+
+- Every technical region is enumerated and receives a dedicated source check.
+- Every changed token is source-verified and correction records are complete.
+- Parsing/rendering diagnostics have no undispositioned hit.
+- No unresolved technical transcription ambiguity remains.
+- Reopened batch checks and cumulative validation pass.
+
+### 10-FIGURES-INDEX
+
+#### Big Picture Objective
+
+Verify all figure/caption associations and reconstruct the Index and Colophon
+accurately from layout-aware source evidence.
+
+#### Detailed Implementation Plan
+
+- Compare every printed figure and caption with the existing asset sequence,
+  detecting missing, partial, swapped, duplicated, or misowned images.
+- Correct caption text and placement from source evidence.
+- Reconstruct the Index in printed column and entry order, preserving headings,
+  subentries, cross-references, punctuation, and page ranges.
+- Verify the Colophon and all actual Index/Colophon boundaries.
+- Perform a separate second pass over the complete Index and all changed figure
+  groups.
+
+#### Completion Requirements
+
+- Every printed figure/caption group has a checked Markdown/asset disposition.
+- All image references resolve and agree with their source placement.
+- The complete Index has two-pass fixed-layout coverage and correct entry order.
+- Colophon content and boundaries match the authoritative source.
+- No unresolved figure, caption, Index, or Colophon ambiguity remains.
+- Focused and cumulative validation passes.
+
+### 11-SATURATION
+
+#### Big Picture Objective
+
+Find and eliminate residual OCR errors across the assembled corrected corpus.
+
+#### Detailed Implementation Plan
+
+- Run corpus-wide detectors for common OCR substitutions, improbable tokens,
+  broken joins/splits, punctuation/Unicode anomalies, malformed Markdown,
+  formula/code errors, headings, captions, cross-references, and Index forms.
+- Review every detector hit against the authoritative source.
+- Conduct a fresh sequential verification pass over all 29 documents using the
+  coverage checklist, with special attention to unchanged passages surrounding
+  prior corrections.
+- Reopen the owning stage for every discovered discrepancy.
+- Repeat the complete detector and verification round after the last correction
+  until a full round yields no new discrepancy.
+
+#### Completion Requirements
+
+- Every detector hit has a source-backed disposition.
+- All 29 documents have a completed fresh verification pass.
+- The final complete round finds no new discrepancy.
+- `unresolved.md` contains zero author-text transcription ambiguity.
+- Coverage, correction, structure, image, link, and cumulative tests pass.
+
+### 12-RELEASE
+
+#### Big Picture Objective
+
+Publish the corrected Markdown source and prove the full-book reliability claim
+without reintroducing Goal 4's process overhead.
+
+#### Detailed Implementation Plan
+
+- Build twice from immutable legacy inputs and the correction set into fresh
+  directories; compare outputs byte-for-byte.
+- Validate document/source coverage, corrections, technical regions,
+  figures/captions, Index, navigation, assets, and Markdown rendering.
+- Rehash the legacy corpus and compare it with the initial snapshot.
+- Run focused Goal 5 tests, affected repository tests, `git diff --check`, and
+  explicit scope inspection.
+- Publish the verified sibling tree and write concise build, source, review,
+  correction, and maintenance documentation.
+- State reviewer types accurately and distinguish corrected OCR from optional
+  source errata annotations.
+
+#### Completion Requirements
+
+- All prior stages are complete with zero open author-text ambiguity.
+- Exactly 29 canonical documents contain the complete book in correct order.
+- Complete first-pass, second-pass, technical, figure/Index, and saturation
+  coverage is verified.
+- Two clean builds are byte-identical and match the published sibling.
+- All links and image references resolve and Markdown renders as intended.
+- Legacy hashes and existing consumer behavior remain unchanged.
+- The final documentation gives exact rebuild/validate commands and accurately
+  supports the claim that known OCR errors have been removed.

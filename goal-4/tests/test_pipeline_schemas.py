@@ -244,11 +244,18 @@ def valid_ast_node(
     data: bytes = GUARD_BYTES,
     raw_block_ids: list[str] | None = None,
     anchor_id: str | None = None,
+    node_type: str | None = None,
+    destination: str | None = None,
+    link_kind: str | None = None,
 ) -> dict[str, object]:
     text = data.decode("utf-8")
     fields = {"text": text}
     if anchor_id is not None:
         fields["anchor_id"] = anchor_id
+    if destination is not None:
+        fields["destination"] = destination
+    if link_kind is not None:
+        fields["link_kind"] = link_kind
     return {
         "author_text_projection": text,
         "author_text_projection_sha256": hashlib.sha256(data).hexdigest(),
@@ -256,7 +263,7 @@ def valid_ast_node(
         "content_role": "CANONICAL_AUTHOR_TEXT",
         "fields": fields,
         "node_id": node_id,
-        "node_type": "GENERATED_ANCHOR" if anchor_id is not None else "TEXT",
+        "node_type": node_type or ("GENERATED_ANCHOR" if anchor_id is not None else "TEXT"),
         "ordinal": 0,
         "output_path": output_path,
         "output_span": {"end_byte_exclusive": len(data), "sha256": hashlib.sha256(data).hexdigest(), "start_byte": 0},
@@ -670,8 +677,8 @@ class PipelineSchemaTests(unittest.TestCase):
             function(*args, **kwargs)
 
     def test_01_package_contract_and_schemas_pass(self) -> None:
-        self.assertEqual(len(self.registry.schemas), 13)
-        self.assertEqual(len(self.contract["ledgers"]), 7)
+        self.assertEqual(len(self.registry.schemas), 14)
+        self.assertEqual(len(self.contract["ledgers"]), 8)
 
     def test_02_valid_mechanical_repair_passes(self) -> None:
         lib.validate_repair(valid_repair(), self.registry)
@@ -896,7 +903,7 @@ class PipelineSchemaTests(unittest.TestCase):
 
     def test_41_externally_pinned_package_lock_passes(self) -> None:
         result = lib.validate_package(ROOT, schema_cli.EXPECTED_PIPELINE_SCHEMA_LOCK_SHA256)
-        self.assertEqual(result["schema_count"], 13)
+        self.assertEqual(result["schema_count"], 14)
 
     def test_42_duplicate_key_json_fails_before_canonicalization(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1120,21 +1127,13 @@ class PipelineSchemaTests(unittest.TestCase):
             lib.validate_release_manifest(valid_release_manifest(), self.registry)
 
     def test_62_not_published_release_must_enumerate_all_blockers(self) -> None:
-        row = valid_release_manifest()
-        for field in (
-            "compatibility_observation_receipt_sha256",
-            "compatibility_verification_sha256",
-            "output_manifest_sha256",
-            "reproducibility_receipt_sha256",
-            "schema_lock_sha256",
-        ):
-            row[field] = VIEW_SHA
-        row["inverse_replay"]["raw_projection_sha256"] = VIEW_SHA
-        row["inverse_replay"]["receipt_sha256"] = VIEW_SHA
-        row["rollback"]["receipt_sha256"] = VIEW_SHA
-        row["two_clean_build_digests"] = [VIEW_SHA, VIEW_SHA]
-        with self.assertRaisesRegex(lib.PipelineSchemaError, "enumerate every Stage 3 blocker"):
-            lib.validate_release_manifest(row, self.registry)
+        dynamic = valid_unresolved()
+        expected = set(lib._frozen_indexes(self.registry)["open_unresolved_ids"]) | {
+            dynamic["unresolved_id"]
+        }
+        self.assertEqual(
+            lib.expected_release_blocker_ids(self.registry, [dynamic]), expected
+        )
 
     def test_63_not_published_state_cannot_claim_atomic_publication(self) -> None:
         row = valid_release_manifest()
@@ -1163,7 +1162,7 @@ class PipelineSchemaTests(unittest.TestCase):
             result = lib.validate_package(
                 relocated, schema_cli.EXPECTED_PIPELINE_SCHEMA_LOCK_SHA256
             )
-            self.assertEqual(result["schema_count"], 13)
+            self.assertEqual(result["schema_count"], 14)
             completed = subprocess.run(
                 [
                     sys.executable,
@@ -1289,7 +1288,10 @@ class PipelineSchemaTests(unittest.TestCase):
         lib.validate_compatibility(record, self.registry)
         receipt = valid_compatibility_observation(record)
         lib.validate_compatibility_observation(record, receipt, self.registry)
-        receipt["oracle_receipts"][0]["stdout_sha256"] = VIEW_SHA
+        receipt["oracle_receipts"][0]["execution_receipt"]["stdout_sha256"] = VIEW_SHA
+        receipt["oracle_receipts"][0]["execution_receipt"]["receipt_sha256"] = receipt_hash(
+            receipt["oracle_receipts"][0]["execution_receipt"]
+        )
         receipt["oracle_receipts"][0]["receipt_sha256"] = receipt_hash(receipt["oracle_receipts"][0])
         receipt["receipt_sha256"] = receipt_hash(receipt)
         self.expect_failure(
@@ -1345,6 +1347,106 @@ class PipelineSchemaTests(unittest.TestCase):
             self.registry,
             operation_row,
             [review],
+        )
+
+    def test_75_ast_raw_ids_bind_each_node_to_exact_bytes_not_only_partition(self) -> None:
+        indexes = lib._frozen_indexes(self.registry)
+        first = indexes["blocks_by_id"]["RAW-000001"]
+        second = indexes["blocks_by_id"]["RAW-000002"]
+        exact = MONOLITH_BYTES[first["start_byte"] : second["end_byte_exclusive"]]
+        node = valid_ast_node(
+            "NODE-TWO-BLOCKS",
+            data=exact,
+            raw_block_ids=["RAW-000001", "RAW-000002"],
+        )
+        lib._validated_ast_nodes(self.registry, [node])
+        skewed = exact[len(GUARD_BYTES) :] + exact[: len(GUARD_BYTES)]
+        node = valid_ast_node(
+            "NODE-TWO-BLOCKS",
+            data=skewed,
+            raw_block_ids=["RAW-000001", "RAW-000002"],
+        )
+        self.expect_failure(lib._validated_ast_nodes, self.registry, [node])
+
+    def test_76_overlay_bridge_rejects_unrelated_or_negative_review_directly(self) -> None:
+        row, operation_row = valid_overlay_binding(self.registry)
+        review = closed_review("REVIEW-NEGATIVE", principal="independent")
+        review.update({"decision_kind": "REJECTION", "decision_payload": "REJECTED", "subject_id": "REPAIR-OTHER", "repair_id": "REPAIR-OTHER"})
+        review["decision_sha256"] = projection("REJECTED")["sha256"]
+        review["evidence_view_sha256"] = row["evidence"]["mechanical"][0]["evidence_sha256"]
+        row["review_ids"] = [review["review_id"]]
+        meta_review = overlay_lib.IndependentReview(
+            review_id=review["review_id"], creator_principal_id="creator",
+            source_reviewer_principal_id=review["principal_id"], source_reviewer_type=review["reviewer_type"],
+            source_reviewer_session_id=review["session_id"], source_reviewer_role=review["reviewer_role"],
+            source_decision="APPROVED", evidence_view_sha256=review["evidence_view_sha256"],
+            review_row_sha256=hashlib.sha256(lib.canonical_json_bytes(review)).hexdigest(),
+            blind_preproposal=review["blind_preproposal"],
+        )
+        operation_row = replace(operation_row, meta=replace(operation_row.meta, review=meta_review))
+        row["operation_projection_sha256"] = overlay_lib.operation_projection_sha256(operation_row)
+        self.expect_failure(lib.validate_overlay_operation_binding, row, self.registry, operation_row, [review])
+
+    def test_77_resolved_navigation_link_joins_resolved_anchor_and_link_ast(self) -> None:
+        anchor = valid_navigation()
+        anchor["sequence"] = 0
+        link = valid_navigation()
+        link.update({
+            "anchor_id": None,
+            "destination_anchor_id": anchor["anchor_id"],
+            "destination_path": anchor["source_path"],
+            "link_kind": "NEXT",
+            "navigation_id": "NAVIGATION-2",
+            "record_type": "LINK",
+            "sequence": 1,
+            "source_node_id": "NODE-LINK-1",
+        })
+        ast = [
+            valid_ast_node("NODE-NAV-1", anchor_id=anchor["anchor_id"]),
+            valid_ast_node("NODE-LINK-1", node_type="GENERATED_LINK", destination=anchor["anchor_id"], link_kind="NEXT"),
+        ]
+        lib.validate_navigation_set([anchor, link], self.registry, ast_nodes=ast)
+        anchor["resolution_state"] = "BROKEN"
+        anchor["workflow"] = blocked_workflow()
+        anchor["unresolved_ids"] = anchor["workflow"]["unresolved_ids"]
+        self.expect_failure(lib.validate_navigation_set, [anchor, link], self.registry, ast_nodes=ast)
+
+    def test_78_navigation_dynamic_blocker_requires_exact_unresolved_fk(self) -> None:
+        row = valid_navigation()
+        row["resolution_state"] = "SOURCE_BLOCKED"
+        row["workflow"] = blocked_workflow("UNRESOLVED-TEST-1")
+        row["unresolved_ids"] = ["UNRESOLVED-TEST-1"]
+        ast = [valid_ast_node("NODE-NAV-1", anchor_id=row["anchor_id"])]
+        self.expect_failure(lib.validate_navigation, row, self.registry, ast_nodes=ast)
+        lib.validate_navigation(row, self.registry, ast_nodes=ast, unresolved_records=[valid_unresolved()])
+
+    def test_79_figure_set_rejects_duplicate_ids_and_wrong_review_subject(self) -> None:
+        first = valid_figure()
+        second = valid_figure()
+        second["record_id"] = "FIGURE-2"
+        self.expect_failure(lib.validate_figure_set, [first, second], self.registry)
+        review = closed_review("REVIEW-FIGURE", role="SPECIALIST_REVIEWER", subject_id="WRONG-FIGURE")
+        review.update({"repair_id": None, "specialty": "FIGURE_CAPTION", "subject_type": "FIGURE_GROUP"})
+        first["review_ids"] = [review["review_id"]]
+        self.expect_failure(lib.validate_figure_set, [first], self.registry, review_records=[review])
+
+    def test_80_registered_ast_ledger_rejects_different_caller_rows(self) -> None:
+        ledger = [valid_ast_node("NODE-LEDGER-1")]
+        self.assertEqual(lib.validate_registered_ast_rows(self.registry, ledger), ledger)
+        caller = deepcopy(ledger)
+        caller[0]["node_id"] = "NODE-CALLER-DIFFERENT"
+        self.expect_failure(lib.validate_registered_ast_rows, self.registry, ledger, caller)
+
+    def test_81_release_blocker_union_includes_dynamic_open_rows_only(self) -> None:
+        dynamic = valid_unresolved()
+        expected = set(lib._frozen_indexes(self.registry)["open_unresolved_ids"]) | {dynamic["unresolved_id"]}
+        self.assertEqual(lib.expected_release_blocker_ids(self.registry, [dynamic]), expected)
+        dynamic["workflow_state"] = "CLOSED"
+        dynamic["final_disposition"] = "UNRESOLVED_SOURCE_NEEDED"
+        dynamic["resolution"] = {"evidence_ids": [], "resolution_sha256": VIEW_SHA, "summary": "closed"}
+        self.assertEqual(
+            lib.expected_release_blocker_ids(self.registry, [dynamic]),
+            set(lib._frozen_indexes(self.registry)["open_unresolved_ids"]),
         )
 
 

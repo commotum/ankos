@@ -543,6 +543,18 @@ def _validated_ast_nodes(
     return by_id
 
 
+def validate_registered_ast_rows(
+    registry: SchemaRegistry,
+    ledger_rows: Sequence[Mapping[str, Any]],
+    caller_rows: Sequence[Mapping[str, Any]] | None = None,
+) -> list[Mapping[str, Any]]:
+    authoritative = list(ledger_rows)
+    _validated_ast_nodes(registry, authoritative)
+    if caller_rows is not None and canonical_json_bytes(list(caller_rows)) != canonical_json_bytes(authoritative):
+        raise PipelineSchemaError("caller AST rows differ from the registered hashed AST ledger")
+    return authoritative
+
+
 def _join_output_node_partition(
     *,
     node_ids: Sequence[str],
@@ -2702,10 +2714,9 @@ def _validate_release_ledgers(
 
     reviews = by_path["goal-4/review-ledger.jsonl"]
     ledger_ast_nodes = by_path["goal-4/ast-node-ledger.jsonl"]
-    if ast_nodes is not None and canonical_json_bytes(list(ast_nodes)) != canonical_json_bytes(ledger_ast_nodes):
-        raise PipelineSchemaError("caller AST rows differ from the registered hashed AST ledger")
-    authoritative_ast_nodes = ledger_ast_nodes
-    _validated_ast_nodes(registry, authoritative_ast_nodes)
+    authoritative_ast_nodes = validate_registered_ast_rows(
+        registry, ledger_ast_nodes, ast_nodes
+    )
     unresolved = by_path["goal-4/unresolved-ledger.jsonl"]
     repairs = by_path["goal-4/repair-ledger.jsonl"]
     provenance = by_path["goal-4/provenance-map.jsonl"]
@@ -2763,6 +2774,17 @@ def _load_receipt(
     if not isinstance(receipt, dict):
         raise PipelineSchemaError(f"release {label} artifact is not an object receipt")
     return receipt
+
+
+def expected_release_blocker_ids(
+    registry: SchemaRegistry, unresolved_records: Sequence[Mapping[str, Any]]
+) -> set[str]:
+    dynamic = {
+        row["unresolved_id"]
+        for row in unresolved_records
+        if row["workflow_state"] != "CLOSED" and row["release_blocker_codes"]
+    }
+    return set(_frozen_indexes(registry)["open_unresolved_ids"]) | dynamic
 
 
 def _validate_inverse_replay_receipt(
@@ -2976,12 +2998,9 @@ def validate_release_manifest(
         output_root=output_root,
         ast_nodes=ast_nodes,
     )
-    dynamic_open_blockers = {
-        row["unresolved_id"]
-        for row in ledger_rows["goal-4/unresolved-ledger.jsonl"]
-        if row["workflow_state"] != "CLOSED" and row["release_blocker_codes"]
-    }
-    expected_open_blockers = set(_frozen_indexes(registry)["open_unresolved_ids"]) | dynamic_open_blockers
+    expected_open_blockers = expected_release_blocker_ids(
+        registry, ledger_rows["goal-4/unresolved-ledger.jsonl"]
+    )
     if set(record["open_blocker_ids"]) != expected_open_blockers:
         raise PipelineSchemaError("release does not enumerate the exact frozen+dynamic open blocker union")
     corpus_path = _artifact_with_digest(

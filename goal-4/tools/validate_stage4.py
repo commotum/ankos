@@ -112,6 +112,7 @@ def _artifact_rows() -> tuple[tuple[str, str], ...]:
         "goal-4/tools/witness_lib.py": "UPSTREAM_TOOL",
         # The complete accepted Stage 4 test surface.
         "goal-4/tests/test_baseline.py": "UPSTREAM_TEST",
+        "goal-4/tests/test_execution_receipt.py": "TEST",
         "goal-4/tests/test_guardrails.py": "UPSTREAM_TEST",
         "goal-4/tests/test_overlay.py": "TEST",
         "goal-4/tests/test_overlay_registry.py": "TEST",
@@ -142,6 +143,7 @@ EXPECTED_VALIDATORS = (
     ),
 )
 REQUIRED_STAGE4_TESTS = (
+    "goal-4/tests/test_execution_receipt.py",
     "goal-4/tests/test_overlay.py",
     "goal-4/tests/test_overlay_registry.py",
     "goal-4/tests/test_pipeline_schemas.py",

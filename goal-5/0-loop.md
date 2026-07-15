@@ -1,90 +1,102 @@
 # Goal 5 Execution Loop
 
-Use this loop to execute `goal-5/0-plan.md` without rebuilding the process
-overhead that Goal 5 is intended to remove.
+Use this loop to execute `goal-5/0-plan.md`. The objective is full-book OCR
+correction with complete source comparison, implemented with the smallest
+workflow that can support that claim.
 
 ## Repeatable Loop
 
-1. Sync current state with the actual files, `git status`, relevant diffs,
-   corpus counts, and tests.
+1. Sync current state with the actual files, source availability, coverage
+   records, corrections, tests, and `git status`.
 2. Update `goal-5/0-plan.md` with current facts before starting the next stage.
 3. Select the first incomplete stage whose prerequisites are ready.
 4. Create or refresh `goal-5/[INDEX]-[SHORTHAND].md` from the template below.
 5. Implement only that stage.
-6. Add verification and no-cheating checks tied directly to that stage's
-   completion requirements.
-7. Run focused tests, appropriate affected repository tests, and whitespace/diff
-   checks.
-8. Record commands, results, discoveries, and remaining limitations in the
-   stage file.
-9. Fold durable results and changed assumptions back into `0-plan.md`.
+6. Add verification and no-cheating checks tied to its completion requirements.
+7. Run focused tests, cumulative validation, affected repository tests where
+   appropriate, and whitespace/diff checks.
+8. Record exact review coverage, corrections, commands, results, and remaining
+   issues in the stage file.
+9. Fold durable findings, new defect patterns, and changed assumptions back into
+   `0-plan.md`.
 10. Continue toward the original objective. If stopping, leave the goal
-    resumable with current evidence, the next action, unblock steps, and
-    assumptions still needing tests.
+    resumable with current evidence, next source range, open discrepancies,
+    unblock actions, and assumptions to challenge.
 
 ## Global Invariants
 
-- Do not narrow the user's objective without saying so.
-- Do not mark a stage complete without evidence for each completion
+- Do not narrow “reliable Markdown source without OCR errors” into structural
+  cleanup, best effort, sampling, or a corpus with accepted known ambiguities.
+- Do not mark a stage complete without evidence for every completion
   requirement.
-- Do not treat a green test as evidence for a requirement the test does not
-  exercise.
-- Prefer small, low-complexity stages that narrow uncertainty and produce a
-  useful corpus increment.
-- Convert blockers into explicit work items, bounded deferrals, or honest known
-  limitations; do not conceal them behind tooling.
-- Preserve the distinction between implementation, validator, diagnostic, and
-  fallback paths.
+- Do not treat tests, parsing, rendering, execution, or model confidence as
+  transcription proof unless an authoritative source establishes the text.
+- Prefer small, low-complexity stages that correct concrete book content.
+- Convert blockers into explicit source-acquisition, legibility, comparison, or
+  verification work; do not hide them behind process artifacts.
+- Preserve the distinction between raw input, authoritative source, correction,
+  generated navigation, diagnostic, verifier, and source erratum.
 - Keep `ref/A-New-Kind-of-Science/` byte-for-byte immutable.
-- Protect unrelated worktree changes. Inspect before deleting, especially in
-  Stage 1.
+- Protect unrelated worktree changes, especially during Goal 4 cleanup.
 - Never use repaired output as the next build's source.
-- Never infer missing author text from plausibility, parser success, or model
-  preference.
-- Keep generated navigation and explanations visibly separate from author text.
-- Do not recreate Goal 4's general schema, lock, authority, review, provenance,
-  race-defense, or mutation infrastructure.
-- Add a tool, abstraction, ledger, or test only when it protects a named Goal 5
-  acceptance criterion.
-- The practical release may retain disclosed OCR/layout uncertainty. It may not
-  claim exhaustive source fidelity while that uncertainty exists.
+- Preserve literal author errors and notation when the source shows them.
+- Do not claim human review for agent work.
+- Do not recreate Goal 4's generalized schema, proof-lock, workflow-authority,
+  review-identity, or hostile-race infrastructure.
+- Add a record field, tool, abstraction, or test only when it directly protects
+  a named Goal 5 acceptance criterion.
 
-## Stage Discipline
+## Content Batch Procedure
 
-- Only one stage is `IN_PROGRESS` at a time.
-- A stage file is an execution record, not a second expanding master plan.
-- Prefer a direct corpus-specific implementation over a reusable framework.
-- Reuse a Goal 4 fact only after rederiving or independently checking it; do
-  not preserve Goal 4 machinery as its own justification.
-- Keep repair records proportional: author-text changes need guarded evidence;
-  generated paths and navigation need deterministic tests, not scholarly
-  provenance rows.
-- When a fixed-layout witness is unavailable, preserve uncertain source text
-  and document the limitation. Do not block unrelated structural progress.
-- Review stage scope with `git diff --name-status` and `git diff --check` before
-  declaring completion.
+Stages 3–8 use this procedure for every assigned source range:
 
-## Verification Selection
+1. Confirm the raw range, authoritative source range, and previous/next boundary.
+2. Read forward sequentially; do not jump only among detector hits.
+3. Compare headings, prose, punctuation, lists, formulas, code, tables,
+   captions, images, page references, and reading order.
+4. Record each correction with exact preimage, replacement, expected count, raw
+   location, authoritative page/location, rationale, and reviewer type.
+5. Apply corrections only through the guarded correction mechanism.
+6. Run relevant OCR, Markdown, formula/code, image, and vocabulary detectors.
+7. Check every detector hit against the authoritative source.
+8. Render changed and structurally complex regions.
+9. Perform a separate second sequential pass over the complete assigned range.
+10. Close the batch only when coverage is complete and no discrepancy or
+    ambiguity remains.
 
-Every stage runs the checks named in its completion requirements. In addition:
+If a new OCR pattern is discovered, search already completed batches as well as
+future batches and reopen any affected stage.
 
-- Stage 1 checks deletion scope, protected diffs, legacy hashes, stale caches,
-  and broken references.
-- Stage 2 checks corpus inventory, boundaries, image counts, path layout, and
-  baseline drift fixtures.
-- Stage 3 checks 29-document coverage, source ordering, conservation, image
-  resolution, and clean-build behavior.
-- Stage 4 checks every repair preimage, changed-passage evidence, known defect
-  sentinels, rendering, and unresolved-candidate disclosure.
-- Stage 5 checks the complete navigation graph, image paths, anchors, and
-  representative rendered documents.
-- Stage 6 reruns all Goal 5 checks, affected repository tests, two-build
-  comparison, legacy hash comparison, scope inspection, and the declared spot
-  review.
+## Evidence Rules
 
-Avoid automatic escalation from a real defect to a generalized framework. Add
-the smallest check that would have caught the actual defect and a nearby
-regression.
+- The authoritative source must be edition-identical, readable for the decision
+  being made, and lawfully usable in the workflow.
+- Raw/split agreement is routing evidence, not independent correction evidence.
+- A dictionary, language model, parser, renderer, or executable result may flag
+  a candidate but does not decide the transcription.
+- Technical material is compared at the token or character level when prose
+  reading can miss meaningful differences.
+- Index order requires fixed-layout or equivalently authoritative column-order
+  evidence.
+- Unreadable source content stays open and blocks final completion; it is not
+  guessed or waived.
+
+## Verification By Stage Type
+
+- Cleanup: diff inspection, keep/delete rationale, legacy hash, stale-reference
+  scan, caches, and scope checks.
+- Foundation: source identity/access, raw inventory, 29-range coverage,
+  zero-correction conservation, image inventory, and build/validator tests.
+- Content batches: complete two-pass range coverage, guarded corrections,
+  detector dispositions, rendering, and cumulative validation.
+- Technical: total technical-region inventory, token comparison, diagnostics,
+  reopened batch closure, and zero ambiguity.
+- Figures/Index: complete visual/caption disposition, fixed-layout Index review,
+  Colophon boundary/content, and second pass.
+- Saturation: full-corpus detector disposition, fresh 29-document pass, reopened
+  corrections, and a final complete round with no new discrepancy.
+- Release: two clean builds, all coverage joins, links/assets/rendering, legacy
+  hashes, affected tests, diff/scope checks, and accurate documentation.
 
 ## Stage File Template
 
@@ -95,13 +107,14 @@ Status: NOT_STARTED
 
 ## Current Facts
 
-- Facts from current code, tests, documents, Git state, and previous stages.
+- Facts from current code, sources, coverage, corrections, tests, Git state,
+  and previous stage results.
 
 ## Updated Assumptions
 
 - Assumptions that still look valid.
 - Assumptions that changed.
-- Assumptions that need tests before being trusted.
+- Assumptions that need tests or source comparison before being trusted.
 
 ## Big Picture Objective
 
@@ -109,41 +122,44 @@ Status: NOT_STARTED
 
 ## Detailed Implementation Plan
 
-- Concrete code, document, data, cleanup, and test changes for this stage.
-- Files expected to change or be removed.
-- Focused commands and manual inspections required.
+- Exact source ranges and corpus files in scope.
+- Concrete cleanup, build, correction, document, and test changes.
+- Detectors, rendering, and first/second review passes required.
 
 ## No-Cheating Checks
 
-- Checks that prove protected legacy/unrelated work was not altered.
-- Checks that prove the build uses raw legacy input, not repaired output.
-- Checks that prevent unsupported author-text changes or false fidelity claims.
-- Stage-specific forbidden shortcuts and how they are detected.
+- Prove review proceeds sequentially rather than only through detector hits.
+- Prove corrections use authoritative source evidence and guarded preimages.
+- Prove no repaired output becomes build input.
+- Prove protected legacy and unrelated work remain unchanged.
+- List stage-specific shortcuts that must fail.
 
 ## Completion Requirements
 
 - Requirement-by-requirement evidence.
-- Required test and validation commands.
-- Documentation or known-limitation updates.
-- Scope and whitespace/diff checks.
+- First- and second-pass coverage totals where applicable.
+- Correction and unresolved-item closure.
+- Required build, validation, test, render, and diff/scope commands.
 
 ## Stage Results
 
 - Fill in at the end of the stage.
-- List commands run and their outcomes.
-- Record what changed and what was deliberately left unchanged.
-- Record what was learned and any new limitation.
+- Record exact source ranges reviewed and reviewer type.
+- List corrections and detector findings by stable ID or range.
+- Record commands and outcomes.
+- Record what was learned, reopened work, and remaining blockers.
 - State what must change in `0-plan.md` before the next stage.
 ```
 
 ## Stop And Resume Contract
 
-When stopping before the goal is complete:
+When stopping before completion:
 
 - Leave at most one stage marked `IN_PROGRESS`.
-- Record the exact current Git state and files intentionally modified.
-- Record the last passing and failing commands without overstating coverage.
-- Name the next concrete action, not merely the next stage title.
-- Carry source uncertainty into `known-limitations.md` or the active stage file.
-- Do not call the repaired corpus released until Stage 6 requirements pass.
+- Record the exact current Git state and files intentionally changed.
+- Record the last fully reviewed source location and the next range to compare.
+- Record open discrepancies without guessing or downgrading them.
+- Record the last passing/failing commands without overstating their coverage.
+- Name the next concrete action and source needed to perform it.
+- Do not call the repaired corpus complete until Stage 12 passes.
 
