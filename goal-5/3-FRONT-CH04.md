@@ -17,7 +17,7 @@ Status: IN_PROGRESS
   numbers belong to the chapters they introduce.
 - `PUBLICATION_AND_CONTENTS`, `PREFACE`, and `CH01` are two-pass complete over
   PDF pages 1–38 with 106 guarded corrections. `CH02` has a complete forward
-  first pass over PDF pages 39–66 with 22 more guarded corrections; its fresh
+  first pass over PDF pages 39–66 with 26 more guarded corrections; its fresh
   second pass is pending. `CH03`–`CH04` remain open.
 - Source-review packs exist under `/tmp/ankos-stage3-publication/` and
   `/tmp/ankos-stage3-preface/`. Page rasters are authoritative; native PDF text
@@ -104,7 +104,7 @@ For each document:
 | 2 | `PREFACE` | 9–16 | final rebuilt document | COMPLETE | all 59 verified; no new discrepancy | closed |
 | 1 | `CH01` | 17–38 | `30320 → 79330` | COMPLETE | `G5-C-0080`–`G5-C-0106` | closed |
 | 2 | `CH01` | 17–38 | final rebuilt document and assets | COMPLETE | all 27 verified; no new discrepancy | closed |
-| 1 | `CH02` | 39–66 | `79330 → 119521` | COMPLETE | `G5-C-0107`–`G5-C-0128` | closed |
+| 1 | `CH02` | 39–66 | `79330 → 119521` | COMPLETE | `G5-C-0107`–`G5-C-0132` | closed |
 | 2 | `CH02` | 39–66 | final rebuilt document | NOT_STARTED | — | `pdf:0039` |
 | 1 | `CH03` | 67–130 | `119521 → 199880` | NOT_STARTED | — | `pdf:0067` |
 | 2 | `CH03` | 67–130 | final rebuilt document | NOT_STARTED | — | `pdf:0067` |
@@ -225,12 +225,13 @@ both modes. The margin-figure placement rule is documented as a canonical
 one-dimensional Markdown serialization rather than a uniquely printed order.
 
 `CH02` received a complete forward prose, punctuation, structure, formula, and
-visual first pass over PDF pages 39–66. Its 22 source-verified corrections
-`G5-C-0107`–`G5-C-0128` restore the chapter opener and hierarchy, remove a
+visual first pass over PDF pages 39–66. Its 26 source-verified corrections
+`G5-C-0107`–`G5-C-0132` restore the chapter opener and hierarchy, remove a
 running head, join caption and page-turn breaks, preserve source quotation and
 ellipsis forms, normalize two inline formulas, restore two vector-only rule
-strips, and canonically linearize the rule-30 and rule-110 full-page plate
-sequences without splitting printed prose. The rule-110 lead and back arrows
+strips, canonically linearize a rule-90 figure group and the rule-30/rule-110
+full-page plate sequences without splitting printed prose, and remove two
+residual doubled-space wrappers around inline π symbols. The rule-110 arrows
 now govern the correct five-page sequence and separate 3,200-step summary
 composite.
 
@@ -240,7 +241,7 @@ remains. Three repaired-only source assets are pinned by hash and decoded
 dimensions: the 154×200 opener composite (including the live numeral) and two
 376×39 vector-only eight-case rule strips. Geometry was independently checked
 against the PDF MediaBox. The default rebuild now contains 1,447 images and
-128 corrections, and all Chapter 2 focused checks except the intentionally
+132 corrections, and all Chapter 2 focused checks except the intentionally
 pending second-pass closure gate pass.
 
 Exact next action: begin a fresh independent second pass of final rebuilt

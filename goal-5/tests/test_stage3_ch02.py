@@ -29,10 +29,10 @@ class ChapterTwoTests(unittest.TestCase):
 
     def test_first_pass_corrections_are_exact_and_source_verified(self) -> None:
         relevant = [row for row in self.corrections if row["document_id"] == "CH02"]
-        self.assertEqual(len(relevant), 22)
+        self.assertEqual(len(relevant), 26)
         self.assertEqual(
             [row["id"] for row in relevant],
-            [f"G5-C-{number:04d}" for number in range(107, 129)],
+            [f"G5-C-{number:04d}" for number in range(107, 133)],
         )
         self.assertTrue(
             all(row["verification_status"] == "SOURCE_VERIFIED" for row in relevant)
@@ -85,9 +85,13 @@ class ChapterTwoTests(unittest.TestCase):
             self.rendered,
         )
         self.assertIn("$\\pi \\approx 3.141592653\\ldots$", self.rendered)
+        self.assertIn("digits of $\\pi$ had", self.rendered)
+        self.assertIn("computing $\\pi$ could", self.rendered)
         self.assertNotIn("3.141592653...", self.rendered)
         self.assertNotIn("formula  $", self.rendered)
         self.assertNotIn("$ . In", self.rendered)
+        self.assertNotIn("  $", self.rendered)
+        self.assertNotIn("$  ", self.rendered)
         self.assertIn(
             "![](_page_40_Picture_6.jpeg)\n\n"
             "![](_page_40_Rule_90.jpeg)\n\n"
@@ -179,6 +183,14 @@ class ChapterTwoTests(unittest.TestCase):
                     build.validate_added_assets(self.documents, self.images, rows)
 
     def test_full_page_plates_do_not_split_prose_and_keep_source_order(self) -> None:
+        rule_90_paragraph = (
+            "The picture below shows the pattern produced by a cellular automaton "
+            "of the same type as before, but with a slightly different rule. This "
+            "time the rule specifies that a cell should be black when either its "
+            "left neighbor or its right neighbor—but not both—were black on the "
+            "step before. And again this rule is undeniably quite simple. But now "
+            "the picture shows that the pattern it produces is not so simple."
+        )
         rule_30_sentence = (
             "For even though it may be impossible to predict what color will occur "
             "at any specific step, one still knows for example that black and white "
@@ -189,10 +201,25 @@ class ChapterTwoTests(unittest.TestCase):
             "the cellular automaton for as many steps as are needed, and to watch "
             "what happens."
         )
+        self.assertIn(rule_90_paragraph, self.rendered)
         self.assertIn(rule_30_sentence, self.rendered)
         self.assertIn(rule_110_sentence, self.rendered)
+        self.assertNotIn("different rule.\n\n![](_page_40", self.rendered)
+        self.assertNotIn("not so simple.\n\nAnd if one runs", self.rendered)
         self.assertNotIn("predict what\n\n![](_page_44", self.rendered)
         self.assertNotIn("and to\n\n![](_page_47", self.rendered)
+
+        rule_90_markers = (
+            rule_90_paragraph,
+            "![](_page_40_Picture_6.jpeg)",
+            "![](_page_40_Rule_90.jpeg)",
+            "A cellular automaton that produces an intricate nested pattern.",
+            "And if one runs the cellular automaton for more steps",
+        )
+        rule_90_positions = [
+            self.rendered.index(marker) for marker in rule_90_markers
+        ]
+        self.assertEqual(rule_90_positions, sorted(rule_90_positions))
 
         ordered_markers = (
             rule_110_sentence,

@@ -40,15 +40,13 @@ A cellular automaton with a slightly different rule. The rule makes a particular
 
 This pattern is however again fairly simple. And we might assume that at least with the type of cellular automata that we are considering, any rule we might choose would always give a pattern that is quite simple. But now we are in for our first surprise.
 
-The picture below shows the pattern produced by a cellular automaton of the same type as before, but with a slightly different rule.
+The picture below shows the pattern produced by a cellular automaton of the same type as before, but with a slightly different rule. This time the rule specifies that a cell should be black when either its left neighbor or its right neighbor—but not both—were black on the step before. And again this rule is undeniably quite simple. But now the picture shows that the pattern it produces is not so simple.
 
 ![](_page_40_Picture_6.jpeg)
 
 ![](_page_40_Rule_90.jpeg)
 
 A cellular automaton that produces an intricate nested pattern. The rule in this case is that a cell should be black whenever one or the other, but not both, of its neighbors were black on the step before. Even though the rule is very simple, the picture shows that the overall pattern obtained over the course of 50 steps starting from a single black cell is not so simple. The particular rule used here can be described by the formula $a_i' = Mod[a_{i-1} + a_{i+1}, 2]$. In the numbering scheme of Chapter 3, it is cellular automaton rule 90.
-
-This time the rule specifies that a cell should be black when either its left neighbor or its right neighbor—but not both—were black on the step before. And again this rule is undeniably quite simple. But now the picture shows that the pattern it produces is not so simple.
 
 And if one runs the cellular automaton for more steps, as in the picture below, then a rather intricate pattern emerges. But one can now see that this pattern has very definite regularity. For even though it is intricate, one can see that it actually consists of many nested triangular pieces that all have exactly the same form. And as the picture shows, each of these pieces is essentially just a smaller copy of the whole pattern, with still smaller copies nested in a very regular way inside it.
 
@@ -240,7 +238,7 @@ In other areas, however, systems that are effectively based on simple rules were
 
 Indeed, even very early in the history of traditional mathematics there were already signs of the basic phenomenon of complexity. One example known for well over two thousand years concerns the distribution of prime numbers (see page 132). The rules for generating primes are simple, yet their distribution seems in many respects random. But almost without exception mathematical work on primes has concentrated not on this randomness, but rather on proving the presence of various regularities in the distribution.
 
-Another early sign of the phenomenon of complexity could have been seen in the digit sequence of a number like $\pi \approx 3.141592653\ldots$ (see page 136). By the 1700s more than a hundred digits of  $\pi$  had been computed, and they appeared quite random. But this fact was treated essentially as a curiosity, and the idea never appears to have arisen that there might be a general phenomenon whereby simple rules like those for computing  $\pi$  could produce complex results.
+Another early sign of the phenomenon of complexity could have been seen in the digit sequence of a number like $\pi \approx 3.141592653\ldots$ (see page 136). By the 1700s more than a hundred digits of $\pi$ had been computed, and they appeared quite random. But this fact was treated essentially as a curiosity, and the idea never appears to have arisen that there might be a general phenomenon whereby simple rules like those for computing $\pi$ could produce complex results.
 
 In the early 1900s various explicit examples were constructed in several areas of mathematics in which simple rules were repeatedly applied to numbers, sequences or geometrical patterns. And sometimes nested or fractal behavior was seen. And in a few cases substantially more complex behavior was also seen. But the very complexity of this behavior was usually taken to show that it could not be relevant for real mathematical work—and could only be of recreational interest.
 
