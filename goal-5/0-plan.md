@@ -189,6 +189,7 @@ goal-5/
 ├── build.py
 ├── validate.py
 ├── corrections.jsonl
+├── added-assets.jsonl
 ├── coverage.csv
 ├── unresolved.md
 └── tests/
@@ -207,6 +208,9 @@ ref/A-New-Kind-of-Science-Repaired/
 `corrections.jsonl` records actual author-text changes with an absolute raw
 byte offset, exact before/after text, source page/location, reason, and reviewer
 status.
+`added-assets.jsonl` pins the small number of authoritative visuals absent from
+the immutable legacy extraction by owner, source location, hash, and decoded
+dimensions; zero-correction builds deliberately exclude them.
 `coverage.csv` records sequential review ranges and second-pass completion.
 Neither file is a generalized workflow database.
 
@@ -276,9 +280,9 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 JPEGs, and generated README/Contents files. It now includes
-  the first source-verified corrections but is not a complete OCR-corrected
-  edition.
+  documents, all 1,444 legacy JPEGs plus three source-backed repaired-only
+  JPEGs, and generated README/Contents files. It now includes the first
+  source-verified corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
   intentional historical cleanup references to Goal 4 and intentional repaired
@@ -311,8 +315,12 @@ Neither file is a generalized workflow database.
   independent clean second pass against the final rebuilt Markdown and assets.
   Its 27 guarded corrections are `G5-C-0080`–`G5-C-0106`; the exact prose-token
   sequence, punctuation, hierarchy, emphasis, paragraph joins, three figures,
-  captions, and source-faithful repaired-only opener were rechecked. Stage 3
-  now continues with `CH02` at `pdf:0039`, raw line 398 and byte 79330.
+  captions, and source-faithful repaired-only opener were rechecked.
+- `CH02` has a complete forward first pass over PDF pages 39–66. Its 22 guarded
+  corrections are `G5-C-0107`–`G5-C-0128`; all 19 inherited figures/captions
+  were checked, three source-backed missing visuals were restored, and two
+  full-page plate sequences were canonically serialized after complete prose
+  paragraphs. Its independent second pass begins next at `pdf:0039`.
 
 ## Stage Status
 

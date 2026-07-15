@@ -16,7 +16,9 @@ Status: IN_PROGRESS
   1 and Chapter 3 opener images and the textual Chapter 2 and Chapter 4 opener
   numbers belong to the chapters they introduce.
 - `PUBLICATION_AND_CONTENTS`, `PREFACE`, and `CH01` are two-pass complete over
-  PDF pages 1–38 with 106 guarded corrections. `CH02`–`CH04` remain open.
+  PDF pages 1–38 with 106 guarded corrections. `CH02` has a complete forward
+  first pass over PDF pages 39–66 with 22 more guarded corrections; its fresh
+  second pass is pending. `CH03`–`CH04` remain open.
 - Source-review packs exist under `/tmp/ankos-stage3-publication/` and
   `/tmp/ankos-stage3-preface/`. Page rasters are authoritative; native PDF text
   is only a navigation/detection aid because its custom glyph and column
@@ -102,7 +104,7 @@ For each document:
 | 2 | `PREFACE` | 9–16 | final rebuilt document | COMPLETE | all 59 verified; no new discrepancy | closed |
 | 1 | `CH01` | 17–38 | `30320 → 79330` | COMPLETE | `G5-C-0080`–`G5-C-0106` | closed |
 | 2 | `CH01` | 17–38 | final rebuilt document and assets | COMPLETE | all 27 verified; no new discrepancy | closed |
-| 1 | `CH02` | 39–66 | `79330 → 119521` | NOT_STARTED | — | `pdf:0039` |
+| 1 | `CH02` | 39–66 | `79330 → 119521` | COMPLETE | `G5-C-0107`–`G5-C-0128` | closed |
 | 2 | `CH02` | 39–66 | final rebuilt document | NOT_STARTED | — | `pdf:0039` |
 | 1 | `CH03` | 67–130 | `119521 → 199880` | NOT_STARTED | — | `pdf:0067` |
 | 2 | `CH03` | 67–130 | final rebuilt document | NOT_STARTED | — | `pdf:0067` |
@@ -222,6 +224,25 @@ uses the repaired opener. Mutation tests and an independent re-audit confirmed
 both modes. The margin-figure placement rule is documented as a canonical
 one-dimensional Markdown serialization rather than a uniquely printed order.
 
-Exact next document: first pass of `CH02`, beginning at `pdf:0039`, raw line
-398 and byte 79330. Its 28-page raster/native-text review pack is under
-`/tmp/ankos-stage3-ch02/`.
+`CH02` received a complete forward prose, punctuation, structure, formula, and
+visual first pass over PDF pages 39–66. Its 22 source-verified corrections
+`G5-C-0107`–`G5-C-0128` restore the chapter opener and hierarchy, remove a
+running head, join caption and page-turn breaks, preserve source quotation and
+ellipsis forms, normalize two inline formulas, restore two vector-only rule
+strips, and canonically linearize the rule-30 and rule-110 full-page plate
+sequences without splitting printed prose. The rule-110 lead and back arrows
+now govern the correct five-page sequence and separate 3,200-step summary
+composite.
+
+All 19 inherited Chapter 2 assets were checked in page order against the PDF;
+their files and hashes match, and no swap, omission, or caption mismatch
+remains. Three repaired-only source assets are pinned by hash and decoded
+dimensions: the 154×200 opener composite (including the live numeral) and two
+376×39 vector-only eight-case rule strips. Geometry was independently checked
+against the PDF MediaBox. The default rebuild now contains 1,447 images and
+128 corrections, and all Chapter 2 focused checks except the intentionally
+pending second-pass closure gate pass.
+
+Exact next action: begin a fresh independent second pass of final rebuilt
+`CH02` at `pdf:0039`, continuing through `pdf:0066`. Its 28-page
+raster/native-text review pack is under `/tmp/ankos-stage3-ch02/`.
