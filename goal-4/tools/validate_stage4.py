@@ -122,17 +122,12 @@ def _artifact_rows() -> tuple[tuple[str, str], ...]:
 
 
 EXPECTED_ARTIFACT_ROWS = _artifact_rows()
-EXPECTED_ARTIFACT_PATHS = tuple(path for path, _ in EXPECTED_ARTIFACT_ROWS)
+REQUIRED_ARTIFACT_PATHS = tuple(path for path, _ in EXPECTED_ARTIFACT_ROWS)
 EXPECTED_CATEGORY_BY_PATH = dict(EXPECTED_ARTIFACT_ROWS)
-EXPECTED_CLOSED_DIRECTORIES = {
-    directory: tuple(
-        sorted(
-            PurePosixPath(path).name
-            for path in EXPECTED_ARTIFACT_PATHS
-            if PurePosixPath(path).parent.as_posix() == directory
-        )
-    )
-    for directory in ("goal-4/schemas", "goal-4/tests", "goal-4/tools")
+CLOSED_DIRECTORY_SUFFIXES = {
+    "goal-4/schemas": ".json",
+    "goal-4/tests": ".py",
+    "goal-4/tools": ".py",
 }
 
 EXPECTED_VALIDATORS = (
@@ -378,7 +373,45 @@ def _exact_keys(value: Any, expected: set[str], label: str) -> Mapping[str, Any]
     return value
 
 
-def _artifact_map(lock: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
+def expected_artifact_category(path: str) -> str | None:
+    if path in EXPECTED_CATEGORY_BY_PATH:
+        return EXPECTED_CATEGORY_BY_PATH[path]
+    parent = PurePosixPath(path).parent.as_posix()
+    if parent == "goal-4/schemas":
+        return "SCHEMA"
+    if parent == "goal-4/tests":
+        return "TEST"
+    if parent == "goal-4/tools":
+        return "TOOL"
+    return None
+
+
+def discover_accepted_artifact_paths(repo: Path) -> tuple[str, ...]:
+    """Derive the exact closed artifact surface without recursive discovery."""
+
+    discovered = set(REQUIRED_ARTIFACT_PATHS)
+    for relative, suffix in CLOSED_DIRECTORY_SUFFIXES.items():
+        directory = _join(repo, safe_relative(relative, "closed package directory"))
+        _plain_directory(directory, f"closed package directory {relative}")
+        with os.scandir(directory) as entries:
+            for entry in entries:
+                _require(
+                    entry.is_file(follow_symlinks=False) and not entry.is_symlink(),
+                    f"closed package directory contains a non-file entry: {relative}/{entry.name}",
+                )
+                _require(
+                    PurePosixPath(entry.name).suffix == suffix,
+                    f"closed package directory contains an unexpected file type: {relative}/{entry.name}",
+                )
+                discovered.add(f"{relative}/{entry.name}")
+    for path in REQUIRED_ARTIFACT_PATHS:
+        _require(_lexists(_join(repo, safe_relative(path, "required artifact path"))), f"required artifact is missing: {path}")
+    return tuple(sorted(discovered))
+
+
+def _artifact_map(
+    repo: Path, lock: Mapping[str, Any]
+) -> dict[str, Mapping[str, Any]]:
     rows = lock["artifacts"]
     _require(isinstance(rows, list), "outer-lock artifacts is not an array")
     paths: list[str] = []
@@ -401,12 +434,15 @@ def _artifact_map(lock: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
         )
         _require_sha256(row["sha256"], f"outer-lock artifact digest: {path}")
         _require(
-            row["category"] == EXPECTED_CATEGORY_BY_PATH.get(path),
+            row["category"] == expected_artifact_category(path),
             f"outer-lock artifact category/path drift: {path}",
         )
         result[path] = row
         paths.append(path)
-    _require(tuple(paths) == EXPECTED_ARTIFACT_PATHS, "outer-lock artifact path set/order drift")
+    _require(
+        tuple(paths) == discover_accepted_artifact_paths(repo),
+        "outer-lock artifact path set/order drift",
+    )
     return result
 
 
@@ -415,7 +451,11 @@ def _load_outer_lock(
 ) -> tuple[Mapping[str, Any], dict[str, Mapping[str, Any]], bytes]:
     _require_sha256(expected_lock_sha256, "caller-supplied Stage 4 outer-lock digest")
     lock_path = _join(repo, LOCK_RELATIVE)
-    raw, _ = read_plain_file(lock_path, "Stage 4 outer implementation lock")
+    raw, lock_status = read_plain_file(lock_path, "Stage 4 outer implementation lock")
+    _require(
+        stat.S_IMODE(lock_status.st_mode) == 0o644,
+        "Stage 4 outer implementation lock mode drift",
+    )
     _require(
         _sha256(raw) == expected_lock_sha256,
         "Stage 4 outer implementation lock digest drift",
@@ -425,7 +465,7 @@ def _load_outer_lock(
     _require(lock["lock_id"] == LOCK_ID, "Stage 4 outer lock identity drift")
     _require(lock["schema_version"] == SCHEMA_VERSION, "Stage 4 outer lock schema drift")
     _require(lock["status"] == LOCK_STATUS, "Stage 4 outer lock status drift")
-    artifacts = _artifact_map(lock)
+    artifacts = _artifact_map(repo, lock)
     _validate_lock_metadata(lock)
     return lock, artifacts, raw
 
@@ -440,6 +480,8 @@ def _validate_lock_metadata(lock: Mapping[str, Any]) -> None:
         {
             "cwd_profiles",
             "modes",
+            "read_only_no_git_evidence_tests",
+            "relocation_evidence_tests",
             "test_paths",
             "validator_paths",
             "zero_build_cli",
@@ -450,6 +492,20 @@ def _validate_lock_metadata(lock: Mapping[str, Any]) -> None:
     _require(tuple(matrix["modes"]) == EXPECTED_MATRIX_MODES, "outer-lock matrix modes drift")
     _require(tuple(matrix["cwd_profiles"]) == EXPECTED_MATRIX_CWDS, "outer-lock matrix CWD profiles drift")
     _require(tuple(matrix["test_paths"]) == EXPECTED_TESTS, "outer-lock matrix tests drift")
+    _require(
+        tuple(matrix["relocation_evidence_tests"])
+        == (
+            "goal-4/tests/test_pipeline_schemas.py",
+            "goal-4/tests/test_stage4.py",
+            "goal-4/tests/test_zero_repair.py",
+        ),
+        "outer-lock relocation-evidence tests drift",
+    )
+    _require(
+        tuple(matrix["read_only_no_git_evidence_tests"])
+        == ("goal-4/tests/test_zero_repair.py",),
+        "outer-lock read-only/no-Git evidence tests drift",
+    )
     _require(
         tuple(matrix["validator_paths"]) == tuple(path for path, _ in EXPECTED_VALIDATORS),
         "outer-lock matrix validators drift",
@@ -477,10 +533,10 @@ def _validate_lock_metadata(lock: Mapping[str, Any]) -> None:
     _require(trust["lock_excluded_from_artifacts"] is True, "outer-lock self-hash exclusion drift")
     _require(trust["validator_relative_path"] == "goal-4/tools/validate_stage4.py", "outer-lock validator path drift")
     _require(
-        trust["validator_relative_path"] in EXPECTED_ARTIFACT_PATHS,
+        trust["validator_relative_path"] in REQUIRED_ARTIFACT_PATHS,
         "outer lock does not bind its validator",
     )
-    _require(LOCK_RELATIVE.as_posix() not in EXPECTED_ARTIFACT_PATHS, "outer lock contains a circular self-hash")
+    _require(LOCK_RELATIVE.as_posix() not in REQUIRED_ARTIFACT_PATHS, "outer lock contains a circular self-hash")
 
 
 def _verify_artifact(
@@ -507,7 +563,37 @@ def _verify_artifact(
 def validate_locked_artifacts(
     repo: Path, artifacts: Mapping[str, Mapping[str, Any]]
 ) -> dict[str, tuple[int, int, int, int, int, int, int, str]]:
-    return {path: _verify_artifact(repo, artifacts[path]) for path in EXPECTED_ARTIFACT_PATHS}
+    validate_closed_directories(repo, artifacts)
+    return {path: _verify_artifact(repo, artifacts[path]) for path in sorted(artifacts)}
+
+
+def validate_closed_directories(
+    repo: Path, artifacts: Mapping[str, Mapping[str, Any]]
+) -> None:
+    """Reject an unpinned schema, test, tool, import shadow, or bytecode cache."""
+
+    for relative in CLOSED_DIRECTORY_SUFFIXES:
+        expected_names = tuple(
+            sorted(
+                PurePosixPath(path).name
+                for path in artifacts
+                if PurePosixPath(path).parent.as_posix() == relative
+            )
+        )
+        directory = _join(repo, safe_relative(relative, "closed package directory"))
+        _plain_directory(directory, f"closed package directory {relative}")
+        with os.scandir(directory) as entries:
+            actual_names: list[str] = []
+            for entry in entries:
+                _require(
+                    entry.is_file(follow_symlinks=False) and not entry.is_symlink(),
+                    f"closed package directory contains a non-file entry: {relative}/{entry.name}",
+                )
+                actual_names.append(entry.name)
+        _require(
+            tuple(sorted(actual_names)) == expected_names,
+            f"closed package directory path-set drift: {relative}",
+        )
 
 
 def _locked_digest(artifacts: Mapping[str, Mapping[str, Any]], path: str) -> str:
@@ -792,7 +878,7 @@ def _runtime_path(repo: Path) -> None:
 def _subprocess_environment() -> dict[str, str]:
     environment = dict(os.environ)
     for key in list(environment):
-        if key.upper() in {"PYTHONPATH", "PYTHONHOME", "PYTHONSTARTUP", "PYTHONINSPECT"}:
+        if key.upper().startswith("PYTHON") or key.upper() in {"LD_LIBRARY_PATH", "LD_PRELOAD"}:
             environment.pop(key, None)
     environment.update(
         {

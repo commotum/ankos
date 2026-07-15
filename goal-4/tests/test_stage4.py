@@ -159,15 +159,16 @@ class FrozenPackageTests(unittest.TestCase):
         cls.lock_digest = outer_lock_digest()
 
     def test_artifact_surface_includes_validator_and_excludes_only_lock(self) -> None:
-        self.assertIn("goal-4/tools/validate_stage4.py", stage4.EXPECTED_ARTIFACT_PATHS)
-        self.assertIn("goal-4/tests/test_stage4.py", stage4.EXPECTED_ARTIFACT_PATHS)
-        self.assertNotIn(stage4.LOCK_RELATIVE.as_posix(), stage4.EXPECTED_ARTIFACT_PATHS)
-        self.assertEqual(tuple(sorted(stage4.EXPECTED_ARTIFACT_PATHS)), stage4.EXPECTED_ARTIFACT_PATHS)
+        surface = stage4.discover_accepted_artifact_paths(ROOT)
+        self.assertIn("goal-4/tools/validate_stage4.py", surface)
+        self.assertIn("goal-4/tests/test_stage4.py", surface)
+        self.assertNotIn(stage4.LOCK_RELATIVE.as_posix(), surface)
+        self.assertEqual(tuple(sorted(surface)), surface)
 
     def test_outer_lock_and_every_accepted_artifact_validate(self) -> None:
         lock, artifacts, raw = stage4._load_outer_lock(ROOT, self.lock_digest)
         self.assertEqual(hashlib.sha256(raw).hexdigest(), self.lock_digest)
-        self.assertEqual(len(artifacts), len(stage4.EXPECTED_ARTIFACT_PATHS))
+        self.assertEqual(len(artifacts), len(stage4.discover_accepted_artifact_paths(ROOT)))
         self.assertEqual(len(stage4.validate_locked_artifacts(ROOT, artifacts)), len(artifacts))
         stage4._validate_direct_bindings(ROOT, lock, artifacts)
         stage4._validate_zero_contract(ROOT, lock)
@@ -211,10 +212,10 @@ class FrozenPackageTests(unittest.TestCase):
 
     def test_lock_only_validator_is_relocation_safe_and_no_git(self) -> None:
         lock, artifacts, _ = stage4._load_outer_lock(ROOT, self.lock_digest)
-        self.assertEqual(len(artifacts), len(stage4.EXPECTED_ARTIFACT_PATHS))
+        self.assertEqual(len(artifacts), len(stage4.discover_accepted_artifact_paths(ROOT)))
         with tempfile.TemporaryDirectory(dir="/tmp") as directory:
             relocated = Path(directory) / "relocated"
-            for relative in (*stage4.EXPECTED_ARTIFACT_PATHS, stage4.LOCK_RELATIVE.as_posix()):
+            for relative in (*sorted(artifacts), stage4.LOCK_RELATIVE.as_posix()):
                 source = ROOT.joinpath(*Path(relative).parts)
                 target = relocated.joinpath(*Path(relative).parts)
                 target.parent.mkdir(parents=True, exist_ok=True)
@@ -250,6 +251,21 @@ class FrozenPackageTests(unittest.TestCase):
             self.assertIs(payload["closure_claim"], False)
             self.assertEqual(payload["lock_sha256"], self.lock_digest)
             self.assertFalse((relocated / ".git").exists())
+            shadow = relocated / "goal-4/tools/json.py"
+            shadow.write_bytes(b"raise RuntimeError('unpinned import shadow')\n")
+            os.chmod(shadow, 0o644)
+            rejected = subprocess.run(
+                command,
+                cwd="/tmp",
+                env=environment,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+                timeout=120,
+            )
+            self.assertNotEqual(rejected.returncode, 0)
+            self.assertIn(b"closed package directory path-set drift", rejected.stderr)
 
     def test_lock_only_api_never_claims_stage_closure(self) -> None:
         result = stage4.run_lock_only(ROOT, self.lock_digest)
