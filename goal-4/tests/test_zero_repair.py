@@ -202,6 +202,7 @@ class ZeroRepairBuildTests(unittest.TestCase):
             "corpus-manifest.json",
             "structure-ledger.jsonl",
             "zero-repair-contract.json",
+            "zero-repair-implementation-lock.json",
         ):
             shutil.copyfile(ROOT / "goal-4" / name, goal / name)
         for name in (
@@ -211,6 +212,11 @@ class ZeroRepairBuildTests(unittest.TestCase):
             "zero_repair_verify.py",
         ):
             shutil.copyfile(ROOT / "goal-4/tools" / name, tools / name)
+        (goal / "tests").mkdir()
+        shutil.copyfile(
+            ROOT / "goal-4/tests/test_zero_repair.py",
+            goal / "tests/test_zero_repair.py",
+        )
         shutil.copyfile(
             ROOT / "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md",
             legacy / "A-New-Kind-of-Science.md",
@@ -259,6 +265,39 @@ class ZeroRepairBuildTests(unittest.TestCase):
             )
             self.assertEqual(completed.returncode, 0, completed.stderr)
             self.assertIn("ZERO-REPAIR VALIDATION OK", completed.stdout)
+
+            relocated_lib = tools / "zero_repair_lib.py"
+            os.chmod(relocated_lib, 0o644)
+            relocated_lib.write_bytes(relocated_lib.read_bytes() + b"\n# locked drift\n")
+            os.chmod(relocated_lib, 0o444)
+            drifted_tool = subprocess.run(
+                command,
+                cwd=self.temp_root,
+                env={**os.environ, "PYTHONPATH": ""},
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(drifted_tool.returncode, 0)
+            self.assertIn("locked artifact", drifted_tool.stderr)
+
+            os.chmod(relocated_lib, 0o644)
+            shutil.copyfile(ROOT / "goal-4/tools/zero_repair_lib.py", relocated_lib)
+            os.chmod(relocated_lib, 0o444)
+            relocated_lock = goal / "zero-repair-implementation-lock.json"
+            os.chmod(relocated_lock, 0o644)
+            relocated_lock.write_bytes(relocated_lock.read_bytes() + b" ")
+            os.chmod(relocated_lock, 0o444)
+            drifted_lock = subprocess.run(
+                command,
+                cwd=self.temp_root,
+                env={**os.environ, "PYTHONPATH": ""},
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(drifted_lock.returncode, 0)
+            self.assertIn("implementation lock hash drift", drifted_lock.stderr)
         finally:
             for directory in [portable, *reversed(directories)]:
                 if directory.exists() and stat.S_ISDIR(os.lstat(directory).st_mode):
@@ -339,9 +378,9 @@ class ZeroRepairBuildTests(unittest.TestCase):
         output = self.temp_root / "atomic-target-race"
         prefix = f".{output.name}.zero-repair-private-"
 
-        def inject_target(_private: Path, target: Path) -> None:
-            target.mkdir()
-            sentinel = target / "sentinel"
+        def inject_target(_parent_fd: int, _source_name: str, _target_name: str) -> None:
+            output.mkdir()
+            sentinel = output / "sentinel"
             sentinel.write_bytes(b"do not replace\n")
             raise ZeroRepairError("injected promotion race")
 
@@ -350,6 +389,155 @@ class ZeroRepairBuildTests(unittest.TestCase):
                 build_zero_repair(ROOT, output)
         self.assertEqual((output / "sentinel").read_bytes(), b"do not replace\n")
         self.assertEqual(list(self.temp_root.glob(prefix + "*")), [])
+
+    def test_renameat2_real_success_collision_and_unavailable_branches(self) -> None:
+        parent = self.temp_root / "renameat2-branches"
+        parent.mkdir()
+        descriptor = os.open(parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            (parent / "source").mkdir()
+            _atomic_rename_noreplace(descriptor, "source", "target")
+            self.assertFalse((parent / "source").exists())
+            self.assertTrue((parent / "target").is_dir())
+
+            (parent / "source-collision").mkdir()
+            (parent / "target-collision").mkdir()
+            with self.assertRaisesRegex(ZeroRepairError, "appeared before atomic promotion"):
+                _atomic_rename_noreplace(
+                    descriptor,
+                    "source-collision",
+                    "target-collision",
+                )
+
+            with mock.patch(
+                "zero_repair_lib.ctypes.CDLL",
+                return_value=types.SimpleNamespace(),
+            ):
+                with self.assertRaisesRegex(ZeroRepairError, "unavailable; refusing promotion"):
+                    _atomic_rename_noreplace(
+                        descriptor,
+                        "source-collision",
+                        "unavailable-target",
+                    )
+            self.assertTrue((parent / "source-collision").is_dir())
+            self.assertFalse((parent / "unavailable-target").exists())
+        finally:
+            os.close(descriptor)
+
+    def test_output_parent_directory_swap_fails_and_cleans_original_temp(self) -> None:
+        outer = self.temp_root / "parent-swap-fixture"
+        parent = outer / "parent"
+        moved = outer / "parent-original"
+        parent.mkdir(parents=True)
+        output = parent / "output"
+        original_make = _make_tape_and_documents
+
+        def build_then_swap(snapshot: object, private: Path) -> object:
+            result = original_make(snapshot, private)
+            parent.rename(moved)
+            parent.mkdir()
+            return result
+
+        with mock.patch(
+            "zero_repair_lib._make_tape_and_documents",
+            side_effect=build_then_swap,
+        ):
+            with self.assertRaisesRegex(ZeroRepairError, "output parent path changed"):
+                build_zero_repair(ROOT, output)
+        self.assertEqual(list(moved.glob(".output.zero-repair-private-*")), [])
+        self.assertFalse(output.exists())
+
+    def test_post_validation_mutation_is_rejected_by_descriptor_receipt(self) -> None:
+        output = self.temp_root / "post-validation-mutation"
+        original_recheck = _recheck_verification_receipt
+
+        def mutate_then_recheck(
+            temporary_fd: int,
+            temporary_status: os.stat_result,
+            receipt: dict[str, object],
+        ) -> None:
+            relative = "CANONICAL/CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md"
+            descriptor = os.open(relative, os.O_WRONLY, dir_fd=temporary_fd)
+            try:
+                os.lseek(descriptor, 0, os.SEEK_SET)
+                os.write(descriptor, b"X")
+                os.fsync(descriptor)
+            finally:
+                os.close(descriptor)
+            original_recheck(temporary_fd, temporary_status, receipt)
+
+        with mock.patch(
+            "zero_repair_lib._recheck_verification_receipt",
+            side_effect=mutate_then_recheck,
+        ):
+            with self.assertRaisesRegex(ZeroRepairError, "differs from independent verification receipt"):
+                build_zero_repair(ROOT, output)
+        self.assertFalse(output.exists())
+
+    def test_cleanup_never_deletes_substituted_private_path(self) -> None:
+        output = self.temp_root / "cleanup-substitution"
+        observed: dict[str, Path] = {}
+
+        def substitute_then_fail(_snapshot: object, private: Path) -> object:
+            original = private.with_name(private.name + "-original")
+            private.rename(original)
+            private.mkdir(mode=0o700)
+            sentinel = private / "sentinel"
+            sentinel.write_bytes(b"replacement\n")
+            observed["replacement"] = private
+            observed["original"] = original
+            raise ZeroRepairError("injected substitution")
+
+        with mock.patch(
+            "zero_repair_lib._make_tape_and_documents",
+            side_effect=substitute_then_fail,
+        ):
+            with self.assertRaisesRegex(ZeroRepairError, "refusing to clean a substituted"):
+                build_zero_repair(ROOT, output)
+        self.assertEqual((observed["replacement"] / "sentinel").read_bytes(), b"replacement\n")
+        self.assertTrue(observed["original"].is_dir())
+
+    def test_exact_verifier_loader_ignores_shadow_module_and_checks_hash(self) -> None:
+        fake = types.ModuleType("zero_repair_verify")
+        fake.__file__ = "/tmp/fake-zero-repair-verifier.py"
+        with mock.patch.dict(sys.modules, {"zero_repair_verify": fake}):
+            verifier, verifier_sha256 = _load_exact_independent_verifier(TOOLS.parent)
+        self.assertIsNot(verifier, fake)
+        self.assertEqual(
+            Path(verifier.__file__),
+            TOOLS / "zero_repair_verify.py",
+        )
+        self.assertEqual(len(verifier_sha256), 64)
+        with self.assertRaisesRegex(
+            verifier.IndependentVerificationError,
+            "loader-declared verifier hash",
+        ):
+            verifier.independently_validate_zero_repair(
+                ROOT,
+                self.first,
+                expected_runtime_sha256="0" * 64,
+            )
+
+    def test_comparator_rejects_symlink_added_after_validation(self) -> None:
+        first = self.clone("late-symlink-first")
+        second = self.clone("late-symlink-second")
+        original_inventory = _full_tree_records
+        calls = 0
+
+        def add_after_first_scan(root: Path) -> list[dict[str, object]]:
+            nonlocal calls
+            records = original_inventory(root)
+            calls += 1
+            if calls == 1:
+                os.symlink("CANONICAL", first / "LATE-SYMLINK")
+            return records
+
+        with mock.patch(
+            "zero_repair_lib._full_tree_records",
+            side_effect=add_after_first_scan,
+        ):
+            with self.assertRaisesRegex(ZeroRepairError, "symlink"):
+                compare_zero_repair_trees(first, second)
 
     def test_comparator_rejects_absent_symlink_wrong_mode_empty_and_arbitrary_roots(self) -> None:
         absent_a = self.temp_root / "absent-a"

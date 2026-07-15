@@ -20,6 +20,7 @@ if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
 import pipeline_schema_lib as lib  # noqa: E402
+import overlay_lib  # noqa: E402
 import validate_pipeline_schemas as schema_cli  # noqa: E402
 
 
@@ -124,6 +125,7 @@ def valid_repair() -> dict[str, object]:
             "span": {"end_byte_exclusive": len(GUARD_BYTES), "sha256": GUARD_SHA, "start_byte": 0},
         },
         "inverse_operation": operation("MOVE", "x", "x"),
+        "operation_projection_sha256": VIEW_SHA,
         "rationale": "Synthetic byte-preserving metadata operation.",
         "repair_class": "NAVIGATION_METADATA",
         "repair_id": "REPAIR-TEST-0001",
@@ -447,6 +449,11 @@ def valid_technical() -> dict[str, object]:
         "parse_check": "SOURCE_BLOCKED",
         "program_count_classification": "NOT_APPLICABLE",
         "raw_block_ids": ["RAW-000001"],
+        "raw_span": {
+            "end_byte_exclusive": len(GUARD_BYTES),
+            "sha256": GUARD_SHA,
+            "start_byte": 0,
+        },
         "render_check": "SOURCE_BLOCKED",
         "repair_ids": [],
         "schema_version": "1.0.0",
@@ -927,6 +934,56 @@ class PipelineSchemaTests(unittest.TestCase):
                 relocated, schema_cli.EXPECTED_PIPELINE_SCHEMA_LOCK_SHA256
             )
             self.assertEqual(result["schema_count"], 13)
+
+    def test_65_repair_row_hash_and_overlay_projection_bridge_are_exact(self) -> None:
+        row = valid_repair()
+        row["repair_class"] = "PROSE_OCR"
+        row["risk"]["class_tags"] = ["PROSE_OCR"]
+        row["target"] = {
+            "canonical_document_id": "PUBLICATION_AND_CONTENTS",
+            "node_ids": ["NODE-1"],
+            "path": "CANONICAL/FRONT-MATTER/00-Publication-and-Contents.md",
+            "role": "CANONICAL_AUTHOR_TEXT",
+        }
+        raw_row = lib._frozen_indexes(self.registry)["blocks_by_id"]["RAW-000001"]
+        meta = overlay_lib.OperationMeta(
+            repair_id=row["repair_id"],
+            target_id="PUBLICATION_AND_CONTENTS",
+            target_path=row["target"]["path"],
+            raw_source_id="RAW-000001",
+            raw_source_span_sha256=GUARD_SHA,
+            raw_source_row_sha256=hashlib.sha256(lib.canonical_json_bytes(raw_row)).hexdigest(),
+            target_role="CANONICAL_AUTHOR_TEXT",
+            repair_class="PROSE_OCR",
+            expected_target_sha256=VIEW_SHA,
+            expected_result_sha256=VIEW_SHA,
+            creator_principal_id="creator",
+            workflow_state="CLOSED",
+            final_disposition="APPLIED_MECHANICALLY_PROVEN",
+        )
+        operation_row = overlay_lib.Move(
+            meta=meta,
+            block_id="RAW-000001",
+            expected_block_sha256=raw_row["raw_sha256"],
+            source_left_id=None,
+            source_right_id="RAW-000002",
+            destination_left_id=None,
+            destination_right_id="RAW-000003",
+            expected_source_adjacency_count=1,
+            expected_destination_adjacency_count=1,
+        )
+        row["operation_projection_sha256"] = overlay_lib.operation_projection_sha256(
+            operation_row
+        )
+        binding = lib.validate_overlay_operation_binding(
+            row, self.registry, operation_row
+        )
+        self.assertTrue(binding.overlay_operation_bound)
+        self.assertEqual(binding.repair_row_sha256, lib.canonical_repair_row_sha256(row))
+        row["operation_projection_sha256"] = EMPTY_SHA
+        self.expect_failure(
+            lib.validate_overlay_operation_binding, row, self.registry, operation_row
+        )
 
 
 if __name__ == "__main__":

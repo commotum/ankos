@@ -1032,7 +1032,7 @@ def validate_repair_set(
     registry: SchemaRegistry,
     review_records: Sequence[Mapping[str, Any]] = (),
     unresolved_records: Sequence[Mapping[str, Any]] = (),
-) -> None:
+) -> dict[str, ValidatedRepairBinding]:
     repair_ids = [record["repair_id"] for record in records]
     if len(repair_ids) != len(set(repair_ids)):
         raise PipelineSchemaError("duplicate repair ID")
@@ -1044,9 +1044,10 @@ def validate_repair_set(
         for row in load_jsonl(registry.repo_root / "goal-4/witness-unresolved.jsonl", require_cj1=True)
     )
     applied_orders: list[int] = []
+    bindings: dict[str, ValidatedRepairBinding] = {}
     by_id = {record["repair_id"]: record for record in records}
     for record in records:
-        validate_repair(record, registry)
+        bindings[record["repair_id"]] = validate_repair(record, registry)
         if not set(record["dependencies"]).issubset(by_id):
             raise PipelineSchemaError("repair dependency does not join")
         if not set(record["review_ids"]).issubset(review_ids):
@@ -1131,6 +1132,7 @@ def validate_repair_set(
                 raise PipelineSchemaError("review evidence-view hash does not bind repair evidence")
     if len(applied_orders) != len(set(applied_orders)):
         raise PipelineSchemaError("duplicate repair application order")
+    return bindings
 
 
 def _required_specialty(record: Mapping[str, Any]) -> str:
@@ -1268,6 +1270,7 @@ def validate_provenance_set(
     sequences: list[int] = []
     repair_ids = {row["repair_id"] for row in repair_records}
     covered_raw_blocks: list[str] = []
+    covered_raw_spans: list[tuple[int, int]] = []
     for record in records:
         validate_provenance(record, registry)
         if record["provenance_id"] in ids:
@@ -1280,6 +1283,8 @@ def validate_provenance_set(
             raise PipelineSchemaError("provenance inverse repair set does not match forward repair set")
         if record["mapping_kind"].startswith("RAW_"):
             covered_raw_blocks.extend(record["source"]["raw_block_ids"])
+            span = record["source"]["span"]
+            covered_raw_spans.append((span["start_byte"], span["end_byte_exclusive"]))
     if sequences != list(range(len(records))):
         raise PipelineSchemaError("provenance sequence is not exact ledger order")
     if len(covered_raw_blocks) != len(set(covered_raw_blocks)):
@@ -1288,6 +1293,16 @@ def validate_provenance_set(
         expected = [row["raw_block_id"] for row in _frozen_indexes(registry)["blocks"]]
         if covered_raw_blocks != expected:
             raise PipelineSchemaError("provenance does not provide exact ordered raw-block coverage")
+        monolith = _frozen_indexes(registry)["input_by_path"][
+            "ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md"
+        ]
+        if not covered_raw_spans or covered_raw_spans[0][0] != 0:
+            raise PipelineSchemaError("complete provenance does not begin at raw byte zero")
+        for left, right in zip(covered_raw_spans, covered_raw_spans[1:]):
+            if left[1] != right[0]:
+                raise PipelineSchemaError("complete provenance raw spans have a gap/overlap")
+        if covered_raw_spans[-1][1] != monolith["byte_size"]:
+            raise PipelineSchemaError("complete provenance does not reach the raw monolith end")
 
 
 def validate_navigation(record: Mapping[str, Any], registry: SchemaRegistry) -> None:
@@ -1319,13 +1334,19 @@ def validate_technical(
         raise PipelineSchemaError("technical span raw blocks are not in frozen source order")
     monolith_path = f"{indexes['legacy_root']}/A-New-Kind-of-Science.md"
     monolith_sha = indexes["input_by_path"][monolith_path]["sha256"]
-    monolith, _ = _read_frozen_input(registry, monolith_path, monolith_sha)
-    raw_window = monolith[block_rows[0]["start_byte"] : block_rows[-1]["end_byte_exclusive"]]
     source_bytes = record["source_projection"].encode("utf-8")
     if sha256_bytes(source_bytes) != record["source_projection_sha256"]:
         raise PipelineSchemaError("technical source-projection hash mismatch")
-    if source_bytes not in raw_window:
-        raise PipelineSchemaError("technical source projection is absent from joined raw blocks")
+    joined_source = _validate_raw_span(
+        registry,
+        source_path=monolith_path,
+        source_sha256=monolith_sha,
+        span=record["raw_span"],
+        raw_block_ids=record["raw_block_ids"],
+        expected_text=record["source_projection"],
+    )
+    if joined_source != source_bytes:
+        raise PipelineSchemaError("technical source projection differs from exact raw span")
     output_span = record["output_span"]
     if output_span["end_byte_exclusive"] <= output_span["start_byte"]:
         raise PipelineSchemaError("technical output span is empty/reversed")
