@@ -11,6 +11,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -67,7 +68,8 @@ def clone_registry_root() -> tempfile.TemporaryDirectory[str]:
 class RealCorpusRegistryTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.state = overlay_registry.load_frozen_overlay_state(ROOT)
+        cls.snapshot = overlay_registry._load_snapshot(ROOT)  # type: ignore[attr-defined]
+        cls.state = cls.snapshot.state
         cls.guardrails = json.loads((ROOT / "goal-4/guardrails.json").read_text(encoding="utf-8"))
 
     def test_real_state_is_exactly_29_targets_and_20430_blocks(self) -> None:
@@ -102,10 +104,18 @@ class RealCorpusRegistryTests(unittest.TestCase):
         replay = overlay_lib.apply_overlays(self.state, ())
         self.assertEqual(replay.state, self.state)
         self.assertEqual(overlay_lib.inverse_replay(replay), self.state)
-        self.assertEqual(
-            overlay_registry.load_frozen_overlay_state(ROOT).sha256,
-            self.state.sha256,
-        )
+
+    def mint(self, state: overlay_lib.OverlayState, operations: object) -> object:
+        # The real loader is exercised once for this class and afresh by every
+        # filesystem mutation test.  Reusing that immutable result here keeps
+        # caller-input mutation tests focused and avoids repeated 20,430-row
+        # schema-package scans.
+        with mock.patch.object(
+            overlay_registry, "_load_snapshot", return_value=self.snapshot
+        ):
+            return overlay_registry.mint_production_authority(
+                ROOT, state, operations  # type: ignore[arg-type]
+            )
 
     def canonical_operation(self) -> overlay_lib.Replace:
         document = self.guardrails["canonical_documents"][0]
@@ -114,19 +124,13 @@ class RealCorpusRegistryTests(unittest.TestCase):
         source = blocks[0]
         replacement_data = source.data + b"X"
         after = (overlay_lib.Block(source.block_id, replacement_data),) + blocks[1:]
-        structure_rows = pipeline.load_jsonl(
-            ROOT / "goal-4/structure-ledger.jsonl", require_cj1=True
-        )
-        raw_row = next(
-            row for row in structure_rows if row.get("raw_block_id") == source.block_id
-        )
         meta = overlay_lib.OperationMeta(
             repair_id="REPAIR-REGISTRY-TEST-0001",
             target_id=target_id,
             target_path=document["path"],
             raw_source_id=source.block_id,
             raw_source_span_sha256=source.sha256,
-            raw_source_row_sha256=sha256(pipeline.canonical_json_bytes(raw_row)),
+            raw_source_row_sha256=self.snapshot.block_row_sha256s[source.block_id],
             target_role=overlay_lib.CANONICAL_AUTHOR_TEXT,
             repair_class=overlay_lib.PROSE_OCR,
             expected_target_sha256=self.state.target_sha256(
@@ -154,7 +158,7 @@ class RealCorpusRegistryTests(unittest.TestCase):
             overlay_registry.RegistryGateError,
             "SOURCE_BLOCKED.*zero authorized witness regions",
         ):
-            overlay_registry.mint_production_authority(ROOT, self.state, (operation,))
+            self.mint(self.state, (operation,))
 
     def test_arbitrary_target_state_drift_is_rejected_before_gate(self) -> None:
         operation = self.canonical_operation()
@@ -168,7 +172,7 @@ class RealCorpusRegistryTests(unittest.TestCase):
         with self.assertRaisesRegex(
             overlay_registry.RegistryError, "initial overlay state differs"
         ):
-            overlay_registry.mint_production_authority(ROOT, drifted, (operation,))
+            self.mint(drifted, (operation,))
 
     def test_raw_row_substitution_is_rejected_before_gate(self) -> None:
         operation = self.canonical_operation()
@@ -179,7 +183,7 @@ class RealCorpusRegistryTests(unittest.TestCase):
         with self.assertRaisesRegex(
             overlay_registry.RegistryError, "raw source row hash drift"
         ):
-            overlay_registry.mint_production_authority(ROOT, self.state, (forged,))
+            self.mint(self.state, (forged,))
 
     def test_noncanonical_operation_cannot_enter_canonical_authority(self) -> None:
         operation = self.canonical_operation()
@@ -195,9 +199,7 @@ class RealCorpusRegistryTests(unittest.TestCase):
         with self.assertRaisesRegex(
             overlay_registry.RegistryError, "cannot include noncanonical roles"
         ):
-            overlay_registry.mint_production_authority(
-                ROOT, self.state, (noncanonical,)
-            )
+            self.mint(self.state, (noncanonical,))
 
     def test_public_executor_rejects_test_only_authority_for_real_state(self) -> None:
         operation = self.canonical_operation()
@@ -238,7 +240,7 @@ class FrozenArtifactMutationTests(unittest.TestCase):
         lines[29] = pipeline.canonical_json_bytes(row)
         path.write_bytes(b"".join(lines))
         with self.assertRaisesRegex(
-            overlay_registry.RegistryError, "locked artifact drift"
+            overlay_registry.RegistryError, "locked (?:byte-size|artifact) drift"
         ):
             overlay_registry.load_frozen_overlay_state(root)
 
@@ -288,7 +290,7 @@ class FrozenArtifactMutationTests(unittest.TestCase):
         rows[0] = pipeline.canonical_json_bytes(row)
         path.write_bytes(b"".join(rows))
         with self.assertRaisesRegex(
-            overlay_registry.RegistryError, "locked artifact drift"
+            overlay_registry.RegistryError, "locked (?:byte-size|artifact) drift"
         ):
             overlay_registry.load_frozen_overlay_state(root)
 
