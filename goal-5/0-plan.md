@@ -269,14 +269,15 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` is empty.
-- A repository-wide scan found no live code or documentation outside Goal 4
-  that references Goal 4 artifacts; Goal 5 itself references only the repaired
-  sibling path.
-- Goal 4 contains three compact facts worth migrating before deletion: the 29
-  provisional raw document ranges, 55 known-defect/guardrail candidates, and a
-  concise legacy/image/routing summary. They remain provisional until Goal 5
-  independently rechecks them and authoritative source evidence confirms
-  content-sensitive boundaries.
+- A repository-wide scan found no code, test, or document outside Goal 4 that
+  consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
+  intentional historical cleanup references to Goal 4 and intentional repaired
+  sibling references, but no dependency on its machinery.
+- Goal 4 contains four compact fact sets worth migrating before deletion: the
+  29 provisional raw document ranges, 55 known-defect/guardrail candidates, a
+  1,444-row image-to-asset map, and a concise legacy/routing/source summary.
+  They remain provisional until Goal 5 independently rechecks them and
+  authoritative source evidence confirms content-sensitive boundaries.
 - No lawful, complete, readable authoritative source is currently mounted in
   the repository. Stage 2 remains source-acquisition blocked unless a suitable
   source is authorized or provided.
