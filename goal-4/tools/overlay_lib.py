@@ -720,6 +720,29 @@ def _validate_role(record: Operation) -> None:
         raise RoleError(f"{meta.repair_id}: derived aggregate refuses repair overlays")
 
 
+def _validate_application_workflow(record: Operation) -> None:
+    """Refuse pending, rejected, duplicate, or unresolved records before mutation."""
+
+    meta = record.meta
+    if meta.workflow_state != "CLOSED":
+        raise EvidenceError(f"{meta.repair_id}: applied overlay is not CLOSED; it must be CLOSED")
+    if meta.target_role == CANONICAL_AUTHOR_TEXT:
+        allowed = {"APPLIED_MECHANICALLY_PROVEN", "APPLIED_WITNESS_VERIFIED"}
+    elif meta.target_role == GENERATED_METADATA:
+        allowed = {"APPLIED_MECHANICALLY_PROVEN"}
+    elif meta.target_role == EDITORIAL_SIDECAR:
+        allowed = {"ANNOTATED_SOURCE_ERRATUM"}
+    elif meta.target_role == SEARCH_DERIVATIVE:
+        allowed = {"APPLIED_MECHANICALLY_PROVEN"}
+    else:
+        allowed = set()
+    if meta.final_disposition not in allowed:
+        raise EvidenceError(
+            f"{meta.repair_id}: disposition {meta.final_disposition} is not applicable "
+            f"to {meta.target_role}"
+        )
+
+
 def _validate_witness(witness: WitnessEvidence, repair_id: str) -> None:
     _require_nonempty_text(witness.witness_id, "witness_id")
     _require_nonempty_text(witness.edition_id, "edition_id")
@@ -870,6 +893,7 @@ def apply_overlays(initial: OverlayState, records: Iterable[Operation]) -> Repla
                 f"{meta.repair_id}: dependencies are not ordered before repair: {sorted(pending)!r}"
             )
         _validate_role(record)
+        _validate_application_workflow(record)
         before = state.blocks(meta.target_role)
         actual_before_sha256 = target_sha256(meta.target_role, before)
         if actual_before_sha256 != meta.expected_target_sha256:

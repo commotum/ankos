@@ -261,15 +261,18 @@ class OverlaySuccessTests(unittest.TestCase):
             with self.subTest(role=role):
                 initial = state_for((Block("SIDE-0001", "old"),), role=role)
                 after = (Block("SIDE-0001", "new"),)
+                meta = meta_for(
+                    initial,
+                    after,
+                    repair_id=f"SIDE-REPAIR-{index:04d}",
+                    role=role,
+                    repair_class=repair_class,
+                    author_evidence=False,
+                )
+                if role == EDITORIAL_SIDECAR:
+                    meta = replace(meta, final_disposition="ANNOTATED_SOURCE_ERRATUM")
                 record = Replace(
-                    meta_for(
-                        initial,
-                        after,
-                        repair_id=f"SIDE-REPAIR-{index:04d}",
-                        role=role,
-                        repair_class=repair_class,
-                        author_evidence=False,
-                    ),
+                    meta,
                     "SIDE-0001",
                     initial.blocks(role)[0].sha256,
                     "old",
@@ -277,6 +280,67 @@ class OverlaySuccessTests(unittest.TestCase):
                     1,
                 )
                 self.assertRoundTrip(initial, record, state_for(after, role=role))
+
+    def test_noncanonical_overlay_must_be_closed_and_applicable(self) -> None:
+        block = Block("META-0001", b"old")
+        initial = state_for((block,), role=GENERATED_METADATA)
+        after = (Block("META-0001", b"new"),)
+        base = Replace(
+            meta_for(
+                initial,
+                after,
+                repair_id="REPAIR-0300",
+                role=GENERATED_METADATA,
+                repair_class=NAVIGATION_METADATA,
+                author_evidence=False,
+            ),
+            block.block_id,
+            block.sha256,
+            b"old",
+            b"new",
+            1,
+        )
+        for state in (
+            "CAPTURED",
+            "EVIDENCE_READY",
+            "PENDING_SPECIALIST_REVIEW",
+            "PENDING_INDEPENDENT_REVIEW",
+            "SOURCE_BLOCKED",
+        ):
+            record = replace(base, meta=replace(base.meta, workflow_state=state))
+            with self.assertRaisesRegex(EvidenceError, "must be CLOSED"):
+                apply_overlays(initial, [record])
+        for disposition in (
+            "REJECTED_VALID_SOURCE_TEXT",
+            "DUPLICATE_CANDIDATE",
+            "UNRESOLVED_SOURCE_NEEDED",
+            "APPLIED_WITNESS_VERIFIED",
+            "ANNOTATED_SOURCE_ERRATUM",
+        ):
+            record = replace(base, meta=replace(base.meta, final_disposition=disposition))
+            with self.assertRaisesRegex(EvidenceError, "not applicable"):
+                apply_overlays(initial, [record])
+
+    def test_editorial_annotation_requires_annotation_disposition(self) -> None:
+        block = Block("EDITORIAL-0001", b"old")
+        initial = state_for((block,), role=EDITORIAL_SIDECAR)
+        after = (Block("EDITORIAL-0001", b"new"),)
+        meta = meta_for(
+            initial,
+            after,
+            repair_id="REPAIR-0301",
+            role=EDITORIAL_SIDECAR,
+            repair_class=SOURCE_ERRATUM_ANNOTATION,
+            author_evidence=False,
+        )
+        invalid = Replace(meta, block.block_id, block.sha256, b"old", b"new", 1)
+        with self.assertRaisesRegex(EvidenceError, "not applicable"):
+            apply_overlays(initial, [invalid])
+        valid = replace(
+            invalid,
+            meta=replace(invalid.meta, final_disposition="ANNOTATED_SOURCE_ERRATUM"),
+        )
+        self.assertEqual(inverse_replay(apply_overlays(initial, [valid])), initial)
 
     def test_ordered_dependency_chain_is_deterministic_and_reversible(self) -> None:
         initial = state_for((Block("RAW-000001", "one two"),))

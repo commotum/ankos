@@ -2,7 +2,7 @@
   "$defs": {
     "anchor": {"additionalProperties": false, "properties": {"end_byte_exclusive": {"minimum": 0, "type": "integer"}, "raw_block_id": {"$ref": "common.schema.json#/$defs/id"}, "sha256": {"$ref": "common.schema.json#/$defs/sha256"}, "start_byte": {"minimum": 0, "type": "integer"}, "text": {"minLength": 1, "type": "string"}}, "required": ["raw_block_id", "start_byte", "end_byte_exclusive", "text", "sha256"], "type": "object"},
     "evidence": {"additionalProperties": false, "properties": {"evidence_id": {"$ref": "common.schema.json#/$defs/id"}, "evidence_kind": {"enum": ["AUTHORITATIVE_WITNESS_REGION", "MECHANICAL_PROOF", "DIAGNOSTIC_ONLY"]}, "evidence_sha256": {"$ref": "common.schema.json#/$defs/sha256"}, "mechanical_proof_id": {"type": ["string", "null"]}, "permission_record_id": {"type": ["string", "null"]}, "witness_region_ids": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array", "uniqueItems": true}}, "required": ["evidence_id", "evidence_kind", "evidence_sha256", "witness_region_ids", "mechanical_proof_id", "permission_record_id"], "type": "object"},
-    "operation": {"additionalProperties": false, "properties": {"expected_input_projection_sha256": {"$ref": "common.schema.json#/$defs/sha256"}, "expected_output_projection_sha256": {"$ref": "common.schema.json#/$defs/sha256"}, "operation_type": {"enum": ["REPLACE", "DELETE", "MOVE", "SPLIT", "MERGE", "ANCHORED_INSERT"]}, "payload": {"additionalProperties": false, "properties": {"destination_anchor_id": {"type": ["string", "null"]}, "source_node_ids": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array"}, "target_node_ids": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array"}, "text": {"type": ["string", "null"]}}, "required": ["source_node_ids", "target_node_ids", "text", "destination_anchor_id"], "type": "object"}}, "required": ["operation_type", "expected_input_projection_sha256", "expected_output_projection_sha256", "payload"], "type": "object"},
+    "operation": {"additionalProperties": false, "properties": {"expected_input_projection_sha256": {"$ref": "common.schema.json#/$defs/sha256"}, "expected_output_projection_sha256": {"$ref": "common.schema.json#/$defs/sha256"}, "operation_type": {"enum": ["REPLACE", "DELETE", "MOVE", "SPLIT", "MERGE", "ANCHORED_INSERT"]}, "payload": {"additionalProperties": false, "properties": {"destination_anchor_id": {"type": ["string", "null"]}, "source_node_ids": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array"}, "target_node_ids": {"items": {"$ref": "common.schema.json#/$defs/id"}, "type": "array"}, "text": {"type": ["string", "null"]}}, "required": ["source_node_ids", "target_node_ids", "text", "destination_anchor_id"], "type": "object"}, "payload_sha256": {"$ref": "common.schema.json#/$defs/sha256"}}, "required": ["operation_type", "expected_input_projection_sha256", "expected_output_projection_sha256", "payload", "payload_sha256"], "type": "object"},
     "projection": {"additionalProperties": false, "properties": {"sha256": {"$ref": "common.schema.json#/$defs/sha256"}, "text": {"type": "string"}}, "required": ["text", "sha256"], "type": "object"}
   },
   "$id": "ankos://schemas/repair-record.schema.json",
@@ -11,6 +11,7 @@
   "properties": {
     "after_projection": {"$ref": "#/$defs/projection"},
     "application_order": {"type": ["integer", "null"]},
+    "baseline_lock_sha256": {"$ref": "common.schema.json#/$defs/sha256"},
     "before_projection": {"$ref": "#/$defs/projection"},
     "confidence": {"enum": ["HIGH", "MEDIUM", "LOW", "UNKNOWN"]},
     "creator": {"$ref": "common.schema.json#/$defs/principal"},
@@ -31,6 +32,6 @@
     "witness_projection": {"oneOf": [{"$ref": "#/$defs/projection"}, {"type": "null"}]},
     "workflow": {"$ref": "workflow.schema.json"}
   },
-  "required": ["schema_version", "repair_id", "application_order", "repair_class", "risk", "target", "workflow", "creator", "dependencies", "guard", "forward_operation", "inverse_operation", "evidence", "before_projection", "witness_projection", "after_projection", "rationale", "confidence", "review_ids", "unresolved_ids", "verification_results"],
+  "required": ["schema_version", "repair_id", "baseline_lock_sha256", "application_order", "repair_class", "risk", "target", "workflow", "creator", "dependencies", "guard", "forward_operation", "inverse_operation", "evidence", "before_projection", "witness_projection", "after_projection", "rationale", "confidence", "review_ids", "unresolved_ids", "verification_results"],
   "type": "object"
 }
