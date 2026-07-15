@@ -255,14 +255,10 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-14 (America/Los_Angeles).
-- Active stage: `1-CLEANUP` (`IN_PROGRESS`).
-- The worktree was clean at commit `f02753e` when Stage 1 began; there were no
-  modified or untracked Goal 4 files left by concurrent agents. All Stage 4
-  agents were stopped before cleanup inventory began.
-- `goal-4/` currently contains 123 files totaling about 26 MiB: 36 root
-  artifacts, 14 generalized schemas, 19 tools, 9 source tests, and 45 ignored
-  bytecode-cache files. Its interrupted pipeline has not corrected or
-  published any book text.
+- Active stage: `2-FOUNDATION` (`IN_PROGRESS`).
+- Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
+  and the empty `goal-4/` directory were removed by exact path. No commit
+  range was reverted, and Goal 4 had corrected no book text.
 - The legacy tree currently contains exactly 1,463 files: 19 Markdown and 1,444
   JPEG. A sorted path-and-file-digest snapshot hashes to
   `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
@@ -273,11 +269,11 @@ Neither file is a generalized workflow database.
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
   intentional historical cleanup references to Goal 4 and intentional repaired
   sibling references, but no dependency on its machinery.
-- Goal 4 contains four compact fact sets worth migrating before deletion: the
-  29 provisional raw document ranges, 55 known-defect/guardrail candidates, a
-  1,444-row image-to-asset map, and a concise legacy/routing/source summary.
-  They remain provisional until Goal 5 independently rechecks them and
-  authoritative source evidence confirms content-sensitive boundaries.
+- Goal 5 now contains only four compact carryovers: 29 provisional raw document
+  ranges, 55 known-defect/guardrail candidates, a 1,444-row image-to-asset map,
+  and a concise legacy/routing/source summary. Direct hashes, ranges, source
+  spans, and assets were rechecked; content-sensitive facts remain provisional
+  until authoritative comparison.
 - No lawful, complete, readable authoritative source is currently mounted in
   the repository. Stage 2 remains source-acquisition blocked unless a suitable
   source is authorized or provided.
@@ -286,8 +282,8 @@ Neither file is a generalized workflow database.
 
 | Stage | Status | Prerequisites |
 |---|---|---|
-| 1-CLEANUP | `IN_PROGRESS` | none |
-| 2-FOUNDATION | `NOT_STARTED` | 1; complete lawful authoritative source for completion |
+| 1-CLEANUP | `COMPLETE` | none |
+| 2-FOUNDATION | `IN_PROGRESS` | 1; complete lawful authoritative source for completion |
 | 3-FRONT-CH04 | `NOT_STARTED` | 2 |
 | 4-CH05-08 | `NOT_STARTED` | 2 |
 | 5-CH09-12 | `NOT_STARTED` | 2 |

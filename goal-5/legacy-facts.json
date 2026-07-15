@@ -9,11 +9,14 @@
       "root_url": "https://www.wolframscience.com/nks/"
     },
     "complete_source_mounted": false,
+    "edition_equivalence_to_local_ocr_proven": false,
+    "fixed_layout_index_source_identified": false,
     "goal_5_action": "Re-evaluate narrower lawful access or use a user-provided/licensed edition-identical source before any transcription change.",
-    "previous_goal_4_result": "The previously identified official online surface was not authorized for Goal 4's bulk AI-assisted audit. No source payload was retained."
+    "previous_goal_4_result": "Observed 2026-07-14: the previously identified official online surface was not authorized for Goal 4's bulk AI-assisted audit. Re-evaluate permission for Goal 5's narrower workflow; no source payload was retained."
   },
   "images": {
     "by_document": [
+      {"document_id": "PUBLICATION_AND_CONTENTS", "references": 0},
       {"document_id": "PREFACE", "references": 2},
       {"document_id": "CH01", "references": 2},
       {"document_id": "CH02", "references": 20},
@@ -28,6 +31,7 @@
       {"document_id": "CH11", "references": 107},
       {"document_id": "CH12", "references": 58},
       {"document_id": "GENERAL_NOTES", "references": 1},
+      {"document_id": "N01", "references": 0},
       {"document_id": "N02", "references": 54},
       {"document_id": "N03", "references": 40},
       {"document_id": "N04", "references": 71},
@@ -38,7 +42,9 @@
       {"document_id": "N09", "references": 70},
       {"document_id": "N10", "references": 91},
       {"document_id": "N11", "references": 14},
-      {"document_id": "N12", "references": 38}
+      {"document_id": "N12", "references": 38},
+      {"document_id": "INDEX", "references": 0},
+      {"document_id": "COLOPHON", "references": 0}
     ],
     "duplicate_payload_group_to_preserve_as_distinct_assets": {
       "paths": [

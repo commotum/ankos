@@ -1,14 +1,15 @@
 # 1-CLEANUP
 
-Status: IN_PROGRESS
+Status: COMPLETE
 
 ## Current Facts
 
 - Stage 1 began from a clean worktree at commit `f02753e`; no modified or
   untracked Goal 4 file was present when deletion planning started.
 - All concurrent Stage 4 agents were stopped before inventory.
-- `goal-4/` has 123 files (about 26 MiB): 36 root artifacts, 14 schemas, 19
-  tools, 9 source tests, and 45 bytecode-cache files.
+- Before removal, `goal-4/` had 123 files (about 26 MiB): 36 root artifacts,
+  14 schemas, 19 tools, 9 source tests, and 45 bytecode-cache files. It is now
+  absent.
 - The repaired sibling exists and is empty.
 - The pre-cleanup legacy snapshot is:
   - files: 1,463;
@@ -97,19 +98,41 @@ path-level deletion; no commit range will be reverted.
 
 ## Completion Requirements
 
-- [ ] Complete keep/delete/migrate decisions are recorded by artifact category.
-- [ ] Every modified/untracked Goal 4 file present at cleanup time is inspected
+- [x] Complete keep/delete/migrate decisions are recorded by artifact category.
+- [x] Every modified/untracked Goal 4 file present at cleanup time was inspected
   before deletion (current count: zero).
-- [ ] Compact migrated facts are independently sanity-checked against legacy
+- [x] Compact migrated facts were independently sanity-checked against legacy
   inputs and contain no Goal 4 workflow state.
-- [ ] Goal 4 generalized pipeline/security/workflow infrastructure and caches
+- [x] Goal 4 generalized pipeline/security/workflow infrastructure and caches
   are absent.
-- [ ] No unrelated file or legacy byte changes.
-- [ ] No stale external Goal 4 references.
-- [ ] Repaired sibling is empty.
-- [ ] `git diff --check` and explicit scope inspection pass.
+- [x] No unrelated file or legacy byte changes.
+- [x] No stale external Goal 4 references.
+- [x] Repaired sibling is empty.
+- [x] `git diff --check` and explicit scope inspection pass.
 
 ## Stage Results
 
-IN_PROGRESS. Inventory and migration decisions are being completed before any
-deletion.
+COMPLETE on 2026-07-14.
+
+- Deleted all 78 tracked Goal 4 files by exact path and all 45 ignored `.pyc`
+  files, then removed the empty `goal-4/` directory. No commit range was
+  reverted.
+- Preserved only four compact, provisional Goal 5 inputs:
+  `source-ranges.json` (29 ranges), `known-defects.jsonl` (55 candidates),
+  `image-map.jsonl` (1,444 image references), and `legacy-facts.json`.
+- Removed Goal 4-only detector IDs, raw-block IDs, workflow status fields, and
+  partial boundary-signature metadata from the migrated inputs.
+- Direct validation passed for all 29 contiguous byte ranges and segment
+  hashes, all 52 exact defect-span hashes, all 1,444 image files/hashes/source
+  line references, and the 29-document image totals.
+- The protected legacy tree still has 1,463 files and reproduces SHA-256
+  `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
+  The monolith remains 3,780,628 bytes with SHA-256
+  `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
+- A repository scan found no live external Goal 4 path, module, or validator
+  references. Intentional historical references inside Goal 5 remain.
+- The repaired sibling is empty, `git diff --check` passes, and scope is limited
+  to deletion of `goal-4/` plus the three compact Goal 5 metadata cleanups.
+- No book text was changed. The next stage must build a plain 29-document
+  baseline and remains unable to complete without lawful, readable,
+  edition-identical source evidence.
