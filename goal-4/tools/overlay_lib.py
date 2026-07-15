@@ -86,6 +86,34 @@ HIGH_RISK_CLASSES = frozenset(
     }
 )
 
+VALIDATED_OPERATION_TAGS = frozenset(
+    {
+        "LEXICAL_ONLY",
+        "STRUCTURAL",
+        "FORMULA_SYMBOL",
+        "CODE_SEMANTICS",
+        "DATA_SEMANTICS",
+        "FIGURE_SEMANTICS",
+        "INDEX_SEMANTICS",
+    }
+)
+HIGH_RISK_OPERATION_TAGS = frozenset(
+    VALIDATED_OPERATION_TAGS.difference({"LEXICAL_ONLY"})
+)
+VALIDATED_AST_IMPACTS = frozenset(
+    {
+        "HEADING_DEPTH",
+        "PARAGRAPH_BOUNDARY",
+        "LIST_STRUCTURE",
+        "FENCE_STRUCTURE",
+        "TABLE_STRUCTURE",
+        "MATH_STRUCTURE",
+        "CODE_STRUCTURE",
+        "BLOCK_BOUNDARY",
+    }
+)
+HIGH_RISK_AST_IMPACTS = VALIDATED_AST_IMPACTS
+
 WORKFLOW_STATES = frozenset(
     {
         "CAPTURED",
@@ -180,6 +208,15 @@ def _require_sha256(value: str, field: str) -> None:
 def _require_nonempty_text(value: str, field: str) -> None:
     if not isinstance(value, str) or not value.strip():
         raise SchemaError(f"{field} must be nonempty text")
+
+
+def _require_relative_path(value: str, field: str) -> None:
+    _require_nonempty_text(value, field)
+    if value.startswith("/") or "\\" in value:
+        raise SchemaError(f"{field} must be a relative POSIX path")
+    parts = value.split("/")
+    if any(part in {"", ".", ".."} for part in parts):
+        raise SchemaError(f"{field} contains an invalid path segment")
 
 
 def _require_positive_int(value: int, field: str) -> None:
@@ -377,13 +414,17 @@ class IndependentReview:
     source_reviewer_role: str
     source_decision: str
     evidence_view_sha256: str
+    review_row_sha256: str
     blind_preproposal: bool
     specialist_review_id: str | None = None
     specialist_principal_id: str | None = None
     specialist_type: str | None = None
     specialist_session_id: str | None = None
+    specialist_role: str | None = None
+    specialist_specialty: str | None = None
     specialist_decision: str | None = None
     specialist_evidence_view_sha256: str | None = None
+    specialist_review_row_sha256: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -392,6 +433,10 @@ class OperationMeta:
 
     repair_id: str
     target_id: str
+    target_path: str
+    raw_source_id: str
+    raw_source_span_sha256: str
+    raw_source_row_sha256: str
     target_role: str
     repair_class: str
     expected_target_sha256: str
@@ -399,6 +444,8 @@ class OperationMeta:
     creator_principal_id: str
     workflow_state: str
     final_disposition: str
+    validated_risk_tags: tuple[str, ...] = ()
+    validated_ast_impact: tuple[str, ...] = ()
     dependencies: tuple[str, ...] = ()
     witness: WitnessEvidence | None = None
     review: IndependentReview | None = None
@@ -406,6 +453,10 @@ class OperationMeta:
     def __post_init__(self) -> None:
         _require_id(self.repair_id, "repair_id")
         _require_id(self.target_id, "target_id")
+        _require_relative_path(self.target_path, "target_path")
+        _require_id(self.raw_source_id, "raw_source_id")
+        _require_sha256(self.raw_source_span_sha256, "raw_source_span_sha256")
+        _require_sha256(self.raw_source_row_sha256, "raw_source_row_sha256")
         if self.target_role not in TARGET_ROLES:
             raise SchemaError(f"unknown target role: {self.target_role!r}")
         if self.repair_class not in CLASS_ALLOWED_ROLES:
@@ -417,6 +468,17 @@ class OperationMeta:
             raise SchemaError(f"unknown workflow state: {self.workflow_state!r}")
         if self.final_disposition not in FINAL_DISPOSITIONS:
             raise SchemaError(f"unknown final disposition: {self.final_disposition!r}")
+        for values, allowed, field_name in (
+            (self.validated_risk_tags, VALIDATED_OPERATION_TAGS, "validated_risk_tags"),
+            (self.validated_ast_impact, VALIDATED_AST_IMPACTS, "validated_ast_impact"),
+        ):
+            if type(values) is not tuple:
+                raise SchemaError(f"{field_name} must be an immutable tuple")
+            if len(values) != len(set(values)) or tuple(sorted(values)) != values:
+                raise SchemaError(f"{field_name} must be sorted and unique")
+            unknown = set(values).difference(allowed)
+            if unknown:
+                raise SchemaError(f"{field_name} contains unknown values: {sorted(unknown)!r}")
         if type(self.dependencies) is not tuple:
             raise SchemaError("dependencies must be an immutable tuple")
         for dependency in self.dependencies:
