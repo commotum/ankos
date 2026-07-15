@@ -139,13 +139,12 @@ worktree and corpus.
 - Known defects include broken headings, word joins/splits, prose inside code
   fences, malformed formulas, damaged Wolfram Language, caption interleaving,
   OCR substitutions, and back-matter reading-order errors.
-- Goal 4 contains a large amount of generated planning, schema, lock, pipeline,
-  validation, and test machinery. Its current source-blocked pipeline has not
-  corrected the book text.
-- At the most recent scaffold sync, Goal 4 had modified and untracked pipeline
-  files. Stage 1 must inspect the then-current status before removing anything.
-- The sibling `ref/A-New-Kind-of-Science-Repaired/` exists but has not been
-  published as a verified repaired edition.
+- Stage 1 removed Goal 4's generated planning, schema, lock, pipeline,
+  validation, and test machinery after migrating four compact fact sets. Goal
+  4 had not corrected the book text.
+- The sibling `ref/A-New-Kind-of-Science-Repaired/` contains a reproducible
+  zero-correction baseline, clearly labeled as provisional rather than a
+  verified repaired edition.
 - Goal 4 reported that the official online surface did not provide permission
   for the bulk AI-assisted workflow it proposed. Goal 5 must re-evaluate the
   actual narrower source access needed, seek authorization, or use a lawful
@@ -194,8 +193,9 @@ ref/A-New-Kind-of-Science-Repaired/
     └── Colophon.md
 ```
 
-`corrections.jsonl` records actual author-text changes with stable location,
-exact before/after text, source page/location, reason, and reviewer status.
+`corrections.jsonl` records actual author-text changes with an absolute raw
+byte offset, exact before/after text, source page/location, reason, and reviewer
+status.
 `coverage.csv` records sequential review ranges and second-pass completion.
 Neither file is a generalized workflow database.
 
@@ -264,7 +264,9 @@ Neither file is a generalized workflow database.
   `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
-- `ref/A-New-Kind-of-Science-Repaired/` is empty.
+- `ref/A-New-Kind-of-Science-Repaired/` contains the validated
+  zero-correction baseline: 29 author-text documents, 1,444 JPEGs, and generated
+  README/Contents files. It is not an OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
   intentional historical cleanup references to Goal 4 and intentional repaired
@@ -277,6 +279,10 @@ Neither file is a generalized workflow database.
 - No lawful, complete, readable authoritative source is currently mounted in
   the repository. Stage 2 remains source-acquisition blocked unless a suitable
   source is authorized or provided.
+- Stage 2's dependency-independent foundation is implemented: the zero-build
+  conserves all monolith bytes, two fresh builds match, the focused validator
+  passes, and `8` tests plus `19` mutation subtests pass. All 29 coverage
+  rows remain unreviewed and `corrections.jsonl` is empty.
 
 ## Stage Status
 

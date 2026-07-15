@@ -12,7 +12,9 @@ Status: IN_PROGRESS
   and every segment hash matches.
 - The image map contains 1,444 ordered references to 1,444 physical JPEGs; each
   live asset hash and referenced monolith line matches.
-- `ref/A-New-Kind-of-Science-Repaired/` is empty.
+- `ref/A-New-Kind-of-Science-Repaired/` now contains the generated
+  zero-correction baseline: 29 author-text documents, 1,444 JPEGs, and two
+  clearly editorial navigation/readme files.
 - No complete lawful, readable, edition-identical source is mounted. The
   official NKS Online site is a candidate to re-evaluate, but equivalence,
   complete access, permitted use, and fixed-layout Index evidence are unproven.
@@ -36,9 +38,10 @@ while leaving the authoritative-source blocker explicit.
 ## Detailed Implementation Plan
 
 1. Add a small standard-library `build.py` that reads the immutable monolith,
-   validates the 29 ranges, applies only source-verified exact-preimage
-   corrections, copies the 1,444 mapped assets beside their documents, and
-   writes simple generated README/Contents files.
+   validates the 29 ranges, applies only source-verified corrections anchored
+   by absolute raw byte offset and exact preimage, copies the 1,444 mapped
+   assets beside their documents, and writes simple generated README/Contents
+   files.
 2. Add a focused `validate.py` that independently checks inputs, coverage,
    expected document bytes, image targets, generated navigation, and the exact
    output file set.
@@ -70,16 +73,39 @@ while leaving the authoritative-source blocker explicit.
 - [ ] A lawful, edition-matched, complete, readable source is documented.
 - [x] Exactly 29 ordered ranges cover the complete raw stream without gap,
   overlap, or duplication.
-- [ ] A zero-correction build succeeds and reassembles to the raw stream.
+- [x] A zero-correction build succeeds and reassembles to the raw stream.
 - [x] All 1,444 raw image references and physical assets are inventoried and
   hash-checked.
-- [ ] The builder, validator, correction log, and coverage record are small and
+- [x] The builder, validator, correction log, and coverage record are small and
   documented.
-- [ ] Focused drift, boundary, skipped/duplicate range, correction-preimage,
+- [x] Focused drift, boundary, skipped/duplicate range, correction-preimage,
   output-mutation, and determinism tests pass.
 
 ## Stage Results
 
-IN_PROGRESS. The source-access requirement is currently blocking stage
-completion. Dependency-independent build and validation work is underway; no
-author text has been changed or reviewed against an authoritative source.
+IN_PROGRESS. The source-access requirement is the only unmet Stage 2
+completion requirement; no author text has been changed or reviewed against an
+authoritative source.
+
+- Added `build.py` and `validate.py`, using only the Python standard library.
+  Corrections are tied to an absolute monolith byte offset and exact nonempty
+  preimage, checked against the original document, rejected on overlap, and
+  applied from the end of each document backward.
+- Added an empty `corrections.jsonl`, a 29-row `coverage.csv` with both
+  passes explicitly `NO`, and `unresolved.md` with the source blocker and
+  next acquisition action.
+- The zero-correction build produced 29 author-text Markdown files and 1,444
+  adjacent JPEGs. Concatenating the 29 files in range order reproduces all
+  3,780,628 monolith bytes, including the absent terminal newline.
+- The validator accepts exactly the expected 1,475 files, verifies every
+  document and image byte, checks the ordered image-reference sequence and
+  generated Contents targets, and reports zero corrections and zero completed
+  second passes.
+- Two fresh temporary builds were byte-identical. Focused tests passed:
+  `8 passed, 19 subtests passed`.
+- A repository scan found no PDF, EPUB, MOBI, DJVU, CBZ, archive, or relevant
+  HTML source; the only HTML file is the unrelated visualization UI at
+  `src/ca/viz/static/index.html`.
+- The next action is not more pipeline code. It is to authorize or provide a
+  complete edition-identical source, including fixed-layout Index evidence,
+  then record its identity/location convention and begin sequential comparison.
