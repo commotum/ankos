@@ -547,11 +547,11 @@ class ChapterFourTests(unittest.TestCase):
         with self.assertRaises(build.BuildError):
             build.validate_added_assets(self.documents, self.images, missing_reason)
 
-    def test_coverage_remains_open_for_independent_review(self) -> None:
+    def test_coverage_is_two_pass_complete(self) -> None:
         rows = validate.validate_coverage(self.documents)
         chapter = next(row for row in rows if row["document_id"] == "CH04")
         self.assertEqual(
-            (chapter["first_pass"], chapter["second_pass"]), ("YES", "NO")
+            (chapter["first_pass"], chapter["second_pass"]), ("YES", "YES")
         )
 
 

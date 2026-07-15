@@ -270,7 +270,7 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-15 (America/Los_Angeles).
-- Active stage: `3-FRONT-CH04` (`IN_PROGRESS`).
+- Active stage: `4-CH05-08` (`IN_PROGRESS`).
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
   and the empty `goal-4/` directory were removed by exact path. No commit
   range was reverted, and Goal 4 had corrected no book text.
@@ -334,13 +334,12 @@ Neither file is a generalized workflow database.
   repaired-only overrides. Focused tests, residual detectors, rendering,
   deterministic builds, and legacy checks pass. The final Markdown SHA-256 is
   `f948d0c45b8bec06b78e72e8e8fa8f807c37f7a0fd29d4b4dc43550bc8768f35`.
-- `CH04` has a complete forward first pass over all 54 PDF pages 131–184. Its
-  first 109 guarded corrections are `G5-C-0194`–`G5-C-0302`; all 59 mapped and four
-  source-added visuals were checked, one damaged figure uses a repaired-only
-  override, and 11 numeric tables were reconstructed from direct fixed-layout
-  evidence. The independent pass then found one omitted printed continuation
-  marker, restored as `G5-C-0303`, and restarted against the new final rebuilt
-  document and assets.
+- `CH04` is complete after a forward first pass and a clean independent pass
+  restarted against the post-`G5-C-0303` final document. Its 110 guarded
+  corrections are `G5-C-0194`–`G5-C-0303`; all 243 live blocks, 172 TeX spans,
+  11 reconstructed tables, and 63 assets were independently verified over all
+  54 PDF pages 131–184. The final Markdown SHA-256 is
+  `33b0521073b7d212d181903a71b1917b7647b006ef09618f93d89697f8942248`.
 
 ## Stage Status
 
@@ -348,8 +347,8 @@ Neither file is a generalized workflow database.
 |---|---|---|
 | 1-CLEANUP | `COMPLETE` | none |
 | 2-FOUNDATION | `COMPLETE` | 1 |
-| 3-FRONT-CH04 | `IN_PROGRESS` | 2 |
-| 4-CH05-08 | `NOT_STARTED` | 2 |
+| 3-FRONT-CH04 | `COMPLETE` | 2 |
+| 4-CH05-08 | `IN_PROGRESS` | 2 |
 | 5-CH09-12 | `NOT_STARTED` | 2 |
 | 6-NOTES-00-04 | `NOT_STARTED` | 2 |
 | 7-NOTES-05-08 | `NOT_STARTED` | 2 |

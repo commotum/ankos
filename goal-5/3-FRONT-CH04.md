@@ -1,6 +1,6 @@
 # 3-FRONT-CH04
 
-Status: IN_PROGRESS
+Status: COMPLETE
 
 ## Current Facts
 
@@ -15,11 +15,10 @@ Status: IN_PROGRESS
 - All six document boundaries are source-confirmed. In particular, the Chapter
   1 and Chapter 3 opener images and the textual Chapter 2 and Chapter 4 opener
   numbers belong to the chapters they introduce.
-- `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`, `CH02`, and `CH03` are
-  two-pass complete over PDF pages 1–130. `CH04` has a complete forward first
-  pass over PDF pages 131–184. Its independent pass found and repaired one
-  omitted continuation marker, bringing Stage 3 to 303 guarded corrections;
-  the complete final-document pass has restarted and remains open.
+- All six documents are two-pass complete over PDF pages 1–184 with 303
+  guarded corrections. The `CH04` independent pass found and repaired one
+  omitted continuation marker, then restarted from PDF page 131 against the
+  new final document and completed cleanly through PDF page 184.
 - Source-review packs exist under `/tmp/ankos-stage3-publication/`,
   `/tmp/ankos-stage3-preface/`, `/tmp/ankos-stage3-ch02/`, and
   `/tmp/ankos-stage3-ch03/`. Page rasters are authoritative; native PDF text is
@@ -111,7 +110,7 @@ For each document:
 | 1 | `CH03` | 67–130 | `119521 → 199880` | COMPLETE | `G5-C-0133`–`G5-C-0193` | closed |
 | 2 | `CH03` | 67–130 | final rebuilt document and assets | COMPLETE | all 61 verified; no new discrepancy | closed |
 | 1 | `CH04` | 131–184 | `199880 → 355646` | COMPLETE | `G5-C-0194`–`G5-C-0302` | closed |
-| 2 | `CH04` | 131–184 | final rebuilt document and assets | IN_PROGRESS | found `G5-C-0303`; restarted against new final hash | `pdf:0131` |
+| 2 | `CH04` | 131–184 | final rebuilt document and assets | COMPLETE | all 110 verified after `G5-C-0303` restart; no new discrepancy | closed |
 
 The first slice's exact page-to-raw map is:
 
@@ -150,23 +149,23 @@ The first slice's exact page-to-raw map is:
 
 - [x] Every source page from PDF 1 through 184 is accounted for in a complete
   forward first pass.
-- [ ] All six documents have a separate complete forward second pass against
+- [x] All six documents have a separate complete forward second pass against
   the final rebuilt Markdown.
-- [ ] Every discovered author-text, structure, formula/code, caption, figure,
+- [x] Every discovered author-text, structure, formula/code, caption, figure,
   table, and reading-order discrepancy is source-resolved, guarded, rebuilt,
   and verified.
-- [ ] All Stage 3 detector hits have source-backed dispositions and every new
+- [x] All Stage 3 detector hits have source-backed dispositions and every new
   defect pattern has been searched backward over completed material.
-- [ ] Stage 3 has zero unresolved author-text ambiguity.
-- [ ] All six `coverage.csv` rows say `YES/YES` with reviewer type `agent` and
+- [x] Stage 3 has zero unresolved author-text ambiguity.
+- [x] All six `coverage.csv` rows say `YES/YES` with reviewer type `agent` and
   exact pass evidence.
-- [ ] Focused tests, cumulative build/validation, legacy-tree hash,
+- [x] Focused tests, cumulative build/validation, legacy-tree hash,
   deterministic builds, Markdown/render checks, `git diff --check`, and scope
   inspection pass.
 
 ## Stage Results
 
-In progress. Foundation gates were rerun on 2026-07-15 before content review:
+Complete. Foundation gates were rerun on 2026-07-15 before content review:
 `10 passed, 26 subtests passed`; default build and both normal and
 zero-correction validation passed; the legacy snapshot remained
 `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
@@ -318,7 +317,31 @@ correction `G5-C-0303`, and the complete pass restarted against the rebuilt
 document whose SHA-256 is
 `33b0521073b7d212d181903a71b1917b7647b006ef09618f93d89697f8942248`.
 
-Exact next action: complete the independent sequential second pass from
-`pdf:0131` through `pdf:0184` against the exact final document hash above and
-all 63 referenced assets. If it is clean, close Stage 3 and begin `CH05` at
-`pdf:0185`.
+The restarted independent pass kept that hash unchanged while checking all 54
+pages, all 243 live blocks, 172 TeX spans, 11 tables with 91 rows and 289
+cells, all three 6×11 matrices, all nine printed PDE equations, and all 63
+assets. A separate visual caption audit checked 45 caption blocks, 38
+image-bearing associations, seven table/math-only captions, both printed
+directional triangles, and ten marginal/side/foot placements. Both passes
+found zero remaining discrepancy, unchecked item, or ambiguity.
+
+The newly discovered missing-marker pattern was searched backward by direct
+visual comparison over PDF pages 1–130. Exactly five prior direction markers
+and eight additional explicit cross-page continuation captions were found; all
+13 are already preserved and associated with the correct Stage 3 figure
+groups. Register-machine arrow glyphs were separately dispositioned as
+instruction symbols.
+
+The final 47-test suite passes. Default and strict zero-correction validation
+pass with six second-pass-complete documents. Two fresh normal builds and the
+default output have the identical 1,483-file tree digest
+`25c2b759018bdcd930c2aac41cc780384ff33f4490f6b7d0394cf35d53369626`;
+the zero-correction build retains 1,444 images and reassembles the raw stream.
+The immutable 1,463-file legacy digest remains
+`b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
+The full 67-page Chapter 4 render loads all assets and visibly preserves the
+restored forward marker. `git diff --check` and scope inspection pass.
+
+Stage 3 is complete. Exact next action: begin `CH05` at `pdf:0185`, raw line
+2,142 and byte 355646, by verifying the chapter opener and image-map ordinal
+169 before advancing sequentially through PDF page 238.
