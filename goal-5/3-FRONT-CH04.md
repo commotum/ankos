@@ -15,8 +15,8 @@ Status: IN_PROGRESS
 - All six document boundaries are source-confirmed. In particular, the Chapter
   1 and Chapter 3 opener images and the textual Chapter 2 and Chapter 4 opener
   numbers belong to the chapters they introduce.
-- The repaired tree is currently a zero-correction projection. All six Stage 3
-  coverage rows say `NO/NO`; `corrections.jsonl` is empty.
+- `PUBLICATION_AND_CONTENTS` is two-pass complete over PDF pages 1–8 with 20
+  guarded corrections. The other five Stage 3 coverage rows remain `NO/NO`.
 - A source-review pack for the first canonical document exists under
   `/tmp/ankos-stage3-publication/`. Page rasters are authoritative; native PDF
   text is only a navigation/detection aid because its custom glyph and column
@@ -87,9 +87,9 @@ For each document:
 
 | Pass | Document | PDF interval | Raw cursor before/after | Status | Correction IDs | Next source page |
 |---|---|---:|---|---|---|---:|
-| 1 | `PUBLICATION_AND_CONTENTS` | 1–8 | `0 → 6480` | IN_PROGRESS | pending | `pdf:0001` |
-| 2 | `PUBLICATION_AND_CONTENTS` | 1–8 | final rebuilt document | NOT_STARTED | pending | `pdf:0001` |
-| 1 | `PREFACE` | 9–16 | `6480 → 30320` | NOT_STARTED | — | `pdf:0009` |
+| 1 | `PUBLICATION_AND_CONTENTS` | 1–8 | `0 → 6480` | COMPLETE | `G5-C-0001`–`G5-C-0020` | closed |
+| 2 | `PUBLICATION_AND_CONTENTS` | 1–8 | final rebuilt document | COMPLETE | verified all 20 | closed |
+| 1 | `PREFACE` | 9–16 | `6480 → 30320` | IN_PROGRESS | pending | `pdf:0009` |
 | 2 | `PREFACE` | 9–16 | final rebuilt document | NOT_STARTED | — | `pdf:0009` |
 | 1 | `CH01` | 17–38 | `30320 → 79330` | NOT_STARTED | — | `pdf:0017` |
 | 2 | `CH01` | 17–38 | final rebuilt document | NOT_STARTED | — | `pdf:0017` |
@@ -153,10 +153,25 @@ The first slice's exact page-to-raw map is:
 
 ## Stage Results
 
-In progress. Foundation gates were rerun on 2026-07-15 before the first content
-comparison: `10 passed, 26 subtests passed`; default build and both normal and
+In progress. Foundation gates were rerun on 2026-07-15 before content review:
+`10 passed, 26 subtests passed`; default build and both normal and
 zero-correction validation passed; the legacy snapshot remained
 `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
 
-Exact resume point: first pass of `PUBLICATION_AND_CONTENTS`, beginning at
-`pdf:0001`, raw byte 0. No Stage 3 correction or coverage claim has yet closed.
+`PUBLICATION_AND_CONTENTS` received two separate forward agent passes over PDF
+pages 1–8. Pages 2, 6, and 8 are intentional blanks. Pages 1, 3, and 5 contain
+decorative title-leaf designs but no wording beyond the transcribed titles; the
+source-derived artwork was not extracted under the current authorization. The
+passes found and source-verified 20 nonoverlapping guarded corrections covering
+two title word joins, CIP digit confusions, an omitted copyright sentence,
+punctuation and permanent-paper sign loss, source emphasis, publisher/CIP row
+structure, title/Contents heading hierarchy, and a headerless Contents table.
+A fresh closing pass against the rebuilt file found no remaining discrepancy.
+
+The corrected Markdown rendered successfully with CommonMark raw HTML enabled;
+the five software-name italics, raised registration sign, line structure,
+permanent-paper sign, heading hierarchy, and 12 row headers were visibly
+present. Three focused publication tests and all ten Foundation tests passed.
+
+Exact resume point: first pass of `PREFACE`, beginning at `pdf:0009`, raw byte
+6480. No Preface discrepancy or coverage claim has yet closed.

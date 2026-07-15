@@ -31,7 +31,10 @@ class FoundationTests(unittest.TestCase):
         raw, documents, corrections, images = build.load_inputs()
         self.assertEqual(raw, self.raw)
         self.assertEqual(len(documents), 29)
-        self.assertEqual(corrections, [])
+        self.assertEqual(
+            corrections,
+            build.validate_corrections(corrections, raw, documents),
+        )
         self.assertEqual(len(images), 1444)
         self.assertEqual(len(raw), 3_780_628)
         self.assertEqual(len(raw.splitlines()), 22_498)
@@ -207,7 +210,14 @@ class FoundationTests(unittest.TestCase):
     def test_coverage_is_a_complete_one_row_join(self) -> None:
         clean = validate.validate_coverage(self.documents)
         self.assertEqual(len(clean), 29)
-        self.assertTrue(all(row["first_pass"] == row["second_pass"] == "NO" for row in clean))
+        self.assertTrue(
+            all(
+                row["first_pass"] in {"NO", "YES"}
+                and row["second_pass"] in {"NO", "YES"}
+                and not (row["second_pass"] == "YES" and row["first_pass"] != "YES")
+                for row in clean
+            )
+        )
 
         variants: list[list[dict[str, str]]] = []
         variants.append(copy.deepcopy(clean[:-1]))
@@ -224,10 +234,10 @@ class FoundationTests(unittest.TestCase):
         changed_source_bound[0]["authoritative_end"] = "pdf:9999"
         variants.append(changed_source_bound)
         reversed_passes = copy.deepcopy(clean)
-        reversed_passes[0]["second_pass"] = "YES"
+        reversed_passes[1]["second_pass"] = "YES"
         variants.append(reversed_passes)
         no_evidence = copy.deepcopy(clean)
-        no_evidence[0]["first_pass"] = "YES"
+        no_evidence[1]["first_pass"] = "YES"
         variants.append(no_evidence)
 
         with tempfile.TemporaryDirectory() as directory:
@@ -323,8 +333,12 @@ class FoundationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1444, 0))
-            self.assertEqual(build.build(second), (29, 1444, 0))
+            self.assertEqual(
+                build.build(first, zero_corrections=True), (29, 1444, 0)
+            )
+            self.assertEqual(
+                build.build(second, zero_corrections=True), (29, 1444, 0)
+            )
             self.assertEqual(self._tree_manifest(first), self._tree_manifest(second))
 
             concatenated = b"".join(

@@ -141,9 +141,9 @@ and pinned fixed-layout source unless explicitly described as a review risk.
 - Stage 1 removed Goal 4's generated planning, schema, lock, pipeline,
   validation, and test machinery after migrating four compact fact sets. Goal
   4 had not corrected the book text.
-- The sibling `ref/A-New-Kind-of-Science-Repaired/` contains a reproducible
-  zero-correction baseline, clearly labeled as provisional rather than a
-  verified repaired edition.
+- The sibling `ref/A-New-Kind-of-Science-Repaired/` is reproducibly generated
+  from the immutable monolith plus guarded corrections. It remains a partial
+  repair worktree rather than a verified complete edition.
 - A complete local First-edition, First-printing PDF is pinned as the
   user-authorized fixed-layout witness for local agent-assisted comparison and
   repaired workspace output. It is Git-ignored and is not authorized here for
@@ -263,9 +263,10 @@ Neither file is a generalized workflow database.
   `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
-- `ref/A-New-Kind-of-Science-Repaired/` contains the validated
-  zero-correction baseline: 29 author-text documents, 1,444 JPEGs, and generated
-  README/Contents files. It is not an OCR-corrected edition.
+- `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
+  documents, 1,444 JPEGs, and generated README/Contents files. It now includes
+  the first source-verified corrections but is not a complete OCR-corrected
+  edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
   intentional historical cleanup references to Goal 4 and intentional repaired
@@ -286,9 +287,10 @@ Neither file is a generalized workflow database.
 - Source comparison corrected twelve chapter-start raw boundaries and eight
   opener-image owners. All 1,444 image filenames now place their source page
   inside their owning canonical document. `FOUNDATION-SOURCE-001` is closed.
-- Stage 3 begins at `PUBLICATION_AND_CONTENTS`: PDF pages 1–8, raw lines 1–85,
-  bytes `[0,6480)`. No document review coverage is complete yet and
-  `corrections.jsonl` is still empty.
+- `PUBLICATION_AND_CONTENTS` is complete after two sequential agent passes over
+  PDF pages 1–8 and a clean closing pass against the rebuilt Markdown. Its 20
+  guarded corrections are `G5-C-0001`–`G5-C-0020`; focused render and tests
+  pass. Stage 3 now continues with `PREFACE` at `pdf:0009`, raw byte 6480.
 
 ## Stage Status
 

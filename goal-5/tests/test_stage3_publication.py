@@ -9,6 +9,7 @@ GOAL_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(GOAL_DIR))
 
 import build  # noqa: E402
+import validate  # noqa: E402
 
 
 class PublicationAndContentsTests(unittest.TestCase):
@@ -82,6 +83,17 @@ class PublicationAndContentsTests(unittest.TestCase):
             (build.OUTPUT_ROOT / Path(self.path)).read_text(encoding="utf-8"),
             self.rendered,
         )
+
+    def test_two_pass_document_coverage_is_closed(self) -> None:
+        rows = validate.validate_coverage(self.documents)
+        publication = rows[0]
+        self.assertEqual(publication["document_id"], "PUBLICATION_AND_CONTENTS")
+        self.assertEqual(
+            (publication["first_pass"], publication["second_pass"]),
+            ("YES", "YES"),
+        )
+        self.assertEqual(publication["reviewer_type"], "agent")
+        self.assertTrue(all(row["second_pass"] == "NO" for row in rows[1:]))
 
 
 if __name__ == "__main__":
