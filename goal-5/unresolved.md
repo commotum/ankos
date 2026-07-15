@@ -1,8 +1,8 @@
 # Unresolved items
 
-There is no open Foundation source blocker. Content-review discrepancies are
-added here only when source comparison cannot resolve them; none has yet been
-opened because sequential review begins in Stage 3.
+There is no open Foundation source blocker or author-text ambiguity. Content
+review discrepancies are added here only when source comparison cannot resolve
+them; the first Stage 3 document closed without an unresolved item.
 
 ## FOUNDATION-SOURCE-001 — complete authoritative source
 
