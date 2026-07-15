@@ -30,9 +30,18 @@ Status: IN_PROGRESS
   no raw text span.
 - Printed running heads and page numbers are checked and dispositioned, but
   need not be transcribed when they are page furniture rather than author text.
+- Heading levels encode logical hierarchy rather than raw font size. Source
+  bold/italic emphasis is preserved where it carries the presentation, while
+  incidental line wrapping, rules, shading, and column geometry are not
+  treated as author text. Paragraph, row, list, and table boundaries are.
+- A source table without a header row uses a small raw-HTML table rather than
+  promoting its first data row to a Markdown header.
 - Title artwork, tables, formulas, code, captions, and text embedded in figures
   require direct visual inspection at sufficient zoom; `pdftotext` agreement
   cannot close them.
+- Decorative cover/title-leaf artwork with no additional wording is accounted
+  for in the page ledger but is not extracted from the PDF as a new repository
+  asset under the current local-comparison-only authorization.
 - A first pass and a second pass must each restart at the document's first PDF
   page and inspect the final rebuilt Markdown, not merely the correction list.
 
