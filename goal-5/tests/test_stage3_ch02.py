@@ -17,7 +17,10 @@ class ChapterTwoTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.raw, cls.documents, cls.corrections, cls.images = build.load_inputs()
-        cls.added_assets = build.load_added_assets(cls.documents, cls.images)
+        cls.all_added_assets = build.load_added_assets(cls.documents, cls.images)
+        cls.added_assets = [
+            row for row in cls.all_added_assets if row["document_id"] == "CH02"
+        ]
         cls.document = next(row for row in cls.documents if row["id"] == "CH02")
         cls.path = build.safe_relative_path(cls.document["output_path"], suffix=".md")
         cls.raw_text = cls.raw[
@@ -157,24 +160,24 @@ class ChapterTwoTests(unittest.TestCase):
         self.assertEqual(opener["id"], "G5-A-0001")
 
         mutations = []
-        missing_reason = copy.deepcopy(self.added_assets)
+        missing_reason = copy.deepcopy(self.all_added_assets)
         missing_reason[0].pop("reason")
         mutations.append(missing_reason)
-        wrong_hash = copy.deepcopy(self.added_assets)
+        wrong_hash = copy.deepcopy(self.all_added_assets)
         wrong_hash[0]["asset_sha256"] = "0" * 64
         mutations.append(wrong_hash)
-        wrong_dimensions = copy.deepcopy(self.added_assets)
+        wrong_dimensions = copy.deepcopy(self.all_added_assets)
         wrong_dimensions[0]["width_px"] = 1
         mutations.append(wrong_dimensions)
-        wrong_owner = copy.deepcopy(self.added_assets)
+        wrong_owner = copy.deepcopy(self.all_added_assets)
         wrong_owner[0]["document_id"] = "CH01"
         mutations.append(wrong_owner)
-        output_collision = copy.deepcopy(self.added_assets)
+        output_collision = copy.deepcopy(self.all_added_assets)
         output_collision[0]["asset_relative_path"] = (
             "goal-5/assets/CH02/_page_39_Figure_2.jpeg"
         )
         mutations.append(output_collision)
-        unverified = copy.deepcopy(self.added_assets)
+        unverified = copy.deepcopy(self.all_added_assets)
         unverified[0]["verification_status"] = "INFERRED"
         mutations.append(unverified)
         for index, rows in enumerate(mutations):
