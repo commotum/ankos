@@ -122,14 +122,13 @@ large schema graph or hostile-filesystem security model.
     obtain better evidence or continue the review rather than weakening the
     objective.
 
-## Current Facts To Reverify
+## Current Facts
 
-These facts orient the scaffold. Execution must recheck them against the live
-worktree and corpus.
+These facts have been rechecked against the live worktree, immutable corpus,
+and pinned fixed-layout source unless explicitly described as a review risk.
 
-- The legacy corpus has been observed to contain 19 Markdown files and 1,444
-  JPEGs.
-- The monolith has been observed at 3,780,628 bytes and 22,498 logical lines.
+- The legacy corpus contains 19 Markdown files and 1,444 JPEGs.
+- The monolith is 3,780,628 bytes and 22,498 logical lines.
 - The monolith references 1,444 images; the split Markdown omits three image
   references.
 - Chapter 12 runs into General Notes, and nominal Notes, Index, and Colophon
@@ -145,15 +144,15 @@ worktree and corpus.
 - The sibling `ref/A-New-Kind-of-Science-Repaired/` contains a reproducible
   zero-correction baseline, clearly labeled as provisional rather than a
   verified repaired edition.
-- Goal 4 reported that the official online surface did not provide permission
-  for the bulk AI-assisted workflow it proposed. Goal 5 must re-evaluate the
-  actual narrower source access needed, seek authorization, or use a lawful
-  user-provided/licensed witness; it must not pretend the source problem away.
+- A complete local First-edition, First-printing PDF is pinned as the
+  user-authorized fixed-layout witness for local agent-assisted comparison and
+  repaired workspace output. It is Git-ignored and is not authorized here for
+  redistribution.
 
 ## Assumptions To Challenge
 
-- A complete edition-identical source can be lawfully accessed for the full
-  comparison.
+- The pinned edition-identical source remains readable at every location needed
+  for the full comparison; any unreadable region must be carried as a blocker.
 - The raw monolith contains all author text even where its transcription or
   layout is damaged.
 - The proposed 29-document organization accounts for all book content.
@@ -254,8 +253,8 @@ Neither file is a generalized workflow database.
 
 ## Current Execution State
 
-- Synced: 2026-07-14 (America/Los_Angeles).
-- Active stage: `2-FOUNDATION` (`BLOCKED`).
+- Synced: 2026-07-15 (America/Los_Angeles).
+- Active stage: `3-FRONT-CH04` (`IN_PROGRESS`).
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
   and the empty `goal-4/` directory were removed by exact path. No commit
   range was reverted, and Goal 4 had corrected no book text.
@@ -271,34 +270,33 @@ Neither file is a generalized workflow database.
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
   intentional historical cleanup references to Goal 4 and intentional repaired
   sibling references, but no dependency on its machinery.
-- Goal 5 now contains only four compact carryovers: 29 provisional raw document
+- Goal 5 contains four compact working datasets: 29 source-confirmed raw/PDF
   ranges, 55 known-defect/guardrail candidates, a 1,444-row image-to-asset map,
-  and a concise legacy/routing/source summary. Direct hashes, ranges, source
-  spans, and assets were rechecked; content-sensitive facts remain provisional
-  until authoritative comparison.
-- No lawful, complete, readable authoritative source is currently mounted in
-  the repository. A live scan found no independent book source, and intentionally
-  deleted source material remains excluded. The official NKS Online candidate
-  is edition-aligned and structurally broad, but Wolfram's current published
-  terms prohibit bulk extraction and use with AI tools without a separate
-  agreement. Stage 2 therefore requires a user-supplied source explicitly
-  authorized for this workflow/output or separate Wolfram permission.
-- Stage 2's dependency-independent foundation is implemented: the zero-build
-  conserves all monolith bytes, two fresh builds match, the focused validator
-  protects the complete legacy-tree snapshot and independently reconstructs
-  corrected bytes, and `9` tests plus `19` mutation subtests pass. All 29
-  coverage rows remain unreviewed and `corrections.jsonl` is empty.
-- Three consecutive goal turns found no authorized independent source or
-  permission change. Stage 2 is formally blocked on
-  `FOUNDATION-SOURCE-001`; no later stage is eligible to start.
+  and a concise legacy/routing/source summary. Content claims remain pending
+  until their sequential comparison passes.
+- The pinned source is `A New Kind of Science/A New Kind of Science.pdf`, a
+  complete, readable 1,280-page First-edition, First-printing fixed-layout
+  witness whose copyright-page identity matches the immutable monolith. Its
+  SHA-256 is
+  `a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6`.
+- Stage 2 is complete. The zero-correction build conserves all monolith bytes;
+  two fresh builds match; the focused validator protects the legacy snapshot,
+  exact source identity, 29 raw/PDF partitions, correction evidence, and image
+  ownership; `10` tests plus `26` mutation subtests pass.
+- Source comparison corrected twelve chapter-start raw boundaries and eight
+  opener-image owners. All 1,444 image filenames now place their source page
+  inside their owning canonical document. `FOUNDATION-SOURCE-001` is closed.
+- Stage 3 begins at `PUBLICATION_AND_CONTENTS`: PDF pages 1–8, raw lines 1–85,
+  bytes `[0,6480)`. No document review coverage is complete yet and
+  `corrections.jsonl` is still empty.
 
 ## Stage Status
 
 | Stage | Status | Prerequisites |
 |---|---|---|
 | 1-CLEANUP | `COMPLETE` | none |
-| 2-FOUNDATION | `BLOCKED` | 1; complete lawful authoritative source for completion |
-| 3-FRONT-CH04 | `NOT_STARTED` | 2 |
+| 2-FOUNDATION | `COMPLETE` | 1 |
+| 3-FRONT-CH04 | `IN_PROGRESS` | 2 |
 | 4-CH05-08 | `NOT_STARTED` | 2 |
 | 5-CH09-12 | `NOT_STARTED` | 2 |
 | 6-NOTES-00-04 | `NOT_STARTED` | 2 |

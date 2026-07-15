@@ -32,7 +32,9 @@ Status: COMPLETE
 ## Updated Assumptions
 
 - The source-confirmed 29-range layout is frozen. PDF pages 1–1,280 form one
-  gapless partition, and Arabic printed page = one-based PDF page − 16.
+  gapless partition. For Arabic-numbered material the logical printed-page
+  mapping is one-based PDF page − 16; the Index leaves themselves are
+  unfoliated.
 - Chapter opener numbers/images at raw lines 166, 398, 680, 1368, 2142, 2700,
   3420, 4336, 5164, 6586, 7692, and 8608 belong to the chapter they introduce,
   not the preceding document.
@@ -63,7 +65,7 @@ and image ownership before content correction begins.
    expected document bytes, image targets, generated navigation, and the exact
    output file set.
 3. Add empty `corrections.jsonl`, one baseline `coverage.csv` row per
-   document, and `unresolved.md` naming the source acquisition blocker.
+   document, and `unresolved.md` for explicit source or content ambiguities.
 4. Add focused tests for raw drift, gaps/overlaps, duplicate output ownership,
    correction preimages, incomplete correction evidence, skipped coverage,
    output mutation, and reproducibility.

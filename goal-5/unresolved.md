@@ -24,8 +24,9 @@ Pinned source facts are in `source-ranges.json`:
 - extent: 1,280 one-based PDF pages, covering publication matter, Preface,
   Chapters 1–12, General and chapter Notes, fixed-layout four-column Index, and
   Colophon
-- location rule: Arabic printed page = PDF page − 16; legacy `_page_N_` asset
-  names refer to one-based PDF page `N + 1`
+- location rule: for Arabic-numbered material, logical printed page = PDF page
+  − 16 (the Index leaves are unfoliated); legacy `_page_N_` asset names refer
+  to one-based PDF page `N + 1`
 
 Ghostscript rendered all 1,280 pages successfully. Twenty-six pages without
 extractable text were accounted for as raster title/divider leaves or

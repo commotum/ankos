@@ -139,9 +139,9 @@
     "legacy_asset_files": 1444,
     "monolith_references": 1444,
     "ownership_totals": {
-      "chapters": 820,
+      "chapters": 821,
       "notes_including_general_notes": 622,
-      "preface": 2
+      "preface": 1
     },
     "split_omissions_to_reverify": [
       {
@@ -187,9 +187,9 @@
     "snapshot_sha256": "b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4"
   },
   "migrated_candidate_counts": {
+    "confirmed_document_ranges": 29,
     "image_map_rows": 1444,
-    "known_defect_or_guardrail_candidates": 55,
-    "provisional_document_ranges": 29
+    "known_defect_or_guardrail_candidates": 55
   },
   "monolith": {
     "bytes": 3780628,
@@ -200,7 +200,7 @@
     "terminal_lf": false
   },
   "note": "These are compact routing and inventory facts migrated from Goal 4 and partly rechecked directly. They are not authoritative evidence for changing book text.",
-  "routing_candidates_to_reverify": [
+  "legacy_routing_defects_observed": [
     "The Chapter 12 split derivative crosses into General Notes.",
     "The nominal Notes file contains one displaced Chapter 3 Notes line.",
     "The nominal Index file begins with displaced Chapter 3 Notes material.",
@@ -209,7 +209,7 @@
     "Four printed-contents destinations are semantically malformed despite lexical link resolution."
   ],
   "schema_version": 1,
-  "status": "SOURCE_PINNED_BOUNDARIES_CONFIRMED_REMAINDER_PROVISIONAL",
+  "status": "SOURCE_PINNED_BOUNDARIES_CONFIRMED_CONTENT_REVIEW_PENDING",
   "routing_facts_source_confirmed": [
     "The canonical Chapter 12 range ends before General Notes.",
     "All General and chapter Notes ranges follow the printed source order.",
