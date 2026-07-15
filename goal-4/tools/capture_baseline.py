@@ -69,11 +69,20 @@ def git_status(root: Path) -> bytes:
     return git_command(root, ["status", "--short", "--untracked-files=all"])
 
 
+def path_is_absent(path: Path) -> bool:
+    """Treat a dangling symlink as present for Stage 2 guardrails."""
+
+    return not path.exists() and not path.is_symlink()
+
+
 def build_lock(root: Path, output_root: Path) -> dict:
     artifact_names = sorted((JSON_OUTPUTS | JSONL_OUTPUTS) - {"baseline-lock.json"})
+    # validate_baseline.py is deliberately excluded: the validator consumes this
+    # lock, so binding it here would make validator maintenance self-referential.
     tool_paths = [
         "goal-4/tools/baseline_lib.py",
         "goal-4/tools/capture_baseline.py",
+        "goal-4/tools/guardrail_lib.py",
         "goal-4/tests/test_baseline.py",
     ]
     for relative in tool_paths:
@@ -113,7 +122,7 @@ def capture(root: Path) -> dict[str, str | int]:
     for name in JSON_OUTPUTS | JSONL_OUTPUTS:
         validate_exact_goal_output(root, output_root / name, f"goal-4/{name}")
     require((root / LEGACY_RELATIVE).is_dir(), "legacy corpus is missing")
-    repaired_sibling_absent_before = not (root / REPAIRED_RELATIVE).exists()
+    repaired_sibling_absent_before = path_is_absent(root / REPAIRED_RELATIVE)
     require(repaired_sibling_absent_before, "Stage 2 may not create or census the repaired sibling")
     contract = load_json(root / "goal-4/guardrails.json")
     quality = load_json(root / "goal-4/quality-evaluation.json")
@@ -150,7 +159,7 @@ def capture(root: Path) -> dict[str, str | int]:
     require(head_before == head_after_core, "Git HEAD moved during Stage 2 capture; rerun from a stable snapshot")
     manifest_after = build_corpus_manifest(root, contract)
     require(manifest == manifest_after, "legacy corpus changed during Stage 2 capture")
-    repaired_sibling_absent_after = not (root / REPAIRED_RELATIVE).exists()
+    repaired_sibling_absent_after = path_is_absent(root / REPAIRED_RELATIVE)
     require(repaired_sibling_absent_after, "repaired sibling appeared during Stage 2 capture")
     environment = build_environment_snapshot(
         root,
@@ -166,7 +175,7 @@ def capture(root: Path) -> dict[str, str | int]:
     atomic_write(output_root / "baseline-environment.json", canonical_json_bytes(environment))
     lock = build_lock(root, output_root)
     atomic_write(output_root / "baseline-lock.json", canonical_json_bytes(lock))
-    require(not (root / REPAIRED_RELATIVE).exists(), "repaired sibling appeared during Stage 2 capture")
+    require(path_is_absent(root / REPAIRED_RELATIVE), "repaired sibling appeared during Stage 2 capture")
     return {
         "artifact_count": len(lock["artifacts"]),
         "block_count": len(blocks),

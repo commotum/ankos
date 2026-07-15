@@ -12,8 +12,12 @@ import subprocess
 import sys
 import unicodedata
 from collections import Counter, defaultdict
+from io import BytesIO
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Iterator
+
+import PIL
+from PIL import Image, ImageFile
 
 from guardrail_lib import (
     GuardrailError,
@@ -356,7 +360,26 @@ def parse_lfs_pointer(payload: bytes) -> dict[str, Any] | None:
 def parse_jpeg(payload: bytes) -> dict[str, Any]:
     require(payload.startswith(b"\xff\xd8"), "JPEG is missing SOI")
     require(payload.endswith(b"\xff\xd9"), "JPEG is missing terminal EOI")
+    sof_markers = {
+        0xC0,
+        0xC1,
+        0xC2,
+        0xC3,
+        0xC5,
+        0xC6,
+        0xC7,
+        0xC9,
+        0xCA,
+        0xCB,
+        0xCD,
+        0xCE,
+        0xCF,
+    }
     index = 2
+    sof: dict[str, Any] | None = None
+    sof_component_ids: set[int] = set()
+    saw_sos = False
+    saw_eoi = False
     while index < len(payload):
         require(payload[index] == 0xFF, "invalid JPEG marker prefix")
         while index < len(payload) and payload[index] == 0xFF:
@@ -364,29 +387,117 @@ def parse_jpeg(payload: bytes) -> dict[str, Any]:
         require(index < len(payload), "truncated JPEG marker")
         marker = payload[index]
         index += 1
+        require(marker != 0x00, "unexpected stuffed byte outside JPEG entropy data")
         if marker == 0xD9:
+            require(index == len(payload), "JPEG contains data after EOI")
+            saw_eoi = True
             break
-        if marker in {0x01, *range(0xD0, 0xD8)}:
+        require(marker != 0xD8, "JPEG contains a nested SOI marker")
+        if marker == 0x01:
             continue
+        require(marker not in range(0xD0, 0xD8), "JPEG restart marker occurs outside entropy data")
         require(index + 2 <= len(payload), "truncated JPEG segment length")
         length = int.from_bytes(payload[index : index + 2], "big")
         require(length >= 2 and index + length <= len(payload), "invalid JPEG segment length")
-        if marker in {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF}:
+        segment_end = index + length
+        if marker in sof_markers:
+            require(sof is None, "JPEG contains multiple supported SOF markers")
             require(length >= 8, "truncated JPEG SOF")
             precision = payload[index + 2]
             height = int.from_bytes(payload[index + 3 : index + 5], "big")
             width = int.from_bytes(payload[index + 5 : index + 7], "big")
             components = payload[index + 7]
+            require(components > 0, "JPEG SOF has no components")
+            require(length == 8 + 3 * components, "JPEG SOF component length mismatch")
             require(width > 0 and height > 0, "invalid JPEG dimensions")
-            return {
+            component_ids: list[int] = []
+            for component_offset in range(index + 8, segment_end, 3):
+                component_id = payload[component_offset]
+                sampling_factors = payload[component_offset + 1]
+                require(
+                    sampling_factors >> 4 > 0 and sampling_factors & 0x0F > 0,
+                    "JPEG SOF contains a zero sampling factor",
+                )
+                component_ids.append(component_id)
+            require(len(set(component_ids)) == components, "JPEG SOF component IDs are not unique")
+            sof_component_ids = set(component_ids)
+            sof = {
                 "width": width,
                 "height": height,
                 "sof_marker": f"SOF{marker - 0xC0}",
                 "sample_precision": precision,
                 "component_count": components,
             }
-        index += length
-    raise GuardrailError("JPEG has no supported SOF marker")
+        elif marker == 0xDA:
+            require(sof is not None, "JPEG SOS precedes SOF")
+            scan_components = payload[index + 2] if length >= 3 else 0
+            require(scan_components > 0, "JPEG SOS has no components")
+            require(length == 6 + 2 * scan_components, "JPEG SOS component length mismatch")
+            require(
+                scan_components <= sof["component_count"],
+                "JPEG SOS has more components than its SOF",
+            )
+            scan_component_ids = {
+                payload[index + 3 + 2 * component]
+                for component in range(scan_components)
+            }
+            require(
+                len(scan_component_ids) == scan_components,
+                "JPEG SOS component selectors are not unique",
+            )
+            require(
+                scan_component_ids <= sof_component_ids,
+                "JPEG SOS references a component absent from its SOF",
+            )
+            saw_sos = True
+            index = segment_end
+            while index < len(payload):
+                if payload[index] != 0xFF:
+                    index += 1
+                    continue
+                marker_prefix = index
+                while index < len(payload) and payload[index] == 0xFF:
+                    index += 1
+                require(index < len(payload), "truncated JPEG entropy marker")
+                entropy_marker = payload[index]
+                if entropy_marker == 0x00 or entropy_marker in range(0xD0, 0xD8):
+                    index += 1
+                    continue
+                index = marker_prefix
+                break
+            continue
+        index = segment_end
+
+    require(sof is not None, "JPEG has no supported SOF marker")
+    require(saw_sos, "JPEG has no SOS marker")
+    require(saw_eoi, "JPEG has no terminal EOI marker")
+
+    old_load_truncated_images = ImageFile.LOAD_TRUNCATED_IMAGES
+    ImageFile.LOAD_TRUNCATED_IMAGES = False
+    try:
+        with Image.open(BytesIO(payload)) as image:
+            verified_format = image.format
+            verified_size = image.size
+            verified_mode = image.mode
+            image.verify()
+        with Image.open(BytesIO(payload)) as image:
+            image.load()
+            loaded_format = image.format
+            loaded_size = image.size
+            loaded_mode = image.mode
+    except (OSError, SyntaxError, ValueError, Image.DecompressionBombError) as error:
+        raise GuardrailError(f"Pillow rejected JPEG: {error}") from error
+    finally:
+        ImageFile.LOAD_TRUNCATED_IMAGES = old_load_truncated_images
+
+    require(verified_format == "JPEG" and loaded_format == "JPEG", "Pillow format is not JPEG")
+    require(verified_size == loaded_size, "Pillow JPEG dimensions changed during decode")
+    require(verified_mode == loaded_mode, "Pillow JPEG color mode changed during decode")
+    require(
+        loaded_size == (sof["width"], sof["height"]),
+        "Pillow and SOF JPEG dimensions differ",
+    )
+    return {**sof, "decoded_color_mode": loaded_mode}
 
 
 def discover_legacy_files(legacy: Path) -> list[str]:
@@ -494,6 +605,7 @@ def manifest_input_rows(root: Path, contract: dict[str, Any]) -> list[dict[str, 
             require(parsed["sof_marker"] == "SOF0", f"progressive/non-baseline JPEG drift: {relative}")
             require(parsed["sample_precision"] == 8, f"JPEG sample precision drift: {relative}")
             require(parsed["component_count"] == 3, f"JPEG component-count drift: {relative}")
+            require(parsed["decoded_color_mode"] == "RGB", f"JPEG decoded color-mode drift: {relative}")
             lfs = parse_lfs_pointer(stored)
             require(lfs is not None, f"JPEG HEAD blob is not a strict LFS pointer: {relative}")
             require(lfs["oid_sha256"] == sha256_bytes(payload), f"LFS OID mismatch: {relative}")
@@ -504,7 +616,7 @@ def manifest_input_rows(root: Path, contract: dict[str, Any]) -> list[dict[str, 
                     "git_lfs_oid_sha256": lfs["oid_sha256"],
                     "git_lfs_size": lfs["size"],
                     "git_storage": "LFS_POINTER_V1",
-                    "image": {**parsed, "decoded_color_mode": "RGB"},
+                    "image": parsed,
                     "kind": "JPEG",
                     "logical_line_count": None,
                     "media_type": "image/jpeg",
@@ -2018,12 +2130,14 @@ def build_environment_snapshot(
         "schema_version": BASELINE_SCHEMA_VERSION,
         "tools": {
             "git": _command_version(root, ["/usr/bin/git", "--version"]),
+            "pillow": f"Pillow {PIL.__version__}",
             "python": _command_version(root, ["/usr/bin/python3", "--version"]),
             "tools_source_sha256": {
                 path.name: sha256_file(path)
                 for path in (
                     root / "goal-4/tools/baseline_lib.py",
                     root / "goal-4/tools/capture_baseline.py",
+                    root / "goal-4/tools/guardrail_lib.py",
                 )
             },
         },
