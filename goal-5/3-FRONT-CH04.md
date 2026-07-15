@@ -17,8 +17,9 @@ Status: IN_PROGRESS
   numbers belong to the chapters they introduce.
 - `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`, `CH02`, and `CH03` are
   two-pass complete over PDF pages 1–130. `CH04` has a complete forward first
-  pass over PDF pages 131–184, bringing Stage 3 to 302 guarded corrections;
-  its independent final-document pass remains open.
+  pass over PDF pages 131–184. Its independent pass found and repaired one
+  omitted continuation marker, bringing Stage 3 to 303 guarded corrections;
+  the complete final-document pass has restarted and remains open.
 - Source-review packs exist under `/tmp/ankos-stage3-publication/`,
   `/tmp/ankos-stage3-preface/`, `/tmp/ankos-stage3-ch02/`, and
   `/tmp/ankos-stage3-ch03/`. Page rasters are authoritative; native PDF text is
@@ -110,7 +111,7 @@ For each document:
 | 1 | `CH03` | 67–130 | `119521 → 199880` | COMPLETE | `G5-C-0133`–`G5-C-0193` | closed |
 | 2 | `CH03` | 67–130 | final rebuilt document and assets | COMPLETE | all 61 verified; no new discrepancy | closed |
 | 1 | `CH04` | 131–184 | `199880 → 355646` | COMPLETE | `G5-C-0194`–`G5-C-0302` | closed |
-| 2 | `CH04` | 131–184 | final rebuilt document and assets | IN_PROGRESS | independent review launched | `pdf:0131` |
+| 2 | `CH04` | 131–184 | final rebuilt document and assets | IN_PROGRESS | found `G5-C-0303`; restarted against new final hash | `pdf:0131` |
 
 The first slice's exact page-to-raw map is:
 
@@ -293,7 +294,7 @@ page. It found no discrepancy or residual ambiguity, and the final document
 hash remained unchanged.
 
 `CH04` received a complete forward first pass over all 54 PDF pages 131–184.
-Its 109 source-verified corrections `G5-C-0194`–`G5-C-0302` restore the logical
+Its first 109 source-verified corrections `G5-C-0194`–`G5-C-0302` restore the logical
 heading hierarchy, source punctuation and emphasis, technical notation,
 damaged numeric data, page-turn joins, compound figure captions, and canonical
 reading order. All 59 mapped visuals were checked in source order. Four
@@ -310,9 +311,12 @@ token-sensitive checks; continued-fraction values were independently
 recomputed at 500-digit precision. CommonMark/headless rendering of the full
 chapter and complex technical slices loaded every image and preserved the
 intended order. Residual OCR, Unicode, Markdown, formula, page-split, and
-backward defect-pattern scans found no unexplained hit. The rebuilt document's
-SHA-256 is
-`7fcf7d208707d94f03ff1b98b9ac7ed495b47fb1cea6428355e229d137fe2fdc`.
+backward defect-pattern scans found no unexplained hit. During the independent
+pass, direct inspection of PDF page 174 found one omitted printed forward
+continuation marker at the end of a lead caption. It is restored by guarded
+correction `G5-C-0303`, and the complete pass restarted against the rebuilt
+document whose SHA-256 is
+`33b0521073b7d212d181903a71b1917b7647b006ef09618f93d89697f8942248`.
 
 Exact next action: complete the independent sequential second pass from
 `pdf:0131` through `pdf:0184` against the exact final document hash above and

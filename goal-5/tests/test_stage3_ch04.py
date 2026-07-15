@@ -79,12 +79,12 @@ class ChapterFourTests(unittest.TestCase):
         relevant = [
             row for row in self.corrections if row["document_id"] == "CH04"
         ]
-        self.assertEqual(len(relevant), 109)
+        self.assertEqual(len(relevant), 110)
         self.assertEqual(
             [row["id"] for row in relevant],
-            [f"G5-C-{number:04d}" for number in range(194, 303)],
+            [f"G5-C-{number:04d}" for number in range(194, 304)],
         )
-        self.assertEqual(sum(row["expected_count"] for row in relevant), 111)
+        self.assertEqual(sum(row["expected_count"] for row in relevant), 112)
         self.assertEqual(
             {
                 row["id"]: row["expected_count"]
@@ -260,6 +260,10 @@ class ChapterFourTests(unittest.TestCase):
             ),
             r"$n \rightarrow If[EvenQ[n], 3\,n/2, 3\,(n+1)/2]$",
             r"$FractionalPart[x+1/4]$",
+            (
+                "determine the overall form of behavior produced in each case. "
+                "<sup>▶</sup>"
+            ),
         )
         for token in expected:
             with self.subTest(token=token[:80]):
