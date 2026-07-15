@@ -1,76 +1,89 @@
 # 3-WITNESSES
 
-Status: IN_PROGRESS
+Status: SOURCE_BLOCKED
 
-Dependencies:
+## Outcome
 
-- Stage 1 fidelity/evidence/licensing contracts: COMPLETE.
-- Stage 2 raw manifest, proposed structure, held-out sample, and externally pinned baseline lock: COMPLETE.
+Stage 3 froze a complete witness schema and an exact source-gap state without acquiring, retaining, or fabricating a primary witness. Every one of the 29 proposed canonical documents and all 20,430 frozen raw blocks is explicitly represented by a `SEGMENT_SOURCE_GAP` row. No row claims a page, region, transcription, legibility result, independent review, or authorized repair.
 
-## Current Facts
+Dependency-independent Stage 4 pipeline work may proceed. Every witness-dependent author-text correction, visual completeness decision, Index-column reconstruction, audit certificate, and unqualified full-repair claim remains blocked.
 
-- Stage sync date is 2026-07-14 in `America/Los_Angeles`.
-- Stage 2 independently froze all 1,463 legacy inputs, 29 proposed author-text segments, 20,430 raw blocks, 1,444 image references, 55 known-defect sentinels, and 1,125 pre-repair held-out IDs under lock SHA-256 `57224a1f1ba8333bbc900b23ff6127a189649feb01c279f30fac05a305658863`.
-- No PDF, EPUB, DjVu, archive, page-image set, witness directory, or other page-level edition witness currently exists in the repository. The previously discussed EPUB is absent.
-- The 1,444 legacy JPEGs are cropped illustrations/components, not complete pages. They cannot establish surrounding prose, punctuation, blank/figure-only pages, page furniture, full captions, Index column order, or omitted plates.
-- The monolith and 17 split Markdown files share an OCR lineage and are routing evidence only, not independent transcription witnesses.
-- The repaired sibling remains absent. Stage 3 writes only witness metadata, acquisition/audit tooling, tests, and permitted bounded review artifacts under `goal-4/**`; it does not create canonical repaired author text.
-- An independent search for an official/licensed edition-identical source, stable page-level access, edition identity, permissions, and complete page/plate coverage is in progress.
+## Official Source Findings
 
-## Updated Assumptions
+The [official NKS Online edition](https://www.wolframscience.com/nks/) exposes page-numbered semantic HTML, responsive full-page images, and official section/chapter PDFs. The [official copyright leaf](https://www.wolframscience.com/nks/piv--copyright/) identifies the rendered book as Wolfram Media, copyright 2002, First edition, Fourth printing. The hardcover identifiers recorded for the target are ISBN-10 `1-57955-008-8` and ISBN-13 `978-1-57955-008-0`.
 
-- The official 2002 print edition or an official edition-identical online rendering is the preferred primary witness; edition identity must be proven rather than inferred from title alone.
-- A searchable HTML transcription is useful only if its relationship to the printed edition, source notation, images, pagination, and Index layout is explicit. It cannot by itself authorize layout- or symbol-sensitive repairs.
-- A downloadable file or stable online page endpoint does not automatically authorize committing or redistributing the witness. The audit mount may need to remain external/read-only with only hashes, page metadata, and bounded permitted review artifacts committed.
-- The Colophon's 1,280-page statement is a reconciliation clue, not a count to force. Covers, publication matter, roman/Arabic numbering, blanks, plates, and digital-only units require an explicit counting definition.
-- Witness coverage can be built incrementally, but every uncovered or illegible authorial region remains a typed batch/release blocker. Dependency-independent Stages 4–7 may continue once the witness schema and mount contract are frozen.
+The public surface is useful but not a complete fixed-layout witness:
 
-## Big Picture Objective
+- semantic HTML is reflowed and cannot establish printed geometry;
+- responsive page images may be inadequate for fine formula, code, or typographic distinctions;
+- official chapter/section PDFs preserve fixed layout but no official public whole-book PDF or EPUB was identified;
+- the public [Index](https://www.wolframscience.com/nks/index/0/) is reflowed HTML, and no public fixed-layout Index witness was identified;
+- covers, inner covers, endpapers, blanks, full physical leaves, inserts, plates, foldouts, trim, bleed, and spread treatment have not been proven complete;
+- official URLs are mutable locators, not content-addressed witness identities;
+- equivalence between the official online printing and the local OCR lineage remains unproven.
 
-Acquire and validate authoritative, edition-identical page-level evidence sufficient to verify every authorial region, technical token, visual component/caption, and Index column without relying on OCR plausibility or correlated derivatives.
+Official count statements also remain deliberately unreconciled. The [Wolfram Media product page](https://www.wolfram-media.com/products/nks/) and the [official Colophon](https://www.wolframscience.com/nks/colophon/) state 1,280 pages; the [official citation page](https://www.wolframscience.com/nks/citation/) states 1,197 pages; and the Colophon begins at printed page 1264. These claims use undefined or differing scopes and are not a lawful physical/digital census.
 
-## Detailed Implementation Plan
+## Licensing State
 
-- Identify candidate official/licensed witnesses and record direct provenance, edition/ISBN/publication identity, access date, owner/provider, terms, permitted local use, and stability risks.
-- Define a read-only witness-mount contract and a versioned witness manifest. Do not commit bulk copyrighted page content unless the source terms explicitly permit it.
-- Derive the complete physical/digital unit universe independently from the witness: covers, publication matter, numbered and unnumbered pages, blanks, figure-only pages, plates, Notes, Index, and Colophon.
-- Give every unit a stable witness ID and record source locator, printed/digital numbering, ordered position, byte/render hash, dimensions, color profile where relevant, duplicate/missing status, and edition binding.
-- Partition every unit into nonoverlapping regions typed as prose/punctuation, heading/furniture, formula/code/data, figure/caption/color, Index column, or demonstrably non-authorial material.
-- Record region geometry/locator, content hash or permitted bounded evidence hash, raw block/segment candidates, legibility by risk dimension, reviewer state, and release impact.
-- Require independently reviewed enumerated reasons for `NOT_APPLICABLE`; blank, figure-only, illegible, or untranscribed authorial regions never qualify automatically.
-- Reconcile the derived unit/page definitions to the Colophon's 1,280-page clue and record any difference without coercing the census.
-- Freeze the blind held-out transcription/adjudication packets from the already selected 1,125 raw IDs before reviewers see proposed repairs. Enforce reviewer/proposer separation and permitted evidence handling.
-- Implement independent validators for manifest schemas, path/URL safety, edition identity, unit order/coverage, nonoverlapping regions, hashes, mount drift, duplicate/missing units, legibility closure, licensing metadata, held-out blinding, and raw/segment joins.
-- Add mutations for missing/duplicated/reordered/tampered pages, page-number aliasing, swapped page images, cropped regions, illegal committed witness payloads, false `NOT_APPLICABLE`, changed permissions/hash, formula/Index legibility downgrades, and outcome leakage.
-- If the preferred witness is unavailable or incomplete, pursue alternate authoritative sources and record exact gaps/unblock actions. Do not fill any source gap from model inference, OCR agreement, or mathematical/language plausibility.
+The official surface is recorded as `REMOTE_INTERACTIVE_ONLY` for bounded planning inspection. Complete bulk acquisition, hashing, archiving, or AI-assisted review is `USE_NOT_AUTHORIZED`, and the complete primary witness remains `NOT_ACQUIRED`.
 
-Expected Stage 3 writes are restricted to `goal-4/**`, including the witness manifest/schema, source/mount metadata, coverage and unresolved ledgers, acquisition/validation tools, tests, and this report. External licensed witness bytes remain outside the repository unless their terms explicitly authorize inclusion.
+The relevant official layers are:
 
-## No-Cheating Checks
+- the [book copyright page](https://www.wolframscience.com/nks/piv--copyright/), which reserves full-text and illustration reproduction beyond its narrow provisions;
+- the [Wolfram Science terms](https://www.wolfram.com/legal/terms/wolfram-science.html), which require advance permission for bulk reproduction, mirroring, or archiving;
+- the [current general Wolfram terms](https://www.wolfram.com/legal/terms/wolfram/), which prohibit scraping, bulk downloading, and use with AI-powered tools absent a separate license.
 
-- Recompute and compare the Stage 2 lock and explicit legacy manifest before and after every witness operation; never discover witness or repaired output as raw corpus input.
-- Require a source/edition chain for every witness unit. Title similarity, page-number coincidence, or OCR agreement is not edition proof.
-- Keep source bytes/read-only mounts separate from committed metadata and from future generated output. Never feed a repaired render back as witness input.
-- Independently derive unit order and total coverage; do not copy the expected 1,280 number into the result or silently omit blanks, covers, plates, figure-only pages, or Index leaves.
-- Require complete region partition arithmetic with no gap/overlap and an independently reviewed enumerated reason for every non-authorial exclusion.
-- Treat legibility separately for prose, punctuation, technical notation, figures/captions/color, and Index columns; a page readable for prose may still be unusable for symbols or layout.
-- Freeze held-out evidence packets and reviewer assignments before proposed repaired answers are visible. Reject any outcome/detector/repair field in sample selection or blind adjudication inputs.
-- Reject tampered, missing, dynamically changed, unlicensed, or wrong-edition witness material. A hash proves identity only after the hashed content has been lawfully inspected and classified.
-- Do not claim human or independent review for agent-only or automated work.
+A Creative Commons icon in a page footer has no adjacent scope statement that overrides these explicit terms. Public reachability and robots permission are not treated as copyright, archival, derivative, or AI-use authorization.
 
-## Completion Requirements
+No official PDF, page raster, crop, site mirror, full-page transcription, credential, cookie, token, or private mount path was committed or retained.
 
-- A versioned manifest covers every witness-derived physical/digital unit in deterministic order with source, edition, permission, locator, hash, dimensions, numbering, and duplicate/missing facts.
-- Every unit is partitioned into total nonoverlapping regions; each authorial region is legible for its risk dimensions or has an explicit downstream/release blocker.
-- Every `NOT_APPLICABLE` region is narrowly enumerated, evidenced as non-authorial, and independently reviewed.
-- Formula/code/data symbols, figure components/captions/color, and Index columns are demonstrably legible in at least one authorized edition-identical primary witness.
-- The census is reconciled to the 1,280-page clue under a documented counting definition rather than forced to match.
-- Witness provenance, edition identity, licensing, permitted storage/use, audit-mount procedure, and offline rebuild behavior are documented and validated.
-- The pre-frozen held-out sample has blind witness transcription/adjudication packets with no proposal leakage and governed reviewer identities/states.
-- Missing, duplicated, reordered, swapped, cropped, wrong-edition, permission-drifted, and byte-tampered witness mutations fail for specific reasons.
-- Full Stage 1/2 validation, normal/optimized/relocated witness validation, direct whitespace/diff/scope checks, and independent hostile review pass.
-- If complete evidence cannot be obtained, the witness manifest remains total, exact affected blocks/regions become `SOURCE_BLOCKED`, dependency-independent Stage 4 may proceed, and Stage 42 remains barred from an unqualified full-repair claim.
+## Frozen Artifacts
 
-## Stage Results
+- `witness-contract.json` freezes target identity, source/unit/content classes, region and legibility semantics, `NOT_APPLICABLE` reasons, held-out blinding, storage restrictions, and stage gates.
+- `witness-source-registry.json` records the official candidate, bounded public sentinels, count conflicts, permission evidence URLs, limitations, and exact unblock action.
+- `witness-state.json` records the current `SOURCE_BLOCKED` acquisition, whole-corpus scope, five open blockers, and the limited permission for dependency-independent pipeline work.
+- `witness-mount-contract.md` defines an external, read-only, credential-free, offline audit interface for a future authorized witness.
+- `witness-region-ledger.jsonl` contains exactly 29 ordered segment source-gap rows whose block counts and ID hashes independently rederive all 20,430 blocks.
+- `witness-unresolved.jsonl` contains four release-blocking unresolved records for acquisition, permission, edition identity, and physical/region census.
+- `witness-lock.json` binds the Stage 3 artifacts, generator, validator library, tests, and all Stage 1/2 prerequisite hashes. Its externally pinned SHA-256 is `f348e4dd0ebf328c48066696eb70359d954e07cbdfd7b7fd827286e3268ba449`.
+- `tools/capture_witness.py` deterministically regenerates the two ledgers and internal lock.
+- `tools/validate_witness.py` enforces the external lock root, all source-gap and license gates, and absence of witness-like binary payloads.
+- `tests/test_witness.py` contains 30 normal/optimized mutation tests.
 
-- In progress. Local witness discovery found no page-level PDF/EPUB/scan or audit mount in the repository. Official/licensed source and permission research is underway; no witness bytes or repaired author text have been created.
+## Exact Blockers
+
+1. `WITNESS-PERMISSION`: no written or separate license covers the required bulk or AI-assisted acquisition, storage, comparison, retention, and derivative handling.
+2. `WITNESS-COMPLETE-CENSUS`: no authorized complete edition-identical object or physical-surface census exists.
+3. `WITNESS-INDEX-LAYOUT`: no authorized fixed-layout evidence establishes the printed Index columns.
+4. `WITNESS-EDITION-MATCH`: the official online printing has not been proven identical to the local OCR lineage.
+5. `WITNESS-INDEPENDENT-REVIEW`: no human transcriber/specialist/independent-review assignments or blind held-out adjudications exist.
+
+The affected scope is exact: 29 segments, 20,430 raw blocks, 1,444 legacy visual candidates, and 1,125 frozen held-out items.
+
+## Unblock Path
+
+Obtain written permission from `ip@wolframscience.com` for a complete official born-digital witness or authorized bulk access, explicitly covering private storage, automated or AI-assisted fidelity review, retention, bounded evidence artifacts, and derivative/redistribution limits. Alternatively, supply a separately licensed complete edition-identical witness whose terms cover the same operations.
+
+After authorization, Stage 3 must reopen and:
+
+- fingerprint edition/printing identity;
+- independently census physical and digital units without forcing a stated count;
+- reconcile covers, endpapers, leaves, blanks, pages, plates, inserts, foldouts, page boxes, and Index leaves;
+- partition every unit into total nonoverlapping regions;
+- record per-axis legibility and independently reviewed non-authorial exclusions;
+- freeze blind held-out evidence packets and human reviewer assignments;
+- run tamper, missing, duplicate, reorder, crop, swap, terms-drift, and mount-safety mutations.
+
+## Verification Results
+
+- `python3 goal-4/tools/validate_witness.py`: PASS
+- `python3 -O goal-4/tools/validate_witness.py`: PASS
+- `python3 -m unittest goal-4/tests/test_witness.py`: 30 PASS
+- `python3 -O -m unittest goal-4/tests/test_witness.py`: 30 PASS
+- `python3 goal-4/tools/capture_witness.py --check`: PASS
+- forbidden witness-like payload scan: zero findings
+- primary witness units/regions acquired: zero
+- author-text repairs authorized by Stage 3: zero
+
+Stage 3 is therefore honestly `SOURCE_BLOCKED`, not incomplete by accident and not falsely complete. Stage 4 may implement reversible schemas, overlays, zero-repair construction, and synthetic fixtures; it may not change author text or claim witness coverage.

@@ -190,7 +190,7 @@ The portable repaired release uses manifest-governed asset files rather than har
 - `principles.md`, especially the requirements to preserve real distinctions and verify constructive fidelity.
 - `ref/notes/context/REFACTOR_TARGET.md`, which keeps ANKoS references under `ref/A-New-Kind-of-Science` and preserves the front/chapter/back organization.
 - The current `ref/A-New-Kind-of-Science/**` corpus as immutable raw input.
-- An edition-identical authoritative witness acquired and pinned in Stage 3.
+- An edition-identical authoritative witness acquired and pinned under the Stage 3 schema; acquisition is currently `SOURCE_BLOCKED` pending permission or a separately licensed witness.
 - Existing Goal 1 source/asset oracles as diagnostic and compatibility evidence only; they do not authorize changing raw text.
 - `goal-3/0-plan.md` for the independently observed corpus map and structural defects.
 
@@ -379,10 +379,11 @@ Stages 8–36 process author text. Each assigned batch must:
 ## Current Execution State
 
 - Synced: 2026-07-14 (America/Los_Angeles).
-- Active stage: `3-WITNESSES` (`IN_PROGRESS`).
-- The sibling release root `ref/A-New-Kind-of-Science-Repaired/` does not yet exist.
+- Active stage: `4-PIPELINE` (`IN_PROGRESS`).
+- The sibling release root `ref/A-New-Kind-of-Science-Repaired/` exists as an empty publication target; no unverified partial release has been placed in it.
 - Stage 1 completed with 59 Goal 1 root oracles classified, all 40 affected oracles behaviorally frozen, 1,510 governed dependency rows re-derived, 39 mutation tests passing, and three independent hostile reviews passing.
 - Stage 2 completed with all 1,463 raw inputs independently hash/Git/LFS/JPEG verified; 29 proposed segments and 20,430 raw blocks frozen; 1,444 image references, 32 routing dispositions, 55 defect sentinels, and 1,125 held-out IDs bound under externally pinned lock `57224a1f1ba8333bbc900b23ff6127a189649feb01c279f30fac05a305658863`; 27 Stage 2 mutation tests and three hostile reviews passed in normal, optimized, portable no-Git, and relocated modes.
+- Stage 3 froze the primary-witness, physical-unit, region, legibility, mount, licensing, and source-gap schemas. The official First Edition, Fourth Printing online surface was identified, but its posted terms do not authorize the required bulk or AI-assisted audit; no complete witness was acquired or retained. All 29 segments, 20,430 raw blocks, 1,444 legacy visual candidates, and 1,125 held-out items are explicitly source-blocked under externally pinned witness lock `f348e4dd0ebf328c48066696eb70359d954e07cbdfd7b7fd827286e3268ba449`; 30 Stage 3 mutation tests pass in normal and optimized modes. Witness-dependent author-text correction and an unqualified full-repair claim remain blocked, while dependency-independent Stages 4–7 may proceed.
 - Protected unrelated Goal 1 work remains outside Goal 4's write scope.
 - Goal 4 execution writes remain restricted to `goal-4/**` and, only in later owning stages, `ref/A-New-Kind-of-Science-Repaired/**`.
 
@@ -394,8 +395,8 @@ Keep one current status per stage and at most one `IN_PROGRESS` stage. `SOURCE_B
 |---|---|---|
 | 1 | `COMPLETE` | none |
 | 2 | `COMPLETE` | 1 |
-| 3 | `IN_PROGRESS` | 1–2 |
-| 4 | `NOT_STARTED` | 1–2; witness schema known, but full witness coverage may still be pending |
+| 3 | `SOURCE_BLOCKED` | 1–2; written bulk/AI audit permission or a separately licensed complete witness is missing |
+| 4 | `IN_PROGRESS` | 1–2; witness schema frozen, full witness coverage pending |
 | 5 | `NOT_STARTED` | 1–2, 4 |
 | 6 | `NOT_STARTED` | 1–2, 4–5 |
 | 7 | `NOT_STARTED` | 1, 4–6 |
