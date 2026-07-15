@@ -6,7 +6,7 @@ Status: IN_PROGRESS
 
 Implement the deterministic, reversible repair-overlay pipeline and validators before changing any author text. The first product is a zero-repair staging build derived only from the frozen legacy manifest and Stage 2 segment/block identities.
 
-The publication target is the new, currently empty sibling `ref/A-New-Kind-of-Science-Repaired/`. Stage 4 constructs and verifies releases under a Goal 4 staging area; Stage 5 owns publication of the correctly partitioned 29-document zero-repair skeleton. The legacy folder remains immutable.
+The publication target is the new, currently empty sibling `ref/A-New-Kind-of-Science-Repaired/`. Stages 4–7 construct and verify the zero-repair edition under Goal 4 staging; Stage 42 owns atomic publication after the witness, media, review, compatibility, rollback, and release gates pass. The legacy folder remains immutable.
 
 ## Current Gates
 
@@ -29,3 +29,5 @@ The publication target is the new, currently empty sibling `ref/A-New-Kind-of-Sc
 ## Immediate Work
 
 Freeze the Stage 4 machine schemas and operation semantics, then implement a minimal zero-repair compiler against synthetic fixtures before applying it to the 20,430-block corpus. No canonical author-text output will be published until forward/inverse conservation and target ownership pass.
+
+The zero-repair compiler uses a separate projection tape whose `SOURCE_BLOCK` records are opaque byte-preserving references to frozen raw blocks. They are not semantic `ANKOS-AST-1` nodes and do not promote Stage 2 lexical guesses to verified headings, formulas, code, figures, or Index entries. `SOURCE_BLOCK` is legal only in an `UNCERTIFIED` zero-repair staging build and is forbidden in a certified release.
