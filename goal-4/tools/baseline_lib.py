@@ -197,7 +197,7 @@ BLOCK_KIND_ENUM = (
     "HEADING",
     "CODE_BLOCK",
     "MATH_BLOCK",
-    "LAYOUT_TABLE",
+    "DATA_TABLE",
     "CAPTION",
     "BLOCKQUOTE",
 )
@@ -783,7 +783,11 @@ def lexical_partition(lines: list[dict[str, Any]]) -> list[dict[str, Any]]:
             cursor += 1
             while cursor < len(texts) and LEX_PIPE_TABLE.match(texts[cursor]) is not None:
                 cursor += 1
-            kind = "LAYOUT_TABLE"
+            # Raw pipe tables are conservatively technical: column/order/data
+            # fidelity matters even when a later witness classifies one as
+            # primarily layout. This keeps every raw table in the high-risk
+            # sample without using detector or repair outcomes.
+            kind = "DATA_TABLE"
         elif LEX_LIST.match(line) is not None:
             cursor += 1
             while (
@@ -850,7 +854,7 @@ def _block_kind_with_inline_math(
 def risk_stratum(document_id: str, block_kind: str) -> str:
     if document_id == "INDEX":
         return "INDEX_COLUMN_OR_ENTRY"
-    if block_kind in {"MATH_INLINE", "MATH_BLOCK", "CODE_BLOCK"}:
+    if block_kind in {"MATH_INLINE", "MATH_BLOCK", "CODE_BLOCK", "DATA_TABLE"}:
         return "FORMULA_CODE_RULE_OR_DATA"
     if block_kind in {"IMAGE_REFERENCE", "CAPTION"}:
         return "FIGURE_CAPTION_OR_VISUAL"
@@ -858,7 +862,6 @@ def risk_stratum(document_id: str, block_kind: str) -> str:
         "HEADING",
         "LIST_ITEM",
         "BLOCKQUOTE",
-        "LAYOUT_TABLE",
         "STRUCTURE_BOUNDARY",
     }:
         return "HEADING_LIST_OR_LAYOUT"
@@ -926,7 +929,7 @@ def build_raw_blocks(
         "CODE_BLOCK": 254,
         "HEADING": 286,
         "IMAGE_REFERENCE": 1444,
-        "LAYOUT_TABLE": 45,
+        "DATA_TABLE": 45,
         "LIST_ITEM": 1624,
         "MATH_BLOCK": 135,
         "PROSE": 6780,
@@ -1140,6 +1143,23 @@ def build_routing_baseline(
     input_by_path = {row["relative_path"]: row for row in manifest["raw_inputs"]}
     routes = _routing_span_rows(manifest)
     legacy = root / LEGACY_RELATIVE
+    monolith_bytes = (legacy / MONOLITH_RELATIVE).read_bytes()
+    monolith_lines = split_raw_lines(monolith_bytes)
+    for route in routes:
+        split_bytes = (legacy / route["source_path"]).read_bytes()
+        split_lines = split_raw_lines(split_bytes)
+        split_start = split_lines[route["split_start_line"] - 1]["byte_start"]
+        split_end = split_lines[route["split_end_line"] - 1]["byte_end"]
+        route["split_span_sha256"] = sha256_bytes(split_bytes[split_start:split_end])
+        route["split_span_byte_size"] = split_end - split_start
+        if route["raw_start_line"] is None:
+            route["raw_span_sha256"] = None
+            route["raw_span_byte_size"] = None
+        else:
+            raw_start = monolith_lines[route["raw_start_line"] - 1]["byte_start"]
+            raw_end = monolith_lines[route["raw_end_line"] - 1]["byte_end"]
+            route["raw_span_sha256"] = sha256_bytes(monolith_bytes[raw_start:raw_end])
+            route["raw_span_byte_size"] = raw_end - raw_start
     routing_files = []
     for path in ROUTING_MARKDOWN_PATHS:
         row = input_by_path[path]
@@ -1208,8 +1228,6 @@ def build_routing_baseline(
     require(len(contents_links) == 16, "Contents link count drift")
     require(sum(row["semantic_route_status"] != "NOMINAL_TARGET_MATCHES_DOCUMENT" for row in contents_links) == 4, "Contents semantic-route anomaly count drift")
     nonrouting_lines = [15347, 16774, 17356, 18922, 20385]
-    monolith_bytes = (legacy / MONOLITH_RELATIVE).read_bytes()
-    monolith_lines = split_raw_lines(monolith_bytes)
     physical_counts = Counter(
         "PREFACE"
         if row["asset_relative_path"].startswith("FRONT-MATTER/Preface/")
@@ -1273,13 +1291,24 @@ def build_routing_baseline(
             "status": "FORMULA_OR_CODE_TEXT_NOT_NAVIGATION",
         },
         "omitted_transition_or_malformed_raw_lines": [
-            {"lines": [398, 399], "reason": "PRINTED_TRANSITION_FURNITURE_NOT_IN_SPLITS"},
-            {"lines": [1368, 1369], "reason": "PRINTED_TRANSITION_FURNITURE_NOT_IN_SPLITS"},
-            {"lines": [2700, 2701], "reason": "PRINTED_TRANSITION_FURNITURE_NOT_IN_SPLITS"},
-            {"lines": [6586, 6587], "reason": "PRINTED_TRANSITION_FURNITURE_NOT_IN_SPLITS"},
-            {"lines": [12083, 12084], "reason": "MALFORMED_EMPTY_HEADING_AND_BLANK_OMITTED"},
-            {"lines": [12086, 12088], "reason": "MALFORMED_BLANK_OR_EMPTY_HEADING_RUN_OMITTED"},
-            {"lines": [17443, 17443], "reason": "BLANK_AT_NOMINAL_FILE_SEAM_OMITTED"},
+            {
+                "lines": [start, end],
+                "raw_span_sha256": sha256_bytes(
+                    monolith_bytes[
+                        monolith_lines[start - 1]["byte_start"] : monolith_lines[end - 1]["byte_end"]
+                    ]
+                ),
+                "reason": reason,
+            }
+            for start, end, reason in (
+                (398, 399, "PRINTED_TRANSITION_FURNITURE_NOT_IN_SPLITS"),
+                (1368, 1369, "PRINTED_TRANSITION_FURNITURE_NOT_IN_SPLITS"),
+                (2700, 2701, "PRINTED_TRANSITION_FURNITURE_NOT_IN_SPLITS"),
+                (6586, 6587, "PRINTED_TRANSITION_FURNITURE_NOT_IN_SPLITS"),
+                (12083, 12084, "MALFORMED_EMPTY_HEADING_AND_BLANK_OMITTED"),
+                (12086, 12088, "MALFORMED_BLANK_OR_EMPTY_HEADING_RUN_OMITTED"),
+                (17443, 17443, "BLANK_AT_NOMINAL_FILE_SEAM_OMITTED"),
+            )
         ],
         "routing_files": routing_files,
         "routing_spans": routes,
@@ -1484,19 +1513,19 @@ def build_held_out_sample(
     }
 
 
-def _content_stage_for_document(document_id: str) -> str:
+def _content_stages_for_document(document_id: str) -> list[str]:
     if document_id in {"PUBLICATION_AND_CONTENTS", "PREFACE", "COLOPHON"}:
-        return "8-BOOKENDS"
+        return ["8-BOOKENDS"]
     if re.fullmatch(r"CH\d{2}", document_id):
-        return f"{8 + int(document_id[2:]):d}-{document_id}"
+        return [f"{8 + int(document_id[2:]):d}-{document_id}"]
     if document_id == "GENERAL_NOTES":
-        return "21-GENERAL-NOTES"
+        return ["21-GENERAL-NOTES"]
     if re.fullmatch(r"N\d{2}", document_id):
-        return f"{21 + int(document_id[1:]):d}-{document_id}"
+        return [f"{21 + int(document_id[1:]):d}-{document_id}"]
     if document_id == "INDEX":
-        return "34-36-INDEX"
+        return ["34-INDEX-AF", "35-INDEX-GM", "36-INDEX-NZ"]
     if document_id in {"INTERPRETIVE_METADATA", "GENERATED_METADATA"}:
-        return "39-NAVIGATION"
+        return ["39-NAVIGATION"]
     raise GuardrailError(f"unknown defect owner document: {document_id}")
 
 
@@ -1510,6 +1539,20 @@ def _specialist_stages(defect_classes: list[str]) -> list[str]:
         stages.add("39-NAVIGATION")
     if "INDEX_ENTRY" in defect_classes:
         stages.update({"34-INDEX-AF", "35-INDEX-GM", "36-INDEX-NZ"})
+    return sorted(stages)
+
+
+def _workflow_stages(owner: str, defect_classes: list[str]) -> list[str]:
+    stages = set(_content_stages_for_document(owner))
+    classes = set(defect_classes)
+    if classes & {"STRUCTURE_BOUNDARY", "MARKDOWN_STRUCTURE", "HEADING_OR_FURNITURE"}:
+        stages.add("5-STRUCTURE")
+    if classes & {"MARKDOWN_STRUCTURE", "HEADING_OR_FURNITURE"}:
+        stages.add("7-STYLE")
+    if classes & {"FIGURE_OR_CAPTION", "NAVIGATION_METADATA"}:
+        stages.add("6-MEDIA")
+    stages.update(_specialist_stages(defect_classes))
+    stages.update({"40-SATURATION", "42-RELEASE"})
     return sorted(stages)
 
 
@@ -1602,10 +1645,11 @@ def build_known_defect_rows(
         row: dict[str, Any] = {
             "closure_stages": ["40-SATURATION", "42-RELEASE"],
             "defect_classes": sorted(spec["classes"]),
-            "expected_detector_classes": sorted(set(spec["detectors"] + ["D13_EXACT_SENTINEL"])),
+            "candidate_detector_routes": sorted(set(spec["detectors"])),
+            "exact_regression_detector": "D13_EXACT_SENTINEL",
             "label": spec["label"],
             "owner_document_id": owner,
-            "primary_content_stage": _content_stage_for_document(owner),
+            "primary_content_stages": _content_stages_for_document(owner),
             "raw_block_ids": raw_block_ids,
             "raw_end_line": spec["end"],
             "raw_source_role": source["role"],
@@ -1623,6 +1667,7 @@ def build_known_defect_rows(
             "end_line_prefix": end_text[:160],
             "end_line_suffix": end_text[-160:],
             "status": "BASELINE_OPEN_SOURCE_NEEDED",
+            "workflow_stages": _workflow_stages(owner, spec["classes"]),
         }
         if spec["start"] in image_by_line and "FIGURE_OR_CAPTION" in spec["classes"]:
             image = image_by_line[spec["start"]]
@@ -1637,40 +1682,46 @@ def build_known_defect_rows(
             "artifact_path": ATLAS_RELATIVE,
             "artifact_sha256": input_by_path[ATLAS_RELATIVE]["sha256"],
             "defect_classes": ["NAVIGATION_METADATA"],
-            "expected_detector_classes": ["D04_SPLIT_ROUTING", "D13_EXACT_SENTINEL"],
+            "candidate_detector_routes": ["D04_SPLIT_ROUTING"],
+            "exact_regression_detector": "D13_EXACT_SENTINEL",
             "label": "ATLAS_MUST_REMAIN_INTERPRETIVE_METADATA",
             "owner_document_id": "INTERPRETIVE_METADATA",
-            "primary_content_stage": "39-NAVIGATION",
+            "primary_content_stages": ["39-NAVIGATION"],
             "repair_authorized": False,
             "sentinel_kind": "AGGREGATE_GUARDRAIL",
             "specialist_stages": ["39-NAVIGATION"],
             "status": "BASELINE_ROLE_GUARDRAIL",
+            "workflow_stages": ["39-NAVIGATION", "40-SATURATION", "42-RELEASE"],
         },
         {
             "artifact_path": "goal-4/image-reference-ledger.jsonl",
             "artifact_sha256": sha256_bytes(jsonl_bytes(image_rows)),
             "defect_classes": ["NAVIGATION_METADATA", "FIGURE_OR_CAPTION"],
-            "expected_detector_classes": ["D05_IMAGE_REFERENCE", "D13_EXACT_SENTINEL"],
+            "candidate_detector_routes": ["D05_IMAGE_REFERENCE"],
+            "exact_regression_detector": "D13_EXACT_SENTINEL",
             "label": "ALL_1444_MONOLITH_IMAGE_TARGETS_BROKEN_RELATIVE_TO_MONOLITH",
             "owner_document_id": "GENERATED_METADATA",
-            "primary_content_stage": "6-MEDIA",
+            "primary_content_stages": ["6-MEDIA"],
             "repair_authorized": False,
             "sentinel_kind": "AGGREGATE_GUARDRAIL",
             "specialist_stages": ["38-FIGURES", "39-NAVIGATION"],
             "status": "BASELINE_MECHANICAL_ROUTE_OPEN",
+            "workflow_stages": ["6-MEDIA", "38-FIGURES", "39-NAVIGATION", "40-SATURATION", "42-RELEASE"],
         },
         {
             "artifact_path": "goal-4/routing-baseline.json",
             "artifact_sha256": sha256_bytes(canonical_json_bytes(routing)),
             "defect_classes": ["NAVIGATION_METADATA", "STRUCTURE_BOUNDARY"],
-            "expected_detector_classes": ["D04_SPLIT_ROUTING", "D13_EXACT_SENTINEL"],
+            "candidate_detector_routes": ["D04_SPLIT_ROUTING"],
+            "exact_regression_detector": "D13_EXACT_SENTINEL",
             "label": "CONTENTS_LINKS_RESOLVE_LEXICALLY_BUT_FOUR_SEMANTIC_DESTINATIONS_ARE_MALFORMED",
             "owner_document_id": "GENERATED_METADATA",
-            "primary_content_stage": "39-NAVIGATION",
+            "primary_content_stages": ["39-NAVIGATION"],
             "repair_authorized": False,
             "sentinel_kind": "AGGREGATE_GUARDRAIL",
             "specialist_stages": ["39-NAVIGATION"],
             "status": "BASELINE_MECHANICAL_ROUTE_OPEN",
+            "workflow_stages": ["5-STRUCTURE", "39-NAVIGATION", "40-SATURATION", "42-RELEASE"],
         },
     ]
     rows.extend(aggregate_rows)
@@ -1845,19 +1896,19 @@ def build_detector_artifacts(
             }
         )
     detector_descriptions = {
-        "D01_RAW_MANIFEST": "Exact type/path/hash/mode/Git/LFS/image-dimension census; failures are fatal rather than candidate hits.",
-        "D02_TEXT_PROFILE": "Strict UTF-8/LF/final-LF/logical-line-map census; failures are fatal.",
-        "D03_STRUCTURE": "Unique boundary signatures and gap/overlap/order/byte conservation checks; failures are fatal.",
-        "D04_SPLIT_ROUTING": "Routing ownership and malformed derivative seam diagnostics only.",
-        "D05_IMAGE_REFERENCE": "Image ordinal, target resolution, basename, physical join, and split omission diagnostics.",
-        "D06_FENCE": "Fence-aware raw-block balance and code/prose candidate routing; never authorizes a text change.",
-        "D07_HEADING": "Empty, numeric, punctuation, running-header, data, and prose-heading lexical candidates.",
-        "D08_CAPTION_ASSOCIATION": "Figure/caption adjacency and interleaving candidates requiring full-page evidence.",
-        "D09_WORD_BOUNDARY": "Joined/split/hyphen/orphan-continuation candidates requiring source review.",
-        "D10_TECHNICAL": "Math/code delimiter, bracket, token, truncation, and rule-table candidates.",
-        "D11_REPETITION": "Repeated n-gram and abnormal expansion candidates.",
-        "D12_INDEX": "Index line-length, density, column-order, and OCR-confusable candidates.",
-        "D13_EXACT_SENTINEL": "Exact pre-repair regression presence/route check; not a discovery detector.",
+        "D01_RAW_MANIFEST": ("FATAL_BASELINE_CHECK", "Exact type/path/hash/mode/Git/LFS/image-dimension census; failures are fatal rather than candidate hits."),
+        "D02_TEXT_PROFILE": ("FATAL_BASELINE_CHECK", "Strict UTF-8/LF/final-LF/logical-line-map census; failures are fatal."),
+        "D03_STRUCTURE": ("FATAL_BASELINE_CHECK", "Unique boundary signatures and gap/overlap/order/byte conservation checks; failures are fatal."),
+        "D04_SPLIT_ROUTING": ("IMPLEMENTED_BASELINE_CANDIDATE_DETECTOR", "Detects generated/malformed/cross-owned routing dispositions from the frozen split map."),
+        "D05_IMAGE_REFERENCE": ("IMPLEMENTED_BASELINE_CANDIDATE_DETECTOR", "Detects all broken monolith image targets and the exact split-reference omissions."),
+        "D06_FENCE": ("RESERVED_FOR_STAGE_40", "No generic prose-in-fence candidate logic is implemented in Stage 2; fence balance is enforced by the raw lexer."),
+        "D07_HEADING": ("IMPLEMENTED_BASELINE_CANDIDATE_DETECTOR", "Detects only empty, numeric, punctuation, running-header, and one frozen lexical prose-heading form."),
+        "D08_CAPTION_ASSOCIATION": ("RESERVED_FOR_STAGE_38_40", "No generic caption-association detector is implemented in Stage 2; known spans receive exact/manual routes."),
+        "D09_WORD_BOUNDARY": ("RESERVED_FOR_STAGE_40", "No generic joined/split/hyphen detector is implemented in Stage 2; known spans receive exact/manual routes."),
+        "D10_TECHNICAL": ("LIMITED_BASELINE_CANDIDATE_DETECTOR", "Stage 2 detects only odd unescaped dollar counts; bracket/token/truncation/rule checks remain Stage 37/40 work."),
+        "D11_REPETITION": ("RESERVED_FOR_STAGE_40", "No generic repeated-n-gram detector is implemented in Stage 2; known spans receive exact/manual routes."),
+        "D12_INDEX": ("LIMITED_BASELINE_CANDIDATE_DETECTOR", "Stage 2 detects only overlong Index lines and literal Ouantum; page-column reconstruction remains witness-dependent."),
+        "D13_EXACT_SENTINEL": ("IMPLEMENTED_EXACT_REGRESSION_CHECK_NOT_DISCOVERY", "Checks exact pre-repair sentinel presence and routing; it is excluded from generic candidate-detector recall."),
     }
     hit_counts = Counter(row["detector_id"] for row in hits)
     families = [
@@ -1865,10 +1916,12 @@ def build_detector_artifacts(
             "description": description,
             "detector_id": detector_id,
             "hit_count": hit_counts[detector_id],
+            "implementation_status": implementation_status,
             "writes_author_text": False,
         }
-        for detector_id, description in detector_descriptions.items()
+        for detector_id, (implementation_status, description) in detector_descriptions.items()
     ]
+    generic_count = sum(bool(row["generic_detector_ids"]) for row in known_routes)
     report = {
         "baseline_only": True,
         "detector_families": families,
@@ -1877,7 +1930,9 @@ def build_detector_artifacts(
         "known_defect_registry": {
             "exact_presence_count": len(defect_rows),
             "exact_presence_denominator": len(defect_rows),
-            "generic_detector_plus_exact_count": sum(bool(row["generic_detector_ids"]) for row in known_routes),
+            "generic_candidate_recall_denominator": len(defect_rows),
+            "generic_candidate_recall_numerator": generic_count,
+            "manual_exact_route_count": len(defect_rows) - generic_count,
             "registry_path": "goal-4/known-defect-regression.jsonl",
             "registry_sha256": sha256_bytes(jsonl_bytes(defect_rows)),
             "routes": known_routes,
@@ -1894,6 +1949,7 @@ def build_detector_artifacts(
         "repairs_applied": 0,
         "schema_version": BASELINE_SCHEMA_VERSION,
         "status": "PRE_REPAIR_DIAGNOSTIC_BASELINE",
+        "stage_40_obligation": "Implement the reserved/limited detector families, seed mutations, and reach 55/55 generic-or-manual protocol recall plus the frozen final threshold; Stage 2 exact-presence routing is not that final claim.",
     }
     require(report["known_defect_registry"]["unrouted_count"] == 0, "known defect lacks a baseline route")
     return hits, report
@@ -1965,7 +2021,10 @@ def build_environment_snapshot(
             "python": _command_version(root, ["/usr/bin/python3", "--version"]),
             "tools_source_sha256": {
                 path.name: sha256_file(path)
-                for path in sorted((root / "goal-4/tools").glob("*.py"), key=lambda item: item.name)
+                for path in (
+                    root / "goal-4/tools/baseline_lib.py",
+                    root / "goal-4/tools/capture_baseline.py",
+                )
             },
         },
     }
