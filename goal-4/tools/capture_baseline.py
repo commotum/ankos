@@ -113,7 +113,8 @@ def capture(root: Path) -> dict[str, str | int]:
     for name in JSON_OUTPUTS | JSONL_OUTPUTS:
         validate_exact_goal_output(root, output_root / name, f"goal-4/{name}")
     require((root / LEGACY_RELATIVE).is_dir(), "legacy corpus is missing")
-    require(not (root / REPAIRED_RELATIVE).exists(), "Stage 2 may not create or census the repaired sibling")
+    repaired_sibling_absent_before = not (root / REPAIRED_RELATIVE).exists()
+    require(repaired_sibling_absent_before, "Stage 2 may not create or census the repaired sibling")
     contract = load_json(root / "goal-4/guardrails.json")
     quality = load_json(root / "goal-4/quality-evaluation.json")
     head_before = git_head(root)
@@ -147,13 +148,20 @@ def capture(root: Path) -> dict[str, str | int]:
     head_after_core = git_head(root)
     status_after_core = git_status(root)
     require(head_before == head_after_core, "Git HEAD moved during Stage 2 capture; rerun from a stable snapshot")
+    manifest_after = build_corpus_manifest(root, contract)
+    require(manifest == manifest_after, "legacy corpus changed during Stage 2 capture")
+    repaired_sibling_absent_after = not (root / REPAIRED_RELATIVE).exists()
+    require(repaired_sibling_absent_after, "repaired sibling appeared during Stage 2 capture")
     environment = build_environment_snapshot(
         root,
         manifest,
+        manifest_after,
         status_before,
         status_after_core,
         head_before,
         head_after_core,
+        repaired_sibling_absent_before,
+        repaired_sibling_absent_after,
     )
     atomic_write(output_root / "baseline-environment.json", canonical_json_bytes(environment))
     lock = build_lock(root, output_root)

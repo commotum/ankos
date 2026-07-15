@@ -10,6 +10,7 @@ import re
 import stat
 import subprocess
 import sys
+import unicodedata
 from collections import Counter, defaultdict
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Iterator
@@ -459,6 +460,7 @@ def manifest_input_rows(root: Path, contract: dict[str, Any]) -> list[dict[str, 
             "git_head_blob_oid": entry["oid"],
             "git_object_format": "sha1",
             "git_tree_mode": entry["mode"],
+            "link_count_at_capture": before.st_nlink,
             "relative_path": relative,
             "role": role,
             "sha256": sha256_bytes(payload),
@@ -489,6 +491,9 @@ def manifest_input_rows(root: Path, contract: dict[str, Any]) -> list[dict[str, 
             )
         else:
             parsed = parse_jpeg(payload)
+            require(parsed["sof_marker"] == "SOF0", f"progressive/non-baseline JPEG drift: {relative}")
+            require(parsed["sample_precision"] == 8, f"JPEG sample precision drift: {relative}")
+            require(parsed["component_count"] == 3, f"JPEG component-count drift: {relative}")
             lfs = parse_lfs_pointer(stored)
             require(lfs is not None, f"JPEG HEAD blob is not a strict LFS pointer: {relative}")
             require(lfs["oid_sha256"] == sha256_bytes(payload), f"LFS OID mismatch: {relative}")
@@ -544,6 +549,16 @@ def build_corpus_manifest(root: Path, contract: dict[str, Any]) -> dict[str, Any
     markdown_paths = [row["relative_path"] for row in rows if row["kind"] == "MARKDOWN"]
     jpeg_paths = [row["relative_path"] for row in rows if row["kind"] == "JPEG"]
     require(len({row["basename"] for row in jpeg_rows}) == 1444, "JPEG basenames are not unique")
+    require(all(path.isascii() for path in all_paths), "legacy path is not ASCII")
+    require(all(unicodedata.normalize("NFC", path) == path for path in all_paths), "legacy path is not NFC")
+    require(len({path.casefold() for path in all_paths}) == len(all_paths), "legacy paths collide under case folding")
+    require(not any(any(ord(character) < 0x20 for character in path) for path in all_paths), "legacy path contains a control character")
+    directories = [legacy] + [
+        path
+        for path in legacy.rglob("*")
+        if path.is_dir() and not path.is_symlink()
+    ]
+    directory_allocated = sum(path.stat(follow_symlinks=False).st_blocks * 512 for path in directories)
     manifest = {
         "contract_id": contract["contract_id"],
         "counts": {
@@ -569,6 +584,13 @@ def build_corpus_manifest(root: Path, contract: dict[str, Any]) -> dict[str, Any
             "jpeg_terminal_lf_sha256": path_list_digest(jpeg_paths),
             "markdown_terminal_lf_sha256": path_list_digest(markdown_paths),
         },
+        "path_profile": {
+            "ascii_only": True,
+            "casefold_unique": True,
+            "control_free": True,
+            "nfc": True,
+            "posix_relative": True,
+        },
         "quality_seed_material": {
             "byte_size": len(material),
             "serialization": "UTF-8 sorted-key compact JSON array without terminal LF",
@@ -579,6 +601,8 @@ def build_corpus_manifest(root: Path, contract: dict[str, Any]) -> dict[str, Any
         "schema_version": BASELINE_SCHEMA_VERSION,
         "totals": {
             "logical_bytes": sum(row["byte_size"] for row in rows),
+            "directory_allocated_bytes_at_capture": directory_allocated,
+            "directory_count_including_root": len(directories),
             "markdown_logical_lines": sum(row["logical_line_count"] or 0 for row in rows),
             "regular_file_allocated_bytes_at_capture": sum(row["allocated_byte_size_at_capture"] for row in rows),
             "tree_allocated_bytes_at_capture": tree_allocated_bytes(legacy),
@@ -592,6 +616,8 @@ def build_corpus_manifest(root: Path, contract: dict[str, Any]) -> dict[str, Any
         "RAW_AUTHOR_TEXT_MONOLITH": 1,
     }, "raw role census drift")
     require(manifest["totals"]["logical_bytes"] == 115037515, "legacy logical-byte total drift")
+    require(manifest["totals"]["directory_count_including_root"] == 36, "legacy directory count drift")
+    require(manifest["totals"]["directory_allocated_bytes_at_capture"] == 180224, "legacy directory allocation drift")
     require(manifest["totals"]["tree_allocated_bytes_at_capture"] == 118206464, "legacy tree allocation drift")
     require(manifest["quality_seed_material"] == {
         "byte_size": 331724,
@@ -1149,6 +1175,61 @@ def build_routing_baseline(
         for row in image_rows
         if row["split_status"] == "OMITTED"
     ]
+    contents_relative = "FRONT-MATTER/Contents/Contents.md"
+    contents_path = legacy / contents_relative
+    contents_lines = split_raw_lines(contents_path.read_bytes())
+    contents_links: list[dict[str, Any]] = []
+    semantic_by_label = {
+        "The Principle of Computational Equivalence": "TARGET_CONTAINS_GENERAL_AND_CHAPTER_NOTES",
+        "Notes": "TARGET_IS_ONE_STRAY_N03_SENTENCE",
+        "Index": "TARGET_CONTAINS_NOTES_AND_NO_ACTUAL_INDEX",
+        "Colophon": "TARGET_BEGINS_IN_N10_AND_ACTUAL_COLOPHON_IS_AT_LINE_5015",
+    }
+    normal_link = re.compile(r"(?<!!)\[([^\]\n]+)\]\(([^)\n]+\.md)\)")
+    for line in contents_lines:
+        text = line["content"].decode("utf-8")
+        for match in normal_link.finditer(text):
+            label, target = match.groups()
+            resolved = (contents_path.parent / Path(*PurePosixPath(target).parts)).resolve(strict=False)
+            require(resolved.is_file() and not resolved.is_symlink(), f"Contents link does not resolve: {line['line']}")
+            require(resolved.is_relative_to(legacy), f"Contents link escapes legacy root: {line['line']}")
+            relative = resolved.relative_to(legacy).as_posix()
+            contents_links.append(
+                {
+                    "label": label,
+                    "lexically_resolves": True,
+                    "line": line["line"],
+                    "resolved_path": relative,
+                    "semantic_route_status": semantic_by_label.get(label, "NOMINAL_TARGET_MATCHES_DOCUMENT"),
+                    "target": target,
+                    "target_sha256": input_by_path[relative]["sha256"],
+                }
+            )
+    require(len(contents_links) == 16, "Contents link count drift")
+    require(sum(row["semantic_route_status"] != "NOMINAL_TARGET_MATCHES_DOCUMENT" for row in contents_links) == 4, "Contents semantic-route anomaly count drift")
+    nonrouting_lines = [15347, 16774, 17356, 18922, 20385]
+    monolith_bytes = (legacy / MONOLITH_RELATIVE).read_bytes()
+    monolith_lines = split_raw_lines(monolith_bytes)
+    physical_counts = Counter(
+        "PREFACE"
+        if row["asset_relative_path"].startswith("FRONT-MATTER/Preface/")
+        else "CHAPTER_PATHS"
+        if row["asset_relative_path"].startswith("CHAPTERS/")
+        else "BACK_MATTER_PATHS"
+        for row in image_rows
+    )
+    semantic_counts = Counter(
+        "PREFACE"
+        if row["canonical_document_id"] == "PREFACE"
+        else "CHAPTERS"
+        if row["canonical_document_id"].startswith("CH")
+        else "NOTES"
+        if row["canonical_document_id"] == "GENERAL_NOTES" or row["canonical_document_id"].startswith("N")
+        else "OTHER"
+        for row in image_rows
+    )
+    require(physical_counts == Counter({"CHAPTER_PATHS": 899, "BACK_MATTER_PATHS": 543, "PREFACE": 2}), "physical image path-location census drift")
+    require(semantic_counts == Counter({"CHAPTERS": 820, "NOTES": 622, "PREFACE": 2}), "semantic image reference-owner census drift")
     return {
         "atlas": {
             "byte_size": atlas["byte_size"],
@@ -1161,6 +1242,7 @@ def build_routing_baseline(
             "textual_witness_allowed": False,
         },
         "consumer_compatibility_baseline": "goal-4/compatibility-baseline.json",
+        "contents_links": contents_links,
         "fence_delimiters": {
             "all_markdown_count": sum(fence_counts.values()),
             "by_path": dict(sorted(fence_counts.items())),
@@ -1173,9 +1255,21 @@ def build_routing_baseline(
             "monolith_source_sha256": monolith["sha256"],
             "split_count": sum(row["image_reference_count"] for row in routing_files),
             "split_omissions": omissions,
+            "physical_path_location_counts": dict(sorted(physical_counts.items())),
+            "semantic_reference_owner_counts": dict(sorted(semantic_counts.items())),
         },
         "nonrouting_link_shapes": {
-            "monolith_lines": [15347, 16774, 17356, 18922, 20385],
+            "rows": [
+                {
+                    "line": number,
+                    "line_sha256": sha256_bytes(
+                        monolith_bytes[
+                            monolith_lines[number - 1]["byte_start"] : monolith_lines[number - 1]["byte_end"]
+                        ]
+                    ),
+                }
+                for number in nonrouting_lines
+            ],
             "status": "FORMULA_OR_CODE_TEXT_NOT_NAVIGATION",
         },
         "omitted_transition_or_malformed_raw_lines": [
@@ -1821,11 +1915,14 @@ def _command_version(root: Path, argv: list[str]) -> str:
 
 def build_environment_snapshot(
     root: Path,
-    manifest: dict[str, Any],
+    manifest_before: dict[str, Any],
+    manifest_after: dict[str, Any],
     status_before: bytes,
     status_after: bytes,
     head_before: str,
     head_after: str,
+    repaired_sibling_absent_before: bool,
+    repaired_sibling_absent_after: bool,
 ) -> dict[str, Any]:
     old_umask = os.umask(0)
     os.umask(old_umask)
@@ -1838,10 +1935,13 @@ def build_environment_snapshot(
             "git_status_after_utf8": status_after.decode("utf-8", errors="strict").splitlines(),
             "git_status_before_sha256": sha256_bytes(status_before),
             "git_status_before_utf8": status_before.decode("utf-8", errors="strict").splitlines(),
-            "legacy_git_tree": manifest["git"]["legacy_tree_oid"],
-            "legacy_manifest_rows_sha256": sha256_bytes(canonical_json_bytes(manifest["raw_inputs"])),
-            "repaired_sibling_absent_after": not (root / REPAIRED_RELATIVE).exists(),
-            "repaired_sibling_absent_before": not (root / REPAIRED_RELATIVE).exists(),
+            "legacy_git_tree_after": manifest_after["git"]["legacy_tree_oid"],
+            "legacy_git_tree_before": manifest_before["git"]["legacy_tree_oid"],
+            "legacy_manifest_rows_sha256_after": sha256_bytes(canonical_json_bytes(manifest_after["raw_inputs"])),
+            "legacy_manifest_rows_sha256_before": sha256_bytes(canonical_json_bytes(manifest_before["raw_inputs"])),
+            "legacy_manifest_stable_during_capture": manifest_before == manifest_after,
+            "repaired_sibling_absent_after": repaired_sibling_absent_after,
+            "repaired_sibling_absent_before": repaired_sibling_absent_before,
             "repository_root_at_capture": root.as_posix(),
         },
         "environment": {

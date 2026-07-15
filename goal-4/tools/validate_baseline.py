@@ -267,10 +267,12 @@ def validate_baseline(
     artifact_root: Path | None = None,
     raw_overrides: dict[str, Path] | None = None,
     check_lock: bool = True,
+    require_sibling_absent: bool = False,
 ) -> dict[str, Any]:
     root = root.resolve(strict=True)
     artifact_root = (artifact_root or root / "goal-4").resolve(strict=True)
-    require(not (root / REPAIRED_RELATIVE).exists(), "Stage 2 repaired sibling must remain absent")
+    if require_sibling_absent:
+        require(not (root / REPAIRED_RELATIVE).exists(), "Stage 2 repaired sibling must remain absent")
     paths = _artifact_paths(artifact_root)
     manifest = load_canonical_json(paths["corpus-manifest.json"])
     routing = load_canonical_json(paths["routing-baseline.json"])
@@ -315,7 +317,17 @@ def validate_baseline(
     require(environment.get("schema_version") == "1.0.0", "baseline environment schema drift")
     scope = environment.get("capture_scope", {})
     require(scope.get("git_head_stable_during_capture") is True, "Git HEAD moved during baseline capture")
-    require(scope.get("legacy_git_tree") == LEGACY_GIT_TREE, "environment legacy binding drift")
+    require(
+        scope.get("legacy_git_tree_before") == scope.get("legacy_git_tree_after") == LEGACY_GIT_TREE,
+        "environment legacy Git-tree binding drift",
+    )
+    require(scope.get("legacy_manifest_stable_during_capture") is True, "legacy manifest moved during baseline capture")
+    require(
+        scope.get("legacy_manifest_rows_sha256_before")
+        == scope.get("legacy_manifest_rows_sha256_after")
+        == sha256_bytes(canonical_json_bytes(manifest["raw_inputs"])),
+        "environment legacy manifest binding drift",
+    )
     require(scope.get("repaired_sibling_absent_before") is True and scope.get("repaired_sibling_absent_after") is True, "environment captured a repaired sibling")
     if check_lock:
         lock_path = artifact_root / "baseline-lock.json"
@@ -337,12 +349,14 @@ def main() -> int:
     parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--artifact-root", type=Path)
     parser.add_argument("--skip-lock", action="store_true")
+    parser.add_argument("--require-sibling-absent", action="store_true")
     args = parser.parse_args()
     try:
         summary = validate_baseline(
             args.repo_root,
             artifact_root=args.artifact_root,
             check_lock=not args.skip_lock,
+            require_sibling_absent=args.require_sibling_absent,
         )
     except (GuardrailError, UnicodeError, OSError, KeyError, TypeError, ValueError) as error:
         print(f"BASELINE FAIL: {error}", file=sys.stderr)
