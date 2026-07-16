@@ -763,6 +763,16 @@ class ChapterElevenTests(unittest.TestCase):
         residues = (
             "<sup>(</sup>a)  $p[x_{-}]",
             r"$p[x_{-}|[p][p][p]",
+            "row of n black cells, 0 black cells survive if n is even",
+            "adding the original number n together n times",
+            "operations of AND, OR and Not",
+            "three symbols, p, q and r",
+            "one has a whole number n, and at each step",
+            r"$n^{th}$",
+            'the Turing machine should "halt" with the head',
+            "exactly  $5 \\times 5 = 25$  black squares",
+            r"automaton,  $\boxminus$  indicates",
+            "$ . Pairs of cells are grouped",
             "interprets this command\n\nby executing",
             "But from\n\nexperience with computer languages",
             "always yielding\n\nfor example purely repetitive patterns",
@@ -778,6 +788,8 @@ class ChapterElevenTests(unittest.TestCase):
             with self.subTest(residue=residue):
                 self.assertNotIn(residue, self.rendered)
         self.assertNotRegex(self.rendered, r"(?m)^\|\s*,\s*\|.*[٨•]")
+        self.assertNotRegex(self.rendered, r"(?m)^rule (?:45|73)$")
+        self.assertNotRegex(self.rendered, r"(?<!\$)Log\[15\](?!\$)")
 
 
 if __name__ == "__main__":
