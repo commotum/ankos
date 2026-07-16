@@ -278,6 +278,16 @@ class ChapterElevenTests(unittest.TestCase):
             ),
         )
 
+    def test_two_pass_coverage_is_closed(self) -> None:
+        rows = validate.validate_coverage(self.documents)
+        row = next(item for item in rows if item["document_id"] == "CH11")
+        self.assertEqual(
+            (row["first_pass"], row["second_pass"], row["reviewer_type"]),
+            ("YES", "YES", "agent"),
+        )
+        self.assertIn("64 guarded corrections", row["notes"])
+        self.assertIn("108 image references", row["notes"])
+
         arithmetic = next(
             row
             for row in self.corrections

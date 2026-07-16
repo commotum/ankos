@@ -270,8 +270,8 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-16 (America/Los_Angeles).
-- Active stage: `5-CH09-12` (`IN_PROGRESS`), currently advancing `CH11` after
-  clean `CH10` closure.
+- Active stage: `5-CH09-12` (`IN_PROGRESS`), currently advancing `CH12` after
+  clean `CH11` closure.
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
   and the empty `goal-4/` directory were removed by exact path. No commit
   range was reverted, and Goal 4 had corrected no book text.
@@ -281,16 +281,16 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions (50 using source-backed
-  repaired-only overrides), 33 source-added images, and generated
-  README/Contents files. It now includes 666 guarded source-verified
+  documents, 1,444 mapped image positions (64 using source-backed
+  repaired-only overrides), 34 source-added images, and generated
+  README/Contents files. It now includes 730 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
   intentional historical cleanup references to Goal 4 and intentional repaired
   sibling references, but no dependency on its machinery.
 - Goal 5 contains four compact working datasets: 29 source-confirmed raw/PDF
-  ranges, 55 known-defect/guardrail candidates, a 1,444-row image-to-asset map,
+  ranges, 57 known-defect/guardrail candidates, a 1,444-row image-to-asset map,
   and a concise legacy/routing/source summary. Content claims remain pending
   until their sequential comparison passes.
 - The pinned source is `A New Kind of Science/A New Kind of Science.pdf`, a
@@ -404,8 +404,33 @@ Neither file is a generalized workflow database.
   `82217582690509ef97acd14ca12f0f9680e380ce6a1d8f8a0373e569114b2bc3`.
   Focused and cumulative tests, complete rendering, default and strict
   zero-correction validation, two fresh byte-identical builds, legacy digest,
-  and scope gates pass. `CH11` begins at `pdf:0653`, raw line 7,692, byte
-  1103253, and image-map ordinal 657.
+  and scope gates pass. `CH11` is complete at `YES/YES` after forward first
+  passes and wholly fresh independent source, technical, and visual
+  final-output passes over all 78 PDF pages 653–730. Its 64 guarded corrections
+  are `G5-C-0667`–`G5-C-0730`; 107 mapped references plus `G5-A-0034`
+  produce 108 final references, with 14 mapped references using repaired-only
+  overrides. The final 103,952-byte, 874-line Markdown hashes to
+  `94e20302298935e73ad11c300d267d05ab23682bf14978e67fe0c3b09ef7080c`.
+  Source, technical, and visual closing reports hash respectively to
+  `47632497b0d234b3f4fecef81fe61398e66017d6304df9a13127fc5b33728b2a`,
+  `5acbfc73fb485ac1faf4b2e347555d1a6340c4f94a8265deb6529bc5bd8e5b96`,
+  and `3f8b746226b218af9cbfde2e5bfe68e73b76df3ff3e5845e89f5dc5b73d93095`;
+  each closes with zero discrepancy and zero ambiguity. The 85-page render
+  hashes to
+  `b97e7ab8ce4fbca72866e09e54bb579255e3b23f2dbee1837be0e4aebad47937`.
+  Nine focused tests, the 98-test Goal 5 suite, and the complete 200-test
+  repository suite with 450 subtests pass. Two fresh normal builds and the
+  published sibling are byte-identical at tree SHA-256
+  `34ec72379ae65788d03dbc195708c71ae7743955de636261a118b61598d4f9b9`;
+  strict zero-correction output hashes to
+  `d787dc0a8ba4388b3a0f1c83f38ed5f5f3c56bc1741241518373b997d2937401`.
+  Recurrence searches found both earlier `guite` instances already corrected
+  in `CH07` and pinned two source-confirmed future instances to `N09` and
+  `N10`; styled ordinal, technical-span, page-join, plate-placement, furniture,
+  and visual-boundary detector families remain carried forward for their
+  owning passes. Thirteen documents now have both passes complete. The next IDs
+  are `G5-C-0731` and `G5-A-0035`; `CH12` begins at `pdf:0731`, raw line
+  8,608, byte 1208768, and image-map ordinal 764.
 
 ## Stage Status
 
