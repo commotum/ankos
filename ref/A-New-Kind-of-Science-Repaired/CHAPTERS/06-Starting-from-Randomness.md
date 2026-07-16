@@ -1,8 +1,8 @@
-## 6
+![](_page_238_Chapter_Opener.jpeg)
 
-#### Starting from Randomness
+## Starting from Randomness
 
-#### The Emergence of Order
+### The Emergence of Order
 
 In the past several chapters, we have seen many examples of behavior that simple programs can produce. But while we have discussed a whole range of different kinds of underlying rules, we have for the most part considered only the simplest possible initial conditions—so that for example we have usually started with just a single black cell.
 
@@ -44,6 +44,8 @@ A cellular automaton that never settles down to a stable state, but instead cont
 
 ![](_page_242_Figure_2.jpeg)
 
+![](_page_242_Rule_30.jpeg)
+
 ![](_page_242_Picture_4.jpeg)
 
 ![](_page_242_Picture_5.jpeg)
@@ -68,7 +70,7 @@ Complex behavior in the rule 110 cellular automaton starting from a random initi
 
 A continuation of the pattern from the previous page. Each page shows 700 steps in the evolution of the cellular automaton.
 
-#### Four Classes of Behavior
+### Four Classes of Behavior
 
 In the previous section we saw what a number of specific cellular automata do if one starts them from random initial conditions. But in this section I want to ask the more general question of what arbitrary cellular automata do when started from random initial conditions.
 
@@ -120,25 +122,21 @@ And in a sense the situation was similar to what is seen, say, with the classifi
 
 Often it is possible to use such detailed properties to make more precise definitions of the original classes. And typically all reasonable definitions will then assign any particular system to the same class.
 
-Examples of class 4 cellular automata with totalistic rules involving nearest neighbors and three possible colors for each cell. Each picture shows 1500 steps of evolution from random initial conditions.
+Examples of class 4 cellular automata with totalistic rules involving nearest neighbors and three possible colors for each cell. Each picture shows 1500 steps of evolution from random initial conditions. <sup>▶</sup>
 
 ![](_page_251_Picture_1.jpeg)
 
-code 1815
+*code 1815*
 
 ![](_page_252_Picture_2.jpeg)
 
-code 2007
+*code 2007*
 
 ![](_page_253_Picture_1.jpeg)
 
-238
-
 ![](_page_254_Picture_1.jpeg)
 
-code 2043
-
-#### STEPHEN WOLFRAM | A NEW KIND OF SCIENCE
+*code 2043*
 
 But with almost any general classification scheme there are inevitably borderline cases which get assigned to one class by one definition and another class by another definition. And so it is with cellular automata: there are occasionally rules like those in the pictures below that show some features of one class and some of another.
 
@@ -162,13 +160,11 @@ But sometimes one can tell at least a certain amount simply from the form of the
 
 In addition, even when one can tell rather little from a single rule, it is often the case that rules which occur next to each other in some sequence have similar behavior. This can be seen for example in the pictures on the facing page. The top row of rules all have class 1 behavior. But then class 2 behavior is seen, followed by class 4 and then class 3. And after that, the remainder of the rules are mostly class 3.
 
-The fact that class 4 appears between class 2 and class 3 in the pictures on the facing page is not uncommon. For while class 4 is above class 3 in terms of apparent complexity, it is in a sense intermediate
+The fact that class 4 appears between class 2 and class 3 in the pictures on the facing page is not uncommon. For while class 4 is above class 3 in terms of apparent complexity, it is in a sense intermediate between class 2 and class 3 in terms of what one might think of as overall activity.
 
 ![](_page_256_Figure_2.jpeg)
 
 A sequence of totalistic rules involving nearest neighbors and four possible colors for each cell chosen to show transitions between rules with different classes of behavior. Note that class 4 seems to occur between class 2 and class 3.
-
-between class 2 and class 3 in terms of what one might think of as overall activity.
 
 The point is that class 1 and 2 systems rapidly settle down to states in which there is essentially no further activity. But class 3 systems continue to have many cells that change at every step, so that they in a sense maintain a high level of activity forever. Class 4 systems are then in the middle: for the activity that they show neither dies out completely, as in class 2, nor remains at the high level seen in class 3.
 
@@ -184,7 +180,7 @@ For different values of this parameter, the behavior one sees is different. But 
 
 But since continuous cellular automata have underlying rules based on a continuous parameter, one can ask what happens if one smoothly varies this parameter—and in particular one can ask what sequence of classes of behavior one ends up seeing.
 
-The answer is that there are normally some stretches of class 1 or 2 behavior, and some stretches of class 3 behavior. But at the transitions
+The answer is that there are normally some stretches of class 1 or 2 behavior, and some stretches of class 3 behavior. But at the transitions it turns out that class 4 behavior is typically seen—as illustrated on the facing page. And what is particularly remarkable is that this behavior involves the same kinds of localized structures and other features that we saw in ordinary discrete class 4 cellular automata.
 
 ![](_page_258_Figure_1.jpeg)
 
@@ -192,19 +188,17 @@ Examples of the evolution of continuous cellular automata from random initial co
 
 ![](_page_259_Picture_2.jpeg)
 
-0.39
+*0.398*
 
 ![](_page_259_Picture_4.jpeg)
 
-0.4
+*0.4*
 
 ![](_page_259_Picture_6.jpeg)
 
-{0.5, 1.13}
+*{0.5, 1.13}*
 
 Examples of continuous cellular automata that exhibit class 4 behavior. The rules are of the same kind as in the previous picture, except that in the third case shown here, the gray level of each neighboring cell is multiplied by 1.13 before the average is done. In addition, the actual gray levels in these pictures are obtained by taking the difference between the gray level of each cell and its neighbor, thus removing the uniform stripes visible in the previous picture. It is remarkable that class 4 behavior with discrete localized structures can still occur in the continuous systems shown here.
-
-it turns out that class 4 behavior is typically seen—as illustrated on the facing page. And what is particularly remarkable is that this behavior involves the same kinds of localized structures and other features that we saw in ordinary discrete class 4 cellular automata.
 
 So what about two-dimensional cellular automata? Do these also exhibit the same four classes of behavior that we have seen in one dimension? The pictures on the next two pages show various steps in the evolution of some simple two-dimensional cellular automata starting from random initial conditions. And just as in one dimension a few distinct classes of behavior can immediately be seen.
 
@@ -232,7 +226,9 @@ One-dimensional slices through the evolution of various two-dimensional cellular
 
 ![](_page_264_Picture_2.jpeg)
 
+<!-- Editorial source-accounting reference: the legacy asset below rasterizes the author caption transcribed as live text after this figure group.
 ![](_page_264_Picture_3.jpeg)
+-->
 
 ![](_page_264_Picture_4.jpeg)
 
@@ -240,7 +236,9 @@ One-dimensional slices through the evolution of various two-dimensional cellular
 
 ![](_page_264_Picture_6.jpeg)
 
-#### **Sensitivity to Initial Conditions**
+The behavior of a class 4 two-dimensional cellular automaton often known in recreational computing as the Game of Life. Localized structures that move (so-called gliders) show up as streaks in the pictures given here. The rule for this cellular automaton considers the 8 neighbors of a cell (including diagonals): if two of these neighbors are black, then the cell stays the same color as before; if three are black, then the cell becomes black; and if any other number of neighbors are black, then the cell becomes white. This rule is outer totalistic 9-neighbor code 224. The pictures on the right show cells that were black on preceding steps in progressively lighter shades of gray.
+
+### Sensitivity to Initial Conditions
 
 In the previous section we identified four basic classes of cellular automata by looking at the overall appearance of patterns they produce. But these four classes also have other significant distinguishing features—and one important example of these is their sensitivity to small changes in initial conditions.
 
@@ -252,7 +250,7 @@ The effect of changing the color of a single cell in the initial conditions for 
 
 The results are rather different for each class.
 
-In class 1, changes always die out, and in fact exactly the same final state is reached regardless of what initial conditions were used. In class 2, changes may persist, but they always remain localized in a small region of the system. In class 3, however, the behavior is quite different. For as the facing page shows, any change that is made
+In class 1, changes always die out, and in fact exactly the same final state is reached regardless of what initial conditions were used. In class 2, changes may persist, but they always remain localized in a small region of the system. In class 3, however, the behavior is quite different. For as the facing page shows, any change that is made typically spreads at a uniform rate, eventually affecting every part of the system. In class 4, changes can also spread, but only in a sporadic way—as illustrated on the facing page and the one that follows.
 
 ![](_page_266_Picture_2.jpeg)
 
@@ -261,8 +259,6 @@ In class 1, changes always die out, and in fact exactly the same final state is 
 ![](_page_266_Picture_4.jpeg)
 
 The effect of changing the color of a single initial cell in three typical class 3 cellular automata.
-
-typically spreads at a uniform rate, eventually affecting every part of the system. In class 4, changes can also spread, but only in a sporadic way—as illustrated on the facing page and the one that follows.
 
 So what is the real significance of these different responses to changes in initial conditions? In a sense what they reveal are basic differences in the way that each class of systems handles information.
 
@@ -276,15 +272,15 @@ Class 4 systems are once again somewhat intermediate between class 2 and class 3
 
 There are many characteristic differences between the four classes of systems that we identified in the previous section. But their differences in the handling of information are in some respects particularly fundamental. And indeed, as we will see later in this book, it is often possible to understand some of the most important features of systems that occur in nature just by looking at how their handling of information corresponds to what we have seen in the basic classes of systems that we have identified here.
 
-The effect of small changes in initial conditions in the rule 110 class 4 cellular automaton. The changes spread only when they are in effect carried by localized structures that propagates across the system.
+The effect of small changes in initial conditions in the rule 110 class 4 cellular automaton. The changes spread only when they are in effect carried by localized structures that propagates across the system. <sup>▶</sup>
 
 ![](_page_268_Picture_2.jpeg)
 
 ![](_page_269_Picture_1.jpeg)
 
-1 cell changed
+*1 cell changed*
 
-#### Systems of Limited Size and Class 2 Behavior
+### Systems of Limited Size and Class 2 Behavior
 
 In the past two sections we have seen two important features of class 2 systems: first, that their behavior is always eventually repetitive, and second, that they do not support any kind of long-range communication.
 
@@ -318,7 +314,7 @@ The pictures below show another example of a system of limited size based on a s
 
 ![](_page_272_Figure_6.jpeg)
 
-A system where the number that represents the position of the dot doubles at each step, wrapping around whenever it reaches the right-hand end. (After t steps the dot is thus at position  $Mod[2^t, n]$  in a size n system.) The plot at left gives the repetition period for this system as a function of its size; for odd n this period is equal to MultiplicativeOrder[2, n].
+A system where the number that represents the position of the dot doubles at each step, wrapping around whenever it reaches the right-hand end. (After $t$ steps the dot is thus at position $Mod[2^t, n]$ in a size $n$ system.) The plot at left gives the repetition period for this system as a function of its size; for odd $n$ this period is equal to $MultiplicativeOrder[2, n]$.
 
 Once again, the behavior that results is always repetitive, and the repetition period can never be greater than the total number of possible positions for the dot. But as the picture shows, the actual repetition period jumps around considerably as the size of the system is changed. And as it turns out, the repetition period is again related to the factors of the number of possible positions for the dot—and tends to be maximal in those cases where this number is prime.
 
@@ -332,11 +328,11 @@ The maximum possible repetition period for any system is always equal to the tot
 
 For the systems involving a single dot that we discussed above, the possible states correspond just to possible positions for the dot, and the number of states is therefore equal to the size of the system.
 
-But in a cellular automaton, every possible arrangement of black and white cells corresponds to a possible state of the system. With n cells there are thus  $2^n$  possible states. And this number increases very rapidly with the size n: for 5 cells there are already 32 states, for 10 cells 1024 states, for 20 cells 1,048,576 states, and for 30 cells 1,073,741,824 states.
+But in a cellular automaton, every possible arrangement of black and white cells corresponds to a possible state of the system. With $n$ cells there are thus $2^n$ possible states. And this number increases very rapidly with the size $n$: for 5 cells there are already 32 states, for 10 cells 1024 states, for 20 cells 1,048,576 states, and for 30 cells 1,073,741,824 states.
 
-The pictures on the next page show the actual repetition periods for various cellular automata. In general, a rapid increase with size is characteristic of class 3 behavior. Of the elementary rules, however, only rule 45 seems to yield periods that always stay close to the maximum of  $2^n$ . And in all cases, there are considerable fluctuations in the periods that occur as the size changes.
+The pictures on the next page show the actual repetition periods for various cellular automata. In general, a rapid increase with size is characteristic of class 3 behavior. Of the elementary rules, however, only rule 45 seems to yield periods that always stay close to the maximum of $2^n$. And in all cases, there are considerable fluctuations in the periods that occur as the size changes.
 
-So how does all of this relate to class 2 behavior? In the examples we have just discussed, we have explicitly set up systems that have limited size. But even when a system in principle contains an infinite number of cells it is still possible that a particular pattern in that system will only grow to occupy a limited number of cells. And in any
+So how does all of this relate to class 2 behavior? In the examples we have just discussed, we have explicitly set up systems that have limited size. But even when a system in principle contains an infinite number of cells it is still possible that a particular pattern in that system will only grow to occupy a limited number of cells. And in any such case, the pattern must repeat itself with a period of at most $2^n$ steps, where $n$ is the size of the pattern.
 
 ![](_page_274_Figure_2.jpeg)
 
@@ -344,13 +340,11 @@ The behavior of cellular automata with a limited number of cells. In each case t
 
 ![](_page_275_Figure_1.jpeg)
 
-Repetition periods for various cellular automata as a function of size. The initial conditions used in each case consist of a single black cell, as in the pictures on the previous page. The dashed gray line indicates the maximum possible repetition period of  $2^n$ . The maximum repetition period for rule 90 is  $2^{(n-1)/2} - 1$ . For rule 30, the peak repetition periods are of order  $2^{0.63n}$ , while for rule 45, they are close to  $2^n$  (for n = 29, for example, the period is 463,347,935, which is 86% of the maximum possible). For rule 110, the peaks seem to increase roughly like  $n^3$ .
-
-such case, the pattern must repeat itself with a period of at most  $2^n$  steps, where n is the size of the pattern.
+Repetition periods for various cellular automata as a function of size. The initial conditions used in each case consist of a single black cell, as in the pictures on the previous page. The dashed gray line indicates the maximum possible repetition period of $2^n$. The maximum repetition period for rule 90 is $2^{(n-1)/2} - 1$. For rule 30, the peak repetition periods are of order $2^{0.63n}$, while for rule 45, they are close to $2^n$ (for $n = 29$, for example, the period is 463,347,935, which is 86% of the maximum possible). For rule 110, the peaks seem to increase roughly like $n^3$.
 
 In a class 2 system with random initial conditions, a similar thing happens: since different parts of the system do not communicate with each other, they all behave like separate patterns of limited size. And in fact in most class 2 cellular automata these patterns are effectively only a few cells across, so that their repetition periods are necessarily quite short.
 
-#### **Randomness in Class 3 Systems**
+### Randomness in Class 3 Systems
 
 When one looks at class 3 systems the most obvious feature of their behavior is its apparent randomness. But where does this randomness ultimately come from? And is it perhaps all somehow just a reflection of randomness that was inserted in the initial conditions?
 
@@ -408,7 +402,7 @@ A couple of sections ago we saw that all class 3 systems have the property that 
 
 By intrinsically generating randomness such systems in a sense have a certain fundamental stability: for whatever is done to their initial conditions, they still give the same overall random behavior, with the same large-scale properties. And as we shall see in the next few chapters, there are in fact many systems in nature whose apparent stability is ultimately a consequence of just this kind of phenomenon.
 
-#### **Special Initial Conditions**
+### Special Initial Conditions
 
 We have seen that cellular automata such as rule 30 generate seemingly random behavior when they are started both from random initial conditions and from simple ones. So one may wonder whether there are in fact any initial conditions that make rule 30 behave in a simple way.
 
@@ -420,13 +414,13 @@ As a rather trivial example, one certainly knows that if its initial state is un
 
 ![](_page_281_Picture_8.jpeg)
 
-Examples of special initial conditions that make the rule 30 cellular automaton yield simple repetitive behavior. Small patches with the same structures as shown here can be seen
+![](_page_281_Rule_30_Strip.jpeg)
 
-embedded in typical random patterns produced by rule 30. At left is a representation of rule 30. Finding initial conditions that make cellular automata yield behavior with certain repetition periods is closely related to the problem of satisfying constraints discussed on page 210.
+Examples of special initial conditions that make the rule 30 cellular automaton yield simple repetitive behavior. Small patches with the same structures as shown here can be seen embedded in typical random patterns produced by rule 30. At left is a representation of rule 30. Finding initial conditions that make cellular automata yield behavior with certain repetition periods is closely related to the problem of satisfying constraints discussed on page 210.
 
 In fact, it turns out that in any cellular automaton it is inevitable that initial conditions which consist just of a fixed block of cells repeated forever will lead to simple repetitive behavior.
 
-For what happens is that each block in effect independently acts like a system of limited size. The right-hand neighbor of the rightmost cell in any particular block is the leftmost cell in the next block, but since all the blocks are identical, this cell always has the same color as the leftmost cell in the block itself. And as a result, the block evolves just like one of the systems of limited size that we discussed on page 255. So this means that given a block that is n cells wide, the repetition period that is obtained must be at most  $2^n$  steps.
+For what happens is that each block in effect independently acts like a system of limited size. The right-hand neighbor of the rightmost cell in any particular block is the leftmost cell in the next block, but since all the blocks are identical, this cell always has the same color as the leftmost cell in the block itself. And as a result, the block evolves just like one of the systems of limited size that we discussed on page 255. So this means that given a block that is $n$ cells wide, the repetition period that is obtained must be at most $2^n$ steps.
 
 But if one wants a short repetition period, then there is a question of whether there is a block of any size which can produce it. The pictures on the next page show the blocks that are needed to get repetition periods of up to ten steps in rule 30. It turns out that no block of any size gives a period of exactly two steps, but blocks can be found for all larger periods at least up to 15 steps.
 
@@ -438,7 +432,7 @@ But for many rules—including a fair number of class 3 ones—the situation is 
 
 ![](_page_282_Picture_7.jpeg)
 
-Rule 126 with a typical random initial condition, and with an initial condition that consists of a random sequence of the blocks and and Rule 126 in general shows class 3 behavior, as on the left. But with the special initial condition on the right it acts like a simple class 2 rule. Note the patches of class 2 behavior even in the picture on the left.
+Rule 126 with a typical random initial condition, and with an initial condition that consists of a random sequence of the blocks $\blacksquare\blacksquare\Box\Box$ and $\blacksquare\blacksquare\blacksquare\Box$. Rule 126 in general shows class 3 behavior, as on the left. But with the special initial condition on the right it acts like a simple class 2 rule. Note the patches of class 2 behavior even in the picture on the left.
 
 ![](_page_283_Picture_2.jpeg)
 
@@ -454,9 +448,9 @@ The pictures below show how this works: on alternate steps the arrangement of bl
 
 ![](_page_284_Figure_6.jpeg)
 
-Two examples of the fact that with special initial conditions rule 126 behaves exactly like rule 90. The initial conditions that are used consist of blocks of cells where each block contains either two black cells or two white cells. If one looks only on every other step, then the
+![](_page_284_Rule_126_Rule_90_Map.jpeg)
 
-blocks behave exactly like individual cells in rule 90. This correspondence is the basic reason that rule 126 produces the same kind of nested patterns as rule 90 when it is started from simple initial conditions.
+Two examples of the fact that with special initial conditions rule 126 behaves exactly like rule 90. The initial conditions that are used consist of blocks of cells where each block contains either two black cells or two white cells. If one looks only on every other step, then the blocks behave exactly like individual cells in rule 90. This correspondence is the basic reason that rule 126 produces the same kind of nested patterns as rule 90 when it is started from simple initial conditions.
 
 The point is that these initial conditions in effect contain only blocks for which rule 126 behaves like rule 90. And as a result, the overall patterns produced by rule 126 in this case are inevitably exactly like those produced by rule 90.
 
@@ -468,7 +462,7 @@ The basic reason can be thought of as being that just as other rules can emulate
 
 The picture below shows how this works. The idea is to consider the initial conditions not as a sequence of individual cells, but rather as a sequence of blocks each containing two adjacent cells. And with an appropriate form for these blocks what one finds is that the configuration of blocks evolves exactly according to rule 90.
 
-The fact that both individual cells and whole blocks of cells evolve according to the same rule then means that whatever pattern is
+The fact that both individual cells and whole blocks of cells evolve according to the same rule then means that whatever pattern is produced must have exactly the same structure whether it is looked at in terms of individual cells or in terms of blocks of cells. And this can be achieved in only two ways: either the pattern must be essentially uniform, or it must have a nested structure—just like we see in rule 90.
 
 ![](_page_285_Figure_7.jpeg)
 
@@ -477,8 +471,6 @@ The fact that both individual cells and whole blocks of cells evolve according t
 ![](_page_285_Picture_9.jpeg)
 
 A demonstration of the fact that in rule 90 blocks of cells can behave just like individual cells. One consequence of this is that the patterns produced by rule 90 have a nested or self-similar form.
-
-produced must have exactly the same structure whether it is looked at in terms of individual cells or in terms of blocks of cells. And this can be achieved in only two ways: either the pattern must be essentially uniform, or it must have a nested structure—just like we see in rule 90.
 
 So what happens with other rules? It turns out that the property of self-emulation is rather rare among cellular automaton rules. But one other example is rule 150—as illustrated in the picture below.
 
@@ -496,7 +488,7 @@ Ultimately, however, additive rules are not the only ones that can emulate thems
 
 ![](_page_286_Picture_9.jpeg)
 
-nie 184
+![](_page_286_Rule_184_Middle.jpeg)
 
 ![](_page_286_Picture_11.jpeg)
 
@@ -508,7 +500,9 @@ With most rules, including 90 and 150, such nested initial conditions typically 
 
 ![](_page_287_Picture_3.jpeg)
 
-The pattern produced by rule 184 (shown at left) evolving from a nested initial condition. The particular initial condition shown can be obtained by applying the substitution system  $\blacksquare \to \blacksquare \blacksquare$ ,  $\Box \to \blacksquare \blacksquare$ , starting from a single black element  $\blacksquare$  (see page 83). With this initial condition, rule 184 exhibits an equal number of black and white stripes, which annihilate in pairs so as to yield a regular nested pattern.
+![](_page_287_Rule_184_Strip.jpeg)
+
+The pattern produced by rule 184 (shown at left) evolving from a nested initial condition. The particular initial condition shown can be obtained by applying the substitution system $\blacksquare \to \blacksquare \Box \blacksquare$, $\Box \to \Box \Box \blacksquare$, starting from a single black element $\blacksquare$ (see page 83). With this initial condition, rule 184 exhibits an equal number of black and white stripes, which annihilate in pairs so as to yield a regular nested pattern.
 
 The nested structure seen in this pattern can then be viewed as a consequence of the fact that rule 184 is able to emulate itself. And the picture below shows that rule 184—unlike any of the additive rules—still produces recognizably nested patterns even when the initial conditions that are used are random.
 
@@ -522,7 +516,7 @@ As we will see on page 338 the presence of such patterns is particularly clear w
 
 Another example of a cellular automaton that produces a nested pattern even from random initial conditions. The particular rule shown involves next-nearest as well as nearest neighbors and has rule number 4067213884. As in rule 184, the nested behavior seen here is most obvious when the density of black and white cells in the initial conditions is equal.
 
-#### The Notion of Attractors
+### The Notion of Attractors
 
 In this chapter we have seen many examples of patterns that can be produced by starting from random initial conditions and then following the evolution of cellular automata for many steps.
 
@@ -552,25 +546,23 @@ In the pictures at the top of the facing page, the first network in each case re
 
 At step 2 in the rule 255 example on the facing page, however, the network has only one loop—representing the fact that at this step the only sequences which can occur with this rule are ones that consist purely of black cells, just as we saw on the previous page.
 
-The case of rule 4 is slightly more complicated: at step 2, the possible sequences that can occur are now represented by a network with two nodes. Starting at the right-hand node one can go around the loop to the right any number of times, corresponding to sequences of
+The case of rule 4 is slightly more complicated: at step 2, the possible sequences that can occur are now represented by a network with two nodes. Starting at the right-hand node one can go around the loop to the right any number of times, corresponding to sequences of any number of white cells. At any point one can follow the arrow to the left to get a black cell, but the form of the network implies that this black cell must always be followed by at least one white cell.
 
 ![](_page_292_Figure_2.jpeg)
 
 Networks representing possible sequences of black and white cells that can occur at successive steps in the evolution of the two cellular automata shown on the left. In each case the possible sequences correspond to possible paths through the network. Both rules start on step 1 from random initial conditions in which all sequences of black and white cells are allowed. On subsequent steps, rule 255 allows only sequences containing just black while rule 4 allows sequences that contain both black and white cells, but requires that every black cell be surrounded by white cells.
 
-any number of white cells. At any point one can follow the arrow to the left to get a black cell, but the form of the network implies that this black cell must always be followed by at least one white cell.
-
 The pictures on the next page show more examples of class 1 and 2 cellular automata. Unlike in the picture above, these rules do not reach their final states after one step, but instead just progressively evolve towards these states. And in the course of this evolution, the set of sequences that can occur becomes progressively smaller.
 
-In rule 128, for example, the fact that regions of black shrink by one cell on each side at each step means that any region of black that exists after t steps must have at least t white cells on either side of it.
+In rule 128, for example, the fact that regions of black shrink by one cell on each side at each step means that any region of black that exists after $t$ steps must have at least $t$ white cells on either side of it.
 
 The networks shown on the next page capture all effects like this. And to do this we see that on successive steps they become somewhat more complicated. But at least for these class 1 and 2 examples, the progression of networks always continues to have a fairly simple form.
 
 ![](_page_293_Picture_1.jpeg)
 
-Networks representing possible sequences of black and white cells that can occur at successive steps in the evolution of several class 1 and 2 cellular automata. These networks never have more than about  $t^2$  nodes after t steps.
+Networks representing possible sequences of black and white cells that can occur at successive steps in the evolution of several class 1 and 2 cellular automata. These networks never have more than about $t^2$ nodes after $t$ steps.
 
-So what happens with class 3 and 4 systems? The pictures on the facing page show a couple of examples. In rule 126, the only effect at step 2 is that black cells can no longer appear on their own: they must always be in groups of two or more. By step 3, it becomes difficult to see any change if one just looks at an explicit picture of the cellular automaton evolution. But from the network, one finds that now an infinite collection of other blocks are forbidden, beginning with the length 12 block —————. And on later steps, the set of sequences that are allowed rapidly becomes more complicated—as reflected in a rapid increase in the complexity of the corresponding networks.
+So what happens with class 3 and 4 systems? The pictures on the facing page show a couple of examples. In rule 126, the only effect at step 2 is that black cells can no longer appear on their own: they must always be in groups of two or more. By step 3, it becomes difficult to see any change if one just looks at an explicit picture of the cellular automaton evolution. But from the network, one finds that now an infinite collection of other blocks are forbidden, beginning with the length 12 block $\Box\blacksquare\blacksquare\blacksquare\Box\blacksquare\blacksquare\Box\blacksquare\blacksquare\blacksquare\Box$. And on later steps, the set of sequences that are allowed rapidly becomes more complicated—as reflected in a rapid increase in the complexity of the corresponding networks.
 
 ![](_page_294_Figure_2.jpeg)
 
@@ -594,7 +586,7 @@ And indeed if one starts with almost any other initial conditions—say for exam
 
 Networks representing possible sequences that can occur in the evolution of the cellular automata at the top of the page, starting from initial conditions in which black cells are only allowed to appear in pairs.
 
-#### Structures in Class 4 Systems
+### Structures in Class 4 Systems
 
 The next page shows three typical examples of class 4 cellular automata. In each case the initial conditions that are used are completely random. But after just a few steps, the systems organize themselves to the point where definite structures become visible.
 
@@ -614,15 +606,15 @@ But going on to initial condition 195, we again find a more complicated structur
 
 ![](_page_297_Picture_2.jpeg)
 
-2 colors, next-nearest neighbors, code 20
+*2 colors, next-nearest neighbors, code 20*
 
 ![](_page_297_Picture_4.jpeg)
 
-3 colors, nearest neighbors, code 357
+*3 colors, nearest neighbors, code 357*
 
 ![](_page_297_Picture_6.jpeg)
 
-3 colors, nearest neighbors, code 1329
+*3 colors, nearest neighbors, code 1329*
 
 Three typical examples of class 4 cellular automata. In each case various kinds of persistent structures are seen.
 
@@ -670,8 +662,6 @@ But when initial condition 54,889 is reached, one suddenly sees the rather diffe
 
 Unbounded growth in code 1329. The initial condition contains a block of 10 cells. The right-hand side of the pattern repeats every 256 steps, and as it moves it leaves behind an infinite sequence of persistent structures.
 
-initial condition number 54,889
-
 Yet looking at the picture above, one might suppose that when unlimited growth occurs, the pattern produced must be fairly complicated. But once again code 1329 has a surprise in store. For the facing page shows that when one reaches initial condition 97,439 there is again unlimited growth—but now the pattern that is produced is very simple. And in fact if one were just to see this pattern, one would probably assume that it came from a rule whose typical behavior is vastly simpler than code 1329.
 
 ![](_page_304_Picture_2.jpeg)
@@ -716,5 +706,5 @@ Collisions between structures (e) and (o) from page 292.
 
 ![](_page_311_Picture_1.jpeg)
 
-A collision between structures (I) and (i) from page 292. It takes more than 4000 steps for the final outcome involving 8 separate structures to become clear. The height of the picture corresponds to 2000 steps, and the third picture ends at step 4300.
+A collision between structures (l) and (i) from page 292. It takes more than 4000 steps for the final outcome involving 8 separate structures to become clear. The height of the picture corresponds to 2000 steps, and the third picture ends at step 4300.
 
