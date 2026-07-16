@@ -84,10 +84,10 @@ class ChapterTenTests(unittest.TestCase):
         self.assertEqual(build.sha256(raw_segment), self.document["raw_segment_sha256"])
 
         relevant = [row for row in self.corrections if row["document_id"] == "CH10"]
-        self.assertEqual(len(relevant), 85)
+        self.assertEqual(len(relevant), 90)
         self.assertEqual(
             [row["id"] for row in relevant],
-            [f"G5-C-{number:04d}" for number in range(577, 662)],
+            [f"G5-C-{number:04d}" for number in range(577, 667)],
         )
         self.assertTrue(all(row["expected_count"] == 1 for row in relevant))
         self.assertTrue(
@@ -104,11 +104,11 @@ class ChapterTenTests(unittest.TestCase):
                 < self.document["raw_end_byte_exclusive"]
             )
 
-        self.assertEqual(len(self.rendered_bytes), 164435)
-        self.assertEqual(len(self.rendered.splitlines()), 1012)
+        self.assertEqual(len(self.rendered_bytes), 164487)
+        self.assertEqual(len(self.rendered.splitlines()), 1014)
         self.assertEqual(
             build.sha256(self.rendered_bytes),
-            "349b6a70066f2e690fbf81fdfad977e150b497b1de6709ffdcf9129478038e59",
+            "82217582690509ef97acd14ca12f0f9680e380ce6a1d8f8a0373e569114b2bc3",
         )
         self.assertEqual(
             validate.independent_document_bytes(
@@ -195,6 +195,8 @@ class ChapterTenTests(unittest.TestCase):
         )
         self.assertEqual(self.rendered.count("<sup>◀</sup>"), 1)
         self.assertNotIn("<sup>♠</sup>", self.rendered)
+        self.assertEqual(self.rendered.count(r"basic $2 \times 2$ patterns."), 1)
+        self.assertEqual(self.rendered.count("*Mathematica*"), 8)
 
     def test_interrupted_prose_and_figure_caption_order_are_exact(self) -> None:
         self.assert_order(
@@ -214,6 +216,11 @@ class ChapterTenTests(unittest.TestCase):
             "![](_page_614_Vigenere_Example.jpeg)",
             "A simple example of an encryption system in which the encrypting "
             "sequence is obtained by repetitively cycling",
+        )
+        self.assert_order(
+            "![](_page_609_Block_Frequency_Panels.jpeg)",
+            "![](_page_609_Picture_2.jpeg)",
+            "Statistics of block frequencies for various sequences.",
         )
         self.assert_order(
             "![](_page_617_Figure_3.jpeg)",
@@ -378,6 +385,12 @@ class ChapterTenTests(unittest.TestCase):
                 "pdf:0620",
                 "28e76e04fc4c770acf5127d3285495a922d784c7496f43acb596a22d6dd27ba2",
             ),
+            651: (
+                "595607b756b6da817693d3877ded069f8b63a2b9c071ed6d367f88b40492ab46",
+                (384, 223),
+                "pdf:0632",
+                "65db6af5782c94809fbb107fb95baadfb5b56f70a2436b028a1d739e8beaa12b",
+            ),
         }
         repaired = [
             row for row in chapter_images if "repaired_asset_relative_path" in row
@@ -466,6 +479,12 @@ class ChapterTenTests(unittest.TestCase):
                 (660, 510),
                 "pdf:0633",
             ),
+            "G5-A-0033": (
+                "_page_609_Block_Frequency_Panels.jpeg",
+                "2eae3f22577a012d78ff23500d0909dbda9f9bb1f7488794c57fa9450ccfd5f4",
+                (1200, 576),
+                "pdf:0610",
+            ),
         }
         chapter_added = [
             row for row in self.added_assets if row["document_id"] == "CH10"
@@ -497,7 +516,9 @@ class ChapterTenTests(unittest.TestCase):
             [added_names["G5-A-0023"]]
             + [mapped_names[number] for number in range(590, 611)]
             + [added_names["G5-A-0024"]]
-            + [mapped_names[number] for number in range(611, 634)]
+            + [mapped_names[number] for number in range(611, 631)]
+            + [added_names["G5-A-0033"]]
+            + [mapped_names[number] for number in range(631, 634)]
             + [added_names["G5-A-0025"]]
             + [mapped_names[number] for number in range(634, 642)]
             + [added_names["G5-A-0026"]]
@@ -516,8 +537,8 @@ class ChapterTenTests(unittest.TestCase):
             + [mapped_names[number] for number in range(654, 657)]
         )
         references = re.findall(r"!\[\]\(([^)]+\.jpeg)\)", self.rendered)
-        self.assertEqual(len(references), 77)
-        self.assertEqual(len(set(references)), 77)
+        self.assertEqual(len(references), 78)
+        self.assertEqual(len(set(references)), 78)
         self.assertEqual(references, expected_references)
 
         unchanged = {
@@ -526,7 +547,6 @@ class ChapterTenTests(unittest.TestCase):
             644: "6b32debc0a3ae9ce898ac103f882137cce41c2ad91330e6dc92a6cc21849c618",
             645: "46077b731213938dc4838ff79baf87410e6ef521e586b77f99596300f7b61a1b",
             650: "9f0c1bf2f9af5226d6d4170e5a03f31301c1119061f659fe7944f2d83abd7278",
-            651: "65db6af5782c94809fbb107fb95baadfb5b56f70a2436b028a1d739e8beaa12b",
             652: "88a349a5e7ef6afcf39c84337bd40cc6e00844b4758ce394c7a40a6b19ce19f7",
             653: "66252aab9bcbced1f65ed65a7625858f5e6ad71d4fa1548bf648f57988ba0ea9",
         }
@@ -567,6 +587,11 @@ class ChapterTenTests(unittest.TestCase):
             "| 0 0 | 0 1 | 0 2 |",
             "818283 + 818485",
             "black cells. And at the bottom are the\n\nof\n\nthese",
+            r"basic  $2 \times 2$  patterns.",
+            "in designing Mathematica",
+            "single Mathematica pattern",
+            "success of Mathematica",
+            "language—like Mathematica—that",
         )
         for residue in raw_only:
             with self.subTest(raw_residue=residue):
