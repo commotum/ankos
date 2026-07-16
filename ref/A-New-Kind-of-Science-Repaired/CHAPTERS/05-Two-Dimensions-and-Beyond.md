@@ -458,7 +458,7 @@ As a first example of a two-dimensional system, consider an array of black and w
 
 ![](_page_226_Picture_9.jpeg)
 
-A system consisting of a grid of black and white cells defined by the constraint that every black cell should have exactly one black neighbor among its four neighbors, and every white cell should have exactly two white neighbors. The infinite repetitive pattern shown here, together with its rotations and reflections, is the only one that satisfies this constraint. (The picture is assumed to wrap around at each edge.) The pattern can be viewed as a tessellation of $5 	imes 5$ blocks of cells.
+A system consisting of a grid of black and white cells defined by the constraint that every black cell should have exactly one black neighbor among its four neighbors, and every white cell should have exactly two white neighbors. The infinite repetitive pattern shown here, together with its rotations and reflections, is the only one that satisfies this constraint. (The picture is assumed to wrap around at each edge.) The pattern can be viewed as a tessellation of $5 \times 5$ blocks of cells.
 
 As in one dimension, knowing the constraint does not immediately provide a procedure for finding a pattern which satisfies it.
 
@@ -476,7 +476,7 @@ So what about more complicated constraints? The pictures below show examples bas
 
 ![](_page_228_Figure_5.jpeg)
 
-Systems specified by the constraint that the local arrangement of colors around every cell must match the fixed set of possible templates shown. Note that these templates apply to every cell, with templates of neighboring cells overlapping. Pattern (a) can be viewed as formed from a tessellation of $5 	imes 10$ blocks of cells; pattern (b) from a tessellation of $24 	imes 24$ blocks. With the numbering scheme for constraints used on the next two pages the cases shown here correspond to 1384774 and 328778790.
+Systems specified by the constraint that the local arrangement of colors around every cell must match the fixed set of possible templates shown. Note that these templates apply to every cell, with templates of neighboring cells overlapping. Pattern (a) can be viewed as formed from a tessellation of $5 \times 10$ blocks of cells; pattern (b) from a tessellation of $24 \times 24$ blocks. With the numbering scheme for constraints used on the next two pages the cases shown here correspond to 1384774 and 328778790.
 
 There are a total of 4,294,967,296 possible sets of such templates. And of these, 766,979,044 lead to constraints that cannot be satisfied by any pattern. But among the 3,527,988,252 that remain, it turns out that every single one can be satisfied by a simple repetitive pattern. In fact the number of different repetitive patterns that are ever needed is quite small: if a particular constraint can be satisfied by any pattern, then one of the set of 171 repetitive patterns on the next two pages is always sufficient.
 
