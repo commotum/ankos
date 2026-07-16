@@ -14,11 +14,11 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-EXPECTED_SHA256 = "24a49cf980ad8b5593c129fe4ed1978d79601c41099669aadbcb089d61084c9e"
-EXPECTED_BYTES = 86_697
+EXPECTED_SHA256 = "8eab0420ff8fbe512d7731c6539742bf0c16bf28dab4ff27fec7dee2ae8f43b0"
+EXPECTED_BYTES = 86_695
 EXPECTED_LINES = 915
 EXPECTED_CORRECTIONS_SHA256 = (
-    "52fcb1e5dca388ebb51e1b15ecf7d974708d626db8ae2947f76715e84c50a4df"
+    "5fa24c7dc5d91a26a9bce9b05446dc95194272695560ca641932241c28ce70cf"
 )
 EXPECTED_IMAGE_ROWS_SHA256 = (
     "510f87b2b07ded726f7385454daec5042d4fa4eff36a565bc58acf0c9ef186bc"
@@ -435,6 +435,8 @@ class NotesForChapter2Tests(unittest.TestCase):
         )
         self.assertEqual(self.rendered.count("Some examples include:\n"), 1)
         self.assertNotIn("**Some examples include:**", self.rendered)
+        self.assertEqual(self.rendered.count("Science Citation Index"), 1)
+        self.assertNotIn("*Science Citation Index*", self.rendered)
 
         for source_style in (
             "into *n* - 2 of the *n* array elements",
