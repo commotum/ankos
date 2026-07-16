@@ -382,12 +382,18 @@ Neither file is a generalized workflow database.
   zero-correction validation, two fresh deterministic builds, legacy digest,
   and scope gates pass. The final Markdown SHA-256 is
   `5e794cedc877e539e30d9ef6102fea18f4533c56d3324f7d454326336e4a2004`.
-- Stage 5 is activated over `CH09`–`CH12`: PDF pages 449–864, printed pages
+- Stage 5 is in progress over `CH09`–`CH12`: PDF pages 449–864, printed pages
   433–848, raw lines 5,164–10,622, bytes `[728322,1540232)`, and mapped
-  ordinals 480–822. The 416-page immutable raw interval hashes to
-  `04b5e3ecfa1c2b8fa09e09d39d78f887e07cc92f1fb5ef059d5c056d593cfb2a`.
-  `CH09` is next at `pdf:0449`, raw line 5,164, byte 728322, and image-map
-  ordinal 480; its coverage remains `NO/NO` until complete sequential review.
+  ordinals 480–822. `CH09` is complete at `YES/YES` after forward first and
+  fresh source, technical, and visual final-output passes over all 114 PDF
+  pages 449–562. Its 77 guarded corrections are `G5-C-0500`–`G5-C-0576`;
+  all 113 final JPEG references and the live rule-94 swatch close with zero
+  discrepancy or ambiguity. One mapped override and additions `G5-A-0020`–
+  `G5-A-0022` repair the PDF-493 and PDF-527 omissions. The final Markdown
+  SHA-256 is
+  `c4786895ea852253233767f683f69ffce0f6e5576e948e4bbe3bf33c26cbc66c`.
+  `CH10` is next at `pdf:0563`, raw line 6,586, byte 932355, and image-map
+  ordinal 590; its coverage remains `NO/NO` until complete sequential review.
 
 ## Stage Status
 
