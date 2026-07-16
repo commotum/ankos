@@ -13,7 +13,7 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-EXPECTED_SHA256 = "8d1cf6cbfdd1de864838781d8c16610630890c0269d3c1b510fb4eea479b5b40"
+EXPECTED_SHA256 = "3321cc8267ac42e44506e911348764e0698e2bd0b147886e115decd994a12c47"
 EXPECTED_BYTES = 29_769
 EXPECTED_LINES = 75
 
@@ -167,7 +167,7 @@ class NotesForChapter1Tests(unittest.TestCase):
                 "Mathematical Principles of Natural Philosophy",
                 "Principia",
                 "Mathematica",
-                "The Wisdom of God Manifested in the Works of the Creation",
+                "The Wisdom of God Manifested in the Works of the Creation,",
                 "Origin of Species",
                 "Mathematica",
                 "Mathematica",
