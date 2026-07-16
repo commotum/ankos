@@ -370,16 +370,18 @@ Neither file is a generalized workflow database.
   byte-identical, and the complete 171-test repository suite plus 171 subtests
   passes. The final Markdown SHA-256 is
   `e052f275ea7519f2e8c270f1dd68eac01d123aa3b73355eff5803f02708e542d`.
-- `CH08` has completed and integrated independent first-pass source, technical,
-  and visual traversals over all 70 PDF pages 379–448, raw lines 4,336–5,163,
-  bytes `[601461,728322)`, all 43 mapped ordinals 437–479, and all 45 printed
-  visual units. The reconciled packet adds 47 guarded corrections
-  `G5-C-0453`–`G5-C-0499`, nine mapped repairs at ordinals 444, 446–450, 452,
-  453, and 468, plus source additions `G5-A-0018` and `G5-A-0019`. The rebuilt
-  chapter is 126,417 bytes and 770 lines with SHA-256
-  `5e794cedc877e539e30d9ef6102fea18f4533c56d3324f7d454326336e4a2004`;
-  build and validation pass. Coverage remains explicitly `NO/NO` because no
-  fresh final-output source, technical, or visual second pass is complete.
+- `CH08` is complete at `YES/YES` after independent source, technical, and
+  visual first passes, integration, and fresh independent source, technical,
+  and visual closing passes over all 70 PDF pages 379–448. Its 47 guarded
+  corrections are `G5-C-0453`–`G5-C-0499`; nine mapped overrides repair
+  ordinals 444, 446–450, 452, 453, and 468, and additions `G5-A-0018` and
+  `G5-A-0019` restore two omitted flow panels. All three final ledgers close
+  with zero discrepancy or ambiguity across the final 770-line Markdown and
+  all 45 live references. The focused six-test CH08 suite, 75-test Goal 5
+  suite, complete 177-test repository suite, rendering, default and strict
+  zero-correction validation, two fresh deterministic builds, legacy digest,
+  and scope gates pass. The final Markdown SHA-256 is
+  `5e794cedc877e539e30d9ef6102fea18f4533c56d3324f7d454326336e4a2004`.
 
 ## Stage Status
 
