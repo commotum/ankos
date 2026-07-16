@@ -217,8 +217,8 @@ def validate_output(
         )
         if not path.is_file() or build.sha256(path.read_bytes()) != expected_hash:
             raise build.BuildError(f"missing or changed output image: {relative}")
-        if zero_corrections or row.get("reference_disposition") != (
-            build.OMITTED_REFERENCE_DISPOSITION
+        if zero_corrections or row.get("reference_disposition") not in (
+            build.OMITTED_REFERENCE_DISPOSITIONS
         ):
             expected_references.append((str(row["document_id"]), source.name))
 

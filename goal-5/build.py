@@ -44,6 +44,15 @@ REFERENCE_DISPOSITION_FIELDS = {
 OMITTED_REFERENCE_DISPOSITION = (
     "SOURCE_FALSE_POSITIVE_RASTERIZED_TEXT_OMITTED"
 )
+REDUNDANT_REFERENCE_DISPOSITION = (
+    "SOURCE_REDUNDANT_PARTIAL_CROP_REPLACED_OMITTED"
+)
+OMITTED_REFERENCE_DISPOSITIONS = frozenset(
+    {
+        OMITTED_REFERENCE_DISPOSITION,
+        REDUNDANT_REFERENCE_DISPOSITION,
+    }
+)
 ADDED_ASSET_FIELDS = {
     "id",
     "document_id",
@@ -495,7 +504,7 @@ def validate_images(
                 f"image {ordinal}: incomplete reference disposition fields {missing}"
             )
         if disposition_fields:
-            if row["reference_disposition"] != OMITTED_REFERENCE_DISPOSITION:
+            if row["reference_disposition"] not in OMITTED_REFERENCE_DISPOSITIONS:
                 raise BuildError(
                     f"image {ordinal}: unsupported reference disposition"
                 )
