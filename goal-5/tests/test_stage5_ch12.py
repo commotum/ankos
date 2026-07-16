@@ -208,6 +208,17 @@ class ChapterTwelveTests(unittest.TestCase):
             self.rendered_bytes,
         )
 
+    def test_two_pass_coverage_is_closed(self) -> None:
+        rows = validate.validate_coverage(self.documents)
+        row = next(item for item in rows if item["document_id"] == "CH12")
+        self.assertEqual(
+            (row["first_pass"], row["second_pass"], row["reviewer_type"]),
+            ("YES", "YES", "agent"),
+        )
+        self.assertIn("131 guarded corrections", row["notes"])
+        self.assertIn("66 unique image references", row["notes"])
+        self.assertIn("all closing passes restarted", row["notes"])
+
     def test_heading_hierarchy_and_high_risk_source_text_are_exact(self) -> None:
         self.assertTrue(
             self.rendered.startswith(
