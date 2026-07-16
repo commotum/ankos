@@ -649,6 +649,20 @@ class NotesForChapter3Tests(unittest.TestCase):
         ]
         self.assertEqual(sequential_positions, sorted(sequential_positions))
 
+    def test_two_pass_coverage_is_closed(self) -> None:
+        rows = validate.validate_coverage(self.documents)
+        row = next(item for item in rows if item["document_id"] == "N03")
+        self.assertEqual(
+            (row["first_pass"], row["second_pass"], row["reviewer_type"]),
+            ("YES", "YES", "agent"),
+        )
+        self.assertIn("25 guarded corrections", row["notes"])
+        self.assertIn("one source-false-positive", row["notes"])
+        self.assertIn("4 repaired-only overrides", row["notes"])
+        self.assertIn(
+            "zero discrepancy ambiguity or source omission", row["notes"]
+        )
+
     def test_closure_inventory_and_n04_handoff_are_exact(self) -> None:
         references = re.findall(
             r"!\[([^\]]*)\]\(([^)\s]+\.jpeg)\)", self.rendered
