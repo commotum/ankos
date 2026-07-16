@@ -386,10 +386,16 @@ class ChapterTenTests(unittest.TestCase):
                 "28e76e04fc4c770acf5127d3285495a922d784c7496f43acb596a22d6dd27ba2",
             ),
             651: (
-                "595607b756b6da817693d3877ded069f8b63a2b9c071ed6d367f88b40492ab46",
-                (384, 223),
+                "a6af8c6071e287d15f7257daa089ffa9321cd09e27ae4661c7f8554c20abfe7f",
+                (500, 314),
                 "pdf:0632",
                 "65db6af5782c94809fbb107fb95baadfb5b56f70a2436b028a1d739e8beaa12b",
+            ),
+            652: (
+                "d24ce5cc45a9a4e5693af17dda0a19eb8e03a2fd5dcf372c8a79a94e157a9024",
+                (500, 312),
+                "pdf:0632",
+                "88a349a5e7ef6afcf39c84337bd40cc6e00844b4758ce394c7a40a6b19ce19f7",
             ),
         }
         repaired = [
@@ -547,7 +553,6 @@ class ChapterTenTests(unittest.TestCase):
             644: "6b32debc0a3ae9ce898ac103f882137cce41c2ad91330e6dc92a6cc21849c618",
             645: "46077b731213938dc4838ff79baf87410e6ef521e586b77f99596300f7b61a1b",
             650: "9f0c1bf2f9af5226d6d4170e5a03f31301c1119061f659fe7944f2d83abd7278",
-            652: "88a349a5e7ef6afcf39c84337bd40cc6e00844b4758ce394c7a40a6b19ce19f7",
             653: "66252aab9bcbced1f65ed65a7625858f5e6ad71d4fa1548bf648f57988ba0ea9",
         }
         for ordinal, expected_hash in unchanged.items():
