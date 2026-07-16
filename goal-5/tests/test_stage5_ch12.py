@@ -42,13 +42,13 @@ EXPECTED_ADDED = {
         "pdf:0823",
     ),
     "_page_832_Basic_Logic_Theorems.jpeg": (
-        "08983a421e1235234626dc9175c6a973056393f0f92d9fc68626cb8e6f1c7975",
-        (2473, 2525),
+        "8c4d5651f14315396a09a6f42d020c2a0c0e1c6f615832767ebe44a65169925d",
+        (2473, 2596),
         "pdf:0833",
     ),
     "_page_833_NAND_Theorems.jpeg": (
-        "2a42adbd6d54c3bd2740b49214c26f7984ec852f5821dc6760ec4f52bddeaae6",
-        (2316, 1270),
+        "267d9c604506975610cbd16bb6b86229473653355bbe0b4365aaa0df435b2837",
+        (2316, 1340),
         "pdf:0834",
     ),
     "_page_846_Picture_13.jpeg": (
