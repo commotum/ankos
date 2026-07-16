@@ -2,8 +2,8 @@
 
 There is no open Foundation source blocker or author-text ambiguity. Content
 review discrepancies are added here only when source comparison cannot resolve
-them; all fifteen documents through General Notes closed without an unresolved
-item.
+them; all sixteen documents through Notes for Chapter 1 closed without an
+unresolved item.
 
 ## FOUNDATION-SOURCE-001 — complete authoritative source
 
