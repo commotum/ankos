@@ -14,11 +14,11 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-EXPECTED_SHA256 = "309c7cea106016e6b2fac9fcc0862142906a5a92554fd66f6b69fa54dc1be19e"
-EXPECTED_BYTES = 86_603
+EXPECTED_SHA256 = "24a49cf980ad8b5593c129fe4ed1978d79601c41099669aadbcb089d61084c9e"
+EXPECTED_BYTES = 86_697
 EXPECTED_LINES = 915
 EXPECTED_CORRECTIONS_SHA256 = (
-    "9125123a12241a8da65f07e3214c4d7c3dfd272c5d64bde00078c949134a934c"
+    "52fcb1e5dca388ebb51e1b15ecf7d974708d626db8ae2947f76715e84c50a4df"
 )
 EXPECTED_IMAGE_ROWS_SHA256 = (
     "510f87b2b07ded726f7385454daec5042d4fa4eff36a565bc58acf0c9ef186bc"
@@ -175,25 +175,24 @@ class NotesForChapter2Tests(unittest.TestCase):
             build.sha256(segment), self.document["raw_segment_sha256"]
         )
 
-        self.assertEqual(len(self.n02_corrections), 41)
+        self.assertEqual(len(self.n02_corrections), 43)
         self.assertEqual(
             [row["id"] for row in self.n02_corrections],
-            [f"G5-C-{number:04d}" for number in range(906, 947)],
+            [f"G5-C-{number:04d}" for number in range(906, 949)],
         )
         self.assertEqual(
             self.rows_sha256(self.n02_corrections),
             EXPECTED_CORRECTIONS_SHA256,
         )
         self.assertEqual(
-            [row["raw_start_byte"] for row in self.n02_corrections],
-            sorted(row["raw_start_byte"] for row in self.n02_corrections),
-        )
-        self.assertEqual(
-            len({row["before"] for row in self.n02_corrections}), 41
+            len({row["before"] for row in self.n02_corrections}), 43
         )
 
         previous_end = self.document["raw_start_byte"]
-        for row in self.n02_corrections:
+        ordered_corrections = sorted(
+            self.n02_corrections, key=lambda row: row["raw_start_byte"]
+        )
+        for row in ordered_corrections:
             with self.subTest(correction=row["id"]):
                 self.assertEqual(
                     set(row), build.CORRECTION_FIELDS | {"raw_line"}
@@ -408,6 +407,46 @@ class NotesForChapter2Tests(unittest.TestCase):
         )
         self.assertEqual(self.rendered.count(inline_sentence), 1)
         self.assertNotIn("single ■ in a background of ▥ blocks", self.rendered)
+
+    def test_source_emphasis_and_math_variable_styles_are_exact(self) -> None:
+        bold_italic_leads = (
+            "Complete pattern.",
+            "Center column.",
+            "Architecture.",
+            "Textile making.",
+            "Rope.",
+            "Knots and string figures.",
+            "Paperfolding.",
+            "Mathematics.",
+            "Logic.",
+            "Grammar.",
+            "Poetry.",
+            "Music.",
+            "Military drill.",
+            "Games.",
+            "Puzzles.",
+            "Cryptography.",
+            "Maze designs.",
+            "Rule-based pictures.",
+        )
+        self.assertEqual(
+            re.findall(r"(?m)^\*\*\*(.+?\.)\*\*\*", self.rendered),
+            list(bold_italic_leads),
+        )
+        self.assertEqual(self.rendered.count("Some examples include:\n"), 1)
+        self.assertNotIn("**Some examples include:**", self.rendered)
+
+        for source_style in (
+            "into *n* - 2 of the *n* array elements",
+            "popularization in *Scientific American* by Martin Gardner",
+            "code 20 *k* = 2, *r* = 2 totalistic rule",
+            "The 3 *n* + 1 problem",
+            "all the *k* = 2, *r* = 1 cellular automata",
+            "rule 110 and *k* = 2, *r* = 2 totalistic code 10",
+            "occur in *k* = 2, *r* = 2 totalistic rules",
+        ):
+            with self.subTest(source_style=source_style):
+                self.assertEqual(self.rendered.count(source_style), 1)
 
     def test_technical_repairs_and_visible_source_forms_are_exact(self) -> None:
         exact_once = (
