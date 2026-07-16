@@ -280,9 +280,9 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions (35 using source-backed
-  repaired-only overrides), 17 source-added images, and generated
-  README/Contents files. It now includes 452 guarded source-verified
+  documents, 1,444 mapped image positions (44 using source-backed
+  repaired-only overrides), 19 source-added images, and generated
+  README/Contents files. It now includes 499 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -370,11 +370,16 @@ Neither file is a generalized workflow database.
   byte-identical, and the complete 171-test repository suite plus 171 subtests
   passes. The final Markdown SHA-256 is
   `e052f275ea7519f2e8c270f1dd68eac01d123aa3b73355eff5803f02708e542d`.
-- `CH08` first-pass source, technical, and visual traversals have started at
-  PDF 379. They cover all 70 pages through PDF 448, raw lines 4,336–5,163,
-  bytes `[601461,728322)`, and mapped ordinals 437–479; no coverage claim will
-  be made until their findings are reconciled and a separate final-output
-  second pass closes cleanly.
+- `CH08` has completed and integrated independent first-pass source, technical,
+  and visual traversals over all 70 PDF pages 379–448, raw lines 4,336–5,163,
+  bytes `[601461,728322)`, all 43 mapped ordinals 437–479, and all 45 printed
+  visual units. The reconciled packet adds 47 guarded corrections
+  `G5-C-0453`–`G5-C-0499`, nine mapped repairs at ordinals 444, 446–450, 452,
+  453, and 468, plus source additions `G5-A-0018` and `G5-A-0019`. The rebuilt
+  chapter is 126,417 bytes and 770 lines with SHA-256
+  `5e794cedc877e539e30d9ef6102fea18f4533c56d3324f7d454326336e4a2004`;
+  build and validation pass. Coverage remains explicitly `NO/NO` because no
+  fresh final-output source, technical, or visual second pass is complete.
 
 ## Stage Status
 
