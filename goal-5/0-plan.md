@@ -358,15 +358,18 @@ Neither file is a generalized workflow database.
   builds, the cumulative 62-test Goal 5 suite, the complete 164-test repository
   suite with 135 subtests, and legacy checks pass. The final Markdown SHA-256
   is `0eb4ebc5400c3e3ed39fb2dd8fd9c38a2977eaef1ffefb528fd4c2708a42dca5`.
-- `CH07` has completed its forward source, technical, and visual passes over
-  all 66 PDF pages 313–378 and all 92 mapped references. Its 53 guarded
-  corrections are `G5-C-0400`–`G5-C-0452`; 12 source-backed mapped overrides
-  repair incomplete or contaminated figures, and no source-added asset was
-  required. Focused rendering, detectors, validation, and the cumulative
-  69-test Goal 5 suite pass. Three fresh independent closing audits are in
-  progress against final Markdown SHA-256
-  `e052f275ea7519f2e8c270f1dd68eac01d123aa3b73355eff5803f02708e542d`;
-  coverage remains `NO/NO` until all three complete cleanly.
+- `CH07` is complete at `YES/YES` after a forward pass and fresh independent
+  source, technical, and visual closing passes over all 66 PDF pages 313–378
+  and all 92 accounting references. Its 53 guarded corrections are
+  `G5-C-0400`–`G5-C-0452`; 12 source-backed mapped overrides repair incomplete
+  or contaminated figures, and no source-added asset was required. The final
+  closing visual traversal caught and repaired two truncated class-1 rule
+  strips before restarting cleanly. All three final ledgers close with zero
+  discrepancy or ambiguity. Default and zero-correction validation both pass
+  with nine closed second-pass documents; two fresh normal builds are
+  byte-identical, and the complete 171-test repository suite plus 171 subtests
+  passes. The final Markdown SHA-256 is
+  `e052f275ea7519f2e8c270f1dd68eac01d123aa3b73355eff5803f02708e542d`.
 
 ## Stage Status
 
