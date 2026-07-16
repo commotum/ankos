@@ -2,7 +2,7 @@
 
 ## Mechanisms in Programs and Nature
 
-#### Universality of Behavior
+### Universality of Behavior
 
 In the past several chapters my main purpose has been to address the fundamental question of how simple programs behave. In this chapter my purpose is now to take what we have learned and begin applying it to the study of actual phenomena in nature.
 
@@ -32,7 +32,7 @@ Some of the phenomena I discuss have at least to some extent already been analyz
 
 And more important, many of the phenomena that I consider—particularly those that involve significant complexity—have never been satisfactorily explained in the context of traditional science. But what we will find in this chapter is that by making use of my discoveries about simple programs a great many of these phenomena can now for the first time successfully be explained.
 
-#### Three Mechanisms for Randomness
+### Three Mechanisms for Randomness
 
 In nature one of the single most common things one sees is apparent randomness. And indeed, there are a great many different kinds of systems that all exhibit randomness. And it could be that in each case the cause of randomness is different. But from my investigations of simple programs I have come to the conclusion that one can in fact identify just three basic mechanisms for randomness, as illustrated in the pictures below.
 
@@ -68,7 +68,7 @@ But that is not to say that the other two mechanisms are never relevant in pract
 
 And in the next few sections, I will discuss various kinds of systems where the randomness that is seen can be best described by each of the three mechanisms for randomness identified here.
 
-#### Randomness from the Environment
+### Randomness from the Environment
 
 With the first mechanism for randomness discussed in the previous section, the randomness of any particular system is taken to be the result of continual interaction between that system and randomness in its environment.
 
@@ -76,9 +76,7 @@ As an everyday example, we can consider a boat bobbing up and down on a rough oc
 
 But what is the real origin of this apparent randomness? In a sense it is that there are innumerable details about an ocean that it is very difficult to know, but which can nevertheless affect the motion of the boat. Thus, for example, a particular wave that hits the boat could be the result of a nearby squall, of an undersea ridge, or perhaps even of a storm that happened the day before several hundred miles away. But since one realistically cannot keep track of all these things, the ocean will inevitably seem in many respects unpredictable and random.
 
-This same basic effect can be even more pronounced when one looks at smaller-scale systems. A classic example is so-called Brownian
-
-motion, in which one takes a small grain, say of pollen, puts it in a liquid, and then looks at its motion under a microscope.
+This same basic effect can be even more pronounced when one looks at smaller-scale systems. A classic example is so-called Brownian motion, in which one takes a small grain, say of pollen, puts it in a liquid, and then looks at its motion under a microscope.
 
 What one finds is that the grain jumps around in an apparently random way. And as was suspected when this was first noticed in the 1820s, what is going on is that molecules in the liquid are continually hitting the grain and causing it to move. But even in a tiny volume of liquid there are already an immense number of molecules. And since one certainly does not even know at any given time exactly where all these molecules are, the details of their effect on the motion of the grain will inevitably seem quite random.
 
@@ -92,9 +90,7 @@ In practice, such noise is usually considered a nuisance, and indeed modern digi
 
 Typically these devices work by operating fairly standard electronic components in extreme conditions where there is usually no output signal, but where microscopic fluctuations can cause breakdown processes to occur which yield large output signals.
 
-A large-scale example is a pair of metal plates with air in between. Usually no current flows across this air gap, but when the voltage between the plates is large enough, the air can break down, sparks can be generated, and spikes of current can occur. But exactly when and
-
-where the sparks occur depends on the detailed microscopic motion of the molecules in the gas, and is therefore potentially quite random.
+A large-scale example is a pair of metal plates with air in between. Usually no current flows across this air gap, but when the voltage between the plates is large enough, the air can break down, sparks can be generated, and spikes of current can occur. But exactly when and where the sparks occur depends on the detailed microscopic motion of the molecules in the gas, and is therefore potentially quite random.
 
 In an effort to obtain as much randomness as possible, actual devices that work along these lines have typically used progressively smaller components: first vacuum tubes and later semiconductors. And indeed, in a modern semiconductor diode, for example, a breakdown event can be initiated by the motion of just one electron.
 
@@ -108,31 +104,27 @@ Every time the device receives a piece of input, its internal state changes. But
 
 In a device that produces a spark, for example, it inevitably takes some time for the hot gas in the path of the spark to be cleared out. And if another spark is generated before this has happened, the path of the second spark will not be independent of the first.
 
-One might think that such effects could be avoided by allowing a certain "dead time" between successive events. But in fact, as we will also see in connection with quantum mechanics, it is a rather general feature of systems that perform amplification that relaxation to a normal state can effectively occur only gradually, so that one would have to wait an infinite time for such relaxation to be absolutely complete.
+One might think that such effects could be avoided by allowing a certain “dead time” between successive events. But in fact, as we will also see in connection with quantum mechanics, it is a rather general feature of systems that perform amplification that relaxation to a normal state can effectively occur only gradually, so that one would have to wait an infinite time for such relaxation to be absolutely complete.
 
-But even when the device used to sample the environment does no amplification and has no relevant internal structure, one may still not see
-
-perfect randomness. And the reason for this is that there are almost inevitably correlations even in the supposedly random environment.
+But even when the device used to sample the environment does no amplification and has no relevant internal structure, one may still not see perfect randomness. And the reason for this is that there are almost inevitably correlations even in the supposedly random environment.
 
 In an ocean for example, the inertia of the water essentially forces there to be waves on the surface of certain sizes. And during the time that a boat is caught up in a particular one of these waves, its motion will always be quite regular; it is only when one watches the effect of a sequence of waves that one sees behavior that appears in any way random.
 
 In a sense, though, this point just emphasizes the incomplete nature of the mechanism for randomness that we have been discussing in this section. For to know in any real way why the motion of the boat is random, we must inevitably ask more about the randomness of the ocean surface. And indeed, it is only at a fairly superficial level of description that it is useful to say that the randomness in the motion of the boat comes from interaction with an environment about which one will say nothing more than that it is random.
 
-#### **Chaos Theory and Randomness from Initial Conditions**
+### Chaos Theory and Randomness from Initial Conditions
 
 At the beginning of this chapter I outlined three basic mechanisms that can lead to apparent randomness. And in the previous section I discussed the first of these mechanisms—based on the idea that the evolution of a system is continually affected by randomness from its environment.
 
 But to get randomness in a particular system it turns out that there is no need for continual interaction between the system and an external random environment. And in the second mechanism for randomness discussed at the beginning of this chapter, no explicit randomness is inserted during the evolution of a system. But there is still randomness in the initial conditions, and the point is that as the system evolves, it samples more and more of this randomness, and as a result produces behavior that is correspondingly random.
 
-As a rather simple example one can think of a car driving along a bumpy road. Unlike waves on an ocean, all the bumps on the road are already present when the car starts driving, and as a result, one can consider these bumps to be part of the initial conditions for the system. But the point is that as time goes on, the car samples more and more of
-
-the bumps, and if there is randomness in these bumps it leads to corresponding randomness in the motion of the car.
+As a rather simple example one can think of a car driving along a bumpy road. Unlike waves on an ocean, all the bumps on the road are already present when the car starts driving, and as a result, one can consider these bumps to be part of the initial conditions for the system. But the point is that as time goes on, the car samples more and more of the bumps, and if there is randomness in these bumps it leads to corresponding randomness in the motion of the car.
 
 A somewhat similar example is a ball rolled along a rough surface. A question such as where the ball comes to rest will depend on the pattern of bumps on the surface. But now another feature of the initial conditions is also important: the initial speed of the ball.
 
 And somewhat surprisingly there is already in practice some apparent randomness in the behavior of such a system even when there are no significant bumps on the surface. Indeed, games of chance based on rolling dice, tossing coins and so on all rely on just such randomness.
 
-As a simple example, consider a ball that has one hemisphere white and the other black. One can roll this ball like a die, and then look to see which color is on top when the ball comes to rest. And if one does this in practice, what one will typically find is that the outcome seems guite random. But where does this randomness come from?
+As a simple example, consider a ball that has one hemisphere white and the other black. One can roll this ball like a die, and then look to see which color is on top when the ball comes to rest. And if one does this in practice, what one will typically find is that the outcome seems quite random. But where does this randomness come from?
 
 The answer is that it comes from randomness in the initial speed with which the ball is rolled. The picture below shows the motion of a ball with a sequence of different initial speeds. And what one sees is that it takes only a small change in the initial speed to make the ball come to rest in a completely different orientation.
 
@@ -154,7 +146,7 @@ A classic example is an idealized version of the kneading process which is used 
 
 The result of this is that any change in the initial position of a point will be amplified by a factor of two at each step. And while a particular machine may be able to control the initial position of a point to a certain accuracy, such repeated amplification will eventually lead to sensitivity to still smaller changes.
 
-But what does this actually mean for the motion of a point in the material? The bottom pictures on the facing page show what happens to two sets of points that start very close together. The most obvious effect is that these points diverge rapidly on successive steps. But after a while, they reach the edge of the material and cannot diverge any
+But what does this actually mean for the motion of a point in the material? The bottom pictures on the facing page show what happens to two sets of points that start very close together. The most obvious effect is that these points diverge rapidly on successive steps. But after a while, they reach the edge of the material and cannot diverge any further. And then in the first case, the subsequent motion looks quite random. But in the second case it is fairly regular. So why is this?
 
 ![](_page_322_Picture_2.jpeg)
 
@@ -164,25 +156,19 @@ A kneading process similar to ones used to make noodles or taffy, which exhibits
 
 Two examples of what can happen when the kneading process above is applied to nearby collections of points. In both cases the points initially diverge exponentially, as implied by chaos theory. But after a while they reach the edge of the material, and although in the first case they then show quite random behavior, in the second case they instead just show simple repetitive behavior. What differs between the two cases is the detailed digit sequences of the positions of the points: in the first case these digit sequences are quite random, while in the second case they have a simple repetitive form.
 
-further. And then in the first case, the subsequent motion looks quite random. But in the second case it is fairly regular. So why is this?
-
-A little analysis shows what is going on. The basic idea is to represent the position of each point at each step as a number, say x, which runs from 0 to 1. When the material is stretched, the number is
-
-doubled. And when the material is cut and stacked, the effect on the number is then to extract its fractional part.
+A little analysis shows what is going on. The basic idea is to represent the position of each point at each step as a number, say $x$, which runs from 0 to 1. When the material is stretched, the number is doubled. And when the material is cut and stacked, the effect on the number is then to extract its fractional part.
 
 But it turns out that this process is exactly the same as the one we discussed on page 153 in the chapter on systems based on numbers.
 
-And what we found there was that it is crucial to think not in terms of the sizes of the numbers x, but rather in terms of their digit sequences represented in base 2. And in fact, in terms of such digit sequences, the kneading process consists simply in shifting all digits one place to the left at each step, as shown in the pictures below.
+And what we found there was that it is crucial to think not in terms of the sizes of the numbers $x$, but rather in terms of their digit sequences represented in base 2. And in fact, in terms of such digit sequences, the kneading process consists simply in shifting all digits one place to the left at each step, as shown in the pictures below.
 
 ![](_page_323_Figure_4.jpeg)
 
-The digit sequences of positions of points on successive steps in the two examples of kneading processes at the bottom of the previous page. At each step these digit sequences are shifted one place to the left. So if the initial digit sequence is random, as in the first example, then the subsequent behavior will also be correspondingly random. But if the initial digit sequence is simple, as in the second example, then the behavior will be correspondingly simple. In general, a point at position x on a particular step will move to position FractionalPart(2x) on the next step.
+The digit sequences of positions of points on successive steps in the two examples of kneading processes at the bottom of the previous page. At each step these digit sequences are shifted one place to the left. So if the initial digit sequence is random, as in the first example, then the subsequent behavior will also be correspondingly random. But if the initial digit sequence is simple, as in the second example, then the behavior will be correspondingly simple. In general, a point at position $x$ on a particular step will move to position $FractionalPart[2 x]$ on the next step.
 
 The way digit sequences work, digits further to the right in a number always make smaller contributions to its overall size. And as a result, one might think that digits which lie far to the right in the initial conditions would never be important. But what the pictures above show is that these digits will always be shifted to the left, so that eventually they will in fact be important. As time goes on, therefore, what is effectively happening is that the system is sampling digits further and further to the right in the initial conditions.
 
-And in a sense this is not unlike what happens in the example of a car driving along a bumpy road discussed at the beginning of this section. Indeed in many ways the only real difference is that instead of
-
-being able to see a sequence of explicit bumps in the road, the initial conditions for the position of a point in the kneading process are encoded in a more abstract form as a sequence of digits.
+And in a sense this is not unlike what happens in the example of a car driving along a bumpy road discussed at the beginning of this section. Indeed in many ways the only real difference is that instead of being able to see a sequence of explicit bumps in the road, the initial conditions for the position of a point in the kneading process are encoded in a more abstract form as a sequence of digits.
 
 But the crucial point is that the behavior we see will only ever be as random as the sequence of digits in the initial conditions. And in the first case on the facing page, it so happens that the sequence of digits for each of the initial points shown is indeed quite random, so the behavior we see is correspondingly random. But in the second case, the sequence of digits is regular, and so the behavior is correspondingly regular.
 
@@ -208,33 +194,27 @@ One might think that the kneading process we have been discussing is just a bad 
 
 The picture on the facing page shows a system in which a beam of light repeatedly bounces off a sequence of mirrors. The system is set up so that every time the light goes around, its position is modified in exactly the same way as the position of a point in the kneading process. And just as in the kneading process, there is very sensitive dependence on the details of the initial conditions, and the behavior that is seen reflects the digit sequence of these initial conditions.
 
-But once again, in any practical implementation, the light would go around only a few tens of times before being affected by microscopic
+But once again, in any practical implementation, the light would go around only a few tens of times before being affected by microscopic perturbations in the mirrors and by other phenomena that are not accounted for in the simple description we have given.
 
 ![](_page_326_Picture_2.jpeg)
 
 ![](_page_326_Picture_3.jpeg)
 
-An arrangement of mirrors set up to exhibit randomness arising from sensitive dependence on initial conditions. The initial condition for the system is specified by the position of the incoming light ray in the gray region at the top of each picture. Whether the light ray goes to the left or to the right at each step is then determined by successive digits in the base 2 representation for the number that gives the initial condition. The heart of the system is the "amplifier" shown on the left which uses a pair of parabolic mirrors to double the displacement of each incoming ray. The initial condition used here is  $\pi/4$ , which has digit sequence 0.1100100100001111111.
-
-STEPHEN WOLFRAM
-
-perturbations in the mirrors and by other phenomena that are not accounted for in the simple description we have given.
+An arrangement of mirrors set up to exhibit randomness arising from sensitive dependence on initial conditions. The initial condition for the system is specified by the position of the incoming light ray in the gray region at the top of each picture. Whether the light ray goes to the left or to the right at each step is then determined by successive digits in the base 2 representation for the number that gives the initial condition. The heart of the system is the “amplifier” shown on the left which uses a pair of parabolic mirrors to double the displacement of each incoming ray. The initial condition used here is $\pi/4$, which has digit sequence 0.1100100100001111111.
 
 At the heart of the system shown on the previous page is a slightly complicated arrangement of parabolic mirrors. But it turns out that almost any convex reflector will lead to the divergence of trajectories necessary to get sensitive dependence on initial conditions.
 
 Indeed, the simple pegboard shown below exhibits the same phenomenon, with balls dropped at even infinitesimally different initial positions eventually following very different trajectories.
 
-The details of these trajectories cannot be deduced quite as directly as before from the digit sequences of initial positions, but
+The details of these trajectories cannot be deduced quite as directly as before from the digit sequences of initial positions, but exactly the same phenomenon of successively sampling less and less significant digits still occurs. And once again, at least for a while, any randomness in the motion of the ball can be attributed to randomness in this initial digit sequence.
 
 ![](_page_327_Picture_6.jpeg)
 
 Paths followed by four idealized balls dropped from initial positions differing by one part in a thousand into an array of identical circular pegs. The balls are taken to fall under gravity, and to bounce elastically whenever they hit a peg. As illustrated in the inset, small differences in direction are amplified—roughly doubling—at each bounce, with the result that after a few bounces the trajectories of the three balls are quite different. In a physical version of the system with balls of the same actual size as on this page perturbations from the environment will inevitably be amplified to have a significant effect on the trajectories after roughly the number of bounces shown. Versions of the system illustrated here—particularly with smaller peg spacings—are sometimes known as Galton or quincunx boards, and have been used since the late 1800s to demonstrate principles of probability theory. If balls are assumed to fall randomly on each side of each peg then with a large number of balls the final positions will approximate a binomial distribution.
 
-exactly the same phenomenon of successively sampling less and less significant digits still occurs. And once again, at least for a while, any randomness in the motion of the ball can be attributed to randomness. in this initial digit sequence.
-
 But after at most ten or so collisions, many other effects, mostly associated with continual interaction with the environment, will always in practice become important, so that any subsequent randomness cannot solely be attributed to initial conditions.
 
-And indeed in any system, the amount of time over which the details of initial conditions can ever be considered the dominant source. of randomness will inevitably be limited by the level of separation that exists between the large-scale features that one observes and small-scale features that one cannot readily control.
+And indeed in any system, the amount of time over which the details of initial conditions can ever be considered the dominant source of randomness will inevitably be limited by the level of separation that exists between the large-scale features that one observes and small-scale features that one cannot readily control.
 
 So in what kinds of systems do the largest such separations occur? The answer tends to be systems in astronomy. And as it turns out, the so-called three-body problem in astronomy was the very first place where sensitive dependence on initial conditions was extensively studied.
 
@@ -242,17 +222,15 @@ The three-body problem consists in determining the motion of three bodies—such
 
 The pictures on the next page show a particular case of the three-body problem, in which there are two large masses in a simple elliptical orbit, together with an infinitesimally small mass moving up and down through the plane of this orbit. And what the pictures demonstrate is that even if the initial position of this mass is changed by just one part in a hundred million, then within 50 revolutions of the large masses the trajectory of the small mass will end up being almost completely different.
 
-So what happens in practice with planets and other bodies in our solar system? Observations suggest that at least on human timescales most of their motion is quite regular. And in fact this regularity was in
+So what happens in practice with planets and other bodies in our solar system? Observations suggest that at least on human timescales most of their motion is quite regular. And in fact this regularity was in the past taken as one of the key pieces of evidence for the idea that simple laws of nature could exist.
 
 ![](_page_329_Figure_1.jpeg)
 
-An example of the three-body problem, in which an idealized planet moves up and down through the plane of two equal-mass idealized stars in a perfect elliptical orbit. The trajectories obtained with four possible initial positions for the planet—differing by 10<sup>8</sup>—are shown. The pictures are made assuming the system to be in uniform motion from left to right. Successive black dots indicate where the planets are on each revolution of the stars. The main picture shows what happens over the course of 100 revolutions. The planet is assumed to be of negligible mass relative to the stars, and to start with zero vertical velocity at exactly an equal distance between the stars. The divergence of trajectories with slightly different initial vertical positions indicates sensitive dependence on initial conditions.
-
-the past taken as one of the key pieces of evidence for the idea that simple laws of nature could exist.
+An example of the three-body problem, in which an idealized planet moves up and down through the plane of two equal-mass idealized stars in a perfect elliptical orbit. The trajectories obtained with four possible initial positions for the planet—differing by $10^{-8}$—are shown. The pictures are made assuming the system to be in uniform motion from left to right. Successive black dots indicate where the planets are on each revolution of the stars. The main picture shows what happens over the course of 100 revolutions. The planet is assumed to be of negligible mass relative to the stars, and to start with zero vertical velocity at exactly an equal distance between the stars. The divergence of trajectories with slightly different initial vertical positions indicates sensitive dependence on initial conditions.
 
 But calculations imply that sensitive dependence on initial conditions should ultimately occur even in our solar system. Needless to say, we do not have the option of explicitly setting up different initial conditions. But if we could watch the solar system for a few million years, then there should be significant randomness that could be attributed to sensitive dependence on the digit sequences of initial conditions—and whose presence in the past may explain some observed present-day features of our solar system.
 
-#### The Intrinsic Generation of Randomness
+### The Intrinsic Generation of Randomness
 
 In the past two sections, we have studied two possible mechanisms that can lead to observed randomness. But as we have discussed, neither of these in any real sense themselves generate randomness. Instead, what they essentially do is just to take random input that comes from outside, and transfer it to whatever system one is looking at.
 
@@ -290,15 +268,13 @@ For our purposes more useful definitions tend to concentrate not so much on whet
 
 So whether or not one chooses to say that the sequence is truly random, it is, as far as one can tell, at least random for all practical purposes. And in fact sequences closely related to it have been used very successfully as sources of randomness in practical computing.
 
-For many years, most kinds of computer systems and languages have had facilities for generating what they usually call random numbers. And in *Mathematica*—ever since it was first released—Random[Integer] has generated 0's and 1's using exactly the rule 30 cellular automaton.
+For many years, most kinds of computer systems and languages have had facilities for generating what they usually call random numbers. And in *Mathematica*—ever since it was first released—Random[Integer] has generated 0’s and 1’s using exactly the rule 30 cellular automaton.
 
 The way this works is that every time Random[Integer] is called, another step in the cellular automaton evolution is performed, and the value of the cell in the center is returned. But one difference from the picture two pages ago is that for practical reasons the pattern is not allowed to grow wider and wider forever. Instead, it is wrapped around in a region that is a few hundred cells wide.
 
-One consequence of this, as discussed on page 259, is that the sequence of 0's and 1's that is generated must then eventually repeat. But even with the fastest foreseeable computers, the actual period of repetition will typically be more than a billion billion times the age of the universe.
+One consequence of this, as discussed on page 259, is that the sequence of 0’s and 1’s that is generated must then eventually repeat. But even with the fastest foreseeable computers, the actual period of repetition will typically be more than a billion billion times the age of the universe.
 
-Another issue is that if one always ran the cellular automaton from page 315 with the particular initial condition shown there, then one would always get exactly the same sequence of 0's and 1's. But by using different initial conditions one can get completely different
-
-sequences. And in practice if the initial conditions are not explicitly specified, what *Mathematica* does, for example, is to use as an initial condition a representation of various features of the exact state of the computer system at the time when Random was first called.
+Another issue is that if one always ran the cellular automaton from page 315 with the particular initial condition shown there, then one would always get exactly the same sequence of 0’s and 1’s. But by using different initial conditions one can get completely different sequences. And in practice if the initial conditions are not explicitly specified, what *Mathematica* does, for example, is to use as an initial condition a representation of various features of the exact state of the computer system at the time when Random was first called.
 
 The rule 30 cellular automaton provides a particularly clear and good example of intrinsic randomness generation. But in previous chapters we have seen many other examples of systems that also intrinsically produce apparent randomness. And it turns out that one of these is related to the method used since the late 1940s for generating random numbers in almost all practical computer systems.
 
@@ -314,7 +290,7 @@ It has then often been assumed that having maximal repetition period will someho
 
 ![](_page_334_Picture_2.jpeg)
 
-Patterns of digits in base 2 produced by starting with the number 1 and then repeatedly multiplying by various fixed constants. In all cases, the complete pattern has a triangular form, but except in the first case, it is truncated on the left here. The mathematical structure of these systems is nevertheless such that digits further to the left do not affect those shown: at each step the number obtained is effectively reduced modulo  $2^n$ , where n is the width of the picture.
+Patterns of digits in base 2 produced by starting with the number 1 and then repeatedly multiplying by various fixed constants. In all cases, the complete pattern has a triangular form, but except in the first case, it is truncated on the left here. The mathematical structure of these systems is nevertheless such that digits further to the left do not affect those shown: at each step the number obtained is effectively reduced modulo  $2^n$ , where $n$ is the width of the picture.
 
 A typical kind of failure, illustrated in the pictures on the next page, is that points with coordinates determined by successive numbers from the generator turn out to be distributed in an embarrassingly regular way. At first, such failures might suggest that more complicated schemes must be needed if one is to get good randomness. And indeed with this thought in mind all sorts of elaborate combinations of linear congruential and other generators have been proposed. But although some aspects of the behavior of such systems can be made quite random, deviations from perfect randomness are still often found.
 
@@ -362,13 +338,11 @@ But the point is that with the mechanism of intrinsic randomness generation, the
 
 But how easy is it to disturb this sequence? If one makes a fairly drastic perturbation, such as changing the colors of cells all the way from white to black, then the sequence will indeed often change, as illustrated in the pictures at the top of the next page.
 
-But with less drastic perturbations, the sequence can be quite robust. As an example, one can consider allowing each cell to be not just black or white, but any shade of gray, as in the continuous cellular automata we discussed on page 155. And in such systems, one can
+But with less drastic perturbations, the sequence can be quite robust. As an example, one can consider allowing each cell to be not just black or white, but any shade of gray, as in the continuous cellular automata we discussed on page 155. And in such systems, one can investigate what happens if at every step one randomly perturbs the gray level of each cell by a small amount.
 
 ![](_page_339_Figure_1.jpeg)
 
 The effect of changing the number of initial black cells in the rule 30 cellular automaton shown above. With only 2 or 3 black cells, the sequence in the center of the pattern does not change. But as soon as more black cells are added, it does change.
-
-investigate what happens if at every step one randomly perturbs the gray level of each cell by a small amount.
 
 The pictures on the facing page show results for perturbations of various sizes. What one sees is that when the perturbations are sufficiently large, the sequence of colors of the center cell does indeed change. But the crucial point is that for perturbations below a certain critical size, the sequence always remains essentially unchanged.
 
@@ -382,9 +356,9 @@ With more care in setting up the experiment, a higher degree of isolation from t
 
 ![](_page_340_Figure_2.jpeg)
 
-The effects of various levels of external randomness on the behavior of continuous cellular automata with generalizations of rules 90 and 30. The value of each cell can be any gray level between 0 and 1. For the generalization of rule 90, the values of the left and right cells are added together, and the value of the cell on the next step is then found by applying the continuous generalization of the modulo 2 function shown at the right. For the generalization of rule 30, a similar scheme based on an algebraic representation of the rule is used. In both cases, every value at each step is also perturbed by a random amount up to the percentage indicated for each picture.
-
 ![](_page_340_Figure_4.jpeg)
+
+The effects of various levels of external randomness on the behavior of continuous cellular automata with generalizations of rules 90 and 30. The value of each cell can be any gray level between 0 and 1. For the generalization of rule 90, the values of the left and right cells are added together, and the value of the cell on the next step is then found by applying the continuous generalization of the modulo 2 function shown at the right. For the generalization of rule 30, a similar scheme based on an algebraic representation of the rule is used. In both cases, every value at each step is also perturbed by a random amount up to the percentage indicated for each picture.
 
 And as a result, the system one is looking at will be subjected to at least some level of random perturbations from the environment.
 
@@ -402,7 +376,7 @@ And when there are, for example, two symmetrical sides to a particular system, i
 
 So in all of these cases the randomness one sees cannot reasonably be attributed to randomness that is introduced from the environment—either continually or through initial conditions. And instead, there is no choice but to conclude that the randomness must in fact come from the mechanism of intrinsic randomness generation that I have discovered in simple programs, and discussed in this section.
 
-#### The Phenomenon of Continuity
+### The Phenomenon of Continuity
 
 Many systems that we encounter in nature have behavior that seems in some way smooth or continuous. Yet cellular automata and most of the other programs that we have discussed involve only discrete elements. So how can such systems ever reproduce what we see in nature?
 
@@ -418,13 +392,11 @@ But when randomness is present, such microscopic details often get averaged out,
 
 Each random walk is made by taking a discrete particle, and then at each step randomly moving the particle one position to the left or right. If one starts off with several particles, then at any particular time, each particle will be at a definite discrete position. But what happens if one looks not at the position of each individual particle, but rather at the overall distribution of all particles?
 
-The answer, as illustrated on the next page, is that if there are enough particles, then the distribution one sees takes on a smooth and
+The answer, as illustrated on the next page, is that if there are enough particles, then the distribution one sees takes on a smooth and continuous form, and shows no trace of the underlying discreteness of the system; the randomness has in a sense successfully washed out essentially all the microscopic details of the system.
 
 ![](_page_343_Figure_2.jpeg)
 
 The distribution of positions by reached particles that follow random walks. The top left shows three individual examples of random walks, in which each particle randomly moves one position to the left or right. Even though the individual particles are discrete, the pictures show that when a large number of particles are considered, the overall behavior obtained seems smooth and continuous.
-
-continuous form, and shows no trace of the underlying discreteness of the system; the randomness has in a sense successfully washed out essentially all the microscopic details of the system.
 
 The pictures at the top of the facing page show what happens if one uses several different underlying rules for the motion of each particle. And what one sees is that despite differences at a microscopic level, the overall distribution obtained in each case has exactly the same continuous form.
 
@@ -452,11 +424,9 @@ The idea of this model is to build up a cluster of black cells by adding just on
 
 At early stages, clusters that are grown in this way look quite irregular. But after a few thousand steps, a smooth overall roughly circular shape begins to emerge. Unlike for the case of random walks, there is as yet no known way to make a rigorous mathematical analysis of this process. But just as for random walks, it appears once again that the details of the underlying rules for the system do not have much effect on the main features of the behavior that is seen.
 
-The pictures below, for example, show generalizations of the aggregation model in which new cells are added only at positions that have certain numbers of existing neighbors. And despite such changes
+The pictures below, for example, show generalizations of the aggregation model in which new cells are added only at positions that have certain numbers of existing neighbors. And despite such changes in underlying rules, the overall shapes of the clusters produced remain very much the same.
 
 ![](_page_347_Picture_5.jpeg)
-
-Patterns produced by generalized aggregation models in which a new cell is added only if (a) it would have only one immediate neighbor (out of four), or (b) it would have either one or four neighbors. The pictures above show step 30,000, while those on the right show step 200. Despite the difference in underlying rules, the same basic overall shape of pattern is eventually produced.
 
 ![](_page_347_Picture_7.jpeg)
 
@@ -464,7 +434,7 @@ Patterns produced by generalized aggregation models in which a new cell is added
 
 ![](_page_347_Figure_9.jpeg)
 
-in underlying rules, the overall shapes of the clusters produced remain very much the same.
+Patterns produced by generalized aggregation models in which a new cell is added only if (a) it would have only one immediate neighbor (out of four), or (b) it would have either one or four neighbors. The pictures above show step 30,000, while those on the right show step 200. Despite the difference in underlying rules, the same basic overall shape of pattern is eventually produced.
 
 In all these examples, however, the randomness that is involved comes from the same basic mechanism: it is explicitly inserted from outside at each step in the evolution of the system.
 
@@ -488,13 +458,13 @@ It is still true, however, that at a small scale the boundaries consist of discr
 
 ![](_page_350_Picture_4.jpeg)
 
-The behavior of an individual domain of black cells in the cellular automaton shown on the next page. The boundary of the domain exhibits seemingly random fluctuations. But at an overall level, the behavior that is produced seems in many respects guite smooth and continuous. The domain effectively behaves as if it has a surface tension, so that it first evolves to a roughly circular shape, then shrinks eventually to nothing. The main black rectangle is initially 39 x 29 cells in size.
+The behavior of an individual domain of black cells in the cellular automaton shown on the next page. The boundary of the domain exhibits seemingly random fluctuations. But at an overall level, the behavior that is produced seems in many respects quite smooth and continuous. The domain effectively behaves as if it has a surface tension, so that it first evolves to a roughly circular shape, then shrinks eventually to nothing. The main black rectangle is initially $39 \times 29$ cells in size.
 
 ![](_page_351_Figure_2.jpeg)
 
-total is exactly 4, then it becomes black. (The rule has totalistic code 976.) The pictures show that on a large scale, the rule leads to regions of black and white whose boundaries behave in a seemingly smooth and continuous way. Note that each picture is 80 cells across, and is effectively wrapped around so that the left neighbor of the leftmost cell is the rightmost cell, and so on.
+Behavior of a two-dimensional cellular automaton starting from a random initial condition. At each step, each cell looks at the total number of black cells in the 9-cell neighborhood consisting of the cell itself and the 8 cells adjacent to it (including diagonals). If this total is less than 4, then the cell becomes white on the next step, while if the total is greater than 6, it becomes black. If the total is exactly 5, then the cell becomes white, and if the total is exactly 4, then it becomes black. (The rule has totalistic code 976.) The pictures show that on a large scale, the rule leads to regions of black and white whose boundaries behave in a seemingly smooth and continuous way. Note that each picture is 80 cells across, and is effectively wrapped around so that the left neighbor of the leftmost cell is the rightmost cell, and so on.
 
-#### **Origins of Discreteness**
+### Origins of Discreteness
 
 In the previous section we saw that even though a system may on a small scale consist of discrete components, it is still possible for the system overall to exhibit behavior that seems smooth and continuous. And as we have discussed before, the vast majority of traditional mathematical models have in fact been based on just such continuity.
 
@@ -504,7 +474,7 @@ So what does this mean for continuous models? In the previous section we found t
 
 Needless to say, if one wants to study phenomena that are based on discreteness, it usually makes more sense to start with a model that is fundamentally discrete. But in making contact with existing scientific models and results, it is useful to see how discrete behavior can emerge from continuous processes.
 
-The boiling of water provides a classic example. If one takes some water and continuously increases its temperature, then for a while nothing much happens. But when the temperature reaches  $100^{\circ}$ C, a discrete transition occurs, and all the water evaporates into steam.
+The boiling of water provides a classic example. If one takes some water and continuously increases its temperature, then for a while nothing much happens. But when the temperature reaches $100^{\circ}\mathrm{C}$, a discrete transition occurs, and all the water evaporates into steam.
 
 It turns out that there are many kinds of systems in which continuous changes can lead to such discrete transitions.
 
@@ -520,17 +490,13 @@ When the initial density of black cells has any value less than 50%, only white 
 
 The pictures on the facing page show another example of the same basic phenomenon. When the initial density of black cells is less than 50%, all regions of black eventually disappear, and the system becomes completely white. But as soon as the density increases above 50%, the behavior suddenly changes, and the system eventually becomes completely black.
 
-It turns out that such discrete transitions are fairly rare among one-dimensional cellular automata, but in two and more dimensions
+It turns out that such discrete transitions are fairly rare among one-dimensional cellular automata, but in two and more dimensions they become increasingly common. The pictures on the next page show two examples—the second corresponding to a rule that we saw in a different context at the end of the previous section.
 
 ![](_page_354_Picture_2.jpeg)
 
 A one-dimensional cellular automaton in which the density of black cells obtained after a large number of steps changes discretely when the initial density of black cells is continuously increased. With an initial density below 50%, regions of black always eventually disappear. But as soon as the density is increased above 50%, regions of black progressively expand, eventually taking over the whole system. The underlying rule allows four possible colors for each cell. The rule is set up so that whenever a region of black occurs to the left of a region of white, an expanding region of gray appears in between. The crucial point is then that if the region of white is narrower than the region of black, then the gray will reach the edge of the white before it reaches the edge of the black. And when this happens, the black expands and the gray gradually tapers away.
 
-they become increasingly common. The pictures on the next page show two examples—the second corresponding to a rule that we saw in a different context at the end of the previous section.
-
 In both examples, what essentially happens is that in regions where there is an excess of black over white, an increasingly large fraction of cells become black, while in regions where there is an excess of white over black, the reverse happens. And so long as the boundaries of the regions do not get stuck—as happens in many one-dimensional cellular automata—the result is that whichever color was initially more common eventually takes over the whole system.
-
-#### STEPHEN WOLFRAM A NEW KIND OF SCIENCE
 
 ![](_page_355_Figure_1.jpeg)
 
@@ -558,7 +524,7 @@ And whenever such equations arise, they inevitably lead to a limited number of s
 
 So even if a system at some level follows continuous rules it is still possible for the system to exhibit discrete overall behavior. And in fact it is quite common for such behavior to be one of the most obvious features of a system—which is why discrete systems like cellular automata end up often being the most appropriate models.
 
-#### The Problem of Satisfying Constraints
+### The Problem of Satisfying Constraints
 
 One feature of programs is that they immediately provide explicit rules that can be followed to determine how a system will behave. But in traditional science it is common to try to work instead with constraints that are merely supposed implicitly to force certain behavior to occur.
 
@@ -570,11 +536,7 @@ Many types of constraints—including those in Chapter 5—have the property tha
 
 The situation is quite different from what happens with explicit evolution rules. For if one knows such rules then these rules immediately yield a procedure for working out what behavior will occur. Yet if one only knows constraints then such constraints do not on their own immediately yield any specific procedure for working out what behavior will occur.
 
-In principle one could imagine looking at every possible pattern, and then picking out the ones that satisfy the constraints. But even with a  $10 \times 10$  array of black and white squares, the number of possible patterns is already 1,267,650,600,228,229,401,496,703,205,376. And with a
-
-I
-
- $20 \times 20$  array this number is larger than the total number of particles in the universe. So it seems quite inconceivable that systems in nature could ever carry out such an exhaustive search.
+In principle one could imagine looking at every possible pattern, and then picking out the ones that satisfy the constraints. But even with a  $10 \times 10$  array of black and white squares, the number of possible patterns is already 1,267,650,600,228,229,401,496,703,205,376. And with a $20 \times 20$ array this number is larger than the total number of particles in the universe. So it seems quite inconceivable that systems in nature could ever carry out such an exhaustive search.
 
 One might imagine, however, that if such systems were just to try patterns at random, then even though incredibly few of these patterns would satisfy any given constraint exactly, a reasonable number might at least still come close. But typically it turns out that even this is not the case. And as an example, the pictures below show what fraction of patterns chosen at random have a given percentage of squares that violate the constraints described on page 211.
 
@@ -602,21 +564,19 @@ The results of a procedure intended to produce patterns that get progressively c
 
 ![](_page_360_Figure_2.jpeg)
 
-Patterns generated by using the same procedure as in the previous picture but with three different sets of constraints. Case (a) uses the same constraints as in the previous picture, (b) requires every black square and every white square to have exactly two adjacent black squares, and (c) requires every black square to have 3 adjacent black squares and 1 white square, and every white square to have 4 adjacent white squares. In cases (a) and (b) it is possible to satisfy the constraints exactly; in case (c) it is not. The pictures show the evolution of a 30 x 30 array, which is nearly 10 times the area of the array shown in the previous picture. Although the fraction of squares that violate the constraints is less than 20% after 100,000 steps, the overall patterns still do not look much like the exact results.
+Patterns generated by using the same procedure as in the previous picture but with three different sets of constraints. Case (a) uses the same constraints as in the previous picture, (b) requires every black square and every white square to have exactly two adjacent black squares, and (c) requires every black square to have 3 adjacent black squares and 1 white square, and every white square to have 4 adjacent white squares. In cases (a) and (b) it is possible to satisfy the constraints exactly; in case (c) it is not. The pictures show the evolution of a $30 \times 30$ array, which is nearly 10 times the area of the array shown in the previous picture. Although the fraction of squares that violate the constraints is less than 20% after 100,000 steps, the overall patterns still do not look much like the exact results.
 
-So why does the procedure not work better? The problem turns out to be a rather general one. And as a simple example, consider a line of black and white squares, together with the constraint that each square should have the same color as its right-hand neighbor. This constraint will be satisfied only if every square has the same color either black or white. But to what extent will an iterative procedure succeed in finding this solution?
+So why does the procedure not work better? The problem turns out to be a rather general one. And as a simple example, consider a line of black and white squares, together with the constraint that each square should have the same color as its right-hand neighbor. This constraint will be satisfied only if every square has the same color—either black or white. But to what extent will an iterative procedure succeed in finding this solution?
 
-As a first example, consider a procedure that at each step picks a square at random, then reverses its color whenever doing so reduces the total number of squares that violate the constraint. The pictures at the top of the next page show what happens in this case. The results are
+As a first example, consider a procedure that at each step picks a square at random, then reverses its color whenever doing so reduces the total number of squares that violate the constraint. The pictures at the top of the next page show what happens in this case. The results are remarkably poor: instead of steadily evolving to all black or all white, the system quickly gets stuck in a state that contains regions of different colors.
 
 ![](_page_361_Picture_2.jpeg)
 
 Results of four tries at applying an iterative procedure to find configurations which satisfy the simple constraint that every square should be the same color as the square to its right. (The squares are assumed to be arranged cyclically, so that the right neighbor of the rightmost square is the leftmost square.) The procedure starts from a random configuration of squares, and then at each step picks a square at random, then reverses the color of this square whenever doing so reduces the total number of squares that violate the constraint. The only configurations that ultimately satisfy the constraints are all white and all black. But the procedure gets stuck long before it reaches these configurations. The problem is that for any block more than one square across changing the color of a square at either end will not reduce the total number of squares that violate the constraint. And as a result, such blocks remain fixed and cannot disappear.
 
-remarkably poor: instead of steadily evolving to all black or all white, the system quickly gets stuck in a state that contains regions of different colors.
-
 And as it turns out, this kind of behavior is not uncommon among iterative procedures; indeed it is even seen in such simple cases as trying to find the lowest point on a curve. The most obvious iterative procedure to use for such a problem involves taking a series of small steps, with the direction of each step being chosen so as locally to go downhill.
 
-And indeed for the first curve shown below, this procedure works just fine, and quickly leads to the lowest point. But for the second
+And indeed for the first curve shown below, this procedure works just fine, and quickly leads to the lowest point. But for the second curve, the procedure will already typically not work; it will usually get stuck in one of the local minima and never reach a global minimum.
 
 ![](_page_361_Figure_7.jpeg)
 
@@ -625,8 +585,6 @@ And indeed for the first curve shown below, this procedure works just fine, and 
 ![](_page_361_Figure_9.jpeg)
 
 Three examples of curves. In the first case, the most obvious mechanical or mathematical procedure of continually going downhill will successfully lead one to the lowest point. But in the other two cases, this procedure will usually end up getting stuck at a local minimum. This is the basic phenomenon which makes it difficult to find patterns that satisfy constraints exactly using a procedure that is based on progressive improvement. The third picture above is a representation of the kind of curve that arises in almost all discrete systems based on constraints.
-
-curve, the procedure will already typically not work; it will usually get stuck in one of the local minima and never reach a global minimum.
 
 And for discrete systems involving, say, just black and white squares, it turns out to be almost inevitable that the curves which arise have the kind of jagged form shown in the third picture at the bottom of the facing page. So this has the consequence that a simple iterative procedure that always tries to go downhill will almost invariably get stuck.
 
@@ -650,7 +608,7 @@ In traditional science the notion of constraints is often introduced in an attem
 
 The two cellular automata on the left both have all white and all black as invariant states. And in the first case, starting from random initial conditions, the system quickly settles down to the all black invariant state. But in the second case, nothing like this happens, and instead the system continues to exhibit complicated and seemingly random behavior forever.
 
-The two-dimensional patterns that arise from the constraints at the end of Chapter 5 all turn out to correspond to invariant states of various two-dimensional cellular automata. And so for example the pattern of page 211 is found to be the unique invariant state for 572,522 of the 4,294,967,296 possible five-neighbor cellular automaton rules. But if one starts these rules from random initial conditions, one typically never gets the pattern of page 211. Instead, as the pictures at the top of the facing page show, one sees a variety of patterns that very
+The two-dimensional patterns that arise from the constraints at the end of Chapter 5 all turn out to correspond to invariant states of various two-dimensional cellular automata. And so for example the pattern of page 211 is found to be the unique invariant state for 572,522 of the 4,294,967,296 possible five-neighbor cellular automaton rules. But if one starts these rules from random initial conditions, one typically never gets the pattern of page 211. Instead, as the pictures at the top of the facing page show, one sees a variety of patterns that very much more reflect explicit rules of evolution than the constraint associated with the invariant state.
 
 ![](_page_363_Picture_7.jpeg)
 
@@ -662,8 +620,6 @@ Two of the 28 elementary cellular automata whose only invariant states are unifo
 
 Typical behavior of two-dimensional cellular automata that leave only the pattern on the right invariant. The results shown come from 500 steps of evolution starting from random initial conditions. In no case does the global behavior seen come even close to satisfying the simple constraints that determine the invariant state.
 
-much more reflect explicit rules of evolution than the constraint associated with the invariant state
-
 So what about actual systems in physics? Do they behave any differently? As one example, consider a large number of circular coins pushed together on a table. One can think of such a system as having an invariant state that satisfies the constraint that the coins should be packed as densely as possible. For identical coins this constraint is satisfied by the simple repetitive pattern shown on the right. And it turns out that in this particular case this pattern is quickly produced if one actually pushes coins together on a table.
 
 But with balls in three dimensions the situation is quite different. In this case the constraint of densest packing is known to be satisfied when the balls are laid out in the simple repetitive way shown on the right. But if one just tries pushing balls together they almost always get stuck, and never take on anything like the arrangement shown. And if one jiggles the balls around one still essentially never gets this arrangement. Indeed, the only way to do it seems to be to lay the balls down carefully one after another.
@@ -672,11 +628,11 @@ In two dimensions similar issues arise as soon as one has coins of more than one
 
 ![](_page_364_Picture_9.jpeg)
 
-The densest packing of identical circles in the plane. Each circle surrounded by six others.
+The densest packing of identical circles in the plane. Each circle is surrounded by six others.
 
 ![](_page_364_Picture_11.jpeg)
 
-The densest packing of identical spheres in threedimensional space. Each sphere is surrounded by 12 others.
+The densest packing of identical spheres in three-dimensional space. Each sphere is surrounded by 12 others.
 
 ![](_page_365_Figure_1.jpeg)
 
@@ -688,11 +644,11 @@ One can look at all sorts of other physical systems, but so far as I can tell th
 
 One might still suppose, however, that the situation could be different in biological systems, and that somehow the process of natural selection might produce forms that are successfully determined by the satisfaction of constraints.
 
-But what I strongly believe, as I discuss in the next chapter, is that in the end, much as in physical systems, only rather simple forms can actually be obtained in this way, and that when more complex forms are seen they once again tend to be associated not with constraints but rather with the effects of explicit evolution rulesmostly those governing the growth of an individual organism.
+But what I strongly believe, as I discuss in the next chapter, is that in the end, much as in physical systems, only rather simple forms can actually be obtained in this way, and that when more complex forms are seen they once again tend to be associated not with constraints but rather with the effects of explicit evolution rules—mostly those governing the growth of an individual organism.
 
-#### **Origins of Simple Behavior**
+### Origins of Simple Behavior
 
-There are many systems in nature that show highly complex behavior. But there are also many systems that show rather simple behavior most often either complete uniformity, or repetition, or nesting.
+There are many systems in nature that show highly complex behavior. But there are also many systems that show rather simple behavior—most often either complete uniformity, or repetition, or nesting.
 
 And what we have found in this book is that programs are very much the same: some show highly complex behavior, while others show only rather simple behavior.
 
@@ -720,7 +676,7 @@ Another mechanism is that every part of a system can evolve completely independe
 
 ![](_page_368_Picture_6.jpeg)
 
-Uniformity in space can be achieved almost trivially if each element in a system independently evolves to the same state
+Uniformity in space can be achieved almost trivially if each element in a system independently evolves to the same state.
 
 A slightly less straightforward mechanism is illustrated in the pictures below. Here different elements in the system do interact, but the result is still that all of them evolve to the same state.
 
@@ -744,7 +700,7 @@ Averaging out small-scale randomness yields apparent uniformity, as shown here f
 
 It is common for uniform behavior to be quite independent of initial conditions or other input to a system. But sometimes different uniform behavior can be obtained with different input.
 
-One way this can happen, illustrated in the pictures below, is for the system to conserve some quantity—such as total density of black and for this quantity to end up being spread uniformly throughout the system by its evolution.
+One way this can happen, illustrated in the pictures below, is for the system to conserve some quantity—such as total density of black—and for this quantity to end up being spread uniformly throughout the system by its evolution.
 
 With each cell at each step having a gray level that is the average of its predecessor and its two neighbors the total amount of black is conserved, but eventually becomes spread uniformly throughout the system.
 
@@ -760,13 +716,11 @@ Constraints are yet another basis for uniformity. And as a trivial example, the 
 
 Beyond uniformity, repetition can be considered the next-simplest form of behavior. Repetition in time corresponds just to a system repeatedly returning to a particular state.
 
-This can happen if, for example, the behavior of a system in effect follows some closed curve such as a circle which always leads back to the same point. And in general, in any system with definite rules that only ever visits a limited number of states, it is
+This can happen if, for example, the behavior of a system in effect follows some closed curve such as a circle which always leads back to the same point. And in general, in any system with definite rules that only ever visits a limited number of states, it is inevitable—as discussed on page 255 and illustrated above—that the behavior of the system will eventually repeat.
 
 ![](_page_370_Picture_2.jpeg)
 
-The behavior of a system will be repetitive in time whenever it effectively follows a closed curve-either literally in space, or in terms of states that it visits.
-
-inevitable—as discussed on page 255 and illustrated above—that the behavior of the system will eventually repeat.
+The behavior of a system will be repetitive in time whenever it effectively follows a closed curve—either literally in space, or in terms of states that it visits.
 
 In some cases the basic structure of a system may allow only a limited number of possible states. But in other cases what happens is instead just that the actual evolution of a system never reaches more than a limited number of states.
 
@@ -830,6 +784,8 @@ Nesting can be defined by thinking in terms of splitting into smaller and smalle
 
 ![](_page_372_Figure_4.jpeg)
 
+Nesting in one- and two-dimensional neighbor-independent substitution systems in which each element breaks into a block of smaller elements at each step.
+
 An essentially equivalent process involves every element branching into smaller and smaller elements and eventually forming a tree-like structure, as in the pictures below.
 
 ![](_page_372_Figure_6.jpeg)
@@ -878,13 +834,11 @@ And as the pictures show, these regions form a pattern that corresponds to a ran
 
 Nesting in rule 184 is easiest to see when the initial conditions contain exactly equal numbers of black and white cells, so that the numbers of left and right stripes exactly balance, and all stripes eventually annihilate. But even when the initial conditions are such that some stripes survive, nested regions are still formed by the stripes that do annihilate. And indeed in essentially any system where there are domains that grow fairly independently and then progressively merge the same basic overall nesting will be seen.
 
-As an example, the picture below shows the rule 110 cellular automaton evolving from random initial conditions. The picture
+As an example, the picture below shows the rule 110 cellular automaton evolving from random initial conditions. The picture samples just the first cell in every $14 \times 7$ block of cells, making each domain of repetitive behavior stand out as having a uniform color.
 
 ![](_page_374_Picture_10.jpeg)
 
 A highly compressed representation of the evolution of rule 110 from random initial conditions in which only the first cell in every 14 × 7 block is sampled.
-
-samples just the first cell in every  $14 \times 7$  block of cells, making each domain of repetitive behavior stand out as having a uniform color.
 
 In the detailed behavior of the various localized structures that separate these domains of repetitive behavior there is all sorts of complexity. But what the picture suggests is that at some rough overall level these structures progressively tend to annihilate each other, and in doing so form an approximate nested pattern.
 
@@ -892,11 +846,15 @@ It turns out that this basic process is not restricted to systems which produce 
 
 ![](_page_375_Picture_4.jpeg)
 
+*k=3 totalistic code 1893*
+
+<!-- Editorial source-accounting reference: the legacy asset below rasterizes the author label transcribed as live text above.
 ![](_page_375_Picture_5.jpeg)
+-->
 
 ![](_page_375_Picture_6.jpeg)
 
-elementary rule 18 (compressed)
+*elementary rule 18 (compressed)*
 
 Examples involving domains containing apparent randomness. In the second picture, each element shown represents a  $2 \times 2$  block of original cells. In both cases, the boundaries between domains appear to follow random walks, annihilating when they meet and thus forming a nested overall pattern.
 
@@ -904,9 +862,7 @@ Instead of following simple straight lines, the boundaries of these domains now 
 
 So what about systems based on constraints? Can these also lead to nesting? In Chapter 5 I showed that they can. But what I found is that whereas at least in principle both uniformity and repetition can be forced fairly easily by constraints, nesting usually cannot be.
 
-At the outset, one might have thought that there would be just one definite mechanism for each type of simple behavior. But what we
-
-have seen in this section is that in fact there are usually several apparently quite different mechanisms possible.
+At the outset, one might have thought that there would be just one definite mechanism for each type of simple behavior. But what we have seen in this section is that in fact there are usually several apparently quite different mechanisms possible.
 
 Often one can identify features in common between the various mechanisms for any particular kind of behavior. But typically these end up just being inevitable consequences of the fact that some specific kind of behavior is being produced.
 
