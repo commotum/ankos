@@ -283,7 +283,7 @@ Neither file is a generalized workflow database.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
   documents, 1,444 mapped image positions (64 using source-backed
   repaired-only overrides), 41 source-added images, and generated
-  README/Contents files. It now includes 882 guarded source-verified
+  README/Contents files. It now includes 905 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -476,8 +476,33 @@ Neither file is a generalized workflow database.
   211-test repository suite with 649 subtests pass. Two fresh normal builds and
   the published sibling are byte-identical at tree SHA-256
   `008e7a5a76abc7eba70832b0dc35277a84c0eeb067e7b37eb516f973c5c5f3ba`.
-  The next target is `N01` at PDF 875, raw line 10,818, byte 1584683, with next
-  correction ID `G5-C-0883`.
+  This was the clean baseline used to start `N01`.
+- `N01` is complete at `YES/YES` after a full first pass and wholly fresh
+  post-italic-fix source, technical, and visual closing passes over PDF pages
+  875–880. Its 23 guarded corrections are `G5-C-0883`–`G5-C-0905`. The final
+  29,769-byte, 75-line Markdown hashes to
+  `3321cc8267ac42e44506e911348764e0698e2bd0b147886e115decd994a12c47`;
+  all 22 main notes, five Timeline subitems, nine italic spans, 65 references,
+  155 numeric-bearing spans, punctuation, structure, and the source-confirmed
+  absence of mapped images close with zero discrepancy and zero ambiguity. A
+  fresh closing traversal found the John Ray title-final comma outside the
+  Markdown emphasis; the guarded target was repaired and all three closing
+  passes restarted from PDF 875. Their final source, technical, and visual
+  reports hash respectively to
+  `2fc709fd033ab8db237d79867816772c5afde05b16aaf5a8d8ddda63aa619b4c`,
+  `8d91d25e466b24d7eb2667a37051b3f377971b156c4b45ece86139ec7546e9d5`,
+  and `5c0a62c233453c8501e92254845ac7ab93cc735e2c438519e44bc82b64172a3f`;
+  the fresh eight-page render hashes to
+  `c4f1462d9589cf3c395a5d657d75abfe3acc3846263275f217b5e20d83959b0a`.
+  Default validation now reports 905 corrections and 16 completed second-pass
+  documents. Five focused tests, the 114-test Goal 5 suite, and the complete
+  216-test repository suite with 690 subtests pass. Two fresh normal builds and
+  the published sibling are byte-identical at tree SHA-256
+  `1dde0107282feb217c20984c122e5218fdba4f28546e191179ec9d9291417d7a`;
+  strict zero-correction output remains
+  `d787dc0a8ba4388b3a0f1c83f38ed5f5f3c56bc1741241518373b997d2937401`.
+  The next target is `N02` at PDF 881, raw line 10,895, byte 1614202, with next
+  correction ID `G5-C-0906`; it owns mapped ordinals 824–877.
 
 ## Stage Status
 
