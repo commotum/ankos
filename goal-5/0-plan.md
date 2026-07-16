@@ -270,7 +270,7 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-15 (America/Los_Angeles).
-- Active stage: `4-CH05-08` (`IN_PROGRESS`).
+- Active stage: `5-CH09-12` (`IN_PROGRESS`).
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
   and the empty `goal-4/` directory were removed by exact path. No commit
   range was reverted, and Goal 4 had corrected no book text.
@@ -382,6 +382,12 @@ Neither file is a generalized workflow database.
   zero-correction validation, two fresh deterministic builds, legacy digest,
   and scope gates pass. The final Markdown SHA-256 is
   `5e794cedc877e539e30d9ef6102fea18f4533c56d3324f7d454326336e4a2004`.
+- Stage 5 is activated over `CH09`–`CH12`: PDF pages 449–864, printed pages
+  433–848, raw lines 5,164–10,622, bytes `[728322,1540232)`, and mapped
+  ordinals 480–822. The 416-page immutable raw interval hashes to
+  `04b5e3ecfa1c2b8fa09e09d39d78f887e07cc92f1fb5ef059d5c056d593cfb2a`.
+  `CH09` is next at `pdf:0449`, raw line 5,164, byte 728322, and image-map
+  ordinal 480; its coverage remains `NO/NO` until complete sequential review.
 
 ## Stage Status
 
@@ -390,8 +396,8 @@ Neither file is a generalized workflow database.
 | 1-CLEANUP | `COMPLETE` | none |
 | 2-FOUNDATION | `COMPLETE` | 1 |
 | 3-FRONT-CH04 | `COMPLETE` | 2 |
-| 4-CH05-08 | `IN_PROGRESS` | 2 |
-| 5-CH09-12 | `NOT_STARTED` | 2 |
+| 4-CH05-08 | `COMPLETE` | 2 |
+| 5-CH09-12 | `IN_PROGRESS` | 2 |
 | 6-NOTES-00-04 | `NOT_STARTED` | 2 |
 | 7-NOTES-05-08 | `NOT_STARTED` | 2 |
 | 8-NOTES-09-12 | `NOT_STARTED` | 2 |
