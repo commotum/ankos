@@ -217,7 +217,10 @@ def validate_output(
         )
         if not path.is_file() or build.sha256(path.read_bytes()) != expected_hash:
             raise build.BuildError(f"missing or changed output image: {relative}")
-        expected_references.append((str(row["document_id"]), source.name))
+        if zero_corrections or row.get("reference_disposition") != (
+            build.OMITTED_REFERENCE_DISPOSITION
+        ):
+            expected_references.append((str(row["document_id"]), source.name))
 
     expected_added_references: list[tuple[str, str]] = []
     for row in added_assets:

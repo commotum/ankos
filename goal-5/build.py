@@ -34,6 +34,16 @@ REPAIRED_IMAGE_FIELDS = {
     "repaired_width_px",
     "repaired_height_px",
 }
+REFERENCE_DISPOSITION_FIELDS = {
+    "reference_disposition",
+    "reference_authoritative_location",
+    "reference_reason",
+    "reference_reviewer_type",
+    "reference_verification_status",
+}
+OMITTED_REFERENCE_DISPOSITION = (
+    "SOURCE_FALSE_POSITIVE_RASTERIZED_TEXT_OMITTED"
+)
 ADDED_ASSET_FIELDS = {
     "id",
     "document_id",
@@ -476,6 +486,43 @@ def validate_images(
             if actual_dimensions != declared_dimensions:
                 raise BuildError(
                     f"image {ordinal}: repaired asset dimensions differ from manifest"
+                )
+
+        disposition_fields = REFERENCE_DISPOSITION_FIELDS & row.keys()
+        if disposition_fields and disposition_fields != REFERENCE_DISPOSITION_FIELDS:
+            missing = sorted(REFERENCE_DISPOSITION_FIELDS - disposition_fields)
+            raise BuildError(
+                f"image {ordinal}: incomplete reference disposition fields {missing}"
+            )
+        if disposition_fields:
+            if row["reference_disposition"] != OMITTED_REFERENCE_DISPOSITION:
+                raise BuildError(
+                    f"image {ordinal}: unsupported reference disposition"
+                )
+            disposition_location = row["reference_authoritative_location"]
+            location_match = (
+                AUTHORITATIVE_LOCATION.match(disposition_location)
+                if isinstance(disposition_location, str)
+                else None
+            )
+            if location_match is None or int(location_match.group(1)) != source_page:
+                raise BuildError(
+                    f"image {ordinal}: reference disposition source page differs"
+                )
+            if (
+                not isinstance(row["reference_reason"], str)
+                or not row["reference_reason"].strip()
+            ):
+                raise BuildError(
+                    f"image {ordinal}: reference disposition lacks a reason"
+                )
+            if row["reference_reviewer_type"] != "agent":
+                raise BuildError(
+                    f"image {ordinal}: invalid reference disposition reviewer"
+                )
+            if row["reference_verification_status"] != "SOURCE_VERIFIED":
+                raise BuildError(
+                    f"image {ordinal}: reference disposition is not source verified"
                 )
 
     physical_assets = {
