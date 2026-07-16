@@ -1,8 +1,8 @@
 ![](_page_652_Picture_0.jpeg)
 
-#### The Notion of Computation
+## The Notion of Computation
 
-#### Computation as a Framework
+### Computation as a Framework
 
 In earlier parts of this book we saw many examples of the kinds of behavior that can be produced by cellular automata and other systems with simple underlying rules. And in this chapter and the next my goal is to develop a general framework for thinking about such behavior.
 
@@ -14,15 +14,13 @@ If traditional science was our only guide, then at this point we would probably 
 
 Throughout this book I have referred to systems such as cellular automata as simple computer programs. So now the point is actually to think of these systems in terms of the computations they can perform.
 
-In a typical case, the initial conditions for a system like a cellular automaton can be viewed as corresponding to the input to a computation, while the state of the system after some number of steps corresponds to the output. And the key idea is then to think in purely
-
-abstract terms about the computation that is performed, without necessarily looking at all the details of how it actually works.
+In a typical case, the initial conditions for a system like a cellular automaton can be viewed as corresponding to the input to a computation, while the state of the system after some number of steps corresponds to the output. And the key idea is then to think in purely abstract terms about the computation that is performed, without necessarily looking at all the details of how it actually works.
 
 Why is such an abstraction useful? The main reason is that it potentially allows one to discuss in a unified way systems that have completely different underlying rules. For even though the internal workings of two systems may have very little in common, the computations the systems perform may nevertheless be very similar.
 
 And by thinking in terms of such computations, it then becomes possible to imagine formulating principles that apply to a very wide variety of different systems—quite independent of the detailed structure of their underlying rules.
 
-#### **Computations in Cellular Automata**
+### Computations in Cellular Automata
 
 I have said that the evolution of a system like a cellular automaton can be viewed as a computation. But what kind of computation is it, and how does it compare to computations that we typically do in practice?
 
@@ -34,7 +32,7 @@ If one starts this cellular automaton with an even number of black cells, then a
 
 ![](_page_653_Picture_10.jpeg)
 
-A simple cellular automaton whose evolution effectively computes the remainder after division of a number by 2. Starting from a row of n black cells, 0 black cells survive if n is even, and 1 black cell survives if n is odd. The cellular automaton follows elementary rule 132. as shown on the left.
+A simple cellular automaton whose evolution effectively computes the remainder after division of a number by 2. Starting from a row of n black cells, 0 black cells survive if n is even, and 1 black cell survives if n is odd. The cellular automaton follows elementary rule 132, as shown on the left.
 
 One specifies the input to the computation by setting up an appropriate number of initial black cells. And then one determines the result of the computation by looking at how many black cells survive in the end.
 
@@ -86,7 +84,7 @@ rule 45
 
 rule 73
 
-#### The Phenomenon of Universality
+### The Phenomenon of Universality
 
 In the previous section we saw that it is possible to get cellular automata to perform some fairly sophisticated computations. But for each specific computation we wanted to do, we always set up a cellular automaton with a different set of underlying rules. And indeed our everyday experience with mechanical and other devices might lead us to assume that in general in order to perform different kinds of tasks we must always use systems that have different underlying constructions.
 
@@ -100,9 +98,7 @@ The details of a particular computer system or computer language will certainly 
 
 One way to see that this must be true is to note that any particular computer system or computer language can always be set up by appropriate programming to emulate any other one.
 
-Typically the way this is done is by having each individual action in the system that is to be emulated be reproduced by some sequence of actions in the other system. And indeed this is ultimately how, for example, *Mathematica* works. For when one enters a command such as Log[15], what actually happens is that the program which implements the *Mathematica* language interprets this command
-
-by executing the appropriate sequence of machine instructions on whatever computer system one is using.
+Typically the way this is done is by having each individual action in the system that is to be emulated be reproduced by some sequence of actions in the other system. And indeed this is ultimately how, for example, *Mathematica* works. For when one enters a command such as Log[15], what actually happens is that the program which implements the *Mathematica* language interprets this command by executing the appropriate sequence of machine instructions on whatever computer system one is using.
 
 And having now identified the phenomenon of universality in the context of practical computing, one can immediately see various analogs of it in other areas of common experience. Human languages provide an example. For one knows that given a single fixed underlying language, it is possible to describe an almost arbitrarily wide range of things. And given any two languages, it is for the most part always possible to translate between them.
 
@@ -116,9 +112,7 @@ But now the question is what kinds of systems are in fact universal.
 
 Most present-day mechanical devices, for example, are built only for rather specific tasks, and are not universal. And among electronic devices there are examples such as simple calculators and electronic address books that are not universal. But by now the vast majority of practical electronic devices, despite all their apparent differences, are based on computers that are universal.
 
-At some level, however, these computers tend to be extremely similar. Indeed, essentially all of them are based on the same kinds of logic circuits, the same basic layout of data paths, and so on. And knowing this, one might conclude that any system which was universal must include direct analogs of these specific elements. But from
-
-experience with computer languages, there is already an indication that the range of systems that are universal might be somewhat broader.
+At some level, however, these computers tend to be extremely similar. Indeed, essentially all of them are based on the same kinds of logic circuits, the same basic layout of data paths, and so on. And knowing this, one might conclude that any system which was universal must include direct analogs of these specific elements. But from experience with computer languages, there is already an indication that the range of systems that are universal might be somewhat broader.
 
 Indeed, *Mathematica* turns out to be a particularly good example, in which one can pick very different sets of operations to use, and yet still be able to implement exactly the same kinds of programs.
 
@@ -130,7 +124,7 @@ But just as we found that the intuition which suggests that simple rules cannot 
 
 In the past it has tended to be assumed that universality is somehow a rare and special quality, usually possessed only by systems that are specifically constructed to have it. But one of the results of this chapter is that in fact universality is a much more widespread phenomenon. And in the next chapter I will argue that for example it also occurs in a wide range of important systems that we see in nature.
 
-#### A Universal Cellular Automaton
+### A Universal Cellular Automaton
 
 As our first specific example of a system that exhibits universality, I discuss in this section a particular universal cellular automaton that has been set up to make its operation as easy to follow as possible.
 
@@ -168,9 +162,7 @@ The pages that follow show how this works. The basic idea is that a block of 20 
 
 ![](_page_663_Picture_3.jpeg)
 
-The rules for the universal cellular automaton. There are 19 possible colors for each cell, represented here by 19 different icons. Since the new color of each cell depends on the previous colors of a total of five cells, there are in principle 2,476,099 cases to cover. But by using 
-
-to stand for a cell with any possible color, many cases are combined. Note that the cases shown are in a definite order reading down successive columns, with special cases given before more general ones. With the initial conditions used, there are some combinations of cells that can never occur, and these are not covered in the rules shown.
+The rules for the universal cellular automaton. There are 19 possible colors for each cell, represented here by 19 different icons. Since the new color of each cell depends on the previous colors of a total of five cells, there are in principle 2,476,099 cases to cover. But by using $\boxminus$ to stand for a cell with any possible color, many cases are combined. Note that the cases shown are in a definite order reading down successive columns, with special cases given before more general ones. With the initial conditions used, there are some combinations of cells that can never occur, and these are not covered in the rules shown.
 
 ![](_page_664_Picture_1.jpeg)
 
@@ -224,7 +216,7 @@ Looking at the specific universal cellular automaton that we have discussed in t
 
 But what we will discover later in this chapter is that such complication in underlying rules is in fact not needed. Indeed, in the end we will see that universality can actually occur in cellular automata with just two colors and nearest neighbors. The operation of such cellular automata is considerably more difficult to follow than the operation of the universal cellular automaton discussed in this section. But the existence of universal cellular automata with such simple underlying rules makes it clear that the basic results we have obtained in this section are potentially of very broad significance.
 
-#### **Emulating Other Systems with Cellular Automata**
+### Emulating Other Systems with Cellular Automata
 
 The previous section showed that a particular universal cellular automaton could emulate any possible cellular automaton. But what about other types of systems? Can cellular automata also emulate these?
 
@@ -263,6 +255,8 @@ The same kind of problem occurs in sequential substitution systems—as well as 
 But just how broad is the set of systems that cellular automata can ultimately emulate? All the examples of systems that I have shown so far can at some level be thought of as involving sequences of elements that are fairly directly analogous to the cells in a cellular automaton.
 
 ![](_page_674_Picture_2.jpeg)
+
+Examples of cellular automata that emulate substitution systems. The successive steps in the evolution of each substitution system are obtained at the points indicated by arrows. Note that the sequences of elements generated by the cellular automata are aligned at the right, while in the pictures of the substitution systems shown they are aligned at the left. The rules for the three cellular automata involve only nearest neighbors, and allow 12 possible colors for each cell.
 
 ![](_page_675_Figure_1.jpeg)
 
@@ -304,7 +298,7 @@ And as a result, one can conclude that any of the very wide range of computation
 
 From the previous section we know that any cellular automaton can be emulated by a universal cellular automaton. But now we see that a universal cellular automaton is actually much more universal than we saw in the previous section. For not only can it emulate any cellular automaton: it can also emulate any of a wide range of other systems, including practical computers.
 
-#### **Emulating Cellular Automata with Other Systems**
+### Emulating Cellular Automata with Other Systems
 
 In the previous section we discovered the rather remarkable fact that cellular automata can be set up to emulate an extremely wide range of other types of systems. But is this somehow a special feature of cellular automata, or do other systems also have similar capabilities?
 
@@ -334,7 +328,7 @@ But if one generalizes to neighbor-dependent substitution systems then it immedi
 
 ![](_page_681_Figure_3.jpeg)
 
-Neighbor-dependent substitution systems that emulate cellular automata with rules 90 and 30. The systems shown are simple examples of neighbor-dependent substitution systems with highly uniform rules always yielding just one cell and corresponding guite directly to cellular automata.
+Neighbor-dependent substitution systems that emulate cellular automata with rules 90 and 30. The systems shown are simple examples of neighbor-dependent substitution systems with highly uniform rules always yielding just one cell and corresponding quite directly to cellular automata.
 
 What about sequential substitution systems? Here again it turns out to be fairly easy to emulate cellular automata—as the pictures at the top of the facing page demonstrate.
 
@@ -356,8 +350,6 @@ Tag systems that emulate the rule 90 and rule 30 cellular automata. The pictures
 
 ![](_page_683_Figure_1.jpeg)
 
-<sup>(</sup>a)  $p[x_{-}][p][p][p] \rightarrow p[x[p]][p][p], p[x_{-}][p][p][q] \rightarrow p[x[q]][p][q], p[x_{-}][p][q][p] \rightarrow p[x[p]][q][p], p[x_{-}][p][q][q] \rightarrow p[x[p]][q][q], p[x_{-}][q][p][p] \rightarrow p[x[p][p][p], p[x_{-}][q][q][q] \rightarrow p[x[p][p][p], p[x_{-}][q][q][q] \rightarrow p[x[p][q][q], p[x_{-}][q][q][q] \rightarrow p[x[p][q][q], p[x_{-}][q][q][q], p[x_{-}][q][q][q] \rightarrow p[x[p][q][q], p[x_{-}][q][q][q], p[x_{-}][q][q][q], p[x_{-}][q][q][q], p[x_{-}][q][q][q][q][q][q][q][q][q][q][q][q][q]$ 
-
 Symbolic systems set up to emulate cellular automata that have rules 90 and 30. Unlike the examples of symbolic systems in Chapter 3, which involve only one symbol, these symbolic systems involve three symbols, p, q and r.
 
 And as soon as one knows that any particular type of system is capable of emulating any cellular automaton, it immediately follows that there must be examples of that type of system that are universal.
@@ -365,8 +357,6 @@ And as soon as one knows that any particular type of system is capable of emulat
 So what about the other types of systems that we considered in Chapter 3? One that we have not yet discussed here are cyclic tag systems. And as it turns out, we will end up using just such systems later in this chapter as part of establishing a dramatic example of universality.
 
 But to demonstrate that cyclic tag systems can manage to emulate cellular automata is not quite as straightforward as to do this for the various kinds of systems we have discussed so far. And indeed we will end up doing it in several stages. The first stage, illustrated in the picture at the top of the facing page, is to get a cyclic tag system to emulate an ordinary tag system with the property that its rules depend only on the very first element that appears at each step.
-
- $p[x_{-}|[p][p][p] \rightarrow p[x[p]][p][p], \ p[x_{-}|[p][p][q] \rightarrow p[x[q]][p][q], \ p[x_{-}|[p][q][p], \ p[x_{-}|[p][q][q] \rightarrow p[x[q]][q][q], \ p[x_{-}|[q][p][p], \ p[x_{-}|[p][q][q], \ p[x_{-}|[p][q][q], \ p[x_{-}|[q][p][q], \ p[x_{-}|[q][p][q], \ p[x_{-}|[q][q][p], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \ p[x_{-}|[q][q][q], \$ 
 
 ![](_page_684_Figure_1.jpeg)
 
@@ -381,8 +371,6 @@ And having done this, the next stage is to get such a tag system to emulate a Tu
 Turing machines with two colors emulating ones with more colors.
 
 ![](_page_685_Figure_2.jpeg)
-
-tag system compressed evolution (1500 steps)
 
 Emulating a Turing machine with a tag system that depends only on the first element at each step. The configuration of cells on each side of the head in the Turing machine is treated as a base 2 number. At the steps indicated by arrows the tag system yields sequences of dark cells with lengths that correspond to each of these numbers.
 
@@ -400,7 +388,7 @@ An example of a register machine set up to emulate a Turing machine. The Turing 
 
 The picture below shows that such a system can be set up to emulate a register machine. And from the fact that register machines are universal it follows that so too are such arithmetic systems.
 
-And indeed the fact that it is possible to set up a universal system using essentially just the operations of ordinary arithmetic is closely related to the proof of Gödel's Theorem discussed on page 784.
+And indeed the fact that it is possible to set up a universal system using essentially just the operations of ordinary arithmetic is closely related to the proof of Gödel’s Theorem discussed on page 784.
 
 But from what we have learned in this chapter, it no longer seems surprising that arithmetic should be capable of achieving universality. Indeed, considering all the kinds of systems that we have found can exhibit universality, it would have been quite peculiar if arithmetic had somehow not been able to support it.
 
@@ -408,17 +396,17 @@ But from what we have learned in this chapter, it no longer seems surprising tha
 
 ![](_page_688_Picture_5.jpeg)
 
-An example of how a simple arithmetic system can emulate a register machine. The arithmetic system takes the value nthat it obtains at each step, computes Mod[n, 30], and then depending on the result applies to n one of the arithmetic operations specified by the rule on the left below. The rule is set up so that if the value of n is written in the form i + 5,  $2^a$ ,  $3^b$  then the values of i, a and b on successive stens correspond respectively to the position of the register machine in its program, and to the values of the two registers (2 and 3 appear because they are the first two primes; 5 appears because it is the length of the register machine program). The values of n in the pictures on the left are indicated on a logarithmic scale.
+An example of how a simple arithmetic system can emulate a register machine. The arithmetic system takes the value $n$ that it obtains at each step, computes $Mod[n, 30]$, and then depending on the result applies to $n$ one of the arithmetic operations specified by the rule on the left below. The rule is set up so that if the value of $n$ is written in the form $i + 5$, $2^a$, $3^b$ then the values of $i$, $a$ and $b$ on successive steps correspond respectively to the position of the register machine in its program, and to the values of the two registers (2 and 3 appear because they are the first two primes; 5 appears because it is the length of the register machine program). The values of $n$ in the pictures on the left are indicated on a logarithmic scale.
 
-| 2 n + 1 | (n - 1)/3 | 3 (n - 1) | (n + 1)/2 | (n-4)/3 | 2 n + 1 | n + 1     | 3 (n - 1) | n + 1 | n + 1   |
-|---------|-----------|-----------|-----------|---------|---------|-----------|-----------|-------|---------|
-| 0       | 1         | 2         | 3         | 4       | 5       | 6         | 7         | 8     | 9       |
-| 2 n + 1 | n + 1     | 3 (n - 1) | (n + 1)/2 | n + 1   | 2 n + 1 | (n - 1)/3 | 3 (n - 1) | n + 1 | (n-4)/3 |
-| 10      | 11        | 12        | 13        | 14      | 15      | 16        | 17        | 18    | 19      |
-| 2 n + 1 | n + 1     | 3 (n - 1) | (n + 1)/2 | n + 1   | 2 n + 1 | n + 1     | 3 (n - 1) | n + 1 | n + 1   |
-| 20      | 21        | 22        | 23        | 24      | 25      | 26        | 27        | 28    | 29      |
+| $2 n + 1$ | $(n - 1)/3$ | $3 (n - 1)$ | $(n + 1)/2$ | $(n - 4)/3$ | $2 n + 1$ | $n + 1$ | $3 (n - 1)$ | $n + 1$ | $n + 1$ |
+|---|---|---|---|---|---|---|---|---|---|
+| $0$ | $1$ | $2$ | $3$ | $4$ | $5$ | $6$ | $7$ | $8$ | $9$ |
+| $2 n + 1$ | $n + 1$ | $3 (n - 1)$ | $(n + 1)/2$ | $n + 1$ | $2 n + 1$ | $(n - 1)/3$ | $3 (n - 1)$ | $n + 1$ | $(n - 4)/3$ |
+| $10$ | $11$ | $12$ | $13$ | $14$ | $15$ | $16$ | $17$ | $18$ | $19$ |
+| $2 n + 1$ | $n + 1$ | $3 (n - 1)$ | $(n + 1)/2$ | $n + 1$ | $2 n + 1$ | $n + 1$ | $3 (n - 1)$ | $n + 1$ | $n + 1$ |
+| $20$ | $21$ | $22$ | $23$ | $24$ | $25$ | $26$ | $27$ | $28$ | $29$ |
 
-#### Implications of Universality
+### Implications of Universality
 
 When we first discussed cellular automata, Turing machines, substitution systems, register machines and so on in Chapter 3, each of these kinds of systems seemed rather different. But already in Chapter 3 we discovered that at the level of overall behavior, all of them had certain features in common. And now, finally, by thinking in terms of computation, we can begin to see why this might be the case.
 
@@ -434,31 +422,27 @@ And among other things, this means that it really does make sense to discuss the
 
 But it should be emphasized that among systems of any particular type—say cellular automata—not all possible underlying rules are capable of supporting the same kinds of computations.
 
-Indeed, as we saw at the beginning of this chapter, some cellular automata can perform only very simple computations, always yielding
-
-for example purely repetitive patterns. But the crucial point is that as one looks at cellular automata with progressively greater computational capabilities, one will eventually pass the threshold of universality. And once past this threshold, the set of computations that can be performed will always be exactly the same.
+Indeed, as we saw at the beginning of this chapter, some cellular automata can perform only very simple computations, always yielding for example purely repetitive patterns. But the crucial point is that as one looks at cellular automata with progressively greater computational capabilities, one will eventually pass the threshold of universality. And once past this threshold, the set of computations that can be performed will always be exactly the same.
 
 One might assume that by using more and more sophisticated underlying rules, one would always be able to construct systems with ever greater computational capabilities. But the phenomenon of universality implies that this is not the case, and that as soon as one has passed the threshold of universality, nothing more can in a sense ever be gained.
 
 In fact, once one has a system that is universal, its properties are remarkably independent of the details of its construction. For at least as far as the computations that it can perform are concerned, it does not matter how sophisticated the underlying rules for the system are, or even whether the system is a cellular automaton, a Turing machine, or something else. And as we shall see, this rather remarkable fact forms the basis for explaining many of the observations we made in Chapter 3, and indeed for developing much of the conceptual framework that is needed for the new kind of science in this book.
 
-#### The Rule 110 Cellular Automaton
+### The Rule 110 Cellular Automaton
 
 In previous sections I have shown that a wide variety of different kinds of systems can in principle be made to exhibit the phenomenon of universality. But how complicated do the underlying rules need to be in a specific case in order actually to achieve universality?
 
 The universal cellular automaton that I described earlier in this chapter had rather complicated underlying rules, involving 19 possible colors for each cell, depending on next-nearest as well as nearest neighbors. But this cellular automaton was specifically constructed so as to make its operation easy to understand. And by not imposing this constraint, one might expect that one would be able to find universal cellular automata that have at least somewhat simpler underlying rules.
 
-Fairly straightforward modifications to the universal cellular automaton shown earlier in this chapter allow one to reduce the number
-
-of colors from 19 to 17. And in fact in the early 1970s, it was already known that cellular automata with 18 colors and nearest-neighbor rules could be universal. In the late 1980s—with some ingenuity—examples of universal cellular automata with 7 colors were also constructed.
+Fairly straightforward modifications to the universal cellular automaton shown earlier in this chapter allow one to reduce the number of colors from 19 to 17. And in fact in the early 1970s, it was already known that cellular automata with 18 colors and nearest-neighbor rules could be universal. In the late 1980s—with some ingenuity—examples of universal cellular automata with 7 colors were also constructed.
 
 But such rules still involve 343 distinct cases and are by almost any measure very complicated. And certainly rules this complicated could not reasonably be expected to be common in the types of systems that we typically see in nature. Yet from my experiments on cellular automata in the early 1980s I became convinced that very much simpler rules should also show universality. And by the mid-1980s I began to suspect that even among the very simplest possible rules—with just two colors and nearest neighbors—there might be examples of universality.
 
-The leading candidate was what I called rule 110-a cellular automaton that we have in fact discussed several times before in this book. Like any of the 256 so-called elementary rules, rule 110 can be specified as below by giving the outcome for each of the eight possible combinations of colors of a cell and its nearest neighbors.
+The leading candidate was what I called rule 110—a cellular automaton that we have in fact discussed several times before in this book. Like any of the 256 so-called elementary rules, rule 110 can be specified as below by giving the outcome for each of the eight possible combinations of colors of a cell and its nearest neighbors.
 
 ![](_page_691_Picture_5.jpeg)
 
-The underlying rules for the rule 110 cellular automaton discussed in this section. As elsewhere in the book, each of the eight cases shows what the new color of a cell should be based on its own previous color, and on the previous colors of its neighbors. Despite the extreme simplicity of its underlying rules, what this section will demonstrate is that the rule 110 cellular automaton is in fact universal, and is thus in a sense capable of arbitrarily complex behavior. If the values of the cells in each block are labelled p, q and r, then rule 110 can be written as Mod[(1+p) gr + g + r, 2] or  $\neg (p \land q \land r) \land (q \lor r)$ .
+The underlying rules for the rule 110 cellular automaton discussed in this section. As elsewhere in the book, each of the eight cases shows what the new color of a cell should be based on its own previous color, and on the previous colors of its neighbors. Despite the extreme simplicity of its underlying rules, what this section will demonstrate is that the rule 110 cellular automaton is in fact universal, and is thus in a sense capable of arbitrarily complex behavior. If the values of the cells in each block are labelled $p$, $q$ and $r$, then rule 110 can be written as $Mod[(1 + p) q r + q + r, 2]$ or $\neg (p \land q \land r) \land (q \lor r)$.
 
 Looking just at this very simple specification, however, it seems at first quite absurd to think that rule 110 might be universal. But as soon as one looks at a picture of how rule 110 actually behaves, the idea that it could be universal starts to seem much less absurd. For despite the simplicity of its underlying rules, rule 110 supports a whole variety of localized structures—that move around and interact in many complicated ways. And from pictures like the one on the facing page, it begins to seem not unreasonable that perhaps these localized structures could be arranged so as to perform meaningful computations.
 
@@ -548,6 +532,8 @@ Close-ups (continued).
 
 ![](_page_701_Picture_1.jpeg)
 
+Close-ups (continued).
+
 additional localized structures are produced that can be seen propagating to the left. These structures could later cause trouble, but looking at region (b) we see that in fact they just pass through other structures that they meet without any adverse effect.
 
 Region (c) shows what happens when the information corresponding to one element in a block passes through the kind of object produced in region (a). The number of localized structures that represent the element is reduced from twelve to four, but the spacings of these structures continue to specify its color. Region (d) then shows how the object in region (c) comes to an end when the beginning of the block separator from the next step arrives.
@@ -580,7 +566,7 @@ In essence, these constraints end up being that the blocks that appear in the ru
 
 Using the ideas discussed on page 669, it is not difficult, however, to make a cyclic tag system that satisfies these constraints, but that emulates any other cyclic tag system. And as a result, we may therefore conclude that rule 110 can in fact successfully emulate absolutely any cyclic tag system. And this means that rule 110 is indeed universal.
 
-#### The Significance of Universality in Rule 110
+### The Significance of Universality in Rule 110
 
 Practical computers and computer languages have traditionally been the only common examples of universality that we ever encounter. And from the fact that these kinds of systems tend to be fairly complicated in their construction, the general intuition has developed that any system that manages to be universal must somehow also be based on quite complicated underlying rules.
 
@@ -602,7 +588,7 @@ Remarkably enough, it turns out that this is essentially what we already observe
 
 So in retrospect the results of Chapter 3 should already have suggested that simple underlying rules such as rule 110 might be able to achieve universality. But what the elaborate construction in the previous section has done is to show for certain that this is the case.
 
-#### Class 4 Behavior and Universality
+### Class 4 Behavior and Universality
 
 If one looks at the typical behavior of rule 110 with random initial conditions, then the most obvious feature of what one sees is that there are a large number of localized structures that move around and interact with each other in complicated ways. But as we saw in Chapter 6, such behavior is by no means unique to rule 110. Indeed, it is in fact characteristic of all cellular automata that lie in what I called class 4.
 
@@ -634,7 +620,7 @@ The strategy for demonstrating universality in a two-dimensional cellular automa
 
 Returning to one dimension, one can ask whether among the 256 elementary cellular automata there are any apart from rule 110 that show even signs of class 4 behavior. As we will see in the next section, one possibility is rule 54. And if this rule is in fact class 4 then it is my expectation that by looking at interactions between the localized structures it supports it will in the end—with enough effort—be possible to show that it too exhibits the phenomenon of universality.
 
-#### The Threshold of Universality in Cellular Automata
+### The Threshold of Universality in Cellular Automata
 
 By showing that rule 110 is universal, we have established that universality is possible even among cellular automata with the very simplest kinds of underlying rules. But there remains the question of what is ultimately needed for a cellular automaton—or any other kind of system—to be able to achieve universality.
 
@@ -684,7 +670,7 @@ Some localized structures are definitely seen. But are they enough to support cl
 
 ![](_page_712_Picture_2.jpeg)
 
-Forms of behavior seen in the first 100 million initial conditions for rule 54. With initial condition 291 the  $n^{th}$  new stripe on the right is produced at step  $2 n^2 + 8 n - 9$ . Even in the last case shown, the arrangement of stripes eventually becomes completely regular, with the  $n^{th}$  new stripe being produced at step  $n^2 + 21 n/2 - \{6, 5, -4, 3\} [Mod[n, 4] + 1]]/2$ . Pairs of cells are grouped together in each picture, as at the bottom of the facing page.
+Forms of behavior seen in the first 100 million initial conditions for rule 54. With initial condition 291 the  $n^{th}$  new stripe on the right is produced at step  $2 n^2 + 8 n - 9$ . Even in the last case shown, the arrangement of stripes eventually becomes completely regular, with the  $n^{th}$  new stripe being produced at step  $n^2 + 21 n/2 - \{6, 5, -4, 3\}[[Mod[n, 4] + 1]]/2$ . Pairs of cells are grouped together in each picture, as at the bottom of the facing page.
 
 So can rule 54 achieve universality? I am not sure. It could be that if one went just a little further in looking at initial conditions one would see more complicated behavior. And it could be that even the structures shown above can be combined to produce all the richness that is needed for universality. But it could also be that whatever one does rule 54 will always in the end just show purely repetitive or nested behavior—which cannot on its own support universality.
 
@@ -748,9 +734,7 @@ In the case of the 19-color universal cellular automaton on page 645 it turns ou
 
 ![](_page_717_Figure_1.jpeg)
 
-cellular automata. In each case single cells are encoded as blocks of cells, and all distinct such encodings with blocks up to length 20 are shown.
-
-rulo 11
+Examples of using various specific elementary cellular automata to emulate other elementary cellular automata. In each case single cells are encoded as blocks of cells, and all distinct such encodings with blocks up to length 20 are shown.
 
 So given a particular elementary cellular automaton one can then ask what other elementary cellular automata it can emulate using blocks up to a certain length.
 
@@ -780,9 +764,7 @@ one step in the evolution of every single one of the 256 possible elementary cel
 
 So what about other underlying rules?
 
-The picture on the facing page shows for several different underlying rules which of the 256 possible elementary rules can successfully be emulated with successively wider blocks. In cases where the underlying rules have only rather simple behavior—as with rules 90 and 184—it turns out that it is never possible to emulate more than a
-
-few of the 256 possible elementary rules. But for underlying rules that have more complex behavior—like rules 22, 30, or 110—it turns out that in the end it is always possible to emulate all 256 elementary rules.
+The picture on the facing page shows for several different underlying rules which of the 256 possible elementary rules can successfully be emulated with successively wider blocks. In cases where the underlying rules have only rather simple behavior—as with rules 90 and 184—it turns out that it is never possible to emulate more than a few of the 256 possible elementary rules. But for underlying rules that have more complex behavior—like rules 22, 30, or 110—it turns out that in the end it is always possible to emulate all 256 elementary rules.
 
 ![](_page_720_Figure_2.jpeg)
 
@@ -792,7 +774,7 @@ The emulation here is, however, only for a single step. So the fact that it is p
 
 And this suggests that such cellular automata will in the end turn out to be universal—with the result that out of the 256 elementary rules one expects that perhaps as many as 27 will in fact be universal.
 
-#### Universality in Turing Machines and Other Systems
+### Universality in Turing Machines and Other Systems
 
 From the results of the previous few sections, we now have some idea where the threshold for universality lies in cellular automata. But what about other kinds of systems—like Turing machines? How complicated do the rules need to be in order to get universality?
 
@@ -812,9 +794,7 @@ It is already an achievement to find a universal Turing machine as comparatively
 
 But as one might expect from the discoveries in this book, this is far from correct. And in fact, by using the universality of rule 110 it turns out to be possible to come up with the vastly simpler universal Turing machine shown below—with just 2 states and 5 possible colors.
 
-| ,   | ٨  | ٨  | ٨  | ٨        | • | • | • | •   | •        |
-|-----|----|----|----|----------|---|---|---|-----|----------|
-| ▼ ■ | ■, | □• | □▲ | <b>A</b> | • | • | • | □ 4 | <b>4</b> |
+![](_page_722_Turing_Rule.jpeg)
 
 The rule for the simplest Turing machine currently known to be universal, based on discoveries in this book. The machine has 2 states and 5 possible colors.
 
@@ -823,8 +803,6 @@ The rule for the simplest Turing machine currently known to be universal, based 
 ![](_page_722_Figure_7.jpeg)
 
 An example of how the Turing machine above manages to emulate rule 110. The compressed picture is made by keeping only the steps indicated at which the head is further to the right than ever before. To get the picture shown requires running the Turing machine for a total of 5000 steps.
-
-STEPHEN WOLFRAM
 
 As the picture at the bottom of the previous page illustrates, this Turing machine emulates rule 110 in a quite straightforward way: its head moves systematically backwards and forwards, at each complete sweep updating all cells according to a single step of rule 110 evolution. And knowing from earlier in this chapter that rule 110 is universal, it then follows that the 2-state 5-color Turing machine must also be universal.
 
@@ -835,6 +813,8 @@ I am quite certain that it is not. And in fact I expect that there are some sign
 If one looks at the 4096 Turing machines with 2 states and 2 colors it is fairly easy to see that their behavior is in all cases too simple to support universality. So between 2 states and 2 colors and 2 states and 5 colors, where does the threshold for universality in Turing machines lie?
 
 ![](_page_723_Figure_6.jpeg)
+
+Examples of Turing machines with 2 states and 4 colors that show complex behavior. The compressed pictures above are based on 50,000 steps of evolution. In all cases, all cells are initially white.
 
 The pictures at the bottom of the facing page give examples of some 2-state 4-color Turing machines that show complex behavior. And I have little doubt that most if not all of these are universal.
 
@@ -850,9 +830,7 @@ The picture below shows an example.
 
 ![](_page_724_Picture_7.jpeg)
 
-One of the 14 essentially equivalent 2-state 3-color Turing machines that yield complicated behavior when started from a blank tape. The compressed picture above is made by taking the first 100,000 steps, and
-
-keeping only those at which the head is further to the left than ever before. The interior of the pattern that emerges is like an inverted version of the rule 60 additive cellular automaton; the boundary, however, is more complicated. In the numbering scheme of page 761 this is machine 596,440 out of the total of 2,985,984 with 2 states and 3 colors.
+One of the 14 essentially equivalent 2-state 3-color Turing machines that yield complicated behavior when started from a blank tape. The compressed picture above is made by taking the first 100,000 steps, and keeping only those at which the head is further to the left than ever before. The interior of the pattern that emerges is like an inverted version of the rule 60 additive cellular automaton; the boundary, however, is more complicated. In the numbering scheme of page 761 this is machine 596,440 out of the total of 2,985,984 with 2 states and 3 colors.
 
 And although it will no doubt be very difficult to prove, it seems likely that this Turing machine will in the end turn out to be universal. And if so, then presumably it will by most measures be the very simplest Turing machine that is universal.
 
@@ -864,9 +842,7 @@ Yet despite this, it still seems conceivable that with appropriate initial condi
 
 From the universality of rule 110 we know that if one just starts enumerating cellular automata in a particular order, then after going through at most 110 rules, one will definitely see universality. And from other results earlier in this chapter it seems likely that in fact one would tend to see universality even somewhat earlier—after going through only perhaps just ten or twenty rules.
 
-Among Turing machines, the universal 2-state 5-color rule on page 707 can be assigned the number 8,679,752,795,626. So this means
-
-that after going through perhaps nine trillion Turing machines one will definitely tend to find an example that is universal. But presumably one will actually find examples much earlier—since for example the 2-state 3-color machine on page 709 is only number 596,440.
+Among Turing machines, the universal 2-state 5-color rule on page 707 can be assigned the number 8,679,752,795,626. So this means that after going through perhaps nine trillion Turing machines one will definitely tend to find an example that is universal. But presumably one will actually find examples much earlier—since for example the 2-state 3-color machine on page 709 is only number 596,440.
 
 And although these numbers are larger than for cellular automata, the fact remains that the simplest potentially universal Turing machines are still very simple in structure, suggesting that the threshold for universality in Turing machines—just like in cellular automata—is in many respects very low.
 
@@ -888,7 +864,7 @@ With short initial conditions, the pictures at the top of the next page demonstr
 
 ![](_page_727_Figure_1.jpeg)
 
-Examples of combinator evolution. The expression in case (e) is the shortest that leads to unlimited growth. The plots at the bottom show the total sizes of expressions reached on successive steps. Note that the detailed pattern of evolution—though not any final fixed point reached—can depend on the fact that the combinator rules are applied at each step in *Mathematica 1*. order.
+Examples of combinator evolution. The expression in case (e) is the shortest that leads to unlimited growth. The plots at the bottom show the total sizes of expressions reached on successive steps. Note that the detailed pattern of evolution—though not any final fixed point reached—can depend on the fact that the combinator rules are applied at each step in *Mathematica* */.* order.
 
 that no fixed point is reached, and instead there is exponential growth in total size—with apparently rather random internal behavior.
 
@@ -900,7 +876,7 @@ And while issues of typical behavior have not really been studied before, it has
 
 One way that we can now show this is to demonstrate that combinators can emulate rule 110. And as the pictures on the next page illustrate, it turns out that just repeatedly applying the combinator expression below reproduces successive steps in the evolution of rule 110.
 
-\$[\$[k[s]][\$[k[s[s]k][k]]]][\$[k[k]]][\$[\$[s]s[s[s]k][k]][k[s[k]]][k[s]s[k[s]][s[k[s]k][k]]][\$[k[s]s[k]]][\$[k]s[s[k]]][\$[k]s[s[k]]][\$[k]s[s[k]]][\$[k]s[s[k]]][\$[k]s[s[k]]][\$[k]s[s[k]]][\$[k]s[s[k]]][k[s]s[k]s[k]][k[s]s[k]s[k]][k[s]s[k]s[k
+$$s[s[k[s]][s[k[s[s[k][k]]]][s[k[k]][s[s[s[s[s[k][k]][k[s[k]]]][k[s[s[k[s]][s[k[s[s[k][k]]]][s[k[k]][s[s[k[s]][s[k[s[s[k][k]]]][s[k[k]][s[s[k][k]][k[k]]]]]][s[k[k]][s[s[s[k][k]][k[s[k]]]][k[s[k]]]]]]]]][s[k[k]][s[s[s[k][k]][k[s[k]]]][k[k]]]]]]][s[k[s[s[s[k][k]][k[s[s[s[k][k]][k[s[s[s[k][k]][k[k]]][k[k]]]]][k[k]]]]]]][s[k[k]][s[s[s[s[s[k][k]][k[s[k]]]][k[s[s[k[s]][s[k[s[s[k][k]]]][s[k[k]][s[s[s[k][k]][k[k]]][k[k]]]]]][s[k[k]][s[s[k[s]][s[k[s[s[k][k]]]][s[k[k]][s[s[k][k]][k[s[k]]]]]]][s[k[k]][s[s[s[s[s[k][k]][k[k]]][k[s[k]]]][s[s[s[s[k][k]][k[k]]][k[k]]][k[s[k]]]]][s[s[s[s[s[s[k][k]][k[k]]][k[k]]][k[s[k]]]][k[s[k]]]][s[s[s[s[s[s[s[k][k]][k[k]]][k[k]]][k[k]]][k[s[k]]]][k[s[k]]]][k[k]]]]]]]]]]][s[s[k[s]][s[k[s[s[k][k]]]][s[k[k]][s[s[k[s]][s[k[s[s[k][k]]]][s[k[k]][s[s[k][k]][k[k]]]]]][k[k[k]]]]]]][k[k[k]]]]][k[s[k]]]]]]][k[k]]]]]][s[k[k]][s[k[s[s[k[s]][k]]]][s[s[k][k]][k[s[k]]]]]]$$
 
 A combinator expression that corresponds to the operation of doing one step of rule 110 evolution.
 
