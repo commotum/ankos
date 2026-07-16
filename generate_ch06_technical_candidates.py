@@ -30,6 +30,7 @@ rows = [
         "after": "![](_page_253_Picture_1.jpeg)\n\n![](_page_254_Picture_1.jpeg)",
         "authoritative_location": "pdf:0254",
         "reason": "Delete the OCR pickup of printed page number 238; the source's italic `code 1659` label is already preserved inside _page_253_Picture_1.jpeg.",
+        "ordering_dependency": ["Retain the visible italic `code 1659` label in _page_253_Picture_1.jpeg; if that asset is later recropped to exclude the label, restore `*code 1659*` as live text."],
     },
     {
         "label": "italic-code-2043",
@@ -121,6 +122,7 @@ rows = [
         "after": "![](_page_286_Picture_9.jpeg)\n\n![](_page_286_Picture_11.jpeg)",
         "authoritative_location": "pdf:0287",
         "reason": "Delete a corrupt duplicate OCR crumb; the printed italic `rule 184` label is already present inside _page_286_Picture_9.jpeg.",
+        "ordering_dependency": ["Retain the visible italic `rule 184` label in _page_286_Picture_9.jpeg; if that asset is later recropped to exclude the label, restore `*rule 184*` as live text."],
     },
     {
         "label": "rule-184-substitution-system",
@@ -208,7 +210,7 @@ for row in rows:
         "expected_count": expected_count,
         "authoritative_location": row["authoritative_location"],
         "reason": row["reason"],
-        "ordering_dependency": [],
+        "ordering_dependency": row.get("ordering_dependency", []),
     }
     encoded_rows.append(record)
 
