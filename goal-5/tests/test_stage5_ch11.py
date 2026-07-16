@@ -20,11 +20,11 @@ import validate  # noqa: E402
 
 
 # Final integration pins from the installed packet and rebuilt CH11.
-EXPECTED_CH11_CORRECTION_COUNT: int | None = 41
-EXPECTED_CH11_RENDERED_BYTES: int | None = 103921
-EXPECTED_CH11_RENDERED_LINES: int | None = 892
+EXPECTED_CH11_CORRECTION_COUNT: int | None = 64
+EXPECTED_CH11_RENDERED_BYTES: int | None = 103952
+EXPECTED_CH11_RENDERED_LINES: int | None = 874
 EXPECTED_CH11_RENDERED_SHA256: str | None = (
-    "3dfc34e4a99364e3fa48b555ed7399a8a8c8a1acd3b977763554c89b836cfd63"
+    "94e20302298935e73ad11c300d267d05ab23682bf14978e67fe0c3b09ef7080c"
 )
 
 # ordinal: (basename, repaired hash, dimensions, source page, legacy hash)
@@ -216,7 +216,7 @@ class ChapterElevenTests(unittest.TestCase):
         self.assertEqual(build.sha256(raw_segment), self.document["raw_segment_sha256"])
 
         relevant = [row for row in self.corrections if row["document_id"] == "CH11"]
-        self.assertEqual(len(self.corrections), 707)
+        self.assertEqual(len(self.corrections), 730)
         expected_count = self.pinned(
             EXPECTED_CH11_CORRECTION_COUNT, "EXPECTED_CH11_CORRECTION_COUNT"
         )
@@ -325,13 +325,28 @@ class ChapterElevenTests(unittest.TestCase):
         self.assertNotRegex(self.rendered, r"(?m)^# 11$")
 
         expected = {
+            "row of $n$ black cells, 0 black cells survive if $n$ is even, and 1 "
+            "black cell survives if $n$ is odd": 1,
+            r"a block of exactly $5 \times 5 = 25$ black squares": 1,
+            "adding the original number $n$ together $n$ times": 1,
+            "*rule 45*": 1,
+            "*rule 73*": 1,
+            "$Log[15]$": 1,
             "elementary rule 132, as shown on the left": 1,
             r"But by using $\boxminus$ to stand for a cell with any possible color": 1,
             "corresponding quite directly to cellular automata": 1,
             "Gödel’s Theorem": 1,
             "rule 110—a cellular automaton": 1,
+            "operations of AND, OR and NOT": 1,
+            "two variables, $p$ and $q$": 1,
+            "values for $p$ and $q$": 1,
+            "three symbols, $p$, $q$ and $r$": 1,
+            "one has a whole number $n$": 1,
+            "operation to $n$": 1,
             r"$i + 5$, $2^a$, $3^b$": 1,
             r"computes $Mod[n, 30]$": 1,
+            r"$n^{\text{th}}$": 2,
+            "the Turing machine should “halt” with the head": 1,
             "taking the first 100,000 steps, and keeping only those": 1,
             "So this means that after going through": 1,
         }
@@ -438,8 +453,7 @@ class ChapterElevenTests(unittest.TestCase):
             "![](_page_700_Picture_1.jpeg)\n\n"
             "Close-ups (continued).\n\n"
             "![](_page_701_Picture_1.jpeg)\n\n"
-            "Close-ups (continued).\n\n"
-            "additional localized structures are produced",
+            "Close-ups (continued).",
             self.rendered,
         )
         self.assertEqual(self.rendered.count("Close-ups (continued)."), 2)
@@ -472,10 +486,142 @@ class ChapterElevenTests(unittest.TestCase):
             "The pictures at the bottom of the facing page give examples",
         )
         self.assert_order(
+            "With short initial conditions, the pictures at the top of the next page",
+            "apparently rather random internal behavior.",
             "![](_page_727_Figure_1.jpeg)",
             "*Mathematica* */.* order.",
-            "that no fixed point is reached",
         )
+
+    def test_second_pass_paragraph_and_plate_serialization_is_exact(self) -> None:
+        mobile_intro = (
+            "As a first example of this, the picture on the facing page shows how a "
+            "cellular automaton can be made to emulate a mobile automaton."
+        )
+        mobile_body = (
+            "The main difference between a mobile automaton and a cellular automaton "
+            "is that in a mobile automaton there is a special active cell that moves "
+            "around from one step to the next, while in a cellular automaton all cells "
+            "are always effectively treated as being exactly the same."
+        )
+        self.assert_order(
+            mobile_intro,
+            "![](_page_672_Picture_1.jpeg)",
+            "An example of a mobile automaton (see page 71)",
+            "![](_page_672_Picture_3.jpeg)",
+            "![](_page_672_Picture_4.jpeg)",
+            mobile_body,
+        )
+
+        register_body = (
+            "But in fact it turns out to be fairly straightforward to do so, as "
+            "illustrated at the top of the facing page. The basic idea is to have the "
+            "cellular automaton produce a pattern that expands and contracts on each "
+            "side in a way that corresponds to the incrementing and decrementing of "
+            "the sizes of numbers in the first and second registers of the register "
+            "machine. In the center of the cellular automaton is then a cell whose "
+            "possible colors correspond to possible points in the program for the "
+            "register machine. And as the cell makes transitions from one color to "
+            "another, it effectively emits signals that move to the left or right "
+            "modifying the pattern in the cellular automaton in a way that follows "
+            "each instruction in the register machine program."
+        )
+        self.assert_order(
+            register_body,
+            "![](_page_676_Picture_1.jpeg)",
+            "![](_page_676_Picture_2.jpeg)",
+            "An example of a register machine being emulated by a cellular automaton.",
+        )
+
+        tag_body = (
+            "And having done this, the next stage is to get such a tag system to "
+            "emulate a Turing machine. The pictures on the next page illustrate how "
+            "this can be done. But at least with the particular construction shown, "
+            "the resulting Turing machine can only have cells with two possible "
+            "colors. The pictures below demonstrate, however, that such a Turing "
+            "machine can readily be made to emulate a Turing machine with any number "
+            "of colors. And through the construction of page 665 this then finally "
+            "shows that a cyclic tag system can successfully emulate any cellular "
+            "automaton—and can thus be universal."
+        )
+        self.assert_order(tag_body, "![](_page_684_Figure_4.jpeg)")
+
+        cyclic_body = (
+            "By looking at picture (d), one can begin to see how it might be possible "
+            "for a cyclic tag system to be emulated by rule 110: the basic idea is to "
+            "have each of the various kinds of lines in the picture be emulated by "
+            "some collection of localized structures in rule 110."
+        )
+        self.assert_order(cyclic_body, "![](_page_696_Picture_2.jpeg)")
+
+        region_body = (
+            "Region (a) shows a block separator—corresponding to a dashed line in "
+            "picture (d) on page 679—hitting the single black element in the sequence "
+            "that exists at the first step. Because the element hit is black, an "
+            "object must be produced that allows information from the block at this "
+            "step to pass through. Most of the activity in region (a) is concerned "
+            "with producing such an object. But it turns out that as a side-effect two "
+            "additional localized structures are produced that can be seen propagating "
+            "to the left. These structures could later cause trouble, but looking at "
+            "region (b) we see that in fact they just pass through other structures "
+            "that they meet without any adverse effect."
+        )
+        self.assert_order(region_body, "![](_page_698_Picture_1.jpeg)")
+
+        class_four_intro = (
+            "The pictures on the next page show a few examples of such class 4 "
+            "systems. And while the details are different in each case, the general "
+            "features of the behavior are always rather similar."
+        )
+        self.assert_order(
+            class_four_intro,
+            "![](_page_707_Figure_1.jpeg)",
+            "Examples of cellular automata with class 4 overall behavior",
+            "So what does this mean about the computational capabilities of such systems?",
+            "if one looks sufficiently hard at any particular rule",
+        )
+
+        nested_body = (
+            "In cellular automata like the ones at the top of the facing page some "
+            "information can be transmitted over larger distances. But the way this "
+            "occurs is highly constrained, and in the end these systems can only "
+            "produce patterns that are in essence purely nested—so that it is again "
+            "not possible for universality to be achieved."
+        )
+        additive_body = (
+            "With simple initial conditions these rules always yield very regular "
+            "nested patterns. But with more complicated initial conditions, they "
+            "produce more complicated patterns of behavior—as the pictures at the "
+            "bottom of this page illustrate. As we saw on page 264, however, these "
+            "patterns never in fact really correspond to more than rather simple "
+            "transformations of the initial conditions. Indeed, even after say "
+            "1,048,576 steps—or any number of steps that is a power of two—the array "
+            "of cells produced always turns out to correspond just to a simple "
+            "superposition of two or three shifted copies of the initial conditions."
+        )
+        self.assert_order(
+            nested_body,
+            "![](_page_710_Picture_1.jpeg)",
+            "What about additive rules such as 90 and 150?",
+            additive_body,
+            "![](_page_710_Picture_4.jpeg)",
+        )
+
+        rule_thirty_body = (
+            "But as the picture on the next page indicates, by having appropriate "
+            "blocks 5 cells wide rule 30 can actually be made to emulate one step in "
+            "the evolution of every single one of the 256 possible elementary "
+            "cellular automata."
+        )
+        self.assert_order(rule_thirty_body, "![](_page_719_Figure_1.jpeg)")
+
+        combinator_body = (
+            "With short initial conditions, the pictures at the top of the next page "
+            "demonstrate that combinators tend to evolve quickly to simple fixed "
+            "points. But with initial condition (e) of length 8 the pictures show that "
+            "no fixed point is reached, and instead there is exponential growth in "
+            "total size—with apparently rather random internal behavior."
+        )
+        self.assert_order(combinator_body, "![](_page_727_Figure_1.jpeg)")
 
     def test_repaired_and_added_assets_are_pinned_and_references_are_exact(
         self,
