@@ -370,6 +370,11 @@ Neither file is a generalized workflow database.
   byte-identical, and the complete 171-test repository suite plus 171 subtests
   passes. The final Markdown SHA-256 is
   `e052f275ea7519f2e8c270f1dd68eac01d123aa3b73355eff5803f02708e542d`.
+- `CH08` first-pass source, technical, and visual traversals have started at
+  PDF 379. They cover all 70 pages through PDF 448, raw lines 4,336–5,163,
+  bytes `[601461,728322)`, and mapped ordinals 437–479; no coverage claim will
+  be made until their findings are reconciled and a separate final-output
+  second pass closes cleanly.
 
 ## Stage Status
 
