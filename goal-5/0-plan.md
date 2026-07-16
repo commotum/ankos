@@ -281,9 +281,9 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions (72 using source-backed
-  repaired-only overrides), 43 source-added images, and generated
-  README/Contents files. It now includes 948 guarded source-verified
+  documents, 1,444 mapped image positions (76 using source-backed
+  repaired-only overrides), 49 source-added images, and generated
+  README/Contents files. It now includes 973 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -527,8 +527,31 @@ Neither file is a generalized workflow database.
   and the published sibling are byte-identical at 1,518 files with tree
   SHA-256
   `aad13eb645fcfb252b5ade650cbf2316c5c67c60139c78e518ae556c28bb92f6`.
-  The next target is `N03` at PDF 899, raw line 11,631, byte 1703015, with next
-  IDs `G5-C-0949` and `G5-A-0044`; it owns mapped ordinals 878–917.
+  This was the clean baseline used to start `N03`.
+- `N03` is complete at `YES/YES` after first-pass integration and wholly fresh
+  post-operator source, technical, and visual closing passes over PDF pages
+  899–916, including the intentional blank PDF 916 and both ownership
+  boundaries. Its 25 guarded corrections are `G5-C-0949`–`G5-C-0973`. The
+  final 82,769-byte, 867-line Markdown hashes to
+  `897cae5d2988c0e4d746aad431cffc411a81d2766e057d184f2c47f718755007`.
+  All 11 headings, 83 main notes, 39 subitems, 351 technical objects, 256
+  Boolean rules, 135 printed page-reference phrases, and 45 live image
+  references close with zero discrepancy, ambiguity, or source omission.
+  Ordinal 894 is a source-confirmed rasterized-prose false positive; four
+  mapped operator panels use source-isolated overrides, and additions
+  `G5-A-0044`–`G5-A-0049` restore six omitted visuals. The fresh source,
+  technical, and visual closing reports hash respectively to
+  `d77aaaba75f41845e4a30ab21d93c4a075bce56a0a1b842b0f56f1de0e39b8bf`,
+  `4d113c8b6037ac688017925f7d036cca4e281e21b059291f1c87b7afb5eacf26`,
+  and `4ccb764d7bff13deb7cdec8a2a16387532dd0e00f4749d21c1d5216f0576051c`.
+  Default validation reports 1,493 images, 973 corrections, and 18 completed
+  second passes. The focused N03, Goal 5, and complete repository suites pass
+  at 9, 133, and 235 tests with 1,097 repository subtests; two fresh normal
+  builds and the published sibling are byte-identical at
+  1,524 files with tree SHA-256
+  `6723d7eb843f6beb6d344591a5d36145f821f46c0146e7d319dd6b22705a19f8`.
+  The next target is `N04` at PDF 917, raw line 12,499, byte 1792864, with next
+  IDs `G5-C-0974` and `G5-A-0050`; it owns mapped ordinals 918–988.
 
 ## Stage Status
 
