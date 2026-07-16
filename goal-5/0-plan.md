@@ -283,7 +283,7 @@ Neither file is a generalized workflow database.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
   documents, 1,444 mapped image positions (64 using source-backed
   repaired-only overrides), 41 source-added images, and generated
-  README/Contents files. It now includes 861 guarded source-verified
+  README/Contents files. It now includes 882 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -446,17 +446,31 @@ Neither file is a generalized workflow database.
   render hashes to
   `087f84eec6ee4a68f012568e301333e3853bc1aa413bb9937cce348be0db9a70`.
   Six focused CH12 tests, the 104-test Goal 5 suite, and the complete 206-test
-  repository suite with 613 subtests pass. Default validation reports 29
+  repository suite with 613 subtests pass. At Stage 5 closure, default
+  validation reported 29
   documents, 1,485 images, 861 corrections, and 14 completed second passes.
-  Two fresh normal builds and the published sibling are byte-identical at
+  Two fresh normal builds and the published sibling were byte-identical at
   1,516 files with tree SHA-256
   `098f7979614a1bdfc4168491f68ae89e6de6ca1b2f764c1afdcb49f805086c2f`;
   strict zero-correction output remains
   `d787dc0a8ba4388b3a0f1c83f38ed5f5f3c56bc1741241518373b997d2937401`.
-  Fourteen documents now have both passes complete. Stage 6 starts at
+  Fourteen documents had both passes complete. Stage 6 started at
   `GENERAL_NOTES` PDF 865, raw line 10,623, byte 1540232, and its first mapped
-  visual is ordinal 823 on PDF 867. The next IDs are `G5-C-0862` and
-  `G5-A-0042`.
+  visual is ordinal 823 on PDF 867. The initial Stage 6 IDs were `G5-C-0862`
+  and `G5-A-0042`.
+- `GENERAL_NOTES` is complete at `YES/YES` after a full first pass and wholly
+  fresh post-integration source, technical, and visual closing passes over PDF
+  pages 865–874. Its 21 guarded corrections are `G5-C-0862`–`G5-C-0882`.
+  The final 44,301-byte, 191-line Markdown hashes to
+  `1a5b294ecc1be93f0ed1f565646eaedaab10775f87ca314e0225c76bad76a10c`;
+  all 32 main notes, five program subgroups, 45 program expressions, 32 table
+  cells, two inline patterns, and mapped ordinal 823 close with zero discrepancy
+  and zero ambiguity. Default validation now reports 882 corrections and 15
+  completed second-pass documents. Two fresh normal builds and the published
+  sibling are byte-identical at tree SHA-256
+  `008e7a5a76abc7eba70832b0dc35277a84c0eeb067e7b37eb516f973c5c5f3ba`.
+  The next target is `N01` at PDF 875, raw line 10,818, byte 1584683, with next
+  correction ID `G5-C-0883`.
 
 ## Stage Status
 
