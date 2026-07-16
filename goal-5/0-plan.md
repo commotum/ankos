@@ -280,9 +280,9 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions (45 using source-backed
-  repaired-only overrides), 22 source-added images, and generated
-  README/Contents files. It now includes 576 guarded source-verified
+  documents, 1,444 mapped image positions (47 using source-backed
+  repaired-only overrides), 32 source-added images, and generated
+  README/Contents files. It now includes 661 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -393,9 +393,14 @@ Neither file is a generalized workflow database.
   SHA-256 is
   `c4786895ea852253233767f683f69ffce0f6e5576e948e4bbe3bf33c26cbc66c`.
   `CH10` begins at `pdf:0563`, raw line 6,586, byte 932355, and image-map
-  ordinal 590. Independent source/text, technical, and visual first passes are
-  in progress over all 90 pages through `pdf:0652`; its coverage remains
-  `NO/NO` until their findings are integrated and fresh closing passes finish.
+  ordinal 590. Independent source/text, technical, and visual first passes over
+  all 90 pages through `pdf:0652` are integrated as `G5-C-0577`–`G5-C-0661`,
+  mapped overrides 610 and 641, and additions `G5-A-0023`–`G5-A-0032`.
+  The rebuilt chapter is 164,435 bytes and 1,012 lines with SHA-256
+  `349b6a70066f2e690fbf81fdfad977e150b497b1de6709ffdcf9129478038e59`.
+  Build, validation, focused/cumulative tests, rendering, zero-correction, and
+  fresh-build identity gates pass; coverage remains `NO/NO` while fresh
+  independent source, technical, and visual closing traversals are active.
 
 ## Stage Status
 
