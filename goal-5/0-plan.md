@@ -280,9 +280,9 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions (16 using source-backed
-  repaired-only overrides), 11 source-added images, and generated
-  README/Contents files. It now includes 355 guarded source-verified
+  documents, 1,444 mapped image positions (23 using source-backed
+  repaired-only overrides), 17 source-added images, and generated
+  README/Contents files. It now includes 399 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -349,6 +349,15 @@ Neither file is a generalized workflow database.
   cumulative 55-test Goal 5 suite, the complete 157-test repository suite,
   and legacy checks pass. The final Markdown SHA-256 is
   `79705293cb790968285d12f4d46f1f96337a0cff7f8eaeb87b142adc5bf751c1`.
+- `CH06` is complete after a forward first pass and three independent clean
+  closing audits over all 74 PDF pages 239–312. Its 44 guarded corrections are
+  `G5-C-0356`–`G5-C-0399`; all author text and structure, 29 inline math
+  spans, 105 accounting references, 99 mapped assets, six additions, seven
+  repaired-only overrides, and the complete 85-page render were rechecked.
+  Focused detectors, strict zero-correction validation, two fresh deterministic
+  builds, the cumulative 62-test Goal 5 suite, the complete 164-test repository
+  suite with 135 subtests, and legacy checks pass. The final Markdown SHA-256
+  is `0eb4ebc5400c3e3ed39fb2dd8fd9c38a2977eaef1ffefb528fd4c2708a42dca5`.
 
 ## Stage Status
 
