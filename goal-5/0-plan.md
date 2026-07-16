@@ -447,8 +447,8 @@ Neither file is a generalized workflow database.
   `087f84eec6ee4a68f012568e301333e3853bc1aa413bb9937cce348be0db9a70`.
   Six focused CH12 tests, the 104-test Goal 5 suite, and the complete 206-test
   repository suite with 613 subtests pass. At Stage 5 closure, default
-  validation reported 29
-  documents, 1,485 images, 861 corrections, and 14 completed second passes.
+  validation reported 29 documents, 1,485 images, 861 corrections, and 14
+  completed second passes.
   Two fresh normal builds and the published sibling were byte-identical at
   1,516 files with tree SHA-256
   `098f7979614a1bdfc4168491f68ae89e6de6ca1b2f764c1afdcb49f805086c2f`;
@@ -465,9 +465,16 @@ Neither file is a generalized workflow database.
   `1a5b294ecc1be93f0ed1f565646eaedaab10775f87ca314e0225c76bad76a10c`;
   all 32 main notes, five program subgroups, 45 program expressions, 32 table
   cells, two inline patterns, and mapped ordinal 823 close with zero discrepancy
-  and zero ambiguity. Default validation now reports 882 corrections and 15
-  completed second-pass documents. Two fresh normal builds and the published
-  sibling are byte-identical at tree SHA-256
+  and zero ambiguity. The closing source, technical, and visual reports hash to
+  `bde3ca484129a34ae5f29ca07a9f76eb3c6ff344b36f9f0d76358d0076e14bb5`,
+  `5d62c26ee888b0d1eb40dd1486d1a8d7c99c423de9c08f71874411e865c96c28`,
+  and `dc8ca77ae8f9e215f9b97e91d096950d6a1f41f7da2ace2930fd8025cb2328ed`;
+  the fresh 13-page render hashes to
+  `44f10b9346c797850d07935be6a8a17eeef57bf046408eb17545f0e5f4ea9b29`.
+  Default validation now reports 882 corrections and 15 completed second-pass
+  documents. Five focused tests, the 109-test Goal 5 suite, and the complete
+  211-test repository suite with 649 subtests pass. Two fresh normal builds and
+  the published sibling are byte-identical at tree SHA-256
   `008e7a5a76abc7eba70832b0dc35277a84c0eeb067e7b37eb516f973c5c5f3ba`.
   The next target is `N01` at PDF 875, raw line 10,818, byte 1584683, with next
   correction ID `G5-C-0883`.
