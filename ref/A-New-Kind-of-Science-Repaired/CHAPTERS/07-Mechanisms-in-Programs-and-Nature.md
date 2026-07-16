@@ -290,7 +290,7 @@ It has then often been assumed that having maximal repetition period will someho
 
 ![](_page_334_Picture_2.jpeg)
 
-Patterns of digits in base 2 produced by starting with the number 1 and then repeatedly multiplying by various fixed constants. In all cases, the complete pattern has a triangular form, but except in the first case, it is truncated on the left here. The mathematical structure of these systems is nevertheless such that digits further to the left do not affect those shown: at each step the number obtained is effectively reduced modulo  $2^n$ , where $n$ is the width of the picture.
+Patterns of digits in base 2 produced by starting with the number 1 and then repeatedly multiplying by various fixed constants. In all cases, the complete pattern has a triangular form, but except in the first case, it is truncated on the left here. The mathematical structure of these systems is nevertheless such that digits further to the left do not affect those shown: at each step the number obtained is effectively reduced modulo $2^n$, where $n$ is the width of the picture.
 
 A typical kind of failure, illustrated in the pictures on the next page, is that points with coordinates determined by successive numbers from the generator turn out to be distributed in an embarrassingly regular way. At first, such failures might suggest that more complicated schemes must be needed if one is to get good randomness. And indeed with this thought in mind all sorts of elaborate combinations of linear congruential and other generators have been proposed. But although some aspects of the behavior of such systems can be made quite random, deviations from perfect randomness are still often found.
 
@@ -536,7 +536,7 @@ Many types of constraints—including those in Chapter 5—have the property tha
 
 The situation is quite different from what happens with explicit evolution rules. For if one knows such rules then these rules immediately yield a procedure for working out what behavior will occur. Yet if one only knows constraints then such constraints do not on their own immediately yield any specific procedure for working out what behavior will occur.
 
-In principle one could imagine looking at every possible pattern, and then picking out the ones that satisfy the constraints. But even with a  $10 \times 10$  array of black and white squares, the number of possible patterns is already 1,267,650,600,228,229,401,496,703,205,376. And with a $20 \times 20$ array this number is larger than the total number of particles in the universe. So it seems quite inconceivable that systems in nature could ever carry out such an exhaustive search.
+In principle one could imagine looking at every possible pattern, and then picking out the ones that satisfy the constraints. But even with a $10 \times 10$ array of black and white squares, the number of possible patterns is already 1,267,650,600,228,229,401,496,703,205,376. And with a $20 \times 20$ array this number is larger than the total number of particles in the universe. So it seems quite inconceivable that systems in nature could ever carry out such an exhaustive search.
 
 One might imagine, however, that if such systems were just to try patterns at random, then even though incredibly few of these patterns would satisfy any given constraint exactly, a reasonable number might at least still come close. But typically it turns out that even this is not the case. And as an example, the pictures below show what fraction of patterns chosen at random have a given percentage of squares that violate the constraints described on page 211.
 
@@ -546,7 +546,7 @@ One might imagine, however, that if such systems were just to try patterns at ra
 
 The fraction of all possible patterns in which a certain percentage of squares violate the constraints discussed on page 211. Only a handful of patterns satisfy the constraints exactly (so that 0% of the squares are wrong). For large arrays, the vast majority of possible patterns have about 70% of the squares wrong.
 
-For the majority of patterns around 70% of the squares turn out to violate the constraints. And in a  $10 \times 10$  array the chance of finding a pattern where the fraction of squares that violate the constraints is even less than 50% is only one in a thousand, while the chance of finding a pattern where the fraction is less than 25% is one in four trillion.
+For the majority of patterns around 70% of the squares turn out to violate the constraints. And in a $10 \times 10$ array the chance of finding a pattern where the fraction of squares that violate the constraints is even less than 50% is only one in a thousand, while the chance of finding a pattern where the fraction is less than 25% is one in four trillion.
 
 And what this means is that a process based on picking patterns at random will be incredibly unlikely to yield results that are even close to satisfying the constraints.
 
@@ -554,7 +554,7 @@ So how can one do better? A common approach used both in natural systems and in 
 
 As a specific example consider taking a series of steps, and at each step picking a square in the array discussed above at random, then reversing the color of this square whenever doing so will not increase the total number of squares in the array that violate the constraints.
 
-The picture below shows results obtained with this procedure. For the first few steps, there is rapid improvement. But as one goes on, one sees that the rate of improvement gets slower and slower. And even after a million steps, it turns out that 15% of the squares in a  $10 \times 10$  array will on average still not satisfy the constraints.
+The picture below shows results obtained with this procedure. For the first few steps, there is rapid improvement. But as one goes on, one sees that the rate of improvement gets slower and slower. And even after a million steps, it turns out that 15% of the squares in a $10 \times 10$ array will on average still not satisfy the constraints.
 
 In practical situations this kind of approximate result can sometimes be useful, but the pictures at the top of the facing page show that the actual patterns obtained do not look much at all like the exact results that we saw for this system in Chapter 5.
 
@@ -856,7 +856,7 @@ It turns out that this basic process is not restricted to systems which produce 
 
 *elementary rule 18 (compressed)*
 
-Examples involving domains containing apparent randomness. In the second picture, each element shown represents a  $2 \times 2$  block of original cells. In both cases, the boundaries between domains appear to follow random walks, annihilating when they meet and thus forming a nested overall pattern.
+Examples involving domains containing apparent randomness. In the second picture, each element shown represents a $2 \times 2$ block of original cells. In both cases, the boundaries between domains appear to follow random walks, annihilating when they meet and thus forming a nested overall pattern.
 
 Instead of following simple straight lines, the boundaries of these domains now execute seemingly random walks. But the fact that they annihilate whenever they meet once again tends to lead to an overall nested pattern of behavior.
 
