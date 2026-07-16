@@ -270,8 +270,8 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-16 (America/Los_Angeles).
-- Active stage: `5-CH09-12` (`IN_PROGRESS`), currently advancing `CH12` after
-  clean `CH11` closure.
+- Active stage: `6-NOTES-00-04` (`IN_PROGRESS`), activated after clean Stage 5
+  closure through `CH12`.
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
   and the empty `goal-4/` directory were removed by exact path. No commit
   range was reverted, and Goal 4 had corrected no book text.
@@ -282,8 +282,8 @@ Neither file is a generalized workflow database.
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
   documents, 1,444 mapped image positions (64 using source-backed
-  repaired-only overrides), 34 source-added images, and generated
-  README/Contents files. It now includes 730 guarded source-verified
+  repaired-only overrides), 41 source-added images, and generated
+  README/Contents files. It now includes 861 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -383,7 +383,7 @@ Neither file is a generalized workflow database.
   zero-correction validation, two fresh deterministic builds, legacy digest,
   and scope gates pass. The final Markdown SHA-256 is
   `5e794cedc877e539e30d9ef6102fea18f4533c56d3324f7d454326336e4a2004`.
-- Stage 5 is in progress over `CH09`–`CH12`: PDF pages 449–864, printed pages
+- Stage 5 is complete over `CH09`–`CH12`: PDF pages 449–864, printed pages
   433–848, raw lines 5,164–10,622, bytes `[728322,1540232)`, and mapped
   ordinals 480–822. `CH09` is complete at `YES/YES` after forward first and
   fresh source, technical, and visual final-output passes over all 114 PDF
@@ -428,9 +428,35 @@ Neither file is a generalized workflow database.
   in `CH07` and pinned two source-confirmed future instances to `N09` and
   `N10`; styled ordinal, technical-span, page-join, plate-placement, furniture,
   and visual-boundary detector families remain carried forward for their
-  owning passes. Thirteen documents now have both passes complete. The next IDs
-  are `G5-C-0731` and `G5-A-0035`; `CH12` begins at `pdf:0731`, raw line
-  8,608, byte 1208768, and image-map ordinal 764.
+  owning passes. `CH12` is complete at `YES/YES` after its full first pass and
+  wholly fresh post-recrop source, technical, and visual closing passes over
+  all 134 PDF pages 731–864. Its 131 guarded corrections are
+  `G5-C-0731`–`G5-C-0861`; 59 mapped originals plus additions
+  `G5-A-0035`–`G5-A-0041` produce 66 unique final references. The final
+  252,955-byte, 1,686-line Markdown hashes to
+  `a1384ad5ada245f65d5ba8c5ff2af275ec1101252775a33ad69a7279216688d7`.
+  A final visual traversal reopened two theorem plates whose first crops omitted
+  terminal continuation ellipses; both were recropped and all three closing
+  passes restarted from PDF 731. Their final source, technical, and visual
+  reports hash to
+  `7ed3469133169de183c663d2366b6cd239a111c681842ccf11107248dd643166`,
+  `8c638f311105881f0502170d7b5d70506fb9401706744e4405f4e1f2bedb134c`,
+  and `5d551a5b503388fd4630a956bc6387b6358c9e5ba1eb01d55e3a94ba598b4be4`;
+  every discrepancy and ambiguity ledger closes at zero. The final 119-page
+  render hashes to
+  `087f84eec6ee4a68f012568e301333e3853bc1aa413bb9937cce348be0db9a70`.
+  Six focused CH12 tests, the 104-test Goal 5 suite, and the complete 206-test
+  repository suite with 613 subtests pass. Default validation reports 29
+  documents, 1,485 images, 861 corrections, and 14 completed second passes.
+  Two fresh normal builds and the published sibling are byte-identical at
+  1,516 files with tree SHA-256
+  `098f7979614a1bdfc4168491f68ae89e6de6ca1b2f764c1afdcb49f805086c2f`;
+  strict zero-correction output remains
+  `d787dc0a8ba4388b3a0f1c83f38ed5f5f3c56bc1741241518373b997d2937401`.
+  Fourteen documents now have both passes complete. Stage 6 starts at
+  `GENERAL_NOTES` PDF 865, raw line 10,623, byte 1540232, and its first mapped
+  visual is ordinal 823 on PDF 867. The next IDs are `G5-C-0862` and
+  `G5-A-0042`.
 
 ## Stage Status
 
@@ -440,8 +466,8 @@ Neither file is a generalized workflow database.
 | 2-FOUNDATION | `COMPLETE` | 1 |
 | 3-FRONT-CH04 | `COMPLETE` | 2 |
 | 4-CH05-08 | `COMPLETE` | 2 |
-| 5-CH09-12 | `IN_PROGRESS` | 2 |
-| 6-NOTES-00-04 | `NOT_STARTED` | 2 |
+| 5-CH09-12 | `COMPLETE` | 2 |
+| 6-NOTES-00-04 | `IN_PROGRESS` | 2 |
 | 7-NOTES-05-08 | `NOT_STARTED` | 2 |
 | 8-NOTES-09-12 | `NOT_STARTED` | 2 |
 | 9-TECHNICAL | `NOT_STARTED` | 3–8 |
