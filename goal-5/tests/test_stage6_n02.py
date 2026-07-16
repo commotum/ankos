@@ -32,6 +32,13 @@ EXPECTED_MAIN_LABELS_SHA256 = (
 EXPECTED_MAPPED_REFERENCES_SHA256 = (
     "5ae0efba370e2dfb5a8eccdf9c146d7e8d419ff32ea65f0463f84e1c104f4c21"
 )
+EXPECTED_EMPHASIS_COUNTS = {
+    "BOLD": 33,
+    "BOLD_ITALIC": 18,
+    "ITALIC_NESTED_IN_BOLD": 1,
+    "ITALIC": 123,
+}
+EXPECTED_REOPENED_TYPOGRAPHY = 27
 
 # ordinal: (basename, repaired digest, dimensions, canonical PDF page)
 EXPECTED_REPAIRS = {
@@ -123,6 +130,12 @@ class NotesForChapter2Tests(unittest.TestCase):
         cls.n02_added = [
             row for row in cls.added_assets if row["document_id"] == "N02"
         ]
+        cls.n03_document = next(
+            row for row in cls.documents if row["id"] == "N03"
+        )
+        cls.n03_images = [
+            row for row in cls.images if row["document_id"] == "N03"
+        ]
 
     @staticmethod
     def rows_sha256(rows: list[dict[str, object]]) -> str:
@@ -139,6 +152,41 @@ class NotesForChapter2Tests(unittest.TestCase):
             + "\n"
         ).encode("utf-8")
         return build.sha256(payload)
+
+    @staticmethod
+    def emphasis_counts(markdown: str) -> dict[str, int]:
+        visible = re.sub(r"(?ms)^```\n.*?^```$", " ", markdown)
+        visible = re.sub(r"(?<!`)`[^`\n]+`(?!`)", " ", visible)
+        visible = re.sub(r"!\[[^\]]*\]\([^)]+\)", " ", visible)
+        if "_" in visible:
+            raise AssertionError("unexpected underscore-form emphasis")
+
+        triples = list(re.finditer(r"\*\*\*(.+?)\*\*\*", visible))
+        without_triples = re.sub(r"\*\*\*(.+?)\*\*\*", " ", visible)
+        bold = list(re.finditer(r"\*\*(.+?)\*\*", without_triples))
+        nested = sum(
+            len(
+                re.findall(
+                    r"(?<!\*)\*([^*\n]+?)\*(?!\*)",
+                    match.group(1),
+                )
+            )
+            for match in bold
+        )
+        without_bold = re.sub(
+            r"\*\*(.+?)\*\*", " ", without_triples
+        )
+        italic = list(
+            re.finditer(
+                r"(?<!\*)\*([^*\n]+?)\*(?!\*)", without_bold
+            )
+        )
+        return {
+            "BOLD": len(bold),
+            "BOLD_ITALIC": len(triples),
+            "ITALIC_NESTED_IN_BOLD": nested,
+            "ITALIC": len(italic),
+        }
 
     def test_source_range_corrections_and_render_are_exact(self) -> None:
         self.assertEqual(
@@ -259,6 +307,19 @@ class NotesForChapter2Tests(unittest.TestCase):
             len(re.findall(r"(?m)^In\[\d+\]", self.rendered)), 13
         )
         self.assertNotIn("####", self.rendered)
+
+    def test_two_pass_coverage_is_closed(self) -> None:
+        rows = validate.validate_coverage(self.documents)
+        row = next(item for item in rows if item["document_id"] == "N02")
+        self.assertEqual(
+            (row["first_pass"], row["second_pass"], row["reviewer_type"]),
+            ("YES", "YES", "agent"),
+        )
+        self.assertIn("43 guarded corrections", row["notes"])
+        self.assertIn("27 typography reopenings", row["notes"])
+        self.assertIn(
+            "zero discrepancy ambiguity or source omission", row["notes"]
+        )
 
     def test_mapped_reference_inventory_and_order_are_exact(self) -> None:
         self.assertEqual(len(self.n02_images), 54)
@@ -408,6 +469,63 @@ class NotesForChapter2Tests(unittest.TestCase):
         self.assertEqual(self.rendered.count(inline_sentence), 1)
         self.assertNotIn("single ■ in a background of ▥ blocks", self.rendered)
 
+    def test_closure_inventory_and_n03_handoff_are_exact(self) -> None:
+        emphasis = self.emphasis_counts(self.rendered)
+        self.assertEqual(emphasis, EXPECTED_EMPHASIS_COUNTS)
+        self.assertEqual(sum(emphasis.values()), 175)
+
+        references = re.findall(
+            r"!\[([^\]]*)\]\(([^)\s]+\.jpeg)\)", self.rendered
+        )
+        repaired = [
+            row
+            for row in self.n02_images
+            if "repaired_asset_relative_path" in row
+        ]
+        self.assertEqual(
+            (
+                len(self.n02_corrections),
+                len(self.n02_images),
+                len(repaired),
+                len(self.n02_added),
+                len(references),
+            ),
+            (43, 54, 8, 2, 56),
+        )
+
+        self.assertEqual(
+            (
+                self.document["raw_end_line"] + 1,
+                self.document["raw_end_byte_exclusive"],
+                self.document["authoritative_pdf_end_page"] + 1,
+            ),
+            (
+                self.n03_document["raw_start_line"],
+                self.n03_document["raw_start_byte"],
+                self.n03_document["authoritative_pdf_start_page"],
+            ),
+        )
+        self.assertEqual(
+            (
+                self.n03_document["raw_start_line"],
+                self.n03_document["raw_start_byte"],
+                self.n03_document["authoritative_pdf_start_page"],
+            ),
+            (11631, 1703015, 899),
+        )
+        self.assertEqual(
+            [row["ordinal"] for row in self.n03_images],
+            list(range(878, 918)),
+        )
+        self.assertEqual(
+            int(self.n02_corrections[-1]["id"].rsplit("-", 1)[1]) + 1,
+            949,
+        )
+        self.assertEqual(
+            int(self.n02_added[-1]["id"].rsplit("-", 1)[1]) + 1,
+            44,
+        )
+
     def test_source_emphasis_and_math_variable_styles_are_exact(self) -> None:
         bold_italic_leads = (
             "Complete pattern.",
@@ -438,7 +556,7 @@ class NotesForChapter2Tests(unittest.TestCase):
         self.assertEqual(self.rendered.count("Science Citation Index"), 1)
         self.assertNotIn("*Science Citation Index*", self.rendered)
 
-        for source_style in (
+        source_styles = (
             "into *n* - 2 of the *n* array elements",
             "popularization in *Scientific American* by Martin Gardner",
             "code 20 *k* = 2, *r* = 2 totalistic rule",
@@ -446,7 +564,12 @@ class NotesForChapter2Tests(unittest.TestCase):
             "all the *k* = 2, *r* = 1 cellular automata",
             "rule 110 and *k* = 2, *r* = 2 totalistic code 10",
             "occur in *k* = 2, *r* = 2 totalistic rules",
-        ):
+        )
+        self.assertEqual(
+            len(bold_italic_leads) + 2 + len(source_styles),
+            EXPECTED_REOPENED_TYPOGRAPHY,
+        )
+        for source_style in source_styles:
             with self.subTest(source_style=source_style):
                 self.assertEqual(self.rendered.count(source_style), 1)
 

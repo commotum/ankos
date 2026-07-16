@@ -281,9 +281,9 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions (64 using source-backed
-  repaired-only overrides), 41 source-added images, and generated
-  README/Contents files. It now includes 905 guarded source-verified
+  documents, 1,444 mapped image positions (72 using source-backed
+  repaired-only overrides), 43 source-added images, and generated
+  README/Contents files. It now includes 948 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -501,8 +501,34 @@ Neither file is a generalized workflow database.
   `1dde0107282feb217c20984c122e5218fdba4f28546e191179ec9d9291417d7a`;
   strict zero-correction output remains
   `d787dc0a8ba4388b3a0f1c83f38ed5f5f3c56bc1741241518373b997d2937401`.
-  The next target is `N02` at PDF 881, raw line 10,895, byte 1614202, with next
-  correction ID `G5-C-0906`; it owns mapped ordinals 824–877.
+- `N02` is complete at `YES/YES` after a complete first pass and wholly fresh
+  post-Science-Citation source, technical, and visual closing passes over PDF
+  pages 881–898, with PDF 880 and 899 checked as ownership boundaries. Its 43
+  guarded corrections are `G5-C-0906`–`G5-C-0948`. The final 86,695-byte,
+  915-line Markdown hashes to
+  `8eab0420ff8fbe512d7731c6539742bf0c16bf28dab4ff27fec7dee2ae8f43b0`;
+  54 mapped references plus `G5-A-0042` and `G5-A-0043` produce 56 final
+  references, with eight mapped references using repaired-only overrides. All
+  47 fenced blocks, 105 inline-code spans, 175 emphasis spans, and 27 reopened
+  typography regions close with zero discrepancy, zero ambiguity, and zero
+  source omission. The final source report, manifest, and `SHA256SUMS` hash
+  respectively to
+  `477bc5e764bc11c1dca9abaeddc504a19d5af08230221537f895edf1538d9f80`,
+  `5ba7a8e990991c66a09f0723ac3de02afba3e4bb6d754a838bda56141ddad66d`,
+  and `d3388b811a84fa34f16c3e43b4ebaf8d393b1b924535393763e8eca6b3483d03`.
+  The final technical and visual reports hash to
+  `067ebaf65e2a65a695508be3fb64744bc1268c739ddfe4e192a404ff76af9ee6`
+  and `6a306875d15947cf7d4c5efd3ad7da2859bc38fb1585d6a01c2e687d59802d75`;
+  the final render hashes to
+  `d082121c86fa72a5c9b80375c90e4bc03cad3beb153eaba146b337cd9b9c8b7b`.
+  Default validation reports 948 corrections and 17 completed second-pass
+  documents. The focused N02, Goal 5, and complete repository suites pass at
+  10, 124, and 226 tests with 768 repository subtests. Two fresh normal builds
+  and the published sibling are byte-identical at 1,518 files with tree
+  SHA-256
+  `aad13eb645fcfb252b5ade650cbf2316c5c67c60139c78e518ae556c28bb92f6`.
+  The next target is `N03` at PDF 899, raw line 11,631, byte 1703015, with next
+  IDs `G5-C-0949` and `G5-A-0044`; it owns mapped ordinals 878–917.
 
 ## Stage Status
 
