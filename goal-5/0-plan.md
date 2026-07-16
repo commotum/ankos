@@ -547,8 +547,8 @@ Neither file is a generalized workflow database.
   Default validation reports 1,493 images, 973 corrections, and 18 completed
   second passes. The focused N03, Goal 5, and complete repository suites pass
   at 9, 133, and 235 tests with 1,097 repository subtests; two fresh normal
-  builds and the published sibling are byte-identical at
-  1,524 files with tree SHA-256
+  builds and the published sibling are byte-identical at 1,524 files with tree
+  SHA-256
   `6723d7eb843f6beb6d344591a5d36145f821f46c0146e7d319dd6b22705a19f8`.
   The next target is `N04` at PDF 917, raw line 12,499, byte 1792864, with next
   IDs `G5-C-0974` and `G5-A-0050`; it owns mapped ordinals 918–988.
