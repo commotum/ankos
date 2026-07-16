@@ -267,8 +267,8 @@ class ChapterTwelveTests(unittest.TestCase):
             "Smallest solutions for various sequences of integer",
         )
         self.assert_order(
-            "Functions that can be used to formulate logic.",
             "![](_page_822_Logic_Primitive_Functions.jpeg)",
+            "Functions that can be used to formulate logic.",
             "![](_page_823_Figure_2.jpeg)",
         )
         self.assert_order(
@@ -280,7 +280,7 @@ class ChapterTwelveTests(unittest.TestCase):
         self.assert_order(
             "![](_page_846_Picture_11.jpeg)",
             "![](_page_846_Picture_13.jpeg)",
-            "If the purpose is just to generate any fixed pattern",
+            "If the purpose is to generate a uniformly expanding pattern",
             "![](_page_847_Figure_1.jpeg)",
         )
 
