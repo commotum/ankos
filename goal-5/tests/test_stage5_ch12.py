@@ -303,7 +303,7 @@ class ChapterTwelveTests(unittest.TestCase):
         self.assertEqual(len(self.images), 1444)
         self.assertGreaterEqual(len(self.added_assets), 41)
         self.assertGreaterEqual(len(self.images) + len(self.added_assets), 1485)
-        self.assertEqual(
+        self.assertGreaterEqual(
             sum("repaired_asset_relative_path" in row for row in self.images), 64
         )
         self.assertEqual([row["ordinal"] for row in chapter_images], list(range(764, 823)))

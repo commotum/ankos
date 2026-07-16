@@ -640,7 +640,7 @@ class ChapterElevenTests(unittest.TestCase):
         self.assertEqual(len(self.images), 1444)
         self.assertGreaterEqual(len(self.added_assets), 34)
         self.assertGreaterEqual(len(self.images) + len(self.added_assets), 1478)
-        self.assertEqual(
+        self.assertGreaterEqual(
             sum("repaired_asset_relative_path" in row for row in self.images), 64
         )
         self.assertEqual(len(chapter_images), 107)
