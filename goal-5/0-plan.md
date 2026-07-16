@@ -269,8 +269,8 @@ Neither file is a generalized workflow database.
 
 ## Current Execution State
 
-- Synced: 2026-07-15 (America/Los_Angeles).
-- Active stage: `5-CH09-12` (`IN_PROGRESS`).
+- Synced: 2026-07-16 (America/Los_Angeles).
+- Active stage: `5-CH09-12` (`IN_PROGRESS`), currently advancing `CH10`.
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
   and the empty `goal-4/` directory were removed by exact path. No commit
   range was reverted, and Goal 4 had corrected no book text.
@@ -280,9 +280,9 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions (44 using source-backed
-  repaired-only overrides), 19 source-added images, and generated
-  README/Contents files. It now includes 499 guarded source-verified
+  documents, 1,444 mapped image positions (45 using source-backed
+  repaired-only overrides), 22 source-added images, and generated
+  README/Contents files. It now includes 576 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -392,8 +392,10 @@ Neither file is a generalized workflow database.
   `G5-A-0022` repair the PDF-493 and PDF-527 omissions. The final Markdown
   SHA-256 is
   `c4786895ea852253233767f683f69ffce0f6e5576e948e4bbe3bf33c26cbc66c`.
-  `CH10` is next at `pdf:0563`, raw line 6,586, byte 932355, and image-map
-  ordinal 590; its coverage remains `NO/NO` until complete sequential review.
+  `CH10` begins at `pdf:0563`, raw line 6,586, byte 932355, and image-map
+  ordinal 590. Independent source/text, technical, and visual first passes are
+  in progress over all 90 pages through `pdf:0652`; its coverage remains
+  `NO/NO` until their findings are integrated and fresh closing passes finish.
 
 ## Stage Status
 
