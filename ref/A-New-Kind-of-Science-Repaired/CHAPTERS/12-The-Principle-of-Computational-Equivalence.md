@@ -1,8 +1,8 @@
 ![](_page_730_Picture_0.jpeg)
 
-### The Principle of Computational Equivalence
+## The Principle of Computational Equivalence
 
-#### **Basic Framework**
+### Basic Framework
 
 Following the discussion of the notion of computation in the previous chapter, I am now ready in this chapter to describe a bold hypothesis that I have developed on the basis of the discoveries in this book, and that I call the Principle of Computational Equivalence.
 
@@ -20,7 +20,7 @@ So in particular this implies that it should be possible to think of processes i
 
 But whatever the details of the rules involved the crucial point is that it is possible to view every process that occurs in nature or elsewhere as a computation. And it is this remarkable uniformity that makes it possible to formulate a principle as broad and powerful as the Principle of Computational Equivalence.
 
-#### **Outline of the Principle**
+### Outline of the Principle
 
 Across all the vastly different processes that we see in nature and in systems that we construct one might at first think that there could be very little in common. But the idea that any process whatsoever can be viewed as a computation immediately provides at least a uniform framework in which to discuss different processes.
 
@@ -38,9 +38,7 @@ The most familiar examples of universal systems today are practical computers an
 
 So this implies that from a computational point of view even systems with quite different underlying structures will still usually show a certain kind of equivalence, in that rules can be found for them that achieve universality—and that therefore can always exhibit the same level of computational sophistication.
 
-But while this is already a remarkable result, it represents only a first step in the direction of the Principle of Computational
-
-Equivalence. For what the result implies is that in many kinds of systems particular rules can be found that achieve universality and thus show the same level of computational sophistication. But the result says nothing about whether such rules are somehow typical, or are instead very rare and special.
+But while this is already a remarkable result, it represents only a first step in the direction of the Principle of Computational Equivalence. For what the result implies is that in many kinds of systems particular rules can be found that achieve universality and thus show the same level of computational sophistication. But the result says nothing about whether such rules are somehow typical, or are instead very rare and special.
 
 And in practice, almost without exception, the actual rules that have been established to be universal have tended to be quite complex. Indeed, most often they have in effect been engineered out of all sorts of components that are direct idealizations of various elaborate structures that exist in practical digital electronic computers.
 
@@ -64,7 +62,7 @@ According to the Principle of Computational Equivalence therefore it does not ma
 
 And what this suggests is that a fundamental unity exists across a vast range of processes in nature and elsewhere: despite all their detailed differences every process can be viewed as corresponding to a computation that is ultimately equivalent in its sophistication.
 
-#### The Content of the Principle
+### The Content of the Principle
 
 Like many other fundamental principles in science, the Principle of Computational Equivalence can be viewed in part as a new law of nature, in part as an abstract fact and in part as a definition. For in one sense it tells us what kinds of computations can and cannot happen in our universe, yet it also summarizes purely abstract deductions about possible computations, and provides foundations for more general definitions of the very concept of computation.
 
@@ -84,9 +82,7 @@ In essence, therefore, the Principle of Computational Equivalence introduces a n
 
 So what might make one think that this is true? One important piece of evidence is the success of the various models of natural systems that I have discussed in this book based on systems like cellular automata. But despite these successes, one might still imagine that other systems could exist in nature that are based, say, on continuous mathematics, and which would allow computations more sophisticated than those in systems like cellular automata to be done.
 
-Needless to say, I do not believe that this is the case, and in fact if one could find a truly fundamental theory of physics along the lines I
-
-discussed in Chapter 9 it would actually be possible to establish this with complete certainty. For such a theory would have the feature that it could be emulated by a universal system of the type I discussed in the previous chapter—with the result that nowhere in our universe could computations ever occur that are more sophisticated than those carried out by the universal systems we have discussed.
+Needless to say, I do not believe that this is the case, and in fact if one could find a truly fundamental theory of physics along the lines I discussed in Chapter 9 it would actually be possible to establish this with complete certainty. For such a theory would have the feature that it could be emulated by a universal system of the type I discussed in the previous chapter—with the result that nowhere in our universe could computations ever occur that are more sophisticated than those carried out by the universal systems we have discussed.
 
 So what about computations that we perform abstractly with computers or in our brains? Can these perhaps be more sophisticated? Presumably they cannot, at least if we want actual results, and not just generalities. For if a computation is to be carried out explicitly, then it must ultimately be implemented as a physical process, and must therefore be subject to the same limitations as any such process.
 
@@ -100,7 +96,7 @@ One could imagine doing much as I did early in this book and successively lookin
 
 And what the Principle of Computational Equivalence then asserts is that the vast majority of such rules will be universal.
 
-If one starts from scratch then it is not particularly difficult to construct rules-though usually fairly complicated ones-that one knows are universal. And from the result in the previous chapter that rule 110 is universal it follows for example that any rule containing this one must also be universal. But if one is just given an arbitrary ruleand especially a simple one—then it can be extremely difficult to determine whether or not the rule is universal.
+If one starts from scratch then it is not particularly difficult to construct rules—though usually fairly complicated ones—that one knows are universal. And from the result in the previous chapter that rule 110 is universal it follows for example that any rule containing this one must also be universal. But if one is just given an arbitrary rule—and especially a simple one—then it can be extremely difficult to determine whether or not the rule is universal.
 
 As we discussed in the previous chapter, the usual way to demonstrate that a rule is universal is to find a scheme for setting up initial conditions and for decoding output that makes the rule emulate some other rule that is already known to be universal.
 
@@ -126,9 +122,7 @@ But when there are no constraints that force simple overall behavior, my guess i
 
 And what this means is that such rules will typically show the same features as rules chosen at random from all possibilities—with the result that presumably they do in the end exhibit universality in almost all cases where their overall behavior is not obviously simple.
 
-But even if a wide range of systems can indeed be shown to be universal this is still not enough to establish the full Principle of Computational Equivalence. For the Principle of Computational
-
-Equivalence is concerned not only with the computational sophistication of complete systems but also with the computational sophistication of specific processes that occur within systems.
+But even if a wide range of systems can indeed be shown to be universal this is still not enough to establish the full Principle of Computational Equivalence. For the Principle of Computational Equivalence is concerned not only with the computational sophistication of complete systems but also with the computational sophistication of specific processes that occur within systems.
 
 And when one says that a particular system is universal what one means is that it is possible by choosing appropriate initial conditions to make the system perform computations of essentially any sophistication. But from this there is no guarantee that the vast majority of initial conditions—including perhaps all those that could readily arise in nature—will not just yield behavior that corresponds only to very simple computations.
 
@@ -158,13 +152,11 @@ It is a little like what happens in thermodynamics, where all sorts of complicat
 
 But computation is both a much more general and much more powerful notion than heat. And as a result, the Principle of Computational Equivalence has vastly richer implications than the laws of thermodynamics—or for that matter, than essentially any single collection of laws in science.
 
-#### The Validity of the Principle
+### The Validity of the Principle
 
 With the intuition of traditional science the Principle of Computational Equivalence—and particularly many of its implications—might seem almost absurd. But as I have developed more and more new intuition from the discoveries in this book so I have become more and more certain that the Principle of Computational Equivalence must be valid.
 
-But like any principle in science with real content it could in the future always be found that at least some aspect of the Principle of Computational Equivalence is not valid. For as a law of nature the principle could turn out to disagree with what is observed in our
-
-universe, while as an abstract fact it could simply represent an incorrect deduction, and even as a definition it could prove not useful or relevant.
+But like any principle in science with real content it could in the future always be found that at least some aspect of the Principle of Computational Equivalence is not valid. For as a law of nature the principle could turn out to disagree with what is observed in our universe, while as an abstract fact it could simply represent an incorrect deduction, and even as a definition it could prove not useful or relevant.
 
 But as more and more evidence is accumulated for phenomena that would follow from the principle, so it becomes more and more reasonable to expect that at least in some formulation or another the principle itself must be valid.
 
@@ -176,9 +168,7 @@ Indeed, my guess is that there is basically no way to formulate an accurate stat
 
 In the course of this book I have made a variety of discoveries that can be interpreted as limited versions of the Principle of Computational Equivalence. And as the years and decades go by, it is my expectation that many more such discoveries will be made. And as these discoveries are absorbed, I suspect that general intuition in science will gradually shift, until in the end the Principle of Computational Equivalence will come to seem almost obvious.
 
-But as of now the principle is far from obvious to most of those whose intuition is derived from traditional science. And as a result all sorts of objections to the principle will no doubt be raised. Some of them will presumably be based on believing that actual systems have
-
-less computational sophistication than is implied by the principle, while others will be based on believing that they have more.
+But as of now the principle is far from obvious to most of those whose intuition is derived from traditional science. And as a result all sorts of objections to the principle will no doubt be raised. Some of them will presumably be based on believing that actual systems have less computational sophistication than is implied by the principle, while others will be based on believing that they have more.
 
 But at an underlying level I suspect that the single most common cause of objections will be confusion about various idealizations that are made in traditional models for systems. For even though a system itself may follow the Principle of Computational Equivalence, there is no guarantee that this will also be true of idealizations of the system.
 
@@ -192,9 +182,7 @@ For example, many such models idealize systems to the point where their complete
 
 It is also common for traditional mathematical models to suggest too much computational sophistication. For example, as I discussed at the end of Chapter 7, models based on traditional mathematical equations often give constraints on behavior rather than explicit rules for generating behavior.
 
-And if one assumes that actual systems somehow always manage to find ways to satisfy such constraints, one will be led to conclude that these systems must be computationally more sophisticated than any of
-
-the universal systems I have discussed—and must thus violate the Principle of Computational Equivalence.
+And if one assumes that actual systems somehow always manage to find ways to satisfy such constraints, one will be led to conclude that these systems must be computationally more sophisticated than any of the universal systems I have discussed—and must thus violate the Principle of Computational Equivalence.
 
 For as I will describe in more detail later in this chapter, an ordinary universal system cannot in any finite number of steps guarantee to be able to tell whether, say, there is any pattern of black and white squares that satisfies some constraint of the type I discussed at the end of Chapter 5. Yet traditional mathematical models often in effect imply that systems in nature can do things like this.
 
@@ -208,9 +196,7 @@ For a start, the experience has been that if one actually tries to build analog 
 
 And indeed, as I have discussed several times in this book, it is in many cases clear that the whole notion of continuity is just an idealization—although one that happens to be almost required if one wants to make use of traditional mathematical methods.
 
-Fluids provide one obvious example. For usually they are thought of as being described by continuous mathematical equations. But at an underlying level real fluids consist of discrete particles. And this means that whatever the mathematical equations may suggest, the actual
-
-ultimate computational capabilities of fluids must be those of a system of discrete particles.
+Fluids provide one obvious example. For usually they are thought of as being described by continuous mathematical equations. But at an underlying level real fluids consist of discrete particles. And this means that whatever the mathematical equations may suggest, the actual ultimate computational capabilities of fluids must be those of a system of discrete particles.
 
 But while it is known that many systems in nature are made up of discrete elements, it is still almost universally believed that there are some things that are fundamentally continuous—notably positions in space and values of quantum mechanical probability amplitudes.
 
@@ -224,11 +210,11 @@ In a sense the most basic defining characteristic of continuous systems is that 
 
 But in itself this is not particularly remarkable. For even a one-dimensional cellular automaton can be viewed as updating an infinite sequence of cells at every step in its evolution. But one feature of this process is that it is fundamentally local: each cell behaves in a way that is determined purely by cells in a local neighborhood around it.
 
-Yet even the most basic arithmetic operations on continuous numbers typically involve significant non-locality. Thus, for example, when one adds two numbers together there can be carries in the digit sequence that propagate arbitrarily far. And if one computes even a function like 1/x almost any digit in x will typically have an effect on almost any digit in the result, as the pictures on the facing page indicate.
+Yet even the most basic arithmetic operations on continuous numbers typically involve significant non-locality. Thus, for example, when one adds two numbers together there can be carries in the digit sequence that propagate arbitrarily far. And if one computes even a function like $1/x$ almost any digit in $x$ will typically have an effect on almost any digit in the result, as the pictures on the facing page indicate.
 
 ![](_page_746_Figure_2.jpeg)
 
-Results from mathematical operations on numbers with similar digit sequences. Each successive line in each picture gives the digit sequence obtained by using a value of x in which one successive digit has been reversed. The top row of pictures start from the repetitive base 2 digit sequence of x = 3/5; the bottom row of pictures from  $x = \pi/4$ . The lack of coherence between successive digit sequences in each picture reflects the non-locality of mathematical operations when applied to digit sequences.
+Results from mathematical operations on numbers with similar digit sequences. Each successive line in each picture gives the digit sequence obtained by using a value of $x$ in which one successive digit has been reversed. The top row of pictures start from the repetitive base 2 digit sequence of $x = 3/5$; the bottom row of pictures from $x = \pi/4$. The lack of coherence between successive digit sequences in each picture reflects the non-locality of mathematical operations when applied to digit sequences.
 
 But can this detailed kind of phenomenon really be used as the basis for doing fundamentally more sophisticated computations? To compare the general computational capabilities of continuous and discrete systems one needs to find some basic scheme for constructing inputs and decoding outputs that one can use in both types of systems. And the most obvious and practical approach is to require that this always be done by finite discrete processes.
 
@@ -244,7 +230,7 @@ And by making simple algebraic changes to the way that time enters a differentia
 
 ![](_page_747_Picture_5.jpeg)
 
-Indications of how an infinite amount of computational work can in principle be performed in a finite time in continuous systems like partial differential equations. The top left picture shows a solution to the wave equation. The top right picture shows a solution to an equation obtained from the wave equation by transforming the time variable according to  $t \rightarrow 1 - 1/t$ . The bottom row shows what the same transformation does to patterns of the kind that are generated by simple cellular automata. It is presumably possible to construct partial differential equations that give both the original and transformed versions of these patterns.
+Indications of how an infinite amount of computational work can in principle be performed in a finite time in continuous systems like partial differential equations. The top left picture shows a solution to the wave equation. The top right picture shows a solution to an equation obtained from the wave equation by transforming the time variable according to $t \rightarrow 1 - 1/t$. The bottom row shows what the same transformation does to patterns of the kind that are generated by simple cellular automata. It is presumably possible to construct partial differential equations that give both the original and transformed versions of these patterns.
 
 So if such processes can correspond to the evolution of systems like cellular automata, then it follows at least formally that differential equations should be able to do in finite time computations that would take a discrete system like a cellular automaton an infinite time to do.
 
@@ -256,7 +242,7 @@ But what about the process of human thinking? Does it also follow the Principle 
 
 There is a great tendency for us to assume that there must be something extremely sophisticated about human thinking. And certainly the fact that present-day computer systems do not emulate even some of its most obvious features might seem to support this view. But as I discussed in Chapter 10, particularly following the discoveries in this book, it is my strong belief that the basic mechanisms of human thinking will in the end turn out to correspond to rather simple computational processes.
 
-So what all of this suggests is that systems in nature do not perform computations that are more sophisticated than the Principle of Computational Equivalence allows. But on its own this is not enough to establish the complete Principle of Computational Equivalence. For the principle also implies a lower limit on computational sophistication making the assertion that almost any process that is not obviously simple will tend to be equivalent in its computational sophistication.
+So what all of this suggests is that systems in nature do not perform computations that are more sophisticated than the Principle of Computational Equivalence allows. But on its own this is not enough to establish the complete Principle of Computational Equivalence. For the principle also implies a lower limit on computational sophistication—making the assertion that almost any process that is not obviously simple will tend to be equivalent in its computational sophistication.
 
 And one of the consequences of this is that it implies that most systems whose behavior seems complex should be universal. Yet as of now we only know for certain about fairly few systems that are universal, albeit including ones like rule 110 that have remarkably simple rules. And no doubt the objection will be raised that other systems whose behavior seems complex may not in fact be universal.
 
@@ -268,9 +254,7 @@ But when one examines the known examples of such systems—all of which have ver
 
 So why else might systems like rule 30 fail to be universal? We know from Chapter 11 that systems whose behavior is purely repetitive or purely nested cannot be universal. And so we might wonder whether perhaps some other form of regularity could be present that would prevent systems like rule 30 from being universal.
 
-When we look at the patterns produced by such systems they certainly do not seem to have any great regularity; indeed in most
-
-respects they seem far more random than patterns produced by systems like rule 110 that we already know are universal.
+When we look at the patterns produced by such systems they certainly do not seem to have any great regularity; indeed in most respects they seem far more random than patterns produced by systems like rule 110 that we already know are universal.
 
 But how can we be sure that we are not being misled by limitations in our powers of perception and analysis—and that an extraterrestrial intelligence, for example, might not immediately recognize regularity that would show that universality is impossible?
 
@@ -280,13 +264,11 @@ In the history of science and mathematics both repetition and nesting feature pr
 
 And when I first started looking at systems like cellular automata I in effect implicitly assumed that some such form of regularity must exist. For I was quite certain that even though I saw behavior that seemed to me complex the simplicity of the underlying rules must somehow ultimately lead to great regularity in it.
 
-But as the years have gone by-and as I have investigated more and more systems and tried more and more methods of analysis—I have gradually come to the conclusion that there is no hidden regularity in any large class of systems, and that instead what the Principle of Computational Equivalence suggests is correct: that beyond systems with obvious regularities like repetition and nesting most systems are universal, and are equivalent in their computational sophistication.
+But as the years have gone by—and as I have investigated more and more systems and tried more and more methods of analysis—I have gradually come to the conclusion that there is no hidden regularity in any large class of systems, and that instead what the Principle of Computational Equivalence suggests is correct: that beyond systems with obvious regularities like repetition and nesting most systems are universal, and are equivalent in their computational sophistication.
 
-#### **Explaining the Phenomenon of Complexity**
+### Explaining the Phenomenon of Complexity
 
-Early in this book I described the remarkable discovery that even systems with extremely simple underlying rules can produce behavior that seems to us immensely complex. And in the course of this book, I have shown a great many examples of this phenomenon, and have
-
-argued that it is responsible for much of the complexity we see in nature and elsewhere.
+Early in this book I described the remarkable discovery that even systems with extremely simple underlying rules can produce behavior that seems to us immensely complex. And in the course of this book, I have shown a great many examples of this phenomenon, and have argued that it is responsible for much of the complexity we see in nature and elsewhere.
 
 Yet so far I have given no fundamental explanation for the phenomenon. But now, by making use of the Principle of Computational Equivalence, I am finally able to do this.
 
@@ -302,15 +284,13 @@ At first, one might think that this explanation would depend on the particular m
 
 In traditional science the idealization is usually made that perception and analysis are in a sense infinitely powerful, so that they need not be taken into account when one draws conclusions about a system. But as soon as one tries to deal with systems whose behavior is anything but fairly simple one finds that this idealization breaks down, and it becomes necessary to consider perception and analysis as explicit processes in their own right.
 
-If one studies systems in nature it is inevitable that both the evolution of the systems themselves and the methods of perception and
+If one studies systems in nature it is inevitable that both the evolution of the systems themselves and the methods of perception and analysis used to study them must be processes based on natural laws. But at least in the recent history of science it has normally been assumed that the evolution of typical systems in nature is somehow much less sophisticated a process than perception and analysis.
 
-analysis used to study them must be processes based on natural laws. But at least in the recent history of science it has normally been assumed that the evolution of typical systems in nature is somehow much less sophisticated a process than perception and analysis.
-
-Yet what the Principle of Computational Equivalence now asserts is that this is not the case, and that once a rather low threshold has been reached, any real system must exhibit essentially the same level of computational sophistication. So this means that observers will tend to be computationally equivalent to the systems they observe with the inevitable consequence that they will consider the behavior of such systems complex.
+Yet what the Principle of Computational Equivalence now asserts is that this is not the case, and that once a rather low threshold has been reached, any real system must exhibit essentially the same level of computational sophistication. So this means that observers will tend to be computationally equivalent to the systems they observe—with the inevitable consequence that they will consider the behavior of such systems complex.
 
 So in the end the fact that we see so much complexity can be attributed quite directly to the Principle of Computational Equivalence, and to the fact that so many of the systems we encounter in practice turn out to be computationally equivalent.
 
-#### **Computational Irreducibility**
+### Computational Irreducibility
 
 When viewed in computational terms most of the great historical triumphs of theoretical science turn out to be remarkably similar in their basic character. For at some level almost all of them are based on finding ways to reduce the amount of computational work that has to be done in order to predict how some particular system will behave.
 
@@ -328,9 +308,7 @@ If one views the evolution of a system as a computation, then each step in this 
 
 Examples of computational reducibility and irreducibility in the evolution of cellular automata. The first two rules yield simple repetitive computationally reducible behavior in which the outcome after many steps can readily be deduced without tracing each step. The third rule yields behavior that appears to be computationally irreducible, so that its outcome can effectively be found only by explicitly tracing each step. The cellular automata shown here all have 3-color totalistic rules.
 
-And certainly in the first two examples above this is the case. For just as with the orbit of an idealized planet there is in effect a straightforward formula that gives the state of each system after any
-
-number of steps. So even though the systems themselves generate their behavior by going through a whole sequence of steps, we can readily shortcut this process and find the outcome with much less effort.
+And certainly in the first two examples above this is the case. For just as with the orbit of an idealized planet there is in effect a straightforward formula that gives the state of each system after any number of steps. So even though the systems themselves generate their behavior by going through a whole sequence of steps, we can readily shortcut this process and find the outcome with much less effort.
 
 But what about the third example on the facing page? What does it take to find the outcome in this case? It is always possible to do an experiment and explicitly run the system for a certain number of steps and see how it behaves. But to have any kind of traditional theory one must find a shortcut that involves much less computation.
 
@@ -346,13 +324,11 @@ But now computational irreducibility leads to a much more fundamental problem wi
 
 Indeed, whenever computational irreducibility exists in a system it means that in effect there can be no way to predict how the system will behave except by going through almost as many steps of computation as the evolution of the system itself.
 
-In traditional science it has rarely even been recognized that there is a need to consider how systems that are used to make predictions actually operate. But what leads to the phenomenon of computational irreducibility is that there is in fact always a fundamental competition
+In traditional science it has rarely even been recognized that there is a need to consider how systems that are used to make predictions actually operate. But what leads to the phenomenon of computational irreducibility is that there is in fact always a fundamental competition between systems used to make predictions and systems whose behavior one tries to predict.
 
 ![](_page_755_Picture_2.jpeg)
 
 5000 steps in the evolution of the third system from the previous page, starting from several initial conditions. The complexity of the behavior makes it seem inconceivable that there could ever be a procedure that would always immediately find its outcome.
-
-between systems used to make predictions and systems whose behavior one tries to predict.
 
 For if meaningful general predictions are to be possible, it must at some level be the case that the system making the predictions be able to outrun the system it is trying to predict. But for this to happen the system making the predictions must be able to perform more sophisticated computations than the system it is trying to predict.
 
@@ -396,13 +372,11 @@ The way things are set up the initial conditions for these cellular automata con
 
 And this means for example that the outcome of a million steps of evolution for either of the cellular automata on the left is now determined by just 20 steps of evolution, where 20 is the length of the base 2 digit sequence of the number 1,000,000.
 
-And this turns out to be quite similar to what happens with typical mathematical formulas in traditional theoretical science. For the point of such formulas is usually to allow one to give a number as
+And this turns out to be quite similar to what happens with typical mathematical formulas in traditional theoretical science. For the point of such formulas is usually to allow one to give a number as input, and then to compute directly something that corresponds, say, to the outcome of that number of steps in the evolution of a system.
 
 ![](_page_759_Figure_1.jpeg)
 
-Examples of computational reducibility in action. The pictures on the left show patterns produced by the ordinary evolution of cellular automata with elementary rules 188 and 60. The pictures on the right show how colors of particular cells in these patterns can be found with much less computational effort. In each case the position of a cell is specified by a pair of numbers given as base 2 digit sequences in the initial conditions for a cellular automaton. The evolution of the cellular automaton then quickly determines what the color of the cell at that position in the pattern on the left will be. For rule 188 the cellular automaton that does this involves 12 colors; for rule 60 it involves 6. In general, to find the color of a cell after t steps of rule 188 or rule 60 evolution takes about Log[2, t] steps. Compare page 608.
-
-input, and then to compute directly something that corresponds, say, to the outcome of that number of steps in the evolution of a system.
+Examples of computational reducibility in action. The pictures on the left show patterns produced by the ordinary evolution of cellular automata with elementary rules 188 and 60. The pictures on the right show how colors of particular cells in these patterns can be found with much less computational effort. In each case the position of a cell is specified by a pair of numbers given as base 2 digit sequences in the initial conditions for a cellular automaton. The evolution of the cellular automaton then quickly determines what the color of the cell at that position in the pattern on the left will be. For rule 188 the cellular automaton that does this involves 12 colors; for rule 60 it involves 6. In general, to find the color of a cell after $t$ steps of rule 188 or rule 60 evolution takes about $Log[2, t]$ steps. Compare page 608.
 
 In traditional mathematics it is normally assumed that once one has an explicit formula involving standard mathematical functions then one can in effect always evaluate this formula immediately.
 
@@ -424,13 +398,11 @@ When I first generated such patterns I spent a huge amount of time trying to ana
 
 And now, what the Principle of Computational Equivalence implies is that in fact almost any system whose behavior is not obviously simple will tend to exhibit computational irreducibility.
 
-But particularly when the underlying rules are simple there is often still some superficial computational reducibility. And so, for example, in the rule 30 pattern on the right one can tell whether a cell at a given position has any chance of not being white just by doing a
+But particularly when the underlying rules are simple there is often still some superficial computational reducibility. And so, for example, in the rule 30 pattern on the right one can tell whether a cell at a given position has any chance of not being white just by doing a very short computation that tests whether that position lies outside the center triangular region of the pattern. And in a class 4 cellular automaton such as rule 110 one can readily shortcut the process of evolution for at least a limited number of steps in places where there happen to be only a few well-separated localized structures present.
 
 ![](_page_760_Picture_11.jpeg)
 
 An example of a pattern where it is difficult to compute directly the color of a particular cell.
-
-very short computation that tests whether that position lies outside the center triangular region of the pattern. And in a class 4 cellular automaton such as rule 110 one can readily shortcut the process of evolution for at least a limited number of steps in places where there happen to be only a few well-separated localized structures present.
 
 And indeed in general almost any regularities that we manage to recognize in the behavior of a system will tend to reflect some kind of computational reducibility in this behavior.
 
@@ -444,13 +416,11 @@ But as we saw in Chapter 10, in almost any case where there is not just repetiti
 
 And this supports the assertion that beyond perhaps some small superficial amount of computational reducibility a great many systems are in the end computationally irreducible. And indeed this assertion explains, at least in part, why our methods of perception and analysis cannot be expected to go further in recognizing regularities.
 
-But if behavior that we see looks complex to us, does this necessarily mean that it can exhibit no computational reducibility? One way to try to get an idea about this is just to construct patterns
+But if behavior that we see looks complex to us, does this necessarily mean that it can exhibit no computational reducibility? One way to try to get an idea about this is just to construct patterns where we explicitly set up the color of each cell to be determined by some short computation from the numbers that represent its position.
 
 ![](_page_762_Figure_2.jpeg)
 
-Examples of patterns set up so that a short computation can be used to determine the color of each cell from the numbers representing its position. Most such patterns look to us quite simple, but the examples shown here were specifically chosen to be ones that look more complicated. In most of them fairly standard mathematical functions are used, but in unusual combinations. In every picture both x and y run from 1 to 127. d[n] stands for IntegerDigits[n, 2, 7]. (h) is equivalent to digit sequences of powers of 3 in base 2 (see page 120). (j) is essentially Pascal's triangle (see page 611). (I) was discussed on page 613. (m) is a nested pattern seen on page 583. The only pattern that is known to be obtainable by evolving down the page according to a simple local rule is (j), which corresponds to the rule 60 elementary cellular automaton.
-
-where we explicitly set up the color of each cell to be determined by some short computation from the numbers that represent its position.
+Examples of patterns set up so that a short computation can be used to determine the color of each cell from the numbers representing its position. Most such patterns look to us quite simple, but the examples shown here were specifically chosen to be ones that look more complicated. In most of them fairly standard mathematical functions are used, but in unusual combinations. In every picture both $x$ and $y$ run from 1 to 127. $d[n]$ stands for $IntegerDigits[n, 2, 7]$. (h) is equivalent to digit sequences of powers of 3 in base 2 (see page 120). (j) is essentially Pascal’s triangle (see page 611). (l) was discussed on page 613. (m) is a nested pattern seen on page 583. The only pattern that is known to be obtainable by evolving down the page according to a simple local rule is (j), which corresponds to the rule 60 elementary cellular automaton.
 
 When we look at such patterns most of them appear to us quite simple. But as the pictures on the previous page demonstrate, it turns out to be possible to find examples where this is not so, and where instead the patterns appear to us at least somewhat complex.
 
@@ -466,13 +436,11 @@ But the discovery of computational irreducibility now implies that this can fund
 
 It is not that one cannot find underlying rules for such behavior. Indeed, as I have argued in this book, particularly when they are formulated in terms of programs I suspect that such rules are often extremely simple. But the point is that to deduce the consequences of these rules can require irreducible amounts of computational effort.
 
-One can always in effect do an experiment, and just watch the actual behavior of whatever system one wants to study. But what one
+One can always in effect do an experiment, and just watch the actual behavior of whatever system one wants to study. But what one cannot in general do is to find an easy theory that will tell one without much effort what every aspect of this behavior will be.
 
 ![](_page_764_Figure_1.jpeg)
 
-A system whose behavior looks complex but still turns out to be computationally reducible. The system is a cellular automaton with 10 possible colors for each cell. But it can also be viewed as a system based on numbers, in which successive rows are the base 10 digit sequences of successive powers of 2. And it turns out that there is a fast way to compute row n just from the base 2 digit sequence of n, as the pictures on the right illustrate. This procedure is based on the standard repeated squaring method of finding  $2^n$  by starting from 2, and then successively squaring the numbers one gets, multiplying by 2 if the corresponding base 2 digit in n is 1. Using this procedure one can certainly compute the color of any cell on row n by doing about  $n Log[n]^3$  operations—instead of the  $n^2$  needed if one carried out the cellular automaton evolution explicitly.
-
-cannot in general do is to find an easy theory that will tell one without much effort what every aspect of this behavior will be.
+A system whose behavior looks complex but still turns out to be computationally reducible. The system is a cellular automaton with 10 possible colors for each cell. But it can also be viewed as a system based on numbers, in which successive rows are the base 10 digit sequences of successive powers of 2. And it turns out that there is a fast way to compute row $n$ just from the base 2 digit sequence of $n$, as the pictures on the right illustrate. This procedure is based on the standard repeated squaring method of finding $2^n$ by starting from 2, and then successively squaring the numbers one gets, multiplying by 2 if the corresponding base 2 digit in $n$ is 1. Using this procedure one can certainly compute the color of any cell on row $n$ by doing about $n Log[n]^3$ operations—instead of the $n^2$ needed if one carried out the cellular automaton evolution explicitly.
 
 So given this, can theoretical science still be useful at all?
 
@@ -480,19 +448,17 @@ The answer is definitely yes. For even in its most traditional form it can often
 
 But ultimately if computational irreducibility is present then these methods will fail. Yet there are still often many reasons to want to use abstract theoretical models rather than just doing experiments on actual systems in nature and elsewhere. And as the results in this book suggest, by using the right kinds of models much can be achieved.
 
-Any accurate model for a system that exhibits computational irreducibility must at some level inevitably involve computations that are as sophisticated as those in the system itself. But as I have shown in
+Any accurate model for a system that exhibits computational irreducibility must at some level inevitably involve computations that are as sophisticated as those in the system itself. But as I have shown in this book even systems with very simple underlying rules can still perform computations that are as sophisticated as in any system.
 
 ![](_page_765_Picture_1.jpeg)
 
 A cellular automaton whose behavior seems to show an analog of free will. Even though its underlying laws are definite—and simple—the behavior is complicated enough that many aspects of it seem to follow no definite laws. (The rule used is the same as on page 740.)
 
-this book even systems with very simple underlying rules can still perform computations that are as sophisticated as in any system.
-
 And what this means is that to capture the essential features even of systems with very complex behavior it can be sufficient to use models that have an extremely simple basic structure. Given these models the only way to find out what they do will usually be just to run them. But the point is that if the structure of the models is simple enough, and fits in well enough with what can be implemented efficiently on a practical computer, then it will often still be perfectly possible to find out many consequences of the model.
 
 And that, in a sense, is what much of this book has been about.
 
-#### The Phenomenon of Free Will
+### The Phenomenon of Free Will
 
 Ever since antiquity it has been a great mystery how the universe can follow definite laws while we as humans still often manage to make decisions about how to act in ways that seem quite free of obvious laws.
 
@@ -540,9 +506,9 @@ And I believe that it is this kind of intrinsic process—that we now know occur
 
 But this is not to say that everything that goes on in our brains has an intrinsic origin. Indeed, as a practical matter what usually seems to happen is that we receive external input that leads to some train of thought which continues for a while, but then dies out until we get more input. And often the actual form of this train of thought is influenced by memory we have developed from inputs in the past making it not necessarily repeatable even with exactly the same input.
 
-But it seems likely that the individual steps in each train of thought follow quite definite underlying rules. And the crucial point is then that I suspect that the computation performed by applying these rules is often sophisticated enough to be computationally irreducible with the result that it must intrinsically produce behavior that seems to us free of obvious laws.
+But it seems likely that the individual steps in each train of thought follow quite definite underlying rules. And the crucial point is then that I suspect that the computation performed by applying these rules is often sophisticated enough to be computationally irreducible—with the result that it must intrinsically produce behavior that seems to us free of obvious laws.
 
-#### Undecidability and Intractability
+### Undecidability and Intractability
 
 Computational irreducibility is a very general phenomenon with many consequences. And among these consequences are various phenomena that have been widely studied in the abstract theory of computation.
 
@@ -552,19 +518,17 @@ In this chapter so far I have mostly been concerned with ongoing processes of co
 
 The pictures on the next page show an example. In each case knowing the final outcome is equivalent to deciding what will eventually happen to the pattern generated by the cellular automaton evolution. Will it die out? Will it stabilize and become repetitive? Or will it somehow continue to grow forever?
 
-One can try to find out by running the system for a certain number of steps and seeing what happens. And indeed in example (a) this approach works well: in only 36 steps one finds that the pattern
+One can try to find out by running the system for a certain number of steps and seeing what happens. And indeed in example (a) this approach works well: in only 36 steps one finds that the pattern dies out. But already in example (b) it is not so easy. One can go for 1000 steps and still not know what is going to happen. And only after 1017 steps does it finally become clear that the pattern in fact dies out.
 
 ![](_page_769_Figure_1.jpeg)
 
 Cellular automaton evolution illustrating the phenomenon of undecidability. Pattern (a) dies out after 36 steps; pattern (b) takes 1017 steps. But what the final outcome in cases (c) and (d) will be is not clear after even a million steps. And in general there appears to be no finite computation that can guarantee to determine the final outcome of the evolution after an infinite number of steps. The cellular automaton rule used is a 4-color totalistic one with code 1004600. Whether a pattern in a cellular automaton ever dies out can be viewed as analogous to a version of the halting problem for Turing machines.
 
-dies out. But already in example (b) it is not so easy. One can go for 1000 steps and still not know what is going to happen. And only after 1017 steps does it finally become clear that the pattern in fact dies out.
-
 So what about examples (c) and (d)? What happens to these? After a million steps neither has died out; in fact they are respectively 31,000 and 39,718 cells wide. And after 10 million steps both are still going, now 339,028 and 390,023 cells wide. But even having traced the evolution this far, one still has no idea what its final outcome will be.
 
 And in any system the only way to be able to guarantee to know this in general is to have some way to shortcut the evolution of the system, and to be able to reduce to a finite computation what takes the system an infinite number of steps to do.
 
-But if the behavior of the system is computationally irreducible as I suspect is so for the cellular automaton on the facing page and for many other systems with simple underlying rules—then the point is that ultimately no such shortcut is possible. And this means that the general question of what the system will ultimately do can be considered formally undecidable, in the sense there can be no finite computation that will guarantee to decide it.
+But if the behavior of the system is computationally irreducible—as I suspect is so for the cellular automaton on the facing page and for many other systems with simple underlying rules—then the point is that ultimately no such shortcut is possible. And this means that the general question of what the system will ultimately do can be considered formally undecidable, in the sense there can be no finite computation that will guarantee to decide it.
 
 For any particular initial condition it may be that if one just runs the system for a certain number of steps then one will be able to tell what it will do. But the crucial point is that there is no guarantee that this will work: indeed there is no finite amount of computation that one can always be certain will be enough to answer the question of what the system does after an infinite number of steps.
 
@@ -584,13 +548,11 @@ But as soon as there are more than two pairs things become much more complicated
 
 And in fact I strongly suspect that even with just three pairs there is already computational irreducibility, so that in effect the only way to answer the question of whether the constraints can be satisfied is explicitly to trace through some fraction of all arbitrarily long sequences—making this question in general undecidable.
 
-And indeed whenever the question one has can somehow involve looking at an infinite number of steps, or elements, or other things, it
+And indeed whenever the question one has can somehow involve looking at an infinite number of steps, or elements, or other things, it turns out that such a question is almost inevitably undecidable if it is asked about a system that exhibits computational irreducibility.
 
 ![](_page_772_Figure_1.jpeg)
 
-Examples of a class of one-dimensional constraints where it is in general undecidable whether they can be satisfied. The constraints require that concatenating in some order the blocks shown should yield identical upper and lower strings. In cases (a)–(I) the constraints can be satisfied, and the minimal strings which do so are shown. The plots to the right give the successive differences in length between upper and lower strings when each new block is added; that this difference reaches zero reflects the fact that the constraint is satisfied. Cases (m)–(s) show constraints that cannot be satisfied by strings of any finite length. When the constraints involve more than two blocks there seems in general to be no upper limit on how long a string one may need to consider to tell whether the constraints can be satisfied. Pictures (a), (b), (h) and (j) show the longest minimal strings needed for any of the 4096, 16384, 65536 and 262144 constraints involving blocks with totals of 7, 8, 9 and 10 elements. The general problem of satisfying constraints of the kind shown here is known as the Post Correspondence Problem. Finding the systems on this page required constructing—by computer and otherwise—an immense number of proofs of the impossibility of satisfying particular constraints.
-
-turns out that such a question is almost inevitably undecidable if it is asked about a system that exhibits computational irreducibility.
+Examples of a class of one-dimensional constraints where it is in general undecidable whether they can be satisfied. The constraints require that concatenating in some order the blocks shown should yield identical upper and lower strings. In cases (a)–(l) the constraints can be satisfied, and the minimal strings which do so are shown. The plots to the right give the successive differences in length between upper and lower strings when each new block is added; that this difference reaches zero reflects the fact that the constraint is satisfied. Cases (m)–(s) show constraints that cannot be satisfied by strings of any finite length. When the constraints involve more than two blocks there seems in general to be no upper limit on how long a string one may need to consider to tell whether the constraints can be satisfied. Pictures (a), (b), (h) and (j) show the longest minimal strings needed for any of the 4096, 16384, 65536 and 262144 constraints involving blocks with totals of 7, 8, 9 and 10 elements. The general problem of satisfying constraints of the kind shown here is known as the Post Correspondence Problem. Finding the systems on this page required constructing—by computer and otherwise—an immense number of proofs of the impossibility of satisfying particular constraints.
 
 So what about finite questions?
 
@@ -606,13 +568,11 @@ The key is to consider very small programs. For with such programs it becomes re
 
 In the past such an approach would not have seemed sensible, for it was normally assumed that programs small enough to make it work would only ever be able to do rather trivial computations. But what my discoveries have shown is that in fact even very small programs can be quite capable of doing all sorts of sophisticated computations.
 
-As a first example—based on a rather simple computation—the picture at the top of the facing page shows a Turing machine set up to add 1 to any number. The input to the Turing machine is the base 2 digit sequence for the number. The head of the machine starts at the right-hand end of this sequence, and the machine runs until its head first goes further to the right—at which point the machine stops, with
+As a first example—based on a rather simple computation—the picture at the top of the facing page shows a Turing machine set up to add 1 to any number. The input to the Turing machine is the base 2 digit sequence for the number. The head of the machine starts at the right-hand end of this sequence, and the machine runs until its head first goes further to the right—at which point the machine stops, with whatever sequence of digits are left behind being taken to be the output of the computation.
 
 ![](_page_774_Figure_1.jpeg)
 
-Examples of the behavior of a simple Turing machine that does the computation of adding 1 to a number. The number is given as a base 2 digit sequence; the Turing machine runs until its head hits the gray stripe on the right. The plot shows the number of steps that this takes as a function of the input number x. The result turns out to be given by 2 IntegerExponent[x+1,2]+3, which has a maximum of 2n+3, where n is the length of the digit sequence of x, or Floor[Log[2,x]]. The average for a given length of input does not increase with n, and is always precisely 5.
-
-whatever sequence of digits are left behind being taken to be the output of the computation.
+Examples of the behavior of a simple Turing machine that does the computation of adding 1 to a number. The number is given as a base 2 digit sequence; the Turing machine runs until its head hits the gray stripe on the right. The plot shows the number of steps that this takes as a function of the input number $x$. The result turns out to be given by $2 IntegerExponent[x + 1, 2] + 3$, which has a maximum of $2n + 3$, where $n$ is the length of the digit sequence of $x$, or $Floor[Log[2, x]]$. The average for a given length of input does not increase with $n$, and is always precisely 5.
 
 And what the pictures above show is that with this particular machine the number of steps needed to finish the computation varies greatly between different inputs. But if one looks just at the absolute maximum number of steps for any given length of input one finds an exactly linear increase with this length.
 
@@ -622,13 +582,11 @@ Each of them works in a slightly different way, but all of them follow one of th
 
 So what about other computations?
 
-It turns out that there are 351 different functions that can be computed by one or more of the 4096 Turing machines with 2 states
+It turns out that there are 351 different functions that can be computed by one or more of the 4096 Turing machines with 2 states and 2 colors. And as the pictures on the facing page show, different Turing machines can take very different numbers of steps to do the computations they do.
 
 ![](_page_775_Figure_1.jpeg)
 
 The three schemes for adding 1 to a number that are used by Turing machines with 2 states and 2 colors. All show the same linear growth in maximum number of steps as their size of input increases. This growth can be viewed as a consequence of potentially having to propagate carry digits from one end of the input number to the other. The machines shown are numbered 445, 461 and 1512.
-
-and 2 colors. And as the pictures on the facing page show, different Turing machines can take very different numbers of steps to do the computations they do.
 
 Turing machine (a), for example, always finishes its computation after at most 5 steps, independent of the length of its input. But in most of the other Turing machines shown, the maximum number of steps needed generally increases with the length of the input.
 
@@ -638,7 +596,7 @@ So are there cases in which there is more rapid growth? Turing machine (e) shows
 
 ![](_page_776_Figure_2.jpeg)
 
-Examples of computations being done by Turing machines with two states and two colors. Evolution from a succession of initial conditions is shown corresponding to inputs of numbers from 1 to 20. Each block of Turing machines yields the same output for a given input. A computation is taken to be complete when the head of the Turing machine goes further to the right than it was at the beginning. The plots show how many steps this takes for successive inputs with lengths up to 9. The maximum for input of length n is (a) 5, (b) 6n+3, (c) 4n+3, (d) 2n+3, (e)  $2n^2+8n+7$ , (f)  $2^{n+1}-1$  (though the average is n+2), (g) 2n+1, (h) 3, (i) 2n+1, (j) 4n-1, (k) roughly  $2.5 n^2$ . In cases (i), (j) and (k) there are some inputs for which the head goes further and further to the left, and the Turing machine never halts. The machines shown are numbered 3279, 1285, 3333, 261, 1447, 1953, 1969, 3517, 3246, 3374, 1507.
+Examples of computations being done by Turing machines with two states and two colors. Evolution from a succession of initial conditions is shown corresponding to inputs of numbers from 1 to 20. Each block of Turing machines yields the same output for a given input. A computation is taken to be complete when the head of the Turing machine goes further to the right than it was at the beginning. The plots show how many steps this takes for successive inputs with lengths up to 9. The maximum for input of length $n$ is (a) 5, (b) $6n + 3$, (c) $4n + 3$, (d) $2n + 3$, (e) $2n^2 + 8n + 7$, (f) $2^{n+1} - 1$ (though the average is $n + 2$), (g) $2n + 1$, (h) 3, (i) $2n + 1$, (j) $4n - 1$, (k) roughly $2.5n^2$. In cases (i), (j) and (k) there are some inputs for which the head goes further and further to the left, and the Turing machine never halts. The machines shown are numbered 3279, 1285, 3333, 261, 1447, 1953, 1969, 3517, 3246, 3374, 1507.
 
 So are there computations that take still longer to do? In Turing machine (f) the maximum number of steps increases exponentially with the length of the input. But unlike in example (e), this Turing machine is not the only one that computes the function it computes. And in fact both (g) and (h) compute the same function—but in a linearly increasing and constant number of steps respectively.
 
@@ -654,13 +612,11 @@ So what happens if one considers more complicated Turing machines? With 3 states
 
 Most of the time the fastest machine at computing a given function again exhibits linear or at most quadratic growth. But the facing page shows some cases where instead it exhibits exponential growth.
 
-And indeed in a few cases the growth seems to be even faster. Example (h) is the most extreme among 3-state 2-color Turing machines: with the size 7 input 106 it already takes 1,978,213,883 steps
+And indeed in a few cases the growth seems to be even faster. Example (h) is the most extreme among 3-state 2-color Turing machines: with the size 7 input 106 it already takes 1,978,213,883 steps to generate its output, and in general with size $n$ input it may be able to take more than $2^{2^n}$ steps.
 
 ![](_page_778_Figure_2.jpeg)
 
 Examples of Turing machines with 3 and 4 states in which the maximum number of steps before a computation is finished grows at least exponentially with the length of the input. In all cases no Turing machines with the same number of states compute the same functions in fewer steps. In case (h) the number of steps grows so rapidly that only two peaks are seen in the plot. The top row of pictures are all scaled to be exactly the same height, even though the initial conditions cannot be chosen to make the number of steps in each case anything more than roughly the same. The machines have numbers: 582285, 657939, 2018806, 2868668, 2138664, 2139050, 132527, 600720, 3374234978, 1806221583, 1232059922, 3238044559. Cases like (c) and (d) show nested behavior reminiscent of a counter which generates digit sequences of successive integers.
-
-to generate its output, and in general with size n input it may be able to take more than  $2^{2^n}$  steps.
 
 But what if one allows Turing machines with more complicated rules? With 4-state 2-color rules it turns out to be possible to generate the same output as examples (c) and (d) in just a fixed number of steps. But for none of the other 3-state 2-color Turing machines shown do 4-state rules offer any speedup.
 
@@ -678,33 +634,31 @@ Once one has a system that is universal it can in principle be made to do any co
 
 And if one looks at different computers and computer languages practical experience tends to suggest that at least at the level of issues like exponential growth the rate at which a given computation can be done is ultimately rather similar in almost every such system.
 
-But one might imagine that across the much broader range of computational systems that I have considered in this book-and that presumably occur in nature—there could nevertheless still be great differences in the rates at which given computations can be done.
+But one might imagine that across the much broader range of computational systems that I have considered in this book—and that presumably occur in nature—there could nevertheless still be great differences in the rates at which given computations can be done.
 
 Yet from what we saw in Chapter 11 one suspects that in fact there are not. For in the course of that chapter it became clear that almost all the very varied systems in this book can actually be made to emulate each other in a quite comparable number of steps.
 
 Indeed often we found that it was possible to emulate every step in a particular system by just a fixed sequence of steps in another system. But if the number of elements that can be updated in one step is sufficiently different this tends to become impossible.
 
-And thus for example the picture on the right shows that it can take  $t^2$  steps for a Turing machine that updates just one cell at each step to build up the same pattern as a one-dimensional cellular automaton builds up in t steps by updating every cell in parallel.
+And thus for example the picture on the right shows that it can take $t^2$ steps for a Turing machine that updates just one cell at each step to build up the same pattern as a one-dimensional cellular automaton builds up in $t$ steps by updating every cell in parallel.
 
-And in d dimensions it is common for it to take, say,  $t^{d+1}$  steps for one system to emulate *t* steps of evolution of another.
+And in $d$ dimensions it is common for it to take, say, $t^{d+1}$ steps for one system to emulate $t$ steps of evolution of another.
 
 But can it take an exponential number of steps? Certainly if one has a substitution system that yields exponentially many elements then to reproduce all these elements with an ordinary Turing machine will take exponentially many steps. And similarly if one has a multiway system that yields exponentially many strings then to reproduce all these will again take exponentially many steps.
 
-But what if one asks only about some limited feature of the output—say whether some particular string appears after t steps of evolution of the multiway system? Given a specific path like the one in the picture on the right it takes an ordinary Turing machine not much more than t steps to test whether the path yields the desired string.
+But what if one asks only about some limited feature of the output—say whether some particular string appears after $t$ steps of evolution of the multiway system? Given a specific path like the one in the picture on the right it takes an ordinary Turing machine not much more than $t$ steps to test whether the path yields the desired string.
 
-But how long can it take for a Turing machine to find out whether any path in the multiway system manages to produce the string? If the Turing machine in effect had to examine each of the perhaps exponentially many paths in turn then this could take exponentially many steps. But the celebrated P=NP question in computational complexity theory asks whether in general there is some
+But how long can it take for a Turing machine to find out whether any path in the multiway system manages to produce the string? If the Turing machine in effect had to examine each of the perhaps exponentially many paths in turn then this could take exponentially many steps. But the celebrated P=NP question in computational complexity theory asks whether in general there is some way to get such an answer in a number of steps that increases not exponentially but only like a power.
 
 ![](_page_780_Picture_10.jpeg)
 
-To emulate t steps in the evolution of the cellular automaton takes the Turing machine  $2t^2 + 5t - 6$  steps.
+To emulate $t$ steps in the evolution of the cellular automaton takes the Turing machine $2t^2 + 5t - 6$ steps.
 
 ![](_page_780_Picture_12.jpeg)
 
 A Turing machine can quickly test the highlighted path but could take exponentially long to test all paths.
 
-way to get such an answer in a number of steps that increases not exponentially but only like a power.
-
-And although it has never been established for certain it seems by now likely that in most meaningful senses there is not. So what this implies is that to answer questions about the *t*-step behavior of a multiway system can take any ordinary Turing machine a number of steps that increases faster than any power of *t*.
+And although it has never been established for certain it seems by now likely that in most meaningful senses there is not. So what this implies is that to answer questions about the $t$-step behavior of a multiway system can take any ordinary Turing machine a number of steps that increases faster than any power of $t$.
 
 So how common is this kind of phenomenon? One can view asking about possible outcomes in a multiway system as like asking about possible ways to satisfy a constraint. And certainly a great many practical problems can be formulated in terms of constraints.
 
@@ -716,27 +670,21 @@ Much like a multiway system, a non-deterministic Turing machine has rules that a
 
 The top row in the picture on the facing page shows the first few of the exponentially many possible paths obtained by making successive sequences of choices in a particular non-deterministic Turing machine. And in the example shown, one sees that for two of these paths the head goes to the right, so that the overall constraint is satisfied.
 
-So what about the cellular automaton below in the picture? Given a particular initial condition its evolution is completely
+So what about the cellular automaton below in the picture? Given a particular initial condition its evolution is completely deterministic. But what the picture shows is that with successive initial conditions it emulates each possible path in the non-deterministic Turing machine.
 
 ![](_page_782_Figure_2.jpeg)
 
-Translation between an NP-complete problem about non-deterministic Turing machines and about cellular automata. The top row shows how a particular non-deterministic Turing machine behaves with successive sequences of choices for rules to apply. The bottom row shows how a cellular automaton can be made to
-
-emulate this behavior when given a succession of different initial conditions. The cellular automaton is set up to produce a vertical black stripe if the head of the Turing machine ever goes further to the right than it starts—as it does in cases 6 and 8. The left part of each cellular automaton configuration emulates the actual evolution of the Turing machine; a specification of which rules should be applied at each step is progressively fetched from the right and delivered to the position of the head. Given particular initial conditions for the Turing machine the problem of whether the head ever goes further to the right than it starts is thus equivalent to the problem of whether the cellular automaton ever produces a vertical black stripe given particular initial conditions on its left. The cellular automaton takes  $2t^2 + t$  steps to emulate t steps of evolution in the Turing machine. It involves a total of 19 colors.
-
-deterministic. But what the picture shows is that with successive initial conditions it emulates each possible path in the non-deterministic Turing machine.
+Translation between an NP-complete problem about non-deterministic Turing machines and about cellular automata. The top row shows how a particular non-deterministic Turing machine behaves with successive sequences of choices for rules to apply. The bottom row shows how a cellular automaton can be made to emulate this behavior when given a succession of different initial conditions. The cellular automaton is set up to produce a vertical black stripe if the head of the Turing machine ever goes further to the right than it starts—as it does in cases 6 and 8. The left part of each cellular automaton configuration emulates the actual evolution of the Turing machine; a specification of which rules should be applied at each step is progressively fetched from the right and delivered to the position of the head. Given particular initial conditions for the Turing machine the problem of whether the head ever goes further to the right than it starts is thus equivalent to the problem of whether the cellular automaton ever produces a vertical black stripe given particular initial conditions on its left. The cellular automaton takes $2t^2 + t$ steps to emulate $t$ steps of evolution in the Turing machine. It involves a total of 19 colors.
 
 And so what this means is that the problem of finding whether initial conditions exist that make the cellular automaton produce a certain outcome is equivalent to the non-deterministic Turing machine problem above—and is therefore in general NP-complete.
 
 So what about other kinds of problems?
 
-The picture on the next page shows the equivalence between the classic problem of satisfiability and the non-deterministic Turing machine problem at the top of this page. In satisfiability what one does is to start with a collection of rows of black, white and gray squares. And then what one asks is whether any sequence of just black and
+The picture on the next page shows the equivalence between the classic problem of satisfiability and the non-deterministic Turing machine problem at the top of this page. In satisfiability what one does is to start with a collection of rows of black, white and gray squares. And then what one asks is whether any sequence of just black and white squares exists that satisfies the constraint that on every row there is at least one square whose color agrees with the color of the corresponding square in the sequence.
 
 ![](_page_783_Figure_2.jpeg)
 
-Translation between the NP-complete problem of halting in a non-deterministic Turing machine and the classic NP-complete problem of satisfiability. In satisfiability one sets up a collection of rows of black, white and gray squares, then asks whether there exists any sequence of black and white squares that satisfies the constraint that on every row the color of at least one square agrees with the color of the corresponding square in the sequence. Each row can be viewed as a term in a conjunctive normal form Boolean expression, with each column corresponding to a different variable. When a given square on a particular row is black or white it indicates that a variable or its negation appear in that term. The translation from the Turing machine problem is achieved by representing the behavior of the Turing machine by saying which of a sequence of elementary statements are true about it at each step: whether the head is in one state or another, whether the cell under the head is black or white, and whether the head is at each of the possible positions it can be in. The Boolean expression then gives constraints on which of these statements can simultaneously be true. In the first two pictures, for example, the first row corresponds to the constraint that on the first step of Turing machine evolution, the head cannot simultaneously be in an up and a down state. About the first half of the terms in each Boolean expression correspond to similar general constraints about the operation of Turing machines. There are then a few terms that specify the particular initial conditions used here, followed by terms that give the rule for the Turing machine that is used. The very last term makes the statement that the Turing machine halts. As the pictures indicate, each possible path of evolution for the Turing machine then corresponds to a possible assignment of truth values to the variables associated with each elementary statement. And if there is any path that leads the Turing machine to halt the Boolean expression will be satisfiable. This is the case in the first and fourth examples shown, but not in the other two. In general, it is possible to represent t steps in the evolution of a non-deterministic Turing machine by a Boolean expression with at most  $t^3$  terms in  $t^2$  variables. A version of the translation shown here was what launched the study of NP completeness in the early 1970s.
-
-white squares exists that satisfies the constraint that on every row there is at least one square whose color agrees with the color of the corresponding square in the sequence.
+Translation between the NP-complete problem of halting in a non-deterministic Turing machine and the classic NP-complete problem of satisfiability. In satisfiability one sets up a collection of rows of black, white and gray squares, then asks whether there exists any sequence of black and white squares that satisfies the constraint that on every row the color of at least one square agrees with the color of the corresponding square in the sequence. Each row can be viewed as a term in a conjunctive normal form Boolean expression, with each column corresponding to a different variable. When a given square on a particular row is black or white it indicates that a variable or its negation appear in that term. The translation from the Turing machine problem is achieved by representing the behavior of the Turing machine by saying which of a sequence of elementary statements are true about it at each step: whether the head is in one state or another, whether the cell under the head is black or white, and whether the head is at each of the possible positions it can be in. The Boolean expression then gives constraints on which of these statements can simultaneously be true. In the first two pictures, for example, the first row corresponds to the constraint that on the first step of Turing machine evolution, the head cannot simultaneously be in an up and a down state. About the first half of the terms in each Boolean expression correspond to similar general constraints about the operation of Turing machines. There are then a few terms that specify the particular initial conditions used here, followed by terms that give the rule for the Turing machine that is used. The very last term makes the statement that the Turing machine halts. As the pictures indicate, each possible path of evolution for the Turing machine then corresponds to a possible assignment of truth values to the variables associated with each elementary statement. And if there is any path that leads the Turing machine to halt the Boolean expression will be satisfiable. This is the case in the first and fourth examples shown, but not in the other two. In general, it is possible to represent $t$ steps in the evolution of a non-deterministic Turing machine by a Boolean expression with at most $t^3$ terms in $t^2$ variables. A version of the translation shown here was what launched the study of NP completeness in the early 1970s.
 
 To see the equivalence to questions about Turing machines one imagines breaking the description of the behavior of a Turing machine into a sequence of elementary statements: whether the head is in a particular state on a particular step, whether a certain cell has a particular color, and so on. The underlying rules for the Turing machine then define constraints on which sequences of such statements can be true. And in the picture on the facing page almost every row of black, white and gray squares corresponds to one such constraint.
 
@@ -744,17 +692,17 @@ The last row, however, represents the further constraint that the head of the Tu
 
 Starting from satisfiability it is possible to show that all sorts of well-known computational problems in discrete mathematics are NP-complete. And in addition almost any undecidable problem that involves simple constraints—such as the correspondence problem on page 757—turns out to be NP-complete if restricted to finite cases.
 
-In studying the phenomenon of NP completeness what has mostly been done in the past is to try to construct particular instances of rather general problems that exhibit equivalence to other problems. But almost always what is actually constructed is quite complicated and certainly not something one would expect to occur at all often.
+In studying the phenomenon of NP completeness what has mostly been done in the past is to try to construct particular instances of rather general problems that exhibit equivalence to other problems. But almost always what is actually constructed is quite complicated—and certainly not something one would expect to occur at all often.
 
 Yet on the basis of intuition from the Principle of Computational Equivalence I strongly suspect that in most cases there are already quite simple instances of general NP-complete problems that are just as difficult as any NP-complete problem. And so, for example, I suspect that it does not take a cellular automaton nearly as complicated as the one on page 767 for it to be an NP-complete problem to determine whether initial conditions exist that lead to particular behavior.
 
-Indeed, my expectation is that asking about possible outcomes of t steps of evolution will already be NP-complete even for the rule 30 cellular automaton, as illustrated below.
+Indeed, my expectation is that asking about possible outcomes of $t$ steps of evolution will already be NP-complete even for the rule 30 cellular automaton, as illustrated below.
 
 ![](_page_785_Figure_2.jpeg)
 
-Example of a simple problem that I suspect is NP-complete. The problem is to determine whether right-hand cells in the initial conditions for rule 30 can be filled in so as to produce a vertical black stripe of a certain height at the bottom of the center column formed after t steps of evolution. The pictures at the top show that in case (a) stripes up to height 3 can be produced, in case (b) up to height 2, and in case (c) only up to height 1. The pictures at the bottom indicate in black for which of the  $2^{t+1}$  successive left-hand sequences of t+1 cells it is impossible to get stripes of respectively heights 1 and 2. The apparent randomness of these patterns reflects the likely difficulty of the problem. The problem is related to issues of rule 30 cryptanalysis discussed on page 603.
+Example of a simple problem that I suspect is NP-complete. The problem is to determine whether right-hand cells in the initial conditions for rule 30 can be filled in so as to produce a vertical black stripe of a certain height at the bottom of the center column formed after $t$ steps of evolution. The pictures at the top show that in case (a) stripes up to height 3 can be produced, in case (b) up to height 2, and in case (c) only up to height 1. The pictures at the bottom indicate in black for which of the $2^{t+1}$ successive left-hand sequences of $t+1$ cells it is impossible to get stripes of respectively heights 1 and 2. The apparent randomness of these patterns reflects the likely difficulty of the problem. The problem is related to issues of rule 30 cryptanalysis discussed on page 603.
 
-Just as with the Turing machines of pages 761 and 763 there will be a certain density of cases where the problem is fairly easy to solve. But it seems likely that as one increases t, no ordinary Turing machine or cellular automaton will ever be able to guarantee to solve the problem in a number of steps that grows only like some power of t.
+Just as with the Turing machines of pages 761 and 763 there will be a certain density of cases where the problem is fairly easy to solve. But it seems likely that as one increases $t$, no ordinary Turing machine or cellular automaton will ever be able to guarantee to solve the problem in a number of steps that grows only like some power of $t$.
 
 Yet even so, there could still in principle exist in nature some other kind of system that would be able to do this. And for example one might imagine that this would be possible if one were able to use exponentially small components. But almost all the evidence we have suggests that in our actual universe there are limits on the sizes and densities of components that we can ever expect to manipulate.
 
@@ -768,11 +716,11 @@ In fact, my suspicion is that such a difference will exist in almost any system 
 
 Such limits can ultimately be viewed as being consequences of the phenomenon of computational irreducibility. But a much more direct consequence is one that we have discussed before: that even given a particular initial condition it can require an irreducible amount of computational work to find the outcome after a given number of steps of evolution.
 
-One can specify the number of steps t that one wants by giving the sequence of digits in t. And for systems with sufficiently simple behavior—say repetitive or nested—the pictures on page 744 indicate that one can typically determine the outcome with an amount of effort that is essentially proportional to the length of this digit sequence.
+One can specify the number of steps $t$ that one wants by giving the sequence of digits in $t$. And for systems with sufficiently simple behavior—say repetitive or nested—the pictures on page 744 indicate that one can typically determine the outcome with an amount of effort that is essentially proportional to the length of this digit sequence.
 
-But the point is that when computational irreducibility is present, one may in effect explicitly have to follow each of the t steps of evolution—again requiring exponentially more computational work.
+But the point is that when computational irreducibility is present, one may in effect explicitly have to follow each of the $t$ steps of evolution—again requiring exponentially more computational work.
 
-#### Implications for Mathematics and Its Foundations
+### Implications for Mathematics and Its Foundations
 
 Much of what I have done in this book has been motivated by trying to understand phenomena in nature. But the ideas that I have developed are general enough that they do not apply just to nature. And indeed in this section what I will do is to show that they can also be used to provide important new insights on fundamental issues in mathematics.
 
@@ -786,75 +734,23 @@ Yet at some level there is still all sorts of complexity in mathematics. And ind
 
 So this suggests that the overall similarity between mathematics and nature must have a deeper origin. And what I believe is that in the end it is just another consequence of the very general Principle of Computational Equivalence that I discuss in this chapter.
 
-For both mathematics and nature involve processes that can be thought of as computations. And then the point is that all these computations follow the Principle of Computational Equivalence, so
+For both mathematics and nature involve processes that can be thought of as computations. And then the point is that all these computations follow the Principle of Computational Equivalence, so that they ultimately tend to be equivalent in their computational sophistication—and thus show all sorts of similar phenomena.
 
 ![](_page_788_Figure_2.jpeg)
 
 Axiom systems for traditional mathematics. It is from the axiom systems on this page and the next that most of the millions of theorems in the literature of mathematics have ultimately been derived. Note that in several cases axiom systems are given here in much shorter forms than in standard mathematics textbooks. (See also the definitions on the next page.)
 
-| predicate logic and                                                                                                                                                                                                |                        |                                                                             |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------|-----------------------------------------------------------------------------|
-| $(a \land b \land a) \Rightarrow a == b$                                                                                                                                                                           |                        | $\exists_{a_{-}} b_{-} \rightarrow \neg \forall_{a} \neg b$                 |
-| $((a \land b \land c) \land (b \land d \land c)) \Rightarrow (a \land b \land d)$                                                                                                                                  |                        | $a_{-} \Rightarrow b_{-} \rightarrow \neg a \lor b$                         |
-| $((a \land b \land c) \land (a \land b \land d) \land a \neq b) \Rightarrow ((a \land c \land d) \lor (a \land d \land c))$                                                                                        |                        | $a \Leftrightarrow b \rightarrow (a \Rightarrow b) \land (b \Rightarrow a)$ |
-| $\overline{ab} \equiv \overline{ba}$                                                                                                                                                                               |                        | a_ ∩ b_ == c_ →                                                             |
-| $\overline{ab} \equiv \overline{cc} \Rightarrow a == b$                                                                                                                                                            |                        | $\forall_n (n \in c \Leftrightarrow (n \in a \land n \in b))$               |
-|                                                                                                                                                                                                                    |                        | <br>{a_}→{a, a}                                                             |
-| $(ab = \overline{cd} \wedge \overline{ab} = \overline{ef}) \Rightarrow \overline{cd} = \overline{ef}$                                                                                                              |                        | $a_{-}I_{b_{-}\to c_{-}}\to \forall_{b}\ (b=c\Rightarrow a)$                |
-| $\exists_{a} (((b \land c \land d) \land (e \land d \land f)) \Rightarrow ((b \land a \land e) \land (f \land c \land a)))$                                                                                        | 4/22224111             | $a \subseteq b \rightarrow \forall_n \ (n \in a \Rightarrow n \in b)$       |
-| $\exists_{a} \exists_{b} (((c \land d \land e) \land (f \land d \land g) \land c \neq d) \Rightarrow ((c \land g \land a) \land (c \land f \land b))$                                                              |                        | $a_{-} \neq b_{-} \rightarrow \neg (a == b)$                                |
-| $(ab = cd \land be = df \land \overline{ag} = ch \land bg = dh \land (a \lor b \lor e) \land (c \lor d)$ $eg = \overline{fh}$                                                                                      | ≀†)∧a ≠ b)⇒            | definitions                                                                 |
-| $\exists_a ((b \wr c \wr a) \land \overline{ca} = \overline{de})$                                                                                                                                                  |                        |                                                                             |
-| $\exists_{a}\exists_{b}\exists_{c}(\neg(a \land b \land c) \land \neg(b \land c \land a) \land \neg(c \land a \land b))$                                                                                           |                        |                                                                             |
-|                                                                                                                                                                                                                    | a) 1/ /a > a > a/1)    |                                                                             |
-| $(\overrightarrow{ab} = \overrightarrow{ac} \wedge \overrightarrow{db} = \overrightarrow{dc} \wedge \overrightarrow{eb} = \overrightarrow{ec} \wedge b + c) \Rightarrow ((a \lor d \lor e) \lor (d \lor e)$        | a) v (e ≀ a ≀ u))      | Λ and                                                                       |
-| $\exists_{a} \forall_{b} \forall_{c} ((\alpha_{-} \land \beta_{-}) \Rightarrow (a \lor b \lor c)) \Rightarrow$                                                                                                     | 5 010 11 11            | v or                                                                        |
-| $\exists_d \ \forall_b \ \forall_c \ ((\alpha_{-} \land \beta_{-}) \Rightarrow (b \land d \land c)) \ /; Free \ Q[\alpha, a \mid c \mid d] \ \& \&$                                                                | rreeQ[β, a b d]        | ¬ not                                                                       |
-| Euclidean plane geometry                                                                                                                                                                                           |                        | л nand                                                                      |
-|                                                                                                                                                                                                                    |                        | ∀ for all                                                                   |
-| $a \cdot (b \cdot c) == (a \cdot b) \cdot c$                                                                                                                                                                       |                        | ∃ there exists                                                              |
-| a · ⊳ a == a                                                                                                                                                                                                       |                        | Δ next integer                                                              |
-|                                                                                                                                                                                                                    |                        | - composition                                                               |
-| a · D == D                                                                                                                                                                                                         |                        | inverse composition     —————————————————————————————————                   |
-| □·a == □<br>▷□ == □                                                                                                                                                                                                |                        | □ inverse                                                                   |
-| ♦ U == U                                                                                                                                                                                                           |                        | ⊕ generalized addition                                                      |
-| $(a \neq \Box \land b \neq \Box) \Rightarrow (a \cdot b \neq \Box \Leftrightarrow \triangleright a == \triangleleft b)$                                                                                            |                        | ⊗ generalized multiplication                                                |
-| elementary category theory                                                                                                                                                                                         |                        | □ <sup>-1</sup> reciprocal                                                  |
-| elementary category trieory                                                                                                                                                                                        |                        | ✓ left identity morphism                                                    |
-| $\forall_a (a \in b \Leftrightarrow a \in c) \Rightarrow b == c$                                                                                                                                                   | (extensionality)       |                                                                             |
-| $\neg a \in \emptyset$                                                                                                                                                                                             | (empty set)            | (□ ≀ □ ≀ □) is between                                                      |
-| $a \in \{b, c\} \Leftrightarrow (a == b \lor a == c)$                                                                                                                                                              | (pairing)              | ☐☐ ≡ ☐☐ segments are congruent                                              |
-| $a \in Ub \Leftrightarrow \exists_{c} (c \in b \land a \in c)$                                                                                                                                                     | (union)                | ∈ element of                                                                |
-| $\exists_a \forall_b (b \in a \Leftrightarrow \forall_c (c \in b \Rightarrow c \in d))$                                                                                                                            | (power set)            | Ø empty set                                                                 |
-| $\exists_a \forall_b (b \in a \Leftrightarrow (b \in c \land \alpha)) /; FreeQ[\alpha, a]$                                                                                                                         | (subset)               | {□, □} pair                                                                 |
-| $\exists_a (\emptyset \in a \land \forall_b (b \in a \Rightarrow \cup \{b, \{b\}\} \in a))$                                                                                                                        | (infinity)             | U union                                                                     |
-| $\forall_a (a \in b \Rightarrow \forall_c \forall_d ((\alpha _{e \to c} \land \alpha _{e \to d}) \Rightarrow c = d)) \Rightarrow$                                                                                  |                        | X set of all points                                                         |
-| $\exists_f \forall_g (g \in f \Leftrightarrow \exists_a (a \in b \land \alpha _{e \to g})) /; FreeQ[\alpha, c   d   f   g)$                                                                                        | g] (replacement)       | O set of all open sets                                                      |
-| -                                                                                                                                                                                                                  |                        | R set of all real numbers                                                   |
-| $(\neg \emptyset \in a \land \forall_b \forall_c ((b \in a \land c \in a \land b \neq c) \Rightarrow b \cap c = \emptyset)) \Rightarrow$<br>$\exists_d \forall_b (b \in a \Rightarrow \exists_e d \cap b = \{e\})$ | (choice)               | typical interpretations                                                     |
-| $a \neq \emptyset \Rightarrow \exists_b \ (b \in a \land a \cap b == \emptyset)$                                                                                                                                   | (regularity)           |                                                                             |
-| set theory                                                                                                                                                                                                         | (rogularity)           |                                                                             |
-| Sot thoory                                                                                                                                                                                                         |                        |                                                                             |
-| set theory and                                                                                                                                                                                                     |                        |                                                                             |
-| $a \in \mathcal{O} \Rightarrow a \subseteq X$ real al                                                                                                                                                              | gebra with all objects | restricted to R                                                             |
-|                                                                                                                                                                                                                    | •                      | $\forall C (c \in a \Rightarrow c > b))) \Rightarrow$                       |
-| 105                                                                                                                                                                                                                | -                      | $(d > b \Leftrightarrow \exists_{c} (c \in a \land d > c))))$               |
-| 2 € 0 → 1/2 € 0                                                                                                                                                                                                    |                        |                                                                             |
-| general topology                                                                                                                                                                                                   | ary515                 |                                                                             |
-| J                                                                                                                                                                                                                  |                        |                                                                             |
-|                                                                                                                                                                                                                    |                        |                                                                             |
+![](_page_789_Further_Axiom_Systems.jpeg)
 
 Further axiom systems for traditional mathematics. The typical interpretations are relevant for applications, though not for formal derivation of theorems. The last two axioms listed for set theory are usually considered optional.
 
-that they ultimately tend to be equivalent in their computational sophistication—and thus show all sorts of similar phenomena.
-
-And what we will see in this section is while some of these phenomena correspond to known features of mathematics—such as Gödel's Theorem—many have never successfully been recognized.
+And what we will see in this section is while some of these phenomena correspond to known features of mathematics—such as Gödel’s Theorem—many have never successfully been recognized.
 
 But just what basic processes are involved in mathematics?
 
 Ever since antiquity mathematics has almost defined itself as being concerned with finding theorems and giving their proofs. And in any particular branch of mathematics a proof consists of a sequence of steps ultimately based on axioms like those of the previous two pages.
 
-The picture below gives a simple example of how this works in basic logic. At the top right are axioms specifying certain fundamental equivalences between logic expressions. A proof of the equivalence  $p \bar{\wedge} q = q \bar{\wedge} p$  between logic expressions is then formed by applying these axioms in the particular sequence shown.
+The picture below gives a simple example of how this works in basic logic. At the top right are axioms specifying certain fundamental equivalences between logic expressions. A proof of the equivalence $p \bar{\wedge} q = q \bar{\wedge} p$ between logic expressions is then formed by applying these axioms in the particular sequence shown.
 
 ![](_page_790_Figure_7.jpeg)
 
@@ -866,7 +762,7 @@ The pictures below show how proofs of theorems work with this setup. Each theore
 
 ![](_page_791_Picture_4.jpeg)
 
-Simple idealizations of proofs in mathematics. The rules on the left in effect correspond to axioms that specify valid transformations between strings of black and white elements. The proofs above then show how one string—say ——can be transformed into another—say ——by using the axioms. Typically there are many different proofs that can be given of a particular theorem; here in each case the ones shown are examples of the shortest possible proofs. The system shown is an example of a general substitution system of the kind discussed on page 497. Note that the fifth theorem — • • • • • • • • • • • • • • • • • •
+Simple idealizations of proofs in mathematics. The rules on the left in effect correspond to axioms that specify valid transformations between strings of black and white elements. The proofs above then show how one string—say □□—can be transformed into another—say □□□□□—by using the axioms. Typically there are many different proofs that can be given of a particular theorem; here in each case the ones shown are examples of the shortest possible proofs. The system shown is an example of a general substitution system of the kind discussed on page 497. Note that the fifth theorem □■□ → ■□■ occurs in effect as a lemma in the second theorem □□ → ■□■.
 
 But just as in the multiway systems in Chapter 5 one can also consider an explicit process of evolution, in which one starts from a particular string, then at each successive step one applies all possible transformations, so that in the end one builds up a whole network of connections between strings, as in the pictures below.
 
@@ -882,13 +778,13 @@ But can networks like the ones above really reflect mathematics as it is actuall
 
 But just like in so many other cases in this book, it seems that even systems whose underlying rules are remarkably simple are already able to capture many of the essential features of mathematics.
 
-An obvious observation in mathematics is that proofs can be difficult to do. One might at first assume that any theorem that is easy
+An obvious observation in mathematics is that proofs can be difficult to do. One might at first assume that any theorem that is easy to state will also be easy to prove. But experience suggests that this is far from correct. And indeed there are all sorts of well-known examples—such as Fermat’s Last Theorem and the Four-Color Theorem—in which a theorem that is easy to state seems to require a proof that is immensely long.
 
 ![](_page_793_Picture_2.jpeg)
 
 ![](_page_793_Picture_3.jpeg)
 
-Three examples of multiway systems that show the analog of long proofs. In each case a string consisting of a single white element is eventually generatedbut this takes respectively 12, 28 and 34 steps to happen. The first multiway system actually generates all strings in the end (not least since it yields the lemmas  $\blacksquare \rightarrow \blacksquare$  and  $\blacksquare \rightarrow \blacksquare$ )—and in fact strings of length n > 2 appear after at most 2n + 7 steps. The second multiway system generates only the n + 1 strings where black comes before white-and all of these strings appear after at most 7 n steps. The third multiway system generates a complicated collection of strings; the numbers of lengths up to 8 are 1, 2, 4, 8, 14, 22, 34, 45. All the strings generated have an even number of black elements.
+Three examples of multiway systems that show the analog of long proofs. In each case a string consisting of a single white element is eventually generated—but this takes respectively 12, 28 and 34 steps to happen. The first multiway system actually generates all strings in the end (not least since it yields the lemmas ■ → ■■ and ■ → □)—and in fact strings of length $n > 2$ appear after at most $2n + 7$ steps. The second multiway system generates only the $n + 1$ strings where black comes before white—and all of these strings appear after at most $7n$ steps. The third multiway system generates a complicated collection of strings; the numbers of lengths up to 8 are 1, 2, 4, 8, 14, 22, 34, 45. All the strings generated have an even number of black elements.
 
 ![](_page_793_Picture_5.jpeg)
 
@@ -897,8 +793,6 @@ Three examples of multiway systems that show the analog of long proofs. In each 
 ![](_page_793_Picture_7.jpeg)
 
 ![](_page_793_Picture_8.jpeg)
-
-to state will also be easy to prove. But experience suggests that this is far from correct. And indeed there are all sorts of well-known examples—such as Fermat's Last Theorem and the Four-Color Theorem—in which a theorem that is easy to state seems to require a proof that is immensely long.
 
 So is there an analog of this in multiway systems? It turns out that often there is, and it is that even though a string may be short it may nevertheless take a great many steps to reach.
 
@@ -910,45 +804,43 @@ Certainly one can take the rules for any multiway system and add transformations
 
 And what I believe is that essentially the same phenomenon operates in almost every area of mathematics. Just like in multiway systems, one can always add axioms to make it easier to prove particular theorems. But I suspect that ultimately there is almost always computational irreducibility, and this makes it essentially inevitable that there will be short theorems that only allow long proofs.
 
-In the previous section we saw that computational irreducibility tends to make infinite questions undecidable. So for example the question of whether a particular string will ever be generated in the evolution of a multiway system—regardless of how long one waits—is in general undecidable. And similarly it can be undecidable whether any proof-regardless of length-exists for a specific result in a mathematical system with particular axioms.
+In the previous section we saw that computational irreducibility tends to make infinite questions undecidable. So for example the question of whether a particular string will ever be generated in the evolution of a multiway system—regardless of how long one waits—is in general undecidable. And similarly it can be undecidable whether any proof—regardless of length—exists for a specific result in a mathematical system with particular axioms.
 
 So what are the implications of this?
 
 Probably the most striking arise when one tries to apply traditional ideas of logic—and particularly notions of true and false.
 
-The way I have set things up, one can find all the statements that can be proved true in a particular axiom system just by starting with an expression that represents "true" and then using the rules of the axiom system, as in the picture on the facing page.
+The way I have set things up, one can find all the statements that can be proved true in a particular axiom system just by starting with an expression that represents “true” and then using the rules of the axiom system, as in the picture on the facing page.
 
-In a multiway system, one can imagine identifying "true" with a string consisting of a single black element. And this would mean that every string in networks like the ones below should correspond to a statement that can be proved true in the axiom system used.
+In a multiway system, one can imagine identifying “true” with a string consisting of a single black element. And this would mean that every string in networks like the ones below should correspond to a statement that can be proved true in the axiom system used.
 
 ![](_page_795_Picture_7.jpeg)
 
-Multiway systems starting from a single black element that represents TRUE. All strings that appear can be thought of as statements that are true according to the axioms represented by the multiway system rules. One can take negation to be the operation that interchanges black and white. This then means that the first multiway system represents an inconsistent axiom system, since on step 2, both 🔳 and its negation 🔳 appear. The other two multiway systems are consistent, so that they never generate both a string and its negation. The third one, however, is incomplete, since for example it never generates either or its negation . The second one, however, is both complete and consistent: it generates all strings that begin with ■, but none that begin with □.
+Multiway systems starting from a single black element that represents TRUE. All strings that appear can be thought of as statements that are true according to the axioms represented by the multiway system rules. One can take negation to be the operation that interchanges black and white. This then means that the first multiway system represents an inconsistent axiom system, since on step 2, both □■ and its negation ■□ appear. The other two multiway systems are consistent, so that they never generate both a string and its negation. The third one, however, is incomplete, since for example it never generates either □□ or its negation ■■. The second one, however, is both complete and consistent: it generates all strings that begin with ■, but none that begin with □.
 
 But is this really reasonable? In traditional logic there is always an operation of negation which takes any true statement, and makes it into a false one, and vice versa. And in a multiway system, one possible way negation might work is just to reverse the colors of the elements in a string. But this then leads to a problem in the first picture above.
 
-For the picture implies that both **and** its negation **c**an be proved to be true statements. But this cannot be correct. And so what
+For the picture implies that both □■ and its negation ■□ can be proved to be true statements. But this cannot be correct. And so what this means is that with the setup used the underlying axiom system is inconsistent. So what about the other multiway systems on the facing page? At least with the strings one can see in the pictures there are no inconsistencies. But what about with longer strings? For the particular rules shown it is fairly easy to demonstrate that there are never inconsistencies. But in general it is not possible to do this, for after some given string has appeared, it can for example be undecidable whether the negation of that particular string ever appears.
 
 ![](_page_796_Figure_2.jpeg)
 
-The network of statements that can be proved true using the axiom system for logic from page 775.  $p \bar{\pi} (p \bar{\pi} p)$  is the simplest representation for TRUE when logic is set up using the NAND operator  $\pi$ . Each arrow indicates an equivalence established by applying a single axiom. On each row only statements that have not appeared before are given. The statements are sorted so that the simplest are first. Note that some fairly simple statements do not show up for at least several rows. The total number of statements on successive rows grows faster than exponentially; for the first few it is 1, 6, 91, 2180, 76138. If continued forever the network would eventually include all possible true statements (tautologies) of logic (see also page 818). Other simple axiom systems for logic like those on page 808 vield networks similar to the one shown.
+The network of statements that can be proved true using the axiom system for logic from page 775. $p \bar{\wedge} (p \bar{\wedge} p)$ is the simplest representation for TRUE when logic is set up using the NAND operator $\bar{\wedge}$. Each arrow indicates an equivalence established by applying a single axiom. On each row only statements that have not appeared before are given. The statements are sorted so that the simplest are first. Note that some fairly simple statements do not show up for at least several rows. The total number of statements on successive rows grows faster than exponentially; for the first few it is 1, 6, 91, 2180, 76138. If continued forever the network would eventually include all possible true statements (tautologies) of logic (see also page 818). Other simple axiom systems for logic like those on page 808 yield networks similar to the one shown.
 
-> this means is that with the setup used the underlying axiom system is inconsistent. So what about the other multiway systems on the facing page? At least with the strings one can see in the pictures there are no inconsistencies. But what about with longer strings? For the particular rules shown it is fairly easy to demonstrate that there are never inconsistencies. But in general it is not possible to do this, for after some given string has appeared, it can for example be undecidable whether the negation of that particular string ever appears.
+So what about the axiom systems normally used in actual mathematics? None of those on pages 773 and 774 appear to be inconsistent. And what this means is that the set of statements that can be proved true will never overlap with the set that can be proved false.
 
-> So what about the axiom systems normally used in actual mathematics? None of those on pages 773 and 774 appear to be inconsistent. And what this means is that the set of statements that can be proved true will never overlap with the set that can be proved false.
-
-> But can every possible statement that one might expect to be true or false actually in the end be proved either true or false?
+But can every possible statement that one might expect to be true or false actually in the end be proved either true or false?
 
 In the early 1900s it was widely believed that this would effectively be the case in all reasonable mathematical axiom systems. For at the time there seemed to be no limit to the power of mathematics, and no end to the theorems that could be proved.
 
-But this all changed in 1931 when Gödel's Theorem showed that at least in any finitely-specified axiom system containing standard arithmetic there must inevitably be statements that cannot be proved either true or false using the rules of the axiom system.
+But this all changed in 1931 when Gödel’s Theorem showed that at least in any finitely-specified axiom system containing standard arithmetic there must inevitably be statements that cannot be proved either true or false using the rules of the axiom system.
 
-This was a great shock to existing thinking about the foundations of mathematics. And indeed to this day Gödel's Theorem has continued to be widely regarded as a surprising and rather mysterious result.
+This was a great shock to existing thinking about the foundations of mathematics. And indeed to this day Gödel’s Theorem has continued to be widely regarded as a surprising and rather mysterious result.
 
 But the discoveries in this book finally begin to make it seem inevitable and actually almost obvious. For it turns out that at some level it can be viewed as just yet another consequence of the very general Principle of Computational Equivalence.
 
-So what is the analog of Gödel's Theorem for multiway systems? Given the setup on page 780 one can ask whether a particular multiway system is complete in the sense that for every possible string the system eventually generates either that string or its negation.
+So what is the analog of Gödel’s Theorem for multiway systems? Given the setup on page 780 one can ask whether a particular multiway system is complete in the sense that for every possible string the system eventually generates either that string or its negation.
 
-And one can see that in fact the third multiway system is incomplete, since by following its rules one can never for example generate either or its negation. But what if one extends the rules by adding more transformations, corresponding to more axioms? Can one always in the end make the system complete?
+And one can see that in fact the third multiway system is incomplete, since by following its rules one can never for example generate either □□ or its negation ■■. But what if one extends the rules by adding more transformations, corresponding to more axioms? Can one always in the end make the system complete?
 
 If one is not quite careful, one will generate too many strings, and inevitably get inconsistencies where both a string and its negation appear, as in the second picture on the facing page. But at least if one only has to worry about a limited number of steps, it is always possible to set things up so as to get a system that is both complete and consistent, as in the third picture on the facing page.
 
@@ -956,7 +848,7 @@ And in fact in the particular case shown on the facing page it is fairly straigh
 
 ![](_page_798_Picture_2.jpeg)
 
-The effect of adding transformations to the rules for a multiway system. The first multiway system is incomplete, in the sense that for some strings, it generates neither the string nor its negation. The second multiway system yields more strings—but introduces inconsistency, since it can generate both and its negation . The third multiway system is however both complete and consistent: for every string it eventually generates either that string or its negation.
+The effect of adding transformations to the rules for a multiway system. The first multiway system is incomplete, in the sense that for some strings, it generates neither the string nor its negation. The second multiway system yields more strings—but introduces inconsistency, since it can generate both □■□ and its negation ■□■. The third multiway system is however both complete and consistent: for every string it eventually generates either that string or its negation.
 
 Yet if a system is computationally irreducible this will inevitably not be possible. For at any point the system will always in effect be able to do more things that one did not expect. And this means that in general one will not be able to construct a finite set of axioms that can be guaranteed to lead to ultimate completeness and consistency.
 
@@ -964,9 +856,7 @@ And in fact it turns out that as soon as the question of whether a particular st
 
 But if one had a system that was complete and consistent then it is easy to come up with such a procedure: one just runs the system until either one reaches the string one is looking for or one reaches its negation. For the completeness of the system guarantees that one must always reach one or the other, while its consistency implies that reaching one allows one to conclude that one will never reach the other.
 
-So the result of this is that if the evolution of a multiway system is computationally irreducible—so that questions about its ultimate behavior are undecidable—the system cannot be both complete and consistent. And if one assumes consistency then it follows that there must be strings where neither the string nor its negation can be
-
-reached—corresponding to the fact that statements must exist that cannot be proved either true or false from a given set of axioms.
+So the result of this is that if the evolution of a multiway system is computationally irreducible—so that questions about its ultimate behavior are undecidable—the system cannot be both complete and consistent. And if one assumes consistency then it follows that there must be strings where neither the string nor its negation can be reached—corresponding to the fact that statements must exist that cannot be proved either true or false from a given set of axioms.
 
 But what does it take to establish that such incompleteness will actually occur in a specific system?
 
@@ -978,9 +868,9 @@ So what axiom systems in mathematics are then universal?
 
 Basic logic is not, since at least in principle one can always determine the truth of any statement in this system by the finite—if perhaps exponentially long—procedure of trying all possible combinations of truth values for the variables that appear in it.
 
-And essentially the same turns out to be the case for pure predicate logic, in which one just formally adds "for all" and "there exists" constructs. But as soon as one also puts in an abstract function or relation with more than one argument, one gets universality.
+And essentially the same turns out to be the case for pure predicate logic, in which one just formally adds “for all” and “there exists” constructs. But as soon as one also puts in an abstract function or relation with more than one argument, one gets universality.
 
-And indeed the basis for Gödel's Theorem is the result that the standard axioms for basic integer arithmetic support universality.
+And indeed the basis for Gödel’s Theorem is the result that the standard axioms for basic integer arithmetic support universality.
 
 Set theory and several other standard axiom systems can readily be made to reproduce arithmetic, and are therefore also universal. And the same is true of group theory and other algebraic systems like ring theory.
 
@@ -988,70 +878,41 @@ If one puts enough constraints on the axioms one uses, one can eventually preven
 
 But of the axiom systems actually used in current mathematics research every single one is now known to be universal.
 
-From page 773 we can see that many of these axiom systems can be stated in quite simple ways. And in the past it might have seemed
-
-hard to believe that systems this simple could ever be universal, and thus in a sense be able to emulate essentially any system.
+From page 773 we can see that many of these axiom systems can be stated in quite simple ways. And in the past it might have seemed hard to believe that systems this simple could ever be universal, and thus in a sense be able to emulate essentially any system.
 
 But from the discoveries in this book this now seems almost inevitable. And indeed the Principle of Computational Equivalence implies that beyond some low threshold almost any axiom system should be expected to be universal.
 
-So how does universality actually work in the case of arithmetic? One approach is illustrated in the picture on the next page. The idea is to set up an arithmetic statement that can be proved true if the evolution of a cellular automaton from a given initial condition makes a given cell be
-
-a given color at a given step, and can be proved false if it does not.
+So how does universality actually work in the case of arithmetic? One approach is illustrated in the picture on the next page. The idea is to set up an arithmetic statement that can be proved true if the evolution of a cellular automaton from a given initial condition makes a given cell be a given color at a given step, and can be proved false if it does not.
 
 By changing numbers in this arithmetic statement one can then in effect sample different aspects of the cellular automaton evolution. And with the cellular automaton being a universal one such as rule 110 this implies that the axioms of arithmetic can support universality.
 
-Such universality then implies Gödel's Theorem and shows that there must exist statements about arithmetic that cannot ever be proved true or false from its normal axioms.
+Such universality then implies Gödel’s Theorem and shows that there must exist statements about arithmetic that cannot ever be proved true or false from its normal axioms.
 
 So what are some examples of such statements?
 
-The original proof of Gödel's Theorem was based on considering the particular self-referential statement "this statement is unprovable".
+The original proof of Gödel’s Theorem was based on considering the particular self-referential statement “this statement is unprovable”.
 
 At first it does not seem obvious that such a statement could ever be set up as a statement in arithmetic. But if it could then one can see that it would immediately follow that—as the statement says—it cannot be proved, since otherwise there would be an inconsistency.
 
-And in fact the main technical difficulty in the original proof of Gödel's Theorem had to do with showing—by doing what amounted to establishing the universality of arithmetic—that the statement could indeed meaningfully be encoded as a statement purely in arithmetic.
+And in fact the main technical difficulty in the original proof of Gödel’s Theorem had to do with showing—by doing what amounted to establishing the universality of arithmetic—that the statement could indeed meaningfully be encoded as a statement purely in arithmetic.
 
 But at least with the original encoding used, the statement would be astronomically long if written out in the notation of page 773. And from this result, one might imagine that unprovability would never be relevant in any practical situation in mathematics.
 
 But does one really need to have such a complicated statement in order for it to be unprovable from the axioms of arithmetic?
 
-```
- (-3x_6 + x_7 + x_8)^2 + (2^{1+x_3}(1+x_1+2x_3) x_2 - 2x_4 - x_{10} + x_{11})^2 + (-2x_8 - x_9 + x_{10} + x_{11})^2 + (1 - 2^{(1+x_3)}(x_1+2x_3) + x_4 + x_{12})^2 + \\ (1 - 2^{x_1} + x_2 + x_{13})^2 + (1 - 2^{x_1} + x_5 + x_{14})^2 + (-x_4 + 2^{x_3} x_5 + 2^{x_1+2x_3} x_6 + 2^{x_1+x_3} x_{15} + x_{16})^2 + (1 - 2^{x_3} + x_{15} + x_{17})^2 + \\ (1 - 2^{x_3} + x_{16} + x_{18})^2 + (-x_6 - 2x_7 + x_9 + x_{19})^2 + (-(2 + 2^{x_6})^{x_6} + (1 + 2^{x_6})^{x_7} (1 + 2x_{20} + (1 + 2^{x_6})x_{21}) + x_{22})^2 + (1 - (1 + 2^{x_6})^{x_7} + x_{22} + x_{23})^2 + \\ (1 - 2^{x_6} + 2x_{20} + x_{24})^2 + (-(2 + 4^{x_6})^{2x_6} + (1 + 4^{x_6})^{x_7} (1 + 2x_{25} + (1 + 4^{x_6})x_{26}) + x_{27})^2 + (1 - (1 + 4^{x_6})^{x_7} + x_{27} + x_{28})^2 + \\ (1 - 4^{x_6} + 2x_{25} + x_{29})^2 + (-(2 + 2^{x_6})^{x_6} + (1 + 2^{x_6})^{x_6} (1 + 2x_{30} + (1 + 2^{x_8}) x_{31}) + x_{32})^2 + (1 - (1 + 2^{x_8})^{x_6} + x_{32} + x_{33})^2 + \\ (1 - 2^{x_8} + 2x_{30} + x_{34})^2 + (-(2 + 2^{x_6})^{x_6} + (1 + 2^{x_6})^{x_6} (1 + 2x_{30} + (1 + 2^{x_8}) x_{36}) + x_{37})^2 + (1 - (1 + 2^{x_6})^{x_6} + x_{32} + x_{38})^2 + \\ (1 - 2^{x_6} + 2x_{30} + x_{39})^2 + (-(2 + 2^{x_6})^{x_6} + (1 + 2^{x_6})^{x_6} (1 + 2x_{40} + (1 + 2^{x_8}) x_{36}) + x_{37})^2 + (1 - (1 + 2^{x_6})^{x_6} + x_{32} + x_{38})^2 + \\ (1 - 2^{x_6} + 2x_{40} + x_{44})^2 + (-(2 + 4^{x_7})^{2x_7} + (1 + 4^{x_7})^{x_9} (1 + 2x_{40} + (1 + 2^{x_9}) x_{31}) + x_{42})^2 + (1 - (1 + 2^{x_6})^{x_9} + x_{42} + x_{43})^2 + \\ (1 - 2^{x_6} + 2x_{40} + x_{44})^2 + (-(2 + 2^{x_{19}})^{x_{19}} + (1 + 2^{x_{19}})^{x_6} (1 + 2x_{50} + (1 + 2^{x_{19}}) x_{51}) + x_{52})^2 + (1 - (1 + 2^{x_{19}})^{x_6} + x_{52} + x_{53})^2 + \\ (1 - 2^{x_{19}} + 2x_{50} + x_{54})^2 + (-(2 + 2^{x_{19}})^{x_{19}} + (1 + 2^{x_{19}})^{x_6} (1 + 2x_{50} + (1 + 2^{x_{19}}) x_{51}) + x_{52})^2 + (1 - (1 + 2^{x_{19}})^{x_6} + x_{52} + x_{53})^2 + \\ (1 - 2^{x_{19}} + 2x_{55} + x_{59})^2 + (-(2 + 2^{x_{19}})^{x_{19}} + (1 + 2^{x_{19}})^{x_{19}} + (1 + 2^{x_{19}})^{x_{10}} + x_{52})^2 + (1 - (1 + 2^{x_{19}})^{x_{10}} + x_{52})
-```
+![](_page_801_Arithmetic_Universality.jpeg)
 
-| x <sub>1</sub> (initial width) | 1  | x <sub>1</sub> (initial width) | 1     | x <sub>1</sub> (initial width) | 1                          | $x_1$ (initial width)          | 1              | $x_1$ (initial width) | 3                  |
-|--------------------------------|----|--------------------------------|-------|--------------------------------|----------------------------|--------------------------------|----------------|-----------------------|--------------------|
-| x <sub>2</sub> (initial state) | 1  | x2 (initial state)             | 1     | x <sub>2</sub> (initial state) | 1                          | x <sub>2</sub> (initial state) | 1              | $x_2$ (initial state) | 5                  |
-| x3 (steps)                     | 1  | x3 (steps)                     | 2     | x <sub>3</sub> (steps)         | 3                          | x3 (steps)                     | 4              | x3 (steps)            | 4                  |
-| x4 (evolution)                 | 22 | x4 (evolution)                 | 4508  | x4 (evolution)                 | 17177704                   | x4 (evolution)                 | 1105983545840  | x4 (evolution)        | 1409438147512048   |
-| X5                             | 1  | X5                             | 1     | X5                             | 1                          | X5                             | 1              | X5                    | 7                  |
-| x <sub>6</sub>                 | 2  | x <sub>6</sub>                 | 140   | x <sub>6</sub>                 | 134200                     | x <sub>6</sub>                 | 2160124112     | x <sub>6</sub>        | 688202220464       |
-| X7                             | 0  | X7                             | 8     | X7                             | 2096                       | X7                             | 8437888        | X7                    | 940049184          |
-| X8                             | 6  | X8                             | 412   | X8                             | 400504                     | X8                             | 6471934448     | X8                    | 2063666612208      |
-| X9                             | 0  | X9                             | 0     | X9                             | 32                         | X9                             | 32768          | X9                    | 805306880          |
-| X10                            | 0  | X10                            | 0     | X <sub>10</sub>                | 32                         | X10                            | 32768          | X <sub>10</sub>       | 805306880          |
-| X11                            | 12 | X11                            | 824   | X <sub>11</sub>                | 801008                     | X11                            | 12943868896    | X <sub>11</sub>       | 4127333224416      |
-| X12                            | 41 | X12                            | 28259 | X <sub>12</sub>                | 251257751                  | X12                            | 34078388542991 | X <sub>12</sub>       | 34619358871451919  |
-| X <sub>13</sub>                | 0  | X13                            | 0     | X <sub>13</sub>                | 0                          | X <sub>13</sub>                | 0              | X <sub>13</sub>       | 2                  |
-| X14                            | 0  | X14                            | 0     | X14                            | 0                          | X14                            | 0              | X <sub>14</sub>       | 0                  |
-| X15                            | 1  | X15                            | 3     | X15                            | 6                          | X15                            | 15             | X <sub>15</sub>       | 13                 |
-| :                              |    | :                              |       | :                              |                            | :                              |                | :                     |                    |
-|                                |    | 450                            |       | 47                             | 477704                     |                                | 105000545040   |                       | 1400400447540040   |
-| $x_4 = 22 =$                   |    | $x_4 = 450$                    |       | -                              | 177704 =                   | $X_4 = I$                      | 105983545840 = | $X_4 = I$             | 1409438147512048 = |
-| 0 1 0                          |    | 001                            | 100   |                                | 001000<br>011000<br>111000 |                                | 0000110000     | 1                     | 8000111110000      |
-|                                |    | 7.7                            | 100   | 1                              | 101000                     | -60                            | 011010000      |                       | 00110010000        |
-|                                |    |                                |       |                                |                            |                                |                |                       |                    |
-
-Universality in arithmetic, illustrated by an integer equation whose solutions in effect emulate the rule 110 universal cellular automaton from Chapter 11. The equation has many solutions, but all of them satisfy the constraint that the variables  $x_1$  through  $x_4$  must encode possible initial conditions and evolution histories for rule 110. If one fills in fixed values for  $x_1$ ,  $x_2$  and  $x_3$ , then only one value for  $x_4$  is ever possible—corresponding to the evolution history of rule 110 for  $x_3$  steps starting from a width  $x_1$  initial condition given by the digit sequence of  $x_2$ . In general any statement about the possible behavior of rule 110 can be encoded as a statement in arithmetic about solutions to the equation. So for example if one fills in values for  $x_1$ ,  $x_2$  and  $x_4$ , but not  $x_3$ , then the statement that the equation has no solution for any  $x_3$  corresponds to a statement that rule 110 can never exhibit certain behavior, even after any number of steps. But the universality of rule 110 implies that such statements must in general be undecidable. So from this it follows that in at least some instances the axioms of arithmetic can never be used to give a finite proof of whether or not the statement is true. The construction shown here can be viewed as providing a simple proof of Gödel's Theorem on the existence of unprovable statements in arithmetic. Note that the equation shown is a so-called exponential Diophantine one, in which some variables appear in exponents. At the cost of considerably more complication—and using for example 2154 variables—it is possible to avoid this. The equation above can however already be viewed as capturing the essence of what is needed to demonstrate the general unsolvability of Diophantine equations and Hilbert's Tenth Problem.
+Universality in arithmetic, illustrated by an integer equation whose solutions in effect emulate the rule 110 universal cellular automaton from Chapter 11. The equation has many solutions, but all of them satisfy the constraint that the variables $x_1$ through $x_4$ must encode possible initial conditions and evolution histories for rule 110. If one fills in fixed values for $x_1$, $x_2$ and $x_3$, then only one value for $x_4$ is ever possible—corresponding to the evolution history of rule 110 for $x_3$ steps starting from a width $x_1$ initial condition given by the digit sequence of $x_2$. In general any statement about the possible behavior of rule 110 can be encoded as a statement in arithmetic about solutions to the equation. So for example if one fills in values for $x_1$, $x_2$ and $x_4$, but not $x_3$, then the statement that the equation has no solution for any $x_3$ corresponds to a statement that rule 110 can never exhibit certain behavior, even after any number of steps. But the universality of rule 110 implies that such statements must in general be undecidable. So from this it follows that in at least some instances the axioms of arithmetic can never be used to give a finite proof of whether or not the statement is true. The construction shown here can be viewed as providing a simple proof of Gödel’s Theorem on the existence of unprovable statements in arithmetic. Note that the equation shown is a so-called exponential Diophantine one, in which some variables appear in exponents. At the cost of considerably more complication—and using for example 2154 variables—it is possible to avoid this. The equation above can however already be viewed as capturing the essence of what is needed to demonstrate the general unsolvability of Diophantine equations and Hilbert’s Tenth Problem.
 
 Over the past seventy years a few simpler examples have been constructed—mostly with no obviously self-referential character.
 
 But usually these examples have involved rather sophisticated and obscure mathematical constructs—most often functions that are somehow set up to grow extremely rapidly. Yet at least in principle there should be examples that can be constructed based just on statements that no solutions exist to particular integer equations.
 
-If an integer equation such as  $x^2 = y^3 + 12$  has a definite solution such as x = 47, y = 13 in terms of particular finite integers then this fact can certainly be proved using the axioms of arithmetic. For it takes only a finite calculation to check the solution, and this very calculation can always in effect be thought of as a proof.
+If an integer equation such as $x^2 = y^3 + 12$ has a definite solution such as $x = 47$, $y = 13$ in terms of particular finite integers then this fact can certainly be proved using the axioms of arithmetic. For it takes only a finite calculation to check the solution, and this very calculation can always in effect be thought of as a proof.
 
 But what if the equation has no solutions? To test this explicitly one would have to look at an infinite number of possible integers. But the point is that even so, there can still potentially be a finite mathematical proof that none of these integers will work.
 
-And sometimes the proof may be straightforward—say being based on showing that one side of the equation is always odd while the other is always even. In other cases the proof may be more difficult say being based on establishing some large maximum size for a solution, then checking all integers up to that size.
+And sometimes the proof may be straightforward—say being based on showing that one side of the equation is always odd while the other is always even. In other cases the proof may be more difficult—say being based on establishing some large maximum size for a solution, then checking all integers up to that size.
 
 And the point is that in general there may in fact be absolutely no proof that can be given in terms of the normal axioms of arithmetic.
 
@@ -1071,11 +932,11 @@ At some level it is a consequence of the involvement of infinity. For at least i
 
 But what about questions that somehow ask, say, about infinite numbers of possible integers? To have a finite way to address questions like these is often in the end the main justification for setting up typical mathematical axiom systems in the first place.
 
-For the point is that instead of handling objects like integers directly, axiom systems can just give abstract rules for manipulating statements about them. And within such statements one can refer, say, to infinite sets of integers just by a symbol like s.
+For the point is that instead of handling objects like integers directly, axiom systems can just give abstract rules for manipulating statements about them. And within such statements one can refer, say, to infinite sets of integers just by a symbol like $s$.
 
-And particularly over the past century there have been many successes in mathematics that can be attributed to this basic kind of approach. But the remarkable fact that follows from Gödel's Theorem is that whatever one does there will always be cases where the approach must ultimately fail. And it turns out that the reason for this is essentially the phenomenon of computational irreducibility.
+And particularly over the past century there have been many successes in mathematics that can be attributed to this basic kind of approach. But the remarkable fact that follows from Gödel’s Theorem is that whatever one does there will always be cases where the approach must ultimately fail. And it turns out that the reason for this is essentially the phenomenon of computational irreducibility.
 
-For while simple infinite quantities like 1/0 or the total number of integers can readily be summarized in finite ways—often just by using symbols like  $\infty$  and  $\aleph_0$ —the same is not in general true of all infinite processes. And in particular if an infinite process is computationally irreducible then there cannot in general be any useful finite summary of what it does—since the existence of such a summary would imply computational reducibility.
+For while simple infinite quantities like $1/0$ or the total number of integers can readily be summarized in finite ways—often just by using symbols like $\infty$ and $\aleph_0$—the same is not in general true of all infinite processes. And in particular if an infinite process is computationally irreducible then there cannot in general be any useful finite summary of what it does—since the existence of such a summary would imply computational reducibility.
 
 So among other things this means that there will inevitably be questions that finite proofs based on axioms that operate within ordinary computational systems will never in general be able to answer.
 
@@ -1085,83 +946,27 @@ For several decades it has been known that universal integer equations exist. Bu
 
 Yet from the discoveries in this book I am quite certain that there are vastly simpler examples that exist—so that in fact there are in the end rather simple integer equations for which the absence of solutions can never be proved from the normal axioms of arithmetic.
 
-If one just starts looking at sequences of integer equations—as on the next page—then in the very simplest cases it is usually fairly easy to tell whether a particular equation will have any solutions. But this rapidly becomes very much more difficult. For there is often no obvious pattern to which equations ultimately have solutions and which do not. And even when equations do have solutions, the integers involved can be quite large. So, for example, the smallest solution to  $x^2 = 61 y^2 + 1$  is x = 1766319049, y = 226153980, while the smallest solution to  $x^3 + y^3 = z^3 + 2$  is x = 1214928, y = 3480205, z = 3528875.
+If one just starts looking at sequences of integer equations—as on the next page—then in the very simplest cases it is usually fairly easy to tell whether a particular equation will have any solutions. But this rapidly becomes very much more difficult. For there is often no obvious pattern to which equations ultimately have solutions and which do not. And even when equations do have solutions, the integers involved can be quite large. So, for example, the smallest solution to $x^2 = 61y^2 + 1$ is $x = 1766319049$, $y = 226153980$, while the smallest solution to $x^3 + y^3 = z^3 + 2$ is $x = 1214928$, $y = 3480205$, $z = 3528875$.
 
-Integer equations such as ax + by + cz = d that have only linear dependence on any variable were largely understood even in antiquity. Quadratic equations in two variables such as  $x^2 = ay^2 + b$  were understood by the 1800s. But even equations such as  $x^2 = a y^3 + b$  were not properly understood until the 1980s. And with equations that have higher powers or more variables questions of whether solutions exist quickly end up being unsolved problems of number theory.
+Integer equations such as $ax + by + cz = d$ that have only linear dependence on any variable were largely understood even in antiquity. Quadratic equations in two variables such as $x^2 = ay^2 + b$ were understood by the 1800s. But even equations such as $x^2 = ay^3 + b$ were not properly understood until the 1980s. And with equations that have higher powers or more variables questions of whether solutions exist quickly end up being unsolved problems of number theory.
 
-It has certainly been known for centuries that there are questions about integer equations and other aspects of number theory that are easy to state, yet seem very hard to answer. But in practice it has almost
+It has certainly been known for centuries that there are questions about integer equations and other aspects of number theory that are easy to state, yet seem very hard to answer. But in practice it has almost universally been assumed that with the continued development of mathematics any of these questions could in the end be answered.
 
-|                                                                                 | 1 2 2 [                                                       | 2 4                                                            |                                                                                                                                                                                        |
-|---------------------------------------------------------------------------------|---------------------------------------------------------------|----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| $2x + 3y = 1  \Box$                                                             | $x^2 = y^3 - 20$ $x = 14$ $y = 6$                             | $x^3 = y^4 - 20xy - 1$ $x = 10   y = 7$                        | $x^3 + y^3 = z^2 + 1$ $x = 1$ $y = 1$ $z = 1$                                                                                                                                          |
-| $2x + 3y = 2  \Box$                                                             | $x^2 = y^3 - 19$ $x = 18$ $y = 7$                             | $x^3 = y^4 - 19xy - 1$ $x = 3   y = 4$                         | $x^3 + y^3 = z^2 + 2$ $x = 107$ $y = 232$ $z = 3703$                                                                                                                                   |
-| $2x + 3y = 3  \Box$                                                             | $x^2 = y^3 - 18$ $x = 3$ $y = 3$                              | $x^3 = y^4 - 18xy - 1$ $x = 75$ $y = 26$                       | $x^3 + y^3 = z^2 + 3$ $x = 1$ $y = 3$ $z = 5$                                                                                                                                          |
-| $2x + 3y = 4  \Box$                                                             | $x^2 = y^3 - 17  \Box$                                        | $x^3 = y^4 - 17xy - 1$                                         | $x^3 + y^3 = z^2 + 4$ $x = 5$ $y = 12$ $z = 43$                                                                                                                                        |
-| 2x + 3y = 5 $x = 1$ $y = 1$                                                     | $x^2 = y^3 - 16  \Box$                                        | $x^3 = y^4 - 16 x y - 1$                                       | $x^3 + y^3 = z^2 + 5$ $x = 1$ $y = 2$ $z = 2$                                                                                                                                          |
-| $2x + 3y = 6  \Box$                                                             | $x^2 = y^3 - 15$ $x = 7$ $y = 4$                              | $x^3 = y^4 - 15 x y - 1$ $x = 624$ $y = 125$                   | $x^3 + y^3 = z^2 + 6$ $x = 7$ $y = 24$ $z = 119$                                                                                                                                       |
-| 2x + 3y = 7 $x = 2$ $y = 1$                                                     | $x^2 = y^3 - 14  \Box$                                        | $x^3 = y^4 - 14xy - 1$                                         | $x^3 + y^3 = z^2 + 7$ $x = 2$ $y = 2$ $z = 3$                                                                                                                                          |
-| $2x + 3y = 8 \qquad \boxed{x = 1 \mid y = 2}$                                   | $x^2 = y^3 - 13$ $x = 70$ $y = 17$                            | $x^3 = y^4 - 13xy - 1$                                         | $x^3 + y^3 = z^2 + 8$ $x = 1$ $y = 2$ $z = 1$                                                                                                                                          |
-| 2x + 3y = 9 $x = 3$ $y = 1$                                                     | $x^2 = y^3 - 12 \qquad \square$                               | $x^3 = y^4 - 12xy - 1$ $x = 3                                $ | $x^3 + y^3 = z^2 + 9$ $x = 3$ $y = 7$ $z = 19$                                                                                                                                         |
-| 2x + 3y = 10 $x = 2$ $y = 2$                                                    | $x^2 = y^3 - 11$ $x = 4$ $y = 3$                              | $x^3 = y^4 - 11xy - 1$                                         | $x^3 + y^3 = z^2 + 10$ $x = 2$ $y = 3$ $z = 5$                                                                                                                                         |
-| 2x + 3y = 11 $x = 1$ $y = 3$                                                    | $x^2 = y^3 - 10  \Box$                                        | $x^3 = y^4 - 10xy - 1$                                         | $x^3 + y^3 = z^3 - 20$ $x = 107$ $y = 137$ $z = 156$                                                                                                                                   |
-| 2x + 3y = 12 $x = 3$ $y = 2$                                                    | $x^2 = y^3 - 9 \qquad \square$                                | $x^3 = y^4 - 9xy - 1$ $x = 80$ $y = 27$                        | $x^3 + y^3 = z^3 - 19$ $x = 14$ $y = 16$ $z = 19$                                                                                                                                      |
-| 2x + 3y = 13 $x = 2$ $y = 3$                                                    | $x^2 = y^3 - 8 \qquad \Box$                                   | $x^3 = y^4 - 8xy - 1$ $x = 12   y = 7$                         | $x^3 + y^3 = z^3 - 18$ $x = 1$ $y = 2$ $z = 3$                                                                                                                                         |
-| 2x + 3y = 14 $x = 1$ $y = 4$                                                    | $x^2 = y^3 - 7$ $x = 1$ $y = 2$                               | $x^3 = y^4 - 7xy - 1$ $x = 1   y = 2$                          | $x^3 + y^3 = z^3 - 17$ $x = 103$ $y = 111$ $z = 135$                                                                                                                                   |
-| 2x + 3y = 15 $x = 3$ $y = 3$                                                    | $x^2 = y^3 - 6 \qquad \Box$                                   | $x^3 = y^4 - 6xy - 1$ $x = 15$ $y = 8$                         | $x^3 + y^3 = z^3 - 16$ $x = 10$ $y = 12$ $z = 14$                                                                                                                                      |
-| $x^2 = y^2 + 1 \qquad \Box$                                                     | $x^2 = y^3 - 5 \qquad \Box$                                   | $x^3 = y^4 - 5xy - 1$                                          | $x^3 + y^3 = z^3 - 15$ $x = 262$ $y = 265$ $z = 332$                                                                                                                                   |
-| $x^2 = y^2 + 2 \qquad \Box$                                                     | $x^2 = y^3 - 4 \qquad \boxed{x = 2 \mid y = 2}$               | $x^3 = y^4 - 4xy - 1$ $x = 30$ $y = 13$                        | $x^3 + y^3 = z^3 - 14  \Box$                                                                                                                                                           |
-| $x^2 = y^2 + 3 \qquad \boxed{x = 2 \mid y = 1}$                                 | $x^2 = y^3 - 3 \qquad \Box$                                   | $x^3 = y^4 - 3xy - 1$                                          | $x^3 + y^3 = z^3 - 13  \Box$                                                                                                                                                           |
-| $x^2 = y^2 + 4 \qquad \Box$                                                     | $x^2 = y^3 - 2$ $x = 5$ $y = 3$                               | $x^3 = y^4 - 2xy - 1$                                          | $x^3 + y^3 = z^3 - 12$ $x = 5725013$ $y = 9019406$ $z = 9730705$                                                                                                                       |
-| $x^2 = y^2 + 5 \qquad \boxed{x = 3 \mid y = 2}$                                 | $x^2 = y^3 - 1 \qquad \Box$                                   | $x^3 = y^4 - xy - 1$                                           | $x^3 + y^3 = z^3 - 11$ $x = 2$ $y = 2$ $z = 3$                                                                                                                                         |
-| $x^2 = y^2 + 6 \qquad \square$                                                  | $x^2 = y^3 \qquad x = 1  y = 1$                               | $x^3 = y^4 - 1 \qquad \Box$                                    | $x^3 + y^3 = z^3 - 10$ $x = 3$ $y = 3$ $z = 4$                                                                                                                                         |
-| $x^2 = y^2 + 7 \qquad \boxed{x = 4 \mid y = 3}$                                 | $x^2 = y^3 + 1$ $x = 3$ $y = 2$                               | $x^3 = y^4 + xy - 1$ $x = 1$ $y = 1$                           | $x^3 + y^3 = z^3 - 9$ $x = 52$ $y = 216$ $z = 217$                                                                                                                                     |
-| $x^2 = y^2 + 8$ $x = 3   y = 1$                                                 | $x^2 = y^3 + 2 \qquad \Box$                                   | $x^3 = y^4 + 2xy - 1$ $x = 3$ $y = 2$                          | $x^3 + y^3 = z^3 - 8$ $x = 16$ $y = 12$ $z = 18$                                                                                                                                       |
-| $x^2 = y^2 + 9 \qquad \boxed{x = 5 \mid y = 4}$                                 | $x^2 = y^3 + 3$ $x = 2$ $y = 1$                               | $x^3 = y^4 + 3xy - 1$ $x = 5$ $y = 3$                          | $x^3 + y^3 = z^3 - 7$ $x = 605809$ $y = 680316$ $z = 812918$                                                                                                                           |
-| $x^2 = y^2 + 10  \Box$                                                          | $x^2 = y^3 + 4 \qquad \square$ $x^2 = y^3 + 5 \qquad \square$ | $x^{3} = y^{4} + 4xy - 1$ $x = 2   y = 1$                      | $x^3 + y^3 = z^3 - 6$ $x = 1$ $y = 1$ $z = 2$                                                                                                                                          |
-| $x^2 = y^2 + 11$ $x = 6$ $y = 5$                                                | $x^2 = y^3 + 5 \qquad \square$ $x^2 = y^3 + 6 \qquad \square$ | $x^{3} = y^{4} + 5xy - 1$ $x^{3} = y^{4} + 6xy - 1$            | $x^3 + y^3 = z^3 - 5 \qquad \square$                                                                                                                                                   |
-| $x^2 = y^2 + 12$ $x = 4$ $y = 2$                                                | $x = y + b \qquad \Box$ $x^2 = y^3 + 7 \qquad \Box$           | x = y + 0xy - 1<br>$x^3 = y^4 + 7xy - 1$                       | $x^3 + y^3 = z^3 - 4$                                                                                                                                                                  |
-| $x^2 = y^2 + 13$ $x = 7$ $y = 6$                                                | $x^2 = y^3 + 8 \qquad \boxed{x = 3 \mid y = 1}$               | $x^{3} = y^{4} + 8xy - 1$ $x = 20$ $y = 9$                     | $x^3 + y^3 = z^3 - 3$                                                                                                                                                                  |
-| $x^2 = y^2 + 14  \Box$                                                          | $x^2 = y^3 + 9$ $x = 6   y = 3  $                             | $x^{3} = y^{4} + 9xy - 1$ $x = 3   y = 1$                      | $x^3 + y^3 = z^3 - 2$ $x = 5   y = 6   z = 7$                                                                                                                                          |
-| $x^2 = y^2 + 15$ $x = 4$ $y = 1$                                                | $x^2 = y^3 + 10  \Box$                                        | $x^{3} = y^{4} + 10xy - 1$                                     | $x^3 + y^3 = z^3 - 1$ $x = 6$ $y = 8$ $z = 9$                                                                                                                                          |
-| $x^2 = y^2 + 16 \qquad x = 5  y = 3$                                            | $x^2 = y^3 + 11  \Box$                                        | $x^{3} = y^{4} + 11xy - 1$ $x = 5$ $y = 2$                     | $x^3 + y^3 = z^3 \qquad \Box$                                                                                                                                                          |
-| $x^2 = y^2 + 1 \qquad \Box$                                                     | $x^2 = y^3 + 12$ $x = 47$ $y = 13$                            | $x^3 = y^4 + 12xy - 1$                                         | $x^{3} + y^{3} = z^{3} + 1$ $x = 1   y = 2   z = 2  $                                                                                                                                  |
-| $x^2 = 2y^2 + 1$ $x = 3$ $y = 2$                                                | $x^2 = y^3 + 13  \Box$                                        | $x^3 = y^4 + 13xy - 1$                                         | $x^{3} + y^{3} = z^{3} + 2$ $x = 1214928$ $y = 3480205$ $z = 3528875$                                                                                                                  |
-| $x^2 = 3y^2 + 1$ $x = 2$ $y = 1$                                                | $x^2 = y^3 + 14  \Box$                                        | $x^3 = y^4 + 14xy - 1$                                         | $x^{3} + y^{3} = z^{3} + 3$ $x = 4   y = 4   z = 5$                                                                                                                                    |
-| $x^2 = 4y^2 + 1  \Box$                                                          | $x^2 = y^3 + 15$ $x = 4$ $y = 1$                              | $x^3 = y^4 + 15 \times y - 1$                                  | $x^3 + y^3 = z^3 + 4$                                                                                                                                                                  |
-| $x^2 = 5y^2 + 1$ $x = 9 y = 4$                                                  | $x^2 = y^3 + 16  \Box$                                        | $x^3 = y^4 + 16xy - 1$ $x = 4$ $y = 1$                         | $\begin{vmatrix} x^3 + y^3 = z^3 + 5 & \Box \\ x^3 + y^3 = z^3 + 6 & \boxed{x = 10529 \mid y = 60248 \mid z = 60355} \end{vmatrix}$                                                    |
-| $x^2 = 6y^2 + 1$ $x = 5$ $y = 2$                                                | $x^2 = y^3 + 17$ $x = 5$ $y = 2$                              | $x^3 = y^4 + 17xy - 1$                                         | $\begin{vmatrix} x^3 + y^3 = z^3 + 6 \\ x^3 + y^3 = z^3 + 7 \end{vmatrix}$ $\begin{vmatrix} x = 10529 \\ x = 924 \end{vmatrix}$ $\begin{vmatrix} y = 60248 \\ z = 60355 \end{vmatrix}$ |
-| $x^2 = 7y^2 + 1$ $x = 8   y = 3$                                                | $x^2 = y^3 + 18$ $x = 19$ $y = 7$                             | $x^3 = y^4 + 18xy - 1$ $x = 8   y = 3$                         | x + y = 2 + 7 $x = 32$ $y = 104$ $z = 105x^{2} + y^{3} = z^{3} + 8 z = 1 z = 1$                                                                                                        |
-| $x^2 = 8y^2 + 1$ $x = 3$ $y = 1$                                                | $x^2 = y^3 + 19$ $x = 12$ $y = 5$                             | $x^3 = y^4 + 19xy - 1$                                         | x + y = z + 8 $x = 1   y = z   z = 1x^3 + y^3 = z^3 + 9 x = 2097   y = 11305   z = 11329$                                                                                              |
-| $x^2 = 9y^2 + 1  \Box$                                                          | $x^2 = y^3 + 20  \Box$                                        | $x^3 = y^4 + 20 x y - 1$                                       | $x^{2} + y^{2} = z^{2} + 10$ $x = 2007$ $y = 11300$ $z = 11329$ $z = 11329$                                                                                                            |
-| $x^2 = 10y^2 + 1$ $x = 19$ $y = 6$                                              | $x^2 = y^3 + 1$ $x = 3   y = 2$                               | $x^2 = y^5 + 3$ $x = 2   y = 1$                                | $x^3 + y^3 = z^3 + 11$ $x = 297$ $y = 619$ $z = 641$                                                                                                                                   |
-| $x^2 = 11y^2 + 1$ $x = 10$ $y = 3$                                              | $x^2 = 2y^3 + 1  \Box$                                        | $x^2 = y^5 + y + 3$ $x = 2537   y = 23$                        | $x^{3} + y^{3} = z^{3} + 12$ $x = 7$ $y = 10$ $z = 11$                                                                                                                                 |
-| $x^2 = 12y^2 + 1$ $x = 7$ $y = 2$                                               | $x^2 = 3y^3 + 1$ $x = 2$ $y = 1$                              | $x^2 = y^5 + 2y + 3$                                           | $x^3 + y^3 = z^3 + 13  \Box$                                                                                                                                                           |
-| $x^2 = 13y^2 + 1$ $x = 649   y = 180  $                                         | $x^2 = 4y^3 + 1  \Box$                                        | $x^2 = y^5 + 3y + 3$                                           | $x^3 + y^3 = z^3 + 14  \Box$                                                                                                                                                           |
-| $x^{2} = 14y^{2} + 1$ $x = 15$ $y = 4$<br>$x^{2} = 15y^{2} + 1$ $x = 4$ $y = 1$ | $x^2 = 5y^3 + 1  \Box$                                        | $x^2 = y^5 + 4y + 3$                                           | $x^{3} + y^{3} = z^{3} + 15$ $x = 2$ $y = 2$ $z = 1$                                                                                                                                   |
-| $x^2 = 16y^2 + 1$ $x = 4   y = 1$<br>$x^2 = 16y^2 + 1$ $\Box$                   | $x^2 = 6y^3 + 1$ $x = 7$ $y = 2$                              | $x^2 = y^5 + 5y + 3$ $x = 3$ $y = 1$                           | $x^{3} + y^{3} = z^{3} + 16$ $x = 2429856$ $y = 6960410$ $z = 7057750$                                                                                                                 |
-| $x^2 = 16y^2 + 1$ $x = 33   y = 8$                                              | $x^2 = 7y^3 + 1  \Box$                                        | $x^2 = y^5 + 6y + 3$                                           | $x^3 + y^3 = z^3 + 17$ $x = 25$ $y = 50$ $z = 52$                                                                                                                                      |
-| $x^{2} = 17 y^{2} + 1  x = 33  y = 8$<br>$x^{2} = 18 y^{2} + 1  x = 17  y = 4$  | $x^2 = 8y^3 + 1$ $x = 3$ $y = 1$                              | $x^2 = y^5 + 7y + 3$ $x = 7   y = 2$                           | $x^{3} + y^{3} = z^{3} + 18$ $x = 94$ $y = 101$ $z = 123$                                                                                                                              |
-| $x^{2} = 18y^{2} + 1$ $x = 17$ $y = 4$ $x^{2} = 19y^{2} + 1$ $x = 170$ $y = 39$ | $x^2 = 9y^3 + 1  \Box$                                        | $x^2 = y^5 + 8y + 3$                                           | $x^{3} + y^{3} = z^{3} + 19$ $x = 26$ $y = 76$ $z = 77$                                                                                                                                |
-| x = 19y + 1 $x = 170   y = 39x^2 = 20y^2 + 1 x = 9   y = 2$                     | $x^2 = 10y^3 + 1$ $x = 9$ $y = 2$                             | $x^2 = y^5 + 9y + 3$                                           | $x^3 + y^3 = z^3 + 20$ $x = 1$ $y = 3$ $z = 2$                                                                                                                                         |
-| $\lambda = 20y + 1    x = 9   y = 2$                                            | , [ ]                                                         | , ,                                                            |                                                                                                                                                                                        |
+![](_page_805_Diophantine_Equation_Table.jpeg)
 
-universally been assumed that with the continued development of mathematics any of these questions could in the end be answered.
+<sup>¶</sup> Smallest solutions for various sequences of integer (or so-called Diophantine) equations. □ indicates that it can be proved that no solution exists. A blank indicates that I know only that no solution exists below a billion. Methods for resolving some of the equations in the first column were known in antiquity; all had been resolved by the 1800s. Practical methods for resolving the so-called elliptic curve equations in the second column were developed only in the 1980s. No general methods are yet known for most of the other equations given—and some classes of them may in fact show undecidability.
 
-However, what Gödel's Theorem shows is that there must always exist some questions that cannot ever be answered using the normal axioms of arithmetic. Yet the fact that the few known explicit examples have been extremely complicated has made this seem somehow fundamentally irrelevant for the actual practice of mathematics.
+However, what Gödel’s Theorem shows is that there must always exist some questions that cannot ever be answered using the normal axioms of arithmetic. Yet the fact that the few known explicit examples have been extremely complicated has made this seem somehow fundamentally irrelevant for the actual practice of mathematics.
 
 But from the discoveries in this book it now seems quite certain that vastly simpler examples also exist. And it is my strong suspicion that in fact of all the current unsolved problems seriously studied in number theory a fair fraction will in the end turn out to be questions that cannot ever be answered using the normal axioms of arithmetic.
 
-If one looks at recent work in number theory, most of it tends to be based on rather sophisticated methods that do not obviously depend only on the normal axioms of arithmetic. And for example the elaborate proof of Fermat's Last Theorem that has been developed may make at least some use of axioms that come from fields like set theory and go beyond the normal ones for arithmetic.
+If one looks at recent work in number theory, most of it tends to be based on rather sophisticated methods that do not obviously depend only on the normal axioms of arithmetic. And for example the elaborate proof of Fermat’s Last Theorem that has been developed may make at least some use of axioms that come from fields like set theory and go beyond the normal ones for arithmetic.
 
 But so long as one stays within, say, the standard axiom systems of mathematics on pages 773 and 774, and does not in effect just end up implicitly adding as an axiom whatever result one is trying to prove, my strong suspicion is that one will ultimately never be able to go much further than one can purely with the normal axioms of arithmetic.
 
 And indeed from the Principle of Computational Equivalence I strongly believe that in general undecidability and unprovability will start to occur in practically any area of mathematics almost as soon as one goes beyond the level of questions that are always easy to answer.
 
-But if this is so, why then has mathematics managed to get as far as it has? Certainly there are problems in mathematics that have remained unsolved for long periods of time. And I suspect that many of these will in fact in the end turn out to involve undecidability and
-
-<sup>¶</sup> Smallest solutions for various sequences of integer (or so-called Diophantine) equations. □ indicates that it can be proved that no solution exists. A blank indicates that I know only that no solution exists below a billion. Methods for resolving some of the equations in the first column were known in antiguity; all had been resolved by the 1800s. Practical methods for resolving the so-called elliptic curve equations in the second column were developed only in the 1980s. No general methods are yet known for most of the other equations given—and some classes of them may in fact show undecidability.
-
-unprovability. But the issue remains why such phenomena have not been much more obvious in everyday work in mathematics.
+But if this is so, why then has mathematics managed to get as far as it has? Certainly there are problems in mathematics that have remained unsolved for long periods of time. And I suspect that many of these will in fact in the end turn out to involve undecidability and unprovability. But the issue remains why such phenomena have not been much more obvious in everyday work in mathematics.
 
 At some level I suspect the reason is quite straightforward: it is that like most other fields of human inquiry mathematics has tended to define itself to be concerned with just those questions that its methods can successfully address. And since the main methods traditionally used in mathematics have revolved around doing proofs, questions that involve undecidability and unprovability have inevitably been avoided.
 
@@ -1209,13 +1014,13 @@ Needless to say, in the framework of the new kind of science in this book, such 
 
 As I said above, it is at some level not surprising that questions will be considered interesting in a particular field only if the methods of that field can say something useful about them. But this I believe is ultimately why there have historically been so few signs of undecidability or unprovability in mathematics. For any kinds of questions in which such phenomena appear are usually not amenable to standard methods of mathematics based on proof, and as a result such questions have inevitably been viewed as being outside what should be considered interesting for mathematics.
 
-So how then can one set up a reasonable idealization for mathematics as it is actually practiced? The first step-much as I discussed earlier in this section—is to think not so much about systems that might be described by mathematics as about the internal processes associated with proof that go on inside mathematics.
+So how then can one set up a reasonable idealization for mathematics as it is actually practiced? The first step—much as I discussed earlier in this section—is to think not so much about systems that might be described by mathematics as about the internal processes associated with proof that go on inside mathematics.
 
 A proof must ultimately be based on an axiom system, and one might have imagined that over the course of time mathematics would have sampled a wide range of possible axiom systems. But in fact in its historical development mathematics has normally stuck to only rather few such systems—each one corresponding essentially to some identifiable field of mathematics, and most given on pages 773 and 774.
 
 So what then happens if one looks at all possible simple axiom systems—much as we looked, say, at all possible simple cellular automata earlier in this book? To what extent does what one sees capture the features of mathematics? With axiom systems idealized as multiway systems the pictures on the next page show some results.
 
-In some cases the total number of theorems that can ever be proved is limited. But often the number of theorems increases rapidly with the length of proof-and in most cases an infinite number of theorems can eventually be proved. And given experience with mathematics an obvious question to ask in such cases is to what extent the system is consistent, or complete, or both.
+In some cases the total number of theorems that can ever be proved is limited. But often the number of theorems increases rapidly with the length of proof—and in most cases an infinite number of theorems can eventually be proved. And given experience with mathematics an obvious question to ask in such cases is to what extent the system is consistent, or complete, or both.
 
 ![](_page_811_Figure_2.jpeg)
 
@@ -1223,23 +1028,21 @@ Plots showing which possible strings get generated in the first 15 steps of evol
 
 But to formulate such a question in a meaningful way one needs a notion of negation. In general, negation is just some operation that takes a string and yields another, giving back the original if it is applied a second time. Earlier in this section we discussed cases in which negation simply reverses the color of each element in a string. And as a generalization of this one can consider cases in which negation can be any operation that preserves lengths of strings.
 
-And in this case it turns out that the criterion for whether a system is complete and consistent is simply that exactly half the
-
-possible strings of a given length are eventually generated if one starts from the string representing "true".
+And in this case it turns out that the criterion for whether a system is complete and consistent is simply that exactly half the possible strings of a given length are eventually generated if one starts from the string representing “true”.
 
 For if more than half the strings are generated, then somewhere both a string and its negation would have to appear, implying that the system must be inconsistent. And similarly, if less than half the strings are generated, there must be some string for which neither that string nor its negation ever appear, implying that the system is incomplete.
 
 The pictures on the next page show the fractions of strings of given lengths that are generated on successive steps in various multiway systems. In general one might have to wait an arbitrarily large number of steps to find out whether a given string will ever be generated. But in practice after just a few steps one already seems to get a reasonable indication of the overall fraction of strings that will ever be generated.
 
-And what one sees is that there is a broad distribution: from cases. in which very few strings can be generated—corresponding to a very incomplete axiom system—to cases in which all or almost all strings can be generated—corresponding to a very inconsistent axiom system.
+And what one sees is that there is a broad distribution: from cases in which very few strings can be generated—corresponding to a very incomplete axiom system—to cases in which all or almost all strings can be generated—corresponding to a very inconsistent axiom system.
 
-So where in this distribution do the typical axiom systems of ordinary mathematics lie? Presumably none are inconsistent. And a few-like basic logic and real algebra-are both complete and consistent, so that in effect they lie right in the middle of the distribution. But most are known to be incomplete. And as we discussed above, this is inevitable as soon as universality is present.
+So where in this distribution do the typical axiom systems of ordinary mathematics lie? Presumably none are inconsistent. And a few—like basic logic and real algebra—are both complete and consistent, so that in effect they lie right in the middle of the distribution. But most are known to be incomplete. And as we discussed above, this is inevitable as soon as universality is present.
 
 But just how incomplete are they? The answer, it seems, is typically not very. For if one looks at axiom systems that are widely used in mathematics they almost all tend to be complete enough to prove at least a fair fraction of statements either true or false.
 
 So why should this be? I suspect that it has to do with the fact that in mathematics one usually wants axiom systems that one can think of as somehow describing definite kinds of objects—about which one then expects to be able to establish all sorts of definite statements.
 
-And certainly if one looks at the history of mathematics most basic axiom systems have been arrived at by starting with objects such as finite integers or finite sets—then trying to find collections of axioms that somehow capture the relevant properties of these objects.
+And certainly if one looks at the history of mathematics most basic axiom systems have been arrived at by starting with objects—such as finite integers or finite sets—then trying to find collections of axioms that somehow capture the relevant properties of these objects.
 
 ![](_page_813_Figure_2.jpeg)
 
@@ -1255,27 +1058,23 @@ One might imagine that if one were to add more axioms to an axiom system one cou
 
 If an axiom system is far from complete—so that a large fraction of statements cannot be proved true or false—then there will typically be many different kinds of objects that are easy to specify and all satisfy the constraints of the system but for which there are fairly obvious properties that differ. But if an axiom system is close to complete—so that the vast majority of statements can be proved true or false—then it is almost inevitable that the different kinds of objects that satisfy its constraints must differ only in obscure ways.
 
-And this is presumably the case in the standard axiom system for arithmetic from page 773. Originally this axiom system was intended to describe just ordinary integers. But Gödel's Theorem showed that it is
-
-incomplete, so that there must be more than one kind of object that can satisfy its constraints. Yet it is rather close to being complete—since as we saw earlier one has to go through at least millions of statements before finding ones that it cannot prove true or false.
+And this is presumably the case in the standard axiom system for arithmetic from page 773. Originally this axiom system was intended to describe just ordinary integers. But Gödel’s Theorem showed that it is incomplete, so that there must be more than one kind of object that can satisfy its constraints. Yet it is rather close to being complete—since as we saw earlier one has to go through at least millions of statements before finding ones that it cannot prove true or false.
 
 And this means that even though there are objects other than the ordinary integers that satisfy the standard axioms of arithmetic, they are quite obscure—in fact, so much so that none have ever yet actually been constructed with any real degree of explicitness. And this is why it has been reasonable to think of the standard axiom system of arithmetic as being basically just about ordinary integers.
 
-But if instead of this standard axiom system one uses the reduced axiom system from page 773—in which the usual axiom for induction has been weakened—then the story is quite different. There is again incompleteness, but now there is much more of it, for even statements as simple as x + y = y + x and x + 0 = x cannot be proved true or false from the axioms. And while ordinary integers still satisfy all the constraints, the system is sufficiently incomplete that all sorts of other objects with quite different properties also do. So this means that the system is in a sense no longer about any very definite kind of mathematical object—and presumably that is why it is not used in practice in mathematics.
+But if instead of this standard axiom system one uses the reduced axiom system from page 773—in which the usual axiom for induction has been weakened—then the story is quite different. There is again incompleteness, but now there is much more of it, for even statements as simple as $x + y = y + x$ and $x + 0 = x$ cannot be proved true or false from the axioms. And while ordinary integers still satisfy all the constraints, the system is sufficiently incomplete that all sorts of other objects with quite different properties also do. So this means that the system is in a sense no longer about any very definite kind of mathematical object—and presumably that is why it is not used in practice in mathematics.
 
 At this juncture it should perhaps be mentioned that in their raw form quite a few well-known axiom systems from mathematics are actually also far from complete. An example of this is the axiom system for group theory given on page 773. But the point is that this axiom system represents in a sense just the beginning of group theory. For it yields only those theorems that hold abstractly for any group.
 
 Yet in doing group theory in practice one normally adds axioms that in effect constrain one to be dealing say with a specific group rather than with all possible groups. And the result of this is that once again one typically has an axiom system that is at least close to complete.
 
-In basic arithmetic and also usually in fields like group theory the underlying objects that one imagines describing can at some level be manipulated—and understood—in fairly concrete ways. But in a field like set theory this is less true. Yet even in this case an attempt has
-
-historically been made to get an axiom system that somehow describes definite kinds of objects. But now the main way this has been done is by progressively adding axioms so as to get closer to having a system that is complete—with only a rather vague notion of just what underlying objects one is really expecting to describe.
+In basic arithmetic and also usually in fields like group theory the underlying objects that one imagines describing can at some level be manipulated—and understood—in fairly concrete ways. But in a field like set theory this is less true. Yet even in this case an attempt has historically been made to get an axiom system that somehow describes definite kinds of objects. But now the main way this has been done is by progressively adding axioms so as to get closer to having a system that is complete—with only a rather vague notion of just what underlying objects one is really expecting to describe.
 
 In studying basic processes of proof multiway systems seem to do well as minimal idealizations. But if one wants to study axiom systems that potentially describe definite objects it seems to be somewhat more convenient to use what I call operator systems. And indeed the version of logic used on page 775—as well as many of the axiom systems on pages 773 and 774—are already set up essentially as operator systems.
 
-The basic idea of an operator system is to work with expressions such as  $(p \circ q) \circ ((q \circ r) \circ p)$  built up using some operator  $\circ$ , and then to consider for example what equivalences may exist between such expressions. If one has an operator whose values are given by some finite table then it is always straightforward to determine whether expressions are equivalent. For all one need do, as in the pictures at the top of the next page, is to evaluate the expressions for all possible values of each variable, and then to see whether the patterns of results one gets are the same.
+The basic idea of an operator system is to work with expressions such as $(p \circ q) \circ ((q \circ r) \circ p)$ built up using some operator $\circ$, and then to consider for example what equivalences may exist between such expressions. If one has an operator whose values are given by some finite table then it is always straightforward to determine whether expressions are equivalent. For all one need do, as in the pictures at the top of the next page, is to evaluate the expressions for all possible values of each variable, and then to see whether the patterns of results one gets are the same.
 
-And in this way one can readily tell, for example, that the first operator shown is idempotent, so that  $p \circ p = p$ , while both the first two operators are associative, so that  $(p \circ q) \circ r = p \circ (q \circ r)$ , and all but the third operator are commutative, so that  $p \circ q = q \circ p$ . And in principle one can use this method to establish any equivalence that exists between any expressions with an operator of any specific form.
+And in this way one can readily tell, for example, that the first operator shown is idempotent, so that $p \circ p = p$, while both the first two operators are associative, so that $(p \circ q) \circ r = p \circ (q \circ r)$, and all but the third operator are commutative, so that $p \circ q = q \circ p$. And in principle one can use this method to establish any equivalence that exists between any expressions with an operator of any specific form.
 
 But the crucial idea that underlies the traditional approach to mathematical proof is that one should also be able to deduce such results just by manipulating expressions in purely symbolic form, using the rules of an axiom system, without ever having to do anything like filling in explicit values of variables.
 
@@ -1289,13 +1088,11 @@ With the way I have set things up, any axiom system is itself just a collection 
 
 In general this can be undecidable—for there is no limit on how long even a single proof might need to be. But in some cases it turns out to be possible to establish that a particular set of axioms can successfully generate all equivalence results for a given operator—and indeed the picture at the top of the facing page shows examples of this for each of the four operators in the picture above.
 
-So if two expressions are equivalent then by applying the rules of the appropriate axiom system it must be possible to get from one to the other—and in fact the picture on page 775 shows an example of how
+So if two expressions are equivalent then by applying the rules of the appropriate axiom system it must be possible to get from one to the other—and in fact the picture on page 775 shows an example of how this can be done for the fourth axiom system above. But if one removes just a single axiom from any of the axiom systems above then it turns out that they no longer work, and for example they cannot establish the equivalence result stated by whichever axiom one has removed.
 
 ![](_page_818_Figure_2.jpeg)
 
-Axiom systems that can be used to derive all the equivalences between expressions that involve operators with the forms shown. Each axiom can be applied in either direction—as in the picture on page 775, with each variable standing for any expression, as in a Mathematica pattern. The operators shown are AND, EQUAL, IMPLIES and NAND. They yield respectively junctional, equivalential, implicational and full propositional or sentential calculus (ordinary logic).
-
-this can be done for the fourth axiom system above. But if one removes just a single axiom from any of the axiom systems above then it turns out that they no longer work, and for example they cannot establish the equivalence result stated by whichever axiom one has removed.
+Axiom systems that can be used to derive all the equivalences between expressions that involve operators with the forms shown. Each axiom can be applied in either direction—as in the picture on page 775, with each variable standing for any expression, as in a *Mathematica* pattern. The operators shown are AND, EQUAL, IMPLIES and NAND. They yield respectively junctional, equivalential, implicational and full propositional or sentential calculus (ordinary logic).
 
 In general one can think of axioms for an operator system as giving constraints on the form of the operator. And if one is going to reproduce all the equivalences that hold for a particular form then these constraints must in effect be such as to force that form to occur.
 
@@ -1317,11 +1114,11 @@ Forms of a binary operator satisfying the constraints of a series of different a
 
 So if one makes a list of all possible axiom systems—say starting with the simplest—where in such a list should one expect to see axiom systems that correspond to traditional areas of mathematics?
 
-Most axiom systems as they are given in typical textbooks are sufficiently complicated that they will not show up at all early. And in fact the only immediate exception is the axiom system  $\{(a \circ b) \circ c = a \circ (b \circ c)\}$  for what are known as semigroups—which ironically are usually viewed as rather advanced mathematical objects.
+Most axiom systems as they are given in typical textbooks are sufficiently complicated that they will not show up at all early. And in fact the only immediate exception is the axiom system $\{(a \circ b) \circ c = a \circ (b \circ c)\}$ for what are known as semigroups—which ironically are usually viewed as rather advanced mathematical objects.
 
-But just how complicated do the axiom systems for traditional areas of mathematics really need to be? Often it seems that they can be vastly simpler than their textbook forms. And so, for example, as page 773 indicates, interpreting the  $\circ$  operator as division,  $\{a \circ (b \circ (c \circ (a \circ b))) = c\}$  is known to be an axiom system for commutative group theory, and  $\{a \circ ((((a \circ a) \circ b) \circ c) \circ (((a \circ a) \circ a) \circ c)) = b\}$  for general group theory.
+But just how complicated do the axiom systems for traditional areas of mathematics really need to be? Often it seems that they can be vastly simpler than their textbook forms. And so, for example, as page 773 indicates, interpreting the $\circ$ operator as division, $\{a \circ (b \circ (c \circ (a \circ b))) = c\}$ is known to be an axiom system for commutative group theory, and $\{a \circ ((((a \circ a) \circ b) \circ c) \circ (((a \circ a) \circ a) \circ c)) = b\}$ for general group theory.
 
-So what about basic logic? How complicated an axiom system does one need for this? Textbook discussions of logic mostly use axiom systems at least as complicated as the first one on page 773. And such axiom systems not only involve several axioms—they also normally involve three separate operators: AND ( $\land$ ), OR ( $\lor$ ) and NOT ( $\neg$ ).
+So what about basic logic? How complicated an axiom system does one need for this? Textbook discussions of logic mostly use axiom systems at least as complicated as the first one on page 773. And such axiom systems not only involve several axioms—they also normally involve three separate operators: AND ($\land$), OR ($\lor$) and NOT ($\neg$).
 
 But is this in fact the only way to formulate logic?
 
@@ -1335,39 +1132,7 @@ But at least at a formal level, logic can be viewed simply as a theory of functi
 
 But the table below demonstrates that as soon as one goes beyond the familiar traditions of language and mathematics there are other operators that can also just as well be used as primitives. And indeed it has been known since before 1900 that both NAND and NOR on their own work—a fact I already used on pages 617 and 775.
 
-| 0  | ¬ a ^ a                                             | 1   | ¬ (a v b)                                                     | 2  | ¬a∧b                                                   | 3  | ¬ a                                       |              |           |     |
-|----|-----------------------------------------------------|-----|---------------------------------------------------------------|----|--------------------------------------------------------|----|-------------------------------------------|--------------|-----------|-----|
-| 4  | ¬b∧a                                                | 5   | ¬ b                                                           | 6  | ¬ (a ^ b) ^ (a V b)                                    | 7  | ¬ (a ∧ b)                                 |              |           |     |
-| 8  | a∧b                                                 | 9   | a∧b∨¬(a∨b)                                                    | 10 | b                                                      | 11 | ¬a∨b                                      | And<br>( ^ ) | Or<br>(V) | Not |
-| 12 | а                                                   | 13  | ¬ b v a                                                       | 14 | a v b                                                  | 15 | ¬a v a                                    | ( // )       | ( • )     | (¬) |
-| 0  | ¬ a ^ a                                             | 1   | ¬ a ^ ¬ b                                                     | 2  | ¬a∧b                                                   | 3  | ¬ a                                       |              |           |     |
-| 4  | ¬b∧a                                                | 5   | ¬ b                                                           | 6  | ¬ (¬ a ∧ ¬ b) ∧ ¬ (a ∧ b)                              | 7  | ¬ (a ∧ b)                                 |              |           |     |
-| 8  | a∧b                                                 | 9   | ¬(¬a∧b)∧¬(¬b∧a)                                               | 10 | b                                                      | 11 | ¬ (¬ b ^ a)                               | And          | Not       |     |
-| 12 | а                                                   | 13  | ¬ (¬ a ∧ b)                                                   | 14 | ¬ (¬ a ∧ ¬ b)                                          | 15 | ¬ (¬ a ^ a)                               | (1)          | (¬)       |     |
-| 0  | ¬ (¬ a v a)                                         | 1   | ¬ (a v b)                                                     | 2  | ¬ (¬ b v a)                                            | 3  | ¬ a                                       | _            |           |     |
-| 4  | ¬ (¬ a v b)                                         | 5   | ¬ b                                                           | 6  | ¬ (¬ a v b) v ¬ (¬ b v a)                              | 7  | ¬ a v ¬ b                                 |              |           |     |
-| 8  | ¬ (¬ a v ¬ b)                                       | 9   | ¬ (¬ a v ¬ b) v ¬ (a v b)                                     | 10 | b                                                      | 11 | ¬a∨b                                      | Or           | Not       |     |
-| 12 | а                                                   | 13  | ¬ b v a                                                       | 14 | a v b                                                  | 15 | ¬a v a                                    | (V)          | (¬)       |     |
-| 0  | ¬ (a ⇒ a)                                           | 1   | ¬ (¬ a ⇒ b)                                                   | 2  | ¬ (b ⇒ a)                                              | 3  | ¬ a                                       |              |           |     |
-| 4  | ¬ (a ⇒ b)                                           | 5   | ¬ b                                                           | 6  | $(a \Rightarrow b) \Rightarrow \neg (b \Rightarrow a)$ | 7  | a ⇒ ¬ b                                   |              |           |     |
-| 8  | ¬ (a ⇒ ¬ b)                                         | 9   | $\neg ((a \Rightarrow b) \Rightarrow \neg (b \Rightarrow a))$ | 10 | b                                                      | 11 | a⇒b                                       | Implies      |           |     |
-| 12 | а                                                   | 13  | b⇒a                                                           | 14 | ¬a⇒b                                                   | 15 | a⇒a                                       | (⇒)          | (¬)       |     |
-| 0  | a⊻a                                                 | 1   | (a ⇒ b) <u>⊌</u> b                                            | 2  | $((a \Rightarrow b) \Rightarrow b) \veebar a$          | 3  | (a ⇒ a) ⊻ a                               |              |           |     |
-| 4  | $((a \Rightarrow b) \Rightarrow b) \veebar b$       | 5   | (a ⇒ a) <u>⊌</u> b                                            | 6  | a⊻b                                                    | 7  | (a ⇒ b) <u>u</u> a                        |              |           |     |
-| 8  | $(((a \Rightarrow b) \Rightarrow b) \lor a) \lor b$ | 9   | ((a ⇒ a) ⊻ a) ⊻ b                                             | 10 | b                                                      | 11 | a ⇒ b                                     |              | Implies   | 5   |
-| 12 | а                                                   | 13  | b⇒a                                                           | 14 | $(a \Rightarrow b) \Rightarrow b$                      | 15 | a⇒a                                       | ( 🗹 )        | (⇒)       |     |
-| 0  | a∘a                                                 | 1   | a∘(a∘b)                                                       | 2  | a∘b                                                    | 3  | a∘(aōa)                                   |              |           |     |
-| 4  | b∘a                                                 | 5   | b∘(aōa)                                                       | 6  | a∘bō (bōa)                                             | 7  | a∘bōb                                     |              |           |     |
-| 8  | (a∘b)∘b                                             | 9   | (a∘b)∘(bōa)                                                   | 10 | b                                                      | 11 | bōa                                       | 2            | 13        |     |
-| 12 | а                                                   | 13  | a∘b                                                           | 14 | a ō (a ō b)                                            | 15 | aōa                                       | (0)          | (0)       |     |
-| 0  | ((ала)ла)л((ала)ла)                                 | 1 ( | ′(ала)л(bлb))л((ала)ла)                                       | 2  | ((ала)ла)л((ала)лb)                                    | 3  | ала                                       |              |           |     |
-| 4  | ((ала)ла)л((аль)ла)                                 | 5   | b⊼b                                                           | 6  | ((a ¬ a) ¬ b) ¬ ((a ¬ b) ¬ a)                          | 7  | алb                                       |              |           |     |
-| 8  | (a л b) л (a л b)                                   | 9   | ((a \(a\) \(\bar{a}\) \(\bar{a}\) \(\bar{a}\)                 | 10 | b                                                      | 11 | (алb) ла                                  | Nand         |           |     |
-| 12 | а                                                   | 13  | (a л a) л b                                                   | 14 | (a ភ a) ភ (b ភ b)                                      | 15 | (ала)ла                                   | ( ភ )        |           |     |
-| 0  | (a ⊽ a) ⊽ a                                         | 1   | a⊽b                                                           | 2  | (a v b) v a                                            | 3  | a⊽a                                       |              |           |     |
-| 4  | (a ⊽ a) ⊽ b                                         | 5   | b⊽b                                                           | 6  | ((a v a) v (b v b)) v (a v b)                          | 7  | ((a v̄ a) v̄ (b v̄ b)) v̄ ((a v̄ a) v̄ a) |              |           |     |
-| 8  | (a v̄ a) v̄ (b v̄ b)                                | 9   | ((a v̄ a) v̄ b) v̄ ((a v̄ b) v̄ a)                            | 10 | b                                                      | 11 | ((a v̄ a) v̄ a) v̄ ((a v̄ a) v̄ b)        | Nor          |           |     |
-| 12 | а                                                   | 13  | ((a v̄ a) v̄ a) v̄ ((a v̄ b) v̄ a)                            | 14 | (a v̄ b) v̄ (a v̄ b)                                   | 15 | ((a v a) v a) v ((a v a) v a)             | ( 0 )        |           |     |
+![](_page_822_Logic_Primitive_Functions.jpeg)
 
 Functions that can be used to formulate logic. In each case the minimal combinations of primitive functions necessary to reproduce each of the 16 logical functions of two arguments is given. From these any possible logical function with any number of arguments can be obtained. Most textbook treatments of logic use AND, OR, and NOT as primitive functions. NAND and NOR are the only primitive functions that work on their own.
 
@@ -1379,17 +1144,15 @@ But boxes (b) and (c) show that known alternative axiom systems for logic reduce
 
 But can one go still further? And what happens for example if one just tries to search simple axiom systems for ones that work?
 
-One can potentially test axiom systems by seeing what operators satisfy their constraints, as on page 805. The first non-trivial axiom system that even allows the NAND operator is  $\{(a \circ a) \circ (a \circ a) = a\}$ . And the first axiom system for which NAND and NOR are the only operators allowed that involve 2 possible values is  $\{((b \circ b) \circ a) \circ (a \circ b) = a\}$ .
+One can potentially test axiom systems by seeing what operators satisfy their constraints, as on page 805. The first non-trivial axiom system that even allows the NAND operator is $\{(a \circ a) \circ (a \circ a) = a\}$. And the first axiom system for which NAND and NOR are the only operators allowed that involve 2 possible values is $\{((b \circ b) \circ a) \circ (a \circ b) = a\}$.
 
-But if one now looks at operators involving 3 possible values then it turns out that this axiom system allows ones not equivalent to NAND
-
-and Nor. And this means that it cannot successfully reproduce all the results of logic. Yet if any axiom system with just a single axiom is going to be able to do this, the axiom must be of the form  $\{... = a\}$ .
+But if one now looks at operators involving 3 possible values then it turns out that this axiom system allows ones not equivalent to NAND and NOR. And this means that it cannot successfully reproduce all the results of logic. Yet if any axiom system with just a single axiom is going to be able to do this, the axiom must be of the form $\{... = a\}$.
 
 With up to 6 NANDs and 2 variables none of the 16,896 possible axiom systems of this kind work even up to 3-value operators. But with 6 NANDs and 3 variables, 296 of the 288,684 possible axiom systems work up to 3-value operators, and 100 work up to 4-value operators.
 
 And of the 25 of these that are not trivially equivalent, it then turns out that the two given as (g) and (h) on the facing page can actually be proved as on the next two pages to be axiom systems for logic—thus showing that in the end quite remarkable simplification can be achieved relative to ordinary textbook axiom systems.
 
-If one looks at axiom systems of the form  $\{... = a, a \circ b = b \circ a\}$  the first one that one finds that allows only NAND and NOR with 2-value operators is  $\{(a \circ a) \circ (a \circ a) = a, a \circ b = b \circ a\}$ . But as soon as one uses a total of just 6 NANDs, one suddenly finds that out of the 3402 possibilities with 3 variables 32 axiom systems equivalent to case (f) above all end up working all the way up to at least 4-value operators. And in fact it then turns out that (f) indeed works as an axiom system for logic.
+If one looks at axiom systems of the form $\{... = a, a \circ b = b \circ a\}$ the first one that one finds that allows only NAND and NOR with 2-value operators is $\{(a \circ a) \circ (a \circ a) = a, a \circ b = b \circ a\}$. But as soon as one uses a total of just 6 NANDs, one suddenly finds that out of the 3402 possibilities with 3 variables 32 axiom systems equivalent to case (f) above all end up working all the way up to at least 4-value operators. And in fact it then turns out that (f) indeed works as an axiom system for logic.
 
 So what this means is that if one were just to go through a list of the simplest few thousand axiom systems one would already be quite likely to find one that represents logic.
 
@@ -1405,7 +1168,7 @@ Axiom systems that reproduce equivalence results for the forms of operators show
 
 ![](_page_826_Figure_1.jpeg)
 
-A proof that the axiom system  $\{((b \circ c) \circ a) \circ (b \circ ((b \circ a) \circ b)) = a\}$  given as example (g) on page 808 can reproduce the Sheffer axiom system (c), and is thus a complete axiom system for logic. The proof involves taking the original axiom  $\boxed{A}$  and using it to establish a sequence of lemmas  $\boxed{Ln}$ , from which it is eventually possible to prove the three Sheffer axioms  $\boxed{n}$ . In each part of the proof each line can be obtained from the previous one just as on page 775 by applying the axiom or lemma indicated. Explicit  $\boxed{n}$  operators have been omitted to allow expressions to be printed more compactly. The proof shown takes a total of 343 steps, and involves intermediate expressions with as many as 128 NANDs. It is quite possible that the proof could be considerably shortened. Note that any proof can always be recast without lemmas, but will usually then be much longer.
+A proof that the axiom system $\{((b \circ c) \circ a) \circ (b \circ ((b \circ a) \circ b)) = a\}$ given as example (g) on page 808 can reproduce the Sheffer axiom system (c), and is thus a complete axiom system for logic. The proof involves taking the original axiom $\boxed{A}$ and using it to establish a sequence of lemmas $\boxed{L_n}$, from which it is eventually possible to prove the three Sheffer axioms $\boxed{T_n}$. In each part of the proof each line can be obtained from the previous one just as on page 775 by applying the axiom or lemma indicated. Explicit $\bar{\wedge}$ operators have been omitted to allow expressions to be printed more compactly. The proof shown takes a total of 343 steps, and involves intermediate expressions with as many as 128 NANDs. It is quite possible that the proof could be considerably shortened. Note that any proof can always be recast without lemmas, but will usually then be much longer.
 
 So what about patterns of theorems? Does logic somehow stand out when one looks at these? The picture below shows which possible simple equivalence theorems hold in systems from page 805.
 
@@ -1421,13 +1184,13 @@ So what happens if essentially just a single form of operator is allowed? The pi
 
 Theorems that hold with operators of each of the forms shown on page 806. NAND and NOR yield the smallest number of theorems.
 
-#### STEPHEN WOLFRAM A NEW KIND OF SCIENCE
+
 
 But if one considers for example analogs of logic for variables with more than two possible values, the picture below shows that one immediately gets systems with still fewer theorems.
 
 ![](_page_829_Picture_2.jpeg)
 
-Theorems in analogs of logic that allow different numbers of truth values. Statements like  $p=\neg\neg p$  do not hold in general with more than 2 truth values.
+Theorems in analogs of logic that allow different numbers of truth values. Statements like $p = \neg \neg p$ do not hold in general with more than 2 truth values.
 
 ![](_page_829_Figure_4.jpeg)
 
@@ -1459,7 +1222,7 @@ But the point is that the kinds of encodings that are normally used in mathemati
 
 Yet to take full advantage of universality one must consider not only translations between objects but also translations between complete proofs. And if one does this it is indeed perfectly possible, say, to program arithmetic to reproduce any proof in set theory. In fact, all one need do is to encode the axioms of set theory in something like the arithmetic equation system of page 786.
 
-But with the notable exception of Gödel's Theorem these kinds of encodings are not normally used in mathematics. So this means that even when universality is present realistic idealizations of mathematics must still distinguish different axiom systems.
+But with the notable exception of Gödel’s Theorem these kinds of encodings are not normally used in mathematics. So this means that even when universality is present realistic idealizations of mathematics must still distinguish different axiom systems.
 
 So in the end what is it that determines which axiom systems are actually used in mathematics? In the course of this section I have discussed a few criteria. But in the end history seems to be the only real determining factor. For given almost any general property that one can pick out in axiom systems like those on pages 773 and 774 there typically seem to be all sorts of operator and multiway systems—often including some rather simple ones—that share the exact same property.
 
@@ -1469,61 +1232,9 @@ So what about existing fields of mathematics? As I mentioned earlier in this sec
 
 The picture on the facing page shows a rather straightforward version of this. It lists in order a large number of theorems from basic logic, highlighting just those few that are considered interesting enough by typical textbooks of logic to be given explicit names.
 
-| $a = a \wedge a$                            | 2 a = a V a                               | a ^ a = a V a                                 | $a \wedge b = b \wedge a$                       | $a \lor b = b \lor a$                         | 5 a = ¬ ¬ a                                 |
-|---------------------------------------------|-------------------------------------------|-----------------------------------------------|-------------------------------------------------|-----------------------------------------------|---------------------------------------------|
-| a ∧ a = ¬ ¬ a                               | a v a = ¬ ¬ a                             | ¬ a = ¬ (a ^ a)                               | ¬a = ¬ (a v a)                                  | a = (a ^ a) ^ a                               | a = (a v a) ^ a                             |
-| $a = a \wedge (a \wedge a)$                 | a = a ^ (a V a)                           | a = a ^ a V a                                 | a = (a v a) v a                                 | a = a v a n a                                 | a = a v (a v a)                             |
-| $a = a \wedge (a \vee b)$                   | 7 a=a∨a∧b                                 | a = (a v b) ^ a                               | a = a ^ (b v a)                                 | $a = a \wedge b \vee a$                       | a = a v b ∧ a                               |
-| a = (b v a) ^ a                             | a = b ^ a V a                             | ¬a=¬a∧¬a                                      | ¬a = ¬a v ¬a                                    | ¬ a ^ a = a ^ ¬ a                             | $\neg a \lor a = a \lor \neg a$             |
-| $\neg (a \land a) = \neg (a \lor a)$        | ¬¬a = (a ^ a) ^ a                         | ¬¬a = (a v a) ∧a                              | ¬¬a = a ^ (a ^ a)                               | ¬¬a = a ^ (a v a)                             | ¬¬a = a ^ a V a                             |
-| ¬¬a = (a v a) v a                           | ¬¬a=a v a ∧ a                             | ¬¬a = a v (a v a)                             | ¬¬a = a ^ (a v b)                               | ¬¬a=a v a ∧ b                                 | ¬¬a = (a v b) ^a                            |
-| ¬¬a = a ^ (b v a)                           | $\neg \neg a = a \land b \lor a$          | ¬¬a=a v b ∧ a                                 | 8 ¬a ^a = ¬b ^b                                 | $a \wedge \neg a = \neg b \wedge b$           | $\neg a \land a = b \land \neg b$           |
-| $a \land \neg a = b \land \neg b$           | 9 ¬a v a = ¬ b v b                        | a v ¬ a = ¬ b v b                             | $\neg a \lor a = b \lor \neg b$                 | $a \lor \neg a = b \lor \neg b$               | ¬¬a = (b v a) ^a                            |
-| $\neg \neg a = b \land a \lor a$            | a ^ ¬ b = ¬ b ^ a                         | $\neg a \land b = b \land \neg a$             | a v ¬ b = ¬ b v a                               | $\neg a \lor b = b \lor \neg a$               | $\neg (a \land b) = \neg (b \land a)$       |
-| $\neg (a \lor b) = \neg (b \lor a)$         | a ^ a = (a ^ a) ^ a                       | a v a = (a ^ a) ^ a                           | a ^ a = (a V a) ^ a                             | a v a = (a v a) ^ a                           | $a \wedge a = a \wedge (a \wedge a)$        |
-| a v a = a ^ (a ^ a)                         | a ^ a = a ^ (a V a)                       | a v a = a ^ (a v a)                           | a n a = a n a v a                               | a v a = a ∧ a v a                             | a ^ a = (a v a) v a                         |
-| a v a = (a v a) v a                         | a ^ a = a V a ^ a                         | a v a = a v a ∧ a                             | a ^ a = a V (a V a)                             | a v a = a v (a v a)                           | a ^ a = a ^ (a v b)                         |
-| a v a = a ^ (a v b)                         | a n a = a v a n b                         | a v a = a v a x b                             | a ^ a = (a v b) ^ a                             | a ∨ a = (a ∨ b) ∧ a                           | a ^ a = a ^ (b v a)                         |
-| $a \lor a = a \land (b \lor a)$             | a n a = a n b v a                         | $a \lor a = a \land b \lor a$                 | a n a = a v b n a                               | a v a = a v b ^ a                             | $a \wedge a = (b \vee a) \wedge a$          |
-| $a \lor a = (b \lor a) \land a$             | a n a = b n a v a                         | a v a = b ∧ a v a                             | $a \wedge b = (a \wedge a) \wedge b$            | $a \wedge b = (a \vee a) \wedge b$            | $a \wedge b = a \wedge (a \wedge b)$        |
-| $a \lor b = a \land a \lor b$               | a v b = (a v a) v b                       | $a \lor b = a \lor (a \lor b)$                | $a \wedge b = (a \wedge b) \wedge a$            | $a \wedge b = a \wedge (b \wedge a)$          | a v b = (a v b) v a                         |
-| $a \lor b = a \lor (b \lor a)$              | $a \wedge b = (a \wedge b) \wedge b$      | $a \wedge b = a \wedge (b \wedge b)$          | $a \wedge b = a \wedge (b \vee b)$              | $a \lor b = (a \lor b) \lor b$                | $a \lor b = a \lor b \land b$               |
-| $a \lor b = a \lor (b \lor b)$              | $a \wedge b = (b \wedge a) \wedge a$      | $a \wedge b = b \wedge (a \wedge a)$          | $a \wedge b = b \wedge (a \vee a)$              | a v b = (b v a) v a                           | $a \lor b = b \lor a \land a$               |
-| $a \lor b = b \lor (a \lor a)$              | $a \wedge b = (b \wedge a) \wedge b$      | $a \wedge b = b \wedge (a \wedge b)$          | $a \lor b = (b \lor a) \lor b$                  | $a \lor b = b \lor (a \lor b)$                | $a \wedge b = (b \wedge b) \wedge a$        |
-| $a \wedge b = (b \vee b) \wedge a$          | $a \wedge b = b \wedge (b \wedge a)$      | $a \lor b = b \land b \lor a$                 | $a \lor b = (b \lor b) \lor a$                  | $a \lor b = b \lor (b \lor a)$                | ¬ (a ^ a) = ¬ a ^ ¬ a                       |
-| ¬ (a v a) = ¬ a ∧ ¬ a                       | ¬ (a ^ a) = ¬ a V ¬ a                     | ¬ (a v a) = ¬ a v ¬ a                         | $^{10}$ $\neg (a \lor b) = \neg a \land \neg b$ | $\neg (a \land b) = \neg a \lor \neg b$       | $\neg (a \lor b) = \neg b \land \neg a$     |
-| $\neg (a \land b) = \neg b \lor \neg a$     | ¬ a ∧ ¬ a = ¬ a ∨ ¬ a                     | $\neg a \land \neg b = \neg b \land \neg a$   | $\neg a \lor \neg b = \neg b \lor \neg a$       | (a ^ a) ^ a = (a V a) ^ a                     | (a ^ a) ^ a = a ^ (a ^ a)                   |
-| $(a \lor a) \land a = a \land (a \land a)$  | (a ^ a) ^ a = a ^ (a ^ a)                 | (a v a) ∧ a = a ∧ (a v a)                     | $a \wedge (a \wedge a) = a \wedge (a \vee a)$   | (a ^ a) ^ a = a ^ a ^ a                       | (a v a) л a = a л a v a                     |
-| a ^ (a ^ a) = a ^ a V a                     | $a \wedge (a \vee a) = a \wedge a \vee a$ | (a ^ a) ^ a = (a ^ a) ^ a                     | (a v a) x a = (a v a) v a                       | a ^ (a ^ a) = (a ^ a) ^ a                     | a ^ (a v a) = (a v a) v a                   |
-| a ^ a V a = (a V a) V a                     | (a ^ a) ^ a = a V a ^ a                   | (a v a) л a = a v a л a                       | $a \wedge (a \wedge a) = a \vee a \wedge a$     | a ^ (a V a) = a V a ^ a                       | a ^ a V a = a V a ^ a                       |
-| (a v a) v a = a v a n a                     | (a ^ a) ^ a = a V (a V a)                 | (a v a) ∧ a = a v (a v a)                     | $a \wedge (a \wedge a) = a \vee (a \vee a)$     | $a \wedge (a \vee a) = a \vee (a \vee a)$     | $a \wedge a \vee a = a \vee (a \vee a)$     |
-| (a v a) v a = a v (a v a)                   | $a \lor a \land a = a \lor (a \lor a)$    | $(a \wedge a) \wedge a = a \wedge (a \vee b)$ | (a v a) ^ a = a ^ (a v b)                       | $a \wedge (a \wedge a) = a \wedge (a \vee b)$ | $a \wedge (a \vee a) = a \wedge (a \vee b)$ |
-| $a \wedge a \vee a = a \wedge (a \vee b)$   | $(a \lor a) \lor a = a \land (a \lor b)$  | $a \lor a \land a = a \land (a \lor b)$       | $a \lor (a \lor a) = a \land (a \lor b)$        | (a ^ a) ^ a = a V a ^ b                       | $(a \lor a) \land a = a \lor a \land b$     |
-| $a \wedge (a \wedge a) = a \vee a \wedge b$ | $a \wedge (a \vee a) = a \vee a \wedge b$ | a ^ a V a = a V a ^ b                         | (a v a) v a = a v a ^ b                         | a v a n a = a v a n b                         | $a \lor (a \lor a) = a \lor a \land b$      |
+![](_page_832_Basic_Logic_Theorems.jpeg)
 
-: 50 lines
-
-| $a \wedge b \vee b = b \wedge (b \vee a)$       | $(a \lor b) \lor b = b \land b \lor a$          | $a \lor b \land b = b \land b \lor a$                   | $a \lor (b \lor b) = b \land b \lor a$                            | $(a \lor b) \lor b = (b \lor b) \lor a$         | $a \lor b \land b = (b \lor b) \lor a$          |
-|-------------------------------------------------|-------------------------------------------------|---------------------------------------------------------|-------------------------------------------------------------------|-------------------------------------------------|-------------------------------------------------|
-| $a \lor (b \lor b) = (b \lor b) \lor a$         | $(a \lor b) \land b = b \lor b \land a$         | $a \wedge b \vee b = b \vee b \wedge a$                 | $(a \lor b) \lor b = b \lor (b \lor a)$                           | $a \lor b \land b = b \lor (b \lor a)$          | $a \lor (b \lor b) = b \lor (b \lor a)$         |
-| $(a \lor b) \land b = (b \land b) \land b$      | $a \wedge b \vee b = (b \wedge b) \wedge b$     | $(a \lor b) \land b = (b \lor b) \land b$               | $a \wedge b \vee b = (b \vee b) \wedge b$                         | $(a \lor b) \land b = b \land (b \land b)$      | $a \wedge b \vee b = b \wedge (b \wedge b)$     |
-| $(a \lor b) \land b = b \land (b \lor b)$       | $a \wedge b \vee b = b \wedge (b \vee b)$       | $(a \lor b) \land b = b \land b \lor b$                 | $a \wedge b \vee b = b \wedge b \vee b$                           | $(a \lor b) \land b = (b \lor b) \lor b$        | $a \wedge b \vee b = (b \vee b) \vee b$         |
-| $(a \lor b) \land b = b \lor b \land b$         | $a \wedge b \vee b = b \vee b \wedge b$         | $(a \lor b) \land b = b \lor (b \lor b)$                | $a \wedge b \vee b = b \vee (b \vee b)$                           | $(a \lor b) \land b = b \land (b \lor c)$       | $a \wedge b \vee b = b \wedge (b \vee c)$       |
-| $(a \lor b) \land b = b \lor b \land c$         | $a \wedge b \vee b = b \vee b \wedge c$         | $(a \lor b) \land b = (b \lor c) \land b$               | $a \wedge b \vee b = (b \vee c) \wedge b$                         | $(a \lor b) \land b = b \land (c \lor b)$       | $a \wedge b \vee b = b \wedge (c \vee b)$       |
-| $(a \lor b) \land b = b \land c \lor b$         | $a \wedge b \vee b = b \wedge c \vee b$         | $(a \lor b) \land b = b \lor c \land b$                 | $a \wedge b \vee b = b \vee c \wedge b$                           | $(a \lor b) \land b = (c \lor b) \land b$       | $a \wedge b \vee b = (c \vee b) \wedge b$       |
-| $(a \lor b) \land b = c \land b \lor b$         | $a \wedge b \vee b = c \wedge b \vee b$         | $^{11}$ $(a \wedge b) \wedge c = a \wedge (b \wedge c)$ | $^{12}$ (a $^{\vee}$ b) $^{\vee}$ c = a $^{\vee}$ (b $^{\vee}$ c) | $(a \wedge b) \wedge c = (a \wedge c) \wedge b$ | $a \wedge (b \wedge c) = (a \wedge c) \wedge b$ |
-| $(a \wedge b) \wedge c = a \wedge (c \wedge b)$ | $a \wedge (b \wedge c) = a \wedge (c \wedge b)$ | $a \wedge (b \vee c) = a \wedge (c \vee b)$             | $(a \lor b) \lor c = (a \lor c) \lor b$                           | $a \lor (b \lor c) = (a \lor c) \lor b$         | $a \lor b \land c = a \lor c \land b$           |
-| $(a \lor b) \lor c = a \lor (c \lor b)$         | $a \lor (b \lor c) = a \lor (c \lor b)$         | $(a \wedge b) \wedge c = (b \wedge a) \wedge c$         | $a \wedge (b \wedge c) = (b \wedge a) \wedge c$                   | $(a \lor b) \land c = (b \lor a) \land c$       | $(a \wedge b) \wedge c = b \wedge (a \wedge c)$ |
-
-: 392 lines
-
-| $a \wedge (b \vee c) = (a \wedge a) \wedge (c \vee b)$     | $a \wedge (b \vee c) = (a \vee a) \wedge (c \vee b)$    | $a \lor b \land c = a \land a \lor c \land b$    | $a \lor b \land c = (a \lor a) \lor c \land b$             | $(a \lor b) \lor c = a \land a \lor (c \lor b)$            |
-|------------------------------------------------------------|---------------------------------------------------------|--------------------------------------------------|------------------------------------------------------------|------------------------------------------------------------|
-| $(a \lor b) \lor c = (a \lor a) \lor (c \lor b)$           | $a \lor (b \lor c) = a \land a \lor (c \lor b)$         | $a \lor (b \lor c) = (a \lor a) \lor (c \lor b)$ | $(a \wedge b) \wedge c = (a \wedge b) \wedge (a \wedge c)$ | $a \wedge (b \wedge c) = (a \wedge b) \wedge (a \wedge c)$ |
-| 13 $a \wedge (b \vee c) = a \wedge b \vee a \wedge c$      | $ ^{14} a \lor b \land c = (a \lor b) \land (a \lor c)$ | $(a \lor b) \lor c = (a \lor b) \lor (a \lor c)$ | $a \lor (b \lor c) = (a \lor b) \lor (a \lor c)$           | $(a \wedge b) \wedge c = (a \wedge b) \wedge (b \wedge c)$ |
-| $a \wedge (b \wedge c) = (a \wedge b) \wedge (b \wedge c)$ | $(a \lor b) \lor c = (a \lor b) \lor (b \lor c)$        | $a \lor (b \lor c) = (a \lor b) \lor (b \lor c)$ | $(a \wedge b) \wedge c = (a \wedge b) \wedge (c \wedge a)$ | $a \wedge (b \wedge c) = (a \wedge b) \wedge (c \wedge a)$ |
-
-The theorems of basic logic written out in order of increasing complexity. Those considered interesting enough to name in typical textbooks are highlighted. The theorems are respectively: (1), (2) idempotence (laws of tautology) of AND and OR, (3), (4) commutativity of AND and OR, (5) law of double negation, (6), (7) absorption (redundancy) laws, (8) law of noncontradiction (definition of FALSE), (9) law of excluded middle (definition of TRUE), (10) de Morgan's law, (11), (12) associativity of AND and OR, (13), (14) distributive laws. With the exception of the second distributive law, it turns out that the highlighted theorems are exactly the ones that cannot be derived from preceding theorems in the list. The distributive laws appear at positions 2813 and 2814 in the list; it takes a long proof to obtain the second one from preceding theorems.
+The theorems of basic logic written out in order of increasing complexity. Those considered interesting enough to name in typical textbooks are highlighted. The theorems are respectively: (1), (2) idempotence (laws of tautology) of AND and OR, (3), (4) commutativity of AND and OR, (5) law of double negation, (6), (7) absorption (redundancy) laws, (8) law of noncontradiction (definition of FALSE), (9) law of excluded middle (definition of TRUE), (10) de Morgan’s law, (11), (12) associativity of AND and OR, (13), (14) distributive laws. With the exception of the second distributive law, it turns out that the highlighted theorems are exactly the ones that cannot be derived from preceding theorems in the list. The distributive laws appear at positions 2813 and 2814 in the list; it takes a long proof to obtain the second one from preceding theorems.
 
 But what determines which theorems these will be? One might have thought that it would be purely a matter of history. But actually looking at the list of theorems it always seems that the interesting ones are in a sense those that show the least unnecessary complication.
 
@@ -1531,35 +1242,7 @@ And indeed if one starts from the beginning of the list one finds that most of t
 
 So what happens if one applies the same criterion in other settings? The picture below shows as an example theorems from the formulation of logic discussed above based on NAND.
 
-| $a \bar{h} b = b \bar{h} a$                                                                         | a = (a \bar{n} a) \bar{n} (a \bar{n} a)         | $a = (a \bar{n} a) \bar{n} (a \bar{n} b)$                                                           | $a = (a \bar{\pi} a) \bar{\pi} (b \bar{\pi} a)$                                                     |
-|-----------------------------------------------------------------------------------------------------|-------------------------------------------------|-----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| a // b = b // a                                                                                     | a = (a // a // / (a // a)                       |                                                                                                     | 1 1 1 1                                                                                             |
-| a = (a ¬ b) ¬ (a ¬ a)                                                                               | a = (b \( \bar{a} \) \( \bar{a} \) \( \alpha \) | (ала)ла — ал(ала)                                                                                   | $(a  \overline{\wedge}  a)  \overline{\wedge}  a = (b  \overline{\wedge}  b)  \overline{\wedge}  b$ |
-| $a \bar{\pi} (a \bar{\pi} a) = (b \bar{\pi} b) \bar{\pi} b$                                         | (a ¬ a) ¬ a = b ¬ (b ¬ b)                       | $a  \overline{\wedge}  (a  \overline{\wedge}  a) = b  \overline{\wedge}  (b  \overline{\wedge}  b)$ | a = (a = b) = (a = b) = a                                                                           |
-| $a  \overline{\wedge}  (a  \overline{\wedge}  b) = a  \overline{\wedge}  (b  \overline{\wedge}  a)$ | (a ភ a) ភ b = (a ភ b) ភ b                       | $a  \overline{n}  (a  \overline{n}  b) = a  \overline{n}  (b  \overline{n}  b)$                     | а л (а л b) — (b л a) л a                                                                           |
-| (a ¬ a) ¬ b = b ¬ (a ¬ a)                                                                           | $(a \pi a) \pi b = (b \pi a) \pi b$             | $(a \pi a) \pi b = b \pi (a \pi b)$                                                                 | $a \pi (a \pi b) = (b \pi b) \pi a$                                                                 |
-| (a ¬ a) ¬ b = b ¬ (b ¬ a)                                                                           | (алb)ла — ал(bла)                               | (a \( \bar{b} \) \( \bar{a} = a \( \bar{a} \) (b \( \bar{b} \))                                     | ал (bла) = ал (bлb)                                                                                 |
-| (a ¬ b) ¬ a = (b ¬ a) ¬ a                                                                           | ал (bла) = (bла)ла                              | (a ¬ b) ¬ a = (b ¬ b) ¬ a                                                                           | ал (bла) = (bлb)ла                                                                                  |
-| a ¬ (b ¬ b) = (b ¬ a) ¬ a                                                                           | (a ភ b) ភ b = b ភ (a ភ a)                       | (a ¬ b) ¬ b = (b ¬ a) ¬ b                                                                           | $(a  \overline{\wedge}  b)  \overline{\wedge}  b = b  \overline{\wedge}  (a  \overline{\wedge}  b)$ |
-| $a  \overline{\wedge}  (b  \overline{\wedge}  b) = (b  \overline{\wedge}  b)  \overline{\wedge}  a$ | (a ភ b) ភ b = b ភ (b ភ a)                       | $a \pi (b \pi c) = a \pi (c \pi b)$                                                                 | $(a  \overline{\wedge}  b)  \overline{\wedge}  c = (b  \overline{\wedge}  a)  \overline{\wedge}  c$ |
-| $a\bar{\wedge}(b\bar{\wedge}c) = (b\bar{\wedge}c)\bar{\wedge}a$                                     | $(a \pi b) \pi c = c \pi (a \pi b)$             | ал(bлс) = (слb)ла                                                                                   | $(a  \overline{\wedge}  b)  \overline{\wedge}  c = c  \overline{\wedge}  (b  \overline{\wedge}  a)$ |
-| (a ¬ a) ¬ (a ¬ a) = (a ¬ a) ¬ (a ¬ b)                                                               | (ала)л(ала) — (ала)л(bла)                       | (ала)л(ала) = (аль)л(ала)                                                                           | $(a  \pi  a)  \pi  (a  \pi  a) = (b  \pi  a)  \pi  (a  \pi  a)$                                     |
-| (ала)л(алb) = (ала)л(алс)                                                                           | (a ¬ a) ¬ (a ¬ b) = (a ¬ a) ¬ (b ¬ a)           | (ала)л(алb) = (ала)л(сла)                                                                           | (a ¬ a) ¬ (a ¬ b) = (a ¬ b) ¬ (a ¬ a)                                                               |
-
-: 118 lines
-
-| $a \bar{\wedge} ((a \bar{\wedge} b) \bar{\wedge} b) = (c \bar{\wedge} (a \bar{\wedge} a)) \bar{\wedge} a$                                           | $a \bar{\pi} ((a \bar{\pi} b) \bar{\pi} b) = ((c \bar{\pi} a) \bar{\pi} c) \bar{\pi} a$ | $a \bar{\pi} ((a \bar{\pi} b) \bar{\pi} b) = (c \bar{\pi} (a \bar{\pi} c)) \bar{\pi} a$                                                             | $(a  \overline{\wedge}  (a  \overline{\wedge}  b))  \overline{\wedge}  b = (c  \overline{\wedge}  (b  \overline{\wedge}  b))  \overline{\wedge}  b$ |
-|-----------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| $(a  \overline{\wedge}  (a  \overline{\wedge}  b))  \overline{\wedge}  b = ((c  \overline{\wedge}  b)  \overline{\wedge}  c)  \overline{\wedge}  b$ | $(a \pi (a \pi b)) \pi b = (c \pi (b \pi c)) \pi b$                                     | $a  \overline{\wedge}  ((a  \overline{\wedge}  b)  \overline{\wedge}  b) = (c  \overline{\wedge}  (c  \overline{\wedge}  a))  \overline{\wedge}  a$ | $(a  \overline{\wedge}  (a  \overline{\wedge}  b))  \overline{\wedge}  b = (c  \overline{\wedge}  (c  \overline{\wedge}  b))  \overline{\wedge}  b$ |
-| $a \bar{\pi} ((a \bar{\pi} b) \bar{\pi} b) = ((c \bar{\pi} c) \bar{\pi} c) \bar{\pi} a$                                                             | $a \bar{\pi} ((a \bar{\pi} b) \bar{\pi} b) = (c \bar{\pi} (c \bar{\pi} c)) \bar{\pi} a$ | $(a \pi (a \pi b)) \pi b = ((c \pi c) \pi c) \pi b$                                                                                                 | $(a \pi (a \pi b)) \pi b = (c \pi (c \pi c)) \pi b$                                                                                                 |
-| $a \bar{\pi} (a \bar{\pi} (b \bar{\pi} c)) = a \bar{\pi} (a \bar{\pi} (c \bar{\pi} b))$                                                             | $(a \pi (a \pi b)) \pi c = ((a \pi b) \pi a) \pi c$                                     | $(a \pi (a \pi b)) \pi c = (a \pi (b \pi a)) \pi c$                                                                                                 | $a \pi ((a \pi b) \pi c) = a \pi ((b \pi a) \pi c)$                                                                                                 |
-| $((a  \overline{\wedge}  a)  \overline{\wedge}  b)  \overline{\wedge}  c = ((a  \overline{\wedge}  b)  \overline{\wedge}  b)  \overline{\wedge}  c$ | $(a \pi (a \pi b)) \pi c = (a \pi (b \pi b)) \pi c$                                     | $a \pi ((a \pi b) \pi c) = a \pi ((b \pi b) \pi c)$                                                                                                 | $a \pi ((a \pi b) \pi c) = ((a \pi b) \pi c) \pi a$                                                                                                 |
-| $a \bar{\pi} (a \bar{\pi} (b \bar{\pi} c)) = (a \bar{\pi} (b \bar{\pi} c)) \bar{\pi} a$                                                             | $a\pi(a\pi(b\pi c)) = a\pi((b\pi c)\pi a)$                                              | $a \pi (a \pi (b \pi c)) = ((a \pi b) \pi c) \pi c$                                                                                                 | $(a \pi (a \pi b)) \pi c = (a \pi (b \pi c)) \pi c$                                                                                                 |
-| $a \bar{\pi} ((a \bar{\pi} b) \bar{\pi} c) = a \bar{\pi} ((b \bar{\pi} c) \bar{\pi} c)$                                                             | $a \pi ((a \pi b) \pi c) = a \pi (c \pi (a \pi b))$                                     | ал (ал (bлс)) = (ал (слb)) ла                                                                                                                       | $a  \overline{\wedge}  (a  \overline{\wedge}  (b  \overline{\wedge}  c)) = a  \overline{\wedge}  ((c  \overline{\wedge}  b)  \overline{\wedge}  a)$ |
-| $a \bar{\pi} ((a \bar{\pi} b) \bar{\pi} c) = a \bar{\pi} (c \bar{\pi} (b \bar{\pi} a))$                                                             | $a \pi (a \pi (b \pi c)) = ((a \pi c) \pi b) \pi b$                                     | $a \pi ((a \pi b) \pi c) = a \pi (c \pi (b \pi b))$                                                                                                 | $((a  \overline{\wedge}  a)  \overline{\wedge}  b)  \overline{\wedge}  c = ((a  \overline{\wedge}  c)  \overline{\wedge}  b)  \overline{\wedge}  c$ |
-| $(a \bar{\wedge} (a \bar{\wedge} b)) \bar{\wedge} c = (a \bar{\wedge} (c \bar{\wedge} b)) \bar{\wedge} c$                                           | $a \bar{\pi} ((a \bar{\pi} b) \bar{\pi} c) = a \bar{\pi} ((c \bar{\pi} b) \bar{\pi} c)$ | $a \bar{\pi} ((a \bar{\pi} b) \bar{\pi} c) = a \bar{\pi} (c \bar{\pi} (b \bar{\pi} c))$                                                             | $a \bar{\pi} ((a \bar{\pi} b) \bar{\pi} c) = a \bar{\pi} (c \bar{\pi} (c \bar{\pi} b))$                                                             |
-
-:
+![](_page_833_NAND_Theorems.jpeg)
 
 The theorems of logic formulated in terms of NAND. Theorems which cannot be derived from ones earlier in the list are highlighted. The last highlighted theorem is 539th in the list. No later theorems would be highlighted since the ones shown form a complete axiom system from which any theorem of logic can be derived. The last highlighted theorem is however an example of one that follows from the axioms, but is hard to prove.
 
@@ -1567,7 +1250,7 @@ Now there is no particular historical tradition to rely on. But the criterion ne
 
 So if one were to go still further, would one eventually find yet more? It turns out that with the criterion we have used one would not. And the reason is that just the six theorems highlighted already happen to form an axiom system from which any possible theorem about NANDs can ultimately be derived.
 
-And indeed, whenever one is dealing with theorems that can be derived from a finite axiom system the criterion implies that only a finite number of theorems should ever be considered interestingending as soon as one has in a sense got enough theorems to be able to reproduce some formulation of the axiom system.
+And indeed, whenever one is dealing with theorems that can be derived from a finite axiom system the criterion implies that only a finite number of theorems should ever be considered interesting—ending as soon as one has in a sense got enough theorems to be able to reproduce some formulation of the axiom system.
 
 But this is essentially like saying that once one knows the rules for a system nothing else about it should ever be considered interesting. Yet most of this book is concerned precisely with all the interesting behavior that can emerge even if one knows the rules for a system.
 
@@ -1575,9 +1258,7 @@ And the point is that if computational irreducibility is present, then there is 
 
 So what this suggests is that a theorem might be considered interesting not only if it cannot be derived at all from simpler theorems but also if it cannot be derived from them except by some long proof. And indeed in basic logic the last theorem identified as interesting on page 817—the distributivity of OR—is an example of one that can in principle be derived from earlier theorems, but only by a proof that seems to be much longer than other theorems of comparable size.
 
-In logic, however, all proofs are in effect ultimately of limited length. But in any axiom system where there is universality—and thus
-
-undecidability—this is no longer the case, and as I discussed above I suspect that it will actually be quite common for there to be all sorts of short theorems that have only extremely long proofs.
+In logic, however, all proofs are in effect ultimately of limited length. But in any axiom system where there is universality—and thus undecidability—this is no longer the case, and as I discussed above I suspect that it will actually be quite common for there to be all sorts of short theorems that have only extremely long proofs.
 
 No doubt many such theorems are much too difficult ever to prove in practice. But even if they could be proved, would they be considered interesting? Certainly they would provide what is in essence new information, but my strong suspicion is that in mathematics as it is currently practiced they would only rarely be considered interesting.
 
@@ -1607,7 +1288,7 @@ And indeed the Principle of Computational Equivalence implies that such phenomen
 
 So what this means is that in the future, when the ideas and methods of this book have successfully been absorbed, the field of mathematics as it exists today will come to be seen as a small and surprisingly uncharacteristic sample of what is actually possible.
 
-#### Intelligence in the Universe
+### Intelligence in the Universe
 
 Whether or not we as humans are the only examples of intelligence in the universe is one of the great unanswered questions of science.
 
@@ -1625,9 +1306,7 @@ And certainly some everyday turns of phrase might suggest that we do. For when w
 
 So what then might this be?
 
-Certainly one can identify all sorts of specific features of human intelligence: the ability to understand language, to do mathematics, solve puzzles, and so on. But the question is whether there are more
-
-general features that somehow capture the essence of true intelligence, independent of the particular details of human intelligence.
+Certainly one can identify all sorts of specific features of human intelligence: the ability to understand language, to do mathematics, solve puzzles, and so on. But the question is whether there are more general features that somehow capture the essence of true intelligence, independent of the particular details of human intelligence.
 
 Perhaps it could be the ability to learn and remember. Or the ability to adapt to a wide range of different and complex situations. Or the ability to handle abstract general representations of data.
 
@@ -1653,11 +1332,9 @@ For a while it was thought that perhaps life might be defined by its ability for
 
 A two-dimensional cellular automaton that exhibits an almost trivial form of self-reproduction, in which multiple copies of any initial pattern appear every time the number of steps of evolution doubles. The rule used is additive, and takes a cell to be black whenever an odd number of its neighbors were black on the step before (outer totalistic code 204). The same basic self-reproduction phenomenon occurs in elementary rule 90, as well as in essentially any other additive rule, in any number of dimensions.
 
-If one looks at typical living systems one of their most obvious features is great apparent complexity. And for a long time it has been thought that such complexity must somehow be unique to living systems—perhaps requiring billions of years of biological evolution to develop. But what I have shown in this book is that this is not the case, and that in fact a vast range of systems—including ones with very
+If one looks at typical living systems one of their most obvious features is great apparent complexity. And for a long time it has been thought that such complexity must somehow be unique to living systems—perhaps requiring billions of years of biological evolution to develop. But what I have shown in this book is that this is not the case, and that in fact a vast range of systems—including ones with very simple underlying rules—can generate at least as much complexity as we see in the components of typical living systems.
 
-simple underlying rules—can generate at least as much complexity as we see in the components of typical living systems.
-
-Yet despite all this, we do not in our everyday experience typically have much difficulty telling living systems from non-living ones. But the reason for this is that all living systems on Earth share an immense number of detailed structural and chemical features reflecting their long common history of biological evolution.
+Yet despite all this, we do not in our everyday experience typically have much difficulty telling living systems from non-living ones. But the reason for this is that all living systems on Earth share an immense number of detailed structural and chemical features—reflecting their long common history of biological evolution.
 
 So what about extraterrestrial life? To be able to recognize this we would need some kind of general definition of life, independent of the details of life on Earth. But just as in the case of intelligence, I believe that no reasonable definition of this kind can actually be given.
 
@@ -1687,9 +1364,9 @@ Everyday experience shows us that it can often be very hard to tell. For even if
 
 We might start by trying to use our powers of perception and analysis to find regularities in the data. And if we found too many regularities we might conclude that the data could not represent enough information to communicate anything significant—and indeed perhaps this is the case for at least some highly repetitive bird songs.
 
-But what if we could find no particular regularities? Our everyday experience with human language might make us think that the data could then have no meaning. But there is nothing to say that it might not be a perfectly meaningful message—even one in human language that just happens to have been encrypted or compressed to a point where it shows no detectable regularities.
+But what if we could find no particular regularities? Our everyday experience with human language might make us think that the data could then have no meaning. But there is nothing to say that it might not be a perfectly meaningful message—even one in human language—that just happens to have been encrypted or compressed to a point where it shows no detectable regularities.
 
-And indeed it is sobering to notice that if one just listens even to bird songs and whale songs there is little that fundamentally seems to distinguish them from what can be generated by all sorts of processes in nature—say the motion of chimes blowing in the wind or of plasma in the Earth's magnetosphere.
+And indeed it is sobering to notice that if one just listens even to bird songs and whale songs there is little that fundamentally seems to distinguish them from what can be generated by all sorts of processes in nature—say the motion of chimes blowing in the wind or of plasma in the Earth’s magnetosphere.
 
 One might imagine that one could find out whether a meaningful message had been communicated in a particular case by looking for correlations it induces between the actions of sender and receiver. But it is extremely common in all sorts of natural systems to see effects that propagate from one element to another. And when it comes even to whale songs it turns out that no clear correlations have ever in the end been identified between senders and receivers.
 
@@ -1771,23 +1448,23 @@ But we can still often manage to guess. And given a particular supposed purpose 
 
 And so, for example, in looking at the pictures on the right it would normally seem much more plausible that rule 254 might have been set up for the purpose of generating a uniformly expanding pattern than that rule 30 might have been. For while rule 30 does generate such a pattern, it also does a lot else that appears irrelevant to this purpose.
 
+![](_page_846_Picture_11.jpeg)
+
+![](_page_846_Picture_13.jpeg)
+
+If the purpose is to generate a uniformly expanding pattern it seems more plausible that the top cellular automaton should have been the one created for this purpose.
+
 So what this might suggest is that perhaps one could tell that a system was set up for a given purpose if the system turns out to be in a sense the minimal one that achieves that purpose.
 
 But an immediate issue is that in traditional engineering we normally do not come even close to getting systems that are minimal. Yet it seems reasonable to suppose that as technology becomes more advanced it should become more common that the systems it sets up for a given purpose are ones that are minimal.
 
 So as an example of all this consider cellular automata that achieve the purpose of doubling the width of the pattern given in their input. Case (a) in the picture on the next page is a cellular automaton one might construct for this purpose by using ideas from traditional engineering.
 
-But while this cellular automaton seems to have little extraneous going on, it operates in a slow and sequential way, and its underlying
-
-![](_page_846_Picture_11.jpeg)
-
-If the purpose is to generate a uniformly expanding pattern it seems more plausible that the top cellular automaton should have been the one created for this purpose.
+But while this cellular automaton seems to have little extraneous going on, it operates in a slow and sequential way, and its underlying rules turn out to be far from minimal. For case (b) gets its results much more quickly—in effect by operating in parallel—and its rules involve four possible colors rather than six.
 
 ![](_page_847_Figure_1.jpeg)
 
 Examples of cellular automata that can be viewed as achieving the purpose of doubling the width of the pattern given in their input. Rule (a) involves 6 colors, and works sequentially, much as a typical traditional engineering system might. Rule (b) involves 4 colors, and works in parallel. Rule (c) was found by a large search, and involves only 3 colors. It takes the fewest steps of any 3-color rule to generate its result. Its rule number is 5407067979.
-
-rules turn out to be far from minimal. For case (b) gets its results much more quickly—in effect by operating in parallel—and its rules involve four possible colors rather than six.
 
 But is case (b) really the minimal cellular automaton that achieves the purpose of doubling its input? Just thinking about it, one might not be able to come up with anything better. But if one in effect explicitly searches all 8 trillion or so rules that involve less than four colors, it turns out that one can find 4277 three-color rules that work.
 
@@ -1797,13 +1474,11 @@ Each uses at least a slightly different scheme, but all achieve the same purpose
 
 But the point is that with sufficiently advanced technology one might expect that doubling of input would be implemented using a rule that is in some sense optimal. Different criteria for optimality could lead to different rules, but usually they will be rules like those on the facing page—and sometimes rules with quite complex behavior.
 
-But now the question is if one were just to encounter such a rule, would one be able to guess that it was created for a purpose? After all,
+But now the question is if one were just to encounter such a rule, would one be able to guess that it was created for a purpose? After all, there are all sorts of features in the behavior of these rules that could in principle represent a possible purpose. But what is special about rules like those on the previous page is that they are the minimal ones that exhibit the particular feature of doubling their input.
 
 ![](_page_848_Figure_2.jpeg)
 
-Examples of rules with three colors that achieve the purpose of doubling the width of the pattern given in their input. These examples are taken from the 4277 found in effect by searching exhaustively all 7,625,597,484,987 possible rules with three colors. In most cases the number of steps to generate the final pattern increases roughly linearly with the width of the input—although in the case of the fourth-to-last rule on the second row it is  $2(n^2 - n + 1)$  for width n.
-
-there are all sorts of features in the behavior of these rules that could in principle represent a possible purpose. But what is special about rules like those on the previous page is that they are the minimal ones that exhibit the particular feature of doubling their input.
+Examples of rules with three colors that achieve the purpose of doubling the width of the pattern given in their input. These examples are taken from the 4277 found in effect by searching exhaustively all 7,625,597,484,987 possible rules with three colors. In most cases the number of steps to generate the final pattern increases roughly linearly with the width of the input—although in the case of the fourth-to-last rule on the second row it is $2(n^2 - n + 1)$ for width $n$.
 
 And in general if one sees some feature in the behavior of a system then finding out that the rule for the system is the minimal or optimal one for producing that feature may make it seem more likely that at least with sufficiently advanced technology the system might have specifically been created for the purpose of exhibiting that feature.
 
@@ -1831,7 +1506,7 @@ So if we do not recognize any objects that seem to be artifacts, what about sign
 
 If we looked at the Earth from far away the most obvious signs of human intelligence would probably be found in radio signals.
 
-And in fact in the past it was often assumed that just to generate radio signals at all must require intelligence and technology. So when complex radio signals not of human origin were discovered in the early 1900s it was at first thought that they must be coming from extraterrestrial intelligence. But it was eventually realized that in fact the signals were just produced by effects in the Earth's magnetosphere.
+And in fact in the past it was often assumed that just to generate radio signals at all must require intelligence and technology. So when complex radio signals not of human origin were discovered in the early 1900s it was at first thought that they must be coming from extraterrestrial intelligence. But it was eventually realized that in fact the signals were just produced by effects in the Earth’s magnetosphere.
 
 And then again in the 1960s when the intense and highly regular signals of pulsars were discovered it was briefly thought that they too must come from extraterrestrial intelligence. But it was soon realized that these signals could actually be produced just by ordinary physical processes in the magnetospheres of rapidly rotating neutron stars.
 
@@ -1851,7 +1526,7 @@ So perhaps the problem is just that the methods of perception and analysis that 
 
 For as we saw in Chapter 10 most of the methods of perception and analysis that we currently use can in general do little more than recognize repetition—and sometimes nesting. Yet in the course of this book we have seen a great many examples where data that appears to us quite random can in fact be produced by very simple underlying rules.
 
-And although I somewhat doubt it, one could certainly imagine that if one were to show data like the center column of rule 30 or the digit sequence of  $\pi$  to an extraterrestrial then they would immediately be able to deduce simple rules that can produce these.
+And although I somewhat doubt it, one could certainly imagine that if one were to show data like the center column of rule 30 or the digit sequence of $\pi$ to an extraterrestrial then they would immediately be able to deduce simple rules that can produce these.
 
 But even if at some point we were to find that some of the seemingly random radio noise that we detect can be generated by simple rules, what would this mean about extraterrestrial intelligence?
 
@@ -1865,7 +1540,7 @@ In the past, one might have thought that it would be enough for the production o
 
 And indeed it seems likely that for example an ordinary physical process like fluid turbulence in the gas around a star should rather quickly do more computation than has by most measures ever been done throughout the whole course of human intellectual history.
 
-In discussions of extraterrestrial intelligence it is often claimed that mathematical constructs—such as the sequence of primes somehow serve as universal signs of intelligence.
+In discussions of extraterrestrial intelligence it is often claimed that mathematical constructs—such as the sequence of primes—somehow serve as universal signs of intelligence.
 
 But from the results in this book it is clear that this is not correct.
 
@@ -1891,9 +1566,7 @@ So even if we cannot find an abstract way to give evidence of purpose or intelli
 
 As I discussed earlier, the more direct the representation the more easily an ordinary physical process can be expected to generate it, and the less there will be any indication of intelligence—just as, for example, something like a photograph can be produced essentially just by projecting light, while a diagram or a painting requires more.
 
-But as soon as there is interpretation of data, it can become very difficult to recognize the results. For different forms of perception and
-
-different experiences and contexts can cause vastly different features to be emphasized. And thus, for example, the fact that we can readily recognize pictures of animals in cave paintings made by Stone Age humans depends greatly on the fact that our visual system still picks out the same specific features.
+But as soon as there is interpretation of data, it can become very difficult to recognize the results. For different forms of perception and different experiences and contexts can cause vastly different features to be emphasized. And thus, for example, the fact that we can readily recognize pictures of animals in cave paintings made by Stone Age humans depends greatly on the fact that our visual system still picks out the same specific features.
 
 But what about more abstract art?
 
@@ -1911,7 +1584,7 @@ There is clearly more to the phenomenon of intelligence than this. But if we req
 
 But I suspect that if we generalize even quite modestly our definition of intelligence then there will be examples that can be found—at least with sufficiently powerful methods of perception and analysis. Yet it seems likely that they will behave in some ways that are as bizarrely different from human intelligence as many of the simple programs in this book are different from the systems that have traditionally been studied in human mathematics and science.
 
-#### Implications for Technology
+### Implications for Technology
 
 My main purpose in this book has been to build a new kind of basic science. But I expect that in time what I have done will also have many implications for technology. No doubt there will be all sorts of specific applications of particular results and ideas. But in the long run probably the most important consequence will be to introduce a vast new range of systems and processes that can be used for technology.
 
@@ -1935,13 +1608,11 @@ So what about computers? Although the components used have shifted from vacuum t
 
 But what the Principle of Computational Equivalence implies is that there are actually a vast range of very different kinds of rules that all lead to exactly the same computational capabilities—and so can all in principle be used as a basis for making computers.
 
-Traditional intuition suggests that to be able to do sophisticated computations one would inevitably need a system with complicated underlying rules. But what I have shown in this book is that this is not the case, and that in fact even systems with extremely simple rules like the rule 110 cellular automaton—can often be universal, and thus be capable of doing computations as sophisticated as any other system.
+Traditional intuition suggests that to be able to do sophisticated computations one would inevitably need a system with complicated underlying rules. But what I have shown in this book is that this is not the case, and that in fact even systems with extremely simple rules—like the rule 110 cellular automaton—can often be universal, and thus be capable of doing computations as sophisticated as any other system.
 
 And the fact that the underlying rules can be so simple vastly expands the kinds of components that can realistically be used to implement them. For while it is quite implausible that some simple chemical process could successfully assemble a traditional computer out of atoms, it seems quite plausible that this could be done for something like a rule 110 cellular automaton.
 
-Indeed, it seems likely that a system could be set up in which just one or a few atoms would correspond to a cell in a system like a cellular automaton. And one thing this would mean is that doing
-
-computations would then translate almost directly into building actual physical structures out of atoms.
+Indeed, it seems likely that a system could be set up in which just one or a few atoms would correspond to a cell in a system like a cellular automaton. And one thing this would mean is that doing computations would then translate almost directly into building actual physical structures out of atoms.
 
 In the past biology—with all its details of DNA, proteins, ribosomes and so on—has provided our only example of programmable construction on an atomic scale. But the discoveries in this book suggest that there are vastly simpler systems that could also be used.
 
@@ -1973,7 +1644,7 @@ But inevitably we tend to notice only those features that somehow fit into the w
 
 So in the decades to come, when the science in this book has been absorbed, it is my expectation that it will not only suggest many new ways to achieve existing technological purposes but will also suggest many new purposes that technology can address.
 
-#### **Historical Perspectives**
+### Historical Perspectives
 
 It would be most satisfying if science were to prove that we as humans are in some fundamental way special, and above everything else in the universe. But if one looks at the history of science many of its greatest advances have come precisely from identifying ways in which we are not special—for this is what allows science to make ever more general statements about the universe and the things in it.
 
@@ -1997,7 +1668,7 @@ It is perhaps a little humbling to discover that we as humans are in effect comp
 
 So while science has often made it seem that we as humans are somehow insignificant compared to the universe, the Principle of Computational Equivalence now shows that in a certain sense we are at the same level as it is. For the principle implies that what goes on inside us can ultimately achieve just the same level of computational sophistication as our whole universe.
 
-But while science has in the past shown that in many ways there is nothing special about us as humans, the very success of science has tended to give us the idea that with our intelligence we are in some way above the universe. Yet now the Principle of Computational Equivalence implies that the computational sophistication of our intelligence should in a sense be shared by many parts of our universe an idea that perhaps seems more familiar from religion than science.
+But while science has in the past shown that in many ways there is nothing special about us as humans, the very success of science has tended to give us the idea that with our intelligence we are in some way above the universe. Yet now the Principle of Computational Equivalence implies that the computational sophistication of our intelligence should in a sense be shared by many parts of our universe—an idea that perhaps seems more familiar from religion than science.
 
 Particularly with all the successes of science, there has been a great desire to capture the essence of the human condition in abstract scientific terms. And this has become all the more relevant as its replication with technology begins to seem realistic. But what the Principle of Computational Equivalence suggests is that abstract descriptions will never ultimately distinguish us from all sorts of other systems in nature and elsewhere. And what this means is that in a sense there can be no abstract basic science of the human condition—only something that involves all sorts of specific details of humans and their history.
 
