@@ -1,8 +1,8 @@
 ![](_page_448_Picture_0.jpeg)
 
-#### Fundamental Physics
+## Fundamental Physics
 
-#### The Problems of Physics
+### The Problems of Physics
 
 In the previous chapter, we saw that many important aspects of a wide variety of everyday systems can be understood by thinking in terms of simple programs. But what about fundamental physics? Can ideas derived from studying simple programs also be applied there?
 
@@ -28,7 +28,7 @@ To suppose that our universe is in essence just a simple program is certainly a 
 
 There is still some distance to go. But from what I have found so far I am extremely optimistic that by using the ideas of this book the most fundamental problem of physics—and one of the ultimate problems of all of science—may finally be within sight of being solved.
 
-#### The Notion of Reversibility
+### The Notion of Reversibility
 
 At any particular step in the evolution of a system like a cellular automaton the underlying rule for the system tells one how to proceed to the next step. But what if one wants to go backwards? Can one deduce from the arrangement of black and white cells at a particular step what the arrangement of cells must have been on previous steps?
 
@@ -66,7 +66,7 @@ But in trying to understand the range of behavior that can occur in reversible s
 
 ![](_page_452_Picture_5.jpeg)
 
-An example of a cellular automaton that is explicitly set up to be reversible. The rule for the system remains unchanged if all its elements are turned upside-downeffectively interchanging the roles of past and future. Patterns produced by the rule must exhibit the same time reversal symmetry, as shown on the left. The specific rule used here is based on taking elementary rule 214, then adding the specification that the new color of a cell should be inverted whenever the cell was black two steps back. Note that by allowing a total of four rather than two colors, a version of the rule that depends only on the immediately preceding step can be constructed.
+An example of a cellular automaton that is explicitly set up to be reversible. The rule for the system remains unchanged if all its elements are turned upside-down—effectively interchanging the roles of past and future. Patterns produced by the rule must exhibit the same time reversal symmetry, as shown on the left. The specific rule used here is based on taking elementary rule 214, then adding the specification that the new color of a cell should be inverted whenever the cell was black two steps back. Note that by allowing a total of four rather than two colors, a version of the rule that depends only on the immediately preceding step can be constructed.
 
 Such rules can be constructed by taking ordinary cellular automata and adding dependence on colors two steps back.
 
@@ -81,6 +81,8 @@ Examples of reversible cellular automata starting from random and from simple in
 ![](_page_454_Picture_2.jpeg)
 
 ![](_page_454_Picture_4.jpeg)
+
+rule 154R
 
 ![](_page_454_Picture_6.jpeg)
 
@@ -102,7 +104,7 @@ The picture on the facing page demonstrates that these can also occur in reversi
 
 So in the end it seems that even though only a very small fraction of possible systems have the property of being reversible, such systems can still exhibit behavior just as complex as one sees anywhere else.
 
-#### Irreversibility and the Second Law of Thermodynamics
+### Irreversibility and the Second Law of Thermodynamics
 
 All the evidence we have from particle physics and elsewhere suggests that at a fundamental level the laws of physics are precisely reversible. Yet our everyday experience is full of examples of seemingly irreversible phenomena. Most often, what happens is that a system which starts in a fairly regular or organized state becomes progressively more and more random and disorganized. And it turns out that this phenomenon can already be seen in many simple programs.
 
@@ -118,13 +120,11 @@ Typical intuition from traditional science makes it difficult to understand how 
 
 But what about reversibility? The underlying rules for the cellular automaton used in the picture above are precisely reversible. Yet the picture itself does not at first appear to be at all reversible. For there appears to be an irreversible increase in randomness as one goes down successive panels on the page.
 
-The resolution of this apparent conflict is however fairly straightforward. For as the picture on the facing page demonstrates, if the
+The resolution of this apparent conflict is however fairly straightforward. For as the picture on the facing page demonstrates, if the simple arrangement of particles occurs in the middle of the evolution, then one can readily see that randomness increases in exactly the same way—whether one goes forwards or backwards from that point.
 
 ![](_page_458_Picture_1.jpeg)
 
 An extended version of the picture on the facing page, in which the reversibility of the underlying cellular automaton is more clearly manifest. An initial condition is carefully constructed so that halfway through the evolution shown a simple arrangement of particles will be produced. If one starts with this arrangement, then the randomness of the system will effectively increase whether one goes forwards or backwards in time from that point.
-
-simple arrangement of particles occurs in the middle of the evolution, then one can readily see that randomness increases in exactly the same way—whether one goes forwards or backwards from that point.
 
 Yet there is still something of a mystery. For our everyday experience is full of examples in which randomness increases much as in the second half of the picture above. But we essentially never see the kind of systematic decrease in randomness that occurs in the first half.
 
@@ -158,7 +158,7 @@ And in the second case, for example, the presence of a small fixed obstacle lead
 
 ![](_page_461_Figure_2.jpeg)
 
-The behavior of a simple two-dimensional cellular automaton that emulates an ideal gas of particles. In the top group of pictures, the particles bounce around in an empty square box. In the bottom group of pictures, the box contains a small fixed obstacle. In the top group of pictures, the arrangement of particles shows simple repetitive behavior. In the bottom group, however, it becomes progressively more random with time. The underlying rules for the cellular automaton used here are reversible, and conserve the total number of particles. The specific rules are based on  $2 \times 2$  blocks—a two-dimensional generalization of the block cellular automata to be discussed in the next section. For each  $2 \times 2$  block the configuration of particles is taken to remain the same at a particular step unless there are exactly two particles arranged diagonally within the block, in which case the particles move to the opposite diagonal.
+The behavior of a simple two-dimensional cellular automaton that emulates an ideal gas of particles. In the top group of pictures, the particles bounce around in an empty square box. In the bottom group of pictures, the box contains a small fixed obstacle. In the top group of pictures, the arrangement of particles shows simple repetitive behavior. In the bottom group, however, it becomes progressively more random with time. The underlying rules for the cellular automaton used here are reversible, and conserve the total number of particles. The specific rules are based on $2 \times 2$ blocks—a two-dimensional generalization of the block cellular automata to be discussed in the next section. For each $2 \times 2$ block the configuration of particles is taken to remain the same at a particular step unless there are exactly two particles arranged diagonally within the block, in which case the particles move to the opposite diagonal.
 
 So even though the total of the energy of all particles remains the same, the distribution of this energy becomes progressively more random, just as the usual Second Law implies.
 
@@ -194,7 +194,7 @@ The pictures below show the behavior of the entropy calculated in this way for s
 
 ![](_page_464_Figure_3.jpeg)
 
-The entropy as a function of time for systems of the type shown in case (b) from page 447. The top plot is exactly for case (b); the bottom one is for a system three times larger in size. The entropy is found in each case by working out how many possible configurations of particles are consistent with measurements of the total numbers of particles in a  $6 \times 6$  grid of regions within the system. Just as the Second Law of Thermodynamics suggests, the entropy tends to increase with time. Note that the plots above would be exactly symmetrical if they were continued to the left: the entropy would increase in the same way going both forwards and backwards from the simple initial conditions used.
+The entropy as a function of time for systems of the type shown in case (b) from page 447. The top plot is exactly for case (b); the bottom one is for a system three times larger in size. The entropy is found in each case by working out how many possible configurations of particles are consistent with measurements of the total numbers of particles in a $6 \times 6$ grid of regions within the system. Just as the Second Law of Thermodynamics suggests, the entropy tends to increase with time. Note that the plots above would be exactly symmetrical if they were continued to the left: the entropy would increase in the same way going both forwards and backwards from the simple initial conditions used.
 
 In effect what is going on is that the measurements we make represent an attempt to determine the state of the system. But as the arrangement of particles in the system becomes more random, this attempt becomes less and less successful.
 
@@ -214,13 +214,11 @@ So this means that if a system generates sufficient randomness, one can think of
 
 This fact turns out in a sense to be implicit in many everyday applications of physics. For it is what allows us to characterize all sorts of physical systems by just specifying a few parameters such as temperature and chemical composition—and avoids us always having to know the details of the initial conditions and history of each system.
 
-The existence of a unique equilibrium to which any particular system tends to evolve is also a common statement of the Second Law of
+The existence of a unique equilibrium to which any particular system tends to evolve is also a common statement of the Second Law of Thermodynamics. And once again, therefore, we find that the Second Law is associated with basic phenomena that we already saw early in this book.
 
 ![](_page_466_Picture_1.jpeg)
 
 The approach to equilibrium in a reversible cellular automaton with a variety of different initial conditions. Apart from exceptional cases where no randomization occurs, the behavior obtained with different initial conditions is eventually quite indistinguishable in its overall properties. Because the underlying rule is reversible, however, the details with different initial conditions are always at least slightly different—otherwise it would not be possible to go backwards in a unique way. The rule used here is 122R. Successive pairs of pictures have initial conditions that differ only in the color of a single cell at the center.
-
-Thermodynamics. And once again, therefore, we find that the Second Law is associated with basic phenomena that we already saw early in this book.
 
 But just how general is the Second Law? And does it really apply to all of the various kinds of systems that we see in nature?
 
@@ -278,13 +276,13 @@ It is an inevitable feature of having a closed system of limited size that in th
 
 In general, however, the maximum possible period for a system containing a certain number of cells can be achieved only if the evolution of the system from any initial condition eventually visits all the possible states of the system, as discussed on page 258. And if this in fact happens, then at least eventually the system will inevitably spend most of its time in states that seem quite random.
 
-But in rule 37R there is no such ergodicity. And instead, starting from any particular initial condition, the system will only ever visit a tiny fraction of all possible states. Yet since the total number of states is astronomically large—about  $10^{60}$  for size 100—the number of states visited by rule 37R, and therefore the repetition period, can still be extremely long.
+But in rule 37R there is no such ergodicity. And instead, starting from any particular initial condition, the system will only ever visit a tiny fraction of all possible states. Yet since the total number of states is astronomically large—about $10^{60}$ for size 100—the number of states visited by rule 37R, and therefore the repetition period, can still be extremely long.
 
 There are various subtleties involved in making a formal study of the limiting behavior of rule 37R after a very long time. But irrespective of these subtleties, the basic fact remains that so far as I can tell, rule 37R simply does not follow the predictions of the Second Law.
 
 And indeed I strongly suspect that there are many systems in nature which behave in more or less the same way. The Second Law is an important and quite general principle—but it is not universally valid. And by thinking in terms of simple programs we have thus been able in this section not only to understand why the Second Law is often true, but also to see some of its limitations.
 
-#### **Conserved Quantities and Continuum Phenomena**
+### Conserved Quantities and Continuum Phenomena
 
 Reversibility is one general feature that appears to exist in the basic laws of physics. Another is conservation of various quantities—so that for example in the evolution of any closed physical system, total values of quantities like energy and electric charge appear always to stay the same.
 
@@ -354,7 +352,7 @@ And much as in physical systems like fluids, what ultimately leads to this is th
 
 One might have thought that continuum behavior would somehow rely on special features of actual systems in physics. But in fact what we have seen here is that once again the fundamental mechanisms responsible already occur in a much more minimal way in programs that have some remarkably simple underlying rules.
 
-#### Ultimate Models for the Universe
+### Ultimate Models for the Universe
 
 The history of physics has seen the development of a sequence of progressively more accurate models for the universe—from classical mechanics, through quantum mechanics, to quantum field theory, and beyond. And one may wonder whether this process will go on forever, or whether at some point it will come to an end, and one will reach a final ultimate model for the universe.
 
@@ -368,13 +366,11 @@ The discovery of such a program would certainly be an exciting event—as well a
 
 For among other things, with such a program one would finally have a model of nature that was not in any sense an approximation or idealization. Instead, it would be a complete and precise representation of the actual operation of the universe—but all reduced to readily stated rules.
 
-In a sense, the existence of such a program would be the ultimate validation of the idea that human thought can comprehend the construction of the universe. But just knowing the underlying program does not mean that one can immediately deduce every aspect of how the universe will behave. For as we have seen many times in this book, there is often a great distance between underlying rules and overall
-
-behavior. And in fact, this is precisely why it is conceivable that a simple program could reproduce all the complexity we see in physics.
+In a sense, the existence of such a program would be the ultimate validation of the idea that human thought can comprehend the construction of the universe. But just knowing the underlying program does not mean that one can immediately deduce every aspect of how the universe will behave. For as we have seen many times in this book, there is often a great distance between underlying rules and overall behavior. And in fact, this is precisely why it is conceivable that a simple program could reproduce all the complexity we see in physics.
 
 Given a particular underlying program, it is always in principle possible to work out what it will do just by running it. But for the whole universe, doing this kind of explicit simulation is almost by definition out of the question. So how then can one even expect to tell whether a particular program is a correct model for the universe? Small-scale simulation will certainly be possible. And I expect that by combining this with a certain amount of perhaps fairly sophisticated mathematical and logical deduction, it will be possible to get at least as far as reproducing the known laws of physics—and thus of determining whether a particular model has the potential to be correct.
 
-So if there is indeed a definite ultimate model for the universe, how might one set about finding it? For those familiar with existing science, there is at first a tremendous tendency to try to work backwards from the known laws of physics, and in essence to try to "engineer" a universe that will have particular features that we observe.
+So if there is indeed a definite ultimate model for the universe, how might one set about finding it? For those familiar with existing science, there is at first a tremendous tendency to try to work backwards from the known laws of physics, and in essence to try to “engineer” a universe that will have particular features that we observe.
 
 But if there is in fact an ultimate model that is quite simple, then from what we have seen in this book, I strongly believe that such an approach will never realistically be successful. For human thinking—even supplemented by the most sophisticated ideas of current mathematics and logic—is far from being able to do what is needed.
 
@@ -382,13 +378,11 @@ Imagine for example trying to work backwards from a knowledge of the overall fea
 
 It is already difficult enough to work out from an underlying rule what behavior it will produce. But to invert this in any systematic way is probably even in principle beyond what any realistic computation can do.
 
-So how then could one ever expect to find the underlying rule in such a case? Almost always, it seems that the best strategy is a simple one: to come up with an appropriate general class of rules, and then just
+So how then could one ever expect to find the underlying rule in such a case? Almost always, it seems that the best strategy is a simple one: to come up with an appropriate general class of rules, and then just to search through these rules, trying each one in turn, and looking to see if it produces the behavior one wants.
 
 ![](_page_482_Figure_1.jpeg)
 
-A typical example of a situation where it would be very difficult to deduce the underlying rule from a description of the overall behavior that it produces. There is in a sense too great a distance between the simple rule shown and the behavior that emerges from it. I suspect that the same will be true of the basic rule for the universe. The particular rule shown here is the elementary cellular automaton with rule number 94, and with initial condition
-
-to search through these rules, trying each one in turn, and looking to see if it produces the behavior one wants.
+A typical example of a situation where it would be very difficult to deduce the underlying rule from a description of the overall behavior that it produces. There is in a sense too great a distance between the simple rule shown and the behavior that emerges from it. I suspect that the same will be true of the basic rule for the universe. The particular rule shown here is the elementary cellular automaton with rule number 94, and with initial condition $\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\Box\Box\Box\Box\Box\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare\blacksquare$.
 
 But what about the rules for the universe? Surely we cannot simply search through possible rules of certain kinds, looking for one whose behavior happens to fit what we see in physics?
 
@@ -396,9 +390,7 @@ With the intuition of traditional science, such an approach seems absurd. But th
 
 To start performing such a search, however, one first needs to work out what kinds of rules to consider. And my suspicion is that none of the specific types of rules that we have discussed so far in this book will turn out to be adequate. For I believe that all these types of rules in some sense probably already have too much structure built in.
 
-Thus, for example, cellular automata probably already have too rigid a built-in notion of space. For a defining feature of cellular automata is that their cells are always arranged in a rigid array in space. Yet I strongly suspect that in the underlying rule for our universe there will be no such built-in structure. Rather, as I discuss in the sections
-
-that follow, my guess is that at the lowest level there will just be certain patterns of connectivity that tend to exist, and that space as we know it will then emerge from these patterns as a kind of large-scale limit.
+Thus, for example, cellular automata probably already have too rigid a built-in notion of space. For a defining feature of cellular automata is that their cells are always arranged in a rigid array in space. Yet I strongly suspect that in the underlying rule for our universe there will be no such built-in structure. Rather, as I discuss in the sections that follow, my guess is that at the lowest level there will just be certain patterns of connectivity that tend to exist, and that space as we know it will then emerge from these patterns as a kind of large-scale limit.
 
 And indeed in general what I expect is that remarkably few familiar features of our universe will actually be reflected in any direct way in its ultimate underlying rule. For if all these features were somehow explicitly and separately included, the rule would necessarily have to be very complicated to fit them all in.
 
@@ -452,7 +444,7 @@ There will certainly be questions about why it is this particular rule, and not 
 
 But to find the ultimate rule will be a major triumph for science, and a clear demonstration that at least in some direction, human thought has reached the edge of what is possible.
 
-#### The Nature of Space
+### The Nature of Space
 
 In the effort to develop an ultimate model for the universe, a crucial first step is to think about the nature of space—for inevitably it is in space that the processes in our universe occur.
 
@@ -460,7 +452,7 @@ Present-day physics almost always assumes that space is a perfect continuum, in 
 
 In our everyday experience space nevertheless appears to be continuous. But then so, for example, do fluids like air and water. And yet in the case of these fluids we know that at an underlying level they are composed of discrete molecules. And in fact over the course of the past century a great many aspects of the physical world that at first seemed continuous have in the end been discovered to be built up from discrete elements. And I very strongly suspect that this will also be true of space.
 
-Particle physics experiments have shown that space acts as a continuum down to distances of around  $10^{-20}$  meters—or a hundred thousandth the radius of a proton. But there is absolutely no reason to think that discrete elements will not be found at still smaller distances.
+Particle physics experiments have shown that space acts as a continuum down to distances of around $10^{-20}$ meters—or a hundred thousandth the radius of a proton. But there is absolutely no reason to think that discrete elements will not be found at still smaller distances.
 
 And indeed, in the past one of the main reasons that space has been assumed to be a perfect continuum is that this makes it easier to handle in the context of traditional mathematics. But when one thinks in terms of programs and the kinds of systems I have discussed in this book, it no longer seems nearly as attractive to assume that space is a perfect continuum.
 
@@ -492,7 +484,7 @@ Several times in the past ideas like this have been explored. And indeed the sta
 
 Yet my suspicion is that a large part of the reason for this is just the assumption that space is a perfect continuum—described by traditional mathematics. For as we have seen many times in this book, if one looks at systems like programs with discrete elements then it immediately becomes much easier for highly complex behavior to emerge. And this is fundamentally what I believe is happening at the lowest level in space throughout our universe.
 
-#### Space as a Network
+### Space as a Network
 
 In the last section I argued that if the ultimate model of physics is to be as simple as possible, then one should expect that all the features of our universe must at some level emerge purely from properties of space. But what should space be like if this is going to be the case?
 
@@ -506,13 +498,11 @@ I already introduced in Chapter 5 a particular type of network in which each nod
 
 For one thing, there is no need to distinguish between incoming and outgoing connections, or indeed to associate any direction with each connection. And in addition, nothing fundamental is lost by requiring that all the nodes in a network have exactly the same total number of connections to other nodes.
 
-With two connections, only very trivial networks can ever be made. But if one uses three connections, a vast range of networks immediately become possible. One might think that one could get a
+With two connections, only very trivial networks can ever be made. But if one uses three connections, a vast range of networks immediately become possible. One might think that one could get a fundamentally larger range if one allowed, say, four or five connections rather than just three. But in fact one cannot, since any node with more than three connections can in effect always be broken into a collection of nodes with exactly three connections, as in the pictures on the left.
 
 ![](_page_491_Picture_1.jpeg)
 
 Examples of how nodes with more than three connections can be decomposed into collections of nodes with exactly three connections.
-
-fundamentally larger range if one allowed, say, four or five connections rather than just three. But in fact one cannot, since any node with more than three connections can in effect always be broken into a collection of nodes with exactly three connections, as in the pictures on the left.
 
 So what this means is that it is in a sense always sufficient to consider networks with exactly three connections at each node. And it is therefore these networks that I will use here in discussing fundamental models of space.
 
@@ -536,6 +526,8 @@ The pictures below illustrate the main difficulty: given only its pattern of con
 
 ![](_page_492_Picture_7.jpeg)
 
+![](_page_492_Picture_8.jpeg)
+
 ![](_page_492_Picture_9.jpeg)
 
 ![](_page_492_Picture_10.jpeg)
@@ -546,9 +538,7 @@ The pictures below illustrate the main difficulty: given only its pattern of con
 
 Six different ways of laying out the same network. (a) nodes arranged around a circle; (b) nodes arranged along a line; (c) nodes arranged across the page according to distance from a particular node; (d) 2D layout with network and spatial distances as close as possible; (e) planar layout; (f) 3D layout.
 
-So how then can one proceed? The fundamental idea is to look at properties of networks that can both readily be deduced from their pattern of connections and can also be identified, at least in some
-
-large-scale limit, with properties of ordinary space. And the notion of distance is perhaps the most fundamental of such properties.
+So how then can one proceed? The fundamental idea is to look at properties of networks that can both readily be deduced from their pattern of connections and can also be identified, at least in some large-scale limit, with properties of ordinary space. And the notion of distance is perhaps the most fundamental of such properties.
 
 A simple way to define the distance between two points is to say that it is the length of the shortest path between them. And in ordinary space, this is normally calculated by subtracting the numerical coordinates of the positions of the points. But on a network things become more direct, and the distance between two nodes can be taken to be simply the minimum number of connections that one has to follow in order to get from one node to the other.
 
@@ -558,29 +548,25 @@ To a large extent one can. And a test is to see whether there is a way to lay ou
 
 The three networks at the top of the previous page were laid out precisely so as to make this the case respectively for one, two and three-dimensional space. But why for example can the second network not be laid out equally well in one-dimensional rather than two-dimensional space? One way to see this is to count the number of nodes that appear at a given distance from a particular node in the network.
 
-And for this specific network, the answer for this is very simple: at distance r there are exactly 3 r nodes—so that the total number of nodes out to distance r grows like  $r^2$ . But now if one tried to lay out all these nodes in one dimension it is inevitable that the network would have to bulge out in order to fit in all the nodes. And it turns out that it is uniquely in two dimensions that this particular network can be laid out in a regular way so that distances based on following connections in it agree with ordinary distances in space.
+And for this specific network, the answer for this is very simple: at distance $r$ there are exactly $3r$ nodes—so that the total number of nodes out to distance $r$ grows like $r^2$. But now if one tried to lay out all these nodes in one dimension it is inevitable that the network would have to bulge out in order to fit in all the nodes. And it turns out that it is uniquely in two dimensions that this particular network can be laid out in a regular way so that distances based on following connections in it agree with ordinary distances in space.
 
-For the other two networks at the top of the previous page similar arguments can be given. And in fact in general the condition for a network to correspond to ordinary d-dimensional space is precisely that the total number of nodes that appear in it out to distance r grows in some limiting sense like  $r^d$ —a result analogous to the standard
+For the other two networks at the top of the previous page similar arguments can be given. And in fact in general the condition for a network to correspond to ordinary $d$-dimensional space is precisely that the total number of nodes that appear in it out to distance $r$ grows in some limiting sense like $r^d$—a result analogous to the standard mathematical fact that the area of a two-dimensional circle is $\pi r^2$, while the volume of a three-dimensional sphere is $4/3 \pi r^3$, the volume of a four-dimensional hypersphere is $1/2 \pi^2 r^4$, and so on.
 
-mathematical fact that the area of a two-dimensional circle is  $\pi r^2$ , while the volume of a three-dimensional sphere is  $4/3 \pi r^3$ , the volume of a four-dimensional hypersphere is  $1/2 \pi^2 r^4$ , and so on.
-
-Below I show pictures of various networks. In each case the first picture is drawn to emphasize obvious regularities in the network. But the second picture is drawn in a more systematic way—by picking a specific starting node, and then laying out other nodes so that those at
+Below I show pictures of various networks. In each case the first picture is drawn to emphasize obvious regularities in the network. But the second picture is drawn in a more systematic way—by picking a specific starting node, and then laying out other nodes so that those at successively greater network distances appear in successive columns across the page. And this setup has the feature that the height of column $r$ gives the number of nodes that are at network distance $r$.
 
 ![](_page_494_Picture_4.jpeg)
 
-Examples of various networks, shown first to emphasize their regularities, and second to illustrate the number of nodes reached by going successively more steps from a given node. For networks that in a limiting sense correspond to ordinary d-dimensional space, this number grows like  $r^{d-1}$ . All the larger networks shown are approximately uniform, in the sense that similar results are obtained starting from any node. Network (e) effectively has limiting dimension  $Log[2, 3] \approx 1.58$ .
+Examples of various networks, shown first to emphasize their regularities, and second to illustrate the number of nodes reached by going successively more steps from a given node. For networks that in a limiting sense correspond to ordinary $d$-dimensional space, this number grows like $r^{d-1}$. All the larger networks shown are approximately uniform, in the sense that similar results are obtained starting from any node. Network (e) effectively has limiting dimension $Log[2, 3] \simeq 1.58$.
 
-successively greater network distances appear in successive columns across the page. And this setup has the feature that the height of column r gives the number of nodes that are at network distance r.
+So by looking at how these heights grow across the page, one can see whether there is a correspondence with the $r^{d-1}$ form that one expects for ordinary $d$-dimensional space. And indeed in case (g), for example, one sees exactly $r^1$ linear growth, reflecting dimension 2.
 
-So by looking at how these heights grow across the page, one can see whether there is a correspondence with the  $r^{d-1}$  form that one expects for ordinary d-dimensional space. And indeed in case (g), for example, one sees exactly  $r^1$  linear growth, reflecting dimension 2.
+Similarly, in case (d) one sees $r^0$ growth, reflecting dimension 1, while in case (h) one sees $r^2$ growth, reflecting dimension 3.
 
-Similarly, in case (d) one sees  $r^0$  growth, reflecting dimension 1, while in case (h) one sees  $r^2$  growth, reflecting dimension 3.
-
-Case (f) illustrates slightly more complicated behavior. The basic network in this case locally has an essentially two-dimensional form—but at large scales it is curved by being wrapped around a sphere. And what therefore happens is that for fairly small r one sees  $r^1$  growth—reflecting the local two-dimensional form—but then for larger r there is slower growth, reflecting the presence of curvature.
+Case (f) illustrates slightly more complicated behavior. The basic network in this case locally has an essentially two-dimensional form—but at large scales it is curved by being wrapped around a sphere. And what therefore happens is that for fairly small $r$ one sees $r^1$ growth—reflecting the local two-dimensional form—but then for larger $r$ there is slower growth, reflecting the presence of curvature.
 
 Later in this chapter we will see how such curvature is related to the phenomenon of gravity. But for now the point is just that network (f) again behaves very much like ordinary space with a definite dimension.
 
-So do all sufficiently large networks somehow correspond to ordinary space in a certain number of dimensions? The answer is definitely no. And as an example, network (i) from the previous page has a tree-like structure with  $3^r$  nodes at distance r. But this number grows faster than  $r^d$  for any d—implying that the network has no correspondence to ordinary space in any finite number of dimensions.
+So do all sufficiently large networks somehow correspond to ordinary space in a certain number of dimensions? The answer is definitely no. And as an example, network (i) from the previous page has a tree-like structure with $3^r$ nodes at distance $r$. But this number grows faster than $r^d$ for any $d$—implying that the network has no correspondence to ordinary space in any finite number of dimensions.
 
 If the connections in a network are chosen at random—as in case (j)—then again there will almost never be the kind of locality that is needed to get something that corresponds to ordinary finite-dimensional space.
 
@@ -590,7 +576,7 @@ It will certainly not be as simple and regular as most of the networks on the pr
 
 And so at the level of individual connections, the network will most likely at first look quite random. But on a larger scale, it must be arranged so as to correspond to ordinary three-dimensional space. And somehow whatever rules update the network must preserve this feature.
 
-#### The Relationship of Space and Time
+### The Relationship of Space and Time
 
 To make an ultimate theory of physics one needs to understand the true nature not only of space but also of time. And I believe that here again the idea of thinking in terms of programs provides some crucial insights.
 
@@ -648,7 +634,7 @@ As I will discuss in the next several sections, I suspect that for many purposes
 
 Any such rules can in principle be thought of as providing a set of constraints for the spacetime network. But the important point is that there is no need to do a separate search to find networks that satisfy such constraints—for the rules themselves instead immediately define a procedure for building up the necessary network.
 
-#### Time and Causal Networks
+### Time and Causal Networks
 
 I argued in the last section that the progress of time should be viewed at a fundamental level much like the evolution of a system like a cellular automaton. But one of the features of a cellular automaton is that it is set up to update all of its cells together, as if at each tick of some global clock. Yet just as it seems unreasonable to imagine that the universe consists of a rigid grid of cells in space, so also it seems unreasonable to imagine that there is a global clock which defines the updating of every element in the universe synchronized in time.
 
@@ -666,23 +652,21 @@ And what this means is that between any two successive moments of time as percei
 
 If an observer could tell what was happening on every step, then it would be easy to recognize the sequential way in which cells are updated. But because an observer who is part of a mobile automaton can in effect only occasionally tell what has happened, then as far as such an observer is concerned, many cells can appear to have been updated in parallel between successive moments of time.
 
-To see in more detail how this works it could be that it would be necessary to make a specific model for the observer. But in fact, it turns out that it is sufficient just to look at the evolution of the mobile
+To see in more detail how this works it could be that it would be necessary to make a specific model for the observer. But in fact, it turns out that it is sufficient just to look at the evolution of the mobile automaton not in terms of individual steps, but rather in terms of updating events and the causal relationships between them.
 
 ![](_page_502_Picture_8.jpeg)
 
 A mobile automaton in which only the single active cell indicated by a dot is updated at each step, thereby avoiding the issue of global synchronization.
 
-automaton not in terms of individual steps, but rather in terms of updating events and the causal relationships between them.
-
 The pictures on the facing page show an example of how this works. Picture (a) is a version of the standard representation that I have used for mobile automaton evolution elsewhere in the book—in which successive lines give the colors of cells on successive steps, and the position of the active cell is indicated at each step by a gray dot. The subsequent pictures on the facing page all ultimately give essentially the same information, but gradually present it to emphasize more a representation in terms of updating events and causal relationships.
 
-Picture (b) is very similar to (a), but shows successive steps of mobile automaton evolution separated, with gray blobs in between indicating "updating events" corresponding to each application of the underlying mobile automaton rule. Picture (b) still has a definite row of cells for each individual step of mobile automaton evolution. But in picture (c) cells not updated on a given step are merged together, yielding vertical stripes of color that extend from one updating event to another.
+Picture (b) is very similar to (a), but shows successive steps of mobile automaton evolution separated, with gray blobs in between indicating “updating events” corresponding to each application of the underlying mobile automaton rule. Picture (b) still has a definite row of cells for each individual step of mobile automaton evolution. But in picture (c) cells not updated on a given step are merged together, yielding vertical stripes of color that extend from one updating event to another.
 
 So what is the significance of these stripes? In essence they serve to carry the information needed to determine what the next updating event will be. And as picture (d) begins to emphasize, one can think of these stripes as indicating what causal relationships or connections exist between updating events.
 
 And this notion then suggests a quite different representation for the whole evolution of the mobile automaton. For rather than having a picture based on successive individual steps of evolution, one can instead form a network of the various causal relationships between updating events, with each updating event being a node in this network, and each stripe being a connection from one node to another.
 
-A sequence of views of the evolution of a mobile automaton, showing how a network of causal relationships between updating events can be created. This network provides a very simple model for spacetime in the universe. Picture (a) is essentially the standard representation of mobile automaton evolution that I have used in this book. Picture (b) includes gray blobs to indicate updating events. Picture (c) merges cells that are not being updated. Picture (d) emphasizes the role of vertical stripes as connections between updating events. Pictures (e) through (g) show how a network can be formed with nodes corresponding to updating events. Pictures (h) and (i) demonstrate that with the particular underlying rule used here, a highly regular network is produced.
+A sequence of views of the evolution of a mobile automaton, showing how a network of causal relationships between updating events can be created. This network provides a very simple model for spacetime in the universe. Picture (a) is essentially the standard representation of mobile automaton evolution that I have used in this book. Picture (b) includes gray blobs to indicate updating events. Picture (c) merges cells that are not being updated. Picture (d) emphasizes the role of vertical stripes as connections between updating events. Pictures (e) through (g) show how a network can be formed with nodes corresponding to updating events. Pictures (h) and (i) demonstrate that with the particular underlying rule used here, a highly regular network is produced. <sup>▶</sup>
 
 ![](_page_504_Picture_1.jpeg)
 
@@ -710,7 +694,7 @@ The pictures on the next two pages show a few examples.
 
 Rules (a) and (b) yield very simple repetitive networks in which there is in effect a notion of time but not of space. The underlying way any mobile automaton works forces time to continue forever. But with rules (a) and (b) only a limited number of points in space can ever be reached.
 
-The other rules shown do not, however, suffer from this problem: in all of them progressively more points are reached in space as time goes on. Rules (c) and (d) yield networks that can be laid out in a quite
+The other rules shown do not, however, suffer from this problem: in all of them progressively more points are reached in space as time goes on. Rules (c) and (d) yield networks that can be laid out in a quite regular manner. But with rules (e), (f) and (g) the networks are more complicated, and begin to seem somewhat random.
 
 ![](_page_507_Figure_1.jpeg)
 
@@ -718,11 +702,9 @@ Examples of mobile automata from Chapter 3 and the causal networks they generate
 
 ![](_page_508_Figure_2.jpeg)
 
-Note that a single connection can join events that occur at very different steps in the evolution of the underlying mobile automaton. And indeed to construct even a small part of the causal network can require an arbitrarily long computation in the underlying mobile automaton. Thus for example to make the causal networks in pictures (e), (f) and (g) requires looking respectively at 2447, 731 and 322 steps of mobile automaton evolution. And indeed in some cases there can be connections that are in effect never resolved. And thus for example in picture (a) there are downward connections that never reach any other node—reflecting the presence of positions on the left in the mobile automata evolution to which the active cell never returns.
-
 ![](_page_508_Figure_4.jpeg)
 
-regular manner. But with rules (e), (f) and (g) the networks are more complicated, and begin to seem somewhat random.
+Note that a single connection can join events that occur at very different steps in the evolution of the underlying mobile automaton. And indeed to construct even a small part of the causal network can require an arbitrarily long computation in the underlying mobile automaton. Thus for example to make the causal networks in pictures (e), (f) and (g) requires looking respectively at 2447, 731 and 322 steps of mobile automaton evolution. And indeed in some cases there can be connections that are in effect never resolved. And thus for example in picture (a) there are downward connections that never reach any other node—reflecting the presence of positions on the left in the mobile automata evolution to which the active cell never returns.
 
 The procedure that is used to lay out the networks on the previous two pages is a direct analog of the procedure used for space networks on page 479: the row in which a particular node will be placed is determined by the minimum number of connections that have to be followed in order to reach that node starting from the node at the top.
 
@@ -732,13 +714,11 @@ Like in so many other systems that we have studied in this book, the randomness 
 
 But despite this uniformity at the level of causal networks, the transformation from mobile automaton evolution to causal network is often far from uniform. And for example the pictures at the top of the facing page show the causal networks for rules (e) and (f) from the previous page—but now with each node numbered to specify the step of mobile automaton evolution from which it was derived.
 
-And what we see is that even nodes that are close to the top of the causal network can correspond to events which occur after a large number of steps of mobile automaton evolution. Indeed, to fill in just twenty rows
+And what we see is that even nodes that are close to the top of the causal network can correspond to events which occur after a large number of steps of mobile automaton evolution. Indeed, to fill in just twenty rows of the causal networks for rules (e) and (f) requires following the underlying mobile automaton evolution for 2447 and 731 steps respectively.
 
 ![](_page_510_Picture_1.jpeg)
 
 Causal networks corresponding to rules (e) and (f) from page 493, with each node explicitly labelled to specify from which step of mobile automaton evolution it is derived. Even to fill in the first few rows of such causal networks, many steps of underlying mobile automaton evolution must be traced.
-
-of the causal networks for rules (e) and (f) requires following the underlying mobile automaton evolution for 2447 and 731 steps respectively.
 
 One feature of causal networks is that they tell one not only what the consequences of a particular event will be, but also in a sense what its causes were. Thus, for example, if one starts, say, with event 17 in the first causal network above, then to find out that its causes were events 11 and 16 one simply has to trace backwards along the connections which lead to it.
 
@@ -758,7 +738,7 @@ As we will see later in this chapter there are in the end some limitations on th
 
 And even though when viewed from outside, systems like mobile automata might seem to have almost none of the familiar features of our universe, what we see is that if we as observers are in a sense part of such systems then immediately some major features quite similar to those of our universe can emerge.
 
-#### The Sequencing of Events in the Universe
+### The Sequencing of Events in the Universe
 
 In the last section I discussed one type of model in which familiar notions of time can emerge without any kind of built-in global clock. The particular models I used were based on mobile automata—in which the presence of a single active cell forces only one event ever to occur in the universe at once. But as we will see in this section, there is actually no need for the setup to be so rigid, or indeed for there to be any kind of construct like an active cell.
 
@@ -788,7 +768,7 @@ So what happens with replacements that involve more than just one element? In ma
 
 Examples of general substitution systems and the causal networks that emerge from them. In the pictures shown here, every replacement that is found to fit in a left-to-right scan is performed at each step. Rules (a) and (b) act like neighbor-independent substitution systems of the type discussed on page 84, and yield exponentially growing tree-like causal networks. The plots at the bottom show the growth rates of the patterns produced by rules (f) and (g). In the case of rule (f) the pattern turns out to be repetitive, with a period of 796 steps.
 
-One may wonder, however, to what extent the behavior one sees depends on the exact scheme that one uses to pick which replacements to apply at each step. The answer is that for the vast majority of rules including rules (c) through (g) in the picture on the facing page—using different schemes yields quite different behavior—and a quite different causal network.
+One may wonder, however, to what extent the behavior one sees depends on the exact scheme that one uses to pick which replacements to apply at each step. The answer is that for the vast majority of rules—including rules (c) through (g) in the picture on the facing page—using different schemes yields quite different behavior—and a quite different causal network.
 
 But remarkably enough there do exist rules for which exactly the same causal network is obtained regardless of what scheme is used. And as it turns out, rules (a) and (b) from the picture on the facing page provide simple examples of this phenomenon, as illustrated in the pictures below.
 
@@ -800,13 +780,11 @@ For each rule, the three different pictures shown above correspond to three diff
 
 This is certainly not true for every substitution system. Indeed, the pictures on the right show how it can fail, for example, for rule (e) from the facing page. What one sees in these pictures is that after event 4, different choices of replacements are made in the two cases, and the causal relationships implied by these replacements are different.
 
-So what could ensure that no such situation would ever arise in a particular substitution system? Essentially what needs to be true is that the sequence of elements alone must always uniquely determine what replacements can be made in every part of the system. One still has a
+So what could ensure that no such situation would ever arise in a particular substitution system? Essentially what needs to be true is that the sequence of elements alone must always uniquely determine what replacements can be made in every part of the system. One still has a choice of whether actually to perform a given replacement at a particular step, or whether to delay that replacement until a subsequent step. But what must be true is that there can never be any ambiguity about what replacement will eventually be made in any given part of the system.
 
 ![](_page_516_Picture_9.jpeg)
 
 Examples of two different ways of performing replacements in rule (e) from the facing page, yielding two different causal networks.
-
-choice of whether actually to perform a given replacement at a particular step, or whether to delay that replacement until a subsequent step. But what must be true is that there can never be any ambiguity about what replacement will eventually be made in any given part of the system.
 
 In rules like the ones at the top of page 500 where each replacement involves just a single element this is inevitably how things must work. But what about rules that have replacements involving blocks of more than one element? Can such rules still have the necessary properties?
 
@@ -824,15 +802,13 @@ The pictures below show two examples of rules that do. In the first picture for 
 
 ![](_page_517_Picture_9.jpeg)
 
-Examples of substitution systems in which the same causal networks are obtained regardless of the way in which replacements are performed. In the first picture for each rule, the replacements are performed essentially at
-
-random. In the second picture they are performed on the earliest possible step. Note that rule (a) effectively sorts the elements in its initial conditions, always placing black before white.
+Examples of substitution systems in which the same causal networks are obtained regardless of the way in which replacements are performed. In the first picture for each rule, the replacements are performed essentially at random. In the second picture they are performed on the earliest possible step. Note that rule (a) effectively sorts the elements in its initial conditions, always placing black before white.
 
 So what underlying property must the rules for a substitution system have in order to make the system as a whole operate in this way? The basic answer is that somehow different replacements must never be able to interfere with each other. And one way to guarantee this is if the blocks involved in replacements can never overlap.
 
-In both the rules shown on the facing page, the only replacement specified is for the block . And it is inevitably the case that in any sequence of r's and r's different blocks of the form do not overlap. If one had replacements for blocks such as , or then these could overlap. But there is an infinite sequence of blocks such as root overlap is possible, and thus for which different replacements can never interfere.
+In both the rules shown on the facing page, the only replacement specified is for the block $\Box\blacksquare$. And it is inevitably the case that in any sequence of $\Box$’s and $\blacksquare$’s different blocks of the form $\Box\blacksquare$ do not overlap. If one had replacements for blocks such as $\blacksquare\blacksquare$, $\Box\Box$ or $\blacksquare\Box\blacksquare$ then these could overlap. But there is an infinite sequence of blocks such as $\blacksquare\Box$, $\blacksquare\Box\Box$ or $\blacksquare\blacksquare\Box\Box$ for which no overlap is possible, and thus for which different replacements can never interfere.
 
-If a rule involves replacements for several distinct blocks, then to avoid the possibility of interference one must require that these blocks can never overlap either themselves or each other. The simplest non-trivial pair of blocks that has this property is , while the simplest triple is , while the simplest triple is , while the simplest triple is guaranteed to yield the same causal network regardless of the order in which replacements are performed.
+If a rule involves replacements for several distinct blocks, then to avoid the possibility of interference one must require that these blocks can never overlap either themselves or each other. The simplest non-trivial pair of blocks that has this property is $\blacksquare\blacksquare\Box\Box$, $\blacksquare\blacksquare\Box\blacksquare\Box$, while the simplest triple is $\blacksquare\blacksquare\blacksquare\Box\Box$, $\blacksquare\Box\blacksquare\Box\Box$, $\blacksquare\Box\blacksquare\blacksquare\Box\Box$. And any substitution system whose rules specify replacements only for blocks such as these is guaranteed to yield the same causal network regardless of the order in which replacements are performed.
 
 In general the condition is in fact somewhat weaker. For it is not necessary that no overlaps exist at all in the replacements—only that no overlaps occur in whatever sequences of elements can actually be generated by the evolution of the substitution systems.
 
@@ -844,7 +820,7 @@ In a system like a cellular automaton, the same underlying rule is in a sense al
 
 So what this means is that there is no need for any built-in global clock, or even for any mechanism like an active cell. Simply by choosing the appropriate underlying rules it is possible to ensure that any sequence of events consistent with these rules will yield the same causal network and thus in effect the same perceived history for the universe.
 
-#### Uniqueness and Branching in Time
+### Uniqueness and Branching in Time
 
 If our universe has no built-in global clock and no construct like an active cell, then it is almost inevitable that at the lowest level there will be at least some arbitrariness in how its rules can be applied.
 
@@ -856,9 +832,9 @@ Both types of systems perform the same type of replacements on strings of elemen
 
 The picture below shows a simple example of how this works. On the first step in this particular picture, there happens to be only one replacement that can be performed consistent with the rules, so only a single string is produced. But on subsequent steps several different replacements are possible, so several strings are produced. And in general every path through a picture like this corresponds to a possible history that exists in the evolution of the multiway system.
 
-A simple example of a multiway system in which replacements are applied in all possible ways to each string at each step.
-
 ![](_page_519_Picture_8.jpeg)
+
+A simple example of a multiway system in which replacements are applied in all possible ways to each string at each step.
 
 So is it conceivable that the ultimate model for our universe could be based on a multiway system? At first one might not think so. For our everyday impression is that our universe has just one definite history, not some kind of whole collection of different histories. And assuming that one is able to look at a multiway system from the outside, one will immediately see that different paths exist corresponding to different histories.
 
@@ -880,13 +856,11 @@ At some level it might seem surprising that a multiway system could ever consist
 
 But if one looks not just at individual strings but rather at the sequences of strings that exist along paths in the multiway system, then one finds that these can no longer be so arbitrary. And indeed, in any multiway system with a limited set of rules, such sequences must necessarily be subject to all sorts of constraints.
 
-In general, each path in a multiway system can be thought of as being defined by a possible sequence of ways in which the replacements specified by a multiway system rule can be applied. And each such path in turn then defines a causal network of the kind we discussed in the previous section. But as we saw there, certain underlying rules have the
+In general, each path in a multiway system can be thought of as being defined by a possible sequence of ways in which the replacements specified by a multiway system rule can be applied. And each such path in turn then defines a causal network of the kind we discussed in the previous section. But as we saw there, certain underlying rules have the property that the form of this causal network ends up being the same regardless of the order in which replacements are applied—and thus regardless of the path that is followed in the multiway system.
 
 ![](_page_521_Figure_7.jpeg)
 
 A multiway system in which strings of any length can be generated—but in which only specific sequences of lengths actually occur on any path.
-
-property that the form of this causal network ends up being the same regardless of the order in which replacements are applied—and thus regardless of the path that is followed in the multiway system.
 
 The pictures below show some simple examples of rules with this property. And as it turns out, it is fairly easy to recognize the presence of the property from the overall pattern of multiway system paths that occur.
 
@@ -904,15 +878,13 @@ If one starts from a given initial string, then typically one will generate diff
 
 Most multiway systems, however, do not have exactly this property, and as a result the causal networks that are obtained by following different paths in them will not be absolutely identical. But it still turns out that whenever paths can always eventually converge—even if not in a fixed number of steps—there will necessarily be similarities on a sufficiently large scale in the causal networks that are obtained.
 
-At the level of individual events, the structure of the causal networks will typically vary greatly. But if one looks at large enough collections of events, these details will tend to be washed out, and
-
-regardless of the path one chooses, the overall form of causal network will be essentially the same. And what this means is that on a sufficiently large scale, the universe will appear to have a unique history, even though at the level of individual events there will be considerable arbitrariness.
+At the level of individual events, the structure of the causal networks will typically vary greatly. But if one looks at large enough collections of events, these details will tend to be washed out, and regardless of the path one chooses, the overall form of causal network will be essentially the same. And what this means is that on a sufficiently large scale, the universe will appear to have a unique history, even though at the level of individual events there will be considerable arbitrariness.
 
 If there is not enough convergence in the multiway system it will still be possible to get stuck with different types of strings that never lead to each other. And if this happens, then it means that the history of the universe can in effect follow many truly separate branches. But whenever there is significant randomness produced by the evolution of the multiway system, this does not typically appear to occur.
 
 So this suggests that in fact it is at some level not too difficult for multiway systems to reproduce our everyday perception that more or less definite things happen in the universe. But while this means that it might be possible for there to be arbitrariness in the causal network for the universe, it still tends to be my suspicion that there is not—and that in fact the particular rules followed by the universe do in the end have the property that they always yield the same causal network.
 
-#### **Evolution of Networks**
+### Evolution of Networks
 
 Earlier in this chapter, I suggested that at the lowest level space might consist of a giant network of nodes. But how might such a network evolve?
 
@@ -924,7 +896,7 @@ This setup is very much similar to the neighbor-independent substitution systems
 
 ![](_page_524_Picture_1.jpeg)
 
-Network evolution in which each node is replaced at each step by a fixed cluster of nodes. The resulting networks have a regular nested form. The dimensions of the limiting networks are respectively  $Log[2, 3] \approx 1.58$  and  $Log[3, 7] \approx 1.77$ .
+Network evolution in which each node is replaced at each step by a fixed cluster of nodes. The resulting networks have a regular nested form. The dimensions of the limiting networks are respectively $Log[2, 3] \simeq 1.58$ and $Log[3, 7] \simeq 1.77$.
 
 So what about more general substitution systems? Are there analogs of these for networks? The answer is that there are, and they are based on making replacements not just for individual nodes, but rather for clusters of nodes, as shown in the pictures below.
 
@@ -932,13 +904,11 @@ So what about more general substitution systems? Are there analogs of these for 
 
 Examples of rules that involve replacing clusters of nodes in a network by other clusters of nodes. All these rules preserve the planarity of a network. Notice that some of them cannot be reversed since their right-hand sides are too symmetrical to determine which orientation of the left-hand side should be used.
 
-In the substitution systems for strings discussed in previous sections, the rules that are given can involve replacing any block of elements by any other. But in networks there are inevitably some restrictions. For example, if a cluster of nodes has a certain number of connections to the rest of the network, then it cannot be replaced by a cluster which has a different number of connections. And in addition, one cannot have replacements
+In the substitution systems for strings discussed in previous sections, the rules that are given can involve replacing any block of elements by any other. But in networks there are inevitably some restrictions. For example, if a cluster of nodes has a certain number of connections to the rest of the network, then it cannot be replaced by a cluster which has a different number of connections. And in addition, one cannot have replacements like the one on the left that go from a symmetrical cluster to one for which a particular orientation has to be chosen.
 
 ![](_page_525_Picture_1.jpeg)
 
 A replacement whose outcome orientation cannot be determined.
-
-like the one on the left that go from a symmetrical cluster to one for which a particular orientation has to be chosen.
 
 But despite these restrictions a fairly large number of replacements are still possible; for example, there are a total of 419 distinct ones that exist involving clusters with no more than five nodes.
 
@@ -960,11 +930,11 @@ In each pair of pictures in the upper part of the page, the top one shows the fo
 
 ![](_page_526_Picture_2.jpeg)
 
-Examples of the evolution of networks in which a single cluster of nodes is replaced at each step according to the rules shown. Each pair of pictures above represents the state of the network before and after each replacement. The nodes affected by the replacement are highlighted in both cases. The location at which the replacement is performed is determined by requiring that it involve the oldest possible nodes in the network. The nodes in the pictures above are drawn with a "clock". The angle of the beginning of the black sector in the clock indicates when the node was created, while the angle of its end represents the current step, so that older nodes have larger black sectors.
+![](_page_526_Picture_3.jpeg)
 
-(c)
+![](_page_526_Picture_4.jpeg)
 
-(b)
+Examples of the evolution of networks in which a single cluster of nodes is replaced at each step according to the rules shown. Each pair of pictures above represents the state of the network before and after each replacement. The nodes affected by the replacement are highlighted in both cases. The location at which the replacement is performed is determined by requiring that it involve the oldest possible nodes in the network. The nodes in the pictures above are drawn with a “clock”. The angle of the beginning of the black sector in the clock indicates when the node was created, while the angle of its end represents the current step, so that older nodes have larger black sectors.
 
 Inevitably there is a certain arbitrariness in the way these pictures are drawn. For the underlying rules specify only what the pattern of connections in a network should be—not how its nodes should be laid out on the page. And in the effort to make clear the relationship between networks obtained on different steps, even identical networks can potentially be drawn somewhat differently.
 
@@ -1016,7 +986,7 @@ Yet in our everyday experience space certainly does not seem to have this proper
 
 So in the end, if one manages to find the ultimate rules for the universe, my expectation is that they will give rise to networks that on a small scale look largely random. But this very randomness will most likely be what for example allows a definite and robust value of 3 to emerge for the dimensionality of space—even though all of the many complicated phenomena in our universe must also somehow be represented within the structure of the same network.
 
-#### Space, Time and Relativity
+### Space, Time and Relativity
 
 Several sections ago I argued that as observers within the universe everything we can observe must at some level be associated purely with the network of causal connections between events in the universe. And in the past few sections I have outlined a series of types of models for how such a causal network might actually get built up.
 
@@ -1064,9 +1034,7 @@ Such locality is built into the basic structure of systems like cellular automat
 
 Examples of patterns produced by cellular automata, illustrating the fact discussed in Chapter 6 that the edge of each pattern has a maximum slope equal to one cell per step, corresponding to an absolute upper limit on the rate of information transmission—similar to the speed of light in physics.
 
-In physics there also seems to be a maximum speed at which the effects of any event can spread: the speed of light, equal to about 300
-
-million meters per second. And it is common in spacetime physics to draw "light cones" of the kind shown at the right to indicate the region that will be reached by a light signal emitted from a particular position in space at a particular time. So what is the analog of this in a causal network?
+In physics there also seems to be a maximum speed at which the effects of any event can spread: the speed of light, equal to about 300 million meters per second. And it is common in spacetime physics to draw “light cones” of the kind shown at the right to indicate the region that will be reached by a light signal emitted from a particular position in space at a particular time. So what is the analog of this in a causal network?
 
 The answer is straightforward, for the very definition of a causal network shows that to see how the effects of a particular event spread one just has to follow the successive connections from it in the causal network.
 
@@ -1078,13 +1046,11 @@ For without it there will tend to be no particular way to match up corresponding
 
 In the case of substitution systems for strings, locality of underlying replacement rules immediately implies overall locality of effects in the system. For the different elements in the system are always just laid out in a one-dimensional string, with the result that local replacement rules can only ever propagate effects to nearby elements in the string—much like in a one-dimensional cellular automaton.
 
-If one is dealing with an underlying system based on networks, however, then the situation can be somewhat more complicated. For as we discussed several sections ago-and will discuss again in the final sections of this chapter—there will typically be only an approximate correspondence between the structure of the network and the structure of ordinary space. And so for example—as we will discuss later in connection with quantum phenomena—there may sometimes be a kind of thread that connects parts of the network that would not
+If one is dealing with an underlying system based on networks, however, then the situation can be somewhat more complicated. For as we discussed several sections ago—and will discuss again in the final sections of this chapter—there will typically be only an approximate correspondence between the structure of the network and the structure of ordinary space. And so for example—as we will discuss later in connection with quantum phenomena—there may sometimes be a kind of thread that connects parts of the network that would not normally be considered nearby in three-dimensional space. And so when clusters of nodes that are nearby with respect to connections on the network get updated, they can potentially propagate effects to what might be considered distant points in space.
 
 ![](_page_534_Picture_9.jpeg)
 
 Schematic illustration of a light cone in physics. Light emitted at a point in space will normally spread out with time into a cone, whose cross-section is shown schematically here.
-
-normally be considered nearby in three-dimensional space. And so when clusters of nodes that are nearby with respect to connections on the network get updated, they can potentially propagate effects to what might be considered distant points in space.
 
 Nevertheless, if a network is going to correspond to space as it seems to exist in our universe, such phenomena must not be too important—and in the end there must to a good approximation be the kind of straightforward locality that exists for example in the simple causal network of page 518.
 
@@ -1092,7 +1058,7 @@ In the next section I will discuss how actual physical entities like particles p
 
 So what about a more complicated causal network? One might imagine that its connections could perhaps represent varying distances in space and varying intervals in time. But there is no independent way to work out distance in space or interval in time beyond looking at the connections in the causal network. So the only thing that ultimately makes sense is to measure space and time taking each connection in the causal network to correspond to an identical elementary distance in space and elementary interval in time.
 
-One may guess that this elementary distance is around  $10^{-35}$  meters, and that the elementary time interval is around  $10^{-43}$  seconds. But whatever these values are, a crucial point is that their ratio must be a fixed speed, and we can identify this with the speed of light. So this means that in a sense every connection in a causal network can be viewed as representing the propagation of an effect at the speed of light.
+One may guess that this elementary distance is around $10^{-35}$ meters, and that the elementary time interval is around $10^{-43}$ seconds. But whatever these values are, a crucial point is that their ratio must be a fixed speed, and we can identify this with the speed of light. So this means that in a sense every connection in a causal network can be viewed as representing the propagation of an effect at the speed of light.
 
 And with this realization we are now close to being able to see how the kinds of systems I have discussed must almost inevitably succeed in reproducing the fundamental features of relativity theory. But first we must consider the concept of motion.
 
@@ -1108,13 +1074,11 @@ If the angle is so great that there are connections going up as well as down bet
 
 One might have thought that states obtained from slices at different angles would inevitably be consistent only with different sets of underlying rules. But in fact this is not the case, and instead the exact same rules can reproduce slices at all angles. And this is a consequence of the fact that the substitution system on page 518 has the property of causal invariance—so that it gives the same causal network independent of the scheme used to apply its underlying rules.
 
-It is slightly more complicated to represent uniform motion in causal networks that are not as regular as the one on page 518. But
+It is slightly more complicated to represent uniform motion in causal networks that are not as regular as the one on page 518. But whenever there is sufficient uniformity to give a stable structure to space one can still think of something like parallel slices at different angles as representing motion at different fixed speeds.
 
 ![](_page_536_Picture_9.jpeg)
 
 Graphical representation in space and time of motion at fixed speeds
-
-whenever there is sufficient uniformity to give a stable structure to space one can still think of something like parallel slices at different angles as representing motion at different fixed speeds.
 
 And the crucial point is that whenever the underlying system is causal invariant the exact same underlying rules will account for what one sees in slices at different angles. And what this means is that in effect the same rules will apply regardless of how fast one is going.
 
@@ -1140,13 +1104,13 @@ The dark gray region in each picture represents a fixed amount of time for the c
 
 ![](_page_539_Picture_2.jpeg)
 
-A simple derivation of the classic phenomenon of relativistic time dilation. The pictures show the behavior of a very simple idealized clock going at different fractions of the speed of light. The clock can be thought of as consisting of a photon of light bouncing backwards and forwards between mirrors a fixed distance apart. (At a more general level in my approach it can also be thought of as a fragment of a causal network.) Time is shown going down the page, so that the photon in the clock traces out a zig-zag path. The fundamental assumption—that in my approach is just a consequence of basic properties of causal networks—is that the photon always goes at the speed of light, so that its path always lies on the surface of light cones like the ones in the top row of pictures. A fixed interval of time for the clock—as indicated by the length of the darker gray regions—corresponds to a progressively longer interval of time at rest. The amount of this time dilation is given by the classic relativistic formula  $1/\sqrt{1-v^2/c^2}$ , where v/c is the ratio of the speed of the clock to the speed of light. Such time dilation is routinely observed in particle accelerators—and has to be corrected for in GPS satellites. It leads to the so-called twin paradox in which less time will pass for a member of a twin going at high speed in a spacecraft than one staying at rest. The fact that time dilation is a general phenomenon not restricted to something like the simple clock shown relies in my approach on general properties of causal networks. Once the basic assumptions are established, the derivation of time dilation given here is no different in principle from the original one given in 1905, though I believe it is in many ways considerably clearer. Note that it is necessary to consider motion in two dimensions—so that the clock as a whole can be moving perpendicular to the path of the photon inside it. If these were parallel, one would inevitably get not just pure time dilation, but a mixture of it and length contraction.
+A simple derivation of the classic phenomenon of relativistic time dilation. The pictures show the behavior of a very simple idealized clock going at different fractions of the speed of light. The clock can be thought of as consisting of a photon of light bouncing backwards and forwards between mirrors a fixed distance apart. (At a more general level in my approach it can also be thought of as a fragment of a causal network.) Time is shown going down the page, so that the photon in the clock traces out a zig-zag path. The fundamental assumption—that in my approach is just a consequence of basic properties of causal networks—is that the photon always goes at the speed of light, so that its path always lies on the surface of light cones like the ones in the top row of pictures. A fixed interval of time for the clock—as indicated by the length of the darker gray regions—corresponds to a progressively longer interval of time at rest. The amount of this time dilation is given by the classic relativistic formula $1/\sqrt{1-v^2/c^2}$, where $v/c$ is the ratio of the speed of the clock to the speed of light. Such time dilation is routinely observed in particle accelerators—and has to be corrected for in GPS satellites. It leads to the so-called twin paradox in which less time will pass for a member of a twin going at high speed in a spacecraft than one staying at rest. The fact that time dilation is a general phenomenon not restricted to something like the simple clock shown relies in my approach on general properties of causal networks. Once the basic assumptions are established, the derivation of time dilation given here is no different in principle from the original one given in 1905, though I believe it is in many ways considerably clearer. Note that it is necessary to consider motion in two dimensions—so that the clock as a whole can be moving perpendicular to the path of the photon inside it. If these were parallel, one would inevitably get not just pure time dilation, but a mixture of it and length contraction.
 
-#### **Elementary Particles**
+### Elementary Particles
 
 There are some aspects of the universe—notably the structure of space and time—that present-day physics tends to assume are continuous. But over the past century it has at least become universally accepted that all matter is made up of identifiable discrete particles.
 
-Experiments have found a fairly small number of fundamentally different kinds of particles, with electrons, photons, muons and the six basic types of quarks being a few examples. And it is one of the striking observed regularities of the universe that all particles of a given kind say electrons—seem to be absolutely identical in their properties.
+Experiments have found a fairly small number of fundamentally different kinds of particles, with electrons, photons, muons and the six basic types of quarks being a few examples. And it is one of the striking observed regularities of the universe that all particles of a given kind—say electrons—seem to be absolutely identical in their properties.
 
 But what actually are particles? As far as present-day experiments can tell, electrons, for example, have zero size and no substructure. But particularly if space is discrete, it seems almost inevitable that electrons and other particles must be made up of more fundamental elements.
 
@@ -1154,7 +1118,7 @@ So how might this work? An immediate possibility that I suspect is actually not 
 
 In networks it can be somewhat difficult to visualize localized structures. But the picture below nevertheless shows a simple example of how a localized structure can move across a regular planar network.
 
-Both the examples on this page show structures that exist on very regular backgrounds. But to get any kind of realistic model for actual
+Both the examples on this page show structures that exist on very regular backgrounds. But to get any kind of realistic model for actual particles in physics one must consider structures on much more complicated and random backgrounds. For any network that has a serious chance of representing actual space—even a supposedly empty part—will no doubt show all sorts of seemingly random activity. So any localized structure that might represent a particle will somehow have to persist even on this kind of random background.
 
 ![](_page_540_Picture_9.jpeg)
 
@@ -1165,8 +1129,6 @@ Typical examples of particle-like localized structures in class 4 cellular autom
 ![](_page_540_Picture_12.jpeg)
 
 A particle-like localized structure in a network.
-
-particles in physics one must consider structures on much more complicated and random backgrounds. For any network that has a serious chance of representing actual space—even a supposedly empty part—will no doubt show all sorts of seemingly random activity. So any localized structure that might represent a particle will somehow have to persist even on this kind of random background.
 
 Yet at first one might think that such randomness would inevitably disrupt any kind of definite persistent structure. But the pictures below show two simple examples where it does not. In the first case, there are localized cracks that persist. And in the second case, there are two different types of regions, separated by boundaries that act like localized structures with definite properties, and persist until they annihilate.
 
@@ -1198,9 +1160,9 @@ In the realistic case of network rules for the universe, planarity as such is pr
 
 And if these rules satisfy the constraint of causal invariance that I discussed in previous sections, then I suspect that this means that they will inevitably exhibit various additional features—perhaps notably including for example what is usually known as local gauge invariance.
 
-But what is most relevant here is that it seems likely that—much as for non-planarity-nonzero values of quantities conserved by network evolution rules can be thought of as being associated with some sort of local structures or tangles of connections in the network. And I suspect that it is essentially such structures that define the cores of the various types of elementary particles that are seen in physics.
+But what is most relevant here is that it seems likely that—much as for non-planarity—nonzero values of quantities conserved by network evolution rules can be thought of as being associated with some sort of local structures or tangles of connections in the network. And I suspect that it is essentially such structures that define the cores of the various types of elementary particles that are seen in physics.
 
-Before the results of this book it might have seemed completely implausible that anything like this could be correct. For independent of any specific arguments about networks and their evolution, traditional intuition would tend to make one think that the elaborate properties of
+Before the results of this book it might have seemed completely implausible that anything like this could be correct. For independent of any specific arguments about networks and their evolution, traditional intuition would tend to make one think that the elaborate properties of particles must inevitably be the result of an elaborate underlying setup. But what we have now seen over and over again in this book is that in fact it is perfectly possible to get phenomena of great complexity even with a remarkably simple underlying setup. And I suspect that particles in physics—with all their various properties and interactions—are just yet another example of this very general phenomenon.
 
 ![](_page_542_Picture_10.jpeg)
 
@@ -1210,9 +1172,7 @@ The K<sub>5</sub> and K<sub>3,3</sub> forms that lead to non-planarity in networ
 
 ![](_page_542_Picture_13.jpeg)
 
-How K33 is embedded in the network from the facing page.
-
-particles must inevitably be the result of an elaborate underlying setup. But what we have now seen over and over again in this book is that in fact it is perfectly possible to get phenomena of great complexity even with a remarkably simple underlying setup. And I suspect that particles in physics—with all their various properties and interactions—are just yet another example of this very general phenomenon.
+How K<sub>3,3</sub> is embedded in the network from the facing page.
 
 One immediate thing that might seem to suggest that elementary particles must somehow be based on simple discrete structures is the fact that their values of quantities like electric charge always seem to be in simple rational ratios. In traditional particle physics this is explained by saying that many if not all particles are somehow just manifestations of the same underlying abstract object, related by a simple fixed group of symmetry operations. But in terms of networks one can imagine a much more explicit explanation: that there are just a simple discrete set of possible structures for the cores of particles—each perhaps related in some quite mechanical way by the group of symmetry operations.
 
@@ -1234,7 +1194,7 @@ In traditional physics energy and momentum are always assumed to have continuous
 
 As I will discuss in the last section of this chapter, quantum mechanics tends to make one think of particles with higher momenta as being somehow progressively less spread out in space. So how can this be consistent with the idea that higher momentum is associated with having more nodes? Part of the answer probably has to do with the fact that outside the piece of the network that corresponds to the particle, the network presumably matches up to yield uniform space in much the same way as without the particle. And within the piece of the network corresponding to the particle, the effective structure of space may be very different—with for example more long-range connections added to reduce the effective overall distance.
 
-#### The Phenomenon of Gravity
+### The Phenomenon of Gravity
 
 At an opposite extreme from elementary particles one can ask how the universe behaves on the largest possible scales. And the most obvious effect on such scales is the phenomenon of gravity. So how then might this emerge from the kinds of models I have discussed here?
 
@@ -1242,11 +1202,11 @@ The standard theory of gravity for nearly a century has been general relativity�
 
 Something like a magnetic field in general has different effects on objects made of different materials. But a key observation verified experimentally to considerable accuracy is that gravity has exactly the same effect on the motion of different objects, regardless of what those objects are made of. And it is this that allows one to think of gravity as a general feature of space—rather than for example as some type of force that acts specifically on different objects.
 
-In the absence of any gravity or forces, our normal definition of space implies that when an object moves from one point to another, it always goes along a straight line, which corresponds to the shortest path. But when gravity is present, objects in general move on curved paths. Yet these paths can still be the shortest—or so-called geodesics if one takes space to be curved. And indeed if space has appropriate curvature one can get all sorts of paths, as in the pictures below.
+In the absence of any gravity or forces, our normal definition of space implies that when an object moves from one point to another, it always goes along a straight line, which corresponds to the shortest path. But when gravity is present, objects in general move on curved paths. Yet these paths can still be the shortest—or so-called geodesics—if one takes space to be curved. And indeed if space has appropriate curvature one can get all sorts of paths, as in the pictures below.
 
 ![](_page_546_Picture_3.jpeg)
 
-Examples of the effect of curvature in space on paths taken by objects. In each case all the paths shown start parallel, but do not remain so when there is curvature. The paths are geodesics which go the minimum distance on the surface to get to all the points they reach. (In general, the minimum may only be local.) Case (b) shows the top of a sphere, which is a surface of positive curvature. Case (c) shows the negatively curved surface  $z = x^2 - y^2$ , (d) a paraboloid  $z = x^2 + y^2$ , and (e,f)  $z = 1/(r + \delta)$  —a rough analog of curvature in space produced by a sphere of mass.
+Examples of the effect of curvature in space on paths taken by objects. In each case all the paths shown start parallel, but do not remain so when there is curvature. The paths are geodesics which go the minimum distance on the surface to get to all the points they reach. (In general, the minimum may only be local.) Case (b) shows the top of a sphere, which is a surface of positive curvature. Case (c) shows the negatively curved surface $z = x^2 - y^2$, (d) a paraboloid $z = x^2 + y^2$, and (e,f) $z = 1/(r + \delta)$—a rough analog of curvature in space produced by a sphere of mass.
 
 But in our actual universe what determines the curvature of space? The answer from general relativity is that the Einstein equations give conditions for the value of a particular kind of curvature in terms of the energy and momentum of matter that is present. And the point then is that the shortest paths in space with this curvature seem to be consistent with those followed by objects moving under the influence of gravity associated with the given distribution of matter.
 
@@ -1264,13 +1224,13 @@ A hexagonal array corresponding to flat two-dimensional space.
 
 ![](_page_547_Picture_8.jpeg)
 
-Networks with various limiting curvatures. If every region in the network is in effect a hexagon—as in the picture at the top of the page—then the network will behave as if it is flat. But if pentagons are introduced, as in the cases on the left, the network will increasingly behave as if it has positive curvature—like part of a sphere. And if heptagons are introduced, as in the cases on the right, the network will behave as if it has negative curvature. In the bottom row of pictures, the networks are laid out as on page 479, so that successive heights give the number of nodes at successive distances r from a particular node. In the limit of large r, this number is approximately  $r^2 (1 - k r^2 + ...)$  where k turns out to be exactly proportional to the curvature.
+Networks with various limiting curvatures. If every region in the network is in effect a hexagon—as in the picture at the top of the page—then the network will behave as if it is flat. But if pentagons are introduced, as in the cases on the left, the network will increasingly behave as if it has positive curvature—like part of a sphere. And if heptagons are introduced, as in the cases on the right, the network will behave as if it has negative curvature. In the bottom row of pictures, the networks are laid out as on page 479, so that successive heights give the number of nodes at successive distances $r$ from a particular node. In the limit of large $r$, this number is approximately $r^2 (1 - k r^2 + ...)$ where $k$ turns out to be exactly proportional to the curvature.
 
-But how can we determine the curvature from the structure of each network? Earlier in this chapter we saw that if a network is going to correspond to ordinary space in some number of dimensions *d* , then this means that by going r connections from any given node one must reach about  $r^{d-1}$  nodes. But it turns out that when curvature is present it leads to a systematic correction to this.
+But how can we determine the curvature from the structure of each network? Earlier in this chapter we saw that if a network is going to correspond to ordinary space in some number of dimensions $d$, then this means that by going $r$ connections from any given node one must reach about $r^{d-1}$ nodes. But it turns out that when curvature is present it leads to a systematic correction to this.
 
-In each of the pictures on the facing page the network shown can be thought of as corresponding to two-dimensional space. And this means that to a first approximation the number of nodes reached must increase linearly with r. But the bottom row of pictures show that there are corrections to this. And what happens is that when there is positive curvature—as in the pictures on the left—progressively fewer than r nodes end up being reached. But when there is negative curvature—as on the right—progressively more nodes end up being reached. And in general the leading correction to the number of nodes reached turns out to be proportional to the curvature multiplied by  $r^{d+1}$ .
+In each of the pictures on the facing page the network shown can be thought of as corresponding to two-dimensional space. And this means that to a first approximation the number of nodes reached must increase linearly with $r$. But the bottom row of pictures show that there are corrections to this. And what happens is that when there is positive curvature—as in the pictures on the left—progressively fewer than $r$ nodes end up being reached. But when there is negative curvature—as on the right—progressively more nodes end up being reached. And in general the leading correction to the number of nodes reached turns out to be proportional to the curvature multiplied by $r^{d+1}$.
 
-So what happens in more than two dimensions? In general the result could be very complicated, and could for example involve all sorts of different forms of curvature and other characteristics of space. But in fact the leading correction to the number of nodes reached is always quite simple: it is just proportional to what is called the Ricci scalar curvature, multiplied by  $r^{d+1}$ . And already here this is some suggestion of general relativity—for the Ricci scalar curvature also turns out to be a central quantity in the Einstein equations.
+So what happens in more than two dimensions? In general the result could be very complicated, and could for example involve all sorts of different forms of curvature and other characteristics of space. But in fact the leading correction to the number of nodes reached is always quite simple: it is just proportional to what is called the Ricci scalar curvature, multiplied by $r^{d+1}$. And already here this is some suggestion of general relativity—for the Ricci scalar curvature also turns out to be a central quantity in the Einstein equations.
 
 But in trying to see a more detailed correspondence there are immediately a variety of complications. Perhaps the most obvious is that the traditional mathematical formulation of general relativity seems to rely on many detailed properties of continuous space. And while one expects that sufficiently large networks should in some sense act on average like continuous space, it is far from clear at first how the kinds of properties of relevance to general relativity will emerge.
 
@@ -1286,13 +1246,11 @@ Yet despite this, it turns out that all the geometrical features that are ultima
 
 One of these is the value of the so-called Ricci tensor, which in effect specifies how the Ricci scalar curvature is made up from different curvature components associated with different directions.
 
-As indicated above, the scalar curvature associated with a network is directly related to how many nodes lie within successive distances r of a given node on the network—or in effect how many nodes lie within successive generalized spheres around that node. And it turns out that the projection of the Ricci tensor along a particular direction is then just related to the number of nodes that lie within a cylinder oriented in that direction. But even just defining a consistent direction in a network is not entirely straightforward. But one way to do it is simply to pick two points in the network, then to say that paths in the network are going in the same direction if they are segments of the same shortest path between those points. And with this definition, a region that approximates a cylinder can be formed just by setting up spheres with centers at every point on the path.
+As indicated above, the scalar curvature associated with a network is directly related to how many nodes lie within successive distances $r$ of a given node on the network—or in effect how many nodes lie within successive generalized spheres around that node. And it turns out that the projection of the Ricci tensor along a particular direction is then just related to the number of nodes that lie within a cylinder oriented in that direction. But even just defining a consistent direction in a network is not entirely straightforward. But one way to do it is simply to pick two points in the network, then to say that paths in the network are going in the same direction if they are segments of the same shortest path between those points. And with this definition, a region that approximates a cylinder can be formed just by setting up spheres with centers at every point on the path.
 
 But there is now another issue to address: at least in its standard formulation general relativity is set up in terms of properties not of three-dimensional space but rather of four-dimensional spacetime. And this means that what is relevant are properties not so much of specific networks representing space, but rather of complete causal networks.
 
-And one immediate feature of causal networks that differs from space networks is that their connections go only one way. But it turns out that this is exactly what one needs in order to set up the analog of a spacetime Ricci tensor. The idea is to start at a particular event in the causal network, then to form what is in effect a cone of events that can be reached from there. To define the spacetime Ricci tensor, one considers—as on page 516—a sequence of spacelike slices through this
-
-cone and asks how the number of events that lie within the cone increases as one goes to successive slices. After t steps, the number of events reached will be proportional to  $t^d$ . But there is then a correction proportional to  $t^{d+2}$ , that has a coefficient that is a combination of the spacetime Ricci scalar and a projection of the spacetime Ricci tensor along what is in effect the time direction defined by the sequence of spacelike slices chosen.
+And one immediate feature of causal networks that differs from space networks is that their connections go only one way. But it turns out that this is exactly what one needs in order to set up the analog of a spacetime Ricci tensor. The idea is to start at a particular event in the causal network, then to form what is in effect a cone of events that can be reached from there. To define the spacetime Ricci tensor, one considers—as on page 516—a sequence of spacelike slices through this cone and asks how the number of events that lie within the cone increases as one goes to successive slices. After $t$ steps, the number of events reached will be proportional to $t^d$. But there is then a correction proportional to $t^{d+2}$, that has a coefficient that is a combination of the spacetime Ricci scalar and a projection of the spacetime Ricci tensor along what is in effect the time direction defined by the sequence of spacelike slices chosen.
 
 So how does this relate to general relativity? It turns out that when there is no matter present the Einstein equations simply state that the spacetime Ricci tensor—and thus all of its projections—are exactly zero. There can still for example be higher-order curvature, but there can be no curvature at the level described by the Ricci tensor.
 
@@ -1320,11 +1278,9 @@ For while at a large scale these may provide a reasonable description of average
 
 In the previous section I suggested that energy and momentum might in effect be associated with the presence of excess nodes in a network. And this now potentially seems to fit quite well with what we have seen in this section. For if the underlying rule for a network is going to maintain to a certain approximation the same average number of nodes as flat space, then it follows that wherever there are more nodes corresponding to energy and momentum, this must be balanced by something reducing the number of nodes. But such a reduction is exactly what is needed to correspond to positive curvature of the kind implied by the Einstein equations in the presence of ordinary matter.
 
-#### **Quantum Phenomena**
+### Quantum Phenomena
 
-From our everyday experience with objects that we can see and touch we develop a certain intuition about how things work. But nearly a century ago it became clear that when it comes to things like electrons some of this intuition is no longer correct. Yet there has developed an elaborate mathematical formalism in quantum theory that successfully reproduces much of what is observed. And while some aspects of this
-
-formalism remain mysterious, it has increasingly come to be believed that any fundamental theory of physics must somehow be based on it.
+From our everyday experience with objects that we can see and touch we develop a certain intuition about how things work. But nearly a century ago it became clear that when it comes to things like electrons some of this intuition is no longer correct. Yet there has developed an elaborate mathematical formalism in quantum theory that successfully reproduces much of what is observed. And while some aspects of this formalism remain mysterious, it has increasingly come to be believed that any fundamental theory of physics must somehow be based on it.
 
 Yet the kinds of programs I have discussed in this book are not in any obvious way set up to fit in with this formalism. But as we have seen a great many times in the course of the book, what emerges from a program can be very different from what is obvious in its underlying rules. And in fact it is my strong suspicion that the kinds of programs that I have discussed in the past few sections will actually in the end turn out to show many if not all the key features of quantum theory.
 
@@ -1334,9 +1290,7 @@ At first, though, things might not seem promising. For my model of particles suc
 
 So how can this be consistent? The basic answer is just that a network which represents our whole universe must also include us as observers. And this means that there is no way that we can look at the network from the outside and see the electron as a definite object. Instead, anything we deduce about the electron must come from processes that explicitly go on inside the network.
 
-But this is not just an issue in studying things like electrons: it is actually a completely general feature of the models I have discussed. And in fact, as we saw earlier in this chapter, it is what allows them to support meaningful notions of even such basic concepts as time. At a
-
-more formal level, it also implies that everything we can observe can be captured by a causal network. And as I will discuss a little below, I suspect that the idea of causal invariance for such a network will then be what turns out to account for some key features of quantum theory.
+But this is not just an issue in studying things like electrons: it is actually a completely general feature of the models I have discussed. And in fact, as we saw earlier in this chapter, it is what allows them to support meaningful notions of even such basic concepts as time. At a more formal level, it also implies that everything we can observe can be captured by a causal network. And as I will discuss a little below, I suspect that the idea of causal invariance for such a network will then be what turns out to account for some key features of quantum theory.
 
 The basic picture of our universe that I have outlined in the past few sections is a network whose connections are continually updated according to some simple set of underlying rules. In the past one might have assumed that a system like this would be far too simple to correspond to our universe. But from the discoveries in this book we now know that even when the underlying rules for a system are simple, its overall behavior can still be immensely complex.
 
@@ -1386,9 +1340,7 @@ Most often the way this is made to happen is by setting up some kind of detector
 
 At first, however, such evolution to an organized state might seem inconsistent with microscopic reversibility. But in fact—just as in so many other seemingly irreversible processes—all that is needed to preserve reversibility is that if one looks at sufficient details of the system there can be arbitrary and seemingly random behavior. And the point is just that in making conclusions about the result of a measurement we choose to ignore such details.
 
-So even though the actual result that we take away from a measurement may be quite simple, many particles—and many events—
-
-will always be involved in getting it. And in fact in traditional quantum theory no measurement can ultimately end up giving a definite result unless in effect an infinite number of particles are involved.
+So even though the actual result that we take away from a measurement may be quite simple, many particles—and many events—will always be involved in getting it. And in fact in traditional quantum theory no measurement can ultimately end up giving a definite result unless in effect an infinite number of particles are involved.
 
 As I mentioned above, ordinary quantum processes can appear to follow different histories depending on what scheme is used to decide the order in which underlying rules are applied. But taking the idealized limit of a measurement in which an infinite number of particles are involved will probably in effect establish a single history.
 
