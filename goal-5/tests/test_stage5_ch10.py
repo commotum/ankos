@@ -379,6 +379,12 @@ class ChapterTenTests(unittest.TestCase):
                 "pdf:0588",
                 "1f04b96b819d010b0733b5b54a5472c4b2e01afc705f123ca5d995ce5f726abe",
             ),
+            613: (
+                "6e8922b56593d17d139120f86251c4d19755c5ded6d90c08d918fe0147562ff4",
+                (987, 1280),
+                "pdf:0592",
+                "b7925aad250dac1de6d00d35946642fc952a2c084286fc2a6950dc92a2e08924",
+            ),
             641: (
                 "f4ea4b4ebf2f6372f0357e7050f16e5a956eb01e1749e658ae77c55cdce075f0",
                 (1200, 411),
