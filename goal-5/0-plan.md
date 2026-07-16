@@ -270,7 +270,8 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-16 (America/Los_Angeles).
-- Active stage: `5-CH09-12` (`IN_PROGRESS`), currently advancing `CH10`.
+- Active stage: `5-CH09-12` (`IN_PROGRESS`), currently advancing `CH11` after
+  clean `CH10` closure.
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
   and the empty `goal-4/` directory were removed by exact path. No commit
   range was reverted, and Goal 4 had corrected no book text.
@@ -280,9 +281,9 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions (47 using source-backed
-  repaired-only overrides), 32 source-added images, and generated
-  README/Contents files. It now includes 661 guarded source-verified
+  documents, 1,444 mapped image positions (50 using source-backed
+  repaired-only overrides), 33 source-added images, and generated
+  README/Contents files. It now includes 666 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -392,15 +393,19 @@ Neither file is a generalized workflow database.
   `G5-A-0022` repair the PDF-493 and PDF-527 omissions. The final Markdown
   SHA-256 is
   `c4786895ea852253233767f683f69ffce0f6e5576e948e4bbe3bf33c26cbc66c`.
-  `CH10` begins at `pdf:0563`, raw line 6,586, byte 932355, and image-map
-  ordinal 590. Independent source/text, technical, and visual first passes over
-  all 90 pages through `pdf:0652` are integrated as `G5-C-0577`–`G5-C-0661`,
-  mapped overrides 610 and 641, and additions `G5-A-0023`–`G5-A-0032`.
-  The rebuilt chapter is 164,435 bytes and 1,012 lines with SHA-256
-  `349b6a70066f2e690fbf81fdfad977e150b497b1de6709ffdcf9129478038e59`.
-  Build, validation, focused/cumulative tests, rendering, zero-correction, and
-  fresh-build identity gates pass; coverage remains `NO/NO` while fresh
-  independent source, technical, and visual closing traversals are active.
+  `CH10` is complete at `YES/YES` after forward first passes and fresh
+  independent source, technical, and visual final-output passes over all 90 PDF
+  pages 563–652, including the blank closing leaf. Its 90 guarded corrections
+  are `G5-C-0577`–`G5-C-0666`; five mapped overrides repair ordinals 610, 613,
+  641, 651, and 652, while additions `G5-A-0023`–`G5-A-0033` restore eleven
+  omitted source visuals. All three final ledgers close with zero discrepancy
+  or ambiguity across 1,014 Markdown lines and all 78 final references. The
+  final Markdown is 164,487 bytes with SHA-256
+  `82217582690509ef97acd14ca12f0f9680e380ce6a1d8f8a0373e569114b2bc3`.
+  Focused and cumulative tests, complete rendering, default and strict
+  zero-correction validation, two fresh byte-identical builds, legacy digest,
+  and scope gates pass. `CH11` begins at `pdf:0653`, raw line 7,692, byte
+  1103253, and image-map ordinal 657.
 
 ## Stage Status
 
