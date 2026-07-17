@@ -25,23 +25,23 @@ import validate  # noqa: E402
 
 
 # Values below are derived from the canonical integrated manifests and target.
-EXPECTED_TARGET_BYTES = 85_468
-EXPECTED_TARGET_LINES = 668
+EXPECTED_TARGET_BYTES = 85_467
+EXPECTED_TARGET_LINES = 666
 EXPECTED_TARGET_SHA256 = (
-    "f25594e86735a49a774ddd53711ad4922db1d39a6a17d971a8acb46b2f04a0c6"
+    "46e2cbc14314b6bb975632189b514eafa23341335cabb9c01cd9981f4a58cba7"
 )
 EXPECTED_CORRECTION_ROWS_SHA256 = (
-    "4981716393e6428abed707f6891584460cfdcdcb599197a80956cc16946ee295"
+    "cef7514262b728269dd9cc8b7861665f719cdbcd5a0b924137039278d10f253b"
 )
 EXPECTED_CORRECTION_ROW_HASH_SEQUENCE = (
-    "3789ed1b4025bd39781f3ced264ea70cd9d14f7768d09d3516327d2aad69657d"
+    "5cac36af9f1c444ff78a1c107c83054337d22fba6ce515d4e992692dd3b96d11"
 )
 EXPECTED_INVENTORY_HASHES = {
-    "headings": "b227459497c9ebdcc335228fda967447528ad23c4537bff797c6c9c24cc0dd55",
-    "labels": "98b279a2dccc502d5da05a6eb2da8abdb9c76bfd2df7f73af4db15d8254e9c4c",
-    "code_fences": "9b6b74483ce64316dbb641b2bc498f59403e7fbbe1e82734cb303e60db76f0a9",
-    "inline_code": "fbd1d17b3e135d4318e8da8e6e699213dab72380fe9a2843f4b63a6c285fd79c",
-    "image_references": "b0a9a688f7e7fcb0203237162eb4f50312d5440ca898e35a5530fb2e5b5f240f",
+    "headings": "f74fc1b553f3e84a3a0a894683c7b56325406091843bc621acfcce20b1fb5ecc",
+    "labels": "3b7eac5203ad6cb559dd59ba30aa9638e5eefee4fa7bbbded06883dccfdf47d3",
+    "code_fences": "da2612b77c04c435607f64d2ceffbc16719f64e0a0776f812382198389fd248f",
+    "inline_code": "30b47173bdafdfb5bd74f036f08866579049fe3c454887ff000ec08721b00f53",
+    "image_references": "387f940554c276de1af83e96d4e2ee888008f031cf8409ad0440cf62dd298f8d",
 }
 EXPECTED_INLINE_CODE_COUNT = 19
 
@@ -378,6 +378,11 @@ REQUIRED_LITERAL_PINS: tuple[tuple[str, str, int], ...] = (
         1,
     ),
     ("density-terminal-period", "very different behavior.\n", 1),
+    (
+        "excluded-blocks-column-join",
+        "additional excluded blocks with lengths between n and 2n.",
+        1,
+    ),
     ("rule22-four-to-m", "4^m", 1),
     (
         "endomorphism-square-brackets",
@@ -406,6 +411,10 @@ FORBIDDEN_LITERAL_PINS: tuple[tuple[str, str], ...] = (
         "`MultiplicativeOrder[k, n/m]` steps \n",
     ),
     ("density-missing-period", "very different behavior\n"),
+    (
+        "excluded-blocks-false-paragraph",
+        "additional excluded blocks with lengths\n\nbetween n and 2n.",
+    ),
     ("rule22-lost-exponent", "two black squares 4 m positions apart"),
     (
         "endomorphism-parentheses",
@@ -603,11 +612,11 @@ class NotesForChapter6Tests(unittest.TestCase):
 
         # Later note chapters append corrections globally; N06's owned slice is
         # immutable and remains the exact guard here.
-        self.assertGreaterEqual(len(self.corrections), 1_400)
-        self.assertEqual(len(self.n06_corrections), 187)
+        self.assertGreaterEqual(len(self.corrections), 1_401)
+        self.assertEqual(len(self.n06_corrections), 188)
         self.assertEqual(
             [row["id"] for row in self.n06_corrections],
-            [f"G5-C-{number:04d}" for number in range(1214, 1401)],
+            [f"G5-C-{number:04d}" for number in range(1214, 1402)],
         )
         self.assertEqual(
             rows_sha256(self.n06_corrections), EXPECTED_CORRECTION_ROWS_SHA256
@@ -617,8 +626,8 @@ class NotesForChapter6Tests(unittest.TestCase):
             EXPECTED_CORRECTION_ROW_HASH_SEQUENCE,
         )
         previous_end = self.document["raw_start_byte"]
-        # C1392-C1399 are append-only visual guards and C1400 is the fresh
-        # source-residual guard; their raw spans occur between earlier text
+        # C1392-C1399 are append-only visual guards and C1400-C1401 are fresh
+        # source-residual guards; their raw spans occur between earlier text
         # guards. Sort only for the non-overlap proof; manifest order remains
         # pinned by the ID and hash-sequence assertions above.
         for row in sorted(
@@ -737,7 +746,7 @@ class NotesForChapter6Tests(unittest.TestCase):
                 for line_number, line in enumerate(self.rendered.splitlines(), 1)
                 if line.endswith((" ", "\t"))
             ],
-            [164, 524],
+            [164, 522],
         )
 
     def test_sixty_four_image_rows_and_thirty_six_changes_are_exact(self) -> None:
@@ -904,7 +913,7 @@ class NotesForChapter6Tests(unittest.TestCase):
 
     def test_high_risk_source_and_technical_literals(self) -> None:
         self.assertEqual(
-            len(REQUIRED_LITERAL_PINS) + len(FORBIDDEN_LITERAL_PINS), 36
+            len(REQUIRED_LITERAL_PINS) + len(FORBIDDEN_LITERAL_PINS), 38
         )
         for pin_id, literal, expected_count in REQUIRED_LITERAL_PINS:
             with self.subTest(required_pin=pin_id):
