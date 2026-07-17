@@ -109,7 +109,9 @@ Map[({0 -> Join[#, {1}], 1 -> Join[#, {1, 0}]} &)[
   Table[0, {# - 1}]] &, Reverse[Rest[ContinuedFraction[h, m]]]]
 ```
 
-Given these rules, the original sequence is given by `Floor[h] + Fold[Flatten[#1 /. #2] &, {0}, rules]`.
+Given these rules, the original sequence is given by
+
+`Floor[h] + Fold[Flatten[#1 /. #2] &, {0}, rules]`
 
 If *h* is the solution to a quadratic equation, then the continued fraction form is repetitive, and so there are a limited number of different substitution rules. In this case, therefore, the original sequence can be found by a neighbor-independent substitution system of the kind discussed on page 82. For `h = GoldenRatio` the substitution system is `{0 -> {1}, 1 -> {1, 0}}` (see page 890), for `h = Sqrt[2]` it is `{0 -> {0, 1}, 1 -> {0, 1, 0}}` (see page 892) and for `h = Sqrt[3]` it is `{0 -> {1, 1, 0}, 1 -> {1, 1, 0, 1}}`. (The presence of nested structure is particularly evident in `FoldList[Plus, 0, Table[Mod[h n, 1] - 1/2, {n, max}]]`.) (See also pages 892, 916, 932 and 1084.)
 
@@ -155,7 +157,9 @@ IntegerDigits[First[Fold[
 
 `n -> If[EvenQ[n], 3 n/2, Round[3 n/4]]`
 
-it is always possible to go backwards by the rule `n -> If[Mod[n, 3] == 0, 2 n/3, Round[4 n/3]]`.
+it is always possible to go backwards by the rule
+
+`n -> If[Mod[n, 3] == 0, 2 n/3, Round[4 n/3]]`
 
 The picture shows the number of base 10 digits in numbers obtained by backward and forward evolution from `n = 8`. For `n < 8`, the system always enters a short cycle. Starting at `n = 44`, there is also a length 12 cycle. But apart from these cycles, the numbers produced always seem to grow without bound at an average rate of `3/(2 Sqrt[2])` in the forward direction, and `2 4^(1/3)/3` in the backward direction (at least all numbers up to 10,000 grow to above `10^100`). Approximately one number in 20 has the property that evolution either backward or forward from it never leads to a smaller number.
 
@@ -258,7 +262,7 @@ f[n_] := f[n] = f[n - f[n - 1]] + f[n - f[n - 2]]
 f[1] = f[2] = 1
 ```
 
-The question of which recursive definitions yield meaningful sequences can depend on the details of how the rules are applied. For example, f[-1] may occur, but if the complete expression is f[-1]-f[-1], then the actual value of f[-1] is irrelevant. The default form of evaluation for recursive functions implemented by all standard computer languages (including Mathematica) is the so-called leftmost innermost scheme, which attempts to find explicit values for each f[k] that occurs first, and will therefore never notice if f[k] in fact occurs only in the combination f[k] - f[k]. (The SMP system that I built around 1980 allowed different schemes—but they rarely seemed useful and were difficult to understand.)
+The question of which recursive definitions yield meaningful sequences can depend on the details of how the rules are applied. For example, f[-1] may occur, but if the complete expression is f[-1]-f[-1], then the actual value of f[-1] is irrelevant. The default form of evaluation for recursive functions implemented by all standard computer languages (including *Mathematica*) is the so-called leftmost innermost scheme, which attempts to find explicit values for each f[k] that occurs first, and will therefore never notice if f[k] in fact occurs only in the combination f[k] - f[k]. (The SMP system that I built around 1980 allowed different schemes—but they rarely seemed useful and were difficult to understand.)
 
 ■ **Page 131 · Properties of sequences.** Sequence (d) is given by
 
@@ -271,9 +275,13 @@ g[{(1)..}] = 1; g[{1, (0)..}] = 0
 g[{1, s__}] := 1 + g[IntegerDigits[FromDigits[{s}, 2] + 1, 2]]
 ```
 
-The list of elements in the sequence up to value *m* is given by `Flatten[Table[Table[n, {IntegerExponent[n, 2] + 1}], {n, m}]]`.
+The list of elements in the sequence up to value *m* is given by
 
-The differences between the first `2 (2^k - 1)` of these elements is `Nest[Replace[#, {x___} -> {x, 1, x, 0}] &, {}, k]`.
+`Flatten[Table[Table[n, {IntegerExponent[n, 2] + 1}], {n, m}]]`
+
+The differences between the first `2 (2^k - 1)` of these elements is
+
+`Nest[Replace[#, {x___} -> {x, 1, x, 0}] &, {}, k]`
 
 The largest *n* for which `f[n] == m` is given by `2 m + 1 - DigitCount[m, 2, 1]` or `IntegerExponent[(2 m)!, 2] + 1` (this satisfies `h[1] = 2; h[m_] := h[Floor[m/2]] + m`).
 
@@ -393,7 +401,7 @@ Among functions with simple explicit definitions, essentially the only examples 
 
 ■ **Ulam sequences.** Slightly more complicated definitions in terms of numbers yield all sorts of sequences with very complicated forms. An example suggested by Stanislaw Ulam around 1960 (in a peculiar attempt to get a 1D analog of a 2D cellular automaton; see pages 877 and 928) starts with `{1, 2}`, then successively appends the smallest number that is the sum of two previous numbers in just one way, yielding
 
-`{1, 2, 3, 4, 6, 8, 11, 13, 16, 18, 26, 28, 36, 38, 47, 48, 53, 57, ...}`
+`{1, 2, 3, 4, 6, 8, 11, 13, 16, 18, 26, 28, 36, 38, 47, 48, 53, 57, …}`
 
 With this initial condition, the sequence is known to go on forever. At least up to `n = 10^6` terms, it increases roughly like `13.5 n`, but as shown below the fluctuations seem random.
 
@@ -460,7 +468,7 @@ The total number of ways that integers less than *n* can be expressed as a sum o
 
 It was proved in 1937 by Ivan Vinogradov that any large odd integer can be expressed as a sum of three primes.
 
-■ **Trapezoidal primes.** If one lays out *n* objects in an *a* × *b* rectangular array, then *n* is prime if either *a* or *b* must be 1. Following the Pythagorean idea of figurate numbers one can instead consider laying out objects in an array of *b* rows, containing successively *a*, *a* - 1, ... objects. It turns out all numbers except powers of 2 can be represented this way.
+■ **Trapezoidal primes.** If one lays out *n* objects in an *a* × *b* rectangular array, then *n* is prime if either *a* or *b* must be 1. Following the Pythagorean idea of figurate numbers one can instead consider laying out objects in an array of *b* rows, containing successively *a*, *a* - 1, … objects. It turns out all numbers except powers of 2 can be represented this way.
 
 ■ **Other integer functions.** `IntegerExponent[n, k]` gives nested behavior as for decimation systems on page 909, while `MultiplicativeOrder[k, n]` and `EulerPhi[n]` yield more complicated behavior, as shown on pages 257 and 1093.
 
@@ -472,13 +480,17 @@ It was proved in 1937 by Ivan Vinogradov that any large odd integer can be expre
 
 ![](_page_926_Figure_11.jpeg)
 
-Whether any odd perfect numbers exist is probably the single oldest unsolved problem in mathematics. It is known that any odd perfect number must be greater than  $10^{300}$ , must have a factor of at least  $10^6$ , and must be less than  $4^{4^s}$  if it has only s prime factors. Looking at curve (b) on page 135, however, it does not seem inconceivable that an odd perfect number could exist. For odd n up to 500 million the only values near 0 that appear in the curve are {-6, -5, -4, -2, -1, 6, 18, 26, 30, 36}, with, for example, the first 6 occurring at n = 8925 and last 18 occurring at n = 159030135. Various generalizations of perfect numbers have been considered, for example IntegerQ[DivisorSigma[1, n]/n] (pluperfect) or Abs[DivisorSigma[1, n] - 2n] < r (quasiperfect).
+Whether any odd perfect numbers exist is probably the single oldest unsolved problem in mathematics. It is known that any odd perfect number must be greater than  $10^{300}$ , must have a factor of at least  $10^6$ , and must be less than  $4^{4^s}$  if it has only s prime factors. Looking at curve (b) on page 135, however, it does not seem inconceivable that an odd perfect number could exist. For odd n up to 500 million the only values near 0 that appear in the curve are {-6, -5, -4, -2, -1, 6, 18, 26, 30, 36}, with, for example, the first 6 occurring at n = 8925 and last 18 occurring at n = 159030135. Various generalizations of perfect numbers have been considered, requiring for example IntegerQ[DivisorSigma[1, n]/n] (pluperfect) or Abs[DivisorSigma[1, n] - 2n] < r (quasiperfect).
 
 ■ **Iterated aliquot sums.** Related to case (b) above is a system which repeats the replacement `n -> Apply[Plus, Divisors[n]] - n` or equivalently `n -> DivisorSigma[1, n] - n`. The fixed points of this procedure are the perfect numbers (see above). Other numbers usually evolve to perfect numbers, or to short repetitive sequences of numbers. But if one starts, for example, with the number 276, then the picture below shows the number of base 10 digits in the value obtained at each step.
 
 ![](_page_926_Figure_14.jpeg)
 
-After 500 steps, the value is the 53-digit number `39448887705043893375102470161238803295318090278129552`. The question of whether such values can increase forever was considered by Eugène Catalan in 1887, and has remained unresolved since.
+After 500 steps, the value is the 53-digit number
+
+`39448887705043893375102470161238803295318090278129552`
+
+The question of whether such values can increase forever was considered by Eugène Catalan in 1887, and has remained unresolved since.
 
 ### Mathematical Constants
 
@@ -538,7 +550,7 @@ which is equal to `MultiplicativeOrder[b, n]` for prime *n*, and is at most *n* 
 
 The fact that $\sqrt{2}$ is not a rational number was discovered by the Pythagoreans. Numbers that arise as solutions of polynomial equations are called algebraic; those that do not are called transcendental. *e* and π were proved to be transcendental in 1873 and 1882 respectively. It is known that `Exp[n]` and `Log[n]` for whole numbers *n* (except 0 and 1 respectively) are transcendental. It is also known for example that `Gamma[1/3]` and `BesselJ[0, n]` are transcendental. It is not known for example whether `EulerGamma` is even irrational.
 
-A number is said to be "normal" in a particular base if every digit and every block of digits of any length occur with equal frequency. Note that the fact that a number is normal in one base does not imply anything about its normality in another base (unless the bases are related for example by both being powers of 2). Despite empirical evidence, no number expressed just in terms of standard mathematical functions has ever been rigorously proved to be normal. It has nevertheless been known since the work of Emile Borel in 1909 that numbers picked randomly on the basis of their value are almost always normal. And indeed with explicit constructions in terms of digits, it is quite straightforward to get numbers that are normal. An example of this is the number 0.1234567891011121314... obtained by concatenating the digits of successive integers in base 10 (see below). This number was discussed by David Champernowne in 1933, and is known to be transcendental. A few other results are also known. One based on gradual extension of work by Richard Stoneham from 1971 is that numbers of the form  $Sum[1/(p^n b^{p^n}), \{n, \infty\}]$  for prime p > 2 are normal in base b (for GCD[b, p] == 1), and are transcendental.
+A number is said to be “normal” in a particular base if every digit and every block of digits of any length occur with equal frequency. Note that the fact that a number is normal in one base does not imply anything about its normality in another base (unless the bases are related for example by both being powers of 2). Despite empirical evidence, no number expressed just in terms of standard mathematical functions has ever been rigorously proved to be normal. It has nevertheless been known since the work of Emile Borel in 1909 that numbers picked randomly on the basis of their value are almost always normal. And indeed with explicit constructions in terms of digits, it is quite straightforward to get numbers that are normal. An example of this is the number 0.1234567891011121314... obtained by concatenating the digits of successive integers in base 10 (see below). This number was discussed by David Champernowne in 1933, and is known to be transcendental. A few other results are also known. One based on gradual extension of work by Richard Stoneham from 1971 is that numbers of the form  $Sum[1/(p^n b^{p^n}), \{n, \infty\}]$  for prime p > 2 are normal in base b (for GCD[b, p] == 1), and are transcendental.
 
 ■ **Page 141 · Square roots.** A standard way to compute $\sqrt{n}$ is Newton's method (actually used already in 2000 BC by the Babylonians), in which one takes an estimate of the value *x* and then successively applies the rule $x \to (x + n/x)/2$. After *t* steps, this method yields a result accurate to about $2^t$ digits.
 
@@ -546,7 +558,7 @@ Another approach to computing square roots is based on the fact that the ratio o
 
 The method of computing square roots shown in the main text is less efficient (it computes *t* digits in *t* steps), but illustrates more of the mechanisms involved. The basic idea is at every step *t* to maintain the relation `s^2 + 4 r == 4^t n`, keeping *r* as small as possible so as to make $s \le 2^t \sqrt{n} < s + 4$. Note that the method works not only for integers, but for any rational number *n* for which $1 \le n < 4$.
 
-■ **Nested digit sequences.** The number obtained from the substitution system `{1 -> {1, 0}, 0 -> {0, 1}}` is approximately 0.587545966 in base 10. It is certainly conceivable that a quantity such as Feigenbaum's constant (approximately 4.6692016091) could have a digit sequence with this kind of nested structure.
+■ **Nested digit sequences.** The number obtained from the substitution system `{1 -> {1, 0}, 0 -> {0, 1}}` is approximately 0.587545966 in base 10. It is certainly conceivable that a quantity such as Feigenbaum’s constant (approximately 4.6692016091) could have a digit sequence with this kind of nested structure.
 
 From the result on page 890, the number whose digits are obtained from `{1 -> {1, 0}, 0 -> {1}}` is given by `Sum[2^(-Floor[n GoldenRatio]), {n, Infinity}]`. This number is known to be transcendental. The nth term in its continued fraction representation turns out to be `2^Fibonacci[n - 2]`.
 
@@ -579,7 +591,9 @@ Note that although the picture above has a nested structure, the original concat
   2^(# - 1)] &)[NestWhile[# + 1 &, 0, (# - 1) 2^# + 1 < n &]]
 ```
 
-where the result of the `NestWhile` can be expressed as `Ceiling[1 + ProductLog[(n - 1) Log[2]/2]/Log[2]]`.
+where the result of the `NestWhile` can be expressed as
+
+`Ceiling[1 + ProductLog[(n - 1) Log[2]/2]/Log[2]]`
 
 Following work by Maxim Rytin in the late 1990s about $k^{n+1}$ digits of a concatenation sequence can be found fairly efficiently from
 
@@ -595,15 +609,15 @@ Concatenation sequences can also be generated by joining together digits from ot
 
 ![](_page_928_Figure_22.jpeg)
 
-■ **Specially constructed transcendental numbers.** Numbers known to be transcendental include ones whose digit sequences contain 1's only at positions *n*!, $2^n$ or `Fibonacci[n]`. Concatenation sequences, as well as generalizations formed by concatenating values of polynomials at successive integer points, are also known to yield numbers that are transcendental.
+■ **Specially constructed transcendental numbers.** Numbers known to be transcendental include ones whose digit sequences contain 1’s only at positions *n*!, $2^n$ or `Fibonacci[n]`. Concatenation sequences, as well as generalizations formed by concatenating values of polynomials at successive integer points, are also known to yield numbers that are transcendental.
 
-■ **Runs of digits.** One can consider any base 2 digit sequence as consisting of successive runs of 0's and 1's, constructed from the list of run lengths by
+■ **Runs of digits.** One can consider any base 2 digit sequence as consisting of successive runs of 0’s and 1’s, constructed from the list of run lengths by
 
 Fold[Join[#1, Table[1 - Last[#1], {#2}]] &, {0}, list]
 
 This representation is related to so-called surreal numbers (though with the first few digits different). The number with run lengths corresponding to successive integers (so that the  $n^{th}$  digit is Mod[Floor[1/2 + Sqrt[2 n]], 2]) turns out to be  $(1-2^{1/4} EllipticTheta[2, 0, 1/2] + EllipticTheta[3, 0, 1/2])/2$ , and appears at least not to be algebraic.
 
-■ **Leading digits.** Even though in individual numbers generated by simple mathematical procedures all possible digits often appear to occur with equal frequency, leading digits in sequences of numbers typically do not. Instead it is common for a leading digit s in base b to occur with frequency Log[b, (s+1)/s] (so that in base 10 1's occur 30% of the time and 9's 4.5%). This will happen whenever FractionalPart[Log[b, a[n]]] is uniformly distributed, which, as discussed on page 903, is known to be true for sequences such as  $r^n$  (with Log[b, r] irrational),  $n^n$ , n!, Fibonacci[n], but not r n, Prime[n] or Log[n]. A logarithmic law for leading digits is also found in many practical numerical tables, as noted by Simon Newcomb in 1881 and Frank Benford in 1938.
+■ **Leading digits.** Even though in individual numbers generated by simple mathematical procedures all possible digits often appear to occur with equal frequency, leading digits in sequences of numbers typically do not. Instead it is common for a leading digit s in base b to occur with frequency Log[b, (s+1)/s] (so that in base 10 1’s occur 30% of the time and 9’s 4.5%). This will happen whenever FractionalPart[Log[b, a[n]]] is uniformly distributed, which, as discussed on page 903, is known to be true for sequences such as  $r^n$  (with Log[b, r] irrational),  $n^n$ , n!, Fibonacci[n], but not r n, Prime[n] or Log[n]. A logarithmic law for leading digits is also found in many practical numerical tables, as noted by Simon Newcomb in 1881 and Frank Benford in 1938.
 ■ **Page 143 · Continued fractions.** The first *n* terms in the continued fraction representation for a number *x* can be found from the built-in *Mathematica* function *ContinuedFraction*, or from
 
 Floor[NestList[1/Mod[#, 1] &, x, n-1]]
@@ -616,9 +630,9 @@ The pictures below show the digit sequences of successive iterates obtained from
 
 ![Six continued-fraction digit-sequence examples](_page_929_continued_fraction_iterates_six_panel_row.jpeg)
 
-Unlike ordinary digits, the individual terms in a continued fraction can be of any size. In the continued fraction for a randomly chosen number, the probability to find a term of size s is Log[2, (1+1/s)/(1+1/(s+1))], so that the probability of getting a 1 is about 41.50%, and the probability of getting a large term falls off like  $1/s^2$ . If one looks at many terms, then their geometric mean is finite, and approaches Khinchin's constant *Khinchin*  $\approx 2.68545$ .
+Unlike ordinary digits, the individual terms in a continued fraction can be of any size. In the continued fraction for a randomly chosen number, the probability to find a term of size s is Log[2, (1+1/s)/(1+1/(s+1))], so that the probability of getting a 1 is about 41.50%, and the probability of getting a large term falls off like  $1/s^2$ . If one looks at many terms, then their geometric mean is finite, and approaches Khinchin’s constant *Khinchin*  $\approx 2.68545$ .
 
-In the first 1000 terms of the continued fraction for  $\pi$ , there are 412 1's, and the geometric mean is about 2.6656. The largest individual term is the 432th one, which is equal to 20,776. In the first million terms, there are 414,526 1's, the geometric mean is 2.68447, and the largest term is the 453,294th one, which is 12,996,958.
+In the first 1000 terms of the continued fraction for  $\pi$ , there are 412 1’s, and the geometric mean is about 2.6656. The largest individual term is the 432th one, which is equal to 20,776. In the first million terms, there are 414,526 1’s, the geometric mean is 2.68447, and the largest term is the 453,294th one, which is 12,996,958.
 
 Note that although the usual continued fraction for  $\pi$  looks quite random, modified forms such as
 
@@ -634,7 +648,7 @@ As discovered by Jeffrey Shallit in 1979, numbers of the form  $Sum[1/k^{2^i}, \
    {9, 10}, {7, 8}, {9, 10}, {3, 4}}[[#]]] &, 1, n]]]
 ```
 
-The continued fractions for square roots are always periodic; for higher roots they never appear to show any significant regularities. The first million terms in the continued fraction for  $2^{1/3}$  contain 414,983 1's, have geometric mean 2.68505, and have largest term 4,156,269 at position 484,709. Terms of any size presumably in the end always occur in continued fractions for higher roots, though this is not known for certain. Fairly large terms are sometimes seen quite early: in  $5^{1/3}$  term 19 is 3052, while in `Root[10 + 8 # - #^3 &, 1]` term 34
+The continued fractions for square roots are always periodic; for higher roots they never appear to show any significant regularities. The first million terms in the continued fraction for  $2^{1/3}$  contain 414,983 1’s, have geometric mean 2.68505, and have largest term 4,156,269 at position 484,709. Terms of any size presumably in the end always occur in continued fractions for higher roots, though this is not known for certain. Fairly large terms are sometimes seen quite early: in  $5^{1/3}$  term 19 is 3052, while in `Root[10 + 8 # - #^3 &, 1]` term 34
 
 is 1,501,790. The presence of a large term indicates a close approximation to a rational number. In a few known cases simple formulas yield numbers that are close but not equal to integers. An example discovered by Srinivasa Ramanujan around 1913 is $Exp[\pi \sqrt{163}]$, which is an integer to one part in $10^{30}$, and has second continued fraction term 1,333,462,407,511. (This particular example can be understood from the fact that as *d* increases $Exp[\pi \sqrt{d}]$ becomes extremely close to $-1728\,KleinInvariantJ[(1 + \sqrt{-d})/2]$, which turns out to be an integer whenever there is unique factorization of numbers of the form $a + b\sqrt{-d}$—and *d* = 163 is the largest of the 9 cases for which this is so.) Other less spectacular examples include $Exp[\pi] - \pi$ and `163/Log[163]`.
 
@@ -657,11 +671,11 @@ which gives a measure of the closeness of successive rational approximations to 
 
 ![](_page_930_Figure_10.jpeg)
 
-■ **History.** Euclid's algorithm states that starting from integers `{a, b}` iterating `{a_, b_} -> If[a > b, {a - b, b}, {a, b - a}]` eventually leads to `{GCD[a, b], 0}`. (See page 1093.) The pictures below show how this works. The numbers of successively smaller squares (corresponding to the numbers of steps in the algorithm) turn out to be exactly `ContinuedFraction[a/b]`.
+■ **History.** Euclid’s algorithm states that starting from integers `{a, b}` iterating `{a_, b_} -> If[a > b, {a - b, b}, {a, b - a}]` eventually leads to `{GCD[a, b], 0}`. (See page 1093.) The pictures below show how this works. The numbers of successively smaller squares (corresponding to the numbers of steps in the algorithm) turn out to be exactly `ContinuedFraction[a/b]`.
 
 ![](_page_930_Picture_12.jpeg)
 
-It was discovered in antiquity that Euclid's algorithm starting with  $\{x, 1\}$  terminates only when x is rational. In all cases, however, the relationship with continued fractions remains, as below.
+It was discovered in antiquity that Euclid’s algorithm starting with  $\{x, 1\}$  terminates only when x is rational. In all cases, however, the relationship with continued fractions remains, as below.
 
 ![](_page_930_Picture_14.jpeg)
 
@@ -687,9 +701,9 @@ Union[Flatten[Table[a/b, {b, n}, {a, 0, b}]]] (See also pages 892, 932 and 1084.
 ![Five digital-slope examples](_page_931_digital_slope_five_panel_row.jpeg)
 
 ■ **Representations for integers.** See page 560.
-■ **Operator representations.** Instead of repeatedly applying an operation to a sequence of digits one can consider forming integers (or other numbers) by performing trees of operations on a single constant. Thus, for example, any integer *m* can be obtained by a tree of *m* - 1 additions of 1's such as `(1 + (1 + 1)) + 1`. Another operator that can be used to generate any integer is $a \circ b = 2a + b - 1$. In this case 6 is $(1 \circ (1 \circ 1)) \circ 1$, and an integer *m* can be obtained by `Tr[1 + IntegerDigits[m, 2]] - 2` or at most `Log[2, m]` applications of $\circ$. The operator $k a + b - k + 1$ can be used for any *k*. It also turns out that `BitXor[2 a, b] + 1` works, though in this case even for 2 the smallest representation is $(1 \circ 1) \circ (1 \circ ((1 \circ 1) \circ 1))$. (For `BitOr[2 a, b] - 1` the number of applications needed is `With[{i = IntegerDigits[m, 2]}, Tr[i + 1] + i[[2]] (1 + i[[3]]) - 1]`.) The pictures below show the smallest number of operator applications required for successive integers. With the pair of operators *a* + *b* and $a \times b$ (a case considered in recreational
+■ **Operator representations.** Instead of repeatedly applying an operation to a sequence of digits one can consider forming integers (or other numbers) by performing trees of operations on a single constant. Thus, for example, any integer *m* can be obtained by a tree of *m* - 1 additions of 1’s such as `(1 + (1 + 1)) + 1`. Another operator that can be used to generate any integer is $a \circ b = 2a + b - 1$. In this case 6 is $(1 \circ (1 \circ 1)) \circ 1$, and an integer *m* can be obtained by `Tr[1 + IntegerDigits[m, 2]] - 2` or at most `Log[2, m]` applications of $\circ$. The operator $k a + b - k + 1$ can be used for any *k*. It also turns out that `BitXor[2 a, b] + 1` works, though in this case even for 2 the smallest representation is $(1 \circ 1) \circ (1 \circ ((1 \circ 1) \circ 1))$. (For `BitOr[2 a, b] - 1` the number of applications needed is `With[{i = IntegerDigits[m, 2]}, Tr[i + 1] + i[[2]] (1 + i[[3]]) - 1]`.) The pictures below show the smallest number of operator applications required for successive integers. With the pair of operators *a* + *b* and $a \times b$ (a case considered in recreational
 
-mathematics for n-ary operators) numbers of the form  $3^s$  have particularly small representations. Note that in all cases the size of the smallest representation must at some level increase like Log[m] (compare pages 1067 and 1070), but there may be some "algorithmically simple" integers that have shorter representations.
+mathematics for n-ary operators) numbers of the form  $3^s$  have particularly small representations. Note that in all cases the size of the smallest representation must at some level increase like Log[m] (compare pages 1067 and 1070), but there may be some “algorithmically simple” integers that have shorter representations.
 
 ![](_page_931_Figure_17.jpeg)
 
@@ -701,7 +715,7 @@ Integrate[1/(1 + x^2 + y^2), {x, 0, 1}, {y, 0, 1}] ==
   Pi ArcSinh[1]/2 - Catalan
 ```
 
-and presumably often cannot be expressed at all in terms of standard mathematical functions. Integrals of rational functions over regions defined by polynomial inequalities have recently been discussed under the name "periods". Many numbers associated with Zeta and Gamma can readily be generated, though apparently for example e and EulerGamma cannot. One can also consider numbers obtained from infinite sums (or by solving recurrence equations). If f[n] is a rational function,  $Sum[f[n], \{n, \infty\}]$ must just be a linear combination of PolyGamma functions, but again the multivariate case can be much more complicated.
+and presumably often cannot be expressed at all in terms of standard mathematical functions. Integrals of rational functions over regions defined by polynomial inequalities have recently been discussed under the name “periods”. Many numbers associated with Zeta and Gamma can readily be generated, though apparently for example e and EulerGamma cannot. One can also consider numbers obtained from infinite sums (or by solving recurrence equations). If f[n] is a rational function,  $Sum[f[n], \{n, \infty\}]$ must just be a linear combination of PolyGamma functions, but again the multivariate case can be much more complicated.
 
 ### Mathematical Functions
 
@@ -773,7 +787,7 @@ In 1972 Sergei Voronin showed that Zeta[z + (3/4 + I t)] has a certain universal
 
 ### Iterated Maps and the Chaos Phenomenon
 
-■ **History of iterated maps.** Newton's method from the late 1600s for finding roots of polynomials (already used in specific cases in antiquity) can be thought of as a smooth iterated map (see page 920) in which a rational function is repeatedly applied (see page 1101). Questions of convergence led in the late 1800s and early 1900s to interest in iteration theory, particularly for rational functions in the complex plane (see page 933). There were occasional comments about complicated behavior (notably by Arthur Cayley in 1879) but no real investigation seems to have been made. In the 1890s Henri Poincaré studied so-called return maps giving for example positions of objects on successive orbits. Starting in the 1930s iterated maps were sometimes considered as possible models in fields like population biology and business cycle theory—usually arising as discrete annualized versions of continuous equations like the Verhulst logistic differential equation from the mid-1800s. In most cases the most that was noted was simple oscillatory behavior, although for example in 1954 William Ricker iterated empirical reproduction curves for fish, and saw more complex behavior—though made little comment on it. In the 1950s Paul Stein and Stanislaw Ulam did an extensive computer study of various iterated maps of nonlinear functions. They concentrated on questions of convergence, but nevertheless noted complicated behavior. (Already in the late 1940s John von Neumann had suggested using  $x \rightarrow 4x$  (1-x) as a random number generator, commenting on its extraction of initial condition digits, as mentioned on page 921.) Some detailed analytical studies of logistic maps of the form  $x \rightarrow ax(1-x)$  were done in the late 1950s and early 1960s—and in the mid-1970s iterated maps became popular, with much analysis and computer experimentation on them being done. But typically studies have concentrated on repetition, nesting and sensitive dependence on initial conditions—not on more general issues of complexity.
+■ **History of iterated maps.** Newton’s method from the late 1600s for finding roots of polynomials (already used in specific cases in antiquity) can be thought of as a smooth iterated map (see page 920) in which a rational function is repeatedly applied (see page 1101). Questions of convergence led in the late 1800s and early 1900s to interest in iteration theory, particularly for rational functions in the complex plane (see page 933). There were occasional comments about complicated behavior (notably by Arthur Cayley in 1879) but no real investigation seems to have been made. In the 1890s Henri Poincaré studied so-called return maps giving for example positions of objects on successive orbits. Starting in the 1930s iterated maps were sometimes considered as possible models in fields like population biology and business cycle theory—usually arising as discrete annualized versions of continuous equations like the Verhulst logistic differential equation from the mid-1800s. In most cases the most that was noted was simple oscillatory behavior, although for example in 1954 William Ricker iterated empirical reproduction curves for fish, and saw more complex behavior—though made little comment on it. In the 1950s Paul Stein and Stanislaw Ulam did an extensive computer study of various iterated maps of nonlinear functions. They concentrated on questions of convergence, but nevertheless noted complicated behavior. (Already in the late 1940s John von Neumann had suggested using  $x \rightarrow 4x$  (1-x) as a random number generator, commenting on its extraction of initial condition digits, as mentioned on page 921.) Some detailed analytical studies of logistic maps of the form  $x \rightarrow ax(1-x)$  were done in the late 1950s and early 1960s—and in the mid-1970s iterated maps became popular, with much analysis and computer experimentation on them being done. But typically studies have concentrated on repetition, nesting and sensitive dependence on initial conditions—not on more general issues of complexity.
 
 In connection with his study of continued fractions Carl Friedrich Gauss noted in 1799 complexity in the behavior of the iterated map  $x \to FractionalPart[1/x]$ . Beginning in the late 1800s there was number theoretical investigation of the sequence FractionalPart[anx] associated with the map  $x \rightarrow FractionalPart[ax]$  (see page 903), notably by G. H. Hardy and John Littlewood in 1914. Various features of randomness such as uniform distribution were established, and connections to smooth iterated maps emerged after the development of symbolic dynamics in the late 1930s.
 
@@ -783,9 +797,9 @@ In connection with his study of continued fractions Carl Friedrich Gauss noted i
 
 So what happens when a system one is simulating tries to sample digits in its initial conditions beyond the ones that are stored? The answer depends on the way that arithmetic is handled in the computer system one uses.
 
-When doing high-precision arithmetic, Mathematica follows the principle that it should only ever give digits that are known to be correct on the basis of the input that was provided. This means that in simulating chaotic systems, the numbers produced will typically have progressively fewer digits: later digits cannot be known to be correct without more precise knowledge of this initial condition. (An example is  $NestList[Mod[2#, 1] \&, N[\pi/4, 40], 200]$ ; Map[Precision, list] gives the number of significant digits of each element in the list.)
+When doing high-precision arithmetic, *Mathematica* follows the principle that it should only ever give digits that are known to be correct on the basis of the input that was provided. This means that in simulating chaotic systems, the numbers produced will typically have progressively fewer digits: later digits cannot be known to be correct without more precise knowledge of this initial condition. (An example is  $NestList[Mod[2#, 1] \&, N[\pi/4, 40], 200]$ ; Map[Precision, list] gives the number of significant digits of each element in the list.)
 
-But most current languages and hardware systems follow a rather different approach. (For low-precision machine arithmetic, Mathematica is also forced to follow this approach.) What they do is to give a fixed number of digits as the result of every computation, whether or not all those digits are known to be correct. It is then the task of numerical analysis to establish that in a particular computation, the final results obtained are not unduly affected by digits that are not known to be correct. And in practice, for many kinds of computations, this is to a large extent the case. But whenever chaos is involved, it is inevitably not.
+But most current languages and hardware systems follow a rather different approach. (For low-precision machine arithmetic, *Mathematica* is also forced to follow this approach.) What they do is to give a fixed number of digits as the result of every computation, whether or not all those digits are known to be correct. It is then the task of numerical analysis to establish that in a particular computation, the final results obtained are not unduly affected by digits that are not known to be correct. And in practice, for many kinds of computations, this is to a large extent the case. But whenever chaos is involved, it is inevitably not.
 
 As an example, consider the iterated map  $x \to Mod[2x, 1]$ discussed in the main text. At each step, this map shifts all the base 2 digits in x one position to the left. But if the computer gives a fixed number of digits at each step, then additional digits must be filled in on the right. On most computers, these additional digits are always 0. And so after some number of steps, all the digits in x are 0, and thus the value of x is simply 0.
 
@@ -828,7 +842,7 @@ sequences obtained with this map starting from x = 1/8 are shown below for vario
 
 ![](_page_936_Picture_3.jpeg)
 
-■ **Higher-dimensional generalizations.** One can consider so-called Anosov maps such as `{x, y} -> Mod[m . {x, y}, 1]` where *m* is a matrix such as `{{2, 1}, {1, 1}}`. Any initial condition containing only rational numbers will then yield repetitive behavior, much as in the shift map. But as soon as *m* itself contains irrational numbers, complicated behavior can be obtained even with an initial condition such as `{1, 1}`.
+■ **Higher-dimensional generalizations.** One can consider so-called Anosov maps such as `{x, y} -> Mod[m . {x, y}, 1]` where *m* is a matrix such as `{{2, 1}, {1, 1}}`. Any initial condition containing only rational numbers will then yield repetitive behavior, much as in the shift map. But as soon as *m* itself contains rational numbers, complicated behavior can be obtained even with an initial condition such as `{1, 1}`.
 ■ **Distribution of chaotic behavior.** For iterated maps, unlike for discrete systems such as cellular automata, one can get continuous ranges of rules by varying parameters. With maps based on piecewise linear functions the regions of parameters in which chaotic behavior occurs typically have simple shapes; with maps based, say, on quadratic
 
 functions, however, elaborate nested shapes can occur. (See page 934.)
@@ -854,7 +868,7 @@ Note that in the definitions above, the elements of list can be either exact rat
 
 ■ **History.** Continuous cellular automata have been introduced independently several times, under several different names. In all cases the rules have been at least slightly more complicated than the ones I consider here, and behavior starting from simple initial conditions does not appear to have been studied before. Versions of continuous cellular automata arose in the mid-1970s as idealizations of coupled ordinary differential equations for arrays of nonlinear oscillators, and implicitly in finite difference approximations to partial differential equations. They began
 
-to be studied with extensive computer simulations in the early 1980s, probably following my work on ordinary cellular automata. Most often considered, notably by Kunihiko Kaneko and co-workers, were so-called "coupled map lattices" or "lattice dynamical systems" in which an iterated map (typically a logistic map) was applied at each step to a combination of neighboring cell values. A transition from regular class 2 to irregular class 3 behavior, with class 4 behavior involving localized structures in between, was observed, and was studied in detail by Hugues Chaté and Paul Manneville, starting in the late 1980s.
+to be studied with extensive computer simulations in the early 1980s, probably following my work on ordinary cellular automata. Most often considered, notably by Kunihiko Kaneko and co-workers, were so-called “coupled map lattices” or “lattice dynamical systems” in which an iterated map (typically a logistic map) was applied at each step to a combination of neighboring cell value. A transition from regular class 2 to irregular class 3 behavior, with class 4 behavior involving localized structures in between, was observed, and was studied in detail by Hugues Chaté and Paul Manneville, starting in the late 1980s.
 
 ■ **Page 158 · Properties.** At step t the background is FractionalPart[at]. For rational a this always repeats, cycling through Denominator[a] possible values (compare page 255). In most patterns generated from initial conditions containing say a single black cell most cells whose values are not forced to be the same end up being at least slightly different—even in cases like a = 0.375. Note that in cases like a = 0.475 there is some trace of a pattern at every step—but it only becomes obvious when it makes values wrap around from 1 to 0. The pictures below show successive colors of (a) the background (compare page 950) and (b) the center cell for each a = n/500 from 0 to 1 for the systems on page 159. (Compare page 243.)
 
@@ -866,7 +880,7 @@ If *a* is not a rational number the background never repeats, but the main featu
 
 Mod[RotateLeft[list] + RotateRight[list], 1]
 
-With a single nonzero initial cell with value 1/k the pattern produced is just Pascal's triangle modulo k. If k is a rational number only a limited set of values appear, and the pattern has a nested form analogous to those shown on page 870. If k is irrational then equidistribution of Mod[Binomial[t, x], k] implies that all possible values eventually appear; the corresponding patterns seem fairly irregular, as shown below. (Compare pages 953 and 1092.)
+With a single nonzero initial cell with value 1/k the pattern produced is just Pascal’s triangle modulo k. If k is a rational number only a limited set of values appear, and the pattern has a nested form analogous to those shown on page 870. If k is irrational then equidistribution of Mod[Binomial[t, x], k] implies that all possible values eventually appear; the corresponding patterns seem fairly irregular, as shown below. (Compare pages 953 and 1092.)
 
 ![](_page_937_Picture_8.jpeg)
 
@@ -874,7 +888,7 @@ With a single nonzero initial cell with value 1/k the pattern produced is just P
 
 ### Partial Differential Equations
 
-■ **Ordinary differential equations.** It is also possible to set up systems which have a finite number of continuous variables (say a[t], b[t], etc.) that change continuously with time. The rules for such systems correspond to ordinary differential equations. Over the past century, the field of dynamical systems theory has produced many results about such systems. If all equations are of the form a'[t] = f[a[t], b[t], ...], etc. then it is known for example that it is necessary to have at least three equations in order to get behavior that is not ultimately fixed or repetitive. (The Lorenz equations are an example.) If the function f depends explicitly on time, then two equations suffice. (The van der Pol equations are an example.)
+■ **Ordinary differential equations.** It is also possible to set up systems which have a finite number of continuous variables (say a[t], b[t], etc.) that change continuously with time. The rules for such systems correspond to ordinary differential equations. Over the past century, the field of dynamical systems theory has produced many results about such systems. If all equations are of the form a'[t] = f[a[t], b[t], …], etc. then it is known for example that it is necessary to have at least three equations in order to get behavior that is not ultimately fixed or repetitive. (The Lorenz equations are an example.) If the function f depends explicitly on time, then two equations suffice. (The van der Pol equations are an example.)
 
 Just as in iterated maps, a small change in the initial values a[0] etc. can often lead to an exponentially increasing difference in later values of a[t], etc. But as in iterated maps, the main part of this process that has been analyzed is simply the excavation of progressively less significant digits in the number a[0].
 
@@ -906,7 +920,7 @@ This equation makes any variation in *u* as a function of *x* eventually become 
 
 Many equations used in physics can lead to singularities: the Navier-Stokes equations for fluid flow yield shock waves, while the Einstein equations yield black holes. At a physical level, such singularities usually indicate that processes not captured by the equations have become important. But at a mathematical level one can simply ask whether a particular equation always has solutions which are at least as regular as its initial conditions. Despite much work, however, only a few results along these lines are known.
 
-■ **Existence and uniqueness.** Unlike systems such as cellular automata, PDEs do not have a built-in notion of "evolution" or "time". Instead, as discussed on page 940, a PDE is essentially just a constraint on the values of a function at different times or different positions. In solving a PDE, one is usually interested in determining values that satisfy this constraint inside a particular region, based on information about values on the edges. It is then a fundamental question how much can be specified on the edges in order to obtain a unique solution. If too little is specified, there may be many possible solutions, while if too much is specified there may be no consistent solution at all. For some very simple PDEs, the conditions for unique solutions are known. So-called hyperbolic equations (such as the wave equation, the sine-Gordon equation and my equation) work a little like cellular automata in that in at least one dimension information can propagate only at a limited speed, say *c*. The result is that in such equations, giving values for `u[t, x]` at *t* = 0 for $-s < x < s$ will uniquely determine `u[t, x]` at larger *t* for $-s + c t < x < s - c t$. In other PDEs, such as so-called elliptic ones, there is no such limit on the rate of information propagation, and as a result, it is immediately necessary to know values of `u[t, x]` at all *x*, and on the boundaries of the region, in order to determine `u[t, x]` for any *t* > 0.
+■ **Existence and uniqueness.** Unlike systems such as cellular automata, PDEs do not have a built-in notion of “evolution” or “time”. Instead, as discussed on page 940, a PDE is essentially just a constraint on the values of a function at different times or different positions. In solving a PDE, one is usually interested in determining values that satisfy this constraint inside a particular region, based on information about values on the edges. It is then a fundamental question how much can be specified on the edges in order to obtain a unique solution. If too little is specified, there may be many possible solutions, while if too much is specified there may be no consistent solution at all. For some very simple PDEs, the conditions for unique solutions are known. So-called hyperbolic equations (such as the wave equation, the sine-Gordon equation and my equation) work a little like cellular automata in that in at least one dimension information can propagate only at a limited speed, say *c*. The result is that in such equations, giving values for `u[t, x]` at *t* = 0 for $-s < x < s$ will uniquely determine `u[t, x]` at larger *t* for $-s + c t < x < s - c t$. In other PDEs, such as so-called elliptic ones, there is no such limit on the rate of information propagation, and as a result, it is immediately necessary to know values of `u[t, x]` at all *x*, and on the boundaries of the region, in order to determine `u[t, x]` for any *t* > 0.
 
 ■ **Page 165 · Field equations.** Any equation of the form
 
@@ -938,7 +952,7 @@ For a = 0, the solution to this equation can be written in terms of Jacobi ellip
 
  $b d JacobiSN[rt, s]^2/(b-d JacobiCN[rt, s]^2)$ where
 
-r = -Sqrt[1/(8 a c (b - d))]
+r = -Sqrt[1/8 a c (b - d)]
 
 s = d(c-b)/(c(d-b))
 
@@ -962,7 +976,7 @@ For equations where one can come at least close to having explicit algebraic for
 
 And indeed in practice it is often difficult to tell whether complexity that is seen is actually a consequence of the underlying PDE, or is instead merely a reflection of the discretization procedure. I strongly suspect that many equations, particularly in fluid dynamics, that have been studied over the past few decades exhibit highly complex behavior. But in most publications such behavior is never shown, presumably because the authors are not sure whether the behavior is a genuine consequence of the equations they are studying.
 
-■ **Implementation.** All the numerical solutions shown were found using the NDSolve function built into Mathematica. In general, finite difference methods, the method of lines and pseudospectral methods can be used. For equations of the form
+■ **Implementation.** All the numerical solutions shown were found using the `NDSolve` function built into *Mathematica*. In general, finite difference methods, the method of lines and pseudospectral methods can be used. For equations of the form
 
 $$\partial_{tt} u[t, x] == \partial_{xx} u[t, x] + f[u[t, x]]$$
 
@@ -991,7 +1005,7 @@ PDEEvolveList[PDEKernel[
  Table[{1, 1} N[Exp[-x^2]], {x, -20, 20, 0.1}]], 400]
 ```
 
-For both this example and the middle one the results converge rapidly as dx decreases. But for the bottom example, the pictures below show that convergence is not so rapid, and indeed, as is typical in working with PDEs, despite having used large amounts of computer time I do not know whether the details of the picture in the main text are really correct. The energy function (see above) is at least roughly conserved, but it seems quite likely that the "shocks" visible are merely a consequence of the discretization procedure used.
+For both this example and the middle one the results converge rapidly as dx decreases. But for the bottom example, the pictures below show that convergence is not so rapid, and indeed, as is typical in working with PDEs, despite having used large amounts of computer time I do not know whether the details of the picture in the main text are really correct. The energy function (see above) is at least roughly conserved, but it seems quite likely that the “shocks” visible are merely a consequence of the discretization procedure used.
 
 ![Three PDE convergence examples at decreasing spatial step sizes](_page_939_pde_convergence_three_panel_row.jpeg)
 
@@ -1003,7 +1017,7 @@ with n = 4, 6, 8, etc. appear to show similar behavior to the n = 2 equation in 
 
 ![](_page_940_Picture_4.jpeg)
 
-■ **Other PDEs.** The pictures above show three PDEs that have been studied in recent years. All are of the so-called parabolic type, so that, unlike my equation, they have no limit on the rate of information propagation, and thus a solution in any region immediately depends on values on the boundary—which in the pictures below is taken to be periodic. (The deterministic Kardar-Parisi-Zhang equation $\partial_t u[t, x] = a \partial_{xx} u[t, x] + \frac{1}{2} b (\partial_x u[t, x])^2$ yields behavior like Burger's equation, but symmetrical. Note that `Abs[u]` is plotted in the second picture, while for the last equation a common less symmetrical form replaces the last term by $u[t, x] \partial_x u[t, x]$.)
+■ **Other PDEs.** The pictures above show three PDEs that have been studied in recent years. All are of the so-called parabolic type, so that, unlike my equation, they have no limit on the rate of information propagation, and thus a solution in any region immediately depends on values on the boundary—which in the pictures below is taken to be periodic. (The deterministic Kardar-Parisi-Zhang equation $\partial_t u[t, x] = a \partial_{xx} u[t, x] + \frac{1}{2} b (\partial_x u[t, x])^2$ yields behavior like Burger’s equation, but symmetrical. Note that `Abs[u]` is plotted in the second picture, while for the last equation a common less symmetrical form replaces the last term by $u[t, x] \partial_x u[t, x]$.)
 
 ### Continuous Versus Discrete Systems
 

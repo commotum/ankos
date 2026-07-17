@@ -14,11 +14,11 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-EXPECTED_SHA256 = "828a966de370f310e7e81b48ca8042d8dd8f598aa97611c098c4a924ac8ece83"
-EXPECTED_BYTES = 115_601
-EXPECTED_LINES = 1_012
+EXPECTED_SHA256 = "21c8b8f71b5624392b5cc874b9abeb380198c20e7237bf1b4358b990fdd23fe7"
+EXPECTED_BYTES = 115_681
+EXPECTED_LINES = 1_026
 EXPECTED_CORRECTIONS_SHA256 = (
-    "3d33d8d007459b047f9a3fb981f23ba6f1b55203846260258e1c8e021d629feb"
+    "c1263e7a22b553ab32e5c854e93dd62ad341030bd83fb057e38fed309abe4a5e"
 )
 EXPECTED_IMAGE_ROWS_SHA256 = (
     "c00359a797473057a847aef362c8ee6e9072010d946dfa07828593094843bb17"
@@ -45,7 +45,7 @@ EXPECTED_EMPHASIS_COUNTS = {
     "BOLD": 110,
     "BOLD_ITALIC": 0,
     "ITALIC_NESTED_IN_BOLD": 0,
-    "ITALIC": 186,
+    "ITALIC": 190,
 }
 
 EXPECTED_DISPOSITION_ORDINALS = [
@@ -281,15 +281,15 @@ class NotesForChapter4Tests(unittest.TestCase):
         self.assertEqual(len(segment), 115228)
         self.assertEqual(build.sha256(segment), self.document["raw_segment_sha256"])
 
-        self.assertEqual(len(self.n04_corrections), 56)
+        self.assertEqual(len(self.n04_corrections), 72)
         self.assertEqual(
             [row["id"] for row in self.n04_corrections],
-            [f"G5-C-{number:04d}" for number in range(974, 1030)],
+            [f"G5-C-{number:04d}" for number in range(974, 1046)],
         )
         self.assertEqual(
             self.rows_sha256(self.n04_corrections), EXPECTED_CORRECTIONS_SHA256
         )
-        self.assertEqual(len({row["before"] for row in self.n04_corrections}), 56)
+        self.assertEqual(len({row["before"] for row in self.n04_corrections}), 72)
 
         previous_end = self.document["raw_start_byte"]
         for row in sorted(
@@ -361,7 +361,7 @@ class NotesForChapter4Tests(unittest.TestCase):
         self.assertEqual(len(re.findall(r"(?m)^▪ ", self.rendered)), 8)
         self.assertEqual(self.rendered.count("```"), 94)
         self.assertEqual(
-            len(re.findall(r"(?<!`)`[^`\n]+`(?!`)", self.rendered)), 311
+            len(re.findall(r"(?<!`)`[^`\n]+`(?!`)", self.rendered)), 312
         )
         self.assertEqual(
             len(re.findall(r"(?<!\\)\$[^$\n]+(?<!\\)\$", self.rendered)),
@@ -374,7 +374,11 @@ class NotesForChapter4Tests(unittest.TestCase):
         )
         emphasis = self.emphasis_counts(self.rendered)
         self.assertEqual(emphasis, EXPECTED_EMPHASIS_COUNTS)
-        self.assertEqual(sum(emphasis.values()), 296)
+        self.assertEqual(sum(emphasis.values()), 300)
+        self.assertEqual(self.rendered.count("’"), 28)
+        self.assertEqual(self.rendered.count("“"), 12)
+        self.assertEqual(self.rendered.count("”"), 12)
+        self.assertEqual(self.rendered.count("*Mathematica*"), 10)
         self.assertNotIn("####", self.rendered)
 
     def test_mapped_inventory_dispositions_and_order_are_exact(self) -> None:
@@ -557,7 +561,7 @@ class NotesForChapter4Tests(unittest.TestCase):
             "With[{r = FromContinuedFraction[ContinuedFraction[x, n]]}, -Log[Denominator[r], Abs[x - r]]]",
             "CCAEvolveList[f_, init_List, t_Integer]",
             "((∂_t u)^2 + (∂_x u)^2)/2",
-            "Sqrt[1/(8 a c (b - d))]",
+            "Sqrt[1/8 a c (b - d)]",
             r"2\,3^{1/4}\,\mathrm{EllipticK}[1/2]",
             r"$u[t, x] \partial_x u[t, x]$.)",
             "s^2 + 4 r == 4^t n",
@@ -572,7 +576,7 @@ class NotesForChapter4Tests(unittest.TestCase):
             "IntegerDigits[Mod[2^n Floor[2^53 x], 2^53], 2, 53]",
             "Flatten[IntegerDigits[IntegerDigits[Mod[2^n Floor[10^12 x], 10^12], 10, 12], 2, 4]]",
             r"$Sin[\pi u]^2$ makes the mapping become just  $u \rightarrow FractionalPart[2u]$",
-            "a'[t] = f[a[t], b[t], ...]",
+            "a'[t] = f[a[t], b[t], …]",
             r"$$\partial_t u[t, x] = -\partial_{xx} u[t, x]$$",
             r"$$\partial_{tt} u[t, x] = \partial_{xx} u[t, x] + f[u[t, x]]$$",
             r"$$\partial_{tt} u[t, x] == \partial_{xx} u[t, x] + f[u[t, x]]$$",
@@ -581,6 +585,29 @@ class NotesForChapter4Tests(unittest.TestCase):
         for specimen in required:
             with self.subTest(specimen=specimen[:80]):
                 self.assertEqual(self.rendered.count(specimen), 1)
+
+        source_fidelity_pins = (
+            "requiring for example IntegerQ[DivisorSigma[1, n]/n]",
+            "*m* itself contains rational numbers",
+            "a combination of neighboring cell value",
+            "using the `NDSolve` function built into *Mathematica*",
+        )
+        for specimen in source_fidelity_pins:
+            with self.subTest(source_fidelity=specimen):
+                self.assertEqual(self.rendered.count(specimen), 1)
+
+        standalone_expressions = (
+            "Floor[h] + Fold[Flatten[#1 /. #2] &, {0}, rules]",
+            "n -> If[Mod[n, 3] == 0, 2 n/3, Round[4 n/3]]",
+            "Flatten[Table[Table[n, {IntegerExponent[n, 2] + 1}], {n, m}]]",
+            "Nest[Replace[#, {x___} -> {x, 1, x, 0}] &, {}, k]",
+            "39448887705043893375102470161238803295318090278129552",
+            "Ceiling[1 + ProductLog[(n - 1) Log[2]/2]/Log[2]]",
+        )
+        for expression in standalone_expressions:
+            with self.subTest(standalone=expression[:80]):
+                self.assertEqual(self.rendered.count(f"\n\n`{expression}`\n\n"), 1)
+                self.assertNotIn(f"`{expression}`.", self.rendered)
 
         shallit = self.rendered[
             self.rendered.index("{0, k - 1, k + 2") : self.rendered.index(
@@ -638,7 +665,7 @@ class NotesForChapter4Tests(unittest.TestCase):
                 len(self.n04_added),
                 len(references),
             ),
-            (56, 71, 30, 11, 52),
+            (72, 71, 30, 11, 52),
         )
         self.assertEqual(
             (
@@ -669,7 +696,7 @@ class NotesForChapter4Tests(unittest.TestCase):
             "_page_943_Picture_11.jpeg",
         )
         self.assertEqual(
-            int(self.n04_corrections[-1]["id"].rsplit("-", 1)[1]) + 1, 1030
+            int(self.n04_corrections[-1]["id"].rsplit("-", 1)[1]) + 1, 1046
         )
         self.assertEqual(
             int(self.n04_added[-1]["id"].rsplit("-", 1)[1]) + 1, 61
