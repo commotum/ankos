@@ -595,7 +595,10 @@ class NotesForChapter5Tests(unittest.TestCase):
         segment = self.raw[1_908_092:2_002_646]
         self.assertEqual(build.sha256(segment), self.document["raw_segment_sha256"])
 
-        self.assertEqual(len(self.corrections), 1_213)
+        # Later Stage 7 documents append corrections without changing the
+        # closed N05 slice. Pin the N05 rows below, not the evolving global
+        # manifest length.
+        self.assertGreaterEqual(len(self.corrections), 1_213)
         self.assertEqual(len(self.n05_corrections), 164)
         self.assertEqual(
             [row["id"] for row in self.n05_corrections],
