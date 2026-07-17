@@ -215,7 +215,7 @@ Probabilistic estimates can also be used for other quantities, such as growth ra
 ■ **Density in rule 90.** From the superposition principle above and the number of black cells at step t in a pattern starting from a single black cell (see page 870) one can compute the density after t steps in the evolution of rule 90 with initial conditions of density *p* to be (see also page 602)
 
 ```
-1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))
+1/2 (1 - (1 - 2 p))^(2^DigitCount[t, 2, 1])
 ```
 
 ■ **Densities in other rules.** The pictures below show how the densities on successive steps depend on the initial density. Densities are indicated by gray levels. Initial densities are shown across each picture. Successive steps are shown down the page. Rule 236 is class 2, and the density retains a memory of its initial value. But in the class 3 rules 126 and 30, the densities converge quickly to a fixed value.

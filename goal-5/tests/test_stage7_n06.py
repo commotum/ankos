@@ -28,18 +28,18 @@ import validate  # noqa: E402
 EXPECTED_TARGET_BYTES = 85_467
 EXPECTED_TARGET_LINES = 666
 EXPECTED_TARGET_SHA256 = (
-    "46e2cbc14314b6bb975632189b514eafa23341335cabb9c01cd9981f4a58cba7"
+    "54bf7356136644c5040ffcc7945b49faab73a2bf5f2758dc51ff91b49e1eb437"
 )
 EXPECTED_CORRECTION_ROWS_SHA256 = (
-    "cef7514262b728269dd9cc8b7861665f719cdbcd5a0b924137039278d10f253b"
+    "2e7c2f5b9ae5610dccdbf11e842caa151ac424e806fb7861190f244c67a04e5f"
 )
 EXPECTED_CORRECTION_ROW_HASH_SEQUENCE = (
-    "5cac36af9f1c444ff78a1c107c83054337d22fba6ce515d4e992692dd3b96d11"
+    "bfb34118d7d29458f5e7159c3051e977561821273add90a92932609cfa4dd2f7"
 )
 EXPECTED_INVENTORY_HASHES = {
     "headings": "f74fc1b553f3e84a3a0a894683c7b56325406091843bc621acfcce20b1fb5ecc",
     "labels": "3b7eac5203ad6cb559dd59ba30aa9638e5eefee4fa7bbbded06883dccfdf47d3",
-    "code_fences": "da2612b77c04c435607f64d2ceffbc16719f64e0a0776f812382198389fd248f",
+    "code_fences": "7caf3059216dccb0d3bcbb8f33cf7f0cc5c61ea2110e786eff313e9e15060212",
     "inline_code": "30b47173bdafdfb5bd74f036f08866579049fe3c454887ff000ec08721b00f53",
     "image_references": "387f940554c276de1af83e96d4e2ee888008f031cf8409ad0440cf62dd298f8d",
 }
@@ -363,7 +363,7 @@ REQUIRED_LITERAL_PINS: tuple[tuple[str, str, int], ...] = (
     ("rule45-background", "background of repeated ■■□ blocks", 1),
     (
         "rule90-density",
-        "1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))",
+        "1/2 (1 - (1 - 2 p))^(2^DigitCount[t, 2, 1])",
         1,
     ),
     ("cyclic-mod-equality", "`Mod[k^t, n] == 1`", 1),
@@ -411,6 +411,10 @@ FORBIDDEN_LITERAL_PINS: tuple[tuple[str, str], ...] = (
         "`MultiplicativeOrder[k, n/m]` steps \n",
     ),
     ("density-missing-period", "very different behavior\n"),
+    (
+        "rule90-density-misgrouped",
+        "1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))",
+    ),
     (
         "excluded-blocks-false-paragraph",
         "additional excluded blocks with lengths\n\nbetween n and 2n.",
@@ -913,7 +917,7 @@ class NotesForChapter6Tests(unittest.TestCase):
 
     def test_high_risk_source_and_technical_literals(self) -> None:
         self.assertEqual(
-            len(REQUIRED_LITERAL_PINS) + len(FORBIDDEN_LITERAL_PINS), 38
+            len(REQUIRED_LITERAL_PINS) + len(FORBIDDEN_LITERAL_PINS), 39
         )
         for pin_id, literal, expected_count in REQUIRED_LITERAL_PINS:
             with self.subTest(required_pin=pin_id):
