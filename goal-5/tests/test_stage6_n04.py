@@ -14,11 +14,11 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-EXPECTED_SHA256 = "21c8b8f71b5624392b5cc874b9abeb380198c20e7237bf1b4358b990fdd23fe7"
+EXPECTED_SHA256 = "f882f0d87558eb4cdfdb21e67d49c06e0052c8456e52aa09cfdddc3a1eb859da"
 EXPECTED_BYTES = 115_681
 EXPECTED_LINES = 1_026
 EXPECTED_CORRECTIONS_SHA256 = (
-    "c1263e7a22b553ab32e5c854e93dd62ad341030bd83fb057e38fed309abe4a5e"
+    "7c13c61d7678bc2ecec7416e3bce4e91ace394219868df439d2bd0c5d5092968"
 )
 EXPECTED_IMAGE_ROWS_SHA256 = (
     "c00359a797473057a847aef362c8ee6e9072010d946dfa07828593094843bb17"
@@ -281,15 +281,15 @@ class NotesForChapter4Tests(unittest.TestCase):
         self.assertEqual(len(segment), 115228)
         self.assertEqual(build.sha256(segment), self.document["raw_segment_sha256"])
 
-        self.assertEqual(len(self.n04_corrections), 72)
+        self.assertEqual(len(self.n04_corrections), 74)
         self.assertEqual(
             [row["id"] for row in self.n04_corrections],
-            [f"G5-C-{number:04d}" for number in range(974, 1046)],
+            [f"G5-C-{number:04d}" for number in range(974, 1048)],
         )
         self.assertEqual(
             self.rows_sha256(self.n04_corrections), EXPECTED_CORRECTIONS_SHA256
         )
-        self.assertEqual(len({row["before"] for row in self.n04_corrections}), 72)
+        self.assertEqual(len({row["before"] for row in self.n04_corrections}), 74)
 
         previous_end = self.document["raw_start_byte"]
         for row in sorted(
@@ -361,11 +361,11 @@ class NotesForChapter4Tests(unittest.TestCase):
         self.assertEqual(len(re.findall(r"(?m)^▪ ", self.rendered)), 8)
         self.assertEqual(self.rendered.count("```"), 94)
         self.assertEqual(
-            len(re.findall(r"(?<!`)`[^`\n]+`(?!`)", self.rendered)), 312
+            len(re.findall(r"(?<!`)`[^`\n]+`(?!`)", self.rendered)), 318
         )
         self.assertEqual(
             len(re.findall(r"(?<!\\)\$[^$\n]+(?<!\\)\$", self.rendered)),
-            137,
+            135,
         )
         self.assertEqual(self.rendered.count("$$"), 12)
         self.assertEqual(
@@ -591,6 +591,8 @@ class NotesForChapter4Tests(unittest.TestCase):
             "*m* itself contains rational numbers",
             "a combination of neighboring cell value",
             "using the `NDSolve` function built into *Mathematica*",
+            "For rational functions `f[x]`, `Integrate[f[x], {x, 0, 1}]` must always be a linear function of `Log` and `ArcTan` applied to algebraic numbers (`f[x] = 1/(1 + x^2)` for example yields $\\pi/4$).",
+            "the sequence `FractionalPart[a^n x]` associated with the map",
         )
         for specimen in source_fidelity_pins:
             with self.subTest(source_fidelity=specimen):
@@ -640,6 +642,8 @@ class NotesForChapter4Tests(unittest.TestCase):
             r"\#",
             "socalled",
             "PrimePi[n] LogIntegral[n]",
+            "Integrate  $[f[x],",
+            "FractionalPart[anx]",
         )
         for remnant in forbidden:
             with self.subTest(remnant=remnant):
@@ -665,7 +669,7 @@ class NotesForChapter4Tests(unittest.TestCase):
                 len(self.n04_added),
                 len(references),
             ),
-            (72, 71, 30, 11, 52),
+            (74, 71, 30, 11, 52),
         )
         self.assertEqual(
             (
@@ -696,7 +700,7 @@ class NotesForChapter4Tests(unittest.TestCase):
             "_page_943_Picture_11.jpeg",
         )
         self.assertEqual(
-            int(self.n04_corrections[-1]["id"].rsplit("-", 1)[1]) + 1, 1046
+            int(self.n04_corrections[-1]["id"].rsplit("-", 1)[1]) + 1, 1048
         )
         self.assertEqual(
             int(self.n04_added[-1]["id"].rsplit("-", 1)[1]) + 1, 61
