@@ -14,11 +14,11 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-EXPECTED_SHA256 = "f882f0d87558eb4cdfdb21e67d49c06e0052c8456e52aa09cfdddc3a1eb859da"
-EXPECTED_BYTES = 115_681
-EXPECTED_LINES = 1_026
+EXPECTED_SHA256 = "2c3aa3a04768d9472e365aafef9eac13a984e29cba9e91bafa5737307e7beeed"
+EXPECTED_BYTES = 115_687
+EXPECTED_LINES = 1_040
 EXPECTED_CORRECTIONS_SHA256 = (
-    "7c13c61d7678bc2ecec7416e3bce4e91ace394219868df439d2bd0c5d5092968"
+    "10be073c63bab5e9ef1a3abdd1fab1db36d5a5b058d5d1c39ff3d0d4ee7f018a"
 )
 EXPECTED_IMAGE_ROWS_SHA256 = (
     "c00359a797473057a847aef362c8ee6e9072010d946dfa07828593094843bb17"
@@ -281,15 +281,15 @@ class NotesForChapter4Tests(unittest.TestCase):
         self.assertEqual(len(segment), 115228)
         self.assertEqual(build.sha256(segment), self.document["raw_segment_sha256"])
 
-        self.assertEqual(len(self.n04_corrections), 74)
+        self.assertEqual(len(self.n04_corrections), 76)
         self.assertEqual(
             [row["id"] for row in self.n04_corrections],
-            [f"G5-C-{number:04d}" for number in range(974, 1048)],
+            [f"G5-C-{number:04d}" for number in range(974, 1050)],
         )
         self.assertEqual(
             self.rows_sha256(self.n04_corrections), EXPECTED_CORRECTIONS_SHA256
         )
-        self.assertEqual(len({row["before"] for row in self.n04_corrections}), 74)
+        self.assertEqual(len({row["before"] for row in self.n04_corrections}), 76)
 
         previous_end = self.document["raw_start_byte"]
         for row in sorted(
@@ -611,6 +611,19 @@ class NotesForChapter4Tests(unittest.TestCase):
                 self.assertEqual(self.rendered.count(f"\n\n`{expression}`\n\n"), 1)
                 self.assertNotIn(f"`{expression}`.", self.rendered)
 
+        display_boundary_pins = (
+            "computed simply by\n\n`NestList[If[EvenQ[#], 3 #/2, 3 (# + 1)/2] &, 1, t]`\n\n■ **Page 122 · The 3n+1 problem.**",
+            "modified forms such as\n\n`4/(Fold[#2/#1 + 2 &, 2, Reverse[Range[1, n, 2]^2]] - 1)`\n\ncan be very regular.",
+            "Farey sequence\n\nUnion[Flatten[Table[a/b, {b, n}, {a, 0, b}]]]\n\n(See also pages 892, 932 and 1084.)",
+            "first family is\n\n(Floor[(n+1)#] - Floor[n#] &)[(b-a)/(a+b)]\n\nand as discussed",
+            "is essentially\n\n`IntegerDigits[Mod[2^n Floor[2^53 x], 2^53], 2, 53]`\n\non the computer, and",
+            "functions as\n\n $\\sqrt{3} \\ JacobiSN[t/3^{1/4}, 1/2]^2/(1 + JacobiCN[t/3^{1/4}, 1/2]^2)$ \n\nIn general the solution is",
+            "solution is\n\n $b d JacobiSN[rt, s]^2/(b-d JacobiCN[rt, s]^2)$ \n\nwhere\n\nr =",
+        )
+        for specimen in display_boundary_pins:
+            with self.subTest(display_boundary=specimen[:80]):
+                self.assertEqual(self.rendered.count(specimen), 1)
+
         shallit = self.rendered[
             self.rendered.index("{0, k - 1, k + 2") : self.rendered.index(
                 "```", self.rendered.index("{0, k - 1, k + 2")
@@ -669,7 +682,7 @@ class NotesForChapter4Tests(unittest.TestCase):
                 len(self.n04_added),
                 len(references),
             ),
-            (74, 71, 30, 11, 52),
+            (76, 71, 30, 11, 52),
         )
         self.assertEqual(
             (
@@ -700,7 +713,7 @@ class NotesForChapter4Tests(unittest.TestCase):
             "_page_943_Picture_11.jpeg",
         )
         self.assertEqual(
-            int(self.n04_corrections[-1]["id"].rsplit("-", 1)[1]) + 1, 1048
+            int(self.n04_corrections[-1]["id"].rsplit("-", 1)[1]) + 1, 1050
         )
         self.assertEqual(
             int(self.n04_added[-1]["id"].rsplit("-", 1)[1]) + 1, 61

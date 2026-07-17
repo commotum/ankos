@@ -117,7 +117,9 @@ If *h* is the solution to a quadratic equation, then the continued fraction form
 
 ■ **Other uniformly distributed sequences.** Cases in which `Mod[a[n], 1]` is uniformly distributed include `Sqrt[n]`, `n Log[n]`, `Log[Fibonacci[n]]`, `Log[n!]`, `h n^2` and `h Prime[n]` (*h* irrational) and probably `n Sin[n]`. (See also page 914.)
 
-■ **Page 122 · Implementation.** The evolution for *t* steps of the system at the top of the page can be computed simply by `NestList[If[EvenQ[#], 3 #/2, 3 (# + 1)/2] &, 1, t]`.
+■ **Page 122 · Implementation.** The evolution for *t* steps of the system at the top of the page can be computed simply by
+
+`NestList[If[EvenQ[#], 3 #/2, 3 (# + 1)/2] &, 1, t]`
 
 ■ **Page 122 · The 3n+1 problem.** The system described here is similar to the so-called 3n+1 problem, in which one looks at the rule `n -> If[EvenQ[n], n/2, (3 n + 1)/2]` and asks whether for any initial value of *n* the system eventually evolves to 1 (and thereafter simply repeats the sequence 1, 2, 1, 2, ...). It has been observed that this happens for all initial values of *n* up to at least `10^16`, but despite a fair amount of mathematical effort since the problem was first posed in the 1930s, no general proof for all values of *n* has ever been found. (For negative initial *n*, the evolution appears always to reach -1, -5 or -17, and then repeat with periods 1, 3 or 11 respectively.) An alternative formulation is to ask whether for all *n*
 
@@ -636,7 +638,9 @@ In the first 1000 terms of the continued fraction for  $\pi$ , there are 412 1�
 
 Note that although the usual continued fraction for  $\pi$  looks quite random, modified forms such as
 
- `4/(Fold[#2/#1 + 2 &, 2, Reverse[Range[1, n, 2]^2]] - 1)` can be very regular.
+`4/(Fold[#2/#1 + 2 &, 2, Reverse[Range[1, n, 2]^2]] - 1)`
+
+can be very regular.
 
 The continued fractions for `Exp[2/k]` and `Tan[k/2]` have simple forms (as discussed by Leonhard Euler in the mid-1700s); other rational powers of *e* and tangents do not appear to. The sequence of odd numbers gives the continued fraction for `Coth[1]`; the sequence of even numbers for `BesselI[0, 1]/BesselI[1, 1]`. In general, continued fractions whose nth term is *a n* + *b* correspond to numbers given by `BesselI[b/a, 2/a]/BesselI[b/a + 1, 2/a]`. Numbers whose continued fraction terms are polynomials in *n* can presumably also be represented in terms of suitably generalized hypergeometric functions. (All so-called Hurwitz numbers have continued fractions that consist of interleaved polynomial sequences—a property left unchanged by $x \to (a x + b)/(c x + d)$.)
 
@@ -696,7 +700,9 @@ Max[MapIndexed[#1/First[#2] &, FoldList[Plus, First[list], Rest[list]]]]
 
 The fractional part of the result obtained is always an element of the Farey sequence
 
-Union[Flatten[Table[a/b, {b, n}, {a, 0, b}]]] (See also pages 892, 932 and 1084.)
+Union[Flatten[Table[a/b, {b, n}, {a, 0, b}]]]
+
+(See also pages 892, 932 and 1084.)
 
 ![Five digital-slope examples](_page_931_digital_slope_five_panel_row.jpeg)
 
@@ -740,7 +746,9 @@ If a, b and c are rational, Sin[ax] + Sin[bx] + Sin[cx] is periodic with period 
 
 ![Two zero-spacing distributions for three-sine functions](_page_932_zero_spacing_two_panel_row.jpeg)
 
-■ **Page 147 · Substitution systems.** Cos[ax] - Cos[bx] has two families of zeros:  $2\pi n/(a+b)$  and  $2\pi n/(b-a)$ . Assuming b > a > 0, the number of zeros from the second family which appear between the  $n^{th}$  and  $n + 1^{th}$  zero from the first family is (Floor[(n+1)#] - Floor[n#] &)[(b-a)/(a+b)]
+■ **Page 147 · Substitution systems.** Cos[ax] - Cos[bx] has two families of zeros:  $2\pi n/(a+b)$  and  $2\pi n/(b-a)$ . Assuming b > a > 0, the number of zeros from the second family which appear between the  $n^{th}$  and  $n + 1^{th}$  zero from the first family is
+
+(Floor[(n+1)#] - Floor[n#] &)[(b-a)/(a+b)]
 
 and as discussed on page 903 this sequence can be obtained by applying a sequence of substitution rules. For Sin[ax] + Sin[bx] a more complicated sequence of substitution rules yields the analogous sequence in which -1/2 is inserted in each Floor.
 
@@ -807,7 +815,9 @@ But it turns out that a typical pocket calculator gives a different result. For 
 
 Pictures (a) and (c) below show simulations of the shift map on a typical computer, while pictures (b) and (d) show corresponding simulations on a pocket calculator. (Starting with initial condition x the digit sequence at step n is essentially
 
-`IntegerDigits[Mod[2^n Floor[2^53 x], 2^53], 2, 53]` on the computer, and
+`IntegerDigits[Mod[2^n Floor[2^53 x], 2^53], 2, 53]`
+
+on the computer, and
 
 `Flatten[IntegerDigits[IntegerDigits[Mod[2^n Floor[10^12 x], 10^12], 10, 12], 2, 4]]`
 
@@ -948,9 +958,13 @@ $$u''[t] == (1 - u[t]^2)(1 + a u[t])$$
 
 For a = 0, the solution to this equation can be written in terms of Jacobi elliptic functions as
 
- $\sqrt{3} \ JacobiSN[t/3^{1/4}, 1/2]^2/(1 + JacobiCN[t/3^{1/4}, 1/2]^2)$  In general the solution is
+ $\sqrt{3} \ JacobiSN[t/3^{1/4}, 1/2]^2/(1 + JacobiCN[t/3^{1/4}, 1/2]^2)$ 
 
- $b d JacobiSN[rt, s]^2/(b-d JacobiCN[rt, s]^2)$ where
+In general the solution is
+
+ $b d JacobiSN[rt, s]^2/(b-d JacobiCN[rt, s]^2)$ 
+
+where
 
 r = -Sqrt[1/8 a c (b - d)]
 
