@@ -27,18 +27,18 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-FINAL_CORRECTION_COUNT = 289
-FINAL_CORRECTION_LAST_NUMBER = 1907
-FINAL_TARGET_BYTES = 134_370
+FINAL_CORRECTION_COUNT = 293
+FINAL_CORRECTION_LAST_NUMBER = 1911
+FINAL_TARGET_BYTES = 134_385
 FINAL_TARGET_LFS = 358
 FINAL_TARGET_SHA256 = (
-    "c7d482f6da519f4ae2d5005af30615c6e400e50bc93473d03449d1c02c6f29e6"
+    "86e49c4265e2e00567d2964c83d1272575c5dc36a83d7acb7bece7e7aa7997cd"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "b174d1a8d6b7a9dbde1f179a3b1740e9037c7150794d9d029c8dd3239658077e"
+    "4fc089becaf24dd1d2efa823b554075dc11d7b6768c491b872e2bcea166a4853"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "590e4201779a29b9c14d641adbba5c95e72c0f6ff2cf6641eb0084098c90d061"
+    "b6a91be51515e9745f4fa56a29936b3975a3a22b118c3a9728bfec62d94a7836"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "ac54c92c628cc5c0042bf995884a2df4da6b98b40f66443eb5f6f412800ee219"
@@ -48,7 +48,7 @@ FINAL_CHANGED_IMAGE_ROWS_SHA256 = (
 )
 FINAL_INLINE_CODE_COUNT = 23
 FINAL_MATH_SPAN_COUNT = 128
-FINAL_TRAILING_WHITESPACE_LINES = [190, 263, 264, 265, 266, 267, 268]
+FINAL_TRAILING_WHITESPACE_LINES = [263, 264, 265, 266, 267, 268]
 FINAL_VISUAL_GUARD_IDS = [
     "G5-C-1653",
     "G5-C-1665",
@@ -216,6 +216,31 @@ EXPECTED_REFERENCES = [
 # technical objects. Counts should be adjudicated if the same literal appears
 # elsewhere in N08, but the literal itself is source-sealed.
 REQUIRED_LITERAL_PINS = [
+    (
+        "ordinary-differential-omission",
+        "some simplified ordinary differential equations",
+        1,
+    ),
+    (
+        "cellular-fluid-history-article",
+        "Following the development of the molecular model",
+        1,
+    ),
+    (
+        "ginger-terminal-period",
+        r"ginger  $\{0.65, \, 0.6, \, 15^{\circ}\}$ .",
+        1,
+    ),
+    (
+        "fibonacci-prose-ellipsis",
+        "(i.e. 1, 2, 3, 5, 8, 13, …)",
+        1,
+    ),
+    (
+        "reaction-diffusion-equality",
+        r"$\partial_t c == d \cdot \partial_{xx} c + m \cdot c$",
+        1,
+    ),
     ("man-made-snow", "man-made snow", 1),
     ("crushing-parenthesis-omission", "are sometimes used.)", 1),
     (
@@ -293,6 +318,26 @@ REQUIRED_LITERAL_PINS = [
 
 
 FORBIDDEN_LITERAL_PINS = [
+    (
+        "missing-ordinary-differential",
+        "some simplified differential equations",
+    ),
+    (
+        "missing-cellular-fluid-history-article",
+        "Following development of the molecular model",
+    ),
+    (
+        "missing-ginger-terminal-period",
+        "ginger  $\\{0.65, \\, 0.6, \\, 15^{\\circ}\\}$ \n\n",
+    ),
+    (
+        "ascii-fibonacci-prose-ellipsis",
+        "(i.e. 1, 2, 3, 5, 8, 13, ...)",
+    ),
+    (
+        "reaction-diffusion-single-equality",
+        r"$\partial_t c = d \cdot \partial_{xx} c + m \cdot c$",
+    ),
     ("missing-computer-graphics-end", "computer graphics is\n\n"),
     ("missing-navier-stokes-end", "Navier-Stokes\n\nAbove the speed"),
     ("missing-genetic-are", "Genetic programs encoded"),
