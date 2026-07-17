@@ -281,9 +281,9 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions (80 using source-backed
-  repaired-only overrides), 71 source-added images, and generated
-  README/Contents files. It now includes 1,213 guarded source-verified
+  documents, 1,444 mapped image positions (86 using source-backed
+  repaired-only overrides), 79 source-added images, and generated
+  README/Contents files. It now includes 1,401 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -594,9 +594,30 @@ Neither file is a generalized workflow database.
   `6deb5c50789cebcb265d8bfc4668c0b5d6b97d6d8dd4a5a483a0da622c4262f5`;
   strict zero-correction output remains
   `d787dc0a8ba4388b3a0f1c83f38ed5f5f3c56bc1741241518373b997d2937401`.
-- Stage 7 continues with `N06` at PDF 963, raw line 14,199, byte 2002646, and
-  mapped ordinal 1048. The next IDs are `G5-C-1214` and `G5-A-0072`; `N06` is
-  `IN_PROGRESS`, while `N07`–`N08` remain `NOT_STARTED`.
+- `N06` is complete at `YES/YES` after a full first pass and wholly fresh
+  post-grouping-and-column-join R4 source, technical, and visual closing
+  traversals over PDF 962–983. Its 188 guarded corrections are
+  `G5-C-1214`–`G5-C-1401`; 64 mapped rows comprise 30 omitted redundant
+  partials, 28 retained originals, and six repaired-only overrides, while
+  additions `G5-A-0072`–`G5-A-0079` produce 42 live references. The final
+  85,467-byte, 666-line Markdown hashes to
+  `54bf7356136644c5040ffcc7945b49faab73a2bf5f2758dc51ff91b49e1eb437`.
+  The final source, technical, and visual reports hash respectively to
+  `1ad9878e74315fe246fd7077ddf62b9447edfb1689980dbd282e49c734850d8f`,
+  `cc003058bb1ec22f4a896db2463908a8b5fa0adc71734fadabdaccddb9a61283`,
+  and `6f313c25158310eeb03a5fc84fe518f319f897d699a82b4c065e8e382ea9af4b`;
+  each closes with zero discrepancy, ambiguity, or omission. The 30-page
+  final render hashes to
+  `bb620243b6bd7076dcaa2922e15b552804cc27b585eae7402b485ff54409b9c8`.
+  Post-coverage validation reports 29 documents, 1,523 images, 1,401
+  corrections, and 21 completed second passes. The focused N06, Goal 5, and
+  complete repository suites pass at 6, 152, and 254 tests with 318, 1,951,
+  and 1,951 subtests. Two fresh normal builds and the published sibling are
+  byte-identical at 1,554 files with tree SHA-256
+  `dd188b36e430c60ed3e6192a93553c7ea64346d12250a62661dbba05343236b4`.
+- Stage 7 continues with `N07` at PDF 983, raw line 14,848, byte 2090568, and
+  mapped ordinal 1112. The next IDs are `G5-C-1402` and `G5-A-0080`; `N07` is
+  `IN_PROGRESS`, while `N08` remains `NOT_STARTED`.
 
 ## Stage Status
 
