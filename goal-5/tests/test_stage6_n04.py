@@ -663,6 +663,24 @@ class NotesForChapter4Tests(unittest.TestCase):
                 self.assertNotIn(remnant, self.rendered)
         self.assertNotRegex(self.rendered, r"(?m)^924$")
 
+    def test_two_pass_coverage_is_closed(self) -> None:
+        rows = validate.validate_coverage(self.documents)
+        row = next(item for item in rows if item["document_id"] == "N04")
+        self.assertEqual(
+            (row["first_pass"], row["second_pass"], row["reviewer_type"]),
+            ("YES", "YES", "agent"),
+        )
+        self.assertIn("76 guarded corrections", row["notes"])
+        self.assertIn(
+            "30 source-redundant partial-crop dispositions", row["notes"]
+        )
+        self.assertIn("11 source-added composites", row["notes"])
+        self.assertIn("seven display-boundary repairs", row["notes"])
+        self.assertIn(
+            "zero discrepancy ambiguity or source omission", row["notes"]
+        )
+        self.assertIn("zero repaired-only overrides", row["notes"])
+
     def test_closure_inventory_and_n05_handoff_are_exact(self) -> None:
         references = re.findall(
             r"!\[([^\]]*)\]\(([^)\s]+\.jpeg)\)", self.rendered
