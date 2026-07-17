@@ -270,8 +270,8 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-16 (America/Los_Angeles).
-- Active stage: `6-NOTES-00-04` (`IN_PROGRESS`), activated after clean Stage 5
-  closure through `CH12`.
+- Active stage: `7-NOTES-05-08` (`IN_PROGRESS`), activated after clean Stage 6
+  closure through `N04`.
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
   and the empty `goal-4/` directory were removed by exact path. No commit
   range was reverted, and Goal 4 had corrected no book text.
@@ -282,8 +282,8 @@ Neither file is a generalized workflow database.
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
   documents, 1,444 mapped image positions (76 using source-backed
-  repaired-only overrides), 49 source-added images, and generated
-  README/Contents files. It now includes 973 guarded source-verified
+  repaired-only overrides), 60 source-added images, and generated
+  README/Contents files. It now includes 1,049 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -550,8 +550,32 @@ Neither file is a generalized workflow database.
   builds and the published sibling are byte-identical at 1,524 files with tree
   SHA-256
   `6723d7eb843f6beb6d344591a5d36145f821f46c0146e7d319dd6b22705a19f8`.
-  The next target is `N04` at PDF 917, raw line 12,499, byte 1792864, with next
-  IDs `G5-C-0974` and `G5-A-0050`; it owns mapped ordinals 918–988.
+  This was the clean baseline used to start `N04`.
+- `N04` is complete at `YES/YES` after its complete first pass and repeated
+  mandatory fresh source, technical, and visual closing restarts against the
+  final rebuilt target over PDF pages 917–942, with both ownership boundaries
+  checked. Its 76 guarded corrections are `G5-C-0974`–`G5-C-1049`; its final
+  115,687-byte, 1,040-line Markdown hashes to
+  `2c3aa3a04768d9472e365aafef9eac13a984e29cba9e91bafa5737307e7beeed`.
+  All 71 mapped rows were source-dispositioned: 30 source-redundant partial
+  crops are omitted, while 41 retained rows plus additions `G5-A-0050`–
+  `G5-A-0060` produce 52 live image references. The final source, technical,
+  and visual reports hash respectively to
+  `3aa639f69edf93368798bccd1ca4e80c3b5ad0fba926c2c9a2d579bc8837b4c1`,
+  `41095776bac647d7481c79149ee475681b3c8e4063fa3036b9d00bbaa1e034c6`,
+  and `bc5192055c3fea1378944178ae12653d0f3b8e1f3031b110ca12b8f413b43660`.
+  Every final ledger closes with zero discrepancy, zero ambiguity, and zero
+  source omission. Post-coverage validation reports 29 documents, 1,504
+  images, 1,049 corrections, and 19 completed second passes. The focused N04,
+  Goal 5, and complete repository suites pass at 7, 140, and 242 tests; the
+  latter two each report 1,305 subtests. Two fresh normal builds and the
+  published sibling are byte-identical at 1,535 files with tree SHA-256
+  `88b9fc5124f10a4defa30e9f641fa7550ff96538cb5b35a856b307623bdacb39`.
+  These are inherited Stage 6 closure results; this Stage 7 activation edit did
+  not rerun them.
+- Stage 7 starts with `N05` at PDF 943, raw line 13,460, byte 1908092, and
+  mapped ordinal 989. The next IDs are `G5-C-1050` and `G5-A-0061`; `N05` is
+  `IN_PROGRESS`, while `N06`–`N08` remain `NOT_STARTED`.
 
 ## Stage Status
 
@@ -562,8 +586,8 @@ Neither file is a generalized workflow database.
 | 3-FRONT-CH04 | `COMPLETE` | 2 |
 | 4-CH05-08 | `COMPLETE` | 2 |
 | 5-CH09-12 | `COMPLETE` | 2 |
-| 6-NOTES-00-04 | `IN_PROGRESS` | 2 |
-| 7-NOTES-05-08 | `NOT_STARTED` | 2 |
+| 6-NOTES-00-04 | `COMPLETE` | 2 |
+| 7-NOTES-05-08 | `IN_PROGRESS` | 2 |
 | 8-NOTES-09-12 | `NOT_STARTED` | 2 |
 | 9-TECHNICAL | `NOT_STARTED` | 3–8 |
 | 10-FIGURES-INDEX | `NOT_STARTED` | 3–8 plus fixed-layout source evidence |
@@ -746,14 +770,21 @@ Correct and verify Chapter 5–8 Notes.
 
 #### Detailed Implementation Plan
 
-- Apply the complete Notes review procedure from Stage 6.
+- Apply the complete two-pass Notes review procedure from Stage 6 to every
+  source page, including blank and image-only pages.
 - Recheck dense formulas, programs, references, and figure/caption associations
   with surrounding source context.
+- Verify the `N04`/`N05` and `N08`/`N09` ownership boundaries and disposition
+  every mapped row and every printed visual against the fixed-layout source.
+- After the last correction or asset change, restart independent source,
+  technical, and visual closing passes from the document's first source page.
 
 #### Completion Requirements
 
 - Chapter 5–8 Notes have complete first- and second-pass coverage.
 - All discovered discrepancies are corrected and source-verified.
+- All 243 mapped rows and every printed visual have explicit source
+  dispositions, with correct identity, crop, order, ownership, and captions.
 - No unresolved author-text item remains in the batch.
 - Focused and cumulative validation passes.
 
