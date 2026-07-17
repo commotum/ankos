@@ -35,13 +35,13 @@ EXPECTED_CORRECTION_SEQUENCE_SHA256 = (
     "d412b0b50426ff17ee38e3f4ef21800c92334a4fc2496467110655254d19d16d"
 )
 EXPECTED_IMAGE_ROWS_SHA256 = (
-    "8de0cbc107cf0f3d26f464d033651133e20eecd5e0ff665767c179371c8875cb"
+    "87d6f62179556612e854563466e3200541ed96f8ce80f1d07a5400aedcc64b41"
 )
 EXPECTED_CHANGED_IMAGE_ROWS_SHA256 = (
-    "4c087037fc3b595fa5a29de902212dcc46e4598d8bd45a72bba4d4d0dd2ba22f"
+    "d94dca287537a8dbaf5f4d3d237eab00cdb216b5d1fbecd449b44da6992a90d0"
 )
 EXPECTED_ADDED_ROWS_SHA256 = (
-    "ca53f88a9f26a0ee864e205f21344cc4001ac50e9add4281cf232e9181d7c234"
+    "2fa71cde066fbcc75a1563963afeb5717f14653e9e8313ce1c5034e1b8329d55"
 )
 
 EXPECTED_HEADINGS = [
@@ -276,7 +276,7 @@ class NotesForChapter7Tests(unittest.TestCase):
             [],
         )
 
-    def test_eighty_eight_image_rows_and_sixty_one_changes(self) -> None:
+    def test_eighty_eight_image_rows_and_sixty_eight_changes(self) -> None:
         self.assertEqual(len(self.image_rows), 88)
         self.assertEqual(
             [row["ordinal"] for row in self.image_rows], list(range(1112, 1200))
@@ -288,12 +288,15 @@ class NotesForChapter7Tests(unittest.TestCase):
             if "reference_disposition" in row
             or "repaired_asset_relative_path" in row
         ]
-        self.assertEqual(len(changed), 61)
+        self.assertEqual(len(changed), 68)
         self.assertEqual(rows_sha256(changed), EXPECTED_CHANGED_IMAGE_ROWS_SHA256)
         redundant = [row for row in changed if "reference_disposition" in row]
         repaired = [row for row in changed if "repaired_asset_relative_path" in row]
-        self.assertEqual((len(redundant), len(repaired)), (59, 2))
-        self.assertEqual([row["ordinal"] for row in repaired], [1127, 1176])
+        self.assertEqual((len(redundant), len(repaired)), (59, 9))
+        self.assertEqual(
+            [row["ordinal"] for row in repaired],
+            [1127, 1165, 1176, 1179, 1180, 1183, 1188, 1190, 1194],
+        )
 
         groups: dict[str, list[int]] = defaultdict(list)
         for row in redundant:
@@ -329,7 +332,7 @@ class NotesForChapter7Tests(unittest.TestCase):
                 self.assertTrue(output.is_file())
                 self.assertEqual(build.sha256(output.read_bytes()), digest)
 
-    def test_fourteen_additions_two_repairs_and_sixteen_assets(self) -> None:
+    def test_fourteen_additions_nine_repairs_and_twenty_three_assets(self) -> None:
         self.assertEqual(
             [row["id"] for row in self.added],
             [f"G5-A-{number:04d}" for number in range(80, 94)],
@@ -346,7 +349,7 @@ class NotesForChapter7Tests(unittest.TestCase):
             for path in (GOAL_DIR / "assets/N07").glob("*.jpeg")
         }
         self.assertEqual(actual_paths, expected_paths)
-        self.assertEqual(len(actual_paths), 16)
+        self.assertEqual(len(actual_paths), 23)
         for row in self.added:
             source = REPO_ROOT / row["asset_relative_path"]
             payload = source.read_bytes()
@@ -366,7 +369,11 @@ class NotesForChapter7Tests(unittest.TestCase):
                 )
 
     def test_fourteen_visual_guards_are_final_not_provisional(self) -> None:
-        guards = self.rows[-14:]
+        guards = [
+            row
+            for row in self.rows
+            if 1567 <= int(row["id"].removeprefix("G5-C-")) <= 1580
+        ]
         self.assertEqual(
             [row["id"] for row in guards],
             [f"G5-C-{number:04d}" for number in range(1567, 1581)],
