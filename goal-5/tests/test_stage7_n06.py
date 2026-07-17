@@ -731,6 +731,14 @@ class NotesForChapter6Tests(unittest.TestCase):
             if ord(character) < 32 and character not in "\n\t"
         ]
         self.assertEqual(controls, [])
+        self.assertEqual(
+            [
+                line_number
+                for line_number, line in enumerate(self.rendered.splitlines(), 1)
+                if line.endswith((" ", "\t"))
+            ],
+            [164, 524],
+        )
 
     def test_sixty_four_image_rows_and_thirty_six_changes_are_exact(self) -> None:
         self.assertEqual(len(self.n06_images), 64)
