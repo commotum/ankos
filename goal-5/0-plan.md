@@ -270,8 +270,8 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-17 (America/Los_Angeles).
-- Active stage: `7-NOTES-05-08` (`IN_PROGRESS`), activated after clean Stage 6
-  closure through `N04`.
+- Active stage: `8-NOTES-09-12` (`IN_PROGRESS`), activated after clean Stage 7
+  closure through `N08`.
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
   and the empty `goal-4/` directory were removed by exact path. No commit
   range was reverted, and Goal 4 had corrected no book text.
@@ -282,8 +282,8 @@ Neither file is a generalized workflow database.
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
   documents, 1,444 mapped image positions (95 using source-backed
-  repaired-only overrides), 93 source-added images, and generated
-  README/Contents files. It now includes 1,618 guarded source-verified
+  repaired-only overrides), 102 source-added images, and generated
+  README/Contents files. It now includes 1,911 guarded source-verified
   corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -635,9 +635,27 @@ Neither file is a generalized workflow database.
   tests, with 2,395 repository subtests. Two fresh normal builds and the
   published sibling are byte-identical at 1,568 files with tree SHA-256
   `82410c48a7f8d362a64cb1e11e2b29dd6579f115d5e3de8f17e3043d18501c9f`.
-- Stage 7 continues with the `N08` first pass at PDF 1007, raw line 15,583,
-  byte 2206052, and mapped ordinal 1200. The next IDs are `G5-C-1619` and
-  `G5-A-0094`; `N08` is `IN_PROGRESS`.
+- `N08` is complete at `YES/YES` after its 26-page first pass and wholly fresh
+  post-five-repair source/content, technical, and visual closing restarts over
+  PDF 1007–1032, with blank PDF 1032 and boundaries 1006/1033 checked. Its 293
+  guarded corrections are `G5-C-1619`–`G5-C-1911`; the final 134,385-byte,
+  358-LF Markdown hashes to
+  `86e49c4265e2e00567d2964c83d1272575c5dc36a83d7acb7bece7e7aa7997cd`.
+  The 32 mapped rows comprise 29 omitted redundant partials and three retained
+  originals; additions `G5-A-0094`–`G5-A-0102` produce 12 live references.
+  The fresh final source, technical, and visual reports hash respectively to
+  `efc334026604a86540986ec293010067ad68db0a5bc5d501150cacb44644c43a`,
+  `920374d14ca6b003a3d8dfc2bd615c8344dfd3c88d36817d8eb224b1517e71d4`,
+  and `7fbb2e4c2439ee576ca7e74141ddd8fd8d8f3aa15cc68f095a10511cee516e71`;
+  every final ledger closes at zero findings. Post-coverage validation reports
+  29 documents, 1,546 images, 1,911 corrections, and 23 completed second
+  passes; the Goal 5 and repository suites pass 168 and 270 tests with 2,800
+  repository subtests. Two fresh normal builds and the published sibling are
+  byte-identical at 1,577 files with tree SHA-256
+  `17c5fb5f9c6c46acb50bad20098614eab536988cb27acc10bd6b8be84f5d08e8`.
+- Stage 7 is complete. Stage 8 is active with `N09` beginning at PDF 1033,
+  printed page 1017, raw line 16,012, byte 2339807, and mapped ordinal 1232.
+  The next IDs are `G5-C-1912` and `G5-A-0103`.
 
 ## Stage Status
 
@@ -649,8 +667,8 @@ Neither file is a generalized workflow database.
 | 4-CH05-08 | `COMPLETE` | 2 |
 | 5-CH09-12 | `COMPLETE` | 2 |
 | 6-NOTES-00-04 | `COMPLETE` | 2 |
-| 7-NOTES-05-08 | `IN_PROGRESS` | 2 |
-| 8-NOTES-09-12 | `NOT_STARTED` | 2 |
+| 7-NOTES-05-08 | `COMPLETE` | 2 |
+| 8-NOTES-09-12 | `IN_PROGRESS` | 2 |
 | 9-TECHNICAL | `NOT_STARTED` | 3–8 |
 | 10-FIGURES-INDEX | `NOT_STARTED` | 3–8 plus fixed-layout source evidence |
 | 11-SATURATION | `NOT_STARTED` | 3–10 |
