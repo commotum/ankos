@@ -23,16 +23,16 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-EXPECTED_TARGET_BYTES = 115_629
-EXPECTED_TARGET_LINES = 694
+EXPECTED_TARGET_BYTES = 115_684
+EXPECTED_TARGET_LINES = 692
 EXPECTED_TARGET_SHA256 = (
-    "d50112bde81f06034cf4d21f59749b8c809db564fb0985bb89b7acc82e683b0e"
+    "fd8696100529789964578841267bbd841411691d05248840ede6e0b4b7bd69f3"
 )
 EXPECTED_CORRECTION_ROWS_SHA256 = (
-    "7f7daba4f1bb0c61884ad87298287507cb72276d3f96036dc8c272199337bfe3"
+    "9f2268a0836440ec47763f4084f796583801fae8f4d0a51f526d660037778329"
 )
 EXPECTED_CORRECTION_SEQUENCE_SHA256 = (
-    "feef95e81f55147935053e34080d3d0d874a96f74a3e1d277cb7edcbe87834d6"
+    "ccbed8f6141b7a58696bae7c60bd6aef5e426e3c10225b62ca1b40a29e4b8c81"
 )
 EXPECTED_IMAGE_ROWS_SHA256 = (
     "87d6f62179556612e854563466e3200541ed96f8ce80f1d07a5400aedcc64b41"
@@ -115,6 +115,26 @@ REQUIRED_LITERALS = [
     "$E_8$",
     "$t^{1/3}$",
     "`Binomial[2 n, n]/(n + 1)`",
+    "a digit $k$ positions from the right will typically repeat",
+    "period $m - 1$ for many values of $a$",
+    "In the case $a = 65539$, the points lie on planes in 3D",
+    "nonlinear functions of $n$ are used",
+    "where $n$ is the number of cells",
+    "Given a sequence $a$ of $n$ equally probable 0’s and 1’s",
+    "to $n$ digits:",
+    "if one takes $n$ numbers that follow Gaussian distributions",
+    "a random walk with $t$ steps of length 1 starting at position 0 can be generated from",
+    "A generalization to $d$ dimensions is then",
+    "a lattice with $k$ directions in two dimensions",
+    "root mean square displacement after $t$ steps",
+    "value $3/(2+d)$; for $d > 4$",
+    "perfectly isotropic in $d$ dimensions",
+    r"where $\beta$ can be deduced from",
+    "same for every $k$, but some complexity in shape is seen, though for large $k$",
+    "wavenumber $k$ by a so-called dispersion relation",
+    "For some $k$ this yields a value",
+    "for some range of $k$—implying an instability",
+    "`m[s_] := Apply[Plus, s, {0, 1}]`.",
 ]
 
 FORBIDDEN_LITERALS = [
@@ -141,6 +161,25 @@ FORBIDDEN_LITERALS = [
     "![](_page_1005_Picture_2.jpeg)",
     "![](_page_1005_Picture_3.jpeg)",
     "![](_page_1005_Picture_4.jpeg)",
+    "a digit k positions from the right will typically repeat",
+    "period m-1 for many values of a",
+    "In the case a = 65539, the points lie on planes in 3D",
+    "nonlinear functions of n are used",
+    "where n is the number of cells",
+    "Given a sequence a of n equally probable 0’s and 1’s",
+    "if one takes n numbers that follow Gaussian distributions",
+    "a random walk with t steps of length 1 starting at position 0 can be generated\n",
+    "A generalization to d dimensions is then",
+    "a lattice with k directions in two dimensions",
+    "root mean square displacement after t steps",
+    "value 3/(2+d); for d>4",
+    "perfectly isotropic in d dimensions",
+    "where β can be deduced from",
+    "same for every k, but some complexity in shape is seen, though for large k",
+    "wavenumber k by a so-called dispersion relation",
+    "for some range of k—implying an instability",
+    "```\nm[s_] := Apply[Plus, s, {0, 1}]\n```",
+    "\n\n.\n",
 ]
 
 
@@ -216,10 +255,10 @@ class NotesForChapter7Tests(unittest.TestCase):
         segment = self.raw[2_090_568:2_206_052]
         self.assertEqual(build.sha256(segment[:256]), "6fb51ed7e49f81225291de3c248e5c113f70ca605b32642727e13f04d2494102")
         self.assertEqual(build.sha256(segment[-256:]), "125e0ebbf4a285e04df5781c930adb627b7514d361a95b5a43bd06a0a799581c")
-        self.assertEqual(len(self.rows), 211)
+        self.assertEqual(len(self.rows), 217)
         self.assertEqual(
             [row["id"] for row in self.rows],
-            [f"G5-C-{number:04d}" for number in range(1402, 1613)],
+            [f"G5-C-{number:04d}" for number in range(1402, 1619)],
         )
         self.assertEqual(rows_sha256(self.rows), EXPECTED_CORRECTION_ROWS_SHA256)
         self.assertEqual(
@@ -280,7 +319,7 @@ class NotesForChapter7Tests(unittest.TestCase):
         labels = [line for line in lines if line.startswith("■ **")]
         fences = [line for line in lines if line.startswith("```")]
         self.assertEqual(headings, EXPECTED_HEADINGS)
-        self.assertEqual((len(labels), len(fences), len(self.references)), (92, 76, 43))
+        self.assertEqual((len(labels), len(fences), len(self.references)), (92, 74, 43))
         self.assertTrue(all(line == "```" for line in fences))
         self.assertEqual(len(fences) % 2, 0)
         self.assertEqual(len(set(self.references)), 43)

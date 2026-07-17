@@ -113,13 +113,13 @@ with or without the `Reverse`, is able to produce orderings which at least in so
 
 The repetition period for a generator with rule `n -> Mod[a n, m]` is given (for $a$ and $m$ relatively prime) by `MultiplicativeOrder[a, m]`. If $m$ is of the form  $2^{j}$ , this implies a maximum period for any $a$ of $m/4$, achieved when `MemberQ[{3, 5}, Mod[a, 8]]`. In general the maximum period is `CarmichaelLambda[m]`, where the value $m - 1$ can be achieved for prime $m$.
 
-As illustrated in the main text, when  $m = 2^{j}$  the right-hand base 2 digits in numbers produced by linear congruential generators repeat with short periods; a digit k positions from the right will typically repeat with period no more than  $2^k$ . When  $m = 2^j - 1$  is prime, however, even the rightmost digit repeats only with period m-1 for many values of a.
+As illustrated in the main text, when  $m = 2^{j}$  the right-hand base 2 digits in numbers produced by linear congruential generators repeat with short periods; a digit $k$ positions from the right will typically repeat with period no more than  $2^k$ . When  $m = 2^j - 1$  is prime, however, even the rightmost digit repeats only with period $m - 1$ for many values of $a$.
 
 More general linear congruential generators use the basic rule `n -> Mod[a n + b, m]`, and in this case, $n = 0$ is no longer special, and a repetition period of exactly $m$ can be achieved with appropriate choices of $a$, $b$ and $m$. Note that if the period is equal to its absolute maximum of $m$, then every possible $n$ is always visited, whatever $n$ one starts from. Page 962 showed diagrams that represent the evolution for all possible starting values of *n*.
 
 Each point in the 2D plots in the main text has coordinates of the form  $\{n[i], n[i+1]\}$  where $n[i + 1] = Mod[a n[i], m]$. If one could ignore the `Mod`, then the coordinates would simply be $\{n[i], a n[i]\}$, so the points would lie on a single straight line with slope $a$. But the presence of the `Mod` takes the points off this line whenever  $a n[i] \ge m$ . Nevertheless, if $a$ is small, there are long runs of $n[i]$ for which the `Mod` is never important. And that is why in the case $a = 3$ the points in the plot fall on obvious lines.
 
-In the case a = 65539, the points lie on planes in 3D. The reason for this is that
+In the case $a = 65539$, the points lie on planes in 3D. The reason for this is that
 
 ```
 n[i + 2] == Mod[65539^2 n[i], 2^31] ==
@@ -175,7 +175,7 @@ Append[Rest[list], Mod[list[[1]] + list[[q - p + 1]], 2^k]]
 
 *Cryptographic generators.* As discussed on page 598, so-called stream cipher cryptographic systems work essentially by generating a repeatable random sequence. Practical stream cipher systems can thus be used as random number generators. Starting in the 1980s, the most common example has been the Data Encryption Standard (DES) introduced by the U.S. government (see page 1085). Unless special-purpose hardware is used, however, this method has not usually been efficient enough for practical random number generation applications.
 
-*Quadratic congruential generators.* Several generalizations of linear congruential generators have been considered in which nonlinear functions of n are used at each step. In fact, the first known generator for digital computers was John von Neumann’s “middle square method”
+*Quadratic congruential generators.* Several generalizations of linear congruential generators have been considered in which nonlinear functions of $n$ are used at each step. In fact, the first known generator for digital computers was John von Neumann’s “middle square method”
 
 ```
 n -> FromDigits[Take[IntegerDigits[n^2, 10, 20], {5, 15}], 10]
@@ -189,9 +189,9 @@ n -> Mod[n^2, m]
 
 It was shown that for $m = p q$ with $p$ and $q$ prime the sequence `Mod[n, 2]` was in a sense as difficult to predict as the number $m$ is to factor (see page 1090). But in practice, the period of the generator in such cases is usually too short to be useful. In addition, there has been the practical problem that if $n$ is stored on a computer as a 32-bit number, then  $n^2$  can be 64 bits long, and so cannot be stored in the same way. In general, the period divides `CarmichaelLambda[CarmichaelLambda[m]]`. When $m$ is a prime, this implies that the period can then be as long as $(m - 3)/2$. The largest $m$ less than  $2^{16}$  for which this is true is 65063, and the sequence generated in this case appears to be fairly random.
 
-*Cellular automaton generators.* I invented the rule 30 cellular automaton random number generator in 1985. Since that time the generator has become quite widely used for a variety of applications. Essentially all the other generators discussed here have certain linearity properties which allow for fairly complete analysis using traditional mathematical methods. Rule 30 has no such properties. Empirical studies, however, suggest that the repetition period, for example, is about  $2^{0.63n}$ , where n is the number of cells (see page 260). Note that rule 45 can be used as an alternative to rule 30. It has a somewhat longer period, but does not mix up nearby initial conditions as quickly as rule 30. (See also page 603.)
+*Cellular automaton generators.* I invented the rule 30 cellular automaton random number generator in 1985. Since that time the generator has become quite widely used for a variety of applications. Essentially all the other generators discussed here have certain linearity properties which allow for fairly complete analysis using traditional mathematical methods. Rule 30 has no such properties. Empirical studies, however, suggest that the repetition period, for example, is about  $2^{0.63n}$ , where $n$ is the number of cells (see page 260). Note that rule 45 can be used as an alternative to rule 30. It has a somewhat longer period, but does not mix up nearby initial conditions as quickly as rule 30. (See also page 603.)
 
-■ **Unequal probabilities.** Given a sequence a of n equally probable 0’s and 1’s, the following generates a single 0 or 1 with probabilities approximating  $\{1-p, p\}$  to n digits:
+■ **Unequal probabilities.** Given a sequence $a$ of $n$ equally probable 0’s and 1’s, the following generates a single 0 or 1 with probabilities approximating  $\{1-p, p\}$  to $n$ digits:
 
 ```
 Fold[{BitAnd, BitOr}[[1 + First[#2]]][#1, Last[#2]] &, 0,
@@ -227,7 +227,7 @@ The mean  $\mu$  and standard deviation  $\sigma$  are determined by properties 
 
 ![](_page_992_Picture_2.jpeg)
 
-The Central Limit Theorem leads to a self-similarity property for the Gaussian distribution: if one takes n numbers that follow Gaussian distributions, then their average should also follow a Gaussian distribution, though with a standard deviation that is  $1/\sqrt{n}$  times smaller.
+The Central Limit Theorem leads to a self-similarity property for the Gaussian distribution: if one takes $n$ numbers that follow Gaussian distributions, then their average should also follow a Gaussian distribution, though with a standard deviation that is  $1/\sqrt{n}$  times smaller.
 
 ■ **History.** That averages of random numbers follow bell-shaped distributions was known in the late 1600s. The formula for the Gaussian distribution was derived by Abraham de Moivre around 1733 in connection with theoretical studies of gambling. In the late 1700s Pierre-Simon Laplace did this again to predict the distribution of comet orbits, and showed that the same results would be obtained for other underlying distributions. Carl Friedrich Gauss made connections to the distribution of observational errors, and the relevance of the Gaussian distribution to biological and social systems was noted. Progressively more general proofs of the Central Limit Theorem were given from the early 1800s to the 1930s. Many natural systems were found to exhibit Gaussian distributions—a typical example being height distributions for humans. (Weight distributions are however closer to lognormal; compare page 1003.) And when statistical methods such as analysis of variance became established in the early 1900s it became increasingly common to assume underlying Gaussian distributions. (Gaussian distributions were also found in statistical mechanics in the late 1800s.)
 ■ **Related results.** Gaussian distributions arise when large numbers of random variables get added together. If instead such variables (say probabilities) get multiplied together what arises is the lognormal distribution
@@ -250,7 +250,7 @@ The distribution of largest eigenvalues can often be expressed in terms of Painl
 
 (See also 1/f noise on page 969.)
 
-■ **Page 328 · Random walks.** In one dimension, a random walk with t steps of length 1 starting at position 0 can be generated
+■ **Page 328 · Random walks.** In one dimension, a random walk with $t$ steps of length 1 starting at position 0 can be generated from
 
 ```
 NestList[# + (-1)^Random[Integer] &, 0, t]
@@ -262,7 +262,7 @@ or equivalently
 FoldList[Plus, 0, Table[(-1)^Random[Integer], {t}]]
 ```
 
-A generalization to d dimensions is then
+A generalization to $d$ dimensions is then
 
 ```
 FoldList[Plus, Table[0, {d}], Table[RotateLeft[PadLeft[
@@ -281,7 +281,7 @@ As mentioned on page 1082, the frequency spectrum `Abs[Fourier[list]]^2` for a 1
 
 The character of random walks changes somewhat in different numbers of dimensions. For example, in 1D and 2D, there is probability 1 that a particle will eventually return to its starting point. But in 3D, this probability (on a simple cubic lattice) drops to about 0.341, and in $d$ dimensions the probability falls roughly like $1/(2d)$. After a large number of steps $t$, the number of distinct positions visited will be proportional to $t$, at least above 2 dimensions (in 2D, it is proportional to $t/Log[t]$ and in 1D  $\sqrt{t}$ ). Note that the outer boundaries of patterns like those on page 330 formed by $n$ random walks tend to become rougher when $t$ is much larger than $Log[n]$.
 
-To make a random walk on a lattice with k directions in two dimensions, one can set up
+To make a random walk on a lattice with $k$ directions in two dimensions, one can set up
 
 ```
 e = Table[{Cos[2 π s/k], Sin[2 π s/k]}, {s, 0, k - 1}]
@@ -309,7 +309,7 @@ In the pictures in the main text, all particles start out at a particular positi
 
 A physical example of an approximation to a random walk is the spreading of ink on blotting paper.
 
-■ **Self-avoiding walks.** Any walk where the probabilities for a given step depend only on a fixed number of preceding steps gives the same kind of limiting Gaussian distribution. But imposing the constraint that a walk must always avoid anywhere it has been before (as for example in an idealized polymer molecule) leads to correlations over arbitrary times. If one adds individual steps at random then in 2D one typically gets stuck after perhaps a few tens of steps. But tricks are known for generating long self-avoiding walks by combining shorter walks or successively pivoting pieces starting with a simple line. The pictures below show some 1000-step examples. They look in many ways similar to ordinary random walks, but their limiting distribution is no longer strictly Gaussian, and their root mean square displacement after t steps varies like  $t^{3/4}$ . (In  $d \le 4$ dimensions the exponent is close to the Flory mean field theory value 3/(2+d); for d>4 the results are the same as without self-avoidance.)
+■ **Self-avoiding walks.** Any walk where the probabilities for a given step depend only on a fixed number of preceding steps gives the same kind of limiting Gaussian distribution. But imposing the constraint that a walk must always avoid anywhere it has been before (as for example in an idealized polymer molecule) leads to correlations over arbitrary times. If one adds individual steps at random then in 2D one typically gets stuck after perhaps a few tens of steps. But tricks are known for generating long self-avoiding walks by combining shorter walks or successively pivoting pieces starting with a simple line. The pictures below show some 1000-step examples. They look in many ways similar to ordinary random walks, but their limiting distribution is no longer strictly Gaussian, and their root mean square displacement after $t$ steps varies like  $t^{3/4}$ . (In  $d \le 4$ dimensions the exponent is close to the Flory mean field theory value $3/(2+d)$; for $d > 4$ the results are the same as without self-avoidance.)
 
 ![](_page_993_Self_Avoiding_Walks_Three_Panel_Row.jpeg)
 
@@ -379,7 +379,7 @@ Apply[Plus,
   Map[Apply[Outer[Times, ##] &, Table[#, {n}]] &, v]]
 ```
 
-For circular or spherical patterns that are perfectly isotropic in d dimensions these tensors must all be proportional to
+For circular or spherical patterns that are perfectly isotropic in $d$ dimensions these tensors must all be proportional to
 
 ```
 (d - 2)!! Array[Apply[Times,
@@ -428,9 +428,7 @@ e[s_] := -1/2 Apply[Plus, s ListConvolve[
 
 so that each pair of adjacent spins contributes -1 when they are parallel and +1 when they are not. The overall magnetization of the system is given by
 
-```
-m[s_] := Apply[Plus, s, {0, 1}]
-```
+`m[s_] := Apply[Plus, s, {0, 1}]`.
 
 In physical ferromagnetic materials what is observed is that at high temperature, corresponding to high internal energy, there is no overall magnetization. But when the temperature goes below a critical value, spins tend to line up, and an overall magnetization spontaneously develops. In the context of the 2D Ising model this phenomenon is associated with the fact that those configurations of a large array of spins that have high total energy are overwhelmingly likely to have near zero overall magnetization, while those that have low total energy are overwhelmingly likely to have nonzero overall magnetization. For an  $n \times n$  array $s$ of spins there are a total of  $2^{n^2}$  possible configurations. The pictures below show the results of picking all configurations with a given energy `e[s]` (cyclic boundary conditions are assumed) and then working out their distribution of magnetization values `m[s]`. Even for small $n$ the pictures demonstrate that for large `e[s]` the magnetization `m[s]` is likely to be close to zero, but for smaller `e[s]` two branches approaching +1 and -1 appear. In the limit  $n \to \infty$  the distribution of magnetization values becomes sharp, and a definite discontinuous phase transition is observed.
 
@@ -442,7 +440,7 @@ Following the work of Lars Onsager around 1944, it turns out that an exact solut
 Abs[m[s]] == (1 - Sinh[2 β]^-4)^(1/8)
 ```
 
-where β can be deduced from
+where $\beta$ can be deduced from
 
 ```
 e[s] == -(Coth[2 β] (1 + 2 EllipticK[4 Sech[2 β]^2 Tanh[2 β]^2]
@@ -619,7 +617,7 @@ Analogous behavior can also be obtained in 2D, as shown for a 2D cellular automa
 
 ![](_page_1002_Picture_16.jpeg)
 
-■ **Brillouin zones.** A region in an ordinary Voronoi diagram shows where a given point is closest. One can also consider higher-order Voronoi diagrams in which each region shows where a given point is the  $k^{th}$  closest. The total area of each region is the same for every k, but some complexity in shape is seen, though for large k they always in a sense approximate circles. 3D versions of such regions have been encountered in studies of quantum mechanical properties of crystals since the 1930s.
+■ **Brillouin zones.** A region in an ordinary Voronoi diagram shows where a given point is closest. One can also consider higher-order Voronoi diagrams in which each region shows where a given point is the  $k^{th}$  closest. The total area of each region is the same for every $k$, but some complexity in shape is seen, though for large $k$ they always in a sense approximate circles. 3D versions of such regions have been encountered in studies of quantum mechanical properties of crystals since the 1930s.
 
 ■ **Packing deformable objects.** If one pushes together identical deformable objects in 2D they tend to arrange themselves in a regular hexagonal array—and this configuration is known to minimize total boundary length. In 3D the arrangement one gets is typically not very regular—although as noted at various times since the 1600s individual objects often have pentagonal faces suggestive of dodecahedra. (The average number of faces for each object depends on the details of the random process used to pack them, but is typically around 14. Note that for a 3D Voronoi diagram with randomly placed points, the average number of faces for each region is  $2 + 48 \pi^2/35 \approx 15.5$ .) It was suggested by William Thomson (Kelvin) in 1887 that an array of 14-faced tetradecahedra on a bcc lattice might yield minimum total face area. But in 1993 Denis Weaire and Robert Phelan discovered a layered repetitive arrangement of 12- and 14-faced polyhedra (average 13.5) that yields 0.003 times less total area. It seems likely that there are polyhedra which fill space in a less regular way and yield still smaller total area. (Note that if the surfaces minimize area like soap films they are slightly curved in all these cases. See also pages 1007 and 1039.)
 ■ **Page 351 · Protein folding.** When the molecular structure of proteins was first studied in the 1950s it was assumed that given their amino acid sequences pure minimization of energy would determine their often elaborate overall shapes. But by the 1990s it was fairly clear that in fact many details of the actual processes by which proteins are assembled can greatly affect their specific pattern of folding. (Examples include effects of chaperone molecules and prions.) (See pages 1003 and 1184.)
@@ -630,7 +628,7 @@ Analogous behavior can also be obtained in 2D, as shown for a 2D cellular automa
 ■ **Uniformity in frequency.** As shown on page 587, a completely random sequence of cells yields a spectrum that is essentially uniform in frequency. Such uniformity in frequency is implied by standard quantum theory to exist in the idealized zero-point fluctuations of a free quantum field—with direct consequences for such semiclassical phenomena as the Casimir effect and Hawking radiation. (See page 1062.)
 
 ■ **Repetition in numbers.** A common source of repetition in systems involving numbers is the almost trivial fact that in a sequence of successive integers there is a repetitive pattern of cases at which a particular divisor occurs. Other examples include the repetitive structure of digits in rational numbers (see page 138) and continued fraction terms in square roots (see page 144).
-■ **Repetition in continuous systems.** A standard approach to partial differential equations (PDEs) used for more than a century is so-called linear stability analysis, in which one assumes that small fluctuations around some kind of basic solution can be treated as a superposition of waves of the form  $Exp[ikx]Exp[i\omega t]$ . And at least in a linear approximation any given PDE then typically implies that  $\omega$ is connected to the wavenumber k by a so-called dispersion relation, which often has a simple algebraic form. For some k this yields a value of  $\omega$  that is real—corresponding to an ordinary wave that maintains the same amplitude. But for some k one often finds that  $\omega$  has an imaginary part. The most common case  $Im[\omega] > 0$  yields exponential damping. But particularly when the original PDE is nonlinear one often finds that  $Im[\omega] < 0$  for some range of k—implying an instability which causes modes with certain spatial wavelengths to grow. The mode with the most negative  $Im[\omega]$  will grow fastest, potentially leading to repetitive behavior that shows a particular dominant spatial wavelength. Repetitive patterns with this type of origin are seen in a number of situations, especially in fluids (and notably in connection with Kelvin-Helmholtz, Rayleigh-Taylor and other well-studied instabilities). Examples are ripples and swell on an ocean (compare page 1001), Bénard convection cells, cloud streets and splash coronas. Note that modes that grow exponentially inevitably soon become too large for a linear approximation—and when this approximation breaks down more complicated behavior with no sign of simple repetitive patterns is often seen.
+■ **Repetition in continuous systems.** A standard approach to partial differential equations (PDEs) used for more than a century is so-called linear stability analysis, in which one assumes that small fluctuations around some kind of basic solution can be treated as a superposition of waves of the form  $Exp[ikx]Exp[i\omega t]$ . And at least in a linear approximation any given PDE then typically implies that  $\omega$ is connected to the wavenumber $k$ by a so-called dispersion relation, which often has a simple algebraic form. For some $k$ this yields a value of  $\omega$  that is real—corresponding to an ordinary wave that maintains the same amplitude. But for some $k$ one often finds that  $\omega$  has an imaginary part. The most common case  $Im[\omega] > 0$  yields exponential damping. But particularly when the original PDE is nonlinear one often finds that  $Im[\omega] < 0$  for some range of $k$—implying an instability which causes modes with certain spatial wavelengths to grow. The mode with the most negative  $Im[\omega]$  will grow fastest, potentially leading to repetitive behavior that shows a particular dominant spatial wavelength. Repetitive patterns with this type of origin are seen in a number of situations, especially in fluids (and notably in connection with Kelvin-Helmholtz, Rayleigh-Taylor and other well-studied instabilities). Examples are ripples and swell on an ocean (compare page 1001), Bénard convection cells, cloud streets and splash coronas. Note that modes that grow exponentially inevitably soon become too large for a linear approximation—and when this approximation breaks down more complicated behavior with no sign of simple repetitive patterns is often seen.
 ■ **Examples of nesting.** Examples in which a single element splits into others include branching in plants, particle showers, genealogical trees, river deltas and crushing of rocks. Examples in which elements merge include river tributaries and some cracking phenomena.
 ■ **Page 358 · Nesting in numbers.** Chapter 4 contains several examples of systems based on numbers that exhibit nested behavior. Ultimately these examples can usually be traced to nesting in the pattern of digits of successive integers, but significant translation is often required.
 
