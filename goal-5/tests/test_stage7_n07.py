@@ -23,16 +23,16 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-EXPECTED_TARGET_BYTES = 115_251
-EXPECTED_TARGET_LINES = 682
+EXPECTED_TARGET_BYTES = 115_629
+EXPECTED_TARGET_LINES = 694
 EXPECTED_TARGET_SHA256 = (
-    "efb47689f4eb15cb68a7b11a3147b75608bfa8882f6a7da2a610f9e61b1e7770"
+    "d50112bde81f06034cf4d21f59749b8c809db564fb0985bb89b7acc82e683b0e"
 )
 EXPECTED_CORRECTION_ROWS_SHA256 = (
-    "81411b0dcae4ac6a035079c191d1615b17ffff28abafdce07476f19e7ef73881"
+    "7f7daba4f1bb0c61884ad87298287507cb72276d3f96036dc8c272199337bfe3"
 )
 EXPECTED_CORRECTION_SEQUENCE_SHA256 = (
-    "d412b0b50426ff17ee38e3f4ef21800c92334a4fc2496467110655254d19d16d"
+    "feef95e81f55147935053e34080d3d0d874a96f74a3e1d277cb7edcbe87834d6"
 )
 EXPECTED_IMAGE_ROWS_SHA256 = (
     "87d6f62179556612e854563466e3200541ed96f8ce80f1d07a5400aedcc64b41"
@@ -82,13 +82,13 @@ REQUIRED_LITERALS = [
     "LFSRStep[list_] :=",
     "LFSRStep[taps_List, list_] :=",
     "PolynomialMod[x^t, {1 + x + x^n, 2}]",
-    "$f[n_] := f[n-1] + f[n-2]$",
+    "`f[n_] := f[n - 1] + f[n - 2]`",
     "λ[x_] := Exp[-10 (x - 1)^2] + Exp[-10 (x - 3)^2]",
     "With[{σ = 1}, (d/(2 π σ t))^(d/2) Exp[-d r^2/(2 σ t)]]",
     "AEvolve[t_] := Nest[AStep, {{0, 0}}, t]",
     "AStep[a_] := ReplacePart[a, 1, (#[[Random[",
     "■ **Isotropy.** Any pattern grown from a single cell",
-    r"\{a1_, a2_, a3_, a4_, a5_, a6_, a7_\}",
+    "{a1_, a2_, a3_, a4_, a5_, a6_, a7_}",
     "e[s_] := -1/2 Apply[Plus, s ListConvolve[",
     "m[s_] := Apply[Plus, s, {0, 1}]",
     "Abs[m[s]] == (1 - Sinh[2 β]^-4)^(1/8)",
@@ -103,6 +103,18 @@ REQUIRED_LITERALS = [
     "c[{m_, n_}, d_] :=",
     "SandStep[s_] := s + ListConvolve[",
     "![](_page_1005_Sandpile_Fixed_Configurations_Four_Cycle_Row.jpeg)",
+    "“1/f noise”",
+    "“taps”",
+    "“droplets”",
+    "“percolating”",
+    "James Gleick’s 1987 popular book *Chaos*",
+    "`SeedRandom[n]`",
+    "`n -> Mod[a n, m]`",
+    "FixedPoint[# - a f'[#] &, Subscript[x, 0]]",
+    "$2^n$ steps",
+    "$E_8$",
+    "$t^{1/3}$",
+    "`Binomial[2 n, n]/(n + 1)`",
 ]
 
 FORBIDDEN_LITERALS = [
@@ -118,6 +130,14 @@ FORBIDDEN_LITERALS = [
     "selfgravitating",
     r"\pi \simeq 0.95",
     "{{{}}, {{}}}, {{}}}",
+    "$f[n_] := f[n-1] + f[n-2]$",
+    "2<sup>n</sup>",
+    "E<sub>8</sub>",
+    "t <sup>1/3</sup>",
+    '"1/f noise"',
+    '"taps"',
+    '"droplets"',
+    '"percolating"',
     "![](_page_1005_Picture_2.jpeg)",
     "![](_page_1005_Picture_3.jpeg)",
     "![](_page_1005_Picture_4.jpeg)",
@@ -196,10 +216,10 @@ class NotesForChapter7Tests(unittest.TestCase):
         segment = self.raw[2_090_568:2_206_052]
         self.assertEqual(build.sha256(segment[:256]), "6fb51ed7e49f81225291de3c248e5c113f70ca605b32642727e13f04d2494102")
         self.assertEqual(build.sha256(segment[-256:]), "125e0ebbf4a285e04df5781c930adb627b7514d361a95b5a43bd06a0a799581c")
-        self.assertEqual(len(self.rows), 179)
+        self.assertEqual(len(self.rows), 211)
         self.assertEqual(
             [row["id"] for row in self.rows],
-            [f"G5-C-{number:04d}" for number in range(1402, 1581)],
+            [f"G5-C-{number:04d}" for number in range(1402, 1613)],
         )
         self.assertEqual(rows_sha256(self.rows), EXPECTED_CORRECTION_ROWS_SHA256)
         self.assertEqual(
@@ -260,7 +280,7 @@ class NotesForChapter7Tests(unittest.TestCase):
         labels = [line for line in lines if line.startswith("■ **")]
         fences = [line for line in lines if line.startswith("```")]
         self.assertEqual(headings, EXPECTED_HEADINGS)
-        self.assertEqual((len(labels), len(fences), len(self.references)), (92, 68, 43))
+        self.assertEqual((len(labels), len(fences), len(self.references)), (92, 76, 43))
         self.assertTrue(all(line == "```" for line in fences))
         self.assertEqual(len(fences) % 2, 0)
         self.assertEqual(len(set(self.references)), 43)
