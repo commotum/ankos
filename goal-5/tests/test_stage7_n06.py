@@ -25,16 +25,16 @@ import validate  # noqa: E402
 
 
 # Values below are derived from the canonical integrated manifests and target.
-EXPECTED_TARGET_BYTES = 85_466
+EXPECTED_TARGET_BYTES = 85_468
 EXPECTED_TARGET_LINES = 668
 EXPECTED_TARGET_SHA256 = (
-    "7d9e5742aa578307533e6431d9161caf17b237afdd192c1abb08ce6644f70d28"
+    "f25594e86735a49a774ddd53711ad4922db1d39a6a17d971a8acb46b2f04a0c6"
 )
 EXPECTED_CORRECTION_ROWS_SHA256 = (
-    "bfd4ccd8247188e9cea886f7d650f58b98578e74ef512b6dce90bb2b21b1582e"
+    "4981716393e6428abed707f6891584460cfdcdcb599197a80956cc16946ee295"
 )
 EXPECTED_CORRECTION_ROW_HASH_SEQUENCE = (
-    "bf7881823539c1206c24c50618ad5a657b70889e25cb340a59a5d4fc300649ff"
+    "3789ed1b4025bd39781f3ced264ea70cd9d14f7768d09d3516327d2aad69657d"
 )
 EXPECTED_INVENTORY_HASHES = {
     "headings": "b227459497c9ebdcc335228fda967447528ad23c4537bff797c6c9c24cc0dd55",
@@ -45,13 +45,12 @@ EXPECTED_INVENTORY_HASHES = {
 }
 EXPECTED_INLINE_CODE_COUNT = 19
 
-# These hashes are frozen by the completed visual-first packet and should not
-# change during text reconciliation.
+# These hashes pin the final post-residual N06 image-map state.
 EXPECTED_IMAGE_ROWS_SHA256 = (
-    "e5a5955bd8e892c0b5860bc0053dfd0bfb27a12cd3ac51252563ee719fd2263d"
+    "66c36e08bba712d6a91727cfabbbc18f17b051cd796a07abcf2f6eacf0c2a0f8"
 )
 EXPECTED_CHANGED_IMAGE_ROWS_SHA256 = (
-    "f7e47594878cce00fec3409bf149bffeca2bf622c444e074f796203222c22bc5"
+    "0d80459b0f85ceaa12a49b1758f8ab1e45e27ce2ed63c8120fd03d7cf393533e"
 )
 EXPECTED_ADDED_ROWS_SHA256 = (
     "fa13028a22caf1a540af66eb59a8625c3d73fb3389a422e07e6b5621f61f82ae"
@@ -93,6 +92,7 @@ EXPECTED_CHANGED_ORDINALS = (
     1087,
     1088,
     1089,
+    1090,
     1098,
     1101,
     1102,
@@ -106,7 +106,7 @@ EXPECTED_CHANGED_ORDINALS = (
     1110,
     1111,
 )
-EXPECTED_REPAIRED_ORDINALS = (1057, 1067, 1081, 1089, 1098)
+EXPECTED_REPAIRED_ORDINALS = (1057, 1067, 1081, 1089, 1090, 1098)
 EXPECTED_COMPOSITE_GROUPS = {
     "G5-A-0072": (1049, 1050, 1051, 1052),
     "G5-A-0073": (1059, 1060, 1061, 1062),
@@ -294,6 +294,14 @@ EXPECTED_ASSETS: dict[
         344_319,
         28,
     ),
+    "_page_978_Picture_15.jpeg": (
+        "REPAIRED_EXISTING_ASSET",
+        1090,
+        "1d6c8da946b6f8033a737b88fc52e4766d066d1be2f3192446565fdf9c69d401",
+        (1800, 980),
+        612_723,
+        29,
+    ),
     "_page_978_Shift_Rule_170_Size_4_to_8_Five_Panel_Row.jpeg": (
         "ADDED_ASSET",
         "G5-A-0076",
@@ -363,6 +371,13 @@ REQUIRED_LITERAL_PINS: tuple[tuple[str, str, int], ...] = (
     ("cyclic-power-equality", "`n == k^s`", 1),
     ("cyclic-spatial-period", "*RotateLeft[list, m] == list*", 1),
     ("cyclic-definition-single-equals", "`m = k^IntegerExponent[n, k]`", 1),
+    ("class4-terminal-period", "and 4320.\n", 1),
+    (
+        "cyclic-terminal-period",
+        "`MultiplicativeOrder[k, n/m]` steps.\n",
+        1,
+    ),
+    ("density-terminal-period", "very different behavior.\n", 1),
     ("rule22-four-to-m", "4^m", 1),
     (
         "endomorphism-square-brackets",
@@ -385,6 +400,12 @@ FORBIDDEN_LITERAL_PINS: tuple[tuple[str, str], ...] = (
     ("cyclic-mod-single-equals", "$Mod[k^t, n] = 1$"),
     ("cyclic-gcd-single-equals", "GCD[k, n] = 1"),
     ("cyclic-power-single-equals", "$n = k^s$"),
+    ("class4-missing-period", "and 4320\n"),
+    (
+        "cyclic-missing-period-and-trailing-space",
+        "`MultiplicativeOrder[k, n/m]` steps \n",
+    ),
+    ("density-missing-period", "very different behavior\n"),
     ("rule22-lost-exponent", "two black squares 4 m positions apart"),
     (
         "endomorphism-parentheses",
@@ -582,11 +603,11 @@ class NotesForChapter6Tests(unittest.TestCase):
 
         # Later note chapters append corrections globally; N06's owned slice is
         # immutable and remains the exact guard here.
-        self.assertGreaterEqual(len(self.corrections), 1_399)
-        self.assertEqual(len(self.n06_corrections), 186)
+        self.assertGreaterEqual(len(self.corrections), 1_400)
+        self.assertEqual(len(self.n06_corrections), 187)
         self.assertEqual(
             [row["id"] for row in self.n06_corrections],
-            [f"G5-C-{number:04d}" for number in range(1214, 1400)],
+            [f"G5-C-{number:04d}" for number in range(1214, 1401)],
         )
         self.assertEqual(
             rows_sha256(self.n06_corrections), EXPECTED_CORRECTION_ROWS_SHA256
@@ -596,9 +617,10 @@ class NotesForChapter6Tests(unittest.TestCase):
             EXPECTED_CORRECTION_ROW_HASH_SEQUENCE,
         )
         previous_end = self.document["raw_start_byte"]
-        # C1392-C1399 are append-only visual guards whose raw spans occur among
-        # earlier text guards. Sort only for the non-overlap proof; manifest
-        # order remains pinned by the ID and hash-sequence assertions above.
+        # C1392-C1399 are append-only visual guards and C1400 is the fresh
+        # source-residual guard; their raw spans occur between earlier text
+        # guards. Sort only for the non-overlap proof; manifest order remains
+        # pinned by the ID and hash-sequence assertions above.
         for row in sorted(
             self.n06_corrections, key=lambda correction: correction["raw_start_byte"]
         ):
@@ -710,7 +732,7 @@ class NotesForChapter6Tests(unittest.TestCase):
         ]
         self.assertEqual(controls, [])
 
-    def test_sixty_four_image_rows_and_thirty_five_changes_are_exact(self) -> None:
+    def test_sixty_four_image_rows_and_thirty_six_changes_are_exact(self) -> None:
         self.assertEqual(len(self.n06_images), 64)
         self.assertEqual(
             [row["ordinal"] for row in self.n06_images], list(range(1048, 1112))
@@ -725,13 +747,13 @@ class NotesForChapter6Tests(unittest.TestCase):
         self.assertEqual(
             [row["ordinal"] for row in changed], list(EXPECTED_CHANGED_ORDINALS)
         )
-        self.assertEqual(len(changed), 35)
+        self.assertEqual(len(changed), 36)
         self.assertEqual(
             rows_sha256(changed), EXPECTED_CHANGED_IMAGE_ROWS_SHA256
         )
         redundant = [row for row in changed if "reference_disposition" in row]
         repaired = [row for row in changed if "repaired_asset_relative_path" in row]
-        self.assertEqual((len(redundant), len(repaired)), (30, 5))
+        self.assertEqual((len(redundant), len(repaired)), (30, 6))
         self.assertEqual(
             [row["ordinal"] for row in repaired], list(EXPECTED_REPAIRED_ORDINALS)
         )
@@ -783,7 +805,7 @@ class NotesForChapter6Tests(unittest.TestCase):
                 self.assertTrue(output.is_file())
                 self.assertEqual(build.sha256(output.read_bytes()), expected_sha)
 
-    def test_eight_additions_and_thirteen_special_assets_are_exact(self) -> None:
+    def test_eight_additions_and_fourteen_special_assets_are_exact(self) -> None:
         self.assertEqual(
             [row["id"] for row in self.n06_added],
             [f"G5-A-{number:04d}" for number in range(72, 80)],
@@ -795,7 +817,7 @@ class NotesForChapter6Tests(unittest.TestCase):
             for row in self.n06_images
             if "repaired_asset_relative_path" in row
         }
-        self.assertEqual((len(added_by_path), len(repaired_by_path)), (8, 5))
+        self.assertEqual((len(added_by_path), len(repaired_by_path)), (8, 6))
         self.assertFalse(set(added_by_path) & set(repaired_by_path))
         expected_paths = {f"goal-5/assets/N06/{name}" for name in EXPECTED_ASSETS}
         self.assertEqual(set(added_by_path) | set(repaired_by_path), expected_paths)
@@ -874,7 +896,7 @@ class NotesForChapter6Tests(unittest.TestCase):
 
     def test_high_risk_source_and_technical_literals(self) -> None:
         self.assertEqual(
-            len(REQUIRED_LITERAL_PINS) + len(FORBIDDEN_LITERAL_PINS), 30
+            len(REQUIRED_LITERAL_PINS) + len(FORBIDDEN_LITERAL_PINS), 36
         )
         for pin_id, literal, expected_count in REQUIRED_LITERAL_PINS:
             with self.subTest(required_pin=pin_id):
@@ -886,4 +908,3 @@ class NotesForChapter6Tests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
