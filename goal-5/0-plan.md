@@ -721,22 +721,27 @@ Neither file is a generalized workflow database.
   `G5-C-3446`) were extended and new record `G5-C-3576` restores two further
   printed RuleDelayed operators. An independent sealed glyph and repair audit
   verified all 12 source glyphs, all six actions, two shadow builds, validation,
-  and strict-zero preservation without qualification. N11 now owns 216
-  corrections, `G5-C-3361`–`G5-C-3576`. All 14 mapped visuals are retained,
+  and strict-zero preservation without qualification. The third wholly fresh
+  closing round then found exactly two further literal-source defects in
+  `G5-C-3476`: PDF 1132 prints `s3` twice where the target had normalized both
+  tokens to `s[3]`. All three sealed lanes independently source-confirmed those
+  two tokens and found nothing else; the existing row is now repaired without
+  changing its guard, offset, ID, or line count. N11 owns 216 corrections,
+  `G5-C-3361`–`G5-C-3576`. All 14 mapped visuals are retained,
   and additions `G5-A-0142`–`G5-A-0148` restore seven missing source visuals.
-  The current 87,975-byte, 986-LF target hashes to
-  `7eea6364e4a504b94a16573a3e6fac3ca69b65e7073c013d022565a78e86e8e8`
+  The current 87,971-byte, 986-LF target hashes to
+  `0724347e91da98fdae48104af86f458248ba016c9ffb3db2c550990457800b4c`
   and contains 21 resolving image references and 66 fenced programs. Two fresh
   post-repair normal builds and the published sibling are byte-identical at
   1,623 files with length-prefixed tree SHA-256
-  `4f88117f8f77433d5a715b02dacfb1837a1f964411d8db58ff7e6c219a7371e9`;
+  `82b17a8d6f39f8452d87f5a3b72ec94e71b23f2ede49ea0ece4e88af8d11f4c4`;
   strict zero-correction output remains the frozen 1,475-file tree. The latest
-  Goal 5 and repository suites pass 188 and 290 tests with 4,706 subtests.
+  Goal 5 and repository suites pass 188 and 290 tests with 4,708 subtests.
   Coverage intentionally remains `NO/NO`; all three wholly fresh source,
-  technical, and visual closers have restarted from PDF 1123 against this
-  exact latest repaired target.
+  technical, and visual closers must restart a fourth time from PDF 1123
+  against this exact latest repaired target.
 - Stage 7 is complete. Stage 8 remains active with `N09` and `N10` closed and
-  `N11` in its third wholly fresh final closing round. The next available IDs
+  `N11` entering its fourth wholly fresh final closing round. The next available IDs
   are `G5-C-3577` and `G5-A-0149`.
 
 ## Stage Status
