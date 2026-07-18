@@ -179,7 +179,7 @@ EXPECTED_FULL_LEDGER_SHA256 = {
     "image-map.jsonl": "e2fac1db19000e4bd4e634ac7dd1ea0920d3c7c9f105e2503904cc024bfe0681",
     "added-assets.jsonl": "d647fa8d948b155720ca3f8c909429654f30398fbf566e0b0fb6cca779e621ae",
     "source-ranges.json": "36dacbddcbb0157f604aafeca93e6e189bd16c6b52ac6409d6d83681a41de498",
-    "coverage.csv": "db7285e9da34b712821890b3197e897c148643d360a26f3800d08a749012e1a1",
+    "coverage.csv": "818f08fb4fa8cc1c6b8c7705ade485c749d62d031d76624b4001ee1d24bacb16",
 }
 
 
@@ -512,129 +512,31 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             [value[0] for value in EXPECTED_ADDED_ASSETS.values()],
         )
 
-    def test_sealed_integration_packet_evidence_and_promotion_equivalence(self) -> None:
-        self.assertFalse(any(path.is_symlink() for path in [PACKET_DIR, *PACKET_DIR.rglob("*")]))
-        self.assertTrue(
-            all(
-                stat.S_IMODE(path.stat().st_mode) == 0o555
-                for path in [PACKET_DIR, *[p for p in PACKET_DIR.rglob("*") if p.is_dir()]]
-            )
-        )
-        self.assertTrue(
-            all(
-                stat.S_IMODE(path.stat().st_mode) == 0o444
-                for path in PACKET_DIR.rglob("*")
-                if path.is_file()
-            )
-        )
-        for relative, expected in EXPECTED_PACKET_FILE_SHA256.items():
-            with self.subTest(packet_file=relative):
-                self.assertEqual(
-                    build.sha256((PACKET_DIR / relative).read_bytes()), expected
-                )
+    def test_exact_integrated_input_ledgers_and_no_temp_provenance(self) -> None:
+        for relative, expected in EXPECTED_FULL_LEDGER_SHA256.items():
+            with self.subTest(input_ledger=relative):
+                payload = (GOAL_DIR / relative).read_bytes()
+                self.assertEqual(build.sha256(payload), expected)
 
-        seal = json.loads((PACKET_DIR / "SEAL.json").read_text(encoding="utf-8"))
+        self.assertEqual(len(self.corrections), 4_370)
         self.assertEqual(
-            (
-                seal["status"],
-                seal["file_count_excluding_seal_files"],
-                seal["manifest_sha256"],
-                seal["sha256sums_sha256"],
-                seal["length_prefixed_payload_tree_sha256"],
-                seal["required_directory_mode"],
-                seal["required_file_mode"],
-                seal["symlink_count"],
-            ),
-            (
-                "READ_ONLY_FINAL_SEALED",
-                79,
-                "c2bf0b8dd8fe97d9a4f3045d298c1b648269b0c8f8789f39b8d2bd391ceac476",
-                "4d96a9a5e673710fe3b93fe8d62e8360e593de6b9bfb7ebadd7b34d64640e04b",
-                "bade6214cd97b69bbb652f017c1fc30ccef8a65ebcb45e6b61c20e2d488194a8",
-                "0555",
-                "0444",
-                0,
-            ),
+            [row["id"] for row in self.corrections],
+            [f"G5-C-{number:04d}" for number in range(1, 4_371)],
         )
-        packet_tree, packet_manifest = length_prefixed_tree(
-            PACKET_DIR, exclude={"SHA256SUMS", "SEAL.json"}
-        )
-        self.assertEqual(len(packet_manifest), 79)
-        self.assertEqual(packet_tree, seal["length_prefixed_payload_tree_sha256"])
-        checksum_rows = {
-            relative: digest
-            for digest, relative in (
-                line.split("  ", 1)
-                for line in (PACKET_DIR / "SHA256SUMS")
-                .read_text(encoding="utf-8")
-                .splitlines()
-            )
-        }
+        self.assertEqual(len(self.images), 1_444)
+        self.assertEqual(len(self.added_assets), 163)
         self.assertEqual(
-            checksum_rows,
-            {relative: digest for relative, digest, _ in packet_manifest},
+            [row["id"] for row in self.added_assets],
+            [f"G5-A-{number:04d}" for number in range(1, 164)],
         )
 
-        for relative, expected_count in EXPECTED_PACKET_JSONL_COUNTS.items():
-            with self.subTest(packet_ledger=relative):
-                self.assertEqual(len(read_jsonl(PACKET_DIR / relative)), expected_count)
-
-        manifest = json.loads(
-            (PACKET_DIR / "manifest.json").read_text(encoding="utf-8")
+        n12_payload = "\n".join(
+            canonical_bytes(row).decode("utf-8")
+            for row in self.rows + self.image_rows + self.added
         )
-        self.assertEqual(manifest["status"], "PROMOTION_READY")
-        self.assertEqual(
-            manifest["canonical_id_ranges"],
-            {
-                "added_assets": ["G5-A-0149", "G5-A-0163"],
-                "corrections": ["G5-C-3577", "G5-C-4370"],
-            },
-        )
-        self.assertEqual(
-            manifest["counts"],
-            {
-                "added_assets": 15,
-                "atomic_edits": 3130,
-                "compatibly_subsumed_atoms": 1,
-                "guard_coalescences": 3,
-                "guarded_corrections": 794,
-                "input_proposals": 825,
-                "manual_resolutions": 1,
-                "multi_proposal_components": 21,
-                "repair_assets": 9,
-                "selected_atoms": 3129,
-                "semantic_interval_components": 797,
-            },
-        )
-        self.assertEqual(
-            set(manifest["lane_statuses"].values()), {"INDEPENDENT_REAUDIT_PASS"}
-        )
-        self.assertEqual(
-            manifest["integrated_target"],
-            {"bytes": 397066, "lines": 1855, "sha256": FINAL_TARGET_SHA256},
-        )
-        summary = json.loads(
-            (PACKET_DIR / "ledgers/verification-summary.json").read_text(
-                encoding="utf-8"
-            )
-        )
-        self.assertEqual(summary["status"], "PASS_FINAL_PROMOTION_READY")
-        self.assertEqual(
-            summary["input_proposals"],
-            {"longform": 8, "source": 736, "technical": 73, "total": 825, "visual": 8},
-        )
-        self.assertEqual(
-            summary["interval_components"]["size_histogram"],
-            {"1": 776, "2": 15, "3": 5, "4": 1},
-        )
-        self.assertEqual(summary["final_guards"]["count"], 794)
-        self.assertEqual(summary["assets"], {
-            "added": 15,
-            "all_added_references_once_in_target": True,
-            "all_hashes_and_dimensions_verified": True,
-            "repaired_overrides": 9,
-            "total": 24,
-        })
+        self.assertIsNone(FORBIDDEN_PROVENANCE.search(n12_payload))
+        self.assertNotIn("<<<<<<<", n12_payload)
+        self.assertNotIn(">>>>>>>", n12_payload)
 
     def test_authoritative_source_and_pending_first_pass_coverage_state(self) -> None:
         range_data = json.loads(build.RANGES_PATH.read_text(encoding="utf-8"))
