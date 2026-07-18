@@ -755,24 +755,30 @@ Neither file is a generalized workflow database.
   generator/relation expression, two flattened superscripts, and one literal
   conversion artifact. Source row `G5-C-4371`, technical rows
   `G5-C-4372`–`G5-C-4385`, and an amendment to existing `G5-C-3797` are now
-  integrated, so N12 owns 809 guards, `G5-C-3577`–`G5-C-4385`. Fifteen additions
+  integrated. A second wholly fresh closing round then found one omitted
+  publication year, 94 equality-operator defects, one code-delimiter defect,
+  and one source display/prose-boundary defect. Source row `G5-C-4386`,
+  technical rows `G5-C-4387`–`G5-C-4445`, and amendments to `G5-C-3907` and
+  `G5-C-4109` are now integrated, so N12 owns 869 guards,
+  `G5-C-3577`–`G5-C-4445`. Fifteen additions
   `G5-A-0149`–`G5-A-0163` restore omitted inline source visuals; nine mapped
-  rows use source-faithful repair overrides. The 397,055-byte, 1,855-LF
+  rows use source-faithful repair overrides. The 397,151-byte, 1,857-LF
   integrated target hashes to
-  `e0dfef7548fe2c0e131ed16cf26db64dcd89cb07a6588dc971e124323a5d8a30`
+  `f825c757b864e2a3265079c2c9d4ce2184222241b1af703c9fcb30da95f30a47`
   and contains 53 resolving image references. A separately reconstructed
-  combined-ledger audit reproduces it byte-for-byte. Two fresh normal builds and the
+  combined-ledger and independent mechanics audits reproduce it byte-for-byte.
+  Two fresh normal builds and the
   published sibling match at 1,638 files with length-prefixed tree SHA-256
-  `f053ac9337e07775998f155e5817d54daf9724e4de9aeb8946b2c37e31b0481f`;
+  `64b66ef3c730d276c5fd8ea673dc94fdaba55527f822788e028e564f5c330383`;
   strict zero-correction output remains the frozen 1,475-file tree. This is a
-  first-pass checkpoint only: `N12` coverage remains `NO/NO` while wholly
-  fresh post-repair full-range source, technical, and visual closers run against
-  the final rebuilt target. The focused Stage 8 suite passes 28 tests with
-  2,775 subtests; the Goal 5 and complete repository suites pass 196 and 298
-  tests with 5,575 subtests.
+  repair checkpoint only: `N12` coverage remains `NO/NO` while wholly fresh
+  post-repair full-range source, technical, and visual closers run against the
+  final rebuilt target. The focused Stage 8 suite passes 28 tests with 2,895
+  subtests; the Goal 5 and complete repository suites pass 196 and 298 tests
+  with 5,695 subtests.
 - Stage 7 is complete. Stage 8 remains active with `N09` and `N10` closed and
   `N11` now closed; `N12` first-pass integration is complete and its fresh
-  post-repair final closing round is active. The next available IDs are `G5-C-4386` and
+  post-repair final closing round is active. The next available IDs are `G5-C-4446` and
   `G5-A-0164`.
 
 ## Stage Status
