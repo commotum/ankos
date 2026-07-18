@@ -556,6 +556,8 @@ FSEvolveList[fracs_, init_, t_] :=
   NestList[First[Select[fracs #, IntegerQ, 1]] &, init, t]
 ```
 
+With the choice
+
 ```
 fracs = {17/91, 78/85, 19/51, 23/38, 29/33, 77/29, 95/
      23, 77/19, 1/17, 11/13, 13/11, 15/14, 15/2, 55/1}
@@ -802,6 +804,8 @@ Mod[x, Prime[Rest[NestList[NestWhile[# + 1 &, # + 1,
 ■ **Register machines.** The results of page 100 suggest that with 2 registers and up to 8 instructions no universal register machines (URMs) exist. Using the method of page 672 one can construct a URM with 3 registers and 175 instructions (or 2 registers and 4694 instructions) that emulates the universal Turing machine on page 706. Using work by Ivan Korec from the 1980s and 1990s one can also construct URMs which directly emulate other register machines. An example with 8 registers and 41 instructions is:
 
 ![](_page_1136_Picture_5.jpeg)
+
+or
 
 ```
 {d[4, 40], i[5], d[3, 9], i[3], d[7, 4], d[5, 14], i[6],

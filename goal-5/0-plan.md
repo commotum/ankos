@@ -727,10 +727,11 @@ Neither file is a generalized workflow database.
   1,623 files with length-prefixed tree SHA-256
   `dc4df2dd03f4155cf37b56c79d0a8403979b325304f2a3a4d2cc6779acf4cb97`;
   strict zero-correction output remains the frozen 1,475-file tree. Coverage
-  intentionally remains `NO/NO`; all source, technical, and visual closers must
-  restart from PDF 1123 after the repaired target is published.
+  intentionally remains `NO/NO`; wholly fresh source, technical, and visual
+  closers are restarting from PDF 1123 against the published repaired target.
 - Stage 7 is complete. Stage 8 remains active with `N09` and `N10` closed and
-  `N11` awaiting its restarted final closing round. The next available IDs are `G5-C-3576`
+  `N11` in its restarted final closing round. The next available IDs are
+  `G5-C-3576`
   and `G5-A-0149`.
 
 ## Stage Status
