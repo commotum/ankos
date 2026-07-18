@@ -709,8 +709,8 @@ Neither file is a generalized workflow database.
   `45b6d6075dd3a33dc1892be25cefc1e8746ac8cdce26241350daf9d0ef026d38`;
   strict-zero remains the frozen 1,475-file tree. The protected legacy tree
   remains the frozen 1,463-file digest.
-- `N11` first-pass source, technical, and visual work over PDF pages 1123–1140
-  is integrated but not closed. The 147 source and 100 technical proposals
+- `N11` is complete at `YES/YES` over PDF pages 1123–1140 plus boundaries
+  1122/1141. The 147 source and 100 technical proposals
   initially merged into 213 nonoverlapping guarded corrections; all 26
   cross-lane overlap components preserve both lanes. The first wholly fresh
   closing round then independently found two omitted source connectives,
@@ -737,12 +737,18 @@ Neither file is a generalized workflow database.
   `82b17a8d6f39f8452d87f5a3b72ec94e71b23f2ede49ea0ece4e88af8d11f4c4`;
   strict zero-correction output remains the frozen 1,475-file tree. The latest
   Goal 5 and repository suites pass 188 and 290 tests with 4,708 subtests.
-  Coverage intentionally remains `NO/NO`; all three wholly fresh source,
-  technical, and visual closers must restart a fourth time from PDF 1123
-  against this exact latest repaired target.
+  The fourth wholly fresh source, technical, and visual closers all sealed
+  `CLEAN_ZERO_FINDINGS` against this exact target. Their final report hashes
+  are respectively
+  `37538ff98b2b64c9bc4380fe7602d0027be66ef05cd9813e3cb05b26ccb46f99`,
+  `d0f88d9dabe98fc27cac850adea798c419ebfef51a5b5328d17cb2ddb66685a1`,
+  and `cf0d64a75b7914b1e15cc64450ffc7c9c7981569a941f03ef00c56955306d5c2`.
+  Coverage is promoted to `YES/YES`; validation reports 26 completed second
+  passes, and the focused N09–N11 suite passes 20 tests with 1,908 subtests.
 - Stage 7 is complete. Stage 8 remains active with `N09` and `N10` closed and
-  `N11` entering its fourth wholly fresh final closing round. The next
-  available IDs are `G5-C-3577` and `G5-A-0149`.
+  `N11` now closed; `N12` complete forward first-pass source, technical, and
+  visual lanes are active. The next available IDs
+  are `G5-C-3577` and `G5-A-0149`.
 
 ## Stage Status
 
