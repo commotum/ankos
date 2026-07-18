@@ -26,18 +26,18 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-FINAL_CORRECTION_COUNT = 638
-FINAL_CORRECTION_LAST_NUMBER = 2549
-FINAL_TARGET_BYTES = 261_274
+FINAL_CORRECTION_COUNT = 894
+FINAL_CORRECTION_LAST_NUMBER = 2805
+FINAL_TARGET_BYTES = 262_098
 FINAL_TARGET_LFS = 1_000
 FINAL_TARGET_SHA256 = (
-    "41cc70b8d238dafa79d0851738d2c31f6c6c9ae8048badcdc72ee69858e5a26a"
+    "9dec811e2a498b35a82f0ba96b73ac734e75d7aa4f17d002e80aa5d3a6606ddb"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "c19bcc13c4f767b2ad150d99240fa6dab780699523bdfc4852a6547a6deb4908"
+    "c835ce45d3037d95a74dc5f28716b907b041bc6a417ff14e5c5fe063ecd18f8c"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "fde7d9521af6fdf56f3c86adb0a7e4d8e568b9fd7f9b21f25657260b38f146fb"
+    "14d85157191fab114f91c2c62d323d12e1dde864288a055b06bfc8f4e838c5ea"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "eb2a63e770f3bd2562a9c1f037fdd3210cedcb779c22f352a851e9dc3ff7ed43"
@@ -181,7 +181,7 @@ REQUIRED_LITERAL_PINS = [
     ("cycle-label", "■ **Page 479 · Cycle lengths.** The lengths", 1),
     ("polytope-parentheses", "the simplex ($d + 1$ vertices) and hypercube ($2^d$ vertices)", 1),
     ("phi-cubed", r"a $\phi^3$ field theory", 1),
-    ("geodesic-space", "z = f[x, y] this is equivalent", 1),
+    ("geodesic-space", "`z = f[x, y]` this is equivalent", 1),
     ("quantum-group", r"quantum group $SU(2)_q$—and", 1),
     ("gauge-quotes", "“gauge” in space", 1),
     ("torsion-quotes", "word “torsion”. Here", 1),
@@ -191,6 +191,13 @@ REQUIRED_LITERAL_PINS = [
     ("source-native-probe", "will then to probe", 1),
     ("source-native-devices", "the actually devices", 1),
     ("source-native-flux", "fact that every point in the system the total flux", 1),
+    ("integer-digits-code", "`IntegerDigits[n, 2, 8]`", 1),
+    ("network-variable", "network *g* so that", 1),
+    ("coordinate-expression", "$x[i, k]$ which minimize", 1),
+    ("string-triple-code", '`{"AAABB", "ABABB", "ABAABB"}`', 1),
+    ("sphere-volume-assignment", "Integrate[Sin[θ]^(d - 1), {θ, 0, r/a}] =", 1),
+    ("small-ball-equation", r"$$\partial_{tt} v[t]/v[t] == -1/2(\rho + 3p)$$", 1),
+    ("source-roman-s-matrices", "as S matrices for elementary evolution events", 1),
 ]
 
 
@@ -213,6 +220,9 @@ FORBIDDEN_LITERAL_PINS = [
     "</sub>",
     "\n• ",
     "\n  - ",
+    "network q so that",
+    "as *S* matrices for elementary evolution events",
+    r"$$\partial_{tt} v[t]/v[t] = -1/2(\rho + 3p)$$",
 ]
 
 
@@ -290,7 +300,7 @@ class NotesForChapter9Tests(unittest.TestCase):
         self.assertEqual(len(self.rows), FINAL_CORRECTION_COUNT)
         self.assertEqual(
             [row["id"] for row in self.rows],
-            [f"G5-C-{number:04d}" for number in range(1912, 2550)],
+            [f"G5-C-{number:04d}" for number in range(1912, 2806)],
         )
         self.assertEqual(rows_sha256(self.rows), FINAL_CORRECTION_ROWS_SHA256)
         self.assertEqual(
@@ -363,7 +373,7 @@ class NotesForChapter9Tests(unittest.TestCase):
         self.assertEqual(
             (len(headings), len(labels), len(fences), len(inline_code),
              len(math_spans), len(self.references)),
-            (16, 174, 76, 22, 265, 32),
+            (16, 174, 76, 82, 403, 32),
         )
         self.assertTrue(all(line == "```" for line in fences))
         self.assertEqual(self.references, EXPECTED_REFERENCES)
@@ -399,6 +409,19 @@ class NotesForChapter9Tests(unittest.TestCase):
             with self.subTest(forbidden=literal):
                 self.assertNotIn(literal, self.rendered)
         self.assertEqual(self.rendered.count("$10^{-3}$ level"), 2)
+        diffusion_equations = (
+            r"$\partial_t f[x, t] == c \, \partial_{xx} f[x, t]$",
+            r"$f[x + dx, t] == f[x, t] + \partial_x f[x, t] dx + 1/2 \partial_{xx} f[x, t] dx^2 + ...$",
+            r"$f[x, t+dt] == p_1 f[x-dx, t] + p_2 f[x, t] + p_3 f[x+dx, t]$",
+            r"$p_1 + p_2 + p_3 == 1$",
+            r"$p_1 == p_3$",
+            r"$f[x, t + dt] == c (f[x - dx, t] + f[x + dx, t]) + (1 - 2c) f[x, t]$",
+            r"$f[x, t] + dt \partial_t f[x, t] == f[x, t] + c dx^2 \partial_{xx} f[x, t]$",
+            r"$\partial_t f[x, t] == \xi \, \partial_{xx} f[x, t]$",
+        )
+        for literal in diffusion_equations:
+            with self.subTest(diffusion_equation=literal):
+                self.assertEqual(self.rendered.count(literal), 1)
         for literal in (
             "*Size dependence.*", "*Additive rules.*", "*Updating orders.*",
             "*History.* Sequential cellular automata",
@@ -540,8 +563,8 @@ class NotesForChapter9Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="n09-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1562, 2549))
-            self.assertEqual(build.build(second), (29, 1562, 2549))
+            self.assertEqual(build.build(first), (29, 1562, 2805))
+            self.assertEqual(build.build(second), (29, 1562, 2805))
             first_manifest = tree_manifest(first)
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
