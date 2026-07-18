@@ -741,8 +741,8 @@ Neither file is a generalized workflow database.
   technical, and visual closers must restart a fourth time from PDF 1123
   against this exact latest repaired target.
 - Stage 7 is complete. Stage 8 remains active with `N09` and `N10` closed and
-  `N11` entering its fourth wholly fresh final closing round. The next available IDs
-  are `G5-C-3577` and `G5-A-0149`.
+  `N11` entering its fourth wholly fresh final closing round. The next
+  available IDs are `G5-C-3577` and `G5-A-0149`.
 
 ## Stage Status
 
