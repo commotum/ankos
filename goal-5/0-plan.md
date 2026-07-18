@@ -281,8 +281,8 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions, 141 source-added images, and
-  generated README/Contents files. It now includes 3,360 guarded
+  documents, 1,444 mapped image positions, 148 source-added images, and
+  generated README/Contents files. It now includes 3,573 guarded
   source-verified corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -708,9 +708,25 @@ Neither file is a generalized workflow database.
   `45b6d6075dd3a33dc1892be25cefc1e8746ac8cdce26241350daf9d0ef026d38`;
   strict-zero remains the frozen 1,475-file tree. The protected legacy tree
   remains the frozen 1,463-file digest.
+- `N11` first-pass source, technical, and visual work over PDF pages 1123–1140
+  is integrated but not closed. The 147 source and 100 technical proposals
+  merge into 213 nonoverlapping guarded corrections, `G5-C-3361`–
+  `G5-C-3573`; all 26 cross-lane overlap components preserve both lanes. All
+  14 mapped visuals are retained, and additions `G5-A-0142`–`G5-A-0148`
+  restore seven missing source visuals. The current 87,968-byte, 982-LF target
+  hashes to
+  `e6f30ab06b5282a0cf17b9d68603bf08d435de6bb899946365c8ed8362c80b25`
+  and contains 21 resolving image references and 66 fenced programs. An
+  independent reconstruction of the integration closes with zero discrepancy.
+  Two fresh normal builds and the published sibling are byte-identical at
+  1,623 files with length-prefixed tree SHA-256
+  `5f5ce7333e0946b3448658d8f1c965f65dee3820b61463c8a8e66b873260fa19`;
+  strict zero-correction output remains the frozen 1,475-file tree. Coverage
+  intentionally remains `NO/NO` while wholly fresh post-integration source,
+  technical, and visual closers run.
 - Stage 7 is complete. Stage 8 remains active with `N09` and `N10` closed and
-  `N11` source, technical, and visual first-pass lanes active over PDF pages
-  1123–1140. The next available IDs are `G5-C-3361` and `G5-A-0142`.
+  `N11` in its final closing round. The next available IDs are `G5-C-3574`
+  and `G5-A-0149`.
 
 ## Stage Status
 
