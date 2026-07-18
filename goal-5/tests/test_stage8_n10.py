@@ -26,18 +26,20 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-FINAL_CORRECTION_COUNT = 555
-FINAL_CORRECTION_LAST_NUMBER = 3360
-FINAL_TARGET_BYTES = 197_898
+FINAL_CORRECTION_COUNT = 584
+FINAL_BASE_CORRECTION_LAST_NUMBER = 3360
+FINAL_REPAIR_CORRECTION_FIRST_NUMBER = 4446
+FINAL_REPAIR_CORRECTION_LAST_NUMBER = 4474
+FINAL_TARGET_BYTES = 197_955
 FINAL_TARGET_LFS = 1_098
 FINAL_TARGET_SHA256 = (
-    "96601763703c87874ec465245b55ed68ee5d59ecc560814ca6fbf078660b2e29"
+    "6044152950100dc26031174038686d69fcf3e2c5482e85283e2c8757016f036a"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "313d8f23a9b39e73454ba9d3d5dd4d7218530a2bb26d57c71b596571796c5031"
+    "9997a1c7c87b77286e24be8c48a21557e87228174bf309dfb2a2fef4d71fc3f7"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "3173ce88f3528c079ca10b840facc94d99aca690de2d4655afbd5a8b7a5659f4"
+    "cd969432e18b5e97a78633dba31bed42b9a879c6ff401355e9fbfdb6ade67a68"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "dd98fb6f43a8dc8013652fb12c19de395ecf3e81de6dbf07974c7389064d9f13"
@@ -354,8 +356,19 @@ class NotesForChapter10Tests(unittest.TestCase):
         self.assertEqual(len(self.rows), FINAL_CORRECTION_COUNT)
         self.assertEqual(
             [row["id"] for row in self.rows],
-            [f"G5-C-{number:04d}"
-             for number in range(2806, FINAL_CORRECTION_LAST_NUMBER + 1)],
+            [
+                *(
+                    f"G5-C-{number:04d}"
+                    for number in range(2806, FINAL_BASE_CORRECTION_LAST_NUMBER + 1)
+                ),
+                *(
+                    f"G5-C-{number:04d}"
+                    for number in range(
+                        FINAL_REPAIR_CORRECTION_FIRST_NUMBER,
+                        FINAL_REPAIR_CORRECTION_LAST_NUMBER + 1,
+                    )
+                ),
+            ],
         )
         self.assertEqual(rows_sha256(self.rows), FINAL_CORRECTION_ROWS_SHA256)
         self.assertEqual(
@@ -473,6 +486,49 @@ class NotesForChapter10Tests(unittest.TestCase):
         )
         for literal in ("N10-SRC-", "N10-TFP-", "G5-N10-VIS-", "FIRST_PASS"):
             self.assertNotIn(literal, manifest)
+
+    def test_reopened_source_and_technical_repairs_are_exact(self) -> None:
+        repaired_rows = [
+            row
+            for row in self.rows
+            if int(row["id"].rsplit("-", 1)[1])
+            >= FINAL_REPAIR_CORRECTION_FIRST_NUMBER
+        ]
+        self.assertEqual(
+            [row["id"] for row in repaired_rows],
+            [
+                f"G5-C-{number:04d}"
+                for number in range(
+                    FINAL_REPAIR_CORRECTION_FIRST_NUMBER,
+                    FINAL_REPAIR_CORRECTION_LAST_NUMBER + 1,
+                )
+            ],
+        )
+        for row in repaired_rows:
+            with self.subTest(reopened_guard=row["id"]):
+                self.assertNotIn(row["before"], self.rendered)
+                self.assertIn(row["after"], self.rendered)
+
+        self.assertEqual(
+            (
+                len(re.findall(r"(?<![<>=!:])=(?![=!])", self.rendered)),
+                len(re.findall(r"(?<![=])==(?!=)", self.rendered)),
+                len(re.findall(r"(?<![=])===(?!=)", self.rendered)),
+                self.rendered.count("=!=")
+            ),
+            (137, 42, 2, 2),
+        )
+        self.assertIn(r"$\xi[r] = \lambda^r$", self.rendered)
+        self.assertNotIn(r"$\xi[r] == \lambda^r$", self.rendered)
+        self.assertIn("then h == 0", self.rendered)
+        self.assertIn(r"Sin[\omega_1 t] + Sin[\omega_2 t] ==", self.rendered)
+        self.assertIn("$f[z] == (1-z) f[z^2]$", self.rendered)
+        self.assertIn("$x == Mod[v^2, m]$", self.rendered)
+        self.assertIn("^{-m} == Sum[", self.rendered)
+        self.assertIn("y''[x] == f[", self.rendered)
+        self.assertIn("$z^3 == 1$", self.rendered)
+        self.assertEqual(self.rendered.count(r"\bar{\wedge}"), 1)
+        self.assertNotIn(r"\bar{\pi}", self.rendered)
 
     def test_image_map_dispositions_and_reference_accounting(self) -> None:
         self.assertEqual(len(self.image_rows), 91)
@@ -600,7 +656,7 @@ class NotesForChapter10Tests(unittest.TestCase):
         self.assertEqual(len(replacement_ids), 18)
         self.assertEqual(len(WHOLLY_MISSING_ADDITIONS), 5)
 
-    def test_authoritative_source_legacy_and_completed_coverage(self) -> None:
+    def test_authoritative_source_legacy_and_reopened_coverage(self) -> None:
         range_data = json.loads(build.RANGES_PATH.read_text(encoding="utf-8"))
         source = range_data["authoritative_source"]
         self.assertEqual(
@@ -614,21 +670,21 @@ class NotesForChapter10Tests(unittest.TestCase):
         n10 = next(row for row in coverage if row["document_id"] == "N10")
         self.assertEqual(
             (n10["first_pass"], n10["second_pass"], n10["reviewer_type"]),
-            ("YES", "YES", "agent"),
+            ("NO", "NO", ""),
         )
-        self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 26)
+        self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 25)
 
     def test_normal_and_zero_builds_remain_deterministic(self) -> None:
         with tempfile.TemporaryDirectory(prefix="n10-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1607, 4445))
-            self.assertEqual(build.build(second), (29, 1607, 4445))
+            self.assertEqual(build.build(first), (29, 1607, 4533))
+            self.assertEqual(build.build(second), (29, 1607, 4533))
             first_manifest = tree_manifest(first)
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
             self.assertEqual(len(first_manifest), 1638)
-            self.assertEqual(validate.validate(first), (29, 1607, 4445, 26))
+            self.assertEqual(validate.validate(first), (29, 1607, 4533, 25))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))
