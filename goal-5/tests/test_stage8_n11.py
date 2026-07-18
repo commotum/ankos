@@ -29,16 +29,16 @@ import validate  # noqa: E402
 FINAL_CORRECTION_COUNT = 216
 FINAL_CORRECTION_FIRST_NUMBER = 3361
 FINAL_CORRECTION_LAST_NUMBER = 3576
-FINAL_TARGET_BYTES = 87_975
+FINAL_TARGET_BYTES = 87_971
 FINAL_TARGET_LFS = 986
 FINAL_TARGET_SHA256 = (
-    "7eea6364e4a504b94a16573a3e6fac3ca69b65e7073c013d022565a78e86e8e8"
+    "0724347e91da98fdae48104af86f458248ba016c9ffb3db2c550990457800b4c"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "4e1747f33a268997d379facc17b1ff3be725024547030e6bcde12076cb8e8e36"
+    "128bb8973671b11c60d04e157568f9a5aef13ab5e9690524152d12bef3619bc2"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "36b2e2b11547186e3f1221da451b9e7141b98778887adfbd94207ca94fe34db9"
+    "d47e43f69821052f2633a9d83fe63c4da639b387af97de766ae0f686fd7dd6b6"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "2ed7d00b10059d2ded715e2f86d049de4d1a5f1e47e204c62b37024592473a71"
@@ -188,7 +188,8 @@ REQUIRED_LITERAL_PINS = [
     "Flatten[{Transpose[{Join[{4, 18 (1 - a), 6}, Table[9,\n"
     "  {2^(2 r + 1) - 3}]], 10 - 3 rtab}], Table[{9, 1}, {r}], 9, 13}]",
     "Select[rules, Mod[Length[#], 6] != 0 &] == {}, init_] :=",
-    "MapThread[If[#1 === #2 === {d[22, 11], s[3]}, {d[",
+    "MapThread[If[#1 === #2 === {d[22, 11], s3}, {d[\n"
+    "    20, 8], s3}, #1] &,",
     r"$f_j[a_j] == InverseFunction[\phi][f_i[\phi[a_j]]]$",
     "yields a number x such that Mod[x, p] == list. Based on this",
     "TSToPR[{n_, rule_}] := Fold[Apply[c, Flatten[{#1, Array[p, #2],",
@@ -220,6 +221,8 @@ FORBIDDEN_LITERAL_PINS = [
     "![](_page_1136_Picture_5.jpeg)\n\n```",
     "f[n_] := If[n <= 1, 1, n f[n - 1]]",
     "f = If[#1 <= 1, 1, #1 #0[#1 - 1]] &",
+    "MapThread[If[#1 === #2 === {d[22, 11], s[3]}, {d[\n"
+    "    20, 8], s[3]}, #1] &,",
     "{_, r[v : (0 | 1)], _} ->\n   (Replace[v, rules]",
     "! x_ -> {0, x, 0}",
     "And[x__] -> {0, 0, 1, 0, x, 1, 3, 0, 0}",
@@ -498,6 +501,7 @@ class NotesForChapter11Tests(unittest.TestCase):
                 self.assertEqual(row["expected_count"], 1)
 
         restarted_technical_after_hashes = {
+            "G5-C-3476": "231ea28627bbdaf7c08e57803fc92bfef2b21981f6400dc785aed3408c681464",
             "G5-C-3389": "3b4281d087f745f6cdb951be43539bb9d520470dfe0800caebcfcf28feab6961",
             "G5-C-3406": "5840c30e57706ec9356cbf04347fabcedfaca7f6a451ca0b9d8a688a861f29a2",
             "G5-C-3422": "981ac142d76e76c409c080373b00e142675519d2f8aa5004ffa81251a4d7dfe8",

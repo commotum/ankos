@@ -584,8 +584,8 @@ Module[{g1, g2, g3, nr = 0, x1, y1, sp}, g1 = Flatten[
   Map[If[# === {}, {{{2}}}, {{{1, 3, 5 - First[#]}}, Table[
     {4, 5 - #[[n]]}, {n, 2, Length[#]}]}] &, rules] /. a_Integer :>
     Map[{d[#[[1]], #[[2]]], s[#[[3]]]} &, Partition[c[a], 3]], 4];
- g2 = g1 = MapThread[If[#1 === #2 === {d[22, 11], s[3]}, {d[
-    20, 8], s[3]}, #1] &, {g1, RotateRight[g1, 6]}]; While[Mod[
+ g2 = g1 = MapThread[If[#1 === #2 === {d[22, 11], s3}, {d[
+    20, 8], s3}, #1] &, {g1, RotateRight[g1, 6]}]; While[Mod[
   Apply[Plus, Map[#[[1, 2]] &, g2]], 30] != 0, nr++; g2 = Join[
   g2, g1]]; y1 = g2[[1, 1, 2]] - 11; If[y1 < 0, y1 += 30]; Cases[
  Last[g2][[2]], s[d[x_, y1], _, _, a_] :> (x1 = x + Length[a])];
