@@ -26,19 +26,19 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-FINAL_CORRECTION_COUNT = 213
+FINAL_CORRECTION_COUNT = 215
 FINAL_CORRECTION_FIRST_NUMBER = 3361
-FINAL_CORRECTION_LAST_NUMBER = 3573
-FINAL_TARGET_BYTES = 87_968
-FINAL_TARGET_LFS = 982
+FINAL_CORRECTION_LAST_NUMBER = 3575
+FINAL_TARGET_BYTES = 87_989
+FINAL_TARGET_LFS = 986
 FINAL_TARGET_SHA256 = (
-    "e6f30ab06b5282a0cf17b9d68603bf08d435de6bb899946365c8ed8362c80b25"
+    "03de4e8dbb7873d764ace90eedc136d161f045aae7001423a631fd529d9c3a9f"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "f1a9bb22e079f058237da06e55e9d2a463a0a34b0edf8d8cc5df3a3c838dca97"
+    "bf476d8b75f6ad28ce89d01514e41d10a93a7665f9272c712b127c0d3cf3ab3a"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "9111603c7939e72030b08c380744edd697d38fa2c7ec5c636544c176c1738c2e"
+    "73916f2aaef92ee319812edf0fb06b27c2d597e90012bcd3095184c6dfc5afb1"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "2ed7d00b10059d2ded715e2f86d049de4d1a5f1e47e204c62b37024592473a71"
@@ -196,6 +196,8 @@ REQUIRED_LITERAL_PINS = [
     r"$n + Table[Prime[i]^reg[[i]], \{i, nr\}]p - 1$",
     "the rule he gave in this case is:\n\n"
     "![](_page_1134_Rogozhin_24_State_2_Color_Turing_Machine_Rule.jpeg)",
+    "With the choice\n\n```\nfracs = {17/91",
+    "![](_page_1136_Picture_5.jpeg)\n\nor\n\n```",
     "*s[s[s][k]][k[k[s[s]]]]* serves as a doubling function.",
 ]
 
@@ -206,6 +208,7 @@ FORBIDDEN_LITERAL_PINS = [
     "Table[{9, 1}, {r}], {9, 13}",
     "Select[rules, Mod[Length[#], 6] + 0 &]",
     "10<sup>49</sup>",
+    "![](_page_1136_Picture_5.jpeg)\n\n```",
     "N11-SRC-",
     "N11-TFP-",
     "G5-N11-VIS-",
@@ -453,6 +456,29 @@ class NotesForChapter11Tests(unittest.TestCase):
                 self.assertIn(display, self.rows_by_id[correction_id]["after"])
                 self.assertEqual(self.rendered.count(display), 1)
 
+        late_connectives = {
+            "G5-C-3574": (
+                2_879_593,
+                18_654,
+                "\n```\nfracs =",
+                "\nWith the choice\n\n```\nfracs =",
+            ),
+            "G5-C-3575": (
+                2_912_735,
+                18_896,
+                "![](_page_1136_Picture_5.jpeg)\n\n",
+                "![](_page_1136_Picture_5.jpeg)\n\nor\n\n",
+            ),
+        }
+        for correction_id, (start, line, before, after) in late_connectives.items():
+            row = self.rows_by_id[correction_id]
+            with self.subTest(late_connective=correction_id):
+                self.assertEqual(row["raw_start_byte"], start)
+                self.assertEqual(row["raw_line"], line)
+                self.assertEqual(row["before"], before)
+                self.assertEqual(row["after"], after)
+                self.assertEqual(row["expected_count"], 1)
+
         manifest = "\n".join(
             canonical_bytes(row).decode("utf-8")
             for row in self.rows + self.image_rows + self.added
@@ -580,13 +606,13 @@ class NotesForChapter11Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="n11-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1592, 3573))
-            self.assertEqual(build.build(second), (29, 1592, 3573))
+            self.assertEqual(build.build(first), (29, 1592, 3575))
+            self.assertEqual(build.build(second), (29, 1592, 3575))
             first_manifest = tree_manifest(first)
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
             self.assertEqual(len(first_manifest), 1623)
-            self.assertEqual(validate.validate(first), (29, 1592, 3573, 25))
+            self.assertEqual(validate.validate(first), (29, 1592, 3575, 25))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))

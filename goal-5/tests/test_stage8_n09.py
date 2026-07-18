@@ -582,13 +582,13 @@ class NotesForChapter9Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="n09-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1592, 3573))
-            self.assertEqual(build.build(second), (29, 1592, 3573))
+            self.assertEqual(build.build(first), (29, 1592, 3575))
+            self.assertEqual(build.build(second), (29, 1592, 3575))
             first_manifest = tree_manifest(first)
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
             self.assertEqual(len(first_manifest), 1623)
-            self.assertEqual(validate.validate(first), (29, 1592, 3573, 25))
+            self.assertEqual(validate.validate(first), (29, 1592, 3575, 25))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))

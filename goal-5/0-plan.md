@@ -282,7 +282,7 @@ Neither file is a generalized workflow database.
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
   documents, 1,444 mapped image positions, 148 source-added images, and
-  generated README/Contents files. It now includes 3,573 guarded
+  generated README/Contents files. The current manifests include 3,575 guarded
   source-verified corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
@@ -710,22 +710,27 @@ Neither file is a generalized workflow database.
   remains the frozen 1,463-file digest.
 - `N11` first-pass source, technical, and visual work over PDF pages 1123–1140
   is integrated but not closed. The 147 source and 100 technical proposals
-  merge into 213 nonoverlapping guarded corrections, `G5-C-3361`–
-  `G5-C-3573`; all 26 cross-lane overlap components preserve both lanes. All
+  initially merged into 213 nonoverlapping guarded corrections; all 26
+  cross-lane overlap components preserve both lanes. The first wholly fresh
+  closing round then independently found two omitted source connectives,
+  “With the choice” on PDF 1131 and “or” on PDF 1137. Repairs
+  `G5-C-3574`–`G5-C-3575` bring N11 to 215 corrections,
+  `G5-C-3361`–`G5-C-3575`. All
   14 mapped visuals are retained, and additions `G5-A-0142`–`G5-A-0148`
-  restore seven missing source visuals. The current 87,968-byte, 982-LF target
+  restore seven missing source visuals. The repaired 87,989-byte, 986-LF target
   hashes to
-  `e6f30ab06b5282a0cf17b9d68603bf08d435de6bb899946365c8ed8362c80b25`
+  `03de4e8dbb7873d764ace90eedc136d161f045aae7001423a631fd529d9c3a9f`
   and contains 21 resolving image references and 66 fenced programs. An
-  independent reconstruction of the integration closes with zero discrepancy.
-  Two fresh normal builds and the published sibling are byte-identical at
+  independent reconstruction of the initial integration closed with zero
+  discrepancy before the two fresh-round findings. Two fresh post-repair
+  normal builds are byte-identical at
   1,623 files with length-prefixed tree SHA-256
-  `5f5ce7333e0946b3448658d8f1c965f65dee3820b61463c8a8e66b873260fa19`;
+  `dc4df2dd03f4155cf37b56c79d0a8403979b325304f2a3a4d2cc6779acf4cb97`;
   strict zero-correction output remains the frozen 1,475-file tree. Coverage
-  intentionally remains `NO/NO` while wholly fresh post-integration source,
-  technical, and visual closers run.
+  intentionally remains `NO/NO`; all source, technical, and visual closers must
+  restart from PDF 1123 after the repaired target is published.
 - Stage 7 is complete. Stage 8 remains active with `N09` and `N10` closed and
-  `N11` in its final closing round. The next available IDs are `G5-C-3574`
+  `N11` awaiting its restarted final closing round. The next available IDs are `G5-C-3576`
   and `G5-A-0149`.
 
 ## Stage Status
