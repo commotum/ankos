@@ -26,18 +26,18 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-FINAL_CORRECTION_COUNT = 517
-FINAL_CORRECTION_LAST_NUMBER = 3322
-FINAL_TARGET_BYTES = 197_817
-FINAL_TARGET_LFS = 1_100
+FINAL_CORRECTION_COUNT = 547
+FINAL_CORRECTION_LAST_NUMBER = 3352
+FINAL_TARGET_BYTES = 197_891
+FINAL_TARGET_LFS = 1_098
 FINAL_TARGET_SHA256 = (
-    "329bef4e8beb40df2885041aed52f944886710b2874fa9db9a07e50905a08bf4"
+    "59ffe4b9bb09850ed0ec439cb3db9a2ee19e17a9757ad9c8da5f04625e448274"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "11ba0659bb9ba8693561cdfb5e536c1dd163cf29464abfe6ed9f471edce590fe"
+    "8ee47005e6ac89deea470ec9578680935fdaf134a8b3f50914d0b492a088bf2e"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "bf9a03b741b303948d57cb9b2c917bd6b4762999b9a029d485d2ca30c6232072"
+    "f1983142e998417492972d6de1e7e1cb9de6c802e67f71ae4c1dc5768a79984b"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "f97180e293da08e4b33767272b3aba23182b1a6f0aef4f49e4b84696f4785e35"
@@ -167,9 +167,23 @@ WHOLLY_MISSING_ADDITIONS = {
 
 
 REQUIRED_LITERAL_PINS = [
-    "- (d) *Binary-coded base 3*.",
-    "- (e) *Fibonacci encoding*.",
-    "- (d) (Period-doubling sequence)",
+    "- (a) *Unary.* `Table[0, {n}]`. (Not self-delimited.)",
+    "- (b) *Ordinary base 2.* `IntegerDigits[n, 2]`.",
+    "- (c) *Length prefixed.* Starting with an ordinary base 2 digit sequence",
+    "- (d) *Binary-coded base 3.*",
+    "- (e) *Fibonacci encoding.*",
+    "- (a) *(Thue-Morse sequence)*",
+    "- (b) *(Fibonacci-related sequence)*",
+    "- (c) *(Cantor set)*",
+    "- (d) *(Period-doubling sequence)*",
+    r"$\phi[j][t-1, \omega]$",
+    r"$(1-\lambda^2)/(\lambda^2-2\lambda Cos[2\pi\omega]+1)-1$",
+    "such as {{1, 1}, {0}} each element",
+    "position `{x, y}` in the pattern shown",
+    r"computation of $3^{20}$ (a)",
+    "■ **Page 627 · Structure of *Mathematica*.**",
+    "$x + y z$ comes to be interpreted in *Mathematica* as "
+    "`Plus[x, Times[y, z]]`",
     "avoid this effect.",
     "found for sufficiently large n from",
     "rather than t applications of h.",
@@ -188,6 +202,17 @@ REQUIRED_LITERAL_PINS = [
 
 
 FORBIDDEN_LITERAL_PINS = [
+    "- (a) Unary. `Table[0, {n}]`.",
+    "- (d) *Binary-coded base 3*.",
+    "- (e) *Fibonacci encoding*.",
+    "- (d) (Period-doubling sequence)",
+    r"\phi[i][t-1, \omega]",
+    r"\cos[2\pi\omega]",
+    "such as\n\n{{1, 1}, {0}} each",
+    "position in the pattern shown",
+    "computation of 320 (a)",
+    "■ **Page 627 · Structure of Mathematica.**",
+    "x + yz comes to be interpreted in Mathematica",
     "$(\\{r^2, rs, s^2, -rs\\})$",
     "$m = \\{\\{0, -1, 1\\}, \\{1, 0, -1\\}, \\{-1, 1, 0\\}\\}\\)$ .",
     "■ **Nested continuous functions.** Elliptic theta",
@@ -301,14 +326,17 @@ class NotesForChapter10Tests(unittest.TestCase):
         self.assertEqual(len(self.rows), FINAL_CORRECTION_COUNT)
         self.assertEqual(
             [row["id"] for row in self.rows],
-            [f"G5-C-{number:04d}" for number in range(2806, 3323)],
+            [f"G5-C-{number:04d}"
+             for number in range(2806, FINAL_CORRECTION_LAST_NUMBER + 1)],
         )
         self.assertEqual(rows_sha256(self.rows), FINAL_CORRECTION_ROWS_SHA256)
         self.assertEqual(
             row_hash_sequence_sha256(self.rows), FINAL_CORRECTION_SEQUENCE_SHA256
         )
         previous_end = self.document["raw_start_byte"]
-        for row in self.rows:
+        for row in sorted(
+            self.rows, key=lambda value: (value["raw_start_byte"], value["id"])
+        ):
             with self.subTest(correction=row["id"]):
                 self.assertEqual(set(row), build.CORRECTION_FIELDS | {"raw_line"})
                 start = row["raw_start_byte"]
@@ -370,7 +398,7 @@ class NotesForChapter10Tests(unittest.TestCase):
         self.assertEqual(
             (len(headings), len(labels), len(fence_lines), len(inline_code),
              len(math_spans), len(display_math), len(self.references)),
-            (12, 160, 98, 92, 208, 10, 57),
+            (12, 160, 98, 93, 209, 10, 57),
         )
         self.assertTrue(all(line == "```" for line in fence_lines))
         self.assertEqual(self.references, EXPECTED_REFERENCES)
@@ -394,6 +422,7 @@ class NotesForChapter10Tests(unittest.TestCase):
         for literal in FORBIDDEN_LITERAL_PINS:
             with self.subTest(forbidden=literal[:60]):
                 self.assertNotIn(literal, self.rendered)
+        self.assertEqual(self.rendered.count("*Mathematica*"), 23)
         manifest = "\n".join(
             canonical_bytes(row).decode("utf-8")
             for row in self.rows + self.image_rows + self.added
@@ -528,13 +557,13 @@ class NotesForChapter10Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="n10-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1585, 3322))
-            self.assertEqual(build.build(second), (29, 1585, 3322))
+            self.assertEqual(build.build(first), (29, 1585, 3352))
+            self.assertEqual(build.build(second), (29, 1585, 3352))
             first_manifest = tree_manifest(first)
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
             self.assertEqual(len(first_manifest), 1616)
-            self.assertEqual(validate.validate(first), (29, 1585, 3322, 24))
+            self.assertEqual(validate.validate(first), (29, 1585, 3352, 24))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))
