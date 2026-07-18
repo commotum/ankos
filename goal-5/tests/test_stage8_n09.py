@@ -28,16 +28,16 @@ import validate  # noqa: E402
 
 FINAL_CORRECTION_COUNT = 894
 FINAL_CORRECTION_LAST_NUMBER = 2805
-FINAL_TARGET_BYTES = 262_098
+FINAL_TARGET_BYTES = 262_097
 FINAL_TARGET_LFS = 1_000
 FINAL_TARGET_SHA256 = (
-    "9dec811e2a498b35a82f0ba96b73ac734e75d7aa4f17d002e80aa5d3a6606ddb"
+    "72c07a44ac1c2879c123ee0871a68cef6ba28a0de6b284169353abb85915eda1"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "c835ce45d3037d95a74dc5f28716b907b041bc6a417ff14e5c5fe063ecd18f8c"
+    "2faf6c7a61f488964fb5698c339a34fef5a16bb1e010660ee4384ba3e8553bf9"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "14d85157191fab114f91c2c62d323d12e1dde864288a055b06bfc8f4e838c5ea"
+    "a1dd2314d964147a0763ce242804a32f82ec22d976b69bfc948ba69e86c7d59a"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "eb2a63e770f3bd2562a9c1f037fdd3210cedcb779c22f352a851e9dc3ff7ed43"
@@ -191,6 +191,7 @@ REQUIRED_LITERAL_PINS = [
     ("source-native-probe", "will then to probe", 1),
     ("source-native-devices", "the actually devices", 1),
     ("source-native-flux", "fact that every point in the system the total flux", 1),
+    ("planar-source-punctuation", "networks to be planar the numbers are", 1),
     ("integer-digits-code", "`IntegerDigits[n, 2, 8]`", 1),
     ("network-variable", "network *g* so that", 1),
     ("coordinate-expression", "$x[i, k]$ which minimize", 1),
@@ -221,6 +222,7 @@ FORBIDDEN_LITERAL_PINS = [
     "\n• ",
     "\n  - ",
     "network q so that",
+    "networks to be planar, the numbers are",
     "as *S* matrices for elementary evolution events",
     r"$$\partial_{tt} v[t]/v[t] = -1/2(\rho + 3p)$$",
 ]
