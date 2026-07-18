@@ -26,19 +26,19 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-FINAL_CORRECTION_COUNT = 215
+FINAL_CORRECTION_COUNT = 216
 FINAL_CORRECTION_FIRST_NUMBER = 3361
-FINAL_CORRECTION_LAST_NUMBER = 3575
-FINAL_TARGET_BYTES = 87_989
+FINAL_CORRECTION_LAST_NUMBER = 3576
+FINAL_TARGET_BYTES = 87_975
 FINAL_TARGET_LFS = 986
 FINAL_TARGET_SHA256 = (
-    "03de4e8dbb7873d764ace90eedc136d161f045aae7001423a631fd529d9c3a9f"
+    "7eea6364e4a504b94a16573a3e6fac3ca69b65e7073c013d022565a78e86e8e8"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "bf476d8b75f6ad28ce89d01514e41d10a93a7665f9272c712b127c0d3cf3ab3a"
+    "4e1747f33a268997d379facc17b1ff3be725024547030e6bcde12076cb8e8e36"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "73916f2aaef92ee319812edf0fb06b27c2d597e90012bcd3095184c6dfc5afb1"
+    "36b2e2b11547186e3f1221da451b9e7141b98778887adfbd94207ca94fe34db9"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "2ed7d00b10059d2ded715e2f86d049de4d1a5f1e47e204c62b37024592473a71"
@@ -198,6 +198,15 @@ REQUIRED_LITERAL_PINS = [
     "![](_page_1134_Rogozhin_24_State_2_Color_Turing_Machine_Rule.jpeg)",
     "With the choice\n\n```\nfracs = {17/91",
     "![](_page_1136_Picture_5.jpeg)\n\nor\n\n```",
+    "f[n_] := If[n == 1, 1, n f[n - 1]]",
+    "f = If[#1 == 1, 1, #1 #0[#1 - 1]] &",
+    "{_, r[v : (0 | 1)], _} :>\n   (Replace[v, rules]",
+    "{! x_ :> {0, x, 0}, And[x__] :>",
+    "Or[x__] :> {0, 0, 1, 0, x, 0, 1, 3, 0}",
+    "({a_, b_, c_} -> d_) -> {1, 2 a, 2 b, 2 c} ->",
+    "Cases[rule, ({m, i + r c} -> {x_, y_, z_}) ->\n"
+    "       {{i, b, m}, c} ->",
+    r"$\{2, \{0 :> (3\#/2 \&), 1 :> (3(\#+1)/2 \&)\}\}$",
     "*s[s[s][k]][k[k[s[s]]]]* serves as a doubling function.",
 ]
 
@@ -209,6 +218,15 @@ FORBIDDEN_LITERAL_PINS = [
     "Select[rules, Mod[Length[#], 6] + 0 &]",
     "10<sup>49</sup>",
     "![](_page_1136_Picture_5.jpeg)\n\n```",
+    "f[n_] := If[n <= 1, 1, n f[n - 1]]",
+    "f = If[#1 <= 1, 1, #1 #0[#1 - 1]] &",
+    "{_, r[v : (0 | 1)], _} ->\n   (Replace[v, rules]",
+    "! x_ -> {0, x, 0}",
+    "And[x__] -> {0, 0, 1, 0, x, 1, 3, 0, 0}",
+    "Or[x__] -> {0, 0, 1, 0, x, 0, 1, 3, 0}",
+    "({a_, b_, c_} -> d_) :> (",
+    "Cases[rule, ({m, i + r c} -> {x_, y_, z_}) :>",
+    r"\mapsto",
     "N11-SRC-",
     "N11-TFP-",
     "G5-N11-VIS-",
@@ -479,6 +497,31 @@ class NotesForChapter11Tests(unittest.TestCase):
                 self.assertEqual(row["after"], after)
                 self.assertEqual(row["expected_count"], 1)
 
+        restarted_technical_after_hashes = {
+            "G5-C-3389": "3b4281d087f745f6cdb951be43539bb9d520470dfe0800caebcfcf28feab6961",
+            "G5-C-3406": "5840c30e57706ec9356cbf04347fabcedfaca7f6a451ca0b9d8a688a861f29a2",
+            "G5-C-3422": "981ac142d76e76c409c080373b00e142675519d2f8aa5004ffa81251a4d7dfe8",
+            "G5-C-3435": "9acdaea9f6a80c89d973461fc6b5c4cddf7a79737f0ff5169ef7336d9a25425e",
+            "G5-C-3446": "1fc57f57abb19742c3cfff8768c900d5f0d48a465457486b56d228e3ab732a06",
+            "G5-C-3576": "89f12084828d3f3881b270a05354f4be7e77a3cc0cdea7ff5e7921ac55ac0d51",
+        }
+        for correction_id, digest in restarted_technical_after_hashes.items():
+            with self.subTest(restarted_technical_repair=correction_id):
+                self.assertEqual(
+                    build.sha256(self.rows_by_id[correction_id]["after"].encode()),
+                    digest,
+                )
+        rule_delayed = self.rows_by_id["G5-C-3576"]
+        self.assertEqual(
+            (rule_delayed["raw_start_byte"], rule_delayed["raw_line"],
+             rule_delayed["expected_count"]),
+            (2_878_268, 18_632, 1),
+        )
+        self.assertEqual(
+            build.sha256(rule_delayed["before"].encode()),
+            "cd3d381b03bb140e6b0fcf35ea595790fe7a4ab57b3783bd39fdabf4391007b1",
+        )
+
         manifest = "\n".join(
             canonical_bytes(row).decode("utf-8")
             for row in self.rows + self.image_rows + self.added
@@ -606,13 +649,13 @@ class NotesForChapter11Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="n11-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1592, 3575))
-            self.assertEqual(build.build(second), (29, 1592, 3575))
+            self.assertEqual(build.build(first), (29, 1592, 3576))
+            self.assertEqual(build.build(second), (29, 1592, 3576))
             first_manifest = tree_manifest(first)
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
             self.assertEqual(len(first_manifest), 1623)
-            self.assertEqual(validate.validate(first), (29, 1592, 3575, 25))
+            self.assertEqual(validate.validate(first), (29, 1592, 3576, 25))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))

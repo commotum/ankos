@@ -106,9 +106,9 @@ f[n_] := Module[{t = 1}, Do[t = t i, {i, n}]; t]
 f[n_] := Module[{t = 1, i}, For[i = 1, i <= n, i++, t *= i]; t]
 f[n_] := Apply[Times, Range[n]]
 f[n_] := Fold[Times, 1, Range[n]]
-f[n_] := If[n <= 1, 1, n f[n - 1]]
+f[n_] := If[n == 1, 1, n f[n - 1]]
 f[n_] := Fold[#2[#1] &, 1, Array[Function[t, #1 t] &, n]]
-f = If[#1 <= 1, 1, #1 #0[#1 - 1]] &
+f = If[#1 == 1, 1, #1 #0[#1 - 1]] &
 ```
 
 ### A Universal Cellular Automaton
@@ -209,7 +209,7 @@ If the Turing machine has s states for its head, then the cellular automaton has
 SSToCA[rules_] := {{b, b, p[x_, _]} -> s[x],
  {_, s[v : (0 | 1)], p[x_, _]} -> p[v, x], {_, p[_, y_], _} -> s[y],
  {_, s[v : (0 | 1)], _m} -> m[v], {s[0 | 1], m[v : (0 | 1)], _} -> s[v],
- {b, m[v : (0 | 1)], _} -> r[v], {_, r[v : (0 | 1)], _} ->
+ {b, m[v : (0 | 1)], _} -> r[v], {_, r[v : (0 | 1)], _} :>
    (Replace[v, rules] /. {{x_} -> s[x], {x_, y_} -> p[x, y]}),
  {_r, s[v : (0 | 1)], _} -> r[v], {_r, b, _} -> m[b],
  {s[0 | 1], m[b], _} -> b, {_, v_, _} -> v}
@@ -302,8 +302,8 @@ The initial conditions are given by
 
 ```
 Flatten[Block[{And, Or}, Map[{0, 2 (# + 1)} &, expr, {-1}] //.
-  {! x_ -> {0, x, 0}, And[x__] -> {0, 0, 1, 0, x, 1, 3, 0, 0},
-   Or[x__] -> {0, 0, 1, 0, x, 0, 1, 3, 0}}]]
+  {! x_ :> {0, x, 0}, And[x__] :> {0, 0, 1, 0, x, 1, 3, 0, 0},
+   Or[x__] :> {0, 0, 1, 0, x, 0, 1, 3, 0}}]]
 ```
 
 and in terms of these initial conditions the cellular automaton must be run for  $Length[list //. \{0, x__\} \rightarrow \{x\}] - 1$  steps in order to find the result.
@@ -357,7 +357,7 @@ For specific cellular automata it is often possible to construct smaller Turing 
 
 ```
 CAToSSS[rules_] := Join[rules /.
-  ({a_, b_, c_} -> d_) :> ({1, 2 a, 2 b, 2 c} -> {2 d, 1, 2 b, 2 c}),
+  ({a_, b_, c_} -> d_) -> {1, 2 a, 2 b, 2 c} -> {2 d, 1, 2 b, 2 c},
   {{1, 0, 0} -> {0, 0}, {0} -> {1, 0, 0, 0}}]
 ```
 
@@ -420,9 +420,9 @@ TMToTM2[rule_, s_, k_] := (# /. MapIndexed[
      {{m, -1, b, d}, c} -> {{0, 0, m}, c, d}}, {d, -1, 1, 2}],
     Table[{{i, n, m}, c} -> {{i + 2^n c, n + 1, m}, c, -1},
      {n, 0, b - 1}, {i, 0, 2^n - 1}], With[{r = 2^b}, Table[
-     If[i + r c >= k, {}, Cases[rule, ({m, i + r c} -> {x_, y_, z_}) :>
-       ({{i, b, m}, c} -> {{x, Mod[y, r], b, z}, Quotient[y, r],
-         1})]], {i, 0, r - 1}]]}, {m, s}, {c, 0, 1}]]]]
+     If[i + r c >= k, {}, Cases[rule, ({m, i + r c} -> {x_, y_, z_}) ->
+       {{i, b, m}, c} -> {{x, Mod[y, r], b, z}, Quotient[y, r],
+         1}]], {i, 0, r - 1}]]}, {m, s}, {c, 0, 1}]]]]
 ```
 
 Some of these states are usually unnecessary, and in the main text such states have been pruned. Given an initial condition {i, list, n} the initial condition for the 2-color Turing machine is
@@ -533,7 +533,7 @@ RMToAS[prog_, nr_] := With[{p = Length[prog], g =
       #)/Prime[r] &, # + 1 &], {j, 0, g - 1}]}] &, prog]]]}]
 ```
 
-The rules for the arithmetic system are represented so that the system from page 122 becomes for example  $\{2, \{0 \mapsto (3\#/2 \&), 1 \mapsto (3(\#+1)/2 \&)\}\}$ . If the register machine starts at instruction n with values regs in its registers, then the corresponding arithmetic system starts with the number  $n + Table[Prime[i]^reg[[i]], \{i, nr\}]p - 1$  where p = Length[prog]. The evolution of the arithmetic system is given by
+The rules for the arithmetic system are represented so that the system from page 122 becomes for example  $\{2, \{0 :> (3\#/2 \&), 1 :> (3(\#+1)/2 \&)\}\}$ . If the register machine starts at instruction n with values regs in its registers, then the corresponding arithmetic system starts with the number  $n + Table[Prime[i]^reg[[i]], \{i, nr\}]p - 1$  where p = Length[prog]. The evolution of the arithmetic system is given by
 
 ```
 ASEvolveList[{n_, rules_}, init_, t_] :=
