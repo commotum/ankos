@@ -269,7 +269,7 @@ Neither file is a generalized workflow database.
 
 ## Current Execution State
 
-- Synced: 2026-07-17 (America/Los_Angeles).
+- Synced: 2026-07-18 (America/Los_Angeles).
 - Active stage: `8-NOTES-09-12` (`IN_PROGRESS`), activated after clean Stage 7
   closure through `N08`.
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
@@ -281,10 +281,9 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions (98 using source-backed repaired-only
-  overrides), 118 source-added images, and generated README/Contents files. It
-  now includes 2,805 guarded source-verified corrections but is not a complete
-  OCR-corrected edition.
+  documents, 1,444 mapped image positions, 141 source-added images, and
+  generated README/Contents files. It now includes 3,322 guarded
+  source-verified corrections but is not a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
   intentional historical cleanup references to Goal 4 and intentional repaired
@@ -686,9 +685,32 @@ Neither file is a generalized workflow database.
   strict zero-correction output remains 1,475 files with length-prefixed tree
   SHA-256
   `1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b`.
+- `N10` Pass 1 is complete and integrated over PDF pages 1083–1122, but its
+  coverage deliberately remains `NO/NO` pending wholly fresh post-integration
+  source/content, technical, and visual/caption closing traversals. Its 517
+  guarded corrections are `G5-C-2806`–`G5-C-3322`; its 23 pinned assets are
+  `G5-A-0119`–`G5-A-0141`; all 91 mapped rows are dispositioned as 57 omitted
+  redundant partials and 34 retained originals. The final 197,817-byte,
+  1,100-LF Markdown hashes to
+  `329bef4e8beb40df2885041aed52f944886710b2874fa9db9a07e50905a08bf4`
+  and contains 57 resolving image references. The reconciled first-pass
+  technical inventory accounts for 4,632 objects in 197 regions. A fresh
+  53-page render resolves all 57 images and 49 fenced blocks, and its PDF
+  hashes to
+  `fff434e475b0db6f8c1158d134fe1106c2f46f1a55c9ecb2f6cbe984df383fe6`.
+  Post-integration validation reports 29 documents, 1,585 images, 3,322
+  corrections, and 24 completed second passes; the focused N10, Goal 5, and
+  repository suites pass at 7, 182, and 284 tests with 4,334 cumulative
+  subtests. Two fresh normal builds and the published sibling are
+  byte-identical at 1,616 files with length-prefixed tree SHA-256
+  `bac83b0e2fd4aa45a24fab5ae533e83a81f52fa7487a65a7dc97fdcde92291b6`;
+  strict-zero remains the frozen 1,475-file tree. The protected legacy tree
+  remains the frozen 1,463-file digest.
 - Stage 7 is complete. Stage 8 remains active with `N09` closed and `N10`
-  beginning at PDF 1083, printed page 1067, raw line 17,087, byte 2603694, and
-  mapped ordinal 1302. The next IDs are `G5-C-2806` and `G5-A-0119`.
+  final closers restarting at PDF 1083 against the integrated target. Any
+  finding forces repair and a full closer restart; three independent
+  zero-finding traversals are required before promotion and the `N11` handoff
+  at PDF 1123. The next available IDs are `G5-C-3323` and `G5-A-0142`.
 
 ## Stage Status
 
