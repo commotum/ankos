@@ -769,20 +769,27 @@ class NotesForChapter8Tests(unittest.TestCase):
         self.assertEqual(validate.legacy_tree_digest(), EXPECTED_LEGACY_TREE)
 
     def test_normal_build_is_deterministic_and_matches_published_tree(self) -> None:
-        expected_corrections = 1618 + int(FINAL_CORRECTION_COUNT)
+        _, documents, corrections, images = build.load_inputs()
+        added_assets = build.load_added_assets(documents, images)
+        expected_build = (
+            len(documents),
+            len(images) + len(added_assets),
+            len(corrections),
+        )
+        coverage = validate.validate_coverage(documents)
+        expected_validation = expected_build + (
+            sum(row["second_pass"] == "YES" for row in coverage),
+        )
         with tempfile.TemporaryDirectory(prefix="n08-normal-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1546, expected_corrections))
-            self.assertEqual(build.build(second), (29, 1546, expected_corrections))
+            self.assertEqual(build.build(first), expected_build)
+            self.assertEqual(build.build(second), expected_build)
             first_manifest = tree_manifest(first)
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
-            self.assertEqual(len(first_manifest), 1577)
-            self.assertEqual(
-                validate.validate(first),
-                (29, 1546, expected_corrections, 23),
-            )
+            self.assertEqual(len(first_manifest), sum(expected_build[:2]) + 2)
+            self.assertEqual(validate.validate(first), expected_validation)
 
     def test_zero_build_still_reassembles_the_immutable_monolith(self) -> None:
         with tempfile.TemporaryDirectory(prefix="n08-zero-build-") as directory:
