@@ -25,19 +25,19 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-FINAL_CORRECTION_COUNT = 794
+FINAL_CORRECTION_COUNT = 809
 FINAL_CORRECTION_FIRST_NUMBER = 3577
-FINAL_CORRECTION_LAST_NUMBER = 4370
-FINAL_TARGET_BYTES = 397_066
+FINAL_CORRECTION_LAST_NUMBER = 4385
+FINAL_TARGET_BYTES = 397_055
 FINAL_TARGET_LFS = 1_855
 FINAL_TARGET_SHA256 = (
-    "d9037760bad9f0999f47bc1219be33214ea439855727ba84d08ef1b0bbe4e3bd"
+    "e0dfef7548fe2c0e131ed16cf26db64dcd89cb07a6588dc971e124323a5d8a30"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "ff566b82073c6ff8df980859739e0a8f034b356e8ad14df6babe733b4836cf24"
+    "0089321f6c4240d03c2b9380ef6eb8faafbf50fc6a4f7a6bd0e38a86222df8fe"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "0fb3a3185103f626dc13358d4f10ea34aa7231e98ff836432c541479d451377e"
+    "41528d2eda8b296c669f8c4bbdb93585c3003c87b4f575b9a13d9c28c8458f8b"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "0b30632d2ca01fe1aba50d7d9fcec926704eae3a1b945a5b741c3768bcafc693"
@@ -61,7 +61,7 @@ EXPECTED_PDF_SHA256 = (
     "a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6"
 )
 EXPECTED_NORMAL_TREE_SHA256 = (
-    "626874f0aa160002961c8a68eb0c117ddef3d1b715279a512bea25def11b027e"
+    "f053ac9337e07775998f155e5817d54daf9724e4de9aeb8946b2c37e31b0481f"
 )
 EXPECTED_ZERO_TREE_SHA256 = (
     "1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b"
@@ -175,11 +175,11 @@ EXPECTED_ADDED_ASSETS = {
 
 
 EXPECTED_FULL_LEDGER_SHA256 = {
-    "corrections.jsonl": "753b9c252f54cc6bced7de144794382d03c5e3a10d54b721ec334500e74f8f90",
+    "corrections.jsonl": "1271f8047a62702048036213dc731f7971dfde517ac4d9f362e23201354cb32d",
     "image-map.jsonl": "e2fac1db19000e4bd4e634ac7dd1ea0920d3c7c9f105e2503904cc024bfe0681",
     "added-assets.jsonl": "d647fa8d948b155720ca3f8c909429654f30398fbf566e0b0fb6cca779e621ae",
     "source-ranges.json": "36dacbddcbb0157f604aafeca93e6e189bd16c6b52ac6409d6d83681a41de498",
-    "coverage.csv": "818f08fb4fa8cc1c6b8c7705ade485c749d62d031d76624b4001ee1d24bacb16",
+    "coverage.csv": "8900b357ce76f749fc1ea97d3e17f9b37df716f8712445092f46bab541370c97",
 }
 
 
@@ -371,7 +371,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 len(display_math),
                 len(self.references),
             ),
-            (13, 257, 104, 0, 507, 12, 53),
+            (13, 257, 104, 0, 510, 12, 53),
         )
         self.assertTrue(all(line == "```" for line in fence_lines))
         self.assertEqual(self.references, EXPECTED_REFERENCES)
@@ -403,6 +403,34 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         self.assertNotIn("\\)$", self.rendered)
         self.assertNotIn("<<<<<<<", self.rendered)
         self.assertNotIn(">>>>>>>", self.rendered)
+
+    def test_late_close_source_and_technical_repairs_are_exact(self) -> None:
+        by_id = {row["id"]: row for row in self.corrections}
+        self.assertEqual(
+            by_id["G5-C-3797"]["after"],
+            "NestList[#2 &, 2, n], or  $2^{2^n}$ , although for  "
+            "$x = (20\\,4^s - 2)/3$  a better fit for  $n \\le 200$  is just  "
+            "$2^{2.6 n}$ , with outputs increasing like  $2^{2^{1.3 n}}$ .\n",
+        )
+        self.assertEqual(
+            [row["id"] for row in self.corrections[-15:]],
+            [f"G5-C-{number:04d}" for number in range(4371, 4386)],
+        )
+        self.assertEqual(
+            (by_id["G5-C-4371"]["before"], by_id["G5-C-4371"]["after"]),
+            ("BBBBBBBA", "BBBBBBA"),
+        )
+        self.assertNotIn("BBBBBBBA", self.rendered)
+        self.assertEqual(self.rendered.count("BBBBBBA"), 1)
+        self.assertNotIn("_-", self.rendered)
+        self.assertNotIn("_{-}", self.rendered)
+        self.assertNotIn("204^s", self.rendered)
+        self.assertEqual(self.rendered.count(r"20\,4^s"), 2)
+        self.assertIn("$s\\,k + 4$ generators and $5\\,s\\,k + 2$", self.rendered)
+        self.assertIn("LeafCount grows like $3^t$.", self.rendered)
+        self.assertEqual(self.rendered.count("10<sup>45</sup>"), 2)
+        self.assertNotIn(r", \\ (a \circ a)", self.rendered)
+        self.assertIn(r", (a \circ a)", self.rendered)
 
     def test_exact_image_map_repairs_and_reference_accounting(self) -> None:
         self.assertEqual(len(self.image_rows), 38)
@@ -518,10 +546,10 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 payload = (GOAL_DIR / relative).read_bytes()
                 self.assertEqual(build.sha256(payload), expected)
 
-        self.assertEqual(len(self.corrections), 4_370)
+        self.assertEqual(len(self.corrections), 4_385)
         self.assertEqual(
             [row["id"] for row in self.corrections],
-            [f"G5-C-{number:04d}" for number in range(1, 4_371)],
+            [f"G5-C-{number:04d}" for number in range(1, 4_386)],
         )
         self.assertEqual(len(self.images), 1_444)
         self.assertEqual(len(self.added_assets), 163)
@@ -559,8 +587,8 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="n12-firstpass-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1607, 4370))
-            self.assertEqual(build.build(second), (29, 1607, 4370))
+            self.assertEqual(build.build(first), (29, 1607, 4385))
+            self.assertEqual(build.build(second), (29, 1607, 4385))
             first_tree, first_manifest = length_prefixed_tree(first)
             second_tree, second_manifest = length_prefixed_tree(second)
             output_tree, output_manifest = length_prefixed_tree(build.OUTPUT_ROOT)
@@ -570,7 +598,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             self.assertEqual(first_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(second_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(output_tree, EXPECTED_NORMAL_TREE_SHA256)
-            self.assertEqual(validate.validate(first), (29, 1607, 4370, 26))
+            self.assertEqual(validate.validate(first), (29, 1607, 4385, 26))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))
