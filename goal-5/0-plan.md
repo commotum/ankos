@@ -761,7 +761,9 @@ Neither file is a generalized workflow database.
   strict zero-correction output remains the frozen 1,475-file tree. This is a
   first-pass checkpoint only: `N12` coverage remains `NO/NO` while wholly
   fresh full-range source, technical, and visual closers run against the final
-  rebuilt target.
+  rebuilt target. The focused Stage 8 suite passes 27 tests with 2,760
+  subtests; the Goal 5 and complete repository suites pass 195 and 297 tests
+  with 5,560 subtests.
 - Stage 7 is complete. Stage 8 remains active with `N09` and `N10` closed and
   `N11` now closed; `N12` first-pass integration is complete and its fresh
   final closing round is active. The next available IDs are `G5-C-4371` and
