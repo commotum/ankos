@@ -281,10 +281,10 @@ Neither file is a generalized workflow database.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions (95 using source-backed
-  repaired-only overrides), 102 source-added images, and generated
-  README/Contents files. It now includes 1,911 guarded source-verified
-  corrections but is not a complete OCR-corrected edition.
+  documents, 1,444 mapped image positions (98 using source-backed repaired-only
+  overrides), 118 source-added images, and generated README/Contents files. It
+  now includes 2,805 guarded source-verified corrections but is not a complete
+  OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
   intentional historical cleanup references to Goal 4 and intentional repaired
@@ -293,6 +293,10 @@ Neither file is a generalized workflow database.
   ranges, 57 known-defect/guardrail candidates, a 1,444-row image-to-asset map,
   and a concise legacy/routing/source summary. Content claims remain pending
   until their sequential comparison passes.
+- `known-defects.jsonl` is a routing/intake inventory, not the live owner-pass
+  disposition ledger. Its per-row status records the state in which a candidate
+  entered Goal 5; current repair and closure evidence lives in
+  `corrections.jsonl`, `coverage.csv`, focused tests, and stage results.
 - The pinned source is `A New Kind of Science/A New Kind of Science.pdf`, a
   complete, readable 1,280-page First-edition, First-printing fixed-layout
   witness whose copyright-page identity matches the immutable monolith. Its
@@ -653,9 +657,38 @@ Neither file is a generalized workflow database.
   repository subtests. Two fresh normal builds and the published sibling are
   byte-identical at 1,577 files with tree SHA-256
   `17c5fb5f9c6c46acb50bad20098614eab536988cb27acc10bd6b8be84f5d08e8`.
-- Stage 7 is complete. Stage 8 is active with `N09` beginning at PDF 1033,
-  printed page 1017, raw line 16,012, byte 2339807, and mapped ordinal 1232.
-  The next IDs are `G5-C-1912` and `G5-A-0103`.
+- `N09` is complete at `YES/YES` after its complete forward first pass and
+  wholly fresh post-punctuation-repair source/content, technical, and
+  visual/caption closing traversals over PDF 1033–1082, with boundaries
+  1032/1083 checked. Its 894 guarded corrections are
+  `G5-C-1912`–`G5-C-2805`; the final 262,097-byte, 1,000-LF Markdown hashes to
+  `72c07a44ac1c2879c123ee0871a68cef6ba28a0de6b284169353abb85915eda1`.
+  The 70 mapped rows comprise 54 omitted redundant partials, 13 retained
+  originals, and three repaired-only overrides; additions
+  `G5-A-0103`–`G5-A-0118` produce 32 live references. The fresh final
+  source/content, technical, and visual/caption reports hash respectively to
+  `24135aef1c029ee4ffd771d41aa0e97a3ee3125436bfabda912fa5e5d85e0589`,
+  `6b5e3e974c6b1711bf35f3707e34e9262d6ad7dfcac588b6a13026bba741caed`,
+  and `d2ea2e16995a0badc2cb865d01a187c0e027e67e4dcb2087e078204b139ee598`;
+  all close with zero discrepancy, ambiguity, or source omission. The technical
+  manifest hashes to
+  `467038260562900858efc14d814712a1ca9ca67e3b3c2ca1ce5e5df85069e505`
+  and accounts for 558/558 objects. The final render report and 61-page PDF
+  hash respectively to
+  `680e9ff5710dc3f39db1ab9ad81ab9a8ac962e4efe8f7acbacdb300140380377`
+  and `672fd099b2b2329ed6b0bb1f158186e1c2cd7f029cb74fd24353e992ba7e80b9`.
+  Post-coverage validation reports 29 documents, 1,562 images, 2,805
+  corrections, and 24 completed second passes; the focused N09, Goal 5, and
+  repository suites pass at 7, 175, and 277 tests with 3,765 repository
+  subtests. Two fresh normal builds and the published sibling are
+  byte-identical at 1,593 files with length-prefixed tree SHA-256
+  `def3951ddfd3c7fb4ab3666aaca1ac9e61631ac1c6110cbe9d03c0b9fa845861`;
+  strict zero-correction output remains 1,475 files with length-prefixed tree
+  SHA-256
+  `1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b`.
+- Stage 7 is complete. Stage 8 remains active with `N09` closed and `N10`
+  beginning at PDF 1083, printed page 1067, raw line 17,087, byte 2603694, and
+  mapped ordinal 1302. The next IDs are `G5-C-2806` and `G5-A-0119`.
 
 ## Stage Status
 

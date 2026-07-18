@@ -562,6 +562,23 @@ class NotesForChapter9Tests(unittest.TestCase):
         self.assertEqual(validate.legacy_tree_digest(), EXPECTED_LEGACY_TREE)
 
     def test_normal_and_zero_builds_remain_deterministic(self) -> None:
+        coverage = validate.validate_coverage(self.documents)
+        n09_coverage = next(
+            row for row in coverage if row["document_id"] == "N09"
+        )
+        self.assertEqual(
+            (
+                n09_coverage["first_pass"],
+                n09_coverage["second_pass"],
+                n09_coverage["reviewer_type"],
+            ),
+            ("YES", "YES", "agent"),
+        )
+        self.assertIn("894 guarded corrections", n09_coverage["notes"])
+        self.assertIn("G5-C-1912 through G5-C-2805", n09_coverage["notes"])
+        self.assertEqual(
+            sum(row["second_pass"] == "YES" for row in coverage), 24
+        )
         with tempfile.TemporaryDirectory(prefix="n09-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
@@ -571,11 +588,7 @@ class NotesForChapter9Tests(unittest.TestCase):
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
             self.assertEqual(len(first_manifest), 1593)
-            raw, documents, corrections, images = build.load_inputs()
-            added = build.load_added_assets(documents, images)
-            validate.validate_output(
-                first, raw, documents, corrections, images, added_assets=added
-            )
+            self.assertEqual(validate.validate(first), (29, 1562, 2805, 24))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))
