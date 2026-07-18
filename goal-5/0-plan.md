@@ -765,7 +765,7 @@ Neither file is a generalized workflow database.
   rows use source-faithful repair overrides. The 397,151-byte, 1,857-LF
   integrated target hashes to
   `f825c757b864e2a3265079c2c9d4ce2184222241b1af703c9fcb30da95f30a47`
-  and contains 53 resolving image references. A separately reconstructed
+  and contains 53 resolving image references. Separately reconstructed
   combined-ledger and independent mechanics audits reproduce it byte-for-byte.
   Two fresh normal builds and the
   published sibling match at 1,638 files with length-prefixed tree SHA-256
