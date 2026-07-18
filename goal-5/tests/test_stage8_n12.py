@@ -25,19 +25,21 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-FINAL_CORRECTION_COUNT = 869
-FINAL_CORRECTION_FIRST_NUMBER = 3577
-FINAL_CORRECTION_LAST_NUMBER = 4445
-FINAL_TARGET_BYTES = 397_151
+FINAL_CORRECTION_COUNT = 928
+FINAL_BASE_CORRECTION_FIRST_NUMBER = 3577
+FINAL_BASE_CORRECTION_LAST_NUMBER = 4445
+FINAL_REPAIR_CORRECTION_FIRST_NUMBER = 4475
+FINAL_REPAIR_CORRECTION_LAST_NUMBER = 4533
+FINAL_TARGET_BYTES = 397_431
 FINAL_TARGET_LFS = 1_857
 FINAL_TARGET_SHA256 = (
-    "f825c757b864e2a3265079c2c9d4ce2184222241b1af703c9fcb30da95f30a47"
+    "6ed667a06431b8a9df4183a34434260156b4dd40a6fcc83e448abed34a46d919"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "e8e0b7087aefc08dbde631f14a28d7c628b7caf41e43fc80321f873856edd4fb"
+    "1153d0aff6247aee57c346dd660a41e88525db5011796e20d7d8662fe4e704b7"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "63e5c33a69f3f90a86c71816bfdbac760d97cab16f3b62a49c43b1099566b308"
+    "5986b5a1a8445d7112f65492e4bb4b1ebfaf4f080d0d5e1ff6a5ca05ed3313ce"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "0b30632d2ca01fe1aba50d7d9fcec926704eae3a1b945a5b741c3768bcafc693"
@@ -61,7 +63,7 @@ EXPECTED_PDF_SHA256 = (
     "a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6"
 )
 EXPECTED_NORMAL_TREE_SHA256 = (
-    "64b66ef3c730d276c5fd8ea673dc94fdaba55527f822788e028e564f5c330383"
+    "c702d9ae593588daa264615be608c6c1dfb6032b1118ea216214e5e764270121"
 )
 EXPECTED_ZERO_TREE_SHA256 = (
     "1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b"
@@ -175,11 +177,11 @@ EXPECTED_ADDED_ASSETS = {
 
 
 EXPECTED_FULL_LEDGER_SHA256 = {
-    "corrections.jsonl": "34406e2761199fbd747798bfa3fab22311455a6c65bc6997641586765ff5149c",
+    "corrections.jsonl": "cec6677c5e1e34301edc4d818b7af4be7bbf0c794b2a92f9a92f48b049ead16d",
     "image-map.jsonl": "e2fac1db19000e4bd4e634ac7dd1ea0920d3c7c9f105e2503904cc024bfe0681",
     "added-assets.jsonl": "d647fa8d948b155720ca3f8c909429654f30398fbf566e0b0fb6cca779e621ae",
     "source-ranges.json": "36dacbddcbb0157f604aafeca93e6e189bd16c6b52ac6409d6d83681a41de498",
-    "coverage.csv": "8900b357ce76f749fc1ea97d3e17f9b37df716f8712445092f46bab541370c97",
+    "coverage.csv": "0dee72ca6941e154b3a34a52761e0b0a199950136c0e0a1cd882a1230d003954",
 }
 
 
@@ -286,10 +288,20 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         self.assertEqual(
             [row["id"] for row in self.rows],
             [
-                f"G5-C-{number:04d}"
-                for number in range(
-                    FINAL_CORRECTION_FIRST_NUMBER, FINAL_CORRECTION_LAST_NUMBER + 1
-                )
+                *(
+                    f"G5-C-{number:04d}"
+                    for number in range(
+                        FINAL_BASE_CORRECTION_FIRST_NUMBER,
+                        FINAL_BASE_CORRECTION_LAST_NUMBER + 1,
+                    )
+                ),
+                *(
+                    f"G5-C-{number:04d}"
+                    for number in range(
+                        FINAL_REPAIR_CORRECTION_FIRST_NUMBER,
+                        FINAL_REPAIR_CORRECTION_LAST_NUMBER + 1,
+                    )
+                ),
             ],
         )
         self.assertEqual(rows_sha256(self.rows), FINAL_CORRECTION_ROWS_SHA256)
@@ -417,7 +429,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             [f"G5-C-{number:04d}" for number in range(4371, 4386)],
         )
         self.assertEqual(
-            [row["id"] for row in self.corrections[-60:]],
+            [row["id"] for row in self.corrections[4385:4445]],
             [f"G5-C-{number:04d}" for number in range(4386, 4446)],
         )
         self.assertEqual(
@@ -464,12 +476,46 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         self.assertNotIn(
             "additive cellular automata (MultiplicativeOrder)", self.rendered
         )
-        self.assertEqual(self.rendered.count(r"Apply[And, axioms]\}];"), 1)
+        self.assertEqual(self.rendered.count(r"Apply[And, axioms]}];"), 1)
+        self.assertNotIn(r"Apply[And, axioms]\}];", self.rendered)
         self.assertNotIn(r"Apply[And, axioms]\}\};", self.rendered)
-        for row in self.corrections[-60:]:
+        for row in self.corrections[4385:4445]:
             with self.subTest(late_guard=row["id"]):
                 self.assertNotIn(row["before"], self.rendered)
                 self.assertEqual(self.rendered.count(row["after"]), 1)
+
+    def test_reopened_spacing_syntax_and_nand_repairs_are_exact(self) -> None:
+        repaired_rows = [
+            row
+            for row in self.rows
+            if int(row["id"].rsplit("-", 1)[1])
+            >= FINAL_REPAIR_CORRECTION_FIRST_NUMBER
+        ]
+        self.assertEqual(
+            [row["id"] for row in repaired_rows],
+            [
+                f"G5-C-{number:04d}"
+                for number in range(
+                    FINAL_REPAIR_CORRECTION_FIRST_NUMBER,
+                    FINAL_REPAIR_CORRECTION_LAST_NUMBER + 1,
+                )
+            ],
+        )
+        for row in repaired_rows:
+            with self.subTest(reopened_guard=row["id"]):
+                self.assertNotIn(row["before"], self.rendered)
+                self.assertEqual(self.rendered.count(row["after"]), 1)
+
+        self.assertNotIn(r"\bar{\pi}", self.rendered)
+        self.assertEqual(self.rendered.count(r"\bar{\land}"), 143)
+        self.assertIn("$a x^2 + b y == c$", self.rendered)
+        self.assertNotIn("b y^2 == c", self.rendered)
+        self.assertIn("Zeta[1/2 + i x]", self.rendered)
+        self.assertIn("StringJoin[u[[s]]] == StringJoin[v[[s]]]", self.rendered)
+        self.assertIn("- (l) See page 613.", self.rendered)
+        self.assertIn("Ceiling[2 a/3] - (a + 1) solutions", self.rendered)
+        self.assertIn("Module[{c, v}, c = Apply[Function,", self.rendered)
+        self.assertIn("Apply[And, axioms]}];", self.rendered)
 
     def test_exact_image_map_repairs_and_reference_accounting(self) -> None:
         self.assertEqual(len(self.image_rows), 38)
@@ -585,10 +631,10 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 payload = (GOAL_DIR / relative).read_bytes()
                 self.assertEqual(build.sha256(payload), expected)
 
-        self.assertEqual(len(self.corrections), 4_445)
+        self.assertEqual(len(self.corrections), 4_533)
         self.assertEqual(
             [row["id"] for row in self.corrections],
-            [f"G5-C-{number:04d}" for number in range(1, 4_446)],
+            [f"G5-C-{number:04d}" for number in range(1, 4_534)],
         )
         self.assertEqual(len(self.images), 1_444)
         self.assertEqual(len(self.added_assets), 163)
@@ -620,14 +666,14 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             (n12["first_pass"], n12["second_pass"], n12["reviewer_type"]),
             ("NO", "NO", ""),
         )
-        self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 26)
+        self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 25)
 
     def test_normal_and_zero_builds_have_frozen_length_prefixed_trees(self) -> None:
         with tempfile.TemporaryDirectory(prefix="n12-firstpass-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1607, 4445))
-            self.assertEqual(build.build(second), (29, 1607, 4445))
+            self.assertEqual(build.build(first), (29, 1607, 4533))
+            self.assertEqual(build.build(second), (29, 1607, 4533))
             first_tree, first_manifest = length_prefixed_tree(first)
             second_tree, second_manifest = length_prefixed_tree(second)
             output_tree, output_manifest = length_prefixed_tree(build.OUTPUT_ROOT)
@@ -637,7 +683,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             self.assertEqual(first_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(second_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(output_tree, EXPECTED_NORMAL_TREE_SHA256)
-            self.assertEqual(validate.validate(first), (29, 1607, 4445, 26))
+            self.assertEqual(validate.validate(first), (29, 1607, 4533, 25))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))
@@ -645,7 +691,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             self.assertEqual(len(zero_manifest), 1475)
             self.assertEqual(zero_tree, EXPECTED_ZERO_TREE_SHA256)
             self.assertEqual(
-                validate.validate(zero, zero_corrections=True), (29, 1444, 0, 26)
+                validate.validate(zero, zero_corrections=True), (29, 1444, 0, 25)
             )
             concatenated = b"".join(
                 (zero / document["output_path"]).read_bytes()

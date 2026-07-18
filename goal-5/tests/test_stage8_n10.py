@@ -208,7 +208,7 @@ REQUIRED_LITERAL_PINS = [
     "`h[a_, b_] := FromDigits[g[ListConvolve[IntegerDigits[a, k], IntegerDigits[b, k], {1, -1}, 0]], k]`",
     "{{}, {{1}}}, n - 3]]]",
     "Complement[Flatten[Table[Outer[1 - Times[##] &",
-    "($\\{r^2, rs, s^2, -rs\\}$  works for any r and s",
+    "($\\{r^2, r s, s^2, -r s\\}$  works for any r and s",
     "$m = \\{\\{0, -1, 1\\}, \\{1, 0, -1\\}, \\{-1, 1, 0\\}\\}$).",
     "probabilities 1/2, 1/4, 1/8, … will yield codewords of lengths 1, 2, 3, …",
     "within the bin—after trailing zeros",

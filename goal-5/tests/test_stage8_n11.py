@@ -647,25 +647,25 @@ class NotesForChapter11Tests(unittest.TestCase):
             (n11["first_pass"], n11["second_pass"], n11["reviewer_type"]),
             ("YES", "YES", "agent"),
         )
-        self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 26)
+        self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 25)
 
     def test_normal_and_zero_builds_remain_deterministic(self) -> None:
         with tempfile.TemporaryDirectory(prefix="n11-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1607, 4445))
-            self.assertEqual(build.build(second), (29, 1607, 4445))
+            self.assertEqual(build.build(first), (29, 1607, 4533))
+            self.assertEqual(build.build(second), (29, 1607, 4533))
             first_manifest = tree_manifest(first)
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
             self.assertEqual(len(first_manifest), 1638)
-            self.assertEqual(validate.validate(first), (29, 1607, 4445, 26))
+            self.assertEqual(validate.validate(first), (29, 1607, 4533, 25))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))
             self.assertEqual(len(tree_manifest(zero)), 1475)
             self.assertEqual(
-                validate.validate(zero, zero_corrections=True), (29, 1444, 0, 26)
+                validate.validate(zero, zero_corrections=True), (29, 1444, 0, 25)
             )
             concatenated = b"".join(
                 (zero / document["output_path"]).read_bytes()
