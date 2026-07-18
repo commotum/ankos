@@ -600,7 +600,7 @@ class NotesForChapter10Tests(unittest.TestCase):
         self.assertEqual(len(replacement_ids), 18)
         self.assertEqual(len(WHOLLY_MISSING_ADDITIONS), 5)
 
-    def test_authoritative_source_legacy_and_pending_coverage(self) -> None:
+    def test_authoritative_source_legacy_and_completed_coverage(self) -> None:
         range_data = json.loads(build.RANGES_PATH.read_text(encoding="utf-8"))
         source = range_data["authoritative_source"]
         self.assertEqual(
@@ -614,9 +614,9 @@ class NotesForChapter10Tests(unittest.TestCase):
         n10 = next(row for row in coverage if row["document_id"] == "N10")
         self.assertEqual(
             (n10["first_pass"], n10["second_pass"], n10["reviewer_type"]),
-            ("NO", "NO", ""),
+            ("YES", "YES", "agent"),
         )
-        self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 24)
+        self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 25)
 
     def test_normal_and_zero_builds_remain_deterministic(self) -> None:
         with tempfile.TemporaryDirectory(prefix="n10-build-") as directory:
@@ -628,7 +628,7 @@ class NotesForChapter10Tests(unittest.TestCase):
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
             self.assertEqual(len(first_manifest), 1616)
-            self.assertEqual(validate.validate(first), (29, 1585, 3360, 24))
+            self.assertEqual(validate.validate(first), (29, 1585, 3360, 25))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))

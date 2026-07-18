@@ -577,7 +577,7 @@ class NotesForChapter9Tests(unittest.TestCase):
         self.assertIn("894 guarded corrections", n09_coverage["notes"])
         self.assertIn("G5-C-1912 through G5-C-2805", n09_coverage["notes"])
         self.assertEqual(
-            sum(row["second_pass"] == "YES" for row in coverage), 24
+            sum(row["second_pass"] == "YES" for row in coverage), 25
         )
         with tempfile.TemporaryDirectory(prefix="n09-build-") as directory:
             first = Path(directory) / "first"
@@ -588,7 +588,7 @@ class NotesForChapter9Tests(unittest.TestCase):
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
             self.assertEqual(len(first_manifest), 1616)
-            self.assertEqual(validate.validate(first), (29, 1585, 3360, 24))
+            self.assertEqual(validate.validate(first), (29, 1585, 3360, 25))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))
