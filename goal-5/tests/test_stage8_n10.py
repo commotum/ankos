@@ -26,24 +26,24 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-FINAL_CORRECTION_COUNT = 547
-FINAL_CORRECTION_LAST_NUMBER = 3352
-FINAL_TARGET_BYTES = 197_891
+FINAL_CORRECTION_COUNT = 555
+FINAL_CORRECTION_LAST_NUMBER = 3360
+FINAL_TARGET_BYTES = 197_898
 FINAL_TARGET_LFS = 1_098
 FINAL_TARGET_SHA256 = (
-    "59ffe4b9bb09850ed0ec439cb3db9a2ee19e17a9757ad9c8da5f04625e448274"
+    "96601763703c87874ec465245b55ed68ee5d59ecc560814ca6fbf078660b2e29"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "8ee47005e6ac89deea470ec9578680935fdaf134a8b3f50914d0b492a088bf2e"
+    "313d8f23a9b39e73454ba9d3d5dd4d7218530a2bb26d57c71b596571796c5031"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "f1983142e998417492972d6de1e7e1cb9de6c802e67f71ae4c1dc5768a79984b"
+    "3173ce88f3528c079ca10b840facc94d99aca690de2d4655afbd5a8b7a5659f4"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
-    "f97180e293da08e4b33767272b3aba23182b1a6f0aef4f49e4b84696f4785e35"
+    "dd98fb6f43a8dc8013652fb12c19de395ecf3e81de6dbf07974c7389064d9f13"
 )
 FINAL_ADDITION_ROWS_SHA256 = (
-    "7aff5e9ec71431f46bea2e0c1165cfd1bba36ca80ea5766b00bf1e52e962de68"
+    "b5471688ec5d919c9924269bb1f36ac14baa16d449f0bbba8487605619613976"
 )
 EXPECTED_RAW_FIRST_256_SHA256 = (
     "ac88f926f3fbf5f358813924d33e6446823cdfc571274bb09e37ccb86cc42bf5"
@@ -158,6 +158,16 @@ EXPECTED_RETAINED_REFERENCES = [
 ]
 
 
+EXPECTED_REPAIRS = {
+    1390: (
+        "_page_1116_Picture_4.jpeg",
+        "787056603e15a8246f7206359129dc5f21028c7e87fb693797585e7ab0c9d057",
+        (1660, 600),
+        55,
+    ),
+}
+
+
 EXPECTED_ADDED_REFERENCES = [
     name for name in EXPECTED_REFERENCES if name not in EXPECTED_RETAINED_REFERENCES
 ]
@@ -198,6 +208,15 @@ REQUIRED_LITERAL_PINS = [
     "Complement[Flatten[Table[Outer[1 - Times[##] &",
     "($\\{r^2, rs, s^2, -rs\\}$  works for any r and s",
     "$m = \\{\\{0, -1, 1\\}, \\{1, 0, -1\\}, \\{-1, 1, 0\\}\\}$).",
+    "probabilities 1/2, 1/4, 1/8, … will yield codewords of lengths 1, 2, 3, …",
+    "within the bin—after trailing zeros",
+    r"*(Period-doubling sequence)* The spectrum is  $(2^{\#}-",
+    "the ordinary squares 1, 4, 9, 16, … show up",
+    "in the pattern shown is given by  `Extract",
+    "`u = h[r, r]; h[h[u, u], s]`—which requires only 3 applications",
+    "functions which require 0, 1, 2, … terms",
+    "BDDs of sizes 1, 2, … is",
+    "$m = \\{\\{1, -1\\}, \\{-1, 1\\}\\}$.)",
 ]
 
 
@@ -219,6 +238,15 @@ FORBIDDEN_LITERAL_PINS = [
     "The pointer compression method",
     "patternsexpressions",
     "featuresbeyond",
+    "probabilities 1/2, 1/4, 1/8, ... will yield codewords of lengths 1, 2, 3, ...",
+    "within the bin after trailing zeros",
+    r"*(Period-doubling sequence)* The spectrum  $(2^{\#}-",
+    "the ordinary squares 1, 4, 9, 16, ... show up",
+    "in the pattern shown is given  `Extract",
+    "`u = h[r, r]; h[h[u, u], s]` which requires only 3 applications",
+    "functions which require 0, 1, 2, ... terms",
+    "BDDs of sizes 1, 2, ... is",
+    "$m = \\{\\{1, -1\\}, \\{-1, 1\\}\\}\\}$ .)",
     "N10-SRC-",
     "N10-TFP-",
     "G5-N10-VIS-",
@@ -404,6 +432,22 @@ class NotesForChapter10Tests(unittest.TestCase):
         self.assertEqual(self.references, EXPECTED_REFERENCES)
         self.assertEqual(len(set(self.references)), 57)
         self.assertEqual(
+            [
+                (number, span)
+                for number, span in enumerate(math_spans, 1)
+                if span.count("{") != span.count("}")
+            ],
+            [],
+        )
+        self.assertEqual(
+            (
+                self.rendered.count("—"),
+                self.rendered.count("…"),
+                self.rendered.count("..."),
+            ),
+            (105, 5, 7),
+        )
+        self.assertEqual(
             [number for number, line in enumerate(lines, 1) if line.endswith((" ", "\t"))],
             [],
         )
@@ -437,10 +481,14 @@ class NotesForChapter10Tests(unittest.TestCase):
         )
         self.assertEqual(rows_sha256(self.image_rows), FINAL_IMAGE_ROWS_SHA256)
         counts = Counter(
-            "omitted" if "reference_disposition" in row else "retained"
+            "omitted" if "reference_disposition" in row
+            else "repaired" if "repaired_asset_relative_path" in row
+            else "retained"
             for row in self.image_rows
         )
-        self.assertEqual(counts, Counter({"omitted": 57, "retained": 34}))
+        self.assertEqual(
+            counts, Counter({"omitted": 57, "retained": 33, "repaired": 1})
+        )
         retained = [
             Path(row["asset_relative_path"]).name for row in self.image_rows
             if "reference_disposition" not in row
@@ -466,7 +514,6 @@ class NotesForChapter10Tests(unittest.TestCase):
             legacy = build.LEGACY_ROOT / Path(row["asset_relative_path"])
             output = build.OUTPUT_ROOT / Path(self.path).parent / basename
             self.assertEqual(build.sha256(legacy.read_bytes()), row["asset_sha256"])
-            self.assertEqual(output.read_bytes(), legacy.read_bytes())
             if "reference_disposition" in row:
                 self.assertEqual(set(row), base_fields | disposition_fields)
                 self.assertEqual(
@@ -480,9 +527,26 @@ class NotesForChapter10Tests(unittest.TestCase):
                 self.assertEqual(len(matches), 1)
                 grouped[matches[0]].append(row["ordinal"])
                 self.assertNotIn(basename, self.references)
+                self.assertEqual(output.read_bytes(), legacy.read_bytes())
+            elif "repaired_asset_relative_path" in row:
+                self.assertEqual(set(row), base_fields | build.REPAIRED_IMAGE_FIELDS)
+                name, digest, dimensions, position = EXPECTED_REPAIRS[row["ordinal"]]
+                repaired = REPO_ROOT / row["repaired_asset_relative_path"]
+                payload = repaired.read_bytes()
+                self.assertEqual(name, basename)
+                self.assertEqual(row["repaired_asset_sha256"], digest)
+                self.assertEqual(build.sha256(payload), digest)
+                self.assertEqual(build.jpeg_dimensions(payload), dimensions)
+                self.assertEqual(
+                    (row["repaired_width_px"], row["repaired_height_px"]),
+                    dimensions,
+                )
+                self.assertEqual(output.read_bytes(), payload)
+                self.assertEqual(self.references[position - 1], name)
             else:
                 self.assertEqual(set(row), base_fields)
                 self.assertIn(basename, self.references)
+                self.assertEqual(output.read_bytes(), legacy.read_bytes())
         self.assertEqual(len(grouped), 18)
         self.assertEqual(sum(map(len, grouped.values())), 57)
         self.assertEqual(set(grouped), {
@@ -501,7 +565,8 @@ class NotesForChapter10Tests(unittest.TestCase):
         )
         self.assertEqual(
             {path.name for path in (GOAL_DIR / "assets/N10").glob("*.jpeg")},
-            set(EXPECTED_ADDED_REFERENCES),
+            set(EXPECTED_ADDED_REFERENCES)
+            | {value[0] for value in EXPECTED_REPAIRS.values()},
         )
 
         visual_guards: dict[str, dict[str, Any]] = {}
@@ -557,13 +622,13 @@ class NotesForChapter10Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="n10-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1585, 3352))
-            self.assertEqual(build.build(second), (29, 1585, 3352))
+            self.assertEqual(build.build(first), (29, 1585, 3360))
+            self.assertEqual(build.build(second), (29, 1585, 3360))
             first_manifest = tree_manifest(first)
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
             self.assertEqual(len(first_manifest), 1616)
-            self.assertEqual(validate.validate(first), (29, 1585, 3352, 24))
+            self.assertEqual(validate.validate(first), (29, 1585, 3360, 24))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))
