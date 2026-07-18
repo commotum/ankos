@@ -282,7 +282,7 @@ Neither file is a generalized workflow database.
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
   documents, 1,444 mapped image positions, 163 source-added images, and
-  generated README/Contents files. The current manifests include 4,370 guarded
+  generated README/Contents files. The current manifests include 4,533 guarded
   source-verified corrections, but this is not yet a complete OCR-corrected
   edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
@@ -686,29 +686,19 @@ Neither file is a generalized workflow database.
   strict zero-correction output remains 1,475 files with length-prefixed tree
   SHA-256
   `1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b`.
-- `N10` is complete at `YES/YES` over PDF pages 1083–1122 after all late text
-  and visual findings were integrated and every dependent closer restarted.
-  Its 555 guarded corrections are `G5-C-2806`–`G5-C-3360`; its 23 pinned
-  assets are `G5-A-0119`–`G5-A-0141`; all 91 mapped rows are dispositioned as
-  57 omitted redundant partials, 33 retained originals, and one repaired-only
-  override. The final 197,898-byte, 1,098-LF Markdown hashes to
-  `96601763703c87874ec465245b55ed68ee5d59ecc560814ca6fbf078660b2e29`
-  and contains 57 resolving image references, 49 fenced blocks, 93 inline-code
-  spans, 209 inline-math spans, and five display-math blocks. Wholly fresh
-  source/content, technical, and visual packets account for all 40 pages plus
-  boundaries 1082/1123 and close with zero discrepancy, ambiguity, or source
-  omission. Their report/verdict hashes are respectively
-  `54befd3c9c44c894c98a5a8e9109bc228e7189aabbf346d7e4937fd97dd038c2`,
-  `1312617c3f027fb9a8ca73336b7591bfdd7be8b0ce213246decb35d3d0936049`,
-  and `20b27b225374bfe3e96056843c405849aa73c16260ac48283d50bd0d470baec2`.
-  Post-coverage validation reports 29 documents, 1,585 images, 3,360
-  corrections, and 25 completed second passes; the focused N10, Goal 5, and
-  repository suites pass at 7, 182, and 284 tests with 4,414 cumulative
-  subtests. Two fresh normal builds and the published sibling are
-  byte-identical at 1,616 files with length-prefixed tree SHA-256
-  `45b6d6075dd3a33dc1892be25cefc1e8746ac8cdce26241350daf9d0ef026d38`;
-  strict-zero remains the frozen 1,475-file tree. The protected legacy tree
-  remains the frozen 1,463-file digest.
+- `N10` is reopened at `NO/NO`. A strict read-only sweep of all PDF pages
+  1083–1122, boundaries 1082/1123, and all 642 inventoried objects found 24
+  stale line groups represented by 33 exact overlays. Its exhaustive relation
+  census distinguishes 183 nonoverlapping tokens: eight collapsed printed
+  `==` glyphs are repaired, no reverse mismatch exists, and the ordinary
+  `\xi[r] = \lambda^r` is deliberately preserved. The sealed sweep projects
+  the exact 197,955-byte, 1,098-LF target SHA-256
+  `6044152950100dc26031174038686d69fcf3e2c5482e85283e2c8757016f036a`.
+  The integrated document owns 584 rows: `G5-C-2806`–`G5-C-3360` plus
+  `G5-C-4446`–`G5-C-4474`. Its 91 mapped rows and additions
+  `G5-A-0119`–`G5-A-0141` are unchanged. Every prior closer was invalidated;
+  wholly fresh source, technical, and visual closers must restart from PDF
+  1083 before coverage can be restored.
 - `N11` is complete at `YES/YES` over PDF pages 1123–1140 plus boundaries
   1122/1141. The 147 source and 100 technical proposals
   initially merged into 213 nonoverlapping guarded corrections; all 26
@@ -745,41 +735,36 @@ Neither file is a generalized workflow database.
   and `cf0d64a75b7914b1e15cc64450ffc7c9c7981569a941f03ef00c56955306d5c2`.
   Coverage is promoted to `YES/YES`; validation reports 26 completed second
   passes, and the focused N09–N11 suite passes 20 tests with 1,908 subtests.
-- `N12` first-pass source/content, technical, long-form, and visual work is
-  integrated over all owned PDF pages 1141–1216 plus boundaries 1140/1217.
-  The four independently audited lanes supplied 825 exact proposals, which
-  reduce to 797 semantic interval components and 794 unique nonoverlapping
-  initial guards. The first wholly fresh closing round then found one extra
-  `B` in a quoted shortest string and 15 technical contexts: 37 corrupted
-  Mathematica Blank tokens, two fused multiplication expressions, one fused
-  generator/relation expression, two flattened superscripts, and one literal
-  conversion artifact. Source row `G5-C-4371`, technical rows
-  `G5-C-4372`–`G5-C-4385`, and an amendment to existing `G5-C-3797` are now
-  integrated. A second wholly fresh closing round then found one omitted
-  publication year, 94 equality-operator defects, one code-delimiter defect,
-  and one source display/prose-boundary defect. Source row `G5-C-4386`,
-  technical rows `G5-C-4387`–`G5-C-4445`, and amendments to `G5-C-3907` and
-  `G5-C-4109` are now integrated, so N12 owns 869 guards,
-  `G5-C-3577`–`G5-C-4445`. Fifteen additions
-  `G5-A-0149`–`G5-A-0163` restore omitted inline source visuals; nine mapped
-  rows use source-faithful repair overrides. The 397,151-byte, 1,857-LF
-  integrated target hashes to
-  `f825c757b864e2a3265079c2c9d4ce2184222241b1af703c9fcb30da95f30a47`
-  and contains 53 resolving image references. Separately reconstructed
-  combined-ledger and independent mechanics audits reproduce it byte-for-byte.
-  Two fresh normal builds and the
-  published sibling match at 1,638 files with length-prefixed tree SHA-256
-  `64b66ef3c730d276c5fd8ea673dc94fdaba55527f822788e028e564f5c330383`;
-  strict zero-correction output remains the frozen 1,475-file tree. This is a
-  repair checkpoint only: `N12` coverage remains `NO/NO` while wholly fresh
-  post-repair full-range source, technical, and visual closers run against the
-  final rebuilt target. The focused Stage 8 suite passes 28 tests with 2,895
-  subtests; the Goal 5 and complete repository suites pass 196 and 298 tests
-  with 5,695 subtests.
-- Stage 7 is complete. Stage 8 remains active with `N09` and `N10` closed and
-  `N11` now closed; `N12` first-pass integration is complete and its fresh
-  post-repair final closing round is active. The next available IDs are `G5-C-4446` and
-  `G5-A-0164`.
+- `N12` remains open at `NO/NO` after its prior first-pass and two repair
+  cycles. Reopened spacing/token, technical/syntax, Zeta, and NAND-glyph
+  audits amend 36 existing N12 rows and add 59 document-unique semantic guards
+  `G5-C-4475`–`G5-C-4533`. The resulting 928-row, 397,431-byte, 1,857-LF
+  target hashes to
+  `6ed667a06431b8a9df4183a34434260156b4dd40a6fcc83e448abed34a46d919`.
+  It restores source-visible factor boundaries, Part syntax, literal code
+  braces, a missing subtraction, the lowercase item `(l)`, membership and
+  epsilon forms, and all 78 stale overbarred NAND glyphs as N12-local
+  `\bar{\land}` while rejecting the superseded false `b y^2` reading. Two
+  independent merge implementations reproduce the target byte-for-byte. Its
+  53 references, additions `G5-A-0149`–`G5-A-0163`, and nine mapped repair
+  overrides are unchanged. Every prior closer is invalidated; wholly fresh
+  source, technical, and visual closers must restart from PDF 1141.
+- The combined correction ledger has 4,533 rows and SHA-256
+  `cec6677c5e1e34301edc4d818b7af4be7bbf0c794b2a92f9a92f48b049ead16d`.
+  The sealed integration packet has manifest SHA-256
+  `ec259b384fc58225f4b76f0e28bb56c8684b1c8cadf40ab950b74aa8db3a9ae0`,
+  43 amended rows, 88 new guards, 213 normalized transforms, and zero
+  cross-provenance changes. Two fresh normal builds and the published sibling
+  match at 1,638 files with length-prefixed tree SHA-256
+  `c702d9ae593588daa264615be608c6c1dfb6032b1118ea216214e5e764270121`;
+  strict zero remains the frozen `1971cbef...` tree and the protected legacy
+  digest is unchanged. Validation reports 25 completed second passes. The
+  focused Stage 8, Goal 5, and complete repository suites pass 30, 198, and
+  300 tests, with 3,071 focused and 5,871 cumulative subtests.
+- Stage 7 is complete. Stage 8 remains active with `N09` and `N11` closed;
+  `N10` and `N12` are both deliberately reopened pending wholly fresh
+  post-repair source, technical, and visual closing traversals. The next
+  available IDs are `G5-C-4534` and `G5-A-0164`.
 
 ## Stage Status
 
