@@ -45,15 +45,32 @@ not silently omitted or double-counted:
 Generated inventories must remain `UNREVIEWED`. Inventory code may not assign
 source-match or clean verdicts.
 
-## Provisional Target Baseline
+## Target Inventory Freeze
 
-The pre-freeze parser currently finds 4,446 explicit syntax objects containing
-181,609 bytes: 485 fenced blocks, 1,099 inline-code spans, 2,707 inline-math
-spans, 28 display-math objects, 73 parenthesized-math objects, 42 superscript
-spans, and 12 subscript spans. It also finds 26 structural table containers
-with 257 rows and 1,189 cells. These counts are provisional until the final
-byte-interval parser, bare-candidate lane, technical-asset lane, and canonical
-source inventory are frozen together.
+The sealed read-only target freeze at
+`/tmp/g5-stage9-freeze-20260718-a1` has inventory SHA-256
+`20af574b2db81a8789f82516440a3b5542c36ae1263ed4e3dd89388b3409e9b0`
+and packet seal
+`7940b12ffc64f673f4d40c6e6d012be18bc948cd23a3556e41cebc3506a5b98c`.
+Root reproduced its manifest and verifier; all ten negative mutation fixtures
+pass. All 14,872 status fields are exactly `UNREVIEWED`.
+
+The mutually exclusive explicit stream contains 4,447 objects and 181,634
+literal bytes: 485 fenced blocks, 1,099 backtick-code spans, one raw-HTML code
+span, 2,707 inline-math spans, 28 display-math objects, 73
+parenthesized-math objects, 42 superscript spans, and 12 subscript spans. The
+new raw-HTML object is the required 25-byte `<code>ListConvolve</code>` span.
+The freeze also records 26 structural tables with 257 data rows, 1,189 review
+cells, 1,560 ordered members, and 242 object/cell joins; 1,314 resolved asset
+references with 83 provisional technical signals; 3,153 nonoverlapping bare
+candidates; and 2,817 exact longest-first operator tokens.
+
+The deterministic provisional three-lane assignment hashes to
+`489d43bed6d3dcce381887b25c2c58462cfd559ab2bd7649b69c62cd0e361b1e`
+with maximum frozen-axis deviation 7.4853%. It will be rebalanced if the fresh
+source or target-detector denominators materially change document loads. The
+canonical source-object denominator remains explicitly pending and no region
+is reviewed by this freeze.
 
 ## Execution
 
@@ -98,6 +115,7 @@ source inventory are frozen together.
 
 ## Current Gate
 
-Inventory/source-evidence generation is active. No Stage 9 technical region is
-yet credited as reviewed, and Stage 9 cannot close before Stage 10 stabilizes
-Index and Colophon.
+The target freeze is complete; canonical source and expanded target-detector
+inventories are active. No Stage 9 technical region is yet credited as
+reviewed, and Stage 9 cannot close before Stage 10 stabilizes Index and
+Colophon.
