@@ -181,7 +181,7 @@ EXPECTED_FULL_LEDGER_SHA256 = {
     "image-map.jsonl": "e2fac1db19000e4bd4e634ac7dd1ea0920d3c7c9f105e2503904cc024bfe0681",
     "added-assets.jsonl": "d647fa8d948b155720ca3f8c909429654f30398fbf566e0b0fb6cca779e621ae",
     "source-ranges.json": "36dacbddcbb0157f604aafeca93e6e189bd16c6b52ac6409d6d83681a41de498",
-    "coverage.csv": "e038c53c623f9ed70ac7371a3f0a977d42a0a0bff13bd4d7d7c2d0c8b0ec7f92",
+    "coverage.csv": "ef57e11ed0a09df588f1b0b0ef6193be8d2d58cc908c6f883e1bfccb8f94503c",
 }
 
 
@@ -668,9 +668,9 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         n12 = next(row for row in coverage if row["document_id"] == "N12")
         self.assertEqual(
             (n12["first_pass"], n12["second_pass"], n12["reviewer_type"]),
-            ("NO", "NO", ""),
+            ("YES", "YES", "agent"),
         )
-        self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 26)
+        self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 27)
 
     def test_normal_and_zero_builds_have_frozen_length_prefixed_trees(self) -> None:
         with tempfile.TemporaryDirectory(prefix="n12-firstpass-build-") as directory:
@@ -687,7 +687,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             self.assertEqual(first_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(second_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(output_tree, EXPECTED_NORMAL_TREE_SHA256)
-            self.assertEqual(validate.validate(first), (29, 1607, 4534, 26))
+            self.assertEqual(validate.validate(first), (29, 1607, 4534, 27))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))
@@ -695,7 +695,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             self.assertEqual(len(zero_manifest), 1475)
             self.assertEqual(zero_tree, EXPECTED_ZERO_TREE_SHA256)
             self.assertEqual(
-                validate.validate(zero, zero_corrections=True), (29, 1444, 0, 26)
+                validate.validate(zero, zero_corrections=True), (29, 1444, 0, 27)
             )
             concatenated = b"".join(
                 (zero / document["output_path"]).read_bytes()
