@@ -364,7 +364,7 @@ If one sufficiently restricts the form of the underlying system then it sometime
 ■ **Algorithmic complexity theory.** Ordinary computational complexity theory asks about the resources needed to run programs that perform a given computation. But algorithmic complexity theory (compare page 1067) asks instead about how large the programs themselves need to be. The results of this book indicate however that even programs that are very small—and thus have low algorithmic complexity—can nevertheless perform all sorts of complex computations.
 ■ **Turing machines.** The Turing machines used here in effect have tapes that extend only to the left, and have no explicit halt states. (They thus differ from the Turing machines which Marvin Minsky and Daniel Bobrow studied in 1961 in the s = 2, k = 2 case and concluded all had simple behavior.) One can think of each Turing machine as computing a function f[x] of the number x given as its input. The function is total (i.e. defined for all x) if the Turing machine always halts; otherwise it is partial (and undefined for at least some x). Turing machines can be numbered according to the scheme on page 888. The number of steps before a machine with given rule halts can be computed from (see page 888)
 
- $Module[{s = 1, a, i = 1, d}, a[_] = 0; MapIndexed[a[#2[[1]]] = #1 &, Reverse[IntegerDigits[x, 2]]]; Do[{s, a[i], d} = {s, a[i]} /. rule; i -= d; If[i == 0, Return[t]], {t, tmax}]]$ 
+ $Module[{s = 1, a, i = 1, d}, a[_] = 0; MapIndexed[a[#2[[1]]] = #1 &, Reverse[IntegerDigits[x, 2]]]; Do[{s, a[i], d} = {s, a[i]} /. rule; i -= d; If[i == 0, Return[t]], {t, tmax}]]$
 
 Of the 4096 Turing machines with s = 2, k = 2, 748 never halt, 3348 sometimes halt and 1683 always halt. (The most rarely halting are ones like machine 3112 that halt only when x = 4 j - 1.) The number of distinct functions f[x] that can be computed by such machines is 351, of which 149 are total. 17 machines compute x + 1; none compute x + 2; 17 compute x - 1 and do not halt when x = 0—an example being 2575. Most machines compute functions that involve digit manipulations without traditional interpretations as mathematical functions. It is quite common to find machines that compute almost the same function: 1507 and 1511 disagree (where 1507 halts) only for  $x \ge 35$ . If t[x] is the number of steps to compute f[x] then the number of distinct pairs  $\{f[x], t[x]\}$  is 492, or 230 for total f[x]. In 164 t[x] does not increase with the number of digits n in x, in 295 it increases linearly, in 27 quadratically, and in 6 exponentially. For total f[x] the corresponding numbers are 84, 136, 7, 3; the 3 machines with exponential growth are 378 (example (f) on page 761), 1953 and 2289; all compute trivial functions. Machine 1447 (example (e)) computes the function which takes the digit sequence of x and replaces its first 3 + IntegerExponent[x + 1, 2] 0’s by 1’s.
 
@@ -994,11 +994,11 @@ The last two statements have never been proved true or false, and remain unsolve
 
  $f[1][n_] = 2 n$ ;  $f[s_][n_] := Nest[f[s - 1], 1, n]$ f[2][n] is then  $2^n$ , f[3] is iterated power, and so on. Given this one can now form the “diagonal” function
 
- $f[\omega][n\_] := f[n][n]$ 
+ $f[\omega][n\_] := f[n][n]$
 
 and this has a higher growth rate than any of the f[s][n] with finite s. This higher growth rate is indicated by the transfinite index  $\omega$ . And in direct analogy to the transfinite numbers discussed above one can then in principle form a hierarchy of functions using operations like
 
- $f[\omega + s][n\_] := Nest[f[\omega + s - 1], 1, n]$ 
+ $f[\omega + s][n\_] := Nest[f[\omega + s - 1], 1, n]$
 
 together with diagonalization at limit ordinals. In practice, however, it gets more and more difficult to determine that the functions defined in this way actually in a sense halt and yield definite values—and indeed for  $f[\epsilon_0]$  this can no longer be proved using the ordinary axioms of arithmetic (see below). Yet it is still possible to define functions with even more rapid rates of growth. An example is the so-called busy beaver function (see page 1144) that gives the maximum number of steps that it takes for any Turing machine of size n to halt when started from a blank tape. In general this function must grow faster than any computable function, and is not itself computable.
 
@@ -1404,7 +1404,7 @@ Any axiom system must consist of equivalences valid for the operator it describe
 
 A simple example that allows *Not* and either *And* or *Or* is the Robbins axiom system from page 773. Given the first two axioms (commutativity and associativity) it turns out that no shorter third axiom will work in this case (though ones such as f[g[f[a, g[f[a, b]]]], g[g[b]]] = b of the same size do work).
 
-Much as in the single-operator case, to reproduce logic two pairs of operators must be allowed for k = 2, none for k = 3, 12 for k = 4, and so on. Among single axioms, the shortest that works up to k = 2 is  $(\neg (\neg (\neg b \lor a) \lor \neg (a \lor b))) = a$ . The shortest that works up to k = 3 is  $(\neg (\neg (a \lor b) \lor \neg b) \lor \neg (\neg a \lor a)) = b$ . It is known, however, that at least 3 variables must appear in order to reproduce logic, and an example of a single axiom with 4 variables that has been found recently to work is  $\{(\neg (\neg (c \lor b) \lor \neg a) \lor \neg (\neg (\neg d \lor d) \lor \neg a \lor c)) = a\}.$ 
+Much as in the single-operator case, to reproduce logic two pairs of operators must be allowed for k = 2, none for k = 3, 12 for k = 4, and so on. Among single axioms, the shortest that works up to k = 2 is  $(\neg (\neg (\neg b \lor a) \lor \neg (a \lor b))) = a$ . The shortest that works up to k = 3 is  $(\neg (\neg (a \lor b) \lor \neg b) \lor \neg (\neg a \lor a)) = b$ . It is known, however, that at least 3 variables must appear in order to reproduce logic, and an example of a single axiom with 4 variables that has been found recently to work is  $\{(\neg (\neg (c \lor b) \lor \neg a) \lor \neg (\neg (\neg d \lor d) \lor \neg a \lor c)) = a\}.$
 
 ■ **Page 808 · History.** (See page 1151.) (c) was found by Henry Sheffer in 1913; (e) by Carew Meredith in 1967. Until this book, very little work appears to have been done on finding short axioms for logic in terms of Nand. Around 1949 Meredith found the axiom system
 
@@ -1433,7 +1433,7 @@ and in 1969 Meredith also gave the system
 
 ![](_page_1190_Figure_6.jpeg)
 
-■ **Page 814 · Multivalued logic.** As noted by Jan Łukasiewicz and Emil Post in the early 1920s, it is possible to generalize ordinary logic to allow k values Range[0, 1, 1/(k-1)], say with 0 being False, and 1 being True. Standard operations in logic can be generalized as  $Not[a\_] = 1 - a$ ,  $And[a\_, b\_] = Min[a, b]$ ,  $Or[a\_, b\_] = Max[a, b], Xor[a\_, b\_] = Abs[a - b],$  $Equal[a\_, b\_] = 1 - Abs[a - b],$ 
+■ **Page 814 · Multivalued logic.** As noted by Jan Łukasiewicz and Emil Post in the early 1920s, it is possible to generalize ordinary logic to allow k values Range[0, 1, 1/(k-1)], say with 0 being False, and 1 being True. Standard operations in logic can be generalized as  $Not[a\_] = 1 - a$ ,  $And[a\_, b\_] = Min[a, b]$ ,  $Or[a\_, b\_] = Max[a, b], Xor[a\_, b\_] = Abs[a - b],$  $Equal[a\_, b\_] = 1 - Abs[a - b],$
 
  $Implies[a\_, b\_] = 1 - UnitStep[a - b] (a - b)$ . An alternative generalization for Not is  $Not[a\_] := Mod[(k-1) a+1, k]/(k-1)$ . The function  $Nand[a\_, b\_] := Not[And[a, b]]$  used in the main text turns out to be universal for any k. Axiom systems can be set up for multivalued logic, but they are presumably more complicated than for ordinary k = 2 logic. (Compare page 1171.)
 
@@ -1464,11 +1464,11 @@ Note that for systems that do not already have it as an axiom, most theorems use
 
 ■ **Page 818 · NAND theorems.** The total number of expressions with n NANDs and s variables is: Binomial[2 n, n]  $s^{n+1}/(n+1)$ (see page 897). With s = 2 and n from 0 to 7 the number of these *True* for all values of variables is {0, 0, 4, 0, 80, 108, 2592, 7296}, with the first few distinct ones being (see page 781)
 
- $\{(p \bar{\land} p) \bar{\land} p, (((p \bar{\land} p) \bar{\land} p) \bar{\land} p) \bar{\land} p, (((p \bar{\land} p) \bar{\land} p) \bar{\land} q) \bar{\land} q\}$ 
+ $\{(p \bar{\land} p) \bar{\land} p, (((p \bar{\land} p) \bar{\land} p) \bar{\land} p) \bar{\land} p, (((p \bar{\land} p) \bar{\land} p) \bar{\land} q) \bar{\land} q\}$
 
 The number of unequal expressions obtained is (2, 3, 3, 7, 10, 15, 12, 16) (compare page 1096), with the first few distinct ones being
 
- $\{p,\,p\,\bar{\land}\,p,\,p\,\bar{\land}\,q,\,(p\,\bar{\land}\,p)\,\bar{\land}\,p,\,(p\,\bar{\land}\,q)\,\bar{\land}\,p,\,(p\,\bar{\land}\,p)\,\bar{\land}\,q\}$ 
+ $\{p,\,p\,\bar{\land}\,p,\,p\,\bar{\land}\,q,\,(p\,\bar{\land}\,p)\,\bar{\land}\,p,\,(p\,\bar{\land}\,q)\,\bar{\land}\,p,\,(p\,\bar{\land}\,p)\,\bar{\land}\,q\}$
 
 Most of the axioms from page 808 are too long to appear early in the list of theorems. But those of system (d) appear at positions {3, 15, 568} and those of (e) at {855, 4}.
 
