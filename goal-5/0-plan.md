@@ -686,7 +686,7 @@ Neither file is a generalized workflow database.
   strict zero-correction output remains 1,475 files with length-prefixed tree
   SHA-256
   `1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b`.
-- `N10` is reopened at `NO/NO`. A strict read-only sweep of all PDF pages
+- `N10` is complete again at `YES/YES`. A strict read-only sweep of all PDF pages
   1083–1122, boundaries 1082/1123, and all 642 inventoried objects found 24
   stale line groups represented by 33 exact overlays. Its exhaustive relation
   census distinguishes 183 nonoverlapping tokens: eight collapsed printed
@@ -696,9 +696,14 @@ Neither file is a generalized workflow database.
   `6044152950100dc26031174038686d69fcf3e2c5482e85283e2c8757016f036a`.
   The integrated document owns 584 rows: `G5-C-2806`–`G5-C-3360` plus
   `G5-C-4446`–`G5-C-4474`. Its 91 mapped rows and additions
-  `G5-A-0119`–`G5-A-0141` are unchanged. Every prior closer was invalidated;
-  wholly fresh source, technical, and visual closers must restart from PDF
-  1083 before coverage can be restored.
+  `G5-A-0119`–`G5-A-0141` are unchanged. Every prior closer was invalidated.
+  Three wholly fresh source, technical, and visual traversals then restarted
+  from PDF 1083 and independently sealed `CLEAN_ZERO_FINDINGS` over all 40
+  owned pages plus both boundaries. Root reproduced their verifiers and
+  manifests. Their source, technical, and visual manifest hashes are
+  `c399a6cc78ec2b3478e41bc38e84e567381a946625243a5cfdcb2a7208ae9271`,
+  `8aa83f6724425461ca808c90bf7caf68f27fcb831d242c16d9671f5e48440a35`,
+  and `32f95664b3689964d019b8475bfbcd9d2560c0de558b9fbe2355dd6b1feb5f9b`.
 - `N11` is complete at `YES/YES` over PDF pages 1123–1140 plus boundaries
   1122/1141. The 147 source and 100 technical proposals
   initially merged into 213 nonoverlapping guarded corrections; all 26
@@ -762,11 +767,11 @@ Neither file is a generalized workflow database.
   match at 1,638 files with length-prefixed tree SHA-256
   `8ebbf72662760277c57666ffcb75bf411b203f717607fbcef39b0b2a049bc715`;
   strict zero remains the frozen `1971cbef...` tree and the protected legacy
-  digest is unchanged. Validation reports 25 completed second passes. The
+  digest is unchanged. Validation reports 26 completed second passes. The
   focused Stage 8, Goal 5, and complete repository suites pass 30, 198, and
   300 tests, with 3,073 focused and 5,873 cumulative subtests.
-- Stage 7 is complete. Stage 8 remains active with `N09` and `N11` closed;
-  `N10` and `N12` are both deliberately reopened pending wholly fresh
+- Stage 7 is complete. Stage 8 remains active with `N09`, `N10`, and `N11`
+  closed; only `N12` remains deliberately reopened pending wholly fresh
   post-repair source, technical, and visual closing traversals. The next
   available IDs are `G5-C-4535` and `G5-A-0164`.
 
