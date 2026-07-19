@@ -161,6 +161,22 @@ After canonical integration:
 - the complete Goal 5 suite passes: 202 tests and 6,177 subtests; and
 - `git diff --check` passes.
 
+## Reopened-Group Second Pass
+
+The wholly fresh post-integration visual second pass is sealed at
+`/tmp/g5-stage10-reopened-secondpass-20260719-a1`. It reviewed all eight
+reopened groups source-first and then candidate-first: 18 live assets, 18 live
+references, 123 source-image regions, and 18 source-vector regions on the eight
+authoritative pages. All counts close with zero finding and zero ambiguity.
+
+The packet contains 416 manifest members. Its `MANIFEST.sha256` file hashes to
+`b1bed267cf06d57ca366d5b0bbc2be94762c6b482c2d99bac9ffa311a8d0d551`
+and `SEAL.json` hashes to
+`2d903a6190be5e761ef8571574beb1ed6cccf0d04b831ce1ec949693335909ce`.
+All 16 adversarial mutations are rejected. Root independently inspected the
+complete group evidence and reproduced the baseline verifier, mutation suite,
+seal, and manifest checks.
+
 ## No-Cheating Checks
 
 - Inventory records and prior reports do not themselves grant review credit.
@@ -178,12 +194,8 @@ After canonical integration:
 
 ## Remaining Completion Requirements
 
-- Perform a wholly fresh post-integration second pass over the eight reopened
-  figure groups, all 18 live assets/references, 123 image regions, and 18
-  vector regions.
-- Restart the affected group or document if that pass finds any mismatch.
-- Close the current rotated Stage 9 technical passes for final `INDEX` and
-  `COLOPHON` technical content.
+- Close the current rotated Stage 9 technical pass for final `INDEX` content;
+  the final `COLOPHON` technical closure is already sealed and accepted.
 - Advance `INDEX` and `COLOPHON` to `YES/YES` in `coverage.csv` only after all
   Stage 10 checks are sealed.
 - Rerun build, validation, complete tests, manifest checks, legacy-integrity
@@ -193,7 +205,6 @@ After canonical integration:
 
 ## Exact Next Action
 
-Assign a fresh agent the eight-row `changed-groups.jsonl` denominator and the
-final integrated target, prohibit prior lane verdicts, and require an
-independent source-first/candidate-first visual and caption comparison before
-closing Stage 10.
+Finish and independently accept the active fresh `INDEX` technical closure,
+then advance `INDEX` and `COLOPHON` to `YES/YES` and run the final cumulative
+build, validation, tests, manifest, legacy-integrity, and diff checks.
