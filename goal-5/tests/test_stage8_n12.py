@@ -25,21 +25,21 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-FINAL_CORRECTION_COUNT = 928
+FINAL_CORRECTION_COUNT = 929
 FINAL_BASE_CORRECTION_FIRST_NUMBER = 3577
 FINAL_BASE_CORRECTION_LAST_NUMBER = 4445
 FINAL_REPAIR_CORRECTION_FIRST_NUMBER = 4475
-FINAL_REPAIR_CORRECTION_LAST_NUMBER = 4533
-FINAL_TARGET_BYTES = 397_431
+FINAL_REPAIR_CORRECTION_LAST_NUMBER = 4534
+FINAL_TARGET_BYTES = 397_424
 FINAL_TARGET_LFS = 1_857
 FINAL_TARGET_SHA256 = (
-    "6ed667a06431b8a9df4183a34434260156b4dd40a6fcc83e448abed34a46d919"
+    "44a64dc63fdf70e139d74ab8f960880fe3f44df5a116af69506dc05e4d4dabeb"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "1153d0aff6247aee57c346dd660a41e88525db5011796e20d7d8662fe4e704b7"
+    "478127ac2bddd0d01e41768e5e2170ff11c61d52b06faa341480c48051aa89f0"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "5986b5a1a8445d7112f65492e4bb4b1ebfaf4f080d0d5e1ff6a5ca05ed3313ce"
+    "e13bcf620940fd64ac8572ec7968244a3471d00ae5a4a30dff54a9f0037e2f65"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "0b30632d2ca01fe1aba50d7d9fcec926704eae3a1b945a5b741c3768bcafc693"
@@ -63,7 +63,7 @@ EXPECTED_PDF_SHA256 = (
     "a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6"
 )
 EXPECTED_NORMAL_TREE_SHA256 = (
-    "c702d9ae593588daa264615be608c6c1dfb6032b1118ea216214e5e764270121"
+    "8ebbf72662760277c57666ffcb75bf411b203f717607fbcef39b0b2a049bc715"
 )
 EXPECTED_ZERO_TREE_SHA256 = (
     "1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b"
@@ -177,11 +177,11 @@ EXPECTED_ADDED_ASSETS = {
 
 
 EXPECTED_FULL_LEDGER_SHA256 = {
-    "corrections.jsonl": "cec6677c5e1e34301edc4d818b7af4be7bbf0c794b2a92f9a92f48b049ead16d",
+    "corrections.jsonl": "80b89a99dbbd54b73682d07a6ffcb236d5c9c49ee36e23b317fb0305fe6dfbf6",
     "image-map.jsonl": "e2fac1db19000e4bd4e634ac7dd1ea0920d3c7c9f105e2503904cc024bfe0681",
     "added-assets.jsonl": "d647fa8d948b155720ca3f8c909429654f30398fbf566e0b0fb6cca779e621ae",
     "source-ranges.json": "36dacbddcbb0157f604aafeca93e6e189bd16c6b52ac6409d6d83681a41de498",
-    "coverage.csv": "0dee72ca6941e154b3a34a52761e0b0a199950136c0e0a1cd882a1230d003954",
+    "coverage.csv": "dd5738bc25617ea55b9b8228e28e738ff03457257d0b395628ce5ba4389ded2e",
 }
 
 
@@ -403,6 +403,10 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 self.rendered.count("..."),
             ),
             (477, 0, 21),
+        )
+        self.assertEqual(
+            [number for number, line in enumerate(lines, 1) if line.endswith((" ", "\t"))],
+            [],
         )
         self.assertEqual(
             [
@@ -631,10 +635,10 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 payload = (GOAL_DIR / relative).read_bytes()
                 self.assertEqual(build.sha256(payload), expected)
 
-        self.assertEqual(len(self.corrections), 4_533)
+        self.assertEqual(len(self.corrections), 4_534)
         self.assertEqual(
             [row["id"] for row in self.corrections],
-            [f"G5-C-{number:04d}" for number in range(1, 4_534)],
+            [f"G5-C-{number:04d}" for number in range(1, 4_535)],
         )
         self.assertEqual(len(self.images), 1_444)
         self.assertEqual(len(self.added_assets), 163)
@@ -672,8 +676,8 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="n12-firstpass-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1607, 4533))
-            self.assertEqual(build.build(second), (29, 1607, 4533))
+            self.assertEqual(build.build(first), (29, 1607, 4534))
+            self.assertEqual(build.build(second), (29, 1607, 4534))
             first_tree, first_manifest = length_prefixed_tree(first)
             second_tree, second_manifest = length_prefixed_tree(second)
             output_tree, output_manifest = length_prefixed_tree(build.OUTPUT_ROOT)
@@ -683,7 +687,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             self.assertEqual(first_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(second_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(output_tree, EXPECTED_NORMAL_TREE_SHA256)
-            self.assertEqual(validate.validate(first), (29, 1607, 4533, 25))
+            self.assertEqual(validate.validate(first), (29, 1607, 4534, 25))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))

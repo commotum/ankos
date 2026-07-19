@@ -282,7 +282,7 @@ Neither file is a generalized workflow database.
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
 - `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
   documents, 1,444 mapped image positions, 163 source-added images, and
-  generated README/Contents files. The current manifests include 4,533 guarded
+  generated README/Contents files. The current manifests include 4,534 guarded
   source-verified corrections, but this is not yet a complete OCR-corrected
   edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
@@ -735,28 +735,32 @@ Neither file is a generalized workflow database.
   and `cf0d64a75b7914b1e15cc64450ffc7c9c7981569a941f03ef00c56955306d5c2`.
   Coverage is promoted to `YES/YES`; validation reports 26 completed second
   passes, and the focused N09–N11 suite passes 20 tests with 1,908 subtests.
-- `N12` remains open at `NO/NO` after its prior first-pass and two repair
-  cycles. Reopened spacing/token, technical/syntax, Zeta, and NAND-glyph
-  audits amend 36 existing N12 rows and add 59 document-unique semantic guards
-  `G5-C-4475`–`G5-C-4533`. The resulting 928-row, 397,431-byte, 1,857-LF
-  target hashes to
-  `6ed667a06431b8a9df4183a34434260156b4dd40a6fcc83e448abed34a46d919`.
+- `N12` remains open at `NO/NO` after its prior first-pass and repair cycles.
+  Reopened spacing/token, technical/syntax, Zeta, and NAND-glyph audits
+  amended 36 existing N12 rows and added 59 document-unique semantic guards
+  `G5-C-4475`–`G5-C-4533`. A subsequent whole-target whitespace saturation
+  check found seven extraction-only terminal ASCII spaces: six owning guards
+  were amended and exact guard `G5-C-4534` was added. Direct page-local PDF
+  checks confirm that none represents printed content. The resulting 929-row,
+  397,424-byte, 1,857-LF target hashes to
+  `44a64dc63fdf70e139d74ab8f960880fe3f44df5a116af69506dc05e4d4dabeb`.
   It restores source-visible factor boundaries, Part syntax, literal code
   braces, a missing subtraction, the lowercase item `(l)`, membership and
   epsilon forms, and all 78 stale overbarred NAND glyphs as N12-local
   `\bar{\land}` while rejecting the superseded false `b y^2` reading. Two
   independent merge implementations reproduce the target byte-for-byte. Its
   53 references, additions `G5-A-0149`–`G5-A-0163`, and nine mapped repair
-  overrides are unchanged. Every prior closer is invalidated; wholly fresh
-  source, technical, and visual closers must restart from PDF 1141.
-- The combined correction ledger has 4,533 rows and SHA-256
-  `cec6677c5e1e34301edc4d818b7af4be7bbf0c794b2a92f9a92f48b049ead16d`.
+  overrides are unchanged. Every prior N12 closer and the earlier `6ed667...`
+  pin are invalidated; wholly fresh source, technical, and visual closers must
+  restart from PDF 1141 against `44a64d...`.
+- The combined correction ledger has 4,534 rows and SHA-256
+  `80b89a99dbbd54b73682d07a6ffcb236d5c9c49ee36e23b317fb0305fe6dfbf6`.
   The sealed integration packet has manifest SHA-256
   `ec259b384fc58225f4b76f0e28bb56c8684b1c8cadf40ab950b74aa8db3a9ae0`,
   43 amended rows, 88 new guards, 213 normalized transforms, and zero
   cross-provenance changes. Two fresh normal builds and the published sibling
   match at 1,638 files with length-prefixed tree SHA-256
-  `c702d9ae593588daa264615be608c6c1dfb6032b1118ea216214e5e764270121`;
+  `8ebbf72662760277c57666ffcb75bf411b203f717607fbcef39b0b2a049bc715`;
   strict zero remains the frozen `1971cbef...` tree and the protected legacy
   digest is unchanged. Validation reports 25 completed second passes. The
   focused Stage 8, Goal 5, and complete repository suites pass 30, 198, and
@@ -764,7 +768,7 @@ Neither file is a generalized workflow database.
 - Stage 7 is complete. Stage 8 remains active with `N09` and `N11` closed;
   `N10` and `N12` are both deliberately reopened pending wholly fresh
   post-repair source, technical, and visual closing traversals. The next
-  available IDs are `G5-C-4534` and `G5-A-0164`.
+  available IDs are `G5-C-4535` and `G5-A-0164`.
 
 ## Stage Status
 
