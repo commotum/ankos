@@ -764,7 +764,7 @@ Neither file is a generalized workflow database.
   strict zero remains the frozen `1971cbef...` tree and the protected legacy
   digest is unchanged. Validation reports 25 completed second passes. The
   focused Stage 8, Goal 5, and complete repository suites pass 30, 198, and
-  300 tests, with 3,071 focused and 5,871 cumulative subtests.
+  300 tests, with 3,073 focused and 5,873 cumulative subtests.
 - Stage 7 is complete. Stage 8 remains active with `N09` and `N11` closed;
   `N10` and `N12` are both deliberately reopened pending wholly fresh
   post-repair source, technical, and visual closing traversals. The next
