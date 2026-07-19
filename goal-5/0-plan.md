@@ -740,7 +740,7 @@ Neither file is a generalized workflow database.
   and `cf0d64a75b7914b1e15cc64450ffc7c9c7981569a941f03ef00c56955306d5c2`.
   Coverage is promoted to `YES/YES`; validation reports 26 completed second
   passes, and the focused N09–N11 suite passes 20 tests with 1,908 subtests.
-- `N12` remains open at `NO/NO` after its prior first-pass and repair cycles.
+- `N12` is complete at `YES/YES` after its prior first-pass and repair cycles.
   Reopened spacing/token, technical/syntax, Zeta, and NAND-glyph audits
   amended 36 existing N12 rows and added 59 document-unique semantic guards
   `G5-C-4475`–`G5-C-4533`. A subsequent whole-target whitespace saturation
@@ -756,8 +756,13 @@ Neither file is a generalized workflow database.
   independent merge implementations reproduce the target byte-for-byte. Its
   53 references, additions `G5-A-0149`–`G5-A-0163`, and nine mapped repair
   overrides are unchanged. Every prior N12 closer and the earlier `6ed667...`
-  pin are invalidated; wholly fresh source, technical, and visual closers must
-  restart from PDF 1141 against `44a64d...`.
+  pin were invalidated. Three wholly fresh source, technical, and visual
+  closers restarted from PDF 1141 against `44a64d...` and independently sealed
+  `CLEAN_ZERO_FINDINGS`; root reproduced every manifest check and verifier.
+  Their source, technical, and visual manifest hashes are
+  `a0f6f8e69fad9ded035b9a301b6c2fcad630a27375b864e6bd2fb37f23b35671`,
+  `eef649d0eda07b92a9f18b38d317113fc38cbcb47783846ef9b3462830f0777f`,
+  and `57477733f74fac3828476abfd5e525884dacc694547bbad3c17878732c610036`.
 - The combined correction ledger has 4,534 rows and SHA-256
   `80b89a99dbbd54b73682d07a6ffcb236d5c9c49ee36e23b317fb0305fe6dfbf6`.
   The sealed integration packet has manifest SHA-256
@@ -767,12 +772,10 @@ Neither file is a generalized workflow database.
   match at 1,638 files with length-prefixed tree SHA-256
   `8ebbf72662760277c57666ffcb75bf411b203f717607fbcef39b0b2a049bc715`;
   strict zero remains the frozen `1971cbef...` tree and the protected legacy
-  digest is unchanged. Validation reports 26 completed second passes. The
+  digest is unchanged. Validation reports 27 completed second passes. The
   focused Stage 8, Goal 5, and complete repository suites pass 30, 198, and
   300 tests, with 3,073 focused and 5,873 cumulative subtests.
-- Stage 7 is complete. Stage 8 remains active with `N09`, `N10`, and `N11`
-  closed; only `N12` remains deliberately reopened pending wholly fresh
-  post-repair source, technical, and visual closing traversals. The next
+- Stage 8 is complete with `N09` through `N12` closed at `YES/YES`. The next
   available IDs are `G5-C-4535` and `G5-A-0164`.
 
 ## Stage Status
@@ -786,7 +789,7 @@ Neither file is a generalized workflow database.
 | 5-CH09-12 | `COMPLETE` | 2 |
 | 6-NOTES-00-04 | `COMPLETE` | 2 |
 | 7-NOTES-05-08 | `COMPLETE` | 2 |
-| 8-NOTES-09-12 | `IN_PROGRESS` | 2 |
+| 8-NOTES-09-12 | `COMPLETE` | 2 |
 | 9-TECHNICAL | `NOT_STARTED` | 3–8 |
 | 10-FIGURES-INDEX | `NOT_STARTED` | 3–8 plus fixed-layout source evidence |
 | 11-SATURATION | `NOT_STARTED` | 3–10 |
