@@ -72,7 +72,7 @@ source or target-detector denominators materially change document loads. The
 canonical source-object denominator remains explicitly pending and no region
 is reviewed by this freeze.
 
-+## Source Inventory Freeze
+## Source Inventory Freeze
 
 The fresh all-page source packet at
 `/tmp/g5-stage9-source-inventory-20260718-a1` has manifest SHA-256
