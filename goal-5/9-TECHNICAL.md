@@ -72,6 +72,32 @@ source or target-detector denominators materially change document loads. The
 canonical source-object denominator remains explicitly pending and no region
 is reviewed by this freeze.
 
++## Source Inventory Freeze
+
+The fresh all-page source packet at
+`/tmp/g5-stage9-source-inventory-20260718-a1` has manifest SHA-256
+`f80f45dba99594c3dac4bc57f2c0b27aa7c66c2ca1ea27c2e1502e8b7f16b52d`
+and seal SHA-256
+`2c1ec46c160b390eacbbd374ceffb4ec1acb15297f41f652402b8a97e131f676`.
+Root reproduced its manifest and `verify.py --self-test`; omission, duplicate,
+and document-drift mutations are all rejected. Every candidate field is
+`UNREVIEWED` and the packet grants zero Stage 9 review credit.
+
+Fresh raw, layout, bbox, XML/font, image-region, and raster evidence covers all
+1,280 pages. The canonical denominator is 190,199 XML text runs; 679,281 bbox
+words are non-creating crosswalk aids. The packet inventories 134,632
+technical/source-only candidates, 56,769 operator/special-glyph rows, 10,304
+script candidates, 13,609 aligned data regions, 47,456 technical
+font/position clusters, 22,064 hidden/overlap candidates, 8,062 extracted
+image regions, and 1,910 raster-derived vector candidates. Exactly 20 pages
+are dispositioned as blank at inventory level.
+
+The source-object sequence hashes to
+`6667b453f203a82c61ae6b5fcc364dc201045f13d44b369349c07ac8f50508aa`.
+Target and source packets use different documented manifest-framing algorithms;
+their identical 1,638-file and 158,900,442-byte target-tree totals are the
+cross-packet compatibility check, not equality of those framing hashes.
+
 ## Execution
 
 - Pin the PDF, correction ledger, builder, source ranges, all 29 document
@@ -115,7 +141,7 @@ is reviewed by this freeze.
 
 ## Current Gate
 
-The target freeze is complete; canonical source and expanded target-detector
-inventories are active. No Stage 9 technical region is yet credited as
-reviewed, and Stage 9 cannot close before Stage 10 stabilizes Index and
-Colophon.
+The target and source freezes are complete; the expanded target-detector and
+cross-packet join inventories are active. No Stage 9 technical region is yet
+credited as reviewed, and Stage 9 cannot close before Stage 10 stabilizes Index
+and Colophon.
