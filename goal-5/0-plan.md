@@ -270,8 +270,8 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-18 (America/Los_Angeles).
-- Active stage: `8-NOTES-09-12` (`IN_PROGRESS`), activated after clean Stage 7
-  closure through `N08`.
+- Active stage: `9-TECHNICAL` (`IN_PROGRESS`), activated after clean Stage 8
+  closure through `N12`.
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
   and the empty `goal-4/` directory were removed by exact path. No commit
   range was reverted, and Goal 4 had corrected no book text.
@@ -790,7 +790,7 @@ Neither file is a generalized workflow database.
 | 6-NOTES-00-04 | `COMPLETE` | 2 |
 | 7-NOTES-05-08 | `COMPLETE` | 2 |
 | 8-NOTES-09-12 | `COMPLETE` | 2 |
-| 9-TECHNICAL | `NOT_STARTED` | 3–8 |
+| 9-TECHNICAL | `IN_PROGRESS` | 3–8 |
 | 10-FIGURES-INDEX | `NOT_STARTED` | 3–8 plus fixed-layout source evidence |
 | 11-SATURATION | `NOT_STARTED` | 3–10 |
 | 12-RELEASE | `NOT_STARTED` | 11; zero open source ambiguity |
