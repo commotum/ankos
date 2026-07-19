@@ -15,8 +15,8 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-EXPECTED_SHA256 = "a1384ad5ada245f65d5ba8c5ff2af275ec1101252775a33ad69a7279216688d7"
-EXPECTED_BYTES = 252_955
+EXPECTED_SHA256 = "0509e50bbbdf0eeec80d3f10b318eaa66de051b828070693e7d26bc42b816854"
+EXPECTED_BYTES = 252_956
 EXPECTED_LINES = 1_686
 
 # basename: (hash, dimensions, canonical PDF page)

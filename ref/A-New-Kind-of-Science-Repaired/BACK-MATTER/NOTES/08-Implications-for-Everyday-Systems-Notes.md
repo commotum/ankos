@@ -195,9 +195,9 @@ With new tip positions as on page 400 given by  $\{p \, Exp[i \, \theta], \, p \
 ```
 With[{d = Conjugate[c], r = 1 - Abs[c]^2},
   Which[Im[c] < 0, d, Im[c] == 0, 0,
-    Re[c] > 0, With[{n = Ceiling[Pi/2/Arg[c]]},
+    Re[c] > 0, With[{n = Ceiling[π/2/Arg[c]]},
       Im[c (1 - d^n)/(1 - d)] + Im[c d^n (1 + d)]/r], Arg[c] >
-    3 Pi/4, Im[c + c^2]/r, True, Im[c] + Im[c^2 + c^3]/r]]
+    3 π/4, Im[c + c^2]/r, True, Im[c] + Im[c^2 + c^3]/r]]
 ```
 
 The picture below shows the region for which the gap is positive, corresponding to trees which are not connected. (This region was found by Michael Barnsley and others in the late 1980s.) The overall maximum gap occurs at  $c = 1/2 \, Sqrt[5 - \sqrt{17} \, ] \, i$ . The bottom boundary of the region lies along `Re[c] = -1/2`; the extremal point on the edge of the gap in this case corresponds to  $\{0, 0, 1, 0, 1, 0, 1, ...\}$  where the last two elements repeat forever. The rest of the boundary consists of a sequence of algebraic curves, with almost imperceptible changes in slope in between; the first corresponds to  $\{0, 0, 0, 1, 0, 1, 0, 1, ...\}$ , while subsequent ones correspond to  $\{0, 1, 1, 1, 0, 1, 0, 1, 0, 1, ...\}$ ,  $\{0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, ...\}$ , etc.

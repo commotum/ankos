@@ -25,21 +25,23 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-FINAL_CORRECTION_COUNT = 929
+FINAL_CORRECTION_COUNT = 1222
 FINAL_BASE_CORRECTION_FIRST_NUMBER = 3577
 FINAL_BASE_CORRECTION_LAST_NUMBER = 4445
 FINAL_REPAIR_CORRECTION_FIRST_NUMBER = 4475
 FINAL_REPAIR_CORRECTION_LAST_NUMBER = 4534
-FINAL_TARGET_BYTES = 397_424
+FINAL_TECHNICAL_CORRECTION_FIRST_NUMBER = 4536
+FINAL_TECHNICAL_CORRECTION_LAST_NUMBER = 4828
+FINAL_TARGET_BYTES = 398_153
 FINAL_TARGET_LFS = 1_857
 FINAL_TARGET_SHA256 = (
-    "44a64dc63fdf70e139d74ab8f960880fe3f44df5a116af69506dc05e4d4dabeb"
+    "c1899d24b3db987f291f9906ade3e8d1d4b10823ee1f5385d26b665d9fd62ea4"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "478127ac2bddd0d01e41768e5e2170ff11c61d52b06faa341480c48051aa89f0"
+    "c9d6d2359b6f646afaa2366a416e1b3b429af04ca360ad727e19c0f93144ea95"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "e13bcf620940fd64ac8572ec7968244a3471d00ae5a4a30dff54a9f0037e2f65"
+    "64ec567ff903044dd97ff2d25fa71f556e10eb626f860b7bed8d8870bf045e2d"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "0b30632d2ca01fe1aba50d7d9fcec926704eae3a1b945a5b741c3768bcafc693"
@@ -63,7 +65,7 @@ EXPECTED_PDF_SHA256 = (
     "a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6"
 )
 EXPECTED_NORMAL_TREE_SHA256 = (
-    "8ebbf72662760277c57666ffcb75bf411b203f717607fbcef39b0b2a049bc715"
+    "ed94317245fd2ae5becdd2305520c29c47740143888d044ef1f356ceba2ab899"
 )
 EXPECTED_ZERO_TREE_SHA256 = (
     "1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b"
@@ -177,7 +179,7 @@ EXPECTED_ADDED_ASSETS = {
 
 
 EXPECTED_FULL_LEDGER_SHA256 = {
-    "corrections.jsonl": "80b89a99dbbd54b73682d07a6ffcb236d5c9c49ee36e23b317fb0305fe6dfbf6",
+    "corrections.jsonl": "f7032d762cbeeac1921aa41ff27597636b9252687a366397442013b2bd5cadb7",
     "image-map.jsonl": "e2fac1db19000e4bd4e634ac7dd1ea0920d3c7c9f105e2503904cc024bfe0681",
     "added-assets.jsonl": "d647fa8d948b155720ca3f8c909429654f30398fbf566e0b0fb6cca779e621ae",
     "source-ranges.json": "36dacbddcbb0157f604aafeca93e6e189bd16c6b52ac6409d6d83681a41de498",
@@ -302,6 +304,13 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                         FINAL_REPAIR_CORRECTION_LAST_NUMBER + 1,
                     )
                 ),
+                *(
+                    f"G5-C-{number:04d}"
+                    for number in range(
+                        FINAL_TECHNICAL_CORRECTION_FIRST_NUMBER,
+                        FINAL_TECHNICAL_CORRECTION_LAST_NUMBER + 1,
+                    )
+                ),
             ],
         )
         self.assertEqual(rows_sha256(self.rows), FINAL_CORRECTION_ROWS_SHA256)
@@ -319,7 +328,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 self.assertGreaterEqual(start, previous_end)
                 self.assertEqual(self.raw[start:end], before)
                 self.assertEqual(self.segment.count(before), row["expected_count"])
-                self.assertEqual(row["expected_count"], 1)
+                self.assertGreaterEqual(row["expected_count"], 1)
                 pages = [
                     int(page)
                     for page in re.findall(
@@ -383,7 +392,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 len(display_math),
                 len(self.references),
             ),
-            (13, 257, 104, 0, 510, 12, 53),
+            (13, 257, 104, 327, 510, 12, 53),
         )
         self.assertTrue(all(line == "```" for line in fence_lines))
         self.assertEqual(self.references, EXPECTED_REFERENCES)
@@ -402,7 +411,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 self.rendered.count("…"),
                 self.rendered.count("..."),
             ),
-            (477, 0, 21),
+            (477, 0, 20),
         )
         self.assertEqual(
             [number for number, line in enumerate(lines, 1) if line.endswith((" ", "\t"))],
@@ -424,7 +433,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         by_id = {row["id"]: row for row in self.corrections}
         self.assertEqual(
             by_id["G5-C-3797"]["after"],
-            "NestList[#2 &, 2, n], or  $2^{2^n}$ , although for  "
+            "`NestList`[#2 &, 2, n], or  $2^{2^n}$ , although for  "
             "$x = (20\\,4^s - 2)/3$  a better fit for  $n \\le 200$  is just  "
             "$2^{2.6 n}$ , with outputs increasing like  $2^{2^{1.3 n}}$ .\n",
         )
@@ -438,7 +447,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         )
         self.assertEqual(
             (by_id["G5-C-4371"]["before"], by_id["G5-C-4371"]["after"]),
-            ("BBBBBBBA", "BBBBBBA"),
+            ('"BBBBBBBA"', '`"BBBBBBA"`'),
         )
         self.assertNotIn("BBBBBBBA", self.rendered)
         self.assertEqual(self.rendered.count("BBBBBBA"), 1)
@@ -447,7 +456,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         self.assertNotIn("204^s", self.rendered)
         self.assertEqual(self.rendered.count(r"20\,4^s"), 2)
         self.assertIn("$s\\,k + 4$ generators and $5\\,s\\,k + 2$", self.rendered)
-        self.assertIn("LeafCount grows like $3^t$.", self.rendered)
+        self.assertIn("`LeafCount` grows like $3^t$.", self.rendered)
         self.assertEqual(self.rendered.count("10<sup>45</sup>"), 2)
         self.assertNotIn(r", \\ (a \circ a)", self.rendered)
         self.assertIn(r", (a \circ a)", self.rendered)
@@ -473,7 +482,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         )
         self.assertEqual(
             self.rendered.count(
-                "additive cellular automata (1984) (MultiplicativeOrder)"
+                "additive cellular automata (1984) (`MultiplicativeOrder`)"
             ),
             1,
         )
@@ -492,8 +501,9 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         repaired_rows = [
             row
             for row in self.rows
-            if int(row["id"].rsplit("-", 1)[1])
-            >= FINAL_REPAIR_CORRECTION_FIRST_NUMBER
+            if FINAL_REPAIR_CORRECTION_FIRST_NUMBER
+            <= int(row["id"].rsplit("-", 1)[1])
+            <= FINAL_REPAIR_CORRECTION_LAST_NUMBER
         ]
         self.assertEqual(
             [row["id"] for row in repaired_rows],
@@ -510,14 +520,36 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 self.assertNotIn(row["before"], self.rendered)
                 self.assertEqual(self.rendered.count(row["after"]), 1)
 
+        technical_rows = [
+            row
+            for row in self.rows
+            if FINAL_TECHNICAL_CORRECTION_FIRST_NUMBER
+            <= int(row["id"].rsplit("-", 1)[1])
+            <= FINAL_TECHNICAL_CORRECTION_LAST_NUMBER
+        ]
+        self.assertEqual(
+            [row["id"] for row in technical_rows],
+            [
+                f"G5-C-{number:04d}"
+                for number in range(
+                    FINAL_TECHNICAL_CORRECTION_FIRST_NUMBER,
+                    FINAL_TECHNICAL_CORRECTION_LAST_NUMBER + 1,
+                )
+            ],
+        )
+        self.assertEqual(len(technical_rows), 293)
+
         self.assertNotIn(r"\bar{\pi}", self.rendered)
         self.assertEqual(self.rendered.count(r"\bar{\land}"), 143)
         self.assertIn("$a x^2 + b y == c$", self.rendered)
         self.assertNotIn("b y^2 == c", self.rendered)
-        self.assertIn("Zeta[1/2 + i x]", self.rendered)
-        self.assertIn("StringJoin[u[[s]]] == StringJoin[v[[s]]]", self.rendered)
+        self.assertIn("`Zeta`[1/2 + i x]", self.rendered)
+        self.assertNotIn("Zeta[1/2 + i x]", self.rendered)
+        self.assertIn(
+            "`StringJoin`[u[[s]]] == `StringJoin`[v[[s]]]", self.rendered
+        )
         self.assertIn("- (l) See page 613.", self.rendered)
-        self.assertIn("Ceiling[2 a/3] - (a + 1) solutions", self.rendered)
+        self.assertIn("`Ceiling`[2 a/3] - (a + 1) solutions", self.rendered)
         self.assertIn("Module[{c, v}, c = Apply[Function,", self.rendered)
         self.assertIn("Apply[And, axioms]}];", self.rendered)
 
@@ -635,10 +667,10 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 payload = (GOAL_DIR / relative).read_bytes()
                 self.assertEqual(build.sha256(payload), expected)
 
-        self.assertEqual(len(self.corrections), 4_534)
+        self.assertEqual(len(self.corrections), 4_830)
         self.assertEqual(
             [row["id"] for row in self.corrections],
-            [f"G5-C-{number:04d}" for number in range(1, 4_535)],
+            [f"G5-C-{number:04d}" for number in range(1, 4_831)],
         )
         self.assertEqual(len(self.images), 1_444)
         self.assertEqual(len(self.added_assets), 163)
@@ -676,8 +708,8 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="n12-firstpass-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1607, 4534))
-            self.assertEqual(build.build(second), (29, 1607, 4534))
+            self.assertEqual(build.build(first), (29, 1607, 4830))
+            self.assertEqual(build.build(second), (29, 1607, 4830))
             first_tree, first_manifest = length_prefixed_tree(first)
             second_tree, second_manifest = length_prefixed_tree(second)
             output_tree, output_manifest = length_prefixed_tree(build.OUTPUT_ROOT)
@@ -687,7 +719,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             self.assertEqual(first_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(second_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(output_tree, EXPECTED_NORMAL_TREE_SHA256)
-            self.assertEqual(validate.validate(first), (29, 1607, 4534, 27))
+            self.assertEqual(validate.validate(first), (29, 1607, 4830, 27))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))

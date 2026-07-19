@@ -14,11 +14,11 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-EXPECTED_SHA256 = "2c3aa3a04768d9472e365aafef9eac13a984e29cba9e91bafa5737307e7beeed"
-EXPECTED_BYTES = 115_687
+EXPECTED_SHA256 = "9874b3e93f1baa19c9204f216850710467ea920aa579234fb779818d9f7f8dd2"
+EXPECTED_BYTES = 115_684
 EXPECTED_LINES = 1_040
 EXPECTED_CORRECTIONS_SHA256 = (
-    "10be073c63bab5e9ef1a3abdd1fab1db36d5a5b058d5d1c39ff3d0d4ee7f018a"
+    "a5859f19ed0c23f0cbc74863f91d01814b9cb40c5309d250127fc521bb3047c4"
 )
 EXPECTED_IMAGE_ROWS_SHA256 = (
     "c00359a797473057a847aef362c8ee6e9072010d946dfa07828593094843bb17"
@@ -281,22 +281,28 @@ class NotesForChapter4Tests(unittest.TestCase):
         self.assertEqual(len(segment), 115228)
         self.assertEqual(build.sha256(segment), self.document["raw_segment_sha256"])
 
-        self.assertEqual(len(self.n04_corrections), 76)
+        self.assertEqual(len(self.n04_corrections), 77)
         self.assertEqual(
             [row["id"] for row in self.n04_corrections],
-            [f"G5-C-{number:04d}" for number in range(974, 1050)],
+            [
+                *(f"G5-C-{number:04d}" for number in range(974, 1050)),
+                "G5-C-4535",
+            ],
         )
         self.assertEqual(
             self.rows_sha256(self.n04_corrections), EXPECTED_CORRECTIONS_SHA256
         )
-        self.assertEqual(len({row["before"] for row in self.n04_corrections}), 76)
+        self.assertEqual(len({row["before"] for row in self.n04_corrections}), 77)
 
         previous_end = self.document["raw_start_byte"]
         for row in sorted(
             self.n04_corrections, key=lambda item: item["raw_start_byte"]
         ):
             with self.subTest(correction=row["id"]):
-                self.assertEqual(set(row), build.CORRECTION_FIELDS | {"raw_line"})
+                self.assertIn(
+                    set(row),
+                    (build.CORRECTION_FIELDS, build.CORRECTION_FIELDS | {"raw_line"}),
+                )
                 self.assertEqual(row["document_id"], "N04")
                 self.assertEqual(row["expected_count"], 1)
                 self.assertEqual(row["reviewer_type"], "agent")
@@ -311,10 +317,11 @@ class NotesForChapter4Tests(unittest.TestCase):
                 self.assertLessEqual(end, self.document["raw_end_byte_exclusive"])
                 self.assertEqual(self.raw[start:end], before)
                 self.assertEqual(segment.count(before), 1)
-                self.assertEqual(
-                    row["raw_line"],
-                    self.document["raw_start_line"] + segment[:local].count(b"\n"),
-                )
+                if "raw_line" in row:
+                    self.assertEqual(
+                        row["raw_line"],
+                        self.document["raw_start_line"] + segment[:local].count(b"\n"),
+                    )
                 pages = [
                     int(value)
                     for value in re.findall(
@@ -700,7 +707,7 @@ class NotesForChapter4Tests(unittest.TestCase):
                 len(self.n04_added),
                 len(references),
             ),
-            (76, 71, 30, 11, 52),
+            (77, 71, 30, 11, 52),
         )
         self.assertEqual(
             (
@@ -731,8 +738,9 @@ class NotesForChapter4Tests(unittest.TestCase):
             "_page_943_Picture_11.jpeg",
         )
         self.assertEqual(
-            int(self.n04_corrections[-1]["id"].rsplit("-", 1)[1]) + 1, 1050
+            int(self.n04_corrections[-2]["id"].rsplit("-", 1)[1]) + 1, 1050
         )
+        self.assertEqual(self.n04_corrections[-1]["id"], "G5-C-4535")
         self.assertEqual(
             int(self.n04_added[-1]["id"].rsplit("-", 1)[1]) + 1, 61
         )
