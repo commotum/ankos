@@ -1,6 +1,6 @@
 # 9-TECHNICAL
 
-Status: IN_PROGRESS
+Status: COMPLETE
 
 ## Entry State
 
@@ -238,6 +238,38 @@ are rejected, both pristine runs and two independent root strict replays pass,
 all 37 sealed members match, and its seal SHA-256 is
 `f0799ce350a784cae5355f1f9814fe3d22f6b556c385912afe47c5f0adc356fa`.
 The three rebalanced chapter/Notes lanes therefore close 29/29 documents
-against the final integrated target. Stage 9 remains `IN_PROGRESS` only until
-the final cumulative build, validation, reproducibility, conservation, legacy,
-test, and diff gates are recorded below.
+against the final integrated target.
+
+## Completion Record
+
+- Root independently accepted the final N06 packet by running its strict public
+  verifier twice from the repository root, reproducing the same 6,346-row
+  source ledger, 21,946-row target ledger, target hash, mutation-report hash,
+  summary hash, and seal hash on both runs. A separate hash replay matched all
+  37 sealed members. The mutation report contains 30 unique, real-delta
+  mutations; all 30 are rejected and both pristine runs pass.
+- The combined matrix contains exactly 29 unique canonical rows. All 29 have a
+  sealed artifact, root PASS, and `0/0`; no row is active, queued, inherited,
+  or unresolved.
+- `python3 goal-5/build.py` builds exactly 29 documents, 1,607 images, and
+  4,830 guarded corrections. `python3 goal-5/validate.py` validates those
+  counts and all 29 second-pass coverage rows.
+- Fresh builds at `/tmp/g5-stage9-final-build-a-20260719` and
+  `/tmp/g5-stage9-final-build-b-20260719` are byte-identical to each other and
+  to `ref/A-New-Kind-of-Science-Repaired/`. Each contains 1,638 files, has
+  sorted relative-path manifest SHA-256
+  `36935ac03b256d360a9833fd53fc936da88d05036db0bc986415b079c4ea804c`,
+  and has length-prefixed tree SHA-256
+  `ed94317245fd2ae5becdd2305520c29c47740143888d044ef1f356ceba2ab899`.
+- A fresh zero-correction build validates at 29 documents, 1,444 images, zero
+  corrections, and 29 coverage rows. Its 1,475-file length-prefixed tree
+  SHA-256 is
+  `1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b`;
+  the validator and cumulative tests reproduce the immutable raw projection.
+- `goal-5/coverage.csv` contains exactly 29 `YES/YES` rows and retains SHA-256
+  `4cf6b456c41bf0268769e44c4588843d6f4fcf5a93dedf4d6d693bc95492dd88`.
+  The protected 1,463-file legacy tree retains SHA-256
+  `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
+- `uv run pytest -q` passes 304 tests and 6,177 subtests in 68.48 seconds.
+  `git diff --check` passes. No technical finding, source ambiguity, or Stage 9
+  completion requirement remains open.

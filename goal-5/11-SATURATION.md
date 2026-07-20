@@ -1,14 +1,15 @@
 # 11-SATURATION
 
-Status: NOT_STARTED
+Status: IN_PROGRESS
 
 ## Current Facts
 
 - The authoritative source is the 1,280-page PDF with SHA-256
   `a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6`.
 - The candidate corpus contains exactly 29 canonical Markdown documents.
-  Stage 9's fresh rotated technical closures are still running, so the target
-  is not yet eligible for Stage 11 credit.
+  Stage 9 is complete: every document has a fresh rotated technical closure,
+  all 29 root replays pass with zero finding or ambiguity, and the stable
+  target is now eligible for Stage 11 review credit.
 - A read-only, no-credit preflight over the current candidate found zero
   invalid UTF-8, non-NFC document, missing final LF, CR byte, tab, mojibake
   marker, unbalanced fence, unusual control/format/private code point, or
@@ -86,5 +87,6 @@ round to find nothing new.
 
 ## Stage Results
 
-Not started. The current detector output is preflight-only and is deliberately
-excluded from completion credit.
+In progress. Any detector-generator preflight remains deliberately excluded
+from completion credit. Round 1 and its document-atomic fresh reviewer receipts
+start only from the post-Stage-9 stable target.

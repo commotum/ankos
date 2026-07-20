@@ -790,9 +790,9 @@ Neither file is a generalized workflow database.
 | 6-NOTES-00-04 | `COMPLETE` | 2 |
 | 7-NOTES-05-08 | `COMPLETE` | 2 |
 | 8-NOTES-09-12 | `COMPLETE` | 2 |
-| 9-TECHNICAL | `IN_PROGRESS` | 3–8 |
+| 9-TECHNICAL | `COMPLETE` | 3–8 |
 | 10-FIGURES-INDEX | `COMPLETE` | 3–8 plus fixed-layout source evidence |
-| 11-SATURATION | `NOT_STARTED` | 3–10 |
+| 11-SATURATION | `IN_PROGRESS` | 3–10 |
 | 12-RELEASE | `NOT_STARTED` | 11; zero open source ambiguity |
 
 ## Stages
