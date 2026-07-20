@@ -142,11 +142,11 @@ cross-packet compatibility check, not equality of those framing hashes.
 ## Current Gate
 
 The target and source freezes and the integrated first pass are complete.
-Fresh rotated closers have formally sealed 18 of the 29 documents with zero
-finding and zero ambiguity: `PREFACE`, `CH01`, `CH02`, `CH04`, `CH06`, `CH09`,
-`CH10`, `CH12`, `GENERAL_NOTES`, `N01`, `N02`, `N03`, `N05`, `N07`, `N09`,
-`N11`, `INDEX`, and `COLOPHON`. Root independently replayed the corresponding
-baseline verifiers, mutation suites, seals, and member hashes before accepting
-them. Eleven documents remain and continue across the three rebalanced
-chapter/Notes lanes. Stage 9 stays `IN_PROGRESS` until all 29 fresh rotated
-closures are sealed against the final integrated target.
+Fresh rotated closers have formally sealed 19 of the 29 documents with zero
+finding and zero ambiguity: `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`,
+`CH02`, `CH04`, `CH06`, `CH09`, `CH10`, `CH12`, `GENERAL_NOTES`, `N01`, `N02`,
+`N03`, `N05`, `N07`, `N09`, `N11`, `INDEX`, and `COLOPHON`. Root independently
+replayed the corresponding baseline verifiers, mutation suites, seals, and
+member hashes before accepting them. Ten documents remain and continue across
+the three rebalanced chapter/Notes lanes. Stage 9 stays `IN_PROGRESS` until all
+29 fresh rotated closures are sealed against the final integrated target.
