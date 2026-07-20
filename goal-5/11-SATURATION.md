@@ -150,11 +150,12 @@ start only from the post-Stage-9 stable target.
   eight boundary/display findings before accepting their guarded repairs.
 - The combined N12 target is 398,142 bytes, 1,843 LF, and SHA-256
   `c999ad62007b5ccc16ca17509e11863dd61b5b996250b955c06e7dede9932e8d`.
-- All pre-repair N12 receipts have `NONE_PRE_REPAIR_EVIDENCE_ONLY` credit. N12
-  is receiving a wholly fresh technical closure and complete 76-page Round 1
-  restart against the combined bytes. Unchanged-document reviewers may retain
-  firsthand page work only after proving assigned document identities and
-  regenerating every corpus-bound receipt against the final Stage 11 packet.
+- All pre-repair N12 receipts have `NONE_PRE_REPAIR_EVIDENCE_ONLY` credit. Its
+  wholly fresh technical closure and complete 76-page Round 1 document restart
+  against the combined bytes are accepted at `0/0`. The Lane 2 reviewer may
+  retain firsthand work for its nine unchanged documents only after proving
+  their identities and regenerating every corpus-bound receipt against the
+  final Stage 11 packet.
 - Lane 1 independently proved all ten assigned document hashes, byte counts,
   and LF counts unchanged, regenerated all receipts against the post-repair
   freeze, and closed 430 pages, 280 detector runs, and 5,271 candidates with
