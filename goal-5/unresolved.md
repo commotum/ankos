@@ -2,8 +2,10 @@
 
 There is no open Foundation source blocker or author-text ambiguity. Content
 review discrepancies are added here only when source comparison cannot resolve
-them; all twenty-four documents through Notes for Chapter 9 closed without an
-unresolved item.
+them; all 29 canonical documents completed the Stage 9 technical and Stage 10
+figure/Index closures without an unresolved item. Stage 11 saturation is in
+progress and will reopen this register if a fresh source comparison cannot be
+resolved.
 
 ## FOUNDATION-SOURCE-001 — complete authoritative source
 

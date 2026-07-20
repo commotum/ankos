@@ -96,3 +96,24 @@ round to find nothing new.
 In progress. Any detector-generator preflight remains deliberately excluded
 from completion credit. Round 1 and its document-atomic fresh reviewer receipts
 start only from the post-Stage-9 stable target.
+
+### Entry Freeze and Round 1 Launch
+
+- The frozen target contains 3,622,710 bytes and 38,182 logical LF-terminated
+  lines. Its ordered target-record SHA-256 is
+  `d872859e9a6ef6dde11307eb40f141a5e579a2853ede44ab430c1365dda27063`;
+  the preflight target-corpus SHA-256 is
+  `3d705f4fae1371c5b0fee5f201677ba54934d3ebeef5dbc37d924e04a5fc5494`.
+- Root independently replayed the post-Stage-9 preflight from live repository
+  bytes. It reproduces 29 documents, 1,280 pages, three lanes, 28 detector
+  families, 812 document-detector runs, 35,481 candidates, the 16-member
+  manifest, and all 15 mutation rejections.
+- Three wholly fresh, fork-free agent reviewers started Round 1 with no
+  inherited verdicts: Lane 1 at
+  `/tmp/g5-stage11-round1-lane1-20260719-a1` (10 documents, 430 pages, 280
+  detector runs, 5,271 candidates); Lane 2 at
+  `/tmp/g5-stage11-round1-lane2-20260719-a1` (10 documents, 425 pages, 280
+  detector runs, 6,354 candidates); and Lane 3 at
+  `/tmp/g5-stage11-round1-lane3-20260719-a1` (nine documents, 425 pages, 252
+  detector runs, 23,856 candidates).
+- Round 1 is active. No lane receipt or finding has yet been accepted by root.
