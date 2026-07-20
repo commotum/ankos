@@ -158,7 +158,7 @@ zero finding and zero ambiguity. Active and queued rows grant no credit.
 | `CH05` | queued | — | — | — |
 | `CH06` | `W1` | `39a013bb69b73f7614caafae482edb27372b4757ed67890d2b28c3bfa8a674d0` | PASS | 0/0 |
 | `CH07` | queued | — | — | — |
-| `CH08` | queued | — | — | — |
+| `CH08` | `/tmp/g5-stage9-ch08-rotated-closer-w2-20260719-a1` | `55e3572553f06057559cf8ca9a76ce89a2268a4d3f7413e0eee1d5b0f65be76a` | PASS | 0/0 |
 | `CH09` | `W1` | `39a013bb69b73f7614caafae482edb27372b4757ed67890d2b28c3bfa8a674d0` | PASS | 0/0 |
 | `CH10` | `W3` | `6d8c59dd79a97d89fd48d7cc06ee560a57071882a7a35aae71ac3cf8e81dc397` | PASS | 0/0 |
 | `CH11` | `/tmp/g5-stage9-ch11-rotated-closer-w2-20260719-a1` | `099b7cf7c74430b792184c71ce81316454b11df1181c67c9c312846cc642ac36` | PASS | 0/0 |
@@ -182,9 +182,9 @@ zero finding and zero ambiguity. Active and queued rows grant no credit.
 ## Current Gate
 
 The target and source freezes and the integrated first pass are complete.
-Fresh rotated closers have formally sealed 24 of the 29 documents with zero
+Fresh rotated closers have formally sealed 25 of the 29 documents with zero
 finding and zero ambiguity: `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`,
-`CH02`, `CH03`, `CH04`, `CH06`, `CH09`, `CH10`, `CH11`, `CH12`,
+`CH02`, `CH03`, `CH04`, `CH06`, `CH08`, `CH09`, `CH10`, `CH11`, `CH12`,
 `GENERAL_NOTES`, `N01`,
 `N02`, `N03`, `N04`, `N05`, `N07`, `N08`, `N09`, `N10`, `N11`, `INDEX`, and
 `COLOPHON`. Root
@@ -207,6 +207,11 @@ rows. All 26 pages, 168 crops, 12 target assets, and 33 extracted source images
 were individually reviewed; all 30 state-changing mutations are rejected,
 both pristine runs pass, and its seal SHA-256 is
 `2ae7a4ddbfd7e84cce29d402a2916e8457eace84cd1e03ac55d71063ba9ba249`.
-Five documents remain across
+The accepted CH08 packet closes 4,544 source-ledger and 220 target-ledger rows,
+including 21,220 lexical links and seven positional visual-only theta/pi
+tokens. All 54 state-changing mutations are rejected, two repository-root
+strict replays pass, all 2,239 manifest members match, and its seal SHA-256 is
+`55e3572553f06057559cf8ca9a76ce89a2268a4d3f7413e0eee1d5b0f65be76a`.
+Four documents remain across
 the three rebalanced chapter/Notes lanes. Stage 9 stays `IN_PROGRESS` until all
 29 fresh rotated closures are sealed against the final integrated target.
