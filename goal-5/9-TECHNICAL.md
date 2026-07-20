@@ -167,7 +167,7 @@ zero finding and zero ambiguity. Active and queued rows grant no credit.
 | `N01` | `W2/final/N01` | `89071c64d3723fde0ca050e8e64247bd0962d7469b3540195277967bc4748d3e` | PASS | 0/0 |
 | `N02` | `W1` | `0932cac622e3d8774bb4e1115834e1d081c6aa45629ff49cbb0b6197b6df9b13` | PASS | 0/0 |
 | `N03` | `/tmp/g5-stage9-rotated-closer-w3-n03-20260719-a1` | `e4a7961a409a17a37bc6907b835c1101bfdf64584e63e789c3931be23420b67a` | PASS | 0/0 |
-| `N04` | `/tmp/g5-stage9-rotated-closer-w3-n04-20260719-a1` | active | — | — |
+| `N04` | `/tmp/g5-stage9-rotated-closer-w3-n04-20260719-a1` | `f59e12fb4558731d6307f11693dda5e85e5adbe0b4401dc56c5d4d697585d679` | PASS | 0/0 |
 | `N05` | `W1` | `3711d31d82a13e3807610410f27fda2f005cec77256f75c6c33d6b90b39f905d` | PASS | 0/0 |
 | `N06` | queued | — | — | — |
 | `N07` | `W1` | `f1ae8c8ec6fd437b9ced37ffb763f3e5662e2b326266778354b1b85de80dc94b` | PASS | 0/0 |
@@ -182,15 +182,20 @@ zero finding and zero ambiguity. Active and queued rows grant no credit.
 ## Current Gate
 
 The target and source freezes and the integrated first pass are complete.
-Fresh rotated closers have formally sealed 21 of the 29 documents with zero
+Fresh rotated closers have formally sealed 22 of the 29 documents with zero
 finding and zero ambiguity: `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`,
 `CH02`, `CH03`, `CH04`, `CH06`, `CH09`, `CH10`, `CH12`, `GENERAL_NOTES`, `N01`,
-`N02`, `N03`, `N05`, `N07`, `N09`, `N10`, `N11`, `INDEX`, and `COLOPHON`. Root
+`N02`, `N03`, `N04`, `N05`, `N07`, `N09`, `N10`, `N11`, `INDEX`, and
+`COLOPHON`. Root
 independently replayed the corresponding baseline verifiers, mutation suites,
 seals, and member hashes before accepting them. The accepted N10 packet closes
 12,303 source-ledger and 46,658 target-ledger rows; all 30 state-changing
 mutations are rejected, both pristine verifier runs pass, and its seal SHA-256
 is `1284462b39247358c7f0be3c8573a058a4bd9b82f54238d5408894edb0bd29d8`.
-Eight documents remain across
+The accepted N04 packet closes 10,013 source-ledger and 31,369 target-ledger
+rows; all 30 state-changing mutations are rejected, both pristine verifier
+runs pass, and its seal SHA-256 is
+`f59e12fb4558731d6307f11693dda5e85e5adbe0b4401dc56c5d4d697585d679`.
+Seven documents remain across
 the three rebalanced chapter/Notes lanes. Stage 9 stays `IN_PROGRESS` until all
 29 fresh rotated closures are sealed against the final integrated target.
