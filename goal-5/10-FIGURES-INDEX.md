@@ -220,7 +220,17 @@ seal, and manifest checks.
 - Every Stage 10 denominator closes with zero finding and zero unresolved
   ambiguity. No Stage 10 requirement remains open.
 
+## Post-Completion Update
+
+Stage 9 subsequently closed all 29 technical packets. Stage 11 then repaired a
+one-byte Markdown-serialization defect in N12 only. A direct 29-document
+comparison proves every Stage 10-scoped target and asset unchanged, so the
+figure, caption, Index, and Colophon verdicts remain current. The normal-tree
+hash above is the historical Stage 10 completion freeze; the post-repair tree
+hash is
+`03c052c18a8d0c274d62a6fd1c8e0d57267ec9714d9be704c9ba19705e19128e`.
+
 ## Exact Next Action
 
-Continue Stage 9's fresh rotated technical closures for the eight remaining
-documents: `CH05`, `CH07`, `CH08`, `CH11`, `N04`, `N06`, `N08`, and `N12`.
+No Stage 10 action remains. Complete the fresh post-repair N12 technical
+closure and both Stage 11 saturation rounds, then proceed to Stage 12.

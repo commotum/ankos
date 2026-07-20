@@ -269,9 +269,28 @@ Neither file is a generalized workflow database.
 
 ## Current Execution State
 
-- Synced: 2026-07-18 (America/Los_Angeles).
-- Active stage: `9-TECHNICAL` (`IN_PROGRESS`), activated after clean Stage 8
-  closure through `N12`.
+- Synced: 2026-07-19 (America/Los_Angeles).
+- Active stage: `11-SATURATION` (`IN_PROGRESS`). Stage 10 remains complete.
+  Stage 9 is reopened for N12 only because Stage 11 found and repaired one
+  source-backed Markdown-serialization defect; the other 28 technical closures
+  remain bound to byte-identical documents.
+- The current repaired tree has exactly 29 canonical documents, 1,607 images,
+  4,830 guarded corrections, 29 completed second-pass coverage rows, and 1,638
+  total files. Its length-prefixed SHA-256 is
+  `03c052c18a8d0c274d62a6fd1c8e0d57267ec9714d9be704c9ba19705e19128e`.
+- N12 is 398,152 bytes, 1,857 LF, and SHA-256
+  `90d4ddcb566aae8515b0515221a10b4d7c2d96f353b429e52010cc93222bbdfa`.
+  A wholly fresh post-fix technical closure and its 76-page Round 1 saturation
+  restart are active; no pre-repair N12 verdict receives credit.
+- Stage 11 Round 1 Lane 1 is accepted at 10 documents, 430 pages, 280 detector
+  runs, and 5,271 candidates with zero finding or ambiguity. Lanes 2 and 3 are
+  active. After the last repair, a complete fresh Round 2 must still find no
+  discrepancy before Stage 11 can close.
+- `python3 goal-5/validate.py` passes. The cumulative suite passes 304 tests and
+  6,177 subtests; `git diff --check` passes.
+
+### Chronological Stage Record
+
 - Stage 1 is complete. All 78 tracked Goal 4 files, 45 ignored bytecode caches,
   and the empty `goal-4/` directory were removed by exact path. No commit
   range was reverted, and Goal 4 had corrected no book text.
@@ -280,11 +299,11 @@ Neither file is a generalized workflow database.
   `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
 - The monolith remains 3,780,628 bytes with SHA-256
   `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
-- `ref/A-New-Kind-of-Science-Repaired/` contains 29 generated author-text
-  documents, 1,444 mapped image positions, 163 source-added images, and
-  generated README/Contents files. The current manifests include 4,534 guarded
-  source-verified corrections, but this is not yet a complete OCR-corrected
-  edition.
+- At the recorded pre-Stage-9 snapshot,
+  `ref/A-New-Kind-of-Science-Repaired/` contained 29 generated author-text
+  documents, 1,444 mapped image positions, 163 source-added images, generated
+  README/Contents files, and 4,534 guarded source-verified corrections. That
+  snapshot was not yet a complete OCR-corrected edition.
 - A repository-wide scan found no code, test, or document outside Goal 4 that
   consumes a specific Goal 4 artifact, module, schema, or contract. Goal 5 has
   intentional historical cleanup references to Goal 4 and intentional repaired
