@@ -139,6 +139,46 @@ cross-packet compatibility check, not equality of those framing hashes.
   zero-correction conservation, legacy-hash preservation, and
   `git diff --check` after the final repair.
 
+## Combined Rotated-Closure Matrix
+
+`W1` is `/tmp/g5-stage9-rotated-closer-w1-20260719-a1`; `W2` is
+`/tmp/g5-stage9-rotated-closer-w2-20260719-a1`; and `W3` is
+`/tmp/g5-stage9-rotated-closer-w3-20260719-a1`. A SHA below is the SHA-256 of
+the document seal or sealed document manifest that root replayed. `0/0` means
+zero finding and zero ambiguity. Active and queued rows grant no credit.
+
+| Document | Fresh closure packet | Sealed artifact SHA-256 | Root replay | Finding/ambiguity |
+|---|---|---|---|---|
+| `PUBLICATION_AND_CONTENTS` | `W1` | `bb825f106b14e800ebb619178ed64df0b9d35fdddb836d37b5836a49cbb451a0` | PASS | 0/0 |
+| `PREFACE` | `W2/final/PREFACE` | `4ef585fbe7a7b9629aa50c54638ef4b9c24193d535e774916533a363c74a13c8` | PASS | 0/0 |
+| `CH01` | `W2/final/CH01` | `7e03ef6598df79764da8aebb4da0bff84a21e7ece9255491ae15adef14d5053c` | PASS | 0/0 |
+| `CH02` | `W2/final/CH02` | `2f99b7cd0df46e3acd99f2394d61588ade1f1e16a2b09585caada13c32af3e30` | PASS | 0/0 |
+| `CH03` | `W2/final/CH03` | `79ad5f2fa1811fd2657b9c16eaefa1f0bb566deed30cbfedb57015b86f9d2b1e` | PASS | 0/0 |
+| `CH04` | `W3` | `71dee26c9c142a8aa008b20326b3afe7099c829e7b49b05a8f50a5460066fee4` | PASS | 0/0 |
+| `CH05` | queued | — | — | — |
+| `CH06` | `W1` | `39a013bb69b73f7614caafae482edb27372b4757ed67890d2b28c3bfa8a674d0` | PASS | 0/0 |
+| `CH07` | queued | — | — | — |
+| `CH08` | queued | — | — | — |
+| `CH09` | `W1` | `39a013bb69b73f7614caafae482edb27372b4757ed67890d2b28c3bfa8a674d0` | PASS | 0/0 |
+| `CH10` | `W3` | `6d8c59dd79a97d89fd48d7cc06ee560a57071882a7a35aae71ac3cf8e81dc397` | PASS | 0/0 |
+| `CH11` | `/tmp/g5-stage9-ch11-rotated-closer-w2-20260719-a1` | active | — | — |
+| `CH12` | `W1` | `85f7a08cadfbe0dbe8c29a5f86eef7b4a1f2e2c195599c467bf64d7b156577f0` | PASS | 0/0 |
+| `GENERAL_NOTES` | `/tmp/g5-stage9-rotated-closer-w3-general-notes-20260719-a1` | `91f484f58a2888db965252d09b9dcf784456ff326d3cb790c103788b06f5cbdb` | PASS | 0/0 |
+| `N01` | `W2/final/N01` | `89071c64d3723fde0ca050e8e64247bd0962d7469b3540195277967bc4748d3e` | PASS | 0/0 |
+| `N02` | `W1` | `0932cac622e3d8774bb4e1115834e1d081c6aa45629ff49cbb0b6197b6df9b13` | PASS | 0/0 |
+| `N03` | `/tmp/g5-stage9-rotated-closer-w3-n03-20260719-a1` | `e4a7961a409a17a37bc6907b835c1101bfdf64584e63e789c3931be23420b67a` | PASS | 0/0 |
+| `N04` | `/tmp/g5-stage9-rotated-closer-w3-n04-20260719-a1` | active | — | — |
+| `N05` | `W1` | `3711d31d82a13e3807610410f27fda2f005cec77256f75c6c33d6b90b39f905d` | PASS | 0/0 |
+| `N06` | queued | — | — | — |
+| `N07` | `W1` | `f1ae8c8ec6fd437b9ced37ffb763f3e5662e2b326266778354b1b85de80dc94b` | PASS | 0/0 |
+| `N08` | queued | — | — | — |
+| `N09` | `W1` | `fccbe7c6891a6085440c1765f80b8a813ee5a4a41308fde243027181a93c0651` | PASS | 0/0 |
+| `N10` | `/tmp/g5-stage9-rotated-closer-w3-n10-20260719-b1` | `1284462b39247358c7f0be3c8573a058a4bd9b82f54238d5408894edb0bd29d8` | PASS | 0/0 |
+| `N11` | `W1` | `1b140d7caf36fcfcc257079c80bc646ab835a5cfd02502dcf16582403c2c2fe6` | PASS | 0/0 |
+| `N12` | `/tmp/g5-stage9-rotated-n12-closer-w1-20260719-a1` | active | — | — |
+| `INDEX` | `/tmp/g5-stage9-rotated-closer-w3-index-20260719-a1` | `2d2736678d8f659802d7d2ad7bb22b2dc0abe7f72a7cf33a18b427993fc0c9be` | PASS | 0/0 |
+| `COLOPHON` | `W2/final/COLOPHON` | `63e8991a2cdd4e59d7983e0d9ce3c6d7f0953e514da81b255046ef3fa64089f9` | PASS | 0/0 |
+
 ## Current Gate
 
 The target and source freezes and the integrated first pass are complete.
