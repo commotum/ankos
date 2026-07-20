@@ -290,9 +290,11 @@ Neither file is a generalized workflow database.
   required.
 - Lane 1 previously sealed 10 documents, 430 pages, 280 detector runs, and
   5,271 candidates with zero finding or ambiguity, but its global bindings now
-  require rebase to the post-N06 freeze. Lanes 2 and 3 are active. After the
-  last repair, a complete fresh Round 2 must still find no discrepancy before
-  Stage 11 can close.
+  require rebase to the post-N06 freeze. Lane 3 is current and root-accepted at
+  nine documents, 425 pages, 252 detector runs, 23,856 candidates, and 379
+  referenced assets after the required fresh N06 restart; Lane 2 remains
+  active. After the last repair, a complete fresh Round 2 must still find no
+  discrepancy before Stage 11 can close.
 - `python3 goal-5/validate.py` passes. The focused affected
   N06/N12/N09–N11 suite passes 36 tests and 3,686 subtests. The complete
   repository suite passes 304 tests and 6,179 subtests against the current

@@ -206,6 +206,16 @@ start only from the post-Stage-9 stable target.
   pages, 646 candidates, and 28 detector runs from scratch. Every lane must
   rebind unchanged-document receipts to this current freeze; N12 still requires
   both its fresh technical closure and Lane 2's complete 76-page restart.
+- Lane 3 completed the required current-freeze rebind and fresh N06 restart.
+  Its sealed packet closes all nine assigned documents, 425 pages, 252 detector
+  runs, 23,856 candidates, and 379 referenced assets, with zero remaining
+  finding or ambiguity. Root reproduced the strict verifier, then reran all 22
+  real-delta mutations and reproduced the verifier again. Manifest SHA-256 is
+  `d4fe65e02f65cf8293c28e582db12f4015c8d820052f3abc883d412fa79d6a74`;
+  seal SHA-256 is
+  `ca10a3fc9e944b9abda1f487b86c8aade16f9b56be307c484b515a2f2997acb3`;
+  ordered member-record SHA-256 is
+  `16d8960c44c4d7a973a09ac39a415a173687baa126d10524742e6ab1820d8098`.
 
 ### Credited Round Matrix
 
@@ -218,7 +228,7 @@ hashes.
 |---|---|---|---:|---:|---|---|---|
 | 1 | 1 | `/tmp/g5-stage11-round1-lane1-20260719-a1` | 10/430 | 280/5,271 | prior PASS | 0/0 | REBASE REQUIRED; zero current credit |
 | 1 | 2 | `/tmp/g5-stage11-round1-lane2-20260719-a1` | 10/425 | 280/6,353 | — | 1/0 | REBASING + N12 RESTART; zero credit |
-| 1 | 3 | `/tmp/g5-stage11-round1-lane3-20260719-a1` | 9/425 | 252/23,856 | — | 1/0 | REBASING + N06 RESTART; zero credit |
+| 1 | 3 | `/tmp/g5-stage11-round1-lane3-20260719-a1` | 9/425 | 252/23,856 | PASS | 1/0 historical; 0/0 after restart | CURRENT ACCEPTED |
 | 2 | 1 | — | 10/430 | to regenerate | — | — | NOT STARTED |
 | 2 | 2 | — | 10/425 | to regenerate | — | — | NOT STARTED |
 | 2 | 3 | — | 9/425 | to regenerate | — | — | NOT STARTED |
