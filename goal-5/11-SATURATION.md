@@ -142,6 +142,9 @@ start only from the post-Stage-9 stable target.
   overlapping existing guards and four add `G5-C-4831` through `G5-C-4834`.
   The PDF page 1195 ending “martian soil chemistry” genuinely has no printed
   period and remains source-faithful.
+- Root independently opened the original-detail source leaves for PDF pages
+  1161, 1174, 1179, 1180, 1188, 1189, and 1192 and visually reproduced all
+  eight boundary/display findings before accepting their guarded repairs.
 - The combined N12 target is 398,142 bytes, 1,843 LF, and SHA-256
   `c999ad62007b5ccc16ca17509e11863dd61b5b996250b955c06e7dede9932e8d`.
 - All pre-repair N12 receipts have `NONE_PRE_REPAIR_EVIDENCE_ONLY` credit. N12
