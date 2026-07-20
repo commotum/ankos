@@ -1,19 +1,18 @@
 # 11-SATURATION
 
-Status: IN_PROGRESS
+Status: COMPLETE
 
 ## Current Facts
 
 - The authoritative source is the 1,280-page PDF with SHA-256
   `a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6`.
 - The candidate corpus contains exactly 29 canonical Markdown documents.
-  Stage 9 reached 29 accepted rotated technical closures at entry. Round 1 has
-  since found nine N12 defects and one N06 table defect. Two apparent N06
+  Stage 9 closed all 29 rotated technical passes. Round 1 then found and
+  repaired nine N12 defects and one N06 table defect; two apparent N06
   formula/subscript findings were disproved at high resolution and rolled back.
-  Wholly fresh N06 and N12 technical closures are accepted, and N12's fresh
-  76-page saturation document restart is accepted. N06's 20-page saturation
-  restart and all three whole-lane seals remain pending; the other 27 document
-  hashes remain unchanged.
+  The affected N06 and N12 technical/document passes were restarted and
+  accepted. Round 2 subsequently repeated all three complete lanes from zero
+  review credit and found no new discrepancy or ambiguity.
 - The current deterministic zero-credit preflight is
   `/tmp/g5-stage11-round2-final-preflight-20260720-a1`. It was generated only
   after Round 1 closed and freezes 29
@@ -99,9 +98,12 @@ round to find nothing new.
 
 ## Stage Results
 
-In progress. Any detector-generator preflight remains deliberately excluded
-from completion credit. Round 1 and its document-atomic fresh reviewer receipts
-start only from the post-Stage-9 stable target.
+Complete. Round 1 found ten source-backed defects, all of which were guarded,
+rebuilt, and re-reviewed. The required post-correction Round 2 then closed all
+29 documents, all 1,280 PDF pages, 38,168 target lines, 812 detector runs,
+35,479 candidates, and 1,314 live image references with zero finding and zero
+ambiguity. Detector preflights supplied denominators only and received no
+review credit in either round.
 
 ### Entry Freeze and Round 1 Launch
 
@@ -249,6 +251,51 @@ start only from the post-Stage-9 stable target.
   next gate is a wholly fresh Round 2 whose reviewers inherit none of these
   dispositions.
 
+### Round 2 Clean Closure
+
+- Lane 1 closed at
+  `/tmp/g5-stage11-round2-lane1-fresh-20260720-a1`: 10 documents, 430
+  pages, 6,551 target lines, 5,271 candidates, 280 detector runs, and 468
+  live image references at `0/0`. Root replayed all 14 real mutations and two
+  complete strict verifiers, each regenerating 860 text extractions and 430
+  source renders. Manifest SHA-256 is
+  `958a2bf4d3d7a79b307a55f3b306f7cbec3ad91adb677e75bfec55f028ea62c5`;
+  seal SHA-256 is
+  `2b0c3b91ca334c8eb5315d12a1ffa00013062f995f4d3bd56afb705a7a7ab6f8`.
+- Lane 2 closed at
+  `/tmp/g5-stage11-round2-lane2-fresh-20260720-a1`: 10 documents, 425
+  pages, 7,336 target lines, 6,352 candidates, 280 detector runs, 467 live
+  image references, and the exact nine zero-text pages at `0/0`. Root replayed
+  all nine real mutations and two complete strict verifiers, each regenerating
+  850 text extractions and 425 source renders. The final root-resealed manifest
+  SHA-256 is
+  `8adbe6e5fc1487678ad0489be3ed6955dddb9bf434ee7add5af944951a92e5df`;
+  receipt SHA-256 is
+  `aa17cb25db783a1afc65ad723d9cb97c09b7a9cd00b5bdab1ee2f49ba3541773`;
+  seal SHA-256 is
+  `070515f320f8bbea570cd7fefc7bafbc5a93df6349426fb33e71cfbff03a9ad7`.
+- Lane 3 was copied from its completed review into the exact clean packet
+  `/tmp/g5-stage11-round2-lane3-final-20260720-b1` after root rejected
+  unmanifested scratch/cache files in the initial packet. It closes nine
+  documents, 425 pages, 24,281 target lines, 23,856 candidates, 252 detector
+  runs, 379 live image references, all 17,737 Index receipts, and all 20 N06
+  page receipts at `0/0`. All 15 real mutation/topology cases were rejected;
+  root reproduced two strict verifiers; and an independent replay regenerated
+  425 raw, layout, bbox, and 300-DPI render artifacts with zero mismatch.
+  Manifest SHA-256 is
+  `7e17e9264c5f951fb95495e38f483abad86e7ea99bd674a4d7be2b02949915d2`;
+  receipt SHA-256 is
+  `01a96ee07bfb99b1f33eb2afa3b1fd41e496fbfd4088f8c82805e9a25bf5f94c`;
+  seal SHA-256 is
+  `98978e6961ea45e93d3b69366e681734e25a82990d7eaf15799da485f45fa0a8`.
+- All three final packets have exact member inventories with no symlink,
+  hardlink, cache, work, special, missing, or unmanifested member. Their
+  aggregate is exactly 29 documents, 1,280 pages, 38,168 target lines, 812
+  detector runs, 35,479 candidates, and 1,314 live references. The stable
+  author-text corpus remains 3,622,684 bytes with concatenated SHA-256
+  `ec7f22f801d157076d33446f2fb5ee01dadaa6b18f3e89d0a123acc0000f2725`.
+  No Round 2 correction or unresolved item was created.
+
 ### Credited Round Matrix
 
 Active rows grant no credit. A lane is accepted only after all assigned pages,
@@ -261,6 +308,6 @@ hashes.
 | 1 | 1 | `/tmp/g5-stage11-round1-lane1-final-rebind-20260720-a1` | 10/430 | 280/5,271 | PASS | 0/0 | ACCEPTED |
 | 1 | 2 | `/tmp/g5-stage11-round1-lane2-final-rebind-20260720-a1` | 10/425 | 280/6,352 | PASS | 0/0 | ACCEPTED |
 | 1 | 3 | `/tmp/g5-stage11-round1-lane3-final-restart-20260720-b1` | 9/425 | 252/23,856 | PASS | 0/0 | ACCEPTED |
-| 2 | 1 | `/tmp/g5-stage11-round2-lane1-fresh-20260720-a1` | 10/430 | 280/5,271 | — | — | FRESH REVIEW ACTIVE; zero credit |
-| 2 | 2 | `/tmp/g5-stage11-round2-lane2-fresh-20260720-a1` | 10/425 | 280/6,352 | — | — | FRESH REVIEW ACTIVE; zero credit |
-| 2 | 3 | `/tmp/g5-stage11-round2-lane3-fresh-20260720-a1` | 9/425 | 252/23,856 | — | — | FRESH REVIEW ACTIVE; zero credit |
+| 2 | 1 | `/tmp/g5-stage11-round2-lane1-fresh-20260720-a1` | 10/430 | 280/5,271 | PASS | 0/0 | ACCEPTED |
+| 2 | 2 | `/tmp/g5-stage11-round2-lane2-fresh-20260720-a1` | 10/425 | 280/6,352 | PASS | 0/0 | ACCEPTED |
+| 2 | 3 | `/tmp/g5-stage11-round2-lane3-final-20260720-b1` | 9/425 | 252/23,856 | PASS | 0/0 | ACCEPTED |

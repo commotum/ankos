@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the compact Goal 5 inputs and a generated 29-document baseline."""
+"""Validate the corrected release or raw diagnostic projection."""
 
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ import build
 
 
 COVERAGE_PATH = build.GOAL_DIR / "coverage.csv"
+UNRESOLVED_PATH = build.GOAL_DIR / "unresolved.md"
 COVERAGE_FIELDS = [
     "document_id",
     "raw_start_line",
@@ -26,6 +27,9 @@ COVERAGE_FIELDS = [
     "notes",
 ]
 IMAGE_REFERENCE = re.compile(r"!\[[^\]]*\]\(([^)\s]+)\)")
+OPEN_UNRESOLVED_STATUS = re.compile(
+    r"^Status:\s*(?:OPEN|BLOCKED|UNRESOLVED)\b", re.MULTILINE
+)
 
 
 def validate_authoritative_source(data: dict[str, object]) -> Path:
@@ -150,6 +154,62 @@ def validate_coverage(
     return rows
 
 
+def validate_release_state(
+    coverage: list[dict[str, str]],
+    corrections: list[dict[str, object]],
+    images: list[dict[str, object]],
+    added_assets: list[dict[str, object]],
+    *,
+    unresolved_path: Path = UNRESOLVED_PATH,
+) -> None:
+    """Enforce the small set of records that support the release claim."""
+
+    if len(coverage) != 29:
+        raise build.BuildError(
+            f"release requires 29 coverage rows, found {len(coverage)}"
+        )
+    for row in coverage:
+        document_id = row.get("document_id", "<unknown>")
+        if row.get("first_pass") != "YES" or row.get("second_pass") != "YES":
+            raise build.BuildError(
+                f"release coverage is incomplete for {document_id}"
+            )
+        if row.get("reviewer_type") != "agent":
+            raise build.BuildError(
+                f"release coverage reviewer is not agent for {document_id}"
+            )
+
+    for record_type, rows in (
+        ("correction", corrections),
+        ("added asset", added_assets),
+    ):
+        for index, row in enumerate(rows, 1):
+            if row.get("reviewer_type") != "agent":
+                label = row.get("id", index)
+                raise build.BuildError(
+                    f"release {record_type} reviewer is not agent for {label}"
+                )
+
+    for row in images:
+        if (
+            "reference_disposition" in row
+            and row.get("reference_reviewer_type") != "agent"
+        ):
+            raise build.BuildError(
+                "release image-reference disposition reviewer is not agent for "
+                f"ordinal {row.get('ordinal', '<unknown>')}"
+            )
+
+    if not unresolved_path.is_file():
+        raise build.BuildError(f"unresolved-item register is missing: {unresolved_path}")
+    unresolved = unresolved_path.read_text(encoding="utf-8")
+    match = OPEN_UNRESOLVED_STATUS.search(unresolved)
+    if match is not None:
+        raise build.BuildError(
+            f"unresolved-item register contains release-blocking {match.group(0)}"
+        )
+
+
 def expected_output_files(
     documents: list[dict[str, object]],
     images: list[dict[str, object]],
@@ -250,7 +310,9 @@ def validate_output(
     if sorted(actual_added) != sorted(expected_added_references):
         raise build.BuildError("output source-added image references differ from manifest")
 
-    if (output / "README.md").read_bytes() != build.readme_bytes():
+    if (output / "README.md").read_bytes() != build.readme_bytes(
+        zero_corrections=zero_corrections
+    ):
         raise build.BuildError("README.md is missing or changed")
     if (output / "Contents.md").read_bytes() != build.contents_bytes(documents):
         raise build.BuildError("Contents.md is missing or changed")
@@ -276,9 +338,6 @@ def validate(
 ) -> tuple[int, int, int, int]:
     raw, documents, corrections, images = build.load_inputs()
     added_assets = build.load_added_assets(documents, images)
-    if zero_corrections:
-        corrections = []
-        added_assets = []
     facts = json.loads((build.GOAL_DIR / "legacy-facts.json").read_text(encoding="utf-8"))
     range_data = json.loads(build.RANGES_PATH.read_text(encoding="utf-8"))
     validate_authoritative_source(range_data)
@@ -290,6 +349,10 @@ def validate(
             "complete legacy tree differs from the frozen path-and-file snapshot"
         )
     coverage = validate_coverage(documents)
+    validate_release_state(coverage, corrections, images, added_assets)
+    if zero_corrections:
+        corrections = []
+        added_assets = []
     validate_output(
         output_root,
         raw,
@@ -315,8 +378,9 @@ def main() -> int:
     documents, images, corrections, reviewed = validate(
         args.output, zero_corrections=args.zero_corrections
     )
+    mode = "raw diagnostic projection" if args.zero_corrections else "corrected release"
     print(
-        f"validated baseline: documents={documents} images={images} "
+        f"validated {mode}: documents={documents} images={images} "
         f"corrections={corrections} second_pass_documents={reviewed}"
     )
     return 0

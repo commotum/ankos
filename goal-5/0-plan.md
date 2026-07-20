@@ -270,13 +270,13 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-20 (America/Los_Angeles).
-- Active stage: `11-SATURATION` (`IN_PROGRESS`). Stages 9 and 10 are complete.
-  Stage 11 found and repaired nine source-backed N12 defects and one
+- Active stage: `12-RELEASE` (`IN_PROGRESS`). Stages 9, 10, and 11 are
+  complete. Stage 11 found and repaired nine source-backed N12 defects and one
   source-backed N06 table defect. Two apparent N06 formula/subscript defects
   were disproved against fresh high-resolution source evidence and rolled
-  back. Wholly fresh N06 and N12 technical closures now pass independent root
-  mutation and pristine replays; the other 27 closures remain bound to
-  byte-identical documents.
+  back. The affected technical and document passes were restarted before the
+  required wholly fresh final saturation round closed all 29 documents and all
+  1,280 pages at zero finding and zero ambiguity.
 - The current repaired tree has exactly 29 canonical documents, 1,607 images,
   4,834 guarded corrections, 29 completed second-pass coverage rows, and 1,638
   total files. Its length-prefixed SHA-256 is
@@ -285,23 +285,20 @@ Neither file is a generalized workflow database.
   `c999ad62007b5ccc16ca17509e11863dd61b5b996250b955c06e7dede9932e8d`.
   Its wholly fresh post-fix technical closure and 76-page Round 1 document
   restart are accepted with zero mismatch or ambiguity; no pre-repair N12
-  verdict receives credit. The full Lane 2 seal still requires final rebind.
+  verdict receives credit. A separate fresh 76-page Round 2 review is also
+  accepted at `0/0`.
 - N06 is 85,452 bytes, 666 LF, and SHA-256
   `23b589b5e711b93d2e4eb85f78c36e6c39f5b418f73a72bd79697fe6575f5a93`.
-  Its prior technical seal and all pre-repair saturation receipts are void.
-  The wholly fresh replacement technical closure is accepted; the complete
-  20-page Round 1 saturation restart remains required.
-- Lane 1 is accepted against the final freeze at 10 documents, 430 pages, 280
-  detector runs, and 5,271 candidates with zero finding or ambiguity; root
-  replayed all 23 mutations and two pristine verifiers. Lane 3's earlier seal
-  remains superseded because it reviewed the now-disproved N06 grouping and
-  the pre-fix N06 table. Lane 2 is accepted at 10 documents, 425 pages, 280
-  detector runs, 6,352 candidates, and 467 assets after root replayed all 49
-  mutations and two pristine verifiers. Lane 3 is accepted after a new
-  source-first N06 review and root replay of all 35 mutations and two pristine
-  verifiers. Round 1 therefore closes all 29 documents, 1,280 pages, 812 runs,
-  and 35,479 candidates at `0/0`; a wholly fresh Round 2 must now find no
-  discrepancy.
+  Its prior technical seal and pre-repair saturation receipts remain void. The
+  wholly fresh replacement technical closure plus complete 20-page Round 1
+  and Round 2 reviews are accepted at `0/0`.
+- Round 1 closed all 29 documents, 1,280 pages, 812 runs, and 35,479
+  candidates after root replayed every final lane mutation suite and strict
+  verifier. The wholly fresh Round 2 then repeated the same complete scope
+  from zero review credit: Lane 1 closed 10/430 documents/pages and
+  280/5,271 runs/candidates; Lane 2 closed 10/425 and 280/6,352; Lane 3
+  closed 9/425 and 252/23,856. All three final packets are exact clean
+  inventories and all three report `0/0`.
 - The final zero-credit Round 1 preflight is
   `/tmp/g5-stage11-round1-final-preflight-20260720-a1`: 29 documents, 1,280
   pages, 812 detector runs, and 35,479 candidates. Its Stage 9 gate is
@@ -316,8 +313,10 @@ Neither file is a generalized workflow database.
   credit; root semantic verification and two strict replays reproduce manifest
   SHA-256
   `941ef2ef335512872de16a3d7f0b425affc8b00afc63f96e31dbbefe39553ecc`
-  and all 20 mutation rejections. Three new reviewers are independently
-  rechecking their complete page/candidate/run lanes from zero.
+  and all 20 mutation rejections. Three new reviewers completed their full
+  page/candidate/run lanes from zero. Root reproduced all final mutation and
+  verifier gates; the stable 3,622,684-byte author-text corpus hashes to
+  `ec7f22f801d157076d33446f2fb5ee01dadaa6b18f3e89d0a123acc0000f2725`.
 - `python3 goal-5/validate.py` passes. The focused affected
   N06/N12 suite passes 15 tests. The complete repository suite passes 304
   tests and 6,185 subtests against the current
@@ -845,8 +844,8 @@ Neither file is a generalized workflow database.
 | 8-NOTES-09-12 | `COMPLETE` | 2 |
 | 9-TECHNICAL | `COMPLETE` | 3–8 |
 | 10-FIGURES-INDEX | `COMPLETE` | 3–8 plus fixed-layout source evidence |
-| 11-SATURATION | `IN_PROGRESS` | 3–10 |
-| 12-RELEASE | `NOT_STARTED` | 11; zero open source ambiguity |
+| 11-SATURATION | `COMPLETE` | 3–10 |
+| 12-RELEASE | `IN_PROGRESS` | 11; zero open source ambiguity |
 
 ## Stages
 

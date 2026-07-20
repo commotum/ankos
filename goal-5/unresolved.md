@@ -8,11 +8,10 @@ resolved nine source-backed N12 serialization/layout defects and one
 source-backed N06 table defect. Two apparent N06 formula/subscript defects were
 disproved with fresh high-resolution source evidence and rolled back. Both
 documents now have accepted, wholly fresh technical closures against the
-combined repaired bytes; N12 also has an accepted fresh 76-page saturation
-document restart. Stage 11 Round 1 is now accepted across all 29 documents and
-1,280 pages with zero finding or ambiguity. Its wholly fresh final round
-remains in progress and will reopen this register if a source comparison cannot
-be resolved.
+combined repaired bytes and complete saturation restarts. Stage 11 Round 1 and
+the wholly fresh post-correction Round 2 are accepted across all 29 documents
+and 1,280 pages with zero finding and zero ambiguity. No release-blocking
+author-text item remains open.
 
 ## FOUNDATION-SOURCE-001 — complete authoritative source
 
