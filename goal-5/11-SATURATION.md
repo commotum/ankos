@@ -117,3 +117,19 @@ start only from the post-Stage-9 stable target.
   `/tmp/g5-stage11-round1-lane3-20260719-a1` (nine documents, 425 pages, 252
   detector runs, 23,856 candidates).
 - Round 1 is active. No lane receipt or finding has yet been accepted by root.
+
+### Credited Round Matrix
+
+Active rows grant no credit. A lane is accepted only after all assigned pages,
+documents, detector runs, and candidates close against one live target freeze;
+root must reproduce the strict verifier, mutation suite, seal, and member
+hashes.
+
+| Round | Lane | Fresh packet | Documents/pages | Detector runs/candidates | Root replay | Finding/ambiguity | State |
+|---|---|---|---:|---:|---|---|---|
+| 1 | 1 | `/tmp/g5-stage11-round1-lane1-20260719-a1` | 10/430 | 280/5,271 | — | — | ACTIVE; zero credit |
+| 1 | 2 | `/tmp/g5-stage11-round1-lane2-20260719-a1` | 10/425 | 280/6,354 | — | — | ACTIVE; zero credit |
+| 1 | 3 | `/tmp/g5-stage11-round1-lane3-20260719-a1` | 9/425 | 252/23,856 | — | — | ACTIVE; zero credit |
+| 2 | 1 | — | 10/430 | to regenerate | — | — | NOT STARTED |
+| 2 | 2 | — | 10/425 | to regenerate | — | — | NOT STARTED |
+| 2 | 3 | — | 9/425 | to regenerate | — | — | NOT STARTED |
