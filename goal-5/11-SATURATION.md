@@ -280,19 +280,23 @@ review credit in either round.
   documents, 425 pages, 24,281 target lines, 23,856 candidates, 252 detector
   runs, 379 live image references, all 17,737 Index receipts, and all 20 N06
   page receipts at `0/0`. All 15 real mutation/topology cases were rejected;
-  root reproduced two strict verifiers; and an independent replay regenerated
-  425 raw, layout, bbox, and 300-DPI render artifacts with zero mismatch.
+  root reproduced two strict verifiers over the complete stored raw, layout,
+  bbox, and 300-DPI evidence set.
   Manifest SHA-256 is
   `7e17e9264c5f951fb95495e38f483abad86e7ea99bd674a4d7be2b02949915d2`;
   receipt SHA-256 is
   `01a96ee07bfb99b1f33eb2afa3b1fd41e496fbfd4088f8c82805e9a25bf5f94c`;
   seal SHA-256 is
   `98978e6961ea45e93d3b69366e681734e25a82990d7eaf15799da485f45fa0a8`.
-- All three final packets have exact member inventories with no symlink,
-  hardlink, cache, work, special, missing, or unmanifested member. Their
-  aggregate is exactly 29 documents, 1,280 pages, 38,168 target lines, 812
-  detector runs, 35,479 candidates, and 1,314 live references. The stable
-  author-text corpus remains 3,622,684 bytes with concatenated SHA-256
+- All three final packets have exact intended-member inventories with no
+  unexpected symlink, hardlink, cache, work, special, missing, or extra
+  member. Lane 1 deliberately keeps two verifier-pass receipts outside its
+  1,334-member manifest in addition to its manifest/seal controls; both are
+  current and identical. Lanes 2 and 3 each have only their three declared
+  seal controls outside their manifests. The aggregate is exactly 29
+  documents, 1,280 pages, 38,168 target lines, 812 detector runs, 35,479
+  candidates, and 1,314 live references. The stable author-text corpus remains
+  3,622,684 bytes with concatenated SHA-256
   `ec7f22f801d157076d33446f2fb5ee01dadaa6b18f3e89d0a123acc0000f2725`.
   No Round 2 correction or unresolved item was created.
 

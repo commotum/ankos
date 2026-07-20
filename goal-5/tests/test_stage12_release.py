@@ -121,6 +121,19 @@ class Stage12ReleaseTests(unittest.TestCase):
         self.assertEqual(len(links), 29)
         self.assertEqual(links, [row["output_path"] for row in self.documents])
 
+    def test_published_navigation_links_resolve(self) -> None:
+        for name in ("README.md", "Contents.md"):
+            source = build.OUTPUT_ROOT / name
+            self.assertTrue(source.is_file(), name)
+            targets = re.findall(
+                r"(?<!!)\[[^]]+\]\(([^)\n]+)\)",
+                source.read_text(encoding="utf-8"),
+            )
+            self.assertTrue(targets, name)
+            for target in targets:
+                with self.subTest(source=name, target=target):
+                    self.assertTrue((source.parent / target).resolve().is_file())
+
     def test_current_release_state_passes(self) -> None:
         validate.validate_release_state(
             self.coverage,
@@ -130,6 +143,14 @@ class Stage12ReleaseTests(unittest.TestCase):
         )
 
     def test_release_state_mutations_are_rejected(self) -> None:
+        with self.assertRaisesRegex(build.BuildError, "requires 29 coverage rows"):
+            validate.validate_release_state(
+                self.coverage[:-1],
+                self.corrections,
+                self.images,
+                self.added_assets,
+            )
+
         incomplete = copy.deepcopy(self.coverage)
         incomplete[0]["second_pass"] = "NO"
         with self.assertRaisesRegex(build.BuildError, "coverage is incomplete"):

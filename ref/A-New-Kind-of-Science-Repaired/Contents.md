@@ -1,4 +1,8 @@
+<!-- GENERATED FILE — DO NOT EDIT DIRECTLY. -->
+
 # Contents
+
+*Editorial navigation generated for this Markdown edition; not author text.*
 
 - [Publication and Printed Contents](FRONT-MATTER/00-Publication-and-Contents.md)
 - [Preface](FRONT-MATTER/01-Preface.md)

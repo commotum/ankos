@@ -297,8 +297,9 @@ Neither file is a generalized workflow database.
   verifier. The wholly fresh Round 2 then repeated the same complete scope
   from zero review credit: Lane 1 closed 10/430 documents/pages and
   280/5,271 runs/candidates; Lane 2 closed 10/425 and 280/6,352; Lane 3
-  closed 9/425 and 252/23,856. All three final packets are exact clean
-  inventories and all three report `0/0`.
+  closed 9/425 and 252/23,856. All three final packets have exact intended
+  member inventories and report `0/0`; Lane 1's two current verifier-pass
+  receipts are deliberately outside its member manifest.
 - The final zero-credit Round 1 preflight is
   `/tmp/g5-stage11-round1-final-preflight-20260720-a1`: 29 documents, 1,280
   pages, 812 detector runs, and 35,479 candidates. Its Stage 9 gate is
