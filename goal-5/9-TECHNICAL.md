@@ -317,8 +317,9 @@ against the final integrated target.
   SHA-256 is
   `1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b`;
   the validator and cumulative tests reproduce the immutable raw projection.
-- `goal-5/coverage.csv` contains exactly 29 `YES/YES` rows and has SHA-256
-  `736356b71d414ff3ce09e308f56b2291809052aeba03f26e754f63070046ef34`.
+- `goal-5/coverage.csv` contains exactly 29 `YES/YES` rows. After recording the
+  accepted N06/N12 Round 1 restarts it has SHA-256
+  `3157e4a88f424796edf3d4cd5f909b1d7f7d335e230f872445db7361051ecee6`.
   The protected 1,463-file legacy tree retains SHA-256
   `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
 - `.venv/bin/pytest -q` passes 304 tests and 6,185 subtests against the combined

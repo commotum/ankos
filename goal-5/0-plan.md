@@ -297,8 +297,10 @@ Neither file is a generalized workflow database.
   remains superseded because it reviewed the now-disproved N06 grouping and
   the pre-fix N06 table. Lane 2 is accepted at 10 documents, 425 pages, 280
   detector runs, 6,352 candidates, and 467 assets after root replayed all 49
-  mutations and two pristine verifiers. Lane 3 must still bind to the
-  post-Stage-9 freeze, after which a wholly fresh Round 2 must find no
+  mutations and two pristine verifiers. Lane 3 is accepted after a new
+  source-first N06 review and root replay of all 35 mutations and two pristine
+  verifiers. Round 1 therefore closes all 29 documents, 1,280 pages, 812 runs,
+  and 35,479 candidates at `0/0`; a wholly fresh Round 2 must now find no
   discrepancy.
 - The final zero-credit Round 1 preflight is
   `/tmp/g5-stage11-round1-final-preflight-20260720-a1`: 29 documents, 1,280

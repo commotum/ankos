@@ -232,6 +232,21 @@ start only from the post-Stage-9 stable target.
   `436d87633f27fca65921eb8846556eadd2ff9070a4a5a2cb8e39342c4a9f593d`;
   seal SHA-256 is
   `eb801bc2e030dba620db96ecf8e0cf326332e4b3cae12ce76e5d6a58b749e990`.
+- Lane 3 performed a new source-first N06 review from empty verdict-bearing
+  directories, covering all 20 pages, 646 N06 candidates, 28 runs, and 42
+  assets. It then combined that work with exact context/byte proofs for the
+  other eight documents' 405 firsthand pages at
+  `/tmp/g5-stage11-round1-lane3-final-restart-20260720-b1`. Root replayed all
+  35 resealed mutations and two pristine verifiers over 9 documents, 425
+  pages, 23,856 candidates, 252 runs, and 379 assets at `0/0`. Manifest
+  SHA-256 is
+  `957ff78c8dbbacac807ca437f6bff056e998b56651dcdc7cca9bd94c3b00ae0e`;
+  seal SHA-256 is
+  `7f6353dfe87af1b6fc5a2c0e9af7985a747c072bec8ec6c3860a6e98ddd9183f`.
+- Round 1 is accepted across all 29 documents, 1,280 pages, 812 detector runs,
+  and 35,479 candidates with zero finding and zero ambiguity. The required
+  next gate is a wholly fresh Round 2 whose reviewers inherit none of these
+  dispositions.
 
 ### Credited Round Matrix
 
@@ -244,7 +259,7 @@ hashes.
 |---|---|---|---:|---:|---|---|---|
 | 1 | 1 | `/tmp/g5-stage11-round1-lane1-final-rebind-20260720-a1` | 10/430 | 280/5,271 | PASS | 0/0 | ACCEPTED |
 | 1 | 2 | `/tmp/g5-stage11-round1-lane2-final-rebind-20260720-a1` | 10/425 | 280/6,352 | PASS | 0/0 | ACCEPTED |
-| 1 | 3 | prior packet superseded; replacement technical packet PASS | 9/425 | 252/23,856 | N06 technical PASS | 1 real + 2 disproved historical | FULL N06 SATURATION RESTART REQUIRED; zero lane credit |
+| 1 | 3 | `/tmp/g5-stage11-round1-lane3-final-restart-20260720-b1` | 9/425 | 252/23,856 | PASS | 0/0 | ACCEPTED |
 | 2 | 1 | — | 10/430 | to regenerate | — | — | NOT STARTED |
 | 2 | 2 | — | 10/425 | to regenerate | — | — | NOT STARTED |
 | 2 | 3 | — | 9/425 | to regenerate | — | — | NOT STARTED |

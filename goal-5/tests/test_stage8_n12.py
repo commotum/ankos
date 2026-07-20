@@ -185,7 +185,7 @@ EXPECTED_FULL_LEDGER_SHA256 = {
     "image-map.jsonl": "e2fac1db19000e4bd4e634ac7dd1ea0920d3c7c9f105e2503904cc024bfe0681",
     "added-assets.jsonl": "d647fa8d948b155720ca3f8c909429654f30398fbf566e0b0fb6cca779e621ae",
     "source-ranges.json": "36dacbddcbb0157f604aafeca93e6e189bd16c6b52ac6409d6d83681a41de498",
-    "coverage.csv": "736356b71d414ff3ce09e308f56b2291809052aeba03f26e754f63070046ef34",
+    "coverage.csv": "3157e4a88f424796edf3d4cd5f909b1d7f7d335e230f872445db7361051ecee6",
 }
 
 
