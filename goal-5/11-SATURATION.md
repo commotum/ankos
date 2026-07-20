@@ -117,7 +117,8 @@ start only from the post-Stage-9 stable target.
   `/tmp/g5-stage11-round1-lane3-20260719-a1` (nine documents, 425 pages, 252
   detector runs, 23,856 candidates).
 - Round 1 is active. Root accepted one source-backed finding, repaired it, and
-  invalidated every pre-repair N12 verdict; no lane is yet sealed.
+  invalidated every pre-repair N12 verdict. Lane 1 is sealed; Lanes 2 and 3
+  remain active.
 
 ### Round 1 Finding and Post-Repair Freeze
 
@@ -147,6 +148,15 @@ start only from the post-Stage-9 stable target.
   against the new packet. Unchanged-document reviewers may retain firsthand
   page work only after proving their assigned document hashes are identical and
   regenerating every corpus-bound receipt against the new freeze.
+- Lane 1 independently proved all ten assigned document hashes, byte counts,
+  and LF counts unchanged, regenerated all receipts against the post-repair
+  freeze, and closed 430 pages, 280 detector runs, and 5,271 candidates with
+  zero findings or ambiguities. Its 18 resealed real-delta mutations are all
+  rejected. Root replayed the final strict verifier twice and reproduced
+  manifest SHA-256
+  `959938268f5438e3349d7df2e7ba18b54c2c67e335eb585a92b4b9c0ae0d49c1`
+  and seal SHA-256
+  `211270e1b4c835e71f96a602604dbbb1ed0ab8d4f500d15315b733d942d02031`.
 
 ### Credited Round Matrix
 
@@ -157,7 +167,7 @@ hashes.
 
 | Round | Lane | Fresh packet | Documents/pages | Detector runs/candidates | Root replay | Finding/ambiguity | State |
 |---|---|---|---:|---:|---|---|---|
-| 1 | 1 | `/tmp/g5-stage11-round1-lane1-20260719-a1` | 10/430 | 280/5,271 | — | 0/0 so far | REBASING; zero credit |
+| 1 | 1 | `/tmp/g5-stage11-round1-lane1-20260719-a1` | 10/430 | 280/5,271 | PASS | 0/0 | ACCEPTED |
 | 1 | 2 | `/tmp/g5-stage11-round1-lane2-20260719-a1` | 10/425 | 280/6,353 | — | 1/0 | N12 RESTART; zero credit |
 | 1 | 3 | `/tmp/g5-stage11-round1-lane3-20260719-a1` | 9/425 | 252/23,856 | — | 0/0 so far | REBASING; zero credit |
 | 2 | 1 | — | 10/430 | to regenerate | — | — | NOT STARTED |
