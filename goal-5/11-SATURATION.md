@@ -10,14 +10,20 @@ Status: IN_PROGRESS
   Stage 9 is complete: every document has a fresh rotated technical closure,
   all 29 root replays pass with zero finding or ambiguity, and the stable
   target is now eligible for Stage 11 review credit.
-- A read-only, no-credit preflight over the current candidate found zero
-  invalid UTF-8, non-NFC document, missing final LF, CR byte, tab, mojibake
-  marker, unbalanced fence, unusual control/format/private code point, or
-  broken image reference. It counted 1,314 live image references.
-- The same preflight found nine repeated-word candidates and 26 lines with
-  trailing whitespace. These are candidates, not defects or clean verdicts;
-  every occurrence must receive a fresh source-backed or serialization-backed
-  disposition in this stage.
+- A deterministic read-only preflight was regenerated after Stage 9 closed at
+  `/tmp/g5-stage11-preflight-generator-w1-20260719-a1`. It freezes 29
+  documents, all 1,280 source pages, 28 detector families, 812 document-detector
+  runs, and 35,481 occurrence/inventory candidates. Its 16-member manifest
+  SHA-256 is
+  `840d992d7d8eb1ca180437391b8a9462ed89c5984bb11a13f609f1f4c3633826`;
+  root reproduced the strict replay, including all 15 real-delta mutation
+  rejections. Every one of its 37,605 work rows remains `UNREVIEWED` with
+  `NONE` review credit.
+- The preflight includes nine repeated-word candidates, 26 trailing-whitespace
+  lines, 1,314 live image references, and explicit zero-hit detector runs.
+  These are candidates and denominators, never defects or inherited clean
+  verdicts; every row must receive a fresh source-backed or
+  serialization-backed disposition in each credited round.
 - Stage 10 is complete: its Index, Colophon, and reopened figure work is
   integrated; the final visual and `INDEX` technical closures are sealed; all
   29 coverage rows are `YES/YES`; and the cumulative checks pass.
