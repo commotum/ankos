@@ -2,10 +2,12 @@
 
 There is no open Foundation source blocker or author-text ambiguity. Content
 review discrepancies are added here only when source comparison cannot resolve
-them; all 29 canonical documents completed the Stage 9 technical and Stage 10
-figure/Index closures without an unresolved item. Stage 11 saturation is in
-progress and will reopen this register if a fresh source comparison cannot be
-resolved.
+them. All 29 canonical documents reached Stage 9 technical closure, and Stage
+10 figure/Index closure remains complete. Stage 11 subsequently found and
+resolved one source-backed N12 serialization defect; that document's technical
+closure and saturation review are being repeated against the repaired bytes.
+Stage 11 remains in progress and will reopen this register if a fresh source
+comparison cannot be resolved.
 
 ## FOUNDATION-SOURCE-001 — complete authoritative source
 
