@@ -269,35 +269,35 @@ Neither file is a generalized workflow database.
 
 ## Current Execution State
 
-- Synced: 2026-07-19 (America/Los_Angeles).
+- Synced: 2026-07-20 (America/Los_Angeles).
 - Active stage: `11-SATURATION` (`IN_PROGRESS`). Stage 10 remains complete.
-  Stage 9 is reopened for N06 and N12 because Stage 11 found and repaired two
-  source-backed defects, one in each document. A second apparent N06 defect was
-  disproved against a fresh 600-DPI source crop and rolled back; the other 27
-  technical closures remain bound to byte-identical documents.
+  Stage 9 is reopened for N06 and N12 because Stage 11 found and repaired nine
+  source-backed N12 defects and one source-backed N06 table defect. Two
+  apparent N06 formula/subscript defects were disproved against fresh 600-DPI
+  and 1,200-DPI source evidence and rolled back; the other 27 technical
+  closures remain bound to byte-identical documents.
 - The current repaired tree has exactly 29 canonical documents, 1,607 images,
-  4,830 guarded corrections, 29 completed second-pass coverage rows, and 1,638
+  4,834 guarded corrections, 29 completed second-pass coverage rows, and 1,638
   total files. Its length-prefixed SHA-256 is
-  `904bab4188661c228690b8fb6fe9ff95c1765512c7fad78b9eb467e53ccbf8ac`.
-- N12 is 398,152 bytes, 1,857 LF, and SHA-256
-  `90d4ddcb566aae8515b0515221a10b4d7c2d96f353b429e52010cc93222bbdfa`.
+  `a682973172db962f41e407f399090a7a0245a47163c550cdf35268054e331216`.
+- N12 is 398,142 bytes, 1,843 LF, and SHA-256
+  `c999ad62007b5ccc16ca17509e11863dd61b5b996250b955c06e7dede9932e8d`.
   A wholly fresh post-fix technical closure and its 76-page Round 1 saturation
   restart are active; no pre-repair N12 verdict receives credit.
-- N06 is 85,467 bytes, 666 LF, and SHA-256
-  `46e2cbc14314b6bb975632189b514eafa23341335cabb9c01cd9981f4a58cba7`.
+- N06 is 85,452 bytes, 666 LF, and SHA-256
+  `23b589b5e711b93d2e4eb85f78c36e6c39f5b418f73a72bd79697fe6575f5a93`.
   Its prior technical seal and all pre-repair saturation receipts are void; a
   wholly fresh technical closure and complete 20-page Round 1 restart are
   required.
 - Lane 1 previously sealed 10 documents, 430 pages, 280 detector runs, and
   5,271 candidates with zero finding or ambiguity, but its global bindings now
-  require rebase to the post-N06 freeze. Lane 3 is current and root-accepted at
-  nine documents, 425 pages, 252 detector runs, 23,856 candidates, and 379
-  referenced assets after the required fresh N06 restart; Lane 2 remains
-  active. After the last repair, a complete fresh Round 2 must still find no
-  discrepancy before Stage 11 can close.
+  require rebase. Lane 3's earlier accepted seal is also superseded because it
+  reviewed the now-disproved N06 grouping and the pre-fix N06 table. Lane 2's
+  fresh N12 restart is active. All three lanes must bind to the combined freeze,
+  after which a wholly fresh Round 2 must find no discrepancy.
 - `python3 goal-5/validate.py` passes. The focused affected
-  N06/N12/N09–N11 suite passes 36 tests and 3,686 subtests. The complete
-  repository suite passes 304 tests and 6,179 subtests against the current
+  N06/N12 suite passes 15 tests. The complete repository suite passes 304
+  tests and 6,185 subtests against the current
   source-faithful freeze.
 
 ### Chronological Stage Record

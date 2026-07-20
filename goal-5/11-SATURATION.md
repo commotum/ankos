@@ -8,18 +8,18 @@ Status: IN_PROGRESS
   `a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6`.
 - The candidate corpus contains exactly 29 canonical Markdown documents.
   Stage 9 reached 29 accepted rotated technical closures at entry. Round 1 has
-  since found one N12 defect and one N06 defect. A second apparent N06 finding
-  was disproved at 600 DPI and its temporary repair was rolled back. Both
-  documents' technical and saturation closures are reopened; the other 27
-  document hashes are unchanged.
+  since found nine N12 defects and one N06 table defect. Two apparent N06
+  formula/subscript findings were disproved at high resolution and rolled back.
+  Both documents' technical and saturation closures are reopened; the other 27
+  document hashes remain unchanged.
 - The current deterministic zero-credit preflight is
-  `/tmp/g5-stage11-n06-sourcefaithful-preflight-20260719-a1`. It freezes 29
+  `/tmp/g5-stage11-combined-final-preflight-20260720-a1`. It freezes 29
   documents, all 1,280 source pages, 28 detector families, 812
-  document-detector runs, and 35,480 occurrence/inventory candidates. Its
-  16-member manifest SHA-256 is
-  `2267f543993c19279dc81e4dff52e598964673c6b1706e66069fafeb82f9e505`;
+  document-detector runs, and 35,479 occurrence/inventory candidates. Its
+  15-member manifest SHA-256 is
+  `05c2c8e1fd4ed03ef42ceea0b7cc1d64a74d83f1c628346268179ae3ef14ea59`;
   root reproduced the strict replay, including all 15 real-delta mutation
-  rejections. Every one of its 37,604 work rows remains `UNREVIEWED` with
+  rejections. Every one of its 37,603 work rows remains `UNREVIEWED` with
   `NONE` review credit.
 - The preflight includes nine repeated-word candidates, 26 trailing-whitespace
   lines, 1,314 live image references, and explicit zero-hit detector runs.
@@ -118,11 +118,11 @@ start only from the post-Stage-9 stable target.
   detector runs, 6,354 candidates); and Lane 3 at
   `/tmp/g5-stage11-round1-lane3-20260719-a1` (nine documents, 425 pages, 252
   detector runs, 23,856 candidates).
-- Round 1 is active. Root accepted two source-backed defects and repaired them:
-  one in N12 and one in N06. A third apparent N06 finding was disproved at
-  600 DPI and rolled back. Every pre-repair N12 and N06 verdict is invalid, and
-  all lane seals must bind to the latest post-N06 freeze before receiving
-  current credit.
+- Round 1 is active. Root accepted ten source-backed defects and repaired them:
+  nine in N12 and one in N06. Two apparent N06 findings were disproved with
+  fresh high-resolution source evidence and rolled back. Every pre-repair N12
+  and N06 verdict is invalid, and all lane seals must bind to the combined
+  repair freeze before receiving current credit.
 
 ### Round 1 Finding and Post-Repair Freeze
 
@@ -132,26 +132,23 @@ start only from the post-Stage-9 stable target.
   a literal backslash before the opening inline-code delimiter.
 - Root opened the 216-DPI source page at original detail and reproduced the
   finding. Guard `G5-C-4600` now consumes raw preimage `\$IterationLimit` at
-  byte 3,000,685 and emits `` `$IterationLimit` ``. The rebuilt N12 target is
-  398,152 bytes, 1,857 LF, and SHA-256
-  `90d4ddcb566aae8515b0515221a10b4d7c2d96f353b429e52010cc93222bbdfa`.
-  The focused N12 suite passes nine tests and 1,400 subtests.
-- A direct comparison of all 29 old and new target records proves N12 is the
-  only changed document. The repaired 1,638-file tree has length-prefixed
-  SHA-256
-  `03c052c18a8d0c274d62a6fd1c8e0d57267ec9714d9be704c9ba19705e19128e`.
-- The zero-credit detector packet was regenerated at
-  `/tmp/g5-stage11-postfix-preflight-20260719-a1`. It has 35,480 candidates
-  (Lane 1: 5,271; Lane 2: 6,353; Lane 3: 23,856), all 812 detector runs, and
-  manifest SHA-256
-  `dc964d2e5daafc6285e5ce9153c9d359fbee882f541ff19b5ea77f8824911677`;
-  strict replay and all 15 mutations pass. Its target-corpus SHA-256 is
-  `206efb8c5c8b608150937ad60fa5b609776b325fd6b69d111e1d0f58ce6279c4`.
+  byte 3,000,685 and emits `` `$IterationLimit` ``.
+- The complete pre-repair N12 restart then reviewed all 76 PDF pages, all 1,857
+  target lines, 2,470 N12 candidates across 28 runs, all 53 assets, and every
+  one of 83 high-risk blank boundaries. It found eight additional defects:
+  six source-continuous prose joins (`L2-N12-002` through `005`, `007`, and
+  `008`), one tight-list boundary (`006`), and the false blank inside the
+  two-line `Apply[Times, Map[…]]` display (`009`). Four findings extend
+  overlapping existing guards and four add `G5-C-4831` through `G5-C-4834`.
+  The PDF page 1195 ending “martian soil chemistry” genuinely has no printed
+  period and remains source-faithful.
+- The combined N12 target is 398,142 bytes, 1,843 LF, and SHA-256
+  `c999ad62007b5ccc16ca17509e11863dd61b5b996250b955c06e7dede9932e8d`.
 - All pre-repair N12 receipts have `NONE_PRE_REPAIR_EVIDENCE_ONLY` credit. N12
-  must receive a fresh technical closure and a complete 76-page Round 1 restart
-  against the new packet. Unchanged-document reviewers may retain firsthand
-  page work only after proving their assigned document hashes are identical and
-  regenerating every corpus-bound receipt against the new freeze.
+  is receiving a wholly fresh technical closure and complete 76-page Round 1
+  restart against the combined bytes. Unchanged-document reviewers may retain
+  firsthand page work only after proving assigned document identities and
+  regenerating every corpus-bound receipt against the final Stage 11 packet.
 - Lane 1 independently proved all ten assigned document hashes, byte counts,
   and LF counts unchanged, regenerated all receipts against the post-repair
   freeze, and closed 430 pages, 280 detector runs, and 5,271 candidates with
@@ -162,60 +159,46 @@ start only from the post-Stage-9 stable target.
   and seal SHA-256
   `211270e1b4c835e71f96a602604dbbb1ed0ab8d4f500d15315b733d942d02031`.
   This is a valid historical seal against the N12-only repair freeze, but the
-  later N06 repair requires the same reviewer to prove all ten Lane 1 document
-  identities and regenerate its global bindings before current acceptance.
+  later combined repairs require the same reviewer to prove all ten Lane 1
+  document identities and regenerate its global bindings before acceptance.
 
-### N06 Findings and Current Freeze
+### N06 Findings and Combined Freeze
 
-- Lane 3 independently found `S11-PF-00009000` on PDF page 969 (printed 953).
-  The target serialized
-  `1/2 (1 - (1 - 2 p))^(2^DigitCount[t, 2, 1])`; the printed exponent instead
-  applies to the inner `(1 - 2 p)` term, inside the outer subtraction.
-- The same pass initially reported `S11-PF-00008972` on PDF page 976 (printed
-  960), interpreting plain `$h \le 2r h_t$` as a lost `_x` subscript. Root's
-  first 240-DPI reading agreed and briefly added `G5-C-4831`. The mandatory
-  restarted N06 pass challenged that decision: a fresh 600-DPI crop clearly
-  prints plain `h`, and the independent text layer agrees. Root removed the
-  temporary guard. This is a source-faithful printed oddity, not a final defect.
-- `G5-C-1292` now emits the correct grouping. N06 remains 85,467 bytes and 666
-  LF but changes SHA-256 to
-  `46e2cbc14314b6bb975632189b514eafa23341335cabb9c01cd9981f4a58cba7`.
-  Regression pins require the corrected rule-90 formula and forbid the
-  source-unprinted `_x` subscript.
-- A direct comparison of all 29 target records proves N06 is the only document
-  changed by this repair. N12 remains 398,152 bytes at SHA-256
-  `90d4ddcb566aae8515b0515221a10b4d7c2d96f353b429e52010cc93222bbdfa`.
-  The current 1,638-file tree has length-prefixed SHA-256
-  `904bab4188661c228690b8fb6fe9ff95c1765512c7fad78b9eb467e53ccbf8ac`;
-  the correction ledger contains 4,830 rows and has SHA-256
-  `e47d2d5396c0149d99a4220560b54be0f29a58de32761e26d7b337c47b671f20`.
-- The current zero-credit packet at
-  `/tmp/g5-stage11-n06-sourcefaithful-preflight-20260719-a1` has manifest
-  SHA-256
-  `2267f543993c19279dc81e4dff52e598964673c6b1706e66069fafeb82f9e505`,
-  target-corpus SHA-256
-  `cf10c212f4d20f6e0e66858662cb3888d4d0836e91ee5bcc7c6b2a05e275da9e`,
-  and target-record SHA-256
-  `3c8da49f506452601524eed8350ee8a7a441a29da7e6bfa03c480a5cb7fbc022`.
-  Strict replay and all 15 mutations pass.
-- Current validation passes at 29 documents, 1,607 images, 4,830 guarded
-  corrections, and 29 second-pass coverage rows. The focused affected suite
-  passes 36 tests and 3,686 subtests; the complete repository suite passes 304
-  tests and 6,179 subtests.
-- All pre-repair N06 receipts have zero credit. Lane 3 must repeat all 20 N06
-  pages, 646 candidates, and 28 detector runs from scratch. Every lane must
-  rebind unchanged-document receipts to this current freeze; N12 still requires
-  both its fresh technical closure and Lane 2's complete 76-page restart.
-- Lane 3 completed the required current-freeze rebind and fresh N06 restart.
-  Its sealed packet closes all nine assigned documents, 425 pages, 252 detector
-  runs, 23,856 candidates, and 379 referenced assets, with zero remaining
-  finding or ambiguity. Root reproduced the strict verifier, then reran all 22
-  real-delta mutations and reproduced the verifier again. Manifest SHA-256 is
-  `d4fe65e02f65cf8293c28e582db12f4015c8d820052f3abc883d412fa79d6a74`;
-  seal SHA-256 is
-  `ca10a3fc9e944b9abda1f487b86c8aade16f9b56be307c484b515a2f2997acb3`;
-  ordered member-record SHA-256 is
-  `16d8960c44c4d7a973a09ac39a415a173687baa126d10524742e6ab1820d8098`.
+- Lane 3 initially treated the PDF page 969 formula as having an inner
+  exponent and root integrated that interpretation. The mandatory fresh N06
+  source-first restart disproved it: a 600-DPI crop and independent text layer
+  both show two closing parentheses before the exponent. `G5-C-1292` was
+  restored to the source-printed outer grouping
+  `1/2 (1 - (1 - 2 p))^(2^DigitCount[t, 2, 1])`.
+- The same restart confirmed that PDF page 976 prints plain
+  `$h \le 2r h_t$`, not an invented `$h_x` form. These two apparent findings
+  are explicitly regression-pinned source oddities and do not count among the
+  ten accepted discrepancies.
+- Fresh 1,200-DPI review of PDF page 967 found one real N06 defect: the target
+  period-ratio table had invented an `n = 31` / `ratio = 1` column. The source
+  has exactly ten entries (`11, 13, 19, 25, 27, 29, 37, 41, 43, 53`).
+  `G5-C-1262` now reproduces that table exactly.
+- N06 is 85,452 bytes, 666 LF, and SHA-256
+  `23b589b5e711b93d2e4eb85f78c36e6c39f5b418f73a72bd79697fe6575f5a93`.
+  Its previous Lane 3 seal is invalid because it accepted the wrong formula
+  grouping and pre-fix table; a full fresh 20-page restart is required.
+- The combined 1,638-file tree has length-prefixed SHA-256
+  `a682973172db962f41e407f399090a7a0245a47163c550cdf35268054e331216`.
+  The correction ledger contains 4,834 rows and has SHA-256
+  `0206a1f4e109293ef348d7435b075eb1a9a18a80523dcbde0cc11d25e23bb509`.
+  Validation passes, and the complete suite passes 304 tests and 6,185
+  subtests.
+- The zero-credit preparation packet at
+  `/tmp/g5-stage11-combined-final-preflight-20260720-a1` covers 29 documents,
+  1,280 pages, 812 detector runs, and 35,479 candidates (Lane 1: 5,271; Lane 2:
+  6,352; Lane 3: 23,856). Its manifest SHA-256 is
+  `05c2c8e1fd4ed03ef42ceea0b7cc1d64a74d83f1c628346268179ae3ef14ea59`,
+  target-corpus SHA-256 is
+  `3f8a39b721b6f407201bf3ea442cc716ec843094a6ea2adec2630344f425c98e`,
+  and target-record SHA-256 is
+  `974aca4828f9c58bad009bead3b13e05402001706be2d7c615a1342fc8408cc1`.
+  Semantic replay and all 15 real-delta verifier mutations pass. It remains
+  preparation-only and must be regenerated after Stage 9 closes.
 
 ### Credited Round Matrix
 
@@ -226,9 +209,9 @@ hashes.
 
 | Round | Lane | Fresh packet | Documents/pages | Detector runs/candidates | Root replay | Finding/ambiguity | State |
 |---|---|---|---:|---:|---|---|---|
-| 1 | 1 | `/tmp/g5-stage11-round1-lane1-20260719-a1` | 10/430 | 280/5,271 | prior PASS | 0/0 | REBASE REQUIRED; zero current credit |
-| 1 | 2 | `/tmp/g5-stage11-round1-lane2-20260719-a1` | 10/425 | 280/6,353 | — | 1/0 | REBASING + N12 RESTART; zero credit |
-| 1 | 3 | `/tmp/g5-stage11-round1-lane3-20260719-a1` | 9/425 | 252/23,856 | PASS | 1/0 historical; 0/0 after restart | CURRENT ACCEPTED |
+| 1 | 1 | `/tmp/g5-stage11-round1-lane1-20260719-a1` | 10/430 | 280/5,271 | prior PASS | 0/0 | FINAL REBASE REQUIRED; zero current credit |
+| 1 | 2 | fresh combined-freeze restart active | 10/425 | 280/6,352 | — | 9/0 historical | N12 RESTART ACTIVE; zero current credit |
+| 1 | 3 | prior packet superseded | 9/425 | 252/23,856 | prior PASS | 1 real + 2 disproved historical | FULL N06 RESTART REQUIRED; zero current credit |
 | 2 | 1 | — | 10/430 | to regenerate | — | — | NOT STARTED |
 | 2 | 2 | — | 10/425 | to regenerate | — | — | NOT STARTED |
 | 2 | 3 | — | 9/425 | to regenerate | — | — | NOT STARTED |

@@ -189,36 +189,37 @@ opening delimiter. Root visually replayed the fixed-layout source, repaired the
 guard from raw preimage `\$IterationLimit` at byte 3,000,685 to
 `` `$IterationLimit` ``, rebuilt, and added a focused regression assertion.
 
-The N12 target changed from 398,153 bytes and SHA-256
-`c1899d24b3db987f291f9906ade3e8d1d4b10823ee1f5385d26b665d9fd62ea4`
-to 398,152 bytes and SHA-256
-`90d4ddcb566aae8515b0515221a10b4d7c2d96f353b429e52010cc93222bbdfa`.
-An independent 29-row comparison proves N12 is the only changed canonical
-document. Its prior 839-member seal is no longer current and grants no credit;
-the other 28 accepted document seals remain bound to unchanged target bytes.
-Stage 9 initially stayed reopened for a wholly fresh post-fix N12 technical
-closure. A later Round 1 reviewer then found one additional source-backed N06
-technical defect on PDF page 969 (printed 953): correction `G5-C-1292` placed
-`2^DigitCount[t, 2, 1]` outside the wrong parenthesized factor. The printed
-formula is `1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))`.
+The complete pre-repair N12 saturation sweep then found eight more defects:
+six false paragraph/list boundaries on PDF pages 1161, 1174, 1179–1180, 1180,
+1188, and 1188–1189; one false blank inside a tight list on PDF page 1192; and
+one false blank inside the two-line `Apply[Times, Map[…]]` display on PDF page
+1188. Four findings extend existing overlapping guards (`G5-C-3797`,
+`G5-C-4422`, `G5-C-4715`, and `G5-C-4762`), while four are new guarded rows
+`G5-C-4831` through `G5-C-4834`. N12 now has 1,226 document-local corrections
+and renders as 398,142 bytes, 1,843 LF, SHA-256
+`c999ad62007b5ccc16ca17509e11863dd61b5b996250b955c06e7dede9932e8d`.
+Its prior technical seal and every pre-repair saturation receipt grant zero
+current credit.
 
-The same review initially suspected that the plain `h` in `$h \le 2r h_t$` on
-PDF page 976 should have an `_x` subscript. Root's first 240-DPI reading agreed
-and briefly added a guard, but the mandatory restarted pass challenged it. A
-fresh 600-DPI crop and independent text extraction clearly show that the book
-prints plain `h`. The temporary guard was removed, and the source-faithful oddity
-is now regression-protected; it is not a final finding or correction.
+The N06 restart corrected two earlier source readings. Fresh 600-DPI evidence
+shows that PDF page 969 prints
+`1/2 (1 - (1 - 2 p))^(2^DigitCount[t, 2, 1])`: the exponent applies to the
+complete outer factor, so the attempted inner-factor rewrite was rolled back.
+Fresh PDF page 976 evidence likewise confirms the book's plain
+`$h \le 2r h_t$`; no `_x` may be invented. A 1,200-DPI source crop of PDF page
+967 did expose one real target defect: the period-ratio table has exactly ten
+columns, with no `n = 31` / `ratio = 1` entry. `G5-C-1262` now reproduces that
+ten-column table. N06 renders as 85,452 bytes, 666 LF, SHA-256
+`23b589b5e711b93d2e4eb85f78c36e6c39f5b418f73a72bd79697fe6575f5a93`.
 
-Root repaired `G5-C-1292`. N06 remains 85,467 bytes but changes SHA-256 from
-`54bf7356136644c5040ffcc7945b49faab73a2bf5f2758dc51ff91b49e1eb437`
-to `46e2cbc14314b6bb975632189b514eafa23341335cabb9c01cd9981f4a58cba7`.
-The final source-faithful post-N06 tree has length-prefixed SHA-256
-`904bab4188661c228690b8fb6fe9ff95c1765512c7fad78b9eb467e53ccbf8ac`.
-A direct old/new 29-row comparison proves N06 is the only target changed by
-this repair; N12 remains byte-identical at its repaired hash. Both prior N06
-and N12 technical seals now grant no current credit. Stage 9 stays reopened
-until wholly fresh post-fix technical closures and root replays pass for both
-documents.
+The combined tree contains 4,834 corrections and has length-prefixed SHA-256
+`a682973172db962f41e407f399090a7a0245a47163c550cdf35268054e331216`.
+The correction ledger SHA-256 is
+`0206a1f4e109293ef348d7435b075eb1a9a18a80523dcbde0cc11d25e23bb509`.
+Both prior N06 and N12 technical seals grant no current credit. Stage 9 stays
+reopened until wholly fresh post-fix technical closures and independent root
+replays pass for both documents; the other 27 accepted document seals remain
+bound to byte-identical targets.
 
 ## Current Gate
 
@@ -293,7 +294,7 @@ against the final integrated target.
   canonical rows with a sealed artifact, root PASS, and `0/0`. N06 and N12 are
   now superseded; 27 rows remain current and two fresh closures are required.
 - `python3 goal-5/build.py` builds exactly 29 documents, 1,607 images, and
-  4,830 guarded corrections. `python3 goal-5/validate.py` validates those
+  4,834 guarded corrections. `python3 goal-5/validate.py` validates those
   counts and all 29 second-pass coverage rows.
 - Fresh builds at `/tmp/g5-stage9-final-build-a-20260719` and
   `/tmp/g5-stage9-final-build-b-20260719` are byte-identical to each other and
@@ -311,6 +312,6 @@ against the final integrated target.
   `4cf6b456c41bf0268769e44c4588843d6f4fcf5a93dedf4d6d693bc95492dd88`.
   The protected 1,463-file legacy tree retains SHA-256
   `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
-- `uv run pytest -q` passed 304 tests and 6,177 subtests in 68.48 seconds at
-  that pre-repair freeze. The Stage 11 repairs now leave two open Stage 9
-  requirements: fresh post-fix N06 and N12 technical closures.
+- `.venv/bin/pytest -q` passes 304 tests and 6,185 subtests against the combined
+  repair freeze. The Stage 11 repairs leave two open Stage 9 requirements:
+  fresh post-fix N06 and N12 technical closures.
