@@ -65,7 +65,7 @@ EXPECTED_PDF_SHA256 = (
     "a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6"
 )
 EXPECTED_NORMAL_TREE_SHA256 = (
-    "51324abb98d1b34b077680a6d5698811fc2372eb78ff1e2f2d6fbb352aea6077"
+    "904bab4188661c228690b8fb6fe9ff95c1765512c7fad78b9eb467e53ccbf8ac"
 )
 EXPECTED_ZERO_TREE_SHA256 = (
     "1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b"
@@ -179,11 +179,11 @@ EXPECTED_ADDED_ASSETS = {
 
 
 EXPECTED_FULL_LEDGER_SHA256 = {
-    "corrections.jsonl": "778fedcda0cd35e3bdcb1b8b52f20671c99bff85c4bdb10abcd5ae54e5c70a6b",
+    "corrections.jsonl": "e47d2d5396c0149d99a4220560b54be0f29a58de32761e26d7b337c47b671f20",
     "image-map.jsonl": "e2fac1db19000e4bd4e634ac7dd1ea0920d3c7c9f105e2503904cc024bfe0681",
     "added-assets.jsonl": "d647fa8d948b155720ca3f8c909429654f30398fbf566e0b0fb6cca779e621ae",
     "source-ranges.json": "36dacbddcbb0157f604aafeca93e6e189bd16c6b52ac6409d6d83681a41de498",
-    "coverage.csv": "4cf6b456c41bf0268769e44c4588843d6f4fcf5a93dedf4d6d693bc95492dd88",
+    "coverage.csv": "fb592a7019feb5cd1f8f19fe13e91c365ce13c578cf4e61ee79ea87a97491d34",
 }
 
 
@@ -682,10 +682,10 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 payload = (GOAL_DIR / relative).read_bytes()
                 self.assertEqual(build.sha256(payload), expected)
 
-        self.assertEqual(len(self.corrections), 4_831)
+        self.assertEqual(len(self.corrections), 4_830)
         self.assertEqual(
             [row["id"] for row in self.corrections],
-            [f"G5-C-{number:04d}" for number in range(1, 4_832)],
+            [f"G5-C-{number:04d}" for number in range(1, 4_831)],
         )
         self.assertEqual(len(self.images), 1_444)
         self.assertEqual(len(self.added_assets), 163)
@@ -723,8 +723,8 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="n12-firstpass-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1607, 4831))
-            self.assertEqual(build.build(second), (29, 1607, 4831))
+            self.assertEqual(build.build(first), (29, 1607, 4830))
+            self.assertEqual(build.build(second), (29, 1607, 4830))
             first_tree, first_manifest = length_prefixed_tree(first)
             second_tree, second_manifest = length_prefixed_tree(second)
             output_tree, output_manifest = length_prefixed_tree(build.OUTPUT_ROOT)
@@ -734,7 +734,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             self.assertEqual(first_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(second_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(output_tree, EXPECTED_NORMAL_TREE_SHA256)
-            self.assertEqual(validate.validate(first), (29, 1607, 4831, 29))
+            self.assertEqual(validate.validate(first), (29, 1607, 4830, 29))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))

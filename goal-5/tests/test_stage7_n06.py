@@ -25,16 +25,16 @@ import validate  # noqa: E402
 
 
 # Values below are derived from the canonical integrated manifests and target.
-EXPECTED_TARGET_BYTES = 85_469
+EXPECTED_TARGET_BYTES = 85_467
 EXPECTED_TARGET_LINES = 666
 EXPECTED_TARGET_SHA256 = (
-    "b66bbd9e04137e3056992b8bdb5e74e40291af09fa3f609f7545a9c246995161"
+    "46e2cbc14314b6bb975632189b514eafa23341335cabb9c01cd9981f4a58cba7"
 )
 EXPECTED_CORRECTION_ROWS_SHA256 = (
-    "ff8ee5ecc3b7f41d30ec7f390376894f3f26bbad75c71592a570bf16462c4faf"
+    "c8263f80a096b4d5e16838ca9225b14421ccb67cbf4e93db5966462ba22e1899"
 )
 EXPECTED_CORRECTION_ROW_HASH_SEQUENCE = (
-    "2c20023fd2c6db55ceb9053e508ded4824e6d5eb5539096f189cb83fac20b472"
+    "7b6db7049295e02f75cd75f7d66ced1c0b37af051ecfb2feb268411a7e5e42be"
 )
 EXPECTED_INVENTORY_HASHES = {
     "headings": "f74fc1b553f3e84a3a0a894683c7b56325406091843bc621acfcce20b1fb5ecc",
@@ -366,7 +366,7 @@ REQUIRED_LITERAL_PINS: tuple[tuple[str, str, int], ...] = (
         "1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))",
         1,
     ),
-    ("spatial-entropy-subscript", r"$h_x \le 2r h_t$", 1),
+    ("source-printed-plain-spacetime-entropy", r"$h \le 2r h_t$", 1),
     ("cyclic-mod-equality", "`Mod[k^t, n] == 1`", 1),
     ("cyclic-gcd-equality", "`GCD[k, n] == 1`", 1),
     ("cyclic-power-equality", "`n == k^s`", 1),
@@ -416,7 +416,7 @@ FORBIDDEN_LITERAL_PINS: tuple[tuple[str, str], ...] = (
         "rule90-density-misgrouped",
         "1/2 (1 - (1 - 2 p))^(2^DigitCount[t, 2, 1])",
     ),
-    ("spatial-entropy-subscript-missing", r"$h \le 2r h_t$"),
+    ("invented-spatial-entropy-subscript", r"$h_x \le 2r h_t$"),
     (
         "excluded-blocks-false-paragraph",
         "additional excluded blocks with lengths\n\nbetween n and 2n.",
@@ -619,13 +619,10 @@ class NotesForChapter6Tests(unittest.TestCase):
         # Later note chapters append corrections globally; N06's owned slice is
         # immutable and remains the exact guard here.
         self.assertGreaterEqual(len(self.corrections), 1_401)
-        self.assertEqual(len(self.n06_corrections), 189)
+        self.assertEqual(len(self.n06_corrections), 188)
         self.assertEqual(
             [row["id"] for row in self.n06_corrections],
-            [
-                *(f"G5-C-{number:04d}" for number in range(1214, 1402)),
-                "G5-C-4831",
-            ],
+            [f"G5-C-{number:04d}" for number in range(1214, 1402)],
         )
         self.assertEqual(
             rows_sha256(self.n06_corrections), EXPECTED_CORRECTION_ROWS_SHA256
@@ -648,20 +645,13 @@ class NotesForChapter6Tests(unittest.TestCase):
                 "```\n1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))\n```\n",
             ),
         )
-        self.assertEqual(
-            (
-                by_id["G5-C-4831"]["raw_start_byte"],
-                by_id["G5-C-4831"]["raw_line"],
-                by_id["G5-C-4831"]["before"],
-                by_id["G5-C-4831"]["after"],
-            ),
-            (2_073_557, 14_691, r"$h \le 2r h_t$", r"$h_x \le 2r h_t$"),
-        )
+        self.assertIn(r"$h \le 2r h_t$", self.rendered)
+        self.assertNotIn(r"$h_x \le 2r h_t$", self.rendered)
 
-        # C1392-C1399 are append-only visual guards, C1400-C1401 are fresh
-        # source-residual guards, and C4831 is the Stage 11 source replay. Their
-        # raw spans occur between earlier text guards. Sort only for the
-        # non-overlap proof; manifest order remains pinned above.
+        # C1392-C1399 are append-only visual guards and C1400-C1401 are fresh
+        # source-residual guards. Their raw spans occur between earlier text
+        # guards. Sort only for the non-overlap proof; manifest order remains
+        # pinned above.
         for row in sorted(
             self.n06_corrections, key=lambda correction: correction["raw_start_byte"]
         ):
