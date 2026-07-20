@@ -672,7 +672,7 @@ class NotesForChapter10Tests(unittest.TestCase):
             (n10["first_pass"], n10["second_pass"], n10["reviewer_type"]),
             ("YES", "YES", "agent"),
         )
-        self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 27)
+        self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 29)
 
     def test_normal_and_zero_builds_remain_deterministic(self) -> None:
         with tempfile.TemporaryDirectory(prefix="n10-build-") as directory:
@@ -684,7 +684,7 @@ class NotesForChapter10Tests(unittest.TestCase):
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
             self.assertEqual(len(first_manifest), 1638)
-            self.assertEqual(validate.validate(first), (29, 1607, 4830, 27))
+            self.assertEqual(validate.validate(first), (29, 1607, 4830, 29))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))
