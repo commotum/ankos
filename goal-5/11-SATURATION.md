@@ -223,6 +223,15 @@ start only from the post-Stage-9 stable target.
   pages and 53 assets; after root exposed and required repair of a manifest
   self-reference, its deterministic suite rejected 32/32 mutations and two
   root pristine replays passed. Stage 9 is complete across all 29 documents.
+- The same Lane 2 reviewer then bound its nine exact-identity-proven documents
+  and 349 firsthand pages to the accepted fresh 76-page N12 restart at
+  `/tmp/g5-stage11-round1-lane2-final-rebind-20260720-a1`. Root replayed all
+  49 meaningful resealed mutations and two pristine verifiers over 10
+  documents, 425 pages, 6,352 candidates, 280 runs, and 467 assets at `0/0`.
+  Manifest SHA-256 is
+  `436d87633f27fca65921eb8846556eadd2ff9070a4a5a2cb8e39342c4a9f593d`;
+  seal SHA-256 is
+  `eb801bc2e030dba620db96ecf8e0cf326332e4b3cae12ce76e5d6a58b749e990`.
 
 ### Credited Round Matrix
 
@@ -234,7 +243,7 @@ hashes.
 | Round | Lane | Fresh packet | Documents/pages | Detector runs/candidates | Root replay | Finding/ambiguity | State |
 |---|---|---|---:|---:|---|---|---|
 | 1 | 1 | `/tmp/g5-stage11-round1-lane1-final-rebind-20260720-a1` | 10/430 | 280/5,271 | PASS | 0/0 | ACCEPTED |
-| 1 | 2 | `/tmp/g5-stage11-n12-final-restart-20260720-a1` plus nine-document rebind pending | 10/425 | 280/6,352 | N12 document PASS | 9/0 historical; fresh N12 0/0 | FULL LANE REBIND REQUIRED; zero lane credit |
+| 1 | 2 | `/tmp/g5-stage11-round1-lane2-final-rebind-20260720-a1` | 10/425 | 280/6,352 | PASS | 0/0 | ACCEPTED |
 | 1 | 3 | prior packet superseded; replacement technical packet PASS | 9/425 | 252/23,856 | N06 technical PASS | 1 real + 2 disproved historical | FULL N06 SATURATION RESTART REQUIRED; zero lane credit |
 | 2 | 1 | — | 10/430 | to regenerate | — | — | NOT STARTED |
 | 2 | 2 | — | 10/425 | to regenerate | — | — | NOT STARTED |

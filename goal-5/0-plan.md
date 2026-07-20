@@ -295,10 +295,11 @@ Neither file is a generalized workflow database.
   detector runs, and 5,271 candidates with zero finding or ambiguity; root
   replayed all 23 mutations and two pristine verifiers. Lane 3's earlier seal
   remains superseded because it reviewed the now-disproved N06 grouping and
-  the pre-fix N06 table. Lane 2's
-  fresh N12 document restart is accepted, but its nine unchanged documents
-  still require final rebind. All three lanes must bind to the post-Stage-9
-  freeze, after which a wholly fresh Round 2 must find no discrepancy.
+  the pre-fix N06 table. Lane 2 is accepted at 10 documents, 425 pages, 280
+  detector runs, 6,352 candidates, and 467 assets after root replayed all 49
+  mutations and two pristine verifiers. Lane 3 must still bind to the
+  post-Stage-9 freeze, after which a wholly fresh Round 2 must find no
+  discrepancy.
 - The final zero-credit Round 1 preflight is
   `/tmp/g5-stage11-round1-final-preflight-20260720-a1`: 29 documents, 1,280
   pages, 812 detector runs, and 35,479 candidates. Its Stage 9 gate is
