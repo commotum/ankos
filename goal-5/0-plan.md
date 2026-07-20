@@ -295,8 +295,16 @@ Neither file is a generalized workflow database.
   5,271 candidates with zero finding or ambiguity, but its global bindings now
   require rebase. Lane 3's earlier accepted seal is also superseded because it
   reviewed the now-disproved N06 grouping and the pre-fix N06 table. Lane 2's
-  fresh N12 restart is active. All three lanes must bind to the combined freeze,
-  after which a wholly fresh Round 2 must find no discrepancy.
+  fresh N12 document restart is accepted, but its nine unchanged documents
+  still require final rebind. All three lanes must bind to the post-Stage-9
+  freeze, after which a wholly fresh Round 2 must find no discrepancy.
+- The final zero-credit Round 1 preflight is
+  `/tmp/g5-stage11-round1-final-preflight-20260720-a1`: 29 documents, 1,280
+  pages, 812 detector runs, and 35,479 candidates. Its Stage 9 gate is
+  explicitly satisfied; root semantic verification and two strict replays
+  reproduce manifest SHA-256
+  `25616b366b8f48a981d15eb4d6b3e4fdecd06b0d0255084a609cce15d8571884`
+  and all 16 mutation rejections.
 - `python3 goal-5/validate.py` passes. The focused affected
   N06/N12 suite passes 15 tests. The complete repository suite passes 304
   tests and 6,185 subtests against the current

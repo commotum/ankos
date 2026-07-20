@@ -10,17 +10,20 @@ Status: IN_PROGRESS
   Stage 9 reached 29 accepted rotated technical closures at entry. Round 1 has
   since found nine N12 defects and one N06 table defect. Two apparent N06
   formula/subscript findings were disproved at high resolution and rolled back.
-  Both documents' technical and saturation closures are reopened; the other 27
-  document hashes remain unchanged.
+  Wholly fresh N06 and N12 technical closures are accepted, and N12's fresh
+  76-page saturation document restart is accepted. N06's 20-page saturation
+  restart and all three whole-lane seals remain pending; the other 27 document
+  hashes remain unchanged.
 - The current deterministic zero-credit preflight is
-  `/tmp/g5-stage11-combined-final-preflight-20260720-a1`. It freezes 29
+  `/tmp/g5-stage11-round1-final-preflight-20260720-a1`. It was generated only
+  after Stage 9 closed and freezes 29
   documents, all 1,280 source pages, 28 detector families, 812
   document-detector runs, and 35,479 occurrence/inventory candidates. Its
   15-member manifest SHA-256 is
-  `05c2c8e1fd4ed03ef42ceea0b7cc1d64a74d83f1c628346268179ae3ef14ea59`;
-  root reproduced the strict replay, including all 15 real-delta mutation
-  rejections. Every one of its 37,603 work rows remains `UNREVIEWED` with
-  `NONE` review credit.
+  `25616b366b8f48a981d15eb4d6b3e4fdecd06b0d0255084a609cce15d8571884`;
+  root reproduced semantic verification and two strict replays, including all
+  16 mutation rejections and the explicit closed-Stage-9 gate. Every one of
+  its 37,603 work rows remains `UNREVIEWED` with `NONE` review credit.
 - The preflight includes nine repeated-word candidates, 26 trailing-whitespace
   lines, 1,314 live image references, and explicit zero-hit detector runs.
   These are candidates and denominators, never defects or inherited clean
@@ -191,17 +194,25 @@ start only from the post-Stage-9 stable target.
   `0206a1f4e109293ef348d7435b075eb1a9a18a80523dcbde0cc11d25e23bb509`.
   Validation passes, and the complete suite passes 304 tests and 6,185
   subtests.
-- The zero-credit preparation packet at
-  `/tmp/g5-stage11-combined-final-preflight-20260720-a1` covers 29 documents,
+- The final zero-credit Round 1 preflight at
+  `/tmp/g5-stage11-round1-final-preflight-20260720-a1` covers 29 documents,
   1,280 pages, 812 detector runs, and 35,479 candidates (Lane 1: 5,271; Lane 2:
   6,352; Lane 3: 23,856). Its manifest SHA-256 is
-  `05c2c8e1fd4ed03ef42ceea0b7cc1d64a74d83f1c628346268179ae3ef14ea59`,
+  `25616b366b8f48a981d15eb4d6b3e4fdecd06b0d0255084a609cce15d8571884`,
   target-corpus SHA-256 is
   `3f8a39b721b6f407201bf3ea442cc716ec843094a6ea2adec2630344f425c98e`,
   and target-record SHA-256 is
   `974aca4828f9c58bad009bead3b13e05402001706be2d7c615a1342fc8408cc1`.
-  Semantic replay and all 15 real-delta verifier mutations pass. It remains
-  preparation-only and must be regenerated after Stage 9 closes.
+  Semantic verification, two root replays, and all 16 verifier mutations pass.
+  Its Stage 9 gate is `SATISFIED_BEFORE_GENERATION`; the packet remains
+  deliberately zero-credit because only lane review receipts can grant review
+  credit.
+- The replacement N06 technical packet closes 6,348 source rows and 21,934
+  target rows; root rejected 38/38 real-file mutations and replayed its seal.
+  The replacement N12 technical packet closes 387,693 JSONL rows plus all 76
+  pages and 53 assets; after root exposed and required repair of a manifest
+  self-reference, its deterministic suite rejected 32/32 mutations and two
+  root pristine replays passed. Stage 9 is complete across all 29 documents.
 
 ### Credited Round Matrix
 
@@ -213,8 +224,8 @@ hashes.
 | Round | Lane | Fresh packet | Documents/pages | Detector runs/candidates | Root replay | Finding/ambiguity | State |
 |---|---|---|---:|---:|---|---|---|
 | 1 | 1 | `/tmp/g5-stage11-round1-lane1-20260719-a1` | 10/430 | 280/5,271 | prior PASS | 0/0 | FINAL REBASE REQUIRED; zero current credit |
-| 1 | 2 | fresh combined-freeze restart active | 10/425 | 280/6,352 | — | 9/0 historical | N12 RESTART ACTIVE; zero current credit |
-| 1 | 3 | prior packet superseded | 9/425 | 252/23,856 | prior PASS | 1 real + 2 disproved historical | FULL N06 RESTART REQUIRED; zero current credit |
+| 1 | 2 | `/tmp/g5-stage11-n12-final-restart-20260720-a1` plus nine-document rebind pending | 10/425 | 280/6,352 | N12 document PASS | 9/0 historical; fresh N12 0/0 | FULL LANE REBIND REQUIRED; zero lane credit |
+| 1 | 3 | prior packet superseded; replacement technical packet PASS | 9/425 | 252/23,856 | N06 technical PASS | 1 real + 2 disproved historical | FULL N06 SATURATION RESTART REQUIRED; zero lane credit |
 | 2 | 1 | — | 10/430 | to regenerate | — | — | NOT STARTED |
 | 2 | 2 | — | 10/425 | to regenerate | — | — | NOT STARTED |
 | 2 | 3 | — | 9/425 | to regenerate | — | — | NOT STARTED |
