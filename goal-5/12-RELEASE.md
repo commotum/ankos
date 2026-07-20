@@ -154,7 +154,7 @@ Completed on 2026-07-20 (America/Los_Angeles).
   SHA-256
   `7076c3dcd7a74b12787007e26263e4360c5e503df2c953631de21a0b9f37a240`.
   All 1,607 published JPEG files pass image decoding.
-- Focused release/Foundation/N11/N12 checks pass 31 tests and 1,766 subtests.
+- Focused release/Foundation/N11/N12 checks pass 32 tests and 1,807 subtests.
   The complete repository suite passes 311 tests and 6,268 subtests.
 - The protected legacy tree remains exactly 1,463 files at SHA-256
   `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
