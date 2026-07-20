@@ -145,7 +145,7 @@ cross-packet compatibility check, not equality of those framing hashes.
 `/tmp/g5-stage9-rotated-closer-w2-20260719-a1`; and `W3` is
 `/tmp/g5-stage9-rotated-closer-w3-20260719-a1`. A SHA below is the SHA-256 of
 the document seal or sealed document manifest that root replayed. `0/0` means
-zero finding and zero ambiguity. Active and queued rows grant no credit.
+zero findings and zero ambiguities. Active and queued rows grant no credit.
 
 | Document | Fresh closure packet | Sealed artifact SHA-256 | Root replay | Finding/ambiguity |
 |---|---|---|---|---|
@@ -169,7 +169,7 @@ zero finding and zero ambiguity. Active and queued rows grant no credit.
 | `N03` | `/tmp/g5-stage9-rotated-closer-w3-n03-20260719-a1` | `e4a7961a409a17a37bc6907b835c1101bfdf64584e63e789c3931be23420b67a` | PASS | 0/0 |
 | `N04` | `/tmp/g5-stage9-rotated-closer-w3-n04-20260719-a1` | `f59e12fb4558731d6307f11693dda5e85e5adbe0b4401dc56c5d4d697585d679` | PASS | 0/0 |
 | `N05` | `W1` | `3711d31d82a13e3807610410f27fda2f005cec77256f75c6c33d6b90b39f905d` | PASS | 0/0 |
-| `N06` | queued | — | — | — |
+| `N06` | `/tmp/g5-stage9-rotated-closer-w3-n06-20260719-a1` (active; zero credit) | — | — | — |
 | `N07` | `W1` | `f1ae8c8ec6fd437b9ced37ffb763f3e5662e2b326266778354b1b85de80dc94b` | PASS | 0/0 |
 | `N08` | `/tmp/g5-stage9-rotated-closer-w3-n08-20260719-a1` | `2ae7a4ddbfd7e84cce29d402a2916e8457eace84cd1e03ac55d71063ba9ba249` | PASS | 0/0 |
 | `N09` | `W1` | `fccbe7c6891a6085440c1765f80b8a813ee5a4a41308fde243027181a93c0651` | PASS | 0/0 |
@@ -183,7 +183,7 @@ zero finding and zero ambiguity. Active and queued rows grant no credit.
 
 The target and source freezes and the integrated first pass are complete.
 Fresh rotated closers have formally sealed 28 of the 29 documents with zero
-finding and zero ambiguity: `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`,
+findings and zero ambiguities: `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`,
 `CH02`, `CH03`, `CH04`, `CH05`, `CH06`, `CH07`, `CH08`, `CH09`, `CH10`,
 `CH11`, `CH12`,
 `GENERAL_NOTES`, `N01`,
