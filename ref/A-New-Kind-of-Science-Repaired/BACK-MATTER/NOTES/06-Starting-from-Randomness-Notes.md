@@ -114,9 +114,9 @@ PolynomialMod[(1 + x)^t z, {x^n - 1, 2}]
 
 where z is the polynomial representing the initial state, and z = 1 for a single black cell in the first position. The state z = 1 evolves after one step to the state z = 1 + x, and for odd n this latter state always eventually appears again. Using the result that  $1 + x^{2^m} == (1 + x)^{2^m}$  modulo 2 for any m, one then finds that the repetition period always divides the quantity  `p[n] = 2^MultiplicativeOrder[2, n] - 1` , which in turn is at most  $2^{n-1}$  - 1. The actual periods are often smaller than p[n], with the following ratios occurring:
 
-| n     | 11 | 13 | 19 | 25 | 27 | 29  | 31    | 37 | 41 | 43 | 53      |
-|-------|----|----|----|----|----|-----|-------|----|----|----|---------|
-| ratio | 3  | 5  | 27 | 41 | 19 | 565 | 21255 | 25 | 3  | 1  | 1266205 |
+| n     | 11 | 13 | 19 | 25 | 27 | 29  | 37    | 41 | 43 | 53      |
+|-------|----|----|----|----|----|-----|-------|----|----|---------|
+| ratio | 3  | 5  | 27 | 41 | 19 | 565 | 21255 | 25 | 3  | 1266205 |
 
 There appears to be no case for n > 5 where the period achieves the absolute maximum  $2^{n-1}$  - 1.
 
@@ -215,7 +215,7 @@ Probabilistic estimates can also be used for other quantities, such as growth ra
 ■ **Density in rule 90.** From the superposition principle above and the number of black cells at step t in a pattern starting from a single black cell (see page 870) one can compute the density after t steps in the evolution of rule 90 with initial conditions of density *p* to be (see also page 602)
 
 ```
-1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))
+1/2 (1 - (1 - 2 p))^(2^DigitCount[t, 2, 1])
 ```
 
 ■ **Densities in other rules.** The pictures below show how the densities on successive steps depend on the initial density. Densities are indicated by gray levels. Initial densities are shown across each picture. Successive steps are shown down the page. Rule 236 is class 2, and the density retains a memory of its initial value. But in the class 3 rules 126 and 30, the densities converge quickly to a fixed value.
