@@ -293,10 +293,10 @@ Neither file is a generalized workflow database.
   require rebase to the post-N06 freeze. Lanes 2 and 3 are active. After the
   last repair, a complete fresh Round 2 must still find no discrepancy before
   Stage 11 can close.
-- `python3 goal-5/validate.py` passes. The focused post-N06 N06/N12 suite passes
-  15 tests and 1,721 subtests; the three affected N09–N11 deterministic-build
-  files pass 21 tests and 1,966 subtests. The cumulative suite must be rerun
-  after the current test-pin updates.
+- `python3 goal-5/validate.py` passes. The focused affected
+  N06/N12/N09–N11 suite passes 36 tests and 3,686 subtests. The complete
+  repository suite passes 304 tests and 6,179 subtests against the current
+  source-faithful freeze.
 
 ### Chronological Stage Record
 

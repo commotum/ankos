@@ -198,6 +198,10 @@ start only from the post-Stage-9 stable target.
   and target-record SHA-256
   `3c8da49f506452601524eed8350ee8a7a441a29da7e6bfa03c480a5cb7fbc022`.
   Strict replay and all 15 mutations pass.
+- Current validation passes at 29 documents, 1,607 images, 4,830 guarded
+  corrections, and 29 second-pass coverage rows. The focused affected suite
+  passes 36 tests and 3,686 subtests; the complete repository suite passes 304
+  tests and 6,179 subtests.
 - All pre-repair N06 receipts have zero credit. Lane 3 must repeat all 20 N06
   pages, 646 candidates, and 28 detector runs from scratch. Every lane must
   rebind unchanged-document receipts to this current freeze; N12 still requires
