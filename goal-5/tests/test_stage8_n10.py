@@ -678,13 +678,13 @@ class NotesForChapter10Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="n10-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1607, 4830))
-            self.assertEqual(build.build(second), (29, 1607, 4830))
+            self.assertEqual(build.build(first), (29, 1607, 4831))
+            self.assertEqual(build.build(second), (29, 1607, 4831))
             first_manifest = tree_manifest(first)
             self.assertEqual(first_manifest, tree_manifest(second))
             self.assertEqual(first_manifest, tree_manifest(build.OUTPUT_ROOT))
             self.assertEqual(len(first_manifest), 1638)
-            self.assertEqual(validate.validate(first), (29, 1607, 4830, 29))
+            self.assertEqual(validate.validate(first), (29, 1607, 4831, 29))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))

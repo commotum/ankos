@@ -271,23 +271,31 @@ Neither file is a generalized workflow database.
 
 - Synced: 2026-07-19 (America/Los_Angeles).
 - Active stage: `11-SATURATION` (`IN_PROGRESS`). Stage 10 remains complete.
-  Stage 9 is reopened for N12 only because Stage 11 found and repaired one
-  source-backed Markdown-serialization defect; the other 28 technical closures
-  remain bound to byte-identical documents.
+  Stage 9 is reopened for N06 and N12 because Stage 11 found and repaired three
+  source-backed defects; the other 27 technical closures remain bound to
+  byte-identical documents.
 - The current repaired tree has exactly 29 canonical documents, 1,607 images,
-  4,830 guarded corrections, 29 completed second-pass coverage rows, and 1,638
+  4,831 guarded corrections, 29 completed second-pass coverage rows, and 1,638
   total files. Its length-prefixed SHA-256 is
-  `03c052c18a8d0c274d62a6fd1c8e0d57267ec9714d9be704c9ba19705e19128e`.
+  `51324abb98d1b34b077680a6d5698811fc2372eb78ff1e2f2d6fbb352aea6077`.
 - N12 is 398,152 bytes, 1,857 LF, and SHA-256
   `90d4ddcb566aae8515b0515221a10b4d7c2d96f353b429e52010cc93222bbdfa`.
   A wholly fresh post-fix technical closure and its 76-page Round 1 saturation
   restart are active; no pre-repair N12 verdict receives credit.
-- Stage 11 Round 1 Lane 1 is accepted at 10 documents, 430 pages, 280 detector
-  runs, and 5,271 candidates with zero finding or ambiguity. Lanes 2 and 3 are
-  active. After the last repair, a complete fresh Round 2 must still find no
-  discrepancy before Stage 11 can close.
-- `python3 goal-5/validate.py` passes. The cumulative suite passes 304 tests and
-  6,177 subtests; `git diff --check` passes.
+- N06 is 85,469 bytes, 666 LF, and SHA-256
+  `b66bbd9e04137e3056992b8bdb5e74e40291af09fa3f609f7545a9c246995161`.
+  Its prior technical seal and all pre-repair saturation receipts are void; a
+  wholly fresh technical closure and complete 20-page Round 1 restart are
+  required.
+- Lane 1 previously sealed 10 documents, 430 pages, 280 detector runs, and
+  5,271 candidates with zero finding or ambiguity, but its global bindings now
+  require rebase to the post-N06 freeze. Lanes 2 and 3 are active. After the
+  last repair, a complete fresh Round 2 must still find no discrepancy before
+  Stage 11 can close.
+- `python3 goal-5/validate.py` passes. The focused post-N06 N06/N12 suite passes
+  15 tests and 1,721 subtests; the three affected N09–N11 deterministic-build
+  files pass 21 tests and 1,966 subtests. The cumulative suite must be rerun
+  after the current test-pin updates.
 
 ### Chronological Stage Record
 

@@ -169,7 +169,7 @@ zero findings and zero ambiguities. Active and queued rows grant no credit.
 | `N03` | `/tmp/g5-stage9-rotated-closer-w3-n03-20260719-a1` | `e4a7961a409a17a37bc6907b835c1101bfdf64584e63e789c3931be23420b67a` | PASS | 0/0 |
 | `N04` | `/tmp/g5-stage9-rotated-closer-w3-n04-20260719-a1` | `f59e12fb4558731d6307f11693dda5e85e5adbe0b4401dc56c5d4d697585d679` | PASS | 0/0 |
 | `N05` | `W1` | `3711d31d82a13e3807610410f27fda2f005cec77256f75c6c33d6b90b39f905d` | PASS | 0/0 |
-| `N06` | `/tmp/g5-stage9-rotated-closer-w3-n06-20260719-a1` | `f0799ce350a784cae5355f1f9814fe3d22f6b556c385912afe47c5f0adc356fa` | PASS | 0/0 |
+| `N06` | post-Stage-11-fix fresh closure required; old packet superseded | — | — | OPEN |
 | `N07` | `W1` | `f1ae8c8ec6fd437b9ced37ffb763f3e5662e2b326266778354b1b85de80dc94b` | PASS | 0/0 |
 | `N08` | `/tmp/g5-stage9-rotated-closer-w3-n08-20260719-a1` | `2ae7a4ddbfd7e84cce29d402a2916e8457eace84cd1e03ac55d71063ba9ba249` | PASS | 0/0 |
 | `N09` | `W1` | `fccbe7c6891a6085440c1765f80b8a813ee5a4a41308fde243027181a93c0651` | PASS | 0/0 |
@@ -196,8 +196,30 @@ to 398,152 bytes and SHA-256
 An independent 29-row comparison proves N12 is the only changed canonical
 document. Its prior 839-member seal is no longer current and grants no credit;
 the other 28 accepted document seals remain bound to unchanged target bytes.
-Stage 9 stays reopened until a wholly fresh post-fix N12 technical closure and
-root replay pass.
+Stage 9 initially stayed reopened for a wholly fresh post-fix N12 technical
+closure. A later Round 1 reviewer then found two additional source-backed N06
+technical defects:
+
+- on PDF page 969 (printed 953), correction `G5-C-1292` placed
+  `2^DigitCount[t, 2, 1]` outside the wrong parenthesized factor; the printed
+  formula is
+  `1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))`;
+- on PDF page 976 (printed 960), the target omitted the spatial-entropy
+  subscript in `$h_x \le 2r h_t$`.
+
+Root independently opened both fixed-layout pages at original detail, repaired
+`G5-C-1292`, and added source guard `G5-C-4831`. N06 changed from 85,467 bytes
+and SHA-256
+`54bf7356136644c5040ffcc7945b49faab73a2bf5f2758dc51ff91b49e1eb437`
+to 85,469 bytes and SHA-256
+`b66bbd9e04137e3056992b8bdb5e74e40291af09fa3f609f7545a9c246995161`.
+The post-N06 repaired tree has length-prefixed SHA-256
+`51324abb98d1b34b077680a6d5698811fc2372eb78ff1e2f2d6fbb352aea6077`.
+A direct old/new 29-row comparison proves N06 is the only target changed by
+this repair; N12 remains byte-identical at its repaired hash. Both prior N06
+and N12 technical seals now grant no current credit. Stage 9 stays reopened
+until wholly fresh post-fix technical closures and root replays pass for both
+documents.
 
 ## Current Gate
 
@@ -269,8 +291,8 @@ against the final integrated target.
   37 sealed members. The mutation report contains 30 unique, real-delta
   mutations; all 30 are rejected and both pristine runs pass.
 - At the pre-repair freeze, the combined matrix contained exactly 29 unique
-  canonical rows with a sealed artifact, root PASS, and `0/0`. N12 is now
-  superseded; 28 rows remain current and one fresh closure is required.
+  canonical rows with a sealed artifact, root PASS, and `0/0`. N06 and N12 are
+  now superseded; 27 rows remain current and two fresh closures are required.
 - `python3 goal-5/build.py` builds exactly 29 documents, 1,607 images, and
   4,830 guarded corrections. `python3 goal-5/validate.py` validates those
   counts and all 29 second-pass coverage rows.
@@ -290,6 +312,6 @@ against the final integrated target.
   `4cf6b456c41bf0268769e44c4588843d6f4fcf5a93dedf4d6d693bc95492dd88`.
   The protected 1,463-file legacy tree retains SHA-256
   `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
-- `uv run pytest -q` passes 304 tests and 6,177 subtests in 68.48 seconds.
-  `git diff --check` passed at that pre-repair freeze. The Stage 11 repair now
-  leaves one open Stage 9 requirement: fresh post-fix N12 technical closure.
+- `uv run pytest -q` passed 304 tests and 6,177 subtests in 68.48 seconds at
+  that pre-repair freeze. The Stage 11 repairs now leave two open Stage 9
+  requirements: fresh post-fix N06 and N12 technical closures.

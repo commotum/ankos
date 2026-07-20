@@ -223,14 +223,15 @@ seal, and manifest checks.
 ## Post-Completion Update
 
 Stage 9 subsequently closed all 29 technical packets. Stage 11 then repaired a
-one-byte Markdown-serialization defect in N12 only. A direct 29-document
-comparison proves every Stage 10-scoped target and asset unchanged, so the
-figure, caption, Index, and Colophon verdicts remain current. The normal-tree
-hash above is the historical Stage 10 completion freeze; the post-repair tree
-hash is
-`03c052c18a8d0c274d62a6fd1c8e0d57267ec9714d9be704c9ba19705e19128e`.
+one-byte Markdown-serialization defect in N12 and two technical text spans in
+N06. Direct target and inventory comparisons prove every asset, image
+reference, caption, fixed-layout Index entry, and Colophon block unchanged, so
+the Stage 10 verdicts remain current. The normal-tree hash above is the
+historical Stage 10 completion freeze; the latest post-repair tree hash is
+`51324abb98d1b34b077680a6d5698811fc2372eb78ff1e2f2d6fbb352aea6077`.
 
 ## Exact Next Action
 
-No Stage 10 action remains. Complete the fresh post-repair N12 technical
-closure and both Stage 11 saturation rounds, then proceed to Stage 12.
+No Stage 10 action remains. Complete the fresh post-repair N06 and N12
+technical closures and both Stage 11 saturation rounds, then proceed to Stage
+12.
