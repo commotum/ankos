@@ -197,24 +197,23 @@ An independent 29-row comparison proves N12 is the only changed canonical
 document. Its prior 839-member seal is no longer current and grants no credit;
 the other 28 accepted document seals remain bound to unchanged target bytes.
 Stage 9 initially stayed reopened for a wholly fresh post-fix N12 technical
-closure. A later Round 1 reviewer then found two additional source-backed N06
-technical defects:
+closure. A later Round 1 reviewer then found one additional source-backed N06
+technical defect on PDF page 969 (printed 953): correction `G5-C-1292` placed
+`2^DigitCount[t, 2, 1]` outside the wrong parenthesized factor. The printed
+formula is `1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))`.
 
-- on PDF page 969 (printed 953), correction `G5-C-1292` placed
-  `2^DigitCount[t, 2, 1]` outside the wrong parenthesized factor; the printed
-  formula is
-  `1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))`;
-- on PDF page 976 (printed 960), the target omitted the spatial-entropy
-  subscript in `$h_x \le 2r h_t$`.
+The same review initially suspected that the plain `h` in `$h \le 2r h_t$` on
+PDF page 976 should have an `_x` subscript. Root's first 240-DPI reading agreed
+and briefly added a guard, but the mandatory restarted pass challenged it. A
+fresh 600-DPI crop and independent text extraction clearly show that the book
+prints plain `h`. The temporary guard was removed, and the source-faithful oddity
+is now regression-protected; it is not a final finding or correction.
 
-Root independently opened both fixed-layout pages at original detail, repaired
-`G5-C-1292`, and added source guard `G5-C-4831`. N06 changed from 85,467 bytes
-and SHA-256
+Root repaired `G5-C-1292`. N06 remains 85,467 bytes but changes SHA-256 from
 `54bf7356136644c5040ffcc7945b49faab73a2bf5f2758dc51ff91b49e1eb437`
-to 85,469 bytes and SHA-256
-`b66bbd9e04137e3056992b8bdb5e74e40291af09fa3f609f7545a9c246995161`.
-The post-N06 repaired tree has length-prefixed SHA-256
-`51324abb98d1b34b077680a6d5698811fc2372eb78ff1e2f2d6fbb352aea6077`.
+to `46e2cbc14314b6bb975632189b514eafa23341335cabb9c01cd9981f4a58cba7`.
+The final source-faithful post-N06 tree has length-prefixed SHA-256
+`904bab4188661c228690b8fb6fe9ff95c1765512c7fad78b9eb467e53ccbf8ac`.
 A direct old/new 29-row comparison proves N06 is the only target changed by
 this repair; N12 remains byte-identical at its repaired hash. Both prior N06
 and N12 technical seals now grant no current credit. Stage 9 stays reopened
