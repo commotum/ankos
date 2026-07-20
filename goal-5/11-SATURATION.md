@@ -17,9 +17,9 @@ Status: NOT_STARTED
   trailing whitespace. These are candidates, not defects or clean verdicts;
   every occurrence must receive a fresh source-backed or serialization-backed
   disposition in this stage.
-- Stage 10's Index, Colophon, and reopened figure work is integrated and its
-  final visual second pass is sealed, but Stage 10 cannot close until the final
-  `INDEX` technical closure and cumulative checks pass.
+- Stage 10 is complete: its Index, Colophon, and reopened figure work is
+  integrated; the final visual and `INDEX` technical closures are sealed; all
+  29 coverage rows are `YES/YES`; and the cumulative checks pass.
 
 ## Big-Picture Objective
 
@@ -30,7 +30,7 @@ round to find nothing new.
 
 ## Execution Plan
 
-1. Wait for Stages 9 and 10 to close, then freeze the final 29 target hashes,
+1. Wait for Stage 9 to close, then freeze the final 29 target hashes,
    correction ledger, builder, source ranges, PDF hash, and detector versions.
 2. Generate exhaustive, verdict-free detector ledgers for OCR substitutions,
    improbable tokens, repeated words, broken joins/splits, punctuation and
