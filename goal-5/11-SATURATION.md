@@ -7,9 +7,9 @@ Status: IN_PROGRESS
 - The authoritative source is the 1,280-page PDF with SHA-256
   `a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6`.
 - The candidate corpus contains exactly 29 canonical Markdown documents.
-  Stage 9 is complete: every document has a fresh rotated technical closure,
-  all 29 root replays pass with zero finding or ambiguity, and the stable
-  target is now eligible for Stage 11 review credit.
+  Stage 9 reached 29 accepted rotated technical closures at entry, but Round 1
+  finding `L2-N12-001` changed N12 by one byte. Its technical closure and
+  saturation review are reopened; the other 28 document hashes are unchanged.
 - A deterministic read-only preflight was regenerated after Stage 9 closed at
   `/tmp/g5-stage11-preflight-generator-w1-20260719-a1`. It freezes 29
   documents, all 1,280 source pages, 28 detector families, 812 document-detector
@@ -99,7 +99,7 @@ start only from the post-Stage-9 stable target.
 
 ### Entry Freeze and Round 1 Launch
 
-- The frozen target contains 3,622,710 bytes and 38,182 logical LF-terminated
+- The entry target contained 3,622,710 bytes and 38,182 logical LF-terminated
   lines. Its ordered target-record SHA-256 is
   `d872859e9a6ef6dde11307eb40f141a5e579a2853ede44ab430c1365dda27063`;
   the preflight target-corpus SHA-256 is
@@ -116,7 +116,37 @@ start only from the post-Stage-9 stable target.
   detector runs, 6,354 candidates); and Lane 3 at
   `/tmp/g5-stage11-round1-lane3-20260719-a1` (nine documents, 425 pages, 252
   detector runs, 23,856 candidates).
-- Round 1 is active. No lane receipt or finding has yet been accepted by root.
+- Round 1 is active. Root accepted one source-backed finding, repaired it, and
+  invalidated every pre-repair N12 verdict; no lane is yet sealed.
+
+### Round 1 Finding and Post-Repair Freeze
+
+- `L2-N12-001` was found independently on PDF page 1154 (printed page 1138),
+  target line 234. The book prints the Wolfram Language symbol
+  `$IterationLimit` in technical type beside `TimeConstraint`; the target had
+  a literal backslash before the opening inline-code delimiter.
+- Root opened the 216-DPI source page at original detail and reproduced the
+  finding. Guard `G5-C-4600` now consumes raw preimage `\$IterationLimit` at
+  byte 3,000,685 and emits `` `$IterationLimit` ``. The rebuilt N12 target is
+  398,152 bytes, 1,857 LF, and SHA-256
+  `90d4ddcb566aae8515b0515221a10b4d7c2d96f353b429e52010cc93222bbdfa`.
+  The focused N12 suite passes nine tests and 1,400 subtests.
+- A direct comparison of all 29 old and new target records proves N12 is the
+  only changed document. The repaired 1,638-file tree has length-prefixed
+  SHA-256
+  `03c052c18a8d0c274d62a6fd1c8e0d57267ec9714d9be704c9ba19705e19128e`.
+- The zero-credit detector packet was regenerated at
+  `/tmp/g5-stage11-postfix-preflight-20260719-a1`. It has 35,480 candidates
+  (Lane 1: 5,271; Lane 2: 6,353; Lane 3: 23,856), all 812 detector runs, and
+  manifest SHA-256
+  `dc964d2e5daafc6285e5ce9153c9d359fbee882f541ff19b5ea77f8824911677`;
+  strict replay and all 15 mutations pass. Its target-corpus SHA-256 is
+  `206efb8c5c8b608150937ad60fa5b609776b325fd6b69d111e1d0f58ce6279c4`.
+- All pre-repair N12 receipts have `NONE_PRE_REPAIR_EVIDENCE_ONLY` credit. N12
+  must receive a fresh technical closure and a complete 76-page Round 1 restart
+  against the new packet. Unchanged-document reviewers may retain firsthand
+  page work only after proving their assigned document hashes are identical and
+  regenerating every corpus-bound receipt against the new freeze.
 
 ### Credited Round Matrix
 
@@ -127,9 +157,9 @@ hashes.
 
 | Round | Lane | Fresh packet | Documents/pages | Detector runs/candidates | Root replay | Finding/ambiguity | State |
 |---|---|---|---:|---:|---|---|---|
-| 1 | 1 | `/tmp/g5-stage11-round1-lane1-20260719-a1` | 10/430 | 280/5,271 | — | — | ACTIVE; zero credit |
-| 1 | 2 | `/tmp/g5-stage11-round1-lane2-20260719-a1` | 10/425 | 280/6,354 | — | — | ACTIVE; zero credit |
-| 1 | 3 | `/tmp/g5-stage11-round1-lane3-20260719-a1` | 9/425 | 252/23,856 | — | — | ACTIVE; zero credit |
+| 1 | 1 | `/tmp/g5-stage11-round1-lane1-20260719-a1` | 10/430 | 280/5,271 | — | 0/0 so far | REBASING; zero credit |
+| 1 | 2 | `/tmp/g5-stage11-round1-lane2-20260719-a1` | 10/425 | 280/6,353 | — | 1/0 | N12 RESTART; zero credit |
+| 1 | 3 | `/tmp/g5-stage11-round1-lane3-20260719-a1` | 9/425 | 252/23,856 | — | 0/0 so far | REBASING; zero credit |
 | 2 | 1 | — | 10/430 | to regenerate | — | — | NOT STARTED |
 | 2 | 2 | — | 10/425 | to regenerate | — | — | NOT STARTED |
 | 2 | 3 | — | 9/425 | to regenerate | — | — | NOT STARTED |

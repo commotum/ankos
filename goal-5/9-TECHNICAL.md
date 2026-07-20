@@ -1,6 +1,6 @@
 # 9-TECHNICAL
 
-Status: COMPLETE
+Status: REOPENED_BY_STAGE_11
 
 ## Entry State
 
@@ -175,14 +175,34 @@ zero findings and zero ambiguities. Active and queued rows grant no credit.
 | `N09` | `W1` | `fccbe7c6891a6085440c1765f80b8a813ee5a4a41308fde243027181a93c0651` | PASS | 0/0 |
 | `N10` | `/tmp/g5-stage9-rotated-closer-w3-n10-20260719-b1` | `1284462b39247358c7f0be3c8573a058a4bd9b82f54238d5408894edb0bd29d8` | PASS | 0/0 |
 | `N11` | `W1` | `1b140d7caf36fcfcc257079c80bc646ab835a5cfd02502dcf16582403c2c2fe6` | PASS | 0/0 |
-| `N12` | `/tmp/g5-stage9-rotated-n12-closer-w1-20260719-a1` | `7264471d7ef517a601fb396b2426e57387bbed42156447ac7b22ad75094af4cf` | PASS | 0/0 |
+| `N12` | post-Stage-11-fix fresh closure required; old packet superseded | — | — | OPEN |
 | `INDEX` | `/tmp/g5-stage9-rotated-closer-w3-index-20260719-a1` | `2d2736678d8f659802d7d2ad7bb22b2dc0abe7f72a7cf33a18b427993fc0c9be` | PASS | 0/0 |
 | `COLOPHON` | `W2/final/COLOPHON` | `63e8991a2cdd4e59d7983e0d9ce3c6d7f0953e514da81b255046ef3fa64089f9` | PASS | 0/0 |
 
+## Stage 11 Reopen
+
+Round 1 saturation found `L2-N12-001` on PDF page 1154 (printed page
+1138): correction `G5-C-4600` wrapped `$IterationLimit` in inline-code
+delimiters but failed to consume the raw Markdown escape immediately before the
+token. The generated text therefore retained one literal backslash before the
+opening delimiter. Root visually replayed the fixed-layout source, repaired the
+guard from raw preimage `\$IterationLimit` at byte 3,000,685 to
+`` `$IterationLimit` ``, rebuilt, and added a focused regression assertion.
+
+The N12 target changed from 398,153 bytes and SHA-256
+`c1899d24b3db987f291f9906ade3e8d1d4b10823ee1f5385d26b665d9fd62ea4`
+to 398,152 bytes and SHA-256
+`90d4ddcb566aae8515b0515221a10b4d7c2d96f353b429e52010cc93222bbdfa`.
+An independent 29-row comparison proves N12 is the only changed canonical
+document. Its prior 839-member seal is no longer current and grants no credit;
+the other 28 accepted document seals remain bound to unchanged target bytes.
+Stage 9 stays reopened until a wholly fresh post-fix N12 technical closure and
+root replay pass.
+
 ## Current Gate
 
-The target and source freezes and the integrated first pass are complete.
-Fresh rotated closers have formally sealed all 29 documents with zero
+The paragraphs below record the pre-repair gate for audit history. Before the
+Stage 11 finding, fresh rotated closers had formally sealed all 29 documents with zero
 findings and zero ambiguities: `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`,
 `CH02`, `CH03`, `CH04`, `CH05`, `CH06`, `CH07`, `CH08`, `CH09`, `CH10`,
 `CH11`, `CH12`,
@@ -248,9 +268,9 @@ against the final integrated target.
   summary hash, and seal hash on both runs. A separate hash replay matched all
   37 sealed members. The mutation report contains 30 unique, real-delta
   mutations; all 30 are rejected and both pristine runs pass.
-- The combined matrix contains exactly 29 unique canonical rows. All 29 have a
-  sealed artifact, root PASS, and `0/0`; no row is active, queued, inherited,
-  or unresolved.
+- At the pre-repair freeze, the combined matrix contained exactly 29 unique
+  canonical rows with a sealed artifact, root PASS, and `0/0`. N12 is now
+  superseded; 28 rows remain current and one fresh closure is required.
 - `python3 goal-5/build.py` builds exactly 29 documents, 1,607 images, and
   4,830 guarded corrections. `python3 goal-5/validate.py` validates those
   counts and all 29 second-pass coverage rows.
@@ -271,5 +291,5 @@ against the final integrated target.
   The protected 1,463-file legacy tree retains SHA-256
   `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
 - `uv run pytest -q` passes 304 tests and 6,177 subtests in 68.48 seconds.
-  `git diff --check` passes. No technical finding, source ambiguity, or Stage 9
-  completion requirement remains open.
+  `git diff --check` passed at that pre-repair freeze. The Stage 11 repair now
+  leaves one open Stage 9 requirement: fresh post-fix N12 technical closure.
