@@ -157,7 +157,7 @@ zero finding and zero ambiguity. Active and queued rows grant no credit.
 | `CH04` | `W3` | `71dee26c9c142a8aa008b20326b3afe7099c829e7b49b05a8f50a5460066fee4` | PASS | 0/0 |
 | `CH05` | queued | — | — | — |
 | `CH06` | `W1` | `39a013bb69b73f7614caafae482edb27372b4757ed67890d2b28c3bfa8a674d0` | PASS | 0/0 |
-| `CH07` | queued | — | — | — |
+| `CH07` | `/tmp/g5-stage9-ch07-rotated-closer-w3-20260719-a1` | `7d97487f4023363349fe32ffb24367a220d506b1837ee6a89a475833b3c5885d` | PASS | 0/0 |
 | `CH08` | `/tmp/g5-stage9-ch08-rotated-closer-w2-20260719-a1` | `55e3572553f06057559cf8ca9a76ce89a2268a4d3f7413e0eee1d5b0f65be76a` | PASS | 0/0 |
 | `CH09` | `W1` | `39a013bb69b73f7614caafae482edb27372b4757ed67890d2b28c3bfa8a674d0` | PASS | 0/0 |
 | `CH10` | `W3` | `6d8c59dd79a97d89fd48d7cc06ee560a57071882a7a35aae71ac3cf8e81dc397` | PASS | 0/0 |
@@ -182,9 +182,9 @@ zero finding and zero ambiguity. Active and queued rows grant no credit.
 ## Current Gate
 
 The target and source freezes and the integrated first pass are complete.
-Fresh rotated closers have formally sealed 25 of the 29 documents with zero
+Fresh rotated closers have formally sealed 26 of the 29 documents with zero
 finding and zero ambiguity: `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`,
-`CH02`, `CH03`, `CH04`, `CH06`, `CH08`, `CH09`, `CH10`, `CH11`, `CH12`,
+`CH02`, `CH03`, `CH04`, `CH06`, `CH07`, `CH08`, `CH09`, `CH10`, `CH11`, `CH12`,
 `GENERAL_NOTES`, `N01`,
 `N02`, `N03`, `N04`, `N05`, `N07`, `N08`, `N09`, `N10`, `N11`, `INDEX`, and
 `COLOPHON`. Root
@@ -212,6 +212,11 @@ including 21,220 lexical links and seven positional visual-only theta/pi
 tokens. All 54 state-changing mutations are rejected, two repository-root
 strict replays pass, all 2,239 manifest members match, and its seal SHA-256 is
 `55e3572553f06057559cf8ca9a76ce89a2268a4d3f7413e0eee1d5b0f65be76a`.
-Four documents remain across
+The accepted CH07 packet closes 4,119 source-ledger and 22,936 target-ledger
+rows. All 66 pages, 110 crops, 92 target assets, and 310 extracted source
+images were individually reviewed; all 30 state-changing mutations are
+rejected, two root strict replays pass, and its seal SHA-256 is
+`7d97487f4023363349fe32ffb24367a220d506b1837ee6a89a475833b3c5885d`.
+Three documents remain across
 the three rebalanced chapter/Notes lanes. Stage 9 stays `IN_PROGRESS` until all
 29 fresh rotated closures are sealed against the final integrated target.
