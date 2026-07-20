@@ -168,6 +168,15 @@ start only from the post-Stage-9 stable target.
   This is a valid historical seal against the N12-only repair freeze, but the
   later combined repairs require the same reviewer to prove all ten Lane 1
   document identities and regenerate its global bindings before acceptance.
+- The same reviewer completed that final rebind at
+  `/tmp/g5-stage11-round1-lane1-final-rebind-20260720-a1`. Exact identity and
+  context proofs preserve 430 firsthand page reviews while all 5,271 candidate
+  and 280 detector-run receipts are regenerated against the final preflight.
+  Root replayed all 23 real-delta mutation rejections and two final pristine
+  verifiers. Manifest SHA-256 is
+  `331b927d1d39f4dd29691f799c8f3a9aef8f880ca76801e9fb558b51e86d8b0f`;
+  seal SHA-256 is
+  `046fefe545ea7f4b8325307dee6b6db133d03c98530b25ff430e574a958c720f`.
 
 ### N06 Findings and Combined Freeze
 
@@ -224,7 +233,7 @@ hashes.
 
 | Round | Lane | Fresh packet | Documents/pages | Detector runs/candidates | Root replay | Finding/ambiguity | State |
 |---|---|---|---:|---:|---|---|---|
-| 1 | 1 | `/tmp/g5-stage11-round1-lane1-20260719-a1` | 10/430 | 280/5,271 | prior PASS | 0/0 | FINAL REBASE REQUIRED; zero current credit |
+| 1 | 1 | `/tmp/g5-stage11-round1-lane1-final-rebind-20260720-a1` | 10/430 | 280/5,271 | PASS | 0/0 | ACCEPTED |
 | 1 | 2 | `/tmp/g5-stage11-n12-final-restart-20260720-a1` plus nine-document rebind pending | 10/425 | 280/6,352 | N12 document PASS | 9/0 historical; fresh N12 0/0 | FULL LANE REBIND REQUIRED; zero lane credit |
 | 1 | 3 | prior packet superseded; replacement technical packet PASS | 9/425 | 252/23,856 | N06 technical PASS | 1 real + 2 disproved historical | FULL N06 SATURATION RESTART REQUIRED; zero lane credit |
 | 2 | 1 | — | 10/430 | to regenerate | — | — | NOT STARTED |

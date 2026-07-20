@@ -291,10 +291,11 @@ Neither file is a generalized workflow database.
   Its prior technical seal and all pre-repair saturation receipts are void.
   The wholly fresh replacement technical closure is accepted; the complete
   20-page Round 1 saturation restart remains required.
-- Lane 1 previously sealed 10 documents, 430 pages, 280 detector runs, and
-  5,271 candidates with zero finding or ambiguity, but its global bindings now
-  require rebase. Lane 3's earlier accepted seal is also superseded because it
-  reviewed the now-disproved N06 grouping and the pre-fix N06 table. Lane 2's
+- Lane 1 is accepted against the final freeze at 10 documents, 430 pages, 280
+  detector runs, and 5,271 candidates with zero finding or ambiguity; root
+  replayed all 23 mutations and two pristine verifiers. Lane 3's earlier seal
+  remains superseded because it reviewed the now-disproved N06 grouping and
+  the pre-fix N06 table. Lane 2's
   fresh N12 document restart is accepted, but its nine unchanged documents
   still require final rebind. All three lanes must bind to the post-Stage-9
   freeze, after which a wholly fresh Round 2 must find no discrepancy.
