@@ -25,21 +25,21 @@ import validate  # noqa: E402
 
 
 # Values below are derived from the canonical integrated manifests and target.
-EXPECTED_TARGET_BYTES = 85_467
+EXPECTED_TARGET_BYTES = 85_452
 EXPECTED_TARGET_LINES = 666
 EXPECTED_TARGET_SHA256 = (
-    "46e2cbc14314b6bb975632189b514eafa23341335cabb9c01cd9981f4a58cba7"
+    "23b589b5e711b93d2e4eb85f78c36e6c39f5b418f73a72bd79697fe6575f5a93"
 )
 EXPECTED_CORRECTION_ROWS_SHA256 = (
-    "c8263f80a096b4d5e16838ca9225b14421ccb67cbf4e93db5966462ba22e1899"
+    "a1dec02328b53fa1f3ddacd62ab442d04e10558361296548ab9238c54087ca3b"
 )
 EXPECTED_CORRECTION_ROW_HASH_SEQUENCE = (
-    "7b6db7049295e02f75cd75f7d66ced1c0b37af051ecfb2feb268411a7e5e42be"
+    "8641cf220bf3825065215e100c048dab582ea7683f42f13814b60bddc4f8f2c3"
 )
 EXPECTED_INVENTORY_HASHES = {
     "headings": "f74fc1b553f3e84a3a0a894683c7b56325406091843bc621acfcce20b1fb5ecc",
     "labels": "3b7eac5203ad6cb559dd59ba30aa9638e5eefee4fa7bbbded06883dccfdf47d3",
-    "code_fences": "da2612b77c04c435607f64d2ceffbc16719f64e0a0776f812382198389fd248f",
+    "code_fences": "7caf3059216dccb0d3bcbb8f33cf7f0cc5c61ea2110e786eff313e9e15060212",
     "inline_code": "30b47173bdafdfb5bd74f036f08866579049fe3c454887ff000ec08721b00f53",
     "image_references": "387f940554c276de1af83e96d4e2ee888008f031cf8409ad0440cf62dd298f8d",
 }
@@ -363,7 +363,14 @@ REQUIRED_LITERAL_PINS: tuple[tuple[str, str, int], ...] = (
     ("rule45-background", "background of repeated ■■□ blocks", 1),
     (
         "rule90-density",
-        "1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))",
+        "1/2 (1 - (1 - 2 p))^(2^DigitCount[t, 2, 1])",
+        1,
+    ),
+    (
+        "period-ratio-table",
+        "| n     | 11 | 13 | 19 | 25 | 27 | 29  | 37    | 41 | 43 | 53      |\n"
+        "|-------|----|----|----|----|----|-----|-------|----|----|---------|\n"
+        "| ratio | 3  | 5  | 27 | 41 | 19 | 565 | 21255 | 25 | 3  | 1266205 |",
         1,
     ),
     ("source-printed-plain-spacetime-entropy", r"$h \le 2r h_t$", 1),
@@ -414,8 +421,9 @@ FORBIDDEN_LITERAL_PINS: tuple[tuple[str, str], ...] = (
     ("density-missing-period", "very different behavior\n"),
     (
         "rule90-density-misgrouped",
-        "1/2 (1 - (1 - 2 p))^(2^DigitCount[t, 2, 1])",
+        "1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))",
     ),
+    ("invented-period-ratio-entry", "| 31 |"),
     ("invented-spatial-entropy-subscript", r"$h_x \le 2r h_t$"),
     (
         "excluded-blocks-false-paragraph",
@@ -635,6 +643,18 @@ class NotesForChapter6Tests(unittest.TestCase):
         by_id = {row["id"]: row for row in self.n06_corrections}
         self.assertEqual(
             (
+                by_id["G5-C-1262"]["raw_start_byte"],
+                by_id["G5-C-1262"]["after"],
+            ),
+            (
+                2_022_065,
+                "| n     | 11 | 13 | 19 | 25 | 27 | 29  | 37    | 41 | 43 | 53      |\n"
+                "|-------|----|----|----|----|----|-----|-------|----|----|---------|\n"
+                "| ratio | 3  | 5  | 27 | 41 | 19 | 565 | 21255 | 25 | 3  | 1266205 |\n",
+            ),
+        )
+        self.assertEqual(
+            (
                 by_id["G5-C-1292"]["raw_start_byte"],
                 by_id["G5-C-1292"]["before"],
                 by_id["G5-C-1292"]["after"],
@@ -642,7 +662,7 @@ class NotesForChapter6Tests(unittest.TestCase):
             (
                 2_035_208,
                 "$$1/2(1-(1-2p))^{2}$$\n",
-                "```\n1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))\n```\n",
+                "```\n1/2 (1 - (1 - 2 p))^(2^DigitCount[t, 2, 1])\n```\n",
             ),
         )
         self.assertIn(r"$h \le 2r h_t$", self.rendered)
@@ -935,7 +955,7 @@ class NotesForChapter6Tests(unittest.TestCase):
 
     def test_high_risk_source_and_technical_literals(self) -> None:
         self.assertEqual(
-            len(REQUIRED_LITERAL_PINS) + len(FORBIDDEN_LITERAL_PINS), 41
+            len(REQUIRED_LITERAL_PINS) + len(FORBIDDEN_LITERAL_PINS), 43
         )
         for pin_id, literal, expected_count in REQUIRED_LITERAL_PINS:
             with self.subTest(required_pin=pin_id):

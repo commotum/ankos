@@ -25,23 +25,25 @@ import build  # noqa: E402
 import validate  # noqa: E402
 
 
-FINAL_CORRECTION_COUNT = 1222
+FINAL_CORRECTION_COUNT = 1226
 FINAL_BASE_CORRECTION_FIRST_NUMBER = 3577
 FINAL_BASE_CORRECTION_LAST_NUMBER = 4445
 FINAL_REPAIR_CORRECTION_FIRST_NUMBER = 4475
 FINAL_REPAIR_CORRECTION_LAST_NUMBER = 4534
 FINAL_TECHNICAL_CORRECTION_FIRST_NUMBER = 4536
 FINAL_TECHNICAL_CORRECTION_LAST_NUMBER = 4828
-FINAL_TARGET_BYTES = 398_152
-FINAL_TARGET_LFS = 1_857
+FINAL_SATURATION_CORRECTION_FIRST_NUMBER = 4831
+FINAL_SATURATION_CORRECTION_LAST_NUMBER = 4834
+FINAL_TARGET_BYTES = 398_142
+FINAL_TARGET_LFS = 1_843
 FINAL_TARGET_SHA256 = (
-    "90d4ddcb566aae8515b0515221a10b4d7c2d96f353b429e52010cc93222bbdfa"
+    "c999ad62007b5ccc16ca17509e11863dd61b5b996250b955c06e7dede9932e8d"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "43c9f2668c8f951848779e4ead4e762d317cedb007e8135442d090e409e95b38"
+    "e0b2b324ffb30ddf9d2b93241967ff17fb7ba574de09144ebc791ae1d5672f3a"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "e1fa1c367f28f6db3e5bf71fc6d62f871e36e3b6d9a08ce8466bfc6da420f548"
+    "acfbeab406d42b3d98aee29b132c3677ca1ae058c2dc2c087e29b18a920cb62f"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "0b30632d2ca01fe1aba50d7d9fcec926704eae3a1b945a5b741c3768bcafc693"
@@ -65,7 +67,7 @@ EXPECTED_PDF_SHA256 = (
     "a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6"
 )
 EXPECTED_NORMAL_TREE_SHA256 = (
-    "904bab4188661c228690b8fb6fe9ff95c1765512c7fad78b9eb467e53ccbf8ac"
+    "a682973172db962f41e407f399090a7a0245a47163c550cdf35268054e331216"
 )
 EXPECTED_ZERO_TREE_SHA256 = (
     "1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b"
@@ -179,11 +181,11 @@ EXPECTED_ADDED_ASSETS = {
 
 
 EXPECTED_FULL_LEDGER_SHA256 = {
-    "corrections.jsonl": "e47d2d5396c0149d99a4220560b54be0f29a58de32761e26d7b337c47b671f20",
+    "corrections.jsonl": "0206a1f4e109293ef348d7435b075eb1a9a18a80523dcbde0cc11d25e23bb509",
     "image-map.jsonl": "e2fac1db19000e4bd4e634ac7dd1ea0920d3c7c9f105e2503904cc024bfe0681",
     "added-assets.jsonl": "d647fa8d948b155720ca3f8c909429654f30398fbf566e0b0fb6cca779e621ae",
     "source-ranges.json": "36dacbddcbb0157f604aafeca93e6e189bd16c6b52ac6409d6d83681a41de498",
-    "coverage.csv": "fb592a7019feb5cd1f8f19fe13e91c365ce13c578cf4e61ee79ea87a97491d34",
+    "coverage.csv": "736356b71d414ff3ce09e308f56b2291809052aeba03f26e754f63070046ef34",
 }
 
 
@@ -311,6 +313,13 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                         FINAL_TECHNICAL_CORRECTION_LAST_NUMBER + 1,
                     )
                 ),
+                *(
+                    f"G5-C-{number:04d}"
+                    for number in range(
+                        FINAL_SATURATION_CORRECTION_FIRST_NUMBER,
+                        FINAL_SATURATION_CORRECTION_LAST_NUMBER + 1,
+                    )
+                ),
             ],
         )
         self.assertEqual(rows_sha256(self.rows), FINAL_CORRECTION_ROWS_SHA256)
@@ -433,7 +442,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         by_id = {row["id"]: row for row in self.corrections}
         self.assertEqual(
             by_id["G5-C-3797"]["after"],
-            "`NestList`[#2 &, 2, n], or  $2^{2^n}$ , although for  "
+            "like `NestList`[#2 &, 2, n], or  $2^{2^n}$ , although for  "
             "$x = (20\\,4^s - 2)/3$  a better fit for  $n \\le 200$  is just  "
             "$2^{2.6 n}$ , with outputs increasing like  $2^{2^{1.3 n}}$ .\n",
         )
@@ -512,6 +521,36 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             self.rendered,
         )
         self.assertNotIn(r"\`$IterationLimit`", self.rendered)
+
+        saturation_rows = [
+            row
+            for row in self.rows
+            if FINAL_SATURATION_CORRECTION_FIRST_NUMBER
+            <= int(row["id"].rsplit("-", 1)[1])
+            <= FINAL_SATURATION_CORRECTION_LAST_NUMBER
+        ]
+        self.assertEqual(
+            [row["id"] for row in saturation_rows],
+            [f"G5-C-{number:04d}" for number in range(4831, 4835)],
+        )
+        self.assertEqual(
+            by_id["G5-C-4422"]["after"],
+            "ith  $\\Delta$  (or a + 1) and `Mod`[a, b] == 0. And in the 1990s Ivan Korec and others ",
+        )
+        self.assertEqual(by_id["G5-C-4715"]["after"], "example `FullSimplify`")
+        self.assertEqual(by_id["G5-C-4762"]["after"], "`Times`,\n")
+        self.assertEqual(by_id["G5-C-4831"]["after"], "a model of that axiom system.")
+        self.assertEqual(by_id["G5-C-4832"]["after"], "of truth tables.)")
+        self.assertEqual(by_id["G5-C-4833"]["after"], "independent algebraic")
+        self.assertEqual(by_id["G5-C-4834"]["after"], "theorems\n- deep theorem:")
+        self.assertIn("like `NestList`[#2 &, 2, n]", self.rendered)
+        self.assertIn("Korec and others showed", self.rendered)
+        self.assertIn("independent algebraic numbers", self.rendered)
+        self.assertIn("example `FullSimplify`", self.rendered)
+        self.assertIn("a model of that axiom system", self.rendered)
+        self.assertIn("of truth tables.)", self.rendered)
+        self.assertIn("theorems\n- deep theorem:", self.rendered)
+        self.assertIn("`Apply`[`Times`,\n`Map`[", self.rendered)
 
         repaired_rows = [
             row
@@ -682,10 +721,10 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 payload = (GOAL_DIR / relative).read_bytes()
                 self.assertEqual(build.sha256(payload), expected)
 
-        self.assertEqual(len(self.corrections), 4_830)
+        self.assertEqual(len(self.corrections), 4_834)
         self.assertEqual(
             [row["id"] for row in self.corrections],
-            [f"G5-C-{number:04d}" for number in range(1, 4_831)],
+            [f"G5-C-{number:04d}" for number in range(1, 4_835)],
         )
         self.assertEqual(len(self.images), 1_444)
         self.assertEqual(len(self.added_assets), 163)
@@ -723,8 +762,8 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="n12-firstpass-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
-            self.assertEqual(build.build(first), (29, 1607, 4830))
-            self.assertEqual(build.build(second), (29, 1607, 4830))
+            self.assertEqual(build.build(first), (29, 1607, 4834))
+            self.assertEqual(build.build(second), (29, 1607, 4834))
             first_tree, first_manifest = length_prefixed_tree(first)
             second_tree, second_manifest = length_prefixed_tree(second)
             output_tree, output_manifest = length_prefixed_tree(build.OUTPUT_ROOT)
@@ -734,7 +773,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
             self.assertEqual(first_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(second_tree, EXPECTED_NORMAL_TREE_SHA256)
             self.assertEqual(output_tree, EXPECTED_NORMAL_TREE_SHA256)
-            self.assertEqual(validate.validate(first), (29, 1607, 4830, 29))
+            self.assertEqual(validate.validate(first), (29, 1607, 4834, 29))
 
             zero = Path(directory) / "zero"
             self.assertEqual(build.build(zero, zero_corrections=True), (29, 1444, 0))
