@@ -25,21 +25,21 @@ import validate  # noqa: E402
 
 
 # Values below are derived from the canonical integrated manifests and target.
-EXPECTED_TARGET_BYTES = 85_467
+EXPECTED_TARGET_BYTES = 85_469
 EXPECTED_TARGET_LINES = 666
 EXPECTED_TARGET_SHA256 = (
-    "54bf7356136644c5040ffcc7945b49faab73a2bf5f2758dc51ff91b49e1eb437"
+    "b66bbd9e04137e3056992b8bdb5e74e40291af09fa3f609f7545a9c246995161"
 )
 EXPECTED_CORRECTION_ROWS_SHA256 = (
-    "2e7c2f5b9ae5610dccdbf11e842caa151ac424e806fb7861190f244c67a04e5f"
+    "ff8ee5ecc3b7f41d30ec7f390376894f3f26bbad75c71592a570bf16462c4faf"
 )
 EXPECTED_CORRECTION_ROW_HASH_SEQUENCE = (
-    "bfb34118d7d29458f5e7159c3051e977561821273add90a92932609cfa4dd2f7"
+    "2c20023fd2c6db55ceb9053e508ded4824e6d5eb5539096f189cb83fac20b472"
 )
 EXPECTED_INVENTORY_HASHES = {
     "headings": "f74fc1b553f3e84a3a0a894683c7b56325406091843bc621acfcce20b1fb5ecc",
     "labels": "3b7eac5203ad6cb559dd59ba30aa9638e5eefee4fa7bbbded06883dccfdf47d3",
-    "code_fences": "7caf3059216dccb0d3bcbb8f33cf7f0cc5c61ea2110e786eff313e9e15060212",
+    "code_fences": "da2612b77c04c435607f64d2ceffbc16719f64e0a0776f812382198389fd248f",
     "inline_code": "30b47173bdafdfb5bd74f036f08866579049fe3c454887ff000ec08721b00f53",
     "image_references": "387f940554c276de1af83e96d4e2ee888008f031cf8409ad0440cf62dd298f8d",
 }
@@ -363,9 +363,10 @@ REQUIRED_LITERAL_PINS: tuple[tuple[str, str, int], ...] = (
     ("rule45-background", "background of repeated ■■□ blocks", 1),
     (
         "rule90-density",
-        "1/2 (1 - (1 - 2 p))^(2^DigitCount[t, 2, 1])",
+        "1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))",
         1,
     ),
+    ("spatial-entropy-subscript", r"$h_x \le 2r h_t$", 1),
     ("cyclic-mod-equality", "`Mod[k^t, n] == 1`", 1),
     ("cyclic-gcd-equality", "`GCD[k, n] == 1`", 1),
     ("cyclic-power-equality", "`n == k^s`", 1),
@@ -413,8 +414,9 @@ FORBIDDEN_LITERAL_PINS: tuple[tuple[str, str], ...] = (
     ("density-missing-period", "very different behavior\n"),
     (
         "rule90-density-misgrouped",
-        "1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))",
+        "1/2 (1 - (1 - 2 p))^(2^DigitCount[t, 2, 1])",
     ),
+    ("spatial-entropy-subscript-missing", r"$h \le 2r h_t$"),
     (
         "excluded-blocks-false-paragraph",
         "additional excluded blocks with lengths\n\nbetween n and 2n.",
@@ -617,10 +619,13 @@ class NotesForChapter6Tests(unittest.TestCase):
         # Later note chapters append corrections globally; N06's owned slice is
         # immutable and remains the exact guard here.
         self.assertGreaterEqual(len(self.corrections), 1_401)
-        self.assertEqual(len(self.n06_corrections), 188)
+        self.assertEqual(len(self.n06_corrections), 189)
         self.assertEqual(
             [row["id"] for row in self.n06_corrections],
-            [f"G5-C-{number:04d}" for number in range(1214, 1402)],
+            [
+                *(f"G5-C-{number:04d}" for number in range(1214, 1402)),
+                "G5-C-4831",
+            ],
         )
         self.assertEqual(
             rows_sha256(self.n06_corrections), EXPECTED_CORRECTION_ROWS_SHA256
@@ -630,10 +635,33 @@ class NotesForChapter6Tests(unittest.TestCase):
             EXPECTED_CORRECTION_ROW_HASH_SEQUENCE,
         )
         previous_end = self.document["raw_start_byte"]
-        # C1392-C1399 are append-only visual guards and C1400-C1401 are fresh
-        # source-residual guards; their raw spans occur between earlier text
-        # guards. Sort only for the non-overlap proof; manifest order remains
-        # pinned by the ID and hash-sequence assertions above.
+        by_id = {row["id"]: row for row in self.n06_corrections}
+        self.assertEqual(
+            (
+                by_id["G5-C-1292"]["raw_start_byte"],
+                by_id["G5-C-1292"]["before"],
+                by_id["G5-C-1292"]["after"],
+            ),
+            (
+                2_035_208,
+                "$$1/2(1-(1-2p))^{2}$$\n",
+                "```\n1/2 (1 - (1 - 2 p)^(2^DigitCount[t, 2, 1]))\n```\n",
+            ),
+        )
+        self.assertEqual(
+            (
+                by_id["G5-C-4831"]["raw_start_byte"],
+                by_id["G5-C-4831"]["raw_line"],
+                by_id["G5-C-4831"]["before"],
+                by_id["G5-C-4831"]["after"],
+            ),
+            (2_073_557, 14_691, r"$h \le 2r h_t$", r"$h_x \le 2r h_t$"),
+        )
+
+        # C1392-C1399 are append-only visual guards, C1400-C1401 are fresh
+        # source-residual guards, and C4831 is the Stage 11 source replay. Their
+        # raw spans occur between earlier text guards. Sort only for the
+        # non-overlap proof; manifest order remains pinned above.
         for row in sorted(
             self.n06_corrections, key=lambda correction: correction["raw_start_byte"]
         ):
@@ -917,7 +945,7 @@ class NotesForChapter6Tests(unittest.TestCase):
 
     def test_high_risk_source_and_technical_literals(self) -> None:
         self.assertEqual(
-            len(REQUIRED_LITERAL_PINS) + len(FORBIDDEN_LITERAL_PINS), 39
+            len(REQUIRED_LITERAL_PINS) + len(FORBIDDEN_LITERAL_PINS), 41
         )
         for pin_id, literal, expected_count in REQUIRED_LITERAL_PINS:
             with self.subTest(required_pin=pin_id):
