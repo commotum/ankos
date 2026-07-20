@@ -169,7 +169,7 @@ zero findings and zero ambiguities. Active and queued rows grant no credit.
 | `N03` | `/tmp/g5-stage9-rotated-closer-w3-n03-20260719-a1` | `e4a7961a409a17a37bc6907b835c1101bfdf64584e63e789c3931be23420b67a` | PASS | 0/0 |
 | `N04` | `/tmp/g5-stage9-rotated-closer-w3-n04-20260719-a1` | `f59e12fb4558731d6307f11693dda5e85e5adbe0b4401dc56c5d4d697585d679` | PASS | 0/0 |
 | `N05` | `W1` | `3711d31d82a13e3807610410f27fda2f005cec77256f75c6c33d6b90b39f905d` | PASS | 0/0 |
-| `N06` | `/tmp/g5-stage9-rotated-closer-w3-n06-20260719-a1` (active; zero credit) | — | — | — |
+| `N06` | `/tmp/g5-stage9-rotated-closer-w3-n06-20260719-a1` | `f0799ce350a784cae5355f1f9814fe3d22f6b556c385912afe47c5f0adc356fa` | PASS | 0/0 |
 | `N07` | `W1` | `f1ae8c8ec6fd437b9ced37ffb763f3e5662e2b326266778354b1b85de80dc94b` | PASS | 0/0 |
 | `N08` | `/tmp/g5-stage9-rotated-closer-w3-n08-20260719-a1` | `2ae7a4ddbfd7e84cce29d402a2916e8457eace84cd1e03ac55d71063ba9ba249` | PASS | 0/0 |
 | `N09` | `W1` | `fccbe7c6891a6085440c1765f80b8a813ee5a4a41308fde243027181a93c0651` | PASS | 0/0 |
@@ -182,12 +182,12 @@ zero findings and zero ambiguities. Active and queued rows grant no credit.
 ## Current Gate
 
 The target and source freezes and the integrated first pass are complete.
-Fresh rotated closers have formally sealed 28 of the 29 documents with zero
+Fresh rotated closers have formally sealed all 29 documents with zero
 findings and zero ambiguities: `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`,
 `CH02`, `CH03`, `CH04`, `CH05`, `CH06`, `CH07`, `CH08`, `CH09`, `CH10`,
 `CH11`, `CH12`,
 `GENERAL_NOTES`, `N01`,
-`N02`, `N03`, `N04`, `N05`, `N07`, `N08`, `N09`, `N10`, `N11`, `N12`,
+`N02`, `N03`, `N04`, `N05`, `N06`, `N07`, `N08`, `N09`, `N10`, `N11`, `N12`,
 `INDEX`, and
 `COLOPHON`. Root
 independently replayed the corresponding baseline verifiers, mutation suites,
@@ -230,6 +230,14 @@ and 10,167 exact token links. All 54 pages, 92 crops, and 80 target assets were
 individually reviewed; all 60 state-changing mutations are rejected, two root
 strict replays pass, all 1,831 manifest members match, and its seal SHA-256 is
 `755ef4dce148817554f60e8517c666136d31260e5f18bce3985e4bfa1f8a1f87`.
-One document remains across
-the three rebalanced chapter/Notes lanes. Stage 9 stays `IN_PROGRESS` until all
-29 fresh rotated closures are sealed against the final integrated target.
+The accepted N06 packet closes 6,346 source-ledger and 21,946 target-ledger
+rows, with 3,187 exact, 2,179 crop-routed, and three whitespace-layout source
+runs. All 20 pages, 77 crops, 42 target assets, and 221 extracted source images
+were individually reviewed at original detail. All 30 state-changing mutations
+are rejected, both pristine runs and two independent root strict replays pass,
+all 37 sealed members match, and its seal SHA-256 is
+`f0799ce350a784cae5355f1f9814fe3d22f6b556c385912afe47c5f0adc356fa`.
+The three rebalanced chapter/Notes lanes therefore close 29/29 documents
+against the final integrated target. Stage 9 remains `IN_PROGRESS` only until
+the final cumulative build, validation, reproducibility, conservation, legacy,
+test, and diff gates are recorded below.
