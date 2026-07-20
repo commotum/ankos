@@ -15,15 +15,16 @@ Status: IN_PROGRESS
   restart and all three whole-lane seals remain pending; the other 27 document
   hashes remain unchanged.
 - The current deterministic zero-credit preflight is
-  `/tmp/g5-stage11-round1-final-preflight-20260720-a1`. It was generated only
-  after Stage 9 closed and freezes 29
+  `/tmp/g5-stage11-round2-final-preflight-20260720-a1`. It was generated only
+  after Round 1 closed and freezes 29
   documents, all 1,280 source pages, 28 detector families, 812
   document-detector runs, and 35,479 occurrence/inventory candidates. Its
   15-member manifest SHA-256 is
-  `25616b366b8f48a981d15eb4d6b3e4fdecd06b0d0255084a609cce15d8571884`;
+  `941ef2ef335512872de16a3d7f0b425affc8b00afc63f96e31dbbefe39553ecc`;
   root reproduced semantic verification and two strict replays, including all
-  16 mutation rejections and the explicit closed-Stage-9 gate. Every one of
-  its 37,603 work rows remains `UNREVIEWED` with `NONE` review credit.
+  20 mutation rejections and the explicit closed-Stage-9 and accepted-Round-1
+  gates. Every one of its 37,603 work rows remains `UNREVIEWED` with `NONE`
+  review credit and no inherited Round 1 disposition.
 - The preflight includes nine repeated-word candidates, 26 trailing-whitespace
   lines, 1,314 live image references, and explicit zero-hit detector runs.
   These are candidates and denominators, never defects or inherited clean
@@ -260,6 +261,6 @@ hashes.
 | 1 | 1 | `/tmp/g5-stage11-round1-lane1-final-rebind-20260720-a1` | 10/430 | 280/5,271 | PASS | 0/0 | ACCEPTED |
 | 1 | 2 | `/tmp/g5-stage11-round1-lane2-final-rebind-20260720-a1` | 10/425 | 280/6,352 | PASS | 0/0 | ACCEPTED |
 | 1 | 3 | `/tmp/g5-stage11-round1-lane3-final-restart-20260720-b1` | 9/425 | 252/23,856 | PASS | 0/0 | ACCEPTED |
-| 2 | 1 | — | 10/430 | to regenerate | — | — | NOT STARTED |
-| 2 | 2 | — | 10/425 | to regenerate | — | — | NOT STARTED |
-| 2 | 3 | — | 9/425 | to regenerate | — | — | NOT STARTED |
+| 2 | 1 | `/tmp/g5-stage11-round2-lane1-fresh-20260720-a1` | 10/430 | 280/5,271 | — | — | FRESH REVIEW ACTIVE; zero credit |
+| 2 | 2 | `/tmp/g5-stage11-round2-lane2-fresh-20260720-a1` | 10/425 | 280/6,352 | — | — | FRESH REVIEW ACTIVE; zero credit |
+| 2 | 3 | `/tmp/g5-stage11-round2-lane3-fresh-20260720-a1` | 9/425 | 252/23,856 | — | — | FRESH REVIEW ACTIVE; zero credit |

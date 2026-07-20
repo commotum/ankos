@@ -309,6 +309,15 @@ Neither file is a generalized workflow database.
   reproduce manifest SHA-256
   `25616b366b8f48a981d15eb4d6b3e4fdecd06b0d0255084a609cce15d8571884`
   and all 16 mutation rejections.
+- After Round 1 closure and the N06/N12 coverage-note update, a wholly fresh
+  Round 2 preflight was generated at
+  `/tmp/g5-stage11-round2-final-preflight-20260720-a1`. It binds all three
+  accepted Round 1 seals while explicitly inheriting no disposition or review
+  credit; root semantic verification and two strict replays reproduce manifest
+  SHA-256
+  `941ef2ef335512872de16a3d7f0b425affc8b00afc63f96e31dbbefe39553ecc`
+  and all 20 mutation rejections. Three new reviewers are independently
+  rechecking their complete page/candidate/run lanes from zero.
 - `python3 goal-5/validate.py` passes. The focused affected
   N06/N12 suite passes 15 tests. The complete repository suite passes 304
   tests and 6,185 subtests against the current
