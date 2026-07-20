@@ -175,18 +175,19 @@ zero finding and zero ambiguity. Active and queued rows grant no credit.
 | `N09` | `W1` | `fccbe7c6891a6085440c1765f80b8a813ee5a4a41308fde243027181a93c0651` | PASS | 0/0 |
 | `N10` | `/tmp/g5-stage9-rotated-closer-w3-n10-20260719-b1` | `1284462b39247358c7f0be3c8573a058a4bd9b82f54238d5408894edb0bd29d8` | PASS | 0/0 |
 | `N11` | `W1` | `1b140d7caf36fcfcc257079c80bc646ab835a5cfd02502dcf16582403c2c2fe6` | PASS | 0/0 |
-| `N12` | `/tmp/g5-stage9-rotated-n12-closer-w1-20260719-a1` | active | — | — |
+| `N12` | `/tmp/g5-stage9-rotated-n12-closer-w1-20260719-a1` | `7264471d7ef517a601fb396b2426e57387bbed42156447ac7b22ad75094af4cf` | PASS | 0/0 |
 | `INDEX` | `/tmp/g5-stage9-rotated-closer-w3-index-20260719-a1` | `2d2736678d8f659802d7d2ad7bb22b2dc0abe7f72a7cf33a18b427993fc0c9be` | PASS | 0/0 |
 | `COLOPHON` | `W2/final/COLOPHON` | `63e8991a2cdd4e59d7983e0d9ce3c6d7f0953e514da81b255046ef3fa64089f9` | PASS | 0/0 |
 
 ## Current Gate
 
 The target and source freezes and the integrated first pass are complete.
-Fresh rotated closers have formally sealed 26 of the 29 documents with zero
+Fresh rotated closers have formally sealed 27 of the 29 documents with zero
 finding and zero ambiguity: `PUBLICATION_AND_CONTENTS`, `PREFACE`, `CH01`,
 `CH02`, `CH03`, `CH04`, `CH06`, `CH07`, `CH08`, `CH09`, `CH10`, `CH11`, `CH12`,
 `GENERAL_NOTES`, `N01`,
-`N02`, `N03`, `N04`, `N05`, `N07`, `N08`, `N09`, `N10`, `N11`, `INDEX`, and
+`N02`, `N03`, `N04`, `N05`, `N07`, `N08`, `N09`, `N10`, `N11`, `N12`,
+`INDEX`, and
 `COLOPHON`. Root
 independently replayed the corresponding baseline verifiers, mutation suites,
 seals, and member hashes before accepting them. The accepted N10 packet closes
@@ -217,6 +218,12 @@ rows. All 66 pages, 110 crops, 92 target assets, and 310 extracted source
 images were individually reviewed; all 30 state-changing mutations are
 rejected, two root strict replays pass, and its seal SHA-256 is
 `7d97487f4023363349fe32ffb24367a220d506b1837ee6a89a475833b3c5885d`.
-Three documents remain across
+The accepted N12 packet closes all 76 pages, 2,076 target objects, 76,848
+target tokens, 19,018 canonical source runs, 8,318 technical-source rows, 53
+target assets, 168 source-asset rows, and 178 manual clusters. All 40
+state-changing mutations are rejected and exactly restored, root independently
+replayed the final 839-member read-only seal, and the seal-manifest SHA-256 is
+`7264471d7ef517a601fb396b2426e57387bbed42156447ac7b22ad75094af4cf`.
+Two documents remain across
 the three rebalanced chapter/Notes lanes. Stage 9 stays `IN_PROGRESS` until all
 29 fresh rotated closures are sealed against the final integrated target.
