@@ -1,6 +1,6 @@
 # 10-FIGURES-INDEX
 
-Status: IN_PROGRESS
+Status: COMPLETE
 
 ## Entry State
 
@@ -154,11 +154,11 @@ After canonical integration:
 
 - `python3 goal-5/build.py` reports 29 documents, 1,607 images, and 4,830
   corrections;
-- `python3 goal-5/validate.py` passes with 27 documents still intentionally
-  marked second-pass complete;
+- `python3 goal-5/validate.py` passes with all 29 documents marked second-pass
+  complete;
 - the canonical generated tree is byte-identical to the vetted combined
   preview;
-- the complete Goal 5 suite passes: 202 tests and 6,177 subtests; and
+- the complete Goal 5 suite passes: 304 tests and 6,177 subtests; and
 - `git diff --check` passes.
 
 ## Reopened-Group Second Pass
@@ -189,22 +189,38 @@ seal, and manifest checks.
   wording, punctuation, typography, and boundaries.
 - The repaired tree is generated from immutable raw input plus guarded
   corrections, never used as the next build source.
-- The remaining eight-group visual second pass must use fresh evidence and no
-  inherited lane verdict.
+- The eight-group visual second pass used fresh evidence and no inherited lane
+  verdict.
 
-## Remaining Completion Requirements
+## Completion Record
 
-- Close the current rotated Stage 9 technical pass for final `INDEX` content;
-  the final `COLOPHON` technical closure is already sealed and accepted.
-- Advance `INDEX` and `COLOPHON` to `YES/YES` in `coverage.csv` only after all
-  Stage 10 checks are sealed.
-- Rerun build, validation, complete tests, manifest checks, legacy-integrity
-  checks, and `git diff --check`; record exact final hashes here.
-- Change this status to `COMPLETE` only when every requirement above passes
-  with zero finding and zero unresolved ambiguity.
+- The fresh final `INDEX` technical closure at
+  `/tmp/g5-stage9-rotated-closer-w3-index-20260719-a1` is independently
+  accepted: 20,748 source-ledger rows, 127,313 target-ledger rows, 29 of 29
+  state-changing mutations rejected, two pristine verifier passes, and zero
+  finding or ambiguity. Its seal file SHA-256 is
+  `2d2736678d8f659802d7d2ad7bb22b2dc0abe7f72a7cf33a18b427993fc0c9be`.
+  The final `COLOPHON` technical closure was already sealed and accepted.
+- `INDEX` and `COLOPHON` are now `YES/YES`; all 29 coverage rows are
+  `YES/YES`. `coverage.csv` has SHA-256
+  `4cf6b456c41bf0268769e44c4588843d6f4fcf5a93dedf4d6d693bc95492dd88`.
+- Two fresh final builds at `/tmp/g5-stage10-final-build-a-20260719` and
+  `/tmp/g5-stage10-final-build-b-20260719` are byte-identical. Each has 1,638
+  files, and its sorted relative-path `sha256sum` manifest hashes to
+  `36935ac03b256d360a9833fd53fc936da88d05036db0bc986415b079c4ea804c`.
+  The frozen length-prefixed normal-tree SHA-256 is
+  `ed94317245fd2ae5becdd2305520c29c47740143888d044ef1f356ceba2ab899`;
+  the zero-correction tree SHA-256 remains
+  `1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b`.
+- Both final builds validate as 29 documents, 1,607 images, 4,830 corrections,
+  and 29 second-pass documents. The complete suite passes with 304 tests and
+  6,177 subtests. The protected 1,463-file legacy tree retains SHA-256
+  `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`,
+  and `git diff --check` passes.
+- Every Stage 10 denominator closes with zero finding and zero unresolved
+  ambiguity. No Stage 10 requirement remains open.
 
 ## Exact Next Action
 
-Finish and independently accept the active fresh `INDEX` technical closure,
-then advance `INDEX` and `COLOPHON` to `YES/YES` and run the final cumulative
-build, validation, tests, manifest, legacy-integrity, and diff checks.
+Continue Stage 9's fresh rotated technical closures for the eight remaining
+documents: `CH05`, `CH07`, `CH08`, `CH11`, `N04`, `N06`, `N08`, and `N12`.
