@@ -7,9 +7,11 @@ them. All 29 canonical documents reached Stage 9 technical closure, and Stage
 resolved nine source-backed N12 serialization/layout defects and one
 source-backed N06 table defect. Two apparent N06 formula/subscript defects were
 disproved with fresh high-resolution source evidence and rolled back. Both
-documents' technical and saturation closures are being repeated against the
-combined repaired bytes. Stage 11 remains in progress and will reopen this
-register if a fresh source comparison cannot be resolved.
+documents now have accepted, wholly fresh technical closures against the
+combined repaired bytes; N12 also has an accepted fresh 76-page saturation
+document restart. Stage 11's whole-lane rebinding and fresh final round remain
+in progress and will reopen this register if a source comparison cannot be
+resolved.
 
 ## FOUNDATION-SOURCE-001 — complete authoritative source
 

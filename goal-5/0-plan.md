@@ -270,25 +270,27 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-20 (America/Los_Angeles).
-- Active stage: `11-SATURATION` (`IN_PROGRESS`). Stage 10 remains complete.
-  Stage 9 is reopened for N06 and N12 because Stage 11 found and repaired nine
-  source-backed N12 defects and one source-backed N06 table defect. Two
-  apparent N06 formula/subscript defects were disproved against fresh 600-DPI
-  and 1,200-DPI source evidence and rolled back; the other 27 technical
-  closures remain bound to byte-identical documents.
+- Active stage: `11-SATURATION` (`IN_PROGRESS`). Stages 9 and 10 are complete.
+  Stage 11 found and repaired nine source-backed N12 defects and one
+  source-backed N06 table defect. Two apparent N06 formula/subscript defects
+  were disproved against fresh high-resolution source evidence and rolled
+  back. Wholly fresh N06 and N12 technical closures now pass independent root
+  mutation and pristine replays; the other 27 closures remain bound to
+  byte-identical documents.
 - The current repaired tree has exactly 29 canonical documents, 1,607 images,
   4,834 guarded corrections, 29 completed second-pass coverage rows, and 1,638
   total files. Its length-prefixed SHA-256 is
   `a682973172db962f41e407f399090a7a0245a47163c550cdf35268054e331216`.
 - N12 is 398,142 bytes, 1,843 LF, and SHA-256
   `c999ad62007b5ccc16ca17509e11863dd61b5b996250b955c06e7dede9932e8d`.
-  A wholly fresh post-fix technical closure and its 76-page Round 1 saturation
-  restart are active; no pre-repair N12 verdict receives credit.
+  Its wholly fresh post-fix technical closure and 76-page Round 1 document
+  restart are accepted with zero mismatch or ambiguity; no pre-repair N12
+  verdict receives credit. The full Lane 2 seal still requires final rebind.
 - N06 is 85,452 bytes, 666 LF, and SHA-256
   `23b589b5e711b93d2e4eb85f78c36e6c39f5b418f73a72bd79697fe6575f5a93`.
-  Its prior technical seal and all pre-repair saturation receipts are void; a
-  wholly fresh technical closure and complete 20-page Round 1 restart are
-  required.
+  Its prior technical seal and all pre-repair saturation receipts are void.
+  The wholly fresh replacement technical closure is accepted; the complete
+  20-page Round 1 saturation restart remains required.
 - Lane 1 previously sealed 10 documents, 430 pages, 280 detector runs, and
   5,271 candidates with zero finding or ambiguity, but its global bindings now
   require rebase. Lane 3's earlier accepted seal is also superseded because it
@@ -820,7 +822,7 @@ Neither file is a generalized workflow database.
 | 6-NOTES-00-04 | `COMPLETE` | 2 |
 | 7-NOTES-05-08 | `COMPLETE` | 2 |
 | 8-NOTES-09-12 | `COMPLETE` | 2 |
-| 9-TECHNICAL | `REOPENED_BY_STAGE_11` | 3–8 |
+| 9-TECHNICAL | `COMPLETE` | 3–8 |
 | 10-FIGURES-INDEX | `COMPLETE` | 3–8 plus fixed-layout source evidence |
 | 11-SATURATION | `IN_PROGRESS` | 3–10 |
 | 12-RELEASE | `NOT_STARTED` | 11; zero open source ambiguity |

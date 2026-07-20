@@ -1,6 +1,6 @@
 # 9-TECHNICAL
 
-Status: REOPENED_BY_STAGE_11
+Status: COMPLETE
 
 ## Entry State
 
@@ -169,13 +169,13 @@ zero findings and zero ambiguities. Active and queued rows grant no credit.
 | `N03` | `/tmp/g5-stage9-rotated-closer-w3-n03-20260719-a1` | `e4a7961a409a17a37bc6907b835c1101bfdf64584e63e789c3931be23420b67a` | PASS | 0/0 |
 | `N04` | `/tmp/g5-stage9-rotated-closer-w3-n04-20260719-a1` | `f59e12fb4558731d6307f11693dda5e85e5adbe0b4401dc56c5d4d697585d679` | PASS | 0/0 |
 | `N05` | `W1` | `3711d31d82a13e3807610410f27fda2f005cec77256f75c6c33d6b90b39f905d` | PASS | 0/0 |
-| `N06` | post-Stage-11-fix fresh closure required; old packet superseded | — | — | OPEN |
+| `N06` | `/tmp/g5-stage9-n06-postfix-closer-20260719-a1` | `e5510fcfc2f04c9f9fdca2d3fc8d4a5efe57a4cbc7bc83639a7576749fe9aa7b` | PASS | 0/0 |
 | `N07` | `W1` | `f1ae8c8ec6fd437b9ced37ffb763f3e5662e2b326266778354b1b85de80dc94b` | PASS | 0/0 |
 | `N08` | `/tmp/g5-stage9-rotated-closer-w3-n08-20260719-a1` | `2ae7a4ddbfd7e84cce29d402a2916e8457eace84cd1e03ac55d71063ba9ba249` | PASS | 0/0 |
 | `N09` | `W1` | `fccbe7c6891a6085440c1765f80b8a813ee5a4a41308fde243027181a93c0651` | PASS | 0/0 |
 | `N10` | `/tmp/g5-stage9-rotated-closer-w3-n10-20260719-b1` | `1284462b39247358c7f0be3c8573a058a4bd9b82f54238d5408894edb0bd29d8` | PASS | 0/0 |
 | `N11` | `W1` | `1b140d7caf36fcfcc257079c80bc646ab835a5cfd02502dcf16582403c2c2fe6` | PASS | 0/0 |
-| `N12` | post-Stage-11-fix fresh closure required; old packet superseded | — | — | OPEN |
+| `N12` | `/tmp/g5-stage9-n12-postrepair-technical-closure-20260720-a1` | `7d3050dbb57933df1c613546bdebb7e9a7857f659232f0abce81d5ec2213a25a` | PASS | 0/0 |
 | `INDEX` | `/tmp/g5-stage9-rotated-closer-w3-index-20260719-a1` | `2d2736678d8f659802d7d2ad7bb22b2dc0abe7f72a7cf33a18b427993fc0c9be` | PASS | 0/0 |
 | `COLOPHON` | `W2/final/COLOPHON` | `63e8991a2cdd4e59d7983e0d9ce3c6d7f0953e514da81b255046ef3fa64089f9` | PASS | 0/0 |
 
@@ -216,10 +216,11 @@ The combined tree contains 4,834 corrections and has length-prefixed SHA-256
 `a682973172db962f41e407f399090a7a0245a47163c550cdf35268054e331216`.
 The correction ledger SHA-256 is
 `0206a1f4e109293ef348d7435b075eb1a9a18a80523dcbde0cc11d25e23bb509`.
-Both prior N06 and N12 technical seals grant no current credit. Stage 9 stays
-reopened until wholly fresh post-fix technical closures and independent root
-replays pass for both documents; the other 27 accepted document seals remain
-bound to byte-identical targets.
+Both prior N06 and N12 technical seals grant no current credit. Their wholly
+fresh post-fix replacements now pass independent root mutation and pristine
+replays, while the other 27 accepted document seals remain bound to
+byte-identical targets. Stage 9 is therefore closed again across all 29
+documents.
 
 ## Current Gate
 
@@ -284,34 +285,41 @@ against the final integrated target.
 
 ## Completion Record
 
-- Root independently accepted the final N06 packet by running its strict public
-  verifier twice from the repository root, reproducing the same 6,346-row
-  source ledger, 21,946-row target ledger, target hash, mutation-report hash,
-  summary hash, and seal hash on both runs. A separate hash replay matched all
-  37 sealed members. The mutation report contains 30 unique, real-delta
-  mutations; all 30 are rejected and both pristine runs pass.
-- At the pre-repair freeze, the combined matrix contained exactly 29 unique
-  canonical rows with a sealed artifact, root PASS, and `0/0`. N06 and N12 are
-  now superseded; 27 rows remain current and two fresh closures are required.
+- Root independently accepted the replacement N06 packet by replaying its
+  strict public verifier, all 38 real-file mutations, and the pristine seal.
+  It closes 6,348 source-ledger rows and 21,934 target-ledger rows against
+  target SHA-256
+  `23b589b5e711b93d2e4eb85f78c36e6c39f5b418f73a72bd79697fe6575f5a93`;
+  mutation-report SHA-256 is
+  `0104f7535ef8de250025ca77d112e172938239035f29c0d681e3ed34eed8a5c0`.
+- Root independently accepted the replacement N12 packet after catching and
+  requiring repair of a self-referential mutation-receipt/manifest hash cycle.
+  The corrected suite requires explicit execution, produces byte-identical
+  receipts across runs, rejects and exactly restores 32/32 real packet-file
+  deltas, and passes two final pristine replays. Its stable mutation-receipt
+  SHA-256 is
+  `004b7cb8e405fd8763ef1f556a9f7062fd5e4fd6c374f2d740842ae4b47033fe`;
+  its 1,526-member manifest framing SHA-256 is
+  `83aec31d5de21626497ad5b15abed5b699ad7d506e6b1c81a0bb336d32769263`.
+- The combined matrix now contains exactly 29 current canonical rows with a
+  sealed artifact, root PASS, and `0/0`.
 - `python3 goal-5/build.py` builds exactly 29 documents, 1,607 images, and
   4,834 guarded corrections. `python3 goal-5/validate.py` validates those
   counts and all 29 second-pass coverage rows.
-- Fresh builds at `/tmp/g5-stage9-final-build-a-20260719` and
-  `/tmp/g5-stage9-final-build-b-20260719` are byte-identical to each other and
-  to `ref/A-New-Kind-of-Science-Repaired/`. Each contains 1,638 files, has
-  sorted relative-path manifest SHA-256
-  `36935ac03b256d360a9833fd53fc936da88d05036db0bc986415b079c4ea804c`,
-  and has length-prefixed tree SHA-256
-  `ed94317245fd2ae5becdd2305520c29c47740143888d044ef1f356ceba2ab899`.
+- Fresh combined-freeze builds at
+  `/tmp/g5-combined-freeze-build-a-20260720` and
+  `/tmp/g5-combined-freeze-build-b-20260720` are byte-identical to each other
+  and to `ref/A-New-Kind-of-Science-Repaired/`. Each contains 1,638 files and
+  has length-prefixed tree SHA-256
+  `a682973172db962f41e407f399090a7a0245a47163c550cdf35268054e331216`.
 - A fresh zero-correction build validates at 29 documents, 1,444 images, zero
   corrections, and 29 coverage rows. Its 1,475-file length-prefixed tree
   SHA-256 is
   `1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b`;
   the validator and cumulative tests reproduce the immutable raw projection.
-- `goal-5/coverage.csv` contains exactly 29 `YES/YES` rows and retains SHA-256
-  `4cf6b456c41bf0268769e44c4588843d6f4fcf5a93dedf4d6d693bc95492dd88`.
+- `goal-5/coverage.csv` contains exactly 29 `YES/YES` rows and has SHA-256
+  `736356b71d414ff3ce09e308f56b2291809052aeba03f26e754f63070046ef34`.
   The protected 1,463-file legacy tree retains SHA-256
   `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
 - `.venv/bin/pytest -q` passes 304 tests and 6,185 subtests against the combined
-  repair freeze. The Stage 11 repairs leave two open Stage 9 requirements:
-  fresh post-fix N06 and N12 technical closures.
+  repair freeze. The Stage 11 repairs leave no open Stage 9 requirement.
