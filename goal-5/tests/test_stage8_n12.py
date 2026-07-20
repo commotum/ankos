@@ -32,16 +32,16 @@ FINAL_REPAIR_CORRECTION_FIRST_NUMBER = 4475
 FINAL_REPAIR_CORRECTION_LAST_NUMBER = 4534
 FINAL_TECHNICAL_CORRECTION_FIRST_NUMBER = 4536
 FINAL_TECHNICAL_CORRECTION_LAST_NUMBER = 4828
-FINAL_TARGET_BYTES = 398_153
+FINAL_TARGET_BYTES = 398_152
 FINAL_TARGET_LFS = 1_857
 FINAL_TARGET_SHA256 = (
-    "c1899d24b3db987f291f9906ade3e8d1d4b10823ee1f5385d26b665d9fd62ea4"
+    "90d4ddcb566aae8515b0515221a10b4d7c2d96f353b429e52010cc93222bbdfa"
 )
 FINAL_CORRECTION_ROWS_SHA256 = (
-    "c9d6d2359b6f646afaa2366a416e1b3b429af04ca360ad727e19c0f93144ea95"
+    "43c9f2668c8f951848779e4ead4e762d317cedb007e8135442d090e409e95b38"
 )
 FINAL_CORRECTION_SEQUENCE_SHA256 = (
-    "64ec567ff903044dd97ff2d25fa71f556e10eb626f860b7bed8d8870bf045e2d"
+    "e1fa1c367f28f6db3e5bf71fc6d62f871e36e3b6d9a08ce8466bfc6da420f548"
 )
 FINAL_IMAGE_ROWS_SHA256 = (
     "0b30632d2ca01fe1aba50d7d9fcec926704eae3a1b945a5b741c3768bcafc693"
@@ -65,7 +65,7 @@ EXPECTED_PDF_SHA256 = (
     "a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6"
 )
 EXPECTED_NORMAL_TREE_SHA256 = (
-    "ed94317245fd2ae5becdd2305520c29c47740143888d044ef1f356ceba2ab899"
+    "03c052c18a8d0c274d62a6fd1c8e0d57267ec9714d9be704c9ba19705e19128e"
 )
 EXPECTED_ZERO_TREE_SHA256 = (
     "1971cbef0d2c588ee94eb0d268e535c1e9fd2eb6bcc8864bd671ab40ca98729b"
@@ -179,7 +179,7 @@ EXPECTED_ADDED_ASSETS = {
 
 
 EXPECTED_FULL_LEDGER_SHA256 = {
-    "corrections.jsonl": "f7032d762cbeeac1921aa41ff27597636b9252687a366397442013b2bd5cadb7",
+    "corrections.jsonl": "9839ce7da11e068a641c6b613b4a81bac180127d464f27f33983e867899a1068",
     "image-map.jsonl": "e2fac1db19000e4bd4e634ac7dd1ea0920d3c7c9f105e2503904cc024bfe0681",
     "added-assets.jsonl": "d647fa8d948b155720ca3f8c909429654f30398fbf566e0b0fb6cca779e621ae",
     "source-ranges.json": "36dacbddcbb0157f604aafeca93e6e189bd16c6b52ac6409d6d83681a41de498",
@@ -498,6 +498,21 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
                 self.assertEqual(self.rendered.count(row["after"]), 1)
 
     def test_reopened_spacing_syntax_and_nand_repairs_are_exact(self) -> None:
+        by_id = {row["id"]: row for row in self.rows}
+        self.assertEqual(
+            (
+                by_id["G5-C-4600"]["raw_start_byte"],
+                by_id["G5-C-4600"]["before"],
+                by_id["G5-C-4600"]["after"],
+            ),
+            (3000685, r"\$IterationLimit", "`$IterationLimit`"),
+        )
+        self.assertIn(
+            "constructs such as `$IterationLimit` and `TimeConstraint`",
+            self.rendered,
+        )
+        self.assertNotIn(r"\`$IterationLimit`", self.rendered)
+
         repaired_rows = [
             row
             for row in self.rows
