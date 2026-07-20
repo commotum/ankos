@@ -4,8 +4,9 @@ There is no open Foundation source blocker or author-text ambiguity. Content
 review discrepancies are added here only when source comparison cannot resolve
 them. All 29 canonical documents reached Stage 9 technical closure, and Stage
 10 figure/Index closure remains complete. Stage 11 subsequently found and
-resolved one source-backed N12 serialization defect and two source-backed N06
-technical defects. Both documents' technical and saturation closures are being
+resolved one source-backed N12 serialization defect and one source-backed N06
+technical formula defect. A second apparent N06 defect was disproved at 600 DPI
+and rolled back. Both documents' technical and saturation closures are being
 repeated against the repaired bytes. Stage 11 remains in progress and will
 reopen this register if a fresh source comparison cannot be resolved.
 

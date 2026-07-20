@@ -271,19 +271,20 @@ Neither file is a generalized workflow database.
 
 - Synced: 2026-07-19 (America/Los_Angeles).
 - Active stage: `11-SATURATION` (`IN_PROGRESS`). Stage 10 remains complete.
-  Stage 9 is reopened for N06 and N12 because Stage 11 found and repaired three
-  source-backed defects; the other 27 technical closures remain bound to
-  byte-identical documents.
+  Stage 9 is reopened for N06 and N12 because Stage 11 found and repaired two
+  source-backed defects, one in each document. A second apparent N06 defect was
+  disproved against a fresh 600-DPI source crop and rolled back; the other 27
+  technical closures remain bound to byte-identical documents.
 - The current repaired tree has exactly 29 canonical documents, 1,607 images,
-  4,831 guarded corrections, 29 completed second-pass coverage rows, and 1,638
+  4,830 guarded corrections, 29 completed second-pass coverage rows, and 1,638
   total files. Its length-prefixed SHA-256 is
-  `51324abb98d1b34b077680a6d5698811fc2372eb78ff1e2f2d6fbb352aea6077`.
+  `904bab4188661c228690b8fb6fe9ff95c1765512c7fad78b9eb467e53ccbf8ac`.
 - N12 is 398,152 bytes, 1,857 LF, and SHA-256
   `90d4ddcb566aae8515b0515221a10b4d7c2d96f353b429e52010cc93222bbdfa`.
   A wholly fresh post-fix technical closure and its 76-page Round 1 saturation
   restart are active; no pre-repair N12 verdict receives credit.
-- N06 is 85,469 bytes, 666 LF, and SHA-256
-  `b66bbd9e04137e3056992b8bdb5e74e40291af09fa3f609f7545a9c246995161`.
+- N06 is 85,467 bytes, 666 LF, and SHA-256
+  `46e2cbc14314b6bb975632189b514eafa23341335cabb9c01cd9981f4a58cba7`.
   Its prior technical seal and all pre-repair saturation receipts are void; a
   wholly fresh technical closure and complete 20-page Round 1 restart are
   required.

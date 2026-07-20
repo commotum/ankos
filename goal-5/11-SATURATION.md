@@ -118,9 +118,11 @@ start only from the post-Stage-9 stable target.
   detector runs, 6,354 candidates); and Lane 3 at
   `/tmp/g5-stage11-round1-lane3-20260719-a1` (nine documents, 425 pages, 252
   detector runs, 23,856 candidates).
-- Round 1 is active. Root accepted three source-backed findings and repaired
-  them. Every pre-repair N12 and N06 verdict is invalid, and all lane seals must
-  bind to the latest post-N06 freeze before receiving current credit.
+- Round 1 is active. Root accepted two source-backed defects and repaired them:
+  one in N12 and one in N06. A third apparent N06 finding was disproved at
+  600 DPI and rolled back. Every pre-repair N12 and N06 verdict is invalid, and
+  all lane seals must bind to the latest post-N06 freeze before receiving
+  current credit.
 
 ### Round 1 Finding and Post-Repair Freeze
 
