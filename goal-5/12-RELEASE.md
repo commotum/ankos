@@ -1,6 +1,6 @@
 # 12-RELEASE
 
-Status: IN_PROGRESS
+Status: COMPLETE
 
 ## Big-Picture Objective
 
@@ -82,5 +82,86 @@ builder, validator, generated-document, normal-tree, and zero-tree hashes.
 
 ## Stage Results
 
-In progress. Exact release hashes and command outcomes will be recorded only
-after the rebuilt published tree and all release gates pass.
+Completed on 2026-07-20 (America/Los_Angeles).
+
+### Accurate Generated Documentation
+
+- `build.py` now emits distinct normal-release and zero-correction README
+  files. The normal README identifies the complete source-verified repair,
+  agent review, absence of human proofreading, preservation of source-printed
+  errors, local PDF boundary, exact commands, and compact Goal 5 records. The
+  zero README identifies an uncorrected diagnostic projection and cannot be
+  mistaken for the release.
+- `Contents.md` remains an exact 29-link ordered navigation file and now labels
+  itself generated editorial material rather than author text. All README and
+  Contents links resolve in the published sibling.
+- Final SHA-256 values are:
+  - builder:
+    `516e36510488c785bdcc7e5cd1775e6a88d9c8f170550ac37632089a5c5ae693`
+  - validator:
+    `2e84ed042d10a87c88475575c676b262de3149b0dc77c86e2e5aa9c7c408fe12`
+  - corrected README:
+    `e56e77f3b18695d927f568655e54a37c6558fcab33021d566f86b0a2bb175ed0`
+  - zero-correction README:
+    `830ed517ba9e4b28971fedfe2f08337d55c96182d878e58223f740c2d309fe72`
+  - Contents:
+    `ec0584ac69c23f629a483680ada74a4b56829f2ac016b1de48e79c32877c9f32`
+
+### Release-Only Rebind
+
+- Stage 11's builder SHA-256 `6399c819...` and normal-tree SHA-256
+  `a6829731...` are retained as historical saturation bindings. Stage 12
+  changed the generator only for mode-aware README/Contents output and release
+  validation; it made no author-text, correction, image-map, added-asset, or
+  coverage change.
+- Before and after that change, the exact 1,636-file author-text/image payload
+  tree (29 documents plus 1,607 images, excluding only generated README and
+  Contents) is
+  `63d702f88f644df70158c1dbf31124bd56e9e2efa04325a8fbf754daf2bb8f61`.
+- The 29 ordered canonical documents remain 3,622,684 bytes and 38,168 LF with
+  concatenated SHA-256
+  `ec7f22f801d157076d33446f2fb5ee01dadaa6b18f3e89d0a123acc0000f2725`.
+  This satisfies the release-only rebind without reopening source review.
+
+### Deterministic Builds
+
+- The published sibling and fresh builds
+  `/tmp/g5-stage12-normal-a-20260720-a1` and
+  `/tmp/g5-stage12-normal-b-20260720-a1` are byte-identical at 1,638 files.
+  Their length-prefixed tree SHA-256 is
+  `d3d2d96b6d4516e76f37b1fbf28c31f524a65d41f3799dbba15a06f17d340660`.
+  Each validates as 29 documents, 1,607 images, 4,834 corrections, and 29
+  completed second-pass rows.
+- `/tmp/g5-stage12-zero-20260720-a1` validates at 29 documents, 1,444 images,
+  zero corrections, and 29 completed coverage rows. Its 1,475-file
+  length-prefixed tree SHA-256 is
+  `45cadbc5af59dd0c23e7fd8599ef663385159c5ae4b69ca3a37bd5ca1166609e`.
+  Its ordered document bytes are exactly the 3,780,628-byte immutable monolith,
+  SHA-256
+  `55537ca8cf7d99197b0e5ba043abbade76739e056e3b04b2f9eb6cf7e2ffee20`.
+- The correction ledger remains 4,834 rows at SHA-256
+  `0206a1f4e109293ef348d7435b075eb1a9a18a80523dcbde0cc11d25e23bb509`;
+  coverage remains 29 `YES/YES` agent rows at SHA-256
+  `3157e4a88f424796edf3d4cd5f909b1d7f7d335e230f872445db7361051ecee6`.
+
+### Final Verification
+
+- Default, both fresh normal, and fresh zero-correction validation pass. Exact
+  directory comparison reports no difference between the two fresh normal
+  builds or between either one and the published sibling.
+- CommonMark parsing/rendering passes all 31 Markdown files: 3,627,415 source
+  bytes, 123,253 tokens, 3,915,770 rendered HTML bytes, and render-record
+  SHA-256
+  `7076c3dcd7a74b12787007e26263e4360c5e503df2c953631de21a0b9f37a240`.
+  All 1,607 published JPEG files pass image decoding.
+- Focused release/Foundation/N11/N12 checks pass 31 tests and 1,766 subtests.
+  The complete repository suite passes 311 tests and 6,268 subtests.
+- The protected legacy tree remains exactly 1,463 files at SHA-256
+  `b9ff7b9b507790f1d519593baf2b2d2f24dd6cd49dc0fe10f0ac629278ea42f4`.
+  Both local PDF copies remain 57,779,240 bytes, mode `0600`, Git-ignored and
+  untracked, with SHA-256
+  `a3cc5dd60e12d6b563aee86ea31a15b03f9cddfd4869b8f965d3a11bbc61a0d6`.
+- `git diff --check` and final scope inspection pass. Changes are limited to
+  Goal 5 records/builder/validator/tests plus the two generated navigation
+  files; the immutable legacy corpus and all author-text/image payloads remain
+  unchanged.

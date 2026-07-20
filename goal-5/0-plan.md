@@ -142,8 +142,9 @@ and pinned fixed-layout source unless explicitly described as a review risk.
   validation, and test machinery after migrating four compact fact sets. Goal
   4 had not corrected the book text.
 - The sibling `ref/A-New-Kind-of-Science-Repaired/` is reproducibly generated
-  from the immutable monolith plus guarded corrections. It remains a partial
-  repair worktree rather than a verified complete edition.
+  from the immutable monolith plus guarded corrections. It is the completed
+  source-verified Goal 5 release; its generated README accurately distinguishes
+  the corrected release from the raw diagnostic projection.
 - A complete local First-edition, First-printing PDF is pinned as the
   user-authorized fixed-layout witness for local agent-assisted comparison and
   repaired workspace output. It is Git-ignored and is not authorized here for
@@ -270,8 +271,8 @@ Neither file is a generalized workflow database.
 ## Current Execution State
 
 - Synced: 2026-07-20 (America/Los_Angeles).
-- Active stage: `12-RELEASE` (`IN_PROGRESS`). Stages 9, 10, and 11 are
-  complete. Stage 11 found and repaired nine source-backed N12 defects and one
+- Final stage: `12-RELEASE` (`COMPLETE`). All Goal 5 stages are complete.
+  Stage 11 found and repaired nine source-backed N12 defects and one
   source-backed N06 table defect. Two apparent N06 formula/subscript defects
   were disproved against fresh high-resolution source evidence and rolled
   back. The affected technical and document passes were restarted before the
@@ -280,7 +281,7 @@ Neither file is a generalized workflow database.
 - The current repaired tree has exactly 29 canonical documents, 1,607 images,
   4,834 guarded corrections, 29 completed second-pass coverage rows, and 1,638
   total files. Its length-prefixed SHA-256 is
-  `a682973172db962f41e407f399090a7a0245a47163c550cdf35268054e331216`.
+  `d3d2d96b6d4516e76f37b1fbf28c31f524a65d41f3799dbba15a06f17d340660`.
 - N12 is 398,142 bytes, 1,843 LF, and SHA-256
   `c999ad62007b5ccc16ca17509e11863dd61b5b996250b955c06e7dede9932e8d`.
   Its wholly fresh post-fix technical closure and 76-page Round 1 document
@@ -318,10 +319,14 @@ Neither file is a generalized workflow database.
   page/candidate/run lanes from zero. Root reproduced all final mutation and
   verifier gates; the stable 3,622,684-byte author-text corpus hashes to
   `ec7f22f801d157076d33446f2fb5ee01dadaa6b18f3e89d0a123acc0000f2725`.
-- `python3 goal-5/validate.py` passes. The focused affected
-  N06/N12 suite passes 15 tests. The complete repository suite passes 304
-  tests and 6,185 subtests against the current
-  source-faithful freeze.
+- Stage 12 changed only generated navigation/release documentation and its
+  focused builder/validator assertions. The 1,636 author-text/image payload
+  files remain byte-identical to the accepted Stage 11 tree at SHA-256
+  `63d702f88f644df70158c1dbf31124bd56e9e2efa04325a8fbf754daf2bb8f61`.
+  Two fresh normal builds and the published sibling match exactly; the raw
+  diagnostic projection reassembles to the immutable monolith and validates.
+- `python3 goal-5/validate.py` passes. The complete repository suite passes
+  311 tests and 6,268 subtests against the final release.
 
 ### Chronological Stage Record
 
@@ -846,7 +851,7 @@ Neither file is a generalized workflow database.
 | 9-TECHNICAL | `COMPLETE` | 3–8 |
 | 10-FIGURES-INDEX | `COMPLETE` | 3–8 plus fixed-layout source evidence |
 | 11-SATURATION | `COMPLETE` | 3–10 |
-| 12-RELEASE | `IN_PROGRESS` | 11; zero open source ambiguity |
+| 12-RELEASE | `COMPLETE` | 11; zero open source ambiguity |
 
 ## Stages
 
