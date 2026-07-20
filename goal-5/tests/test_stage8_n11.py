@@ -632,7 +632,7 @@ class NotesForChapter11Tests(unittest.TestCase):
             [name for name in EXPECTED_REFERENCES if name in added_names],
         )
 
-    def test_authoritative_source_and_first_pass_coverage_state(self) -> None:
+    def test_authoritative_source_and_final_coverage_state(self) -> None:
         range_data = json.loads(build.RANGES_PATH.read_text(encoding="utf-8"))
         source = range_data["authoritative_source"]
         self.assertEqual(

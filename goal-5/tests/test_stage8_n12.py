@@ -230,7 +230,7 @@ def length_prefixed_tree(root: Path) -> tuple[str, list[tuple[str, str, int]]]:
     return digest.hexdigest(), manifest
 
 
-class NotesForChapter12FirstPassTests(unittest.TestCase):
+class NotesForChapter12FinalTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.raw, cls.documents, cls.corrections, cls.images = build.load_inputs()
@@ -741,7 +741,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         self.assertNotIn("<<<<<<<", n12_payload)
         self.assertNotIn(">>>>>>>", n12_payload)
 
-    def test_authoritative_source_and_pending_first_pass_coverage_state(self) -> None:
+    def test_authoritative_source_and_final_coverage_state(self) -> None:
         range_data = json.loads(build.RANGES_PATH.read_text(encoding="utf-8"))
         source = range_data["authoritative_source"]
         self.assertEqual(
@@ -759,7 +759,7 @@ class NotesForChapter12FirstPassTests(unittest.TestCase):
         self.assertEqual(sum(row["second_pass"] == "YES" for row in coverage), 29)
 
     def test_normal_and_zero_builds_have_frozen_length_prefixed_trees(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="n12-firstpass-build-") as directory:
+        with tempfile.TemporaryDirectory(prefix="n12-final-build-") as directory:
             first = Path(directory) / "first"
             second = Path(directory) / "second"
             self.assertEqual(build.build(first), (29, 1607, 4834))
