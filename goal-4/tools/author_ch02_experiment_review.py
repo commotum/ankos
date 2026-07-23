@@ -245,6 +245,10 @@ experiment = source_candidate(
         "input": "A chosen sequence of possible simple programs.",
         "external_data": "Observed run histories are supplied to the investigator.",
         "law_kind": "Enumeration followed by execution and observation.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Enumerate the chosen program sequence, execute each program, and "
+            "inspect the resulting behavior."
+        ),
         "result_kind": "A collection of program behaviors for comparison.",
         "parameters_and_variants": (
             "The sampled program class, rule sequence, initial conditions, and "
@@ -1780,7 +1784,7 @@ pascal_mod2 = declarative_pattern(
     values="Binary parity values.",
     result="A static nested binary array.",
     aliases=["odd binomial-coefficient pattern"],
-    route_keys=["pascal-page611"],
+    route_keys=["pascal-page611", "pascal-polynomial-page1091"],
 )
 add_evidence(
     pascal_mod2,
@@ -1794,9 +1798,9 @@ add_evidence(
     modality="FORMULA",
 )
 
-rule60 = declarative_pattern(
-    key="rule60",
-    name="Rule 60 binomial-modulo-two pattern preset",
+rule60_pattern = declarative_pattern(
+    key="rule60-pattern",
+    name="binomial-modulo-two array identified with the Rule 60 single-seed pattern",
     anchor="U005117",
     definition=(
         "The static array value at row t and position n is "
@@ -1805,7 +1809,52 @@ rule60 = declarative_pattern(
     support="Nonnegative integer row and position coordinates.",
     values="Binary parity values.",
     result="A uniquely determined distorted nested binary pattern.",
+    aliases=["Rule 60 binomial pattern"],
+    route_keys=["rule60-bit-page583"],
+)
+
+rule60_ca = source_candidate(
+    key="rule60-ca",
+    name="Rule 60 cellular automaton preset",
+    anchor="U005117",
     aliases=["cellular automaton rule 60"],
+    facts={
+        "object_kind": "A named one-dimensional binary cellular-automaton preset.",
+        "native_time": "Discrete cellular-automaton generations.",
+        "carrier": "Cells in a one-dimensional row.",
+        "support": "A one-dimensional cellular space.",
+        "alphabet_or_value_schema": "Two cell values represented by parity 0 and 1.",
+        "complete_state": "One binary value at every cell position.",
+        "seed": (
+            "The co-referenced canonical pattern is the single-seed evolution "
+            "represented by Mod[Binomial[t,n],2]."
+        ),
+        "frontier_or_activation": "The named elementary rule applies across the row.",
+        "read_dependencies_or_neighborhood": (
+            "An elementary left/self/right neighborhood is implied by the rule number."
+        ),
+        "law_kind": "A deterministic elementary cellular-automaton lookup rule.",
+        "result_kind": "A uniquely determined evolution once the Rule 60 lookup is supplied.",
+        "parameters_and_variants": "The source fixes elementary rule number 60.",
+        "excluded_observers_and_representations": (
+            "The binomial formula is a direct denotation of one canonical "
+            "evolution, not the complete native transition relation."
+        ),
+        "evidence_limit": (
+            "This passage does not expand the Rule 60 lookup table, state a "
+            "boundary convention, or define arbitrary-seed evolution."
+        ),
+    },
+    claim=(
+        "The source explicitly identifies the displayed binomial-modulo-two "
+        "array as the pattern produced by cellular automaton Rule 60."
+    ),
+    missing=(
+        "This passage does not expand the Rule 60 lookup table, state a "
+        "boundary convention, or define arbitrary-seed evolution."
+    ),
+    strength="DIRECT_IDENTITY",
+    modality="FORMULA",
     route_keys=["rule60-page58"],
 )
 
@@ -2330,6 +2379,49 @@ add_evidence(
     ),
     fields=list(center_column["facts"]),
     modality="CODE",
+)
+
+rule102 = source_candidate(
+    key="rule102",
+    name="Rule 102 cellular automaton preset",
+    anchor="U005149",
+    aliases=["reflection of rule 60"],
+    facts={
+        "object_kind": "A named one-dimensional binary cellular-automaton preset.",
+        "native_time": "Discrete elementary cellular-automaton generations.",
+        "carrier": "Cells in a one-dimensional row.",
+        "support": "A one-dimensional cellular space.",
+        "topology": "An elementary left/self/right neighborhood.",
+        "alphabet_or_value_schema": "Two cell values.",
+        "complete_state": "One binary value at every cell position.",
+        "frontier_or_activation": "The elementary rule applies across the row.",
+        "read_dependencies_or_neighborhood": "Left neighbor, self, and right neighbor.",
+        "law_kind": "A deterministic elementary cellular-automaton lookup rule.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Rule 102 is the spatial reflection of Rule 60; exactly one of its "
+            "eight lookup outputs differs from Rule 110."
+        ),
+        "result_kind": "A unique successor once the eight-case lookup is expanded.",
+        "parameters_and_variants": "Elementary rule number 102.",
+        "excluded_observers_and_representations": (
+            "The comparison with Rule 110 and reflection description are "
+            "identity-bearing relations, not a displayed evolution."
+        ),
+        "evidence_limit": (
+            "The passage does not print Rule 102's eight outputs, state a seed "
+            "or boundary, or define completion and witness semantics."
+        ),
+    },
+    claim=(
+        "The Rule 110 note separately identifies elementary Rule 102 as the "
+        "reflection of Rule 60 and distinguishes its eight-case lookup from "
+        "Rule 110 in exactly one case."
+    ),
+    missing=(
+        "The passage does not print Rule 102's eight outputs, state a seed or "
+        "boundary, or define completion and witness semantics."
+    ),
+    strength="DIRECT_PARTIAL_MECHANICS",
 )
 
 
@@ -3099,8 +3191,6 @@ add_evidence(
         "implementation mechanics to page 927."
     ),
     fields=[
-        "support",
-        "topology",
         "parameters_and_variants",
         "excluded_observers_and_representations",
         "evidence_limit",
@@ -3218,6 +3308,13 @@ add_route(
     vocabulary=["Pascal's triangle", "binomial coefficients", "modulo 2"],
 )
 add_route(
+    key="pascal-polynomial-page1091",
+    unit="U005116",
+    literal="PolynomialMod[Expand[(1/x + x)^t], 2] (see page 1091)",
+    topic="polynomial construction of the Rule 90/Pascal parity array",
+    vocabulary=["PolynomialMod", "rule 90", "binomial coefficients"],
+)
+add_route(
     key="rule60-page58",
     unit="U005117",
     literal="the one produced by rule 60 (see page 58)",
@@ -3274,6 +3371,13 @@ add_route(
     vocabulary=["rule 30", "all possible blocks", "page 725"],
 )
 add_route(
+    key="rule30-boundary-page949",
+    unit="U005142",
+    literal="compare page 949",
+    topic="Rule 30 regular/random-region boundary motion",
+    vocabulary=["rule 30", "boundary", "average motion"],
+)
+add_route(
     key="rule30-column-page1087",
     unit="U005148",
     literal="the arguments on page 1087",
@@ -3300,6 +3404,13 @@ add_route(
     literal="Localized structures ... are shown on page 292.",
     topic="Rule 110 localized-structure definitions",
     vocabulary=["rule 110", "localized structures", "page 292"],
+)
+add_route(
+    key="design-weaving-page929",
+    unit="U005166",
+    literal="See also page 929.",
+    topic="rule-based design and weaving construction boundary",
+    vocabulary=["design", "weaving patterns", "cellular automata"],
 )
 add_route(
     key="cosmati-apollonian-page986",
@@ -3449,6 +3560,14 @@ add_route(
     topic="shift-commuting block-map equivalence with one-dimensional cellular automata",
     vocabulary=["shift-commuting block maps", "1D cellular automata", "page 961"],
 )
+add_route(
+    key="historical-additive-page870",
+    unit="U005238",
+    literal="binomial coefficient modulo primes ... (see page 870)",
+    topic="additive cellular automata and binomial-coefficient parity",
+    vocabulary=["additive cellular automata", "binomial coefficient", "rule 90"],
+    scope="WITHIN_STAGE",
+)
 
 # The explicit historical checklist is retained as discovery routing, not
 # multiplied into duplicate candidates in this chapter.
@@ -3480,6 +3599,7 @@ for key, unit, literal, topic, vocabulary, scope in [
     ("hofstadter-sequence-page907", "U005280", "page 907", "Hofstadter recursive-sequence construction", ["Hofstadter", "recursive sequence", "page 907"], "CROSS_RANGE"),
     ("mandelbrot-page934", "U005281", "page 934", "Mandelbrot-set iteration", ["Mandelbrot set", "page 934"], "CROSS_RANGE"),
     ("early-ca-experiment-page19", "U005286", "page 19", "1981 elementary-cellular-automaton experiment", ["computer experiments", "cellular automata", "page 19"], "CROSS_RANGE"),
+    ("random-initial-page112", "U005286", "See page 112.", "random-initial-condition versus intrinsic-randomness evidence", ["random initial conditions", "rule 30", "page 112"], "CROSS_RANGE"),
     ("ca-classes-page231", "U005288", "page 231", "four cellular-automaton behavior classes", ["four basic classes", "random initial conditions", "page 231"], "CROSS_RANGE"),
     ("irreducibility-page737", "U005290", "page 737", "computational-irreducibility property", ["computational irreducibility", "page 737"], "CROSS_RANGE"),
     ("ca-fluid-page378", "U005292", "page 378", "cellular-automaton fluid construction", ["fluid mechanics", "cellular automata", "page 378"], "CROSS_RANGE"),
@@ -3491,4 +3611,367 @@ for key, unit, literal, topic, vocabulary, scope in [
         topic=topic,
         vocabulary=vocabulary,
         scope=scope,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Deterministic worker-local allocation and complete row/asset authoring.
+
+SEED_KEYS = {
+    "centered-single-seed",
+    "cyclic-boundary",
+    "cyclic-explicit-seed",
+    "background-seed",
+    "offset-block-seed",
+    "dd-padded-seed",
+    "explicit-cyclic-seed",
+    "periodic-patch-seed",
+    "positioned-patch-preset",
+    "rule90-background-seed",
+}
+HISTORICAL_CANDIDATE_KEYS = {
+    "pylos-labyrinth",
+    "triangular-circle-array",
+    "celtic-touching-circles",
+    "roman-rosette",
+    "cosmati-triangles",
+    "triangle-grid-push",
+    "nested-rope",
+    "truchet-pattern-space",
+    "game-of-life",
+    "von-neumann-29color-ca",
+    "ulam-recursive-2d-ca",
+    "fredkin-2d-rule90",
+    "code20",
+    "linear-feedback-shift-register",
+    "shift-commuting-block-map",
+}
+RELATION_IMAGE_UNITS = {
+    "U000264",
+    "U005200",
+    "U005201",
+    "U005202",
+}
+CONTROL_IMAGE_UNITS = {"U005240"}
+
+
+def anchor_order_maps(
+    reading_input: list[dict[str, str]],
+    asset_input: list[dict[str, str]],
+) -> tuple[dict[str, int], dict[str, int], dict[str, dict[str, str]]]:
+    unit_order: dict[str, int] = {}
+    image_order: dict[str, int] = {}
+    asset_by_path: dict[str, dict[str, str]] = {}
+    ordinal = 1
+    for path in EXPECTED_PATHS:
+        for row in reading_input:
+            if row["path"] == path:
+                unit_order[row["source_unit_id"]] = ordinal
+                ordinal += 1
+        for row in asset_input:
+            if row["assignment_path"] == path:
+                image_order[row["physical_path"]] = ordinal
+                asset_by_path[row["physical_path"]] = row
+                ordinal += 1
+    if len(unit_order) != len(reading_input):
+        raise AuthoringError("reading assignment contains an unexpected path")
+    if len(image_order) != len(asset_input):
+        raise AuthoringError("asset assignment contains an unexpected path")
+    return unit_order, image_order, asset_by_path
+
+
+def allocate_semantic_records(
+    reading_input: list[dict[str, str]],
+    asset_input: list[dict[str, str]],
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, str]],
+    dict[str, list[str]],
+    dict[str, list[str]],
+    dict[str, list[str]],
+]:
+    unit_order, image_order, asset_by_path = anchor_order_maps(
+        reading_input, asset_input
+    )
+
+    def anchor_details(anchor_id: str) -> tuple[str, int]:
+        if anchor_id in unit_order:
+            return "SOURCE_UNIT", unit_order[anchor_id]
+        if anchor_id in image_order:
+            return "IMAGE", image_order[anchor_id]
+        raise AuthoringError(f"unknown discovery anchor {anchor_id}")
+
+    candidate_specs = sorted(
+        ALL_CANDIDATE_SPECS,
+        key=lambda item: (
+            anchor_details(item["anchor"])[1],
+            item["_insertion"],
+        ),
+    )
+    candidate_id_by_key = {
+        spec["key"]: f"W{index:04d}"
+        for index, spec in enumerate(candidate_specs, 1)
+    }
+    candidate_ordinal_by_key: dict[str, int] = {}
+    candidate_counts: defaultdict[tuple[str, str], int] = defaultdict(int)
+    for spec in candidate_specs:
+        kind, _ = anchor_details(spec["anchor"])
+        identity = (kind, spec["anchor"])
+        candidate_counts[identity] += 1
+        candidate_ordinal_by_key[spec["key"]] = candidate_counts[identity]
+
+    evidence_entries: list[tuple[CandidateSpec, EvidenceSpec, str, int]] = []
+    for spec in ALL_CANDIDATE_SPECS:
+        for evidence_spec in spec["evidence"]:
+            evidence_anchor = (
+                evidence_spec["image_path"]
+                if evidence_spec["image_path"] is not None
+                else evidence_spec["unit"]
+            )
+            kind, order = anchor_details(evidence_anchor)
+            evidence_entries.append((spec, evidence_spec, kind, order))
+    evidence_entries.sort(
+        key=lambda item: (
+            item[3],
+            item[1]["_insertion"],
+            item[0]["_insertion"],
+        )
+    )
+    evidence_identity: dict[tuple[str, str], tuple[str, str, int]] = {}
+    evidence_counts: defaultdict[tuple[str, str], int] = defaultdict(int)
+    for index, (spec, evidence_spec, kind, _) in enumerate(evidence_entries, 1):
+        anchor_id = (
+            evidence_spec["image_path"]
+            if evidence_spec["image_path"] is not None
+            else evidence_spec["unit"]
+        )
+        identity = (kind, anchor_id)
+        evidence_counts[identity] += 1
+        evidence_identity[(spec["key"], evidence_spec["label"])] = (
+            f"WE{index:06d}",
+            f"WG{index:06d}",
+            evidence_counts[identity],
+        )
+
+    route_specs = sorted(
+        ALL_ROUTE_SPECS,
+        key=lambda item: (
+            unit_order[item["unit"]],
+            item["_insertion"],
+        ),
+    )
+    route_id_by_key = {
+        spec["key"]: f"WR{index:04d}"
+        for index, spec in enumerate(route_specs, 1)
+    }
+    route_counts: defaultdict[str, int] = defaultdict(int)
+    route_proposals: list[dict[str, str]] = []
+    route_links_by_unit: defaultdict[str, list[str]] = defaultdict(list)
+    for spec in route_specs:
+        route_counts[spec["unit"]] += 1
+        route_id = route_id_by_key[spec["key"]]
+        route_links_by_unit[spec["unit"]].append(route_id)
+        route_proposals.append(
+            {
+                "route_id": route_id,
+                "source_unit_id": spec["unit"],
+                "source_asset_id": "",
+                "discovery_epoch": "1",
+                "discovery_kind": "SOURCE_UNIT",
+                "discovery_id": spec["unit"],
+                "discovery_ordinal": str(route_counts[spec["unit"]]),
+                "literal_target": spec["literal"],
+                "route_kind": spec["kind"],
+                "expected_topic": spec["topic"],
+                "owning_stage": "6",
+                "closure_scope": spec["scope"],
+                "status": "PENDING",
+                "target_unit_ids": "[]",
+                "target_asset_ids": "[]",
+                "attempts": "[]",
+                "vocabulary_terms": compact(spec["vocabulary"]),
+                "defect_boundary": "",
+            }
+        )
+
+    candidate_proposals: list[dict[str, Any]] = []
+    candidate_links_by_unit: defaultdict[str, list[str]] = defaultdict(list)
+    candidate_links_by_image: defaultdict[str, list[str]] = defaultdict(list)
+    anchor_candidate_links_by_unit: defaultdict[str, list[str]] = defaultdict(list)
+    for spec in candidate_specs:
+        candidate_id = candidate_id_by_key[spec["key"]]
+        anchor_kind, _ = anchor_details(spec["anchor"])
+        local_evidence: list[dict[str, Any]] = []
+        label_to_id: dict[str, str] = {}
+        for evidence_spec in spec["evidence"]:
+            evidence_id, group_id, ordinal = evidence_identity[
+                (spec["key"], evidence_spec["label"])
+            ]
+            label_to_id[evidence_spec["label"]] = evidence_id
+            evidence_anchor = (
+                evidence_spec["image_path"]
+                if evidence_spec["image_path"] is not None
+                else evidence_spec["unit"]
+            )
+            evidence_kind = (
+                "IMAGE"
+                if evidence_spec["image_path"] is not None
+                else "SOURCE_UNIT"
+            )
+            local_evidence.append(
+                {
+                    "evidence_id": evidence_id,
+                    "evidence_group_id": group_id,
+                    "discovery_anchor": {
+                        "epoch": 1,
+                        "kind": evidence_kind,
+                        "id": evidence_anchor,
+                        "ordinal": ordinal,
+                    },
+                    "source_unit_id": evidence_spec["unit"],
+                    "image_path": evidence_spec["image_path"],
+                    "strength": evidence_spec["strength"],
+                    "modality": evidence_spec["modality"],
+                    "claim": evidence_spec["claim"],
+                    "fingerprint_fields": evidence_spec["fields"],
+                }
+            )
+        local_evidence.sort(
+            key=lambda item: int(item["evidence_id"][2:])
+        )
+        source_unit_ids = sorted(
+            {item["source_unit_id"] for item in local_evidence},
+            key=lambda unit_id: unit_order[unit_id],
+        )
+        image_witnesses = sorted(
+            {
+                item["image_path"]
+                for item in local_evidence
+                if item["image_path"] is not None
+            },
+            key=lambda path: image_order[path],
+        )
+        for unit_id in source_unit_ids:
+            candidate_links_by_unit[unit_id].append(candidate_id)
+        for image_path in image_witnesses:
+            candidate_links_by_image[image_path].append(candidate_id)
+        if anchor_kind == "SOURCE_UNIT":
+            anchor_candidate_links_by_unit[spec["anchor"]].append(candidate_id)
+        else:
+            anchor_candidate_links_by_unit[
+                asset_by_path[spec["anchor"]]["source_unit_id"]
+            ].append(candidate_id)
+
+        fingerprint: dict[str, dict[str, Any]] = {}
+        field_support: dict[str, str] = {}
+        for field in FINGERPRINT_FIELDS:
+            supporting_ids = [
+                item["evidence_id"]
+                for item in local_evidence
+                if field in item["fingerprint_fields"]
+            ]
+            if field in spec["facts"]:
+                if not supporting_ids:
+                    raise AuthoringError(
+                        f"{spec['key']} has no evidence for supported field {field}"
+                    )
+                field_support[field] = "SUPPORTED"
+                fingerprint[field] = {
+                    "status": "SUPPORTED",
+                    "value": spec["facts"][field],
+                    "evidence_ids": supporting_ids,
+                    "reason": "",
+                }
+            else:
+                if supporting_ids:
+                    raise AuthoringError(
+                        f"{spec['key']} evidence claims absent field {field}"
+                    )
+                field_support[field] = "UNKNOWN_FROM_SOURCE"
+                fingerprint[field] = {
+                    "status": "UNKNOWN_FROM_SOURCE",
+                    "value": None,
+                    "evidence_ids": [],
+                    "reason": spec["missing"],
+                }
+
+        def parameter_records(
+            values: list[tuple[str, str, list[str]]],
+        ) -> list[dict[str, Any]]:
+            records: list[dict[str, Any]] = []
+            for name, description, labels in values:
+                try:
+                    evidence_ids = [label_to_id[label] for label in labels]
+                except KeyError as exc:
+                    raise AuthoringError(
+                        f"{spec['key']} parameter cites unknown evidence {exc}"
+                    ) from exc
+                records.append(
+                    {
+                        "name": name,
+                        "source_description": description,
+                        "evidence_ids": evidence_ids,
+                    }
+                )
+            return records
+
+        try:
+            candidate_route_ids = [
+                route_id_by_key[key] for key in spec["route_keys"]
+            ]
+        except KeyError as exc:
+            raise AuthoringError(
+                f"{spec['key']} cites unknown route key {exc}"
+            ) from exc
+        provenance_units = set(source_unit_ids)
+        for route_key in spec["route_keys"]:
+            route_source = next(
+                item["unit"]
+                for item in ALL_ROUTE_SPECS
+                if item["key"] == route_key
+            )
+            if route_source not in provenance_units:
+                raise AuthoringError(
+                    f"{spec['key']} route {route_key} lacks candidate provenance"
+                )
+
+        values: dict[str, Any] = {
+            "id": candidate_id,
+            "record_status": "ACTIVE",
+            "provisional_name": spec["name"],
+            "aliases": spec["aliases"],
+            "discovery_stage": 6,
+            "discovery_anchor": {
+                "epoch": 1,
+                "kind": anchor_kind,
+                "id": spec["anchor"],
+                "ordinal": candidate_ordinal_by_key[spec["key"]],
+            },
+            "source_unit_ids": source_unit_ids,
+            "source_evidence": local_evidence,
+            "source_status": ["CLEAR"],
+            "image_witnesses": image_witnesses,
+            "evidence_strength": list(
+                dict.fromkeys(item["strength"] for item in local_evidence)
+            ),
+            "field_support": field_support,
+            "fingerprint": fingerprint,
+            "parameters": parameter_records(spec["parameters"]),
+            "variants": parameter_records(spec["variants"]),
+            "missing_mechanics": [spec["missing"]],
+            "uncertainties": spec.get("uncertainties", []),
+            "related_candidate_ids": [],
+            "cross_reference_ids": candidate_route_ids,
+            "evidence_reassignments": [],
+        }
+        candidate_proposals.append(
+            {field: values[field] for field in CANDIDATE_FIELDS}
+        )
+
+    return (
+        candidate_proposals,
+        route_proposals,
+        dict(candidate_links_by_unit),
+        dict(candidate_links_by_image),
+        dict(anchor_candidate_links_by_unit),
     )
