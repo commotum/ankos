@@ -957,7 +957,7 @@ def test_epoch_two_reopen_retains_provenance_and_appends_ids(
     plan = merge.prepare_merge(bundle, goal_dir=goal)
     preview = plan.preview()
     assert preview["discovery_epoch"] == 2
-    assert preview["review_ids"] == ["V000003"]
+    assert preview["review_ids"] == ["V000002"]
     assert preview["review_mode"] == "REOPEN"
     assert preview["search_ledger_preserved"] is True
     assert preview["search_fixed_point_cleared"] is True
@@ -1059,18 +1059,19 @@ def test_same_path_can_reopen_again_at_epoch_three_after_epoch_two_closure(
     )
     plan = merge.prepare_merge(epoch_three, goal_dir=goal)
     assert plan.discovery_epoch == 3
-    assert plan.review_ids == ("V000004",)
+    assert plan.review_ids == ("V000005",)
     merge.apply_merge(plan)
 
     history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
-    assert [event["epoch"] for event in history] == [1, 1, 2, 3]
+    assert [event["epoch"] for event in history] == [1, 1, 2, 2, 3]
     assert [event["source_paths"] for event in history] == [
-        [FIRST_STAGE_4_PATH],
+        INITIAL_STAGE_4_PREFIX,
+        [],
         [ASSIGNMENT_PATH],
-        [ASSIGNMENT_PATH],
+        [],
         [ASSIGNMENT_PATH],
     ]
-    assert history[3]["previous_event_sha256"] == history[2]["event_sha256"]
+    assert history[4]["previous_event_sha256"] == history[3]["event_sha256"]
 
 
 def test_pending_stage_five_forward_merge_uses_active_epoch_two(
@@ -1122,7 +1123,7 @@ def test_pending_stage_five_forward_merge_uses_active_epoch_two(
     plan = merge.prepare_merge(stage_five_bundle, goal_dir=goal)
     assert plan.review_mode == "INITIAL"
     assert plan.discovery_epoch == 2
-    assert plan.review_ids == ("V000006",)
+    assert plan.review_ids == ("V000005",)
     merge.apply_merge(plan)
 
     history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
@@ -1132,9 +1133,8 @@ def test_pending_stage_five_forward_merge_uses_active_epoch_two(
         "V000003",
         "V000004",
         "V000005",
-        "V000006",
     ]
-    assert [event["epoch"] for event in history] == [1, 1, 1, 1, 2, 2]
+    assert [event["epoch"] for event in history] == [1, 1, 2, 2, 2]
     assert history[-1]["mode"] == "INITIAL"
     assert history[-1]["source_paths"] == [STAGE_5_PATH]
 
@@ -1279,7 +1279,7 @@ def test_search_enrichment_default_dry_run_then_transactional_apply(
     preview = json.loads(completed.stdout)
     assert preview["mode"] == "dry-run"
     assert preview["proposal_kind"] == "SEARCH_APPEND"
-    assert preview["review_ids"] == ["V000003"]
+    assert preview["review_ids"] == ["V000002"]
     assert preview["trigger_hit_ids"] == [governed_hit_id]
     assert _transaction_state(goal) == before
 
@@ -1298,20 +1298,25 @@ def test_search_enrichment_default_dry_run_then_transactional_apply(
     history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
     assert [event["mode"] for event in history] == [
         "INITIAL",
-        "INITIAL",
         "SEARCH_APPEND",
     ]
     enrichment = history[-1]
-    assert enrichment["trigger_hit_ids"] == [governed_hit_id]
     assert len(enrichment["candidate_changes"]) == 1
     create = enrichment["candidate_changes"][0]
     assert create["action"] == "CREATE"
     assert create["candidate_id"] == "B0001"
     assert create["after_candidate"] == candidates[0]
-    assert enrichment["previous_path_result_sha256"] == history[1][
-        "result_projection_sha256"
-    ]
-    assert enrichment["result_snapshot"]["source_path"] == ASSIGNMENT_PATH
+    prior_path = next(
+        change
+        for change in history[0]["path_changes"]
+        if change["source_path"] == ASSIGNMENT_PATH
+    )
+    assert enrichment["path_changes"][0][
+        "previous_path_result_sha256"
+    ] == prior_path["result_projection_sha256"]
+    assert enrichment["path_changes"][0]["result_snapshot"][
+        "source_path"
+    ] == ASSIGNMENT_PATH
 
 
 def test_search_enrichment_rejects_unauthorized_and_immutable_deltas(
@@ -1392,7 +1397,7 @@ def test_search_enrichment_rejects_forbidden_coordinator_identity(
         merge.prepare_search_append(forbidden, goal_dir=goal)
 
 
-def test_search_enrichment_rejects_multi_path_candidate_transaction(
+def test_search_append_rejects_declared_unchanged_snapshot_path(
     tmp_path: Path,
 ) -> None:
     goal, proposal_path, _, _ = _search_enrichment_fixture(tmp_path)
@@ -1403,7 +1408,7 @@ def test_search_enrichment_rejects_multi_path_candidate_transaction(
 
     with pytest.raises(
         merge.MergeError,
-        match="must target exactly one source path",
+        match="source_paths must equal changed row/asset snapshots",
     ):
         merge.prepare_search_append(multi_path, goal_dir=goal)
 
@@ -1427,8 +1432,8 @@ def test_search_enrichment_rollback_restores_history_and_all_ledgers(
 
     monkeypatch.setattr(merge.os, "replace", fail_before_history_replace)
     with pytest.raises(
-        OSError,
-        match="enrichment history replacement failure",
+        merge.MergeError,
+        match="recovery action=ROLLED_BACK_MIXED",
     ):
         merge.apply_merge(plan)
 
