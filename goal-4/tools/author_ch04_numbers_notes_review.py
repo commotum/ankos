@@ -80,6 +80,12 @@ def S(
     images: tuple[str, ...] = (),
     image_direct: bool = False,
     overrides: dict[str, str] | None = None,
+    law_uid: str | None = None,
+    identity_image: str | None = None,
+    facts: dict[str, dict[str, Any]] | None = None,
+    source_status: tuple[str, ...] = ("CLEAR",),
+    source_uncertainties: tuple[str, ...] = (),
+    relation_names: tuple[str, ...] = (),
 ) -> dict[str, Any]:
     return {
         "name": name,
@@ -93,6 +99,12 @@ def S(
         "images": images,
         "image_direct": image_direct,
         "overrides": overrides or {},
+        "law_uid": law_uid,
+        "identity_image": identity_image,
+        "facts": facts or {},
+        "source_status": source_status,
+        "source_uncertainties": source_uncertainties,
+        "relation_names": relation_names,
     }
 
 
