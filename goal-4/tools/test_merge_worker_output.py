@@ -934,6 +934,144 @@ def _resolved_route_proposal(goal: Path, root: Path) -> Path:
     return proposal_path
 
 
+def _missing_route_proposal(
+    goal: Path,
+    root: Path,
+    *,
+    filename: str,
+) -> tuple[Path, dict[str, str]]:
+    routes = merge._read_csv(
+        goal / merge.ROUTE_NAME,
+        merge.CROSS_REFERENCE_HEADER,
+    )
+    assert len(routes) == 1
+    update = dict(routes[0])
+    update.update(
+        {
+            "status": "MISSING_TARGET_FINAL",
+            "attempts": (
+                '["Reviewed the complete canonical corpus and route context."]'
+            ),
+            "vocabulary_terms": (
+                '["following explanatory section","additional construction detail"]'
+            ),
+            "defect_boundary": (
+                "The canonical source contains no uniquely resolvable target "
+                "after complete review and exact local-search closure."
+            ),
+        }
+    )
+    proposal = {
+        "schema_version": 1,
+        "proposal_kind": "ROUTE_RESOLUTION",
+        "coordinator_id": "missing-route-resolution-coordinator",
+        "epoch": 1,
+        "base_artifact_sha256": {
+            name: hashlib.sha256((goal / name).read_bytes()).hexdigest()
+            for name in merge.WRITE_NAMES
+        },
+        "route_updates": [update],
+    }
+    proposal_path = root / filename
+    proposal_path.parent.mkdir(parents=True, exist_ok=True)
+    proposal_path.write_bytes(canonical_json_bytes(proposal))
+    return proposal_path, update
+
+
+def _stage18_saturation_proposal(
+    goal: Path,
+    root: Path,
+    *,
+    filename: str,
+    establish_fixed_point: bool,
+) -> tuple[Path, dict[str, Any]]:
+    manifest = json.loads(
+        (goal / merge.MANIFEST_NAME).read_text(encoding="utf-8")
+    )
+    ordered_documents = sorted(
+        manifest["documents"],
+        key=lambda document: (
+            merge.validate_audit.stage_for_document(document),
+            int(document["order"]),
+        ),
+    )
+    search = json.loads(
+        (goal / merge.SEARCH_NAME).read_text(encoding="utf-8")
+    )
+    round_record: dict[str, Any] = {
+        "round_id": f"S{len(search['rounds']) + 1:03d}",
+        "epoch": max(
+            event["epoch"]
+            for event in merge._read_jsonl(
+                goal / merge.REVIEW_HISTORY_NAME
+            )
+        ),
+        "kind": "SATURATION",
+        "owning_stage": 18,
+        "queries": [
+            {
+                "query_id": (
+                    f"Q{sum(len(item['queries']) for item in search['rounds']) + 1:04d}"
+                ),
+                "family": "zero-result Stage 18 saturation fixture",
+                "pattern": "__MERGE_COMPLETION_IMPOSSIBLE_MATCH_71A9C2__",
+                "mode": "LITERAL",
+                "case_sensitive": True,
+                "whole_word": False,
+                "scope_paths": [
+                    document["path"] for document in ordered_documents
+                ],
+            }
+        ],
+        "tool_assumptions": [
+            "Deterministic zero-result completion fixture."
+        ],
+        "result_ids": [],
+        "result_digest": "",
+        "hits": [],
+        "new_vocabulary": [],
+        "new_candidates": [],
+        "new_evidence_groups": [],
+        "new_routes": [],
+        "rerun_digest": "",
+    }
+    digest = merge.validate_audit.search_result_digest(round_record)
+    round_record["result_digest"] = digest
+    round_record["rerun_digest"] = digest
+    proposed_search = copy.deepcopy(search)
+    proposed_search["rounds"].append(round_record)
+    proposed_search["fixed_point"] = (
+        {
+            "round_id": round_record["round_id"],
+            "zero_delta": True,
+            "rerun_reproduced": True,
+            "result_digest": digest,
+        }
+        if establish_fixed_point
+        else None
+    )
+    proposal = {
+        "schema_version": 1,
+        "proposal_kind": "SEARCH_APPEND",
+        "coordinator_id": "stage18-saturation-coordinator",
+        "epoch": round_record["epoch"],
+        "source_paths": [],
+        "base_artifact_sha256": {
+            name: hashlib.sha256((goal / name).read_bytes()).hexdigest()
+            for name in merge.WRITE_NAMES
+        },
+        "reading_updates": [],
+        "asset_updates": [],
+        "candidate_updates": [],
+        "route_appends": [],
+        "proposed_search": proposed_search,
+    }
+    proposal_path = root / filename
+    proposal_path.parent.mkdir(parents=True, exist_ok=True)
+    proposal_path.write_bytes(canonical_json_bytes(proposal))
+    return proposal_path, proposed_search
+
+
 def test_default_cli_is_dry_run_and_rewrites_all_id_families(
     tmp_path: Path,
 ) -> None:
@@ -1718,6 +1856,142 @@ def test_route_resolution_default_dry_run_then_transactional_apply(
     assert event["route_changes"][0]["action"] == "UPDATE"
     assert event["route_changes"][0]["before_route"] == routes[0]
     assert event["route_changes"][0]["after_route"] == update
+
+
+def test_missing_target_final_rejects_premature_review_and_search_state(
+    closed_review_goal_template: Path,
+    tmp_path: Path,
+) -> None:
+    partial_goal = _goal_after_initial_merge(tmp_path / "partial")
+    partial_proposal, _ = _missing_route_proposal(
+        partial_goal,
+        tmp_path,
+        filename="partial-missing-route.json",
+    )
+    with pytest.raises(
+        merge.MergeError,
+        match="requires complete sequential source review and asset screening",
+    ):
+        merge.prepare_route_resolution(
+            partial_proposal,
+            goal_dir=partial_goal,
+        )
+
+    no_local_goal = _copy_goal_template(
+        closed_review_goal_template,
+        tmp_path / "no-local",
+    )
+    history = merge._read_jsonl(
+        no_local_goal / merge.REVIEW_HISTORY_NAME
+    )
+    history = [
+        event for event in history if event["mode"] != "SEARCH_APPEND"
+    ]
+    search = json.loads(
+        (no_local_goal / merge.SEARCH_NAME).read_text(encoding="utf-8")
+    )
+    search.update(
+        {
+            "tool_assumptions": [],
+            "vocabulary": [],
+            "rounds": [],
+            "fixed_point": None,
+        }
+    )
+    (no_local_goal / merge.REVIEW_HISTORY_NAME).write_bytes(
+        merge._jsonl_bytes(history)
+    )
+    (no_local_goal / merge.SEARCH_NAME).write_bytes(
+        canonical_json_bytes(search)
+    )
+    current_values = (
+        json.loads(
+            (no_local_goal / merge.MANIFEST_NAME).read_text(
+                encoding="utf-8"
+            )
+        ),
+        merge._read_jsonl(no_local_goal / merge.UNITS_NAME),
+        merge._read_csv(
+            no_local_goal / merge.READING_NAME,
+            READING_HEADER,
+        ),
+        merge._read_jsonl(no_local_goal / merge.CANDIDATE_NAME),
+        merge._read_csv(
+            no_local_goal / merge.ROUTE_NAME,
+            merge.CROSS_REFERENCE_HEADER,
+        ),
+        merge._read_csv(
+            no_local_goal / merge.ASSET_NAME,
+            ASSET_HEADER,
+        ),
+        search,
+        history,
+    )
+    assert merge.validate_audit.validate_objects(*current_values) == []
+    no_local_proposal, _ = _missing_route_proposal(
+        no_local_goal,
+        tmp_path,
+        filename="no-local-missing-route.json",
+    )
+    with pytest.raises(
+        merge.MergeError,
+        match="requires exact LOCAL search closure",
+    ):
+        merge.prepare_route_resolution(
+            no_local_proposal,
+            goal_dir=no_local_goal,
+        )
+
+
+def test_missing_target_final_reachable_after_review_and_local_closure(
+    closed_review_goal_template: Path,
+    tmp_path: Path,
+) -> None:
+    goal = _copy_goal_template(closed_review_goal_template, tmp_path)
+    proposal_path, expected_update = _missing_route_proposal(
+        goal,
+        tmp_path,
+        filename="completed-missing-route.json",
+    )
+    search_before = (goal / merge.SEARCH_NAME).read_bytes()
+    assert json.loads(search_before)["fixed_point"] is None
+    before = _transaction_state(goal)
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(TOOLS_DIR / "merge_worker_output.py"),
+            "--route-resolution",
+            str(proposal_path),
+            "--goal-dir",
+            str(goal),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    preview = json.loads(completed.stdout)
+    assert preview["mode"] == "dry-run"
+    assert preview["proposal_kind"] == "ROUTE_RESOLUTION"
+    assert preview["stage"] == 18
+    assert preview["source_paths"] == [ASSIGNMENT_PATH]
+    assert _transaction_state(goal) == before
+
+    plan = merge.prepare_route_resolution(proposal_path, goal_dir=goal)
+    merge.apply_merge(plan)
+    assert (goal / merge.SEARCH_NAME).read_bytes() == search_before
+    routes = merge._read_csv(
+        goal / merge.ROUTE_NAME,
+        merge.CROSS_REFERENCE_HEADER,
+    )
+    assert routes == [expected_update]
+    history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
+    event = history[-1]
+    assert event["mode"] == "ROUTE_RESOLUTION"
+    assert event["stage"] == 18
+    assert event["source_paths"] == [ASSIGNMENT_PATH]
+    assert event["route_changes"][0]["after_route"] == expected_update
 
 
 def test_candidate_revision_default_dry_run_then_transactional_apply(

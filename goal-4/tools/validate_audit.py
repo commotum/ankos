@@ -2931,6 +2931,52 @@ def validate_review_history(
                         if asset is not None:
                             resolution_paths.add(asset["assignment_path"])
                 elif after_route.get("status") == "MISSING_TARGET_FINAL":
+                    reviewed_unit_ids = {
+                        unit_id
+                        for path_change in latest_path_change.values()
+                        for unit_id in path_change.get("source_unit_ids", [])
+                        if isinstance(unit_id, str)
+                    }
+                    reviewed_asset_ids = {
+                        asset_id
+                        for path_change in latest_path_change.values()
+                        for asset_id in path_change.get("asset_ids", [])
+                        if isinstance(asset_id, str)
+                    }
+                    if (
+                        next_initial_path_index != len(audit_paths)
+                        or reviewed_unit_ids != set(unit_by_id)
+                        or reviewed_asset_ids != set(asset_by_id)
+                    ):
+                        errors.append(
+                            f"{change_prefix} finalizes missing route before "
+                            "complete reading/asset review"
+                        )
+                    if any(
+                        not exact_local_closure(
+                            search_state,
+                            closed_stage,
+                            closed_epoch,
+                            scope,
+                        )
+                        for (closed_stage, closed_epoch), scope
+                        in expected_local_scopes.items()
+                    ):
+                        errors.append(
+                            f"{change_prefix} finalizes missing route before "
+                            "applicable LOCAL closure"
+                        )
+                    if not any(
+                        isinstance(round_record, dict)
+                        and round_record.get("kind") == "SATURATION"
+                        and round_record.get("owning_stage") == 18
+                        and round_record.get("epoch") == active_epoch
+                        for round_record in search_state.get("rounds", [])
+                    ):
+                        errors.append(
+                            f"{change_prefix} finalizes missing route before "
+                            "current-epoch Stage-18 SATURATION"
+                        )
                     source_unit = unit_by_id.get(
                         after_route.get("source_unit_id")
                     )
@@ -3040,6 +3086,48 @@ def validate_review_history(
                     errors.append(
                         f"{prefix} sets fixed_point without a final "
                         "zero-delta saturation round"
+                    )
+                reviewed_unit_ids = {
+                    unit_id
+                    for path_change in latest_path_change.values()
+                    for unit_id in path_change.get("source_unit_ids", [])
+                    if isinstance(unit_id, str)
+                }
+                reviewed_asset_ids = {
+                    asset_id
+                    for path_change in latest_path_change.values()
+                    for asset_id in path_change.get("asset_ids", [])
+                    if isinstance(asset_id, str)
+                }
+                if (
+                    next_initial_path_index != len(audit_paths)
+                    or reviewed_unit_ids != set(unit_by_id)
+                    or reviewed_asset_ids != set(asset_by_id)
+                ):
+                    errors.append(
+                        f"{prefix} sets fixed_point before complete "
+                        "reading/asset review"
+                    )
+                if any(
+                    route.get("status") == "PENDING"
+                    for route in route_state.values()
+                ):
+                    errors.append(
+                        f"{prefix} sets fixed_point with pending routes"
+                    )
+                if any(
+                    not exact_local_closure(
+                        search_state,
+                        closed_stage,
+                        closed_epoch,
+                        scope,
+                    )
+                    for (closed_stage, closed_epoch), scope
+                    in expected_local_scopes.items()
+                ):
+                    errors.append(
+                        f"{prefix} sets fixed_point before applicable "
+                        "LOCAL closure"
                     )
 
         _validate_atomic_prefix_state(
@@ -4799,6 +4887,16 @@ def validate_objects(
 
     fixed_point = search.get("fixed_point")
     if fixed_point is not None:
+        if reviewed_count != len(units):
+            errors.append(
+                "search fixed_point precedes complete source-unit review"
+            )
+        if screened_count != len(assets):
+            errors.append(
+                "search fixed_point precedes complete asset screening"
+            )
+        if any(route.get("status") == "PENDING" for route in routes):
+            errors.append("search fixed_point exists with pending routes")
         required_fixed = {
             "round_id",
             "zero_delta",
@@ -5043,6 +5141,13 @@ def validate_objects(
                         f"candidate {candidate_id} evidence anchor hit lacks "
                         "candidate link"
                     )
+                if evidence.get("source_unit_id") != hit.get(
+                    "source_unit_id"
+                ):
+                    errors.append(
+                        f"candidate {candidate_id} evidence source unit "
+                        "differs from anchor hit"
+                    )
         elif kind == "SOURCE_UNIT":
             source_unit = unit_by_id.get(anchor_id)
             if source_unit is None:
@@ -5245,7 +5350,11 @@ def validate_objects(
                 f"stage {required_stage} has pending within-stage routes"
             )
 
-    if 18 in require_stages or require_all_reviewed:
+    if (
+        fixed_point is not None
+        or 18 in require_stages
+        or require_all_reviewed
+    ):
         if isinstance(fixed_point, dict):
             fixed_round_id = fixed_point.get("round_id")
             fixed_round_index = next(

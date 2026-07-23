@@ -1758,6 +1758,102 @@ def _validate_current_epoch_local_search_closed(
             )
 
 
+def _validate_stage18_context_ready(
+    *,
+    label: str,
+    manifest: dict[str, Any],
+    history: list[dict[str, Any]],
+    reading: list[dict[str, str]],
+    assets: list[dict[str, str]],
+    search: dict[str, Any],
+) -> None:
+    """Require exhausted blind review/local context before final route absence."""
+
+    canonical_paths = {
+        document["path"] for document in manifest["documents"]
+    }
+    reviewed_paths = {
+        path
+        for event in history
+        if event.get("mode") in {"INITIAL", "REOPEN"}
+        for path in event.get("source_paths", [])
+        if isinstance(path, str)
+    }
+    if (
+        any(row.get("review_status") != "REVIEWED" for row in reading)
+        or any(
+            row.get("inspection_status") != "SCREENED" for row in assets
+        )
+        or reviewed_paths != canonical_paths
+    ):
+        raise MergeError(
+            f"{label} requires complete sequential source review and "
+            "asset screening"
+        )
+
+    expected_scopes: dict[tuple[int, int], set[str]] = {}
+    for event in history:
+        if event.get("mode") not in {"INITIAL", "REOPEN"}:
+            continue
+        stage = event.get("stage")
+        epoch = event.get("epoch")
+        source_paths = event.get("source_paths")
+        if (
+            isinstance(stage, bool)
+            or not isinstance(stage, int)
+            or isinstance(epoch, bool)
+            or not isinstance(epoch, int)
+            or not isinstance(source_paths, list)
+            or not all(isinstance(path, str) for path in source_paths)
+        ):
+            raise MergeError(
+                f"{label} encountered malformed review scope"
+            )
+        expected_scopes.setdefault((stage, epoch), set()).update(
+            source_paths
+        )
+
+    rounds = search.get("rounds")
+    if not isinstance(rounds, list):
+        raise MergeError(f"{label} search rounds are not an array")
+    for (stage, epoch), expected_paths in sorted(expected_scopes.items()):
+        local_rounds = [
+            round_record
+            for round_record in rounds
+            if isinstance(round_record, dict)
+            and round_record.get("kind") == "LOCAL"
+            and round_record.get("owning_stage") == stage
+            and round_record.get("epoch") == epoch
+        ]
+        actual_paths = {
+            path
+            for round_record in local_rounds
+            for query in round_record.get("queries", [])
+            if isinstance(query, dict)
+            for path in query.get("scope_paths", [])
+            if isinstance(path, str)
+        }
+        if not local_rounds or actual_paths != expected_paths:
+            raise MergeError(
+                f"{label} requires exact LOCAL search closure "
+                f"for Stage {stage} epoch {epoch} "
+                f"(expected={sorted(expected_paths)}, "
+                f"actual={sorted(actual_paths)})"
+            )
+    active_epoch = _active_review_epoch(history)
+    if not any(
+        isinstance(round_record, dict)
+        and round_record.get("kind") == "SATURATION"
+        and round_record.get("owning_stage") == 18
+        and round_record.get("epoch") == active_epoch
+        for round_record in rounds
+    ):
+        raise MergeError(
+            f"{label} requires a Stage 18 SATURATION search round in "
+            f"the active review epoch {active_epoch}"
+        )
+
+
 def _path_is_complete(
     path: str,
     reading: list[dict[str, str]],
@@ -2839,6 +2935,26 @@ def _prepare_search_append_locked(
         raise MergeError(
             "appended candidates differ from the search-round candidate delta"
         )
+    if proposed_search.get("fixed_point") is not None:
+        _validate_stage18_context_ready(
+            label="fixed-point establishment",
+            manifest=manifest,
+            history=review_history,
+            reading=proposed_reading,
+            assets=proposed_assets,
+            search=proposed_search,
+        )
+        pending_route_ids = [
+            route["route_id"]
+            for route in proposed_routes
+            if route.get("status") == "PENDING"
+        ]
+        if pending_route_ids:
+            raise MergeError(
+                "fixed-point establishment requires all cross-reference "
+                "routes to be terminal; pending="
+                + ",".join(pending_route_ids)
+            )
     if snapshot_changed_paths != source_path_set:
         raise MergeError(
             "SEARCH_APPEND source_paths must equal changed row/asset snapshots"
@@ -3110,6 +3226,7 @@ def _prepare_route_resolution_locked(
     route_changes: list[dict[str, Any]] = []
     resolution_paths: set[str] = set()
     operating_stage = 4
+    missing_target_final_requested = False
     immutable_fields = set(CROSS_REFERENCE_HEADER) - {
         "status",
         "target_unit_ids",
@@ -3158,6 +3275,7 @@ def _prepare_route_resolution_locked(
                     f"route {route_id}.{field} rewrites prior entries"
                 )
         if update["status"] == "MISSING_TARGET_FINAL":
+            missing_target_final_requested = True
             operating_stage = 18
             source_unit = unit_by_id.get(update["source_unit_id"])
             source_asset = asset_by_id.get(update["source_asset_id"])
@@ -3218,6 +3336,15 @@ def _prepare_route_resolution_locked(
             )
         )
         update_by_id[route_id] = update
+    if missing_target_final_requested:
+        _validate_stage18_context_ready(
+            label="MISSING_TARGET_FINAL",
+            manifest=manifest,
+            history=review_history,
+            reading=reading,
+            assets=assets,
+            search=search,
+        )
     route_changes.sort(key=lambda change: int(change["route_id"][1:]))
     source_paths = tuple(_ordered_audit_paths(manifest, resolution_paths))
     proposed_routes = [
