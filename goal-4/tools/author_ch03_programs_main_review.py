@@ -2941,7 +2941,6 @@ random_seed = source_candidate(
         "visible_history": "A seed ensemble does not itself have an evolution history.",
         "control_state": NA_NO_CONTROL["control_state"],
         "input": "The ensemble produces inputs rather than consuming one.",
-        "boundary": "The source does not define a finite boundary; this is recorded as an evidence limit.",
         "external_data": NA_NO_CONTROL["external_data"],
         "frontier_or_activation": "A seed ensemble has no update frontier.",
         "schedule": "A seed ensemble has no iterative schedule.",
@@ -3669,7 +3668,16 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
             role = "SOURCE_DEFECT"
             risks = ["CONSTRUCTION_BEARING", "TEXT_BEARING", "AMBIGUOUS", "CAPTION_INCOMPLETE"]
             transcription = "CHECKED"
-            statement = "Original-resolution inspection confirms the severe rule-30 label crop; no mechanics were inferred from the fragment."
+            statement = (
+                "Original-resolution inspection confirms the severe rule-30 "
+                "label crop; no mechanics were inferred from the fragment."
+                if uid == "U000343"
+                else (
+                    "Original-resolution inspection confirms an intact "
+                    "code-1635 trajectory with its identifying label clipped "
+                    "at the bottom edge; U000377--U000378 recover the identity."
+                )
+            )
         elif path in RULE_IMAGES:
             role = "NATIVE_EVIDENCE"
             risks = ["CONSTRUCTION_BEARING", "TEXT_BEARING"]
