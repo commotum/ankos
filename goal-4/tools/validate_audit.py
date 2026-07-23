@@ -907,412 +907,6 @@ def validate_candidate(
         errors.append(f"{prefix} conflicting field lacks CONFLICTING source status")
 
 
-def _validate_review_history_without_enrichment(
-    manifest: dict[str, Any],
-    units: list[dict[str, Any]],
-    reading: list[dict[str, str]],
-    assets: list[dict[str, str]],
-    review_history: list[dict[str, Any]],
-    search: dict[str, Any],
-    stage_by_path: dict[str, int],
-) -> tuple[
-    list[str],
-    set[int],
-    dict[str, set[int]],
-    dict[str, set[int]],
-    dict[tuple[int, int], set[str]],
-]:
-    """Validate the closed append-only review log and return anchor coverage."""
-    errors: list[str] = []
-    unit_by_id = {unit["id"]: unit for unit in units}
-    reading_by_id = {row.get("source_unit_id", ""): row for row in reading}
-    asset_by_id = {row.get("asset_id", ""): row for row in assets}
-    audit_paths = [
-        document["path"]
-        for document in sorted(
-            manifest["documents"],
-            key=lambda document: (
-                stage_by_path[document["path"]],
-                int(document["order"]),
-            ),
-        )
-    ]
-    document_position = {
-        path: index for index, path in enumerate(audit_paths, start=1)
-    }
-    unit_position = {
-        unit["id"]: index for index, unit in enumerate(units, start=1)
-    }
-    asset_position = {
-        row.get("asset_id", ""): index
-        for index, row in enumerate(assets, start=1)
-    }
-    unit_events: dict[str, list[dict[str, Any]]] = {}
-    asset_events: dict[str, list[dict[str, Any]]] = {}
-    unit_history_epochs: dict[str, set[int]] = {}
-    asset_path_history_epochs: dict[str, set[int]] = {}
-    expected_local_scopes: dict[tuple[int, int], set[str]] = {}
-    history_epochs: set[int] = set()
-    seen_units: set[str] = set()
-    seen_assets: set[str] = set()
-    seen_epoch_units: set[tuple[int, str]] = set()
-    seen_epoch_assets: set[tuple[int, str]] = set()
-    prior_event_hash: str | None = None
-    prior_event_epoch: int | None = None
-    prior_event_document_position: int | None = None
-    prior_search_round_count = 0
-    next_initial_path_index = 0
-    search_rounds = search.get("rounds", []) if isinstance(search, dict) else []
-    if not isinstance(search_rounds, list):
-        search_rounds = []
-
-    if not isinstance(review_history, list):
-        return (
-            ["review-history root must be an ordered JSONL record list"],
-            set(),
-            {},
-            {},
-            {},
-        )
-
-    for index, event in enumerate(review_history, start=1):
-        prefix = f"review-history event {index}"
-        if not isinstance(event, dict):
-            errors.append(f"{prefix} is not an object")
-            continue
-        if set(event) != set(REVIEW_HISTORY_FIELDS):
-            errors.append(f"{prefix} fields differ from the closed contract")
-            continue
-        if event.get("review_id") != f"V{index:06d}":
-            errors.append(f"{prefix} violates the append-only V sequence")
-        epoch = event.get("epoch")
-        stage = event.get("stage")
-        mode = event.get("mode")
-        reviewer = event.get("reviewer")
-        if not isinstance(epoch, int) or epoch < 1:
-            errors.append(f"{prefix} has invalid epoch")
-            continue
-        history_epochs.add(epoch)
-        if not isinstance(stage, int) or not 4 <= stage <= 17:
-            errors.append(f"{prefix} has invalid stage")
-            continue
-        if mode not in REVIEW_MODES:
-            errors.append(f"{prefix} has invalid mode")
-        if not isinstance(reviewer, str) or not reviewer.strip():
-            errors.append(f"{prefix} lacks reviewer")
-
-        source_paths = exact_string_list(
-            event.get("source_paths"),
-            f"{prefix}.source_paths",
-            errors,
-            nonempty=True,
-        )
-        if len(source_paths) != 1:
-            errors.append(f"{prefix} must cover exactly one canonical source path")
-        source_unit_ids = exact_string_list(
-            event.get("source_unit_ids"),
-            f"{prefix}.source_unit_ids",
-            errors,
-            nonempty=True,
-        )
-        asset_ids = exact_string_list(
-            event.get("asset_ids"),
-            f"{prefix}.asset_ids",
-            errors,
-        )
-        if any(path not in stage_by_path for path in source_paths):
-            errors.append(f"{prefix} contains an unknown source path")
-        canonical_paths = sorted(
-            set(source_paths), key=lambda path: document_position.get(path, 10**9)
-        )
-        if source_paths != canonical_paths:
-            errors.append(f"{prefix} source paths are not in canonical corpus order")
-        if any(stage_by_path.get(path) != stage for path in source_paths):
-            errors.append(f"{prefix} source path lies outside its stage")
-        event_path = source_paths[0] if len(source_paths) == 1 else None
-
-        expected_units = [
-            unit["id"] for unit in units if unit["path"] in set(source_paths)
-        ]
-        expected_assets = [
-            row.get("asset_id", "")
-            for row in assets
-            if row.get("assignment_path") in set(source_paths)
-        ]
-        if source_unit_ids != expected_units:
-            errors.append(
-                f"{prefix} source-unit scope is not the exact ordered path scope"
-            )
-        if asset_ids != expected_assets:
-            errors.append(
-                f"{prefix} asset scope is not the exact ordered path scope"
-            )
-        if any(unit_id not in unit_by_id for unit_id in source_unit_ids):
-            errors.append(f"{prefix} names an unknown source unit")
-        if any(asset_id not in asset_by_id for asset_id in asset_ids):
-            errors.append(f"{prefix} names an unknown asset")
-        if source_unit_ids != sorted(
-            source_unit_ids, key=lambda value: unit_position.get(value, 10**9)
-        ):
-            errors.append(f"{prefix} source units are not in canonical order")
-        if asset_ids != sorted(
-            asset_ids, key=lambda value: asset_position.get(value, 10**9)
-        ):
-            errors.append(f"{prefix} assets are not in canonical order")
-
-        event_document_position = min(
-            (document_position.get(path, 10**9) for path in source_paths),
-            default=10**9,
-        )
-        if prior_event_epoch is not None:
-            if epoch < prior_event_epoch:
-                errors.append(f"{prefix} moves backward to an earlier epoch")
-            elif epoch > prior_event_epoch + 1:
-                errors.append(f"{prefix} skips a global review epoch")
-            elif (
-                epoch == prior_event_epoch
-                and prior_event_document_position is not None
-                and event_document_position <= prior_event_document_position
-            ):
-                errors.append(
-                    f"{prefix} violates strict frozen document traversal "
-                    "within its epoch"
-                )
-            if epoch > prior_event_epoch and mode != "REOPEN":
-                errors.append(
-                    f"{prefix} opens a new epoch without a REOPEN event"
-                )
-        elif epoch != 1 or mode != "INITIAL":
-            errors.append(
-                f"{prefix} must begin history with INITIAL epoch 1"
-            )
-        prior_event_epoch = epoch
-        prior_event_document_position = event_document_position
-
-        already_seen = [
-            identifier in seen_units for identifier in source_unit_ids
-        ] + [identifier in seen_assets for identifier in asset_ids]
-        if mode == "INITIAL" and any(already_seen):
-            errors.append(f"{prefix} INITIAL scope contains previously reviewed rows")
-        if mode == "REOPEN" and (not already_seen or not all(already_seen)):
-            errors.append(f"{prefix} REOPEN scope is not wholly previously reviewed")
-        if mode == "INITIAL" and event_path is not None:
-            expected_initial_path = (
-                audit_paths[next_initial_path_index]
-                if next_initial_path_index < len(audit_paths)
-                else None
-            )
-            if event_path != expected_initial_path:
-                errors.append(
-                    f"{prefix} INITIAL path is not the first unread audit path"
-                )
-            elif not any(already_seen):
-                next_initial_path_index += 1
-        for unit_id in source_unit_ids:
-            if (epoch, unit_id) in seen_epoch_units:
-                errors.append(
-                    f"{prefix} repeats source unit {unit_id} in one epoch"
-                )
-            seen_epoch_units.add((epoch, unit_id))
-            seen_units.add(unit_id)
-            unit_events.setdefault(unit_id, []).append(event)
-            unit_history_epochs.setdefault(unit_id, set()).add(epoch)
-        for asset_id in asset_ids:
-            if (epoch, asset_id) in seen_epoch_assets:
-                errors.append(f"{prefix} repeats asset {asset_id} in one epoch")
-            seen_epoch_assets.add((epoch, asset_id))
-            seen_assets.add(asset_id)
-            asset_events.setdefault(asset_id, []).append(event)
-            physical_path = asset_by_id.get(asset_id, {}).get("physical_path")
-            if physical_path:
-                asset_path_history_epochs.setdefault(physical_path, set()).add(
-                    epoch
-                )
-        expected_local_scopes.setdefault((stage, epoch), set()).update(
-            source_paths
-        )
-
-        prefix_count = event.get("prior_search_round_count")
-        prefix_digest = event.get("prior_search_rounds_sha256")
-        if not isinstance(prefix_count, int) or prefix_count < 0:
-            errors.append(f"{prefix} has invalid prior search round count")
-            prefix_count = 0
-        if prefix_count < prior_search_round_count:
-            errors.append(f"{prefix} moves backward to an earlier search prefix")
-        if prefix_count > len(search_rounds):
-            errors.append(f"{prefix} search prefix exceeds recorded rounds")
-            search_prefix = search_rounds
-        else:
-            search_prefix = search_rounds[:prefix_count]
-        if prefix_digest != canonical_sha256(search_prefix):
-            errors.append(f"{prefix} prior search-round prefix hash is stale")
-        if any(
-            isinstance(round_record, dict)
-            and isinstance(round_record.get("epoch"), int)
-            and round_record["epoch"] > epoch
-            for round_record in search_prefix
-        ):
-            errors.append(f"{prefix} search prefix contains a future epoch")
-        previous_history_event = (
-            review_history[index - 2] if index > 1 else None
-        )
-        is_first_event_of_epoch = (
-            not isinstance(previous_history_event, dict)
-            or previous_history_event.get("epoch") != epoch
-        )
-        if is_first_event_of_epoch and epoch > 1:
-            for (prior_stage, prior_epoch), prior_paths in (
-                expected_local_scopes.items()
-            ):
-                if prior_epoch >= epoch:
-                    continue
-                local_rounds = [
-                    round_record
-                    for round_record in search_prefix
-                    if isinstance(round_record, dict)
-                    and round_record.get("kind") == "LOCAL"
-                    and round_record.get("owning_stage") == prior_stage
-                    and round_record.get("epoch") == prior_epoch
-                ]
-                local_scope = {
-                    path
-                    for round_record in local_rounds
-                    for query in round_record.get("queries", [])
-                    if isinstance(query, dict)
-                    for path in query.get("scope_paths", [])
-                }
-                if not local_rounds or local_scope != prior_paths:
-                    errors.append(
-                        f"{prefix} advances epoch before Stage {prior_stage} "
-                        f"epoch {prior_epoch} LOCAL closure"
-                    )
-        prior_search_round_count = prefix_count
-
-        previous_hash = event.get("previous_event_sha256")
-        if previous_hash != prior_event_hash:
-            errors.append(f"{prefix} previous-event hash breaks the append chain")
-        for field in (
-            "input_projection_sha256",
-            "result_projection_sha256",
-            "event_sha256",
-        ):
-            if not isinstance(event.get(field), str) or not HEX64.fullmatch(
-                event[field]
-            ):
-                errors.append(f"{prefix} has invalid {field}")
-        try:
-            expected_input_digest = canonical_sha256(
-                review_input_projection(event, unit_by_id, asset_by_id)
-            )
-        except (KeyError, TypeError):
-            expected_input_digest = None
-        if (
-            expected_input_digest is not None
-            and event.get("input_projection_sha256") != expected_input_digest
-        ):
-            errors.append(f"{prefix} immutable input projection hash is stale")
-        try:
-            expected_event_digest = review_event_sha256(event)
-        except (KeyError, TypeError):
-            expected_event_digest = None
-        if (
-            expected_event_digest is not None
-            and event.get("event_sha256") != expected_event_digest
-        ):
-            errors.append(f"{prefix} closed event hash is stale")
-        prior_event_hash = event.get("event_sha256")
-
-    latest_unit_event = {
-        unit_id: events[-1] for unit_id, events in unit_events.items()
-    }
-    latest_asset_event = {
-        asset_id: events[-1] for asset_id, events in asset_events.items()
-    }
-    for row in reading:
-        unit_id = row.get("source_unit_id", "")
-        event = latest_unit_event.get(unit_id)
-        if row.get("review_status") == "PENDING":
-            if event is not None:
-                errors.append(
-                    f"reading {unit_id} is pending but has review history"
-                )
-            continue
-        if row.get("review_status") != "REVIEWED":
-            continue
-        if event is None:
-            errors.append(f"reading {unit_id} is reviewed without review history")
-            continue
-        if row.get("review_epoch") != str(event["epoch"]):
-            errors.append(
-                f"reading {unit_id} review epoch is not its latest history epoch"
-            )
-        if row.get("review_stage") != str(event["stage"]):
-            errors.append(
-                f"reading {unit_id} review stage differs from latest history"
-            )
-        if row.get("reviewer") != event["reviewer"]:
-            errors.append(
-                f"reading {unit_id} reviewer differs from latest history"
-            )
-    for row in assets:
-        asset_id = row.get("asset_id", "")
-        event = latest_asset_event.get(asset_id)
-        if row.get("inspection_status") == "PENDING":
-            if event is not None:
-                errors.append(f"asset {asset_id} is pending but has review history")
-            continue
-        if row.get("inspection_status") != "SCREENED":
-            continue
-        if event is None:
-            errors.append(f"asset {asset_id} is screened without review history")
-            continue
-        if row.get("review_epoch") != str(event["epoch"]):
-            errors.append(
-                f"asset {asset_id} review epoch is not its latest history epoch"
-            )
-        if row.get("review_stage") != str(event["stage"]):
-            errors.append(
-                f"asset {asset_id} review stage differs from latest history"
-            )
-        if row.get("reviewer") != event["reviewer"]:
-            errors.append(f"asset {asset_id} reviewer differs from latest history")
-
-    for event in review_history:
-        if not isinstance(event, dict) or set(event) != set(REVIEW_HISTORY_FIELDS):
-            continue
-        unit_ids = event.get("source_unit_ids")
-        event_asset_ids = event.get("asset_ids")
-        if not isinstance(unit_ids, list) or not isinstance(event_asset_ids, list):
-            continue
-        is_fully_latest = all(
-            latest_unit_event.get(unit_id) is event for unit_id in unit_ids
-        ) and all(
-            latest_asset_event.get(asset_id) is event
-            for asset_id in event_asset_ids
-        )
-        if not is_fully_latest:
-            continue
-        try:
-            current_result_digest = canonical_sha256(
-                review_result_projection(event, reading_by_id, asset_by_id)
-            )
-        except (KeyError, TypeError):
-            continue
-        if event.get("result_projection_sha256") != current_result_digest:
-            errors.append(
-                f"review-history {event.get('review_id', '?')} current result "
-                "projection hash is stale"
-            )
-
-    return (
-        errors,
-        history_epochs,
-        unit_history_epochs,
-        asset_path_history_epochs,
-        expected_local_scopes,
-    )
-
-
 READING_ENRICHMENT_SCALAR_FIELDS = {
     "review_disposition",
     "source_status",
@@ -4971,6 +4565,61 @@ def mutation_checks(
         result["evidence_reassignments"] = []
         return result
 
+    tail_candidate_one = lineage_candidate("B0001", 1, 1, 1)
+    tail_candidate_two = lineage_candidate("B0002", 2, 1, 2)
+    tail_candidate_two["cross_reference_ids"] = []
+    tail_evidence = copy.deepcopy(tail_candidate_one["source_evidence"][0])
+    tail_evidence.update(
+        {
+            "evidence_id": "E000003",
+            "evidence_group_id": "G000003",
+            "discovery_anchor": {
+                "epoch": 1,
+                "kind": "SOURCE_UNIT",
+                "id": unit_id,
+                "ordinal": 3,
+            },
+            "strength": "CORROBORATING",
+            "claim": (
+                "A later append-only evidence item corroborates the earlier "
+                "candidate after another candidate already exists."
+            ),
+            "fingerprint_fields": [],
+        }
+    )
+    tail_candidate_one["source_evidence"].append(tail_evidence)
+    tail_candidate_one["evidence_strength"] = [
+        "DIRECT_COMPLETE_MECHANICS",
+        "CORROBORATING",
+    ]
+    tail_reading = copy.deepcopy(base_reading)
+    tail_reading[0]["candidate_ids"] = '["B0001","B0002"]'
+    tail_history = append_history_event(
+        [],
+        tail_reading,
+        base_assets,
+        path,
+        1,
+        "INITIAL",
+        "fixture-reviewer",
+        [],
+    )
+    tail_errors = validate_objects(
+        manifest,
+        units,
+        tail_reading,
+        [tail_candidate_one, tail_candidate_two],
+        base_routes,
+        base_assets,
+        base_search,
+        tail_history,
+    )
+    if tail_errors:
+        failures.append(
+            "valid E-tail appended to an earlier candidate failed: "
+            + "; ".join(tail_errors)
+        )
+
     lineage_candidates = [
         lineage_candidate("B0001", 1, 1, 1),
         lineage_candidate("B0002", 2, 1, 2),
@@ -5873,6 +5522,30 @@ def mutation_checks(
         if not any("unrelated candidate links" in error for error in unrelated_errors):
             failures.append(
                 "unrelated candidate-link enrichment mutation unexpectedly passed"
+            )
+        unrelated_route_snapshot = copy.deepcopy(
+            local_enrichment_history[-1]["result_snapshot"]
+        )
+        unrelated_route_snapshot["reading_results"][0][
+            "route_ids"
+        ] = '["R000001","R999999"]'
+        unrelated_route_errors: list[str] = []
+        _validate_search_enrichment_diff(
+            previous_snapshot,
+            unrelated_route_snapshot,
+            {unit_id},
+            {unit_id: {"B0001"}},
+            {unit_id: set()},
+            {"B0001"},
+            set(),
+            unrelated_route_errors,
+            "unrelated-route fixture",
+        )
+        if not any(
+            "unrelated route links" in error for error in unrelated_route_errors
+        ):
+            failures.append(
+                "unrelated route-link enrichment mutation unexpectedly passed"
             )
 
         asset_snapshot = defect_asset_history[-1]["result_snapshot"]

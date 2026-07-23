@@ -281,6 +281,19 @@ def validate(data: dict[str, Any]) -> list[str]:
                     "candidate_id_policy.allocation_order lacks "
                     f"{required_phrase!r}"
                 )
+    evidence_id_policy = data.get("evidence_id_policy")
+    if not isinstance(evidence_id_policy, str) or not all(
+        phrase in evidence_id_policy
+        for phrase in (
+            "E###### identifiers are unique and contiguous",
+            "strictly increasing E order",
+            "global evidence stream in numeric E order",
+            "later E may append to an earlier active B",
+            "G###### identifiers are contiguous",
+            "minimum allocated E identifier",
+        )
+    ):
+        errors.append("evidence_id_policy is incomplete")
 
     eligibility = data.get("eligibility_criteria")
     if not isinstance(eligibility, list) or len(eligibility) < 5:
@@ -347,9 +360,10 @@ def validate(data: dict[str, Any]) -> list[str]:
             "positive active global review_epoch",
             "INITIAL review may therefore occur in any active epoch",
             "formal re-review opens the next epoch with REOPEN",
+            "SEARCH_ENRICHMENT does not change review_epoch",
             "Epoch 1 may end after a partial canonical prefix",
-            "matching history event at the same epoch",
-            "immutable review-history paths",
+            "matching review event at the same epoch",
+            "immutable INITIAL/REOPEN history paths",
             "before the next epoch begins",
             "zero-discovery pass",
         )
@@ -368,15 +382,32 @@ def validate(data: dict[str, Any]) -> list[str]:
             "review-history.jsonl",
             "append-only V###### hash chain",
             "exactly one canonical source path",
-            "exact ordered source-unit and asset identities",
-            "input and result projection hashes",
-            "hashed prior-search-round prefix",
+            "complete ordered reading/asset result snapshot",
+            "independently recomputable digest",
+            "chains previous_path_result_sha256",
+            "INITIAL and REOPEN record full semantic review snapshots",
             "INITIAL consumes the first unread canonical path",
-            "Current REVIEWED/SCREENED rows equal the latest event",
-            "same epoch",
+            "SEARCH_ENRICHMENT stays in the active epoch",
+            "typed non-EXCLUSION trigger H IDs",
+            "latest path snapshot exactly equals current full rows",
         )
     ):
         errors.append("review_history_contract is incomplete")
+    enrichment_contract = data.get("search_enrichment_contract")
+    if not isinstance(enrichment_contract, str) or not all(
+        phrase in enrichment_contract
+        for phrase in (
+            "hit-addressed reading",
+            "additive secondary/candidate/route arrays",
+            "exact same-path, same-epoch",
+            "non-EXCLUSION trigger hit",
+            "exact unit",
+            "Asset changes are limited",
+            "cannot change completion metadata",
+            "At least one allowed delta",
+        )
+    ):
+        errors.append("search_enrichment_contract is incomplete")
     for key in ("evidence_application", "visual_evidence_rule"):
         if not isinstance(data.get(key), str) or not data[key].strip():
             errors.append(f"{key} must be non-empty")
@@ -701,6 +732,18 @@ def run_mutation_checks(data: dict[str, Any]) -> list[str]:
     missing_review_history = copy.deepcopy(data)
     del missing_review_history["review_history_contract"]
     mutations.append(("missing append-only review history", missing_review_history))
+
+    missing_enrichment_contract = copy.deepcopy(data)
+    del missing_enrichment_contract["search_enrichment_contract"]
+    mutations.append(
+        ("missing typed search enrichment", missing_enrichment_contract)
+    )
+
+    missing_evidence_id_policy = copy.deepcopy(data)
+    del missing_evidence_id_policy["evidence_id_policy"]
+    mutations.append(
+        ("missing append-compatible E/G allocation", missing_evidence_id_policy)
+    )
 
     open_search_language = copy.deepcopy(data)
     open_search_language["search_query_language"]["fields"].append("command")

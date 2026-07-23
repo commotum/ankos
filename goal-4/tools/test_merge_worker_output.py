@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import copy
 import csv
+import hashlib
 import json
 import shutil
 import subprocess
@@ -374,6 +376,202 @@ def _goal_after_initial_merge(root: Path) -> Path:
     goal = _copy_global_state(root / "state")
     merge.apply_merge(merge.prepare_merge(bundle, goal_dir=goal))
     return goal
+
+
+def _search_candidate(
+    source_unit_id: str,
+    hit_id: str,
+) -> dict[str, Any]:
+    missing = "Further mechanics are not stated in this evidence."
+    field_support = {
+        field: "UNKNOWN_FROM_SOURCE" for field in FINGERPRINT_FIELDS
+    }
+    fingerprint = {
+        field: {
+            "status": "UNKNOWN_FROM_SOURCE",
+            "value": None,
+            "evidence_ids": [],
+            "reason": missing,
+        }
+        for field in FINGERPRINT_FIELDS
+    }
+    values: dict[str, Any] = {
+        "id": "B0001",
+        "record_status": "ACTIVE",
+        "provisional_name": "Search-discovered construction lead",
+        "aliases": [],
+        "discovery_stage": 4,
+        "discovery_anchor": {
+            "epoch": 1,
+            "kind": "SEARCH_HIT",
+            "id": hit_id,
+            "ordinal": 1,
+        },
+        "source_unit_ids": [source_unit_id],
+        "source_evidence": [
+            {
+                "evidence_id": "E000001",
+                "evidence_group_id": "G000001",
+                "discovery_anchor": {
+                    "epoch": 1,
+                    "kind": "SEARCH_HIT",
+                    "id": hit_id,
+                    "ordinal": 1,
+                },
+                "source_unit_id": source_unit_id,
+                "image_path": None,
+                "strength": "LEAD_ONLY",
+                "modality": "PROSE",
+                "claim": "The search hit supplies a governed construction lead.",
+                "fingerprint_fields": [],
+            }
+        ],
+        "source_status": ["CLEAR"],
+        "image_witnesses": [],
+        "evidence_strength": ["LEAD_ONLY"],
+        "field_support": field_support,
+        "fingerprint": fingerprint,
+        "parameters": [],
+        "variants": [],
+        "missing_mechanics": [missing],
+        "uncertainties": [],
+        "related_candidate_ids": [],
+        "cross_reference_ids": [],
+        "evidence_reassignments": [],
+    }
+    return {field: values[field] for field in CANDIDATE_FIELDS}
+
+
+def _search_enrichment_fixture(
+    root: Path,
+) -> tuple[Path, Path, str, str]:
+    initial_bundle = _completed_no_construction_bundle(
+        root / "initial",
+        stage=4,
+        assignment_paths=INITIAL_STAGE_4_PREFIX,
+        worker_id="search-enrichment-initial-reviewer",
+    )
+    goal = _copy_global_state(root / "state")
+    merge.apply_merge(merge.prepare_merge(initial_bundle, goal_dir=goal))
+
+    units = merge._read_jsonl(goal / merge.UNITS_NAME)
+    target_units = [
+        unit for unit in units if unit["path"] == ASSIGNMENT_PATH
+    ]
+    query = {
+        "query_id": "Q0001",
+        "family": "construction lead phrase",
+        "pattern": "a first clue towards a whole new kind of science",
+        "mode": "LITERAL",
+        "case_sensitive": True,
+        "whole_word": False,
+        "scope_paths": INITIAL_STAGE_4_PREFIX,
+    }
+    pairs, errors = merge.validate_audit.execute_frozen_queries(
+        [query],
+        units,
+        merge.validate_audit.REPO_ROOT
+        / "ref"
+        / "A-New-Kind-of-Science",
+    )
+    assert errors == []
+    assert pairs
+    target_ids = {unit["id"] for unit in target_units}
+    governed_pair = next(pair for pair in pairs if pair[1] in target_ids)
+    governed_unit_id = governed_pair[1]
+    unit_by_id = {unit["id"]: unit for unit in units}
+    hits: list[dict[str, Any]] = []
+    governed_hit_id = ""
+    for index, (query_id, unit_id) in enumerate(pairs, start=1):
+        hit_id = f"H{index:06d}"
+        governed = unit_id == governed_unit_id
+        if governed:
+            governed_hit_id = hit_id
+        hits.append(
+            {
+                "hit_id": hit_id,
+                "query_id": query_id,
+                "source_unit_id": unit_id,
+                "context_sha256": unit_by_id[unit_id]["sha256"],
+                "disposition": (
+                    "GOVERNED_CANDIDATE_OR_SUPPORT"
+                    if governed
+                    else "EXCLUSION"
+                ),
+                "candidate_ids": ["B0001"] if governed else [],
+                "route_ids": [],
+                "rationale": (
+                    "The hit governs the newly discovered candidate."
+                    if governed
+                    else "The match is not a separate construction lead."
+                ),
+            }
+        )
+    assert governed_hit_id
+    round_record: dict[str, Any] = {
+        "round_id": "S001",
+        "epoch": 1,
+        "kind": "LOCAL",
+        "owning_stage": 4,
+        "queries": [query],
+        "tool_assumptions": ["Literal UTF-8 source-unit search."],
+        "result_ids": [hit["hit_id"] for hit in hits],
+        "result_digest": "",
+        "hits": hits,
+        "new_vocabulary": [],
+        "new_candidates": ["B0001"],
+        "new_evidence_groups": ["G000001"],
+        "new_routes": [],
+        "rerun_digest": "",
+    }
+    digest = merge.validate_audit.search_result_digest(round_record)
+    round_record["result_digest"] = digest
+    round_record["rerun_digest"] = digest
+    proposed_search = {
+        "schema_version": 1,
+        "phase": "blind_discovery",
+        "tool_assumptions": ["Literal UTF-8 source-unit search."],
+        "vocabulary": [],
+        "rounds": [round_record],
+        "fixed_point": None,
+    }
+
+    reading = merge._read_csv(
+        goal / merge.READING_NAME,
+        READING_HEADER,
+    )
+    target = next(
+        row for row in reading if row["source_unit_id"] == governed_unit_id
+    )
+    reading_update = dict(target)
+    reading_update.update(
+        {
+            "review_disposition": "CANDIDATE",
+            "candidate_ids": '["B0001"]',
+            "evidence_statement": "The appended LOCAL hit supplies a construction lead.",
+        }
+    )
+    proposal = {
+        "schema_version": 1,
+        "proposal_kind": "SEARCH_ENRICHMENT",
+        "coordinator_id": "search-enrichment-coordinator",
+        "epoch": 1,
+        "source_paths": [ASSIGNMENT_PATH],
+        "base_artifact_sha256": {
+            name: hashlib.sha256((goal / name).read_bytes()).hexdigest()
+            for name in merge.WRITE_NAMES
+        },
+        "reading_updates": [reading_update],
+        "asset_updates": [],
+        "candidate_updates": [
+            _search_candidate(governed_unit_id, governed_hit_id)
+        ],
+        "route_appends": [],
+        "proposed_search": proposed_search,
+    }
+    proposal_path = root / "search-enrichment-proposal.json"
+    proposal_path.write_bytes(canonical_json_bytes(proposal))
+    return goal, proposal_path, governed_unit_id, governed_hit_id
 
 
 def _add_local_closure(
@@ -1086,3 +1284,164 @@ def test_epoch_two_reopen_rejects_stale_projection(
         match="stale reading-input projection",
     ):
         merge.prepare_merge(bundle, goal_dir=target_goal)
+
+
+def test_search_enrichment_default_dry_run_then_transactional_apply(
+    tmp_path: Path,
+) -> None:
+    goal, proposal_path, unit_id, governed_hit_id = (
+        _search_enrichment_fixture(tmp_path)
+    )
+    before = _transaction_state(goal)
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(TOOLS_DIR / "merge_worker_output.py"),
+            "--search-enrichment",
+            str(proposal_path),
+            "--goal-dir",
+            str(goal),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    preview = json.loads(completed.stdout)
+    assert preview["mode"] == "dry-run"
+    assert preview["proposal_kind"] == "SEARCH_ENRICHMENT"
+    assert preview["review_ids"] == ["V000003"]
+    assert preview["trigger_hit_ids"] == [governed_hit_id]
+    assert _transaction_state(goal) == before
+
+    plan = merge.prepare_search_enrichment(proposal_path, goal_dir=goal)
+    merge.apply_merge(plan)
+    reading = merge._read_csv(goal / merge.READING_NAME, READING_HEADER)
+    row = next(item for item in reading if item["source_unit_id"] == unit_id)
+    assert row["review_disposition"] == "CANDIDATE"
+    assert json.loads(row["candidate_ids"]) == ["B0001"]
+    candidates = merge._read_jsonl(goal / merge.CANDIDATE_NAME)
+    assert [candidate["id"] for candidate in candidates] == ["B0001"]
+    search = json.loads((goal / merge.SEARCH_NAME).read_text(encoding="utf-8"))
+    assert [round_record["round_id"] for round_record in search["rounds"]] == [
+        "S001"
+    ]
+    history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
+    assert [event["mode"] for event in history] == [
+        "INITIAL",
+        "INITIAL",
+        "SEARCH_ENRICHMENT",
+    ]
+    enrichment = history[-1]
+    assert enrichment["trigger_hit_ids"] == [governed_hit_id]
+    assert enrichment["previous_path_result_sha256"] == history[1][
+        "result_projection_sha256"
+    ]
+    assert enrichment["result_snapshot"]["source_path"] == ASSIGNMENT_PATH
+
+
+def test_search_enrichment_rejects_unauthorized_and_immutable_deltas(
+    tmp_path: Path,
+) -> None:
+    goal, proposal_path, governed_unit_id, _ = _search_enrichment_fixture(
+        tmp_path
+    )
+    base = json.loads(proposal_path.read_text(encoding="utf-8"))
+    reading = merge._read_csv(goal / merge.READING_NAME, READING_HEADER)
+    unrelated = next(
+        row
+        for row in reading
+        if row["path"] == ASSIGNMENT_PATH
+        and row["source_unit_id"] != governed_unit_id
+    )
+    assets = merge._read_csv(goal / merge.ASSET_NAME, ASSET_HEADER)
+    prefaced_asset = next(
+        row for row in assets if row["assignment_path"] == ASSIGNMENT_PATH
+    )
+
+    mutations: list[tuple[str, dict[str, Any], str]] = []
+    no_hit = copy.deepcopy(base)
+    unrelated_update = dict(unrelated)
+    unrelated_update["evidence_statement"] = (
+        "Changed without an authorizing search hit."
+    )
+    no_hit["reading_updates"].append(unrelated_update)
+    mutations.append(("no-hit", no_hit, "without a new search hit"))
+
+    completion = copy.deepcopy(base)
+    completion["reading_updates"][0]["review_epoch"] = "2"
+    mutations.append(("completion", completion, "completion/identity field"))
+
+    visual = copy.deepcopy(base)
+    asset_update = dict(prefaced_asset)
+    asset_update["visual_role"] = "CONTROL"
+    visual["asset_updates"] = [asset_update]
+    mutations.append(("visual", visual, "visual/completion field"))
+
+    unrelated_link = copy.deepcopy(base)
+    unrelated_link["reading_updates"][0]["candidate_ids"] = (
+        '["B0001","B9999"]'
+    )
+    mutations.append(
+        ("unrelated-link", unrelated_link, "absent from its hit")
+    )
+
+    nonappend_search = copy.deepcopy(base)
+    nonappend_search["proposed_search"]["rounds"].append(
+        copy.deepcopy(nonappend_search["proposed_search"]["rounds"][0])
+    )
+    mutations.append(
+        ("nonappend-search", nonappend_search, "append one")
+    )
+
+    stale = copy.deepcopy(base)
+    stale["base_artifact_sha256"][merge.SEARCH_NAME] = "0" * 64
+    mutations.append(("stale-prefix", stale, "digests are stale"))
+
+    for name, mutation, message in mutations:
+        path = tmp_path / f"{name}.json"
+        path.write_bytes(canonical_json_bytes(mutation))
+        with pytest.raises(merge.MergeError, match=message):
+            merge.prepare_search_enrichment(path, goal_dir=goal)
+
+
+def test_search_enrichment_rejects_forbidden_coordinator_identity(
+    tmp_path: Path,
+) -> None:
+    goal, proposal_path, _, _ = _search_enrichment_fixture(tmp_path)
+    proposal = json.loads(proposal_path.read_text(encoding="utf-8"))
+    proposal["coordinator_id"] = "T03 reconciliation coordinator"
+    forbidden = tmp_path / "forbidden-coordinator.json"
+    forbidden.write_bytes(canonical_json_bytes(proposal))
+
+    with pytest.raises(merge.MergeError, match="forbidden"):
+        merge.prepare_search_enrichment(forbidden, goal_dir=goal)
+
+
+def test_search_enrichment_rollback_restores_history_and_all_ledgers(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    goal, proposal_path, _, _ = _search_enrichment_fixture(tmp_path)
+    plan = merge.prepare_search_enrichment(proposal_path, goal_dir=goal)
+    before = _transaction_state(goal)
+    real_replace = merge.os.replace
+    calls = 0
+
+    def fail_before_history_replace(source: Path, target: Path) -> None:
+        nonlocal calls
+        calls += 1
+        if calls == len(merge.WRITE_NAMES):
+            raise OSError("injected enrichment history replacement failure")
+        real_replace(source, target)
+
+    monkeypatch.setattr(merge.os, "replace", fail_before_history_replace)
+    with pytest.raises(
+        OSError,
+        match="enrichment history replacement failure",
+    ):
+        merge.apply_merge(plan)
+
+    assert _transaction_state(goal) == before
+    assert _merge_staging_dirs(goal) == []

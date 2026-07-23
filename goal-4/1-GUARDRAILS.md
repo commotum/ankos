@@ -101,18 +101,32 @@ The candidate lifecycle is now append-only:
   every non-review stream is epoch-monotone, each typed stream preserves the
   frozen stage/source traversal within an epoch, and evidence cannot predate
   its candidate;
+- global `E######` identifiers are unique and contiguous, each candidate keeps
+  its `source_evidence` in increasing E order, and global evidence traversal
+  follows numeric E order so a later E can append to an earlier active B.
+  Global `G######` identifiers are contiguous and their numeric order equals
+  the order of each group's minimum allocated E;
 - every pending source/image row has a blank `review_epoch`; the initial review
   records the active global epoch and a formal re-review opens the next epoch
-  with `REOPEN`. Forward unread paths then continue in that active epoch.
+  with `REOPEN`. `SEARCH_ENRICHMENT` never changes completion metadata.
+  Forward unread paths then continue in that active epoch.
   Immutable direct source/image anchors require a matching history event at
   the exact anchor epoch;
 - `review-history.jsonl` is an append-only `V######` hash chain. Each event
-  covers exactly one canonical source path and binds its stage, epoch, mode,
-  reviewer, exact ordered source units and assets, immutable input/result
-  projections, and the exact hashed search-round prefix visible when review
-  began. `INITIAL` consumes the first unread canonical path. The first event
-  of a later epoch is `REOPEN`, and its recorded search prefix already closes
-  every earlier history scope;
+  covers exactly one canonical source path, embeds the complete ordered
+  reading/asset result snapshot, binds its independently recomputable digest,
+  and chains the prior result for that path. `INITIAL` and `REOPEN` are full
+  semantic review snapshots and carry no search triggers. `INITIAL` consumes
+  the first unread canonical path. The first event of a later epoch is
+  `REOPEN`, and its recorded search prefix already closes every earlier
+  history scope;
+- `SEARCH_ENRICHMENT` stays in the active epoch and chains a strictly later
+  hashed search prefix containing newly visible, typed, non-exclusion H
+  triggers from that same path and epoch. Every changed reading row has an
+  exact trigger hit. Semantic scalars may change, while secondary, candidate,
+  and route arrays may only gain values carried by the trigger. Assets may
+  gain only triggered candidate/route links; completion metadata and all
+  visual/source inspection findings remain byte-for-byte unchanged;
 - a split tombstones the parent and allocates new children; every `SPLIT_INTO`
   edge carries a typed distinction proof plus explicit before/after rationale;
 - a merge requires a typed alias, co-reference, or proved-duplicate identity
@@ -194,6 +208,12 @@ scope through epoch `N`. Stage closure applies the same requirement to the
 active epoch. Epoch 1 may therefore remain a partial prefix when a justified
 reopen advances the audit, and later unread paths continue under the new
 active epoch without losing either pass from history.
+
+Every historical V event embeds its full result snapshot, so its digest remains
+independently verifiable after later review or enrichment. The latest event for
+each path must reproduce the complete current reading and asset projection
+exactly; changing evidence, disposition, links, or an image finding silently is
+therefore invalid.
 
 If one extracted unit contains multiple atomic claims requiring different
 primary dispositions, Stage 2 must split it rather than select a convenient

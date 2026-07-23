@@ -1926,6 +1926,7 @@ def prepare_search_enrichment(
         raise MergeError("appended search round lacks a round_id")
     hit_rows = new_round.get("hits", [])
     trigger_hits: dict[str, dict[str, Any]] = {}
+    authorizing_hits: dict[str, dict[str, Any]] = {}
     hit_paths: dict[str, str] = {}
     candidate_ids_by_unit: dict[str, set[str]] = {}
     route_ids_by_unit: dict[str, set[str]] = {}
@@ -1956,6 +1957,13 @@ def prepare_search_enrichment(
             isinstance(value, str) for value in route_links
         ):
             raise MergeError(f"search hit {hit_id} has invalid route links")
+        if hit.get("disposition") == "EXCLUSION":
+            if candidate_links or route_links:
+                raise MergeError(
+                    f"EXCLUSION hit {hit_id} cannot authorize semantic links"
+                )
+            continue
+        authorizing_hits[hit_id] = hit
         candidate_ids_by_unit.setdefault(unit_id, set()).update(candidate_links)
         route_ids_by_unit.setdefault(unit_id, set()).update(route_links)
         candidate_ids_by_path.setdefault(path, set()).update(candidate_links)
@@ -1963,7 +1971,7 @@ def prepare_search_enrichment(
 
     hits_for_declared_paths = {
         hit_id: hit
-        for hit_id, hit in trigger_hits.items()
+        for hit_id, hit in authorizing_hits.items()
         if hit_paths[hit_id] in source_path_set
     }
     if any(
@@ -1977,6 +1985,7 @@ def prepare_search_enrichment(
     reading_updates = proposal["reading_updates"]
     reading_update_by_id: dict[str, dict[str, str]] = {}
     changed_paths: set[str] = set()
+    snapshot_changed_paths: set[str] = set()
     for update in reading_updates:
         unit_id = update["source_unit_id"]
         if unit_id in reading_update_by_id:
@@ -2025,6 +2034,7 @@ def prepare_search_enrichment(
                 )
         reading_update_by_id[unit_id] = update
         changed_paths.add(path)
+        snapshot_changed_paths.add(path)
     proposed_reading = [
         reading_update_by_id.get(row["source_unit_id"], row)
         for row in reading
@@ -2068,6 +2078,7 @@ def prepare_search_enrichment(
                 )
         asset_update_by_id[asset_id] = update
         changed_paths.add(path)
+        snapshot_changed_paths.add(path)
     proposed_assets = [
         asset_update_by_id.get(row["asset_id"], row) for row in assets
     ]
@@ -2202,6 +2213,10 @@ def prepare_search_enrichment(
         raise MergeError(
             "enrichment source_paths differ from paths with semantic deltas"
         )
+    if snapshot_changed_paths != source_path_set:
+        raise MergeError(
+            "every enrichment path must change a triggered reading/asset snapshot"
+        )
 
     next_review_number = _review_sequence(review_history) + 1
     prior_event_sha256 = review_history[-1]["event_sha256"]
@@ -2226,10 +2241,9 @@ def prepare_search_enrichment(
                 f"search enrichment path lacks prior result history: {path}"
             )
         path_hit_ids = [
-            hit["hit_id"]
-            for hit in hit_rows
-            if hit.get("source_unit_id") in unit_by_id
-            and unit_by_id[hit["source_unit_id"]]["path"] == path
+            hit_id
+            for hit_id in hits_for_declared_paths
+            if hit_paths[hit_id] == path
         ]
         event_core = {
             "review_id": f"V{next_review_number + offset:06d}",
@@ -2328,7 +2342,7 @@ def prepare_search_enrichment(
         epoch=epoch,
         source_paths=source_paths,
         search_round_id=search_round_id,
-        trigger_hit_ids=tuple(trigger_hits),
+        trigger_hit_ids=tuple(hits_for_declared_paths),
         review_ids=tuple(event["review_id"] for event in review_events),
         reading_update_count=len(reading_updates),
         asset_update_count=len(asset_updates),
