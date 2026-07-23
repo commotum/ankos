@@ -190,7 +190,14 @@ These are current facts after completion of Stages 1–3:
   statistical-physics preset, and the 1973 two-dimensional particle cellular
   automaton; `R000005..R000011` preserve 7 cross-range obligations; and
   `S003`/`S004` record 304 fully dispositioned hits with a zero-delta rerun.
-  The live state is valid and resumable at Stage 6.
+  The resulting state was the verified Stage 6 input.
+- Stage 6 is complete in `6-CH02-EXPERIMENT.md`: all 489 paired Chapter 2
+  units and 78 images are reviewed at the required depth;
+  `B0006..B0091` preserve 86 deliberately uncollapsed blind coverage
+  candidates; all 6 within-stage and 3 incoming routes are resolved; 84 new
+  cross-range obligations remain queued; and `S005`/`S006` record 1,154
+  fully dispositioned hits with a zero-delta rerun. The live state is valid
+  and resumable at Stage 7.
 - The EPUB briefly inspected in the repository was deleted and is not an audit source.
 - Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
 - Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.
@@ -423,6 +430,8 @@ Blindly audit Chapter 1 main text and Chapter 1 Notes for construction-bearing s
 - No blind-phase boundary is violated.
 
 ### 6-CH02-EXPERIMENT
+
+Status: **COMPLETE** in `goal-4/6-CH02-EXPERIMENT.md`.
 
 #### Big Picture Objective
 
