@@ -1452,6 +1452,311 @@ def _validate_candidate_enrichment_update(
         )
 
 
+def _validate_atomic_prefix_state(
+    candidate_state: dict[str, dict[str, Any]],
+    route_state: dict[str, dict[str, str]],
+    latest_path_change: dict[str, dict[str, Any]],
+    search_state: dict[str, Any],
+    asset_by_id: dict[str, dict[str, str]],
+    errors: list[str],
+    prefix: str,
+) -> None:
+    """Require every closed V prefix to be a self-consistent live state."""
+    reading_rows: dict[str, dict[str, Any]] = {}
+    asset_rows: dict[str, dict[str, Any]] = {}
+    for path_change in latest_path_change.values():
+        snapshot = path_change.get("result_snapshot")
+        if not isinstance(snapshot, dict):
+            continue
+        for row in snapshot.get("reading_results", []):
+            if isinstance(row, dict) and isinstance(
+                row.get("source_unit_id"), str
+            ):
+                reading_rows[row["source_unit_id"]] = row
+        for row in snapshot.get("asset_results", []):
+            if isinstance(row, dict) and isinstance(row.get("asset_id"), str):
+                asset_rows[row["asset_id"]] = row
+
+    evidence_by_id: dict[str, tuple[str, dict[str, Any]]] = {}
+    evidence_group_ids: set[str] = set()
+    for candidate_id, candidate in candidate_state.items():
+        for evidence in candidate.get("source_evidence", []):
+            if not isinstance(evidence, dict):
+                continue
+            evidence_id = evidence.get("evidence_id")
+            group_id = evidence.get("evidence_group_id")
+            if isinstance(evidence_id, str):
+                evidence_by_id[evidence_id] = (candidate_id, evidence)
+            if isinstance(group_id, str):
+                evidence_group_ids.add(group_id)
+
+    expected_reading_candidates = {
+        unit_id: {
+            candidate_id
+            for candidate_id, candidate in candidate_state.items()
+            if candidate.get("record_status") == "ACTIVE"
+            and unit_id in candidate.get("source_unit_ids", [])
+        }
+        for unit_id in reading_rows
+    }
+    expected_asset_candidates = {
+        asset_id: {
+            candidate_id
+            for candidate_id, candidate in candidate_state.items()
+            if candidate.get("record_status") == "ACTIVE"
+            and asset_by_id.get(asset_id, {}).get("physical_path")
+            in candidate.get("image_witnesses", [])
+        }
+        for asset_id in asset_rows
+    }
+    expected_reading_routes = {
+        unit_id: {
+            route_id
+            for route_id, route in route_state.items()
+            if route.get("source_unit_id") == unit_id
+        }
+        for unit_id in reading_rows
+    }
+    expected_asset_routes = {
+        asset_id: {
+            route_id
+            for route_id, route in route_state.items()
+            if route.get("source_asset_id") == asset_id
+        }
+        for asset_id in asset_rows
+    }
+
+    for unit_id, row in reading_rows.items():
+        candidate_ids = set(
+            parsed_string_list(
+                row.get("candidate_ids", ""),
+                f"{prefix}.reading.{unit_id}.candidate_ids",
+                errors,
+            )
+        )
+        route_ids = set(
+            parsed_string_list(
+                row.get("route_ids", ""),
+                f"{prefix}.reading.{unit_id}.route_ids",
+                errors,
+            )
+        )
+        for candidate_id in candidate_ids:
+            candidate = candidate_state.get(candidate_id)
+            if candidate is None:
+                errors.append(
+                    f"{prefix} reading {unit_id} links future candidate "
+                    f"{candidate_id}"
+                )
+            elif candidate.get("record_status") != "ACTIVE":
+                errors.append(
+                    f"{prefix} reading {unit_id} links terminal candidate "
+                    f"{candidate_id}"
+                )
+        if candidate_ids != expected_reading_candidates[unit_id]:
+            errors.append(
+                f"{prefix} reading {unit_id} candidate links are not the "
+                "prefix reverse join"
+            )
+        if any(route_id not in route_state for route_id in route_ids):
+            errors.append(f"{prefix} reading {unit_id} links a future route")
+        if route_ids != expected_reading_routes[unit_id]:
+            errors.append(
+                f"{prefix} reading {unit_id} route links are not the "
+                "prefix reverse join"
+            )
+
+    for asset_id, row in asset_rows.items():
+        candidate_ids = set(
+            parsed_string_list(
+                row.get("candidate_ids", ""),
+                f"{prefix}.asset.{asset_id}.candidate_ids",
+                errors,
+            )
+        )
+        route_ids = set(
+            parsed_string_list(
+                row.get("route_ids", ""),
+                f"{prefix}.asset.{asset_id}.route_ids",
+                errors,
+            )
+        )
+        for candidate_id in candidate_ids:
+            candidate = candidate_state.get(candidate_id)
+            if candidate is None:
+                errors.append(
+                    f"{prefix} asset {asset_id} links future candidate "
+                    f"{candidate_id}"
+                )
+            elif candidate.get("record_status") != "ACTIVE":
+                errors.append(
+                    f"{prefix} asset {asset_id} links terminal candidate "
+                    f"{candidate_id}"
+                )
+        if candidate_ids != expected_asset_candidates[asset_id]:
+            errors.append(
+                f"{prefix} asset {asset_id} candidate links are not the "
+                "prefix reverse join"
+            )
+        if any(route_id not in route_state for route_id in route_ids):
+            errors.append(f"{prefix} asset {asset_id} links a future route")
+        if route_ids != expected_asset_routes[asset_id]:
+            errors.append(
+                f"{prefix} asset {asset_id} route links are not the "
+                "prefix reverse join"
+            )
+
+    for candidate_id, candidate in candidate_state.items():
+        for unit_id in candidate.get("source_unit_ids", []):
+            if unit_id not in reading_rows:
+                errors.append(
+                    f"{prefix} candidate {candidate_id} source provenance "
+                    f"{unit_id} lacks a reviewed prefix snapshot"
+                )
+        for image_path in candidate.get("image_witnesses", []):
+            asset_id = next(
+                (
+                    value
+                    for value, asset in asset_by_id.items()
+                    if asset.get("physical_path") == image_path
+                ),
+                None,
+            )
+            if asset_id not in asset_rows:
+                errors.append(
+                    f"{prefix} candidate {candidate_id} image provenance "
+                    f"{image_path} lacks a reviewed prefix snapshot"
+                )
+        for route_id in candidate.get("cross_reference_ids", []):
+            route = route_state.get(route_id)
+            if route is None:
+                errors.append(
+                    f"{prefix} candidate {candidate_id} cites future route "
+                    f"{route_id}"
+                )
+                continue
+            source_asset = asset_by_id.get(route.get("source_asset_id", ""))
+            source_is_owned = (
+                route.get("source_unit_id")
+                in candidate.get("source_unit_ids", [])
+                or (
+                    source_asset is not None
+                    and source_asset.get("physical_path")
+                    in candidate.get("image_witnesses", [])
+                )
+            )
+            if not source_is_owned:
+                errors.append(
+                    f"{prefix} candidate {candidate_id} route provenance "
+                    f"{route_id} is not source-backed"
+                )
+        for relation in candidate.get("related_candidate_ids", []):
+            if not isinstance(relation, dict):
+                continue
+            target_id = relation.get("candidate_id")
+            if target_id not in candidate_state:
+                errors.append(
+                    f"{prefix} candidate {candidate_id} relation targets "
+                    f"future candidate {target_id}"
+                )
+            for evidence_id in relation.get("evidence_ids", []):
+                if evidence_id not in evidence_by_id:
+                    errors.append(
+                        f"{prefix} candidate {candidate_id} relation cites "
+                        f"future evidence {evidence_id}"
+                    )
+        for reassignment in candidate.get("evidence_reassignments", []):
+            if not isinstance(reassignment, dict):
+                continue
+            if reassignment.get("from_evidence_id") not in evidence_by_id:
+                errors.append(
+                    f"{prefix} candidate {candidate_id} reassigns future evidence"
+                )
+            for target in reassignment.get("targets", []):
+                if not isinstance(target, dict):
+                    continue
+                target_id = target.get("candidate_id")
+                evidence_id = target.get("evidence_id")
+                target_evidence = evidence_by_id.get(str(evidence_id))
+                if target_id not in candidate_state:
+                    errors.append(
+                        f"{prefix} candidate {candidate_id} reassignment "
+                        f"targets future candidate {target_id}"
+                    )
+                if target_evidence is None or target_evidence[0] != target_id:
+                    errors.append(
+                        f"{prefix} candidate {candidate_id} reassignment "
+                        "targets future candidate evidence"
+                    )
+
+    for route_id, route in route_state.items():
+        source_unit_id = route.get("source_unit_id")
+        source_asset_id = route.get("source_asset_id")
+        if source_unit_id and source_unit_id not in reading_rows:
+            errors.append(
+                f"{prefix} route {route_id} source lacks a reviewed prefix "
+                "snapshot"
+            )
+        if source_asset_id and source_asset_id not in asset_rows:
+            errors.append(
+                f"{prefix} route {route_id} source asset lacks a reviewed "
+                "prefix snapshot"
+            )
+        if route.get("status") == "RESOLVED":
+            for target_id in parsed_string_list(
+                route.get("target_unit_ids", ""),
+                f"{prefix}.route.{route_id}.target_unit_ids",
+                errors,
+            ):
+                if target_id not in reading_rows:
+                    errors.append(
+                        f"{prefix} resolved route {route_id} targets an "
+                        "unreviewed future unit"
+                    )
+            for target_id in parsed_string_list(
+                route.get("target_asset_ids", ""),
+                f"{prefix}.route.{route_id}.target_asset_ids",
+                errors,
+            ):
+                if target_id not in asset_rows:
+                    errors.append(
+                        f"{prefix} resolved route {route_id} targets an "
+                        "unreviewed future asset"
+                    )
+
+    for round_record in search_state.get("rounds", []):
+        if not isinstance(round_record, dict):
+            continue
+        for hit in round_record.get("hits", []):
+            if not isinstance(hit, dict):
+                continue
+            if any(
+                candidate_id not in candidate_state
+                for candidate_id in hit.get("candidate_ids", [])
+            ):
+                errors.append(f"{prefix} search hit links a future candidate")
+            if any(
+                route_id not in route_state
+                for route_id in hit.get("route_ids", [])
+            ):
+                errors.append(f"{prefix} search hit links a future route")
+        if any(
+            candidate_id not in candidate_state
+            for candidate_id in round_record.get("new_candidates", [])
+        ):
+            errors.append(f"{prefix} search delta links a future candidate")
+        if any(
+            route_id not in route_state
+            for route_id in round_record.get("new_routes", [])
+        ):
+            errors.append(f"{prefix} search delta links a future route")
+        if any(
+            group_id not in evidence_group_ids
+            for group_id in round_record.get("new_evidence_groups", [])
+        ):
+            errors.append(f"{prefix} search delta links future evidence")
+
+
 def validate_review_history(
     manifest: dict[str, Any],
     units: list[dict[str, Any]],
@@ -2130,6 +2435,11 @@ def validate_review_history(
                     errors.append(
                         f"{change_prefix} recreates an existing candidate"
                     )
+                if after_candidate.get("record_status") != "ACTIVE":
+                    errors.append(
+                        f"{change_prefix} CREATE is not an ACTIVE candidate; "
+                        "lifecycle tombstones require Stage 18 UPDATE"
+                    )
                 expected_id = f"B{len(candidate_state) + 1:04d}"
                 if candidate_id != expected_id:
                     errors.append(
@@ -2544,6 +2854,16 @@ def validate_review_history(
                         f"{prefix} sets fixed_point without a final "
                         "zero-delta saturation round"
                     )
+
+        _validate_atomic_prefix_state(
+            candidate_state,
+            route_state,
+            latest_path_change,
+            search_state,
+            asset_by_id,
+            errors,
+            prefix,
+        )
 
         if event.get("previous_event_sha256") != prior_event_sha256:
             errors.append(f"{prefix} breaks the append-only event hash chain")

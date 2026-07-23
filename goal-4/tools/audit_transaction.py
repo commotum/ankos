@@ -18,7 +18,8 @@ The on-disk protocol is deliberately small:
 1. fsync staged base and proposed bytes;
 2. fsync a canonical ``PREPARED`` journal and atomically publish the pending
    directory;
-3. replace and fsync each target;
+3. copy each target through a unique owner-writable scratch, fsync its bytes,
+   apply the final mode, then replace and fsync the target;
 4. fsync the canonical ``COMMITTED`` journal;
 5. atomically retire the pending directory and fsync the goal directory.
 
@@ -710,21 +711,65 @@ def _install_from_stage(
     mode: int,
     *,
     purpose: str,
+    fault_injector: FaultInjector | None,
+    event_prefix: str,
 ) -> None:
     work = pending / WORK_DIRECTORY_NAME
-    scratch = work / f"{purpose}-{name}.tmp"
     try:
         data = staged.read_bytes()
     except OSError as exc:
         raise TransactionError(
             f"cannot read staged {purpose} artifact {name}: {exc}"
         ) from exc
-    _write_fsynced(scratch, data, mode)
-    _fsync_directory(work)
-    os.replace(scratch, goal / name)
-    _fsync_regular_file(goal / name)
-    _fsync_directory(goal)
-    _fsync_directory(work)
+
+    descriptor, scratch_name = tempfile.mkstemp(
+        prefix=f".{purpose}-{name}-",
+        suffix=".tmp",
+        dir=work,
+    )
+    scratch = Path(scratch_name)
+    try:
+        try:
+            # The unique scratch stays owner-writable while bytes are
+            # produced.  Its final ledger mode is applied only after content
+            # is durable and immediately before the atomic install.  A crash
+            # can therefore leave a read-only scratch, but a retry never
+            # reopens that path.
+            os.fchmod(descriptor, 0o600)
+            view = memoryview(data)
+            written = 0
+            while written < len(view):
+                count = os.write(descriptor, view[written:])
+                if count <= 0:
+                    raise OSError(
+                        f"short write while preparing install of {name}"
+                    )
+                written += count
+            os.fsync(descriptor)
+            os.fchmod(descriptor, mode)
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+
+        _fsync_directory(work)
+        _call_fault(
+            fault_injector,
+            f"{event_prefix}:scratch_ready:{name}",
+        )
+        os.replace(scratch, goal / name)
+        _fsync_regular_file(goal / name)
+        _fsync_directory(goal)
+        _fsync_directory(work)
+    except BaseException as exc:
+        if isinstance(exc, Exception) and _lexists(scratch):
+            try:
+                scratch.unlink()
+                _fsync_directory(work)
+            except OSError:
+                # The name is unique and remains confined to the pending
+                # directory, so a later retry cannot collide with it.
+                pass
+        raise
 
 
 def _target_digests_and_modes(
@@ -818,6 +863,8 @@ def _restore_all(
             name,
             journal["artifact_modes"][name],
             purpose=f"recover-{version}",
+            fault_injector=fault_injector,
+            event_prefix="recovery",
         )
         _call_fault(
             fault_injector,
@@ -1051,6 +1098,8 @@ def apply_transaction(
                     name,
                     modes[name],
                     purpose="apply-proposed",
+                    fault_injector=fault_injector,
+                    event_prefix="apply",
                 )
                 _call_fault(
                     fault_injector,

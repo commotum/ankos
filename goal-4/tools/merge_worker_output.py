@@ -10,9 +10,11 @@ import io
 import json
 import os
 import sys
+from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any
 
 import build_worker_bundle
@@ -69,6 +71,85 @@ class MergeError(ValueError):
     """The worker output cannot be merged without weakening an invariant."""
 
 
+def _plan_validation_token(
+    original_bytes: Mapping[str, bytes],
+    original_modes: Mapping[str, int],
+    proposed_bytes: Mapping[str, bytes],
+) -> str:
+    """Bind every immutable plan-state byte and mode to one digest."""
+
+    expected_original = set(SNAPSHOT_NAMES)
+    expected_proposed = set(WRITE_NAMES)
+    if (
+        set(original_bytes) != expected_original
+        or set(original_modes) != expected_original
+        or set(proposed_bytes) != expected_proposed
+    ):
+        raise MergeError(
+            "prepared plan state maps differ from the closed artifact contract"
+        )
+
+    digest = hashlib.sha256()
+
+    def add(payload: bytes) -> None:
+        digest.update(len(payload).to_bytes(8, "big"))
+        digest.update(payload)
+
+    add(b"goal-4-validated-plan-v1")
+    for label, names, values in (
+        (b"original-bytes", SNAPSHOT_NAMES, original_bytes),
+        (b"proposed-bytes", WRITE_NAMES, proposed_bytes),
+    ):
+        add(label)
+        for name in names:
+            value = values[name]
+            if not isinstance(value, bytes):
+                raise MergeError(
+                    f"prepared plan byte payload is invalid: {name}"
+                )
+            add(name.encode("utf-8"))
+            add(value)
+    add(b"original-modes")
+    for name in SNAPSHOT_NAMES:
+        mode = original_modes[name]
+        if (
+            isinstance(mode, bool)
+            or not isinstance(mode, int)
+            or mode < 0
+            or mode > 0o777
+        ):
+            raise MergeError(f"prepared plan mode is invalid: {name}")
+        add(name.encode("utf-8"))
+        add(mode.to_bytes(2, "big"))
+    return digest.hexdigest()
+
+
+def _freeze_plan_state(
+    original_bytes: Mapping[str, bytes],
+    original_modes: Mapping[str, int],
+    proposed_bytes: Mapping[str, bytes],
+) -> tuple[
+    Mapping[str, bytes],
+    Mapping[str, int],
+    Mapping[str, bytes],
+    str,
+]:
+    frozen_original_bytes = MappingProxyType(dict(original_bytes))
+    frozen_original_modes = MappingProxyType(dict(original_modes))
+    frozen_proposed_bytes = MappingProxyType(dict(proposed_bytes))
+    validation_token = _plan_validation_token(
+        frozen_original_bytes,
+        frozen_original_modes,
+        frozen_proposed_bytes,
+    )
+    return (
+        frozen_original_bytes,
+        frozen_original_modes,
+        frozen_proposed_bytes,
+        validation_token,
+    )
+
+
 @dataclass(frozen=True)
 class MergePlan:
     bundle: Path
@@ -86,9 +167,10 @@ class MergePlan:
     reading_update_count: int
     asset_update_count: int
     worker_uncertainties: tuple[str, ...]
-    original_bytes: dict[str, bytes]
-    original_modes: dict[str, int]
-    proposed_bytes: dict[str, bytes]
+    original_bytes: Mapping[str, bytes]
+    original_modes: Mapping[str, int]
+    proposed_bytes: Mapping[str, bytes]
+    validation_token: str
 
     def preview(self) -> dict[str, Any]:
         return {
@@ -144,9 +226,10 @@ class SearchAppendPlan:
     candidate_update_count: int
     candidate_append_count: int
     route_append_count: int
-    original_bytes: dict[str, bytes]
-    original_modes: dict[str, int]
-    proposed_bytes: dict[str, bytes]
+    original_bytes: Mapping[str, bytes]
+    original_modes: Mapping[str, int]
+    proposed_bytes: Mapping[str, bytes]
+    validation_token: str
 
     def preview(self) -> dict[str, Any]:
         before_fixed_point = json.loads(
@@ -202,9 +285,10 @@ class RouteResolutionPlan:
     source_paths: tuple[str, ...]
     review_ids: tuple[str, ...]
     route_update_count: int
-    original_bytes: dict[str, bytes]
-    original_modes: dict[str, int]
-    proposed_bytes: dict[str, bytes]
+    original_bytes: Mapping[str, bytes]
+    original_modes: Mapping[str, int]
+    proposed_bytes: Mapping[str, bytes]
+    validation_token: str
 
     def preview(self) -> dict[str, Any]:
         return {
@@ -235,9 +319,10 @@ class CandidateRevisionPlan:
     candidate_append_count: int
     reading_update_count: int
     asset_update_count: int
-    original_bytes: dict[str, bytes]
-    original_modes: dict[str, int]
-    proposed_bytes: dict[str, bytes]
+    original_bytes: Mapping[str, bytes]
+    original_modes: Mapping[str, int]
+    proposed_bytes: Mapping[str, bytes]
+    validation_token: str
 
     def preview(self) -> dict[str, Any]:
         return {
@@ -2276,6 +2361,16 @@ def _prepare_merge_locked(
         if path.read_bytes() != bundle_bytes[label]:
             raise MergeError(f"verified bundle changed during merge planning: {label}")
 
+    (
+        original_bytes,
+        original_modes,
+        proposed_bytes,
+        validation_token,
+    ) = _freeze_plan_state(
+        original_bytes,
+        original_modes,
+        proposed_bytes,
+    )
     return MergePlan(
         bundle=bundle,
         goal_dir=goal_dir,
@@ -2295,6 +2390,7 @@ def _prepare_merge_locked(
         original_bytes=original_bytes,
         original_modes=original_modes,
         proposed_bytes=proposed_bytes,
+        validation_token=validation_token,
     )
 
 
@@ -2898,6 +2994,16 @@ def _prepare_search_append_locked(
                 f"global audit state changed during SEARCH_APPEND planning: {name}"
             )
 
+    (
+        original_bytes,
+        original_modes,
+        proposed_bytes,
+        validation_token,
+    ) = _freeze_plan_state(
+        original_bytes,
+        original_modes,
+        proposed_bytes,
+    )
     return SearchAppendPlan(
         proposal=proposal_path,
         goal_dir=goal_dir,
@@ -2917,6 +3023,7 @@ def _prepare_search_append_locked(
         original_bytes=original_bytes,
         original_modes=original_modes,
         proposed_bytes=proposed_bytes,
+        validation_token=validation_token,
     )
 
 
@@ -3195,6 +3302,16 @@ def _prepare_route_resolution_locked(
     )
     if proposal_path.read_bytes() != proposal_bytes:
         raise MergeError("ROUTE_RESOLUTION proposal changed during validation")
+    (
+        original_bytes,
+        original_modes,
+        proposed_bytes,
+        validation_token,
+    ) = _freeze_plan_state(
+        original_bytes,
+        original_modes,
+        proposed_bytes,
+    )
     return RouteResolutionPlan(
         proposal=proposal_path,
         goal_dir=goal_dir,
@@ -3207,6 +3324,7 @@ def _prepare_route_resolution_locked(
         original_bytes=original_bytes,
         original_modes=original_modes,
         proposed_bytes=proposed_bytes,
+        validation_token=validation_token,
     )
 
 
@@ -3619,6 +3737,16 @@ def _prepare_candidate_revision_locked(
     )
     if proposal_path.read_bytes() != proposal_bytes:
         raise MergeError("CANDIDATE_REVISION proposal changed during validation")
+    (
+        original_bytes,
+        original_modes,
+        proposed_bytes,
+        validation_token,
+    ) = _freeze_plan_state(
+        original_bytes,
+        original_modes,
+        proposed_bytes,
+    )
     return CandidateRevisionPlan(
         proposal=proposal_path,
         goal_dir=goal_dir,
@@ -3635,6 +3763,7 @@ def _prepare_candidate_revision_locked(
         original_bytes=original_bytes,
         original_modes=original_modes,
         proposed_bytes=proposed_bytes,
+        validation_token=validation_token,
     )
 
 
@@ -3643,13 +3772,38 @@ def _assert_snapshot_unchanged(
 ) -> None:
     for name, expected in plan.original_bytes.items():
         path = plan.goal_dir / name
-        if not path.is_file() or path.is_symlink() or path.read_bytes() != expected:
+        if (
+            not path.is_file()
+            or path.is_symlink()
+            or path.read_bytes() != expected
+            or (path.stat().st_mode & 0o777) != plan.original_modes[name]
+        ):
             raise MergeError(f"global audit state changed concurrently: {name}")
+
+
+def _assert_plan_integrity(plan: Plan) -> None:
+    """Reject any plan whose frozen, validated state was replaced or changed."""
+
+    for label, values in (
+        ("original_bytes", plan.original_bytes),
+        ("original_modes", plan.original_modes),
+        ("proposed_bytes", plan.proposed_bytes),
+    ):
+        if not isinstance(values, MappingProxyType):
+            raise MergeError(f"prepared plan {label} map is not frozen")
+    current_token = _plan_validation_token(
+        plan.original_bytes,
+        plan.original_modes,
+        plan.proposed_bytes,
+    )
+    if current_token != plan.validation_token:
+        raise MergeError("prepared plan validation token mismatch")
 
 
 def apply_merge(plan: Plan) -> None:
     """Commit a validated plan through the shared durable transaction."""
 
+    _assert_plan_integrity(plan)
     _assert_snapshot_unchanged(plan)
     try:
         audit_transaction.apply_transaction(

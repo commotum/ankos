@@ -424,6 +424,51 @@ def test_rollback_failure_retains_complete_staging_and_is_retryable(
     assert not os.path.lexists(pending)
 
 
+def test_read_only_recovery_scratch_crash_is_retryable_in_mixed_state(
+    tmp_path: Path,
+) -> None:
+    goal, base, proposed, modes = _make_goal(tmp_path)
+    read_only_name = transaction.ARTIFACT_NAMES[0]
+    modes[read_only_name] = 0o400
+    (goal / read_only_name).chmod(0o400)
+
+    with pytest.raises(SimulatedCrash):
+        transaction.apply_transaction(
+            goal,
+            base,
+            proposed,
+            modes,
+            fault_injector=_crash_on(
+                f"apply:after_replace:{read_only_name}"
+            ),
+        )
+    assert _state_bytes(goal) != base
+    assert _state_bytes(goal) != proposed
+
+    with pytest.raises(SimulatedCrash):
+        transaction.recover_transaction(
+            goal,
+            fault_injector=_crash_on(
+                f"recovery:scratch_ready:{read_only_name}"
+            ),
+        )
+
+    pending = goal / transaction.PENDING_NAME
+    abandoned = list(
+        (pending / transaction.WORK_DIRECTORY_NAME).glob(
+            f".recover-base-{read_only_name}-*.tmp"
+        )
+    )
+    assert len(abandoned) == 1
+    assert abandoned[0].stat().st_mode & 0o777 == 0o400
+
+    recovered = transaction.recover_transaction(goal)
+    assert recovered.action == "ROLLED_BACK_MIXED"
+    assert _state_bytes(goal) == base
+    assert _state_modes(goal) == modes
+    assert not os.path.lexists(pending)
+
+
 def test_unknown_target_bytes_fail_closed_and_retain_pending(
     tmp_path: Path,
 ) -> None:

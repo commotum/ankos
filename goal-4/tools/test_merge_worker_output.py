@@ -7,7 +7,9 @@ import json
 import shutil
 import subprocess
 import sys
+from dataclasses import replace
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any
 
 import pytest
@@ -1024,6 +1026,51 @@ def test_apply_uses_validated_staged_ledgers_and_preserves_search(
             if row["physical_path"] == candidates[0]["image_witnesses"][0]
         )
     ) == ["R000001"]
+
+
+def test_prepared_plan_state_maps_are_frozen_and_token_bound(
+    tmp_path: Path,
+) -> None:
+    bundle = _completed_bundle(tmp_path)
+    goal = _copy_global_state(tmp_path)
+    plan = merge.prepare_merge(bundle, goal_dir=goal)
+    before = _transaction_state(goal)
+    assert len(plan.validation_token) == 64
+
+    replacements: dict[str, bytes | int] = {
+        "proposed_bytes": plan.proposed_bytes[merge.READING_NAME] + b"\n",
+        "original_bytes": plan.original_bytes[merge.READING_NAME] + b"\n",
+        "original_modes": plan.original_modes[merge.READING_NAME] ^ 0o001,
+    }
+    for field, replacement_value in replacements.items():
+        frozen = getattr(plan, field)
+        assert isinstance(frozen, MappingProxyType)
+        with pytest.raises(TypeError):
+            frozen[merge.READING_NAME] = replacement_value
+
+        replaced = dict(frozen)
+        replaced[merge.READING_NAME] = replacement_value
+        tampered = replace(
+            plan,
+            **{field: MappingProxyType(replaced)},
+        )
+        with pytest.raises(
+            merge.MergeError,
+            match="prepared plan validation token mismatch",
+        ):
+            merge.apply_merge(tampered)
+        assert _transaction_state(goal) == before
+
+    mutable_replacement = replace(
+        plan,
+        proposed_bytes=dict(plan.proposed_bytes),
+    )
+    with pytest.raises(
+        merge.MergeError,
+        match="prepared plan proposed_bytes map is not frozen",
+    ):
+        merge.apply_merge(mutable_replacement)
+    assert _transaction_state(goal) == before
 
 
 def test_apply_fault_rolls_back_through_durable_transaction(

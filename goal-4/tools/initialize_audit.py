@@ -195,7 +195,6 @@ def expected_artifacts() -> dict[Path, bytes]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check-initial", action="store_true")
-    parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
 
     if args.check_initial:
@@ -238,7 +237,7 @@ def main() -> int:
         )
         if path.exists()
     ]
-    if existing_ledgers and not args.force:
+    if existing_ledgers:
         print(
             "refusing to overwrite existing audit ledgers: "
             + ", ".join(str(path.relative_to(GOAL_DIR)) for path in existing_ledgers)
