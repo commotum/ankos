@@ -60,6 +60,10 @@
             ],
             "type": "string"
           },
+          "review_epoch": {
+            "pattern": "^(?:|[1-9][0-9]*)$",
+            "type": "string"
+          },
           "review_stage": {
             "type": "string"
           },
@@ -128,6 +132,7 @@
           "assignment_basis",
           "reference_status",
           "inspection_status",
+          "review_epoch",
           "visual_role",
           "source_status",
           "risk_flags",
@@ -2008,6 +2013,10 @@
             ],
             "type": "string"
           },
+          "review_epoch": {
+            "pattern": "^(?:|[1-9][0-9]*)$",
+            "type": "string"
+          },
           "review_stage": {
             "type": "string"
           },
@@ -2060,6 +2069,7 @@
           "global_line_end",
           "unit_sha256",
           "review_status",
+          "review_epoch",
           "review_disposition",
           "source_status",
           "uncertainty",

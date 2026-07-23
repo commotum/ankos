@@ -329,7 +329,7 @@ def _copy_global_state(root: Path) -> Path:
 def _bytes(goal: Path) -> dict[str, bytes]:
     return {
         name: (goal / name).read_bytes()
-        for name in (*merge.WRITE_NAMES, merge.SEARCH_NAME)
+        for name in merge.WRITE_NAMES
     }
 
 
@@ -444,6 +444,21 @@ def test_bad_completed_bundle_is_rejected(tmp_path: Path) -> None:
     output_path.write_bytes(canonical_json_bytes(output))
 
     with pytest.raises(merge.MergeError, match="bundle verification failed"):
+        merge.prepare_merge(bundle, goal_dir=goal)
+
+
+def test_worker_review_epoch_must_match_bundle_epoch(tmp_path: Path) -> None:
+    bundle = _completed_bundle(tmp_path)
+    goal = _copy_global_state(tmp_path)
+    output_path = bundle / "output" / "output.json"
+    output = json.loads(output_path.read_text(encoding="utf-8"))
+    output["reading_updates"][0]["review_epoch"] = "2"
+    output_path.write_bytes(canonical_json_bytes(output))
+
+    with pytest.raises(
+        merge.MergeError,
+        match="review_epoch differs from bundle",
+    ):
         merge.prepare_merge(bundle, goal_dir=goal)
 
 

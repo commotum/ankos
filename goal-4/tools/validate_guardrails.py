@@ -335,6 +335,20 @@ def validate(data: dict[str, Any]) -> list[str]:
         )
     ):
         errors.append("source_uncertainty_contract is incomplete")
+    review_epoch_contract = data.get("review_epoch_contract")
+    if not isinstance(review_epoch_contract, str) or not all(
+        phrase in review_epoch_contract
+        for phrase in (
+            "PENDING reading or asset row has a blank review_epoch",
+            "positive review_epoch",
+            "1 for its initial review",
+            "formal re-review",
+            "cannot postdate",
+            "Epoch-1 LOCAL coverage is exact",
+            "zero-discovery pass",
+        )
+    ):
+        errors.append("review_epoch_contract is incomplete")
     for key in ("evidence_application", "visual_evidence_rule"):
         if not isinstance(data.get(key), str) or not data[key].strip():
             errors.append(f"{key} must be non-empty")
@@ -554,9 +568,11 @@ def validate(data: dict[str, Any]) -> list[str]:
         errors.append("blind_freeze_requirements must contain the full closure contract")
     elif not any(
         "Stages 4 through 17" in requirement
-        and "LOCAL round" in requirement
+        and "epoch-1 LOCAL rounds" in requirement
         and "exact union of scopes" in requirement
         and "before the Stage 18 saturation fixed point" in requirement
+        and "(stage, review_epoch)" in requirement
+        and "zero-discovery passes" in requirement
         for requirement in freeze
         if isinstance(requirement, str)
     ):
@@ -627,6 +643,14 @@ def run_mutation_checks(data: dict[str, Any]) -> list[str]:
     )
     mutations.append(
         ("missing exact source uncertainty boundary", missing_uncertainty_boundary)
+    )
+
+    missing_review_epoch = copy.deepcopy(data)
+    missing_review_epoch["review_epoch_contract"] = (
+        "Reviewed rows may have an epoch."
+    )
+    mutations.append(
+        ("missing source review epoch contract", missing_review_epoch)
     )
 
     open_search_language = copy.deepcopy(data)

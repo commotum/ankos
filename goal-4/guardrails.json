@@ -112,6 +112,7 @@
     "CONFLICTING"
   ],
   "source_uncertainty_contract": "Every reviewed source unit and screened asset records uncertainty independently of disposition or visual role. CLEAR requires an empty uncertainty boundary; AMBIGUOUS, DEFECTIVE, and CONFLICTING require a meaningful nonempty boundary. SOURCE_DEFECT_OR_AMBIGUITY and SOURCE_DEFECT cannot be CLEAR. Pending rows carry no adjudicated uncertainty.",
+  "review_epoch_contract": "Every PENDING reading or asset row has a blank review_epoch. Every REVIEWED reading and SCREENED asset has a positive review_epoch: 1 for its initial review and the newly incremented global epoch for a formal re-review. Immutable SOURCE_UNIT and IMAGE anchors cannot postdate the current review_epoch of their canonical source row. Epoch-1 LOCAL coverage is exact for every Stage 4-17 assigned document set; for every later (stage, review_epoch), the exact LOCAL query-scope union equals the document paths re-reviewed in that epoch, including a zero-discovery pass.",
   "evidence_modalities": [
     "PROSE",
     "FORMULA",
@@ -136,7 +137,7 @@
     "AMBIGUOUS",
     "CAPTION_INCOMPLETE"
   ],
-  "discovery_anchor_contract": "Candidates and evidence use immutable {epoch, kind, id, ordinal} anchors. Routes use the corresponding CSV fields and search rounds record the same epoch. SOURCE_UNIT and IMAGE anchors belong to the owning sequential range; SEARCH_HIT anchors belong to a typed LOCAL or SATURATION round. Epoch 1 is the initial traversal and every formal blind reopen increments the epoch. The global union of candidate, evidence, route, and search epochs is contiguous from 1; each stream preserves frozen stage/source traversal and evidence cannot predate its candidate.",
+  "discovery_anchor_contract": "Candidates and evidence use immutable {epoch, kind, id, ordinal} anchors. Routes use the corresponding CSV fields, source rows carry review_epoch, and search rounds record the same epoch. SOURCE_UNIT and IMAGE anchors belong to the owning sequential range and cannot postdate their source review_epoch; SEARCH_HIT anchors belong to a typed LOCAL or SATURATION round. Epoch 1 is the initial traversal and every formal blind reopen increments the epoch. The global union of source-review, candidate, evidence, route, and search epochs is contiguous from 1; each stream preserves frozen stage/source traversal and evidence cannot predate its candidate.",
   "lifecycle_relation_contract": {
     "proof_kinds": [
       "PROVISIONAL_COMPARISON",
@@ -448,7 +449,7 @@
   "blind_freeze_requirements": [
     "All assigned canonical source units have exactly one primary reading disposition.",
     "All physical images have a visual-screening record and all image references have an asset row.",
-    "Stages 4 through 17 each have at least one LOCAL round whose exact union of scopes covers that stage's assigned documents before the Stage 18 saturation fixed point.",
+    "Stages 4 through 17 each have epoch-1 LOCAL rounds whose exact union of scopes covers that stage's assigned documents before the Stage 18 saturation fixed point; for every later (stage, review_epoch), the exact LOCAL scope union covers exactly the document paths re-reviewed in that epoch, including zero-discovery passes.",
     "Every local and saturation search hit has a final blind disposition.",
     "Every relevant cross-reference is resolved or has an explicit defect boundary.",
     "Every active candidate has every fingerprint key, complete provenance, and explicit missing mechanics.",

@@ -1171,14 +1171,6 @@ def validate_objects(
                         f"{prefix} image-anchored owning stage differs from "
                         "asset stage"
                     )
-                if (
-                    row["discovery_kind"] == "IMAGE"
-                    and asset_review_epochs.get(source_path, -1)
-                    < discovery_epoch
-                ):
-                    errors.append(
-                        f"{prefix} image anchor postdates its asset review epoch"
-                    )
             if source_asset["inspection_status"] != "SCREENED":
                 errors.append(f"{prefix} source asset is not screened")
         defect = row["defect_boundary"].strip()
@@ -1630,6 +1622,23 @@ def validate_objects(
                 errors.append(f"{prefix} reviewed outside assigned stage")
         else:
             errors.append(f"{prefix} has invalid inspection_status")
+
+    for route in routes:
+        if route.get("discovery_kind") != "IMAGE":
+            continue
+        source_asset = asset_record_by_id.get(route.get("source_asset_id", ""))
+        if source_asset is None:
+            continue
+        try:
+            route_epoch = int(route.get("discovery_epoch", ""))
+        except ValueError:
+            continue
+        source_path = source_asset.get("physical_path", "")
+        if asset_review_epochs.get(source_path, -1) < route_epoch:
+            errors.append(
+                f"route {route.get('route_id')} image anchor postdates "
+                "its asset review epoch"
+            )
 
     expected_asset_route_links: dict[str, set[str]] = {
         asset_id: set() for asset_id in asset_ids
@@ -3073,6 +3082,7 @@ def mutation_checks(
     )
     lineage_candidates[3]["cross_reference_ids"] = []
     lineage_reading = copy.deepcopy(base_reading)
+    lineage_reading[0]["review_epoch"] = "2"
     lineage_reading[0]["candidate_ids"] = '["B0003","B0004"]'
     lineage_errors = validate_objects(
         manifest,
@@ -3258,6 +3268,66 @@ def mutation_checks(
             base_search,
         )
     )
+    reviewed_without_epoch = copy.deepcopy(base_reading)
+    reviewed_without_epoch[0]["review_epoch"] = ""
+    mutations.append(
+        (
+            "reviewed reading without review epoch",
+            reviewed_without_epoch,
+            base_candidates,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    pending_with_epoch = copy.deepcopy(base_reading)
+    pending_with_epoch[-1]["review_epoch"] = "1"
+    mutations.append(
+        (
+            "pending reading with review epoch",
+            pending_with_epoch,
+            base_candidates,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    screened_without_epoch = copy.deepcopy(defect_asset)
+    screened_without_epoch[0]["review_epoch"] = ""
+    mutations.append(
+        (
+            "screened asset without review epoch",
+            base_reading,
+            base_candidates,
+            base_routes,
+            screened_without_epoch,
+            base_search,
+        )
+    )
+    pending_asset_with_epoch = copy.deepcopy(base_assets)
+    pending_asset_with_epoch[-1]["review_epoch"] = "1"
+    mutations.append(
+        (
+            "pending asset with review epoch",
+            base_reading,
+            base_candidates,
+            base_routes,
+            pending_asset_with_epoch,
+            base_search,
+        )
+    )
+    anchor_after_review = copy.deepcopy(base_routes)
+    anchor_after_review[0]["discovery_epoch"] = "2"
+    mutations.append(
+        (
+            "source anchor postdates source review epoch",
+            base_reading,
+            base_candidates,
+            anchor_after_review,
+            base_assets,
+            base_search,
+        )
+    )
     gap_route_epoch = copy.deepcopy(base_routes)
     gap_route_epoch[0]["discovery_epoch"] = "7"
     mutations.append(
@@ -3272,10 +3342,12 @@ def mutation_checks(
     )
     evidence_predates_candidate = copy.deepcopy(base_candidates)
     evidence_predates_candidate[0]["discovery_anchor"]["epoch"] = 2
+    evidence_predates_reading = copy.deepcopy(base_reading)
+    evidence_predates_reading[0]["review_epoch"] = "2"
     mutations.append(
         (
             "evidence predates candidate discovery epoch",
-            base_reading,
+            evidence_predates_reading,
             evidence_predates_candidate,
             base_routes,
             base_assets,
@@ -3458,6 +3530,7 @@ def mutation_checks(
     )
 
     search_reading = copy.deepcopy(base_reading)
+    search_reading[0]["review_epoch"] = "2"
     for row in search_reading:
         if row["path"] != path or row["review_status"] == "REVIEWED":
             continue

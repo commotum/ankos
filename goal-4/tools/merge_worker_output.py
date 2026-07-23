@@ -616,7 +616,12 @@ def _validate_stage_prerequisites(
 def _positive_epoch(value: object, label: str) -> int:
     if isinstance(value, int) and not isinstance(value, bool) and value >= 1:
         return value
-    if isinstance(value, str) and value.isdigit() and int(value) >= 1:
+    if (
+        isinstance(value, str)
+        and value.isdigit()
+        and not value.startswith("0")
+        and int(value) >= 1
+    ):
         return int(value)
     raise MergeError(f"{label} has an invalid discovery/review epoch: {value!r}")
 

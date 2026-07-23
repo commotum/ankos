@@ -221,6 +221,14 @@ def sanitized_guardrails(guardrails: dict[str, Any]) -> dict[str, Any]:
 
 def brief(worker_id: str, stage: int, epoch: int, paths: list[str]) -> str:
     listed = "\n".join(f"- `{path}`" for path in paths)
+    reopen_instruction = (
+        "\nThis is a formally reopened pass. In every reading/asset update, "
+        "retain the input row's existing global B/R links exactly and in "
+        "their existing order; add any new worker-local W/WR links without "
+        "removing or inventing global links.\n"
+        if epoch > 1
+        else ""
+    )
     return f"""# Blind Source Review
 
 Worker: `{worker_id}`
@@ -232,6 +240,7 @@ Do not run search in this worker bundle; the coordinator performs and records
 typed local-search rounds after merging the sequential review. Do not use
 outside knowledge to fill missing mechanics, and do not decide implementation,
 equivalence, reuse, or final taxonomy.
+{reopen_instruction}
 
 Assigned canonical documents:
 
@@ -241,7 +250,8 @@ For every source unit:
 
 1. Read the complete byte range and enough adjacent bundled context.
 2. Return exactly one primary reading disposition and a separate source status.
-3. Record concise evidence, secondary roles, local candidate links, and routes.
+3. Set `review_epoch` to `{epoch}` and record concise evidence, secondary
+   roles, candidate links, and routes.
 4. Err toward a worker-local `W####` candidate when both an identity anchor and
    semantic anchor may be present.
 5. Fill every fingerprint field with supported, not-applicable, unknown, or

@@ -95,8 +95,13 @@ The candidate lifecycle is now append-only:
   mechanically rechecked; epoch 1 is the initial traversal and each formally
   reopened blind pass increments the epoch before allocating further IDs;
 - candidate, evidence, route, and search epochs form one contiguous global
-  sequence beginning at 1; each typed stream preserves the frozen stage/source
-  traversal within an epoch, and evidence cannot predate its candidate;
+  sequence together with source-row review epochs, beginning at 1; each typed
+  stream preserves the frozen stage/source traversal within an epoch, and
+  evidence cannot predate its candidate;
+- every pending source/image row has a blank `review_epoch`; the initial review
+  records epoch 1 and any formal re-review records the newly incremented epoch.
+  Immutable direct source/image anchors may precede, but cannot postdate, the
+  row's current review epoch;
 - a split tombstones the parent and allocates new children; every `SPLIT_INTO`
   edge carries a typed distinction proof plus explicit before/after rationale;
 - a merge requires a typed alias, co-reference, or proved-duplicate identity
@@ -168,6 +173,12 @@ boundary: `CLEAR` requires it to be empty, while every non-clear status
 requires a meaningful nonempty boundary. `SOURCE_DEFECT_OR_AMBIGUITY` and the
 `SOURCE_DEFECT` visual/secondary role therefore cannot be paired with
 `CLEAR`. Pending rows carry no adjudicated uncertainty.
+
+Epoch-1 local searches exactly cover every assigned Stage 4–17 document set.
+For each later `(stage, review_epoch)`, the union of that epoch's local query
+scopes equals exactly the document paths re-reviewed in that epoch. This
+records a formal zero-discovery reopen instead of leaving its existence
+implicit.
 
 If one extracted unit contains multiple atomic claims requiring different
 primary dispositions, Stage 2 must split it rather than select a convenient

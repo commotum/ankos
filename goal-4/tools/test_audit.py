@@ -192,6 +192,114 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         True,
     ) == []
 
+    reopened_reading = copy.deepcopy(reading)
+    reopened_assets = copy.deepcopy(assets)
+    reopened_path = next(
+        document["path"]
+        for document in manifest["documents"]
+        if MODULE.stage_for_document(document) == 4
+    )
+    for row in reopened_reading:
+        if row["path"] == reopened_path:
+            row["review_epoch"] = "2"
+    for row in reopened_assets:
+        if row["assignment_path"] == reopened_path:
+            row["review_epoch"] = "2"
+    reopened_search = copy.deepcopy(search)
+    reopened_local = {
+        "round_id": "S016",
+        "epoch": 2,
+        "kind": "LOCAL",
+        "owning_stage": 4,
+        "queries": [
+            {
+                "query_id": "Q0016",
+                "family": "zero-result reopened fixture",
+                "pattern": "__AUDIT_HARNESS_IMPOSSIBLE_MATCH_71A9C2__",
+                "mode": "LITERAL",
+                "case_sensitive": True,
+                "whole_word": False,
+                "scope_paths": [reopened_path],
+            }
+        ],
+        "tool_assumptions": ["Deterministic zero-result fixture."],
+        "result_ids": [],
+        "result_digest": "",
+        "hits": [],
+        "new_vocabulary": [],
+        "new_candidates": [],
+        "new_evidence_groups": [],
+        "new_routes": [],
+        "rerun_digest": "",
+    }
+    reopened_local_digest = MODULE.search_result_digest(reopened_local)
+    reopened_local["result_digest"] = reopened_local_digest
+    reopened_local["rerun_digest"] = reopened_local_digest
+    reopened_saturation = copy.deepcopy(saturation)
+    reopened_saturation["round_id"] = "S017"
+    reopened_saturation["epoch"] = 2
+    reopened_saturation["queries"][0]["query_id"] = "Q0017"
+    reopened_saturation_digest = MODULE.search_result_digest(
+        reopened_saturation
+    )
+    reopened_saturation["result_digest"] = reopened_saturation_digest
+    reopened_saturation["rerun_digest"] = reopened_saturation_digest
+    reopened_search["rounds"].extend(
+        [reopened_local, reopened_saturation]
+    )
+    reopened_search["fixed_point"] = {
+        "round_id": "S017",
+        "zero_delta": True,
+        "rerun_reproduced": True,
+        "result_digest": reopened_saturation_digest,
+    }
+    assert MODULE.validate_objects(
+        manifest,
+        units,
+        reopened_reading,
+        candidates,
+        routes,
+        reopened_assets,
+        reopened_search,
+        {18},
+        True,
+    ) == []
+
+    missing_reopen_local = copy.deepcopy(reopened_search)
+    missing_reopen_local["rounds"].pop(-2)
+    missing_reopen_local["rounds"][-1]["round_id"] = "S016"
+    missing_reopen_local["rounds"][-1]["queries"][0]["query_id"] = "Q0016"
+    missing_reopen_digest = MODULE.search_result_digest(
+        missing_reopen_local["rounds"][-1]
+    )
+    missing_reopen_local["rounds"][-1][
+        "result_digest"
+    ] = missing_reopen_digest
+    missing_reopen_local["rounds"][-1][
+        "rerun_digest"
+    ] = missing_reopen_digest
+    missing_reopen_local["fixed_point"] = {
+        "round_id": "S016",
+        "zero_delta": True,
+        "rerun_reproduced": True,
+        "result_digest": missing_reopen_digest,
+    }
+    missing_reopen_errors = MODULE.validate_objects(
+        manifest,
+        units,
+        reopened_reading,
+        candidates,
+        routes,
+        reopened_assets,
+        missing_reopen_local,
+        {18},
+        True,
+    )
+    assert any(
+        "review-epoch 2 LOCAL-round coverage" in error
+        for error in missing_reopen_errors
+    )
+
     saturation_only = copy.deepcopy(search)
     saturation_only["rounds"] = [saturation_only["rounds"][-1]]
     saturation_only["rounds"][0]["round_id"] = "S001"
