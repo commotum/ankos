@@ -693,6 +693,7 @@ def _validate_worker_output(
 
     asset_updates = output.get("asset_updates", [])
     candidate_images_from_assets: dict[str, set[str]] = {}
+    route_sources_from_assets: dict[str, set[str]] = {}
     if isinstance(asset_updates, list):
         seen = set()
         immutable = ASSET_HEADER[: ASSET_HEADER.index("inspection_status")]
@@ -728,6 +729,12 @@ def _validate_worker_output(
                 candidate_images_from_assets.setdefault(candidate_id, set()).add(
                     row.get("physical_path", "")
                 )
+            for route_id in parse_string_array(
+                row.get("route_ids"),
+                f"asset update {asset_id} route_ids",
+                errors,
+            ):
+                route_sources_from_assets.setdefault(route_id, set()).add(asset_id)
         if seen != set(assigned_assets):
             errors.append(
                 "completed worker output must update every assigned asset exactly once"
@@ -735,6 +742,7 @@ def _validate_worker_output(
 
     proposals = output.get("candidate_proposals", [])
     proposal_by_id: dict[str, dict[str, Any]] = {}
+    proposal_anchor_keys: list[tuple[int, int, int]] = []
     if isinstance(proposals, list):
         proposal_ids = [
             row.get("id")
@@ -749,6 +757,18 @@ def _validate_worker_output(
                 "worker candidate IDs must be a complete ordered W0001 sequence"
             )
         proposal_id_set = set(proposal_ids)
+        unit_anchor_order = {
+            unit_id: index
+            for index, unit_id in enumerate(assigned_units, start=1)
+        }
+        image_anchor_order = {
+            asset_id: len(unit_anchor_order) + index
+            for index, asset_id in enumerate(assigned_assets, start=1)
+        }
+        image_path_by_asset = {
+            asset_id: asset.get("physical_path")
+            for asset_id, asset in assigned_assets.items()
+        }
         for row in proposals:
             if not isinstance(row, dict):
                 continue
@@ -763,6 +783,56 @@ def _validate_worker_output(
                 errors.append(
                     f"candidate {candidate_id} discovery_stage differs from bundle"
                 )
+            anchor = row.get("discovery_anchor")
+            if not isinstance(anchor, dict):
+                errors.append(f"candidate {candidate_id} lacks a discovery anchor")
+            else:
+                anchor_kind = anchor.get("kind")
+                anchor_id = anchor.get("id")
+                anchor_ordinal = anchor.get("ordinal")
+                if anchor.get("epoch") != 1:
+                    errors.append(
+                        f"candidate {candidate_id} bundle discovery epoch must be 1"
+                    )
+                anchor_order: int | None = None
+                if not isinstance(anchor_id, str):
+                    errors.append(
+                        f"candidate {candidate_id} anchor ID must be a string"
+                    )
+                elif anchor_kind == "SOURCE_UNIT":
+                    anchor_order = unit_anchor_order.get(anchor_id)
+                    if anchor_order is None:
+                        errors.append(
+                            f"candidate {candidate_id} anchor is outside assignment"
+                        )
+                    elif anchor_id not in row.get("source_unit_ids", []):
+                        errors.append(
+                            f"candidate {candidate_id} source anchor is not evidence"
+                        )
+                elif anchor_kind == "IMAGE":
+                    anchor_order = image_anchor_order.get(anchor_id)
+                    if anchor_order is None:
+                        errors.append(
+                            f"candidate {candidate_id} anchor is outside assignment"
+                        )
+                    elif image_path_by_asset.get(anchor_id) not in row.get(
+                        "image_witnesses", []
+                    ):
+                        errors.append(
+                            f"candidate {candidate_id} image anchor is not evidence"
+                        )
+                else:
+                    errors.append(
+                        f"candidate {candidate_id} SEARCH_HIT/unknown anchor "
+                        "is invalid for a Stage 4–17 reading bundle"
+                    )
+                if (
+                    anchor_order is not None
+                    and isinstance(anchor_ordinal, int)
+                    and not isinstance(anchor_ordinal, bool)
+                    and anchor_ordinal >= 1
+                ):
+                    proposal_anchor_keys.append((1, anchor_order, anchor_ordinal))
             source_ids = row.get("source_unit_ids", [])
             if isinstance(source_ids, list) and (
                 not all(isinstance(item, str) for item in source_ids)
@@ -927,6 +997,22 @@ def _validate_worker_output(
                         f"candidate {candidate_id} relates to an undeclared "
                         "worker candidate"
                     )
+        if len(proposal_anchor_keys) == len(proposals):
+            if proposal_anchor_keys != sorted(proposal_anchor_keys):
+                errors.append(
+                    "worker candidate order differs from discovery-anchor traversal"
+                )
+            ordinals_by_anchor: dict[tuple[int, int], list[int]] = {}
+            for epoch, anchor_order, ordinal in proposal_anchor_keys:
+                ordinals_by_anchor.setdefault((epoch, anchor_order), []).append(
+                    ordinal
+                )
+            for anchor_key, ordinals in ordinals_by_anchor.items():
+                if ordinals != list(range(1, len(ordinals) + 1)):
+                    errors.append(
+                        "worker discovery-anchor ordinals are not complete for "
+                        f"anchor {anchor_key}"
+                    )
 
     routes = output.get("route_proposals", [])
     route_ids: set[str] = set()
@@ -942,16 +1028,47 @@ def _validate_worker_output(
                 errors.append(f"duplicate route proposal: {route_id}")
             route_ids.add(route_id)
             if row.get("source_unit_id") not in assigned_units:
-                errors.append(f"route {route_id} is outside the source assignment")
+                if row.get("discovery_kind") == "SOURCE_UNIT":
+                    errors.append(
+                        f"route {route_id} is outside the source assignment"
+                    )
+            if row.get("source_asset_id") not in assigned_assets:
+                if row.get("discovery_kind") == "IMAGE":
+                    errors.append(
+                        f"route {route_id} is outside the asset assignment"
+                    )
             if row.get("owning_stage") != str(manifest.get("stage")):
                 errors.append(f"route {route_id} owning_stage differs from bundle")
-            if route_sources_from_reading.get(route_id, set()) != {
-                row.get("source_unit_id")
-            }:
-                errors.append(f"route {route_id} reading-ledger join differs")
-        if set(route_sources_from_reading) != route_ids:
+            if row.get("discovery_epoch") != "1":
+                errors.append(f"route {route_id} discovery_epoch must be 1")
+            if row.get("discovery_kind") == "SOURCE_UNIT":
+                if row.get("source_asset_id") or row.get("discovery_id") != row.get(
+                    "source_unit_id"
+                ):
+                    errors.append(f"route {route_id} source-unit anchor differs")
+                if route_sources_from_reading.get(route_id, set()) != {
+                    row.get("source_unit_id")
+                } or route_sources_from_assets.get(route_id, set()):
+                    errors.append(f"route {route_id} reading-ledger join differs")
+            elif row.get("discovery_kind") == "IMAGE":
+                if row.get("source_unit_id") or row.get("discovery_id") != row.get(
+                    "source_asset_id"
+                ):
+                    errors.append(f"route {route_id} image anchor differs")
+                if route_sources_from_assets.get(route_id, set()) != {
+                    row.get("source_asset_id")
+                } or route_sources_from_reading.get(route_id, set()):
+                    errors.append(f"route {route_id} asset-ledger join differs")
+            else:
+                errors.append(
+                    f"route {route_id} SEARCH_HIT/unknown discovery is invalid "
+                    "for a Stage 4–17 reading bundle"
+                )
+        if set(route_sources_from_reading) | set(
+            route_sources_from_assets
+        ) != route_ids:
             errors.append(
-                "reading-ledger route IDs differ from worker route proposals"
+                "reading/asset route IDs differ from worker route proposals"
             )
 
     for candidate_id, row in proposal_by_id.items():
@@ -1145,6 +1262,13 @@ def verify_bundle(
         or not output_root.stat().st_mode & 0o200
     ):
         errors.append("bundle output directory must be a writable real directory")
+    worker_output_path = output_root / "output.json"
+    if (
+        worker_output_path.exists()
+        and not worker_output_path.is_symlink()
+        and worker_output_path.stat().st_nlink != 1
+    ):
+        errors.append("worker output file is hard-linked")
 
     prompt_path = input_root / "brief.md"
     try:

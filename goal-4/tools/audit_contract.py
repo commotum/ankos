@@ -36,9 +36,11 @@ READING_HEADER = [
 CROSS_REFERENCE_HEADER = [
     "route_id",
     "source_unit_id",
+    "source_asset_id",
     "discovery_epoch",
     "discovery_kind",
     "discovery_id",
+    "discovery_ordinal",
     "literal_target",
     "route_kind",
     "expected_topic",
@@ -71,6 +73,7 @@ ASSET_HEADER = [
     "original_resolution_status",
     "transcription_status",
     "candidate_ids",
+    "route_ids",
     "evidence_statement",
     "review_stage",
     "reviewer",
@@ -268,6 +271,8 @@ def candidate_schema(id_pattern: str = "^B[0-9]{4}$") -> dict[str, Any]:
         "type": "object",
         "required": [
             "evidence_id",
+            "evidence_group_id",
+            "discovery_anchor",
             "source_unit_id",
             "image_path",
             "strength",
@@ -277,6 +282,24 @@ def candidate_schema(id_pattern: str = "^B[0-9]{4}$") -> dict[str, Any]:
         ],
         "properties": {
             "evidence_id": {"type": "string"},
+            "evidence_group_id": {
+                "type": "string",
+                "pattern": "^G[0-9]{6}$",
+            },
+            "discovery_anchor": {
+                "type": "object",
+                "required": ["epoch", "kind", "id", "ordinal"],
+                "properties": {
+                    "epoch": {"type": "integer", "minimum": 1},
+                    "kind": {
+                        "type": "string",
+                        "enum": ["SOURCE_UNIT", "IMAGE", "SEARCH_HIT"],
+                    },
+                    "id": {"type": "string"},
+                    "ordinal": {"type": "integer", "minimum": 1},
+                },
+                "additionalProperties": False,
+            },
             "source_unit_id": {"type": ["string", "null"]},
             "image_path": {"type": ["string", "null"]},
             "strength": {"type": "string", "enum": EVIDENCE_STRENGTHS},
@@ -398,7 +421,7 @@ def schema_documents() -> dict[str, dict[str, Any]]:
     cross_properties["route_kind"] = {"type": "string", "enum": ROUTE_KINDS}
     cross_properties["discovery_kind"] = {
         "type": "string",
-        "enum": ["SOURCE_UNIT", "SEARCH_HIT"],
+        "enum": ["SOURCE_UNIT", "IMAGE", "SEARCH_HIT"],
     }
     cross_properties["closure_scope"] = {
         "type": "string",

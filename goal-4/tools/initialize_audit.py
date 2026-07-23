@@ -157,6 +157,7 @@ def expected_artifacts() -> dict[Path, bytes]:
                 "original_resolution_status": "NOT_REVIEWED",
                 "transcription_status": "NOT_APPLICABLE",
                 "candidate_ids": "[]",
+                "route_ids": "[]",
                 "evidence_statement": "",
                 "review_stage": "",
                 "reviewer": "",

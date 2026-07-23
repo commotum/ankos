@@ -52,6 +52,8 @@ SCHEMA_DIR = GOAL_DIR / "schemas"
 
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 B_ID = re.compile(r"^B[0-9]{4}$")
+E_ID = re.compile(r"^E[0-9]{6}$")
+G_ID = re.compile(r"^G[0-9]{6}$")
 Q_ID = re.compile(r"^Q[0-9]{4}$")
 H_ID = re.compile(r"^H[0-9]{6}$")
 PAGE_NUMBER = re.compile(r"_page_(\d+)")
@@ -227,6 +229,9 @@ def expected_asset_assignments(
 def search_result_digest(round_record: dict[str, Any]) -> str:
     """Hash frozen queries and the ordered canonical result identity/context."""
     payload = {
+        "epoch": round_record["epoch"],
+        "kind": round_record["kind"],
+        "owning_stage": round_record["owning_stage"],
         "queries": round_record["queries"],
         "results": [
             {
@@ -350,6 +355,8 @@ def validate_candidate(
             continue
         expected = {
             "evidence_id",
+            "evidence_group_id",
+            "discovery_anchor",
             "source_unit_id",
             "image_path",
             "strength",
@@ -361,13 +368,31 @@ def validate_candidate(
             errors.append(f"{prefix} evidence fields do not match allowlist")
             continue
         evidence_id = item["evidence_id"]
-        if not isinstance(evidence_id, str) or not evidence_id:
+        if not isinstance(evidence_id, str) or not E_ID.fullmatch(evidence_id):
             errors.append(f"{prefix} evidence ID is invalid")
         elif evidence_id in local_evidence_ids or evidence_id in evidence_ids_global:
             errors.append(f"{prefix} evidence ID is not unique: {evidence_id}")
         else:
             local_evidence_ids.add(evidence_id)
             evidence_ids_global.add(evidence_id)
+        if not isinstance(item["evidence_group_id"], str) or not G_ID.fullmatch(
+            item["evidence_group_id"]
+        ):
+            errors.append(f"{prefix} evidence group ID is invalid")
+        evidence_anchor = item["discovery_anchor"]
+        if (
+            not isinstance(evidence_anchor, dict)
+            or set(evidence_anchor) != {"epoch", "kind", "id", "ordinal"}
+            or not isinstance(evidence_anchor.get("epoch"), int)
+            or evidence_anchor["epoch"] < 1
+            or evidence_anchor.get("kind")
+            not in {"SOURCE_UNIT", "IMAGE", "SEARCH_HIT"}
+            or not isinstance(evidence_anchor.get("id"), str)
+            or not evidence_anchor["id"]
+            or not isinstance(evidence_anchor.get("ordinal"), int)
+            or evidence_anchor["ordinal"] < 1
+        ):
+            errors.append(f"{prefix} evidence discovery anchor is invalid")
         source_unit_id = item["source_unit_id"]
         image_path = item["image_path"]
         if source_unit_id is not None and source_unit_id not in unit_ids:
@@ -386,6 +411,19 @@ def validate_candidate(
             )
         if isinstance(image_path, str):
             evidence_images.add(image_path)
+        if isinstance(evidence_anchor, dict):
+            if (
+                evidence_anchor.get("kind") == "SOURCE_UNIT"
+                and evidence_anchor.get("id") != source_unit_id
+            ):
+                errors.append(
+                    f"{prefix} evidence source-unit anchor is inconsistent"
+                )
+            if (
+                evidence_anchor.get("kind") == "IMAGE"
+                and evidence_anchor.get("id") != image_path
+            ):
+                errors.append(f"{prefix} evidence image anchor is inconsistent")
         if item["source_unit_id"] is None and item["image_path"] is None:
             errors.append(f"{prefix} evidence has no canonical witness")
         if item["strength"] not in EVIDENCE_STRENGTHS:
@@ -774,8 +812,7 @@ def validate_objects(
         route_id = row["route_id"]
         prefix = f"route {route_id}"
         source_unit = unit_by_id.get(row["source_unit_id"])
-        if source_unit is None:
-            errors.append(f"{prefix} has unknown source unit")
+        source_asset = asset_record_by_id.get(row["source_asset_id"])
         if row["route_kind"] not in ROUTE_KINDS:
             errors.append(f"{prefix} has invalid kind")
         try:
@@ -784,17 +821,40 @@ def validate_objects(
             discovery_epoch = -1
         if discovery_epoch < 1:
             errors.append(f"{prefix} has invalid discovery epoch")
-        if row["discovery_kind"] not in {"SOURCE_UNIT", "SEARCH_HIT"}:
+        try:
+            discovery_ordinal = int(row["discovery_ordinal"])
+        except ValueError:
+            discovery_ordinal = -1
+        if discovery_ordinal < 1:
+            errors.append(f"{prefix} has invalid discovery ordinal")
+        if row["discovery_kind"] not in {
+            "SOURCE_UNIT",
+            "IMAGE",
+            "SEARCH_HIT",
+        }:
             errors.append(f"{prefix} has invalid discovery kind")
-        if (
-            row["discovery_kind"] == "SOURCE_UNIT"
-            and row["discovery_id"] != row["source_unit_id"]
-        ):
-            errors.append(f"{prefix} source discovery anchor is inconsistent")
+        if row["discovery_kind"] == "SOURCE_UNIT":
+            if (
+                source_unit is None
+                or row["source_asset_id"]
+                or row["discovery_id"] != row["source_unit_id"]
+            ):
+                errors.append(f"{prefix} source discovery anchor is inconsistent")
+        if row["discovery_kind"] == "IMAGE":
+            if (
+                source_asset is None
+                or row["source_unit_id"]
+                or row["discovery_id"] != row["source_asset_id"]
+            ):
+                errors.append(f"{prefix} image discovery anchor is inconsistent")
         if row["discovery_kind"] == "SEARCH_HIT" and not H_ID.fullmatch(
             row["discovery_id"]
         ):
             errors.append(f"{prefix} has invalid search-hit discovery anchor")
+        if row["discovery_kind"] == "SEARCH_HIT" and (
+            source_unit is None or row["source_asset_id"]
+        ):
+            errors.append(f"{prefix} search discovery source is inconsistent")
         if row["closure_scope"] not in ROUTE_CLOSURE_SCOPES:
             errors.append(f"{prefix} has invalid closure scope")
         if row["status"] not in ROUTE_STATUSES:
@@ -836,6 +896,17 @@ def validate_objects(
                 or source_reading["review_status"] != "REVIEWED"
             ):
                 errors.append(f"{prefix} source unit is not reviewed")
+        if source_asset is not None:
+            source_path = source_asset["physical_path"]
+            expected_stage = int(
+                expected_assets[source_path]["assignment_stage"]
+            )
+            if row["discovery_kind"] == "IMAGE" and owning_stage != expected_stage:
+                errors.append(
+                    f"{prefix} image-anchored owning stage differs from asset stage"
+                )
+            if source_asset["inspection_status"] != "SCREENED":
+                errors.append(f"{prefix} source asset is not screened")
         defect = row["defect_boundary"].strip()
         if row["status"] == "PENDING":
             if targets or target_assets or defect:
@@ -907,6 +978,13 @@ def validate_objects(
         )
 
     candidate_by_id = {candidate["id"]: candidate for candidate in candidates}
+    evidence_by_group: dict[str, list[tuple[str, dict[str, Any]]]] = {}
+    for candidate in candidates:
+        for evidence in candidate.get("source_evidence", []):
+            if isinstance(evidence, dict):
+                evidence_by_group.setdefault(
+                    str(evidence.get("evidence_group_id", "")), []
+                ).append((candidate["id"], evidence))
     split_children: set[str] = set()
     for candidate in candidates:
         source_number = int(candidate["id"][1:]) if B_ID.fullmatch(candidate["id"]) else -1
@@ -968,14 +1046,21 @@ def validate_objects(
             errors.append(f"candidate {candidate_id} links an unreviewed source unit")
         for route_id in candidate["cross_reference_ids"]:
             route = route_by_id.get(route_id)
-            if (
-                route is not None
-                and route["source_unit_id"] not in candidate["source_unit_ids"]
-            ):
-                errors.append(
-                    f"candidate {candidate_id} cross-reference source is absent "
-                    "from candidate provenance"
+            if route is not None:
+                route_unit_is_owned = (
+                    route["source_unit_id"] in candidate["source_unit_ids"]
                 )
+                route_asset = asset_record_by_id.get(route["source_asset_id"])
+                route_asset_is_owned = (
+                    route_asset is not None
+                    and route_asset["physical_path"]
+                    in candidate["image_witnesses"]
+                )
+                if not route_unit_is_owned and not route_asset_is_owned:
+                    errors.append(
+                        f"candidate {candidate_id} cross-reference source is "
+                        "absent from candidate provenance"
+                    )
 
     for unit_id in unit_ids:
         if reading_candidate_links.get(unit_id, set()) != candidate_source_links[
@@ -1008,6 +1093,7 @@ def validate_objects(
     ]:
         errors.append("asset ledger order/set differs from physical images")
     screened_count = 0
+    asset_route_links: dict[str, set[str]] = {}
     for row in assets:
         path = row.get("physical_path", "")
         image = image_by_path.get(path)
@@ -1040,11 +1126,17 @@ def validate_objects(
         linked_candidates = parsed_string_list(
             row.get("candidate_ids", ""), f"{prefix}.candidate_ids", errors
         )
+        linked_routes = parsed_string_list(
+            row.get("route_ids", ""), f"{prefix}.route_ids", errors
+        )
+        asset_route_links[row.get("asset_id", "")] = set(linked_routes)
         risk_flags = parsed_string_list(
             row.get("risk_flags", ""), f"{prefix}.risk_flags", errors
         )
         if any(value not in candidate_ids for value in linked_candidates):
             errors.append(f"{prefix} links unknown candidate")
+        if any(value not in route_ids for value in linked_routes):
+            errors.append(f"{prefix} links unknown route")
         if any(value not in VISUAL_RISK_FLAGS for value in risk_flags):
             errors.append(f"{prefix} has invalid visual risk flag")
         status = row.get("inspection_status")
@@ -1057,6 +1149,7 @@ def validate_objects(
                 or row.get("review_stage")
                 or row.get("reviewer")
                 or linked_candidates
+                or linked_routes
                 or row.get("original_resolution_status") != "NOT_REVIEWED"
                 or row.get("transcription_status") != "NOT_APPLICABLE"
             ):
@@ -1099,6 +1192,22 @@ def validate_objects(
                 errors.append(f"{prefix} reviewed outside assigned stage")
         else:
             errors.append(f"{prefix} has invalid inspection_status")
+
+    expected_asset_route_links: dict[str, set[str]] = {
+        asset_id: set() for asset_id in asset_ids
+    }
+    for route in routes:
+        if route["source_asset_id"] in expected_asset_route_links:
+            expected_asset_route_links[route["source_asset_id"]].add(
+                route["route_id"]
+            )
+    for asset_id in asset_ids:
+        if asset_route_links.get(asset_id, set()) != expected_asset_route_links[
+            asset_id
+        ]:
+            errors.append(
+                f"asset {asset_id} route links are not the exact reverse join"
+            )
 
     asset_candidate_links: dict[str, set[str]] = {
         candidate_id: set() for candidate_id in candidate_ids
@@ -1296,6 +1405,12 @@ def validate_objects(
             )
             if any(path not in document_by_path for path in scope_paths):
                 errors.append(f"search query {query_id} has unknown scope path")
+            if kind == "LOCAL" and any(
+                stage_by_path.get(path) != owning_stage for path in scope_paths
+            ):
+                errors.append(
+                    f"search query {query_id} leaves its local owning stage"
+                )
             if any(
                 reading_row["review_status"] != "REVIEWED"
                 for reading_row in reading
@@ -1304,7 +1419,25 @@ def validate_objects(
                 errors.append(
                     f"search query {query_id} scopes an unreviewed document"
                 )
+            if any(
+                asset["inspection_status"] != "SCREENED"
+                for asset in assets
+                if asset["assignment_path"] in scope_paths
+            ):
+                errors.append(
+                    f"search query {query_id} scopes an unscreened asset"
+                )
             current_query_scopes[query_id] = set(scope_paths)
+
+        if kind == "SATURATION":
+            if reviewed_count != len(units):
+                errors.append(
+                    f"search round {round_index} saturation precedes full reading"
+                )
+            if screened_count != len(assets):
+                errors.append(
+                    f"search round {round_index} saturation precedes asset screening"
+                )
 
         round_assumptions = exact_string_list(
             round_record["tool_assumptions"],
@@ -1350,6 +1483,7 @@ def validate_objects(
             seen_hits.add(hit_id)
             if isinstance(hit_id, str):
                 hit_by_id[hit_id] = hit
+                hit_round_meta[hit_id] = (epoch, owning_stage, kind)
             hit_ids.append(hit_id)
             if hit["query_id"] not in current_query_ids:
                 errors.append(
@@ -1393,6 +1527,24 @@ def validate_objects(
                 errors.append(f"search hit {hit_id} links unknown candidate")
             if any(value not in route_ids for value in hit_routes):
                 errors.append(f"search hit {hit_id} links unknown route")
+            if hit["disposition"] in {
+                "GOVERNED_CANDIDATE_OR_SUPPORT",
+                "DUPLICATE",
+            } and not hit_candidates:
+                errors.append(
+                    f"search hit {hit_id} governed/duplicate disposition "
+                    "lacks candidate link"
+                )
+            if hit["disposition"] == "CROSS_REFERENCE" and not hit_routes:
+                errors.append(
+                    f"search hit {hit_id} cross-reference disposition lacks route"
+                )
+            if hit["disposition"] == "EXCLUSION" and (
+                hit_candidates or hit_routes
+            ):
+                errors.append(
+                    f"search hit {hit_id} exclusion carries candidate/route links"
+                )
             if not isinstance(hit["rationale"], str) or not hit[
                 "rationale"
             ].strip():
@@ -1441,6 +1593,55 @@ def validate_objects(
             )
         if any(item not in route_ids for item in delta_values["new_routes"]):
             errors.append(f"search round {round_index} names unknown new route")
+        for group_id in delta_values["new_evidence_groups"]:
+            group_records = evidence_by_group.get(group_id, [])
+            if not group_records:
+                errors.append(
+                    f"search round {round_index} names unknown evidence group "
+                    f"{group_id}"
+                )
+            for candidate_id, evidence in group_records:
+                anchor = evidence.get("discovery_anchor", {})
+                if (
+                    anchor.get("epoch") != epoch
+                    or anchor.get("kind") != "SEARCH_HIT"
+                    or anchor.get("id") not in hit_ids
+                ):
+                    errors.append(
+                        f"search round {round_index} evidence group {group_id} "
+                        f"has inconsistent anchor on {candidate_id}"
+                    )
+        for candidate_id in delta_values["new_candidates"]:
+            candidate = candidate_by_id.get(candidate_id)
+            anchor = candidate.get("discovery_anchor", {}) if candidate else {}
+            if (
+                candidate is not None
+                and (
+                    candidate["discovery_stage"] != owning_stage
+                    or anchor.get("epoch") != epoch
+                    or anchor.get("kind") != "SEARCH_HIT"
+                    or anchor.get("id") not in hit_ids
+                )
+            ):
+                errors.append(
+                    f"search round {round_index} new candidate {candidate_id} "
+                    "has inconsistent discovery anchor"
+                )
+        for route_id in delta_values["new_routes"]:
+            route = route_by_id.get(route_id)
+            if (
+                route is not None
+                and (
+                    route["owning_stage"] != str(owning_stage)
+                    or route["discovery_epoch"] != str(epoch)
+                    or route["discovery_kind"] != "SEARCH_HIT"
+                    or route["discovery_id"] not in hit_ids
+                )
+            ):
+                errors.append(
+                    f"search round {round_index} new route {route_id} "
+                    "has inconsistent discovery anchor"
+                )
         for key, seen in (
             ("new_vocabulary", seen_new_vocabulary),
             ("new_candidates", seen_new_candidates),
@@ -1457,20 +1658,103 @@ def validate_objects(
         ordered_stage18_candidates.extend(delta_values["new_candidates"])
         ordered_stage18_routes.extend(delta_values["new_routes"])
 
-    stage18_candidates = [
+    search_discovered_candidates = [
         candidate["id"]
         for candidate in candidates
-        if candidate["discovery_stage"] == 18
+        if candidate.get("discovery_anchor", {}).get("kind") == "SEARCH_HIT"
     ]
-    if stage18_candidates != ordered_stage18_candidates:
+    if search_discovered_candidates != ordered_stage18_candidates:
         errors.append(
-            "Stage 18 candidate sequence differs from search-round discovery order"
+            "search-discovered candidate sequence differs from round discovery order"
         )
-    stage18_routes = [
-        route["route_id"] for route in routes if route["owning_stage"] == "18"
+    search_discovered_routes = [
+        route["route_id"]
+        for route in routes
+        if route["discovery_kind"] == "SEARCH_HIT"
     ]
-    if stage18_routes != ordered_stage18_routes:
-        errors.append("Stage 18 route sequence differs from search-round discovery order")
+    if search_discovered_routes != ordered_stage18_routes:
+        errors.append(
+            "search-discovered route sequence differs from round discovery order"
+        )
+
+    route_anchor_ordinals: dict[tuple[int, str, str], list[int]] = {}
+    prior_route_key: tuple[int, int, int, int, int, int] | None = None
+    for route in routes:
+        route_id = route["route_id"]
+        try:
+            epoch = int(route["discovery_epoch"])
+            ordinal = int(route["discovery_ordinal"])
+        except ValueError:
+            continue
+        kind = route["discovery_kind"]
+        anchor_id = route["discovery_id"]
+        route_key: tuple[int, int, int, int, int, int] | None = None
+        if kind == "SOURCE_UNIT":
+            unit = unit_by_id.get(anchor_id)
+            if unit is not None:
+                stage = stage_by_path[unit["path"]]
+                route_key = (
+                    epoch,
+                    stage,
+                    int(unit["document_order"]),
+                    0,
+                    unit_position[anchor_id],
+                    ordinal,
+                )
+        elif kind == "IMAGE":
+            asset = asset_record_by_id.get(anchor_id)
+            if asset is not None:
+                assignment = expected_assets.get(asset["physical_path"])
+                if assignment is not None:
+                    assignment_path = assignment["assignment_path"]
+                    stage = int(assignment["assignment_stage"])
+                    route_key = (
+                        epoch,
+                        stage,
+                        int(document_by_path[assignment_path]["order"]),
+                        1,
+                        image_position[asset["physical_path"]],
+                        ordinal,
+                    )
+        elif kind == "SEARCH_HIT":
+            hit = hit_by_id.get(anchor_id)
+            meta = hit_round_meta.get(anchor_id)
+            if hit is None or meta is None:
+                errors.append(f"route {route_id} anchor hit is unknown")
+            else:
+                hit_epoch, stage, _ = meta
+                route_key = (
+                    epoch,
+                    stage,
+                    len(document_by_path) + 1,
+                    2,
+                    int(anchor_id[1:]),
+                    ordinal,
+                )
+                if hit_epoch != epoch or route["owning_stage"] != str(stage):
+                    errors.append(
+                        f"route {route_id} anchor epoch/stage differs from round"
+                    )
+                if route_id not in hit["route_ids"]:
+                    errors.append(f"route {route_id} anchor hit lacks route link")
+                if route["source_unit_id"] != hit["source_unit_id"]:
+                    errors.append(
+                        f"route {route_id} source differs from anchor hit"
+                    )
+        route_anchor_ordinals.setdefault((epoch, kind, anchor_id), []).append(
+            ordinal
+        )
+        if route_key is not None:
+            if prior_route_key is not None and route_key < prior_route_key:
+                errors.append(
+                    f"route {route_id} violates frozen allocation traversal"
+                )
+            prior_route_key = route_key
+    for anchor_identity, ordinals in route_anchor_ordinals.items():
+        if sorted(ordinals) != list(range(1, len(ordinals) + 1)):
+            errors.append(
+                f"route anchor {anchor_identity} ordinals are not contiguous"
+            )
 
     fixed_point = search.get("fixed_point")
     if fixed_point is not None:
@@ -1486,6 +1770,8 @@ def validate_objects(
             errors.append("search fixed_point exists without rounds")
         else:
             last = rounds[-1]
+            if last.get("kind") != "SATURATION" or last.get("owning_stage") != 18:
+                errors.append("search fixed_point final round is not saturation")
             if fixed_point["round_id"] != last.get("round_id"):
                 errors.append("search fixed_point does not name the final round")
             if fixed_point["zero_delta"] is not True:
@@ -1506,6 +1792,16 @@ def validate_objects(
                 errors.append("search fixed_point final round is not zero-delta")
             if last.get("result_digest") != last.get("rerun_digest"):
                 errors.append("search fixed_point final rerun differs")
+            final_scope = {
+                path
+                for query in last.get("queries", [])
+                if isinstance(query, dict)
+                for path in query.get("scope_paths", [])
+            }
+            if final_scope != set(document_by_path):
+                errors.append(
+                    "search fixed_point final round does not scope every document"
+                )
 
     unit_position = {
         unit["id"]: position for position, unit in enumerate(units, start=1)
@@ -1514,29 +1810,35 @@ def validate_objects(
         image["path"]: position
         for position, image in enumerate(manifest["images"], start=1)
     }
-    anchor_ordinals: dict[tuple[str, str], list[int]] = {}
-    prior_anchor_key: tuple[int, int, int, int, int] | None = None
+    anchor_ordinals: dict[tuple[int, str, str], list[int]] = {}
+    prior_anchor_key: tuple[int, int, int, int, int, int] | None = None
+    candidate_epochs: set[int] = set()
     for candidate in candidates:
         candidate_id = candidate["id"]
         anchor = candidate["discovery_anchor"]
         if not isinstance(anchor, dict) or not {
+            "epoch",
             "kind",
             "id",
             "ordinal",
         }.issubset(anchor):
             continue
+        epoch = anchor["epoch"]
         kind = anchor["kind"]
         anchor_id = anchor["id"]
         ordinal = anchor["ordinal"]
         if (
-            kind not in {"SOURCE_UNIT", "IMAGE", "SEARCH_HIT"}
+            not isinstance(epoch, int)
+            or epoch < 1
+            or kind not in {"SOURCE_UNIT", "IMAGE", "SEARCH_HIT"}
             or not isinstance(anchor_id, str)
             or not isinstance(ordinal, int)
             or ordinal < 1
         ):
             continue
+        candidate_epochs.add(epoch)
         anchor_stage = -1
-        anchor_key: tuple[int, int, int, int, int] | None = None
+        anchor_key: tuple[int, int, int, int, int, int] | None = None
         if kind == "SOURCE_UNIT":
             source_unit = unit_by_id.get(anchor_id)
             if source_unit is None:
@@ -1544,6 +1846,7 @@ def validate_objects(
             else:
                 anchor_stage = stage_by_path[source_unit["path"]]
                 anchor_key = (
+                    epoch,
                     anchor_stage,
                     int(source_unit["document_order"]),
                     0,
@@ -1562,6 +1865,7 @@ def validate_objects(
                 assignment_path = assignment["assignment_path"]
                 anchor_stage = int(assignment["assignment_stage"])
                 anchor_key = (
+                    epoch,
                     anchor_stage,
                     int(document_by_path[assignment_path]["order"]),
                     1,
@@ -1573,18 +1877,25 @@ def validate_objects(
                         f"candidate {candidate_id} anchor image lacks provenance"
                     )
         elif kind == "SEARCH_HIT":
-            anchor_stage = 18
             hit = hit_by_id.get(anchor_id)
-            if hit is None:
+            meta = hit_round_meta.get(anchor_id)
+            if hit is None or meta is None:
                 errors.append(f"candidate {candidate_id} anchor hit is unknown")
             else:
+                hit_epoch, anchor_stage, _ = meta
                 anchor_key = (
-                    18,
-                    0,
-                    0,
+                    epoch,
+                    anchor_stage,
+                    len(document_by_path) + 1,
+                    2,
                     int(anchor_id[1:]),
                     ordinal,
                 )
+                if epoch != hit_epoch:
+                    errors.append(
+                        f"candidate {candidate_id} anchor epoch differs from "
+                        "search round"
+                    )
                 if candidate_id not in hit["candidate_ids"]:
                     errors.append(
                         f"candidate {candidate_id} anchor hit lacks candidate link"
@@ -1593,26 +1904,87 @@ def validate_objects(
             errors.append(
                 f"candidate {candidate_id} discovery stage differs from anchor stage"
             )
-        if candidate["discovery_stage"] == 18 and kind != "SEARCH_HIT":
-            errors.append(
-                f"candidate {candidate_id} Stage 18 discovery lacks search-hit anchor"
-            )
-        if candidate["discovery_stage"] < 18 and kind == "SEARCH_HIT":
-            errors.append(
-                f"candidate {candidate_id} pre-saturation discovery uses search hit"
-            )
-        anchor_ordinals.setdefault((kind, anchor_id), []).append(ordinal)
+        anchor_ordinals.setdefault((epoch, kind, anchor_id), []).append(ordinal)
         if anchor_key is not None:
             if prior_anchor_key is not None and anchor_key < prior_anchor_key:
                 errors.append(
                     f"candidate {candidate_id} violates frozen B-ID traversal order"
                 )
             prior_anchor_key = anchor_key
+    if candidate_epochs and candidate_epochs != set(
+        range(1, max(candidate_epochs) + 1)
+    ):
+        errors.append("candidate discovery epochs are not contiguous from 1")
     for anchor_identity, ordinals in anchor_ordinals.items():
         if sorted(ordinals) != list(range(1, len(ordinals) + 1)):
             errors.append(
                 f"candidate anchor {anchor_identity} ordinals are not contiguous"
             )
+
+    evidence_anchor_ordinals: dict[tuple[int, str, str], list[int]] = {}
+    search_evidence_groups: set[str] = set()
+    for candidate in candidates:
+        candidate_id = candidate["id"]
+        for evidence in candidate["source_evidence"]:
+            anchor = evidence.get("discovery_anchor", {})
+            if not isinstance(anchor, dict) or not {
+                "epoch",
+                "kind",
+                "id",
+                "ordinal",
+            }.issubset(anchor):
+                continue
+            epoch = anchor["epoch"]
+            kind = anchor["kind"]
+            anchor_id = anchor["id"]
+            ordinal = anchor["ordinal"]
+            if (
+                not isinstance(epoch, int)
+                or epoch < 1
+                or not isinstance(ordinal, int)
+                or ordinal < 1
+            ):
+                continue
+            evidence_anchor_ordinals.setdefault(
+                (epoch, kind, anchor_id), []
+            ).append(ordinal)
+            if kind == "SEARCH_HIT":
+                search_evidence_groups.add(evidence["evidence_group_id"])
+                hit = hit_by_id.get(anchor_id)
+                meta = hit_round_meta.get(anchor_id)
+                if hit is None or meta is None:
+                    errors.append(
+                        f"candidate {candidate_id} evidence anchor hit is unknown"
+                    )
+                else:
+                    hit_epoch, _, _ = meta
+                    if hit_epoch != epoch:
+                        errors.append(
+                            f"candidate {candidate_id} evidence epoch differs "
+                            "from search round"
+                        )
+                    if candidate_id not in hit["candidate_ids"]:
+                        errors.append(
+                            f"candidate {candidate_id} evidence anchor hit lacks "
+                            "candidate link"
+                        )
+            elif kind == "SOURCE_UNIT" and anchor_id not in unit_by_id:
+                errors.append(
+                    f"candidate {candidate_id} evidence anchor unit is unknown"
+                )
+            elif kind == "IMAGE" and anchor_id not in image_by_path:
+                errors.append(
+                    f"candidate {candidate_id} evidence anchor image is unknown"
+                )
+    for anchor_identity, ordinals in evidence_anchor_ordinals.items():
+        if sorted(ordinals) != list(range(1, len(ordinals) + 1)):
+            errors.append(
+                f"evidence anchor {anchor_identity} ordinals are not contiguous"
+            )
+    if search_evidence_groups != seen_new_evidence_groups:
+        errors.append(
+            "search-discovered evidence groups differ from search-round deltas"
+        )
 
     for required_stage in require_stages:
         if required_stage == 18:
@@ -1640,12 +2012,33 @@ def validate_objects(
         ]
         if any(row["inspection_status"] != "SCREENED" for row in assigned_assets):
             errors.append(f"stage {required_stage} assets are not fully screened")
+        local_rounds = [
+            round_record
+            for round_record in rounds
+            if isinstance(round_record, dict)
+            and round_record.get("kind") == "LOCAL"
+            and round_record.get("owning_stage") == required_stage
+        ]
+        local_scope = {
+            path
+            for round_record in local_rounds
+            for query in round_record.get("queries", [])
+            if isinstance(query, dict)
+            for path in query.get("scope_paths", [])
+        }
+        if not local_rounds or local_scope != assigned_paths:
+            errors.append(
+                f"stage {required_stage} lacks full-scope local-search evidence"
+            )
         if any(
             route["status"] == "PENDING"
             for route in routes
             if route["owning_stage"] == str(required_stage)
+            and route["closure_scope"] == "WITHIN_STAGE"
         ):
-            errors.append(f"stage {required_stage} has pending owned routes")
+            errors.append(
+                f"stage {required_stage} has pending within-stage routes"
+            )
 
     if require_all_reviewed:
         if any(route["status"] == "PENDING" for route in routes):
