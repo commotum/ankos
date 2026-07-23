@@ -366,21 +366,36 @@ amend_spec(
         ),
     },
 )
-SPECS.append(
-    S(
-        "related BitXor rule-60 integer iteration",
-        ["U005649"],
-        "ITERATION",
-        "i -> BitXor[i, 2 i]",
-        params=("initial i",),
-        variants=("digit sequences correspond to elementary cellular automaton rule 60",),
+for old_name, new_name in (
+    ("BitXor[2 n,n] digit function", "BitXor[2 n,n] integer iteration"),
+    ("BitXor[3+2 n,n] digit function", "BitXor[3+2 n,n] integer iteration"),
+    ("BitXor[3 n,n] digit function", "BitXor[3 n,n] integer iteration"),
+    ("BitXor[6 n,n] digit function", "BitXor[6 n,n] integer iteration"),
+    ("BitOr[2 n,n] digit function", "BitOr[2 n,n] integer iteration"),
+    ("BitOr[6 n,n] digit function", "BitOr[6 n,n] integer iteration"),
+):
+    amend_spec(
+        old_name,
+        name=new_name,
+        kind="ITERATION",
+        params=("initial n",),
         facts={
             "termination_completion_failure": FF(
-                "The source states only repeated application; no terminal predicate is part of the law.",
-                "U005649",
+                "The source specifies repeated application and no intrinsic terminal predicate.",
+                "U005725",
             ),
         },
     )
+amend_spec(
+    "BitXor[2 n,n] integer iteration",
+    uids=["U005649", "U005725"],
+    variants=("digit sequences correspond to elementary cellular automaton rule 60",),
+    facts={
+        "termination_completion_failure": FF(
+            "U005649 and U005725 specify repeated application and no intrinsic terminal predicate.",
+            ("U005649", "U005725"),
+        ),
+    },
 )
 
 amend_spec(
@@ -1011,6 +1026,7 @@ for pde_name in (
 # global B IDs.  The blind schema only permits B IDs in related_candidate_ids;
 # the coordinator will map these named comparisons after W-ID allocation.
 RELATION_GROUPS = [
+    ("Gray-code ordering generator", "BitXor[2 n,n] integer iteration"),
     ("truncated powers-of-three congruential generator", "base-6 cellular automaton for powers of three"),
     ("standard 3n+1 map", "universal 3n+1 eventual-one query", "per-seed 3n+1 eventual-one predicate", "base-6 cellular automaton for the 3n+1 map"),
     ("iterated run-length encoder", "92-token substitution realization of run-length encoding"),
@@ -1037,6 +1053,7 @@ ROUTES = [
     ("page117_sub", "U005657", "page 83", "replacement rule and seed for the rotated page-117 substitution preset", ["substitution system", "page 117"], "CROSS_RANGE"),
     ("powers3_ca", "U005671", "page 614", "complicated base-6 powers-of-three pattern used for the cellular-automaton correspondence", ["powers of three", "base 6 cellular automaton"], "CROSS_RANGE"),
     ("linear_recurrences", "U005728", "page 128", "coefficients, orders, and initial values of the page-128 linear recurrences", ["linear recurrence", "page 128"], "WITHIN_STAGE"),
+    ("prime_sieve", "U005802", "page 132", "sieve-of-Eratosthenes removal/filter procedure for generating the primes", ["sieve of Eratosthenes", "prime generation"], "WITHIN_STAGE"),
     ("three_squares", "U005820", "page 135", "necessary-and-sufficient sum-of-three-squares representability condition", ["three squares", "representability"], "WITHIN_STAGE"),
     ("digit_sqrt", "U005863", "page 141", "per-step update law for the digit-by-digit square-root construction", ["square root", "digit by digit"], "WITHIN_STAGE"),
     ("integer_representations", "U005927", "page 560", "integer-representation construction referenced without mechanics", ["integer representation"], "CROSS_RANGE"),
@@ -1053,7 +1070,7 @@ HISTORICAL_UNITS = {
 
 OBSERVER_UNITS = {
     "U005649", "U005672", "U005679", "U005686", "U005692", "U005693",
-    "U005694", "U005705", "U005710", "U005715", "U005724", "U005757",
+    "U005705", "U005710", "U005715", "U005724", "U005757",
     "U005759", "U005779", "U005788", "U005790", "U005794", "U005799",
     "U005810", "U005811", "U005812", "U005828", "U005829", "U005831",
     "U005834", "U005840", "U005853", "U005858", "U005859", "U005866", "U005868",
@@ -1183,9 +1200,9 @@ ASSET_CANDIDATE_NAMES: dict[str, tuple[str, ...]] = {
     "A000446": ("reversible rounded integer map",),
     "A000450": ("fixed-width digit-reversal permutation",),
     "A000456": (
-        "BitXor[2 n,n] digit function", "BitXor[3+2 n,n] digit function",
-        "BitXor[3 n,n] digit function", "BitXor[6 n,n] digit function",
-        "BitOr[2 n,n] digit function", "BitOr[6 n,n] digit function",
+        "BitXor[2 n,n] integer iteration", "BitXor[3+2 n,n] integer iteration",
+        "BitXor[3 n,n] integer iteration", "BitXor[6 n,n] integer iteration",
+        "BitOr[2 n,n] integer iteration", "BitOr[6 n,n] integer iteration",
     ),
     "A000457": ("binary-dependency recursive-sequence schema",),
     "A000458": ("complex primitive-recursive function",),
@@ -2197,111 +2214,246 @@ def author(bundle: Path) -> dict[str, Any]:
         row["source_unit_id"]: row["block_kind"] for row in reading
     }
     asset_by_path = {row["physical_path"]: row for row in assets}
+    asset_by_id = {row["asset_id"]: row for row in assets}
     image_order = {
         row["physical_path"]: len(reading) + index
         for index, row in enumerate(assets, 1)
     }
     anchor_order = {**unit_order, **image_order}
 
-    # Candidate IDs and candidate-anchor ordinals.
-    SPECS.sort(key=lambda spec: unit_order[spec["uids"][0]])
-    candidate_anchor_counts: dict[str, int] = defaultdict(int)
+    # Validate and apply the one symmetric candidate/image join.  This makes
+    # an asset link impossible to add without adding the corresponding
+    # candidate witness and evidence row.
+    referenced_ids = {
+        row["asset_id"]
+        for row in assets
+        if row["reference_status"] == "REFERENCED"
+    }
+    classified_referenced_ids = set().union(*ASSET_ROLE_IDS.values())
+    if referenced_ids != classified_referenced_ids:
+        raise RuntimeError(
+            "referenced asset-role partition differs: "
+            f"missing={sorted(referenced_ids - classified_referenced_ids)}, "
+            f"extra={sorted(classified_referenced_ids - referenced_ids)}"
+        )
+    orphan_ids = {
+        row["asset_id"]
+        for row in assets
+        if row["reference_status"] == "UNREFERENCED_PHYSICAL"
+    }
+    if orphan_ids != set(ORPHAN_RISKS):
+        raise RuntimeError("orphan risk ledger does not cover exactly 30 assets")
+
+    for asset_id, candidate_names in ASSET_CANDIDATE_NAMES.items():
+        image_path = asset_by_id[asset_id]["physical_path"]
+        for candidate_name in candidate_names:
+            spec = spec_named(candidate_name)
+            spec["images"] = tuple(ordered_unique([
+                *spec["images"],
+                image_path,
+            ]))
+
+    # Candidate IDs and candidate-anchor ordinals.  The three image-native
+    # Other-PDE equations are discovered at A000518; every other candidate is
+    # source-unit anchored.
+    for spec in SPECS:
+        spec["_candidate_anchor_id"] = spec["identity_image"] or spec["uids"][0]
+        spec["_candidate_anchor_kind"] = (
+            "IMAGE" if spec["identity_image"] else "SOURCE_UNIT"
+        )
+    SPECS.sort(key=lambda spec: anchor_order[spec["_candidate_anchor_id"]])
+    candidate_anchor_counts: dict[tuple[str, str], int] = defaultdict(int)
     for index, spec in enumerate(SPECS, 1):
         spec["id"] = f"W{index:04d}"
-        anchor = spec["uids"][0]
-        candidate_anchor_counts[anchor] += 1
+        anchor = spec["_candidate_anchor_id"]
+        anchor_kind = spec["_candidate_anchor_kind"]
+        anchor_key = (anchor_kind, anchor)
+        candidate_anchor_counts[anchor_key] += 1
         spec["candidate_anchor"] = {
             "epoch": EPOCH,
-            "kind": "SOURCE_UNIT",
+            "kind": anchor_kind,
             "id": anchor,
-            "ordinal": candidate_anchor_counts[anchor],
+            "ordinal": candidate_anchor_counts[anchor_key],
         }
+        spec["_decisions"] = field_decisions(spec, block_kind_by_uid)
+
+    id_by_name = {spec["name"]: spec["id"] for spec in SPECS}
 
     # Build evidence requests, then allocate immutable IDs in frozen traversal
-    # order.  Each candidate has distinct identity and mechanics evidence.
+    # order.  Fingerprint fields are allocated only to their declared exact
+    # anchors; context rows keep the provenance joins complete without making
+    # mechanics claims.
     requests: list[dict[str, Any]] = []
     serial = 0
-    for spec in SPECS:
-        for uid_index, uid in enumerate(spec["uids"]):
-            code_unit = block_kind_by_uid[uid] == "fenced_code"
-            support_fields = (
-                [
-                    "read_dependencies_or_neighborhood",
-                    "law_kind",
-                    "rule_relation_constraint_function_or_probability_law",
-                    "write_replacement_assembly_or_commit",
-                    "result_kind",
-                ]
-                if code_unit
-                else ["parameters_and_variants", "evidence_limit"]
+
+    def append_request(
+        *,
+        spec: dict[str, Any],
+        anchor: str,
+        sort_slot: int,
+        strength: str,
+        modality: str,
+        claim: str,
+        fields: list[str],
+    ) -> None:
+        nonlocal serial
+        serial += 1
+        is_image = anchor in image_order
+        requests.append({
+            "sort": (anchor_order[anchor], sort_slot, serial),
+            "candidate": spec,
+            "anchor_kind": "IMAGE" if is_image else "SOURCE_UNIT",
+            "anchor_id": anchor,
+            "source_unit_id": None if is_image else anchor,
+            "image_path": anchor if is_image else None,
+            "strength": strength,
+            "modality": modality,
+            "claim": claim,
+            "fields": fields,
+        })
+
+    def source_modality(uid: str, fields: list[str]) -> str:
+        block_kind = block_kind_by_uid[uid]
+        if block_kind == "fenced_code":
+            return "CODE"
+        if block_kind == "image":
+            return "CAPTION"
+        if "rule_relation_constraint_function_or_probability_law" in fields:
+            return "FORMULA"
+        return "PROSE"
+
+    def mechanics_strength(
+        spec: dict[str, Any],
+        anchor: str,
+        fields: list[str],
+    ) -> str:
+        if anchor in image_order:
+            asset_id = asset_by_path[anchor]["asset_id"]
+            if asset_id == "A000443":
+                return "DEFECT_LIMITED"
+            role = next(
+                role for role, ids in ASSET_ROLE_IDS.items() if asset_id in ids
             )
-            serial += 1
-            requests.append({
-                "sort": (anchor_order[uid], 0, serial),
-                "candidate": spec,
-                "anchor_kind": "SOURCE_UNIT",
-                "anchor_id": uid,
-                "source_unit_id": uid,
-                "image_path": None,
-                "strength": (
-                    "DIRECT_IDENTITY"
-                    if uid_index == 0
+            if role == "NATIVE_EVIDENCE":
+                return (
+                    "DIRECT_COMPLETE_MECHANICS"
+                    if anchor in {BITWISE_IMAGE, OTHER_PDE_IMAGE}
                     else "DIRECT_PARTIAL_MECHANICS"
-                    if code_unit
-                    else "CORROBORATING"
+                )
+            return "CONTEXTUAL"
+        law_anchor = choose_law_anchor(spec, block_kind_by_uid)
+        if (
+            anchor == law_anchor
+            and "rule_relation_constraint_function_or_probability_law" in fields
+            and block_kind_by_uid[anchor] == "fenced_code"
+        ):
+            return "DIRECT_COMPLETE_MECHANICS"
+        if anchor == law_anchor:
+            return "DIRECT_PARTIAL_MECHANICS"
+        return "CORROBORATING"
+
+    for spec in SPECS:
+        decisions = spec["_decisions"]
+        identity_anchor = spec["_candidate_anchor_id"]
+        append_request(
+            spec=spec,
+            anchor=identity_anchor,
+            sort_slot=0,
+            strength="DIRECT_IDENTITY",
+            modality=(
+                "IMAGE"
+                if identity_anchor in image_order
+                else source_modality(identity_anchor, [])
+            ),
+            claim=(
+                f"Identifies the image-native equation {spec['name']}."
+                if identity_anchor in image_order
+                else f"Identifies {spec['name']} at the source's stated scope."
+            ),
+            fields=[],
+        )
+
+        fields_by_anchor: dict[str, list[str]] = defaultdict(list)
+        for field in FIELDS:
+            for anchor in decisions[field]["anchors"]:
+                if anchor not in anchor_order:
+                    raise RuntimeError(
+                        f"{spec['name']}.{field} uses unavailable anchor {anchor}"
+                    )
+                fields_by_anchor[anchor].append(field)
+        for anchor in sorted(fields_by_anchor, key=anchor_order.__getitem__):
+            fields = ordered_unique(fields_by_anchor[anchor])
+            exact_claims = []
+            for field in fields:
+                item = decisions[field]
+                exact_claims.append(
+                    f"{field}={item['value']!r}"
+                    if item["value"] is not None
+                    else f"{field}=NOT_APPLICABLE ({item['reason']})"
+                )
+            append_request(
+                spec=spec,
+                anchor=anchor,
+                sort_slot=1,
+                strength=mechanics_strength(spec, anchor, fields),
+                modality=(
+                    "IMAGE"
+                    if anchor in image_order
+                    else source_modality(anchor, fields)
                 ),
-                "modality": "CODE" if code_unit else "PROSE",
-                "claim": (
-                    f"Identifies {spec['name']} and its stated scope."
-                    if uid_index == 0
-                    else f"Supplies an explicit formula for {spec['name']}."
-                    if code_unit
-                    else f"Supplies context, restriction, or an alternative expression for {spec['name']}."
+                claim=(
+                    f"For {spec['name']}, this anchor supports only: "
+                    + "; ".join(exact_claims)
+                    + "."
                 ),
-                # The first unit receives a separate native-law claim below;
-                # later code/formula and context units support only the exact
-                # fields they actually bear.
-                "fields": [] if uid_index == 0 else support_fields,
-                "mechanics": uid_index != 0,
-            })
-            if uid_index == 0:
-                serial += 1
-                requests.append({
-                    "sort": (anchor_order[uid], 1, serial),
-                    "candidate": spec,
-                    "anchor_kind": "SOURCE_UNIT",
-                    "anchor_id": uid,
-                    "source_unit_id": uid,
-                    "image_path": None,
-                    "strength": (
-                        "DIRECT_PARTIAL_MECHANICS"
-                        if spec["missing"] or (spec["images"] and spec["image_direct"])
-                        else "DIRECT_COMPLETE_MECHANICS"
-                    ),
-                    "modality": "FORMULA" if spec["kind"] in {"FUNCTION", "QUERY", "RELATION", "PDE", "ODE"} else "PROSE",
-                    "claim": f"States the native law: {spec['law']}",
-                    "fields": FIELDS,
-                    "mechanics": True,
-                })
+                fields=fields,
+            )
+
+        existing_anchors = {
+            request["anchor_id"]
+            for request in requests
+            if request["candidate"] is spec
+        }
+        for uid in spec["uids"]:
+            if uid in existing_anchors:
+                continue
+            append_request(
+                spec=spec,
+                anchor=uid,
+                sort_slot=2,
+                strength="CONTEXTUAL",
+                modality=source_modality(uid, []),
+                claim=(
+                    f"The Markdown image pointer provides only the source link for {spec['name']}; "
+                    "it does not transcribe the pictured mechanics."
+                    if block_kind_by_uid[uid] == "image"
+                    else f"Supplies source context for {spec['name']} without supporting an additional fingerprint field."
+                ),
+                fields=[],
+            )
+        existing_anchors = {
+            request["anchor_id"]
+            for request in requests
+            if request["candidate"] is spec
+        }
         for image_path in spec["images"]:
-            serial += 1
-            requests.append({
-                "sort": (anchor_order[image_path], 0, serial),
-                "candidate": spec,
-                "anchor_kind": "IMAGE",
-                "anchor_id": image_path,
-                "source_unit_id": None,
-                "image_path": image_path,
-                "strength": "DIRECT_COMPLETE_MECHANICS" if spec["image_direct"] else "CONTEXTUAL",
-                "modality": "IMAGE",
-                "claim": (
-                    f"Original-resolution checked transcription states: {spec['law']}"
-                    if spec["image_direct"]
-                    else f"Original-resolution image is a contextual witness for {spec['name']}."
+            if image_path in existing_anchors:
+                continue
+            asset_id = asset_by_path[image_path]["asset_id"]
+            append_request(
+                spec=spec,
+                anchor=image_path,
+                sort_slot=2,
+                strength="DEFECT_LIMITED" if asset_id == "A000443" else "CONTEXTUAL",
+                modality="IMAGE",
+                claim=(
+                    f"A000443 corroborates only the visible case-(a)/(b) material for {spec['name']}; "
+                    "the case-(c) formula is outside the bottom crop."
+                    if asset_id == "A000443"
+                    else f"Original-resolution {asset_id} is a contextual visual witness for {spec['name']} and supplies no additional native field."
                 ),
-                "fields": FIELDS if spec["image_direct"] else [],
-                "mechanics": spec["image_direct"],
-            })
+                fields=[],
+            )
 
     requests.sort(key=lambda item: item["sort"])
     evidence_anchor_counts: dict[tuple[str, str], int] = defaultdict(int)
@@ -2323,7 +2475,12 @@ def author(bundle: Path) -> dict[str, Any]:
 
     route_by_key: dict[str, dict[str, Any]] = {}
     route_anchor_counts: dict[str, int] = defaultdict(int)
-    for index, (key, uid, literal, expected, terms) in enumerate(ROUTES, 1):
+    sorted_routes = sorted(
+        enumerate(ROUTES),
+        key=lambda pair: (unit_order[pair[1][1]], pair[0]),
+    )
+    for index, (_, route_spec) in enumerate(sorted_routes, 1):
+        key, uid, literal, expected, terms, scope = route_spec
         route_anchor_counts[uid] += 1
         route_id = f"WR{index:04d}"
         route_by_key[key] = {
@@ -2338,7 +2495,7 @@ def author(bundle: Path) -> dict[str, Any]:
             "route_kind": "PAGE",
             "expected_topic": expected,
             "owning_stage": str(STAGE),
-            "closure_scope": "CROSS_RANGE",
+            "closure_scope": scope,
             "status": "PENDING",
             "target_unit_ids": "[]",
             "target_asset_ids": "[]",
@@ -2367,7 +2524,11 @@ def author(bundle: Path) -> dict[str, Any]:
             for field in FIELDS
             for evidence_id in field_evidence_ids[field]
         )
-        support, fingerprint = profile(spec, field_evidence_ids)
+        support, fingerprint = profile(
+            spec,
+            spec["_decisions"],
+            field_evidence_ids,
+        )
         evidence_rows = [{
             "evidence_id": r["evidence_id"],
             "evidence_group_id": r["group_id"],
@@ -2380,6 +2541,36 @@ def author(bundle: Path) -> dict[str, Any]:
             "fingerprint_fields": r["fields"],
         } for r in reqs]
         route_ids = [route_by_key[key]["route_id"] for key in spec["route_keys"]]
+        unknown_reasons = [
+            spec["_decisions"][field]["reason"]
+            for field in FIELDS
+            if spec["_decisions"][field]["status"] == "UNKNOWN_FROM_SOURCE"
+        ]
+        conflicting_reasons = [
+            spec["_decisions"][field]["reason"]
+            for field in FIELDS
+            if spec["_decisions"][field]["status"] == "CONFLICTING_SOURCE"
+        ]
+        source_statuses = {
+            SOURCE_STATUS_BY_UID.get(uid, ("CLEAR", ""))[0]
+            for uid in spec["uids"]
+        }
+        source_statuses.update(
+            "DEFECTIVE"
+            if asset_by_path[image_path]["asset_id"] == "A000443"
+            else "CLEAR"
+            for image_path in spec["images"]
+        )
+        status_order = {"CLEAR": 0, "AMBIGUOUS": 1, "DEFECTIVE": 2, "CONFLICTING": 3}
+        parameter_evidence = field_evidence_ids["parameters_and_variants"]
+        relation_evidence = next(
+            (
+                r["evidence_id"]
+                for r in reqs
+                if r["strength"] not in {"DIRECT_IDENTITY", "CONTEXTUAL", "LEAD_ONLY"}
+            ),
+            reqs[0]["evidence_id"],
+        )
         candidates.append({
             "id": candidate_id,
             "record_status": "ACTIVE",
@@ -2389,28 +2580,66 @@ def author(bundle: Path) -> dict[str, Any]:
             "discovery_anchor": spec["candidate_anchor"],
             "source_unit_ids": ordered_unique(spec["uids"]),
             "source_evidence": evidence_rows,
-            "source_status": ["CLEAR"],
+            "source_status": sorted(source_statuses, key=status_order.__getitem__),
             "image_witnesses": list(spec["images"]),
             "evidence_strength": ordered_unique([r["strength"] for r in reqs]),
             "field_support": support,
             "fingerprint": fingerprint,
             "parameters": [
-                {"name": name, "source_description": f"Printed parameter or input: {name}.", "evidence_ids": field_evidence_ids["parameters_and_variants"]}
+                {
+                    "name": name,
+                    "source_description": (
+                        f"Printed parameter/input: {name}."
+                        if parameter_evidence
+                        else f"Named but not fully specified in the sealed source: {name}."
+                    ),
+                    "evidence_ids": parameter_evidence,
+                }
                 for name in spec["params"]
             ],
             "variants": [
-                {"name": name, "source_description": f"Separately stated variant: {name}.", "evidence_ids": field_evidence_ids["parameters_and_variants"]}
+                {
+                    "name": name,
+                    "source_description": f"Separately stated source variant: {name}.",
+                    "evidence_ids": parameter_evidence,
+                }
                 for name in spec["variants"]
             ],
-            "missing_mechanics": list(spec["missing"]),
-            "uncertainties": list(spec["missing"]),
-            "related_candidate_ids": [],
+            "missing_mechanics": ordered_unique([
+                *spec["missing"],
+                *unknown_reasons,
+            ]),
+            "uncertainties": ordered_unique([
+                *spec["source_uncertainties"],
+                *unknown_reasons,
+                *conflicting_reasons,
+            ]),
+            "related_candidate_ids": [
+                {
+                    "candidate_id": id_by_name[peer],
+                    "relation": "SOURCE_COMPARE",
+                    "proof_kind": "PROVISIONAL_COMPARISON",
+                    "evidence_ids": [relation_evidence],
+                    "before_rationale": "",
+                    "after_rationale": "",
+                    "uncertainty": (
+                        f"The source relates {spec['name']} to {peer}; this "
+                        "provisional comparison is not an identity merge."
+                    ),
+                }
+                for peer in spec["relation_names"]
+            ],
             "cross_reference_ids": route_ids,
             "evidence_reassignments": [],
         })
         for uid in ordered_unique(spec["uids"]):
             unit_candidates[uid].append(candidate_id)
         unit_anchor_candidates[spec["uids"][0]].append(candidate_id)
+        if spec["_candidate_anchor_kind"] == "IMAGE":
+            source_unit_id = asset_by_path[spec["_candidate_anchor_id"]][
+                "source_unit_id"
+            ]
+            unit_anchor_candidates[source_unit_id].append(candidate_id)
         for image_path in spec["images"]:
             asset_candidates[image_path].append(candidate_id)
 
@@ -2419,35 +2648,66 @@ def author(bundle: Path) -> dict[str, Any]:
         unit_routes[route["source_unit_id"]].append(route["route_id"])
 
     kind_by_candidate = {spec["id"]: spec["kind"] for spec in SPECS}
+    name_by_candidate = {spec["id"]: spec["name"] for spec in SPECS}
     for row in reading:
         uid = row["source_unit_id"]
         candidate_ids = unit_candidates[uid]
         route_ids = unit_routes[uid]
+        source_status, source_uncertainty = SOURCE_STATUS_BY_UID.get(
+            uid, ("CLEAR", "")
+        )
         row.update({
             "review_status": "REVIEWED",
             "review_epoch": str(EPOCH),
-            "source_status": "CLEAR",
-            "uncertainty": "",
+            "source_status": source_status,
+            "uncertainty": source_uncertainty,
             "candidate_ids": array_text(candidate_ids),
             "route_ids": array_text(route_ids),
             "review_stage": str(STAGE),
             "reviewer": WORKER,
         })
         roles: list[str] = []
-        if candidate_ids:
+        if uid == "U005695":
+            row["review_disposition"] = "SOURCE_DEFECT_OR_AMBIGUITY"
+            row["evidence_statement"] = (
+                "The Markdown pointer anchors A000443, whose original was "
+                "reviewed: cases (a) and (b) are visible, but the bottom crop "
+                "removes the identity-bearing case-(c) formula."
+            )
+            roles.append("SOURCE_DEFECT")
+        elif candidate_ids:
             kinds = {kind_by_candidate[cid] for cid in candidate_ids}
             if kinds & {"REPRESENTATION", "GENERATOR"}:
                 roles.append("REPRESENTATION")
             if kinds & {"OBSERVER", "QUERY"}:
                 roles.append("OBSERVER_OR_ANALYZER")
-            if kinds & {"SOLVER"}:
+            if kinds & {"SOLVER", "EVALUATION_POLICY"}:
                 roles.append("IMPLEMENTATION_DETAIL")
+            if kinds & {"PRESET"}:
+                roles.append("SEED_INPUT_OR_BOUNDARY")
+            if kinds & {"RELATION", "PDE", "ODE"}:
+                roles.append("PROPERTY_OR_RESTRICTION")
             row["review_disposition"] = "CANDIDATE" if uid in unit_anchor_candidates else "SUPPORTS_CANDIDATE"
-            names = [SPECS[int(cid[1:]) - 1]["name"] for cid in candidate_ids]
-            row["evidence_statement"] = "Canonical source supplies identity, mechanics, restriction, or direct support for: " + "; ".join(names) + "."
+            names = [name_by_candidate[cid] for cid in candidate_ids]
+            row["evidence_statement"] = (
+                "Canonical source supplies candidate-specific identity, law, "
+                "restriction, or failure evidence for: "
+                + "; ".join(names)
+                + "."
+                + (
+                    " It also carries pending route(s) "
+                    + ", ".join(route_ids)
+                    + " for mechanics explicitly located elsewhere in Stage 8."
+                    if route_ids
+                    else ""
+                )
+            )
         elif route_ids:
             row["review_disposition"] = "CROSS_REFERENCE"
-            row["evidence_statement"] = "Construction-relevant mechanics are located only by the explicit routed target."
+            row["evidence_statement"] = (
+                "Construction-relevant mechanics are identified only through "
+                "the exact typed route(s): " + ", ".join(route_ids) + "."
+            )
             roles.append("EXTERNAL_ONLY")
         elif row["block_kind"] == "image":
             row["review_disposition"] = "REPRESENTATION_OR_OBSERVER"
@@ -2470,41 +2730,112 @@ def author(bundle: Path) -> dict[str, Any]:
         image_path = row["physical_path"]
         candidate_ids = asset_candidates[image_path]
         orphan = row["reference_status"] == "UNREFERENCED_PHYSICAL"
-        native = image_path in {BITWISE_IMAGE, OTHER_PDE_IMAGE}
+        asset_id = row["asset_id"]
+        if orphan:
+            role = "SOURCE_DEFECT"
+            risks = ORPHAN_RISKS[asset_id]
+        else:
+            role = next(
+                role_name
+                for role_name, ids in ASSET_ROLE_IDS.items()
+                if asset_id in ids
+            )
+            risks = ASSET_RISKS.get(asset_id, ())
+        defective = orphan or asset_id == "A000443"
+        text_bearing = "TEXT_BEARING" in risks
+        if asset_id == "A000443":
+            evidence_statement = (
+                "Original 546×413 extraction reviewed at original resolution. "
+                "The case-(a) and case-(b) formulas are legible and may support "
+                "only DEFECT_LIMITED evidence; the lower edge cuts off the "
+                "case-(c) formula, which was not reconstructed."
+            )
+            uncertainty = (
+                "Transcription CHECKED is limited to the two visible formulas; "
+                "case (c)'s one-step rule is unavailable below the crop."
+            )
+        elif orphan:
+            evidence_statement = (
+                "Original-resolution unreferenced fragment was screened only "
+                "to document the extraction defect/alternate crop. It has no "
+                "candidate or route link and contributes no mechanics."
+            )
+            uncertainty = (
+                "No live Markdown source-unit anchor exists for this physical "
+                "fragment, so it cannot be promoted to candidate evidence."
+            )
+        elif role == "NATIVE_EVIDENCE":
+            evidence_statement = (
+                "Original-resolution native construction image was reviewed; "
+                + (
+                    "its construction-bearing text/formula was independently checked."
+                    if text_bearing
+                    else "its diagrammatic construction role was checked without claiming a text transcription."
+                )
+            )
+            uncertainty = ""
+        elif role == "RELATION":
+            evidence_statement = (
+                "Original-resolution image directly illustrates the stated "
+                "relation between represented quantities, but is not promoted "
+                "to an autonomous transition law."
+            )
+            uncertainty = ""
+        elif role == "CONTROL":
+            evidence_statement = (
+                "Original-resolution control/comparison rendering was reviewed "
+                "as a preset, parameter comparison, or implementation check; "
+                "it supplies no additional native law."
+            )
+            uncertainty = ""
+        else:
+            evidence_statement = (
+                "Original-resolution observer/rendering was reviewed; it shows "
+                "behavior or measured output and supplies no additional native law."
+            )
+            uncertainty = ""
         row.update({
             "inspection_status": "SCREENED",
             "review_epoch": str(EPOCH),
-            "visual_role": "SOURCE_DEFECT" if orphan else "NATIVE_EVIDENCE" if native else "OBSERVER",
-            "source_status": "DEFECTIVE" if orphan else "CLEAR",
-            "risk_flags": array_text(
-                ["TEXT_BEARING", "AMBIGUOUS"] if orphan
-                else ["CONSTRUCTION_BEARING", "TEXT_BEARING"] if native
-                else ["TEXT_BEARING"]
-            ),
+            "visual_role": role,
+            "source_status": "DEFECTIVE" if defective else "CLEAR",
+            "risk_flags": array_text(list(risks)),
             "original_resolution_status": "REVIEWED",
-            "transcription_status": "NOT_REQUIRED" if orphan else "CHECKED",
+            "transcription_status": "CHECKED" if text_bearing and not orphan else "NOT_REQUIRED",
             "candidate_ids": array_text(candidate_ids),
             "route_ids": "[]",
-            "evidence_statement": (
-                "Original-resolution orphan fragment/alternate panel was checked; a clean referenced composite exists, so it is retained only as source-defect evidence and contributes no hidden mechanics."
-                if orphan
-                else "Original-resolution formula labels were independently checked and transcribed as direct image evidence."
-                if native
-                else "Original-resolution rendering was checked; it is an observer/control image and contributes no hidden native mechanics."
-            ),
+            "evidence_statement": evidence_statement,
             "review_stage": str(STAGE),
             "reviewer": WORKER,
-            "uncertainty": (
-                "The physical image lacks a live source-unit anchor; its relationship to the clean referenced composite cannot be promoted to mechanics evidence."
-                if orphan else ""
-            ),
+            "uncertainty": uncertainty,
         })
 
+    actual_role_counts = count_values(assets, "visual_role")
+    expected_role_counts = {
+        "NATIVE_EVIDENCE": 6,
+        "RELATION": 2,
+        "CONTROL": 21,
+        "OBSERVER": 22,
+        "SOURCE_DEFECT": 31,
+    }
+    if actual_role_counts != expected_role_counts:
+        raise RuntimeError(
+            f"asset role counts differ: {actual_role_counts} != {expected_role_counts}"
+        )
+    if count_values(assets, "source_status") != {"CLEAR": 51, "DEFECTIVE": 31}:
+        raise RuntimeError("asset source-status partition differs from audited totals")
+
     output["candidate_proposals"] = candidates
-    output["route_proposals"] = list(route_by_key.values())
+    output["route_proposals"] = sorted(
+        route_by_key.values(),
+        key=lambda row: int(row["route_id"][2:]),
+    )
     output["uncertainties"] = [
-        "Thirty unreferenced physical assets were original-resolution checked but remain defect-only because their source-unit relationship is unanchored.",
-        "Several explicitly named partial constructions retain PENDING routes rather than inferred mechanics from outside the sealed range.",
+        "Thirty unreferenced physical assets were original-resolution checked but remain defect-only because they have no live source-unit anchor.",
+        "A000443 exposes complete formulas only for cases (a) and (b); the case-(c) rule is clipped and was not reconstructed.",
+        "Case (c) remains an E5 partial-system candidate with exact missing mechanics and DEFECT_LIMITED image evidence. No route is emitted because the sealed source contains no literal target or locator from which a valid immutable route identity could be formed.",
+        "U005993 is internally conflicting about rationality conditions for repetitive versus complicated Anosov-map behavior; the displayed map law remains separately transcribed.",
+        "All typed routes remain pending for coordinator target closure; no routed mechanics were silently imported into this sealed worker result.",
     ]
     output["prohibited_input_nonuse"] = False
     atomic_json(output_path, output)

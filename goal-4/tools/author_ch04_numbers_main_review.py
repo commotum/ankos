@@ -784,9 +784,13 @@ context_evidence(
 )
 
 DIGIT_SHIFT_NA = {
-    field: reason
-    for field, reason in DECLARATIVE_NA.items()
-    if field != "read_dependencies_or_neighborhood"
+    **{
+        field: reason
+        for field, reason in DECLARATIVE_NA.items()
+        if field != "read_dependencies_or_neighborhood"
+    },
+    "native_time": "This is a static representation correspondence, not an iterated process with native time.",
+    "termination_completion_failure": "A static representation correspondence has no native run or termination policy.",
 }
 binary_shift_relation = candidate(
     "binary-arithmetic-shift-relation",
@@ -794,7 +798,6 @@ binary_shift_relation = candidate(
     "U000671",
     {
         "object_kind": "A representation-level correspondence between factor-2 arithmetic and base-2 digit shifts.",
-        "native_time": "No independent native time; one digit transformation corresponds to one arithmetic operation.",
         "carrier": "An ordered base-2 digit sequence.",
         "support": "Whole and fractional binary digit positions.",
         "topology": "Digit positions are linearly ordered by positional weight.",
@@ -808,7 +811,6 @@ binary_shift_relation = candidate(
         "result_kind": "The shifted base-2 digit sequence representing the multiplied or divided number.",
         "successor_cardinality": "Exactly one shifted digit sequence for each complete input sequence and direction.",
         "determinism_branching_or_measure": "Deterministic.",
-        "termination_completion_failure": "A finite displayed shift completes directly; the correspondence also applies positionwise to the stated unbounded positional representation.",
         "witness_semantics": "The positional value of the output is twice or half the positional value of the input, as selected.",
         "parameters_and_variants": "Left shift represents multiplication by 2; right shift represents division by 2; the latter is composed with multiplication by 3 in the 3/2 example.",
         "excluded_observers_and_representations": "The stacked digit histories display repeated uses of the correspondence but are not extra native state.",
@@ -824,7 +826,6 @@ evidence(
     "The prose states that multiplication by 2 shifts a base-2 digit sequence one place left and appends a zero.",
     [
         "object_kind",
-        "native_time",
         "carrier",
         "support",
         "topology",
@@ -837,7 +838,6 @@ evidence(
         "result_kind",
         "successor_cardinality",
         "determinism_branching_or_measure",
-        "termination_completion_failure",
         "witness_semantics",
         "parameters_and_variants",
         "excluded_observers_and_representations",
@@ -3327,6 +3327,46 @@ for coefficient, anchor in [(1, "U000922"), (2, "U000925"), (4, "U000928")]:
         "second",
     )
 
+for _spec in [diffusion_pde, wave_pde, sine_gordon_pde]:
+    context_evidence(
+        _spec,
+        f"{_spec['key']}-derivative-caption",
+        "U000912",
+        "The shared caption defines u and the time/space derivative notation used in this displayed equation.",
+        fields=[
+            "native_time",
+            "carrier",
+            "support",
+            "topology",
+            "alphabet_or_value_schema",
+            "input",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "result_kind",
+            "witness_semantics",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        strength="CORROBORATING",
+        modality="CAPTION",
+    )
+
+for _coefficient, _unit in [(1, "U000931"), (2, "U000933"), (4, "U000935")]:
+    context_evidence(
+        nonlinear_pdes[_coefficient],
+        f"nonlinear-pde-{_coefficient}-repeated-formula",
+        _unit,
+        "The longer-time page repeats the same nonlinear PDE formula verbatim.",
+        fields=[
+            "object_kind",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "parameters_and_variants",
+        ],
+        strength="CORROBORATING",
+        modality="FORMULA",
+    )
+
 gaussian_pde_seed = source_candidate(
     "gaussian-pde-initial-data",
     "Gaussian stationary initial data for the PDE figures",
@@ -3347,6 +3387,41 @@ gaussian_pde_seed = source_candidate(
     strength="DIRECT_COMPLETE_MECHANICS",
     modality="FORMULA",
 )
+
+PDE_OBSERVER_IMAGES = [
+    (diffusion_pde, "U000903", "CHAPTERS/_page_178_Picture_2.jpeg"),
+    (diffusion_pde, "U000904", "CHAPTERS/_page_178_Picture_3.jpeg"),
+    (wave_pde, "U000906", "CHAPTERS/_page_178_Picture_5.jpeg"),
+    (wave_pde, "U000907", "CHAPTERS/_page_178_Picture_6.jpeg"),
+    (sine_gordon_pde, "U000909", "CHAPTERS/_page_178_Picture_8.jpeg"),
+    (sine_gordon_pde, "U000910", "CHAPTERS/_page_178_Picture_9.jpeg"),
+    (nonlinear_pdes[1], "U000920", "CHAPTERS/_page_180_Picture_2.jpeg"),
+    (nonlinear_pdes[1], "U000921", "CHAPTERS/_page_180_Picture_3.jpeg"),
+    (nonlinear_pdes[2], "U000923", "CHAPTERS/_page_180_Picture_5.jpeg"),
+    (nonlinear_pdes[2], "U000924", "CHAPTERS/_page_180_Picture_6.jpeg"),
+    (nonlinear_pdes[4], "U000926", "CHAPTERS/_page_180_Picture_8.jpeg"),
+    (nonlinear_pdes[4], "U000927", "CHAPTERS/_page_180_Picture_9.jpeg"),
+    (nonlinear_pdes[1], "U000930", "CHAPTERS/_page_181_Picture_2.jpeg"),
+    (nonlinear_pdes[2], "U000932", "CHAPTERS/_page_181_Picture_4.jpeg"),
+    (nonlinear_pdes[4], "U000934", "CHAPTERS/_page_181_Picture_6.jpeg"),
+]
+for _equation_spec, _unit, _path in PDE_OBSERVER_IMAGES:
+    context_evidence(
+        _equation_spec,
+        f"{_equation_spec['key']}-{Path(_path).stem}-observer",
+        _unit,
+        "This original-resolution asset is a solution representation associated with the stated equation, not evidence for a solver or additional law.",
+        image_path=_path,
+        strength="CORROBORATING",
+    )
+    context_evidence(
+        gaussian_pde_seed,
+        f"gaussian-seed-{Path(_path).stem}-context",
+        _unit,
+        "The shared caption states that the Gaussian stationary initial data are used for these PDE figures; this asset is one such solution representation.",
+        image_path=_path,
+        strength="CORROBORATING",
+    )
 
 pde_sampler = source_candidate(
     "symbolic-pde-sampler",
@@ -3430,7 +3505,7 @@ pde_numerical_scheme = source_candidate(
 context_evidence(
     pde_numerical_scheme,
     "pde-solver-sensitive-panel",
-    "U000934",
+    "U000936",
     "The final original-resolution solution panel is the one whose details the caption says are sensitive to the numerical approximation scheme.",
     image_path="CHAPTERS/_page_181_Picture_6.jpeg",
     fields=["result_kind", "excluded_observers_and_representations", "evidence_limit"],
@@ -3469,11 +3544,20 @@ add_route(
     ["Fibonacci substitution system", "page 83", "quadratic irrational"],
 )
 add_route(
-    "shift-map-prev-pages",
+    "shift-map-picture",
     "U000833",
-    "the so-called shift map used in case (d) on the previous two pages",
-    "iterated-map case (d) formula and trajectories",
-    ["shift map", "case (d)", "previous two pages"],
+    "as the picture illustrates",
+    "case (d) shift-map formula and trajectory in the illustrated four-map figure",
+    ["picture", "shift map", "case (d)", "digit shift"],
+    scope="WITHIN_STAGE",
+    kind="OTHER",
+)
+add_route(
+    "iterated-map-arithmetic-page122",
+    "U000836",
+    "compare page 122",
+    "earlier arithmetic systems based on repeated multiplication and their digit-sequence behavior",
+    ["compare page 122", "arithmetic systems", "digit sequences", "iterated maps"],
     scope="WITHIN_STAGE",
 )
 add_route(
@@ -3501,6 +3585,15 @@ add_route(
     kind="SECTION",
 )
 add_route(
+    "iterated-maps-previous-section",
+    "U000865",
+    "the iterated maps that we just discussed in the previous section",
+    "unit-interval iterated-map family and scalar postprocessing mechanics",
+    ["iterated maps", "previous section", "unit interval", "scalar mapping"],
+    scope="WITHIN_STAGE",
+    kind="SECTION",
+)
+add_route(
     "iterated-map-a-page150",
     "U000873",
     "exactly iterated map (a) from page 150",
@@ -3517,13 +3610,21 @@ add_route(
     scope="WITHIN_STAGE",
 )
 add_route(
+    "localized-structure-page160",
+    "U000882",
+    "the picture in the middle of page 160",
+    "c=0.3299 additive continuous-CA continuation and adjacent-cell difference view",
+    ["picture", "page 160", "localized structures", "0.3299", "differences"],
+    scope="WITHIN_STAGE",
+)
+add_route(
     "continuous-rules-previous-page",
     "U000886",
     "the same kind of rules as on the previous page",
     "additive-constant continuous-CA family and parameter presets",
     ["same kind of rules", "previous page", "continuous cellular automata"],
     scope="WITHIN_STAGE",
-    kind="SECTION",
+    kind="PAGE",
 )
 add_route(
     "nonlinear-pdes-previous-page",
@@ -3571,14 +3672,19 @@ for _spec in [average_ca, fractional_three_half_ca, additive_ca_family]:
     _spec["related_keys"] = ["continuous-ca-family"]
 for _spec in [diffusion_pde, wave_pde, sine_gordon_pde, *nonlinear_pdes.values()]:
     _spec["related_keys"] = ["pde-family"]
-for _spec in cos_specs.values():
-    _spec["related_keys"] = ["trig-axis-crossing-substitution-encoder"]
 
 map_specs["iterated-map-d"]["route_keys"].extend(
-    ["shift-map-prev-pages", "shift-map-pages150-151"]
+    ["shift-map-picture", "shift-map-pages150-151"]
 )
-map_specs["iterated-map-a"]["route_keys"].append("intrinsic-maps-pages150-151")
-map_specs["iterated-map-b"]["route_keys"].append("intrinsic-maps-pages150-151")
+map_specs["iterated-map-a"]["route_keys"].extend(
+    ["iterated-map-arithmetic-page122", "intrinsic-maps-pages150-151"]
+)
+map_specs["iterated-map-b"]["route_keys"].extend(
+    ["iterated-map-arithmetic-page122", "intrinsic-maps-pages150-151"]
+)
+continuous_ca_family["route_keys"].append("iterated-maps-previous-section")
+additive_presets["0.3299"]["route_keys"].append("localized-structure-page160")
+neighbor_difference["route_keys"].append("localized-structure-page160")
 additive_ca_family["route_keys"].append("continuous-rules-previous-page")
 for _spec in nonlinear_pdes.values():
     _spec["route_keys"].append("nonlinear-pdes-previous-page")
@@ -3588,11 +3694,16 @@ for _spec, _label, _unit in [
     (axis_crossing_encoder, "generalized-substitution-route", "U000819"),
     (cos_specs["cosdiff-2-sqrt5"], "fibonacci-substitution-route", "U000822"),
     (map_specs["iterated-map-d"], "shift-map-route-a", "U000833"),
+    (map_specs["iterated-map-a"], "arithmetic-comparison-map-a-route", "U000836"),
+    (map_specs["iterated-map-b"], "arithmetic-comparison-map-b-route", "U000836"),
     (map_specs["iterated-map-d"], "shift-map-route-b", "U000850"),
     (map_specs["iterated-map-a"], "intrinsic-map-a-route", "U000857"),
     (map_specs["iterated-map-b"], "intrinsic-map-b-route", "U000857"),
     (continuous_ca_family, "totalistic-prior-route", "U000865"),
+    (continuous_ca_family, "iterated-maps-prior-section-route", "U000865"),
     (fractional_three_half_ca, "iterated-map-a-route", "U000873"),
+    (additive_presets["0.3299"], "localized-structure-page160-route", "U000882"),
+    (neighbor_difference, "localized-difference-page160-route", "U000882"),
     (diffusion_pde, "continuous-average-route", "U000897"),
     (additive_ca_family, "continuous-rules-route", "U000886"),
     (nonlinear_pdes[1], "nonlinear-pde-route-1", "U000936"),
@@ -3781,6 +3892,88 @@ def candidate_roles(
     return list(dict.fromkeys(roles))
 
 
+# Exhaustive original-resolution classification. Roles are semantic:
+# native panels carry mechanics, controls vary a parameter or seed, relations
+# compare constructions, and observers display outcomes without a new law.
+ASSET_REVIEW: dict[str, tuple[str, list[str], str]] = {
+    "A000779": ("DECORATIVE", [], "NOT_REQUIRED"),
+    "A000780": ("OBSERVER", ["TEXT_BEARING"], "CHECKED"),
+    "A000781": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000782": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000783": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000784": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000785": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000786": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000787": ("OBSERVER", ["TEXT_BEARING"], "CHECKED"),
+    "A000788": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000789": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000790": ("CONTROL", [], "NOT_REQUIRED"),
+    "A000791": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000792": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000793": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000794": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000795": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000796": (
+        "SOURCE_DEFECT",
+        ["CONSTRUCTION_BEARING", "TEXT_BEARING", "AMBIGUOUS", "CAPTION_INCOMPLETE"],
+        "CHECKED",
+    ),
+    "A000797": ("OBSERVER", ["TEXT_BEARING"], "CHECKED"),
+    "A000798": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000799": ("OBSERVER", ["TEXT_BEARING"], "CHECKED"),
+    "A000800": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000801": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000802": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000803": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000804": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000805": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000806": ("OBSERVER", ["TEXT_BEARING"], "CHECKED"),
+    "A000807": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000808": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000809": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
+    "A000810": ("CONTROL", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000811": ("RELATION", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000812": ("OBSERVER", ["TEXT_BEARING"], "CHECKED"),
+    "A000813": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000814": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000815": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
+    "A000816": ("CONTROL", [], "NOT_REQUIRED"),
+    "A000817": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
+    "A000818": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
+    "A000819": ("CONTROL", [], "NOT_REQUIRED"),
+    "A000821": ("CONTROL", [], "NOT_REQUIRED"),
+    "A000822": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING"], "NOT_REQUIRED"),
+    "A000823": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING", "TEXT_BEARING"], "CHECKED"),
+    "A000824": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000825": ("NATIVE_EVIDENCE", ["CONSTRUCTION_BEARING"], "NOT_REQUIRED"),
+    "A000826": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
+    "A000827": ("CONTROL", ["TEXT_BEARING"], "CHECKED"),
+    "A000828": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000829": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000830": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000831": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000832": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000833": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000834": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000835": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000836": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000837": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000838": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000839": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000840": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000841": ("OBSERVER", [], "NOT_REQUIRED"),
+    "A000842": ("OBSERVER", [], "NOT_REQUIRED"),
+}
+EXPECTED_ASSET_ROLE_COUNTS = {
+    "NATIVE_EVIDENCE": 13,
+    "RELATION": 1,
+    "CONTROL": 11,
+    "OBSERVER": 36,
+    "DECORATIVE": 1,
+    "SOURCE_DEFECT": 1,
+}
+
+
 def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
     manifest = json.loads((bundle / "allowed-manifest.json").read_text())
     if (
@@ -3814,18 +4007,13 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
         candidate_links_by_image,
         anchor_links_by_unit,
     ) = allocate(readings, assets)
-    direct_image_paths = {
-        ev["image_path"]
-        for proposal in candidates
-        for ev in proposal["source_evidence"]
-        if ev["image_path"] is not None
-        and ev["strength"]
-        in {
-            "DIRECT_IDENTITY",
-            "DIRECT_PARTIAL_MECHANICS",
-            "DIRECT_COMPLETE_MECHANICS",
-        }
-    }
+    if {row["asset_id"] for row in assets} != set(ASSET_REVIEW):
+        raise AuthoringError("static asset review does not exactly cover the assignment")
+    observed_role_counts: defaultdict[str, int] = defaultdict(int)
+    for role, _risks, _transcription in ASSET_REVIEW.values():
+        observed_role_counts[role] += 1
+    if dict(observed_role_counts) != EXPECTED_ASSET_ROLE_COUNTS:
+        raise AuthoringError("static asset-role totals changed")
     specs_sorted = sorted(
         ALL_CANDIDATES,
         key=lambda spec: next(
@@ -3907,25 +4095,16 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
     asset_updates: list[dict[str, str]] = []
     for original in assets:
         row = deepcopy(original)
+        asset_id = row["asset_id"]
         path = row["physical_path"]
         uid = row["source_unit_id"]
         cids = candidate_links_by_image.get(path, [])
-        if path == "CHAPTERS/_page_130_Chapter_Opener.jpeg":
-            role = "DECORATIVE"
-            risks: list[str] = []
-            transcription = "NOT_REQUIRED"
+        role, risks, transcription = ASSET_REVIEW[asset_id]
+        if role == "DECORATIVE":
             status = "CLEAR"
             uncertainty = ""
             statement = "Original-resolution inspection confirms a decorative chapter opener with no construction-bearing content."
-        elif uid in DEFECT_UNITS:
-            role = "SOURCE_DEFECT"
-            risks = [
-                "CONSTRUCTION_BEARING",
-                "TEXT_BEARING",
-                "AMBIGUOUS",
-                "CAPTION_INCOMPLETE",
-            ]
-            transcription = "CHECKED"
+        elif role == "SOURCE_DEFECT":
             status = "DEFECTIVE"
             uncertainty = DEFECT_UNITS[uid]
             statement = (
@@ -3934,27 +4113,39 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
                 "the next plot row. It is linked only as DEFECT_LIMITED "
                 f"evidence to {', '.join(cids)}."
             )
-        elif path in direct_image_paths:
-            role = "NATIVE_EVIDENCE"
-            risks = ["CONSTRUCTION_BEARING", "TEXT_BEARING"]
-            transcription = "CHECKED"
+        elif role == "NATIVE_EVIDENCE":
             status = "CLEAR"
             uncertainty = ""
             statement = (
-                "Original-resolution inspection and independent transcription "
-                "confirm direct identity or mechanics evidence"
+                "Original-resolution inspection confirms native identity or "
+                "mechanics evidence"
                 + (f" for {', '.join(cids)}." if cids else ".")
             )
-        else:
-            role = "OBSERVER"
-            risks = []
-            transcription = "NOT_REQUIRED"
+        elif role == "CONTROL":
             status = "CLEAR"
             uncertainty = ""
             statement = (
-                "Thumbnail/context review and source-preserving inspection "
-                "confirm an output history, plot, mesh, finite digit display, "
-                "or alternative representation rather than independent mechanics"
+                "Original-resolution inspection confirms a parameter, seed, "
+                "or comparison control and its resulting display, not an "
+                "independent complete law"
+                + (f" for {', '.join(cids)}." if cids else ".")
+            )
+        elif role == "RELATION":
+            status = "CLEAR"
+            uncertainty = ""
+            statement = (
+                "Original-resolution inspection confirms a construction-bearing "
+                "relation among distinct represented systems without merging "
+                "their identities"
+                + (f"; linked candidates: {', '.join(cids)}." if cids else ".")
+            )
+        else:
+            status = "CLEAR"
+            uncertainty = ""
+            statement = (
+                "Original-resolution inspection confirms an output history, "
+                "plot, mesh, finite digit display, or alternative representation "
+                "rather than independent mechanics"
                 + (f" supporting {', '.join(cids)}." if cids else ".")
             )
         row.update(
