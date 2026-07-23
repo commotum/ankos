@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "fixed_point": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "phase": {
+      "const": "blind_discovery"
+    },
+    "rounds": {
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "tool_assumptions": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "vocabulary": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "phase",
+    "tool_assumptions",
+    "vocabulary",
+    "rounds",
+    "fixed_point"
+  ],
+  "title": "Blind search rounds",
+  "type": "object"
+}

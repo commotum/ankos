@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "attempts": {
+      "type": "string"
+    },
+    "defect_boundary": {
+      "type": "string"
+    },
+    "expected_topic": {
+      "type": "string"
+    },
+    "literal_target": {
+      "type": "string"
+    },
+    "owning_stage": {
+      "type": "string"
+    },
+    "route_id": {
+      "type": "string"
+    },
+    "route_kind": {
+      "enum": [
+        "PAGE",
+        "SECTION",
+        "NOTES",
+        "INDEX",
+        "ALIAS",
+        "OTHER"
+      ],
+      "type": "string"
+    },
+    "source_unit_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "PENDING",
+        "RESOLVED",
+        "MISSING_TARGET_FINAL"
+      ],
+      "type": "string"
+    },
+    "target_unit_ids": {
+      "type": "string"
+    },
+    "vocabulary_terms": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "route_id",
+    "source_unit_id",
+    "literal_target",
+    "route_kind",
+    "expected_topic",
+    "owning_stage",
+    "status",
+    "target_unit_ids",
+    "attempts",
+    "vocabulary_terms",
+    "defect_boundary"
+  ],
+  "title": "Blind cross-reference row",
+  "type": "object"
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_id": {
+      "pattern": "^B[0-9]{4}$",
+      "type": "string"
+    },
+    "existing_t_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "proposed_t_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reconciliation_result": {
+      "type": "string"
+    },
+    "source_unit_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "candidate_id",
+    "existing_t_ids",
+    "proposed_t_id",
+    "source_unit_ids",
+    "reconciliation_result"
+  ],
+  "title": "Stage 19+ coverage join row",
+  "type": "object"
+}

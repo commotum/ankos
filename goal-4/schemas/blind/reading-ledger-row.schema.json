@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "block_kind": {
+      "type": "string"
+    },
+    "byte_end": {
+      "type": "string"
+    },
+    "byte_start": {
+      "type": "string"
+    },
+    "candidate_ids": {
+      "type": "string"
+    },
+    "document_order": {
+      "type": "string"
+    },
+    "evidence_statement": {
+      "type": "string"
+    },
+    "global_line_end": {
+      "type": "string"
+    },
+    "global_line_start": {
+      "type": "string"
+    },
+    "line_end": {
+      "type": "string"
+    },
+    "line_start": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string"
+    },
+    "review_disposition": {
+      "enum": [
+        "",
+        "CANDIDATE",
+        "SUPPORTS_CANDIDATE",
+        "CROSS_REFERENCE",
+        "REPRESENTATION_OR_OBSERVER",
+        "APPLICATION_OR_EMULATION",
+        "HISTORICAL_ONLY",
+        "NO_CONSTRUCTION",
+        "SOURCE_DEFECT_OR_AMBIGUITY"
+      ],
+      "type": "string"
+    },
+    "review_stage": {
+      "type": "string"
+    },
+    "review_status": {
+      "enum": [
+        "PENDING",
+        "REVIEWED"
+      ],
+      "type": "string"
+    },
+    "reviewer": {
+      "type": "string"
+    },
+    "route_ids": {
+      "type": "string"
+    },
+    "secondary_roles": {
+      "type": "string"
+    },
+    "source_status": {
+      "enum": [
+        "",
+        "CLEAR",
+        "AMBIGUOUS",
+        "DEFECTIVE",
+        "CONFLICTING"
+      ],
+      "type": "string"
+    },
+    "source_unit_id": {
+      "type": "string"
+    },
+    "unit_sha256": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "source_unit_id",
+    "document_order",
+    "path",
+    "block_kind",
+    "byte_start",
+    "byte_end",
+    "line_start",
+    "line_end",
+    "global_line_start",
+    "global_line_end",
+    "unit_sha256",
+    "review_status",
+    "review_disposition",
+    "source_status",
+    "secondary_roles",
+    "candidate_ids",
+    "route_ids",
+    "evidence_statement",
+    "review_stage",
+    "reviewer"
+  ],
+  "title": "Blind reading-ledger row",
+  "type": "object"
+}

@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "asset_id": {
+      "type": "string"
+    },
+    "assignment_basis": {
+      "type": "string"
+    },
+    "assignment_path": {
+      "type": "string"
+    },
+    "assignment_stage": {
+      "type": "string"
+    },
+    "bytes": {
+      "type": "string"
+    },
+    "candidate_ids": {
+      "type": "string"
+    },
+    "evidence_statement": {
+      "type": "string"
+    },
+    "inspection_status": {
+      "enum": [
+        "PENDING",
+        "SCREENED"
+      ],
+      "type": "string"
+    },
+    "link_id": {
+      "type": "string"
+    },
+    "original_resolution_status": {
+      "enum": [
+        "NOT_REVIEWED",
+        "NOT_REQUIRED",
+        "REVIEWED"
+      ],
+      "type": "string"
+    },
+    "physical_path": {
+      "type": "string"
+    },
+    "reference_status": {
+      "enum": [
+        "REFERENCED",
+        "UNREFERENCED_PHYSICAL"
+      ],
+      "type": "string"
+    },
+    "review_stage": {
+      "type": "string"
+    },
+    "reviewer": {
+      "type": "string"
+    },
+    "sha256": {
+      "type": "string"
+    },
+    "source_path": {
+      "type": "string"
+    },
+    "source_unit_id": {
+      "type": "string"
+    },
+    "transcription_status": {
+      "enum": [
+        "NOT_APPLICABLE",
+        "NOT_REQUIRED",
+        "CHECKED"
+      ],
+      "type": "string"
+    },
+    "uncertainty": {
+      "type": "string"
+    },
+    "visual_role": {
+      "enum": [
+        "",
+        "NATIVE_EVIDENCE",
+        "RELATION",
+        "CONTROL",
+        "OBSERVER",
+        "DECORATIVE",
+        "SOURCE_DEFECT"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "asset_id",
+    "link_id",
+    "physical_path",
+    "sha256",
+    "bytes",
+    "source_path",
+    "source_unit_id",
+    "assignment_path",
+    "assignment_stage",
+    "assignment_basis",
+    "reference_status",
+    "inspection_status",
+    "visual_role",
+    "original_resolution_status",
+    "transcription_status",
+    "candidate_ids",
+    "evidence_statement",
+    "review_stage",
+    "reviewer",
+    "uncertainty"
+  ],
+  "title": "Blind asset-ledger row",
+  "type": "object"
+}

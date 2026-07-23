@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_id": {
+      "pattern": "^B[0-9]{4}$",
+      "type": "string"
+    },
+    "catalog_action": {
+      "type": "string"
+    },
+    "evidence_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "family_action": {
+      "type": "string"
+    },
+    "family_relations": {
+      "type": "array"
+    },
+    "hostile_review_required": {
+      "type": "boolean"
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "semantic_role": {
+      "type": "string"
+    },
+    "semantic_subtype": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "candidate_id",
+    "catalog_action",
+    "semantic_role",
+    "semantic_subtype",
+    "family_action",
+    "family_relations",
+    "rationale",
+    "evidence_ids",
+    "hostile_review_required"
+  ],
+  "title": "Stage 20 classification row",
+  "type": "object"
+}
