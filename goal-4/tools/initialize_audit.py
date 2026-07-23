@@ -11,6 +11,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+import audit_transaction
 from audit_contract import (
     ASSET_HEADER,
     CROSS_REFERENCE_HEADER,
@@ -196,6 +197,12 @@ def main() -> int:
     parser.add_argument("--check-initial", action="store_true")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
+
+    try:
+        audit_transaction.require_clean(GOAL_DIR)
+    except audit_transaction.TransactionError as exc:
+        print(f"refusing initialization while transaction is pending: {exc}")
+        return 1
 
     artifacts = expected_artifacts()
     if args.check_initial:

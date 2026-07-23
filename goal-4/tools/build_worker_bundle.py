@@ -18,6 +18,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+import audit_transaction
 from audit_contract import (
     ASSET_HEADER,
     GOAL_DIR,
@@ -649,6 +650,27 @@ def discovery_anchor_orders(
 
 
 def build_bundle(
+    output: Path,
+    worker_id: str,
+    stage: int,
+    requested_paths: list[str],
+    epoch: int = 1,
+) -> None:
+    """Build from one cooperative atomic Goal-4 ledger snapshot."""
+    try:
+        with audit_transaction.read_guard(GOAL_DIR):
+            _build_bundle_locked(
+                output,
+                worker_id,
+                stage,
+                requested_paths,
+                epoch,
+            )
+    except audit_transaction.TransactionError as exc:
+        raise ValueError(str(exc)) from exc
+
+
+def _build_bundle_locked(
     output: Path,
     worker_id: str,
     stage: int,
@@ -1525,6 +1547,21 @@ def _validate_worker_output(
 
 
 def verify_bundle(
+    bundle: Path,
+    require_completed_output: bool = False,
+) -> list[str]:
+    """Verify against one cooperative atomic Goal-4 ledger snapshot."""
+    try:
+        with audit_transaction.read_guard(GOAL_DIR):
+            return _verify_bundle_locked(
+                bundle,
+                require_completed_output=require_completed_output,
+            )
+    except audit_transaction.TransactionError as exc:
+        return [str(exc)]
+
+
+def _verify_bundle_locked(
     bundle: Path,
     require_completed_output: bool = False,
 ) -> list[str]:

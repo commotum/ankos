@@ -278,6 +278,88 @@ def test_crash_before_pending_publication_leaves_safe_removable_orphan(
     assert sorted(goal.glob(f"{transaction.BUILD_PREFIX}*")) == []
 
 
+def test_error_after_pending_rename_before_prepare_return_is_recovered(
+    tmp_path: Path,
+) -> None:
+    goal, base, proposed, modes = _make_goal(tmp_path)
+
+    with pytest.raises(
+        transaction.TransactionApplyError,
+        match="recovery action=CLEARED_BASE",
+    ):
+        transaction.apply_transaction(
+            goal,
+            base,
+            proposed,
+            modes,
+            fault_injector=_error_on("apply:after_pending_publish"),
+        )
+
+    assert _state_bytes(goal) == base
+    assert _state_modes(goal) == modes
+    assert not os.path.lexists(goal / transaction.PENDING_NAME)
+
+
+def test_persistent_cleanup_error_returns_verified_commit_with_deferred_cleanup(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    goal, base, proposed, modes = _make_goal(tmp_path)
+    real_rmtree = transaction.shutil.rmtree
+
+    def fail_cleanup(path: Path, *args: Any, **kwargs: Any) -> None:
+        if Path(path).name.startswith(transaction.CLEANUP_PREFIX):
+            raise OSError("persistent cleanup failure")
+        real_rmtree(path, *args, **kwargs)
+
+    monkeypatch.setattr(transaction.shutil, "rmtree", fail_cleanup)
+    result = transaction.apply_transaction(goal, base, proposed, modes)
+
+    assert result.state == "COMMITTED"
+    assert result.cleanup_deferred is True
+    assert _state_bytes(goal) == proposed
+    assert _state_modes(goal) == modes
+    assert not os.path.lexists(goal / transaction.PENDING_NAME)
+    assert len(list(goal.glob(f"{transaction.CLEANUP_PREFIX}*"))) == 1
+
+    monkeypatch.setattr(transaction.shutil, "rmtree", real_rmtree)
+    assert transaction.recover_transaction(goal).action == "NO_PENDING"
+    assert list(goal.glob(f"{transaction.CLEANUP_PREFIX}*")) == []
+
+
+def test_orphan_only_cleanup_failure_does_not_claim_pending_retention(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    goal, base, proposed, modes = _make_goal(tmp_path)
+    with pytest.raises(SimulatedCrash):
+        transaction.apply_transaction(
+            goal,
+            base,
+            proposed,
+            modes,
+            fault_injector=_crash_on("apply:before_publish"),
+        )
+    assert not os.path.lexists(goal / transaction.PENDING_NAME)
+
+    real_rmtree = transaction.shutil.rmtree
+
+    def fail_orphan(path: Path, *args: Any, **kwargs: Any) -> None:
+        if Path(path).name.startswith(transaction.BUILD_PREFIX):
+            raise OSError("orphan cleanup failure")
+        real_rmtree(path, *args, **kwargs)
+
+    monkeypatch.setattr(transaction.shutil, "rmtree", fail_orphan)
+    with pytest.raises(
+        transaction.TransactionRecoveryError,
+        match="no canonical pending transaction",
+    ) as caught:
+        transaction.recover_transaction(goal)
+
+    assert "canonical staged state was retained" not in str(caught.value)
+    assert len(list(goal.glob(f"{transaction.BUILD_PREFIX}*"))) == 1
+
+
 def test_mixed_prepared_state_rolls_back_to_staged_base(
     tmp_path: Path,
 ) -> None:

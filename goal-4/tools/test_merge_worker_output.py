@@ -577,7 +577,7 @@ def _search_enrichment_fixture(
         candidate_updates.append(second)
     proposal = {
         "schema_version": 1,
-        "proposal_kind": "SEARCH_ENRICHMENT",
+        "proposal_kind": "SEARCH_APPEND",
         "coordinator_id": "search-enrichment-coordinator",
         "epoch": 1,
         "source_paths": [ASSIGNMENT_PATH],
@@ -645,7 +645,30 @@ def _add_local_closure(
     round_record["result_digest"] = digest
     round_record["rerun_digest"] = digest
     search["rounds"].append(round_record)
-    search_path.write_bytes(canonical_json_bytes(search))
+    proposal = {
+        "schema_version": 1,
+        "proposal_kind": "SEARCH_APPEND",
+        "coordinator_id": "deterministic-local-closure-coordinator",
+        "epoch": epoch,
+        "source_paths": [],
+        "base_artifact_sha256": {
+            name: hashlib.sha256((goal / name).read_bytes()).hexdigest()
+            for name in merge.WRITE_NAMES
+        },
+        "reading_updates": [],
+        "asset_updates": [],
+        "candidate_updates": [],
+        "route_appends": [],
+        "proposed_search": search,
+    }
+    proposal_path = (
+        goal.parent
+        / f"local-closure-stage-{stage}-epoch-{epoch}.json"
+    )
+    proposal_path.write_bytes(canonical_json_bytes(proposal))
+    merge.apply_merge(
+        merge.prepare_search_append(proposal_path, goal_dir=goal)
+    )
 
 
 def test_default_cli_is_dry_run_and_rewrites_all_id_families(
@@ -671,7 +694,7 @@ def test_default_cli_is_dry_run_and_rewrites_all_id_families(
     assert completed.returncode == 0, completed.stderr
     preview = json.loads(completed.stdout)
     assert preview["mode"] == "dry-run"
-    assert preview["review_ids"] == ["V000001", "V000002"]
+    assert preview["review_ids"] == ["V000001"]
     assert preview["review_mode"] == "INITIAL"
     assert preview["mappings"] == {
         "candidates": {"W0001": "B0001"},
@@ -701,13 +724,9 @@ def test_apply_uses_validated_staged_ledgers_and_preserves_search(
 
     assert (goal / merge.SEARCH_NAME).read_bytes() == search_before
     history = merge._read_jsonl(goal / merge.REVIEW_HISTORY_NAME)
-    assert [event["review_id"] for event in history] == ["V000001", "V000002"]
-    assert [event["source_paths"] for event in history] == [
-        [FIRST_STAGE_4_PATH],
-        [ASSIGNMENT_PATH],
-    ]
+    assert [event["review_id"] for event in history] == ["V000001"]
+    assert history[0]["source_paths"] == INITIAL_STAGE_4_PREFIX
     assert history[0]["previous_event_sha256"] is None
-    assert history[1]["previous_event_sha256"] == history[0]["event_sha256"]
     candidates = merge._read_jsonl(goal / merge.CANDIDATE_NAME)
     routes = merge._read_csv(
         goal / merge.ROUTE_NAME,
@@ -716,15 +735,16 @@ def test_apply_uses_validated_staged_ledgers_and_preserves_search(
     reading = merge._read_csv(goal / merge.READING_NAME, READING_HEADER)
     assets = merge._read_csv(goal / merge.ASSET_NAME, ASSET_HEADER)
     assert [row["id"] for row in candidates] == ["B0001"]
-    assert history[0]["candidate_changes"] == []
-    assert len(history[1]["candidate_changes"]) == 1
-    create = history[1]["candidate_changes"][0]
+    assert len(history[0]["candidate_changes"]) == 1
+    create = history[0]["candidate_changes"][0]
     assert create["action"] == "CREATE"
     assert create["candidate_id"] == "B0001"
     assert create["previous_candidate_result_sha256"] is None
     assert create["before_candidate"] is None
     assert create["before_candidate_sha256"] is None
     assert create["after_candidate"] == candidates[0]
+    assert len(history[0]["route_changes"]) == 1
+    assert history[0]["route_changes"][0]["after_route"] == routes[0]
     assert [row["route_id"] for row in routes] == ["R000001"]
     assert [
         item["evidence_id"] for item in candidates[0]["source_evidence"]
@@ -745,133 +765,50 @@ def test_apply_uses_validated_staged_ledgers_and_preserves_search(
     ) == ["R000001"]
 
 
-@pytest.mark.parametrize("failure_call", [2, 3, len(merge.WRITE_NAMES)])
-def test_apply_pre_replace_failure_restores_bytes_modes_and_cleans_staging(
+def test_apply_fault_rolls_back_through_durable_transaction(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
-    failure_call: int,
 ) -> None:
     bundle = _completed_bundle(tmp_path)
     goal = _copy_global_state(tmp_path)
     plan = merge.prepare_merge(bundle, goal_dir=goal)
     before = _transaction_state(goal)
-    real_replace = merge.os.replace
-    calls = 0
-    injected = OSError(f"failure before replace call {failure_call}")
+    real_apply = merge.audit_transaction.apply_transaction
 
-    def fail_before_replace(source: Path, target: Path) -> None:
-        nonlocal calls
-        calls += 1
-        if calls == failure_call:
-            raise injected
-        real_replace(source, target)
+    def faulted_apply(
+        goal_dir: Path,
+        base_bytes: dict[str, bytes],
+        proposed_bytes: dict[str, bytes],
+        artifact_modes: dict[str, int],
+    ) -> object:
+        def inject(event: str) -> None:
+            if event == (
+                "apply:after_replace:"
+                + merge.audit_transaction.ARTIFACT_NAMES[0]
+            ):
+                raise OSError("injected durable apply failure")
 
-    monkeypatch.setattr(merge.os, "replace", fail_before_replace)
-    with pytest.raises(OSError) as caught:
-        merge.apply_merge(plan)
+        return real_apply(
+            goal_dir,
+            base_bytes,
+            proposed_bytes,
+            artifact_modes,
+            fault_injector=inject,
+        )
 
-    assert caught.value is injected
-    assert _transaction_state(goal) == before
-    assert _merge_staging_dirs(goal) == []
-
-
-@pytest.mark.parametrize("interrupt_call", [2, len(merge.WRITE_NAMES)])
-def test_apply_replace_then_interrupt_restores_every_target_and_cleans_staging(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-    interrupt_call: int,
-) -> None:
-    bundle = _completed_bundle(tmp_path)
-    goal = _copy_global_state(tmp_path)
-    plan = merge.prepare_merge(bundle, goal_dir=goal)
-    before = _transaction_state(goal)
-    real_replace = merge.os.replace
-    calls = 0
-    injected = InjectedTransactionInterrupt(
-        "replacement committed before bookkeeping"
+    monkeypatch.setattr(
+        merge.audit_transaction,
+        "apply_transaction",
+        faulted_apply,
     )
-
-    def replace_then_interrupt(source: Path, target: Path) -> None:
-        nonlocal calls
-        calls += 1
-        real_replace(source, target)
-        if calls == interrupt_call:
-            raise injected
-
-    monkeypatch.setattr(merge.os, "replace", replace_then_interrupt)
-    with pytest.raises(InjectedTransactionInterrupt) as caught:
-        merge.apply_merge(plan)
-
-    assert caught.value is injected
-    assert _transaction_state(goal) == before
-    assert _merge_staging_dirs(goal) == []
-
-
-def test_apply_final_verification_failure_rolls_back_bytes_and_modes(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    bundle = _completed_bundle(tmp_path)
-    goal = _copy_global_state(tmp_path)
-    plan = merge.prepare_merge(bundle, goal_dir=goal)
-    before = _transaction_state(goal)
-    real_replace = merge.os.replace
-    calls = 0
-    corrupt_target = goal / merge.CANDIDATE_NAME
-
-    def corrupt_after_final_replace(source: Path, target: Path) -> None:
-        nonlocal calls
-        calls += 1
-        real_replace(source, target)
-        if calls == len(merge.WRITE_NAMES):
-            corrupt_target.write_bytes(b"concurrent mutation\n")
-            corrupt_target.chmod(0o600)
-
-    monkeypatch.setattr(merge.os, "replace", corrupt_after_final_replace)
     with pytest.raises(
         merge.MergeError,
-        match="applied ledger differs from staged bytes",
+        match="recovery action=ROLLED_BACK_MIXED",
     ):
         merge.apply_merge(plan)
 
     assert _transaction_state(goal) == before
-    assert _merge_staging_dirs(goal) == []
-
-
-def test_apply_rollback_failure_retains_recovery_staging(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    bundle = _completed_bundle(tmp_path)
-    goal = _copy_global_state(tmp_path)
-    plan = merge.prepare_merge(bundle, goal_dir=goal)
-    real_replace = merge.os.replace
-    calls = 0
-
-    def fail_commit_then_rollback(source: Path, target: Path) -> None:
-        nonlocal calls
-        calls += 1
-        if calls == 2:
-            raise OSError("injected commit failure")
-        if calls == 4:
-            raise InjectedTransactionInterrupt("injected rollback failure")
-        real_replace(source, target)
-
-    monkeypatch.setattr(merge.os, "replace", fail_commit_then_rollback)
-    with pytest.raises(
-        merge.MergeError,
-        match="rollback also failed",
-    ) as caught:
-        merge.apply_merge(plan)
-
-    recovery_dirs = _merge_staging_dirs(goal)
-    assert len(recovery_dirs) == 1
-    assert str(recovery_dirs[0]) in str(caught.value)
-    recovery_copy = recovery_dirs[0] / "old" / merge.CANDIDATE_NAME
-    assert recovery_copy.read_bytes() == plan.original_bytes[merge.CANDIDATE_NAME]
-    assert (
-        recovery_copy.stat().st_mode & 0o777
-    ) == plan.original_modes[merge.CANDIDATE_NAME]
+    assert not (goal / merge.audit_transaction.PENDING_NAME).exists()
 
 
 def test_bad_completed_bundle_is_rejected(tmp_path: Path) -> None:
@@ -1329,7 +1266,7 @@ def test_search_enrichment_default_dry_run_then_transactional_apply(
         [
             sys.executable,
             str(TOOLS_DIR / "merge_worker_output.py"),
-            "--search-enrichment",
+            "--search-append",
             str(proposal_path),
             "--goal-dir",
             str(goal),
@@ -1341,12 +1278,12 @@ def test_search_enrichment_default_dry_run_then_transactional_apply(
     assert completed.returncode == 0, completed.stderr
     preview = json.loads(completed.stdout)
     assert preview["mode"] == "dry-run"
-    assert preview["proposal_kind"] == "SEARCH_ENRICHMENT"
+    assert preview["proposal_kind"] == "SEARCH_APPEND"
     assert preview["review_ids"] == ["V000003"]
     assert preview["trigger_hit_ids"] == [governed_hit_id]
     assert _transaction_state(goal) == before
 
-    plan = merge.prepare_search_enrichment(proposal_path, goal_dir=goal)
+    plan = merge.prepare_search_append(proposal_path, goal_dir=goal)
     merge.apply_merge(plan)
     reading = merge._read_csv(goal / merge.READING_NAME, READING_HEADER)
     row = next(item for item in reading if item["source_unit_id"] == unit_id)
@@ -1362,7 +1299,7 @@ def test_search_enrichment_default_dry_run_then_transactional_apply(
     assert [event["mode"] for event in history] == [
         "INITIAL",
         "INITIAL",
-        "SEARCH_ENRICHMENT",
+        "SEARCH_APPEND",
     ]
     enrichment = history[-1]
     assert enrichment["trigger_hit_ids"] == [governed_hit_id]
@@ -1439,7 +1376,7 @@ def test_search_enrichment_rejects_unauthorized_and_immutable_deltas(
         path = tmp_path / f"{name}.json"
         path.write_bytes(canonical_json_bytes(mutation))
         with pytest.raises(merge.MergeError, match=message):
-            merge.prepare_search_enrichment(path, goal_dir=goal)
+            merge.prepare_search_append(path, goal_dir=goal)
 
 
 def test_search_enrichment_rejects_forbidden_coordinator_identity(
@@ -1452,7 +1389,7 @@ def test_search_enrichment_rejects_forbidden_coordinator_identity(
     forbidden.write_bytes(canonical_json_bytes(proposal))
 
     with pytest.raises(merge.MergeError, match="prohibited"):
-        merge.prepare_search_enrichment(forbidden, goal_dir=goal)
+        merge.prepare_search_append(forbidden, goal_dir=goal)
 
 
 def test_search_enrichment_rejects_multi_path_candidate_transaction(
@@ -1468,7 +1405,7 @@ def test_search_enrichment_rejects_multi_path_candidate_transaction(
         merge.MergeError,
         match="must target exactly one source path",
     ):
-        merge.prepare_search_enrichment(multi_path, goal_dir=goal)
+        merge.prepare_search_append(multi_path, goal_dir=goal)
 
 
 def test_search_enrichment_rollback_restores_history_and_all_ledgers(
@@ -1476,7 +1413,7 @@ def test_search_enrichment_rollback_restores_history_and_all_ledgers(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     goal, proposal_path, _, _ = _search_enrichment_fixture(tmp_path)
-    plan = merge.prepare_search_enrichment(proposal_path, goal_dir=goal)
+    plan = merge.prepare_search_append(proposal_path, goal_dir=goal)
     before = _transaction_state(goal)
     real_replace = merge.os.replace
     calls = 0
@@ -1506,7 +1443,7 @@ def test_search_enrichment_appends_evidence_to_existing_active_candidate(
         tmp_path
     )
     merge.apply_merge(
-        merge.prepare_search_enrichment(first_proposal, goal_dir=goal)
+        merge.prepare_search_append(first_proposal, goal_dir=goal)
     )
     units = merge._read_jsonl(goal / merge.UNITS_NAME)
     query = {
@@ -1608,7 +1545,7 @@ def test_search_enrichment_appends_evidence_to_existing_active_candidate(
     candidate["evidence_strength"].append("CORROBORATING")
     proposal = {
         "schema_version": 1,
-        "proposal_kind": "SEARCH_ENRICHMENT",
+        "proposal_kind": "SEARCH_APPEND",
         "coordinator_id": "second-search-enrichment-coordinator",
         "epoch": 1,
         "source_paths": [ASSIGNMENT_PATH],
@@ -1636,9 +1573,9 @@ def test_search_enrichment_appends_evidence_to_existing_active_candidate(
         merge.MergeError,
         match="deletes or rewrites prior provenance",
     ):
-        merge.prepare_search_enrichment(inserted_path, goal_dir=goal)
+        merge.prepare_search_append(inserted_path, goal_dir=goal)
 
-    plan = merge.prepare_search_enrichment(proposal_path, goal_dir=goal)
+    plan = merge.prepare_search_append(proposal_path, goal_dir=goal)
     assert plan.candidate_update_count == 1
     assert plan.candidate_append_count == 0
     merge.apply_merge(plan)

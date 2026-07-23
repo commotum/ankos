@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -1422,13 +1423,13 @@ def close_candidate_change(
         "previous_candidate_result_sha256": (
             previous_candidate_result_sha256
         ),
-        "before_candidate": before_candidate,
+        "before_candidate": copy.deepcopy(before_candidate),
         "before_candidate_sha256": (
             canonical_sha256(before_candidate)
             if before_candidate is not None
             else None
         ),
-        "after_candidate": after_candidate,
+        "after_candidate": copy.deepcopy(after_candidate),
         "after_candidate_sha256": canonical_sha256(after_candidate),
     }
 
@@ -1444,11 +1445,11 @@ def close_route_change(
         "action": action,
         "route_id": after_route["route_id"],
         "previous_route_result_sha256": previous_route_result_sha256,
-        "before_route": before_route,
+        "before_route": copy.deepcopy(before_route),
         "before_route_sha256": (
             canonical_sha256(before_route) if before_route is not None else None
         ),
-        "after_route": after_route,
+        "after_route": copy.deepcopy(after_route),
         "after_route_sha256": canonical_sha256(after_route),
     }
 
@@ -1466,9 +1467,9 @@ def close_search_change(
             if previous_search_result_sha256 is None
             else previous_search_result_sha256
         ),
-        "before_search": before_search,
+        "before_search": copy.deepcopy(before_search),
         "before_search_sha256": before_sha256,
-        "after_search": after_search,
+        "after_search": copy.deepcopy(after_search),
         "after_search_sha256": canonical_sha256(after_search),
     }
 
@@ -1523,10 +1524,10 @@ def close_review_event(
         "mode": core["mode"],
         "reviewer": core["reviewer"],
         "source_paths": list(core["source_paths"]),
-        "path_changes": list(core.get("path_changes", [])),
-        "candidate_changes": list(core.get("candidate_changes", [])),
-        "route_changes": list(core.get("route_changes", [])),
-        "search_change": core.get("search_change"),
+        "path_changes": copy.deepcopy(core.get("path_changes", [])),
+        "candidate_changes": copy.deepcopy(core.get("candidate_changes", [])),
+        "route_changes": copy.deepcopy(core.get("route_changes", [])),
+        "search_change": copy.deepcopy(core.get("search_change")),
         "previous_event_sha256": previous_event_sha256,
         "event_sha256": "",
     }

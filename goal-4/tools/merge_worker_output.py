@@ -246,6 +246,14 @@ class CandidateRevisionPlan:
         }
 
 
+Plan = (
+    MergePlan
+    | SearchAppendPlan
+    | RouteResolutionPlan
+    | CandidateRevisionPlan
+)
+
+
 SEARCH_APPEND_PROPOSAL_FIELDS = (
     "schema_version",
     "proposal_kind",
@@ -1323,6 +1331,24 @@ def _canonical_audit_paths(
             "source_paths are not in canonical audit order"
         )
     return canonical
+
+
+def _ordered_audit_paths(
+    manifest: dict[str, Any],
+    paths: set[str],
+) -> list[str]:
+    document_by_path = {
+        document["path"]: document for document in manifest["documents"]
+    }
+    if not paths or any(path not in document_by_path for path in paths):
+        raise MergeError("derived source paths are empty or outside the corpus")
+    return sorted(
+        paths,
+        key=lambda path: (
+            validate_audit.stage_for_document(document_by_path[path]),
+            int(document_by_path[path]["order"]),
+        ),
+    )
 
 
 def _validate_monotonic_search_append(
@@ -3073,9 +3099,7 @@ def _prepare_route_resolution_locked(
         )
         update_by_id[route_id] = update
     route_changes.sort(key=lambda change: int(change["route_id"][1:]))
-    source_paths = tuple(
-        _canonical_audit_paths(manifest, list(resolution_paths))
-    )
+    source_paths = tuple(_ordered_audit_paths(manifest, resolution_paths))
     proposed_routes = [
         update_by_id.get(route["route_id"], route) for route in routes
     ]
@@ -3173,8 +3197,436 @@ def _prepare_route_resolution_locked(
     )
 
 
+def prepare_candidate_revision(
+    proposal_path: Path,
+    *,
+    goal_dir: Path = GOAL_DIR,
+) -> CandidateRevisionPlan:
+    """Plan one Stage-18 candidate lifecycle transaction."""
+    try:
+        with audit_transaction.read_guard(goal_dir):
+            return _prepare_candidate_revision_locked(
+                proposal_path,
+                goal_dir=goal_dir,
+            )
+    except audit_transaction.TransactionError as exc:
+        raise MergeError(str(exc)) from exc
+
+
+def _prepare_candidate_revision_locked(
+    proposal_path: Path,
+    *,
+    goal_dir: Path,
+) -> CandidateRevisionPlan:
+    proposal_path = proposal_path.resolve()
+    goal_dir = goal_dir.resolve()
+    proposal_bytes, proposal = _load_coordinator_proposal(
+        proposal_path,
+        kind="CANDIDATE_REVISION",
+        schema=_candidate_revision_proposal_schema(),
+    )
+    original_bytes, original_modes = _snapshot(goal_dir)
+    _require_base_artifact_digests(
+        proposal,
+        original_bytes,
+        "CANDIDATE_REVISION",
+    )
+    try:
+        (
+            manifest,
+            units,
+            reading,
+            candidates,
+            routes,
+            assets,
+            search,
+            review_history,
+        ) = _load_audit_state(original_bytes)
+    except (KeyError, TypeError, ValueError) as exc:
+        raise MergeError(f"cannot load current audit state: {exc}") from exc
+    current_errors = validate_audit.validate_objects(
+        manifest,
+        units,
+        reading,
+        candidates,
+        routes,
+        assets,
+        search,
+        review_history,
+    )
+    if current_errors:
+        raise MergeError(
+            "CANDIDATE_REVISION requires a valid current audit state:\n- "
+            + "\n- ".join(current_errors)
+        )
+    if any(row["review_status"] != "REVIEWED" for row in reading) or any(
+        row["inspection_status"] != "SCREENED" for row in assets
+    ):
+        raise MergeError(
+            "CANDIDATE_REVISION requires complete source and asset review"
+        )
+    epoch = proposal["epoch"]
+    if epoch != _active_review_epoch(review_history):
+        raise MergeError("CANDIDATE_REVISION must use the active review epoch")
+
+    candidate_by_id = {
+        candidate["id"]: candidate for candidate in candidates
+    }
+    latest_candidate_digests = _latest_version_digests(
+        review_history,
+        changes_field="candidate_changes",
+        id_field="candidate_id",
+        digest_field="after_candidate_sha256",
+    )
+    candidate_update_by_id: dict[str, dict[str, Any]] = {}
+    candidate_changes: list[dict[str, Any]] = []
+    appended_candidates: list[dict[str, Any]] = []
+    appended_evidence: list[dict[str, Any]] = []
+    definitive_evidence_ids: set[str] = set()
+    prefix_fields = (
+        "aliases",
+        "source_unit_ids",
+        "source_evidence",
+        "source_status",
+        "image_witnesses",
+        "evidence_strength",
+        "parameters",
+        "variants",
+        "missing_mechanics",
+        "uncertainties",
+        "related_candidate_ids",
+        "cross_reference_ids",
+        "evidence_reassignments",
+    )
+    for raw_update in proposal["candidate_updates"]:
+        update = _canonical_candidate_record(raw_update)
+        candidate_id = update["id"]
+        if candidate_id in candidate_update_by_id:
+            raise MergeError(
+                f"duplicate candidate revision update: {candidate_id}"
+            )
+        before = candidate_by_id.get(candidate_id)
+        if before is None:
+            appended_candidates.append(update)
+            candidate_changes.append(
+                close_candidate_change("CREATE", update)
+            )
+            prior_evidence_count = 0
+            prior_relation_count = 0
+        else:
+            if update == before:
+                raise MergeError(
+                    f"candidate revision is unchanged: {candidate_id}"
+                )
+            for field in (
+                "id",
+                "provisional_name",
+                "discovery_stage",
+                "discovery_anchor",
+            ):
+                if update[field] != before[field]:
+                    raise MergeError(
+                        f"candidate {candidate_id} changes immutable {field}"
+                    )
+            before_status = before["record_status"]
+            after_status = update["record_status"]
+            if (
+                before_status != "ACTIVE"
+                and after_status != before_status
+            ) or (
+                before_status == "ACTIVE"
+                and after_status
+                not in {
+                    "ACTIVE",
+                    "MERGED_REDIRECT",
+                    "SPLIT_SUPERSEDED",
+                }
+            ):
+                raise MergeError(
+                    f"candidate {candidate_id} has an invalid lifecycle transition"
+                )
+            for field in prefix_fields:
+                old_values = before[field]
+                new_values = update[field]
+                if (
+                    not isinstance(old_values, list)
+                    or not isinstance(new_values, list)
+                    or not _is_exact_prefix(old_values, new_values)
+                ):
+                    raise MergeError(
+                        f"candidate {candidate_id}.{field} rewrites prior provenance"
+                    )
+            previous_digest = latest_candidate_digests.get(candidate_id)
+            if previous_digest is None:
+                raise MergeError(
+                    f"candidate {candidate_id} lacks a prior version digest"
+                )
+            candidate_changes.append(
+                close_candidate_change(
+                    "UPDATE",
+                    update,
+                    before_candidate=before,
+                    previous_candidate_result_sha256=previous_digest,
+                )
+            )
+            prior_evidence_count = len(before["source_evidence"])
+            prior_relation_count = len(before["related_candidate_ids"])
+        appended_evidence.extend(
+            update["source_evidence"][prior_evidence_count:]
+        )
+        for relation in update["related_candidate_ids"][
+            prior_relation_count:
+        ]:
+            if (
+                isinstance(relation, dict)
+                and relation.get("relation")
+                in {"MERGED_INTO", "SPLIT_INTO"}
+            ):
+                definitive_evidence_ids.update(
+                    evidence_id
+                    for evidence_id in relation.get("evidence_ids", [])
+                    if isinstance(evidence_id, str)
+                )
+        candidate_update_by_id[candidate_id] = update
+    candidate_changes.sort(
+        key=lambda change: int(change["candidate_id"][1:])
+    )
+    proposed_candidates = [
+        candidate_update_by_id.get(candidate["id"], candidate)
+        for candidate in candidates
+    ] + appended_candidates
+    _sequence(
+        [candidate["id"] for candidate in proposed_candidates],
+        "B",
+        4,
+        "proposed candidate",
+    )
+    proposed_evidence_ids, proposed_group_ids = (
+        _existing_evidence_sequences(proposed_candidates)
+    )
+    _sequence(proposed_evidence_ids, "E", 6, "proposed evidence")
+    _sequence(proposed_group_ids, "G", 6, "proposed evidence-group")
+    proposed_candidate_ids = {
+        candidate["id"] for candidate in proposed_candidates
+    }
+
+    reading_by_id = {row["source_unit_id"]: row for row in reading}
+    reading_update_by_id: dict[str, dict[str, str]] = {}
+    revision_paths: set[str] = set()
+    for update in proposal["reading_updates"]:
+        unit_id = update["source_unit_id"]
+        if unit_id in reading_update_by_id:
+            raise MergeError(
+                f"duplicate candidate-revision reading update: {unit_id}"
+            )
+        before = reading_by_id.get(unit_id)
+        if before is None:
+            raise MergeError(
+                f"candidate-revision reading row is unknown: {unit_id}"
+            )
+        changed_fields = {
+            field for field in READING_HEADER if update[field] != before[field]
+        }
+        if changed_fields != {"candidate_ids"}:
+            raise MergeError(
+                f"candidate revision may change only reading candidate_ids: {unit_id}"
+            )
+        if not set(
+            _json_array(
+                update["candidate_ids"],
+                f"reading {unit_id}.candidate_ids",
+            )
+        ).issubset(proposed_candidate_ids):
+            raise MergeError(
+                f"reading {unit_id} links an unknown candidate"
+            )
+        reading_update_by_id[unit_id] = update
+        revision_paths.add(before["path"])
+    proposed_reading = [
+        reading_update_by_id.get(row["source_unit_id"], row)
+        for row in reading
+    ]
+
+    asset_by_id = {row["asset_id"]: row for row in assets}
+    asset_update_by_id: dict[str, dict[str, str]] = {}
+    for update in proposal["asset_updates"]:
+        asset_id = update["asset_id"]
+        if asset_id in asset_update_by_id:
+            raise MergeError(
+                f"duplicate candidate-revision asset update: {asset_id}"
+            )
+        before = asset_by_id.get(asset_id)
+        if before is None:
+            raise MergeError(
+                f"candidate-revision asset row is unknown: {asset_id}"
+            )
+        changed_fields = {
+            field for field in ASSET_HEADER if update[field] != before[field]
+        }
+        if changed_fields != {"candidate_ids"}:
+            raise MergeError(
+                f"candidate revision may change only asset candidate_ids: {asset_id}"
+            )
+        if not set(
+            _json_array(
+                update["candidate_ids"],
+                f"asset {asset_id}.candidate_ids",
+            )
+        ).issubset(proposed_candidate_ids):
+            raise MergeError(f"asset {asset_id} links an unknown candidate")
+        asset_update_by_id[asset_id] = update
+        revision_paths.add(before["assignment_path"])
+    proposed_assets = [
+        asset_update_by_id.get(row["asset_id"], row) for row in assets
+    ]
+
+    unit_by_id = {unit["id"]: unit for unit in units}
+    asset_by_physical_path = {
+        asset["physical_path"]: asset for asset in assets
+    }
+    search_hit_paths = {
+        hit["hit_id"]: unit_by_id[hit["source_unit_id"]]["path"]
+        for round_record in search.get("rounds", [])
+        if isinstance(round_record, dict)
+        for hit in round_record.get("hits", [])
+        if isinstance(hit, dict)
+        and isinstance(hit.get("hit_id"), str)
+        and hit.get("source_unit_id") in unit_by_id
+    }
+    evidence_by_id = {
+        evidence["evidence_id"]: evidence
+        for candidate in proposed_candidates
+        for evidence in candidate["source_evidence"]
+        if isinstance(evidence, dict)
+        and isinstance(evidence.get("evidence_id"), str)
+    }
+    evidence_to_scope = list(appended_evidence) + [
+        evidence_by_id[evidence_id]
+        for evidence_id in sorted(definitive_evidence_ids)
+        if evidence_id in evidence_by_id
+    ]
+    for evidence in evidence_to_scope:
+        path = _provenance_anchor_path(
+            evidence.get("discovery_anchor"),
+            unit_by_id=unit_by_id,
+            asset_by_physical_path=asset_by_physical_path,
+            search_hit_paths=search_hit_paths,
+        )
+        if path is None:
+            raise MergeError(
+                "candidate revision evidence has no canonical source path"
+            )
+        revision_paths.add(path)
+    source_paths = tuple(_ordered_audit_paths(manifest, revision_paths))
+    latest_path_digests = _latest_path_result_digests(review_history)
+    event_core: dict[str, Any] = {
+        "review_id": f"V{_review_sequence(review_history) + 1:06d}",
+        "epoch": epoch,
+        "stage": 18,
+        "mode": "CANDIDATE_REVISION",
+        "reviewer": proposal["coordinator_id"],
+        "source_paths": list(source_paths),
+    }
+    proposed_reading_by_id = {
+        row["source_unit_id"]: row for row in proposed_reading
+    }
+    proposed_asset_by_id = {
+        row["asset_id"]: row for row in proposed_assets
+    }
+    path_changes: list[dict[str, Any]] = []
+    for path in source_paths:
+        previous_digest = latest_path_digests.get(path)
+        if previous_digest is None:
+            raise MergeError(
+                f"candidate-revision path lacks prior result history: {path}"
+            )
+        path_changes.append(
+            close_path_change(
+                event_core,
+                {
+                    "source_path": path,
+                    "source_unit_ids": [
+                        unit["id"] for unit in units if unit["path"] == path
+                    ],
+                    "asset_ids": [
+                        asset["asset_id"]
+                        for asset in assets
+                        if asset["assignment_path"] == path
+                    ],
+                    "previous_path_result_sha256": previous_digest,
+                },
+                unit_by_id,
+                proposed_reading_by_id,
+                proposed_asset_by_id,
+            )
+        )
+    event_core.update(
+        {
+            "path_changes": path_changes,
+            "candidate_changes": candidate_changes,
+            "route_changes": [],
+            "search_change": None,
+        }
+    )
+    prior_event = (
+        review_history[-1]["event_sha256"] if review_history else None
+    )
+    event = close_review_event(event_core, prior_event)
+    proposed_history = review_history + [event]
+    validation_errors = validate_audit.validate_objects(
+        manifest,
+        units,
+        proposed_reading,
+        proposed_candidates,
+        routes,
+        proposed_assets,
+        search,
+        proposed_history,
+    )
+    if validation_errors:
+        raise MergeError(
+            "proposed CANDIDATE_REVISION failed full validation:\n- "
+            + "\n- ".join(validation_errors)
+        )
+    proposed_bytes = {
+        name: original_bytes[name] for name in WRITE_NAMES
+    }
+    proposed_bytes[CANDIDATE_NAME] = _jsonl_bytes(proposed_candidates)
+    proposed_bytes[READING_NAME] = build_worker_bundle.csv_bytes(
+        READING_HEADER,
+        proposed_reading,
+    )
+    proposed_bytes[ASSET_NAME] = build_worker_bundle.csv_bytes(
+        ASSET_HEADER,
+        proposed_assets,
+    )
+    proposed_bytes[REVIEW_HISTORY_NAME] = _append_jsonl(
+        original_bytes[REVIEW_HISTORY_NAME],
+        [event],
+    )
+    if proposal_path.read_bytes() != proposal_bytes:
+        raise MergeError("CANDIDATE_REVISION proposal changed during validation")
+    return CandidateRevisionPlan(
+        proposal=proposal_path,
+        goal_dir=goal_dir,
+        coordinator_id=proposal["coordinator_id"],
+        epoch=epoch,
+        source_paths=source_paths,
+        review_ids=(event["review_id"],),
+        candidate_update_count=(
+            len(proposal["candidate_updates"]) - len(appended_candidates)
+        ),
+        candidate_append_count=len(appended_candidates),
+        reading_update_count=len(proposal["reading_updates"]),
+        asset_update_count=len(proposal["asset_updates"]),
+        original_bytes=original_bytes,
+        original_modes=original_modes,
+        proposed_bytes=proposed_bytes,
+    )
+
+
 def _assert_snapshot_unchanged(
-    plan: MergePlan | SearchAppendPlan,
+    plan: Plan,
 ) -> None:
     for name, expected in plan.original_bytes.items():
         path = plan.goal_dir / name
@@ -3182,7 +3634,7 @@ def _assert_snapshot_unchanged(
             raise MergeError(f"global audit state changed concurrently: {name}")
 
 
-def apply_merge(plan: MergePlan | SearchAppendPlan) -> None:
+def apply_merge(plan: Plan) -> None:
     """Commit a validated plan through the shared durable transaction."""
 
     _assert_snapshot_unchanged(plan)
@@ -3215,28 +3667,81 @@ def main() -> int:
         help="sealed sequential-review worker bundle",
     )
     parser.add_argument(
-        "--search-enrichment",
+        "--search-append",
         type=Path,
-        help="closed SEARCH_ENRICHMENT coordinator proposal JSON",
+        help="closed SEARCH_APPEND coordinator proposal JSON",
+    )
+    parser.add_argument(
+        "--route-resolution",
+        type=Path,
+        help="closed ROUTE_RESOLUTION coordinator proposal JSON",
+    )
+    parser.add_argument(
+        "--candidate-revision",
+        type=Path,
+        help="closed CANDIDATE_REVISION coordinator proposal JSON",
     )
     parser.add_argument("--goal-dir", type=Path, default=GOAL_DIR)
     parser.add_argument(
         "--apply",
         action="store_true",
-        help="write the validated proposal through same-filesystem staging files",
+        help="commit the validated proposal through a durable transaction",
+    )
+    parser.add_argument(
+        "--recover",
+        action="store_true",
+        help="exclusively recover or retire a pending durable transaction",
     )
     args = parser.parse_args()
     try:
-        if (args.bundle is None) == (args.search_enrichment is None):
-            raise MergeError(
-                "provide exactly one worker bundle or --search-enrichment proposal"
-            )
-        if args.search_enrichment is not None:
-            plan: MergePlan | SearchEnrichmentPlan = (
-                prepare_search_enrichment(
-                    args.search_enrichment,
-                    goal_dir=args.goal_dir,
+        proposal_inputs = [
+            args.bundle,
+            args.search_append,
+            args.route_resolution,
+            args.candidate_revision,
+        ]
+        if args.recover:
+            if any(value is not None for value in proposal_inputs) or args.apply:
+                raise MergeError(
+                    "--recover cannot be combined with a proposal or --apply"
                 )
+            try:
+                result = audit_transaction.recover_transaction(args.goal_dir)
+            except audit_transaction.TransactionError as exc:
+                raise MergeError(str(exc)) from exc
+            print(
+                json.dumps(
+                    {
+                        "mode": "recovered",
+                        "action": result.action,
+                        "transaction_id": result.transaction_id,
+                        "journal_state": result.journal_state,
+                    },
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+            return 0
+        if sum(value is not None for value in proposal_inputs) != 1:
+            raise MergeError(
+                "provide exactly one worker bundle, --search-append, "
+                "--route-resolution, or --candidate-revision proposal"
+            )
+        plan: Plan
+        if args.search_append is not None:
+            plan = prepare_search_append(
+                args.search_append,
+                goal_dir=args.goal_dir,
+            )
+        elif args.route_resolution is not None:
+            plan = prepare_route_resolution(
+                args.route_resolution,
+                goal_dir=args.goal_dir,
+            )
+        elif args.candidate_revision is not None:
+            plan = prepare_candidate_revision(
+                args.candidate_revision,
+                goal_dir=args.goal_dir,
             )
         else:
             assert args.bundle is not None

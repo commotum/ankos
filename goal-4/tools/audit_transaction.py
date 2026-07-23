@@ -34,6 +34,14 @@ exclusive apply/recovery removes it.  A loss after the pending directory has
 been atomically retired can similarly leave a private cleanup directory; the
 target decision is already complete and the next exclusive operation removes
 the orphan.
+
+There is intentionally no durable completion receipt after pending state is
+retired.  If a process dies between the pending-to-cleanup rename and cleanup,
+the next recovery can prove that no canonical transaction is pending and can
+remove the private orphan, but it reports ``NO_PENDING`` rather than claiming
+an authoritative transaction ID or reconstructing caller acknowledgement.
+Callers that require an outcome ID must retain the successful
+``TransactionResult`` in their own higher-level protocol.
 """
 
 from __future__ import annotations
@@ -631,7 +639,12 @@ def _remove_internal_directory(goal: Path, path: Path) -> None:
         raise TransactionError(
             f"internal transaction path is not a directory: {path}"
         )
-    shutil.rmtree(path)
+    try:
+        shutil.rmtree(path)
+    except OSError as exc:
+        raise TransactionError(
+            f"cannot remove internal transaction directory {path}: {exc}"
+        ) from exc
     _fsync_directory(goal)
 
 
@@ -680,6 +693,7 @@ def _publish_prepared(
         _fsync_directory(build)
         _call_fault(fault_injector, "apply:before_publish")
         os.replace(build, pending)
+        _call_fault(fault_injector, "apply:after_pending_publish")
         _fsync_directory(goal)
         return pending, build
     except BaseException as exc:
@@ -776,10 +790,7 @@ def _retire_pending(
     os.replace(pending, cleanup)
     _fsync_directory(goal)
     _call_fault(fault_injector, f"{event_prefix}:after_pending_retired")
-    try:
-        shutil.rmtree(cleanup)
-    finally:
-        _fsync_directory(goal)
+    _remove_internal_directory(goal, cleanup)
 
 
 def _restore_all(
@@ -955,10 +966,19 @@ def recover_transaction(
         except TransactionRecoveryError:
             raise
         except Exception as exc:
-            raise TransactionRecoveryError(
-                "transaction recovery failed; canonical staged state was "
-                f"retained at {goal / PENDING_NAME}: {exc}"
-            ) from exc
+            pending = goal / PENDING_NAME
+            if _lexists(pending):
+                message = (
+                    "transaction recovery failed; canonical staged state was "
+                    f"retained at {pending}: {exc}"
+                )
+            else:
+                message = (
+                    "transaction recovery found no canonical pending "
+                    "transaction; private orphan cleanup failed and the "
+                    f"orphan was retained: {exc}"
+                )
+            raise TransactionRecoveryError(message) from exc
 
 
 def apply_transaction(
@@ -1059,6 +1079,12 @@ def apply_transaction(
         except BaseException as exc:
             if not isinstance(exc, Exception):
                 raise
+            if pending is None and _lexists(pending_path):
+                # Publication is the directory rename, not this helper's
+                # return.  A goal-directory fsync failure (or an exception
+                # delivered immediately after rename) must still enter the
+                # canonical recovery path.
+                pending = pending_path
             if pending is None:
                 if build is not None and _lexists(build):
                     _remove_internal_directory(goal, build)
@@ -1090,7 +1116,7 @@ def apply_transaction(
                 cleanup_deferred = False
                 try:
                     _cleanup_orphans(goal)
-                except TransactionError:
+                except Exception:
                     cleanup_deferred = True
                 return TransactionResult(
                     journal["transaction_id"],

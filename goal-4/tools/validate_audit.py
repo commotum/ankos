@@ -14,6 +14,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+import audit_transaction
 import verify_corpus
 from audit_contract import (
     ASSET_HEADER,
@@ -6991,23 +6992,29 @@ def main() -> int:
     goal_dir = args.goal_dir.resolve()
     repo_root = args.repo_root.resolve()
     try:
-        manifest = json.loads(
-            (goal_dir / "corpus-manifest.json").read_text(encoding="utf-8")
-        )
-        units_bytes = (goal_dir / "source-units.jsonl").read_bytes()
-        units = verify_corpus.load_units(goal_dir / "source-units.jsonl")
-        reading = load_csv(goal_dir / "reading-ledger.csv", READING_HEADER)
-        candidates = load_jsonl(goal_dir / "candidate-ledger.jsonl")
-        routes = load_csv(
-            goal_dir / "cross-reference-ledger.csv",
-            CROSS_REFERENCE_HEADER,
-        )
-        assets = load_csv(goal_dir / "asset-ledger.csv", ASSET_HEADER)
-        review_history = load_jsonl(goal_dir / "review-history.jsonl")
-        search = json.loads(
-            (goal_dir / "search-rounds.json").read_text(encoding="utf-8")
-        )
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        with audit_transaction.read_guard(goal_dir):
+            manifest = json.loads(
+                (goal_dir / "corpus-manifest.json").read_text(encoding="utf-8")
+            )
+            units_bytes = (goal_dir / "source-units.jsonl").read_bytes()
+            units = verify_corpus.load_units(goal_dir / "source-units.jsonl")
+            reading = load_csv(goal_dir / "reading-ledger.csv", READING_HEADER)
+            candidates = load_jsonl(goal_dir / "candidate-ledger.jsonl")
+            routes = load_csv(
+                goal_dir / "cross-reference-ledger.csv",
+                CROSS_REFERENCE_HEADER,
+            )
+            assets = load_csv(goal_dir / "asset-ledger.csv", ASSET_HEADER)
+            review_history = load_jsonl(goal_dir / "review-history.jsonl")
+            search = json.loads(
+                (goal_dir / "search-rounds.json").read_text(encoding="utf-8")
+            )
+    except (
+        audit_transaction.TransactionError,
+        OSError,
+        ValueError,
+        json.JSONDecodeError,
+    ) as exc:
         print(f"audit artifact load failed: {exc}", file=sys.stderr)
         return 1
 

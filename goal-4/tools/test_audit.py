@@ -60,26 +60,47 @@ def append_history_event(
     prior_rounds,
     trigger_search_kind=None,
     trigger_hit_ids=None,
+    before_search=None,
+    after_search=None,
 ):
     document = next(
         item for item in manifest["documents"] if item["path"] == source_path
     )
-    prior_path_event = next(
+    prior_path_change = next(
         (
-            item
+            change
             for item in reversed(history)
-            if item.get("source_paths") == [source_path]
+            for change in item.get("path_changes", [])
+            if change.get("source_path") == source_path
         ),
         None,
     )
-    event = MODULE.close_review_event(
+    normalized_mode = (
+        "SEARCH_APPEND" if mode == "SEARCH_ENRICHMENT" else mode
+    )
+    core = {
+        "review_id": f"V{len(history) + 1:06d}",
+        "epoch": epoch,
+        "stage": (
+            after_search["rounds"][-1]["owning_stage"]
+            if normalized_mode == "SEARCH_APPEND"
+            else MODULE.stage_for_document(document)
+        ),
+        "mode": normalized_mode,
+        "reviewer": reviewer,
+        "source_paths": [source_path],
+        "candidate_changes": [],
+        "route_changes": [],
+        "search_change": (
+            MODULE.close_search_change(before_search, after_search)
+            if before_search is not None and after_search is not None
+            else None
+        ),
+    }
+    path_change = MODULE.close_path_change(
+        core,
         {
-            "review_id": f"V{len(history) + 1:06d}",
-            "epoch": epoch,
-            "stage": MODULE.stage_for_document(document),
-            "mode": mode,
-            "reviewer": reviewer,
-            "source_paths": [source_path],
+            "source_path": source_path,
             "source_unit_ids": [
                 item["id"] for item in units if item["path"] == source_path
             ],
@@ -89,18 +110,81 @@ def append_history_event(
                 if item["assignment_path"] == source_path
             ],
             "previous_path_result_sha256": (
-                prior_path_event["result_projection_sha256"]
-                if prior_path_event is not None
+                prior_path_change["result_projection_sha256"]
+                if prior_path_change is not None
                 else None
             ),
-            "trigger_search_kind": trigger_search_kind,
-            "trigger_hit_ids": trigger_hit_ids or [],
         },
         {item["id"]: item for item in units},
         {item["source_unit_id"]: item for item in reading},
         {item["asset_id"]: item for item in assets},
+    )
+    core["path_changes"] = [path_change]
+    event = MODULE.close_review_event(
+        core,
         history[-1]["event_sha256"] if history else None,
-        prior_rounds,
+    )
+    return [*history, event]
+
+
+def append_search_event(
+    history,
+    before_search,
+    after_search,
+    reading,
+    assets,
+    units,
+    changed_paths=(),
+    reviewer="closure-searcher",
+):
+    round_record = after_search["rounds"][-1]
+    core = {
+        "review_id": f"V{len(history) + 1:06d}",
+        "epoch": round_record["epoch"],
+        "stage": round_record["owning_stage"],
+        "mode": "SEARCH_APPEND",
+        "reviewer": reviewer,
+        "source_paths": list(changed_paths),
+        "candidate_changes": [],
+        "route_changes": [],
+        "search_change": MODULE.close_search_change(
+            before_search,
+            after_search,
+        ),
+    }
+    unit_by_id = {item["id"]: item for item in units}
+    reading_by_id = {item["source_unit_id"]: item for item in reading}
+    asset_by_id = {item["asset_id"]: item for item in assets}
+    latest_by_path = {}
+    for event in history:
+        for change in event.get("path_changes", []):
+            latest_by_path[change["source_path"]] = change
+    core["path_changes"] = [
+        MODULE.close_path_change(
+            core,
+            {
+                "source_path": path,
+                "source_unit_ids": [
+                    item["id"] for item in units if item["path"] == path
+                ],
+                "asset_ids": [
+                    item["asset_id"]
+                    for item in assets
+                    if item["assignment_path"] == path
+                ],
+                "previous_path_result_sha256": latest_by_path[path][
+                    "result_projection_sha256"
+                ],
+            },
+            unit_by_id,
+            reading_by_id,
+            asset_by_id,
+        )
+        for path in changed_paths
+    ]
+    event = MODULE.close_review_event(
+        core,
+        history[-1]["event_sha256"] if history else None,
     )
     return [*history, event]
 
@@ -301,6 +385,40 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
             "result_digest": saturation_digest,
         },
     }
+    replay_search = {
+        "schema_version": 1,
+        "phase": "blind_discovery",
+        "tool_assumptions": [],
+        "vocabulary": [],
+        "rounds": [],
+        "fixed_point": None,
+    }
+    search_history = history
+    local_history = history
+    local_search = copy.deepcopy(replay_search)
+    for round_record in rounds:
+        before_search = copy.deepcopy(replay_search)
+        replay_search["rounds"].append(copy.deepcopy(round_record))
+        for assumption in round_record["tool_assumptions"]:
+            if assumption not in replay_search["tool_assumptions"]:
+                replay_search["tool_assumptions"].append(assumption)
+        if round_record["kind"] == "SATURATION":
+            replay_search["fixed_point"] = copy.deepcopy(
+                search["fixed_point"]
+            )
+        search_history = append_search_event(
+            search_history,
+            before_search,
+            replay_search,
+            reading,
+            assets,
+            units,
+        )
+        if round_record["kind"] == "LOCAL":
+            local_history = copy.deepcopy(search_history)
+            local_search = copy.deepcopy(replay_search)
+    assert replay_search == search
+    history = search_history
     assert MODULE.validate_objects(
         manifest,
         units,
@@ -314,8 +432,8 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         True,
     ) == []
 
-    saturation_enrichment_search = copy.deepcopy(search)
-    enrichment_saturation = saturation_enrichment_search["rounds"][-1]
+    saturation_enrichment_search = copy.deepcopy(local_search)
+    enrichment_saturation = copy.deepcopy(saturation)
     enrichment_saturation["queries"][0]["pattern"] = (
         "STEPHEN WOLFRAM A NEW KIND OF SCIENCE"
     )
@@ -363,16 +481,14 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
     enrichment_digest = MODULE.search_result_digest(enrichment_saturation)
     enrichment_saturation["result_digest"] = enrichment_digest
     enrichment_saturation["rerun_digest"] = enrichment_digest
-    saturation_enrichment_search["fixed_point"]["result_digest"] = (
-        enrichment_digest
-    )
+    saturation_enrichment_search["rounds"].append(enrichment_saturation)
     saturation_enriched_reading = copy.deepcopy(reading)
     saturation_enriched_reading[0]["evidence_statement"] = (
         "The initial review is retained and a later SATURATION hit records "
         "the title-bearing control context."
     )
     saturation_enrichment_history = append_history_event(
-        history,
+        local_history,
         manifest,
         units,
         saturation_enriched_reading,
@@ -384,6 +500,30 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         saturation_enrichment_search["rounds"],
         "SATURATION",
         [trigger_hit_id],
+        before_search=local_search,
+        after_search=saturation_enrichment_search,
+    )
+    closure_saturation = copy.deepcopy(saturation)
+    closure_saturation["round_id"] = "S016"
+    closure_saturation["queries"][0]["query_id"] = "Q0016"
+    closure_digest = MODULE.search_result_digest(closure_saturation)
+    closure_saturation["result_digest"] = closure_digest
+    closure_saturation["rerun_digest"] = closure_digest
+    before_closure_search = copy.deepcopy(saturation_enrichment_search)
+    saturation_enrichment_search["rounds"].append(closure_saturation)
+    saturation_enrichment_search["fixed_point"] = {
+        "round_id": "S016",
+        "zero_delta": True,
+        "rerun_reproduced": True,
+        "result_digest": closure_digest,
+    }
+    saturation_enrichment_history = append_search_event(
+        saturation_enrichment_history,
+        before_closure_search,
+        saturation_enrichment_search,
+        saturation_enriched_reading,
+        assets,
+        units,
     )
     assert MODULE.validate_objects(
         manifest,
@@ -411,15 +551,17 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
     for row in reopened_assets:
         if row["assignment_path"] == reopened_path:
             row["review_epoch"] = "2"
-    reopened_search = copy.deepcopy(search)
+    pre_reopen_search = copy.deepcopy(saturation_enrichment_search)
+    reopened_search = copy.deepcopy(pre_reopen_search)
+    reopened_search["fixed_point"] = None
     reopened_local = {
-        "round_id": "S016",
+        "round_id": "S017",
         "epoch": 2,
         "kind": "LOCAL",
         "owning_stage": 4,
         "queries": [
             {
-                "query_id": "Q0016",
+                "query_id": "Q0017",
                 "family": "zero-result reopened fixture",
                 "pattern": "__AUDIT_HARNESS_IMPOSSIBLE_MATCH_71A9C2__",
                 "mode": "LITERAL",
@@ -442,9 +584,9 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
     reopened_local["result_digest"] = reopened_local_digest
     reopened_local["rerun_digest"] = reopened_local_digest
     reopened_saturation = copy.deepcopy(saturation)
-    reopened_saturation["round_id"] = "S017"
+    reopened_saturation["round_id"] = "S018"
     reopened_saturation["epoch"] = 2
-    reopened_saturation["queries"][0]["query_id"] = "Q0017"
+    reopened_saturation["queries"][0]["query_id"] = "Q0018"
     reopened_saturation_digest = MODULE.search_result_digest(
         reopened_saturation
     )
@@ -454,13 +596,13 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         [reopened_local, reopened_saturation]
     )
     reopened_search["fixed_point"] = {
-        "round_id": "S017",
+        "round_id": "S018",
         "zero_delta": True,
         "rerun_reproduced": True,
         "result_digest": reopened_saturation_digest,
     }
     reopened_history = append_history_event(
-        history,
+        saturation_enrichment_history,
         manifest,
         units,
         reopened_reading,
@@ -469,7 +611,34 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         2,
         "REOPEN",
         "closure-fixture",
-        search["rounds"],
+        pre_reopen_search["rounds"],
+        before_search=pre_reopen_search,
+        after_search={
+            **copy.deepcopy(pre_reopen_search),
+            "fixed_point": None,
+        },
+    )
+    reopened_before_local = {
+        **copy.deepcopy(pre_reopen_search),
+        "fixed_point": None,
+    }
+    reopened_after_local = copy.deepcopy(reopened_before_local)
+    reopened_after_local["rounds"].append(copy.deepcopy(reopened_local))
+    reopened_history = append_search_event(
+        reopened_history,
+        reopened_before_local,
+        reopened_after_local,
+        reopened_reading,
+        reopened_assets,
+        units,
+    )
+    reopened_history = append_search_event(
+        reopened_history,
+        reopened_after_local,
+        reopened_search,
+        reopened_reading,
+        reopened_assets,
+        units,
     )
     assert MODULE.validate_objects(
         manifest,
@@ -486,8 +655,8 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
 
     missing_reopen_local = copy.deepcopy(reopened_search)
     missing_reopen_local["rounds"].pop(-2)
-    missing_reopen_local["rounds"][-1]["round_id"] = "S016"
-    missing_reopen_local["rounds"][-1]["queries"][0]["query_id"] = "Q0016"
+    missing_reopen_local["rounds"][-1]["round_id"] = "S017"
+    missing_reopen_local["rounds"][-1]["queries"][0]["query_id"] = "Q0017"
     missing_reopen_digest = MODULE.search_result_digest(
         missing_reopen_local["rounds"][-1]
     )
@@ -498,7 +667,7 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         "rerun_digest"
     ] = missing_reopen_digest
     missing_reopen_local["fixed_point"] = {
-        "round_id": "S016",
+        "round_id": "S017",
         "zero_delta": True,
         "rerun_reproduced": True,
         "result_digest": missing_reopen_digest,
