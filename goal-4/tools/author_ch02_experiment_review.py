@@ -467,6 +467,122 @@ add_evidence(
         "evidence_limit",
     ],
 )
+for label, unit, claim, fields, modality in [
+    (
+        "eca-rule-list-description",
+        "U004966",
+        "The Notes state the exact eight-entry Rule 30 list representation and "
+        "identify rule-number decoding as a family parameterization.",
+        [
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "PROSE",
+    ),
+    (
+        "eca-rule-number-code",
+        "U004967",
+        "The code deterministically decodes an elementary rule number into its "
+        "eight binary lookup outputs.",
+        [
+            "alphabet_or_value_schema",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "CODE",
+    ),
+    (
+        "eca-step-description",
+        "U004968",
+        "The prose delimits one-step evaluation from a complete rule list and "
+        "current cellular state.",
+        [
+            "native_time",
+            "complete_state",
+            "schedule",
+            "law_kind",
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+            "evidence_limit",
+        ],
+        "PROSE",
+    ),
+    (
+        "eca-step-code",
+        "U004969",
+        "The exact CAStep definition applies the eight-entry rule to every "
+        "cyclic left/self/right neighborhood.",
+        [
+            "topology",
+            "complete_state",
+            "boundary",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "CODE",
+    ),
+    (
+        "eca-history-description",
+        "U004970",
+        "The prose defines an evolution result as a list of states for a "
+        "requested number of steps.",
+        [
+            "native_time",
+            "complete_state",
+            "visible_history",
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "PROSE",
+    ),
+    (
+        "eca-history-code",
+        "U004971",
+        "The exact CAEvolveList definition iterates CAStep t times while "
+        "retaining the initial and successive states.",
+        [
+            "native_time",
+            "complete_state",
+            "visible_history",
+            "schedule",
+            "law_kind",
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "CODE",
+    ),
+]:
+    add_evidence(
+        eca,
+        label=label,
+        unit=unit,
+        claim=claim,
+        fields=fields,
+        modality=modality,
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
 
 rule254 = ca_preset(
     key="rule254",
@@ -736,6 +852,133 @@ add_evidence(
     ],
     modality="FORMULA",
 )
+for label, unit, claim, fields, modality in [
+    (
+        "eca-formula-description",
+        "U005084",
+        "The Notes introduce a coordinate-indexed recurrence for the value of "
+        "each cellular-automaton cell at each step.",
+        [
+            "native_time",
+            "carrier",
+            "support",
+            "topology",
+            "complete_state",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "PROSE",
+    ),
+    (
+        "eca-formula-recurrence",
+        "U005085",
+        "The exact recurrence sets a[t,i] from the three predecessor values at "
+        "i-1, i, and i+1 through the chosen function f.",
+        [
+            "native_time",
+            "topology",
+            "complete_state",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "result_kind",
+            "successor_cardinality",
+            "determinism_branching_or_measure",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "FORMULA",
+    ),
+    (
+        "eca-coordinate-query",
+        "U005090",
+        "The source explains that evaluating a[t,i] returns the requested cell "
+        "after recursively computing the required predecessor values.",
+        [
+            "native_time",
+            "complete_state",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "result_kind",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "PROSE",
+    ),
+    (
+        "eca-memoized-recurrence",
+        "U005091",
+        "The memoized recurrence preserves the same three-cell native law while "
+        "caching intermediate coordinate values as an implementation detail.",
+        [
+            "native_time",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "CODE",
+    ),
+]:
+    add_evidence(
+        eca,
+        label=label,
+        unit=unit,
+        claim=claim,
+        fields=fields,
+        modality=modality,
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+add_evidence(
+    rule90,
+    label="rule90-formula-introduction",
+    unit="U005086",
+    claim=(
+        "The prose identifies Rule 90 as a particular choice of the "
+        "three-predecessor function f."
+    ),
+    fields=[
+        "object_kind",
+        "read_dependencies_or_neighborhood",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+        "evidence_limit",
+    ],
+)
+add_evidence(
+    rule90,
+    label="rule90-pattern-table",
+    unit="U005087",
+    claim=(
+        "The four pattern assignments give the complete Rule 90 lookup after "
+        "eliminating the irrelevant self value."
+    ),
+    fields=[
+        "alphabet_or_value_schema",
+        "read_dependencies_or_neighborhood",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    modality="CODE",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
 
 
 def add_candidate_image(
@@ -933,6 +1176,170 @@ add_evidence(
         "evidence_limit",
     ],
 )
+for label, unit, claim, fields, modality in [
+    (
+        "general-rule30-table",
+        "U004998",
+        "The code expands Rule 30 into all eight explicit three-cell "
+        "replacement cases.",
+        [
+            "alphabet_or_value_schema",
+            "topology",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "CODE",
+    ),
+    (
+        "general-step-introduction",
+        "U004999",
+        "The prose introduces one-step evaluation for explicit replacement rules.",
+        [
+            "native_time",
+            "complete_state",
+            "schedule",
+            "law_kind",
+            "result_kind",
+            "evidence_limit",
+        ],
+        "PROSE",
+    ),
+    (
+        "general-step-transpose",
+        "U005000",
+        "The exact definition assembles left/self/right blocks and applies the "
+        "matching replacement at every position.",
+        [
+            "topology",
+            "complete_state",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "result_kind",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "CODE",
+    ),
+    (
+        "general-step-alternative",
+        "U005001",
+        "The source marks the following Partition definition as an equivalent "
+        "one-step implementation.",
+        [
+            "law_kind",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "PROSE",
+    ),
+    (
+        "general-step-partition",
+        "U005002",
+        "The exact Partition definition applies replacements to cyclic "
+        "three-cell blocks at every position.",
+        [
+            "boundary",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "rule_relation_constraint_function_or_probability_law",
+            "write_replacement_assembly_or_commit",
+            "result_kind",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "CODE",
+    ),
+    (
+        "general-pattern-rule-introduction",
+        "U005003",
+        "The prose permits pattern-valued replacement cases and introduces "
+        "the compact Rule 90 table.",
+        [
+            "alphabet_or_value_schema",
+            "law_kind",
+            "parameters_and_variants",
+            "evidence_limit",
+        ],
+        "PROSE",
+    ),
+    (
+        "general-rule90-pattern-table",
+        "U005004",
+        "The four wildcard replacement cases give the complete Rule 90 law "
+        "within the explicit-replacement schema.",
+        [
+            "alphabet_or_value_schema",
+            "topology",
+            "read_dependencies_or_neighborhood",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "parameters_and_variants",
+            "excluded_observers_and_representations",
+            "evidence_limit",
+        ],
+        "CODE",
+    ),
+]:
+    add_evidence(
+        general_1d,
+        label=label,
+        unit=unit,
+        claim=claim,
+        fields=fields,
+        modality=modality,
+        strength="DIRECT_PARTIAL_MECHANICS",
+    )
+add_evidence(
+    rule30,
+    label="rule30-explicit-replacement-table",
+    unit="U004998",
+    claim="The code independently expands Rule 30 into all eight neighborhood outputs.",
+    fields=[
+        "alphabet_or_value_schema",
+        "read_dependencies_or_neighborhood",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    modality="CODE",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
+add_evidence(
+    rule90,
+    label="rule90-explicit-pattern-table",
+    unit="U005004",
+    claim=(
+        "The four wildcard cases independently give every Rule 90 output while "
+        "showing that the self value is irrelevant."
+    ),
+    fields=[
+        "alphabet_or_value_schema",
+        "read_dependencies_or_neighborhood",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    modality="CODE",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
 
 # Coverage-bearing seed and boundary classes stated explicitly in the Notes.
 centered_seed = source_candidate(
@@ -983,6 +1390,54 @@ add_evidence(
     ),
     fields=list(centered_seed["facts"]),
     modality="CODE",
+)
+add_evidence(
+    centered_seed,
+    label="centered-seed-formula-description",
+    unit="U005088",
+    claim=(
+        "The Notes introduce an explicit coordinate-form initial condition "
+        "with one value-1 cell and zero elsewhere."
+    ),
+    fields=[
+        "object_kind",
+        "carrier",
+        "support",
+        "alphabet_or_value_schema",
+        "complete_state",
+        "seed",
+        "law_kind",
+        "result_kind",
+        "determinism_branching_or_measure",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+)
+add_evidence(
+    centered_seed,
+    label="centered-seed-formula-code",
+    unit="U005089",
+    claim=(
+        "The exact assignments set position 0 to 1 and every other position at "
+        "step 0 to 0."
+    ),
+    fields=[
+        "carrier",
+        "support",
+        "alphabet_or_value_schema",
+        "complete_state",
+        "seed",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    modality="CODE",
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 
 cyclic_boundary = source_candidate(
