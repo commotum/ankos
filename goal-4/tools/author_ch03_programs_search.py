@@ -119,6 +119,17 @@ PROPOSED_VOCABULARY = [
     "iterated map",
 ]
 
+# The design file was explicitly a pre-main-review draft.  The merged
+# candidate-specific witness proof found these five minimal alias additions
+# before the family was frozen:
+#
+# - F03 `states?`: B0157/U000444 and B0257/U005411;
+# - F05 `replacements?`: B0178/U000505;
+# - F06 `remove[ds]?|removing`: B0184/U000526;
+# - F06 `leading elements?`: B0298/U005562 and B0300/U005566; and
+# - F07 `registers?|instructions?`: B0197/U000555 and B0201/U000565.
+# No family was added, removed, reordered, or broadened after this final
+# 229-candidate witness reconciliation.
 QUERY_SPECS = [
     (
         "cellular-automaton families, rule codes, and algebraic variants",
@@ -146,7 +157,7 @@ QUERY_SPECS = [
         (
             r"\b(?:Turing machines?|TM(?:Step|EvolveList|Rule)|tapes?|"
             r"head states?|blank tape|halt states?|halting|Busy Beaver|"
-            r"rule 1953)\b"
+            r"rule 1953|states?)\b"
         ),
         "REGEX",
     ),
@@ -166,7 +177,7 @@ QUERY_SPECS = [
             r"\b(?:sequential substitution systems?|SSSEvolveList|"
             r"search[- ]and[- ]replace|scan(?:ned|ning)? (?:the )?string|"
             r"left to right|first (?:matching )?(?:sequence|replacement)|"
-            r"replacement order)\b"
+            r"replacement order|replacements?)\b"
         ),
         "REGEX",
     ),
@@ -175,7 +186,8 @@ QUERY_SPECS = [
         (
             r"\b(?:tag systems?|Post(?: tag)?|cyclic tag systems?|"
             r"CT(?:Step|EvolveList)|TSEvolveList|deletion number|"
-            r"append(?:ed)? blocks?|tagged onto|Kolakoski)\b"
+            r"append(?:ed)? blocks?|tagged onto|Kolakoski|remove[ds]?|"
+            r"removing|leading elements?)\b"
         ),
         "REGEX",
     ),
@@ -274,13 +286,14 @@ QUERY_SPECS = [
 # triage, challenge, and candidate-reach drift fail before proposal creation.
 EXPECTED_STAGE_UNIT_COUNT = 653
 EXPECTED_STAGE_ASSET_COUNT = 133
+EXPECTED_STAGE_CANDIDATE_COUNT = 229
 EXPECTED_HIT_COUNTS = [
     134,
     46,
-    35,
+    49,
     83,
-    19,
-    28,
+    22,
+    33,
     37,
     27,
     112,
@@ -291,15 +304,22 @@ EXPECTED_HIT_COUNTS = [
     154,
 ]
 EXPECTED_NORMALIZED_RESULT_DIGEST = (
-    "a443503224d697733c070f2b2f275b5a65caff84adfac9e2b4c9bebfb693fe8f"
+    "003108dea049abf52948d1e648ac52688e51ba7f239a2c5cdfaf127fdd268eed"
 )
 EXPECTED_TRIAGE_DIGEST = (
-    "446666b8becc917691a5564a742df2bda9ee6985cf9bd1a5d17a278b11bfcc05"
+    "6b6d104ab3428ac7cf626f1999b44c6856826f6a4d96ad763100a9b1e228e3df"
 )
-EXPECTED_CANDIDATE_COVERAGE_DIGEST = ""
-EXPECTED_OMISSION_CHALLENGE_COUNT = -1
-EXPECTED_OMISSION_CHALLENGE_DIGEST = ""
-EXPECTED_NEW_VOCABULARY: list[str] = []  # Filled after exact live deduplication.
+EXPECTED_CANDIDATE_COVERAGE_DIGEST = (
+    "6328791ffc002cf6dd18282c30ada2c2a92fa6995d03dadf27039f6ddf07a880"
+)
+EXPECTED_OMISSION_CHALLENGE_COUNT = 266
+EXPECTED_OMISSION_CHALLENGE_DIGEST = (
+    "1e8b273abca746fbdd4b041205f8e0952db133de23bcff7c3e4296d07d0f067c"
+)
+EXPECTED_NEW_VOCABULARY = list(PROPOSED_VOCABULARY)
+EXPECTED_NEW_VOCABULARY_DIGEST = (
+    "926797eedb6db057505a4d86d73b7d049ffb8caab0faa6d6d4daeb0c7d671c94"
+)
 
 DIRECT_MECHANICS_STRENGTHS = {
     "DIRECT_IDENTITY",
@@ -529,6 +549,13 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         or len(QUERY_SPECS) != 14
     ):
         raise AuthoringError("frozen vocabulary/query family is malformed")
+    vocabulary_digest = hashlib.sha256(
+        canonical_json_bytes(PROPOSED_VOCABULARY)
+    ).hexdigest()
+    if vocabulary_digest != EXPECTED_NEW_VOCABULARY_DIGEST:
+        raise AuthoringError(
+            f"frozen Stage 7 vocabulary drifted: {vocabulary_digest}"
+        )
 
     units = read_jsonl(goal_dir / merge_worker_output.UNITS_NAME)
     reading = read_csv(goal_dir / merge_worker_output.READING_NAME)
@@ -669,6 +696,11 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     expected_stage_candidates = (
         linked_from_reading | linked_from_assets | evidenced_in_stage
     )
+    if len(expected_stage_candidates) != EXPECTED_STAGE_CANDIDATE_COUNT:
+        raise AuthoringError(
+            "dynamically derived Stage 7 candidate count drifted: "
+            f"{len(expected_stage_candidates)}"
+        )
     unknown_or_inactive_candidates = {
         candidate_id
         for candidate_id in expected_stage_candidates
@@ -774,6 +806,10 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
             "derived target: "
             f"missing={sorted(expected_stage_candidates - reached_stage_candidates)} "
             f"unexpected={sorted(reached_stage_candidates - expected_stage_candidates)}"
+        )
+    if len(reached_stage_candidates) != EXPECTED_STAGE_CANDIDATE_COUNT:
+        raise AuthoringError(
+            "candidate-facing queries do not reach the frozen 229/229 total"
         )
     candidate_coverage = _candidate_coverage_projection(
         expected_candidates=expected_stage_candidates,
