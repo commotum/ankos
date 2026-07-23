@@ -170,13 +170,20 @@ ROUTE_TARGETS = {
 
 LATE_ROUTE_TARGETS = {
     "R000097": {
-        "units": ["U000149", "U000150", "U000151", "U000152"],
+        "units": [
+            "U000149",
+            "U000150",
+            "U000151",
+            "U000152",
+            "U000153",
+        ],
         "assets": ["A001057"],
         "attempt": (
-            "Resolved the backward printed page 19 pointer to the reviewed "
-            "1981 all-programs experiment statement, original printout, and "
-            "caption; the image does not establish exact lookup tables or "
-            "boundary mechanics."
+            "Resolved the printed page 19 pointer to the reviewed 1981 "
+            "systematic all-program experiment, its reproduced output and "
+            "caption, and the cellular-automaton co-reference; no lookup "
+            "table or boundary convention is inferred from the historical "
+            "image."
         ),
     },
 }

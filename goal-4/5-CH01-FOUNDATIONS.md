@@ -16,7 +16,10 @@ Status: **COMPLETE**.
 - They own 3 physical images, all referenced from the main chapter; the Notes
   path owns no physical image.
 - Stage 5 is recorded by epoch-1 transactions `V000004..V000006`: one
-  `INITIAL` transaction and two `SEARCH_APPEND` transactions.
+  `INITIAL` transaction and two `SEARCH_APPEND` transactions. Later
+  target-stage transaction `V000011` resolves Chapter 2's backward page-19
+  route to this already-reviewed material without reopening its reading or
+  search dispositions.
 
 ## Updated Assumptions
 

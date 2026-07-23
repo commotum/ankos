@@ -1,6 +1,6 @@
 # 7-CH03-PROGRAMS
 
-Status: **READY**.
+Status: **IN PROGRESS**.
 
 ## Current Facts
 
@@ -12,8 +12,9 @@ Status: **READY**.
   - `BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md`.
 - The paired paths contain 653 deterministic source units:
   `U000306..U000640` and `U005319..U005636`.
-- They own 132 physical images: 87 referenced from the main chapter and 45
-  referenced from the Notes.
+- They own 133 physical images: 87 referenced from the main chapter, 45
+  referenced from the Notes, and unreferenced physical asset `A000407`
+  assigned to the Notes by its unique directory/page range.
 
 ## Updated Assumptions
 
@@ -60,7 +61,7 @@ material may be created under `/tmp`.
 | Obligation | Assigned | Completed |
 |---|---:|---:|
 | Source units | 653 | 0 |
-| Physical images | 132 | 0 |
+| Physical images | 133 | 0 |
 | LOCAL search scopes | 2 paths | 0 |
 | Search hits | 0 | 0 |
 | Within-stage routes | 0 | 0 |
@@ -79,15 +80,15 @@ only through coordinator preview/apply.
 ## Search And Evidence Log
 
 No Stage 7 query has run. LOCAL search begins only after all 653 units are
-reviewed and all 132 images are screened.
+reviewed and all 133 images are screened.
 
 ## Detailed Implementation Plan
 
 1. Build and verify one sealed epoch-1 bundle for both paired paths.
-2. Prepare the exact nonsemantic 653-row/132-asset worksheet.
+2. Prepare the exact nonsemantic 653-row/133-asset worksheet.
 3. Read every source unit in canonical order and record only source-grounded
    dispositions, evidence, candidates, routes, and source boundaries.
-4. Screen all 132 images in context, escalating construction-bearing,
+4. Screen all 133 images in context, escalating construction-bearing,
    text-bearing, ambiguous, or caption-incomplete assets to original
    resolution.
 5. Complete every provisional fingerprint and missing-mechanics boundary.
@@ -115,7 +116,7 @@ reviewed and all 132 images are screened.
 ## Completion Requirements
 
 - All 653 source units are individually reviewed.
-- All 132 images are screened at the required depth.
+- All 133 images are screened at the required depth.
 - Every candidate has complete source-limited provenance and fingerprint.
 - Every relevant reference is resolved locally or queued with typed scope.
 - Every LOCAL hit has a final blind disposition and exact two-path scope.

@@ -6,7 +6,7 @@ Status: **COMPLETE**.
 
 - Stages 1–6 are complete.
 - The valid live state contains 788 reviewed source units, 83 screened images,
-  91 active blind candidates, 101 routes (9 resolved and 92 pending
+  91 active blind candidates, 101 routes (10 resolved and 91 pending
   cross-range), and 6 closed LOCAL rounds.
 - Stage 6 owns exactly two canonical documents in manifest order:
   - `CHAPTERS/02-The-Crucial-Experiment.md`;
@@ -15,8 +15,10 @@ Status: **COMPLETE**.
   `U000174..U000305` and `U004962..U005318`.
 - They own 78 physical images: 22 referenced from the main chapter and 56
   referenced from the Notes.
-- Stage 6 is recorded by epoch-1 transactions `V000007..V000010`: one
-  `INITIAL`, one `ROUTE_RESOLUTION`, and two `SEARCH_APPEND` transactions.
+- Stage 6 execution and its late backward-route closure are recorded by
+  epoch-1 transactions `V000007..V000011`: one `INITIAL`, two
+  `ROUTE_RESOLUTION`, and two `SEARCH_APPEND` transactions. `V000011` is
+  attributed to target Stage 5 because it resolves a backward page-19 route.
 
 ## Updated Assumptions
 
@@ -70,6 +72,7 @@ visual-screening material was created under `/tmp`.
 | Search hits | 1,154 | 1,154 |
 | Incoming routes resolved here | 3 | 3 |
 | Within-stage routes | 6 | 6 |
+| Outgoing backward routes resolved | 1 | 1 |
 | Cross-range routes opened | 84 | 84 |
 
 The reading dispositions are 62 `CANDIDATE`, 119 `SUPPORTS_CANDIDATE`, 44
@@ -141,8 +144,11 @@ It also resolved all six Stage 6 `WITHIN_STAGE` routes:
 - `R000073`: Leonardo geometrical-constraint passage;
 - `R000088`: `BitXor` munching-squares construction.
 
-The 84 Stage 6 `CROSS_RANGE` routes remain pending for their canonical target
-stages. No future range was pre-reviewed to close them.
+After the zero-delta search, `V000011` resolved backward route `R000097` to
+the already-reviewed 1981 experiment, printout, caption, and
+cellular-automaton co-reference on printed page 19. The remaining 83 Stage 6
+`CROSS_RANGE` routes stay pending for future canonical target stages. No
+future range was pre-reviewed to close them.
 
 ## Source Boundaries And Defects
 
@@ -213,7 +219,11 @@ verified corpus map: documents=29 images=1607 units=14311
 
 Normal and optimized stage gates, normal and optimized mutation/self-tests,
 normal and optimized corpus verification, and byte-compilation all pass. The
-full Goal 4 regression suite is run as the terminal Stage 6 gate.
+terminal full Goal 4 regression suite passes:
+
+```text
+94 passed in 554.43s (0:09:14)
+```
 
 There are no pending Stage 6 `WITHIN_STAGE` routes, no undispositioned LOCAL
 hits, and no semantic discovery on the terminal rerun. Stage 7 may begin with

@@ -148,7 +148,7 @@ A candidate may therefore justify a new catalog entry while remaining a preset, 
 
 ## Current Facts
 
-These are current facts after completion of Stages 1–3:
+These are current facts after completion of Stages 1–6:
 
 - The taxonomy scaffold was re-indexed from Goal 3 to Goal 4 before execution;
   that pre-execution state is retained only as historical provenance in
@@ -194,8 +194,9 @@ These are current facts after completion of Stages 1–3:
 - Stage 6 is complete in `6-CH02-EXPERIMENT.md`: all 489 paired Chapter 2
   units and 78 images are reviewed at the required depth;
   `B0006..B0091` preserve 86 deliberately uncollapsed blind coverage
-  candidates; all 6 within-stage and 3 incoming routes are resolved; 84 new
-  cross-range obligations remain queued; and `S005`/`S006` record 1,154
+  candidates; all 6 within-stage, 3 incoming, and 1 backward route are
+  resolved; 83 new cross-range obligations remain queued; and
+  `S005`/`S006` record 1,154
   fully dispositioned hits with a zero-delta rerun. The live state is valid
   and resumable at Stage 7.
 - The EPUB briefly inspected in the repository was deleted and is not an audit source.
