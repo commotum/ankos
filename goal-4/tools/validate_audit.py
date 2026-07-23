@@ -68,6 +68,17 @@ Q_ID = re.compile(r"^Q[0-9]{4}$")
 H_ID = re.compile(r"^H[0-9]{6}$")
 V_ID = re.compile(r"^V[0-9]{6}$")
 PAGE_NUMBER = re.compile(r"_page_(\d+)")
+SEARCH_QUERY_FIELDS = frozenset(
+    {
+        "query_id",
+        "family",
+        "pattern",
+        "mode",
+        "case_sensitive",
+        "whole_word",
+        "scope_paths",
+    }
+)
 
 
 def load_csv(path: Path, expected_header: list[str]) -> list[dict[str, str]]:
@@ -294,6 +305,28 @@ def search_result_digest(round_record: dict[str, Any]) -> str:
         ],
     }
     return hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
+
+
+def search_query_id_sequence_errors(rounds: object) -> list[str]:
+    """Validate Q IDs in their global encounter order across all rounds."""
+    if not isinstance(rounds, list):
+        return []
+    encountered: list[object] = []
+    for round_record in rounds:
+        if not isinstance(round_record, dict):
+            continue
+        queries = round_record.get("queries")
+        if not isinstance(queries, list):
+            continue
+        for query in queries:
+            if isinstance(query, dict) and set(query) == SEARCH_QUERY_FIELDS:
+                encountered.append(query.get("query_id"))
+    expected = [
+        f"Q{index:04d}" for index in range(1, len(encountered) + 1)
+    ]
+    if encountered != expected:
+        return ["search query IDs are not a complete append-only Q sequence"]
+    return []
 
 
 def execute_frozen_queries(
@@ -2204,6 +2237,7 @@ def validate_objects(
     if not isinstance(rounds, list):
         errors.append("search-rounds.rounds must be an array")
         rounds = []
+    errors.extend(search_query_id_sequence_errors(rounds))
     seen_queries: set[str] = set()
     seen_hits: set[str] = set()
     hit_by_id: dict[str, dict[str, Any]] = {}
@@ -2272,16 +2306,7 @@ def validate_objects(
         current_query_ids: set[str] = set()
         current_query_scopes: dict[str, set[str]] = {}
         for query_index, query in enumerate(queries, start=1):
-            expected_query_fields = {
-                "query_id",
-                "family",
-                "pattern",
-                "mode",
-                "case_sensitive",
-                "whole_word",
-                "scope_paths",
-            }
-            if not isinstance(query, dict) or set(query) != expected_query_fields:
+            if not isinstance(query, dict) or set(query) != SEARCH_QUERY_FIELDS:
                 errors.append(
                     f"search round {round_index} query {query_index} fields are invalid"
                 )
@@ -2583,11 +2608,6 @@ def validate_objects(
             seen.update(delta_values[key])
         ordered_stage18_candidates.extend(delta_values["new_candidates"])
         ordered_stage18_routes.extend(delta_values["new_routes"])
-
-    if seen_queries != {
-        f"Q{index:04d}" for index in range(1, len(seen_queries) + 1)
-    }:
-        errors.append("search query IDs are not a complete append-only Q sequence")
 
     search_discovered_candidates = [
         candidate["id"]
@@ -4715,6 +4735,100 @@ def mutation_checks(
             "valid local-search mutation fixture failed: " + "; ".join(search_errors)
         )
     else:
+        def refresh_round_digest(round_record: dict[str, Any]) -> None:
+            round_digest = search_result_digest(round_record)
+            round_record["result_digest"] = round_digest
+            round_record["rerun_digest"] = round_digest
+
+        def replace_active_query_id(
+            search_state: dict[str, Any],
+            query_id: str,
+        ) -> None:
+            active_round = search_state["rounds"][1]
+            active_round["queries"][-1]["query_id"] = query_id
+            for hit in active_round["hits"]:
+                hit["query_id"] = query_id
+            refresh_round_digest(active_round)
+
+        impossible_query = copy.deepcopy(epoch1_round["queries"][0])
+        impossible_query["family"] = "query-order mutation fixture"
+
+        reversed_query_order = copy.deepcopy(search_fixture)
+        reversed_extra = copy.deepcopy(impossible_query)
+        reversed_extra["query_id"] = "Q0003"
+        reversed_query_order["rounds"][1]["queries"].insert(
+            0, reversed_extra
+        )
+        refresh_round_digest(reversed_query_order["rounds"][1])
+
+        duplicate_query_id = copy.deepcopy(search_fixture)
+        replace_active_query_id(duplicate_query_id, "Q0001")
+
+        skipped_query_id = copy.deepcopy(search_fixture)
+        replace_active_query_id(skipped_query_id, "Q0003")
+
+        cross_round_query_order = copy.deepcopy(search_fixture)
+        cross_round_extra = copy.deepcopy(impossible_query)
+        cross_round_extra["query_id"] = "Q0003"
+        cross_round_query_order["rounds"][0]["queries"].append(
+            cross_round_extra
+        )
+        refresh_round_digest(cross_round_query_order["rounds"][0])
+        cross_round_history = append_history_event(
+            base_history,
+            search_reading,
+            search_assets,
+            path,
+            2,
+            "REOPEN",
+            "fixture-reviewer",
+            cross_round_query_order["rounds"][:1],
+        )
+
+        query_order_mutations = (
+            ("reversed query IDs", reversed_query_order, search_history),
+            ("duplicate query ID", duplicate_query_id, search_history),
+            ("skipped query ID", skipped_query_id, search_history),
+            (
+                "cross-round query order",
+                cross_round_query_order,
+                cross_round_history,
+            ),
+        )
+        for mutation_name, search_state, history_state in query_order_mutations:
+            order_errors = validate_objects(
+                manifest,
+                units,
+                search_reading,
+                base_candidates,
+                base_routes,
+                search_assets,
+                search_state,
+                history_state,
+            )
+            if (
+                "search query IDs are not a complete append-only Q sequence"
+                not in order_errors
+            ):
+                failures.append(
+                    f"{mutation_name} unexpectedly passed Q-sequence validation"
+                )
+            replay_or_digest_errors = [
+                error
+                for error in order_errors
+                if (
+                    "recorded results differ from independent query execution"
+                    in error
+                    or "result digest is stale" in error
+                    or "rerun did not reproduce" in error
+                )
+            ]
+            if replay_or_digest_errors:
+                failures.append(
+                    f"{mutation_name} did not preserve replay/digest validity: "
+                    + "; ".join(replay_or_digest_errors)
+                )
+
         stale_digest = copy.deepcopy(search_fixture)
         stale_digest["rounds"][1]["result_digest"] = "0" * 64
         mutations.append(

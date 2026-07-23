@@ -102,6 +102,39 @@ def test_schema_files_are_frozen() -> None:
     assert MODULE.validate_schema_files(MODULE.GOAL_DIR) == []
 
 
+def test_search_query_ids_follow_global_encounter_order() -> None:
+    def query(query_id: str):
+        return {
+            "query_id": query_id,
+            "family": "query-order fixture",
+            "pattern": "__QUERY_ORDER_FIXTURE__",
+            "mode": "LITERAL",
+            "case_sensitive": True,
+            "whole_word": False,
+            "scope_paths": ["fixture.md"],
+        }
+
+    positive_multi_round = [
+        {"queries": [query("Q0001"), query("Q0002")]},
+        {"queries": [query("Q0003")]},
+    ]
+    assert MODULE.search_query_id_sequence_errors(positive_multi_round) == []
+
+    invalid = {
+        "reversed": [{"queries": [query("Q0002"), query("Q0001")]}],
+        "duplicate": [{"queries": [query("Q0001"), query("Q0001")]}],
+        "skipped": [{"queries": [query("Q0001"), query("Q0003")]}],
+        "cross-round": [
+            {"queries": [query("Q0001"), query("Q0003")]},
+            {"queries": [query("Q0002")]},
+        ],
+    }
+    for label, rounds in invalid.items():
+        assert MODULE.search_query_id_sequence_errors(rounds) == [
+            "search query IDs are not a complete append-only Q sequence"
+        ], label
+
+
 def test_stage18_requires_every_local_stage_before_saturation() -> None:
     manifest, units, reading, candidates, routes, assets, _, _ = load()
     assert candidates == []
