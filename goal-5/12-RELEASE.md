@@ -2,6 +2,11 @@
 
 Status: COMPLETE
 
+> **Historical release record.** The finished 29-document corpus is the
+> repository's canonical source at `ref/A-New-Kind-of-Science/`. Goal 5's
+> build machinery and intermediary evidence remain recoverable from Git commit
+> `bc4d240c9e12f73d11039f5f1a2a251e0174e804`.
+
 ## Big-Picture Objective
 
 Release the corrected 29-document Markdown corpus with accurate generated

@@ -2,6 +2,12 @@
 
 Shorthand: `UNIVERSAL-CONSTRUCTIONS`
 
+> **Source location for subsequent work:** use
+> [`ref/A-New-Kind-of-Science/Contents.md`](../ref/A-New-Kind-of-Science/Contents.md)
+> and the 29 canonical documents it links. This completed goal's embedded
+> source-line records are historical evidence for its conclusions, not the
+> citation surface for new implementation work.
+
 ## Big-Picture Objective
 
 Derive the simplest coherent constructive API capable of representing every catalog entry in `ref/notes/CA-Types.csv` without family-specific rollouts, semantic disguises, fallback paths, or speculative universal abstractions.
@@ -18,8 +24,8 @@ Goal 1 is research, architecture, and implementation planning. It does not imple
 - `tests/`: current behavioral evidence and runtime contracts.
 - `ref/notes/CA-Types.csv`: authoritative 45-row coverage index.
 - `ref/notes/CA-Types.md`: taxonomy and search-vocabulary seed, not a substitute for book evidence.
-- `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`: canonical local book text for excerpt collection.
-- Split chapter files, atlas, notes, and index under `ref/A-New-Kind-of-Science/`: navigation and cross-reference aids. Do not duplicate an excerpt merely because it appears in both the monolith and a split file.
+- `ref/A-New-Kind-of-Science/Contents.md` and its 29 linked documents: canonical local book source for subsequent lookup and citation.
+- The completed Goal 1 stage records: historical excerpt inventories and construction-analysis evidence.
 
 ## Non-Negotiable Constraints
 

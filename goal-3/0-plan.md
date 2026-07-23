@@ -28,9 +28,9 @@ Goal 3 is a research, taxonomy, and architecture-pressure audit. It does not imp
 
 1. **Book-first discovery.** Do not use T01–T45, `CA-Types.md`, Goal 1 stage conclusions, the proposed API, or runtime capabilities to decide what exists in the Book during the blind discovery phase.
 2. **Artifact-level independence, not a false claim of amnesia.** Prior context is known, but blind discovery artifacts use provisional `B####` candidate IDs and contain no T-ID mappings or API-fit decisions until Stage 19.
-3. **Sequential coverage precedes search saturation.** Keyword searches, headings, Index terms, and the Atlas can find omissions but cannot substitute for reading every source unit in order.
-4. **The monolith is canonical.** Use `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md` for completeness, order, and canonical provenance. Split Markdown is a secondary witness and image-location aid.
-5. **Main text and Notes are paired.** Review each chapter's main-text span together with its corresponding Notes span. Do not trust split directory names to identify semantic ownership.
+3. **Sequential coverage precedes search saturation.** Keyword searches, headings, and Index terms can find omissions but cannot substitute for reading every source unit in order.
+4. **The ordered 29-document corpus is canonical.** Start from `ref/A-New-Kind-of-Science/Contents.md`, follow its document order, and use those linked Markdown files for completeness and provenance.
+5. **Main text and Notes are paired.** Review each chapter document together with its corresponding Notes document.
 6. **Figures count as evidence.** Visually screen every image at least once, using contact sheets or thumbnails where appropriate. Inspect construction-bearing, text-bearing, ambiguous, or caption-incomplete figures at original resolution with their surrounding context; do not infer exact rules from pixels when the source does not establish them.
 7. **No count target.** Do not protect 45, inflate the number of additions, or collapse candidates merely to preserve an elegant API.
 8. **Coverage catalog and semantic families remain separate.** A named preset can deserve a catalog row without a new executor. Conversely, two systems can fit the same five fields while remaining semantically distinct.
@@ -43,7 +43,7 @@ Goal 3 is a research, taxonomy, and architecture-pressure audit. It does not imp
 15. **Declarative objects are not fake trajectories.** A constraint, function, constant, equation, or model set may be in scope without a native update.
 16. **Insufficient source evidence is a resolved boundary, not permission to invent.** Record the exact missing mechanics and classify the candidate as `INSUFFICIENT_BOOK_EVIDENCE` after exhaustive review.
 17. **External sources are auxiliary only.** They may clarify terminology or document a source defect, but they cannot create Book coverage or silently fill absent Book semantics.
-18. **Preserve source defects.** OCR errors, missing assets, contradictory claims, and underdetermined rules remain visible and are never silently repaired.
+18. **Preserve the canonical source.** Do not edit the Book corpus during the taxonomy audit. Record any apparent textual, visual, or semantic ambiguity as an audit finding rather than silently changing source material.
 19. **Scope writes to Goal 3.** During execution, preserve current dirty work and write audit artifacts only under `goal-3/` unless the user explicitly authorizes integration elsewhere.
 20. **No stage completes on green tooling alone.** Validators prove ledger integrity; they do not prove that a human or agent read and correctly understood the source.
 
@@ -51,7 +51,7 @@ Goal 3 is a research, taxonomy, and architecture-pressure audit. It does not imp
 
 ### Source Unit
 
-A deterministic, hash-bound unit of the canonical monolith: heading, paragraph, list item, code/formula block, caption, table-like block, image reference, or other indivisible review unit. Source units must partition the canonical corpus without silent gaps or overlaps.
+A deterministic, hash-bound unit of one canonical book document: heading, paragraph, list item, code/formula block, caption, table-like block, image reference, or other indivisible review unit. Source units must partition the ordered 29-document corpus without silent gaps or overlaps.
 
 ### Candidate
 
@@ -123,29 +123,27 @@ A candidate may therefore justify a new catalog entry while remaining a preset, 
 ## Authoritative Inputs
 
 - User directions and `principles.md`.
-- `ref/A-New-Kind-of-Science/A-New-Kind-of-Science.md`: canonical Book transcription.
-- The 12 chapter Markdown files and split back matter: secondary witnesses and resolvable image links.
-- The 1,444 local Book images: visual evidence governed through a basename/hash crosswalk.
-- `ANKoS-Atlas.md`: late-stage navigation and missed-section comparator only, never primary Book evidence.
-- The actual Index within the canonical monolith: alias and cross-reference discovery, not construction proof by itself.
+- [Canonical source overview](../ref/A-New-Kind-of-Science/README.md).
+- [Ordered contents](../ref/A-New-Kind-of-Science/Contents.md), linking all 29 canonical book documents.
+- The 1,607 colocated Book images referenced by those documents.
+- [The canonical Index](../ref/A-New-Kind-of-Science/BACK-MATTER/Index.md): alias and cross-reference discovery, not construction proof by itself.
 - `ref/notes/CA-Types.csv`, `ref/notes/CA-Types.md`, Goal 1, Goal 2, `api.md`, `simple_programs.md`, and `src/ca`: withheld during blind discovery and opened only for reconciliation and architecture-pressure analysis.
 
 ## Current Facts
 
-These are scaffold-time facts to reverify and hash-pin in Stage 2:
+These are current cutover facts to reverify and hash-pin in Stage 2:
 
 - `CA-Types.md` explicitly says its source scope is Chapters 3–5. Goal 1 makes the 45-row CSV exhaustive relative to that seed catalog, not relative to an independent whole-book discovery pass.
-- The current catalog has stable identifiers T01–T45. At scaffold time, Goal 1 reports 43 complete types, T40 in progress, and T42 pending; Goal 3 must resync rather than depend on that snapshot.
-- The local ANKoS tree contains 19 Markdown files and 1,444 physical JPEGs.
-- The canonical monolith has 22,497 physical newline-terminated lines and 22,498 logical lines because the final line lacks a trailing newline.
-- The monolith contains 1,444 image references with 1,444 unique basenames. Split Markdown contains 1,441 references; three monolith-referenced assets are omitted from the split Markdown.
-- Split back-matter names are misleading: `BACK-MATTER/Notes/Notes.md` is one stray line; Chapter 12 crosses into General Notes; files named `Index.md` and `Colophon.md` contain large Notes continuations.
-- `ANKoS-Atlas.md` is derivative and useful only as a checklist after blind reading.
+- The current catalog has stable identifiers T01–T45, and Goal 1 reports all 45 type stages plus synthesis and the implementation handoff complete.
+- The canonical source tree contains exactly 29 ordered book documents, plus `README.md` and `Contents.md`.
+- The 29 documents cover publication information and printed contents, Preface, Chapters 1–12, General Notes, Notes for Chapters 1–12, Index, and Colophon.
+- The canonical source tree contains 1,607 JPEGs colocated with their owning document groups.
+- The source documents and their image references were validated before canonical cutover; Stage 2 must independently reverify counts, hashes, ordering, and link resolution rather than inherit that verdict.
 - The EPUB briefly inspected in the repository was deleted and is not an audit source.
 - Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
 - Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.
 
-## Canonical Monolith Map
+## Canonical Corpus Map
 
 Stage 2 must rederive this map rather than trust it blindly:
 
@@ -217,9 +215,9 @@ Execution of the stages will create, refine, and verify:
 
 ## Success Metrics
 
-- All 19 Markdown files and all 1,444 physical images are present in the source manifest or explicitly diagnosed.
+- All 29 canonical book documents, both navigation documents, and all 1,607 physical images are present in the source manifest or explicitly diagnosed.
 - Every canonical logical line belongs to exactly one segment and every deterministic source unit has exactly one reading-ledger disposition.
-- Preface/bookends, 12/12 main chapters, General Notes, 12/12 chapter Notes spans, actual Index, and Colophon are screened.
+- Preface/bookends, 12/12 main chapters, General Notes, 12/12 chapter Notes documents, canonical Index, and Colophon are screened.
 - Every image reference has an asset-ledger row and every physical image is visually screened at least once; construction-bearing, text-bearing, ambiguous, and caption-incomplete images receive original-resolution review with surrounding context.
 - Every relevant cross-reference reaches a reviewed target or a documented missing target.
 - Sequential discovery and recursive search reach a declared fixed point with no undispositioned search hit.
@@ -233,9 +231,9 @@ Execution of the stages will create, refine, and verify:
 
 ## Verification Requirements
 
-- Independently parse the raw monolith and compare it with the manifest and source-unit ledger; do not derive expected coverage from the same ledger being tested.
+- Independently parse all 29 ordered documents and compare them with the manifest and source-unit ledger; do not derive expected coverage from the same ledger being tested.
 - Prove segment and source-unit union equals the canonical corpus with no gaps or overlaps.
-- Verify every source reference, split witness, image basename/path, and hash resolves or has an explicit defect record.
+- Verify every source reference, document link, image path, and hash resolves or has an explicit finding.
 - Verify candidate IDs, source-unit links, cross-reference targets, search dispositions, classification rows, and coverage-matrix joins are total and unique.
 - Verify blind artifacts were frozen before T reconciliation and contain no T-ID mapping or API-fit fields.
 - Re-run all search rounds and compare query/result digests.
@@ -273,22 +271,22 @@ Fix the audit's inclusion threshold, evidence model, candidate identity, disposi
 
 #### Big Picture Objective
 
-Create a trustworthy, hash-pinned map of the entire local Book corpus despite malformed split boundaries and broken monolith image paths.
+Create a trustworthy, hash-pinned map of the complete canonical Book corpus.
 
 #### Detailed Implementation Plan
 
-- Inventory and hash all Markdown and image files.
-- Re-derive canonical logical-line boundaries for front matter, all chapters, General Notes, all chapter Notes, actual Index, and Colophon.
-- Crosswalk split Markdown paragraphs and image references back to canonical segments.
-- Reconcile the 1,444 monolith references, 1,441 split references, and physical assets, including the three known split omissions.
-- Record malformed split ownership without rewriting source files.
+- Inventory and hash all canonical Markdown and image files.
+- Verify that `Contents.md` names exactly the 29 book documents in canonical order.
+- Partition each document into deterministic source units and bind every unit to its document, byte range, logical-line range, and hash.
+- Resolve every document and image link from its owning Markdown file.
+- Reconcile the physical image inventory with all Markdown references without rewriting source files.
 
 #### Completion Requirements
 
-- `corpus-manifest.json` accounts for every Markdown file and physical image.
-- Canonical segments cover all logical lines exactly once.
-- Every image reference resolves through a unique basename/hash or has an explicit defect.
-- Split anomalies and ownership mappings are machine-verifiable.
+- `corpus-manifest.json` accounts for all 29 book documents, the two navigation documents, and all 1,607 physical images.
+- Canonical source units cover every book-document byte and logical line exactly once.
+- Every image reference resolves to its intended colocated file and hash or has an explicit finding.
+- Document order and ownership mappings are machine-verifiable.
 - Independent source-manifest verification and mutation checks pass.
 
 ### 3-AUDIT-HARNESS
@@ -341,8 +339,8 @@ Blindly audit Chapter 1 main text and Chapter 1 Notes for construction-bearing s
 
 #### Detailed Implementation Plan
 
-- Sequentially review canonical main lines 168–399 and Notes lines 10818–10894 after revalidated Stage 2 mapping.
-- Inspect all owned captions, code/formulas, tables, and images through split witnesses.
+- Sequentially review `CHAPTERS/01-The-Foundations-for-a-New-Kind-of-Science.md` and `BACK-MATTER/NOTES/01-The-Foundations-for-a-New-Kind-of-Science-Notes.md`.
+- Inspect all owned captions, code/formulas, tables, and images in their canonical document context.
 - Record B candidates and full provisional semantic fingerprints.
 - Run a range-local trigger/alias search only after sequential reading.
 - Queue cross-range references without consulting the existing catalog.
@@ -362,7 +360,7 @@ Blindly audit Chapter 2 main text and Chapter 2 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review canonical main lines 400–681 and Notes lines 10895–11630.
+- Sequentially review `CHAPTERS/02-The-Crucial-Experiment.md` and `BACK-MATTER/NOTES/02-The-Crucial-Experiment-Notes.md`.
 - Apply the same source-unit, image, candidate, local-search, and cross-reference protocol established in Stage 5.
 - Treat rules, initial conditions, behavior classes, properties, renderings, and historical commentary as distinct roles.
 
@@ -381,7 +379,7 @@ Blindly audit Chapter 3 main text and Chapter 3 Notes without using the catalog 
 
 #### Detailed Implementation Plan
 
-- Sequentially review canonical main lines 682–1369 and Notes lines 11631–12498.
+- Sequentially review `CHAPTERS/03-The-World-of-Simple-Programs.md` and `BACK-MATTER/NOTES/03-The-World-of-Simple-Programs-Notes.md`.
 - Inspect implementation code, rule tables, figure-only mechanics, variants, histories, and cross-system comparisons.
 - Allocate B candidates independently of T IDs or familiar names.
 - Preserve distinctions among native construction, restriction, representation, emulation, observer, and behavior.
@@ -401,7 +399,7 @@ Blindly audit Chapter 4 main text and Chapter 4 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review canonical main lines 1370–2143 and Notes lines 12499–13459.
+- Sequentially review `CHAPTERS/04-Systems-Based-on-Numbers.md` and `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md`.
 - Separate immutable definitions, representation queries, iterative work procedures, sequences, filters, maps, continuous systems, equations, observations, and numerical methods.
 - Inspect every formula, implementation fragment, caption, and governed image.
 - Record exactness, partiality, completion, and hidden-work-state requirements in candidate fingerprints.
@@ -421,7 +419,7 @@ Blindly audit Chapter 5 main text and Chapter 5 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review canonical main lines 2144–2701 and Notes lines 13460–14198.
+- Sequentially review `CHAPTERS/05-Two-Dimensions-and-Beyond.md` and `BACK-MATTER/NOTES/05-Two-Dimensions-and-Beyond-Notes.md`.
 - Record topology, dimensionality, structural replacement, graph identity, branching, constraints, schedules, and witness semantics explicitly.
 - Inspect rule diagrams and construction-bearing images in full context.
 - Preserve underdetermined variants rather than choosing convenient conventions.
@@ -441,7 +439,7 @@ Blindly audit Chapter 6 main text and Chapter 6 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review canonical main lines 2702–3421 and Notes lines 14199–14847.
+- Sequentially review `CHAPTERS/06-Starting-from-Randomness.md` and `BACK-MATTER/NOTES/06-Starting-from-Randomness-Notes.md`.
 - Distinguish behavior classes, ensembles, random seeds, attractors, perturbations, finite-size protocols, and any native construction changes.
 - Record probability laws only where the Book specifies them.
 - Inspect all captions/images and run local saturation after reading.
@@ -461,7 +459,7 @@ Blindly audit Chapter 7 main text and Chapter 7 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review canonical main lines 3422–4337 and Notes lines 14848–15582.
+- Sequentially review `CHAPTERS/07-Mechanisms-in-Programs-and-Nature.md` and `BACK-MATTER/NOTES/07-Mechanisms-in-Programs-and-Nature-Notes.md`.
 - Pay explicit attention to stochastic movement, aggregation, constraint satisfaction, continuity/discreteness mechanisms, and systems introduced as explanatory examples.
 - Record event selection, probability, frontier growth, and ensemble/observer distinctions.
 - Inspect every construction-bearing figure and follow local references.
@@ -481,7 +479,7 @@ Blindly audit Chapter 8 main text and Chapter 8 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review canonical main lines 4338–5165 and Notes lines 15583–16011.
+- Sequentially review `CHAPTERS/08-Implications-for-Everyday-Systems.md` and `BACK-MATTER/NOTES/08-Implications-for-Everyday-Systems-Notes.md`.
 - Determine whether each application merely instantiates earlier mechanics or specifies new coupling, mutation, global selection, growth, stochastic, or hybrid semantics.
 - Keep physical interpretation and display conventions outside native construction identity unless the Book makes them causal.
 - Inspect all figures and implementation details.
@@ -501,7 +499,7 @@ Blindly audit Chapter 9 main text and Chapter 9 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review canonical main lines 5166–6587 and Notes lines 16012–17086.
+- Sequentially review `CHAPTERS/09-Fundamental-Physics.md` and `BACK-MATTER/NOTES/09-Fundamental-Physics-Notes.md`.
 - Record multi-time state, reversibility constructions, block schedules, conserved systems, network rewrites, causal event structures, branching, and sequencing evidence without forcing them into prior categories.
 - Distinguish derived causal representations from native evolution and distinguish property restrictions from construction-enforced mechanics.
 - Inspect all relevant rule diagrams, network figures, and formulas.
@@ -521,7 +519,7 @@ Blindly audit Chapter 10 main text and Chapter 10 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review canonical main lines 6588–7693 and Notes lines 17087–18194.
+- Sequentially review `CHAPTERS/10-Processes-of-Perception-and-Analysis.md` and `BACK-MATTER/NOTES/10-Processes-of-Perception-and-Analysis-Notes.md`.
 - Separate analyzers and compression/view procedures from generative probabilistic models, transducers, automata, and stochastic cellular systems.
 - Record consumed input, hidden state, output semantics, likelihood/probability roles, and learning/fitting procedures where specified.
 - Inspect code, formulas, captions, and all governed images.
@@ -541,7 +539,7 @@ Blindly audit Chapter 11 main text and Chapter 11 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review canonical main lines 7694–8609 and Notes lines 18195–19027.
+- Sequentially review `CHAPTERS/11-The-Notion-of-Computation.md` and `BACK-MATTER/NOTES/11-The-Notion-of-Computation-Notes.md`.
 - Distinguish native constructions from emulations, universal presets, encodings, proof artifacts, and computational properties.
 - Record any construction mechanics introduced only to establish universality.
 - Inspect all diagrams, encodings, implementation passages, and cross-references.
@@ -561,7 +559,7 @@ Blindly audit Chapter 12 main text and Chapter 12 Notes.
 
 #### Detailed Implementation Plan
 
-- Sequentially review canonical main lines 8610–10622 and Notes lines 19028–20825.
+- Sequentially review `CHAPTERS/12-The-Principle-of-Computational-Equivalence.md` and `BACK-MATTER/NOTES/12-The-Principle-of-Computational-Equivalence-Notes.md`.
 - Separate philosophical claims, mathematical examples, axiom systems, proof/search relations, computations, and actual formal constructions.
 - Record any explicitly instantiated rewrite, proof, equation, machine, or generative mechanism.
 - Inspect all images and follow every locally resolvable route.
@@ -577,21 +575,19 @@ Blindly audit Chapter 12 main text and Chapter 12 Notes.
 
 #### Big Picture Objective
 
-Screen the complete actual Index and then use the Atlas to find names, aliases, and sections missed by sequential reading without treating either as primary construction evidence.
+Screen the complete canonical Index for names, aliases, cross-references, and sections missed by sequential reading without treating Index entries alone as primary construction evidence.
 
 #### Detailed Implementation Plan
 
-- Sequentially inspect every actual-Index source unit/headword at canonical lines 20826–22457, assigning explicit no-construction dispositions where appropriate.
+- Sequentially inspect every source unit and headword in `BACK-MATTER/Index.md`, assigning explicit no-construction dispositions where appropriate.
 - Follow every construction-relevant page route to an already reviewed source unit or reopen the owning chapter stage.
-- Compare the Atlas's section/term inventory against discovered candidates only after Index review.
-- Record Index-only and Atlas-only leads, false positives, and unresolved OCR routes.
+- Record Index-only leads, false positives, and unresolved routes.
 
 #### Completion Requirements
 
 - Every actual-Index source unit/headword is screened; every construction-relevant route is mapped, excluded with reason, or assigned a documented missing target.
-- Every Atlas lead maps to reviewed Book evidence or a clear derivative-only exclusion.
 - Any missed construction reopens and re-closes its owning stage.
-- Index/Atlas text is never the sole mechanics evidence for an accepted candidate.
+- Index text is never the sole mechanics evidence for an accepted candidate.
 
 ### 18-SATURATION
 

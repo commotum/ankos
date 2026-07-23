@@ -2,6 +2,12 @@
 
 Shorthand: `BOOK-SOURCE`
 
+> **Historical completion record.** This goal is complete and is not an active
+> build system. The canonical book source now lives directly at
+> `ref/A-New-Kind-of-Science/`. The execution tools, tests, correction ledgers,
+> source maps, and intermediate assets used to produce it remain recoverable
+> from Git commit `bc4d240c9e12f73d11039f5f1a2a251e0174e804`.
+
 ## Big-Picture Objective
 
 Create a reliable Markdown source of the complete *A New Kind of Science* book

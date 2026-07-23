@@ -346,7 +346,7 @@ small and testable.
 ## References
 
 ```text
-ref/A-New-Kind-of-Science/ANKoS-Atlas.md  book atlas and chapter map
+ref/A-New-Kind-of-Science/Contents.md     canonical book contents and navigation
 ref/notes/generator.md                    trajectory generator schema
 ref/notes/CA-Types.md                     construction taxonomy
 ```

@@ -10,7 +10,6 @@ This loop governs every stage in `goal-3/0-plan.md`. The plan is authoritative b
 - Discovery candidates use provisional `B####` IDs.
 - Do not consult or import T01–T45 mappings, `CA-Types.md` summaries, Goal 1 type conclusions, Goal 2 plans, `api.md`, `simple_programs.md`, or `src/ca` to decide what the Book contains.
 - Do not claim cognitive amnesia. Instead, make the artifacts structurally independent: no T-ID mapping columns, API-fit fields, or existing-family dispositions are allowed before the blind candidate ledger is frozen.
-- The Atlas is withheld until Stage 17 because it is a derivative summary that could anchor discovery.
 
 ### Reconciliation and semantics: Stages 19–21
 
@@ -48,7 +47,7 @@ This loop governs every stage in `goal-3/0-plan.md`. The plan is authoritative b
 - Preserve the distinction between Book evidence, taxonomy, semantic equivalence, API fit, implementation, verifier, diagnostic, and fallback paths.
 - Preserve the distinction between a coverage entry and a semantic family.
 - Do not protect the current count of 45 or pursue a larger count as a success metric.
-- Do not infer mechanics from a name, Index entry, Atlas summary, nearby image, historical mention, or external definition.
+- Do not infer mechanics from a name, Index entry, nearby image, historical mention, or external definition.
 - Do not classify by current API convenience or runtime support.
 - Do not call two constructions equivalent through opaque state packing, arbitrary callbacks, hidden schedules, source interpreters, lossy projections, or multi-step emulation.
 - Do not fabricate semantics when the Book is incomplete or contradictory.
@@ -119,7 +118,7 @@ Short excerpts may be retained when necessary to pin exact mechanics, but do not
 
 ## Asset Protocol
 
-- Map monolith image basenames to unique physical files and hashes; never trust broken monolith relative paths directly.
+- Map every canonical image reference to its resolved physical file and hash.
 - Give every reference an asset-ledger row even when the image is non-constructional.
 - Visually screen every physical image at least once; contact-sheet or thumbnail review is acceptable for initial screening.
 - Classify the image role as `NATIVE_EVIDENCE`, `RELATION`, `CONTROL`, `OBSERVER`, `DECORATIVE`, or `SOURCE_DEFECT`.
@@ -342,7 +341,7 @@ At the end of every stage, answer:
 
 ### Index and saturation
 
-- Every Index source unit/headword is screened, and every relevant Index/Atlas lead and cross-reference has a final route record.
+- Every Index source unit/headword is screened, and every relevant Index lead and cross-reference has a final route record.
 - Search result sets reproduce from frozen queries.
 - Every hit is partitioned with no remainder.
 - The final iteration is a real fixed point.
@@ -366,8 +365,8 @@ At the end of every stage, answer:
 
 ## Final Verification
 
-- Re-hash and independently parse the complete raw corpus.
-- Verify all 19 Markdown files, all canonical logical lines, all 1,444 physical images, and all monolith references are accounted for.
+- Re-hash and independently parse the complete canonical corpus.
+- Verify all 29 book documents, both navigation documents, all canonical logical lines, all 1,607 physical images, and every image reference are accounted for.
 - Verify all source units have reading dispositions.
 - Verify all search hits and relevant cross-references have final dispositions.
 - Verify all candidates have complete provenance, fingerprints, and one value on each final classification axis.

@@ -1,6 +1,11 @@
 # Goal 1 Evidence Index
 
-This ledger is the authoritative coverage join between `ref/notes/CA-Types.csv`, the numbered taxonomy sections in `ref/notes/CA-Types.md`, Goal 1 evidence stages, and the eventual Goal 2 conformance obligations. `CA-Types.md` supplies search vocabulary only; book evidence must come from the canonical monolith.
+> **Source location for subsequent work:** use
+> [`ref/A-New-Kind-of-Science/Contents.md`](../ref/A-New-Kind-of-Science/Contents.md)
+> and its 29 linked canonical documents. The source-line inventories below are
+> retained as Goal 1's historical evidence record.
+
+This ledger is the authoritative coverage join between `ref/notes/CA-Types.csv`, the numbered taxonomy sections in `ref/notes/CA-Types.md`, Goal 1 evidence stages, and the eventual Goal 2 conformance obligations. `CA-Types.md` supplies search vocabulary only; new book evidence must come from the canonical 29-document corpus linked above.
 
 ## Status Vocabulary
 

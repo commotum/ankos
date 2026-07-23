@@ -248,7 +248,7 @@ Pass the rendered `seed_state` to `ca.rollout(...)`.
 ## References
 
 ```text
-ref/A-New-Kind-of-Science/ANKoS-Atlas.md  book atlas and chapter map
+ref/A-New-Kind-of-Science/Contents.md     canonical book contents and navigation
 ref/notes/CA-Types.md                     construction taxonomy
 ref/notes/generator.md                    trajectory generator schema
 ```
