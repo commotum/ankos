@@ -1,7 +1,7 @@
 # 3-AUDIT-HARNESS
 
-Status: **COMPLETE** after adversarial reclosure and independent system/history
-signoff.
+Status: **COMPLETE** after adversarial reclosure, independent system/history
+signoff, and the Stage 4 interleaved-evidence regression.
 
 ## Current Facts
 
@@ -20,9 +20,10 @@ signoff.
   `V######` transaction. Replaying those transactions from the empty initial
   state must reproduce all six mutable ledgers and the latest per-path
   snapshots exactly.
-- The live Stage 4 starting state remains byte-for-byte equal to the generated
-  initial state: 0 reviewed units, 0 screened assets, 0 candidates, 0 routes,
-  and 0 search rounds.
+- The generated empty state remains byte-reproducible as the Stage 4 baseline.
+  The live audit has since advanced validly through Stage 4: 157 reviewed
+  units, 2 screened assets, 2 active candidates, 4 pending cross-range routes,
+  2 LOCAL rounds, and 3 atomic review-history events.
 
 ## Updated Assumptions
 
@@ -198,6 +199,15 @@ global `B/R/E/G` namespaces and rewrites all nested joins. Worker output cannot
 resolve routes, perform coordinator search, assign reconciliation fields, or
 reassign tombstone evidence.
 
+Worker evidence allocation is global to the frozen discovery traversal, not
+candidate-record order. A candidate may therefore own nonconsecutive worker
+evidence IDs when another candidate is discovered between its first and later
+support. The verifier flattens all evidence, requires the complete unique
+`WE000001...` sequence, checks source/image anchor monotonicity in numeric WE
+order, and orders WG groups by their first WE. The coordinator uses that same
+numeric order for global `E/G` allocation. Stage 4 exercises the case
+`B0001={E000001,E000003}` and `B0002={E000002,E000004}`.
+
 Prepared merge plans are immutable mappings with a validation token covering
 all original bytes/modes and all proposed ledger bytes. Apply recomputes that
 token before entering the transaction. The initializer has no reset or
@@ -304,7 +314,10 @@ uv run --with pytest pytest -q goal-4/tools/test_audit.py
   15 passed
 
 uv run --with pytest pytest -q goal-4/tools/test_merge_worker_output.py
-  34 passed
+  36 passed
+
+uv run --with pytest pytest -q goal-4/tools/test_prepare_review_output.py
+  8 passed
 
 uv run --with pytest pytest -q goal-4/tools/test_audit_transaction.py
   22 passed
@@ -341,6 +354,9 @@ input projections, and global ID collisions, and prove that preview is
 non-mutating, explicit apply uses validated staging, all four worker ID
 families are rewritten, and search state is preserved. They also prove that:
 
+- evidence allocation remains source/image ordered when support for one
+  candidate is interleaved with another candidate's discovery, while gap,
+  duplicate, group-order, and out-of-traversal mutations fail;
 - final-missing route resolution remains reachable after full review, LOCAL
   closure, and a non-fixed current-epoch full-corpus saturation round;
 - a 28/29-document saturation scope is rejected;
@@ -369,6 +385,6 @@ Re-integration answers:
 8. The guardrail machine contract was strengthened for discovery epochs,
    visual risk, route closure, query replay, evidence groups, and lineage.
 9. The audit remains independent of the current taxonomy count and API.
-10. Exact next stage: `4-BOOKENDS`, beginning with its assigned canonical units
-    and images in document-first order, followed by its frozen local search and
-    route closure.
+10. At original Stage 3 completion the exact next stage was `4-BOOKENDS`.
+    That stage is now complete; the harness remains closed and the live audit
+    resumes at `5-CH01-FOUNDATIONS`.

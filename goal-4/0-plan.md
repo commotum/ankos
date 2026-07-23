@@ -172,12 +172,18 @@ These are current facts after completion of Stages 1–3:
   `V######` transaction, and replay validates every historical prefix as well
   as the terminal state. Coordinator apply is protected by immutable prepared
   plans, a cooperative read/write lock, a durable recovery journal, and
-  deterministic six-ledger rollback/finalization.
+  deterministic six-ledger rollback/finalization. Stage 4 subsequently exposed
+  and reclosed one evidence-allocation edge case: worker evidence IDs now
+  follow frozen source/image traversal independently of candidate grouping,
+  with regression coverage through preview, apply, and replay.
 - Independent Stage 3 reclosure proved that 28/29-document saturation cannot
   authorize a final missing target, 29/29 remains reachable, and a saturation
-  round from an earlier epoch is stale after reopen. The valid Stage 4 starting
-  state remains empty: 0 reviewed units, 0 screened images, 0 candidates,
-  0 routes, and 0 search rounds.
+  round from an earlier epoch is stale after reopen.
+- Stage 4 is complete in `4-BOOKENDS.md`: 157 source units and 2 physical
+  images are reviewed, `B0001`/`B0002` record the Rule 30 and Rule 110
+  bookend constructions, 4 cross-range routes are queued, and 2 exact-scope
+  LOCAL rounds record 144 fully dispositioned hits with a zero-delta rerun.
+  The live state is valid and resumable at Stage 5.
 - The EPUB briefly inspected in the repository was deleted and is not an audit source.
 - Existing Goal 1 stages already record some systems as siblings, future work, unsupported execution, or separate constructions. Those records are valuable only after blind discovery is frozen.
 - Preliminary examples such as sequential/asynchronous cellular automata, second-order cellular automata, block cellular automata, probabilistic cellular automata and substitutions, random walks, aggregation processes, input-consuming finite automata, probabilistic generators, evolving rules, and later network constructions are hypotheses to investigate—not accepted additions.
@@ -364,6 +370,8 @@ fixed point additionally requires zero pending routes and exact ordered
 vocabulary replay.
 
 ### 4-BOOKENDS
+
+Status: **COMPLETE** in `goal-4/4-BOOKENDS.md`.
 
 #### Big Picture Objective
 
