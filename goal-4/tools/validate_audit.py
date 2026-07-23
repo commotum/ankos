@@ -83,6 +83,11 @@ Q_ID = re.compile(r"^Q[0-9]{4}$")
 H_ID = re.compile(r"^H[0-9]{6}$")
 V_ID = re.compile(r"^V[0-9]{6}$")
 PAGE_NUMBER = re.compile(r"_page_(\d+)")
+SUPPORTED_SOURCE_ABSENCE = re.compile(
+    r"\b(?:unknown from source|unstated|not stated|not specified|"
+    r"not identified)\b",
+    re.IGNORECASE,
+)
 SEARCH_QUERY_FIELDS = frozenset(
     {
         "query_id",
@@ -709,6 +714,13 @@ def validate_candidate(
                 or not field_evidence_ids
             ):
                 errors.append(f"{prefix}.{field} supported value lacks evidence")
+            elif (
+                field != "evidence_limit"
+                and SUPPORTED_SOURCE_ABSENCE.search(value["value"])
+            ):
+                errors.append(
+                    f"{prefix}.{field} supported value encodes source absence"
+                )
             if reason not in ("", None):
                 errors.append(f"{prefix}.{field} supported value has a reason")
         elif support == "NOT_APPLICABLE":
@@ -7854,6 +7866,20 @@ def mutation_checks(
             "supported field without evidence",
             base_reading,
             missing_field_evidence,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    supported_source_absence = copy.deepcopy(base_candidates)
+    supported_source_absence[0]["fingerprint"][FINGERPRINT_FIELDS[0]][
+        "value"
+    ] = "Unknown from source."
+    mutations.append(
+        (
+            "supported field encoding source absence",
+            base_reading,
+            supported_source_absence,
             base_routes,
             base_assets,
             base_search,
