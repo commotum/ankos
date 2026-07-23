@@ -92,16 +92,26 @@ The candidate lifecycle is now append-only:
 - every candidate stores an immutable discovery epoch, typed discovery anchor
   (`SOURCE_UNIT`, `IMAGE`, or a stage-owned `SEARCH_HIT`), and one-based
   within-anchor ordinal so allocation order and discovery stage can be
-  mechanically rechecked; epoch 1 is the initial traversal and each formally
-  reopened blind pass increments the epoch before allocating further IDs;
+  mechanically rechecked; epoch 1 begins the initial traversal but may end
+  after a partial canonical prefix, while each formally reopened blind pass
+  increments the epoch before allocating further IDs;
 - candidate, evidence, route, and search epochs form one contiguous global
-  sequence together with source-row review epochs, beginning at 1; each typed
-  stream preserves the frozen stage/source traversal within an epoch, and
-  evidence cannot predate its candidate;
+  sequence together with immutable review-history epochs, beginning at 1;
+  every non-review stream is epoch-monotone, each typed stream preserves the
+  frozen stage/source traversal within an epoch, and evidence cannot predate
+  its candidate;
 - every pending source/image row has a blank `review_epoch`; the initial review
-  records epoch 1 and any formal re-review records the newly incremented epoch.
-  Immutable direct source/image anchors may precede, but cannot postdate, the
-  row's current review epoch;
+  records the active global epoch and a formal re-review opens the next epoch
+  with `REOPEN`. Forward unread paths then continue in that active epoch.
+  Immutable direct source/image anchors require a matching history event at
+  the exact anchor epoch;
+- `review-history.jsonl` is an append-only `V######` hash chain. Each event
+  covers exactly one canonical source path and binds its stage, epoch, mode,
+  reviewer, exact ordered source units and assets, immutable input/result
+  projections, and the exact hashed search-round prefix visible when review
+  began. `INITIAL` consumes the first unread canonical path. The first event
+  of a later epoch is `REOPEN`, and its recorded search prefix already closes
+  every earlier history scope;
 - a split tombstones the parent and allocates new children; every `SPLIT_INTO`
   edge carries a typed distinction proof plus explicit before/after rationale;
 - a merge requires a typed alias, co-reference, or proved-duplicate identity
@@ -174,11 +184,15 @@ requires a meaningful nonempty boundary. `SOURCE_DEFECT_OR_AMBIGUITY` and the
 `SOURCE_DEFECT` visual/secondary role therefore cannot be paired with
 `CLEAR`. Pending rows carry no adjudicated uncertainty.
 
-Epoch-1 local searches exactly cover every assigned Stage 4–17 document set.
-For each later `(stage, review_epoch)`, the union of that epoch's local query
-scopes equals exactly the document paths re-reviewed in that epoch. This
-records a formal zero-discovery reopen instead of leaving its existence
-implicit.
+Local-search scope is derived only from immutable history, never reconstructed
+from the latest scalar row state. For every `(stage, epoch)`, the union of local
+query scopes equals exactly the history paths reviewed in that pair, including
+a formal zero-discovery pass. Before an event can open epoch `N+1`, its hashed
+prior-search prefix already contains exact local closure for every history
+scope through epoch `N`. Stage closure applies the same requirement to the
+active epoch. Epoch 1 may therefore remain a partial prefix when a justified
+reopen advances the audit, and later unread paths continue under the new
+active epoch without losing either pass from history.
 
 If one extracted unit contains multiple atomic claims requiring different
 primary dispositions, Stage 2 must split it rather than select a convenient

@@ -3453,8 +3453,76 @@ def mutation_checks(
             + "; ".join(defect_reading_errors)
         )
 
+    ordered_fixture_paths = [
+        document["path"]
+        for document in sorted(
+            manifest["documents"],
+            key=lambda document: (
+                stage_for_document(document),
+                int(document["order"]),
+            ),
+        )
+    ]
+    defect_asset_path = next(
+        candidate_path
+        for candidate_path in ordered_fixture_paths
+        if any(
+            item["assignment_path"] == candidate_path for item in base_assets
+        )
+    )
+    defect_asset_reading = copy.deepcopy(base_reading)
     defect_asset = copy.deepcopy(base_assets)
-    defect_asset[0].update(
+    defect_stage = stage_for_document(
+        next(
+            document
+            for document in manifest["documents"]
+            if document["path"] == defect_asset_path
+        )
+    )
+    for row in defect_asset_reading:
+        if row["path"] != defect_asset_path:
+            continue
+        row.update(
+            {
+                "review_status": "REVIEWED",
+                "review_epoch": "1",
+                "review_disposition": "NO_CONSTRUCTION",
+                "source_status": "CLEAR",
+                "uncertainty": "",
+                "secondary_roles": "[]",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "No construction in this fixture unit.",
+                "review_stage": str(defect_stage),
+                "reviewer": "fixture-reviewer",
+            }
+        )
+    for row in defect_asset:
+        if row["assignment_path"] != defect_asset_path:
+            continue
+        row.update(
+            {
+                "inspection_status": "SCREENED",
+                "review_epoch": "1",
+                "visual_role": "DECORATIVE",
+                "source_status": "CLEAR",
+                "risk_flags": "[]",
+                "original_resolution_status": "NOT_REQUIRED",
+                "transcription_status": "NOT_REQUIRED",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "No construction-bearing visual content.",
+                "review_stage": str(defect_stage),
+                "reviewer": "fixture-reviewer",
+                "uncertainty": "",
+            }
+        )
+    defect_asset_index = next(
+        index
+        for index, item in enumerate(defect_asset)
+        if item["assignment_path"] == defect_asset_path
+    )
+    defect_asset[defect_asset_index].update(
         {
             "inspection_status": "SCREENED",
             "review_epoch": "1",
@@ -3469,7 +3537,7 @@ def mutation_checks(
                 "The original-resolution image is visibly clipped at the "
                 "construction boundary."
             ),
-            "review_stage": defect_asset[0]["assignment_stage"],
+            "review_stage": defect_asset[defect_asset_index]["assignment_stage"],
             "reviewer": "fixture-reviewer",
             "uncertainty": (
                 "The clipped edge prevents a complete reading of the depicted "
@@ -3478,10 +3546,10 @@ def mutation_checks(
         }
     )
     defect_asset_history = append_history_event(
-        [],
-        base_reading,
+        base_history,
+        defect_asset_reading,
         defect_asset,
-        path,
+        defect_asset_path,
         1,
         "INITIAL",
         "fixture-reviewer",
@@ -3490,7 +3558,7 @@ def mutation_checks(
     defect_asset_errors = validate_objects(
         manifest,
         units,
-        base_reading,
+        defect_asset_reading,
         base_candidates,
         base_routes,
         defect_asset,
@@ -4212,7 +4280,7 @@ def mutation_checks(
         )
     )
     missing_asset_uncertainty = copy.deepcopy(defect_asset)
-    missing_asset_uncertainty[0]["uncertainty"] = ""
+    missing_asset_uncertainty[defect_asset_index]["uncertainty"] = ""
     mutations.append(
         (
             "non-clear asset without uncertainty boundary",
@@ -4224,7 +4292,7 @@ def mutation_checks(
         )
     )
     clear_asset_uncertainty = copy.deepcopy(defect_asset)
-    clear_asset_uncertainty[0].update(
+    clear_asset_uncertainty[defect_asset_index].update(
         {
             "visual_role": "CONTROL",
             "source_status": "CLEAR",
@@ -4241,7 +4309,7 @@ def mutation_checks(
         )
     )
     clear_defect_asset = copy.deepcopy(defect_asset)
-    clear_defect_asset[0].update(
+    clear_defect_asset[defect_asset_index].update(
         {
             "source_status": "CLEAR",
             "uncertainty": "",
@@ -4282,7 +4350,7 @@ def mutation_checks(
         )
     )
     screened_without_epoch = copy.deepcopy(defect_asset)
-    screened_without_epoch[0]["review_epoch"] = ""
+    screened_without_epoch[defect_asset_index]["review_epoch"] = ""
     mutations.append(
         (
             "screened asset without review epoch",

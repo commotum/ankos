@@ -34,7 +34,58 @@ def load():
     search = MODULE.json.loads(
         (goal / "search-rounds.json").read_text(encoding="utf-8")
     )
-    return manifest, units, reading, candidates, routes, assets, search
+    review_history = MODULE.load_jsonl(goal / "review-history.jsonl")
+    return (
+        manifest,
+        units,
+        reading,
+        candidates,
+        routes,
+        assets,
+        search,
+        review_history,
+    )
+
+
+def append_history_event(
+    history,
+    manifest,
+    units,
+    reading,
+    assets,
+    source_path,
+    epoch,
+    mode,
+    reviewer,
+    prior_rounds,
+):
+    document = next(
+        item for item in manifest["documents"] if item["path"] == source_path
+    )
+    event = MODULE.close_review_event(
+        {
+            "review_id": f"V{len(history) + 1:06d}",
+            "epoch": epoch,
+            "stage": MODULE.stage_for_document(document),
+            "mode": mode,
+            "reviewer": reviewer,
+            "source_paths": [source_path],
+            "source_unit_ids": [
+                item["id"] for item in units if item["path"] == source_path
+            ],
+            "asset_ids": [
+                item["asset_id"]
+                for item in assets
+                if item["assignment_path"] == source_path
+            ],
+        },
+        {item["id"]: item for item in units},
+        {item["source_unit_id"]: item for item in reading},
+        {item["asset_id"]: item for item in assets},
+        history[-1]["event_sha256"] if history else None,
+        prior_rounds,
+    )
+    return [*history, event]
 
 
 def test_initial_harness_is_valid() -> None:
@@ -52,7 +103,7 @@ def test_schema_files_are_frozen() -> None:
 
 
 def test_stage18_requires_every_local_stage_before_saturation() -> None:
-    manifest, units, reading, candidates, routes, assets, _ = load()
+    manifest, units, reading, candidates, routes, assets, _, _ = load()
     assert candidates == []
     assert routes == []
     document_by_path = {
@@ -93,6 +144,26 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
                 "reviewer": "closure-fixture",
                 "uncertainty": "",
             }
+        )
+    history = []
+    for document in sorted(
+        manifest["documents"],
+        key=lambda item: (
+            MODULE.stage_for_document(item),
+            int(item["order"]),
+        ),
+    ):
+        history = append_history_event(
+            history,
+            manifest,
+            units,
+            reading,
+            assets,
+            document["path"],
+            1,
+            "INITIAL",
+            "closure-fixture",
+            [],
         )
 
     rounds = []
@@ -188,6 +259,7 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         routes,
         assets,
         search,
+        history,
         {18},
         True,
     ) == []
@@ -253,6 +325,18 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         "rerun_reproduced": True,
         "result_digest": reopened_saturation_digest,
     }
+    reopened_history = append_history_event(
+        history,
+        manifest,
+        units,
+        reopened_reading,
+        reopened_assets,
+        reopened_path,
+        2,
+        "REOPEN",
+        "closure-fixture",
+        search["rounds"],
+    )
     assert MODULE.validate_objects(
         manifest,
         units,
@@ -261,6 +345,7 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         routes,
         reopened_assets,
         reopened_search,
+        reopened_history,
         {18},
         True,
     ) == []
@@ -292,6 +377,7 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         routes,
         reopened_assets,
         missing_reopen_local,
+        reopened_history,
         {18},
         True,
     )
@@ -323,6 +409,7 @@ def test_stage18_requires_every_local_stage_before_saturation() -> None:
         routes,
         assets,
         saturation_only,
+        history,
         {18},
         True,
     )

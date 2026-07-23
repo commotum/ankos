@@ -385,6 +385,9 @@ def _add_local_closure(
 ) -> None:
     search_path = goal / merge.SEARCH_NAME
     search = json.loads(search_path.read_text(encoding="utf-8"))
+    assumption = "Deterministic zero-result fixture."
+    if assumption not in search["tool_assumptions"]:
+        search["tool_assumptions"].append(assumption)
     query_number = (
         sum(
             len(round_record["queries"])
@@ -408,7 +411,7 @@ def _add_local_closure(
                 "scope_paths": source_paths,
             }
         ],
-        "tool_assumptions": ["Deterministic zero-result fixture."],
+        "tool_assumptions": [assumption],
         "result_ids": [],
         "result_digest": "",
         "hits": [],
@@ -777,7 +780,7 @@ def test_epoch_two_reopen_retains_provenance_and_appends_ids(
     assert preview["discovery_epoch"] == 2
     assert preview["review_ids"] == ["V000003"]
     assert preview["review_mode"] == "REOPEN"
-    assert preview["search_ledger_preserved"] is False
+    assert preview["search_ledger_preserved"] is True
     assert preview["search_fixed_point_cleared"] is True
     assert plan.candidate_ids == {"W0001": "B0002"}
     assert plan.route_ids == {"WR0001": "R000002"}
@@ -976,11 +979,13 @@ def test_reopen_epoch_must_be_next_global_epoch(
         merge.prepare_merge(bundle, goal_dir=goal)
 
 
-def test_epoch_two_reopen_requires_completed_live_projection(
+def test_initial_forward_merge_cannot_skip_active_epoch_one(
     tmp_path: Path,
 ) -> None:
-    bundle = _completed_bundle(
+    bundle = _completed_no_construction_bundle(
         tmp_path / "reopened",
+        stage=4,
+        assignment_path=FIRST_STAGE_4_PATH,
         epoch=2,
         worker_id="merge-premature-reopen-worker",
     )
