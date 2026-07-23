@@ -28,6 +28,7 @@ from audit_contract import (
     READING_DISPOSITIONS,
     READING_HEADER,
     REPO_ROOT,
+    ROUTE_CLOSURE_SCOPES,
     ROUTE_KINDS,
     ROUTE_STATUSES,
     SEARCH_HIT_DISPOSITIONS,
@@ -276,10 +277,14 @@ def validate_candidate(
     anchor = row["discovery_anchor"]
     if (
         not isinstance(anchor, dict)
-        or set(anchor) != {"kind", "id"}
+        or set(anchor) != {"epoch", "kind", "id", "ordinal"}
+        or not isinstance(anchor.get("epoch"), int)
+        or anchor["epoch"] < 1
         or anchor.get("kind") not in {"SOURCE_UNIT", "IMAGE", "SEARCH_HIT"}
         or not isinstance(anchor.get("id"), str)
         or not anchor["id"]
+        or not isinstance(anchor.get("ordinal"), int)
+        or anchor["ordinal"] < 1
     ):
         errors.append(f"{prefix} has invalid discovery_anchor")
 
@@ -287,7 +292,6 @@ def validate_candidate(
         row["source_unit_ids"],
         f"{prefix}.source_unit_ids",
         errors,
-        nonempty=True,
     )
     if any(unit not in unit_ids for unit in source_units):
         errors.append(f"{prefix} references unknown source unit")
@@ -301,6 +305,8 @@ def validate_candidate(
     image_witnesses = exact_string_list(
         row["image_witnesses"], f"{prefix}.image_witnesses", errors
     )
+    if not source_units and not image_witnesses:
+        errors.append(f"{prefix} requires a source unit or image witness")
     aggregate_strengths = exact_string_list(
         row["evidence_strength"],
         f"{prefix}.evidence_strength",
@@ -631,6 +637,8 @@ def validate_objects(
     }
     expected_assets, assignment_errors = expected_asset_assignments(manifest)
     errors.extend(assignment_errors)
+    asset_record_by_id = {row.get("asset_id", ""): row for row in assets}
+    asset_ids = set(asset_record_by_id)
 
     route_by_id = {row.get("route_id", ""): row for row in routes}
     route_ids = set(route_by_id)
@@ -770,10 +778,32 @@ def validate_objects(
             errors.append(f"{prefix} has unknown source unit")
         if row["route_kind"] not in ROUTE_KINDS:
             errors.append(f"{prefix} has invalid kind")
+        try:
+            discovery_epoch = int(row["discovery_epoch"])
+        except ValueError:
+            discovery_epoch = -1
+        if discovery_epoch < 1:
+            errors.append(f"{prefix} has invalid discovery epoch")
+        if row["discovery_kind"] not in {"SOURCE_UNIT", "SEARCH_HIT"}:
+            errors.append(f"{prefix} has invalid discovery kind")
+        if (
+            row["discovery_kind"] == "SOURCE_UNIT"
+            and row["discovery_id"] != row["source_unit_id"]
+        ):
+            errors.append(f"{prefix} source discovery anchor is inconsistent")
+        if row["discovery_kind"] == "SEARCH_HIT" and not H_ID.fullmatch(
+            row["discovery_id"]
+        ):
+            errors.append(f"{prefix} has invalid search-hit discovery anchor")
+        if row["closure_scope"] not in ROUTE_CLOSURE_SCOPES:
+            errors.append(f"{prefix} has invalid closure scope")
         if row["status"] not in ROUTE_STATUSES:
             errors.append(f"{prefix} has invalid status")
         targets = parsed_string_list(
             row["target_unit_ids"], f"{prefix}.target_unit_ids", errors
+        )
+        target_assets = parsed_string_list(
+            row["target_asset_ids"], f"{prefix}.target_asset_ids", errors
         )
         attempts = parsed_string_list(
             row["attempts"], f"{prefix}.attempts", errors
@@ -783,6 +813,8 @@ def validate_objects(
         )
         if any(value not in unit_ids for value in targets):
             errors.append(f"{prefix} targets unknown source unit")
+        if any(value not in asset_ids for value in target_assets):
+            errors.append(f"{prefix} targets unknown asset")
         if not row["literal_target"].strip() or not row["expected_topic"].strip():
             errors.append(f"{prefix} lacks target/topic")
         try:
@@ -791,10 +823,12 @@ def validate_objects(
             owning_stage = -1
         if source_unit is not None:
             expected_stage = stage_by_path[source_unit["path"]]
-            if owning_stage not in {expected_stage, 18}:
+            if (
+                row["discovery_kind"] == "SOURCE_UNIT"
+                and owning_stage != expected_stage
+            ):
                 errors.append(
-                    f"{prefix} owning stage is neither source-unit stage nor "
-                    "saturation stage"
+                    f"{prefix} source-anchored owning stage differs from source stage"
                 )
             source_reading = reading_by_unit.get(row["source_unit_id"])
             if (
@@ -804,18 +838,57 @@ def validate_objects(
                 errors.append(f"{prefix} source unit is not reviewed")
         defect = row["defect_boundary"].strip()
         if row["status"] == "PENDING":
-            if targets or defect:
+            if targets or target_assets or defect:
                 errors.append(f"{prefix} pending route has final disposition data")
         elif row["status"] == "RESOLVED":
-            if not targets or defect:
+            if (not targets and not target_assets) or defect:
                 errors.append(
                     f"{prefix} resolved route lacks targets or claims a defect"
                 )
+            if any(
+                reading_by_unit[target]["review_status"] != "REVIEWED"
+                for target in targets
+                if target in reading_by_unit
+            ):
+                errors.append(f"{prefix} resolves to an unreviewed source unit")
+            if any(
+                asset_record_by_id[target]["inspection_status"] != "SCREENED"
+                for target in target_assets
+                if target in asset_record_by_id
+            ):
+                errors.append(f"{prefix} resolves to an unscreened asset")
         elif row["status"] == "MISSING_TARGET_FINAL":
-            if targets or not attempts or not defect:
+            if targets or target_assets or not attempts or not defect:
                 errors.append(
                     f"{prefix} final missing route needs attempts/defect and no target"
                 )
+        if row["status"] == "RESOLVED":
+            target_stages = {
+                stage_by_path[unit_by_id[target]["path"]]
+                for target in targets
+                if target in unit_by_id
+            }
+            target_stages.update(
+                int(
+                    expected_assets[
+                        asset_record_by_id[target]["physical_path"]
+                    ]["assignment_stage"]
+                )
+                for target in target_assets
+                if target in asset_record_by_id
+                and asset_record_by_id[target]["physical_path"] in expected_assets
+            )
+            if (
+                row["closure_scope"] == "WITHIN_STAGE"
+                and any(stage != owning_stage for stage in target_stages)
+            ):
+                errors.append(f"{prefix} within-stage route crosses stage boundary")
+            if (
+                row["closure_scope"] == "CROSS_RANGE"
+                and target_stages
+                and all(stage == owning_stage for stage in target_stages)
+            ):
+                errors.append(f"{prefix} cross-range route resolves only within stage")
 
     evidence_ids_global: set[str] = set()
     if [row.get("id") for row in candidates] != [
@@ -887,21 +960,12 @@ def validate_objects(
             for unit_id, links in reading_candidate_links.items()
             if candidate_id in links
         }
-        if candidate["record_status"] == "ACTIVE" and not linked_rows:
-            errors.append(f"candidate {candidate_id} has no reading-ledger join")
-            continue
         if candidate["record_status"] != "ACTIVE" and actual_linked_units:
             errors.append(
                 f"candidate {candidate_id} tombstone retains reading-ledger links"
             )
         if any(row["review_status"] != "REVIEWED" for row in linked_rows):
             errors.append(f"candidate {candidate_id} links an unreviewed source unit")
-        expected_statuses = {row["source_status"] for row in linked_rows}
-        if set(candidate["source_status"]) != expected_statuses:
-            errors.append(
-                f"candidate {candidate_id} source_status is not the exact "
-                "reading-ledger aggregate"
-            )
         for route_id in candidate["cross_reference_ids"]:
             route = route_by_id.get(route_id)
             if (
@@ -987,6 +1051,7 @@ def validate_objects(
         if status == "PENDING":
             if (
                 row.get("visual_role")
+                or row.get("source_status")
                 or risk_flags
                 or row.get("evidence_statement")
                 or row.get("review_stage")
@@ -1000,6 +1065,8 @@ def validate_objects(
             screened_count += 1
             if row.get("visual_role") not in VISUAL_ROLES:
                 errors.append(f"{prefix} has invalid visual role")
+            if row.get("source_status") not in SOURCE_STATUSES:
+                errors.append(f"{prefix} has invalid source status")
             high_risk = bool(risk_flags)
             resolution = row.get("original_resolution_status")
             if high_risk and resolution != "REVIEWED":
@@ -1020,10 +1087,6 @@ def validate_objects(
                     errors.append(
                         f"{prefix} native evidence lacks resolution/transcription check"
                     )
-            if linked_candidates and row.get("visual_role") != "NATIVE_EVIDENCE":
-                errors.append(
-                    f"{prefix} candidate witness is not classified NATIVE_EVIDENCE"
-                )
             if not row.get("evidence_statement", "").strip():
                 errors.append(f"{prefix} lacks evidence statement")
             if not row.get("reviewer", "").strip():
@@ -1060,6 +1123,22 @@ def validate_objects(
             errors.append(
                 f"candidate {candidate_id} image witnesses lack exact asset reverse joins"
             )
+        provenance_statuses = {
+            reading_by_unit[source_unit_id]["source_status"]
+            for source_unit_id in candidate["source_unit_ids"]
+            if source_unit_id in reading_by_unit
+        }
+        provenance_statuses.update(
+            asset_by_path[image_path]["source_status"]
+            for image_path in candidate["image_witnesses"]
+            if image_path in asset_by_path
+            and asset_by_path[image_path]["inspection_status"] == "SCREENED"
+        )
+        if set(candidate["source_status"]) != provenance_statuses:
+            errors.append(
+                f"candidate {candidate_id} source_status is not the exact "
+                "unit/asset provenance aggregate"
+            )
         for evidence in candidate["source_evidence"]:
             image_path = evidence.get("image_path")
             if image_path is None:
@@ -1075,7 +1154,8 @@ def validate_objects(
                 "DIRECT_PARTIAL_MECHANICS",
                 "DIRECT_COMPLETE_MECHANICS",
             } and (
-                asset["original_resolution_status"] != "REVIEWED"
+                asset["visual_role"] != "NATIVE_EVIDENCE"
+                or asset["original_resolution_status"] != "REVIEWED"
                 or asset["transcription_status"] != "CHECKED"
             ):
                 errors.append(
@@ -1117,14 +1197,10 @@ def validate_objects(
     if not isinstance(rounds, list):
         errors.append("search-rounds.rounds must be an array")
         rounds = []
-    if rounds and reviewed_count != len(units):
-        errors.append("search rounds began before complete sequential reading")
-    if rounds and screened_count != len(assets):
-        errors.append("search rounds began before complete asset screening")
-
     seen_queries: set[str] = set()
     seen_hits: set[str] = set()
     hit_by_id: dict[str, dict[str, Any]] = {}
+    hit_round_meta: dict[str, tuple[int, int, str]] = {}
     seen_new_vocabulary: set[str] = set()
     seen_new_candidates: set[str] = set()
     seen_new_evidence_groups: set[str] = set()
@@ -1132,9 +1208,13 @@ def validate_objects(
     ordered_stage18_candidates: list[str] = []
     ordered_stage18_routes: list[str] = []
     expected_next_hit = 1
+    prior_round_key: tuple[int, int, int] | None = None
     for round_index, round_record in enumerate(rounds, start=1):
         required = {
             "round_id",
+            "epoch",
+            "kind",
+            "owning_stage",
             "queries",
             "tool_assumptions",
             "result_ids",
@@ -1151,6 +1231,29 @@ def validate_objects(
             continue
         if round_record["round_id"] != f"S{round_index:03d}":
             errors.append(f"search round {round_index} ID is invalid")
+        epoch = round_record["epoch"]
+        kind = round_record["kind"]
+        owning_stage = round_record["owning_stage"]
+        if not isinstance(epoch, int) or epoch < 1:
+            errors.append(f"search round {round_index} has invalid epoch")
+            epoch = -1
+        if kind not in {"LOCAL", "SATURATION"}:
+            errors.append(f"search round {round_index} has invalid kind")
+        if not isinstance(owning_stage, int) or not 4 <= owning_stage <= 18:
+            errors.append(f"search round {round_index} has invalid owning stage")
+            owning_stage = -1
+        if kind == "LOCAL" and not 4 <= owning_stage <= 17:
+            errors.append(f"search round {round_index} LOCAL stage is invalid")
+        if kind == "SATURATION" and owning_stage != 18:
+            errors.append(f"search round {round_index} SATURATION stage is not 18")
+        round_key = (
+            epoch,
+            owning_stage,
+            0 if kind == "LOCAL" else 1,
+        )
+        if prior_round_key is not None and round_key < prior_round_key:
+            errors.append(f"search round {round_index} violates audit event order")
+        prior_round_key = round_key
 
         queries = round_record["queries"]
         if not isinstance(queries, list) or not queries:
@@ -1404,7 +1507,124 @@ def validate_objects(
             if last.get("result_digest") != last.get("rerun_digest"):
                 errors.append("search fixed_point final rerun differs")
 
+    unit_position = {
+        unit["id"]: position for position, unit in enumerate(units, start=1)
+    }
+    image_position = {
+        image["path"]: position
+        for position, image in enumerate(manifest["images"], start=1)
+    }
+    anchor_ordinals: dict[tuple[str, str], list[int]] = {}
+    prior_anchor_key: tuple[int, int, int, int, int] | None = None
+    for candidate in candidates:
+        candidate_id = candidate["id"]
+        anchor = candidate["discovery_anchor"]
+        if not isinstance(anchor, dict) or not {
+            "kind",
+            "id",
+            "ordinal",
+        }.issubset(anchor):
+            continue
+        kind = anchor["kind"]
+        anchor_id = anchor["id"]
+        ordinal = anchor["ordinal"]
+        if (
+            kind not in {"SOURCE_UNIT", "IMAGE", "SEARCH_HIT"}
+            or not isinstance(anchor_id, str)
+            or not isinstance(ordinal, int)
+            or ordinal < 1
+        ):
+            continue
+        anchor_stage = -1
+        anchor_key: tuple[int, int, int, int, int] | None = None
+        if kind == "SOURCE_UNIT":
+            source_unit = unit_by_id.get(anchor_id)
+            if source_unit is None:
+                errors.append(f"candidate {candidate_id} anchor unit is unknown")
+            else:
+                anchor_stage = stage_by_path[source_unit["path"]]
+                anchor_key = (
+                    anchor_stage,
+                    int(source_unit["document_order"]),
+                    0,
+                    unit_position[anchor_id],
+                    ordinal,
+                )
+                if anchor_id not in candidate["source_unit_ids"]:
+                    errors.append(
+                        f"candidate {candidate_id} anchor unit lacks provenance"
+                    )
+        elif kind == "IMAGE":
+            assignment = expected_assets.get(anchor_id)
+            if assignment is None:
+                errors.append(f"candidate {candidate_id} anchor image is unknown")
+            else:
+                assignment_path = assignment["assignment_path"]
+                anchor_stage = int(assignment["assignment_stage"])
+                anchor_key = (
+                    anchor_stage,
+                    int(document_by_path[assignment_path]["order"]),
+                    1,
+                    image_position[anchor_id],
+                    ordinal,
+                )
+                if anchor_id not in candidate["image_witnesses"]:
+                    errors.append(
+                        f"candidate {candidate_id} anchor image lacks provenance"
+                    )
+        elif kind == "SEARCH_HIT":
+            anchor_stage = 18
+            hit = hit_by_id.get(anchor_id)
+            if hit is None:
+                errors.append(f"candidate {candidate_id} anchor hit is unknown")
+            else:
+                anchor_key = (
+                    18,
+                    0,
+                    0,
+                    int(anchor_id[1:]),
+                    ordinal,
+                )
+                if candidate_id not in hit["candidate_ids"]:
+                    errors.append(
+                        f"candidate {candidate_id} anchor hit lacks candidate link"
+                    )
+        if anchor_stage != candidate["discovery_stage"]:
+            errors.append(
+                f"candidate {candidate_id} discovery stage differs from anchor stage"
+            )
+        if candidate["discovery_stage"] == 18 and kind != "SEARCH_HIT":
+            errors.append(
+                f"candidate {candidate_id} Stage 18 discovery lacks search-hit anchor"
+            )
+        if candidate["discovery_stage"] < 18 and kind == "SEARCH_HIT":
+            errors.append(
+                f"candidate {candidate_id} pre-saturation discovery uses search hit"
+            )
+        anchor_ordinals.setdefault((kind, anchor_id), []).append(ordinal)
+        if anchor_key is not None:
+            if prior_anchor_key is not None and anchor_key < prior_anchor_key:
+                errors.append(
+                    f"candidate {candidate_id} violates frozen B-ID traversal order"
+                )
+            prior_anchor_key = anchor_key
+    for anchor_identity, ordinals in anchor_ordinals.items():
+        if sorted(ordinals) != list(range(1, len(ordinals) + 1)):
+            errors.append(
+                f"candidate anchor {anchor_identity} ordinals are not contiguous"
+            )
+
     for required_stage in require_stages:
+        if required_stage == 18:
+            if reviewed_count != len(units):
+                errors.append("stage 18 began before every source unit was reviewed")
+            if screened_count != len(assets):
+                errors.append("stage 18 began before every asset was screened")
+            if any(route["status"] == "PENDING" for route in routes):
+                errors.append("stage 18 has pending cross-reference routes")
+            if fixed_point is None:
+                errors.append("stage 18 lacks a validated search fixed point")
+            continue
         assigned_paths = {
             path
             for path, document in document_by_path.items()
@@ -1420,6 +1640,18 @@ def validate_objects(
         ]
         if any(row["inspection_status"] != "SCREENED" for row in assigned_assets):
             errors.append(f"stage {required_stage} assets are not fully screened")
+        if any(
+            route["status"] == "PENDING"
+            for route in routes
+            if route["owning_stage"] == str(required_stage)
+        ):
+            errors.append(f"stage {required_stage} has pending owned routes")
+
+    if require_all_reviewed:
+        if any(route["status"] == "PENDING" for route in routes):
+            errors.append("all-reviewed closure has pending routes")
+        if fixed_point is None:
+            errors.append("all-reviewed closure lacks search fixed point")
 
     return errors
 

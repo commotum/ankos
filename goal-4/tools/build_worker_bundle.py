@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Build or verify a sealed, sanitized blind-discovery worker bundle."""
+"""Build or verify a sealed, sanitized blind-discovery worker bundle.
+
+Preparation and output validation do not enforce the required runtime sandbox
+or perform the coordinator's canonical-ID allocation and merge validation.
+"""
 
 from __future__ import annotations
 
@@ -61,6 +65,7 @@ EXECUTION_REQUIREMENT_FIELDS = {
     "network_allowed",
     "runtime_os_sandbox_required",
     "bundle_preparation_enforces_sandbox",
+    "coordinator_merge_validation_required",
 }
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 CHAPTER_PATH_RE = re.compile(
@@ -399,6 +404,25 @@ def json_schema_errors(
     return errors
 
 
+def parse_string_array(
+    value: object,
+    label: str,
+    errors: list[str],
+) -> list[str]:
+    try:
+        parsed = json.loads(value) if isinstance(value, str) else None
+    except json.JSONDecodeError:
+        parsed = None
+    if (
+        not isinstance(parsed, list)
+        or not all(isinstance(item, str) for item in parsed)
+        or len(parsed) != len(set(parsed))
+    ):
+        errors.append(f"{label} must be a JSON array of unique strings")
+        return []
+    return parsed
+
+
 def build_bundle(
     output: Path,
     worker_id: str,
@@ -496,6 +520,7 @@ def build_bundle(
             "network_allowed": False,
             "runtime_os_sandbox_required": True,
             "bundle_preparation_enforces_sandbox": False,
+            "coordinator_merge_validation_required": True,
         },
         "allowed_inputs": allowed,
     }
@@ -607,8 +632,12 @@ def _validate_worker_output(
         for row in assigned_assets.values()
         if row.get("physical_path")
     }
+    if nonuse is not True:
+        return
 
     reading_updates = output.get("reading_updates", [])
+    candidate_sources_from_reading: dict[str, set[str]] = {}
+    route_sources_from_reading: dict[str, set[str]] = {}
     if isinstance(reading_updates, list):
         seen: set[str] = set()
         immutable = READING_HEADER[: READING_HEADER.index("review_status")]
@@ -616,6 +645,9 @@ def _validate_worker_output(
             if not isinstance(row, dict):
                 continue
             unit_id = row.get("source_unit_id")
+            if not isinstance(unit_id, str):
+                errors.append("reading update has a non-string source_unit_id")
+                continue
             if unit_id in seen:
                 errors.append(f"duplicate reading update: {unit_id}")
             seen.add(unit_id)
@@ -625,8 +657,42 @@ def _validate_worker_output(
                 continue
             if any(row.get(field) != original.get(field) for field in immutable):
                 errors.append(f"reading update changes source identity: {unit_id}")
+            if row.get("review_status") != "REVIEWED":
+                errors.append(f"reading update is not REVIEWED: {unit_id}")
+            if not row.get("review_disposition") or not row.get("source_status"):
+                errors.append(f"reading update lacks a disposition/status: {unit_id}")
+            if row.get("review_stage") != str(manifest.get("stage")):
+                errors.append(f"reading update stage differs from bundle: {unit_id}")
+            if row.get("reviewer") != manifest.get("worker_id"):
+                errors.append(f"reading update reviewer differs from worker: {unit_id}")
+            if not row.get("evidence_statement"):
+                errors.append(f"reading update lacks evidence: {unit_id}")
+            parse_string_array(
+                row.get("secondary_roles"),
+                f"reading update {unit_id} secondary_roles",
+                errors,
+            )
+            for candidate_id in parse_string_array(
+                row.get("candidate_ids"),
+                f"reading update {unit_id} candidate_ids",
+                errors,
+            ):
+                candidate_sources_from_reading.setdefault(candidate_id, set()).add(
+                    unit_id
+                )
+            for route_id in parse_string_array(
+                row.get("route_ids"),
+                f"reading update {unit_id} route_ids",
+                errors,
+            ):
+                route_sources_from_reading.setdefault(route_id, set()).add(unit_id)
+        if seen != set(assigned_units):
+            errors.append(
+                "completed worker output must update every assigned source unit exactly once"
+            )
 
     asset_updates = output.get("asset_updates", [])
+    candidate_images_from_assets: dict[str, set[str]] = {}
     if isinstance(asset_updates, list):
         seen = set()
         immutable = ASSET_HEADER[: ASSET_HEADER.index("inspection_status")]
@@ -634,6 +700,9 @@ def _validate_worker_output(
             if not isinstance(row, dict):
                 continue
             asset_id = row.get("asset_id")
+            if not isinstance(asset_id, str):
+                errors.append("asset update has a non-string asset_id")
+                continue
             if asset_id in seen:
                 errors.append(f"duplicate asset update: {asset_id}")
             seen.add(asset_id)
@@ -643,18 +712,53 @@ def _validate_worker_output(
                 continue
             if any(row.get(field) != original.get(field) for field in immutable):
                 errors.append(f"asset update changes source identity: {asset_id}")
+            if row.get("inspection_status") != "SCREENED":
+                errors.append(f"asset update is not SCREENED: {asset_id}")
+            if row.get("review_stage") != str(manifest.get("stage")):
+                errors.append(f"asset update stage differs from bundle: {asset_id}")
+            if row.get("reviewer") != manifest.get("worker_id"):
+                errors.append(f"asset update reviewer differs from worker: {asset_id}")
+            if not row.get("visual_role") or not row.get("evidence_statement"):
+                errors.append(f"asset update lacks visual evidence fields: {asset_id}")
+            for candidate_id in parse_string_array(
+                row.get("candidate_ids"),
+                f"asset update {asset_id} candidate_ids",
+                errors,
+            ):
+                candidate_images_from_assets.setdefault(candidate_id, set()).add(
+                    row.get("physical_path", "")
+                )
+        if seen != set(assigned_assets):
+            errors.append(
+                "completed worker output must update every assigned asset exactly once"
+            )
 
     proposals = output.get("candidate_proposals", [])
+    proposal_by_id: dict[str, dict[str, Any]] = {}
     if isinstance(proposals, list):
-        proposal_ids = {
+        proposal_ids = [
             row.get("id")
             for row in proposals
             if isinstance(row, dict) and isinstance(row.get("id"), str)
-        }
+        ]
+        expected_ids = [
+            f"W{index:04d}" for index in range(1, len(proposal_ids) + 1)
+        ]
+        if proposal_ids != expected_ids or len(proposal_ids) != len(proposals):
+            errors.append(
+                "worker candidate IDs must be a complete ordered W0001 sequence"
+            )
+        proposal_id_set = set(proposal_ids)
         for row in proposals:
             if not isinstance(row, dict):
                 continue
             candidate_id = row.get("id", "<unknown>")
+            if not isinstance(candidate_id, str):
+                errors.append("candidate proposal has a non-string id")
+                continue
+            proposal_by_id[candidate_id] = row
+            if row.get("record_status") != "ACTIVE":
+                errors.append(f"worker candidate {candidate_id} must be ACTIVE")
             if row.get("discovery_stage") != manifest.get("stage"):
                 errors.append(
                     f"candidate {candidate_id} discovery_stage differs from bundle"
@@ -675,16 +779,149 @@ def _validate_worker_output(
                 errors.append(
                     f"candidate {candidate_id} cites an image outside assignment"
                 )
+            if isinstance(source_ids, list) and all(
+                isinstance(item, str) for item in source_ids
+            ):
+                source_set = set(source_ids)
+                if candidate_sources_from_reading.get(candidate_id, set()) != (
+                    source_set
+                ):
+                    errors.append(
+                        f"candidate {candidate_id} source-unit/read-ledger join differs"
+                    )
+                source_statuses = {
+                    next(
+                        (
+                            read_row.get("source_status")
+                            for read_row in reading_updates
+                            if isinstance(read_row, dict)
+                            and read_row.get("source_unit_id") == source_id
+                        ),
+                        None,
+                    )
+                    for source_id in source_set
+                }
+                declared_statuses = row.get("source_status", [])
+                if (
+                    not isinstance(declared_statuses, list)
+                    or not all(
+                        isinstance(item, str) for item in declared_statuses
+                    )
+                    or set(declared_statuses) != source_statuses
+                ):
+                    errors.append(
+                        f"candidate {candidate_id} source-status join differs"
+                    )
+            if isinstance(image_ids, list) and all(
+                isinstance(item, str) for item in image_ids
+            ) and candidate_images_from_assets.get(candidate_id, set()) != set(
+                image_ids
+            ):
+                errors.append(
+                    f"candidate {candidate_id} image/asset-ledger join differs"
+                )
+
+            evidence_rows = row.get("source_evidence", [])
+            evidence_by_id: dict[str, dict[str, Any]] = {}
+            evidence_source_ids: set[str] = set()
+            evidence_image_paths: set[str] = set()
+            if isinstance(evidence_rows, list):
+                for evidence in evidence_rows:
+                    if not isinstance(evidence, dict):
+                        continue
+                    evidence_id = evidence.get("evidence_id")
+                    if not isinstance(evidence_id, str) or evidence_id in evidence_by_id:
+                        errors.append(
+                            f"candidate {candidate_id} has invalid/duplicate evidence IDs"
+                        )
+                        continue
+                    evidence_by_id[evidence_id] = evidence
+                    source_id = evidence.get("source_unit_id")
+                    image_path = evidence.get("image_path")
+                    if source_id is None and image_path is None:
+                        errors.append(
+                            f"candidate {candidate_id} evidence {evidence_id} "
+                            "has no source or image"
+                        )
+                    if isinstance(source_id, str):
+                        evidence_source_ids.add(source_id)
+                    if isinstance(image_path, str):
+                        evidence_image_paths.add(image_path)
+            if isinstance(source_ids, list) and all(
+                isinstance(item, str) for item in source_ids
+            ) and evidence_source_ids != set(source_ids):
+                errors.append(
+                    f"candidate {candidate_id} source-evidence/source-unit join differs"
+                )
+            if isinstance(image_ids, list) and all(
+                isinstance(item, str) for item in image_ids
+            ) and evidence_image_paths != set(image_ids):
+                errors.append(
+                    f"candidate {candidate_id} source-evidence/image join differs"
+                )
+            evidence_strengths = {
+                evidence.get("strength")
+                for evidence in evidence_by_id.values()
+                if isinstance(evidence.get("strength"), str)
+            }
+            declared_strengths = row.get("evidence_strength", [])
+            if (
+                not isinstance(declared_strengths, list)
+                or not all(isinstance(item, str) for item in declared_strengths)
+                or set(declared_strengths) != evidence_strengths
+            ):
+                errors.append(
+                    f"candidate {candidate_id} evidence-strength join differs"
+                )
+
+            fingerprint_references: dict[str, set[str]] = {}
+            fingerprint = row.get("fingerprint", {})
+            if isinstance(fingerprint, dict):
+                for field, field_value in fingerprint.items():
+                    if not isinstance(field_value, dict):
+                        continue
+                    for evidence_id in field_value.get("evidence_ids", []):
+                        if isinstance(evidence_id, str):
+                            fingerprint_references.setdefault(
+                                evidence_id, set()
+                            ).add(field)
+            referenced_evidence: set[str] = set(fingerprint_references)
+            for record_field in ("parameters", "variants", "related_candidate_ids"):
+                records = row.get(record_field, [])
+                if isinstance(records, list):
+                    for record in records:
+                        if isinstance(record, dict):
+                            referenced_evidence.update(
+                                evidence_id
+                                for evidence_id in record.get("evidence_ids", [])
+                                if isinstance(evidence_id, str)
+                            )
+            if not referenced_evidence <= set(evidence_by_id):
+                errors.append(
+                    f"candidate {candidate_id} references undeclared evidence"
+                )
+            for evidence_id, evidence in evidence_by_id.items():
+                declared_fields = evidence.get("fingerprint_fields", [])
+                if (
+                    not isinstance(declared_fields, list)
+                    or not all(isinstance(item, str) for item in declared_fields)
+                    or set(declared_fields)
+                    != fingerprint_references.get(evidence_id, set())
+                ):
+                    errors.append(
+                        f"candidate {candidate_id} evidence {evidence_id} "
+                        "fingerprint-field join differs"
+                    )
             related_ids = row.get("related_candidate_ids", [])
             if isinstance(related_ids, list):
-                relation_targets = {
+                relation_targets = [
                     relation.get("candidate_id")
                     for relation in related_ids
                     if isinstance(relation, dict)
                     and isinstance(relation.get("candidate_id"), str)
-                }
+                ]
                 if len(relation_targets) != len(related_ids) or not (
-                    relation_targets <= proposal_ids
+                    set(relation_targets) <= proposal_id_set
                 ):
                     errors.append(
                         f"candidate {candidate_id} relates to an undeclared "
@@ -692,8 +929,8 @@ def _validate_worker_output(
                     )
 
     routes = output.get("route_proposals", [])
+    route_ids: set[str] = set()
     if isinstance(routes, list):
-        route_ids: set[str] = set()
         for row in routes:
             if not isinstance(row, dict):
                 continue
@@ -708,6 +945,31 @@ def _validate_worker_output(
                 errors.append(f"route {route_id} is outside the source assignment")
             if row.get("owning_stage") != str(manifest.get("stage")):
                 errors.append(f"route {route_id} owning_stage differs from bundle")
+            if route_sources_from_reading.get(route_id, set()) != {
+                row.get("source_unit_id")
+            }:
+                errors.append(f"route {route_id} reading-ledger join differs")
+        if set(route_sources_from_reading) != route_ids:
+            errors.append(
+                "reading-ledger route IDs differ from worker route proposals"
+            )
+
+    for candidate_id, row in proposal_by_id.items():
+        cross_reference_ids = row.get("cross_reference_ids", [])
+        if isinstance(cross_reference_ids, list) and (
+            not all(isinstance(item, str) for item in cross_reference_ids)
+            or not set(cross_reference_ids) <= route_ids
+        ):
+            errors.append(
+                f"candidate {candidate_id} references an undeclared worker route"
+            )
+    linked_candidate_ids = set(candidate_sources_from_reading) | set(
+        candidate_images_from_assets
+    )
+    if linked_candidate_ids != set(proposal_by_id):
+        errors.append(
+            "reading/asset candidate IDs differ from worker candidate proposals"
+        )
 
 
 def verify_bundle(
@@ -772,6 +1034,7 @@ def verify_bundle(
         "network_allowed": False,
         "runtime_os_sandbox_required": True,
         "bundle_preparation_enforces_sandbox": False,
+        "coordinator_merge_validation_required": True,
     }
     if not isinstance(requirements, dict) or set(requirements) != (
         EXECUTION_REQUIREMENT_FIELDS
@@ -869,8 +1132,19 @@ def verify_bundle(
                 or relative.startswith("input/")
             ):
                 errors.append(f"bundle contains an undeclared directory: {relative}")
+            elif not path.is_file() and not path.is_dir():
+                errors.append(f"bundle contains a special filesystem entry: {relative}")
     if manifest_path.exists() and manifest_path.stat().st_mode & 0o222:
         errors.append("bundle manifest is writable")
+    if manifest_path.exists() and manifest_path.stat().st_nlink != 1:
+        errors.append("bundle manifest is hard-linked")
+    output_root = bundle / "output"
+    if (
+        not output_root.is_dir()
+        or output_root.is_symlink()
+        or not output_root.stat().st_mode & 0o200
+    ):
+        errors.append("bundle output directory must be a writable real directory")
 
     prompt_path = input_root / "brief.md"
     try:
@@ -960,11 +1234,15 @@ def verify_bundle(
     if [row.get("path") for row in reading_rows] != unit_paths:
         errors.append("bundle reading input order/path differs from source units")
 
-    source_files = {
-        path.relative_to(input_root / "sources").as_posix()
-        for path in (input_root / "sources").rglob("*")
-        if path.is_file()
-    } if (input_root / "sources").is_dir() else set()
+    source_files = (
+        {
+            path.relative_to(input_root / "sources").as_posix()
+            for path in (input_root / "sources").rglob("*")
+            if path.is_file()
+        }
+        if (input_root / "sources").is_dir()
+        else set()
+    )
     if source_files != set(source_paths):
         errors.append("bundled source-file paths differ from source_paths")
 
@@ -993,15 +1271,100 @@ def verify_bundle(
         for row in asset_rows
         if is_safe_relative_path(row.get("physical_path"))
     }
-    image_files = {
-        path.relative_to(input_root / "images").as_posix()
-        for path in (input_root / "images").rglob("*")
-        if path.is_file()
-    } if (input_root / "images").is_dir() else set()
+    image_files = (
+        {
+            path.relative_to(input_root / "images").as_posix()
+            for path in (input_root / "images").rglob("*")
+            if path.is_file()
+        }
+        if (input_root / "images").is_dir()
+        else set()
+    )
     if image_files != expected_images:
         errors.append("bundled image paths differ from the asset assignment")
 
-    forbidden_parts = {".git", "goal-1", "goal-2", "src"}
+    derived_input_files = {
+        "input/brief.md",
+        "input/guardrails.json",
+        "input/source-units.jsonl",
+        "input/reading-input.csv",
+        "input/asset-input.csv",
+        *(f"input/schemas/{name}" for name in SCHEMA_NAMES),
+        *(f"input/sources/{path}" for path in source_paths),
+        *(f"input/images/{path}" for path in expected_images),
+    }
+    if set(actual_files) != derived_input_files:
+        errors.append(
+            "bundle input files differ from the exact derived assignment projection"
+        )
+
+    try:
+        authoritative_units = [
+            json.loads(line)
+            for line in (GOAL_DIR / "source-units.jsonl")
+            .read_text(encoding="utf-8")
+            .splitlines()
+            if line
+        ]
+        expected_units = [
+            unit for unit in authoritative_units if unit["path"] in source_paths
+        ]
+        expected_unit_bytes = b"".join(
+            (
+                json.dumps(unit, sort_keys=True, separators=(",", ":")) + "\n"
+            ).encode()
+            for unit in expected_units
+        )
+        if (input_root / "source-units.jsonl").read_bytes() != expected_unit_bytes:
+            errors.append("bundled source units differ from the authoritative projection")
+
+        expected_reading = [
+            row
+            for row in read_csv(GOAL_DIR / "reading-ledger.csv")
+            if row["path"] in source_paths
+        ]
+        if (input_root / "reading-input.csv").read_bytes() != csv_bytes(
+            READING_HEADER,
+            expected_reading,
+        ):
+            errors.append("reading input differs from the authoritative projection")
+
+        expected_assets = [
+            row
+            for row in read_csv(GOAL_DIR / "asset-ledger.csv")
+            if row["assignment_path"] in source_paths
+        ]
+        if (input_root / "asset-input.csv").read_bytes() != csv_bytes(
+            ASSET_HEADER,
+            expected_assets,
+        ):
+            errors.append("asset input differs from the authoritative projection")
+
+        for source_path in source_paths:
+            if (input_root / "sources" / source_path).read_bytes() != (
+                SOURCE_ROOT / source_path
+            ).read_bytes():
+                errors.append(
+                    f"bundled source differs from authoritative source: {source_path}"
+                )
+        for image_path in expected_images:
+            if (input_root / "images" / image_path).read_bytes() != (
+                SOURCE_ROOT / image_path
+            ).read_bytes():
+                errors.append(
+                    f"bundled image differs from authoritative image: {image_path}"
+                )
+    except (OSError, json.JSONDecodeError, KeyError, ValueError) as exc:
+        errors.append(f"cannot verify authoritative bundle projection: {exc}")
+
+    forbidden_parts = {
+        ".git",
+        "goal-1",
+        "goal-2",
+        "src",
+        "api.md",
+        "simple_programs.md",
+    }
     for relative in allowed_root_files:
         if forbidden_parts & set(Path(relative).parts):
             errors.append(f"bundle contains prohibited path: {relative}")
@@ -1044,7 +1407,11 @@ def main() -> int:
                     print(f"ERROR: {error}", file=sys.stderr)
                 return 1
             if args.verify_output:
-                print("verified sealed blind-worker bundle and completed output")
+                print(
+                    "verified sealed blind-worker bundle and completed output; "
+                    "coordinator canonical-ID allocation and merge validation "
+                    "remain required"
+                )
             else:
                 print(
                     "verified prepared blind-worker bundle; "

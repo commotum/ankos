@@ -216,10 +216,12 @@ def validate(data: dict[str, Any]) -> list[str]:
                 errors.append(f"candidate_id_policy.{key} must be non-empty")
         allocation_order = policy.get("allocation_order", "")
         for required_phrase in (
+            "immutable discovery epoch",
             "frozen audit traversal",
             "chapter followed by its paired Notes",
             "Stage 17 Index",
             "Stage 18 saturation",
+            "reopened blind pass increments the epoch",
             "root merge",
         ):
             if required_phrase not in allocation_order:

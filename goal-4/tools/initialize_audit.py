@@ -152,6 +152,7 @@ def expected_artifacts() -> dict[Path, bytes]:
                 "reference_status": image["inventory_status"],
                 "inspection_status": "PENDING",
                 "visual_role": "",
+                "source_status": "",
                 "risk_flags": "[]",
                 "original_resolution_status": "NOT_REVIEWED",
                 "transcription_status": "NOT_APPLICABLE",

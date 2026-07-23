@@ -89,9 +89,11 @@ The candidate lifecycle is now append-only:
   chapter followed by its paired Notes, with units in document order and owned
   images in manifest order; Stage 17 Index; then Stage 18 saturation
   round/result order;
-- every candidate stores that typed discovery anchor (`SOURCE_UNIT`, `IMAGE`,
-  or Stage-18 `SEARCH_HIT`) so allocation order and discovery stage can be
-  mechanically rechecked;
+- every candidate stores an immutable discovery epoch, typed discovery anchor
+  (`SOURCE_UNIT`, `IMAGE`, or a stage-owned `SEARCH_HIT`), and one-based
+  within-anchor ordinal so allocation order and discovery stage can be
+  mechanically rechecked; epoch 1 is the initial traversal and each formally
+  reopened blind pass increments the epoch before allocating further IDs;
 - a split tombstones the parent and allocates new children;
 - a merge requires explicit alias/co-reference or proved duplicate capture,
   keeps the earliest ID active, and retains redirect provenance;

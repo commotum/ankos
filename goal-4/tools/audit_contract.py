@@ -36,12 +36,17 @@ READING_HEADER = [
 CROSS_REFERENCE_HEADER = [
     "route_id",
     "source_unit_id",
+    "discovery_epoch",
+    "discovery_kind",
+    "discovery_id",
     "literal_target",
     "route_kind",
     "expected_topic",
     "owning_stage",
+    "closure_scope",
     "status",
     "target_unit_ids",
+    "target_asset_ids",
     "attempts",
     "vocabulary_terms",
     "defect_boundary",
@@ -61,6 +66,7 @@ ASSET_HEADER = [
     "reference_status",
     "inspection_status",
     "visual_role",
+    "source_status",
     "risk_flags",
     "original_resolution_status",
     "transcription_status",
@@ -210,6 +216,7 @@ VISUAL_RISK_FLAGS = [
     "CAPTION_INCOMPLETE",
 ]
 ROUTE_KINDS = ["PAGE", "SECTION", "NOTES", "INDEX", "ALIAS", "OTHER"]
+ROUTE_CLOSURE_SCOPES = ["WITHIN_STAGE", "CROSS_RANGE"]
 ROUTE_STATUSES = ["PENDING", "RESOLVED", "MISSING_TARGET_FINAL"]
 SEARCH_HIT_DISPOSITIONS = [
     "GOVERNED_CANDIDATE_OR_SUPPORT",
@@ -320,13 +327,15 @@ def candidate_schema(id_pattern: str = "^B[0-9]{4}$") -> dict[str, Any]:
         "discovery_stage": {"type": "integer", "minimum": 4, "maximum": 18},
         "discovery_anchor": {
             "type": "object",
-            "required": ["kind", "id"],
+            "required": ["epoch", "kind", "id", "ordinal"],
             "properties": {
+                "epoch": {"type": "integer", "minimum": 1},
                 "kind": {
                     "type": "string",
                     "enum": ["SOURCE_UNIT", "IMAGE", "SEARCH_HIT"],
                 },
                 "id": {"type": "string"},
+                "ordinal": {"type": "integer", "minimum": 1},
             },
             "additionalProperties": False,
         },
@@ -387,6 +396,14 @@ def schema_documents() -> dict[str, dict[str, Any]]:
         field: {"type": "string"} for field in CROSS_REFERENCE_HEADER
     }
     cross_properties["route_kind"] = {"type": "string", "enum": ROUTE_KINDS}
+    cross_properties["discovery_kind"] = {
+        "type": "string",
+        "enum": ["SOURCE_UNIT", "SEARCH_HIT"],
+    }
+    cross_properties["closure_scope"] = {
+        "type": "string",
+        "enum": ROUTE_CLOSURE_SCOPES,
+    }
     cross_properties["status"] = {"type": "string", "enum": ROUTE_STATUSES}
     asset_properties = {
         field: {"type": "string"} for field in ASSET_HEADER
@@ -402,6 +419,7 @@ def schema_documents() -> dict[str, dict[str, Any]]:
                 "enum": ["PENDING", "SCREENED"],
             },
             "visual_role": {"type": "string", "enum": [""] + VISUAL_ROLES},
+            "source_status": {"type": "string", "enum": [""] + SOURCE_STATUSES},
             "original_resolution_status": {
                 "type": "string",
                 "enum": ["NOT_REVIEWED", "NOT_REQUIRED", "REVIEWED"],
@@ -455,6 +473,9 @@ def schema_documents() -> dict[str, dict[str, Any]]:
         "type": "object",
         "required": [
             "round_id",
+            "epoch",
+            "kind",
+            "owning_stage",
             "queries",
             "tool_assumptions",
             "result_ids",
@@ -468,6 +489,9 @@ def schema_documents() -> dict[str, dict[str, Any]]:
         ],
         "properties": {
             "round_id": {"type": "string", "pattern": "^S[0-9]{3}$"},
+            "epoch": {"type": "integer", "minimum": 1},
+            "kind": {"type": "string", "enum": ["LOCAL", "SATURATION"]},
+            "owning_stage": {"type": "integer", "minimum": 4, "maximum": 18},
             "queries": {"type": "array", "items": query_schema},
             "tool_assumptions": _string_array(),
             "result_ids": _string_array(),

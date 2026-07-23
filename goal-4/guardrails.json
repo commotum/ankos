@@ -11,7 +11,7 @@
   "candidate_id_policy": {
     "pattern": "^B[0-9]{4}$",
     "first_id": "B0001",
-    "allocation_order": "First discovery-anchor occurrence in the frozen audit traversal: Stage 4 documents in Contents order; then each Stage 5-16 chapter followed by its paired Notes, with source units in document order and owned images in manifest order; then Stage 17 Index; then Stage 18 saturation results in round/result order. IDs are allocated only by the root merge step.",
+    "allocation_order": "First immutable discovery epoch, then discovery-anchor occurrence in that epoch's frozen audit traversal, then the candidate's one-based within-anchor ordinal. Epoch 1 is the initial pass: Stage 4 documents in Contents order and its local-search hits; then each Stage 5-16 chapter followed by its paired Notes, with source units in document order, owned images in manifest order, and that stage's local-search hits; then Stage 17 Index and local-search hits; then Stage 18 saturation results in round/result order. Any formally reopened blind pass increments the epoch before allocating IDs and records candidates in that pass's traversal order. IDs are allocated only by the root merge step.",
     "worker_policy": "Isolated workers use stage-local W identifiers and never allocate B identifiers.",
     "reuse_policy": "Never reuse or renumber an allocated B identifier.",
     "split_policy": "The original ID becomes a SPLIT_SUPERSEDED tombstone and every child receives a new ID in canonical-evidence order. Every evidence/link row is reassigned explicitly; the original aggregate provenance and before/after rationale remain auditable.",
