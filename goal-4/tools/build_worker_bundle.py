@@ -657,16 +657,20 @@ def build_bundle(
     stage: int,
     requested_paths: list[str],
     epoch: int = 1,
+    *,
+    goal_dir: Path | None = None,
 ) -> None:
     """Build from one cooperative atomic Goal-4 ledger snapshot."""
+    goal_dir = (goal_dir or GOAL_DIR).resolve()
     try:
-        with audit_transaction.read_guard(GOAL_DIR):
+        with audit_transaction.read_guard(goal_dir):
             _build_bundle_locked(
                 output,
                 worker_id,
                 stage,
                 requested_paths,
                 epoch,
+                goal_dir=goal_dir,
             )
     except audit_transaction.TransactionError as exc:
         raise ValueError(str(exc)) from exc
@@ -678,13 +682,15 @@ def _build_bundle_locked(
     stage: int,
     requested_paths: list[str],
     epoch: int = 1,
+    *,
+    goal_dir: Path,
 ) -> None:
     if output.exists():
         raise ValueError(f"output already exists: {output}")
     if not isinstance(epoch, int) or isinstance(epoch, bool) or epoch < 1:
         raise ValueError("discovery epoch must be a positive integer")
-    manifest = json.loads((GOAL_DIR / "corpus-manifest.json").read_text())
-    guardrails = json.loads((GOAL_DIR / "guardrails.json").read_text())
+    manifest = json.loads((goal_dir / "corpus-manifest.json").read_text())
+    guardrails = json.loads((goal_dir / "guardrails.json").read_text())
     text_patterns = compile_blind_text_patterns(guardrails)
     if not isinstance(worker_id, str) or not worker_id.strip():
         raise ValueError("worker_id must be a nonempty string")
@@ -710,7 +716,7 @@ def _build_bundle_locked(
 
     units = [
         json.loads(line)
-        for line in (GOAL_DIR / "source-units.jsonl")
+        for line in (goal_dir / "source-units.jsonl")
         .read_text(encoding="utf-8")
         .splitlines()
         if line
@@ -718,12 +724,12 @@ def _build_bundle_locked(
     selected_units = [unit for unit in units if unit["path"] in paths]
     reading = [
         row
-        for row in read_csv(GOAL_DIR / "reading-ledger.csv")
+        for row in read_csv(goal_dir / "reading-ledger.csv")
         if row["path"] in paths
     ]
     assets = [
         row
-        for row in read_csv(GOAL_DIR / "asset-ledger.csv")
+        for row in read_csv(goal_dir / "asset-ledger.csv")
         if row["assignment_path"] in paths
     ]
     projection_review_mode(reading, assets)
@@ -743,7 +749,7 @@ def _build_bundle_locked(
 
     output.mkdir(parents=True)
     input_root = output / "input"
-    schema_source = GOAL_DIR / "schemas" / "blind"
+    schema_source = goal_dir / "schemas" / "blind"
     for schema_name in SCHEMA_NAMES:
         write(
             input_root / "schemas" / schema_name,
@@ -1696,14 +1702,17 @@ def verify_bundle(
     bundle: Path,
     require_completed_output: bool = False,
     *,
+    goal_dir: Path | None = None,
     worker_output_override: dict[str, Any] | None = None,
 ) -> list[str]:
     """Verify against one cooperative atomic Goal-4 ledger snapshot."""
+    goal_dir = (goal_dir or GOAL_DIR).resolve()
     try:
-        with audit_transaction.read_guard(GOAL_DIR):
+        with audit_transaction.read_guard(goal_dir):
             return _verify_bundle_locked(
                 bundle,
                 require_completed_output=require_completed_output,
+                goal_dir=goal_dir,
                 worker_output_override=worker_output_override,
             )
     except audit_transaction.TransactionError as exc:
@@ -1714,6 +1723,7 @@ def _verify_bundle_locked(
     bundle: Path,
     require_completed_output: bool = False,
     *,
+    goal_dir: Path,
     worker_output_override: dict[str, Any] | None = None,
 ) -> list[str]:
     errors: list[str] = []
@@ -1727,7 +1737,7 @@ def _verify_bundle_locked(
         return ["bundle manifest is not an object"]
     try:
         trusted_guardrails = json.loads(
-            (GOAL_DIR / "guardrails.json").read_text(encoding="utf-8")
+            (goal_dir / "guardrails.json").read_text(encoding="utf-8")
         )
         text_patterns = compile_blind_text_patterns(trusted_guardrails)
     except (OSError, json.JSONDecodeError, ValueError) as exc:
@@ -1775,7 +1785,7 @@ def _verify_bundle_locked(
     else:
         try:
             corpus_manifest = json.loads(
-                (GOAL_DIR / "corpus-manifest.json").read_text(encoding="utf-8")
+                (goal_dir / "corpus-manifest.json").read_text(encoding="utf-8")
             )
             canonical_paths = [
                 path
@@ -1972,7 +1982,7 @@ def _verify_bundle_locked(
             actual_schema_sha = schema_set_digest(schema_root)
             if manifest.get("schema_sha256") != actual_schema_sha:
                 errors.append("bundle schema-set digest mismatch")
-            trusted_schema_root = GOAL_DIR / "schemas" / "blind"
+            trusted_schema_root = goal_dir / "schemas" / "blind"
             for name in SCHEMA_NAMES:
                 if (schema_root / name).read_bytes() != (
                     trusted_schema_root / name
@@ -1984,7 +1994,7 @@ def _verify_bundle_locked(
     try:
         expected_guardrails = canonical_json_bytes(
             sanitized_guardrails(
-                json.loads((GOAL_DIR / "guardrails.json").read_text())
+                json.loads((goal_dir / "guardrails.json").read_text())
             )
         )
         if (input_root / "guardrails.json").read_bytes() != expected_guardrails:
@@ -2097,7 +2107,7 @@ def _verify_bundle_locked(
     try:
         authoritative_units = [
             json.loads(line)
-            for line in (GOAL_DIR / "source-units.jsonl")
+            for line in (goal_dir / "source-units.jsonl")
             .read_text(encoding="utf-8")
             .splitlines()
             if line
@@ -2116,7 +2126,7 @@ def _verify_bundle_locked(
 
         expected_reading = [
             row
-            for row in read_csv(GOAL_DIR / "reading-ledger.csv")
+            for row in read_csv(goal_dir / "reading-ledger.csv")
             if row["path"] in source_paths
         ]
         if (input_root / "reading-input.csv").read_bytes() != csv_bytes(
@@ -2127,7 +2137,7 @@ def _verify_bundle_locked(
 
         expected_assets = [
             row
-            for row in read_csv(GOAL_DIR / "asset-ledger.csv")
+            for row in read_csv(goal_dir / "asset-ledger.csv")
             if row["assignment_path"] in source_paths
         ]
         if (input_root / "asset-input.csv").read_bytes() != csv_bytes(
@@ -2190,6 +2200,12 @@ def main() -> int:
         ),
     )
     parser.add_argument("--worker-id", default="blind-worker")
+    parser.add_argument(
+        "--goal-dir",
+        type=Path,
+        default=GOAL_DIR,
+        help="authoritative Goal 4 ledger directory",
+    )
     parser.add_argument("--stage", type=int)
     parser.add_argument(
         "--epoch",
@@ -2205,6 +2221,7 @@ def main() -> int:
             errors = verify_bundle(
                 args.verify.resolve(),
                 require_completed_output=args.verify_output,
+                goal_dir=args.goal_dir,
             )
             if errors:
                 for error in errors:
@@ -2232,6 +2249,7 @@ def main() -> int:
             args.stage,
             args.path,
             args.epoch,
+            goal_dir=args.goal_dir,
         )
         errors = verify_bundle(args.output.resolve())
         if errors:

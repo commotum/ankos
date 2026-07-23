@@ -137,12 +137,18 @@ def _completed_bundle(
     worker_id: str = "merge-test-worker",
 ) -> Path:
     bundle = root / "bundle"
+    authoritative_goal = (
+        _copy_global_state(root)
+        if epoch == 1
+        else build_worker_bundle.GOAL_DIR
+    )
     build_worker_bundle.build_bundle(
         bundle,
         worker_id,
         4,
         INITIAL_STAGE_4_PREFIX if epoch == 1 else [ASSIGNMENT_PATH],
         epoch=epoch,
+        goal_dir=authoritative_goal,
     )
     manifest = json.loads(
         (bundle / "allowed-manifest.json").read_text(encoding="utf-8")
@@ -256,6 +262,7 @@ def _completed_bundle(
     errors = build_worker_bundle.verify_bundle(
         bundle,
         require_completed_output=True,
+        goal_dir=authoritative_goal,
     )
     assert errors == []
     return bundle
@@ -365,6 +372,7 @@ def _completed_interleaved_evidence_bundle(root: Path) -> Path:
     assert build_worker_bundle.verify_bundle(
         bundle,
         require_completed_output=True,
+        goal_dir=root / "goal-4",
     ) == []
     return bundle
 
@@ -379,6 +387,11 @@ def _completed_no_construction_bundle(
     worker_id: str | None = None,
 ) -> Path:
     bundle = root / "bundle"
+    authoritative_goal = (
+        _copy_global_state(root)
+        if epoch == 1
+        else build_worker_bundle.GOAL_DIR
+    )
     if assignment_paths is None:
         assert assignment_path is not None
         assignment_paths = [assignment_path]
@@ -390,6 +403,7 @@ def _completed_no_construction_bundle(
         stage,
         assignment_paths,
         epoch=epoch,
+        goal_dir=authoritative_goal,
     )
     reading_updates: list[dict[str, str]] = []
     for original in _read_csv(bundle / "input" / "reading-input.csv"):
@@ -446,12 +460,15 @@ def _completed_no_construction_bundle(
     assert build_worker_bundle.verify_bundle(
         bundle,
         require_completed_output=True,
+        goal_dir=authoritative_goal,
     ) == []
     return bundle
 
 
 def _copy_global_state(root: Path) -> Path:
     goal = root / "goal-4"
+    if goal.is_dir():
+        return goal
     goal.mkdir(parents=True)
     initialized = {
         path.name: payload
@@ -1240,6 +1257,7 @@ def test_interleaved_candidate_evidence_verifies_previews_and_validates(
     assert build_worker_bundle.verify_bundle(
         bundle,
         require_completed_output=True,
+        goal_dir=tmp_path / "goal-4",
     ) == []
     goal = _copy_global_state(tmp_path)
 
@@ -1290,6 +1308,7 @@ def test_interleaved_worker_evidence_rejects_invalid_local_allocations(
     gap_errors = build_worker_bundle.verify_bundle(
         bundle,
         require_completed_output=True,
+        goal_dir=tmp_path / "goal-4",
         worker_output_override=gap,
     )
     assert any(
@@ -1304,6 +1323,7 @@ def test_interleaved_worker_evidence_rejects_invalid_local_allocations(
     duplicate_errors = build_worker_bundle.verify_bundle(
         bundle,
         require_completed_output=True,
+        goal_dir=tmp_path / "goal-4",
         worker_output_override=duplicate,
     )
     assert any(
@@ -1329,6 +1349,7 @@ def test_interleaved_worker_evidence_rejects_invalid_local_allocations(
     traversal_errors = build_worker_bundle.verify_bundle(
         bundle,
         require_completed_output=True,
+        goal_dir=tmp_path / "goal-4",
         worker_output_override=out_of_traversal,
     )
     assert any(

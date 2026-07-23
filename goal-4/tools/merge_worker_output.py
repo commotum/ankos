@@ -2033,6 +2033,7 @@ def _prepare_merge_locked(
     verification_errors = build_worker_bundle.verify_bundle(
         bundle,
         require_completed_output=True,
+        goal_dir=goal_dir,
     )
     if verification_errors:
         raise MergeError(
