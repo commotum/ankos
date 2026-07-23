@@ -168,6 +168,10 @@ def ca_preset(
         "carrier": "Cell positions carrying black or white values.",
         "support": "A one-dimensional line of cells.",
         "topology": "Each position has an immediate left and right neighbor.",
+        "structural_invariants": (
+            "The one-dimensional cell support and binary value schema remain "
+            "fixed across generations."
+        ),
         "alphabet_or_value_schema": "Two cell values, black and white.",
         "complete_state": "The current row of black/white cell values.",
         "seed": seed_text,
@@ -1213,6 +1217,13 @@ general_1d = source_candidate(
             "One returned value replaces each target cell in the next list."
         ),
         "result_kind": "A unique next configuration when the rule is total.",
+        "successor_cardinality": (
+            "Exactly one successor when every neighborhood has exactly one "
+            "replacement/function result."
+        ),
+        "determinism_branching_or_measure": (
+            "Deterministic for a fixed total, single-valued replacement list or function."
+        ),
         "parameters_and_variants": (
             "Rule representation, range r, value schema, and finite boundary "
             "profile are variable."
@@ -1471,8 +1482,8 @@ centered_seed = source_candidate(
             "The CenterList function name and list syntax are implementation notation."
         ),
         "evidence_limit": (
-            "The passage does not define behavior for invalid n or independently "
-            "choose the boundary used when the seed is evolved."
+            "The passage does not define behavior for invalid n or constructor "
+            "failure; any evolution boundary is a downstream program choice."
         ),
     },
     claim=(
@@ -1480,8 +1491,8 @@ centered_seed = source_candidate(
         "condition and its binary value encoding."
     ),
     missing=(
-        "The passage does not define behavior for invalid n or independently "
-        "choose the boundary used when the seed is evolved."
+        "The passage does not define behavior for invalid n or constructor "
+        "failure; any evolution boundary is a downstream program choice."
     ),
 )
 add_evidence(
@@ -1647,6 +1658,10 @@ def profile_candidate(
             "carrier": "Cells carrying values from the declared alphabet.",
             "support": support,
             "topology": neighborhood,
+            "structural_invariants": (
+                "The declared cellular support, neighborhood profile, and "
+                "value schema remain fixed across the requested run."
+            ),
             "alphabet_or_value_schema": alphabet,
             "complete_state": "The value at every cell in the current configuration.",
             "frontier_or_activation": "The rule is applied across the cellular support.",
@@ -1767,8 +1782,18 @@ function_profile["facts"]["write_replacement_assembly_or_commit"] = (
     "The supplied function's result provides the value produced for each "
     "neighborhood application."
 )
-function_profile["evidence"][0]["fields"].append(
-    "write_replacement_assembly_or_commit"
+function_profile["facts"]["successor_cardinality"] = (
+    "Exactly one successor configuration for a fixed valid single-valued function."
+)
+function_profile["facts"]["determinism_branching_or_measure"] = (
+    "Deterministic for a fixed valid single-valued neighborhood function."
+)
+function_profile["evidence"][0]["fields"].extend(
+    [
+        "write_replacement_assembly_or_commit",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+    ]
 )
 add_evidence(
     function_profile,
@@ -1930,8 +1955,8 @@ def seed_or_query_candidate(
     seed_boundary: bool = True,
 ) -> CandidateSpec:
     missing = (
-        "The compact specification does not state invalid-input behavior, "
-        "native failure, or an independent witness convention."
+        "The compact specification does not state invalid-input or constructor-"
+        "failure behavior."
     )
     facts = {
         "object_kind": "A cellular-automaton initial-state constructor class.",
@@ -2092,8 +2117,8 @@ explicit_cyclic_seed = source_candidate(
             "demonstrate the seed but are not part of this constructor."
         ),
         "evidence_limit": (
-            "The example does not define behavior for malformed lists or a "
-            "native stopping condition beyond the requested run length."
+            "The example does not define behavior for malformed or empty cyclic "
+            "lists or constructor failure."
         ),
     },
     claim=(
@@ -2101,8 +2126,8 @@ explicit_cyclic_seed = source_candidate(
         "continued cyclically and introduces the five-cell rule 30 example."
     ),
     missing=(
-        "The example does not define behavior for malformed lists or a native "
-        "stopping condition beyond the requested run length."
+        "The example does not define behavior for malformed or empty cyclic "
+        "lists or constructor failure."
     ),
 )
 explicit_cyclic_seed["source_status"] = ["CLEAR", "DEFECTIVE"]
@@ -2161,8 +2186,8 @@ periodic_patch_seed = source_candidate(
             "are downstream evolution and observer choices."
         ),
         "evidence_limit": (
-            "The example does not state invalid-input, native completion, "
-            "failure, or witness semantics."
+            "The example does not state malformed foreground/background or "
+            "constructor-failure behavior."
         ),
     },
     claim=(
@@ -2170,8 +2195,8 @@ periodic_patch_seed = source_candidate(
         "{1,0,1,1} background, and default affected-region projection."
     ),
     missing=(
-        "The example does not state invalid-input, native completion, failure, "
-        "or witness semantics."
+        "The example does not state malformed foreground/background or "
+        "constructor-failure behavior."
     ),
 )
 add_evidence(
@@ -2294,6 +2319,10 @@ def explicit_ca_example(
             "carrier": "Cells carrying values from the declared alphabet.",
             "support": support,
             "topology": neighborhood,
+            "structural_invariants": (
+                "The declared cellular support, neighborhood profile, and "
+                "value schema remain fixed across evolution steps."
+            ),
             "alphabet_or_value_schema": alphabet,
             "complete_state": "The current value at every cell in the retained support.",
             "visible_history": "The example renders successive configurations as rows or rasters.",
@@ -2505,7 +2534,7 @@ def declarative_pattern(
 ) -> CandidateSpec:
     missing = (
         "The source does not fully specify domain clipping, coordinate bounds, "
-        "invalid arguments, or a separate witness convention."
+        "or invalid-argument behavior."
     )
     return source_candidate(
         key=key,
@@ -2558,8 +2587,7 @@ def direct_query_candidate(
     route_keys: list[str] | None = None,
 ) -> CandidateSpec:
     missing = (
-        "The assigned passage does not state invalid-input behavior or an "
-        "independent witness/certificate convention."
+        "The assigned passage does not state invalid-input behavior."
     )
     return source_candidate(
         key=key,
@@ -2577,6 +2605,10 @@ def direct_query_candidate(
             "result_kind": result,
             "successor_cardinality": "Exactly one query result for each valid input.",
             "determinism_branching_or_measure": "Deterministic.",
+            "termination_completion_failure": (
+                "For a valid finite query input, direct evaluation completes "
+                "with the finite query result; invalid-input behavior is unstated."
+            ),
             "parameters_and_variants": parameters_text,
             "excluded_observers_and_representations": (
                 "Formatting, rasterization, and later interpretation of the "
@@ -2613,6 +2645,10 @@ time_slice_query = direct_query_candidate(
     parameters_text="The selector form and its step bounds/stride.",
     aliases=["CellularAutomaton time offset off_t"],
 )
+time_slice_query["facts"]["structural_invariants"] = (
+    "Selected evolution rows retain their source order."
+)
+time_slice_query["evidence"][0]["fields"].append("structural_invariants")
 add_evidence(
     time_slice_query,
     label="ca-time-slice-history-length",
@@ -2676,6 +2712,9 @@ space_slice_query = direct_query_candidate(
     parameters_text="The selector mode, spatial bounds, and optional stride.",
     aliases=["CellularAutomaton space offset off_x"],
 )
+space_slice_query["facts"]["structural_invariants"] = (
+    "Every returned evolution row has the same selected spatial width."
+)
 for label, unit, claim, fields in [
     (
         "ca-space-slice-origin",
@@ -2688,7 +2727,7 @@ for label, unit, claim, fields in [
         "ca-space-slice-fixed-width",
         "U005031",
         "Every row returned by one evolution projection has the same size.",
-        ["result_kind", "evidence_limit"],
+        ["structural_invariants", "result_kind", "evidence_limit"],
     ),
     (
         "ca-space-slice-affected-width",
@@ -3313,33 +3352,48 @@ add_evidence(
 
 k_rule90_row_count = direct_query_candidate(
     key="k-color-rule90-row-count",
-    name="k-color Rule 90 row nonwhite-cell count function",
+    name="prime-k color Rule 90 row nonwhite-cell count function",
     anchor="U005125",
     object_kind=(
-        "A direct integer-valued query on the canonical k-color additive "
+        "A direct integer-valued query on the canonical prime-k color additive "
         "Rule 90 single-seed pattern."
     ),
-    input_text="A nonnegative row index t and color modulus k.",
+    input_text="A nonnegative row index t and prime color modulus k.",
     law="Return Apply[Times, 1 + IntegerDigits[t,k]].",
     result="The number of nonwhite cells on row t.",
-    parameters_text="The row index t and color modulus k.",
+    parameters_text="The row index t and prime color modulus k.",
     aliases=["k-color additive row population"],
 )
+k_rule90_row_count["uncertainties"] = [
+    (
+        "The paragraph discusses non-prime k by factor superposition and later "
+        "states a prime-k formula; the row-count candidate is conservatively "
+        "restricted to prime k because the sentence does not separately spell "
+        "out the formula's domain."
+    )
+]
 
 binomial_k_exponent = direct_query_candidate(
     key="binomial-k-exponent-borrow-count",
     name="Binomial k-exponent borrow-count function",
     anchor="U005125",
     object_kind="A direct integer-valued arithmetic query.",
-    input_text="Nonnegative integers t and n together with the base/factor k.",
+    input_text="Nonnegative integers t and n together with a prime base/factor k.",
     law=(
-        "Return the number of borrows in the base-k subtraction of n from t; "
+        "For prime k, return the number of borrows in the base-k subtraction of n from t; "
         "the source identifies this with IntegerExponent[Binomial[t,n],k]."
     ),
     result="The k-exponent of Binomial[t,n].",
-    parameters_text="The integers t and n and the base/factor k.",
+    parameters_text="The integers t and n and the prime base/factor k.",
     aliases=["binomial valuation by base-k borrows"],
 )
+binomial_k_exponent["uncertainties"] = [
+    (
+        "The source sentence does not explicitly repeat “prime” on the "
+        "borrow-count equality; this provisional candidate is conservatively "
+        "restricted to prime k rather than claiming a composite-base identity."
+    )
+]
 
 binomial_mod_k = declarative_pattern(
     key="binomial-mod-k-prime",
@@ -3417,7 +3471,7 @@ def pictured_integer_pattern(
     missing = (
         "The image and caption identify the function and modulo-two display, "
         "but do not state the function's full arithmetic definition, domain "
-        "clipping, invalid arguments, or witness semantics."
+        "clipping, or invalid-argument behavior."
     )
     facts = {
         "object_kind": "A declarative integer-function modulo-two pattern.",
@@ -3572,7 +3626,7 @@ def bitwise_function_candidate(
     missing = (
         "The source names and relates the bitwise function but does not give a "
         "complete bit-by-bit definition, signed-integer convention, domain "
-        "boundary, or witness semantics."
+        "boundary, or invalid-argument behavior."
     )
     spec = source_candidate(
         key=key,
@@ -4320,6 +4374,102 @@ terza_rima = source_candidate(
     missing=(
         "Only the interleaved/repetitive mechanic and form identity are given; "
         "the exact sequence law and completion convention are absent."
+    ),
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+
+branching_game = source_candidate(
+    key="rule-governed-branching-game",
+    name="rule-governed branching game class",
+    anchor="U005221",
+    aliases=["game process"],
+    facts={
+        "object_kind": "A rule-governed stepwise branching process.",
+        "native_time": "Discrete successive game steps.",
+        "carrier": "The components of the current game position.",
+        "complete_state": "A current game position sufficient to determine allowed choices.",
+        "external_data": "A choice supplied at each step by skill or randomness.",
+        "frontier_or_activation": "The current position presents a choice among possibilities.",
+        "schedule": "One allowed choice is made at each successive step.",
+        "law_kind": "Definite game rules combined with player- or randomness-selected choices.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "From the current position, use the definite rules to delimit many "
+            "possible next choices, then select one by skill or randomness."
+        ),
+        "result_kind": "A branching play trajectory through game positions.",
+        "successor_cardinality": "Many possible next positions can be available at a step.",
+        "determinism_branching_or_measure": (
+            "Branching; selection may be skill-based or random, with no policy "
+            "or probability measure stated."
+        ),
+        "parameters_and_variants": (
+            "The particular game rules, position schema, choice policy, and "
+            "random measure vary."
+        ),
+        "excluded_observers_and_representations": (
+            "Go's black/white grid appearance and historical origin are "
+            "example/context, not a universal game-state schema."
+        ),
+        "evidence_limit": (
+            "The passage gives the branching game-class mechanic but no complete "
+            "rule set, legal-move relation, terminal condition, utility/payoff, "
+            "player schedule, or random measure."
+        ),
+    },
+    claim=(
+        "The source explicitly characterizes games as definite-rule systems "
+        "that branch at each step through choices made by skill or randomness."
+    ),
+    missing=(
+        "The passage gives the branching game-class mechanic but no complete "
+        "rule set, legal-move relation, terminal condition, utility/payoff, "
+        "player schedule, or random measure."
+    ),
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+
+constraint_puzzle = source_candidate(
+    key="constraint-puzzle-solution-set",
+    name="constraint-defined puzzle solution-set class",
+    anchor="U005222",
+    aliases=["constraint puzzle"],
+    facts={
+        "object_kind": "A denotational constraint-satisfaction/model-set class.",
+        "complete_state": (
+            "A candidate assignment containing every value needed to test all constraints."
+        ),
+        "input": "A puzzle instance expressed by its constraints.",
+        "law_kind": "A conjunction or system of satisfaction constraints.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Accept exactly the candidate assignments that satisfy the puzzle's constraints."
+        ),
+        "result_kind": "The set of assignments that satisfy all constraints.",
+        "witness_semantics": (
+            "A witness is a complete candidate assignment that satisfies every "
+            "constraint in the puzzle instance."
+        ),
+        "parameters_and_variants": (
+            "Geometric versus arithmetic domain, variables, value schema, and "
+            "the actual constraint set vary by puzzle."
+        ),
+        "excluded_observers_and_representations": (
+            "Historical age and perceived solution complexity are context or "
+            "outcome properties, not additional constraints."
+        ),
+        "evidence_limit": (
+            "The passage establishes the constraint/solution-set semantics but "
+            "does not supply a particular variable domain, constraint language, "
+            "solver, solution count, failure convention, or sampling measure."
+        ),
+    },
+    claim=(
+        "The source explicitly characterizes puzzles as constraint-based and "
+        "distinguishes simple constraints from potentially complicated solutions."
+    ),
+    missing=(
+        "The passage establishes the constraint/solution-set semantics but does "
+        "not supply a particular variable domain, constraint language, solver, "
+        "solution count, failure convention, or sampling measure."
     ),
     strength="DIRECT_PARTIAL_MECHANICS",
 )
@@ -5559,8 +5709,6 @@ for key in {
             "frontier_or_activation",
             "schedule",
             "read_dependencies_or_neighborhood",
-            "termination_completion_failure",
-            "witness_semantics",
         ],
         seed_constructor_reason,
     )
@@ -5634,6 +5782,27 @@ justify_not_applicable(
         "This candidate denotes the complete model set of tile assignments; "
         "it is not a stepwise tile-placement process or a sampler that chooses "
         "one assignment."
+    ),
+)
+justify_not_applicable(
+    constraint_puzzle,
+    [
+        "native_time",
+        "visible_history",
+        "control_state",
+        "seed",
+        "boundary",
+        "external_data",
+        "frontier_or_activation",
+        "schedule",
+        "read_dependencies_or_neighborhood",
+        "write_replacement_assembly_or_commit",
+        "determinism_branching_or_measure",
+        "termination_completion_failure",
+    ],
+    (
+        "This candidate denotes the set of satisfying assignments; it does not "
+        "supply an iterative solver, sampler, or schedule that chooses one solution."
     ),
 )
 justify_not_applicable(
