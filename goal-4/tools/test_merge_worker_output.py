@@ -19,6 +19,7 @@ TOOLS_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(TOOLS_DIR))
 
 import build_worker_bundle  # noqa: E402
+import initialize_audit  # noqa: E402
 import merge_worker_output as merge  # noqa: E402
 from audit_contract import (  # noqa: E402
     ASSET_HEADER,
@@ -452,8 +453,19 @@ def _completed_no_construction_bundle(
 def _copy_global_state(root: Path) -> Path:
     goal = root / "goal-4"
     goal.mkdir(parents=True)
+    initialized = {
+        path.name: payload
+        for path, payload in initialize_audit.expected_artifacts().items()
+        if path.parent == merge.GOAL_DIR
+    }
     for name in merge.SNAPSHOT_NAMES:
-        shutil.copy2(merge.GOAL_DIR / name, goal / name)
+        source = merge.GOAL_DIR / name
+        target = goal / name
+        if name in merge.WRITE_NAMES:
+            target.write_bytes(initialized[name])
+            shutil.copymode(source, target)
+        else:
+            shutil.copy2(source, target)
     shutil.copytree(merge.GOAL_DIR / "schemas", goal / "schemas")
     return goal
 
