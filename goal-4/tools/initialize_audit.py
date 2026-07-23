@@ -28,6 +28,7 @@ CANDIDATE_PATH = GOAL_DIR / "candidate-ledger.jsonl"
 CROSS_REFERENCE_PATH = GOAL_DIR / "cross-reference-ledger.csv"
 ASSET_PATH = GOAL_DIR / "asset-ledger.csv"
 SEARCH_PATH = GOAL_DIR / "search-rounds.json"
+REVIEW_HISTORY_PATH = GOAL_DIR / "review-history.jsonl"
 SCHEMA_DIR = GOAL_DIR / "schemas"
 
 
@@ -182,6 +183,7 @@ def expected_artifacts() -> dict[Path, bytes]:
         CANDIDATE_PATH: b"",
         CROSS_REFERENCE_PATH: csv_bytes(CROSS_REFERENCE_HEADER, []),
         ASSET_PATH: csv_bytes(ASSET_HEADER, asset_rows),
+        REVIEW_HISTORY_PATH: b"",
         SEARCH_PATH: canonical_json_bytes(search),
     }
     for relative, schema in schema_documents().items():
@@ -215,6 +217,7 @@ def main() -> int:
             CANDIDATE_PATH,
             CROSS_REFERENCE_PATH,
             ASSET_PATH,
+            REVIEW_HISTORY_PATH,
             SEARCH_PATH,
         )
         if path.exists()

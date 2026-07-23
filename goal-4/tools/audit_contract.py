@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -68,6 +69,52 @@ ASSET_HEADER = [
     "assignment_stage",
     "assignment_basis",
     "reference_status",
+    "inspection_status",
+    "review_epoch",
+    "visual_role",
+    "source_status",
+    "risk_flags",
+    "original_resolution_status",
+    "transcription_status",
+    "candidate_ids",
+    "route_ids",
+    "evidence_statement",
+    "review_stage",
+    "reviewer",
+    "uncertainty",
+]
+
+REVIEW_HISTORY_FIELDS = [
+    "review_id",
+    "epoch",
+    "stage",
+    "mode",
+    "reviewer",
+    "source_paths",
+    "source_unit_ids",
+    "asset_ids",
+    "input_projection_sha256",
+    "result_projection_sha256",
+    "previous_event_sha256",
+    "event_sha256",
+]
+REVIEW_MODES = ["INITIAL", "REOPEN"]
+READING_REVIEW_RESULT_FIELDS = [
+    "source_unit_id",
+    "review_status",
+    "review_epoch",
+    "review_disposition",
+    "source_status",
+    "uncertainty",
+    "secondary_roles",
+    "candidate_ids",
+    "route_ids",
+    "evidence_statement",
+    "review_stage",
+    "reviewer",
+]
+ASSET_REVIEW_RESULT_FIELDS = [
+    "asset_id",
     "inspection_status",
     "review_epoch",
     "visual_role",
@@ -716,6 +763,55 @@ def schema_documents() -> dict[str, dict[str, Any]]:
         },
         "additionalProperties": False,
     }
+    review_history_schema = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "Append-only blind review-history event",
+        "type": "object",
+        "required": REVIEW_HISTORY_FIELDS,
+        "properties": {
+            "review_id": {"type": "string", "pattern": "^V[0-9]{6}$"},
+            "epoch": {"type": "integer", "minimum": 1},
+            "stage": {"type": "integer", "minimum": 4, "maximum": 17},
+            "mode": {"type": "string", "enum": REVIEW_MODES},
+            "reviewer": {"type": "string", "minLength": 1},
+            "source_paths": _string_array(),
+            "source_unit_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "pattern": "^U[0-9]{6}$",
+                },
+                "uniqueItems": True,
+            },
+            "asset_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "pattern": "^A[0-9]{6}$",
+                },
+                "uniqueItems": True,
+            },
+            "input_projection_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+            },
+            "result_projection_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+            },
+            "previous_event_sha256": {
+                "oneOf": [
+                    {"type": "null"},
+                    {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                ]
+            },
+            "event_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+            },
+        },
+        "additionalProperties": False,
+    }
     family_relation_schema = {
         "type": "object",
         "required": [
@@ -971,6 +1067,7 @@ def schema_documents() -> dict[str, dict[str, Any]]:
         "blind/candidate-record.schema.json": candidate_schema(),
         "blind/cross-reference-row.schema.json": cross_schema,
         "blind/asset-ledger-row.schema.json": asset_schema,
+        "blind/review-history-event.schema.json": review_history_schema,
         "blind/search-rounds.schema.json": search_schema,
         "blind/worker-output.schema.json": worker_output_schema,
         "reconciliation/classification-row.schema.json": classification_schema,
@@ -982,3 +1079,83 @@ def canonical_json_bytes(value: Any) -> bytes:
     return (
         json.dumps(value, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
     ).encode("utf-8")
+
+
+def canonical_sha256(value: Any) -> str:
+    return hashlib.sha256(canonical_json_bytes(value)).hexdigest()
+
+
+def review_input_projection(
+    event: dict[str, Any],
+    unit_by_id: dict[str, dict[str, Any]],
+    asset_by_id: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    """Return the immutable corpus/input projection bound by a review event."""
+    return {
+        "schema_version": 1,
+        "review_id": event["review_id"],
+        "epoch": event["epoch"],
+        "stage": event["stage"],
+        "mode": event["mode"],
+        "reviewer": event["reviewer"],
+        "source_paths": event["source_paths"],
+        "source_units": [
+            {
+                "source_unit_id": unit_id,
+                "path": unit_by_id[unit_id]["path"],
+                "sha256": unit_by_id[unit_id]["sha256"],
+            }
+            for unit_id in event["source_unit_ids"]
+        ],
+        "assets": [
+            {
+                "asset_id": asset_id,
+                "physical_path": asset_by_id[asset_id]["physical_path"],
+                "assignment_path": asset_by_id[asset_id]["assignment_path"],
+                "sha256": asset_by_id[asset_id]["sha256"],
+            }
+            for asset_id in event["asset_ids"]
+        ],
+    }
+
+
+def review_result_projection(
+    event: dict[str, Any],
+    reading_by_id: dict[str, dict[str, Any]],
+    asset_by_id: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    """Return the exact current result projection for a review event."""
+    return {
+        "schema_version": 1,
+        "review_id": event["review_id"],
+        "epoch": event["epoch"],
+        "stage": event["stage"],
+        "mode": event["mode"],
+        "reviewer": event["reviewer"],
+        "source_paths": event["source_paths"],
+        "reading_results": [
+            {
+                field: reading_by_id[unit_id][field]
+                for field in READING_REVIEW_RESULT_FIELDS
+            }
+            for unit_id in event["source_unit_ids"]
+        ],
+        "asset_results": [
+            {
+                field: asset_by_id[asset_id][field]
+                for field in ASSET_REVIEW_RESULT_FIELDS
+            }
+            for asset_id in event["asset_ids"]
+        ],
+    }
+
+
+def review_event_sha256(event: dict[str, Any]) -> str:
+    """Hash one closed history event, excluding only its own digest field."""
+    return canonical_sha256(
+        {
+            field: event[field]
+            for field in REVIEW_HISTORY_FIELDS
+            if field != "event_sha256"
+        }
+    )

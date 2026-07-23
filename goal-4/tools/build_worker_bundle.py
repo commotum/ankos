@@ -183,6 +183,17 @@ def stage_paths(manifest: dict[str, Any], stage: int) -> set[str]:
     return paths
 
 
+def ordered_stage_paths(manifest: dict[str, Any], stage: int) -> list[str]:
+    """Return one stage's documents in the corpus manifest's canonical order."""
+
+    allowed = stage_paths(manifest, stage)
+    return [
+        document["path"]
+        for document in manifest["documents"]
+        if document["path"] in allowed
+    ]
+
+
 def sanitized_guardrails(guardrails: dict[str, Any]) -> dict[str, Any]:
     keep = [
         "schema_version",
@@ -627,10 +638,14 @@ def build_bundle(
         text_patterns,
         "worker_metadata",
     )
-    allowed_stage_paths = stage_paths(manifest, stage)
+    allowed_stage_path_order = ordered_stage_paths(manifest, stage)
+    allowed_stage_paths = set(allowed_stage_path_order)
     if requested_paths and len(requested_paths) != len(set(requested_paths)):
         raise ValueError("requested paths must be unique")
-    paths = sorted(requested_paths or allowed_stage_paths)
+    requested_set = set(requested_paths) if requested_paths else allowed_stage_paths
+    paths = [
+        path for path in allowed_stage_path_order if path in requested_set
+    ]
     if not paths or set(paths) - allowed_stage_paths:
         raise ValueError(
             f"paths are not exactly within stage {stage}: "
@@ -1527,11 +1542,32 @@ def verify_bundle(
     if not isinstance(source_paths, list) or not source_paths or not all(
         is_safe_relative_path(path) for path in source_paths
     ):
-        errors.append("bundle source_paths must be nonempty, unique, and sorted")
+        errors.append(
+            "bundle source_paths must be nonempty, unique, and canonically ordered"
+        )
         source_paths = []
-    elif source_paths != sorted(set(source_paths)):
-        errors.append("bundle source_paths must be nonempty, unique, and sorted")
+    elif len(source_paths) != len(set(source_paths)):
+        errors.append(
+            "bundle source_paths must be nonempty, unique, and canonically ordered"
+        )
         source_paths = []
+    else:
+        try:
+            corpus_manifest = json.loads(
+                (GOAL_DIR / "corpus-manifest.json").read_text(encoding="utf-8")
+            )
+            canonical_paths = [
+                path
+                for path in ordered_stage_paths(corpus_manifest, stage)
+                if path in set(source_paths)
+            ]
+        except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError):
+            canonical_paths = []
+        if source_paths != canonical_paths:
+            errors.append(
+                "bundle source_paths must follow canonical manifest order"
+            )
+            source_paths = []
     if isinstance(stage, int):
         for source_path in source_paths:
             if stage_for_path(source_path) != stage:
@@ -1749,7 +1785,7 @@ def verify_bundle(
     unit_paths = [unit.get("path") for unit in units]
     if (
         any(not isinstance(path, str) for path in unit_paths)
-        or sorted(set(unit_paths)) != source_paths
+        or list(dict.fromkeys(unit_paths)) != source_paths
     ):
         errors.append("bundle source_paths differ from source-unit paths")
     if manifest.get("source_unit_count") != len(units):
