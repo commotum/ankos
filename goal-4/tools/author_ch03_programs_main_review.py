@@ -3709,13 +3709,16 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
                     "at the bottom edge; U000377--U000378 recover the identity."
                 )
             )
-        elif path in RULE_IMAGES:
+        elif path in RULE_IMAGES or path in direct_image_paths:
             role = "NATIVE_EVIDENCE"
-            risks = ["CONSTRUCTION_BEARING", "TEXT_BEARING"]
+            risks = ["CONSTRUCTION_BEARING"]
+            if path in RULE_IMAGES or path in TEXT_IMAGES:
+                risks.append("TEXT_BEARING")
             transcription = "CHECKED"
             statement = (
-                "Original-resolution inspection confirms a construction-bearing "
-                "rule, code, program, or finite rule survey"
+                "Original-resolution inspection confirms direct "
+                "construction-bearing evidence for a rule, program, query, "
+                "observer, representation, or finite rule survey"
                 + (f" linked to {', '.join(cids)}." if cids else ".")
             )
         else:
