@@ -12,6 +12,8 @@ from pathlib import Path
 
 MODULE_PATH = Path(__file__).with_name("validate_audit.py")
 sys.path.insert(0, str(MODULE_PATH.parent))
+import initialize_audit
+
 SPEC = importlib.util.spec_from_file_location("validate_audit", MODULE_PATH)
 assert SPEC is not None and SPEC.loader is not None
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -1072,7 +1074,44 @@ def test_worker_bundle_detects_input_mutation(tmp_path: Path) -> None:
     assert "hash/size mismatch" in verified.stderr
 
 
-def test_full_harness_runs_from_relocated_copy(tmp_path: Path) -> None:
+def test_self_test_passes_on_initial_state(tmp_path: Path) -> None:
+    goal = tmp_path / "goal-4"
+    goal.mkdir()
+    for name in ("corpus-manifest.json", "source-units.jsonl"):
+        shutil.copy2(MODULE.GOAL_DIR / name, goal / name)
+    for live_path, data in initialize_audit.expected_artifacts().items():
+        target = goal / live_path.relative_to(MODULE.GOAL_DIR)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(MODULE_PATH),
+            "--repo-root",
+            str(MODULE.REPO_ROOT),
+            "--goal-dir",
+            str(goal),
+            "--self-test",
+        ],
+        cwd=tmp_path,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert "reviewed=0 candidates=0 routes=0" in completed.stdout
+    assert "validated blind audit harness and mutation checks" in completed.stdout
+
+
+def test_self_test_passes_on_progressed_relocated_copy(tmp_path: Path) -> None:
+    _, _, reading, candidates, routes, _, search, review_history = load()
+    assert any(row["review_status"] == "REVIEWED" for row in reading)
+    assert candidates
+    assert routes
+    assert search["rounds"]
+    assert review_history
+
     relocated = tmp_path / "ankos"
     source_target = relocated / "ref" / "A-New-Kind-of-Science"
     source_target.parent.mkdir(parents=True)

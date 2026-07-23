@@ -1,1 +1,5 @@
 route_id,source_unit_id,source_asset_id,discovery_epoch,discovery_kind,discovery_id,discovery_ordinal,literal_target,route_kind,expected_topic,owning_stage,closure_scope,status,target_unit_ids,target_asset_ids,attempts,vocabulary_terms,defect_boundary
+R000001,U004864,,1,SOURCE_UNIT,U004864,1,the simple rule on page 27,PAGE,Rule 30 transition lookup and boundary convention,4,CROSS_RANGE,PENDING,[],[],[],"[""rule 30"",""cellular automaton""]",
+R000002,U004871,,1,SOURCE_UNIT,U004871,1,the rule 110 cellular automaton discussed on page 32,PAGE,Rule 110 transition lookup and native update mechanics,4,CROSS_RANGE,PENDING,[],[],[],"[""rule 110"",""cellular automaton""]",
+R000003,U004871,,1,SOURCE_UNIT,U004871,2,11 of the 15 kinds from page 292,PAGE,persistent-structure definitions and their relation to Rule 110 behavior,4,CROSS_RANGE,PENDING,[],[],[],"[""persistent structures"",""rule 110""]",
+R000004,U004873,,1,SOURCE_UNIT,U004873,1,the rule 30 cellular automaton of page 29,PAGE,Rule 30 single-cell evolution and displayed boundary context,4,CROSS_RANGE,PENDING,[],[],[],"[""rule 30"",""single black cell""]",

@@ -1,8 +1,2031 @@
 {
   "fixed_point": null,
   "phase": "blind_discovery",
-  "rounds": [],
+  "rounds": [
+    {
+      "epoch": 1,
+      "hits": [
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "34ea5cf6451ada1618af2e60c628eed660f6f533a8aa067aacfa646ef814a425",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000001",
+          "query_id": "Q0001",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004864"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "1522a14740862c45de5a88c93ce8a88b0343f97b97d18e3a5684e02b71db10c4",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000002",
+          "query_id": "Q0001",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004873"
+        },
+        {
+          "candidate_ids": [
+            "B0002"
+          ],
+          "context_sha256": "1e5cca1416ddf22fa0cb6d18260672ab4f2455adf25b908217f767f159f7a5cf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000003",
+          "query_id": "Q0002",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004871"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1656fdb4da0e5fe3942b85d0ab876fab39419e8d00e5973d3a6ec6c533ac7560",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000004",
+          "query_id": "Q0003",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000061"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "34ea5cf6451ada1618af2e60c628eed660f6f533a8aa067aacfa646ef814a425",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000005",
+          "query_id": "Q0003",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004864"
+        },
+        {
+          "candidate_ids": [
+            "B0002"
+          ],
+          "context_sha256": "1e5cca1416ddf22fa0cb6d18260672ab4f2455adf25b908217f767f159f7a5cf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000006",
+          "query_id": "Q0003",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004871"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "1522a14740862c45de5a88c93ce8a88b0343f97b97d18e3a5684e02b71db10c4",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000007",
+          "query_id": "Q0003",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004873"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f80603f637615c7d1b52416d9041951f23cfe796de9631ab44fd71e96991a534",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000008",
+          "query_id": "Q0003",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004907"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "316c7c7185d08c7e8ef207bb2bf2d65798aac0ddcc1daa57dc760c35904f04c7",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000009",
+          "query_id": "Q0004",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000024"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "34ea5cf6451ada1618af2e60c628eed660f6f533a8aa067aacfa646ef814a425",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000010",
+          "query_id": "Q0004",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004864"
+        },
+        {
+          "candidate_ids": [
+            "B0002"
+          ],
+          "context_sha256": "1e5cca1416ddf22fa0cb6d18260672ab4f2455adf25b908217f767f159f7a5cf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000011",
+          "query_id": "Q0004",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004871"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "b12e196aa3b6cff29fcd3ef776a44bbf1b81293a8c523e78163e1a37eda6f5ee",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000012",
+          "query_id": "Q0005",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000033"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f80603f637615c7d1b52416d9041951f23cfe796de9631ab44fd71e96991a534",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000013",
+          "query_id": "Q0005",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004907"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1cd9e84ce257655a818960dfbbd9b4fa1f8fa9f960510ee79bc2efbe291af045",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000014",
+          "query_id": "Q0006",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004880"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "5667c94d78362940b45cc1e23ed4c497f855fa5ab11893e8646fd9c6dd547374",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000015",
+          "query_id": "Q0006",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004892"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "bc7b7bb1647a241936c902fb79e678f4e4077158d21fe1f294009f8ef1b446cc",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000016",
+          "query_id": "Q0006",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004897"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3546366097437cb796d584b8044fb7ccbfd3a99a2b5190c66a15a3fa629518c2",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000017",
+          "query_id": "Q0006",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004901"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1656fdb4da0e5fe3942b85d0ab876fab39419e8d00e5973d3a6ec6c533ac7560",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000018",
+          "query_id": "Q0007",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000061"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "9dbefd542fc58479803b847ee47cd3814ba7b2d7b1d9907be8f0900901673530",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000019",
+          "query_id": "Q0007",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000062"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "53315ead6e78e57868958864e49f5b34e11b52f71f79dcbee909390e08aa3d9a",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000020",
+          "query_id": "Q0007",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000068"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "34ea5cf6451ada1618af2e60c628eed660f6f533a8aa067aacfa646ef814a425",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000021",
+          "query_id": "Q0007",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004864"
+        },
+        {
+          "candidate_ids": [
+            "B0002"
+          ],
+          "context_sha256": "1e5cca1416ddf22fa0cb6d18260672ab4f2455adf25b908217f767f159f7a5cf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000022",
+          "query_id": "Q0007",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004871"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "1522a14740862c45de5a88c93ce8a88b0343f97b97d18e3a5684e02b71db10c4",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000023",
+          "query_id": "Q0007",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004873"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8fc31ede5bc83ecbfd3900ccdce756ed4eaccd6b7ac1b5ca57903e304594841a",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000024",
+          "query_id": "Q0007",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004878"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3546366097437cb796d584b8044fb7ccbfd3a99a2b5190c66a15a3fa629518c2",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000025",
+          "query_id": "Q0007",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004901"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "30909e6fa574f7cbd8d6eb449513b97ef913a37dc51c164fc3c74eaa6b542ccc",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000026",
+          "query_id": "Q0007",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004902"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f80603f637615c7d1b52416d9041951f23cfe796de9631ab44fd71e96991a534",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000027",
+          "query_id": "Q0007",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004907"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "ac4672b3cfb7bd178a6473469273a7ba75756542c1950e13a12e45b7ad643807",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000028",
+          "query_id": "Q0007",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U014293"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "316c7c7185d08c7e8ef207bb2bf2d65798aac0ddcc1daa57dc760c35904f04c7",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000029",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000024"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "49cf14f28c51b0b2e5f84d8421cb42476a23014946efc78107b58e703c01ce52",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000030",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000025"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "71683dfeda1a1d198ef54b41253e3bb8e86a62ef4d630770a7877ae5d5d4d213",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000031",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000027"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "b12e196aa3b6cff29fcd3ef776a44bbf1b81293a8c523e78163e1a37eda6f5ee",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000032",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000033"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7c0a3c682d0202457404debb3cb652818a185cd69645d440cf659e8c526fa663",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000033",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000045"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0a81e17bd527edc704fdddd0f5e3e6938f323c9cdf9fec5bf60e0dd2e2eb1e47",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000034",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000051"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7cc39411959c700b2e5b765cc12ecc7b40e835e8cdb4e49c836ce9a5140c7bd7",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000035",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000059"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "630db8c152061cf5d81e57fe34722fa11170b7929d986c41327d6bcd16aa5c55",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000036",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000063"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0b0ac4e03195368c4f6f7cd89c34a4c92f8b9cce0addc0e10b30462b6db8cd0b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000037",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004863"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "34ea5cf6451ada1618af2e60c628eed660f6f533a8aa067aacfa646ef814a425",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000038",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004864"
+        },
+        {
+          "candidate_ids": [
+            "B0002"
+          ],
+          "context_sha256": "1e5cca1416ddf22fa0cb6d18260672ab4f2455adf25b908217f767f159f7a5cf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000039",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004871"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "1522a14740862c45de5a88c93ce8a88b0343f97b97d18e3a5684e02b71db10c4",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000040",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004873"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3b8624cb0de20af41d785d3269f6ab867e68c8c2f95d310270c1bc856ff1d7a2",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000041",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004876"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8fc31ede5bc83ecbfd3900ccdce756ed4eaccd6b7ac1b5ca57903e304594841a",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000042",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004878"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "bdb365fbef8bc4ac61041aad1ea2d8a624a67869792f9448f6db879a2d744087",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000043",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004882"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "097c4a8f5954cf876839a4cdcaddfe33cee7a5e99f48bce985dba989f1e61eb0",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000044",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004883"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8ef037e1ca6b6ea81fea8f87fddcafd9a968cfa7c13abeca5b713a9a20c717d7",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000045",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004884"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "c2081235442f0ae0f76e1dcef2da909292f7b0c4b252fde76dea606914b7fcbe",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000046",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004887"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "c7409e0fd73019e955aefbdceacc78ee686eebf712aa67c2fe86f33bc524fa6c",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000047",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004895"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "61086543de94f36b5a290ef18b935ae1d98553af5b9522d0ae263012c1ccf484",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000048",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004899"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3546366097437cb796d584b8044fb7ccbfd3a99a2b5190c66a15a3fa629518c2",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000049",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004901"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "30909e6fa574f7cbd8d6eb449513b97ef913a37dc51c164fc3c74eaa6b542ccc",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000050",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004902"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "716e41a071c202c7617ecc5adb40c9ea40884db81e174171223d0a7cea743b47",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000051",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004904"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f80603f637615c7d1b52416d9041951f23cfe796de9631ab44fd71e96991a534",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000052",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004907"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "5a760c79289189e10d896fd154a1ffed926592deb85aa8f7c3e4cd0e7d8fc9d0",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000053",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004913"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4e6a44572dbb144bb1a75d93a79b3ec54d40bd49e715949aec1bae12a9ce575b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000054",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004914"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a341ca00810ec34db3b911216c4eadbbaca7dc23d952f85c0e31e5d7e3b44428",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000055",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004917"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e641df5d3c450f1ac34c7b45e9c7ff199376dcd01c83060292f83d18a6e2994d",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000056",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004921"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6e5759edb56937a831ffa40b7e5a8565ffaffb9ffc141b126721ac92e9c1b5ce",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000057",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004923"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "ac4672b3cfb7bd178a6473469273a7ba75756542c1950e13a12e45b7ad643807",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000058",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U014293"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6aee67e63984895197e6b0f92bdcb7638c31fe096ef49cadeedff0b787ee0769",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000059",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U014296"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "bc591950b0a42ae3fe86a196c7efa611fd2afd698154c735abdf4a07bf775ead",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000060",
+          "query_id": "Q0008",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U014306"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "b00e525871c3a8118363170ecaab4b6128d3b869a8c3b889d8b3fb22117b67b8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000061",
+          "query_id": "Q0009",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000022"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "316c7c7185d08c7e8ef207bb2bf2d65798aac0ddcc1daa57dc760c35904f04c7",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000062",
+          "query_id": "Q0009",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000024"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "49cf14f28c51b0b2e5f84d8421cb42476a23014946efc78107b58e703c01ce52",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000063",
+          "query_id": "Q0009",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000025"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "5616be799dd8ec80e6cf190f7607e313f33cc303d866fdfba37219f8ec3c8615",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000064",
+          "query_id": "Q0009",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004861"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8fc31ede5bc83ecbfd3900ccdce756ed4eaccd6b7ac1b5ca57903e304594841a",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000065",
+          "query_id": "Q0009",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004878"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1cd9e84ce257655a818960dfbbd9b4fa1f8fa9f960510ee79bc2efbe291af045",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000066",
+          "query_id": "Q0009",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004880"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "bdb365fbef8bc4ac61041aad1ea2d8a624a67869792f9448f6db879a2d744087",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000067",
+          "query_id": "Q0009",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004882"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3546366097437cb796d584b8044fb7ccbfd3a99a2b5190c66a15a3fa629518c2",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000068",
+          "query_id": "Q0009",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004901"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d45bdaddd3424c61b0072986a9ac00d31da0b3e5e531aabece0cc580363dbdc6",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000069",
+          "query_id": "Q0009",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004903"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f80603f637615c7d1b52416d9041951f23cfe796de9631ab44fd71e96991a534",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000070",
+          "query_id": "Q0009",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004907"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4e6a44572dbb144bb1a75d93a79b3ec54d40bd49e715949aec1bae12a9ce575b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000071",
+          "query_id": "Q0009",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004914"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d26893ea529ec57b07432df7e46e7437c2d07fd16ef1ee2823b8fda05ccca7d8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000072",
+          "query_id": "Q0009",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U014295"
+        }
+      ],
+      "kind": "LOCAL",
+      "new_candidates": [],
+      "new_evidence_groups": [],
+      "new_routes": [],
+      "new_vocabulary": [
+        "rule 30",
+        "rule 110",
+        "cellular automaton",
+        "initial condition",
+        "successive row",
+        "evolution step",
+        "neighbor",
+        "transition",
+        "update",
+        "synchronous",
+        "asynchronous",
+        "random",
+        "randomness",
+        "probabilistic",
+        "probability",
+        "stochastic",
+        "Bernoulli",
+        "constraint",
+        "equation",
+        "solution",
+        "function",
+        "relation",
+        "inequality",
+        "differential",
+        "input",
+        "output",
+        "generator",
+        "substitution",
+        "network",
+        "Turing machine",
+        "mobile automaton",
+        "algorithm",
+        "program",
+        "rule",
+        "system",
+        "process",
+        "simulation",
+        "emulation",
+        "implementation",
+        "representation",
+        "display",
+        "render"
+      ],
+      "owning_stage": 4,
+      "queries": [
+        {
+          "case_sensitive": false,
+          "family": "candidate alias",
+          "mode": "LITERAL",
+          "pattern": "rule 30",
+          "query_id": "Q0001",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "candidate alias",
+          "mode": "LITERAL",
+          "pattern": "rule 110",
+          "query_id": "Q0002",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "candidate family",
+          "mode": "LITERAL",
+          "pattern": "cellular automaton",
+          "query_id": "Q0003",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "native evolution mechanics",
+          "mode": "REGEX",
+          "pattern": "\\b(?:initial conditions?|successive rows?|evolution steps?|neighbou?rs?|transitions?|updates?|synchronous|asynchronous)\\b",
+          "query_id": "Q0004",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "stochasticity guardrail",
+          "mode": "REGEX",
+          "pattern": "\\b(?:random(?:ness)?|probabilistic|probability|stochastic|Bernoulli)\\b",
+          "query_id": "Q0005",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "declarative-function guardrail",
+          "mode": "REGEX",
+          "pattern": "\\b(?:constraints?|equations?|solutions?|functions?|relations?|inequalit(?:y|ies)|differential)\\b",
+          "query_id": "Q0006",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "input-generator-structure guardrail",
+          "mode": "REGEX",
+          "pattern": "\\b(?:inputs?|outputs?|generators?|substitutions?|networks?|Turing machines?|mobile automata|automaton)\\b",
+          "query_id": "Q0007",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "general construction nouns",
+          "mode": "REGEX",
+          "pattern": "\\b(?:algorithms?|programs?|rules?|systems?|process(?:es)?)\\b",
+          "query_id": "Q0008",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "representation-application boundary",
+          "mode": "REGEX",
+          "pattern": "\\b(?:simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|implement(?:s|ed|ing|ation)?|represent(?:s|ed|ing|ation)?|displays?|render(?:s|ed|ing)?)\\b",
+          "query_id": "Q0009",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        }
+      ],
+      "rerun_digest": "d38f0df6f962915286871957dee2beb8adaef779c7c1c1a191b0dc5ffa30e594",
+      "result_digest": "d38f0df6f962915286871957dee2beb8adaef779c7c1c1a191b0dc5ffa30e594",
+      "result_ids": [
+        "H000001",
+        "H000002",
+        "H000003",
+        "H000004",
+        "H000005",
+        "H000006",
+        "H000007",
+        "H000008",
+        "H000009",
+        "H000010",
+        "H000011",
+        "H000012",
+        "H000013",
+        "H000014",
+        "H000015",
+        "H000016",
+        "H000017",
+        "H000018",
+        "H000019",
+        "H000020",
+        "H000021",
+        "H000022",
+        "H000023",
+        "H000024",
+        "H000025",
+        "H000026",
+        "H000027",
+        "H000028",
+        "H000029",
+        "H000030",
+        "H000031",
+        "H000032",
+        "H000033",
+        "H000034",
+        "H000035",
+        "H000036",
+        "H000037",
+        "H000038",
+        "H000039",
+        "H000040",
+        "H000041",
+        "H000042",
+        "H000043",
+        "H000044",
+        "H000045",
+        "H000046",
+        "H000047",
+        "H000048",
+        "H000049",
+        "H000050",
+        "H000051",
+        "H000052",
+        "H000053",
+        "H000054",
+        "H000055",
+        "H000056",
+        "H000057",
+        "H000058",
+        "H000059",
+        "H000060",
+        "H000061",
+        "H000062",
+        "H000063",
+        "H000064",
+        "H000065",
+        "H000066",
+        "H000067",
+        "H000068",
+        "H000069",
+        "H000070",
+        "H000071",
+        "H000072"
+      ],
+      "round_id": "S001",
+      "tool_assumptions": [
+        "Python Unicode regular expressions over decoded UTF-8 canonical source-unit byte ranges, with MULTILINE semantics and query-major then canonical source-unit result order."
+      ]
+    },
+    {
+      "epoch": 1,
+      "hits": [
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "34ea5cf6451ada1618af2e60c628eed660f6f533a8aa067aacfa646ef814a425",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000073",
+          "query_id": "Q0010",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004864"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "1522a14740862c45de5a88c93ce8a88b0343f97b97d18e3a5684e02b71db10c4",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000074",
+          "query_id": "Q0010",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004873"
+        },
+        {
+          "candidate_ids": [
+            "B0002"
+          ],
+          "context_sha256": "1e5cca1416ddf22fa0cb6d18260672ab4f2455adf25b908217f767f159f7a5cf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000075",
+          "query_id": "Q0011",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004871"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1656fdb4da0e5fe3942b85d0ab876fab39419e8d00e5973d3a6ec6c533ac7560",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000076",
+          "query_id": "Q0012",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000061"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "34ea5cf6451ada1618af2e60c628eed660f6f533a8aa067aacfa646ef814a425",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000077",
+          "query_id": "Q0012",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004864"
+        },
+        {
+          "candidate_ids": [
+            "B0002"
+          ],
+          "context_sha256": "1e5cca1416ddf22fa0cb6d18260672ab4f2455adf25b908217f767f159f7a5cf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000078",
+          "query_id": "Q0012",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004871"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "1522a14740862c45de5a88c93ce8a88b0343f97b97d18e3a5684e02b71db10c4",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000079",
+          "query_id": "Q0012",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004873"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f80603f637615c7d1b52416d9041951f23cfe796de9631ab44fd71e96991a534",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000080",
+          "query_id": "Q0012",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004907"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "316c7c7185d08c7e8ef207bb2bf2d65798aac0ddcc1daa57dc760c35904f04c7",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000081",
+          "query_id": "Q0013",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000024"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "34ea5cf6451ada1618af2e60c628eed660f6f533a8aa067aacfa646ef814a425",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000082",
+          "query_id": "Q0013",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004864"
+        },
+        {
+          "candidate_ids": [
+            "B0002"
+          ],
+          "context_sha256": "1e5cca1416ddf22fa0cb6d18260672ab4f2455adf25b908217f767f159f7a5cf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000083",
+          "query_id": "Q0013",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004871"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "b12e196aa3b6cff29fcd3ef776a44bbf1b81293a8c523e78163e1a37eda6f5ee",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000084",
+          "query_id": "Q0014",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000033"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f80603f637615c7d1b52416d9041951f23cfe796de9631ab44fd71e96991a534",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000085",
+          "query_id": "Q0014",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004907"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1cd9e84ce257655a818960dfbbd9b4fa1f8fa9f960510ee79bc2efbe291af045",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000086",
+          "query_id": "Q0015",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004880"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "5667c94d78362940b45cc1e23ed4c497f855fa5ab11893e8646fd9c6dd547374",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000087",
+          "query_id": "Q0015",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004892"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "bc7b7bb1647a241936c902fb79e678f4e4077158d21fe1f294009f8ef1b446cc",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000088",
+          "query_id": "Q0015",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004897"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3546366097437cb796d584b8044fb7ccbfd3a99a2b5190c66a15a3fa629518c2",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000089",
+          "query_id": "Q0015",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004901"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1656fdb4da0e5fe3942b85d0ab876fab39419e8d00e5973d3a6ec6c533ac7560",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000090",
+          "query_id": "Q0016",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000061"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "9dbefd542fc58479803b847ee47cd3814ba7b2d7b1d9907be8f0900901673530",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000091",
+          "query_id": "Q0016",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000062"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "53315ead6e78e57868958864e49f5b34e11b52f71f79dcbee909390e08aa3d9a",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000092",
+          "query_id": "Q0016",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000068"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "34ea5cf6451ada1618af2e60c628eed660f6f533a8aa067aacfa646ef814a425",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000093",
+          "query_id": "Q0016",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004864"
+        },
+        {
+          "candidate_ids": [
+            "B0002"
+          ],
+          "context_sha256": "1e5cca1416ddf22fa0cb6d18260672ab4f2455adf25b908217f767f159f7a5cf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000094",
+          "query_id": "Q0016",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004871"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "1522a14740862c45de5a88c93ce8a88b0343f97b97d18e3a5684e02b71db10c4",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000095",
+          "query_id": "Q0016",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004873"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8fc31ede5bc83ecbfd3900ccdce756ed4eaccd6b7ac1b5ca57903e304594841a",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000096",
+          "query_id": "Q0016",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004878"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3546366097437cb796d584b8044fb7ccbfd3a99a2b5190c66a15a3fa629518c2",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000097",
+          "query_id": "Q0016",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004901"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "30909e6fa574f7cbd8d6eb449513b97ef913a37dc51c164fc3c74eaa6b542ccc",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000098",
+          "query_id": "Q0016",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004902"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f80603f637615c7d1b52416d9041951f23cfe796de9631ab44fd71e96991a534",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000099",
+          "query_id": "Q0016",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004907"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "ac4672b3cfb7bd178a6473469273a7ba75756542c1950e13a12e45b7ad643807",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000100",
+          "query_id": "Q0016",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U014293"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "316c7c7185d08c7e8ef207bb2bf2d65798aac0ddcc1daa57dc760c35904f04c7",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000101",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000024"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "49cf14f28c51b0b2e5f84d8421cb42476a23014946efc78107b58e703c01ce52",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000102",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000025"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "71683dfeda1a1d198ef54b41253e3bb8e86a62ef4d630770a7877ae5d5d4d213",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000103",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000027"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "b12e196aa3b6cff29fcd3ef776a44bbf1b81293a8c523e78163e1a37eda6f5ee",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000104",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000033"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7c0a3c682d0202457404debb3cb652818a185cd69645d440cf659e8c526fa663",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000105",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000045"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0a81e17bd527edc704fdddd0f5e3e6938f323c9cdf9fec5bf60e0dd2e2eb1e47",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000106",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000051"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "7cc39411959c700b2e5b765cc12ecc7b40e835e8cdb4e49c836ce9a5140c7bd7",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000107",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000059"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "630db8c152061cf5d81e57fe34722fa11170b7929d986c41327d6bcd16aa5c55",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000108",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000063"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "0b0ac4e03195368c4f6f7cd89c34a4c92f8b9cce0addc0e10b30462b6db8cd0b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000109",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004863"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "34ea5cf6451ada1618af2e60c628eed660f6f533a8aa067aacfa646ef814a425",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000110",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004864"
+        },
+        {
+          "candidate_ids": [
+            "B0002"
+          ],
+          "context_sha256": "1e5cca1416ddf22fa0cb6d18260672ab4f2455adf25b908217f767f159f7a5cf",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000111",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004871"
+        },
+        {
+          "candidate_ids": [
+            "B0001"
+          ],
+          "context_sha256": "1522a14740862c45de5a88c93ce8a88b0343f97b97d18e3a5684e02b71db10c4",
+          "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+          "hit_id": "H000112",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review already captured this unit as identity, mechanics, or support for the linked blind candidate.",
+          "route_ids": [],
+          "source_unit_id": "U004873"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3b8624cb0de20af41d785d3269f6ab867e68c8c2f95d310270c1bc856ff1d7a2",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000113",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004876"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8fc31ede5bc83ecbfd3900ccdce756ed4eaccd6b7ac1b5ca57903e304594841a",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000114",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004878"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "bdb365fbef8bc4ac61041aad1ea2d8a624a67869792f9448f6db879a2d744087",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000115",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004882"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "097c4a8f5954cf876839a4cdcaddfe33cee7a5e99f48bce985dba989f1e61eb0",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000116",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004883"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8ef037e1ca6b6ea81fea8f87fddcafd9a968cfa7c13abeca5b713a9a20c717d7",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000117",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004884"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "c2081235442f0ae0f76e1dcef2da909292f7b0c4b252fde76dea606914b7fcbe",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000118",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004887"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "c7409e0fd73019e955aefbdceacc78ee686eebf712aa67c2fe86f33bc524fa6c",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000119",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004895"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "61086543de94f36b5a290ef18b935ae1d98553af5b9522d0ae263012c1ccf484",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000120",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004899"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3546366097437cb796d584b8044fb7ccbfd3a99a2b5190c66a15a3fa629518c2",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000121",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004901"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "30909e6fa574f7cbd8d6eb449513b97ef913a37dc51c164fc3c74eaa6b542ccc",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000122",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004902"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "716e41a071c202c7617ecc5adb40c9ea40884db81e174171223d0a7cea743b47",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000123",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004904"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f80603f637615c7d1b52416d9041951f23cfe796de9631ab44fd71e96991a534",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000124",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004907"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "5a760c79289189e10d896fd154a1ffed926592deb85aa8f7c3e4cd0e7d8fc9d0",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000125",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004913"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4e6a44572dbb144bb1a75d93a79b3ec54d40bd49e715949aec1bae12a9ce575b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000126",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004914"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "a341ca00810ec34db3b911216c4eadbbaca7dc23d952f85c0e31e5d7e3b44428",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000127",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004917"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "e641df5d3c450f1ac34c7b45e9c7ff199376dcd01c83060292f83d18a6e2994d",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000128",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004921"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6e5759edb56937a831ffa40b7e5a8565ffaffb9ffc141b126721ac92e9c1b5ce",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000129",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004923"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "ac4672b3cfb7bd178a6473469273a7ba75756542c1950e13a12e45b7ad643807",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000130",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U014293"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "6aee67e63984895197e6b0f92bdcb7638c31fe096ef49cadeedff0b787ee0769",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000131",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U014296"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "bc591950b0a42ae3fe86a196c7efa611fd2afd698154c735abdf4a07bf775ead",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000132",
+          "query_id": "Q0017",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U014306"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "b00e525871c3a8118363170ecaab4b6128d3b869a8c3b889d8b3fb22117b67b8",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000133",
+          "query_id": "Q0018",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U000022"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "316c7c7185d08c7e8ef207bb2bf2d65798aac0ddcc1daa57dc760c35904f04c7",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000134",
+          "query_id": "Q0018",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000024"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "49cf14f28c51b0b2e5f84d8421cb42476a23014946efc78107b58e703c01ce52",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000135",
+          "query_id": "Q0018",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U000025"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "5616be799dd8ec80e6cf190f7607e313f33cc303d866fdfba37219f8ec3c8615",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000136",
+          "query_id": "Q0018",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004861"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "8fc31ede5bc83ecbfd3900ccdce756ed4eaccd6b7ac1b5ca57903e304594841a",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000137",
+          "query_id": "Q0018",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004878"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "1cd9e84ce257655a818960dfbbd9b4fa1f8fa9f960510ee79bc2efbe291af045",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000138",
+          "query_id": "Q0018",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004880"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "bdb365fbef8bc4ac61041aad1ea2d8a624a67869792f9448f6db879a2d744087",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000139",
+          "query_id": "Q0018",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004882"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "3546366097437cb796d584b8044fb7ccbfd3a99a2b5190c66a15a3fa629518c2",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000140",
+          "query_id": "Q0018",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U004901"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d45bdaddd3424c61b0072986a9ac00d31da0b3e5e531aabece0cc580363dbdc6",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000141",
+          "query_id": "Q0018",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004903"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "f80603f637615c7d1b52416d9041951f23cfe796de9631ab44fd71e96991a534",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000142",
+          "query_id": "Q0018",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004907"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "4e6a44572dbb144bb1a75d93a79b3ec54d40bd49e715949aec1bae12a9ce575b",
+          "disposition": "EXCLUSION",
+          "hit_id": "H000143",
+          "query_id": "Q0018",
+          "rationale": "Sequential context review finds framing, history, education, application, navigation, or incidental wording without both a construction identity and semantic anchor.",
+          "route_ids": [],
+          "source_unit_id": "U004914"
+        },
+        {
+          "candidate_ids": [],
+          "context_sha256": "d26893ea529ec57b07432df7e46e7437c2d07fd16ef1ee2823b8fda05ccca7d8",
+          "disposition": "CONTROL_OR_RELATIONSHIP",
+          "hit_id": "H000144",
+          "query_id": "Q0018",
+          "rationale": "Sequential context review identifies this match as notation, tooling, production, representation, experiment control, or other non-native relationship rather than a new construction.",
+          "route_ids": [],
+          "source_unit_id": "U014295"
+        }
+      ],
+      "kind": "LOCAL",
+      "new_candidates": [],
+      "new_evidence_groups": [],
+      "new_routes": [],
+      "new_vocabulary": [],
+      "owning_stage": 4,
+      "queries": [
+        {
+          "case_sensitive": false,
+          "family": "candidate alias",
+          "mode": "LITERAL",
+          "pattern": "rule 30",
+          "query_id": "Q0010",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "candidate alias",
+          "mode": "LITERAL",
+          "pattern": "rule 110",
+          "query_id": "Q0011",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "candidate family",
+          "mode": "LITERAL",
+          "pattern": "cellular automaton",
+          "query_id": "Q0012",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "native evolution mechanics",
+          "mode": "REGEX",
+          "pattern": "\\b(?:initial conditions?|successive rows?|evolution steps?|neighbou?rs?|transitions?|updates?|synchronous|asynchronous)\\b",
+          "query_id": "Q0013",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "stochasticity guardrail",
+          "mode": "REGEX",
+          "pattern": "\\b(?:random(?:ness)?|probabilistic|probability|stochastic|Bernoulli)\\b",
+          "query_id": "Q0014",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "declarative-function guardrail",
+          "mode": "REGEX",
+          "pattern": "\\b(?:constraints?|equations?|solutions?|functions?|relations?|inequalit(?:y|ies)|differential)\\b",
+          "query_id": "Q0015",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "input-generator-structure guardrail",
+          "mode": "REGEX",
+          "pattern": "\\b(?:inputs?|outputs?|generators?|substitutions?|networks?|Turing machines?|mobile automata|automaton)\\b",
+          "query_id": "Q0016",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "general construction nouns",
+          "mode": "REGEX",
+          "pattern": "\\b(?:algorithms?|programs?|rules?|systems?|process(?:es)?)\\b",
+          "query_id": "Q0017",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        },
+        {
+          "case_sensitive": false,
+          "family": "representation-application boundary",
+          "mode": "REGEX",
+          "pattern": "\\b(?:simulat(?:e|es|ed|ing|ion)|emulat(?:e|es|ed|ing|ion)|implement(?:s|ed|ing|ation)?|represent(?:s|ed|ing|ation)?|displays?|render(?:s|ed|ing)?)\\b",
+          "query_id": "Q0018",
+          "scope_paths": [
+            "FRONT-MATTER/00-Publication-and-Contents.md",
+            "FRONT-MATTER/01-Preface.md",
+            "BACK-MATTER/NOTES/00-General-Notes.md",
+            "BACK-MATTER/Colophon.md"
+          ],
+          "whole_word": false
+        }
+      ],
+      "rerun_digest": "0366f2afd221ead88fc17151593578e614846734609e09920d58744740b16660",
+      "result_digest": "0366f2afd221ead88fc17151593578e614846734609e09920d58744740b16660",
+      "result_ids": [
+        "H000073",
+        "H000074",
+        "H000075",
+        "H000076",
+        "H000077",
+        "H000078",
+        "H000079",
+        "H000080",
+        "H000081",
+        "H000082",
+        "H000083",
+        "H000084",
+        "H000085",
+        "H000086",
+        "H000087",
+        "H000088",
+        "H000089",
+        "H000090",
+        "H000091",
+        "H000092",
+        "H000093",
+        "H000094",
+        "H000095",
+        "H000096",
+        "H000097",
+        "H000098",
+        "H000099",
+        "H000100",
+        "H000101",
+        "H000102",
+        "H000103",
+        "H000104",
+        "H000105",
+        "H000106",
+        "H000107",
+        "H000108",
+        "H000109",
+        "H000110",
+        "H000111",
+        "H000112",
+        "H000113",
+        "H000114",
+        "H000115",
+        "H000116",
+        "H000117",
+        "H000118",
+        "H000119",
+        "H000120",
+        "H000121",
+        "H000122",
+        "H000123",
+        "H000124",
+        "H000125",
+        "H000126",
+        "H000127",
+        "H000128",
+        "H000129",
+        "H000130",
+        "H000131",
+        "H000132",
+        "H000133",
+        "H000134",
+        "H000135",
+        "H000136",
+        "H000137",
+        "H000138",
+        "H000139",
+        "H000140",
+        "H000141",
+        "H000142",
+        "H000143",
+        "H000144"
+      ],
+      "round_id": "S002",
+      "tool_assumptions": [
+        "Python Unicode regular expressions over decoded UTF-8 canonical source-unit byte ranges, with MULTILINE semantics and query-major then canonical source-unit result order."
+      ]
+    }
+  ],
   "schema_version": 1,
-  "tool_assumptions": [],
-  "vocabulary": []
+  "tool_assumptions": [
+    "Python Unicode regular expressions over decoded UTF-8 canonical source-unit byte ranges, with MULTILINE semantics and query-major then canonical source-unit result order."
+  ],
+  "vocabulary": [
+    "rule 30",
+    "rule 110",
+    "cellular automaton",
+    "initial condition",
+    "successive row",
+    "evolution step",
+    "neighbor",
+    "transition",
+    "update",
+    "synchronous",
+    "asynchronous",
+    "random",
+    "randomness",
+    "probabilistic",
+    "probability",
+    "stochastic",
+    "Bernoulli",
+    "constraint",
+    "equation",
+    "solution",
+    "function",
+    "relation",
+    "inequality",
+    "differential",
+    "input",
+    "output",
+    "generator",
+    "substitution",
+    "network",
+    "Turing machine",
+    "mobile automaton",
+    "algorithm",
+    "program",
+    "rule",
+    "system",
+    "process",
+    "simulation",
+    "emulation",
+    "implementation",
+    "representation",
+    "display",
+    "render"
+  ]
 }

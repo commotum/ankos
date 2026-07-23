@@ -5667,7 +5667,53 @@ def mutation_checks(
     failures: list[str] = []
     base_reading = copy.deepcopy(reading)
     base_assets = copy.deepcopy(assets)
-    base_search = copy.deepcopy(search)
+    # Mutation fixtures exercise the validator contract, not the current audit
+    # checkpoint. Preserve the corpus/assignment columns supplied by the live
+    # ledgers, but reconstruct their initialized mutable state so completed
+    # reviews, candidates, routes, history, and search rounds cannot leak into
+    # the synthetic B0001/R000001 fixture below.
+    for row in base_reading:
+        row.update(
+            {
+                "review_status": "PENDING",
+                "review_epoch": "",
+                "review_disposition": "",
+                "source_status": "",
+                "uncertainty": "",
+                "secondary_roles": "[]",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "",
+                "review_stage": "",
+                "reviewer": "",
+            }
+        )
+    for row in base_assets:
+        row.update(
+            {
+                "inspection_status": "PENDING",
+                "review_epoch": "",
+                "visual_role": "",
+                "source_status": "",
+                "risk_flags": "[]",
+                "original_resolution_status": "NOT_REVIEWED",
+                "transcription_status": "NOT_APPLICABLE",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "",
+                "review_stage": "",
+                "reviewer": "",
+                "uncertainty": "",
+            }
+        )
+    base_search = {
+        "schema_version": 1,
+        "phase": "blind_discovery",
+        "tool_assumptions": [],
+        "vocabulary": [],
+        "rounds": [],
+        "fixed_point": None,
+    }
     unit = units[0]
     unit_id = unit["id"]
     path = unit["path"]
