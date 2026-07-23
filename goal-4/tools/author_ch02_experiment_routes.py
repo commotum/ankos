@@ -168,6 +168,19 @@ ROUTE_TARGETS = {
     },
 }
 
+LATE_ROUTE_TARGETS = {
+    "R000097": {
+        "units": ["U000149", "U000150", "U000151", "U000152"],
+        "assets": ["A001057"],
+        "attempt": (
+            "Resolved the backward printed page 19 pointer to the reviewed "
+            "1981 all-programs experiment statement, original printout, and "
+            "caption; the image does not establish exact lookup tables or "
+            "boundary mechanics."
+        ),
+    },
+}
+
 
 class AuthoringError(ValueError):
     """The current audit state cannot safely receive this proposal."""
@@ -217,7 +230,7 @@ def atomic_create(path: Path, payload: bytes) -> None:
         os.close(directory)
 
 
-def build_proposal(goal_dir: Path) -> dict[str, Any]:
+def build_proposal(goal_dir: Path, *, late: bool = False) -> dict[str, Any]:
     goal_dir = goal_dir.resolve()
     if goal_dir != GOAL_DIR.resolve():
         raise AuthoringError("this reproducer is bound to the canonical Goal 4")
@@ -232,18 +245,27 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         for row in read_csv(goal_dir / merge_worker_output.ASSET_NAME)
     }
     history = read_jsonl(goal_dir / merge_worker_output.REVIEW_HISTORY_NAME)
-    if not history or history[-1].get("mode") != "INITIAL":
-        raise AuthoringError("Stage 6 INITIAL history event is not terminal")
+    expected_terminal_mode = "SEARCH_APPEND" if late else "INITIAL"
+    if not history or history[-1].get("mode") != expected_terminal_mode:
+        raise AuthoringError(
+            f"expected terminal Stage 6 {expected_terminal_mode} event"
+        )
     epoch = history[-1].get("epoch")
     if epoch != 1:
         raise AuthoringError(f"unexpected active epoch: {epoch!r}")
 
     route_by_id = {row["route_id"]: row for row in routes}
-    if set(ROUTE_TARGETS) - set(route_by_id):
+    targets = LATE_ROUTE_TARGETS if late else ROUTE_TARGETS
+    if set(targets) - set(route_by_id):
         raise AuthoringError("one or more governed routes are absent")
+    if late and any(
+        route_by_id[route_id]["status"] != "RESOLVED"
+        for route_id in ROUTE_TARGETS
+    ):
+        raise AuthoringError("initial Chapter 2 route closure is incomplete")
 
     updates: list[dict[str, str]] = []
-    for route_id, target in ROUTE_TARGETS.items():
+    for route_id, target in targets.items():
         row = deepcopy(route_by_id[route_id])
         if row["status"] != "PENDING":
             raise AuthoringError(f"{route_id} is not PENDING")
@@ -273,7 +295,11 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     return {
         "schema_version": 1,
         "proposal_kind": "ROUTE_RESOLUTION",
-        "coordinator_id": "ch02-experiment-route-closure-e1",
+        "coordinator_id": (
+            "ch02-experiment-late-route-closure-e1"
+            if late
+            else "ch02-experiment-route-closure-e1"
+        ),
         "epoch": epoch,
         "base_artifact_sha256": {
             name: hashlib.sha256((goal_dir / name).read_bytes()).hexdigest()
@@ -284,13 +310,19 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
-        print(f"usage: {Path(sys.argv[0]).name} OUTPUT_JSON", file=sys.stderr)
+    if len(sys.argv) not in {2, 3} or (
+        len(sys.argv) == 3 and sys.argv[1] != "--late"
+    ):
+        print(
+            f"usage: {Path(sys.argv[0]).name} [--late] OUTPUT_JSON",
+            file=sys.stderr,
+        )
         return 2
-    output_path = Path(sys.argv[1])
+    late = len(sys.argv) == 3
+    output_path = Path(sys.argv[-1])
     try:
         with audit_transaction.read_guard(GOAL_DIR):
-            proposal = build_proposal(GOAL_DIR)
+            proposal = build_proposal(GOAL_DIR, late=late)
             atomic_create(output_path, canonical_json_bytes(proposal))
     except (OSError, json.JSONDecodeError, AuthoringError, ValueError) as exc:
         print(f"Chapter 2 route authoring failed: {exc}", file=sys.stderr)
