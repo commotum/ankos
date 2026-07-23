@@ -383,6 +383,13 @@ eca = source_candidate(
     ),
     strength="DIRECT_IDENTITY",
 )
+eca["evidence"][0]["fields"] = [
+    "object_kind",
+    "native_time",
+    "law_kind",
+    "parameters_and_variants",
+    "evidence_limit",
+]
 add_evidence(
     eca,
     label="eca-schema",
@@ -492,6 +499,30 @@ add_evidence(
         "evidence_limit",
     ],
     modality="CAPTION",
+)
+add_evidence(
+    rule254,
+    label="rule254-direct-law",
+    unit="U000186",
+    claim=(
+        "The prose states the exact Rule 254 transition: the next cell is black "
+        "iff self or either immediate neighbor was black."
+    ),
+    fields=[
+        "native_time",
+        "alphabet_or_value_schema",
+        "frontier_or_activation",
+        "schedule",
+        "read_dependencies_or_neighborhood",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "evidence_limit",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 add_evidence(
     rule254,
@@ -2337,13 +2368,27 @@ center_column = source_candidate(
         "object_kind": "An observer/query over a Rule 30 evolution.",
         "native_time": "One output symbol is taken from each successive generation.",
         "carrier": "The center spatial column of the evolution history.",
+        "support": "The first n positions of the center-column output sequence.",
+        "topology": "A linearly ordered sequence indexed by generation.",
+        "structural_invariants": "Exactly one binary center value is retained per generation.",
         "alphabet_or_value_schema": "Binary black/white values.",
+        "complete_state": (
+            "For input n, the complete denotation is the ordered prefix of n "
+            "center-column symbols."
+        ),
+        "visible_history": (
+            "The returned sequence preserves the center value from each "
+            "successive Rule 30 generation."
+        ),
         "input": "A requested prefix length n.",
         "law_kind": "Project the Rule 30 history to its center cell at each step.",
         "rule_relation_constraint_function_or_probability_law": (
             "Return the first n center-column values of the single-seed Rule 30 run."
         ),
         "result_kind": "A finite binary sequence prefix.",
+        "successor_cardinality": (
+            "Exactly one n-symbol prefix is returned for each valid requested length."
+        ),
         "determinism_branching_or_measure": (
             "Deterministic; randomness is an observed statistical property."
         ),
@@ -3717,6 +3762,44 @@ RELATION_IMAGE_UNITS = {
 }
 CONTROL_IMAGE_UNITS = {"U005240"}
 
+UNKNOWN_FACT_LABELS = {
+    "object_kind": "a more specific native object kind",
+    "native_time": "whether the object has native time or iteration, and its time domain",
+    "carrier": "what entities carry the native state or values",
+    "support": "the native domain/support and its extent",
+    "topology": "the native adjacency, incidence, or domain topology",
+    "structural_invariants": "which structural facts must remain invariant",
+    "alphabet_or_value_schema": "the complete native value/alphabet schema",
+    "complete_state": "what information constitutes one complete native state or denotation",
+    "visible_history": "whether a history is native and, if so, what it retains",
+    "control_state": "whether separate native control state exists and what it contains",
+    "seed": "a native seed or initial-state convention",
+    "input": "the complete native input contract",
+    "boundary": "the native boundary convention",
+    "external_data": "whether native evaluation consumes external data",
+    "frontier_or_activation": "which components are active or eligible at a step",
+    "schedule": "the native evaluation/update schedule",
+    "read_dependencies_or_neighborhood": "the complete native read-dependency relation",
+    "law_kind": "the kind of native law",
+    "rule_relation_constraint_function_or_probability_law": "the complete native law",
+    "write_replacement_assembly_or_commit": "how native results are written, assembled, or committed",
+    "result_kind": "the complete native result type",
+    "successor_cardinality": "the number of native successors/results per valid input",
+    "determinism_branching_or_measure": "whether results are deterministic, branching, or measure-valued",
+    "termination_completion_failure": "native completion, termination, and failure semantics",
+    "witness_semantics": "what counts as a native witness or certificate",
+    "parameters_and_variants": "the full parameter and variant space",
+    "excluded_observers_and_representations": "a complete boundary between native mechanics and observers/representations",
+    "evidence_limit": "the complete source-evidence boundary",
+}
+
+
+def exact_unknown_reason(spec: CandidateSpec, field: str) -> str:
+    return (
+        f"The assigned Chapter 2 evidence for {spec['name']} does not state "
+        f"{UNKNOWN_FACT_LABELS[field]}."
+    )
+
 
 def justify_not_applicable(
     spec: CandidateSpec,
@@ -3775,6 +3858,7 @@ justify_not_applicable(
     center_column,
     [
         "control_state",
+        "seed",
         "boundary",
         "external_data",
         "frontier_or_activation",
@@ -3999,6 +4083,7 @@ def allocate_semantic_records(
 
         fingerprint: dict[str, dict[str, Any]] = {}
         field_support: dict[str, str] = {}
+        unknown_reasons: list[str] = []
         for field in FINGERPRINT_FIELDS:
             supporting_ids = [
                 item["evidence_id"]
@@ -4034,12 +4119,14 @@ def allocate_semantic_records(
                     raise AuthoringError(
                         f"{spec['key']} evidence claims absent field {field}"
                     )
+                reason = exact_unknown_reason(spec, field)
+                unknown_reasons.append(reason)
                 field_support[field] = "UNKNOWN_FROM_SOURCE"
                 fingerprint[field] = {
                     "status": "UNKNOWN_FROM_SOURCE",
                     "value": None,
                     "evidence_ids": [],
-                    "reason": spec["missing"],
+                    "reason": reason,
                 }
 
         def parameter_records(
@@ -4105,7 +4192,9 @@ def allocate_semantic_records(
             "fingerprint": fingerprint,
             "parameters": parameter_records(spec["parameters"]),
             "variants": parameter_records(spec["variants"]),
-            "missing_mechanics": [spec["missing"]],
+            "missing_mechanics": list(
+                dict.fromkeys([spec["missing"], *unknown_reasons])
+            ),
             "uncertainties": spec.get("uncertainties", []),
             "related_candidate_ids": [],
             "cross_reference_ids": candidate_route_ids,
