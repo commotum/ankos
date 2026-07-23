@@ -62,6 +62,14 @@ def append_history_event(
     document = next(
         item for item in manifest["documents"] if item["path"] == source_path
     )
+    prior_path_event = next(
+        (
+            item
+            for item in reversed(history)
+            if item.get("source_paths") == [source_path]
+        ),
+        None,
+    )
     event = MODULE.close_review_event(
         {
             "review_id": f"V{len(history) + 1:06d}",
@@ -78,6 +86,13 @@ def append_history_event(
                 for item in assets
                 if item["assignment_path"] == source_path
             ],
+            "previous_path_result_sha256": (
+                prior_path_event["result_projection_sha256"]
+                if prior_path_event is not None
+                else None
+            ),
+            "trigger_search_kind": None,
+            "trigger_hit_ids": [],
         },
         {item["id"]: item for item in units},
         {item["source_unit_id"]: item for item in reading},

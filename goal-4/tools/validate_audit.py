@@ -1313,6 +1313,819 @@ def _validate_review_history_without_enrichment(
     )
 
 
+READING_ENRICHMENT_SCALAR_FIELDS = {
+    "review_disposition",
+    "source_status",
+    "uncertainty",
+    "evidence_statement",
+}
+READING_ENRICHMENT_ADDITIVE_FIELDS = {
+    "secondary_roles",
+    "candidate_ids",
+    "route_ids",
+}
+ASSET_ENRICHMENT_ADDITIVE_FIELDS = {"candidate_ids", "route_ids"}
+
+
+def _validate_history_snapshot(
+    event: dict[str, Any],
+    source_unit_ids: list[str],
+    asset_ids: list[str],
+    errors: list[str],
+    prefix: str,
+) -> dict[str, Any] | None:
+    snapshot = event.get("result_snapshot")
+    if not isinstance(snapshot, dict) or set(snapshot) != {
+        "schema_version",
+        "source_path",
+        "reading_results",
+        "asset_results",
+    }:
+        errors.append(f"{prefix} has malformed full result snapshot")
+        return None
+    source_paths = event.get("source_paths")
+    source_path = source_paths[0] if isinstance(source_paths, list) and len(source_paths) == 1 else None
+    if snapshot.get("schema_version") != 1 or snapshot.get("source_path") != source_path:
+        errors.append(f"{prefix} result snapshot identity is inconsistent")
+    reading_results = snapshot.get("reading_results")
+    asset_results = snapshot.get("asset_results")
+    if not isinstance(reading_results, list):
+        errors.append(f"{prefix} result snapshot reading_results is not an array")
+        reading_results = []
+    if not isinstance(asset_results, list):
+        errors.append(f"{prefix} result snapshot asset_results is not an array")
+        asset_results = []
+    if [
+        row.get("source_unit_id") if isinstance(row, dict) else None
+        for row in reading_results
+    ] != source_unit_ids:
+        errors.append(f"{prefix} result snapshot source-unit order/scope differs")
+    if [
+        row.get("asset_id") if isinstance(row, dict) else None
+        for row in asset_results
+    ] != asset_ids:
+        errors.append(f"{prefix} result snapshot asset order/scope differs")
+
+    for row_index, row in enumerate(reading_results, start=1):
+        row_prefix = f"{prefix} reading snapshot row {row_index}"
+        if not isinstance(row, dict) or set(row) != set(
+            READING_REVIEW_RESULT_FIELDS
+        ):
+            errors.append(f"{row_prefix} fields differ from full projection")
+            continue
+        if row.get("review_status") != "REVIEWED":
+            errors.append(f"{row_prefix} is not REVIEWED")
+        try:
+            if int(row.get("review_epoch", "")) < 1:
+                raise ValueError
+            if not 4 <= int(row.get("review_stage", "")) <= 17:
+                raise ValueError
+        except (TypeError, ValueError):
+            errors.append(f"{row_prefix} has invalid completion metadata")
+        if not isinstance(row.get("reviewer"), str) or not row["reviewer"].strip():
+            errors.append(f"{row_prefix} lacks reviewer")
+        disposition = row.get("review_disposition")
+        source_status = row.get("source_status")
+        if disposition not in READING_DISPOSITIONS:
+            errors.append(f"{row_prefix} has invalid disposition")
+        if source_status not in SOURCE_STATUSES:
+            errors.append(f"{row_prefix} has invalid source status")
+        secondary = parsed_string_list(
+            row.get("secondary_roles", ""),
+            f"{row_prefix}.secondary_roles",
+            errors,
+        )
+        candidates = parsed_string_list(
+            row.get("candidate_ids", ""),
+            f"{row_prefix}.candidate_ids",
+            errors,
+        )
+        routes = parsed_string_list(
+            row.get("route_ids", ""),
+            f"{row_prefix}.route_ids",
+            errors,
+        )
+        if any(value not in SECONDARY_ROLES for value in secondary):
+            errors.append(f"{row_prefix} has invalid secondary role")
+        uncertainty = row.get("uncertainty", "")
+        if source_status == "CLEAR" and uncertainty:
+            errors.append(f"{row_prefix} CLEAR source has uncertainty")
+        if source_status in {"AMBIGUOUS", "DEFECTIVE", "CONFLICTING"} and not str(
+            uncertainty
+        ).strip():
+            errors.append(f"{row_prefix} non-clear source lacks uncertainty")
+        if not isinstance(row.get("evidence_statement"), str) or not row[
+            "evidence_statement"
+        ].strip():
+            errors.append(f"{row_prefix} lacks evidence statement")
+        if disposition in {"CANDIDATE", "SUPPORTS_CANDIDATE"} and not candidates:
+            errors.append(f"{row_prefix} candidate disposition lacks B link")
+        if disposition == "CROSS_REFERENCE" and not routes:
+            errors.append(f"{row_prefix} cross-reference lacks route")
+        if disposition == "NO_CONSTRUCTION" and (candidates or routes):
+            errors.append(f"{row_prefix} NO_CONSTRUCTION carries links")
+        if disposition == "SOURCE_DEFECT_OR_AMBIGUITY" and source_status == "CLEAR":
+            errors.append(f"{row_prefix} source defect is CLEAR")
+
+    for row_index, row in enumerate(asset_results, start=1):
+        row_prefix = f"{prefix} asset snapshot row {row_index}"
+        if not isinstance(row, dict) or set(row) != set(
+            ASSET_REVIEW_RESULT_FIELDS
+        ):
+            errors.append(f"{row_prefix} fields differ from full projection")
+            continue
+        if row.get("inspection_status") != "SCREENED":
+            errors.append(f"{row_prefix} is not SCREENED")
+        try:
+            if int(row.get("review_epoch", "")) < 1:
+                raise ValueError
+            if not 4 <= int(row.get("review_stage", "")) <= 17:
+                raise ValueError
+        except (TypeError, ValueError):
+            errors.append(f"{row_prefix} has invalid completion metadata")
+        if not isinstance(row.get("reviewer"), str) or not row["reviewer"].strip():
+            errors.append(f"{row_prefix} lacks reviewer")
+        if row.get("visual_role") not in VISUAL_ROLES:
+            errors.append(f"{row_prefix} has invalid visual role")
+        source_status = row.get("source_status")
+        if source_status not in SOURCE_STATUSES:
+            errors.append(f"{row_prefix} has invalid source status")
+        risk_flags = parsed_string_list(
+            row.get("risk_flags", ""),
+            f"{row_prefix}.risk_flags",
+            errors,
+        )
+        parsed_string_list(
+            row.get("candidate_ids", ""),
+            f"{row_prefix}.candidate_ids",
+            errors,
+        )
+        parsed_string_list(
+            row.get("route_ids", ""),
+            f"{row_prefix}.route_ids",
+            errors,
+        )
+        if any(value not in VISUAL_RISK_FLAGS for value in risk_flags):
+            errors.append(f"{row_prefix} has invalid risk flag")
+        if row.get("original_resolution_status") not in {
+            "NOT_REQUIRED",
+            "REVIEWED",
+        }:
+            errors.append(f"{row_prefix} has invalid resolution status")
+        if row.get("transcription_status") not in {
+            "NOT_APPLICABLE",
+            "NOT_REQUIRED",
+            "CHECKED",
+        }:
+            errors.append(f"{row_prefix} has invalid transcription status")
+        uncertainty = row.get("uncertainty", "")
+        if source_status == "CLEAR" and uncertainty:
+            errors.append(f"{row_prefix} CLEAR source has uncertainty")
+        if source_status in {"AMBIGUOUS", "DEFECTIVE", "CONFLICTING"} and not str(
+            uncertainty
+        ).strip():
+            errors.append(f"{row_prefix} non-clear source lacks uncertainty")
+
+    return snapshot
+
+
+def _validate_search_enrichment_diff(
+    previous_snapshot: dict[str, Any],
+    snapshot: dict[str, Any],
+    trigger_unit_ids: set[str],
+    trigger_candidate_ids_by_unit: dict[str, set[str]],
+    trigger_route_ids_by_unit: dict[str, set[str]],
+    trigger_candidate_ids: set[str],
+    trigger_route_ids: set[str],
+    errors: list[str],
+    prefix: str,
+) -> None:
+    previous_reading = {
+        row["source_unit_id"]: row
+        for row in previous_snapshot["reading_results"]
+        if isinstance(row, dict) and "source_unit_id" in row
+    }
+    previous_assets = {
+        row["asset_id"]: row
+        for row in previous_snapshot["asset_results"]
+        if isinstance(row, dict) and "asset_id" in row
+    }
+    changed = False
+    allowed_reading = (
+        READING_ENRICHMENT_SCALAR_FIELDS
+        | READING_ENRICHMENT_ADDITIVE_FIELDS
+    )
+    for row in snapshot["reading_results"]:
+        if not isinstance(row, dict) or "source_unit_id" not in row:
+            continue
+        unit_id = row["source_unit_id"]
+        before = previous_reading.get(unit_id)
+        if before is None:
+            errors.append(f"{prefix} enrichment adds an unknown reading row")
+            continue
+        changed_fields = {
+            field for field in READING_REVIEW_RESULT_FIELDS if row.get(field) != before.get(field)
+        }
+        if not changed_fields:
+            continue
+        changed = True
+        if unit_id not in trigger_unit_ids:
+            errors.append(
+                f"{prefix} changes reading {unit_id} without an exact trigger hit"
+            )
+        illegal = changed_fields - allowed_reading
+        if illegal:
+            errors.append(
+                f"{prefix} changes immutable reading fields: {sorted(illegal)}"
+            )
+        for field in changed_fields & READING_ENRICHMENT_ADDITIVE_FIELDS:
+            old_values = set(
+                parsed_string_list(
+                    before[field], f"{prefix}.previous.{unit_id}.{field}", errors
+                )
+            )
+            new_values = set(
+                parsed_string_list(
+                    row[field], f"{prefix}.current.{unit_id}.{field}", errors
+                )
+            )
+            if not old_values.issubset(new_values):
+                errors.append(
+                    f"{prefix} removes prior reading enrichment from "
+                    f"{unit_id}.{field}"
+                )
+            added = new_values - old_values
+            if field == "candidate_ids" and not added.issubset(
+                trigger_candidate_ids_by_unit.get(unit_id, set())
+            ):
+                errors.append(
+                    f"{prefix} adds unrelated candidate links to {unit_id}"
+                )
+            if field == "route_ids" and not added.issubset(
+                trigger_route_ids_by_unit.get(unit_id, set())
+            ):
+                errors.append(f"{prefix} adds unrelated route links to {unit_id}")
+        current_candidate_ids = set(
+            parsed_string_list(
+                row["candidate_ids"],
+                f"{prefix}.current.{unit_id}.candidate_ids",
+                errors,
+            )
+        )
+        current_route_ids = set(
+            parsed_string_list(
+                row["route_ids"],
+                f"{prefix}.current.{unit_id}.route_ids",
+                errors,
+            )
+        )
+        if row.get("review_disposition") in {
+            "CANDIDATE",
+            "SUPPORTS_CANDIDATE",
+        } and not (
+            current_candidate_ids
+            & trigger_candidate_ids_by_unit.get(unit_id, set())
+        ):
+            errors.append(
+                f"{prefix} candidate disposition lacks a triggered candidate link"
+            )
+        if row.get("review_disposition") == "CROSS_REFERENCE" and not (
+            current_route_ids & trigger_route_ids_by_unit.get(unit_id, set())
+        ):
+            errors.append(
+                f"{prefix} cross-reference disposition lacks a triggered route link"
+            )
+
+    for row in snapshot["asset_results"]:
+        if not isinstance(row, dict) or "asset_id" not in row:
+            continue
+        asset_id = row["asset_id"]
+        before = previous_assets.get(asset_id)
+        if before is None:
+            errors.append(f"{prefix} enrichment adds an unknown asset row")
+            continue
+        changed_fields = {
+            field for field in ASSET_REVIEW_RESULT_FIELDS if row.get(field) != before.get(field)
+        }
+        if not changed_fields:
+            continue
+        changed = True
+        illegal = changed_fields - ASSET_ENRICHMENT_ADDITIVE_FIELDS
+        if illegal:
+            errors.append(
+                f"{prefix} changes immutable asset fields: {sorted(illegal)}"
+            )
+        for field in changed_fields & ASSET_ENRICHMENT_ADDITIVE_FIELDS:
+            old_values = set(
+                parsed_string_list(
+                    before[field], f"{prefix}.previous.{asset_id}.{field}", errors
+                )
+            )
+            new_values = set(
+                parsed_string_list(
+                    row[field], f"{prefix}.current.{asset_id}.{field}", errors
+                )
+            )
+            if not old_values.issubset(new_values):
+                errors.append(
+                    f"{prefix} removes prior asset enrichment from "
+                    f"{asset_id}.{field}"
+                )
+            added = new_values - old_values
+            if field == "candidate_ids" and not added.issubset(
+                trigger_candidate_ids
+            ):
+                errors.append(
+                    f"{prefix} adds unrelated candidate links to asset {asset_id}"
+                )
+            if field == "route_ids" and not added.issubset(trigger_route_ids):
+                errors.append(
+                    f"{prefix} adds unrelated route links to asset {asset_id}"
+                )
+    if not changed:
+        errors.append(f"{prefix} SEARCH_ENRICHMENT has no semantic delta")
+
+
+def validate_review_history(
+    manifest: dict[str, Any],
+    units: list[dict[str, Any]],
+    reading: list[dict[str, str]],
+    assets: list[dict[str, str]],
+    review_history: list[dict[str, Any]],
+    search: dict[str, Any],
+    stage_by_path: dict[str, int],
+) -> tuple[
+    list[str],
+    set[int],
+    dict[str, set[int]],
+    dict[str, set[int]],
+    dict[tuple[int, int], set[str]],
+]:
+    """Validate immutable review snapshots and typed search enrichments."""
+    errors: list[str] = []
+    unit_by_id = {unit["id"]: unit for unit in units}
+    reading_by_id = {row.get("source_unit_id", ""): row for row in reading}
+    asset_by_id = {row.get("asset_id", ""): row for row in assets}
+    audit_paths = [
+        document["path"]
+        for document in sorted(
+            manifest["documents"],
+            key=lambda document: (
+                stage_by_path[document["path"]],
+                int(document["order"]),
+            ),
+        )
+    ]
+    document_position = {
+        path: index for index, path in enumerate(audit_paths, start=1)
+    }
+    unit_position = {
+        unit["id"]: index for index, unit in enumerate(units, start=1)
+    }
+    asset_position = {
+        row.get("asset_id", ""): index
+        for index, row in enumerate(assets, start=1)
+    }
+    search_rounds = search.get("rounds", []) if isinstance(search, dict) else []
+    if not isinstance(search_rounds, list):
+        search_rounds = []
+    hit_meta: dict[str, tuple[int, int, str, str]] = {}
+    for round_position, round_record in enumerate(search_rounds, start=1):
+        if not isinstance(round_record, dict):
+            continue
+        epoch = round_record.get("epoch")
+        kind = round_record.get("kind")
+        for hit in round_record.get("hits", []):
+            if (
+                isinstance(hit, dict)
+                and isinstance(hit.get("hit_id"), str)
+                and isinstance(epoch, int)
+                and kind in {"LOCAL", "SATURATION"}
+                and isinstance(hit.get("source_unit_id"), str)
+            ):
+                hit_meta[hit["hit_id"]] = (
+                    round_position,
+                    epoch,
+                    kind,
+                    hit["source_unit_id"],
+                )
+
+    history_epochs: set[int] = set()
+    unit_history_epochs: dict[str, set[int]] = {}
+    asset_path_history_epochs: dict[str, set[int]] = {}
+    expected_local_scopes: dict[tuple[int, int], set[str]] = {}
+    latest_review_unit_event: dict[str, dict[str, Any]] = {}
+    latest_review_asset_event: dict[str, dict[str, Any]] = {}
+    latest_path_event: dict[str, dict[str, Any]] = {}
+    seen_paths: set[str] = set()
+    seen_review_path_epochs: set[tuple[int, str]] = set()
+    next_initial_path_index = 0
+    prior_event_hash: str | None = None
+    prior_event_epoch: int | None = None
+    prior_search_round_count = 0
+    last_review_position_by_epoch: dict[int, int] = {}
+
+    if not isinstance(review_history, list):
+        return (
+            ["review-history root must be an ordered JSONL record list"],
+            set(),
+            {},
+            {},
+            {},
+        )
+
+    for index, event in enumerate(review_history, start=1):
+        prefix = f"review-history event {index}"
+        if not isinstance(event, dict):
+            errors.append(f"{prefix} is not an object")
+            continue
+        if set(event) != set(REVIEW_HISTORY_FIELDS):
+            errors.append(f"{prefix} fields differ from the closed contract")
+            continue
+        if event.get("review_id") != f"V{index:06d}":
+            errors.append(f"{prefix} violates the append-only V sequence")
+        epoch = event.get("epoch")
+        stage = event.get("stage")
+        mode = event.get("mode")
+        reviewer = event.get("reviewer")
+        if not isinstance(epoch, int) or epoch < 1:
+            errors.append(f"{prefix} has invalid epoch")
+            continue
+        history_epochs.add(epoch)
+        if not isinstance(stage, int) or not 4 <= stage <= 17:
+            errors.append(f"{prefix} has invalid stage")
+            continue
+        if mode not in REVIEW_MODES:
+            errors.append(f"{prefix} has invalid mode")
+        if not isinstance(reviewer, str) or not reviewer.strip():
+            errors.append(f"{prefix} lacks reviewer")
+        is_review_event = mode in {"INITIAL", "REOPEN"}
+        is_enrichment = mode == "SEARCH_ENRICHMENT"
+
+        source_paths = exact_string_list(
+            event.get("source_paths"),
+            f"{prefix}.source_paths",
+            errors,
+            nonempty=True,
+        )
+        if len(source_paths) != 1:
+            errors.append(f"{prefix} must cover exactly one canonical source path")
+        event_path = source_paths[0] if len(source_paths) == 1 else None
+        source_unit_ids = exact_string_list(
+            event.get("source_unit_ids"),
+            f"{prefix}.source_unit_ids",
+            errors,
+            nonempty=True,
+        )
+        asset_ids = exact_string_list(
+            event.get("asset_ids"),
+            f"{prefix}.asset_ids",
+            errors,
+        )
+        if event_path not in stage_by_path:
+            errors.append(f"{prefix} contains an unknown source path")
+        elif stage_by_path[event_path] != stage:
+            errors.append(f"{prefix} source path lies outside its stage")
+        expected_units = [
+            unit["id"] for unit in units if unit["path"] == event_path
+        ]
+        expected_assets = [
+            row.get("asset_id", "")
+            for row in assets
+            if row.get("assignment_path") == event_path
+        ]
+        if source_unit_ids != expected_units:
+            errors.append(
+                f"{prefix} source-unit scope is not the exact ordered path scope"
+            )
+        if asset_ids != expected_assets:
+            errors.append(
+                f"{prefix} asset scope is not the exact ordered path scope"
+            )
+        if source_unit_ids != sorted(
+            source_unit_ids, key=lambda value: unit_position.get(value, 10**9)
+        ):
+            errors.append(f"{prefix} source units are not in canonical order")
+        if asset_ids != sorted(
+            asset_ids, key=lambda value: asset_position.get(value, 10**9)
+        ):
+            errors.append(f"{prefix} assets are not in canonical order")
+
+        opens_epoch = prior_event_epoch is None or epoch > prior_event_epoch
+        if prior_event_epoch is None:
+            if epoch != 1 or mode != "INITIAL":
+                errors.append(f"{prefix} must begin history with INITIAL epoch 1")
+        else:
+            if epoch < prior_event_epoch:
+                errors.append(f"{prefix} moves backward to an earlier epoch")
+            elif epoch > prior_event_epoch + 1:
+                errors.append(f"{prefix} skips a global review epoch")
+            if epoch > prior_event_epoch and mode != "REOPEN":
+                errors.append(f"{prefix} opens a new epoch without REOPEN")
+        if is_enrichment and prior_event_epoch != epoch:
+            errors.append(
+                f"{prefix} SEARCH_ENRICHMENT is not in the active epoch"
+            )
+
+        prefix_count = event.get("prior_search_round_count")
+        prefix_digest = event.get("prior_search_rounds_sha256")
+        if not isinstance(prefix_count, int) or prefix_count < 0:
+            errors.append(f"{prefix} has invalid prior search round count")
+            prefix_count = 0
+        if prefix_count < prior_search_round_count:
+            errors.append(f"{prefix} moves backward to an earlier search prefix")
+        if prefix_count > len(search_rounds):
+            errors.append(f"{prefix} search prefix exceeds recorded rounds")
+            search_prefix = search_rounds
+        else:
+            search_prefix = search_rounds[:prefix_count]
+        if prefix_digest != canonical_sha256(search_prefix):
+            errors.append(f"{prefix} prior search-round prefix hash is stale")
+        if any(
+            isinstance(round_record, dict)
+            and isinstance(round_record.get("epoch"), int)
+            and round_record["epoch"] > epoch
+            for round_record in search_prefix
+        ):
+            errors.append(f"{prefix} search prefix contains a future epoch")
+        if opens_epoch and epoch > 1:
+            for (prior_stage, prior_epoch), prior_paths in (
+                expected_local_scopes.items()
+            ):
+                if prior_epoch >= epoch:
+                    continue
+                local_rounds = [
+                    round_record
+                    for round_record in search_prefix
+                    if isinstance(round_record, dict)
+                    and round_record.get("kind") == "LOCAL"
+                    and round_record.get("owning_stage") == prior_stage
+                    and round_record.get("epoch") == prior_epoch
+                ]
+                local_scope = {
+                    path
+                    for round_record in local_rounds
+                    for query in round_record.get("queries", [])
+                    if isinstance(query, dict)
+                    for path in query.get("scope_paths", [])
+                }
+                if not local_rounds or local_scope != prior_paths:
+                    errors.append(
+                        f"{prefix} advances epoch before Stage {prior_stage} "
+                        f"epoch {prior_epoch} LOCAL closure"
+                    )
+        prior_search_round_count = prefix_count
+
+        prior_path_event = latest_path_event.get(event_path or "")
+        expected_previous_path_digest = (
+            prior_path_event.get("result_projection_sha256")
+            if prior_path_event is not None
+            else None
+        )
+        if event.get("previous_path_result_sha256") != expected_previous_path_digest:
+            errors.append(f"{prefix} breaks its per-path result chain")
+        if mode == "INITIAL" and prior_path_event is not None:
+            errors.append(f"{prefix} INITIAL path was already reviewed")
+        if mode in {"REOPEN", "SEARCH_ENRICHMENT"} and prior_path_event is None:
+            errors.append(f"{prefix} {mode} path has no prior snapshot")
+
+        trigger_kind = event.get("trigger_search_kind")
+        trigger_hit_ids = exact_string_list(
+            event.get("trigger_hit_ids"),
+            f"{prefix}.trigger_hit_ids",
+            errors,
+        )
+        trigger_unit_ids: set[str] = set()
+        if is_review_event:
+            if trigger_kind is not None or trigger_hit_ids:
+                errors.append(f"{prefix} review event carries search triggers")
+        elif is_enrichment:
+            if trigger_kind not in SEARCH_ENRICHMENT_TRIGGER_KINDS:
+                errors.append(f"{prefix} has invalid enrichment trigger kind")
+            if not trigger_hit_ids:
+                errors.append(f"{prefix} enrichment lacks trigger hit IDs")
+            prior_path_prefix_count = (
+                prior_path_event.get("prior_search_round_count", 0)
+                if prior_path_event is not None
+                else 0
+            )
+            if prefix_count <= prior_path_prefix_count:
+                errors.append(
+                    f"{prefix} enrichment does not advance its path search prefix"
+                )
+            for hit_id in trigger_hit_ids:
+                meta = hit_meta.get(hit_id)
+                if meta is None:
+                    errors.append(f"{prefix} trigger hit {hit_id} is unknown")
+                    continue
+                round_position, hit_epoch, hit_kind, unit_id = meta
+                if not prior_path_prefix_count < round_position <= prefix_count:
+                    errors.append(
+                        f"{prefix} trigger hit {hit_id} is not newly visible"
+                    )
+                if hit_epoch != epoch or hit_kind != trigger_kind:
+                    errors.append(
+                        f"{prefix} trigger hit {hit_id} has wrong epoch/kind"
+                    )
+                source_unit = unit_by_id.get(unit_id)
+                if source_unit is None or source_unit["path"] != event_path:
+                    errors.append(
+                        f"{prefix} trigger hit {hit_id} lies outside its path"
+                    )
+                else:
+                    trigger_unit_ids.add(unit_id)
+
+        snapshot = _validate_history_snapshot(
+            event,
+            source_unit_ids,
+            asset_ids,
+            errors,
+            prefix,
+        )
+        if isinstance(snapshot, dict):
+            if event.get("result_projection_sha256") != canonical_sha256(snapshot):
+                errors.append(f"{prefix} full result snapshot hash is stale")
+            if is_review_event:
+                for row in snapshot["reading_results"]:
+                    if isinstance(row, dict) and (
+                        row.get("review_epoch") != str(epoch)
+                        or row.get("review_stage") != str(stage)
+                        or row.get("reviewer") != reviewer
+                    ):
+                        errors.append(
+                            f"{prefix} reading snapshot completion metadata "
+                            "differs from review event"
+                        )
+                for row in snapshot["asset_results"]:
+                    if isinstance(row, dict) and (
+                        row.get("review_epoch") != str(epoch)
+                        or row.get("review_stage") != str(stage)
+                        or row.get("reviewer") != reviewer
+                    ):
+                        errors.append(
+                            f"{prefix} asset snapshot completion metadata "
+                            "differs from review event"
+                        )
+            elif is_enrichment and prior_path_event is not None:
+                previous_snapshot = prior_path_event.get("result_snapshot")
+                if isinstance(previous_snapshot, dict):
+                    _validate_search_enrichment_diff(
+                        previous_snapshot,
+                        snapshot,
+                        trigger_unit_ids,
+                        errors,
+                        prefix,
+                    )
+
+        if is_review_event and event_path is not None:
+            event_position = document_position.get(event_path, 10**9)
+            prior_position = last_review_position_by_epoch.get(epoch)
+            if prior_position is not None and event_position <= prior_position:
+                errors.append(
+                    f"{prefix} violates strict frozen document traversal "
+                    "within its epoch"
+                )
+            last_review_position_by_epoch[epoch] = event_position
+            if (epoch, event_path) in seen_review_path_epochs:
+                errors.append(f"{prefix} repeats a reviewed path in one epoch")
+            seen_review_path_epochs.add((epoch, event_path))
+            if mode == "INITIAL":
+                expected_initial_path = (
+                    audit_paths[next_initial_path_index]
+                    if next_initial_path_index < len(audit_paths)
+                    else None
+                )
+                if event_path != expected_initial_path:
+                    errors.append(
+                        f"{prefix} INITIAL path is not the first unread audit path"
+                    )
+                else:
+                    next_initial_path_index += 1
+            elif mode == "REOPEN" and event_path not in seen_paths:
+                errors.append(f"{prefix} REOPEN path was not previously reviewed")
+            seen_paths.add(event_path)
+            expected_local_scopes.setdefault((stage, epoch), set()).add(event_path)
+            for unit_id in source_unit_ids:
+                latest_review_unit_event[unit_id] = event
+                unit_history_epochs.setdefault(unit_id, set()).add(epoch)
+            for asset_id in asset_ids:
+                latest_review_asset_event[asset_id] = event
+                physical_path = asset_by_id.get(asset_id, {}).get("physical_path")
+                if physical_path:
+                    asset_path_history_epochs.setdefault(
+                        physical_path, set()
+                    ).add(epoch)
+        elif is_enrichment and event_path not in seen_paths:
+            errors.append(f"{prefix} enrichment path was never reviewed")
+
+        previous_hash = event.get("previous_event_sha256")
+        if previous_hash != prior_event_hash:
+            errors.append(f"{prefix} previous-event hash breaks append chain")
+        for field in (
+            "input_projection_sha256",
+            "result_projection_sha256",
+            "event_sha256",
+        ):
+            if not isinstance(event.get(field), str) or not HEX64.fullmatch(
+                event[field]
+            ):
+                errors.append(f"{prefix} has invalid {field}")
+        try:
+            expected_input_digest = canonical_sha256(
+                review_input_projection(event, unit_by_id, asset_by_id)
+            )
+        except (KeyError, TypeError):
+            expected_input_digest = None
+        if (
+            expected_input_digest is not None
+            and event.get("input_projection_sha256") != expected_input_digest
+        ):
+            errors.append(f"{prefix} immutable input projection hash is stale")
+        try:
+            expected_event_digest = review_event_sha256(event)
+        except (KeyError, TypeError):
+            expected_event_digest = None
+        if (
+            expected_event_digest is not None
+            and event.get("event_sha256") != expected_event_digest
+        ):
+            errors.append(f"{prefix} closed event hash is stale")
+        prior_event_hash = event.get("event_sha256")
+        prior_event_epoch = epoch
+        if event_path is not None:
+            latest_path_event[event_path] = event
+
+    for row in reading:
+        unit_id = row.get("source_unit_id", "")
+        event = latest_review_unit_event.get(unit_id)
+        if row.get("review_status") == "PENDING":
+            if event is not None:
+                errors.append(f"reading {unit_id} is pending but has review history")
+            continue
+        if row.get("review_status") != "REVIEWED":
+            continue
+        if event is None:
+            errors.append(f"reading {unit_id} is reviewed without review history")
+            continue
+        if row.get("review_epoch") != str(event["epoch"]):
+            errors.append(
+                f"reading {unit_id} review epoch is not its latest review event"
+            )
+        if row.get("review_stage") != str(event["stage"]):
+            errors.append(
+                f"reading {unit_id} review stage differs from latest review event"
+            )
+        if row.get("reviewer") != event["reviewer"]:
+            errors.append(
+                f"reading {unit_id} reviewer differs from latest review event"
+            )
+    for row in assets:
+        asset_id = row.get("asset_id", "")
+        event = latest_review_asset_event.get(asset_id)
+        if row.get("inspection_status") == "PENDING":
+            if event is not None:
+                errors.append(f"asset {asset_id} is pending but has review history")
+            continue
+        if row.get("inspection_status") != "SCREENED":
+            continue
+        if event is None:
+            errors.append(f"asset {asset_id} is screened without review history")
+            continue
+        if row.get("review_epoch") != str(event["epoch"]):
+            errors.append(
+                f"asset {asset_id} review epoch is not its latest review event"
+            )
+        if row.get("review_stage") != str(event["stage"]):
+            errors.append(
+                f"asset {asset_id} review stage differs from latest review event"
+            )
+        if row.get("reviewer") != event["reviewer"]:
+            errors.append(
+                f"asset {asset_id} reviewer differs from latest review event"
+            )
+
+    for path, event in latest_path_event.items():
+        try:
+            current_snapshot = review_result_projection(
+                event, reading_by_id, asset_by_id
+            )
+        except (KeyError, TypeError, IndexError):
+            continue
+        if event.get("result_snapshot") != current_snapshot:
+            errors.append(
+                f"review-history latest snapshot for {path} differs from "
+                "current full row projection"
+            )
+
+    return (
+        errors,
+        history_epochs,
+        unit_history_epochs,
+        asset_path_history_epochs,
+        expected_local_scopes,
+    )
+
+
 def validate_objects(
     manifest: dict[str, Any],
     units: list[dict[str, Any]],
@@ -3295,8 +4108,18 @@ def mutation_checks(
         mode: str,
         reviewer: str,
         prior_rounds: list[dict[str, Any]],
+        trigger_search_kind: str | None = None,
+        trigger_hit_ids: list[str] | None = None,
     ) -> list[dict[str, Any]]:
         result = copy.deepcopy(prior)
+        prior_path_event = next(
+            (
+                item
+                for item in reversed(result)
+                if item.get("source_paths") == [source_path]
+            ),
+            None,
+        )
         event = close_review_event(
             {
                 "review_id": f"V{len(result) + 1:06d}",
@@ -3319,6 +4142,13 @@ def mutation_checks(
                     for item in asset_state
                     if item["assignment_path"] == source_path
                 ],
+                "previous_path_result_sha256": (
+                    prior_path_event["result_projection_sha256"]
+                    if prior_path_event is not None
+                    else None
+                ),
+                "trigger_search_kind": trigger_search_kind,
+                "trigger_hit_ids": trigger_hit_ids or [],
             },
             unit_by_fixture_id,
             {

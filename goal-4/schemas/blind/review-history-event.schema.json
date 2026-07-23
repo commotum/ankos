@@ -25,11 +25,23 @@
     "mode": {
       "enum": [
         "INITIAL",
-        "REOPEN"
+        "REOPEN",
+        "SEARCH_ENRICHMENT"
       ],
       "type": "string"
     },
     "previous_event_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      ]
+    },
+    "previous_path_result_sha256": {
       "oneOf": [
         {
           "type": "null"
@@ -51,6 +63,194 @@
     "result_projection_sha256": {
       "pattern": "^[0-9a-f]{64}$",
       "type": "string"
+    },
+    "result_snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_results": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "asset_id": {
+                "pattern": "^A[0-9]{6}$",
+                "type": "string"
+              },
+              "candidate_ids": {
+                "type": "string"
+              },
+              "evidence_statement": {
+                "type": "string"
+              },
+              "inspection_status": {
+                "const": "SCREENED"
+              },
+              "original_resolution_status": {
+                "enum": [
+                  "NOT_REQUIRED",
+                  "REVIEWED"
+                ],
+                "type": "string"
+              },
+              "review_epoch": {
+                "pattern": "^[1-9][0-9]*$",
+                "type": "string"
+              },
+              "review_stage": {
+                "type": "string"
+              },
+              "reviewer": {
+                "type": "string"
+              },
+              "risk_flags": {
+                "type": "string"
+              },
+              "route_ids": {
+                "type": "string"
+              },
+              "source_status": {
+                "enum": [
+                  "CLEAR",
+                  "AMBIGUOUS",
+                  "DEFECTIVE",
+                  "CONFLICTING"
+                ],
+                "type": "string"
+              },
+              "transcription_status": {
+                "enum": [
+                  "NOT_APPLICABLE",
+                  "NOT_REQUIRED",
+                  "CHECKED"
+                ],
+                "type": "string"
+              },
+              "uncertainty": {
+                "type": "string"
+              },
+              "visual_role": {
+                "enum": [
+                  "NATIVE_EVIDENCE",
+                  "RELATION",
+                  "CONTROL",
+                  "OBSERVER",
+                  "DECORATIVE",
+                  "SOURCE_DEFECT"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "asset_id",
+              "inspection_status",
+              "review_epoch",
+              "visual_role",
+              "source_status",
+              "risk_flags",
+              "original_resolution_status",
+              "transcription_status",
+              "candidate_ids",
+              "route_ids",
+              "evidence_statement",
+              "review_stage",
+              "reviewer",
+              "uncertainty"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "reading_results": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "candidate_ids": {
+                "type": "string"
+              },
+              "evidence_statement": {
+                "type": "string"
+              },
+              "review_disposition": {
+                "enum": [
+                  "CANDIDATE",
+                  "SUPPORTS_CANDIDATE",
+                  "CROSS_REFERENCE",
+                  "REPRESENTATION_OR_OBSERVER",
+                  "APPLICATION_OR_EMULATION",
+                  "HISTORICAL_ONLY",
+                  "NO_CONSTRUCTION",
+                  "SOURCE_DEFECT_OR_AMBIGUITY"
+                ],
+                "type": "string"
+              },
+              "review_epoch": {
+                "pattern": "^[1-9][0-9]*$",
+                "type": "string"
+              },
+              "review_stage": {
+                "type": "string"
+              },
+              "review_status": {
+                "const": "REVIEWED"
+              },
+              "reviewer": {
+                "type": "string"
+              },
+              "route_ids": {
+                "type": "string"
+              },
+              "secondary_roles": {
+                "type": "string"
+              },
+              "source_status": {
+                "enum": [
+                  "CLEAR",
+                  "AMBIGUOUS",
+                  "DEFECTIVE",
+                  "CONFLICTING"
+                ],
+                "type": "string"
+              },
+              "source_unit_id": {
+                "pattern": "^U[0-9]{6}$",
+                "type": "string"
+              },
+              "uncertainty": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_unit_id",
+              "review_status",
+              "review_epoch",
+              "review_disposition",
+              "source_status",
+              "uncertainty",
+              "secondary_roles",
+              "candidate_ids",
+              "route_ids",
+              "evidence_statement",
+              "review_stage",
+              "reviewer"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1
+        },
+        "source_path": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "source_path",
+        "reading_results",
+        "asset_results"
+      ],
+      "type": "object"
     },
     "review_id": {
       "pattern": "^V[0-9]{6}$",
@@ -79,6 +279,28 @@
       "maximum": 17,
       "minimum": 4,
       "type": "integer"
+    },
+    "trigger_hit_ids": {
+      "items": {
+        "pattern": "^H[0-9]{6}$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "trigger_search_kind": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "enum": [
+            "LOCAL",
+            "SATURATION"
+          ],
+          "type": "string"
+        }
+      ]
     }
   },
   "required": [
@@ -92,7 +314,11 @@
     "asset_ids",
     "prior_search_round_count",
     "prior_search_rounds_sha256",
+    "previous_path_result_sha256",
+    "trigger_search_kind",
+    "trigger_hit_ids",
     "input_projection_sha256",
+    "result_snapshot",
     "result_projection_sha256",
     "previous_event_sha256",
     "event_sha256"

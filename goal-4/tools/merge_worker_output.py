@@ -126,6 +126,160 @@ class MergePlan:
         }
 
 
+@dataclass(frozen=True)
+class SearchEnrichmentPlan:
+    proposal: Path
+    goal_dir: Path
+    coordinator_id: str
+    epoch: int
+    source_paths: tuple[str, ...]
+    search_round_id: str
+    trigger_hit_ids: tuple[str, ...]
+    review_ids: tuple[str, ...]
+    reading_update_count: int
+    asset_update_count: int
+    candidate_update_count: int
+    candidate_append_count: int
+    route_append_count: int
+    original_bytes: dict[str, bytes]
+    original_modes: dict[str, int]
+    proposed_bytes: dict[str, bytes]
+
+    def preview(self) -> dict[str, Any]:
+        return {
+            "proposal_kind": "SEARCH_ENRICHMENT",
+            "proposal": str(self.proposal),
+            "goal_dir": str(self.goal_dir),
+            "coordinator_id": self.coordinator_id,
+            "epoch": self.epoch,
+            "source_paths": list(self.source_paths),
+            "search_round_id": self.search_round_id,
+            "trigger_hit_ids": list(self.trigger_hit_ids),
+            "review_ids": list(self.review_ids),
+            "changes": {
+                "reading_updates": self.reading_update_count,
+                "asset_updates": self.asset_update_count,
+                "candidate_updates": self.candidate_update_count,
+                "candidate_appends": self.candidate_append_count,
+                "route_appends": self.route_append_count,
+                "search_round_appends": 1,
+                "review_event_appends": len(self.review_ids),
+            },
+            "search_ledger_preserved": False,
+            "search_fixed_point_cleared": True,
+            "search_ledger_sha256": hashlib.sha256(
+                self.proposed_bytes[SEARCH_NAME]
+            ).hexdigest(),
+            "review_history_sha256": hashlib.sha256(
+                self.proposed_bytes[REVIEW_HISTORY_NAME]
+            ).hexdigest(),
+        }
+
+
+ENRICHMENT_PROPOSAL_FIELDS = (
+    "schema_version",
+    "proposal_kind",
+    "coordinator_id",
+    "epoch",
+    "source_paths",
+    "base_artifact_sha256",
+    "reading_updates",
+    "asset_updates",
+    "candidate_updates",
+    "route_appends",
+    "proposed_search",
+)
+READING_ENRICHMENT_SCALARS = {
+    "review_disposition",
+    "source_status",
+    "uncertainty",
+    "evidence_statement",
+}
+READING_ENRICHMENT_ARRAYS = {
+    "secondary_roles",
+    "candidate_ids",
+    "route_ids",
+}
+ASSET_ENRICHMENT_ARRAYS = {"candidate_ids", "route_ids"}
+CANDIDATE_ENRICHMENT_IMMUTABLE = {
+    "id",
+    "record_status",
+    "provisional_name",
+    "discovery_stage",
+    "discovery_anchor",
+    "evidence_reassignments",
+}
+
+
+def _enrichment_proposal_schema() -> dict[str, Any]:
+    digest_properties = {
+        name: {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        for name in WRITE_NAMES
+    }
+    string_row = {"type": "string"}
+    return {
+        "type": "object",
+        "required": list(ENRICHMENT_PROPOSAL_FIELDS),
+        "properties": {
+            "schema_version": {"const": 1},
+            "proposal_kind": {"const": "SEARCH_ENRICHMENT"},
+            "coordinator_id": {"type": "string", "minLength": 1},
+            "epoch": {"type": "integer", "minimum": 1},
+            "source_paths": {
+                "type": "array",
+                "items": {"type": "string", "minLength": 1},
+                "uniqueItems": True,
+            },
+            "base_artifact_sha256": {
+                "type": "object",
+                "required": list(WRITE_NAMES),
+                "properties": digest_properties,
+                "additionalProperties": False,
+            },
+            "reading_updates": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "required": READING_HEADER,
+                    "properties": {
+                        field: string_row for field in READING_HEADER
+                    },
+                    "additionalProperties": False,
+                },
+            },
+            "asset_updates": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "required": ASSET_HEADER,
+                    "properties": {
+                        field: string_row for field in ASSET_HEADER
+                    },
+                    "additionalProperties": False,
+                },
+            },
+            "candidate_updates": {
+                "type": "array",
+                "items": {"type": "object"},
+            },
+            "route_appends": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "required": CROSS_REFERENCE_HEADER,
+                    "properties": {
+                        field: string_row
+                        for field in CROSS_REFERENCE_HEADER
+                    },
+                    "additionalProperties": False,
+                },
+            },
+            "proposed_search": {"type": "object"},
+        },
+        "additionalProperties": False,
+    }
+
+
 def _read_csv(path: Path, header: list[str]) -> list[dict[str, str]]:
     try:
         payload = path.read_bytes()
@@ -578,6 +732,204 @@ def _load_output(payload: bytes) -> dict[str, Any]:
     if not isinstance(output, dict):
         raise MergeError("worker output is not an object")
     return output
+
+
+def _read_jsonl_bytes(payload: bytes, label: str) -> list[dict[str, Any]]:
+    try:
+        text = payload.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise MergeError(f"{label} is not UTF-8") from exc
+    rows: list[dict[str, Any]] = []
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        if not line:
+            raise MergeError(f"{label} contains a blank line at {line_number}")
+        try:
+            value = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise MergeError(
+                f"{label} line {line_number} is invalid JSON"
+            ) from exc
+        if not isinstance(value, dict):
+            raise MergeError(f"{label} line {line_number} is not an object")
+        rows.append(value)
+    return rows
+
+
+def _jsonl_bytes(rows: list[dict[str, Any]]) -> bytes:
+    return b"".join(
+        (
+            json.dumps(row, ensure_ascii=False, separators=(",", ":"))
+            + "\n"
+        ).encode("utf-8")
+        for row in rows
+    )
+
+
+def _load_json_object_bytes(payload: bytes, label: str) -> dict[str, Any]:
+    try:
+        value = json.loads(payload)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise MergeError(f"{label} is invalid JSON: {exc}") from exc
+    if not isinstance(value, dict):
+        raise MergeError(f"{label} root is not an object")
+    return value
+
+
+def _load_enrichment_proposal(path: Path) -> tuple[bytes, dict[str, Any]]:
+    if not path.is_file() or path.is_symlink():
+        raise MergeError(f"enrichment proposal is missing or unsafe: {path}")
+    try:
+        payload = path.read_bytes()
+    except OSError as exc:
+        raise MergeError(f"cannot read enrichment proposal: {exc}") from exc
+    proposal = _load_json_object_bytes(payload, "enrichment proposal")
+    if payload != build_worker_bundle.canonical_json_bytes(proposal):
+        raise MergeError("enrichment proposal is not canonically serialized")
+    schema_errors = build_worker_bundle.json_schema_errors(
+        proposal,
+        _enrichment_proposal_schema(),
+        "enrichment-proposal",
+    )
+    if schema_errors:
+        raise MergeError(
+            "enrichment proposal schema failed:\n- "
+            + "\n- ".join(schema_errors)
+        )
+    return payload, proposal
+
+
+def _is_exact_prefix(old: list[Any], new: list[Any]) -> bool:
+    return len(new) >= len(old) and new[: len(old)] == old
+
+
+def _is_ordered_subset(old: list[Any], new: list[Any]) -> bool:
+    iterator = iter(new)
+    return all(any(item == candidate for candidate in iterator) for item in old)
+
+
+def _validate_string_array_additions(
+    old_value: object,
+    new_value: object,
+    label: str,
+) -> tuple[list[str], list[str]]:
+    old = _json_array(old_value, f"{label} prior")
+    new = _json_array(new_value, f"{label} proposed")
+    if not _is_exact_prefix(old, new):
+        raise MergeError(f"{label} may append values but cannot delete or reorder")
+    return old, new[len(old) :]
+
+
+def _candidate_new_evidence(
+    old: dict[str, Any] | None,
+    new: dict[str, Any],
+    *,
+    trigger_hits: dict[str, dict[str, Any]],
+    round_evidence_groups: set[str],
+) -> set[str]:
+    candidate_id = new.get("id", "<unknown>")
+    evidence = new.get("source_evidence")
+    if not isinstance(evidence, list) or not all(
+        isinstance(item, dict) for item in evidence
+    ):
+        raise MergeError(f"candidate {candidate_id} has malformed source_evidence")
+    prior_evidence: list[dict[str, Any]] = []
+    if old is not None:
+        old_evidence = old.get("source_evidence")
+        if not isinstance(old_evidence, list) or not all(
+            isinstance(item, dict) for item in old_evidence
+        ):
+            raise MergeError(
+                f"existing candidate {candidate_id} has malformed source_evidence"
+            )
+        prior_evidence = old_evidence
+        if not _is_exact_prefix(prior_evidence, evidence):
+            raise MergeError(
+                f"candidate {candidate_id} must preserve prior evidence "
+                "as an exact prefix"
+            )
+    appended = evidence[len(prior_evidence) :]
+    if not appended:
+        raise MergeError(
+            f"candidate {candidate_id} update lacks appended search evidence"
+        )
+    evidence_ids: set[str] = set()
+    for item in appended:
+        evidence_id = item.get("evidence_id")
+        group_id = item.get("evidence_group_id")
+        anchor = item.get("discovery_anchor")
+        if (
+            not isinstance(evidence_id, str)
+            or not isinstance(group_id, str)
+            or not isinstance(anchor, dict)
+            or anchor.get("kind") != "SEARCH_HIT"
+            or anchor.get("id") not in trigger_hits
+        ):
+            raise MergeError(
+                f"candidate {candidate_id} appended evidence is not anchored "
+                "to the new search hits"
+            )
+        if group_id not in round_evidence_groups:
+            raise MergeError(
+                f"candidate {candidate_id} appended evidence group {group_id} "
+                "is absent from the new search round delta"
+            )
+        hit = trigger_hits[anchor["id"]]
+        source_unit_id = item.get("source_unit_id")
+        if (
+            source_unit_id is not None
+            and source_unit_id != hit.get("source_unit_id")
+        ):
+            raise MergeError(
+                f"candidate {candidate_id} appended evidence source differs "
+                "from its trigger hit"
+            )
+        evidence_ids.add(evidence_id)
+    return evidence_ids
+
+
+def _mechanics_changes_use_new_evidence(
+    old: dict[str, Any],
+    new: dict[str, Any],
+    new_evidence_ids: set[str],
+) -> None:
+    candidate_id = new["id"]
+    old_fingerprint = old.get("fingerprint")
+    new_fingerprint = new.get("fingerprint")
+    if not isinstance(old_fingerprint, dict) or not isinstance(
+        new_fingerprint,
+        dict,
+    ):
+        raise MergeError(f"candidate {candidate_id} has malformed fingerprint")
+    for field in FINGERPRINT_FIELDS:
+        if old_fingerprint.get(field) == new_fingerprint.get(field):
+            continue
+        value = new_fingerprint.get(field)
+        evidence_ids = value.get("evidence_ids") if isinstance(value, dict) else None
+        if not isinstance(evidence_ids, list) or not (
+            set(evidence_ids) & new_evidence_ids
+        ):
+            raise MergeError(
+                f"candidate {candidate_id} changed fingerprint field {field} "
+                "without newly appended evidence"
+            )
+    for collection_name in ("parameters", "variants", "related_candidate_ids"):
+        old_items = old.get(collection_name)
+        new_items = new.get(collection_name)
+        if not isinstance(old_items, list) or not isinstance(new_items, list):
+            raise MergeError(
+                f"candidate {candidate_id}.{collection_name} is malformed"
+            )
+        for index, item in enumerate(new_items):
+            if index < len(old_items) and item == old_items[index]:
+                continue
+            evidence_ids = item.get("evidence_ids") if isinstance(item, dict) else None
+            if not isinstance(evidence_ids, list) or not (
+                set(evidence_ids) & new_evidence_ids
+            ):
+                raise MergeError(
+                    f"candidate {candidate_id}.{collection_name} changed "
+                    "without newly appended evidence"
+                )
 
 
 def _snapshot(goal_dir: Path) -> tuple[dict[str, bytes], dict[str, int]]:
