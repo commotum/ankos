@@ -128,6 +128,12 @@ PROPOSED_VOCABULARY = [
 # - F06 `remove[ds]?|removing`: B0184/U000526;
 # - F06 `leading elements?`: B0298/U005562 and B0300/U005566; and
 # - F07 `registers?|instructions?`: B0197/U000555 and B0201/U000565.
+# A subsequent hostile proof review found that B0292's direct-PROSE evidence
+# unit U005550 was reached only indirectly through candidate-linked CODE.
+# F06 therefore also carries the exact source locator
+# `rules for case (a) on page 94`.  That phrase is intentionally recorded as
+# a narrow contextual locator, not as lexical proof of tag-system mechanics;
+# the candidate ledger's governed evidence remains the semantic authority.
 # No family was added, removed, reordered, or broadened after this final
 # 229-candidate witness reconciliation.
 QUERY_SPECS = [
@@ -187,7 +193,8 @@ QUERY_SPECS = [
             r"\b(?:tag systems?|Post(?: tag)?|cyclic tag systems?|"
             r"CT(?:Step|EvolveList)|TSEvolveList|deletion number|"
             r"append(?:ed)? blocks?|tagged onto|Kolakoski|remove[ds]?|"
-            r"removing|leading elements?)\b"
+            r"removing|leading elements?|"
+            r"rules? for case \(a\) on page 94)\b"
         ),
         "REGEX",
     ),
@@ -532,12 +539,12 @@ def _candidate_coverage_projection(
         prose_witnesses = [
             pair
             for pair in witnesses
-            if pair[0] <= 9
+            if pair[0] <= 9 and pair[1] in prose_direct_units
         ]
         if prose_direct_units and not prose_witnesses:
             raise AuthoringError(
                 f"{candidate_id} has direct prose semantics but no F01-F09 "
-                "witness on that evidence"
+                "witness on one of its direct-PROSE evidence units"
             )
         nonprose_direct_units = {
             item["source_unit_id"]
