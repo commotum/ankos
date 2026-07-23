@@ -414,6 +414,28 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         raise AuthoringError(
             f"Stage 6 search triage projection drifted: {triage_digest}"
         )
+    candidate_query_ids = {
+        query["query_id"] for query in queries[:6]
+    }
+    reached_candidates = {
+        candidate_id
+        for query_id, unit_id in result_pairs
+        if query_id in candidate_query_ids
+        for candidate_id in parse_links(
+            reading_by_id[unit_id]["candidate_ids"],
+            f"{unit_id}.candidate_ids",
+        )
+    }
+    expected_candidates = {
+        f"B{value:04d}" for value in range(6, 92)
+    }
+    if reached_candidates != expected_candidates:
+        raise AuthoringError(
+            "candidate-derived Stage 6 queries do not reach exactly "
+            "B0006..B0091: "
+            f"missing={sorted(expected_candidates - reached_candidates)} "
+            f"unexpected={sorted(reached_candidates - expected_candidates)}"
+        )
     hit_start = sum(len(record.get("hits", [])) for record in rounds) + 1
     hits: list[dict[str, Any]] = []
     for offset, (query_id, unit_id) in enumerate(result_pairs):
