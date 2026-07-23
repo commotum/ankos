@@ -133,6 +133,7 @@ def preset(
     aliases: list[str] | None = None,
     extra: dict[str, str] | None = None,
     modality: str = "FORMULA",
+    image_path: str | None = None,
     missing: str | None = None,
 ) -> dict[str, Any]:
     limit = missing or (
@@ -157,7 +158,7 @@ def preset(
     }
     if extra:
         facts.update(extra)
-    return base.source_candidate(
+    spec = base.source_candidate(
         key=key,
         name=name,
         anchor=anchor,
@@ -174,6 +175,9 @@ def preset(
             )
         ],
     )
+    if image_path is not None:
+        spec["evidence"][-1]["image_path"] = image_path
+    return spec
 
 
 DIRECT_NA = [
@@ -544,6 +548,7 @@ for number in [3826, 5451, 6385, 7743, 8364, 8701, 12294, 16963, 17989]:
         ),
         family="staggered two-cell-neighborhood cellular automata",
         modality="IMAGE",
+        image_path=k3_image,
         missing=(
             "The image fixes the rule number and displayed evolution, while "
             "the exact seed and boundary convention are not stated here."

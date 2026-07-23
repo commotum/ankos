@@ -1955,6 +1955,15 @@ tree_rep = representation_candidate(
 )
 context_evidence(
     tree_rep,
+    "substitution-tree-page400-route",
+    "U000471",
+    "This unit routes the branch-tree representation to its later application "
+    "to actual tree and leaf growth.",
+    strength="LEAD_ONLY",
+    modality="CROSS_REFERENCE",
+)
+context_evidence(
+    tree_rep,
     "substitution-tree-four-case-figure",
     "U000470",
     "The original-resolution tree figure renders four co-referential substitution presets.",
@@ -3115,11 +3124,11 @@ for _spec, _route_key in [
     (tot_codes[2049], "totalistic-last-two-page66"),
     (balanced_sub, "substitution-original-page82-a"),
     (balanced_sub, "substitution-original-page82-b"),
-    (sequential, "sequential-previous-substitution-section"),
+    (sub, "sequential-previous-substitution-section"),
     (tag1, "tag1-page83-a"),
     (tag1, "tag1-page83-b"),
     (cyclic, "cyclic-previous-tag-section"),
-    (cyclic_survey, "cyclic-case-c-page83"),
+    (cyclic, "cyclic-case-c-page83"),
     (cyclic_seed, "cyclic-page83"),
     (zero_observer, "register-page122"),
     (arith_map, "register-page122"),
@@ -3139,9 +3148,15 @@ for _spec, _label, _unit in [
     (tot_codes[2049], "totalistic-code-2049-page66-route", "U000381"),
     (balanced_sub, "substitution-original-page82-route-a", "U000481"),
     (balanced_sub, "substitution-original-page82-route-b", "U000482"),
+    (
+        sub,
+        "sequential-previous-substitution-section-route",
+        "U000493",
+    ),
     (tag1, "tag-delete-one-route-a", "U000524"),
     (tag1, "tag-delete-one-route-b", "U000525"),
     (cyclic, "cyclic-tag-previous-section-route", "U000530"),
+    (cyclic, "cyclic-tag-case-c-page83-route", "U000536"),
     (cyclic_seed, "cyclic-tag-route-context", "U000539"),
     (zero_observer, "register-zero-route-context", "U000560"),
     (arith_map, "register-map-route-context", "U000560"),
@@ -3585,6 +3600,14 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
         candidate_links_by_image,
         anchor_links_by_unit,
     ) = allocate(readings, assets)
+    direct_image_paths = {
+        evidence["image_path"]
+        for proposal in candidates
+        for evidence in proposal["source_evidence"]
+        if evidence["image_path"] is not None
+        and evidence["strength"]
+        in {"DIRECT_IDENTITY", "DIRECT_PARTIAL_MECHANICS", "DIRECT_COMPLETE_MECHANICS"}
+    }
     specs_sorted = sorted(
         ALL_CANDIDATES,
         key=lambda spec: next(
@@ -3700,7 +3723,11 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
             risks = ["CONSTRUCTION_BEARING"]
             if path in TEXT_IMAGES:
                 risks.append("TEXT_BEARING")
-            transcription = "CHECKED" if path in TEXT_IMAGES else "NOT_REQUIRED"
+            transcription = (
+                "CHECKED"
+                if path in TEXT_IMAGES or path in direct_image_paths
+                else "NOT_REQUIRED"
+            )
             statement = (
                 "Original-resolution inspection confirms an evolution, long-run "
                 "history, compressed view, plot, or alternative representation"
