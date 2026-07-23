@@ -677,10 +677,11 @@ def build_bundle(
     paths = [
         path for path in allowed_stage_path_order if path in requested_set
     ]
-    if not paths or set(paths) - allowed_stage_paths:
+    unknown_paths = requested_set - allowed_stage_paths
+    if not paths or unknown_paths:
         raise ValueError(
             f"paths are not exactly within stage {stage}: "
-            f"{sorted(set(paths) - allowed_stage_paths)}"
+            f"{sorted(unknown_paths)}"
         )
 
     units = [

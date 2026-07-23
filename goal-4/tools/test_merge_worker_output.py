@@ -754,6 +754,19 @@ def test_bundle_rejects_mixed_pending_and_reviewed_projection(
         )
 
 
+def test_bundle_rejects_invalid_path_mixed_with_valid_assignment(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(ValueError, match="OUTSIDE.md"):
+        build_worker_bundle.build_bundle(
+            tmp_path / "invalid-path-bundle",
+            "invalid-path-worker",
+            4,
+            [FIRST_STAGE_4_PATH, "OUTSIDE.md"],
+            epoch=1,
+        )
+
+
 def test_epoch_two_reopen_retains_provenance_and_appends_ids(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

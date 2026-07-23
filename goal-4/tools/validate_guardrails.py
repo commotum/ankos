@@ -266,10 +266,14 @@ def validate(data: dict[str, Any]) -> list[str]:
         for required_phrase in (
             "immutable discovery epoch",
             "frozen audit traversal",
+            "first unread canonical path",
+            "Stage 4 local-search hits",
             "chapter followed by its paired Notes",
             "Stage 17 Index",
             "Stage 18 saturation",
             "reopened blind pass increments the epoch",
+            "prior search-prefix closure",
+            "active epoch",
             "root merge",
         ):
             if required_phrase not in allocation_order:
@@ -340,15 +344,39 @@ def validate(data: dict[str, Any]) -> list[str]:
         phrase in review_epoch_contract
         for phrase in (
             "PENDING reading or asset row has a blank review_epoch",
-            "positive review_epoch",
-            "1 for its initial review",
-            "formal re-review",
-            "cannot postdate",
-            "Epoch-1 LOCAL coverage is exact",
+            "positive active global review_epoch",
+            "INITIAL review may therefore occur in any active epoch",
+            "formal re-review opens the next epoch with REOPEN",
+            "Epoch 1 may end after a partial canonical prefix",
+            "matching history event at the same epoch",
+            "immutable review-history paths",
+            "before the next epoch begins",
             "zero-discovery pass",
+        )
+    ) or any(
+        stale in review_epoch_contract
+        for stale in (
+            "1 for its initial review",
+            "Epoch-1 LOCAL coverage is exact",
         )
     ):
         errors.append("review_epoch_contract is incomplete")
+    review_history_contract = data.get("review_history_contract")
+    if not isinstance(review_history_contract, str) or not all(
+        phrase in review_history_contract
+        for phrase in (
+            "review-history.jsonl",
+            "append-only V###### hash chain",
+            "exactly one canonical source path",
+            "exact ordered source-unit and asset identities",
+            "input and result projection hashes",
+            "hashed prior-search-round prefix",
+            "INITIAL consumes the first unread canonical path",
+            "Current REVIEWED/SCREENED rows equal the latest event",
+            "same epoch",
+        )
+    ):
+        errors.append("review_history_contract is incomplete")
     for key in ("evidence_application", "visual_evidence_rule"):
         if not isinstance(data.get(key), str) or not data[key].strip():
             errors.append(f"{key} must be non-empty")
@@ -576,11 +604,11 @@ def validate(data: dict[str, Any]) -> list[str]:
     if not isinstance(freeze, list) or len(freeze) < 6:
         errors.append("blind_freeze_requirements must contain the full closure contract")
     elif not any(
-        "Stages 4 through 17" in requirement
-        and "epoch-1 LOCAL rounds" in requirement
-        and "exact union of scopes" in requirement
+        "Stage 4 through 17 review-history" in requirement
+        and "(stage, epoch)" in requirement
+        and "exact LOCAL-round scope union" in requirement
+        and "before a later epoch can begin" in requirement
         and "before the Stage 18 saturation fixed point" in requirement
-        and "(stage, review_epoch)" in requirement
         and "zero-discovery passes" in requirement
         for requirement in freeze
         if isinstance(requirement, str)
@@ -662,6 +690,18 @@ def run_mutation_checks(data: dict[str, Any]) -> list[str]:
         ("missing source review epoch contract", missing_review_epoch)
     )
 
+    stale_review_epoch = copy.deepcopy(data)
+    stale_review_epoch["review_epoch_contract"] = (
+        "Every PENDING reading or asset row has a blank review_epoch. Every "
+        "reviewed row has a positive review_epoch, with 1 for its initial "
+        "review and a formal re-review later. Epoch-1 LOCAL coverage is exact."
+    )
+    mutations.append(("stale scalar review epoch contract", stale_review_epoch))
+
+    missing_review_history = copy.deepcopy(data)
+    del missing_review_history["review_history_contract"]
+    mutations.append(("missing append-only review history", missing_review_history))
+
     open_search_language = copy.deepcopy(data)
     open_search_language["search_query_language"]["fields"].append("command")
     mutations.append(("open-ended search query language", open_search_language))
@@ -692,7 +732,7 @@ def run_mutation_checks(data: dict[str, Any]) -> list[str]:
     missing_local_coverage["blind_freeze_requirements"] = [
         requirement
         for requirement in missing_local_coverage["blind_freeze_requirements"]
-        if "Stages 4 through 17" not in requirement
+        if "Stage 4 through 17 review-history" not in requirement
     ]
     mutations.append(
         ("freeze omits exact LOCAL-round coverage", missing_local_coverage)

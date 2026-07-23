@@ -1031,6 +1031,8 @@ def validate_review_history(
         if prior_event_epoch is not None:
             if epoch < prior_event_epoch:
                 errors.append(f"{prefix} moves backward to an earlier epoch")
+            elif epoch > prior_event_epoch + 1:
+                errors.append(f"{prefix} skips a global review epoch")
             elif (
                 epoch == prior_event_epoch
                 and prior_event_document_position is not None
@@ -1312,6 +1314,7 @@ def validate_objects(
     asset_record_by_id = {row.get("asset_id", ""): row for row in assets}
     asset_ids = set(asset_record_by_id)
     discovery_epochs: set[int] = set()
+    non_review_epochs: set[int] = set()
     (
         history_errors,
         history_epochs,
@@ -1504,6 +1507,7 @@ def validate_objects(
             errors.append(f"{prefix} has invalid discovery epoch")
         else:
             discovery_epochs.add(discovery_epoch)
+            non_review_epochs.add(discovery_epoch)
         try:
             discovery_ordinal = int(row["discovery_ordinal"])
         except ValueError:
@@ -2242,6 +2246,7 @@ def validate_objects(
             epoch = -1
         else:
             discovery_epochs.add(epoch)
+            non_review_epochs.add(epoch)
         if kind not in {"LOCAL", "SATURATION"}:
             errors.append(f"search round {round_index} has invalid kind")
         if not isinstance(owning_stage, int) or not 4 <= owning_stage <= 18:
@@ -2755,6 +2760,7 @@ def validate_objects(
         ):
             continue
         discovery_epochs.add(epoch)
+        non_review_epochs.add(epoch)
         anchor_stage = -1
         anchor_key: tuple[int, int, int, int, int, int] | None = None
         if kind == "SOURCE_UNIT":
@@ -2889,6 +2895,7 @@ def validate_objects(
         ):
             continue
         discovery_epochs.add(epoch)
+        non_review_epochs.add(epoch)
         candidate_epoch = candidate.get("discovery_anchor", {}).get("epoch")
         if isinstance(candidate_epoch, int) and epoch < candidate_epoch:
             errors.append(
@@ -2999,7 +3006,14 @@ def validate_objects(
     ):
         errors.append(
             "global discovery epochs are not contiguous from 1 across "
-            "candidates, evidence, routes, and search"
+            "review history, candidates, evidence, routes, and search"
+        )
+    if non_review_epochs and (
+        not history_epochs or max(non_review_epochs) > max(history_epochs)
+    ):
+        errors.append(
+            "search/non-review discovery opens an epoch not established by "
+            "append-only review history"
         )
 
     def validate_local_epoch_coverage(

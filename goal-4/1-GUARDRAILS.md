@@ -85,10 +85,11 @@ The candidate lifecycle is now append-only:
 
 - workers use local W identifiers;
 - the root merge allocates B IDs by first discovery-anchor occurrence in the
-  frozen audit traversal: Stage 4 bookends in Contents order; each Stage 5–16
-  chapter followed by its paired Notes, with units in document order and owned
-  images in manifest order; Stage 17 Index; then Stage 18 saturation
-  round/result order;
+  frozen audit traversal: Stage 4 bookends in Contents order followed by
+  Stage 4 local-search hits; each Stage 5–16 chapter followed by its paired
+  Notes, with units in document order, owned images in manifest order, and
+  that stage's local-search hits; Stage 17 Index and local-search hits; then
+  Stage 18 saturation round/result order;
 - every candidate stores an immutable discovery epoch, typed discovery anchor
   (`SOURCE_UNIT`, `IMAGE`, or a stage-owned `SEARCH_HIT`), and one-based
   within-anchor ordinal so allocation order and discovery stage can be
