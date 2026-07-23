@@ -61,6 +61,7 @@ ASSET_HEADER = [
     "reference_status",
     "inspection_status",
     "visual_role",
+    "risk_flags",
     "original_resolution_status",
     "transcription_status",
     "candidate_ids",
@@ -200,6 +201,12 @@ VISUAL_ROLES = [
     "OBSERVER",
     "DECORATIVE",
     "SOURCE_DEFECT",
+]
+VISUAL_RISK_FLAGS = [
+    "CONSTRUCTION_BEARING",
+    "TEXT_BEARING",
+    "AMBIGUOUS",
+    "CAPTION_INCOMPLETE",
 ]
 ROUTE_KINDS = ["PAGE", "SECTION", "NOTES", "INDEX", "ALIAS", "OTHER"]
 ROUTE_STATUSES = ["PENDING", "RESOLVED", "MISSING_TARGET_FINAL"]
@@ -390,6 +397,91 @@ def schema_documents() -> dict[str, dict[str, Any]]:
             },
         }
     )
+    query_schema = {
+        "type": "object",
+        "required": ["query_id", "family", "pattern", "flags", "scope_paths"],
+        "properties": {
+            "query_id": {"type": "string", "pattern": "^Q[0-9]{4}$"},
+            "family": {"type": "string"},
+            "pattern": {"type": "string"},
+            "flags": _string_array(),
+            "scope_paths": _string_array(),
+        },
+        "additionalProperties": False,
+    }
+    hit_schema = {
+        "type": "object",
+        "required": [
+            "hit_id",
+            "query_id",
+            "source_unit_id",
+            "context_sha256",
+            "disposition",
+            "candidate_ids",
+            "route_ids",
+            "rationale",
+        ],
+        "properties": {
+            "hit_id": {"type": "string", "pattern": "^H[0-9]{6}$"},
+            "query_id": {"type": "string", "pattern": "^Q[0-9]{4}$"},
+            "source_unit_id": {"type": "string", "pattern": "^U[0-9]{6}$"},
+            "context_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "disposition": {
+                "type": "string",
+                "enum": SEARCH_HIT_DISPOSITIONS,
+            },
+            "candidate_ids": _string_array(),
+            "route_ids": _string_array(),
+            "rationale": {"type": "string", "minLength": 1},
+        },
+        "additionalProperties": False,
+    }
+    round_schema = {
+        "type": "object",
+        "required": [
+            "round_id",
+            "queries",
+            "tool_assumptions",
+            "result_ids",
+            "result_digest",
+            "hits",
+            "new_vocabulary",
+            "new_candidates",
+            "new_evidence_groups",
+            "new_routes",
+            "rerun_digest",
+        ],
+        "properties": {
+            "round_id": {"type": "string", "pattern": "^S[0-9]{3}$"},
+            "queries": {"type": "array", "items": query_schema},
+            "tool_assumptions": _string_array(),
+            "result_ids": _string_array(),
+            "result_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "hits": {"type": "array", "items": hit_schema},
+            "new_vocabulary": _string_array(),
+            "new_candidates": _string_array(),
+            "new_evidence_groups": _string_array(),
+            "new_routes": _string_array(),
+            "rerun_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        },
+        "additionalProperties": False,
+    }
+    fixed_point_schema = {
+        "type": "object",
+        "required": [
+            "round_id",
+            "zero_delta",
+            "rerun_reproduced",
+            "result_digest",
+        ],
+        "properties": {
+            "round_id": {"type": "string", "pattern": "^S[0-9]{3}$"},
+            "zero_delta": {"const": True},
+            "rerun_reproduced": {"const": True},
+            "result_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        },
+        "additionalProperties": False,
+    }
     search_schema = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "title": "Blind search rounds",
@@ -407,8 +499,8 @@ def schema_documents() -> dict[str, dict[str, Any]]:
             "phase": {"const": "blind_discovery"},
             "tool_assumptions": _string_array(),
             "vocabulary": _string_array(),
-            "rounds": {"type": "array"},
-            "fixed_point": {"type": ["object", "null"]},
+            "rounds": {"type": "array", "items": round_schema},
+            "fixed_point": {"oneOf": [{"type": "null"}, fixed_point_schema]},
         },
         "additionalProperties": False,
     }
@@ -460,6 +552,17 @@ def schema_documents() -> dict[str, dict[str, Any]]:
         },
         "additionalProperties": False,
     }
+    reading_schema = _csv_row_schema(
+        "Blind reading-ledger row", READING_HEADER, reading_properties
+    )
+    cross_schema = _csv_row_schema(
+        "Blind cross-reference row",
+        CROSS_REFERENCE_HEADER,
+        cross_properties,
+    )
+    asset_schema = _csv_row_schema(
+        "Blind asset-ledger row", ASSET_HEADER, asset_properties
+    )
     worker_output_schema = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "title": "Sealed blind-worker output",
@@ -487,30 +590,22 @@ def schema_documents() -> dict[str, dict[str, Any]]:
                 "pattern": "^[0-9a-f]{64}$",
             },
             "prohibited_input_nonuse": {"const": True},
-            "reading_updates": {"type": "array"},
+            "reading_updates": {"type": "array", "items": reading_schema},
             "candidate_proposals": {
                 "type": "array",
                 "items": candidate_schema("^W[0-9]{4}$"),
             },
-            "asset_updates": {"type": "array"},
-            "route_proposals": {"type": "array"},
+            "asset_updates": {"type": "array", "items": asset_schema},
+            "route_proposals": {"type": "array", "items": cross_schema},
             "uncertainties": _string_array(),
         },
         "additionalProperties": False,
     }
     return {
-        "blind/reading-ledger-row.schema.json": _csv_row_schema(
-            "Blind reading-ledger row", READING_HEADER, reading_properties
-        ),
+        "blind/reading-ledger-row.schema.json": reading_schema,
         "blind/candidate-record.schema.json": candidate_schema(),
-        "blind/cross-reference-row.schema.json": _csv_row_schema(
-            "Blind cross-reference row",
-            CROSS_REFERENCE_HEADER,
-            cross_properties,
-        ),
-        "blind/asset-ledger-row.schema.json": _csv_row_schema(
-            "Blind asset-ledger row", ASSET_HEADER, asset_properties
-        ),
+        "blind/cross-reference-row.schema.json": cross_schema,
+        "blind/asset-ledger-row.schema.json": asset_schema,
         "blind/search-rounds.schema.json": search_schema,
         "blind/worker-output.schema.json": worker_output_schema,
         "reconciliation/classification-row.schema.json": classification_schema,
