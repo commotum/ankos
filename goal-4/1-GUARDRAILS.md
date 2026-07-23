@@ -108,25 +108,28 @@ The candidate lifecycle is now append-only:
   the order of each group's minimum allocated E;
 - every pending source/image row has a blank `review_epoch`; the initial review
   records the active global epoch and a formal re-review opens the next epoch
-  with `REOPEN`. `SEARCH_ENRICHMENT` never changes completion metadata.
+  with `REOPEN`. `SEARCH_APPEND` never changes completion metadata.
   Forward unread paths then continue in that active epoch.
   Immutable direct source/image anchors require a matching history event at
   the exact anchor epoch;
-- `review-history.jsonl` is an append-only `V######` hash chain. Each event
-  covers exactly one canonical source path, embeds the complete ordered
+- `review-history.jsonl` is an append-only `V######` hash chain of atomic
+  coordinator transactions. An event's ordered `source_paths` exactly match
+  its ordered `path_changes`; each path change embeds the complete ordered
   reading/asset result snapshot, binds its independently recomputable digest,
-  and chains the prior result for that path. `INITIAL` and `REOPEN` are full
-  semantic review snapshots and carry no search triggers. `INITIAL` consumes
-  the first unread canonical path. The first event of a later epoch is
-  `REOPEN`, and its recorded search prefix already closes every earlier
-  history scope;
-- `SEARCH_ENRICHMENT` stays in the active epoch and chains a strictly later
-  hashed search prefix containing newly visible, typed, non-exclusion H
-  triggers from that same path and epoch. Every changed reading row has an
-  exact trigger hit. Semantic scalars may change, while secondary, candidate,
-  and route arrays may only gain values carried by the trigger. Assets may
-  gain only triggered candidate/route links; completion metadata and all
-  visual/source inspection findings remain byte-for-byte unchanged;
+  and chains the prior result for that path. Full before/after candidate,
+  route, and optional search changes make replay authoritative for every
+  mutable blind ledger. `INITIAL` consumes the next unread canonical path
+  prefix, while the first transaction of a later epoch is `REOPEN` and its
+  replayed search state already closes every earlier history scope;
+- `SEARCH_APPEND` stays in the active epoch and appends exactly one LOCAL or
+  SATURATION round. Every changed reading row has an exact same-unit,
+  same-path, non-exclusion trigger hit. Semantic scalars may change, while
+  secondary, candidate, and route arrays may only gain values carried by that
+  trigger. An asset may gain candidate/route links only from non-exclusion
+  hits on the asset's own canonical assignment path; authority never crosses
+  between paths in the same transaction. Completion metadata and all
+  visual/source inspection findings remain byte-for-byte unchanged. A
+  zero-delta round may have no path changes;
 - a split tombstones the parent and allocates new children; every `SPLIT_INTO`
   edge carries a typed distinction proof plus explicit before/after rationale;
 - a merge requires a typed alias, co-reference, or proved-duplicate identity
@@ -209,11 +212,11 @@ active epoch. Epoch 1 may therefore remain a partial prefix when a justified
 reopen advances the audit, and later unread paths continue under the new
 active epoch without losing either pass from history.
 
-Every historical V event embeds its full result snapshot, so its digest remains
-independently verifiable after later review or enrichment. The latest event for
-each path must reproduce the complete current reading and asset projection
-exactly; changing evidence, disposition, links, or an image finding silently is
-therefore invalid.
+Every historical V transaction embeds a full result snapshot for each listed
+path, so every digest remains independently verifiable after later review or
+search. The latest path change must reproduce the complete current reading and
+asset projection exactly; changing evidence, disposition, links, or an image
+finding silently is therefore invalid.
 
 If one extracted unit contains multiple atomic claims requiring different
 primary dispositions, Stage 2 must split it rather than select a convenient

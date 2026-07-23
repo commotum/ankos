@@ -203,6 +203,37 @@ def test_schema_files_are_frozen() -> None:
     assert MODULE.validate_schema_files(MODULE.GOAL_DIR) == []
 
 
+def test_search_append_asset_links_require_same_path_hit_authority() -> None:
+    asset = {field: "" for field in MODULE.ASSET_REVIEW_RESULT_FIELDS}
+    asset.update(
+        {
+            "asset_id": "A000001",
+            "candidate_ids": "[]",
+            "route_ids": "[]",
+        }
+    )
+    previous = {"reading_results": [], "asset_results": [asset]}
+    current = copy.deepcopy(previous)
+    current["asset_results"][0]["candidate_ids"] = '["B0001"]'
+    current["asset_results"][0]["route_ids"] = '["R000001"]'
+    errors = []
+    MODULE._validate_search_enrichment_diff(
+        previous,
+        current,
+        set(),
+        {},
+        {},
+        {"path-a.md": {"B0001"}},
+        {"path-a.md": {"R000001"}},
+        {"A000001": "path-b.md"},
+        "path-b.md",
+        errors,
+        "cross-path regression",
+    )
+    assert any("unrelated candidate links" in error for error in errors)
+    assert any("unrelated route links" in error for error in errors)
+
+
 def test_search_query_ids_follow_global_encounter_order() -> None:
     def query(query_id: str):
         return {

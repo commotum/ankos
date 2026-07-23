@@ -6880,6 +6880,39 @@ def mutation_checks(
             failures.append(
                 "illegal image-role enrichment mutation unexpectedly passed"
             )
+        cross_path_asset_snapshot = copy.deepcopy(asset_snapshot)
+        cross_path_asset_snapshot["asset_results"][0][
+            "candidate_ids"
+        ] = '["B0001"]'
+        cross_path_asset_snapshot["asset_results"][0][
+            "route_ids"
+        ] = '["R000001"]'
+        cross_path_errors: list[str] = []
+        _validate_search_enrichment_diff(
+            asset_snapshot,
+            cross_path_asset_snapshot,
+            set(),
+            {},
+            {},
+            {path: {"B0001"}},
+            {path: {"R000001"}},
+            {
+                row["asset_id"]: row["assignment_path"]
+                for row in defect_asset
+            },
+            defect_asset_path,
+            cross_path_errors,
+            "cross-path-asset-authorization fixture",
+        )
+        if not any(
+            "unrelated candidate links" in error
+            for error in cross_path_errors
+        ) or not any(
+            "unrelated route links" in error for error in cross_path_errors
+        ):
+            failures.append(
+                "path-A search hits authorized path-B asset links"
+            )
         silent_image_role = copy.deepcopy(defect_asset)
         silent_image_role[defect_asset_index]["visual_role"] = "CONTROL"
         expect_history_failure(

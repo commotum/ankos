@@ -149,6 +149,12 @@ class SearchAppendPlan:
     proposed_bytes: dict[str, bytes]
 
     def preview(self) -> dict[str, Any]:
+        before_fixed_point = json.loads(
+            self.original_bytes[SEARCH_NAME]
+        ).get("fixed_point")
+        after_fixed_point = json.loads(
+            self.proposed_bytes[SEARCH_NAME]
+        ).get("fixed_point")
         return {
             "proposal_kind": "SEARCH_APPEND",
             "proposal": str(self.proposal),
@@ -169,7 +175,14 @@ class SearchAppendPlan:
                 "review_event_appends": len(self.review_ids),
             },
             "search_ledger_preserved": False,
-            "search_fixed_point_cleared": True,
+            "search_fixed_point_cleared": (
+                before_fixed_point is not None
+                and after_fixed_point is None
+            ),
+            "search_fixed_point_established": (
+                before_fixed_point is None
+                and after_fixed_point is not None
+            ),
             "search_ledger_sha256": hashlib.sha256(
                 self.proposed_bytes[SEARCH_NAME]
             ).hexdigest(),
