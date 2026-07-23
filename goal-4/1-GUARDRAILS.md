@@ -84,7 +84,11 @@ classified.
 The candidate lifecycle is now append-only:
 
 - workers use local W identifiers;
-- the root merge allocates B IDs by first canonical evidence order;
+- the root merge allocates B IDs by first discovery-anchor occurrence in the
+  frozen audit traversal: Stage 4 bookends in Contents order; each Stage 5–16
+  chapter followed by its paired Notes, with units in document order and owned
+  images in manifest order; Stage 17 Index; then Stage 18 saturation
+  round/result order;
 - a split tombstones the parent and allocates new children;
 - a merge requires explicit alias/co-reference or proved duplicate capture,
   keeps the earliest ID active, and retains redirect provenance;

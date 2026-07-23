@@ -299,6 +299,8 @@ def candidate_schema(id_pattern: str = "^B[0-9]{4}$") -> dict[str, Any]:
                     "POSSIBLY_SAME_AS",
                     "POSSIBLE_VARIANT_OF",
                     "SOURCE_COMPARE",
+                    "MERGED_INTO",
+                    "SPLIT_INTO",
                 ],
             },
             "evidence_ids": _string_array(),

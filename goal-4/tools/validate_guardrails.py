@@ -214,6 +214,19 @@ def validate(data: dict[str, Any]) -> list[str]:
         ):
             if not isinstance(policy.get(key), str) or not policy[key].strip():
                 errors.append(f"candidate_id_policy.{key} must be non-empty")
+        allocation_order = policy.get("allocation_order", "")
+        for required_phrase in (
+            "frozen audit traversal",
+            "chapter followed by its paired Notes",
+            "Stage 17 Index",
+            "Stage 18 saturation",
+            "root merge",
+        ):
+            if required_phrase not in allocation_order:
+                errors.append(
+                    "candidate_id_policy.allocation_order lacks "
+                    f"{required_phrase!r}"
+                )
 
     eligibility = data.get("eligibility_criteria")
     if not isinstance(eligibility, list) or len(eligibility) < 5:
