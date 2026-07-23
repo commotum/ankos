@@ -16,6 +16,37 @@
       "type": "array",
       "uniqueItems": true
     },
+    "discovery_anchor": {
+      "additionalProperties": false,
+      "properties": {
+        "epoch": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "SOURCE_UNIT",
+            "IMAGE",
+            "SEARCH_HIT"
+          ],
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "epoch",
+        "kind",
+        "id",
+        "ordinal"
+      ],
+      "type": "object"
+    },
     "discovery_stage": {
       "maximum": 18,
       "minimum": 4,
@@ -1473,7 +1504,9 @@
             "enum": [
               "POSSIBLY_SAME_AS",
               "POSSIBLE_VARIANT_OF",
-              "SOURCE_COMPARE"
+              "SOURCE_COMPARE",
+              "MERGED_INTO",
+              "SPLIT_INTO"
             ],
             "type": "string"
           },
@@ -1496,6 +1529,41 @@
         "additionalProperties": false,
         "properties": {
           "claim": {
+            "type": "string"
+          },
+          "discovery_anchor": {
+            "additionalProperties": false,
+            "properties": {
+              "epoch": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "SOURCE_UNIT",
+                  "IMAGE",
+                  "SEARCH_HIT"
+                ],
+                "type": "string"
+              },
+              "ordinal": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "epoch",
+              "kind",
+              "id",
+              "ordinal"
+            ],
+            "type": "object"
+          },
+          "evidence_group_id": {
+            "pattern": "^G[0-9]{6}$",
             "type": "string"
           },
           "evidence_id": {
@@ -1577,6 +1645,8 @@
         },
         "required": [
           "evidence_id",
+          "evidence_group_id",
+          "discovery_anchor",
           "source_unit_id",
           "image_path",
           "strength",
@@ -1649,6 +1719,7 @@
     "provisional_name",
     "aliases",
     "discovery_stage",
+    "discovery_anchor",
     "source_unit_ids",
     "source_evidence",
     "source_status",

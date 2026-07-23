@@ -113,6 +113,45 @@ def forbidden_keys(value: Any, path: str = "$") -> list[str]:
     return failures
 
 
+def blind_text_leaks(value: Any, patterns: list[re.Pattern[str]], path: str) -> list[str]:
+    failures: list[str] = []
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            failures.extend(blind_text_leaks(nested, patterns, f"{path}.{key}"))
+    elif isinstance(value, list):
+        for index, nested in enumerate(value):
+            failures.extend(
+                blind_text_leaks(nested, patterns, f"{path}[{index}]")
+            )
+    elif isinstance(value, str):
+        for pattern in patterns:
+            if pattern.search(value):
+                failures.append(f"{path} matches {pattern.pattern!r}")
+    return failures
+
+
+def load_blind_text_patterns() -> tuple[list[re.Pattern[str]], list[str]]:
+    errors: list[str] = []
+    try:
+        guardrails = json.loads(
+            (GOAL_DIR / "guardrails.json").read_text(encoding="utf-8")
+        )
+        raw_patterns = guardrails["blind_schema_policy"][
+            "free_text_review_patterns"
+        ]
+    except (OSError, KeyError, json.JSONDecodeError) as exc:
+        return [], [f"cannot load blind free-text patterns: {exc}"]
+    if not isinstance(raw_patterns, list):
+        return [], ["blind free-text patterns are not an array"]
+    compiled: list[re.Pattern[str]] = []
+    for raw in raw_patterns:
+        try:
+            compiled.append(re.compile(raw, re.IGNORECASE))
+        except (TypeError, re.error) as exc:
+            errors.append(f"invalid blind free-text pattern {raw!r}: {exc}")
+    return compiled, errors
+
+
 def stage_for_document(document: dict[str, Any]) -> int:
     kind = document["kind"]
     if kind in {
@@ -643,6 +682,53 @@ def validate_candidate(
     ):
         errors.append(f"{prefix} split tombstone needs at least two SPLIT_INTO")
 
+    reassignments = row["evidence_reassignments"]
+    if not isinstance(reassignments, list):
+        errors.append(f"{prefix}.evidence_reassignments must be an array")
+        reassignments = []
+    reassigned_from: list[str] = []
+    for reassignment in reassignments:
+        if not isinstance(reassignment, dict) or set(reassignment) != {
+            "from_evidence_id",
+            "targets",
+        }:
+            errors.append(f"{prefix} has malformed evidence reassignment")
+            continue
+        from_evidence_id = reassignment["from_evidence_id"]
+        if from_evidence_id not in local_evidence_ids:
+            errors.append(f"{prefix} reassigns unknown local evidence")
+        reassigned_from.append(from_evidence_id)
+        targets = reassignment["targets"]
+        if not isinstance(targets, list) or not targets:
+            errors.append(f"{prefix} evidence reassignment has no targets")
+            continue
+        seen_targets: set[tuple[str, str]] = set()
+        for target in targets:
+            if not isinstance(target, dict) or set(target) != {
+                "candidate_id",
+                "evidence_id",
+            }:
+                errors.append(f"{prefix} has malformed reassignment target")
+                continue
+            target_key = (target["candidate_id"], target["evidence_id"])
+            if target_key in seen_targets:
+                errors.append(f"{prefix} repeats evidence reassignment target")
+            seen_targets.add(target_key)
+            if target["candidate_id"] not in candidate_ids:
+                errors.append(f"{prefix} reassigns evidence to unknown candidate")
+            if not isinstance(target["evidence_id"], str) or not E_ID.fullmatch(
+                target["evidence_id"]
+            ):
+                errors.append(f"{prefix} has invalid target evidence ID")
+    if len(reassigned_from) != len(set(reassigned_from)):
+        errors.append(f"{prefix} reassigns one evidence item more than once")
+    if row["record_status"] == "ACTIVE" and reassignments:
+        errors.append(f"{prefix} active record has evidence reassignments")
+    if row["record_status"] != "ACTIVE" and set(reassigned_from) != local_evidence_ids:
+        errors.append(
+            f"{prefix} tombstone does not reassign every evidence item"
+        )
+
     if isinstance(row["field_support"], dict) and (
         "CONFLICTING_SOURCE" in row["field_support"].values()
     ) and (
@@ -669,6 +755,13 @@ def validate_objects(
     document_by_path = {doc["path"]: doc for doc in manifest["documents"]}
     image_by_path = {image["path"]: image for image in manifest["images"]}
     image_paths = set(image_by_path)
+    unit_position = {
+        unit["id"]: position for position, unit in enumerate(units, start=1)
+    }
+    image_position = {
+        image["path"]: position
+        for position, image in enumerate(manifest["images"], start=1)
+    }
     stage_by_path = {
         path: stage_for_document(document)
         for path, document in document_by_path.items()
@@ -756,6 +849,17 @@ def validate_objects(
                 errors.append(f"{prefix} has invalid review disposition")
             if row.get("source_status") not in SOURCE_STATUSES:
                 errors.append(f"{prefix} has invalid source status")
+            if row.get("source_status") in {
+                "AMBIGUOUS",
+                "DEFECTIVE",
+                "CONFLICTING",
+            } and not row.get("uncertainty", "").strip():
+                errors.append(f"{prefix} non-clear source lacks uncertainty boundary")
+            if (
+                row.get("visual_role") == "SOURCE_DEFECT"
+                and row.get("source_status") == "CLEAR"
+            ):
+                errors.append(f"{prefix} source-defect role has CLEAR source status")
             if not row.get("evidence_statement", "").strip():
                 errors.append(f"{prefix} lacks evidence statement")
             if not row.get("reviewer", "").strip():
@@ -898,13 +1002,19 @@ def validate_objects(
                 errors.append(f"{prefix} source unit is not reviewed")
         if source_asset is not None:
             source_path = source_asset["physical_path"]
-            expected_stage = int(
-                expected_assets[source_path]["assignment_stage"]
-            )
-            if row["discovery_kind"] == "IMAGE" and owning_stage != expected_stage:
-                errors.append(
-                    f"{prefix} image-anchored owning stage differs from asset stage"
-                )
+            assignment = expected_assets.get(source_path)
+            if assignment is None:
+                errors.append(f"{prefix} source asset assignment is unknown")
+            else:
+                expected_stage = int(assignment["assignment_stage"])
+                if (
+                    row["discovery_kind"] == "IMAGE"
+                    and owning_stage != expected_stage
+                ):
+                    errors.append(
+                        f"{prefix} image-anchored owning stage differs from "
+                        "asset stage"
+                    )
             if source_asset["inspection_status"] != "SCREENED":
                 errors.append(f"{prefix} source asset is not screened")
         defect = row["defect_boundary"].strip()
@@ -986,8 +1096,15 @@ def validate_objects(
                     str(evidence.get("evidence_group_id", "")), []
                 ).append((candidate["id"], evidence))
     split_children: set[str] = set()
+    supersession_targets: dict[str, list[str]] = {
+        candidate_id: [] for candidate_id in candidate_ids
+    }
     for candidate in candidates:
-        source_number = int(candidate["id"][1:]) if B_ID.fullmatch(candidate["id"]) else -1
+        source_number = (
+            int(candidate["id"][1:])
+            if B_ID.fullmatch(candidate["id"])
+            else -1
+        )
         for relation in candidate.get("related_candidate_ids", []):
             if not isinstance(relation, dict):
                 continue
@@ -998,13 +1115,11 @@ def validate_objects(
             target = candidate_by_id.get(target_id)
             if target is None:
                 continue
-            if target["record_status"] != "ACTIVE":
-                errors.append(
-                    f"candidate {candidate['id']} supersession target "
-                    f"{target_id} is not ACTIVE"
-                )
+            supersession_targets[candidate["id"]].append(target_id)
             target_number = (
-                int(target_id[1:]) if isinstance(target_id, str) and B_ID.fullmatch(target_id) else -1
+                int(target_id[1:])
+                if isinstance(target_id, str) and B_ID.fullmatch(target_id)
+                else -1
             )
             if relation_kind == "MERGED_INTO" and target_number >= source_number:
                 errors.append(
@@ -1018,6 +1133,110 @@ def validate_objects(
                 if target_id in split_children:
                     errors.append(f"candidate {target_id} has multiple split parents")
                 split_children.add(target_id)
+
+        direct_targets = [
+            candidate_by_id[target_id]
+            for target_id in supersession_targets[candidate["id"]]
+            if target_id in candidate_by_id
+        ]
+        if candidate["record_status"] == "MERGED_REDIRECT" and direct_targets:
+            target = direct_targets[0]
+            for field in (
+                "source_unit_ids",
+                "image_witnesses",
+                "cross_reference_ids",
+            ):
+                if not set(candidate[field]).issubset(set(target[field])):
+                    errors.append(
+                        f"candidate {candidate['id']} merge drops {field}"
+                    )
+        if candidate["record_status"] == "SPLIT_SUPERSEDED" and direct_targets:
+            for field in (
+                "source_unit_ids",
+                "image_witnesses",
+                "cross_reference_ids",
+            ):
+                target_union = set().union(
+                    *(set(target[field]) for target in direct_targets)
+                )
+                if not set(candidate[field]).issubset(target_union):
+                    errors.append(
+                        f"candidate {candidate['id']} split drops {field}"
+                    )
+
+        source_evidence = {
+            item["evidence_id"]: item
+            for item in candidate.get("source_evidence", [])
+            if isinstance(item, dict) and "evidence_id" in item
+        }
+        direct_target_ids = set(supersession_targets[candidate["id"]])
+        for reassignment in candidate.get("evidence_reassignments", []):
+            if not isinstance(reassignment, dict):
+                continue
+            source_item = source_evidence.get(reassignment.get("from_evidence_id"))
+            for mapped in reassignment.get("targets", []):
+                if not isinstance(mapped, dict):
+                    continue
+                target_id = mapped.get("candidate_id")
+                if target_id not in direct_target_ids:
+                    errors.append(
+                        f"candidate {candidate['id']} reassigns evidence outside "
+                        "its direct supersession targets"
+                    )
+                    continue
+                target_candidate = candidate_by_id.get(target_id)
+                if target_candidate is None:
+                    continue
+                target_item = next(
+                    (
+                        item
+                        for item in target_candidate["source_evidence"]
+                        if item["evidence_id"] == mapped.get("evidence_id")
+                    ),
+                    None,
+                )
+                if target_item is None:
+                    errors.append(
+                        f"candidate {candidate['id']} maps to missing target evidence"
+                    )
+                elif source_item is not None and (
+                    source_item["source_unit_id"] != target_item["source_unit_id"]
+                    or source_item["image_path"] != target_item["image_path"]
+                ):
+                    errors.append(
+                        f"candidate {candidate['id']} evidence reassignment "
+                        "changes its canonical witness"
+                    )
+
+    lineage_state: dict[str, int] = {}
+
+    def terminal_descendants(candidate_id: str) -> set[str]:
+        state = lineage_state.get(candidate_id, 0)
+        if state == 1:
+            errors.append(f"candidate lineage cycle reaches {candidate_id}")
+            return set()
+        if state == 2:
+            candidate = candidate_by_id[candidate_id]
+            if candidate["record_status"] == "ACTIVE":
+                return {candidate_id}
+        lineage_state[candidate_id] = 1
+        candidate = candidate_by_id[candidate_id]
+        if candidate["record_status"] == "ACTIVE":
+            terminals = {candidate_id}
+        else:
+            terminals: set[str] = set()
+            for target_id in supersession_targets.get(candidate_id, []):
+                if target_id in candidate_by_id:
+                    terminals.update(terminal_descendants(target_id))
+            if not terminals:
+                errors.append(
+                    f"candidate {candidate_id} lineage has no active descendant"
+                )
+        lineage_state[candidate_id] = 2
+        return terminals
+
+    for candidate_id in candidate_ids:
+        terminal_descendants(candidate_id)
 
     candidate_source_links: dict[str, set[str]] = {
         unit_id: set() for unit_id in unit_ids
@@ -1594,6 +1813,10 @@ def validate_objects(
         if any(item not in route_ids for item in delta_values["new_routes"]):
             errors.append(f"search round {round_index} names unknown new route")
         for group_id in delta_values["new_evidence_groups"]:
+            if not G_ID.fullmatch(group_id):
+                errors.append(
+                    f"search round {round_index} has invalid evidence group ID"
+                )
             group_records = evidence_by_group.get(group_id, [])
             if not group_records:
                 errors.append(
@@ -1803,13 +2026,6 @@ def validate_objects(
                     "search fixed_point final round does not scope every document"
                 )
 
-    unit_position = {
-        unit["id"]: position for position, unit in enumerate(units, start=1)
-    }
-    image_position = {
-        image["path"]: position
-        for position, image in enumerate(manifest["images"], start=1)
-    }
     anchor_ordinals: dict[tuple[int, str, str], list[int]] = {}
     prior_anchor_key: tuple[int, int, int, int, int, int] | None = None
     candidate_epochs: set[int] = set()
@@ -2045,6 +2261,22 @@ def validate_objects(
             errors.append("all-reviewed closure has pending routes")
         if fixed_point is None:
             errors.append("all-reviewed closure lacks search fixed point")
+
+    text_patterns, pattern_errors = load_blind_text_patterns()
+    errors.extend(pattern_errors)
+    for artifact_name, artifact in (
+        ("reading-ledger", reading),
+        ("candidate-ledger", candidates),
+        ("cross-reference-ledger", routes),
+        ("asset-ledger", assets),
+        ("search-rounds", search),
+    ):
+        leaks = blind_text_leaks(artifact, text_patterns, artifact_name)
+        if leaks:
+            errors.append(
+                f"{artifact_name} contains prohibited reconciliation text: "
+                + "; ".join(leaks[:10])
+            )
 
     return errors
 

@@ -1,1 +1,1 @@
-route_id,source_unit_id,literal_target,route_kind,expected_topic,owning_stage,status,target_unit_ids,attempts,vocabulary_terms,defect_boundary
+route_id,source_unit_id,source_asset_id,discovery_epoch,discovery_kind,discovery_id,discovery_ordinal,literal_target,route_kind,expected_topic,owning_stage,closure_scope,status,target_unit_ids,target_asset_ids,attempts,vocabulary_terms,defect_boundary

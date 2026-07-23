@@ -140,7 +140,8 @@
     "missing_mechanics",
     "uncertainties",
     "related_candidate_ids",
-    "cross_reference_ids"
+    "cross_reference_ids",
+    "evidence_reassignments"
   ],
   "candidate_record_statuses": [
     "ACTIVE",

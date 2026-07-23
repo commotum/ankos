@@ -7,6 +7,142 @@
       "type": "string"
     },
     "asset_updates": {
+      "items": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "type": "string"
+          },
+          "assignment_basis": {
+            "type": "string"
+          },
+          "assignment_path": {
+            "type": "string"
+          },
+          "assignment_stage": {
+            "type": "string"
+          },
+          "bytes": {
+            "type": "string"
+          },
+          "candidate_ids": {
+            "type": "string"
+          },
+          "evidence_statement": {
+            "type": "string"
+          },
+          "inspection_status": {
+            "enum": [
+              "PENDING",
+              "SCREENED"
+            ],
+            "type": "string"
+          },
+          "link_id": {
+            "type": "string"
+          },
+          "original_resolution_status": {
+            "enum": [
+              "NOT_REVIEWED",
+              "NOT_REQUIRED",
+              "REVIEWED"
+            ],
+            "type": "string"
+          },
+          "physical_path": {
+            "type": "string"
+          },
+          "reference_status": {
+            "enum": [
+              "REFERENCED",
+              "UNREFERENCED_PHYSICAL"
+            ],
+            "type": "string"
+          },
+          "review_stage": {
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "risk_flags": {
+            "type": "string"
+          },
+          "route_ids": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "source_path": {
+            "type": "string"
+          },
+          "source_status": {
+            "enum": [
+              "",
+              "CLEAR",
+              "AMBIGUOUS",
+              "DEFECTIVE",
+              "CONFLICTING"
+            ],
+            "type": "string"
+          },
+          "source_unit_id": {
+            "type": "string"
+          },
+          "transcription_status": {
+            "enum": [
+              "NOT_APPLICABLE",
+              "NOT_REQUIRED",
+              "CHECKED"
+            ],
+            "type": "string"
+          },
+          "uncertainty": {
+            "type": "string"
+          },
+          "visual_role": {
+            "enum": [
+              "",
+              "NATIVE_EVIDENCE",
+              "RELATION",
+              "CONTROL",
+              "OBSERVER",
+              "DECORATIVE",
+              "SOURCE_DEFECT"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "link_id",
+          "physical_path",
+          "sha256",
+          "bytes",
+          "source_path",
+          "source_unit_id",
+          "assignment_path",
+          "assignment_stage",
+          "assignment_basis",
+          "reference_status",
+          "inspection_status",
+          "visual_role",
+          "source_status",
+          "risk_flags",
+          "original_resolution_status",
+          "transcription_status",
+          "candidate_ids",
+          "route_ids",
+          "evidence_statement",
+          "review_stage",
+          "reviewer",
+          "uncertainty"
+        ],
+        "title": "Blind asset-ledger row",
+        "type": "object"
+      },
       "type": "array"
     },
     "bundle_sha256": {
@@ -31,6 +167,37 @@
             },
             "type": "array",
             "uniqueItems": true
+          },
+          "discovery_anchor": {
+            "additionalProperties": false,
+            "properties": {
+              "epoch": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "SOURCE_UNIT",
+                  "IMAGE",
+                  "SEARCH_HIT"
+                ],
+                "type": "string"
+              },
+              "ordinal": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "epoch",
+              "kind",
+              "id",
+              "ordinal"
+            ],
+            "type": "object"
           },
           "discovery_stage": {
             "maximum": 18,
@@ -1489,7 +1656,9 @@
                   "enum": [
                     "POSSIBLY_SAME_AS",
                     "POSSIBLE_VARIANT_OF",
-                    "SOURCE_COMPARE"
+                    "SOURCE_COMPARE",
+                    "MERGED_INTO",
+                    "SPLIT_INTO"
                   ],
                   "type": "string"
                 },
@@ -1512,6 +1681,41 @@
               "additionalProperties": false,
               "properties": {
                 "claim": {
+                  "type": "string"
+                },
+                "discovery_anchor": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "epoch": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "SOURCE_UNIT",
+                        "IMAGE",
+                        "SEARCH_HIT"
+                      ],
+                      "type": "string"
+                    },
+                    "ordinal": {
+                      "minimum": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "epoch",
+                    "kind",
+                    "id",
+                    "ordinal"
+                  ],
+                  "type": "object"
+                },
+                "evidence_group_id": {
+                  "pattern": "^G[0-9]{6}$",
                   "type": "string"
                 },
                 "evidence_id": {
@@ -1593,6 +1797,8 @@
               },
               "required": [
                 "evidence_id",
+                "evidence_group_id",
+                "discovery_anchor",
                 "source_unit_id",
                 "image_path",
                 "strength",
@@ -1665,6 +1871,7 @@
           "provisional_name",
           "aliases",
           "discovery_stage",
+          "discovery_anchor",
           "source_unit_ids",
           "source_evidence",
           "source_status",
@@ -1692,9 +1899,225 @@
       "type": "string"
     },
     "reading_updates": {
+      "items": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "block_kind": {
+            "type": "string"
+          },
+          "byte_end": {
+            "type": "string"
+          },
+          "byte_start": {
+            "type": "string"
+          },
+          "candidate_ids": {
+            "type": "string"
+          },
+          "document_order": {
+            "type": "string"
+          },
+          "evidence_statement": {
+            "type": "string"
+          },
+          "global_line_end": {
+            "type": "string"
+          },
+          "global_line_start": {
+            "type": "string"
+          },
+          "line_end": {
+            "type": "string"
+          },
+          "line_start": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "review_disposition": {
+            "enum": [
+              "",
+              "CANDIDATE",
+              "SUPPORTS_CANDIDATE",
+              "CROSS_REFERENCE",
+              "REPRESENTATION_OR_OBSERVER",
+              "APPLICATION_OR_EMULATION",
+              "HISTORICAL_ONLY",
+              "NO_CONSTRUCTION",
+              "SOURCE_DEFECT_OR_AMBIGUITY"
+            ],
+            "type": "string"
+          },
+          "review_stage": {
+            "type": "string"
+          },
+          "review_status": {
+            "enum": [
+              "PENDING",
+              "REVIEWED"
+            ],
+            "type": "string"
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "route_ids": {
+            "type": "string"
+          },
+          "secondary_roles": {
+            "type": "string"
+          },
+          "source_status": {
+            "enum": [
+              "",
+              "CLEAR",
+              "AMBIGUOUS",
+              "DEFECTIVE",
+              "CONFLICTING"
+            ],
+            "type": "string"
+          },
+          "source_unit_id": {
+            "type": "string"
+          },
+          "unit_sha256": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_unit_id",
+          "document_order",
+          "path",
+          "block_kind",
+          "byte_start",
+          "byte_end",
+          "line_start",
+          "line_end",
+          "global_line_start",
+          "global_line_end",
+          "unit_sha256",
+          "review_status",
+          "review_disposition",
+          "source_status",
+          "secondary_roles",
+          "candidate_ids",
+          "route_ids",
+          "evidence_statement",
+          "review_stage",
+          "reviewer"
+        ],
+        "title": "Blind reading-ledger row",
+        "type": "object"
+      },
       "type": "array"
     },
     "route_proposals": {
+      "items": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "attempts": {
+            "type": "string"
+          },
+          "closure_scope": {
+            "enum": [
+              "WITHIN_STAGE",
+              "CROSS_RANGE"
+            ],
+            "type": "string"
+          },
+          "defect_boundary": {
+            "type": "string"
+          },
+          "discovery_epoch": {
+            "type": "string"
+          },
+          "discovery_id": {
+            "type": "string"
+          },
+          "discovery_kind": {
+            "enum": [
+              "SOURCE_UNIT",
+              "IMAGE",
+              "SEARCH_HIT"
+            ],
+            "type": "string"
+          },
+          "discovery_ordinal": {
+            "type": "string"
+          },
+          "expected_topic": {
+            "type": "string"
+          },
+          "literal_target": {
+            "type": "string"
+          },
+          "owning_stage": {
+            "type": "string"
+          },
+          "route_id": {
+            "type": "string"
+          },
+          "route_kind": {
+            "enum": [
+              "PAGE",
+              "SECTION",
+              "NOTES",
+              "INDEX",
+              "ALIAS",
+              "OTHER"
+            ],
+            "type": "string"
+          },
+          "source_asset_id": {
+            "type": "string"
+          },
+          "source_unit_id": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "RESOLVED",
+              "MISSING_TARGET_FINAL"
+            ],
+            "type": "string"
+          },
+          "target_asset_ids": {
+            "type": "string"
+          },
+          "target_unit_ids": {
+            "type": "string"
+          },
+          "vocabulary_terms": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "route_id",
+          "source_unit_id",
+          "source_asset_id",
+          "discovery_epoch",
+          "discovery_kind",
+          "discovery_id",
+          "discovery_ordinal",
+          "literal_target",
+          "route_kind",
+          "expected_topic",
+          "owning_stage",
+          "closure_scope",
+          "status",
+          "target_unit_ids",
+          "target_asset_ids",
+          "attempts",
+          "vocabulary_terms",
+          "defect_boundary"
+        ],
+        "title": "Blind cross-reference row",
+        "type": "object"
+      },
       "type": "array"
     },
     "schema_sha256": {

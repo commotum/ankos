@@ -3,15 +3,237 @@
   "additionalProperties": false,
   "properties": {
     "fixed_point": {
-      "type": [
-        "object",
-        "null"
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "rerun_reproduced": {
+              "const": true
+            },
+            "result_digest": {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            "round_id": {
+              "pattern": "^S[0-9]{3}$",
+              "type": "string"
+            },
+            "zero_delta": {
+              "const": true
+            }
+          },
+          "required": [
+            "round_id",
+            "zero_delta",
+            "rerun_reproduced",
+            "result_digest"
+          ],
+          "type": "object"
+        }
       ]
     },
     "phase": {
       "const": "blind_discovery"
     },
     "rounds": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "epoch": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "hits": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "candidate_ids": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "context_sha256": {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                "disposition": {
+                  "enum": [
+                    "GOVERNED_CANDIDATE_OR_SUPPORT",
+                    "DUPLICATE",
+                    "CROSS_REFERENCE",
+                    "CONTROL_OR_RELATIONSHIP",
+                    "EXCLUSION"
+                  ],
+                  "type": "string"
+                },
+                "hit_id": {
+                  "pattern": "^H[0-9]{6}$",
+                  "type": "string"
+                },
+                "query_id": {
+                  "pattern": "^Q[0-9]{4}$",
+                  "type": "string"
+                },
+                "rationale": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "route_ids": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "source_unit_id": {
+                  "pattern": "^U[0-9]{6}$",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "hit_id",
+                "query_id",
+                "source_unit_id",
+                "context_sha256",
+                "disposition",
+                "candidate_ids",
+                "route_ids",
+                "rationale"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "LOCAL",
+              "SATURATION"
+            ],
+            "type": "string"
+          },
+          "new_candidates": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "new_evidence_groups": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "new_routes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "new_vocabulary": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "owning_stage": {
+            "maximum": 18,
+            "minimum": 4,
+            "type": "integer"
+          },
+          "queries": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "family": {
+                  "type": "string"
+                },
+                "flags": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "uniqueItems": true
+                },
+                "pattern": {
+                  "type": "string"
+                },
+                "query_id": {
+                  "pattern": "^Q[0-9]{4}$",
+                  "type": "string"
+                },
+                "scope_paths": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "uniqueItems": true
+                }
+              },
+              "required": [
+                "query_id",
+                "family",
+                "pattern",
+                "flags",
+                "scope_paths"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "rerun_digest": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "result_digest": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "result_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "round_id": {
+            "pattern": "^S[0-9]{3}$",
+            "type": "string"
+          },
+          "tool_assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "round_id",
+          "epoch",
+          "kind",
+          "owning_stage",
+          "queries",
+          "tool_assumptions",
+          "result_ids",
+          "result_digest",
+          "hits",
+          "new_vocabulary",
+          "new_candidates",
+          "new_evidence_groups",
+          "new_routes",
+          "rerun_digest"
+        ],
+        "type": "object"
+      },
       "type": "array"
     },
     "schema_version": {

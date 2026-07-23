@@ -48,6 +48,7 @@ MANIFEST_FIELDS = {
     "schema_version",
     "worker_id",
     "stage",
+    "discovery_epoch",
     "source_paths",
     "source_unit_count",
     "asset_count",
@@ -149,12 +150,13 @@ def sanitized_guardrails(guardrails: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def brief(worker_id: str, stage: int, paths: list[str]) -> str:
+def brief(worker_id: str, stage: int, epoch: int, paths: list[str]) -> str:
     listed = "\n".join(f"- `{path}`" for path in paths)
     return f"""# Blind Source Review
 
 Worker: `{worker_id}`
 Stage: `{stage}`
+Discovery epoch: `{epoch}`
 
 Read only the files in this bundle, in the exact source-unit order provided.
 Do not search before completing sequential reading. Do not use outside
@@ -428,9 +430,12 @@ def build_bundle(
     worker_id: str,
     stage: int,
     requested_paths: list[str],
+    epoch: int = 1,
 ) -> None:
     if output.exists():
         raise ValueError(f"output already exists: {output}")
+    if not isinstance(epoch, int) or isinstance(epoch, bool) or epoch < 1:
+        raise ValueError("discovery epoch must be a positive integer")
     manifest = json.loads((GOAL_DIR / "corpus-manifest.json").read_text())
     guardrails = json.loads((GOAL_DIR / "guardrails.json").read_text())
     allowed_stage_paths = stage_paths(manifest, stage)
@@ -474,7 +479,7 @@ def build_bundle(
         input_root / "guardrails.json",
         canonical_json_bytes(sanitized_guardrails(guardrails)),
     )
-    prompt_bytes = brief(worker_id, stage, paths).encode("utf-8")
+    prompt_bytes = brief(worker_id, stage, epoch, paths).encode("utf-8")
     write(input_root / "brief.md", prompt_bytes)
     write(
         input_root / "source-units.jsonl",
@@ -507,6 +512,7 @@ def build_bundle(
         "schema_version": 1,
         "worker_id": worker_id,
         "stage": stage,
+        "discovery_epoch": epoch,
         "source_paths": paths,
         "source_unit_count": len(selected_units),
         "asset_count": len(assets),
@@ -762,12 +768,9 @@ def _validate_worker_output(
             for index, unit_id in enumerate(assigned_units, start=1)
         }
         image_anchor_order = {
-            asset_id: len(unit_anchor_order) + index
-            for index, asset_id in enumerate(assigned_assets, start=1)
-        }
-        image_path_by_asset = {
-            asset_id: asset.get("physical_path")
-            for asset_id, asset in assigned_assets.items()
+            asset.get("physical_path"): len(unit_anchor_order) + index
+            for index, asset in enumerate(assigned_assets.values(), start=1)
+            if asset.get("physical_path")
         }
         for row in proposals:
             if not isinstance(row, dict):
@@ -790,9 +793,10 @@ def _validate_worker_output(
                 anchor_kind = anchor.get("kind")
                 anchor_id = anchor.get("id")
                 anchor_ordinal = anchor.get("ordinal")
-                if anchor.get("epoch") != 1:
+                if anchor.get("epoch") != manifest.get("discovery_epoch"):
                     errors.append(
-                        f"candidate {candidate_id} bundle discovery epoch must be 1"
+                        f"candidate {candidate_id} discovery epoch differs "
+                        "from bundle"
                     )
                 anchor_order: int | None = None
                 if not isinstance(anchor_id, str):
@@ -815,9 +819,7 @@ def _validate_worker_output(
                         errors.append(
                             f"candidate {candidate_id} anchor is outside assignment"
                         )
-                    elif image_path_by_asset.get(anchor_id) not in row.get(
-                        "image_witnesses", []
-                    ):
+                    elif anchor_id not in row.get("image_witnesses", []):
                         errors.append(
                             f"candidate {candidate_id} image anchor is not evidence"
                         )
@@ -832,7 +834,13 @@ def _validate_worker_output(
                     and not isinstance(anchor_ordinal, bool)
                     and anchor_ordinal >= 1
                 ):
-                    proposal_anchor_keys.append((1, anchor_order, anchor_ordinal))
+                    proposal_anchor_keys.append(
+                        (
+                            manifest.get("discovery_epoch"),
+                            anchor_order,
+                            anchor_ordinal,
+                        )
+                    )
             source_ids = row.get("source_unit_ids", [])
             if isinstance(source_ids, list) and (
                 not all(isinstance(item, str) for item in source_ids)
@@ -1039,8 +1047,12 @@ def _validate_worker_output(
                     )
             if row.get("owning_stage") != str(manifest.get("stage")):
                 errors.append(f"route {route_id} owning_stage differs from bundle")
-            if row.get("discovery_epoch") != "1":
-                errors.append(f"route {route_id} discovery_epoch must be 1")
+            if row.get("discovery_epoch") != str(
+                manifest.get("discovery_epoch")
+            ):
+                errors.append(
+                    f"route {route_id} discovery_epoch differs from bundle"
+                )
             if row.get("discovery_kind") == "SOURCE_UNIT":
                 if row.get("source_asset_id") or row.get("discovery_id") != row.get(
                     "source_unit_id"
@@ -1115,6 +1127,13 @@ def verify_bundle(
     stage = manifest.get("stage")
     if not isinstance(stage, int) or isinstance(stage, bool) or not 4 <= stage <= 17:
         errors.append("bundle stage must be an integer from 4 through 17")
+    discovery_epoch = manifest.get("discovery_epoch")
+    if (
+        not isinstance(discovery_epoch, int)
+        or isinstance(discovery_epoch, bool)
+        or discovery_epoch < 1
+    ):
+        errors.append("bundle discovery_epoch must be a positive integer")
     source_paths = manifest.get("source_paths")
     if not isinstance(source_paths, list) or not source_paths or not all(
         is_safe_relative_path(path) for path in source_paths
@@ -1283,8 +1302,10 @@ def verify_bundle(
     if (
         isinstance(worker_id, str)
         and isinstance(stage, int)
+        and isinstance(discovery_epoch, int)
         and source_paths
-        and prompt_bytes != brief(worker_id, stage, source_paths).encode("utf-8")
+        and prompt_bytes
+        != brief(worker_id, stage, discovery_epoch, source_paths).encode("utf-8")
     ):
         errors.append("bundle brief differs from its declared assignment")
     for term in FORBIDDEN_BRIEF_TERMS:
@@ -1517,6 +1538,12 @@ def main() -> int:
     )
     parser.add_argument("--worker-id", default="blind-worker")
     parser.add_argument("--stage", type=int)
+    parser.add_argument(
+        "--epoch",
+        type=int,
+        default=1,
+        help="positive blind-discovery epoch (1 for the initial pass)",
+    )
     parser.add_argument("--path", action="append", default=[])
     args = parser.parse_args()
 
@@ -1551,6 +1578,7 @@ def main() -> int:
             args.worker_id,
             args.stage,
             args.path,
+            args.epoch,
         )
         errors = verify_bundle(args.output.resolve())
         if errors:

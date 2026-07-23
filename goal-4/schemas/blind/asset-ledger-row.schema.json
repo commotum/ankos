@@ -57,10 +57,26 @@
     "reviewer": {
       "type": "string"
     },
+    "risk_flags": {
+      "type": "string"
+    },
+    "route_ids": {
+      "type": "string"
+    },
     "sha256": {
       "type": "string"
     },
     "source_path": {
+      "type": "string"
+    },
+    "source_status": {
+      "enum": [
+        "",
+        "CLEAR",
+        "AMBIGUOUS",
+        "DEFECTIVE",
+        "CONFLICTING"
+      ],
       "type": "string"
     },
     "source_unit_id": {
@@ -104,9 +120,12 @@
     "reference_status",
     "inspection_status",
     "visual_role",
+    "source_status",
+    "risk_flags",
     "original_resolution_status",
     "transcription_status",
     "candidate_ids",
+    "route_ids",
     "evidence_statement",
     "review_stage",
     "reviewer",

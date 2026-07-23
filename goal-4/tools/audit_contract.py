@@ -180,6 +180,7 @@ CANDIDATE_FIELDS = [
     "uncertainties",
     "related_candidate_ids",
     "cross_reference_ids",
+    "evidence_reassignments",
 ]
 FORBIDDEN_BLIND_FIELDS = [
     "t_ids",
@@ -339,6 +340,30 @@ def candidate_schema(id_pattern: str = "^B[0-9]{4}$") -> dict[str, Any]:
         },
         "additionalProperties": False,
     }
+    evidence_reassignment_schema = {
+        "type": "object",
+        "required": ["from_evidence_id", "targets"],
+        "properties": {
+            "from_evidence_id": {"type": "string"},
+            "targets": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                    "type": "object",
+                    "required": ["candidate_id", "evidence_id"],
+                    "properties": {
+                        "candidate_id": {
+                            "type": "string",
+                            "pattern": id_pattern,
+                        },
+                        "evidence_id": {"type": "string"},
+                    },
+                    "additionalProperties": False,
+                },
+            },
+        },
+        "additionalProperties": False,
+    }
     properties: dict[str, Any] = {
         "id": {"type": "string", "pattern": id_pattern},
         "record_status": {
@@ -390,6 +415,10 @@ def candidate_schema(id_pattern: str = "^B[0-9]{4}$") -> dict[str, Any]:
         "uncertainties": _string_array(),
         "related_candidate_ids": {"type": "array", "items": relation_schema},
         "cross_reference_ids": _string_array(),
+        "evidence_reassignments": {
+            "type": "array",
+            "items": evidence_reassignment_schema,
+        },
     }
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",

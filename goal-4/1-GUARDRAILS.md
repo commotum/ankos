@@ -97,6 +97,10 @@ The candidate lifecycle is now append-only:
 - a split tombstones the parent and allocates new children;
 - a merge requires explicit alias/co-reference or proved duplicate capture,
   keeps the earliest ID active, and retains redirect provenance;
+- every tombstone records an exact old-evidence-to-target-evidence
+  reassignment map; lineage may have multiple later supersession layers but
+  must remain acyclic, preserve unit/image/route coverage, and terminate in
+  active descendants;
 - same behavior, same API shape, same implementation family, or even lossless
   semantic equivalence never establishes Book candidate identity by itself.
 
