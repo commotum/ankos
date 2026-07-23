@@ -95,12 +95,17 @@ REVIEW_HISTORY_FIELDS = [
     "asset_ids",
     "prior_search_round_count",
     "prior_search_rounds_sha256",
+    "previous_path_result_sha256",
+    "trigger_search_kind",
+    "trigger_hit_ids",
     "input_projection_sha256",
+    "result_snapshot",
     "result_projection_sha256",
     "previous_event_sha256",
     "event_sha256",
 ]
-REVIEW_MODES = ["INITIAL", "REOPEN"]
+REVIEW_MODES = ["INITIAL", "REOPEN", "SEARCH_ENRICHMENT"]
+SEARCH_ENRICHMENT_TRIGGER_KINDS = ["LOCAL", "SATURATION"]
 READING_REVIEW_RESULT_FIELDS = [
     "source_unit_id",
     "review_status",
@@ -765,6 +770,83 @@ def schema_documents() -> dict[str, dict[str, Any]]:
         },
         "additionalProperties": False,
     }
+    reading_snapshot_schema = {
+        "type": "object",
+        "required": READING_REVIEW_RESULT_FIELDS,
+        "properties": {
+            field: {"type": "string"}
+            for field in READING_REVIEW_RESULT_FIELDS
+        },
+        "additionalProperties": False,
+    }
+    reading_snapshot_schema["properties"].update(
+        {
+            "source_unit_id": {
+                "type": "string",
+                "pattern": "^U[0-9]{6}$",
+            },
+            "review_status": {"const": "REVIEWED"},
+            "review_epoch": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]*$",
+            },
+            "review_disposition": {
+                "type": "string",
+                "enum": READING_DISPOSITIONS,
+            },
+            "source_status": {"type": "string", "enum": SOURCE_STATUSES},
+        }
+    )
+    asset_snapshot_schema = {
+        "type": "object",
+        "required": ASSET_REVIEW_RESULT_FIELDS,
+        "properties": {
+            field: {"type": "string"} for field in ASSET_REVIEW_RESULT_FIELDS
+        },
+        "additionalProperties": False,
+    }
+    asset_snapshot_schema["properties"].update(
+        {
+            "asset_id": {"type": "string", "pattern": "^A[0-9]{6}$"},
+            "inspection_status": {"const": "SCREENED"},
+            "review_epoch": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]*$",
+            },
+            "visual_role": {"type": "string", "enum": VISUAL_ROLES},
+            "source_status": {"type": "string", "enum": SOURCE_STATUSES},
+            "original_resolution_status": {
+                "type": "string",
+                "enum": ["NOT_REQUIRED", "REVIEWED"],
+            },
+            "transcription_status": {
+                "type": "string",
+                "enum": ["NOT_APPLICABLE", "NOT_REQUIRED", "CHECKED"],
+            },
+        }
+    )
+    review_result_snapshot_schema = {
+        "type": "object",
+        "required": [
+            "schema_version",
+            "source_path",
+            "reading_results",
+            "asset_results",
+        ],
+        "properties": {
+            "schema_version": {"const": 1},
+            "source_path": {"type": "string", "minLength": 1},
+            "reading_results": {
+                "type": "array",
+                "items": reading_snapshot_schema,
+            },
+            "asset_results": {
+                "type": "array",
+                "items": asset_snapshot_schema,
+            },
+        },
+        "additionalProperties": False,
+    }
     review_history_schema = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "title": "Append-only blind review-history event",
@@ -801,10 +883,34 @@ def schema_documents() -> dict[str, dict[str, Any]]:
                 "type": "string",
                 "pattern": "^[0-9a-f]{64}$",
             },
+            "previous_path_result_sha256": {
+                "oneOf": [
+                    {"type": "null"},
+                    {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                ]
+            },
+            "trigger_search_kind": {
+                "oneOf": [
+                    {"type": "null"},
+                    {
+                        "type": "string",
+                        "enum": SEARCH_ENRICHMENT_TRIGGER_KINDS,
+                    },
+                ]
+            },
+            "trigger_hit_ids": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "pattern": "^H[0-9]{6}$",
+                },
+                "uniqueItems": True,
+            },
             "input_projection_sha256": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{64}$",
             },
+            "result_snapshot": review_result_snapshot_schema,
             "result_projection_sha256": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{64}$",
@@ -1113,6 +1219,11 @@ def review_input_projection(
         "prior_search_rounds_sha256": event[
             "prior_search_rounds_sha256"
         ],
+        "previous_path_result_sha256": event[
+            "previous_path_result_sha256"
+        ],
+        "trigger_search_kind": event["trigger_search_kind"],
+        "trigger_hit_ids": event["trigger_hit_ids"],
         "source_units": [
             {
                 "source_unit_id": unit_id,
@@ -1141,12 +1252,7 @@ def review_result_projection(
     """Return the exact current result projection for a review event."""
     return {
         "schema_version": 1,
-        "review_id": event["review_id"],
-        "epoch": event["epoch"],
-        "stage": event["stage"],
-        "mode": event["mode"],
-        "reviewer": event["reviewer"],
-        "source_paths": event["source_paths"],
+        "source_path": event["source_paths"][0],
         "reading_results": [
             {
                 field: reading_by_id[unit_id][field]
@@ -1195,7 +1301,13 @@ def close_review_event(
         "asset_ids": list(core["asset_ids"]),
         "prior_search_round_count": len(prior_search_rounds),
         "prior_search_rounds_sha256": canonical_sha256(prior_search_rounds),
+        "previous_path_result_sha256": core.get(
+            "previous_path_result_sha256"
+        ),
+        "trigger_search_kind": core.get("trigger_search_kind"),
+        "trigger_hit_ids": list(core.get("trigger_hit_ids", [])),
         "input_projection_sha256": "",
+        "result_snapshot": {},
         "result_projection_sha256": "",
         "previous_event_sha256": previous_event_sha256,
         "event_sha256": "",
@@ -1203,8 +1315,11 @@ def close_review_event(
     event["input_projection_sha256"] = canonical_sha256(
         review_input_projection(event, unit_by_id, asset_by_id)
     )
+    event["result_snapshot"] = review_result_projection(
+        event, reading_by_id, asset_by_id
+    )
     event["result_projection_sha256"] = canonical_sha256(
-        review_result_projection(event, reading_by_id, asset_by_id)
+        event["result_snapshot"]
     )
     event["event_sha256"] = review_event_sha256(event)
     return event

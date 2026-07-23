@@ -29,6 +29,7 @@ from audit_contract import (
     MERGE_IDENTITY_PROOF_KINDS,
     READING_DISPOSITIONS,
     READING_HEADER,
+    READING_REVIEW_RESULT_FIELDS,
     REVIEW_HISTORY_FIELDS,
     REVIEW_MODES,
     REPO_ROOT,
@@ -36,10 +37,12 @@ from audit_contract import (
     ROUTE_KINDS,
     ROUTE_STATUSES,
     SEARCH_HIT_DISPOSITIONS,
+    SEARCH_ENRICHMENT_TRIGGER_KINDS,
     SECONDARY_ROLES,
     SOURCE_STATUSES,
     VISUAL_RISK_FLAGS,
     VISUAL_ROLES,
+    ASSET_REVIEW_RESULT_FIELDS,
     canonical_sha256,
     canonical_json_bytes,
     close_review_event,
@@ -904,7 +907,7 @@ def validate_candidate(
         errors.append(f"{prefix} conflicting field lacks CONFLICTING source status")
 
 
-def validate_review_history(
+def _validate_review_history_without_enrichment(
     manifest: dict[str, Any],
     units: list[dict[str, Any]],
     reading: list[dict[str, str]],

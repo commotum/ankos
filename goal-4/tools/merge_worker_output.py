@@ -1126,6 +1126,14 @@ def prepare_merge(
     prior_event_sha256 = (
         review_history[-1]["event_sha256"] if review_history else None
     )
+    latest_path_result_sha256 = {
+        event["source_paths"][0]: event["result_projection_sha256"]
+        for event in review_history
+        if isinstance(event, dict)
+        and isinstance(event.get("source_paths"), list)
+        and len(event["source_paths"]) == 1
+        and isinstance(event.get("result_projection_sha256"), str)
+    }
     review_events: list[dict[str, Any]] = []
     for offset, source_path in enumerate(source_paths):
         review_id = f"V{next_review_number + offset:06d}"
@@ -1146,6 +1154,13 @@ def prepare_merge(
                 for row in bundle_assets
                 if row["assignment_path"] == source_path
             ],
+            "previous_path_result_sha256": (
+                latest_path_result_sha256.get(source_path)
+                if review_mode == "REOPEN"
+                else None
+            ),
+            "trigger_search_kind": None,
+            "trigger_hit_ids": [],
         }
         try:
             review_event = close_review_event(
@@ -1166,6 +1181,9 @@ def prepare_merge(
         }
         review_events.append(review_event)
         prior_event_sha256 = review_event["event_sha256"]
+        latest_path_result_sha256[source_path] = review_event[
+            "result_projection_sha256"
+        ]
     proposed_review_history = review_history + review_events
 
     validation_errors = validate_audit.validate_objects(
