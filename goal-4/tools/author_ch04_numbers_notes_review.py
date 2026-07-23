@@ -1065,9 +1065,21 @@ def author(bundle: Path) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("bundle", type=Path)
+    parser.add_argument("--report", type=Path)
+    parser.add_argument("--fresh-bundle", type=Path)
+    parser.add_argument("--report-only", action="store_true")
     args = parser.parse_args()
-    result = author(args.bundle.resolve())
-    print(json.dumps(result, sort_keys=True))
+    bundle = args.bundle.resolve()
+    if not args.report_only:
+        result = author(bundle)
+        print(json.dumps(result, sort_keys=True))
+    if args.report is not None:
+        render_report(
+            bundle,
+            args.report.resolve(),
+            args.fresh_bundle.resolve() if args.fresh_bundle else None,
+        )
+        print(f"wrote report: {args.report.resolve()}")
 
 
 if __name__ == "__main__":

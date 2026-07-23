@@ -2597,7 +2597,7 @@ add_route(
     "a generalized substitution system",
     "base mechanics of generalized substitution systems used by the axis-crossing encoding",
     ["generalized substitution system", "continued fraction", "axis crossing"],
-    kind="TERM",
+    kind="OTHER",
 )
 add_route(
     "fibonacci-substitution-page83",
@@ -3361,7 +3361,25 @@ def _allocate_tail(
 
         route_ids = [route_id_by_key[key] for key in item["route_keys"]]
         related_ids = [
-            id_by_key[key] for key in item.get("related_keys", [])
+            {
+                "candidate_id": id_by_key[key],
+                "relation": "POSSIBLE_VARIANT_OF",
+                "proof_kind": "PROVISIONAL_COMPARISON",
+                "evidence_ids": [
+                    next(
+                        ev["evidence_id"]
+                        for ev in local
+                        if ev["strength"] != "LEAD_ONLY"
+                    )
+                ],
+                "before_rationale": "",
+                "after_rationale": "",
+                "uncertainty": (
+                    "The source supports family/preset membership, but this "
+                    "provisional relation is not an identity merge."
+                ),
+            }
+            for key in item.get("related_keys", [])
         ]
         values: dict[str, Any] = {
             "id": cid,
