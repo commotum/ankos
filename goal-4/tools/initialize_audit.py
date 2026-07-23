@@ -74,6 +74,7 @@ def expected_artifacts() -> dict[Path, bytes]:
                 "review_status": "PENDING",
                 "review_disposition": "",
                 "source_status": "",
+                "uncertainty": "",
                 "secondary_roles": "[]",
                 "candidate_ids": "[]",
                 "route_ids": "[]",
@@ -161,11 +162,7 @@ def expected_artifacts() -> dict[Path, bytes]:
                 "evidence_statement": "",
                 "review_stage": "",
                 "reviewer": "",
-                "uncertainty": (
-                    "No live Markdown owner; inspect as physical inventory."
-                    if link is None
-                    else ""
-                ),
+                "uncertainty": "",
             }
         )
 

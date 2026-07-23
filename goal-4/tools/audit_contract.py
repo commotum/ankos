@@ -25,6 +25,7 @@ READING_HEADER = [
     "review_status",
     "review_disposition",
     "source_status",
+    "uncertainty",
     "secondary_roles",
     "candidate_ids",
     "route_ids",

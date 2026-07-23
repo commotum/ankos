@@ -907,6 +907,7 @@ def validate_objects(
                 for key in (
                     "review_disposition",
                     "source_status",
+                    "uncertainty",
                     "evidence_statement",
                     "review_stage",
                     "reviewer",
@@ -919,14 +920,20 @@ def validate_objects(
                 errors.append(f"{prefix} has invalid review disposition")
             if row.get("source_status") not in SOURCE_STATUSES:
                 errors.append(f"{prefix} has invalid source status")
-            if row.get("source_status") in {
-                "AMBIGUOUS",
-                "DEFECTIVE",
-                "CONFLICTING",
-            } and not row.get("uncertainty", "").strip():
+            uncertainty = row.get("uncertainty", "").strip()
+            if row.get("source_status") == "CLEAR" and uncertainty:
+                errors.append(f"{prefix} CLEAR source has an uncertainty boundary")
+            if (
+                row.get("source_status") in {
+                    "AMBIGUOUS",
+                    "DEFECTIVE",
+                    "CONFLICTING",
+                }
+                and not uncertainty
+            ):
                 errors.append(f"{prefix} non-clear source lacks uncertainty boundary")
             if (
-                row.get("visual_role") == "SOURCE_DEFECT"
+                "SOURCE_DEFECT" in secondary
                 and row.get("source_status") == "CLEAR"
             ):
                 errors.append(f"{prefix} source-defect role has CLEAR source status")
@@ -1452,6 +1459,7 @@ def validate_objects(
                 or row.get("evidence_statement")
                 or row.get("review_stage")
                 or row.get("reviewer")
+                or row.get("uncertainty")
                 or linked_candidates
                 or linked_routes
                 or row.get("original_resolution_status") != "NOT_REVIEWED"
@@ -1464,6 +1472,23 @@ def validate_objects(
                 errors.append(f"{prefix} has invalid visual role")
             if row.get("source_status") not in SOURCE_STATUSES:
                 errors.append(f"{prefix} has invalid source status")
+            uncertainty = row.get("uncertainty", "").strip()
+            if row.get("source_status") == "CLEAR" and uncertainty:
+                errors.append(f"{prefix} CLEAR source has an uncertainty boundary")
+            if (
+                row.get("source_status") in {
+                    "AMBIGUOUS",
+                    "DEFECTIVE",
+                    "CONFLICTING",
+                }
+                and not uncertainty
+            ):
+                errors.append(f"{prefix} non-clear source lacks uncertainty boundary")
+            if (
+                row.get("visual_role") == "SOURCE_DEFECT"
+                and row.get("source_status") == "CLEAR"
+            ):
+                errors.append(f"{prefix} source-defect role has CLEAR source status")
             high_risk = bool(risk_flags)
             resolution = row.get("original_resolution_status")
             if high_risk and resolution != "REVIEWED":

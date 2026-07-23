@@ -1,6 +1,6 @@
 # 3-AUDIT-HARNESS
 
-Status: **COMPLETE**.
+Status: **IN PROGRESS** pending adversarial reclosure.
 
 ## Current Facts
 
