@@ -43,6 +43,34 @@ class InjectedTransactionInterrupt(BaseException):
     """Deterministic stand-in for an interruption at a transaction boundary."""
 
 
+def test_candidate_anchor_path_resolves_image_physical_path() -> None:
+    image_path = "FRONT-MATTER/example.jpeg"
+    candidate = {
+        "id": "B0001",
+        "discovery_anchor": {
+            "epoch": 1,
+            "kind": "IMAGE",
+            "id": image_path,
+            "ordinal": 1,
+        },
+    }
+    assets_by_physical_path = {
+        image_path: {
+            "asset_id": "A000001",
+            "physical_path": image_path,
+            "assignment_path": ASSIGNMENT_PATH,
+        }
+    }
+    assert (
+        merge._candidate_anchor_path(
+            candidate,
+            {},
+            assets_by_physical_path,
+        )
+        == ASSIGNMENT_PATH
+    )
+
+
 def _read_csv(path: Path) -> list[dict[str, str]]:
     with path.open(newline="", encoding="utf-8") as handle:
         return list(csv.DictReader(handle))

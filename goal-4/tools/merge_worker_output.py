@@ -970,7 +970,7 @@ def _rewrite_candidate(
 def _candidate_anchor_path(
     candidate: dict[str, Any],
     unit_by_id: dict[str, dict[str, Any]],
-    asset_by_id: dict[str, dict[str, str]],
+    asset_by_physical_path: dict[str, dict[str, str]],
 ) -> str:
     """Resolve a blind-worker candidate's owning review path."""
     candidate_id = candidate.get("id", "<unknown>")
@@ -984,7 +984,7 @@ def _candidate_anchor_path(
         if source_unit is not None and isinstance(source_unit.get("path"), str):
             return source_unit["path"]
     elif kind == "IMAGE" and isinstance(anchor_id, str):
-        asset = asset_by_id.get(anchor_id)
+        asset = asset_by_physical_path.get(anchor_id)
         if asset is not None and isinstance(asset.get("assignment_path"), str):
             return asset["assignment_path"]
     elif kind == "SEARCH_HIT":
@@ -2321,12 +2321,15 @@ def _prepare_merge_locked(
         row["source_unit_id"]: row for row in proposed_reading
     }
     result_asset_by_id = {row["asset_id"]: row for row in proposed_assets}
+    result_asset_by_physical_path = {
+        row["physical_path"]: row for row in proposed_assets
+    }
     candidate_changes: list[dict[str, Any]] = []
     for candidate in mapped_candidates:
         anchor_path = _candidate_anchor_path(
             candidate,
             unit_by_id,
-            result_asset_by_id,
+            result_asset_by_physical_path,
         )
         if anchor_path not in source_path_set:
             raise MergeError(

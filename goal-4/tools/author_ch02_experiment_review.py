@@ -3243,6 +3243,27 @@ add_route(
     vocabulary=["numbering of rules", "elementary rule", "page 53"],
 )
 add_route(
+    key="main-primes-page132",
+    unit="U000293",
+    literal="the distribution of prime numbers (see page 132)",
+    topic="prime-number generation and distribution",
+    vocabulary=["prime numbers", "generating primes", "page 132"],
+)
+add_route(
+    key="main-pi-page136",
+    unit="U000294",
+    literal="digit sequence of a number like pi ... (see page 136)",
+    topic="digit-sequence construction for pi",
+    vocabulary=["digits of pi", "simple rules", "page 136"],
+)
+add_route(
+    key="main-iterated-maps-page149",
+    unit="U000297",
+    literal="iterated maps ... discuss on page 149",
+    topic="iterated-map native mechanics",
+    vocabulary=["iterated maps", "complexity", "page 149"],
+)
+add_route(
     key="built-in-ca-page867",
     unit="U004984",
     literal="the built-in CellularAutomaton function ... discussed on page 867",
@@ -3294,6 +3315,13 @@ add_route(
     vocabulary=["Cantor set", "continuous mapping", "cellular automaton"],
 )
 add_route(
+    key="symbolic-ca-formula-page618",
+    unit="U005109",
+    literal="such formulas rapidly become very complicated, as discussed on page 618",
+    topic="symbolic closed formulas for cellular-automaton cell values",
+    vocabulary=["formula", "cell value", "cellular automaton"],
+)
+add_route(
     key="rule170-page153",
     unit="U005112",
     literal="compare page 153",
@@ -3306,6 +3334,20 @@ add_route(
     literal="As shown on page 611",
     topic="Pascal-triangle parity construction",
     vocabulary=["Pascal's triangle", "binomial coefficients", "modulo 2"],
+)
+add_route(
+    key="rule90-count-page902",
+    unit="U005114",
+    literal="DigitCount[t, 2, 1] is plotted on page 902",
+    topic="Rule 90 black-cell count function",
+    vocabulary=["rule 90", "DigitCount", "black cells"],
+)
+add_route(
+    key="rule90-position-page117",
+    unit="U005114",
+    literal="the connection with the picture on page 117",
+    topic="Rule 90 black-cell position construction",
+    vocabulary=["rule 90", "positions", "page 117"],
 )
 add_route(
     key="pascal-polynomial-page1091",
@@ -3341,6 +3383,27 @@ add_route(
     literal="See also page 922 for the continuous case.",
     topic="continuous analog of the additive-rule construction",
     vocabulary=["additive", "continuous case", "page 922"],
+)
+add_route(
+    key="rule90-dimension-page933",
+    unit="U005119",
+    literal="fractal dimension ... (see page 933)",
+    topic="fractal-dimension definition applied to Rule 90",
+    vocabulary=["rule 90", "fractal dimension", "page 933"],
+)
+add_route(
+    key="rule90-sierpinski-page934",
+    unit="U005119",
+    literal="a Sierpinski pattern (see page 934)",
+    topic="Sierpinski-pattern construction and Rule 90 correspondence",
+    vocabulary=["Sierpinski pattern", "rule 90", "page 934"],
+)
+add_route(
+    key="rule90-additive-page955",
+    unit="U005119",
+    literal="additive rules (see page 955)",
+    topic="additive-rule nesting property and construction class",
+    vocabulary=["additive rules", "nesting", "page 955"],
 )
 add_route(
     key="gcd-page613",
@@ -3655,6 +3718,78 @@ RELATION_IMAGE_UNITS = {
 CONTROL_IMAGE_UNITS = {"U005240"}
 
 
+def justify_not_applicable(
+    spec: CandidateSpec,
+    fields: list[str],
+    reason: str,
+) -> None:
+    not_applicable = spec.setdefault("not_applicable", {})
+    source_evidence = spec["evidence"][0]
+    for field in fields:
+        if field in spec["facts"]:
+            continue
+        not_applicable[field] = reason
+        if field not in source_evidence["fields"]:
+            source_evidence["fields"].append(field)
+
+
+direct_object_reason = (
+    "This object is evaluated directly as a function or relation over supplied "
+    "coordinates; it has no native iterated transition for this field."
+)
+for key in {
+    "pascal-mod2",
+    "rule60-pattern",
+    "binomial-mod2-array",
+    "multinomial-mod2-array",
+    "stirling1-mod2-array",
+    "stirling2-mod2-array",
+    "gcd-pattern",
+    "jacobi-pattern",
+    "bitand-function",
+    "bitor-function",
+    "bitxor-function",
+    "munching-squares",
+    "bitand-curve",
+    "bitor-curve",
+    "bitxor-curve",
+}:
+    justify_not_applicable(
+        next(item for item in ALL_CANDIDATE_SPECS if item["key"] == key),
+        [
+            "native_time",
+            "visible_history",
+            "control_state",
+            "seed",
+            "boundary",
+            "external_data",
+            "frontier_or_activation",
+            "schedule",
+            "read_dependencies_or_neighborhood",
+            "write_replacement_assembly_or_commit",
+            "witness_semantics",
+        ],
+        direct_object_reason,
+    )
+justify_not_applicable(
+    center_column,
+    [
+        "control_state",
+        "boundary",
+        "external_data",
+        "frontier_or_activation",
+        "schedule",
+        "read_dependencies_or_neighborhood",
+        "write_replacement_assembly_or_commit",
+        "witness_semantics",
+    ],
+    (
+        "This candidate is a deterministic projection/query over an underlying "
+        "Rule 30 history, not a second native transition system."
+    ),
+)
+
+
 def anchor_order_maps(
     reading_input: list[dict[str, str]],
     asset_input: list[dict[str, str]],
@@ -3882,6 +4017,18 @@ def allocate_semantic_records(
                     "evidence_ids": supporting_ids,
                     "reason": "",
                 }
+            elif field in spec.get("not_applicable", {}):
+                if not supporting_ids:
+                    raise AuthoringError(
+                        f"{spec['key']} has no evidence for not-applicable field {field}"
+                    )
+                field_support[field] = "NOT_APPLICABLE"
+                fingerprint[field] = {
+                    "status": "NOT_APPLICABLE",
+                    "value": None,
+                    "evidence_ids": supporting_ids,
+                    "reason": spec["not_applicable"][field],
+                }
             else:
                 if supporting_ids:
                     raise AuthoringError(
@@ -3975,3 +4122,349 @@ def allocate_semantic_records(
         dict(candidate_links_by_image),
         dict(anchor_candidate_links_by_unit),
     )
+
+
+def unit_number(unit_id: str) -> int:
+    return int(unit_id[1:])
+
+
+def default_reading_judgment(
+    row: dict[str, str],
+) -> tuple[str, list[str], str]:
+    number = unit_number(row["source_unit_id"])
+    if row["block_kind"] == "image":
+        return (
+            "REPRESENTATION_OR_OBSERVER",
+            ["REPRESENTATION"],
+            (
+                "Reviewed with its surrounding source and at original image "
+                "resolution; this unlinked image is an output, comparison, or "
+                "historical representation rather than native mechanics."
+            ),
+        )
+    if row["path"] == EXPECTED_PATHS[0]:
+        if number >= 258:
+            return (
+                "HISTORICAL_ONLY",
+                ["HISTORICAL_MENTION", "CONTROL_OR_COMPARISON"],
+                (
+                    "Reviewed in full; this unit supplies historical, "
+                    "methodological, or behavior context without a separately "
+                    "delimited native construction."
+                ),
+            )
+        if row["block_kind"] in {"caption", "code"}:
+            return (
+                "REPRESENTATION_OR_OBSERVER",
+                ["REPRESENTATION", "BEHAVIOR_OR_OUTCOME"],
+                (
+                    "Reviewed in context; the caption or display describes an "
+                    "output/representation already governed by candidate evidence "
+                    "elsewhere and does not add a separate construction."
+                ),
+            )
+        return (
+            "NO_CONSTRUCTION",
+            ["BEHAVIOR_OR_OUTCOME", "CONTROL_OR_COMPARISON"],
+            (
+                "Reviewed in full; this main-text unit discusses observed "
+                "behavior, explanatory framing, or methodology without a new "
+                "identity-plus-mechanics construction."
+            ),
+        )
+    if number <= 5111:
+        return (
+            "REPRESENTATION_OR_OBSERVER",
+            ["IMPLEMENTATION_DETAIL", "REPRESENTATION"],
+            (
+                "Reviewed in full; this Notes unit is implementation syntax, "
+                "an algebraic/Boolean encoding, a display control, or an output "
+                "representation rather than an additional native construction."
+            ),
+        )
+    if number <= 5149:
+        return (
+            "REPRESENTATION_OR_OBSERVER",
+            ["OBSERVER_OR_ANALYZER", "BEHAVIOR_OR_OUTCOME", "REPRESENTATION"],
+            (
+                "Reviewed in full; this Notes unit records a property, test, "
+                "plot, or observer result and is not a distinct native law."
+            ),
+        )
+    if number <= 5166:
+        return (
+            "NO_CONSTRUCTION",
+            ["CONTROL_OR_COMPARISON", "APPLICATION"],
+            (
+                "Reviewed in full; this reactions/design discussion supplies "
+                "comparison or application context without reproducible native mechanics."
+            ),
+        )
+    return (
+        "HISTORICAL_ONLY",
+        ["HISTORICAL_MENTION", "CONTROL_OR_COMPARISON"],
+        (
+            "Reviewed in full; this historical or cultural unit either lacks a "
+            "delimited construction procedure or repeats a separately captured "
+            "candidate without adding native mechanics."
+        ),
+    )
+
+
+def candidate_secondary_roles(
+    unit_id: str,
+    candidate_ids: list[str],
+    candidate_specs_by_id: dict[str, CandidateSpec],
+    block_kind: str,
+) -> list[str]:
+    roles: list[str] = []
+    keys = {candidate_specs_by_id[item]["key"] for item in candidate_ids}
+    if keys & SEED_KEYS:
+        roles.append("SEED_INPUT_OR_BOUNDARY")
+    if keys & HISTORICAL_CANDIDATE_KEYS:
+        roles.append("HISTORICAL_MENTION")
+    if block_kind == "image":
+        roles.append("REPRESENTATION")
+    if unit_id in {"U005145", "U005146"}:
+        roles.append("OBSERVER_OR_ANALYZER")
+    return list(dict.fromkeys(roles))
+
+
+def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
+    manifest = json.loads(
+        (bundle / "allowed-manifest.json").read_text(encoding="utf-8")
+    )
+    if (
+        manifest.get("worker_id") != EXPECTED_WORKER
+        or manifest.get("content_set_sha256") != EXPECTED_CONTENT_SET
+        or manifest.get("source_paths") != EXPECTED_PATHS
+        or manifest.get("source_unit_count") != 489
+        or manifest.get("asset_count") != 78
+        or manifest.get("stage") != 6
+        or manifest.get("discovery_epoch") != 1
+    ):
+        raise AuthoringError("bundle is not the exact Stage 6 epoch-1 assignment")
+
+    output_path = bundle / "output" / "output.json"
+    original_bytes = output_path.read_bytes()
+    output = json.loads(original_bytes)
+    reading_input = read_csv(bundle / "input" / "reading-input.csv")
+    asset_input = read_csv(bundle / "input" / "asset-input.csv")
+    scaffold = prepare_review_output.scaffold_output(
+        prepare_review_output.expected_template(bundle, manifest),
+        reading_input,
+        asset_input,
+    )
+    if output != scaffold:
+        raise AuthoringError(
+            "worker output is not the exact nonsemantic scaffold; refusing "
+            "to overwrite review work"
+        )
+
+    (
+        candidate_proposals,
+        route_proposals,
+        candidate_links_by_unit,
+        candidate_links_by_image,
+        anchor_candidate_links_by_unit,
+    ) = allocate_semantic_records(reading_input, asset_input)
+    candidate_specs_sorted = sorted(
+        ALL_CANDIDATE_SPECS,
+        key=lambda spec: next(
+            index
+            for index, candidate in enumerate(candidate_proposals)
+            if candidate["provisional_name"] == spec["name"]
+            and candidate["discovery_anchor"]["id"] == spec["anchor"]
+        ),
+    )
+    if len(candidate_specs_sorted) != len(candidate_proposals):
+        raise AuthoringError("candidate proposal/spec allocation differs")
+    candidate_specs_by_id = {
+        proposal["id"]: spec
+        for proposal, spec in zip(candidate_proposals, candidate_specs_sorted)
+    }
+    route_links_by_unit: defaultdict[str, list[str]] = defaultdict(list)
+    for route in route_proposals:
+        route_links_by_unit[route["source_unit_id"]].append(route["route_id"])
+
+    reading_updates: list[dict[str, str]] = []
+    for original in reading_input:
+        row = deepcopy(original)
+        unit_id = row["source_unit_id"]
+        candidate_ids = candidate_links_by_unit.get(unit_id, [])
+        route_ids = route_links_by_unit.get(unit_id, [])
+        if candidate_ids:
+            is_anchor = bool(
+                set(candidate_ids)
+                & set(anchor_candidate_links_by_unit.get(unit_id, []))
+            )
+            disposition = "CANDIDATE" if is_anchor else "SUPPORTS_CANDIDATE"
+            secondary = candidate_secondary_roles(
+                unit_id,
+                candidate_ids,
+                candidate_specs_by_id,
+                row["block_kind"],
+            )
+            names = [
+                candidate_specs_by_id[item]["name"] for item in candidate_ids
+            ]
+            statement = (
+                f"This unit {'discovers' if is_anchor else 'supports'} "
+                f"{', '.join(candidate_ids)} ({'; '.join(names)}) with "
+                "source-grounded identity, mechanics, representation limits, "
+                "or explicit uncertainty."
+            )
+            if route_ids:
+                statement += (
+                    f" It also originates {', '.join(route_ids)} for mechanics "
+                    "or relations not completed in this unit."
+                )
+        elif route_ids:
+            disposition = "CROSS_REFERENCE"
+            secondary = (
+                ["HISTORICAL_MENTION", "CONTROL_OR_COMPARISON"]
+                if unit_number(unit_id) >= 5227
+                else ["CONTROL_OR_COMPARISON"]
+            )
+            statement = (
+                f"Reviewed in full; this unit originates "
+                f"{', '.join(route_ids)} to construction-bearing targets while "
+                "remaining route, context, property, or representation evidence here."
+            )
+        else:
+            disposition, secondary, statement = default_reading_judgment(row)
+        row.update(
+            {
+                "review_status": "REVIEWED",
+                "review_epoch": "1",
+                "review_disposition": disposition,
+                "source_status": "CLEAR",
+                "uncertainty": "",
+                "secondary_roles": compact(secondary),
+                "candidate_ids": compact(candidate_ids),
+                "route_ids": compact(route_ids),
+                "evidence_statement": statement,
+                "review_stage": "6",
+                "reviewer": EXPECTED_WORKER,
+            }
+        )
+        reading_updates.append(row)
+
+    asset_updates: list[dict[str, str]] = []
+    for original in asset_input:
+        row = deepcopy(original)
+        image_path = row["physical_path"]
+        source_unit_id = row["source_unit_id"]
+        candidate_ids = candidate_links_by_image.get(image_path, [])
+        if candidate_ids:
+            visual_role = "NATIVE_EVIDENCE"
+            risk_flags = ["CONSTRUCTION_BEARING"]
+            transcription_status = "CHECKED"
+            statement = (
+                "Original-resolution inspection confirms construction-bearing "
+                f"visual evidence for {', '.join(candidate_ids)}; only visibly "
+                "unambiguous geometry, symbols, or lookup cases are used."
+            )
+        elif image_path == "CHAPTERS/_page_38_Chapter_Opener.jpeg":
+            visual_role = "DECORATIVE"
+            risk_flags = []
+            transcription_status = "NOT_REQUIRED"
+            statement = (
+                "Original-resolution inspection confirms a decorative Chapter 2 "
+                "opener without a captioned rule, seed, or construction."
+            )
+        elif source_unit_id in RELATION_IMAGE_UNITS:
+            visual_role = "RELATION"
+            risk_flags = ["CONSTRUCTION_BEARING"]
+            transcription_status = "NOT_REQUIRED"
+            statement = (
+                "Original-resolution inspection confirms a historical ornament "
+                "or comparison image; surrounding text does not supply enough "
+                "mechanics to use it as native candidate evidence."
+            )
+        elif source_unit_id in CONTROL_IMAGE_UNITS:
+            visual_role = "CONTROL"
+            risk_flags = ["TEXT_BEARING"]
+            transcription_status = "CHECKED"
+            statement = (
+                "Original-resolution inspection confirms a historical publication-"
+                "count/control figure, not a construction law."
+            )
+        else:
+            visual_role = "OBSERVER"
+            risk_flags = ["CONSTRUCTION_BEARING"]
+            transcription_status = "NOT_REQUIRED"
+            statement = (
+                "Original-resolution inspection confirms an evolution, plot, "
+                "rendered output, or comparison view; its native mechanics are "
+                "supplied by prose/formula evidence or remain absent."
+            )
+        row.update(
+            {
+                "inspection_status": "SCREENED",
+                "review_epoch": "1",
+                "visual_role": visual_role,
+                "source_status": "CLEAR",
+                "risk_flags": compact(risk_flags),
+                "original_resolution_status": "REVIEWED",
+                "transcription_status": transcription_status,
+                "candidate_ids": compact(candidate_ids),
+                "route_ids": "[]",
+                "evidence_statement": statement,
+                "review_stage": "6",
+                "reviewer": EXPECTED_WORKER,
+                "uncertainty": "",
+            }
+        )
+        asset_updates.append(row)
+
+    proposed = deepcopy(output)
+    proposed.update(
+        {
+            "prohibited_input_nonuse": False,
+            "reading_updates": reading_updates,
+            "candidate_proposals": candidate_proposals,
+            "asset_updates": asset_updates,
+            "route_proposals": route_proposals,
+            "uncertainties": [
+                (
+                    "The Rule 90 striped-background inline artwork is preserved "
+                    "without inventing a numeric block transcription."
+                ),
+                (
+                    "Historically named partial cellular automata retain exact "
+                    "missing transition, seed, boundary, and witness mechanics "
+                    "as source limits for later routed review."
+                ),
+            ],
+        }
+    )
+    return original_bytes, proposed
+
+
+def main() -> int:
+    if len(sys.argv) != 2:
+        print(f"usage: {Path(sys.argv[0]).name} BUNDLE", file=sys.stderr)
+        return 2
+    bundle = Path(sys.argv[1]).resolve()
+    try:
+        with prepare_review_output.output_lock(bundle):
+            original_bytes, proposed = build_output(bundle)
+            prepare_review_output.atomic_replace(
+                bundle / "output" / "output.json",
+                canonical_json_bytes(proposed),
+                original_bytes,
+            )
+    except (OSError, csv.Error, json.JSONDecodeError, AuthoringError, ValueError) as exc:
+        print(f"Chapter 2 authoring failed: {exc}", file=sys.stderr)
+        return 1
+    print(
+        "recorded Stage 6 Chapter 2 review: "
+        f"reading=489 assets=78 candidates={len(ALL_CANDIDATE_SPECS)} "
+        f"routes={len(ALL_ROUTE_SPECS)} declaration=false"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
