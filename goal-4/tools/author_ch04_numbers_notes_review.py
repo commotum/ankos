@@ -1825,6 +1825,10 @@ for pde_name in (
         },
     )
 
+amend_spec(
+    "irrational-rotation multiple sequence",
+    uids=["U005678", "U005680", "U005681"],
+)
 
 # Source-grounded relationship names are retained without allocating forbidden
 # global B IDs.  The blind schema only permits B IDs in related_candidate_ids;
@@ -1843,6 +1847,36 @@ RELATION_GROUPS = [
     ("continuous cellular-automaton averaging implementation", "page-157 continuous-CA transfer-rule preset", "page-158 continuous-CA offset-rule preset", "continuous-CA background trajectory", "continuous-CA center-cell color observer"),
     ("Klein-Gordon PDE relation", "Klein-Gordon exact pulse solution"),
     ("finite-difference PDE discretization family", "Courant stability constraint", "explicit second-order PDE finite-difference solver", "PDE convergence observer"),
+    (
+        "irrational-rotation multiple sequence",
+        "Beatty-difference digit sequence",
+        "continued-fraction-derived substitution generator",
+    ),
+    (
+        "nth-prime asymptotic approximation",
+        "prime-counting approximation family",
+    ),
+    (
+        "prime-counting approximation family",
+        "Riemann zeta denotation",
+    ),
+    (
+        "prime-counting approximation family",
+        "Riemann-hypothesis constraint",
+    ),
+    (
+        "normal-number constraint",
+        "Stoneham normal-number family",
+    ),
+    (
+        "normal-number constraint",
+        "successive-integer concatenation sequence",
+    ),
+    (
+        "exact multiplier-mod-one map",
+        "fixed-binary-precision shift-map simulation",
+        "fixed-decimal-precision shift-map simulation",
+    ),
 ]
 for group in RELATION_GROUPS:
     for name in group:
@@ -1851,6 +1885,70 @@ for group in RELATION_GROUPS:
         spec["relation_names"] = tuple(dict.fromkeys(
             list(spec.get("relation_names", ())) + list(peers)
         ))
+
+# These hostile-reviewed comparisons receive their own candidate-local source
+# evidence records.  They remain comparisons only; none is an identity merge.
+RELATION_EVIDENCE_GROUPS = (
+    (
+        (
+            "irrational-rotation multiple sequence",
+            "Beatty-difference digit sequence",
+            "continued-fraction-derived substitution generator",
+        ),
+        "U005681",
+    ),
+    (
+        (
+            "nth-prime asymptotic approximation",
+            "prime-counting approximation family",
+        ),
+        "U005810",
+    ),
+    (
+        (
+            "prime-counting approximation family",
+            "Riemann zeta denotation",
+        ),
+        "U005956",
+    ),
+    (
+        (
+            "prime-counting approximation family",
+            "Riemann-hypothesis constraint",
+        ),
+        "U005956",
+    ),
+    (
+        (
+            "normal-number constraint",
+            "Stoneham normal-number family",
+        ),
+        "U005860",
+    ),
+    (
+        (
+            "normal-number constraint",
+            "successive-integer concatenation sequence",
+        ),
+        "U005860",
+    ),
+    (
+        (
+            "exact multiplier-mod-one map",
+            "fixed-binary-precision shift-map simulation",
+            "fixed-decimal-precision shift-map simulation",
+        ),
+        "U005978",
+    ),
+)
+RELATION_EVIDENCE_ANCHORS: dict[tuple[str, str], tuple[str, ...]] = {}
+for relation_group, relation_anchor in RELATION_EVIDENCE_GROUPS:
+    for relation_source in relation_group:
+        for relation_peer in relation_group:
+            if relation_source != relation_peer:
+                RELATION_EVIDENCE_ANCHORS[
+                    (relation_source, relation_peer)
+                ] = (relation_anchor,)
 
 
 ROUTES = [
@@ -2993,7 +3091,11 @@ def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) ->
         "",
         "## Hostile-review repair summary",
         "",
-        "- Replaced the kind-wide profile template with 28 explicit source-limited decisions per candidate.",
+        "- Replaced the remaining kind-wide generator inferences with candidate-specific state semantics: Gray code, the two FoldList sequence-(c) formulations, and Ulam retain their stated seeds/history, while the three direct Table/Flatten/Union denotations have no invented frontier, schedule, or commit.",
+        "- Recorded source-supported initial conditions and history/closed-form boundaries for the AGM solver, continued-fraction trajectory, Gauss/multiplier/tent maps, and both finite-storage shift-map representations.",
+        "- Transcribed the complete continued-fraction substitution, parity-trace reconstruction, sequence-(d), sequence-(c), and AGM laws; every law spanning two source units is partial at both units and complete only through their joint field evidence.",
+        "- Restored the two-Gaussian periodic preset, the dimensional stationary-square-pulse preset, and the split PDEKernel/PDEStep provenance without inventing unstated grid, domain, pulse, or boundary details.",
+        "- Added symmetric candidate-local comparison evidence for the irrational/Beatty/substitution family, prime/zeta family, normality witnesses, and exact-versus-finite shift maps; all remain provisional comparisons rather than identity merges.",
         "- Every `UNKNOWN_FROM_SOURCE` reason is reproduced verbatim in that candidate's `missing_mechanics`; every supported/N/A/conflicting field cites only its declared unit/image anchors.",
         "- Split, corrected, or added the Gray/bitwise, universal/per-seed 3n+1, case-(b)/(c), evaluation-policy, prime approximation, perfect/pluperfect/quasiperfect, Stoneham, continuous-CA-rule, and non-autonomous-ODE records identified by hostile review.",
         "- Removed the overcaptured named numerical-method list, retained failure/partiality/conflict semantics, and represented local candidate comparisons with worker-local provisional relations.",
@@ -3137,6 +3239,7 @@ def author(bundle: Path) -> dict[str, Any]:
         modality: str,
         claim: str,
         fields: list[str],
+        relation_peer: str | None = None,
     ) -> None:
         nonlocal serial
         serial += 1
@@ -3152,6 +3255,7 @@ def author(bundle: Path) -> dict[str, Any]:
             "modality": modality,
             "claim": claim,
             "fields": fields,
+            "relation_peer": relation_peer,
         })
 
     def source_modality(uid: str, fields: list[str]) -> str:
@@ -3187,6 +3291,15 @@ def author(bundle: Path) -> dict[str, Any]:
                     else "DIRECT_PARTIAL_MECHANICS"
                 )
             return "CONTEXTUAL"
+        if any(
+            anchor in spec["_decisions"][field]["anchors"]
+            and len(spec["_decisions"][field]["anchors"]) > 1
+            for field in fields
+        ):
+            # A combined claim whose exact provenance spans multiple source
+            # units is partial at every contributing unit.  No one half may
+            # be promoted to independently complete mechanics.
+            return "DIRECT_PARTIAL_MECHANICS"
         law_anchor = choose_law_anchor(spec, block_kind_by_uid)
         if (
             anchor == law_anchor
@@ -3291,6 +3404,31 @@ def author(bundle: Path) -> dict[str, Any]:
                         + "."
                     ),
                     fields=fields,
+                )
+
+        for peer in spec["relation_names"]:
+            for anchor in RELATION_EVIDENCE_ANCHORS.get(
+                (spec["name"], peer),
+                (),
+            ):
+                if anchor not in spec["uids"]:
+                    raise RuntimeError(
+                        f"{spec['name']} relation to {peer} uses source "
+                        f"{anchor} outside candidate source units"
+                    )
+                append_request(
+                    spec=spec,
+                    anchor=anchor,
+                    sort_slot=90,
+                    strength="CORROBORATING",
+                    modality=source_modality(anchor, []),
+                    claim=(
+                        f"For {spec['name']}, {anchor} explicitly supports "
+                        f"the source comparison with {peer}; this is not an "
+                        "identity merge."
+                    ),
+                    fields=[],
+                    relation_peer=peer,
                 )
 
         existing_anchors = {
@@ -3447,14 +3585,23 @@ def author(bundle: Path) -> dict[str, Any]:
         )
         status_order = {"CLEAR": 0, "AMBIGUOUS": 1, "DEFECTIVE": 2, "CONFLICTING": 3}
         parameter_evidence = field_evidence_ids["parameters_and_variants"]
-        relation_evidence = next(
+        default_relation_evidence = next(
             (
                 r["evidence_id"]
                 for r in reqs
+                if r["relation_peer"] is None
                 if r["strength"] not in {"DIRECT_IDENTITY", "CONTEXTUAL", "LEAD_ONLY"}
             ),
             reqs[0]["evidence_id"],
         )
+        relation_evidence_by_peer = {
+            peer: [
+                r["evidence_id"]
+                for r in reqs
+                if r["relation_peer"] == peer
+            ]
+            for peer in spec["relation_names"]
+        }
         candidates.append({
             "id": candidate_id,
             "record_status": "ACTIVE",
@@ -3503,7 +3650,10 @@ def author(bundle: Path) -> dict[str, Any]:
                     "candidate_id": id_by_name[peer],
                     "relation": "SOURCE_COMPARE",
                     "proof_kind": "PROVISIONAL_COMPARISON",
-                    "evidence_ids": [relation_evidence],
+                    "evidence_ids": (
+                        relation_evidence_by_peer[peer]
+                        or [default_relation_evidence]
+                    ),
                     "before_rationale": "",
                     "after_rationale": "",
                     "uncertainty": (

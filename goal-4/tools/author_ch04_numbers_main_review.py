@@ -583,6 +583,10 @@ def radix_preset(base: int) -> CandidateSpec:
     facts["alphabet_or_value_schema"] = f"Digits 0 through {base - 1} with positional weights that are powers of {base}."
     facts["complete_state"] = f"The displayed finite base-{base} digit sequence for 3829."
     facts["input"] = f"The displayed finite base-{base} digit sequence."
+    facts["rule_relation_constraint_function_or_probability_law"] = (
+        "Starting at the right, multiply successive displayed digits by "
+        f"1, {base}, {base}^2, ... and sum them."
+    )
     facts["result_kind"] = "The represented whole number 3829."
     facts["termination_completion_failure"] = "The displayed finite weighted sum completes after its last digit."
     facts["parameters_and_variants"] = f"The radix is fixed at b={base}; only the displayed whole-number decomposition is asserted."
@@ -1823,18 +1827,25 @@ rational_periodicity = source_candidate(
         law_kind="A declarative periodicity constraint.",
         law="The digit sequence eventually repeats; in the displayed base-2/base-10 cases the period is at most q-1.",
         result="A repetitive digit sequence with the stated period bound.",
-        successor="One canonical expansion per rational and base.",
-        determinism="Declarative and deterministic under a canonical expansion convention.",
+        successor="The source states an eventually repeating representation but does not select between dual radix expansions when both denote the same rational.",
+        determinism="The periodicity property is definite, but the source does not state a representation-selection convention for dual expansions.",
         termination="The property is witnessed by a finite preperiod and period.",
         witness="A finite block repeats forever after some position and its period does not exceed q-1.",
         variants="Base 10 and base 2 examples are displayed.",
         excluded="Printed truncation does not terminate the mathematical expansion.",
-        limit="The q-1 bound is stated in the displayed context; exceptional terminating expansions are treated as trailing zeros.",
+        limit="The q-1 period bound is stated; the source does not specify how to select between dual terminating and nonterminating radix expansions of the same rational.",
     ),
     not_applicable=DECLARATIVE_NA,
-    missing="No mechanics are missing within the stated representation convention.",
+    missing="A convention for selecting between dual terminating and nonterminating radix expansions is not stated.",
     claim="The caption explicitly states eventual repetition and the period-at-most-q-1 bound.",
     strength="DIRECT_COMPLETE_MECHANICS",
+)
+mark_unknown(
+    rational_periodicity,
+    {
+        "successor_cardinality": "The source does not choose one representation when a rational has dual terminating and nonterminating radix expansions.",
+        "determinism_branching_or_measure": "No selection convention is stated for a rational with dual radix expansions.",
+    },
 )
 
 long_division = source_candidate(
@@ -2454,9 +2465,9 @@ mark_unknown(
 riemann_hypothesis = yes_no_query(
     "riemann-hypothesis-query",
     "Riemann-Hypothesis peak-sign query as stated",
-    "U000826",
-    "Determine whether all peaks after the first in the displayed Riemann-Siegel Z curve lie above the axis.",
-    "NO requires a violating peak; YES requires a proof covering every peak in the stated scope.",
+    "U000824",
+    "Determine whether all peaks after the first in the displayed Riemann-Siegel Z curve lie above the axis and all valleys lie below the axis.",
+    "NO requires a peak after the first on or below the axis, or a valley on or above the axis; YES requires a proof covering every peak and valley in the stated scope.",
     "The source reports that the claim has not been established.",
 )
 
@@ -3589,7 +3600,6 @@ pde_numerical_scheme = source_candidate(
     "U000936",
     {
         "object_kind": "The numerical approximation procedure used to compute the displayed PDE solution.",
-        "input": "One PDE and its initial data.",
         "law_kind": "An unnamed numerical approximation algorithm.",
         "result_kind": "The computed approximate field shown in the figures.",
         "excluded_observers_and_representations": "The grayscale solution panel is the solver output representation.",
@@ -3612,7 +3622,6 @@ pde_numerical_scheme = source_candidate(
         if field
         not in {
             "object_kind",
-            "input",
             "law_kind",
             "result_kind",
             "excluded_observers_and_representations",
@@ -3764,13 +3773,12 @@ context_evidence(
     "The passage first identifies the zeta function as the construction behind the following plotted example.",
     strength="DIRECT_IDENTITY",
 )
-riemann_hypothesis["anchor"] = "U000824"
 context_evidence(
     riemann_hypothesis,
-    "riemann-hypothesis-introduction",
-    "U000824",
-    "The passage first isolates the Riemann Hypothesis as the peak/valley sign proposition.",
-    strength="DIRECT_IDENTITY",
+    "riemann-hypothesis-caption",
+    "U000826",
+    "The caption independently restates the peaks-after-the-first half of the proposition; the complete peak/valley proposition is in U000824.",
+    strength="CORROBORATING",
 )
 for _spec in additive_presets.values():
     _spec["related_keys"] = ["continuous-ca-additive-family"]
@@ -3917,12 +3925,6 @@ ASSET_CONTEXT_LINKS: list[
         "CHAPTERS/_page_156_Figure_1.jpeg",
         [square_root_function, sqrt_generator],
         "U000789",
-    ),
-    (
-        "A000809",
-        "CHAPTERS/_page_160_Figure_4.jpeg",
-        [cube_root_family, fourth_root_family, log_family, exp_family],
-        "U000814",
     ),
     (
         "A000812",
