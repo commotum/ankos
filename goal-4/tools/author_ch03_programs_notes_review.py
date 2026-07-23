@@ -1113,20 +1113,16 @@ busy = direct_object(
         "preserved as witnesses without inventing an external transcription."
     ),
 )
-for unit, path, label in [
-    ("U005438", "BACK-MATTER/NOTES/_page_904_busy_beaver_2_3_4_state_rules.jpeg", "busy-234"),
-    ("U005440", "BACK-MATTER/NOTES/_page_904_busy_beaver_5_state_rule.jpeg", "busy-5"),
-]:
-    add_support(
-        busy,
-        label=label,
-        unit=unit,
-        image_path=path,
-        claim="Original-resolution inspection confirms the printed witness rule table.",
-        fields=["result_kind", "parameters_and_variants", "evidence_limit"],
-        strength="CORROBORATING",
-        modality="IMAGE",
-    )
+add_support(
+    busy,
+    label="busy-five-state-bound",
+    unit="U005439",
+    claim=(
+        "The source states the five-state lower-bound witness and explicitly "
+        "says that the optimum is unknown."
+    ),
+    fields=["result_kind", "parameters_and_variants", "evidence_limit"],
+)
 
 busy_witnesses: list[dict[str, Any]] = []
 for key, name, state_count, steps, black_cells, group_name in [
@@ -2267,11 +2263,224 @@ symbolic = transition(
     parameters="Rewrite rule, initial expression, replacement order, and steps.",
     termination="Evolution reaches a fixed point for the stated page-103 system.",
 )
+for field in [
+    "parameters_and_variants",
+    "read_dependencies_or_neighborhood",
+    "result_kind",
+    "termination_completion_failure",
+]:
+    symbolic["evidence"][0]["fields"].remove(field)
+symbolic["facts"]["structural_invariants"] = (
+    "The integer expr //. {e -> 0, x_[y_] -> 2^x + y} remains invariant "
+    "through evolution and selects the final fixed-point index m."
+)
+add_support(
+    symbolic,
+    label="symbolic-nonlocal-representations",
+    unit="U005593",
+    claim=(
+        "The source states that typical symbolic transformation rules are "
+        "non-local in the displayed linear representations."
+    ),
+    fields=["read_dependencies_or_neighborhood"],
+)
+add_support(
+    symbolic,
+    label="symbolic-fixed-point-invariant",
+    unit="U005605",
+    claim=(
+        "The page-103 properties state eventual fixed-point form and the "
+        "invariant that selects its final index."
+    ),
+    fields=[
+        "termination_completion_failure",
+        "structural_invariants",
+        "result_kind",
+    ],
+)
+add_support(
+    symbolic,
+    label="symbolic-fixed-point-bound",
+    unit="U005607",
+    claim=(
+        "The source states the depth-zero fixed-point condition and an explicit "
+        "upper bound on the number of steps."
+    ),
+    fields=["termination_completion_failure", "parameters_and_variants"],
+    modality="FORMULA",
+)
+add_support(
+    symbolic,
+    label="symbolic-replacement-order",
+    unit="U005615",
+    claim=(
+        "The source fixes left-to-right functional-representation scanning, "
+        "application whenever possible, and overlap avoidance."
+    ),
+    fields=[
+        "parameters_and_variants",
+        "read_dependencies_or_neighborhood",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+    ],
+)
+add_support(
+    symbolic,
+    label="symbolic-one-application",
+    unit="U005616",
+    claim="The Module code gives exact control for applying a rule only once.",
+    fields=[
+        "schedule",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+    ],
+    modality="CODE",
+)
+
+symbolic_codecs = direct_object(
+    key="symbolic-expression-codecs",
+    name="symbolic-expression codec family",
+    anchor="U005591",
+    object_kind=(
+        "A family of determinate transformations between functional symbolic "
+        "expressions and Polish, tree, or single-symbol bracket representations."
+    ),
+    input_text=(
+        "A symbolic expression for encoding, or a valid Polish token list for "
+        "the inverse Polish decoder."
+    ),
+    law=(
+        "Select one source-defined codec: recursively flatten application as "
+        "{operator,head,argument} for Polish form; reverse-reduce that token "
+        "list for decoding; recursively replace application by {head,argument} "
+        "for tree form; or map brackets to 1/0 while deleting e."
+    ),
+    result=(
+        "The selected Polish, tree, or bracket representation, or the "
+        "recovered functional expression for Polish decoding."
+    ),
+    parameters="Codec variant and valid source expression or token-list input.",
+    modality="PROSE",
+)
+for field in [
+    "input",
+    "rule_relation_constraint_function_or_probability_law",
+    "result_kind",
+]:
+    symbolic_codecs["evidence"][0]["fields"].remove(field)
+symbolic_codecs["route_keys"] = ["polish"]
+add_support(
+    symbolic_codecs,
+    label="symbolic-codec-table",
+    unit="U005592",
+    image_path="BACK-MATTER/NOTES/_page_911_symbolic_representation_table.jpeg",
+    claim=(
+        "The source-delimited table contextually compares the functional, "
+        "Polish, operator, and tree representations."
+    ),
+    fields=[
+        "object_kind",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+    ],
+    strength="CORROBORATING",
+    modality="IMAGE",
+)
+add_support(
+    symbolic_codecs,
+    label="polish-encoder-introduction",
+    unit="U005593",
+    claim="The source identifies the Polish encoder and its expression input.",
+    fields=["input", "parameters_and_variants"],
+)
+add_support(
+    symbolic_codecs,
+    label="polish-encoder",
+    unit="U005594",
+    claim="The recursive Flatten expression gives the exact Polish encoder.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="CODE",
+)
+add_support(
+    symbolic_codecs,
+    label="polish-decoder-introduction",
+    unit="U005595",
+    claim="The source identifies recovery of the original expression.",
+    fields=["input", "result_kind", "parameters_and_variants"],
+)
+add_support(
+    symbolic_codecs,
+    label="polish-decoder",
+    unit="U005596",
+    claim="The reverse-reduction expression gives the exact Polish decoder.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="CODE",
+)
+add_support(
+    symbolic_codecs,
+    label="tree-encoder",
+    unit="U005598",
+    claim="The recursive application-to-pair replacement gives the exact tree encoder.",
+    fields=[
+        "input",
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="CODE",
+)
+add_support(
+    symbolic_codecs,
+    label="bracket-encoder-introduction",
+    unit="U005599",
+    claim="The source delimits the single-symbol bracket representation.",
+    fields=["input", "result_kind", "parameters_and_variants"],
+)
+add_support(
+    symbolic_codecs,
+    label="bracket-encoder",
+    unit="U005600",
+    claim="The character replacement expression gives the exact bracket encoder.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="CODE",
+)
+
+direct_object(
+    key="symbolic-size-depth-analyzers",
+    name="symbolic-expression size and depth analyzer family",
+    anchor="U005601",
+    object_kind=(
+        "A family of three determinate structural analyzers for a symbolic "
+        "application expression."
+    ),
+    input_text="A finite symbolic application expression expr.",
+    law=(
+        "Return LeafCount[expr], Depth[expr] for the rightmost branch, or "
+        "expr /. _Symbol -> 1 //. x_[y_] -> 1 + Max[x,y] for maximum tree depth."
+    ),
+    result="The selected symbol count, rightmost-branch depth, or maximum tree depth.",
+    parameters="Input expression and selected size/depth analyzer.",
+    modality="FORMULA",
+)
 
 expression_enum = direct_object(
     key="symbolic-expression-enumerator",
     name="fixed-leaf-count symbolic expression enumerator",
-    anchor="U005601",
+    anchor="U005602",
     object_kind="A recursive generator of all binary application expressions of fixed leaf count.",
     input_text="A finite symbol set s and positive leaf count n.",
     law=(
@@ -2288,6 +2497,88 @@ add_support(
     fields=["rule_relation_constraint_function_or_probability_law", "result_kind"],
     strength="DIRECT_COMPLETE_MECHANICS",
     modality="CODE",
+)
+
+expression_count = direct_object(
+    key="symbolic-expression-count",
+    name="fixed-leaf symbolic-expression count function",
+    anchor="U005604",
+    object_kind=(
+        "An exact counting function for application expressions of fixed "
+        "leaf count over a finite symbol set."
+    ),
+    input_text="Positive leaf count n and finite symbol-set size Length[s].",
+    law="Return Binomial[2 n - 2, n - 1] Length[s]^n/n.",
+    result="The total number of fixed-leaf application expressions.",
+    parameters="Positive n and finite symbol set s.",
+)
+expression_count["route_keys"] = ["balanced"]
+
+page103_analyzers = direct_object(
+    key="page103-symbolic-analyzers",
+    name="page-103 symbolic-system invariant and trajectory analyzer family",
+    anchor="U005605",
+    object_kind=(
+        "A family of exact analyzers for the page-103 symbolic rewriting "
+        "system's invariant, final fixed point, Church value, active inner "
+        "part, depth trajectory, and fixed-point time bound."
+    ),
+    input_text=(
+        "A page-103 symbolic expression; the explicit depth trajectory also "
+        "takes its finite range parameter m."
+    ),
+    law=(
+        "Use expr //. {e->0,x_[y_]->2^x+y} for the invariant/final index; "
+        "expr //. {e->2,x_[y_]->y^x} for the Church value; "
+        "FixedPoint[Replace[#,e[x_]->x]&,expr] for the active inner part; "
+        "the stated FoldList/Table formula for depth; and the stated nested "
+        "sum for the time bound."
+    ),
+    result=(
+        "The selected invariant/final index, Church value, active inner "
+        "expression, depth trajectory, or upper bound on fixed-point time."
+    ),
+    parameters="Input expression, selected analyzer, and trajectory parameter m where required.",
+    modality="FORMULA",
+)
+page103_analyzers["route_keys"] = ["church"]
+add_support(
+    page103_analyzers,
+    label="page103-depth-trajectory",
+    unit="U005606",
+    claim="The FoldList/Table formula gives the exact stated depth trajectory.",
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
+    modality="CODE",
+)
+add_support(
+    page103_analyzers,
+    label="page103-depth-bound",
+    unit="U005607",
+    claim=(
+        "The source states the trajectory landmarks, fixed-point criterion, "
+        "and explicit size-n upper bound."
+    ),
+    fields=[
+        "rule_relation_constraint_function_or_probability_law",
+        "result_kind",
+        "parameters_and_variants",
+    ],
+    modality="FORMULA",
+)
+add_support(
+    page103_analyzers,
+    label="page103-depth-plot",
+    unit="U005608",
+    image_path="BACK-MATTER/NOTES/_page_912_Figure_15.jpeg",
+    claim="The source-delimited figure is a contextual observer of inner-part depth.",
+    fields=["result_kind", "excluded_observers_and_representations"],
+    strength="CORROBORATING",
+    modality="IMAGE",
 )
 
 transition(
@@ -2318,6 +2609,34 @@ operator = transition(
     neighborhood="Any subtree matching the left-hand operator pattern.",
     parameters="Pattern rule, operator alphabet, initial expression, order, and steps.",
     termination="No general completion law is stated.",
+)
+add_support(
+    operator,
+    label="operator-replacement-order",
+    unit="U005615",
+    claim=(
+        "The source fixes the ReplaceAll left-to-right scan and "
+        "overlap-avoidance semantics used by the operator class."
+    ),
+    fields=[
+        "schedule",
+        "read_dependencies_or_neighborhood",
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+        "result_kind",
+    ],
+)
+add_support(
+    operator,
+    label="operator-one-application",
+    unit="U005616",
+    claim="The Module code gives exact control for applying a pattern rule only once.",
+    fields=[
+        "schedule",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+    ],
+    modality="CODE",
 )
 
 for key, anchor, name, law, image_unit, image_path in [
@@ -2385,6 +2704,7 @@ for args in [
     ("tm-alt", "U005418", "page 1143", "alternative Turing-machine implementation", ["Turing machine", "implementation"]),
     ("tm-equivalence", "U005420", "page 1120", "Turing-machine rule equivalence", ["Turing machine", "equivalence"]),
     ("tm-complex", "U005425", "page 709", "complex small Turing-machine presets", ["Turing machine", "complex behavior"]),
+    ("tm-localized-page81", "U005429", "page 81", "localized Turing-machine rule and seed backgrounds", ["Turing machine", "localized structures", "repetitive backgrounds"], "WITHIN_STAGE"),
     ("tm-foundations", "U005435", "page 1128", "Turing-machine calculation model", ["Turing", "calculation"]),
     ("tm-universality", "U005435", "page 1110", "Turing-machine capabilities", ["Turing machines", "capabilities"]),
     ("tm-constructions", "U005436", "page 1119", "small universal Turing-machine constructions", ["Minsky", "Turing machine"]),
@@ -2409,6 +2729,7 @@ for args in [
     ("tag-syntax", "U005558", "page 1149", "Post syntactic reduction systems", ["Post", "tag systems"]),
     ("tag-first", "U005558", "page 670", "first-symbol tag-system restriction", ["tag system", "first element"], "CROSS_RANGE"),
     ("tag-computation", "U005558", "pages 1113 and 1141", "tag-system computational mechanics", ["tag systems", "computation"]),
+    ("cyclic-rule-e", "U005568", "Rule (e) from the main text", "mechanical cyclic-tag rule (e) preset", ["cyclic tag system", "rule (e)", "mechanical implementation"], "WITHIN_STAGE"),
     ("register-halt", "U005581", "page 1137", "register-machine halting semantics", ["register machine", "halt"]),
     ("random-programs", "U005587", "page 1182", "random program generation", ["random programs", "register machine"]),
     ("polish", "U005593", "page 1173", "Polish symbolic-expression representation", ["Polish notation", "symbolic expressions"]),
@@ -2462,6 +2783,30 @@ DEFECT_ASSETS = {
     ),
 }
 
+LOCALIZED_TM_ASSETS = {
+    "BACK-MATTER/NOTES/_page_904_Picture_3.jpeg",
+    "BACK-MATTER/NOTES/_page_904_Picture_4.jpeg",
+    "BACK-MATTER/NOTES/_page_904_Picture_5.jpeg",
+    "BACK-MATTER/NOTES/_page_904_Picture_6.jpeg",
+    "BACK-MATTER/NOTES/_page_904_Picture_7.jpeg",
+}
+
+READING_UNCERTAINTIES = {
+    unit: (
+        "The source delimits a localized-background Turing-machine variant, "
+        "but the available image does not reliably expose the complete "
+        "repeating word, phase, head position, or head state."
+    )
+    for unit in [
+        "U005429",
+        "U005430",
+        "U005431",
+        "U005432",
+        "U005433",
+        "U005434",
+    ]
+}
+
 ORIGINAL_REVIEWED = {
     "BACK-MATTER/NOTES/_page_898_Picture_8.jpeg",
     "BACK-MATTER/NOTES/_page_900_Picture_28.jpeg",
@@ -2476,8 +2821,14 @@ ORIGINAL_REVIEWED = {
     "BACK-MATTER/NOTES/_page_901_Picture_27.jpeg",
     "BACK-MATTER/NOTES/_page_902_Figure_23.jpeg",
     "BACK-MATTER/NOTES/_page_902_Figure_24.jpeg",
+    "BACK-MATTER/NOTES/_page_904_Picture_3.jpeg",
+    "BACK-MATTER/NOTES/_page_904_Picture_4.jpeg",
+    "BACK-MATTER/NOTES/_page_904_Picture_5.jpeg",
+    "BACK-MATTER/NOTES/_page_904_Picture_6.jpeg",
+    "BACK-MATTER/NOTES/_page_904_Picture_7.jpeg",
     "BACK-MATTER/NOTES/_page_904_busy_beaver_2_3_4_state_rules.jpeg",
     "BACK-MATTER/NOTES/_page_904_busy_beaver_5_state_rule.jpeg",
+    "BACK-MATTER/NOTES/_page_906_Figure_6.jpeg",
     "BACK-MATTER/NOTES/_page_906_golden_ratio_rectangle.jpeg",
     "BACK-MATTER/NOTES/_page_907_Picture_11.jpeg",
     "BACK-MATTER/NOTES/_page_907_Picture_7.jpeg",
@@ -2485,6 +2836,7 @@ ORIGINAL_REVIEWED = {
     "BACK-MATTER/NOTES/_page_907_rule_b_path_evolution.jpeg",
     "BACK-MATTER/NOTES/_page_910_cyclic_tag_trough.jpeg",
     "BACK-MATTER/NOTES/_page_911_symbolic_representation_table.jpeg",
+    "BACK-MATTER/NOTES/_page_912_Figure_15.jpeg",
     "BACK-MATTER/NOTES/_page_912_Figure_19.jpeg",
     "BACK-MATTER/NOTES/_page_912_Figure_21.jpeg",
     "BACK-MATTER/NOTES/_page_913_Picture_8.jpeg",
@@ -2544,6 +2896,127 @@ def build(bundle: Path) -> tuple[bytes, dict[str, Any]]:
         ),
     )
     specs_by_id = dict(zip((c["id"] for c in candidate_proposals), sorted_specs))
+    candidates_by_id = {
+        candidate["id"]: candidate for candidate in candidate_proposals
+    }
+    candidate_id_by_key = {
+        spec["key"]: candidate_id for candidate_id, spec in specs_by_id.items()
+    }
+
+    def add_provisional_relation(
+        source_key: str,
+        target_key: str,
+        relation: str,
+        evidence_units: list[str],
+        uncertainty: str,
+    ) -> None:
+        source_id = candidate_id_by_key[source_key]
+        target_id = candidate_id_by_key[target_key]
+        source = candidates_by_id[source_id]
+        evidence_ids = [
+            evidence["evidence_id"]
+            for evidence in source["source_evidence"]
+            if evidence["source_unit_id"] in evidence_units
+        ]
+        if not evidence_ids:
+            raise AuthoringError(
+                f"relation {source_key}->{target_key} lacks source-local evidence"
+            )
+        source["related_candidate_ids"].append(
+            {
+                "candidate_id": target_id,
+                "relation": relation,
+                "proof_kind": "PROVISIONAL_COMPARISON",
+                "evidence_ids": list(dict.fromkeys(evidence_ids)),
+                "before_rationale": "",
+                "after_rationale": "",
+                "uncertainty": uncertainty,
+            }
+        )
+
+    add_provisional_relation(
+        "period-doubling-sequence",
+        "rule150-adjacent-column",
+        "POSSIBLY_SAME_AS",
+        ["U005520"],
+        (
+            "The source gives the same IntegerExponent formula and identifies "
+            "the sequence with the Rule-150 vertical column, but final identity "
+            "and index conventions remain coordinator work."
+        ),
+    )
+    add_provisional_relation(
+        "parity-sequence",
+        "successive-digits-sequence",
+        "POSSIBLY_SAME_AS",
+        ["U005521"],
+        (
+            "The two definitions agree under the source's binary color "
+            "convention, but final color/value and index alignment remain "
+            "coordinator work."
+        ),
+    )
+    add_provisional_relation(
+        "thue-morse-digit-transducer",
+        "thue-morse",
+        "SOURCE_COMPARE",
+        ["U005502", "U005503"],
+        (
+            "The source explicitly derives the concrete transducer from case "
+            "(b), but the sequence and its evaluator remain distinct formal "
+            "objects pending coordinator normalization."
+        ),
+    )
+    add_provisional_relation(
+        "thue-morse-digit-transducer",
+        "digit-finite-automaton",
+        "POSSIBLE_VARIANT_OF",
+        ["U005502", "U005503"],
+        (
+            "The concrete two-state evaluator is presented as a finite "
+            "automaton instance; final class/variant typing remains coordinator work."
+        ),
+    )
+    add_provisional_relation(
+        "cyclic-substitution-restriction",
+        "thue-morse",
+        "SOURCE_COMPARE",
+        ["U005571"],
+        (
+            "The source gives a restricted cyclic-tag construction producing "
+            "the Thue-Morse substitution system, but it does not make the two "
+            "native objects identical."
+        ),
+    )
+    add_provisional_relation(
+        "mechanical-cyclic-tag",
+        "cyclic-tag",
+        "POSSIBLE_VARIANT_OF",
+        ["U005568"],
+        (
+            "The source presents the trough mechanism as a cyclic-tag "
+            "implementation; final implementation-variant typing remains "
+            "coordinator work."
+        ),
+    )
+    for witness_key in [
+        "busy-witness-2",
+        "busy-witness-3",
+        "busy-witness-4",
+        "busy-witness-5",
+    ]:
+        add_provisional_relation(
+            witness_key,
+            "busy-beaver",
+            "SOURCE_COMPARE",
+            ["U005437", "U005439"],
+            (
+                "The concrete machine is a source-delimited witness for the "
+                "optimization query, not the query itself; final catalog "
+                "typing remains coordinator work."
+            ),
+        )
+
     route_links: defaultdict[str, list[str]] = defaultdict(list)
     for proposal in route_proposals:
         route_links[proposal["source_unit_id"]].append(proposal["route_id"])
@@ -2619,13 +3092,16 @@ def build(bundle: Path) -> tuple[bytes, dict[str, Any]]:
                 "Reviewed in full; this unit states behavior, counts, analysis, "
                 "or representation without a separately delimited native law."
             )
+        uncertainty = READING_UNCERTAINTIES.get(unit, "")
+        if uncertainty:
+            statement += f" Ambiguity boundary: {uncertainty}"
         row.update(
             {
                 "review_status": "REVIEWED",
                 "review_epoch": "1",
                 "review_disposition": disposition,
-                "source_status": "CLEAR",
-                "uncertainty": "",
+                "source_status": "AMBIGUOUS" if uncertainty else "CLEAR",
+                "uncertainty": uncertainty,
                 "secondary_roles": compact(list(dict.fromkeys(roles))),
                 "candidate_ids": compact(candidates),
                 "route_ids": compact(routes),
@@ -2647,6 +3123,60 @@ def build(bundle: Path) -> tuple[bytes, dict[str, Any]]:
             status = "DEFECTIVE"
             statement = uncertainty
             transcription = "CHECKED"
+        elif path in LOCALIZED_TM_ASSETS:
+            role = "NATIVE_EVIDENCE"
+            status = "AMBIGUOUS"
+            flags = [
+                "CONSTRUCTION_BEARING",
+                "AMBIGUOUS",
+                "CAPTION_INCOMPLETE",
+            ]
+            uncertainty = (
+                "The raster distinguishes this repetitive-background variant "
+                "and localized trace, but not a reliable complete background "
+                "word, phase, head position, or head state."
+            )
+            statement = (
+                "Original-resolution inspection confirms a construction-bearing "
+                f"localized-background variant linked to {', '.join(candidates)}; "
+                "its exact seed and control placement remain ambiguous."
+            )
+            transcription = "CHECKED"
+        elif path == "BACK-MATTER/NOTES/_page_911_symbolic_representation_table.jpeg":
+            role = "RELATION"
+            status = "CLEAR"
+            flags = ["TEXT_BEARING", "CONSTRUCTION_BEARING"]
+            uncertainty = ""
+            statement = (
+                "Original-resolution inspection confirms the functional, Polish, "
+                "operator, and tree comparison linked to "
+                f"{', '.join(candidates)}; the table relates representations."
+            )
+            transcription = "CHECKED"
+        elif path == "BACK-MATTER/NOTES/_page_910_cyclic_tag_trough.jpeg":
+            role = "RELATION"
+            status = "CLEAR"
+            flags = ["CONSTRUCTION_BEARING"]
+            uncertainty = ""
+            statement = (
+                "Original-resolution inspection confirms the mechanical trough "
+                "rendering; prose, not pixels, supplies its operational semantics."
+            )
+            transcription = "NOT_REQUIRED"
+        elif path in {
+            "BACK-MATTER/NOTES/_page_906_Figure_6.jpeg",
+            "BACK-MATTER/NOTES/_page_912_Figure_15.jpeg",
+        }:
+            role = "OBSERVER"
+            status = "CLEAR"
+            flags = []
+            uncertainty = ""
+            statement = (
+                "Original-resolution contextual inspection confirms this as "
+                f"an observer linked to {', '.join(candidates)}, not an "
+                "independently encoded native law."
+            )
+            transcription = "NOT_REQUIRED"
         elif candidates:
             role = "NATIVE_EVIDENCE"
             status = "CLEAR"
@@ -2665,26 +3195,6 @@ def build(bundle: Path) -> tuple[bytes, dict[str, Any]]:
                 "only visibly supported labels, geometry, or outputs are used."
             )
             transcription = "CHECKED"
-        elif path == "BACK-MATTER/NOTES/_page_911_symbolic_representation_table.jpeg":
-            role = "RELATION"
-            status = "CLEAR"
-            flags = ["TEXT_BEARING", "CONSTRUCTION_BEARING"]
-            uncertainty = ""
-            statement = (
-                "Original-resolution inspection confirms the functional, Polish, "
-                "operator, and tree representation table; it is representational."
-            )
-            transcription = "CHECKED"
-        elif path == "BACK-MATTER/NOTES/_page_910_cyclic_tag_trough.jpeg":
-            role = "RELATION"
-            status = "CLEAR"
-            flags = ["CONSTRUCTION_BEARING"]
-            uncertainty = ""
-            statement = (
-                "Original-resolution inspection confirms the mechanical trough "
-                "rendering; prose, not pixels, supplies its operational semantics."
-            )
-            transcription = "NOT_REQUIRED"
         else:
             role = "OBSERVER"
             status = "CLEAR"
@@ -2727,6 +3237,11 @@ def build(bundle: Path) -> tuple[bytes, dict[str, Any]]:
             "uncertainties": [
                 "A000407 is an unreferenced orphaned text strip, not a usable figure.",
                 "A000422 is only 22×22 pixels; its geometry is supported by adjacent prose, not by independent image measurement.",
+                (
+                    "A000413 through A000417 delimit five localized-background "
+                    "Turing-machine variants, but their exact repeating words, "
+                    "phases, head positions, and head states remain visually ambiguous."
+                ),
                 "Busy Beaver witness tables are retained without importing an external transcription.",
             ],
         }
