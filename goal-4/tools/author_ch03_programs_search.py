@@ -287,6 +287,19 @@ QUERY_SPECS = [
 EXPECTED_STAGE_UNIT_COUNT = 653
 EXPECTED_STAGE_ASSET_COUNT = 133
 EXPECTED_STAGE_CANDIDATE_COUNT = 229
+EXPECTED_RESULT_PAIR_COUNT = 1247
+EXPECTED_UNIQUE_RESULT_UNIT_COUNT = 595
+EXPECTED_PATH_PAIR_COUNTS = {
+    STAGE_PATHS[0]: 606,
+    STAGE_PATHS[1]: 641,
+}
+EXPECTED_PATH_UNIQUE_UNIT_COUNTS = {
+    STAGE_PATHS[0]: 297,
+    STAGE_PATHS[1]: 298,
+}
+EXPECTED_QUERY_SPEC_DIGEST = (
+    "ecfc9057c4cbfe9dbae6d31b7fcfe43e3d2a453891e0937098c4562c338f33a7"
+)
 EXPECTED_HIT_COUNTS = [
     134,
     46,
@@ -320,6 +333,16 @@ EXPECTED_NEW_VOCABULARY = list(PROPOSED_VOCABULARY)
 EXPECTED_NEW_VOCABULARY_DIGEST = (
     "926797eedb6db057505a4d86d73b7d049ffb8caab0faa6d6d4daeb0c7d671c94"
 )
+EXPECTED_DISPOSITION_COUNTS = {
+    "CONTROL_OR_RELATIONSHIP": 170,
+    "CROSS_REFERENCE": 65,
+    "EXCLUSION": 303,
+    "GOVERNED_CANDIDATE_OR_SUPPORT": 709,
+}
+EXPECTED_ROUND_DIGESTS = {
+    "S007": "9ebedd6626f35563b89498f2f4328a0cd28b1b5f0c57d14e75502a191456781f",
+    "S008": "795ef68adc15ffa229d14dfe27b58e419037352e3cde3a100fa75254b6c6ca11",
+}
 
 DIRECT_MECHANICS_STRENGTHS = {
     "DIRECT_IDENTITY",
@@ -419,6 +442,42 @@ def _normalized_result_pairs(
         (int(query_id[1:]) - query_start + 1, unit_id)
         for query_id, unit_id in result_pairs
     ]
+
+
+def _normalized_hit_projection(
+    round_record: dict[str, Any],
+) -> list[tuple[Any, ...]]:
+    queries = round_record.get("queries")
+    hits = round_record.get("hits")
+    if (
+        not isinstance(queries, list)
+        or len(queries) != len(QUERY_SPECS)
+        or not isinstance(hits, list)
+    ):
+        raise AuthoringError("Stage 7 round lacks its closed query/hit arrays")
+    ordinal_by_query_id = {
+        query["query_id"]: ordinal
+        for ordinal, query in enumerate(queries, start=1)
+        if isinstance(query, dict) and isinstance(query.get("query_id"), str)
+    }
+    if len(ordinal_by_query_id) != len(queries):
+        raise AuthoringError("Stage 7 round query IDs are malformed")
+    projection: list[tuple[Any, ...]] = []
+    for hit in hits:
+        if not isinstance(hit, dict) or hit.get("query_id") not in ordinal_by_query_id:
+            raise AuthoringError("Stage 7 round hit/query join is malformed")
+        projection.append(
+            (
+                ordinal_by_query_id[hit["query_id"]],
+                hit.get("source_unit_id"),
+                hit.get("context_sha256"),
+                hit.get("disposition"),
+                hit.get("candidate_ids"),
+                hit.get("route_ids"),
+                hit.get("rationale"),
+            )
+        )
+    return projection
 
 
 def _candidate_coverage_projection(
@@ -522,8 +581,11 @@ def _source_specific_rationale(
             f"{row['source_unit_id']} lacks a source-specific evidence statement"
         )
     if family_ordinal <= 10:
+        family = QUERY_SPECS[family_ordinal - 1][0]
         lead = (
-            f"Omission challenge F{family_ordinal:02d} retains {outcome}: "
+            f"Omission challenge F{family_ordinal:02d} ({family}) at "
+            f"{row['source_unit_id']} [{row['block_kind']}] retains "
+            f"{outcome}: "
         )
     else:
         lead = ""
@@ -555,6 +617,13 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     if vocabulary_digest != EXPECTED_NEW_VOCABULARY_DIGEST:
         raise AuthoringError(
             f"frozen Stage 7 vocabulary drifted: {vocabulary_digest}"
+        )
+    query_spec_digest = hashlib.sha256(
+        canonical_json_bytes(QUERY_SPECS)
+    ).hexdigest()
+    if query_spec_digest != EXPECTED_QUERY_SPEC_DIGEST:
+        raise AuthoringError(
+            f"frozen Stage 7 query family drifted: {query_spec_digest}"
         )
 
     units = read_jsonl(goal_dir / merge_worker_output.UNITS_NAME)
@@ -747,6 +816,10 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     if query_errors:
         raise AuthoringError("; ".join(query_errors))
 
+    if len(result_pairs) != EXPECTED_RESULT_PAIR_COUNT:
+        raise AuthoringError(
+            f"Stage 7 result-pair count drifted: {len(result_pairs)}"
+        )
     hit_counts = [
         sum(query_id == query["query_id"] for query_id, _ in result_pairs)
         for query in queries
@@ -764,6 +837,29 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
         )
 
     result_unit_ids = sorted({unit_id for _, unit_id in result_pairs})
+    if len(result_unit_ids) != EXPECTED_UNIQUE_RESULT_UNIT_COUNT:
+        raise AuthoringError(
+            f"Stage 7 unique result-unit count drifted: {len(result_unit_ids)}"
+        )
+    path_pair_counts = {
+        path: sum(
+            unit_by_id[unit_id]["path"] == path
+            for _, unit_id in result_pairs
+        )
+        for path in STAGE_PATHS
+    }
+    path_unique_unit_counts = {
+        path: sum(unit_by_id[unit_id]["path"] == path for unit_id in result_unit_ids)
+        for path in STAGE_PATHS
+    }
+    if (
+        path_pair_counts != EXPECTED_PATH_PAIR_COUNTS
+        or path_unique_unit_counts != EXPECTED_PATH_UNIQUE_UNIT_COUNTS
+    ):
+        raise AuthoringError(
+            "Stage 7 path-local result counts drifted: "
+            f"pairs={path_pair_counts} unique={path_unique_unit_counts}"
+        )
     triage_projection = [
         (
             unit_id,
@@ -985,6 +1081,29 @@ def build_proposal(goal_dir: Path) -> dict[str, Any]:
     digest = validate_audit.search_result_digest(round_record)
     round_record["result_digest"] = digest
     round_record["rerun_digest"] = digest
+    expected_round_digest = EXPECTED_ROUND_DIGESTS.get(
+        round_record["round_id"]
+    )
+    if digest != expected_round_digest:
+        raise AuthoringError(
+            f"{round_record['round_id']} result digest drifted: {digest}"
+        )
+    disposition_counts: dict[str, int] = {}
+    for hit in hits:
+        disposition = hit["disposition"]
+        disposition_counts[disposition] = (
+            disposition_counts.get(disposition, 0) + 1
+        )
+    if disposition_counts != EXPECTED_DISPOSITION_COUNTS:
+        raise AuthoringError(
+            f"Stage 7 hit dispositions drifted: {disposition_counts}"
+        )
+    if prior_stage_rounds and _normalized_hit_projection(
+        prior_stage_rounds[0]
+    ) != _normalized_hit_projection(round_record):
+        raise AuthoringError(
+            "Stage 7 zero-delta rerun differs from the seed hit projection"
+        )
 
     proposed_search = deepcopy(search)
     tool_assumptions = proposed_search.get("tool_assumptions")
