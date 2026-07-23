@@ -680,6 +680,82 @@ context_evidence(
 
 totalistic_code_image = "CHAPTERS/_page_75_Figure_6.jpeg"
 
+totalistic_codec_facts = {
+    "object_kind": "A deterministic codec between a three-color totalistic rule table and an integer.",
+    "native_time": "No native time; this is a fixed encoding/decoding function.",
+    "carrier": "Seven ordered three-color outputs.",
+    "support": "The seven possible averages 0, 1/3, 2/3, 1, 4/3, 5/3, and 2.",
+    "alphabet_or_value_schema": "Seven ternary digits and an integer in 0--2186.",
+    "complete_state": "An ordered seven-output totalistic table or its integer code.",
+    "input": "One ordered seven-case ternary table, or one code in 0--2186.",
+    "law_kind": "A base-3 positional encoding and its inverse.",
+    "rule_relation_constraint_function_or_probability_law": (
+        "Read the outputs in the pictured average-case order as base-3 digits "
+        "to obtain the code; decode the code to recover the seven outputs."
+    ),
+    "result_kind": "The corresponding totalistic code or seven-output table.",
+    "successor_cardinality": "Exactly one code per table and one table per code.",
+    "determinism_branching_or_measure": "Deterministic and bijective on the stated domain.",
+    "witness_semantics": "Re-encoding the decoded seven ternary outputs yields the same integer.",
+    "parameters_and_variants": "The average-case order is the one shown in the worked rule.",
+    "excluded_observers_and_representations": "Printed color boxes display, but do not change, the case order.",
+    "evidence_limit": "The visual case order must be preserved; another convention is not inferred.",
+}
+totalistic_codec = source_candidate(
+    "totalistic-3-codec",
+    "three-color totalistic cellular-automaton base-3 rule codec",
+    "U000351",
+    totalistic_codec_facts,
+    aliases=["three-color totalistic code number"],
+    not_applicable=codec_na,
+    missing="No mechanics are missing within the pictured seven-average convention.",
+    claim="The passage defines 2187 three-color totalistic rules and introduces their code numbers.",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    totalistic_codec,
+    "totalistic-codec-diagram",
+    "U000352",
+    "The worked original-resolution rule orders all seven average cases and their ternary outputs.",
+    image_path=totalistic_code_image,
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
+context_evidence(
+    totalistic_codec,
+    "totalistic-codec-caption",
+    "U000353",
+    "The caption explicitly defines the average-case order and base-3 positional encoding.",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
+
+white_preserving_totalistic = source_candidate(
+    "totalistic-white-background-restriction",
+    "white-background-preserving three-color totalistic-rule restriction",
+    "U000355",
+    {
+        **TOTALISTIC_BASE,
+        "object_kind": "The restriction to three-color totalistic rules that preserve an all-white background.",
+        "structural_invariants": "The all-white configuration is a fixed background under every admitted rule.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Use a three-color totalistic table whose output for the all-white, average-0 neighborhood is white."
+        ),
+        "parameters_and_variants": "Exclude every three-color totalistic rule that changes the white background.",
+        "result_kind": "A white-background-preserving next row and trajectory.",
+    },
+    not_applicable=NA_NO_CONTROL,
+    missing="The figure is a representative code-numbered survey, not a textual enumeration of every admitted code.",
+    claim="The original-resolution grid delimits the selected totalistic-rule survey.",
+    image_path="CHAPTERS/_page_76_Figure_2.jpeg",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    white_preserving_totalistic,
+    "totalistic-white-preserving-caption",
+    "U000356",
+    "The caption explicitly states that rules which change the white background are excluded.",
+    strength="DIRECT_COMPLETE_MECHANICS",
+)
+
 
 def totalistic_preset(
     code: int | None,
@@ -688,6 +764,8 @@ def totalistic_preset(
     *,
     image_path: str | None = None,
     ambiguous_name: str | None = None,
+    source_strength: str | None = None,
+    claim_override: str | None = None,
 ) -> CandidateSpec:
     label = ambiguous_name or f"code {code}"
     key = (
@@ -727,12 +805,14 @@ def totalistic_preset(
             if ambiguous
             else "The off-picture boundary convention is not explicitly stated."
         ),
-        claim=(
+        claim=claim_override
+        or (
             f"The source delimits {label} within the already-defined ternary "
             "totalistic code convention and records the stated behavior."
         ),
         image_path=image_path,
-        strength=("DIRECT_PARTIAL_MECHANICS" if ambiguous else "DIRECT_COMPLETE_MECHANICS"),
+        strength=source_strength
+        or ("DIRECT_PARTIAL_MECHANICS" if ambiguous else "DIRECT_COMPLETE_MECHANICS"),
         source_status=(["AMBIGUOUS"] if ambiguous else None),
         uncertainties=(
             ["The middle page-81 evolution is unambiguously delimited, but its code number is absent from the assigned image and surrounding units."]
@@ -743,9 +823,58 @@ def totalistic_preset(
     return spec
 
 
+def totalistic_survey(
+    key: str,
+    name: str,
+    anchor: str,
+    image_path: str,
+    codes: list[int],
+    result: str,
+) -> CandidateSpec:
+    facts = deepcopy(TOTALISTIC_BASE)
+    facts.update(
+        {
+            "object_kind": f"A bounded survey of {len(codes)} code-identified three-color totalistic presets.",
+            "result_kind": result,
+            "parameters_and_variants": (
+                "The survey members are exactly the visibly delimited codes "
+                + ", ".join(str(code) for code in codes)
+                + "."
+            ),
+        }
+    )
+    evidence_label = f"{key}-source"
+    return source_candidate(
+        key,
+        name,
+        anchor,
+        facts,
+        not_applicable=NA_NO_CONTROL,
+        missing="The visual code labels plus the established codec fix each rule; no finite-display boundary convention is stated.",
+        claim="Original-resolution inspection confirms the complete bounded code-labeled preset survey.",
+        image_path=image_path,
+        variants=[
+            (
+                f"code {code}",
+                f"The survey member identified by totalistic code {code}.",
+                [evidence_label],
+            )
+            for code in codes
+        ],
+    )
+
+
 tot_codes: dict[int, CandidateSpec] = {}
 tot_codes[777] = totalistic_preset(
     777, "U000352", "The complete example evolution.", image_path=totalistic_code_image
+)
+totalistic_finite_survey = totalistic_survey(
+    "totalistic-finite-periodic-survey",
+    "finite/repetitive three-color totalistic preset survey",
+    "U000359",
+    "CHAPTERS/_page_77_Figure_6.jpeg",
+    [600, 843, 870, 1086, 1167, 1329, 1572, 1815, 1842],
+    "Nine displayed trajectories that attain finite size and then repeat.",
 )
 single_gray = source_candidate(
     "totalistic-single-gray-seed",
@@ -762,14 +891,52 @@ single_gray = source_candidate(
     claim="The caption explicitly fixes the initial condition used on the following totalistic examples.",
 )
 tot_codes[1329] = totalistic_preset(
-    1329, "U000360", "A finite pattern with the reported maximum period of 78 steps."
+    1329,
+    "U000359",
+    "A finite pattern with the reported maximum period of 78 steps.",
+    image_path="CHAPTERS/_page_77_Figure_6.jpeg",
+)
+context_evidence(
+    tot_codes[1329],
+    "totalistic-code-1329-caption",
+    "U000360",
+    "The caption materially identifies code 1329 as the maximum-period-78 case.",
+    strength="DIRECT_IDENTITY",
+)
+totalistic_forever_survey = totalistic_survey(
+    "totalistic-forever-repetitive-survey",
+    "forever-growing repetitive three-color totalistic preset survey",
+    "U000361",
+    "CHAPTERS/_page_78_Figure_2.jpeg",
+    [219, 957, 966, 1884],
+    "Four displayed forever-growing trajectories with fundamentally repetitive structure.",
 )
 tot_codes[420] = totalistic_preset(
-    420, "U000364", "A nested pattern with a structure not seen in the elementary examples."
+    420,
+    "U000363",
+    "A nested pattern with a structure not seen in the elementary examples.",
+    image_path="CHAPTERS/_page_78_Figure_4.jpeg",
+)
+context_evidence(
+    tot_codes[420],
+    "totalistic-code-420-caption",
+    "U000364",
+    "The following prose materially identifies code 420 as the uncommon nested structure.",
+    strength="DIRECT_IDENTITY",
 )
 for _code in [237, 948, 1749]:
     tot_codes[_code] = totalistic_preset(
-        _code, "U000367", "A named nested-pattern example."
+        _code,
+        "U000363",
+        "A named nested-pattern example.",
+        image_path="CHAPTERS/_page_78_Figure_4.jpeg",
+    )
+    context_evidence(
+        tot_codes[_code],
+        f"totalistic-code-{_code}-caption",
+        "U000367",
+        f"The comparison prose explicitly identifies code {_code} as a nested example.",
+        strength="DIRECT_IDENTITY",
     )
 for _code in [177, 912, 2040]:
     tot_codes[_code] = totalistic_preset(
@@ -784,22 +951,26 @@ tot_codes[1041] = totalistic_preset(
     "A displayed complex evolution mixing regularity and irregularity.",
     image_path="CHAPTERS/_page_81_Picture_1.jpeg",
 )
-tot_unnamed = totalistic_preset(
-    None,
+tot_codes[1635] = totalistic_preset(
+    1635,
     "U000374",
     "A displayed complex evolution mixing regularity and irregularity.",
     image_path="CHAPTERS/_page_81_Picture_2.jpeg",
-    ambiguous_name="unlabeled middle page-81 example",
+    source_strength="DEFECT_LIMITED",
+    claim_override=(
+        "The trajectory is intact, but its bottom-edge code label is clipped; "
+        "the later continuation and explicit label establish code 1635."
+    ),
+)
+tot_codes[1635]["source_status"] = ["CLEAR", "DEFECTIVE"]
+tot_codes[1635]["uncertainties"].append(
+    "The page-81 trajectory is intact but its code-1635 label is clipped; the later continuation and explicit label resolve the identity."
 )
 tot_codes[2049] = totalistic_preset(
     2049,
     "U000375",
     "A displayed complex evolution followed for 3000 steps.",
     image_path="CHAPTERS/_page_81_Picture_3.jpeg",
-)
-tot_codes[2049]["source_status"] = ["CLEAR", "AMBIGUOUS"]
-tot_codes[2049]["uncertainties"].append(
-    "The page-81 crop contains a boundary-spill 'code 1635' label above and a clear 'code 2049' label below; the later explicit code-2049 label and long run resolve the intended preset."
 )
 context_evidence(
     tot_codes[2049],
@@ -815,11 +986,13 @@ context_evidence(
     "Original-resolution inspection confirms the long continued trajectory.",
     image_path="CHAPTERS/_page_83_Picture_1.jpeg",
 )
-tot_codes[1635] = totalistic_preset(
-    1635,
+context_evidence(
+    tot_codes[1635],
+    "totalistic-code-1635-long-image",
     "U000377",
-    "A complex evolution continued for 3000 steps.",
+    "Original-resolution inspection confirms the 3000-step continuation of the middle page-81 trajectory.",
     image_path="CHAPTERS/_page_82_Picture_1.jpeg",
+    strength="CORROBORATING",
 )
 context_evidence(
     tot_codes[1635],
@@ -829,7 +1002,25 @@ context_evidence(
     strength="DIRECT_IDENTITY",
 )
 tot_codes[1599] = totalistic_preset(
-    1599, "U000384", "An edge-of-extinction run that resolves after 8282 steps."
+    1599,
+    "U000383",
+    "An edge-of-extinction run that resolves after 8282 steps.",
+    image_path="CHAPTERS/_page_84_Picture_2.jpeg",
+)
+totalistic_growth_survey = totalistic_survey(
+    "totalistic-growth-extinction-survey",
+    "growth/extinction three-color totalistic preset survey",
+    "U000383",
+    "CHAPTERS/_page_84_Picture_2.jpeg",
+    [357, 600, 1599, 2058],
+    "Four displayed trajectories initially poised between growth and extinction.",
+)
+context_evidence(
+    tot_codes[1599],
+    "totalistic-code-1599-prose",
+    "U000384",
+    "The prose singles out code 1599 as the unresolved long-running case.",
+    strength="DIRECT_IDENTITY",
 )
 context_evidence(
     tot_codes[1599],
@@ -885,6 +1076,49 @@ observer_na = {
     ]
 }
 
+totalistic_fate = source_candidate(
+    "totalistic-fate-resolution-query",
+    "totalistic growth/extinction fate and first-resolution query",
+    "U000382",
+    observer_facts(
+        "totalistic growth/extinction fate and first-resolution",
+        "A three-color totalistic cellular-automaton trajectory.",
+        (
+            "Determine whether the evolving pattern resolves to extinction or "
+            "a simple repetitive form, and report the first step at which that "
+            "resolution occurs; leave the result unresolved over the observed "
+            "prefix when no such step has yet occurred."
+        ),
+        "A fate classification and, when witnessed, its first resolution step.",
+    ),
+    not_applicable=observer_na,
+    missing="The prose does not formalize a machine-checkable predicate for when a fate first becomes visually clear.",
+    claim="The passage explicitly asks when the displayed growth/extinction cases resolve and contrasts resolved and still-unresolved prefixes.",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    totalistic_fate,
+    "totalistic-fate-panel",
+    "U000383",
+    "The original-resolution panel supplies the four code-identified query inputs, including code 1599.",
+    image_path="CHAPTERS/_page_84_Picture_2.jpeg",
+    strength="CORROBORATING",
+)
+context_evidence(
+    totalistic_fate,
+    "totalistic-fate-panel-caption",
+    "U000384",
+    "The caption states the under-100-step resolution bound for all displayed cases except code 1599.",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    totalistic_fate,
+    "totalistic-fate-code1599",
+    "U000387",
+    "The caption reports code 1599 resolving after 8282 steps into 31 repetitive structures.",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+
 
 def add_route(
     key: str,
@@ -907,6 +1141,48 @@ def add_route(
             "kind": kind,
             "_insertion": len(ALL_ROUTES),
         }
+    )
+
+
+def bounded_trajectory_survey(
+    key: str,
+    name: str,
+    anchor: str,
+    base_facts: dict[str, str],
+    image_path: str,
+    members: list[tuple[str, str]],
+    result: str,
+    *,
+    not_applicable: dict[str, str],
+    missing: str,
+    claim: str,
+) -> CandidateSpec:
+    facts = deepcopy(base_facts)
+    facts.update(
+        {
+            "object_kind": f"A bounded survey of {len(members)} explicitly pictured presets.",
+            "result_kind": result,
+            "parameters_and_variants": (
+                "The survey contains exactly "
+                + ", ".join(member for member, _description in members)
+                + "."
+            ),
+        }
+    )
+    evidence_label = f"{key}-source"
+    return source_candidate(
+        key,
+        name,
+        anchor,
+        facts,
+        not_applicable=not_applicable,
+        missing=missing,
+        claim=claim,
+        image_path=image_path,
+        variants=[
+            (member, description, [evidence_label])
+            for member, description in members
+        ],
     )
 
 
@@ -984,10 +1260,40 @@ context_evidence(
     strength="CORROBORATING",
 )
 
+mobile_survey = bounded_trajectory_survey(
+    "mobile-eight-case-survey",
+    "eight-case ordinary mobile-automaton preset survey",
+    "U000397",
+    MOBILE_BASE,
+    "CHAPTERS/_page_87_Figure_2.jpeg",
+    [
+        ("case (a)", "A localized purely repetitive active-cell trajectory."),
+        ("case (b)", "A localized purely repetitive active-cell trajectory."),
+        ("case (c)", "A purely repetitive trajectory shifting systematically to the right."),
+        ("case (d)", "A purely repetitive trajectory shifting systematically to the right."),
+        ("case (e)", "A right-shifting repetitive trajectory that leaves stripes."),
+        ("case (f)", "A right-shifting repetitive trajectory that leaves stripes."),
+        ("case (g)", "A nonperiodic back-and-forth sweep with record-extreme growth."),
+        ("case (h)", "A nonperiodic back-and-forth sweep with record-extreme growth."),
+    ],
+    "Eight complete rule/evolution panels spanning localized, drifting, striped, and record-sweeping behavior.",
+    not_applicable={"external_data": NA_NO_CONTROL["external_data"]},
+    missing="The cases have letter identities but no numeric rule codes or finite-display boundary convention.",
+    claim="The original-resolution figure visibly delimits eight complete ordinary mobile-automaton rules and trajectories.",
+)
+context_evidence(
+    mobile,
+    "mobile-family-eight-case-survey",
+    "U000397",
+    "The eight-case original-resolution survey corroborates the finite standard rule-table shape.",
+    image_path="CHAPTERS/_page_87_Figure_2.jpeg",
+    strength="CORROBORATING",
+)
+
 record_extrema = source_candidate(
     "record-extremum-compression",
     "record-extremum head-position compression observer",
-    "U000402",
+    "U000401",
     observer_facts(
         "record-extremum head-position compression",
         "A mobile-automaton or Turing-machine trajectory with a distinguished active/head position.",
@@ -997,7 +1303,16 @@ record_extrema = source_candidate(
     aliases=["compressed mobile automaton evolution", "compressed Turing machine evolution"],
     not_applicable=observer_na,
     missing="The observer does not define how to render intervals between retained events.",
-    claim="The caption explicitly defines compression by new left/right position records.",
+    claim="The original-resolution image delimits the compressed histories of mobile cases (g) and (h).",
+    image_path="CHAPTERS/_page_87_Picture_7.jpeg",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    record_extrema,
+    "record-extremum-mobile-definition",
+    "U000402",
+    "The caption explicitly defines compression by new left/right position records.",
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 
 EXT_MOBILE_BASE = deepcopy(MOBILE_BASE)
@@ -1067,6 +1382,14 @@ context_evidence(
     image_path="CHAPTERS/_page_88_Picture_8.jpeg",
     strength="DIRECT_COMPLETE_MECHANICS",
 )
+context_evidence(
+    mobile_nested,
+    "extended-mobile-nested-compressed",
+    "U000407",
+    "The original-resolution compressed history supports the same nested preset.",
+    image_path="CHAPTERS/_page_88_Picture_6.jpeg",
+    strength="CORROBORATING",
+)
 mobile_random_color = mobile_extended_preset(
     "extended-mobile-random-color",
     "apparently-random-color extended mobile automaton preset",
@@ -1082,6 +1405,18 @@ context_evidence(
     image_path="CHAPTERS/_page_89_Picture_3.jpeg",
     strength="DIRECT_COMPLETE_MECHANICS",
 )
+for _label, _unit, _path in [
+    ("extended-mobile-random-color-history", "U000412", "CHAPTERS/_page_89_Picture_5.jpeg"),
+    ("extended-mobile-random-color-compressed", "U000413", "CHAPTERS/_page_89_Picture_6.jpeg"),
+]:
+    context_evidence(
+        mobile_random_color,
+        _label,
+        _unit,
+        "The original-resolution history is a co-referential view of the same extended mobile preset.",
+        image_path=_path,
+        strength="CORROBORATING",
+    )
 mobile_random_motion = mobile_extended_preset(
     "extended-mobile-random-motion",
     "apparently-random-active-motion extended mobile automaton preset",
@@ -1096,6 +1431,14 @@ context_evidence(
     "The original-resolution rule diagram fixes the lookup.",
     image_path="CHAPTERS/_page_90_Figure_4.jpeg",
     strength="DIRECT_COMPLETE_MECHANICS",
+)
+context_evidence(
+    mobile_random_motion,
+    "extended-mobile-random-motion-history",
+    "U000417",
+    "The original-resolution ordinary history supports the same random-motion preset.",
+    image_path="CHAPTERS/_page_90_Figure_3.jpeg",
+    strength="CORROBORATING",
 )
 
 GENERAL_MOBILE_BASE = deepcopy(EXT_MOBILE_BASE)
@@ -1125,6 +1468,14 @@ general_mobile = source_candidate(
     missing="The source does not state conflict resolution when writable local regions overlap.",
     claim="The passage delimits multiple active cells and rules that move, split, or delete active cells.",
 )
+context_evidence(
+    general_mobile,
+    "generalized-mobile-worked-rule",
+    "U000424",
+    "The original-resolution worked rule corroborates generalized move/split mechanics.",
+    image_path="CHAPTERS/_page_91_Figure_6.jpeg",
+    strength="CORROBORATING",
+)
 general_split = source_candidate(
     "generalized-mobile-split-preset",
     "generalized mobile automaton splitting preset",
@@ -1141,6 +1492,38 @@ context_evidence(
     "U000425",
     "Original-resolution inspection confirms the multiple-active-cell evolution.",
     image_path="CHAPTERS/_page_91_Figure_8.jpeg",
+)
+general_mobile_survey = bounded_trajectory_survey(
+    "generalized-mobile-eight-case-survey",
+    "eight-case generalized mobile-automaton preset survey",
+    "U000429",
+    GENERAL_MOBILE_BASE,
+    "CHAPTERS/_page_92_Figure_1.jpeg",
+    [
+        (f"case ({letter})", description)
+        for letter, description in [
+            ("a", "A rule for which only finitely many cells become active."),
+            ("b", "A rule with indefinitely proliferating active cells."),
+            ("c", "A rule with indefinitely proliferating active cells."),
+            ("d", "A rule with near-cellular-automaton activity."),
+            ("e", "A rule with a complicated active-cell arrangement."),
+            ("f", "A rule with a complicated active-cell arrangement."),
+            ("g", "A rule with a complicated active-cell arrangement."),
+            ("h", "A rule with a complicated active-cell arrangement."),
+        ]
+    ],
+    "Eight complete generalized-mobile rule/evolution panels with differing active-cell proliferation.",
+    not_applicable={"external_data": NA_NO_CONTROL["external_data"]},
+    missing="The source does not state conflict resolution for overlapping writable regions.",
+    claim="The original-resolution figure visibly delimits all eight generalized-mobile rule tables and trajectories.",
+)
+context_evidence(
+    general_mobile,
+    "generalized-mobile-eight-case-survey",
+    "U000429",
+    "The original-resolution eight-case survey corroborates the generalized family mechanics.",
+    image_path="CHAPTERS/_page_92_Figure_1.jpeg",
+    strength="CORROBORATING",
 )
 
 
@@ -1200,12 +1583,21 @@ context_evidence(
 )
 
 
-def tm_restriction(states: int, anchor: str, count: str, result: str) -> CandidateSpec:
+def tm_restriction(
+    states: int,
+    anchor: str,
+    count: str,
+    result: str,
+    *,
+    blank_tape_survey: bool,
+) -> CandidateSpec:
     facts = deepcopy(TM_BASE)
     facts["object_kind"] = f"A {states}-head-state, two-tape-color Turing-machine restriction."
     facts["control_state"] = f"Exactly {states} possible head states."
     facts["parameters_and_variants"] = f"Head states={states}, tape colors=2; {count}."
     facts["result_kind"] = result
+    if blank_tape_survey:
+        facts["seed"] = "The reported survey starts from an all-white tape with the head in its first state."
     return source_candidate(
         f"turing-{states}-state",
         f"{states}-state two-color Turing machine family",
@@ -1213,18 +1605,99 @@ def tm_restriction(states: int, anchor: str, count: str, result: str) -> Candida
         facts,
         aliases=[f"{states}-state Turing machines"],
         not_applicable={"external_data": NA_NO_CONTROL["external_data"]},
-        missing="The source does not specify a halting state or finite boundary convention.",
-        claim=f"The passage materially delimits the {states}-state/two-color rule space and its blank-tape behavior survey.",
+        missing=(
+            "The source does not specify a halting state or finite boundary convention."
+            if blank_tape_survey
+            else "The source does not explicitly state a blank-tape survey condition, halting state, or finite boundary convention."
+        ),
+        claim=(
+            f"The passage materially delimits the {states}-state/two-color rule space"
+            + (" and its blank-tape behavior survey." if blank_tape_survey else ".")
+        ),
     )
 
 
-tm2 = tm_restriction(2, "U000439", "4096 possible rules", "Only repetitive or nested displayed behavior.")
-tm3 = tm_restriction(3, "U000443", "about three million possible rules", "Ultimately repetitive or nested behavior from an all-white tape in the reported survey.")
-tm4 = tm_restriction(4, "U000444", "a finite large rule space", "Some presets yield apparently random behavior.")
+tm2 = tm_restriction(
+    2,
+    "U000439",
+    "4096 possible rules",
+    "Only repetitive or nested displayed behavior.",
+    blank_tape_survey=False,
+)
+tm3 = tm_restriction(
+    3,
+    "U000443",
+    "about three million possible rules",
+    "Ultimately repetitive or nested behavior from an all-white tape in the reported survey.",
+    blank_tape_survey=True,
+)
+tm4 = tm_restriction(
+    4,
+    "U000444",
+    "a finite large rule space",
+    "Some blank-tape presets yield apparently random behavior.",
+    blank_tape_survey=True,
+)
+tm2_survey = bounded_trajectory_survey(
+    "turing-two-state-six-case-survey",
+    "six-case two-state/two-color Turing-machine preset survey",
+    "U000440",
+    {**TM_BASE, "control_state": "Exactly two possible head states."},
+    "CHAPTERS/_page_94_Figure_1.jpeg",
+    [
+        (f"case ({letter})", "A complete two-state/two-color transition table and displayed trajectory.")
+        for letter in "abcdef"
+    ],
+    "Six complete two-state/two-color transition-table and trajectory panels.",
+    not_applicable={"external_data": NA_NO_CONTROL["external_data"]},
+    missing="The cases have letter identities but no numeric machine codes, halting states, or explicit finite boundary convention.",
+    claim="The original-resolution figure visibly delimits all six complete two-state/two-color Turing rules.",
+)
+context_evidence(
+    tm2,
+    "turing-two-state-survey",
+    "U000440",
+    "The original-resolution six-case rule survey corroborates the two-state restriction.",
+    image_path="CHAPTERS/_page_94_Figure_1.jpeg",
+    strength="CORROBORATING",
+)
+tm_mixed_survey = bounded_trajectory_survey(
+    "turing-three-four-state-eight-case-survey",
+    "eight-case three/four-state Turing-machine preset survey",
+    "U000447",
+    TM_BASE,
+    "CHAPTERS/_page_95_Figure_2.jpeg",
+    [
+        ("case (a)", "A complete three-state/two-color blank-tape preset."),
+        ("case (b)", "A complete three-state/two-color blank-tape preset."),
+        ("case (c)", "A complete four-state/two-color blank-tape preset."),
+        ("case (d)", "A complete four-state/two-color blank-tape preset."),
+        ("case (e)", "A complete four-state/two-color blank-tape preset."),
+        ("case (f)", "A complete four-state/two-color blank-tape preset."),
+        ("case (g)", "A complete four-state/two-color blank-tape preset."),
+        ("case (h)", "A complete four-state/two-color blank-tape preset."),
+    ],
+    "Eight complete transition-table panels run from a blank tape and first head state.",
+    not_applicable={"external_data": NA_NO_CONTROL["external_data"]},
+    missing="The cases have letter identities but no numeric machine codes, halting states, or finite boundary convention.",
+    claim="The original-resolution figure visibly delimits all eight three/four-state transition tables and their trajectories.",
+)
+for _spec, _label in [
+    (tm3, "turing-three-state-survey"),
+    (tm4, "turing-four-state-survey"),
+]:
+    context_evidence(
+        _spec,
+        _label,
+        "U000447",
+        "The original-resolution eight-case survey corroborates this state-count restriction.",
+        image_path="CHAPTERS/_page_95_Figure_2.jpeg",
+        strength="CORROBORATING",
+    )
 blank_tm_seed = source_candidate(
     "turing-blank-seed",
     "blank-tape first-head-state Turing-machine seed",
-    "U000448",
+    "U000447",
     {
         **seed_facts(
             "all tape cells white with the head in its first state",
@@ -1236,7 +1709,16 @@ blank_tm_seed = source_candidate(
     },
     not_applicable={k: v for k, v in seed_na.items() if k != "control_state"},
     missing="The exact initial tape coordinate is not stated.",
-    claim="The caption explicitly fixes the blank tape and first head state for the survey.",
+    claim="The original-resolution survey visibly delimits the common blank-tape/first-state start.",
+    image_path="CHAPTERS/_page_95_Figure_2.jpeg",
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
+context_evidence(
+    blank_tm_seed,
+    "turing-blank-seed-caption",
+    "U000448",
+    "The caption explicitly fixes the blank tape and first head state for the survey.",
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 context_evidence(
     record_extrema,
@@ -1262,6 +1744,14 @@ context_evidence(
     "The original-resolution rule image supplies the complete transition table.",
     image_path="CHAPTERS/_page_96_Picture_4.jpeg",
     strength="DIRECT_COMPLETE_MECHANICS",
+)
+context_evidence(
+    tm_random,
+    "turing-four-state-random-compressed",
+    "U000450",
+    "The original-resolution compressed/continued trajectory is co-referential evidence for the same preset.",
+    image_path="CHAPTERS/_page_96_Picture_3.jpeg",
+    strength="CORROBORATING",
 )
 
 
