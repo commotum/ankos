@@ -67,6 +67,8 @@ WORKER_CANDIDATE_RE = re.compile(r"^W[0-9]{4}$")
 GLOBAL_CANDIDATE_RE = re.compile(r"^B[0-9]{4}$")
 WORKER_ROUTE_RE = re.compile(r"^WR[0-9]{4}$")
 GLOBAL_ROUTE_RE = re.compile(r"^R[0-9]{6}$")
+WORKER_EVIDENCE_RE = re.compile(r"^WE[0-9]{6}$")
+WORKER_EVIDENCE_GROUP_RE = re.compile(r"^WG[0-9]{6}$")
 CHAPTER_PATH_RE = re.compile(
     r"^(?:CHAPTERS|BACK-MATTER/NOTES)/([0-9]{2})-[^/]+\.md$"
 )
@@ -274,9 +276,11 @@ For every source unit:
    `WR0001`, `WR0002`, ... sequence in discovery order; do not resolve them or
    declare a final missing target. The coordinator maps WR IDs to global R IDs
    and performs global routing.
-8. Allocate evidence as `WE000001`, `WE000002`, ... in first-occurrence order,
-   and evidence groups as `WG000001`, `WG000002`, ... in group first-occurrence
-   order. The coordinator maps these worker-local IDs to global E/G IDs.
+8. Allocate evidence as `WE000001`, `WE000002`, ... in frozen source/image
+   discovery traversal, independent of which candidate owns each record.
+   Allocate evidence groups as `WG000001`, `WG000002`, ... by the first
+   evidence ID in each group. The coordinator maps these worker-local IDs to
+   global E/G IDs.
 
 Write only `output/output.json` and preserve every required hash/declaration.
 Network use and access outside this bundle are prohibited. If the bundle lacks
@@ -1074,9 +1078,7 @@ def _validate_worker_output(
     proposals = output.get("candidate_proposals", [])
     proposal_by_id: dict[str, dict[str, Any]] = {}
     proposal_anchor_keys: list[tuple[int, int, int]] = []
-    worker_evidence_ids: list[str] = []
-    worker_group_ids: list[str] = []
-    seen_worker_group_ids: set[str] = set()
+    worker_evidence_rows: list[tuple[str, str, dict[str, Any]]] = []
     reading_status_by_unit = {
         row.get("source_unit_id"): row.get("source_status")
         for row in reading_updates
@@ -1251,14 +1253,9 @@ def _validate_worker_output(
                         )
                         continue
                     evidence_by_id[evidence_id] = evidence
-                    worker_evidence_ids.append(evidence_id)
-                    evidence_group_id = evidence.get("evidence_group_id")
-                    if (
-                        isinstance(evidence_group_id, str)
-                        and evidence_group_id not in seen_worker_group_ids
-                    ):
-                        seen_worker_group_ids.add(evidence_group_id)
-                        worker_group_ids.append(evidence_group_id)
+                    worker_evidence_rows.append(
+                        (evidence_id, candidate_id, evidence)
+                    )
                     source_id = evidence.get("source_unit_id")
                     image_path = evidence.get("image_path")
                     if source_id is None and image_path is None:
@@ -1366,15 +1363,162 @@ def _validate_worker_output(
                         "worker discovery-anchor ordinals are not complete for "
                         f"anchor {anchor_key}"
                     )
-        if not is_complete_worker_sequence(worker_evidence_ids, "WE", 6):
-            errors.append(
-                "worker evidence IDs must be a complete ordered WE000001 sequence"
+        worker_evidence_ids = [
+            evidence_id
+            for evidence_id, _, _ in worker_evidence_rows
+        ]
+        evidence_ids_are_unique = (
+            len(worker_evidence_ids) == len(set(worker_evidence_ids))
+        )
+        evidence_ids_have_valid_shape = all(
+            WORKER_EVIDENCE_RE.fullmatch(evidence_id)
+            for evidence_id in worker_evidence_ids
+        )
+        ordered_worker_evidence = sorted(
+            worker_evidence_rows,
+            key=lambda item: item[0],
+        )
+        ordered_worker_evidence_ids = [
+            evidence_id
+            for evidence_id, _, _ in ordered_worker_evidence
+        ]
+        evidence_ids_are_complete = (
+            evidence_ids_are_unique
+            and evidence_ids_have_valid_shape
+            and is_complete_worker_sequence(
+                ordered_worker_evidence_ids,
+                "WE",
+                6,
             )
-        if not is_complete_worker_sequence(worker_group_ids, "WG", 6):
+        )
+        if not evidence_ids_are_complete:
             errors.append(
-                "worker evidence-group first occurrences must be a complete "
-                "ordered WG000001 sequence"
+                "worker evidence IDs must be a complete unique WE000001 "
+                "sequence independent of candidate grouping"
             )
+        else:
+            evidence_anchor_keys: list[tuple[int, int, int]] = []
+            evidence_ordinals_by_anchor: dict[
+                tuple[int, str, str], list[int]
+            ] = {}
+            worker_group_ids: list[str] = []
+            seen_worker_group_ids: set[str] = set()
+            for evidence_id, candidate_id, evidence in ordered_worker_evidence:
+                evidence_group_id = evidence.get("evidence_group_id")
+                if (
+                    isinstance(evidence_group_id, str)
+                    and evidence_group_id not in seen_worker_group_ids
+                ):
+                    seen_worker_group_ids.add(evidence_group_id)
+                    worker_group_ids.append(evidence_group_id)
+
+                anchor = evidence.get("discovery_anchor")
+                if not isinstance(anchor, dict):
+                    errors.append(
+                        f"candidate {candidate_id} evidence {evidence_id} "
+                        "lacks a discovery anchor"
+                    )
+                    continue
+                anchor_epoch = anchor.get("epoch")
+                anchor_kind = anchor.get("kind")
+                anchor_id = anchor.get("id")
+                anchor_ordinal = anchor.get("ordinal")
+                if anchor_epoch != bundle_epoch:
+                    errors.append(
+                        f"candidate {candidate_id} evidence {evidence_id} "
+                        "discovery epoch differs from bundle"
+                    )
+                anchor_order: int | None = None
+                if not isinstance(anchor_id, str):
+                    errors.append(
+                        f"candidate {candidate_id} evidence {evidence_id} "
+                        "anchor ID must be a string"
+                    )
+                elif anchor_kind == "SOURCE_UNIT":
+                    anchor_order = assigned_unit_anchor_order.get(anchor_id)
+                    if anchor_order is None:
+                        errors.append(
+                            f"candidate {candidate_id} evidence {evidence_id} "
+                            "anchor is outside assignment"
+                        )
+                    elif evidence.get("source_unit_id") != anchor_id:
+                        errors.append(
+                            f"candidate {candidate_id} evidence {evidence_id} "
+                            "source anchor is inconsistent"
+                        )
+                elif anchor_kind == "IMAGE":
+                    anchor_order = assigned_image_anchor_order.get(anchor_id)
+                    if anchor_order is None:
+                        errors.append(
+                            f"candidate {candidate_id} evidence {evidence_id} "
+                            "anchor is outside assignment"
+                        )
+                    elif evidence.get("image_path") != anchor_id:
+                        errors.append(
+                            f"candidate {candidate_id} evidence {evidence_id} "
+                            "image anchor is inconsistent"
+                        )
+                else:
+                    errors.append(
+                        f"candidate {candidate_id} evidence {evidence_id} "
+                        "SEARCH_HIT/unknown anchor is invalid for a Stage "
+                        "4–17 reading bundle"
+                    )
+                if (
+                    isinstance(anchor_epoch, int)
+                    and not isinstance(anchor_epoch, bool)
+                    and anchor_epoch >= 1
+                    and isinstance(anchor_kind, str)
+                    and isinstance(anchor_id, str)
+                    and isinstance(anchor_ordinal, int)
+                    and not isinstance(anchor_ordinal, bool)
+                    and anchor_ordinal >= 1
+                ):
+                    evidence_ordinals_by_anchor.setdefault(
+                        (anchor_epoch, anchor_kind, anchor_id),
+                        [],
+                    ).append(anchor_ordinal)
+                if (
+                    anchor_order is not None
+                    and isinstance(anchor_ordinal, int)
+                    and not isinstance(anchor_ordinal, bool)
+                    and anchor_ordinal >= 1
+                    and valid_bundle_epoch
+                ):
+                    evidence_anchor_keys.append(
+                        (bundle_epoch, anchor_order, anchor_ordinal)
+                    )
+
+            if (
+                len(evidence_anchor_keys) == len(ordered_worker_evidence)
+                and evidence_anchor_keys != sorted(evidence_anchor_keys)
+            ):
+                errors.append(
+                    "worker evidence ID order differs from frozen "
+                    "discovery-anchor traversal"
+                )
+            for anchor_identity, ordinals in evidence_ordinals_by_anchor.items():
+                if sorted(ordinals) != list(range(1, len(ordinals) + 1)):
+                    errors.append(
+                        "worker evidence discovery-anchor ordinals are not "
+                        f"complete for anchor {anchor_identity}"
+                    )
+
+            if (
+                not all(
+                    WORKER_EVIDENCE_GROUP_RE.fullmatch(group_id)
+                    for group_id in worker_group_ids
+                )
+                or not is_complete_worker_sequence(
+                    worker_group_ids,
+                    "WG",
+                    6,
+                )
+            ):
+                errors.append(
+                    "worker evidence-group IDs must be a complete WG000001 "
+                    "sequence by first evidence ID"
+                )
 
     routes = output.get("route_proposals", [])
     route_ids: set[str] = set()

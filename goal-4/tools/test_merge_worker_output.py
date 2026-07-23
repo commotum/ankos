@@ -260,6 +260,114 @@ def _completed_bundle(
     return bundle
 
 
+def _completed_interleaved_evidence_bundle(root: Path) -> Path:
+    """Build two candidates whose frozen evidence traversal is interleaved."""
+    bundle = _completed_bundle(root)
+    output_path = bundle / "output" / "output.json"
+    output = json.loads(output_path.read_text(encoding="utf-8"))
+    manifest = json.loads(
+        (bundle / "allowed-manifest.json").read_text(encoding="utf-8")
+    )
+    reading_input = _read_csv(bundle / "input" / "reading-input.csv")
+    preface_units = [
+        row["source_unit_id"]
+        for row in reading_input
+        if row["path"] == ASSIGNMENT_PATH
+    ]
+    assert len(preface_units) >= 3
+    first_source, second_source, third_source = preface_units[:3]
+    image_path = output["asset_updates"][0]["physical_path"]
+
+    first_candidate = output["candidate_proposals"][0]
+    assert first_candidate["source_unit_ids"] == [first_source]
+    source_one_evidence = first_candidate["source_evidence"][0]
+    source_three_evidence = copy.deepcopy(source_one_evidence)
+    source_three_evidence.update(
+        {
+            "evidence_id": "WE000003",
+            "evidence_group_id": "WG000003",
+            "discovery_anchor": {
+                "epoch": manifest["discovery_epoch"],
+                "kind": "SOURCE_UNIT",
+                "id": third_source,
+                "ordinal": 1,
+            },
+            "source_unit_id": third_source,
+            "claim": "A later source unit corroborates the first lead.",
+            "strength": "CORROBORATING",
+        }
+    )
+    first_candidate.update(
+        {
+            "source_unit_ids": [first_source, third_source],
+            "source_evidence": [
+                source_one_evidence,
+                source_three_evidence,
+            ],
+            "image_witnesses": [],
+            "evidence_strength": ["LEAD_ONLY", "CORROBORATING"],
+            "cross_reference_ids": [],
+        }
+    )
+
+    second_candidate = _candidate(
+        second_source,
+        image_path,
+        manifest["discovery_epoch"],
+    )
+    second_candidate.update(
+        {
+            "id": "W0002",
+            "provisional_name": "Second interleaved construction lead",
+            "discovery_anchor": {
+                "epoch": manifest["discovery_epoch"],
+                "kind": "SOURCE_UNIT",
+                "id": second_source,
+                "ordinal": 1,
+            },
+        }
+    )
+    second_candidate["source_evidence"][0].update(
+        {
+            "evidence_id": "WE000002",
+            "evidence_group_id": "WG000002",
+        }
+    )
+    second_candidate["source_evidence"][1].update(
+        {
+            "evidence_id": "WE000004",
+            "evidence_group_id": "WG000004",
+        }
+    )
+    output["candidate_proposals"] = [first_candidate, second_candidate]
+
+    for row in output["reading_updates"]:
+        unit_id = row["source_unit_id"]
+        if unit_id == second_source:
+            row.update(
+                {
+                    "review_disposition": "CANDIDATE",
+                    "candidate_ids": '["W0002"]',
+                    "evidence_statement": "Assigned source unit supplies the second lead.",
+                }
+            )
+        elif unit_id == third_source:
+            row.update(
+                {
+                    "review_disposition": "SUPPORTS_CANDIDATE",
+                    "candidate_ids": '["W0001"]',
+                    "evidence_statement": "Assigned source unit supports the first lead.",
+                }
+            )
+    output["asset_updates"][0]["candidate_ids"] = '["W0002"]'
+    output_path.write_bytes(canonical_json_bytes(output))
+    assert build_worker_bundle.verify_bundle(
+        bundle,
+        require_completed_output=True,
+    ) == []
+    return bundle
+
+
 def _completed_no_construction_bundle(
     root: Path,
     *,
@@ -1111,6 +1219,111 @@ def test_default_cli_is_dry_run_and_rewrites_all_id_families(
     }
     assert preview["search_ledger_preserved"] is True
     assert _bytes(goal) == before
+
+
+def test_interleaved_candidate_evidence_verifies_previews_and_validates(
+    tmp_path: Path,
+) -> None:
+    bundle = _completed_interleaved_evidence_bundle(tmp_path)
+    assert build_worker_bundle.verify_bundle(
+        bundle,
+        require_completed_output=True,
+    ) == []
+    goal = _copy_global_state(tmp_path)
+
+    plan = merge.prepare_merge(bundle, goal_dir=goal)
+    preview = plan.preview()
+    assert preview["mappings"]["evidence"] == {
+        "WE000001": "E000001",
+        "WE000002": "E000002",
+        "WE000003": "E000003",
+        "WE000004": "E000004",
+    }
+    assert preview["mappings"]["evidence_groups"] == {
+        "WG000001": "G000001",
+        "WG000002": "G000002",
+        "WG000003": "G000003",
+        "WG000004": "G000004",
+    }
+
+    merge.apply_merge(plan)
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(TOOLS_DIR / "validate_audit.py"),
+            "--repo-root",
+            str(merge.validate_audit.REPO_ROOT),
+            "--goal-dir",
+            str(goal),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+
+
+def test_interleaved_worker_evidence_rejects_invalid_local_allocations(
+    tmp_path: Path,
+) -> None:
+    bundle = _completed_interleaved_evidence_bundle(tmp_path)
+    output = json.loads(
+        (bundle / "output" / "output.json").read_text(encoding="utf-8")
+    )
+
+    gap = copy.deepcopy(output)
+    gap["candidate_proposals"][1]["source_evidence"][1][
+        "evidence_id"
+    ] = "WE000005"
+    gap_errors = build_worker_bundle.verify_bundle(
+        bundle,
+        require_completed_output=True,
+        worker_output_override=gap,
+    )
+    assert any(
+        "complete unique WE000001 sequence" in error
+        for error in gap_errors
+    )
+
+    duplicate = copy.deepcopy(output)
+    duplicate["candidate_proposals"][1]["source_evidence"][0][
+        "evidence_id"
+    ] = "WE000001"
+    duplicate_errors = build_worker_bundle.verify_bundle(
+        bundle,
+        require_completed_output=True,
+        worker_output_override=duplicate,
+    )
+    assert any(
+        "complete unique WE000001 sequence" in error
+        for error in duplicate_errors
+    )
+
+    out_of_traversal = copy.deepcopy(output)
+    first_late = out_of_traversal["candidate_proposals"][0][
+        "source_evidence"
+    ][1]
+    second_early = out_of_traversal["candidate_proposals"][1][
+        "source_evidence"
+    ][0]
+    first_late["evidence_id"], second_early["evidence_id"] = (
+        second_early["evidence_id"],
+        first_late["evidence_id"],
+    )
+    first_late["evidence_group_id"], second_early["evidence_group_id"] = (
+        second_early["evidence_group_id"],
+        first_late["evidence_group_id"],
+    )
+    traversal_errors = build_worker_bundle.verify_bundle(
+        bundle,
+        require_completed_output=True,
+        worker_output_override=out_of_traversal,
+    )
+    assert any(
+        "evidence ID order differs from frozen discovery-anchor traversal"
+        in error
+        for error in traversal_errors
+    )
 
 
 def test_apply_uses_validated_staged_ledgers_and_preserves_search(

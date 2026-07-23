@@ -723,9 +723,8 @@ def _candidate_local_sequences(
     proposals: list[dict[str, Any]],
 ) -> tuple[list[str], list[str], list[str]]:
     candidate_ids: list[str] = []
-    evidence_ids: list[str] = []
+    evidence_records: list[tuple[str, str]] = []
     evidence_group_ids: list[str] = []
-    seen_groups: set[str] = set()
     for index, candidate in enumerate(proposals):
         if not isinstance(candidate, dict):
             raise MergeError(f"candidate_proposals[{index}] is not an object")
@@ -747,10 +746,25 @@ def _candidate_local_sequences(
                 raise MergeError(
                     f"candidate {candidate_id} has incomplete evidence identifiers"
                 )
-            evidence_ids.append(evidence_id)
-            if group_id not in seen_groups:
-                seen_groups.add(group_id)
-                evidence_group_ids.append(group_id)
+            evidence_records.append((evidence_id, group_id))
+
+    # Candidate records group evidence by owner, but the frozen E/G allocation
+    # traverses source anchors globally. Worker-local WE IDs encode that
+    # traversal, so recover the flat order from the IDs before allocating.
+    evidence_records.sort(key=lambda item: item[0])
+    evidence_ids = [evidence_id for evidence_id, _ in evidence_records]
+    _sequence(evidence_ids, "WE", 6, "worker evidence")
+    seen_groups: set[str] = set()
+    for _, group_id in evidence_records:
+        if group_id not in seen_groups:
+            seen_groups.add(group_id)
+            evidence_group_ids.append(group_id)
+    _sequence(
+        evidence_group_ids,
+        "WG",
+        6,
+        "worker evidence-group",
+    )
     return candidate_ids, evidence_ids, evidence_group_ids
 
 

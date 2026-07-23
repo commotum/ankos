@@ -1068,14 +1068,14 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
                     "source_status": "CLEAR",
                     "risk_flags": compact(["CONSTRUCTION_BEARING"]),
                     "original_resolution_status": "REVIEWED",
-                    "transcription_status": "NOT_REQUIRED",
+                    "transcription_status": "CHECKED",
                     "candidate_ids": compact(["W0002"]),
                     "route_ids": "[]",
                     "evidence_statement": (
-                        "Inspected at original resolution: the image shows the "
-                        "long binary evolution described by U004871 and "
-                        "corroborates W0002; no exact rule is inferred from "
-                        "pixels."
+                        "Inspected at original resolution and checked against "
+                        "the surrounding note: the image shows the long binary "
+                        "evolution described by U004871 and corroborates "
+                        "W0002; no exact rule is inferred from pixels."
                     ),
                     "review_stage": "4",
                     "reviewer": EXPECTED_WORKER,
@@ -1097,7 +1097,7 @@ def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
                         ]
                     ),
                     "original_resolution_status": "REVIEWED",
-                    "transcription_status": "NOT_APPLICABLE",
+                    "transcription_status": "NOT_REQUIRED",
                     "candidate_ids": "[]",
                     "route_ids": "[]",
                     "evidence_statement": (
