@@ -1943,6 +1943,37 @@ context_evidence(
     strength="DIRECT_COMPLETE_MECHANICS",
     modality="FORMULA",
 )
+context_evidence(
+    sqrt_generator,
+    "sqrt-generator-native-panel",
+    "U000789",
+    "Original-resolution inspection confirms the r/s register states, branch evolution, and emitted binary square-root digits.",
+    image_path="CHAPTERS/_page_156_Figure_1.jpeg",
+    fields=[
+        "carrier",
+        "support",
+        "topology",
+        "structural_invariants",
+        "alphabet_or_value_schema",
+        "complete_state",
+        "visible_history",
+        "seed",
+        "input",
+        "frontier_or_activation",
+        "schedule",
+        "read_dependencies_or_neighborhood",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+        "successor_cardinality",
+        "determinism_branching_or_measure",
+        "witness_semantics",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
+)
 
 
 def partial_function_family(key: str, name: str, anchor: str, law: str, result: str) -> CandidateSpec:
@@ -1954,8 +1985,6 @@ def partial_function_family(key: str, name: str, anchor: str, law: str, result: 
             "object_kind": f"Displayed {name} expressions and their value representations.",
             "native_time": "No native time; these are fixed displayed denotations.",
             "input": "Only the named expressions and arguments printed in the table.",
-            "law_kind": "A named mathematical-function denotation.",
-            "rule_relation_constraint_function_or_probability_law": law,
             "result_kind": result,
             "parameters_and_variants": "Only the explicitly displayed expressions and arguments are in scope.",
             "excluded_observers_and_representations": "The decimal and binary digit strings are representations of the displayed values.",
@@ -1972,6 +2001,8 @@ def partial_function_family(key: str, name: str, anchor: str, law: str, result: 
             "structural_invariants": "No structural invariant is stated for a general evaluator.",
             "alphabet_or_value_schema": "No formal input or result schema is stated beyond the displayed expressions.",
             "complete_state": "The fixed denotations have no stated operational state.",
+            "law_kind": "The table names the displayed function expressions but does not define a general function law.",
+            "rule_relation_constraint_function_or_probability_law": "The table supplies displayed expressions and values, not a general function rule or evaluator.",
             "successor_cardinality": "The table does not define a general successor or branch convention.",
             "determinism_branching_or_measure": "A general branch convention is not stated.",
             "termination_completion_failure": "No evaluation procedure or completion criterion is supplied.",
@@ -2198,6 +2229,7 @@ mark_unknown(
         "determinism_branching_or_measure": "No general branch convention or evaluator is specified.",
         "termination_completion_failure": "No evaluation procedure or completion bound is specified.",
         "witness_semantics": "No general evaluation certificate is defined.",
+        "parameters_and_variants": "The source does not delimit a formal grammar, operation set, branch convention, or parameterized expression language.",
     },
 )
 
@@ -2367,11 +2399,11 @@ zeta_function = source_candidate(
         result="The value of the reciprocal-power series.",
         successor="One series value where the displayed series converges.",
         determinism="Deterministic.",
-        termination="The denotation is an infinite sum; finite numerical evaluation requires an approximation not stated here.",
+        termination="The displayed denotation is an infinite sum rather than a finite summation procedure.",
         witness="Partial sums converge to the stated value in the admitted domain.",
         variants="The source relates the function to prime distribution.",
         excluded="The plotted Riemann-Siegel curve is a related function, not Zeta's native representation.",
-        limit="Analytic continuation and the complete complex domain are not specified.",
+        limit="Analytic continuation, the complete complex domain, and a finite numerical approximation method are not specified.",
     ),
     not_applicable=DECLARATIVE_NA,
     missing="Analytic continuation, convergence domain, and evaluation method are not supplied.",
@@ -2514,6 +2546,38 @@ pi_quarter_seed = source_candidate(
     claim="The passage explicitly fixes pi/4 as the second page's initial condition.",
     strength="DIRECT_IDENTITY",
 )
+context_evidence(
+    pi_quarter_seed,
+    "pi-quarter-native-control",
+    "U000837",
+    "Original-resolution inspection confirms pi/4 as the initial condition for all four displayed map panels.",
+    image_path="CHAPTERS/_page_166_Figure_2.jpeg",
+    fields=[
+        "complete_state",
+        "seed",
+        "result_kind",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_IDENTITY",
+)
+for _map_spec in map_specs.values():
+    context_evidence(
+        _map_spec,
+        f"{_map_spec['key']}-pi-quarter-native-panel",
+        "U000837",
+        "Original-resolution inspection confirms the displayed map formula and its pi/4-controlled trajectory.",
+        image_path="CHAPTERS/_page_166_Figure_2.jpeg",
+        fields=[
+            "object_kind",
+            "visible_history",
+            "seed",
+            "law_kind",
+            "rule_relation_constraint_function_or_probability_law",
+            "result_kind",
+            "parameters_and_variants",
+        ],
+        strength="DIRECT_COMPLETE_MECHANICS",
+    )
 
 nearby_pair_seed = source_candidate(
     "shift-map-nearby-seed-pair",
@@ -2725,8 +2789,15 @@ context_evidence(
     "U000867",
     "The original-resolution panel shows the stated one-black-cell history under the average-neighborhood rule.",
     image_path="CHAPTERS/_page_171_Picture_5.jpeg",
-    fields=["visible_history", "seed", "result_kind"],
-    strength="CORROBORATING",
+    fields=[
+        "visible_history",
+        "seed",
+        "read_dependencies_or_neighborhood",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
 )
 
 continuous_single_black = source_candidate(
@@ -2777,8 +2848,17 @@ context_evidence(
     "U000867",
     "The original-resolution panel shows the average rule's trajectory from one black cell.",
     image_path="CHAPTERS/_page_171_Picture_5.jpeg",
-    fields=["visible_history", "seed", "result_kind"],
-    strength="DIRECT_PARTIAL_MECHANICS",
+    fields=[
+        "object_kind",
+        "visible_history",
+        "seed",
+        "read_dependencies_or_neighborhood",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 context_evidence(
     average_ca,
@@ -2822,8 +2902,17 @@ context_evidence(
     "U000871",
     "The original-resolution panel shows the fractional three-halves rule's trajectory from one black cell.",
     image_path="CHAPTERS/_page_172_Picture_1.jpeg",
-    fields=["visible_history", "seed", "result_kind"],
-    strength="DIRECT_PARTIAL_MECHANICS",
+    fields=[
+        "object_kind",
+        "visible_history",
+        "seed",
+        "read_dependencies_or_neighborhood",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+        "parameters_and_variants",
+    ],
+    strength="DIRECT_COMPLETE_MECHANICS",
 )
 context_evidence(
     fractional_three_half_ca,
@@ -2908,8 +2997,15 @@ context_evidence(
     "U000878",
     "The original-resolution panel shows the c=1/4 cellular-automaton trajectory.",
     image_path="CHAPTERS/_page_173_Picture_4.jpeg",
-    fields=["visible_history"],
-    strength="CORROBORATING",
+    fields=[
+        "visible_history",
+        "read_dependencies_or_neighborhood",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
+        "result_kind",
+    ],
+    strength="DIRECT_PARTIAL_MECHANICS",
 )
 context_evidence(
     additive_ca_family,
@@ -3027,7 +3123,15 @@ for c in [*first_constants, *second_only_constants]:
             "U000878",
             "The original-resolution native panel shows the c=1/4 trajectory.",
             image_path="CHAPTERS/_page_173_Picture_4.jpeg",
-            fields=["visible_history", "parameters_and_variants"],
+            fields=[
+                "visible_history",
+                "read_dependencies_or_neighborhood",
+                "law_kind",
+                "rule_relation_constraint_function_or_probability_law",
+                "write_replacement_assembly_or_commit",
+                "result_kind",
+                "parameters_and_variants",
+            ],
             strength="DIRECT_PARTIAL_MECHANICS",
         )
         context_evidence(
@@ -3467,6 +3571,7 @@ pde_sampler = source_candidate(
 mark_unknown(
     pde_sampler,
     {
+        "alphabet_or_value_schema": "The source says components come from discrete sets but does not list the vocabulary or formal value schema.",
         "support": "The source does not delimit expression size or syntactic structure.",
         "complete_state": "No operational sampler state is specified.",
         "input": "No concrete component vocabulary or generator input schema is supplied.",
@@ -3824,6 +3929,12 @@ ASSET_CONTEXT_LINKS: list[
         "CHAPTERS/_page_163_Figure_4.jpeg",
         [zeta_function, riemann_siegel, riemann_hypothesis],
         "U000825",
+    ),
+    (
+        "A000813",
+        "CHAPTERS/_page_165_Figure_1.jpeg",
+        [iterated_map_family, half_seed],
+        "U000835",
     ),
     (
         "A000814",

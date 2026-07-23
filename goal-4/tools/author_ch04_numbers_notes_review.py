@@ -2170,7 +2170,8 @@ def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) ->
     for asset in direct_assets:
         lines.append(
             f"  - `{asset['asset_id']}` `{asset['physical_path']}` — "
-            f"original `REVIEWED`, transcription `CHECKED`, candidates "
+            f"original `{asset['original_resolution_status']}`, transcription "
+            f"`{asset['transcription_status']}`, candidates "
             f"`{asset['candidate_ids']}`."
         )
     a443 = asset_by_id["A000443"]
