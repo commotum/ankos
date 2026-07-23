@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "phase": "blind_discovery",
+  "candidate_id_policy": {
+    "pattern": "^B[0-9]{4}$",
+    "first_id": "B0001",
+    "allocation_order": "First canonical source-unit occurrence, then canonical image-reference order, with IDs allocated only by the root merge step.",
+    "worker_policy": "Isolated workers use stage-local W identifiers and never allocate B identifiers.",
+    "reuse_policy": "Never reuse or renumber an allocated B identifier.",
+    "split_policy": "The child containing the earliest canonical identity/mechanics evidence keeps the original ID; later children receive the next IDs; the superseded parent relationship remains recorded.",
+    "merge_policy": "Only explicit alias/duplicate identity evidence permits a blind-phase merge. The earliest ID remains active and every merged ID remains as a redirect record."
+  },
+  "eligibility_criteria": [
+    {
+      "id": "E1_EXPLICIT_NATIVE_LAW",
+      "capture_when": "Canonical Book evidence states or unambiguously diagrams a transition, generation, replacement, evaluation, relation, constraint, probability, input-processing, or completion law over a defined object.",
+      "do_not_capture_when": "The unit states only an observed outcome, behavioral property, rendering convention, application, analogy, or historical fact and supplies no native law or independently named coverage obligation."
+    },
+    {
+      "id": "E2_DELIMITED_PARTIAL_SYSTEM",
+      "capture_when": "Canonical Book evidence names or formally delimits a system and supplies at least one identity-bearing mechanic, even though other mechanics remain missing or cross-referenced.",
+      "do_not_capture_when": "Only a name or Index entry occurs and no in-context Book passage supplies identity-bearing mechanics; record a route or identity-only evidence instead."
+    },
+    {
+      "id": "E3_COVERAGE_BEARING_VARIANT",
+      "capture_when": "Canonical Book evidence gives a named or materially delimited preset, restriction, seed/input/boundary class, schedule, composition, or variant whose separate traceability could be lost if folded into another mention.",
+      "do_not_capture_when": "The difference is merely a display choice, empirical observation, informal adjective, or duplicated wording with no coverage-bearing identity."
+    },
+    {
+      "id": "E4_DECLARATIVE_OBJECT",
+      "capture_when": "Canonical Book evidence defines a relation, constraint/model set, immutable function, constant, equation, axiom system, or query with a determinate denotation or accepted-result condition, whether or not it has native time evolution.",
+      "do_not_capture_when": "The unit merely uses ordinary mathematics to describe another construction and does not define an independently queryable or coverage-bearing object."
+    },
+    {
+      "id": "E5_UNCERTAIN_MECHANICS",
+      "capture_when": "After reading the complete unit and context, there is a concrete, source-grounded possibility that native mechanics or a coverage-bearing identity is present but a defect, missing target, or underdetermination prevents resolution.",
+      "do_not_capture_when": "Uncertainty comes only from not yet reading the available context or from external textbook expectations."
+    }
+  ],
+  "reading_dispositions": [
+    "CANDIDATE",
+    "SUPPORTS_CANDIDATE",
+    "CROSS_REFERENCE",
+    "REPRESENTATION_OR_OBSERVER",
+    "APPLICATION_OR_EMULATION",
+    "HISTORICAL_ONLY",
+    "NO_CONSTRUCTION",
+    "SOURCE_DEFECT_OR_AMBIGUITY"
+  ],
+  "reading_disposition_rules": {
+    "CANDIDATE": "Use iff the unit satisfies at least one eligibility criterion and introduces or materially changes identity-bearing mechanics or a coverage-bearing obligation.",
+    "SUPPORTS_CANDIDATE": "Use iff the unit contributes mechanics, parameters, restrictions, examples, or evidence to a B candidate but does not independently introduce its identity.",
+    "CROSS_REFERENCE": "Use iff the unit's construction-relevant content is principally a route whose target must be read before mechanics can be established.",
+    "REPRESENTATION_OR_OBSERVER": "Use iff the unit principally encodes, renders, measures, analyzes, transforms, or summarizes another object without supplying a new native law.",
+    "APPLICATION_OR_EMULATION": "Use iff the unit principally applies, interprets, or emulates an identified construction without specifying a new native or coupling law.",
+    "HISTORICAL_ONLY": "Use iff the unit concerns provenance, attribution, chronology, or terminology and supplies no mechanics or live route.",
+    "NO_CONSTRUCTION": "Use iff complete in-context reading establishes that none of the other seven dispositions applies.",
+    "SOURCE_DEFECT_OR_AMBIGUITY": "Use iff a source defect or genuine Book ambiguity blocks a sound primary disposition; record attempted resolution and any linked candidate or route."
+  },
+  "disposition_precedence": [
+    "SOURCE_DEFECT_OR_AMBIGUITY when the defect prevents a sound ordinary disposition",
+    "CANDIDATE when an eligibility criterion is met",
+    "SUPPORTS_CANDIDATE when mechanics support an existing candidate",
+    "CROSS_REFERENCE when routing is the unit's principal construction role",
+    "REPRESENTATION_OR_OBSERVER",
+    "APPLICATION_OR_EMULATION",
+    "HISTORICAL_ONLY",
+    "NO_CONSTRUCTION"
+  ],
+  "blind_secondary_roles": [
+    "PROPERTY_OR_RESTRICTION",
+    "SEED_INPUT_OR_BOUNDARY",
+    "BEHAVIOR_OR_OUTCOME",
+    "REPRESENTATION",
+    "OBSERVER_OR_ANALYZER",
+    "APPLICATION",
+    "EMULATION",
+    "COMPOSITION_OR_COUPLING",
+    "IMPLEMENTATION_DETAIL",
+    "CONTROL_OR_COMPARISON",
+    "HISTORICAL_MENTION",
+    "EXTERNAL_ONLY",
+    "SOURCE_DEFECT"
+  ],
+  "evidence_strengths": {
+    "DIRECT_COMPLETE": "Canonical prose, formula, code, table, or independently checked explicit diagram supplies enough mechanics to instantiate the claimed object/event/denotation.",
+    "DIRECT_PARTIAL": "Canonical evidence supplies identity-bearing mechanics but one or more fingerprint fields remain genuinely unspecified or unresolved.",
+    "DIRECT_IDENTITY_ONLY": "Canonical evidence establishes a name or delimited identity but not enough mechanics to instantiate it; this cannot alone justify a mechanics claim.",
+    "CORROBORATING": "Canonical evidence supports a mechanic, parameter, alias, restriction, property, or provenance already established elsewhere but cannot establish identity alone.",
+    "VISUAL_EXPLICIT": "An original-resolution image visibly and unambiguously establishes the recorded fact and the transcription/interpretation is independently checked against caption or context.",
+    "VISUAL_CONTEXT_ONLY": "An image supports relationship or appearance only; it cannot establish hidden rule data, timing, colors, or coordinates.",
+    "DEFECT_LIMITED": "Available canonical evidence is damaged, contradictory, missing its target, or otherwise unable to decide the recorded mechanic; the exact boundary is stated."
+  },
+  "blind_candidate_fields": [
+    "id",
+    "record_status",
+    "provisional_name",
+    "aliases",
+    "discovery_stage",
+    "source_unit_ids",
+    "source_evidence",
+    "image_witnesses",
+    "evidence_strength",
+    "fingerprint",
+    "parameters",
+    "variants",
+    "missing_mechanics",
+    "uncertainties",
+    "related_candidate_ids",
+    "cross_reference_ids"
+  ],
+  "candidate_record_statuses": [
+    "ACTIVE",
+    "MERGED_REDIRECT",
+    "SPLIT_SUPERSEDED"
+  ],
+  "fingerprint_fields": [
+    "object_kind",
+    "native_time",
+    "carrier",
+    "support",
+    "topology",
+    "structural_invariants",
+    "alphabet_or_value_schema",
+    "complete_state",
+    "visible_history",
+    "control_state",
+    "seed",
+    "input",
+    "boundary",
+    "external_data",
+    "frontier_or_activation",
+    "schedule",
+    "read_dependencies_or_neighborhood",
+    "law_kind",
+    "rule_relation_constraint_function_or_probability_law",
+    "write_replacement_assembly_or_commit",
+    "result_kind",
+    "successor_cardinality",
+    "determinism_branching_or_measure",
+    "termination_completion_failure",
+    "witness_semantics",
+    "parameters_and_variants",
+    "excluded_observers_and_representations",
+    "evidence_limit"
+  ],
+  "unknown_value_policy": "Every fingerprint key is present. Use UNKNOWN_FROM_SOURCE only after available in-scope context and routes have been exhausted, and duplicate the exact unresolved fact in missing_mechanics.",
+  "forbidden_blind_fields": [
+    "t_ids",
+    "catalog_mapping",
+    "catalog_action",
+    "semantic_role",
+    "family_action",
+    "existing_family",
+    "api_fit",
+    "api_mapping",
+    "implementation_target",
+    "runtime_support"
+  ],
+  "final_classification_vocabularies": {
+    "catalog_action": [
+      "EXISTING_ENTRY_SUFFICIENT",
+      "EXISTING_ENTRY_NEEDS_CORRECTION",
+      "ADD_CATALOG_ENTRY",
+      "NO_SEPARATE_CATALOG_ENTRY",
+      "INSUFFICIENT_BOOK_EVIDENCE"
+    ],
+    "semantic_role": [
+      "NATIVE_TRANSITION_OR_GENERATOR",
+      "STOCHASTIC_OR_BRANCHING_PROCESS",
+      "INPUT_PROCESSOR_OR_TRANSDUCER",
+      "RELATION_CONSTRAINT_OR_MODEL_SET",
+      "IMMUTABLE_DEFINITION_OR_QUERY",
+      "SPECIALIZATION_OR_PRESET",
+      "PROPERTY_OR_RESTRICTION",
+      "SEED_INPUT_OR_BOUNDARY_CLASS",
+      "COMPOSITION_OR_HYBRID",
+      "REPRESENTATION_CODEC_OR_OBSERVER",
+      "APPLICATION_OR_EMULATION",
+      "DUPLICATE_OR_ALIAS",
+      "SOURCE_INSUFFICIENT_ROLE"
+    ],
+    "family_action": [
+      "EXISTING_SEMANTIC_FAMILY",
+      "NEW_SEMANTIC_FAMILY",
+      "SOURCE_INSUFFICIENT_FOR_FAMILY"
+    ]
+  },
+  "proof_obligations": {
+    "same_family": [
+      "Complete source-grounded fingerprints exist for both sides.",
+      "Either a total structural/relational map with an inverse on its valid image commutes for one native event/result, or both are proved instances/restrictions of one explicit parameterized schema with unchanged mechanics.",
+      "The proof preserves program data, complete state/denotation, invariants, target selection, schedule, read snapshot, effects or relation, successor cardinality/probability, completion/failure, witnesses, and native event granularity.",
+      "No hidden interpreter, phase clock, callback, opaque packing, lossy projection, or multi-step emulation supplies the correspondence."
+    ],
+    "specialization_preset_property_seed": [
+      "Name the base construction.",
+      "State the exact parameter restriction, predicate, constructor, property, or input law.",
+      "Prove native mechanics are otherwise unchanged.",
+      "State separately whether the Book identity still warrants catalog coverage."
+    ],
+    "composition_hybrid": [
+      "Name every component construction.",
+      "State the coupling law, data flow, event ordering, and shared state.",
+      "Prove whether the coupling is ordinary composition or introduces an irreducible coupling algebra.",
+      "Do not hide one component in another component's opaque value."
+    ],
+    "representation_observer_application_emulation": [
+      "State the exact source role and represented, observed, applied, or emulated construction.",
+      "Show that no new native law is specified, or capture that law as a separate candidate.",
+      "Keep encoding, rendering, measurement, solving, and decoding outside native events."
+    ],
+    "new_catalog_entry": [
+      "Provide sufficient canonical Book identity and an evidence packet.",
+      "Assign one final semantic role and family action.",
+      "Show what traceable Book obligation would be lost by folding it into another catalog row.",
+      "Do not require family novelty merely because catalog coverage is new."
+    ],
+    "new_semantic_family": [
+      "Provide sufficient canonical Book mechanics to instantiate the construction.",
+      "Identify the nearest candidate/family.",
+      "Give a concrete native event, result, or denotation whose state, schedule, reads, probability, structure, successor cardinality, completion, or witnesses cannot be preserved by that family.",
+      "Show the difference is not a parameter, restriction, seed, representation, generic composition, observer, or another instance of one explicit parameterized schema.",
+      "Obtain independent hostile review."
+    ],
+    "source_insufficient": [
+      "Exhaust all canonical context, local searches, and queued routes.",
+      "State exactly which identity or mechanic remains missing, damaged, or contradictory.",
+      "Separate facts established by the Book from external expectations.",
+      "Use the explicit source-insufficient final values rather than inventing semantics."
+    ]
+  },
+  "worker_isolation": {
+    "context_mode": "Spawn discovery workers without inherited conversation context.",
+    "allowed_inputs": [
+      "principles.md",
+      "goal-4/guardrails.json",
+      "the current stage's guardrail excerpt",
+      "the assigned canonical Markdown document or deterministic source-unit slice",
+      "only images owned by that assigned slice",
+      "blind ledger schemas and write-free validation instructions"
+    ],
+    "forbidden_inputs": [
+      "ref/notes/CA-Types.csv",
+      "ref/notes/CA-Types.md",
+      "goal-1/",
+      "goal-2/",
+      "api.md",
+      "simple_programs.md",
+      "src/ca/",
+      "other workers' candidate mappings before root merge",
+      "whole-corpus trigger searches before assigned sequential reading"
+    ],
+    "output_contract": [
+      "Use worker-local W identifiers.",
+      "Return source-unit dispositions, candidate proposals, image reviews, routes, and uncertainties only for the assigned range.",
+      "Include every required fingerprint key and never include a forbidden blind field.",
+      "Do not edit shared ledgers; the root merge allocates B IDs in canonical order and records provenance."
+    ]
+  },
+  "blind_freeze_requirements": [
+    "All assigned canonical source units have exactly one primary reading disposition.",
+    "All physical images have a visual-screening record and all image references have an asset row.",
+    "Every local and saturation search hit has a final blind disposition.",
+    "Every relevant cross-reference is resolved or has an explicit defect boundary.",
+    "Every active candidate has every fingerprint key, complete provenance, and explicit missing mechanics.",
+    "Blind artifacts contain none of the forbidden blind fields.",
+    "Artifact hashes are frozen before any Stage 19 input is opened."
+  ]
+}
