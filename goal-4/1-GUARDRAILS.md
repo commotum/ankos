@@ -94,6 +94,9 @@ The candidate lifecycle is now append-only:
   within-anchor ordinal so allocation order and discovery stage can be
   mechanically rechecked; epoch 1 is the initial traversal and each formally
   reopened blind pass increments the epoch before allocating further IDs;
+- candidate, evidence, route, and search epochs form one contiguous global
+  sequence beginning at 1; each typed stream preserves the frozen stage/source
+  traversal within an epoch, and evidence cannot predate its candidate;
 - a split tombstones the parent and allocates new children; every `SPLIT_INTO`
   edge carries a typed distinction proof plus explicit before/after rationale;
 - a merge requires a typed alias, co-reference, or proved-duplicate identity
@@ -159,6 +162,12 @@ Each atomic source unit receives exactly one primary reading disposition from:
 boundary classes, behavior, representation, observation, application,
 emulation, coupling, implementation details, controls, history, external-only
 mentions, and source defects.
+
+Every reviewed source unit and screened asset has an exact `uncertainty`
+boundary: `CLEAR` requires it to be empty, while every non-clear status
+requires a meaningful nonempty boundary. `SOURCE_DEFECT_OR_AMBIGUITY` and the
+`SOURCE_DEFECT` visual/secondary role therefore cannot be paired with
+`CLEAR`. Pending rows carry no adjudicated uncertainty.
 
 If one extracted unit contains multiple atomic claims requiring different
 primary dispositions, Stage 2 must split it rather than select a convenient

@@ -323,6 +323,18 @@ def validate(data: dict[str, Any]) -> list[str]:
             errors.append(f"{key} does not match the frozen vocabulary")
         elif _duplicates(values):
             errors.append(f"{key} contains duplicates")
+    uncertainty_contract = data.get("source_uncertainty_contract")
+    if not isinstance(uncertainty_contract, str) or not all(
+        phrase in uncertainty_contract
+        for phrase in (
+            "CLEAR requires an empty uncertainty boundary",
+            "require a meaningful nonempty boundary",
+            "SOURCE_DEFECT_OR_AMBIGUITY",
+            "SOURCE_DEFECT cannot be CLEAR",
+            "Pending rows carry no adjudicated uncertainty",
+        )
+    ):
+        errors.append("source_uncertainty_contract is incomplete")
     for key in ("evidence_application", "visual_evidence_rule"):
         if not isinstance(data.get(key), str) or not data[key].strip():
             errors.append(f"{key} must be non-empty")
@@ -540,6 +552,17 @@ def validate(data: dict[str, Any]) -> list[str]:
     freeze = data.get("blind_freeze_requirements")
     if not isinstance(freeze, list) or len(freeze) < 6:
         errors.append("blind_freeze_requirements must contain the full closure contract")
+    elif not any(
+        "Stages 4 through 17" in requirement
+        and "LOCAL round" in requirement
+        and "exact union of scopes" in requirement
+        and "before the Stage 18 saturation fixed point" in requirement
+        for requirement in freeze
+        if isinstance(requirement, str)
+    ):
+        errors.append(
+            "blind_freeze_requirements lack exact pre-saturation LOCAL coverage"
+        )
     triggers = data.get("close_review_triggers")
     if not isinstance(triggers, list) or len(triggers) < 6:
         errors.append("close_review_triggers must define hostile-review coverage")
@@ -598,6 +621,14 @@ def run_mutation_checks(data: dict[str, Any]) -> list[str]:
     missing_visual_risk["visual_risk_flags"].remove("TEXT_BEARING")
     mutations.append(("missing visual risk flag", missing_visual_risk))
 
+    missing_uncertainty_boundary = copy.deepcopy(data)
+    missing_uncertainty_boundary["source_uncertainty_contract"] = (
+        "Source quality is recorded."
+    )
+    mutations.append(
+        ("missing exact source uncertainty boundary", missing_uncertainty_boundary)
+    )
+
     open_search_language = copy.deepcopy(data)
     open_search_language["search_query_language"]["fields"].append("command")
     mutations.append(("open-ended search query language", open_search_language))
@@ -622,6 +653,16 @@ def run_mutation_checks(data: dict[str, Any]) -> list[str]:
     ] = ["after_rationale"]
     mutations.append(
         ("split lifecycle loses before rationale", missing_split_rationale)
+    )
+
+    missing_local_coverage = copy.deepcopy(data)
+    missing_local_coverage["blind_freeze_requirements"] = [
+        requirement
+        for requirement in missing_local_coverage["blind_freeze_requirements"]
+        if "Stages 4 through 17" not in requirement
+    ]
+    mutations.append(
+        ("freeze omits exact LOCAL-round coverage", missing_local_coverage)
     )
 
     for name, mutated in mutations:

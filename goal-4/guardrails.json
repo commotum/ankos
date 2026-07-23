@@ -111,6 +111,7 @@
     "DEFECTIVE",
     "CONFLICTING"
   ],
+  "source_uncertainty_contract": "Every reviewed source unit and screened asset records uncertainty independently of disposition or visual role. CLEAR requires an empty uncertainty boundary; AMBIGUOUS, DEFECTIVE, and CONFLICTING require a meaningful nonempty boundary. SOURCE_DEFECT_OR_AMBIGUITY and SOURCE_DEFECT cannot be CLEAR. Pending rows carry no adjudicated uncertainty.",
   "evidence_modalities": [
     "PROSE",
     "FORMULA",
@@ -135,7 +136,7 @@
     "AMBIGUOUS",
     "CAPTION_INCOMPLETE"
   ],
-  "discovery_anchor_contract": "Candidates and evidence use immutable {epoch, kind, id, ordinal} anchors. Routes use the corresponding CSV fields. SOURCE_UNIT and IMAGE anchors belong to the owning sequential range; SEARCH_HIT anchors belong to a typed LOCAL or SATURATION round. Epoch 1 is the initial traversal and every formal blind reopen increments the epoch.",
+  "discovery_anchor_contract": "Candidates and evidence use immutable {epoch, kind, id, ordinal} anchors. Routes use the corresponding CSV fields and search rounds record the same epoch. SOURCE_UNIT and IMAGE anchors belong to the owning sequential range; SEARCH_HIT anchors belong to a typed LOCAL or SATURATION round. Epoch 1 is the initial traversal and every formal blind reopen increments the epoch. The global union of candidate, evidence, route, and search epochs is contiguous from 1; each stream preserves frozen stage/source traversal and evidence cannot predate its candidate.",
   "lifecycle_relation_contract": {
     "proof_kinds": [
       "PROVISIONAL_COMPARISON",

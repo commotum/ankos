@@ -879,6 +879,10 @@ def _validate_worker_output(
                 errors.append(f"reading update changes source identity: {unit_id}")
             if row.get("review_status") != "REVIEWED":
                 errors.append(f"reading update is not REVIEWED: {unit_id}")
+            if row.get("review_epoch") != str(bundle_epoch):
+                errors.append(
+                    f"reading update review_epoch differs from bundle: {unit_id}"
+                )
             if not row.get("review_disposition") or not row.get("source_status"):
                 errors.append(f"reading update lacks a disposition/status: {unit_id}")
             if row.get("review_stage") != str(manifest.get("stage")):
@@ -943,6 +947,10 @@ def _validate_worker_output(
                 errors.append(f"asset update changes source identity: {asset_id}")
             if row.get("inspection_status") != "SCREENED":
                 errors.append(f"asset update is not SCREENED: {asset_id}")
+            if row.get("review_epoch") != str(bundle_epoch):
+                errors.append(
+                    f"asset update review_epoch differs from bundle: {asset_id}"
+                )
             if row.get("review_stage") != str(manifest.get("stage")):
                 errors.append(f"asset update stage differs from bundle: {asset_id}")
             if row.get("reviewer") != manifest.get("worker_id"):

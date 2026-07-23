@@ -912,6 +912,7 @@ def validate_objects(
 
     reading_candidate_links: dict[str, set[str]] = {}
     reading_route_links: dict[str, set[str]] = {}
+    reading_review_epochs: dict[str, int] = {}
     reviewed_count = 0
     for row in reading:
         unit_id = row.get("source_unit_id", "")
@@ -963,6 +964,7 @@ def validate_objects(
             if any(
                 row.get(key)
                 for key in (
+                    "review_epoch",
                     "review_disposition",
                     "source_status",
                     "uncertainty",
@@ -974,6 +976,15 @@ def validate_objects(
                 errors.append(f"{prefix} pending row contains review result")
         elif status == "REVIEWED":
             reviewed_count += 1
+            try:
+                review_epoch = int(row.get("review_epoch", ""))
+            except ValueError:
+                review_epoch = -1
+            if review_epoch < 1:
+                errors.append(f"{prefix} has invalid review epoch")
+            else:
+                reading_review_epochs[unit_id] = review_epoch
+                discovery_epochs.add(review_epoch)
             if row.get("review_disposition") not in READING_DISPOSITIONS:
                 errors.append(f"{prefix} has invalid review disposition")
             if row.get("source_status") not in SOURCE_STATUSES:
@@ -1131,6 +1142,14 @@ def validate_objects(
                 errors.append(
                     f"{prefix} source-anchored owning stage differs from source stage"
                 )
+            if (
+                row["discovery_kind"] == "SOURCE_UNIT"
+                and reading_review_epochs.get(row["source_unit_id"], -1)
+                < discovery_epoch
+            ):
+                errors.append(
+                    f"{prefix} source anchor postdates its source review epoch"
+                )
             source_reading = reading_by_unit.get(row["source_unit_id"])
             if (
                 source_reading is None
@@ -1151,6 +1170,14 @@ def validate_objects(
                     errors.append(
                         f"{prefix} image-anchored owning stage differs from "
                         "asset stage"
+                    )
+                if (
+                    row["discovery_kind"] == "IMAGE"
+                    and asset_review_epochs.get(source_path, -1)
+                    < discovery_epoch
+                ):
+                    errors.append(
+                        f"{prefix} image anchor postdates its asset review epoch"
                     )
             if source_asset["inspection_status"] != "SCREENED":
                 errors.append(f"{prefix} source asset is not screened")
@@ -1476,6 +1503,7 @@ def validate_objects(
         errors.append("asset ledger order/set differs from physical images")
     screened_count = 0
     asset_route_links: dict[str, set[str]] = {}
+    asset_review_epochs: dict[str, int] = {}
     for row in assets:
         path = row.get("physical_path", "")
         image = image_by_path.get(path)
@@ -1525,6 +1553,7 @@ def validate_objects(
         if status == "PENDING":
             if (
                 row.get("visual_role")
+                or row.get("review_epoch")
                 or row.get("source_status")
                 or risk_flags
                 or row.get("evidence_statement")
@@ -1539,6 +1568,15 @@ def validate_objects(
                 errors.append(f"{prefix} pending row contains inspection result")
         elif status == "SCREENED":
             screened_count += 1
+            try:
+                review_epoch = int(row.get("review_epoch", ""))
+            except ValueError:
+                review_epoch = -1
+            if review_epoch < 1:
+                errors.append(f"{prefix} has invalid review epoch")
+            else:
+                asset_review_epochs[path] = review_epoch
+                discovery_epochs.add(review_epoch)
             if row.get("visual_role") not in VISUAL_ROLES:
                 errors.append(f"{prefix} has invalid visual role")
             if row.get("source_status") not in SOURCE_STATUSES:
@@ -2281,6 +2319,11 @@ def validate_objects(
                     errors.append(
                         f"candidate {candidate_id} anchor unit lacks provenance"
                     )
+                if reading_review_epochs.get(anchor_id, -1) < epoch:
+                    errors.append(
+                        f"candidate {candidate_id} source anchor postdates "
+                        "its source review epoch"
+                    )
         elif kind == "IMAGE":
             assignment = expected_assets.get(anchor_id)
             if assignment is None:
@@ -2299,6 +2342,11 @@ def validate_objects(
                 if anchor_id not in candidate["image_witnesses"]:
                     errors.append(
                         f"candidate {candidate_id} anchor image lacks provenance"
+                    )
+                if asset_review_epochs.get(anchor_id, -1) < epoch:
+                    errors.append(
+                        f"candidate {candidate_id} image anchor postdates "
+                        "its asset review epoch"
                     )
         elif kind == "SEARCH_HIT":
             hit = hit_by_id.get(anchor_id)
@@ -2428,6 +2476,11 @@ def validate_objects(
                     unit_position[anchor_id],
                     ordinal,
                 )
+                if reading_review_epochs.get(anchor_id, -1) < epoch:
+                    errors.append(
+                        f"candidate {candidate_id} evidence source anchor "
+                        "postdates its source review epoch"
+                    )
         elif kind == "IMAGE":
             assignment = expected_assets.get(anchor_id)
             if assignment is None:
@@ -2444,6 +2497,11 @@ def validate_objects(
                     image_position[anchor_id],
                     ordinal,
                 )
+                if asset_review_epochs.get(anchor_id, -1) < epoch:
+                    errors.append(
+                        f"candidate {candidate_id} evidence image anchor "
+                        "postdates its asset review epoch"
+                    )
         if evidence_key is not None:
             if prior_evidence_key is not None and evidence_key < prior_evidence_key:
                 errors.append(
@@ -2467,6 +2525,69 @@ def validate_objects(
             "global discovery epochs are not contiguous from 1 across "
             "candidates, evidence, routes, and search"
         )
+
+    def validate_local_epoch_coverage(
+        stage_number: int,
+        round_limit: int,
+        closure_label: str,
+    ) -> None:
+        assigned_paths = {
+            path
+            for path, document in document_by_path.items()
+            if stage_for_document(document) == stage_number
+        }
+        expected_scopes: dict[int, set[str]] = {1: set(assigned_paths)}
+        for reading_row in reading:
+            if reading_row["path"] not in assigned_paths:
+                continue
+            try:
+                row_epoch = int(reading_row.get("review_epoch", ""))
+            except ValueError:
+                continue
+            if row_epoch > 1:
+                expected_scopes.setdefault(row_epoch, set()).add(
+                    reading_row["path"]
+                )
+        for asset_row in assets:
+            if asset_row["assignment_path"] not in assigned_paths:
+                continue
+            try:
+                row_epoch = int(asset_row.get("review_epoch", ""))
+            except ValueError:
+                continue
+            if row_epoch > 1:
+                expected_scopes.setdefault(row_epoch, set()).add(
+                    asset_row["assignment_path"]
+                )
+
+        actual_rounds: dict[int, list[dict[str, Any]]] = {}
+        for index, round_record in enumerate(rounds):
+            if index >= round_limit or not isinstance(round_record, dict):
+                continue
+            if (
+                round_record.get("kind") != "LOCAL"
+                or round_record.get("owning_stage") != stage_number
+            ):
+                continue
+            epoch = round_record.get("epoch")
+            if isinstance(epoch, int) and epoch >= 1:
+                actual_rounds.setdefault(epoch, []).append(round_record)
+        for epoch in sorted(set(expected_scopes) | set(actual_rounds)):
+            local_rounds = actual_rounds.get(epoch, [])
+            local_scope = {
+                path
+                for round_record in local_rounds
+                for query in round_record.get("queries", [])
+                if isinstance(query, dict)
+                for path in query.get("scope_paths", [])
+            }
+            if not local_rounds or local_scope != expected_scopes.get(
+                epoch, set()
+            ):
+                errors.append(
+                    f"{closure_label} lacks exact Stage {stage_number} "
+                    f"review-epoch {epoch} LOCAL-round coverage"
+                )
 
     for required_stage in require_stages:
         if required_stage == 18:
@@ -2494,24 +2615,11 @@ def validate_objects(
         ]
         if any(row["inspection_status"] != "SCREENED" for row in assigned_assets):
             errors.append(f"stage {required_stage} assets are not fully screened")
-        local_rounds = [
-            round_record
-            for round_record in rounds
-            if isinstance(round_record, dict)
-            and round_record.get("kind") == "LOCAL"
-            and round_record.get("owning_stage") == required_stage
-        ]
-        local_scope = {
-            path
-            for round_record in local_rounds
-            for query in round_record.get("queries", [])
-            if isinstance(query, dict)
-            for path in query.get("scope_paths", [])
-        }
-        if not local_rounds or local_scope != assigned_paths:
-            errors.append(
-                f"stage {required_stage} lacks full-scope local-search evidence"
-            )
+        validate_local_epoch_coverage(
+            required_stage,
+            len(rounds),
+            f"stage {required_stage}",
+        )
         if any(
             route["status"] == "PENDING"
             for route in routes
@@ -2537,34 +2645,11 @@ def validate_objects(
         else:
             fixed_round_index = len(rounds)
         for stage_number in range(4, 18):
-            assigned_paths = {
-                path
-                for path, document in document_by_path.items()
-                if stage_for_document(document) == stage_number
-            }
-            prior_local_rounds = [
-                round_record
-                for index, round_record in enumerate(rounds)
-                if index < fixed_round_index
-                and isinstance(round_record, dict)
-                and round_record.get("kind") == "LOCAL"
-                and round_record.get("owning_stage") == stage_number
-            ]
-            prior_local_scope = {
-                path
-                for round_record in prior_local_rounds
-                for query in round_record.get("queries", [])
-                if isinstance(query, dict)
-                for path in query.get("scope_paths", [])
-            }
-            if (
-                not prior_local_rounds
-                or prior_local_scope != assigned_paths
-            ):
-                errors.append(
-                    "stage 18/all-reviewed closure lacks exact Stage "
-                    f"{stage_number} LOCAL-round coverage before saturation"
-                )
+            validate_local_epoch_coverage(
+                stage_number,
+                fixed_round_index,
+                "stage 18/all-reviewed closure before saturation",
+            )
 
     if require_all_reviewed:
         if any(route["status"] == "PENDING" for route in routes):
@@ -2614,6 +2699,7 @@ def mutation_checks(
     base_reading[0].update(
         {
             "review_status": "REVIEWED",
+            "review_epoch": "1",
             "review_disposition": "CANDIDATE",
             "source_status": "CLEAR",
             "secondary_roles": "[]",
@@ -2728,6 +2814,7 @@ def mutation_checks(
     defect_reading[1].update(
         {
             "review_status": "REVIEWED",
+            "review_epoch": "1",
             "review_disposition": "SOURCE_DEFECT_OR_AMBIGUITY",
             "source_status": "DEFECTIVE",
             "uncertainty": (
@@ -2764,6 +2851,7 @@ def mutation_checks(
     defect_asset[0].update(
         {
             "inspection_status": "SCREENED",
+            "review_epoch": "1",
             "visual_role": "SOURCE_DEFECT",
             "source_status": "DEFECTIVE",
             "risk_flags": '["AMBIGUOUS"]',
@@ -2811,6 +2899,7 @@ def mutation_checks(
         }
     )
     reopened_routes = [copy.deepcopy(route), reopened_route]
+    reopened_reading[0]["review_epoch"] = "2"
     reopened_reading[0]["route_ids"] = '["R000001","R000002"]'
     reopened_errors = validate_objects(
         manifest,
@@ -3346,6 +3435,7 @@ def mutation_checks(
     risky_asset[0].update(
         {
             "inspection_status": "SCREENED",
+            "review_epoch": "1",
             "visual_role": "CONTROL",
             "source_status": "CLEAR",
             "risk_flags": '["TEXT_BEARING"]',
@@ -3374,6 +3464,7 @@ def mutation_checks(
         row.update(
             {
                 "review_status": "REVIEWED",
+                "review_epoch": "2",
                 "review_disposition": "NO_CONSTRUCTION",
                 "source_status": "CLEAR",
                 "secondary_roles": "[]",

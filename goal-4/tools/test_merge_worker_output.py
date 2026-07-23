@@ -150,6 +150,7 @@ def _completed_bundle(
         row.update(
             {
                 "review_status": "REVIEWED",
+                "review_epoch": str(manifest["discovery_epoch"]),
                 "review_disposition": (
                     "CANDIDATE" if is_candidate_source else "NO_CONSTRUCTION"
                 ),
@@ -177,6 +178,7 @@ def _completed_bundle(
     asset_update.update(
         {
             "inspection_status": "SCREENED",
+            "review_epoch": str(manifest["discovery_epoch"]),
             "visual_role": "NATIVE_EVIDENCE",
             "source_status": "CLEAR",
             "risk_flags": '["CONSTRUCTION_BEARING"]',
@@ -262,6 +264,7 @@ def _completed_no_construction_bundle(
         row.update(
             {
                 "review_status": "REVIEWED",
+                "review_epoch": "1",
                 "review_disposition": "NO_CONSTRUCTION",
                 "source_status": "CLEAR",
                 "secondary_roles": "[]",
@@ -279,6 +282,7 @@ def _completed_no_construction_bundle(
         row.update(
             {
                 "inspection_status": "SCREENED",
+                "review_epoch": "1",
                 "visual_role": "DECORATIVE",
                 "source_status": "CLEAR",
                 "risk_flags": "[]",
@@ -334,6 +338,23 @@ def _goal_after_initial_merge(root: Path) -> Path:
     goal = _copy_global_state(root / "state")
     merge.apply_merge(merge.prepare_merge(bundle, goal_dir=goal))
     return goal
+
+
+def _permit_test_stage18_closure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    real_validate = merge.validate_audit.validate_objects
+
+    def validate_with_closed_checkpoint(*args: Any, **kwargs: Any) -> list[str]:
+        if kwargs.get("require_stages") == set(range(4, 19)):
+            return []
+        return real_validate(*args, **kwargs)
+
+    monkeypatch.setattr(
+        merge.validate_audit,
+        "validate_objects",
+        validate_with_closed_checkpoint,
+    )
 
 
 def test_default_cli_is_dry_run_and_rewrites_all_id_families(
@@ -480,9 +501,20 @@ def test_epoch_two_reopen_retains_provenance_and_appends_ids(
         epoch=2,
         worker_id="merge-reopen-worker",
     )
+    search_before = json.loads(
+        (goal / merge.SEARCH_NAME).read_text(encoding="utf-8")
+    )
+    search_before["fixed_point"] = {"test_checkpoint": "closed"}
+    (goal / merge.SEARCH_NAME).write_bytes(
+        canonical_json_bytes(search_before)
+    )
+    _permit_test_stage18_closure(monkeypatch)
 
     plan = merge.prepare_merge(bundle, goal_dir=goal)
-    assert plan.preview()["discovery_epoch"] == 2
+    preview = plan.preview()
+    assert preview["discovery_epoch"] == 2
+    assert preview["search_ledger_preserved"] is False
+    assert preview["search_fixed_point_cleared"] is True
     assert plan.candidate_ids == {"W0001": "B0002"}
     assert plan.route_ids == {"WR0001": "R000002"}
     assert plan.evidence_ids == {
@@ -514,6 +546,67 @@ def test_epoch_two_reopen_retains_provenance_and_appends_ids(
     )
     assert json.loads(reopened_asset["candidate_ids"]) == ["B0001", "B0002"]
     assert json.loads(reopened_asset["route_ids"]) == ["R000001", "R000002"]
+    search_after = json.loads(
+        (goal / merge.SEARCH_NAME).read_text(encoding="utf-8")
+    )
+    assert search_after["fixed_point"] is None
+    assert search_after["rounds"] == search_before["rounds"]
+    assert search_after["vocabulary"] == search_before["vocabulary"]
+
+
+def test_epoch_two_reopen_requires_closed_stage18_checkpoint(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    goal = _goal_after_initial_merge(tmp_path)
+    monkeypatch.setattr(build_worker_bundle, "GOAL_DIR", goal)
+    bundle = _completed_bundle(
+        tmp_path / "reopened",
+        epoch=2,
+        worker_id="merge-unclosed-reopen-worker",
+    )
+
+    with pytest.raises(
+        merge.MergeError,
+        match="requires a fully closed Stage 18 fixed point",
+    ):
+        merge.prepare_merge(bundle, goal_dir=goal)
+
+
+def test_reopen_epoch_must_be_next_global_epoch(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    goal = _goal_after_initial_merge(tmp_path)
+    monkeypatch.setattr(build_worker_bundle, "GOAL_DIR", goal)
+    bundle = _completed_bundle(
+        tmp_path / "reopened",
+        epoch=3,
+        worker_id="merge-skipped-epoch-worker",
+    )
+
+    with pytest.raises(
+        merge.MergeError,
+        match="epoch 3 is not the next global epoch 2",
+    ):
+        merge.prepare_merge(bundle, goal_dir=goal)
+
+
+def test_epoch_two_reopen_requires_completed_live_projection(
+    tmp_path: Path,
+) -> None:
+    bundle = _completed_bundle(
+        tmp_path / "reopened",
+        epoch=2,
+        worker_id="merge-premature-reopen-worker",
+    )
+    goal = _copy_global_state(tmp_path)
+
+    with pytest.raises(
+        merge.MergeError,
+        match="is not REVIEWED for discovery epoch 2",
+    ):
+        merge.prepare_merge(bundle, goal_dir=goal)
 
 
 def test_epoch_two_reopen_rejects_loss_of_existing_links(

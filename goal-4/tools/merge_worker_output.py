@@ -43,6 +43,7 @@ WRITE_NAMES = (
     ROUTE_NAME,
     READING_NAME,
     ASSET_NAME,
+    SEARCH_NAME,
 )
 SNAPSHOT_NAMES = (
     MANIFEST_NAME,
@@ -100,9 +101,17 @@ class MergePlan:
                 "route_appends": len(self.route_ids),
             },
             "worker_uncertainties": list(self.worker_uncertainties),
-            "search_ledger_preserved": True,
+            "search_ledger_preserved": (
+                self.proposed_bytes[SEARCH_NAME]
+                == self.original_bytes[SEARCH_NAME]
+            ),
+            "search_rounds_preserved": True,
+            "search_vocabulary_preserved": True,
+            "search_fixed_point_cleared": (
+                self.discovery_epoch > 1
+            ),
             "search_ledger_sha256": hashlib.sha256(
-                self.original_bytes[SEARCH_NAME]
+                self.proposed_bytes[SEARCH_NAME]
             ).hexdigest(),
         }
 
@@ -480,6 +489,7 @@ def _replace_rows(
     route_ids: dict[str, str],
     label: str,
     reopened: bool,
+    expected_review_epoch: int,
 ) -> list[dict[str, str]]:
     original_by_id = {row[id_field]: row for row in rows}
     by_id: dict[str, dict[str, str]] = {}
@@ -491,6 +501,11 @@ def _replace_rows(
             raise MergeError(f"{label} update collision: {identifier}")
         if identifier not in assigned_ids:
             raise MergeError(f"{label} update is outside the bundle: {identifier}")
+        if update.get("review_epoch") != str(expected_review_epoch):
+            raise MergeError(
+                f"{label} {identifier}.review_epoch differs from bundle "
+                f"epoch {expected_review_epoch}"
+            )
         mapped = dict(update)
         original = original_by_id[identifier]
         mapped["candidate_ids"] = _map_csv_id_array(
@@ -594,6 +609,107 @@ def _validate_stage_prerequisites(
     if errors:
         raise MergeError(
             f"stage {stage} merge prerequisites failed:\n- "
+            + "\n- ".join(errors)
+        )
+
+
+def _positive_epoch(value: object, label: str) -> int:
+    if isinstance(value, int) and not isinstance(value, bool) and value >= 1:
+        return value
+    if isinstance(value, str) and value.isdigit() and int(value) >= 1:
+        return int(value)
+    raise MergeError(f"{label} has an invalid discovery/review epoch: {value!r}")
+
+
+def _global_max_epoch(
+    reading: list[dict[str, str]],
+    candidates: list[dict[str, Any]],
+    routes: list[dict[str, str]],
+    assets: list[dict[str, str]],
+    search: dict[str, Any],
+) -> int:
+    epochs: list[int] = []
+    for row in reading:
+        value = row.get("review_epoch", "")
+        if value:
+            epochs.append(_positive_epoch(value, f"reading {row.get('source_unit_id')}"))
+    for row in assets:
+        value = row.get("review_epoch", "")
+        if value:
+            epochs.append(_positive_epoch(value, f"asset {row.get('asset_id')}"))
+    for candidate in candidates:
+        candidate_id = candidate.get("id", "<unknown>")
+        anchor = candidate.get("discovery_anchor")
+        if not isinstance(anchor, dict):
+            raise MergeError(f"candidate {candidate_id} lacks a discovery anchor")
+        epochs.append(
+            _positive_epoch(
+                anchor.get("epoch"),
+                f"candidate {candidate_id}",
+            )
+        )
+        evidence = candidate.get("source_evidence")
+        if not isinstance(evidence, list):
+            raise MergeError(f"candidate {candidate_id} has malformed evidence")
+        for item in evidence:
+            if not isinstance(item, dict) or not isinstance(
+                item.get("discovery_anchor"),
+                dict,
+            ):
+                raise MergeError(
+                    f"candidate {candidate_id} has malformed evidence anchor"
+                )
+            epochs.append(
+                _positive_epoch(
+                    item["discovery_anchor"].get("epoch"),
+                    f"candidate {candidate_id} evidence",
+                )
+            )
+    for route in routes:
+        epochs.append(
+            _positive_epoch(
+                route.get("discovery_epoch"),
+                f"route {route.get('route_id')}",
+            )
+        )
+    rounds = search.get("rounds")
+    if not isinstance(rounds, list):
+        raise MergeError("search rounds are not an array")
+    for index, round_record in enumerate(rounds):
+        if not isinstance(round_record, dict):
+            raise MergeError(f"search round {index} is not an object")
+        epochs.append(
+            _positive_epoch(
+                round_record.get("epoch"),
+                f"search round {index}",
+            )
+        )
+    return max(epochs, default=0)
+
+
+def _validate_reopen_prerequisites(
+    *,
+    manifest: dict[str, Any],
+    units: list[dict[str, Any]],
+    reading: list[dict[str, str]],
+    candidates: list[dict[str, Any]],
+    routes: list[dict[str, str]],
+    assets: list[dict[str, str]],
+    search: dict[str, Any],
+) -> None:
+    errors = validate_audit.validate_objects(
+        manifest,
+        units,
+        reading,
+        candidates,
+        routes,
+        assets,
+        search,
+        require_stages=set(range(4, 19)),
+    )
+    if errors:
+        raise MergeError(
+            "reopened merge requires a fully closed Stage 18 fixed point:\n- "
             + "\n- ".join(errors)
         )
 
@@ -706,16 +822,40 @@ def prepare_merge(
                 f"asset merge collision: {row.get('asset_id')} is not "
                 f"{expected_asset_status} for discovery epoch {discovery_epoch}"
             )
-    _validate_stage_prerequisites(
-        stage=stage,
-        manifest=manifest,
-        units=units,
-        reading=reading,
-        candidates=candidates,
-        routes=routes,
-        assets=assets,
-        search=search,
-    )
+    if reopened:
+        global_max_epoch = _global_max_epoch(
+            reading,
+            candidates,
+            routes,
+            assets,
+            search,
+        )
+        expected_epoch = global_max_epoch + 1
+        if discovery_epoch != expected_epoch:
+            raise MergeError(
+                f"reopened discovery epoch {discovery_epoch} is not the next "
+                f"global epoch {expected_epoch}"
+            )
+        _validate_reopen_prerequisites(
+            manifest=manifest,
+            units=units,
+            reading=reading,
+            candidates=candidates,
+            routes=routes,
+            assets=assets,
+            search=search,
+        )
+    else:
+        _validate_stage_prerequisites(
+            stage=stage,
+            manifest=manifest,
+            units=units,
+            reading=reading,
+            candidates=candidates,
+            routes=routes,
+            assets=assets,
+            search=search,
+        )
 
     output = _load_output(bundle_bytes["output"])
     forbidden_paths = validate_audit.forbidden_keys(output)
@@ -854,6 +994,7 @@ def prepare_merge(
         route_ids=route_mapping,
         label="reading",
         reopened=reopened,
+        expected_review_epoch=discovery_epoch,
     )
     proposed_assets = _replace_rows(
         assets,
@@ -864,9 +1005,13 @@ def prepare_merge(
         route_ids=route_mapping,
         label="asset",
         reopened=reopened,
+        expected_review_epoch=discovery_epoch,
     )
     proposed_candidates = candidates + mapped_candidates
     proposed_routes = routes + mapped_routes
+    proposed_search = deepcopy(search)
+    if reopened:
+        proposed_search["fixed_point"] = None
 
     validation_errors = validate_audit.validate_objects(
         manifest,
@@ -875,7 +1020,7 @@ def prepare_merge(
         proposed_candidates,
         proposed_routes,
         proposed_assets,
-        search,
+        proposed_search,
     )
     if validation_errors:
         raise MergeError(
@@ -900,6 +1045,11 @@ def prepare_merge(
         ASSET_NAME: build_worker_bundle.csv_bytes(
             ASSET_HEADER,
             proposed_assets,
+        ),
+        SEARCH_NAME: (
+            original_bytes[SEARCH_NAME]
+            if not reopened
+            else build_worker_bundle.canonical_json_bytes(proposed_search)
         ),
     }
     if original_bytes[SEARCH_NAME] != (goal_dir / SEARCH_NAME).read_bytes():
@@ -989,8 +1139,6 @@ def apply_merge(plan: MergePlan) -> None:
     for name in WRITE_NAMES:
         if (plan.goal_dir / name).read_bytes() != plan.proposed_bytes[name]:
             raise MergeError(f"applied ledger differs from staged bytes: {name}")
-    if (plan.goal_dir / SEARCH_NAME).read_bytes() != plan.original_bytes[SEARCH_NAME]:
-        raise MergeError("search ledger changed during apply")
 
 
 def main() -> int:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import importlib.util
 import csv
 import json
@@ -48,6 +49,179 @@ def test_required_harness_mutations_fail() -> None:
 
 def test_schema_files_are_frozen() -> None:
     assert MODULE.validate_schema_files(MODULE.GOAL_DIR) == []
+
+
+def test_stage18_requires_every_local_stage_before_saturation() -> None:
+    manifest, units, reading, candidates, routes, assets, _ = load()
+    assert candidates == []
+    assert routes == []
+    document_by_path = {
+        document["path"]: document for document in manifest["documents"]
+    }
+    for row in reading:
+        row.update(
+            {
+                "review_status": "REVIEWED",
+                "review_epoch": "1",
+                "review_disposition": "NO_CONSTRUCTION",
+                "source_status": "CLEAR",
+                "uncertainty": "",
+                "secondary_roles": "[]",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "No qualifying construction in this fixture unit.",
+                "review_stage": str(
+                    MODULE.stage_for_document(document_by_path[row["path"]])
+                ),
+                "reviewer": "closure-fixture",
+            }
+        )
+    for row in assets:
+        row.update(
+            {
+                "inspection_status": "SCREENED",
+                "review_epoch": "1",
+                "visual_role": "DECORATIVE",
+                "source_status": "CLEAR",
+                "risk_flags": "[]",
+                "original_resolution_status": "NOT_REQUIRED",
+                "transcription_status": "NOT_REQUIRED",
+                "candidate_ids": "[]",
+                "route_ids": "[]",
+                "evidence_statement": "No construction-bearing visual content.",
+                "review_stage": row["assignment_stage"],
+                "reviewer": "closure-fixture",
+                "uncertainty": "",
+            }
+        )
+
+    rounds = []
+    query_number = 1
+    for stage in range(4, 18):
+        scope_paths = [
+            document["path"]
+            for document in manifest["documents"]
+            if MODULE.stage_for_document(document) == stage
+        ]
+        round_record = {
+            "round_id": f"S{len(rounds) + 1:03d}",
+            "epoch": 1,
+            "kind": "LOCAL",
+            "owning_stage": stage,
+            "queries": [
+                {
+                    "query_id": f"Q{query_number:04d}",
+                    "family": "zero-result closure fixture",
+                    "pattern": "__AUDIT_HARNESS_IMPOSSIBLE_MATCH_71A9C2__",
+                    "mode": "LITERAL",
+                    "case_sensitive": True,
+                    "whole_word": False,
+                    "scope_paths": scope_paths,
+                }
+            ],
+            "tool_assumptions": ["Deterministic zero-result fixture."],
+            "result_ids": [],
+            "result_digest": "",
+            "hits": [],
+            "new_vocabulary": [],
+            "new_candidates": [],
+            "new_evidence_groups": [],
+            "new_routes": [],
+            "rerun_digest": "",
+        }
+        digest = MODULE.search_result_digest(round_record)
+        round_record["result_digest"] = digest
+        round_record["rerun_digest"] = digest
+        rounds.append(round_record)
+        query_number += 1
+
+    saturation = {
+        "round_id": f"S{len(rounds) + 1:03d}",
+        "epoch": 1,
+        "kind": "SATURATION",
+        "owning_stage": 18,
+        "queries": [
+            {
+                "query_id": f"Q{query_number:04d}",
+                "family": "zero-result saturation fixture",
+                "pattern": "__AUDIT_HARNESS_IMPOSSIBLE_MATCH_71A9C2__",
+                "mode": "LITERAL",
+                "case_sensitive": True,
+                "whole_word": False,
+                "scope_paths": [
+                    document["path"] for document in manifest["documents"]
+                ],
+            }
+        ],
+        "tool_assumptions": ["Deterministic zero-result fixture."],
+        "result_ids": [],
+        "result_digest": "",
+        "hits": [],
+        "new_vocabulary": [],
+        "new_candidates": [],
+        "new_evidence_groups": [],
+        "new_routes": [],
+        "rerun_digest": "",
+    }
+    saturation_digest = MODULE.search_result_digest(saturation)
+    saturation["result_digest"] = saturation_digest
+    saturation["rerun_digest"] = saturation_digest
+    rounds.append(saturation)
+    search = {
+        "schema_version": 1,
+        "phase": "blind_discovery",
+        "tool_assumptions": ["Deterministic zero-result fixture."],
+        "vocabulary": [],
+        "rounds": rounds,
+        "fixed_point": {
+            "round_id": saturation["round_id"],
+            "zero_delta": True,
+            "rerun_reproduced": True,
+            "result_digest": saturation_digest,
+        },
+    }
+    assert MODULE.validate_objects(
+        manifest,
+        units,
+        reading,
+        candidates,
+        routes,
+        assets,
+        search,
+        {18},
+        True,
+    ) == []
+
+    saturation_only = copy.deepcopy(search)
+    saturation_only["rounds"] = [saturation_only["rounds"][-1]]
+    saturation_only["rounds"][0]["round_id"] = "S001"
+    saturation_only["rounds"][0]["queries"][0]["query_id"] = "Q0001"
+    saturation_only_digest = MODULE.search_result_digest(
+        saturation_only["rounds"][0]
+    )
+    saturation_only["rounds"][0]["result_digest"] = saturation_only_digest
+    saturation_only["rounds"][0]["rerun_digest"] = saturation_only_digest
+    saturation_only["fixed_point"] = {
+        "round_id": "S001",
+        "zero_delta": True,
+        "rerun_reproduced": True,
+        "result_digest": saturation_only_digest,
+    }
+    saturation_only_errors = MODULE.validate_objects(
+        manifest,
+        units,
+        reading,
+        candidates,
+        routes,
+        assets,
+        saturation_only,
+        {18},
+        True,
+    )
+    assert any(
+        "review-epoch 1 LOCAL-round coverage" in error
+        for error in saturation_only_errors
+    )
 
 
 def test_sealed_worker_bundle_is_sanitized_and_hash_bound(tmp_path: Path) -> None:
@@ -213,6 +387,7 @@ def test_completed_empty_worker_output_is_exact_and_accepted(
         row.update(
             {
                 "review_status": "REVIEWED",
+                "review_epoch": "1",
                 "review_disposition": "NO_CONSTRUCTION",
                 "source_status": "CLEAR",
                 "secondary_roles": "[]",
@@ -231,6 +406,7 @@ def test_completed_empty_worker_output_is_exact_and_accepted(
         row.update(
             {
                 "inspection_status": "SCREENED",
+                "review_epoch": "1",
                 "visual_role": "DECORATIVE",
                 "source_status": "CLEAR",
                 "risk_flags": "[]",

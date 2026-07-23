@@ -23,6 +23,7 @@ READING_HEADER = [
     "global_line_end",
     "unit_sha256",
     "review_status",
+    "review_epoch",
     "review_disposition",
     "source_status",
     "uncertainty",
@@ -68,6 +69,7 @@ ASSET_HEADER = [
     "assignment_basis",
     "reference_status",
     "inspection_status",
+    "review_epoch",
     "visual_role",
     "source_status",
     "risk_flags",
@@ -538,6 +540,10 @@ def schema_documents() -> dict[str, dict[str, Any]]:
     reading_properties.update(
         {
             "review_status": {"type": "string", "enum": ["PENDING", "REVIEWED"]},
+            "review_epoch": {
+                "type": "string",
+                "pattern": "^(?:|[1-9][0-9]*)$",
+            },
             "review_disposition": {
                 "type": "string",
                 "enum": [""] + READING_DISPOSITIONS,
@@ -570,6 +576,10 @@ def schema_documents() -> dict[str, dict[str, Any]]:
             "inspection_status": {
                 "type": "string",
                 "enum": ["PENDING", "SCREENED"],
+            },
+            "review_epoch": {
+                "type": "string",
+                "pattern": "^(?:|[1-9][0-9]*)$",
             },
             "visual_role": {"type": "string", "enum": [""] + VISUAL_ROLES},
             "source_status": {"type": "string", "enum": [""] + SOURCE_STATUSES},
