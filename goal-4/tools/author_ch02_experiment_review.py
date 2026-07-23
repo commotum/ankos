@@ -1145,6 +1145,21 @@ function_profile = profile_candidate(
     ),
     aliases=["function cellular automaton rule"],
 )
+function_profile["facts"]["complete_state"] = (
+    "The current cellular configuration together with the current step number "
+    "when the supplied function depends on that number."
+)
+function_profile["facts"]["control_state"] = (
+    "The current step number, beginning at 0, is exposed to the rule function."
+)
+function_profile["facts"]["schedule"] = (
+    "At each discrete generation the function receives each old neighborhood "
+    "and the current step number; the successor advances that number."
+)
+function_profile["facts"]["write_replacement_assembly_or_commit"] = (
+    "The function result supplies each next cell value, after which the step "
+    "counter advances with the complete successor configuration."
+)
 add_evidence(
     function_profile,
     label="function-ca-values",
@@ -1169,8 +1184,12 @@ add_evidence(
     ),
     fields=[
         "native_time",
+        "complete_state",
+        "control_state",
+        "schedule",
         "law_kind",
         "rule_relation_constraint_function_or_probability_law",
+        "write_replacement_assembly_or_commit",
         "parameters_and_variants",
         "evidence_limit",
     ],
@@ -2197,7 +2216,7 @@ munching = declarative_pattern(
     values="Boolean membership in the equality relation.",
     result="A sequence of relation-defined grid patterns.",
     aliases=["munching squares", "munching foos"],
-    route_keys=["munching-page871"],
+    route_keys=[],
 )
 add_candidate_image(
     munching,
@@ -3039,5 +3058,437 @@ code10 = source_candidate(
         "The passage does not state the seed used in the displayed images, "
         "boundary, code-number convention, completion, or witness semantics."
     ),
-    strength="DIRECT_COMPLETE_MECHANICS",
+    strength="DIRECT_PARTIAL_MECHANICS",
 )
+
+
+# Candidate-bearing routes whose source sentences are already candidate
+# provenance.  Two generalized profiles gain contextual evidence here because
+# U005008 is the sentence that points to their missing implementations.
+rule170["route_keys"].append("rule170-page153")
+totalistic_profile = next(
+    item for item in ALL_CANDIDATE_SPECS if item["key"] == "totalistic-ca"
+)
+totalistic_profile["route_keys"].append("totalistic-page886")
+add_evidence(
+    totalistic_profile,
+    label="totalistic-implementation-route",
+    unit="U005008",
+    claim=(
+        "The Notes explicitly route implementation of totalistic cellular "
+        "automata to page 886 without adding a second native rule."
+    ),
+    fields=[
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CONTEXTUAL",
+    modality="CROSS_REFERENCE",
+)
+rectangular_profile = next(
+    item for item in ALL_CANDIDATE_SPECS if item["key"] == "rectangular-dd-ca"
+)
+rectangular_profile["route_keys"].append("higher-dimensional-page927")
+add_evidence(
+    rectangular_profile,
+    label="higher-dimensional-implementation-route",
+    unit="U005008",
+    claim=(
+        "The same sentence routes fuller higher-dimensional cellular-automaton "
+        "implementation mechanics to page 927."
+    ),
+    fields=[
+        "support",
+        "topology",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ],
+    strength="CONTEXTUAL",
+    modality="CROSS_REFERENCE",
+)
+
+
+# ---------------------------------------------------------------------------
+# Construction-relevant cross-reference obligations.  Behavior-only page
+# mentions and ordinary display continuations are left as observer/context
+# dispositions; these routes are the ones that can complete, distinguish, or
+# independently discover a construction-bearing object.
+
+ALL_ROUTE_SPECS: list[RouteSpec] = []
+
+
+def add_route(
+    *,
+    key: str,
+    unit: str,
+    literal: str,
+    topic: str,
+    vocabulary: list[str],
+    scope: str = "CROSS_RANGE",
+    kind: str = "PAGE",
+) -> None:
+    if any(item["key"] == key for item in ALL_ROUTE_SPECS):
+        raise AuthoringError(f"duplicate route key {key}")
+    ALL_ROUTE_SPECS.append(
+        {
+            "key": key,
+            "unit": unit,
+            "literal": literal,
+            "topic": topic,
+            "vocabulary": vocabulary,
+            "scope": scope,
+            "kind": kind,
+            "_insertion": len(ALL_ROUTE_SPECS),
+        }
+    )
+
+
+add_route(
+    key="rule-numbering-page53",
+    unit="U004966",
+    literal="The numbering of rules is discussed on page 53.",
+    topic="elementary cellular-automaton rule-number decoding",
+    vocabulary=["numbering of rules", "elementary rule", "page 53"],
+)
+add_route(
+    key="built-in-ca-page867",
+    unit="U004984",
+    literal="the built-in CellularAutomaton function ... discussed on page 867",
+    topic="built-in cellular-automaton evolution interface and semantics",
+    vocabulary=["CellularAutomaton", "built-in function", "page 867"],
+    scope="WITHIN_STAGE",
+)
+add_route(
+    key="bitwise-formulas-page869",
+    unit="U004996",
+    literal="Boolean expressions ... can be quite complicated (see page 869)",
+    topic="Boolean and algebraic representations of cellular-automaton rules",
+    vocabulary=["Boolean expressions", "bitwise", "cellular automaton rules"],
+    scope="WITHIN_STAGE",
+)
+add_route(
+    key="general-rule-page60",
+    unit="U004997",
+    literal="explicit replacements for all possible blocks ... (see page 60)",
+    topic="general one-dimensional cellular-automaton rule schema",
+    vocabulary=["explicit replacements", "blocks", "neighborhood"],
+)
+add_route(
+    key="totalistic-page886",
+    unit="U005008",
+    literal="implementation of totalistic cellular automata on page 886",
+    topic="totalistic cellular-automaton rule decoding and implementation",
+    vocabulary=["totalistic cellular automata", "implementation", "page 886"],
+)
+add_route(
+    key="higher-dimensional-page927",
+    unit="U005008",
+    literal="higher-dimensional cellular automata on page 927",
+    topic="higher-dimensional cellular-automaton native mechanics",
+    vocabulary=["higher-dimensional", "cellular automata", "page 927"],
+)
+add_route(
+    key="built-in-profile-page886",
+    unit="U005009",
+    literal="see also page 886",
+    topic="general built-in cellular-automaton profile semantics",
+    vocabulary=["CellularAutomaton", "general function", "page 886"],
+)
+add_route(
+    key="cantor-map-page959",
+    unit="U005110",
+    literal="Compare page 959.",
+    topic="cellular automata as continuous maps on Cantor sequence space",
+    vocabulary=["Cantor set", "continuous mapping", "cellular automaton"],
+)
+add_route(
+    key="rule170-page153",
+    unit="U005112",
+    literal="compare page 153",
+    topic="Rule 170 shift-map mechanics and correspondence",
+    vocabulary=["rule 170", "shift map", "Mod[2 x, 1]"],
+)
+add_route(
+    key="pascal-page611",
+    unit="U005113",
+    literal="As shown on page 611",
+    topic="Pascal-triangle parity construction",
+    vocabulary=["Pascal's triangle", "binomial coefficients", "modulo 2"],
+)
+add_route(
+    key="rule60-page58",
+    unit="U005117",
+    literal="the one produced by rule 60 (see page 58)",
+    topic="Rule 60 cellular-automaton mechanics",
+    vocabulary=["rule 60", "Binomial", "modulo 2"],
+)
+add_route(
+    key="rule60-bit-page583",
+    unit="U005117",
+    literal="or (see page 583)",
+    topic="direct bitwise formula for the Rule 60 pattern",
+    vocabulary=["BitAnd", "rule 60", "digit sequences"],
+)
+add_route(
+    key="additive-page952",
+    unit="U005127",
+    literal="additive rules, discussed further on page 952",
+    topic="additive cellular-automaton restriction and mechanics",
+    vocabulary=["additive rules", "cellular automata", "page 952"],
+)
+add_route(
+    key="additive-continuous-page922",
+    unit="U005127",
+    literal="See also page 922 for the continuous case.",
+    topic="continuous analog of the additive-rule construction",
+    vocabulary=["additive", "continuous case", "page 922"],
+)
+add_route(
+    key="gcd-page613",
+    unit="U005134",
+    literal="GCD[m, n] yields a more complicated pattern (see page 613)",
+    topic="greatest-common-divisor function and its pattern",
+    vocabulary=["GCD", "integer function", "page 613"],
+)
+add_route(
+    key="jacobi-page1081",
+    unit="U005134",
+    literal="JacobiSymbol[m, 2 n - 1] (see page 1081)",
+    topic="Jacobi-symbol function and its modulo-two pattern",
+    vocabulary=["JacobiSymbol", "integer function", "page 1081"],
+)
+add_route(
+    key="function-combinations-page747",
+    unit="U005134",
+    literal="various combinations of functions (see page 747)",
+    topic="compositions of integer functions that generate patterns",
+    vocabulary=["combinations of functions", "integer functions", "page 747"],
+)
+add_route(
+    key="rule30-completeness-page725",
+    unit="U005144",
+    literal="All possible blocks appear to occur eventually (see page 725).",
+    topic="Rule 30 block-occurrence property and supporting definition",
+    vocabulary=["rule 30", "all possible blocks", "page 725"],
+)
+add_route(
+    key="rule30-column-page1087",
+    unit="U005148",
+    literal="the arguments on page 1087",
+    topic="Rule 30 center-column nonrepetition evidence",
+    vocabulary=["rule 30", "center column", "repeat"],
+)
+add_route(
+    key="rule110-page229",
+    unit="U005149",
+    literal="details of rule 110 ... on page 229",
+    topic="Rule 110 detailed mechanics and behavior",
+    vocabulary=["rule 110", "details", "page 229"],
+)
+add_route(
+    key="rule110-page675",
+    unit="U005149",
+    literal="details of rule 110 ... on page 675",
+    topic="Rule 110 detailed mechanics and computation",
+    vocabulary=["rule 110", "details", "page 675"],
+)
+add_route(
+    key="rule110-structures-page292",
+    unit="U005149",
+    literal="Localized structures ... are shown on page 292.",
+    topic="Rule 110 localized-structure definitions",
+    vocabulary=["rule 110", "localized structures", "page 292"],
+)
+add_route(
+    key="cosmati-apollonian-page986",
+    unit="U005193",
+    literal="Compare the Apollonian packing of page 986.",
+    topic="Apollonian circle-packing construction",
+    vocabulary=["Apollonian packing", "nested", "page 986"],
+)
+add_route(
+    key="paperfolding-page892",
+    unit="U005214",
+    literal="the nested form on page 892",
+    topic="nested paperfolding construction",
+    vocabulary=["paperfolding", "nested form", "page 892"],
+)
+add_route(
+    key="logic-page1099",
+    unit="U005216",
+    literal="See page 1099.",
+    topic="logic-rule generators and constraints",
+    vocabulary=["logic", "rules", "page 1099"],
+)
+add_route(
+    key="grammar-page1103",
+    unit="U005217",
+    literal="See page 1103.",
+    topic="formal grammar construction mechanics",
+    vocabulary=["grammar", "generating structures", "page 1103"],
+)
+add_route(
+    key="firing-squad-page1035",
+    unit="U005220",
+    literal="the firing squad problem on page 1035",
+    topic="firing-squad synchronization cellular automaton",
+    vocabulary=["firing squad", "synchronization", "page 1035"],
+)
+add_route(
+    key="cryptography-page1085",
+    unit="U005223",
+    literal="See page 1085.",
+    topic="rule-based cryptographic constructions",
+    vocabulary=["cryptography", "rules", "page 1085"],
+)
+add_route(
+    key="maze-page873",
+    unit="U005224",
+    literal="the one shown on page 873",
+    topic="classical labyrinth construction procedure",
+    vocabulary=["maze designs", "labyrinth", "page 873"],
+    scope="WITHIN_STAGE",
+)
+add_route(
+    key="von-neumann-self-reproduction-page1179",
+    unit="U005230",
+    literal="cellular automata capable of self-reproduction (see page 1179)",
+    topic="self-reproducing cellular-automaton construction mechanics",
+    vocabulary=["self-reproduction", "cellular automata", "page 1179"],
+)
+add_route(
+    key="von-neumann-universality-page1115",
+    unit="U005230",
+    literal="universal computation (see page 1115)",
+    topic="universal cellular-automaton construction mechanics",
+    vocabulary=["universal computation", "cellular automata", "page 1115"],
+)
+add_route(
+    key="garden-of-eden-page961",
+    unit="U005230",
+    literal="Garden of Eden result ... see page 961",
+    topic="Garden-of-Eden cellular-automaton property and configuration class",
+    vocabulary=["Garden of Eden", "initial conditions", "page 961"],
+)
+add_route(
+    key="historical-firing-squad-page1035",
+    unit="U005230",
+    literal="firing squad synchronization, as on page 1035",
+    topic="firing-squad synchronization construction",
+    vocabulary=["firing squad", "synchronization", "page 1035"],
+)
+add_route(
+    key="ulam-page928",
+    unit="U005232",
+    literal="generalized 2D cellular automata ... (see page 928)",
+    topic="Ulam generalized two-dimensional growth automata",
+    vocabulary=["Ulam", "2D cellular automata", "single black cells"],
+)
+add_route(
+    key="ulam-number-sequence-page908",
+    unit="U005232",
+    literal="sequences based on numbers discussed on page 908",
+    topic="Ulam's non-cellular one-dimensional number-sequence construction",
+    vocabulary=["Ulam", "sequences based on numbers", "page 908"],
+)
+add_route(
+    key="fredkin-page1179",
+    unit="U005232",
+    literal="the 2D analog of rule 90 ... (see page 1179)",
+    topic="Fredkin's two-dimensional Rule 90 analog and self-reproduction",
+    vocabulary=["Fredkin", "2D analog", "rule 90"],
+)
+add_route(
+    key="life-page249",
+    unit="U005233",
+    literal="The Game of Life ... (see page 249)",
+    topic="Conway Life transition, neighborhood, and seed mechanics",
+    vocabulary=["Game of Life", "Conway", "page 249"],
+)
+add_route(
+    key="code20-page283",
+    unit="U005233",
+    literal="code 20 k = 2, r = 2 totalistic rule from page 283",
+    topic="binary range-2 totalistic code 20 lookup and code convention",
+    vocabulary=["code 20", "totalistic", "k=2", "r=2"],
+)
+add_route(
+    key="lfsr-page974",
+    unit="U005236",
+    literal="linear feedback shift registers (see page 974)",
+    topic="linear feedback shift-register native update mechanics",
+    vocabulary=["linear feedback shift register", "LFSR", "page 974"],
+)
+add_route(
+    key="lfsr-page259",
+    unit="U005236",
+    literal="limited number of cells (compare page 259)",
+    topic="finite additive cellular-automaton correspondence",
+    vocabulary=["additive cellular automata", "limited number of cells", "page 259"],
+)
+add_route(
+    key="nonlinear-feedback-page1088",
+    unit="U005236",
+    literal="ones surprisingly close to rule 30 (see page 1088)",
+    topic="nonlinear feedback shift-register constructions near Rule 30",
+    vocabulary=["nonlinear feedback shift register", "rule 30", "page 1088"],
+)
+add_route(
+    key="shift-maps-page960",
+    unit="U005237",
+    literal="symbolic dynamics (see page 960)",
+    topic="symbolic-dynamics sequence space and shift map",
+    vocabulary=["symbolic dynamics", "infinite sequences", "page 960"],
+)
+add_route(
+    key="shift-maps-page961",
+    unit="U005237",
+    literal="exactly 1D cellular automata (see page 961)",
+    topic="shift-commuting block-map equivalence with one-dimensional cellular automata",
+    vocabulary=["shift-commuting block maps", "1D cellular automata", "page 961"],
+)
+
+# The explicit historical checklist is retained as discovery routing, not
+# multiplied into duplicate candidates in this chapter.
+for key, unit, literal, topic, vocabulary, scope in [
+    ("primes-perfect-page132", "U005242", "pages 132 and 910", "prime-number generation", ["primes", "simple problems", "page 132"], "CROSS_RANGE"),
+    ("perfect-numbers-page910", "U005242", "pages 132 and 910", "perfect-number construction", ["perfect numbers", "simple problems", "page 910"], "CROSS_RANGE"),
+    ("leonardo-constraints-page875", "U005244", "page 875", "Leonardo geometrical-constraint constructions", ["Leonardo da Vinci", "geometrical constraints", "page 875"], "WITHIN_STAGE"),
+    ("continued-fractions-page143", "U005245", "pages 143 and 915", "continued-fraction construction from simple formulas", ["continued fractions", "simple formulas", "page 143"], "CROSS_RANGE"),
+    ("continued-fractions-page915", "U005245", "pages 143 and 915", "continued-fraction construction details", ["continued fractions", "Euler", "page 915"], "CROSS_RANGE"),
+    ("pi-digits-page136", "U005246", "page 136", "digit-sequence construction for pi", ["digits of pi", "transcendental numbers", "page 136"], "CROSS_RANGE"),
+    ("three-body-page972", "U005248", "page 972", "three-body dynamical-system construction", ["three-body problem", "dynamics", "page 972"], "CROSS_RANGE"),
+    ("thue-substitution-page893", "U005250", "page 893", "Thue substitution-system construction", ["Axel Thue", "substitution systems", "page 893"], "CROSS_RANGE"),
+    ("combinators-page1121", "U005252", "page 1121", "combinator reduction systems", ["Schönfinkel", "combinators", "page 1121"], "CROSS_RANGE"),
+    ("post-tag-page894", "U005253", "page 894", "Post tag-system mechanics", ["Emil Post", "tag system", "page 894"], "CROSS_RANGE"),
+    ("godel-page782", "U005255", "page 782", "Gödel construction used in incompleteness", ["Gödel", "construction", "page 782"], "CROSS_RANGE"),
+    ("three-n-plus-one-page904", "U005257", "page 904", "3 n + 1 iteration", ["3 n + 1", "iteration", "page 904"], "CROSS_RANGE"),
+    ("prng-page974", "U005258", "page 974", "pseudorandom number-generator constructions", ["pseudorandom number generators", "page 974"], "CROSS_RANGE"),
+    ("iterated-maps-page918", "U005264", "page 918", "iterated-map construction class", ["iterated maps", "simulation", "page 918"], "CROSS_RANGE"),
+    ("neural-networks-page1099", "U005266", "page 1099", "idealized neural-network update mechanics", ["neural networks", "simulation", "page 1099"], "CROSS_RANGE"),
+    ("hard-spheres-page999", "U005267", "page 999", "hard-sphere molecular dynamics", ["hard sphere", "molecules", "page 999"], "CROSS_RANGE"),
+    ("close-nonlinear-feedback-page1088", "U005268", "page 1088", "Golomb nonlinear feedback shift registers", ["Golomb", "feedback shift register", "page 1088"], "CROSS_RANGE"),
+    ("munching-foos-page871", "U005271", "page 871", "MIT munching-foos program mechanics", ["munching foos", "small computer programs", "page 871"], "WITHIN_STAGE"),
+    ("minsky-tm-page81", "U005272", "page 81", "Minsky simple Turing-machine mechanics", ["Minsky", "Turing machines", "page 81"], "CROSS_RANGE"),
+    ("lorenz-pde-page971", "U005273", "page 971", "Lorenz differential-equation relation", ["Lorenz", "differential equation", "page 971"], "CROSS_RANGE"),
+    ("random-boolean-page936", "U005274", "page 936", "random Boolean-network construction", ["random Boolean networks", "page 936"], "CROSS_RANGE"),
+    ("paterson-worms-page930", "U005276", "page 930", "Paterson two-dimensional Turing-machine worms", ["Paterson", "worms", "2D Turing machines"], "CROSS_RANGE"),
+    ("restricted-2d-ca-page864", "U005277", "page 864", "property-restricted two-dimensional cellular automata", ["2D cellular automata", "forced properties", "page 864"], "CROSS_RANGE"),
+    ("fractals-page934", "U005278", "page 934", "fractal generation constructions", ["Mandelbrot", "fractals", "page 934"], "CROSS_RANGE"),
+    ("hofstadter-sequence-page907", "U005280", "page 907", "Hofstadter recursive-sequence construction", ["Hofstadter", "recursive sequence", "page 907"], "CROSS_RANGE"),
+    ("mandelbrot-page934", "U005281", "page 934", "Mandelbrot-set iteration", ["Mandelbrot set", "page 934"], "CROSS_RANGE"),
+    ("early-ca-experiment-page19", "U005286", "page 19", "1981 elementary-cellular-automaton experiment", ["computer experiments", "cellular automata", "page 19"], "CROSS_RANGE"),
+    ("ca-classes-page231", "U005288", "page 231", "four cellular-automaton behavior classes", ["four basic classes", "random initial conditions", "page 231"], "CROSS_RANGE"),
+    ("irreducibility-page737", "U005290", "page 737", "computational-irreducibility property", ["computational irreducibility", "page 737"], "CROSS_RANGE"),
+    ("ca-fluid-page378", "U005292", "page 378", "cellular-automaton fluid construction", ["fluid mechanics", "cellular automata", "page 378"], "CROSS_RANGE"),
+]:
+    add_route(
+        key=key,
+        unit=unit,
+        literal=literal,
+        topic=topic,
+        vocabulary=vocabulary,
+        scope=scope,
+    )
