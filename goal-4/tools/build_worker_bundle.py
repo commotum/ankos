@@ -28,15 +28,6 @@ from audit_contract import (
 
 
 SOURCE_ROOT = REPO_ROOT / "ref" / "A-New-Kind-of-Science"
-FORBIDDEN_BRIEF_TERMS = [
-    "T01",
-    "T45",
-    "SimpleProgram",
-    "api fit",
-    "runtime support",
-    "existing catalog",
-    "semantic family action",
-]
 SCHEMA_NAMES = (
     "asset-ledger-row.schema.json",
     "candidate-record.schema.json",
@@ -84,6 +75,74 @@ STAGE_4_PATHS = {
 
 def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def compile_blind_text_patterns(
+    guardrails: dict[str, Any],
+) -> tuple[re.Pattern[str], ...]:
+    """Compile the authoritative blind free-text denylist."""
+    try:
+        raw_patterns = guardrails["blind_schema_policy"][
+            "free_text_review_patterns"
+        ]
+    except KeyError as exc:
+        raise ValueError(
+            "guardrails lack authoritative blind free-text patterns"
+        ) from exc
+    if not isinstance(raw_patterns, list) or not raw_patterns:
+        raise ValueError(
+            "guardrail blind free-text patterns must be a nonempty array"
+        )
+    patterns: list[re.Pattern[str]] = []
+    for index, raw in enumerate(raw_patterns):
+        if not isinstance(raw, str) or not raw:
+            raise ValueError(
+                f"guardrail blind free-text pattern {index} is not a string"
+            )
+        try:
+            patterns.append(re.compile(raw, re.IGNORECASE))
+        except re.error as exc:
+            raise ValueError(
+                f"invalid guardrail blind free-text pattern {raw!r}: {exc}"
+            ) from exc
+    return tuple(patterns)
+
+
+def blind_text_matches(
+    value: Any,
+    patterns: tuple[re.Pattern[str], ...],
+    path: str = "$",
+) -> list[str]:
+    """Return locations where free text leaks frozen reconciliation language."""
+    matches: list[str] = []
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            matches.extend(
+                blind_text_matches(nested, patterns, f"{path}.{key}")
+            )
+    elif isinstance(value, list):
+        for index, nested in enumerate(value):
+            matches.extend(
+                blind_text_matches(nested, patterns, f"{path}[{index}]")
+            )
+    elif isinstance(value, str):
+        for pattern in patterns:
+            if pattern.search(value):
+                matches.append(f"{path} matches {pattern.pattern!r}")
+    return matches
+
+
+def reject_blind_text(
+    value: Any,
+    patterns: tuple[re.Pattern[str], ...],
+    label: str,
+) -> None:
+    matches = blind_text_matches(value, patterns, label)
+    if matches:
+        raise ValueError(
+            "forbidden blind priming in generated metadata: "
+            + "; ".join(matches)
+        )
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -501,6 +560,14 @@ def build_bundle(
         raise ValueError("discovery epoch must be a positive integer")
     manifest = json.loads((GOAL_DIR / "corpus-manifest.json").read_text())
     guardrails = json.loads((GOAL_DIR / "guardrails.json").read_text())
+    text_patterns = compile_blind_text_patterns(guardrails)
+    if not isinstance(worker_id, str) or not worker_id.strip():
+        raise ValueError("worker_id must be a nonempty string")
+    reject_blind_text(
+        {"worker_id": worker_id},
+        text_patterns,
+        "worker_metadata",
+    )
     allowed_stage_paths = stage_paths(manifest, stage)
     if requested_paths and len(requested_paths) != len(set(requested_paths)):
         raise ValueError("requested paths must be unique")
@@ -530,6 +597,19 @@ def build_bundle(
         if row["assignment_path"] in paths
     ]
 
+    prompt_bytes = brief(worker_id, stage, epoch, paths).encode("utf-8")
+    reject_blind_text(
+        prompt_bytes.decode("utf-8"),
+        text_patterns,
+        "brief",
+    )
+    blind_guardrails = sanitized_guardrails(guardrails)
+    reject_blind_text(
+        blind_guardrails,
+        text_patterns,
+        "sanitized_guardrails",
+    )
+
     output.mkdir(parents=True)
     input_root = output / "input"
     schema_source = GOAL_DIR / "schemas" / "blind"
@@ -540,9 +620,8 @@ def build_bundle(
         )
     write(
         input_root / "guardrails.json",
-        canonical_json_bytes(sanitized_guardrails(guardrails)),
+        canonical_json_bytes(blind_guardrails),
     )
-    prompt_bytes = brief(worker_id, stage, epoch, paths).encode("utf-8")
     write(input_root / "brief.md", prompt_bytes)
     write(
         input_root / "source-units.jsonl",
@@ -595,6 +674,11 @@ def build_bundle(
         },
         "allowed_inputs": allowed,
     }
+    reject_blind_text(
+        bundle_manifest,
+        text_patterns,
+        "allowed_manifest",
+    )
     manifest_bytes = canonical_json_bytes(bundle_manifest)
     write(output / "allowed-manifest.json", manifest_bytes)
     template = {
@@ -610,6 +694,11 @@ def build_bundle(
         "route_proposals": [],
         "uncertainties": [],
     }
+    reject_blind_text(
+        template,
+        text_patterns,
+        "worker_output_template",
+    )
     write(output / "output" / "output.json", canonical_json_bytes(template))
     seal_inputs(input_root)
     (output / "allowed-manifest.json").chmod(0o444)
@@ -620,6 +709,7 @@ def _validate_worker_output(
     manifest: dict[str, Any],
     errors: list[str],
     require_completed_output: bool,
+    text_patterns: tuple[re.Pattern[str], ...],
 ) -> None:
     output_path = bundle / "output" / "output.json"
     try:
@@ -630,6 +720,8 @@ def _validate_worker_output(
     if not isinstance(output, dict):
         errors.append("worker output is not an object")
         return
+    for match in blind_text_matches(output, text_patterns, "worker_output"):
+        errors.append(f"worker output contains forbidden blind priming: {match}")
 
     schema_path = bundle / "input" / "schemas" / "worker-output.schema.json"
     try:
@@ -1314,6 +1406,20 @@ def verify_bundle(
         return [f"cannot load bundle manifest: {exc}"]
     if not isinstance(manifest, dict):
         return ["bundle manifest is not an object"]
+    try:
+        trusted_guardrails = json.loads(
+            (GOAL_DIR / "guardrails.json").read_text(encoding="utf-8")
+        )
+        text_patterns = compile_blind_text_patterns(trusted_guardrails)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        errors.append(f"cannot load blind free-text patterns: {exc}")
+        text_patterns = ()
+    for match in blind_text_matches(
+        manifest,
+        text_patterns,
+        "allowed_manifest",
+    ):
+        errors.append(f"bundle manifest contains forbidden blind priming: {match}")
     if set(manifest) != MANIFEST_FIELDS:
         errors.append("bundle manifest fields are invalid")
     if manifest_bytes != canonical_json_bytes(manifest):
@@ -1510,9 +1616,8 @@ def verify_bundle(
         != brief(worker_id, stage, discovery_epoch, source_paths).encode("utf-8")
     ):
         errors.append("bundle brief differs from its declared assignment")
-    for term in FORBIDDEN_BRIEF_TERMS:
-        if term.lower() in brief_text.lower():
-            errors.append(f"bundle brief contains priming term: {term}")
+    for match in blind_text_matches(brief_text, text_patterns, "brief"):
+        errors.append(f"bundle brief contains forbidden blind priming: {match}")
 
     schema_root = input_root / "schemas"
     actual_schema_names = (
@@ -1721,6 +1826,7 @@ def verify_bundle(
         manifest,
         errors,
         require_completed_output,
+        text_patterns,
     )
     return errors
 

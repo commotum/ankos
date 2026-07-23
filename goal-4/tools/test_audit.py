@@ -89,6 +89,99 @@ def test_sealed_worker_bundle_is_sanitized_and_hash_bound(tmp_path: Path) -> Non
             assert path.stat().st_nlink == 1
 
 
+def test_worker_bundle_rejects_forbidden_free_text_worker_ids(
+    tmp_path: Path,
+) -> None:
+    build = MODULE_PATH.with_name("build_worker_bundle.py")
+    forbidden_ids = (
+        "T02",
+        "worker-t02-alpha",
+        "reviewer-[t17]",
+        "qa-ADD_CATALOG_ENTRY",
+        "Api Fit Reviewer",
+    )
+    for index, worker_id in enumerate(forbidden_ids):
+        bundle = tmp_path / f"forbidden-{index}"
+        created = subprocess.run(
+            [
+                sys.executable,
+                str(build),
+                "--output",
+                str(bundle),
+                "--worker-id",
+                worker_id,
+                "--stage",
+                "5",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert created.returncode != 0
+        assert "forbidden blind priming" in created.stderr
+        assert not bundle.exists()
+
+
+def test_worker_bundle_verifier_rejects_tampered_priming_metadata(
+    tmp_path: Path,
+) -> None:
+    bundle = tmp_path / "bundle"
+    build = MODULE_PATH.with_name("build_worker_bundle.py")
+    subprocess.run(
+        [
+            sys.executable,
+            str(build),
+            "--output",
+            str(bundle),
+            "--worker-id",
+            "benign-worker",
+            "--stage",
+            "5",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    manifest_path = bundle / "allowed-manifest.json"
+    original_manifest = manifest_path.read_bytes()
+    manifest = json.loads(original_manifest)
+    manifest["worker_id"] = "tampered-[t02]-worker"
+    manifest_path.chmod(0o644)
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    manifest_path.chmod(0o444)
+    verified = subprocess.run(
+        [sys.executable, str(build), "--verify", str(bundle)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert verified.returncode != 0
+    assert "bundle manifest contains forbidden blind priming" in verified.stderr
+
+    manifest_path.chmod(0o644)
+    manifest_path.write_bytes(original_manifest)
+    manifest_path.chmod(0o444)
+    brief_path = bundle / "input" / "brief.md"
+    brief_path.chmod(0o644)
+    brief_path.write_text(
+        brief_path.read_text(encoding="utf-8") + "\nReviewer T03 metadata.\n",
+        encoding="utf-8",
+    )
+    brief_path.chmod(0o444)
+    verified = subprocess.run(
+        [sys.executable, str(build), "--verify", str(bundle)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert verified.returncode != 0
+    assert "bundle brief contains forbidden blind priming" in verified.stderr
+
+
 def test_completed_empty_worker_output_is_exact_and_accepted(
     tmp_path: Path,
 ) -> None:

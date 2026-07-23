@@ -81,6 +81,9 @@
     "source_unit_id": {
       "type": "string"
     },
+    "uncertainty": {
+      "type": "string"
+    },
     "unit_sha256": {
       "type": "string"
     }
@@ -100,6 +103,7 @@
     "review_status",
     "review_disposition",
     "source_status",
+    "uncertainty",
     "secondary_roles",
     "candidate_ids",
     "route_ids",

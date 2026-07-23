@@ -840,6 +840,7 @@ def validate_objects(
     errors.extend(assignment_errors)
     asset_record_by_id = {row.get("asset_id", ""): row for row in assets}
     asset_ids = set(asset_record_by_id)
+    discovery_epochs: set[int] = set()
 
     route_by_id = {row.get("route_id", ""): row for row in routes}
     route_ids = set(route_by_id)
@@ -1002,6 +1003,8 @@ def validate_objects(
             discovery_epoch = -1
         if discovery_epoch < 1:
             errors.append(f"{prefix} has invalid discovery epoch")
+        else:
+            discovery_epochs.add(discovery_epoch)
         try:
             discovery_ordinal = int(row["discovery_ordinal"])
         except ValueError:
@@ -1675,6 +1678,8 @@ def validate_objects(
         if not isinstance(epoch, int) or epoch < 1:
             errors.append(f"search round {round_index} has invalid epoch")
             epoch = -1
+        else:
+            discovery_epochs.add(epoch)
         if kind not in {"LOCAL", "SATURATION"}:
             errors.append(f"search round {round_index} has invalid kind")
         if not isinstance(owning_stage, int) or not 4 <= owning_stage <= 18:
@@ -2164,7 +2169,6 @@ def validate_objects(
 
     anchor_ordinals: dict[tuple[int, str, str], list[int]] = {}
     prior_anchor_key: tuple[int, int, int, int, int, int] | None = None
-    candidate_epochs: set[int] = set()
     for candidate in candidates:
         candidate_id = candidate["id"]
         anchor = candidate["discovery_anchor"]
@@ -2188,7 +2192,7 @@ def validate_objects(
             or ordinal < 1
         ):
             continue
-        candidate_epochs.add(epoch)
+        discovery_epochs.add(epoch)
         anchor_stage = -1
         anchor_key: tuple[int, int, int, int, int, int] | None = None
         if kind == "SOURCE_UNIT":
@@ -2263,10 +2267,6 @@ def validate_objects(
                     f"candidate {candidate_id} violates frozen B-ID traversal order"
                 )
             prior_anchor_key = anchor_key
-    if candidate_epochs and candidate_epochs != set(
-        range(1, max(candidate_epochs) + 1)
-    ):
-        errors.append("candidate discovery epochs are not contiguous from 1")
     for anchor_identity, ordinals in anchor_ordinals.items():
         if sorted(ordinals) != list(range(1, len(ordinals) + 1)):
             errors.append(
@@ -2275,59 +2275,114 @@ def validate_objects(
 
     evidence_anchor_ordinals: dict[tuple[int, str, str], list[int]] = {}
     search_evidence_groups: set[str] = set()
+    ordered_evidence: list[tuple[int, dict[str, Any], dict[str, Any]]] = []
     for candidate in candidates:
-        candidate_id = candidate["id"]
         for evidence in candidate["source_evidence"]:
-            anchor = evidence.get("discovery_anchor", {})
-            if not isinstance(anchor, dict) or not {
-                "epoch",
-                "kind",
-                "id",
-                "ordinal",
-            }.issubset(anchor):
-                continue
-            epoch = anchor["epoch"]
-            kind = anchor["kind"]
-            anchor_id = anchor["id"]
-            ordinal = anchor["ordinal"]
-            if (
-                not isinstance(epoch, int)
-                or epoch < 1
-                or not isinstance(ordinal, int)
-                or ordinal < 1
-            ):
-                continue
-            evidence_anchor_ordinals.setdefault(
-                (epoch, kind, anchor_id), []
-            ).append(ordinal)
-            if kind == "SEARCH_HIT":
-                search_evidence_groups.add(evidence["evidence_group_id"])
-                hit = hit_by_id.get(anchor_id)
-                meta = hit_round_meta.get(anchor_id)
-                if hit is None or meta is None:
+            evidence_id = evidence.get("evidence_id", "")
+            if isinstance(evidence_id, str) and E_ID.fullmatch(evidence_id):
+                ordered_evidence.append((int(evidence_id[1:]), candidate, evidence))
+    ordered_evidence.sort(key=lambda item: item[0])
+    prior_evidence_key: tuple[int, int, int, int, int, int] | None = None
+    for _, candidate, evidence in ordered_evidence:
+        candidate_id = candidate["id"]
+        anchor = evidence.get("discovery_anchor", {})
+        if not isinstance(anchor, dict) or not {
+            "epoch",
+            "kind",
+            "id",
+            "ordinal",
+        }.issubset(anchor):
+            continue
+        epoch = anchor["epoch"]
+        kind = anchor["kind"]
+        anchor_id = anchor["id"]
+        ordinal = anchor["ordinal"]
+        if (
+            not isinstance(epoch, int)
+            or epoch < 1
+            or kind not in {"SOURCE_UNIT", "IMAGE", "SEARCH_HIT"}
+            or not isinstance(anchor_id, str)
+            or not isinstance(ordinal, int)
+            or ordinal < 1
+        ):
+            continue
+        discovery_epochs.add(epoch)
+        candidate_epoch = candidate.get("discovery_anchor", {}).get("epoch")
+        if isinstance(candidate_epoch, int) and epoch < candidate_epoch:
+            errors.append(
+                f"candidate {candidate_id} evidence predates candidate discovery epoch"
+            )
+        evidence_anchor_ordinals.setdefault(
+            (epoch, kind, anchor_id), []
+        ).append(ordinal)
+        evidence_key: tuple[int, int, int, int, int, int] | None = None
+        if kind == "SEARCH_HIT":
+            search_evidence_groups.add(evidence["evidence_group_id"])
+            hit = hit_by_id.get(anchor_id)
+            meta = hit_round_meta.get(anchor_id)
+            if hit is None or meta is None:
+                errors.append(
+                    f"candidate {candidate_id} evidence anchor hit is unknown"
+                )
+            else:
+                hit_epoch, anchor_stage, _ = meta
+                evidence_key = (
+                    epoch,
+                    anchor_stage,
+                    len(document_by_path) + 1,
+                    2,
+                    int(anchor_id[1:]),
+                    ordinal,
+                )
+                if hit_epoch != epoch:
                     errors.append(
-                        f"candidate {candidate_id} evidence anchor hit is unknown"
+                        f"candidate {candidate_id} evidence epoch differs "
+                        "from search round"
                     )
-                else:
-                    hit_epoch, _, _ = meta
-                    if hit_epoch != epoch:
-                        errors.append(
-                            f"candidate {candidate_id} evidence epoch differs "
-                            "from search round"
-                        )
-                    if candidate_id not in hit["candidate_ids"]:
-                        errors.append(
-                            f"candidate {candidate_id} evidence anchor hit lacks "
-                            "candidate link"
-                        )
-            elif kind == "SOURCE_UNIT" and anchor_id not in unit_by_id:
+                if candidate_id not in hit["candidate_ids"]:
+                    errors.append(
+                        f"candidate {candidate_id} evidence anchor hit lacks "
+                        "candidate link"
+                    )
+        elif kind == "SOURCE_UNIT":
+            source_unit = unit_by_id.get(anchor_id)
+            if source_unit is None:
                 errors.append(
                     f"candidate {candidate_id} evidence anchor unit is unknown"
                 )
-            elif kind == "IMAGE" and anchor_id not in image_by_path:
+            else:
+                anchor_stage = stage_by_path[source_unit["path"]]
+                evidence_key = (
+                    epoch,
+                    anchor_stage,
+                    int(source_unit["document_order"]),
+                    0,
+                    unit_position[anchor_id],
+                    ordinal,
+                )
+        elif kind == "IMAGE":
+            assignment = expected_assets.get(anchor_id)
+            if assignment is None:
                 errors.append(
                     f"candidate {candidate_id} evidence anchor image is unknown"
                 )
+            else:
+                assignment_path = assignment["assignment_path"]
+                evidence_key = (
+                    epoch,
+                    int(assignment["assignment_stage"]),
+                    int(document_by_path[assignment_path]["order"]),
+                    1,
+                    image_position[anchor_id],
+                    ordinal,
+                )
+        if evidence_key is not None:
+            if prior_evidence_key is not None and evidence_key < prior_evidence_key:
+                errors.append(
+                    f"candidate {candidate_id} evidence violates frozen "
+                    "allocation traversal"
+                )
+            prior_evidence_key = evidence_key
     for anchor_identity, ordinals in evidence_anchor_ordinals.items():
         if sorted(ordinals) != list(range(1, len(ordinals) + 1)):
             errors.append(
@@ -2336,6 +2391,13 @@ def validate_objects(
     if search_evidence_groups != seen_new_evidence_groups:
         errors.append(
             "search-discovered evidence groups differ from search-round deltas"
+        )
+    if discovery_epochs and discovery_epochs != set(
+        range(1, max(discovery_epochs) + 1)
+    ):
+        errors.append(
+            "global discovery epochs are not contiguous from 1 across "
+            "candidates, evidence, routes, and search"
         )
 
     for required_stage in require_stages:
@@ -2544,6 +2606,115 @@ def mutation_checks(
     if base_errors:
         return ["valid candidate/route mutation fixture failed: " + "; ".join(base_errors)]
 
+    defect_reading = copy.deepcopy(base_reading)
+    defect_unit = units[1]
+    defect_document = next(
+        document
+        for document in manifest["documents"]
+        if document["path"] == defect_unit["path"]
+    )
+    defect_reading[1].update(
+        {
+            "review_status": "REVIEWED",
+            "review_disposition": "SOURCE_DEFECT_OR_AMBIGUITY",
+            "source_status": "DEFECTIVE",
+            "uncertainty": (
+                "The source unit ends mid-expression, so its construction "
+                "boundary cannot be recovered locally."
+            ),
+            "secondary_roles": '["SOURCE_DEFECT"]',
+            "candidate_ids": "[]",
+            "route_ids": "[]",
+            "evidence_statement": (
+                "The visible source boundary is incomplete and is retained "
+                "as an explicit defect."
+            ),
+            "review_stage": str(stage_for_document(defect_document)),
+            "reviewer": "fixture-reviewer",
+        }
+    )
+    defect_reading_errors = validate_objects(
+        manifest,
+        units,
+        defect_reading,
+        base_candidates,
+        base_routes,
+        base_assets,
+        base_search,
+    )
+    if defect_reading_errors:
+        failures.append(
+            "valid source-defect reading fixture failed: "
+            + "; ".join(defect_reading_errors)
+        )
+
+    defect_asset = copy.deepcopy(base_assets)
+    defect_asset[0].update(
+        {
+            "inspection_status": "SCREENED",
+            "visual_role": "SOURCE_DEFECT",
+            "source_status": "DEFECTIVE",
+            "risk_flags": '["AMBIGUOUS"]',
+            "original_resolution_status": "REVIEWED",
+            "transcription_status": "NOT_REQUIRED",
+            "candidate_ids": "[]",
+            "route_ids": "[]",
+            "evidence_statement": (
+                "The original-resolution image is visibly clipped at the "
+                "construction boundary."
+            ),
+            "review_stage": defect_asset[0]["assignment_stage"],
+            "reviewer": "fixture-reviewer",
+            "uncertainty": (
+                "The clipped edge prevents a complete reading of the depicted "
+                "construction."
+            ),
+        }
+    )
+    defect_asset_errors = validate_objects(
+        manifest,
+        units,
+        base_reading,
+        base_candidates,
+        base_routes,
+        defect_asset,
+        base_search,
+    )
+    if defect_asset_errors:
+        failures.append(
+            "valid source-defect asset fixture failed: "
+            + "; ".join(defect_asset_errors)
+        )
+
+    reopened_reading = copy.deepcopy(base_reading)
+    reopened_route = copy.deepcopy(route)
+    reopened_route.update(
+        {
+            "route_id": "R000002",
+            "discovery_epoch": "2",
+            "discovery_ordinal": "1",
+            "literal_target": "reopened-pass fixture target",
+            "expected_topic": "reopened-pass fixture mechanics",
+            "vocabulary_terms": '["reopened-pass fixture mechanics"]',
+        }
+    )
+    reopened_routes = [copy.deepcopy(route), reopened_route]
+    reopened_reading[0]["route_ids"] = '["R000001","R000002"]'
+    reopened_errors = validate_objects(
+        manifest,
+        units,
+        reopened_reading,
+        base_candidates,
+        reopened_routes,
+        base_assets,
+        base_search,
+    )
+    if reopened_errors:
+        failures.append(
+            "valid reopened discovery-epoch fixture failed: "
+            + "; ".join(reopened_errors)
+        )
+
     def lineage_candidate(
         candidate_id: str,
         evidence_number: int,
@@ -2676,6 +2847,115 @@ def mutation_checks(
             "broken multi-layer evidence reassignment",
             lineage_reading,
             broken_lineage,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    missing_reading_uncertainty = copy.deepcopy(defect_reading)
+    missing_reading_uncertainty[1]["uncertainty"] = ""
+    mutations.append(
+        (
+            "non-clear reading without uncertainty boundary",
+            missing_reading_uncertainty,
+            base_candidates,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    clear_reading_uncertainty = copy.deepcopy(base_reading)
+    clear_reading_uncertainty[0]["uncertainty"] = (
+        "A CLEAR reading must not retain an uncertainty boundary."
+    )
+    mutations.append(
+        (
+            "CLEAR reading with uncertainty boundary",
+            clear_reading_uncertainty,
+            base_candidates,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    clear_defect_reading = copy.deepcopy(defect_reading)
+    clear_defect_reading[1]["source_status"] = "CLEAR"
+    clear_defect_reading[1]["uncertainty"] = ""
+    mutations.append(
+        (
+            "source-defect reading marked CLEAR",
+            clear_defect_reading,
+            base_candidates,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    missing_asset_uncertainty = copy.deepcopy(defect_asset)
+    missing_asset_uncertainty[0]["uncertainty"] = ""
+    mutations.append(
+        (
+            "non-clear asset without uncertainty boundary",
+            base_reading,
+            base_candidates,
+            base_routes,
+            missing_asset_uncertainty,
+            base_search,
+        )
+    )
+    clear_asset_uncertainty = copy.deepcopy(defect_asset)
+    clear_asset_uncertainty[0].update(
+        {
+            "visual_role": "CONTROL",
+            "source_status": "CLEAR",
+        }
+    )
+    mutations.append(
+        (
+            "CLEAR asset with uncertainty boundary",
+            base_reading,
+            base_candidates,
+            base_routes,
+            clear_asset_uncertainty,
+            base_search,
+        )
+    )
+    clear_defect_asset = copy.deepcopy(defect_asset)
+    clear_defect_asset[0].update(
+        {
+            "source_status": "CLEAR",
+            "uncertainty": "",
+        }
+    )
+    mutations.append(
+        (
+            "source-defect asset marked CLEAR",
+            base_reading,
+            base_candidates,
+            base_routes,
+            clear_defect_asset,
+            base_search,
+        )
+    )
+    gap_route_epoch = copy.deepcopy(base_routes)
+    gap_route_epoch[0]["discovery_epoch"] = "7"
+    mutations.append(
+        (
+            "route opens a gapped global discovery epoch",
+            base_reading,
+            base_candidates,
+            gap_route_epoch,
+            base_assets,
+            base_search,
+        )
+    )
+    evidence_predates_candidate = copy.deepcopy(base_candidates)
+    evidence_predates_candidate[0]["discovery_anchor"]["epoch"] = 2
+    mutations.append(
+        (
+            "evidence predates candidate discovery epoch",
+            base_reading,
+            evidence_predates_candidate,
             base_routes,
             base_assets,
             base_search,
@@ -2886,7 +3166,7 @@ def mutation_checks(
         "rounds": [
             {
                 "round_id": "S001",
-                "epoch": 1,
+                "epoch": 2,
                 "kind": "LOCAL",
                 "owning_stage": stage,
                 "queries": [
@@ -3012,6 +3292,21 @@ def mutation_checks(
                 base_routes,
                 base_assets,
                 fake_group,
+            )
+        )
+        gap_search_epoch = copy.deepcopy(search_fixture)
+        gap_search_epoch["rounds"][0]["epoch"] = 7
+        gap_digest = search_result_digest(gap_search_epoch["rounds"][0])
+        gap_search_epoch["rounds"][0]["result_digest"] = gap_digest
+        gap_search_epoch["rounds"][0]["rerun_digest"] = gap_digest
+        mutations.append(
+            (
+                "search round opens a gapped global discovery epoch",
+                search_reading,
+                base_candidates,
+                base_routes,
+                base_assets,
+                gap_search_epoch,
             )
         )
 
