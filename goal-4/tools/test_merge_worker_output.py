@@ -1415,7 +1415,7 @@ def test_search_enrichment_rejects_forbidden_coordinator_identity(
     forbidden = tmp_path / "forbidden-coordinator.json"
     forbidden.write_bytes(canonical_json_bytes(proposal))
 
-    with pytest.raises(merge.MergeError, match="forbidden"):
+    with pytest.raises(merge.MergeError, match="prohibited"):
         merge.prepare_search_enrichment(forbidden, goal_dir=goal)
 
 
@@ -1445,3 +1445,143 @@ def test_search_enrichment_rollback_restores_history_and_all_ledgers(
 
     assert _transaction_state(goal) == before
     assert _merge_staging_dirs(goal) == []
+
+
+def test_search_enrichment_appends_evidence_to_existing_active_candidate(
+    tmp_path: Path,
+) -> None:
+    goal, first_proposal, first_unit_id, _ = _search_enrichment_fixture(
+        tmp_path
+    )
+    merge.apply_merge(
+        merge.prepare_search_enrichment(first_proposal, goal_dir=goal)
+    )
+    units = merge._read_jsonl(goal / merge.UNITS_NAME)
+    query = {
+        "query_id": "Q0002",
+        "family": "second construction lead phrase",
+        "pattern": "This book is the culmination of nearly twenty years of work",
+        "mode": "LITERAL",
+        "case_sensitive": True,
+        "whole_word": False,
+        "scope_paths": INITIAL_STAGE_4_PREFIX,
+    }
+    pairs, errors = merge.validate_audit.execute_frozen_queries(
+        [query],
+        units,
+        merge.validate_audit.REPO_ROOT
+        / "ref"
+        / "A-New-Kind-of-Science",
+    )
+    assert errors == []
+    target_ids = {
+        unit["id"] for unit in units if unit["path"] == ASSIGNMENT_PATH
+    }
+    unit_id = next(
+        found_unit_id
+        for _, found_unit_id in pairs
+        if found_unit_id in target_ids and found_unit_id != first_unit_id
+    )
+    search = json.loads((goal / merge.SEARCH_NAME).read_text(encoding="utf-8"))
+    prior_hit_count = sum(
+        len(round_record["hits"]) for round_record in search["rounds"]
+    )
+    hit_id = f"H{prior_hit_count + 1:06d}"
+    unit_by_id = {unit["id"]: unit for unit in units}
+    hit = {
+        "hit_id": hit_id,
+        "query_id": "Q0002",
+        "source_unit_id": unit_id,
+        "context_sha256": unit_by_id[unit_id]["sha256"],
+        "disposition": "GOVERNED_CANDIDATE_OR_SUPPORT",
+        "candidate_ids": ["B0001"],
+        "route_ids": [],
+        "rationale": "The hit adds evidence to the existing candidate.",
+    }
+    round_record = {
+        "round_id": "S002",
+        "epoch": 1,
+        "kind": "LOCAL",
+        "owning_stage": 4,
+        "queries": [query],
+        "tool_assumptions": ["Literal UTF-8 source-unit search."],
+        "result_ids": [hit_id],
+        "result_digest": "",
+        "hits": [hit],
+        "new_vocabulary": [],
+        "new_candidates": [],
+        "new_evidence_groups": ["G000002"],
+        "new_routes": [],
+        "rerun_digest": "",
+    }
+    digest = merge.validate_audit.search_result_digest(round_record)
+    round_record["result_digest"] = digest
+    round_record["rerun_digest"] = digest
+    proposed_search = copy.deepcopy(search)
+    proposed_search["rounds"].append(round_record)
+    proposed_search["fixed_point"] = None
+
+    reading = merge._read_csv(goal / merge.READING_NAME, READING_HEADER)
+    row = next(item for item in reading if item["source_unit_id"] == unit_id)
+    reading_update = dict(row)
+    reading_update.update(
+        {
+            "review_disposition": "SUPPORTS_CANDIDATE",
+            "candidate_ids": '["B0001"]',
+            "evidence_statement": "The second LOCAL hit supports B0001.",
+        }
+    )
+    candidate = copy.deepcopy(
+        merge._read_jsonl(goal / merge.CANDIDATE_NAME)[0]
+    )
+    candidate["source_unit_ids"].append(unit_id)
+    candidate["source_evidence"].append(
+        {
+            "evidence_id": "E000002",
+            "evidence_group_id": "G000002",
+            "discovery_anchor": {
+                "epoch": 1,
+                "kind": "SEARCH_HIT",
+                "id": hit_id,
+                "ordinal": 1,
+            },
+            "source_unit_id": unit_id,
+            "image_path": None,
+            "strength": "CORROBORATING",
+            "modality": "PROSE",
+            "claim": "The second hit corroborates the existing candidate.",
+            "fingerprint_fields": [],
+        }
+    )
+    candidate["evidence_strength"].append("CORROBORATING")
+    proposal = {
+        "schema_version": 1,
+        "proposal_kind": "SEARCH_ENRICHMENT",
+        "coordinator_id": "second-search-enrichment-coordinator",
+        "epoch": 1,
+        "source_paths": [ASSIGNMENT_PATH],
+        "base_artifact_sha256": {
+            name: hashlib.sha256((goal / name).read_bytes()).hexdigest()
+            for name in merge.WRITE_NAMES
+        },
+        "reading_updates": [reading_update],
+        "asset_updates": [],
+        "candidate_updates": [candidate],
+        "route_appends": [],
+        "proposed_search": proposed_search,
+    }
+    proposal_path = tmp_path / "existing-candidate-enrichment.json"
+    proposal_path.write_bytes(canonical_json_bytes(proposal))
+
+    plan = merge.prepare_search_enrichment(proposal_path, goal_dir=goal)
+    assert plan.candidate_update_count == 1
+    assert plan.candidate_append_count == 0
+    merge.apply_merge(plan)
+    updated = merge._read_jsonl(goal / merge.CANDIDATE_NAME)[0]
+    assert [
+        item["evidence_id"] for item in updated["source_evidence"]
+    ] == ["E000001", "E000002"]
+    assert merge._existing_evidence_sequences([updated]) == (
+        ["E000001", "E000002"],
+        ["G000001", "G000002"],
+    )

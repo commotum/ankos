@@ -2089,7 +2089,16 @@ def prepare_search_enrichment(
     appended_candidates: list[dict[str, Any]] = []
     appended_evidence: list[dict[str, Any]] = []
     round_evidence_groups = set(new_round.get("new_evidence_groups", []))
-    for update in candidate_updates:
+    for raw_update in candidate_updates:
+        update = {
+            field: raw_update[field] for field in CANDIDATE_FIELDS
+        }
+        if isinstance(update.get("fingerprint"), dict):
+            update["fingerprint"] = {
+                field: update["fingerprint"][field]
+                for field in FINGERPRINT_FIELDS
+                if field in update["fingerprint"]
+            }
         candidate_id = update.get("id")
         if not isinstance(candidate_id, str) or candidate_id in candidate_update_by_id:
             raise MergeError("candidate updates have invalid or duplicate IDs")

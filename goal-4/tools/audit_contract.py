@@ -98,6 +98,7 @@ REVIEW_HISTORY_FIELDS = [
     "previous_path_result_sha256",
     "trigger_search_kind",
     "trigger_hit_ids",
+    "candidate_changes",
     "input_projection_sha256",
     "result_snapshot",
     "result_projection_sha256",
@@ -106,6 +107,16 @@ REVIEW_HISTORY_FIELDS = [
 ]
 REVIEW_MODES = ["INITIAL", "REOPEN", "SEARCH_ENRICHMENT"]
 SEARCH_ENRICHMENT_TRIGGER_KINDS = ["LOCAL", "SATURATION"]
+CANDIDATE_CHANGE_FIELDS = [
+    "action",
+    "candidate_id",
+    "previous_candidate_result_sha256",
+    "before_candidate",
+    "before_candidate_sha256",
+    "after_candidate",
+    "after_candidate_sha256",
+]
+CANDIDATE_CHANGE_ACTIONS = ["CREATE", "UPDATE"]
 READING_REVIEW_RESULT_FIELDS = [
     "source_unit_id",
     "review_status",
@@ -847,6 +858,41 @@ def schema_documents() -> dict[str, dict[str, Any]]:
         },
         "additionalProperties": False,
     }
+    candidate_change_schema = {
+        "type": "object",
+        "required": CANDIDATE_CHANGE_FIELDS,
+        "properties": {
+            "action": {
+                "type": "string",
+                "enum": CANDIDATE_CHANGE_ACTIONS,
+            },
+            "candidate_id": {
+                "type": "string",
+                "pattern": "^B[0-9]{4}$",
+            },
+            "previous_candidate_result_sha256": {
+                "oneOf": [
+                    {"type": "null"},
+                    {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                ]
+            },
+            "before_candidate": {
+                "oneOf": [{"type": "null"}, candidate_schema()]
+            },
+            "before_candidate_sha256": {
+                "oneOf": [
+                    {"type": "null"},
+                    {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                ]
+            },
+            "after_candidate": candidate_schema(),
+            "after_candidate_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+            },
+        },
+        "additionalProperties": False,
+    }
     review_history_schema = {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "title": "Append-only blind review-history event",
@@ -905,6 +951,10 @@ def schema_documents() -> dict[str, dict[str, Any]]:
                     "pattern": "^H[0-9]{6}$",
                 },
                 "uniqueItems": True,
+            },
+            "candidate_changes": {
+                "type": "array",
+                "items": candidate_change_schema,
             },
             "input_projection_sha256": {
                 "type": "string",
@@ -1281,6 +1331,30 @@ def review_event_sha256(event: dict[str, Any]) -> str:
     )
 
 
+def close_candidate_change(
+    action: str,
+    after_candidate: dict[str, Any],
+    before_candidate: dict[str, Any] | None = None,
+    previous_candidate_result_sha256: str | None = None,
+) -> dict[str, Any]:
+    """Close one candidate CREATE/UPDATE version record."""
+    return {
+        "action": action,
+        "candidate_id": after_candidate["id"],
+        "previous_candidate_result_sha256": (
+            previous_candidate_result_sha256
+        ),
+        "before_candidate": before_candidate,
+        "before_candidate_sha256": (
+            canonical_sha256(before_candidate)
+            if before_candidate is not None
+            else None
+        ),
+        "after_candidate": after_candidate,
+        "after_candidate_sha256": canonical_sha256(after_candidate),
+    }
+
+
 def close_review_event(
     core: dict[str, Any],
     unit_by_id: dict[str, dict[str, Any]],
@@ -1306,6 +1380,7 @@ def close_review_event(
         ),
         "trigger_search_kind": core.get("trigger_search_kind"),
         "trigger_hit_ids": list(core.get("trigger_hit_ids", [])),
+        "candidate_changes": list(core.get("candidate_changes", [])),
         "input_projection_sha256": "",
         "result_snapshot": {},
         "result_projection_sha256": "",
