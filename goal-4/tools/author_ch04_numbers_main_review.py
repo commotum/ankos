@@ -925,8 +925,12 @@ for key, name, law, initial, read in variable_recurrences:
         not_applicable=EVOLUTION_NA,
         missing="The rule fails if a computed reference is not a defined positive earlier index; the displayed trajectory avoids this.",
         claim=f"Original-resolution inspection directly transcribes {law} with {initial}.",
-        strength="DIRECT_COMPLETE_MECHANICS",
+        strength="DEFECT_LIMITED",
         image_path="CHAPTERS/_page_144_Figure_3.jpeg",
+        source_status=["DEFECTIVE"],
+        uncertainties=[
+            "The recurrence formulas and shown prefixes are legible, but the asset has hard bottom-edge bleed/cut through the following plot row."
+        ],
     )
 
 
@@ -2003,6 +2007,15 @@ context_evidence(
     fields=["complete_state", "seed"],
     strength="DIRECT_IDENTITY",
 )
+nearby_pair_seed["evidence"][0]["fields"] = [
+    field
+    for field in nearby_pair_seed["evidence"][0]["fields"]
+    if field not in {"complete_state", "seed"}
+]
+nearby_pair_seed["evidence"][0]["claim"] = (
+    "The passage defines a paired shift-map experiment whose initial values "
+    "differ by about one part in a billion billion."
+)
 
 trajectory_difference = source_candidate(
     "iterated-map-digit-difference",
@@ -2279,6 +2292,18 @@ for c in [*first_constants, *second_only_constants]:
             facts,
             not_applicable=EVOLUTION_NA,
             missing="The off-picture boundary condition and numerical precision convention are not stated.",
+        )
+        evidence(
+            spec,
+            f"{key}-family-anchor",
+            "U000883",
+            (
+                "The caption delimits the displayed different-constant runs "
+                "as presets of one shared additive-constant rule family."
+            ),
+            [],
+            strength="DIRECT_IDENTITY",
+            modality="CAPTION",
         )
         panel = SURVEY_ONE if c in first_constants else SURVEY_TWO
         panel_unit = "U000884" if c in first_constants else "U000885"
@@ -2648,6 +2673,24 @@ add_route(
 )
 
 # Candidate-to-family and candidate-to-route provenance.
+map_specs["iterated-map-d"]["anchor"] = "U000833"
+diffusion_pde["anchor"] = "U000897"
+zeta_function["anchor"] = "U000823"
+context_evidence(
+    zeta_function,
+    "zeta-introduction",
+    "U000823",
+    "The passage first identifies the zeta function as the construction behind the following plotted example.",
+    strength="DIRECT_IDENTITY",
+)
+riemann_hypothesis["anchor"] = "U000824"
+context_evidence(
+    riemann_hypothesis,
+    "riemann-hypothesis-introduction",
+    "U000824",
+    "The passage first isolates the Riemann Hypothesis as the peak/valley sign proposition.",
+    strength="DIRECT_IDENTITY",
+)
 for _spec in additive_presets.values():
     _spec["related_keys"] = ["continuous-ca-additive-family"]
 for _spec in radix_presets.values():
@@ -2702,3 +2745,665 @@ for _spec, _label, _unit in [
         strength="LEAD_ONLY",
         modality="CROSS_REFERENCE",
     )
+
+
+UNKNOWN_LABELS = {
+    field: field.replace("_", " ") for field in FINGERPRINT_FIELDS
+}
+
+
+def unknown_reason(spec: CandidateSpec, field: str) -> str:
+    return (
+        f"The assigned Chapter 4 main-text evidence for {spec['name']} does "
+        f"not state {UNKNOWN_LABELS[field]} beyond the recorded facts and routes."
+    )
+
+
+def allocate(
+    reading_input: list[dict[str, str]],
+    asset_input: list[dict[str, str]],
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, str]],
+    dict[str, list[str]],
+    dict[str, list[str]],
+    dict[str, list[str]],
+]:
+    unit_order = {
+        row["source_unit_id"]: index
+        for index, row in enumerate(reading_input, 1)
+    }
+    image_order = {
+        row["physical_path"]: len(reading_input) + index
+        for index, row in enumerate(asset_input, 1)
+    }
+    asset_by_path = {row["physical_path"]: row for row in asset_input}
+
+    def anchor_details(anchor: str) -> tuple[str, int]:
+        if anchor in unit_order:
+            return "SOURCE_UNIT", unit_order[anchor]
+        if anchor in image_order:
+            return "IMAGE", image_order[anchor]
+        raise AuthoringError(f"unknown anchor {anchor}")
+
+    specs = sorted(
+        ALL_CANDIDATES,
+        key=lambda item: (anchor_details(item["anchor"])[1], item["_insertion"]),
+    )
+    return _allocate_tail(
+        specs,
+        anchor_details,
+        unit_order,
+        image_order,
+        asset_by_path,
+    )
+
+
+DEFECT_UNITS = {
+    "U000726": (
+        "A000796 has a hard bottom-edge bleed/cut through the following plot "
+        "row. The eight recurrence formulas and displayed prefixes above it "
+        "remain legible, but the asset is used only as DEFECT_LIMITED evidence "
+        "and no content is inferred from the cut row."
+    )
+}
+
+HISTORICAL_UNITS = {
+    "U000746",
+    "U000747",
+    "U000748",
+    "U000893",
+    "U000894",
+    "U000900",
+    "U000943",
+}
+APPLICATION_UNITS = {"U000892"}
+REPRESENTATION_UNITS = {
+    "U000652",
+    "U000656",
+    "U000657",
+    "U000663",
+    "U000666",
+    "U000683",
+    "U000688",
+    "U000768",
+    "U000769",
+    "U000770",
+    "U000779",
+    "U000785",
+    "U000795",
+    "U000800",
+    "U000804",
+    "U000809",
+    "U000815",
+    "U000818",
+    "U000825",
+    "U000836",
+    "U000838",
+    "U000850",
+    "U000860",
+    "U000869",
+    "U000873",
+    "U000880",
+    "U000929",
+}
+
+
+def default_reading(row: dict[str, str]) -> tuple[str, list[str], str]:
+    uid = row["source_unit_id"]
+    kind = row["block_kind"]
+    if kind == "image":
+        return (
+            "REPRESENTATION_OR_OBSERVER",
+            ["REPRESENTATION", "BEHAVIOR_OR_OUTCOME"],
+            "Reviewed in context and at required resolution; this unlinked image is an output, trajectory, plot, or display rather than another native law.",
+        )
+    if uid in HISTORICAL_UNITS:
+        return (
+            "HISTORICAL_ONLY",
+            ["HISTORICAL_MENTION", "CONTROL_OR_COMPARISON"],
+            "Reviewed in full; this unit supplies provenance or historical comparison without a new identity-plus-mechanics construction.",
+        )
+    if uid in APPLICATION_UNITS:
+        return (
+            "APPLICATION_OR_EMULATION",
+            ["APPLICATION", "HISTORICAL_MENTION"],
+            "Reviewed in full; this unit lists scientific applications of PDEs without specifying the named equations' mechanics.",
+        )
+    if uid in REPRESENTATION_UNITS:
+        return (
+            "REPRESENTATION_OR_OBSERVER",
+            ["REPRESENTATION", "OBSERVER_OR_ANALYZER", "BEHAVIOR_OR_OUTCOME"],
+            "Reviewed in full; this unit explains or captions a representation/observer without independently introducing another construction.",
+        )
+    return (
+        "NO_CONSTRUCTION",
+        ["BEHAVIOR_OR_OUTCOME", "CONTROL_OR_COMPARISON"],
+        "Reviewed in full; this unit supplies motivation, behavior, property, comparison, or conclusion without another separately delimited construction.",
+    )
+
+
+def candidate_roles(
+    candidate_ids: list[str],
+    specs_by_id: dict[str, CandidateSpec],
+    block_kind: str,
+) -> list[str]:
+    roles: list[str] = []
+    names = " ".join(
+        specs_by_id[cid]["name"].lower() for cid in candidate_ids
+    )
+    if "seed" in names or "initial value" in names or "initial data" in names:
+        roles.append("SEED_INPUT_OR_BOUNDARY")
+    if (
+        "observer" in names
+        or "count" in names
+        or "gap" in names
+        or "difference" in names
+        or "query" in names
+        or "hypothesis" in names
+    ):
+        roles.append("OBSERVER_OR_ANALYZER")
+    if (
+        "representation" in names
+        or "codec" in names
+        or "encoding" in names
+        or "digit" in names
+    ):
+        roles.append("REPRESENTATION")
+    if "preset" in names or "family" in names or "class" in names:
+        roles.append("PROPERTY_OR_RESTRICTION")
+    if block_kind == "image":
+        roles.append("REPRESENTATION")
+    return list(dict.fromkeys(roles))
+
+
+def build_output(bundle: Path) -> tuple[bytes, dict[str, Any]]:
+    manifest = json.loads((bundle / "allowed-manifest.json").read_text())
+    if (
+        manifest.get("worker_id") != EXPECTED_WORKER
+        or manifest.get("content_set_sha256") != EXPECTED_CONTENT_SET
+        or manifest.get("source_paths") != EXPECTED_PATHS
+        or manifest.get("source_unit_count") != 306
+        or manifest.get("asset_count") != 63
+        or manifest.get("stage") != STAGE
+        or manifest.get("discovery_epoch") != 1
+    ):
+        raise AuthoringError("bundle is not the exact Stage 8 epoch-1 assignment")
+
+    output_path = bundle / "output" / "output.json"
+    original_bytes = output_path.read_bytes()
+    output = json.loads(original_bytes)
+    readings = read_csv(bundle / "input" / "reading-input.csv")
+    assets = read_csv(bundle / "input" / "asset-input.csv")
+    scaffold = prepare_review_output.scaffold_output(
+        prepare_review_output.expected_template(bundle, manifest),
+        readings,
+        assets,
+    )
+    if output != scaffold:
+        raise AuthoringError("output is not the pristine nonsemantic scaffold")
+
+    (
+        candidates,
+        routes,
+        candidate_links_by_unit,
+        candidate_links_by_image,
+        anchor_links_by_unit,
+    ) = allocate(readings, assets)
+    direct_image_paths = {
+        ev["image_path"]
+        for proposal in candidates
+        for ev in proposal["source_evidence"]
+        if ev["image_path"] is not None
+        and ev["strength"]
+        in {
+            "DIRECT_IDENTITY",
+            "DIRECT_PARTIAL_MECHANICS",
+            "DIRECT_COMPLETE_MECHANICS",
+        }
+    }
+    specs_sorted = sorted(
+        ALL_CANDIDATES,
+        key=lambda spec: next(
+            i
+            for i, proposal in enumerate(candidates)
+            if proposal["provisional_name"] == spec["name"]
+            and proposal["discovery_anchor"]["id"] == spec["anchor"]
+        ),
+    )
+    specs_by_id = {
+        proposal["id"]: spec
+        for proposal, spec in zip(candidates, specs_sorted)
+    }
+    route_links: defaultdict[str, list[str]] = defaultdict(list)
+    for route in routes:
+        route_links[route["source_unit_id"]].append(route["route_id"])
+
+    reading_updates: list[dict[str, str]] = []
+    for original in readings:
+        row = deepcopy(original)
+        uid = row["source_unit_id"]
+        cids = candidate_links_by_unit.get(uid, [])
+        rids = route_links.get(uid, [])
+        if uid in DEFECT_UNITS:
+            disposition = "SOURCE_DEFECT_OR_AMBIGUITY"
+            secondary = ["SOURCE_DEFECT", "REPRESENTATION"]
+            statement = (
+                f"Reviewed in full and at original resolution; {DEFECT_UNITS[uid]} "
+                f"Linked candidates: {', '.join(cids)}."
+            )
+            status = "DEFECTIVE"
+            uncertainty = DEFECT_UNITS[uid]
+        elif cids:
+            is_anchor = bool(
+                set(cids) & set(anchor_links_by_unit.get(uid, []))
+            )
+            disposition = "CANDIDATE" if is_anchor else "SUPPORTS_CANDIDATE"
+            secondary = candidate_roles(cids, specs_by_id, row["block_kind"])
+            statement = (
+                f"This unit {'discovers' if is_anchor else 'supports'} "
+                f"{', '.join(cids)} with source-grounded identity, mechanics, "
+                "function, relation, seed, representation, observer, or preset evidence."
+            )
+            if rids:
+                statement += f" It also originates {', '.join(rids)}."
+            status = "CLEAR"
+            uncertainty = ""
+        elif rids:
+            disposition = "CROSS_REFERENCE"
+            secondary = ["CONTROL_OR_COMPARISON"]
+            statement = (
+                f"Reviewed in full; this unit originates {', '.join(rids)} "
+                "to construction-bearing targets and does not independently "
+                "supply another local law."
+            )
+            status = "CLEAR"
+            uncertainty = ""
+        else:
+            disposition, secondary, statement = default_reading(row)
+            status = "CLEAR"
+            uncertainty = ""
+        row.update(
+            {
+                "review_status": "REVIEWED",
+                "review_epoch": "1",
+                "review_disposition": disposition,
+                "source_status": status,
+                "uncertainty": uncertainty,
+                "secondary_roles": compact(secondary),
+                "candidate_ids": compact(cids),
+                "route_ids": compact(rids),
+                "evidence_statement": statement,
+                "review_stage": str(STAGE),
+                "reviewer": EXPECTED_WORKER,
+            }
+        )
+        reading_updates.append(row)
+
+    asset_updates: list[dict[str, str]] = []
+    for original in assets:
+        row = deepcopy(original)
+        path = row["physical_path"]
+        uid = row["source_unit_id"]
+        cids = candidate_links_by_image.get(path, [])
+        if path == "CHAPTERS/_page_130_Chapter_Opener.jpeg":
+            role = "DECORATIVE"
+            risks: list[str] = []
+            transcription = "NOT_REQUIRED"
+            status = "CLEAR"
+            uncertainty = ""
+            statement = "Original-resolution inspection confirms a decorative chapter opener with no construction-bearing content."
+        elif uid in DEFECT_UNITS:
+            role = "SOURCE_DEFECT"
+            risks = [
+                "CONSTRUCTION_BEARING",
+                "TEXT_BEARING",
+                "AMBIGUOUS",
+                "CAPTION_INCOMPLETE",
+            ]
+            transcription = "CHECKED"
+            status = "DEFECTIVE"
+            uncertainty = DEFECT_UNITS[uid]
+            statement = (
+                "Original-resolution inspection confirms legible recurrence "
+                "formulas/prefixes above a hard bottom-edge bleed/cut through "
+                "the next plot row. It is linked only as DEFECT_LIMITED "
+                f"evidence to {', '.join(cids)}."
+            )
+        elif path in direct_image_paths:
+            role = "NATIVE_EVIDENCE"
+            risks = ["CONSTRUCTION_BEARING", "TEXT_BEARING"]
+            transcription = "CHECKED"
+            status = "CLEAR"
+            uncertainty = ""
+            statement = (
+                "Original-resolution inspection and independent transcription "
+                "confirm direct identity or mechanics evidence"
+                + (f" for {', '.join(cids)}." if cids else ".")
+            )
+        else:
+            role = "OBSERVER"
+            risks = []
+            transcription = "NOT_REQUIRED"
+            status = "CLEAR"
+            uncertainty = ""
+            statement = (
+                "Thumbnail/context review and source-preserving inspection "
+                "confirm an output history, plot, mesh, finite digit display, "
+                "or alternative representation rather than independent mechanics"
+                + (f" supporting {', '.join(cids)}." if cids else ".")
+            )
+        row.update(
+            {
+                "inspection_status": "SCREENED",
+                "review_epoch": "1",
+                "visual_role": role,
+                "source_status": status,
+                "risk_flags": compact(risks),
+                "original_resolution_status": "REVIEWED",
+                "transcription_status": transcription,
+                "candidate_ids": compact(cids),
+                "route_ids": compact(route_links.get(uid, [])),
+                "evidence_statement": statement,
+                "review_stage": str(STAGE),
+                "reviewer": EXPECTED_WORKER,
+                "uncertainty": uncertainty,
+            }
+        )
+        asset_updates.append(row)
+
+    proposed = deepcopy(output)
+    proposed.update(
+        {
+            "prohibited_input_nonuse": False,
+            "reading_updates": reading_updates,
+            "candidate_proposals": candidates,
+            "asset_updates": asset_updates,
+            "route_proposals": routes,
+            "uncertainties": [
+                "A000796 has a hard bottom-edge bleed/cut through the next plot row; its legible recurrence formulas/prefixes are retained only as DEFECT_LIMITED evidence.",
+                "The Riemann-Siegel Z function is identified only as 'essentially' Zeta[1/2+i t], leaving its exact phase and normalization unknown.",
+                "The random interval seed ensemble has no specified probability measure, endpoint convention, or precision model.",
+                "The symbolic PDE sampler lacks its grammar, component vocabulary, size control, and sampling law.",
+                "The PDE numerical approximation scheme is unnamed: stencil, space/time steps, integrator, precision, boundaries, stability, and convergence checks are all absent.",
+            ],
+        }
+    )
+    return original_bytes, proposed
+
+
+def main() -> int:
+    if len(sys.argv) != 2:
+        print(f"usage: {Path(sys.argv[0]).name} BUNDLE", file=sys.stderr)
+        return 2
+    bundle = Path(sys.argv[1]).resolve()
+    try:
+        with prepare_review_output.output_lock(bundle):
+            original_bytes, proposed = build_output(bundle)
+            prepare_review_output.atomic_replace(
+                bundle / "output" / "output.json",
+                canonical_json_bytes(proposed),
+                original_bytes,
+            )
+    except (
+        OSError,
+        csv.Error,
+        json.JSONDecodeError,
+        AuthoringError,
+        ValueError,
+    ) as exc:
+        print(f"Chapter 4 main authoring failed: {exc}", file=sys.stderr)
+        return 1
+    print(
+        "recorded Stage 8 Chapter 4 main review: "
+        f"reading=306 assets=63 candidates={len(ALL_CANDIDATES)} "
+        f"routes={len(ALL_ROUTES)} declaration=false"
+    )
+    return 0
+
+
+def _allocate_tail(
+    specs: list[CandidateSpec],
+    anchor_details: Any,
+    unit_order: dict[str, int],
+    image_order: dict[str, int],
+    asset_by_path: dict[str, dict[str, str]],
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, str]],
+    dict[str, list[str]],
+    dict[str, list[str]],
+    dict[str, list[str]],
+]:
+    id_by_key = {
+        item["key"]: f"W{index:04d}" for index, item in enumerate(specs, 1)
+    }
+    candidate_ordinals: dict[str, int] = {}
+    candidate_counts: defaultdict[tuple[str, str], int] = defaultdict(int)
+    for item in specs:
+        kind, _ = anchor_details(item["anchor"])
+        identity = (kind, item["anchor"])
+        candidate_counts[identity] += 1
+        candidate_ordinals[item["key"]] = candidate_counts[identity]
+
+    evidence_entries: list[tuple[CandidateSpec, EvidenceSpec, str, int]] = []
+    for item in ALL_CANDIDATES:
+        for ev in item["evidence"]:
+            anchor = ev["image_path"] or ev["unit"]
+            kind, order = anchor_details(anchor)
+            evidence_entries.append((item, ev, kind, order))
+    evidence_entries.sort(
+        key=lambda x: (x[3], x[1]["_insertion"], x[0]["_insertion"])
+    )
+    ev_identity: dict[tuple[str, str], tuple[str, str, int]] = {}
+    ev_counts: defaultdict[tuple[str, str], int] = defaultdict(int)
+    for index, (item, ev, kind, _order) in enumerate(evidence_entries, 1):
+        anchor = ev["image_path"] or ev["unit"]
+        identity = (kind, anchor)
+        ev_counts[identity] += 1
+        ev_identity[(item["key"], ev["label"])] = (
+            f"WE{index:06d}",
+            f"WG{index:06d}",
+            ev_counts[identity],
+        )
+
+    route_specs = sorted(
+        ALL_ROUTES,
+        key=lambda item: (unit_order[item["unit"]], item["_insertion"]),
+    )
+    route_id_by_key = {
+        item["key"]: f"WR{index:04d}"
+        for index, item in enumerate(route_specs, 1)
+    }
+    route_counts: defaultdict[str, int] = defaultdict(int)
+    route_proposals: list[dict[str, str]] = []
+    for item in route_specs:
+        route_counts[item["unit"]] += 1
+        route_proposals.append(
+            {
+                "route_id": route_id_by_key[item["key"]],
+                "source_unit_id": item["unit"],
+                "source_asset_id": "",
+                "discovery_epoch": "1",
+                "discovery_kind": "SOURCE_UNIT",
+                "discovery_id": item["unit"],
+                "discovery_ordinal": str(route_counts[item["unit"]]),
+                "literal_target": item["literal"],
+                "route_kind": item["kind"],
+                "expected_topic": item["topic"],
+                "owning_stage": str(STAGE),
+                "closure_scope": item["scope"],
+                "status": "PENDING",
+                "target_unit_ids": "[]",
+                "target_asset_ids": "[]",
+                "attempts": "[]",
+                "vocabulary_terms": compact(item["vocabulary"]),
+                "defect_boundary": "",
+            }
+        )
+
+    candidate_links_by_unit: defaultdict[str, list[str]] = defaultdict(list)
+    candidate_links_by_image: defaultdict[str, list[str]] = defaultdict(list)
+    anchor_links_by_unit: defaultdict[str, list[str]] = defaultdict(list)
+    proposals: list[dict[str, Any]] = []
+
+    for item in specs:
+        cid = id_by_key[item["key"]]
+        anchor_kind, anchor_order = anchor_details(item["anchor"])
+        local: list[dict[str, Any]] = []
+        label_to_id: dict[str, str] = {}
+        for ev in item["evidence"]:
+            eid, gid, ordinal = ev_identity[(item["key"], ev["label"])]
+            label_to_id[ev["label"]] = eid
+            ev_anchor = ev["image_path"] or ev["unit"]
+            ev_kind, ev_order = anchor_details(ev_anchor)
+            if ev_order < anchor_order:
+                raise AuthoringError(
+                    f"evidence {ev['label']} predates candidate {item['key']}"
+                )
+            local.append(
+                {
+                    "evidence_id": eid,
+                    "evidence_group_id": gid,
+                    "discovery_anchor": {
+                        "epoch": 1,
+                        "kind": ev_kind,
+                        "id": ev_anchor,
+                        "ordinal": ordinal,
+                    },
+                    "source_unit_id": ev["unit"],
+                    "image_path": ev["image_path"],
+                    "strength": ev["strength"],
+                    "modality": ev["modality"],
+                    "claim": ev["claim"],
+                    "fingerprint_fields": ev["fields"],
+                }
+            )
+        if not local:
+            raise AuthoringError(f"candidate {item['key']} has no evidence")
+        local.sort(key=lambda x: int(x["evidence_id"][2:]))
+        units = sorted(
+            {ev["source_unit_id"] for ev in local},
+            key=lambda x: unit_order[x],
+        )
+        images = sorted(
+            {ev["image_path"] for ev in local if ev["image_path"] is not None},
+            key=lambda x: image_order[x],
+        )
+        for uid in units:
+            candidate_links_by_unit[uid].append(cid)
+        for path in images:
+            candidate_links_by_image[path].append(cid)
+        anchor_unit = (
+            item["anchor"]
+            if anchor_kind == "SOURCE_UNIT"
+            else asset_by_path[item["anchor"]]["source_unit_id"]
+        )
+        if anchor_unit not in units:
+            raise AuthoringError(
+                f"candidate {item['key']} lacks evidence at discovery anchor {anchor_unit}"
+            )
+        anchor_links_by_unit[anchor_unit].append(cid)
+
+        field_support: dict[str, str] = {}
+        fingerprint: dict[str, dict[str, Any]] = {}
+        unknowns: list[str] = []
+        for field in FINGERPRINT_FIELDS:
+            supporting = [
+                ev["evidence_id"]
+                for ev in local
+                if field in ev["fingerprint_fields"]
+            ]
+            if field in item["facts"]:
+                if not supporting:
+                    raise AuthoringError(f"{item['key']} lacks evidence for {field}")
+                field_support[field] = "SUPPORTED"
+                fingerprint[field] = {
+                    "status": "SUPPORTED",
+                    "value": item["facts"][field],
+                    "evidence_ids": supporting,
+                    "reason": "",
+                }
+            elif field in item["not_applicable"]:
+                if not supporting:
+                    raise AuthoringError(f"{item['key']} lacks N/A evidence for {field}")
+                field_support[field] = "NOT_APPLICABLE"
+                fingerprint[field] = {
+                    "status": "NOT_APPLICABLE",
+                    "value": None,
+                    "evidence_ids": supporting,
+                    "reason": item["not_applicable"][field],
+                }
+            else:
+                if supporting:
+                    raise AuthoringError(
+                        f"{item['key']} supplies evidence for absent field {field}"
+                    )
+                reason = unknown_reason(item, field)
+                unknowns.append(reason)
+                field_support[field] = "UNKNOWN_FROM_SOURCE"
+                fingerprint[field] = {
+                    "status": "UNKNOWN_FROM_SOURCE",
+                    "value": None,
+                    "evidence_ids": [],
+                    "reason": reason,
+                }
+
+        def records(values: list[tuple[str, str, list[str]]]) -> list[dict[str, Any]]:
+            return [
+                {
+                    "name": name,
+                    "source_description": description,
+                    "evidence_ids": [label_to_id[label] for label in labels],
+                }
+                for name, description, labels in values
+            ]
+
+        route_ids = [route_id_by_key[key] for key in item["route_keys"]]
+        related_ids = [
+            id_by_key[key] for key in item.get("related_keys", [])
+        ]
+        values: dict[str, Any] = {
+            "id": cid,
+            "record_status": "ACTIVE",
+            "provisional_name": item["name"],
+            "aliases": item["aliases"],
+            "discovery_stage": STAGE,
+            "discovery_anchor": {
+                "epoch": 1,
+                "kind": anchor_kind,
+                "id": item["anchor"],
+                "ordinal": candidate_ordinals[item["key"]],
+            },
+            "source_unit_ids": units,
+            "source_evidence": local,
+            "source_status": item["source_status"],
+            "image_witnesses": images,
+            "evidence_strength": list(
+                dict.fromkeys(ev["strength"] for ev in local)
+            ),
+            "field_support": field_support,
+            "fingerprint": fingerprint,
+            "parameters": records(item["parameters"]),
+            "variants": records(item["variants"]),
+            "missing_mechanics": list(
+                dict.fromkeys([item["missing"], *unknowns])
+            ),
+            "uncertainties": item["uncertainties"],
+            "related_candidate_ids": related_ids,
+            "cross_reference_ids": route_ids,
+            "evidence_reassignments": [],
+        }
+        proposals.append({field: values[field] for field in CANDIDATE_FIELDS})
+
+    return (
+        proposals,
+        route_proposals,
+        dict(candidate_links_by_unit),
+        dict(candidate_links_by_image),
+        dict(anchor_links_by_unit),
+    )
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

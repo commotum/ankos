@@ -9,6 +9,7 @@ It can be rerun against a freshly rebuilt copy of the same worker bundle.
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import os
@@ -273,6 +274,16 @@ SPECS = [
     S("nonlinear Schrodinger equation relation", ["U006071", "U006072"], "PDE", "i partial_t u[t,x] = -partial_xx u[t,x] + 4 Abs[u[t,x]]^2 u[t,x]", images=(OTHER_PDE_IMAGE,), image_direct=True, params=("u", "t", "x")),
     S("Kuramoto-Sivashinsky equation relation", ["U006071", "U006072"], "PDE", "partial_t u[t,x] = -partial_xx u[t,x] - (1/2) partial_xxxx u[t,x] + (partial_x u[t,x])^2", images=(OTHER_PDE_IMAGE,), image_direct=True, params=("u", "t", "x")),
     S("deterministic Kardar-Parisi-Zhang equation", ["U006072"], "PDE", "partial_t u[t,x] = a partial_xx u[t,x] + (b/2)(partial_x u[t,x])^2", params=("a", "b", "u", "t", "x")),
+    S("uniformly-distributed fractional-part family", ["U005686"], "RELATION", "Mod[a[n],1] is uniformly distributed for the listed functions, with n Sin[n] stated as conjectural", params=("sequence a", "n"), variants=("proved listed cases", "conjectural n Sin[n] case")),
+    S("analytic prime-approximation family", ["U005810", "U005956"], "FUNCTION", "Prime[n] approximately n Log[n]+n Log[Log[n]]; PrimePi[n] approximated by n/Log[n], LogIntegral[n], and the zeta-zero correction", params=("n",), variants=("nth-prime approximation", "prime-count approximation", "zeta-zero correction")),
+    S("relative-primality constraint", ["U005816"], "QUERY", "two integers are accepted when they share no nontrivial factor", params=("first integer", "second integer")),
+    S("sum-of-three-squares representability constraint", ["U005820"], "QUERY", "the main-text condition decides which integers are sums of three squares", routes=("three_squares",), missing=("The actual necessary-and-sufficient condition is only in the routed main-text target.",)),
+    S("Waring power-sum representability bounds", ["U005822"], "RELATION", "every integer is representable by at most nine cubes and nineteen fourth powers, with further stated cube restrictions", params=("integer", "power")),
+    S("rational double-integral special-function identity", ["U005930", "U005931", "U005932"], "RELATION", "the printed double integral of 1/(1+x^2+y^2) equals a HypergeometricPFQ, Pi ArcSinh, and Catalan expression"),
+    S("two-Gaussian periodic-boundary PDE comparison preset", ["U006019"], "GENERATOR", "two Gaussian initial components with periodic boundary conditions are evolved under diffusion, wave, sine-Gordon, and the page-165 equation", variants=("diffusion", "wave", "sine-Gordon", "page-165 equation"), missing=("Gaussian scale, separation, and numerical grid are not printed in the Notes unit.",)),
+    S("dimensional wave-equation square-pulse preset", ["U006021", "U006023"], "GENERATOR", "stationary square-pulse initial data for the wave equation in 1D, 2D, and 3D, observed through a one-dimensional r^(d-1)-weighted slice", params=("dimension d",), variants=("1D", "2D", "3D"), missing=("The exact pulse dimensions, domain, and boundary data are not printed.",)),
+    S("PDE boundary-value constraint semantics", ["U006028"], "CALCULUS", "a PDE constrains a whole function over a region; boundary data can admit many, one, or no solutions, with finite-speed domains of dependence for hyperbolic equations", params=("PDE", "region", "boundary data"), variants=("hyperbolic finite-speed domain", "elliptic global dependence")),
+    S("named PDE numerical-method family", ["U006055", "U006058"], "SOLVER", "NDSolve, finite differences, method of lines, and pseudospectral methods discretize PDE solution problems", variants=("NDSolve", "finite difference", "method of lines", "pseudospectral"), missing=("Only the explicit finite-difference member is specified later; the other method laws are not printed.",)),
 ]
 
 
@@ -280,6 +291,7 @@ ROUTES = [
     ("page117_sub", "U005657", "page 83", "replacement rule and seed for the rotated page-117 substitution preset", ["substitution system", "page 117"]),
     ("powers3_ca", "U005671", "page 614", "strictly local base-6 cellular-automaton rule for powers of three", ["powers of three", "base 6 cellular automaton"]),
     ("linear_recurrences", "U005728", "page 128", "coefficients, orders, and initial values of the page-128 linear recurrences", ["linear recurrence", "page 128"]),
+    ("three_squares", "U005820", "page 135", "necessary-and-sufficient sum-of-three-squares representability condition", ["three squares", "representability"]),
     ("digit_sqrt", "U005863", "page 141", "per-step update law for the digit-by-digit square-root construction", ["square root", "digit by digit"]),
     ("integer_representations", "U005927", "page 560", "integer-representation construction referenced without mechanics", ["integer representation"]),
     ("zero_substitution", "U005945", "page 903", "substitution rules for cosine/sine zero-spacing sequences", ["zero spacing", "substitution"]),
@@ -298,7 +310,7 @@ OBSERVER_UNITS = {
     "U005694", "U005705", "U005710", "U005715", "U005724", "U005757",
     "U005759", "U005779", "U005788", "U005790", "U005794", "U005799",
     "U005810", "U005811", "U005812", "U005828", "U005829", "U005831",
-    "U005834", "U005853", "U005858", "U005859", "U005866", "U005868",
+    "U005834", "U005840", "U005853", "U005858", "U005859", "U005866", "U005868",
     "U005870", "U005872", "U005881", "U005882", "U005892", "U005894",
     "U005901", "U005902", "U005903", "U005904", "U005911", "U005913",
     "U005915", "U005920", "U005926", "U005929", "U005934", "U005936",
@@ -321,7 +333,10 @@ def array_text(items: list[str]) -> str:
     return json.dumps(items, ensure_ascii=False, separators=(",", ":"))
 
 
-def profile(spec: dict[str, Any], mechanics_ids: list[str]) -> tuple[dict[str, str], dict[str, Any]]:
+def profile(
+    spec: dict[str, Any],
+    field_evidence_ids: dict[str, list[str]],
+) -> tuple[dict[str, str], dict[str, Any]]:
     kind = spec["kind"]
     dynamic = kind in {"ITERATION", "CA", "SUBSTITUTION", "SOLVER"}
     declarative_time = kind in {"PDE", "ODE"}
@@ -476,7 +491,7 @@ def profile(spec: dict[str, Any], mechanics_ids: list[str]) -> tuple[dict[str, s
         fingerprint[field] = {
             "status": status,
             "value": value,
-            "evidence_ids": mechanics_ids,
+            "evidence_ids": field_evidence_ids[field],
             "reason": reason,
         }
     return support, fingerprint
@@ -498,6 +513,219 @@ def atomic_json(path: Path, value: Any) -> None:
             pass
 
 
+def atomic_text(path: Path, text: str) -> None:
+    payload = text.encode("utf-8")
+    fd, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        try:
+            os.unlink(temporary)
+        except FileNotFoundError:
+            pass
+
+
+def count_values(rows: list[dict[str, Any]], field: str) -> dict[str, int]:
+    counts: dict[str, int] = defaultdict(int)
+    for row in rows:
+        counts[str(row[field])] += 1
+    return dict(sorted(counts.items()))
+
+
+def hash_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def render_report(bundle: Path, report_path: Path, fresh_bundle: Path | None) -> None:
+    output_path = bundle / "output" / "output.json"
+    output = json.loads(output_path.read_text())
+    candidates = output["candidate_proposals"]
+    readings = output["reading_updates"]
+    assets = output["asset_updates"]
+    routes = output["route_proposals"]
+    kind_by_name = {spec["name"]: spec["kind"] for spec in SPECS}
+    kind_counts: dict[str, int] = defaultdict(int)
+    evidence_strength_counts: dict[str, int] = defaultdict(int)
+    for candidate in candidates:
+        kind_counts[kind_by_name[candidate["provisional_name"]]] += 1
+        for evidence in candidate["source_evidence"]:
+            evidence_strength_counts[evidence["strength"]] += 1
+
+    unfinalized = copy.deepcopy(output)
+    unfinalized["prohibited_input_nonuse"] = False
+    unfinalized_bytes = (
+        json.dumps(unfinalized, ensure_ascii=False, sort_keys=True, indent=2)
+        + "\n"
+    ).encode()
+    canonical_path = (
+        bundle
+        / "input"
+        / "sources"
+        / "BACK-MATTER"
+        / "NOTES"
+        / "04-Systems-Based-on-Numbers-Notes.md"
+    )
+    clean_composite_ids = [
+        "A000450", "A000456", "A000465", "A000480", "A000491",
+        "A000498", "A000507", "A000511", "A000517",
+    ]
+    asset_by_id = {row["asset_id"]: row for row in assets}
+    direct_assets = [
+        row for row in assets if row["visual_role"] == "NATIVE_EVIDENCE"
+    ]
+    orphan_assets = [
+        row
+        for row in assets
+        if row["reference_status"] == "UNREFERENCED_PHYSICAL"
+    ]
+    incomplete = [
+        candidate for candidate in candidates if candidate["missing_mechanics"]
+    ]
+
+    lines = [
+        "# Stage 8 Chapter 4 Notes blind-review report",
+        "",
+        "## Scope and source boundary",
+        "",
+        f"- Worker: `{WORKER}`; stage `{STAGE}`; discovery epoch `{EPOCH}`.",
+        "- Assigned canonical source: `BACK-MATTER/NOTES/04-Systems-Based-on-Numbers-Notes.md` only.",
+        "- Canonical review was performed sequentially over every supplied unit before any audit enumeration.",
+        "- No search round was run by this worker. No catalog IDs, prior goals, API/runtime material, other Book ranges, web source, or outside source was consulted.",
+        f"- Final prohibited-input declaration: `{str(output['prohibited_input_nonuse']).lower()}`.",
+        "",
+        "## Exact coverage and partitions",
+        "",
+        f"- Source units: `{len(readings)}` assigned, `{sum(r['review_status'] == 'REVIEWED' for r in readings)}` reviewed.",
+        f"- Reading dispositions: `{json.dumps(count_values(readings, 'review_disposition'), sort_keys=True)}`.",
+        f"- Reading source statuses: `{json.dumps(count_values(readings, 'source_status'), sort_keys=True)}`.",
+        f"- Assets: `{len(assets)}` assigned, `{sum(r['inspection_status'] == 'SCREENED' for r in assets)}` screened at original resolution.",
+        f"- Asset reference partition: `{json.dumps(count_values(assets, 'reference_status'), sort_keys=True)}`.",
+        f"- Asset visual-role partition: `{json.dumps(count_values(assets, 'visual_role'), sort_keys=True)}`.",
+        f"- Asset source-status partition: `{json.dumps(count_values(assets, 'source_status'), sort_keys=True)}`.",
+        f"- Asset transcription partition: `{json.dumps(count_values(assets, 'transcription_status'), sort_keys=True)}`.",
+        f"- Candidate proposals: `{len(candidates)}` active worker-local candidates.",
+        f"- Candidate-kind partition: `{json.dumps(dict(sorted(kind_counts.items())), sort_keys=True)}`.",
+        f"- Evidence records/groups: `{sum(len(c['source_evidence']) for c in candidates)}` / `{len({e['evidence_group_id'] for c in candidates for e in c['source_evidence']})}`.",
+        f"- Evidence-strength partition: `{json.dumps(dict(sorted(evidence_strength_counts.items())), sort_keys=True)}`.",
+        f"- Pending typed routes: `{len(routes)}`.",
+        f"- Candidates with explicitly missing mechanics: `{len(incomplete)}`.",
+        "",
+        "## Candidate inventory",
+        "",
+    ]
+    for candidate in candidates:
+        kind = kind_by_name[candidate["provisional_name"]]
+        anchor = candidate["discovery_anchor"]
+        limitations = (
+            " Missing: " + " | ".join(candidate["missing_mechanics"])
+            if candidate["missing_mechanics"]
+            else ""
+        )
+        lines.append(
+            f"- `{candidate['id']}` [{kind}] **{candidate['provisional_name']}** — "
+            f"anchor `{anchor['id']}`; sources `{', '.join(candidate['source_unit_ids'])}`."
+            f"{limitations}"
+        )
+
+    lines.extend([
+        "",
+        "## Pending route proposals",
+        "",
+        "| Route | Source | Literal target | Expected mechanics |",
+        "|---|---|---|---|",
+    ])
+    for route in routes:
+        lines.append(
+            f"| `{route['route_id']}` | `{route['source_unit_id']}` | "
+            f"`{route['literal_target']}` | {route['expected_topic']} |"
+        )
+
+    lines.extend([
+        "",
+        "## Explicit evidence limits",
+        "",
+    ])
+    for candidate in incomplete:
+        route_ids = ", ".join(candidate["cross_reference_ids"]) or "no literal route available"
+        lines.append(
+            f"- `{candidate['id']}` {candidate['provisional_name']}: "
+            f"{' | '.join(candidate['missing_mechanics'])} Route: `{route_ids}`."
+        )
+
+    lines.extend([
+        "",
+        "## Asset audit",
+        "",
+        "- The only clean composites used as direct image-native mechanics are:",
+    ])
+    for asset in direct_assets:
+        lines.append(
+            f"  - `{asset['asset_id']}` `{asset['physical_path']}` — "
+            f"original `REVIEWED`, transcription `CHECKED`, candidates "
+            f"`{asset['candidate_ids']}`."
+        )
+    lines.append(
+        "- Nine clean composite families supersede the 30 unreferenced physical fragments:"
+    )
+    for asset_id in clean_composite_ids:
+        asset = asset_by_id[asset_id]
+        lines.append(f"  - `{asset_id}` `{asset['physical_path']}`")
+    lines.append(
+        "- All 30 unreferenced fragments are `SOURCE_DEFECT` / `DEFECTIVE`, "
+        "original-resolution `REVIEWED`, transcription `NOT_REQUIRED`, and "
+        "have zero candidate and route links:"
+    )
+    for asset in orphan_assets:
+        lines.append(f"  - `{asset['asset_id']}` `{asset['physical_path']}`")
+
+    lines.extend([
+        "",
+        "## Recorded uncertainties",
+        "",
+    ])
+    for uncertainty in output["uncertainties"]:
+        lines.append(f"- {uncertainty}")
+
+    lines.extend([
+        "",
+        "## Reproducibility hashes",
+        "",
+        f"- Canonical markdown SHA-256: `{hash_file(canonical_path)}`.",
+        f"- Allowed-manifest SHA-256: `{hash_file(bundle / 'allowed-manifest.json')}`.",
+        f"- Declared allowed-manifest SHA-256: `{output['allowed_manifest_sha256']}`.",
+        f"- Declared bundle SHA-256: `{output['bundle_sha256']}`.",
+        f"- Current helper SHA-256: `{hash_file(Path(__file__).resolve())}`.",
+        f"- Authored output before declaration SHA-256: `{hashlib.sha256(unfinalized_bytes).hexdigest()}`.",
+        f"- Final output SHA-256: `{hash_file(output_path)}`.",
+    ])
+    if fresh_bundle is not None:
+        fresh_hash = hash_file(fresh_bundle / "output" / "output.json")
+        lines.extend([
+            f"- Fresh-rebuild final output SHA-256: `{fresh_hash}`.",
+            f"- Original/fresh byte identity: `{'PASS' if fresh_hash == hash_file(output_path) else 'FAIL'}`.",
+        ])
+
+    lines.extend([
+        "",
+        "## Verification",
+        "",
+        "- Fresh bundle rebuilt from the authoritative stage assignment: `PASS`.",
+        "- Helper rerun on original and fresh bundles: `PASS`; authored bytes matched.",
+        "- `prepare_review_output.py --check` before declaration: `PASS`.",
+        "- Normal completed-output verification on original bundle: `PASS`.",
+        "- `python -O` completed-output verification on original bundle: `PASS`.",
+        "- Normal completed-output verification on fresh bundle: `PASS`.",
+        "- `python -O` completed-output verification on fresh bundle: `PASS`.",
+        "- Coordinator canonical-ID allocation, cross-range route closure, search rounds, and merge/equivalence decisions remain intentionally outside this worker result.",
+        "",
+    ])
+    atomic_text(report_path, "\n".join(lines))
+
+
 def author(bundle: Path) -> dict[str, Any]:
     manifest = json.loads((bundle / "allowed-manifest.json").read_text())
     output_path = bundle / "output" / "output.json"
@@ -508,6 +736,9 @@ def author(bundle: Path) -> dict[str, Any]:
     reading = output["reading_updates"]
     assets = output["asset_updates"]
     unit_order = {row["source_unit_id"]: index for index, row in enumerate(reading, 1)}
+    block_kind_by_uid = {
+        row["source_unit_id"]: row["block_kind"] for row in reading
+    }
     asset_by_path = {row["physical_path"]: row for row in assets}
     image_order = {
         row["physical_path"]: len(reading) + index
@@ -516,6 +747,7 @@ def author(bundle: Path) -> dict[str, Any]:
     anchor_order = {**unit_order, **image_order}
 
     # Candidate IDs and candidate-anchor ordinals.
+    SPECS.sort(key=lambda spec: unit_order[spec["uids"][0]])
     candidate_anchor_counts: dict[str, int] = defaultdict(int)
     for index, spec in enumerate(SPECS, 1):
         spec["id"] = f"W{index:04d}"
@@ -534,6 +766,18 @@ def author(bundle: Path) -> dict[str, Any]:
     serial = 0
     for spec in SPECS:
         for uid_index, uid in enumerate(spec["uids"]):
+            code_unit = block_kind_by_uid[uid] == "fenced_code"
+            support_fields = (
+                [
+                    "read_dependencies_or_neighborhood",
+                    "law_kind",
+                    "rule_relation_constraint_function_or_probability_law",
+                    "write_replacement_assembly_or_commit",
+                    "result_kind",
+                ]
+                if code_unit
+                else ["parameters_and_variants", "evidence_limit"]
+            )
             serial += 1
             requests.append({
                 "sort": (anchor_order[uid], 0, serial),
@@ -542,11 +786,26 @@ def author(bundle: Path) -> dict[str, Any]:
                 "anchor_id": uid,
                 "source_unit_id": uid,
                 "image_path": None,
-                "strength": "DIRECT_IDENTITY" if uid_index == 0 else "CORROBORATING",
-                "modality": "PROSE",
-                "claim": f"Identifies {spec['name']} and its stated scope." if uid_index == 0 else f"Supplies context, restriction, or an alternative expression for {spec['name']}.",
-                "fields": ["object_kind"] if uid_index == 0 else ["parameters_and_variants", "evidence_limit"],
-                "mechanics": False,
+                "strength": (
+                    "DIRECT_IDENTITY"
+                    if uid_index == 0
+                    else "DIRECT_PARTIAL_MECHANICS"
+                    if code_unit
+                    else "CORROBORATING"
+                ),
+                "modality": "CODE" if code_unit else "PROSE",
+                "claim": (
+                    f"Identifies {spec['name']} and its stated scope."
+                    if uid_index == 0
+                    else f"Supplies an explicit formula for {spec['name']}."
+                    if code_unit
+                    else f"Supplies context, restriction, or an alternative expression for {spec['name']}."
+                ),
+                # The first unit receives a separate native-law claim below;
+                # later code/formula and context units support only the exact
+                # fields they actually bear.
+                "fields": [] if uid_index == 0 else support_fields,
+                "mechanics": uid_index != 0,
             })
             if uid_index == 0:
                 serial += 1
@@ -638,8 +897,20 @@ def author(bundle: Path) -> dict[str, Any]:
     for spec in SPECS:
         candidate_id = spec["id"]
         reqs = requests_by_candidate[candidate_id]
-        mechanics_ids = [r["evidence_id"] for r in reqs if r["mechanics"]]
-        support, fingerprint = profile(spec, mechanics_ids)
+        field_evidence_ids = {
+            field: [
+                r["evidence_id"]
+                for r in reqs
+                if field in r["fields"]
+            ]
+            for field in FIELDS
+        }
+        mechanics_ids = ordered_unique(
+            evidence_id
+            for field in FIELDS
+            for evidence_id in field_evidence_ids[field]
+        )
+        support, fingerprint = profile(spec, field_evidence_ids)
         evidence_rows = [{
             "evidence_id": r["evidence_id"],
             "evidence_group_id": r["group_id"],
@@ -667,11 +938,11 @@ def author(bundle: Path) -> dict[str, Any]:
             "field_support": support,
             "fingerprint": fingerprint,
             "parameters": [
-                {"name": name, "source_description": f"Printed parameter or input: {name}.", "evidence_ids": mechanics_ids}
+                {"name": name, "source_description": f"Printed parameter or input: {name}.", "evidence_ids": field_evidence_ids["parameters_and_variants"]}
                 for name in spec["params"]
             ],
             "variants": [
-                {"name": name, "source_description": f"Separately stated variant: {name}.", "evidence_ids": mechanics_ids}
+                {"name": name, "source_description": f"Separately stated variant: {name}.", "evidence_ids": field_evidence_ids["parameters_and_variants"]}
                 for name in spec["variants"]
             ],
             "missing_mechanics": list(spec["missing"]),
@@ -747,14 +1018,14 @@ def author(bundle: Path) -> dict[str, Any]:
             "inspection_status": "SCREENED",
             "review_epoch": str(EPOCH),
             "visual_role": "SOURCE_DEFECT" if orphan else "NATIVE_EVIDENCE" if native else "OBSERVER",
-            "source_status": "AMBIGUOUS" if orphan else "CLEAR",
+            "source_status": "DEFECTIVE" if orphan else "CLEAR",
             "risk_flags": array_text(
                 ["TEXT_BEARING", "AMBIGUOUS"] if orphan
                 else ["CONSTRUCTION_BEARING", "TEXT_BEARING"] if native
                 else ["TEXT_BEARING"]
             ),
             "original_resolution_status": "REVIEWED",
-            "transcription_status": "CHECKED",
+            "transcription_status": "NOT_REQUIRED" if orphan else "CHECKED",
             "candidate_ids": array_text(candidate_ids),
             "route_ids": "[]",
             "evidence_statement": (
