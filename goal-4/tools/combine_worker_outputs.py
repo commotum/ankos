@@ -494,6 +494,62 @@ def _manifest_paths(manifest: dict[str, Any], label: str) -> list[str]:
     return list(paths)
 
 
+def _validate_row_partition(
+    *,
+    sub_rows: list[tuple[int, list[dict[str, str]]]],
+    combined_rows: list[dict[str, str]],
+    identity_field: str,
+    label: str,
+) -> None:
+    """Require an exact disjoint partition without imposing concatenation order."""
+
+    combined_by_id: dict[str, dict[str, str]] = {}
+    for row in combined_rows:
+        identity = row.get(identity_field)
+        if not isinstance(identity, str) or not identity:
+            raise CombineError(
+                f"union {label} input has an invalid {identity_field}"
+            )
+        if identity in combined_by_id:
+            raise CombineError(
+                f"union {label} assignment has duplicate {identity_field}s"
+            )
+        combined_by_id[identity] = row
+
+    seen: set[str] = set()
+    for origin, rows in sub_rows:
+        for row in rows:
+            identity = row.get(identity_field)
+            if not isinstance(identity, str) or not identity:
+                raise CombineError(
+                    f"sub-bundle {origin} {label} input has an invalid "
+                    f"{identity_field}"
+                )
+            if identity in seen:
+                raise CombineError(
+                    f"sub-bundle {label} assignments overlap at {identity}"
+                )
+            seen.add(identity)
+            original = combined_by_id.get(identity)
+            if original is None:
+                raise CombineError(
+                    f"sub-bundle {label} assignment is outside the union: "
+                    f"{identity}"
+                )
+            if row != original:
+                raise CombineError(
+                    f"sub-bundle {label} input differs from the union's "
+                    f"immutable row for {identity}"
+                )
+
+    missing = set(combined_by_id) - seen
+    if missing:
+        raise CombineError(
+            f"sub-bundle {label} assignments do not cover the union exactly; "
+            f"missing {sorted(missing)}"
+        )
+
+
 def _allocate_and_rewrite(
     sub_snapshots: list[BundleSnapshot],
     combined: BundleSnapshot,
@@ -507,34 +563,65 @@ def _allocate_and_rewrite(
         raise CombineError("union manifest discovery_epoch is invalid")
     union_paths = _manifest_paths(manifest, "union manifest")
 
-    flattened_paths: list[str] = []
-    flattened_reading: list[dict[str, str]] = []
-    flattened_assets: list[dict[str, str]] = []
+    union_path_order = {path: index for index, path in enumerate(union_paths)}
+    seen_paths: set[str] = set()
     for index, snapshot in enumerate(sub_snapshots):
         if snapshot.manifest.get("stage") != stage:
             raise CombineError(f"sub-bundle {index} stage differs from union")
         if snapshot.manifest.get("discovery_epoch") != epoch:
             raise CombineError(f"sub-bundle {index} epoch differs from union")
-        flattened_paths.extend(
-            _manifest_paths(snapshot.manifest, f"sub-bundle {index} manifest")
-        )
-        flattened_reading.extend(snapshot.reading)
-        flattened_assets.extend(snapshot.assets)
-    if flattened_paths != union_paths:
+        for path in _manifest_paths(
+            snapshot.manifest,
+            f"sub-bundle {index} manifest",
+        ):
+            if path in seen_paths:
+                raise CombineError(
+                    f"sub-bundle source path assignments overlap at {path}"
+                )
+            if path not in union_path_order:
+                raise CombineError(
+                    f"sub-bundle source path assignment is outside the union: "
+                    f"{path}"
+                )
+            seen_paths.add(path)
+    missing_paths = set(union_paths) - seen_paths
+    if missing_paths:
         raise CombineError(
-            "sub-bundle source paths are not an exact ordered partition "
-            "of the union assignment"
+            "sub-bundle source paths do not cover the union exactly; "
+            f"missing {sorted(missing_paths)}"
         )
-    if len(flattened_paths) != len(set(flattened_paths)):
-        raise CombineError("sub-bundle source path assignments overlap")
-    if flattened_reading != combined.reading:
-        raise CombineError(
-            "sub-bundle reading inputs are not the exact ordered union projection"
-        )
-    if flattened_assets != combined.assets:
-        raise CombineError(
-            "sub-bundle asset inputs are not the exact ordered union projection"
-        )
+
+    # Canonicalize worker origin independently of CLI argument order.  The
+    # identifiers remain worker-local through the origin index, while every
+    # allocation is subsequently ordered by the union's anchor traversal.
+    sub_snapshots = sorted(
+        sub_snapshots,
+        key=lambda snapshot: tuple(
+            union_path_order[path]
+            for path in _manifest_paths(
+                snapshot.manifest,
+                f"sub-bundle {snapshot.path} manifest",
+            )
+        ),
+    )
+    _validate_row_partition(
+        sub_rows=[
+            (index, snapshot.reading)
+            for index, snapshot in enumerate(sub_snapshots)
+        ],
+        combined_rows=combined.reading,
+        identity_field="source_unit_id",
+        label="reading",
+    )
+    _validate_row_partition(
+        sub_rows=[
+            (index, snapshot.assets)
+            for index, snapshot in enumerate(sub_snapshots)
+        ],
+        combined_rows=combined.assets,
+        identity_field="asset_id",
+        label="asset",
+    )
 
     assigned_units = {
         row["source_unit_id"]: row for row in combined.reading
@@ -706,8 +793,8 @@ def _allocate_and_rewrite(
     combined_worker = manifest.get("worker_id")
     if not isinstance(combined_worker, str) or not combined_worker:
         raise CombineError("union manifest worker_id is invalid")
-    rewritten_reading: list[dict[str, str]] = []
-    rewritten_assets: list[dict[str, str]] = []
+    rewritten_reading_by_id: dict[str, dict[str, str]] = {}
+    rewritten_assets_by_id: dict[str, dict[str, str]] = {}
     for origin, snapshot in enumerate(sub_snapshots):
         reading_updates = snapshot.output.get("reading_updates")
         asset_updates = snapshot.output.get("asset_updates")
@@ -761,9 +848,14 @@ def _allocate_and_rewrite(
             )
             row["review_stage"] = str(stage)
             row["reviewer"] = combined_worker
-            rewritten_reading.append(
-                {field: row[field] for field in READING_HEADER}
-            )
+            source_unit_id = row["source_unit_id"]
+            if source_unit_id in rewritten_reading_by_id:
+                raise CombineError(
+                    f"rewritten reading update is duplicated: {source_unit_id}"
+                )
+            rewritten_reading_by_id[source_unit_id] = {
+                field: row[field] for field in READING_HEADER
+            }
         for source in asset_updates:
             row = deepcopy(source)
             row["candidate_ids"] = _rewrite_csv_links(
@@ -790,9 +882,26 @@ def _allocate_and_rewrite(
             )
             row["review_stage"] = str(stage)
             row["reviewer"] = combined_worker
-            rewritten_assets.append(
-                {field: row[field] for field in ASSET_HEADER}
-            )
+            asset_id = row["asset_id"]
+            if asset_id in rewritten_assets_by_id:
+                raise CombineError(
+                    f"rewritten asset update is duplicated: {asset_id}"
+                )
+            rewritten_assets_by_id[asset_id] = {
+                field: row[field] for field in ASSET_HEADER
+            }
+
+    # Worker inputs are projections and can be interleaved in the combined
+    # canonical ledgers.  Emit the union's own frozen order, not sub-bundle
+    # concatenation order.
+    rewritten_reading = [
+        rewritten_reading_by_id[row["source_unit_id"]]
+        for row in combined.reading
+    ]
+    rewritten_assets = [
+        rewritten_assets_by_id[row["asset_id"]]
+        for row in combined.assets
+    ]
 
     uncertainties: list[str] = []
     for origin, snapshot in enumerate(sub_snapshots):

@@ -608,7 +608,7 @@ context_evidence(
     "eca-rule-45-name",
     "U000345",
     "The following label names the preceding evolution as rule 45.",
-    strength="DIRECT_COMPLETE_MECHANICS",
+    strength="DIRECT_IDENTITY",
 )
 eca_rules[73] = eca_preset(
     73,
@@ -1891,6 +1891,10 @@ def representation_candidate(
     *,
     image_path: str,
     route_keys: list[str] | None = None,
+    claim: str = (
+        "The passage explicitly defines this alternative rendering of "
+        "substitution evolution."
+    ),
 ) -> CandidateSpec:
     facts = observer_facts(name, input_text, law, result)
     facts["object_kind"] = f"A deterministic representation transform: {name}."
@@ -1901,7 +1905,7 @@ def representation_candidate(
         facts,
         not_applicable=observer_na,
         missing="The representation does not alter or recover the underlying native substitution law.",
-        claim="The passage explicitly defines this alternative rendering of substitution evolution.",
+        claim=claim,
         image_path=image_path,
         route_keys=route_keys,
     )
@@ -2757,6 +2761,10 @@ bracket_rep = representation_candidate(
     "Encode each opening bracket by a dark square and each closing bracket by a light square, preserving bracket order.",
     "A binary square sequence/picture of expression bracket structure.",
     image_path="CHAPTERS/_page_118_Picture_3.jpeg",
+    claim=(
+        "The passage explicitly defines this alternative rendering of "
+        "symbolic-expression evolution."
+    ),
 )
 for _index, _unit, _path in [
     (1, "U000576", "CHAPTERS/_page_118_Picture_3.jpeg"),
