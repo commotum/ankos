@@ -385,12 +385,17 @@ def _completed_no_construction_bundle(
     assignment_paths: list[str] | None = None,
     epoch: int = 1,
     worker_id: str | None = None,
+    goal_dir: Path | None = None,
 ) -> Path:
     bundle = root / "bundle"
     authoritative_goal = (
-        _copy_global_state(root)
-        if epoch == 1
-        else build_worker_bundle.GOAL_DIR
+        goal_dir
+        if goal_dir is not None
+        else (
+            _copy_global_state(root)
+            if epoch == 1
+            else build_worker_bundle.GOAL_DIR
+        )
     )
     if assignment_paths is None:
         assert assignment_path is not None
@@ -1540,7 +1545,10 @@ def test_stale_input_projection_is_rejected(tmp_path: Path) -> None:
         build_worker_bundle.csv_bytes(READING_HEADER, rows)
     )
 
-    with pytest.raises(merge.MergeError, match="stale reading-input projection"):
+    with pytest.raises(
+        merge.MergeError,
+        match="reading input differs from the authoritative projection",
+    ):
         merge.prepare_merge(bundle, goal_dir=goal)
 
 
@@ -1853,14 +1861,15 @@ def test_reopen_epoch_must_be_next_global_epoch(
 def test_initial_forward_merge_cannot_skip_active_epoch_one(
     tmp_path: Path,
 ) -> None:
+    goal = _copy_global_state(tmp_path)
     bundle = _completed_no_construction_bundle(
         tmp_path / "reopened",
         stage=4,
         assignment_path=FIRST_STAGE_4_PATH,
         epoch=2,
         worker_id="merge-premature-reopen-worker",
+        goal_dir=goal,
     )
-    goal = _copy_global_state(tmp_path)
 
     with pytest.raises(
         merge.MergeError,
@@ -1941,7 +1950,7 @@ def test_epoch_two_reopen_rejects_stale_projection(
 
     with pytest.raises(
         merge.MergeError,
-        match="stale reading-input projection",
+        match="reading input differs from the authoritative projection",
     ):
         merge.prepare_merge(bundle, goal_dir=target_goal)
 
