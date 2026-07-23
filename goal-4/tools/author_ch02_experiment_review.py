@@ -199,7 +199,7 @@ def ca_preset(
         ),
         "evidence_limit": missing,
     }
-    return source_candidate(
+    spec = source_candidate(
         key=key,
         name=name,
         anchor=anchor,
@@ -243,7 +243,6 @@ experiment = source_candidate(
         "native_time": "Each sampled program is run through successive steps.",
         "carrier": "A collection or sequence of finitely specified programs.",
         "input": "A chosen sequence of possible simple programs.",
-        "external_data": "Observed run histories are supplied to the investigator.",
         "law_kind": "Enumeration followed by execution and observation.",
         "rule_relation_constraint_function_or_probability_law": (
             "Enumerate the chosen program sequence, execute each program, and "
@@ -283,7 +282,6 @@ add_evidence(
     fields=[
         "object_kind",
         "input",
-        "external_data",
         "result_kind",
         "parameters_and_variants",
         "excluded_observers_and_representations",
@@ -1355,10 +1353,14 @@ centered_seed = source_candidate(
         "complete_state": (
             "n white cells with the middle position replaced by one black cell."
         ),
+        "input": "A valid positive row length n.",
         "seed": "One black cell centered in a length-n white row.",
         "law_kind": "A deterministic initial-state constructor.",
         "rule_relation_constraint_function_or_probability_law": (
             "Create n zeros and replace position Ceiling[n/2] by 1."
+        ),
+        "write_replacement_assembly_or_commit": (
+            "Assemble the length-n row, then replace its center entry by 1."
         ),
         "result_kind": "One finite binary initial row.",
         "successor_cardinality": "Exactly one seed for each valid positive n.",
@@ -1449,6 +1451,12 @@ cyclic_boundary = source_candidate(
         "object_kind": "A boundary class for finite cellular arrays.",
         "carrier": "A finite ordered array of cells.",
         "support": "A finite one-dimensional array.",
+        "complete_state": (
+            "A finite array together with an attempted off-end neighbor read."
+        ),
+        "input": (
+            "A nonempty finite array and a neighbor lookup that crosses one endpoint."
+        ),
         "topology": (
             "The leftmost and rightmost positions are adjacent, forming a cycle."
         ),
@@ -1463,7 +1471,14 @@ cyclic_boundary = source_candidate(
         "rule_relation_constraint_function_or_probability_law": (
             "Resolve every off-end neighbor read by cyclic wraparound."
         ),
-        "result_kind": "A closed finite cellular support with no missing edge reads.",
+        "result_kind": (
+            "The uniquely resolved opposite-end source position/value for the "
+            "off-end neighbor read."
+        ),
+        "successor_cardinality": (
+            "Exactly one wrapped lookup result for each valid nonempty array and "
+            "off-end neighbor query."
+        ),
         "determinism_branching_or_measure": "Deterministic.",
         "parameters_and_variants": "The finite array length.",
         "excluded_observers_and_representations": (
@@ -1636,19 +1651,39 @@ function_profile = profile_candidate(
     aliases=["function cellular automaton rule"],
 )
 function_profile["facts"]["complete_state"] = (
-    "The current cellular configuration together with the current step number "
-    "when the supplied function depends on that number."
+    "The current cellular configuration; the current step number is separate "
+    "control state when the supplied function depends on it."
 )
 function_profile["facts"]["control_state"] = (
     "The current step number, beginning at 0, is exposed to the rule function."
 )
 function_profile["facts"]["schedule"] = (
     "At each discrete generation the function receives each old neighborhood "
-    "and the current step number; the successor advances that number."
+    "and the current step number."
 )
 function_profile["facts"]["write_replacement_assembly_or_commit"] = (
-    "The function result supplies each next cell value, after which the step "
-    "counter advances with the complete successor configuration."
+    "The supplied function's result provides the value produced for each "
+    "neighborhood application."
+)
+function_profile["evidence"][0]["fields"].append(
+    "write_replacement_assembly_or_commit"
+)
+add_evidence(
+    function_profile,
+    label="function-ca-evolution-contract",
+    unit="U005010",
+    claim=(
+        "The general built-in contract identifies an initial configuration, "
+        "a finite number of discrete steps, and the resulting evolution list."
+    ),
+    fields=[
+        "native_time",
+        "complete_state",
+        "schedule",
+        "result_kind",
+        "parameters_and_variants",
+        "evidence_limit",
+    ],
 )
 add_evidence(
     function_profile,
@@ -1674,12 +1709,9 @@ add_evidence(
     ),
     fields=[
         "native_time",
-        "complete_state",
         "control_state",
         "schedule",
-        "law_kind",
         "rule_relation_constraint_function_or_probability_law",
-        "write_replacement_assembly_or_commit",
         "parameters_and_variants",
         "evidence_limit",
     ],
@@ -1750,13 +1782,24 @@ def seed_or_query_candidate(
         "native failure, or an independent witness convention."
     )
     facts = {
-        "object_kind": description,
+        "object_kind": "A cellular-automaton initial-state constructor class.",
+        "complete_state": result,
         "input": description,
-        "law_kind": "A constructor or projection profile for CA evolution.",
+        "seed": description,
+        "boundary": description,
+        "law_kind": "A deterministic initial-state constructor.",
         "rule_relation_constraint_function_or_probability_law": description,
+        "write_replacement_assembly_or_commit": (
+            "Assemble or overlay the declared pieces to construct the initial "
+            "configuration."
+        ),
         "result_kind": result,
+        "successor_cardinality": (
+            "Exactly one constructed initial configuration for a fixed valid "
+            "specification."
+        ),
         "determinism_branching_or_measure": (
-            "Deterministic for a fixed specification."
+            "Deterministic as an initial-state constructor."
         ),
         "parameters_and_variants": description,
         "excluded_observers_and_representations": (
@@ -1765,9 +1808,8 @@ def seed_or_query_candidate(
         ),
         "evidence_limit": missing,
     }
-    if seed_boundary:
-        facts["seed"] = description
-        facts["boundary"] = description
+    if not seed_boundary:
+        facts.pop("boundary")
     return source_candidate(
         key=key,
         name=name,
@@ -1838,11 +1880,22 @@ explicit_cyclic_seed = source_candidate(
         "complete_state": "The explicit list {1,0,0,1,0}.",
         "seed": "The explicit five-cell binary list {1,0,0,1,0}.",
         "boundary": "The explicit list continues cyclically.",
-        "law_kind": "Use the list as the initial state for rule 30.",
-        "result_kind": "A finite cyclic Rule 30 evolution.",
-        "parameters_and_variants": "Five cells, rule 30, and a three-step example run.",
+        "input": "The explicit list {1,0,0,1,0}.",
+        "law_kind": "A deterministic cyclic initial-state constructor.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Use the supplied five values in their stated order and close the "
+            "finite row cyclically."
+        ),
+        "write_replacement_assembly_or_commit": (
+            "Assemble the five ordered values into one cyclic initial configuration."
+        ),
+        "result_kind": "The finite cyclic initial configuration {1,0,0,1,0}.",
+        "successor_cardinality": "Exactly one constructed seed for this preset.",
+        "determinism_branching_or_measure": "Deterministic constructor.",
+        "parameters_and_variants": "The fixed five values and cyclic continuation.",
         "excluded_observers_and_representations": (
-            "The printed four-row output is a finite witness of the preset."
+            "Rule 30, the requested three-step run, and its printed four rows "
+            "demonstrate the seed but are not part of this constructor."
         ),
         "evidence_limit": (
             "The example does not define behavior for malformed lists or a "
@@ -1858,6 +1911,14 @@ explicit_cyclic_seed = source_candidate(
         "stopping condition beyond the requested run length."
     ),
 )
+explicit_cyclic_seed["source_status"] = ["DEFECTIVE", "AMBIGUOUS"]
+explicit_cyclic_seed["uncertainties"] = [
+    (
+        "U005043 contains the damaged sentence “The runs rule 30 with 5 cells "
+        "for 3 steps”; U005044 resolves the omitted call subject and exact "
+        "example without repairing the source prose."
+    )
+]
 add_evidence(
     explicit_cyclic_seed,
     label="explicit-cyclic-seed-run",
@@ -1886,18 +1947,24 @@ periodic_patch_seed = source_candidate(
         ),
         "seed": "Patch {1,1} on a repeating {1,0,1,1} background.",
         "boundary": "The four-value background repeats beyond the foreground.",
-        "law_kind": "Use the composed state as the initial condition for rule 30.",
-        "result_kind": (
-            "A rule 30 evolution, by default projected to the region affected "
-            "by the foreground patch."
+        "input": "Foreground {1,1} and repeating background block {1,0,1,1}.",
+        "law_kind": "A deterministic foreground/background seed constructor.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Superimpose the foreground {1,1} on an infinite repetition of "
+            "the background block {1,0,1,1}."
         ),
+        "write_replacement_assembly_or_commit": (
+            "Overlay the finite foreground on the aligned repeating background."
+        ),
+        "result_kind": "The constructed infinite patterned initial configuration.",
+        "successor_cardinality": "Exactly one constructed seed for this preset.",
+        "determinism_branching_or_measure": "Deterministic constructor.",
         "parameters_and_variants": (
-            "Foreground block, repeating background block, rule, run length, "
-            "and output window."
+            "The fixed foreground block and repeating background block."
         ),
         "excluded_observers_and_representations": (
-            "The affected-region crop is an output projection, not a boundary "
-            "or transition change."
+            "Rule 30, its 50-step run, and the affected-region/all-region crop "
+            "are downstream evolution and observer choices."
         ),
         "evidence_limit": (
             "The example does not state invalid-input, native completion, "
@@ -1958,13 +2025,26 @@ positioned_patch_seed = source_candidate(
         ),
         "seed": "The two explicitly positioned foreground blocks on background 0.",
         "boundary": "The value-0 background extends outside the finite blocks.",
-        "law_kind": "Use the composed state as the initial condition for rule 30.",
-        "result_kind": "A unique 50-step Rule 30 evolution.",
-        "parameters_and_variants": (
-            "Foreground values, offsets -10 and 20, zero background, rule 30, "
-            "and 50 steps."
+        "input": (
+            "Block {1} at offset -10, block {1,1} at offset 20, and background 0."
         ),
-        "excluded_observers_and_representations": "The raster is an output representation.",
+        "law_kind": "A deterministic positioned-block seed constructor.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Place {1} at offset -10 and {1,1} at offset 20 on the zero background."
+        ),
+        "write_replacement_assembly_or_commit": (
+            "Overlay both positioned finite blocks on the unbounded zero background."
+        ),
+        "result_kind": "The constructed positioned-block initial configuration.",
+        "successor_cardinality": "Exactly one constructed seed for this preset.",
+        "determinism_branching_or_measure": "Deterministic constructor.",
+        "parameters_and_variants": (
+            "Foreground values, offsets -10 and 20, and zero background."
+        ),
+        "excluded_observers_and_representations": (
+            "Rule 30, the 50-step request, and the raster are downstream "
+            "evolution or representation choices."
+        ),
         "evidence_limit": (
             "The example does not state collision/overlap precedence for "
             "arbitrary positioned blocks or invalid-input behavior."
@@ -2050,6 +2130,20 @@ def explicit_ca_example(
             ("rule specification", description, [f"{key}-source"]),
         ],
     )
+    # The prose anchor names the preset/profile but the following CODE unit
+    # carries the full seed, run, and output-window mechanics.  Keep the two
+    # evidence claims exact rather than making the prose inherit the call.
+    spec["evidence"][0]["fields"] = [
+        "object_kind",
+        "native_time",
+        "alphabet_or_value_schema",
+        "law_kind",
+        "rule_relation_constraint_function_or_probability_law",
+        "parameters_and_variants",
+        "excluded_observers_and_representations",
+        "evidence_limit",
+    ]
+    return spec
 
 
 rule921408 = explicit_ca_example(
@@ -2357,18 +2451,34 @@ rule90_background = source_candidate(
         "complete_state": (
             "One black cell together with the repeated striped background block."
         ),
+        "input": (
+            "A single black foreground cell and the pictured repeating striped "
+            "background block."
+        ),
         "seed": (
             "A single black cell inserted into a background of repetitions of "
             "the pictured striped black-to-white block."
         ),
         "boundary": "The background repeats outside the finite foreground.",
-        "law_kind": "Rule 90 evolution from the declared patterned seed.",
-        "result_kind": (
-            "A Rule 90 evolution with white and striped nested regions."
+        "law_kind": "A deterministic foreground/background seed constructor.",
+        "rule_relation_constraint_function_or_probability_law": (
+            "Insert the single black foreground cell into an unbounded repetition "
+            "of the pictured striped background block."
         ),
-        "parameters_and_variants": "The repeated background block is the varying seed profile.",
+        "write_replacement_assembly_or_commit": (
+            "Overlay the foreground cell on the aligned repeating background."
+        ),
+        "result_kind": "The constructed patterned initial configuration.",
+        "successor_cardinality": (
+            "Exactly one constructed seed for a fixed foreground and background block."
+        ),
+        "determinism_branching_or_measure": "Deterministic constructor.",
+        "parameters_and_variants": (
+            "The single-cell foreground and pictured repeated background block."
+        ),
         "excluded_observers_and_representations": (
-            "The displayed fractal dimensions and raster are outcome/representation."
+            "Rule 90 evolution, its white/striped nested regions, fractal "
+            "dimensions, and the raster are downstream outcomes or representations."
         ),
         "evidence_limit": (
             "The inline artwork establishes the source's seed symbols, but the "
