@@ -1850,16 +1850,15 @@ def _validate_stage18_context_ready(
     if not active_epochs:
         raise MergeError(f"{label} has no active review epoch")
     active_epoch = max(active_epochs)
-    if not any(
-        isinstance(round_record, dict)
-        and round_record.get("kind") == "SATURATION"
-        and round_record.get("owning_stage") == 18
-        and round_record.get("epoch") == active_epoch
-        for round_record in rounds
+    if not validate_audit.has_full_corpus_saturation(
+        search,
+        epoch=active_epoch,
+        canonical_paths=canonical_paths,
     ):
         raise MergeError(
             f"{label} requires a Stage 18 SATURATION search round in "
-            f"the active review epoch {active_epoch}"
+            f"the active review epoch {active_epoch} with exact "
+            "full-corpus scope"
         )
 
 

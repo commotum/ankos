@@ -1960,6 +1960,49 @@ def test_missing_target_final_rejects_premature_review_and_search_state(
             goal_dir=no_saturation_goal,
         )
 
+    partial_scope_goal = _copy_goal_template(
+        closed_review_goal_template,
+        tmp_path / "partial-saturation-scope",
+    )
+    partial_search_proposal, _ = _stage18_saturation_proposal(
+        partial_scope_goal,
+        tmp_path,
+        filename="partial-scope-saturation.json",
+        establish_fixed_point=False,
+    )
+    partial_payload = json.loads(
+        partial_search_proposal.read_text(encoding="utf-8")
+    )
+    partial_round = partial_payload["proposed_search"]["rounds"][-1]
+    partial_round["queries"][0]["scope_paths"].pop()
+    partial_digest = merge.validate_audit.search_result_digest(
+        partial_round
+    )
+    partial_round["result_digest"] = partial_digest
+    partial_round["rerun_digest"] = partial_digest
+    partial_search_proposal.write_bytes(
+        canonical_json_bytes(partial_payload)
+    )
+    merge.apply_merge(
+        merge.prepare_search_append(
+            partial_search_proposal,
+            goal_dir=partial_scope_goal,
+        )
+    )
+    partial_route_proposal, _ = _missing_route_proposal(
+        partial_scope_goal,
+        tmp_path,
+        filename="partial-scope-missing-route.json",
+    )
+    with pytest.raises(
+        merge.MergeError,
+        match="requires a Stage 18 SATURATION search round.*exact full-corpus scope",
+    ):
+        merge.prepare_route_resolution(
+            partial_route_proposal,
+            goal_dir=partial_scope_goal,
+        )
+
     with pytest.raises(
         merge.MergeError,
         match="requires a Stage 18 SATURATION search round.*epoch 2",

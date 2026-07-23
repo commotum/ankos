@@ -266,6 +266,49 @@ def test_atomic_prefix_rejects_search_over_unreviewed_future_sources() -> None:
     assert any("hit targets an unreviewed future unit" in error for error in errors)
 
 
+def test_missing_final_saturation_requires_exact_full_corpus_scope() -> None:
+    manifest, *_ = load()
+    canonical_paths = {
+        document["path"] for document in manifest["documents"]
+    }
+    assert len(canonical_paths) == 29
+    ordered_paths = sorted(canonical_paths)
+
+    partial_search = {
+        "rounds": [
+            {
+                "epoch": 2,
+                "kind": "SATURATION",
+                "owning_stage": 18,
+                "queries": [
+                    {"scope_paths": [ordered_paths[0]]},
+                ],
+            }
+        ]
+    }
+    assert not MODULE.has_full_corpus_saturation(
+        partial_search,
+        epoch=2,
+        canonical_paths=canonical_paths,
+    )
+
+    full_search = copy.deepcopy(partial_search)
+    full_search["rounds"][0]["queries"] = [
+        {"scope_paths": ordered_paths[:14]},
+        {"scope_paths": ordered_paths[14:]},
+    ]
+    assert MODULE.has_full_corpus_saturation(
+        full_search,
+        epoch=2,
+        canonical_paths=canonical_paths,
+    )
+    assert not MODULE.has_full_corpus_saturation(
+        full_search,
+        epoch=3,
+        canonical_paths=canonical_paths,
+    )
+
+
 def test_search_query_ids_follow_global_encounter_order() -> None:
     def query(query_id: str):
         return {

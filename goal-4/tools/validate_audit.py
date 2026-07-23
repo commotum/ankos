@@ -322,6 +322,36 @@ def search_result_digest(round_record: dict[str, Any]) -> str:
     return hashlib.sha256(canonical_json_bytes(payload)).hexdigest()
 
 
+def has_full_corpus_saturation(
+    search: dict[str, Any],
+    *,
+    epoch: int,
+    canonical_paths: set[str],
+) -> bool:
+    """Return whether one current-epoch Stage 18 round scopes the corpus."""
+    rounds = search.get("rounds")
+    if not isinstance(rounds, list):
+        return False
+    for round_record in rounds:
+        if (
+            not isinstance(round_record, dict)
+            or round_record.get("kind") != "SATURATION"
+            or round_record.get("owning_stage") != 18
+            or round_record.get("epoch") != epoch
+        ):
+            continue
+        scope_paths = {
+            path
+            for query in round_record.get("queries", [])
+            if isinstance(query, dict)
+            for path in query.get("scope_paths", [])
+            if isinstance(path, str)
+        }
+        if scope_paths == canonical_paths:
+            return True
+    return False
+
+
 def search_query_id_sequence_errors(rounds: object) -> list[str]:
     """Validate Q IDs in their global encounter order across all rounds."""
     if not isinstance(rounds, list):
@@ -3165,16 +3195,15 @@ def validate_review_history(
                             f"{change_prefix} finalizes missing route before "
                             "applicable LOCAL closure"
                         )
-                    if not any(
-                        isinstance(round_record, dict)
-                        and round_record.get("kind") == "SATURATION"
-                        and round_record.get("owning_stage") == 18
-                        and round_record.get("epoch") == active_epoch
-                        for round_record in search_state.get("rounds", [])
+                    if not has_full_corpus_saturation(
+                        search_state,
+                        epoch=active_epoch,
+                        canonical_paths=set(audit_paths),
                     ):
                         errors.append(
                             f"{change_prefix} finalizes missing route before "
-                            "current-epoch Stage-18 SATURATION"
+                            "current-epoch Stage-18 SATURATION with exact "
+                            "full-corpus scope"
                         )
                     source_unit = unit_by_id.get(
                         after_route.get("source_unit_id")
@@ -5089,6 +5118,19 @@ def validate_objects(
     if vocabulary != replayed_vocabulary:
         errors.append(
             "search vocabulary differs from ordered per-round new_vocabulary"
+        )
+
+    if any(
+        route.get("status") == "MISSING_TARGET_FINAL"
+        for route in routes
+    ) and not has_full_corpus_saturation(
+        search,
+        epoch=max(history_epochs, default=0),
+        canonical_paths=set(document_by_path),
+    ):
+        errors.append(
+            "MISSING_TARGET_FINAL routes lack current-epoch Stage-18 "
+            "SATURATION with exact full-corpus scope"
         )
 
     fixed_point = search.get("fixed_point")
