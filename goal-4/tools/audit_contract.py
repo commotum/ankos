@@ -230,6 +230,18 @@ SEARCH_HIT_DISPOSITIONS = [
     "CONTROL_OR_RELATIONSHIP",
     "EXCLUSION",
 ]
+LIFECYCLE_PROOF_KINDS = [
+    "PROVISIONAL_COMPARISON",
+    "ALIAS_IDENTITY",
+    "CO_REFERENCE_IDENTITY",
+    "PROVED_DUPLICATE_IDENTITY",
+    "SPLIT_DISTINCTION",
+]
+MERGE_IDENTITY_PROOF_KINDS = {
+    "ALIAS_IDENTITY",
+    "CO_REFERENCE_IDENTITY",
+    "PROVED_DUPLICATE_IDENTITY",
+}
 CATALOG_ACTIONS = [
     "EXISTING_ENTRY_SUFFICIENT",
     "EXISTING_ENTRY_NEEDS_CORRECTION",
@@ -397,7 +409,15 @@ def candidate_schema(
     }
     relation_schema = {
         "type": "object",
-        "required": ["candidate_id", "relation", "evidence_ids", "uncertainty"],
+        "required": [
+            "candidate_id",
+            "relation",
+            "proof_kind",
+            "evidence_ids",
+            "before_rationale",
+            "after_rationale",
+            "uncertainty",
+        ],
         "properties": {
             "candidate_id": {"type": "string", "pattern": id_pattern},
             "relation": {
@@ -410,7 +430,13 @@ def candidate_schema(
                     "SPLIT_INTO",
                 ],
             },
+            "proof_kind": {
+                "type": "string",
+                "enum": LIFECYCLE_PROOF_KINDS,
+            },
             "evidence_ids": _string_array(),
+            "before_rationale": {"type": "string"},
+            "after_rationale": {"type": "string"},
             "uncertainty": {"type": "string"},
         },
         "additionalProperties": False,

@@ -69,6 +69,18 @@ EXPECTED_VISUAL_RISK_FLAGS = {
     "AMBIGUOUS",
     "CAPTION_INCOMPLETE",
 }
+EXPECTED_LIFECYCLE_PROOF_KINDS = {
+    "PROVISIONAL_COMPARISON",
+    "ALIAS_IDENTITY",
+    "CO_REFERENCE_IDENTITY",
+    "PROVED_DUPLICATE_IDENTITY",
+    "SPLIT_DISTINCTION",
+}
+EXPECTED_MERGE_IDENTITY_PROOFS = {
+    "ALIAS_IDENTITY",
+    "CO_REFERENCE_IDENTITY",
+    "PROVED_DUPLICATE_IDENTITY",
+}
 EXPECTED_BLIND_CANDIDATE_FIELDS = {
     "id",
     "record_status",
@@ -327,6 +339,37 @@ def validate(data: dict[str, Any]) -> list[str]:
         "discovery_anchor_contract"
     ].strip():
         errors.append("discovery_anchor_contract must be non-empty")
+    lifecycle = data.get("lifecycle_relation_contract")
+    if not isinstance(lifecycle, dict) or set(lifecycle) != {
+        "proof_kinds",
+        "merge_identity_proof_kinds",
+        "merge_evidence_strength",
+        "split_proof_kind",
+        "split_rationale_fields",
+        "provisional_proof_kind",
+    }:
+        errors.append("lifecycle_relation_contract fields are invalid")
+    else:
+        if set(lifecycle["proof_kinds"]) != EXPECTED_LIFECYCLE_PROOF_KINDS:
+            errors.append("lifecycle proof kinds do not match the frozen contract")
+        if (
+            set(lifecycle["merge_identity_proof_kinds"])
+            != EXPECTED_MERGE_IDENTITY_PROOFS
+        ):
+            errors.append(
+                "merge identity proof kinds do not match the frozen contract"
+            )
+        if lifecycle["merge_evidence_strength"] != "DIRECT_IDENTITY":
+            errors.append("merge identity proof must require DIRECT_IDENTITY")
+        if lifecycle["split_proof_kind"] != "SPLIT_DISTINCTION":
+            errors.append("split proof kind must be SPLIT_DISTINCTION")
+        if lifecycle["split_rationale_fields"] != [
+            "before_rationale",
+            "after_rationale",
+        ]:
+            errors.append("split rationale fields are not exact")
+        if lifecycle["provisional_proof_kind"] != "PROVISIONAL_COMPARISON":
+            errors.append("provisional lifecycle proof kind is invalid")
     route_scopes = data.get("route_closure_scopes")
     if not isinstance(route_scopes, dict) or set(route_scopes) != {
         "WITHIN_STAGE",
@@ -564,6 +607,22 @@ def run_mutation_checks(data: dict[str, Any]) -> list[str]:
         duplicate_proof["proof_obligations"]["same_family"][0]
     )
     mutations.append(("duplicate proof obligation", duplicate_proof))
+
+    generic_merge_proof = copy.deepcopy(data)
+    generic_merge_proof["lifecycle_relation_contract"][
+        "merge_evidence_strength"
+    ] = "DIRECT_COMPLETE_MECHANICS"
+    mutations.append(
+        ("generic mechanics permits lifecycle merge", generic_merge_proof)
+    )
+
+    missing_split_rationale = copy.deepcopy(data)
+    missing_split_rationale["lifecycle_relation_contract"][
+        "split_rationale_fields"
+    ] = ["after_rationale"]
+    mutations.append(
+        ("split lifecycle loses before rationale", missing_split_rationale)
+    )
 
     for name, mutated in mutations:
         if not validate(mutated):

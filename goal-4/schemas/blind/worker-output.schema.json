@@ -1678,6 +1678,12 @@
             "items": {
               "additionalProperties": false,
               "properties": {
+                "after_rationale": {
+                  "type": "string"
+                },
+                "before_rationale": {
+                  "type": "string"
+                },
                 "candidate_id": {
                   "pattern": "^W[0-9]{4}$",
                   "type": "string"
@@ -1688,6 +1694,16 @@
                   },
                   "type": "array",
                   "uniqueItems": true
+                },
+                "proof_kind": {
+                  "enum": [
+                    "PROVISIONAL_COMPARISON",
+                    "ALIAS_IDENTITY",
+                    "CO_REFERENCE_IDENTITY",
+                    "PROVED_DUPLICATE_IDENTITY",
+                    "SPLIT_DISTINCTION"
+                  ],
+                  "type": "string"
                 },
                 "relation": {
                   "enum": [
@@ -1706,7 +1722,10 @@
               "required": [
                 "candidate_id",
                 "relation",
+                "proof_kind",
                 "evidence_ids",
+                "before_rationale",
+                "after_rationale",
                 "uncertainty"
               ],
               "type": "object"

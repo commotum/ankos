@@ -25,6 +25,8 @@ from audit_contract import (
     FINGERPRINT_FIELDS,
     FORBIDDEN_BLIND_FIELDS,
     GOAL_DIR,
+    LIFECYCLE_PROOF_KINDS,
+    MERGE_IDENTITY_PROOF_KINDS,
     READING_DISPOSITIONS,
     READING_HEADER,
     REPO_ROOT,
@@ -453,6 +455,7 @@ def validate_candidate(
         evidence = []
     local_evidence_ids: set[str] = set()
     evidence_fields: dict[str, set[str]] = {}
+    evidence_strength_by_id: dict[str, str] = {}
     evidence_strengths: set[str] = set()
     evidence_units: set[str] = set()
     evidence_images: set[str] = set()
@@ -537,6 +540,8 @@ def validate_candidate(
             errors.append(f"{prefix} evidence strength is invalid")
         else:
             evidence_strengths.add(item["strength"])
+            if isinstance(evidence_id, str):
+                evidence_strength_by_id[evidence_id] = item["strength"]
         if item["modality"] not in EVIDENCE_MODALITIES:
             errors.append(f"{prefix} evidence modality is invalid")
         if item["modality"] == "IMAGE" and image_path is None:
@@ -698,7 +703,10 @@ def validate_candidate(
         if not isinstance(relation, dict) or set(relation) != {
             "candidate_id",
             "relation",
+            "proof_kind",
             "evidence_ids",
+            "before_rationale",
+            "after_rationale",
             "uncertainty",
         }:
             errors.append(f"{prefix} has malformed related candidate")
@@ -715,6 +723,12 @@ def validate_candidate(
             "SPLIT_INTO",
         }:
             errors.append(f"{prefix} has invalid blind candidate relation")
+        proof_kind = relation["proof_kind"]
+        if (
+            not isinstance(proof_kind, str)
+            or proof_kind not in LIFECYCLE_PROOF_KINDS
+        ):
+            errors.append(f"{prefix} has invalid lifecycle proof kind")
         relation_key = (relation["candidate_id"], relation["relation"])
         if relation_key in seen_relations:
             errors.append(f"{prefix} repeats a candidate relation")
@@ -733,10 +747,53 @@ def validate_candidate(
                 errors.append(
                     f"{prefix} definitive supersession relation is uncertain"
                 )
+            if relation["relation"] == "MERGED_INTO":
+                if (
+                    not isinstance(proof_kind, str)
+                    or proof_kind not in MERGE_IDENTITY_PROOF_KINDS
+                ):
+                    errors.append(
+                        f"{prefix} merge lacks a typed identity proof"
+                    )
+                if any(
+                    evidence_strength_by_id.get(evidence_id)
+                    != "DIRECT_IDENTITY"
+                    for evidence_id in relation_evidence
+                ):
+                    errors.append(
+                        f"{prefix} merge identity proof uses non-identity evidence"
+                    )
+                if relation["before_rationale"] or relation["after_rationale"]:
+                    errors.append(
+                        f"{prefix} merge relation carries split rationale fields"
+                    )
+            else:
+                if proof_kind != "SPLIT_DISTINCTION":
+                    errors.append(
+                        f"{prefix} split lacks a typed distinction proof"
+                    )
+                if (
+                    not isinstance(relation["before_rationale"], str)
+                    or not relation["before_rationale"].strip()
+                    or not isinstance(relation["after_rationale"], str)
+                    or not relation["after_rationale"].strip()
+                ):
+                    errors.append(
+                        f"{prefix} split lacks explicit before/after rationale"
+                    )
         elif not isinstance(relation["uncertainty"], str) or not relation[
             "uncertainty"
         ].strip():
             errors.append(f"{prefix} provisional relation lacks uncertainty")
+        else:
+            if proof_kind != "PROVISIONAL_COMPARISON":
+                errors.append(
+                    f"{prefix} provisional relation has a definitive proof kind"
+                )
+            if relation["before_rationale"] or relation["after_rationale"]:
+                errors.append(
+                    f"{prefix} provisional relation carries split rationale fields"
+                )
 
     if row["record_status"] == "ACTIVE" and definitive_relations:
         errors.append(f"{prefix} active record has supersession relation")
@@ -1166,29 +1223,40 @@ def validate_objects(
             evidence_ids_global,
             errors,
         )
-    expected_evidence_ids = {
-        f"E{index:06d}"
-        for index in range(1, len(evidence_ids_global) + 1)
-    }
-    if evidence_ids_global != expected_evidence_ids:
-        errors.append("evidence IDs are not a complete append-only E sequence")
+    evidence_id_order = [
+        evidence.get("evidence_id")
+        for candidate in candidates
+        for evidence in candidate.get("source_evidence", [])
+        if isinstance(evidence, dict)
+    ]
+    expected_evidence_id_order = [
+        f"E{index:06d}" for index in range(1, len(evidence_id_order) + 1)
+    ]
+    if evidence_id_order != expected_evidence_id_order:
+        errors.append(
+            "evidence IDs are not in exact append-only E allocation order"
+        )
 
     candidate_by_id = {candidate["id"]: candidate for candidate in candidates}
     evidence_by_group: dict[str, list[tuple[str, dict[str, Any]]]] = {}
+    evidence_group_first_order: list[str] = []
     for candidate in candidates:
         for evidence in candidate.get("source_evidence", []):
             if isinstance(evidence, dict):
-                evidence_by_group.setdefault(
-                    str(evidence.get("evidence_group_id", "")), []
-                ).append((candidate["id"], evidence))
-    evidence_group_ids = set(evidence_by_group)
-    expected_group_ids = {
+                group_id = str(evidence.get("evidence_group_id", ""))
+                if group_id not in evidence_by_group:
+                    evidence_group_first_order.append(group_id)
+                evidence_by_group.setdefault(group_id, []).append(
+                    (candidate["id"], evidence)
+                )
+    expected_group_first_order = [
         f"G{index:06d}"
-        for index in range(1, len(evidence_group_ids) + 1)
-    }
-    if evidence_group_ids != expected_group_ids:
+        for index in range(1, len(evidence_group_first_order) + 1)
+    ]
+    if evidence_group_first_order != expected_group_first_order:
         errors.append(
-            "evidence-group IDs are not a complete append-only G sequence"
+            "evidence-group first occurrences are not in exact append-only "
+            "G allocation order"
         )
     split_children: set[str] = set()
     supersession_targets: dict[str, list[str]] = {
@@ -2454,6 +2522,50 @@ def validate_objects(
                 f"stage {required_stage} has pending within-stage routes"
             )
 
+    if 18 in require_stages or require_all_reviewed:
+        if isinstance(fixed_point, dict):
+            fixed_round_id = fixed_point.get("round_id")
+            fixed_round_index = next(
+                (
+                    index
+                    for index, round_record in enumerate(rounds)
+                    if isinstance(round_record, dict)
+                    and round_record.get("round_id") == fixed_round_id
+                ),
+                len(rounds),
+            )
+        else:
+            fixed_round_index = len(rounds)
+        for stage_number in range(4, 18):
+            assigned_paths = {
+                path
+                for path, document in document_by_path.items()
+                if stage_for_document(document) == stage_number
+            }
+            prior_local_rounds = [
+                round_record
+                for index, round_record in enumerate(rounds)
+                if index < fixed_round_index
+                and isinstance(round_record, dict)
+                and round_record.get("kind") == "LOCAL"
+                and round_record.get("owning_stage") == stage_number
+            ]
+            prior_local_scope = {
+                path
+                for round_record in prior_local_rounds
+                for query in round_record.get("queries", [])
+                if isinstance(query, dict)
+                for path in query.get("scope_paths", [])
+            }
+            if (
+                not prior_local_rounds
+                or prior_local_scope != assigned_paths
+            ):
+                errors.append(
+                    "stage 18/all-reviewed closure lacks exact Stage "
+                    f"{stage_number} LOCAL-round coverage before saturation"
+                )
+
     if require_all_reviewed:
         if any(route["status"] == "PENDING" for route in routes):
             errors.append("all-reviewed closure has pending routes")
@@ -2715,6 +2827,43 @@ def mutation_checks(
             + "; ".join(reopened_errors)
         )
 
+    allocation_candidate = copy.deepcopy(candidate)
+    second_evidence = copy.deepcopy(evidence)
+    second_evidence.update(
+        {
+            "evidence_id": "E000002",
+            "evidence_group_id": "G000002",
+            "discovery_anchor": {
+                "epoch": 1,
+                "kind": "SOURCE_UNIT",
+                "id": unit_id,
+                "ordinal": 2,
+            },
+            "strength": "CORROBORATING",
+            "claim": "The same canonical unit independently corroborates the fixture.",
+            "fingerprint_fields": [],
+        }
+    )
+    allocation_candidate["source_evidence"].append(second_evidence)
+    allocation_candidate["evidence_strength"] = [
+        "DIRECT_COMPLETE_MECHANICS",
+        "CORROBORATING",
+    ]
+    allocation_errors = validate_objects(
+        manifest,
+        units,
+        base_reading,
+        [allocation_candidate],
+        base_routes,
+        base_assets,
+        base_search,
+    )
+    if allocation_errors:
+        failures.append(
+            "valid exact evidence-allocation fixture failed: "
+            + "; ".join(allocation_errors)
+        )
+
     def lineage_candidate(
         candidate_id: str,
         evidence_number: int,
@@ -2759,13 +2908,29 @@ def mutation_checks(
                 {
                     "candidate_id": "B0003",
                     "relation": "SPLIT_INTO",
+                    "proof_kind": "SPLIT_DISTINCTION",
                     "evidence_ids": ["E000001"],
+                    "before_rationale": (
+                        "The parent record combined two distinguishable "
+                        "construction boundaries."
+                    ),
+                    "after_rationale": (
+                        "This child retains the first construction boundary."
+                    ),
                     "uncertainty": "",
                 },
                 {
                     "candidate_id": "B0004",
                     "relation": "SPLIT_INTO",
+                    "proof_kind": "SPLIT_DISTINCTION",
                     "evidence_ids": ["E000001"],
+                    "before_rationale": (
+                        "The parent record combined two distinguishable "
+                        "construction boundaries."
+                    ),
+                    "after_rationale": (
+                        "This child retains the second construction boundary."
+                    ),
                     "uncertainty": "",
                 },
             ],
@@ -2786,6 +2951,10 @@ def mutation_checks(
             ],
         }
     )
+    lineage_candidates[1]["source_evidence"][0][
+        "strength"
+    ] = "DIRECT_IDENTITY"
+    lineage_candidates[1]["evidence_strength"] = ["DIRECT_IDENTITY"]
     lineage_candidates[1].update(
         {
             "record_status": "MERGED_REDIRECT",
@@ -2793,7 +2962,10 @@ def mutation_checks(
                 {
                     "candidate_id": "B0001",
                     "relation": "MERGED_INTO",
+                    "proof_kind": "PROVED_DUPLICATE_IDENTITY",
                     "evidence_ids": ["E000002"],
+                    "before_rationale": "",
+                    "after_rationale": "",
                     "uncertainty": "",
                 }
             ],
@@ -2847,6 +3019,66 @@ def mutation_checks(
             "broken multi-layer evidence reassignment",
             lineage_reading,
             broken_lineage,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    reversed_evidence_order = copy.deepcopy(allocation_candidate)
+    reversed_evidence_order["source_evidence"].reverse()
+    mutations.append(
+        (
+            "reversed global E allocation order",
+            base_reading,
+            [reversed_evidence_order],
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    reversed_group_order = copy.deepcopy(allocation_candidate)
+    reversed_group_order["source_evidence"][0][
+        "evidence_group_id"
+    ] = "G000002"
+    reversed_group_order["source_evidence"][1][
+        "evidence_group_id"
+    ] = "G000001"
+    mutations.append(
+        (
+            "reversed first-occurrence G allocation order",
+            base_reading,
+            [reversed_group_order],
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    generic_merge_evidence = copy.deepcopy(lineage_candidates)
+    generic_merge_evidence[1]["source_evidence"][0][
+        "strength"
+    ] = "DIRECT_COMPLETE_MECHANICS"
+    generic_merge_evidence[1]["evidence_strength"] = [
+        "DIRECT_COMPLETE_MECHANICS"
+    ]
+    mutations.append(
+        (
+            "merge justified only by generic mechanics evidence",
+            lineage_reading,
+            generic_merge_evidence,
+            base_routes,
+            base_assets,
+            base_search,
+        )
+    )
+    missing_split_rationale = copy.deepcopy(lineage_candidates)
+    missing_split_rationale[0]["related_candidate_ids"][0][
+        "after_rationale"
+    ] = ""
+    mutations.append(
+        (
+            "split tombstone without explicit after rationale",
+            lineage_reading,
+            missing_split_rationale,
             base_routes,
             base_assets,
             base_search,

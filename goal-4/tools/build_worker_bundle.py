@@ -62,6 +62,10 @@ EXECUTION_REQUIREMENT_FIELDS = {
     "worker_route_resolution_allowed",
 }
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+WORKER_CANDIDATE_RE = re.compile(r"^W[0-9]{4}$")
+GLOBAL_CANDIDATE_RE = re.compile(r"^B[0-9]{4}$")
+WORKER_ROUTE_RE = re.compile(r"^WR[0-9]{4}$")
+GLOBAL_ROUTE_RE = re.compile(r"^R[0-9]{6}$")
 CHAPTER_PATH_RE = re.compile(
     r"^(?:CHAPTERS|BACK-MATTER/NOTES)/([0-9]{2})-[^/]+\.md$"
 )
@@ -507,6 +511,48 @@ def is_complete_worker_sequence(
     ]
 
 
+def reopened_local_links(
+    value: object,
+    original_value: object,
+    *,
+    epoch: object,
+    local_pattern: re.Pattern[str],
+    global_pattern: re.Pattern[str],
+    label: str,
+    errors: list[str],
+) -> list[str]:
+    """Validate retained global links and return this worker's local links."""
+
+    links = parse_string_array(value, label, errors)
+    original_links = parse_string_array(
+        original_value,
+        f"{label} authoritative input",
+        errors,
+    )
+    local_links = [link for link in links if local_pattern.fullmatch(link)]
+    retained_links = [link for link in links if global_pattern.fullmatch(link)]
+    invalid_links = [
+        link
+        for link in links
+        if not local_pattern.fullmatch(link)
+        and not global_pattern.fullmatch(link)
+    ]
+    if invalid_links:
+        errors.append(f"{label} has invalid link IDs: {invalid_links}")
+    if epoch == 1:
+        if retained_links:
+            errors.append(
+                f"{label} initial pass cannot claim pre-existing global links"
+            )
+    elif isinstance(epoch, int) and not isinstance(epoch, bool) and epoch > 1:
+        if retained_links != original_links:
+            errors.append(
+                f"{label} reopened pass must retain existing global links "
+                "exactly and in order"
+            )
+    return local_links
+
+
 def discovery_anchor_orders(
     assigned_units: dict[str, dict[str, str]],
     assigned_assets: dict[str, dict[str, str]],
@@ -846,18 +892,26 @@ def _validate_worker_output(
                 f"reading update {unit_id} secondary_roles",
                 errors,
             )
-            for candidate_id in parse_string_array(
+            for candidate_id in reopened_local_links(
                 row.get("candidate_ids"),
-                f"reading update {unit_id} candidate_ids",
-                errors,
+                original.get("candidate_ids"),
+                epoch=bundle_epoch,
+                local_pattern=WORKER_CANDIDATE_RE,
+                global_pattern=GLOBAL_CANDIDATE_RE,
+                label=f"reading update {unit_id} candidate_ids",
+                errors=errors,
             ):
                 candidate_sources_from_reading.setdefault(candidate_id, set()).add(
                     unit_id
                 )
-            for route_id in parse_string_array(
+            for route_id in reopened_local_links(
                 row.get("route_ids"),
-                f"reading update {unit_id} route_ids",
-                errors,
+                original.get("route_ids"),
+                epoch=bundle_epoch,
+                local_pattern=WORKER_ROUTE_RE,
+                global_pattern=GLOBAL_ROUTE_RE,
+                label=f"reading update {unit_id} route_ids",
+                errors=errors,
             ):
                 route_sources_from_reading.setdefault(route_id, set()).add(unit_id)
         if seen != set(assigned_units):
@@ -895,18 +949,26 @@ def _validate_worker_output(
                 errors.append(f"asset update reviewer differs from worker: {asset_id}")
             if not row.get("visual_role") or not row.get("evidence_statement"):
                 errors.append(f"asset update lacks visual evidence fields: {asset_id}")
-            for candidate_id in parse_string_array(
+            for candidate_id in reopened_local_links(
                 row.get("candidate_ids"),
-                f"asset update {asset_id} candidate_ids",
-                errors,
+                original.get("candidate_ids"),
+                epoch=bundle_epoch,
+                local_pattern=WORKER_CANDIDATE_RE,
+                global_pattern=GLOBAL_CANDIDATE_RE,
+                label=f"asset update {asset_id} candidate_ids",
+                errors=errors,
             ):
                 candidate_images_from_assets.setdefault(candidate_id, set()).add(
                     row.get("physical_path", "")
                 )
-            for route_id in parse_string_array(
+            for route_id in reopened_local_links(
                 row.get("route_ids"),
-                f"asset update {asset_id} route_ids",
-                errors,
+                original.get("route_ids"),
+                epoch=bundle_epoch,
+                local_pattern=WORKER_ROUTE_RE,
+                global_pattern=GLOBAL_ROUTE_RE,
+                label=f"asset update {asset_id} route_ids",
+                errors=errors,
             ):
                 route_sources_from_assets.setdefault(route_id, set()).add(asset_id)
         if seen != set(assigned_assets):

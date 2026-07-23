@@ -94,9 +94,12 @@ The candidate lifecycle is now append-only:
   within-anchor ordinal so allocation order and discovery stage can be
   mechanically rechecked; epoch 1 is the initial traversal and each formally
   reopened blind pass increments the epoch before allocating further IDs;
-- a split tombstones the parent and allocates new children;
-- a merge requires explicit alias/co-reference or proved duplicate capture,
-  keeps the earliest ID active, and retains redirect provenance;
+- a split tombstones the parent and allocates new children; every `SPLIT_INTO`
+  edge carries a typed distinction proof plus explicit before/after rationale;
+- a merge requires a typed alias, co-reference, or proved-duplicate identity
+  proof backed only by `DIRECT_IDENTITY` evidence; generic mechanics evidence
+  cannot establish identity; the merge keeps the earliest ID active and
+  retains redirect provenance;
 - every tombstone records an exact old-evidence-to-target-evidence
   reassignment map; lineage may have multiple later supersession layers but
   must remain acyclic, preserve unit/image/route coverage, and terminate in

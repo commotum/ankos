@@ -65,6 +65,8 @@ class MergePlan:
     bundle: Path
     goal_dir: Path
     worker_id: str
+    stage: int
+    discovery_epoch: int
     source_paths: tuple[str, ...]
     candidate_ids: dict[str, str]
     route_ids: dict[str, str]
@@ -82,6 +84,8 @@ class MergePlan:
             "worker_id": self.worker_id,
             "bundle": str(self.bundle),
             "goal_dir": str(self.goal_dir),
+            "stage": self.stage,
+            "discovery_epoch": self.discovery_epoch,
             "source_paths": list(self.source_paths),
             "mappings": {
                 "candidates": self.candidate_ids,
@@ -174,9 +178,28 @@ def _map_csv_id_array(
     value: object,
     mapping: dict[str, str],
     label: str,
+    *,
+    original_value: object,
+    reopened: bool,
 ) -> str:
     values = _json_array(value, label)
-    mapped = [_map_id(item, mapping, label) for item in values]
+    original_values = _json_array(original_value, f"{label} authoritative input")
+    retained = [item for item in values if item not in mapping]
+    if reopened:
+        if retained != original_values:
+            raise MergeError(
+                f"{label} reopened pass must retain existing global links "
+                "exactly and in order"
+            )
+    elif retained:
+        raise MergeError(
+            f"{label} initial pass contains nonlocal or pre-existing links: "
+            f"{retained}"
+        )
+    mapped = [
+        mapping[item] if item in mapping else item
+        for item in values
+    ]
     return json.dumps(mapped, ensure_ascii=False, separators=(",", ":"))
 
 
@@ -456,7 +479,9 @@ def _replace_rows(
     candidate_ids: dict[str, str],
     route_ids: dict[str, str],
     label: str,
+    reopened: bool,
 ) -> list[dict[str, str]]:
+    original_by_id = {row[id_field]: row for row in rows}
     by_id: dict[str, dict[str, str]] = {}
     for update in updates:
         identifier = update.get(id_field)
@@ -467,15 +492,20 @@ def _replace_rows(
         if identifier not in assigned_ids:
             raise MergeError(f"{label} update is outside the bundle: {identifier}")
         mapped = dict(update)
+        original = original_by_id[identifier]
         mapped["candidate_ids"] = _map_csv_id_array(
             update.get("candidate_ids"),
             candidate_ids,
             f"{label} {identifier}.candidate_ids",
+            original_value=original.get("candidate_ids"),
+            reopened=reopened,
         )
         mapped["route_ids"] = _map_csv_id_array(
             update.get("route_ids"),
             route_ids,
             f"{label} {identifier}.route_ids",
+            original_value=original.get("route_ids"),
+            reopened=reopened,
         )
         by_id[identifier] = mapped
     if set(by_id) != assigned_ids:
@@ -537,6 +567,37 @@ def _snapshot(goal_dir: Path) -> tuple[dict[str, bytes], dict[str, int]]:
     return payloads, modes
 
 
+def _validate_stage_prerequisites(
+    *,
+    stage: int,
+    manifest: dict[str, Any],
+    units: list[dict[str, Any]],
+    reading: list[dict[str, str]],
+    candidates: list[dict[str, Any]],
+    routes: list[dict[str, str]],
+    assets: list[dict[str, str]],
+    search: dict[str, Any],
+) -> None:
+    prerequisite_stages = set(range(4, stage))
+    if not prerequisite_stages:
+        return
+    errors = validate_audit.validate_objects(
+        manifest,
+        units,
+        reading,
+        candidates,
+        routes,
+        assets,
+        search,
+        require_stages=prerequisite_stages,
+    )
+    if errors:
+        raise MergeError(
+            f"stage {stage} merge prerequisites failed:\n- "
+            + "\n- ".join(errors)
+        )
+
+
 def prepare_merge(
     bundle: Path,
     *,
@@ -586,6 +647,21 @@ def prepare_merge(
         raise MergeError("global manifest/search root is not an object")
     if not isinstance(bundle_manifest, dict):
         raise MergeError("bundle manifest is not an object")
+    stage = bundle_manifest.get("stage")
+    discovery_epoch = bundle_manifest.get("discovery_epoch")
+    if (
+        not isinstance(stage, int)
+        or isinstance(stage, bool)
+        or not 4 <= stage <= 17
+    ):
+        raise MergeError("bundle manifest has an invalid stage")
+    if (
+        not isinstance(discovery_epoch, int)
+        or isinstance(discovery_epoch, bool)
+        or discovery_epoch < 1
+    ):
+        raise MergeError("bundle manifest has an invalid discovery_epoch")
+    reopened = discovery_epoch > 1
 
     source_paths_value = bundle_manifest.get("source_paths")
     if not isinstance(source_paths_value, list) or not all(
@@ -616,16 +692,30 @@ def prepare_merge(
     if bundle_assets != current_asset_projection:
         raise MergeError("stale asset-input projection differs from global rows")
 
+    expected_reading_status = "REVIEWED" if reopened else "PENDING"
+    expected_asset_status = "SCREENED" if reopened else "PENDING"
     for row in bundle_reading:
-        if row.get("review_status") != "PENDING":
+        if row.get("review_status") != expected_reading_status:
             raise MergeError(
-                f"reading merge collision: {row.get('source_unit_id')} is not PENDING"
+                f"reading merge collision: {row.get('source_unit_id')} is not "
+                f"{expected_reading_status} for discovery epoch {discovery_epoch}"
             )
     for row in bundle_assets:
-        if row.get("inspection_status") != "PENDING":
+        if row.get("inspection_status") != expected_asset_status:
             raise MergeError(
-                f"asset merge collision: {row.get('asset_id')} is not PENDING"
+                f"asset merge collision: {row.get('asset_id')} is not "
+                f"{expected_asset_status} for discovery epoch {discovery_epoch}"
             )
+    _validate_stage_prerequisites(
+        stage=stage,
+        manifest=manifest,
+        units=units,
+        reading=reading,
+        candidates=candidates,
+        routes=routes,
+        assets=assets,
+        search=search,
+    )
 
     output = _load_output(bundle_bytes["output"])
     forbidden_paths = validate_audit.forbidden_keys(output)
@@ -763,6 +853,7 @@ def prepare_merge(
         candidate_ids=candidate_mapping,
         route_ids=route_mapping,
         label="reading",
+        reopened=reopened,
     )
     proposed_assets = _replace_rows(
         assets,
@@ -772,6 +863,7 @@ def prepare_merge(
         candidate_ids=candidate_mapping,
         route_ids=route_mapping,
         label="asset",
+        reopened=reopened,
     )
     proposed_candidates = candidates + mapped_candidates
     proposed_routes = routes + mapped_routes
@@ -820,6 +912,8 @@ def prepare_merge(
         bundle=bundle,
         goal_dir=goal_dir,
         worker_id=str(bundle_manifest.get("worker_id")),
+        stage=stage,
+        discovery_epoch=discovery_epoch,
         source_paths=source_paths,
         candidate_ids=candidate_mapping,
         route_ids=route_mapping,
